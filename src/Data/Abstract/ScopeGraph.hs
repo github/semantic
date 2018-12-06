@@ -163,6 +163,15 @@ lookupScopePath declaration currentAddress g = go lowerBound currentAddress id
         <|> traverseEdges' Superclass <|> traverseEdges' Import <|> traverseEdges' Export <|> traverseEdges' Lexical
       where traverseEdges' edge = linksOfScope address g >>= Map.lookup edge >>= traverseEdges path (go (Set.insert address visited)) edge
 
+foldrGraph :: Ord scopeAddress => (scopeAddress -> (EdgeLabel -> Maybe a) -> Maybe a) -> scopeAddress -> ScopeGraph scopeAddress -> Maybe a
+foldrGraph combine address graph = go lowerBound address
+  where go visited address
+          | address `Set.member` visited = Nothing
+          | otherwise                    = do
+            edges <- linksOfScope address graph
+            let visited' = Set.insert address visited
+            combine address (flip Map.lookup edges >=> foldMapA (go visited'))
+
 pathToDeclaration :: Ord scopeAddress => Declaration -> scopeAddress -> ScopeGraph scopeAddress -> Maybe (Path scopeAddress)
 pathToDeclaration decl address g = DPath decl . snd <$> lookupDeclaration (unDeclaration decl) address g
 
