@@ -156,7 +156,6 @@ type Syntax = '[
   , TypeScript.Syntax.LiteralType
   , TypeScript.Syntax.Union
   , TypeScript.Syntax.Intersection
-  , TypeScript.Syntax.Module
   , TypeScript.Syntax.InternalModule
   , TypeScript.Syntax.FunctionType
   , TypeScript.Syntax.Tuple
