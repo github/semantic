@@ -1,5 +1,6 @@
 module Analysis.TypeScript.Spec (spec) where
 
+import           Control.Abstract.ScopeGraph
 import           Control.Abstract.Value as Value
 import           Control.Arrow ((&&&))
 import           Data.Abstract.Evaluatable
@@ -80,12 +81,8 @@ spec config = parallel $ do
         other -> expectationFailure (show other)
 
     it "fails exporting symbols not defined in the module" $ do
-      (scopeGraph, (heap, res)) <- evaluate ["bad-export.ts", "pip.ts", "a.ts", "foo.ts"]
-      case ModuleTable.lookup "bad-export.ts" <$> res of
-        Right (Just (Module _ (scopeAndFrame, valueRef) :| [])) -> do
-          SpecHelpers.lookupDeclaration "pip" scopeAndFrame heap scopeGraph `shouldBe` Nothing
-          valueRef `shouldBe` Rval Unit
-        other -> expectationFailure (show other)
+      (_, (_, res)) <- evaluate ["bad-export.ts", "pip.ts", "a.ts", "foo.ts"]
+      res `shouldBe` Left (SomeError (inject @(BaseError (ScopeError Precise)) (BaseError (ModuleInfo "bad-export.ts") (Span (Pos 2 1) (Pos 2 28)) ImportReferenceError)))
 
     it "evaluates early return statements" $ do
       (scopeGraph, (heap, res)) <- evaluate ["early-return.ts"]
