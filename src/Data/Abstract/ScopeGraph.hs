@@ -72,16 +72,10 @@ data Path scope
   | DPath Declaration Position
   -- | Construct an edge from a scope to another declaration path.
   | EPath EdgeLabel scope (Path scope)
+  deriving (Eq, Functor, Generic, NFData, Ord, Show)
 
 instance AbstractHole (Path scope) where
   hole = Hole
-
-deriving instance Eq scope => Eq (Path scope)
-deriving instance Show scope => Show (Path scope)
-deriving instance Ord scope => Ord (Path scope)
-deriving instance Generic (Path scope)
-deriving instance NFData scope => NFData (Path scope)
-deriving instance Functor Path
 
 -- Returns the declaration of a path.
 pathDeclaration :: Path scope -> Declaration
