@@ -74,18 +74,16 @@ getSlot :: Ord address => Slot address -> Heap address address value -> Maybe (S
 getSlot Slot{..} = (IntMap.lookup (unPosition position) =<<) . frameSlots frameAddress
 
 setSlot :: Ord address => Slot address -> Set value -> Heap scope address value -> Heap scope address value
-setSlot Slot{..} value h@Heap{} =
-    case frameLookup frameAddress h of
-      Just frame -> let slotMap = slots frame in
-        h { heap = Map.insert frameAddress (frame { slots = IntMap.insert (unPosition position) value slotMap }) (heap h) }
-      Nothing -> h
+setSlot Slot{..} value h@Heap{} = case frameLookup frameAddress h of
+  Just frame -> let slotMap = slots frame in
+    h { heap = Map.insert frameAddress (frame { slots = IntMap.insert (unPosition position) value slotMap }) (heap h) }
+  Nothing -> h
 
 deleteSlot :: Ord address => Slot address -> Heap scope address value -> Heap scope address value
-deleteSlot Slot{..} h@Heap{} =
-    case frameLookup frameAddress h of
-      Just frame -> let slotMap = slots frame in
-        h { heap = Map.insert frameAddress (frame { slots = IntMap.delete (unPosition position) slotMap }) (heap h) }
-      Nothing -> h
+deleteSlot Slot{..} h@Heap{} = case frameLookup frameAddress h of
+  Just frame -> let slotMap = slots frame in
+    h { heap = Map.insert frameAddress (frame { slots = IntMap.delete (unPosition position) slotMap }) (heap h) }
+  Nothing -> h
 
 lookupDeclaration :: Ord address => Declaration -> (address, address) -> ScopeGraph address -> Heap address address value -> Maybe (Slot address)
 lookupDeclaration Declaration{..} (currentScope, currentFrame) scopeGraph heap = do
@@ -116,10 +114,9 @@ insertFrame :: Ord address => address -> Frame scope address value -> Heap scope
 insertFrame address frame h@Heap{..} = h { heap = Map.insert address frame heap }
 
 fillFrame :: Ord address => address -> IntMap (Set value) -> Heap scope address value -> Heap scope address value
-fillFrame address slots heap =
-  case frameLookup address heap of
-    Just frame -> insertFrame address (frame { slots = slots }) heap
-    Nothing    -> heap
+fillFrame address slots heap = case frameLookup address heap of
+  Just frame -> insertFrame address (frame { slots = slots }) heap
+  Nothing    -> heap
 
 -- | Look up the cell of values for an address in a 'Heap', if any.
 heapLookup :: (Ord address, Ord value) => address -> Heap address address value -> Maybe (Set value)
