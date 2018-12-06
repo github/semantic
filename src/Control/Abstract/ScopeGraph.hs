@@ -247,11 +247,13 @@ deriving instance Eq (ScopeError address return)
 deriving instance Show (ScopeError address return)
 instance Show address => Show1 (ScopeError address) where liftShowsPrec _ _ = showsPrec
 instance Eq1 (ScopeError address) where
-  liftEq _ (ScopeError m1 n1) (ScopeError m2 n2)           = m1 == m2 && n1 == n2
-  liftEq _ CurrentScopeError CurrentScopeError             = True
-  liftEq _ LookupScopeError LookupScopeError               = True
-  liftEq _ (LookupPathError decl1) (LookupPathError decl2) = decl1 == decl2
-  liftEq _ _ _                                             = False
+  liftEq _ (ScopeError m1 n1)                   (ScopeError m2 n2)                  = m1 == m2 && n1 == n2
+  liftEq _ LookupScopeError                     LookupScopeError                    = True
+  liftEq _ ImportReferenceError                 ImportReferenceError                = True
+  liftEq _ (LookupPathError decl1)              (LookupPathError decl2)             = decl1 == decl2
+  liftEq _ (LookupDeclarationScopeError decl1)  (LookupDeclarationScopeError decl2) = decl1 ==  decl2
+  liftEq _ CurrentScopeError                    CurrentScopeError                   = True
+  liftEq _ _                                    _                                   = False
 
 alloc :: (Member (Allocator address) sig, Carrier sig m) => Name -> Evaluator term address value m address
 alloc = send . flip Alloc ret
