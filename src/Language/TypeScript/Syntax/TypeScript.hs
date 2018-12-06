@@ -556,14 +556,35 @@ instance Eq1 Module where liftEq = genericLiftEq
 instance Ord1 Module where liftCompare = genericLiftCompare
 instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 
-instance Evaluatable Module where
-  eval eval Module{..} = do
-    name <- maybeM (throwEvalError NoNameError) (declaredName moduleIdentifier)
+declareModule :: ( AbstractValue term address value m
+                 , Carrier sig m
+                 , Declarations term
+                 , Member (Allocator address) sig
+                 , Member (Deref value) sig
+                 , Member (Reader (CurrentFrame address)) sig
+                 , Member (Reader (CurrentScope address)) sig
+                 , Member (Reader Span) sig
+                 , Member (Resumable (BaseError (EvalError address value))) sig
+                 , Member (State (Heap address address value)) sig
+                 , Member (State (ScopeGraph address)) sig
+                 , Member Fresh sig
+                 , Member (Reader ModuleInfo) sig
+                 , Member (Resumable (BaseError (AddressError address value))) sig
+                 , Member (Resumable (BaseError (HeapError address))) sig
+                 , Member (Resumable (BaseError (ScopeError address))) sig
+                 , Ord address
+                 )
+                => (term -> Evaluator term address value m (ValueRef address value))
+                -> term
+                -> [term]
+                -> Evaluator term address value m (ValueRef address value)
+declareModule eval identifier statements = do
+    name <- maybeM (throwEvalError NoNameError) (declaredName identifier)
     span <- ask @Span
     currentScope' <- currentScope
 
     let declaration = Declaration name
-        moduleBody = maybe (rvalBox unit) (runApp . foldMap1 (App . eval)) (nonEmpty moduleStatements)
+        moduleBody = maybe (rvalBox unit) (runApp . foldMap1 (App . eval)) (nonEmpty statements)
     maybeSlot <- maybeLookupDeclaration declaration
 
     case maybeSlot of
@@ -589,6 +610,9 @@ instance Evaluatable Module where
         assign moduleSlot =<< klass (Declaration name) childFrame
 
         rvalBox unit
+
+instance Evaluatable Module where
+  eval eval Module{..} = declareModule eval moduleIdentifier moduleStatements
 
 instance Declarations1 Module where
   liftDeclaredName declaredName = declaredName . moduleIdentifier
@@ -601,38 +625,8 @@ instance Ord1 InternalModule where liftCompare = genericLiftCompare
 instance Show1 InternalModule where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable InternalModule where
-  eval eval InternalModule{..} = do
-    name <- maybeM (throwEvalError NoNameError) (declaredName internalModuleIdentifier)
-    span <- ask @Span
-    currentScope' <- currentScope
-
-    let declaration = Declaration name
-        moduleBody = maybe (rvalBox unit) (runApp . foldMap1 (App . eval)) (nonEmpty internalModuleStatements)
-    maybeSlot <- maybeLookupDeclaration declaration
-
-    case maybeSlot of
-      Just slot -> do
-        moduleVal <- deref slot
-        maybeFrame <- scopedEnvironment moduleVal
-        case maybeFrame of
-          Just moduleFrame -> do
-            withScopeAndFrame moduleFrame moduleBody
-          Nothing -> throwEvalError (DerefError moduleVal)
-      Nothing -> do
-        let edges = Map.singleton Lexical [ currentScope' ]
-        childScope <- newScope edges
-        declare (Declaration name) span (Just childScope)
-
-        currentFrame' <- currentFrame
-        let frameEdges = Map.singleton Lexical (Map.singleton currentScope' currentFrame')
-        childFrame <- newFrame childScope frameEdges
-
-        withScopeAndFrame childFrame (void moduleBody)
-
-        moduleSlot <- lookupDeclaration (Declaration name)
-        assign moduleSlot =<< klass (Declaration name) childFrame
-
-        rvalBox unit
+  eval eval InternalModule{..} =
+    declareModule eval internalModuleIdentifier internalModuleStatements
 
 instance Declarations a => Declarations (InternalModule a) where
   declaredName InternalModule{..} = declaredName internalModuleIdentifier

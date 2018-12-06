@@ -81,21 +81,19 @@ instance ( FreeVariables term
          )
       => Carrier (Abstract.Function term address (Value term address) :+: sig) (Abstract.FunctionC term address (Value term address) (Eff m)) where
   ret = FunctionC . const . ret
-  eff op = FunctionC (\ eval -> handleSum (eff . handleReader eval runFunctionC) (\case
+  eff op =
+    let closure maybeName params body scope = do
+          packageInfo <- currentPackage
+          moduleInfo <- currentModule
+          Closure packageInfo moduleInfo maybeName params body scope <$> currentFrame
+
+    in FunctionC (\ eval -> handleSum (eff . handleReader eval runFunctionC) (\case
     Abstract.Function name params body scope k -> runEvaluator $ do
-      packageInfo <- currentPackage
-      moduleInfo <- currentModule
-
-      currentFrame' <- currentFrame
-      let closure = Closure packageInfo moduleInfo (Just name) params (Right body) scope currentFrame'
-      Evaluator $ runFunctionC (k (Rval closure)) eval
+      val <- closure (Just name) params (Right body) scope
+      Evaluator $ runFunctionC (k $ Rval val) eval
     Abstract.BuiltIn associatedScope builtIn k -> runEvaluator $ do
-      packageInfo <- currentPackage
-      moduleInfo <- currentModule
-
-      currentFrame' <- currentFrame
-      let closure = Closure packageInfo moduleInfo Nothing [] (Left builtIn) associatedScope currentFrame'
-      Evaluator $ runFunctionC (k closure) eval
+      val <- closure Nothing [] (Left builtIn) associatedScope
+      Evaluator $ runFunctionC (k val) eval
     Abstract.Call op params k -> runEvaluator $ do
       boxed <- case op of
         Closure _ _ _ _ (Left Print) _ _ -> traverse (trace . show) params *> rvalBox Unit
