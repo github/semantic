@@ -61,15 +61,10 @@ newtype Position = Position { unPosition :: Int }
   deriving (Eq, Show, Ord, Generic, NFData)
 
 newtype ScopeGraph scope = ScopeGraph { unScopeGraph :: Map scope (Scope scope) }
+  deriving (Eq, Generic, NFData, Ord, Show)
 
 instance Ord scope => Lower (ScopeGraph scope) where
   lowerBound = ScopeGraph mempty
-
-deriving instance Eq address => Eq (ScopeGraph address)
-deriving instance Show address => Show (ScopeGraph address)
-deriving instance Ord address => Ord (ScopeGraph address)
-deriving instance Generic (ScopeGraph address)
-deriving instance NFData scope => NFData (ScopeGraph scope)
 
 data Path scope where
   -- | Construct a direct path to a declaration.
