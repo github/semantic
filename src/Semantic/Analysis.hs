@@ -15,13 +15,14 @@ import Prologue
 import qualified Data.Map.Strict as Map
 
 type ModuleC address value m
-  = ErrorC (LoopControl address value)          (Eff
-  ( ErrorC (Return address value)               (Eff
-  ( ReaderC (address, address)          (Eff
-  ( DerefC address value                (Eff
-  ( AllocatorC address                  (Eff
-  ( ReaderC ModuleInfo                  (Eff
-    m)))))))))))
+  = ErrorC (LoopControl address value) (Eff
+  ( ErrorC (Return address value)      (Eff
+  ( ReaderC (CurrentScope address)     (Eff
+  ( ReaderC (CurrentFrame address)     (Eff
+  ( DerefC address value               (Eff
+  ( AllocatorC address                 (Eff
+  ( ReaderC ModuleInfo                 (Eff
+    m)))))))))))))
 
 type ValueC term address value m
   = FunctionC term address value                                  (Eff
@@ -64,7 +65,8 @@ evaluate :: ( AbstractValue term address value (ValueC term address value inner)
             , Member (State (ScopeGraph address)) innerSig
             , Member (State (Heap address address value)) outerSig
             , Member (State (ScopeGraph address)) outerSig
-            , Member (Reader (address, address)) innerSig
+            , Member (Reader (CurrentFrame address)) innerSig
+            , Member (Reader (CurrentScope address)) innerSig
             , Member (Resumable (BaseError (HeapError address))) innerSig
             , Member (Resumable (BaseError (ScopeError address))) innerSig
             , Member Trace innerSig
@@ -99,7 +101,8 @@ evaluate lang perModule runTerm modules = do
           pure ((scopeAddress, frameAddress), val)
           where runInModule scopeAddress frameAddress
                   = runDeref
-                  . raiseHandler (runReader (scopeAddress, frameAddress))
+                  . raiseHandler (runReader (CurrentFrame frameAddress))
+                  . raiseHandler (runReader (CurrentScope scopeAddress))
                   . runReturn
                   . runLoopControl
 
@@ -132,7 +135,8 @@ evalTerm :: ( Carrier sig m
             , Member (Resumable (BaseError ResolutionError)) sig
             , Member (State (Heap address address value)) sig
             , Member (State (ScopeGraph address)) sig
-            , Member (Reader (address, address)) sig
+            , Member (Reader (CurrentFrame address)) sig
+            , Member (Reader (CurrentScope address)) sig
             , Member (State Span) sig
             , Member (While address value) sig
             , Member Fresh sig

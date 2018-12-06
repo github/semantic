@@ -144,13 +144,14 @@ instance Evaluatable Load where
 
 doLoad :: ( Member (Boolean value) sig
           , Member (Modules address value) sig
+          , Member (Reader (CurrentFrame address)) sig
+          , Member (Reader (CurrentScope address)) sig
           , Member (Reader ModuleInfo) sig
           , Member (Reader Span) sig
           , Member (Resumable (BaseError ResolutionError)) sig
           , Member (State (ScopeGraph.ScopeGraph address)) sig
           , Member (State (Heap address address value)) sig
           , Member (Resumable (BaseError (HeapError address))) sig
-          , Member (Reader (address, address)) sig
           , Member Trace sig
           , Ord address
           , Carrier sig m

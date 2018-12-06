@@ -23,7 +23,8 @@ instance ( Member (Allocator address) sig
          , Member (Deref Abstract) sig
          , Member (Error (Return address Abstract)) sig
          , Member Fresh sig
-         , Member (Reader (address, address)) sig
+         , Member (Reader (CurrentFrame address)) sig
+         , Member (Reader (CurrentScope address)) sig
          , Member (Reader ModuleInfo) sig
          , Member (Reader Span) sig
          , Member (State Span) sig
