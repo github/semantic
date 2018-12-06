@@ -27,7 +27,7 @@ instance (Eq1 exc) => Eq1 (BaseError exc) where
   liftEq f (BaseError _ _ exc1) (BaseError _ _ exc2) = liftEq f exc1 exc2
 
 instance Show1 exc => Show1 (BaseError exc) where
-  liftShowsPrec sl sp d (BaseError _ _ exc) = liftShowsPrec sl sp d exc
+  liftShowsPrec sl sp d (BaseError info span exc) = showParen (d > 10) $ showString "BaseError" . showChar ' ' . showsPrec 11 info . showChar ' ' . showsPrec 11 span . showChar ' ' . liftShowsPrec sl sp 11 exc
 
 instance (NFData1 exc, NFData resume) => NFData (BaseError exc resume) where
   rnf = liftRnf rnf
