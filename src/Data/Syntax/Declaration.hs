@@ -31,12 +31,8 @@ instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Function where
   eval _ Function{..} = do
     name <- maybeM (throwEvalError NoNameError) (declaredName functionName)
-    -- TODO: Should we declare the name of the function within `function`?
     span <- ask @Span
-    currentScope' <- currentScope
-    let lexicalEdges = Map.singleton Lexical [ currentScope' ]
-    associatedScope <- newScope lexicalEdges
-    declare (Declaration name) span (Just associatedScope)
+    associatedScope <- declareFunction name span
 
     params <- withScope associatedScope . for functionParameters $ \paramNode -> do
       param <- maybeM (throwEvalError NoNameError) (declaredName paramNode)
@@ -45,6 +41,23 @@ instance Evaluatable Function where
     addr <- lookupDeclaration (Declaration name)
     v <- function name params functionBody associatedScope
     v <$ (value v >>= assign addr)
+
+declareFunction :: ( Carrier sig m
+                   , Member (State (ScopeGraph address)) sig
+                   , Member (Allocator address) sig
+                   , Member (Reader (address, address)) sig
+                   , Member Fresh sig
+                   , Ord address
+                   )
+                => Name
+                -> Span
+                -> Evaluator term address value m address
+declareFunction name span = do
+  currentScope' <- currentScope
+  let lexicalEdges = Map.singleton Lexical [ currentScope' ]
+  associatedScope <- newScope lexicalEdges
+  declare (Declaration name) span (Just associatedScope)
+  pure associatedScope
 
 instance Tokenize Function where
   tokenize Function{..} = within' Scope.Function $ do
@@ -74,12 +87,8 @@ instance Diffable Method where
 instance Evaluatable Method where
   eval _ Method{..} = do
     name <- maybeM (throwEvalError NoNameError) (declaredName methodName)
-    -- TODO: Should we declare the name of the function within `function`?
     span <- ask @Span
-    currentScope' <- currentScope
-    let lexicalEdges = Map.singleton Lexical [ currentScope' ]
-    associatedScope <- newScope lexicalEdges
-    declare (Declaration name) span (Just associatedScope)
+    associatedScope <- declareFunction name span
 
     params <- withScope associatedScope $ do
       let self = Name.name "__self"
