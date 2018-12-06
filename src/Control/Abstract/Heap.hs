@@ -1,4 +1,5 @@
-{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, KindSignatures, RankNTypes, TypeOperators, UndecidableInstances, ScopedTypeVariables #-}
+{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, KindSignatures, RankNTypes, ScopedTypeVariables, TypeOperators,
+             UndecidableInstances #-}
 module Control.Abstract.Heap
 ( Heap
 , HeapError(..)
@@ -40,24 +41,24 @@ module Control.Abstract.Heap
 , scopeLookup
 ) where
 
-import Control.Abstract.Context (withCurrentCallStack)
-import Control.Abstract.Evaluator
-import Control.Abstract.Roots
-import Control.Applicative (Alternative)
-import Control.Effect.Carrier
-import Data.Abstract.BaseError
+import           Control.Abstract.Context (withCurrentCallStack)
+import           Control.Abstract.Evaluator
+import           Control.Abstract.Roots
+import           Control.Abstract.ScopeGraph hiding (ScopeError (..))
+import           Control.Abstract.ScopeGraph (ScopeError)
+import           Control.Applicative (Alternative)
+import           Control.Effect.Carrier
+import           Data.Abstract.BaseError
+import           Data.Abstract.Heap (Heap, Position (..))
 import qualified Data.Abstract.Heap as Heap
-import Data.Abstract.ScopeGraph (Path(..), putDeclarationScopeAtPosition)
-import Data.Abstract.Heap (Heap, Position(..))
-import Control.Abstract.ScopeGraph hiding (ScopeError(..))
-import Control.Abstract.ScopeGraph (ScopeError)
-import Data.Abstract.Live
-import Data.Abstract.Module (ModuleInfo)
-import Data.Abstract.Name
-import Data.Span (Span, emptySpan)
+import           Data.Abstract.Live
+import           Data.Abstract.Module (ModuleInfo)
+import           Data.Abstract.Name
+import           Data.Abstract.Ref
+import           Data.Abstract.ScopeGraph (Path (..), putDeclarationScopeAtPosition)
 import qualified Data.Map.Strict as Map
-import Prologue
-import Data.Abstract.Ref
+import           Data.Span (Span, emptySpan)
+import           Prologue
 
 
 -- | Evaluates an action locally the scope and frame of the given frame address.
@@ -430,12 +431,12 @@ deriving instance Show address => Show (HeapError address resume)
 instance Show address => Show1 (HeapError address) where
   liftShowsPrec _ _ = showsPrec
 instance Eq address => Eq1 (HeapError address) where
-  liftEq _ CurrentFrameError CurrentFrameError = True
+  liftEq _ CurrentFrameError CurrentFrameError           = True
   liftEq _ (LookupAddressError a) (LookupAddressError b) = a == b
-  liftEq _ (LookupLinksError a) (LookupLinksError b) = a == b
-  liftEq _ (LookupLinkError a) (LookupLinkError b) = a == b
-  liftEq _ (LookupFrameError a) (LookupFrameError b) = a == b
-  liftEq _ _ _ = False
+  liftEq _ (LookupLinksError a) (LookupLinksError b)     = a == b
+  liftEq _ (LookupLinkError a) (LookupLinkError b)       = a == b
+  liftEq _ (LookupFrameError a) (LookupFrameError b)     = a == b
+  liftEq _ _ _                                           = False
 
 throwHeapError  :: ( Member (Resumable (BaseError (HeapError address))) sig
                    , Member (Reader ModuleInfo) sig
@@ -463,7 +464,7 @@ data AddressError address value resume where
 
 instance (NFData address) => NFData1 (AddressError address value) where
   liftRnf _ x = case x of
-    UnallocatedAddress a -> rnf a
+    UnallocatedAddress a   -> rnf a
     UninitializedAddress a -> rnf a
 
 instance (NFData address, NFData resume) => NFData (AddressError address value resume) where
