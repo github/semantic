@@ -14,7 +14,7 @@ import Control.Abstract hiding (Return, Break, Continue, While)
 import Data.Abstract.Evaluatable as Abstract
 import Data.JSON.Fields
 import Diffing.Algorithm
-import Reprinting.Tokenize
+import Reprinting.Tokenize (Tokenize (..), imperative, within', yield)
 import qualified Data.Reprinting.Token as Token
 import qualified Data.Reprinting.Scope as Scope
 
@@ -70,9 +70,9 @@ instance Evaluatable If where
 instance Tokenize If where
   tokenize If{..} = within' Scope.If $ do
     ifCondition
-    yield Token.Then
+    yield (Token.Flow Token.Then)
     ifThenBody
-    yield Token.Else
+    yield (Token.Flow Token.Else)
     ifElseBody
 
 -- | Else statement. The else condition is any term, that upon successful completion, continues evaluation to the elseBody, e.g. `for ... else` in Python.
@@ -85,6 +85,9 @@ instance Show1 Else where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Else
 instance Evaluatable Else
+
+instance Tokenize Else where
+  tokenize Else{..} = within' Scope.If (yield (Token.Flow Token.Else) *> elseCondition *> yield Token.Sep *> elseBody)
 
 -- TODO: Alternative definition would flatten if/else if/else chains: data If a = If ![(a, a)] !(Maybe a)
 
@@ -111,6 +114,12 @@ instance Show1 Match where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Implement Eval instance for Match
 instance Evaluatable Match
 
+instance Tokenize Match where
+  tokenize Match{..} = do
+    yield (Token.Flow Token.Switch)
+    matchSubject
+    yield (Token.Flow Token.In) -- This may need further refinement
+    matchPatterns
 
 -- | A pattern in a pattern-matching or computed jump control-flow statement, like 'case' in C or JavaScript, 'when' in Ruby, or the left-hand side of '->' in the body of Haskell 'case' expressions.
 data Pattern a = Pattern { value :: !a, patternBody :: !a }
@@ -123,6 +132,8 @@ instance Show1 Pattern where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Implement Eval instance for Pattern
 instance Evaluatable Pattern
 
+instance Tokenize Pattern where
+  tokenize Pattern{..} = within' Scope.Case (value *> patternBody)
 
 -- | A let statement or local binding, like 'a as b' or 'let a = b'.
 data Let a  = Let { letVariable :: !a, letValue :: !a, letBody :: !a }
@@ -182,6 +193,10 @@ instance Evaluatable Assignment where
             pure ()
         assign lhsSlot =<< Abstract.value rhs
         pure (LvalMember lhsSlot)
+
+instance Tokenize Assignment where
+  -- Should we be using 'assignmentContext' in here?
+  tokenize Assignment{..} = assignmentTarget *> yield Token.Assign <* assignmentValue
 
 -- | Post increment operator (e.g. 1++ in Go, or i++ in C).
 newtype PostIncrement a = PostIncrement { value :: a }
@@ -255,6 +270,9 @@ instance Show1 Yield where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Implement Eval instance for Yield
 instance Evaluatable Yield
 
+instance Tokenize Yield where
+  tokenize (Yield y) = yield (Token.Flow Token.Yield) *> y
+
 
 newtype Break a = Break { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
@@ -266,6 +284,9 @@ instance Show1 Break where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Break where
   eval eval (Break x) = eval x >>= throwBreak
 
+instance Tokenize Break where
+  tokenize (Break b) = yield (Token.Flow Token.Break) *> b
+
 newtype Continue a = Continue { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
@@ -275,6 +296,9 @@ instance Show1 Continue where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Continue where
   eval eval (Continue x) = eval x >>= throwContinue
+
+instance Tokenize Continue where
+  tokenize (Continue c) = yield (Token.Flow Token.Continue) *> c
 
 newtype Retry a = Retry { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
@@ -286,6 +310,8 @@ instance Show1 Retry where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Implement Eval instance for Retry
 instance Evaluatable Retry
 
+instance Tokenize Retry where
+  tokenize (Retry r) = yield (Token.Flow Token.Retry) *> r
 
 newtype NoOp a = NoOp { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
@@ -320,6 +346,13 @@ instance Show1 ForEach where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Implement Eval instance for ForEach
 instance Evaluatable ForEach
 
+instance Tokenize ForEach where
+  tokenize ForEach{..} = within' Scope.Loop $ do
+    yield (Token.Flow Token.Foreach)
+    forEachBinding
+    yield (Token.Flow Token.In)
+    forEachSubject
+    forEachBody
 
 data While a = While { whileCondition :: !a, whileBody :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
@@ -330,6 +363,12 @@ instance Show1 While where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable While where
   eval eval While{..} = while (eval whileCondition >>= Abstract.value) (eval whileBody >>= Abstract.value)
+
+instance Tokenize While where
+  tokenize While{..} = within' Scope.Loop $ do
+    yield (Token.Flow Token.While)
+    whileCondition
+    whileBody
 
 data DoWhile a = DoWhile { doWhileCondition :: !a, doWhileBody :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
@@ -364,6 +403,12 @@ instance Show1 Try where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Implement Eval instance for Try
 instance Evaluatable Try
 
+instance Tokenize Try where
+  tokenize Try{..} = do
+    yield (Token.Flow Token.Try)
+    tryBody
+    yield (Token.Flow Token.Rescue)
+    sequenceA_ tryCatch
 
 data Catch a = Catch { catchException :: !a, catchBody :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
@@ -375,6 +420,8 @@ instance Show1 Catch where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Implement Eval instance for Catch
 instance Evaluatable Catch
 
+instance Tokenize Catch where
+  tokenize Data.Syntax.Statement.Catch{..} = within' Scope.Catch $ catchException *> catchBody
 
 newtype Finally a = Finally { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
@@ -386,6 +433,8 @@ instance Show1 Finally where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Implement Eval instance for Finally
 instance Evaluatable Finally
 
+instance Tokenize Finally where
+  tokenize (Finally f) = within' Scope.Finally f
 
 -- Scoping
 
@@ -400,6 +449,9 @@ instance Show1 ScopeEntry where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Implement Eval instance for ScopeEntry
 instance Evaluatable ScopeEntry
 
+instance Tokenize ScopeEntry where
+  tokenize (ScopeEntry t) = within' Scope.BeginBlock (sequenceA_ t)
+
 
 -- | ScopeExit (e.g. `END {}` block in Ruby or Perl).
 newtype ScopeExit a = ScopeExit { terms :: [a] }
@@ -411,3 +463,6 @@ instance Show1 ScopeExit where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for ScopeExit
 instance Evaluatable ScopeExit
+
+instance Tokenize ScopeExit where
+  tokenize (ScopeExit t) = within' Scope.EndBlock (sequenceA_ t)

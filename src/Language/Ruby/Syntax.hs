@@ -21,11 +21,12 @@ import           Data.JSON.Fields
 import qualified Data.Language as Language
 import qualified Data.Map.Strict as Map
 import qualified Data.Reprinting.Scope as Scope
+import qualified Data.Reprinting.Token as Token
 import           Data.Semigroup.App
 import           Data.Semigroup.Foldable
 import           Diffing.Algorithm
 import           Proto3.Suite.Class
-import           Reprinting.Tokenize
+import           Reprinting.Tokenize hiding (Superclass)
 
 -- TODO: Fully sort out ruby require/load mechanics
 --
@@ -113,6 +114,13 @@ instance Evaluatable Require where
     insertFrameLink ScopeGraph.Import (Map.singleton moduleScope moduleFrame)
     rvalBox v -- Returns True if the file was loaded, False if it was already loaded. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-require
 
+instance Tokenize Require where
+  tokenize Require{..} = do
+    yield . Run $ if requireRelative
+                     then "require_relative"
+                     else "require"
+    within' Scope.Params requirePath
+
 doRequire :: ( Member (Boolean value) sig
              , Member (Modules address value) sig
              , Carrier sig m
@@ -132,6 +140,11 @@ data Load a = Load { loadPath :: a, loadWrap :: Maybe a }
 instance Eq1 Load where liftEq = genericLiftEq
 instance Ord1 Load where liftCompare = genericLiftCompare
 instance Show1 Load where liftShowsPrec = genericLiftShowsPrec
+
+instance Tokenize Load where
+  tokenize Load{..} = do
+    yield (Run "load")
+    within' Scope.Params $ loadPath *> fromMaybe (pure ()) loadWrap
 
 instance Evaluatable Load where
   eval eval (Load x Nothing) = do
@@ -227,6 +240,15 @@ instance Evaluatable Class where
 instance Declarations1 Class where
   liftDeclaredName declaredName = declaredName . classIdentifier
 
+instance Tokenize Class where
+  tokenize Class{..} = within' Scope.Class $ do
+    classIdentifier
+    case classSuperClass of
+      Just a  -> yield Token.Extends *> a
+      Nothing -> pure ()
+    classBody
+
+
 data Module a = Module { moduleIdentifier :: !a, moduleStatements :: ![a] }
   deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
@@ -271,6 +293,13 @@ instance Evaluatable Module where
 instance Declarations1 Module where
   liftDeclaredName declaredName = declaredName . moduleIdentifier
 
+instance Tokenize Module where
+  tokenize Module{..} = do
+    yield (Run "module")
+    moduleIdentifier
+    within' Scope.Namespace $ sequenceA_ moduleStatements
+
+
 data LowPrecedenceAnd a = LowPrecedenceAnd { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
@@ -285,6 +314,13 @@ instance Eq1 LowPrecedenceAnd where liftEq = genericLiftEq
 instance Ord1 LowPrecedenceAnd where liftCompare = genericLiftCompare
 instance Show1 LowPrecedenceAnd where liftShowsPrec = genericLiftShowsPrec
 
+-- TODO: These should probably be expressed with a new context/token,
+-- rather than a literal run, and need to take surrounding precedence
+-- into account.
+instance Tokenize LowPrecedenceAnd where
+  tokenize LowPrecedenceAnd{..} = lhs *> yield (Token.Run "and") <* rhs
+
+
 data LowPrecedenceOr a = LowPrecedenceOr { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
@@ -298,6 +334,9 @@ instance Evaluatable LowPrecedenceOr where
 instance Eq1 LowPrecedenceOr where liftEq = genericLiftEq
 instance Ord1 LowPrecedenceOr where liftCompare = genericLiftCompare
 instance Show1 LowPrecedenceOr where liftShowsPrec = genericLiftShowsPrec
+
+instance Tokenize LowPrecedenceOr where
+  tokenize LowPrecedenceOr{..} = lhs *> yield (Token.Run "or") <* rhs
 
 data Assignment a = Assignment { assignmentContext :: ![a], assignmentTarget :: !a, assignmentValue :: !a }
   deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
@@ -335,3 +374,7 @@ instance Evaluatable Assignment where
             pure ()
         assign lhsSlot =<< Abstract.value rhs
         pure (LvalMember lhsSlot)
+
+instance Tokenize Assignment where
+  -- Should we be using 'assignmentContext' in here?
+  tokenize Assignment{..} = assignmentTarget *> yield Token.Assign <* assignmentValue

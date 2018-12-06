@@ -10,3 +10,11 @@ module Foo
     end
   end
 end
+
+class A::B::C
+  def foo
+    puts "hi"
+  end
+  def self.foo
+  end
+end
