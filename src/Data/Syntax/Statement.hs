@@ -141,7 +141,7 @@ instance Evaluatable Let where
 
     _ <- withLexicalScopeAndFrame $ do
       declare (Declaration name) letSpan assocScope
-      letVal <- (eval letValue >>= Abstract.value)
+      letVal <- eval letValue >>= Abstract.value
       slot <- lookupDeclaration (Declaration name)
       assign slot letVal
       eval letBody
