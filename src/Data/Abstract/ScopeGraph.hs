@@ -160,6 +160,16 @@ lookupScopePath declaration currentAddress g = snd <$> foldrGraph combine curren
           <|> uncurry (EPath Export)     <$> path Export
           <|> uncurry (EPath Lexical)    <$> path Lexical
 
+findPath :: Ord scopeAddress => (scopeAddress -> Maybe (Path scopeAddress)) -> Declaration -> scopeAddress -> ScopeGraph scopeAddress -> Maybe (Path scopeAddress)
+findPath extra decl currentAddress g = snd <$> foldrGraph combine currentAddress g
+  where combine address path = fmap (address, )
+          $   pathToDeclaration decl address g
+          <|> extra address
+          <|> uncurry (EPath Superclass) <$> path Superclass
+          <|> uncurry (EPath Import)     <$> path Import
+          <|> uncurry (EPath Export)     <$> path Export
+          <|> uncurry (EPath Lexical)    <$> path Lexical
+
 foldrGraph :: Ord scopeAddress => (scopeAddress -> (EdgeLabel -> Maybe a) -> Maybe a) -> scopeAddress -> ScopeGraph scopeAddress -> Maybe a
 foldrGraph combine address graph = go lowerBound address
   where go visited address
