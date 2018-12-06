@@ -589,9 +589,6 @@ instance Evaluatable Module where
         assign moduleSlot =<< klass (Declaration name) childFrame
 
         rvalBox unit
-    -- name <- maybeM (throwEvalError NoNameError) (declaredName iden)
-    -- rvalBox =<< letrec' name (\addr ->
-    --   makeNamespace name addr Nothing (traverse_ eval xs))
 
 instance Declarations1 Module where
   liftDeclaredName declaredName = declaredName . moduleIdentifier
@@ -604,10 +601,39 @@ instance Ord1 InternalModule where liftCompare = genericLiftCompare
 instance Show1 InternalModule where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable InternalModule where
-  eval _ (InternalModule _ _) = undefined -- do
-    -- name <- maybeM (throwEvalError NoNameError) (declaredName iden)
-    -- rvalBox =<< letrec' name (\addr ->
-    --   makeNamespace name addr Nothing (traverse_ eval xs))
+  eval _ InternalModule = do
+  eval eval Module{..} = do
+    name <- maybeM (throwEvalError NoNameError) (declaredName internalModuleIdentifier)
+    span <- ask @Span
+    currentScope' <- currentScope
+
+    let declaration = Declaration name
+        moduleBody = maybe (rvalBox unit) (runApp . foldMap1 (App . eval)) (nonEmpty internalModuleStatements)
+    maybeSlot <- maybeLookupDeclaration declaration
+
+    case maybeSlot of
+      Just slot -> do
+        moduleVal <- deref slot
+        maybeFrame <- scopedEnvironment moduleVal
+        case maybeFrame of
+          Just moduleFrame -> do
+            withScopeAndFrame moduleFrame moduleBody
+          Nothing -> throwEvalError (DerefError moduleVal)
+      Nothing -> do
+        let edges = Map.singleton Lexical [ currentScope' ]
+        childScope <- newScope edges
+        declare (Declaration name) span (Just childScope)
+
+        currentFrame' <- currentFrame
+        let frameEdges = Map.singleton Lexical (Map.singleton currentScope' currentFrame')
+        childFrame <- newFrame childScope frameEdges
+
+        withScopeAndFrame childFrame (void moduleBody)
+
+        moduleSlot <- lookupDeclaration (Declaration name)
+        assign moduleSlot =<< klass (Declaration name) childFrame
+
+        rvalBox unit
 
 instance Declarations a => Declarations (InternalModule a) where
   declaredName InternalModule{..} = declaredName internalModuleIdentifier
