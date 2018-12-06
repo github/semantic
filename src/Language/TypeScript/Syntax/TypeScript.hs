@@ -601,8 +601,7 @@ instance Ord1 InternalModule where liftCompare = genericLiftCompare
 instance Show1 InternalModule where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable InternalModule where
-  eval _ InternalModule = do
-  eval eval Module{..} = do
+  eval eval InternalModule{..} = do
     name <- maybeM (throwEvalError NoNameError) (declaredName internalModuleIdentifier)
     span <- ask @Span
     currentScope' <- currentScope
