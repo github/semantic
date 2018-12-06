@@ -215,7 +215,7 @@ instance Ord1 Array where liftCompare = genericLiftCompare
 instance Show1 Array where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Array where
-  eval _ (Array _) = undefined -- rvalBox =<< array =<< traverse (eval >=> address) a
+  eval eval Array{..} = rvalBox =<< array =<< traverse (eval >=> Eval.value) arrayElements
 
 instance Tokenize Array where
   tokenize = list . arrayElements
