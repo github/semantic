@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DuplicateRecordFields, GADTs, TupleSections #-}
+{-# LANGUAGE DeriveAnyClass, DuplicateRecordFields, TupleSections #-}
 module Data.Abstract.ScopeGraph
   ( Slot(..)
   , associatedScope
