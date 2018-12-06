@@ -143,30 +143,36 @@ reference ref decl currentAddress g = fromMaybe g $ do
   -- Start from the current address
   currentScope' <- lookupScope currentAddress g
   -- Build a path up to the declaration
-  go currentScope' currentAddress id
+  go lowerBound currentScope' currentAddress id
   where
-    go currentScope address path
-      =   flip (insertScope currentAddress) g . flip (insertReference ref) currentScope . path <$> pathToDeclaration decl address g
-      <|> traverseEdges' Superclass <|> traverseEdges' Import <|> traverseEdges' Export <|> traverseEdges' Lexical
-      where traverseEdges' edge = linksOfScope address g >>= Map.lookup edge >>= traverseEdges path (go currentScope) edge
+    go visited currentScope address path
+      | address `Set.member` visited = Nothing
+      | otherwise
+        =   flip (insertScope currentAddress) g . flip (insertReference ref) currentScope . path <$> pathToDeclaration decl address g
+        <|> traverseEdges' Superclass <|> traverseEdges' Import <|> traverseEdges' Export <|> traverseEdges' Lexical
+      where traverseEdges' edge = linksOfScope address g >>= Map.lookup edge >>= traverseEdges path (go (Set.insert address visited) currentScope) edge
 
 -- | Insert a reference into the given scope by constructing a resolution path to the declaration within the given scope graph.
 insertImportReference :: Ord address => Reference -> Declaration -> address -> ScopeGraph address -> Scope address -> Maybe (Scope address)
-insertImportReference ref decl currentAddress g scope = go currentAddress (EPath Import currentAddress)
+insertImportReference ref decl currentAddress g scope = go lowerBound currentAddress (EPath Import currentAddress)
   where
-    go address path
-      =   flip (insertReference ref) scope . path <$> pathToDeclaration decl address g
-      <|> traverseEdges' Superclass <|> traverseEdges' Import <|> traverseEdges' Export <|> traverseEdges' Lexical
-      where traverseEdges' edge = linksOfScope address g >>= Map.lookup edge >>= traverseEdges path go edge
+    go visited address path
+      | address `Set.member` visited = Nothing
+      | otherwise
+        =   flip (insertReference ref) scope . path <$> pathToDeclaration decl address g
+        <|> traverseEdges' Superclass <|> traverseEdges' Import <|> traverseEdges' Export <|> traverseEdges' Lexical
+      where traverseEdges' edge = linksOfScope address g >>= Map.lookup edge >>= traverseEdges path (go (Set.insert address visited)) edge
 
 lookupScopePath :: Ord scopeAddress => Name -> scopeAddress -> ScopeGraph scopeAddress -> Maybe (Path scopeAddress)
-lookupScopePath declaration currentAddress g = go currentAddress id
+lookupScopePath declaration currentAddress g = go lowerBound currentAddress id
   where
-    go address path
-      =   path <$> pathToDeclaration (Declaration declaration) address g
-      <|> path <$> lookupReference declaration address g
-      <|> traverseEdges' Superclass <|> traverseEdges' Import <|> traverseEdges' Export <|> traverseEdges' Lexical
-      where traverseEdges' edge = linksOfScope address g >>= Map.lookup edge >>= traverseEdges path go edge
+    go visited address path
+      | address `Set.member` visited = Nothing
+      | otherwise
+        =   path <$> pathToDeclaration (Declaration declaration) address g
+        <|> path <$> lookupReference declaration address g
+        <|> traverseEdges' Superclass <|> traverseEdges' Import <|> traverseEdges' Export <|> traverseEdges' Lexical
+      where traverseEdges' edge = linksOfScope address g >>= Map.lookup edge >>= traverseEdges path (go (Set.insert address visited)) edge
 
 pathToDeclaration :: Ord scopeAddress => Declaration -> scopeAddress -> ScopeGraph scopeAddress -> Maybe (Path scopeAddress)
 pathToDeclaration decl address g = DPath decl . snd <$> lookupDeclaration (unDeclaration decl) address g
