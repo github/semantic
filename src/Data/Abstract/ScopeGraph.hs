@@ -146,7 +146,7 @@ reference ref decl@Declaration{..} currentAddress g = fromMaybe g $ do
   go currentScope' currentAddress id
   where
     go currentScope address path
-      =   flip (insertScope currentAddress) g . modifyReferences currentScope . Map.insert ref . path . DPath decl . snd <$> lookupDeclaration unDeclaration address g
+      =   flip (insertScope currentAddress) g . flip (insertReference ref) currentScope . path . DPath decl . snd <$> lookupDeclaration unDeclaration address g
       <|> traverseEdges' Superclass <|> traverseEdges' Import <|> traverseEdges' Lexical
       where traverseEdges' edge = linksOfScope address g >>= Map.lookup edge >>= traverseEdges path (go currentScope) edge
 
@@ -155,7 +155,7 @@ insertImportReference :: Ord address => Reference -> Declaration -> address -> S
 insertImportReference ref decl@Declaration{..} currentAddress g scope = go currentAddress (EPath Import currentAddress)
   where
     go address path
-      =   modifyReferences scope . Map.insert ref . path . DPath decl . snd <$> lookupDeclaration unDeclaration address g
+      =   flip (insertReference ref) scope . path . DPath decl . snd <$> lookupDeclaration unDeclaration address g
       <|> traverseEdges' Superclass <|> traverseEdges' Export <|> traverseEdges' Import <|> traverseEdges' Lexical
       where traverseEdges' edge = linksOfScope address g >>= Map.lookup edge >>= traverseEdges path go edge
 
@@ -168,8 +168,8 @@ lookupScopePath declaration currentAddress g = go currentAddress id
       <|> traverseEdges' Superclass <|> traverseEdges' Export <|> traverseEdges' Import <|> traverseEdges' Lexical
       where traverseEdges' edge = linksOfScope address g >>= Map.lookup edge >>= traverseEdges path go edge
 
-modifyReferences :: Scope scopeAddress -> (Map Reference (Path scopeAddress) -> Map Reference (Path scopeAddress)) -> Scope scopeAddress
-modifyReferences scope f = scope { references = f (references scope) }
+insertReference :: Reference -> Path scopeAddress -> Scope scopeAddress -> Scope scopeAddress
+insertReference ref path scope = scope { references = Map.insert ref path (references scope) }
 
 traverseEdges :: Foldable t => (Path scopeAddress -> Path scopeAddress) -> (scopeAddress -> (Path scopeAddress -> Path scopeAddress) -> Maybe a) -> EdgeLabel -> t scopeAddress -> Maybe a
 -- Return the first path to the declaration through the scopes.
