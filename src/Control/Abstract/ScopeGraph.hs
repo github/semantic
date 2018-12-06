@@ -49,7 +49,6 @@ import           Prologue
 lookup :: (Ord address, Member (State (ScopeGraph address)) sig, Carrier sig m) => Reference -> Evaluator term address value m (Maybe address)
 lookup ref = ScopeGraph.scopeOfRef ref <$> get
 
--- TODO: Don't return an address.
 declare :: ( Carrier sig m
            , Member (State (ScopeGraph address)) sig
            , Member (Reader (address, address)) sig
