@@ -17,6 +17,7 @@ module Control.Abstract.Heap
 , deref
 , assign
 , newFrame
+, CurrentFrame(..)
 , currentFrame
 , withScopeAndFrame
 , withLexicalScopeAndFrame
@@ -121,6 +122,8 @@ putHeap = put
 -- | Update the heap.
 modifyHeap :: (Member (State (Heap address address value)) sig, Carrier sig m) => (Heap address address value -> Heap address address value) -> Evaluator term address value m ()
 modifyHeap = modify
+
+newtype CurrentFrame address = CurrentFrame { unCurrentFrame :: address }
 
 -- | Retrieve the heap.
 currentFrame :: ( Carrier sig m
