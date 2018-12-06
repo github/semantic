@@ -8,14 +8,16 @@ import           Data.Aeson (ToJSON)
 import qualified Data.Text as T
 import           Proto3.Suite
 
-import Control.Abstract hiding (Import)
+import           Control.Abstract hiding (Import)
 import           Data.Abstract.Evaluatable as Evaluatable
-import           qualified Data.Abstract.ScopeGraph as ScopeGraph
+import qualified Data.Abstract.Name as Name
+import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.JSON.Fields
+import qualified Data.Map.Strict as Map
+import           Data.Semigroup.App
+import           Data.Semigroup.Foldable
 import           Diffing.Algorithm
 import           Language.TypeScript.Resolution
-import qualified Data.Map.Strict as Map
-import qualified Data.Abstract.Name as Name
 
 data Import a = Import { importSymbols :: ![Alias], importFrom :: ImportPath }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
@@ -405,7 +407,7 @@ newtype ExtendsClause a = ExtendsClause { extendsClauses :: [a] }
   deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
 
 instance Declarations1 ExtendsClause where
-  liftDeclaredName _ (ExtendsClause []) = Nothing
+  liftDeclaredName _ (ExtendsClause [])                 = Nothing
   liftDeclaredName declaredName (ExtendsClause (x : _)) = declaredName x
 
 instance Eq1 ExtendsClause where liftEq = genericLiftEq
@@ -555,7 +557,38 @@ instance Ord1 Module where liftCompare = genericLiftCompare
 instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Module where
-  eval _ (Module _ _) = undefined -- do
+  eval eval Module{..} = do
+    name <- maybeM (throwEvalError NoNameError) (declaredName moduleIdentifier)
+    span <- ask @Span
+    currentScope' <- currentScope
+
+    let declaration = Declaration name
+        moduleBody = maybe (rvalBox unit) (runApp . foldMap1 (App . eval)) (nonEmpty moduleStatements)
+    maybeSlot <- maybeLookupDeclaration declaration
+
+    case maybeSlot of
+      Just slot -> do
+        moduleVal <- deref slot
+        maybeFrame <- scopedEnvironment moduleVal
+        case maybeFrame of
+          Just moduleFrame -> do
+            withScopeAndFrame moduleFrame moduleBody
+          Nothing -> throwEvalError (DerefError moduleVal)
+      Nothing -> do
+        let edges = Map.singleton Lexical [ currentScope' ]
+        childScope <- newScope edges
+        declare (Declaration name) span (Just childScope)
+
+        currentFrame' <- currentFrame
+        let frameEdges = Map.singleton Lexical (Map.singleton currentScope' currentFrame')
+        childFrame <- newFrame childScope frameEdges
+
+        withScopeAndFrame childFrame (void moduleBody)
+
+        moduleSlot <- lookupDeclaration (Declaration name)
+        assign moduleSlot =<< klass (Declaration name) childFrame
+
+        rvalBox unit
     -- name <- maybeM (throwEvalError NoNameError) (declaredName iden)
     -- rvalBox =<< letrec' name (\addr ->
     --   makeNamespace name addr Nothing (traverse_ eval xs))
