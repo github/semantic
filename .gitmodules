@@ -9,7 +9,7 @@
 	url = https://github.com/robrix/freer-cofreer.git
 [submodule "vendor/fastsum"]
 	path = vendor/fastsum
-	url = git@github.com:patrickt/fastsum.git
+	url = https://github.com/patrickt/fastsum.git
 [submodule "vendor/semilattices"]
 	path = vendor/semilattices
 	url = https://github.com/robrix/semilattices.git

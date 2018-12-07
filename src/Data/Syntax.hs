@@ -11,6 +11,7 @@ import Data.Location
 import qualified Data.Set as Set
 import Data.Sum
 import Data.Term
+import qualified Data.Reprinting.Token as Token
 import GHC.Types (Constraint)
 import GHC.TypeLits
 import Diffing.Algorithm
@@ -165,7 +166,7 @@ instance Evaluatable Identifier where
   eval _ (Identifier name) = pure (LvalLocal name)
 
 instance Tokenize Identifier where
-  tokenize = yield . Run . formatName . Data.Syntax.name
+  tokenize = yield . Token.Run . formatName . Data.Syntax.name
 
 instance FreeVariables1 Identifier where
   liftFreeVariables _ (Identifier x) = Set.singleton x
