@@ -23,7 +23,6 @@ import           Control.Effect.Sum
 import           Data.Abstract.Address.Hole
 import           Data.Abstract.Address.Located
 import           Data.Abstract.BaseError
-import           Data.Abstract.Ref
 import           Data.Abstract.Declarations
 import           Data.Abstract.Module (Module (moduleInfo), ModuleInfo (..))
 import           Data.Abstract.Package (PackageInfo (..))
@@ -82,7 +81,7 @@ graphingTerms :: ( Member (Reader ModuleInfo) sig
                  , term ~ Term syntax Location
                  , Carrier sig m
                  )
-              => Open (Open (term -> Evaluator term (Hole context (Located address)) value m (ValueRef (Hole context (Located address)) value)))
+              => Open (Open (term -> Evaluator term (Hole context (Located address)) value m a))
 graphingTerms recur0 recur term@(Term (In a syntax)) = do
   definedInModule <- currentModule
   case toVertex a definedInModule syntax of
