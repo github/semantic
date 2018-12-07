@@ -81,8 +81,8 @@ graphingTerms :: ( Member (Reader ModuleInfo) sig
                  , term ~ Term syntax Location
                  , Carrier sig m
                  )
-              => Open (Open (term -> Evaluator term (Hole context (Located address)) value m a))
-graphingTerms recur0 recur term@(Term (In a syntax)) = do
+              => Open (term -> Evaluator term (Hole context (Located address)) value m a)
+graphingTerms recur term@(Term (In a syntax)) = do
   definedInModule <- currentModule
   case toVertex a definedInModule syntax of
     Just (v@Function{}, name) -> recurWithContext v name
@@ -92,14 +92,14 @@ graphingTerms recur0 recur term@(Term (In a syntax)) = do
       addr <- lookupDeclaration (Declaration name)
       defined <- gets (Map.lookup addr)
       maybe (pure ()) (appendGraph . connect (vertex v) . vertex) defined
-      recur0 recur term
-    _ -> recur0 recur term
+      recur term
+    _ -> recur term
   where
     recurWithContext v name = do
       variableDefinition v
       moduleInclusion v
       local (const v) $ do
-        valRef <- recur0 recur term
+        valRef <- recur term
         slot <- lookupDeclaration (Declaration name)
         modify (Map.insert slot v)
         pure valRef
