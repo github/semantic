@@ -688,3 +688,11 @@ instance Evaluatable AbstractClass where
     assign classSlot =<< klass (Declaration name) childFrame
 
     rvalBox unit
+
+data MetaProperty a = MetaProperty
+  deriving (Diffable, Eq, Foldable, Functor,  Generic1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1, Named1, Message1, NFData1)
+
+instance Eq1 MetaProperty where liftEq = genericLiftEq
+instance Ord1 MetaProperty where liftCompare = genericLiftCompare
+instance Show1 MetaProperty where liftShowsPrec = genericLiftShowsPrec
+instance Evaluatable MetaProperty

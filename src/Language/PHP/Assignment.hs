@@ -428,7 +428,7 @@ compoundStatement :: Assignment Term
 compoundStatement = makeTerm <$> symbol CompoundStatement <*> children (manyTerm statement)
 
 objectCreationExpression :: Assignment Term
-objectCreationExpression = (makeTerm <$> symbol ObjectCreationExpression <*> children (Expression.New <$> ((:) <$> term classTypeDesignator <*> (arguments <|> pure []))))
+objectCreationExpression = (makeTerm <$> symbol ObjectCreationExpression <*> children (Expression.New <$> term classTypeDesignator <*> emptyTerm <*> (arguments <|> pure [])))
 
   <|> (makeTerm <$> symbol ObjectCreationExpression <*> children (makeAnonClass <$ token AnonNew <* token AnonClass <*> emptyTerm <*> (arguments <|> pure []) <*> (term classBaseClause <|> emptyTerm) <*> (term classInterfaceClause <|> emptyTerm) <*> (makeTerm <$> location <*> manyTerm classMemberDeclaration)))
   where makeAnonClass identifier args baseClause interfaceClause declarations = Declaration.Class [] identifier (args <> [baseClause, interfaceClause]) declarations

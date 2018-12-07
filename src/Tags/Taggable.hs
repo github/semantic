@@ -684,3 +684,4 @@ instance Taggable TypeScript.ThisType
 instance Taggable TypeScript.ExistentialType
 instance Taggable TypeScript.LiteralType
 instance Taggable TypeScript.Update
+instance Taggable TypeScript.MetaProperty
