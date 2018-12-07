@@ -22,7 +22,10 @@ import           Reprinting.Tokenize hiding (Superclass)
 
 -- | Typical prefix function application, like `f(x)` in many languages, or `f x` in Haskell.
 data Call a = Call { callContext :: ![a], callFunction :: !a, callParams :: ![a], callBlock :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+
+instance Declarations1 Call where
+  liftDeclaredName declaredName Call{..} = declaredName callFunction
 
 instance Eq1 Call where liftEq = genericLiftEq
 instance Ord1 Call where liftCompare = genericLiftCompare
