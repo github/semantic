@@ -50,7 +50,7 @@ resolvePHPName :: ( Member (Modules address value) sig
                => T.Text
                -> Evaluator term address value m ModulePath
 resolvePHPName n = do
-  modulePath <- resolvePaths [name]
+  modulePath <- resolve [name]
   maybeM (throwResolutionError $ NotFoundError name [name] Language.PHP) modulePath
   where name = toName n
         toName = T.unpack . dropRelativePrefix . stripQuotes
