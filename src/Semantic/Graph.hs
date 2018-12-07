@@ -366,15 +366,17 @@ resumingEvalError :: ( Carrier sig m
                                                   m)) a
                   -> Evaluator term address value m a
 resumingEvalError = runEvalErrorWith (\ baseError -> traceError "EvalError" baseError *> case baseErrorException baseError of
+  ConstructorError _     -> pure hole
+  ScopedEnvError _       -> pure hole
   QualifiedImportError{} -> pure hole
-  DerefError{} -> pure hole
-  ReferenceError{} -> pure hole
-  DefaultExportError{}  -> pure ()
-  ExportError{}         -> pure ()
-  IntegerFormatError{}  -> pure 0
-  FloatFormatError{}    -> pure 0
-  RationalFormatError{} -> pure 0
-  NoNameError           -> gensym)
+  DerefError{}           -> pure hole
+  ReferenceError{}       -> pure hole
+  DefaultExportError{}   -> pure ()
+  ExportError{}          -> pure ()
+  IntegerFormatError{}   -> pure 0
+  FloatFormatError{}     -> pure 0
+  RationalFormatError{}  -> pure 0
+  NoNameError            -> gensym)
 
 resumingUnspecialized :: ( AbstractHole value
                          , Carrier sig m

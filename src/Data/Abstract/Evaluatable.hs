@@ -171,21 +171,25 @@ data EvalError address value return where
   NoNameError :: EvalError address value Name
   RationalFormatError :: Text -> EvalError address value Rational
   ReferenceError      :: value -> Name -> EvalError address value (ValueRef address value)
+  ConstructorError    :: Name -> EvalError address value address
+  ScopedEnvError      :: value -> EvalError address value address
 
 deriving instance (Eq address, Eq value) => Eq (EvalError address value return)
 deriving instance (Show address, Show value) => Show (EvalError address value return)
 
 instance NFData value => NFData1 (EvalError address value) where
   liftRnf _ x = case x of
-    DerefError v -> rnf v
-    DefaultExportError -> ()
-    ExportError p n -> rnf p `seq` rnf n
-    FloatFormatError i -> rnf i
-    IntegerFormatError i -> rnf i
-    NoNameError -> ()
-    RationalFormatError i -> rnf i
-    ReferenceError v n -> rnf v `seq` rnf n
+    DerefError v           -> rnf v
+    DefaultExportError     -> ()
+    ExportError p n        -> rnf p `seq` rnf n
+    FloatFormatError i     -> rnf i
+    IntegerFormatError i   -> rnf i
+    NoNameError            -> ()
+    RationalFormatError i  -> rnf i
+    ReferenceError v n     -> rnf v `seq` rnf n
     QualifiedImportError i -> rnf i
+    ConstructorError n     -> rnf n
+    ScopedEnvError v       -> rnf v
 
 instance (NFData value, NFData return) => NFData (EvalError address value return) where
   rnf = liftRnf rnf
