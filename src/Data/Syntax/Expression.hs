@@ -15,6 +15,7 @@ import           Data.Abstract.Name as Name
 import           Data.Abstract.Number (liftIntegralFrac, liftReal, liftedExponent, liftedFloorDiv)
 import           Data.JSON.Fields
 import qualified Data.List.NonEmpty as NonEmpty
+import qualified Data.Map.Strict as Map
 import qualified Data.Reprinting.Scope as Scope
 import qualified Data.Reprinting.Token as Token
 import           Diffing.Algorithm hiding (Delete)
@@ -645,14 +646,25 @@ instance Show1 New where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for New
 instance Evaluatable New where
-  eval _ New{..} = do
-    case newSubject of
-      [] -> pure ()
-      (subject : _) -> do
-        name <- maybeM (throwEvalError NoNameError) (declaredName subject)
-        reference (Reference name) (Declaration name)
-    -- TODO: Traverse subterms and instantiate frames from the corresponding scope
-    rvalBox unit
+  eval eval New{..} = do
+    name <- maybeM (throwEvalError NoNameError) (declaredName subject)
+    assocScope <- maybeM (throwEvalError $ ConstructorError name) =<< associatedScope (Declaration name)
+    objectScope <- newScope (Map.singleton Superclass [ assocScope ])
+    slot <- lookupDeclaration (Declaration name)
+    classVal <- deref slot
+    classFrame <- maybeM (throwEvalError $ ScopedEnvError classVal) =<< scopedEnvironment classVal
+    objectFrame <- newFrame objectScope (Map.singleton Superclass $ Map.singleton assocScope classFrame)
+    objectVal <- object objectFrame
+
+    void . withScopeAndFrame objectFrame $ do
+      let constructorName = Name.name "constructor"
+      reference (Reference constructorName) (Declaration constructorName)
+      constructor <- deref =<< lookupDeclaration (Declaration $ constructorName)
+      args <- traverse (eval >=> Abstract.value) arguments
+      call constructor (objectVal : args)
+
+    rvalBox objectVal
+
 
 -- | A cast expression to a specified type.
 data Cast a =  Cast { castSubject :: !a, castType :: !a }
