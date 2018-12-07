@@ -527,6 +527,18 @@ instance Evaluatable MemberAccess where
         -- Throw a ReferenceError since we're attempting to reference a name within a value that is not an Object.
         throwEvalError (ReferenceError lhsValue rhs)
 
+  resolve eval MemberAccess{..} = do
+    name <- maybeM (throwEvalError NoNameError) (declaredName lhs)
+    reference (Reference name) (Declaration name)
+    lhsValue <- eval lhs
+    lhsFrame <- Abstract.scopedEnvironment lhsValue
+    case lhsFrame of
+      Just lhsFrame ->
+        withScopeAndFrame lhsFrame $ do
+          reference (Reference rhs) (Declaration rhs)
+          Just <$> lookupDeclaration (Declaration rhs)
+      Nothing -> pure Nothing -- FIXME: this should really be throwing
+
 
 instance Tokenize MemberAccess where
   tokenize MemberAccess{..} = lhs *> yield Access *> yield (Run (formatName rhs))
