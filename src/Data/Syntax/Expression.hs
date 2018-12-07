@@ -637,8 +637,7 @@ data New a = New { subject :: a , typeParameters :: a, arguments :: [a] }
   deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
 instance Declarations1 New where
-  liftDeclaredName _ (New [])                       = Nothing
-  liftDeclaredName declaredName (New (subject : _)) = declaredName subject
+  liftDeclaredName declaredName New{..} = declaredName subject
 
 instance Eq1 New where liftEq = genericLiftEq
 instance Ord1 New where liftCompare = genericLiftCompare
