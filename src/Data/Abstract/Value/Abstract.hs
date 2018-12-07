@@ -70,13 +70,13 @@ instance ( Member (Abstract.Boolean Abstract) sig
          , Alternative m
          , Monad m
          )
-      => Carrier (While address Abstract :+: sig) (WhileC address Abstract m) where
+      => Carrier (While Abstract :+: sig) (WhileC Abstract m) where
   ret = WhileC . ret
   eff = WhileC . handleSum
     (eff . handleCoercible)
     (\ (Abstract.While cond body k) -> do
       cond' <- runWhileC cond
-      ifthenelse cond' (runWhileC body *> empty) (runWhileC (k $ Rval unit)))
+      ifthenelse cond' (runWhileC body *> empty) (runWhileC (k unit)))
 
 
 instance Ord address => ValueRoots address Abstract where

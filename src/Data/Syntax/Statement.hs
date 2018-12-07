@@ -333,7 +333,7 @@ instance Ord1 For where liftCompare = genericLiftCompare
 instance Show1 For where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable For where
-  eval eval (fmap (eval >=> Abstract.value) -> For before cond step body) = forLoop before cond step body
+  eval eval (fmap (eval >=> Abstract.value) -> For before cond step body) = Rval <$> forLoop before cond step body
 
 
 data ForEach a = ForEach { forEachBinding :: !a, forEachSubject :: !a, forEachBody :: !a }
@@ -362,7 +362,7 @@ instance Ord1 While where liftCompare = genericLiftCompare
 instance Show1 While where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable While where
-  eval eval While{..} = while (eval whileCondition >>= Abstract.value) (eval whileBody >>= Abstract.value)
+  eval eval While{..} = Rval <$> while (eval whileCondition >>= Abstract.value) (eval whileBody >>= Abstract.value)
 
 instance Tokenize While where
   tokenize While{..} = within' Scope.Loop $ do
@@ -378,7 +378,7 @@ instance Ord1 DoWhile where liftCompare = genericLiftCompare
 instance Show1 DoWhile where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable DoWhile where
-  eval eval DoWhile{..} = doWhile (eval doWhileBody >>= Abstract.value) (eval doWhileCondition >>= Abstract.value)
+  eval eval DoWhile{..} = Rval <$> doWhile (eval doWhileBody >>= Abstract.value) (eval doWhileCondition >>= Abstract.value)
 
 -- Exception handling
 

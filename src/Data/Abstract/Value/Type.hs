@@ -311,13 +311,13 @@ instance ( Member (Abstract.Boolean Type) sig
          , Alternative m
          , Monad m
          )
-      => Carrier (Abstract.While address Type :+: sig) (WhileC address Type m) where
+      => Carrier (Abstract.While Type :+: sig) (WhileC Type m) where
   ret = WhileC . ret
   eff = WhileC . handleSum
     (eff . handleCoercible)
     (\ (Abstract.While cond body k) -> do
       cond' <- runWhileC cond
-      ifthenelse cond' (runWhileC body *> empty) (runWhileC (k (Rval unit))))
+      ifthenelse cond' (runWhileC body *> empty) (runWhileC (k unit)))
 
 
 instance AbstractHole Type where

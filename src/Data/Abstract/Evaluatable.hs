@@ -45,7 +45,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , FreeVariables term
           , Member (Allocator address) sig
           , Member (Boolean value) sig
-          , Member (While address value) sig
+          , Member (While value) sig
           , Member (Deref value) sig
           , Member (State (ScopeGraph address)) sig
           , Member (Error (LoopControl value)) sig
