@@ -77,6 +77,12 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
     v <- throwUnspecializedError $ UnspecializedError ("Eval unspecialized for " <> liftShowsPrec (const (const id)) (const id) 0 expr "")
     rvalBox v
 
+  resolve :: ( Carrier sig m
+             )
+          => (term -> Evaluator term address value m value)
+          -> (constr term -> Evaluator term address value m address)
+  resolve _ = undefined
+
 
 traceResolve :: (Show a, Show b, Member Trace sig, Carrier sig m) => a -> b -> Evaluator term address value m ()
 traceResolve name path = trace ("resolved " <> show name <> " -> " <> show path)
