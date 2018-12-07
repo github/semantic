@@ -26,7 +26,7 @@ type ModuleC address value m
 
 type ValueC term address value m
   = FunctionC term address value                                  (Eff
-  ( WhileC address value                                          (Eff
+  ( WhileC value                                                  (Eff
   ( BooleanC value                                                (Eff
   ( InterposeC (Resumable (BaseError (UnspecializedError value))) (Eff
     m)))))))
@@ -44,8 +44,8 @@ evaluate :: ( AbstractValue term address value (ValueC term address value inner)
             , booleanC ~ BooleanC value (Eff (InterposeC (Resumable (BaseError (UnspecializedError value))) (Eff inner)))
             , booleanSig ~ (Boolean value :+: Interpose (Resumable (BaseError (UnspecializedError value))) :+: innerSig)
             , Carrier booleanSig booleanC
-            , whileC ~ WhileC address value (Eff booleanC)
-            , whileSig ~ (While address value :+: booleanSig)
+            , whileC ~ WhileC value (Eff booleanC)
+            , whileSig ~ (While value :+: booleanSig)
             , Carrier whileSig whileC
             , functionC ~ FunctionC term address value (Eff whileC)
             , functionSig ~ (Function term address value :+: whileSig)
@@ -142,7 +142,7 @@ evalTerm :: ( Carrier sig m
             , Member (Reader (CurrentFrame address)) sig
             , Member (Reader (CurrentScope address)) sig
             , Member (State Span) sig
-            , Member (While address value) sig
+            , Member (While value) sig
             , Member Fresh sig
             , Member Trace sig
             , Ord address

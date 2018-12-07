@@ -134,10 +134,10 @@ instance forall sig m term address. ( Carrier sig m
          , Show address
          , Show term
          )
-      => Carrier (Abstract.While address (Value term address) :+: sig) (WhileC address (Value term address) (Eff m)) where
+      => Carrier (Abstract.While (Value term address) :+: sig) (WhileC (Value term address) (Eff m)) where
   ret = WhileC . ret
   eff = WhileC . handleSum (eff . handleCoercible) (\case
-    Abstract.While cond body k -> interpose @(Resumable (BaseError (UnspecializedError (Value term address)))) (runEvaluator (rvalBox =<< loop (\continue -> do
+    Abstract.While cond body k -> interpose @(Resumable (BaseError (UnspecializedError (Value term address)))) (runEvaluator (loop (\continue -> do
       cond' <- Evaluator (runWhileC cond)
 
       -- `interpose` is used to handle 'UnspecializedError's and abort out of the
