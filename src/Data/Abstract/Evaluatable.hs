@@ -77,23 +77,23 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
     v <- throwUnspecializedError $ UnspecializedError ("Eval unspecialized for " <> liftShowsPrec (const (const id)) (const id) 0 expr "")
     rvalBox v
 
-  resolve :: ( AbstractValue term address value m
-             , Carrier sig m
-             , Declarations term
-             , Member (Reader (CurrentFrame address)) sig
-             , Member (Reader (CurrentScope address)) sig
-             , Member (Reader ModuleInfo) sig
-             , Member (Reader Span) sig
-             , Member (Resumable (BaseError (EvalError address value))) sig
-             , Member (Resumable (BaseError (HeapError address))) sig
-             , Member (Resumable (BaseError (ScopeError address))) sig
-             , Member (State (Heap address address value)) sig
-             , Member (State (ScopeGraph address)) sig
-             , Ord address
-             )
-          => (term -> Evaluator term address value m value)
-          -> (constr term -> Evaluator term address value m (Maybe (Slot address)))
-  resolve _ _ = pure Nothing
+  ref :: ( AbstractValue term address value m
+         , Carrier sig m
+         , Declarations term
+         , Member (Reader (CurrentFrame address)) sig
+         , Member (Reader (CurrentScope address)) sig
+         , Member (Reader ModuleInfo) sig
+         , Member (Reader Span) sig
+         , Member (Resumable (BaseError (EvalError address value))) sig
+         , Member (Resumable (BaseError (HeapError address))) sig
+         , Member (Resumable (BaseError (ScopeError address))) sig
+         , Member (State (Heap address address value)) sig
+         , Member (State (ScopeGraph address)) sig
+         , Ord address
+         )
+      => (term -> Evaluator term address value m value)
+      -> (constr term -> Evaluator term address value m (Maybe (Slot address)))
+  ref _ _ = pure Nothing
 
 
 traceResolve :: (Show a, Show b, Member Trace sig, Carrier sig m) => a -> b -> Evaluator term address value m ()
