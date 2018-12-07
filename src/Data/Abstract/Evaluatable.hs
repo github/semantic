@@ -78,10 +78,11 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
     rvalBox v
 
   resolve :: ( Carrier sig m
+             , Ord address
              )
           => (term -> Evaluator term address value m value)
-          -> (constr term -> Evaluator term address value m address)
-  resolve _ = undefined
+          -> (constr term -> Evaluator term address value m (Maybe (Slot address)))
+  resolve _ _ = pure Nothing
 
 
 traceResolve :: (Show a, Show b, Member Trace sig, Carrier sig m) => a -> b -> Evaluator term address value m ()
