@@ -100,7 +100,7 @@ resolvePythonModules q = do
       let searchPaths = [ path </> "__init__.py"
                         , path <.> ".py"
                         ]
-      modulePath <- resolve searchPaths
+      modulePath <- resolvePaths searchPaths
       maybeM (throwResolutionError $ NotFoundError path searchPaths Language.Python) modulePath
 
 

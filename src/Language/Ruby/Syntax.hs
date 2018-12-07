@@ -42,7 +42,7 @@ resolveRubyName :: ( Member (Modules address value) sig
 resolveRubyName name = do
   let name' = cleanNameOrPath name
   let paths = [name' <.> "rb"]
-  modulePath <- resolve paths
+  modulePath <- resolvePaths paths
   maybeM (throwResolutionError $ NotFoundError name' paths Language.Ruby) modulePath
 
 -- load "/root/src/file.rb"
@@ -56,7 +56,7 @@ resolveRubyPath :: ( Member (Modules address value) sig
                 -> Evaluator term address value m M.ModulePath
 resolveRubyPath path = do
   let name' = cleanNameOrPath path
-  modulePath <- resolve [name']
+  modulePath <- resolvePaths [name']
   maybeM (throwResolutionError $ NotFoundError name' [name'] Language.Ruby) modulePath
 
 cleanNameOrPath :: Text -> String

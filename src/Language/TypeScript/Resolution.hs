@@ -120,7 +120,7 @@ resolveModule path' exts = do
                   <> maybe mempty (:[]) packageDotJSON
                   <> (((path </> "index") <.>) <$> exts)
   trace ("searching in " <> show searchPaths)
-  maybe (Left searchPaths) Right <$> resolve searchPaths
+  maybe (Left searchPaths) Right <$> resolvePaths searchPaths
 
 typescriptExtensions :: [String]
 typescriptExtensions = ["ts", "tsx", "d.ts"]
