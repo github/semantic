@@ -633,7 +633,7 @@ instance Evaluatable Await where
   eval eval (Await a) = eval a
 
 -- | An object constructor call in Javascript, Java, etc.
-newtype New a = New { newSubject :: [a] }
+data New a = New { subject :: a , typeParameters :: a, arguments :: [a] }
   deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
 instance Declarations1 New where
