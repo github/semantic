@@ -28,7 +28,7 @@ runPythonPackaging :: ( Carrier sig m
                       , Member (State Strategy) sig
                       , Member (Allocator address) sig
                       , Member (Deref (Value term address)) sig
-                      , Member (Error (LoopControl address (Value term address))) sig
+                      , Member (Error (LoopControl (Value term address))) sig
                       , Member (Error (Return (Value term address))) sig
                       , Member (Reader ModuleInfo) sig
                       , Member (Reader PackageInfo) sig
@@ -48,7 +48,7 @@ instance ( Carrier sig m
          , Member (Allocator address) sig
          , Member (Boolean (Value term address)) sig
          , Member (Deref (Value term address)) sig
-         , Member (Error (LoopControl address (Value term address))) sig
+         , Member (Error (LoopControl (Value term address))) sig
          , Member (Error (Return (Value term address))) sig
          , Member Fresh sig
          , Member (Function term address (Value term address)) sig
