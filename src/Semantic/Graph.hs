@@ -361,6 +361,7 @@ resumingEvalError :: ( Carrier sig m
                      , Show value
                      , Show address
                      , AbstractHole value
+                     , AbstractHole address
                      )
                   => Evaluator term address value (ResumableWithC (BaseError (EvalError address value)) (Eff
                                                   m)) a
