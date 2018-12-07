@@ -6,22 +6,37 @@ module Data.Reprinting.Scope
 
 import Data.Reprinting.Operator
 
+
 -- | A 'Scope' represents a scope in which other tokens can be
--- interpreted. For example, in the 'Imperative' context a 'TSep'
+-- interpreted. For example, in the 'Imperative' context a 'Sep'
 -- could be a semicolon or newline, whereas in a 'List' context a
--- 'TSep' is probably going to be a comma.
+-- 'Sep' is probably going to be a comma.
+-- TODO: look into sharing control-flow constructs with 'Flow'
 data Scope
-  = List
-  | Hash
-  | Pair
-  | Method
-  | Function
-  | Call
-  | Params
-  | Return
-  | If
-  | InfixL Operator Int
-  | Imperative
+  = List                -- ^ List literals (usually comma-separated, in square brackets)
+  | Hash                -- ^ Hashes (key-value pairs, in curly brackets)
+  | Pair                -- ^ Colon-separated key-value pairs
+  | Slice               -- ^ Range-selection context, as in Go or Python
+  | Method              -- ^ Member-function declaration
+  | Atom                -- ^ Quoted symbols, e.g. Ruby Symbol
+  | Function            -- ^ Function declaration
+  | Namespace           -- ^ Namespace/module context
+  | Call                -- ^ Function call (usually comma-separated arguments)
+  | Params              -- ^ Function parameters (ibid.)
+  | Return              -- ^ Zero or more values
+  | Loop                -- ^ @for@, @while@, @foreach@ loops
+  | If                  -- ^ Conditionals
+  | Case                -- ^ @case@ or @switch@ context
+  | InfixL Operator Int -- ^ Left-associative operators, with context
+  | Prefix Operator     -- ^ Prefix operators
+  | Indexing            -- ^ Single-element array/list indexing
+  | Imperative          -- ^ ALGOL-style top-to-bottom int
+  | Interpolation       -- ^ String interpolation
+  | Catch               -- ^ @try@
+  | Finally             -- ^ @except@
+  | BeginBlock          -- ^ Ruby-specific: @BEGIN@
+  | EndBlock            -- ^ Ruby-specific: @END@
+  | Class               -- ^ Class definition
     deriving (Show, Eq)
 
 precedenceOf :: [Scope] -> Int
