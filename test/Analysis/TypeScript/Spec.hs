@@ -32,7 +32,7 @@ spec config = parallel $ do
         other -> expectationFailure (show other)
 
     it "imports with aliased symbols" $ do
-      (scopeGraph, (heap, res)) <- evaluate ["main.ts", "foo.ts", "a.ts", "foo/b.ts"]
+      (scopeGraph, (heap, res)) <- evaluate ["main.ts", "foo.ts", "foo/b.ts"]
       case ModuleTable.lookup "main.ts" <$> res of
         Right (Just (Module _ (scopeAndFrame, _) :| [])) -> do
           const () <$> SpecHelpers.lookupDeclaration "bar" scopeAndFrame heap scopeGraph `shouldBe` Just ()
