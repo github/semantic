@@ -40,9 +40,8 @@ spec = parallel $ do
         declare (ScopeGraph.Declaration "identity") emptySpan (Just associatedScope)
         withScope associatedScope $ do
           declare (Declaration x) emptySpan Nothing
-        valueRef <- function "identity" [ x ]
+        identity <- function "identity" [ x ]
           (SpecEff (LvalMember <$> Heap.lookupDeclaration (ScopeGraph.Declaration (SpecHelpers.name "x")))) associatedScope
-        identity <- value valueRef
         val <- pure (integer 123)
         call identity [val]
     expected `shouldBe` Right (Rval $ integer 123)

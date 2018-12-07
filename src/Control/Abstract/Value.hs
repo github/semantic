@@ -65,7 +65,7 @@ data Comparator
 --
 -- In the concrete domain, introductions & eliminations respectively construct & pattern match against values, while in abstract domains they respectively construct & project finite sets of discrete observations of abstract values. For example, an abstract domain modelling integers as a sign (-, 0, or +) would introduce abstract values by mapping integers to their sign and eliminate them by mapping signs back to some canonical integer, e.g. - -> -1, 0 -> 0, + -> 1.
 
-function :: (Member (Function term address value) sig, Carrier sig m) => Name -> [Name] -> term -> address -> Evaluator term address value m (ValueRef address value)
+function :: (Member (Function term address value) sig, Carrier sig m) => Name -> [Name] -> term -> address -> Evaluator term address value m value
 function name params body scope = sendFunction (Function name params body scope ret)
 
 data BuiltIn
@@ -83,7 +83,7 @@ sendFunction :: (Member (Function term address value) sig, Carrier sig m) => Fun
 sendFunction = send
 
 data Function term address value (m :: * -> *) k
-  = Function Name [Name] term address (ValueRef address value -> k)
+  = Function Name [Name] term address (value -> k)
   | BuiltIn address BuiltIn (value -> k)
   | Call value [value] (ValueRef address value -> k)
   deriving (Functor)

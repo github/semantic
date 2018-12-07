@@ -10,7 +10,6 @@ import Control.Abstract as Abstract
 import Control.Effect.Carrier
 import Control.Effect.Sum
 import Data.Abstract.BaseError
-import Data.Abstract.Ref
 import Data.Abstract.Evaluatable
 import qualified Data.Map.Strict as Map
 import Prologue
@@ -51,7 +50,7 @@ instance ( Member (Allocator address) sig
         for_ params $ \param -> do
           address <- lookupDeclaration (Declaration param)
           assign address Abstract
-        Rval <$> catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body)) >>= Abstract.value)
+        catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body)) >>= Abstract.value)
       Evaluator $ runFunctionC (k res) eval
     BuiltIn _ _ k -> runFunctionC (k Abstract) eval
     Call _ _ k -> runEvaluator $ do
