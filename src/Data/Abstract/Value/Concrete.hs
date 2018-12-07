@@ -71,7 +71,7 @@ instance ( FreeVariables term
          , Member (Resumable (BaseError (HeapError address))) sig
          , Member (Resumable (BaseError (ScopeError address))) sig
          , Member (State (Heap address address (Value term address))) sig
-         , Member (Error (Return address (Value term address))) sig
+         , Member (Error (Return (Value term address))) sig
          , Declarations term
          , Member Trace sig
          , Ord address
@@ -109,7 +109,7 @@ instance ( FreeVariables term
               for_ (zip names params) $ \(name, param) -> do
                 addr <- lookupDeclaration (Declaration name)
                 assign addr param
-              catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body)))
+              Rval <$> catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body)) >>= Abstract.value)
         _ -> throwValueError (CallError op)
       Evaluator $ runFunctionC (k boxed) eval) op)
 
@@ -207,7 +207,7 @@ instance ( Member (Allocator address) sig
          , Member (Abstract.Boolean (Value term address)) sig
          , Member (Deref (Value term address)) sig
          , Member (Error (LoopControl address (Value term address))) sig
-         , Member (Error (Return address (Value term address))) sig
+         , Member (Error (Return (Value term address))) sig
          , Member Fresh sig
          , Member (Reader ModuleInfo) sig
          , Member (Reader PackageInfo) sig

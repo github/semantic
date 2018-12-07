@@ -16,7 +16,7 @@ import qualified Data.Map.Strict as Map
 
 type ModuleC address value m
   = ErrorC (LoopControl address value) (Eff
-  ( ErrorC (Return address value)      (Eff
+  ( ErrorC (Return value)              (Eff
   ( ReaderC (CurrentScope address)     (Eff
   ( ReaderC (CurrentFrame address)     (Eff
   ( DerefC address value               (Eff
@@ -59,7 +59,9 @@ evaluate :: ( AbstractValue term address value (ValueC term address value inner)
             , Member (Reader ModuleInfo) innerSig
             , Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address value))))) outerSig
             , Member (Reader Span) innerSig
+            , Member (Reader Span) outerSig
             , Member (Resumable (BaseError (AddressError address value))) innerSig
+            , Member (Resumable (BaseError (AddressError address value))) outerSig
             , Member (Resumable (BaseError (UnspecializedError value))) innerSig
             , Member (State (Heap address address value)) innerSig
             , Member (State (ScopeGraph address)) innerSig
@@ -103,7 +105,9 @@ evaluate lang perModule runTerm modules = do
                   = runDeref
                   . raiseHandler (runReader (CurrentFrame frameAddress))
                   . raiseHandler (runReader (CurrentScope scopeAddress))
+                  . (>>= rvalBox)
                   . runReturn
+                  . (>>= value)
                   . runLoopControl
 
         runValueEffects = raiseHandler runInterpose . runBoolean . runWhile . runFunction runTerm . either ((*> rvalBox unit) . definePrelude) runTerm
@@ -121,7 +125,7 @@ evalTerm :: ( Carrier sig m
             , Member (Boolean value) sig
             , Member (Deref value) sig
             , Member (Error (LoopControl address value)) sig
-            , Member (Error (Return address value)) sig
+            , Member (Error (Return value)) sig
             , Member (Function term address value) sig
             , Member (Modules address value) sig
             , Member (Reader ModuleInfo) sig

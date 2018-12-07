@@ -21,7 +21,7 @@ data Abstract = Abstract
 
 instance ( Member (Allocator address) sig
          , Member (Deref Abstract) sig
-         , Member (Error (Return address Abstract)) sig
+         , Member (Error (Return Abstract)) sig
          , Member Fresh sig
          , Member (Reader (CurrentFrame address)) sig
          , Member (Reader (CurrentScope address)) sig
@@ -51,7 +51,7 @@ instance ( Member (Allocator address) sig
         for_ params $ \param -> do
           address <- lookupDeclaration (Declaration param)
           assign address Abstract
-        catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body)))
+        Rval <$> catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body)) >>= Abstract.value)
       Evaluator $ runFunctionC (k res) eval
     BuiltIn _ _ k -> runFunctionC (k Abstract) eval
     Call _ _ k -> runEvaluator $ do

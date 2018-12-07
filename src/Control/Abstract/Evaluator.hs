@@ -60,20 +60,20 @@ type Open a = a -> a
 -- Effects
 
 -- | An effect for explicitly returning out of a function/method body.
-newtype Return address value = Return { unReturn :: ValueRef address value }
+newtype Return value = Return { unReturn :: value }
   deriving (Eq, Ord, Show)
 
-earlyReturn :: ( Member (Error (Return address value)) sig
+earlyReturn :: ( Member (Error (Return value)) sig
                , Carrier sig m
                )
-            => ValueRef address value
-            -> Evaluator term address value m (ValueRef address value)
+            => value
+            -> Evaluator term address value m value
 earlyReturn = throwError . Return
 
-catchReturn :: (Member (Error (Return address value)) sig, Carrier sig m) => Evaluator term address value m (ValueRef address value) -> Evaluator term address value m (ValueRef address value)
+catchReturn :: (Member (Error (Return value)) sig, Carrier sig m) => Evaluator term address value m value -> Evaluator term address value m value
 catchReturn = flip catchError (\ (Return value) -> pure value)
 
-runReturn :: (Carrier sig m, Effect sig) => Evaluator term address value (ErrorC (Return address value) (Eff m)) (ValueRef address value) -> Evaluator term address value m (ValueRef address value)
+runReturn :: (Carrier sig m, Effect sig) => Evaluator term address value (ErrorC (Return value) (Eff m)) value -> Evaluator term address value m value
 runReturn = raiseHandler $ fmap (either unReturn id) . runError
 
 
