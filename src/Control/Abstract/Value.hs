@@ -95,7 +95,6 @@ instance Effect (Function term address value) where
   handle state handler = coerce . fmap (handler . (<$ state))
 
 
--- TODO: eval and runFunction should return a ValueRef instead of a value
 runFunction :: Carrier (Function term address value :+: sig) (FunctionC term address value (Eff m))
             => (term -> Evaluator term address value (FunctionC term address value (Eff m)) (ValueRef address value))
             -> Evaluator term address value (FunctionC term address value (Eff m)) a
