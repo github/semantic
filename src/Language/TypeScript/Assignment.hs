@@ -313,7 +313,7 @@ newExpression :: Assignment Term
 newExpression = makeTerm <$> symbol Grammar.NewExpression <*> children (Expression.New  <$> term constructableExpression <*> (typeArguments' <|> emptyTerm) <*> (arguments <|> pure []))
 
 constructableExpression :: Assignment Term
-constructableExpression = this <|> identifier <|> number <|> string <|> templateString <|> regex <|> true <|> false <|> null' <|> undefined <|> object <|> array <|> function <|> arrowFunction <|> class' <|> anonymousClass <|> parenthesizedExpression <|> subscriptExpression <|> memberExpression <|> metaProperty <|> newExpression
+constructableExpression = this <|> identifier <|> number <|> string <|> templateString <|> regex <|> true <|> false <|> null' <|> undefined' <|> object <|> array <|> function <|> arrowFunction <|> class' <|> anonymousClass <|> parenthesizedExpression <|> subscriptExpression <|> memberExpression <|> metaProperty <|> newExpression
 
 metaProperty :: Assignment Term
 metaProperty = makeTerm <$> symbol Grammar.MetaProperty <*> (TypeScript.Syntax.MetaProperty <$ rawSource)
