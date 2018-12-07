@@ -527,7 +527,7 @@ instance Evaluatable MemberAccess where
         -- Throw a ReferenceError since we're attempting to reference a name within a value that is not an Object.
         throwEvalError (ReferenceError lhsValue rhs)
 
-  ref eval MemberAccess{..} = do
+  ref eval _ MemberAccess{..} = do
     name <- maybeM (throwEvalError NoNameError) (declaredName lhs)
     reference (Reference name) (Declaration name)
     lhsValue <- eval lhs

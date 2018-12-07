@@ -169,7 +169,7 @@ instance Evaluatable Identifier where
     reference (Reference name) (Declaration name)
     LvalMember <$> lookupDeclaration (Declaration name)
 
-  ref _ (Identifier name) = do
+  ref _ _ (Identifier name) = do
     reference (Reference name) (Declaration name)
     Just <$> lookupDeclaration (Declaration name)
 
