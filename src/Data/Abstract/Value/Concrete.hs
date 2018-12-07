@@ -109,7 +109,7 @@ instance ( FreeVariables term
               for_ (zip names params) $ \(name, param) -> do
                 addr <- lookupDeclaration (Declaration name)
                 assign addr param
-              catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body)) >>= Abstract.value)
+              catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body)))
         _ -> throwValueError (CallError op)
       Evaluator $ runFunctionC (k boxed) eval) op)
 
