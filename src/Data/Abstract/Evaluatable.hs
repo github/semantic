@@ -78,6 +78,14 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
     rvalBox v
 
   resolve :: ( Carrier sig m
+             , Member (Reader (CurrentFrame address)) sig
+             , Member (Reader (CurrentScope address)) sig
+             , Member (Reader ModuleInfo) sig
+             , Member (Reader Span) sig
+             , Member (Resumable (BaseError (HeapError address))) sig
+             , Member (Resumable (BaseError (ScopeError address))) sig
+             , Member (State (Heap address address value)) sig
+             , Member (State (ScopeGraph address)) sig
              , Ord address
              )
           => (term -> Evaluator term address value m value)
