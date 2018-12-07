@@ -88,7 +88,7 @@ instance Evaluatable Send where
           func <- deref =<< lookupDeclaration (Declaration sel)
           args <- traverse (eval >=> Abstract.value) sendArgs
           call func (lhsValue : args) -- TODO pass through sendBlock
-    maybe callFunction (`withScopeAndFrame` callFunction) lhsFrame
+    Rval <$> maybe callFunction (`withScopeAndFrame` callFunction) lhsFrame
 
 instance Tokenize Send where
   tokenize Send{..} = within Scope.Call $ do

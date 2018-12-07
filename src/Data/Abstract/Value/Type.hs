@@ -20,7 +20,6 @@ import Data.Abstract.BaseError
 import Data.Semigroup.Foldable (foldMap1)
 import qualified Data.Map as Map
 import Prologue hiding (TypeError)
-import Data.Abstract.Ref
 import Data.Abstract.Evaluatable
 
 type TName = Int
@@ -288,7 +287,7 @@ instance ( Member (Allocator address) sig
       boxed <- case unified of
         _ :-> ret -> pure ret
         actual    -> throwTypeError (UnificationError needed actual)
-      Evaluator $ runFunctionC (k (Rval boxed)) eval) op)
+      Evaluator $ runFunctionC (k boxed) eval) op)
 
 
 instance ( Member (Reader ModuleInfo) sig

@@ -14,7 +14,7 @@ import Control.Effect.Carrier
 import Control.Effect.Interpose
 import Control.Effect.Sum
 import Data.Abstract.BaseError
-import Data.Abstract.Evaluatable (UnspecializedError(..), ValueRef(..), EvalError(..), Declarations)
+import Data.Abstract.Evaluatable (UnspecializedError(..), EvalError(..), Declarations)
 import Data.Abstract.FreeVariables
 import Data.Abstract.Name
 import qualified Data.Abstract.Number as Number
@@ -96,8 +96,8 @@ instance ( FreeVariables term
       Evaluator $ runFunctionC (k val) eval
     Abstract.Call op params k -> runEvaluator $ do
       boxed <- case op of
-        Closure _ _ _ _ (Left Print) _ _ -> traverse (trace . show) params *> rvalBox Unit
-        Closure _ _ _ _ (Left Show) _ _ -> rvalBox . String . pack $ show params
+        Closure _ _ _ _ (Left Print) _ _ -> traverse (trace . show) params $> Unit
+        Closure _ _ _ _ (Left Show) _ _ -> pure . String . pack $ show params
         Closure packageInfo moduleInfo _ names (Right body) associatedScope parentFrame -> do
           -- Evaluate the bindings and body with the closure’s package/module info in scope in order to
           -- charge them to the closure's origin.
@@ -109,7 +109,7 @@ instance ( FreeVariables term
               for_ (zip names params) $ \(name, param) -> do
                 addr <- lookupDeclaration (Declaration name)
                 assign addr param
-              Rval <$> catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body)) >>= Abstract.value)
+              catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body)) >>= Abstract.value)
         _ -> throwValueError (CallError op)
       Evaluator $ runFunctionC (k boxed) eval) op)
 
@@ -340,7 +340,7 @@ data ValueError term address resume where
   StringError            :: Value term address                       -> ValueError term address Text
   BoolError              :: Value term address                       -> ValueError term address Bool
   IndexError             :: Value term address -> Value term address -> ValueError term address (Value term address)
-  CallError              :: Value term address                       -> ValueError term address (ValueRef address (Value term address))
+  CallError              :: Value term address                       -> ValueError term address (Value term address)
   NumericError           :: Value term address                       -> ValueError term address (Value term address)
   Numeric2Error          :: Value term address -> Value term address -> ValueError term address (Value term address)
   ComparisonError        :: Value term address -> Value term address -> ValueError term address (Value term address)

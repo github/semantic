@@ -27,24 +27,23 @@ import           System.IO.Unsafe (unsafePerformIO)
 spec :: Spec
 spec = parallel $ do
   it "constructs integers" $ do
-    (_, (_, (_, expected))) <- evaluate (rvalBox (integer 123))
-    expected `shouldBe` Right (Rval (Value.Integer (Number.Integer 123)))
+    (_, (_, (_, expected))) <- evaluate (pure (integer 123))
+    expected `shouldBe` Right (Value.Integer (Number.Integer 123))
 
   it "calls functions" $ do
-    (_, (_, (_, expected))) <- evaluate $
-      rvalBox <=< value <=< withLexicalScopeAndFrame $ do
-        currentScope' <- currentScope
-        let lexicalEdges = Map.singleton Lexical [ currentScope' ]
-            x =  SpecHelpers.name "x"
-        associatedScope <- newScope lexicalEdges
-        declare (ScopeGraph.Declaration "identity") emptySpan (Just associatedScope)
-        withScope associatedScope $ do
-          declare (Declaration x) emptySpan Nothing
-        identity <- function "identity" [ x ]
-          (SpecEff (LvalMember <$> Heap.lookupDeclaration (ScopeGraph.Declaration (SpecHelpers.name "x")))) associatedScope
-        val <- pure (integer 123)
-        call identity [val]
-    expected `shouldBe` Right (Rval $ integer 123)
+    (_, (_, (_, expected))) <- evaluate .withLexicalScopeAndFrame $ do
+      currentScope' <- currentScope
+      let lexicalEdges = Map.singleton Lexical [ currentScope' ]
+          x =  SpecHelpers.name "x"
+      associatedScope <- newScope lexicalEdges
+      declare (ScopeGraph.Declaration "identity") emptySpan (Just associatedScope)
+      withScope associatedScope $ do
+        declare (Declaration x) emptySpan Nothing
+      identity <- function "identity" [ x ]
+        (SpecEff (LvalMember <$> Heap.lookupDeclaration (ScopeGraph.Declaration (SpecHelpers.name "x")))) associatedScope
+      val <- pure (integer 123)
+      call identity [val]
+    expected `shouldBe` Right (integer 123)
 
 evaluate
   = runM
@@ -73,10 +72,8 @@ evaluate
         . runEvalError
         . runDeref @Val
         . runAllocator
-        . (>>= rvalBox)
         . runReturn
         . runLoopControl
-        . (>>= Abstract.value)
         . runBoolean
         . runFunction runSpecEff
         $ action
@@ -119,6 +116,6 @@ instance FreeVariables SpecEff where freeVariables _ = lowerBound
 
 instance Declarations SpecEff where
   declaredName eff =
-    case unsafePerformIO (evaluate $ runSpecEff eff) of
-      (_, (_, (_, Right (Rval (Value.Symbol text))))) -> Just (SpecHelpers.name text)
-      _                                               -> error "declaredName for SpecEff should return an RVal"
+    case unsafePerformIO (evaluate (runSpecEff eff >>= Abstract.value)) of
+      (_, (_, (_, Right (Value.Symbol text)))) -> Just (SpecHelpers.name text)
+      _                                        -> error "declaredName for SpecEff should return an RVal"

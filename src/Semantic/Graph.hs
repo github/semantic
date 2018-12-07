@@ -407,7 +407,7 @@ resumingValueError :: ( Carrier sig m
                                                                   m)) a
                    -> Evaluator term address (Value term address) m a
 resumingValueError = runValueErrorWith (\ baseError -> traceError "ValueError" baseError *> case baseErrorException baseError of
-  CallError val     -> rvalBox val
+  CallError{}       -> pure hole
   StringError val   -> pure (pack (prettyShow val))
   BoolError{}       -> pure True
   BoundsError{}     -> pure hole
