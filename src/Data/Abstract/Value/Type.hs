@@ -275,7 +275,7 @@ instance ( Member (Allocator address) sig
           assign address tvar
           (tvar :) <$> rest) (pure []) params
         -- TODO: We may still want to represent this as a closure and not a function type
-        (zeroOrMoreProduct tvars :->) <$> catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body)) >>= Abstract.value)
+        (zeroOrMoreProduct tvars :->) <$> catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body)))
       Evaluator (runFunctionC (k res) eval)
 
     Abstract.BuiltIn _ Print k -> runFunctionC (k (String :-> Unit)) eval

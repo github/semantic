@@ -50,7 +50,7 @@ instance ( Member (Allocator address) sig
         for_ params $ \param -> do
           address <- lookupDeclaration (Declaration param)
           assign address Abstract
-        catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body)) >>= Abstract.value)
+        catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body)))
       Evaluator $ runFunctionC (k res) eval
     BuiltIn _ _ k -> runFunctionC (k Abstract) eval
     Call _ _ k -> runFunctionC (k Abstract) eval) op)

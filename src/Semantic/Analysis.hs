@@ -110,7 +110,7 @@ evaluate lang perModule runTerm modules = do
                   . runLoopControl
                   . (>>= value)
 
-        runValueEffects = raiseHandler runInterpose . runBoolean . runWhile . runFunction runTerm . either ((*> rvalBox unit) . definePrelude) runTerm
+        runValueEffects = raiseHandler runInterpose . runBoolean . runWhile . runFunction (value <=< runTerm) . either ((*> rvalBox unit) . definePrelude) runTerm
 
 -- | Evaluate a term recursively, applying the passed function at every recursive position.
 --

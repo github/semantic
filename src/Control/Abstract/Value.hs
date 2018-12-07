@@ -96,12 +96,12 @@ instance Effect (Function term address value) where
 
 
 runFunction :: Carrier (Function term address value :+: sig) (FunctionC term address value (Eff m))
-            => (term -> Evaluator term address value (FunctionC term address value (Eff m)) (ValueRef address value))
+            => (term -> Evaluator term address value (FunctionC term address value (Eff m)) value)
             -> Evaluator term address value (FunctionC term address value (Eff m)) a
             -> Evaluator term address value m a
 runFunction eval = raiseHandler (flip runFunctionC (runEvaluator . eval) . interpret)
 
-newtype FunctionC term address value m a = FunctionC { runFunctionC :: (term -> Eff (FunctionC term address value m) (ValueRef address value)) -> m a }
+newtype FunctionC term address value m a = FunctionC { runFunctionC :: (term -> Eff (FunctionC term address value m) value) -> m a }
 
 
 -- | Construct a boolean value in the abstract domain.
