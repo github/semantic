@@ -90,7 +90,7 @@ instance ( FreeVariables term
     in FunctionC (\ eval -> handleSum (eff . handleReader eval runFunctionC) (\case
     Abstract.Function name params body scope k -> runEvaluator $ do
       val <- closure (Just name) params (Right body) scope
-      Evaluator $ runFunctionC (k $ Rval val) eval
+      Evaluator $ runFunctionC (k val) eval
     Abstract.BuiltIn associatedScope builtIn k -> runEvaluator $ do
       val <- closure Nothing [] (Left builtIn) associatedScope
       Evaluator $ runFunctionC (k val) eval

@@ -40,7 +40,7 @@ instance Evaluatable Function where
 
     addr <- lookupDeclaration (Declaration name)
     v <- function name params functionBody associatedScope
-    v <$ (value v >>= assign addr)
+    Rval v <$ assign addr v
 
 declareFunction :: ( Carrier sig m
                    , Member (State (ScopeGraph address)) sig
@@ -99,7 +99,7 @@ instance Evaluatable Method where
 
     addr <- lookupDeclaration (Declaration name)
     v <- function name params methodBody associatedScope
-    v <$ (value v >>= assign addr)
+    Rval v <$ assign addr v
 
 instance Tokenize Data.Syntax.Declaration.Method where
   tokenize Method{..} = within' Scope.Method $ do
