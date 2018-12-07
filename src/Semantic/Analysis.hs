@@ -105,7 +105,6 @@ evaluate lang perModule runTerm modules = do
                   = runDeref
                   . raiseHandler (runReader (CurrentFrame frameAddress))
                   . raiseHandler (runReader (CurrentScope scopeAddress))
-                  . (>>= rvalBox)
                   . runReturn
                   . runLoopControl
                   . (>>= value)

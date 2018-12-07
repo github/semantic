@@ -27,7 +27,7 @@ spec config = parallel $ do
     it "imports with aliases" $ do
       (scopeGraph, (heap, res)) <- evaluate ["main1.py", "a.py", "b/__init__.py", "b/c.py"]
       case ModuleTable.lookup "main1.py" <$> res of
-        Right (Just (Module _ (scopeAndFrame, valueRef) :| [])) -> do
+        Right (Just (Module _ (scopeAndFrame, value) :| [])) -> do
           const () <$> SpecHelpers.lookupDeclaration "b" scopeAndFrame heap scopeGraph `shouldBe` Just ()
           const () <$> SpecHelpers.lookupDeclaration "e" scopeAndFrame heap scopeGraph `shouldBe` Just ()
         other -> expectationFailure (show other)
@@ -35,7 +35,7 @@ spec config = parallel $ do
     it "imports using from syntax" $ do
       (scopeGraph, (heap, res)) <- evaluate ["main2.py", "a.py", "b/__init__.py", "b/c.py"]
       case ModuleTable.lookup "main2.py" <$> res of
-        Right (Just (Module _ (scopeAndFrame, valueRef) :| [])) -> do
+        Right (Just (Module _ (scopeAndFrame, value) :| [])) -> do
           const () <$> SpecHelpers.lookupDeclaration "bar" scopeAndFrame heap scopeGraph `shouldBe` Just ()
           const () <$> SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
 
@@ -46,7 +46,7 @@ spec config = parallel $ do
     it "imports with relative syntax" $ do
       (scopeGraph, (heap, res)) <- evaluate ["main3.py", "c/__init__.py", "c/utils.py"]
       case ModuleTable.lookup "main3.py" <$> res of
-        Right (Just (Module _ (scopeAndFrame, valueRef) :| [])) -> do
+        Right (Just (Module _ (scopeAndFrame, value) :| [])) -> do
           const () <$> SpecHelpers.lookupDeclaration "utils" scopeAndFrame heap scopeGraph `shouldBe` Just ()
           -- (lookupDeclaration "utils" heap >>= deNamespace heap) `shouldBe` Just ("utils", ["to_s"])
         other -> expectationFailure (show other)
@@ -54,19 +54,19 @@ spec config = parallel $ do
     it "subclasses" $ do
       (scopeGraph, (heap, res)) <- evaluate ["subclass.py"]
       case ModuleTable.lookup "subclass.py" <$> res of
-        Right (Just (Module _ (scopeAndFrame, valueRef) :| [])) -> do
+        Right (Just (Module _ (scopeAndFrame, value) :| [])) -> do
           () <$ SpecHelpers.lookupDeclaration "Foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
           () <$ SpecHelpers.lookupDeclaration "Bar" scopeAndFrame heap scopeGraph `shouldBe` Just ()
           SpecHelpers.lookupMembers "Bar" Superclass scopeAndFrame heap scopeGraph `shouldBe` Just [ "dang" ]
-          valueRef `shouldBe` Rval (String "\"bar\"")
+          value `shouldBe` String "\"bar\""
         other -> expectationFailure (show other)
 
     it "handles multiple inheritance left-to-right" $ do
       (scopeGraph, (heap, res)) <- evaluate ["multiple_inheritance.py"]
       case ModuleTable.lookup "multiple_inheritance.py" <$> res of
-        Right (Just (Module _ (scopeAndFrame, valueRef) :| [])) -> do
+        Right (Just (Module _ (scopeAndFrame, value) :| [])) -> do
           SpecHelpers.lookupMembers "Baz" Superclass scopeAndFrame heap scopeGraph `shouldBe` Just [ "dang" ]
-          valueRef `shouldBe` Rval (String "\"bar!\"")
+          value `shouldBe` String "\"bar!\""
         other -> expectationFailure (show other)
 
   where

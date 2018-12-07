@@ -82,7 +82,7 @@ include eval pathTerm f = do
   ((moduleScope, moduleFrame), v) <- f path
   insertImportEdge moduleScope
   insertFrameLink ScopeGraph.Import (Map.singleton moduleScope moduleFrame)
-  pure v
+  pure (Rval v)
 
 newtype Require a = Require { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
