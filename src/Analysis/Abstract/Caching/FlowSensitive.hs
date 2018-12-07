@@ -63,15 +63,15 @@ cachingTerms :: ( Cacheable term address value
                 , Member (State (Heap address address value)) sig
                 , Carrier sig m
                 )
-             => Open (Open (term -> Evaluator term address value m (ValueRef address value)))
-cachingTerms recur0 recur term = do
+             => Open (term -> Evaluator term address value m (ValueRef address value))
+cachingTerms recur term = do
   c <- getConfiguration term
   cached <- lookupCache c
   case cached of
     Just pairs -> scatter pairs
     Nothing -> do
       pairs <- consultOracle c
-      cachingConfiguration c pairs (recur0 recur term)
+      cachingConfiguration c pairs (recur term)
 
 convergingModules :: ( Cacheable term address value
                      , Member Fresh sig

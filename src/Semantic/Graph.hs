@@ -329,10 +329,10 @@ withTermSpans :: ( Member (Reader Span) sig
                  , Carrier sig m
                  , Base term ~ TermF syntax Location
                  )
-              => Open (Open (term -> Evaluator term address value m a))
-withTermSpans recur0 recur term = let
+              => Open (term -> Evaluator term address value m a)
+withTermSpans recur term = let
   span = locationSpan (termFAnnotation (project term))
-  updatedSpanAlg = withCurrentSpan span (recur0 recur term)
+  updatedSpanAlg = withCurrentSpan span (recur term)
   in modifyChildSpan span updatedSpanAlg
 
 resumingResolutionError :: ( Member Trace sig

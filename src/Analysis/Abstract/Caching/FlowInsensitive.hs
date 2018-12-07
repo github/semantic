@@ -64,15 +64,15 @@ cachingTerms :: ( Member NonDet sig
                 , Ord term
                 , Ord value
                 )
-             => Open (Open (term -> Evaluator term address value m (ValueRef address value)))
-cachingTerms recur0 recur term = do
+             => Open (term -> Evaluator term address value m (ValueRef address value))
+cachingTerms recur term = do
   c <- getConfiguration term
   cached <- lookupCache c
   case cached of
     Just values -> scatter values
     Nothing -> do
       values <- consultOracle c
-      cachingConfiguration c values (recur0 recur term)
+      cachingConfiguration c values (recur term)
 
 convergingModules :: ( Eq value
                      , Member Fresh sig

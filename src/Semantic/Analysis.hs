@@ -148,6 +148,6 @@ evalTerm :: ( Carrier sig m
             , Show address
             , Recursive term
             )
-         => Open (Open (term -> Evaluator term address value m (ValueRef address value)))
+         => Open (term -> Evaluator term address value m (ValueRef address value))
          -> term -> Evaluator term address value m (ValueRef address value)
-evalTerm perTerm = fix (perTerm (\ ev -> eval ev . project))
+evalTerm perTerm = fix (\ ev -> perTerm (eval ev . project))

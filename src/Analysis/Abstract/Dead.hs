@@ -35,8 +35,8 @@ revivingTerms :: ( Member (State (Dead term)) sig
                  , Ord term
                  , Carrier sig m
                  )
-              => Open (Open (term -> Evaluator term address value m a))
-revivingTerms recur0 recur term = revive term *> recur0 recur term
+              => Open (term -> Evaluator term address value m a)
+revivingTerms recur term = revive term *> recur term
 
 killingModules :: ( Foldable (Base term)
                   , Member (State (Dead term)) sig
