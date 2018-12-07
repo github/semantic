@@ -165,7 +165,7 @@ instance Ord1 Identifier where liftCompare = genericLiftCompare
 instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Identifier where
-  eval _ (Identifier name) = do
+  eval _ _ (Identifier name) = do
     reference (Reference name) (Declaration name)
     LvalMember <$> lookupDeclaration (Declaration name)
 
@@ -207,7 +207,7 @@ instance Ord1 Empty where liftCompare _ _ _ = EQ
 instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
 
 instance Evaluatable Empty where
-  eval _ _ = rvalBox unit
+  eval _ _ _ = rvalBox unit
 
 instance Tokenize Empty where
   tokenize = ignore
@@ -313,7 +313,7 @@ instance Ord1 Context where liftCompare = genericLiftCompare
 instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Context where
-  eval eval Context{..} = eval contextSubject
+  eval eval _ Context{..} = eval contextSubject
 
 instance Tokenize Context where
   tokenize Context{..} = sequenceA_ (sepTrailing contextTerms) *> contextSubject

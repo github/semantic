@@ -23,7 +23,7 @@ instance Ord1 JavaScriptRequire where liftCompare = genericLiftCompare
 instance Show1 JavaScriptRequire where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable JavaScriptRequire where
-  eval _ (JavaScriptRequire aliasTerm importPath) = do
+  eval _ _ (JavaScriptRequire aliasTerm importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath javascriptExtensions
     ((moduleScope, moduleFrame), _) <- require modulePath
 

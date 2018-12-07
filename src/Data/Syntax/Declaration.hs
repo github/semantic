@@ -29,7 +29,7 @@ instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 -- TODO: How should we represent function types, where applicable?
 
 instance Evaluatable Function where
-  eval _ Function{..} = do
+  eval _ _ Function{..} = do
     name <- maybeM (throwEvalError NoNameError) (declaredName functionName)
     span <- ask @Span
     associatedScope <- declareFunction name span
@@ -85,7 +85,7 @@ instance Diffable Method where
 -- Evaluating a Method creates a closure and makes that value available in the
 -- local environment.
 instance Evaluatable Method where
-  eval _ Method{..} = do
+  eval _ _ Method{..} = do
     name <- maybeM (throwEvalError NoNameError) (declaredName methodName)
     span <- ask @Span
     associatedScope <- declareFunction name span
@@ -160,8 +160,8 @@ instance Ord1 VariableDeclaration where liftCompare = genericLiftCompare
 instance Show1 VariableDeclaration where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable VariableDeclaration where
-  eval _ (VariableDeclaration [])   = rvalBox unit
-  eval eval (VariableDeclaration decs) = do
+  eval _    _ (VariableDeclaration [])   = rvalBox unit
+  eval eval _ (VariableDeclaration decs) = do
     for_ decs $ \declaration -> do
       name <- maybeM (throwEvalError NoNameError) (declaredName declaration)
       declare (Declaration name) emptySpan Nothing
@@ -205,7 +205,7 @@ instance Show1 PublicFieldDefinition where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for PublicFieldDefinition
 instance Evaluatable PublicFieldDefinition where
-  eval _ PublicFieldDefinition{..} = do
+  eval _ _ PublicFieldDefinition{..} = do
     span <- ask @Span
     propertyName <- maybeM (throwEvalError NoNameError) (declaredName publicFieldPropertyName)
     declare (Declaration propertyName) span Nothing
@@ -237,7 +237,7 @@ instance Ord1 Class where liftCompare = genericLiftCompare
 instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Class where
-  eval eval Class{..} = do
+  eval eval _ Class{..} = do
     name <- maybeM (throwEvalError NoNameError) (declaredName classIdentifier)
     span <- ask @Span
     currentScope' <- currentScope
@@ -342,7 +342,7 @@ instance Ord1 TypeAlias where liftCompare = genericLiftCompare
 instance Show1 TypeAlias where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable TypeAlias where
-  eval _ TypeAlias{..} = do
+  eval _ _ TypeAlias{..} = do
     name <- maybeM (throwEvalError NoNameError) (declaredName typeAliasIdentifier)
     kindName <- maybeM (throwEvalError NoNameError) (declaredName typeAliasKind)
 

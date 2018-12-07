@@ -71,8 +71,9 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Show address
           )
        => (term -> Evaluator term address value m (ValueRef address value))
+       -> ()
        -> (constr term -> Evaluator term address value m (ValueRef address value))
-  eval recur expr = do
+  eval recur _ expr = do
     traverse_ recur expr
     v <- throwUnspecializedError $ UnspecializedError ("Eval unspecialized for " <> liftShowsPrec (const (const id)) (const id) 0 expr "")
     rvalBox v
@@ -284,11 +285,11 @@ throwUnspecializedError = throwBaseError
 
 -- | If we can evaluate any syntax which can occur in a 'Sum', we can evaluate the 'Sum'.
 instance (Apply Evaluatable fs, Apply Show1 fs, Apply Foldable fs) => Evaluatable (Sum fs) where
-  eval eval' = apply @Evaluatable (eval eval')
+  eval eval' ref = apply @Evaluatable (eval eval' ref)
 
 -- | Evaluating a 'TermF' ignores its annotation, evaluating the underlying syntax.
 instance (Evaluatable s, Show a) => Evaluatable (TermF s a) where
-  eval eval' = eval eval' . termFOut
+  eval eval' ref = eval eval' ref . termFOut
 
 
 -- NOTE: Use 'Data.Syntax.Statements' instead of '[]' if you need imperative eval semantics.
@@ -300,4 +301,4 @@ instance (Evaluatable s, Show a) => Evaluatable (TermF s a) where
 --   3. Only the last statement’s return value is returned.
 instance Evaluatable [] where
   -- 'nonEmpty' and 'foldMap1' enable us to return the last statement’s result instead of 'unit' for non-empty lists.
-  eval eval = maybe (rvalBox unit) (runApp . foldMap1 (App . eval)) . nonEmpty
+  eval eval _ = maybe (rvalBox unit) (runApp . foldMap1 (App . eval)) . nonEmpty

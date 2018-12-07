@@ -70,7 +70,7 @@ instance Ord1 Send where liftCompare = genericLiftCompare
 instance Show1 Send where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Send where
-  eval eval Send{..} = do
+  eval eval _ Send{..} = do
     sel <- case sendSelector of
              Just sel -> maybeM (throwEvalError NoNameError) (declaredName sel)
              Nothing  ->
@@ -105,7 +105,7 @@ instance Ord1 Require where liftCompare = genericLiftCompare
 instance Show1 Require where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Require where
-  eval eval (Require _ x) = do
+  eval eval _ (Require _ x) = do
     name <- eval x >>= value >>= asString
     path <- resolveRubyName name
     traceResolve name path
@@ -147,10 +147,10 @@ instance Tokenize Load where
     within' Scope.Params $ loadPath *> fromMaybe (pure ()) loadWrap
 
 instance Evaluatable Load where
-  eval eval (Load x Nothing) = do
+  eval eval _ (Load x Nothing) = do
     path <- eval x >>= value >>= asString
     rvalBox =<< doLoad path False
-  eval eval (Load x (Just wrap)) = do
+  eval eval _ (Load x (Just wrap)) = do
     path <- eval x >>= value >>= asString
     shouldWrap <- eval wrap >>= value >>= asBool
     rvalBox =<< doLoad path shouldWrap
@@ -194,7 +194,7 @@ instance Ord1 Class where liftCompare = genericLiftCompare
 instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Class where
-  eval eval Class{..} = do
+  eval eval _ Class{..} = do
     name <- maybeM (throwEvalError NoNameError) (declaredName classIdentifier)
     span <- ask @Span
     currentScope' <- currentScope
@@ -257,7 +257,7 @@ instance Ord1 Module where liftCompare = genericLiftCompare
 instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Module where
-  eval eval Module{..} =  do
+  eval eval _ Module{..} =  do
     name <- maybeM (throwEvalError NoNameError) (declaredName moduleIdentifier)
     span <- ask @Span
     currentScope' <- currentScope
@@ -305,7 +305,7 @@ data LowPrecedenceAnd a = LowPrecedenceAnd { lhs :: a, rhs :: a }
 
 instance Evaluatable LowPrecedenceAnd where
   -- N.B. we have to use Monad rather than Applicative/Traversable on 'And' and 'Or' so that we don't evaluate both operands
-  eval eval t = rvalBox =<< go (fmap (eval >=> value) t) where
+  eval eval _ t = rvalBox =<< go (fmap (eval >=> value) t) where
     go (LowPrecedenceAnd a b) = do
       cond <- a
       ifthenelse cond b (pure cond)
@@ -326,7 +326,7 @@ data LowPrecedenceOr a = LowPrecedenceOr { lhs :: a, rhs :: a }
 
 instance Evaluatable LowPrecedenceOr where
   -- N.B. we have to use Monad rather than Applicative/Traversable on 'And' and 'Or' so that we don't evaluate both operands
-  eval eval t = rvalBox =<< go (fmap (eval >=> value) t) where
+  eval eval _ t = rvalBox =<< go (fmap (eval >=> value) t) where
     go (LowPrecedenceOr a b) = do
       cond <- a
       ifthenelse cond (pure cond) b
@@ -349,7 +349,7 @@ instance Ord1 Assignment where liftCompare = genericLiftCompare
 instance Show1 Assignment where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Assignment where
-  eval eval Assignment{..} = do
+  eval eval _ Assignment{..} = do
     lhsName <- maybeM (throwEvalError NoNameError) (declaredName assignmentTarget)
     maybeSlot <- maybeLookupDeclaration (Declaration lhsName)
     assignmentSpan <- ask @Span

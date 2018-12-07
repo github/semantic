@@ -28,7 +28,7 @@ instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
   -- http://www.typescriptlang.org/docs/handbook/module-resolution.html
 instance Evaluatable Import where
-  eval _ (Import symbols importPath) = do
+  eval _ _ (Import symbols importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
     ((moduleScope, moduleFrame), _) <- require modulePath
     if Prologue.null symbols then do
@@ -58,7 +58,7 @@ instance Ord1 QualifiedAliasedImport where liftCompare = genericLiftCompare
 instance Show1 QualifiedAliasedImport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedAliasedImport where
-  eval _ (QualifiedAliasedImport aliasTerm importPath) = do
+  eval _ _ (QualifiedAliasedImport aliasTerm importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
     ((moduleScope, moduleFrame), _) <- require modulePath
     span <- ask @Span
@@ -83,7 +83,7 @@ instance Ord1 SideEffectImport where liftCompare = genericLiftCompare
 instance Show1 SideEffectImport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable SideEffectImport where
-  eval _ (SideEffectImport importPath) = do
+  eval _ _ (SideEffectImport importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
     void $ require modulePath
     rvalBox unit
@@ -98,7 +98,7 @@ instance Ord1 QualifiedExport where liftCompare = genericLiftCompare
 instance Show1 QualifiedExport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedExport where
-  eval _ (QualifiedExport exportSymbols) = do
+  eval _ _ (QualifiedExport exportSymbols) = do
     -- Create a Lexical edge from the qualifed export's scope to the current scope.
     currentScopeAddress <- currentScope
     let edges = Map.singleton Lexical [ currentScopeAddress ]
@@ -126,7 +126,7 @@ instance Ord1 QualifiedExportFrom where liftCompare = genericLiftCompare
 instance Show1 QualifiedExportFrom where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedExportFrom where
-  eval _ (QualifiedExportFrom importPath exportSymbols) = do
+  eval _ _ (QualifiedExportFrom importPath exportSymbols) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
 
     ((moduleScope, moduleFrame), _) <- require modulePath
@@ -150,7 +150,7 @@ instance Ord1 DefaultExport where liftCompare = genericLiftCompare
 instance Show1 DefaultExport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable DefaultExport where
-  eval eval (DefaultExport term) = do
+  eval eval _ (DefaultExport term) = do
     case declaredName term of
       Just _ -> do
         exportScope <- newScope mempty
@@ -337,7 +337,7 @@ instance Ord1 TypeIdentifier where liftCompare = genericLiftCompare
 instance Show1 TypeIdentifier where liftShowsPrec = genericLiftShowsPrec
 -- TODO: TypeIdentifier shouldn't evaluate to an address in the heap?
 instance Evaluatable TypeIdentifier where
-  eval _ TypeIdentifier{..} = do
+  eval _ _ TypeIdentifier{..} = do
     -- Add a reference to the type identifier in the current scope.
     reference (Reference (Evaluatable.name contents)) (Declaration (Evaluatable.name contents))
     rvalBox unit
@@ -390,7 +390,7 @@ instance Ord1 AmbientDeclaration where liftCompare = genericLiftCompare
 instance Show1 AmbientDeclaration where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable AmbientDeclaration where
-  eval eval (AmbientDeclaration body) = eval body
+  eval eval _ (AmbientDeclaration body) = eval body
 
 data EnumDeclaration a = EnumDeclaration { enumDeclarationIdentifier :: !a, enumDeclarationBody :: ![a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
@@ -415,7 +415,7 @@ instance Ord1 ExtendsClause where liftCompare = genericLiftCompare
 instance Show1 ExtendsClause where liftShowsPrec = genericLiftShowsPrec
 -- TODO: ExtendsClause shouldn't evaluate to an address in the heap?
 instance Evaluatable ExtendsClause where
-  eval eval ExtendsClause{..} = do
+  eval eval _ ExtendsClause{..} = do
     -- Evaluate subterms
     traverse_ eval extendsClauses
     rvalBox unit
@@ -612,7 +612,7 @@ declareModule eval identifier statements = do
         rvalBox unit
 
 instance Evaluatable Module where
-  eval eval Module{..} = declareModule eval moduleIdentifier moduleStatements
+  eval eval _ Module{..} = declareModule eval moduleIdentifier moduleStatements
 
 instance Declarations1 Module where
   liftDeclaredName declaredName = declaredName . moduleIdentifier
@@ -625,7 +625,7 @@ instance Ord1 InternalModule where liftCompare = genericLiftCompare
 instance Show1 InternalModule where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable InternalModule where
-  eval eval InternalModule{..} =
+  eval eval _ InternalModule{..} =
     declareModule eval internalModuleIdentifier internalModuleStatements
 
 instance Declarations a => Declarations (InternalModule a) where
@@ -658,7 +658,7 @@ instance Declarations a => Declarations (AbstractClass a) where
   declaredName AbstractClass{..} = declaredName abstractClassIdentifier
 
 instance Evaluatable AbstractClass where
-  eval eval AbstractClass{..} = do
+  eval eval _ AbstractClass{..} = do
     name <- maybeM (throwEvalError NoNameError) (declaredName abstractClassIdentifier)
     span <- ask @Span
     currentScope' <- currentScope

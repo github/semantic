@@ -92,7 +92,7 @@ instance Ord1 Require where liftCompare    = genericLiftCompare
 instance Show1 Require where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Require where
-  eval eval (Require path) = include eval path load
+  eval eval _ (Require path) = include eval path load
 
 
 newtype RequireOnce a = RequireOnce { value :: a }
@@ -103,7 +103,7 @@ instance Ord1 RequireOnce where liftCompare = genericLiftCompare
 instance Show1 RequireOnce where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable RequireOnce where
-  eval eval (RequireOnce path) = include eval path require
+  eval eval _ (RequireOnce path) = include eval path require
 
 
 newtype Include a = Include { value :: a }
@@ -114,7 +114,7 @@ instance Ord1 Include where liftCompare    = genericLiftCompare
 instance Show1 Include where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Include where
-  eval eval (Include path) = include eval path load
+  eval eval _ (Include path) = include eval path load
 
 
 newtype IncludeOnce a = IncludeOnce { value :: a }
@@ -125,7 +125,7 @@ instance Ord1 IncludeOnce where liftCompare    = genericLiftCompare
 instance Show1 IncludeOnce where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable IncludeOnce where
-  eval eval (IncludeOnce path) = include eval path require
+  eval eval _ (IncludeOnce path) = include eval path require
 
 
 newtype ArrayElement a = ArrayElement { value :: a }
@@ -219,7 +219,7 @@ instance Ord1 QualifiedName where liftCompare = genericLiftCompare
 instance Show1 QualifiedName where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedName where
-  eval _ (QualifiedName obj iden) = do
+  eval _ _ (QualifiedName obj iden) = do
     name <- maybeM (throwEvalError NoNameError) (declaredName obj)
     reference (Reference name) (Declaration name)
     childScope <- associatedScope (Declaration name)

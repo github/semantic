@@ -95,7 +95,7 @@ instance Eq1 RequiredParameter where liftEq = genericLiftEq
 instance Ord1 RequiredParameter where liftCompare = genericLiftCompare
 instance Show1 RequiredParameter where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable RequiredParameter where
-  eval eval RequiredParameter{..} = do
+  eval eval _ RequiredParameter{..} = do
     name <- maybeM (throwEvalError NoNameError) (declaredName requiredParameterSubject)
     span <- ask @Span
     declare (Declaration name) span Nothing
