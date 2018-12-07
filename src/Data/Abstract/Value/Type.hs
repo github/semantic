@@ -241,7 +241,7 @@ instance Ord address => ValueRoots address Type where
 
 instance ( Member (Allocator address) sig
          , Member (Deref Type) sig
-         , Member (Error (Return address Type)) sig
+         , Member (Error (Return Type)) sig
          , Member Fresh sig
          , Member (Reader (CurrentFrame address)) sig
          , Member (Reader (CurrentScope address)) sig
@@ -276,7 +276,7 @@ instance ( Member (Allocator address) sig
           assign address tvar
           (tvar :) <$> rest) (pure []) params
         -- TODO: We may still want to represent this as a closure and not a function type
-        bimap id (zeroOrMoreProduct tvars :->) <$> catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body)))
+        Rval . (zeroOrMoreProduct tvars :->) <$> catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body)) >>= Abstract.value)
       Evaluator (runFunctionC (k res) eval)
 
     Abstract.BuiltIn _ Print k -> runFunctionC (k (String :-> Unit)) eval

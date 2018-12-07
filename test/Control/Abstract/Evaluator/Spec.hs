@@ -3,7 +3,7 @@ module Control.Abstract.Evaluator.Spec
 ( spec
 ) where
 
-import           Control.Abstract
+import           Control.Abstract as Abstract
 import qualified Control.Abstract.Heap as Heap
 import           Data.Abstract.Address.Precise as Precise
 import           Data.Abstract.BaseError
@@ -74,7 +74,9 @@ evaluate
         . runEvalError
         . runDeref @Val
         . runAllocator
+        . (>>= rvalBox)
         . runReturn
+        . (>>= Abstract.value)
         . runLoopControl
         . runBoolean
         . runFunction runSpecEff
@@ -89,7 +91,7 @@ newtype SpecEff = SpecEff
   { runSpecEff :: Evaluator SpecEff Precise Val (FunctionC SpecEff Precise Val
                  (Eff (BooleanC Val
                  (Eff (ErrorC (LoopControl Precise Val)
-                 (Eff (ErrorC (Return Precise Val)
+                 (Eff (ErrorC (Return Val)
                  (Eff (AllocatorC Precise
                  (Eff (DerefC Precise Val
                  (Eff (ResumableC (BaseError (EvalError Precise Val))

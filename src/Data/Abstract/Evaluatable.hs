@@ -49,7 +49,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Member (Deref value) sig
           , Member (State (ScopeGraph address)) sig
           , Member (Error (LoopControl address value)) sig
-          , Member (Error (Return address value)) sig
+          , Member (Error (Return value)) sig
           , Member Fresh sig
           , Member (Function term address value) sig
           , Member (Modules address value) sig
