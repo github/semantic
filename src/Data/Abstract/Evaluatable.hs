@@ -92,8 +92,9 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
          , Ord address
          )
       => (term -> Evaluator term address value m value)
+      -> (term -> Evaluator term address value m (Maybe (Slot address)))
       -> (constr term -> Evaluator term address value m (Maybe (Slot address)))
-  ref _ _ = pure Nothing
+  ref _ _ _ = pure Nothing
 
 
 traceResolve :: (Show a, Show b, Member Trace sig, Carrier sig m) => a -> b -> Evaluator term address value m ()
