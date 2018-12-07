@@ -32,7 +32,7 @@ instance Evaluatable Call where
   eval eval Call{..} = do
     op <- eval callFunction >>= Abstract.value
     args <- traverse (eval >=> Abstract.value) callParams
-    call op args
+    Rval <$> call op args
 
 instance Tokenize Call where
   tokenize Call{..} = within Scope.Call $ do

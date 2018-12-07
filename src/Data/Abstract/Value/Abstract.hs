@@ -53,8 +53,7 @@ instance ( Member (Allocator address) sig
         catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body)) >>= Abstract.value)
       Evaluator $ runFunctionC (k res) eval
     BuiltIn _ _ k -> runFunctionC (k Abstract) eval
-    Call _ _ k -> runEvaluator $ do
-      rvalBox Abstract >>= Evaluator . flip runFunctionC eval . k) op)
+    Call _ _ k -> runFunctionC (k Abstract) eval) op)
 
 
 instance (Carrier sig m, Alternative m) => Carrier (Boolean Abstract :+: sig) (BooleanC Abstract m) where

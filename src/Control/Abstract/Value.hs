@@ -76,7 +76,7 @@ data BuiltIn
 builtIn :: (Member (Function term address value) sig, Carrier sig m) => address -> BuiltIn -> Evaluator term address value m value
 builtIn address = sendFunction . flip (BuiltIn address) ret
 
-call :: (Member (Function term address value) sig, Carrier sig m) => value -> [value] -> Evaluator term address value m (ValueRef address value)
+call :: (Member (Function term address value) sig, Carrier sig m) => value -> [value] -> Evaluator term address value m value
 call fn args = sendFunction (Call fn args ret)
 
 sendFunction :: (Member (Function term address value) sig, Carrier sig m) => Function term address value (Evaluator term address value m) (Evaluator term address value m a) -> Evaluator term address value m a
@@ -85,7 +85,7 @@ sendFunction = send
 data Function term address value (m :: * -> *) k
   = Function Name [Name] term address (value -> k)
   | BuiltIn address BuiltIn (value -> k)
-  | Call value [value] (ValueRef address value -> k)
+  | Call value [value] (value -> k)
   deriving (Functor)
 
 instance HFunctor (Function term address value) where
