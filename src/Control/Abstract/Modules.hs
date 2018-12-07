@@ -72,7 +72,10 @@ instance HFunctor (Modules address value) where
   hmap _ = coerce
 
 instance Effect (Modules address value) where
-  handle state handler = coerce . fmap (handler . (<$ state))
+  handle state handler (Load    path  k) = Load    path  (handler . (<$ state) . k)
+  handle state handler (Lookup  path  k) = Lookup  path  (handler . (<$ state) . k)
+  handle state handler (Resolve paths k) = Resolve paths (handler . (<$ state) . k)
+  handle state handler (List    path  k) = List    path  (handler . (<$ state) . k)
 
 
 sendModules :: ( Member (Modules address value) sig
