@@ -5,7 +5,7 @@
   (SymbolElement)
   (Integer)
   (This)
-  (Identifier)
+  (ZSuper)
   (Enumeration
     (Integer)
     (Integer)
