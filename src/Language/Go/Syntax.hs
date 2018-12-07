@@ -59,7 +59,7 @@ instance Ord1 Import where liftCompare = genericLiftCompare
 instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Import where
-  eval _ (Language.Go.Syntax.Import importPath _) = do
+  eval _ _ (Language.Go.Syntax.Import importPath _) = do
     paths <- resolveGoImport importPath
     for_ paths $ \path -> do
       traceResolve (unPath importPath) path
@@ -80,7 +80,7 @@ instance Ord1 QualifiedImport where liftCompare = genericLiftCompare
 instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedImport where
-  eval _ (QualifiedImport importPath aliasTerm) = do
+  eval _ _ (QualifiedImport importPath aliasTerm) = do
     paths <- resolveGoImport importPath
     alias <- maybeM (throwEvalError NoNameError) (declaredName aliasTerm)
     span <- ask @Span
@@ -115,7 +115,7 @@ instance Show1 SideEffectImport where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Revisit this and confirm if this is correct.
 instance Evaluatable SideEffectImport where
-  eval _ (SideEffectImport importPath _) = do
+  eval _ _ (SideEffectImport importPath _) = do
     paths <- resolveGoImport importPath
     traceResolve (unPath importPath) paths
     for_ paths $ \path -> require path -- Do we need to construct any scope / frames for these side-effect imports?
@@ -284,7 +284,7 @@ instance Ord1 Package where liftCompare = genericLiftCompare
 instance Show1 Package where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Package where
-  eval eval (Package _ xs) = maybe (rvalBox unit) (runApp . foldMap1 (App . eval)) (nonEmpty xs)
+  eval eval _ (Package _ xs) = maybe (rvalBox unit) (runApp . foldMap1 (App . eval)) (nonEmpty xs)
 
 
 -- | A type assertion in Go (e.g. `x.(T)` where the value of `x` is not nil and is of type `T`).

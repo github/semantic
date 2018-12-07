@@ -23,7 +23,7 @@ instance Ord1 File where liftCompare = genericLiftCompare
 instance Show1 File where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable File where
-  eval _ File = rvalBox =<< (string . T.pack . modulePath <$> currentModule)
+  eval _ _ File = rvalBox =<< (string . T.pack . modulePath <$> currentModule)
 
 -- We may need a separate token class for these given additional languages
 instance Tokenize File where
@@ -39,7 +39,7 @@ instance Ord1 Line where liftCompare = genericLiftCompare
 instance Show1 Line where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Line where
-  eval _ Line = rvalBox =<< (integer . fromIntegral . posLine . spanStart <$> currentSpan)
+  eval _ _ Line = rvalBox =<< (integer . fromIntegral . posLine . spanStart <$> currentSpan)
 
 -- PT TODO: proper token for this
 instance Tokenize Line where
