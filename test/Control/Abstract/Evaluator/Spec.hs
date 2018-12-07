@@ -76,8 +76,8 @@ evaluate
         . runAllocator
         . (>>= rvalBox)
         . runReturn
-        . (>>= Abstract.value)
         . runLoopControl
+        . (>>= Abstract.value)
         . runBoolean
         . runFunction runSpecEff
         $ action
@@ -90,7 +90,7 @@ type Val = Value SpecEff Precise
 newtype SpecEff = SpecEff
   { runSpecEff :: Evaluator SpecEff Precise Val (FunctionC SpecEff Precise Val
                  (Eff (BooleanC Val
-                 (Eff (ErrorC (LoopControl Precise Val)
+                 (Eff (ErrorC (LoopControl Val)
                  (Eff (ErrorC (Return Val)
                  (Eff (AllocatorC Precise
                  (Eff (DerefC Precise Val

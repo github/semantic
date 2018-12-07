@@ -15,13 +15,13 @@ import Prologue
 import qualified Data.Map.Strict as Map
 
 type ModuleC address value m
-  = ErrorC (LoopControl address value) (Eff
-  ( ErrorC (Return value)              (Eff
-  ( ReaderC (CurrentScope address)     (Eff
-  ( ReaderC (CurrentFrame address)     (Eff
-  ( DerefC address value               (Eff
-  ( AllocatorC address                 (Eff
-  ( ReaderC ModuleInfo                 (Eff
+  = ErrorC (LoopControl value)     (Eff
+  ( ErrorC (Return value)          (Eff
+  ( ReaderC (CurrentScope address) (Eff
+  ( ReaderC (CurrentFrame address) (Eff
+  ( DerefC address value           (Eff
+  ( AllocatorC address             (Eff
+  ( ReaderC ModuleInfo             (Eff
     m)))))))))))))
 
 type ValueC term address value m
@@ -107,8 +107,8 @@ evaluate lang perModule runTerm modules = do
                   . raiseHandler (runReader (CurrentScope scopeAddress))
                   . (>>= rvalBox)
                   . runReturn
-                  . (>>= value)
                   . runLoopControl
+                  . (>>= value)
 
         runValueEffects = raiseHandler runInterpose . runBoolean . runWhile . runFunction runTerm . either ((*> rvalBox unit) . definePrelude) runTerm
 
@@ -124,7 +124,7 @@ evalTerm :: ( Carrier sig m
             , Member (Allocator address) sig
             , Member (Boolean value) sig
             , Member (Deref value) sig
-            , Member (Error (LoopControl address value)) sig
+            , Member (Error (LoopControl value)) sig
             , Member (Error (Return value)) sig
             , Member (Function term address value) sig
             , Member (Modules address value) sig

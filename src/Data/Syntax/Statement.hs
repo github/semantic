@@ -282,7 +282,7 @@ instance Ord1 Break where liftCompare = genericLiftCompare
 instance Show1 Break where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Break where
-  eval eval (Break x) = eval x >>= throwBreak
+  eval eval (Break x) = eval x >>= Abstract.value >>= throwBreak >>= rvalBox
 
 instance Tokenize Break where
   tokenize (Break b) = yield (Token.Flow Token.Break) *> b
@@ -295,7 +295,7 @@ instance Ord1 Continue where liftCompare = genericLiftCompare
 instance Show1 Continue where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Continue where
-  eval eval (Continue x) = eval x >>= throwContinue
+  eval eval (Continue x) = eval x >>= Abstract.value >>= throwContinue >>= rvalBox
 
 instance Tokenize Continue where
   tokenize (Continue c) = yield (Token.Flow Token.Continue) *> c

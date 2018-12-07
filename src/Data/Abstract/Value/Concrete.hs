@@ -129,7 +129,7 @@ instance ( Member (Reader ModuleInfo) sig
 
 instance forall sig m term address. ( Carrier sig m
          , Member (Abstract.Boolean (Value term address)) sig
-         , Member (Error (LoopControl address (Value term address))) sig
+         , Member (Error (LoopControl (Value term address))) sig
          , Member (Interpose (Resumable (BaseError (UnspecializedError (Value term address))))) sig
          , Show address
          , Show term
@@ -137,20 +137,20 @@ instance forall sig m term address. ( Carrier sig m
       => Carrier (Abstract.While address (Value term address) :+: sig) (WhileC address (Value term address) (Eff m)) where
   ret = WhileC . ret
   eff = WhileC . handleSum (eff . handleCoercible) (\case
-    Abstract.While cond body k -> interpose @(Resumable (BaseError (UnspecializedError (Value term address)))) (runEvaluator (loop (\continue -> do
+    Abstract.While cond body k -> interpose @(Resumable (BaseError (UnspecializedError (Value term address)))) (runEvaluator (rvalBox =<< loop (\continue -> do
       cond' <- Evaluator (runWhileC cond)
 
       -- `interpose` is used to handle 'UnspecializedError's and abort out of the
       -- loop, otherwise under concrete semantics we run the risk of the
       -- conditional always being true and getting stuck in an infinite loop.
 
-      ifthenelse cond' (Evaluator (runWhileC body) *> continue) (rvalBox Unit))))
-      (\(Resumable (BaseError _ _ (UnspecializedError _)) _) -> throwError (Abort @address @(Value term address)))
+      ifthenelse cond' (Evaluator (runWhileC body) *> continue) (pure Unit))))
+      (\(Resumable (BaseError _ _ (UnspecializedError _)) _) -> throwError (Abort @(Value term address)))
         >>= runWhileC . k)
     where
       loop x = catchLoopControl (fix x) $ \case
-        Break valueRef -> pure valueRef
-        Abort -> rvalBox unit
+        Break value -> pure value
+        Abort -> pure unit
         -- FIXME: Figure out how to deal with this. Ruby treats this as the result
         -- of the current block iteration, while PHP specifies a breakout level
         -- and TypeScript appears to take a label.
@@ -206,7 +206,7 @@ instance (Show address, Show term) => AbstractIntro (Value term address) where
 instance ( Member (Allocator address) sig
          , Member (Abstract.Boolean (Value term address)) sig
          , Member (Deref (Value term address)) sig
-         , Member (Error (LoopControl address (Value term address))) sig
+         , Member (Error (LoopControl (Value term address))) sig
          , Member (Error (Return (Value term address))) sig
          , Member Fresh sig
          , Member (Reader ModuleInfo) sig
