@@ -40,7 +40,7 @@ spec = parallel $ do
       withScope associatedScope $ do
         declare (Declaration x) emptySpan Nothing
       identity <- function "identity" [ x ]
-        (SpecEff (LvalMember <$> Heap.lookupDeclaration (ScopeGraph.Declaration (SpecHelpers.name "x")))) associatedScope
+        (SpecEff (Heap.lookupDeclaration (ScopeGraph.Declaration (SpecHelpers.name "x")) >>= deref)) associatedScope
       val <- pure (integer 123)
       call identity [val]
     expected `shouldBe` Right (integer 123)
@@ -107,7 +107,7 @@ newtype SpecEff = SpecEff
                  (Eff (StateC (ScopeGraph Precise)
                  (Eff (TraceByIgnoringC
                  (Eff (LiftC IO)))))))))))))))))))))))))))))))))))))))))))))
-                 (ValueRef Precise Val)
+                 Val
   }
 
 instance Eq SpecEff where _ == _ = True
@@ -116,6 +116,6 @@ instance FreeVariables SpecEff where freeVariables _ = lowerBound
 
 instance Declarations SpecEff where
   declaredName eff =
-    case unsafePerformIO (evaluate (runSpecEff eff >>= Abstract.value)) of
+    case unsafePerformIO (evaluate (runSpecEff eff)) of
       (_, (_, (_, Right (Value.Symbol text)))) -> Just (SpecHelpers.name text)
       _                                        -> error "declaredName for SpecEff should return an RVal"
