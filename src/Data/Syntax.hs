@@ -169,6 +169,11 @@ instance Evaluatable Identifier where
     reference (Reference name) (Declaration name)
     LvalMember <$> lookupDeclaration (Declaration name)
 
+  resolve _ (Identifier name) = do
+    reference (Reference name) (Declaration name)
+    Just <$> lookupDeclaration (Declaration name)
+
+
 instance Tokenize Identifier where
   tokenize = yield . Token.Run . formatName . Data.Syntax.name
 
