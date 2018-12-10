@@ -145,4 +145,4 @@ evalTerm :: ( Carrier sig m
             )
          => Open (term -> Evaluator term address value m value)
          -> term -> Evaluator term address value m value
-evalTerm perTerm = fst (fix (\ (ev, re) -> (perTerm (eval ev re . project), ref ev re . project)))
+evalTerm perTerm = fst (fix (\ ~(ev, re) -> (perTerm (eval ev re . project), ref ev re . project)))
