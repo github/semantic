@@ -87,7 +87,7 @@ instance Evaluatable Send where
           func <- deref =<< lookupDeclaration (Declaration sel)
           args <- traverse eval sendArgs
           call func (lhsValue : args) -- TODO pass through sendBlock
-    Rval <$> maybe callFunction (`withScopeAndFrame` callFunction) lhsFrame
+    maybe callFunction (`withScopeAndFrame` callFunction) lhsFrame
 
 instance Tokenize Send where
   tokenize Send{..} = within Scope.Call $ do
@@ -111,7 +111,7 @@ instance Evaluatable Require where
     ((moduleScope, moduleFrame), v) <- doRequire path
     insertImportEdge moduleScope
     insertFrameLink ScopeGraph.Import (Map.singleton moduleScope moduleFrame)
-    rvalBox v -- Returns True if the file was loaded, False if it was already loaded. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-require
+    pure v -- Returns True if the file was loaded, False if it was already loaded. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-require
 
 instance Tokenize Require where
   tokenize Require{..} = do
@@ -148,11 +148,11 @@ instance Tokenize Load where
 instance Evaluatable Load where
   eval eval _ (Load x Nothing) = do
     path <- eval x >>= asString
-    rvalBox =<< doLoad path False
+    doLoad path False
   eval eval _ (Load x (Just wrap)) = do
     path <- eval x >>= asString
     shouldWrap <- eval wrap >>= asBool
-    rvalBox =<< doLoad path shouldWrap
+    doLoad path shouldWrap
 
 doLoad :: ( Member (Boolean value) sig
           , Member (Modules address value) sig
@@ -206,7 +206,7 @@ instance Evaluatable Class where
         classVal <- deref slot
         maybeFrame <- scopedEnvironment classVal
         case maybeFrame of
-          Just classFrame -> withScopeAndFrame classFrame (Rval <$> eval classBody)
+          Just classFrame -> withScopeAndFrame classFrame (eval classBody)
           Nothing         -> throwEvalError (DerefError classVal)
       Nothing -> do
         let classSuperclasses = maybeToList classSuperClass
@@ -234,7 +234,7 @@ instance Evaluatable Class where
         classSlot <- lookupDeclaration (Declaration name)
         assign classSlot =<< klass (Declaration name) childFrame
 
-        rvalBox unit
+        pure unit
 
 instance Declarations1 Class where
   liftDeclaredName declaredName = declaredName . classIdentifier
@@ -262,7 +262,7 @@ instance Evaluatable Module where
     currentScope' <- currentScope
 
     let declaration = Declaration name
-        moduleBody = maybe (rvalBox unit) (runApp . foldMap1 (App . fmap Rval . eval)) (nonEmpty moduleStatements)
+        moduleBody = maybe (pure unit) (runApp . foldMap1 (App . eval)) (nonEmpty moduleStatements)
     maybeSlot <- maybeLookupDeclaration declaration
 
     case maybeSlot of
@@ -287,7 +287,7 @@ instance Evaluatable Module where
         moduleSlot <- lookupDeclaration (Declaration name)
         assign moduleSlot =<< klass (Declaration name) childFrame
 
-        rvalBox unit
+        pure unit
 
 instance Declarations1 Module where
   liftDeclaredName declaredName = declaredName . moduleIdentifier
@@ -304,7 +304,7 @@ data LowPrecedenceAnd a = LowPrecedenceAnd { lhs :: a, rhs :: a }
 
 instance Evaluatable LowPrecedenceAnd where
   -- N.B. we have to use Monad rather than Applicative/Traversable on 'And' and 'Or' so that we don't evaluate both operands
-  eval eval _ t = rvalBox =<< go (fmap eval t) where
+  eval eval _ t = go (fmap eval t) where
     go (LowPrecedenceAnd a b) = do
       cond <- a
       ifthenelse cond b (pure cond)
@@ -325,7 +325,7 @@ data LowPrecedenceOr a = LowPrecedenceOr { lhs :: a, rhs :: a }
 
 instance Evaluatable LowPrecedenceOr where
   -- N.B. we have to use Monad rather than Applicative/Traversable on 'And' and 'Or' so that we don't evaluate both operands
-  eval eval _ t = rvalBox =<< go (fmap eval t) where
+  eval eval _ t = go (fmap eval t) where
     go (LowPrecedenceOr a b) = do
       cond <- a
       ifthenelse cond (pure cond) b
@@ -369,7 +369,7 @@ instance Evaluatable Assignment where
       Nothing ->
         pure ()
     assign lhs rhs
-    pure (LvalMember lhs)
+    pure rhs
 
 instance Tokenize Assignment where
   -- Should we be using 'assignmentContext' in here?

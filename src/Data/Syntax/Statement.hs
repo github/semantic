@@ -34,7 +34,7 @@ instance ToJSON1 Statements
 
 instance Evaluatable Statements where
   eval eval _ (Statements xs) =
-    maybe (rvalBox unit) (runApp . foldMap1 (App . fmap Rval . eval)) (nonEmpty xs)
+    maybe (pure unit) (runApp . foldMap1 (App . eval)) (nonEmpty xs)
 
 instance Tokenize Statements where
   tokenize = imperative
@@ -49,7 +49,7 @@ instance ToJSON1 StatementBlock
 
 instance Evaluatable StatementBlock where
   eval eval _ (StatementBlock xs) =
-    maybe (rvalBox unit) (runApp . foldMap1 (App . fmap Rval . eval)) (nonEmpty xs)
+    maybe (pure unit) (runApp . foldMap1 (App . eval)) (nonEmpty xs)
 
 instance Tokenize StatementBlock where
   tokenize = imperative
@@ -65,7 +65,7 @@ instance Show1 If where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable If where
   eval eval _ (If cond if' else') = do
     bool <- eval cond
-    ifthenelse bool (eval if') (eval else') >>= rvalBox
+    ifthenelse bool (eval if') (eval else')
 
 instance Tokenize If where
   tokenize If{..} = within' Scope.If $ do
@@ -156,7 +156,7 @@ instance Evaluatable Let where
       slot <- lookupDeclaration (Declaration name)
       assign slot letVal
       eval letBody
-    rvalBox unit
+    pure unit
 
 
 -- Assignment
@@ -189,7 +189,7 @@ instance Evaluatable Assignment where
       Nothing ->
         pure ()
     assign lhs rhs
-    pure (LvalMember lhs)
+    pure rhs
 
 instance Tokenize Assignment where
   -- Should we be using 'assignmentContext' in here?
@@ -252,7 +252,7 @@ instance Ord1 Return where liftCompare = genericLiftCompare
 instance Show1 Return where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Return where
-  eval eval _ (Return x) = eval x >>= earlyReturn >>= rvalBox
+  eval eval _ (Return x) = eval x >>= earlyReturn
 
 instance Tokenize Return where
   tokenize (Return x) = within' Scope.Return x
@@ -279,7 +279,7 @@ instance Ord1 Break where liftCompare = genericLiftCompare
 instance Show1 Break where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Break where
-  eval eval _ (Break x) = eval x >>= throwBreak >>= rvalBox
+  eval eval _ (Break x) = eval x >>= throwBreak
 
 instance Tokenize Break where
   tokenize (Break b) = yield (Token.Flow Token.Break) *> b
@@ -292,7 +292,7 @@ instance Ord1 Continue where liftCompare = genericLiftCompare
 instance Show1 Continue where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Continue where
-  eval eval _ (Continue x) = eval x >>= throwContinue >>= rvalBox
+  eval eval _ (Continue x) = eval x >>= throwContinue
 
 instance Tokenize Continue where
   tokenize (Continue c) = yield (Token.Flow Token.Continue) *> c
@@ -318,7 +318,7 @@ instance Ord1 NoOp where liftCompare = genericLiftCompare
 instance Show1 NoOp where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable NoOp where
-  eval _ _ _ = rvalBox unit
+  eval _ _ _ = pure unit
 
 -- Loops
 
@@ -330,7 +330,7 @@ instance Ord1 For where liftCompare = genericLiftCompare
 instance Show1 For where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable For where
-  eval eval _ (fmap eval -> For before cond step body) = Rval <$> forLoop before cond step body
+  eval eval _ (fmap eval -> For before cond step body) = forLoop before cond step body
 
 
 data ForEach a = ForEach { forEachBinding :: !a, forEachSubject :: !a, forEachBody :: !a }
@@ -359,7 +359,7 @@ instance Ord1 While where liftCompare = genericLiftCompare
 instance Show1 While where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable While where
-  eval eval _ While{..} = Rval <$> while (eval whileCondition) (eval whileBody)
+  eval eval _ While{..} = while (eval whileCondition) (eval whileBody)
 
 instance Tokenize While where
   tokenize While{..} = within' Scope.Loop $ do
@@ -375,7 +375,7 @@ instance Ord1 DoWhile where liftCompare = genericLiftCompare
 instance Show1 DoWhile where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable DoWhile where
-  eval eval _ DoWhile{..} = Rval <$> doWhile (eval doWhileBody) (eval doWhileCondition)
+  eval eval _ DoWhile{..} = doWhile (eval doWhileBody) (eval doWhileCondition)
 
 -- Exception handling
 

@@ -40,7 +40,7 @@ instance Evaluatable Function where
 
     addr <- lookupDeclaration (Declaration name)
     v <- function name params functionBody associatedScope
-    Rval v <$ assign addr v
+    v <$ assign addr v
 
 declareFunction :: ( Carrier sig m
                    , Member (State (ScopeGraph address)) sig
@@ -99,7 +99,7 @@ instance Evaluatable Method where
 
     addr <- lookupDeclaration (Declaration name)
     v <- function name params methodBody associatedScope
-    Rval v <$ assign addr v
+    v <$ assign addr v
 
 instance Tokenize Data.Syntax.Declaration.Method where
   tokenize Method{..} = within' Scope.Method $ do
@@ -160,7 +160,7 @@ instance Ord1 VariableDeclaration where liftCompare = genericLiftCompare
 instance Show1 VariableDeclaration where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable VariableDeclaration where
-  eval _    _ (VariableDeclaration [])   = rvalBox unit
+  eval _    _ (VariableDeclaration [])   = pure unit
   eval eval _ (VariableDeclaration decs) = do
     for_ decs $ \declaration -> do
       name <- maybeM (throwEvalError NoNameError) (declaredName declaration)
@@ -171,7 +171,7 @@ instance Evaluatable VariableDeclaration where
         pure (subtermSpan, ref)
 
       putDeclarationSpan (Declaration name) span
-    rvalBox unit
+    pure unit
 
 instance Declarations a => Declarations (VariableDeclaration a) where
   declaredName (VariableDeclaration vars) = case vars of
@@ -209,7 +209,7 @@ instance Evaluatable PublicFieldDefinition where
     span <- ask @Span
     propertyName <- maybeM (throwEvalError NoNameError) (declaredName publicFieldPropertyName)
     declare (Declaration propertyName) span Nothing
-    rvalBox unit
+    pure unit
 
 
 
@@ -266,7 +266,7 @@ instance Evaluatable Class where
     classSlot <- lookupDeclaration (Declaration name)
     assign classSlot =<< klass (Declaration name) childFrame
 
-    rvalBox unit
+    pure unit
 
 instance Declarations1 Class where
   liftDeclaredName declaredName = declaredName . classIdentifier
@@ -354,7 +354,7 @@ instance Evaluatable TypeAlias where
     kindSlot <- lookupDeclaration (Declaration kindName)
     assign slot =<< deref kindSlot
 
-    rvalBox unit
+    pure unit
 
 instance Declarations a => Declarations (TypeAlias a) where
   declaredName TypeAlias{..} = declaredName typeAliasIdentifier

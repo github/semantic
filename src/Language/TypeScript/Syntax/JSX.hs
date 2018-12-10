@@ -115,7 +115,7 @@ instance Evaluatable RequiredParameter where
       Nothing ->
         pure ()
     assign lhs rhs
-    pure (LvalMember lhs)
+    pure rhs
 
 data RestParameter a = RestParameter { restParameterContext :: ![a], restParameterSubject :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
