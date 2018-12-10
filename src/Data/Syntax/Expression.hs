@@ -536,8 +536,8 @@ instance Evaluatable MemberAccess where
       Just lhsFrame ->
         withScopeAndFrame lhsFrame $ do
           reference (Reference rhs) (Declaration rhs)
-          Just <$> lookupDeclaration (Declaration rhs)
-      Nothing -> pure Nothing -- FIXME: this should really be throwing
+          lookupDeclaration (Declaration rhs)
+      Nothing -> throwEvalError RefError
 
 
 instance Tokenize MemberAccess where

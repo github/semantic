@@ -171,7 +171,7 @@ instance Evaluatable Identifier where
 
   ref _ _ (Identifier name) = do
     reference (Reference name) (Declaration name)
-    Just <$> lookupDeclaration (Declaration name)
+    lookupDeclaration (Declaration name)
 
 
 instance Tokenize Identifier where
