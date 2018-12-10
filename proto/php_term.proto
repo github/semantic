@@ -209,28 +209,28 @@ message FloorDivision {
 }
 
 message BAnd {
-  PHPTerm left = 1;
-  PHPTerm right = 2;
+  PHPTerm lhs = 1;
+  PHPTerm rhs = 2;
 }
 
 message BOr {
-  PHPTerm left = 1;
-  PHPTerm right = 2;
+  PHPTerm lhs = 1;
+  PHPTerm rhs = 2;
 }
 
 message BXOr {
-  PHPTerm left = 1;
-  PHPTerm right = 2;
+  PHPTerm lhs = 1;
+  PHPTerm rhs = 2;
 }
 
 message LShift {
-  PHPTerm left = 1;
-  PHPTerm right = 2;
+  PHPTerm lhs = 1;
+  PHPTerm rhs = 2;
 }
 
 message RShift {
-  PHPTerm left = 1;
-  PHPTerm right = 2;
+  PHPTerm lhs = 1;
+  PHPTerm rhs = 2;
 }
 
 message And {

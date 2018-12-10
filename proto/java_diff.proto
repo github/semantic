@@ -256,33 +256,33 @@ message Comparison {
 }
 
 message BOr {
-  JavaDiff left = 1;
-  JavaDiff right = 2;
+  JavaDiff lhs = 1;
+  JavaDiff rhs = 2;
 }
 
 message BXOr {
-  JavaDiff left = 1;
-  JavaDiff right = 2;
+  JavaDiff lhs = 1;
+  JavaDiff rhs = 2;
 }
 
 message BAnd {
-  JavaDiff left = 1;
-  JavaDiff right = 2;
+  JavaDiff lhs = 1;
+  JavaDiff rhs = 2;
 }
 
 message LShift {
-  JavaDiff left = 1;
-  JavaDiff right = 2;
+  JavaDiff lhs = 1;
+  JavaDiff rhs = 2;
 }
 
 message RShift {
-  JavaDiff left = 1;
-  JavaDiff right = 2;
+  JavaDiff lhs = 1;
+  JavaDiff rhs = 2;
 }
 
 message UnsignedRShift {
-  JavaDiff left = 1;
-  JavaDiff right = 2;
+  JavaDiff lhs = 1;
+  JavaDiff rhs = 2;
 }
 
 message Complement {
