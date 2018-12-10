@@ -128,8 +128,9 @@ instance HasPrelude 'Ruby where
       void $ defineBuiltIn (Declaration $ X.name "inspect") Show
 
 instance HasPrelude 'TypeScript where
-  definePrelude _ = defineSelf
-    -- defineNamespace (Declaration (X.name "console")) $ defineBuiltIn (Declaration $ X.name "log") Print
+  definePrelude _ = do
+    defineSelf
+    defineNamespace (Declaration (X.name "console")) $ defineBuiltIn (Declaration $ X.name "log") Print
 
 instance HasPrelude 'JavaScript where
   definePrelude _ = do
