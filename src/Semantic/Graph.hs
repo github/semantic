@@ -360,6 +360,7 @@ resumingEvalError :: ( Carrier sig m
                      , Member Trace sig
                      , Show value
                      , Show address
+                     , AbstractHole address
                      , AbstractHole value
                      )
                   => Evaluator term address value (ResumableWithC (BaseError (EvalError address value)) (Eff
@@ -368,6 +369,7 @@ resumingEvalError :: ( Carrier sig m
 resumingEvalError = runEvalErrorWith (\ baseError -> traceError "EvalError" baseError *> case baseErrorException baseError of
   QualifiedImportError{} -> pure hole
   DerefError{} -> pure hole
+  RefError -> pure hole
   ReferenceError{} -> pure hole
   DefaultExportError{}  -> pure ()
   ExportError{}         -> pure ()
