@@ -518,8 +518,6 @@ instance Show1 MemberAccess where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable MemberAccess where
   eval eval MemberAccess{..} = do
-    name <- maybeM (throwEvalError NoNameError) (declaredName lhs)
-    reference (Reference name) (Declaration name)
     lhsValue <- Abstract.value =<< eval lhs
     lhsFrame <- Abstract.scopedEnvironment lhsValue
     case lhsFrame of
@@ -697,5 +695,7 @@ instance Eq1 This where liftEq = genericLiftEq
 instance Ord1 This where liftCompare = genericLiftCompare
 instance Show1 This where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable This where
-  eval _ This =
-    rvalBox =<< deref =<< lookupDeclaration (Declaration $ Name.name "__self")
+  eval _ This = do
+    let name = Name.name "__self"
+    reference (Reference name) (Declaration name)
+    rvalBox =<< deref =<< lookupDeclaration (Declaration name)
