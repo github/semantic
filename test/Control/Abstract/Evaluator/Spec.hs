@@ -12,7 +12,6 @@ import           Data.Abstract.FreeVariables
 import           Data.Abstract.Module
 import qualified Data.Abstract.Number as Number
 import           Data.Abstract.Package
-import           Data.Abstract.Ref
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.Abstract.Value.Concrete as Value
 import           Data.Algebra
