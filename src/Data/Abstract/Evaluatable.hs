@@ -192,7 +192,7 @@ data EvalError address value return where
   IntegerFormatError  :: Text -> EvalError address value Integer
   NoNameError :: EvalError address value Name
   RationalFormatError :: Text -> EvalError address value Rational
-  ReferenceError      :: value -> Name -> EvalError address value (ValueRef address value)
+  ReferenceError      :: value -> Name -> EvalError address value (Slot address)
 
 deriving instance (Eq address, Eq value) => Eq (EvalError address value return)
 deriving instance (Show address, Show value) => Show (EvalError address value return)
