@@ -94,8 +94,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
       -> (term -> Evaluator term address value m (Slot address))
       -> (constr term -> Evaluator term address value m (Slot address))
   ref _ _ expr = do
-    _ <- throwUnspecializedError $ UnspecializedError ("ref unspecialized for " <> liftShowsPrec (const (const id)) (const id) 0 expr "")
-    throwEvalError RefError
+    throwUnspecializedError $ RefUnspecializedError ("ref unspecialized for " <> liftShowsPrec (const (const id)) (const id) 0 expr "")
 
 
 traceResolve :: (Show a, Show b, Member Trace sig, Carrier sig m) => a -> b -> Evaluator term address value m ()
