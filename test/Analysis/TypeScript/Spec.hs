@@ -76,7 +76,7 @@ spec config = parallel $ do
         Right (Just (Module _ (scopeAndFrame@(currentScope, currentFrame), valueRef) :| [])) -> do
           () <$ SpecHelpers.lookupDeclaration "baz" scopeAndFrame heap scopeGraph `shouldBe` Nothing
           valueRef `shouldBe` Rval Unit
-          Heap.heapSize heap `shouldBe` 3
+          Heap.heapSize heap `shouldBe` 4
         other -> expectationFailure (show other)
 
     it "fails exporting symbols not defined in the module" $ do
