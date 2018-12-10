@@ -27,7 +27,6 @@ import Data.Abstract.FreeVariables as X
 import Data.Abstract.Module
 import Data.Abstract.Name as X
 import Data.Abstract.Ref as X
-import Data.ImportPath (ImportPath)
 import Data.Language
 import Data.Scientific (Scientific)
 import Data.Semigroup.App
@@ -184,7 +183,6 @@ defineSelf = do
 
 -- | The type of error thrown when failing to evaluate a term.
 data EvalError address value return where
-  QualifiedImportError :: ImportPath -> EvalError address value (ValueRef address value)
   DerefError :: value -> EvalError address value value
   RefError :: EvalError address value (Slot address)
   DefaultExportError  :: EvalError address value ()
@@ -210,7 +208,6 @@ instance NFData value => NFData1 (EvalError address value) where
     NoNameError -> ()
     RationalFormatError i -> rnf i
     ReferenceError v n -> rnf v `seq` rnf n
-    QualifiedImportError i -> rnf i
 
 instance (NFData value, NFData return) => NFData (EvalError address value return) where
   rnf = liftRnf rnf
