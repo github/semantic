@@ -248,7 +248,7 @@ instance ( Member (Allocator address) sig
          , Member (Reader ModuleInfo) sig
          , Member (Reader Span) sig
          , Member (State Span) sig
-         , Member (Resumable (BaseError (EvalError address Type))) sig
+         , Member (Resumable (BaseError (EvalError term address Type))) sig
          , Member (Resumable (BaseError TypeError)) sig
          , Member (Resumable (BaseError (AddressError address Type))) sig
          , Member (State (Heap address address Type)) sig

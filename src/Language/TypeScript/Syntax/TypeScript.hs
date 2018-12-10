@@ -67,7 +67,7 @@ instance Evaluatable QualifiedAliasedImport where
     let scopeMap = Map.singleton moduleScope moduleFrame
     aliasFrame <- newFrame importScope (Map.singleton ScopeGraph.Import scopeMap)
 
-    alias <- maybeM (throwEvalError NoNameError) (declaredName aliasTerm)
+    alias <- maybeM (throwEvalError $ NoNameError aliasTerm) (declaredName aliasTerm)
     declare (Declaration alias) span (Just importScope)
     aliasSlot <- lookupDeclaration (Declaration alias)
     assign aliasSlot =<< object aliasFrame
@@ -564,7 +564,7 @@ declareModule :: ( AbstractValue term address value m
                  , Member (Reader (CurrentFrame address)) sig
                  , Member (Reader (CurrentScope address)) sig
                  , Member (Reader Span) sig
-                 , Member (Resumable (BaseError (EvalError address value))) sig
+                 , Member (Resumable (BaseError (EvalError term address value))) sig
                  , Member (State (Heap address address value)) sig
                  , Member (State (ScopeGraph address)) sig
                  , Member Fresh sig
@@ -579,7 +579,7 @@ declareModule :: ( AbstractValue term address value m
                 -> [term]
                 -> Evaluator term address value m (ValueRef address value)
 declareModule eval identifier statements = do
-    name <- maybeM (throwEvalError NoNameError) (declaredName identifier)
+    name <- maybeM (throwEvalError $ NoNameError identifier) (declaredName identifier)
     span <- ask @Span
     currentScope' <- currentScope
 
@@ -659,12 +659,12 @@ instance Declarations a => Declarations (AbstractClass a) where
 
 instance Evaluatable AbstractClass where
   eval eval AbstractClass{..} = do
-    name <- maybeM (throwEvalError NoNameError) (declaredName abstractClassIdentifier)
+    name <- maybeM (throwEvalError $ NoNameError abstractClassIdentifier) (declaredName abstractClassIdentifier)
     span <- ask @Span
     currentScope' <- currentScope
 
     superScopes <- for classHeritage $ \superclass -> do
-      name <- maybeM (throwEvalError NoNameError) (declaredName superclass)
+      name <- maybeM (throwEvalError $ NoNameError superclass) (declaredName superclass)
       scope <- associatedScope (Declaration name)
       slot <- lookupDeclaration (Declaration name)
       superclassFrame <- scopedEnvironment =<< deref slot
