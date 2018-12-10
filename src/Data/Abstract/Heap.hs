@@ -48,7 +48,7 @@ data Frame scopeAddress frameAddress value = Frame
   }
   deriving (Eq, Ord, Show, Generic, NFData)
 
--- | A map of frame addresses onto Frames.
+-- | A Heap is a Map from frame addresses to frames.
 newtype Heap scopeAddress frameAddress value = Heap { unHeap :: Map frameAddress (Frame scopeAddress frameAddress value) }
   deriving stock (Eq, Generic, Ord)
   deriving newtype (NFData)
@@ -135,11 +135,13 @@ heapSize = Map.size . unHeap
 heapRestrict :: Ord address => Heap address address value -> Live address -> Heap address address value
 heapRestrict (Heap m) roots = Heap (Map.filterWithKey (\ address _ -> address `liveMember` roots) m)
 
+-- | Checks whether a heap as no slots and links.
 isHeapEmpty :: (Eq address, Eq value) => Heap scope address value -> Bool
 isHeapEmpty h@(Heap heap)
   =  heapSize h == 1
   && (toEmptyFrame <$> Map.elems heap) == [ Frame () mempty mempty ]
   where
+    -- Maps a frame's address param to () so we can check that its slots and links are empty.
     toEmptyFrame Frame{..} = Frame () (Map.mapKeysMonotonic (const ()) <$> links) slots
 
 
