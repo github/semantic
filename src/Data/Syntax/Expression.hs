@@ -353,11 +353,7 @@ instance Ord1 Delete where liftCompare = genericLiftCompare
 instance Show1 Delete where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Delete where
-  eval eval _ (Delete a) = do
-    valueRef <- eval a
-    case valueRef of
-      LvalMember addr -> dealloc addr >> rvalBox unit
-      Rval val        -> throwEvalError (DerefError val)
+  eval _ ref (Delete a) = ref a >>= dealloc >> rvalBox unit
 
 -- | A sequence expression such as Javascript or C's comma operator.
 data SequenceExpression a = SequenceExpression { firstExpression :: !a, secondExpression :: !a }
