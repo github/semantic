@@ -1,4 +1,4 @@
-import { Greeter } from "./class2"
+import { Adder } from "./class2"
 
-const foo = new Greeter("world")
-foo.greet()
+var foo = new Adder(5)
+foo.add()
