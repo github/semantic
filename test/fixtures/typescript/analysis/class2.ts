@@ -1,11 +1,11 @@
-class Greeter {
-    greeting: string;
-    constructor(message: string) {
-        this.greeting = message;
+class Adder {
+    summand: number;
+    constructor(summand: number) {
+        this.summand = summand;
     }
-    greet() {
-        return "Hello, " + this.greeting;
+    add() {
+        return 4 + this.summand;
     }
 }
 
-export { Greeter }
+export { Adder }
