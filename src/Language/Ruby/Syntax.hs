@@ -78,7 +78,7 @@ instance Evaluatable Send where
                -- Previously we returned a variable called `call`.
                throwEvalError NoNameError
 
-    let self = lookupDeclaration (Declaration $ Name.name "__self") >>= Abstract.value . LvalMember
+    let self = lookupDeclaration (Declaration $ Name.name "__self") >>= deref
     lhsValue <- maybe self eval sendReceiver
     lhsFrame <- Abstract.scopedEnvironment lhsValue
 
