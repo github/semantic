@@ -174,34 +174,6 @@ instance (Show address, Show term) => AbstractIntro (Value term address) where
 
   null     = Null
 
--- materializeEnvironment :: ( Member (Deref (Value term address)) sig
---                           , Member (Reader ModuleInfo) sig
---                           , Member (Reader Span) sig
---                           , Member (Resumable (BaseError (AddressError address (Value term address)))) sig
---                           , Member (State (Heap address address (Value term address))) sig
---                           , Ord address
---                           , Carrier sig m
---                           )
---                        => Value term address
---                        -> Evaluator term address (Value term address) m (Maybe (Environment address))
--- materializeEnvironment val = do
---   ancestors <- rec val
---   pure (Env.Environment <$> nonEmpty ancestors)
---     where
---       rec val = do
---         supers <- concat <$> traverse (deref >=> rec) (parents val)
---         pure . maybe [] (: supers) $ bindsFrom val
---
---       bindsFrom = \case
---         Class _ _ binds -> Just binds
---         Namespace _ _ binds -> Just binds
---         _ -> Nothing
---
---       parents = \case
---         Class _ supers _ -> supers
---         Namespace _ supers _ -> toList supers
---         _ -> []
-
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( Member (Allocator address) sig
          , Member (Abstract.Boolean (Value term address)) sig
