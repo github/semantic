@@ -136,16 +136,16 @@ instance HasPrelude 'PHP
 
 instance HasPrelude 'Python where
   definePrelude _ =
-    void $ defineBuiltIn (Declaration $ X.name "print") Print
+    defineBuiltIn (Declaration $ X.name "print") Print
 
 instance HasPrelude 'Ruby where
   definePrelude _ = do
     defineSelf
 
-    void $ defineBuiltIn (Declaration $ X.name "puts") Print
+    defineBuiltIn (Declaration $ X.name "puts") Print
 
     defineClass (Declaration (X.name "Object")) [] $ do
-      void $ defineBuiltIn (Declaration $ X.name "inspect") Show
+      defineBuiltIn (Declaration $ X.name "inspect") Show
 
 instance HasPrelude 'TypeScript where
   definePrelude _ = defineSelf
