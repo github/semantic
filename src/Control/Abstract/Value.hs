@@ -25,7 +25,6 @@ module Control.Abstract.Value
 , runWhile
 , WhileC(..)
 , value
-, rvalBox
 ) where
 
 import Control.Abstract.Evaluator
@@ -304,7 +303,3 @@ value :: ( Member (Deref value) sig
       -> Evaluator term address value m value
 value (Rval val)        = pure val
 value (LvalMember slot) = deref slot
-
--- | Convenience function for boxing a raw value and wrapping it in an Rval
-rvalBox :: value -> Evaluator term address value m (ValueRef address value)
-rvalBox val = pure (Rval val)
