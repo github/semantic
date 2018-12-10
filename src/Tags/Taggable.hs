@@ -609,6 +609,7 @@ instance Taggable Ruby.Require
 instance Taggable Ruby.Load
 instance Taggable Ruby.LowPrecedenceAnd
 instance Taggable Ruby.LowPrecedenceOr
+instance Taggable Ruby.ZSuper
 
 instance Taggable TypeScript.JavaScriptRequire
 instance Taggable TypeScript.Debugger

@@ -126,6 +126,7 @@ type Syntax = '[
   , Ruby.Syntax.Module
   , Ruby.Syntax.Require
   , Ruby.Syntax.Send
+  , Ruby.Syntax.ZSuper
   , []
   ]
 
@@ -214,12 +215,12 @@ withNewScope inner = withExtendedScope $ do
 identifier :: Assignment Term
 identifier =
       vcallOrLocal
+  <|> zsuper
   <|> mk Constant
   <|> mk InstanceVariable
   <|> mk ClassVariable
   <|> mk GlobalVariable
   <|> mk Operator
-  <|> mk Super
   <|> mk Setter
   <|> mk SplatArgument
   <|> mk HashSplatArgument
@@ -227,6 +228,7 @@ identifier =
   <|> mk Uninterpreted
   where
     mk s = makeTerm <$> symbol s <*> (Syntax.Identifier . name <$> source)
+    zsuper = makeTerm <$> symbol Super <*> (Ruby.Syntax.ZSuper <$ source)
     vcallOrLocal = do
       (loc, ident, locals) <- identWithLocals
       case ident of
