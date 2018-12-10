@@ -70,7 +70,6 @@ library
                      , Data.Abstract.Number
                      , Data.Abstract.Package
                      , Data.Abstract.Path
-                     , Data.Abstract.Ref
                      , Data.Abstract.ScopeGraph
                      , Data.Abstract.Value.Abstract
                      , Data.Abstract.Value.Concrete
