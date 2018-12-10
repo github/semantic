@@ -291,6 +291,7 @@ instance (Apply Evaluatable fs, Apply Show1 fs, Apply Foldable fs) => Evaluatabl
 -- | Evaluating a 'TermF' ignores its annotation, evaluating the underlying syntax.
 instance (Evaluatable s, Show a) => Evaluatable (TermF s a) where
   eval eval' ref = eval eval' ref . termFOut
+  ref eval ref' = ref eval ref' . termFOut
 
 
 -- NOTE: Use 'Data.Syntax.Statements' instead of '[]' if you need imperative eval semantics.
