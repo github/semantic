@@ -59,9 +59,7 @@ evaluate :: ( AbstractValue term address value (ValueC term address value inner)
             , Member (Reader ModuleInfo) innerSig
             , Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address value))))) outerSig
             , Member (Reader Span) innerSig
-            , Member (Reader Span) outerSig
             , Member (Resumable (BaseError (AddressError address value))) innerSig
-            , Member (Resumable (BaseError (AddressError address value))) outerSig
             , Member (Resumable (BaseError (UnspecializedError value))) innerSig
             , Member (State (Heap address address value)) innerSig
             , Member (State (ScopeGraph address)) innerSig
@@ -76,9 +74,9 @@ evaluate :: ( AbstractValue term address value (ValueC term address value inner)
             , Show address
             )
          => proxy lang
-         -> (  (Module (Either (proxy lang) term) -> Evaluator term address value inner (ValueRef address value))
-            -> (Module (Either (proxy lang) term) -> Evaluator term address value (ModuleC address value outer) (ValueRef address value)))
-         -> (term -> Evaluator term address value (ValueC term address value inner) (ValueRef address value))
+         -> (  (Module (Either (proxy lang) term) -> Evaluator term address value inner value)
+            -> (Module (Either (proxy lang) term) -> Evaluator term address value (ModuleC address value outer) value))
+         -> (term -> Evaluator term address value (ValueC term address value inner) value)
          -> [Module term]
          -> Evaluator term address value outer (ModuleTable (NonEmpty (Module (ModuleResult address value))))
 evaluate lang perModule runTerm modules = do
@@ -107,9 +105,8 @@ evaluate lang perModule runTerm modules = do
                   . raiseHandler (runReader (CurrentScope scopeAddress))
                   . runReturn
                   . runLoopControl
-                  . (>>= value)
 
-        runValueEffects = raiseHandler runInterpose . runBoolean . runWhile . runFunction (value <=< runTerm) . either ((*> rvalBox unit) . definePrelude) runTerm
+        runValueEffects = raiseHandler runInterpose . runBoolean . runWhile . runFunction runTerm . either ((unit <$) . definePrelude) runTerm
 
 -- | Evaluate a term recursively, applying the passed function at every recursive position.
 --
@@ -148,6 +145,6 @@ evalTerm :: ( Carrier sig m
             , Show address
             , Recursive term
             )
-         => Open (term -> Evaluator term address value m (ValueRef address value))
-         -> term -> Evaluator term address value m (ValueRef address value)
-evalTerm perTerm = fmap Rval . fst (fix (\ (ev, re) -> (value <=< perTerm (fmap Rval . eval ev re . project), ref ev re . project)))
+         => Open (term -> Evaluator term address value m value)
+         -> term -> Evaluator term address value m value
+evalTerm perTerm = fst (fix (\ (ev, re) -> (perTerm (eval ev re . project), ref ev re . project)))

@@ -7,7 +7,6 @@ module Analysis.Abstract.Caching.FlowSensitive
 
 import Control.Abstract
 import Data.Abstract.Module
-import Data.Abstract.Ref
 import Data.Map.Monoidal as Monoidal
 import Prologue
 
@@ -35,8 +34,8 @@ lookupCache configuration = cacheLookup configuration <$> get
 cachingConfiguration :: (Cacheable term address value, Member (State (Cache term address value)) sig, Member (State (Heap address address value)) sig, Carrier sig m)
                      => Configuration term address value
                      -> Set (Cached address value)
-                     -> Evaluator term address value m (ValueRef address value)
-                     -> Evaluator term address value m (ValueRef address value)
+                     -> Evaluator term address value m value
+                     -> Evaluator term address value m value
 cachingConfiguration configuration values action = do
   modify (cacheSet configuration values)
   result <- Cached <$> action <*> getHeap
@@ -63,7 +62,7 @@ cachingTerms :: ( Cacheable term address value
                 , Member (State (Heap address address value)) sig
                 , Carrier sig m
                 )
-             => Open (term -> Evaluator term address value m (ValueRef address value))
+             => Open (term -> Evaluator term address value m value)
 cachingTerms recur term = do
   c <- getConfiguration term
   cached <- lookupCache c
@@ -83,8 +82,8 @@ convergingModules :: ( Cacheable term address value
                      , Carrier sig m
                      , Effect sig
                      )
-                  => (Module (Either prelude term) -> Evaluator term address value (AltC Maybe (Eff m)) (ValueRef address value))
-                  -> (Module (Either prelude term) -> Evaluator term address value m (ValueRef address value))
+                  => (Module (Either prelude term) -> Evaluator term address value (AltC Maybe (Eff m)) value)
+                  -> (Module (Either prelude term) -> Evaluator term address value m value)
 convergingModules recur m@(Module _ (Left _)) = raiseHandler runNonDet (recur m) >>= maybeM empty
 convergingModules recur m@(Module _ (Right term)) = do
   c <- getConfiguration term
@@ -117,7 +116,7 @@ converge seed f = loop seed
             loop x'
 
 -- | Nondeterministically write each of a collection of stores & return their associated results.
-scatter :: (Foldable t, Member NonDet sig, Member (State (Heap address address value)) sig, Carrier sig m) => t (Cached address value) -> Evaluator term address value m (ValueRef address value)
+scatter :: (Foldable t, Member NonDet sig, Member (State (Heap address address value)) sig, Carrier sig m) => t (Cached address value) -> Evaluator term address value m value
 scatter = foldMapA (\ (Cached value heap') -> putHeap heap' $> value)
 
 -- | Get the current 'Configuration' with a passed-in term.
@@ -152,7 +151,7 @@ data Configuration term address value = Configuration
   deriving (Eq, Ord, Show)
 
 data Cached address value = Cached
-  { cachedValue :: ValueRef address value
+  { cachedValue :: value
   , cachedHeap  :: Heap address address value
   }
   deriving (Eq, Ord, Show)
