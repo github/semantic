@@ -24,7 +24,6 @@ module Control.Abstract.Value
 , While(..)
 , runWhile
 , WhileC(..)
-, value
 ) where
 
 import Control.Abstract.Evaluator
@@ -35,7 +34,6 @@ import Data.Abstract.BaseError
 import Data.Abstract.Module
 import Data.Abstract.Name
 import Data.Abstract.Number as Number
-import Data.Abstract.Ref
 import Data.Scientific (Scientific)
 import Data.Span
 import Prologue hiding (TypeError)
@@ -288,18 +286,3 @@ class AbstractIntro value => AbstractValue term address value carrier where
   scopedEnvironment :: value -> Evaluator term address value carrier (Maybe address)
 
   object :: address -> Evaluator term address value carrier value
-
-
--- | Evaluates a 'Value' returning the referenced value
-value :: ( Member (Deref value) sig
-         , Member (Reader ModuleInfo) sig
-         , Member (Reader Span) sig
-         , Member (Resumable (BaseError (AddressError address value))) sig
-         , Member (State (Heap address address value)) sig
-         , Carrier sig m
-         , Ord address
-         )
-      => ValueRef address value
-      -> Evaluator term address value m value
-value (Rval val)        = pure val
-value (LvalMember slot) = deref slot
