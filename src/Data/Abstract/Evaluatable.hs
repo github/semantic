@@ -287,6 +287,7 @@ throwUnspecializedError = throwBaseError
 -- | If we can evaluate any syntax which can occur in a 'Sum', we can evaluate the 'Sum'.
 instance (Apply Evaluatable fs, Apply Show1 fs, Apply Foldable fs) => Evaluatable (Sum fs) where
   eval eval' ref = apply @Evaluatable (eval eval' ref)
+  ref eval ref' = apply @Evaluatable (ref eval ref')
 
 -- | Evaluating a 'TermF' ignores its annotation, evaluating the underlying syntax.
 instance (Evaluatable s, Show a) => Evaluatable (TermF s a) where
