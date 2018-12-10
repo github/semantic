@@ -1,7 +1,7 @@
 {-# LANGUAGE TupleSections #-}
 module Analysis.Ruby.Spec (spec) where
 
-import           Control.Abstract (Declaration (..), ScopeError (..), runDeref, value)
+import           Control.Abstract (Declaration (..), ScopeError (..), runDeref)
 import           Control.Effect.Resumable (SomeError (..))
 import           Data.Abstract.Evaluatable
 import qualified Data.Abstract.ModuleTable as ModuleTable
