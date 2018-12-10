@@ -63,7 +63,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Member (Resumable (BaseError (HeapError address))) sig
           , Member (Resumable (BaseError (AddressError address value))) sig
           , Member (Resumable (BaseError (UnspecializedError value))) sig
-          , Member (Resumable (BaseError (EvalError address value))) sig
+          , Member (Resumable (BaseError (EvalError term address value))) sig
           , Member (Resumable (BaseError ResolutionError)) sig
           , Member (State (Heap address address value)) sig
           , Member Trace sig
@@ -160,66 +160,66 @@ defineSelf = do
 -- Effects
 
 -- | The type of error thrown when failing to evaluate a term.
-data EvalError address value return where
-  QualifiedImportError :: ImportPath -> EvalError address value (ValueRef address value)
-  DerefError :: value -> EvalError address value (ValueRef address value)
-  DefaultExportError  :: EvalError address value ()
-  ExportError         :: ModulePath -> Name -> EvalError address value ()
+data EvalError term address value return where
+  QualifiedImportError :: ImportPath -> EvalError term address value (ValueRef address value)
+  DerefError :: value -> EvalError term address value (ValueRef address value)
+  DefaultExportError  :: EvalError term address value ()
+  ExportError         :: ModulePath -> Name -> EvalError term address value ()
   -- Indicates that our evaluator wasn't able to make sense of these literals.
-  FloatFormatError    :: Text -> EvalError address value Scientific
-  IntegerFormatError  :: Text -> EvalError address value Integer
-  NoNameError :: EvalError address value Name
-  RationalFormatError :: Text -> EvalError address value Rational
-  ReferenceError      :: value -> Name -> EvalError address value (ValueRef address value)
-  ConstructorError    :: Name -> EvalError address value address
-  ScopedEnvError      :: value -> EvalError address value address
+  FloatFormatError    :: Text -> EvalError term address value Scientific
+  IntegerFormatError  :: Text -> EvalError term address value Integer
+  NoNameError         :: term -> EvalError term address value Name
+  RationalFormatError :: Text -> EvalError term address value Rational
+  ReferenceError      :: value -> Name -> EvalError term address value (ValueRef address value)
+  ConstructorError    :: Name -> EvalError term address value address
+  ScopedEnvError      :: value -> EvalError term address value address
 
-deriving instance (Eq address, Eq value) => Eq (EvalError address value return)
-deriving instance (Show address, Show value) => Show (EvalError address value return)
+deriving instance (Eq term, Eq address, Eq value) => Eq (EvalError term address value return)
+deriving instance (Show term, Show address, Show value) => Show (EvalError term address value return)
 
-instance NFData value => NFData1 (EvalError address value) where
+instance (NFData term, NFData value) => NFData1 (EvalError term address value) where
   liftRnf _ x = case x of
     DerefError v           -> rnf v
     DefaultExportError     -> ()
     ExportError p n        -> rnf p `seq` rnf n
     FloatFormatError i     -> rnf i
     IntegerFormatError i   -> rnf i
-    NoNameError            -> ()
+    NoNameError t            -> rnf t
     RationalFormatError i  -> rnf i
     ReferenceError v n     -> rnf v `seq` rnf n
     QualifiedImportError i -> rnf i
     ConstructorError n     -> rnf n
     ScopedEnvError v       -> rnf v
 
-instance (NFData value, NFData return) => NFData (EvalError address value return) where
+instance (NFData term, NFData value, NFData return) => NFData (EvalError term address value return) where
   rnf = liftRnf rnf
 
-instance Eq value => Eq1 (EvalError address value) where
-  liftEq _ (DerefError v) (DerefError v2) = v == v2
+instance (Eq term, Eq value) => Eq1 (EvalError term address value) where
+  liftEq _ (DerefError v) (DerefError v2)                  = v == v2
   liftEq _ DefaultExportError DefaultExportError           = True
   liftEq _ (ExportError a b) (ExportError c d)             = (a == c) && (b == d)
   liftEq _ (FloatFormatError a) (FloatFormatError b)       = a == b
   liftEq _ (IntegerFormatError a) (IntegerFormatError b)   = a == b
-  liftEq _ NoNameError        NoNameError                  = True
+  liftEq _ (NoNameError t1)       (NoNameError t2)         = t1 == t2
   liftEq _ (RationalFormatError a) (RationalFormatError b) = a == b
   liftEq _ (ReferenceError v n) (ReferenceError v2 n2)     = (v == v2) && (n == n2)
   liftEq _ _ _                                             = False
 
-instance (Show address, Show value) => Show1 (EvalError address value) where
+instance (Show term, Show address, Show value) => Show1 (EvalError term address value) where
   liftShowsPrec _ _ = showsPrec
 
-runEvalError :: (Carrier sig m, Effect sig) => Evaluator term address value (ResumableC (BaseError (EvalError address value)) (Eff m)) a -> Evaluator term address value m (Either (SomeError (BaseError (EvalError address value))) a)
+runEvalError :: (Carrier sig m, Effect sig) => Evaluator term address value (ResumableC (BaseError (EvalError term address value)) (Eff m)) a -> Evaluator term address value m (Either (SomeError (BaseError (EvalError term address value))) a)
 runEvalError = raiseHandler runResumable
 
-runEvalErrorWith :: Carrier sig m => (forall resume . (BaseError (EvalError address value)) resume -> Evaluator term address value m resume) -> Evaluator term address value (ResumableWithC (BaseError (EvalError address value)) (Eff m)) a -> Evaluator term address value m a
+runEvalErrorWith :: Carrier sig m => (forall resume . (BaseError (EvalError term address value)) resume -> Evaluator term address value m resume) -> Evaluator term address value (ResumableWithC (BaseError (EvalError term address value)) (Eff m)) a -> Evaluator term address value m a
 runEvalErrorWith f = raiseHandler $ runResumableWith (runEvaluator . f)
 
 throwEvalError :: ( Member (Reader ModuleInfo) sig
                   , Member (Reader Span) sig
-                  , Member (Resumable (BaseError (EvalError address value))) sig
+                  , Member (Resumable (BaseError (EvalError term address value))) sig
                   , Carrier sig m
                   )
-               => EvalError address value resume
+               => EvalError term address value resume
                -> Evaluator term address value m resume
 throwEvalError = throwBaseError
 

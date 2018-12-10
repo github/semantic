@@ -30,12 +30,12 @@ instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Function where
   eval _ Function{..} = do
-    name <- maybeM (throwEvalError NoNameError) (declaredName functionName)
+    name <- maybeM (throwEvalError $ NoNameError functionName) (declaredName functionName)
     span <- ask @Span
     associatedScope <- declareFunction name span
 
     params <- withScope associatedScope . for functionParameters $ \paramNode -> do
-      param <- maybeM (throwEvalError NoNameError) (declaredName paramNode)
+      param <- maybeM (throwEvalError $ NoNameError paramNode) (declaredName paramNode)
       param <$ declare (Declaration param) span Nothing
 
     addr <- lookupDeclaration (Declaration name)
@@ -86,15 +86,15 @@ instance Diffable Method where
 -- local environment.
 instance Evaluatable Method where
   eval _ Method{..} = do
-    name <- maybeM (throwEvalError NoNameError) (declaredName methodName)
+    name <- maybeM (throwEvalError $ NoNameError methodName) (declaredName methodName)
     span <- ask @Span
     associatedScope <- declareFunction name span
 
     params <- withScope associatedScope $ do
       let self = Name.name "__self"
-      declare (Declaration self)  emptySpan Nothing
+      declare (Declaration self) emptySpan Nothing
       fmap (self :) . for methodParameters $ \paramNode -> do
-        param <- maybeM (throwEvalError NoNameError) (declaredName paramNode)
+        param <- maybeM (throwEvalError $ NoNameError paramNode) (declaredName paramNode)
         param <$ declare (Declaration param) span Nothing
 
     addr <- lookupDeclaration (Declaration name)
@@ -163,7 +163,7 @@ instance Evaluatable VariableDeclaration where
   eval _ (VariableDeclaration [])   = rvalBox unit
   eval eval (VariableDeclaration decs) = do
     for_ decs $ \declaration -> do
-      name <- maybeM (throwEvalError NoNameError) (declaredName declaration)
+      name <- maybeM (throwEvalError $ NoNameError declaration) (declaredName declaration)
       declare (Declaration name) emptySpan Nothing
       (span, _) <- do
         ref <- eval declaration
@@ -205,10 +205,15 @@ instance Show1 PublicFieldDefinition where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for PublicFieldDefinition
 instance Evaluatable PublicFieldDefinition where
-  eval _ PublicFieldDefinition{..} = do
+  eval eval PublicFieldDefinition{..} = do
     span <- ask @Span
-    propertyName <- maybeM (throwEvalError NoNameError) (declaredName publicFieldPropertyName)
-    declare (Declaration propertyName) span Nothing
+    propertyName <- maybeM (throwEvalError $ NoNameError publicFieldPropertyName) (declaredName publicFieldPropertyName)
+
+    withScope instanceMemberScope $ do
+      declare (Declaration propertyName) span Nothing
+      slot <- lookupDeclaration (Declaration propertyName)
+      value <- value =<< eval publicFieldValue
+      assign slot value
     rvalBox unit
 
 
@@ -238,12 +243,12 @@ instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Class where
   eval eval Class{..} = do
-    name <- maybeM (throwEvalError NoNameError) (declaredName classIdentifier)
+    name <- maybeM (throwEvalError $ NoNameError classIdentifier) (declaredName classIdentifier)
     span <- ask @Span
     currentScope' <- currentScope
 
     superScopes <- for classSuperclasses $ \superclass -> do
-      name <- maybeM (throwEvalError NoNameError) (declaredName superclass)
+      name <- maybeM (throwEvalError $ NoNameError superclass) (declaredName superclass)
       scope <- associatedScope (Declaration name)
       slot <- lookupDeclaration (Declaration name)
       superclassFrame <- scopedEnvironment =<< deref slot
@@ -254,17 +259,19 @@ instance Evaluatable Class where
     let superclassEdges = (Superclass, ) . pure . fst <$> catMaybes superScopes
         current = (Lexical, ) <$> pure (pure currentScope')
         edges = Map.fromList (superclassEdges <> current)
-    childScope <- newScope edges
-    declare (Declaration name) span (Just childScope)
+    classScope <- newScope edges
+    declare (Declaration name) span (Just classScope)
 
     let frameEdges = Map.singleton Superclass (Map.fromList (catMaybes superScopes))
-    childFrame <- newFrame childScope frameEdges
+    classFrame <- newFrame classScope frameEdges
 
-    withScopeAndFrame childFrame $ do
-      void $ eval classBody
+    instanceMemberScope <- newScope (Map.singleton InstanceOf [ classScope ])
 
     classSlot <- lookupDeclaration (Declaration name)
-    assign classSlot =<< klass (Declaration name) childFrame
+    assign classSlot =<< klass (Declaration name) classFrame instanceMemberScope
+
+    withScopeAndFrame classFrame $ do
+      void $ eval classBody
 
     rvalBox unit
 
@@ -343,8 +350,8 @@ instance Show1 TypeAlias where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable TypeAlias where
   eval _ TypeAlias{..} = do
-    name <- maybeM (throwEvalError NoNameError) (declaredName typeAliasIdentifier)
-    kindName <- maybeM (throwEvalError NoNameError) (declaredName typeAliasKind)
+    name <- maybeM (throwEvalError $ NoNameError typeAliasIdentifier) (declaredName typeAliasIdentifier)
+    kindName <- maybeM (throwEvalError $ NoNameError typeAliasKind) (declaredName typeAliasKind)
 
     span <- ask @Span
     assocScope <- associatedScope (Declaration kindName)

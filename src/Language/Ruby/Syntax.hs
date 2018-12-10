@@ -195,7 +195,7 @@ instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Class where
   eval eval Class{..} = do
-    name <- maybeM (throwEvalError NoNameError) (declaredName classIdentifier)
+    name <- maybeM (throwEvalError $ NoNameError classIdentifier) (declaredName classIdentifier)
     span <- ask @Span
     currentScope' <- currentScope
 
@@ -212,7 +212,7 @@ instance Evaluatable Class where
       Nothing -> do
         let classSuperclasses = maybeToList classSuperClass
         superScopes <- for classSuperclasses $ \superclass -> do
-          name <- maybeM (throwEvalError NoNameError) (declaredName superclass)
+          name <- maybeM (throwEvalError $ NoNameError superclass) (declaredName superclass)
           scope <- associatedScope (Declaration name)
           slot <- lookupDeclaration (Declaration name)
           superclassFrame <- scopedEnvironment =<< deref slot
@@ -258,7 +258,7 @@ instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Module where
   eval eval Module{..} =  do
-    name <- maybeM (throwEvalError NoNameError) (declaredName moduleIdentifier)
+    name <- maybeM (throwEvalError $ NoNameError moduleIdentifier) (declaredName moduleIdentifier)
     span <- ask @Span
     currentScope' <- currentScope
 
@@ -350,7 +350,7 @@ instance Show1 Assignment where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Assignment where
   eval eval Assignment{..} = do
-    lhsName <- maybeM (throwEvalError NoNameError) (declaredName assignmentTarget)
+    lhsName <- maybeM (throwEvalError $ NoNameError assignmentTarget) (declaredName assignmentTarget)
     maybeSlot <- maybeLookupDeclaration (Declaration lhsName)
     assignmentSpan <- ask @Span
     maybe (declare (Declaration lhsName) assignmentSpan Nothing) (const (pure ())) maybeSlot
