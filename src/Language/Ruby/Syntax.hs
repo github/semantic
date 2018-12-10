@@ -72,11 +72,9 @@ instance Show1 Send where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Send where
   eval eval Send{..} = do
     sel <- case sendSelector of
-             Just sel -> maybeM (throwEvalError NoNameError) (declaredName sel)
+             Just sel -> maybeM (throwEvalError $ NoNameError sel) (declaredName sel)
              Nothing  ->
-               -- TODO: if there is no selector then it's a call on the receiver
-               -- Previously we returned a variable called `call`.
-               throwEvalError NoNameError
+               pure (Name.name "call")
 
     let self = LvalMember <$> lookupDeclaration (Declaration $ Name.name "__self")
     recv <- maybe self eval sendReceiver
