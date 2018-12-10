@@ -157,7 +157,7 @@ instance Evaluatable DefaultExport where
         exportFrame <- newFrame exportScope mempty
         exportSpan <- ask @Span
         withScopeAndFrame exportFrame $ do
-          valueRef <- value =<< eval term
+          valueRef <- eval term
           let declaration = Declaration $ Name.name "__default"
           declare declaration exportSpan Nothing
           defaultSlot <- lookupDeclaration declaration
@@ -390,7 +390,7 @@ instance Ord1 AmbientDeclaration where liftCompare = genericLiftCompare
 instance Show1 AmbientDeclaration where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable AmbientDeclaration where
-  eval eval _ (AmbientDeclaration body) = eval body
+  eval eval _ (AmbientDeclaration body) = eval body >>= rvalBox
 
 data EnumDeclaration a = EnumDeclaration { enumDeclarationIdentifier :: !a, enumDeclarationBody :: ![a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
@@ -574,7 +574,7 @@ declareModule :: ( AbstractValue term address value m
                  , Member (Resumable (BaseError (ScopeError address))) sig
                  , Ord address
                  )
-                => (term -> Evaluator term address value m (ValueRef address value))
+                => (term -> Evaluator term address value m value)
                 -> term
                 -> [term]
                 -> Evaluator term address value m (ValueRef address value)
@@ -584,7 +584,7 @@ declareModule eval identifier statements = do
     currentScope' <- currentScope
 
     let declaration = Declaration name
-        moduleBody = maybe (rvalBox unit) (runApp . foldMap1 (App . eval)) (nonEmpty statements)
+        moduleBody = maybe (rvalBox unit) (runApp . foldMap1 (App . fmap Rval . eval)) (nonEmpty statements)
     maybeSlot <- maybeLookupDeclaration declaration
 
     case maybeSlot of

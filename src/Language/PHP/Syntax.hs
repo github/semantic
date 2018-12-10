@@ -57,13 +57,11 @@ resolvePHPName n = do
 
 include :: ( AbstractValue term address value m
            , Carrier sig m
-           , Member (Deref value) sig
            , Member (Modules address value) sig
            , Member (Reader (CurrentFrame address)) sig
            , Member (Reader (CurrentScope address)) sig
            , Member (Reader ModuleInfo) sig
            , Member (Reader Span) sig
-           , Member (Resumable (BaseError (AddressError address value))) sig
            , Member (Resumable (BaseError (HeapError address))) sig
            , Member (State (ScopeGraph address)) sig
            , Member (Resumable (BaseError ResolutionError)) sig
@@ -71,12 +69,12 @@ include :: ( AbstractValue term address value m
            , Member Trace sig
            , Ord address
            )
-        => (term -> Evaluator term address value m (ValueRef address value))
+        => (term -> Evaluator term address value m value)
         -> term
         -> (ModulePath -> Evaluator term address value m (ModuleResult address value))
         -> Evaluator term address value m (ValueRef address value)
 include eval pathTerm f = do
-  name <- eval pathTerm >>= Abstract.value >>= asString
+  name <- eval pathTerm >>= asString
   path <- resolvePHPName name
   traceResolve name path
   ((moduleScope, moduleFrame), v) <- f path

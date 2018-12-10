@@ -78,15 +78,14 @@ instance Evaluatable Send where
                -- Previously we returned a variable called `call`.
                throwEvalError NoNameError
 
-    let self = LvalMember <$> lookupDeclaration (Declaration $ Name.name "__self")
-    recv <- maybe self eval sendReceiver
-    lhsValue <- Abstract.value recv
+    let self = lookupDeclaration (Declaration $ Name.name "__self") >>= Abstract.value . LvalMember
+    lhsValue <- maybe self eval sendReceiver
     lhsFrame <- Abstract.scopedEnvironment lhsValue
 
     let callFunction = do
           reference (Reference sel) (Declaration sel)
           func <- deref =<< lookupDeclaration (Declaration sel)
-          args <- traverse (eval >=> Abstract.value) sendArgs
+          args <- traverse eval sendArgs
           call func (lhsValue : args) -- TODO pass through sendBlock
     Rval <$> maybe callFunction (`withScopeAndFrame` callFunction) lhsFrame
 
@@ -106,7 +105,7 @@ instance Show1 Require where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Require where
   eval eval _ (Require _ x) = do
-    name <- eval x >>= value >>= asString
+    name <- eval x >>= asString
     path <- resolveRubyName name
     traceResolve name path
     ((moduleScope, moduleFrame), v) <- doRequire path
@@ -148,11 +147,11 @@ instance Tokenize Load where
 
 instance Evaluatable Load where
   eval eval _ (Load x Nothing) = do
-    path <- eval x >>= value >>= asString
+    path <- eval x >>= asString
     rvalBox =<< doLoad path False
   eval eval _ (Load x (Just wrap)) = do
-    path <- eval x >>= value >>= asString
-    shouldWrap <- eval wrap >>= value >>= asBool
+    path <- eval x >>= asString
+    shouldWrap <- eval wrap >>= asBool
     rvalBox =<< doLoad path shouldWrap
 
 doLoad :: ( Member (Boolean value) sig
@@ -207,7 +206,7 @@ instance Evaluatable Class where
         classVal <- deref slot
         maybeFrame <- scopedEnvironment classVal
         case maybeFrame of
-          Just classFrame -> withScopeAndFrame classFrame (eval classBody)
+          Just classFrame -> withScopeAndFrame classFrame (Rval <$> eval classBody)
           Nothing         -> throwEvalError (DerefError classVal)
       Nothing -> do
         let classSuperclasses = maybeToList classSuperClass
@@ -263,7 +262,7 @@ instance Evaluatable Module where
     currentScope' <- currentScope
 
     let declaration = Declaration name
-        moduleBody = maybe (rvalBox unit) (runApp . foldMap1 (App . eval)) (nonEmpty moduleStatements)
+        moduleBody = maybe (rvalBox unit) (runApp . foldMap1 (App . fmap Rval . eval)) (nonEmpty moduleStatements)
     maybeSlot <- maybeLookupDeclaration declaration
 
     case maybeSlot of
@@ -305,7 +304,7 @@ data LowPrecedenceAnd a = LowPrecedenceAnd { lhs :: a, rhs :: a }
 
 instance Evaluatable LowPrecedenceAnd where
   -- N.B. we have to use Monad rather than Applicative/Traversable on 'And' and 'Or' so that we don't evaluate both operands
-  eval eval _ t = rvalBox =<< go (fmap (eval >=> value) t) where
+  eval eval _ t = rvalBox =<< go (fmap eval t) where
     go (LowPrecedenceAnd a b) = do
       cond <- a
       ifthenelse cond b (pure cond)
@@ -326,7 +325,7 @@ data LowPrecedenceOr a = LowPrecedenceOr { lhs :: a, rhs :: a }
 
 instance Evaluatable LowPrecedenceOr where
   -- N.B. we have to use Monad rather than Applicative/Traversable on 'And' and 'Or' so that we don't evaluate both operands
-  eval eval _ t = rvalBox =<< go (fmap (eval >=> value) t) where
+  eval eval _ t = rvalBox =<< go (fmap eval t) where
     go (LowPrecedenceOr a b) = do
       cond <- a
       ifthenelse cond (pure cond) b
@@ -369,7 +368,7 @@ instance Evaluatable Assignment where
             pure ()
       Nothing ->
         pure ()
-    assign lhs =<< Abstract.value rhs
+    assign lhs rhs
     pure (LvalMember lhs)
 
 instance Tokenize Assignment where
