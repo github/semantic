@@ -313,7 +313,7 @@ instance Ord1 Context where liftCompare = genericLiftCompare
 instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Context where
-  eval eval _ Context{..} = eval contextSubject
+  eval eval _ Context{..} = eval contextSubject >>= rvalBox
 
 instance Tokenize Context where
   tokenize Context{..} = sequenceA_ (sepTrailing contextTerms) *> contextSubject

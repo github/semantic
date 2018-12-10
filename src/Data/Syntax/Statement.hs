@@ -34,7 +34,7 @@ instance ToJSON1 Statements
 
 instance Evaluatable Statements where
   eval eval _ (Statements xs) =
-    maybe (rvalBox unit) (runApp . foldMap1 (App . eval)) (nonEmpty xs)
+    maybe (rvalBox unit) (runApp . foldMap1 (App . fmap Rval . eval)) (nonEmpty xs)
 
 instance Tokenize Statements where
   tokenize = imperative
@@ -49,7 +49,7 @@ instance ToJSON1 StatementBlock
 
 instance Evaluatable StatementBlock where
   eval eval _ (StatementBlock xs) =
-    maybe (rvalBox unit) (runApp . foldMap1 (App . eval)) (nonEmpty xs)
+    maybe (rvalBox unit) (runApp . foldMap1 (App . fmap Rval . eval)) (nonEmpty xs)
 
 instance Tokenize StatementBlock where
   tokenize = imperative
@@ -64,8 +64,8 @@ instance Show1 If where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable If where
   eval eval _ (If cond if' else') = do
-    bool <- eval cond >>= Abstract.value
-    ifthenelse bool (eval if') (eval else')
+    bool <- eval cond
+    ifthenelse bool (eval if') (eval else') >>= rvalBox
 
 instance Tokenize If where
   tokenize If{..} = within' Scope.If $ do
@@ -152,7 +152,7 @@ instance Evaluatable Let where
 
     _ <- withLexicalScopeAndFrame $ do
       declare (Declaration name) letSpan assocScope
-      letVal <- eval letValue >>= Abstract.value
+      letVal <- eval letValue
       slot <- lookupDeclaration (Declaration name)
       assign slot letVal
       eval letBody
@@ -188,7 +188,7 @@ instance Evaluatable Assignment where
             pure ()
       Nothing ->
         pure ()
-    assign lhs =<< Abstract.value rhs
+    assign lhs rhs
     pure (LvalMember lhs)
 
 instance Tokenize Assignment where
@@ -252,7 +252,7 @@ instance Ord1 Return where liftCompare = genericLiftCompare
 instance Show1 Return where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Return where
-  eval eval _ (Return x) = eval x >>= Abstract.value >>= earlyReturn >>= rvalBox
+  eval eval _ (Return x) = eval x >>= earlyReturn >>= rvalBox
 
 instance Tokenize Return where
   tokenize (Return x) = within' Scope.Return x
@@ -279,7 +279,7 @@ instance Ord1 Break where liftCompare = genericLiftCompare
 instance Show1 Break where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Break where
-  eval eval _ (Break x) = eval x >>= Abstract.value >>= throwBreak >>= rvalBox
+  eval eval _ (Break x) = eval x >>= throwBreak >>= rvalBox
 
 instance Tokenize Break where
   tokenize (Break b) = yield (Token.Flow Token.Break) *> b
@@ -292,7 +292,7 @@ instance Ord1 Continue where liftCompare = genericLiftCompare
 instance Show1 Continue where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Continue where
-  eval eval _ (Continue x) = eval x >>= Abstract.value >>= throwContinue >>= rvalBox
+  eval eval _ (Continue x) = eval x >>= throwContinue >>= rvalBox
 
 instance Tokenize Continue where
   tokenize (Continue c) = yield (Token.Flow Token.Continue) *> c
@@ -330,7 +330,7 @@ instance Ord1 For where liftCompare = genericLiftCompare
 instance Show1 For where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable For where
-  eval eval _ (fmap (eval >=> Abstract.value) -> For before cond step body) = Rval <$> forLoop before cond step body
+  eval eval _ (fmap eval -> For before cond step body) = Rval <$> forLoop before cond step body
 
 
 data ForEach a = ForEach { forEachBinding :: !a, forEachSubject :: !a, forEachBody :: !a }
@@ -359,7 +359,7 @@ instance Ord1 While where liftCompare = genericLiftCompare
 instance Show1 While where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable While where
-  eval eval _ While{..} = Rval <$> while (eval whileCondition >>= Abstract.value) (eval whileBody >>= Abstract.value)
+  eval eval _ While{..} = Rval <$> while (eval whileCondition) (eval whileBody)
 
 instance Tokenize While where
   tokenize While{..} = within' Scope.Loop $ do
@@ -375,7 +375,7 @@ instance Ord1 DoWhile where liftCompare = genericLiftCompare
 instance Show1 DoWhile where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable DoWhile where
-  eval eval _ DoWhile{..} = Rval <$> doWhile (eval doWhileBody >>= Abstract.value) (eval doWhileCondition >>= Abstract.value)
+  eval eval _ DoWhile{..} = Rval <$> doWhile (eval doWhileBody) (eval doWhileCondition)
 
 -- Exception handling
 

@@ -70,7 +70,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Ord address
           , Show address
           )
-       => (term -> Evaluator term address value m (ValueRef address value))
+       => (term -> Evaluator term address value m value)
        -> (term -> Evaluator term address value m (Slot address))
        -> (constr term -> Evaluator term address value m (ValueRef address value))
   eval recur _ expr = do
@@ -307,4 +307,4 @@ instance (Evaluatable s, Show a) => Evaluatable (TermF s a) where
 --   3. Only the last statement’s return value is returned.
 instance Evaluatable [] where
   -- 'nonEmpty' and 'foldMap1' enable us to return the last statement’s result instead of 'unit' for non-empty lists.
-  eval eval _ = maybe (rvalBox unit) (runApp . foldMap1 (App . eval)) . nonEmpty
+  eval eval _ = maybe (rvalBox unit) (runApp . foldMap1 (App . fmap Rval . eval)) . nonEmpty

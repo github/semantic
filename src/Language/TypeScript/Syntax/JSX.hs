@@ -114,7 +114,7 @@ instance Evaluatable RequiredParameter where
             pure ()
       Nothing ->
         pure ()
-    assign lhs =<< Abstract.value rhs
+    assign lhs rhs
     pure (LvalMember lhs)
 
 data RestParameter a = RestParameter { restParameterContext :: ![a], restParameterSubject :: !a }
