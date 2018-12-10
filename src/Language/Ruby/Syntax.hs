@@ -349,31 +349,28 @@ instance Ord1 Assignment where liftCompare = genericLiftCompare
 instance Show1 Assignment where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Assignment where
-  eval eval _ Assignment{..} = do
+  eval eval ref Assignment{..} = do
     lhsName <- maybeM (throwEvalError NoNameError) (declaredName assignmentTarget)
     maybeSlot <- maybeLookupDeclaration (Declaration lhsName)
     assignmentSpan <- ask @Span
     maybe (declare (Declaration lhsName) assignmentSpan Nothing) (const (pure ())) maybeSlot
 
-    lhs <- eval assignmentTarget
+    lhs <- ref assignmentTarget
     rhs <- eval assignmentValue
 
-    case lhs of
-      Rval val -> throwEvalError (DerefError val)
-      LvalMember lhsSlot -> do
-        case declaredName assignmentValue of
-          Just rhsName -> do
-            assocScope <- associatedScope (Declaration rhsName)
-            case assocScope of
-              Just assocScope' -> do
-                objectScope <- newScope (Map.singleton Import [ assocScope' ])
-                putSlotDeclarationScope lhsSlot (Just objectScope) -- TODO: not sure if this is right
-              Nothing ->
-                pure ()
+    case declaredName assignmentValue of
+      Just rhsName -> do
+        assocScope <- associatedScope (Declaration rhsName)
+        case assocScope of
+          Just assocScope' -> do
+            objectScope <- newScope (Map.singleton Import [ assocScope' ])
+            putSlotDeclarationScope lhs (Just objectScope) -- TODO: not sure if this is right
           Nothing ->
             pure ()
-        assign lhsSlot =<< Abstract.value rhs
-        pure (LvalMember lhsSlot)
+      Nothing ->
+        pure ()
+    assign lhs =<< Abstract.value rhs
+    pure (LvalMember lhs)
 
 instance Tokenize Assignment where
   -- Should we be using 'assignmentContext' in here?
