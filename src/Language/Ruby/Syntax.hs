@@ -245,3 +245,18 @@ instance Show1 LowPrecedenceOr where liftShowsPrec = genericLiftShowsPrec
 
 instance Tokenize LowPrecedenceOr where
   tokenize LowPrecedenceOr{..} = lhs *> yield (Token.Run "or") <* rhs
+
+-- | A call to @super@ without parentheses in Ruby is known as "zsuper", which has
+-- the semantics of invoking @super()@ but implicitly passing the current function's
+-- arguments to the @super()@ invocation.
+data ZSuper a = ZSuper
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+
+instance Evaluatable ZSuper
+
+instance Eq1 ZSuper where liftEq = genericLiftEq
+instance Ord1 ZSuper where liftCompare = genericLiftCompare
+instance Show1 ZSuper where liftShowsPrec = genericLiftShowsPrec
+
+instance Tokenize ZSuper where
+  tokenize _ = yield $ Run "super"
