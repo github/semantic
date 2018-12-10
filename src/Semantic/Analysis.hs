@@ -145,4 +145,5 @@ evalTerm :: ( Carrier sig m
             )
          => Open (term -> Evaluator term address value m value)
          -> term -> Evaluator term address value m value
+-- NB: We use a lazy pattern match for the lambda’s argument to postpone evaluating the pair until eval/ref is called.
 evalTerm perTerm = fst (fix (\ ~(ev, re) -> (perTerm (eval ev re . project), ref ev re . project)))
