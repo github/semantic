@@ -514,14 +514,15 @@ instance Evaluatable MemberAccess where
     reference (Reference name) (Declaration name)
     lhsValue <- eval lhs
     lhsFrame <- Abstract.scopedEnvironment lhsValue
-    case lhsFrame of
+    slot <- case lhsFrame of
       Just lhsFrame ->
         withScopeAndFrame lhsFrame $ do
           reference (Reference rhs) (Declaration rhs)
-          lookupDeclaration (Declaration rhs) >>= deref
+          lookupDeclaration (Declaration rhs)
       Nothing -> do
         -- Throw a ReferenceError since we're attempting to reference a name within a value that is not an Object.
-        throwEvalError (ReferenceError lhsValue rhs) >>= Abstract.value
+        throwEvalError (ReferenceError lhsValue rhs)
+    deref slot
 
   ref eval _ MemberAccess{..} = do
     name <- maybeM (throwEvalError NoNameError) (declaredName lhs)
@@ -533,7 +534,7 @@ instance Evaluatable MemberAccess where
         withScopeAndFrame lhsFrame $ do
           reference (Reference rhs) (Declaration rhs)
           lookupDeclaration (Declaration rhs)
-      Nothing -> throwEvalError RefError
+      Nothing -> throwEvalError (ReferenceError lhsValue rhs)
 
 
 instance Tokenize MemberAccess where
