@@ -121,9 +121,8 @@ type TestEvaluatingC term
   ( ResumableC (BaseError (ScopeError Precise)) (Eff
   ( ResumableC (BaseError (UnspecializedError (Val term))) (Eff
   ( ResumableC (BaseError (LoadError Precise (Val term))) (Eff
-
-  (StateC (Heap Precise Precise (Val term)) (Eff
-  (StateC (ScopeGraph Precise) (Eff
+  ( StateC (Heap Precise Precise (Val term)) (Eff
+  ( StateC (ScopeGraph Precise) (Eff
   ( FreshC (Eff
   ( TraceByIgnoringC (Eff
   ( LiftC IO))))))))))))))))))))))))
