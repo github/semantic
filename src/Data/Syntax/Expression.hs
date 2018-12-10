@@ -50,8 +50,7 @@ instance Show1 LessThan where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable LessThan where
   eval eval _ t = traverse eval t >>= go where
-    go x = case x of
-      (LessThan a b)         -> liftComparison (Concrete (<)) a b
+    go (LessThan a b) = liftComparison (Concrete (<)) a b
 
 instance Tokenize LessThan where
   tokenize LessThan{..} = within' (Scope.InfixL (Compare Less) 4) $ lhs *> yield Token.Sym <* rhs
@@ -65,8 +64,7 @@ instance Show1 LessThanEqual where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable LessThanEqual where
   eval eval _ t = traverse eval t >>= go where
-    go x = case x of
-      (LessThanEqual a b)         -> liftComparison (Concrete (<=)) a b
+    go (LessThanEqual a b) = liftComparison (Concrete (<=)) a b
 
 instance Tokenize LessThanEqual where
   tokenize LessThanEqual{..} = within' (Scope.InfixL (CompareEql Less) 4) $ lhs *> yield Token.Sym <* rhs
@@ -80,8 +78,7 @@ instance Show1 GreaterThan where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable GreaterThan where
   eval eval _ t = traverse eval t >>= go where
-    go x = case x of
-      (GreaterThan a b)         -> liftComparison (Concrete (>)) a b
+    go (GreaterThan a b) = liftComparison (Concrete (>)) a b
 
 instance Tokenize GreaterThan where
   tokenize GreaterThan{..} = within' (Scope.InfixL (Compare Greater) 4) $ lhs *> yield Token.Sym <* rhs
@@ -95,8 +92,7 @@ instance Show1 GreaterThanEqual where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable GreaterThanEqual where
   eval eval _ t = traverse eval t >>= go where
-    go x = case x of
-      (GreaterThanEqual a b)         -> liftComparison (Concrete (>=)) a b
+    go (GreaterThanEqual a b) = liftComparison (Concrete (>=)) a b
 
 instance Tokenize GreaterThanEqual where
   tokenize GreaterThanEqual{..} = within' (Scope.InfixL (CompareEql Greater) 4) $ lhs *> yield Token.Sym <* rhs
@@ -110,10 +106,9 @@ instance Show1 Equal where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Equal where
   eval eval _ t = traverse eval t >>= go where
-    go x = case x of
-      -- TODO: in PHP and JavaScript, the equals operator performs type coercion.
-      -- We need some mechanism to customize this behavior per-language.
-      (Equal a b)         -> liftComparison (Concrete (==)) a b
+    -- TODO: in PHP and JavaScript, the equals operator performs type coercion.
+    -- We need some mechanism to customize this behavior per-language.
+    go (Equal a b) = liftComparison (Concrete (==)) a b
 
 instance Tokenize Equal where
   tokenize Equal{..} = within' (Scope.InfixL Eql 4) $ lhs *> yield Token.Sym <* rhs
@@ -127,10 +122,9 @@ instance Show1 StrictEqual where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable StrictEqual where
   eval eval _ t = traverse eval t >>= go where
-    go x = case x of
-      -- TODO: in PHP and JavaScript, the equals operator performs type coercion.
-      -- We need some mechanism to customize this behavior per-language.
-      (StrictEqual a b)         -> liftComparison (Concrete (==)) a b
+    -- TODO: in PHP and JavaScript, the equals operator performs type coercion.
+    -- We need some mechanism to customize this behavior per-language.
+    go (StrictEqual a b) = liftComparison (Concrete (==)) a b
 
 instance Tokenize StrictEqual where
   tokenize StrictEqual{..} = within' (Scope.InfixL StrictEql 4) $ lhs *> yield Token.Sym <* rhs
@@ -144,8 +138,7 @@ instance Show1 Comparison where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Comparison where
   eval eval _ t = traverse eval t >>= go where
-    go x = case x of
-      (Comparison a b)         -> liftComparison (Concrete (==)) a b
+    go (Comparison a b) = liftComparison (Concrete (==)) a b
 
 instance Tokenize Comparison where
   tokenize Comparison{..} = within' (Scope.InfixL Spaceship 4) $ lhs *> yield Token.Sym <* rhs
@@ -159,7 +152,7 @@ instance Show1 Plus where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Plus where
   eval eval _ t = traverse eval t >>= go where
-    go (Plus a b)          = liftNumeric2 add a b  where add    = liftReal (+)
+    go (Plus a b) = liftNumeric2 add a b  where add    = liftReal (+)
 
 instance Tokenize Plus where
   tokenize Plus{..} = within' (Scope.InfixL Add 6) $ lhs *> yield Token.Sym <* rhs
@@ -173,7 +166,7 @@ instance Show1 Minus where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Minus where
   eval eval _ t = traverse eval t >>= go where
-    go (Minus a b)         = liftNumeric2 sub a b  where sub    = liftReal (-)
+    go (Minus a b) = liftNumeric2 (liftReal (-)) a b
 
 instance Tokenize Minus where
   tokenize Minus{..} = within' (Scope.InfixL Subtract 6) $ lhs *> yield Token.Sym <* rhs
@@ -187,7 +180,7 @@ instance Show1 Times where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Times where
   eval eval _ t = traverse eval t >>= go where
-    go (Times a b)         = liftNumeric2 mul a b  where mul    = liftReal (*)
+    go (Times a b) = liftNumeric2 (liftReal (*)) a b
 
 instance Tokenize Times where
   tokenize Times{..} = within' (Scope.InfixL Multiply 7) $ lhs *> yield Token.Sym <* rhs
@@ -201,7 +194,7 @@ instance Show1 DividedBy where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable DividedBy where
   eval eval _ t = traverse eval t >>= go where
-    go (DividedBy a b)     = liftNumeric2 div' a b where div'   = liftIntegralFrac div (/)
+    go (DividedBy a b) = liftNumeric2 (liftIntegralFrac div (/)) a b
 
 instance Tokenize DividedBy where
   tokenize DividedBy{..} = within' (Scope.InfixL Divide 7) $ lhs *> yield Token.Sym <* rhs
@@ -215,7 +208,7 @@ instance Show1 Modulo where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Modulo where
   eval eval _ t = traverse eval t >>= go where
-    go (Modulo a b)        = liftNumeric2 mod'' a b where mod'' = liftIntegralFrac mod mod'
+    go (Modulo a b) = liftNumeric2 (liftIntegralFrac mod mod') a b
 
 instance Tokenize Modulo where
   tokenize Modulo{..} = within' (Scope.InfixL Modulus 7) $ lhs *> yield Token.Sym <* rhs
@@ -229,7 +222,7 @@ instance Show1 Power where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Power where
   eval eval _ t = traverse eval t >>= go where
-    go (Power a b)         = liftNumeric2 liftedExponent a b
+    go (Power a b) = liftNumeric2 liftedExponent a b
 
 instance Tokenize Power where
   tokenize Power{..} = within' (Scope.InfixL Raise 9) $ lhs *> yield Token.Sym <* rhs
@@ -243,7 +236,7 @@ instance Show1 Negate where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Negate where
   eval eval _ t = traverse eval t >>= go where
-    go (Negate a)          = liftNumeric negate a
+    go (Negate a) = liftNumeric negate a
 
 instance Tokenize Negate where
   tokenize Negate{..} = within' (Scope.Prefix NumericNegate) $ yield Token.Sym <* value
