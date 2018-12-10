@@ -163,15 +163,15 @@ defineSelf = do
 -- | The type of error thrown when failing to evaluate a term.
 data EvalError address value return where
   QualifiedImportError :: ImportPath -> EvalError address value (ValueRef address value)
-  DerefError :: value -> EvalError address value (ValueRef address value)
-  DefaultExportError  :: EvalError address value ()
-  ExportError         :: ModulePath -> Name -> EvalError address value ()
+  DerefError           :: value -> EvalError address value (ValueRef address value)
+  DefaultExportError   :: EvalError address value ()
+  ExportError          :: ModulePath -> Name -> EvalError address value ()
   -- Indicates that our evaluator wasn't able to make sense of these literals.
-  FloatFormatError    :: Text -> EvalError address value Scientific
-  IntegerFormatError  :: Text -> EvalError address value Integer
-  NoNameError :: EvalError address value Name
-  RationalFormatError :: Text -> EvalError address value Rational
-  ReferenceError      :: value -> Name -> EvalError address value (ValueRef address value)
+  FloatFormatError     :: Text -> EvalError address value Scientific
+  IntegerFormatError   :: Text -> EvalError address value Integer
+  NoNameError          :: EvalError address value Name
+  RationalFormatError  :: Text -> EvalError address value Rational
+  ReferenceError       :: value -> Name -> EvalError address value (ValueRef address value)
 
 deriving instance (Eq address, Eq value) => Eq (EvalError address value return)
 deriving instance (Show address, Show value) => Show (EvalError address value return)
