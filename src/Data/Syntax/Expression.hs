@@ -300,10 +300,9 @@ instance Eq1 And where liftEq = genericLiftEq
 instance Ord1 And where liftCompare = genericLiftCompare
 instance Show1 And where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable And where
-  eval eval _ t = go (fmap eval t) where
-    go (And a b) = do
-      cond <- a
-      ifthenelse cond b (pure cond)
+  eval eval _ (And a b) = do
+    a' <- eval a
+    ifthenelse a' (eval b) (pure a')
 
 instance Tokenize And where
   tokenize And{..} = within' (Scope.InfixL LogicalAnd 2) $ lhs *> yield Token.Sym <* rhs
@@ -316,8 +315,7 @@ instance Ord1 Not where liftCompare = genericLiftCompare
 instance Show1 Not where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Not where
-  eval eval _ t = go (fmap eval t) where
-    go (Not a) = a >>= asBool >>= boolean . not
+  eval eval _ (Not a) = eval a >>= asBool >>= boolean . not
 
 instance Tokenize Not where
   tokenize Not{..} = within' (Scope.Prefix LogicalNot) $ yield Token.Sym <* value
@@ -331,8 +329,7 @@ instance Show1 XOr where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable XOr where
   -- N.B. we have to use Monad rather than Applicative/Traversable on 'And' and 'Or' so that we don't evaluate both operands
-  eval eval _ t = go (fmap eval t) where
-    go (XOr a b) = liftA2 (/=) (a >>= asBool) (b >>= asBool) >>= boolean
+  eval eval _ (XOr a b) = liftA2 (/=) (eval a >>= asBool) (eval b >>= asBool) >>= boolean
 
 instance Tokenize XOr where
   tokenize XOr{..} = within' (Scope.InfixL LogicalXor 2) $ lhs *> yield Token.Sym <* rhs
