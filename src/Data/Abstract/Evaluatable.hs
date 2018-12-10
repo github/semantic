@@ -60,7 +60,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Member (Resumable (BaseError (ScopeError address))) sig
           , Member (Resumable (BaseError (HeapError address))) sig
           , Member (Resumable (BaseError (AddressError address value))) sig
-          , Member (Resumable (BaseError (UnspecializedError value))) sig
+          , Member (Resumable (BaseError (UnspecializedError address value))) sig
           , Member (Resumable (BaseError (EvalError address value))) sig
           , Member (Resumable (BaseError ResolutionError)) sig
           , Member (State (Heap address address value)) sig
@@ -85,7 +85,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
          , Member (Resumable (BaseError (EvalError address value))) sig
          , Member (Resumable (BaseError (HeapError address))) sig
          , Member (Resumable (BaseError (ScopeError address))) sig
-         , Member (Resumable (BaseError (UnspecializedError value))) sig
+         , Member (Resumable (BaseError (UnspecializedError address value))) sig
          , Member (State (Heap address address value)) sig
          , Member (State (ScopeGraph address)) sig
          , Ord address
@@ -241,43 +241,47 @@ throwEvalError :: ( Member (Reader ModuleInfo) sig
 throwEvalError = throwBaseError
 
 
-data UnspecializedError a b where
-  UnspecializedError :: String -> UnspecializedError value value
+data UnspecializedError address value resume where
+  UnspecializedError    :: String -> UnspecializedError address value value
+  RefUnspecializedError :: String -> UnspecializedError address value (Slot address)
 
-instance NFData1 (UnspecializedError a) where
-  liftRnf _ (UnspecializedError s) = rnf s
+instance NFData1 (UnspecializedError address value) where
+  liftRnf _ (UnspecializedError s)    = rnf s
+  liftRnf _ (RefUnspecializedError s) = rnf s
 
-instance NFData b => NFData (UnspecializedError a b) where
-  rnf = liftRnf rnf
+instance NFData (UnspecializedError address value resume) where
+  rnf = liftRnf (const ())
 
-deriving instance Eq (UnspecializedError a b)
-deriving instance Show (UnspecializedError a b)
+deriving instance Eq   (UnspecializedError address value resume)
+deriving instance Show (UnspecializedError address value resume)
 
 
-instance Eq1 (UnspecializedError a) where
-  liftEq _ (UnspecializedError a) (UnspecializedError b) = a == b
+instance Eq1 (UnspecializedError address value) where
+  liftEq _ (UnspecializedError a)    (UnspecializedError b)    = a == b
+  liftEq _ (RefUnspecializedError a) (RefUnspecializedError b) = a == b
+  liftEq _ _                         _                         = False
 
-instance Show1 (UnspecializedError a) where
+instance Show1 (UnspecializedError address value) where
   liftShowsPrec _ _ = showsPrec
 
 runUnspecialized :: (Carrier sig m, Effect sig)
-                 => Evaluator term address value (ResumableC (BaseError (UnspecializedError value)) (Eff m)) a
-                 -> Evaluator term address value m (Either (SomeError (BaseError (UnspecializedError value))) a)
+                 => Evaluator term address value (ResumableC (BaseError (UnspecializedError address value)) (Eff m)) a
+                 -> Evaluator term address value m (Either (SomeError (BaseError (UnspecializedError address value))) a)
 runUnspecialized = raiseHandler runResumable
 
 runUnspecializedWith :: Carrier sig m
-                     => (forall resume . BaseError (UnspecializedError value) resume -> Evaluator term address value m resume)
-                     -> Evaluator term address value (ResumableWithC (BaseError (UnspecializedError value)) (Eff m)) a
+                     => (forall resume . BaseError (UnspecializedError address value) resume -> Evaluator term address value m resume)
+                     -> Evaluator term address value (ResumableWithC (BaseError (UnspecializedError address value)) (Eff m)) a
                      -> Evaluator term address value m a
 runUnspecializedWith f = raiseHandler $ runResumableWith (runEvaluator . f)
 
 
-throwUnspecializedError :: ( Member (Resumable (BaseError (UnspecializedError value))) sig
+throwUnspecializedError :: ( Member (Resumable (BaseError (UnspecializedError address value))) sig
                            , Member (Reader ModuleInfo) sig
                            , Member (Reader Span) sig
                            , Carrier sig m
                            )
-                        => UnspecializedError value resume
+                        => UnspecializedError address value resume
                         -> Evaluator term address value m resume
 throwUnspecializedError = throwBaseError
 

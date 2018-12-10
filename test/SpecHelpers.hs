@@ -119,7 +119,7 @@ type TestEvaluatingC term
   ( ResumableC (BaseError (EvalError Precise (Val term))) (Eff
   ( ResumableC (BaseError (HeapError Precise)) (Eff
   ( ResumableC (BaseError (ScopeError Precise)) (Eff
-  ( ResumableC (BaseError (UnspecializedError (Val term))) (Eff
+  ( ResumableC (BaseError (UnspecializedError Precise (Val term))) (Eff
   ( ResumableC (BaseError (LoadError Precise (Val term))) (Eff
   ( StateC (Heap Precise Precise (Val term)) (Eff
   ( StateC (ScopeGraph Precise) (Eff
@@ -133,7 +133,7 @@ type TestEvaluatingErrors term
      , BaseError (EvalError Precise (Val term))
      , BaseError (HeapError Precise)
      , BaseError (ScopeError Precise)
-     , BaseError (UnspecializedError (Val term))
+     , BaseError (UnspecializedError Precise (Val term))
      , BaseError (LoadError Precise (Val term))
      ]
 testEvaluating :: Evaluator term Precise (Val term) (TestEvaluatingC term) a

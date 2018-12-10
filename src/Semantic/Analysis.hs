@@ -25,10 +25,10 @@ type ModuleC address value m
     m)))))))))))))
 
 type ValueC term address value m
-  = FunctionC term address value                                  (Eff
-  ( WhileC value                                                  (Eff
-  ( BooleanC value                                                (Eff
-  ( InterposeC (Resumable (BaseError (UnspecializedError value))) (Eff
+  = FunctionC term address value                                          (Eff
+  ( WhileC value                                                          (Eff
+  ( BooleanC value                                                        (Eff
+  ( InterposeC (Resumable (BaseError (UnspecializedError address value))) (Eff
     m)))))))
 
 -- | Evaluate a list of modules with the prelude for the passed language available, and applying the passed function to every module.
@@ -41,8 +41,8 @@ evaluate :: ( AbstractValue term address value (ValueC term address value inner)
             , allocatorSig ~ (Allocator address :+: Reader ModuleInfo :+: outerSig)
             , allocatorC ~ (AllocatorC address (Eff (ReaderC ModuleInfo (Eff outer))))
             , Carrier allocatorSig allocatorC
-            , booleanC ~ BooleanC value (Eff (InterposeC (Resumable (BaseError (UnspecializedError value))) (Eff inner)))
-            , booleanSig ~ (Boolean value :+: Interpose (Resumable (BaseError (UnspecializedError value))) :+: innerSig)
+            , booleanC ~ BooleanC value (Eff (InterposeC (Resumable (BaseError (UnspecializedError address value))) (Eff inner)))
+            , booleanSig ~ (Boolean value :+: Interpose (Resumable (BaseError (UnspecializedError address value))) :+: innerSig)
             , Carrier booleanSig booleanC
             , whileC ~ WhileC value (Eff booleanC)
             , whileSig ~ (While value :+: booleanSig)
@@ -60,7 +60,7 @@ evaluate :: ( AbstractValue term address value (ValueC term address value inner)
             , Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address value))))) outerSig
             , Member (Reader Span) innerSig
             , Member (Resumable (BaseError (AddressError address value))) innerSig
-            , Member (Resumable (BaseError (UnspecializedError value))) innerSig
+            , Member (Resumable (BaseError (UnspecializedError address value))) innerSig
             , Member (State (Heap address address value)) innerSig
             , Member (State (ScopeGraph address)) innerSig
             , Member (State (Heap address address value)) outerSig
@@ -128,7 +128,7 @@ evalTerm :: ( Carrier sig m
             , Member (Resumable (BaseError (AddressError address value))) sig
             , Member (Resumable (BaseError (HeapError address))) sig
             , Member (Resumable (BaseError (ScopeError address))) sig
-            , Member (Resumable (BaseError (UnspecializedError value))) sig
+            , Member (Resumable (BaseError (UnspecializedError address value))) sig
             , Member (Resumable (BaseError (EvalError address value))) sig
             , Member (Resumable (BaseError ResolutionError)) sig
             , Member (State (Heap address address value)) sig

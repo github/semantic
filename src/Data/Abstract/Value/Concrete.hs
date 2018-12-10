@@ -130,14 +130,14 @@ instance ( Member (Reader ModuleInfo) sig
 instance forall sig m term address. ( Carrier sig m
          , Member (Abstract.Boolean (Value term address)) sig
          , Member (Error (LoopControl (Value term address))) sig
-         , Member (Interpose (Resumable (BaseError (UnspecializedError (Value term address))))) sig
+         , Member (Interpose (Resumable (BaseError (UnspecializedError address (Value term address))))) sig
          , Show address
          , Show term
          )
       => Carrier (Abstract.While (Value term address) :+: sig) (WhileC (Value term address) (Eff m)) where
   ret = WhileC . ret
   eff = WhileC . handleSum (eff . handleCoercible) (\case
-    Abstract.While cond body k -> interpose @(Resumable (BaseError (UnspecializedError (Value term address)))) (runEvaluator (loop (\continue -> do
+    Abstract.While cond body k -> interpose @(Resumable (BaseError (UnspecializedError address (Value term address)))) (runEvaluator (loop (\continue -> do
       cond' <- Evaluator (runWhileC cond)
 
       -- `interpose` is used to handle 'UnspecializedError's and abort out of the
@@ -145,7 +145,9 @@ instance forall sig m term address. ( Carrier sig m
       -- conditional always being true and getting stuck in an infinite loop.
 
       ifthenelse cond' (Evaluator (runWhileC body) *> continue) (pure Unit))))
-      (\(Resumable (BaseError _ _ (UnspecializedError _)) _) -> throwError (Abort @(Value term address)))
+      (\case
+        Resumable (BaseError _ _ (UnspecializedError _))    _ -> throwError (Abort @(Value term address))
+        Resumable (BaseError _ _ (RefUnspecializedError _)) _ -> throwError (Abort @(Value term address)))
         >>= runWhileC . k)
     where
       loop x = catchLoopControl (fix x) $ \case
