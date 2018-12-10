@@ -377,15 +377,17 @@ resumingEvalError = runEvalErrorWith (\ baseError -> traceError "EvalError" base
   RationalFormatError{} -> pure 0
   NoNameError           -> gensym)
 
-resumingUnspecialized :: ( AbstractHole value
+resumingUnspecialized :: ( AbstractHole address
+                         , AbstractHole value
                          , Carrier sig m
                          , Member Trace sig
                          )
-                      => Evaluator term address value (ResumableWithC (BaseError (UnspecializedError value)) (Eff
+                      => Evaluator term address value (ResumableWithC (BaseError (UnspecializedError address value)) (Eff
                                                       m)) a
                       -> Evaluator term address value m a
 resumingUnspecialized = runUnspecializedWith (\ baseError -> traceError "UnspecializedError" baseError *> case baseErrorException baseError of
-  UnspecializedError _ -> pure hole)
+  UnspecializedError _ -> pure hole
+  RefUnspecializedError _ -> pure hole)
 
 resumingAddressError :: ( AbstractHole value
                         , Carrier sig m
