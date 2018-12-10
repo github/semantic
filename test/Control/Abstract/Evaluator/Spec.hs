@@ -31,7 +31,7 @@ spec = parallel $ do
     expected `shouldBe` Right (Value.Integer (Number.Integer 123))
 
   it "calls functions" $ do
-    (_, (_, (_, expected))) <- evaluate .withLexicalScopeAndFrame $ do
+    (_, (_, (_, expected))) <- evaluate . withLexicalScopeAndFrame $ do
       currentScope' <- currentScope
       let lexicalEdges = Map.singleton Lexical [ currentScope' ]
           x =  SpecHelpers.name "x"
