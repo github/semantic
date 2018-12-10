@@ -41,10 +41,16 @@ import qualified Data.Map.Strict as Map
 import           Prelude hiding (lookup)
 import           Prologue
 
+-- | A Frame describes the vertices of the Heap. Think of it as an instance of a Scope in the ScopeGraph.
 data Frame scopeAddress frameAddress value = Frame
   { scopeAddress :: scopeAddress
+    -- ^ The scope address of its corresponding Scope
   , links        :: Map EdgeLabel (Map scopeAddress frameAddress)
+  -- ^ A map of edge labels to maps of scope addresses to frame addresses (scope addresses are unique keys in the ScopeGraph
+  --   and frame addresses are unique keys in the Heap). This map describes the frame’s links to other frames.
+  --   A frame’s links are always in one-to-one correspondence with its scope’s edges to parent scopes.
   , slots        :: IntMap (Set value)
+  -- ^ An IntMap of values that are declared in the frame.
   }
   deriving (Eq, Ord, Show, Generic, NFData)
 
