@@ -1,9 +1,8 @@
 (Statements
   (New
-    (Call
-      (MemberAccess
-        (Identifier))
-      (Float)
-    { (TextElement)
-    ->(TextElement) }
-      (Empty))))
+    (MemberAccess
+      (Identifier))
+    (Empty)
+    (Float)
+  { (TextElement)
+  ->(TextElement) }))
