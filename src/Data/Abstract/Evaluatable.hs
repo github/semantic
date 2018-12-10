@@ -71,7 +71,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Show address
           )
        => (term -> Evaluator term address value m (ValueRef address value))
-       -> ()
+       -> (term -> Evaluator term address value m (Maybe (Slot address)))
        -> (constr term -> Evaluator term address value m (ValueRef address value))
   eval recur _ expr = do
     traverse_ recur expr
