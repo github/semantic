@@ -10,7 +10,9 @@ import Control.Abstract as Abstract
 import Control.Effect.Carrier
 import Control.Effect.Sum
 import Data.Abstract.BaseError
-import Data.Abstract.Environment as Env
+import Data.Abstract.Ref
+import Data.Abstract.Evaluatable
+import qualified Data.Map.Strict as Map
 import Prologue
 
 data Abstract = Abstract
@@ -19,30 +21,41 @@ data Abstract = Abstract
 
 instance ( Member (Allocator address) sig
          , Member (Deref Abstract) sig
-         , Member (Env address) sig
-         , Member (Error (Return address)) sig
+         , Member (Error (Return address Abstract)) sig
          , Member Fresh sig
+         , Member (Reader (CurrentFrame address)) sig
+         , Member (Reader (CurrentScope address)) sig
          , Member (Reader ModuleInfo) sig
          , Member (Reader Span) sig
+         , Member (State Span) sig
+         , Member (State (ScopeGraph address)) sig
+         , Member (Resumable (BaseError (EvalError address Abstract))) sig
+         , Member (Resumable (BaseError (ScopeError address))) sig
+         , Member (Resumable (BaseError (HeapError address))) sig
          , Member (Resumable (BaseError (AddressError address Abstract))) sig
-         , Member (State (Heap address Abstract)) sig
+         , Member (State (Heap address address Abstract)) sig
+         , Declarations term
          , Ord address
+         , Show address
          , Carrier sig m
          )
       => Carrier (Abstract.Function term address Abstract :+: sig) (FunctionC term address Abstract (Eff m)) where
   ret = FunctionC . const . ret
   eff op = FunctionC (\ eval -> handleSum (eff . handleReader eval runFunctionC) (\case
-    Function _ params body k -> runEvaluator $ do
-      env <- foldr (\ name rest -> do
-        addr <- alloc name
-        assign addr Abstract
-        Env.insert name addr <$> rest) (pure lowerBound) params
-      addr <- locally (bindAll env *> catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body))))
-      deref addr >>= Evaluator . flip runFunctionC eval . k
-    BuiltIn _ k -> runFunctionC (k Abstract) eval
-    Call _ _ params k -> runEvaluator $ do
-      traverse_ deref params
-      box Abstract >>= Evaluator . flip runFunctionC eval . k) op)
+    Function _ params body scope k -> runEvaluator $ do
+      currentScope' <- currentScope
+      currentFrame' <- currentFrame
+      let frameLinks = Map.singleton Lexical (Map.singleton currentScope' currentFrame')
+      frame <- newFrame scope frameLinks
+      res <- withScopeAndFrame frame $ do
+        for_ params $ \param -> do
+          address <- lookupDeclaration (Declaration param)
+          assign address Abstract
+        catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body)))
+      Evaluator $ runFunctionC (k res) eval
+    BuiltIn _ _ k -> runFunctionC (k Abstract) eval
+    Call _ _ k -> runEvaluator $ do
+      rvalBox Abstract >>= Evaluator . flip runFunctionC eval . k) op)
 
 
 instance (Carrier sig m, Alternative m) => Carrier (Boolean Abstract :+: sig) (BooleanC Abstract m) where
@@ -57,13 +70,13 @@ instance ( Member (Abstract.Boolean Abstract) sig
          , Alternative m
          , Monad m
          )
-      => Carrier (While Abstract :+: sig) (WhileC Abstract m) where
+      => Carrier (While address Abstract :+: sig) (WhileC address Abstract m) where
   ret = WhileC . ret
   eff = WhileC . handleSum
     (eff . handleCoercible)
     (\ (Abstract.While cond body k) -> do
       cond' <- runWhileC cond
-      ifthenelse cond' (runWhileC body *> empty) (runWhileC (k unit)))
+      ifthenelse cond' (runWhileC body *> empty) (runWhileC (k $ Rval unit)))
 
 
 instance Ord address => ValueRoots address Abstract where
@@ -84,28 +97,21 @@ instance AbstractIntro Abstract where
   kvPair _ _ = Abstract
   null       = Abstract
 
-instance ( Member (Allocator address) sig
-         , Member (Deref Abstract) sig
-         , Member Fresh sig
-         , Member (State (Heap address Abstract)) sig
-         , Ord address
-         , Carrier sig m
-         )
-      => AbstractValue term address Abstract m where
+instance AbstractValue term address Abstract m where
   array _ = pure Abstract
 
   tuple _ = pure Abstract
 
-  klass _ _ _ = pure Abstract
-  namespace _ _ _ = pure Abstract
+  klass _ _ = pure Abstract
+  namespace _ _ = pure Abstract
 
-  scopedEnvironment _ = pure lowerBound
+  scopedEnvironment _ = pure Nothing
 
   asString _ = pure ""
   asPair _ = pure (Abstract, Abstract)
   asArray _ = pure mempty
 
-  index _ _ = box Abstract
+  index _ _ = pure Abstract
 
   liftNumeric _ _ = pure Abstract
   liftNumeric2 _ _ _ = pure Abstract
@@ -118,3 +124,4 @@ instance ( Member (Allocator address) sig
   liftComparison _ _ _ = pure Abstract
 
   castToInteger _ = pure Abstract
+  object _ = pure Abstract

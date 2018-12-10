@@ -216,33 +216,33 @@ message FloorDivision {
 }
 
 message BOr {
-  GoDiff left = 1;
-  GoDiff right = 2;
+  GoDiff lhs = 1;
+  GoDiff rhs = 2;
 }
 
 message BAnd {
-  GoDiff left = 1;
-  GoDiff right = 2;
+  GoDiff lhs = 1;
+  GoDiff rhs = 2;
 }
 
 message BXOr {
-  GoDiff left = 1;
-  GoDiff right = 2;
+  GoDiff lhs = 1;
+  GoDiff rhs = 2;
 }
 
 message LShift {
-  GoDiff left = 1;
-  GoDiff right = 2;
+  GoDiff lhs = 1;
+  GoDiff rhs = 2;
 }
 
 message RShift {
-  GoDiff left = 1;
-  GoDiff right = 2;
+  GoDiff lhs = 1;
+  GoDiff rhs = 2;
 }
 
 message UnsignedRShift {
-  GoDiff left = 1;
-  GoDiff right = 2;
+  GoDiff lhs = 1;
+  GoDiff rhs = 2;
 }
 
 message Complement {

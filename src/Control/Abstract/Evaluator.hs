@@ -17,16 +17,17 @@ module Control.Abstract.Evaluator
   , module X
   ) where
 
-import Control.Effect           as X
+import Control.Effect as X
 import Control.Effect.Carrier
-import Control.Effect.Error     as X
-import Control.Effect.Fresh     as X
-import Control.Effect.NonDet    as X
-import Control.Effect.Reader    as X
+import Control.Effect.Error as X
+import Control.Effect.Fresh as X
+import Control.Effect.NonDet as X
+import Control.Effect.Reader as X
 import Control.Effect.Resumable as X
-import Control.Effect.State     as X
-import Control.Effect.Trace     as X
+import Control.Effect.State as X
+import Control.Effect.Trace as X
 import Control.Monad.IO.Class
+import Data.Abstract.Ref
 import Data.Coerce
 
 -- | An 'Evaluator' is a thin wrapper around 'Eff' with (phantom) type parameters for the address, term, and value types.
@@ -59,45 +60,53 @@ type Open a = a -> a
 -- Effects
 
 -- | An effect for explicitly returning out of a function/method body.
-newtype Return address = Return { unReturn :: address }
+newtype Return address value = Return { unReturn :: ValueRef address value }
   deriving (Eq, Ord, Show)
 
-earlyReturn :: (Member (Error (Return address)) sig, Carrier sig m)
-            => address
-            -> Evaluator term address value m address
+earlyReturn :: ( Member (Error (Return address value)) sig
+               , Carrier sig m
+               )
+            => ValueRef address value
+            -> Evaluator term address value m (ValueRef address value)
 earlyReturn = throwError . Return
 
-catchReturn :: (Member (Error (Return address)) sig, Carrier sig m) => Evaluator term address value m address -> Evaluator term address value m address
-catchReturn = flip catchError (\ (Return addr) -> pure addr)
+catchReturn :: (Member (Error (Return address value)) sig, Carrier sig m) => Evaluator term address value m (ValueRef address value) -> Evaluator term address value m (ValueRef address value)
+catchReturn = flip catchError (\ (Return value) -> pure value)
 
-runReturn :: (Carrier sig m, Effect sig) => Evaluator term address value (ErrorC (Return address) (Eff m)) address -> Evaluator term address value m address
+runReturn :: (Carrier sig m, Effect sig) => Evaluator term address value (ErrorC (Return address value) (Eff m)) (ValueRef address value) -> Evaluator term address value m (ValueRef address value)
 runReturn = raiseHandler $ fmap (either unReturn id) . runError
 
 
 -- | Effects for control flow around loops (breaking and continuing).
-data LoopControl address
-  = Break    { unLoopControl :: address }
-  | Continue { unLoopControl :: address }
+data LoopControl address value
+  = Break    { unLoopControl :: ValueRef address value }
+  | Continue { unLoopControl :: ValueRef address value }
   | Abort
   deriving (Eq, Ord, Show)
 
-throwBreak :: (Member (Error (LoopControl address)) sig, Carrier sig m)
-           => address
-           -> Evaluator term address value m address
+throwBreak :: (Member (Error (LoopControl address value)) sig, Carrier sig m)
+           => ValueRef address value
+           -> Evaluator term address value m (ValueRef address value)
 throwBreak = throwError . Break
 
-throwContinue :: (Member (Error (LoopControl address)) sig, Carrier sig m)
-              => address
-              -> Evaluator term address value m address
+throwContinue :: (Member (Error (LoopControl address value)) sig, Carrier sig m)
+              => ValueRef address value
+              -> Evaluator term address value m (ValueRef address value)
 throwContinue = throwError . Continue
 
-throwAbort :: forall term address sig m value a
-           .  (Member (Error (LoopControl address)) sig, Carrier sig m)
+throwAbort :: forall term address sig m value a . (Member (Error (LoopControl address value)) sig , Carrier sig m)
            => Evaluator term address value m a
-throwAbort = throwError (Abort @address)
+throwAbort = throwError (Abort @address @value)
 
-catchLoopControl :: (Member (Error (LoopControl address)) sig, Carrier sig m) => Evaluator term address value m a -> (LoopControl address -> Evaluator term address value m a) -> Evaluator term address value m a
+catchLoopControl :: ( Member (Error (LoopControl address value)) sig
+                    , Carrier sig m
+                    )
+                 => Evaluator term address value m a
+                 -> (LoopControl address value -> Evaluator term address value m a)
+                 -> Evaluator term address value m a
 catchLoopControl = catchError
 
-runLoopControl :: (Carrier sig m, Effect sig) => Evaluator term address value (ErrorC (LoopControl address) (Eff m)) address -> Evaluator term address value m address
+runLoopControl :: (Carrier sig m, Effect sig)
+               => Evaluator term address value (ErrorC (LoopControl address value) (Eff m)) (ValueRef address value)
+               -> Evaluator term address value m (ValueRef address value)
 runLoopControl = raiseHandler $ fmap (either unLoopControl id) . runError

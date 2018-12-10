@@ -27,6 +27,7 @@ import           Language.Go.Grammar as Grammar
 import           Language.Go.Syntax as Go.Syntax hiding (runeLiteral, labelName)
 import           Language.Go.Type as Go.Type
 import           Proto3.Suite (Named (..), Named1 (..))
+import Data.ImportPath (importPath, defaultAlias)
 
 type Syntax =
   '[ Comment.Comment

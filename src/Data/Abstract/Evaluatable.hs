@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, KindSignatures, RankNTypes, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, KindSignatures, RankNTypes, TypeOperators, UndecidableInstances, InstanceSigs #-}
 module Data.Abstract.Evaluatable
 ( module X
 , Evaluatable(..)
@@ -18,22 +18,21 @@ module Data.Abstract.Evaluatable
 
 import Control.Abstract hiding (Load)
 import Control.Abstract.Context as X
-import Control.Abstract.Environment as X hiding (runEnvironmentError, runEnvironmentErrorWith)
 import Control.Abstract.Evaluator as X hiding (LoopControl(..), Return(..), catchLoopControl, runLoopControl, catchReturn, runReturn)
-import Control.Abstract.Heap as X hiding (runAddressError, runAddressErrorWith)
 import Control.Abstract.Modules as X (Modules, ModuleResult, ResolutionError(..), load, lookupModule, listModulesInDir, require, resolve, throwResolutionError)
 import Control.Abstract.Value as X hiding (Boolean(..), Function(..), While(..))
-import Data.Abstract.Declarations as X
-import Data.Abstract.Environment as X
 import Data.Abstract.BaseError as X
+import Data.Abstract.Declarations as X
 import Data.Abstract.FreeVariables as X
 import Data.Abstract.Module
 import Data.Abstract.Name as X
 import Data.Abstract.Ref as X
+import Data.ImportPath (ImportPath)
 import Data.Language
 import Data.Scientific (Scientific)
 import Data.Semigroup.App
 import Data.Semigroup.Foldable
+import Data.Span (emptySpan)
 import Data.Sum hiding (project)
 import Data.Term
 import Prologue
@@ -46,30 +45,33 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , FreeVariables term
           , Member (Allocator address) sig
           , Member (Boolean value) sig
-          , Member (While value) sig
+          , Member (While address value) sig
           , Member (Deref value) sig
-          , Member (ScopeEnv address) sig
-          , Member (Env address) sig
-          , Member (Error (LoopControl address)) sig
-          , Member (Error (Return address)) sig
+          , Member (State (ScopeGraph address)) sig
+          , Member (Error (LoopControl address value)) sig
+          , Member (Error (Return address value)) sig
           , Member Fresh sig
           , Member (Function term address value) sig
-          , Member (Modules address) sig
+          , Member (Modules address value) sig
           , Member (Reader ModuleInfo) sig
           , Member (Reader PackageInfo) sig
           , Member (Reader Span) sig
           , Member (State Span) sig
+          , Member (Reader (CurrentFrame address)) sig
+          , Member (Reader (CurrentScope address)) sig
+          , Member (Resumable (BaseError (ScopeError address))) sig
+          , Member (Resumable (BaseError (HeapError address))) sig
           , Member (Resumable (BaseError (AddressError address value))) sig
-          , Member (Resumable (BaseError (EnvironmentError address))) sig
           , Member (Resumable (BaseError (UnspecializedError value))) sig
-          , Member (Resumable (BaseError EvalError)) sig
+          , Member (Resumable (BaseError (EvalError address value))) sig
           , Member (Resumable (BaseError ResolutionError)) sig
-          , Member (State (Heap address value)) sig
+          , Member (State (Heap address address value)) sig
           , Member Trace sig
           , Ord address
+          , Show address
           )
-       => (term -> Evaluator term address value m (ValueRef address))
-       -> (constr term -> Evaluator term address value m (ValueRef address))
+       => (term -> Evaluator term address value m (ValueRef address value))
+       -> (constr term -> Evaluator term address value m (ValueRef address value))
   eval recur expr = do
     traverse_ recur expr
     v <- throwUnspecializedError $ UnspecializedError ("Eval unspecialized for " <> liftShowsPrec (const (const id)) (const id) 0 expr "")
@@ -87,17 +89,21 @@ class HasPrelude (language :: Language) where
                    , Carrier sig m
                    , HasCallStack
                    , Member (Allocator address) sig
+                   , Member (State (ScopeGraph address)) sig
+                   , Member (Resumable (BaseError (ScopeError address))) sig
+                   , Member (Resumable (BaseError (HeapError address))) sig
                    , Member (Deref value) sig
-                   , Member (Env address) sig
                    , Member Fresh sig
                    , Member (Function term address value) sig
                    , Member (Reader ModuleInfo) sig
                    , Member (Reader Span) sig
                    , Member (Resumable (BaseError (AddressError address value))) sig
-                   , Member (Resumable (BaseError (EnvironmentError address))) sig
-                   , Member (State (Heap address value)) sig
+                   , Member (State (Heap address address value)) sig
+                   , Member (Reader (CurrentFrame address)) sig
+                   , Member (Reader (CurrentScope address)) sig
                    , Member Trace sig
                    , Ord address
+                   , Show address
                    )
                 => proxy language
                 -> Evaluator term address value m ()
@@ -110,77 +116,107 @@ instance HasPrelude 'PHP
 
 instance HasPrelude 'Python where
   definePrelude _ =
-    define (name "print") (builtIn Print)
+    void $ defineBuiltIn (Declaration $ X.name "print") Print
 
 instance HasPrelude 'Ruby where
   definePrelude _ = do
-    define (name "puts") (builtIn Print)
+    defineSelf
 
-    defineClass (name "Object") [] $ do
-      define (name "inspect") (builtIn Show)
+    void $ defineBuiltIn (Declaration $ X.name "puts") Print
+
+    defineClass (Declaration (X.name "Object")) [] $ do
+      void $ defineBuiltIn (Declaration $ X.name "inspect") Show
 
 instance HasPrelude 'TypeScript where
-  definePrelude _ =
-    defineNamespace (name "console") $ do
-      define (name "log") (builtIn Print)
+  definePrelude _ = do
+    defineSelf
+    defineNamespace (Declaration (X.name "console")) $ defineBuiltIn (Declaration $ X.name "log") Print
 
 instance HasPrelude 'JavaScript where
   definePrelude _ = do
-    defineNamespace (name "console") $ do
-      define (name "log") (builtIn Print)
+    defineSelf
+    defineNamespace (Declaration (X.name "console")) $ defineBuiltIn (Declaration $ X.name "log") Print
+
+defineSelf :: ( AbstractValue term address value m
+              , Carrier sig m
+              , Member (State (ScopeGraph address)) sig
+              , Member (Resumable (BaseError (ScopeError address))) sig
+              , Member (Resumable (BaseError (HeapError address))) sig
+              , Member (Deref value) sig
+              , Member (Reader ModuleInfo) sig
+              , Member (Reader Span) sig
+              , Member (State (Heap address address value)) sig
+              , Member (Reader (CurrentFrame address)) sig
+              , Member (Reader (CurrentScope address)) sig
+              , Ord address
+              )
+           => Evaluator term address value m ()
+defineSelf = do
+  let self = Declaration $ X.name "__self"
+  declare self emptySpan Nothing
+  slot <- lookupDeclaration self
+  assign slot =<< object =<< currentFrame
 
 
 -- Effects
 
 -- | The type of error thrown when failing to evaluate a term.
-data EvalError return where
-  NoNameError :: EvalError Name
+data EvalError address value return where
+  QualifiedImportError :: ImportPath -> EvalError address value (ValueRef address value)
+  DerefError           :: value -> EvalError address value (ValueRef address value)
+  DefaultExportError   :: EvalError address value ()
+  ExportError          :: ModulePath -> Name -> EvalError address value ()
   -- Indicates that our evaluator wasn't able to make sense of these literals.
-  IntegerFormatError  :: Text -> EvalError Integer
-  FloatFormatError    :: Text -> EvalError Scientific
-  RationalFormatError :: Text -> EvalError Rational
-  DefaultExportError  :: EvalError ()
-  ExportError         :: ModulePath -> Name -> EvalError ()
+  FloatFormatError     :: Text -> EvalError address value Scientific
+  IntegerFormatError   :: Text -> EvalError address value Integer
+  NoNameError          :: EvalError address value Name
+  RationalFormatError  :: Text -> EvalError address value Rational
+  ReferenceError       :: value -> Name -> EvalError address value (ValueRef address value)
 
-deriving instance Eq (EvalError return)
-deriving instance Show (EvalError return)
+deriving instance (Eq address, Eq value) => Eq (EvalError address value return)
+deriving instance (Show address, Show value) => Show (EvalError address value return)
 
-instance NFData1 EvalError where
+instance NFData value => NFData1 (EvalError address value) where
   liftRnf _ x = case x of
-    NoNameError -> ()
-    IntegerFormatError i -> rnf i
-    FloatFormatError i -> rnf i
-    RationalFormatError i -> rnf i
+    DerefError v -> rnf v
     DefaultExportError -> ()
     ExportError p n -> rnf p `seq` rnf n
+    FloatFormatError i -> rnf i
+    IntegerFormatError i -> rnf i
+    NoNameError -> ()
+    RationalFormatError i -> rnf i
+    ReferenceError v n -> rnf v `seq` rnf n
+    QualifiedImportError i -> rnf i
 
-instance NFData return => NFData (EvalError return) where
+instance (NFData value, NFData return) => NFData (EvalError address value return) where
   rnf = liftRnf rnf
 
-instance Eq1 EvalError where
-  liftEq _ NoNameError        NoNameError                  = True
+instance Eq value => Eq1 (EvalError address value) where
+  liftEq _ (DerefError v) (DerefError v2) = v == v2
   liftEq _ DefaultExportError DefaultExportError           = True
   liftEq _ (ExportError a b) (ExportError c d)             = (a == c) && (b == d)
-  liftEq _ (IntegerFormatError a) (IntegerFormatError b)   = a == b
   liftEq _ (FloatFormatError a) (FloatFormatError b)       = a == b
+  liftEq _ (IntegerFormatError a) (IntegerFormatError b)   = a == b
+  liftEq _ NoNameError        NoNameError                  = True
   liftEq _ (RationalFormatError a) (RationalFormatError b) = a == b
+  liftEq _ (ReferenceError v n) (ReferenceError v2 n2)     = (v == v2) && (n == n2)
   liftEq _ _ _                                             = False
 
-instance Show1 EvalError where
+instance (Show address, Show value) => Show1 (EvalError address value) where
   liftShowsPrec _ _ = showsPrec
 
-runEvalError :: (Carrier sig m, Effect sig) => Evaluator term address value (ResumableC (BaseError EvalError) (Eff m)) a -> Evaluator term address value m (Either (SomeError (BaseError EvalError)) a)
+runEvalError :: (Carrier sig m, Effect sig) => Evaluator term address value (ResumableC (BaseError (EvalError address value)) (Eff m)) a -> Evaluator term address value m (Either (SomeError (BaseError (EvalError address value))) a)
 runEvalError = raiseHandler runResumable
 
-runEvalErrorWith :: Carrier sig m => (forall resume . (BaseError EvalError) resume -> Evaluator term address value m resume) -> Evaluator term address value (ResumableWithC (BaseError EvalError) (Eff m)) a -> Evaluator term address value m a
+runEvalErrorWith :: Carrier sig m => (forall resume . (BaseError (EvalError address value)) resume -> Evaluator term address value m resume) -> Evaluator term address value (ResumableWithC (BaseError (EvalError address value)) (Eff m)) a -> Evaluator term address value m a
 runEvalErrorWith f = raiseHandler $ runResumableWith (runEvaluator . f)
 
 throwEvalError :: ( Member (Reader ModuleInfo) sig
                   , Member (Reader Span) sig
-                  , Member (Resumable (BaseError EvalError)) sig
+                  , Member (Resumable (BaseError (EvalError address value))) sig
                   , Carrier sig m
                   )
-               => EvalError resume
+               => EvalError address value resume
                -> Evaluator term address value m resume
 throwEvalError = throwBaseError
 

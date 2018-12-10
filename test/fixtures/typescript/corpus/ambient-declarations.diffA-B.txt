@@ -36,9 +36,8 @@
       {-(Empty)-}
       {-(Annotation
         {-(PredefinedType)-})-}
-      {-(Assignment
-        {-(Identifier)-}
-        {-(Empty)-})-})-})-})-}
+      {-(Identifier)-}
+      {-(Empty)-})-})-})-}
 {-(AmbientDeclaration
   {-(InternalModule
     {-(Identifier)-}
@@ -52,9 +51,8 @@
         {-(Empty)-}
         {-(Annotation
           {-(PredefinedType)-})-}
-        {-(Assignment
-          {-(Identifier)-}
-          {-(Empty)-})-})-})-}
+        {-(Identifier)-}
+        {-(Empty)-})-})-}
     {-(VariableDeclaration
       {-(Assignment
         {-(Annotation
@@ -108,9 +106,8 @@
             (Empty)
             (Annotation
               (PredefinedType))
-            (Assignment
-              (Identifier)
-              (Empty))))
+            (Identifier)
+            (Empty)))
         (PublicFieldDefinition
           (Empty)
           (Empty)

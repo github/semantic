@@ -180,28 +180,28 @@ message XOr {
 }
 
 message BAnd {
-  PythonTerm left = 1;
-  PythonTerm right = 2;
+  PythonTerm lhs = 1;
+  PythonTerm rhs = 2;
 }
 
 message BOr {
-  PythonTerm left = 1;
-  PythonTerm right = 2;
+  PythonTerm lhs = 1;
+  PythonTerm rhs = 2;
 }
 
 message BXOr {
-  PythonTerm left = 1;
-  PythonTerm right = 2;
+  PythonTerm lhs = 1;
+  PythonTerm rhs = 2;
 }
 
 message LShift {
-  PythonTerm left = 1;
-  PythonTerm right = 2;
+  PythonTerm lhs = 1;
+  PythonTerm rhs = 2;
 }
 
 message RShift {
-  PythonTerm left = 1;
-  PythonTerm right = 2;
+  PythonTerm lhs = 1;
+  PythonTerm rhs = 2;
 }
 
 message Complement {

@@ -7,6 +7,8 @@ import Prelude hiding (readFile)
 import           Analysis.Abstract.Caching.FlowSensitive
 import           Analysis.Abstract.Collecting
 import           Control.Abstract
+import           Control.Abstract.Heap (runHeapError)
+import           Control.Abstract.ScopeGraph (runScopeError)
 import           Control.Exception (displayException)
 import           Control.Effect.Trace (runTraceByPrinting)
 import           Data.Abstract.Address.Monovariant as Monovariant
@@ -40,11 +42,13 @@ justEvaluating
   . runEvaluator
   . raiseHandler runTraceByPrinting
   . runHeap
+  . runScopeGraph
   . raiseHandler runFresh
   . fmap reassociate
   . runLoadError
   . runUnspecialized
-  . runEnvironmentError
+  . runScopeError
+  . runHeapError
   . runEvalError
   . runResolutionError
   . runAddressError
@@ -55,20 +59,22 @@ checking
   . runEvaluator
   . raiseHandler runTraceByPrinting
   . runHeap
+  . runScopeGraph
   . raiseHandler runFresh
   . caching
   . providingLiveSet
   . fmap reassociate
   . runLoadError
   . runUnspecialized
+  . runScopeError
+  . runHeapError
   . runResolutionError
-  . runEnvironmentError
   . runEvalError
   . runAddressError
   . runTypes
 
 evalGoProject         = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Go)         goParser
-evalRubyProject       = justEvaluating <=< evaluateProject (Proxy @'Language.Ruby)       rubyParser
+evalRubyProject       = justEvaluating <=< evaluateProject (Proxy @'Language.Ruby)               rubyParser
 evalPHPProject        = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.PHP)        phpParser
 evalPythonProject     = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Python)     pythonParser
 evalJavaScriptProject = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.JavaScript) typescriptParser
@@ -103,7 +109,7 @@ evaluateProject' (TaskConfig config logger statter) proxy parser paths = either 
        (runModuleTable
        (runModules (ModuleTable.modulePaths (packageModules package))
        (raiseHandler (runReader (packageInfo package))
-       (raiseHandler (runState (lowerBound @Span))
+       (raiseHandler (evalState (lowerBound @Span))
        (raiseHandler (runReader (lowerBound @Span))
        (evaluate proxy id (evalTerm withTermSpans) modules)))))))
 
@@ -116,7 +122,7 @@ evaluatePythonProjects proxy parser lang path = runTaskWithOptions debugOptions 
        (runModuleTable
        (runModules (ModuleTable.modulePaths (packageModules package))
        (raiseHandler (runReader (packageInfo package))
-       (raiseHandler (runState (lowerBound @Span))
+       (raiseHandler (evalState (lowerBound @Span))
        (raiseHandler (runReader (lowerBound @Span))
        (evaluate proxy id (evalTerm withTermSpans) modules)))))))
 
@@ -127,7 +133,7 @@ evaluateProjectWithCaching proxy parser path = runTaskWithOptions debugOptions $
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   pure (id @(Evaluator _ Monovariant _ _ _)
        (raiseHandler (runReader (packageInfo package))
-       (raiseHandler (runState (lowerBound @Span))
+       (raiseHandler (evalState (lowerBound @Span))
        (raiseHandler (runReader (lowerBound @Span))
        (runModuleTable
        (runModules (ModuleTable.modulePaths (packageModules package))
@@ -143,5 +149,5 @@ blob = runTask . readBlob . file
 mergeErrors :: Either (SomeError (Sum errs)) (Either (SomeError err) result) -> Either (SomeError (Sum (err ': errs))) result
 mergeErrors = either (\ (SomeError sum) -> Left (SomeError (weaken sum))) (either (\ (SomeError err) -> Left (SomeError (inject err))) Right)
 
-reassociate :: Either (SomeError err1) (Either (SomeError err2) (Either (SomeError err3) (Either (SomeError err4) (Either (SomeError err5) (Either (SomeError err6) (Either (SomeError err7) result)))))) -> Either (SomeError (Sum '[err7, err6, err5, err4, err3, err2, err1])) result
-reassociate = mergeErrors . mergeErrors . mergeErrors . mergeErrors . mergeErrors . mergeErrors . mergeErrors . Right
+reassociate :: Either (SomeError err1) (Either (SomeError err2) (Either (SomeError err3) (Either (SomeError err4) (Either (SomeError err5) (Either (SomeError err6) (Either (SomeError err7) (Either (SomeError err8) result))))))) -> Either (SomeError (Sum '[err8, err7, err6, err5, err4, err3, err2, err1])) result
+reassociate = mergeErrors . mergeErrors . mergeErrors . mergeErrors . mergeErrors . mergeErrors . mergeErrors . mergeErrors . Right

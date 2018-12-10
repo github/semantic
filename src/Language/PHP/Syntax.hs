@@ -12,6 +12,9 @@ import qualified Data.Text as T
 import           Diffing.Algorithm
 import           Prologue hiding (Text)
 import           Proto3.Suite.Class
+import Control.Abstract
+import qualified Data.Abstract.ScopeGraph as ScopeGraph
+import qualified Data.Map.Strict as Map
 
 newtype Text a = Text { value :: T.Text }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
@@ -38,7 +41,7 @@ instance Evaluatable VariableName
 -- file, the complete contents of the included file are treated as though it
 -- were defined inside that function.
 
-resolvePHPName :: ( Member (Modules address) sig
+resolvePHPName :: ( Member (Modules address value) sig
                   , Member (Reader ModuleInfo) sig
                   , Member (Reader Span) sig
                   , Member (Resumable (BaseError ResolutionError)) sig
@@ -55,28 +58,31 @@ resolvePHPName n = do
 include :: ( AbstractValue term address value m
            , Carrier sig m
            , Member (Deref value) sig
-           , Member (Env address) sig
-           , Member (Modules address) sig
+           , Member (Modules address value) sig
+           , Member (Reader (CurrentFrame address)) sig
+           , Member (Reader (CurrentScope address)) sig
            , Member (Reader ModuleInfo) sig
            , Member (Reader Span) sig
            , Member (Resumable (BaseError (AddressError address value))) sig
+           , Member (Resumable (BaseError (HeapError address))) sig
+           , Member (State (ScopeGraph address)) sig
            , Member (Resumable (BaseError ResolutionError)) sig
-           , Member (Resumable (BaseError (EnvironmentError address))) sig
-           , Member (State (Heap address value)) sig
+           , Member (State (Heap address address value)) sig
            , Member Trace sig
            , Ord address
            )
-        => (term -> Evaluator term address value m (ValueRef address))
+        => (term -> Evaluator term address value m (ValueRef address value))
         -> term
-        -> (ModulePath -> Evaluator term address value m (ModuleResult address))
-        -> Evaluator term address value m (ValueRef address)
+        -> (ModulePath -> Evaluator term address value m (ModuleResult address value))
+        -> Evaluator term address value m (ValueRef address value)
 include eval pathTerm f = do
   name <- eval pathTerm >>= Abstract.value >>= asString
   path <- resolvePHPName name
   traceResolve name path
-  (_, (importedEnv, v)) <- f path
-  bindAll importedEnv
-  pure (Rval v)
+  ((moduleScope, moduleFrame), v) <- f path
+  insertImportEdge moduleScope
+  insertFrameLink ScopeGraph.Import (Map.singleton moduleScope moduleFrame)
+  pure v
 
 newtype Require a = Require { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
@@ -213,9 +219,24 @@ instance Ord1 QualifiedName where liftCompare = genericLiftCompare
 instance Show1 QualifiedName where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedName where
-  eval eval (QualifiedName name iden) = do
-    namePtr <- eval name >>= address
-    Rval <$> evaluateInScopedEnv namePtr (eval iden >>= address)
+  eval _ (QualifiedName obj iden) = do
+    name <- maybeM (throwEvalError NoNameError) (declaredName obj)
+    reference (Reference name) (Declaration name)
+    childScope <- associatedScope (Declaration name)
+
+    propName <- maybeM (throwEvalError NoNameError) (declaredName iden)
+    case childScope of
+      Just childScope -> do
+        currentScopeAddress <- currentScope
+        currentFrameAddress <- currentFrame
+        frameAddress <- newFrame childScope (Map.singleton Lexical (Map.singleton currentScopeAddress currentFrameAddress))
+        withScopeAndFrame frameAddress $ do
+          reference (Reference propName) (Declaration propName)
+          address <- lookupDeclaration (Declaration propName)
+          pure $! LvalMember address
+      Nothing ->
+        -- TODO: Throw an ReferenceError because we can't find the associated child scope for `obj`.
+        rvalBox unit
 
 newtype NamespaceName a = NamespaceName { names :: NonEmpty a }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1, NFData1)
@@ -225,9 +246,7 @@ instance Eq1 NamespaceName where liftEq = genericLiftEq
 instance Ord1 NamespaceName where liftCompare = genericLiftCompare
 instance Show1 NamespaceName where liftShowsPrec = genericLiftShowsPrec
 
-instance Evaluatable NamespaceName where
-  eval eval (NamespaceName xs) = Rval <$> foldl1 f (fmap (eval >=> address) xs)
-    where f ns id = ns >>= flip evaluateInScopedEnv id
+instance Evaluatable NamespaceName
 
 newtype ConstDeclaration a = ConstDeclaration { values :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
@@ -381,21 +400,7 @@ instance Eq1 Namespace where liftEq = genericLiftEq
 instance Ord1 Namespace where liftCompare = genericLiftCompare
 instance Show1 Namespace where liftShowsPrec = genericLiftShowsPrec
 
-instance Evaluatable Namespace where
-  eval eval Namespace{..} = Rval <$> go (declaredName <$> namespaceName)
-    where
-      -- Each namespace name creates a closure over the subsequent namespace closures
-      go (n:x:xs) = do
-        name <- maybeM (throwEvalError NoNameError) n
-        letrec' name $ \addr ->
-          box =<< makeNamespace name addr Nothing (void $ go (x:xs))
-      -- The last name creates a closure over the namespace body.
-      go [n] = do
-        name <- maybeM (throwEvalError NoNameError) n
-        letrec' name $ \addr ->
-          box =<< makeNamespace name addr Nothing (void $ eval namespaceBody)
-      -- The absence of names implies global scope, cf http://php.net/manual/en/language.namespaces.definitionmultiple.php
-      go [] = eval namespaceBody >>= address
+instance Evaluatable Namespace
 
 data TraitDeclaration a = TraitDeclaration { traitName :: a, traitStatements :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)

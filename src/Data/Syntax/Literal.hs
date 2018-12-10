@@ -246,7 +246,7 @@ instance Ord1 Array where liftCompare = genericLiftCompare
 instance Show1 Array where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Array where
-  eval eval (Array a) = rvalBox =<< array =<< traverse (eval >=> address) a
+  eval eval Array{..} = rvalBox =<< array =<< traverse (eval >=> Eval.value) arrayElements
 
 instance Tokenize Array where
   tokenize = list . arrayElements
@@ -286,7 +286,7 @@ instance Ord1 Tuple where liftCompare = genericLiftCompare
 instance Show1 Tuple where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Tuple where
-  eval eval (Tuple cs) = rvalBox =<< tuple =<< traverse (eval >=> address) cs
+  eval eval (Tuple cs) = rvalBox =<< tuple =<< traverse (eval >=> Eval.value) cs
 
 newtype Set a = Set { setElements :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
