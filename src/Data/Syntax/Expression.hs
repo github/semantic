@@ -509,20 +509,7 @@ instance Ord1 MemberAccess where liftCompare = genericLiftCompare
 instance Show1 MemberAccess where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable MemberAccess where
-  eval eval _ MemberAccess{..} = do
-    name <- maybeM (throwEvalError NoNameError) (declaredName lhs)
-    reference (Reference name) (Declaration name)
-    lhsValue <- eval lhs
-    lhsFrame <- Abstract.scopedEnvironment lhsValue
-    slot <- case lhsFrame of
-      Just lhsFrame ->
-        withScopeAndFrame lhsFrame $ do
-          reference (Reference rhs) (Declaration rhs)
-          lookupDeclaration (Declaration rhs)
-      Nothing -> do
-        -- Throw a ReferenceError since we're attempting to reference a name within a value that is not an Object.
-        throwEvalError (ReferenceError lhsValue rhs)
-    deref slot
+  eval eval ref' = ref eval ref' >=> deref
 
   ref eval _ MemberAccess{..} = do
     name <- maybeM (throwEvalError NoNameError) (declaredName lhs)
@@ -534,6 +521,7 @@ instance Evaluatable MemberAccess where
         withScopeAndFrame lhsFrame $ do
           reference (Reference rhs) (Declaration rhs)
           lookupDeclaration (Declaration rhs)
+      -- Throw a ReferenceError since we're attempting to reference a name within a value that is not an Object.
       Nothing -> throwEvalError (ReferenceError lhsValue rhs)
 
 
