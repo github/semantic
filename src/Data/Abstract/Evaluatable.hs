@@ -88,14 +88,17 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
          , Member (Resumable (BaseError (EvalError address value))) sig
          , Member (Resumable (BaseError (HeapError address))) sig
          , Member (Resumable (BaseError (ScopeError address))) sig
+         , Member (Resumable (BaseError (UnspecializedError value))) sig
          , Member (State (Heap address address value)) sig
          , Member (State (ScopeGraph address)) sig
          , Ord address
          )
       => (term -> Evaluator term address value m value)
       -> (term -> Evaluator term address value m (Slot address))
-      -> (constr term -> Evaluator term address value m (Maybe (Slot address)))
-  ref _ _ _ = pure Nothing
+      -> (constr term -> Evaluator term address value m (Slot address))
+  ref _ _ expr = do
+    _ <- throwUnspecializedError $ UnspecializedError ("ref unspecialized for " <> liftShowsPrec (const (const id)) (const id) 0 expr "")
+    throwEvalError RefError
 
 
 traceResolve :: (Show a, Show b, Member Trace sig, Carrier sig m) => a -> b -> Evaluator term address value m ()
