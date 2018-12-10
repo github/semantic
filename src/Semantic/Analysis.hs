@@ -111,7 +111,6 @@ evaluate lang perModule runTerm modules = do
 -- | Evaluate a term recursively, applying the passed function at every recursive position.
 --
 --   This calls out to the 'Evaluatable' instances, will be passed to 'runValueEffects', and can have other functions composed after it to e.g. intercept effects arising in the evaluation of the term.
---   TODO: evalTerm should return a ValueRef like eval and runFunction
 evalTerm :: ( Carrier sig m
             , Declarations term
             , Evaluatable (Base term)
