@@ -4,10 +4,9 @@
 module Language.Python.Syntax where
 
 import           Data.Abstract.BaseError
-import           Data.Abstract.Environment as Env
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
-import           Data.Aeson
+import           Data.Aeson hiding (object)
 import           Data.Functor.Classes.Generic
 import           Data.JSON.Fields
 import qualified Data.Language as Language
@@ -21,6 +20,11 @@ import Proto3.Suite (Primitive(..), Message(..), Message1(..), Named1(..), Named
 import qualified Proto3.Suite as Proto
 import qualified Proto3.Wire.Encode as Encode
 import qualified Proto3.Wire.Decode as Decode
+import Control.Abstract.ScopeGraph hiding (Import)
+import Control.Abstract.Heap
+import qualified Data.Abstract.ScopeGraph as ScopeGraph
+import qualified Data.Map.Strict as Map
+import qualified Data.List as List
 
 data QualifiedName
   = QualifiedName { paths :: NonEmpty FilePath }
@@ -65,7 +69,7 @@ relativeQualifiedName prefix paths = RelativeQualifiedName (T.unpack prefix) (Ju
 -- Subsequent imports of `parent.two` or `parent.three` will execute
 --     `parent/two/__init__.py` and
 --     `parent/three/__init__.py` respectively.
-resolvePythonModules :: ( Member (Modules address) sig
+resolvePythonModules :: ( Member (Modules address value) sig
                         , Member (Reader ModuleInfo) sig
                         , Member (Reader Span) sig
                         , Member (Resumable (BaseError ResolutionError)) sig
@@ -76,9 +80,9 @@ resolvePythonModules :: ( Member (Modules address) sig
                      -> Evaluator term address value m (NonEmpty ModulePath)
 resolvePythonModules q = do
   relRootDir <- rootDir q <$> currentModule
-  for (moduleNames q) $ \name -> do
-    x <- search relRootDir name
-    x <$ traceResolve name x
+  for (moduleNames q) $ \relPath -> do
+    x <- search relRootDir relPath
+    x <$ traceResolve relPath x
   where
     rootDir (QualifiedName _) ModuleInfo{..}           = mempty -- overall rootDir of the Package.
     rootDir (RelativeQualifiedName n _) ModuleInfo{..} = upDir numDots (takeDirectory modulePath)
@@ -128,11 +132,28 @@ toTuple Alias{..} = (aliasValue, aliasName)
 
 -- from a import b
 instance Evaluatable Import where
-  -- from . import moduleY
+  -- from . import moduleY            -- aliasValue = moduleY, aliasName = moduleY
+  -- from . import moduleY as moduleZ -- aliasValue = moduleY, aliasName = moduleZ
   -- This is a bit of a special case in the syntax as this actually behaves like a qualified relative import.
   eval _ (Import (RelativeQualifiedName n Nothing) [Alias{..}]) = do
     path <- NonEmpty.last <$> resolvePythonModules (RelativeQualifiedName n (Just (qualifiedName (formatName aliasValue :| []))))
-    rvalBox =<< evalQualifiedImport aliasValue path
+    ((moduleScope, moduleFrame), _) <- require path
+
+    span <- ask @Span
+    -- Construct a proxy scope containing an import edge to the imported module's last returned scope.
+    importScope <- newScope (Map.singleton ScopeGraph.Import [ moduleScope ])
+
+    -- Construct an object frame.
+    let scopeMap = Map.singleton moduleScope moduleFrame
+    aliasFrame <- newFrame importScope (Map.singleton ScopeGraph.Import scopeMap)
+
+    -- Add declaration of the alias name to the current scope (within our current module).
+    declare (Declaration aliasName) span (Just importScope)
+    -- Retrieve the frame slot for the new declaration.
+    aliasSlot <- lookupDeclaration (Declaration aliasName)
+    assign aliasSlot =<< object aliasFrame
+
+    rvalBox unit
 
   -- from a import b
   -- from a import b as c
@@ -146,30 +167,27 @@ instance Evaluatable Import where
 
     -- Last module path is the one we want to import
     let path = NonEmpty.last modulePaths
-    importedBinds <- fst . snd <$> require path
-    bindAll (select importedBinds)
+    ((moduleScope, moduleFrame), _) <- require path
+    if Prologue.null xs then do
+      insertImportEdge moduleScope
+      insertFrameLink ScopeGraph.Import (Map.singleton moduleScope moduleFrame)
+    else do
+      let scopeEdges = Map.singleton ScopeGraph.Import [ moduleScope ]
+      scopeAddress <- newScope scopeEdges
+      withScope moduleScope .
+        for_ xs $ \Alias{..} ->
+          insertImportReference (Reference aliasName) (Declaration aliasValue) scopeAddress
+
+      let frameLinks = Map.singleton moduleScope moduleFrame
+      frameAddress <- newFrame scopeAddress (Map.singleton ScopeGraph.Import frameLinks)
+
+      insertImportEdge scopeAddress
+      insertFrameLink ScopeGraph.Import (Map.singleton scopeAddress frameAddress)
+
     rvalBox unit
-    where
-      select importedBinds
-        | Prologue.null xs = importedBinds
-        | otherwise = Env.aliasBindings (toTuple <$> xs) importedBinds
 
 
--- Evaluate a qualified import
-evalQualifiedImport :: ( AbstractValue term address value m
-                       , Carrier sig m
-                       , Member (Allocator address) sig
-                       , Member (Deref value) sig
-                       , Member (Env address) sig
-                       , Member (Modules address) sig
-                       , Member (State (Heap address value)) sig
-                       , Ord address
-                       )
-                    => Name -> ModulePath -> Evaluator term address value m value
-evalQualifiedImport name path = letrec' name $ \addr -> do
-  unit <$ makeNamespace name addr Nothing (bindAll . fst . snd =<< require path)
-
-newtype QualifiedImport a = QualifiedImport { qualifiedImportFrom :: NonEmpty FilePath }
+newtype QualifiedImport a = QualifiedImport { qualifiedImportFrom :: NonEmpty String }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
 
 instance Message1 QualifiedImport where
@@ -192,14 +210,35 @@ instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable QualifiedImport where
   eval _ (QualifiedImport qualifiedName) = do
     modulePaths <- resolvePythonModules (QualifiedName qualifiedName)
-    rvalBox =<< go (NonEmpty.zip (name . T.pack <$> qualifiedName) modulePaths)
+    let namesAndPaths = toList (NonEmpty.zip (Data.Abstract.Evaluatable.name . T.pack <$> qualifiedName) modulePaths)
+
+    go namesAndPaths
+    rvalBox unit
     where
-      -- Evaluate and import the last module, updating the environment
-      go ((name, path) :| []) = evalQualifiedImport name path
-      -- Evaluate each parent module, just creating a namespace
-      go ((name, path) :| xs) = letrec' name $ \addr -> do
-        void $ require path
-        makeNamespace name addr Nothing (void (require path >> go (NonEmpty.fromList xs)))
+      go [] = pure ()
+      go ((name, modulePath) : namesAndPaths) = do
+        span <- ask @Span
+        scopeAddress <- newScope mempty
+        declare (Declaration name) span (Just scopeAddress)
+        aliasSlot <- lookupDeclaration (Declaration name)
+        -- a.b.c
+        withScope scopeAddress $
+          mkScopeMap modulePath (\scopeMap -> do
+              objFrame <- newFrame scopeAddress (Map.singleton ScopeGraph.Import scopeMap)
+              val <- object objFrame
+              assign aliasSlot val
+
+              withFrame objFrame $ do
+                let (namePaths, rest) = List.partition ((== name) . fst) namesAndPaths
+                for_ namePaths $ \(_, modulePath) -> do
+                  mkScopeMap modulePath $ \scopeMap -> do
+                    withFrame objFrame $ do
+                      insertFrameLink ScopeGraph.Import scopeMap
+                go rest)
+      mkScopeMap modulePath fun = do
+        ((moduleScope, moduleFrame), _) <- require modulePath
+        insertImportEdge moduleScope
+        fun (Map.singleton moduleScope moduleFrame)
 
 data QualifiedAliasedImport a = QualifiedAliasedImport { qualifiedAliasedImportFrom :: QualifiedName, qualifiedAliasedImportAlias :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
@@ -213,14 +252,22 @@ instance Evaluatable QualifiedAliasedImport where
   eval _ (QualifiedAliasedImport name aliasTerm) = do
     modulePaths <- resolvePythonModules name
 
-    -- Evaluate each parent module
-    for_ (NonEmpty.init modulePaths) require
-
-    -- Evaluate and import the last module, aliasing and updating the environment
+    span <- ask @Span
+    scopeAddress <- newScope mempty
     alias <- maybeM (throwEvalError NoNameError) (declaredName aliasTerm)
-    rvalBox =<< letrec' alias (\addr -> do
-      let path = NonEmpty.last modulePaths
-      unit <$ makeNamespace alias addr Nothing (void (bindAll . fst . snd =<< require path)))
+    declare (Declaration alias) span (Just scopeAddress)
+    objFrame <- newFrame scopeAddress mempty
+    val <- object objFrame
+    aliasSlot <- lookupDeclaration (Declaration alias)
+    assign aliasSlot val
+
+    withScopeAndFrame objFrame .
+      for_ modulePaths $ \modulePath -> do
+        ((moduleScope, moduleFrame), _) <- require modulePath
+        insertImportEdge moduleScope
+        insertFrameLink ScopeGraph.Import (Map.singleton moduleScope moduleFrame)
+
+    rvalBox unit
 
 -- | Ellipsis (used in splice expressions and alternatively can be used as a fill in expression, like `undefined` in Haskell)
 data Ellipsis a = Ellipsis

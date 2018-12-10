@@ -2,17 +2,18 @@
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Data.Syntax.Declaration where
 
-import           Control.Abstract.ScopeGraph
-import qualified Data.Abstract.Environment as Env
+import           Control.Abstract hiding (Function)
 import           Data.Abstract.Evaluatable
 import           Data.JSON.Fields
-import qualified Data.Map.Strict as Map
 import qualified Data.Reprinting.Scope as Scope
 import qualified Data.Set as Set
+import qualified Data.Map.Strict as Map
 import           Diffing.Algorithm
 import           Prologue
 import           Proto3.Suite.Class
-import           Reprinting.Tokenize
+import           Reprinting.Tokenize hiding (Superclass)
+import Data.Span (emptySpan)
+import Data.Abstract.Name as Name
 
 data Function a = Function { functionContext :: ![a], functionName :: !a, functionParameters :: ![a], functionBody :: !a }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, ToJSONFields1, Named1, Message1, NFData1)
@@ -30,10 +31,33 @@ instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Function where
   eval _ Function{..} = do
     name <- maybeM (throwEvalError NoNameError) (declaredName functionName)
-    (_, addr) <- letrec name (function (Just name) (paramNames functionParameters) functionBody)
-    bind name addr
-    pure (Rval addr)
-    where paramNames = foldMap (maybeToList . declaredName)
+    span <- ask @Span
+    associatedScope <- declareFunction name span
+
+    params <- withScope associatedScope . for functionParameters $ \paramNode -> do
+      param <- maybeM (throwEvalError NoNameError) (declaredName paramNode)
+      param <$ declare (Declaration param) span Nothing
+
+    addr <- lookupDeclaration (Declaration name)
+    v <- function name params functionBody associatedScope
+    v <$ (value v >>= assign addr)
+
+declareFunction :: ( Carrier sig m
+                   , Member (State (ScopeGraph address)) sig
+                   , Member (Allocator address) sig
+                   , Member (Reader (CurrentScope address)) sig
+                   , Member Fresh sig
+                   , Ord address
+                   )
+                => Name
+                -> Span
+                -> Evaluator term address value m address
+declareFunction name span = do
+  currentScope' <- currentScope
+  let lexicalEdges = Map.singleton Lexical [ currentScope' ]
+  associatedScope <- newScope lexicalEdges
+  declare (Declaration name) span (Just associatedScope)
+  pure associatedScope
 
 instance Tokenize Function where
   tokenize Function{..} = within' Scope.Function $ do
@@ -63,10 +87,19 @@ instance Diffable Method where
 instance Evaluatable Method where
   eval _ Method{..} = do
     name <- maybeM (throwEvalError NoNameError) (declaredName methodName)
-    (_, addr) <- letrec name (function (Just name) (paramNames methodParameters) methodBody)
-    bind name addr
-    pure (Rval addr)
-    where paramNames = foldMap (maybeToList . declaredName)
+    span <- ask @Span
+    associatedScope <- declareFunction name span
+
+    params <- withScope associatedScope $ do
+      let self = Name.name "__self"
+      declare (Declaration self)  emptySpan Nothing
+      fmap (self :) . for methodParameters $ \paramNode -> do
+        param <- maybeM (throwEvalError NoNameError) (declaredName paramNode)
+        param <$ declare (Declaration param) span Nothing
+
+    addr <- lookupDeclaration (Declaration name)
+    v <- function name params methodBody associatedScope
+    v <$ (value v >>= assign addr)
 
 instance Tokenize Data.Syntax.Declaration.Method where
   tokenize Method{..} = within' Scope.Method $ do
@@ -129,17 +162,16 @@ instance Show1 VariableDeclaration where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable VariableDeclaration where
   eval _ (VariableDeclaration [])   = rvalBox unit
   eval eval (VariableDeclaration decs) = do
-    addresses <- for decs $ \declaration -> do
+    for_ decs $ \declaration -> do
       name <- maybeM (throwEvalError NoNameError) (declaredName declaration)
-      (span, valueRef) <- do
+      declare (Declaration name) emptySpan Nothing
+      (span, _) <- do
         ref <- eval declaration
         subtermSpan <- get @Span
         pure (subtermSpan, ref)
 
-      declare (Declaration name) span Nothing -- TODO is it true that variable declarations never have an associated scope?
-
-      address valueRef
-    rvalBox =<< tuple addresses
+      putDeclarationSpan (Declaration name) span
+    rvalBox unit
 
 instance Declarations a => Declarations (VariableDeclaration a) where
   declaredName (VariableDeclaration vars) = case vars of
@@ -208,27 +240,33 @@ instance Evaluatable Class where
   eval eval Class{..} = do
     name <- maybeM (throwEvalError NoNameError) (declaredName classIdentifier)
     span <- ask @Span
-    -- Run the action within the class's scope.
     currentScope' <- currentScope
 
-    supers <- for classSuperclasses $ \superclass -> do
+    superScopes <- for classSuperclasses $ \superclass -> do
       name <- maybeM (throwEvalError NoNameError) (declaredName superclass)
       scope <- associatedScope (Declaration name)
-      (scope,) <$> (eval superclass >>= address)
+      slot <- lookupDeclaration (Declaration name)
+      superclassFrame <- scopedEnvironment =<< deref slot
+      pure $ case (scope, superclassFrame) of
+        (Just scope, Just frame) -> Just (scope, frame)
+        _ -> Nothing
 
-    let imports = (Import,) <$> (fmap pure . catMaybes $ fst <$> supers)
-        current = maybe mempty (fmap (Lexical, ) . pure . pure) currentScope'
-        edges = Map.fromList (imports <> current)
+    let superclassEdges = (Superclass, ) . pure . fst <$> catMaybes superScopes
+        current = (Lexical, ) <$> pure (pure currentScope')
+        edges = Map.fromList (superclassEdges <> current)
     childScope <- newScope edges
     declare (Declaration name) span (Just childScope)
 
-    withScope childScope $ do
-      (_, addr) <- letrec name $ do
-        void $ eval classBody
-        classBinds <- Env.head <$> getEnv
-        klass name (snd <$> supers) classBinds
-      bind name addr
-      pure (Rval addr)
+    let frameEdges = Map.singleton Superclass (Map.fromList (catMaybes superScopes))
+    childFrame <- newFrame childScope frameEdges
+
+    withScopeAndFrame childFrame $ do
+      void $ eval classBody
+
+    classSlot <- lookupDeclaration (Declaration name)
+    assign classSlot =<< klass (Declaration name) childFrame
+
+    rvalBox unit
 
 instance Declarations1 Class where
   liftDeclaredName declaredName = declaredName . classIdentifier
@@ -304,11 +342,19 @@ instance Ord1 TypeAlias where liftCompare = genericLiftCompare
 instance Show1 TypeAlias where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable TypeAlias where
-  eval eval TypeAlias{..} = do
+  eval _ TypeAlias{..} = do
     name <- maybeM (throwEvalError NoNameError) (declaredName typeAliasIdentifier)
-    addr <- eval typeAliasKind >>= address
-    bind name addr
-    pure (Rval addr)
+    kindName <- maybeM (throwEvalError NoNameError) (declaredName typeAliasKind)
+
+    span <- ask @Span
+    assocScope <- associatedScope (Declaration kindName)
+    declare (Declaration name) span assocScope
+
+    slot <- lookupDeclaration (Declaration name)
+    kindSlot <- lookupDeclaration (Declaration kindName)
+    assign slot =<< deref kindSlot
+
+    rvalBox unit
 
 instance Declarations a => Declarations (TypeAlias a) where
   declaredName TypeAlias{..} = declaredName typeAliasIdentifier

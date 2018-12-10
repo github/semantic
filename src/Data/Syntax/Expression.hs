@@ -9,16 +9,16 @@ import Data.Fixed
 import Data.List (intersperse)
 import Proto3.Suite.Class
 
-import           Control.Abstract.ScopeGraph as ScopeGraph
+import           Control.Abstract hiding (Call, Member, Void)
 import           Data.Abstract.Evaluatable as Abstract hiding (Member, Void)
+import           Data.Abstract.Name as Name
 import           Data.Abstract.Number (liftIntegralFrac, liftReal, liftedExponent, liftedFloorDiv)
 import           Data.JSON.Fields
-import qualified Data.Reprinting.Scope as Scope
-import           Diffing.Algorithm hiding (Delete)
-import           Reprinting.Tokenize
-import           Data.Reprinting.Token (Element (..))
-import qualified Data.Reprinting.Token as Token
 import qualified Data.List.NonEmpty as NonEmpty
+import qualified Data.Reprinting.Scope as Scope
+import qualified Data.Reprinting.Token as Token
+import           Diffing.Algorithm hiding (Delete)
+import           Reprinting.Tokenize hiding (Superclass)
 
 -- | Typical prefix function application, like `f(x)` in many languages, or `f x` in Haskell.
 data Call a = Call { callContext :: ![a], callFunction :: !a, callParams :: ![a], callBlock :: !a }
@@ -31,9 +31,8 @@ instance Show1 Call where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Call where
   eval eval Call{..} = do
     op <- eval callFunction >>= Abstract.value
-    recv <- box unit -- TODO
-    args <- traverse (eval >=> address) callParams
-    Rval <$> call op recv args
+    args <- traverse (eval >=> Abstract.value) callParams
+    call op args
 
 instance Tokenize Call where
   tokenize Call{..} = within Scope.Call $ do
@@ -356,9 +355,9 @@ instance Show1 Delete where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Delete where
   eval eval (Delete a) = do
     valueRef <- eval a
-    addr <- address valueRef
-    dealloc addr
-    rvalBox unit
+    case valueRef of
+      LvalMember addr -> dealloc addr >> rvalBox unit
+      Rval val        -> throwEvalError (DerefError val)
 
 -- | A sequence expression such as Javascript or C's comma operator.
 data SequenceExpression a = SequenceExpression { firstExpression :: !a, secondExpression :: !a }
@@ -514,19 +513,20 @@ instance Ord1 MemberAccess where liftCompare = genericLiftCompare
 instance Show1 MemberAccess where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable MemberAccess where
-  eval eval (MemberAccess obj propName) = do
-    name <- maybeM (throwEvalError NoNameError) (declaredName obj)
+  eval eval MemberAccess{..} = do
+    name <- maybeM (throwEvalError NoNameError) (declaredName lhs)
     reference (Reference name) (Declaration name)
-    childScope <- associatedScope (Declaration name)
+    lhsValue <- Abstract.value =<< eval lhs
+    lhsFrame <- Abstract.scopedEnvironment lhsValue
+    case lhsFrame of
+      Just lhsFrame ->
+        withScopeAndFrame lhsFrame $ do
+          reference (Reference rhs) (Declaration rhs)
+          LvalMember <$> lookupDeclaration (Declaration rhs)
+      Nothing -> do
+        -- Throw a ReferenceError since we're attempting to reference a name within a value that is not an Object.
+        throwEvalError (ReferenceError lhsValue rhs)
 
-    ptr <- eval obj >>= address
-    case childScope of
-      Just childScope -> withScope childScope $ reference (Reference propName) (Declaration propName)
-      Nothing ->
-        -- TODO: Throw an ReferenceError because we can't find the associated child scope for `obj`.
-        pure ()
-
-    pure $! LvalMember ptr propName
 
 instance Tokenize MemberAccess where
   tokenize MemberAccess{..} = lhs *> yield Access *> yield (Run (formatName rhs))
@@ -595,12 +595,10 @@ instance Eq1 ScopeResolution where liftEq = genericLiftEq
 instance Ord1 ScopeResolution where liftCompare = genericLiftCompare
 instance Show1 ScopeResolution where liftShowsPrec = genericLiftShowsPrec
 
-instance Evaluatable ScopeResolution where
-  eval eval (ScopeResolution xs) = Rval <$> foldl1 f (fmap (eval >=> address) xs)
-    where f ns id = ns >>= flip evaluateInScopedEnv id
+instance Evaluatable ScopeResolution
 
 instance Tokenize ScopeResolution where
-  tokenize (ScopeResolution (a :| rest)) = 
+  tokenize (ScopeResolution (a :| rest)) =
     a *> for_ rest (yield Token.Resolve *>)
 
 instance Declarations1 ScopeResolution where
@@ -670,11 +668,10 @@ data Super a = Super
 instance Eq1 Super where liftEq = genericLiftEq
 instance Ord1 Super where liftCompare = genericLiftCompare
 instance Show1 Super where liftShowsPrec = genericLiftShowsPrec
-instance Evaluatable Super where
-  eval _ Super = Rval <$> (maybeM (box unit) =<< self)
+instance Evaluatable Super
 
 instance Tokenize Super where
-  tokenize _ = yield Superclass
+  tokenize _ = yield Token.Superclass
 
 data This a = This
   deriving (Diffable, Eq, Foldable, Functor,  Generic1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1, Named1, Message1, NFData1)
@@ -686,4 +683,5 @@ instance Eq1 This where liftEq = genericLiftEq
 instance Ord1 This where liftCompare = genericLiftCompare
 instance Show1 This where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable This where
-  eval _ This = Rval <$> (maybeM (box unit) =<< self)
+  eval _ This =
+    rvalBox =<< deref =<< lookupDeclaration (Declaration $ Name.name "__self")

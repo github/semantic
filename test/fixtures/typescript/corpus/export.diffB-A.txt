@@ -55,19 +55,19 @@
     {-(Empty)-}
     {-(Empty)-}
     {-(Identifier)-}
-    {-(Statements)-})-})-}
+    {-(StatementBlock)-})-})-}
   (DefaultExport
     (Function
       (Empty)
       (Empty)
       (Empty)
-      (Statements)))
+      (StatementBlock)))
 {+(DefaultExport
   {+(Function
     {+(Empty)+}
     {+(Empty)+}
     {+(Identifier)+}
-    {+(Statements)+})+})+}
+    {+(StatementBlock)+})+})+}
 { (QualifiedExport)
 ->(QualifiedExport) }
   (DefaultExport

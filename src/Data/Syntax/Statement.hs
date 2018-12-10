@@ -10,8 +10,8 @@ import Data.Semigroup.App
 import Data.Semigroup.Foldable
 import Proto3.Suite.Class
 
+import Control.Abstract hiding (Return, Break, Continue, While)
 import Data.Abstract.Evaluatable as Abstract
-import Control.Abstract.ScopeGraph
 import Data.JSON.Fields
 import Diffing.Algorithm
 import Reprinting.Tokenize (Tokenize (..), imperative, within', yield)
@@ -23,6 +23,7 @@ import qualified Data.Reprinting.Scope as Scope
 --   1. Each statement’s effects on the store are accumulated;
 --   2. Each statement can affect the environment of later statements (e.g. by 'modify'-ing the environment); and
 --   3. Only the last statement’s return value is returned.
+--   TODO: Separate top-level statement nodes into non-lexical Statement and lexical StatementBlock nodes
 newtype Statements a = Statements { statements :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1, NFData1)
 
@@ -32,13 +33,25 @@ instance Show1 Statements where liftShowsPrec = genericLiftShowsPrec
 instance ToJSON1 Statements
 
 instance Evaluatable Statements where
-  eval eval (Statements xs) = do
-    currentScope' <- currentScope
-    let edges = maybe mempty (Map.singleton Lexical . pure) currentScope'
-    scope <- newScope edges
-    withScope scope $ maybe (rvalBox unit) (runApp . foldMap1 (App . eval)) (nonEmpty xs)
+  eval eval (Statements xs) =
+    maybe (rvalBox unit) (runApp . foldMap1 (App . eval)) (nonEmpty xs)
 
 instance Tokenize Statements where
+  tokenize = imperative
+
+newtype StatementBlock a = StatementBlock { statements :: [a] }
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1, NFData1)
+
+instance Eq1 StatementBlock where liftEq = genericLiftEq
+instance Ord1 StatementBlock where liftCompare = genericLiftCompare
+instance Show1 StatementBlock where liftShowsPrec = genericLiftShowsPrec
+instance ToJSON1 StatementBlock
+
+instance Evaluatable StatementBlock where
+  eval eval (StatementBlock xs) =
+    maybe (rvalBox unit) (runApp . foldMap1 (App . eval)) (nonEmpty xs)
+
+instance Tokenize StatementBlock where
   tokenize = imperative
 
 -- | Conditional. This must have an else block, which can be filled with some default value when omitted in the source, e.g. 'pure ()' for C-style if-without-else or 'pure Nothing' for Ruby-style, in both cases assuming some appropriate Applicative context into which the If will be lifted.
@@ -52,7 +65,7 @@ instance Show1 If where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable If where
   eval eval (If cond if' else') = do
     bool <- eval cond >>= Abstract.value
-    Rval <$> ifthenelse bool (eval if' >>= address) (eval else' >>= address)
+    ifthenelse bool (eval if') (eval else')
 
 instance Tokenize If where
   tokenize If{..} = within' Scope.If $ do
@@ -133,8 +146,17 @@ instance Show1 Let where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Let where
   eval eval Let{..} = do
     name <- maybeM (throwEvalError NoNameError) (declaredName letVariable)
-    addr <- snd <$> letrec name (eval letValue >>= Abstract.value)
-    Rval <$> locally (bind name addr *> (eval letBody >>= address))
+    letSpan <- ask @Span
+    valueName <- maybeM (throwEvalError NoNameError) (declaredName letValue)
+    assocScope <- associatedScope (Declaration valueName)
+
+    _ <- withLexicalScopeAndFrame $ do
+      declare (Declaration name) letSpan assocScope
+      letVal <- eval letValue >>= Abstract.value
+      slot <- lookupDeclaration (Declaration name)
+      assign slot letVal
+      eval letBody
+    rvalBox unit
 
 
 -- Assignment
@@ -153,30 +175,24 @@ instance Show1 Assignment where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Assignment where
   eval eval Assignment{..} = do
     lhs <- eval assignmentTarget
-    rhs <- eval assignmentValue >>= address
+    rhs <- eval assignmentValue
 
     case lhs of
-      LvalLocal name -> do
+      Rval val -> throwEvalError (DerefError val)
+      LvalMember lhsSlot -> do
         case declaredName assignmentValue of
           Just rhsName -> do
             assocScope <- associatedScope (Declaration rhsName)
             case assocScope of
               Just assocScope' -> do
                 objectScope <- newScope (Map.singleton Import [ assocScope' ])
-                putDeclarationScope (Declaration name) objectScope
-              Nothing -> pure ()
+                putSlotDeclarationScope lhsSlot (Just objectScope) -- TODO: not sure if this is right
+              Nothing ->
+                pure ()
           Nothing ->
-            -- The rhs wasn't assigned to a reference/declaration.
             pure ()
-        bind name rhs
-      LvalMember _ _ ->
-        -- we don't yet support mutable object properties:
-        pure ()
-      Rval _ ->
-        -- the left hand side of the assignment expression is invalid:
-        pure ()
-
-    pure (Rval rhs)
+        assign lhsSlot =<< Abstract.value rhs
+        pure (LvalMember lhsSlot)
 
 instance Tokenize Assignment where
   -- Should we be using 'assignmentContext' in here?
@@ -239,7 +255,7 @@ instance Ord1 Return where liftCompare = genericLiftCompare
 instance Show1 Return where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Return where
-  eval eval (Return x) = Rval <$> (eval x >>= address >>= earlyReturn)
+  eval eval (Return x) = eval x >>= earlyReturn
 
 instance Tokenize Return where
   tokenize (Return x) = within' Scope.Return x
@@ -266,7 +282,7 @@ instance Ord1 Break where liftCompare = genericLiftCompare
 instance Show1 Break where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Break where
-  eval eval (Break x) = Rval <$> (eval x >>= address >>= throwBreak)
+  eval eval (Break x) = eval x >>= throwBreak
 
 instance Tokenize Break where
   tokenize (Break b) = yield (Token.Flow Token.Break) *> b
@@ -279,7 +295,7 @@ instance Ord1 Continue where liftCompare = genericLiftCompare
 instance Show1 Continue where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Continue where
-  eval eval (Continue x) = Rval <$> (eval x >>= address >>= throwContinue)
+  eval eval (Continue x) = eval x >>= throwContinue
 
 instance Tokenize Continue where
   tokenize (Continue c) = yield (Token.Flow Token.Continue) *> c
@@ -317,7 +333,7 @@ instance Ord1 For where liftCompare = genericLiftCompare
 instance Show1 For where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable For where
-  eval eval (fmap (eval >=> Abstract.value) -> For before cond step body) = rvalBox =<< forLoop before cond step body
+  eval eval (fmap (eval >=> Abstract.value) -> For before cond step body) = forLoop before cond step body
 
 
 data ForEach a = ForEach { forEachBinding :: !a, forEachSubject :: !a, forEachBody :: !a }
@@ -346,7 +362,7 @@ instance Ord1 While where liftCompare = genericLiftCompare
 instance Show1 While where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable While where
-  eval eval While{..} = rvalBox =<< while (eval whileCondition >>= Abstract.value) (eval whileBody >>= Abstract.value)
+  eval eval While{..} = while (eval whileCondition >>= Abstract.value) (eval whileBody >>= Abstract.value)
 
 instance Tokenize While where
   tokenize While{..} = within' Scope.Loop $ do
@@ -362,7 +378,7 @@ instance Ord1 DoWhile where liftCompare = genericLiftCompare
 instance Show1 DoWhile where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable DoWhile where
-  eval eval DoWhile{..} = rvalBox =<< doWhile (eval doWhileBody >>= Abstract.value) (eval doWhileCondition >>= Abstract.value)
+  eval eval DoWhile{..} = doWhile (eval doWhileBody >>= Abstract.value) (eval doWhileCondition >>= Abstract.value)
 
 -- Exception handling
 
