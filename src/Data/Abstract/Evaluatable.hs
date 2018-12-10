@@ -26,7 +26,6 @@ import Data.Abstract.Declarations as X
 import Data.Abstract.FreeVariables as X
 import Data.Abstract.Module
 import Data.Abstract.Name as X
-import Data.Abstract.Ref as X
 import Data.Language
 import Data.Scientific (Scientific)
 import Data.Semigroup.App
