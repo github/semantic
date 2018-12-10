@@ -39,7 +39,7 @@ instance Evaluatable JavaScriptRequire where
       Nothing -> do
         insertImportEdge moduleScope
         insertFrameLink ScopeGraph.Import (Map.singleton moduleScope moduleFrame)
-    rvalBox unit
+    pure unit
 
 data Debugger a = Debugger
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)

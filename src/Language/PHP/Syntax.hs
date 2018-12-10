@@ -72,7 +72,7 @@ include :: ( AbstractValue term address value m
         => (term -> Evaluator term address value m value)
         -> term
         -> (ModulePath -> Evaluator term address value m (ModuleResult address value))
-        -> Evaluator term address value m (ValueRef address value)
+        -> Evaluator term address value m value
 include eval pathTerm f = do
   name <- eval pathTerm >>= asString
   path <- resolvePHPName name
@@ -80,7 +80,7 @@ include eval pathTerm f = do
   ((moduleScope, moduleFrame), v) <- f path
   insertImportEdge moduleScope
   insertFrameLink ScopeGraph.Import (Map.singleton moduleScope moduleFrame)
-  pure (Rval v)
+  pure v
 
 newtype Require a = Require { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
@@ -231,10 +231,10 @@ instance Evaluatable QualifiedName where
         withScopeAndFrame frameAddress $ do
           reference (Reference propName) (Declaration propName)
           address <- lookupDeclaration (Declaration propName)
-          pure $! LvalMember address
+          deref address
       Nothing ->
         -- TODO: Throw an ReferenceError because we can't find the associated child scope for `obj`.
-        rvalBox unit
+        pure unit
 
 newtype NamespaceName a = NamespaceName { names :: NonEmpty a }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1, NFData1)

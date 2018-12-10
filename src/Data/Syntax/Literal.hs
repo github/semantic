@@ -32,7 +32,7 @@ instance Ord1 Boolean where liftCompare = genericLiftCompare
 instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Boolean where
-  eval _ _ (Boolean x) = boolean x >>= rvalBox
+  eval _ _ (Boolean x) = boolean x
 
 instance Tokenize Boolean where
   tokenize = yield . Truth . booleanContent
@@ -50,7 +50,7 @@ instance Show1 Data.Syntax.Literal.Integer where liftShowsPrec = genericLiftShow
 instance Evaluatable Data.Syntax.Literal.Integer where
   -- TODO: We should use something more robust than shelling out to readMaybe.
   eval _ _ (Data.Syntax.Literal.Integer x) =
-    rvalBox =<< (integer <$> either (const (throwEvalError (IntegerFormatError x))) pure (parseInteger x))
+    integer <$> either (const (throwEvalError (IntegerFormatError x))) pure (parseInteger x)
 
 instance Tokenize Data.Syntax.Literal.Integer where
   tokenize = yield . Run . integerContent
@@ -66,7 +66,7 @@ instance Show1 Data.Syntax.Literal.Float where liftShowsPrec = genericLiftShowsP
 
 instance Evaluatable Data.Syntax.Literal.Float where
   eval _ _ (Float s) =
-    rvalBox =<< (float <$> either (const (throwEvalError (FloatFormatError s))) pure (parseScientific s))
+    float <$> either (const (throwEvalError (FloatFormatError s))) pure (parseScientific s)
 
 instance Tokenize Data.Syntax.Literal.Float where
   tokenize = yield . Run . floatContent
@@ -84,7 +84,7 @@ instance Evaluatable Data.Syntax.Literal.Rational where
     let
       trimmed = T.takeWhile (/= 'r') r
       parsed = readMaybe @Prelude.Integer (T.unpack trimmed)
-    in rvalBox =<< (rational <$> maybe (throwEvalError (RationalFormatError r)) (pure . toRational) parsed)
+    in rational <$> maybe (throwEvalError (RationalFormatError r)) (pure . toRational) parsed
 
 instance Tokenize Data.Syntax.Literal.Rational where
   tokenize (Rational t) = yield . Run $ t
@@ -155,7 +155,7 @@ instance Ord1 TextElement where liftCompare = genericLiftCompare
 instance Show1 TextElement where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable TextElement where
-  eval _ _ (TextElement x) = rvalBox (string x)
+  eval _ _ (TextElement x) = pure (string x)
 
 instance Tokenize TextElement where
   tokenize = yield . Run . textElementContent
@@ -189,7 +189,7 @@ instance Eq1 Null where liftEq = genericLiftEq
 instance Ord1 Null where liftCompare = genericLiftCompare
 instance Show1 Null where liftShowsPrec = genericLiftShowsPrec
 
-instance Evaluatable Null where eval _ _ _ = rvalBox null
+instance Evaluatable Null where eval _ _ _ = pure null
 
 instance Tokenize Null where
   tokenize _ = yield Nullity
@@ -215,7 +215,7 @@ instance Ord1 SymbolElement where liftCompare = genericLiftCompare
 instance Show1 SymbolElement where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable SymbolElement where
-  eval _ _ (SymbolElement s) = rvalBox (symbol s)
+  eval _ _ (SymbolElement s) = pure (symbol s)
 
 instance Tokenize SymbolElement where
   tokenize = yield . Run . symbolContent
@@ -231,7 +231,7 @@ instance Show1 Regex where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Regex
 instance Evaluatable Regex where
-  eval _ _ (Regex x) = rvalBox (regex x)
+  eval _ _ (Regex x) = pure (regex x)
 
 instance Tokenize Regex where
   tokenize = yield . Run . regexContent
@@ -246,7 +246,7 @@ instance Ord1 Array where liftCompare = genericLiftCompare
 instance Show1 Array where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Array where
-  eval eval _ Array{..} = rvalBox =<< array =<< traverse eval arrayElements
+  eval eval _ Array{..} = array =<< traverse eval arrayElements
 
 instance Tokenize Array where
   tokenize = list . arrayElements
@@ -259,7 +259,7 @@ instance Ord1 Hash where liftCompare = genericLiftCompare
 instance Show1 Hash where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Hash where
-  eval eval _ t = rvalBox =<< (Eval.hash <$> traverse (eval >=> asPair) (hashElements t))
+  eval eval _ t = Eval.hash <$> traverse (eval >=> asPair) (hashElements t)
 
 instance Tokenize Hash where
   tokenize = Tok.hash . hashElements
@@ -273,7 +273,7 @@ instance Show1 KeyValue where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable KeyValue where
   eval eval _ (fmap eval -> KeyValue{..}) =
-    rvalBox =<< (kvPair <$> key <*> value)
+    kvPair <$> key <*> value
 
 instance Tokenize KeyValue where
   tokenize (KeyValue k v) = pair k v
@@ -286,7 +286,7 @@ instance Ord1 Tuple where liftCompare = genericLiftCompare
 instance Show1 Tuple where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Tuple where
-  eval eval _ (Tuple cs) = rvalBox =<< tuple =<< traverse eval cs
+  eval eval _ (Tuple cs) = tuple =<< traverse eval cs
 
 newtype Set a = Set { setElements :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)

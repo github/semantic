@@ -150,4 +150,4 @@ evalTerm :: ( Carrier sig m
             )
          => Open (term -> Evaluator term address value m (ValueRef address value))
          -> term -> Evaluator term address value m (ValueRef address value)
-evalTerm perTerm = fst (fix (\ (ev, re) -> (perTerm (eval (value <=< ev) re . project), ref (value <=< ev) re . project)))
+evalTerm perTerm = fmap Rval . fst (fix (\ (ev, re) -> (value <=< perTerm (fmap Rval . eval ev re . project), ref ev re . project)))

@@ -32,7 +32,7 @@ instance Evaluatable Call where
   eval eval _ Call{..} = do
     op <- eval callFunction
     args <- traverse eval callParams
-    Rval <$> call op args
+    call op args
 
 instance Tokenize Call where
   tokenize Call{..} = within Scope.Call $ do
@@ -49,7 +49,7 @@ instance Ord1 LessThan where liftCompare = genericLiftCompare
 instance Show1 LessThan where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable LessThan where
-  eval eval _ t = rvalBox =<< (traverse eval t >>= go) where
+  eval eval _ t = (traverse eval t >>= go) where
     go x = case x of
       (LessThan a b)         -> liftComparison (Concrete (<)) a b
 
@@ -64,7 +64,7 @@ instance Ord1 LessThanEqual where liftCompare = genericLiftCompare
 instance Show1 LessThanEqual where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable LessThanEqual where
-  eval eval _ t = rvalBox =<< (traverse eval t >>= go) where
+  eval eval _ t = (traverse eval t >>= go) where
     go x = case x of
       (LessThanEqual a b)         -> liftComparison (Concrete (<=)) a b
 
@@ -79,7 +79,7 @@ instance Ord1 GreaterThan where liftCompare = genericLiftCompare
 instance Show1 GreaterThan where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable GreaterThan where
-  eval eval _ t = rvalBox =<< (traverse eval t >>= go) where
+  eval eval _ t = (traverse eval t >>= go) where
     go x = case x of
       (GreaterThan a b)         -> liftComparison (Concrete (>)) a b
 
@@ -94,7 +94,7 @@ instance Ord1 GreaterThanEqual where liftCompare = genericLiftCompare
 instance Show1 GreaterThanEqual where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable GreaterThanEqual where
-  eval eval _ t = rvalBox =<< (traverse eval t >>= go) where
+  eval eval _ t = (traverse eval t >>= go) where
     go x = case x of
       (GreaterThanEqual a b)         -> liftComparison (Concrete (>=)) a b
 
@@ -109,7 +109,7 @@ instance Ord1 Equal where liftCompare = genericLiftCompare
 instance Show1 Equal where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Equal where
-  eval eval _ t = rvalBox =<< (traverse eval t >>= go) where
+  eval eval _ t = (traverse eval t >>= go) where
     go x = case x of
       -- TODO: in PHP and JavaScript, the equals operator performs type coercion.
       -- We need some mechanism to customize this behavior per-language.
@@ -126,7 +126,7 @@ instance Ord1 StrictEqual where liftCompare = genericLiftCompare
 instance Show1 StrictEqual where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable StrictEqual where
-  eval eval _ t = rvalBox =<< (traverse eval t >>= go) where
+  eval eval _ t = (traverse eval t >>= go) where
     go x = case x of
       -- TODO: in PHP and JavaScript, the equals operator performs type coercion.
       -- We need some mechanism to customize this behavior per-language.
@@ -143,7 +143,7 @@ instance Ord1 Comparison where liftCompare = genericLiftCompare
 instance Show1 Comparison where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Comparison where
-  eval eval _ t = rvalBox =<< (traverse eval t >>= go) where
+  eval eval _ t = (traverse eval t >>= go) where
     go x = case x of
       (Comparison a b)         -> liftComparison (Concrete (==)) a b
 
@@ -158,7 +158,7 @@ instance Ord1 Plus where liftCompare = genericLiftCompare
 instance Show1 Plus where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Plus where
-  eval eval _ t = rvalBox =<< (traverse eval t >>= go) where
+  eval eval _ t = (traverse eval t >>= go) where
     go (Plus a b)          = liftNumeric2 add a b  where add    = liftReal (+)
 
 instance Tokenize Plus where
@@ -172,7 +172,7 @@ instance Ord1 Minus where liftCompare = genericLiftCompare
 instance Show1 Minus where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Minus where
-  eval eval _ t = rvalBox =<< (traverse eval t >>= go) where
+  eval eval _ t = (traverse eval t >>= go) where
     go (Minus a b)         = liftNumeric2 sub a b  where sub    = liftReal (-)
 
 instance Tokenize Minus where
@@ -186,7 +186,7 @@ instance Ord1 Times where liftCompare = genericLiftCompare
 instance Show1 Times where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Times where
-  eval eval _ t = rvalBox =<< (traverse eval t >>= go) where
+  eval eval _ t = (traverse eval t >>= go) where
     go (Times a b)         = liftNumeric2 mul a b  where mul    = liftReal (*)
 
 instance Tokenize Times where
@@ -200,7 +200,7 @@ instance Ord1 DividedBy where liftCompare = genericLiftCompare
 instance Show1 DividedBy where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable DividedBy where
-  eval eval _ t = rvalBox =<< (traverse eval t >>= go) where
+  eval eval _ t = (traverse eval t >>= go) where
     go (DividedBy a b)     = liftNumeric2 div' a b where div'   = liftIntegralFrac div (/)
 
 instance Tokenize DividedBy where
@@ -214,7 +214,7 @@ instance Ord1 Modulo where liftCompare = genericLiftCompare
 instance Show1 Modulo where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Modulo where
-  eval eval _ t = rvalBox =<< (traverse eval t >>= go) where
+  eval eval _ t = (traverse eval t >>= go) where
     go (Modulo a b)        = liftNumeric2 mod'' a b where mod'' = liftIntegralFrac mod mod'
 
 instance Tokenize Modulo where
@@ -228,7 +228,7 @@ instance Ord1 Power where liftCompare = genericLiftCompare
 instance Show1 Power where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Power where
-  eval eval _ t = rvalBox =<< (traverse eval t >>= go) where
+  eval eval _ t = (traverse eval t >>= go) where
     go (Power a b)         = liftNumeric2 liftedExponent a b
 
 instance Tokenize Power where
@@ -242,7 +242,7 @@ instance Ord1 Negate where liftCompare = genericLiftCompare
 instance Show1 Negate where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Negate where
-  eval eval _ t = rvalBox =<< (traverse eval t >>= go) where
+  eval eval _ t = (traverse eval t >>= go) where
     go (Negate a)          = liftNumeric negate a
 
 instance Tokenize Negate where
@@ -256,7 +256,7 @@ instance Ord1 FloorDivision where liftCompare = genericLiftCompare
 instance Show1 FloorDivision where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable FloorDivision where
-  eval eval _ t = rvalBox =<< (traverse eval t >>= go) where
+  eval eval _ t = (traverse eval t >>= go) where
     go (FloorDivision a b) = liftNumeric2 liftedFloorDiv a b
 
 instance Tokenize FloorDivision where
@@ -295,7 +295,7 @@ instance Show1 Or where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Or where
   eval eval _ (Or a b) = do
     a' <- eval a
-    ifthenelse a' (pure a') (eval b) >>= rvalBox
+    ifthenelse a' (pure a') (eval b)
 
 instance Tokenize Or where
   tokenize Or{..} = within' (Scope.InfixL LogicalOr 2) $ lhs *> yield Token.Sym <* rhs
@@ -307,7 +307,7 @@ instance Eq1 And where liftEq = genericLiftEq
 instance Ord1 And where liftCompare = genericLiftCompare
 instance Show1 And where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable And where
-  eval eval _ t = rvalBox =<< go (fmap eval t) where
+  eval eval _ t = go (fmap eval t) where
     go (And a b) = do
       cond <- a
       ifthenelse cond b (pure cond)
@@ -323,7 +323,7 @@ instance Ord1 Not where liftCompare = genericLiftCompare
 instance Show1 Not where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Not where
-  eval eval _ t = rvalBox =<< go (fmap eval t) where
+  eval eval _ t = go (fmap eval t) where
     go (Not a) = a >>= asBool >>= boolean . not
 
 instance Tokenize Not where
@@ -338,7 +338,7 @@ instance Show1 XOr where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable XOr where
   -- N.B. we have to use Monad rather than Applicative/Traversable on 'And' and 'Or' so that we don't evaluate both operands
-  eval eval _ t = rvalBox =<< go (fmap eval t) where
+  eval eval _ t = go (fmap eval t) where
     go (XOr a b) = liftA2 (/=) (a >>= asBool) (b >>= asBool) >>= boolean
 
 instance Tokenize XOr where
@@ -353,7 +353,7 @@ instance Ord1 Delete where liftCompare = genericLiftCompare
 instance Show1 Delete where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Delete where
-  eval _ ref (Delete a) = ref a >>= dealloc >> rvalBox unit
+  eval _ ref (Delete a) = ref a >>= dealloc >> pure unit
 
 -- | A sequence expression such as Javascript or C's comma operator.
 data SequenceExpression a = SequenceExpression { firstExpression :: !a, secondExpression :: !a }
@@ -365,7 +365,7 @@ instance Show1 SequenceExpression where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable SequenceExpression where
   eval eval _ (SequenceExpression a b) =
-    eval a >> eval b >>= rvalBox
+    eval a >> eval b
 
 -- | Javascript void operator
 newtype Void a = Void { value :: a }
@@ -377,7 +377,7 @@ instance Show1 Void where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Void where
   eval eval _ (Void a) =
-    eval a >> rvalBox null
+    eval a >> pure null
 
 -- | Javascript typeof operator
 newtype Typeof a = Typeof { value :: a }
@@ -401,7 +401,7 @@ instance Evaluatable BOr where
   eval eval _ (BOr a b) = do
     a' <- eval a >>= castToInteger
     b' <- eval b >>= castToInteger
-    liftBitwise2 (.|.) a' b' >>= rvalBox
+    liftBitwise2 (.|.) a' b'
 
 instance Tokenize BOr where
   tokenize BOr{..} = within' (Scope.InfixL BinaryOr 4) $ lhs *> yield Token.Sym <* rhs
@@ -416,7 +416,7 @@ instance Evaluatable BAnd where
   eval eval _ (BAnd a b) = do
     a' <- eval a >>= castToInteger
     b' <- eval b >>= castToInteger
-    liftBitwise2 (.&.) a' b' >>= rvalBox
+    liftBitwise2 (.&.) a' b'
 
 instance Tokenize BAnd where
   tokenize BAnd{..} = within' (Scope.InfixL BinaryAnd 5) $ lhs *> yield Token.Sym <* rhs
@@ -431,7 +431,7 @@ instance Evaluatable BXOr where
   eval eval _ (BXOr a b) = do
     a' <- eval a >>= castToInteger
     b' <- eval b >>= castToInteger
-    liftBitwise2 xor a' b' >>= rvalBox
+    liftBitwise2 xor a' b'
 
 instance Tokenize BXOr where
   tokenize BXOr{..} = within' (Scope.InfixL BinaryXor 5) $ lhs *> yield Token.Sym <* rhs
@@ -446,7 +446,7 @@ instance Evaluatable LShift where
   eval eval _ (LShift a b) = do
     a' <- eval a >>= castToInteger
     b' <- eval b >>= castToInteger
-    liftBitwise2 shiftL' a' b' >>= rvalBox
+    liftBitwise2 shiftL' a' b'
     where
       shiftL' a b = shiftL a (fromIntegral (toInteger b))
 
@@ -463,7 +463,7 @@ instance Evaluatable RShift where
   eval eval _ (RShift a b) = do
     a' <- eval a >>= castToInteger
     b' <- eval b >>= castToInteger
-    liftBitwise2 shiftR' a' b' >>= rvalBox
+    liftBitwise2 shiftR' a' b'
     where
       shiftR' a b = shiftR a (fromIntegral (toInteger b))
 
@@ -480,7 +480,7 @@ instance Evaluatable UnsignedRShift where
   eval eval _ (UnsignedRShift a b) = do
     a' <- eval a >>= castToInteger
     b' <- eval b >>= castToInteger
-    unsignedRShift a' b' >>= rvalBox
+    unsignedRShift a' b'
 
 newtype Complement a = Complement { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
@@ -492,7 +492,7 @@ instance Show1 Complement where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Complement where
   eval eval _ (Complement a) = do
     a' <- eval a >>= castToInteger
-    liftBitwise complement a' >>= rvalBox
+    liftBitwise complement a'
 
 instance Tokenize Complement where
   tokenize Complement{..} = within' (Scope.Prefix BinaryComplement) $ yield Token.Sym <* value
@@ -518,10 +518,10 @@ instance Evaluatable MemberAccess where
       Just lhsFrame ->
         withScopeAndFrame lhsFrame $ do
           reference (Reference rhs) (Declaration rhs)
-          LvalMember <$> lookupDeclaration (Declaration rhs)
+          lookupDeclaration (Declaration rhs) >>= deref
       Nothing -> do
         -- Throw a ReferenceError since we're attempting to reference a name within a value that is not an Object.
-        throwEvalError (ReferenceError lhsValue rhs)
+        throwEvalError (ReferenceError lhsValue rhs) >>= Abstract.value
 
   ref eval _ MemberAccess{..} = do
     name <- maybeM (throwEvalError NoNameError) (declaredName lhs)
@@ -550,8 +550,8 @@ instance Show1 Subscript where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Finish Eval instance for Subscript
 -- TODO return a special LvalSubscript instance here
 instance Evaluatable Subscript where
-  eval eval _ (Subscript l [r]) = Rval <$> join (index <$> eval l <*> eval r)
-  eval _    _ (Subscript _ _)   = rvalBox =<< throwUnspecializedError (UnspecializedError "Eval unspecialized for subscript with slices")
+  eval eval _ (Subscript l [r]) = join (index <$> eval l <*> eval r)
+  eval _    _ (Subscript _ _)   = throwUnspecializedError (UnspecializedError "Eval unspecialized for subscript with slices")
 
 instance Tokenize Subscript where
   tokenize Subscript{..} = lhs *> within' Scope.Indexing (sequenceA_ (intersperse (yield Token.Sep) rhs))
@@ -635,7 +635,7 @@ instance Show1 Await where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Improve this to model asynchrony or capture some data suggesting async calls are not a problem.
 --       We are currently dealing with an asynchronous construct synchronously.
 instance Evaluatable Await where
-  eval eval _ (Await a) = eval a >>= rvalBox
+  eval eval _ (Await a) = eval a
 
 -- | An object constructor call in Javascript, Java, etc.
 newtype New a = New { newSubject :: [a] }
@@ -658,7 +658,7 @@ instance Evaluatable New where
         name <- maybeM (throwEvalError NoNameError) (declaredName subject)
         reference (Reference name) (Declaration name)
     -- TODO: Traverse subterms and instantiate frames from the corresponding scope
-    rvalBox unit
+    pure unit
 
 -- | A cast expression to a specified type.
 data Cast a =  Cast { castSubject :: !a, castType :: !a }
@@ -692,4 +692,4 @@ instance Ord1 This where liftCompare = genericLiftCompare
 instance Show1 This where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable This where
   eval _ _ This =
-    rvalBox =<< deref =<< lookupDeclaration (Declaration $ Name.name "__self")
+    deref =<< lookupDeclaration (Declaration $ Name.name "__self")

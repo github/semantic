@@ -66,7 +66,7 @@ instance Evaluatable Import where
       ((moduleScope, moduleFrame), _) <- require path
       insertImportEdge moduleScope
       insertFrameLink ScopeGraph.Import (Map.singleton moduleScope moduleFrame)
-    rvalBox unit
+    pure unit
 
 
 -- | Qualified Import declarations (symbols are qualified in calling environment).
@@ -103,7 +103,7 @@ instance Evaluatable QualifiedImport where
                   insertImportEdge moduleScope
                   fun (Map.singleton moduleScope moduleFrame)
       go paths
-    rvalBox unit
+    pure unit
 
 -- | Side effect only imports (no symbols made available to the calling environment).
 data SideEffectImport a = SideEffectImport { sideEffectImportFrom :: !ImportPath, sideEffectImportToken :: !a }
@@ -119,7 +119,7 @@ instance Evaluatable SideEffectImport where
     paths <- resolveGoImport importPath
     traceResolve (unPath importPath) paths
     for_ paths $ \path -> require path -- Do we need to construct any scope / frames for these side-effect imports?
-    rvalBox unit
+    pure unit
 
 -- A composite literal in Go
 data Composite a = Composite { compositeType :: !a, compositeElement :: !a }
@@ -284,7 +284,7 @@ instance Ord1 Package where liftCompare = genericLiftCompare
 instance Show1 Package where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Package where
-  eval eval _ (Package _ xs) = maybe (rvalBox unit) (runApp . foldMap1 (App . fmap Rval . eval)) (nonEmpty xs)
+  eval eval _ (Package _ xs) = maybe (pure unit) (runApp . foldMap1 (App . eval)) (nonEmpty xs)
 
 
 -- | A type assertion in Go (e.g. `x.(T)` where the value of `x` is not nil and is of type `T`).

@@ -26,7 +26,7 @@ import qualified Proto3.Suite.DotProto as Proto
 import qualified Proto3.Wire.Encode as Encode
 import qualified Proto3.Wire.Decode as Decode
 import Control.Abstract.ScopeGraph (reference, Reference(..), Declaration(..))
-import Control.Abstract.Heap (lookupDeclaration)
+import Control.Abstract.Heap (deref, lookupDeclaration)
 
 -- Combinators
 
@@ -165,9 +165,7 @@ instance Ord1 Identifier where liftCompare = genericLiftCompare
 instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Identifier where
-  eval _ _ (Identifier name) = do
-    reference (Reference name) (Declaration name)
-    LvalMember <$> lookupDeclaration (Declaration name)
+  eval eval ref' = ref eval ref' >=> deref
 
   ref _ _ (Identifier name) = do
     reference (Reference name) (Declaration name)
@@ -207,7 +205,7 @@ instance Ord1 Empty where liftCompare _ _ _ = EQ
 instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
 
 instance Evaluatable Empty where
-  eval _ _ _ = rvalBox unit
+  eval _ _ _ = pure unit
 
 instance Tokenize Empty where
   tokenize = ignore
@@ -313,7 +311,7 @@ instance Ord1 Context where liftCompare = genericLiftCompare
 instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Context where
-  eval eval _ Context{..} = eval contextSubject >>= rvalBox
+  eval eval _ Context{..} = eval contextSubject
 
 instance Tokenize Context where
   tokenize Context{..} = sequenceA_ (sepTrailing contextTerms) *> contextSubject

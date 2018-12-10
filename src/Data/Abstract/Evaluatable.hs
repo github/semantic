@@ -72,11 +72,11 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           )
        => (term -> Evaluator term address value m value)
        -> (term -> Evaluator term address value m (Slot address))
-       -> (constr term -> Evaluator term address value m (ValueRef address value))
+       -> (constr term -> Evaluator term address value m value)
   eval recur _ expr = do
     traverse_ recur expr
     v <- throwUnspecializedError $ UnspecializedError ("Eval unspecialized for " <> liftShowsPrec (const (const id)) (const id) 0 expr "")
-    rvalBox v
+    pure v
 
   ref :: ( AbstractValue term address value m
          , Carrier sig m
@@ -185,7 +185,7 @@ defineSelf = do
 -- | The type of error thrown when failing to evaluate a term.
 data EvalError address value return where
   QualifiedImportError :: ImportPath -> EvalError address value (ValueRef address value)
-  DerefError :: value -> EvalError address value (ValueRef address value)
+  DerefError :: value -> EvalError address value value
   RefError :: EvalError address value (Slot address)
   DefaultExportError  :: EvalError address value ()
   ExportError         :: ModulePath -> Name -> EvalError address value ()
@@ -307,4 +307,4 @@ instance (Evaluatable s, Show a) => Evaluatable (TermF s a) where
 --   3. Only the last statement’s return value is returned.
 instance Evaluatable [] where
   -- 'nonEmpty' and 'foldMap1' enable us to return the last statement’s result instead of 'unit' for non-empty lists.
-  eval eval _ = maybe (rvalBox unit) (runApp . foldMap1 (App . fmap Rval . eval)) . nonEmpty
+  eval eval _ = maybe (pure unit) (runApp . foldMap1 (App . eval)) . nonEmpty
