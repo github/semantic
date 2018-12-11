@@ -16,7 +16,7 @@ module Data.Abstract.Evaluatable
 , throwUnspecializedError
 ) where
 
-import Control.Abstract hiding (Load)
+import Control.Abstract hiding (Load, String)
 import Control.Abstract.Context as X
 import Control.Abstract.Evaluator as X hiding (LoopControl(..), Return(..), catchLoopControl, runLoopControl, catchReturn, runReturn)
 import Control.Abstract.Modules as X (Modules, ModuleResult, ResolutionError(..), load, lookupModule, listModulesInDir, require, resolve, throwResolutionError)
