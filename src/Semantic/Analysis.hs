@@ -103,9 +103,41 @@ evaluate lang perModule runTerm modules = do
                   . raiseHandler (runReader (CurrentScope scopeAddress))
                   . runReturn
                   . runLoopControl
-                  . perModule (runDomainEffects . moduleBody)
+                  . perModule (runDomainEffects runTerm . moduleBody)
 
-        runDomainEffects = raiseHandler runInterpose . runBoolean . runWhile . runFunction runTerm . either ((unit <$) . definePrelude) runTerm
+runDomainEffects :: ( AbstractValue term address value (ValueC term address value m)
+                    , Carrier sig m
+                    , booleanC ~ BooleanC value (Eff (InterposeC (Resumable (BaseError (UnspecializedError address value))) (Eff m)))
+                    , booleanSig ~ (Boolean value :+: Interpose (Resumable (BaseError (UnspecializedError address value))) :+: sig)
+                    , Carrier booleanSig booleanC
+                    , whileC ~ WhileC value (Eff booleanC)
+                    , whileSig ~ (While value :+: booleanSig)
+                    , Carrier whileSig whileC
+                    , functionC ~ FunctionC term address value (Eff whileC)
+                    , functionSig ~ (Function term address value :+: whileSig)
+                    , Carrier functionSig functionC
+                    , HasPrelude lang
+                    , Member (Allocator address) sig
+                    , Member (Deref value) sig
+                    , Member Fresh sig
+                    , Member (Reader (CurrentFrame address)) sig
+                    , Member (Reader (CurrentScope address)) sig
+                    , Member (Reader ModuleInfo) sig
+                    , Member (Reader Span) sig
+                    , Member (Resumable (BaseError (AddressError address value))) sig
+                    , Member (Resumable (BaseError (HeapError address))) sig
+                    , Member (Resumable (BaseError (ScopeError address))) sig
+                    , Member (Resumable (BaseError (UnspecializedError address value))) sig
+                    , Member (State (Heap address address value)) sig
+                    , Member (State (ScopeGraph address)) sig
+                    , Member Trace sig
+                    , Ord address
+                    , Show address
+                    )
+                 => (term -> Evaluator term address value (ValueC term address value m) value)
+                 -> Either (proxy lang) term
+                 -> Evaluator term address value m value
+runDomainEffects runTerm = raiseHandler runInterpose . runBoolean . runWhile . runFunction runTerm . either ((unit <$) . definePrelude) runTerm
 
 -- | Evaluate a term recursively, applying the passed function at every recursive position.
 --
