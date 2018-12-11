@@ -24,6 +24,7 @@ module Control.Abstract.Value
 , While(..)
 , runWhile
 , WhileC(..)
+, Unit(..)
 ) where
 
 import Control.Abstract.Evaluator
