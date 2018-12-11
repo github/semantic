@@ -25,6 +25,7 @@ module Control.Abstract.Value
 , runWhile
 , WhileC(..)
 , Unit(..)
+, runUnit
 , UnitC(..)
 ) where
 
@@ -200,6 +201,11 @@ instance Effect (Unit value) where
   handle state handler (Unit k) = Unit (handler . (<$ state) . k)
 
 newtype UnitC value m a = UnitC { runUnitC :: m a }
+
+runUnit :: Carrier (Unit value :+: sig) (UnitC value (Eff m))
+        => Evaluator term address value (UnitC value (Eff m)) a
+        -> Evaluator term address value m a
+runUnit = raiseHandler $ runUnitC . interpret
 
 class Show value => AbstractIntro value where
   -- | Construct an abstract unit value.
