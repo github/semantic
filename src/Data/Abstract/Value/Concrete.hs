@@ -40,7 +40,7 @@ data Value term address
   | Regex Text
   | Tuple [Value term address]
   | Array [Value term address]
-  | Class Declaration [Value term address] address
+  | Class Declaration [Value term address] address address
   | Object address
   | Namespace Name address
   | KVPair (Value term address) (Value term address)
@@ -207,14 +207,14 @@ instance ( Member (Allocator address) sig
     | Array addresses <- val = pure addresses
     | otherwise = throwValueError $ ArrayError val
 
-  klass n binds = do
-    pure $ Class n mempty binds
+  klass n frame instanceScope = do
+    pure $ Class n mempty frame instanceScope
 
   namespace name = pure . Namespace name
 
   scopedEnvironment v
     | Object address <- v = pure (Just address)
-    | Class _ _ address <- v = pure (Just address)
+    | Class _ _ address _ <- v = pure (Just address)
     | Namespace _ address <- v = pure (Just address)
     | otherwise = pure Nothing
 

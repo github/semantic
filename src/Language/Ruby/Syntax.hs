@@ -220,17 +220,18 @@ instance Evaluatable Class where
         let superclassEdges = (Superclass, ) . pure . fst <$> catMaybes superScopes
             current = (Lexical, ) <$> pure (pure currentScope')
             edges = Map.fromList (superclassEdges <> current)
-        childScope <- newScope edges
-        declare (Declaration name) span (Just childScope)
+        classScope <- newScope edges
+        declare (Declaration name) span (Just classScope)
 
         let frameEdges = Map.singleton Superclass (Map.fromList (catMaybes superScopes))
-        childFrame <- newFrame childScope frameEdges
+        childFrame <- newFrame classScope frameEdges
 
         withScopeAndFrame childFrame $ do
           void $ eval classBody
 
         classSlot <- lookupDeclaration (Declaration name)
-        assign classSlot =<< klass (Declaration name) childFrame
+        instanceScope <- newScope (Map.singleton InstanceOf [ classScope ])
+        assign classSlot =<< klass (Declaration name) childFrame instanceScope
 
         pure unit
 
@@ -273,17 +274,18 @@ instance Evaluatable Module where
           Nothing -> throwEvalError (DerefError moduleVal)
       Nothing -> do
         let edges = Map.singleton Lexical [ currentScope' ]
-        childScope <- newScope edges
-        declare (Declaration name) span (Just childScope)
+        classScope <- newScope edges
+        declare (Declaration name) span (Just classScope)
 
         currentFrame' <- currentFrame
         let frameEdges = Map.singleton Lexical (Map.singleton currentScope' currentFrame')
-        childFrame <- newFrame childScope frameEdges
+        childFrame <- newFrame classScope frameEdges
 
         withScopeAndFrame childFrame (void moduleBody)
 
         moduleSlot <- lookupDeclaration (Declaration name)
-        assign moduleSlot =<< klass (Declaration name) childFrame
+        instanceScope <- newScope (Map.singleton InstanceOf [ classScope ])
+        assign moduleSlot =<< klass (Declaration name) childFrame instanceScope
 
         pure unit
 
