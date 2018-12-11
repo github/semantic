@@ -607,7 +607,7 @@ declareModule eval identifier statements = do
         withScopeAndFrame childFrame (void moduleBody)
 
         moduleSlot <- lookupDeclaration (Declaration name)
-        assign moduleSlot =<< klass (Declaration name) childFrame
+        assign moduleSlot =<< namespace name childFrame
 
         pure unit
 
@@ -675,17 +675,18 @@ instance Evaluatable AbstractClass where
     let superclassEdges = (Superclass, ) . pure . fst <$> catMaybes superScopes
         current = (Lexical, ) <$> pure (pure currentScope')
         edges = Map.fromList (superclassEdges <> current)
-    childScope <- newScope edges
-    declare (Declaration name) span (Just childScope)
+    classScope <- newScope edges
+    declare (Declaration name) span (Just classScope)
 
     let frameEdges = Map.singleton Superclass (Map.fromList (catMaybes superScopes))
-    childFrame <- newFrame childScope frameEdges
+    childFrame <- newFrame classScope frameEdges
 
     withScopeAndFrame childFrame $ do
       void $ eval classBody
 
     classSlot <- lookupDeclaration (Declaration name)
-    assign classSlot =<< klass (Declaration name) childFrame
+    instanceScope <- newScope (Map.singleton InstanceOf [ classScope ])
+    assign classSlot =<< klass (Declaration name) childFrame instanceScope
 
     pure unit
 

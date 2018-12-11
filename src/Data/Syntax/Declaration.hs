@@ -209,11 +209,12 @@ instance Evaluatable PublicFieldDefinition where
     span <- ask @Span
     propertyName <- maybeM (throwEvalError $ NoNameError publicFieldPropertyName) (declaredName publicFieldPropertyName)
 
-    -- withScope instanceMemberScope $ do
-    declare (Declaration propertyName) span Nothing
-    slot <- lookupDeclaration (Declaration propertyName)
-    value <- eval publicFieldValue
-    assign slot value
+    instanceScope <- scopedEnvironment
+    withScope instanceScope $ do
+      declare (Declaration propertyName) span Nothing
+      slot <- lookupDeclaration (Declaration propertyName)
+      value <- eval publicFieldValue
+      assign slot value
     pure unit
 
 data Variable a = Variable { variableName :: !a, variableType :: !a, variableValue :: !a }
@@ -266,7 +267,7 @@ instance Evaluatable Class where
     instanceMemberScope <- newScope (Map.singleton InstanceOf [ classScope ])
 
     classSlot <- lookupDeclaration (Declaration name)
-    assign classSlot =<< klass (Declaration name) classFrame -- instanceMemberScope
+    assign classSlot =<< klass (Declaration name) classFrame instanceMemberScope
 
     withScopeAndFrame classFrame $ do
       void $ eval classBody
