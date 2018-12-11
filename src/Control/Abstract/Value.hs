@@ -29,6 +29,7 @@ module Control.Abstract.Value
 , runUnit
 , UnitC(..)
 , String(..)
+, StringC(..)
 ) where
 
 import Control.Abstract.Evaluator
@@ -226,6 +227,8 @@ instance HFunctor (String value) where
 instance Effect (String value) where
   handle state handler (String text k) = String text (handler . (<$ state) . k)
   handle state handler (AsString v k) = AsString v (handler . (<$ state) . k)
+
+newtype StringC value m a = StringC { runStringC :: m a }
 
 
 class Show value => AbstractIntro value where
