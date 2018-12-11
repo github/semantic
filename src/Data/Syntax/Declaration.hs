@@ -209,12 +209,11 @@ instance Evaluatable PublicFieldDefinition where
     span <- ask @Span
     propertyName <- maybeM (throwEvalError $ NoNameError publicFieldPropertyName) (declaredName publicFieldPropertyName)
 
-    instanceScope <- scopedEnvironment
-    withScope instanceScope $ do
-      declare (Declaration propertyName) span Nothing
-      slot <- lookupDeclaration (Declaration propertyName)
-      value <- eval publicFieldValue
-      assign slot value
+    -- withScope instanceScope $ do
+    declare (Declaration propertyName) span Nothing
+    slot <- lookupDeclaration (Declaration propertyName)
+    value <- eval publicFieldValue
+    assign slot value
     pure unit
 
 data Variable a = Variable { variableName :: !a, variableType :: !a, variableValue :: !a }
