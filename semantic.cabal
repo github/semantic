@@ -50,8 +50,6 @@ library
                      -- Effects
                      , Control.Effect.Interpose
                      , Control.Effect.REPL
-                     -- Matching and rewriting DSLs
-                     , Control.Matching
                      , Control.Rewriting
                      -- Datatypes for abstract interpretation
                      , Data.Abstract.Address.Hole
@@ -348,11 +346,11 @@ test-suite test
                      , Diffing.Interpreter.Spec
                      , Graphing.Calls.Spec
                      , Integration.Spec
-                     , Matching.Go.Spec
-                     , Matching.Python.Spec
                      , Numeric.Spec
                      , Proto3.Roundtrip
                      , Reprinting.Spec
+                     , Rewriting.Go.Spec
+                     , Rewriting.Python.Spec                     
                      , Rendering.TOC.Spec
                      , Semantic.Spec
                      , Semantic.CLI.Spec

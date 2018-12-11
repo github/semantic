@@ -1,8 +1,8 @@
 {-# LANGUAGE TypeOperators #-}
 
-module Matching.Go.Spec (spec) where
+module Rewriting.Go.Spec (spec) where
 
-import           Control.Matching
+import           Control.Rewriting
 import           Data.Abstract.Module
 import           Data.List
 import           Data.Sum
@@ -13,7 +13,7 @@ import           Data.Text (Text)
 import           SpecHelpers
 
 -- This gets the Text contents of all integers
-integerMatcher :: (Lit.Integer :< fs) => Matcher (Term (Sum fs) ann) Text
+integerMatcher :: (Lit.Integer :< fs) => Rewrite (Term (Sum fs) ann) Text
 integerMatcher = enter Lit.integerContent
 
 -- This matches all for-loops with its index variable new variable bound to 0,
@@ -30,7 +30,7 @@ loopMatcher = target <* go where
 
 
 spec :: Spec
-spec = describe "matching/go" $ do
+spec = describe "recursively" $ do
   it "extracts integers" $ do
     parsed <- parseFile goParser "test/fixtures/go/matching/integers.go"
     let matched = recursively integerMatcher parsed
