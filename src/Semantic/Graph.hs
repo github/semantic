@@ -31,7 +31,7 @@ import Prelude hiding (readFile)
 import           Analysis.Abstract.Caching.FlowInsensitive
 import           Analysis.Abstract.Collecting
 import           Analysis.Abstract.Graph as Graph
-import           Control.Abstract
+import           Control.Abstract hiding (String)
 import           Control.Abstract.PythonPackage as PythonPackage
 import           Data.Abstract.Address.Hole as Hole
 import           Data.Abstract.Address.Located as Located
