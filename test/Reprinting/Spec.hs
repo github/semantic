@@ -22,7 +22,6 @@ import           Language.Ruby.PrettyPrint
 import           Reprinting.Pipeline
 import           Reprinting.Tokenize
 import           Semantic.IO
-import           Semantic.Util.Rewriting hiding (parseFile)
 
 spec :: Spec
 spec = describe "reprinting" $ do

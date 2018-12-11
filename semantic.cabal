@@ -206,7 +206,6 @@ library
                      , Semantic.Timeout
                      , Semantic.Util
                      , Semantic.Util.Pretty
-                     , Semantic.Util.Rewriting
                      , Semantic.Version
                      -- Serialization
                      , Serializing.DOT
