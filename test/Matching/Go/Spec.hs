@@ -21,7 +21,7 @@ integerMatcher = enter Lit.integerContent
 loopMatcher :: ( Stmt.For :< fs
                , Stmt.Assignment :< fs
                , Lit.Integer :< fs)
-            => TermMatcher fs ann
+            => Rule (Term (Sum fs) ann)
 loopMatcher = target <* go where
   go = enter Stmt.forBefore
        >>> enter Stmt.assignmentValue
@@ -33,10 +33,10 @@ spec :: Spec
 spec = describe "matching/go" $ do
   it "extracts integers" $ do
     parsed <- parseFile goParser "test/fixtures/go/matching/integers.go"
-    let matched = matchRecursively integerMatcher parsed
+    let matched = recursively integerMatcher parsed
     sort matched `shouldBe` ["1", "2", "3"]
 
   it "counts for loops" $ do
     parsed <- parseFile goParser "test/fixtures/go/matching/for.go"
-    let matched = matchRecursively @[] loopMatcher parsed
+    let matched = recursively @[] @(Term _ _) loopMatcher parsed
     length matched `shouldBe` 2

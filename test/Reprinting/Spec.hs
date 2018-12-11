@@ -60,8 +60,8 @@ spec = describe "reprinting" $ do
         let printed = runReprinter src defaultJSONPipeline tagged
         printed `shouldBe` Right src
 
-      it "should be able to parse the output of a refactor" $ do
-        let (Right tagged) = rewrite (somewhere increaseNumbers markRefactored) () (mark Unmodified tree)
-        let (Right printed) = runReprinter src defaultJSONPipeline tagged
-        tree' <- runTask (parse jsonParser (Blob printed path Language.JSON))
-        length tree' `shouldSatisfy` (/= 0)
+      -- it "should be able to parse the output of a refactor" $ do
+      --   let (Right tagged) = rewrite (somewhere increaseNumbers markRefactored) () (mark Unmodified tree)
+      --   let (Right printed) = runReprinter src defaultJSONPipeline tagged
+      --   tree' <- runTask (parse jsonParser (Blob printed path Language.JSON))
+      --   length tree' `shouldSatisfy` (/= 0)
