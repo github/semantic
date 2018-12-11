@@ -28,7 +28,7 @@ instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
   -- http://www.typescriptlang.org/docs/handbook/module-resolution.html
 instance Evaluatable Import where
-  eval _ (Import symbols importPath) = do
+  eval _ _ (Import symbols importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
     ((moduleScope, moduleFrame), _) <- require modulePath
     if Prologue.null symbols then do
@@ -48,7 +48,7 @@ instance Evaluatable Import where
       -- Create edges from the current scope/frame to the import scope/frame.
       insertImportEdge scopeAddress
       insertFrameLink ScopeGraph.Import (Map.singleton scopeAddress frameAddress)
-    rvalBox unit
+    pure unit
 
 data QualifiedAliasedImport a = QualifiedAliasedImport { qualifiedAliasedImportAlias :: !a, qualifiedAliasedImportFrom :: ImportPath }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
@@ -58,7 +58,7 @@ instance Ord1 QualifiedAliasedImport where liftCompare = genericLiftCompare
 instance Show1 QualifiedAliasedImport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedAliasedImport where
-  eval _ (QualifiedAliasedImport aliasTerm importPath) = do
+  eval _ _ (QualifiedAliasedImport aliasTerm importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
     ((moduleScope, moduleFrame), _) <- require modulePath
     span <- ask @Span
@@ -72,7 +72,7 @@ instance Evaluatable QualifiedAliasedImport where
     aliasSlot <- lookupDeclaration (Declaration alias)
     assign aliasSlot =<< object aliasFrame
 
-    rvalBox unit
+    pure unit
 
 
 newtype SideEffectImport a = SideEffectImport { sideEffectImportFrom :: ImportPath }
@@ -83,10 +83,10 @@ instance Ord1 SideEffectImport where liftCompare = genericLiftCompare
 instance Show1 SideEffectImport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable SideEffectImport where
-  eval _ (SideEffectImport importPath) = do
+  eval _ _ (SideEffectImport importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
     void $ require modulePath
-    rvalBox unit
+    pure unit
 
 
 -- | Qualified Export declarations
@@ -98,7 +98,7 @@ instance Ord1 QualifiedExport where liftCompare = genericLiftCompare
 instance Show1 QualifiedExport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedExport where
-  eval _ (QualifiedExport exportSymbols) = do
+  eval _ _ (QualifiedExport exportSymbols) = do
     -- Create a Lexical edge from the qualifed export's scope to the current scope.
     currentScopeAddress <- currentScope
     let edges = Map.singleton Lexical [ currentScopeAddress ]
@@ -109,7 +109,7 @@ instance Evaluatable QualifiedExport where
         reference (Reference aliasName) (Declaration aliasValue)
 
     -- Create an export edge from a new scope to the qualifed export's scope.
-    rvalBox unit
+    pure unit
 
 data Alias = Alias { aliasValue :: Name, aliasName :: Name }
   deriving (Eq, Generic, Hashable, Ord, Show, Message, Named, ToJSON, NFData)
@@ -126,7 +126,7 @@ instance Ord1 QualifiedExportFrom where liftCompare = genericLiftCompare
 instance Show1 QualifiedExportFrom where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedExportFrom where
-  eval _ (QualifiedExportFrom importPath exportSymbols) = do
+  eval _ _ (QualifiedExportFrom importPath exportSymbols) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
 
     ((moduleScope, moduleFrame), _) <- require modulePath
@@ -140,7 +140,7 @@ instance Evaluatable QualifiedExportFrom where
     insertExportEdge exportScope
     insertFrameLink ScopeGraph.Export (Map.singleton exportScope exportFrame)
 
-    rvalBox unit
+    pure unit
 
 newtype DefaultExport a = DefaultExport { defaultExport :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
@@ -150,14 +150,14 @@ instance Ord1 DefaultExport where liftCompare = genericLiftCompare
 instance Show1 DefaultExport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable DefaultExport where
-  eval eval (DefaultExport term) = do
+  eval eval _ (DefaultExport term) = do
     case declaredName term of
       Just _ -> do
         exportScope <- newScope mempty
         exportFrame <- newFrame exportScope mempty
         exportSpan <- ask @Span
         withScopeAndFrame exportFrame $ do
-          valueRef <- value =<< eval term
+          valueRef <- eval term
           let declaration = Declaration $ Name.name "__default"
           declare declaration exportSpan Nothing
           defaultSlot <- lookupDeclaration declaration
@@ -166,7 +166,7 @@ instance Evaluatable DefaultExport where
         insertExportEdge exportScope
         insertFrameLink ScopeGraph.Export (Map.singleton exportScope exportFrame)
       Nothing -> throwEvalError DefaultExportError
-    rvalBox unit
+    pure unit
 
 
 -- | Lookup type for a type-level key in a typescript map.
@@ -337,10 +337,10 @@ instance Ord1 TypeIdentifier where liftCompare = genericLiftCompare
 instance Show1 TypeIdentifier where liftShowsPrec = genericLiftShowsPrec
 -- TODO: TypeIdentifier shouldn't evaluate to an address in the heap?
 instance Evaluatable TypeIdentifier where
-  eval _ TypeIdentifier{..} = do
+  eval _ _ TypeIdentifier{..} = do
     -- Add a reference to the type identifier in the current scope.
     reference (Reference (Evaluatable.name contents)) (Declaration (Evaluatable.name contents))
-    rvalBox unit
+    pure unit
 
 data NestedIdentifier a = NestedIdentifier { left :: !a, right :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
@@ -390,7 +390,7 @@ instance Ord1 AmbientDeclaration where liftCompare = genericLiftCompare
 instance Show1 AmbientDeclaration where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable AmbientDeclaration where
-  eval eval (AmbientDeclaration body) = eval body
+  eval eval _ (AmbientDeclaration body) = eval body
 
 data EnumDeclaration a = EnumDeclaration { enumDeclarationIdentifier :: !a, enumDeclarationBody :: ![a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
@@ -415,10 +415,10 @@ instance Ord1 ExtendsClause where liftCompare = genericLiftCompare
 instance Show1 ExtendsClause where liftShowsPrec = genericLiftShowsPrec
 -- TODO: ExtendsClause shouldn't evaluate to an address in the heap?
 instance Evaluatable ExtendsClause where
-  eval eval ExtendsClause{..} = do
+  eval eval _ ExtendsClause{..} = do
     -- Evaluate subterms
     traverse_ eval extendsClauses
-    rvalBox unit
+    pure unit
 
 newtype ArrayType a = ArrayType { arrayType :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
@@ -574,17 +574,17 @@ declareModule :: ( AbstractValue term address value m
                  , Member (Resumable (BaseError (ScopeError address))) sig
                  , Ord address
                  )
-                => (term -> Evaluator term address value m (ValueRef address value))
+                => (term -> Evaluator term address value m value)
                 -> term
                 -> [term]
-                -> Evaluator term address value m (ValueRef address value)
+                -> Evaluator term address value m value
 declareModule eval identifier statements = do
     name <- maybeM (throwEvalError NoNameError) (declaredName identifier)
     span <- ask @Span
     currentScope' <- currentScope
 
     let declaration = Declaration name
-        moduleBody = maybe (rvalBox unit) (runApp . foldMap1 (App . eval)) (nonEmpty statements)
+        moduleBody = maybe (pure unit) (runApp . foldMap1 (App . eval)) (nonEmpty statements)
     maybeSlot <- maybeLookupDeclaration declaration
 
     case maybeSlot of
@@ -609,10 +609,10 @@ declareModule eval identifier statements = do
         moduleSlot <- lookupDeclaration (Declaration name)
         assign moduleSlot =<< klass (Declaration name) childFrame
 
-        rvalBox unit
+        pure unit
 
 instance Evaluatable Module where
-  eval eval Module{..} = declareModule eval moduleIdentifier moduleStatements
+  eval eval _ Module{..} = declareModule eval moduleIdentifier moduleStatements
 
 instance Declarations1 Module where
   liftDeclaredName declaredName = declaredName . moduleIdentifier
@@ -625,7 +625,7 @@ instance Ord1 InternalModule where liftCompare = genericLiftCompare
 instance Show1 InternalModule where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable InternalModule where
-  eval eval InternalModule{..} =
+  eval eval _ InternalModule{..} =
     declareModule eval internalModuleIdentifier internalModuleStatements
 
 instance Declarations a => Declarations (InternalModule a) where
@@ -658,7 +658,7 @@ instance Declarations a => Declarations (AbstractClass a) where
   declaredName AbstractClass{..} = declaredName abstractClassIdentifier
 
 instance Evaluatable AbstractClass where
-  eval eval AbstractClass{..} = do
+  eval eval _ AbstractClass{..} = do
     name <- maybeM (throwEvalError NoNameError) (declaredName abstractClassIdentifier)
     span <- ask @Span
     currentScope' <- currentScope
@@ -687,4 +687,4 @@ instance Evaluatable AbstractClass where
     classSlot <- lookupDeclaration (Declaration name)
     assign classSlot =<< klass (Declaration name) childFrame
 
-    rvalBox unit
+    pure unit

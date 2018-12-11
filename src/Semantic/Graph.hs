@@ -329,10 +329,10 @@ withTermSpans :: ( Member (Reader Span) sig
                  , Carrier sig m
                  , Base term ~ TermF syntax Location
                  )
-              => Open (Open (term -> Evaluator term address value m a))
-withTermSpans recur0 recur term = let
+              => Open (term -> Evaluator term address value m a)
+withTermSpans recur term = let
   span = locationSpan (termFAnnotation (project term))
-  updatedSpanAlg = withCurrentSpan span (recur0 recur term)
+  updatedSpanAlg = withCurrentSpan span (recur term)
   in modifyChildSpan span updatedSpanAlg
 
 resumingResolutionError :: ( Member Trace sig
@@ -360,13 +360,13 @@ resumingEvalError :: ( Carrier sig m
                      , Member Trace sig
                      , Show value
                      , Show address
+                     , AbstractHole address
                      , AbstractHole value
                      )
                   => Evaluator term address value (ResumableWithC (BaseError (EvalError address value)) (Eff
                                                   m)) a
                   -> Evaluator term address value m a
 resumingEvalError = runEvalErrorWith (\ baseError -> traceError "EvalError" baseError *> case baseErrorException baseError of
-  QualifiedImportError{} -> pure hole
   DerefError{} -> pure hole
   ReferenceError{} -> pure hole
   DefaultExportError{}  -> pure ()
@@ -376,15 +376,17 @@ resumingEvalError = runEvalErrorWith (\ baseError -> traceError "EvalError" base
   RationalFormatError{} -> pure 0
   NoNameError           -> gensym)
 
-resumingUnspecialized :: ( AbstractHole value
+resumingUnspecialized :: ( AbstractHole address
+                         , AbstractHole value
                          , Carrier sig m
                          , Member Trace sig
                          )
-                      => Evaluator term address value (ResumableWithC (BaseError (UnspecializedError value)) (Eff
+                      => Evaluator term address value (ResumableWithC (BaseError (UnspecializedError address value)) (Eff
                                                       m)) a
                       -> Evaluator term address value m a
 resumingUnspecialized = runUnspecializedWith (\ baseError -> traceError "UnspecializedError" baseError *> case baseErrorException baseError of
-  UnspecializedError _ -> pure hole)
+  UnspecializedError _ -> pure hole
+  RefUnspecializedError _ -> pure hole)
 
 resumingAddressError :: ( AbstractHole value
                         , Carrier sig m
@@ -407,7 +409,7 @@ resumingValueError :: ( Carrier sig m
                                                                   m)) a
                    -> Evaluator term address (Value term address) m a
 resumingValueError = runValueErrorWith (\ baseError -> traceError "ValueError" baseError *> case baseErrorException baseError of
-  CallError val     -> rvalBox val
+  CallError{}       -> pure hole
   StringError val   -> pure (pack (prettyShow val))
   BoolError{}       -> pure True
   BoundsError{}     -> pure hole

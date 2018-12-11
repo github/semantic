@@ -26,8 +26,6 @@ import Data.Abstract.Declarations as X
 import Data.Abstract.FreeVariables as X
 import Data.Abstract.Module
 import Data.Abstract.Name as X
-import Data.Abstract.Ref as X
-import Data.ImportPath (ImportPath)
 import Data.Language
 import Data.Scientific (Scientific)
 import Data.Semigroup.App
@@ -45,11 +43,11 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , FreeVariables term
           , Member (Allocator address) sig
           , Member (Boolean value) sig
-          , Member (While address value) sig
+          , Member (While value) sig
           , Member (Deref value) sig
           , Member (State (ScopeGraph address)) sig
-          , Member (Error (LoopControl address value)) sig
-          , Member (Error (Return address value)) sig
+          , Member (Error (LoopControl value)) sig
+          , Member (Error (Return value)) sig
           , Member Fresh sig
           , Member (Function term address value) sig
           , Member (Modules address value) sig
@@ -62,7 +60,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Member (Resumable (BaseError (ScopeError address))) sig
           , Member (Resumable (BaseError (HeapError address))) sig
           , Member (Resumable (BaseError (AddressError address value))) sig
-          , Member (Resumable (BaseError (UnspecializedError value))) sig
+          , Member (Resumable (BaseError (UnspecializedError address value))) sig
           , Member (Resumable (BaseError (EvalError address value))) sig
           , Member (Resumable (BaseError ResolutionError)) sig
           , Member (State (Heap address address value)) sig
@@ -70,12 +68,33 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Ord address
           , Show address
           )
-       => (term -> Evaluator term address value m (ValueRef address value))
-       -> (constr term -> Evaluator term address value m (ValueRef address value))
-  eval recur expr = do
+       => (term -> Evaluator term address value m value)
+       -> (term -> Evaluator term address value m (Slot address))
+       -> (constr term -> Evaluator term address value m value)
+  eval recur _ expr = do
     traverse_ recur expr
-    v <- throwUnspecializedError $ UnspecializedError ("Eval unspecialized for " <> liftShowsPrec (const (const id)) (const id) 0 expr "")
-    rvalBox v
+    throwUnspecializedError $ UnspecializedError ("Eval unspecialized for " <> liftShowsPrec (const (const id)) (const id) 0 expr "")
+
+  ref :: ( AbstractValue term address value m
+         , Carrier sig m
+         , Declarations term
+         , Member (Reader (CurrentFrame address)) sig
+         , Member (Reader (CurrentScope address)) sig
+         , Member (Reader ModuleInfo) sig
+         , Member (Reader Span) sig
+         , Member (Resumable (BaseError (EvalError address value))) sig
+         , Member (Resumable (BaseError (HeapError address))) sig
+         , Member (Resumable (BaseError (ScopeError address))) sig
+         , Member (Resumable (BaseError (UnspecializedError address value))) sig
+         , Member (State (Heap address address value)) sig
+         , Member (State (ScopeGraph address)) sig
+         , Ord address
+         )
+      => (term -> Evaluator term address value m value)
+      -> (term -> Evaluator term address value m (Slot address))
+      -> (constr term -> Evaluator term address value m (Slot address))
+  ref _ _ expr = do
+    throwUnspecializedError $ RefUnspecializedError ("ref unspecialized for " <> liftShowsPrec (const (const id)) (const id) 0 expr "")
 
 
 traceResolve :: (Show a, Show b, Member Trace sig, Carrier sig m) => a -> b -> Evaluator term address value m ()
@@ -116,16 +135,16 @@ instance HasPrelude 'PHP
 
 instance HasPrelude 'Python where
   definePrelude _ =
-    void $ defineBuiltIn (Declaration $ X.name "print") Print
+    defineBuiltIn (Declaration $ X.name "print") Print
 
 instance HasPrelude 'Ruby where
   definePrelude _ = do
     defineSelf
 
-    void $ defineBuiltIn (Declaration $ X.name "puts") Print
+    defineBuiltIn (Declaration $ X.name "puts") Print
 
     defineClass (Declaration (X.name "Object")) [] $ do
-      void $ defineBuiltIn (Declaration $ X.name "inspect") Show
+      defineBuiltIn (Declaration $ X.name "inspect") Show
 
 instance HasPrelude 'TypeScript where
   definePrelude _ = do
@@ -162,16 +181,15 @@ defineSelf = do
 
 -- | The type of error thrown when failing to evaluate a term.
 data EvalError address value return where
-  QualifiedImportError :: ImportPath -> EvalError address value (ValueRef address value)
-  DerefError           :: value -> EvalError address value (ValueRef address value)
-  DefaultExportError   :: EvalError address value ()
-  ExportError          :: ModulePath -> Name -> EvalError address value ()
+  DerefError :: value -> EvalError address value value
+  DefaultExportError  :: EvalError address value ()
+  ExportError         :: ModulePath -> Name -> EvalError address value ()
   -- Indicates that our evaluator wasn't able to make sense of these literals.
-  FloatFormatError     :: Text -> EvalError address value Scientific
-  IntegerFormatError   :: Text -> EvalError address value Integer
-  NoNameError          :: EvalError address value Name
-  RationalFormatError  :: Text -> EvalError address value Rational
-  ReferenceError       :: value -> Name -> EvalError address value (ValueRef address value)
+  FloatFormatError    :: Text -> EvalError address value Scientific
+  IntegerFormatError  :: Text -> EvalError address value Integer
+  NoNameError :: EvalError address value Name
+  RationalFormatError :: Text -> EvalError address value Rational
+  ReferenceError      :: value -> Name -> EvalError address value (Slot address)
 
 deriving instance (Eq address, Eq value) => Eq (EvalError address value return)
 deriving instance (Show address, Show value) => Show (EvalError address value return)
@@ -186,7 +204,6 @@ instance NFData value => NFData1 (EvalError address value) where
     NoNameError -> ()
     RationalFormatError i -> rnf i
     ReferenceError v n -> rnf v `seq` rnf n
-    QualifiedImportError i -> rnf i
 
 instance (NFData value, NFData return) => NFData (EvalError address value return) where
   rnf = liftRnf rnf
@@ -221,43 +238,47 @@ throwEvalError :: ( Member (Reader ModuleInfo) sig
 throwEvalError = throwBaseError
 
 
-data UnspecializedError a b where
-  UnspecializedError :: String -> UnspecializedError value value
+data UnspecializedError address value resume where
+  UnspecializedError    :: String -> UnspecializedError address value value
+  RefUnspecializedError :: String -> UnspecializedError address value (Slot address)
 
-instance NFData1 (UnspecializedError a) where
-  liftRnf _ (UnspecializedError s) = rnf s
+instance NFData1 (UnspecializedError address value) where
+  liftRnf _ (UnspecializedError s)    = rnf s
+  liftRnf _ (RefUnspecializedError s) = rnf s
 
-instance NFData b => NFData (UnspecializedError a b) where
-  rnf = liftRnf rnf
+instance NFData (UnspecializedError address value resume) where
+  rnf = liftRnf (const ())
 
-deriving instance Eq (UnspecializedError a b)
-deriving instance Show (UnspecializedError a b)
+deriving instance Eq   (UnspecializedError address value resume)
+deriving instance Show (UnspecializedError address value resume)
 
 
-instance Eq1 (UnspecializedError a) where
-  liftEq _ (UnspecializedError a) (UnspecializedError b) = a == b
+instance Eq1 (UnspecializedError address value) where
+  liftEq _ (UnspecializedError a)    (UnspecializedError b)    = a == b
+  liftEq _ (RefUnspecializedError a) (RefUnspecializedError b) = a == b
+  liftEq _ _                         _                         = False
 
-instance Show1 (UnspecializedError a) where
+instance Show1 (UnspecializedError address value) where
   liftShowsPrec _ _ = showsPrec
 
 runUnspecialized :: (Carrier sig m, Effect sig)
-                 => Evaluator term address value (ResumableC (BaseError (UnspecializedError value)) (Eff m)) a
-                 -> Evaluator term address value m (Either (SomeError (BaseError (UnspecializedError value))) a)
+                 => Evaluator term address value (ResumableC (BaseError (UnspecializedError address value)) (Eff m)) a
+                 -> Evaluator term address value m (Either (SomeError (BaseError (UnspecializedError address value))) a)
 runUnspecialized = raiseHandler runResumable
 
 runUnspecializedWith :: Carrier sig m
-                     => (forall resume . BaseError (UnspecializedError value) resume -> Evaluator term address value m resume)
-                     -> Evaluator term address value (ResumableWithC (BaseError (UnspecializedError value)) (Eff m)) a
+                     => (forall resume . BaseError (UnspecializedError address value) resume -> Evaluator term address value m resume)
+                     -> Evaluator term address value (ResumableWithC (BaseError (UnspecializedError address value)) (Eff m)) a
                      -> Evaluator term address value m a
 runUnspecializedWith f = raiseHandler $ runResumableWith (runEvaluator . f)
 
 
-throwUnspecializedError :: ( Member (Resumable (BaseError (UnspecializedError value))) sig
+throwUnspecializedError :: ( Member (Resumable (BaseError (UnspecializedError address value))) sig
                            , Member (Reader ModuleInfo) sig
                            , Member (Reader Span) sig
                            , Carrier sig m
                            )
-                        => UnspecializedError value resume
+                        => UnspecializedError address value resume
                         -> Evaluator term address value m resume
 throwUnspecializedError = throwBaseError
 
@@ -266,11 +287,13 @@ throwUnspecializedError = throwBaseError
 
 -- | If we can evaluate any syntax which can occur in a 'Sum', we can evaluate the 'Sum'.
 instance (Apply Evaluatable fs, Apply Show1 fs, Apply Foldable fs) => Evaluatable (Sum fs) where
-  eval eval' = apply @Evaluatable (eval eval')
+  eval eval' ref = apply @Evaluatable (eval eval' ref)
+  ref eval ref' = apply @Evaluatable (ref eval ref')
 
 -- | Evaluating a 'TermF' ignores its annotation, evaluating the underlying syntax.
 instance (Evaluatable s, Show a) => Evaluatable (TermF s a) where
-  eval eval' = eval eval' . termFOut
+  eval eval' ref = eval eval' ref . termFOut
+  ref eval ref' = ref eval ref' . termFOut
 
 
 -- NOTE: Use 'Data.Syntax.Statements' instead of '[]' if you need imperative eval semantics.
@@ -282,4 +305,4 @@ instance (Evaluatable s, Show a) => Evaluatable (TermF s a) where
 --   3. Only the last statement’s return value is returned.
 instance Evaluatable [] where
   -- 'nonEmpty' and 'foldMap1' enable us to return the last statement’s result instead of 'unit' for non-empty lists.
-  eval eval = maybe (rvalBox unit) (runApp . foldMap1 (App . eval)) . nonEmpty
+  eval eval _ = maybe (pure unit) (runApp . foldMap1 (App . eval)) . nonEmpty

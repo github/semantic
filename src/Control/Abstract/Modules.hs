@@ -31,10 +31,9 @@ import qualified Data.Set as Set
 import Data.Span
 import Prologue
 import System.FilePath.Posix (takeDirectory)
-import Data.Abstract.Ref
 
 -- A scope address, frame address, and value ref.
-type ModuleResult address value = ((address, address), ValueRef address value)
+type ModuleResult address value = ((address, address), value)
 
 -- | Retrieve an evaluated module, if any. @Nothing@ means we’ve never tried to load it, and @Just (env, value)@ indicates the result of a completed load.
 lookupModule :: (Member (Modules address value) sig, Carrier sig m) => ModulePath -> Evaluator term address value m (Maybe (ModuleResult address value))
