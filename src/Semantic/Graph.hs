@@ -359,7 +359,6 @@ resumingEvalError :: ( Carrier sig m
                      , Member Fresh sig
                      , Member Trace sig
                      , Show value
-                     , Show address
                      , Show term
                      , AbstractHole address
                      , AbstractHole value
@@ -368,14 +367,16 @@ resumingEvalError :: ( Carrier sig m
                                                   m)) a
                   -> Evaluator term address value m a
 resumingEvalError = runEvalErrorWith (\ baseError -> traceError "EvalError" baseError *> case baseErrorException baseError of
-  DerefError{}          -> pure hole
-  ReferenceError{}      -> pure hole
+  ConstructorError{}    -> pure hole
   DefaultExportError{}  -> pure ()
+  DerefError{}          -> pure hole
   ExportError{}         -> pure ()
-  IntegerFormatError{}  -> pure 0
   FloatFormatError{}    -> pure 0
+  IntegerFormatError{}  -> pure 0
+  NoNameError{}         -> gensym
   RationalFormatError{} -> pure 0
-  NoNameError{}         -> gensym)
+  ReferenceError{}      -> pure hole
+  ScopedEnvError{}      -> pure hole)
 
 resumingUnspecialized :: ( AbstractHole address
                          , AbstractHole value
