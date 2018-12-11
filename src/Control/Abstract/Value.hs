@@ -80,9 +80,9 @@ sendFunction :: (Member (Function term address value) sig, Carrier sig m) => Fun
 sendFunction = send
 
 data Function term address value (m :: * -> *) k
-  = Function Name [Name] term address (value -> k)
-  | BuiltIn address BuiltIn (value -> k)
-  | Call value [value] (value -> k)
+  =  Function Name [Name] term address (value -> k) -- ^ A function is parameterized by its name, parameter names, body, parent scope, and returns a ValueRef.
+  | BuiltIn address BuiltIn (value -> k)            -- ^ A built-in is parameterized by its parent scope, BuiltIn type, and returns a value.
+  | Call value [value] (value -> k)                 -- ^ A Call takes a set of values as parameters and returns a ValueRef.
   deriving (Functor)
 
 instance HFunctor (Function term address value) where
