@@ -7,7 +7,7 @@ import qualified Data.Text as T
 import           Prologue
 import           System.FilePath.Posix
 
-import           Control.Abstract as Abstract hiding (Load)
+import           Control.Abstract as Abstract hiding (Load, String)
 import           Control.Abstract.Heap (Heap, HeapError, insertFrameLink)
 import           Control.Abstract.ScopeGraph (insertImportEdge)
 import           Control.Abstract.Value (Boolean)
