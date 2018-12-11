@@ -85,7 +85,6 @@ evaluate lang perModule runTerm modules = do
   foldr (run preludeScopeAddress preludeFrameAddress . fmap Right) ask modules
   where run preludeScopeAddress preludeFrameAddress m rest = do
           evaluated <- evalModule (Just preludeScopeAddress) (Just preludeFrameAddress) m
-          -- FIXME: this should be some sort of Monoidal insert à la the Heap to accommodate multiple Go files being part of the same module.
           local (ModuleTable.insert (modulePath (moduleInfo m)) ((evaluated <$ m) :| [])) rest
 
         -- Run the allocator and Reader ModuleInfo effects (Some allocator instances depend on Reader ModuleInfo)
