@@ -52,13 +52,13 @@
     {+(Empty)+}
     {+(Empty)+}
     {+(Identifier)+}
-    {+(Statements)+})+})+}
+    {+(StatementBlock)+})+})+}
   (DefaultExport
     (Function
       (Empty)
       (Empty)
       (Empty)
-      (Statements)))
+      (StatementBlock)))
 {+(QualifiedExport)+}
 {+(DefaultExport
   {+(TextElement)+})+}
@@ -69,7 +69,7 @@
     {-(Empty)-}
     {-(Empty)-}
     {-(Identifier)-}
-    {-(Statements)-})-})-}
+    {-(StatementBlock)-})-})-}
 {-(QualifiedExport)-}
 {-(DefaultExport
   {-(TextElement)-})-}

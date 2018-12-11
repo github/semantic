@@ -3,7 +3,7 @@
     (Empty)
     (Empty)
     (Identifier)
-    (Statements
+    (StatementBlock
       (Return
         (Boolean))))
   (Empty))

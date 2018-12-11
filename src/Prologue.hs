@@ -9,6 +9,7 @@ module Prologue
   ) where
 
 
+import Debug.Trace as X (traceShowM, traceM)
 import Control.DeepSeq as X
 import Data.Bifunctor.Join as X
 import Data.Bits as X

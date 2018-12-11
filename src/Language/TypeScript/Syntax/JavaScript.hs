@@ -10,6 +10,10 @@ import           Data.Abstract.Evaluatable
 import           Data.JSON.Fields
 import           Diffing.Algorithm
 import           Language.TypeScript.Resolution
+import           Control.Abstract.ScopeGraph hiding (Import)
+import           Control.Abstract.Heap
+import           qualified Data.Abstract.ScopeGraph as ScopeGraph
+import           qualified Data.Map.Strict as Map
 
 data JavaScriptRequire a = JavaScriptRequire { javascriptRequireIden :: !a, javascriptRequireFrom :: ImportPath }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
@@ -19,10 +23,23 @@ instance Ord1 JavaScriptRequire where liftCompare = genericLiftCompare
 instance Show1 JavaScriptRequire where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable JavaScriptRequire where
-  eval _ (JavaScriptRequire aliasTerm importPath) = do
+  eval _ _ (JavaScriptRequire aliasTerm importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath javascriptExtensions
-    alias <- maybeM (throwEvalError NoNameError) (declaredName aliasTerm)
-    rvalBox =<< evalRequire modulePath alias
+    ((moduleScope, moduleFrame), _) <- require modulePath
+
+    case declaredName aliasTerm of
+      Just alias -> do
+        span <- ask @Span
+        importScope <- newScope (Map.singleton ScopeGraph.Import [ moduleScope ])
+        declare (Declaration alias) span (Just importScope)
+        let scopeMap = Map.singleton moduleScope moduleFrame
+        aliasFrame <- newFrame importScope (Map.singleton ScopeGraph.Import scopeMap)
+        aliasSlot <- lookupDeclaration (Declaration alias)
+        assign aliasSlot =<< object aliasFrame
+      Nothing -> do
+        insertImportEdge moduleScope
+        insertFrameLink ScopeGraph.Import (Map.singleton moduleScope moduleFrame)
+    pure unit
 
 data Debugger a = Debugger
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)

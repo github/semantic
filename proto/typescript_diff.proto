@@ -196,6 +196,7 @@ message TypeScriptSyntax {
     QualifiedExportFrom qualifiedExportFrom = 162;
     JavaScriptRequire javaScriptRequire = 163;
     List list = 164;
+    StatementBlock statementBlock = 165;
   }
 }
 
@@ -298,33 +299,33 @@ message FloorDivision {
 }
 
 message BAnd {
-  TypeScriptDiff left = 1;
-  TypeScriptDiff right = 2;
+  TypeScriptDiff lhs = 1;
+  TypeScriptDiff rhs = 2;
 }
 
 message BOr {
-  TypeScriptDiff left = 1;
-  TypeScriptDiff right = 2;
+  TypeScriptDiff lhs = 1;
+  TypeScriptDiff rhs = 2;
 }
 
 message BXOr {
-  TypeScriptDiff left = 1;
-  TypeScriptDiff right = 2;
+  TypeScriptDiff lhs = 1;
+  TypeScriptDiff rhs = 2;
 }
 
 message LShift {
-  TypeScriptDiff left = 1;
-  TypeScriptDiff right = 2;
+  TypeScriptDiff lhs = 1;
+  TypeScriptDiff rhs = 2;
 }
 
 message RShift {
-  TypeScriptDiff left = 1;
-  TypeScriptDiff right = 2;
+  TypeScriptDiff lhs = 1;
+  TypeScriptDiff rhs = 2;
 }
 
 message UnsignedRShift {
-  TypeScriptDiff left = 1;
-  TypeScriptDiff right = 2;
+  TypeScriptDiff lhs = 1;
+  TypeScriptDiff rhs = 2;
 }
 
 message Complement {
@@ -857,6 +858,7 @@ message OptionalParameter {
 message RequiredParameter {
   repeated TypeScriptDiff requiredParameterContext = 1;
   TypeScriptDiff requiredParameterSubject = 2;
+  TypeScriptDiff requiredParameterValue = 3;
 }
 
 message RestParameter {
@@ -963,6 +965,10 @@ message JavaScriptRequire {
 
 message List {
   repeated TypeScriptDiff listContent = 1;
+}
+
+message StatementBlock {
+  repeated TypeScriptDiff statements = 1;
 }
 
 message Alias {

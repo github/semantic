@@ -99,7 +99,8 @@ message RubySyntax {
     Module module = 83;
     Require require = 84;
     Send send = 85;
-    List list = 86;
+    ZSuper zSuper = 86;
+    List list = 87;
   }
 }
 
@@ -166,28 +167,28 @@ message FloorDivision {
 }
 
 message BAnd {
-  RubyTerm left = 1;
-  RubyTerm right = 2;
+  RubyTerm lhs = 1;
+  RubyTerm rhs = 2;
 }
 
 message BOr {
-  RubyTerm left = 1;
-  RubyTerm right = 2;
+  RubyTerm lhs = 1;
+  RubyTerm rhs = 2;
 }
 
 message BXOr {
-  RubyTerm left = 1;
-  RubyTerm right = 2;
+  RubyTerm lhs = 1;
+  RubyTerm rhs = 2;
 }
 
 message LShift {
-  RubyTerm left = 1;
-  RubyTerm right = 2;
+  RubyTerm lhs = 1;
+  RubyTerm rhs = 2;
 }
 
 message RShift {
-  RubyTerm left = 1;
-  RubyTerm right = 2;
+  RubyTerm lhs = 1;
+  RubyTerm rhs = 2;
 }
 
 message Complement {
@@ -498,6 +499,8 @@ message Send {
   repeated RubyTerm sendArgs = 3;
   repeated RubyTerm sendBlock = 4;
 }
+
+message ZSuper { }
 
 message List {
   repeated RubyTerm listContent = 1;
