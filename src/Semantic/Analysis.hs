@@ -1,6 +1,7 @@
 {-# LANGUAGE TypeFamilies, TypeOperators #-}
 module Semantic.Analysis
 ( evaluate
+, runDomainEffects
 , evalTerm
 ) where
 
@@ -11,6 +12,7 @@ import Data.Abstract.Evaluatable
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
 import Data.Function
+import Data.Language (Language)
 import Prologue
 import qualified Data.Map.Strict as Map
 
@@ -32,54 +34,25 @@ type DomainC term address value m
     m)))))))
 
 -- | Evaluate a list of modules with the prelude for the passed language available, and applying the passed function to every module.
-evaluate :: ( AbstractValue term address value (DomainC term address value inner)
-            , Carrier innerSig inner
-            , Carrier outerSig outer
+evaluate :: ( Carrier outerSig outer
             , derefSig ~ (Deref value :+: allocatorSig)
             , derefC ~ (DerefC address value (Eff allocatorC))
             , Carrier derefSig derefC
             , allocatorSig ~ (Allocator address :+: Reader ModuleInfo :+: outerSig)
             , allocatorC ~ (AllocatorC address (Eff (ReaderC ModuleInfo (Eff outer))))
             , Carrier allocatorSig allocatorC
-            , booleanC ~ BooleanC value (Eff (InterposeC (Resumable (BaseError (UnspecializedError address value))) (Eff inner)))
-            , booleanSig ~ (Boolean value :+: Interpose (Resumable (BaseError (UnspecializedError address value))) :+: innerSig)
-            , Carrier booleanSig booleanC
-            , whileC ~ WhileC value (Eff booleanC)
-            , whileSig ~ (While value :+: booleanSig)
-            , Carrier whileSig whileC
-            , functionC ~ FunctionC term address value (Eff whileC)
-            , functionSig ~ (Function term address value :+: whileSig)
-            , Carrier functionSig functionC
             , Effect outerSig
-            , HasPrelude lang
             , Member Fresh outerSig
-            , Member (Allocator address) innerSig
-            , Member (Deref value) innerSig
-            , Member Fresh innerSig
-            , Member (Reader ModuleInfo) innerSig
             , Member (Reader (ModuleTable (Module (ModuleResult address value)))) outerSig
-            , Member (Reader Span) innerSig
-            , Member (Resumable (BaseError (AddressError address value))) innerSig
-            , Member (Resumable (BaseError (UnspecializedError address value))) innerSig
-            , Member (State (Heap address address value)) innerSig
-            , Member (State (ScopeGraph address)) innerSig
             , Member (State (Heap address address value)) outerSig
             , Member (State (ScopeGraph address)) outerSig
-            , Member (Reader (CurrentFrame address)) innerSig
-            , Member (Reader (CurrentScope address)) innerSig
-            , Member (Resumable (BaseError (HeapError address))) innerSig
-            , Member (Resumable (BaseError (ScopeError address))) innerSig
-            , Member Trace innerSig
             , Ord address
-            , Show address
             )
-         => proxy lang
-         -> (  (Module (Either (proxy lang) term) -> Evaluator term address value inner value)
-            -> (Module (Either (proxy lang) term) -> Evaluator term address value (ModuleC address value outer) value))
-         -> (term -> Evaluator term address value (DomainC term address value inner) value)
+         => proxy (lang :: Language)
+         -> (Module (Either (proxy lang) term) -> Evaluator term address value (ModuleC address value outer) value)
          -> [Module term]
          -> Evaluator term address value outer (ModuleTable (Module (ModuleResult address value)))
-evaluate lang perModule runTerm modules = do
+evaluate lang runModule modules = do
   let prelude = Module moduleInfoFromCallStack (Left lang)
   ((preludeScopeAddress, preludeFrameAddress), _) <- evalModule Nothing Nothing prelude
   foldr (run preludeScopeAddress preludeFrameAddress . fmap Right) ask modules
@@ -103,7 +76,7 @@ evaluate lang perModule runTerm modules = do
                   . raiseHandler (runReader (CurrentScope scopeAddress))
                   . runReturn
                   . runLoopControl
-                  . perModule (runDomainEffects runTerm)
+                  . runModule
 
 runDomainEffects :: ( AbstractValue term address value (DomainC term address value m)
                     , Carrier sig m
