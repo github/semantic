@@ -103,7 +103,7 @@ evaluate lang perModule runTerm modules = do
                   . raiseHandler (runReader (CurrentScope scopeAddress))
                   . runReturn
                   . runLoopControl
-                  . perModule (runDomainEffects runTerm . moduleBody)
+                  . perModule (runDomainEffects runTerm)
 
 runDomainEffects :: ( AbstractValue term address value (DomainC term address value m)
                     , Carrier sig m
@@ -135,9 +135,9 @@ runDomainEffects :: ( AbstractValue term address value (DomainC term address val
                     , Show address
                     )
                  => (term -> Evaluator term address value (DomainC term address value m) value)
-                 -> Either (proxy lang) term
+                 -> Module (Either (proxy lang) term)
                  -> Evaluator term address value m value
-runDomainEffects runTerm = raiseHandler runInterpose . runBoolean . runWhile . runFunction runTerm . either ((unit <$) . definePrelude) runTerm
+runDomainEffects runTerm = raiseHandler runInterpose . runBoolean . runWhile . runFunction runTerm . either ((unit <$) . definePrelude) runTerm . moduleBody
 
 -- | Evaluate a term recursively, applying the passed function at every recursive position.
 --
