@@ -95,7 +95,7 @@ evaluate lang perModule runTerm modules = do
                 _ -> mempty
           scopeAddress <- newScope scopeEdges
           frameAddress <- newFrame scopeAddress frameLinks
-          val <- runInModule scopeAddress frameAddress (perModule (runValueEffects . moduleBody) m)
+          val <- runInModule scopeAddress frameAddress m
           pure ((scopeAddress, frameAddress), val)
           where runInModule scopeAddress frameAddress
                   = runDeref
@@ -103,6 +103,7 @@ evaluate lang perModule runTerm modules = do
                   . raiseHandler (runReader (CurrentScope scopeAddress))
                   . runReturn
                   . runLoopControl
+                  . perModule (runValueEffects . moduleBody)
 
         runValueEffects = raiseHandler runInterpose . runBoolean . runWhile . runFunction runTerm . either ((unit <$) . definePrelude) runTerm
 
