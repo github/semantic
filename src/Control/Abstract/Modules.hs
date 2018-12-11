@@ -110,13 +110,6 @@ askModuleTable :: (Member (Reader (ModuleTable (Module (ModuleResult address val
 askModuleTable = ask
 
 
-newtype Merging address value = Merging { runMerging :: ModuleResult address value }
-
-instance Semigroup (Merging address value) where
-  -- TODO: We may need to combine graphs
-  Merging ((_, _), _) <> Merging ((graph2, heap2), val) = Merging ((graph2, heap2), val)
-
-
 -- | An error thrown when loading a module from the list of provided modules. Indicates we weren't able to find a module with the given name.
 data LoadError address value resume where
   ModuleNotFoundError :: ModulePath -> LoadError address value (ModuleResult address value)
