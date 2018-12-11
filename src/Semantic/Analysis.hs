@@ -30,8 +30,9 @@ type DomainC term address value m
   = FunctionC term address value                                          (Eff
   ( WhileC value                                                          (Eff
   ( BooleanC value                                                        (Eff
+  ( UnitC value                                                           (Eff
   ( InterposeC (Resumable (BaseError (UnspecializedError address value))) (Eff
-    m)))))))
+    m)))))))))
 
 -- | Evaluate a list of modules with the prelude for the passed language available, and applying the passed function to every module.
 evaluate :: ( Carrier outerSig outer
@@ -80,8 +81,11 @@ evaluate lang runModule modules = do
 
 runDomainEffects :: ( AbstractValue term address value (DomainC term address value m)
                     , Carrier sig m
-                    , booleanC ~ BooleanC value (Eff (InterposeC (Resumable (BaseError (UnspecializedError address value))) (Eff m)))
-                    , booleanSig ~ (Boolean value :+: Interpose (Resumable (BaseError (UnspecializedError address value))) :+: sig)
+                    , unitC ~ UnitC value (Eff (InterposeC (Resumable (BaseError (UnspecializedError address value))) (Eff m)))
+                    , unitSig ~ (Unit value :+: Interpose (Resumable (BaseError (UnspecializedError address value))) :+: sig)
+                    , Carrier unitSig unitC
+                    , booleanC ~ BooleanC value (Eff unitC)
+                    , booleanSig ~ (Boolean value :+: unitSig)
                     , Carrier booleanSig booleanC
                     , whileC ~ WhileC value (Eff booleanC)
                     , whileSig ~ (While value :+: booleanSig)
@@ -110,7 +114,7 @@ runDomainEffects :: ( AbstractValue term address value (DomainC term address val
                  => (term -> Evaluator term address value (DomainC term address value m) value)
                  -> Module (Either (proxy lang) term)
                  -> Evaluator term address value m value
-runDomainEffects runTerm = raiseHandler runInterpose . runBoolean . runWhile . runFunction runTerm . either ((unit <$) . definePrelude) runTerm . moduleBody
+runDomainEffects runTerm = raiseHandler runInterpose . runUnit . runBoolean . runWhile . runFunction runTerm . either ((unit <*) . definePrelude) runTerm . moduleBody
 
 -- | Evaluate a term recursively, applying the passed function at every recursive position.
 --
@@ -141,6 +145,7 @@ evalTerm :: ( Carrier sig m
             , Member (Reader (CurrentFrame address)) sig
             , Member (Reader (CurrentScope address)) sig
             , Member (State Span) sig
+            , Member (Unit value) sig
             , Member (While value) sig
             , Member Fresh sig
             , Member Trace sig

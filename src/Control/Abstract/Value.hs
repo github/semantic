@@ -24,6 +24,7 @@ module Control.Abstract.Value
 , While(..)
 , runWhile
 , WhileC(..)
+, unit
 , Unit(..)
 , runUnit
 , UnitC(..)
@@ -189,6 +190,10 @@ runWhile = raiseHandler $ runWhileC . interpret
 newtype WhileC value m a = WhileC { runWhileC :: m a }
 
 
+-- | Construct an abstract unit value.
+unit :: (Carrier sig m, Member (Unit value) sig) => Evaluator term address value m value
+unit = send (Unit ret)
+
 data Unit value (m :: * -> *) k
   = Unit (value -> k)
   deriving (Functor)
@@ -207,11 +212,8 @@ runUnit :: Carrier (Unit value :+: sig) (UnitC value (Eff m))
         -> Evaluator term address value m a
 runUnit = raiseHandler $ runUnitC . interpret
 
-class Show value => AbstractIntro value where
-  -- | Construct an abstract unit value.
-  --   TODO: This might be the same as the empty tuple for some value types
-  unit :: value
 
+class Show value => AbstractIntro value where
   -- | Construct an abstract string value.
   string :: Text -> value
 

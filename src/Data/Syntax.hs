@@ -205,7 +205,7 @@ instance Ord1 Empty where liftCompare _ _ _ = EQ
 instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
 
 instance Evaluatable Empty where
-  eval _ _ _ = pure unit
+  eval _ _ _ = unit
 
 instance Tokenize Empty where
   tokenize = ignore

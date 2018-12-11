@@ -343,7 +343,7 @@ instance Ord1 Delete where liftCompare = genericLiftCompare
 instance Show1 Delete where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Delete where
-  eval _ ref (Delete a) = ref a >>= dealloc >> pure unit
+  eval _ ref (Delete a) = ref a >>= dealloc >> unit
 
 -- | A sequence expression such as Javascript or C's comma operator.
 data SequenceExpression a = SequenceExpression { firstExpression :: !a, secondExpression :: !a }
@@ -637,7 +637,7 @@ instance Evaluatable New where
         name <- maybeM (throwEvalError NoNameError) (declaredName subject)
         reference (Reference name) (Declaration name)
     -- TODO: Traverse subterms and instantiate frames from the corresponding scope
-    pure unit
+    unit
 
 -- | A cast expression to a specified type.
 data Cast a =  Cast { castSubject :: !a, castType :: !a }

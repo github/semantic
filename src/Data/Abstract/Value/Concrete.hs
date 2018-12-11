@@ -127,12 +127,10 @@ instance ( Member (Reader ModuleInfo) sig
     Abstract.AsBool other       k -> throwBaseError (BoolError other) >>= runBooleanC . k)
 
 
-instance forall sig m term address. ( Carrier sig m
+instance ( Carrier sig m
          , Member (Abstract.Boolean (Value term address)) sig
          , Member (Error (LoopControl (Value term address))) sig
          , Member (Interpose (Resumable (BaseError (UnspecializedError address (Value term address))))) sig
-         , Show address
-         , Show term
          )
       => Carrier (Abstract.While (Value term address) :+: sig) (WhileC (Value term address) (Eff m)) where
   ret = WhileC . ret
@@ -152,18 +150,25 @@ instance forall sig m term address. ( Carrier sig m
     where
       loop x = catchLoopControl (fix x) $ \case
         Break value -> pure value
-        Abort -> pure unit
+        Abort -> pure Unit
         -- FIXME: Figure out how to deal with this. Ruby treats this as the result
         -- of the current block iteration, while PHP specifies a breakout level
         -- and TypeScript appears to take a label.
         Continue _  -> loop x
 
 
+instance Carrier sig m
+      => Carrier (Abstract.Unit (Value term address) :+: sig) (UnitC (Value term address) m) where
+  ret = UnitC . ret
+  eff = UnitC . handleSum
+    (eff . handleCoercible)
+    (\ (Abstract.Unit k) -> runUnitC (k Unit))
+
+
 instance AbstractHole (Value term address) where
   hole = Hole
 
 instance (Show address, Show term) => AbstractIntro (Value term address) where
-  unit     = Unit
   integer  = Integer . Number.Integer
   string   = String
   float    = Float . Number.Decimal

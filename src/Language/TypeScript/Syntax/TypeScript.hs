@@ -48,7 +48,7 @@ instance Evaluatable Import where
       -- Create edges from the current scope/frame to the import scope/frame.
       insertImportEdge scopeAddress
       insertFrameLink ScopeGraph.Import (Map.singleton scopeAddress frameAddress)
-    pure unit
+    unit
 
 data QualifiedAliasedImport a = QualifiedAliasedImport { qualifiedAliasedImportAlias :: !a, qualifiedAliasedImportFrom :: ImportPath }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
@@ -72,7 +72,7 @@ instance Evaluatable QualifiedAliasedImport where
     aliasSlot <- lookupDeclaration (Declaration alias)
     assign aliasSlot =<< object aliasFrame
 
-    pure unit
+    unit
 
 
 newtype SideEffectImport a = SideEffectImport { sideEffectImportFrom :: ImportPath }
@@ -86,7 +86,7 @@ instance Evaluatable SideEffectImport where
   eval _ _ (SideEffectImport importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
     void $ require modulePath
-    pure unit
+    unit
 
 
 -- | Qualified Export declarations
@@ -109,7 +109,7 @@ instance Evaluatable QualifiedExport where
         reference (Reference aliasName) (Declaration aliasValue)
 
     -- Create an export edge from a new scope to the qualifed export's scope.
-    pure unit
+    unit
 
 data Alias = Alias { aliasValue :: Name, aliasName :: Name }
   deriving (Eq, Generic, Hashable, Ord, Show, Message, Named, ToJSON, NFData)
@@ -140,7 +140,7 @@ instance Evaluatable QualifiedExportFrom where
     insertExportEdge exportScope
     insertFrameLink ScopeGraph.Export (Map.singleton exportScope exportFrame)
 
-    pure unit
+    unit
 
 newtype DefaultExport a = DefaultExport { defaultExport :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
@@ -166,7 +166,7 @@ instance Evaluatable DefaultExport where
         insertExportEdge exportScope
         insertFrameLink ScopeGraph.Export (Map.singleton exportScope exportFrame)
       Nothing -> throwEvalError DefaultExportError
-    pure unit
+    unit
 
 
 -- | Lookup type for a type-level key in a typescript map.
@@ -340,7 +340,7 @@ instance Evaluatable TypeIdentifier where
   eval _ _ TypeIdentifier{..} = do
     -- Add a reference to the type identifier in the current scope.
     reference (Reference (Evaluatable.name contents)) (Declaration (Evaluatable.name contents))
-    pure unit
+    unit
 
 data NestedIdentifier a = NestedIdentifier { left :: !a, right :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
@@ -418,7 +418,7 @@ instance Evaluatable ExtendsClause where
   eval eval _ ExtendsClause{..} = do
     -- Evaluate subterms
     traverse_ eval extendsClauses
-    pure unit
+    unit
 
 newtype ArrayType a = ArrayType { arrayType :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
@@ -572,6 +572,7 @@ declareModule :: ( AbstractValue term address value m
                  , Member (Resumable (BaseError (AddressError address value))) sig
                  , Member (Resumable (BaseError (HeapError address))) sig
                  , Member (Resumable (BaseError (ScopeError address))) sig
+                 , Member (Unit value) sig
                  , Ord address
                  )
                 => (term -> Evaluator term address value m value)
@@ -584,7 +585,7 @@ declareModule eval identifier statements = do
     currentScope' <- currentScope
 
     let declaration = Declaration name
-        moduleBody = maybe (pure unit) (runApp . foldMap1 (App . eval)) (nonEmpty statements)
+        moduleBody = maybe unit (runApp . foldMap1 (App . eval)) (nonEmpty statements)
     maybeSlot <- maybeLookupDeclaration declaration
 
     case maybeSlot of
@@ -609,7 +610,7 @@ declareModule eval identifier statements = do
         moduleSlot <- lookupDeclaration (Declaration name)
         assign moduleSlot =<< klass (Declaration name) childFrame
 
-        pure unit
+        unit
 
 instance Evaluatable Module where
   eval eval _ Module{..} = declareModule eval moduleIdentifier moduleStatements
@@ -687,4 +688,4 @@ instance Evaluatable AbstractClass where
     classSlot <- lookupDeclaration (Declaration name)
     assign classSlot =<< klass (Declaration name) childFrame
 
-    pure unit
+    unit
