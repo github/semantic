@@ -24,7 +24,7 @@ type ModuleC address value m
   ( ReaderC ModuleInfo             (Eff
     m)))))))))))))
 
-type ValueC term address value m
+type DomainC term address value m
   = FunctionC term address value                                          (Eff
   ( WhileC value                                                          (Eff
   ( BooleanC value                                                        (Eff
@@ -32,7 +32,7 @@ type ValueC term address value m
     m)))))))
 
 -- | Evaluate a list of modules with the prelude for the passed language available, and applying the passed function to every module.
-evaluate :: ( AbstractValue term address value (ValueC term address value inner)
+evaluate :: ( AbstractValue term address value (DomainC term address value inner)
             , Carrier innerSig inner
             , Carrier outerSig outer
             , derefSig ~ (Deref value :+: allocatorSig)
@@ -76,7 +76,7 @@ evaluate :: ( AbstractValue term address value (ValueC term address value inner)
          => proxy lang
          -> (  (Module (Either (proxy lang) term) -> Evaluator term address value inner value)
             -> (Module (Either (proxy lang) term) -> Evaluator term address value (ModuleC address value outer) value))
-         -> (term -> Evaluator term address value (ValueC term address value inner) value)
+         -> (term -> Evaluator term address value (DomainC term address value inner) value)
          -> [Module term]
          -> Evaluator term address value outer (ModuleTable (Module (ModuleResult address value)))
 evaluate lang perModule runTerm modules = do
@@ -105,7 +105,7 @@ evaluate lang perModule runTerm modules = do
                   . runLoopControl
                   . perModule (runDomainEffects runTerm . moduleBody)
 
-runDomainEffects :: ( AbstractValue term address value (ValueC term address value m)
+runDomainEffects :: ( AbstractValue term address value (DomainC term address value m)
                     , Carrier sig m
                     , booleanC ~ BooleanC value (Eff (InterposeC (Resumable (BaseError (UnspecializedError address value))) (Eff m)))
                     , booleanSig ~ (Boolean value :+: Interpose (Resumable (BaseError (UnspecializedError address value))) :+: sig)
@@ -134,7 +134,7 @@ runDomainEffects :: ( AbstractValue term address value (ValueC term address valu
                     , Ord address
                     , Show address
                     )
-                 => (term -> Evaluator term address value (ValueC term address value m) value)
+                 => (term -> Evaluator term address value (DomainC term address value m) value)
                  -> Either (proxy lang) term
                  -> Evaluator term address value m value
 runDomainEffects runTerm = raiseHandler runInterpose . runBoolean . runWhile . runFunction runTerm . either ((unit <$) . definePrelude) runTerm
