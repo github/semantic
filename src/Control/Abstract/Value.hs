@@ -25,6 +25,7 @@ module Control.Abstract.Value
 , runWhile
 , WhileC(..)
 , Unit(..)
+, UnitC(..)
 ) where
 
 import Control.Abstract.Evaluator
@@ -198,6 +199,7 @@ instance HFunctor (Unit value) where
 instance Effect (Unit value) where
   handle state handler (Unit k) = Unit (handler . (<$ state) . k)
 
+newtype UnitC value m a = UnitC { runUnitC :: m a }
 
 class Show value => AbstractIntro value where
   -- | Construct an abstract unit value.
