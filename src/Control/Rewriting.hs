@@ -21,6 +21,7 @@ module Control.Rewriting
   , narrow
   , narrowF
   , enter
+  , create
   -- | Useful rewrites
   , mhead
   , mjust
@@ -41,6 +42,7 @@ import           Control.Arrow
 import           Control.Category
 import qualified Data.Functor.Foldable as Foldable
 
+import Data.History
 import Data.Sum
 import Data.Term
 
@@ -163,6 +165,9 @@ narrowF = do
   case project syn of
     Just fs -> pure (In ann fs)
     Nothing -> empty
+
+create :: (f :< fs, Apply Functor fs, term ~ Term (Sum fs) History) => f term -> Rule term
+create f = remark Refactored <$> (injectTerm <$> fmap annotation id <*> pure f)
 
 -- | Matches on the head of the input list. Fails if the list is empty.
 --

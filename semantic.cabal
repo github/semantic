@@ -328,7 +328,6 @@ test-suite test
                      , Analysis.TypeScript.Spec
                      , Assigning.Assignment.Spec
                      , Control.Abstract.Evaluator.Spec
-                     , Control.Rewriting.Spec
                      , Data.Abstract.Path.Spec
                      , Data.Abstract.Name.Spec
                      , Data.Diff.Spec
@@ -350,6 +349,7 @@ test-suite test
                      , Proto3.Roundtrip
                      , Reprinting.Spec
                      , Rewriting.Go.Spec
+                     , Rewriting.JSON.Spec
                      , Rewriting.Python.Spec                     
                      , Rendering.TOC.Spec
                      , Semantic.Spec
