@@ -74,7 +74,15 @@ instance ( Member (Abstract.Boolean Abstract) sig
     (eff . handleCoercible)
     (\ (Abstract.While cond body k) -> do
       cond' <- runWhileC cond
-      ifthenelse cond' (runWhileC body *> empty) (runWhileC (k unit)))
+      ifthenelse cond' (runWhileC body *> empty) (runWhileC (k Abstract)))
+
+
+instance Carrier sig m
+      => Carrier (Unit Abstract :+: sig) (UnitC Abstract m) where
+  ret = UnitC . ret
+  eff = UnitC . handleSum
+    (eff . handleCoercible)
+    (\ (Abstract.Unit k) -> runUnitC (k Abstract))
 
 
 instance Ord address => ValueRoots address Abstract where
@@ -84,7 +92,6 @@ instance AbstractHole Abstract where
   hole = Abstract
 
 instance AbstractIntro Abstract where
-  unit       = Abstract
   integer _  = Abstract
   string _   = Abstract
   float _    = Abstract

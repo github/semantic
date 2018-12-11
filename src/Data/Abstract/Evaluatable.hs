@@ -65,6 +65,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Member (Resumable (BaseError ResolutionError)) sig
           , Member (State (Heap address address value)) sig
           , Member Trace sig
+          , Member (Unit value) sig
           , Ord address
           , Show address
           )
@@ -121,6 +122,7 @@ class HasPrelude (language :: Language) where
                    , Member (Reader (CurrentFrame address)) sig
                    , Member (Reader (CurrentScope address)) sig
                    , Member Trace sig
+                   , Member (Unit value) sig
                    , Ord address
                    , Show address
                    )
@@ -305,4 +307,4 @@ instance (Evaluatable s, Show a) => Evaluatable (TermF s a) where
 --   3. Only the last statement’s return value is returned.
 instance Evaluatable [] where
   -- 'nonEmpty' and 'foldMap1' enable us to return the last statement’s result instead of 'unit' for non-empty lists.
-  eval eval _ = maybe (pure unit) (runApp . foldMap1 (App . eval)) . nonEmpty
+  eval eval _ = maybe unit (runApp . foldMap1 (App . eval)) . nonEmpty

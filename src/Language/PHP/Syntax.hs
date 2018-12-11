@@ -234,7 +234,7 @@ instance Evaluatable QualifiedName where
           deref address
       Nothing ->
         -- TODO: Throw an ReferenceError because we can't find the associated child scope for `obj`.
-        pure unit
+        unit
 
 newtype NamespaceName a = NamespaceName { names :: NonEmpty a }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1, NFData1)

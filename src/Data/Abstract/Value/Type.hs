@@ -316,14 +316,21 @@ instance ( Member (Abstract.Boolean Type) sig
     (eff . handleCoercible)
     (\ (Abstract.While cond body k) -> do
       cond' <- runWhileC cond
-      ifthenelse cond' (runWhileC body *> empty) (runWhileC (k unit)))
+      ifthenelse cond' (runWhileC body *> empty) (runWhileC (k Unit)))
+
+
+instance Carrier sig m
+      => Carrier (Abstract.Unit Type :+: sig) (UnitC Type m) where
+  ret = UnitC . ret
+  eff = UnitC . handleSum
+    (eff . handleCoercible)
+    (\ (Abstract.Unit k) -> runUnitC (k Unit))
 
 
 instance AbstractHole Type where
   hole = Hole
 
 instance AbstractIntro Type where
-  unit       = Unit
   integer _  = Int
   string _   = String
   float _    = Float
