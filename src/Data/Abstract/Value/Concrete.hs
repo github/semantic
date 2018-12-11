@@ -9,7 +9,7 @@ module Data.Abstract.Value.Concrete
 import Control.Abstract.ScopeGraph (Allocator, ScopeError)
 import Control.Abstract.Heap (scopeLookup)
 import qualified Control.Abstract as Abstract
-import Control.Abstract hiding (Boolean(..), Function(..), Unit(..), While(..))
+import Control.Abstract hiding (Boolean(..), Function(..), String(..), Unit(..), While(..))
 import Control.Effect.Carrier
 import Control.Effect.Interpose
 import Control.Effect.Sum
