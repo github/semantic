@@ -1,5 +1,11 @@
 {-# LANGUAGE GADTs, TypeOperators #-}
 
+-- | This module provides 'Rewrite', a monadic DSL that abstracts the
+-- details of rewriting a given datum into another type, supporting
+-- failure and retries. A set of /strategic combinators/, as described
+-- in Lämmel et al.'s /The Essence of Strategic Programming/, is
+-- provided to promote single-layer rewrites into top-down or
+-- bottom-up tree transformations.
 module Control.Rewriting
   ( -- | Core types
     Rewrite
@@ -46,16 +52,10 @@ import Data.History
 import Data.Sum
 import Data.Term
 
--- | A @Rewrite t a@ is a parser over some 'Recursive' and
---   'Corecursive' type @t@, yielding values of type @a@.
---
--- Matching operations are implicitly recursive: when you run a
--- 'Rewrite', it is applied bottom-up. If a matching operation
--- returns a value, it is assumed to have succeeded. You use the
--- 'guard', 'narrow', and 'ensure' functions to control whether a
--- given datum is matched. The @t@ datum matched by a matcher is
--- immutable; if you need to modify values during a match operation,
--- consider using Control.Rewriting.
+-- | The fundamental type of rewriting rules. A @Rewrite t a@ maps
+-- values of type @t@ to values of type @a@, supporting failure and choice.
+-- If you need to layer monadic effects on top of a 'Rewrite', use a 'Lift'
+-- effect.
 data Rewrite t a where
   -- TODO: Choice is inflexible and slow. A Sum over fs can be queried for its index, and we can build a jump table over that.
   -- We can copy NonDet to have fair conjunction or disjunction.
@@ -69,7 +69,7 @@ data Rewrite t a where
   Pure   :: a -> Rewrite t a
   Then   :: Rewrite t b -> (b -> Rewrite t a) -> Rewrite t a
 
--- | A rewriter is a matcher that doesn't vary in its input and output types.
+-- | A 'Rule' is a 'Rewrite' with identical input and output types.
 type Rule t = Rewrite t t
 
 instance Functor (Rewrite t) where
@@ -101,8 +101,9 @@ instance Arrow Rewrite where
 target :: Rewrite t t
 target = id
 
--- | 'ensure' succeeds iff the provided predicate function returns true when applied to the matcher's 'target'.
--- If it succeeds, it returns the matcher's 'target'.
+-- | 'ensure' succeeds iff the provided predicate function returns
+-- true when applied to the rewrite's 'target'. If it succeeds, it
+-- returns the target.
 ensure :: (t -> Bool) -> Rewrite t t
 ensure f = target >>= \c -> c <$ guard (f c)
 
@@ -110,16 +111,16 @@ ensure f = target >>= \c -> c <$ guard (f c)
 purely :: (a -> b) -> Rewrite a b
 purely = arr
 
--- | 'refine' takes a modification function and a new matcher action
--- the target parameter of which is the result of the modification
+-- | 'refine' takes a modification function and a new 'Rewrite', the
+-- input parameter of which is the result of the modification
 -- function. If the modification function returns 'Just' when applied
--- to the current 'target', the given matcher is executed with the
--- result of that 'Just' as the new target; if 'Nothing' is returned,
--- the action fails.
+-- to the current 'target', the given rewrite action is executed with
+-- the result of that 'Just' as the new target; if 'Nothing' is
+-- returned, the action fails.
 --
--- This is the lowest-level combinator for applying a predicate function
--- to a matcher. In practice, you'll generally use the 'enter' and 'narrow'
--- combinators to iterate on recursive 'Term' values.
+-- This is a low-level combinator useful for matching over
+-- non-recursive types. When dealing with recursive types such as
+-- 'Term', you'll generally use the 'enter' and 'narrow' combinators.
 refine :: (t -> Maybe u) -> Rewrite u a -> Rewrite t a
 refine = Match
 
@@ -133,20 +134,20 @@ infixr 1 >+>
 (>+>) :: Rule t -> Rule t -> Rule t
 a >+> b = (a >>> b) <|> a <|> b
 
+-- | Attempt to run a rule, falling back on the identity rule if it fails.
 try :: Rule a -> Rule a
 try a = a <|> id
 
-
 -- | The 'enter' combinator is the primary interface for creating
--- matchers that 'project' their internal 'Term' values into some
+-- rewrites that 'project' internal 'Term' values into some
 -- constituent type. Given a function from a constituent type @f@
--- @need p@ succeeds if the provided term can be projected into
--- an @f@, then applies the @p@ function.
+-- @need p@ succeeds if the provided term can be projected into an
+-- @f@, then applies the @p@ function.
 enter :: ( f :< fs
-         , term ~ Term (Sum fs) ann
-         )
-     => (f term -> b)
-     -> Rewrite term b
+        , term ~ Term (Sum fs) ann
+        )
+      => (f term -> b)
+      -> Rewrite term b
 enter f = Match (fmap f . projectTerm) target
 
 -- | 'narrow' projects the given 'Term' of 'Sum's into a constituent member
@@ -166,22 +167,24 @@ narrowF = do
     Just fs -> pure (In ann fs)
     Nothing -> empty
 
+-- | Packs a 'Term'-containing 'Functor' into a 'Sum' of terms, then marks
+-- the resulting term as 'Refactored'.
 create :: (f :< fs, Apply Functor fs, term ~ Term (Sum fs) History) => f term -> Rule term
 create f = remark Refactored <$> (injectTerm <$> fmap annotation id <*> pure f)
 
--- | Matches on the head of the input list. Fails if the list is empty.
+-- | Matches the head of the input list. Fails if the list is empty.
 --
 -- @mhead = only listToMaybe@
 mhead :: Rewrite [a] a
 mhead = only listToMaybe
 
--- | Matches on 'Just' values.
+-- | Matches 'Just' values.
 --
 -- @mjust = only id@
 mjust :: Rewrite (Maybe a) a
 mjust = only id
 
--- | Run one step of a 'Rewrite' computation. Look at 'rewriteRecursively' if you want something
+-- | Run one step of a 'Rewrite' computation. Look at 'recursively' if you want something
 -- that folds over subterms.
 rewrite :: (Alternative m, Monad m) => t -> Rewrite t a -> m a
 rewrite t (Choice a b) = rewrite t a <|> rewrite t b
