@@ -103,9 +103,9 @@ evaluate lang perModule runTerm modules = do
                   . raiseHandler (runReader (CurrentScope scopeAddress))
                   . runReturn
                   . runLoopControl
-                  . perModule (runValueEffects . moduleBody)
+                  . perModule (runDomainEffects . moduleBody)
 
-        runValueEffects = raiseHandler runInterpose . runBoolean . runWhile . runFunction runTerm . either ((unit <$) . definePrelude) runTerm
+        runDomainEffects = raiseHandler runInterpose . runBoolean . runWhile . runFunction runTerm . either ((unit <$) . definePrelude) runTerm
 
 -- | Evaluate a term recursively, applying the passed function at every recursive position.
 --
