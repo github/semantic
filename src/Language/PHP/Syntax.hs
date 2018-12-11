@@ -57,13 +57,11 @@ resolvePHPName n = do
 
 include :: ( AbstractValue term address value m
            , Carrier sig m
-           , Member (Deref value) sig
            , Member (Modules address value) sig
            , Member (Reader (CurrentFrame address)) sig
            , Member (Reader (CurrentScope address)) sig
            , Member (Reader ModuleInfo) sig
            , Member (Reader Span) sig
-           , Member (Resumable (BaseError (AddressError address value))) sig
            , Member (Resumable (BaseError (HeapError address))) sig
            , Member (State (ScopeGraph address)) sig
            , Member (Resumable (BaseError ResolutionError)) sig
@@ -71,12 +69,12 @@ include :: ( AbstractValue term address value m
            , Member Trace sig
            , Ord address
            )
-        => (term -> Evaluator term address value m (ValueRef address value))
+        => (term -> Evaluator term address value m value)
         -> term
         -> (ModulePath -> Evaluator term address value m (ModuleResult address value))
-        -> Evaluator term address value m (ValueRef address value)
+        -> Evaluator term address value m value
 include eval pathTerm f = do
-  name <- eval pathTerm >>= Abstract.value >>= asString
+  name <- eval pathTerm >>= asString
   path <- resolvePHPName name
   traceResolve name path
   ((moduleScope, moduleFrame), v) <- f path
@@ -92,7 +90,7 @@ instance Ord1 Require where liftCompare    = genericLiftCompare
 instance Show1 Require where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Require where
-  eval eval (Require path) = include eval path load
+  eval eval _ (Require path) = include eval path load
 
 
 newtype RequireOnce a = RequireOnce { value :: a }
@@ -103,7 +101,7 @@ instance Ord1 RequireOnce where liftCompare = genericLiftCompare
 instance Show1 RequireOnce where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable RequireOnce where
-  eval eval (RequireOnce path) = include eval path require
+  eval eval _ (RequireOnce path) = include eval path require
 
 
 newtype Include a = Include { value :: a }
@@ -114,7 +112,7 @@ instance Ord1 Include where liftCompare    = genericLiftCompare
 instance Show1 Include where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Include where
-  eval eval (Include path) = include eval path load
+  eval eval _ (Include path) = include eval path load
 
 
 newtype IncludeOnce a = IncludeOnce { value :: a }
@@ -125,7 +123,7 @@ instance Ord1 IncludeOnce where liftCompare    = genericLiftCompare
 instance Show1 IncludeOnce where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable IncludeOnce where
-  eval eval (IncludeOnce path) = include eval path require
+  eval eval _ (IncludeOnce path) = include eval path require
 
 
 newtype ArrayElement a = ArrayElement { value :: a }
@@ -219,7 +217,7 @@ instance Ord1 QualifiedName where liftCompare = genericLiftCompare
 instance Show1 QualifiedName where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedName where
-  eval _ (QualifiedName obj iden) = do
+  eval _ _ (QualifiedName obj iden) = do
     name <- maybeM (throwEvalError $ NoNameError obj) (declaredName obj)
     reference (Reference name) (Declaration name)
     childScope <- associatedScope (Declaration name)
@@ -233,10 +231,10 @@ instance Evaluatable QualifiedName where
         withScopeAndFrame frameAddress $ do
           reference (Reference propName) (Declaration propName)
           address <- lookupDeclaration (Declaration propName)
-          pure $! LvalMember address
+          deref address
       Nothing ->
         -- TODO: Throw an ReferenceError because we can't find the associated child scope for `obj`.
-        rvalBox unit
+        pure unit
 
 newtype NamespaceName a = NamespaceName { names :: NonEmpty a }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1, NFData1)

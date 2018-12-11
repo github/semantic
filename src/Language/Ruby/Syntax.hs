@@ -70,21 +70,20 @@ instance Ord1 Send where liftCompare = genericLiftCompare
 instance Show1 Send where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Send where
-  eval eval Send{..} = do
+  eval eval _ Send{..} = do
     sel <- case sendSelector of
              Just sel -> maybeM (throwEvalError $ NoNameError sel) (declaredName sel)
              Nothing  ->
                pure (Name.name "call")
 
-    let self = LvalMember <$> lookupDeclaration (Declaration $ Name.name "__self")
-    recv <- maybe self eval sendReceiver
-    lhsValue <- Abstract.value recv
+    let self = lookupDeclaration (Declaration $ Name.name "__self") >>= deref
+    lhsValue <- maybe self eval sendReceiver
     lhsFrame <- Abstract.scopedEnvironment lhsValue
 
     let callFunction = do
           reference (Reference sel) (Declaration sel)
           func <- deref =<< lookupDeclaration (Declaration sel)
-          args <- traverse (eval >=> Abstract.value) sendArgs
+          args <- traverse eval sendArgs
           call func (lhsValue : args) -- TODO pass through sendBlock
     maybe callFunction (`withScopeAndFrame` callFunction) lhsFrame
 
@@ -103,14 +102,14 @@ instance Ord1 Require where liftCompare = genericLiftCompare
 instance Show1 Require where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Require where
-  eval eval (Require _ x) = do
-    name <- eval x >>= value >>= asString
+  eval eval _ (Require _ x) = do
+    name <- eval x >>= asString
     path <- resolveRubyName name
     traceResolve name path
     ((moduleScope, moduleFrame), v) <- doRequire path
     insertImportEdge moduleScope
     insertFrameLink ScopeGraph.Import (Map.singleton moduleScope moduleFrame)
-    rvalBox v -- Returns True if the file was loaded, False if it was already loaded. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-require
+    pure v -- Returns True if the file was loaded, False if it was already loaded. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-require
 
 instance Tokenize Require where
   tokenize Require{..} = do
@@ -145,13 +144,13 @@ instance Tokenize Load where
     within' Scope.Params $ loadPath *> fromMaybe (pure ()) loadWrap
 
 instance Evaluatable Load where
-  eval eval (Load x Nothing) = do
-    path <- eval x >>= value >>= asString
-    rvalBox =<< doLoad path False
-  eval eval (Load x (Just wrap)) = do
-    path <- eval x >>= value >>= asString
-    shouldWrap <- eval wrap >>= value >>= asBool
-    rvalBox =<< doLoad path shouldWrap
+  eval eval _ (Load x Nothing) = do
+    path <- eval x >>= asString
+    doLoad path False
+  eval eval _ (Load x (Just wrap)) = do
+    path <- eval x >>= asString
+    shouldWrap <- eval wrap >>= asBool
+    doLoad path shouldWrap
 
 doLoad :: ( Member (Boolean value) sig
           , Member (Modules address value) sig
@@ -192,7 +191,7 @@ instance Ord1 Class where liftCompare = genericLiftCompare
 instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Class where
-  eval eval Class{..} = do
+  eval eval _ Class{..} = do
     name <- maybeM (throwEvalError $ NoNameError classIdentifier) (declaredName classIdentifier)
     span <- ask @Span
     currentScope' <- currentScope
@@ -233,7 +232,7 @@ instance Evaluatable Class where
         classSlot <- lookupDeclaration (Declaration name)
         assign classSlot =<< klass (Declaration name) childFrame
 
-        rvalBox unit
+        pure unit
 
 instance Declarations1 Class where
   liftDeclaredName declaredName = declaredName . classIdentifier
@@ -255,13 +254,13 @@ instance Ord1 Module where liftCompare = genericLiftCompare
 instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Module where
-  eval eval Module{..} =  do
+  eval eval _ Module{..} =  do
     name <- maybeM (throwEvalError $ NoNameError moduleIdentifier) (declaredName moduleIdentifier)
     span <- ask @Span
     currentScope' <- currentScope
 
     let declaration = Declaration name
-        moduleBody = maybe (rvalBox unit) (runApp . foldMap1 (App . eval)) (nonEmpty moduleStatements)
+        moduleBody = maybe (pure unit) (runApp . foldMap1 (App . eval)) (nonEmpty moduleStatements)
     maybeSlot <- maybeLookupDeclaration declaration
 
     case maybeSlot of
@@ -286,7 +285,7 @@ instance Evaluatable Module where
         moduleSlot <- lookupDeclaration (Declaration name)
         assign moduleSlot =<< klass (Declaration name) childFrame
 
-        rvalBox unit
+        pure unit
 
 instance Declarations1 Module where
   liftDeclaredName declaredName = declaredName . moduleIdentifier
@@ -303,7 +302,7 @@ data LowPrecedenceAnd a = LowPrecedenceAnd { lhs :: a, rhs :: a }
 
 instance Evaluatable LowPrecedenceAnd where
   -- N.B. we have to use Monad rather than Applicative/Traversable on 'And' and 'Or' so that we don't evaluate both operands
-  eval eval t = rvalBox =<< go (fmap (eval >=> value) t) where
+  eval eval _ t = go (fmap eval t) where
     go (LowPrecedenceAnd a b) = do
       cond <- a
       ifthenelse cond b (pure cond)
@@ -324,7 +323,7 @@ data LowPrecedenceOr a = LowPrecedenceOr { lhs :: a, rhs :: a }
 
 instance Evaluatable LowPrecedenceOr where
   -- N.B. we have to use Monad rather than Applicative/Traversable on 'And' and 'Or' so that we don't evaluate both operands
-  eval eval t = rvalBox =<< go (fmap (eval >=> value) t) where
+  eval eval _ t = go (fmap eval t) where
     go (LowPrecedenceOr a b) = do
       cond <- a
       ifthenelse cond (pure cond) b
@@ -347,32 +346,44 @@ instance Ord1 Assignment where liftCompare = genericLiftCompare
 instance Show1 Assignment where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Assignment where
-  eval eval Assignment{..} = do
+  eval eval ref Assignment{..} = do
     lhsName <- maybeM (throwEvalError $ NoNameError assignmentTarget) (declaredName assignmentTarget)
     maybeSlot <- maybeLookupDeclaration (Declaration lhsName)
     assignmentSpan <- ask @Span
     maybe (declare (Declaration lhsName) assignmentSpan Nothing) (const (pure ())) maybeSlot
 
-    lhs <- eval assignmentTarget
+    lhs <- ref assignmentTarget
     rhs <- eval assignmentValue
 
-    case lhs of
-      Rval val -> throwEvalError (DerefError val)
-      LvalMember lhsSlot -> do
-        case declaredName assignmentValue of
-          Just rhsName -> do
-            assocScope <- associatedScope (Declaration rhsName)
-            case assocScope of
-              Just assocScope' -> do
-                objectScope <- newScope (Map.singleton Import [ assocScope' ])
-                putSlotDeclarationScope lhsSlot (Just objectScope) -- TODO: not sure if this is right
-              Nothing ->
-                pure ()
+    case declaredName assignmentValue of
+      Just rhsName -> do
+        assocScope <- associatedScope (Declaration rhsName)
+        case assocScope of
+          Just assocScope' -> do
+            objectScope <- newScope (Map.singleton Import [ assocScope' ])
+            putSlotDeclarationScope lhs (Just objectScope) -- TODO: not sure if this is right
           Nothing ->
             pure ()
-        assign lhsSlot =<< Abstract.value rhs
-        pure (LvalMember lhsSlot)
+      Nothing ->
+        pure ()
+    assign lhs rhs
+    pure rhs
 
 instance Tokenize Assignment where
   -- Should we be using 'assignmentContext' in here?
   tokenize Assignment{..} = assignmentTarget *> yield Token.Assign <* assignmentValue
+
+-- | A call to @super@ without parentheses in Ruby is known as "zsuper", which has
+-- the semantics of invoking @super()@ but implicitly passing the current function's
+-- arguments to the @super()@ invocation.
+data ZSuper a = ZSuper
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+
+instance Evaluatable ZSuper
+
+instance Eq1 ZSuper where liftEq = genericLiftEq
+instance Ord1 ZSuper where liftCompare = genericLiftCompare
+instance Show1 ZSuper where liftShowsPrec = genericLiftShowsPrec
+
+instance Tokenize ZSuper where
+  tokenize _ = yield $ Run "super"

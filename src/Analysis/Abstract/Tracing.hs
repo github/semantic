@@ -17,8 +17,8 @@ tracingTerms :: ( Member (State (Heap address address value)) sig
                 , Reducer (Configuration term address value) (trace (Configuration term address value))
                 )
              => trace (Configuration term address value)
-             -> Open (Open (term -> Evaluator term address value m a))
-tracingTerms proxy recur0 recur term = getConfiguration term >>= trace . (`asTypeOf` proxy) . Reducer.unit >> recur0 recur term
+             -> Open (term -> Evaluator term address value m a)
+tracingTerms proxy recur term = getConfiguration term >>= trace . (`asTypeOf` proxy) . Reducer.unit >> recur term
 
 trace :: (Member (Writer (trace (Configuration term address value))) sig, Carrier sig m) => trace (Configuration term address value) -> Evaluator term address value m ()
 trace = tell
@@ -35,7 +35,7 @@ getConfiguration term = Configuration term <$>  getHeap
 
 -- | A single point in a program’s execution.
 data Configuration term address value = Configuration
-  { configurationTerm :: term                -- ^ The “instruction,” i.e. the current term to evaluate.
-  , configurationHeap :: Heap address address value  -- ^ The heap of values.
+  { configurationTerm :: term                       -- ^ The “instruction,” i.e. the current term to evaluate.
+  , configurationHeap :: Heap address address value -- ^ The heap of values.
   }
   deriving (Eq, Ord, Show)

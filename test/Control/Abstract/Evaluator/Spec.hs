@@ -3,7 +3,7 @@ module Control.Abstract.Evaluator.Spec
 ( spec
 ) where
 
-import           Control.Abstract
+import           Control.Abstract as Abstract
 import qualified Control.Abstract.Heap as Heap
 import           Data.Abstract.Address.Precise as Precise
 import           Data.Abstract.BaseError
@@ -12,7 +12,6 @@ import           Data.Abstract.FreeVariables
 import           Data.Abstract.Module
 import qualified Data.Abstract.Number as Number
 import           Data.Abstract.Package
-import           Data.Abstract.Ref
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.Abstract.Value.Concrete as Value
 import           Data.Algebra
@@ -27,25 +26,23 @@ import           System.IO.Unsafe (unsafePerformIO)
 spec :: Spec
 spec = parallel $ do
   it "constructs integers" $ do
-    (_, (_, (_, expected))) <- evaluate (rvalBox (integer 123))
-    expected `shouldBe` Right (Rval (Value.Integer (Number.Integer 123)))
+    (_, (_, (_, expected))) <- evaluate (pure (integer 123))
+    expected `shouldBe` Right (Value.Integer (Number.Integer 123))
 
   it "calls functions" $ do
-    (_, (_, (_, expected))) <- evaluate $
-      rvalBox <=< value <=< withLexicalScopeAndFrame $ do
-        currentScope' <- currentScope
-        let lexicalEdges = Map.singleton Lexical [ currentScope' ]
-            x =  SpecHelpers.name "x"
-        associatedScope <- newScope lexicalEdges
-        declare (ScopeGraph.Declaration "identity") emptySpan (Just associatedScope)
-        withScope associatedScope $ do
-          declare (Declaration x) emptySpan Nothing
-        valueRef <- function "identity" [ x ]
-          (SpecEff (LvalMember <$> Heap.lookupDeclaration (ScopeGraph.Declaration (SpecHelpers.name "x")))) associatedScope
-        identity <- value valueRef
-        val <- pure (integer 123)
-        call identity [val]
-    expected `shouldBe` Right (Rval $ integer 123)
+    (_, (_, (_, expected))) <- evaluate . withLexicalScopeAndFrame $ do
+      currentScope' <- currentScope
+      let lexicalEdges = Map.singleton Lexical [ currentScope' ]
+          x =  SpecHelpers.name "x"
+      associatedScope <- newScope lexicalEdges
+      declare (ScopeGraph.Declaration "identity") emptySpan (Just associatedScope)
+      withScope associatedScope $ do
+        declare (Declaration x) emptySpan Nothing
+      identity <- function "identity" [ x ]
+        (SpecEff (Heap.lookupDeclaration (ScopeGraph.Declaration (SpecHelpers.name "x")) >>= deref)) associatedScope
+      val <- pure (integer 123)
+      call identity [val]
+    expected `shouldBe` Right (integer 123)
 
 evaluate
   = runM
@@ -88,8 +85,8 @@ type Val = Value SpecEff Precise
 newtype SpecEff = SpecEff
   { runSpecEff :: Evaluator SpecEff Precise Val (FunctionC SpecEff Precise Val
                  (Eff (BooleanC Val
-                 (Eff (ErrorC (LoopControl Precise Val)
-                 (Eff (ErrorC (Return Precise Val)
+                 (Eff (ErrorC (LoopControl Val)
+                 (Eff (ErrorC (Return Val)
                  (Eff (AllocatorC Precise
                  (Eff (DerefC Precise Val
                  (Eff (ResumableC (BaseError (EvalError Precise Val))
@@ -109,7 +106,7 @@ newtype SpecEff = SpecEff
                  (Eff (StateC (ScopeGraph Precise)
                  (Eff (TraceByIgnoringC
                  (Eff (LiftC IO)))))))))))))))))))))))))))))))))))))))))))))
-                 (ValueRef Precise Val)
+                 Val
   }
 
 instance Eq SpecEff where _ == _ = True
@@ -118,6 +115,6 @@ instance FreeVariables SpecEff where freeVariables _ = lowerBound
 
 instance Declarations SpecEff where
   declaredName eff =
-    case unsafePerformIO (evaluate $ runSpecEff eff) of
-      (_, (_, (_, Right (Rval (Value.Symbol text))))) -> Just (SpecHelpers.name text)
-      _                                               -> error "declaredName for SpecEff should return an RVal"
+    case unsafePerformIO (evaluate (runSpecEff eff)) of
+      (_, (_, (_, Right (Value.Symbol text)))) -> Just (SpecHelpers.name text)
+      _                                        -> error "declaredName for SpecEff should return an RVal"

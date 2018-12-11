@@ -256,5 +256,5 @@ newtype Declaration = Declaration { unDeclaration :: Name }
 
 -- | The type of edge from a scope to its parent scopes.
 -- Either a lexical edge or an import edge in the case of non-lexical edges.
-data EdgeLabel = Lexical | Import | Export | Superclass
+data EdgeLabel = Lexical | Import | Export | Superclass | InstanceOf
   deriving (Eq, Ord, Show, Generic, NFData)
