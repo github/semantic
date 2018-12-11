@@ -186,6 +186,18 @@ runWhile = raiseHandler $ runWhileC . interpret
 newtype WhileC value m a = WhileC { runWhileC :: m a }
 
 
+data Unit value (m :: * -> *) k
+  = Unit (value -> k)
+  deriving (Functor)
+
+instance HFunctor (Unit value) where
+  hmap _ = coerce
+  {-# INLINE hmap #-}
+
+instance Effect (Unit value) where
+  handle state handler (Unit k) = Unit (handler . (<$ state) . k)
+
+
 class Show value => AbstractIntro value where
   -- | Construct an abstract unit value.
   --   TODO: This might be the same as the empty tuple for some value types
