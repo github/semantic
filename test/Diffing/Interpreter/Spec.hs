@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds #-}
-module Diffing.Interpreter.Spec where
+module Diffing.Interpreter.Spec (spec, afterTerm, beforeTerm) where
 
 import Control.Applicative ((<|>))
 import Data.Diff
@@ -7,7 +7,6 @@ import Data.Foldable (asum)
 import Data.Functor.Foldable (cata)
 import Data.Functor.Listable
 import Data.Maybe
-import Data.Location
 import Data.Mergeable
 import Data.Patch (after, before)
 import Data.Sum
@@ -19,7 +18,7 @@ import Test.Hspec (Spec, describe, it, parallel)
 import Test.Hspec.Expectations.Pretty
 import Test.Hspec.LeanCheck
 import Test.LeanCheck.Core
-import SpecHelpers
+import SpecHelpers ()
 
 spec :: Spec
 spec = parallel $ do

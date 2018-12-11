@@ -3,7 +3,7 @@
 module Data.Syntax where
 
 import Data.Abstract.Evaluatable hiding (Empty, Error)
-import Data.Aeson (ToJSON(..), object)
+import Data.Aeson as Aeson (ToJSON(..), object)
 import Data.Char (toLower)
 import Data.JSON.Fields
 import Data.Range
@@ -25,6 +25,8 @@ import Proto3.Wire.Types
 import qualified Proto3.Suite.DotProto as Proto
 import qualified Proto3.Wire.Encode as Encode
 import qualified Proto3.Wire.Decode as Decode
+import Control.Abstract.ScopeGraph (reference, Reference(..), Declaration(..))
+import Control.Abstract.Heap (deref, lookupDeclaration)
 
 -- Combinators
 
@@ -163,7 +165,12 @@ instance Ord1 Identifier where liftCompare = genericLiftCompare
 instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Identifier where
-  eval _ (Identifier name) = pure (LvalLocal name)
+  eval eval ref' = ref eval ref' >=> deref
+
+  ref _ _ (Identifier name) = do
+    reference (Reference name) (Declaration name)
+    lookupDeclaration (Declaration name)
+
 
 instance Tokenize Identifier where
   tokenize = yield . Token.Run . formatName . Data.Syntax.name
@@ -198,7 +205,7 @@ instance Ord1 Empty where liftCompare _ _ _ = EQ
 instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
 
 instance Evaluatable Empty where
-  eval _ _ = rvalBox unit
+  eval _ _ _ = pure unit
 
 instance Tokenize Empty where
   tokenize = ignore
@@ -263,7 +270,7 @@ instance HasDefault SrcLoc where
 
 instance ToJSON ErrorStack where
   toJSON (ErrorStack es) = toJSON (jSite <$> es) where
-    jSite (ErrorSite site SrcLoc{..}) = object
+    jSite (ErrorSite site SrcLoc{..}) = Aeson.object
       [ "site" .= site
       , "package" .= srcLocPackage
       , "module" .= srcLocModule
@@ -304,7 +311,7 @@ instance Ord1 Context where liftCompare = genericLiftCompare
 instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Context where
-  eval eval Context{..} = eval contextSubject
+  eval eval _ Context{..} = eval contextSubject
 
 instance Tokenize Context where
   tokenize Context{..} = sequenceA_ (sepTrailing contextTerms) *> contextSubject

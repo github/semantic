@@ -204,6 +204,7 @@ type Syntax = '[
   , TypeScript.Syntax.QualifiedExportFrom
   , TypeScript.Syntax.JavaScriptRequire
   , []
+  , Statement.StatementBlock
   ]
 
 type Term = Term.Term (Sum Syntax) Location
@@ -618,8 +619,11 @@ tupleType = makeTerm <$> symbol TupleType <*> children (TypeScript.Syntax.Tuple 
 constructorTy :: Assignment Term
 constructorTy = makeTerm <$> symbol ConstructorType <*> children (TypeScript.Syntax.Constructor <$> (fromMaybe <$> emptyTerm <*> optional (term typeParameters)) <*> formalParameters <*> term ty)
 
+statementTerm :: Assignment Term
+statementTerm = makeTerm <$> symbol StatementBlock <*> children (Statement.Statements <$> manyTerm statement)
+
 statementBlock :: Assignment Term
-statementBlock = makeTerm <$> symbol StatementBlock <*> children (Statement.Statements <$> manyTerm statement)
+statementBlock = makeTerm <$> symbol StatementBlock <*> children (Statement.StatementBlock <$> manyTerm statement)
 
 classBodyStatements :: Assignment Term
 classBodyStatements = makeTerm'' <$> symbol ClassBody <*> children (contextualize' <$> Assignment.manyThrough comment (postContextualize' <$> (concat <$> many ((\as b -> as <> [b]) <$> manyTerm decorator <*> term (methodDefinition <|> publicFieldDefinition <|> methodSignature <|> indexSignature <|> abstractMethodSignature))) <*> many comment))
@@ -645,7 +649,7 @@ statement = handleError everything
       , debuggerStatement
       , expressionStatement'
       , declaration
-      , statementBlock
+      , statementTerm
       , ifStatement
       , switchStatement
       , forStatement
@@ -813,7 +817,7 @@ requiredParameter = makeRequiredParameter
                              <*> (term typeAnnotation' <|> emptyTerm)
                              <*> (term expression <|> emptyTerm))
   where
-    makeRequiredParameter loc (modifier, readonly, identifier, annotation, initializer) = makeTerm loc (TypeScript.Syntax.RequiredParameter [modifier, readonly, annotation] (makeTerm loc (Statement.Assignment [] identifier initializer)))
+    makeRequiredParameter loc (modifier, readonly, identifier, annotation, initializer) = makeTerm loc (TypeScript.Syntax.RequiredParameter [modifier, readonly, annotation] identifier initializer)
 
 restParameter :: Assignment Term
 restParameter = makeRestParameter <$> symbol Grammar.RestParameter <*> children ((,) <$> term identifier <*> (term typeAnnotation' <|> emptyTerm))
@@ -888,11 +892,11 @@ callExpression = makeCall <$> (symbol CallExpression <|> symbol CallExpression')
         typeArguments = symbol Grammar.TypeArguments *> children (some (term ty))
 
 tryStatement :: Assignment Term
-tryStatement = makeTry <$> symbol TryStatement <*> children ((,,) <$> term statementBlock <*> optional (term catchClause) <*> optional (term finallyClause))
+tryStatement = makeTry <$> symbol TryStatement <*> children ((,,) <$> term statementTerm <*> optional (term catchClause) <*> optional (term finallyClause))
   where
     makeTry loc (statementBlock', catch, finally) = makeTerm loc (Statement.Try statementBlock' (catMaybes [catch, finally]))
-    catchClause = makeTerm <$> symbol CatchClause <*> children (Statement.Catch <$> (identifier <|> emptyTerm) <*> statementBlock)
-    finallyClause = makeTerm <$> symbol FinallyClause <*> children (Statement.Finally <$> statementBlock)
+    catchClause = makeTerm <$> symbol CatchClause <*> children (Statement.Catch <$> (identifier <|> emptyTerm) <*> statementTerm)
+    finallyClause = makeTerm <$> symbol FinallyClause <*> children (Statement.Finally <$> statementTerm)
 
 binaryExpression  :: Assignment Term
 binaryExpression = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm expression (term expression)

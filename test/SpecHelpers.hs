@@ -8,29 +8,32 @@ module SpecHelpers
 , parseTestFile
 , readFilePair
 , testEvaluating
-, deNamespace
-, derefQName
 , verbatim
 , Verbatim(..)
 , toList
 , Config
 , LogQueue
 , StatQueue
+, lookupDeclaration
+, lookupMembers
+, EdgeLabel(..)
 ) where
 
-import Control.Abstract
+import Control.Abstract hiding (lookupDeclaration)
+import Data.Abstract.ScopeGraph (EdgeLabel(..))
+import qualified Data.Abstract.ScopeGraph as ScopeGraph
+import qualified Data.Abstract.Heap as Heap
 import Control.Arrow ((&&&))
 import Control.Effect.Trace as X (runTraceByIgnoring, runTraceByReturning)
 import Control.Monad ((>=>))
+import Data.Traversable as X (for)
 import Data.Abstract.Address.Precise as X
-import Data.Abstract.Environment as Env
-import Data.Abstract.Evaluatable
+import Data.Abstract.Evaluatable hiding (lookupDeclaration)
 import Data.Abstract.FreeVariables as X
-import Data.Abstract.Heap as X
 import Data.Abstract.Module as X
 import Data.Abstract.ModuleTable as X hiding (lookup)
 import Data.Abstract.Name as X
-import Data.Abstract.Value.Concrete (Value(..), ValueError, runValueError, materializeEnvironment)
+import Data.Abstract.Value.Concrete (Value(..), ValueError, runValueError)
 import Data.Bifunctor (first)
 import Data.Blob as X
 import Data.ByteString.Builder (toLazyByteString)
@@ -58,7 +61,9 @@ import Semantic.Diff as X
 import Semantic.Parse as X
 import Semantic.Task as X hiding (parsePackage)
 import Semantic.Util as X
+import Semantic.Graph (runHeap, runScopeGraph)
 import System.FilePath as X
+import Debug.Trace as X (traceShowM, traceM)
 
 import Data.ByteString as X (ByteString)
 import Data.Functor.Both as X (Both, runBothWith, both)
@@ -74,6 +79,7 @@ import Test.LeanCheck as X
 
 import qualified Data.ByteString as B
 import qualified Data.Set as Set
+import Data.Set (Set)
 import qualified Semantic.IO as IO
 import Semantic.Config (Config)
 import Semantic.Telemetry (LogQueue, StatQueue)
@@ -85,7 +91,7 @@ runBuilder = toStrict . toLazyByteString
 -- | This orphan instance is so we don't have to insert @name@ calls
 -- in dozens and dozens of environment specs.
 instance IsString Name where
-  fromString = name . fromString
+  fromString = X.name . fromString
 
 -- | Returns an s-expression formatted diff for the specified FilePath pair.
 diffFilePaths :: TaskConfig -> Both FilePath -> IO ByteString
@@ -107,81 +113,82 @@ parseTestFile parser path = runTask $ do
   pure (blob, term)
 
 type TestEvaluatingC term
-  = ResumableC (BaseError (ValueError term Precise)) (Eff
-  ( ResumableC (BaseError (AddressError Precise (Val term))) (Eff
+  = ResumableC (BaseError (AddressError Precise (Val term))) (Eff
+  ( ResumableC (BaseError (ValueError term Precise)) (Eff
   ( ResumableC (BaseError ResolutionError) (Eff
-  ( ResumableC (BaseError EvalError) (Eff
-  ( ResumableC (BaseError (EnvironmentError Precise)) (Eff
-  ( ResumableC (BaseError (UnspecializedError (Val term))) (Eff
-  ( ResumableC (BaseError (LoadError Precise)) (Eff
+  ( ResumableC (BaseError (EvalError Precise (Val term))) (Eff
+  ( ResumableC (BaseError (HeapError Precise)) (Eff
+  ( ResumableC (BaseError (ScopeError Precise)) (Eff
+  ( ResumableC (BaseError (UnspecializedError Precise (Val term))) (Eff
+  ( ResumableC (BaseError (LoadError Precise (Val term))) (Eff
+  ( StateC (Heap Precise Precise (Val term)) (Eff
+  ( StateC (ScopeGraph Precise) (Eff
   ( FreshC (Eff
-  ( StateC (Heap Precise (Val term)) (Eff
-  ( TraceByReturningC (Eff
-  ( LiftC IO))))))))))))))))))))
+  ( TraceByIgnoringC (Eff
+  ( LiftC IO))))))))))))))))))))))))
 type TestEvaluatingErrors term
-  = '[ BaseError (ValueError term Precise)
-     , BaseError (AddressError Precise (Val term))
+  = '[ BaseError (AddressError Precise (Val term))
+     , BaseError (ValueError term Precise)
      , BaseError ResolutionError
-     , BaseError EvalError
-     , BaseError (EnvironmentError Precise)
-     , BaseError (UnspecializedError (Val term))
-     , BaseError (LoadError Precise)
+     , BaseError (EvalError Precise (Val term))
+     , BaseError (HeapError Precise)
+     , BaseError (ScopeError Precise)
+     , BaseError (UnspecializedError Precise (Val term))
+     , BaseError (LoadError Precise (Val term))
      ]
-testEvaluating :: Evaluator term Precise (Val term) (TestEvaluatingC term) (Span, a)
+testEvaluating :: Evaluator term Precise (Val term) (TestEvaluatingC term) a
                -> IO
-                 ( [String]
-                 , ( Heap Precise (Val term)
-                   , Either (SomeError (Data.Sum.Sum (TestEvaluatingErrors term))) a
-                   )
-                 )
+                  (ScopeGraph Precise,
+                    (Heap Precise Precise (Value term Precise),
+                     Either (SomeError (Data.Sum.Sum (TestEvaluatingErrors term))) a))
 testEvaluating
   = runM
-  . runTraceByReturning
-  . runState lowerBound
+  . runTraceByIgnoring
   . runFresh
   . runEvaluator
+  . runScopeGraph
+  . runHeap
   . fmap reassociate
   . runLoadError
   . runUnspecialized
-  . runEnvironmentError
+  . runScopeError
+  . runHeapError
   . runEvalError
   . runResolutionError
+  . runValueError
   . runAddressError
-  . runValueError @_ @_ @_ @Precise
-  . fmap snd
 
 type Val term = Value term Precise
 
 
-deNamespace :: Heap Precise (Value term Precise)
-            -> Value term Precise
-            -> Maybe (Name, [Name])
-deNamespace heap ns@(Namespace name _ _) = (,) name . Env.allNames <$> namespaceScope heap ns
-deNamespace _ _                          = Nothing
+members :: EdgeLabel
+        -> Heap Precise Precise (Value term Precise)
+        -> ScopeGraph Precise
+        -> Value term Precise
+        -> Maybe [Name]
+members edgeLabel heap scopeGraph (Object frame)    = frameNames [ edgeLabel ] heap scopeGraph frame
+members edgeLabel heap scopeGraph (Class _ _ frame) = frameNames [ edgeLabel ] heap scopeGraph frame
+members _ _ _ _                                     = Nothing
 
-namespaceScope :: Heap Precise (Value term Precise)
-               -> Value term Precise
-               -> Maybe (Environment Precise)
-namespaceScope heap ns@(Namespace _ _ _)
-  = either (const Nothing) (snd . snd)
-  . run
-  . runFresh
-  . runEvaluator
-  . runAddressError
-  . raiseHandler (runState heap)
-  . raiseHandler (runState (lowerBound @Span))
-  . raiseHandler (runReader (lowerBound @Span))
-  . raiseHandler (runReader (ModuleInfo "SpecHelper.hs"))
-  . runDeref
-  $ materializeEnvironment ns
+frameNames :: [ EdgeLabel ]
+           -> Heap Precise Precise (Value term Precise)
+           -> ScopeGraph Precise
+           -> Precise
+           -> Maybe [ Name ]
+frameNames edge heap scopeGraph frame = do
+  scopeAddress <- Heap.scopeLookup frame heap
+  scope <- ScopeGraph.lookupScope scopeAddress scopeGraph
+  pure (unDeclaration <$> toList (ScopeGraph.declarationNames edge scope scopeGraph))
 
-namespaceScope _ _ = Nothing
+lookupMembers :: Name -> EdgeLabel -> (Precise, Precise) -> Heap Precise Precise (Value term Precise) -> ScopeGraph Precise -> Maybe [ Name ]
+lookupMembers name edgeLabel scopeAndFrame heap scopeGraph =
+  (lookupDeclaration name scopeAndFrame heap scopeGraph >>= members edgeLabel heap scopeGraph . Prelude.head)
 
-derefQName :: Heap Precise (Value term Precise) -> NonEmpty Name -> Bindings Precise -> Maybe (Value term Precise)
-derefQName heap names binds = go names (Env.newEnv binds)
-  where go (n1 :| ns) env = Env.lookupEnv' n1 env >>= flip heapLookup heap >>= fmap fst . Set.minView >>= case ns of
-          []        -> Just
-          (n2 : ns) -> namespaceScope heap >=> go (n2 :| ns)
+lookupDeclaration :: Name -> (Precise, Precise) -> Heap Precise Precise (Value term Precise) -> ScopeGraph Precise -> Maybe [ Value term Precise ]
+lookupDeclaration name (currentScope, currentFrame) heap scopeGraph = do
+  path <- ScopeGraph.lookupScopePath name currentScope scopeGraph
+  frameAddress <- Heap.lookupFrameAddress path currentFrame heap
+  toList <$> Heap.getSlot (Slot frameAddress (Heap.pathPosition path)) heap
 
 newtype Verbatim = Verbatim ByteString
   deriving (Eq)

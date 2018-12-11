@@ -456,6 +456,9 @@ instance Listable1 Statement.While where
 instance Listable1 Statement.Yield where
   liftTiers tiers = liftCons1 tiers Statement.Yield
 
+instance Listable1 Ruby.Syntax.Assignment where
+  liftTiers tiers = liftCons3 (liftTiers tiers) tiers tiers Ruby.Syntax.Assignment
+
 instance Listable1 Ruby.Syntax.Class where
   liftTiers tiers = liftCons3 tiers (liftTiers tiers) tiers Ruby.Syntax.Class
 

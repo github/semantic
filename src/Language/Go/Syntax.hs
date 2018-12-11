@@ -1,16 +1,15 @@
-{-# LANGUAGE DeriveAnyClass, LambdaCase #-}
+{-# LANGUAGE DeriveAnyClass #-}
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Language.Go.Syntax where
 
 import Prologue
 
-import           Control.Abstract.ScopeGraph hiding (Import)
+import Control.Abstract
 import           Data.Abstract.BaseError
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import qualified Data.Abstract.Package as Package
 import           Data.Abstract.Path
-import           Data.Aeson
 import           Data.JSON.Fields
 import qualified Data.Map as Map
 import           Data.Semigroup.App
@@ -18,45 +17,11 @@ import           Data.Semigroup.Foldable
 import qualified Data.Text as T
 import           Diffing.Algorithm
 import           Proto3.Suite.Class
-import           Proto3.Suite
-import qualified Proto3.Wire.Encode as Encode
-import qualified Proto3.Wire.Decode as Decode
+import qualified Data.Abstract.ScopeGraph as ScopeGraph
+import Data.ImportPath
 import           System.FilePath.Posix
 
-data IsRelative = Unknown | Relative | NonRelative
-  deriving (Bounded, Enum, Finite, Eq, Generic, Hashable, Ord, Show, ToJSON, Named, MessageField, NFData)
-
-instance Primitive IsRelative where
-  primType _ = primType (Proxy @(Enumerated IsRelative))
-  encodePrimitive f = encodePrimitive f . Enumerated . Right
-  decodePrimitive   = decodePrimitive >>= \case
-    (Enumerated (Right r)) -> pure r
-    other                  -> Prelude.fail ("IsRelative decodeMessageField: unexpected value" <> show other)
-
-instance HasDefault IsRelative where
-  def = Unknown
-
-data ImportPath = ImportPath { unPath :: FilePath, pathIsRelative :: IsRelative }
-  deriving (Eq, Generic, Hashable, Ord, Show, ToJSON, Named, Message, NFData)
-
-instance MessageField ImportPath where
-  encodeMessageField num = Encode.embedded num . encodeMessage (fieldNumber 1)
-  decodeMessageField = fromMaybe def <$> Decode.embedded (decodeMessage (fieldNumber 1))
-  protoType _ = messageField (Prim $ Named (Single (nameOf (Proxy @ImportPath)))) Nothing
-
-instance HasDefault ImportPath where
-  def = ImportPath mempty Unknown
-
-importPath :: Text -> ImportPath
-importPath str = let path = stripQuotes str in ImportPath (T.unpack path) (pathType path)
-  where
-    pathType xs | not (T.null xs), T.head xs == '.' = Relative -- head call here is safe
-                | otherwise = NonRelative
-
-defaultAlias :: ImportPath -> Name
-defaultAlias = name . T.pack . takeFileName . unPath
-
-resolveGoImport :: ( Member (Modules address) sig
+resolveGoImport :: ( Member (Modules address value) sig
                    , Member (Reader ModuleInfo) sig
                    , Member (Reader Package.PackageInfo) sig
                    , Member (Reader Span) sig
@@ -94,13 +59,14 @@ instance Ord1 Import where liftCompare = genericLiftCompare
 instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Import where
-  eval _ (Import importPath _) = do
+  eval _ _ (Language.Go.Syntax.Import importPath _) = do
     paths <- resolveGoImport importPath
     for_ paths $ \path -> do
       traceResolve (unPath importPath) path
-      importedEnv <- fst . snd <$> require path
-      bindAll importedEnv
-    rvalBox unit
+      ((moduleScope, moduleFrame), _) <- require path
+      insertImportEdge moduleScope
+      insertFrameLink ScopeGraph.Import (Map.singleton moduleScope moduleFrame)
+    pure unit
 
 
 -- | Qualified Import declarations (symbols are qualified in calling environment).
@@ -114,15 +80,30 @@ instance Ord1 QualifiedImport where liftCompare = genericLiftCompare
 instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedImport where
-  eval _ (QualifiedImport importPath aliasTerm) = do
+  eval _ _ (QualifiedImport importPath aliasTerm) = do
     paths <- resolveGoImport importPath
     alias <- maybeM (throwEvalError NoNameError) (declaredName aliasTerm)
-    void . letrec' alias $ \addr -> do
-      makeNamespace alias addr Nothing . for_ paths $ \p -> do
-        traceResolve (unPath importPath) p
-        importedEnv <- fst . snd <$> require p
-        bindAll importedEnv
-    rvalBox unit
+    span <- ask @Span
+    scopeAddress <- newScope mempty
+    declare (Declaration alias) span (Just scopeAddress)
+    aliasSlot <- lookupDeclaration (Declaration alias)
+
+    withScope scopeAddress $ do
+      let
+        go [] = pure ()
+        go (modulePath : paths) =
+          mkScopeMap modulePath (\scopeMap -> do
+            objFrame <- newFrame scopeAddress (Map.singleton ScopeGraph.Import scopeMap)
+            val <- object objFrame
+            assign aliasSlot val
+            for_ paths $ \modulePath ->
+              mkScopeMap modulePath (withFrame objFrame . insertFrameLink ScopeGraph.Import))
+          where mkScopeMap modulePath fun = do
+                  ((moduleScope, moduleFrame), _) <- require modulePath
+                  insertImportEdge moduleScope
+                  fun (Map.singleton moduleScope moduleFrame)
+      go paths
+    pure unit
 
 -- | Side effect only imports (no symbols made available to the calling environment).
 data SideEffectImport a = SideEffectImport { sideEffectImportFrom :: !ImportPath, sideEffectImportToken :: !a }
@@ -132,12 +113,13 @@ instance Eq1 SideEffectImport where liftEq = genericLiftEq
 instance Ord1 SideEffectImport where liftCompare = genericLiftCompare
 instance Show1 SideEffectImport where liftShowsPrec = genericLiftShowsPrec
 
+-- TODO: Revisit this and confirm if this is correct.
 instance Evaluatable SideEffectImport where
-  eval _ (SideEffectImport importPath _) = do
+  eval _ _ (SideEffectImport importPath _) = do
     paths <- resolveGoImport importPath
     traceResolve (unPath importPath) paths
-    for_ paths require
-    rvalBox unit
+    for_ paths $ \path -> require path -- Do we need to construct any scope / frames for these side-effect imports?
+    pure unit
 
 -- A composite literal in Go
 data Composite a = Composite { compositeType :: !a, compositeElement :: !a }
@@ -302,11 +284,7 @@ instance Ord1 Package where liftCompare = genericLiftCompare
 instance Show1 Package where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Package where
-  eval eval (Package _ xs) = do
-    currentScope' <- currentScope
-    let edges = maybe mempty (Map.singleton Lexical . pure) currentScope'
-    scope <- newScope edges
-    withScope scope $ maybe (rvalBox unit) (runApp . foldMap1 (App . eval)) (nonEmpty xs)
+  eval eval _ (Package _ xs) = maybe (pure unit) (runApp . foldMap1 (App . eval)) (nonEmpty xs)
 
 
 -- | A type assertion in Go (e.g. `x.(T)` where the value of `x` is not nil and is of type `T`).

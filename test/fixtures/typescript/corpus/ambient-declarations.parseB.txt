@@ -26,9 +26,8 @@
             (Empty)
             (Annotation
               (PredefinedType))
-            (Assignment
-              (Identifier)
-              (Empty))))
+            (Identifier)
+            (Empty)))
         (PublicFieldDefinition
           (Empty)
           (Empty)

@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, LambdaCase, RankNTypes, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, LambdaCase, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Value.Type
   ( Type (..)
   , TypeError (..)
@@ -11,15 +11,16 @@ module Data.Abstract.Value.Type
   , runWhile
   ) where
 
+import Control.Abstract.ScopeGraph
 import qualified Control.Abstract as Abstract
 import Control.Abstract hiding (Boolean(..), Function(..), While(..))
 import Control.Effect.Carrier
 import Control.Effect.Sum
-import Data.Abstract.Environment as Env
 import Data.Abstract.BaseError
 import Data.Semigroup.Foldable (foldMap1)
 import qualified Data.Map as Map
 import Prologue hiding (TypeError)
+import Data.Abstract.Evaluatable
 
 type TName = Int
 
@@ -239,38 +240,53 @@ instance Ord address => ValueRoots address Type where
 
 instance ( Member (Allocator address) sig
          , Member (Deref Type) sig
-         , Member (Env address) sig
-         , Member (Error (Return address)) sig
+         , Member (Error (Return Type)) sig
          , Member Fresh sig
+         , Member (Reader (CurrentFrame address)) sig
+         , Member (Reader (CurrentScope address)) sig
          , Member (Reader ModuleInfo) sig
          , Member (Reader Span) sig
+         , Member (State Span) sig
+         , Member (Resumable (BaseError (EvalError address Type))) sig
          , Member (Resumable (BaseError TypeError)) sig
          , Member (Resumable (BaseError (AddressError address Type))) sig
-         , Member (State (Heap address Type)) sig
+         , Member (State (Heap address address Type)) sig
+         , Member (State (ScopeGraph address)) sig
+         , Member (Resumable (BaseError (ScopeError address))) sig
+         , Member (Resumable (BaseError (HeapError address))) sig
          , Member (State TypeMap) sig
+         , Declarations term
          , Ord address
+         , Show address
          , Carrier sig m
          )
       => Carrier (Abstract.Function term address Type :+: sig) (FunctionC term address Type (Eff m)) where
   ret = FunctionC . const . ret
   eff op = FunctionC (\ eval -> handleSum (eff . handleReader eval runFunctionC) (\case
-    Abstract.Function _ params body k -> runEvaluator $ do
-      (env, tvars) <- foldr (\ name rest -> do
-        addr <- alloc name
-        tvar <- Var <$> fresh
-        assign addr tvar
-        bimap (Env.insert name addr) (tvar :) <$> rest) (pure (lowerBound, [])) params
-      locally (catchReturn (bindAll env *> runFunction (Evaluator . eval) (Evaluator (eval body)))) >>= deref >>= Evaluator . flip runFunctionC eval . k . (zeroOrMoreProduct tvars :->)
-    Abstract.BuiltIn Print k -> runFunctionC (k (String :-> Unit)) eval
-    Abstract.BuiltIn Show  k -> runFunctionC (k (Object :-> String)) eval
-    Abstract.Call op _ params k -> runEvaluator $ do
+    Abstract.Function _ params body scope k -> runEvaluator $ do
+      currentScope' <- currentScope
+      currentFrame' <- currentFrame
+      let frameLinks = Map.singleton Lexical (Map.singleton currentScope' currentFrame')
+      frame <- newFrame scope frameLinks
+      res <- withScopeAndFrame frame $ do
+        tvars <- foldr (\ param rest -> do
+          tvar <- Var <$> fresh
+          address <- lookupDeclaration (Declaration param)
+          assign address tvar
+          (tvar :) <$> rest) (pure []) params
+        -- TODO: We may still want to represent this as a closure and not a function type
+        (zeroOrMoreProduct tvars :->) <$> catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body)))
+      Evaluator (runFunctionC (k res) eval)
+
+    Abstract.BuiltIn _ Print k -> runFunctionC (k (String :-> Unit)) eval
+    Abstract.BuiltIn _ Show  k -> runFunctionC (k (Object :-> String)) eval
+    Abstract.Call op paramTypes k -> runEvaluator $ do
       tvar <- fresh
-      paramTypes <- traverse deref params
       let needed = zeroOrMoreProduct paramTypes :-> Var tvar
       unified <- op `unify` needed
       boxed <- case unified of
-        _ :-> ret -> box ret
-        actual    -> throwTypeError (UnificationError needed actual) >>= box
+        _ :-> ret -> pure ret
+        actual    -> throwTypeError (UnificationError needed actual)
       Evaluator $ runFunctionC (k boxed) eval) op)
 
 
@@ -320,30 +336,26 @@ instance AbstractIntro Type where
   null        = Null
 
 -- | Discard the value arguments (if any), constructing a 'Type' instead.
-instance ( Member (Allocator address) sig
-         , Member (Deref Type) sig
-         , Member Fresh sig
+instance ( Member Fresh sig
          , Member (Reader ModuleInfo) sig
          , Member (Reader Span) sig
-         , Member (Resumable (BaseError (AddressError address Type))) sig
          , Member (Resumable (BaseError TypeError)) sig
-         , Member (State (Heap address Type)) sig
          , Member (State TypeMap) sig
-         , Ord address
          , Carrier sig m
          )
       => AbstractValue term address Type m where
-  array fields = do
+  array fieldTypes = do
     var <- fresh
-    fieldTypes <- traverse deref fields
     Array <$> foldr (\ t1 -> (unify t1 =<<)) (pure (Var var)) fieldTypes
 
-  tuple fields = zeroOrMoreProduct <$> traverse deref fields
+  tuple fields = pure $ zeroOrMoreProduct fields
 
-  klass _ _ _     = pure Object
-  namespace _ _ _ = pure Unit
+  klass _ _       = pure Object
+  namespace _ _   = pure Unit
 
-  scopedEnvironment _ = pure (Just lowerBound)
+  scopedEnvironment _ = pure Nothing
+
+  object _ = pure Object
 
   asString t = unify t String $> ""
   asPair t   = do
@@ -358,7 +370,7 @@ instance ( Member (Allocator address) sig
     _ <- unify sub Int
     field <- fresh
     _ <- unify (Array (Var field)) arr
-    box (Var field)
+    pure (Var field)
 
   liftNumeric _ = unify (Int :+ Float :+ Rational)
   liftNumeric2 _ left right = case (left, right) of

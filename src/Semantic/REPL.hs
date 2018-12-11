@@ -5,12 +5,13 @@ module Semantic.REPL
 ) where
 
 import Control.Abstract hiding (Continue, List, string)
+import Control.Abstract.ScopeGraph (runScopeError)
+import Control.Abstract.Heap (runHeapError)
 import Control.Effect.Carrier
 import Control.Effect.Resource
 import Control.Effect.Sum
 import Control.Effect.REPL
 import Data.Abstract.Address.Precise as Precise
-import Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable hiding (string)
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
@@ -75,11 +76,13 @@ repl proxy parser paths = defaultConfig debugOptions >>= \ config -> runM . runD
     . id @(Evaluator _ Precise (Value _ Precise) _ _)
     . raiseHandler runTraceByPrinting
     . runHeap
+    . runScopeGraph
     . raiseHandler runFresh
     . fmap reassociate
     . runLoadError
     . runUnspecialized
-    . runEnvironmentError
+    . runScopeError
+    . runHeapError
     . runEvalError
     . runResolutionError
     . runAddressError
@@ -93,6 +96,7 @@ repl proxy parser paths = defaultConfig debugOptions >>= \ config -> runM . runD
 
 -- TODO: REPL for typechecking/abstract semantics
 -- TODO: drive the flow from within the REPL instead of from without
+
 
 runTelemetryIgnoringStat :: (Carrier sig m, MonadIO m) => LogOptions -> Eff (TelemetryIgnoringStatC m) a -> m a
 runTelemetryIgnoringStat logOptions = flip runTelemetryIgnoringStatC logOptions . interpret
@@ -109,25 +113,23 @@ instance (Carrier sig m, MonadIO m) => Carrier (Telemetry :+: sig) (TelemetryIgn
       writeLogMessage logOptions (Message level message pairs zonedTime)
       runTelemetryIgnoringStatC k logOptions) op)
 
-step :: ( Member (Env address) sig
-        , Member (Error SomeException) sig
+step :: ( Member (Error SomeException) sig
         , Member REPL sig
         , Member (Reader ModuleInfo) sig
         , Member (Reader Span) sig
         , Member (Reader Step) sig
         , Member (State [Breakpoint]) sig
-        , Show address
         , Carrier sig m
         )
      => [(ModulePath, Blob)]
-     -> Open (Open (term -> Evaluator term address value m a))
-step blobs recur0 recur term = do
+     -> Open (term -> Evaluator term address value m a)
+step blobs recur term = do
   break <- shouldBreak
   if break then do
     list
-    runCommands (recur0 recur term)
+    runCommands (recur term)
   else
-    recur0 recur term
+    recur term
   where list = do
           path <- asks modulePath
           span <- ask
@@ -141,10 +143,11 @@ step blobs recur0 recur term = do
           output "  :continue                   continue evaluation until the next breakpoint"
           output "  :show bindings              show the current bindings"
           output "  :quit, :q, :abandon         abandon the current evaluation and exit the repl"
-        showBindings = do
-          bindings <- Env.head <$> getEnv
-          output . T.pack $ unlines (uncurry showBinding <$> Env.pairs bindings)
-        showBinding name addr = show name <> " = " <> show addr
+        -- TODO: showScopeGraph option for REPL.
+        -- showBindings = do
+        --   bindings <- Env.head <$> getEnv
+        --   output . T.pack $ unlines (uncurry showBinding <$> Env.pairs bindings)
+        -- showBinding name addr = show name <> " = " <> show addr
         runCommand run [":step"]     = local (const Step) run
         runCommand run [":continue"] = local (const Continue) run
         runCommand run [":break", s]
@@ -152,7 +155,8 @@ step blobs recur0 recur term = do
         -- TODO: :show breakpoints
         -- TODO: :delete breakpoints
         runCommand run [":list"] = list >> runCommands run
-        runCommand run [":show", "bindings"] = showBindings >> runCommands run
+        -- TODO: Show the scope graph
+        -- runCommand run [":show", "bindings"] = showBindings >> runCommands run
         -- TODO: show the value(s) in the heap
         -- TODO: can we call functions somehow? Maybe parse expressions with the current parser?
         runCommand _   [quit] | quit `elem` [":quit", ":q", ":abandon"] = throwError (SomeException Quit)

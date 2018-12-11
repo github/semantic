@@ -23,8 +23,6 @@ import           Control.Effect.Sum
 import           Data.Abstract.Address.Hole
 import           Data.Abstract.Address.Located
 import           Data.Abstract.BaseError
-import           Data.Abstract.Environment
-import           Data.Abstract.Ref
 import           Data.Abstract.Declarations
 import           Data.Abstract.Module (Module (moduleInfo), ModuleInfo (..))
 import           Data.Abstract.Package (PackageInfo (..))
@@ -66,44 +64,45 @@ style = (defaultStyle (T.encodeUtf8Builder . vertexIdentifier))
 -- | Add vertices to the graph for evaluated identifiers.
 graphingTerms :: ( Member (Reader ModuleInfo) sig
                  , Member (Reader Span) sig
-                 , Member (Env (Hole context (Located address))) sig
                  , Member (State (Graph ControlFlowVertex)) sig
-                 , Member (State (Map (Hole context (Located address)) ControlFlowVertex)) sig
-                 , Member (Resumable (BaseError (EnvironmentError (Hole context (Located address))))) sig
-                 , AbstractValue term (Hole context (Located address)) value m
+                 , Member (State (Map (Slot hole) ControlFlowVertex)) sig
+                 , Member (State (Heap hole hole value)) sig
+                 , Member (State (ScopeGraph (Hole context (Located address)))) sig
+                 , Member (Resumable (BaseError (ScopeError hole))) sig
+                 , Member (Resumable (BaseError (HeapError hole))) sig
+                 , Member (Reader (CurrentFrame hole)) sig
+                 , Member (Reader (CurrentScope hole)) sig
                  , Member (Reader ControlFlowVertex) sig
                  , VertexDeclaration syntax
                  , Declarations1 syntax
                  , Ord address
                  , Ord context
                  , Foldable syntax
+                 , hole ~ Hole context (Located address)
                  , term ~ Term syntax Location
                  , Carrier sig m
                  )
-              => Open (Open (term -> Evaluator term (Hole context (Located address)) value m (ValueRef (Hole context (Located address)))))
-graphingTerms recur0 recur term@(Term (In a syntax)) = do
+              => Open (term -> Evaluator term hole value m a)
+graphingTerms recur term@(Term (In a syntax)) = do
   definedInModule <- currentModule
   case toVertex a definedInModule syntax of
-    Just (v@Function{}, _) -> recurWithContext v
-    Just (v@Method{}, _) -> recurWithContext v
+    Just (v@Function{}, name) -> recurWithContext v name
+    Just (v@Method{}, name) -> recurWithContext v name
     Just (v@Variable{..}, name) -> do
       variableDefinition v
-      maybeAddr <- lookupEnv name
-      case maybeAddr of
-        Just a -> do
-          defined <- gets (Map.lookup a)
-          maybe (pure ()) (appendGraph . connect (vertex v) . vertex) defined
-        _ -> pure ()
-      recur0 recur term
-    _ -> recur0 recur term
+      addr <- lookupDeclaration (Declaration name)
+      defined <- gets (Map.lookup addr)
+      maybe (pure ()) (appendGraph . connect (vertex v) . vertex) defined
+      recur term
+    _ -> recur term
   where
-    recurWithContext v = do
+    recurWithContext v name = do
       variableDefinition v
       moduleInclusion v
       local (const v) $ do
-        valRef <- recur0 recur term
-        addr <- Control.Abstract.address valRef
-        modify (Map.insert addr v)
+        valRef <- recur term
+        slot <- lookupDeclaration (Declaration name)
+        modify (Map.insert slot v)
         pure valRef
 
 -- | Add vertices to the graph for evaluated modules and the packages containing them.
@@ -118,13 +117,13 @@ graphingPackages recur m =
   let v = moduleVertex (moduleInfo m) in packageInclusion v *> local (const v) (recur m)
 
 -- | Add vertices to the graph for imported modules.
-graphingModules :: ( Member (Modules address) sig
+graphingModules :: ( Member (Modules address value) sig
                    , Member (Reader ModuleInfo) sig
                    , Member (State (Graph ControlFlowVertex)) sig
                    , Member (Reader ControlFlowVertex) sig
                    , Carrier sig m
                    )
-                => (Module body -> Evaluator term address value (EavesdropC address (Eff m)) a)
+                => (Module body -> Evaluator term address value (EavesdropC address value (Eff m)) a)
                 -> (Module body -> Evaluator term address value m a)
 graphingModules recur m = do
   let v = moduleVertex (moduleInfo m)
@@ -140,12 +139,12 @@ graphingModules recur m = do
       in moduleInclusion (moduleVertex (ModuleInfo path'))
 
 -- | Add vertices to the graph for imported modules.
-graphingModuleInfo :: ( Member (Modules address) sig
+graphingModuleInfo :: ( Member (Modules address value) sig
                       , Member (Reader ModuleInfo) sig
                       , Member (State (Graph ModuleInfo)) sig
                       , Carrier sig m
                       )
-                   => (Module body -> Evaluator term address value (EavesdropC address (Eff m)) a)
+                   => (Module body -> Evaluator term address value (EavesdropC address value (Eff m)) a)
                    -> (Module body -> Evaluator term address value m a)
 graphingModuleInfo recur m = do
   appendGraph (vertex (moduleInfo m))
@@ -154,23 +153,22 @@ graphingModuleInfo recur m = do
     Lookup path _ -> currentModule >>= appendGraph . (`connect` vertex (ModuleInfo path)) . vertex
     _             -> pure ()
 
-eavesdrop :: (Carrier sig m, Member (Modules address) sig)
-          => Evaluator term address value (EavesdropC address (Eff m)) a
-          -> (forall x . Modules address (Eff m) (Eff m x) -> Evaluator term address value m ())
+eavesdrop :: (Carrier sig m, Member (Modules address value) sig)
+          => Evaluator term address value (EavesdropC address value (Eff m)) a
+          -> (forall x . Modules address value (Eff m) (Eff m x) -> Evaluator term address value m ())
           -> Evaluator term address value m a
 eavesdrop m f = raiseHandler (runEavesdropC (runEvaluator . f) . interpret) m
 
-newtype EavesdropC address m a = EavesdropC ((forall x . Modules address m (m x) -> m ()) -> m a)
+newtype EavesdropC address value m a = EavesdropC ((forall x . Modules address value m (m x) -> m ()) -> m a)
 
-runEavesdropC :: (forall x . Modules address m (m x) -> m ()) -> EavesdropC address m a -> m a
+runEavesdropC :: (forall x . Modules address value m (m x) -> m ()) -> EavesdropC address value m a -> m a
 runEavesdropC f (EavesdropC m) = m f
 
-instance (Carrier sig m, Member (Modules address) sig, Applicative m) => Carrier sig (EavesdropC address m) where
+instance (Carrier sig m, Member (Modules address value) sig, Applicative m) => Carrier sig (EavesdropC address value m) where
   ret a = EavesdropC (const (ret a))
   eff op
     | Just eff <- prj op = EavesdropC (\ handler -> let eff' = handlePure (runEavesdropC handler) eff in handler eff' *> send eff')
     | otherwise          = EavesdropC (\ handler -> eff (handlePure (runEavesdropC handler) op))
-
 
 -- | Add an edge from the current package to the passed vertex.
 packageInclusion :: ( Member (Reader PackageInfo) sig
@@ -213,7 +211,7 @@ appendGraph = modify . (<>)
 
 
 graphing :: (Carrier sig m, Effect sig)
-         => Evaluator term address value (StateC (Map address ControlFlowVertex) (Eff
+         => Evaluator term address value (StateC (Map (Slot address) ControlFlowVertex) (Eff
                                          (StateC (Graph ControlFlowVertex) (Eff
                                          m)))) result
          -> Evaluator term address value m (Graph ControlFlowVertex, result)
