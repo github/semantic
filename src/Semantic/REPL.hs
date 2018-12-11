@@ -122,14 +122,14 @@ step :: ( Member (Error SomeException) sig
         , Carrier sig m
         )
      => [(ModulePath, Blob)]
-     -> Open (Open (term -> Evaluator term address value m a))
-step blobs recur0 recur term = do
+     -> Open (term -> Evaluator term address value m a)
+step blobs recur term = do
   break <- shouldBreak
   if break then do
     list
-    runCommands (recur0 recur term)
+    runCommands (recur term)
   else
-    recur0 recur term
+    recur term
   where list = do
           path <- asks modulePath
           span <- ask

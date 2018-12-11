@@ -10,7 +10,6 @@ import Control.Abstract as Abstract
 import Control.Effect.Carrier
 import Control.Effect.Sum
 import Data.Abstract.BaseError
-import Data.Abstract.Ref
 import Data.Abstract.Evaluatable
 import qualified Data.Map.Strict as Map
 import Prologue
@@ -21,7 +20,7 @@ data Abstract = Abstract
 
 instance ( Member (Allocator address) sig
          , Member (Deref Abstract) sig
-         , Member (Error (Return address Abstract)) sig
+         , Member (Error (Return Abstract)) sig
          , Member Fresh sig
          , Member (Reader (CurrentFrame address)) sig
          , Member (Reader (CurrentScope address)) sig
@@ -54,8 +53,7 @@ instance ( Member (Allocator address) sig
         catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body)))
       Evaluator $ runFunctionC (k res) eval
     BuiltIn _ _ k -> runFunctionC (k Abstract) eval
-    Call _ _ k -> runEvaluator $ do
-      rvalBox Abstract >>= Evaluator . flip runFunctionC eval . k) op)
+    Call _ _ k -> runFunctionC (k Abstract) eval) op)
 
 
 instance (Carrier sig m, Alternative m) => Carrier (Boolean Abstract :+: sig) (BooleanC Abstract m) where
@@ -70,13 +68,13 @@ instance ( Member (Abstract.Boolean Abstract) sig
          , Alternative m
          , Monad m
          )
-      => Carrier (While address Abstract :+: sig) (WhileC address Abstract m) where
+      => Carrier (While Abstract :+: sig) (WhileC Abstract m) where
   ret = WhileC . ret
   eff = WhileC . handleSum
     (eff . handleCoercible)
     (\ (Abstract.While cond body k) -> do
       cond' <- runWhileC cond
-      ifthenelse cond' (runWhileC body *> empty) (runWhileC (k $ Rval unit)))
+      ifthenelse cond' (runWhileC body *> empty) (runWhileC (k unit)))
 
 
 instance Ord address => ValueRoots address Abstract where

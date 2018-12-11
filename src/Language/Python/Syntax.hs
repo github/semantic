@@ -135,7 +135,7 @@ instance Evaluatable Import where
   -- from . import moduleY            -- aliasValue = moduleY, aliasName = moduleY
   -- from . import moduleY as moduleZ -- aliasValue = moduleY, aliasName = moduleZ
   -- This is a bit of a special case in the syntax as this actually behaves like a qualified relative import.
-  eval _ (Import (RelativeQualifiedName n Nothing) [Alias{..}]) = do
+  eval _ _ (Import (RelativeQualifiedName n Nothing) [Alias{..}]) = do
     path <- NonEmpty.last <$> resolvePythonModules (RelativeQualifiedName n (Just (qualifiedName (formatName aliasValue :| []))))
     ((moduleScope, moduleFrame), _) <- require path
 
@@ -153,13 +153,13 @@ instance Evaluatable Import where
     aliasSlot <- lookupDeclaration (Declaration aliasName)
     assign aliasSlot =<< object aliasFrame
 
-    rvalBox unit
+    pure unit
 
   -- from a import b
   -- from a import b as c
   -- from a import *
   -- from .moduleY import b
-  eval _ (Import name xs) = do
+  eval _ _ (Import name xs) = do
     modulePaths <- resolvePythonModules name
 
     -- Eval parent modules first
@@ -184,7 +184,7 @@ instance Evaluatable Import where
       insertImportEdge scopeAddress
       insertFrameLink ScopeGraph.Import (Map.singleton scopeAddress frameAddress)
 
-    rvalBox unit
+    pure unit
 
 
 newtype QualifiedImport a = QualifiedImport { qualifiedImportFrom :: NonEmpty String }
@@ -208,12 +208,12 @@ instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
 
 -- import a.b.c
 instance Evaluatable QualifiedImport where
-  eval _ (QualifiedImport qualifiedName) = do
+  eval _ _ (QualifiedImport qualifiedName) = do
     modulePaths <- resolvePythonModules (QualifiedName qualifiedName)
     let namesAndPaths = toList (NonEmpty.zip (Data.Abstract.Evaluatable.name . T.pack <$> qualifiedName) modulePaths)
 
     go namesAndPaths
-    rvalBox unit
+    pure unit
     where
       go [] = pure ()
       go ((name, modulePath) : namesAndPaths) = do
@@ -249,7 +249,7 @@ instance Show1 QualifiedAliasedImport where liftShowsPrec = genericLiftShowsPrec
 
 -- import a.b.c as e
 instance Evaluatable QualifiedAliasedImport where
-  eval _ (QualifiedAliasedImport name aliasTerm) = do
+  eval _ _ (QualifiedAliasedImport name aliasTerm) = do
     modulePaths <- resolvePythonModules name
 
     span <- ask @Span
@@ -267,7 +267,7 @@ instance Evaluatable QualifiedAliasedImport where
         insertImportEdge moduleScope
         insertFrameLink ScopeGraph.Import (Map.singleton moduleScope moduleFrame)
 
-    rvalBox unit
+    pure unit
 
 -- | Ellipsis (used in splice expressions and alternatively can be used as a fill in expression, like `undefined` in Haskell)
 data Ellipsis a = Ellipsis

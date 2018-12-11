@@ -178,6 +178,7 @@ message TypeScriptSyntax {
     QualifiedExportFrom qualifiedExportFrom = 162;
     JavaScriptRequire javaScriptRequire = 163;
     List list = 164;
+    StatementBlock statementBlock = 165;
   }
 }
 
@@ -280,33 +281,33 @@ message FloorDivision {
 }
 
 message BAnd {
-  TypeScriptTerm left = 1;
-  TypeScriptTerm right = 2;
+  TypeScriptTerm lhs = 1;
+  TypeScriptTerm rhs = 2;
 }
 
 message BOr {
-  TypeScriptTerm left = 1;
-  TypeScriptTerm right = 2;
+  TypeScriptTerm lhs = 1;
+  TypeScriptTerm rhs = 2;
 }
 
 message BXOr {
-  TypeScriptTerm left = 1;
-  TypeScriptTerm right = 2;
+  TypeScriptTerm lhs = 1;
+  TypeScriptTerm rhs = 2;
 }
 
 message LShift {
-  TypeScriptTerm left = 1;
-  TypeScriptTerm right = 2;
+  TypeScriptTerm lhs = 1;
+  TypeScriptTerm rhs = 2;
 }
 
 message RShift {
-  TypeScriptTerm left = 1;
-  TypeScriptTerm right = 2;
+  TypeScriptTerm lhs = 1;
+  TypeScriptTerm rhs = 2;
 }
 
 message UnsignedRShift {
-  TypeScriptTerm left = 1;
-  TypeScriptTerm right = 2;
+  TypeScriptTerm lhs = 1;
+  TypeScriptTerm rhs = 2;
 }
 
 message Complement {
@@ -839,6 +840,7 @@ message OptionalParameter {
 message RequiredParameter {
   repeated TypeScriptTerm requiredParameterContext = 1;
   TypeScriptTerm requiredParameterSubject = 2;
+  TypeScriptTerm requiredParameterValue = 3;
 }
 
 message RestParameter {
@@ -945,6 +947,10 @@ message JavaScriptRequire {
 
 message List {
   repeated TypeScriptTerm listContent = 1;
+}
+
+message StatementBlock {
+  repeated TypeScriptTerm statements = 1;
 }
 
 message Alias {

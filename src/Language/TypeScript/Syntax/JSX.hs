@@ -85,7 +85,7 @@ instance Ord1 OptionalParameter where liftCompare = genericLiftCompare
 instance Show1 OptionalParameter where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable OptionalParameter
 
-data RequiredParameter a = RequiredParameter { requiredParameterContext :: ![a], requiredParameterSubject :: !a, requiredParameterValue :: !a }
+data RequiredParameter a = RequiredParameter { requiredParameterContext :: [a], requiredParameterSubject :: a, requiredParameterValue :: a }
   deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
 
 instance Declarations1 RequiredParameter where
@@ -95,30 +95,27 @@ instance Eq1 RequiredParameter where liftEq = genericLiftEq
 instance Ord1 RequiredParameter where liftCompare = genericLiftCompare
 instance Show1 RequiredParameter where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable RequiredParameter where
-  eval eval RequiredParameter{..} = do
+  eval eval ref RequiredParameter{..} = do
     name <- maybeM (throwEvalError $ NoNameError requiredParameterSubject) (declaredName requiredParameterSubject)
     span <- ask @Span
     declare (Declaration name) span Nothing
 
-    lhs <- eval requiredParameterSubject
+    lhs <- ref requiredParameterSubject
     rhs <- eval requiredParameterValue
 
-    case lhs of
-      Rval val -> throwEvalError (DerefError val)
-      LvalMember lhsSlot -> do
-        case declaredName requiredParameterValue of
-          Just rhsName -> do
-            assocScope <- associatedScope (Declaration rhsName)
-            case assocScope of
-              Just assocScope' -> do
-                objectScope <- newScope (Map.singleton Import [ assocScope' ])
-                putSlotDeclarationScope lhsSlot (Just objectScope) -- TODO: not sure if this is right
-              Nothing ->
-                pure ()
+    case declaredName requiredParameterValue of
+      Just rhsName -> do
+        assocScope <- associatedScope (Declaration rhsName)
+        case assocScope of
+          Just assocScope' -> do
+            objectScope <- newScope (Map.singleton Import [ assocScope' ])
+            putSlotDeclarationScope lhs (Just objectScope) -- TODO: not sure if this is right
           Nothing ->
             pure ()
-        assign lhsSlot =<< Abstract.value rhs
-        pure (LvalMember lhsSlot)
+      Nothing ->
+        pure ()
+    assign lhs rhs
+    pure rhs
 
 data RestParameter a = RestParameter { restParameterContext :: ![a], restParameterSubject :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)

@@ -1,7 +1,7 @@
 module Analysis.PHP.Spec (spec) where
 
 import           Control.Abstract
-import           Data.Abstract.Evaluatable (EvalError (..), ValueRef (..))
+import           Data.Abstract.Evaluatable (EvalError (..))
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import qualified Data.Language as Language
 import qualified Language.PHP.Assignment as PHP
@@ -14,8 +14,8 @@ spec config = parallel $ do
     xit "evaluates include and require" $ do
       (scopeGraph, (heap, res)) <- evaluate ["main.php", "foo.php", "bar.php"]
       case ModuleTable.lookup "main.php" <$> res of
-        Right (Just (Module _ (scopeAndFrame, valueRef) :| [])) -> do
-          valueRef `shouldBe` Rval unit
+        Right (Just (Module _ (scopeAndFrame, value) :| [])) -> do
+          value `shouldBe` unit
           const () <$> SpecHelpers.lookupDeclaration "bar" scopeAndFrame heap scopeGraph `shouldBe` Just ()
           const () <$> SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
         other -> expectationFailure (show other)
@@ -23,8 +23,8 @@ spec config = parallel $ do
     xit "evaluates include_once and require_once" $ do
       (scopeGraph, (heap, res)) <- evaluate ["main_once.php", "foo.php", "bar.php"]
       case ModuleTable.lookup "main_once.php" <$> res of
-        Right (Just (Module _ (scopeAndFrame, valueRef) :| [])) -> do
-          valueRef `shouldBe` Rval unit
+        Right (Just (Module _ (scopeAndFrame, value) :| [])) -> do
+          value `shouldBe` unit
           const () <$> SpecHelpers.lookupDeclaration "bar" scopeAndFrame heap scopeGraph `shouldBe` Just ()
           const () <$> SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
         other -> expectationFailure (show other)
@@ -32,7 +32,7 @@ spec config = parallel $ do
     xit "evaluates namespaces" $ do
       (scopeGraph, (heap, res)) <- evaluate ["namespaces.php"]
       case ModuleTable.lookup "namespaces.php" <$> res of
-        Right (Just (Module _ (scopeAndFrame, valueRef) :| [])) -> do
+        Right (Just (Module _ (scopeAndFrame, value) :| [])) -> do
           const () <$> SpecHelpers.lookupDeclaration "Foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
           const () <$> SpecHelpers.lookupDeclaration "NS1" scopeAndFrame heap scopeGraph `shouldBe` Just ()
 

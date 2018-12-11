@@ -23,7 +23,6 @@ import           Control.Effect.Sum
 import           Data.Abstract.Address.Hole
 import           Data.Abstract.Address.Located
 import           Data.Abstract.BaseError
-import           Data.Abstract.Ref
 import           Data.Abstract.Declarations
 import           Data.Abstract.Module (Module (moduleInfo), ModuleInfo (..))
 import           Data.Abstract.Package (PackageInfo (..))
@@ -66,24 +65,25 @@ style = (defaultStyle (T.encodeUtf8Builder . vertexIdentifier))
 graphingTerms :: ( Member (Reader ModuleInfo) sig
                  , Member (Reader Span) sig
                  , Member (State (Graph ControlFlowVertex)) sig
-                 , Member (State (Map (Slot (Hole context (Located address))) ControlFlowVertex)) sig
-                 , Member (State (Heap (Hole context (Located address)) (Hole context (Located address)) value)) sig
+                 , Member (State (Map (Slot hole) ControlFlowVertex)) sig
+                 , Member (State (Heap hole hole value)) sig
                  , Member (State (ScopeGraph (Hole context (Located address)))) sig
-                 , Member (Resumable (BaseError (ScopeError (Hole context (Located address))))) sig
-                 , Member (Resumable (BaseError (HeapError (Hole context (Located address))))) sig
-                 , Member (Reader (CurrentFrame (Hole context (Located address)))) sig
-                 , Member (Reader (CurrentScope (Hole context (Located address)))) sig
+                 , Member (Resumable (BaseError (ScopeError hole))) sig
+                 , Member (Resumable (BaseError (HeapError hole))) sig
+                 , Member (Reader (CurrentFrame hole)) sig
+                 , Member (Reader (CurrentScope hole)) sig
                  , Member (Reader ControlFlowVertex) sig
                  , VertexDeclaration syntax
                  , Declarations1 syntax
                  , Ord address
                  , Ord context
                  , Foldable syntax
+                 , hole ~ Hole context (Located address)
                  , term ~ Term syntax Location
                  , Carrier sig m
                  )
-              => Open (Open (term -> Evaluator term (Hole context (Located address)) value m (ValueRef (Hole context (Located address)) value)))
-graphingTerms recur0 recur term@(Term (In a syntax)) = do
+              => Open (term -> Evaluator term hole value m a)
+graphingTerms recur term@(Term (In a syntax)) = do
   definedInModule <- currentModule
   case toVertex a definedInModule syntax of
     Just (v@Function{}, name) -> recurWithContext v name
@@ -93,14 +93,14 @@ graphingTerms recur0 recur term@(Term (In a syntax)) = do
       addr <- lookupDeclaration (Declaration name)
       defined <- gets (Map.lookup addr)
       maybe (pure ()) (appendGraph . connect (vertex v) . vertex) defined
-      recur0 recur term
-    _ -> recur0 recur term
+      recur term
+    _ -> recur term
   where
     recurWithContext v name = do
       variableDefinition v
       moduleInclusion v
       local (const v) $ do
-        valRef <- recur0 recur term
+        valRef <- recur term
         slot <- lookupDeclaration (Declaration name)
         modify (Map.insert slot v)
         pure valRef

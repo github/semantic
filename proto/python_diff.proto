@@ -198,28 +198,28 @@ message XOr {
 }
 
 message BAnd {
-  PythonDiff left = 1;
-  PythonDiff right = 2;
+  PythonDiff lhs = 1;
+  PythonDiff rhs = 2;
 }
 
 message BOr {
-  PythonDiff left = 1;
-  PythonDiff right = 2;
+  PythonDiff lhs = 1;
+  PythonDiff rhs = 2;
 }
 
 message BXOr {
-  PythonDiff left = 1;
-  PythonDiff right = 2;
+  PythonDiff lhs = 1;
+  PythonDiff rhs = 2;
 }
 
 message LShift {
-  PythonDiff left = 1;
-  PythonDiff right = 2;
+  PythonDiff lhs = 1;
+  PythonDiff rhs = 2;
 }
 
 message RShift {
-  PythonDiff left = 1;
-  PythonDiff right = 2;
+  PythonDiff lhs = 1;
+  PythonDiff rhs = 2;
 }
 
 message Complement {

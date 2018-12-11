@@ -238,33 +238,33 @@ message Comparison {
 }
 
 message BOr {
-  JavaTerm left = 1;
-  JavaTerm right = 2;
+  JavaTerm lhs = 1;
+  JavaTerm rhs = 2;
 }
 
 message BXOr {
-  JavaTerm left = 1;
-  JavaTerm right = 2;
+  JavaTerm lhs = 1;
+  JavaTerm rhs = 2;
 }
 
 message BAnd {
-  JavaTerm left = 1;
-  JavaTerm right = 2;
+  JavaTerm lhs = 1;
+  JavaTerm rhs = 2;
 }
 
 message LShift {
-  JavaTerm left = 1;
-  JavaTerm right = 2;
+  JavaTerm lhs = 1;
+  JavaTerm rhs = 2;
 }
 
 message RShift {
-  JavaTerm left = 1;
-  JavaTerm right = 2;
+  JavaTerm lhs = 1;
+  JavaTerm rhs = 2;
 }
 
 message UnsignedRShift {
-  JavaTerm left = 1;
-  JavaTerm right = 2;
+  JavaTerm lhs = 1;
+  JavaTerm rhs = 2;
 }
 
 message Complement {

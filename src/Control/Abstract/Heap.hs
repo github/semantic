@@ -55,7 +55,6 @@ import qualified Data.Abstract.Heap as Heap
 import           Data.Abstract.Live
 import           Data.Abstract.Module (ModuleInfo)
 import           Data.Abstract.Name
-import           Data.Abstract.Ref
 import           Data.Abstract.ScopeGraph (Path (..), putDeclarationScopeAtPosition)
 import qualified Data.Map.Strict as Map
 import           Data.Span (Span, emptySpan)
@@ -176,13 +175,13 @@ define :: ( HasCallStack
           )
        => Declaration
        -> Evaluator term address value m value
-       -> Evaluator term address value m (ValueRef address value)
+       -> Evaluator term address value m ()
 define declaration def = withCurrentCallStack callStack $ do
   -- TODO: This span is still wrong.
   declare declaration emptySpan Nothing
   slot <- lookupDeclaration declaration
   value <- def
-  LvalMember slot <$ assign slot value
+  assign slot value
 
 -- | Associate an empty child scope with a declaration and then locally evaluate the body within an associated frame.
 withChildFrame :: ( Member (Allocator address) sig

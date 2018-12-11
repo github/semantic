@@ -24,8 +24,6 @@ module Control.Abstract.Value
 , While(..)
 , runWhile
 , WhileC(..)
-, value
-, rvalBox
 ) where
 
 import Control.Abstract.Evaluator
@@ -36,7 +34,6 @@ import Data.Abstract.BaseError
 import Data.Abstract.Module
 import Data.Abstract.Name
 import Data.Abstract.Number as Number
-import Data.Abstract.Ref
 import Data.Scientific (Scientific)
 import Data.Span
 import Prologue hiding (TypeError)
@@ -65,7 +62,7 @@ data Comparator
 --
 -- In the concrete domain, introductions & eliminations respectively construct & pattern match against values, while in abstract domains they respectively construct & project finite sets of discrete observations of abstract values. For example, an abstract domain modelling integers as a sign (-, 0, or +) would introduce abstract values by mapping integers to their sign and eliminate them by mapping signs back to some canonical integer, e.g. - -> -1, 0 -> 0, + -> 1.
 
-function :: (Member (Function term address value) sig, Carrier sig m) => Name -> [Name] -> term -> address -> Evaluator term address value m (ValueRef address value)
+function :: (Member (Function term address value) sig, Carrier sig m) => Name -> [Name] -> term -> address -> Evaluator term address value m value
 function name params body scope = sendFunction (Function name params body scope ret)
 
 data BuiltIn
@@ -76,16 +73,16 @@ data BuiltIn
 builtIn :: (Member (Function term address value) sig, Carrier sig m) => address -> BuiltIn -> Evaluator term address value m value
 builtIn address = sendFunction . flip (BuiltIn address) ret
 
-call :: (Member (Function term address value) sig, Carrier sig m) => value -> [value] -> Evaluator term address value m (ValueRef address value)
+call :: (Member (Function term address value) sig, Carrier sig m) => value -> [value] -> Evaluator term address value m value
 call fn args = sendFunction (Call fn args ret)
 
 sendFunction :: (Member (Function term address value) sig, Carrier sig m) => Function term address value (Evaluator term address value m) (Evaluator term address value m a) -> Evaluator term address value m a
 sendFunction = send
 
 data Function term address value (m :: * -> *) k
-  = Function Name [Name] term address (ValueRef address value -> k)
-  | BuiltIn address BuiltIn (value -> k)
-  | Call value [value] (ValueRef address value -> k)
+  =  Function Name [Name] term address (value -> k) -- ^ A function is parameterized by its name, parameter names, body, parent scope, and returns a ValueRef.
+  | BuiltIn address BuiltIn (value -> k)            -- ^ A built-in is parameterized by its parent scope, BuiltIn type, and returns a value.
+  | Call value [value] (value -> k)                 -- ^ A Call takes a set of values as parameters and returns a ValueRef.
   deriving (Functor)
 
 instance HFunctor (Function term address value) where
@@ -95,14 +92,13 @@ instance Effect (Function term address value) where
   handle state handler = coerce . fmap (handler . (<$ state))
 
 
--- TODO: eval and runFunction should return a ValueRef instead of a value
 runFunction :: Carrier (Function term address value :+: sig) (FunctionC term address value (Eff m))
-            => (term -> Evaluator term address value (FunctionC term address value (Eff m)) (ValueRef address value))
+            => (term -> Evaluator term address value (FunctionC term address value (Eff m)) value)
             -> Evaluator term address value (FunctionC term address value (Eff m)) a
             -> Evaluator term address value m a
 runFunction eval = raiseHandler (flip runFunctionC (runEvaluator . eval) . interpret)
 
-newtype FunctionC term address value m a = FunctionC { runFunctionC :: (term -> Eff (FunctionC term address value m) (ValueRef address value)) -> m a }
+newtype FunctionC term address value m a = FunctionC { runFunctionC :: (term -> Eff (FunctionC term address value m) value) -> m a }
 
 
 -- | Construct a boolean value in the abstract domain.
@@ -140,17 +136,17 @@ newtype BooleanC value m a = BooleanC { runBooleanC :: m a }
 
 
 -- | The fundamental looping primitive, built on top of 'ifthenelse'.
-while :: (Member (While address value) sig, Carrier sig m)
+while :: (Member (While value) sig, Carrier sig m)
       => Evaluator term address value m value -- ^ Condition
       -> Evaluator term address value m value -- ^ Body
-      -> Evaluator term address value m (ValueRef address value)
+      -> Evaluator term address value m value
 while cond body = send (While cond body ret)
 
 -- | Do-while loop, built on top of while.
-doWhile :: (Member (While address value) sig, Carrier sig m)
+doWhile :: (Member (While value) sig, Carrier sig m)
   => Evaluator term address value m value -- ^ Body
   -> Evaluator term address value m value -- ^ Condition
-  -> Evaluator term address value m (ValueRef address value)
+  -> Evaluator term address value m value
 doWhile body cond = body *> while cond body
 
 -- | C-style for loops.
@@ -163,7 +159,7 @@ forLoop :: ( Carrier sig m
            , Member (State (ScopeGraph address)) sig
            , Member (Reader (CurrentFrame address)) sig
            , Member (Reader (CurrentScope address)) sig
-           , Member (While address value) sig
+           , Member (While value) sig
            , Member Fresh sig
            , Ord address
            )
@@ -171,23 +167,23 @@ forLoop :: ( Carrier sig m
   -> Evaluator term address value m value -- ^ Condition
   -> Evaluator term address value m value -- ^ Increment/stepper
   -> Evaluator term address value m value -- ^ Body
-  -> Evaluator term address value m (ValueRef address value)
+  -> Evaluator term address value m value
 forLoop initial cond step body = initial *> while cond (withLexicalScopeAndFrame body *> step)
 
-data While address value m k
-  = While (m value) (m value) (ValueRef address value -> k)
+data While value m k
+  = While (m value) (m value) (value -> k)
   deriving (Functor)
 
-instance HFunctor (While address value) where
+instance HFunctor (While value) where
   hmap f (While cond body k) = While (f cond) (f body) k
 
 
-runWhile :: Carrier (While address value :+: sig) (WhileC address value (Eff m))
-         => Evaluator term address value (WhileC address value (Eff m)) a
+runWhile :: Carrier (While value :+: sig) (WhileC value (Eff m))
+         => Evaluator term address value (WhileC value (Eff m)) a
          -> Evaluator term address value m a
 runWhile = raiseHandler $ runWhileC . interpret
 
-newtype WhileC address value m a = WhileC { runWhileC :: m a }
+newtype WhileC value m a = WhileC { runWhileC :: m a }
 
 
 class Show value => AbstractIntro value where
@@ -290,22 +286,3 @@ class AbstractIntro value => AbstractValue term address value carrier where
   scopedEnvironment :: value -> Evaluator term address value carrier (Maybe address)
 
   object :: address -> Evaluator term address value carrier value
-
-
--- | Evaluates a 'Value' returning the referenced value
-value :: ( Member (Deref value) sig
-         , Member (Reader ModuleInfo) sig
-         , Member (Reader Span) sig
-         , Member (Resumable (BaseError (AddressError address value))) sig
-         , Member (State (Heap address address value)) sig
-         , Carrier sig m
-         , Ord address
-         )
-      => ValueRef address value
-      -> Evaluator term address value m value
-value (Rval val)        = pure val
-value (LvalMember slot) = deref slot
-
--- | Convenience function for boxing a raw value and wrapping it in an Rval
-rvalBox :: value -> Evaluator term address value m (ValueRef address value)
-rvalBox val = pure (Rval val)

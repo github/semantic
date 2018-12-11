@@ -29,7 +29,7 @@ instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 -- TODO: How should we represent function types, where applicable?
 
 instance Evaluatable Function where
-  eval _ Function{..} = do
+  eval _ _ Function{..} = do
     name <- maybeM (throwEvalError $ NoNameError functionName) (declaredName functionName)
     span <- ask @Span
     associatedScope <- declareFunction name span
@@ -40,7 +40,7 @@ instance Evaluatable Function where
 
     addr <- lookupDeclaration (Declaration name)
     v <- function name params functionBody associatedScope
-    v <$ (value v >>= assign addr)
+    v <$ assign addr v
 
 declareFunction :: ( Carrier sig m
                    , Member (State (ScopeGraph address)) sig
@@ -85,7 +85,7 @@ instance Diffable Method where
 -- Evaluating a Method creates a closure and makes that value available in the
 -- local environment.
 instance Evaluatable Method where
-  eval _ Method{..} = do
+  eval _ _ Method{..} = do
     name <- maybeM (throwEvalError $ NoNameError methodName) (declaredName methodName)
     span <- ask @Span
     associatedScope <- declareFunction name span
@@ -99,7 +99,7 @@ instance Evaluatable Method where
 
     addr <- lookupDeclaration (Declaration name)
     v <- function name params methodBody associatedScope
-    v <$ (value v >>= assign addr)
+    v <$ assign addr v
 
 instance Tokenize Data.Syntax.Declaration.Method where
   tokenize Method{..} = within' Scope.Method $ do
@@ -160,8 +160,8 @@ instance Ord1 VariableDeclaration where liftCompare = genericLiftCompare
 instance Show1 VariableDeclaration where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable VariableDeclaration where
-  eval _ (VariableDeclaration [])   = rvalBox unit
-  eval eval (VariableDeclaration decs) = do
+  eval _    _ (VariableDeclaration [])   = pure unit
+  eval eval _ (VariableDeclaration decs) = do
     for_ decs $ \declaration -> do
       name <- maybeM (throwEvalError $ NoNameError declaration) (declaredName declaration)
       declare (Declaration name) emptySpan Nothing
@@ -171,7 +171,7 @@ instance Evaluatable VariableDeclaration where
         pure (subtermSpan, ref)
 
       putDeclarationSpan (Declaration name) span
-    rvalBox unit
+    pure unit
 
 instance Declarations a => Declarations (VariableDeclaration a) where
   declaredName (VariableDeclaration vars) = case vars of
@@ -205,18 +205,16 @@ instance Show1 PublicFieldDefinition where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for PublicFieldDefinition
 instance Evaluatable PublicFieldDefinition where
-  eval eval PublicFieldDefinition{..} = do
+  eval eval _ PublicFieldDefinition{..} = do
     span <- ask @Span
     propertyName <- maybeM (throwEvalError $ NoNameError publicFieldPropertyName) (declaredName publicFieldPropertyName)
 
-    withScope instanceMemberScope $ do
-      declare (Declaration propertyName) span Nothing
-      slot <- lookupDeclaration (Declaration propertyName)
-      value <- value =<< eval publicFieldValue
-      assign slot value
-    rvalBox unit
-
-
+    -- withScope instanceMemberScope $ do
+    declare (Declaration propertyName) span Nothing
+    slot <- lookupDeclaration (Declaration propertyName)
+    value <- eval publicFieldValue
+    assign slot value
+    pure unit
 
 data Variable a = Variable { variableName :: !a, variableType :: !a, variableValue :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
@@ -242,7 +240,7 @@ instance Ord1 Class where liftCompare = genericLiftCompare
 instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Class where
-  eval eval Class{..} = do
+  eval eval _ Class{..} = do
     name <- maybeM (throwEvalError $ NoNameError classIdentifier) (declaredName classIdentifier)
     span <- ask @Span
     currentScope' <- currentScope
@@ -268,12 +266,12 @@ instance Evaluatable Class where
     instanceMemberScope <- newScope (Map.singleton InstanceOf [ classScope ])
 
     classSlot <- lookupDeclaration (Declaration name)
-    assign classSlot =<< klass (Declaration name) classFrame instanceMemberScope
+    assign classSlot =<< klass (Declaration name) classFrame -- instanceMemberScope
 
     withScopeAndFrame classFrame $ do
       void $ eval classBody
 
-    rvalBox unit
+    pure unit
 
 instance Declarations1 Class where
   liftDeclaredName declaredName = declaredName . classIdentifier
@@ -349,7 +347,7 @@ instance Ord1 TypeAlias where liftCompare = genericLiftCompare
 instance Show1 TypeAlias where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable TypeAlias where
-  eval _ TypeAlias{..} = do
+  eval _ _ TypeAlias{..} = do
     name <- maybeM (throwEvalError $ NoNameError typeAliasIdentifier) (declaredName typeAliasIdentifier)
     kindName <- maybeM (throwEvalError $ NoNameError typeAliasKind) (declaredName typeAliasKind)
 
@@ -361,7 +359,7 @@ instance Evaluatable TypeAlias where
     kindSlot <- lookupDeclaration (Declaration kindName)
     assign slot =<< deref kindSlot
 
-    rvalBox unit
+    pure unit
 
 instance Declarations a => Declarations (TypeAlias a) where
   declaredName TypeAlias{..} = declaredName typeAliasIdentifier

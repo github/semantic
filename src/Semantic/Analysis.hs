@@ -15,20 +15,20 @@ import Prologue
 import qualified Data.Map.Strict as Map
 
 type ModuleC address value m
-  = ErrorC (LoopControl address value) (Eff
-  ( ErrorC (Return address value)      (Eff
-  ( ReaderC (CurrentScope address)     (Eff
-  ( ReaderC (CurrentFrame address)     (Eff
-  ( DerefC address value               (Eff
-  ( AllocatorC address                 (Eff
-  ( ReaderC ModuleInfo                 (Eff
+  = ErrorC (LoopControl value)     (Eff
+  ( ErrorC (Return value)          (Eff
+  ( ReaderC (CurrentScope address) (Eff
+  ( ReaderC (CurrentFrame address) (Eff
+  ( DerefC address value           (Eff
+  ( AllocatorC address             (Eff
+  ( ReaderC ModuleInfo             (Eff
     m)))))))))))))
 
 type ValueC term address value m
-  = FunctionC term address value                                  (Eff
-  ( WhileC address value                                          (Eff
-  ( BooleanC value                                                (Eff
-  ( InterposeC (Resumable (BaseError (UnspecializedError value))) (Eff
+  = FunctionC term address value                                          (Eff
+  ( WhileC value                                                          (Eff
+  ( BooleanC value                                                        (Eff
+  ( InterposeC (Resumable (BaseError (UnspecializedError address value))) (Eff
     m)))))))
 
 -- | Evaluate a list of modules with the prelude for the passed language available, and applying the passed function to every module.
@@ -41,11 +41,11 @@ evaluate :: ( AbstractValue term address value (ValueC term address value inner)
             , allocatorSig ~ (Allocator address :+: Reader ModuleInfo :+: outerSig)
             , allocatorC ~ (AllocatorC address (Eff (ReaderC ModuleInfo (Eff outer))))
             , Carrier allocatorSig allocatorC
-            , booleanC ~ BooleanC value (Eff (InterposeC (Resumable (BaseError (UnspecializedError value))) (Eff inner)))
-            , booleanSig ~ (Boolean value :+: Interpose (Resumable (BaseError (UnspecializedError value))) :+: innerSig)
+            , booleanC ~ BooleanC value (Eff (InterposeC (Resumable (BaseError (UnspecializedError address value))) (Eff inner)))
+            , booleanSig ~ (Boolean value :+: Interpose (Resumable (BaseError (UnspecializedError address value))) :+: innerSig)
             , Carrier booleanSig booleanC
-            , whileC ~ WhileC address value (Eff booleanC)
-            , whileSig ~ (While address value :+: booleanSig)
+            , whileC ~ WhileC value (Eff booleanC)
+            , whileSig ~ (While value :+: booleanSig)
             , Carrier whileSig whileC
             , functionC ~ FunctionC term address value (Eff whileC)
             , functionSig ~ (Function term address value :+: whileSig)
@@ -60,7 +60,7 @@ evaluate :: ( AbstractValue term address value (ValueC term address value inner)
             , Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address value))))) outerSig
             , Member (Reader Span) innerSig
             , Member (Resumable (BaseError (AddressError address value))) innerSig
-            , Member (Resumable (BaseError (UnspecializedError value))) innerSig
+            , Member (Resumable (BaseError (UnspecializedError address value))) innerSig
             , Member (State (Heap address address value)) innerSig
             , Member (State (ScopeGraph address)) innerSig
             , Member (State (Heap address address value)) outerSig
@@ -74,9 +74,9 @@ evaluate :: ( AbstractValue term address value (ValueC term address value inner)
             , Show address
             )
          => proxy lang
-         -> (  (Module (Either (proxy lang) term) -> Evaluator term address value inner (ValueRef address value))
-            -> (Module (Either (proxy lang) term) -> Evaluator term address value (ModuleC address value outer) (ValueRef address value)))
-         -> (term -> Evaluator term address value (ValueC term address value inner) (ValueRef address value))
+         -> (  (Module (Either (proxy lang) term) -> Evaluator term address value inner value)
+            -> (Module (Either (proxy lang) term) -> Evaluator term address value (ModuleC address value outer) value))
+         -> (term -> Evaluator term address value (ValueC term address value inner) value)
          -> [Module term]
          -> Evaluator term address value outer (ModuleTable (NonEmpty (Module (ModuleResult address value))))
 evaluate lang perModule runTerm modules = do
@@ -88,10 +88,9 @@ evaluate lang perModule runTerm modules = do
           -- FIXME: this should be some sort of Monoidal insert à la the Heap to accommodate multiple Go files being part of the same module.
           local (ModuleTable.insert (modulePath (moduleInfo m)) ((evaluated <$ m) :| [])) rest
 
-        evalModule parentScope parentFrame m =
-          -- Run the allocator and Reader ModuleInfo effects (Some allocator instances depend on Reader ModuleInfo)
-          -- after setting up the scope and frame for a module.
-          raiseHandler (runReader (moduleInfo m)) . runAllocator $ do
+        -- Run the allocator and Reader ModuleInfo effects (Some allocator instances depend on Reader ModuleInfo)
+        -- after setting up the scope and frame for a module.
+        evalModule parentScope parentFrame m = raiseHandler (runReader (moduleInfo m)) . runAllocator $ do
           let (scopeEdges, frameLinks) = case (parentScope, parentFrame) of
                 (Just parentScope, Just parentFrame) -> (Map.singleton Lexical [ parentScope ], Map.singleton Lexical (Map.singleton parentScope parentFrame))
                 _ -> mempty
@@ -106,12 +105,11 @@ evaluate lang perModule runTerm modules = do
                   . runReturn
                   . runLoopControl
 
-        runValueEffects = raiseHandler runInterpose . runBoolean . runWhile . runFunction runTerm . either ((*> rvalBox unit) . definePrelude) runTerm
+        runValueEffects = raiseHandler runInterpose . runBoolean . runWhile . runFunction runTerm . either ((unit <$) . definePrelude) runTerm
 
 -- | Evaluate a term recursively, applying the passed function at every recursive position.
 --
 --   This calls out to the 'Evaluatable' instances, will be passed to 'runValueEffects', and can have other functions composed after it to e.g. intercept effects arising in the evaluation of the term.
---   TODO: evalTerm should return a ValueRef like eval and runFunction
 evalTerm :: ( Carrier sig m
             , Declarations term
             , Evaluatable (Base term)
@@ -120,8 +118,8 @@ evalTerm :: ( Carrier sig m
             , Member (Allocator address) sig
             , Member (Boolean value) sig
             , Member (Deref value) sig
-            , Member (Error (LoopControl address value)) sig
-            , Member (Error (Return address value)) sig
+            , Member (Error (LoopControl value)) sig
+            , Member (Error (Return value)) sig
             , Member (Function term address value) sig
             , Member (Modules address value) sig
             , Member (Reader ModuleInfo) sig
@@ -130,7 +128,7 @@ evalTerm :: ( Carrier sig m
             , Member (Resumable (BaseError (AddressError address value))) sig
             , Member (Resumable (BaseError (HeapError address))) sig
             , Member (Resumable (BaseError (ScopeError address))) sig
-            , Member (Resumable (BaseError (UnspecializedError value))) sig
+            , Member (Resumable (BaseError (UnspecializedError address value))) sig
             , Member (Resumable (BaseError (EvalError term address value))) sig
             , Member (Resumable (BaseError ResolutionError)) sig
             , Member (State (Heap address address value)) sig
@@ -138,13 +136,14 @@ evalTerm :: ( Carrier sig m
             , Member (Reader (CurrentFrame address)) sig
             , Member (Reader (CurrentScope address)) sig
             , Member (State Span) sig
-            , Member (While address value) sig
+            , Member (While value) sig
             , Member Fresh sig
             , Member Trace sig
             , Ord address
             , Show address
             , Recursive term
             )
-         => Open (Open (term -> Evaluator term address value m (ValueRef address value)))
-         -> term -> Evaluator term address value m (ValueRef address value)
-evalTerm perTerm = fix (perTerm (\ ev -> eval ev . project))
+         => Open (term -> Evaluator term address value m value)
+         -> term -> Evaluator term address value m value
+-- NB: We use a lazy pattern match for the lambda’s argument to postpone evaluating the pair until eval/ref is called.
+evalTerm perTerm = fst (fix (\ ~(ev, re) -> (perTerm (eval ev re . project), ref ev re . project)))

@@ -477,6 +477,9 @@ instance Listable1 Ruby.Syntax.Module where
 instance Listable1 Ruby.Syntax.Require where
   liftTiers tiers' = liftCons2 tiers tiers' Ruby.Syntax.Require
 
+instance Listable1 Ruby.Syntax.ZSuper where
+  liftTiers tiers = cons0 Ruby.Syntax.ZSuper
+
 instance Listable1 Ruby.Syntax.Send where
   liftTiers tiers = liftCons4 (liftTiers tiers) (liftTiers tiers) (liftTiers tiers) (liftTiers tiers) Ruby.Syntax.Send
 
