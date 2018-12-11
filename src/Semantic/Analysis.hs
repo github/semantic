@@ -57,7 +57,7 @@ evaluate :: ( AbstractValue term address value (ValueC term address value inner)
             , Member (Deref value) innerSig
             , Member Fresh innerSig
             , Member (Reader ModuleInfo) innerSig
-            , Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address value))))) outerSig
+            , Member (Reader (ModuleTable (Module (ModuleResult address value)))) outerSig
             , Member (Reader Span) innerSig
             , Member (Resumable (BaseError (AddressError address value))) innerSig
             , Member (Resumable (BaseError (UnspecializedError address value))) innerSig
@@ -78,14 +78,14 @@ evaluate :: ( AbstractValue term address value (ValueC term address value inner)
             -> (Module (Either (proxy lang) term) -> Evaluator term address value (ModuleC address value outer) value))
          -> (term -> Evaluator term address value (ValueC term address value inner) value)
          -> [Module term]
-         -> Evaluator term address value outer (ModuleTable (NonEmpty (Module (ModuleResult address value))))
+         -> Evaluator term address value outer (ModuleTable (Module (ModuleResult address value)))
 evaluate lang perModule runTerm modules = do
   let prelude = Module moduleInfoFromCallStack (Left lang)
   ((preludeScopeAddress, preludeFrameAddress), _) <- evalModule Nothing Nothing prelude
   foldr (run preludeScopeAddress preludeFrameAddress . fmap Right) ask modules
   where run preludeScopeAddress preludeFrameAddress m rest = do
           evaluated <- evalModule (Just preludeScopeAddress) (Just preludeFrameAddress) m
-          local (ModuleTable.insert (modulePath (moduleInfo m)) ((evaluated <$ m) :| [])) rest
+          local (ModuleTable.insert (modulePath (moduleInfo m)) (evaluated <$ m)) rest
 
         -- Run the allocator and Reader ModuleInfo effects (Some allocator instances depend on Reader ModuleInfo)
         -- after setting up the scope and frame for a module.

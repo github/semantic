@@ -26,7 +26,6 @@ import Data.Abstract.BaseError
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
 import Data.Language
-import Data.Semigroup.Foldable (foldMap1)
 import qualified Data.Set as Set
 import Data.Span
 import Prologue
@@ -83,7 +82,7 @@ sendModules :: ( Member (Modules address value) sig
             -> Evaluator term address value m return
 sendModules = send
 
-runModules :: ( Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address value))))) sig
+runModules :: ( Member (Reader (ModuleTable (Module (ModuleResult address value)))) sig
               , Member (Resumable (BaseError (LoadError address value))) sig
               , Carrier sig m
               )
@@ -94,7 +93,7 @@ runModules paths = raiseHandler $ flip runModulesC paths . interpret
 
 newtype ModulesC address value m a = ModulesC { runModulesC :: Set ModulePath -> m a }
 
-instance ( Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address value))))) sig
+instance ( Member (Reader (ModuleTable (Module (ModuleResult address value)))) sig
          , Member (Resumable (BaseError (LoadError address value))) sig
          , Carrier sig m
          , Monad m
@@ -102,12 +101,12 @@ instance ( Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address v
       => Carrier (Modules address value :+: sig) (ModulesC address value m) where
   ret = ModulesC . const . ret
   eff op = ModulesC (\ paths -> handleSum (eff . handleReader paths runModulesC) (\case
-    Load    name  k -> askModuleTable >>= maybeM (throwLoadError (ModuleNotFoundError name)) . fmap (runMerging . foldMap1 (Merging . moduleBody)) . ModuleTable.lookup name >>= flip runModulesC paths . k
-    Lookup  path  k -> askModuleTable >>= flip runModulesC paths . k . fmap (runMerging . foldMap1 (Merging . moduleBody)) . ModuleTable.lookup path
+    Load    name  k -> askModuleTable >>= maybeM (throwLoadError (ModuleNotFoundError name)) . fmap moduleBody . ModuleTable.lookup name >>= flip runModulesC paths . k
+    Lookup  path  k -> askModuleTable >>= flip runModulesC paths . k . fmap moduleBody . ModuleTable.lookup path
     Resolve names k -> runModulesC (k (find (`Set.member` paths) names)) paths
     List    dir   k -> runModulesC (k (filter ((dir ==) . takeDirectory) (toList paths))) paths) op)
 
-askModuleTable :: (Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address value))))) sig, Carrier sig m) => m (ModuleTable (NonEmpty (Module (ModuleResult address value))))
+askModuleTable :: (Member (Reader (ModuleTable (Module (ModuleResult address value)))) sig, Carrier sig m) => m (ModuleTable (Module (ModuleResult address value)))
 askModuleTable = ask
 
 
