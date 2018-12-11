@@ -28,6 +28,7 @@ module Control.Abstract.Value
 , Unit(..)
 , runUnit
 , UnitC(..)
+, String(..)
 ) where
 
 import Control.Abstract.Evaluator
@@ -40,6 +41,7 @@ import Data.Abstract.Name
 import Data.Abstract.Number as Number
 import Data.Scientific (Scientific)
 import Data.Span
+import Prelude hiding (String)
 import Prologue hiding (TypeError)
 
 -- | This datum is passed into liftComparison to handle the fact that Ruby and PHP
@@ -211,6 +213,19 @@ runUnit :: Carrier (Unit value :+: sig) (UnitC value (Eff m))
         => Evaluator term address value (UnitC value (Eff m)) a
         -> Evaluator term address value m a
 runUnit = raiseHandler $ runUnitC . interpret
+
+data String value (m :: * -> *) k
+  = String Text (value -> k)
+  | AsString value (Text -> k)
+  deriving (Functor)
+
+instance HFunctor (String value) where
+  hmap _ = coerce
+  {-# INLINE hmap #-}
+
+instance Effect (String value) where
+  handle state handler (String text k) = String text (handler . (<$ state) . k)
+  handle state handler (AsString v k) = AsString v (handler . (<$ state) . k)
 
 
 class Show value => AbstractIntro value where
