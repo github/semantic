@@ -1,7 +1,7 @@
 module Analysis.TypeScript.Spec (spec) where
 
 import           Control.Abstract.ScopeGraph
-import           Control.Abstract.Value as Value
+import           Control.Abstract.Value as Value hiding (String, Unit)
 import           Control.Arrow ((&&&))
 import           Data.Abstract.Evaluatable
 import qualified Data.Abstract.Heap as Heap
