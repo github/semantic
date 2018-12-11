@@ -12,7 +12,6 @@ import Control.Abstract.ScopeGraph
 import Control.Abstract.Value
 import Data.Abstract.BaseError
 import Data.Abstract.Name
-import Data.Abstract.Ref
 import Data.Map.Strict as Map
 import Data.Span
 import Prologue
@@ -35,7 +34,7 @@ defineBuiltIn :: ( HasCallStack
                  )
               => Declaration
               -> BuiltIn
-              -> Evaluator term address value m (ValueRef address value)
+              -> Evaluator term address value m ()
 defineBuiltIn declaration value = withCurrentCallStack callStack $ do
   currentScope' <- currentScope
   let lexicalEdges = Map.singleton Lexical [ currentScope' ]
@@ -49,7 +48,7 @@ defineBuiltIn declaration value = withCurrentCallStack callStack $ do
 
   slot <- lookupDeclaration declaration
   value <- builtIn associatedScope value
-  LvalMember slot <$ assign slot value
+  assign slot value
 
 defineClass :: ( AbstractValue term address value m
                , Carrier sig m
