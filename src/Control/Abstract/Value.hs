@@ -197,7 +197,7 @@ newtype WhileC value m a = WhileC { runWhileC :: m a }
 unit :: (Carrier sig m, Member (Unit value) sig) => Evaluator term address value m value
 unit = send (Unit ret)
 
-data Unit value (m :: * -> *) k
+newtype Unit value (m :: * -> *) k
   = Unit (value -> k)
   deriving (Functor)
 
