@@ -41,14 +41,20 @@ import qualified Data.Map.Strict as Map
 import           Prelude hiding (lookup)
 import           Prologue
 
+-- | A Frame describes the vertices of the Heap. Think of it as an instance of a Scope in the ScopeGraph.
 data Frame scopeAddress frameAddress value = Frame
   { scopeAddress :: scopeAddress
+    -- ^ The scope address of its corresponding Scope
   , links        :: Map EdgeLabel (Map scopeAddress frameAddress)
+  -- ^ A map of edge labels to maps of scope addresses to frame addresses (scope addresses are unique keys in the ScopeGraph
+  --   and frame addresses are unique keys in the Heap). This map describes the frame’s links to other frames.
+  --   A frame’s links are always in one-to-one correspondence with its scope’s edges to parent scopes.
   , slots        :: IntMap (Set value)
+  -- ^ An IntMap of values that are declared in the frame.
   }
   deriving (Eq, Ord, Show, Generic, NFData)
 
--- | A map of frame addresses onto Frames.
+-- | A Heap is a Map from frame addresses to frames.
 newtype Heap scopeAddress frameAddress value = Heap { unHeap :: Map frameAddress (Frame scopeAddress frameAddress value) }
   deriving stock (Eq, Generic, Ord)
   deriving newtype (NFData)
@@ -135,11 +141,13 @@ heapSize = Map.size . unHeap
 heapRestrict :: Ord address => Heap address address value -> Live address -> Heap address address value
 heapRestrict (Heap m) roots = Heap (Map.filterWithKey (\ address _ -> address `liveMember` roots) m)
 
+-- | Checks whether a heap as no slots and links.
 isHeapEmpty :: (Eq address, Eq value) => Heap scope address value -> Bool
 isHeapEmpty h@(Heap heap)
   =  heapSize h == 1
   && (toEmptyFrame <$> Map.elems heap) == [ Frame () mempty mempty ]
   where
+    -- Maps a frame's address param to () so we can check that its slots and links are empty.
     toEmptyFrame Frame{..} = Frame () (Map.mapKeysMonotonic (const ()) <$> links) slots
 
 

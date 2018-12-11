@@ -198,33 +198,33 @@ message FloorDivision {
 }
 
 message BOr {
-  GoTerm left = 1;
-  GoTerm right = 2;
+  GoTerm lhs = 1;
+  GoTerm rhs = 2;
 }
 
 message BAnd {
-  GoTerm left = 1;
-  GoTerm right = 2;
+  GoTerm lhs = 1;
+  GoTerm rhs = 2;
 }
 
 message BXOr {
-  GoTerm left = 1;
-  GoTerm right = 2;
+  GoTerm lhs = 1;
+  GoTerm rhs = 2;
 }
 
 message LShift {
-  GoTerm left = 1;
-  GoTerm right = 2;
+  GoTerm lhs = 1;
+  GoTerm rhs = 2;
 }
 
 message RShift {
-  GoTerm left = 1;
-  GoTerm right = 2;
+  GoTerm lhs = 1;
+  GoTerm rhs = 2;
 }
 
 message UnsignedRShift {
-  GoTerm left = 1;
-  GoTerm right = 2;
+  GoTerm lhs = 1;
+  GoTerm rhs = 2;
 }
 
 message Complement {

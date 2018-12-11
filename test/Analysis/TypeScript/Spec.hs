@@ -44,13 +44,12 @@ spec config = parallel $ do
       (scopeGraph, (heap, res)) <- evaluate ["main1.ts", "foo.ts", "a.ts"]
       case ModuleTable.lookup "main1.ts" <$> res of
         Right (Just (Module _ (scopeAndFrame, _) :| [])) -> do
-          -- Env.names env `shouldBe` [ "b", "z" ]
           () <$ SpecHelpers.lookupDeclaration "b" scopeAndFrame heap scopeGraph `shouldBe` Just ()
           () <$ SpecHelpers.lookupDeclaration "z" scopeAndFrame heap scopeGraph `shouldBe` Just ()
+
           lookupMembers "b" Import scopeAndFrame heap scopeGraph `shouldBe` Just  [ "baz", "foo" ]
           lookupMembers "z" Import scopeAndFrame heap scopeGraph `shouldBe` Just  [ "baz", "foo" ]
-          -- (Heap.lookupDeclaration "b" heap  >>= deNamespace heap) `shouldBe` Just ("b", [ "baz", "foo" ])
-          -- (Heap.lookupDeclaration "z" heap >>= deNamespace heap) `shouldBe` Just ("z", [ "baz", "foo" ])
+
           () <$ SpecHelpers.lookupDeclaration "baz" scopeAndFrame heap scopeGraph `shouldBe` Nothing
           () <$ SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldBe` Nothing
         other -> expectationFailure (show other)
@@ -77,7 +76,7 @@ spec config = parallel $ do
         Right (Just (Module _ (scopeAndFrame@(currentScope, currentFrame), value) :| [])) -> do
           () <$ SpecHelpers.lookupDeclaration "baz" scopeAndFrame heap scopeGraph `shouldBe` Nothing
           value `shouldBe` Unit
-          Heap.heapSize heap `shouldBe` 3
+          Heap.heapSize heap `shouldBe` 4
         other -> expectationFailure (show other)
 
     it "fails exporting symbols not defined in the module" $ do

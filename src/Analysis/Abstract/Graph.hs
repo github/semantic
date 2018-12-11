@@ -65,23 +65,24 @@ style = (defaultStyle (T.encodeUtf8Builder . vertexIdentifier))
 graphingTerms :: ( Member (Reader ModuleInfo) sig
                  , Member (Reader Span) sig
                  , Member (State (Graph ControlFlowVertex)) sig
-                 , Member (State (Map (Slot (Hole context (Located address))) ControlFlowVertex)) sig
-                 , Member (State (Heap (Hole context (Located address)) (Hole context (Located address)) value)) sig
+                 , Member (State (Map (Slot hole) ControlFlowVertex)) sig
+                 , Member (State (Heap hole hole value)) sig
                  , Member (State (ScopeGraph (Hole context (Located address)))) sig
-                 , Member (Resumable (BaseError (ScopeError (Hole context (Located address))))) sig
-                 , Member (Resumable (BaseError (HeapError (Hole context (Located address))))) sig
-                 , Member (Reader (CurrentFrame (Hole context (Located address)))) sig
-                 , Member (Reader (CurrentScope (Hole context (Located address)))) sig
+                 , Member (Resumable (BaseError (ScopeError hole))) sig
+                 , Member (Resumable (BaseError (HeapError hole))) sig
+                 , Member (Reader (CurrentFrame hole)) sig
+                 , Member (Reader (CurrentScope hole)) sig
                  , Member (Reader ControlFlowVertex) sig
                  , VertexDeclaration syntax
                  , Declarations1 syntax
                  , Ord address
                  , Ord context
                  , Foldable syntax
+                 , hole ~ Hole context (Located address)
                  , term ~ Term syntax Location
                  , Carrier sig m
                  )
-              => Open (term -> Evaluator term (Hole context (Located address)) value m a)
+              => Open (term -> Evaluator term hole value m a)
 graphingTerms recur term@(Term (In a syntax)) = do
   definedInModule <- currentModule
   case toVertex a definedInModule syntax of

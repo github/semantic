@@ -7,7 +7,6 @@ module Language.TypeScript.Resolution
   , resolveModule
   , resolveNonRelativePath
   , javascriptExtensions
-  -- , evalRequire
   , typescriptExtensions
   ) where
 
@@ -19,8 +18,8 @@ import           Data.Abstract.Evaluatable
 import qualified Data.Abstract.Module as M
 import           Data.Abstract.Package
 import           Data.Abstract.Path
+import           Data.ImportPath
 import qualified Data.Language as Language
-import Data.ImportPath
 
 -- Node.js resolution algorithm: https://nodejs.org/api/modules.html#modules_all_together
 --
