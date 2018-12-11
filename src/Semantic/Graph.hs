@@ -157,7 +157,7 @@ runImportGraphToModuleInfos :: ( Declarations term
                             -> Package term
                             -> Eff m (Graph ControlFlowVertex)
 runImportGraphToModuleInfos lang (package :: Package term) = runImportGraph lang package allModuleInfos
-  where allModuleInfos info = maybe (vertex (unknownModuleVertex info)) (foldMap (vertex . moduleVertex . moduleInfo)) (ModuleTable.lookup (modulePath info) (packageModules package))
+  where allModuleInfos info = vertex (maybe (unknownModuleVertex info) (moduleVertex . moduleInfo) (ModuleTable.lookup (modulePath info) (packageModules package)))
 
 runImportGraphToModules :: ( Declarations term
                            , Evaluatable (Base term)
@@ -173,7 +173,7 @@ runImportGraphToModules :: ( Declarations term
                         -> Package term
                         -> Eff m (Graph (Module term))
 runImportGraphToModules lang (package :: Package term) = runImportGraph lang package resolveOrLowerBound
-  where resolveOrLowerBound info = maybe lowerBound (foldMap vertex) (ModuleTable.lookup (modulePath info) (packageModules package))
+  where resolveOrLowerBound info = maybe lowerBound vertex (ModuleTable.lookup (modulePath info) (packageModules package))
 
 runImportGraph :: ( Declarations term
                   , Evaluatable (Base term)
@@ -210,7 +210,7 @@ runImportGraph lang (package :: Package term) f
   . raiseHandler (runReader (lowerBound @Span))
   . raiseHandler (runState (lowerBound @(ScopeGraph (Hole (Maybe Name) Precise))))
   . runAllocator
-  $ evaluate lang (graphingModuleInfo (runDomainEffects (evalTerm id))) (ModuleTable.toPairs ( packageModules package) >>= toList . snd)
+  $ evaluate lang (graphingModuleInfo (runDomainEffects (evalTerm id))) (snd <$> ModuleTable.toPairs (packageModules package))
 
 runHeap :: (Carrier sig m, Effect sig)
         => Evaluator term address value (StateC (Heap address address value) (Eff m)) a
