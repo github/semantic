@@ -169,7 +169,6 @@ library
                      , Language.Java.Assignment
                      , Language.Java.Grammar
                      , Language.Java.Syntax
-                     , Matching.Core
                      , Numeric.Exts
                      -- Parser glue
                      , Parsing.CMark
