@@ -13,7 +13,7 @@ module Data.Abstract.Value.Type
 
 import Control.Abstract.ScopeGraph
 import qualified Control.Abstract as Abstract
-import Control.Abstract hiding (Boolean(..), Function(..), Unit(..), While(..))
+import Control.Abstract hiding (Boolean(..), Function(..), String(..), Unit(..), While(..))
 import Control.Effect.Carrier
 import Control.Effect.Sum
 import Data.Abstract.BaseError
