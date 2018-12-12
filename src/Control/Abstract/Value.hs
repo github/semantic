@@ -208,12 +208,12 @@ instance HFunctor (Unit value) where
 instance Effect (Unit value) where
   handle state handler (Unit k) = Unit (handler . (<$ state) . k)
 
-newtype UnitC value m a = UnitC { runUnitC :: m a }
-
 runUnit :: Carrier (Unit value :+: sig) (UnitC value (Eff m))
         => Evaluator term address value (UnitC value (Eff m)) a
         -> Evaluator term address value m a
 runUnit = raiseHandler $ runUnitC . interpret
+
+newtype UnitC value m a = UnitC { runUnitC :: m a }
 
 
 data String value (m :: * -> *) k
