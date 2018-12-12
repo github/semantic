@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedLists, TypeOperators #-}
+{-# LANGUAGE GADTs, OverloadedLists, TypeOperators #-}
 
 module Reprinting.Spec where
 
@@ -22,7 +22,11 @@ import           Language.Ruby.PrettyPrint
 import           Reprinting.Pipeline
 import           Reprinting.Tokenize
 import           Semantic.IO
-import           Semantic.Util.Rewriting hiding (parseFile)
+
+increaseNumbers :: (Literal.Float :< fs, Apply Functor fs) => Rule (Term (Sum fs) History)
+increaseNumbers = do
+  (Literal.Float c) <- target >>= guardTerm
+  create (Literal.Float (c <> "0"))
 
 spec :: Spec
 spec = describe "reprinting" $ do
@@ -61,7 +65,7 @@ spec = describe "reprinting" $ do
         printed `shouldBe` Right src
 
       it "should be able to parse the output of a refactor" $ do
-        let (Right tagged) = rewrite (somewhere increaseNumbers markRefactored) () (mark Unmodified tree)
+        let (Just tagged) = rewrite (mark Unmodified tree) (topDownAny increaseNumbers) 
         let (Right printed) = runReprinter src defaultJSONPipeline tagged
         tree' <- runTask (parse jsonParser (Blob printed path Language.JSON))
         length tree' `shouldSatisfy` (/= 0)

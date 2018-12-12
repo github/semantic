@@ -1,6 +1,6 @@
-{-# LANGUAGE TypeFamilies, TypeOperators #-}
+{-# LANGUAGE TypeOperators, TypeFamilies #-}
 
-module Control.Rewriting.Spec (spec) where
+module Rewriting.JSON.Spec (spec) where
 
 import           Prelude hiding (id, (.))
 
@@ -11,7 +11,6 @@ import           Data.Either
 import           Data.Text (Text)
 
 import           Control.Category
-import           Control.Matching as Matching
 import           Control.Rewriting as Rewriting
 import           Data.History as History
 import qualified Data.Source as Source
@@ -22,21 +21,22 @@ import           Reprinting.Pipeline
 
 -- Adds a "hi": "bye" key-value pair to any empty Hash.
 onTrees :: ( Literal.TextElement :< syn
-           , Literal.KeyValue :< syn
-           , Apply Functor syn
-           , term ~ Term (Sum syn) History
-           ) => Rewrite (env, term) (Literal.Hash term)
+          , Literal.Hash :< syn
+          , Literal.KeyValue :< syn
+          , Apply Functor syn
+          , term ~ Term (Sum syn) History
+          ) => Rule term
 onTrees = do
-  Literal.Hash els <- Rewriting.target
+  Literal.Hash els <- Rewriting.target >>= guardTerm
   guard (null els)
-  k <- modified $ Literal.TextElement "\"hi\""
-  v <- modified $ Literal.TextElement "\"bye\""
-  pair <- modified $ (Literal.KeyValue k v)
-  pure (Literal.Hash (pair : els))
+  k <- create $ Literal.TextElement "\"hi\""
+  v <- create $ Literal.TextElement "\"bye\""
+  pair <- create $ (Literal.KeyValue k v)
+  create (Literal.Hash (pair : els))
 
 -- Matches only "hi" string literals.
 isHi :: ( Literal.TextElement :< fs
-        ) => Matcher (Term (Sum fs) History) Text
+        ) => Rewrite (Term (Sum fs) History) Text
 isHi = enter Literal.textElementContent
        >>> ensure (== "\"hi\"")
 
@@ -48,11 +48,11 @@ spec = describe "rewriting" $ do
 
   refactored <- runIO $ do
     json <- parseFile jsonParser path
-    let result = rewrite (somewhere onTrees markRefactored) () (History.mark Unmodified json)
-    either (fail . show) pure result
+    let result = rewrite @Maybe (History.mark Unmodified json) (topDownAny onTrees) 
+    maybe (fail "rewrite failed") pure result
 
   it "should add keys to JSON values" $ do
-    length (matchRecursively @[] isHi refactored) `shouldBe` 1
+    length (recursively @[] isHi refactored) `shouldBe` 1
 
   it "should round-trip correctly" $ do
     let res = runReprinter bytes defaultJSONPipeline refactored
