@@ -41,11 +41,22 @@ import           Prologue
 data Slot address = Slot { frameAddress :: address, position :: Position }
     deriving (Eq, Show, Ord, Generic, NFData)
 
+data Relation = Default | InstanceOf
+  deriving (Eq, Show, Ord, Generic, NFData)
+
+data Data address = Data {
+    declaration :: Declaration
+  , relation :: Relation
+  , span :: Span
+  , scopeAddress :: Maybe address
+  }
+  deriving (Eq, Show, Ord, Generic, NFData)
+
 -- Offsets and frame addresses in the heap should be addresses?
-data Scope scopeAddress = Scope
-  { edges        :: Map EdgeLabel [scopeAddress] -- Maybe Map EdgeLabel [Path scope]?
-  , references   :: Map Reference (Path scopeAddress)
-  , declarations :: Seq (Declaration, (Span, Maybe scopeAddress))
+data Scope address = Scope
+  { edges        :: Map EdgeLabel [address]
+  , references   :: Map Reference (Path address)
+  , declarations :: Seq (Data address)
   } deriving (Eq, Show, Ord, Generic, NFData)
 
 instance Lower (Scope scopeAddress) where
@@ -101,7 +112,7 @@ pathsOfScope :: Ord scope => scope -> ScopeGraph scope -> Maybe (Map Reference (
 pathsOfScope scope = fmap references . Map.lookup scope . unScopeGraph
 
 -- Returns the declaration data of a scope in a scope graph.
-ddataOfScope :: Ord scope => scope -> ScopeGraph scope -> Maybe (Seq (Declaration, (Span, Maybe scope)))
+ddataOfScope :: Ord scope => scope -> ScopeGraph scope -> Maybe (Seq (Data scope))
 ddataOfScope scope = fmap declarations . Map.lookup scope . unScopeGraph
 
 -- Returns the edges of a scope in a scope graph.
@@ -114,15 +125,15 @@ lookupScope scope = Map.lookup scope . unScopeGraph
 
 -- Declare a declaration with a span and an associated scope in the scope graph.
 -- TODO: Return the whole value in Maybe or Either.
-declare :: Ord scope => Declaration -> Span -> Maybe scope -> scope -> ScopeGraph scope -> (ScopeGraph scope, Maybe Position)
-declare declaration ddata assocScope currentScope g = fromMaybe (g, Nothing) $ do
+declare :: Ord scope => Declaration -> Span -> Relation -> Maybe scope -> scope -> ScopeGraph scope -> (ScopeGraph scope, Maybe Position)
+declare decl declSpan rel assocScope currentScope g = fromMaybe (g, Nothing) $ do
   scope <- lookupScope currentScope g
 
   dataSeq <- ddataOfScope currentScope g
-  case Seq.findIndexR (\(decl, (span, _)) -> decl == declaration && ddata == span) dataSeq of
+  case Seq.findIndexR (\Data{..} -> decl == declaration && declSpan == span && rel == relation) dataSeq of
     Just index -> pure (g, Just (Position index))
     Nothing -> do
-      let newScope = scope { declarations = declarations scope Seq.|> (declaration, (ddata, assocScope)) }
+      let newScope = scope { declarations = declarations scope Seq.|> Data decl rel declSpan assocScope }
       pure (insertScope currentScope newScope g, Just (Position (length (declarations newScope))))
 
 -- | Add a reference to a declaration in the scope graph.
@@ -167,9 +178,9 @@ insertReference :: Reference -> Path scopeAddress -> Scope scopeAddress -> Scope
 insertReference ref path scope = scope { references = Map.insert ref path (references scope) }
 
 lookupDeclaration :: Ord scopeAddress => Name -> scopeAddress -> ScopeGraph scopeAddress -> Maybe ((Declaration, (Span, Maybe scopeAddress)), Position)
-lookupDeclaration declaration scope g = do
+lookupDeclaration name scope g = do
   dataSeq <- ddataOfScope scope g
-  index <- Seq.findIndexR ((Declaration declaration ==) . fst) dataSeq
+  index <- Seq.findIndexR (\Data{..} -> Declaration name == declaration) dataSeq
   (, Position index) <$> Seq.lookup index dataSeq
 
 declarationNames :: Ord address => [EdgeLabel] -> Scope address -> ScopeGraph address -> Set Declaration
@@ -256,5 +267,5 @@ newtype Declaration = Declaration { unDeclaration :: Name }
 
 -- | The type of edge from a scope to its parent scopes.
 -- Either a lexical edge or an import edge in the case of non-lexical edges.
-data EdgeLabel = Lexical | Import | Export | Superclass | InstanceOf
+data EdgeLabel = Lexical | Import | Export | Superclass
   deriving (Eq, Ord, Show, Generic, NFData)
