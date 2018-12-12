@@ -30,6 +30,7 @@ module Control.Abstract.Value
 , UnitC(..)
 , String(..)
 , StringC(..)
+, runString
 ) where
 
 import Control.Abstract.Evaluator
@@ -230,6 +231,14 @@ instance Effect (String value) where
 
 newtype StringC value m a = StringC { runStringC :: m a }
 
+runString :: Carrier (String value :+: sig) (StringC value (Eff m))
+              -- Have to mention String because we don't know what the value type is
+              -- Enables single effect handler function across abstract, concret, type
+              -- Allows us to define something once in evaluate in Semantic.Analysis
+              -- instead of crazy composition
+          => Evaluator term address value (StringC value (Eff m)) a
+          -> Evaluator term address value m a
+runString = raiseHandler $ runStringC . interpret
 
 class Show value => AbstractIntro value where
   -- | Construct an abstract string value.
