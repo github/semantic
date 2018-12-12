@@ -210,7 +210,7 @@ instance Evaluatable PublicFieldDefinition where
     propertyName <- maybeM (throwEvalError $ NoNameError publicFieldPropertyName) (declaredName publicFieldPropertyName)
 
     -- withScope instanceScope $ do
-    declare (Declaration propertyName) span Nothing
+    declare (Declaration propertyName) span Instance Nothing
     slot <- lookupDeclaration (Declaration propertyName)
     value <- eval publicFieldValue
     assign slot value
