@@ -7,7 +7,6 @@ import qualified Analysis.Ruby.Spec
 import qualified Analysis.TypeScript.Spec
 import qualified Assigning.Assignment.Spec
 import qualified Control.Abstract.Evaluator.Spec
-import qualified Control.Rewriting.Spec
 import qualified Data.Diff.Spec
 import qualified Data.Abstract.Name.Spec
 import qualified Data.Abstract.Path.Spec
@@ -23,11 +22,12 @@ import qualified Diffing.Algorithm.SES.Spec
 import qualified Diffing.Interpreter.Spec
 import qualified Graphing.Calls.Spec
 import qualified Integration.Spec
-import qualified Matching.Go.Spec
-import qualified Matching.Python.Spec
 import qualified Numeric.Spec
 import qualified Rendering.TOC.Spec
 import qualified Reprinting.Spec
+import qualified Rewriting.Go.Spec
+import qualified Rewriting.JSON.Spec
+import qualified Rewriting.Python.Spec
 import qualified Tags.Spec
 import qualified Semantic.Spec
 import qualified Semantic.CLI.Spec
@@ -52,7 +52,6 @@ main = do
       describe "Analysis.TypeScript" (Analysis.TypeScript.Spec.spec args)
       describe "Assigning.Assignment" Assigning.Assignment.Spec.spec
       describe "Control.Abstract.Evaluator" Control.Abstract.Evaluator.Spec.spec
-      describe "Control.Rewriting.Spec" Control.Rewriting.Spec.spec
       describe "Data.Diff" Data.Diff.Spec.spec
       describe "Data.Graph" Data.Graph.Spec.spec
       describe "Data.Abstract.Path" Data.Abstract.Path.Spec.spec
@@ -67,11 +66,12 @@ main = do
       describe "Diffing.Algorithm.SES" Diffing.Algorithm.SES.Spec.spec
       describe "Diffing.Interpreter" Diffing.Interpreter.Spec.spec
       describe "Graphing.Calls" Graphing.Calls.Spec.spec
-      describe "Matching.Go" Matching.Go.Spec.spec
-      describe "Matching.Python" Matching.Python.Spec.spec
       describe "Numeric" Numeric.Spec.spec
       describe "Rendering.TOC" Rendering.TOC.Spec.spec
       describe "Reprinting.Spec" Reprinting.Spec.spec
+      describe "Rewriting.Go" Rewriting.Go.Spec.spec
+      describe "Rewriting.JSON" Rewriting.JSON.Spec.spec
+      describe "Rewriting.Python" Rewriting.Python.Spec.spec      
       describe "Tags.Spec" Tags.Spec.spec
       describe "Semantic" Semantic.Spec.spec
       describe "Semantic.CLI" Semantic.CLI.Spec.spec
