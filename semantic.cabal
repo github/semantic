@@ -50,8 +50,6 @@ library
                      -- Effects
                      , Control.Effect.Interpose
                      , Control.Effect.REPL
-                     -- Matching and rewriting DSLs
-                     , Control.Matching
                      , Control.Rewriting
                      -- Datatypes for abstract interpretation
                      , Data.Abstract.Address.Hole
@@ -169,7 +167,6 @@ library
                      , Language.Java.Assignment
                      , Language.Java.Grammar
                      , Language.Java.Syntax
-                     , Matching.Core
                      , Numeric.Exts
                      -- Parser glue
                      , Parsing.CMark
@@ -209,7 +206,6 @@ library
                      , Semantic.Timeout
                      , Semantic.Util
                      , Semantic.Util.Pretty
-                     , Semantic.Util.Rewriting
                      , Semantic.Version
                      -- Serialization
                      , Serializing.DOT
@@ -331,7 +327,6 @@ test-suite test
                      , Analysis.TypeScript.Spec
                      , Assigning.Assignment.Spec
                      , Control.Abstract.Evaluator.Spec
-                     , Control.Rewriting.Spec
                      , Data.Abstract.Path.Spec
                      , Data.Abstract.Name.Spec
                      , Data.Diff.Spec
@@ -349,11 +344,12 @@ test-suite test
                      , Diffing.Interpreter.Spec
                      , Graphing.Calls.Spec
                      , Integration.Spec
-                     , Matching.Go.Spec
-                     , Matching.Python.Spec
                      , Numeric.Spec
                      , Proto3.Roundtrip
                      , Reprinting.Spec
+                     , Rewriting.Go.Spec
+                     , Rewriting.JSON.Spec
+                     , Rewriting.Python.Spec                     
                      , Rendering.TOC.Spec
                      , Semantic.Spec
                      , Semantic.CLI.Spec
