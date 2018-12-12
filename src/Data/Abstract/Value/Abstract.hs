@@ -84,6 +84,13 @@ instance Carrier sig m
     (eff . handleCoercible)
     (\ (Abstract.Unit k) -> runUnitC (k Abstract))
 
+instance Carrier sig m
+      => Carrier (Abstract.String Abstract :+: sig) (StringC Abstract m) where
+  ret = StringC . ret
+  eff = StringC . handleSum
+    (eff . handleCoercible) (\case
+      Abstract.String _ k -> runStringC (k Abstract)
+      AsString _ k -> runStringC (k ""))
 
 instance Ord address => ValueRoots address Abstract where
   valueRoots = mempty
