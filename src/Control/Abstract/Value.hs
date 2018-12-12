@@ -253,8 +253,6 @@ runString = raiseHandler $ runStringC . interpret
 class Show value => AbstractIntro value where
   -- | Construct a self-evaluating symbol value.
   --   TODO: Should these be interned in some table to provide stronger uniqueness guarantees?
-  symbol :: Text -> value
-
   -- | Construct an abstract regex value.
   regex :: Text -> value
 
