@@ -184,7 +184,6 @@ data While value m k
 instance HFunctor (While value) where
   hmap f (While cond body k) = While (f cond) (f body) k
 
-
 runWhile :: Carrier (While value :+: sig) (WhileC value (Eff m))
          => Evaluator term address value (WhileC value (Eff m)) a
          -> Evaluator term address value m a
