@@ -184,7 +184,6 @@ instance (Show address, Show term) => AbstractIntro (Value term address) where
   integer  = Integer . Number.Integer
   float    = Float . Number.Decimal
   rational = Rational . Number.Ratio
-  regex    = Regex
 
   kvPair = KVPair
   hash = Hash . map (uncurry KVPair)

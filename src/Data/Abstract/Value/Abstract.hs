@@ -100,7 +100,6 @@ instance AbstractHole Abstract where
 instance AbstractIntro Abstract where
   integer _  = Abstract
   float _    = Abstract
-  regex _    = Abstract
   rational _ = Abstract
   hash _     = Abstract
   kvPair _ _ = Abstract
