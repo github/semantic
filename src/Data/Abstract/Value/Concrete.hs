@@ -36,8 +36,6 @@ data Value term address
   | Rational (Number.Number Rational)
   | Float    (Number.Number Scientific)
   | String Text
-  | Symbol Text
-  | Regex Text
   | Tuple [Value term address]
   | Array [Value term address]
   | Class Declaration [Value term address] address
