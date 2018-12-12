@@ -33,6 +33,9 @@ module Control.Abstract.Value
 , String(..)
 , StringC(..)
 , runString
+, Numeric(..)
+, NumericC(..)
+, runNumeric
 ) where
 
 import Control.Abstract.Evaluator
@@ -249,6 +252,28 @@ runString :: Carrier (String value :+: sig) (StringC value (Eff m))
           => Evaluator term address value (StringC value (Eff m)) a
           -> Evaluator term address value m a
 runString = raiseHandler $ runStringC . interpret
+
+data Numeric value (m :: * -> *) k
+  = Integer Integer (value -> k)
+  | Float Scientific (value -> k)
+  | Rational Rational (value -> k)
+  | LiftNumeric (forall a . Num a => a -> a) value (value -> k)
+  | LiftNumeric2 (forall a b. Number a -> Number b -> SomeNumber) value value (value -> k)
+  deriving (Functor)
+
+instance HFunctor (Numeric value) where
+  hmap _ = coerce
+  {-# INLINE hmap #-}
+
+instance Effect (Numeric value) where
+  handle state handler = coerce . fmap (handler . (<$ state))
+
+newtype NumericC value m a = NumericC { runNumericC :: m a }
+
+runNumeric :: Carrier (Numeric value :+: sig) (NumericC value (Eff m))
+           => Evaluator term address value (NumericC value (Eff m)) a
+           -> Evaluator term address value m a
+runNumeric = raiseHandler $ runNumericC . interpret
 
 class Show value => AbstractIntro value where
   -- | Construct an abstract integral value.
