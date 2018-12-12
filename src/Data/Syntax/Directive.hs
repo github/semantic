@@ -23,7 +23,7 @@ instance Ord1 File where liftCompare = genericLiftCompare
 instance Show1 File where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable File where
-  eval _ _ File = string . T.pack . modulePath <$> currentModule
+  eval _ _ File = currentModule >>= string . T.pack . modulePath
 
 -- We may need a separate token class for these given additional languages
 instance Tokenize File where

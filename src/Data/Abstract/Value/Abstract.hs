@@ -99,7 +99,6 @@ instance AbstractHole Abstract where
 
 instance AbstractIntro Abstract where
   integer _  = Abstract
-  string _   = Abstract
   float _    = Abstract
   symbol _   = Abstract
   regex _    = Abstract
@@ -118,7 +117,6 @@ instance AbstractValue term address Abstract m where
 
   scopedEnvironment _ = pure Nothing
 
-  asString _ = pure ""
   asPair _ = pure (Abstract, Abstract)
   asArray _ = pure mempty
 

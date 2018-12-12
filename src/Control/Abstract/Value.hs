@@ -28,6 +28,8 @@ module Control.Abstract.Value
 , Unit(..)
 , runUnit
 , UnitC(..)
+, string
+, asString
 , String(..)
 , StringC(..)
 , runString
@@ -216,6 +218,14 @@ runUnit = raiseHandler $ runUnitC . interpret
 newtype UnitC value m a = UnitC { runUnitC :: m a }
 
 
+-- | Construct a String value in the abstract domain.
+string :: (Member (String value) sig, Carrier sig m) => Text -> m value
+string t = send (String t ret)
+
+-- | Extract 'Text' from a given value.
+asString :: (Member (String value) sig, Carrier sig m) => value -> m Text
+asString v = send (AsString v ret)
+
 data String value (m :: * -> *) k
   = String Text (value -> k)
   | AsString value (Text -> k)
@@ -241,9 +251,6 @@ runString :: Carrier (String value :+: sig) (StringC value (Eff m))
 runString = raiseHandler $ runStringC . interpret
 
 class Show value => AbstractIntro value where
-  -- | Construct an abstract string value.
-  string :: Text -> value
-
   -- | Construct a self-evaluating symbol value.
   --   TODO: Should these be interned in some table to provide stronger uniqueness guarantees?
   symbol :: Text -> value
@@ -313,9 +320,6 @@ class AbstractIntro value => AbstractValue term address value carrier where
 
   -- | Extract the contents of a key-value pair as a tuple.
   asPair :: value -> Evaluator term address value carrier (value, value)
-
-  -- | Extract a 'Text' from a given value.
-  asString :: value -> Evaluator term address value carrier Text
 
   -- | @index x i@ computes @x[i]@, with zero-indexing.
   index :: value -> value -> Evaluator term address value carrier value

@@ -2,7 +2,7 @@
 module Control.Abstract.PythonPackage
 ( runPythonPackaging, Strategy(..) ) where
 
-import Control.Abstract
+import           Control.Abstract as Abstract
 import           Control.Effect.Carrier
 import           Control.Effect.Sum
 import           Data.Abstract.Evaluatable
@@ -21,6 +21,7 @@ runPythonPackaging :: ( Carrier sig m
                       , Show term
                       , Member Trace sig
                       , Member (Boolean (Value term address)) sig
+                      , Member (Abstract.String (Value term address)) sig
                       , Member (State (Heap address address (Value term address))) sig
                       , Member (Resumable (BaseError (AddressError address (Value term address)))) sig
                       , Member (Resumable (BaseError (ValueError term address))) sig
@@ -59,6 +60,7 @@ instance ( Carrier sig m
          , Member (Resumable (BaseError (ValueError term address))) sig
          , Member (State (Heap address address (Value term address))) sig
          , Member (State Strategy) sig
+         , Member (Abstract.String (Value term address)) sig
          , Member Trace sig
          , Ord address
          , Show address

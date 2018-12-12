@@ -146,6 +146,7 @@ evalTerm :: ( Carrier sig m
             , Member (Resumable (BaseError ResolutionError)) sig
             , Member (State (Heap address address value)) sig
             , Member (State (ScopeGraph address)) sig
+            , Member (Abstract.String value) sig
             , Member (Reader (CurrentFrame address)) sig
             , Member (Reader (CurrentScope address)) sig
             , Member (State Span) sig

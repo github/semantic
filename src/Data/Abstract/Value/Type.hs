@@ -345,7 +345,6 @@ instance AbstractHole Type where
 
 instance AbstractIntro Type where
   integer _  = Int
-  string _   = String
   float _    = Float
   symbol _   = Symbol
   regex _    = Regex
@@ -377,7 +376,6 @@ instance ( Member Fresh sig
 
   object _ = pure Object
 
-  asString t = unify t String $> ""
   asPair t   = do
     t1 <- fresh
     t2 <- fresh
