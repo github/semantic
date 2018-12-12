@@ -182,7 +182,6 @@ instance AbstractHole (Value term address) where
 
 instance (Show address, Show term) => AbstractIntro (Value term address) where
   integer  = Integer . Number.Integer
-  string   = String
   float    = Float . Number.Decimal
   symbol   = Symbol
   rational = Rational . Number.Ratio
@@ -234,10 +233,6 @@ instance ( Member (Allocator address) sig
     | Class _ _ address <- v = pure (Just address)
     | Namespace _ address <- v = pure (Just address)
     | otherwise = pure Nothing
-
-  asString v
-    | String n <- v = pure n
-    | otherwise     = throwValueError $ StringError v
 
 
   index = go where

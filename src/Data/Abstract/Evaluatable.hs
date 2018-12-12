@@ -17,6 +17,7 @@ module Data.Abstract.Evaluatable
 ) where
 
 import Control.Abstract hiding (Load, String)
+import qualified Control.Abstract as Abstract
 import Control.Abstract.Context as X
 import Control.Abstract.Evaluator as X hiding (LoopControl(..), Return(..), catchLoopControl, runLoopControl, catchReturn, runReturn)
 import Control.Abstract.Modules as X (Modules, ModuleResult, ResolutionError(..), load, lookupModule, listModulesInDir, require, resolve, throwResolutionError)
@@ -55,6 +56,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Member (Reader PackageInfo) sig
           , Member (Reader Span) sig
           , Member (State Span) sig
+          , Member (Abstract.String value) sig
           , Member (Reader (CurrentFrame address)) sig
           , Member (Reader (CurrentScope address)) sig
           , Member (Resumable (BaseError (ScopeError address))) sig

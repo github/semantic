@@ -155,7 +155,7 @@ instance Ord1 TextElement where liftCompare = genericLiftCompare
 instance Show1 TextElement where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable TextElement where
-  eval _ _ (TextElement x) = pure (string x)
+  eval _ _ (TextElement x) = string x
 
 instance Tokenize TextElement where
   tokenize = yield . Run . textElementContent
