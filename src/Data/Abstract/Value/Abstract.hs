@@ -91,6 +91,16 @@ instance Carrier sig m
     Abstract.String _ k -> runStringC (k Abstract)
     AsString        _ k -> runStringC (k ""))
 
+instance Carrier sig m
+      => Carrier (Numeric Abstract :+: sig) (NumericC Abstract m) where
+  ret = NumericC . ret
+  eff = NumericC . handleSum (eff . handleCoercible) (\case
+    Integer _ k -> runNumericC (k Abstract)
+    Float _ k -> runNumericC (k Abstract)
+    Rational _ k -> runNumericC (k Abstract)
+    LiftNumeric _ _ k -> runNumericC (k Abstract)
+    LiftNumeric2 _ _ _ k -> runNumericC (k Abstract))
+
 instance Ord address => ValueRoots address Abstract where
   valueRoots = mempty
 
