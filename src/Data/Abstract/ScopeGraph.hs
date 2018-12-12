@@ -41,14 +41,13 @@ import           Prologue
 data Slot address = Slot { frameAddress :: address, position :: Position }
     deriving (Eq, Show, Ord, Generic, NFData)
 
-data Relation = Default | InstanceOf
+data Relation address = Default | InstanceOf
   deriving (Eq, Show, Ord, Generic, NFData)
 
-data Data address = Data {
-    declaration :: Declaration
-  , relation :: Relation
+data Data address = Data { 
+    declaration :: Declaration -- summand
+  , relation :: Relation -- 
   , span :: Span
-  , scopeAddress :: Maybe address
   }
   deriving (Eq, Show, Ord, Generic, NFData)
 
