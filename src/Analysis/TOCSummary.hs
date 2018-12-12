@@ -8,7 +8,7 @@ module Analysis.TOCSummary
 import Prologue hiding (project)
 
 import           Control.Arrow
-import           Control.Rewriting hiding (apply)
+import           Control.Rewriting
 import           Data.Blob
 import           Data.Error (Error (..), showExpectation)
 import           Data.Language as Language
@@ -117,16 +117,16 @@ instance CustomHasDeclaration whole Declaration.Method where
 -- is constructed by slicing out text from the original blob corresponding
 -- to a location, which is found via the passed-in rule.
 getIdentifier :: Functor m
-           => Rule () (m (Term syntax Location)) (Term syntax Location)
+           => Rewrite (m (Term syntax Location)) (Term syntax Location)
            -> Blob
            -> TermF m Location (Term syntax Location, a)
            -> Text
 getIdentifier finder Blob{..} (In a r)
   = let declRange = locationByteRange a
-        bodyRange = locationByteRange <$> rewrite (finder >>^ annotation) () (fmap fst r)
+        bodyRange = locationByteRange <$> rewrite (fmap fst r) (finder >>^ annotation)
         -- Text-based gyrations to slice the identifier out of the provided blob source
         sliceFrom = T.stripEnd . toText . flip Source.slice blobSource . subtractRange declRange
-    in either (const mempty) sliceFrom bodyRange
+    in maybe mempty sliceFrom bodyRange
 
 getSource :: Source -> Location -> Text
 getSource blobSource = toText . flip Source.slice blobSource . locationByteRange
