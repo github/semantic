@@ -336,6 +336,25 @@ instance ( Member (Reader ModuleInfo) sig
     Abstract.String   _ k -> runStringC (k String)
     Abstract.AsString t k -> unify t String *> runStringC (k ""))
 
+instance ( Member (Reader ModuleInfo) sig
+         , Member (Reader Span) sig
+         , Member (Resumable (BaseError TypeError)) sig
+         , Member (State TypeMap) sig
+         , Carrier sig m
+         , Monad m
+         )
+      => Carrier (Abstract.Numeric Type :+: sig) (NumericC Type m) where
+  ret = NumericC . ret
+  eff = NumericC . handleSum (eff . handleCoercible) (\case
+    Abstract.Integer _ k -> runNumericC (k Int)
+    Abstract.Float _ k -> runNumericC (k Float)
+    Abstract.Rational _ k -> runNumericC (k Rational)
+    Abstract.LiftNumeric _ t k -> unify (Int :+ Float :+ Rational) t >>= runNumericC . k
+    Abstract.LiftNumeric2 _ left right k -> case (left, right) of
+      (Float, Int) -> runNumericC (k Float)
+      (Int, Float) -> runNumericC (k Float)
+      _            -> unify left right >>= runNumericC . k)
+
 instance AbstractHole Type where
   hole = Hole
 
