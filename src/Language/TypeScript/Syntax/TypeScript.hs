@@ -685,8 +685,7 @@ instance Evaluatable AbstractClass where
       void $ eval classBody
 
     classSlot <- lookupDeclaration (Declaration name)
-    instanceScope <- newScope (Map.singleton InstanceOf [ classScope ])
-    assign classSlot =<< klass (Declaration name) childFrame instanceScope
+    assign classSlot =<< klass (Declaration name) childFrame
 
     pure unit
 

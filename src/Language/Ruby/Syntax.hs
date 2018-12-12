@@ -230,8 +230,7 @@ instance Evaluatable Class where
           void $ eval classBody
 
         classSlot <- lookupDeclaration (Declaration name)
-        instanceScope <- newScope (Map.singleton InstanceOf [ classScope ])
-        assign classSlot =<< klass (Declaration name) childFrame instanceScope
+        assign classSlot =<< klass (Declaration name) childFrame
 
         pure unit
 
@@ -284,8 +283,7 @@ instance Evaluatable Module where
         withScopeAndFrame childFrame (void moduleBody)
 
         moduleSlot <- lookupDeclaration (Declaration name)
-        instanceScope <- newScope (Map.singleton InstanceOf [ classScope ])
-        assign moduleSlot =<< klass (Declaration name) childFrame instanceScope
+        assign moduleSlot =<< klass (Declaration name) childFrame
 
         pure unit
 

@@ -263,10 +263,8 @@ instance Evaluatable Class where
     let frameEdges = Map.singleton Superclass (Map.fromList (catMaybes superScopes))
     classFrame <- newFrame classScope frameEdges
 
-    instanceMemberScope <- newScope (Map.singleton InstanceOf [ classScope ])
-
     classSlot <- lookupDeclaration (Declaration name)
-    assign classSlot =<< klass (Declaration name) classFrame instanceMemberScope
+    assign classSlot =<< klass (Declaration name) classFrame
 
     withScopeAndFrame classFrame $ do
       void $ eval classBody
