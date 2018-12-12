@@ -215,7 +215,7 @@ instance Ord1 SymbolElement where liftCompare = genericLiftCompare
 instance Show1 SymbolElement where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable SymbolElement where
-  eval _ _ (SymbolElement s) = pure (symbol s)
+  eval _ _ (SymbolElement s) = string s
 
 instance Tokenize SymbolElement where
   tokenize = yield . Run . symbolContent

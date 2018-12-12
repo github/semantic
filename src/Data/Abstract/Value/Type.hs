@@ -346,7 +346,6 @@ instance AbstractHole Type where
 instance AbstractIntro Type where
   integer _  = Int
   float _    = Float
-  symbol _   = Symbol
   regex _    = Regex
   rational _ = Rational
   hash       = Hash

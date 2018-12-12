@@ -183,7 +183,6 @@ instance AbstractHole (Value term address) where
 instance (Show address, Show term) => AbstractIntro (Value term address) where
   integer  = Integer . Number.Integer
   float    = Float . Number.Decimal
-  symbol   = Symbol
   rational = Rational . Number.Ratio
   regex    = Regex
 
