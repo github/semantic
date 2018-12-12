@@ -175,13 +175,56 @@ instance ( Member (Reader ModuleInfo) sig
     Abstract.AsString (String t) k -> runStringC (k t)
     Abstract.AsString other      k -> throwBaseError (StringError other) >>= runStringC . k)
 
+instance ( Member (Reader ModuleInfo) sig
+         , Member (Reader Span) sig
+         , Member (Resumable (BaseError (ValueError term address))) sig
+         , Carrier sig m
+         , Monad m
+         )
+      => Carrier (Abstract.Numeric (Value term address) :+: sig) (NumericC (Value term address) m) where
+  ret = NumericC . ret
+  eff = NumericC . handleSum (eff . handleCoercible) (\case
+    Abstract.Integer  t k -> runNumericC (k (Integer (Number.Integer t)))
+    Abstract.Float    t k -> runNumericC (k (Float (Number.Decimal t)))
+    Abstract.Rational t k -> runNumericC (k (Rational (Number.Ratio t)))
+    Abstract.LiftNumeric f arg k -> runNumericC . k =<< case arg of
+      Integer (Number.Integer i) -> pure $ Integer (Number.Integer (f i))
+      Float (Number.Decimal d)   -> pure $ Float (Number.Decimal (f d))
+      Rational (Number.Ratio r)  -> pure $ Rational (Number.Ratio (f r))
+      other                      -> throwBaseError (NumericError other)
+    Abstract.LiftNumeric2 f left right k -> runNumericC . k =<< case (left, right) of
+      (Integer  i, Integer j)  -> attemptUnsafeArithmetic (f i j) & specialize
+      (Integer  i, Rational j) -> attemptUnsafeArithmetic (f i j) & specialize
+      (Integer  i, Float j)    -> attemptUnsafeArithmetic (f i j) & specialize
+      (Rational i, Integer j)  -> attemptUnsafeArithmetic (f i j) & specialize
+      (Rational i, Rational j) -> attemptUnsafeArithmetic (f i j) & specialize
+      (Rational i, Float j)    -> attemptUnsafeArithmetic (f i j) & specialize
+      (Float    i, Integer j)  -> attemptUnsafeArithmetic (f i j) & specialize
+      (Float    i, Rational j) -> attemptUnsafeArithmetic (f i j) & specialize
+      (Float    i, Float j)    -> attemptUnsafeArithmetic (f i j) & specialize
+      _                        -> throwBaseError (Numeric2Error left right))
+
+-- Dispatch whatever's contained inside a 'Number.SomeNumber' to its appropriate 'MonadValue' ctor
+specialize :: ( Member (Reader ModuleInfo) sig
+              , Member (Reader Span) sig
+              , Member (Resumable (BaseError (ValueError term address))) sig
+              , Carrier sig m
+              , Monad m
+              )
+           => Either ArithException Number.SomeNumber
+           -> m (Value term address)
+specialize (Left exc) = throwBaseError (ArithmeticError exc)
+specialize (Right (Number.SomeNumber (Number.Integer t))) = pure (Integer (Number.Integer t))
+specialize (Right (Number.SomeNumber (Number.Decimal t)))   = pure (Float (Number.Decimal t))
+specialize (Right (Number.SomeNumber (Number.Ratio t))) = pure (Rational (Number.Ratio t))
+
 instance AbstractHole (Value term address) where
   hole = Hole
 
 instance (Show address, Show term) => AbstractIntro (Value term address) where
-  integer  = Integer . Number.Integer
-  float    = Float . Number.Decimal
-  rational = Rational . Number.Ratio
+  integer  t = Integer (Number.Integer t)
+  float    t = Float (Number.Decimal t)
+  rational t = Rational (Number.Ratio t)
 
   kvPair = KVPair
   hash = Hash . map (uncurry KVPair)
