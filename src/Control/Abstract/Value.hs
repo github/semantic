@@ -251,11 +251,6 @@ runString :: Carrier (String value :+: sig) (StringC value (Eff m))
 runString = raiseHandler $ runStringC . interpret
 
 class Show value => AbstractIntro value where
-  -- | Construct a self-evaluating symbol value.
-  --   TODO: Should these be interned in some table to provide stronger uniqueness guarantees?
-  -- | Construct an abstract regex value.
-  regex :: Text -> value
-
   -- | Construct an abstract integral value.
   integer :: Integer -> value
 

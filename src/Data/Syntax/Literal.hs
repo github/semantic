@@ -231,7 +231,7 @@ instance Show1 Regex where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Regex
 instance Evaluatable Regex where
-  eval _ _ (Regex x) = pure (regex x)
+  eval _ _ (Regex x) = string x
 
 instance Tokenize Regex where
   tokenize = yield . Run . regexContent
