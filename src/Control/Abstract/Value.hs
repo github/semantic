@@ -3,8 +3,8 @@ module Control.Abstract.Value
 ( AbstractValue(..)
 , AbstractIntro(..)
 , Comparator(..)
--- * Value effects
--- $valueEffects
+-- * Domain effects
+-- $domainEffects
 , function
 , BuiltIn(..)
 , builtIn
@@ -55,9 +55,9 @@ data Comparator
   = Concrete (forall a . Ord a => a -> a -> Bool)
   | Generalized
 
--- Value effects
+-- Domain effects
 
--- $valueEffects
+-- $domainEffects
 -- Value effects are effects modelling the /introduction/ & /elimination/ of some specific kind of value.
 --
 -- Modelling each of these as effects has several advantages∷
