@@ -1,9 +1,9 @@
-{-# LANGUAGE TypeOperators, TypeFamilies #-}
+{-# LANGUAGE TypeFamilies, TypeOperators #-}
 
-module Matching.Python.Spec (spec) where
+module Rewriting.Python.Spec (spec) where
 
-import Control.Arrow
-import           Control.Matching
+import           Control.Arrow
+import           Control.Rewriting
 import           Data.Abstract.Module
 import           Data.List
 import           Data.Sum
@@ -18,7 +18,7 @@ docstringMatcher :: ( Decl.Function :< fs
                     , [] :< fs
                     , Lit.TextElement :< fs
                     , term ~ Term (Sum fs) ann
-                    ) => Matcher term (TermF Decl.Function ann term)
+                    ) => Rewrite term (TermF Decl.Function ann term)
 docstringMatcher =
   narrowF <* (enter Decl.functionBody
               >>> narrow @[]
@@ -30,10 +30,10 @@ spec :: Spec
 spec = describe "matching/python" $ do
   it "matches top-level docstrings" $ do
     parsed <- parseFile pythonParser "test/fixtures/python/matching/docstrings.py"
-    let matched = matchRecursively @[] docstringMatcher parsed
+    let matched = recursively @[] docstringMatcher parsed
     length matched `shouldBe` 2
 
   it "matches docstrings recursively" $ do
     parsed <- parseFile pythonParser "test/fixtures/python/matching/docstrings_nested.py"
-    let matched = matchRecursively @[] docstringMatcher parsed
+    let matched = recursively @[] docstringMatcher parsed
     length matched `shouldBe` 3
