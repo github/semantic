@@ -164,6 +164,18 @@ instance Carrier sig m
     (eff . handleCoercible)
     (\ (Abstract.Unit k) -> runUnitC (k Unit))
 
+instance ( Member (Reader ModuleInfo) sig
+         , Member (Reader Span) sig
+         , Member (Resumable (BaseError (ValueError term address))) sig
+         , Carrier sig m
+         , Monad m
+         )
+      => Carrier (Abstract.String (Value term address) :+: sig) (StringC (Value term address) m) where
+  ret = StringC . ret
+  eff = StringC . handleSum (eff . handleCoercible) (\case
+    Abstract.String   t          k -> runStringC (k (String t))
+    Abstract.AsString (String t) k -> runStringC (k t)
+    Abstract.AsString other      k -> throwBaseError (StringError other) >>= runStringC . k)
 
 instance AbstractHole (Value term address) where
   hole = Hole
