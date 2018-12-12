@@ -326,6 +326,19 @@ instance Carrier sig m
     (eff . handleCoercible)
     (\ (Abstract.Unit k) -> runUnitC (k Unit))
 
+instance ( Member (Reader ModuleInfo) sig
+         , Member (Reader Span) sig
+         , Member (Resumable (BaseError TypeError)) sig
+         , Member (State TypeMap) sig
+         , Carrier sig m
+         , Alternative m
+         , Monad m
+         )
+      => Carrier (Abstract.String Type :+: sig) (StringC Type m) where
+  ret = StringC . ret
+  eff = StringC . handleSum (eff . handleCoercible) (\case
+    Abstract.String   _ k -> runStringC (k String)
+    Abstract.AsString t k -> unify t String *> runStringC (k ""))
 
 instance AbstractHole Type where
   hole = Hole
