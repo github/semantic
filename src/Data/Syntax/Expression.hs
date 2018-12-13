@@ -503,7 +503,18 @@ instance Ord1 MemberAccess where liftCompare = genericLiftCompare
 instance Show1 MemberAccess where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable MemberAccess where
-  eval eval ref' = ref eval ref' >=> deref
+  eval eval _ MemberAccess{..} = do
+    lhsValue <- eval lhs
+    lhsFrame <- Abstract.scopedEnvironment lhsValue
+    slot <- case lhsFrame of
+      Just lhsFrame ->
+        withScopeAndFrame lhsFrame $ do
+          reference (Reference rhs) (Declaration rhs)
+          lookupDeclaration (Declaration rhs)
+      -- Throw a ReferenceError since we're attempting to reference a name within a value that is not an Object.
+      Nothing -> throwEvalError (ReferenceError lhsValue rhs)
+    value <- deref slot
+    bindThis lhsValue value
 
   ref eval _ MemberAccess{..} = do
     lhsValue <- eval lhs
@@ -647,13 +658,14 @@ instance Evaluatable New where
 
     void . withScopeAndFrame objectFrame $ do
       for_ instanceMembers $ \Data{..} -> do
-        declare dataDeclaration dataRelation dataSpan dataAssociatedScope
+        declare dataDeclaration Default dataSpan dataAssociatedScope
 
       let constructorName = Name.name "constructor"
       reference (Reference constructorName) (Declaration constructorName)
       constructor <- deref =<< lookupDeclaration (Declaration constructorName)
       args <- traverse eval arguments
-      call constructor (objectVal : args)
+      boundConstructor <- bindThis objectVal constructor
+      call boundConstructor args
 
     pure objectVal
 

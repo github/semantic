@@ -94,7 +94,7 @@ instance Evaluatable Method where
       let self = Name.name "__self"
       -- TODO: Should we give `self` a special Relation?
       declare (Declaration self) Default emptySpan Nothing
-      fmap (self :) . for methodParameters $ \paramNode -> do
+      for methodParameters $ \paramNode -> do
         param <- maybeM (throwEvalError $ NoNameError paramNode) (declaredName paramNode)
         param <$ declare (Declaration param) Default span Nothing
 

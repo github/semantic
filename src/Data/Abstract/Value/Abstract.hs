@@ -53,6 +53,7 @@ instance ( Member (Allocator address) sig
         catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body)))
       Evaluator $ runFunctionC (k res) eval
     BuiltIn _ _ k -> runFunctionC (k Abstract) eval
+    Bind _ _ k -> runFunctionC (k Abstract) eval
     Call _ _ k -> runFunctionC (k Abstract) eval) op)
 
 

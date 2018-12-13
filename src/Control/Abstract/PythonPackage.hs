@@ -70,7 +70,7 @@ instance ( Carrier sig m
     | Just e <- prj op = wrap $ case handleCoercible e of
       Call callName params k -> Evaluator . k =<< do
         case callName of
-          Closure _ _ name' paramNames _ _ _ -> do
+          Closure _ _ name' _ paramNames _ _ _ -> do
             let bindings = foldr (uncurry Map.insert) lowerBound (zip paramNames params)
             let asStrings = asArray >=> traverse asString
 
@@ -89,4 +89,5 @@ instance ( Carrier sig m
         call callName params
       Function name params body scope k -> function name params body scope >>= Evaluator . k
       BuiltIn n b k -> builtIn n b >>= Evaluator . k
+      Bind obj value k -> bindThis obj value >>= Evaluator . k
     | otherwise        = PythonPackagingC (eff (handleCoercible op))
