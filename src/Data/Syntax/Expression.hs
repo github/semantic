@@ -701,6 +701,5 @@ instance Ord1 This where liftCompare = genericLiftCompare
 instance Show1 This where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable This where
   eval _ _ This = do
-    let name = Name.name "__self"
-    reference (Reference name) (Declaration name)
-    deref =<< lookupDeclaration (Declaration name)
+    reference (Reference __semantic_self) (Declaration __semantic_self)
+    deref =<< lookupDeclaration (Declaration __semantic_self)

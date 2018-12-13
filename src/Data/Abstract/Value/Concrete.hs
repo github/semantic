@@ -111,7 +111,7 @@ instance ( FreeVariables term
             withScopeAndFrame frameAddress $ do
               case maybeThis of
                 Just object -> do
-                  slot <- lookupDeclaration (Declaration $ name "__self")
+                  slot <- lookupDeclaration (Declaration __semantic_self)
                   assign slot object
                 Nothing -> pure ()
               for_ (zip names params) $ \(name, param) -> do

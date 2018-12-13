@@ -13,7 +13,7 @@ import           Prologue
 import           Proto3.Suite.Class
 import           Reprinting.Tokenize hiding (Superclass)
 import Data.Span (emptySpan)
-import Data.Abstract.Name as Name
+import Data.Abstract.Name (__semantic_self)
 
 data Function a = Function { functionContext :: ![a], functionName :: !a, functionParameters :: ![a], functionBody :: !a }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, ToJSONFields1, Named1, Message1, NFData1)
@@ -91,9 +91,8 @@ instance Evaluatable Method where
     associatedScope <- declareFunction name span
 
     params <- withScope associatedScope $ do
-      let self = Name.name "__self"
       -- TODO: Should we give `self` a special Relation?
-      declare (Declaration self) Default emptySpan Nothing
+      declare (Declaration __semantic_self) Default emptySpan Nothing
       for methodParameters $ \paramNode -> do
         param <- maybeM (throwEvalError $ NoNameError paramNode) (declaredName paramNode)
         param <$ declare (Declaration param) Default span Nothing
