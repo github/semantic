@@ -101,7 +101,7 @@ spec config = parallel $ do
       (_, (_, res)) <- evaluate ["void.ts"]
       case ModuleTable.lookup "void.ts" <$> res of
         Right (Just (Module _ (_, value))) -> value `shouldBe` Null
-        other                                       -> expectationFailure (show other)
+        other                              -> expectationFailure (show other)
 
     it "evaluates delete" $ do
       (scopeGraph, (heap, res)) <- evaluate ["delete.ts"]
@@ -124,39 +124,38 @@ spec config = parallel $ do
     it "evaluates BOr statements" $ do
       (_, (_, res)) <- evaluate ["bor.ts"]
       case ModuleTable.lookup "bor.ts" <$> res of
-        Right (Just (Module _ (_, value))) ->
-          value `shouldBe` Value.Integer (Number.Integer 3)
-        other -> expectationFailure (show other)
+        Right (Just (Module _ (_, value))) -> value `shouldBe` Value.Integer (Number.Integer 3)
+        other                              -> expectationFailure (show other)
 
     it "evaluates BAnd statements" $ do
       (_, (_, res)) <- evaluate ["band.ts"]
       case ModuleTable.lookup "band.ts" <$> res of
         Right (Just (Module _ (_, value))) -> value `shouldBe` Value.Integer (Number.Integer 0)
-        other                                       -> expectationFailure (show other)
+        other                              -> expectationFailure (show other)
 
     it "evaluates BXOr statements" $ do
       (_, (_, res)) <- evaluate ["bxor.ts"]
       case ModuleTable.lookup "bxor.ts" <$> res of
         Right (Just (Module _ (_, value))) -> value `shouldBe` Value.Integer (Number.Integer 3)
-        other                                       -> expectationFailure (show other)
+        other                              -> expectationFailure (show other)
 
     it "evaluates LShift statements" $ do
       (_, (_, res)) <- evaluate ["lshift.ts"]
       case ModuleTable.lookup "lshift.ts" <$> res of
         Right (Just (Module _ (_, value))) -> value `shouldBe` Value.Integer (Number.Integer 4)
-        other                                       -> expectationFailure (show other)
+        other                              -> expectationFailure (show other)
 
     it "evaluates RShift statements" $ do
       (_, (_, res)) <- evaluate ["rshift.ts"]
       case ModuleTable.lookup "rshift.ts" <$> res of
         Right (Just (Module _ (_, value))) -> value `shouldBe` Value.Integer (Number.Integer 0)
-        other                                       -> expectationFailure (show other)
+        other                              -> expectationFailure (show other)
 
     it "evaluates Complement statements" $ do
       (_, (_, res)) <- evaluate ["complement.ts"]
       case ModuleTable.lookup "complement.ts" <$> res of
         Right (Just (Module _ (_, value))) -> value `shouldBe` Value.Integer (Number.Integer (-2))
-        other                                       -> expectationFailure (show other)
+        other                              -> expectationFailure (show other)
 
 
   where
