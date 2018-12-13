@@ -26,6 +26,7 @@ import Data.Abstract.Declarations as X
 import Data.Abstract.FreeVariables as X
 import Data.Abstract.Module
 import Data.Abstract.Name as X
+import Data.Abstract.ScopeGraph (Relation(..))
 import Data.Language
 import Data.Scientific (Scientific)
 import Data.Semigroup.App
@@ -135,26 +136,26 @@ instance HasPrelude 'PHP
 
 instance HasPrelude 'Python where
   definePrelude _ =
-    defineBuiltIn (Declaration $ X.name "print") Print
+    defineBuiltIn (Declaration $ X.name "print") Default Print
 
 instance HasPrelude 'Ruby where
   definePrelude _ = do
     defineSelf
 
-    defineBuiltIn (Declaration $ X.name "puts") Print
+    defineBuiltIn (Declaration $ X.name "puts") Default Print
 
     defineClass (Declaration (X.name "Object")) [] $ do
-      defineBuiltIn (Declaration $ X.name "inspect") Show
+      defineBuiltIn (Declaration $ X.name "inspect") Default Show
 
 instance HasPrelude 'TypeScript where
   definePrelude _ = do
     defineSelf
-    defineNamespace (Declaration (X.name "console")) $ defineBuiltIn (Declaration $ X.name "log") Print
+    defineNamespace (Declaration (X.name "console")) $ defineBuiltIn (Declaration $ X.name "log") Default Print
 
 instance HasPrelude 'JavaScript where
   definePrelude _ = do
     defineSelf
-    defineNamespace (Declaration (X.name "console")) $ defineBuiltIn (Declaration $ X.name "log") Print
+    defineNamespace (Declaration (X.name "console")) $ defineBuiltIn (Declaration $ X.name "log") Default Print
 
 defineSelf :: ( AbstractValue term address value m
               , Carrier sig m
@@ -172,7 +173,8 @@ defineSelf :: ( AbstractValue term address value m
            => Evaluator term address value m ()
 defineSelf = do
   let self = Declaration $ X.name "__self"
-  declare self emptySpan Nothing
+  -- TODO: Should `self` be given a special Relation?
+  declare self Default emptySpan Nothing
   slot <- lookupDeclaration self
   assign slot =<< object =<< currentFrame
 
