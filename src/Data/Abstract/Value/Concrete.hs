@@ -29,7 +29,7 @@ import qualified Data.Map.Strict as Map
 
 data Value term address
                                                                          --  Scope   Frame
-  = Closure PackageInfo ModuleInfo (Maybe Name) [Name] (Either BuiltIn term) address address
+  = Closure PackageInfo ModuleInfo (Maybe Name) (Maybe (Value term address)) [Name] (Either BuiltIn term) address address
   | Unit
   | Boolean Bool
   | Integer  (Number.Number Integer)
@@ -85,7 +85,7 @@ instance ( FreeVariables term
     let closure maybeName params body scope = do
           packageInfo <- currentPackage
           moduleInfo <- currentModule
-          Closure packageInfo moduleInfo maybeName params body scope <$> currentFrame
+          Closure packageInfo moduleInfo maybeName Nothing params body scope <$> currentFrame
 
     in FunctionC (\ eval -> handleSum (eff . handleReader eval runFunctionC) (\case
     Abstract.Function name params body scope k -> runEvaluator $ do
@@ -94,11 +94,14 @@ instance ( FreeVariables term
     Abstract.BuiltIn associatedScope builtIn k -> runEvaluator $ do
       val <- closure Nothing [] (Left builtIn) associatedScope
       Evaluator $ runFunctionC (k val) eval
+    Abstract.Bind obj@(Object frame) (Closure packageInfo moduleInfo name _ names body scope parentFrame) k ->
+      runFunctionC (k (Closure packageInfo moduleInfo name (Just obj) names body scope parentFrame)) eval
+    Abstract.Bind _ value k -> runFunctionC (k value) eval
     Abstract.Call op params k -> runEvaluator $ do
       boxed <- case op of
-        Closure _ _ _ _ (Left Print) _ _ -> traverse (trace . show) params $> Unit
-        Closure _ _ _ _ (Left Show) _ _ -> pure . String . pack $ show params
-        Closure packageInfo moduleInfo _ names (Right body) associatedScope parentFrame -> do
+        Closure _ _ _ _ _ (Left Print) _ _ -> traverse (trace . show) params $> Unit
+        Closure _ _ _ _ _ (Left Show) _ _ -> pure . String . pack $ show params
+        Closure packageInfo moduleInfo _ maybeThis names (Right body) associatedScope parentFrame -> do
           -- Evaluate the bindings and body with the closure’s package/module info in scope in order to
           -- charge them to the closure's origin.
           withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
@@ -106,6 +109,11 @@ instance ( FreeVariables term
             let frameEdges = Map.singleton Lexical (Map.singleton parentScope parentFrame)
             frameAddress <- newFrame associatedScope frameEdges
             withScopeAndFrame frameAddress $ do
+              case maybeThis of
+                Just object -> do
+                  slot <- lookupDeclaration (Declaration $ name "__self")
+                  assign slot object
+                Nothing -> pure ()
               for_ (zip names params) $ \(name, param) -> do
                 addr <- lookupDeclaration (Declaration name)
                 assign addr param

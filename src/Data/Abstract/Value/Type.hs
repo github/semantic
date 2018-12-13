@@ -280,6 +280,7 @@ instance ( Member (Allocator address) sig
 
     Abstract.BuiltIn _ Print k -> runFunctionC (k (String :-> Unit)) eval
     Abstract.BuiltIn _ Show  k -> runFunctionC (k (Object :-> String)) eval
+    Abstract.Bind _ value k -> runFunctionC (k value) eval
     Abstract.Call op paramTypes k -> runEvaluator $ do
       tvar <- fresh
       let needed = zeroOrMoreProduct paramTypes :-> Var tvar
