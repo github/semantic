@@ -349,7 +349,7 @@ test-suite test
                      , Reprinting.Spec
                      , Rewriting.Go.Spec
                      , Rewriting.JSON.Spec
-                     , Rewriting.Python.Spec                     
+                     , Rewriting.Python.Spec
                      , Rendering.TOC.Spec
                      , Semantic.Spec
                      , Semantic.CLI.Spec
