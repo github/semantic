@@ -258,7 +258,7 @@ scopeOfDeclaration Declaration{..} g@(ScopeGraph graph) = go (Map.keys graph)
 associatedScope :: Ord scope => Declaration -> ScopeGraph scope -> Maybe scope
 associatedScope Declaration{..} g@(ScopeGraph graph) = go (Map.keys graph)
   where
-    go = foldr (\ scope -> ((lookupDeclaration unDeclaration scope g >>= snd . snd . fst) <|>)) Nothing
+    go = foldr (\ scope -> ((lookupDeclaration unDeclaration scope g >>= dataAssociatedScope . fst) <|>)) Nothing
 
 newtype Reference = Reference { unReference :: Name }
   deriving (Eq, Ord, Show, Generic, NFData)
