@@ -94,7 +94,7 @@ spec config = parallel $ do
       (scopeGraph, (heap, res)) <- evaluate ["sequence-expression.ts"]
       case ModuleTable.lookup "sequence-expression.ts" <$> res of
         Right (Just (Module _ (scopeAndFrame, value))) ->
-          SpecHelpers.lookupDeclaration "x" scopeAndFrame heap scopeGraph `shouldBe` Just [ Concrete.float (Number.Decimal (scientific 3 0)) ]
+          SpecHelpers.lookupDeclaration "x" scopeAndFrame heap scopeGraph `shouldBe` Just [ Concrete.Float (Number.Decimal (scientific 3 0)) ]
         other -> expectationFailure (show other)
 
     it "evaluates void expressions" $ do
