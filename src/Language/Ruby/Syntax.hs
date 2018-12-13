@@ -76,7 +76,7 @@ instance Evaluatable Send where
              Nothing  ->
                pure (Name.name "call")
 
-    let self = lookupDeclaration (Declaration __semantic_self) >>= deref
+    let self = deref =<< lookupDeclaration (Declaration __semantic_self)
     lhsValue <- maybe self eval sendReceiver
     lhsFrame <- Abstract.scopedEnvironment lhsValue
 
@@ -84,7 +84,8 @@ instance Evaluatable Send where
           reference (Reference sel) (Declaration sel)
           func <- deref =<< lookupDeclaration (Declaration sel)
           args <- traverse eval sendArgs
-          call func (lhsValue : args) -- TODO pass through sendBlock
+          boundFunc <- bindThis lhsValue func
+          call boundFunc args -- TODO pass through sendBlock
     maybe callFunction (`withScopeAndFrame` callFunction) lhsFrame
 
 instance Tokenize Send where
