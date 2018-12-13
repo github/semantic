@@ -44,10 +44,11 @@ data Slot address = Slot { frameAddress :: address, position :: Position }
 data Relation = Default | InstanceOf
   deriving (Eq, Show, Ord, Generic, NFData)
 
-data Data address = Data { 
-    declaration :: Declaration -- summand
-  , relation :: Relation -- 
-  , span :: Span
+data Data scopeAddress = Data {
+    dataDeclaration :: Declaration
+  , dataRelation :: Relation
+  , dataSpan :: Span
+  , dataAssociatedScope :: Maybe scopeAddress
   }
   deriving (Eq, Show, Ord, Generic, NFData)
 
