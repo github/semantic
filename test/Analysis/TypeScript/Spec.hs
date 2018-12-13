@@ -157,6 +157,12 @@ spec config = parallel $ do
         Right (Just (Module _ (_, value))) -> value `shouldBe` Value.Integer (Number.Integer (-2))
         other                              -> expectationFailure (show other)
 
+    it "uniquely tracks public fields for instances" $ do
+      (scopeGraph, (heap, res)) <- evaluate ["class1.ts", "class2.ts"]
+      case ModuleTable.lookup "class1.ts" <$> res of
+        Right (Just (Module _ (_, value))) -> value `shouldBe` (float 9.0)
+        other                              -> expectationFailure (show other)
+
 
   where
     fixtures = "test/fixtures/typescript/analysis/"
