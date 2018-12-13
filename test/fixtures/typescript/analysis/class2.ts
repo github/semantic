@@ -1,10 +1,10 @@
-class Adder {
+class Adder<A> {
     summand: number;
     constructor(summand: number) {
         this.summand = summand;
     }
-    add() {
-        return 4 + this.summand;
+    add<A>(foo: A) {
+        return foo
     }
 }
 

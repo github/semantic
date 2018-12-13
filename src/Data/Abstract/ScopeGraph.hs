@@ -18,6 +18,7 @@ module Data.Abstract.ScopeGraph
   , Position(..)
   , reference
   , Reference(..) -- TODO don't export these constructors
+  , Relation(..)
   , ScopeGraph(..)
   , lookupScope
   , lookupScopePath
@@ -44,11 +45,11 @@ data Slot address = Slot { frameAddress :: address, position :: Position }
 data Relation = Default | InstanceOf
   deriving (Eq, Show, Ord, Generic, NFData)
 
-data Data address = Data {
-    declaration :: Declaration
-  , relation :: Relation
-  , span :: Span
-  , scopeAddress :: Maybe address
+data Data scopeAddress = Data {
+    dataDeclaration :: Declaration
+  , dataRelation :: Relation
+  , dataSpan :: Span
+  , dataAssociatedScope :: Maybe scopeAddress
   }
   deriving (Eq, Show, Ord, Generic, NFData)
 
@@ -125,12 +126,12 @@ lookupScope scope = Map.lookup scope . unScopeGraph
 
 -- Declare a declaration with a span and an associated scope in the scope graph.
 -- TODO: Return the whole value in Maybe or Either.
-declare :: Ord scope => Declaration -> Span -> Relation -> Maybe scope -> scope -> ScopeGraph scope -> (ScopeGraph scope, Maybe Position)
-declare decl declSpan rel assocScope currentScope g = fromMaybe (g, Nothing) $ do
+declare :: Ord scope => Declaration -> Relation -> Span -> Maybe scope -> scope -> ScopeGraph scope -> (ScopeGraph scope, Maybe Position)
+declare decl rel declSpan assocScope currentScope g = fromMaybe (g, Nothing) $ do
   scope <- lookupScope currentScope g
 
   dataSeq <- ddataOfScope currentScope g
-  case Seq.findIndexR (\Data{..} -> decl == declaration && declSpan == span && rel == relation) dataSeq of
+  case Seq.findIndexR (\Data{..} -> decl == dataDeclaration && declSpan == dataSpan && rel == dataRelation) dataSeq of
     Just index -> pure (g, Just (Position index))
     Nothing -> do
       let newScope = scope { declarations = declarations scope Seq.|> Data decl rel declSpan assocScope }
@@ -177,23 +178,23 @@ pathToDeclaration decl address g = DPath decl . snd <$> lookupDeclaration (unDec
 insertReference :: Reference -> Path scopeAddress -> Scope scopeAddress -> Scope scopeAddress
 insertReference ref path scope = scope { references = Map.insert ref path (references scope) }
 
-lookupDeclaration :: Ord scopeAddress => Name -> scopeAddress -> ScopeGraph scopeAddress -> Maybe ((Declaration, (Span, Maybe scopeAddress)), Position)
+lookupDeclaration :: Ord scopeAddress => Name -> scopeAddress -> ScopeGraph scopeAddress -> Maybe (Data scopeAddress, Position)
 lookupDeclaration name scope g = do
   dataSeq <- ddataOfScope scope g
-  index <- Seq.findIndexR (\Data{..} -> Declaration name == declaration) dataSeq
+  index <- Seq.findIndexR (\Data{..} -> Declaration name == dataDeclaration) dataSeq
   (, Position index) <$> Seq.lookup index dataSeq
 
 declarationNames :: Ord address => [EdgeLabel] -> Scope address -> ScopeGraph address -> Set Declaration
 declarationNames edgeLabels scope scopeGraph = localDeclarations <> edgeNames
   where addresses = join (Map.elems $ Map.restrictKeys (edges scope) (Set.fromList edgeLabels))
         edgeNames = flip foldMap addresses $ \address -> maybe mempty (flip (declarationNames edgeLabels) scopeGraph) (lookupScope address scopeGraph)
-        localDeclarations = Set.fromList . toList . fmap fst $ declarations scope
+        localDeclarations = Set.fromList . toList . fmap dataDeclaration $ declarations scope
 
 
 putDeclarationScopeAtPosition :: Ord scopeAddress => scopeAddress -> Position -> Maybe scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
 putDeclarationScopeAtPosition scope position assocScope g@(ScopeGraph graph) = fromMaybe g $ do
   dataSeq <- ddataOfScope scope g
-  let seq = Seq.adjust' (\(d, (span, _)) -> (d, (span, assocScope))) (unPosition position) dataSeq
+  let seq = Seq.adjust' (\Data{..} -> Data dataDeclaration dataRelation dataSpan assocScope) (unPosition position) dataSeq
   pure $ ScopeGraph (Map.adjust (\s -> s { declarations = seq }) scope graph)
 
 lookupReference :: Ord scopeAddress => Name -> scopeAddress -> ScopeGraph scopeAddress -> Maybe (Path scopeAddress)
@@ -207,21 +208,22 @@ insertEdge label target currentAddress g@(ScopeGraph graph) = fromMaybe g $ do
   pure (ScopeGraph (Map.insert currentAddress newScope graph))
 
 
--- | Insert associate the given associated scope into the declaration in the scope graph.
+-- | Update the 'Scope' containing a 'Declaration' with an associated scope address.
+-- Returns an unmodified 'ScopeGraph' if the 'Declaration' cannot be found with the given scope address.
 insertDeclarationScope :: Ord scopeAddress => Declaration -> scopeAddress -> scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
-insertDeclarationScope decl@Declaration{..} address currentAddress g@(ScopeGraph graph) = fromMaybe g $ do
-  declScope <- pathDeclarationScope currentAddress =<< lookupScopePath unDeclaration currentAddress g
-  (span, position) <- (fst . snd . fst &&& unPosition . snd) <$> lookupDeclaration unDeclaration declScope g
-  scope <- lookupScope declScope g
-  pure $ ScopeGraph (Map.insert declScope (scope { declarations = Seq.adjust (const (decl, (span, Just address))) position (declarations scope) }) graph)
+insertDeclarationScope decl@Declaration{..} associatedScopeAddress scopeAddress g = fromMaybe g $ do
+  declScopeAddress <- pathDeclarationScope scopeAddress =<< lookupScopePath unDeclaration scopeAddress g
+  scope <- lookupScope declScopeAddress g
+  (declData, position) <- (id . fst &&& unPosition . snd) <$> lookupDeclaration unDeclaration declScopeAddress g
+  pure $ insertScope declScopeAddress (scope { declarations = Seq.adjust (const (Data decl (dataRelation declData) (dataSpan declData) (Just associatedScopeAddress))) position (declarations scope) }) g
 
 -- | Insert a declaration span into the declaration in the scope graph.
 insertDeclarationSpan :: Ord scopeAddress => Declaration -> Span -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
-insertDeclarationSpan decl@Declaration{..} span g@(ScopeGraph graph) = fromMaybe g $ do
-  declScope <- scopeOfDeclaration decl g
-  (associatedScope, position) <- (snd . snd . fst &&& unPosition . snd) <$> lookupDeclaration unDeclaration declScope g
-  scope <- lookupScope declScope g
-  pure $ ScopeGraph (Map.insert declScope (scope { declarations = Seq.adjust (const (decl, (span, associatedScope))) position (declarations scope) }) graph)
+insertDeclarationSpan decl@Declaration{..} span g = fromMaybe g $ do
+  declScopeAddress <- scopeOfDeclaration decl g
+  (declData, position) <- (id . fst &&& unPosition . snd) <$> lookupDeclaration unDeclaration declScopeAddress g
+  scope <- lookupScope declScopeAddress g
+  pure $ insertScope declScopeAddress (scope { declarations = Seq.adjust (const (Data decl (dataRelation declData) span (dataAssociatedScope declData))) position (declarations scope) }) g
 
 -- | Insert a new scope with the given address and edges into the scope graph.
 newScope :: Ord address => address -> Map EdgeLabel [address] -> ScopeGraph address -> ScopeGraph address
@@ -257,7 +259,7 @@ scopeOfDeclaration Declaration{..} g@(ScopeGraph graph) = go (Map.keys graph)
 associatedScope :: Ord scope => Declaration -> ScopeGraph scope -> Maybe scope
 associatedScope Declaration{..} g@(ScopeGraph graph) = go (Map.keys graph)
   where
-    go = foldr (\ scope -> ((lookupDeclaration unDeclaration scope g >>= snd . snd . fst) <|>)) Nothing
+    go = foldr (\ scope -> ((lookupDeclaration unDeclaration scope g >>= dataAssociatedScope . fst) <|>)) Nothing
 
 newtype Reference = Reference { unReference :: Name }
   deriving (Eq, Ord, Show, Generic, NFData)
