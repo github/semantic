@@ -218,11 +218,11 @@ insertDeclarationScope decl@Declaration{..} associatedScopeAddress scopeAddress 
 
 -- | Insert a declaration span into the declaration in the scope graph.
 insertDeclarationSpan :: Ord scopeAddress => Declaration -> Span -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
-insertDeclarationSpan decl@Declaration{..} span g@(ScopeGraph graph) = fromMaybe g $ do
-  declScope <- scopeOfDeclaration decl g
-  (associatedScope, position) <- (snd . snd . fst &&& unPosition . snd) <$> lookupDeclaration unDeclaration declScope g
-  scope <- lookupScope declScope g
-  pure $ ScopeGraph (Map.insert declScope (scope { declarations = Seq.adjust (const (decl, (span, associatedScope))) position (declarations scope) }) graph)
+insertDeclarationSpan decl@Declaration{..} span g = fromMaybe g $ do
+  declScopeAddress <- scopeOfDeclaration decl g
+  (declData, position) <- (id . fst &&& unPosition . snd) <$> lookupDeclaration unDeclaration declScopeAddress g
+  scope <- lookupScope declScopeAddress g
+  pure $ insertScope declScopeAddress (scope { declarations = Seq.adjust (const (Data decl (dataRelation declData) span (dataAssociatedScope declData))) position (declarations scope) }) g
 
 -- | Insert a new scope with the given address and edges into the scope graph.
 newScope :: Ord address => address -> Map EdgeLabel [address] -> ScopeGraph address -> ScopeGraph address
