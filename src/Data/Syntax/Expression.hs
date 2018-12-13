@@ -638,16 +638,11 @@ instance Evaluatable New where
     slot <- lookupDeclaration (Declaration name)
     classVal <- deref slot
     classFrame <- maybeM (throwEvalError $ ScopedEnvError classVal) =<< scopedEnvironment classVal
-    classScope
-    instanceMembers <- getRelations classScope InstanceOf
 
     objectFrame <- newFrame objectScope (Map.singleton Superclass $ Map.singleton assocScope classFrame)
     objectVal <- object objectFrame
 
     void . withScopeAndFrame objectFrame $ do
-      for_ instanceMembers $ \member ->
-        declare member span Default Nothing
-
       let constructorName = Name.name "constructor"
       reference (Reference constructorName) (Declaration constructorName)
       constructor <- deref =<< lookupDeclaration (Declaration $ constructorName)
