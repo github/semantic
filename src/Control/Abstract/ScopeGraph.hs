@@ -9,6 +9,7 @@ module Control.Abstract.ScopeGraph
   , ScopeGraph
   , ScopeError(..)
   , Reference(..)
+  , Relation(..)
   , EdgeLabel(..)
   , CurrentScope(..)
   , currentScope
