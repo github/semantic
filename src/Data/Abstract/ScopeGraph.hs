@@ -180,7 +180,7 @@ insertReference ref path scope = scope { references = Map.insert ref path (refer
 lookupDeclaration :: Ord scopeAddress => Name -> scopeAddress -> ScopeGraph scopeAddress -> Maybe (Data scopeAddress, Position)
 lookupDeclaration name scope g = do
   dataSeq <- ddataOfScope scope g
-  index <- Seq.findIndexR (\Data{..} -> Declaration name == declaration) dataSeq
+  index <- Seq.findIndexR (\Data{..} -> Declaration name == dataDeclaration) dataSeq
   (, Position index) <$> Seq.lookup index dataSeq
 
 declarationNames :: Ord address => [EdgeLabel] -> Scope address -> ScopeGraph address -> Set Declaration
