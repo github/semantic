@@ -638,6 +638,7 @@ instance Evaluatable New where
     slot <- lookupDeclaration (Declaration name)
     classVal <- deref slot
     classFrame <- maybeM (throwEvalError $ ScopedEnvError classVal) =<< scopedEnvironment classVal
+
     objectFrame <- newFrame objectScope (Map.singleton Superclass $ Map.singleton assocScope classFrame)
     objectVal <- object objectFrame
 

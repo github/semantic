@@ -85,7 +85,7 @@ instance Evaluatable QualifiedImport where
     alias <- maybeM (throwEvalError $ NoNameError aliasTerm) (declaredName aliasTerm)
     span <- ask @Span
     scopeAddress <- newScope mempty
-    declare (Declaration alias) span (Just scopeAddress)
+    declare (Declaration alias) Default span (Just scopeAddress)
     aliasSlot <- lookupDeclaration (Declaration alias)
 
     withScope scopeAddress $ do

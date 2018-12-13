@@ -31,7 +31,7 @@ instance Evaluatable JavaScriptRequire where
       Just alias -> do
         span <- ask @Span
         importScope <- newScope (Map.singleton ScopeGraph.Import [ moduleScope ])
-        declare (Declaration alias) span (Just importScope)
+        declare (Declaration alias) Default span (Just importScope)
         let scopeMap = Map.singleton moduleScope moduleFrame
         aliasFrame <- newFrame importScope (Map.singleton ScopeGraph.Import scopeMap)
         aliasSlot <- lookupDeclaration (Declaration alias)
