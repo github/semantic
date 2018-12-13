@@ -207,7 +207,8 @@ insertEdge label target currentAddress g@(ScopeGraph graph) = fromMaybe g $ do
   pure (ScopeGraph (Map.insert currentAddress newScope graph))
 
 
--- | Insert associate the given associated scope into the declaration in the scope graph.
+-- | Update the 'Scope' containing a 'Declaration' with an associated scope address.
+-- Returns an unmodified 'ScopeGraph' if the 'Declaration' cannot be found with the given scope address.
 insertDeclarationScope :: Ord scopeAddress => Declaration -> scopeAddress -> scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
 insertDeclarationScope decl@Declaration{..} address currentAddress g@(ScopeGraph graph) = fromMaybe g $ do
   declScope <- pathDeclarationScope currentAddress =<< lookupScopePath unDeclaration currentAddress g
