@@ -18,6 +18,7 @@ module Data.Abstract.ScopeGraph
   , Position(..)
   , reference
   , Reference(..) -- TODO don't export these constructors
+  , Relation(..)
   , ScopeGraph(..)
   , lookupScope
   , lookupScopePath
