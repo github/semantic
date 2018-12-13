@@ -76,7 +76,7 @@ instance Evaluatable Send where
              Nothing  ->
                pure (Name.name "call")
 
-    let self = deref =<< lookupDeclaration (Declaration __semantic_self)
+    let self = deref =<< lookupDeclaration (Declaration __self)
     lhsValue <- maybe self eval sendReceiver
     lhsFrame <- Abstract.scopedEnvironment lhsValue
 

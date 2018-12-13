@@ -172,7 +172,7 @@ defineSelf :: ( AbstractValue term address value m
               )
            => Evaluator term address value m ()
 defineSelf = do
-  let self = Declaration X.__semantic_self
+  let self = Declaration X.__self
   -- TODO: Should `self` be given a special Relation?
   declare self Default emptySpan Nothing
   slot <- lookupDeclaration self
