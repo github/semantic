@@ -96,8 +96,7 @@ instance Evaluatable Method where
       declare (Declaration self) Default emptySpan Nothing
       fmap (self :) . for methodParameters $ \paramNode -> do
         param <- maybeM (throwEvalError $ NoNameError paramNode) (declaredName paramNode)
-        -- TODO: Should we treat params as a special Relation? I've left this as an `InstanceOf` for now.
-        param <$ declare (Declaration param) InstanceOf span Nothing
+        param <$ declare (Declaration param) Default span Nothing
 
     addr <- lookupDeclaration (Declaration name)
     v <- function name params methodBody associatedScope
@@ -211,8 +210,7 @@ instance Evaluatable PublicFieldDefinition where
     span <- ask @Span
     propertyName <- maybeM (throwEvalError $ NoNameError publicFieldPropertyName) (declaredName publicFieldPropertyName)
 
-    -- withScope instanceScope $ do
-    declare (Declaration propertyName) InstanceOf span Nothing
+    declare (Declaration propertyName) Instance span Nothing
     slot <- lookupDeclaration (Declaration propertyName)
     value <- eval publicFieldValue
     assign slot value
