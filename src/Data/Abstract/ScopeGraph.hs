@@ -1,7 +1,9 @@
 {-# LANGUAGE DeriveAnyClass, DuplicateRecordFields, TupleSections #-}
 module Data.Abstract.ScopeGraph
   ( Slot(..)
+  , Data(..)
   , associatedScope
+  , relationsOfScope
   , Declaration(..) -- TODO don't export these constructors
   , declare
   , EdgeLabel(..)
@@ -42,7 +44,7 @@ import           Prologue
 data Slot address = Slot { frameAddress :: address, position :: Position }
     deriving (Eq, Show, Ord, Generic, NFData)
 
-data Relation = Default | InstanceOf
+data Relation = Default | Instance
   deriving (Eq, Show, Ord, Generic, NFData)
 
 data Data scopeAddress = Data {
@@ -119,6 +121,11 @@ ddataOfScope scope = fmap declarations . Map.lookup scope . unScopeGraph
 -- Returns the edges of a scope in a scope graph.
 linksOfScope :: Ord scope => scope -> ScopeGraph scope -> Maybe (Map EdgeLabel [scope])
 linksOfScope scope = fmap edges . Map.lookup scope . unScopeGraph
+
+relationsOfScope :: Ord scope => scope -> Relation -> ScopeGraph scope -> [ Data scope ]
+relationsOfScope scope relation g = fromMaybe mempty $ do
+  dataSeq <- ddataOfScope scope g
+  pure . toList $ Seq.filter (\Data{..} -> dataRelation == relation) dataSeq
 
 -- Lookup a scope in the scope graph.
 lookupScope :: Ord scope => scope -> ScopeGraph scope -> Maybe (Scope scope)
