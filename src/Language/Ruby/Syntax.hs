@@ -221,7 +221,7 @@ instance Evaluatable Class where
             current = (Lexical, ) <$> pure (pure currentScope')
             edges = Map.fromList (superclassEdges <> current)
         classScope <- newScope edges
-        declare (Declaration name) span (Just classScope)
+        declare (Declaration name) Default span (Just classScope)
 
         let frameEdges = Map.singleton Superclass (Map.fromList (catMaybes superScopes))
         childFrame <- newFrame classScope frameEdges
@@ -274,7 +274,7 @@ instance Evaluatable Module where
       Nothing -> do
         let edges = Map.singleton Lexical [ currentScope' ]
         classScope <- newScope edges
-        declare (Declaration name) span (Just classScope)
+        declare (Declaration name) Default span (Just classScope)
 
         currentFrame' <- currentFrame
         let frameEdges = Map.singleton Lexical (Map.singleton currentScope' currentFrame')
@@ -350,7 +350,7 @@ instance Evaluatable Assignment where
     lhsName <- maybeM (throwEvalError $ NoNameError assignmentTarget) (declaredName assignmentTarget)
     maybeSlot <- maybeLookupDeclaration (Declaration lhsName)
     assignmentSpan <- ask @Span
-    maybe (declare (Declaration lhsName) assignmentSpan Nothing) (const (pure ())) maybeSlot
+    maybe (declare (Declaration lhsName) Default assignmentSpan Nothing) (const (pure ())) maybeSlot
 
     lhs <- ref assignmentTarget
     rhs <- eval assignmentValue
