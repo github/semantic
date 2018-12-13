@@ -55,7 +55,7 @@ import qualified Data.Abstract.Heap as Heap
 import           Data.Abstract.Live
 import           Data.Abstract.Module (ModuleInfo)
 import           Data.Abstract.Name
-import           Data.Abstract.ScopeGraph (Path (..), putDeclarationScopeAtPosition)
+import           Data.Abstract.ScopeGraph (Path (..), Relation(..), putDeclarationScopeAtPosition)
 import qualified Data.Map.Strict as Map
 import           Data.Span (Span, emptySpan)
 import           Prologue
