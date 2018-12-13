@@ -130,7 +130,7 @@ declare decl rel declSpan assocScope currentScope g = fromMaybe (g, Nothing) $ d
   scope <- lookupScope currentScope g
 
   dataSeq <- ddataOfScope currentScope g
-  case Seq.findIndexR (\Data{..} -> decl == declaration && declSpan == span && rel == relation) dataSeq of
+  case Seq.findIndexR (\Data{..} -> decl == dataDeclaration && declSpan == dataSpan && rel == dataRelation) dataSeq of
     Just index -> pure (g, Just (Position index))
     Nothing -> do
       let newScope = scope { declarations = declarations scope Seq.|> Data decl rel declSpan assocScope }
