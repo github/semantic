@@ -174,11 +174,12 @@ define :: ( HasCallStack
           , Carrier sig m
           )
        => Declaration
+       -> Relation
        -> Evaluator term address value m value
        -> Evaluator term address value m ()
-define declaration def = withCurrentCallStack callStack $ do
+define declaration rel def = withCurrentCallStack callStack $ do
   -- TODO: This span is still wrong.
-  declare declaration emptySpan Nothing
+  declare declaration rel emptySpan Nothing
   slot <- lookupDeclaration declaration
   value <- def
   assign slot value
