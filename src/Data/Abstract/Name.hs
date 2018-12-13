@@ -6,6 +6,7 @@ module Data.Abstract.Name
 , name
 , nameI
 , formatName
+, __semantic_self
 ) where
 
 import           Control.Effect
@@ -70,3 +71,6 @@ instance Hashable Name where
 instance ToJSON Name where
   toJSON = toJSON . formatName
   toEncoding = toEncoding . formatName
+
+__semantic_self :: Name
+__semantic_self = name "__self"

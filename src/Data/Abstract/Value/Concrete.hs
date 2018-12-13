@@ -94,7 +94,7 @@ instance ( FreeVariables term
     Abstract.BuiltIn associatedScope builtIn k -> runEvaluator $ do
       val <- closure Nothing [] (Left builtIn) associatedScope
       Evaluator $ runFunctionC (k val) eval
-    Abstract.Bind obj@(Object frame) (Closure packageInfo moduleInfo name _ names body scope parentFrame) k ->
+    Abstract.Bind obj (Closure packageInfo moduleInfo name _ names body scope parentFrame) k ->
       runFunctionC (k (Closure packageInfo moduleInfo name (Just obj) names body scope parentFrame)) eval
     Abstract.Bind _ value k -> runFunctionC (k value) eval
     Abstract.Call op params k -> runEvaluator $ do
@@ -111,7 +111,7 @@ instance ( FreeVariables term
             withScopeAndFrame frameAddress $ do
               case maybeThis of
                 Just object -> do
-                  slot <- lookupDeclaration (Declaration $ name "__self")
+                  slot <- lookupDeclaration (Declaration __semantic_self)
                   assign slot object
                 Nothing -> pure ()
               for_ (zip names params) $ \(name, param) -> do
