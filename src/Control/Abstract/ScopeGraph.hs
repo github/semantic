@@ -12,12 +12,14 @@ module Control.Abstract.ScopeGraph
   , Relation(..)
   , EdgeLabel(..)
   , CurrentScope(..)
+  , Data(..)
   , currentScope
   , insertExportEdge
   , insertImportEdge
   , insertLexicalEdge
   , withScope
   , associatedScope
+  , relationsOfScope
   , putDeclarationScope
   , putDeclarationSpan
   , insertImportReference
@@ -42,7 +44,7 @@ import           Control.Effect.Carrier
 import           Data.Abstract.BaseError
 import           Data.Abstract.Module
 import           Data.Abstract.Name hiding (name)
-import           Data.Abstract.ScopeGraph (Declaration(..), EdgeLabel, Reference, Relation(..), Scope (..), ScopeGraph, Slot(..))
+import           Data.Abstract.ScopeGraph (Declaration(..), EdgeLabel, Reference, Relation(..), Scope (..), ScopeGraph, Slot(..), Data(..))
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.Span
 import           Prelude hiding (lookup)
@@ -148,6 +150,16 @@ lookupScope :: ( Member (Resumable (BaseError (ScopeError address))) sig
              => address
              -> Evaluator term address value m (Scope address)
 lookupScope address = maybeM (throwScopeError LookupScopeError) . ScopeGraph.lookupScope address =<< get
+
+relationsOfScope :: ( Member (State (ScopeGraph address)) sig
+                    , Carrier sig m
+                    , Ord address
+                    )
+                => address
+                -> Relation
+                -> Evaluator term address value m [ Data address ]
+relationsOfScope scope relation =
+  ScopeGraph.relationsOfScope scope relation <$> get
 
 insertImportReference :: ( Member (Resumable (BaseError (ScopeError address))) sig
                         , Member (Reader ModuleInfo) sig
