@@ -36,7 +36,7 @@ instance Evaluatable Function where
 
     params <- withScope associatedScope . for functionParameters $ \paramNode -> do
       param <- maybeM (throwEvalError $ NoNameError paramNode) (declaredName paramNode)
-      param <$ declare (Declaration param) span Nothing
+      param <$ declare (Declaration param) Default span Nothing
 
     addr <- lookupDeclaration (Declaration name)
     v <- function name params functionBody associatedScope
@@ -56,7 +56,7 @@ declareFunction name span = do
   currentScope' <- currentScope
   let lexicalEdges = Map.singleton Lexical [ currentScope' ]
   associatedScope <- newScope lexicalEdges
-  declare (Declaration name) span (Just associatedScope)
+  declare (Declaration name) Default span (Just associatedScope)
   pure associatedScope
 
 instance Tokenize Function where
@@ -92,10 +92,12 @@ instance Evaluatable Method where
 
     params <- withScope associatedScope $ do
       let self = Name.name "__self"
-      declare (Declaration self) emptySpan Nothing
+      -- TODO: Should we give `self` a special Relation?
+      declare (Declaration self) Default emptySpan Nothing
       fmap (self :) . for methodParameters $ \paramNode -> do
         param <- maybeM (throwEvalError $ NoNameError paramNode) (declaredName paramNode)
-        param <$ declare (Declaration param) span Nothing
+        -- TODO: Should we treat params as a special Relation? I've left this as an `InstanceOf` for now.
+        param <$ declare (Declaration param) InstanceOf span Nothing
 
     addr <- lookupDeclaration (Declaration name)
     v <- function name params methodBody associatedScope
@@ -164,7 +166,7 @@ instance Evaluatable VariableDeclaration where
   eval eval _ (VariableDeclaration decs) = do
     for_ decs $ \declaration -> do
       name <- maybeM (throwEvalError $ NoNameError declaration) (declaredName declaration)
-      declare (Declaration name) emptySpan Nothing
+      declare (Declaration name) Default emptySpan Nothing
       (span, _) <- do
         ref <- eval declaration
         subtermSpan <- get @Span
@@ -210,7 +212,7 @@ instance Evaluatable PublicFieldDefinition where
     propertyName <- maybeM (throwEvalError $ NoNameError publicFieldPropertyName) (declaredName publicFieldPropertyName)
 
     -- withScope instanceScope $ do
-    declare (Declaration propertyName) span Instance Nothing
+    declare (Declaration propertyName) InstanceOf span Nothing
     slot <- lookupDeclaration (Declaration propertyName)
     value <- eval publicFieldValue
     assign slot value
@@ -258,7 +260,7 @@ instance Evaluatable Class where
         current = (Lexical, ) <$> pure (pure currentScope')
         edges = Map.fromList (superclassEdges <> current)
     classScope <- newScope edges
-    declare (Declaration name) span (Just classScope)
+    declare (Declaration name) Default span (Just classScope)
 
     let frameEdges = Map.singleton Superclass (Map.fromList (catMaybes superScopes))
     classFrame <- newFrame classScope frameEdges
@@ -351,7 +353,8 @@ instance Evaluatable TypeAlias where
 
     span <- ask @Span
     assocScope <- associatedScope (Declaration kindName)
-    declare (Declaration name) span assocScope
+    -- TODO: Should we consider a special Relation for `TypeAlias`?
+    declare (Declaration name) Default span assocScope
 
     slot <- lookupDeclaration (Declaration name)
     kindSlot <- lookupDeclaration (Declaration kindName)
