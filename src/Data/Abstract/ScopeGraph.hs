@@ -177,7 +177,7 @@ pathToDeclaration decl address g = DPath decl . snd <$> lookupDeclaration (unDec
 insertReference :: Reference -> Path scopeAddress -> Scope scopeAddress -> Scope scopeAddress
 insertReference ref path scope = scope { references = Map.insert ref path (references scope) }
 
-lookupDeclaration :: Ord scopeAddress => Name -> scopeAddress -> ScopeGraph scopeAddress -> Maybe ((Declaration, (Span, Maybe scopeAddress)), Position)
+lookupDeclaration :: Ord scopeAddress => Name -> scopeAddress -> ScopeGraph scopeAddress -> Maybe (Data scopeAddress, Position)
 lookupDeclaration name scope g = do
   dataSeq <- ddataOfScope scope g
   index <- Seq.findIndexR (\Data{..} -> Declaration name == declaration) dataSeq
