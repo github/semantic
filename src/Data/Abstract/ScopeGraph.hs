@@ -210,11 +210,11 @@ insertEdge label target currentAddress g@(ScopeGraph graph) = fromMaybe g $ do
 -- | Update the 'Scope' containing a 'Declaration' with an associated scope address.
 -- Returns an unmodified 'ScopeGraph' if the 'Declaration' cannot be found with the given scope address.
 insertDeclarationScope :: Ord scopeAddress => Declaration -> scopeAddress -> scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
-insertDeclarationScope decl@Declaration{..} address currentAddress g@(ScopeGraph graph) = fromMaybe g $ do
-  declScope <- pathDeclarationScope currentAddress =<< lookupScopePath unDeclaration currentAddress g
-  (span, position) <- (fst . snd . fst &&& unPosition . snd) <$> lookupDeclaration unDeclaration declScope g
-  scope <- lookupScope declScope g
-  pure $ ScopeGraph (Map.insert declScope (scope { declarations = Seq.adjust (const (decl, (span, Just address))) position (declarations scope) }) graph)
+insertDeclarationScope decl@Declaration{..} associatedScopeAddress scopeAddress g = fromMaybe g $ do
+  declScopeAddress <- pathDeclarationScope scopeAddress =<< lookupScopePath unDeclaration scopeAddress g
+  scope <- lookupScope declScopeAddress g
+  (declData, position) <- (id . fst &&& unPosition . snd) <$> lookupDeclaration unDeclaration declScopeAddress g
+  pure $ insertScope declScopeAddress (scope { declarations = Seq.adjust (const (Data decl (dataRelation declData) (dataSpan declData) (Just associatedScopeAddress))) position (declarations scope) }) g
 
 -- | Insert a declaration span into the declaration in the scope graph.
 insertDeclarationSpan :: Ord scopeAddress => Declaration -> Span -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
