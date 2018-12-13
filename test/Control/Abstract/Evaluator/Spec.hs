@@ -116,5 +116,5 @@ instance FreeVariables SpecEff where freeVariables _ = lowerBound
 instance Declarations SpecEff where
   declaredName eff =
     case unsafePerformIO (evaluate (runSpecEff eff)) of
-      (_, (_, (_, Right (Value.Symbol text)))) -> Just (SpecHelpers.name text)
+      (_, (_, (_, Right (Value.String text)))) -> Just (SpecHelpers.name text)
       _                                        -> error "declaredName for SpecEff should return an RVal"
