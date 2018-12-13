@@ -187,7 +187,7 @@ declarationNames :: Ord address => [EdgeLabel] -> Scope address -> ScopeGraph ad
 declarationNames edgeLabels scope scopeGraph = localDeclarations <> edgeNames
   where addresses = join (Map.elems $ Map.restrictKeys (edges scope) (Set.fromList edgeLabels))
         edgeNames = flip foldMap addresses $ \address -> maybe mempty (flip (declarationNames edgeLabels) scopeGraph) (lookupScope address scopeGraph)
-        localDeclarations = Set.fromList . toList . fmap fst $ declarations scope
+        localDeclarations = Set.fromList . toList . fmap dataDeclaration $ declarations scope
 
 
 putDeclarationScopeAtPosition :: Ord scopeAddress => scopeAddress -> Position -> Maybe scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
