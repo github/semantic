@@ -642,10 +642,16 @@ instance Evaluatable New where
     objectFrame <- newFrame objectScope (Map.singleton Superclass $ Map.singleton assocScope classFrame)
     objectVal <- object objectFrame
 
+    classScope <- scopeLookup classFrame
+    instanceMembers <- relationsOfScope classScope Instance
+
     void . withScopeAndFrame objectFrame $ do
+      for_ instanceMembers $ \Data{..} -> do
+        declare dataDeclaration dataRelation dataSpan dataAssociatedScope
+
       let constructorName = Name.name "constructor"
       reference (Reference constructorName) (Declaration constructorName)
-      constructor <- deref =<< lookupDeclaration (Declaration $ constructorName)
+      constructor <- deref =<< lookupDeclaration (Declaration constructorName)
       args <- traverse eval arguments
       call constructor (objectVal : args)
 
