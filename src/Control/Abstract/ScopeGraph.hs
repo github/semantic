@@ -41,7 +41,7 @@ import           Control.Effect.Carrier
 import           Data.Abstract.BaseError
 import           Data.Abstract.Module
 import           Data.Abstract.Name hiding (name)
-import           Data.Abstract.ScopeGraph (Declaration (..), EdgeLabel, Reference, Scope (..), ScopeGraph, Slot (..))
+import           Data.Abstract.ScopeGraph (Declaration(..), EdgeLabel, Reference, Relation(..), Scope (..), ScopeGraph, Slot(..))
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.Span
 import           Prelude hiding (lookup)
