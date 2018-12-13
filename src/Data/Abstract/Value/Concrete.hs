@@ -111,7 +111,7 @@ instance ( FreeVariables term
             withScopeAndFrame frameAddress $ do
               case maybeThis of
                 Just object -> do
-                  maybeSlot <- maybeLookupDeclaration (Declaration __semantic_self)
+                  maybeSlot <- maybeLookupDeclaration (Declaration __self)
                   maybe (pure ()) (`assign` object) maybeSlot
                 Nothing -> pure ()
               for_ (zip names params) $ \(name, param) -> do

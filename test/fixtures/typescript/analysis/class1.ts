@@ -1,4 +1,15 @@
-import { Adder } from "./class2"
+class Adder {
+    summand: number;
+
+    constructor(summand: number) {
+        this.summand = summand;
+    }
+
+    addOne() {
+      this.summand += 1;
+      return this.summand;
+    }
+}
 
 var foo = new Adder(5)
-foo.add()
+foo.addOne()

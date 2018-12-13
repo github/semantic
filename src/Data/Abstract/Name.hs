@@ -6,7 +6,7 @@ module Data.Abstract.Name
 , name
 , nameI
 , formatName
-, __semantic_self
+, __self
 ) where
 
 import           Control.Effect
@@ -72,5 +72,5 @@ instance ToJSON Name where
   toJSON = toJSON . formatName
   toEncoding = toEncoding . formatName
 
-__semantic_self :: Name
-__semantic_self = name "__self"
+__self :: Name
+__self = name "__self"
