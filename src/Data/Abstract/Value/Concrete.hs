@@ -101,7 +101,7 @@ instance ( FreeVariables term
       boxed <- case op of
         Closure _ _ _ _ _ (Left Print) _ _ -> traverse (trace . show) params $> Unit
         Closure _ _ _ _ _ (Left Show) _ _ -> pure . String . pack $ show params
-        Closure packageInfo moduleInfo _ maybeThis names (Right body) associatedScope parentFrame -> do
+        Closure packageInfo moduleInfo _ maybeSelf names (Right body) associatedScope parentFrame -> do
           -- Evaluate the bindings and body with the closure’s package/module info in scope in order to
           -- charge them to the closure's origin.
           withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
@@ -109,7 +109,7 @@ instance ( FreeVariables term
             let frameEdges = Map.singleton Lexical (Map.singleton parentScope parentFrame)
             frameAddress <- newFrame associatedScope frameEdges
             withScopeAndFrame frameAddress $ do
-              case maybeThis of
+              case maybeSelf of
                 Just object -> do
                   maybeSlot <- maybeLookupDeclaration (Declaration __self)
                   maybe (pure ()) (`assign` object) maybeSlot
