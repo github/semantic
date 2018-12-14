@@ -509,7 +509,7 @@ instance Ord1 ConstructSignature where liftCompare = genericLiftCompare
 instance Show1 ConstructSignature where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable ConstructSignature
 
-data IndexSignature a = IndexSignature { indexSignatureSubject :: a, indexSignatureType :: a }
+data IndexSignature a = IndexSignature { indexSignatureSubject :: a, indexSignatureType :: a, typeAnnotation :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 IndexSignature where liftEq = genericLiftEq
