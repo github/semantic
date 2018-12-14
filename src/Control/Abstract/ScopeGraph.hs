@@ -157,7 +157,7 @@ relationsOfScope :: ( Member (State (ScopeGraph address)) sig
                     )
                 => address
                 -> Relation
-                -> Evaluator term address value m [ Data address ]
+                -> Evaluator term address value m [ Info address ]
 relationsOfScope scope relation =
   ScopeGraph.relationsOfScope scope relation <$> get
 
