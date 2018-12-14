@@ -43,6 +43,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Declarations term
           , FreeVariables term
           , Member (Allocator address) sig
+          , Member (Bitwise value) sig
           , Member (Boolean value) sig
           , Member (While value) sig
           , Member (Deref value) sig

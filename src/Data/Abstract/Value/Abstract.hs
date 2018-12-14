@@ -137,12 +137,6 @@ instance AbstractValue term address Abstract m where
 
   index _ _ = pure Abstract
 
-  liftBitwise _ _ = pure Abstract
-  liftBitwise2 _ _ _ = pure Abstract
-
-  unsignedRShift _ _ = pure Abstract
-
   liftComparison _ _ _ = pure Abstract
 
-  castToInteger _ = pure Abstract
   object _ = pure Abstract

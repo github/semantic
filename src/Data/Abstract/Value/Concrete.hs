@@ -315,29 +315,6 @@ instance ( Member (Abstract.Boolean (Value term address)) sig
 
         pair = (left, right)
 
-  liftBitwise operator target
-    | Integer (Number.Integer i) <- target = pure . Integer . Number.Integer $ operator i
-    | otherwise = throwValueError (BitwiseError target)
-
-  liftBitwise2 operator left right
-    | (Integer (Number.Integer i), Integer (Number.Integer j)) <- pair = pure . Integer . Number.Integer $ operator i j
-    | otherwise = throwValueError (Bitwise2Error left right)
-      where pair = (left, right)
-
-  unsignedRShift left right
-    | (Integer (Number.Integer i), Integer (Number.Integer j)) <- pair =
-      if i >= 0 then pure . Integer . Number.Integer $ ourShift (fromIntegral i) (fromIntegral j)
-      else throwValueError (Bitwise2Error left right)
-    | otherwise = throwValueError (Bitwise2Error left right)
-      where
-        pair = (left, right)
-        ourShift :: Word64 -> Int -> Integer
-        ourShift a b = toInteger (shiftR a b)
-
-  castToInteger (Integer (Number.Integer i)) = pure (Integer (Number.Integer i))
-  castToInteger (Float (Number.Decimal i)) = pure (Integer (Number.Integer (coefficient (normalize i))))
-  castToInteger i = throwValueError (NumericError i)
-
   object frameAddress = pure (Object frameAddress)
 
 -- | The type of exceptions that can be thrown when constructing values in 'Value'’s 'MonadValue' instance.

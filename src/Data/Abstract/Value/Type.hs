@@ -415,11 +415,6 @@ instance ( Member Fresh sig
     _ <- unify (Array (Var field)) arr
     pure (Var field)
 
-  liftBitwise _ = unify Int
-  liftBitwise2 _ t1 t2   = unify Int t1 >>= flip unify t2
-
-  unsignedRShift t1 t2 = unify Int t2 *> unify Int t1
-
   liftComparison (Concrete _) left right = case (left, right) of
     (Float, Int) ->                     pure Bool
     (Int, Float) ->                     pure Bool
@@ -428,5 +423,3 @@ instance ( Member Fresh sig
     (Float, Int) ->                     pure Int
     (Int, Float) ->                     pure Int
     _                 -> unify left right $> Bool
-
-  castToInteger t = unify t (Int :+ Float :+ Rational) $> Int
