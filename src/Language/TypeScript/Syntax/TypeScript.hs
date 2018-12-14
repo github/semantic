@@ -67,7 +67,7 @@ instance Evaluatable QualifiedAliasedImport where
     let scopeMap = Map.singleton moduleScope moduleFrame
     aliasFrame <- newFrame importScope (Map.singleton ScopeGraph.Import scopeMap)
 
-    alias <- maybeM (throwEvalError $ NoNameError aliasTerm) (declaredName aliasTerm)
+    alias <- maybeM (throwNoNameError aliasTerm) (declaredName aliasTerm)
     declare (Declaration alias) Default span (Just importScope)
     aliasSlot <- lookupDeclaration (Declaration alias)
     assign aliasSlot =<< object aliasFrame
@@ -579,7 +579,7 @@ declareModule :: ( AbstractValue term address value m
                 -> [term]
                 -> Evaluator term address value m value
 declareModule eval identifier statements = do
-    name <- maybeM (throwEvalError $ NoNameError identifier) (declaredName identifier)
+    name <- maybeM (throwNoNameError identifier) (declaredName identifier)
     span <- ask @Span
     currentScope' <- currentScope
 
@@ -659,12 +659,12 @@ instance Declarations a => Declarations (AbstractClass a) where
 
 instance Evaluatable AbstractClass where
   eval eval _ AbstractClass{..} = do
-    name <- maybeM (throwEvalError $ NoNameError abstractClassIdentifier) (declaredName abstractClassIdentifier)
+    name <- maybeM (throwNoNameError abstractClassIdentifier) (declaredName abstractClassIdentifier)
     span <- ask @Span
     currentScope' <- currentScope
 
     superScopes <- for classHeritage $ \superclass -> do
-      name <- maybeM (throwEvalError $ NoNameError superclass) (declaredName superclass)
+      name <- maybeM (throwNoNameError superclass) (declaredName superclass)
       scope <- associatedScope (Declaration name)
       slot <- lookupDeclaration (Declaration name)
       superclassFrame <- scopedEnvironment =<< deref slot

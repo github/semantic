@@ -8,6 +8,7 @@ module Data.Abstract.Evaluatable
 -- * Effects
 , EvalError(..)
 , throwEvalError
+, throwNoNameError
 , runEvalError
 , runEvalErrorWith
 , UnspecializedError(..)
@@ -193,6 +194,15 @@ data EvalError term address value return where
   RationalFormatError :: Text -> EvalError term address value Rational
   ReferenceError      :: value -> Name -> EvalError term address value (Slot address)
   ScopedEnvError      :: value -> EvalError term address value address
+
+throwNoNameError :: ( Carrier sig m
+                    , Member (Reader ModuleInfo) sig
+                    , Member (Reader Span) sig
+                    , Member (Resumable (BaseError (EvalError term address value))) sig
+                    )
+                => term
+                -> Evaluator term address value m Name
+throwNoNameError = throwEvalError . NoNameError
 
 deriving instance (Eq term, Eq value) => Eq (EvalError term address value return)
 deriving instance (Show term, Show value) => Show (EvalError term address value return)

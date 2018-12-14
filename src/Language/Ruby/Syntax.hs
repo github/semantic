@@ -72,7 +72,7 @@ instance Show1 Send where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Send where
   eval eval _ Send{..} = do
     sel <- case sendSelector of
-             Just sel -> maybeM (throwEvalError $ NoNameError sel) (declaredName sel)
+             Just sel -> maybeM (throwNoNameError sel) (declaredName sel)
              Nothing  ->
                pure (Name.name "call")
 
@@ -193,7 +193,7 @@ instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Class where
   eval eval _ Class{..} = do
-    name <- maybeM (throwEvalError $ NoNameError classIdentifier) (declaredName classIdentifier)
+    name <- maybeM (throwNoNameError classIdentifier) (declaredName classIdentifier)
     span <- ask @Span
     currentScope' <- currentScope
 
@@ -210,7 +210,7 @@ instance Evaluatable Class where
       Nothing -> do
         let classSuperclasses = maybeToList classSuperClass
         superScopes <- for classSuperclasses $ \superclass -> do
-          name <- maybeM (throwEvalError $ NoNameError superclass) (declaredName superclass)
+          name <- maybeM (throwNoNameError superclass) (declaredName superclass)
           scope <- associatedScope (Declaration name)
           slot <- lookupDeclaration (Declaration name)
           superclassFrame <- scopedEnvironment =<< deref slot
@@ -256,7 +256,7 @@ instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Module where
   eval eval _ Module{..} =  do
-    name <- maybeM (throwEvalError $ NoNameError moduleIdentifier) (declaredName moduleIdentifier)
+    name <- maybeM (throwNoNameError moduleIdentifier) (declaredName moduleIdentifier)
     span <- ask @Span
     currentScope' <- currentScope
 
@@ -348,7 +348,7 @@ instance Show1 Assignment where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Assignment where
   eval eval ref Assignment{..} = do
-    lhsName <- maybeM (throwEvalError $ NoNameError assignmentTarget) (declaredName assignmentTarget)
+    lhsName <- maybeM (throwNoNameError assignmentTarget) (declaredName assignmentTarget)
     maybeSlot <- maybeLookupDeclaration (Declaration lhsName)
     assignmentSpan <- ask @Span
     maybe (declare (Declaration lhsName) Default assignmentSpan Nothing) (const (pure ())) maybeSlot
