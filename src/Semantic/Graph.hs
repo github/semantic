@@ -34,7 +34,6 @@ import           Analysis.Abstract.Graph as Graph
 import           Control.Abstract
 import           Control.Abstract.PythonPackage as PythonPackage
 import           Data.Abstract.Address.Hole as Hole
-import           Data.Abstract.Address.Located as Located
 import           Data.Abstract.Address.Monovariant as Monovariant
 import           Data.Abstract.Address.Precise as Precise
 import           Data.Abstract.BaseError (BaseError (..))
@@ -114,7 +113,7 @@ runCallGraph :: ( VertexDeclarationWithStrategy (VertexDeclarationStrategy synta
 runCallGraph lang includePackages modules package
   = fmap (simplify . fst)
   . runEvaluator
-  . graphing @_ @_ @_ @(Hole (Maybe Name) (Located Monovariant)) @Abstract
+  . graphing @_ @_ @_ @(Hole (Maybe Name) Monovariant) @Abstract
   . runHeap
   . runScopeGraph
   . caching
