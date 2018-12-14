@@ -47,7 +47,7 @@ data Slot address = Slot { frameAddress :: address, position :: Position }
 data Relation = Default | Instance
   deriving (Eq, Show, Ord, Generic, NFData)
 
-data Data scopeAddress = Data {
+data Info scopeAddress = Info {
     dataDeclaration :: Declaration
   , dataRelation :: Relation
   , dataSpan :: Span
@@ -59,7 +59,7 @@ data Data scopeAddress = Data {
 data Scope address = Scope
   { edges        :: Map EdgeLabel [address]
   , references   :: Map Reference (Path address)
-  , declarations :: Seq (Data address)
+  , declarations :: Seq (Info address)
   } deriving (Eq, Show, Ord, Generic, NFData)
 
 instance Lower (Scope scopeAddress) where
