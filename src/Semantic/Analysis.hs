@@ -32,9 +32,10 @@ type DomainC term address value m
   ( BooleanC value                                                        (Eff
   ( StringC value                                                         (Eff
   ( NumericC value                                                        (Eff
+  ( BitwiseC value                                                        (Eff
   ( UnitC value                                                           (Eff
   ( InterposeC (Resumable (BaseError (UnspecializedError address value))) (Eff
-    m)))))))))))))
+    m)))))))))))))))
 
 -- | Evaluate a list of modules with the prelude for the passed language available, and applying the passed function to every module.
 evaluate :: ( Carrier outerSig outer
@@ -86,8 +87,11 @@ runDomainEffects :: ( AbstractValue term address value (DomainC term address val
                     , unitC ~ UnitC value (Eff (InterposeC (Resumable (BaseError (UnspecializedError address value))) (Eff m)))
                     , unitSig ~ (Unit value :+: Interpose (Resumable (BaseError (UnspecializedError address value))) :+: sig)
                     , Carrier unitSig unitC
-                    , numericC ~ NumericC value (Eff unitC)
-                    , numericSig ~ (Abstract.Numeric value :+: unitSig)
+                    , bitwiseC ~ BitwiseC value (Eff unitC)
+                    , bitwiseSig ~ (Abstract.Bitwise value :+: unitSig)
+                    , Carrier bitwiseSig bitwiseC
+                    , numericC ~ NumericC value (Eff bitwiseC)
+                    , numericSig ~ (Abstract.Numeric value :+: bitwiseSig)
                     , Carrier numericSig numericC
                     , stringC ~ StringC value (Eff numericC)
                     , stringSig ~ (Abstract.String value :+: numericSig)
@@ -122,7 +126,7 @@ runDomainEffects :: ( AbstractValue term address value (DomainC term address val
                  => (term -> Evaluator term address value (DomainC term address value m) value)
                  -> Module (Either (proxy lang) term)
                  -> Evaluator term address value m value
-runDomainEffects runTerm = raiseHandler runInterpose . runUnit . runNumeric . runString . runBoolean . runWhile . runFunction runTerm . either ((unit <*) . definePrelude) runTerm . moduleBody
+runDomainEffects runTerm = raiseHandler runInterpose . runUnit . runBitwise . runNumeric . runString . runBoolean . runWhile . runFunction runTerm . either ((unit <*) . definePrelude) runTerm . moduleBody
 
 -- | Evaluate a term recursively, applying the passed function at every recursive position.
 --
