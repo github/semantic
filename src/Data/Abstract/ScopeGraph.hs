@@ -230,7 +230,7 @@ insertDeclarationSpan decl@Declaration{..} span g = fromMaybe g $ do
   declScopeAddress <- scopeOfDeclaration decl g
   (declData, position) <- second unPosition <$> lookupDeclaration unDeclaration declScopeAddress g
   scope <- lookupScope declScopeAddress g
-  pure $ insertScope declScopeAddress (scope { declarations = Seq.adjust (const (Data decl (dataRelation declData) span (dataAssociatedScope declData))) position (declarations scope) }) g
+  pure $ insertScope declScopeAddress (scope { declarations = Seq.update (declData { dataSpan = span }) })
 
 -- | Insert a new scope with the given address and edges into the scope graph.
 newScope :: Ord address => address -> Map EdgeLabel [address] -> ScopeGraph address -> ScopeGraph address
