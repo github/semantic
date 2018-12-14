@@ -221,14 +221,14 @@ insertDeclarationScope :: Ord scopeAddress => Declaration -> scopeAddress -> sco
 insertDeclarationScope decl@Declaration{..} associatedScopeAddress scopeAddress g = fromMaybe g $ do
   declScopeAddress <- pathDeclarationScope scopeAddress =<< lookupScopePath unDeclaration scopeAddress g
   scope <- lookupScope declScopeAddress g
-  (declData, position) <- (id *** unPosition) <$> lookupDeclaration unDeclaration declScopeAddress g
+  (declData, position) <- (second unPosition) <$> lookupDeclaration unDeclaration declScopeAddress g
   pure $ insertScope declScopeAddress (scope { declarations = Seq.adjust (const (Data decl (dataRelation declData) (dataSpan declData) (Just associatedScopeAddress))) position (declarations scope) }) g
 
 -- | Insert a declaration span into the declaration in the scope graph.
 insertDeclarationSpan :: Ord scopeAddress => Declaration -> Span -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
 insertDeclarationSpan decl@Declaration{..} span g = fromMaybe g $ do
   declScopeAddress <- scopeOfDeclaration decl g
-  (declData, position) <- (id *** unPosition) <$> lookupDeclaration unDeclaration declScopeAddress g
+  (declData, position) <- (second unPosition) <$> lookupDeclaration unDeclaration declScopeAddress g
   scope <- lookupScope declScopeAddress g
   pure $ insertScope declScopeAddress (scope { declarations = Seq.adjust (const (Data decl (dataRelation declData) span (dataAssociatedScope declData))) position (declarations scope) }) g
 
