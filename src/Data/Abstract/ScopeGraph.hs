@@ -218,11 +218,11 @@ insertEdge label target currentAddress g@(ScopeGraph graph) = fromMaybe g $ do
 -- | Update the 'Scope' containing a 'Declaration' with an associated scope address.
 -- Returns an unmodified 'ScopeGraph' if the 'Declaration' cannot be found with the given scope address.
 insertDeclarationScope :: Ord scopeAddress => Declaration -> scopeAddress -> scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
-insertDeclarationScope decl@Declaration{..} associatedScopeAddress scopeAddress g = fromMaybe g $ do
+insertDeclarationScope Declaration{..} associatedScopeAddress scopeAddress g = fromMaybe g $ do
   declScopeAddress <- pathDeclarationScope scopeAddress =<< lookupScopePath unDeclaration scopeAddress g
   scope <- lookupScope declScopeAddress g
   (declData, position) <- second unPosition <$> lookupDeclaration unDeclaration declScopeAddress g
-  pure $ insertScope declScopeAddress (scope { declarations = Seq.update (declData { dataAssociatedScope = Just associatedScopeAddress }) position (declarations scope) }) g
+  pure $ insertScope declScopeAddress (scope { declarations = Seq.update position (declData { dataAssociatedScope = Just associatedScopeAddress }) (declarations scope) }) g
 
 -- | Insert a declaration span into the declaration in the scope graph.
 insertDeclarationSpan :: Ord scopeAddress => Declaration -> Span -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
@@ -230,7 +230,7 @@ insertDeclarationSpan decl@Declaration{..} span g = fromMaybe g $ do
   declScopeAddress <- scopeOfDeclaration decl g
   (declData, position) <- second unPosition <$> lookupDeclaration unDeclaration declScopeAddress g
   scope <- lookupScope declScopeAddress g
-  pure $ insertScope declScopeAddress (scope { declarations = Seq.update (declData { dataSpan = span }) })
+  pure $ insertScope declScopeAddress (scope { declarations = Seq.update position (declData { dataSpan = span }) (declarations scope) }) g
 
 -- | Insert a new scope with the given address and edges into the scope graph.
 newScope :: Ord address => address -> Map EdgeLabel [address] -> ScopeGraph address -> ScopeGraph address
