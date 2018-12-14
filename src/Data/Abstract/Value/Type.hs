@@ -359,9 +359,6 @@ instance AbstractHole Type where
   hole = Hole
 
 instance AbstractIntro Type where
-  integer _  = Int
-  float _    = Float
-  rational _ = Rational
   hash       = Hash
   kvPair k v = k :* v
 
@@ -402,12 +399,6 @@ instance ( Member Fresh sig
     field <- fresh
     _ <- unify (Array (Var field)) arr
     pure (Var field)
-
-  liftNumeric _ = unify (Int :+ Float :+ Rational)
-  liftNumeric2 _ left right = case (left, right) of
-    (Float, Int) -> pure Float
-    (Int, Float) -> pure Float
-    _            -> unify left right
 
   liftBitwise _ = unify Int
   liftBitwise2 _ t1 t2   = unify Int t1 >>= flip unify t2

@@ -33,6 +33,11 @@ module Control.Abstract.Value
 , String(..)
 , StringC(..)
 , runString
+, integer
+, float
+, rational
+, liftNumeric
+, liftNumeric2
 , Numeric(..)
 , NumericC(..)
 , runNumeric
@@ -45,7 +50,7 @@ import Control.Effect.Carrier
 import Data.Abstract.BaseError
 import Data.Abstract.Module
 import Data.Abstract.Name
-import Data.Abstract.Number as Number
+import Data.Abstract.Number (Number, SomeNumber)
 import Data.Scientific (Scientific)
 import Data.Span
 import Prelude hiding (String)
@@ -253,6 +258,37 @@ runString :: Carrier (String value :+: sig) (StringC value (Eff m))
           -> Evaluator term address value m a
 runString = raiseHandler $ runStringC . interpret
 
+
+-- | Construct an abstract integral value.
+integer :: (Member (Numeric value) sig, Carrier sig m) => Integer -> m value
+integer t = send (Integer t ret)
+
+-- | Construct a floating-point value.
+float :: (Member (Numeric value) sig, Carrier sig m) => Scientific -> m value
+float t = send (Float t ret)
+
+-- | Construct a rational value.
+rational :: (Member (Numeric value) sig, Carrier sig m) => Rational -> m value
+rational t = send (Rational t ret)
+
+-- | Lift a unary operator over a 'Num' to a function on 'value's.
+liftNumeric  :: (Member (Numeric value) sig, Carrier sig m)
+             => (forall a . Num a => a -> a)
+             -> value
+             -> m value
+liftNumeric t v = send (LiftNumeric t v ret)
+
+-- | Lift a pair of binary operators to a function on 'value's.
+--   You usually pass the same operator as both arguments, except in the cases where
+--   Haskell provides different functions for integral and fractional operations, such
+--   as division, exponentiation, and modulus.
+liftNumeric2 :: (Member (Numeric value) sig, Carrier sig m)
+             => (forall a b. Number a -> Number b -> SomeNumber)
+             -> value
+             -> value
+             -> m value
+liftNumeric2 t v1 v2 = send (LiftNumeric2 t v1 v2 ret)
+
 data Numeric value (m :: * -> *) k
   = Integer Integer (value -> k)
   | Float Scientific (value -> k)
@@ -276,15 +312,6 @@ runNumeric :: Carrier (Numeric value :+: sig) (NumericC value (Eff m))
 runNumeric = raiseHandler $ runNumericC . interpret
 
 class Show value => AbstractIntro value where
-  -- | Construct an abstract integral value.
-  integer :: Integer -> value
-
-  -- | Construct a floating-point value.
-  float :: Scientific -> value
-
-  -- | Construct a rational value.
-  rational :: Rational -> value
-
   -- | Construct a key-value pair for use in a hash.
   kvPair :: value -> value -> value
 
@@ -300,18 +327,6 @@ class Show value => AbstractIntro value where
 class AbstractIntro value => AbstractValue term address value carrier where
   -- | Cast numbers to integers
   castToInteger :: value -> Evaluator term address value carrier value
-
-
-  -- | Lift a unary operator over a 'Num' to a function on 'value's.
-  liftNumeric  :: (forall a . Num a => a -> a)
-               -> (value -> Evaluator term address value carrier value)
-
-  -- | Lift a pair of binary operators to a function on 'value's.
-  --   You usually pass the same operator as both arguments, except in the cases where
-  --   Haskell provides different functions for integral and fractional operations, such
-  --   as division, exponentiation, and modulus.
-  liftNumeric2 :: (forall a b. Number a -> Number b -> SomeNumber)
-               -> (value -> value -> Evaluator term address value carrier value)
 
   -- | Lift a Comparator (usually wrapping a function like == or <=) to a function on values.
   liftComparison :: Comparator -> (value -> value -> Evaluator term address value carrier value)

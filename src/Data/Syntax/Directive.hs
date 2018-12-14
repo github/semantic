@@ -39,7 +39,7 @@ instance Ord1 Line where liftCompare = genericLiftCompare
 instance Show1 Line where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Line where
-  eval _ _ Line = integer . fromIntegral . posLine . spanStart <$> currentSpan
+  eval _ _ Line = currentSpan >>= integer . fromIntegral . posLine . spanStart
 
 -- PT TODO: proper token for this
 instance Tokenize Line where

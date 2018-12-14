@@ -50,7 +50,7 @@ instance Show1 Data.Syntax.Literal.Integer where liftShowsPrec = genericLiftShow
 instance Evaluatable Data.Syntax.Literal.Integer where
   -- TODO: We should use something more robust than shelling out to readMaybe.
   eval _ _ (Data.Syntax.Literal.Integer x) =
-    integer <$> either (const (throwEvalError (IntegerFormatError x))) pure (parseInteger x)
+    either (const (throwEvalError (IntegerFormatError x))) pure (parseInteger x) >>= integer
 
 instance Tokenize Data.Syntax.Literal.Integer where
   tokenize = yield . Run . integerContent
@@ -66,7 +66,7 @@ instance Show1 Data.Syntax.Literal.Float where liftShowsPrec = genericLiftShowsP
 
 instance Evaluatable Data.Syntax.Literal.Float where
   eval _ _ (Float s) =
-    float <$> either (const (throwEvalError (FloatFormatError s))) pure (parseScientific s)
+    either (const (throwEvalError (FloatFormatError s))) pure (parseScientific s) >>= float
 
 instance Tokenize Data.Syntax.Literal.Float where
   tokenize = yield . Run . floatContent
@@ -84,7 +84,7 @@ instance Evaluatable Data.Syntax.Literal.Rational where
     let
       trimmed = T.takeWhile (/= 'r') r
       parsed = readMaybe @Prelude.Integer (T.unpack trimmed)
-    in rational <$> maybe (throwEvalError (RationalFormatError r)) (pure . toRational) parsed
+    in maybe (throwEvalError (RationalFormatError r)) (pure . toRational) parsed >>= rational
 
 instance Tokenize Data.Syntax.Literal.Rational where
   tokenize (Rational t) = yield . Run $ t
