@@ -355,6 +355,21 @@ instance ( Member (Reader ModuleInfo) sig
       (Int, Float) -> runNumericC (k Float)
       _            -> unify left right >>= runNumericC . k)
 
+instance ( Member (Reader ModuleInfo) sig
+         , Member (Reader Span) sig
+         , Member (Resumable (BaseError TypeError)) sig
+         , Member (State TypeMap) sig
+         , Carrier sig m
+         , Monad m
+         )
+      => Carrier (Abstract.Bitwise Type :+: sig) (BitwiseC Type m) where
+  ret = BitwiseC . ret
+  eff = BitwiseC . handleSum (eff . handleCoercible) (\case
+    CastToInteger t k -> unify t (Int :+ Float :+ Rational) >> runBitwiseC (k Int)
+    LiftBitwise _ t k -> unify t Int >>= runBitwiseC . k
+    LiftBitwise2 _ t1 t2 k -> unify Int t1 >>= unify t2 >>= runBitwiseC . k
+    UnsignedRShift t1 t2 k -> unify Int t2 *> unify Int t1 >>= runBitwiseC . k)
+
 instance AbstractHole Type where
   hole = Hole
 
