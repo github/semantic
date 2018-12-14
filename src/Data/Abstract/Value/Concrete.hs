@@ -236,8 +236,7 @@ instance ( Member (Reader ModuleInfo) sig
     LiftBitwise2 operator (Integer (Number.Integer i)) (Integer (Number.Integer j)) k -> runBitwiseC . k . Integer . Number.Integer $ operator i j
     LiftBitwise2 _ left right k -> throwBaseError (Bitwise2Error left right) >>= runBitwiseC . k
     UnsignedRShift (Integer (Number.Integer i)) (Integer (Number.Integer j)) k | i >= 0 -> runBitwiseC . k . Integer . Number.Integer $ ourShift (fromIntegral i) (fromIntegral j)
-    UnsignedRShift left right k -> throwBaseError (Bitwise2Error left right) >>= runBitwiseC . k
-    )
+    UnsignedRShift left right k -> throwBaseError (Bitwise2Error left right) >>= runBitwiseC . k)
 
 ourShift :: Word64 -> Int -> Integer
 ourShift a b = toInteger (shiftR a b)
