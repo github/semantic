@@ -30,12 +30,12 @@ instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Function where
   eval _ _ Function{..} = do
-    name <- maybeM (throwEvalError $ NoNameError functionName) (declaredName functionName)
+    name <- maybeM (throwNoNameError functionName) (declaredName functionName)
     span <- ask @Span
     associatedScope <- declareFunction name span
 
     params <- withScope associatedScope . for functionParameters $ \paramNode -> do
-      param <- maybeM (throwEvalError $ NoNameError paramNode) (declaredName paramNode)
+      param <- maybeM (throwNoNameError paramNode) (declaredName paramNode)
       param <$ declare (Declaration param) Default span Nothing
 
     addr <- lookupDeclaration (Declaration name)
@@ -86,7 +86,7 @@ instance Diffable Method where
 -- local environment.
 instance Evaluatable Method where
   eval _ _ Method{..} = do
-    name <- maybeM (throwEvalError $ NoNameError methodName) (declaredName methodName)
+    name <- maybeM (throwNoNameError methodName) (declaredName methodName)
     span <- ask @Span
     associatedScope <- declareFunction name span
 
@@ -94,7 +94,7 @@ instance Evaluatable Method where
       -- TODO: Should we give `self` a special Relation?
       declare (Declaration __self) Default emptySpan Nothing
       for methodParameters $ \paramNode -> do
-        param <- maybeM (throwEvalError $ NoNameError paramNode) (declaredName paramNode)
+        param <- maybeM (throwNoNameError paramNode) (declaredName paramNode)
         param <$ declare (Declaration param) Default span Nothing
 
     addr <- lookupDeclaration (Declaration name)
@@ -163,7 +163,7 @@ instance Evaluatable VariableDeclaration where
   eval _    _ (VariableDeclaration [])   = pure unit
   eval eval _ (VariableDeclaration decs) = do
     for_ decs $ \declaration -> do
-      name <- maybeM (throwEvalError $ NoNameError declaration) (declaredName declaration)
+      name <- maybeM (throwNoNameError declaration) (declaredName declaration)
       declare (Declaration name) Default emptySpan Nothing
       (span, _) <- do
         ref <- eval declaration
@@ -207,7 +207,7 @@ instance Show1 PublicFieldDefinition where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable PublicFieldDefinition where
   eval eval _ PublicFieldDefinition{..} = do
     span <- ask @Span
-    propertyName <- maybeM (throwEvalError $ NoNameError publicFieldPropertyName) (declaredName publicFieldPropertyName)
+    propertyName <- maybeM (throwNoNameError publicFieldPropertyName) (declaredName publicFieldPropertyName)
 
     declare (Declaration propertyName) Instance span Nothing
     slot <- lookupDeclaration (Declaration propertyName)
@@ -240,12 +240,12 @@ instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Class where
   eval eval _ Class{..} = do
-    name <- maybeM (throwEvalError $ NoNameError classIdentifier) (declaredName classIdentifier)
+    name <- maybeM (throwNoNameError classIdentifier) (declaredName classIdentifier)
     span <- ask @Span
     currentScope' <- currentScope
 
     superScopes <- for classSuperclasses $ \superclass -> do
-      name <- maybeM (throwEvalError $ NoNameError superclass) (declaredName superclass)
+      name <- maybeM (throwNoNameError superclass) (declaredName superclass)
       scope <- associatedScope (Declaration name)
       slot <- lookupDeclaration (Declaration name)
       superclassFrame <- scopedEnvironment =<< deref slot
@@ -345,8 +345,8 @@ instance Show1 TypeAlias where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable TypeAlias where
   eval _ _ TypeAlias{..} = do
-    name <- maybeM (throwEvalError $ NoNameError typeAliasIdentifier) (declaredName typeAliasIdentifier)
-    kindName <- maybeM (throwEvalError $ NoNameError typeAliasKind) (declaredName typeAliasKind)
+    name <- maybeM (throwNoNameError typeAliasIdentifier) (declaredName typeAliasIdentifier)
+    kindName <- maybeM (throwNoNameError typeAliasKind) (declaredName typeAliasKind)
 
     span <- ask @Span
     assocScope <- associatedScope (Declaration kindName)

@@ -643,7 +643,7 @@ instance Show1 New where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Implement Eval instance for New
 instance Evaluatable New where
   eval eval _ New{..} = do
-    name <- maybeM (throwEvalError $ NoNameError subject) (declaredName subject)
+    name <- maybeM (throwNoNameError subject) (declaredName subject)
     assocScope <- maybeM (throwEvalError $ ConstructorError name) =<< associatedScope (Declaration name)
     objectScope <- newScope (Map.singleton Superclass [ assocScope ])
     slot <- lookupDeclaration (Declaration name)
@@ -657,9 +657,10 @@ instance Evaluatable New where
     instanceMembers <- relationsOfScope classScope Instance
 
     void . withScopeAndFrame objectFrame $ do
-      for_ instanceMembers $ \Data{..} -> do
+      for_ instanceMembers $ \Info{..} -> do
         declare dataDeclaration Default dataSpan dataAssociatedScope
 
+      -- TODO: This is a typescript specific name and we should allow languages to customize it.
       let constructorName = Name.name "constructor"
       reference (Reference constructorName) (Declaration constructorName)
       constructor <- deref =<< lookupDeclaration (Declaration constructorName)

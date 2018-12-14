@@ -96,7 +96,7 @@ instance Ord1 RequiredParameter where liftCompare = genericLiftCompare
 instance Show1 RequiredParameter where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable RequiredParameter where
   eval eval ref RequiredParameter{..} = do
-    name <- maybeM (throwEvalError $ NoNameError requiredParameterSubject) (declaredName requiredParameterSubject)
+    name <- maybeM (throwNoNameError requiredParameterSubject) (declaredName requiredParameterSubject)
     span <- ask @Span
     declare (Declaration name) Default span Nothing
 

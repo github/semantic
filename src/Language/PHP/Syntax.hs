@@ -218,11 +218,11 @@ instance Show1 QualifiedName where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedName where
   eval _ _ (QualifiedName obj iden) = do
-    name <- maybeM (throwEvalError $ NoNameError obj) (declaredName obj)
+    name <- maybeM (throwNoNameError obj) (declaredName obj)
     reference (Reference name) (Declaration name)
     childScope <- associatedScope (Declaration name)
 
-    propName <- maybeM (throwEvalError $ NoNameError iden) (declaredName iden)
+    propName <- maybeM (throwNoNameError iden) (declaredName iden)
     case childScope of
       Just childScope -> do
         currentScopeAddress <- currentScope

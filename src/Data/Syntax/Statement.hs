@@ -145,9 +145,9 @@ instance Show1 Let where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Let where
   eval eval _ Let{..} = do
-    name <- maybeM (throwEvalError $ NoNameError letVariable) (declaredName letVariable)
+    name <- maybeM (throwNoNameError letVariable) (declaredName letVariable)
     letSpan <- ask @Span
-    valueName <- maybeM (throwEvalError $ NoNameError letValue) (declaredName letValue)
+    valueName <- maybeM (throwNoNameError letValue) (declaredName letValue)
     assocScope <- associatedScope (Declaration valueName)
 
     _ <- withLexicalScopeAndFrame $ do

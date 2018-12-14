@@ -82,7 +82,7 @@ instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable QualifiedImport where
   eval _ _ (QualifiedImport importPath aliasTerm) = do
     paths <- resolveGoImport importPath
-    alias <- maybeM (throwEvalError $ NoNameError aliasTerm) (declaredName aliasTerm)
+    alias <- maybeM (throwNoNameError aliasTerm) (declaredName aliasTerm)
     span <- ask @Span
     scopeAddress <- newScope mempty
     declare (Declaration alias) Default span (Just scopeAddress)

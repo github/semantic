@@ -254,7 +254,7 @@ instance Evaluatable QualifiedAliasedImport where
 
     span <- ask @Span
     scopeAddress <- newScope mempty
-    alias <- maybeM (throwEvalError $ NoNameError aliasTerm) (declaredName aliasTerm)
+    alias <- maybeM (throwNoNameError aliasTerm) (declaredName aliasTerm)
     declare (Declaration alias) Default span (Just scopeAddress)
     objFrame <- newFrame scopeAddress mempty
     val <- object objFrame
