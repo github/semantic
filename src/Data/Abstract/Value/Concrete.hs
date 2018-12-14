@@ -218,6 +218,30 @@ specialize (Right (Number.SomeNumber (Number.Integer t))) = pure (Integer (Numbe
 specialize (Right (Number.SomeNumber (Number.Decimal t)))   = pure (Float (Number.Decimal t))
 specialize (Right (Number.SomeNumber (Number.Ratio t))) = pure (Rational (Number.Ratio t))
 
+
+instance ( Member (Reader ModuleInfo) sig
+         , Member (Reader Span) sig
+         , Member (Resumable (BaseError (ValueError term address))) sig
+         , Carrier sig m
+         , Monad m
+         )
+      => Carrier (Abstract.Bitwise (Value term address) :+: sig) (BitwiseC (Value term address) m) where
+  ret = BitwiseC . ret
+  eff = BitwiseC . handleSum (eff . handleCoercible) (\case
+    CastToInteger (Integer (Number.Integer i)) k -> runBitwiseC (k (Integer (Number.Integer i)))
+    CastToInteger (Float (Number.Decimal i)) k -> runBitwiseC (k (Integer (Number.Integer (coefficient (normalize i)))))
+    CastToInteger i k -> throwBaseError (NumericError i) >>= runBitwiseC . k
+    LiftBitwise operator (Integer (Number.Integer i)) k -> runBitwiseC . k . Integer . Number.Integer . operator $ i
+    LiftBitwise _ other k -> throwBaseError (BitwiseError other) >>= runBitwiseC . k
+    LiftBitwise2 operator (Integer (Number.Integer i)) (Integer (Number.Integer j)) k -> runBitwiseC . k . Integer . Number.Integer $ operator i j
+    LiftBitwise2 _ left right k -> throwBaseError (Bitwise2Error left right) >>= runBitwiseC . k
+    UnsignedRShift (Integer (Number.Integer i)) (Integer (Number.Integer j)) k | i >= 0 -> runBitwiseC . k . Integer . Number.Integer $ ourShift (fromIntegral i) (fromIntegral j)
+    UnsignedRShift left right k -> throwBaseError (Bitwise2Error left right) >>= runBitwiseC . k
+    )
+
+ourShift :: Word64 -> Int -> Integer
+ourShift a b = toInteger (shiftR a b)
+
 instance AbstractHole (Value term address) where
   hole = Hole
 
