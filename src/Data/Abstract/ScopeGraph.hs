@@ -222,7 +222,7 @@ insertDeclarationScope decl@Declaration{..} associatedScopeAddress scopeAddress 
   declScopeAddress <- pathDeclarationScope scopeAddress =<< lookupScopePath unDeclaration scopeAddress g
   scope <- lookupScope declScopeAddress g
   (declData, position) <- second unPosition <$> lookupDeclaration unDeclaration declScopeAddress g
-  pure $ insertScope declScopeAddress (scope { declarations = Seq.adjust (const (Data decl (dataRelation declData) (dataSpan declData) (Just associatedScopeAddress))) position (declarations scope) }) g
+  pure $ insertScope declScopeAddress (scope { declarations = Seq.update (declData { dataAssociatedScope = Just associatedScopeAddress }) position (declarations scope) }) g
 
 -- | Insert a declaration span into the declaration in the scope graph.
 insertDeclarationSpan :: Ord scopeAddress => Declaration -> Span -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
