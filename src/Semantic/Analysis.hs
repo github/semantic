@@ -137,6 +137,7 @@ evalTerm :: ( Carrier sig m
             , FreeVariables term
             , AbstractValue term address value m
             , Member (Allocator address) sig
+            , Member (Bitwise value) sig
             , Member (Boolean value) sig
             , Member (Deref value) sig
             , Member (Error (LoopControl value)) sig

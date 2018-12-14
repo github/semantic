@@ -41,6 +41,10 @@ module Control.Abstract.Value
 , Numeric(..)
 , NumericC(..)
 , runNumeric
+, castToInteger
+, liftBitwise
+, liftBitwise2
+, unsignedRShift
 , Bitwise(..)
 , BitwiseC(..)
 , runBitwise
@@ -315,6 +319,33 @@ runNumeric :: Carrier (Numeric value :+: sig) (NumericC value (Eff m))
 runNumeric = raiseHandler $ runNumericC . interpret
 
 
+-- | Cast numbers to integers
+castToInteger :: (Member (Bitwise value) sig, Carrier sig m) => value -> m value
+castToInteger t = send (CastToInteger t ret)
+
+-- | Lift a unary bitwise operator to values. This is usually 'complement'.
+liftBitwise :: (Member (Bitwise value) sig, Carrier sig m)
+            => (forall a . Bits a => a -> a)
+            -> value
+            -> m value
+liftBitwise t v = send (LiftBitwise t v ret)
+
+-- | Lift a binary bitwise operator to values. The Integral constraint is
+--   necessary to satisfy implementation details of Haskell left/right shift,
+--   but it's fine, since these are only ever operating on integral values.
+liftBitwise2 :: (Member (Bitwise value) sig, Carrier sig m)
+             => (forall a . (Integral a, Bits a) => a -> a -> a)
+             -> value
+             -> value
+             -> m value
+liftBitwise2 t v1 v2 = send (LiftBitwise2 t v1 v2 ret)
+
+unsignedRShift :: (Member (Bitwise value) sig, Carrier sig m)
+               => value
+               -> value
+               -> m value
+unsignedRShift v1 v2 = send (UnsignedRShift v1 v2 ret)
+
 data Bitwise value (m :: * -> *) k
   = CastToInteger value (value -> k)
   | LiftBitwise (forall a . Bits a => a -> a) value (value -> k)
@@ -351,23 +382,8 @@ class Show value => AbstractIntro value where
 --
 --   This allows us to abstract the choice of whether to evaluate under binders for different value types.
 class AbstractIntro value => AbstractValue term address value carrier where
-  -- | Cast numbers to integers
-  castToInteger :: value -> Evaluator term address value carrier value
-
   -- | Lift a Comparator (usually wrapping a function like == or <=) to a function on values.
   liftComparison :: Comparator -> (value -> value -> Evaluator term address value carrier value)
-
-  -- | Lift a unary bitwise operator to values. This is usually 'complement'.
-  liftBitwise :: (forall a . Bits a => a -> a)
-              -> (value -> Evaluator term address value carrier value)
-
-  -- | Lift a binary bitwise operator to values. The Integral constraint is
-  --   necessary to satisfy implementation details of Haskell left/right shift,
-  --   but it's fine, since these are only ever operating on integral values.
-  liftBitwise2 :: (forall a . (Integral a, Bits a) => a -> a -> a)
-               -> (value -> value -> Evaluator term address value carrier value)
-
-  unsignedRShift :: value -> value -> Evaluator term address value carrier value
 
   -- | Construct an N-ary tuple of multiple (possibly-disjoint) values
   tuple :: [value] -> Evaluator term address value carrier value
