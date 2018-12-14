@@ -28,7 +28,7 @@ import Prologue
 import qualified Data.Map.Strict as Map
 
 data Value term address
-                                                                         --  Scope   Frame
+    -- TODO: Split Closure up into a separate data type.                                                  Scope   Frame
   = Closure PackageInfo ModuleInfo (Maybe Name) (Maybe (Value term address)) [Name] (Either BuiltIn term) address address
   | Unit
   | Boolean Bool
