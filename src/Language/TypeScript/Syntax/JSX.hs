@@ -98,7 +98,6 @@ instance Evaluatable RequiredParameter where
   eval eval ref RequiredParameter{..} = do
     name <- maybeM (throwEvalError $ NoNameError requiredParameterSubject) (declaredName requiredParameterSubject)
     span <- ask @Span
-    -- TODO: Should we specify function parameters with a special Relation?
     declare (Declaration name) Default span Nothing
 
     lhs <- ref requiredParameterSubject
