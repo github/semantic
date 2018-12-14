@@ -101,6 +101,16 @@ instance Carrier sig m
     LiftNumeric _ _ k -> runNumericC (k Abstract)
     LiftNumeric2 _ _ _ k -> runNumericC (k Abstract))
 
+instance Carrier sig m
+      => Carrier (Bitwise Abstract :+: sig) (BitwiseC Abstract m) where
+  ret = BitwiseC . ret
+  eff = BitwiseC . handleSum (eff . handleCoercible) (\case
+    CastToInteger _ k -> runBitwiseC (k Abstract)
+    LiftBitwise _ _ k -> runBitwiseC (k Abstract)
+    LiftBitwise2 _ _ _ k -> runBitwiseC (k Abstract)
+    UnsignedRShift _ _ k -> runBitwiseC (k Abstract))
+
+
 instance Ord address => ValueRoots address Abstract where
   valueRoots = mempty
 
