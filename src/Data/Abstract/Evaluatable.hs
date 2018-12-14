@@ -21,7 +21,7 @@ import qualified Control.Abstract as Abstract
 import Control.Abstract.Context as X
 import Control.Abstract.Evaluator as X hiding (LoopControl(..), Return(..), catchLoopControl, runLoopControl, catchReturn, runReturn)
 import Control.Abstract.Modules as X (Modules, ModuleResult, ResolutionError(..), load, lookupModule, listModulesInDir, require, resolve, throwResolutionError)
-import Control.Abstract.Value as X hiding (Boolean(..), Function(..), Numeric(..), String(..), Unit(..), While(..))
+import Control.Abstract.Value as X hiding (Bitwise(..), Boolean(..), Function(..), Numeric(..), String(..), Unit(..), While(..))
 import Data.Abstract.BaseError as X
 import Data.Abstract.Declarations as X
 import Data.Abstract.FreeVariables as X

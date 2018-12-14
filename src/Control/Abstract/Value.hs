@@ -41,6 +41,9 @@ module Control.Abstract.Value
 , Numeric(..)
 , NumericC(..)
 , runNumeric
+, Bitwise(..)
+, BitwiseC(..)
+, runBitwise
 ) where
 
 import Control.Abstract.Evaluator
@@ -310,6 +313,29 @@ runNumeric :: Carrier (Numeric value :+: sig) (NumericC value (Eff m))
            => Evaluator term address value (NumericC value (Eff m)) a
            -> Evaluator term address value m a
 runNumeric = raiseHandler $ runNumericC . interpret
+
+
+data Bitwise value (m :: * -> *) k
+  = CastToInteger value (value -> k)
+  | LiftBitwise (forall a . Bits a => a -> a) value (value -> k)
+  | LiftBitwise2 (forall a . (Integral a, Bits a) => a -> a -> a) value value (value -> k)
+  | UnsignedRShift value value (value -> k)
+  deriving (Functor)
+
+instance HFunctor (Bitwise value) where
+  hmap _ = coerce
+  {-# INLINE hmap #-}
+
+instance Effect (Bitwise value) where
+  handle state handler = coerce . fmap (handler . (<$ state))
+
+runBitwise :: Carrier (Bitwise value :+: sig) (BitwiseC value (Eff m))
+           => Evaluator term address value (BitwiseC value (Eff m)) a
+           -> Evaluator term address value m a
+runBitwise = raiseHandler $ runBitwiseC . interpret
+
+newtype BitwiseC value m a = BitwiseC { runBitwiseC :: m a }
+
 
 class Show value => AbstractIntro value where
   -- | Construct a key-value pair for use in a hash.
