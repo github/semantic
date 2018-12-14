@@ -139,6 +139,7 @@ evalTerm :: ( Carrier sig m
             , Member (Error (Return value)) sig
             , Member (Function term address value) sig
             , Member (Modules address value) sig
+            , Member (Numeric value) sig
             , Member (Reader ModuleInfo) sig
             , Member (Reader PackageInfo) sig
             , Member (Reader Span) sig
