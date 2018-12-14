@@ -222,30 +222,16 @@ instance AbstractHole (Value term address) where
   hole = Hole
 
 instance (Show address, Show term) => AbstractIntro (Value term address) where
-  integer  t = Integer (Number.Integer t)
-  float    t = Float (Number.Decimal t)
-  rational t = Rational (Number.Ratio t)
-
   kvPair = KVPair
   hash = Hash . map (uncurry KVPair)
 
   null     = Null
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
-instance ( Member (Allocator address) sig
-         , Member (Abstract.Boolean (Value term address)) sig
-         , Member (Deref (Value term address)) sig
-         , Member (Error (LoopControl (Value term address))) sig
-         , Member (Error (Return (Value term address))) sig
-         , Member Fresh sig
+instance ( Member (Abstract.Boolean (Value term address)) sig
          , Member (Reader ModuleInfo) sig
-         , Member (Reader PackageInfo) sig
          , Member (Reader Span) sig
          , Member (Resumable (BaseError (ValueError term address))) sig
-         , Member (Resumable (BaseError (AddressError address (Value term address)))) sig
-         , Member (State (Heap address address (Value term address))) sig
-         , Member Trace sig
-         , Ord address
          , Show address
          , Show term
          , Carrier sig m
@@ -283,36 +269,6 @@ instance ( Member (Allocator address) sig
       | (Tuple tup, Integer (Number.Integer i)) <- (arr, idx) = tryIdx tup i
       | otherwise = throwValueError (IndexError arr idx)
 
-  liftNumeric f arg
-    | Integer (Number.Integer i) <- arg = pure . integer  $ f i
-    | Float (Number.Decimal d)   <- arg = pure . float    $ f d
-    | Rational (Number.Ratio r)  <- arg = pure . rational $ f r
-    | otherwise = throwValueError (NumericError arg)
-
-  liftNumeric2 f left right
-    | (Integer  i, Integer j)  <- pair = tentative f i j & specialize
-    | (Integer  i, Rational j) <- pair = tentative f i j & specialize
-    | (Integer  i, Float j)    <- pair = tentative f i j & specialize
-    | (Rational i, Integer j)  <- pair = tentative f i j & specialize
-    | (Rational i, Rational j) <- pair = tentative f i j & specialize
-    | (Rational i, Float j)    <- pair = tentative f i j & specialize
-    | (Float    i, Integer j)  <- pair = tentative f i j & specialize
-    | (Float    i, Rational j) <- pair = tentative f i j & specialize
-    | (Float    i, Float j)    <- pair = tentative f i j & specialize
-    | otherwise = throwValueError (Numeric2Error left right)
-      where
-        tentative x i j = attemptUnsafeArithmetic (x i j)
-
-        -- Dispatch whatever's contained inside a 'Number.SomeNumber' to its appropriate 'MonadValue' ctor
-        specialize :: AbstractValue term address (Value term address) m
-                   => Either ArithException Number.SomeNumber
-                   -> Evaluator term address (Value term address) m (Value term address)
-        specialize (Left exc) = throwValueError (ArithmeticError exc)
-        specialize (Right (Number.SomeNumber (Number.Integer i))) = pure $ integer i
-        specialize (Right (Number.SomeNumber (Number.Ratio r)))   = pure $ rational r
-        specialize (Right (Number.SomeNumber (Number.Decimal d))) = pure $ float d
-        pair = (left, right)
-
   liftComparison comparator left right
     | (Integer (Number.Integer i), Integer (Number.Integer j)) <- pair = go i j
     | (Integer (Number.Integer i), Float   (Number.Decimal j)) <- pair = go (fromIntegral i) j
@@ -325,10 +281,10 @@ instance ( Member (Allocator address) sig
       where
         -- Explicit type signature is necessary here because we're passing all sorts of things
         -- to these comparison functions.
-        go :: (AbstractValue term address (Value term address) m, Ord a) => a -> a -> Evaluator term address (Value term address) m (Value term address)
+        go :: Ord a => a -> a -> Evaluator term address (Value term address) m (Value term address)
         go l r = case comparator of
           Concrete f  -> boolean (f l r)
-          Generalized -> pure $ integer (orderingToInt (compare l r))
+          Generalized -> pure $ Integer (Number.Integer (orderingToInt (compare l r)))
 
         -- Map from [LT, EQ, GT] to [-1, 0, 1]
         orderingToInt :: Ordering -> Prelude.Integer
@@ -337,17 +293,17 @@ instance ( Member (Allocator address) sig
         pair = (left, right)
 
   liftBitwise operator target
-    | Integer (Number.Integer i) <- target = pure . integer $ operator i
+    | Integer (Number.Integer i) <- target = pure . Integer . Number.Integer $ operator i
     | otherwise = throwValueError (BitwiseError target)
 
   liftBitwise2 operator left right
-    | (Integer (Number.Integer i), Integer (Number.Integer j)) <- pair = pure . integer $ operator i j
+    | (Integer (Number.Integer i), Integer (Number.Integer j)) <- pair = pure . Integer . Number.Integer $ operator i j
     | otherwise = throwValueError (Bitwise2Error left right)
       where pair = (left, right)
 
   unsignedRShift left right
     | (Integer (Number.Integer i), Integer (Number.Integer j)) <- pair =
-      if i >= 0 then pure . integer $ ourShift (fromIntegral i) (fromIntegral j)
+      if i >= 0 then pure . Integer . Number.Integer $ ourShift (fromIntegral i) (fromIntegral j)
       else throwValueError (Bitwise2Error left right)
     | otherwise = throwValueError (Bitwise2Error left right)
       where

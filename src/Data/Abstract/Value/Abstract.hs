@@ -108,9 +108,6 @@ instance AbstractHole Abstract where
   hole = Abstract
 
 instance AbstractIntro Abstract where
-  integer _  = Abstract
-  float _    = Abstract
-  rational _ = Abstract
   hash _     = Abstract
   kvPair _ _ = Abstract
   null       = Abstract
@@ -129,9 +126,6 @@ instance AbstractValue term address Abstract m where
   asArray _ = pure mempty
 
   index _ _ = pure Abstract
-
-  liftNumeric _ _ = pure Abstract
-  liftNumeric2 _ _ _ = pure Abstract
 
   liftBitwise _ _ = pure Abstract
   liftBitwise2 _ _ _ = pure Abstract
