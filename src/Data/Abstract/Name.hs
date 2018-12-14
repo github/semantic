@@ -73,4 +73,4 @@ instance ToJSON Name where
   toEncoding = toEncoding . formatName
 
 __self :: Name
-__self = name "__self"
+__self = name "__semantic_self"
