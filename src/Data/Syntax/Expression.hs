@@ -9,7 +9,7 @@ import Data.Fixed
 import Data.List (intersperse)
 import Proto3.Suite.Class
 
-import           Control.Abstract hiding (Call, Member, Void)
+import           Control.Abstract hiding (Bitwise(..), Call, Member, Void)
 import           Data.Abstract.Evaluatable as Abstract hiding (Member, Void)
 import           Data.Abstract.Name as Name
 import           Data.Abstract.Number (liftIntegralFrac, liftReal, liftedExponent, liftedFloorDiv)
