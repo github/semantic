@@ -188,7 +188,7 @@ insertReference ref path scope = scope { references = Map.insert ref path (refer
 lookupDeclaration :: Ord scopeAddress => Name -> scopeAddress -> ScopeGraph scopeAddress -> Maybe (Data scopeAddress, Position)
 lookupDeclaration name scope g = do
   dataSeq <- ddataOfScope scope g
-  index <- Seq.findIndexR (\Data{..} -> Declaration name == dataDeclaration) dataSeq
+  index <- Seq.findIndexR (\Info{..} -> Declaration name == dataDeclaration) dataSeq
   (, Position index) <$> Seq.lookup index dataSeq
 
 declarationNames :: Ord address => [EdgeLabel] -> Scope address -> ScopeGraph address -> Set Declaration
@@ -201,7 +201,7 @@ declarationNames edgeLabels scope scopeGraph = localDeclarations <> edgeNames
 putDeclarationScopeAtPosition :: Ord scopeAddress => scopeAddress -> Position -> Maybe scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
 putDeclarationScopeAtPosition scope position assocScope g@(ScopeGraph graph) = fromMaybe g $ do
   dataSeq <- ddataOfScope scope g
-  let seq = Seq.adjust' (\Data{..} -> Data dataDeclaration dataRelation dataSpan assocScope) (unPosition position) dataSeq
+  let seq = Seq.adjust' (\Info{..} -> Info { dataAssociatedScope = assocScope, .. }) (unPosition position) dataSeq
   pure $ ScopeGraph (Map.adjust (\s -> s { declarations = seq }) scope graph)
 
 lookupReference :: Ord scopeAddress => Name -> scopeAddress -> ScopeGraph scopeAddress -> Maybe (Path scopeAddress)
