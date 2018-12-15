@@ -71,6 +71,16 @@ instance Declarations1 Function where
 instance FreeVariables1 Function where
   liftFreeVariables freeVariables f@Function{..} = foldMap freeVariables f `Set.difference` foldMap freeVariables functionParameters
 
+data Accessibility a = Public { unPublic :: a }
+                     | Protected { unProtected :: a }
+                     | Private { unPrivate :: a }
+                     deriving (Diffable, Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, ToJSONFields1, Named1, Message1, NFData1)
+
+instance Eq1 Accessibility where liftEq = genericLiftEq
+instance Ord1 Accessibility where liftCompare = genericLiftCompare
+instance Show1 Accessibility where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Accessibility
 
 data Method a = Method { methodContext :: [a]
                        , methodAccessibility :: a
