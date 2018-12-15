@@ -42,6 +42,7 @@ import Proto3.Suite (Named1(..), Named(..))
 type Syntax = '[
     Comment.Comment
   , Comment.HashBang
+  , Declaration.Accessibility
   , Declaration.Class
   , Declaration.Function
   , Declaration.Method
@@ -481,7 +482,16 @@ parameter =  requiredParameter
          <|> optionalParameter
 
 accessibilityModifier' :: Assignment Term
-accessibilityModifier' = makeTerm <$> symbol AccessibilityModifier <*> children (Syntax.Identifier . name <$> source)
+accessibilityModifier' = makeTerm'
+                      <$> symbol AccessibilityModifier
+                      <*> children (inject <$> do
+                        loc  <- location
+                        s <- source
+                        pure $ case s of
+                          "protected" -> Declaration.Protected $ makeTerm loc (Syntax.Identifier (name s))
+                          "private" -> Declaration.Private $ makeTerm loc (Syntax.Identifier (name s))
+                          -- | The catchall case is 'Declaration.Public'.
+                          _ -> Declaration.Public $ makeTerm loc (Syntax.Identifier (name s)))
 
 destructuringPattern :: Assignment Term
 destructuringPattern = object <|> array
@@ -497,7 +507,7 @@ methodDefinition = makeMethod <$>
   symbol MethodDefinition
   <*> children ((,,,,,) <$> (term accessibilityModifier' <|> emptyTerm) <*> (term readonly' <|> emptyTerm) <*> emptyTerm <*> term propertyName <*> callSignatureParts <*> term statementBlock)
   where
-    makeMethod loc (modifier, readonly, receiver, propertyName', (typeParameters', params, ty'), statements) = makeTerm loc (Declaration.Method [modifier, readonly, typeParameters', ty'] receiver propertyName' params statements)
+    makeMethod loc (modifier, readonly, receiver, propertyName', (typeParameters', params, ty'), statements) = makeTerm loc (Declaration.Method [readonly, typeParameters', ty'] modifier receiver propertyName' params statements)
 
 callSignatureParts :: Assignment (Term, [Term], Term)
 callSignatureParts = contextualize' <$> Assignment.manyThrough comment (postContextualize' <$> callSignature' <*> many comment)
