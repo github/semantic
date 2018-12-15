@@ -163,6 +163,13 @@ spec config = parallel $ do
         Right (Just (Module _ (_, value))) -> value `shouldBe` (float 9.0)
         other                              -> expectationFailure (show other)
 
+    it "prevents lookup of private members external to the instance" $ do
+      (scopeGraph, (heap, res)) <- evaluate ["class-private1.ts", "class-private2.ts"]
+      case ModuleTable.lookup "class-private1.ts" <$> res of
+        Right (Just (Module _ (_, value))) -> value `shouldNotBe` (float 5.0)
+        other                              -> expectationFailure (show other)
+
+
 
   where
     fixtures = "test/fixtures/typescript/analysis/"
