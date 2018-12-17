@@ -72,13 +72,11 @@ instance Show1 Send where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Send where
   eval eval _ Send{..} = do
     sel <- case sendSelector of
-             Just sel -> maybeM (throwEvalError NoNameError) (declaredName sel)
+             Just sel -> maybeM (throwNoNameError sel) (declaredName sel)
              Nothing  ->
-               -- TODO: if there is no selector then it's a call on the receiver
-               -- Previously we returned a variable called `call`.
-               throwEvalError NoNameError
+               pure (Name.name "call")
 
-    let self = lookupDeclaration (Declaration $ Name.name "__self") >>= deref
+    let self = deref =<< lookupDeclaration (Declaration __self)
     lhsValue <- maybe self eval sendReceiver
     lhsFrame <- Abstract.scopedEnvironment lhsValue
 
@@ -86,7 +84,8 @@ instance Evaluatable Send where
           reference (Reference sel) (Declaration sel)
           func <- deref =<< lookupDeclaration (Declaration sel)
           args <- traverse eval sendArgs
-          call func (lhsValue : args) -- TODO pass through sendBlock
+          boundFunc <- bindThis lhsValue func
+          call boundFunc args -- TODO pass through sendBlock
     maybe callFunction (`withScopeAndFrame` callFunction) lhsFrame
 
 instance Tokenize Send where
@@ -194,7 +193,7 @@ instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Class where
   eval eval _ Class{..} = do
-    name <- maybeM (throwEvalError NoNameError) (declaredName classIdentifier)
+    name <- maybeM (throwNoNameError classIdentifier) (declaredName classIdentifier)
     span <- ask @Span
     currentScope' <- currentScope
 
@@ -211,7 +210,7 @@ instance Evaluatable Class where
       Nothing -> do
         let classSuperclasses = maybeToList classSuperClass
         superScopes <- for classSuperclasses $ \superclass -> do
-          name <- maybeM (throwEvalError NoNameError) (declaredName superclass)
+          name <- maybeM (throwNoNameError superclass) (declaredName superclass)
           scope <- associatedScope (Declaration name)
           slot <- lookupDeclaration (Declaration name)
           superclassFrame <- scopedEnvironment =<< deref slot
@@ -222,11 +221,11 @@ instance Evaluatable Class where
         let superclassEdges = (Superclass, ) . pure . fst <$> catMaybes superScopes
             current = (Lexical, ) <$> pure (pure currentScope')
             edges = Map.fromList (superclassEdges <> current)
-        childScope <- newScope edges
-        declare (Declaration name) span (Just childScope)
+        classScope <- newScope edges
+        declare (Declaration name) Default span (Just classScope)
 
         let frameEdges = Map.singleton Superclass (Map.fromList (catMaybes superScopes))
-        childFrame <- newFrame childScope frameEdges
+        childFrame <- newFrame classScope frameEdges
 
         withScopeAndFrame childFrame $ do
           void $ eval classBody
@@ -257,7 +256,7 @@ instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Module where
   eval eval _ Module{..} =  do
-    name <- maybeM (throwEvalError NoNameError) (declaredName moduleIdentifier)
+    name <- maybeM (throwNoNameError moduleIdentifier) (declaredName moduleIdentifier)
     span <- ask @Span
     currentScope' <- currentScope
 
@@ -275,12 +274,12 @@ instance Evaluatable Module where
           Nothing -> throwEvalError (DerefError moduleVal)
       Nothing -> do
         let edges = Map.singleton Lexical [ currentScope' ]
-        childScope <- newScope edges
-        declare (Declaration name) span (Just childScope)
+        classScope <- newScope edges
+        declare (Declaration name) Default span (Just classScope)
 
         currentFrame' <- currentFrame
         let frameEdges = Map.singleton Lexical (Map.singleton currentScope' currentFrame')
-        childFrame <- newFrame childScope frameEdges
+        childFrame <- newFrame classScope frameEdges
 
         withScopeAndFrame childFrame (void moduleBody)
 
@@ -349,10 +348,10 @@ instance Show1 Assignment where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Assignment where
   eval eval ref Assignment{..} = do
-    lhsName <- maybeM (throwEvalError NoNameError) (declaredName assignmentTarget)
+    lhsName <- maybeM (throwNoNameError assignmentTarget) (declaredName assignmentTarget)
     maybeSlot <- maybeLookupDeclaration (Declaration lhsName)
     assignmentSpan <- ask @Span
-    maybe (declare (Declaration lhsName) assignmentSpan Nothing) (const (pure ())) maybeSlot
+    maybe (declare (Declaration lhsName) Default assignmentSpan Nothing) (const (pure ())) maybeSlot
 
     lhs <- ref assignmentTarget
     rhs <- eval assignmentValue
