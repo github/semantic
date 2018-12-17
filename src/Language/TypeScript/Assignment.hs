@@ -205,6 +205,7 @@ type Syntax = '[
   , TypeScript.Syntax.JavaScriptRequire
   , []
   , Statement.StatementBlock
+  , TypeScript.Syntax.MetaProperty
   ]
 
 type Term = Term.Term (Sum Syntax) Location
@@ -309,7 +310,35 @@ memberExpression :: Assignment Term
 memberExpression = makeTerm <$> (symbol Grammar.MemberExpression <|> symbol Grammar.MemberExpression') <*> children (Expression.MemberAccess <$> term expression <*> propertyIdentifier')
 
 newExpression :: Assignment Term
-newExpression = makeTerm <$> symbol Grammar.NewExpression <*> children (Expression.New . pure <$> term expression)
+newExpression = makeTerm <$> symbol Grammar.NewExpression <*> children (Expression.New  <$> term constructableExpression <*> (typeArguments' <|> emptyTerm) <*> (arguments <|> pure []))
+
+constructableExpression :: Assignment Term
+constructableExpression = choice [
+    this
+  , identifier
+  , number
+  , string
+  , templateString
+  , regex
+  , true
+  , false
+  , null'
+  , undefined'
+  , object
+  , array
+  , function
+  , arrowFunction
+  , class'
+  , anonymousClass
+  , parenthesizedExpression
+  , subscriptExpression
+  , memberExpression
+  , metaProperty
+  , newExpression
+  ]
+
+metaProperty :: Assignment Term
+metaProperty = makeTerm <$> symbol Grammar.MetaProperty <*> (TypeScript.Syntax.MetaProperty <$ rawSource)
 
 updateExpression :: Assignment Term
 updateExpression = makeTerm <$> symbol Grammar.UpdateExpression <*> children (TypeScript.Syntax.Update <$> term expression)
@@ -488,7 +517,7 @@ constructSignature :: Assignment Term
 constructSignature = makeTerm <$> symbol Grammar.ConstructSignature <*> children (TypeScript.Syntax.ConstructSignature <$> (fromMaybe <$> emptyTerm <*> optional (term typeParameters)) <*> formalParameters <*> (fromMaybe <$> emptyTerm <*> optional (term typeAnnotation')))
 
 indexSignature :: Assignment Term
-indexSignature = makeTerm <$> symbol Grammar.IndexSignature <*> children (TypeScript.Syntax.IndexSignature <$> term identifier <*> term typeAnnotation')
+indexSignature = makeTerm <$> symbol Grammar.IndexSignature <*> children (TypeScript.Syntax.IndexSignature <$> term identifier <*> predefinedTy <*> term typeAnnotation')
 
 methodSignature :: Assignment Term
 methodSignature = makeMethodSignature <$> symbol Grammar.MethodSignature <*> children ((,,,) <$> (term accessibilityModifier' <|> emptyTerm) <*> (term readonly' <|> emptyTerm) <*> term propertyName <*> callSignatureParts)
@@ -888,8 +917,10 @@ pair = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> term property
 callExpression :: Assignment Term
 callExpression = makeCall <$> (symbol CallExpression <|> symbol CallExpression') <*> children ((,,,) <$> term (expression <|> super <|> function) <*> (typeArguments <|> pure []) <*> (arguments <|> (pure <$> term templateString)) <*> emptyTerm)
   where makeCall loc (subject, typeArgs, args, body) = makeTerm loc (Expression.Call typeArgs subject args body)
-        arguments = symbol Arguments *> children (manyTerm (expression <|> spreadElement))
         typeArguments = symbol Grammar.TypeArguments *> children (some (term ty))
+
+arguments :: Assignment [Term]
+arguments = symbol Arguments *> children (manyTerm (expression <|> spreadElement))
 
 tryStatement :: Assignment Term
 tryStatement = makeTry <$> symbol TryStatement <*> children ((,,) <$> term statementTerm <*> optional (term catchClause) <*> optional (term finallyClause))

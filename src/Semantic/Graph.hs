@@ -358,22 +358,24 @@ resumingEvalError :: ( Carrier sig m
                      , Member Fresh sig
                      , Member Trace sig
                      , Show value
-                     , Show address
+                     , Show term
                      , AbstractHole address
                      , AbstractHole value
                      )
-                  => Evaluator term address value (ResumableWithC (BaseError (EvalError address value)) (Eff
+                  => Evaluator term address value (ResumableWithC (BaseError (EvalError term address value)) (Eff
                                                   m)) a
                   -> Evaluator term address value m a
 resumingEvalError = runEvalErrorWith (\ baseError -> traceError "EvalError" baseError *> case baseErrorException baseError of
-  DerefError{} -> pure hole
-  ReferenceError{} -> pure hole
+  ConstructorError{}    -> pure hole
   DefaultExportError{}  -> pure ()
+  DerefError{}          -> pure hole
   ExportError{}         -> pure ()
-  IntegerFormatError{}  -> pure 0
   FloatFormatError{}    -> pure 0
+  IntegerFormatError{}  -> pure 0
+  NoNameError{}         -> gensym
   RationalFormatError{} -> pure 0
-  NoNameError           -> gensym)
+  ReferenceError{}      -> pure hole
+  ScopedEnvError{}      -> pure hole)
 
 resumingUnspecialized :: ( AbstractHole address
                          , AbstractHole value
@@ -396,8 +398,8 @@ resumingAddressError :: ( AbstractHole value
                                                      m)) a
                      -> Evaluator term address value m a
 resumingAddressError = runAddressErrorWith $ \ baseError -> traceError "AddressError" baseError *> case baseErrorException baseError of
-  UnallocatedAddress   _ -> pure lowerBound
-  UninitializedAddress _ -> pure hole
+  UnallocatedSlot   _ -> pure lowerBound
+  UninitializedSlot _ -> pure hole
 
 resumingValueError :: ( Carrier sig m
                       , Member Trace sig

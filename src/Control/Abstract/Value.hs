@@ -7,6 +7,7 @@ module Control.Abstract.Value
 -- $valueEffects
 , function
 , BuiltIn(..)
+, bindThis
 , builtIn
 , call
 , Function(..)
@@ -79,10 +80,14 @@ call fn args = sendFunction (Call fn args ret)
 sendFunction :: (Member (Function term address value) sig, Carrier sig m) => Function term address value (Evaluator term address value m) (Evaluator term address value m a) -> Evaluator term address value m a
 sendFunction = send
 
+bindThis :: (Member (Function term address value) sig, Carrier sig m) => value -> value -> Evaluator term address value m value
+bindThis this that = sendFunction (Bind this that ret)
+
 data Function term address value (m :: * -> *) k
   =  Function Name [Name] term address (value -> k) -- ^ A function is parameterized by its name, parameter names, body, parent scope, and returns a ValueRef.
   | BuiltIn address BuiltIn (value -> k)            -- ^ A built-in is parameterized by its parent scope, BuiltIn type, and returns a value.
   | Call value [value] (value -> k)                 -- ^ A Call takes a set of values as parameters and returns a ValueRef.
+  | Bind value value (value -> k)
   deriving (Functor)
 
 instance HFunctor (Function term address value) where

@@ -1,8 +1,7 @@
 (Statements
   (Throw
     (New
-      (Call
-        (Identifier)
-      { (TextElement)
-      ->(TextElement) }
-        (Empty)))))
+      (Identifier)
+      (Empty)
+    { (TextElement)
+    ->(TextElement) })))
