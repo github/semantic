@@ -6,9 +6,6 @@ import Prologue
 
 import           Data.Aeson (ToJSON)
 import qualified Data.Map.Strict as Map
-import           Data.Semigroup.App
-import           Data.Semigroup.Foldable
-import qualified Data.Text as T
 import           Proto3.Suite
 
 import           Control.Abstract hiding (Import)
