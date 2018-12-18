@@ -9,14 +9,17 @@ module Control.Abstract.ScopeGraph
   , ScopeGraph
   , ScopeError(..)
   , Reference(..)
+  , Relation(..)
   , EdgeLabel(..)
   , CurrentScope(..)
+  , Info(..)
   , currentScope
   , insertExportEdge
   , insertImportEdge
   , insertLexicalEdge
   , withScope
   , associatedScope
+  , relationsOfScope
   , putDeclarationScope
   , putDeclarationSpan
   , insertImportReference
@@ -41,7 +44,7 @@ import           Control.Effect.Carrier
 import           Data.Abstract.BaseError
 import           Data.Abstract.Module
 import           Data.Abstract.Name hiding (name)
-import           Data.Abstract.ScopeGraph (Declaration (..), EdgeLabel, Reference, Scope (..), ScopeGraph, Slot (..))
+import           Data.Abstract.ScopeGraph (Declaration(..), EdgeLabel, Reference, Relation(..), Scope (..), ScopeGraph, Slot(..), Info(..))
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.Span
 import           Prelude hiding (lookup)
@@ -56,12 +59,13 @@ declare :: ( Carrier sig m
            , Ord address
            )
         => Declaration
+        -> Relation
         -> Span
         -> Maybe address
         -> Evaluator term address value m ()
-declare decl span scope = do
+declare decl rel span scope = do
   currentAddress <- currentScope
-  modify (fst . ScopeGraph.declare decl span scope currentAddress)
+  modify (fst . ScopeGraph.declare decl rel span scope currentAddress)
 
 putDeclarationScope :: (Ord address, Member (Reader (CurrentScope address)) sig, Member (State (ScopeGraph address)) sig, Carrier sig m) => Declaration -> address -> Evaluator term address value m ()
 putDeclarationScope decl assocScope = do
@@ -146,6 +150,16 @@ lookupScope :: ( Member (Resumable (BaseError (ScopeError address))) sig
              => address
              -> Evaluator term address value m (Scope address)
 lookupScope address = maybeM (throwScopeError LookupScopeError) . ScopeGraph.lookupScope address =<< get
+
+relationsOfScope :: ( Member (State (ScopeGraph address)) sig
+                    , Carrier sig m
+                    , Ord address
+                    )
+                => address
+                -> Relation
+                -> Evaluator term address value m [ Info address ]
+relationsOfScope scope relation =
+  ScopeGraph.relationsOfScope scope relation <$> get
 
 insertImportReference :: ( Member (Resumable (BaseError (ScopeError address))) sig
                         , Member (Reader ModuleInfo) sig

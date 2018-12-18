@@ -247,7 +247,7 @@ instance ( Member (Allocator address) sig
          , Member (Reader ModuleInfo) sig
          , Member (Reader Span) sig
          , Member (State Span) sig
-         , Member (Resumable (BaseError (EvalError address Type))) sig
+         , Member (Resumable (BaseError (EvalError term address Type))) sig
          , Member (Resumable (BaseError TypeError)) sig
          , Member (Resumable (BaseError (AddressError address Type))) sig
          , Member (State (Heap address address Type)) sig
@@ -280,6 +280,7 @@ instance ( Member (Allocator address) sig
 
     Abstract.BuiltIn _ Print k -> runFunctionC (k (String :-> Unit)) eval
     Abstract.BuiltIn _ Show  k -> runFunctionC (k (Object :-> String)) eval
+    Abstract.Bind _ value k -> runFunctionC (k value) eval
     Abstract.Call op paramTypes k -> runEvaluator $ do
       tvar <- fresh
       let needed = zeroOrMoreProduct paramTypes :-> Var tvar
