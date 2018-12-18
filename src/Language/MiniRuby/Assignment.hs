@@ -39,6 +39,7 @@ import           Prologue hiding (for)
 -- | Small version of Ruby syntax for testing the code rewriting pipeline.
 type Syntax =
   '[ Comment.Comment
+   , Declaration.Accessibility
    , Declaration.Function
    , Declaration.Method
    , Expression.Minus
@@ -103,9 +104,10 @@ identifier =
         else pure $ makeTerm loc (Ruby.Syntax.Send Nothing (Just identTerm) [] Nothing)
 
 method :: Assignment Term
-method = makeTerm <$> symbol Method <*> (withNewScope . children) (Declaration.Method [] <$> emptyTerm <*> methodSelector <*> params <*> expressions')
+method = makeTerm <$> symbol Method <*> (withNewScope . children) (Declaration.Method [] <$> emptyTerm <*> accessibility <*> methodSelector <*> params <*> expressions')
   where params = symbol MethodParameters *> children (many parameter) <|> pure []
         expressions' = makeTerm <$> location <*> many expression
+        accessibility = makeTerm <$> location <*> pure Declaration.Unknown
 
 methodSelector :: Assignment Term
 methodSelector = makeTerm <$> symbols <*> (Syntax.Identifier <$> (name <$> source))
