@@ -83,6 +83,12 @@ instance Show1 Visibility where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Visibility
 
+instance Declarations1 Visibility where
+  liftDeclaredName _ Unknown                  = Just (name "Unknown")
+  liftDeclaredName declaredName (Public a)    = declaredName a
+  liftDeclaredName declaredName (Protected a) = declaredName a
+  liftDeclaredName declaredName (Private a)   = declaredName a
+
 data Method a = Method { methodContext :: [a]
                        , methodAccessibility :: a
                        , methodReceiver :: a
