@@ -44,6 +44,7 @@ type Syntax = '[
     Comment.Comment
   , Declaration.Function
   , Declaration.Method
+  , Declaration.Visibility
   , Directive.File
   , Directive.Line
   , Expression.Plus

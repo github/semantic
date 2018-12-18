@@ -42,7 +42,6 @@ import Proto3.Suite (Named1(..), Named(..))
 type Syntax = '[
     Comment.Comment
   , Comment.HashBang
-  , Declaration.Accessibility
   , Declaration.Class
   , Declaration.Function
   , Declaration.Method
@@ -51,6 +50,7 @@ type Syntax = '[
   , Declaration.PublicFieldDefinition
   , Declaration.VariableDeclaration
   , Declaration.TypeAlias
+  , Declaration.Visibility
   , Expression.Plus
   , Expression.Minus
   , Expression.Times

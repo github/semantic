@@ -31,13 +31,13 @@ import Data.ImportPath (importPath, defaultAlias)
 
 type Syntax =
   '[ Comment.Comment
-   , Declaration.Accessibility
    , Declaration.Constructor
    , Declaration.Function
    , Declaration.Method
    , Declaration.MethodSignature
    , Declaration.Type
    , Declaration.TypeAlias
+   , Declaration.Visibility
    , Expression.Plus
    , Expression.Minus
    , Expression.Times
