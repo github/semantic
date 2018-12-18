@@ -35,9 +35,9 @@ spec = parallel $ do
       let lexicalEdges = Map.singleton Lexical [ currentScope' ]
           x =  SpecHelpers.name "x"
       associatedScope <- newScope lexicalEdges
-      declare (ScopeGraph.Declaration "identity") emptySpan (Just associatedScope)
+      declare (ScopeGraph.Declaration "identity") Default emptySpan (Just associatedScope)
       withScope associatedScope $ do
-        declare (Declaration x) emptySpan Nothing
+        declare (Declaration x) Default emptySpan Nothing
       identity <- function "identity" [ x ]
         (SpecEff (Heap.lookupDeclaration (ScopeGraph.Declaration (SpecHelpers.name "x")) >>= deref)) associatedScope
       val <- pure (integer 123)
@@ -89,7 +89,7 @@ newtype SpecEff = SpecEff
                  (Eff (ErrorC (Return Val)
                  (Eff (AllocatorC Precise
                  (Eff (DerefC Precise Val
-                 (Eff (ResumableC (BaseError (EvalError Precise Val))
+                 (Eff (ResumableC (BaseError (EvalError SpecEff Precise Val))
                  (Eff (ResumableC (BaseError (AddressError Precise Val))
                  (Eff (ResumableC (BaseError (ValueError SpecEff Precise))
                  (Eff (ResumableC (BaseError (HeapError Precise))

@@ -28,8 +28,8 @@ import Prologue
 import qualified Data.Map.Strict as Map
 
 data Value term address
-                                                                         --  Scope   Frame
-  = Closure PackageInfo ModuleInfo (Maybe Name) [Name] (Either BuiltIn term) address address
+    -- TODO: Split Closure up into a separate data type.                                                  Scope   Frame
+  = Closure PackageInfo ModuleInfo (Maybe Name) (Maybe (Value term address)) [Name] (Either BuiltIn term) address address
   | Unit
   | Boolean Bool
   | Integer  (Number.Number Integer)
@@ -66,7 +66,7 @@ instance ( FreeVariables term
          , Member (State Span) sig
          , Member (State (ScopeGraph address)) sig
          , Member (Resumable (BaseError (AddressError address (Value term address)))) sig
-         , Member (Resumable (BaseError (EvalError address (Value term address)))) sig
+         , Member (Resumable (BaseError (EvalError term address (Value term address)))) sig
          , Member (Resumable (BaseError (ValueError term address))) sig
          , Member (Resumable (BaseError (HeapError address))) sig
          , Member (Resumable (BaseError (ScopeError address))) sig
@@ -85,7 +85,7 @@ instance ( FreeVariables term
     let closure maybeName params body scope = do
           packageInfo <- currentPackage
           moduleInfo <- currentModule
-          Closure packageInfo moduleInfo maybeName params body scope <$> currentFrame
+          Closure packageInfo moduleInfo maybeName Nothing params body scope <$> currentFrame
 
     in FunctionC (\ eval -> handleSum (eff . handleReader eval runFunctionC) (\case
     Abstract.Function name params body scope k -> runEvaluator $ do
@@ -94,11 +94,14 @@ instance ( FreeVariables term
     Abstract.BuiltIn associatedScope builtIn k -> runEvaluator $ do
       val <- closure Nothing [] (Left builtIn) associatedScope
       Evaluator $ runFunctionC (k val) eval
+    Abstract.Bind obj@Object{} (Closure packageInfo moduleInfo name _ names body scope parentFrame) k ->
+      runFunctionC (k (Closure packageInfo moduleInfo name (Just obj) names body scope parentFrame)) eval
+    Abstract.Bind _ value k -> runFunctionC (k value) eval
     Abstract.Call op params k -> runEvaluator $ do
       boxed <- case op of
-        Closure _ _ _ _ (Left Print) _ _ -> traverse (trace . show) params $> Unit
-        Closure _ _ _ _ (Left Show) _ _ -> pure . String . pack $ show params
-        Closure packageInfo moduleInfo _ names (Right body) associatedScope parentFrame -> do
+        Closure _ _ _ _ _ (Left Print) _ _ -> traverse (trace . show) params $> Unit
+        Closure _ _ _ _ _ (Left Show) _ _ -> pure . String . pack $ show params
+        Closure packageInfo moduleInfo _ maybeSelf names (Right body) associatedScope parentFrame -> do
           -- Evaluate the bindings and body with the closure’s package/module info in scope in order to
           -- charge them to the closure's origin.
           withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
@@ -106,6 +109,11 @@ instance ( FreeVariables term
             let frameEdges = Map.singleton Lexical (Map.singleton parentScope parentFrame)
             frameAddress <- newFrame associatedScope frameEdges
             withScopeAndFrame frameAddress $ do
+              case maybeSelf of
+                Just object -> do
+                  maybeSlot <- maybeLookupDeclaration (Declaration __self)
+                  maybe (pure ()) (`assign` object) maybeSlot
+                Nothing -> pure ()
               for_ (zip names params) $ \(name, param) -> do
                 addr <- lookupDeclaration (Declaration name)
                 assign addr param
@@ -207,8 +215,8 @@ instance ( Member (Allocator address) sig
     | Array addresses <- val = pure addresses
     | otherwise = throwValueError $ ArrayError val
 
-  klass n binds = do
-    pure $ Class n mempty binds
+  klass n frame = do
+    pure $ Class n mempty frame
 
   namespace name = pure . Namespace name
 

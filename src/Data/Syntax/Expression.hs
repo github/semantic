@@ -15,6 +15,7 @@ import           Data.Abstract.Name as Name
 import           Data.Abstract.Number (liftIntegralFrac, liftReal, liftedExponent, liftedFloorDiv)
 import           Data.JSON.Fields
 import qualified Data.List.NonEmpty as NonEmpty
+import qualified Data.Map.Strict as Map
 import qualified Data.Reprinting.Scope as Scope
 import qualified Data.Reprinting.Token as Token
 import           Diffing.Algorithm hiding (Delete)
@@ -22,7 +23,10 @@ import           Reprinting.Tokenize hiding (Superclass)
 
 -- | Typical prefix function application, like `f(x)` in many languages, or `f x` in Haskell.
 data Call a = Call { callContext :: ![a], callFunction :: !a, callParams :: ![a], callBlock :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+
+instance Declarations1 Call where
+  liftDeclaredName declaredName Call{..} = declaredName callFunction
 
 instance Eq1 Call where liftEq = genericLiftEq
 instance Ord1 Call where liftCompare = genericLiftCompare
@@ -499,11 +503,20 @@ instance Ord1 MemberAccess where liftCompare = genericLiftCompare
 instance Show1 MemberAccess where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable MemberAccess where
-  eval eval ref' = ref eval ref' >=> deref
+  eval eval _ MemberAccess{..} = do
+    lhsValue <- eval lhs
+    lhsFrame <- Abstract.scopedEnvironment lhsValue
+    slot <- case lhsFrame of
+      Just lhsFrame ->
+        withScopeAndFrame lhsFrame $ do
+          reference (Reference rhs) (Declaration rhs)
+          lookupDeclaration (Declaration rhs)
+      -- Throw a ReferenceError since we're attempting to reference a name within a value that is not an Object.
+      Nothing -> throwEvalError (ReferenceError lhsValue rhs)
+    value <- deref slot
+    bindThis lhsValue value
 
   ref eval _ MemberAccess{..} = do
-    name <- maybeM (throwEvalError NoNameError) (declaredName lhs)
-    reference (Reference name) (Declaration name)
     lhsValue <- eval lhs
     lhsFrame <- Abstract.scopedEnvironment lhsValue
     case lhsFrame of
@@ -617,12 +630,11 @@ instance Evaluatable Await where
   eval eval _ (Await a) = eval a
 
 -- | An object constructor call in Javascript, Java, etc.
-newtype New a = New { newSubject :: [a] }
+data New a = New { subject :: a , typeParameters :: a, arguments :: [a] }
   deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
 instance Declarations1 New where
-  liftDeclaredName _ (New [])                       = Nothing
-  liftDeclaredName declaredName (New (subject : _)) = declaredName subject
+  liftDeclaredName declaredName New{..} = declaredName subject
 
 instance Eq1 New where liftEq = genericLiftEq
 instance Ord1 New where liftCompare = genericLiftCompare
@@ -630,14 +642,33 @@ instance Show1 New where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for New
 instance Evaluatable New where
-  eval _ _ New{..} = do
-    case newSubject of
-      [] -> pure ()
-      (subject : _) -> do
-        name <- maybeM (throwEvalError NoNameError) (declaredName subject)
-        reference (Reference name) (Declaration name)
-    -- TODO: Traverse subterms and instantiate frames from the corresponding scope
-    pure unit
+  eval eval _ New{..} = do
+    name <- maybeM (throwNoNameError subject) (declaredName subject)
+    assocScope <- maybeM (throwEvalError $ ConstructorError name) =<< associatedScope (Declaration name)
+    objectScope <- newScope (Map.singleton Superclass [ assocScope ])
+    slot <- lookupDeclaration (Declaration name)
+    classVal <- deref slot
+    classFrame <- maybeM (throwEvalError $ ScopedEnvError classVal) =<< scopedEnvironment classVal
+
+    objectFrame <- newFrame objectScope (Map.singleton Superclass $ Map.singleton assocScope classFrame)
+    objectVal <- object objectFrame
+
+    classScope <- scopeLookup classFrame
+    instanceMembers <- relationsOfScope classScope Instance
+
+    void . withScopeAndFrame objectFrame $ do
+      for_ instanceMembers $ \Info{..} -> do
+        declare dataDeclaration Default dataSpan dataAssociatedScope
+
+      -- TODO: This is a typescript specific name and we should allow languages to customize it.
+      let constructorName = Name.name "constructor"
+      reference (Reference constructorName) (Declaration constructorName)
+      constructor <- deref =<< lookupDeclaration (Declaration constructorName)
+      args <- traverse eval arguments
+      boundConstructor <- bindThis objectVal constructor
+      call boundConstructor args
+
+    pure objectVal
 
 -- | A cast expression to a specified type.
 data Cast a =  Cast { castSubject :: !a, castType :: !a }
@@ -670,5 +701,6 @@ instance Eq1 This where liftEq = genericLiftEq
 instance Ord1 This where liftCompare = genericLiftCompare
 instance Show1 This where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable This where
-  eval _ _ This =
-    deref =<< lookupDeclaration (Declaration $ Name.name "__self")
+  eval _ _ This = do
+    reference (Reference __self) (Declaration __self)
+    deref =<< lookupDeclaration (Declaration __self)

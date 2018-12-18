@@ -13,7 +13,7 @@ import           Prologue
 import           Proto3.Suite.Class
 import           Reprinting.Tokenize hiding (Superclass)
 import Data.Span (emptySpan)
-import Data.Abstract.Name as Name
+import Data.Abstract.Name (__self)
 
 data Function a = Function { functionContext :: ![a], functionName :: !a, functionParameters :: ![a], functionBody :: !a }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, ToJSONFields1, Named1, Message1, NFData1)
@@ -30,13 +30,13 @@ instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Function where
   eval _ _ Function{..} = do
-    name <- maybeM (throwEvalError NoNameError) (declaredName functionName)
+    name <- maybeM (throwNoNameError functionName) (declaredName functionName)
     span <- ask @Span
     associatedScope <- declareFunction name span
 
     params <- withScope associatedScope . for functionParameters $ \paramNode -> do
-      param <- maybeM (throwEvalError NoNameError) (declaredName paramNode)
-      param <$ declare (Declaration param) span Nothing
+      param <- maybeM (throwNoNameError paramNode) (declaredName paramNode)
+      param <$ declare (Declaration param) Default span Nothing
 
     addr <- lookupDeclaration (Declaration name)
     v <- function name params functionBody associatedScope
@@ -56,7 +56,7 @@ declareFunction name span = do
   currentScope' <- currentScope
   let lexicalEdges = Map.singleton Lexical [ currentScope' ]
   associatedScope <- newScope lexicalEdges
-  declare (Declaration name) span (Just associatedScope)
+  declare (Declaration name) Default span (Just associatedScope)
   pure associatedScope
 
 instance Tokenize Function where
@@ -86,16 +86,16 @@ instance Diffable Method where
 -- local environment.
 instance Evaluatable Method where
   eval _ _ Method{..} = do
-    name <- maybeM (throwEvalError NoNameError) (declaredName methodName)
+    name <- maybeM (throwNoNameError methodName) (declaredName methodName)
     span <- ask @Span
     associatedScope <- declareFunction name span
 
     params <- withScope associatedScope $ do
-      let self = Name.name "__self"
-      declare (Declaration self)  emptySpan Nothing
-      fmap (self :) . for methodParameters $ \paramNode -> do
-        param <- maybeM (throwEvalError NoNameError) (declaredName paramNode)
-        param <$ declare (Declaration param) span Nothing
+      -- TODO: Should we give `self` a special Relation?
+      declare (Declaration __self) Default emptySpan Nothing
+      for methodParameters $ \paramNode -> do
+        param <- maybeM (throwNoNameError paramNode) (declaredName paramNode)
+        param <$ declare (Declaration param) Default span Nothing
 
     addr <- lookupDeclaration (Declaration name)
     v <- function name params methodBody associatedScope
@@ -163,8 +163,8 @@ instance Evaluatable VariableDeclaration where
   eval _    _ (VariableDeclaration [])   = pure unit
   eval eval _ (VariableDeclaration decs) = do
     for_ decs $ \declaration -> do
-      name <- maybeM (throwEvalError NoNameError) (declaredName declaration)
-      declare (Declaration name) emptySpan Nothing
+      name <- maybeM (throwNoNameError declaration) (declaredName declaration)
+      declare (Declaration name) Default emptySpan Nothing
       (span, _) <- do
         ref <- eval declaration
         subtermSpan <- get @Span
@@ -205,13 +205,15 @@ instance Show1 PublicFieldDefinition where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for PublicFieldDefinition
 instance Evaluatable PublicFieldDefinition where
-  eval _ _ PublicFieldDefinition{..} = do
+  eval eval _ PublicFieldDefinition{..} = do
     span <- ask @Span
-    propertyName <- maybeM (throwEvalError NoNameError) (declaredName publicFieldPropertyName)
-    declare (Declaration propertyName) span Nothing
+    propertyName <- maybeM (throwNoNameError publicFieldPropertyName) (declaredName publicFieldPropertyName)
+
+    declare (Declaration propertyName) Instance span Nothing
+    slot <- lookupDeclaration (Declaration propertyName)
+    value <- eval publicFieldValue
+    assign slot value
     pure unit
-
-
 
 data Variable a = Variable { variableName :: !a, variableType :: !a, variableValue :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
@@ -238,12 +240,12 @@ instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Class where
   eval eval _ Class{..} = do
-    name <- maybeM (throwEvalError NoNameError) (declaredName classIdentifier)
+    name <- maybeM (throwNoNameError classIdentifier) (declaredName classIdentifier)
     span <- ask @Span
     currentScope' <- currentScope
 
     superScopes <- for classSuperclasses $ \superclass -> do
-      name <- maybeM (throwEvalError NoNameError) (declaredName superclass)
+      name <- maybeM (throwNoNameError superclass) (declaredName superclass)
       scope <- associatedScope (Declaration name)
       slot <- lookupDeclaration (Declaration name)
       superclassFrame <- scopedEnvironment =<< deref slot
@@ -254,17 +256,17 @@ instance Evaluatable Class where
     let superclassEdges = (Superclass, ) . pure . fst <$> catMaybes superScopes
         current = (Lexical, ) <$> pure (pure currentScope')
         edges = Map.fromList (superclassEdges <> current)
-    childScope <- newScope edges
-    declare (Declaration name) span (Just childScope)
+    classScope <- newScope edges
+    declare (Declaration name) Default span (Just classScope)
 
     let frameEdges = Map.singleton Superclass (Map.fromList (catMaybes superScopes))
-    childFrame <- newFrame childScope frameEdges
-
-    withScopeAndFrame childFrame $ do
-      void $ eval classBody
+    classFrame <- newFrame classScope frameEdges
 
     classSlot <- lookupDeclaration (Declaration name)
-    assign classSlot =<< klass (Declaration name) childFrame
+    assign classSlot =<< klass (Declaration name) classFrame
+
+    withScopeAndFrame classFrame $ do
+      void $ eval classBody
 
     pure unit
 
@@ -343,12 +345,13 @@ instance Show1 TypeAlias where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable TypeAlias where
   eval _ _ TypeAlias{..} = do
-    name <- maybeM (throwEvalError NoNameError) (declaredName typeAliasIdentifier)
-    kindName <- maybeM (throwEvalError NoNameError) (declaredName typeAliasKind)
+    name <- maybeM (throwNoNameError typeAliasIdentifier) (declaredName typeAliasIdentifier)
+    kindName <- maybeM (throwNoNameError typeAliasKind) (declaredName typeAliasKind)
 
     span <- ask @Span
     assocScope <- associatedScope (Declaration kindName)
-    declare (Declaration name) span assocScope
+    -- TODO: Should we consider a special Relation for `TypeAlias`?
+    declare (Declaration name) Default span assocScope
 
     slot <- lookupDeclaration (Declaration name)
     kindSlot <- lookupDeclaration (Declaration kindName)
