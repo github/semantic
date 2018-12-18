@@ -74,6 +74,7 @@ instance FreeVariables1 Function where
 data Accessibility a = Public { unPublic :: a }
                      | Protected { unProtected :: a }
                      | Private { unPrivate :: a }
+                     | Unknown
                      deriving (Diffable, Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, ToJSONFields1, Named1, Message1, NFData1)
 
 instance Eq1 Accessibility where liftEq = genericLiftEq
