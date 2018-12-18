@@ -42,6 +42,7 @@ import           Proto3.Suite (Named (..), Named1 (..))
 
 type Syntax =
   '[ Comment.Comment
+   , Declaration.Accessibility
    , Declaration.Class
    , Declaration.InterfaceDeclaration
    , Declaration.Method
@@ -334,12 +335,13 @@ fieldDeclaration :: Assignment Term
 fieldDeclaration = makeTerm <$> symbol FieldDeclaration <*> children ((,) <$> manyTerm modifier <*> type' <**> variableDeclaratorList)
 
 method :: Assignment Term
-method = makeTerm <$> symbol MethodDeclaration <*> children (makeMethod <$> many modifier <*> emptyTerm <*> methodHeader <*> methodBody)
+method = makeTerm <$> symbol MethodDeclaration <*> children (makeMethod <$> many modifier <*> emptyTerm <*> accessibility <*> methodHeader <*> methodBody)
   where
     methodBody = symbol MethodBody *> children (term expression <|> emptyTerm)
     methodDeclarator = symbol MethodDeclarator *> children ( (,) <$> identifier <*> formalParameters)
+    accessibility = makeTerm <$> location <*> pure Declaration.Unknown
     methodHeader = symbol MethodHeader *> children ((,,,,) <$> (typeParameters <|> pure []) <*> manyTerm annotation <*> type' <*> methodDeclarator <*> (throws <|> pure []))
-    makeMethod modifiers receiver (typeParams, annotations, returnType, (name, params), throws) = Declaration.Method (returnType : modifiers <> typeParams <> annotations <> throws) receiver name params
+    makeMethod modifiers receiver accessibility (typeParams, annotations, returnType, (name, params), throws) = Declaration.Method (returnType : modifiers <> typeParams <> annotations <> throws) receiver accessibility name params
 
 generic :: Assignment Term
 generic = makeTerm <$> symbol Grammar.GenericType <*> children(Java.Syntax.GenericType <$> term type' <*> manyTerm type')
