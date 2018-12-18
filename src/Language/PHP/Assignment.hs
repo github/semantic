@@ -443,12 +443,17 @@ classMemberDeclaration = choice [
   traitUseClause
   ]
 
+-- TODO: What should the `location` be for implicit `public` visibility modifier?
+publicVisibility = Assignment Term
+publicVisibility = makeTerm <$> location <*> pure Declaration.Public
+
 methodDeclaration :: Assignment Term
-methodDeclaration =  (makeTerm <$> symbol MethodDeclaration <*> children (makeMethod1 <$> manyTerm methodModifier <*> emptyTerm <*> functionDefinitionParts)) <|> makeTerm <$> symbol MethodDeclaration <*> children (makeMethod2 <$> someTerm methodModifier <*> emptyTerm <*> term name <*> parameters <*> term (returnType <|> emptyTerm) <*> emptyTerm)
+methodDeclaration =  (makeTerm <$> symbol MethodDeclaration <*> children (makeMethod1 <$> (visibilityModifier <|> publicVisibility) <*> manyTerm methodModifier <*> emptyTerm <*> functionDefinitionParts))
+                 <|> makeTerm <$> symbol MethodDeclaration <*> children (makeMethod2 <$> (visibilityModifier <|> publicVisibility) <*> someTerm methodModifier <*> emptyTerm <*> term name <*> parameters <*> term (returnType <|> emptyTerm) <*> emptyTerm)
   where
     functionDefinitionParts = symbol FunctionDefinition *> children ((,,,) <$> term name <*> parameters <*> term (returnType <|> emptyTerm) <*> (term compoundStatement <|> emptyTerm))
-    makeMethod1 modifiers receiver (name, params, returnType, compoundStatement) = Declaration.Method (modifiers <> [returnType]) receiver name params compoundStatement
-    makeMethod2 modifiers receiver name params returnType compoundStatement = Declaration.Method (modifiers <> [returnType]) receiver name params compoundStatement
+    makeMethod1 visibility modifiers receiver (name, params, returnType, compoundStatement) = Declaration.Method (modifiers <> [returnType]) receiver visibility name params compoundStatement
+    makeMethod2 visibility modifiers receiver name params returnType compoundStatement      = Declaration.Method (modifiers <> [returnType]) receiver visibility name params compoundStatement
 
 classBaseClause :: Assignment Term
 classBaseClause = makeTerm <$> symbol ClassBaseClause <*> children (Syntax.ClassBaseClause <$> term qualifiedName)
