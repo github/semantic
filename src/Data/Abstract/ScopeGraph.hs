@@ -6,6 +6,7 @@ module Data.Abstract.ScopeGraph
   , relationsOfScope
   , Declaration(..) -- TODO don't export these constructors
   , declare
+  , formatDeclaration
   , EdgeLabel(..)
   , insertDeclarationScope
   , insertDeclarationSpan
@@ -273,6 +274,9 @@ newtype Reference = Reference { unReference :: Name }
 
 newtype Declaration = Declaration { unDeclaration :: Name }
   deriving (Eq, Ord, Show, Generic, NFData)
+
+formatDeclaration :: Declaration -> Text
+formatDeclaration = formatName . unDeclaration
 
 -- | The type of edge from a scope to its parent scopes.
 -- Either a lexical edge or an import edge in the case of non-lexical edges.
