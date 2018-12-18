@@ -126,7 +126,17 @@ runDomainEffects :: ( AbstractValue term address value (DomainC term address val
                  => (term -> Evaluator term address value (DomainC term address value m) value)
                  -> Module (Either (proxy lang) term)
                  -> Evaluator term address value m value
-runDomainEffects runTerm = raiseHandler runInterpose . runUnit . runBitwise . runNumeric . runString . runBoolean . runWhile . runFunction runTerm . either ((unit <*) . definePrelude) runTerm . moduleBody
+runDomainEffects runTerm
+  = raiseHandler runInterpose
+  . runUnit
+  . runBitwise
+  . runNumeric
+  . runString
+  . runBoolean
+  . runWhile
+  . runFunction runTerm
+  . either ((unit <*) . definePrelude) runTerm
+  . moduleBody
 
 -- | Evaluate a term recursively, applying the passed function at every recursive position.
 --
