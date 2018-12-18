@@ -39,9 +39,9 @@ import           Prologue hiding (for)
 -- | Small version of Ruby syntax for testing the code rewriting pipeline.
 type Syntax =
   '[ Comment.Comment
-   , Declaration.Accessibility
    , Declaration.Function
    , Declaration.Method
+   , Declaration.Visibility
    , Expression.Minus
    , Expression.Plus
    , Expression.Times

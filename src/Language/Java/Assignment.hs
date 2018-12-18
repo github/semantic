@@ -42,11 +42,11 @@ import           Proto3.Suite (Named (..), Named1 (..))
 
 type Syntax =
   '[ Comment.Comment
-   , Declaration.Accessibility
    , Declaration.Class
    , Declaration.InterfaceDeclaration
    , Declaration.Method
    , Declaration.VariableDeclaration
+   , Declaration.Visibility
    , Expression.Plus
    , Expression.Minus
    , Expression.Times

@@ -43,6 +43,7 @@ type Syntax = '[
   , Declaration.Function
   , Declaration.Method
   , Declaration.VariableDeclaration
+  , Declaration.Visibility
   , Expression.Plus
   , Expression.Minus
   , Expression.Times
