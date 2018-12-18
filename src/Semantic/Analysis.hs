@@ -37,16 +37,6 @@ type DomainC term address value m
   ( InterposeC (Resumable (BaseError (UnspecializedError address value))) (Eff
     m)))))))))))))))
 
-type DomainSig term address value m
-  =   Function term address value
-  :+: While value
-  :+: Boolean value
-  :+: Abstract.String value
-  :+: Numeric value
-  :+: Bitwise value
-  :+: Unit value
-  :+: Interpose (Resumable (BaseError (UnspecializedError address value)))
-
 -- | Evaluate a list of modules with the prelude for the passed language available, and applying the passed function to every module.
 evaluate :: ( Carrier outerSig outer
             , derefSig ~ (Deref value :+: allocatorSig)
@@ -94,7 +84,27 @@ evaluate lang runModule modules = do
 
 runDomainEffects :: ( AbstractValue term address value (DomainC term address value m)
                     , Carrier sig m
-                    , Carrier (DomainSig term address value m) (DomainC term address value m)
+                    , unitC ~ UnitC value (Eff (InterposeC (Resumable (BaseError (UnspecializedError address value))) (Eff m)))
+                    , unitSig ~ (Unit value :+: Interpose (Resumable (BaseError (UnspecializedError address value))) :+: sig)
+                    , Carrier unitSig unitC
+                    , bitwiseC ~ BitwiseC value (Eff unitC)
+                    , bitwiseSig ~ (Abstract.Bitwise value :+: unitSig)
+                    , Carrier bitwiseSig bitwiseC
+                    , numericC ~ NumericC value (Eff bitwiseC)
+                    , numericSig ~ (Abstract.Numeric value :+: bitwiseSig)
+                    , Carrier numericSig numericC
+                    , stringC ~ StringC value (Eff numericC)
+                    , stringSig ~ (Abstract.String value :+: numericSig)
+                    , Carrier stringSig stringC
+                    , booleanC ~ BooleanC value (Eff stringC)
+                    , booleanSig ~ (Boolean value :+: stringSig)
+                    , Carrier booleanSig booleanC
+                    , whileC ~ WhileC value (Eff booleanC)
+                    , whileSig ~ (While value :+: booleanSig)
+                    , Carrier whileSig whileC
+                    , functionC ~ FunctionC term address value (Eff whileC)
+                    , functionSig ~ (Function term address value :+: whileSig)
+                    , Carrier functionSig functionC
                     , HasPrelude lang
                     , Member (Allocator address) sig
                     , Member (Deref value) sig
