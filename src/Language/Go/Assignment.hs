@@ -31,6 +31,7 @@ import Data.ImportPath (importPath, defaultAlias)
 
 type Syntax =
   '[ Comment.Comment
+   , Declaration.Accessibility
    , Declaration.Constructor
    , Declaration.Function
    , Declaration.Method
@@ -458,11 +459,12 @@ indexExpression :: Assignment Term
 indexExpression = makeTerm <$> symbol IndexExpression <*> children (Expression.Subscript <$> expression <*> manyTerm expression)
 
 methodDeclaration :: Assignment Term
-methodDeclaration = makeTerm <$> symbol MethodDeclaration <*> children (mkTypedMethodDeclaration <$> receiver <*> term fieldIdentifier <*> params <*> returnParameters <*> (term block <|> emptyTerm))
+methodDeclaration = makeTerm <$> symbol MethodDeclaration <*> children (mkTypedMethodDeclaration <$> receiver <*> accessibility <*> term fieldIdentifier <*> params <*> returnParameters <*> (term block <|> emptyTerm))
   where
     params = symbol ParameterList *> children (manyTerm expression)
     receiver = symbol ParameterList *> children expressions
-    mkTypedMethodDeclaration receiver' name' parameters' type'' body' = Declaration.Method type'' receiver' name' parameters' body'
+    mkTypedMethodDeclaration receiver' accessibility' name' parameters' type'' body' = Declaration.Method type'' accessibility' receiver' name' parameters' body'
+    accessibility = makeTerm <$> location <*> pure Declaration.Unknown
     returnParameters = (symbol ParameterList *> children (manyTerm expression))
                     <|> pure <$> expression
                     <|> pure []
