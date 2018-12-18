@@ -169,12 +169,12 @@ instance Taggable Declaration.Function where
   symbolName = declaredName . Declaration.functionName
 
 instance Taggable Declaration.Method where
-  docsLiteral Python (Declaration.Method _ _ _ _ (Term (In _ bodyF)))
+  docsLiteral Python (Declaration.Method _ _ _ _ _ (Term (In _ bodyF)))
     | (Term (In exprAnn exprF):_) <- toList bodyF
     , isTextElement exprF = Just (locationByteRange exprAnn)
     | otherwise           = Nothing
   docsLiteral _ _         = Nothing
-  snippet ann (Declaration.Method _ _ _ _ (Term (In body _))) = Just $ subtractLocation ann body
+  snippet ann (Declaration.Method _ _ _ _ _ (Term (In body _))) = Just $ subtractLocation ann body
   symbolName = declaredName . Declaration.methodName
 
 instance Taggable Declaration.Class where
