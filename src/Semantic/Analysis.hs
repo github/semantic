@@ -37,7 +37,7 @@ type DomainC term address value m
   ( InterposeC (Resumable (BaseError (UnspecializedError address value))) (Eff
     m)))))))))))))))
 
-type DomainSig term address value m
+type DomainSig term address value
   =   Function term address value
   :+: While value
   :+: Boolean value
@@ -94,7 +94,7 @@ evaluate lang runModule modules = do
 
 runDomainEffects :: ( AbstractValue term address value (DomainC term address value m)
                     , Carrier sig m
-                    , Carrier (DomainSig term address value m) (DomainC term address value m)
+                    , Carrier (DomainSig term address value) (DomainC term address value m)
                     , HasPrelude lang
                     , Member (Allocator address) sig
                     , Member (Deref value) sig
