@@ -337,6 +337,7 @@ instance Taggable Declaration.Type
 instance Taggable Declaration.TypeAlias
 instance Taggable Declaration.Variable
 instance Taggable Declaration.VariableDeclaration
+instance Taggable Declaration.Visibility
 
 instance Taggable Directive.File
 instance Taggable Directive.Line
