@@ -55,7 +55,7 @@ import qualified Data.Abstract.Heap as Heap
 import           Data.Abstract.Live
 import           Data.Abstract.Module (ModuleInfo)
 import           Data.Abstract.Name
-import           Data.Abstract.ScopeGraph (Path (..), putDeclarationScopeAtPosition)
+import           Data.Abstract.ScopeGraph (Path (..), Relation(..), putDeclarationScopeAtPosition)
 import qualified Data.Map.Strict as Map
 import           Data.Span (Span, emptySpan)
 import           Prologue
@@ -174,11 +174,12 @@ define :: ( HasCallStack
           , Carrier sig m
           )
        => Declaration
+       -> Relation
        -> Evaluator term address value m value
        -> Evaluator term address value m ()
-define declaration def = withCurrentCallStack callStack $ do
+define declaration rel def = withCurrentCallStack callStack $ do
   -- TODO: This span is still wrong.
-  declare declaration emptySpan Nothing
+  declare declaration rel emptySpan Nothing
   slot <- lookupDeclaration declaration
   value <- def
   assign slot value
@@ -216,7 +217,7 @@ deref :: ( Member (Deref value) sig
          )
       => Slot address
       -> Evaluator term address value m value
-deref slot@Slot{..} = gets (Heap.getSlot slot) >>= maybeM (throwAddressError (UnallocatedAddress frameAddress)) >>= send . flip DerefCell ret >>= maybeM (throwAddressError $ UninitializedAddress frameAddress)
+deref slot@Slot{..} = gets (Heap.getSlot slot) >>= maybeM (throwAddressError (UnallocatedSlot slot)) >>= send . flip DerefCell ret >>= maybeM (throwAddressError $ UninitializedSlot slot)
 
 putSlotDeclarationScope :: ( Member (State (Heap address address value)) sig
                            , Member (State (ScopeGraph address)) sig
@@ -461,13 +462,13 @@ runHeapErrorWith :: Carrier sig m
 runHeapErrorWith f = raiseHandler $ runResumableWith (runEvaluator . f)
 
 data AddressError address value resume where
-  UnallocatedAddress   :: address -> AddressError address value (Set value)
-  UninitializedAddress :: address -> AddressError address value value
+  UnallocatedSlot   :: Slot address -> AddressError address value (Set value)
+  UninitializedSlot :: Slot address -> AddressError address value value
 
 instance (NFData address) => NFData1 (AddressError address value) where
   liftRnf _ x = case x of
-    UnallocatedAddress a   -> rnf a
-    UninitializedAddress a -> rnf a
+    UnallocatedSlot a   -> rnf a
+    UninitializedSlot a -> rnf a
 
 instance (NFData address, NFData resume) => NFData (AddressError address value resume) where
   rnf = liftRnf rnf
@@ -477,8 +478,8 @@ deriving instance Show address => Show (AddressError address value resume)
 instance Show address => Show1 (AddressError address value) where
   liftShowsPrec _ _ = showsPrec
 instance Eq address => Eq1 (AddressError address value) where
-  liftEq _ (UninitializedAddress a) (UninitializedAddress b) = a == b
-  liftEq _ (UnallocatedAddress a)   (UnallocatedAddress b)   = a == b
+  liftEq _ (UninitializedSlot a) (UninitializedSlot b) = a == b
+  liftEq _ (UnallocatedSlot a)   (UnallocatedSlot b)   = a == b
   liftEq _ _                        _                        = False
 
 throwAddressError :: ( Member (Resumable (BaseError (AddressError address body))) sig

@@ -28,7 +28,7 @@ instance ( Member (Allocator address) sig
          , Member (Reader Span) sig
          , Member (State Span) sig
          , Member (State (ScopeGraph address)) sig
-         , Member (Resumable (BaseError (EvalError address Abstract))) sig
+         , Member (Resumable (BaseError (EvalError term address Abstract))) sig
          , Member (Resumable (BaseError (ScopeError address))) sig
          , Member (Resumable (BaseError (HeapError address))) sig
          , Member (Resumable (BaseError (AddressError address Abstract))) sig
@@ -53,6 +53,7 @@ instance ( Member (Allocator address) sig
         catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body)))
       Evaluator $ runFunctionC (k res) eval
     BuiltIn _ _ k -> runFunctionC (k Abstract) eval
+    Bind _ _ k -> runFunctionC (k Abstract) eval
     Call _ _ k -> runFunctionC (k Abstract) eval) op)
 
 
@@ -127,7 +128,7 @@ instance AbstractValue term address Abstract m where
 
   tuple _ = pure Abstract
 
-  klass _ _ = pure Abstract
+  klass _ _     = pure Abstract
   namespace _ _ = pure Abstract
 
   scopedEnvironment _ = pure Nothing

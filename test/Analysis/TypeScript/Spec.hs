@@ -32,7 +32,7 @@ spec config = parallel $ do
         other -> expectationFailure (show other)
 
     it "imports with aliased symbols" $ do
-      (scopeGraph, (heap, res)) <- evaluate ["main.ts", "foo.ts", "a.ts", "foo/b.ts"]
+      (scopeGraph, (heap, res)) <- evaluate ["main.ts", "foo.ts", "foo/b.ts"]
       case ModuleTable.lookup "main.ts" <$> res of
         Right (Just (Module _ (scopeAndFrame, _))) -> do
           const () <$> SpecHelpers.lookupDeclaration "bar" scopeAndFrame heap scopeGraph `shouldBe` Just ()
@@ -124,9 +124,8 @@ spec config = parallel $ do
     it "evaluates BOr statements" $ do
       (_, (_, res)) <- evaluate ["bor.ts"]
       case ModuleTable.lookup "bor.ts" <$> res of
-        Right (Just (Module _ (_, value))) ->
-          value `shouldBe` Concrete.Integer (Number.Integer 3)
-        other -> expectationFailure (show other)
+        Right (Just (Module _ (_, value))) -> value `shouldBe` Concrete.Integer (Number.Integer 3)
+        other                              -> expectationFailure (show other)
 
     it "evaluates BAnd statements" $ do
       (_, (_, res)) <- evaluate ["band.ts"]
@@ -156,6 +155,12 @@ spec config = parallel $ do
       (_, (_, res)) <- evaluate ["complement.ts"]
       case ModuleTable.lookup "complement.ts" <$> res of
         Right (Just (Module _ (_, value))) -> value `shouldBe` Concrete.Integer (Number.Integer (-2))
+        other                              -> expectationFailure (show other)
+
+    it "uniquely tracks public fields for instances" $ do
+      (scopeGraph, (heap, res)) <- evaluate ["class1.ts", "class2.ts"]
+      case ModuleTable.lookup "class1.ts" <$> res of
+        Right (Just (Module _ (_, value))) -> value `shouldBe` (Concrete.Float (Number.Decimal 9.0))
         other                              -> expectationFailure (show other)
 
 

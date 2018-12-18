@@ -1,7 +1,6 @@
 (Statements
   (Throw
     (New
-      (Call
-        (Identifier)
-        (TextElement)
-        (Empty)))))
+      (Identifier)
+      (Empty)
+      (TextElement))))
