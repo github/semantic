@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DuplicateRecordFields, TupleSections #-}
+{-# LANGUAGE DeriveAnyClass, DuplicateRecordFields #-}
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Language.TypeScript.Syntax.Types where
 
