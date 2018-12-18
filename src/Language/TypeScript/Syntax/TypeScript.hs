@@ -67,8 +67,8 @@ instance Evaluatable QualifiedAliasedImport where
     let scopeMap = Map.singleton moduleScope moduleFrame
     aliasFrame <- newFrame importScope (Map.singleton ScopeGraph.Import scopeMap)
 
-    alias <- maybeM (throwEvalError NoNameError) (declaredName aliasTerm)
-    declare (Declaration alias) span (Just importScope)
+    alias <- maybeM (throwNoNameError aliasTerm) (declaredName aliasTerm)
+    declare (Declaration alias) Default span (Just importScope)
     aliasSlot <- lookupDeclaration (Declaration alias)
     assign aliasSlot =<< object aliasFrame
 
@@ -159,7 +159,7 @@ instance Evaluatable DefaultExport where
         withScopeAndFrame exportFrame $ do
           valueRef <- eval term
           let declaration = Declaration $ Name.name "__default"
-          declare declaration exportSpan Nothing
+          declare declaration Default exportSpan Nothing
           defaultSlot <- lookupDeclaration declaration
           assign defaultSlot valueRef
 
@@ -509,7 +509,7 @@ instance Ord1 ConstructSignature where liftCompare = genericLiftCompare
 instance Show1 ConstructSignature where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable ConstructSignature
 
-data IndexSignature a = IndexSignature { indexSignatureSubject :: a, indexSignatureType :: a }
+data IndexSignature a = IndexSignature { subject :: a, subjectType :: a, typeAnnotation :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 IndexSignature where liftEq = genericLiftEq
@@ -564,7 +564,7 @@ declareModule :: ( AbstractValue term address value m
                  , Member (Reader (CurrentFrame address)) sig
                  , Member (Reader (CurrentScope address)) sig
                  , Member (Reader Span) sig
-                 , Member (Resumable (BaseError (EvalError address value))) sig
+                 , Member (Resumable (BaseError (EvalError term address value))) sig
                  , Member (State (Heap address address value)) sig
                  , Member (State (ScopeGraph address)) sig
                  , Member Fresh sig
@@ -580,7 +580,7 @@ declareModule :: ( AbstractValue term address value m
                 -> [term]
                 -> Evaluator term address value m value
 declareModule eval identifier statements = do
-    name <- maybeM (throwEvalError NoNameError) (declaredName identifier)
+    name <- maybeM (throwNoNameError identifier) (declaredName identifier)
     span <- ask @Span
     currentScope' <- currentScope
 
@@ -599,7 +599,7 @@ declareModule eval identifier statements = do
       Nothing -> do
         let edges = Map.singleton Lexical [ currentScope' ]
         childScope <- newScope edges
-        declare (Declaration name) span (Just childScope)
+        declare (Declaration name) Default span (Just childScope)
 
         currentFrame' <- currentFrame
         let frameEdges = Map.singleton Lexical (Map.singleton currentScope' currentFrame')
@@ -608,7 +608,7 @@ declareModule eval identifier statements = do
         withScopeAndFrame childFrame (void moduleBody)
 
         moduleSlot <- lookupDeclaration (Declaration name)
-        assign moduleSlot =<< klass (Declaration name) childFrame
+        assign moduleSlot =<< namespace name childFrame
 
         unit
 
@@ -660,12 +660,12 @@ instance Declarations a => Declarations (AbstractClass a) where
 
 instance Evaluatable AbstractClass where
   eval eval _ AbstractClass{..} = do
-    name <- maybeM (throwEvalError NoNameError) (declaredName abstractClassIdentifier)
+    name <- maybeM (throwNoNameError abstractClassIdentifier) (declaredName abstractClassIdentifier)
     span <- ask @Span
     currentScope' <- currentScope
 
     superScopes <- for classHeritage $ \superclass -> do
-      name <- maybeM (throwEvalError NoNameError) (declaredName superclass)
+      name <- maybeM (throwNoNameError superclass) (declaredName superclass)
       scope <- associatedScope (Declaration name)
       slot <- lookupDeclaration (Declaration name)
       superclassFrame <- scopedEnvironment =<< deref slot
@@ -676,11 +676,11 @@ instance Evaluatable AbstractClass where
     let superclassEdges = (Superclass, ) . pure . fst <$> catMaybes superScopes
         current = (Lexical, ) <$> pure (pure currentScope')
         edges = Map.fromList (superclassEdges <> current)
-    childScope <- newScope edges
-    declare (Declaration name) span (Just childScope)
+    classScope <- newScope edges
+    declare (Declaration name) Default span (Just classScope)
 
     let frameEdges = Map.singleton Superclass (Map.fromList (catMaybes superScopes))
-    childFrame <- newFrame childScope frameEdges
+    childFrame <- newFrame classScope frameEdges
 
     withScopeAndFrame childFrame $ do
       void $ eval classBody
@@ -689,3 +689,11 @@ instance Evaluatable AbstractClass where
     assign classSlot =<< klass (Declaration name) childFrame
 
     unit
+
+data MetaProperty a = MetaProperty
+  deriving (Diffable, Eq, Foldable, Functor,  Generic1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1, Named1, Message1, NFData1)
+
+instance Eq1 MetaProperty where liftEq = genericLiftEq
+instance Ord1 MetaProperty where liftCompare = genericLiftCompare
+instance Show1 MetaProperty where liftShowsPrec = genericLiftShowsPrec
+instance Evaluatable MetaProperty

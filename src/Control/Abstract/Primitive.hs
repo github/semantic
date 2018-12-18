@@ -33,18 +33,19 @@ defineBuiltIn :: ( HasCallStack
                  , Carrier sig m
                  )
               => Declaration
+              -> Relation
               -> BuiltIn
               -> Evaluator term address value m ()
-defineBuiltIn declaration value = withCurrentCallStack callStack $ do
+defineBuiltIn declaration rel value = withCurrentCallStack callStack $ do
   currentScope' <- currentScope
   let lexicalEdges = Map.singleton Lexical [ currentScope' ]
   associatedScope <- newScope lexicalEdges
   -- TODO: This span is still wrong.
-  declare declaration emptySpan (Just associatedScope)
+  declare declaration rel emptySpan (Just associatedScope)
 
   param <- gensym
   withScope associatedScope $ do
-    declare (Declaration param) emptySpan Nothing
+    declare (Declaration param) rel emptySpan Nothing
 
   slot <- lookupDeclaration declaration
   value <- builtIn associatedScope value
@@ -70,7 +71,7 @@ defineClass :: ( Carrier sig m
             -> [Declaration]
             -> Evaluator term address value m a
             -> Evaluator term address value m ()
-defineClass declaration superclasses body = void . define declaration $ do
+defineClass declaration superclasses body = void . define declaration Default $ do
     currentScope' <- currentScope
 
     superScopes <- for superclasses associatedScope
@@ -105,7 +106,7 @@ defineNamespace :: ( AbstractValue term address value m
                 => Declaration
                 -> Evaluator term address value m a
                 -> Evaluator term address value m ()
-defineNamespace declaration@Declaration{..} body = void . define declaration $ do
+defineNamespace declaration@Declaration{..} body = void . define declaration Default $ do
   withChildFrame declaration $ \frame -> do
     _ <- body
     namespace unDeclaration frame
