@@ -179,7 +179,7 @@ define :: ( HasCallStack
        -> Evaluator term address value m ()
 define declaration rel def = withCurrentCallStack callStack $ do
   -- TODO: This span is still wrong.
-  declare declaration rel emptySpan Nothing
+  declare declaration rel emptySpan Nothing Nothing
   slot <- lookupDeclaration declaration
   value <- def
   assign slot value

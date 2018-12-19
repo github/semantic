@@ -24,6 +24,7 @@ module Data.Abstract.ScopeGraph
   , Reference(..) -- TODO don't export these constructors
   , Relation(..)
   , ScopeGraph(..)
+  , Kind(..)
   , lookupScope
   , lookupScopePath
   , Scope(..)
@@ -53,8 +54,12 @@ data Info scopeAddress = Info
   { infoDeclaration :: Declaration
   , infoRelation :: Relation
   , infoSpan :: Span
+  , infoKind :: Maybe Kind
   , infoAssociatedScope :: Maybe scopeAddress
   } deriving (Eq, Show, Ord, Generic, NFData)
+
+data Kind = TypeAlias | Class | Method | QualifiedAliasedImport | DefaultExport | Module | AbstractClass | Let | QualifiedImport | UnqualifiedImport | Assignment | RequiredParameter | PublicField | VariableDeclaration | Function | Parameter
+  deriving (Eq, Show, Ord, Generic, NFData)
 
 -- Offsets and frame addresses in the heap should be addresses?
 data Scope address =
@@ -141,15 +146,15 @@ lookupScope scope = Map.lookup scope . unScopeGraph
 
 -- Declare a declaration with a span and an associated scope in the scope graph.
 -- TODO: Return the whole value in Maybe or Either.
-declare :: Ord scope => Declaration -> Relation -> Span -> Maybe scope -> scope -> ScopeGraph scope -> (ScopeGraph scope, Maybe Position)
-declare decl rel declSpan assocScope currentScope g = fromMaybe (g, Nothing) $ do
+declare :: Ord scope => Declaration -> Relation -> Span -> Maybe Kind -> Maybe scope -> scope -> ScopeGraph scope -> (ScopeGraph scope, Maybe Position)
+declare decl rel declSpan kind assocScope currentScope g = fromMaybe (g, Nothing) $ do
   scope <- lookupScope currentScope g
 
   dataSeq <- ddataOfScope currentScope g
   case Seq.findIndexR (\Info{..} -> decl == infoDeclaration && declSpan == infoSpan && rel == infoRelation) dataSeq of
     Just index -> pure (g, Just (Position index))
     Nothing -> do
-      let newScope = scope { declarations = declarations scope Seq.|> Info decl rel declSpan assocScope }
+      let newScope = scope { declarations = declarations scope Seq.|> Info decl rel declSpan kind assocScope }
       pure (insertScope currentScope newScope g, Just (Position (length (declarations newScope))))
 
 -- | Add a reference to a declaration in the scope graph.

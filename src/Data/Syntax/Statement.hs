@@ -1,22 +1,23 @@
-{-# LANGUAGE DeriveAnyClass, ScopedTypeVariables, UndecidableInstances, ViewPatterns, DuplicateRecordFields #-}
+{-# LANGUAGE DeriveAnyClass, DuplicateRecordFields, ScopedTypeVariables, UndecidableInstances, ViewPatterns #-}
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Data.Syntax.Statement where
 
 import Prologue
 
+import           Data.Aeson (ToJSON1 (..))
 import qualified Data.Map.Strict as Map
-import Data.Aeson (ToJSON1 (..))
-import Data.Semigroup.App
-import Data.Semigroup.Foldable
-import Proto3.Suite.Class
+import           Data.Semigroup.App
+import           Data.Semigroup.Foldable
+import           Proto3.Suite.Class
 
-import Control.Abstract hiding (Return, Break, Continue, While)
-import Data.Abstract.Evaluatable as Abstract
-import Data.JSON.Fields
-import Diffing.Algorithm
-import Reprinting.Tokenize (Tokenize (..), imperative, within', yield)
-import qualified Data.Reprinting.Token as Token
+import           Control.Abstract hiding (Break, Continue, Return, While)
+import           Data.Abstract.Evaluatable as Abstract
+import           Data.JSON.Fields
 import qualified Data.Reprinting.Scope as Scope
+import qualified Data.Reprinting.Token as Token
+import           Diffing.Algorithm
+import           Reprinting.Tokenize (Tokenize (..), imperative, within', yield)
+import qualified Data.Abstract.ScopeGraph as ScopeGraph
 
 -- | Imperative sequence of statements/declarations s.t.:
 --
@@ -151,7 +152,7 @@ instance Evaluatable Let where
     assocScope <- associatedScope (Declaration valueName)
 
     _ <- withLexicalScopeAndFrame $ do
-      declare (Declaration name) Default letSpan assocScope
+      declare (Declaration name) Default letSpan (Just ScopeGraph.Let) assocScope
       letVal <- eval letValue
       slot <- lookupDeclaration (Declaration name)
       assign slot letVal

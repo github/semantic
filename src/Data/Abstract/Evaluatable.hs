@@ -174,7 +174,7 @@ defineSelf :: ( AbstractValue term address value m
            => Evaluator term address value m ()
 defineSelf = do
   let self = Declaration X.__self
-  declare self Prelude emptySpan Nothing
+  declare self Prelude emptySpan Nothing Nothing
   slot <- lookupDeclaration self
   assign slot =<< object =<< currentFrame
 
