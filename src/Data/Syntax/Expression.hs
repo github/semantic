@@ -630,11 +630,11 @@ instance Evaluatable Await where
   eval eval _ (Await a) = eval a
 
 -- | An object constructor call in Javascript, Java, etc.
-data New a = New { subject :: a , typeParameters :: a, arguments :: [a] }
+data New a = New { newSubject :: a , newTypeParameters :: a, newArguments :: [a] }
   deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
 instance Declarations1 New where
-  liftDeclaredName declaredName New{..} = declaredName subject
+  liftDeclaredName declaredName New{..} = declaredName newSubject
 
 instance Eq1 New where liftEq = genericLiftEq
 instance Ord1 New where liftCompare = genericLiftCompare
@@ -643,7 +643,7 @@ instance Show1 New where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Implement Eval instance for New
 instance Evaluatable New where
   eval eval _ New{..} = do
-    name <- maybeM (throwNoNameError subject) (declaredName subject)
+    name <- maybeM (throwNoNameError newSubject) (declaredName newSubject)
     assocScope <- maybeM (throwEvalError $ ConstructorError name) =<< associatedScope (Declaration name)
     objectScope <- newScope (Map.singleton Superclass [ assocScope ])
     slot <- lookupDeclaration (Declaration name)
@@ -664,7 +664,7 @@ instance Evaluatable New where
       let constructorName = Name.name "constructor"
       reference (Reference constructorName) (Declaration constructorName)
       constructor <- deref =<< lookupDeclaration (Declaration constructorName)
-      args <- traverse eval arguments
+      args <- traverse eval newArguments
       boundConstructor <- bindThis objectVal constructor
       call boundConstructor args
 
