@@ -74,7 +74,7 @@ instance FreeVariables1 Function where
 data Visibility a = Public { unPublic :: a }
                   | Protected { unProtected :: a }
                   | Private { unPrivate :: a }
-                  | Unknown
+                  | Unknown { unUnknown :: a }
                   deriving (Diffable, Eq, Ord, Show, Foldable, Traversable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Named1, Message1, NFData1)
 
 instance Eq1 Visibility where liftEq = genericLiftEq
@@ -84,7 +84,7 @@ instance Show1 Visibility where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Visibility
 
 instance Declarations1 Visibility where
-  liftDeclaredName _ Unknown                  = Just (name "Unknown")
+  liftDeclaredName declaredName (Unknown a)   = declaredName a
   liftDeclaredName declaredName (Public a)    = declaredName a
   liftDeclaredName declaredName (Protected a) = declaredName a
   liftDeclaredName declaredName (Private a)   = declaredName a

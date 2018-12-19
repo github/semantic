@@ -464,7 +464,7 @@ methodDeclaration = makeTerm <$> symbol MethodDeclaration <*> children (mkTypedM
     params = symbol ParameterList *> children (manyTerm expression)
     receiver = symbol ParameterList *> children expressions
     mkTypedMethodDeclaration receiver' accessibility' name' parameters' type'' body' = Declaration.Method type'' accessibility' receiver' name' parameters' body'
-    accessibility = makeTerm <$> location <*> pure Declaration.Unknown
+    accessibility = makeTerm <$> location <*> (Declaration.Unknown <$> emptyTerm)
     returnParameters = (symbol ParameterList *> children (manyTerm expression))
                     <|> pure <$> expression
                     <|> pure []
