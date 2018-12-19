@@ -1,4 +1,4 @@
-{-# LANGUAGE AllowAmbiguousTypes, GADTs, ConstraintKinds, LambdaCase, RankNTypes, TypeFamilies, TypeOperators, ScopedTypeVariables, UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes, GADTs, ConstraintKinds, RankNTypes, TypeFamilies, TypeOperators, ScopedTypeVariables, UndecidableInstances #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Tags.Taggable.Instances () where
 
