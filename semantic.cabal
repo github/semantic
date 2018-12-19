@@ -211,6 +211,7 @@ library
                      , Serializing.Format
                      , Serializing.SExpression
                      , Tags.Taggable
+                     , Tags.Taggable.Instances
                      , Tags.Tagging
                      -- Custom Prelude
                      , Prologue

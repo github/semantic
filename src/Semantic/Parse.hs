@@ -24,6 +24,7 @@ import           Rendering.Renderer
 import           Semantic.Task
 import           Serializing.Format
 import           Tags.Taggable
+import           Tags.Taggable.Instances ()
 
 -- | Using the specified renderer, parse a list of 'Blob's to produce a 'Builder' output.
 runParse :: (Member Distribute sig, Member (Error SomeException) sig, Member Task sig, Carrier sig m, MonadIO m) => TermRenderer output -> [Blob] -> m Builder
