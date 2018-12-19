@@ -16,6 +16,7 @@ import           Data.JSON.Fields
 import qualified Data.Map.Strict as Map
 import           Data.Semigroup.App
 import           Data.Semigroup.Foldable
+import           Data.Span
 import           Diffing.Algorithm
 import           Language.TypeScript.Resolution
 
@@ -43,7 +44,9 @@ instance Evaluatable Import where
       -- Insert import references into the import scope starting from the perspective of the import scope.
       withScopeAndFrame moduleFrame $ do
         for_ symbols $ \Alias{..} ->
-          insertImportReference (Reference aliasName) (Declaration aliasValue) scopeAddress
+          -- TODO: Need an easier way to get the span of an Alias. It's difficult because we no longer have a term.
+          -- Even if we had one we'd have to evaluate it at the moment.
+          insertImportReference (Reference aliasName) emptySpan ScopeGraph.Identifier (Declaration aliasValue) scopeAddress
 
       -- Create edges from the current scope/frame to the import scope/frame.
       insertImportEdge scopeAddress
@@ -106,7 +109,7 @@ instance Evaluatable QualifiedExport where
     insertExportEdge exportScope -- Create an export edge from the current scope to the export scope
     withScope exportScope .
       for_ exportSymbols $ \Alias{..} -> do
-        reference (Reference aliasName) (Declaration aliasValue)
+        reference (Reference aliasName) emptySpan ScopeGraph.Identifier (Declaration aliasValue)
 
     -- Create an export edge from a new scope to the qualifed export's scope.
     pure unit
@@ -135,7 +138,7 @@ instance Evaluatable QualifiedExportFrom where
 
     withScopeAndFrame moduleFrame .
       for_ exportSymbols $ \Alias{..} -> do
-        insertImportReference (Reference aliasName) (Declaration aliasValue) exportScope
+        insertImportReference (Reference aliasName) emptySpan ScopeGraph.Identifier (Declaration aliasValue) exportScope
 
     insertExportEdge exportScope
     insertFrameLink ScopeGraph.Export (Map.singleton exportScope exportFrame)
@@ -339,7 +342,8 @@ instance Show1 TypeIdentifier where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable TypeIdentifier where
   eval _ _ TypeIdentifier{..} = do
     -- Add a reference to the type identifier in the current scope.
-    reference (Reference (Evaluatable.name contents)) (Declaration (Evaluatable.name contents))
+    span <- ask @Span
+    reference (Reference (Evaluatable.name contents)) span ScopeGraph.TypeIdentifier (Declaration (Evaluatable.name contents))
     pure unit
 
 data NestedIdentifier a = NestedIdentifier { left :: !a, right :: !a }

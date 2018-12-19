@@ -217,9 +217,11 @@ instance Ord1 QualifiedName where liftCompare = genericLiftCompare
 instance Show1 QualifiedName where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedName where
-  eval _ _ (QualifiedName obj iden) = do
+  eval eval _ (QualifiedName obj iden) = do
     name <- maybeM (throwNoNameError obj) (declaredName obj)
-    reference (Reference name) (Declaration name)
+    _ <- eval obj
+    objSpan <- get @Span
+    reference (Reference name) objSpan ScopeGraph.Identifier (Declaration name)
     childScope <- associatedScope (Declaration name)
 
     propName <- maybeM (throwNoNameError iden) (declaredName iden)
@@ -229,7 +231,9 @@ instance Evaluatable QualifiedName where
         currentFrameAddress <- currentFrame
         frameAddress <- newFrame childScope (Map.singleton Lexical (Map.singleton currentScopeAddress currentFrameAddress))
         withScopeAndFrame frameAddress $ do
-          reference (Reference propName) (Declaration propName)
+          _ <- eval iden
+          propSpan <- get @Span
+          reference (Reference propName) propSpan ScopeGraph.Identifier (Declaration propName)
           address <- lookupDeclaration (Declaration propName)
           deref address
       Nothing ->

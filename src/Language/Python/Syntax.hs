@@ -16,6 +16,7 @@ import qualified Data.Language as Language
 import qualified Data.List as List
 import qualified Data.List.NonEmpty as NonEmpty
 import qualified Data.Map.Strict as Map
+import           Data.Span
 import qualified Data.Text as T
 import           Diffing.Algorithm
 import           GHC.Generics
@@ -187,7 +188,7 @@ instance Evaluatable Import where
       scopeAddress <- newScope scopeEdges
       withScope moduleScope .
         for_ xs $ \Alias{..} ->
-          insertImportReference (Reference aliasName) (Declaration aliasValue) scopeAddress
+          insertImportReference (Reference aliasName) emptySpan ScopeGraph.Identifier (Declaration aliasValue) scopeAddress
 
       let frameLinks = Map.singleton moduleScope moduleFrame
       frameAddress <- newFrame scopeAddress (Map.singleton ScopeGraph.Import frameLinks)

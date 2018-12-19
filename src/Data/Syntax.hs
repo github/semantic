@@ -26,6 +26,7 @@ import qualified Proto3.Suite.DotProto as Proto
 import qualified Proto3.Wire.Encode as Encode
 import qualified Proto3.Wire.Decode as Decode
 import Control.Abstract.ScopeGraph (reference, Reference(..), Declaration(..))
+import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import Control.Abstract.Heap (deref, lookupDeclaration)
 
 -- Combinators
@@ -168,7 +169,8 @@ instance Evaluatable Identifier where
   eval eval ref' = ref eval ref' >=> deref
 
   ref _ _ (Identifier name) = do
-    reference (Reference name) (Declaration name)
+    span <- ask @Span
+    reference (Reference name) span ScopeGraph.Identifier (Declaration name)
     lookupDeclaration (Declaration name)
 
 
