@@ -11,6 +11,7 @@ import Control.Abstract.Heap
 import Control.Abstract.ScopeGraph
 import Control.Abstract.Value
 import Data.Abstract.BaseError
+import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import Data.Abstract.Name
 import Data.Map.Strict as Map
 import Data.Span
@@ -41,11 +42,11 @@ defineBuiltIn declaration rel value = withCurrentCallStack callStack $ do
   let lexicalEdges = Map.singleton Lexical [ currentScope' ]
   associatedScope <- newPreludeScope lexicalEdges
   -- TODO: This span is still wrong.
-  declare declaration rel emptySpan Nothing (Just associatedScope)
+  declare declaration rel emptySpan ScopeGraph.Unknown (Just associatedScope)
 
   param <- gensym
   withScope associatedScope $ do
-    declare (Declaration param) rel emptySpan Nothing Nothing
+    declare (Declaration param) rel emptySpan ScopeGraph.Unknown Nothing
 
   slot <- lookupDeclaration declaration
   value <- builtIn associatedScope value
