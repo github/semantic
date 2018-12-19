@@ -201,7 +201,7 @@ withChildFrame :: ( Member (Allocator address) sig
                 -> (address -> Evaluator term address value m a)
                 -> Evaluator term address value m a
 withChildFrame declaration body = do
-  scope <- newScope mempty
+  scope <- newPreludeScope mempty
   putDeclarationScope declaration scope
   frame <- newFrame scope mempty
   withScopeAndFrame frame (body frame)

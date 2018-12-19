@@ -92,7 +92,7 @@ instance Evaluatable Method where
 
     params <- withScope associatedScope $ do
       -- TODO: Should we give `self` a special Relation?
-      declare (Declaration __self) Default emptySpan Nothing
+      declare (Declaration __self) Prelude emptySpan Nothing
       for methodParameters $ \paramNode -> do
         param <- maybeM (throwNoNameError paramNode) (declaredName paramNode)
         param <$ declare (Declaration param) Default span Nothing
