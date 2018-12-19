@@ -45,7 +45,7 @@ import           Control.Effect.Carrier
 import           Data.Abstract.BaseError
 import           Data.Abstract.Module
 import           Data.Abstract.Name hiding (name)
-import           Data.Abstract.ScopeGraph (Declaration(..), EdgeLabel, Reference, Relation(..), Scope (..), ScopeGraph, Slot(..), Info(..))
+import           Data.Abstract.ScopeGraph (Kind, Declaration(..), EdgeLabel, Reference, Relation(..), Scope (..), ScopeGraph, Slot(..), Info(..))
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.Span
 import           Prelude hiding (lookup)
@@ -62,11 +62,12 @@ declare :: ( Carrier sig m
         => Declaration
         -> Relation
         -> Span
+        -> Maybe Kind
         -> Maybe address
         -> Evaluator term address value m ()
-declare decl rel span scope = do
+declare decl rel span kind scope = do
   currentAddress <- currentScope
-  modify (fst . ScopeGraph.declare decl rel span scope currentAddress)
+  modify (fst . ScopeGraph.declare decl rel span kind scope currentAddress)
 
 putDeclarationScope :: (Ord address, Member (Reader (CurrentScope address)) sig, Member (State (ScopeGraph address)) sig, Carrier sig m) => Declaration -> address -> Evaluator term address value m ()
 putDeclarationScope decl assocScope = do

@@ -4,16 +4,16 @@ module Language.TypeScript.Syntax.JavaScript where
 
 import Prologue
 
-import           Proto3.Suite
+import Proto3.Suite
 
+import           Control.Abstract.Heap
+import           Control.Abstract.ScopeGraph hiding (Import)
 import           Data.Abstract.Evaluatable
+import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.JSON.Fields
+import qualified Data.Map.Strict as Map
 import           Diffing.Algorithm
 import           Language.TypeScript.Resolution
-import           Control.Abstract.ScopeGraph hiding (Import)
-import           Control.Abstract.Heap
-import           qualified Data.Abstract.ScopeGraph as ScopeGraph
-import           qualified Data.Map.Strict as Map
 
 data JavaScriptRequire a = JavaScriptRequire { javascriptRequireIden :: !a, javascriptRequireFrom :: ImportPath }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
@@ -31,7 +31,7 @@ instance Evaluatable JavaScriptRequire where
       Just alias -> do
         span <- ask @Span
         importScope <- newScope (Map.singleton ScopeGraph.Import [ moduleScope ])
-        declare (Declaration alias) Default span (Just importScope)
+        declare (Declaration alias) Default span (Just ScopeGraph.UnqualifiedImport) (Just importScope)
         let scopeMap = Map.singleton moduleScope moduleFrame
         aliasFrame <- newFrame importScope (Map.singleton ScopeGraph.Import scopeMap)
         aliasSlot <- lookupDeclaration (Declaration alias)

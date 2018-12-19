@@ -68,7 +68,7 @@ instance Evaluatable QualifiedAliasedImport where
     aliasFrame <- newFrame importScope (Map.singleton ScopeGraph.Import scopeMap)
 
     alias <- maybeM (throwNoNameError aliasTerm) (declaredName aliasTerm)
-    declare (Declaration alias) Default span (Just importScope)
+    declare (Declaration alias) Default span (Just ScopeGraph.QualifiedAliasedImport) (Just importScope)
     aliasSlot <- lookupDeclaration (Declaration alias)
     assign aliasSlot =<< object aliasFrame
 
@@ -159,7 +159,7 @@ instance Evaluatable DefaultExport where
         withScopeAndFrame exportFrame $ do
           valueRef <- eval term
           let declaration = Declaration $ Name.name "__default"
-          declare declaration Default exportSpan Nothing
+          declare declaration Default exportSpan (Just ScopeGraph.DefaultExport) Nothing
           defaultSlot <- lookupDeclaration declaration
           assign defaultSlot valueRef
 
@@ -598,7 +598,7 @@ declareModule eval identifier statements = do
       Nothing -> do
         let edges = Map.singleton Lexical [ currentScope' ]
         childScope <- newScope edges
-        declare (Declaration name) Default span (Just childScope)
+        declare (Declaration name) Default span (Just ScopeGraph.Module) (Just childScope)
 
         currentFrame' <- currentFrame
         let frameEdges = Map.singleton Lexical (Map.singleton currentScope' currentFrame')
@@ -658,7 +658,7 @@ instance Declarations a => Declarations (AbstractClass a) where
   declaredName AbstractClass{..} = declaredName abstractClassIdentifier
 
 instance Evaluatable AbstractClass where
-  eval eval _ AbstractClass{..} = do
+  eval eval _ term@AbstractClass{..} = do
     name <- maybeM (throwNoNameError abstractClassIdentifier) (declaredName abstractClassIdentifier)
     span <- ask @Span
     currentScope' <- currentScope
@@ -670,13 +670,13 @@ instance Evaluatable AbstractClass where
       superclassFrame <- scopedEnvironment =<< deref slot
       pure $ case (scope, superclassFrame) of
         (Just scope, Just frame) -> Just (scope, frame)
-        _ -> Nothing
+        _                        -> Nothing
 
     let superclassEdges = (Superclass, ) . pure . fst <$> catMaybes superScopes
         current = (Lexical, ) <$> pure (pure currentScope')
         edges = Map.fromList (superclassEdges <> current)
     classScope <- newScope edges
-    declare (Declaration name) Default span (Just classScope)
+    declare (Declaration name) Default span (Just ScopeGraph.AbstractClass) (Just classScope)
 
     let frameEdges = Map.singleton Superclass (Map.fromList (catMaybes superScopes))
     childFrame <- newFrame classScope frameEdges

@@ -3,28 +3,39 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-} -- FIXME
 module Language.Python.Syntax where
 
+import           Control.Abstract.Heap
+import           Control.Abstract.ScopeGraph hiding (Import)
 import           Data.Abstract.BaseError
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
+import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.Aeson hiding (object)
 import           Data.Functor.Classes.Generic
 import           Data.JSON.Fields
 import qualified Data.Language as Language
+import qualified Data.List as List
 import qualified Data.List.NonEmpty as NonEmpty
+import qualified Data.Map.Strict as Map
 import qualified Data.Text as T
 import           Diffing.Algorithm
 import           GHC.Generics
 import           Prologue
-import           System.FilePath.Posix
-import Proto3.Suite (Primitive(..), Message(..), Message1(..), Named1(..), Named(..), MessageField(..), DotProtoIdentifier(..), DotProtoPrimType(..), DotProtoType(..), messageField)
+import           Proto3.Suite
+    ( DotProtoIdentifier (..)
+    , DotProtoPrimType (..)
+    , DotProtoType (..)
+    , Message (..)
+    , Message1 (..)
+    , MessageField (..)
+    , Named (..)
+    , Named1 (..)
+    , Primitive (..)
+    , messageField
+    )
 import qualified Proto3.Suite as Proto
-import qualified Proto3.Wire.Encode as Encode
 import qualified Proto3.Wire.Decode as Decode
-import Control.Abstract.ScopeGraph hiding (Import)
-import Control.Abstract.Heap
-import qualified Data.Abstract.ScopeGraph as ScopeGraph
-import qualified Data.Map.Strict as Map
-import qualified Data.List as List
+import qualified Proto3.Wire.Encode as Encode
+import           System.FilePath.Posix
 
 data QualifiedName
   = QualifiedName { paths :: NonEmpty FilePath }
@@ -148,7 +159,7 @@ instance Evaluatable Import where
     aliasFrame <- newFrame importScope (Map.singleton ScopeGraph.Import scopeMap)
 
     -- Add declaration of the alias name to the current scope (within our current module).
-    declare (Declaration aliasName) Default span (Just importScope)
+    declare (Declaration aliasName) Default span (Just ScopeGraph.UnqualifiedImport) (Just importScope)
     -- Retrieve the frame slot for the new declaration.
     aliasSlot <- lookupDeclaration (Declaration aliasName)
     assign aliasSlot =<< object aliasFrame
@@ -219,7 +230,7 @@ instance Evaluatable QualifiedImport where
       go ((name, modulePath) : namesAndPaths) = do
         span <- ask @Span
         scopeAddress <- newScope mempty
-        declare (Declaration name) Default span (Just scopeAddress)
+        declare (Declaration name) Default span (Just ScopeGraph.QualifiedImport) (Just scopeAddress)
         aliasSlot <- lookupDeclaration (Declaration name)
         -- a.b.c
         withScope scopeAddress $
@@ -255,7 +266,7 @@ instance Evaluatable QualifiedAliasedImport where
     span <- ask @Span
     scopeAddress <- newScope mempty
     alias <- maybeM (throwNoNameError aliasTerm) (declaredName aliasTerm)
-    declare (Declaration alias) Default span (Just scopeAddress)
+    declare (Declaration alias) Default span (Just ScopeGraph.QualifiedAliasedImport) (Just scopeAddress)
     objFrame <- newFrame scopeAddress mempty
     val <- object objFrame
     aliasSlot <- lookupDeclaration (Declaration alias)

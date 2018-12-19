@@ -12,6 +12,7 @@ import           Data.JSON.Fields
 import           Diffing.Algorithm
 import qualified Data.Map.Strict as Map
 import Control.Abstract as Abstract
+import qualified Data.Abstract.ScopeGraph as ScopeGraph
 
 data JsxElement a = JsxElement { jsxOpeningElement :: !a,  jsxElements :: ![a], jsxClosingElement :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
@@ -98,7 +99,7 @@ instance Evaluatable RequiredParameter where
   eval eval ref RequiredParameter{..} = do
     name <- maybeM (throwNoNameError requiredParameterSubject) (declaredName requiredParameterSubject)
     span <- ask @Span
-    declare (Declaration name) Default span Nothing
+    declare (Declaration name) Default span (Just ScopeGraph.RequiredParameter) Nothing
 
     lhs <- ref requiredParameterSubject
     rhs <- eval requiredParameterValue

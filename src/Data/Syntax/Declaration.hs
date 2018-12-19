@@ -4,16 +4,17 @@ module Data.Syntax.Declaration where
 
 import           Control.Abstract hiding (Function)
 import           Data.Abstract.Evaluatable
+import           Data.Abstract.Name (__self)
+import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.JSON.Fields
+import qualified Data.Map.Strict as Map
 import qualified Data.Reprinting.Scope as Scope
 import qualified Data.Set as Set
-import qualified Data.Map.Strict as Map
+import           Data.Span (emptySpan)
 import           Diffing.Algorithm
 import           Prologue
 import           Proto3.Suite.Class
 import           Reprinting.Tokenize hiding (Superclass)
-import Data.Span (emptySpan)
-import Data.Abstract.Name (__self)
 
 data Function a = Function { functionContext :: ![a], functionName :: !a, functionParameters :: ![a], functionBody :: !a }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, ToJSONFields1, Named1, Message1, NFData1)
@@ -32,11 +33,13 @@ instance Evaluatable Function where
   eval _ _ Function{..} = do
     name <- maybeM (throwNoNameError functionName) (declaredName functionName)
     span <- ask @Span
-    associatedScope <- declareFunction name span
+    associatedScope <- declareFunction name span ScopeGraph.Function
 
     params <- withScope associatedScope . for functionParameters $ \paramNode -> do
       param <- maybeM (throwNoNameError paramNode) (declaredName paramNode)
-      param <$ declare (Declaration param) Default span Nothing
+      -- TODO: This might be a motivation for a typeclass for `declarationKind` since we
+      -- sometimes create declarations for our children.
+      param <$ declare (Declaration param) Default span (Just ScopeGraph.Parameter) Nothing
 
     addr <- lookupDeclaration (Declaration name)
     v <- function name params functionBody associatedScope
@@ -51,12 +54,13 @@ declareFunction :: ( Carrier sig m
                    )
                 => Name
                 -> Span
+                -> ScopeGraph.Kind
                 -> Evaluator term address value m address
-declareFunction name span = do
+declareFunction name span kind = do
   currentScope' <- currentScope
   let lexicalEdges = Map.singleton Lexical [ currentScope' ]
   associatedScope <- newScope lexicalEdges
-  declare (Declaration name) Default span (Just associatedScope)
+  declare (Declaration name) Default span (Just kind) (Just associatedScope)
   pure associatedScope
 
 instance Tokenize Function where
@@ -88,14 +92,14 @@ instance Evaluatable Method where
   eval _ _ Method{..} = do
     name <- maybeM (throwNoNameError methodName) (declaredName methodName)
     span <- ask @Span
-    associatedScope <- declareFunction name span
+    associatedScope <- declareFunction name span ScopeGraph.Method
 
     params <- withScope associatedScope $ do
       -- TODO: Should we give `self` a special Relation?
-      declare (Declaration __self) Prelude emptySpan Nothing
+      declare (Declaration __self) Prelude emptySpan Nothing Nothing
       for methodParameters $ \paramNode -> do
         param <- maybeM (throwNoNameError paramNode) (declaredName paramNode)
-        param <$ declare (Declaration param) Default span Nothing
+        param <$ declare (Declaration param) Default span (Just ScopeGraph.Parameter) Nothing
 
     addr <- lookupDeclaration (Declaration name)
     v <- function name params methodBody associatedScope
@@ -164,7 +168,7 @@ instance Evaluatable VariableDeclaration where
   eval eval _ (VariableDeclaration decs) = do
     for_ decs $ \declaration -> do
       name <- maybeM (throwNoNameError declaration) (declaredName declaration)
-      declare (Declaration name) Default emptySpan Nothing
+      declare (Declaration name) Default emptySpan (Just ScopeGraph.VariableDeclaration) Nothing
       (span, _) <- do
         ref <- eval declaration
         subtermSpan <- get @Span
@@ -209,7 +213,7 @@ instance Evaluatable PublicFieldDefinition where
     span <- ask @Span
     propertyName <- maybeM (throwNoNameError publicFieldPropertyName) (declaredName publicFieldPropertyName)
 
-    declare (Declaration propertyName) Instance span Nothing
+    declare (Declaration propertyName) Instance span (Just ScopeGraph.PublicField) Nothing
     slot <- lookupDeclaration (Declaration propertyName)
     value <- eval publicFieldValue
     assign slot value
@@ -251,13 +255,13 @@ instance Evaluatable Class where
       superclassFrame <- scopedEnvironment =<< deref slot
       pure $ case (scope, superclassFrame) of
         (Just scope, Just frame) -> Just (scope, frame)
-        _ -> Nothing
+        _                        -> Nothing
 
     let superclassEdges = (Superclass, ) . pure . fst <$> catMaybes superScopes
         current = (Lexical, ) <$> pure (pure currentScope')
         edges = Map.fromList (superclassEdges <> current)
     classScope <- newScope edges
-    declare (Declaration name) Default span (Just classScope)
+    declare (Declaration name) Default span (Just ScopeGraph.Class) (Just classScope)
 
     let frameEdges = Map.singleton Superclass (Map.fromList (catMaybes superScopes))
     classFrame <- newFrame classScope frameEdges
@@ -351,7 +355,7 @@ instance Evaluatable TypeAlias where
     span <- ask @Span
     assocScope <- associatedScope (Declaration kindName)
     -- TODO: Should we consider a special Relation for `TypeAlias`?
-    declare (Declaration name) Default span assocScope
+    declare (Declaration name) Default span (Just ScopeGraph.TypeAlias) assocScope
 
     slot <- lookupDeclaration (Declaration name)
     kindSlot <- lookupDeclaration (Declaration kindName)
