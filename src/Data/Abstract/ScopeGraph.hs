@@ -3,6 +3,7 @@ module Data.Abstract.ScopeGraph
   ( Slot(..)
   , Info(..)
   , associatedScope
+  , lookupDeclaration
   , relationsOfScope
   , Declaration(..) -- TODO don't export these constructors
   , declare
