@@ -5,6 +5,7 @@ module Control.Abstract.ScopeGraph
   , declare
   , reference
   , newScope
+  , newPreludeScope
   , Declaration(..)
   , ScopeGraph
   , ScopeError(..)
@@ -131,6 +132,21 @@ newScope edges = do
   name <- gensym
   address <- alloc name
   address <$ modify (ScopeGraph.newScope address edges)
+
+-- | Inserts a new scope into the scope graph with the given edges.
+newPreludeScope :: ( Member (Allocator address) sig
+            , Member (State (ScopeGraph address)) sig
+            , Member Fresh sig
+            , Carrier sig m
+            , Ord address
+            )
+         => Map EdgeLabel [address]
+         -> Evaluator term address value m address
+newPreludeScope edges = do
+  -- Take the edges and construct a new scope
+  name <- gensym
+  address <- alloc name
+  address <$ modify (ScopeGraph.newPreludeScope address edges)
 
 newtype CurrentScope address = CurrentScope { unCurrentScope :: address }
 

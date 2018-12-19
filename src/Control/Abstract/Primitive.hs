@@ -39,7 +39,7 @@ defineBuiltIn :: ( HasCallStack
 defineBuiltIn declaration rel value = withCurrentCallStack callStack $ do
   currentScope' <- currentScope
   let lexicalEdges = Map.singleton Lexical [ currentScope' ]
-  associatedScope <- newScope lexicalEdges
+  associatedScope <- newPreludeScope lexicalEdges
   -- TODO: This span is still wrong.
   declare declaration rel emptySpan (Just associatedScope)
 
@@ -79,7 +79,7 @@ defineClass declaration superclasses body = void . define declaration Default $ 
     let superclassEdges = (Superclass, ) <$> (fmap pure . catMaybes $ superScopes)
         current = fmap (Lexical, ) . pure . pure $ currentScope'
         edges = Map.fromList (superclassEdges <> current)
-    childScope <- newScope edges
+    childScope <- newPreludeScope edges
     putDeclarationScope declaration childScope
 
     withScope childScope $ do

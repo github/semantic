@@ -12,6 +12,7 @@ module Data.Abstract.ScopeGraph
   , insertDeclarationSpan
   , insertImportReference
   , newScope
+  , newPreludeScope
   , insertScope
   , insertEdge
   , Path(..)
@@ -45,7 +46,7 @@ import           Prologue
 data Slot address = Slot { frameAddress :: address, position :: Position }
     deriving (Eq, Show, Ord, Generic, NFData)
 
-data Relation = Default | Instance
+data Relation = Default | Instance | Prelude
   deriving (Eq, Show, Ord, Generic, NFData)
 
 data Info scopeAddress = Info
@@ -56,11 +57,18 @@ data Info scopeAddress = Info
   } deriving (Eq, Show, Ord, Generic, NFData)
 
 -- Offsets and frame addresses in the heap should be addresses?
-data Scope address = Scope
-  { edges        :: Map EdgeLabel [address]
-  , references   :: Map Reference (Path address)
-  , declarations :: Seq (Info address)
-  } deriving (Eq, Show, Ord, Generic, NFData)
+data Scope address =
+    Scope {
+      edges        :: Map EdgeLabel [address]
+    , references   :: Map Reference (Path address)
+    , declarations :: Seq (Info address)
+    }
+  | PreludeScope {
+      edges        :: Map EdgeLabel [address]
+    , references   :: Map Reference (Path address)
+    , declarations :: Seq (Info address)
+    }
+  deriving (Eq, Show, Ord, Generic, NFData)
 
 instance Lower (Scope scopeAddress) where
   lowerBound = Scope mempty mempty mempty
@@ -235,6 +243,10 @@ insertDeclarationSpan decl@Declaration{..} span g = fromMaybe g $ do
 -- | Insert a new scope with the given address and edges into the scope graph.
 newScope :: Ord address => address -> Map EdgeLabel [address] -> ScopeGraph address -> ScopeGraph address
 newScope address edges = insertScope address (Scope edges mempty mempty)
+
+-- | Insert a new scope with the given address and edges into the scope graph.
+newPreludeScope :: Ord address => address -> Map EdgeLabel [address] -> ScopeGraph address -> ScopeGraph address
+newPreludeScope address edges = insertScope address (PreludeScope edges mempty mempty)
 
 insertScope :: Ord address => address -> Scope address -> ScopeGraph address -> ScopeGraph address
 insertScope address scope = ScopeGraph . Map.insert address scope . unScopeGraph
