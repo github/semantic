@@ -31,7 +31,6 @@ import Data.Blob
 import Data.Language
 import Data.Location
 import Data.Machine as Machine
-import Data.Range
 import Data.Term
 import Data.Text hiding (empty)
 
