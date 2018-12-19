@@ -658,7 +658,7 @@ instance Declarations a => Declarations (AbstractClass a) where
   declaredName AbstractClass{..} = declaredName abstractClassIdentifier
 
 instance Evaluatable AbstractClass where
-  eval eval _ term@AbstractClass{..} = do
+  eval eval _ AbstractClass{..} = do
     name <- maybeM (throwNoNameError abstractClassIdentifier) (declaredName abstractClassIdentifier)
     span <- ask @Span
     currentScope' <- currentScope
