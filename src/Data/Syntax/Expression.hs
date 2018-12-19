@@ -20,6 +20,7 @@ import qualified Data.Reprinting.Scope as Scope
 import qualified Data.Reprinting.Token as Token
 import           Diffing.Algorithm hiding (Delete)
 import           Reprinting.Tokenize hiding (Superclass)
+import qualified Data.Abstract.ScopeGraph as ScopeGraph
 
 -- | Typical prefix function application, like `f(x)` in many languages, or `f x` in Haskell.
 data Call a = Call { callContext :: ![a], callFunction :: !a, callParams :: ![a], callBlock :: !a }
@@ -509,7 +510,8 @@ instance Evaluatable MemberAccess where
     slot <- case lhsFrame of
       Just lhsFrame ->
         withScopeAndFrame lhsFrame $ do
-          reference (Reference rhs) (Declaration rhs)
+          span <- ask @Span
+          reference (Reference rhs) span ScopeGraph.MemberAccess (Declaration rhs)
           lookupDeclaration (Declaration rhs)
       -- Throw a ReferenceError since we're attempting to reference a name within a value that is not an Object.
       Nothing -> throwEvalError (ReferenceError lhsValue rhs)
@@ -522,7 +524,8 @@ instance Evaluatable MemberAccess where
     case lhsFrame of
       Just lhsFrame ->
         withScopeAndFrame lhsFrame $ do
-          reference (Reference rhs) (Declaration rhs)
+          span <- ask @Span
+          reference (Reference rhs) span ScopeGraph.MemberAccess (Declaration rhs)
           lookupDeclaration (Declaration rhs)
       -- Throw a ReferenceError since we're attempting to reference a name within a value that is not an Object.
       Nothing -> throwEvalError (ReferenceError lhsValue rhs)
@@ -662,7 +665,8 @@ instance Evaluatable New where
 
       -- TODO: This is a typescript specific name and we should allow languages to customize it.
       let constructorName = Name.name "constructor"
-      reference (Reference constructorName) (Declaration constructorName)
+      span <- ask @Span
+      reference (Reference constructorName) span ScopeGraph.New (Declaration constructorName)
       constructor <- deref =<< lookupDeclaration (Declaration constructorName)
       args <- traverse eval arguments
       boundConstructor <- bindThis objectVal constructor
@@ -702,5 +706,6 @@ instance Ord1 This where liftCompare = genericLiftCompare
 instance Show1 This where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable This where
   eval _ _ This = do
-    reference (Reference __self) (Declaration __self)
+    span <- ask @Span
+    reference (Reference __self) span ScopeGraph.This (Declaration __self)
     deref =<< lookupDeclaration (Declaration __self)

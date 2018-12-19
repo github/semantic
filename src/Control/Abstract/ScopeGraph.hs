@@ -84,11 +84,13 @@ reference :: forall address sig m term value
             , Carrier sig m
             )
           => Reference
+          -> Span
+          -> Kind
           -> Declaration
           -> Evaluator term address value m ()
-reference ref decl = do
+reference ref span kind decl = do
   currentAddress <- currentScope
-  modify @(ScopeGraph address) (ScopeGraph.reference ref decl currentAddress)
+  modify @(ScopeGraph address) (ScopeGraph.reference ref span kind decl currentAddress)
 
 -- | Combinator to insert an export edge from the current scope to the provided scope address.
 insertExportEdge :: (Member (Reader (CurrentScope scopeAddress)) sig, Member (State (ScopeGraph scopeAddress)) sig, Carrier sig m, Ord scopeAddress)
@@ -187,14 +189,16 @@ insertImportReference :: ( Member (Resumable (BaseError (ScopeError address))) s
                         , Ord address
                         )
                       => Reference
+                      -> Span
+                      -> Kind
                       -> Declaration
                       -> address
                       -> Evaluator term address value m ()
-insertImportReference ref decl scopeAddress = do
+insertImportReference ref span kind decl scopeAddress = do
   scopeGraph <- get
   scope <- lookupScope scopeAddress
   currentAddress <- currentScope
-  newScope <- maybeM (throwScopeError ImportReferenceError) (ScopeGraph.insertImportReference ref decl currentAddress scopeGraph scope)
+  newScope <- maybeM (throwScopeError ImportReferenceError) (ScopeGraph.insertImportReference ref span kind decl currentAddress scopeGraph scope)
   insertScope scopeAddress newScope
 
 insertScope :: ( Member (State (ScopeGraph address)) sig

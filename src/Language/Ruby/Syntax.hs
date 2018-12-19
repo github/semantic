@@ -81,7 +81,8 @@ instance Evaluatable Send where
     lhsFrame <- Abstract.scopedEnvironment lhsValue
 
     let callFunction = do
-          reference (Reference sel) (Declaration sel)
+          span <- ask @Span
+          reference (Reference sel) span ScopeGraph.Call (Declaration sel)
           func <- deref =<< lookupDeclaration (Declaration sel)
           args <- traverse eval sendArgs
           boundFunc <- bindThis lhsValue func

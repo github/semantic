@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DuplicateRecordFields, TupleSections #-}
+{-# LANGUAGE DeriveAnyClass, DuplicateRecordFields, TupleSections, LambdaCase #-}
 module Data.Abstract.ScopeGraph
   ( Slot(..)
   , Info(..)
@@ -22,6 +22,7 @@ module Data.Abstract.ScopeGraph
   , Position(..)
   , reference
   , Reference(..) -- TODO don't export these constructors
+  , ReferenceInfo(..)
   , Relation(..)
   , ScopeGraph(..)
   , Kind(..)
@@ -58,19 +59,25 @@ data Info scopeAddress = Info
   , infoAssociatedScope :: Maybe scopeAddress
   } deriving (Eq, Show, Ord, Generic, NFData)
 
-data Kind = TypeAlias | Class | Method | QualifiedAliasedImport | DefaultExport | Module | AbstractClass | Let | QualifiedImport | UnqualifiedImport | Assignment | RequiredParameter | PublicField | VariableDeclaration | Function | Parameter | Unknown
+data ReferenceInfo = ReferenceInfo
+  { refSpan :: Span
+  , refKind :: Kind
+  }
+  deriving (Eq, Show, Ord, Generic, NFData)
+
+data Kind = TypeAlias | Class | Method | QualifiedAliasedImport | DefaultExport | Module | AbstractClass | Let | QualifiedImport | UnqualifiedImport | Assignment | RequiredParameter | PublicField | VariableDeclaration | Function | Parameter | Unknown | Identifier | TypeIdentifier | This | New | MemberAccess | Call
   deriving (Eq, Show, Ord, Generic, NFData)
 
 -- Offsets and frame addresses in the heap should be addresses?
 data Scope address =
     Scope {
       edges        :: Map EdgeLabel [address]
-    , references   :: Map Reference (Path address)
+    , references   :: Map Reference ([ReferenceInfo], (Path address))
     , declarations :: Seq (Info address)
     }
   | PreludeScope {
       edges        :: Map EdgeLabel [address]
-    , references   :: Map Reference (Path address)
+    , references   :: Map Reference ([ReferenceInfo], Path address)
     , declarations :: Seq (Info address)
     }
   deriving (Eq, Show, Ord, Generic, NFData)
@@ -124,7 +131,7 @@ pathPosition (DPath _ p)   = p
 pathPosition (EPath _ _ p) = pathPosition p
 
 -- Returns the reference paths of a scope in a scope graph.
-pathsOfScope :: Ord scope => scope -> ScopeGraph scope -> Maybe (Map Reference (Path scope))
+pathsOfScope :: Ord scope => scope -> ScopeGraph scope -> Maybe (Map Reference ([ReferenceInfo], Path scope))
 pathsOfScope scope = fmap references . Map.lookup scope . unScopeGraph
 
 -- Returns the declaration data of a scope in a scope graph.
@@ -159,16 +166,16 @@ declare decl rel declSpan kind assocScope currentScope g = fromMaybe (g, Nothing
 
 -- | Add a reference to a declaration in the scope graph.
 -- Returns the original scope graph if the declaration could not be found.
-reference :: Ord scope => Reference -> Declaration -> scope -> ScopeGraph scope -> ScopeGraph scope
-reference ref decl currentAddress g = fromMaybe g $ do
+reference :: Ord scope => Reference -> Span -> Kind -> Declaration -> scope -> ScopeGraph scope -> ScopeGraph scope
+reference ref span kind decl currentAddress g = fromMaybe g $ do
   -- Start from the current address
   currentScope' <- lookupScope currentAddress g
   -- Build a path up to the declaration
-  flip (insertScope currentAddress) g . flip (insertReference ref) currentScope' <$> findPath (const Nothing) decl currentAddress g
+  flip (insertScope currentAddress) g . flip (insertReference ref span kind) currentScope' <$> findPath (const Nothing) decl currentAddress g
 
 -- | Insert a reference into the given scope by constructing a resolution path to the declaration within the given scope graph.
-insertImportReference :: Ord address => Reference -> Declaration -> address -> ScopeGraph address -> Scope address -> Maybe (Scope address)
-insertImportReference ref decl currentAddress g scope = flip (insertReference ref) scope . EPath Import currentAddress <$> findPath (const Nothing) decl currentAddress g
+insertImportReference :: Ord address => Reference -> Span -> Kind -> Declaration -> address -> ScopeGraph address -> Scope address -> Maybe (Scope address)
+insertImportReference ref span kind decl currentAddress g scope = flip (insertReference ref span kind) scope . EPath Import currentAddress <$> findPath (const Nothing) decl currentAddress g
 
 lookupScopePath :: Ord scopeAddress => Name -> scopeAddress -> ScopeGraph scopeAddress -> Maybe (Path scopeAddress)
 lookupScopePath declaration currentAddress g = findPath (flip (lookupReference declaration) g) (Declaration declaration) currentAddress g
@@ -195,8 +202,10 @@ foldGraph combine address graph = go lowerBound address
 pathToDeclaration :: Ord scopeAddress => Declaration -> scopeAddress -> ScopeGraph scopeAddress -> Maybe (Path scopeAddress)
 pathToDeclaration decl address g = DPath decl . snd <$> lookupDeclaration (unDeclaration decl) address g
 
-insertReference :: Reference -> Path scopeAddress -> Scope scopeAddress -> Scope scopeAddress
-insertReference ref path scope = scope { references = Map.insert ref path (references scope) }
+insertReference :: Reference -> Span -> Kind -> Path scopeAddress -> Scope scopeAddress -> Scope scopeAddress
+insertReference ref span kind path scope = scope { references = Map.alter (\case
+  Nothing -> pure ([ ReferenceInfo span kind ], path)
+  Just (refInfos, path) -> pure (ReferenceInfo span kind : refInfos, path)) ref (references scope) }
 
 lookupDeclaration :: Ord scopeAddress => Name -> scopeAddress -> ScopeGraph scopeAddress -> Maybe (Info scopeAddress, Position)
 lookupDeclaration name scope g = do
@@ -218,7 +227,7 @@ putDeclarationScopeAtPosition scope position assocScope g@(ScopeGraph graph) = f
   pure $ ScopeGraph (Map.adjust (\s -> s { declarations = seq }) scope graph)
 
 lookupReference :: Ord scopeAddress => Name -> scopeAddress -> ScopeGraph scopeAddress -> Maybe (Path scopeAddress)
-lookupReference  name scope g = Map.lookup (Reference name) =<< pathsOfScope scope g
+lookupReference  name scope g = fmap snd . Map.lookup (Reference name) =<< pathsOfScope scope g
 
 insertEdge :: Ord scopeAddress => EdgeLabel -> scopeAddress -> scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
 insertEdge label target currentAddress g@(ScopeGraph graph) = fromMaybe g $ do
@@ -271,7 +280,7 @@ pathOfRef :: (Ord scope) => Reference -> ScopeGraph scope -> Maybe (Path scope)
 pathOfRef ref graph = do
   scope <- scopeOfRef ref graph
   pathsMap <- pathsOfScope scope graph
-  Map.lookup ref pathsMap
+  snd <$> Map.lookup ref pathsMap
 
 -- Returns the scope the declaration was declared in.
 scopeOfDeclaration :: Ord scope => Declaration -> ScopeGraph scope -> Maybe scope
