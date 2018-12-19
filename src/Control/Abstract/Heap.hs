@@ -55,7 +55,7 @@ import qualified Data.Abstract.Heap as Heap
 import           Data.Abstract.Live
 import           Data.Abstract.Module (ModuleInfo)
 import           Data.Abstract.Name
-import           Data.Abstract.ScopeGraph (Path (..), Relation(..), putDeclarationScopeAtPosition)
+import           Data.Abstract.ScopeGraph (Kind(..), Path (..), Relation(..), putDeclarationScopeAtPosition)
 import qualified Data.Map.Strict as Map
 import           Data.Span (Span, emptySpan)
 import           Prologue
@@ -179,7 +179,7 @@ define :: ( HasCallStack
        -> Evaluator term address value m ()
 define declaration rel def = withCurrentCallStack callStack $ do
   -- TODO: This span is still wrong.
-  declare declaration rel emptySpan Nothing Nothing
+  declare declaration rel emptySpan Unknown Nothing
   slot <- lookupDeclaration declaration
   value <- def
   assign slot value

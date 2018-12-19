@@ -62,7 +62,7 @@ declare :: ( Carrier sig m
         => Declaration
         -> Relation
         -> Span
-        -> Maybe Kind
+        -> Kind
         -> Maybe address
         -> Evaluator term address value m ()
 declare decl rel span kind scope = do

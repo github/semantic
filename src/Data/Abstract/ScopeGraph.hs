@@ -54,11 +54,11 @@ data Info scopeAddress = Info
   { infoDeclaration :: Declaration
   , infoRelation :: Relation
   , infoSpan :: Span
-  , infoKind :: Maybe Kind
+  , infoKind :: Kind
   , infoAssociatedScope :: Maybe scopeAddress
   } deriving (Eq, Show, Ord, Generic, NFData)
 
-data Kind = TypeAlias | Class | Method | QualifiedAliasedImport | DefaultExport | Module | AbstractClass | Let | QualifiedImport | UnqualifiedImport | Assignment | RequiredParameter | PublicField | VariableDeclaration | Function | Parameter
+data Kind = TypeAlias | Class | Method | QualifiedAliasedImport | DefaultExport | Module | AbstractClass | Let | QualifiedImport | UnqualifiedImport | Assignment | RequiredParameter | PublicField | VariableDeclaration | Function | Parameter | Unknown
   deriving (Eq, Show, Ord, Generic, NFData)
 
 -- Offsets and frame addresses in the heap should be addresses?
@@ -146,7 +146,7 @@ lookupScope scope = Map.lookup scope . unScopeGraph
 
 -- Declare a declaration with a span and an associated scope in the scope graph.
 -- TODO: Return the whole value in Maybe or Either.
-declare :: Ord scope => Declaration -> Relation -> Span -> Maybe Kind -> Maybe scope -> scope -> ScopeGraph scope -> (ScopeGraph scope, Maybe Position)
+declare :: Ord scope => Declaration -> Relation -> Span -> Kind -> Maybe scope -> scope -> ScopeGraph scope -> (ScopeGraph scope, Maybe Position)
 declare decl rel declSpan kind assocScope currentScope g = fromMaybe (g, Nothing) $ do
   scope <- lookupScope currentScope g
 

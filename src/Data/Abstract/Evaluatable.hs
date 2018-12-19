@@ -27,7 +27,7 @@ import Data.Abstract.Declarations as X
 import Data.Abstract.FreeVariables as X
 import Data.Abstract.Module
 import Data.Abstract.Name as X
-import Data.Abstract.ScopeGraph (Relation(..))
+import qualified Data.Abstract.ScopeGraph as ScopeGraph 
 import Data.Language
 import Data.Scientific (Scientific)
 import Data.Semigroup.App
@@ -174,7 +174,7 @@ defineSelf :: ( AbstractValue term address value m
            => Evaluator term address value m ()
 defineSelf = do
   let self = Declaration X.__self
-  declare self Prelude emptySpan Nothing Nothing
+  declare self Prelude emptySpan ScopeGraph.Unknown Nothing
   slot <- lookupDeclaration self
   assign slot =<< object =<< currentFrame
 

@@ -152,7 +152,7 @@ instance Evaluatable Let where
     assocScope <- associatedScope (Declaration valueName)
 
     _ <- withLexicalScopeAndFrame $ do
-      declare (Declaration name) Default letSpan (Just ScopeGraph.Let) assocScope
+      declare (Declaration name) Default letSpan ScopeGraph.Let assocScope
       letVal <- eval letValue
       slot <- lookupDeclaration (Declaration name)
       assign slot letVal
