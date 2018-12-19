@@ -115,6 +115,13 @@ liftCons5 :: [Tier a] -> [Tier b] -> [Tier c] -> [Tier d] -> [Tier e] -> (a -> b
 liftCons5 tiers1 tiers2 tiers3 tiers4 tiers5 f = mapT (uncurry5 f) (tiers1 >< tiers2 >< tiers3 >< tiers4 >< tiers5) `addWeight` 1
   where uncurry5 f (a, (b, (c, (d, e)))) = f a b c d e
 
+-- | Lifts a senary constructor to a list of tiers, given lists of tiers for its arguments.
+--
+--   Commonly used in the definition of 'Listable1' and 'Listable2' instances.
+liftCons6 :: [Tier a] -> [Tier b] -> [Tier c] -> [Tier d] -> [Tier e] -> [Tier f] -> (a -> b -> c -> d -> e -> f -> g) -> [Tier g]
+liftCons6 tiers1 tiers2 tiers3 tiers4 tiers5 tiers6 f = mapT (uncurry6 f) (tiers1 >< tiers2 >< tiers3 >< tiers4 >< tiers5 >< tiers6) `addWeight` 1
+  where uncurry6 g (a, (b, (c, (d, (e, f))))) = g a b c d e f
+
 -- | Convenient wrapper for 'Listable1' type constructors and 'Listable' types, where a 'Listable' instance would necessarily be orphaned.
 newtype ListableF f a = ListableF { unListableF :: f a }
   deriving Show
