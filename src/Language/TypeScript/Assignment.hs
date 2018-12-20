@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
+{-# LANGUAGE DataKinds, LambdaCase, RankNTypes, TypeOperators #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-} -- FIXME
 module Language.TypeScript.Assignment
 ( assignment
@@ -484,14 +484,14 @@ parameter =  requiredParameter
 accessibilityModifier' :: Assignment Term
 accessibilityModifier' = makeTerm'
                       <$> symbol AccessibilityModifier
-                      <*> children (inject <$> do
-                        loc  <- location
-                        s <- source
-                        pure $ case s of
-                          "protected" -> Declaration.Protected $ makeTerm loc (Syntax.Identifier (name s))
-                          "private" -> Declaration.Private $ makeTerm loc (Syntax.Identifier (name s))
-                          -- | The catchall case is 'Declaration.Public'.
-                          _ -> Declaration.Public $ makeTerm loc (Syntax.Identifier (name s)))
+                      <*> children (inject <$> (source >>= pure . textToVisibility))
+
+textToVisibility :: Text -> Declaration.Visibility a
+textToVisibility = \case
+  "protected" -> Declaration.Protected
+  "private"   -> Declaration.Private
+  -- | The catchall case is public visibility.
+  _           -> Declaration.Public
 
 destructuringPattern :: Assignment Term
 destructuringPattern = object <|> array
@@ -674,9 +674,12 @@ classBodyStatements = makeTerm'' <$> symbol ClassBody <*> children (contextualiz
       Just cs -> formalParams <> toList cs
       Nothing -> formalParams
 
+publicVisibility :: Assignment Term
+publicVisibility = makeTerm <$> location <*> pure Declaration.Public
+
 publicFieldDefinition :: Assignment Term
-publicFieldDefinition = makeField <$> symbol Grammar.PublicFieldDefinition <*> children ((,,,,) <$> (term accessibilityModifier' <|> emptyTerm) <*> (term readonly' <|> emptyTerm) <*> term propertyName <*> (term typeAnnotation' <|> emptyTerm) <*> (term expression <|> emptyTerm))
-  where makeField loc (modifier, readonly, propertyName, annotation, expression) = makeTerm loc (Declaration.PublicFieldDefinition [modifier, readonly, annotation] propertyName expression)
+publicFieldDefinition = makeField <$> symbol Grammar.PublicFieldDefinition <*> children ((,,,,) <$> (term accessibilityModifier' <|> term publicVisibility) <*> (term readonly' <|> emptyTerm) <*> term propertyName <*> (term typeAnnotation' <|> emptyTerm) <*> (term expression <|> emptyTerm))
+  where makeField loc (modifier, readonly, propertyName, annotation, expression) = makeTerm loc (Declaration.PublicFieldDefinition [readonly, annotation] propertyName modifier expression)
 
 
 statement :: Assignment Term

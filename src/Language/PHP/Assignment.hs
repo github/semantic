@@ -446,7 +446,7 @@ classMemberDeclaration = choice [
 
 -- TODO: What should the `location` be for implicit `public` visibility modifier?
 publicVisibility :: Assignment Term
-publicVisibility = makeTerm <$> location <*> (Declaration.Public <$> emptyTerm)
+publicVisibility = makeTerm <$> location <*> pure Declaration.Public
 
 methodDeclaration :: Assignment Term
 methodDeclaration =  (makeTerm <$> symbol MethodDeclaration <*> children (makeMethod1 <$> (visibilityModifier <|> publicVisibility) <*> manyTerm methodModifier <*> emptyTerm <*> functionDefinitionParts))
