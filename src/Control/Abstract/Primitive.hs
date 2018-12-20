@@ -71,7 +71,7 @@ defineClass :: ( AbstractValue term address value m
             -> [Declaration]
             -> Evaluator term address value m a
             -> Evaluator term address value m ()
-defineClass declaration superclasses body = void . define declaration Default $ do
+defineClass declaration superclasses body = void . define declaration (Default Public) $ do
     currentScope' <- currentScope
 
     superScopes <- for superclasses associatedScope
@@ -106,7 +106,7 @@ defineNamespace :: ( AbstractValue term address value m
                 => Declaration
                 -> Evaluator term address value m a
                 -> Evaluator term address value m ()
-defineNamespace declaration@Declaration{..} body = void . define declaration Default $ do
+defineNamespace declaration@Declaration{..} body = void . define declaration (Default Public) $ do
   withChildFrame declaration $ \frame -> do
     _ <- body
     namespace unDeclaration frame

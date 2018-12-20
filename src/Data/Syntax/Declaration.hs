@@ -32,11 +32,11 @@ instance Evaluatable Function where
   eval _ _ Function{..} = do
     name <- maybeM (throwNoNameError functionName) (declaredName functionName)
     span <- ask @Span
-    associatedScope <- declareFunction name span
+    associatedScope <- declareFunction name (Default Control.Abstract.Public) span
 
     params <- withScope associatedScope . for functionParameters $ \paramNode -> do
       param <- maybeM (throwNoNameError paramNode) (declaredName paramNode)
-      param <$ declare (Declaration param) Default span Nothing
+      param <$ declare (Declaration param) (Default Control.Abstract.Public) span Nothing
 
     addr <- lookupDeclaration (Declaration name)
     v <- function name params functionBody associatedScope
@@ -113,10 +113,10 @@ instance Evaluatable Method where
     associatedScope <- declareFunction name span
 
     params <- withScope associatedScope $ do
-      declare (Declaration __self) Default emptySpan Nothing
+      declare (Declaration __self) (Default Control.Abstract.Public) emptySpan Nothing
       for methodParameters $ \paramNode -> do
         param <- maybeM (throwNoNameError paramNode) (declaredName paramNode)
-        param <$ declare (Declaration param) Default span Nothing
+        param <$ declare (Declaration param) (Default Control.Abstract.Public) span Nothing
 
     addr <- lookupDeclaration (Declaration name)
     v <- function name params methodBody associatedScope
@@ -185,7 +185,7 @@ instance Evaluatable VariableDeclaration where
   eval eval _ (VariableDeclaration decs) = do
     for_ decs $ \declaration -> do
       name <- maybeM (throwNoNameError declaration) (declaredName declaration)
-      declare (Declaration name) Default emptySpan Nothing
+      declare (Declaration name) (Default Control.Abstract.Public) emptySpan Nothing
       (span, _) <- do
         ref <- eval declaration
         subtermSpan <- get @Span
@@ -230,7 +230,7 @@ instance Evaluatable PublicFieldDefinition where
     span <- ask @Span
     propertyName <- maybeM (throwNoNameError publicFieldPropertyName) (declaredName publicFieldPropertyName)
 
-    declare (Declaration propertyName) Instance span Nothing
+    declare (Declaration propertyName) (Instance Control.Abstract.Public) span Nothing
     slot <- lookupDeclaration (Declaration propertyName)
     value <- eval publicFieldValue
     assign slot value
@@ -278,7 +278,7 @@ instance Evaluatable Class where
         current = (Lexical, ) <$> pure (pure currentScope')
         edges = Map.fromList (superclassEdges <> current)
     classScope <- newScope edges
-    declare (Declaration name) Default span (Just classScope)
+    declare (Declaration name) (Default Control.Abstract.Public) span (Just classScope)
 
     let frameEdges = Map.singleton Superclass (Map.fromList (catMaybes superScopes))
     classFrame <- newFrame classScope frameEdges
@@ -372,7 +372,7 @@ instance Evaluatable TypeAlias where
     span <- ask @Span
     assocScope <- associatedScope (Declaration kindName)
     -- TODO: Should we consider a special Relation for `TypeAlias`?
-    declare (Declaration name) Default span assocScope
+    declare (Declaration name) (Default Control.Abstract.Public) span assocScope
 
     slot <- lookupDeclaration (Declaration name)
     kindSlot <- lookupDeclaration (Declaration kindName)
