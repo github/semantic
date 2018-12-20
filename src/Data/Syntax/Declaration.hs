@@ -218,8 +218,11 @@ instance Declarations a => Declarations (InterfaceDeclaration a) where
 
 
 -- | A public field definition such as a field definition in a JavaScript class.
-data PublicFieldDefinition a = PublicFieldDefinition { publicFieldContext :: ![a], publicFieldPropertyName :: !a, publicFieldValue :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+data PublicFieldDefinition a = PublicFieldDefinition { publicFieldContext :: [a]
+                                                     , publicFieldPropertyName :: a
+                                                     , publicFieldVisibility :: a
+                                                     , publicFieldValue :: a
+                                                     } deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
 instance Eq1 PublicFieldDefinition where liftEq = genericLiftEq
 instance Ord1 PublicFieldDefinition where liftCompare = genericLiftCompare
