@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, TupleSections, UndecidableInstances #-}
+{-# LANGUAGE DeriveAnyClass, LambdaCase, MultiParamTypeClasses, ScopedTypeVariables, TupleSections, UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Data.Syntax.Declaration where
 
@@ -239,7 +239,6 @@ instance Evaluatable PublicFieldDefinition where
     value <- eval publicFieldValue
     assign slot value
     pure unit
-
 data Variable a = Variable { variableName :: !a, variableType :: !a, variableValue :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
