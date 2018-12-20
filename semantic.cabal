@@ -60,6 +60,7 @@ library
                      , Data.Abstract.Evaluatable
                      , Data.Abstract.FreeVariables
                      , Data.Abstract.Visibilities.Visibilities
+                     , Data.Abstract.Visibilities.Instances
                      , Data.Abstract.Heap
                      , Data.Abstract.Live
                      , Data.Abstract.Module
