@@ -90,7 +90,7 @@ instance Declarations1 Visibility where
   liftDeclaredName declaredName (Private a)   = declaredName a
 
 data Method a = Method { methodContext :: [a]
-                       , methodAccessibility :: a
+                       , methodVisibility :: a
                        , methodReceiver :: a
                        , methodName :: a
                        , methodParameters :: [a]
