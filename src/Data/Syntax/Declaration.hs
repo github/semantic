@@ -83,11 +83,11 @@ instance Show1 Data.Syntax.Declaration.Visibility where liftShowsPrec = genericL
 
 instance Evaluatable Data.Syntax.Declaration.Visibility
 
-instance Declarations1 Visibility where
-  liftDeclaredName declaredName (Unknown a)   = declaredName a
-  liftDeclaredName declaredName (Public a)    = declaredName a
-  liftDeclaredName declaredName (Protected a) = declaredName a
-  liftDeclaredName declaredName (Private a)   = declaredName a
+instance Visibilities1 Data.Syntax.Declaration.Visibility where
+  liftTermToVisibility _ Data.Syntax.Declaration.Public    = Just Control.Abstract.Public
+  liftTermToVisibility _ Data.Syntax.Declaration.Protected = Just Control.Abstract.Protected
+  liftTermToVisibility _ Data.Syntax.Declaration.Private   = Just Control.Abstract.Private
+  liftTermToVisibility _ Data.Syntax.Declaration.Unknown   = Just Control.Abstract.Unknown
 
 data Method a = Method { methodContext :: [a]
                        , methodVisibility :: a
