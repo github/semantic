@@ -50,13 +50,14 @@ declareFunction :: ( Carrier sig m
                    , Ord address
                    )
                 => Name
+                -> Relation
                 -> Span
                 -> Evaluator term address value m address
-declareFunction name span = do
+declareFunction name relation span = do
   currentScope' <- currentScope
   let lexicalEdges = Map.singleton Lexical [ currentScope' ]
   associatedScope <- newScope lexicalEdges
-  declare (Declaration name) Default span (Just associatedScope)
+  declare (Declaration name) relation span (Just associatedScope)
   pure associatedScope
 
 instance Tokenize Function where
@@ -110,7 +111,7 @@ instance Evaluatable Method where
   eval _ _ Method{..} = do
     name <- maybeM (throwNoNameError methodName) (declaredName methodName)
     span <- ask @Span
-    associatedScope <- declareFunction name span
+    associatedScope <- declareFunction name (Default (fromMaybe Control.Abstract.Public (termToVisibility methodVisibility))) span
 
     params <- withScope associatedScope $ do
       declare (Declaration __self) (Default Control.Abstract.Public) emptySpan Nothing
