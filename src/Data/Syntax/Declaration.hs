@@ -71,17 +71,17 @@ instance Declarations1 Function where
 instance FreeVariables1 Function where
   liftFreeVariables freeVariables f@Function{..} = foldMap freeVariables f `Set.difference` foldMap freeVariables functionParameters
 
-data Visibility a = Public { unPublic :: a }
-                  | Protected { unProtected :: a }
-                  | Private { unPrivate :: a }
-                  | Unknown { unUnknown :: a }
-                  deriving (Diffable, Eq, Ord, Show, Foldable, Traversable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Named1, Message1, NFData1)
+data Visibility a = Public
+                  | Protected
+                  | Private
+                  | Unknown
+                  deriving (Declarations1, Diffable, Eq, Ord, Show, Foldable, Traversable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Named1, Message1, NFData1)
 
-instance Eq1 Visibility where liftEq = genericLiftEq
-instance Ord1 Visibility where liftCompare = genericLiftCompare
-instance Show1 Visibility where liftShowsPrec = genericLiftShowsPrec
+instance Eq1 Data.Syntax.Declaration.Visibility where liftEq = genericLiftEq
+instance Ord1 Data.Syntax.Declaration.Visibility where liftCompare = genericLiftCompare
+instance Show1 Data.Syntax.Declaration.Visibility where liftShowsPrec = genericLiftShowsPrec
 
-instance Evaluatable Visibility
+instance Evaluatable Data.Syntax.Declaration.Visibility
 
 instance Declarations1 Visibility where
   liftDeclaredName declaredName (Unknown a)   = declaredName a
