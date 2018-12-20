@@ -13,6 +13,7 @@ module Control.Abstract.ScopeGraph
   , EdgeLabel(..)
   , CurrentScope(..)
   , Info(..)
+  , Visibility(..)
   , currentScope
   , insertExportEdge
   , insertImportEdge
@@ -44,7 +45,7 @@ import           Control.Effect.Carrier
 import           Data.Abstract.BaseError
 import           Data.Abstract.Module
 import           Data.Abstract.Name hiding (name)
-import           Data.Abstract.ScopeGraph (Declaration(..), EdgeLabel, Reference, Relation(..), Scope (..), ScopeGraph, Slot(..), Info(..))
+import           Data.Abstract.ScopeGraph (Declaration(..), EdgeLabel, Reference, Relation(..), Scope (..), ScopeGraph, Slot(..), Info(..), Visibility(..))
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.Span
 import           Prelude hiding (lookup)
@@ -156,10 +157,12 @@ relationsOfScope :: ( Member (State (ScopeGraph address)) sig
                     , Ord address
                     )
                 => address
-                -> Relation
+                -> [Relation]
                 -> Evaluator term address value m [ Info address ]
-relationsOfScope scope relation =
-  ScopeGraph.relationsOfScope scope relation <$> get
+relationsOfScope scope relations = do
+  g <- get
+  let infos = concatMap (\relation -> ScopeGraph.relationsOfScope scope relation g) relations
+  pure infos
 
 insertImportReference :: ( Member (Resumable (BaseError (ScopeError address))) sig
                         , Member (Reader ModuleInfo) sig
