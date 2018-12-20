@@ -59,6 +59,7 @@ library
                      , Data.Abstract.Declarations
                      , Data.Abstract.Evaluatable
                      , Data.Abstract.FreeVariables
+                     , Data.Abstract.Visibilities.Visibilities
                      , Data.Abstract.Heap
                      , Data.Abstract.Live
                      , Data.Abstract.Module
