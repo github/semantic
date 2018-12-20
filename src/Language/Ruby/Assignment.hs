@@ -336,12 +336,12 @@ method :: Assignment Term
 method = makeTerm <$> symbol Method <*> (withNewScope . children) (Declaration.Method [] <$> emptyTerm <*> visibility <*> methodSelector <*> params <*> expressions')
   where params = symbol MethodParameters *> children (many parameter) <|> pure []
         expressions' = makeTerm <$> location <*> many expression
-        visibility = makeTerm <$> location <*> (Declaration.Unknown <$> emptyTerm)
+        visibility = makeTerm <$> location <*> pure Declaration.Unknown
 
 singletonMethod :: Assignment Term
 singletonMethod = makeTerm <$> symbol SingletonMethod <*> (withNewScope . children) (Declaration.Method [] <$> expression <*> visibility <*> methodSelector <*> params <*> expressions)
   where params = symbol MethodParameters *> children (many parameter) <|> pure []
-        visibility = makeTerm <$> location <*> (Declaration.Unknown <$> emptyTerm)
+        visibility = makeTerm <$> location <*> pure Declaration.Unknown
 
 lambda :: Assignment Term
 lambda = makeTerm <$> symbol Lambda <*> (withExtendedScope . children) (

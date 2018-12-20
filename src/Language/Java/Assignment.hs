@@ -339,7 +339,7 @@ method = makeTerm <$> symbol MethodDeclaration <*> children (makeMethod <$> many
   where
     methodBody = symbol MethodBody *> children (term expression <|> emptyTerm)
     methodDeclarator = symbol MethodDeclarator *> children ( (,) <$> identifier <*> formalParameters)
-    accessibility = makeTerm <$> location <*> (Declaration.Unknown <$> emptyTerm)
+    accessibility = makeTerm <$> location <*> pure Declaration.Unknown
     methodHeader = symbol MethodHeader *> children ((,,,,) <$> (typeParameters <|> pure []) <*> manyTerm annotation <*> type' <*> methodDeclarator <*> (throws <|> pure []))
     makeMethod modifiers receiver accessibility (typeParams, annotations, returnType, (name, params), throws) = Declaration.Method (returnType : modifiers <> typeParams <> annotations <> throws) receiver accessibility name params
 
