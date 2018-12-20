@@ -46,6 +46,7 @@ import           Data.Abstract.Value.Abstract as Abstract
 import           Data.Abstract.Value.Concrete as Concrete
     (Value, ValueError (..), runValueErrorWith)
 import           Data.Abstract.Value.Type as Type
+import           Data.Abstract.Visibilities.Instances ()
 import           Data.Blob
 import           Data.File
 import           Data.Graph
@@ -67,7 +68,7 @@ import           Text.Show.Pretty (ppShow)
 
 data GraphType = ImportGraph | CallGraph
 
-type AnalysisClasses = '[ Declarations1, Eq1, Evaluatable, FreeVariables1, Foldable, Functor, Ord1, Show1 ]
+type AnalysisClasses = '[ Declarations1, Eq1, Evaluatable, FreeVariables1, Visibilities1, Foldable, Functor, Ord1, Show1 ]
 
 runGraph :: ( Member Distribute sig
             , Member (Error SomeException) sig
@@ -95,6 +96,7 @@ runGraph CallGraph includePackages project
 
 runCallGraph :: ( VertexDeclarationWithStrategy (VertexDeclarationStrategy syntax) syntax syntax
                 , Declarations1 syntax
+                , Visibilities1 syntax
                 , Ord1 syntax
                 , Functor syntax
                 , Evaluatable syntax
@@ -145,6 +147,7 @@ runModuleTable = raiseHandler $ runReader lowerBound
 runImportGraphToModuleInfos :: ( Declarations term
                                , Evaluatable (Base term)
                                , FreeVariables term
+                               , Visibilities term
                                , HasPrelude lang
                                , Member Trace sig
                                , Recursive term
@@ -161,6 +164,7 @@ runImportGraphToModuleInfos lang (package :: Package term) = runImportGraph lang
 runImportGraphToModules :: ( Declarations term
                            , Evaluatable (Base term)
                            , FreeVariables term
+                           , Visibilities term
                            , HasPrelude lang
                            , Member Trace sig
                            , Recursive term
@@ -177,6 +181,7 @@ runImportGraphToModules lang (package :: Package term) = runImportGraph lang pac
 runImportGraph :: ( Declarations term
                   , Evaluatable (Base term)
                   , FreeVariables term
+                  , Visibilities term
                   , HasPrelude lang
                   , Member Trace sig
                   , Recursive term
@@ -245,6 +250,7 @@ parsePythonPackage :: forall syntax sig m term.
                    ( Declarations1 syntax
                    , Evaluatable syntax
                    , FreeVariables1 syntax
+                   , Visibilities1 syntax
                    , Functor syntax
                    , term ~ Term syntax Location
                    , Member (Error SomeException) sig
