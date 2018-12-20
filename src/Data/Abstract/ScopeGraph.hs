@@ -51,6 +51,8 @@ data Visibility = Public
                 | Unknown
                 deriving (Eq, Show, Ord, Generic, NFData)
 
+data Relation = Default  Visibility
+              | Instance Visibility
   deriving (Eq, Show, Ord, Generic, NFData)
 
 data Info scopeAddress = Info
