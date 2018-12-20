@@ -1,5 +1,5 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, UndecidableInstances #-}
-{-# OPTIONS_GHC -Wno-warn-orphans, -Wno-missing-export-lists #-}
+{-# OPTIONS_GHC -Wno-orphans -Wno-missing-export-lists #-}
 module Data.Abstract.Visibilities.Instances where
 
 import Data.Sum
