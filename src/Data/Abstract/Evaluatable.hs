@@ -28,6 +28,7 @@ import Data.Abstract.FreeVariables as X
 import Data.Abstract.Module
 import Data.Abstract.Name as X
 import Data.Abstract.ScopeGraph (Relation(..))
+import Data.Abstract.Visibilities.Visibilities as X
 import Data.Language
 import Data.Scientific (Scientific)
 import Data.Semigroup.App
@@ -43,6 +44,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Carrier sig m
           , Declarations term
           , FreeVariables term
+          , Visibilities term
           , Member (Allocator address) sig
           , Member (Boolean value) sig
           , Member (While value) sig
@@ -137,26 +139,26 @@ instance HasPrelude 'PHP
 
 instance HasPrelude 'Python where
   definePrelude _ =
-    defineBuiltIn (Declaration $ X.name "print") Default Print
+    defineBuiltIn (Declaration $ X.name "print") (Default Public) Print
 
 instance HasPrelude 'Ruby where
   definePrelude _ = do
     defineSelf
 
-    defineBuiltIn (Declaration $ X.name "puts") Default Print
+    defineBuiltIn (Declaration $ X.name "puts") (Default Public) Print
 
     defineClass (Declaration (X.name "Object")) [] $ do
-      defineBuiltIn (Declaration $ X.name "inspect") Default Show
+      defineBuiltIn (Declaration $ X.name "inspect") (Default Public) Show
 
 instance HasPrelude 'TypeScript where
   definePrelude _ = do
     defineSelf
-    defineNamespace (Declaration (X.name "console")) $ defineBuiltIn (Declaration $ X.name "log") Default Print
+    defineNamespace (Declaration (X.name "console")) $ defineBuiltIn (Declaration $ X.name "log") (Default Public) Print
 
 instance HasPrelude 'JavaScript where
   definePrelude _ = do
     defineSelf
-    defineNamespace (Declaration (X.name "console")) $ defineBuiltIn (Declaration $ X.name "log") Default Print
+    defineNamespace (Declaration (X.name "console")) $ defineBuiltIn (Declaration $ X.name "log") (Default Public) Print
 
 defineSelf :: ( AbstractValue term address value m
               , Carrier sig m
@@ -174,7 +176,7 @@ defineSelf :: ( AbstractValue term address value m
            => Evaluator term address value m ()
 defineSelf = do
   let self = Declaration X.__self
-  declare self Default emptySpan Nothing
+  declare self (Default Public) emptySpan Nothing
   slot <- lookupDeclaration self
   assign slot =<< object =<< currentFrame
 
