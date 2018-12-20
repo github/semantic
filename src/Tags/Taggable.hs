@@ -3,7 +3,7 @@
 Taggable allows projecting syntax terms to a list of named symbols. In order to
 identify a new syntax as Taggable, you need to:
 
-1. Give that syntax a non-derived Taggable instance and implement as least the
+1. Give that syntax a non-derived Taggable instance and implement at least the
 'symbolName' method.
 
 2. Make sure that 'symbolsToSummarize' in Tagging.hs includes the string
