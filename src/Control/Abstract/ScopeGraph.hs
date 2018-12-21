@@ -51,7 +51,11 @@ import           Data.Span
 import           Prelude hiding (lookup)
 import           Prologue
 
-lookup :: (Ord address, Member (State (ScopeGraph address)) sig, Carrier sig m) => Reference -> Evaluator term address value m (Maybe address)
+lookup :: ( Ord address
+          , Member (State (ScopeGraph address)) sig
+          , Carrier sig m)
+       => Reference
+       -> Evaluator term address value m (Maybe address)
 lookup ref = ScopeGraph.scopeOfRef ref <$> get
 
 declare :: ( Carrier sig m
@@ -68,20 +72,34 @@ declare decl rel span scope = do
   currentAddress <- currentScope
   modify (fst . ScopeGraph.declare decl rel span scope currentAddress)
 
-putDeclarationScope :: (Ord address, Member (Reader (CurrentScope address)) sig, Member (State (ScopeGraph address)) sig, Carrier sig m) => Declaration -> address -> Evaluator term address value m ()
+putDeclarationScope :: ( Ord address
+                       , Member (Reader (CurrentScope address)) sig
+                       , Member (State (ScopeGraph address)) sig
+                       , Carrier sig m
+                       )
+                     => Declaration
+                     -> address
+                     -> Evaluator term address value m ()
 putDeclarationScope decl assocScope = do
   currentAddress <- currentScope
   modify (ScopeGraph.insertDeclarationScope decl assocScope currentAddress)
 
-putDeclarationSpan :: forall address sig m term value. (Ord address, Member (State (ScopeGraph address)) sig, Carrier sig m) => Declaration -> Span -> Evaluator term address value m ()
+putDeclarationSpan :: forall address sig m term value .
+                      ( Ord address
+                      , Member (State (ScopeGraph address)) sig
+                      , Carrier sig m
+                      )
+                   => Declaration
+                   -> Span
+                   -> Evaluator term address value m ()
 putDeclarationSpan decl = modify @(ScopeGraph address) . ScopeGraph.insertDeclarationSpan decl
 
-reference :: forall address sig m term value
-          . ( Ord address
-            , Member (State (ScopeGraph address)) sig
-            , Member (Reader (CurrentScope address)) sig
-            , Carrier sig m
-            )
+reference :: forall address sig m term value .
+             ( Ord address
+             , Member (State (ScopeGraph address)) sig
+             , Member (Reader (CurrentScope address)) sig
+             , Carrier sig m
+             )
           => Reference
           -> Declaration
           -> Evaluator term address value m ()
@@ -192,14 +210,13 @@ insertScope :: ( Member (State (ScopeGraph address)) sig
             -> Evaluator term address value m ()
 insertScope scopeAddress scope = modify (ScopeGraph.insertScope scopeAddress scope)
 
-maybeLookupScopePath ::
-                ( Member (State (ScopeGraph address)) sig
-                , Member (Reader (CurrentScope address)) sig
-                , Carrier sig m
-                , Ord address
-                )
-             => Declaration
-             -> Evaluator term address value m (Maybe (ScopeGraph.Path address))
+maybeLookupScopePath :: ( Member (State (ScopeGraph address)) sig
+                        , Member (Reader (CurrentScope address)) sig
+                        , Carrier sig m
+                        , Ord address
+                        )
+                     => Declaration
+                     -> Evaluator term address value m (Maybe (ScopeGraph.Path address))
 maybeLookupScopePath Declaration{..} = do
   currentAddress <- currentScope
   gets (ScopeGraph.lookupScopePath unDeclaration currentAddress)
@@ -220,13 +237,15 @@ lookupScopePath decl@Declaration{..} = do
   maybeM (throwScopeError $ LookupPathError decl) (ScopeGraph.lookupScopePath unDeclaration currentAddress scopeGraph)
 
 lookupDeclarationScope :: ( Member (Resumable (BaseError (ScopeError address))) sig
-                , Member (Reader ModuleInfo) sig
-                , Member (Reader Span) sig
-                , Member (State (ScopeGraph address)) sig
-                , Member (Reader (CurrentScope address)) sig
-                , Carrier sig m
-                , Ord address
-                ) => Declaration -> Evaluator term address value m address
+                          , Member (Reader ModuleInfo) sig
+                          , Member (Reader Span) sig
+                          , Member (State (ScopeGraph address)) sig
+                          , Member (Reader (CurrentScope address)) sig
+                          , Carrier sig m
+                          , Ord address
+                          )
+                       => Declaration
+                       -> Evaluator term address value m address
 lookupDeclarationScope decl = do
   path <- lookupScopePath decl
   currentScope' <- currentScope
@@ -248,8 +267,8 @@ throwScopeError :: ( Member (Resumable (BaseError (ScopeError address))) sig
                    , Member (Reader Span) sig
                    , Carrier sig m
                    )
-            => ScopeError address resume
-            -> Evaluator term address value m resume
+                => ScopeError address resume
+                -> Evaluator term address value m resume
 throwScopeError = throwBaseError
 
 data ScopeError address return where
