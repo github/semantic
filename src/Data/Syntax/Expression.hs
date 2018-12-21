@@ -506,15 +506,22 @@ instance Evaluatable MemberAccess where
   eval eval _ MemberAccess{..} = do
     lhsValue <- eval lhs
     lhsFrame <- Abstract.scopedEnvironment lhsValue
-    slot <- case lhsFrame of
+    rhsSlot <- case lhsFrame of
       Just lhsFrame ->
         withScopeAndFrame lhsFrame $ do
           reference (Reference rhs) (Declaration rhs)
           lookupDeclaration (Declaration rhs)
       -- Throw a ReferenceError since we're attempting to reference a name within a value that is not an Object.
       Nothing -> throwEvalError (ReferenceError lhsValue rhs)
-    value <- deref slot
-    bindThis lhsValue value
+
+    rhsValue <- deref rhsSlot
+    rhsFrame <- maybeM (throwEvalError $ ScopedEnvError rhsValue) =<< scopedEnvironment rhsValue
+    rhsScope <- scopeLookup rhsFrame
+    infos <- relationsOfScope rhsScope [(Instance Public), (Default Public)]
+
+    case (find (\Info{..} -> (Declaration rhs) == infoDeclaration) infos) of
+      Just _  -> bindThis lhsValue rhsValue
+      Nothing -> bindThis lhsValue =<< (throwEvalError $ DerefError rhsValue)
 
   ref eval _ MemberAccess{..} = do
     lhsValue <- eval lhs
