@@ -484,7 +484,7 @@ parameter =  requiredParameter
 accessibilityModifier' :: Assignment Term
 accessibilityModifier' = makeTerm'
                       <$> symbol AccessibilityModifier
-                      <*> children (inject <$> (source >>= pure . textToVisibility))
+                      <*> children (inject <$> (textToVisibility <$> source))
 
 textToVisibility :: Text -> Declaration.Visibility a
 textToVisibility = \case
