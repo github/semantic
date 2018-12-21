@@ -73,7 +73,7 @@ data Kind = TypeAlias | Class | Method | QualifiedAliasedImport | DefaultExport 
 data Scope address =
     Scope {
       edges        :: Map EdgeLabel [address]
-    , references   :: Map Reference ([ReferenceInfo], (Path address))
+    , references   :: Map Reference ([ReferenceInfo], Path address)
     , declarations :: Seq (Info address)
     }
   | PreludeScope {
