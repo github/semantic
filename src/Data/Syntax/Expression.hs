@@ -493,11 +493,11 @@ instance Tokenize Complement where
   tokenize Complement{..} = within' (Scope.Prefix BinaryComplement) $ yield Token.Sym <* value
 
 -- | Member Access (e.g. a.b)
-data MemberAccess a = MemberAccess { lhs :: a, rhs :: Name }
+data MemberAccess a = MemberAccess { lhs :: a, rhs :: a }
   deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
 instance Declarations1 MemberAccess where
-  liftDeclaredName _ MemberAccess{..} = Just rhs
+  liftDeclaredName declaredName MemberAccess{..} = declaredName rhs
 
 instance Eq1 MemberAccess where liftEq = genericLiftEq
 instance Ord1 MemberAccess where liftCompare = genericLiftCompare
@@ -532,7 +532,7 @@ instance Evaluatable MemberAccess where
 
 
 instance Tokenize MemberAccess where
-  tokenize MemberAccess{..} = lhs *> yield Access *> yield (Run (formatName rhs))
+  tokenize MemberAccess{..} = lhs *> yield Access <* rhs
 
 -- | Subscript (e.g a[1])
 data Subscript a = Subscript { lhs :: a, rhs :: [a] }
