@@ -224,6 +224,7 @@ instance ( Member (Allocator address) sig
     | Object address <- v = pure (Just address)
     | Class _ _ address <- v = pure (Just address)
     | Namespace _ address <- v = pure (Just address)
+    | Closure _ _ _ _ _ _ _ address <- v = pure (Just address)
     | otherwise = pure Nothing
 
   asString v
