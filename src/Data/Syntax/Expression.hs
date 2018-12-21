@@ -662,10 +662,14 @@ instance Evaluatable New where
       let constructorName = Name.name "constructor"
       span <- ask @Span
       reference (Reference constructorName) span ScopeGraph.New (Declaration constructorName)
-      constructor <- deref =<< lookupDeclaration (Declaration constructorName)
-      args <- traverse eval arguments
-      boundConstructor <- bindThis objectVal constructor
-      call boundConstructor args
+      maybeConstructor <- maybeLookupDeclaration (Declaration constructorName)
+      case maybeConstructor of
+        Just slot -> do
+          constructor <- deref slot
+          args <- traverse eval arguments
+          boundConstructor <- bindThis objectVal constructor
+          call boundConstructor args
+        Nothing -> pure objectVal
 
     pure objectVal
 
