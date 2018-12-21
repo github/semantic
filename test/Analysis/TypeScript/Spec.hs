@@ -1,3 +1,4 @@
+{-# Language GADTs #-}
 module Analysis.TypeScript.Spec (spec) where
 
 import           Control.Abstract.ScopeGraph
@@ -164,11 +165,10 @@ spec config = parallel $ do
         other                              -> expectationFailure (show other)
 
     it "prevents lookup of private members external to the instance" $ do
-      (scopeGraph, (heap, res)) <- evaluate ["class-private1.ts", "class-private2.ts"]
+      (_, (_, res)) <- evaluate ["class-private1.ts", "class-private2.ts"]
       case ModuleTable.lookup "class-private1.ts" <$> res of
-        Right (Just (Module _ (_, value))) -> value `shouldNotBe` (float 5.0)
-        other                              -> expectationFailure (show other)
-
+        Left (SomeError (BaseError _ _ (DerefError (Closure _ _ maybeName _ _ _ _ _)))) -> maybeName `shouldBe` (Just "private_add")
+        other                                                                           -> expectationFailure (show other)
 
 
   where
