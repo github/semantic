@@ -660,11 +660,11 @@ instance Evaluatable New where
 
       -- TODO: This is a typescript specific name and we should allow languages to customize it.
       let constructorName = Name.name "constructor"
-      span <- ask @Span
-      reference (Reference constructorName) span ScopeGraph.New (Declaration constructorName)
       maybeConstructor <- maybeLookupDeclaration (Declaration constructorName)
       case maybeConstructor of
         Just slot -> do
+          span <- ask @Span
+          reference (Reference constructorName) span ScopeGraph.New (Declaration constructorName)
           constructor <- deref slot
           args <- traverse eval arguments
           boundConstructor <- bindThis objectVal constructor
