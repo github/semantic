@@ -348,7 +348,7 @@ pointerType :: Assignment Term
 pointerType = makeTerm <$> symbol PointerType <*> children (Type.Pointer <$> expression)
 
 qualifiedType :: Assignment Term
-qualifiedType = makeTerm <$> symbol QualifiedType <*> children (Expression.MemberAccess <$> expression <*> (identifier' <|> typeIdentifier'))
+qualifiedType = makeTerm <$> symbol QualifiedType <*> children (Expression.MemberAccess <$> expression <*> (identifier <|> typeIdentifier))
 
 sliceType :: Assignment Term
 sliceType = makeTerm <$> symbol SliceType <*> children (Type.Slice <$> expression)
@@ -489,7 +489,7 @@ parenthesizedExpression :: Assignment Term
 parenthesizedExpression = symbol ParenthesizedExpression *> children expressions
 
 selectorExpression :: Assignment Term
-selectorExpression = makeWithContext <$> symbol SelectorExpression <*> children ((,,) <$> expression <*> optional comment <*> (identifier' <|> fieldIdentifier'))
+selectorExpression = makeWithContext <$> symbol SelectorExpression <*> children ((,,) <$> expression <*> optional comment <*> (identifier <|> fieldIdentifier))
   where makeWithContext loc (lhs, comment, rhs) = maybe (makeTerm loc (Expression.MemberAccess lhs rhs)) (\c -> makeTerm loc (Syntax.Context (c :| []) (makeTerm loc (Expression.MemberAccess lhs rhs)))) comment
 
 sliceExpression :: Assignment Term
