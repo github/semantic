@@ -8,7 +8,7 @@ import Control.DeepSeq
 import Data.Abstract.Declarations (Declarations)
 import Data.Abstract.FreeVariables (FreeVariables)
 import Data.Abstract.Visibilities.Visibilities
-import Data.Abstract.Visibilities.Instances
+import Data.Abstract.Visibilities.Instances ()
 import Data.Functor.Classes
 import Data.Functor.Foldable
 import Data.Term
