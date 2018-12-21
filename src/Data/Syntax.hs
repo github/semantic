@@ -166,11 +166,13 @@ instance Ord1 Identifier where liftCompare = genericLiftCompare
 instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Identifier where
-  eval eval ref' = ref eval ref' >=> deref
-
-  ref _ _ (Identifier name) = do
+  eval eval ref' term@(Identifier name) = do
+    -- FIXME: Set the span up correctly in ref so we can move the `reference` call there.
     span <- ask @Span
     reference (Reference name) span ScopeGraph.Identifier (Declaration name)
+    deref =<< ref eval ref' term
+
+  ref _ _ (Identifier name) = do
     lookupDeclaration (Declaration name)
 
 
