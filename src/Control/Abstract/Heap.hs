@@ -19,6 +19,7 @@ module Control.Abstract.Heap
 , newFrame
 , CurrentFrame(..)
 , currentFrame
+, lookupFrame
 , withScopeAndFrame
 , withLexicalScopeAndFrame
 , withChildFrame
@@ -289,6 +290,19 @@ lookupDeclarationFrame :: ( Member (State (Heap address address value)) sig
 lookupDeclarationFrame decl = do
   path <- lookupScopePath decl
   lookupFrameAddress path
+
+lookupFrame :: ( Member (State (Heap address address value)) sig
+               , Member (Reader ModuleInfo) sig
+               , Member (Reader Span) sig
+               , Member (Resumable (BaseError (HeapError address))) sig
+               , Ord address
+               , Carrier sig m
+               )
+             => address
+             -> Evaluator term address value m (Heap.Frame address address value)
+lookupFrame address = do
+  heap <- getHeap
+  maybeM (throwHeapError (LookupFrameError address)) (Heap.frameLookup address heap)
 
 -- | Follow a path through the heap and return the frame address associated with the declaration.
 lookupFrameAddress :: ( Member (State (Heap address address value)) sig
