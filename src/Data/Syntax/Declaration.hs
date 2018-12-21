@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, LambdaCase, MultiParamTypeClasses, ScopedTypeVariables, TupleSections, UndecidableInstances #-}
+{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, TupleSections, UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Data.Syntax.Declaration where
 
