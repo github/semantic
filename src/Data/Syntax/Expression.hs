@@ -504,29 +504,24 @@ instance Ord1 MemberAccess where liftCompare = genericLiftCompare
 instance Show1 MemberAccess where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable MemberAccess where
-  eval eval _ MemberAccess{..} = do
+  eval eval ref MemberAccess{..} = do
     lhsValue <- eval lhs
     lhsFrame <- Abstract.scopedEnvironment lhsValue
     slot <- case lhsFrame of
       Just lhsFrame ->
-        withScopeAndFrame lhsFrame $ do
-          span <- ask @Span
-          reference (Reference rhs) span ScopeGraph.MemberAccess (Declaration rhs)
-          lookupDeclaration (Declaration rhs)
+        -- FIXME: The span is not set up correctly when calling `ref` so we have to eval
+        -- it first
+        withScopeAndFrame lhsFrame (eval rhs >> ref rhs)
       -- Throw a ReferenceError since we're attempting to reference a name within a value that is not an Object.
       Nothing -> throwEvalError (ReferenceError lhsValue rhs)
     value <- deref slot
     bindThis lhsValue value
 
-  ref eval _ MemberAccess{..} = do
+  ref eval ref' MemberAccess{..} = do
     lhsValue <- eval lhs
     lhsFrame <- Abstract.scopedEnvironment lhsValue
     case lhsFrame of
-      Just lhsFrame ->
-        withScopeAndFrame lhsFrame $ do
-          span <- ask @Span
-          reference (Reference rhs) span ScopeGraph.MemberAccess (Declaration rhs)
-          lookupDeclaration (Declaration rhs)
+      Just lhsFrame -> withScopeAndFrame lhsFrame (ref' rhs)
       -- Throw a ReferenceError since we're attempting to reference a name within a value that is not an Object.
       Nothing -> throwEvalError (ReferenceError lhsValue rhs)
 
