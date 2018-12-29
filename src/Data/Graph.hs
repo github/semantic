@@ -27,8 +27,11 @@ import qualified Data.Set as Set
 
 -- | An algebraic graph with 'Ord', 'Semigroup', and 'Monoid' instances.
 newtype Graph vertex = Graph { unGraph :: G.Graph vertex }
-  deriving (Alternative, Applicative, Eq, Functor, Monad, Show, Class.Graph, Class.ToGraph, NFData)
+  deriving (Alternative, Applicative, Eq, Functor, Monad, Show, Class.Graph, NFData)
 
+instance Ord t => Class.ToGraph (Graph t) where
+  type ToVertex (Graph t) = t
+  toGraph = Class.toGraph . unGraph
 
 simplify :: Ord vertex => Graph vertex -> Graph vertex
 simplify (Graph graph) = Graph (G.simplify graph)
