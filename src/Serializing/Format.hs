@@ -13,7 +13,7 @@ import Data.ByteString.Builder
 import Language.Haskell.HsColour
 import Language.Haskell.HsColour.Colourise
 import Prologue
-import Serializing.DOT
+import Algebra.Graph.Export.Dot
 import Serializing.SExpression
 import Text.Show.Pretty
 
@@ -26,7 +26,7 @@ data Format input where
 data FormatStyle = Colourful | Plain
 
 runSerialize :: FormatStyle -> Format input -> input -> Builder
-runSerialize _         (DOT style)        = serializeDOT style
+runSerialize _         (DOT style)        = export style
 runSerialize _         JSON               = (<> "\n") . fromEncoding . toEncoding
 runSerialize _         (SExpression opts) = serializeSExpression opts
 runSerialize Colourful Show               = (<> "\n") . stringUtf8 . hscolour TTY defaultColourPrefs False False "" False . ppShow

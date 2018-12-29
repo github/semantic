@@ -207,7 +207,6 @@ library
                      , Semantic.Util.Pretty
                      , Semantic.Version
                      -- Serialization
-                     , Serializing.DOT
                      , Serializing.Format
                      , Serializing.SExpression
                      , Tags.Taggable
