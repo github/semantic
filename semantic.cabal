@@ -240,6 +240,7 @@ library
                      , Glob
                      , hashable
                      , haskeline
+                     , hostname
                      , hscolour
                      , http-client
                      , http-client-tls
