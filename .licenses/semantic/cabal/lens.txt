@@ -4,7 +4,7 @@ name: lens
 version: '4.17'
 summary: Lenses, Folds and Traversals
 homepage: https://github.com/ekmett/lens/
-license: bsd-3-clause
+license: bsd-2-clause
 ---
 Copyright 2012-2016 Edward Kmett
 

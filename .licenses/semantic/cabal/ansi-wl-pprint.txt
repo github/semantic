@@ -4,7 +4,7 @@ name: ansi-wl-pprint
 version: 0.6.8.2
 summary: The Wadler/Leijen Pretty Printer for colored ANSI terminal output
 homepage: https://github.com/ekmett/ansi-wl-pprint
-license: bsd-3-clause
+license: bsd-2-clause
 ---
 Copyright 2008, Daan Leijen and Max Bolingbroke. All rights reserved.
 
