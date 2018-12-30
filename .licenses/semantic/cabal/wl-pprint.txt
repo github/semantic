@@ -3,7 +3,7 @@ type: cabal
 name: wl-pprint
 version: 1.2.1
 summary: The Wadler/Leijen Pretty Printer
-homepage: 
+homepage:
 license: bsd-2-clause
 ---
 Copyright 2000, Daan Leijen. All rights reserved.
