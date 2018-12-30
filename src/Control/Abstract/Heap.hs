@@ -445,10 +445,10 @@ instance Eq address => Eq1 (HeapError address) where
 instance NFData address => NFData1 (HeapError address) where
   liftRnf _ x = case x of
     CurrentFrameError    -> ()
-    LookupAddressError a -> rnf x
-    LookupFrameError a   -> x `seq` ()
-    LookupLinksError a   -> rnf x
-    LookupLinkError p    -> rnf x
+    LookupAddressError a -> rnf a
+    LookupFrameError a   -> a `seq` ()
+    LookupLinksError a   -> rnf a
+    LookupLinkError p    -> rnf p
 
 instance (NFData address, NFData resume) => NFData (HeapError address resume) where
   rnf = liftRnf rnf
