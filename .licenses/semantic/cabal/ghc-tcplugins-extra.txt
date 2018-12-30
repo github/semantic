@@ -4,7 +4,7 @@ name: ghc-tcplugins-extra
 version: '0.3'
 summary: Utilities for writing GHC type-checker plugins
 homepage: https://github.com/clash-lang/ghc-tcplugins-extra
-license: bsd-3-clause
+license: bsd-2-clause
 ---
 Copyright (c) 2015-2016, University of Twente,
               2017-2018, QBayLogic

@@ -4,7 +4,7 @@ name: comonad
 version: 5.0.4
 summary: Comonads
 homepage: https://github.com/ekmett/comonad/
-license: bsd-3-clause
+license: bsd-2-clause
 ---
 Copyright 2008-2014 Edward Kmett
 Copyright 2004-2008 Dave Menendez

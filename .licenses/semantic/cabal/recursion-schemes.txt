@@ -4,7 +4,7 @@ name: recursion-schemes
 version: '5.1'
 summary: Generalized bananas, lenses and barbed wire
 homepage: https://github.com/ekmett/recursion-schemes/
-license: bsd-3-clause
+license: bsd-2-clause
 ---
 Copyright 2011-2015 Edward Kmett
 

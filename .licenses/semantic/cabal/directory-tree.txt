@@ -4,7 +4,7 @@ name: directory-tree
 version: 0.12.1
 summary: A simple directory-like tree datatype, with useful IO functions
 homepage: https://brandon.si/code/directory-tree-module-released/
-license: bsd-3-clause
+license: bsd-2-clause
 ---
 Copyright (c) 2009 Brandon Simmons
 

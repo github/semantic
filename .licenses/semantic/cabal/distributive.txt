@@ -4,7 +4,7 @@ name: distributive
 version: '0.6'
 summary: Distributive functors -- Dual to Traversable
 homepage: https://github.com/ekmett/distributive/
-license: bsd-3-clause
+license: bsd-2-clause
 ---
 Copyright 2011-2016 Edward Kmett
 
