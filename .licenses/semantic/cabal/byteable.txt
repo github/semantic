@@ -4,7 +4,7 @@ name: byteable
 version: 0.1.1
 summary: Type class for sequence of bytes
 homepage: https://github.com/vincenthz/hs-byteable
-license: bsd-3-clause
+license: other
 ---
 Copyright (c) 2013 Vincent Hanquez <vincent@snarc.org>
 

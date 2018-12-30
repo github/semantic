@@ -4,7 +4,7 @@ name: reflection
 version: 2.1.4
 summary: Reifies arbitrary terms into types that can be reflected back into terms
 homepage: https://github.com/ekmett/reflection
-license: bsd-3-clause
+license: other
 ---
 Copyright (c) 2009-2013 Edward Kmett
 Copyright (c) 2004 Oleg Kiselyov and Chung-chieh Shan

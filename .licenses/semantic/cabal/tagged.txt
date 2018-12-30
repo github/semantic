@@ -1,10 +1,10 @@
 ---
 type: cabal
 name: tagged
-version: 0.8.5
+version: 0.8.6
 summary: Haskell 98 phantom types to avoid unsafely passing dummy arguments
 homepage: https://github.com/ekmett/tagged
-license: bsd-3-clause
+license: other
 ---
 Copyright (c) 2009-2015 Edward Kmett
 All rights reserved.

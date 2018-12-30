@@ -1,10 +1,10 @@
 ---
 type: cabal
 name: profunctors
-version: 5.2.2
+version: '5.3'
 summary: Profunctors
 homepage: https://github.com/ekmett/profunctors/
-license: bsd-3-clause
+license: other
 ---
 Copyright 2011-2015 Edward Kmett
 

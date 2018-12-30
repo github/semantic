@@ -4,7 +4,7 @@ name: zlib
 version: 0.6.2
 summary: Compression and decompression in the gzip and zlib formats
 homepage: 
-license: bsd-3-clause
+license: other
 ---
 Copyright (c) 2006-2016, Duncan Coutts
 All rights reserved.

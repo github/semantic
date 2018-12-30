@@ -4,7 +4,7 @@ name: machines
 version: 0.6.4
 summary: Networked stream transducers
 homepage: https://github.com/ekmett/machines/
-license: bsd-3-clause
+license: other
 ---
 Copyright 2012-2015 Edward Kmett, Runar Bjarnason, Paul Chiusano
 

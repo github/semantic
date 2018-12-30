@@ -4,7 +4,7 @@ name: optional-args
 version: 1.0.2
 summary: Optional function arguments
 homepage: 
-license: bsd-3-clause
+license: other
 ---
 Copyright (c) 2015 Gabriel Gonzalez
 All rights reserved.

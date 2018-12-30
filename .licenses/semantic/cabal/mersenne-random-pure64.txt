@@ -4,7 +4,7 @@ name: mersenne-random-pure64
 version: 0.2.2.0
 summary: Generate high quality pseudorandom numbers purely using a Mersenne Twister
 homepage: https://code.haskell.org/~dons/code/mersenne-random-pure64/
-license: bsd-3-clause
+license: other
 ---
 Copyright (c) Don Stewart <dons@galois.com> 2008
 

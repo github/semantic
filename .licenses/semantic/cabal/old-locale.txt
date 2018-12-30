@@ -4,7 +4,7 @@ name: old-locale
 version: 1.0.0.7
 summary: locale library
 homepage: 
-license: bsd-3-clause
+license: other
 ---
 This library (libraries/base) is derived from code from two
 sources: 

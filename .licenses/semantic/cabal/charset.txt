@@ -4,7 +4,7 @@ name: charset
 version: 0.3.7.1
 summary: Fast unicode character sets based on complemented PATRICIA tries
 homepage: https://github.com/ekmett/charset
-license: bsd-3-clause
+license: other
 ---
 Copyright (c) 2010, Edward Kmett
 

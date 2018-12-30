@@ -4,7 +4,7 @@ name: vector-instances
 version: '3.4'
 summary: Orphan Instances for 'Data.Vector'
 homepage: https://github.com/ekmett/vector-instances
-license: bsd-3-clause
+license: other
 ---
 Copyright (c)2010, Edward Kmett
 

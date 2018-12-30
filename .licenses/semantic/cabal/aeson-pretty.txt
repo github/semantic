@@ -4,7 +4,7 @@ name: aeson-pretty
 version: 0.8.7
 summary: JSON pretty-printing library and command-line tool.
 homepage: https://github.com/informatikr/aeson-pretty
-license: bsd-3-clause
+license: other
 ---
 Copyright (c)2011, Falko Peters
 

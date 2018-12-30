@@ -3,7 +3,7 @@ type: cabal
 name: data-default-class
 version: 0.1.2.0
 summary: A class for types with a default value
-homepage: https://github.com/mauke/data-default
+homepage: 
 license: bsd-3-clause
 ---
 Copyright (c) 2013 Lukas Mai

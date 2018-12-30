@@ -4,7 +4,7 @@ name: haskell-src
 version: 1.0.3.0
 summary: Support for manipulating Haskell source code
 homepage: 
-license: bsd-3-clause
+license: other
 ---
 The Glasgow Haskell Compiler License
 

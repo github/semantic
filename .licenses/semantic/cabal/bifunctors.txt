@@ -4,7 +4,7 @@ name: bifunctors
 version: 5.5.3
 summary: Bifunctors
 homepage: https://github.com/ekmett/bifunctors/
-license: bsd-2-clause
+license: other
 ---
 Copyright 2008-2016 Edward Kmett
 

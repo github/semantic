@@ -4,7 +4,7 @@ name: socks
 version: 0.5.6
 summary: Socks proxy (ver 5)
 homepage: https://github.com/vincenthz/hs-socks
-license: bsd-3-clause
+license: other
 ---
 Copyright (c) 2010-2011 Vincent Hanquez <vincent@snarc.org>
 

@@ -4,7 +4,7 @@ name: hourglass
 version: 0.2.12
 summary: simple performant time related library
 homepage: https://github.com/vincenthz/hs-hourglass
-license: bsd-3-clause
+license: other
 ---
 Copyright (c) 2014 Vincent Hanquez <vincent@snarc.org>
 

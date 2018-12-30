@@ -1,10 +1,10 @@
 ---
 type: cabal
 name: fingertree
-version: 0.1.4.1
+version: 0.1.4.2
 summary: Generic finger-tree structure, with example instances
-homepage:
-license: bsd-3-clause
+homepage: 
+license: other
 ---
 The Glasgow Haskell Compiler License
 

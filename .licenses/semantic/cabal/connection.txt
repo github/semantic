@@ -4,7 +4,7 @@ name: connection
 version: 0.2.8
 summary: Simple and easy network connections API
 homepage: https://github.com/vincenthz/hs-connection
-license: bsd-3-clause
+license: other
 ---
 Copyright (c) 2012 Vincent Hanquez <vincent@snarc.org>
 

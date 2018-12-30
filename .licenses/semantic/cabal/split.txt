@@ -3,8 +3,8 @@ type: cabal
 name: split
 version: 0.2.3.3
 summary: Combinator library for splitting lists.
-homepage: https://github.com/byorgey/split
-license: bsd-3-clause
+homepage: 
+license: other
 ---
 Copyright (c) 2008 Brent Yorgey, Louis Wasserman
 

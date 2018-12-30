@@ -4,7 +4,7 @@ name: adjunctions
 version: '4.4'
 summary: Adjunctions and representable functors
 homepage: https://github.com/ekmett/adjunctions/
-license: bsd-2-clause
+license: other
 ---
 Copyright 2011-2014 Edward Kmett
 
