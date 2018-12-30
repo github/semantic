@@ -3,7 +3,7 @@ type: cabal
 name: deepseq
 version: 1.4.4.0
 summary: Deep evaluation of data structures
-homepage: 
+homepage: https://github.com/haskell/deepseq
 license: bsd-3-clause
 ---
 This library (deepseq) is derived from code from the GHC project which

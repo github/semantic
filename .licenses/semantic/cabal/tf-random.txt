@@ -3,7 +3,7 @@ type: cabal
 name: tf-random
 version: '0.5'
 summary: High-quality splittable pseudorandom number generator
-homepage: 
+homepage: https://hub.darcs.net/michal.palka/tf-random
 license: bsd-3-clause
 ---
 Copyright (c) 2012-2013, Michał Pałka
