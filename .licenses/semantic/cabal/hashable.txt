@@ -4,7 +4,7 @@ name: hashable
 version: 1.2.7.0
 summary: A class for types that can be converted to a hash value
 homepage: https://github.com/tibbe/hashable
-license: other
+license: bsd-3-clause
 ---
 Copyright Milan Straka 2010
 

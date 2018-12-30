@@ -4,7 +4,7 @@ name: profunctors
 version: '5.3'
 summary: Profunctors
 homepage: https://github.com/ekmett/profunctors/
-license: other
+license: bsd-3-clause
 ---
 Copyright 2011-2015 Edward Kmett
 

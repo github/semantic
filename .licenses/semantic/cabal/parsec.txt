@@ -4,7 +4,7 @@ name: parsec
 version: 3.1.13.0
 summary: Monadic parser combinators
 homepage: https://github.com/haskell/parsec
-license: other
+license: bsd-3-clause
 ---
 Copyright 1999-2000, Daan Leijen; 2007, Paolo Martini. All rights reserved.
 

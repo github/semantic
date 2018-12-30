@@ -4,7 +4,7 @@ name: ghc-heap
 version: 8.6.3
 summary: Functions for walking GHC's heap
 homepage: 
-license: other
+license: bsd-3-clause
 ---
 Copyright (c) 2012-2013, Joachim Breitner
 

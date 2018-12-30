@@ -4,7 +4,7 @@ name: cryptonite
 version: '0.25'
 summary: Cryptography Primitives sink
 homepage: https://github.com/haskell-crypto/cryptonite
-license: other
+license: bsd-3-clause
 ---
 Copyright (c) 2006-2015 Vincent Hanquez <vincent@snarc.org>
 

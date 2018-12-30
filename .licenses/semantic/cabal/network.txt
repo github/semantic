@@ -4,7 +4,7 @@ name: network
 version: 2.8.0.0
 summary: Low-level networking interface
 homepage: https://github.com/haskell/network
-license: other
+license: bsd-3-clause
 ---
 Copyright (c) 2002-2010, The University Court of the University of Glasgow.
 Copyright (c) 2007-2010, Johan Tibell

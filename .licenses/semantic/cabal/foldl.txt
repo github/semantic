@@ -4,7 +4,7 @@ name: foldl
 version: 1.4.5
 summary: Composable, streaming, and efficient left folds
 homepage: 
-license: other
+license: bsd-3-clause
 ---
 Copyright (c) 2013 Gabriel Gonzalez
 All rights reserved.

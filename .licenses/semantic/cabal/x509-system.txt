@@ -4,7 +4,7 @@ name: x509-system
 version: 1.6.6
 summary: Handle per-operating-system X.509 accessors and storage
 homepage: https://github.com/vincenthz/hs-certificate
-license: other
+license: bsd-3-clause
 ---
 Copyright (c) 2010-2013 Vincent Hanquez <vincent@snarc.org>
 

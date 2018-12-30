@@ -4,7 +4,7 @@ name: semigroups
 version: 0.18.5
 summary: Anything that associates
 homepage: https://github.com/ekmett/semigroups/
-license: other
+license: bsd-3-clause
 ---
 Copyright 2011-2015 Edward Kmett
 

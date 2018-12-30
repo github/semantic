@@ -4,7 +4,7 @@ name: hpc
 version: 0.6.0.3
 summary: Code Coverage Library for Haskell
 homepage: 
-license: other
+license: bsd-3-clause
 ---
 Copyright (c) 2006 Andy Gill, Colin Runciman
 Copyright (c) 2007 Andy Gill

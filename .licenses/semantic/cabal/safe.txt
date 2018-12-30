@@ -4,7 +4,7 @@ name: safe
 version: 0.3.17
 summary: Library of safe (exception free) functions
 homepage: https://github.com/ndmitchell/safe
-license: other
+license: bsd-3-clause
 ---
 Copyright Neil Mitchell 2007-2018.
 All rights reserved.

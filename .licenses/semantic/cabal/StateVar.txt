@@ -4,7 +4,7 @@ name: StateVar
 version: 1.1.1.1
 summary: State variables
 homepage: https://github.com/haskell-opengl/StateVar
-license: other
+license: bsd-3-clause
 ---
 Copyright (c) 2014-2015, Edward Kmett
 Copyright (c) 2009-2018, Sven Panne

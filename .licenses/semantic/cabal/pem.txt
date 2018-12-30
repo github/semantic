@@ -4,7 +4,7 @@ name: pem
 version: 0.2.4
 summary: Privacy Enhanced Mail (PEM) format reader and writer.
 homepage: https://github.com/vincenthz/hs-pem
-license: other
+license: bsd-3-clause
 ---
 Copyright (c) 2010-2018 Vincent Hanquez <vincent@snarc.org>
 

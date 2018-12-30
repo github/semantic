@@ -4,7 +4,7 @@ name: vector
 version: 0.12.0.2
 summary: Efficient Arrays
 homepage: https://github.com/haskell/vector
-license: other
+license: bsd-3-clause
 ---
 Copyright (c) 2008-2012, Roman Leshchinskiy
 All rights reserved.

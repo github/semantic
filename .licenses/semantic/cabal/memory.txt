@@ -4,7 +4,7 @@ name: memory
 version: 0.14.18
 summary: memory and related abstraction stuff
 homepage: https://github.com/vincenthz/hs-memory
-license: other
+license: bsd-3-clause
 ---
 Copyright (c) 2015-2018 Vincent Hanquez <vincent@snarc.org>
 Copyright (c) 2017-2018 Nicolas Di Prima <nicolas@primetype.co.uk>

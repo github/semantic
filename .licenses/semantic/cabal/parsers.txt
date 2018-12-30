@@ -4,7 +4,7 @@ name: parsers
 version: 0.12.9
 summary: Parsing combinators
 homepage: https://github.com/ekmett/parsers/
-license: other
+license: bsd-3-clause
 ---
 Copyright 2011-2013 Edward Kmett
 

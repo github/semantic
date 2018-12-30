@@ -4,7 +4,7 @@ name: ghc-boot
 version: 8.6.3
 summary: Shared functionality between GHC and its boot libraries
 homepage: 
-license: other
+license: bsd-3-clause
 ---
 The Glasgow Haskell Compiler License
 

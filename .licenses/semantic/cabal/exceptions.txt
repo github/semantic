@@ -4,7 +4,7 @@ name: exceptions
 version: 0.10.0
 summary: Extensible optionally-pure exceptions
 homepage: https://github.com/ekmett/exceptions/
-license: other
+license: bsd-3-clause
 ---
 Copyright 2013-2015 Edward Kmett
 Copyright 2012 Google Inc.

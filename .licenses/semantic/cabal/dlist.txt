@@ -4,7 +4,7 @@ name: dlist
 version: 0.8.0.5
 summary: Difference lists
 homepage: https://github.com/spl/dlist
-license: other
+license: bsd-3-clause
 ---
 Copyright (c) 2006-2009 Don Stewart, 2013-2016 Sean Leather
 

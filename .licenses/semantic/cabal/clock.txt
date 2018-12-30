@@ -4,7 +4,7 @@ name: clock
 version: 0.7.2
 summary: 'High-resolution clock functions: monotonic, realtime, cputime.'
 homepage: https://github.com/corsis/clock
-license: other
+license: bsd-3-clause
 ---
 Copyright (c) 2009-2012, Cetin Sert
 Copyright (c) 2010, Eugene Kirpichov

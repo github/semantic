@@ -4,7 +4,7 @@ name: cmark-gfm
 version: 0.1.6
 summary: Fast, accurate GitHub Flavored Markdown parser and renderer
 homepage: https://github.com/kivikakk/cmark-gfm-hs
-license: other
+license: bsd-3-clause
 ---
 Copyright (c) 2014, John MacFarlane
 
