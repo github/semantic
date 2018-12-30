@@ -4,7 +4,7 @@ name: quickcheck-instances
 version: 0.3.19
 summary: Common quickcheck instances
 homepage: https://github.com/phadej/qc-instances
-license: bsd-3-clause
+license: other
 ---
 Copyright (c)2012, Antoine Latter
 

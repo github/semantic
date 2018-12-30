@@ -4,7 +4,7 @@ name: asn1-parse
 version: 0.9.4
 summary: Simple monadic parser for ASN1 stream types.
 homepage: https://github.com/vincenthz/hs-asn1
-license: bsd-3-clause
+license: other
 ---
 Copyright (c) 2010-2013 Vincent Hanquez <vincent@snarc.org>
 

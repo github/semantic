@@ -4,7 +4,7 @@ name: fastsum
 version: 0.1.1.0
 summary: A fast open-union type suitable for 100+ contained alternatives
 homepage: https://github.com/patrickt/fastsum
-license: bsd-3-clause
+license: other
 ---
 Original work Copyright (c) 2016, Allele Dev
 Modified work Copyright (c) 2016, Patrick Thomson and Josh Vera

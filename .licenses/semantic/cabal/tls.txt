@@ -4,7 +4,7 @@ name: tls
 version: 1.4.1
 summary: TLS/SSL protocol native implementation (Server and Client)
 homepage: https://github.com/vincenthz/hs-tls
-license: bsd-3-clause
+license: other
 ---
 Copyright (c) 2010-2015 Vincent Hanquez <vincent@snarc.org>
 

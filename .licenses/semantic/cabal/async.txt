@@ -4,7 +4,7 @@ name: async
 version: 2.2.1
 summary: Run IO operations asynchronously and wait for their results
 homepage: https://github.com/simonmar/async
-license: bsd-3-clause
+license: other
 ---
 Copyright (c) 2012, Simon Marlow
 

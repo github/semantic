@@ -1,10 +1,10 @@
 ---
 type: cabal
 name: distributive
-version: 0.5.3
+version: '0.6'
 summary: Distributive functors -- Dual to Traversable
 homepage: https://github.com/ekmett/distributive/
-license: bsd-2-clause
+license: other
 ---
 Copyright 2011-2016 Edward Kmett
 

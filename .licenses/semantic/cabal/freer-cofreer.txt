@@ -4,7 +4,7 @@ name: freer-cofreer
 version: 0.0.0.1
 summary: Freer monads and Cofreer comonads.
 homepage: https://github.com/robrix/freer-cofreer
-license: bsd-3-clause
+license: other
 ---
 Copyright Rob Rix (c) 2017
 

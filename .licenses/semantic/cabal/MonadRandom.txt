@@ -4,7 +4,7 @@ name: MonadRandom
 version: 0.5.1.1
 summary: Random-number generation monad.
 homepage: 
-license: bsd-3-clause
+license: other
 ---
 Copyright (c) 2016, Brent Yorgey
 

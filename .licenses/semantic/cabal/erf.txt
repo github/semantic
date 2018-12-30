@@ -1,0 +1,8 @@
+---
+type: cabal
+name: erf
+version: 2.0.0.0
+summary: The error function, erf, and related functions.
+homepage: 
+license: none
+---

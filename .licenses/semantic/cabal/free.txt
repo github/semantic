@@ -1,10 +1,10 @@
 ---
 type: cabal
 name: free
-version: 5.0.2
+version: '5.1'
 summary: Monads for free
 homepage: https://github.com/ekmett/free/
-license: bsd-3-clause
+license: other
 ---
 Copyright 2008-2013 Edward Kmett
 

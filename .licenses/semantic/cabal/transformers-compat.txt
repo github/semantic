@@ -4,7 +4,7 @@ name: transformers-compat
 version: 0.6.2
 summary: A small compatibility shim for the transformers library
 homepage: https://github.com/ekmett/transformers-compat/
-license: bsd-3-clause
+license: other
 ---
 Copyright 2012-2015 Edward Kmett
 

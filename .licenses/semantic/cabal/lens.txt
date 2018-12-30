@@ -1,10 +1,10 @@
 ---
 type: cabal
 name: lens
-version: 4.16.1
+version: '4.17'
 summary: Lenses, Folds and Traversals
 homepage: https://github.com/ekmett/lens/
-license: bsd-2-clause
+license: other
 ---
 Copyright 2012-2016 Edward Kmett
 

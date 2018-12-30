@@ -4,7 +4,7 @@ name: utf8-string
 version: 1.0.1.1
 summary: Support for reading and writing UTF8 Strings
 homepage: https://github.com/glguy/utf8-string/
-license: bsd-3-clause
+license: other
 ---
 * Copyright (c) 2007, Galois Inc.
 * All rights reserved.

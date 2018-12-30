@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: generics-sop
-version: 0.3.2.0
+version: 0.4.0.1
 summary: Generic Programming using True Sums of Products
 homepage: 
 license: bsd-3-clause

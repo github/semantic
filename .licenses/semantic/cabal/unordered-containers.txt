@@ -4,7 +4,7 @@ name: unordered-containers
 version: 0.2.9.0
 summary: Efficient hashing-based container types
 homepage: https://github.com/tibbe/unordered-containers
-license: bsd-3-clause
+license: other
 ---
 Copyright (c) 2010, Johan Tibell
 

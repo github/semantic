@@ -1,10 +1,10 @@
 ---
 type: cabal
 name: semilattices
-version: 0.0.0.1
+version: 0.0.0.3
 summary: Semilattices
 homepage: https://github.com/robrix/semilattices
-license: bsd-3-clause
+license: other
 ---
 Copyright (c) 2017, Rob Rix
 
