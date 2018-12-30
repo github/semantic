@@ -4,7 +4,7 @@ name: cereal
 version: 0.5.7.0
 summary: A binary serialization library
 homepage: https://github.com/GaloisInc/cereal
-license: other
+license: bsd-3-clause
 ---
 Copyright (c) Lennart Kolmodin, Galois, Inc.
 

@@ -4,7 +4,7 @@ name: aeson
 version: 1.4.2.0
 summary: Fast JSON parsing and encoding
 homepage: https://github.com/bos/aeson
-license: other
+license: bsd-3-clause
 ---
 Copyright (c) 2011, MailRank, Inc.
 

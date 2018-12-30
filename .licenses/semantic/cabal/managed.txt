@@ -4,7 +4,7 @@ name: managed
 version: 1.0.6
 summary: A monad for managed values
 homepage: 
-license: other
+license: bsd-3-clause
 ---
 Copyright (c) 2014 Gabriel Gonzalez
 All rights reserved.

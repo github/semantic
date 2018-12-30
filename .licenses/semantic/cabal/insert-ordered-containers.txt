@@ -4,7 +4,7 @@ name: insert-ordered-containers
 version: 0.2.1.0
 summary: Associative containers retaining insertion order for traversals.
 homepage: https://github.com/phadej/insert-ordered-containers
-license: other
+license: bsd-3-clause
 ---
 Copyright (c) 2015, Oleg Grenrus
 

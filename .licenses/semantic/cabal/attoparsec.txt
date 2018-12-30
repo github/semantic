@@ -4,7 +4,7 @@ name: attoparsec
 version: 0.13.2.2
 summary: Fast combinator parsing for bytestrings and text
 homepage: https://github.com/bos/attoparsec
-license: other
+license: bsd-3-clause
 ---
 Copyright (c) Lennart Kolmodin
 

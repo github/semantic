@@ -4,7 +4,7 @@ name: contravariant
 version: '1.5'
 summary: Contravariant functors
 homepage: https://github.com/ekmett/contravariant/
-license: other
+license: bsd-3-clause
 ---
 Copyright 2007-2015 Edward Kmett
 

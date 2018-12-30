@@ -4,7 +4,7 @@ name: void
 version: 0.7.2
 summary: A Haskell 98 logically uninhabited data type
 homepage: https://github.com/ekmett/void
-license: other
+license: bsd-3-clause
 ---
 Copyright 2015 Edward Kmett
 

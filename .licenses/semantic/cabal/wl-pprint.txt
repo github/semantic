@@ -4,7 +4,7 @@ name: wl-pprint
 version: 1.2.1
 summary: The Wadler/Leijen Pretty Printer
 homepage: 
-license: other
+license: bsd-3-clause
 ---
 Copyright 2000, Daan Leijen. All rights reserved.
 

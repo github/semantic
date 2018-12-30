@@ -4,7 +4,7 @@ name: ghc-typelits-knownnat
 version: '0.6'
 summary: Derive KnownNat constraints from other KnownNat constraints
 homepage: https://clash-lang.org/
-license: other
+license: bsd-3-clause
 ---
 Copyright (c) 2016     , University of Twente,
               2017-2018, QBayLogic B.V.,

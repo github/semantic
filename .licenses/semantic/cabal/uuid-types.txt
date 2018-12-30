@@ -4,7 +4,7 @@ name: uuid-types
 version: 1.0.3
 summary: Type definitions for Universally Unique Identifiers
 homepage: https://github.com/aslatter/uuid
-license: other
+license: bsd-3-clause
 ---
 Copyright (c) 2008, Antoine Latter
 

@@ -4,7 +4,7 @@ name: asn1-types
 version: 0.3.2
 summary: ASN.1 types
 homepage: https://github.com/vincenthz/hs-asn1-types
-license: other
+license: bsd-3-clause
 ---
 Copyright (c) 2010-2013 Vincent Hanquez <vincent@snarc.org>
 

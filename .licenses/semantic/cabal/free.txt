@@ -4,7 +4,7 @@ name: free
 version: '5.1'
 summary: Monads for free
 homepage: https://github.com/ekmett/free/
-license: other
+license: bsd-3-clause
 ---
 Copyright 2008-2013 Edward Kmett
 

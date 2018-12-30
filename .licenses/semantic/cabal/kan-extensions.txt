@@ -4,7 +4,7 @@ name: kan-extensions
 version: '5.2'
 summary: Kan extensions, Kan lifts, the Yoneda lemma, and (co)density (co)monads
 homepage: https://github.com/ekmett/kan-extensions/
-license: other
+license: bsd-3-clause
 ---
 Copyright 2008-2016 Edward Kmett
 

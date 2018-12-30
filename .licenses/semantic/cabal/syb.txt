@@ -4,7 +4,7 @@ name: syb
 version: '0.7'
 summary: Scrap Your Boilerplate
 homepage: https://www.cs.uu.nl/wiki/GenericProgramming/SYB
-license: other
+license: bsd-3-clause
 ---
 This library (libraries/syb) is derived from code from several
 sources: 

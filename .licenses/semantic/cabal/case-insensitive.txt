@@ -4,7 +4,7 @@ name: case-insensitive
 version: 1.2.0.11
 summary: Case insensitive string comparison
 homepage: https://github.com/basvandijk/case-insensitive
-license: other
+license: bsd-3-clause
 ---
 Copyright (c) 2011-2013 Bas van Dijk
 

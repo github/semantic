@@ -4,7 +4,7 @@ name: blaze-builder
 version: 0.4.1.0
 summary: Efficient buffered output.
 homepage: https://github.com/lpsmith/blaze-builder
-license: other
+license: bsd-3-clause
 ---
 Copyright Jasper Van der Jeugt 2010, Simon Meier 2010 & 2011
 

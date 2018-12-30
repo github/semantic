@@ -4,7 +4,7 @@ name: semigroupoids
 version: 5.3.1
 summary: 'Semigroupoids: Category sans id'
 homepage: https://github.com/ekmett/semigroupoids
-license: other
+license: bsd-3-clause
 ---
 Copyright 2011-2015 Edward Kmett
 

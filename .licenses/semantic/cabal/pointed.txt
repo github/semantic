@@ -4,7 +4,7 @@ name: pointed
 version: 5.0.1
 summary: Pointed and copointed data
 homepage: https://github.com/ekmett/pointed/
-license: other
+license: bsd-3-clause
 ---
 Copyright 2008-2011 Edward Kmett
 

@@ -4,7 +4,7 @@ name: parallel
 version: 3.2.2.0
 summary: Parallel programming library
 homepage: 
-license: other
+license: bsd-3-clause
 ---
 This library (libraries/parallel) is derived from code from
 the GHC project which is largely (c) The University of

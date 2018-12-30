@@ -4,7 +4,7 @@ name: transformers-base
 version: 0.4.5.2
 summary: Lift computations from the bottom of a transformer stack
 homepage: https://github.com/mvv/transformers-base
-license: other
+license: bsd-3-clause
 ---
 Copyright (c) 2011, Mikhail Vorozhtsov, Bas van Dijk
 All rights reserved.
