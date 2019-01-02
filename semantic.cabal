@@ -209,7 +209,6 @@ library
                      , Semantic.Util.Pretty
                      , Semantic.Version
                      -- Serialization
-                     , Serializing.DOT
                      , Serializing.Format
                      , Serializing.SExpression
                      , Tags.Taggable
@@ -241,6 +240,7 @@ library
                      , Glob
                      , hashable
                      , haskeline
+                     , hostname
                      , hscolour
                      , http-client
                      , http-client-tls

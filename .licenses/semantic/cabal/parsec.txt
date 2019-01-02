@@ -3,7 +3,7 @@ type: cabal
 name: parsec
 version: 3.1.13.0
 summary: Monadic parser combinators
-homepage: https://github.com/hvr/parsec
+homepage: https://github.com/haskell/parsec
 license: bsd-2-clause
 ---
 Copyright 1999-2000, Daan Leijen; 2007, Paolo Martini. All rights reserved.

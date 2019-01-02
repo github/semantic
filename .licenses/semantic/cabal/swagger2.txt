@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: swagger2
-version: 2.2.2
+version: 2.3.1
 summary: Swagger 2.0 data model
 homepage: https://github.com/GetShopTV/swagger2
 license: bsd-3-clause
