@@ -244,16 +244,16 @@ insertDeclarationScope :: Ord scopeAddress => Declaration -> scopeAddress -> sco
 insertDeclarationScope Declaration{..} associatedScopeAddress scopeAddress g = fromMaybe g $ do
   declScopeAddress <- pathDeclarationScope scopeAddress =<< lookupScopePath unDeclaration scopeAddress g
   scope <- lookupScope declScopeAddress g
-  (declData, position) <- second unPosition <$> lookupDeclaration unDeclaration declScopeAddress g
-  pure $ insertScope declScopeAddress (scope { declarations = Seq.update position (declData { infoAssociatedScope = Just associatedScopeAddress }) (declarations scope) }) g
+  (declInfo, position) <- second unPosition <$> lookupDeclaration unDeclaration declScopeAddress g
+  pure $ insertScope declScopeAddress (scope { declarations = Seq.update position (declInfo { infoAssociatedScope = Just associatedScopeAddress }) (declarations scope) }) g
 
 -- | Insert a declaration span into the declaration in the scope graph.
 insertDeclarationSpan :: Ord scopeAddress => Declaration -> Span -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
 insertDeclarationSpan decl@Declaration{..} span g = fromMaybe g $ do
   declScopeAddress <- scopeOfDeclaration decl g
-  (declData, position) <- second unPosition <$> lookupDeclaration unDeclaration declScopeAddress g
+  (declInfo, position) <- second unPosition <$> lookupDeclaration unDeclaration declScopeAddress g
   scope <- lookupScope declScopeAddress g
-  pure $ insertScope declScopeAddress (scope { declarations = Seq.update position (declData { infoSpan = span }) (declarations scope) }) g
+  pure $ insertScope declScopeAddress (scope { declarations = Seq.update position (declInfo { infoSpan = span }) (declarations scope) }) g
 
 -- | Insert a new scope with the given address and edges into the scope graph.
 newScope :: Ord address => address -> Map EdgeLabel [address] -> ScopeGraph address -> ScopeGraph address

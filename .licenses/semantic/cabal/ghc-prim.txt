@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: ghc-prim
-version: 0.5.2.0
+version: 0.5.3
 summary: GHC primitives
 homepage: 
 license: bsd-3-clause

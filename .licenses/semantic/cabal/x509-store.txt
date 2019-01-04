@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: x509-store
-version: 1.6.6
+version: 1.6.7
 summary: X.509 collection accessing and storing methods
 homepage: https://github.com/vincenthz/hs-certificate
 license: bsd-3-clause

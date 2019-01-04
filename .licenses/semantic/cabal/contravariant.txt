@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: contravariant
-version: 1.4.1
+version: '1.5'
 summary: Contravariant functors
 homepage: https://github.com/ekmett/contravariant/
 license: bsd-3-clause
