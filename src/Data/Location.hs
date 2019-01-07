@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveAnyClass, DerivingVia #-}
 
 module Data.Location
   ( Location(..)
@@ -6,7 +6,7 @@ module Data.Location
   , Range(..)
   ) where
 
-import Prologue (Generic, NFData (..))
+import Prologue
 
 import Data.JSON.Fields
 import Data.Range
@@ -18,9 +18,7 @@ data Location
   , locationSpan  :: {-# UNPACK #-} Span
   }
   deriving (Eq, Ord, Show, Generic, NFData)
+  deriving Semigroup via GenericSemigroup Location
 
 instance ToJSONFields Location where
   toJSONFields Location{..} = toJSONFields locationByteRange <> toJSONFields locationSpan
-
-instance Semigroup Location where
-  (Location r1 sp1) <> (Location r2 sp2) = Location (r1 <> r2) (sp1 <> sp2)
