@@ -4,7 +4,7 @@ name: scientific
 version: 0.3.6.2
 summary: Numbers represented using scientific notation
 homepage: https://github.com/basvandijk/scientific
-license: other
+license: bsd-3-clause
 ---
 Copyright (c) 2013, Bas van Dijk
 

@@ -3,8 +3,8 @@ type: cabal
 name: proto3-wire
 version: 1.0.0
 summary: A low-level implementation of the Protocol Buffers (version 3) wire format
-homepage:
-license: apache-2.0
+homepage: 
+license: bsd-3-clause
 ---
 Copyright 2016 Awake Networks
 
