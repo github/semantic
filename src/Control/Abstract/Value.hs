@@ -41,6 +41,7 @@ module Control.Abstract.Value
 , liftNumeric2
 , Numeric(..)
 , NumericC(..)
+, Object(..)
 , runNumeric
 , castToInteger
 , liftBitwise
@@ -372,6 +373,18 @@ runBitwise = raiseHandler $ runBitwiseC . interpret
 
 newtype BitwiseC value m a = BitwiseC { runBitwiseC :: m a }
 
+
+data Object value (m :: * -> *) k
+  = Object value (value -> k)
+  | ScopedEnvironment value (value -> k)
+  deriving (Functor)
+
+instance HFunctor (Object value) where
+    hmap _ = coerce
+    {-# INLINE hmap #-}
+
+instance Effect (Object value) where
+    handle state handler = coerce . fmap (handler . (<$ state))
 
 class Show value => AbstractIntro value where
   -- | Construct a key-value pair for use in a hash.
