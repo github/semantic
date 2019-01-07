@@ -42,6 +42,7 @@ module Control.Abstract.Value
 , Numeric(..)
 , NumericC(..)
 , Object(..)
+, ObjectC(..)
 , runNumeric
 , castToInteger
 , liftBitwise
@@ -385,6 +386,8 @@ instance HFunctor (Object value) where
 
 instance Effect (Object value) where
     handle state handler = coerce . fmap (handler . (<$ state))
+
+newtype ObjectC value m a = ObjectC { runObjectC :: m a }
 
 class Show value => AbstractIntro value where
   -- | Construct a key-value pair for use in a hash.
