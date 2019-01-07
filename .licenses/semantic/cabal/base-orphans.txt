@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: base-orphans
-version: '0.7'
+version: '0.8'
 summary: Backwards-compatible orphan instances for base
 homepage: https://github.com/haskell-compat/base-orphans
 license: mit
