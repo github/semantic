@@ -98,49 +98,33 @@ newtype DefaultDeclaration a = DefaultDeclaration { defaultDeclarationContent ::
 
 instance Evaluatable DefaultDeclaration
 
-
 newtype VariableOperator a = VariableOperator { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
-
-instance Eq1 VariableOperator where liftEq = genericLiftEq
-instance Ord1 VariableOperator where liftCompare = genericLiftCompare
-instance Show1 VariableOperator where liftShowsPrec = genericLiftShowsPrec
+  deriving (Eq1, Show1, Ord1) via Generically VariableOperator
 
 instance Evaluatable VariableOperator
 
 newtype ConstructorOperator a = ConstructorOperator { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
-
-instance Eq1 ConstructorOperator where liftEq = genericLiftEq
-instance Ord1 ConstructorOperator where liftCompare = genericLiftCompare
-instance Show1 ConstructorOperator where liftShowsPrec = genericLiftShowsPrec
+  deriving (Eq1, Show1, Ord1) via Generically ConstructorOperator
 
 instance Evaluatable ConstructorOperator
 
 newtype TypeOperator a = TypeOperator { name :: Name }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
-
-instance Eq1 TypeOperator where liftEq = genericLiftEq
-instance Ord1 TypeOperator where liftCompare = genericLiftCompare
-instance Show1 TypeOperator where liftShowsPrec = genericLiftShowsPrec
+  deriving (Eq1, Show1, Ord1) via Generically TypeOperator
 
 instance Evaluatable TypeOperator
 
 newtype PromotedTypeOperator a = PromotedTypeOperator { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
-
-instance Eq1 PromotedTypeOperator where liftEq = genericLiftEq
-instance Ord1 PromotedTypeOperator where liftCompare = genericLiftCompare
-instance Show1 PromotedTypeOperator where liftShowsPrec = genericLiftShowsPrec
+  deriving (Eq1, Show1, Ord1) via Generically PromotedTypeOperator
 
 instance Evaluatable PromotedTypeOperator
 
 newtype VariableSymbol a = VariableSymbol { variableSymbolName :: Name }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
-
-instance Eq1 VariableSymbol where liftEq = genericLiftEq
-instance Ord1 VariableSymbol where liftCompare = genericLiftCompare
-instance Show1 VariableSymbol where liftShowsPrec = genericLiftShowsPrec
+  deriving (Eq1, Show1, Ord1) via Generically VariableSymbol
 
 instance Evaluatable VariableSymbol
 

@@ -42,10 +42,7 @@ instance Evaluatable QuasiQuotationDeclaration
 
 newtype QuasiQuotationQuoter a = QuasiQuotationQuoter { name :: Name }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
-
-instance Eq1 QuasiQuotationQuoter where liftEq = genericLiftEq
-instance Ord1 QuasiQuotationQuoter where liftCompare = genericLiftCompare
-instance Show1 QuasiQuotationQuoter where liftShowsPrec = genericLiftShowsPrec
+  deriving (Eq1, Show1, Ord1) via Generically QuasiQuotationQuoter
 
 instance Evaluatable QuasiQuotationQuoter
 
