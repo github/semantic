@@ -43,6 +43,7 @@ module Control.Abstract.Value
 , NumericC(..)
 , Object(..)
 , ObjectC(..)
+, runObject
 , runNumeric
 , castToInteger
 , liftBitwise
@@ -388,6 +389,12 @@ instance Effect (Object value) where
     handle state handler = coerce . fmap (handler . (<$ state))
 
 newtype ObjectC value m a = ObjectC { runObjectC :: m a }
+
+runObject :: Carrier (Object value :+: sig) (ObjectC value (Eff m))
+           => Evaluator term address value (ObjectC value (Eff m)) a
+           -> Evaluator term address value m a
+runObject = raiseHandler $ runObjectC . interpret
+
 
 class Show value => AbstractIntro value where
   -- | Construct a key-value pair for use in a hash.
