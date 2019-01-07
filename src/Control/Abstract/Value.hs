@@ -376,22 +376,22 @@ runBitwise = raiseHandler $ runBitwiseC . interpret
 newtype BitwiseC value m a = BitwiseC { runBitwiseC :: m a }
 
 
-data Object value (m :: * -> *) k
-  = Object value (value -> k)
-  | ScopedEnvironment value (value -> k)
+data Object address value (m :: * -> *) k
+  = Object address (value -> k)
+  | ScopedEnvironment value (Maybe address -> k)
   deriving (Functor)
 
-instance HFunctor (Object value) where
+instance HFunctor (Object address value) where
     hmap _ = coerce
     {-# INLINE hmap #-}
 
-instance Effect (Object value) where
+instance Effect (Object address value) where
     handle state handler = coerce . fmap (handler . (<$ state))
 
-newtype ObjectC value m a = ObjectC { runObjectC :: m a }
+newtype ObjectC address value m a = ObjectC { runObjectC :: m a }
 
-runObject :: Carrier (Object value :+: sig) (ObjectC value (Eff m))
-           => Evaluator term address value (ObjectC value (Eff m)) a
+runObject :: Carrier (Object address value :+: sig) (ObjectC address value (Eff m))
+           => Evaluator term address value (ObjectC address value (Eff m)) a
            -> Evaluator term address value m a
 runObject = raiseHandler $ runObjectC . interpret
 
