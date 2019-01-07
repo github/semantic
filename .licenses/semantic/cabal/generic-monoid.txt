@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: generic-monoid
-version: '0.0.1.0'
+version: '0.1.0.0'
 summary: Derive monoid instances for product types.
 homepage: https://github.com/luke-clifton/generic-monoid
 license: bsd-3-clause
