@@ -112,11 +112,11 @@ instance Carrier sig m
     UnsignedRShift _ _ k -> runBitwiseC (k Abstract))
 
 instance Carrier sig m
-      => Carrier (Object Abstract value :+: sig) (ObjectC Abstract value m) where
+      => Carrier (Object address Abstract :+: sig) (ObjectC address Abstract m) where
   ret = ObjectC . ret
   eff = ObjectC . handleSum (eff . handleCoercible) (\case
     Object _ k -> runObjectC (k Abstract)
-    ScopedEnvironment _ k -> runObjectC (k (Just Abstract)))
+    ScopedEnvironment _ k -> runObjectC (k Nothing))
 
 instance Ord address => ValueRoots address Abstract where
   valueRoots = mempty
