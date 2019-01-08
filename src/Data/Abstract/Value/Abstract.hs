@@ -111,6 +111,12 @@ instance Carrier sig m
     LiftBitwise2 _ _ _ k -> runBitwiseC (k Abstract)
     UnsignedRShift _ _ k -> runBitwiseC (k Abstract))
 
+instance Carrier sig m
+      => Carrier (Object Abstract value :+: sig) (ObjectC Abstract value m) where
+  ret = ObjectC . ret
+  eff = ObjectC . handleSum (eff . handleCoercible) (\case
+    Object _ k -> runObjectC (k Abstract)
+    ScopedEnvironment _ k -> runObjectC (k (Just Abstract)))
 
 instance Ord address => ValueRoots address Abstract where
   valueRoots = mempty
@@ -139,5 +145,3 @@ instance AbstractValue term address Abstract m where
   index _ _ = pure Abstract
 
   liftComparison _ _ _ = pure Abstract
-
-  object _ = pure Abstract
