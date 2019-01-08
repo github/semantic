@@ -16,6 +16,7 @@ import Data.Bits as X
 import Data.ByteString as X (ByteString)
 import Data.Coerce as X
 import Data.Functor.Both as X (Both, both, runBothWith)
+import Data.Int as X (Int8, Int16, Int32, Int64)
 import Data.IntMap as X (IntMap)
 import Data.IntSet as X (IntSet)
 import Data.Ix as X (Ix (..))
@@ -29,6 +30,7 @@ import Data.Set as X (Set)
 import Data.Sum as X (Sum, Element, Elements, (:<), (:<:), Apply (..), inject)
 import Data.Text as X (Text)
 import Data.These as X
+import Data.Word as X (Word8, Word16, Word32, Word64)
 
 import Control.Exception as X hiding (Handler (..), assert, evaluate, throw, throwIO, throwTo)
 
