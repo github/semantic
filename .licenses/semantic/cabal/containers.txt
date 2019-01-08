@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: containers
-version: 0.5.11.0
+version: 0.6.0.1
 summary: Assorted concrete container types
 homepage: 
 license: bsd-3-clause

@@ -312,7 +312,7 @@ identifier' :: Assignment Name
 identifier' = (symbol Identifier <|> symbol TypeIdentifier <|> symbol Identifier') *> (name <$> source)
 
 scopedIdentifier :: Assignment Term
-scopedIdentifier = makeTerm <$> symbol ScopedIdentifier <*> children (Expression.MemberAccess <$> term expression <*> identifier')
+scopedIdentifier = makeTerm <$> symbol ScopedIdentifier <*> children (Expression.MemberAccess <$> term expression <*> identifier)
 
 superInterfaces :: Assignment [Term]
 superInterfaces = symbol SuperInterfaces *> children (symbol InterfaceTypeList *> children(manyTerm type'))
@@ -345,7 +345,7 @@ generic :: Assignment Term
 generic = makeTerm <$> symbol Grammar.GenericType <*> children(Java.Syntax.GenericType <$> term type' <*> manyTerm type')
 
 methodInvocation :: Assignment Term
-methodInvocation = makeTerm <$> symbol MethodInvocation <*> children (uncurry Expression.Call <$> (callFunction <$> expression <*> optional ((,) <$ optional (token AnonRParen) <* token AnonDot <*> manyTerm typeArgument <*> identifier')) <*> (argumentList <|> pure []) <*> emptyTerm)
+methodInvocation = makeTerm <$> symbol MethodInvocation <*> children (uncurry Expression.Call <$> (callFunction <$> expression <*> optional ((,) <$ optional (token AnonRParen) <* token AnonDot <*> manyTerm typeArgument <*> identifier)) <*> (argumentList <|> pure []) <*> emptyTerm)
   where
     callFunction a (Just (typeArguments, b)) = (typeArguments, makeTerm1 (Expression.MemberAccess a b))
     callFunction a Nothing = ([], a)
@@ -355,7 +355,7 @@ methodReference = makeTerm <$> symbol Grammar.MethodReference <*> children (Java
   where new = makeTerm <$> token AnonNew <*> pure Java.Syntax.NewKeyword
 
 explicitConstructorInvocation :: Assignment Term
-explicitConstructorInvocation = makeTerm <$> symbol ExplicitConstructorInvocation <*> children (uncurry Expression.Call <$> (callFunction <$> term expression <*> optional ((,) <$ optional (token AnonRParen) <* token AnonDot <*> manyTerm type' <*> identifier')) <*> argumentList <*> emptyTerm)
+explicitConstructorInvocation = makeTerm <$> symbol ExplicitConstructorInvocation <*> children (uncurry Expression.Call <$> (callFunction <$> term expression <*> optional ((,) <$ optional (token AnonRParen) <* token AnonDot <*> manyTerm type' <*> identifier)) <*> argumentList <*> emptyTerm)
   where
     callFunction a (Just (typeArguments, b)) = (typeArguments, makeTerm1 (Expression.MemberAccess a b))
     callFunction a Nothing = ([], a)
@@ -410,7 +410,7 @@ type' =  choice [
      , makeTerm <$> symbol FloatingPointType <*> children (pure Type.Float)
      , makeTerm <$> symbol BooleanType <*> children (pure Type.Bool)
      , symbol ArrayType *> children (array <$> type' <*> dims) -- type rule recurs into itself
-     , makeTerm <$> symbol ScopedTypeIdentifier <*> children (Expression.MemberAccess <$> term type' <*> identifier')
+     , makeTerm <$> symbol ScopedTypeIdentifier <*> children (Expression.MemberAccess <$> term type' <*> identifier)
      , wildcard
      , identifier
      , typeIdentifier
@@ -646,7 +646,7 @@ castExpression :: Assignment Term
 castExpression = makeTerm <$> symbol CastExpression <*> children (flip Type.Annotation <$> type' <*> term expression)
 
 fieldAccess :: Assignment Term
-fieldAccess = makeTerm <$> symbol FieldAccess <*> children (Expression.MemberAccess <$> term expression <*> identifier')
+fieldAccess = makeTerm <$> symbol FieldAccess <*> children (Expression.MemberAccess <$> term expression <*> identifier)
 
 spreadParameter :: Assignment Term
 spreadParameter = makeTerm <$> symbol Grammar.SpreadParameter <*> children (Java.Syntax.SpreadParameter <$> (makeSingleDecl <$> manyTerm modifier <*> type' <*> variableDeclarator))

@@ -192,7 +192,7 @@ data EvalError term address value return where
   IntegerFormatError  :: Text -> EvalError term address value Integer
   NoNameError         :: term -> EvalError term address value Name
   RationalFormatError :: Text -> EvalError term address value Rational
-  ReferenceError      :: value -> Name -> EvalError term address value (Slot address)
+  ReferenceError      :: value -> term -> EvalError term address value (Slot address)
   ScopedEnvError      :: value -> EvalError term address value address
 
 throwNoNameError :: ( Carrier sig m

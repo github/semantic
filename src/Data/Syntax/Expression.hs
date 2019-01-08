@@ -493,46 +493,41 @@ instance Tokenize Complement where
   tokenize Complement{..} = within' (Scope.Prefix BinaryComplement) $ yield Token.Sym <* value
 
 -- | Member Access (e.g. a.b)
-data MemberAccess a = MemberAccess { lhs :: a, rhs :: Name }
+data MemberAccess a = MemberAccess { lhs :: a, rhs :: a }
   deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
 instance Declarations1 MemberAccess where
-  liftDeclaredName _ MemberAccess{..} = Just rhs
+  liftDeclaredName declaredName MemberAccess{..} = declaredName rhs
 
 instance Eq1 MemberAccess where liftEq = genericLiftEq
 instance Ord1 MemberAccess where liftCompare = genericLiftCompare
 instance Show1 MemberAccess where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable MemberAccess where
-  eval eval _ MemberAccess{..} = do
+  eval eval ref MemberAccess{..} = do
     lhsValue <- eval lhs
     lhsFrame <- Abstract.scopedEnvironment lhsValue
     slot <- case lhsFrame of
       Just lhsFrame ->
-        withScopeAndFrame lhsFrame $ do
-          span <- ask @Span
-          reference (Reference rhs) span ScopeGraph.MemberAccess (Declaration rhs)
-          lookupDeclaration (Declaration rhs)
+        -- FIXME: The span is not set up correctly when calling `ref` so we have to eval
+        -- it first
+        withScopeAndFrame lhsFrame (eval rhs >> ref rhs)
       -- Throw a ReferenceError since we're attempting to reference a name within a value that is not an Object.
       Nothing -> throwEvalError (ReferenceError lhsValue rhs)
     value <- deref slot
     bindThis lhsValue value
 
-  ref eval _ MemberAccess{..} = do
+  ref eval ref' MemberAccess{..} = do
     lhsValue <- eval lhs
     lhsFrame <- Abstract.scopedEnvironment lhsValue
     case lhsFrame of
-      Just lhsFrame ->
-        withScopeAndFrame lhsFrame $ do
-          span <- ask @Span
-          reference (Reference rhs) span ScopeGraph.MemberAccess (Declaration rhs)
-          lookupDeclaration (Declaration rhs)
+      Just lhsFrame -> withScopeAndFrame lhsFrame (ref' rhs)
       -- Throw a ReferenceError since we're attempting to reference a name within a value that is not an Object.
       Nothing -> throwEvalError (ReferenceError lhsValue rhs)
 
 
 instance Tokenize MemberAccess where
-  tokenize MemberAccess{..} = lhs *> yield Access *> yield (Run (formatName rhs))
+  tokenize MemberAccess{..} = lhs *> yield Access <* rhs
 
 -- | Subscript (e.g a[1])
 data Subscript a = Subscript { lhs :: a, rhs :: [a] }
@@ -665,12 +660,16 @@ instance Evaluatable New where
 
       -- TODO: This is a typescript specific name and we should allow languages to customize it.
       let constructorName = Name.name "constructor"
-      span <- ask @Span
-      reference (Reference constructorName) span ScopeGraph.New (Declaration constructorName)
-      constructor <- deref =<< lookupDeclaration (Declaration constructorName)
-      args <- traverse eval arguments
-      boundConstructor <- bindThis objectVal constructor
-      call boundConstructor args
+      maybeConstructor <- maybeLookupDeclaration (Declaration constructorName)
+      case maybeConstructor of
+        Just slot -> do
+          span <- ask @Span
+          reference (Reference constructorName) span ScopeGraph.New (Declaration constructorName)
+          constructor <- deref slot
+          args <- traverse eval arguments
+          boundConstructor <- bindThis objectVal constructor
+          call boundConstructor args
+        Nothing -> pure objectVal
 
     pure objectVal
 

@@ -209,7 +209,8 @@ instance VertexDeclarationWithStrategy 'Custom whole Declaration.Method where
   toVertexWithStrategy _ ann info term@Declaration.Method{} = (\n -> (methodVertex (formatName n) info (locationSpan ann), n)) <$> liftDeclaredName declaredName term
 
 instance VertexDeclarationWithStrategy 'Custom whole whole => VertexDeclarationWithStrategy 'Custom whole Expression.MemberAccess where
-  toVertexWithStrategy proxy ann info (Expression.MemberAccess (Term (In lhsAnn lhs)) name) =
-    case toVertexWithStrategy proxy lhsAnn info lhs of
-      Just (Variable n _ _, _) -> Just (variableVertex (n <> "." <> formatName name) info (locationSpan ann), name)
-      _ -> Just (variableVertex (formatName name) info (locationSpan ann), name)
+  toVertexWithStrategy proxy ann info (Expression.MemberAccess (Term (In lhsAnn lhs)) (Term (In rhsAnn rhs))) =
+    case (toVertexWithStrategy proxy lhsAnn info lhs, toVertexWithStrategy proxy rhsAnn info rhs) of
+      (Just (Variable n _ _, _), Just (_, name)) -> Just (variableVertex (n <> "." <> formatName name) info (locationSpan ann), name)
+      (_, Just (_, name)) -> Just (variableVertex (formatName name) info (locationSpan ann), name)
+      _ -> Nothing

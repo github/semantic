@@ -1,9 +1,9 @@
 ---
 type: cabal
 name: base64-bytestring
-version: 1.0.0.1
+version: 1.0.0.2
 summary: Fast base64 encoding and decoding for ByteStrings
-homepage: https://github.com/bos/base64-bytestring
+homepage: https://github.com/haskell/base64-bytestring
 license: bsd-3-clause
 ---
 Copyright (c) 2010 Bryan O'Sullivan <bos@serpentine.com>
