@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: binary
-version: 0.8.5.1
+version: 0.8.6.0
 summary: Binary serialisation for Haskell values using lazy ByteStrings
 homepage: https://github.com/kolmodin/binary
 license: bsd-3-clause
