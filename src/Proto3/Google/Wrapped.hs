@@ -8,7 +8,7 @@ import Prologue
 
 import Proto3.Suite
 
-newtype Wrapped a = Wrapped { wrappedValue :: a }
+newtype Wrapped a = Wrapped { value :: a }
   deriving (Eq, Show, Generic)
 
 instance Named (Wrapped Text) where nameOf _ = "StringValue"
