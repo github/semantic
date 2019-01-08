@@ -81,6 +81,14 @@ library
                      , Data.File
                      , Data.Functor.Both
                      , Data.Functor.Classes.Generic
+                     , Data.GitHub.Auth
+                     , Data.GitHub.IPVersion
+                     , Data.GitHub.Timestamp
+                     , Data.GitHub.Request.Context
+                     , Data.GitHub.Request.Method
+                     , Data.GitHub.Spamurai
+                     , Data.GitHub.User
+                     , Data.GitHub.User.Type
                      , Data.Graph
                      , Data.Graph.ControlFlowVertex
                      , Data.Graph.TermVertex
@@ -174,6 +182,8 @@ library
                      , Parsing.Parser
                      , Parsing.TreeSitter
                      , Paths_semantic
+                     , Proto3.Google.Wrapped
+                     , Proto3.Suite.Exts
                      -- Rendering formats
                      , Rendering.Graph
                      , Rendering.JSON
