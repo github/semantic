@@ -7,7 +7,7 @@ module Analysis.Abstract.Caching.FlowInsensitive
 
 import Control.Abstract
 import Data.Abstract.Module
-import Data.Map.Monoidal as Monoidal
+import Data.Map.Monoidal as Monoidal hiding (empty)
 import Prologue
 
 -- | Look up the set of values for a given configuration in the in-cache.

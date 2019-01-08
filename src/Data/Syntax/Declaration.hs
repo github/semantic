@@ -1,29 +1,28 @@
-{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, TupleSections, UndecidableInstances #-}
+{-# LANGUAGE DeriveAnyClass, DerivingVia, MultiParamTypeClasses, ScopedTypeVariables, TupleSections, UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Data.Syntax.Declaration where
 
+import           Prologue
+
+import           Proto3.Suite.Class
+import qualified Data.Map.Strict as Map
+import qualified Data.Set as Set
+
 import           Control.Abstract hiding (Function)
 import           Data.Abstract.Evaluatable
+import           Data.Abstract.Name (__self)
 import           Data.JSON.Fields
 import qualified Data.Reprinting.Scope as Scope
-import qualified Data.Set as Set
-import qualified Data.Map.Strict as Map
+import           Data.Span (emptySpan)
 import           Diffing.Algorithm
-import           Prologue
-import           Proto3.Suite.Class
 import           Reprinting.Tokenize hiding (Superclass)
-import Data.Span (emptySpan)
-import Data.Abstract.Name (__self)
 
 data Function a = Function { functionContext :: ![a], functionName :: !a, functionParameters :: ![a], functionBody :: !a }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, ToJSONFields1, Named1, Message1, NFData1)
+  deriving (Eq1, Show1, Ord1) via Generically Function
 
 instance Diffable Function where
   equivalentBySubterm = Just . functionName
-
-instance Eq1 Function where liftEq = genericLiftEq
-instance Ord1 Function where liftCompare = genericLiftCompare
-instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Filter the closed-over environment by the free variables in the term.
 -- TODO: How should we represent function types, where applicable?
@@ -74,10 +73,7 @@ instance FreeVariables1 Function where
 
 data Method a = Method { methodContext :: ![a], methodReceiver :: !a, methodName :: !a, methodParameters :: ![a], methodBody :: !a }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, ToJSONFields1, Named1, Message1, NFData1)
-
-instance Eq1 Method where liftEq = genericLiftEq
-instance Ord1 Method where liftCompare = genericLiftCompare
-instance Show1 Method where liftShowsPrec = genericLiftShowsPrec
+  deriving (Eq1, Show1, Ord1) via Generically Method
 
 instance Diffable Method where
   equivalentBySubterm = Just . methodName
@@ -117,10 +113,7 @@ instance FreeVariables1 Method where
 -- | A method signature in TypeScript or a method spec in Go.
 data MethodSignature a = MethodSignature { methodSignatureContext :: ![a], methodSignatureName :: !a, methodSignatureParameters :: ![a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
-
-instance Eq1 MethodSignature where liftEq = genericLiftEq
-instance Ord1 MethodSignature where liftCompare = genericLiftCompare
-instance Show1 MethodSignature where liftShowsPrec = genericLiftShowsPrec
+  deriving (Eq1, Show1, Ord1) via Generically MethodSignature
 
 -- TODO: Implement Eval instance for MethodSignature
 instance Evaluatable MethodSignature
@@ -128,21 +121,14 @@ instance Evaluatable MethodSignature
 
 newtype RequiredParameter a = RequiredParameter { requiredParameter :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
-
-instance Eq1 RequiredParameter where liftEq = genericLiftEq
-instance Ord1 RequiredParameter where liftCompare = genericLiftCompare
-instance Show1 RequiredParameter where liftShowsPrec = genericLiftShowsPrec
+  deriving (Eq1, Show1, Ord1) via Generically RequiredParameter
 
 -- TODO: Implement Eval instance for RequiredParameter
 instance Evaluatable RequiredParameter
 
-
 newtype OptionalParameter a = OptionalParameter { optionalParameter :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
-
-instance Eq1 OptionalParameter where liftEq = genericLiftEq
-instance Ord1 OptionalParameter where liftCompare = genericLiftCompare
-instance Show1 OptionalParameter where liftShowsPrec = genericLiftShowsPrec
+  deriving (Eq1, Show1, Ord1) via Generically OptionalParameter
 
 -- TODO: Implement Eval instance for OptionalParameter
 instance Evaluatable OptionalParameter
@@ -154,10 +140,7 @@ instance Evaluatable OptionalParameter
 -- | A declaration of possibly many variables such as var foo = 5, bar = 6 in JavaScript.
 newtype VariableDeclaration a = VariableDeclaration { variableDeclarations :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
-
-instance Eq1 VariableDeclaration where liftEq = genericLiftEq
-instance Ord1 VariableDeclaration where liftCompare = genericLiftCompare
-instance Show1 VariableDeclaration where liftShowsPrec = genericLiftShowsPrec
+  deriving (Eq1, Show1, Ord1) via Generically VariableDeclaration
 
 instance Evaluatable VariableDeclaration where
   eval _    _ (VariableDeclaration [])   = pure unit
@@ -183,10 +166,7 @@ instance Declarations a => Declarations (VariableDeclaration a) where
 
 data InterfaceDeclaration a = InterfaceDeclaration { interfaceDeclarationContext :: ![a], interfaceDeclarationIdentifier :: !a, interfaceDeclarationSuperInterfaces :: ![a], interfaceDeclarationBody :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
-
-instance Eq1 InterfaceDeclaration where liftEq = genericLiftEq
-instance Ord1 InterfaceDeclaration where liftCompare = genericLiftCompare
-instance Show1 InterfaceDeclaration where liftShowsPrec = genericLiftShowsPrec
+  deriving (Eq1, Show1, Ord1) via Generically InterfaceDeclaration
 
 -- TODO: Implement Eval instance for InterfaceDeclaration
 instance Evaluatable InterfaceDeclaration
@@ -198,10 +178,7 @@ instance Declarations a => Declarations (InterfaceDeclaration a) where
 -- | A public field definition such as a field definition in a JavaScript class.
 data PublicFieldDefinition a = PublicFieldDefinition { publicFieldContext :: ![a], publicFieldPropertyName :: !a, publicFieldValue :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
-
-instance Eq1 PublicFieldDefinition where liftEq = genericLiftEq
-instance Ord1 PublicFieldDefinition where liftCompare = genericLiftCompare
-instance Show1 PublicFieldDefinition where liftShowsPrec = genericLiftShowsPrec
+  deriving (Eq1, Show1, Ord1) via Generically PublicFieldDefinition
 
 -- TODO: Implement Eval instance for PublicFieldDefinition
 instance Evaluatable PublicFieldDefinition where
@@ -217,26 +194,20 @@ instance Evaluatable PublicFieldDefinition where
 
 data Variable a = Variable { variableName :: !a, variableType :: !a, variableValue :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
-
-instance Eq1 Variable where liftEq = genericLiftEq
-instance Ord1 Variable where liftCompare = genericLiftCompare
-instance Show1 Variable where liftShowsPrec = genericLiftShowsPrec
+  deriving (Eq1, Show1, Ord1) via Generically Variable
 
 -- TODO: Implement Eval instance for Variable
 instance Evaluatable Variable
 
 data Class a = Class { classContext :: ![a], classIdentifier :: !a, classSuperclasses :: ![a], classBody :: !a }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, FreeVariables1, ToJSONFields1, Named1, Message1, NFData1)
+  deriving (Eq1, Show1, Ord1) via Generically Class
 
 instance Declarations a => Declarations (Class a) where
   declaredName (Class _ name _ _) = declaredName name
 
 instance Diffable Class where
   equivalentBySubterm = Just . classIdentifier
-
-instance Eq1 Class where liftEq = genericLiftEq
-instance Ord1 Class where liftCompare = genericLiftCompare
-instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Class where
   eval eval _ Class{..} = do
@@ -276,10 +247,7 @@ instance Declarations1 Class where
 -- | A decorator in Python
 data Decorator a = Decorator { decoratorIdentifier :: !a, decoratorParamaters :: ![a], decoratorBody :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
-
-instance Eq1 Decorator where liftEq = genericLiftEq
-instance Ord1 Decorator where liftCompare = genericLiftCompare
-instance Show1 Decorator where liftShowsPrec = genericLiftShowsPrec
+  deriving (Eq1, Show1, Ord1) via Generically Decorator
 
 -- TODO: Implement Eval instance for Decorator
 instance Evaluatable Decorator
@@ -290,10 +258,7 @@ instance Evaluatable Decorator
 -- | An ADT, i.e. a disjoint sum of products, like 'data' in Haskell, or 'enum' in Rust or Swift.
 data Datatype a = Datatype { datatypeContext :: a, datatypeName :: a, datatypeConstructors :: [a], datatypeDeriving :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
-
-instance Eq1 Data.Syntax.Declaration.Datatype where liftEq = genericLiftEq
-instance Ord1 Data.Syntax.Declaration.Datatype where liftCompare = genericLiftCompare
-instance Show1 Data.Syntax.Declaration.Datatype where liftShowsPrec = genericLiftShowsPrec
+  deriving (Eq1, Show1, Ord1) via Generically Datatype
 
 -- TODO: Implement Eval instance for Datatype
 instance Evaluatable Data.Syntax.Declaration.Datatype
@@ -302,10 +267,7 @@ instance Evaluatable Data.Syntax.Declaration.Datatype
 -- | A single constructor in a datatype, or equally a 'struct' in C, Rust, or Swift.
 data Constructor a = Constructor { constructorContext :: [a], constructorName :: a, constructorFields :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
-
-instance Eq1 Data.Syntax.Declaration.Constructor where liftEq = genericLiftEq
-instance Ord1 Data.Syntax.Declaration.Constructor where liftCompare = genericLiftCompare
-instance Show1 Data.Syntax.Declaration.Constructor where liftShowsPrec = genericLiftShowsPrec
+  deriving (Eq1, Show1, Ord1) via Generically Constructor
 
 -- TODO: Implement Eval instance for Constructor
 instance Evaluatable Data.Syntax.Declaration.Constructor
@@ -314,10 +276,7 @@ instance Evaluatable Data.Syntax.Declaration.Constructor
 -- | Comprehension (e.g. ((a for b in c if a()) in Python)
 data Comprehension a = Comprehension { comprehensionValue :: !a, comprehensionBody :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
-
-instance Eq1 Comprehension where liftEq = genericLiftEq
-instance Ord1 Comprehension where liftCompare = genericLiftCompare
-instance Show1 Comprehension where liftShowsPrec = genericLiftShowsPrec
+  deriving (Eq1, Show1, Ord1) via Generically Comprehension
 
 -- TODO: Implement Eval instance for Comprehension
 instance Evaluatable Comprehension
@@ -326,10 +285,7 @@ instance Evaluatable Comprehension
 -- | A declared type (e.g. `a []int` in Go).
 data Type a = Type { typeName :: !a, typeKind :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
-
-instance Eq1 Type where liftEq = genericLiftEq
-instance Ord1 Type where liftCompare = genericLiftCompare
-instance Show1 Type where liftShowsPrec = genericLiftShowsPrec
+  deriving (Eq1, Show1, Ord1) via Generically Type
 
 -- TODO: Implement Eval instance for Type
 instance Evaluatable Type
@@ -338,10 +294,7 @@ instance Evaluatable Type
 -- | Type alias declarations in Javascript/Haskell, etc.
 data TypeAlias a = TypeAlias { typeAliasContext :: ![a], typeAliasIdentifier :: !a, typeAliasKind :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
-
-instance Eq1 TypeAlias where liftEq = genericLiftEq
-instance Ord1 TypeAlias where liftCompare = genericLiftCompare
-instance Show1 TypeAlias where liftShowsPrec = genericLiftShowsPrec
+  deriving (Eq1, Show1, Ord1) via Generically TypeAlias
 
 instance Evaluatable TypeAlias where
   eval _ _ TypeAlias{..} = do
