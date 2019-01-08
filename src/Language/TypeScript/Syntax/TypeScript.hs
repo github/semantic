@@ -16,6 +16,9 @@ import           Data.Semigroup.Foldable
 import           Data.Span
 import           Diffing.Algorithm
 import           Language.TypeScript.Resolution
+import qualified Data.Abstract.ScopeGraph as ScopeGraph
+import Data.Aeson hiding (object)
+import qualified Data.Abstract.Name as Name
 
 data Import a = Import { importSymbols :: ![Alias], importFrom :: ImportPath }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
