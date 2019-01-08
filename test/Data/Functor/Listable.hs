@@ -21,6 +21,7 @@ import Analysis.CyclomaticComplexity
 import Analysis.TOCSummary
 import Control.Monad.Free as Free
 import Control.Monad.Trans.Free as FreeF
+import Data.Bifunctor.Join
 import Data.ByteString (ByteString)
 import Data.Char (chr)
 import Data.Diff
@@ -150,6 +151,9 @@ instance Listable1 NonEmpty where
 
 instance Listable2 p => Listable1 (Join p) where
   liftTiers tiers = liftCons1 (liftTiers2 tiers tiers) Join
+
+instance Listable1 Both where
+  liftTiers tiers = liftCons2 tiers tiers Both
 
 instance Listable2 These where
   liftTiers2 this that = liftCons1 this This \/ liftCons1 that That \/ liftCons2 this that These
