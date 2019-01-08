@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveAnyClass #-}
 
-module Data.GitHub.Events.Push
+module Data.GitHub.Event.Push
   ( RepositoryPush (..)
   ) where
 
@@ -8,9 +8,9 @@ import Prologue
 
 import Proto3.Suite
 
+import qualified Data.GitHub.Git as Git
 import Data.GitHub.Request.Context
-
-newtype SHA = SHA { shaContents :: Text }
+import Data.GitHub.User
 
 data ChangedFile = ChangedFile
   { filePreviousOID  :: Git.OID
@@ -23,8 +23,8 @@ data ChangedFile = ChangedFile
 data RepositoryPush = RepositoryPush
   { pushRequestContext :: Nested RequestContext
   , pushActor          :: Nested User
-  , pushBefore         :: SHA
-  , pushAfter          :: SHA
+  , pushBefore         :: Git.SHA
+  , pushAfter          :: Git.SHA
   , pushRef            :: Text
   , pushChangedFiles   :: NestedVec ChangedFile
   } deriving (Eq, Show, Generic, Message, Named)
