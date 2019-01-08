@@ -13,9 +13,7 @@ import           Data.Abstract.Evaluatable
 import           Data.Abstract.Name (__self)
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.JSON.Fields
-import qualified Data.Map.Strict as Map
 import qualified Data.Reprinting.Scope as Scope
-import qualified Data.Set as Set
 import           Data.Span (emptySpan)
 import           Diffing.Algorithm
 import           Reprinting.Tokenize hiding (Superclass)
