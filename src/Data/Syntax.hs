@@ -1,4 +1,4 @@
-{-# LANGUAGE AllowAmbiguousTypes, DeriveAnyClass, GADTs, TypeOperators, MultiParamTypeClasses, UndecidableInstances, ScopedTypeVariables, KindSignatures, RankNTypes, ConstraintKinds, GeneralizedNewtypeDeriving, DerivingStrategies #-}
+{-# LANGUAGE AllowAmbiguousTypes, DeriveAnyClass, DerivingVia, GADTs, TypeOperators, MultiParamTypeClasses, UndecidableInstances, ScopedTypeVariables, KindSignatures, RankNTypes, ConstraintKinds, GeneralizedNewtypeDeriving, DerivingStrategies #-}
 {-# OPTIONS_GHC -Wno-missing-export-lists -Wno-redundant-constraints -fno-warn-orphans #-} -- For HasCallStack
 module Data.Syntax where
 
@@ -160,10 +160,8 @@ newtype Identifier a = Identifier { name :: Name }
   deriving newtype (Eq, Ord, Show)
   deriving stock (Foldable, Functor, Generic1, Traversable)
   deriving anyclass (Diffable, Hashable1, Message1, Named1, ToJSONFields1, NFData1)
+  deriving (Eq1, Show1, Ord1) via Generically Identifier
 
-instance Eq1 Identifier where liftEq = genericLiftEq
-instance Ord1 Identifier where liftCompare = genericLiftCompare
-instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Identifier where
   eval eval ref' term@(Identifier name) = do
@@ -190,10 +188,7 @@ newtype AccessibilityModifier a = AccessibilityModifier { contents :: Text }
   deriving newtype (Eq, Ord, Show)
   deriving stock (Foldable, Functor, Generic1, Traversable)
   deriving anyclass (Declarations1, Diffable, FreeVariables1, Hashable1, Message1, Named1, ToJSONFields1, NFData1)
-
-instance Eq1 AccessibilityModifier where liftEq = genericLiftEq
-instance Ord1 AccessibilityModifier where liftCompare = genericLiftCompare
-instance Show1 AccessibilityModifier where liftShowsPrec = genericLiftShowsPrec
+  deriving (Eq1, Show1, Ord1) via Generically AccessibilityModifier
 
 -- TODO: Implement Eval instance for AccessibilityModifier
 instance Evaluatable AccessibilityModifier
@@ -203,10 +198,7 @@ instance Evaluatable AccessibilityModifier
 --   This can be used to represent an implicit no-op, e.g. the alternative in an 'if' statement without an 'else'.
 data Empty a = Empty
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1, NFData1)
-
-instance Eq1 Empty where liftEq _ _ _ = True
-instance Ord1 Empty where liftCompare _ _ _ = EQ
-instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
+  deriving (Eq1, Show1, Ord1) via Generically Empty
 
 instance Evaluatable Empty where
   eval _ _ _ = pure unit
@@ -217,10 +209,7 @@ instance Tokenize Empty where
 -- | Syntax representing a parsing or assignment error.
 data Error a = Error { errorCallStack :: ErrorStack, errorExpected :: [String], errorActual :: Maybe String, errorChildren :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
-
-instance Eq1 Error where liftEq = genericLiftEq
-instance Ord1 Error where liftCompare = genericLiftCompare
-instance Show1 Error where liftShowsPrec = genericLiftShowsPrec
+  deriving (Eq1, Show1, Ord1) via Generically Error
 
 instance Evaluatable Error
 
@@ -235,7 +224,6 @@ instance Message String where
   encodeMessage = encodeMessageField
   decodeMessage = Decode.at decodeMessageField
   dotProto _ = [ Proto.DotProtoMessageField $ protoType (Proxy @String) ]
-
 
 errorSyntax :: Error.Error String -> [a] -> Error a
 errorSyntax Error.Error{..} = Error (ErrorStack $ errorSite <$> getCallStack callStack) errorExpected errorActual
@@ -302,6 +290,7 @@ instance Ord ErrorStack where
 
 data Context a = Context { contextTerms :: NonEmpty a, contextSubject :: a }
   deriving (Eq, Foldable, FreeVariables1, Functor, Generic1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
+  deriving (Eq1, Show1, Ord1) via Generically Context
 
 instance Diffable Context where
   subalgorithmFor blur focus (Context n s) = Context <$> traverse blur n <*> focus s
@@ -309,10 +298,6 @@ instance Diffable Context where
   equivalentBySubterm = Just . contextSubject
 
 instance Hashable1 Context where liftHashWithSalt = foldl
-
-instance Eq1 Context where liftEq = genericLiftEq
-instance Ord1 Context where liftCompare = genericLiftCompare
-instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Context where
   eval eval _ Context{..} = eval contextSubject
