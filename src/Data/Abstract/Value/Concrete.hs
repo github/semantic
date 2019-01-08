@@ -9,7 +9,7 @@ module Data.Abstract.Value.Concrete
 import Control.Abstract.ScopeGraph (Allocator, ScopeError)
 import Control.Abstract.Heap (scopeLookup)
 import qualified Control.Abstract as Abstract
-import Control.Abstract hiding (Boolean(..), Function(..), Numeric(..), String(..), Unit(..), While(..))
+import Control.Abstract hiding (Boolean(..), Function(..), Numeric(..), Object(..), String(..), Unit(..), While(..))
 import Control.Effect.Carrier
 import Control.Effect.Interpose
 import Control.Effect.Sum
@@ -248,6 +248,18 @@ instance ( Member (Reader ModuleInfo) sig
 
 ourShift :: Word64 -> Int -> Integer
 ourShift a b = toInteger (shiftR a b)
+
+
+instance Carrier sig m => Carrier (Abstract.Object address (Value term address) :+: sig) (ObjectC address (Value term address) m) where
+  ret = ObjectC . ret
+  eff = ObjectC . handleSum (eff . handleCoercible) (\case
+    Abstract.Object address k -> runObjectC (k (Object address))
+    Abstract.ScopedEnvironment (Object address) k -> runObjectC (k (Just address))
+    Abstract.ScopedEnvironment (Class _ _ address) k -> runObjectC (k (Just address))
+    Abstract.ScopedEnvironment (Namespace _ address) k -> runObjectC (k (Just address))
+    Abstract.ScopedEnvironment _ k -> runObjectC (k Nothing)
+    )
+
 
 instance AbstractHole (Value term address) where
   hole = Hole
