@@ -82,6 +82,8 @@ library
                      , Data.Functor.Both
                      , Data.Functor.Classes.Generic
                      , Data.GitHub.Auth
+                     , Data.GitHub.Event.Push
+                     , Data.GitHub.Git
                      , Data.GitHub.IPVersion
                      , Data.GitHub.Timestamp
                      , Data.GitHub.Request.Context
