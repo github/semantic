@@ -160,6 +160,7 @@ evalTerm :: ( Carrier sig m
             , Member (Function term address value) sig
             , Member (Modules address value) sig
             , Member (Numeric value) sig
+            , Member (Object address value) sig
             , Member (Reader ModuleInfo) sig
             , Member (Reader PackageInfo) sig
             , Member (Reader Span) sig
