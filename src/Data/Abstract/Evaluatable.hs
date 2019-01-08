@@ -86,6 +86,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
   ref :: ( AbstractValue term address value m
          , Carrier sig m
          , Declarations term
+         , Member (Object address value) sig
          , Member (Reader (CurrentFrame address)) sig
          , Member (Reader (CurrentScope address)) sig
          , Member (Reader ModuleInfo) sig
@@ -130,6 +131,7 @@ class HasPrelude (language :: Language) where
                    , Member (Reader (CurrentScope address)) sig
                    , Member Trace sig
                    , Member (Unit value) sig
+                   , Member (Object address value) sig
                    , Ord address
                    , Show address
                    )
@@ -165,8 +167,7 @@ instance HasPrelude 'JavaScript where
     defineSelf
     defineNamespace (Declaration (X.name "console")) $ defineBuiltIn (Declaration $ X.name "log") Default Print
 
-defineSelf :: ( AbstractValue term address value m
-              , Carrier sig m
+defineSelf :: ( Carrier sig m
               , Member (State (ScopeGraph address)) sig
               , Member (Resumable (BaseError (ScopeError address))) sig
               , Member (Resumable (BaseError (HeapError address))) sig
@@ -176,6 +177,7 @@ defineSelf :: ( AbstractValue term address value m
               , Member (State (Heap address address value)) sig
               , Member (Reader (CurrentFrame address)) sig
               , Member (Reader (CurrentScope address)) sig
+              , Member (Object address value) sig
               , Ord address
               )
            => Evaluator term address value m ()

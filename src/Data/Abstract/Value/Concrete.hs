@@ -296,13 +296,6 @@ instance ( Member (Abstract.Boolean (Value term address)) sig
 
   namespace name = pure . Namespace name
 
-  scopedEnvironment v
-    | Object address <- v = pure (Just address)
-    | Class _ _ address <- v = pure (Just address)
-    | Namespace _ address <- v = pure (Just address)
-    | otherwise = pure Nothing
-
-
   index = go where
     tryIdx list ii
       | ii > genericLength list = throwValueError (BoundsError list ii)
@@ -334,8 +327,6 @@ instance ( Member (Abstract.Boolean (Value term address)) sig
         orderingToInt = toInteger . pred . fromEnum
 
         pair = (left, right)
-
-  object frameAddress = pure (Object frameAddress)
 
 -- | The type of exceptions that can be thrown when constructing values in 'Value'’s 'MonadValue' instance.
 data ValueError term address resume where

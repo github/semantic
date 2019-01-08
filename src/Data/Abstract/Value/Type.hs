@@ -404,9 +404,6 @@ instance ( Member Fresh sig
   klass _ _       = pure Object
   namespace _ _   = pure Unit
 
-  scopedEnvironment _ = pure Nothing
-  object _ = pure Object
-
   asPair t   = do
     t1 <- fresh
     t2 <- fresh

@@ -222,6 +222,7 @@ declareModule :: ( AbstractValue term address value m
                  , Declarations term
                  , Member (Allocator address) sig
                  , Member (Deref value) sig
+                 , Member (Object address value) sig
                  , Member (Reader (CurrentFrame address)) sig
                  , Member (Reader (CurrentScope address)) sig
                  , Member (Reader Span) sig
