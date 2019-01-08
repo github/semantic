@@ -1,7 +1,8 @@
 {-# LANGUAGE DeriveAnyClass, GeneralizedNewtypeDeriving, DerivingStrategies, DerivingVia, LambdaCase, ScopedTypeVariables #-}
 
 module Data.GitHub.User.Type
-  ( Type (..) ) where
+  ( Type (..)
+  ) where
 
 import Prologue
 
@@ -19,8 +20,4 @@ data Type
 instance HasDefault Type where def = Unknown
 
 instance Finite Type where
-  enumerate _ = [ ("UNKNOWN", 0)
-                , ("USER", 1)
-                , ("ORGANIZATION", 2)
-                , ("BOT", 3)
-                ]
+  enumerate = enumerateUpper "UNKNOWN" [User ..]
