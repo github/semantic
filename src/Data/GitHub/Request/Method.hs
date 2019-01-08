@@ -23,8 +23,4 @@ data RequestMethod
     deriving (Eq, Show, Ord, Enum, Bounded, Generic, Named, MessageField)
     deriving Primitive via PrimitiveEnum RequestMethod
 
-instance Finite RequestMethod where
-  enumerate = enumerateUpper "REQUEST_METHOD_UNKNOWN" [Get ..]
-              
-
 instance HasDefault RequestMethod where def = Unknown
