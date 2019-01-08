@@ -41,6 +41,8 @@ module Control.Abstract.Value
 , liftNumeric2
 , Numeric(..)
 , NumericC(..)
+, object
+, scopedEnvironment
 , Object(..)
 , ObjectC(..)
 , runObject
@@ -376,6 +378,13 @@ runBitwise = raiseHandler $ runBitwiseC . interpret
 newtype BitwiseC value m a = BitwiseC { runBitwiseC :: m a }
 
 
+object :: (Member (Object address value) sig, Carrier sig m) => address -> m value
+object address = send (Object address ret)
+
+-- | Extract the environment from any scoped object (e.g. classes, namespaces, etc).
+scopedEnvironment :: (Member (Object address value) sig, Carrier sig m) => value -> m (Maybe address)
+scopedEnvironment value = send (ScopedEnvironment value ret)
+
 data Object address value (m :: * -> *) k
   = Object address (value -> k)
   | ScopedEnvironment value (Maybe address -> k)
@@ -438,8 +447,3 @@ class AbstractIntro value => AbstractValue term address value carrier where
   namespace :: Name                 -- ^ The namespace's identifier
             -> address              -- ^ The frame of the namespace.
             -> Evaluator term address value carrier value
-
-  -- | Extract the environment from any scoped object (e.g. classes, namespaces, etc).
-  scopedEnvironment :: value -> Evaluator term address value carrier (Maybe address)
-
-  object :: address -> Evaluator term address value carrier value
