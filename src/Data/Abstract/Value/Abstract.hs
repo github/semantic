@@ -137,8 +137,6 @@ instance AbstractValue term address Abstract m where
   klass _ _     = pure Abstract
   namespace _ _ = pure Abstract
 
-  scopedEnvironment _ = pure Nothing
-
   asPair _ = pure (Abstract, Abstract)
   asArray _ = pure mempty
 
