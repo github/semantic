@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, GeneralizedNewtypeDeriving, DerivingStrategies, DerivingVia, LambdaCase, ScopedTypeVariables #-}
+{-# LANGUAGE DeriveAnyClass, DerivingStrategies, DerivingVia, ScopedTypeVariables #-}
 
 module Data.GitHub.User.Type
   ( Type (..)
@@ -18,6 +18,3 @@ data Type
     deriving Primitive via PrimitiveEnum Type
 
 instance HasDefault Type where def = Unknown
-
-instance Finite Type where
-  enumerate = enumerateUpper "UNKNOWN" [User ..]

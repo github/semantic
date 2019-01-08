@@ -17,5 +17,3 @@ data SpamuraiClassification
     deriving Primitive via PrimitiveEnum SpamuraiClassification
 
 instance HasDefault SpamuraiClassification where def = Unknown
-instance Finite SpamuraiClassification where
-  enumerate = enumerateUpper "SPAMURAI_CLASSIFICATION_UNKNOWN" [Hammy ..]

@@ -17,4 +17,3 @@ data IPVersion
     deriving Primitive via PrimitiveEnum IPVersion
 
 instance HasDefault IPVersion where def = Unknown
-instance Finite IPVersion where enumerate = enumerateUpper "VERSION_UNKNOWN" [IPV4 ..]
