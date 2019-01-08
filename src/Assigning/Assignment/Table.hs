@@ -1,3 +1,4 @@
+{-# LANGUAGE DerivingVia #-}
 module Assigning.Assignment.Table
 ( Table(tableAddresses)
 , singleton
@@ -12,8 +13,8 @@ import qualified Data.IntMap as IntMap
 import qualified Data.IntSet as IntSet
 
 data Table i a = Table { tableAddresses :: [i], tableBranches :: IntMap a }
-  deriving (Eq, Foldable, Functor, Show, Traversable)
-
+  deriving (Eq, Foldable, Functor, Show, Traversable, Generic)
+  deriving Monoid via GenericMonoid (Table i a)
 
 singleton :: Enum i => i -> a -> Table i a
 singleton i a = Table [i] (IntMap.singleton (fromEnum i) a)
@@ -28,13 +29,8 @@ toPairs Table{..} = first toEnum <$> IntMap.toList tableBranches
 lookup :: Enum i => i -> Table i a -> Maybe a
 lookup i = IntMap.lookup (fromEnum i) . tableBranches
 
-
-instance (Enum i, Monoid a) => Semigroup (Table i a) where
-  (Table i1 b1) <> (Table i2 b2) = Table (i1 `mappend` i2) (IntMap.unionWith mappend b1 b2)
-
-instance (Enum i, Monoid a) => Monoid (Table i a) where
-  mempty = Table mempty mempty
-  mappend = (<>)
+instance (Enum i, Semigroup a) => Semigroup (Table i a) where
+  (Table i1 b1) <> (Table i2 b2) = Table (i1 <> i2) (IntMap.unionWith (<>) b1 b2)
 
 instance (Enum i, Show i) => Show1 (Table i) where
   liftShowsPrec spA slA d t = showsBinaryWith showsPrec (const (liftShowList spA slA)) "Table" d (tableAddresses t) (toPairs t)
