@@ -13,7 +13,7 @@ module Data.Abstract.Value.Type
 
 import Control.Abstract.ScopeGraph
 import qualified Control.Abstract as Abstract
-import Control.Abstract hiding (Boolean(..), Function(..), Numeric(..), String(..), Unit(..), While(..))
+import Control.Abstract hiding (Boolean(..), Function(..), Numeric(..), Object(..), String(..), Unit(..), While(..))
 import Control.Effect.Carrier
 import Control.Effect.Sum
 import Data.Abstract.BaseError
@@ -371,6 +371,12 @@ instance ( Member (Reader ModuleInfo) sig
     LiftBitwise2 _ t1 t2 k -> unify Int t1 >>= unify t2 >>= runBitwiseC . k
     UnsignedRShift t1 t2 k -> unify Int t2 *> unify Int t1 >>= runBitwiseC . k)
 
+instance ( Carrier sig m ) => Carrier (Abstract.Object address Type :+: sig) (ObjectC address Type m) where
+  ret = ObjectC . ret
+  eff = ObjectC . handleSum (eff . handleCoercible) (\case
+    Abstract.Object _ k -> runObjectC (k Object)
+    Abstract.ScopedEnvironment _ k -> runObjectC (k Nothing))
+
 instance AbstractHole Type where
   hole = Hole
 
@@ -399,7 +405,6 @@ instance ( Member Fresh sig
   namespace _ _   = pure Unit
 
   scopedEnvironment _ = pure Nothing
-
   object _ = pure Object
 
   asPair t   = do
