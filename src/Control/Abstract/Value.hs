@@ -388,6 +388,7 @@ scopedEnvironment value = send (ScopedEnvironment value ret)
 data Object address value (m :: * -> *) k
   = Object address (value -> k)
   | ScopedEnvironment value (Maybe address -> k)
+  | Klass Declaration address (value -> k)
   deriving (Functor)
 
 instance HFunctor (Object address value) where
