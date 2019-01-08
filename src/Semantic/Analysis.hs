@@ -33,9 +33,10 @@ type DomainC term address value m
   ( StringC value                                                         (Eff
   ( NumericC value                                                        (Eff
   ( BitwiseC value                                                        (Eff
+  ( ObjectC address value                                                 (Eff
   ( UnitC value                                                           (Eff
   ( InterposeC (Resumable (BaseError (UnspecializedError address value))) (Eff
-    m)))))))))))))))
+    m)))))))))))))))))
 
 -- | Evaluate a list of modules with the prelude for the passed language available, and applying the passed function to every module.
 evaluate :: ( Carrier outerSig outer
@@ -87,8 +88,11 @@ runDomainEffects :: ( AbstractValue term address value (DomainC term address val
                     , unitC ~ UnitC value (Eff (InterposeC (Resumable (BaseError (UnspecializedError address value))) (Eff m)))
                     , unitSig ~ (Unit value :+: Interpose (Resumable (BaseError (UnspecializedError address value))) :+: sig)
                     , Carrier unitSig unitC
-                    , bitwiseC ~ BitwiseC value (Eff unitC)
-                    , bitwiseSig ~ (Abstract.Bitwise value :+: unitSig)
+                    , objectC ~ ObjectC address value (Eff unitC)
+                    , objectSig ~ (Abstract.Object address value :+: unitSig)
+                    , Carrier objectSig objectC
+                    , bitwiseC ~ BitwiseC value (Eff objectC)
+                    , bitwiseSig ~ (Abstract.Bitwise value :+: objectSig)
                     , Carrier bitwiseSig bitwiseC
                     , numericC ~ NumericC value (Eff bitwiseC)
                     , numericSig ~ (Abstract.Numeric value :+: bitwiseSig)
@@ -129,6 +133,7 @@ runDomainEffects :: ( AbstractValue term address value (DomainC term address val
 runDomainEffects runTerm
   = raiseHandler runInterpose
   . runUnit
+  . runObject
   . runBitwise
   . runNumeric
   . runString
