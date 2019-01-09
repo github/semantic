@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: directory
-version: 1.3.1.5
+version: 1.3.3.0
 summary: Platform-agnostic library for filesystem operations
 homepage: 
 license: bsd-3-clause

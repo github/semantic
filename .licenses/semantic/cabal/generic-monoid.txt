@@ -1,13 +1,12 @@
 ---
 type: cabal
-name: effects
-version: 0.3.2.0
-summary: Implementation of the Freer Monad
-homepage: https://github.com/joshvera/effects
+name: generic-monoid
+version: '0.1.0.0'
+summary: Derive monoid instances for product types.
+homepage: https://github.com/luke-clifton/generic-monoid
 license: bsd-3-clause
 ---
-Original work Copyright (c) 2016, Allele Dev
-Modified work Copyright 2016 Josh Vera
+Copyright (c) 2018, Luke Clifton
 
 All rights reserved.
 
@@ -22,7 +21,7 @@ modification, are permitted provided that the following conditions are met:
       disclaimer in the documentation and/or other materials provided
       with the distribution.
 
-    * Neither the name of Allele Dev nor the names of other
+    * Neither the name of Luke Clifton nor the names of other
       contributors may be used to endorse or promote products derived
       from this software without specific prior written permission.
 

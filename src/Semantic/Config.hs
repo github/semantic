@@ -15,7 +15,7 @@ module Semantic.Config
   ) where
 
 import           Data.Duration
-import           Network.BSD
+import           Network.HostName
 import           Network.HTTP.Client.TLS
 import           Network.URI
 import           Prologue

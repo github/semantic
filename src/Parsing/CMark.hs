@@ -51,7 +51,7 @@ exts = [
   ]
 
 cmarkParser :: Source -> A.AST (TermF [] NodeType) Grammar
-cmarkParser source = toTerm (totalRange source) (totalSpan source) $ commonmarkToNode [ optSourcePos, optSafe ] exts (toText source)
+cmarkParser source = toTerm (totalRange source) (totalSpan source) $ commonmarkToNode [ optSourcePos ] exts (toText source)
   where toTerm :: Range -> Span -> Node -> A.AST (TermF [] NodeType) Grammar
         toTerm within withinSpan (Node position t children) =
           let range = maybe within (spanToRangeInLineRanges lineRanges . toSpan) position

@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveAnyClass, DerivingVia #-}
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-} -- FIXME
 module Language.Python.Syntax where
@@ -109,17 +109,11 @@ resolvePythonModules q = do
 -- If the list of symbols is empty copy everything to the calling environment.
 data Import a = Import { importFrom :: QualifiedName, importSymbols :: ![Alias] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
-
-instance Eq1 Import where liftEq = genericLiftEq
-instance Ord1 Import where liftCompare = genericLiftCompare
-instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
+  deriving (Eq1, Show1, Ord1) via Generically Import
 
 newtype FutureImport a = FutureImport { futureImportSymbols :: [Alias] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
-
-instance Eq1 FutureImport where liftEq = genericLiftEq
-instance Ord1 FutureImport where liftCompare = genericLiftCompare
-instance Show1 FutureImport where liftShowsPrec = genericLiftShowsPrec
+  deriving (Eq1, Show1, Ord1) via Generically FutureImport
 
 instance Evaluatable FutureImport where
 
@@ -189,6 +183,7 @@ instance Evaluatable Import where
 
 newtype QualifiedImport a = QualifiedImport { qualifiedImportFrom :: NonEmpty String }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
+  deriving (Eq1, Show1, Ord1) via Generically QualifiedImport
 
 instance Message1 QualifiedImport where
   liftEncodeMessage _ _ QualifiedImport{..} = encodeMessageField 1 qualifiedImportFrom
@@ -201,10 +196,6 @@ instance Message Prelude.String where
   encodeMessage _ = encodePrimitive 1
   decodeMessage _ = Decode.at (Decode.one decodePrimitive mempty) 1
   dotProto = undefined
-
-instance Eq1 QualifiedImport where liftEq = genericLiftEq
-instance Ord1 QualifiedImport where liftCompare = genericLiftCompare
-instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
 
 -- import a.b.c
 instance Evaluatable QualifiedImport where
@@ -242,10 +233,7 @@ instance Evaluatable QualifiedImport where
 
 data QualifiedAliasedImport a = QualifiedAliasedImport { qualifiedAliasedImportFrom :: QualifiedName, qualifiedAliasedImportAlias :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
-
-instance Eq1 QualifiedAliasedImport where liftEq = genericLiftEq
-instance Ord1 QualifiedAliasedImport where liftCompare = genericLiftCompare
-instance Show1 QualifiedAliasedImport where liftShowsPrec = genericLiftShowsPrec
+  deriving (Eq1, Show1, Ord1) via Generically QualifiedAliasedImport
 
 -- import a.b.c as e
 instance Evaluatable QualifiedAliasedImport where
@@ -272,21 +260,14 @@ instance Evaluatable QualifiedAliasedImport where
 -- | Ellipsis (used in splice expressions and alternatively can be used as a fill in expression, like `undefined` in Haskell)
 data Ellipsis a = Ellipsis
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
-
-instance Eq1 Ellipsis where liftEq = genericLiftEq
-instance Ord1 Ellipsis where liftCompare = genericLiftCompare
-instance Show1 Ellipsis where liftShowsPrec = genericLiftShowsPrec
+  deriving (Eq1, Show1, Ord1) via Generically Ellipsis
 
 -- TODO: Implement Eval instance for Ellipsis
 instance Evaluatable Ellipsis
 
-
 data Redirect a = Redirect { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
-
-instance Eq1 Redirect where liftEq = genericLiftEq
-instance Ord1 Redirect where liftCompare = genericLiftCompare
-instance Show1 Redirect where liftShowsPrec = genericLiftShowsPrec
+  deriving (Eq1, Show1, Ord1) via Generically Redirect
 
 -- TODO: Implement Eval instance for Redirect
 instance Evaluatable Redirect

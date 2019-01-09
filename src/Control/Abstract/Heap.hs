@@ -447,6 +447,7 @@ deriving instance Eq address => Eq (HeapError address resume)
 deriving instance Show address => Show (HeapError address resume)
 instance Show address => Show1 (HeapError address) where
   liftShowsPrec _ _ = showsPrec
+  
 instance Eq address => Eq1 (HeapError address) where
   liftEq _ CurrentFrameError CurrentFrameError           = True
   liftEq _ (LookupAddressError a) (LookupAddressError b) = a == b
@@ -454,6 +455,17 @@ instance Eq address => Eq1 (HeapError address) where
   liftEq _ (LookupLinkError a) (LookupLinkError b)       = a == b
   liftEq _ (LookupFrameError a) (LookupFrameError b)     = a == b
   liftEq _ _ _                                           = False
+
+instance NFData address => NFData1 (HeapError address) where
+  liftRnf _ x = case x of
+    CurrentFrameError    -> ()
+    LookupAddressError a -> rnf a
+    LookupFrameError a   -> a `seq` ()
+    LookupLinksError a   -> rnf a
+    LookupLinkError p    -> rnf p
+
+instance (NFData address, NFData resume) => NFData (HeapError address resume) where
+  rnf = liftRnf rnf
 
 throwHeapError  :: ( Member (Resumable (BaseError (HeapError address))) sig
                    , Member (Reader ModuleInfo) sig

@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: megaparsec
-version: 6.5.0
+version: 7.0.4
 summary: Monadic parser combinators
 homepage: https://github.com/mrkkrp/megaparsec
 license: bsd-2-clause
