@@ -375,7 +375,8 @@ instance ( Carrier sig m ) => Carrier (Abstract.Object address Type :+: sig) (Ob
   ret = ObjectC . ret
   eff = ObjectC . handleSum (eff . handleCoercible) (\case
     Abstract.Object _ k -> runObjectC (k Object)
-    Abstract.ScopedEnvironment _ k -> runObjectC (k Nothing))
+    Abstract.ScopedEnvironment _ k -> runObjectC (k Nothing)
+    Abstract.Klass _ _ k -> runObjectC (k Object))
 
 instance AbstractHole Type where
   hole = Hole
