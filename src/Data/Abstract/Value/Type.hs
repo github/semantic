@@ -402,7 +402,6 @@ instance ( Member Fresh sig
 
   tuple fields = pure $ zeroOrMoreProduct fields
 
-  klass _ _       = pure Object
   namespace _ _   = pure Unit
 
   asPair t   = do
