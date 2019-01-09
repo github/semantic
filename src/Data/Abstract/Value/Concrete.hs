@@ -258,6 +258,7 @@ instance Carrier sig m => Carrier (Abstract.Object address (Value term address) 
     Abstract.ScopedEnvironment (Class _ _ address) k -> runObjectC (k (Just address))
     Abstract.ScopedEnvironment (Namespace _ address) k -> runObjectC (k (Just address))
     Abstract.ScopedEnvironment _ k -> runObjectC (k Nothing)
+    Abstract.Klass n frame k -> runObjectC (k (Class n mempty frame))
     )
 
 
