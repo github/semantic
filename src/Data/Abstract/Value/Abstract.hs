@@ -116,7 +116,8 @@ instance Carrier sig m
   ret = ObjectC . ret
   eff = ObjectC . handleSum (eff . handleCoercible) (\case
     Object _ k -> runObjectC (k Abstract)
-    ScopedEnvironment _ k -> runObjectC (k Nothing))
+    ScopedEnvironment _ k -> runObjectC (k Nothing)
+    Klass _ _ k -> runObjectC (k Abstract))
 
 instance Ord address => ValueRoots address Abstract where
   valueRoots = mempty
