@@ -55,6 +55,7 @@ module Control.Abstract.Value
 , Bitwise(..)
 , BitwiseC(..)
 , Array(..)
+, ArrayC(..)
 , runBitwise
 ) where
 
@@ -425,6 +426,7 @@ instance HFunctor (Array value) where
 instance Effect (Array value) where
     handle state handler = coerce . fmap (handler . (<$ state))
 
+newtype ArrayC value m a = ArrayC { runArrayC :: m a }
 class Show value => AbstractIntro value where
   -- | Construct a key-value pair for use in a hash.
   kvPair :: value -> value -> value
