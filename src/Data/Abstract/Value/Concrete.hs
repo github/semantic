@@ -292,9 +292,6 @@ instance ( Member (Abstract.Boolean (Value term address)) sig
     | Array addresses <- val = pure addresses
     | otherwise = throwValueError $ ArrayError val
 
-  klass n frame = do
-    pure $ Class n mempty frame
-
   namespace name = pure . Namespace name
 
   index = go where
