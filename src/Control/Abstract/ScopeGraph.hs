@@ -291,6 +291,18 @@ instance Eq1 (ScopeError address) where
   liftEq _ CurrentScopeError                    CurrentScopeError                   = True
   liftEq _ _                                    _                                   = False
 
+instance NFData1 (ScopeError address) where
+  liftRnf _ x = case x of
+    ScopeError d s                -> rnf d `seq` rnf s
+    LookupScopeError              -> ()
+    ImportReferenceError          -> ()
+    LookupPathError d             -> rnf d
+    LookupDeclarationScopeError d -> rnf d
+    CurrentScopeError             -> ()
+
+instance NFData return => NFData (ScopeError address return) where
+  rnf = liftRnf rnf
+
 alloc :: (Member (Allocator address) sig, Carrier sig m) => Name -> Evaluator term address value m address
 alloc = send . flip Alloc ret
 

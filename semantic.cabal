@@ -155,9 +155,11 @@ library
                      , Language.TypeScript.Grammar
                      , Language.TypeScript.Resolution
                      , Language.TypeScript.Syntax
+                     , Language.TypeScript.Syntax.Import
                      , Language.TypeScript.Syntax.JavaScript
                      , Language.TypeScript.Syntax.JSX
                      , Language.TypeScript.Syntax.TypeScript
+                     , Language.TypeScript.Syntax.Types
                      , Language.PHP.Assignment
                      , Language.PHP.Grammar
                      , Language.PHP.Syntax
@@ -209,7 +211,6 @@ library
                      , Semantic.Util.Pretty
                      , Semantic.Version
                      -- Serialization
-                     , Serializing.DOT
                      , Serializing.Format
                      , Serializing.SExpression
                      , Tags.Taggable
@@ -236,11 +237,13 @@ library
                      , free
                      , freer-cofreer
                      , fused-effects
+                     , generic-monoid
                      , ghc-prim
                      , gitrev
                      , Glob
                      , hashable
                      , haskeline
+                     , hostname
                      , hscolour
                      , http-client
                      , http-client-tls
