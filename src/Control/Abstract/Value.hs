@@ -54,6 +54,7 @@ module Control.Abstract.Value
 , unsignedRShift
 , Bitwise(..)
 , BitwiseC(..)
+, Array(..)
 , runBitwise
 ) where
 
@@ -412,6 +413,17 @@ runObject :: Carrier (Object address value :+: sig) (ObjectC address value (Eff 
            -> Evaluator term address value m a
 runObject = raiseHandler $ runObjectC . interpret
 
+data Array value (m :: * -> *) k
+  = Array [value] (value -> k)
+  | AsArray value ([value] -> k)
+  deriving (Functor)
+
+instance HFunctor (Array value) where
+    hmap _ = coerce
+    {-# INLINE hmap #-}
+
+instance Effect (Array value) where
+    handle state handler = coerce . fmap (handler . (<$ state))
 
 class Show value => AbstractIntro value where
   -- | Construct a key-value pair for use in a hash.
