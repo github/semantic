@@ -43,6 +43,7 @@ module Control.Abstract.Value
 , NumericC(..)
 , object
 , scopedEnvironment
+, klass
 , Object(..)
 , ObjectC(..)
 , runObject
@@ -385,6 +386,12 @@ object address = send (Object address ret)
 scopedEnvironment :: (Member (Object address value) sig, Carrier sig m) => value -> m (Maybe address)
 scopedEnvironment value = send (ScopedEnvironment value ret)
 
+-- | Build a class value from a name and environment.
+-- declaration is the new class's identifier
+-- address is the environment to capture
+klass :: (Member (Object address value) sig, Carrier sig m) => Declaration -> address -> m value
+klass d a = send (Klass d a ret)
+
 data Object address value (m :: * -> *) k
   = Object address (value -> k)
   | ScopedEnvironment value (Maybe address -> k)
@@ -436,11 +443,6 @@ class AbstractIntro value => AbstractValue term address value carrier where
 
   -- | @index x i@ computes @x[i]@, with zero-indexing.
   index :: value -> value -> Evaluator term address value carrier value
-
-  -- | Build a class value from a name and environment.
-  klass :: Declaration      -- ^ The new class's identifier
-        -> address          -- ^ The environment to capture
-        -> Evaluator term address value carrier value
 
   -- | Build a namespace value from a name and environment stack
   --
