@@ -135,7 +135,6 @@ instance AbstractValue term address Abstract m where
 
   tuple _ = pure Abstract
 
-  klass _ _     = pure Abstract
   namespace _ _ = pure Abstract
 
   asPair _ = pure (Abstract, Abstract)
