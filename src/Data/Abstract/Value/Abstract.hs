@@ -119,6 +119,13 @@ instance Carrier sig m
     ScopedEnvironment _ k -> runObjectC (k Nothing)
     Klass _ _ k -> runObjectC (k Abstract))
 
+instance Carrier sig m
+      => Carrier (Array Abstract :+: sig) (ArrayC Abstract m) where
+  ret = ArrayC . ret
+  eff = ArrayC . handleSum (eff . handleCoercible) (\case
+    Array _ k -> runArrayC (k Abstract)
+    AsArray _ k -> runArrayC (k []))
+
 instance Ord address => ValueRoots address Abstract where
   valueRoots = mempty
 
