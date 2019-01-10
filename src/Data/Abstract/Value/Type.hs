@@ -13,7 +13,7 @@ module Data.Abstract.Value.Type
 
 import Control.Abstract.ScopeGraph
 import qualified Control.Abstract as Abstract
-import Control.Abstract hiding (Boolean(..), Function(..), Numeric(..), Object(..), String(..), Unit(..), While(..))
+import Control.Abstract hiding (Boolean(..), Function(..), Numeric(..), Object(..), Array(..), String(..), Unit(..), While(..))
 import Control.Effect.Carrier
 import Control.Effect.Sum
 import Data.Abstract.BaseError
@@ -377,6 +377,24 @@ instance ( Carrier sig m ) => Carrier (Abstract.Object address Type :+: sig) (Ob
     Abstract.Object _ k -> runObjectC (k Object)
     Abstract.ScopedEnvironment _ k -> runObjectC (k Nothing)
     Abstract.Klass _ _ k -> runObjectC (k Object))
+
+instance ( Member Fresh sig
+         , Member (Reader ModuleInfo) sig
+         , Member (Reader Span) sig
+         , Member (Resumable (BaseError TypeError)) sig
+         , Member (State TypeMap) sig
+         , Carrier sig m
+         , Monad m
+         )
+      => Carrier (Abstract.Array Type :+: sig) (ArrayC Type m) where
+  ret = ArrayC . ret
+  eff = ArrayC . handleSum (eff . handleCoercible) (\case
+    Abstract.Array fieldTypes k -> (do
+          var <- fresh
+          Array <$> foldr (\ t1 -> (unify t1 =<<)) (pure (Var var)) fieldTypes) >>= runArrayC . k
+    Abstract.AsArray t k -> (do
+          field <- fresh
+          unify t (Array (Var field)) $> mempty) >>= runArrayC . k)
 
 instance AbstractHole Type where
   hole = Hole
