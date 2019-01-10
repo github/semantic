@@ -76,10 +76,7 @@ data Visibility a = Public
                   | Private
                   | Unknown
                   deriving (Declarations1, Diffable, Eq, Ord, Show, Foldable, Traversable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Named1, Message1, NFData1)
-
-instance Eq1 Data.Syntax.Declaration.Visibility where liftEq = genericLiftEq
-instance Ord1 Data.Syntax.Declaration.Visibility where liftCompare = genericLiftCompare
-instance Show1 Data.Syntax.Declaration.Visibility where liftShowsPrec = genericLiftShowsPrec
+                  deriving (Eq1, Show1, Ord1) via Generically Data.Syntax.Declaration.Visibility
 
 instance Evaluatable Data.Syntax.Declaration.Visibility
 
