@@ -2,7 +2,6 @@
 
 module Data.Functor.Both
 ( Both (..)
-, both
 , runBothWith
 ) where
 
@@ -18,10 +17,7 @@ data Both a = Both a a
   deriving Monoid    via GenericMonoid (Both a)
   deriving (Eq1, Show1, Ord1) via Generically Both
 
--- | Synonym for 'Both' for backwards compatibility.
-both :: a -> a -> Both a
-both = Both
-
 -- | Apply a function to `Both` sides of a computation.
+-- The eliminator/catamorphism over 'Both'.
 runBothWith :: (a -> a -> b) -> Both a -> b
 runBothWith f (Both a b) = f a b
