@@ -1,4 +1,5 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, DerivingStrategies, DerivingVia, ScopedTypeVariables, UndecidableInstances #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module Proto3.Suite.Exts
   ( PrimitiveEnum (..)
@@ -9,6 +10,9 @@ import Prologue
 import Proto3.Suite
 import Proto3.Wire.Encode as Encode
 import Proto3.Wire.Decode as Decode
+
+instance Lower (Nested a) where
+  lowerBound = Nested Nothing
 
 newtype PrimitiveEnum a = PrimitiveEnum a
   deriving stock (Eq, Ord)
