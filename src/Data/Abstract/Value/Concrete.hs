@@ -9,7 +9,7 @@ module Data.Abstract.Value.Concrete
 import Control.Abstract.ScopeGraph (Allocator, ScopeError)
 import Control.Abstract.Heap (scopeLookup)
 import qualified Control.Abstract as Abstract
-import Control.Abstract hiding (Boolean(..), Function(..), Numeric(..), Object(..), String(..), Unit(..), While(..))
+import Control.Abstract hiding (Boolean(..), Function(..), Numeric(..), Object(..), Array(..), String(..), Unit(..), While(..))
 import Control.Effect.Carrier
 import Control.Effect.Interpose
 import Control.Effect.Sum
@@ -261,7 +261,22 @@ instance Carrier sig m => Carrier (Abstract.Object address (Value term address) 
     Abstract.Klass n frame k -> runObjectC (k (Class n mempty frame))
     )
 
-
+instance ( Member (Abstract.Boolean (Value term address)) sig
+       , Member (Reader ModuleInfo) sig
+       , Member (Reader Span) sig
+       , Member (Resumable (BaseError (ValueError term address))) sig
+       , Show address
+       , Show term
+       , Carrier sig m
+       , Monad m
+       )
+      => Carrier (Abstract.Array (Value term address) :+: sig) (ArrayC (Value term address) m) where
+  ret = ArrayC . ret
+  eff = ArrayC . handleSum (eff . handleCoercible) (\case
+    Abstract.Array t k -> runArrayC (k (Array t))
+    Abstract.AsArray (Array addresses) k -> pure addresses >>= runArrayC . k
+    Abstract.AsArray val k -> (throwBaseError $ ArrayError val) >>= runArrayC . k)
+    
 instance AbstractHole (Value term address) where
   hole = Hole
 
