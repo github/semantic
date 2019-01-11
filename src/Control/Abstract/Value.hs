@@ -451,7 +451,7 @@ runArray = raiseHandler $ runArrayC . interpret
 
 data Hash value (m :: * -> *) k
   = Hash [(value, value)] (value -> k)
-  | KvPair value (value -> value -> k)
+  | KvPair value value (value -> k)
   deriving (Functor)
 
 instance HFunctor (Hash value) where
