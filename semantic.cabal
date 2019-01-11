@@ -349,6 +349,7 @@ test-suite test
                      , Data.Functor.Classes.Generic.Spec
                      , Data.Functor.Listable
                      , Data.Graph.Spec
+                     , Data.GitHub.Spec
                      , Data.Mergeable
                      , Data.Range.Spec
                      , Data.Scientific.Spec
