@@ -261,12 +261,9 @@ instance Carrier sig m => Carrier (Abstract.Object address (Value term address) 
     Abstract.Klass n frame k -> runObjectC (k (Class n mempty frame))
     )
 
-instance ( Member (Abstract.Boolean (Value term address)) sig
-       , Member (Reader ModuleInfo) sig
+instance ( Member (Reader ModuleInfo) sig
        , Member (Reader Span) sig
        , Member (Resumable (BaseError (ValueError term address))) sig
-       , Show address
-       , Show term
        , Carrier sig m
        , Monad m
        )
@@ -276,7 +273,7 @@ instance ( Member (Abstract.Boolean (Value term address)) sig
     Abstract.Array t k -> runArrayC (k (Array t))
     Abstract.AsArray (Array addresses) k -> pure addresses >>= runArrayC . k
     Abstract.AsArray val k -> (throwBaseError $ ArrayError val) >>= runArrayC . k)
-    
+
 instance AbstractHole (Value term address) where
   hole = Hole
 
