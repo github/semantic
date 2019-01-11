@@ -271,7 +271,7 @@ instance ( Member (Reader ModuleInfo) sig
   ret = ArrayC . ret
   eff = ArrayC . handleSum (eff . handleCoercible) (\case
     Abstract.Array t k -> runArrayC (k (Array t))
-    Abstract.AsArray (Array addresses) k -> pure addresses >>= runArrayC . k
+    Abstract.AsArray (Array addresses) k -> runArrayC (k addresses)
     Abstract.AsArray val k -> (throwBaseError $ ArrayError val) >>= runArrayC . k)
 
 instance AbstractHole (Value term address) where
