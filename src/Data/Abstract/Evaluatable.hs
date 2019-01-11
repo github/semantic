@@ -57,6 +57,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Member (Modules address value) sig
           , Member (Numeric value) sig
           , Member (Object address value) sig
+          , Member (Array value) sig
           , Member (Reader ModuleInfo) sig
           , Member (Reader PackageInfo) sig
           , Member (Reader Span) sig
