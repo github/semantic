@@ -92,7 +92,6 @@ library
                      , Data.GitHub.Repository
                      , Data.GitHub.Spamurai
                      , Data.GitHub.User
-                     , Data.GitHub.User.Type
                      , Data.Graph
                      , Data.Graph.ControlFlowVertex
                      , Data.Graph.TermVertex
