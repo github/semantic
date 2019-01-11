@@ -2,7 +2,7 @@
 
 module Data.GitHub.User
   ( User (..)
-  , SpamuraiClassification (..)
+  , Type (..)
   , monalisa
   ) where
 
@@ -12,8 +12,17 @@ import Proto3.Suite
 import Proto3.Suite.Exts
 
 import Proto3.Google.Timestamp
-import Data.GitHub.User.Type (Type (Bot))
-import Data.GitHub.Spamurai
+import Data.GitHub.Spamurai (SpamuraiClassification (Hammy))
+
+data Type
+  = Unknown
+  | Standard
+  | Organization
+  | Bot
+    deriving (Eq, Show, Enum, Bounded, MessageField, Named, Generic)
+    deriving Primitive via PrimitiveEnum Type
+
+instance HasDefault Type where def = Unknown
 
 data User = User
   { userId                  :: Word32
