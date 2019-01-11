@@ -13,7 +13,7 @@ module Data.Abstract.Value.Type
 
 import Control.Abstract.ScopeGraph
 import qualified Control.Abstract as Abstract
-import Control.Abstract hiding (Boolean(..), Function(..), Numeric(..), Object(..), Array(..), String(..), Unit(..), While(..))
+import Control.Abstract hiding (Boolean(..), Function(..), Numeric(..), Object(..), Array(..), Hash(..), String(..), Unit(..), While(..))
 import Control.Effect.Carrier
 import Control.Effect.Sum
 import Data.Abstract.BaseError
@@ -395,6 +395,20 @@ instance ( Member Fresh sig
     Abstract.AsArray t k -> (do
           field <- fresh
           unify t (Array (Var field)) >> runArrayC (k mempty)))
+
+instance ( Member (Reader ModuleInfo) sig
+         , Member (Reader Span) sig
+         , Member (Resumable (BaseError TypeError)) sig
+         , Member (State TypeMap) sig
+         , Carrier sig m
+         , Alternative m
+         , Monad m
+         )
+      => Carrier (Abstract.Hash Type :+: sig) (HashC Type m) where
+  ret = HashC . ret
+  eff = HashC . handleSum (eff . handleCoercible) (\case
+    Abstract.Hash _ k -> runHashC (k Hash)
+    Abstract.KvPair t v k -> (t :* v) >>= runHash . k)
 
 
 instance AbstractHole Type where
