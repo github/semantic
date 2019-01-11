@@ -415,10 +415,6 @@ instance ( Member Fresh sig
          , Carrier sig m
          )
       => AbstractValue term address Type m where
-  array fieldTypes = do
-    var <- fresh
-    Array <$> foldr (\ t1 -> (unify t1 =<<)) (pure (Var var)) fieldTypes
-
   tuple fields = pure $ zeroOrMoreProduct fields
 
   namespace _ _   = pure Unit
@@ -427,9 +423,6 @@ instance ( Member Fresh sig
     t1 <- fresh
     t2 <- fresh
     unify t (Var t1 :* Var t2) $> (Var t1, Var t2)
-  asArray t = do
-    field <- fresh
-    unify t (Array (Var field)) $> mempty
 
   index arr sub = do
     _ <- unify sub Int
