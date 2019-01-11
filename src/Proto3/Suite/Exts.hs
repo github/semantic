@@ -1,18 +1,25 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, DerivingStrategies, DerivingVia, ScopedTypeVariables, UndecidableInstances #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, DerivingStrategies, DerivingVia, PatternSynonyms, ScopedTypeVariables, UndecidableInstances #-}
 
 module Proto3.Suite.Exts
   ( PrimitiveEnum (..)
+  , pattern Present
+  , pattern Absent
   ) where
 
 import Prologue
 
+import Data.Either
 import Proto3.Suite
 import Proto3.Wire.Encode as Encode
 import Proto3.Wire.Decode as Decode
 
-instance Lower (Nested a) where
-  lowerBound = Nested Nothing
+pattern Present :: a -> Nested a
+pattern Present t = Nested (Just t)
+
+pattern Absent :: Nested a
+pattern Absent = Nested Nothing
+
+{-# COMPLETE Present, Absent #-}
 
 newtype PrimitiveEnum a = PrimitiveEnum a
   deriving stock (Eq, Ord)
@@ -21,7 +28,7 @@ newtype PrimitiveEnum a = PrimitiveEnum a
 -- | Provides a DerivingVia hook to opt into a sensible definition of 'Primitive'
 -- for a given 'Enum'. Should the decoding fail, the 'HasDefault' instance is used
 -- as a fallback.
-instance forall a. (Enum a, Bounded a, Named a, HasDefault a) => Primitive (PrimitiveEnum a) where
+instance (Enum a, Bounded a, Named a, HasDefault a) => Primitive (PrimitiveEnum a) where
   primType _ = Named (Single (nameOf (Proxy @a)))
   encodePrimitive = Encode.enum
-  decodePrimitive = either (const def) id <$> Decode.enum
+  decodePrimitive = fromRight def <$> Decode.enum
