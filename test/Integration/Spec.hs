@@ -24,7 +24,7 @@ spec config = parallel $ do
       examples <- runIO $ examples directory
       traverse_ (runTest pending) examples
     runTest pending ParseExample{..} = it ("parses " <> file) $ maybe (testParse config file parseOutput) pendingWith (lookup parseOutput pending)
-    runTest pending DiffExample{..} = it ("diffs " <> diffOutput) $ maybe (testDiff config (both fileA fileB) diffOutput) pendingWith (lookup diffOutput pending)
+    runTest pending DiffExample{..} = it ("diffs " <> diffOutput) $ maybe (testDiff config (Both fileA fileB) diffOutput) pendingWith (lookup diffOutput pending)
 
 data Example = DiffExample { fileA :: FilePath, fileB :: FilePath, diffOutput :: FilePath }
              | ParseExample { file :: FilePath, parseOutput :: FilePath }
