@@ -54,6 +54,8 @@ module Control.Abstract.Value
 , unsignedRShift
 , Bitwise(..)
 , BitwiseC(..)
+, array
+, asArray
 , Array(..)
 , ArrayC(..)
 , runArray
@@ -415,6 +417,15 @@ runObject :: Carrier (Object address value :+: sig) (ObjectC address value (Eff 
            -> Evaluator term address value m a
 runObject = raiseHandler $ runObjectC . interpret
 
+-- | Construct an array of zero or more values.
+-- array :: [value] -> Evaluator term address value carrier value
+array :: (Member (Array value) sig, Carrier sig m) => [value] -> m value
+array v = send (Array v ret)
+
+-- asArray :: value -> Evaluator term address value carrier [value]
+asArray :: (Member (Array value) sig, Carrier sig m) => value -> m [value]
+asArray v = send (AsArray v ret)
+
 data Array value (m :: * -> *) k
   = Array [value] (value -> k)
   | AsArray value ([value] -> k)
@@ -453,11 +464,6 @@ class AbstractIntro value => AbstractValue term address value carrier where
 
   -- | Construct an N-ary tuple of multiple (possibly-disjoint) values
   tuple :: [value] -> Evaluator term address value carrier value
-
-  -- | Construct an array of zero or more values.
-  array :: [value] -> Evaluator term address value carrier value
-
-  asArray :: value -> Evaluator term address value carrier [value]
 
   -- | Extract the contents of a key-value pair as a tuple.
   asPair :: value -> Evaluator term address value carrier (value, value)
