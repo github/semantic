@@ -60,6 +60,9 @@ module Control.Abstract.Value
 , ArrayC(..)
 , runArray
 , runBitwise
+, Hash(..)
+, runHash
+, HashC(..)
 ) where
 
 import Control.Abstract.Evaluator
@@ -444,6 +447,26 @@ runArray :: Carrier (Array value :+: sig) (ArrayC value (Eff m))
            => Evaluator term address value (ArrayC value (Eff m)) a
            -> Evaluator term address value m a
 runArray = raiseHandler $ runArrayC . interpret
+
+
+data Hash value (m :: * -> *) k
+  = Hash [(value, value)] (value -> k)
+  | KvPair value (value -> value -> k)
+  deriving (Functor)
+
+instance HFunctor (Hash value) where
+    hmap _ = coerce
+    {-# INLINE hmap #-}
+
+instance Effect (Hash value) where
+    handle state handler = coerce . fmap (handler . (<$ state))
+
+newtype HashC value m a = HashC { runHashC :: m a }
+
+runHash :: Carrier (Hash value :+: sig) (HashC value (Eff m))
+           => Evaluator term address value (HashC value (Eff m)) a
+           -> Evaluator term address value m a
+runHash = raiseHandler $ runHashC . interpret
 
 class Show value => AbstractIntro value where
   -- | Construct a key-value pair for use in a hash.
