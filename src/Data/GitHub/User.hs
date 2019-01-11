@@ -9,6 +9,7 @@ module Data.GitHub.User
 import Prologue
 
 import Proto3.Suite
+import Proto3.Suite.Exts
 
 import Data.GitHub.Timestamp
 import Data.GitHub.User.Type (Type (Bot))
@@ -20,7 +21,8 @@ data User = User
   , userType                :: Type
   , userBillingPlan         :: Text
   , userSpammy              :: Bool
-  , userTimestamp           :: Nested Timestamp
+  , userGlobalRelayId       :: Text
+  , userCreatedAt           :: Nested Timestamp
   , userSuspended           :: Bool
   , userSpamuraiCalculation :: SpamuraiClassification
   , userAnalyticsTrackingId :: Text
@@ -28,12 +30,13 @@ data User = User
 
 monalisa :: User
 monalisa = User
-  { userId = 11111
+  { userId = 1
   , userLogin = "monalisa"
   , userType = Bot
   , userBillingPlan = "medium"
   , userSpammy = False
-  , userTimestamp = Nested Nothing
+  , userGlobalRelayId = "global"
+  , userCreatedAt = lowerBound
   , userSuspended = False
   , userSpamuraiCalculation = Hammy
   , userAnalyticsTrackingId = "MACHHOMMY"
