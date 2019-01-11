@@ -20,6 +20,7 @@ runPythonPackaging :: ( Carrier sig m
                       , Show term
                       , Member (Boolean (Value term address)) sig
                       , Member (Abstract.String (Value term address)) sig
+                      , Member (Abstract.Array (Value term address)) sig
                       , Member (Resumable (BaseError (ValueError term address))) sig
                       , Member (State Strategy) sig
                       , Member (Reader ModuleInfo) sig
@@ -43,6 +44,7 @@ instance ( Carrier sig m
          , Member (Resumable (BaseError (ValueError term address))) sig
          , Member (State Strategy) sig
          , Member (Abstract.String (Value term address)) sig
+         , Member (Abstract.Array (Value term address)) sig
          , Show address
          , Show term
          )
