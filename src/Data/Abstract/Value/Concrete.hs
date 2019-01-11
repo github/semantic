@@ -298,11 +298,6 @@ instance ( Member (Abstract.Boolean (Value term address)) sig
     | otherwise = throwValueError $ KeyValueError val
 
   tuple = pure . Tuple
-  array = pure . Array
-
-  asArray val
-    | Array addresses <- val = pure addresses
-    | otherwise = throwValueError $ ArrayError val
 
   namespace name = pure . Namespace name
 
