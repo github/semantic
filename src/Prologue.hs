@@ -16,6 +16,7 @@ import Data.Bits as X
 import Data.ByteString as X (ByteString)
 import Data.Coerce as X
 import Data.Functor.Both as X (Both (Both), runBothWith)
+import Data.Either as X (fromLeft, fromRight)
 import Data.IntMap as X (IntMap)
 import Data.IntSet as X (IntSet)
 import Data.Ix as X (Ix (..))
