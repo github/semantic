@@ -126,6 +126,14 @@ instance Carrier sig m
     Array _ k -> runArrayC (k Abstract)
     AsArray _ k -> runArrayC (k []))
 
+instance Carrier sig m
+      => Carrier (Hash Abstract :+: sig) (HashC Abstract m) where
+  ret = HashC . ret
+  eff = HashC . handleSum (eff . handleCoercible) (\case
+    Hash _ k -> runHashC (k Abstract)
+    KvPair _ _ k -> runHashC (k Abstract))
+
+
 instance Ord address => ValueRoots address Abstract where
   valueRoots = mempty
 
