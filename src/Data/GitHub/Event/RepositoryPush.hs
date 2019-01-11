@@ -1,37 +1,15 @@
 {-# LANGUAGE DeriveAnyClass, DerivingVia, OverloadedLists #-}
 
-module Data.GitHub.Event.Push where
+module Data.GitHub.Event.RepositoryPush where
 
 import Prologue
 
 import Proto3.Suite
-import Proto3.Suite.Exts
 
 import qualified Data.GitHub.Git as Git
-import Data.GitHub.Timestamp
 import Data.GitHub.Request.Context
 import Data.GitHub.User
 import Data.GitHub.Repository
-import Proto3.Google.Wrapped
-
-data Site
-  = Unknown
-  | Localhost
-  | CP1_IAD
-  | SDC42_SEA
-    deriving (Eq, Show, Ord, Enum, Bounded, Generic, MessageField, Named)
-    deriving Primitive via PrimitiveEnum Site
-
-instance HasDefault Site where def = minBound
-
-data Envelope = Envelope
-  { envelopeTypeURL   :: Text
-  , envelopeMessage   :: ByteString
-  , envelopeId        :: Text
-  , envelopeTimestamp :: Nested Timestamp
-  , envelopeSite      :: Site
-  } deriving (Eq, Show, Generic, Named, Message)
-
 
 data ChangedFile = ChangedFile
   { filePreviousOID  :: Git.OID
@@ -65,8 +43,8 @@ samplePush = RepositoryPush
   { pushRequestContext = lowerBound
   , pushActor = pure monalisa
   , pushRepository = pure sampleRepository
-  , pushBefore = "308cf87a25e096a71be8aba8bb53f5575a60c388"
-  , pushAfter = "d7d56aeb77d6b8434d2789b4b0b6b305dfce10a82"
+  , pushBefore = Git.SHA "308cf87a25e096a71be8aba8bb53f5575a60c388"
+  , pushAfter = Git.SHA "d7d56aeb77d6b8434d2789b4b0b6b305dfce10a82"
   , pushRef = "refs/heads/test-branch"
   , pushChangedFiles = [sampleChange]
   }

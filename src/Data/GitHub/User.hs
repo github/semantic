@@ -11,7 +11,7 @@ import Prologue
 import Proto3.Suite
 import Proto3.Suite.Exts
 
-import Data.GitHub.Timestamp
+import Proto3.Google.Timestamp
 import Data.GitHub.User.Type (Type (Bot))
 import Data.GitHub.Spamurai
 

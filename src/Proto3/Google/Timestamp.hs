@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveAnyClass #-}
 
-module Data.GitHub.Timestamp (Timestamp (..)) where
+module Proto3.Google.Timestamp (Timestamp (..)) where
 
 import Prologue
 

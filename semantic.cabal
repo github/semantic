@@ -82,11 +82,11 @@ library
                      , Data.Functor.Both
                      , Data.Functor.Classes.Generic
                      , Data.GitHub.Auth
-                     , Data.GitHub.Event.Push
-                     , Data.GitHub.GeneratedSchema
+                     , Data.GitHub.Envelope
+                     , Data.GitHub.Event.RepositoryPush
                      , Data.GitHub.Git
                      , Data.GitHub.IPVersion
-                     , Data.GitHub.Timestamp
+                     , Proto3.Google.Timestamp
                      , Data.GitHub.Request.Context
                      , Data.GitHub.Request.Method
                      , Data.GitHub.Repository
