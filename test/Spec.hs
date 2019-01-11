@@ -11,6 +11,7 @@ import qualified Data.Diff.Spec
 import qualified Data.Abstract.Name.Spec
 import qualified Data.Abstract.Path.Spec
 import qualified Data.Functor.Classes.Generic.Spec
+import qualified Data.GitHub.Spec
 import qualified Data.Graph.Spec
 import qualified Data.Range.Spec
 import qualified Data.Scientific.Spec
@@ -57,6 +58,7 @@ main = do
       describe "Data.Abstract.Path" Data.Abstract.Path.Spec.spec
       describe "Data.Abstract.Name" Data.Abstract.Name.Spec.spec
       describe "Data.Functor.Classes.Generic" Data.Functor.Classes.Generic.Spec.spec
+      describe "Data.GitHub" Data.GitHub.Spec.spec
       describe "Data.Range" Data.Range.Spec.spec
       describe "Data.Scientific" Data.Scientific.Spec.spec
       describe "Data.Semigroup.App" Data.Semigroup.App.Spec.spec
