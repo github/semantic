@@ -46,7 +46,7 @@ sampleRepository = Repository
   , repoParentId = 0
   , repoStargazerCount = 1000
   , repoPublicForkCount = 777
-  , repoPushedAt = lowerBound
-  , repoCreatedAt = lowerBound
-  , repoUpdatedAt = lowerBound
+  , repoPushedAt = Absent
+  , repoCreatedAt = Absent
+  , repoUpdatedAt = Absent
   }

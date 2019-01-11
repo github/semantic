@@ -5,6 +5,7 @@ module Data.GitHub.Event.RepositoryPush where
 import Prologue
 
 import Proto3.Suite
+import Proto3.Suite.Exts
 
 import qualified Data.GitHub.Git as Git
 import Data.GitHub.Request.Context
@@ -40,7 +41,7 @@ data RepositoryPush = RepositoryPush
 
 samplePush :: RepositoryPush
 samplePush = RepositoryPush
-  { pushRequestContext = lowerBound
+  { pushRequestContext = Absent
   , pushActor = pure monalisa
   , pushRepository = pure sampleRepository
   , pushBefore = Git.SHA "308cf87a25e096a71be8aba8bb53f5575a60c388"
