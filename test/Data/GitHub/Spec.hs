@@ -22,7 +22,8 @@ spec =
       (Right decoded) <- fromByteString @Envelope sampleEnvelope
       envelopeId decoded `shouldBe` "f1ef901a-ca31-4d6b-aff1-a5ea1e2a940e"
       (Right message) <- fromByteString @RepositoryPush (envelopeMessage decoded)
-      userLogin (pushActor message) `shouldBe` "monalisa"
+      let (Present mona) = pushActor message
+      userLogin mona `shouldBe` "monalisa"
       toByteString decoded `shouldBe` sampleEnvelope
       
   
