@@ -138,14 +138,11 @@ instance AbstractIntro Abstract where
   null       = Abstract
 
 instance AbstractValue term address Abstract m where
-  array _ = pure Abstract
-
   tuple _ = pure Abstract
 
   namespace _ _ = pure Abstract
 
   asPair _ = pure (Abstract, Abstract)
-  asArray _ = pure mempty
 
   index _ _ = pure Abstract
 
