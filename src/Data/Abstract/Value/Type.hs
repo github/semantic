@@ -394,7 +394,8 @@ instance ( Member Fresh sig
           Array <$> foldr (\ t1 -> (unify t1 =<<)) (pure (Var var)) fieldTypes) >>= runArrayC . k
     Abstract.AsArray t k -> (do
           field <- fresh
-          unify t (Array (Var field)) $> mempty) >>= runArrayC . k)
+          unify t (Array (Var field)) >> runArrayC (k mempty)))
+
 
 instance AbstractHole Type where
   hole = Hole
