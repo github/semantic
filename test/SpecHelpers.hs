@@ -66,7 +66,7 @@ import System.FilePath as X
 import Debug.Trace as X (traceShowM, traceM)
 
 import Data.ByteString as X (ByteString)
-import Data.Functor.Both as X (Both, runBothWith, both)
+import Data.Functor.Both as X (Both (Both), runBothWith)
 import Data.Maybe as X
 import Data.Monoid as X (Monoid(..), First(..), Last(..))
 import Data.Semigroup as X (Semigroup(..))
