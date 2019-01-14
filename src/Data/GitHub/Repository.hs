@@ -3,7 +3,6 @@
 module Data.GitHub.Repository
   ( Repository (..)
   , Visibility (..)
-  , sampleRepository
   ) where
 
 import Prologue
@@ -35,18 +34,3 @@ data Repository = Repository
   , repoCreatedAt       :: Nested Timestamp
   , repoUpdatedAt       :: Nested Timestamp
   } deriving (Eq, Show, Generic, Message, Named)
-
-sampleRepository :: Repository
-sampleRepository = Repository
-  { repoId = 77777
-  , repoGlobalRelayId = "MDQ6VXNlcjE=:"
-  , repoName = "test"
-  , repoDescription = "desc"
-  , repoVisibility = Public
-  , repoParentId = 0
-  , repoStargazerCount = 1000
-  , repoPublicForkCount = 777
-  , repoPushedAt = Absent
-  , repoCreatedAt = Absent
-  , repoUpdatedAt = Absent
-  }
