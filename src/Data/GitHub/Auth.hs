@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DerivingVia, LambdaCase #-}
+{-# LANGUAGE DeriveAnyClass, DerivingVia #-}
 
 module Data.GitHub.Auth
   ( AuthTypes (..)
