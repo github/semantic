@@ -35,7 +35,7 @@ data RepositoryPush = RepositoryPush
   , pushRepository     :: Nested Repository
   , pushBefore         :: Git.SHA
   , pushAfter          :: Git.SHA
-  , pushRef            :: Text
+  , pushRef            :: Git.Ref
   , pushChangedFiles   :: NestedVec ChangedFile
   } deriving (Eq, Show, Generic, Message, Named)
 
@@ -46,6 +46,6 @@ samplePush = RepositoryPush
   , pushRepository = pure sampleRepository
   , pushBefore = Git.SHA "308cf87a25e096a71be8aba8bb53f5575a60c388"
   , pushAfter = Git.SHA "d7d56aeb77d6b8434d2789b4b0b6b305dfce10a82"
-  , pushRef = "refs/heads/test-branch"
+  , pushRef = Git.Ref "refs/heads/test-branch"
   , pushChangedFiles = [sampleChange]
   }

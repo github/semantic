@@ -5,5 +5,5 @@ import System.Exit (exitFailure, exitSuccess)
 
 main :: IO ()
 main = do
-    hints <- hlint [ "src" ]
+    hints <- hlint [ "src", "services/indexer/src" ]
     if null (filter ((>= Warning) . suggestionSeverity) hints) then exitSuccess else exitFailure
