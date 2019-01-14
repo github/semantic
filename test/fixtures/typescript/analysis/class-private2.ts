@@ -1,11 +1,18 @@
 class Adder {
-    summand: number;
-    constructor(summand: number) {
-        this.summand = summand;
+    public x: number;
+    private y: number;
+
+    private foo() {
+      return this.y;
     }
-    private private_add() {
-      return 0 + this.summand;
+
+    constructor(z) {
+      this.x = z + 1;
+      this.y = z + 2;
     }
+
 }
 
-export { Adder }
+let adder = new Adder(1);
+
+adder.y;
