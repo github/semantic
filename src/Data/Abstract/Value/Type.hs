@@ -407,9 +407,6 @@ instance AbstractHole Type where
   hole = Hole
 
 instance AbstractIntro Type where
-  hash       = Hash
-  kvPair k v = k :* v
-
   null        = Null
 
 -- | Discard the value arguments (if any), constructing a 'Type' instead.
