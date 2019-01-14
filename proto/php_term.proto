@@ -310,7 +310,9 @@ message MemberAccess {
 }
 
 message New {
-  repeated PHPTerm newSubject = 1;
+  PHPTerm subject = 1;
+  PHPTerm typeParameters = 2;
+  repeated PHPTerm arguments = 3;
 }
 
 message SequenceExpression {

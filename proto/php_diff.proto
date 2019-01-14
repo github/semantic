@@ -328,7 +328,9 @@ message MemberAccess {
 }
 
 message New {
-  repeated PHPDiff newSubject = 1;
+  PHPDiff subject = 1;
+  PHPDiff typeParameters = 2;
+  repeated PHPDiff arguments = 3;
 }
 
 message SequenceExpression {

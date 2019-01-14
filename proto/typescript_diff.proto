@@ -197,6 +197,7 @@ message TypeScriptSyntax {
     JavaScriptRequire javaScriptRequire = 163;
     List list = 164;
     StatementBlock statementBlock = 165;
+    MetaProperty metaProperty = 166;
   }
 }
 
@@ -450,7 +451,9 @@ message InstanceOf {
 }
 
 message New {
-  repeated TypeScriptDiff newSubject = 1;
+  TypeScriptDiff subject = 1;
+  TypeScriptDiff typeParameters = 2;
+  repeated TypeScriptDiff arguments = 3;
 }
 
 message Await {
@@ -724,8 +727,9 @@ message AbstractMethodSignature {
 }
 
 message IndexSignature {
-  TypeScriptDiff indexSignatureSubject = 1;
-  TypeScriptDiff indexSignatureType = 2;
+  TypeScriptDiff subject = 1;
+  TypeScriptDiff subjectType = 2;
+  TypeScriptDiff typeAnnotation = 3;
 }
 
 message ObjectType {
@@ -970,6 +974,8 @@ message List {
 message StatementBlock {
   repeated TypeScriptDiff statements = 1;
 }
+
+message MetaProperty { }
 
 message Alias {
   bytes aliasValue = 1;
