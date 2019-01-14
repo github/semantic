@@ -587,3 +587,6 @@ instance Evaluatable This where
   eval _ _ This = do
     reference (Reference __self) (Declaration __self)
     deref =<< lookupDeclaration (Declaration __self)
+
+instance Visibilities1 This where
+  liftTermToVisibility _ _ = Just Private

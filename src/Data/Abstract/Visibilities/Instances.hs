@@ -75,7 +75,6 @@ instance Visibilities1 Expression.SequenceExpression
 instance Visibilities1 Expression.StrictEqual
 instance Visibilities1 Expression.Subscript
 instance Visibilities1 Expression.Super
-instance Visibilities1 Expression.This
 instance Visibilities1 Expression.Times
 instance Visibilities1 Expression.Typeof
 instance Visibilities1 Expression.UnsignedRShift
