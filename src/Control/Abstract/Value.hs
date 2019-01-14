@@ -60,6 +60,8 @@ module Control.Abstract.Value
 , ArrayC(..)
 , runArray
 , runBitwise
+, Control.Abstract.Value.hash
+, kvPair
 , Hash(..)
 , runHash
 , HashC(..)
@@ -448,6 +450,15 @@ runArray :: Carrier (Array value :+: sig) (ArrayC value (Eff m))
            -> Evaluator term address value m a
 runArray = raiseHandler $ runArrayC . interpret
 
+-- | Construct a hash out of pairs.
+-- hash :: [(value, value)] -> value
+hash :: (Member (Hash value) sig, Carrier sig m) => [(value, value)] -> m value
+hash v = send (Hash v ret)
+
+-- | Construct a key-value pair for use in a hash.
+-- kvPair :: value -> value -> value
+kvPair :: (Member (Hash value) sig, Carrier sig m) => value -> value -> m value
+kvPair v1 v2 = send (KvPair v1 v2 ret)
 
 data Hash value (m :: * -> *) k
   = Hash [(value, value)] (value -> k)
@@ -469,12 +480,6 @@ runHash :: Carrier (Hash value :+: sig) (HashC value (Eff m))
 runHash = raiseHandler $ runHashC . interpret
 
 class Show value => AbstractIntro value where
-  -- | Construct a key-value pair for use in a hash.
-  kvPair :: value -> value -> value
-
-  -- | Construct a hash out of pairs.
-  hash :: [(value, value)] -> value
-
   -- | Construct the nil/null datatype.
   null :: value
 
