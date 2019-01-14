@@ -32,5 +32,7 @@ data Envelope = Envelope
   , envelopeSite      :: Site
   } deriving (Eq, Show, Generic, Named, Message)
 
+-- | Convenience method for unparsing Kafka messages, given that all GH Kafka
+-- messages are wrapped inside an Envelope's message field.
 fromEnvelopeByteString :: Message a => ByteString -> Either Proto3.ParseError a
-fromEnvelopeByteString b = fromByteString b >>= fromByteString . envelopeMessage
+fromEnvelopeByteString = fromByteString >=> fromByteString . envelopeMessage
