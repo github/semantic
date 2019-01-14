@@ -35,9 +35,10 @@ type DomainC term address value m
   ( BitwiseC value                                                        (Eff
   ( ObjectC address value                                                 (Eff
   ( ArrayC value                                                          (Eff
+  ( HashC value                                                          (Eff
   ( UnitC value                                                           (Eff
   ( InterposeC (Resumable (BaseError (UnspecializedError address value))) (Eff
-    m)))))))))))))))))))
+    m)))))))))))))))))))))
 
 -- | Evaluate a list of modules with the prelude for the passed language available, and applying the passed function to every module.
 evaluate :: ( Carrier outerSig outer
@@ -89,8 +90,11 @@ runDomainEffects :: ( AbstractValue term address value (DomainC term address val
                     , unitC ~ UnitC value (Eff (InterposeC (Resumable (BaseError (UnspecializedError address value))) (Eff m)))
                     , unitSig ~ (Unit value :+: Interpose (Resumable (BaseError (UnspecializedError address value))) :+: sig)
                     , Carrier unitSig unitC
-                    , arrayC ~ ArrayC value (Eff unitC)
-                    , arraySig ~ (Abstract.Array value :+: unitSig)
+                    , hashC ~ HashC value (Eff unitC)
+                    , hashSig ~ (Abstract.Hash value :+: unitSig)
+                    , Carrier hashSig hashC
+                    , arrayC ~ ArrayC value (Eff hashC)
+                    , arraySig ~ (Abstract.Array value :+: hashSig)
                     , Carrier arraySig arrayC
                     , objectC ~ ObjectC address value (Eff arrayC)
                     , objectSig ~ (Abstract.Object address value :+: arraySig)
@@ -137,6 +141,7 @@ runDomainEffects :: ( AbstractValue term address value (DomainC term address val
 runDomainEffects runTerm
   = raiseHandler runInterpose
   . runUnit
+  . runHash
   . runArray
   . runObject
   . runBitwise
@@ -167,6 +172,7 @@ evalTerm :: ( Carrier sig m
             , Member (Numeric value) sig
             , Member (Object address value) sig
             , Member (Array value) sig
+            , Member (Hash value) sig
             , Member (Reader ModuleInfo) sig
             , Member (Reader PackageInfo) sig
             , Member (Reader Span) sig
