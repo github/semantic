@@ -274,17 +274,11 @@ instance ( Member (Reader ModuleInfo) sig
     Abstract.AsArray (Array addresses) k -> runArrayC (k addresses)
     Abstract.AsArray val k -> (throwBaseError $ ArrayError val) >>= runArrayC . k)
 
-instance ( Member (Reader ModuleInfo) sig
-       , Member (Reader Span) sig
-       , Member (Resumable (BaseError (ValueError term address))) sig
-       , Carrier sig m
-       , Monad m
-       )
-      => Carrier (Abstract.Hash (Value term address) :+: sig) (HashC (Value term address) m) where
+instance ( Carrier sig m ) => Carrier (Abstract.Hash (Value term address) :+: sig) (HashC (Value term address) m) where
   ret = HashC . ret
   eff = HashC . handleSum (eff . handleCoercible) (\case
     Abstract.Hash t k -> runHashC (k ((Hash . map (uncurry KVPair)) t))
-    Abstract.KVPair t v k -> runHashC (k KVPair))
+    Abstract.KvPair t v k -> runHashC (k (KVPair t v)))
 
 
 instance AbstractHole (Value term address) where
