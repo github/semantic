@@ -28,7 +28,7 @@ data Call a = Call { callContext :: ![a], callFunction :: !a, callParams :: ![a]
 
 instance Declarations1 Call where
   liftDeclaredName declaredName Call{..} = declaredName callFunction
-  
+
 instance Evaluatable Call where
   eval eval _ Call{..} = do
     op <- eval callFunction
@@ -421,10 +421,15 @@ instance Evaluatable MemberAccess where
       -- Throw a ReferenceError since we're attempting to reference a name within a value that is not an Object.
       Nothing -> throwEvalError (ReferenceError lhsValue rhs)
 
+    let lhsVisibility = fromMaybe Control.Abstract.Public (termToVisibility lhs)
     rhsValue <- deref rhsSlot
     rhsFrame <- maybeM (throwEvalError $ ScopedEnvError rhsValue) =<< scopedEnvironment rhsValue
     rhsScope <- scopeLookup rhsFrame
-    infos <- relationsOfScope rhsScope [(Instance Public), (Default Public)]
+    let visibilities = case lhsVisibility of
+          Control.Abstract.Private -> [(Instance Private), (Instance Protected), (Instance Public), (Default Private), (Default Protected), (Default Public)]
+          _ -> [(Instance Public), (Default Public)]
+
+    infos <- relationsOfScope rhsScope visibilities
 
     case (find (\Info{..} -> (Declaration rhs) == infoDeclaration) infos) of
       Just _  -> bindThis lhsValue rhsValue
