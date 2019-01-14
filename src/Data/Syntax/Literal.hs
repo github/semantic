@@ -259,7 +259,9 @@ instance Ord1 Hash where liftCompare = genericLiftCompare
 instance Show1 Hash where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Hash where
-  eval eval _ t = Eval.hash <$> traverse (eval >=> asPair) (hashElements t)
+  eval eval _ t = do
+    elements <- traverse (eval >=> asPair) (hashElements t)
+    Eval.hash elements
 
 instance Tokenize Hash where
   tokenize = Tok.hash . hashElements
@@ -272,8 +274,10 @@ instance Ord1 KeyValue where liftCompare = genericLiftCompare
 instance Show1 KeyValue where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable KeyValue where
-  eval eval _ (fmap eval -> KeyValue{..}) =
-    kvPair <$> key <*> value
+  eval eval _ (KeyValue{..}) = do
+    k <- eval key
+    v <- eval value
+    kvPair k v
 
 instance Tokenize KeyValue where
   tokenize (KeyValue k v) = pair k v
