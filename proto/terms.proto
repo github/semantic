@@ -24,7 +24,7 @@ import "php_diff.proto";
 import "types.proto";
 
 option java_package = "com.github.semantic.terms";
-option go_package = "github.com/semantic/terms;types";
+option go_package = "github.com/semantic/terms;terms";
 
 message ParseTree {
   Language language = 1;
