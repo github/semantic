@@ -141,8 +141,6 @@ instance AbstractHole Abstract where
   hole = Abstract
 
 instance AbstractIntro Abstract where
-  hash _     = Abstract
-  kvPair _ _ = Abstract
   null       = Abstract
 
 instance AbstractValue term address Abstract m where
