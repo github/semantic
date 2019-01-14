@@ -396,19 +396,11 @@ instance ( Member Fresh sig
           field <- fresh
           unify t (Array (Var field)) >> runArrayC (k mempty)))
 
-instance ( Member (Reader ModuleInfo) sig
-         , Member (Reader Span) sig
-         , Member (Resumable (BaseError TypeError)) sig
-         , Member (State TypeMap) sig
-         , Carrier sig m
-         , Alternative m
-         , Monad m
-         )
-      => Carrier (Abstract.Hash Type :+: sig) (HashC Type m) where
+instance ( Carrier sig m ) => Carrier (Abstract.Hash Type :+: sig) (HashC Type m) where
   ret = HashC . ret
   eff = HashC . handleSum (eff . handleCoercible) (\case
-    Abstract.Hash _ k -> runHashC (k Hash)
-    Abstract.KvPair t v k -> (t :* v) >>= runHash . k)
+    Abstract.Hash t k -> runHashC (k (Hash t))
+    Abstract.KvPair t1 t2 k -> runHashC (k (t1 :* t2)))
 
 
 instance AbstractHole Type where
