@@ -285,9 +285,6 @@ instance AbstractHole (Value term address) where
   hole = Hole
 
 instance (Show address, Show term) => AbstractIntro (Value term address) where
-  kvPair = KVPair
-  hash = Hash . map (uncurry KVPair)
-
   null     = Null
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
