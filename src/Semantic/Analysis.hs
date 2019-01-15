@@ -113,7 +113,7 @@ evalTerm :: ( Carrier sig m
             , Declarations term
             , Evaluatable (Base term)
             , FreeVariables term
-            , Visibilities term
+            , AccessControls term
             , AbstractValue term address value m
             , Member (Allocator address) sig
             , Member (Boolean value) sig

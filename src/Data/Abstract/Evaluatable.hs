@@ -28,7 +28,7 @@ import Data.Abstract.FreeVariables as X
 import Data.Abstract.Module
 import Data.Abstract.Name as X
 import Data.Abstract.ScopeGraph (Relation(..))
-import Data.Abstract.Visibilities.Visibilities as X
+import Data.Abstract.AccessControls.Class as X
 import Data.Language
 import Data.Scientific (Scientific)
 import Data.Semigroup.App
@@ -44,7 +44,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Carrier sig m
           , Declarations term
           , FreeVariables term
-          , Visibilities term
+          , AccessControls term
           , Member (Allocator address) sig
           , Member (Boolean value) sig
           , Member (While value) sig

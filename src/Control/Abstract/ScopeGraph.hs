@@ -13,7 +13,7 @@ module Control.Abstract.ScopeGraph
   , EdgeLabel(..)
   , CurrentScope(..)
   , Info(..)
-  , Visibility(..)
+  , AccessControl(..)
   , currentScope
   , insertExportEdge
   , insertImportEdge
@@ -45,7 +45,7 @@ import           Control.Effect.Carrier
 import           Data.Abstract.BaseError
 import           Data.Abstract.Module
 import           Data.Abstract.Name hiding (name)
-import           Data.Abstract.ScopeGraph (Declaration(..), EdgeLabel, Reference, Relation(..), Scope (..), ScopeGraph, Slot(..), Info(..), Visibility(..))
+import           Data.Abstract.ScopeGraph (Declaration(..), EdgeLabel, Reference, Relation(..), Scope (..), ScopeGraph, Slot(..), Info(..), AccessControl(..))
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.Span
 import           Prelude hiding (lookup)
