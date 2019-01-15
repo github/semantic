@@ -49,5 +49,5 @@ diffFixtures =
   , (show SExpressionDiffRenderer, runDiff SExpressionDiffRenderer, pathMode, "test/fixtures/ruby/corpus/method-declaration.diffA-B.txt")
   , (show ToCDiffRenderer, runDiff ToCDiffRenderer, pathMode, prefix </> "diff-tree.toc.json")
   ]
-  where pathMode = [both (File "test/fixtures/ruby/corpus/method-declaration.A.rb" Ruby) (File "test/fixtures/ruby/corpus/method-declaration.B.rb"  Ruby)]
+  where pathMode = [Both (File "test/fixtures/ruby/corpus/method-declaration.A.rb" Ruby) (File "test/fixtures/ruby/corpus/method-declaration.B.rb"  Ruby)]
         prefix = "test/fixtures/cli"

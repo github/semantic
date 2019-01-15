@@ -15,7 +15,8 @@ import Data.Bifunctor.Join as X
 import Data.Bits as X
 import Data.ByteString as X (ByteString)
 import Data.Coerce as X
-import Data.Functor.Both as X (Both, both, runBothWith)
+import Data.Functor.Both as X (Both (Both), runBothWith)
+import Data.Either as X (fromLeft, fromRight)
 import Data.IntMap as X (IntMap)
 import Data.IntSet as X (IntSet)
 import Data.Ix as X (Ix (..))
@@ -51,6 +52,7 @@ import Data.Functor.Foldable as X (Base, Corecursive (..), Recursive (..))
 import Data.Hashable as X (Hashable, hash, hashUsing, hashWithSalt)
 import Data.Hashable.Lifted as X (Hashable1(..), hashWithSalt1)
 import Data.Monoid as X (First (..), Last (..), Monoid (..))
+import Data.Monoid.Generic as X
 import Data.Proxy as X (Proxy (..))
 import Data.Semigroup as X (Semigroup (..))
 import Data.Traversable as X
