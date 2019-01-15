@@ -1,6 +1,8 @@
-{-# LANGUAGE RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE RankNTypes, DerivingStrategies, DeriveAnyClass, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Rendering.Symbol
 ( renderToSymbols
+, File(..)
+, Symbol(..)
 , SymbolFields(..)
 , defaultSymbolFields
 , parseSymbolFields
@@ -16,6 +18,11 @@ import           Data.Term
 import qualified Data.Text as T
 import           Tags.Taggable
 import           Tags.Tagging
+
+import Proto3.Suite
+import qualified Proto3.Suite.DotProto as Proto
+import qualified Proto3.Wire.Encode as Encode
+import qualified Proto3.Wire.Decode as Decode
 
 
 -- | Render a 'Term' to a list of symbols (See 'Symbol').
@@ -42,7 +49,9 @@ data File = File
   { filePath :: T.Text
   , fileLanguage :: T.Text
   , fileSymbols :: [Symbol]
-  } deriving (Generic, Eq, Show)
+  }
+  deriving stock (Generic, Eq, Show)
+  deriving anyclass (Named, Message)
 
 instance ToJSON File where
   toJSON File{..} = object [ "path" .= filePath
@@ -57,7 +66,17 @@ data Symbol = Symbol
   , symbolLine :: Maybe T.Text
   , symbolSpan :: Maybe Span
   , symbolDocs :: Maybe T.Text
-  } deriving (Generic, Eq, Show)
+  }
+  deriving stock (Generic, Eq, Show)
+  deriving anyclass (Named, Message)
+
+instance Named T.Text where
+  nameOf _ = "string"
+
+instance Message T.Text where
+  encodeMessage = encodeMessageField
+  decodeMessage = Decode.at decodeMessageField
+  dotProto _ = [ Proto.DotProtoMessageField $ protoType (Proxy @T.Text) ]
 
 instance ToJSON Symbol where
   toJSON Symbol{..} = objectWithoutNulls

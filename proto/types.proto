@@ -146,3 +146,19 @@ message TermAnnotation {
   Range range = 1;
   Span span = 2;
 }
+
+message File {
+  string filePath = 1;
+  string fileLanguage = 2;
+  repeated Symbol fileSymbols = 3;
+}
+
+message Symbol {
+  string symbolName = 1;
+  string symbolPath = 2;
+  string symbolLang = 3;
+  string symbolKind = 4;
+  string symbolLine = 5;
+  Span symbolSpan = 6;
+  string symbolDocs = 7;
+}
