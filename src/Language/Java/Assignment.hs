@@ -46,7 +46,7 @@ type Syntax =
    , Declaration.InterfaceDeclaration
    , Declaration.Method
    , Declaration.VariableDeclaration
-   , Declaration.Visibility
+   , Declaration.AccessControl
    , Expression.Plus
    , Expression.Minus
    , Expression.Times

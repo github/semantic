@@ -43,7 +43,7 @@ type Syntax = '[
   , Declaration.Function
   , Declaration.Method
   , Declaration.VariableDeclaration
-  , Declaration.Visibility
+  , Declaration.AccessControl
   , Expression.Plus
   , Expression.Minus
   , Expression.Times
@@ -444,17 +444,17 @@ classMemberDeclaration = choice [
   traitUseClause
   ]
 
--- TODO: What should the `location` be for implicit `public` visibility modifier?
-publicVisibility :: Assignment Term
-publicVisibility = makeTerm <$> location <*> pure Declaration.Public
+-- TODO: What should the `location` be for implicit `public` access control modifier?
+publicAccessControl :: Assignment Term
+publicAccessControl = makeTerm <$> location <*> pure Declaration.Public
 
 methodDeclaration :: Assignment Term
-methodDeclaration =  (makeTerm <$> symbol MethodDeclaration <*> children (makeMethod1 <$> (visibilityModifier <|> publicVisibility) <*> manyTerm methodModifier <*> emptyTerm <*> functionDefinitionParts))
-                 <|> makeTerm <$> symbol MethodDeclaration <*> children (makeMethod2 <$> (visibilityModifier <|> publicVisibility) <*> someTerm methodModifier <*> emptyTerm <*> term name <*> parameters <*> term (returnType <|> emptyTerm) <*> emptyTerm)
+methodDeclaration =  (makeTerm <$> symbol MethodDeclaration <*> children (makeMethod1 <$> (accessControlModifier <|> publicAccessControl) <*> manyTerm methodModifier <*> emptyTerm <*> functionDefinitionParts))
+                 <|> makeTerm <$> symbol MethodDeclaration <*> children (makeMethod2 <$> (accessControlModifier <|> publicAccessControl) <*> someTerm methodModifier <*> emptyTerm <*> term name <*> parameters <*> term (returnType <|> emptyTerm) <*> emptyTerm)
   where
     functionDefinitionParts = symbol FunctionDefinition *> children ((,,,) <$> term name <*> parameters <*> term (returnType <|> emptyTerm) <*> (term compoundStatement <|> emptyTerm))
-    makeMethod1 visibility modifiers receiver (name, params, returnType, compoundStatement) = Declaration.Method (modifiers <> [returnType]) receiver visibility name params compoundStatement
-    makeMethod2 visibility modifiers receiver name params returnType compoundStatement      = Declaration.Method (modifiers <> [returnType]) receiver visibility name params compoundStatement
+    makeMethod1 accessControl modifiers receiver (name, params, returnType, compoundStatement) = Declaration.Method (modifiers <> [returnType]) receiver accessControl name params compoundStatement
+    makeMethod2 accessControl modifiers receiver name params returnType compoundStatement      = Declaration.Method (modifiers <> [returnType]) receiver accessControl name params compoundStatement
 
 classBaseClause :: Assignment Term
 classBaseClause = makeTerm <$> symbol ClassBaseClause <*> children (Syntax.ClassBaseClause <$> term qualifiedName)
@@ -463,10 +463,10 @@ classInterfaceClause :: Assignment Term
 classInterfaceClause = makeTerm <$> symbol ClassInterfaceClause <*> children (Syntax.ClassInterfaceClause <$> someTerm qualifiedName)
 
 classConstDeclaration :: Assignment Term
-classConstDeclaration = makeTerm <$> symbol ClassConstDeclaration <*> children (Syntax.ClassConstDeclaration <$> (term visibilityModifier <|> emptyTerm) <*> manyTerm constElement)
+classConstDeclaration = makeTerm <$> symbol ClassConstDeclaration <*> children (Syntax.ClassConstDeclaration <$> (term accessControlModifier <|> emptyTerm) <*> manyTerm constElement)
 
-visibilityModifier :: Assignment Term
-visibilityModifier = makeTerm <$> symbol VisibilityModifier <*> (Syntax.Identifier . Name.name <$> source)
+accessControlModifier :: Assignment Term
+accessControlModifier = makeTerm <$> symbol VisibilityModifier <*> (Syntax.Identifier . Name.name <$> source)
 
 constElement :: Assignment Term
 constElement = makeTerm <$> symbol ConstElement <*> children (Statement.Assignment [] <$> term name <*> term expression)
@@ -678,7 +678,7 @@ propertyDeclaration :: Assignment Term
 propertyDeclaration = makeTerm <$> symbol PropertyDeclaration <*> children (Syntax.PropertyDeclaration <$> term propertyModifier <*> someTerm propertyElement)
 
 propertyModifier :: Assignment Term
-propertyModifier = (makeTerm <$> symbol PropertyModifier <*> children (Syntax.PropertyModifier <$> (term visibilityModifier <|> emptyTerm) <*> (term staticModifier <|> emptyTerm))) <|> term (makeTerm <$> symbol PropertyModifier <*> (Syntax.Identifier . Name.name <$> source))
+propertyModifier = (makeTerm <$> symbol PropertyModifier <*> children (Syntax.PropertyModifier <$> (term accessControlModifier <|> emptyTerm) <*> (term staticModifier <|> emptyTerm))) <|> term (makeTerm <$> symbol PropertyModifier <*> (Syntax.Identifier . Name.name <$> source))
 
 propertyElement :: Assignment Term
 propertyElement = makeTerm <$> symbol PropertyElement <*> children (Statement.Assignment [] <$> term variableName <*> term propertyInitializer) <|> (symbol PropertyElement *> children (term variableName))
@@ -692,7 +692,7 @@ destructorDeclaration = makeTerm <$> symbol DestructorDeclaration <*> children (
 
 methodModifier :: Assignment Term
 methodModifier = choice [
-  visibilityModifier,
+  accessControlModifier,
   classModifier,
   staticModifier
   ]
@@ -716,7 +716,7 @@ traitSelectInsteadOfClause :: Assignment Term
 traitSelectInsteadOfClause = makeTerm <$> symbol TraitSelectInsteadOfClause <*> children (Syntax.InsteadOf <$> term (classConstantAccessExpression <|> name) <*> term name)
 
 traitAliasAsClause :: Assignment Term
-traitAliasAsClause = makeTerm <$> symbol TraitAliasAsClause <*> children (Syntax.AliasAs <$> term (classConstantAccessExpression <|> name) <*> (term visibilityModifier <|> emptyTerm) <*> (term name <|> emptyTerm))
+traitAliasAsClause = makeTerm <$> symbol TraitAliasAsClause <*> children (Syntax.AliasAs <$> term (classConstantAccessExpression <|> name) <*> (term accessControlModifier <|> emptyTerm) <*> (term name <|> emptyTerm))
 
 namespaceDefinition :: Assignment Term
 namespaceDefinition = makeTerm <$> symbol NamespaceDefinition <*> children (Syntax.Namespace <$> (toList <$> namespaceName' <|> pure []) <*> (term compoundStatement <|> emptyTerm))

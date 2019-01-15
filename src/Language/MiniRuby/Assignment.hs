@@ -41,7 +41,7 @@ type Syntax =
   '[ Comment.Comment
    , Declaration.Function
    , Declaration.Method
-   , Declaration.Visibility
+   , Declaration.AccessControl
    , Expression.Minus
    , Expression.Plus
    , Expression.Times
