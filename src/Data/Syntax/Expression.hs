@@ -426,7 +426,13 @@ instance Evaluatable MemberAccess where
 
     let lhsVisibility = fromMaybe Control.Abstract.Public (termToVisibility lhs)
     let visibilities = case lhsVisibility of
-          Control.Abstract.Private -> [(Instance Private), (Instance Protected), (Instance Public), (Default Private), (Default Protected), (Default Public)]
+          Control.Abstract.Private -> [ (Instance Private)
+                                      , (Instance Protected)
+                                      , (Instance Public)
+                                      , (Default Private)
+                                      , (Default Protected)
+                                      , (Default Public)
+                                      ]
           _ -> [(Instance Public), (Default Public)]
 
     infos <- relationsOfScope rhsScope visibilities
