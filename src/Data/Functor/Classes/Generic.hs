@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE TypeOperators, RankNTypes, UndecidableInstances #-}
 module Data.Functor.Classes.Generic
 ( Eq1(..)
 , genericLiftEq
@@ -9,6 +9,7 @@ module Data.Functor.Classes.Generic
 , defaultGShow1Options
 , genericLiftShowsPrec
 , genericLiftShowsPrecWithOptions
+, Generically (..)
 ) where
 
 import Data.Functor.Classes
@@ -179,3 +180,11 @@ instance (Show1 f, GShow1 g) => GShow1 (f :.: g) where
 
 showBraces :: Bool -> ShowS -> ShowS
 showBraces should rest = if should then showChar '{' . rest . showChar '}' else rest
+
+-- | Used with the `DerivingVia` extension to provide fast derivations for
+-- 'Eq1', 'Show1', and 'Ord1'.
+newtype Generically f a = Generically { unGenerically :: f a }
+
+instance (Generic1 f, GEq1 (Rep1 f)) => Eq1 (Generically f) where liftEq eq (Generically a1) (Generically a2) = genericLiftEq eq a1 a2
+instance (Generic1 f, GEq1 (Rep1 f), GOrd1 (Rep1 f)) => Ord1  (Generically f) where liftCompare compare (Generically a1) (Generically a2) = genericLiftCompare compare a1 a2
+instance (Generic1 f, GShow1 (Rep1 f)) => Show1 (Generically f) where liftShowsPrec d sp sl = genericLiftShowsPrec d sp sl . unGenerically

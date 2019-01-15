@@ -43,7 +43,7 @@ import Proto3.Suite
 -- 'ByteString' under the hood. Construct these with 'fromUTF8'; obviously,
 -- passing 'fromUTF8' non-UTF8 bytes will cause crashes.
 newtype Source = Source { sourceBytes :: B.ByteString }
-  deriving (Eq, IsString, Show, Generic, MessageField)
+  deriving (Eq, Semigroup, Monoid, IsString, Show, Generic, MessageField)
 
 fromUTF8 :: B.ByteString -> Source
 fromUTF8 = Source
@@ -158,13 +158,3 @@ rangeToSpan source (Range rangeStart rangeEnd) = Span startPos endPos
         (lineRanges, _) = span ((<= rangeEnd) . start) rest
         firstRange = fromMaybe emptyRange (getFirst (foldMap (First . Just) lineRanges))
         lastRange  = fromMaybe firstRange (getLast (foldMap (Last . Just) lineRanges))
-
-
--- Instances
-
-instance Semigroup Source where
-  Source a <> Source b = Source (a <> b)
-
-instance Monoid Source where
-  mempty = Source B.empty
-  mappend = (<>)

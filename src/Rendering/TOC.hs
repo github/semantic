@@ -1,4 +1,4 @@
-{-# LANGUAGE RankNTypes, ScopedTypeVariables #-}
+{-# LANGUAGE DerivingVia, RankNTypes, ScopedTypeVariables #-}
 module Rendering.TOC
 ( renderToCDiff
 , renderRPCToCDiff
@@ -26,7 +26,7 @@ import Data.Diff
 import Data.Language as Language
 import Data.List (sortOn)
 import qualified Data.List as List
-import qualified Data.Map as Map
+import qualified Data.Map.Monoidal as Map
 import Data.Patch
 import Data.Location
 import Data.Term
@@ -36,15 +36,10 @@ renderJSONSummaryError :: BlobPair -> String -> Summaries
 renderJSONSummaryError pair e = Summaries mempty (Map.singleton path [object ["error" .= e]])
   where path = T.pack (pathKeyForBlobPair pair)
 
-data Summaries = Summaries { changes, errors :: !(Map.Map T.Text [Value]) }
-  deriving (Eq, Show)
-
-instance Semigroup Summaries where
-  (<>) (Summaries c1 e1) (Summaries c2 e2) = Summaries (Map.unionWith (<>) c1 c2) (Map.unionWith (<>) e1 e2)
-
-instance Monoid Summaries where
-  mempty = Summaries mempty mempty
-  mappend = (<>)
+data Summaries = Summaries { changes, errors :: Map.Map T.Text [Value] }
+  deriving (Eq, Show, Generic)
+  deriving Semigroup via GenericSemigroup Summaries
+  deriving Monoid via GenericMonoid Summaries
 
 instance ToJSON Summaries where
   toJSON Summaries{..} = object [ "changes" .= changes, "errors" .= errors ]

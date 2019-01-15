@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances #-}
+{-# LANGUAGE DeriveAnyClass, DerivingVia, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Data.Syntax.Directive where
 
@@ -17,10 +17,7 @@ import Reprinting.Tokenize
 -- A file directive like the Ruby constant `__FILE__`.
 data File a = File
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
-
-instance Eq1 File where liftEq = genericLiftEq
-instance Ord1 File where liftCompare = genericLiftCompare
-instance Show1 File where liftShowsPrec = genericLiftShowsPrec
+  deriving (Eq1, Show1, Ord1) via Generically File
 
 instance Evaluatable File where
   eval _ _ File = currentModule >>= string . T.pack . modulePath
@@ -33,10 +30,7 @@ instance Tokenize File where
 -- A line directive like the Ruby constant `__LINE__`.
 data Line a = Line
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
-
-instance Eq1 Line where liftEq = genericLiftEq
-instance Ord1 Line where liftCompare = genericLiftCompare
-instance Show1 Line where liftShowsPrec = genericLiftShowsPrec
+  deriving (Eq1, Show1, Ord1) via Generically Line
 
 instance Evaluatable Line where
   eval _ _ Line = currentSpan >>= integer . fromIntegral . posLine . spanStart
