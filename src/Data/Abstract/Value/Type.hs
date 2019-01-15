@@ -389,9 +389,10 @@ instance ( Member Fresh sig
       => Carrier (Abstract.Array Type :+: sig) (ArrayC Type m) where
   ret = ArrayC . ret
   eff = ArrayC . handleSum (eff . handleCoercible) (\case
-    Abstract.Array fieldTypes k -> (do
+    Abstract.Array fieldTypes k -> do
           var <- fresh
-          Array <$> foldr (\ t1 -> (unify t1 =<<)) (pure (Var var)) fieldTypes) >>= runArrayC . k
+          fieldType <- foldr (\ t1 -> (unify t1 =<<)) (pure (Var var)) fieldTypes
+          runArrayC (k (Array fieldType))
     Abstract.AsArray t k -> do
           field <- fresh
           unify t (Array (Var field)) >> runArrayC (k mempty))
