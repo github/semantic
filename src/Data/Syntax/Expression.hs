@@ -424,8 +424,8 @@ instance Evaluatable MemberAccess where
     rhsValue <- deref rhsSlot
     rhsScope <- scopeLookup (frameAddress rhsSlot)
 
-    let lhsVisibility = fromMaybe Control.Abstract.Public (termToVisibility lhs)
-    let visibilities = case lhsVisibility of
+    let lhsAccessControl = fromMaybe Control.Abstract.Public (termToAccessControl lhs)
+    let accessControls = case lhsAccessControl of
           Control.Abstract.Private -> [ (Instance Private)
                                       , (Instance Protected)
                                       , (Instance Public)
@@ -435,7 +435,7 @@ instance Evaluatable MemberAccess where
                                       ]
           _ -> [(Instance Public), (Default Public)]
 
-    infos <- relationsOfScope rhsScope visibilities
+    infos <- relationsOfScope rhsScope accessControls
 
     case (find (\Info{..} -> (Declaration rhs) == infoDeclaration) infos) of
       Just _  -> bindThis lhsValue rhsValue
@@ -603,5 +603,5 @@ instance Evaluatable This where
     reference (Reference __self) (Declaration __self)
     deref =<< lookupDeclaration (Declaration __self)
 
-instance Visibilities1 This where
-  liftTermToVisibility _ _ = Just Private
+instance AccessControls1 This where
+  liftTermToAccessControl _ _ = Just Private
