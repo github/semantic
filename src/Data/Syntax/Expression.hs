@@ -559,7 +559,11 @@ instance Evaluatable New where
 
     void . withScopeAndFrame objectFrame $ do
       for_ instanceMembers $ \Info{..} -> do
-        declare infoDeclaration (Default Public) infoSpan infoAssociatedScope
+        let relation = case infoRelation of
+              Instance Public -> Default Public
+              Instance Private -> Default Private
+              _ -> infoRelation
+        declare infoDeclaration relation infoSpan infoAssociatedScope
 
       -- TODO: This is a typescript specific name and we should allow languages to customize it.
       let constructorName = Name.name "constructor"
