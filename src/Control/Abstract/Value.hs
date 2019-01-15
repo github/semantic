@@ -54,12 +54,12 @@ module Control.Abstract.Value
 , unsignedRShift
 , Bitwise(..)
 , BitwiseC(..)
+, runBitwise
 , array
 , asArray
 , Array(..)
 , ArrayC(..)
 , runArray
-, runBitwise
 , Control.Abstract.Value.hash
 , kvPair
 , Hash(..)
