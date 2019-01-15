@@ -104,7 +104,7 @@ instance Evaluatable Method where
   eval _ _ Method{..} = do
     name <- maybeM (throwNoNameError methodName) (declaredName methodName)
     span <- ask @Span
-    associatedScope <- declareFunction name (Default (fromMaybe Control.Abstract.Public (termToVisibility methodVisibility))) span
+    associatedScope <- declareFunction name (Default (fromMaybe Control.Abstract.Public (termToAccessControl methodVisibility))) span
 
     params <- withScope associatedScope $ do
       declare (Declaration __self) (Default Control.Abstract.Public) emptySpan Nothing
@@ -209,7 +209,7 @@ instance Evaluatable PublicFieldDefinition where
     span <- ask @Span
     propertyName <- maybeM (throwNoNameError publicFieldPropertyName) (declaredName publicFieldPropertyName)
 
-    declare (Declaration propertyName) (Instance (fromMaybe (Control.Abstract.Public) (termToVisibility publicFieldVisibility))) span Nothing
+    declare (Declaration propertyName) (Instance (fromMaybe (Control.Abstract.Public) (termToAccessControl publicFieldVisibility))) span Nothing
     slot <- lookupDeclaration (Declaration propertyName)
     value <- eval publicFieldValue
     assign slot value
