@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DerivingVia, DuplicateRecordFields, ScopedTypeVariables, ViewPatterns #-}
+{-# LANGUAGE DeriveAnyClass, DerivingVia, DuplicateRecordFields, ScopedTypeVariables #-}
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Data.Syntax.Literal where
 
@@ -223,7 +223,7 @@ data KeyValue a = KeyValue { key :: !a, value :: !a }
   deriving (Eq1, Ord1, Show1) via Generically KeyValue
 
 instance Evaluatable KeyValue where
-  eval eval _ (KeyValue{..}) = do
+  eval eval _ KeyValue{..} = do
     k <- eval key
     v <- eval value
     kvPair k v

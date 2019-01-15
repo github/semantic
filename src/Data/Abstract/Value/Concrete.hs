@@ -272,7 +272,7 @@ instance ( Member (Reader ModuleInfo) sig
   eff = ArrayC . handleSum (eff . handleCoercible) (\case
     Abstract.Array t k -> runArrayC (k (Array t))
     Abstract.AsArray (Array addresses) k -> runArrayC (k addresses)
-    Abstract.AsArray val k -> (throwBaseError $ ArrayError val) >>= runArrayC . k)
+    Abstract.AsArray val k -> throwBaseError (ArrayError val) >>= runArrayC . k)
 
 instance ( Carrier sig m ) => Carrier (Abstract.Hash (Value term address) :+: sig) (HashC (Value term address) m) where
   ret = HashC . ret
