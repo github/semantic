@@ -9,8 +9,12 @@ import "terms.proto";
 option java_package = "com.github.semantic.analysis";
 option go_package = "github.com/semantic/analysis/;analysis";
 
+// Semantic's CodeAnalysis service provides endpoints for parsing, analyzing, and comparing source code.
+
 service CodeAnalysis {
+  // Check health & status of the service.
   rpc Ping (PingRequest) returns (PingResponse);
+  // Retrieve c-tags like symbols for blobs.
   rpc Symbols (ParseTreeRequest) returns (ParseTreeSymbolResponse);
 }
 
