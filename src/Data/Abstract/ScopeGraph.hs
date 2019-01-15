@@ -29,7 +29,7 @@ module Data.Abstract.ScopeGraph
   , pathDeclarationScope
   , putDeclarationScopeAtPosition
   , declarationNames
-  , Visibility(..)
+  , AccessControl(..)
   ) where
 
 import           Control.Abstract.Hole
@@ -45,14 +45,14 @@ import           Prologue
 data Slot address = Slot { frameAddress :: address, position :: Position }
     deriving (Eq, Show, Ord, Generic, NFData)
 
-data Visibility = Public
-                | Protected
-                | Private
-                | Unknown
-                deriving (Eq, Show, Ord, Generic, NFData)
+data AccessControl = Public
+                   | Protected
+                   | Private
+                   | Unknown
+                   deriving (Eq, Show, Ord, Generic, NFData)
 
-data Relation = Default  Visibility
-              | Instance Visibility
+data Relation = Default  AccessControl
+              | Instance AccessControl
   deriving (Eq, Show, Ord, Generic, NFData)
 
 data Info scopeAddress = Info
