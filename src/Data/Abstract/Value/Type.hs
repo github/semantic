@@ -392,9 +392,9 @@ instance ( Member Fresh sig
     Abstract.Array fieldTypes k -> (do
           var <- fresh
           Array <$> foldr (\ t1 -> (unify t1 =<<)) (pure (Var var)) fieldTypes) >>= runArrayC . k
-    Abstract.AsArray t k -> (do
+    Abstract.AsArray t k -> do
           field <- fresh
-          unify t (Array (Var field)) >> runArrayC (k mempty)))
+          unify t (Array (Var field)) >> runArrayC (k mempty))
 
 instance ( Carrier sig m ) => Carrier (Abstract.Hash Type :+: sig) (HashC Type m) where
   ret = HashC . ret
