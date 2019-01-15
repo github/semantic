@@ -71,20 +71,20 @@ instance Declarations1 Function where
 instance FreeVariables1 Function where
   liftFreeVariables freeVariables f@Function{..} = foldMap freeVariables f `Set.difference` foldMap freeVariables functionParameters
 
-data Visibility a = Public
-                  | Protected
-                  | Private
-                  | Unknown
-                  deriving (Declarations1, Diffable, Eq, Ord, Show, Foldable, Traversable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Named1, Message1, NFData1)
-                  deriving (Eq1, Show1, Ord1) via Generically Data.Syntax.Declaration.Visibility
+data AccessControl a = Public
+                     | Protected
+                     | Private
+                     | Unknown
+                     deriving (Declarations1, Diffable, Eq, Ord, Show, Foldable, Traversable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Named1, Message1, NFData1)
+                     deriving (Eq1, Show1, Ord1) via Generically Data.Syntax.Declaration.AccessControl
 
-instance Evaluatable Data.Syntax.Declaration.Visibility
+instance Evaluatable Data.Syntax.Declaration.AccessControl
 
-instance Visibilities1 Data.Syntax.Declaration.Visibility where
-  liftTermToVisibility _ Data.Syntax.Declaration.Public    = Just Control.Abstract.Public
-  liftTermToVisibility _ Data.Syntax.Declaration.Protected = Just Control.Abstract.Protected
-  liftTermToVisibility _ Data.Syntax.Declaration.Private   = Just Control.Abstract.Private
-  liftTermToVisibility _ Data.Syntax.Declaration.Unknown   = Just Control.Abstract.Unknown
+instance AccessControls1 Data.Syntax.Declaration.AccessControl where
+  liftTermToAccessControl _ Data.Syntax.Declaration.Public    = Just Control.Abstract.Public
+  liftTermToAccessControl _ Data.Syntax.Declaration.Protected = Just Control.Abstract.Protected
+  liftTermToAccessControl _ Data.Syntax.Declaration.Private   = Just Control.Abstract.Private
+  liftTermToAccessControl _ Data.Syntax.Declaration.Unknown   = Just Control.Abstract.Unknown
 
 data Method a = Method { methodContext :: [a]
                        , methodVisibility :: a
