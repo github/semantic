@@ -211,6 +211,7 @@ library
                      -- Serialization
                      , Serializing.Format
                      , Serializing.SExpression
+                     , Service.CodeAnalysis
                      , Tags.Taggable
                      , Tags.Tagging
                      -- Custom Prelude
