@@ -44,7 +44,7 @@ type Syntax = '[
     Comment.Comment
   , Declaration.Function
   , Declaration.Method
-  , Declaration.Visibility
+  , Declaration.AccessControl
   , Directive.File
   , Directive.Line
   , Expression.Plus
@@ -333,15 +333,15 @@ parameter = postContextualize comment (term uncontextualizedParameter)
     optionalParameter = symbol OptionalParameter *> children (lhsIdent <* expression)
 
 method :: Assignment Term
-method = makeTerm <$> symbol Method <*> (withNewScope . children) (Declaration.Method [] <$> emptyTerm <*> visibility <*> methodSelector <*> params <*> expressions')
+method = makeTerm <$> symbol Method <*> (withNewScope . children) (Declaration.Method [] <$> emptyTerm <*> accessControl <*> methodSelector <*> params <*> expressions')
   where params = symbol MethodParameters *> children (many parameter) <|> pure []
         expressions' = makeTerm <$> location <*> many expression
-        visibility = makeTerm <$> location <*> pure Declaration.Unknown
+        accessControl = makeTerm <$> location <*> pure Declaration.Unknown
 
 singletonMethod :: Assignment Term
-singletonMethod = makeTerm <$> symbol SingletonMethod <*> (withNewScope . children) (Declaration.Method [] <$> expression <*> visibility <*> methodSelector <*> params <*> expressions)
+singletonMethod = makeTerm <$> symbol SingletonMethod <*> (withNewScope . children) (Declaration.Method [] <$> expression <*> accessControl <*> methodSelector <*> params <*> expressions)
   where params = symbol MethodParameters *> children (many parameter) <|> pure []
-        visibility = makeTerm <$> location <*> pure Declaration.Unknown
+        accessControl = makeTerm <$> location <*> pure Declaration.Unknown
 
 lambda :: Assignment Term
 lambda = makeTerm <$> symbol Lambda <*> (withExtendedScope . children) (

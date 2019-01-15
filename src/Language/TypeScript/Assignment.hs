@@ -50,7 +50,7 @@ type Syntax = '[
   , Declaration.PublicFieldDefinition
   , Declaration.VariableDeclaration
   , Declaration.TypeAlias
-  , Declaration.Visibility
+  , Declaration.AccessControl
   , Expression.Plus
   , Expression.Minus
   , Expression.Times
@@ -484,13 +484,13 @@ parameter =  requiredParameter
 accessibilityModifier' :: Assignment Term
 accessibilityModifier' = makeTerm'
                       <$> symbol AccessibilityModifier
-                      <*> children (inject <$> (textToVisibility <$> source))
+                      <*> children (inject <$> (textToAccessControl <$> source))
 
-textToVisibility :: Text -> Declaration.Visibility a
-textToVisibility = \case
+textToAccessControl :: Text -> Declaration.AccessControl a
+textToAccessControl = \case
   "protected" -> Declaration.Protected
   "private"   -> Declaration.Private
-  -- | The catchall case is public visibility.
+  -- | The catchall case is public.
   _           -> Declaration.Public
 
 destructuringPattern :: Assignment Term
@@ -674,11 +674,11 @@ classBodyStatements = makeTerm'' <$> symbol ClassBody <*> children (contextualiz
       Just cs -> formalParams <> toList cs
       Nothing -> formalParams
 
-publicVisibility :: Assignment Term
-publicVisibility = makeTerm <$> location <*> pure Declaration.Public
+publicAccessControl :: Assignment Term
+publicAccessControl = makeTerm <$> location <*> pure Declaration.Public
 
 publicFieldDefinition :: Assignment Term
-publicFieldDefinition = makeField <$> symbol Grammar.PublicFieldDefinition <*> children ((,,,,) <$> (term accessibilityModifier' <|> term publicVisibility) <*> (term readonly' <|> emptyTerm) <*> term propertyName <*> (term typeAnnotation' <|> emptyTerm) <*> (term expression <|> emptyTerm))
+publicFieldDefinition = makeField <$> symbol Grammar.PublicFieldDefinition <*> children ((,,,,) <$> (term accessibilityModifier' <|> term publicAccessControl) <*> (term readonly' <|> emptyTerm) <*> term propertyName <*> (term typeAnnotation' <|> emptyTerm) <*> (term expression <|> emptyTerm))
   where makeField loc (modifier, readonly, propertyName, annotation, expression) = makeTerm loc (Declaration.PublicFieldDefinition [readonly, annotation] propertyName modifier expression)
 
 

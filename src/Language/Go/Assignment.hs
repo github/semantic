@@ -37,7 +37,7 @@ type Syntax =
    , Declaration.MethodSignature
    , Declaration.Type
    , Declaration.TypeAlias
-   , Declaration.Visibility
+   , Declaration.AccessControl
    , Expression.Plus
    , Expression.Minus
    , Expression.Times
