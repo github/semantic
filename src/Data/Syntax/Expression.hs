@@ -421,10 +421,10 @@ instance Evaluatable MemberAccess where
       -- Throw a ReferenceError since we're attempting to reference a name within a value that is not an Object.
       Nothing -> throwEvalError (ReferenceError lhsValue rhs)
 
-    let lhsVisibility = fromMaybe Control.Abstract.Public (termToVisibility lhs)
     rhsValue <- deref rhsSlot
-    rhsFrame <- maybeM (throwEvalError $ ScopedEnvError rhsValue) =<< scopedEnvironment rhsValue
-    rhsScope <- scopeLookup rhsFrame
+    rhsScope <- scopeLookup (frameAddress rhsSlot)
+
+    let lhsVisibility = fromMaybe Control.Abstract.Public (termToVisibility lhs)
     let visibilities = case lhsVisibility of
           Control.Abstract.Private -> [(Instance Private), (Instance Protected), (Instance Public), (Default Private), (Default Protected), (Default Public)]
           _ -> [(Instance Public), (Default Public)]
