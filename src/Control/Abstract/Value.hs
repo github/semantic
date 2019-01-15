@@ -419,11 +419,9 @@ runObject :: Carrier (Object address value :+: sig) (ObjectC address value (Eff 
 runObject = raiseHandler $ runObjectC . interpret
 
 -- | Construct an array of zero or more values.
--- array :: [value] -> Evaluator term address value carrier value
 array :: (Member (Array value) sig, Carrier sig m) => [value] -> m value
 array v = send (Array v ret)
 
--- asArray :: value -> Evaluator term address value carrier [value]
 asArray :: (Member (Array value) sig, Carrier sig m) => value -> m [value]
 asArray v = send (AsArray v ret)
 
@@ -447,12 +445,10 @@ runArray :: Carrier (Array value :+: sig) (ArrayC value (Eff m))
 runArray = raiseHandler $ runArrayC . interpret
 
 -- | Construct a hash out of pairs.
--- hash :: [(value, value)] -> value
 hash :: (Member (Hash value) sig, Carrier sig m) => [(value, value)] -> m value
 hash v = send (Hash v ret)
 
 -- | Construct a key-value pair for use in a hash.
--- kvPair :: value -> value -> value
 kvPair :: (Member (Hash value) sig, Carrier sig m) => value -> value -> m value
 kvPair v1 v2 = send (KvPair v1 v2 ret)
 
