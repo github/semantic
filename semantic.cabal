@@ -59,8 +59,8 @@ library
                      , Data.Abstract.Declarations
                      , Data.Abstract.Evaluatable
                      , Data.Abstract.FreeVariables
-                     , Data.Abstract.Visibilities.Visibilities
-                     , Data.Abstract.Visibilities.Instances
+                     , Data.Abstract.AccessControls.Class
+                     , Data.Abstract.AccessControls.Instances
                      , Data.Abstract.Heap
                      , Data.Abstract.Live
                      , Data.Abstract.Module

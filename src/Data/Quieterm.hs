@@ -7,15 +7,15 @@ module Data.Quieterm
 import Control.DeepSeq
 import Data.Abstract.Declarations (Declarations)
 import Data.Abstract.FreeVariables (FreeVariables)
-import Data.Abstract.Visibilities.Visibilities
-import Data.Abstract.Visibilities.Instances ()
+import Data.Abstract.AccessControls.Class
+import Data.Abstract.AccessControls.Instances ()
 import Data.Functor.Classes
 import Data.Functor.Foldable
 import Data.Term
 import Text.Show (showListWith)
 
 newtype Quieterm syntax ann = Quieterm { unQuieterm :: TermF syntax ann (Quieterm syntax ann) }
-  deriving (Declarations, FreeVariables, Visibilities)
+  deriving (Declarations, FreeVariables, AccessControls)
 
 type instance Base (Quieterm syntax ann) = TermF syntax ann
 instance Functor syntax => Recursive   (Quieterm syntax ann) where project = unQuieterm
