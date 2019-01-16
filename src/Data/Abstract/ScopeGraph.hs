@@ -139,8 +139,16 @@ lookupScope scope = Map.lookup scope . unScopeGraph
 
 -- Declare a declaration with a span and an associated scope in the scope graph.
 -- TODO: Return the whole value in Maybe or Either.
-declare :: Ord scope => Declaration -> Relation -> Span -> Maybe scope -> scope -> ScopeGraph scope -> (ScopeGraph scope, Maybe Position)
-declare decl rel declSpan assocScope currentScope g = fromMaybe (g, Nothing) $ do
+declare :: Ord scope
+        => Declaration
+        -> Relation
+        -> AccessControl
+        -> Span
+        -> Maybe scope
+        -> scope
+        -> ScopeGraph scope
+        -> (ScopeGraph scope, Maybe Position)
+declare decl rel accessControl declSpan assocScope currentScope g = fromMaybe (g, Nothing) $ do
   scope <- lookupScope currentScope g
 
   dataSeq <- ddataOfScope currentScope g
