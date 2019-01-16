@@ -50,7 +50,34 @@ data AccessControl = Public
                    | Protected
                    | Private
                    | Unknown
-                   deriving (Eq, Show, Ord, Generic, NFData)
+                   deriving (Eq, Show, Generic, NFData)
+
+-- | The Ord AccessControl instance represents an order specification of AccessControls.
+-- It is helpful to consider `Public <= Private` as saying "Can a Public syntax term access a Private syntax term?"
+-- AccessControls that are less than or equal to another AccessControl implies access.
+-- In this way, Public AccessControl is the top of the order specification, and Private AccessControl is the bottom.
+-- Unknown AccessControl represents an absurd value, whose comparison is not meaningful, and always defaults to True. We simply do not have enough information to perform the comparison in a meaningful way.
+instance Ord AccessControl where
+  -- | We cannot meaningfully compare Unknown AccessControl, so this always defaults to True.
+  (<=) Unknown _           = True
+  (<=) _       Unknown     = True
+
+  -- | Private AccessControl represents the least overlap or accessibility with other AccessControls.
+  -- When asking if the AccessControl "on the left" is less than the AccessControl "on the right", Private AccessControl on the left always implies access to the thing on the right.
+  (<=) Private _           = True
+  (<=) _       Private     = False
+
+  -- | Protected AccessControl is inbetween Private and Public in the order specification.
+  -- Protected AccessControl "on the left" has access to Protected or Public AccessControls "on the right".
+  (<=) Protected Public    = True
+  (<=) Protected Protected = True
+
+  -- | Public AccessControl "on the left" has access only to Public AccessControl "on the right".
+  -- In all other cases, Public AccessControl "on the left" implies no access.
+  (<=) Public Public       = True
+  (<=) Public _            = False
+
+
 
 data Relation = Default | Instance deriving (Eq, Show, Ord, Generic, NFData)
 
@@ -137,7 +164,7 @@ declarationsByRelation scope relation g = fromMaybe mempty $ do
 declarationsByAccessControl :: Ord scope => scope -> AccessControl -> ScopeGraph scope -> [ Info scope ]
 declarationsByAccessControl scope accessControl g = fromMaybe mempty $ do
   dataSeq <- ddataOfScope scope g
-  pure . toList $ Seq.filter (\Info{..} -> infoAccessControl == accessControl) dataSeq
+  pure . toList $ Seq.filter (\Info{..} -> accessControl <= infoAccessControl) dataSeq
 
 -- Lookup a scope in the scope graph.
 lookupScope :: Ord scope => scope -> ScopeGraph scope -> Maybe (Scope scope)
