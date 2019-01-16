@@ -547,7 +547,7 @@ instance Evaluatable New where
     objectVal <- object objectFrame
 
     classScope <- scopeLookup classFrame
-    instanceMembers <- relationsOfScope classScope [(Instance Public), (Instance Protected), (Instance Private), (Instance Unknown)]
+    instanceMembers <- declarationsByRelation classScope Instance
 
     void . withScopeAndFrame objectFrame $ do
       for_ instanceMembers $ \Info{..} -> do
