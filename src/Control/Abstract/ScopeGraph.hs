@@ -20,8 +20,8 @@ module Control.Abstract.ScopeGraph
   , insertLexicalEdge
   , withScope
   , associatedScope
-  , relationsOfScope
   , declarationsByAccessControl
+  , declarationsByRelation
   , putDeclarationScope
   , putDeclarationSpan
   , insertImportReference
@@ -171,17 +171,14 @@ lookupScope :: ( Member (Resumable (BaseError (ScopeError address))) sig
              -> Evaluator term address value m (Scope address)
 lookupScope address = maybeM (throwScopeError LookupScopeError) . ScopeGraph.lookupScope address =<< get
 
-relationsOfScope :: ( Member (State (ScopeGraph address)) sig
-                    , Carrier sig m
-                    , Ord address
-                    )
-                => address
-                -> [Relation]
-                -> Evaluator term address value m [ Info address ]
-relationsOfScope scope relations = do
-  g <- get
-  let infos = concatMap (\relation -> ScopeGraph.relationsOfScope scope relation g) relations
-  pure infos
+declarationsByRelation :: ( Member (State (ScopeGraph address)) sig
+                          , Carrier sig m
+                          , Ord address
+                          )
+                       => address
+                       -> Relation
+                       -> Evaluator term address value m [ Info address ]
+declarationsByRelation scope relation = ScopeGraph.declarationsByRelation scope relation <$> get
 
 declarationsByAccessControl :: ( Member (State (ScopeGraph address)) sig
                                , Carrier sig m
