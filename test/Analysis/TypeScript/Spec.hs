@@ -1,7 +1,7 @@
 module Analysis.TypeScript.Spec (spec) where
 
 import           Control.Abstract.ScopeGraph
-import           Control.Abstract.Value as Value
+import           Control.Abstract.Value as Value hiding (String, Unit)
 import           Control.Arrow ((&&&))
 import           Data.Abstract.Evaluatable
 import qualified Data.Abstract.Heap as Heap
@@ -10,7 +10,7 @@ import qualified Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Number as Number
 import           Data.Abstract.Package (PackageInfo (..))
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
-import           Data.Abstract.Value.Concrete as Value
+import           Data.Abstract.Value.Concrete as Concrete
 import qualified Data.Language as Language
 import qualified Data.List.NonEmpty as NonEmpty
 import           Data.Location
@@ -94,7 +94,7 @@ spec config = parallel $ do
       (scopeGraph, (heap, res)) <- evaluate ["sequence-expression.ts"]
       case ModuleTable.lookup "sequence-expression.ts" <$> res of
         Right (Just (Module _ (scopeAndFrame, value))) ->
-          SpecHelpers.lookupDeclaration "x" scopeAndFrame heap scopeGraph `shouldBe` Just [ Value.float (scientific 3 0) ]
+          SpecHelpers.lookupDeclaration "x" scopeAndFrame heap scopeGraph `shouldBe` Just [ Concrete.Float (Number.Decimal (scientific 3 0)) ]
         other -> expectationFailure (show other)
 
     it "evaluates void expressions" $ do
@@ -124,43 +124,43 @@ spec config = parallel $ do
     it "evaluates BOr statements" $ do
       (_, (_, res)) <- evaluate ["bor.ts"]
       case ModuleTable.lookup "bor.ts" <$> res of
-        Right (Just (Module _ (_, value))) -> value `shouldBe` Value.Integer (Number.Integer 3)
+        Right (Just (Module _ (_, value))) -> value `shouldBe` Concrete.Integer (Number.Integer 3)
         other                              -> expectationFailure (show other)
 
     it "evaluates BAnd statements" $ do
       (_, (_, res)) <- evaluate ["band.ts"]
       case ModuleTable.lookup "band.ts" <$> res of
-        Right (Just (Module _ (_, value))) -> value `shouldBe` Value.Integer (Number.Integer 0)
+        Right (Just (Module _ (_, value))) -> value `shouldBe` Concrete.Integer (Number.Integer 0)
         other                              -> expectationFailure (show other)
 
     it "evaluates BXOr statements" $ do
       (_, (_, res)) <- evaluate ["bxor.ts"]
       case ModuleTable.lookup "bxor.ts" <$> res of
-        Right (Just (Module _ (_, value))) -> value `shouldBe` Value.Integer (Number.Integer 3)
+        Right (Just (Module _ (_, value))) -> value `shouldBe` Concrete.Integer (Number.Integer 3)
         other                              -> expectationFailure (show other)
 
     it "evaluates LShift statements" $ do
       (_, (_, res)) <- evaluate ["lshift.ts"]
       case ModuleTable.lookup "lshift.ts" <$> res of
-        Right (Just (Module _ (_, value))) -> value `shouldBe` Value.Integer (Number.Integer 4)
+        Right (Just (Module _ (_, value))) -> value `shouldBe` Concrete.Integer (Number.Integer 4)
         other                              -> expectationFailure (show other)
 
     it "evaluates RShift statements" $ do
       (_, (_, res)) <- evaluate ["rshift.ts"]
       case ModuleTable.lookup "rshift.ts" <$> res of
-        Right (Just (Module _ (_, value))) -> value `shouldBe` Value.Integer (Number.Integer 0)
+        Right (Just (Module _ (_, value))) -> value `shouldBe` Concrete.Integer (Number.Integer 0)
         other                              -> expectationFailure (show other)
 
     it "evaluates Complement statements" $ do
       (_, (_, res)) <- evaluate ["complement.ts"]
       case ModuleTable.lookup "complement.ts" <$> res of
-        Right (Just (Module _ (_, value))) -> value `shouldBe` Value.Integer (Number.Integer (-2))
+        Right (Just (Module _ (_, value))) -> value `shouldBe` Concrete.Integer (Number.Integer (-2))
         other                              -> expectationFailure (show other)
 
     it "uniquely tracks public fields for instances" $ do
       (scopeGraph, (heap, res)) <- evaluate ["class1.ts", "class2.ts"]
       case ModuleTable.lookup "class1.ts" <$> res of
-        Right (Just (Module _ (_, value))) -> value `shouldBe` (float 9.0)
+        Right (Just (Module _ (_, value))) -> value `shouldBe` (Concrete.Float (Number.Decimal 9.0))
         other                              -> expectationFailure (show other)
 
 
