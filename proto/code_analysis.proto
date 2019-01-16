@@ -15,7 +15,8 @@ service CodeAnalysis {
   // Check health & status of the service.
   rpc Ping (PingRequest) returns (PingResponse);
   // Retrieve c-tags like symbols for blobs.
-  rpc Symbols (ParseTreeRequest) returns (ParseTreeSymbolResponse);
+  rpc ParseTreeSymbols (ParseTreeRequest) returns (ParseTreeSymbolResponse);
+  rpc DiffTreeTOC (DiffTreeRequest) returns (DiffTreeTOCResponse);
 }
 
 message PingRequest {
@@ -35,4 +36,20 @@ message ParseTreeRequest {
 
 message ParseTreeSymbolResponse {
   repeated File files = 1;
+}
+
+message DiffTreeRequest {
+  repeated BlobPair blobs = 1;
+}
+
+message Summaries {
+  TOCSummary changes = 1;
+  ErrorSummary errors = 1;
+}
+
+message TOCSummary {
+  string summaryCategoryName = 1;
+  string summaryTermName = 1;
+  Span summarySpan = 1;
+  string summaryChangeType = 1;
 }

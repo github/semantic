@@ -1,4 +1,4 @@
-{-# LANGUAGE DerivingVia, RankNTypes, ScopedTypeVariables #-}
+{-# LANGUAGE DerivingVia, DerivingStrategies, DeriveAnyClass, RankNTypes, ScopedTypeVariables #-}
 module Rendering.TOC
 ( renderToCDiff
 , renderRPCToCDiff
@@ -31,19 +31,31 @@ import Data.Patch
 import Data.Location
 import Data.Term
 import qualified Data.Text as T
+import Proto3.Suite as Proto3
+import qualified Proto3.Wire.Decode as Decode
+import qualified Proto3.Wire.Encode as Encode
 
 renderJSONSummaryError :: BlobPair -> String -> Summaries
 renderJSONSummaryError pair e = Summaries mempty (Map.singleton path [object ["error" .= e]])
   where path = T.pack (pathKeyForBlobPair pair)
 
 data Summaries = Summaries { changes, errors :: Map.Map T.Text [Value] }
-  deriving (Eq, Show, Generic)
+  deriving stock (Eq, Show, Generic)
+  deriving anyclass (Named)
   deriving Semigroup via GenericSemigroup Summaries
   deriving Monoid via GenericMonoid Summaries
 
+-- TODO: Get this to auto generate. The following is incomplete.
+instance Message Summaries where
+  encodeMessage = undefined
+  decodeMessage = undefined
+  dotProto _ =
+    [ DotProtoMessageField $ DotProtoField 1 (Prim . Named $ Single "TOCSummary") (Single "changes") [] Nothing
+    , DotProtoMessageField $ DotProtoField 1 (Prim . Named $ Single "ErrorSummary") (Single "errors") [] Nothing
+    ]
+
 instance ToJSON Summaries where
   toJSON Summaries{..} = object [ "changes" .= changes, "errors" .= errors ]
-
 
 data TOCSummary
   = TOCSummary
@@ -53,7 +65,19 @@ data TOCSummary
     , summaryChangeType :: T.Text
     }
   | ErrorSummary { errorText :: T.Text, errorSpan :: Span, errorLanguage :: Language }
-  deriving (Generic, Eq, Show)
+  deriving stock (Generic, Eq, Show)
+  deriving anyclass (Named)
+
+-- TODO: Get this to auto generate. The following is incomplete.
+instance Message TOCSummary where
+  encodeMessage = undefined
+  decodeMessage = undefined
+  dotProto _ =
+    [ DotProtoMessageField $ DotProtoField 1 (Prim Proto3.String) (Single "summaryCategoryName") [] Nothing
+    , DotProtoMessageField $ DotProtoField 1 (Prim Proto3.String) (Single "summaryTermName") [] Nothing
+    , DotProtoMessageField $ DotProtoField 1 (Prim . Named $ Single "Span") (Single "summarySpan") [] Nothing
+    , DotProtoMessageField $ DotProtoField 1 (Prim Proto3.String) (Single "summaryChangeType") [] Nothing
+    ]
 
 instance ToJSON TOCSummary where
   toJSON TOCSummary{..} = object [ "changeType" .= summaryChangeType, "category" .= summaryCategoryName, "term" .= summaryTermName, "span" .= summarySpan ]
