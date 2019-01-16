@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DuplicateRecordFields #-}
+{-# LANGUAGE DeriveAnyClass, DerivingVia, DuplicateRecordFields #-}
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Language.TypeScript.Syntax.Types where
 
@@ -15,70 +15,54 @@ import           Diffing.Algorithm
 -- | Lookup type for a type-level key in a typescript map.
 data LookupType a = LookupType { lookupTypeIdentifier :: a, lookupTypeKey :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Eq1, Show1, Ord1) via Generically LookupType
 
-instance Eq1 LookupType where liftEq = genericLiftEq
-instance Ord1 LookupType where liftCompare = genericLiftCompare
-instance Show1 LookupType where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable LookupType
 
 data FunctionType a = FunctionType { functionTypeParameters :: !a, functionFormalParameters :: ![a], functionType :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Eq1, Show1, Ord1) via Generically FunctionType
 
-instance Eq1 FunctionType where liftEq = genericLiftEq
-instance Ord1 FunctionType where liftCompare = genericLiftCompare
-instance Show1 FunctionType where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable FunctionType
 
 data TypeParameter a = TypeParameter { typeParameter :: !a, typeParameterConstraint :: !a, typeParameterDefaultType :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Eq1, Show1, Ord1) via Generically TypeParameter
 
-instance Eq1 TypeParameter where liftEq = genericLiftEq
-instance Ord1 TypeParameter where liftCompare = genericLiftCompare
-instance Show1 TypeParameter where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable TypeParameter
 
 data TypeAssertion a = TypeAssertion { typeAssertionParameters :: !a, typeAssertionExpression :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Eq1, Show1, Ord1) via Generically TypeAssertion
 
-instance Eq1 TypeAssertion where liftEq = genericLiftEq
-instance Ord1 TypeAssertion where liftCompare = genericLiftCompare
-instance Show1 TypeAssertion where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable TypeAssertion
 
 newtype DefaultType a = DefaultType { defaultType :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Eq1, Show1, Ord1) via Generically DefaultType
 
-instance Eq1 DefaultType where liftEq = genericLiftEq
-instance Ord1 DefaultType where liftCompare = genericLiftCompare
-instance Show1 DefaultType where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable DefaultType
 
 newtype ParenthesizedType a = ParenthesizedType { parenthesizedType :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Eq1, Show1, Ord1) via Generically ParenthesizedType
 
-instance Eq1 ParenthesizedType where liftEq = genericLiftEq
-instance Ord1 ParenthesizedType where liftCompare = genericLiftCompare
-instance Show1 ParenthesizedType where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable ParenthesizedType
 
 newtype PredefinedType a = PredefinedType { predefinedType :: T.Text }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Eq1, Show1, Ord1) via Generically PredefinedType
 
-instance Eq1 PredefinedType where liftEq = genericLiftEq
-instance Ord1 PredefinedType where liftCompare = genericLiftCompare
-instance Show1 PredefinedType where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Implement Eval instance for PredefinedType
 instance Evaluatable PredefinedType
 
 newtype TypeIdentifier a = TypeIdentifier { contents :: T.Text }
   deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Eq1, Show1, Ord1) via Generically TypeIdentifier
 
 instance Declarations1 TypeIdentifier where
   liftDeclaredName _ (TypeIdentifier identifier) = Just (Evaluatable.name identifier)
 
-instance Eq1 TypeIdentifier where liftEq = genericLiftEq
-instance Ord1 TypeIdentifier where liftCompare = genericLiftCompare
-instance Show1 TypeIdentifier where liftShowsPrec = genericLiftShowsPrec
 -- TODO: TypeIdentifier shouldn't evaluate to an address in the heap?
 instance Evaluatable TypeIdentifier where
   eval _ _ TypeIdentifier{..} = do
@@ -88,97 +72,72 @@ instance Evaluatable TypeIdentifier where
 
 data NestedTypeIdentifier a = NestedTypeIdentifier { left :: !a, right :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Eq1, Show1, Ord1) via Generically NestedTypeIdentifier
 
-instance Eq1 NestedTypeIdentifier where liftEq = genericLiftEq
-instance Ord1 NestedTypeIdentifier where liftCompare = genericLiftCompare
-instance Show1 NestedTypeIdentifier where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable NestedTypeIdentifier
 
 data GenericType a = GenericType { genericTypeIdentifier :: !a, genericTypeArguments :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Eq1, Show1, Ord1) via Generically GenericType
 
-instance Eq1 GenericType where liftEq = genericLiftEq
-instance Ord1 GenericType where liftCompare = genericLiftCompare
-instance Show1 GenericType where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable GenericType
 
 data TypePredicate a = TypePredicate { typePredicateIdentifier :: !a, typePredicateType :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Eq1, Show1, Ord1) via Generically TypePredicate
 
-instance Eq1 TypePredicate where liftEq = genericLiftEq
-instance Ord1 TypePredicate where liftCompare = genericLiftCompare
-instance Show1 TypePredicate where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable TypePredicate
 
 newtype ObjectType a = ObjectType { objectTypeElements :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Eq1, Show1, Ord1) via Generically ObjectType
 
-instance Eq1 ObjectType where liftEq = genericLiftEq
-instance Ord1 ObjectType where liftCompare = genericLiftCompare
-instance Show1 ObjectType where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable ObjectType
 
 newtype ArrayType a = ArrayType { arrayType :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Eq1, Show1, Ord1) via Generically ArrayType
 
-instance Eq1 ArrayType where liftEq = genericLiftEq
-instance Ord1 ArrayType where liftCompare = genericLiftCompare
-instance Show1 ArrayType where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable ArrayType
 
 newtype FlowMaybeType a = FlowMaybeType { flowMaybeType :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Eq1, Show1, Ord1) via Generically FlowMaybeType
 
-instance Eq1 FlowMaybeType where liftEq = genericLiftEq
-instance Ord1 FlowMaybeType where liftCompare = genericLiftCompare
-instance Show1 FlowMaybeType where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable FlowMaybeType
 
 newtype TypeQuery a = TypeQuery { typeQuerySubject :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Eq1, Show1, Ord1) via Generically TypeQuery
 
-instance Eq1 TypeQuery where liftEq = genericLiftEq
-instance Ord1 TypeQuery where liftCompare = genericLiftCompare
-instance Show1 TypeQuery where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable TypeQuery
 
 newtype IndexTypeQuery a = IndexTypeQuery { indexTypeQuerySubject :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Eq1, Show1, Ord1) via Generically IndexTypeQuery
 
-instance Eq1 IndexTypeQuery where liftEq = genericLiftEq
-instance Ord1 IndexTypeQuery where liftCompare = genericLiftCompare
-instance Show1 IndexTypeQuery where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable IndexTypeQuery
 
 newtype TypeArguments a = TypeArguments { typeArguments :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Eq1, Show1, Ord1) via Generically TypeArguments
 
-instance Eq1 TypeArguments where liftEq = genericLiftEq
-instance Ord1 TypeArguments where liftCompare = genericLiftCompare
-instance Show1 TypeArguments where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable TypeArguments
 
 newtype ThisType a = ThisType { contents :: T.Text }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Eq1, Show1, Ord1) via Generically ThisType
 
-instance Eq1 ThisType where liftEq = genericLiftEq
-instance Ord1 ThisType where liftCompare = genericLiftCompare
-instance Show1 ThisType where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable ThisType
 
 newtype ExistentialType a = ExistentialType { contents :: T.Text }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Eq1, Show1, Ord1) via Generically ExistentialType
 
-instance Eq1 ExistentialType where liftEq = genericLiftEq
-instance Ord1 ExistentialType where liftCompare = genericLiftCompare
-instance Show1 ExistentialType where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable ExistentialType
-
 
 newtype LiteralType a = LiteralType { literalTypeSubject :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Eq1, Show1, Ord1) via Generically LiteralType
 
-instance Eq1 LiteralType where liftEq = genericLiftEq
-instance Ord1 LiteralType where liftCompare = genericLiftCompare
-instance Show1 LiteralType where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable LiteralType
