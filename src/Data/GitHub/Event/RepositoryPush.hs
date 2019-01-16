@@ -24,6 +24,7 @@ data ChangedFile = ChangedFile
 
 data RepositoryPush = RepositoryPush
   { pushRequestContext :: Nested RequestContext
+  , pushOwner          :: Nested User
   , pushActor          :: Nested User
   , pushRepository     :: Nested Repository
   , pushBefore         :: Git.SHA
