@@ -51,9 +51,7 @@ data AccessControl = Public
                    | Unknown
                    deriving (Eq, Show, Ord, Generic, NFData)
 
-data Relation = Default  AccessControl
-              | Instance AccessControl
-  deriving (Eq, Show, Ord, Generic, NFData)
+data Relation = Default | Instance deriving (Eq, Show, Ord, Generic, NFData)
 
 data Info scopeAddress = Info
   { infoDeclaration :: Declaration
