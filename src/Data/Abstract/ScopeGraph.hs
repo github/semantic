@@ -58,6 +58,7 @@ data Relation = Default  AccessControl
 data Info scopeAddress = Info
   { infoDeclaration :: Declaration
   , infoRelation :: Relation
+  , infoAccessControl :: AccessControl
   , infoSpan :: Span
   , infoAssociatedScope :: Maybe scopeAddress
   } deriving (Eq, Show, Ord, Generic, NFData)
