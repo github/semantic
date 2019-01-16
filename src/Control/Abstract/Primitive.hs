@@ -34,9 +34,10 @@ defineBuiltIn :: ( HasCallStack
                  )
               => Declaration
               -> Relation
+              -> AccessControl
               -> BuiltIn
               -> Evaluator term address value m ()
-defineBuiltIn declaration rel value = withCurrentCallStack callStack $ do
+defineBuiltIn declaration rel accessControl value = withCurrentCallStack callStack $ do
   currentScope' <- currentScope
   let lexicalEdges = Map.singleton Lexical [ currentScope' ]
   associatedScope <- newScope lexicalEdges
