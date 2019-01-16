@@ -16,13 +16,12 @@ import           Data.List.Split (splitWhen)
 import           Data.Location
 import           Data.Term
 import qualified Data.Text as T
+import           Proto3.Suite
+import qualified Proto3.Suite.DotProto as Proto
+import qualified Proto3.Wire.Decode as Decode
+import qualified Proto3.Wire.Encode as Encode
 import           Tags.Taggable
 import           Tags.Tagging
-
-import Proto3.Suite
-import qualified Proto3.Suite.DotProto as Proto
-import qualified Proto3.Wire.Encode as Encode
-import qualified Proto3.Wire.Decode as Decode
 
 
 -- | Render a 'Term' to a list of symbols (See 'Symbol').
