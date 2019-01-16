@@ -25,7 +25,7 @@ data PackageInfo = PackageInfo
 -- | A package represents the unit of dependency, i.e. something which can depend upon, or be depended upon by, other packages. Packages have modules and may have entry points from which evaluation can proceed.
 data Package term = Package
   { packageInfo :: PackageInfo
-  , packageModules :: ModuleTable (NonEmpty (Module term))
+  , packageModules :: ModuleTable (Module term)
   }
   deriving (Eq, Functor, Ord, Show)
 
