@@ -186,6 +186,8 @@ library
                      , Reprinting.Pipeline
                      -- High-level flow & operational functionality (logging, stats, etc.)
                      , Semantic.Analysis
+                     , Semantic.API.Parse
+                     , Semantic.API.Symbols
                      , Semantic.AST
                      , Semantic.CLI
                      , Semantic.Config
@@ -264,6 +266,7 @@ library
                      , scientific
                      , semigroupoids
                      , semilattices
+                     , servant
                      , split
                      , stm-chans
                      , template-haskell
