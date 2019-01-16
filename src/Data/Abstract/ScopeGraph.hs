@@ -155,7 +155,7 @@ declare decl rel accessControl declSpan assocScope currentScope g = fromMaybe (g
   case Seq.findIndexR (\Info{..} -> decl == infoDeclaration && declSpan == infoSpan && rel == infoRelation) dataSeq of
     Just index -> pure (g, Just (Position index))
     Nothing -> do
-      let newScope = scope { declarations = declarations scope Seq.|> Info decl rel declSpan assocScope }
+      let newScope = scope { declarations = declarations scope Seq.|> Info decl rel accessControl declSpan assocScope }
       pure (insertScope currentScope newScope g, Just (Position (length (declarations newScope))))
 
 -- | Add a reference to a declaration in the scope graph.
