@@ -139,26 +139,26 @@ instance HasPrelude 'PHP
 
 instance HasPrelude 'Python where
   definePrelude _ =
-    defineBuiltIn (Declaration $ X.name "print") (Default Public) Print
+    defineBuiltIn (Declaration $ X.name "print") Default Public Print
 
 instance HasPrelude 'Ruby where
   definePrelude _ = do
     defineSelf
 
-    defineBuiltIn (Declaration $ X.name "puts") (Default Public) Print
+    defineBuiltIn (Declaration $ X.name "puts") Default Public Print
 
     defineClass (Declaration (X.name "Object")) [] $ do
-      defineBuiltIn (Declaration $ X.name "inspect") (Default Public) Show
+      defineBuiltIn (Declaration $ X.name "inspect") Default Public Show
 
 instance HasPrelude 'TypeScript where
   definePrelude _ = do
     defineSelf
-    defineNamespace (Declaration (X.name "console")) $ defineBuiltIn (Declaration $ X.name "log") (Default Public) Print
+    defineNamespace (Declaration (X.name "console")) $ defineBuiltIn (Declaration $ X.name "log") Default Public Print
 
 instance HasPrelude 'JavaScript where
   definePrelude _ = do
     defineSelf
-    defineNamespace (Declaration (X.name "console")) $ defineBuiltIn (Declaration $ X.name "log") (Default Public) Print
+    defineNamespace (Declaration (X.name "console")) $ defineBuiltIn (Declaration $ X.name "log") Default Public Print
 
 defineSelf :: ( AbstractValue term address value m
               , Carrier sig m
@@ -176,7 +176,7 @@ defineSelf :: ( AbstractValue term address value m
            => Evaluator term address value m ()
 defineSelf = do
   let self = Declaration X.__self
-  declare self (Default Public) emptySpan Nothing
+  declare self Default Public emptySpan Nothing
   slot <- lookupDeclaration self
   assign slot =<< object =<< currentFrame
 

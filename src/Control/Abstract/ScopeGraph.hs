@@ -68,9 +68,9 @@ declare :: ( Carrier sig m
         -> Span
         -> Maybe address
         -> Evaluator term address value m ()
-declare decl rel span scope = do
+declare decl rel accessControl span scope = do
   currentAddress <- currentScope
-  modify (fst . ScopeGraph.declare decl rel span scope currentAddress)
+  modify (fst . ScopeGraph.declare decl rel accessControl span scope currentAddress)
 
 putDeclarationScope :: ( Ord address
                        , Member (Reader (CurrentScope address)) sig

@@ -210,7 +210,7 @@ declareModule eval identifier statements = do
       Nothing -> do
         let edges = Map.singleton Lexical [ currentScope' ]
         childScope <- newScope edges
-        declare (Declaration name) (Default Public) span (Just childScope)
+        declare (Declaration name) Default Public span (Just childScope)
 
         currentFrame' <- currentFrame
         let frameEdges = Map.singleton Lexical (Map.singleton currentScope' currentFrame')
@@ -272,7 +272,7 @@ instance Evaluatable AbstractClass where
         current = (Lexical, ) <$> pure (pure currentScope')
         edges = Map.fromList (superclassEdges <> current)
     classScope <- newScope edges
-    declare (Declaration name) (Default Public) span (Just classScope)
+    declare (Declaration name) Default Public span (Just classScope)
 
     let frameEdges = Map.singleton Superclass (Map.fromList (catMaybes superScopes))
     childFrame <- newFrame classScope frameEdges
