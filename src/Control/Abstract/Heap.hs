@@ -176,11 +176,12 @@ define :: ( HasCallStack
           )
        => Declaration
        -> Relation
+       -> AccessControl
        -> Evaluator term address value m value
        -> Evaluator term address value m ()
-define declaration rel def = withCurrentCallStack callStack $ do
+define declaration rel accessControl def = withCurrentCallStack callStack $ do
   -- TODO: This span is still wrong.
-  declare declaration rel emptySpan Nothing
+  declare declaration rel accessControl emptySpan Nothing
   slot <- lookupDeclaration declaration
   value <- def
   assign slot value
@@ -447,7 +448,7 @@ deriving instance Eq address => Eq (HeapError address resume)
 deriving instance Show address => Show (HeapError address resume)
 instance Show address => Show1 (HeapError address) where
   liftShowsPrec _ _ = showsPrec
-  
+
 instance Eq address => Eq1 (HeapError address) where
   liftEq _ CurrentFrameError CurrentFrameError           = True
   liftEq _ (LookupAddressError a) (LookupAddressError b) = a == b
