@@ -3,8 +3,8 @@ module Data.Abstract.ScopeGraph
   ( Slot(..)
   , Info(..)
   , associatedScope
-  , relationsOfScope
   , declarationsByAccessControl
+  , declarationsByRelation
   , Declaration(..) -- TODO don't export these constructors
   , declare
   , EdgeLabel(..)
@@ -129,8 +129,8 @@ ddataOfScope scope = fmap declarations . Map.lookup scope . unScopeGraph
 linksOfScope :: Ord scope => scope -> ScopeGraph scope -> Maybe (Map EdgeLabel [scope])
 linksOfScope scope = fmap edges . Map.lookup scope . unScopeGraph
 
-relationsOfScope :: Ord scope => scope -> Relation -> ScopeGraph scope -> [ Info scope ]
-relationsOfScope scope relation g = fromMaybe mempty $ do
+declarationsByRelation :: Ord scope => scope -> Relation -> ScopeGraph scope -> [ Info scope ]
+declarationsByRelation scope relation g = fromMaybe mempty $ do
   dataSeq <- ddataOfScope scope g
   pure . toList $ Seq.filter (\Info{..} -> infoRelation == relation) dataSeq
 
