@@ -21,6 +21,7 @@ module Control.Abstract.ScopeGraph
   , withScope
   , associatedScope
   , relationsOfScope
+  , declarationsByAccessControl
   , putDeclarationScope
   , putDeclarationSpan
   , insertImportReference
@@ -181,6 +182,15 @@ relationsOfScope scope relations = do
   g <- get
   let infos = concatMap (\relation -> ScopeGraph.relationsOfScope scope relation g) relations
   pure infos
+
+declarationsByAccessControl :: ( Member (State (ScopeGraph address)) sig
+                               , Carrier sig m
+                               , Ord address
+                               )
+                            => address
+                            -> AccessControl
+                            -> Evaluator term address value m [ Info address ]
+declarationsByAccessControl scopeAddress accessControl = ScopeGraph.declarationsByAccessControl scopeAddress accessControl <$> get
 
 insertImportReference :: ( Member (Resumable (BaseError (ScopeError address))) sig
                         , Member (Reader ModuleInfo) sig
