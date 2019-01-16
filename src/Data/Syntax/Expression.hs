@@ -424,18 +424,10 @@ instance Evaluatable MemberAccess where
     rhsValue <- deref rhsSlot
     rhsScope <- scopeLookup (frameAddress rhsSlot)
 
-    let lhsAccessControl = fromMaybe Control.Abstract.Public (termToAccessControl lhs)
-    let accessControls = case lhsAccessControl of
-          Control.Abstract.Private -> [ (Instance Private)
-                                      , (Instance Protected)
-                                      , (Instance Public)
-                                      , (Default Private)
-                                      , (Default Protected)
-                                      , (Default Public)
-                                      ]
-          _ -> [(Instance Public), (Default Public)]
+    let lhsAccessControl = fromMaybe Public (termToAccessControl lhs)
+    infos <- declarationsByAccessControl rhsScope lhsAccessControl
 
-    infos <- relationsOfScope rhsScope accessControls
+    traceShowM (infos)
 
     case (find (\Info{..} -> (Declaration rhs) == infoDeclaration) infos) of
       Just _  -> bindThis lhsValue rhsValue
@@ -559,11 +551,7 @@ instance Evaluatable New where
 
     void . withScopeAndFrame objectFrame $ do
       for_ instanceMembers $ \Info{..} -> do
-        let relation = case infoRelation of
-              Instance Public -> Default Public
-              Instance Private -> Default Private
-              _ -> infoRelation
-        declare infoDeclaration relation infoSpan infoAssociatedScope
+        declare infoDeclaration Default infoAccessControl infoSpan infoAssociatedScope
 
       -- TODO: This is a typescript specific name and we should allow languages to customize it.
       let constructorName = Name.name "constructor"
