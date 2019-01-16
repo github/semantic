@@ -66,6 +66,7 @@ declare :: ( Carrier sig m
            )
         => Declaration
         -> Relation
+        -> AccessControl
         -> Span
         -> Maybe address
         -> Evaluator term address value m ()
@@ -167,8 +168,8 @@ lookupScope :: ( Member (Resumable (BaseError (ScopeError address))) sig
                 , Carrier sig m
                 , Ord address
                 )
-             => address
-             -> Evaluator term address value m (Scope address)
+            => address
+            -> Evaluator term address value m (Scope address)
 lookupScope address = maybeM (throwScopeError LookupScopeError) . ScopeGraph.lookupScope address =<< get
 
 declarationsByRelation :: ( Member (State (ScopeGraph address)) sig
