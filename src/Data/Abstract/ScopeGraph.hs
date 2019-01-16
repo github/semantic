@@ -4,6 +4,7 @@ module Data.Abstract.ScopeGraph
   , Info(..)
   , associatedScope
   , relationsOfScope
+  , declarationsByAccessControl
   , Declaration(..) -- TODO don't export these constructors
   , declare
   , EdgeLabel(..)
@@ -132,6 +133,11 @@ relationsOfScope :: Ord scope => scope -> Relation -> ScopeGraph scope -> [ Info
 relationsOfScope scope relation g = fromMaybe mempty $ do
   dataSeq <- ddataOfScope scope g
   pure . toList $ Seq.filter (\Info{..} -> infoRelation == relation) dataSeq
+
+declarationsByAccessControl :: Ord scope => scope -> AccessControl -> ScopeGraph scope -> [ Info scope ]
+declarationsByAccessControl scope accessControl g = fromMaybe mempty $ do
+  dataSeq <- ddataOfScope scope g
+  pure . toList $ Seq.filter (\Info{..} -> infoAccessControl == accessControl) dataSeq
 
 -- Lookup a scope in the scope graph.
 lookupScope :: Ord scope => scope -> ScopeGraph scope -> Maybe (Scope scope)
