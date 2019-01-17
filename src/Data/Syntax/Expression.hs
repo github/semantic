@@ -428,12 +428,12 @@ instance Evaluatable MemberAccess where
     let lhsAccessControl = fromMaybe Public (termToAccessControl lhs)
     infos <- declarationsByAccessControl rhsScope lhsAccessControl
 
-    rhsValue' <- case (find (\Info{..} -> (Declaration rhs) == infoDeclaration) infos) of
+    rhsValue' <- case find (\Info{..} -> Declaration rhs == infoDeclaration) infos of
       Just _  -> pure rhsValue
       Nothing -> do
         let lhsName = fromMaybe (name "") (declaredName lhs)
         info <- declarationByName rhsScope (Declaration rhs)
-        throwEvalError $ AccessControlError (lhsName, lhsAccessControl) (rhs, (infoAccessControl info)) rhsValue
+        throwEvalError $ AccessControlError (lhsName, lhsAccessControl) (rhs, infoAccessControl info) rhsValue
 
     bindThis lhsValue rhsValue'
 
