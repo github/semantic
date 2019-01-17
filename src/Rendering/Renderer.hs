@@ -11,7 +11,6 @@ module Rendering.Renderer
 , renderRPCToCDiff
 , renderToCTerm
 , renderSymbolTerms
-, renderToSymbols
 , renderTreeGraph
 , renderJSONError
 , renderJSONSymbolError
@@ -19,9 +18,6 @@ module Rendering.Renderer
 , renderJSONSummaryError
 , Summaries(..)
 , TOCSummary(..)
-, SymbolFields(..)
-, defaultSymbolFields
-, parseSymbolFields
 ) where
 
 import Data.ByteString.Builder
@@ -29,7 +25,6 @@ import Data.Graph
 import Data.Graph.DiffVertex
 import Rendering.Graph as R
 import Rendering.JSON as R
-import Rendering.Symbol as R
 import Rendering.TOC as R
 
 -- | Specification of renderers for diffs, producing output in the parameter type.
@@ -58,8 +53,6 @@ data TermRenderer output where
   JSONGraphTermRenderer :: TermRenderer (JSON "trees" SomeJSON)
   -- | Render to a 'ByteString' formatted as nested s-expressions.
   SExpressionTermRenderer :: TermRenderer Builder
-  -- | Render to a list of symbols.
-  SymbolsTermRenderer :: SymbolFields -> TermRenderer (JSON "files" SomeJSON)
   -- | Render to a 'ByteString' formatted as a DOT description of the term.
   DOTTermRenderer :: TermRenderer (Graph TermVertex)
   -- | Render to a 'ByteString' formatted using the 'Show' instance.

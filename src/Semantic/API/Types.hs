@@ -30,7 +30,7 @@ import           Data.ByteString.Lazy.Char8 as BC
 import qualified Data.Text as T
 import           GHC.Generics
 import           Proto3.Suite as Proto3
-import Network.HTTP.Media ((//), (/:))
+import Network.HTTP.Media ((//))
 import           Servant.API
 import Data.Bifunctor (first)
 
@@ -150,6 +150,42 @@ instance MimeRender PlainText PingResponse where
 --
 
 -- TODO: Custom Types for Blob, Source, etc.
+
+-- data Language
+--     = Unknown
+--     | Go
+--     | Haskell
+--     | Java
+--     | JavaScript
+--     | JSON
+--     | JSX
+--     | Markdown
+--     | Python
+--     | Ruby
+--     | TypeScript
+--     | PHP
+--   deriving stock (Eq, Ord, Show, Generic)
+--   deriving anyclass (Named, Enum, MessageField, ToJSON)
+--
+-- -- This ensures that the protobuf file is generated with ALL_CAPS_NAMES.
+-- instance Finite Language where
+--   enumerate _ = fmap go [Unknown ..] where
+--     go x = (fromString (fmap toUpper (show x)), fromEnum x)
+--
+-- instance FromJSON Language where
+--   parseJSON = withText "Language" $ \l -> pure $ case T.toLower l of
+--     "go"         -> Go
+--     "haskell"    -> Haskell
+--     "java"       -> Java
+--     "javascript" -> JavaScript
+--     "json"       -> JSON
+--     "jsx"        -> JSX
+--     "markdown"   -> Markdown
+--     "python"     -> Python
+--     "ruby"       -> Ruby
+--     "typescript" -> TypeScript
+--     "php"        -> PHP
+--     _            -> Unknown
 
 
 data Position = Position
