@@ -68,7 +68,7 @@ instance Evaluatable TypeIdentifier where
   eval _ _ TypeIdentifier{..} = do
     -- Add a reference to the type identifier in the current scope.
     reference (Reference (Evaluatable.name contents)) (Declaration (Evaluatable.name contents))
-    pure unit
+    unit
 
 data NestedTypeIdentifier a = NestedTypeIdentifier { left :: !a, right :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
@@ -140,4 +140,4 @@ newtype LiteralType a = LiteralType { literalTypeSubject :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
   deriving (Eq1, Show1, Ord1) via Generically LiteralType
 
-instance Evaluatable LiteralType         
+instance Evaluatable LiteralType

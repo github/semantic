@@ -54,7 +54,7 @@ spec = parallel $ do
       diffTOC blankDiff `shouldBe` [ ]
 
     it "summarizes changed methods" $ do
-      sourceBlobs <- blobsForPaths (both "ruby/toc/methods.A.rb" "ruby/toc/methods.B.rb")
+      sourceBlobs <- blobsForPaths (Both "ruby/toc/methods.A.rb" "ruby/toc/methods.B.rb")
       diff <- runTask $ diffWithParser rubyParser sourceBlobs
       diffTOC diff `shouldBe`
         [ TOCSummary "Method" "self.foo" (Span (Pos 1 1) (Pos 2 4)) "added"
@@ -63,7 +63,7 @@ spec = parallel $ do
         ]
 
     xit "summarizes changed classes" $ do
-      sourceBlobs <- blobsForPaths (both "ruby/toc/classes.A.rb" "ruby/toc/classes.B.rb")
+      sourceBlobs <- blobsForPaths (Both "ruby/toc/classes.A.rb" "ruby/toc/classes.B.rb")
       diff <- runTask $ diffWithParser rubyParser sourceBlobs
       diffTOC diff `shouldBe`
         [ TOCSummary "Class" "Baz" (Span (Pos 1 1) (Pos 2 4)) "removed"
@@ -72,37 +72,37 @@ spec = parallel $ do
         ]
 
     it "dedupes changes in same parent method" $ do
-      sourceBlobs <- blobsForPaths (both "javascript/toc/duplicate-parent.A.js" "javascript/toc/duplicate-parent.B.js")
+      sourceBlobs <- blobsForPaths (Both "javascript/toc/duplicate-parent.A.js" "javascript/toc/duplicate-parent.B.js")
       diff <- runTask $ diffWithParser typescriptParser sourceBlobs
       diffTOC diff `shouldBe`
         [ TOCSummary "Function" "myFunction" (Span (Pos 1 1) (Pos 6 2)) "modified" ]
 
     it "dedupes similar methods" $ do
-      sourceBlobs <- blobsForPaths (both "javascript/toc/erroneous-duplicate-method.A.js" "javascript/toc/erroneous-duplicate-method.B.js")
+      sourceBlobs <- blobsForPaths (Both "javascript/toc/erroneous-duplicate-method.A.js" "javascript/toc/erroneous-duplicate-method.B.js")
       diff <- runTask $ diffWithParser typescriptParser sourceBlobs
       diffTOC diff `shouldBe`
         [ TOCSummary "Function" "performHealthCheck" (Span (Pos 8 1) (Pos 29 2)) "modified" ]
 
     it "summarizes Go methods with receivers with special formatting" $ do
-      sourceBlobs <- blobsForPaths (both "go/toc/method-with-receiver.A.go" "go/toc/method-with-receiver.B.go")
+      sourceBlobs <- blobsForPaths (Both "go/toc/method-with-receiver.A.go" "go/toc/method-with-receiver.B.go")
       diff <- runTask $ diffWithParser goParser sourceBlobs
       diffTOC diff `shouldBe`
         [ TOCSummary "Method" "(*apiClient) CheckAuth" (Span (Pos 3 1) (Pos 3 101)) "added" ]
 
     it "summarizes Ruby methods that start with two identifiers" $ do
-      sourceBlobs <- blobsForPaths (both "ruby/toc/method-starts-with-two-identifiers.A.rb" "ruby/toc/method-starts-with-two-identifiers.B.rb")
+      sourceBlobs <- blobsForPaths (Both "ruby/toc/method-starts-with-two-identifiers.A.rb" "ruby/toc/method-starts-with-two-identifiers.B.rb")
       diff <- runTask $ diffWithParser rubyParser sourceBlobs
       diffTOC diff `shouldBe`
         [ TOCSummary "Method" "foo" (Span (Pos 1 1) (Pos 4 4)) "modified" ]
 
     it "handles unicode characters in file" $ do
-      sourceBlobs <- blobsForPaths (both "ruby/toc/unicode.A.rb" "ruby/toc/unicode.B.rb")
+      sourceBlobs <- blobsForPaths (Both "ruby/toc/unicode.A.rb" "ruby/toc/unicode.B.rb")
       diff <- runTask $ diffWithParser rubyParser sourceBlobs
       diffTOC diff `shouldBe`
         [ TOCSummary "Method" "foo" (Span (Pos 6 1) (Pos 7 4)) "added" ]
 
     it "properly slices source blob that starts with a newline and has multi-byte chars" $ do
-      sourceBlobs <- blobsForPaths (both "javascript/toc/starts-with-newline.js" "javascript/toc/starts-with-newline.js")
+      sourceBlobs <- blobsForPaths (Both "javascript/toc/starts-with-newline.js" "javascript/toc/starts-with-newline.js")
       diff <- runTaskWithOptions (defaultOptions { optionsLogLevel = Nothing }) $ diffWithParser typescriptParser sourceBlobs
       diffTOC diff `shouldBe` []
 
@@ -145,22 +145,22 @@ spec = parallel $ do
 
   describe "diff with ToCDiffRenderer'" $ do
     it "produces JSON output" $ do
-      blobs <- blobsForPaths (both "ruby/toc/methods.A.rb" "ruby/toc/methods.B.rb")
+      blobs <- blobsForPaths (Both "ruby/toc/methods.A.rb" "ruby/toc/methods.B.rb")
       output <- runTask (runDiff ToCDiffRenderer [blobs])
       runBuilder output `shouldBe` ("{\"changes\":{\"test/fixtures/ruby/toc/methods.A.rb -> test/fixtures/ruby/toc/methods.B.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"self.foo\",\"changeType\":\"added\"},{\"span\":{\"start\":[4,1],\"end\":[6,4]},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"modified\"},{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{}}\n" :: ByteString)
 
     it "produces JSON output if there are parse errors" $ do
-      blobs <- blobsForPaths (both "ruby/toc/methods.A.rb" "ruby/toc/methods.X.rb")
+      blobs <- blobsForPaths (Both "ruby/toc/methods.A.rb" "ruby/toc/methods.X.rb")
       output <- runTaskWithOptions (defaultOptions { optionsLogLevel = Nothing }) (runDiff ToCDiffRenderer [blobs])
       runBuilder output `shouldBe` ("{\"changes\":{\"test/fixtures/ruby/toc/methods.A.rb -> test/fixtures/ruby/toc/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"removed\"},{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{\"test/fixtures/ruby/toc/methods.A.rb -> test/fixtures/ruby/toc/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,3]},\"error\":\"expected end of input nodes, but got ParseError\",\"language\":\"Ruby\"}]}}\n" :: ByteString)
 
     it "ignores anonymous functions" $ do
-      blobs <- blobsForPaths (both "ruby/toc/lambda.A.rb" "ruby/toc/lambda.B.rb")
+      blobs <- blobsForPaths (Both "ruby/toc/lambda.A.rb" "ruby/toc/lambda.B.rb")
       output <- runTask (runDiff ToCDiffRenderer [blobs])
       runBuilder output `shouldBe` ("{\"changes\":{},\"errors\":{}}\n" :: ByteString)
 
     it "summarizes Markdown headings" $ do
-      blobs <- blobsForPaths (both "markdown/toc/headings.A.md" "markdown/toc/headings.B.md")
+      blobs <- blobsForPaths (Both "markdown/toc/headings.A.md" "markdown/toc/headings.B.md")
       output <- runTask (runDiff ToCDiffRenderer [blobs])
       runBuilder output `shouldBe` ("{\"changes\":{\"test/fixtures/markdown/toc/headings.A.md -> test/fixtures/markdown/toc/headings.B.md\":[{\"span\":{\"start\":[1,1],\"end\":[3,16]},\"category\":\"Heading 1\",\"term\":\"Introduction\",\"changeType\":\"removed\"},{\"span\":{\"start\":[5,1],\"end\":[7,4]},\"category\":\"Heading 2\",\"term\":\"Two\",\"changeType\":\"modified\"},{\"span\":{\"start\":[9,1],\"end\":[11,10]},\"category\":\"Heading 3\",\"term\":\"This heading is new\",\"changeType\":\"added\"},{\"span\":{\"start\":[13,1],\"end\":[14,4]},\"category\":\"Heading 1\",\"term\":\"Final\",\"changeType\":\"added\"}]},\"errors\":{}}\n" :: ByteString)
 
@@ -171,14 +171,14 @@ type Term' = Term ListableSyntax (Maybe Declaration)
 numTocSummaries :: Diff' -> Int
 numTocSummaries diff = length $ filter isValidSummary (diffTOC diff)
 
--- Return a diff where body is inserted in the expressions of a function. The function is present in both sides of the diff.
+-- Return a diff where body is inserted in the expressions of a function. The function is present in Both sides of the diff.
 programWithChange :: Term' -> Diff'
 programWithChange body = merge (Nothing, Nothing) (inject [ function' ])
   where
     function' = merge (Just (FunctionDeclaration "foo" mempty lowerBound Ruby), Just (FunctionDeclaration "foo" mempty lowerBound Ruby)) (inject (Declaration.Function [] name' [] (merge (Nothing, Nothing) (inject [ inserting body ]))))
     name' = merge (Nothing, Nothing) (inject (Syntax.Identifier (name "foo")))
 
--- Return a diff where term is inserted in the program, below a function found on both sides of the diff.
+-- Return a diff where term is inserted in the program, below a function found on Both sides of the diff.
 programWithChangeOutsideFunction :: Term' -> Diff'
 programWithChangeOutsideFunction term = merge (Nothing, Nothing) (inject [ function', term' ])
   where

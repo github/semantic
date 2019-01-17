@@ -1,37 +1,23 @@
-{-# OPTIONS_GHC -fno-warn-orphans -funbox-strict-fields #-}
+{-# LANGUAGE DerivingVia #-}
+
 module Data.Functor.Both
-( Both
-, both
+( Both (..)
 , runBothWith
-, module X
 ) where
 
-import Data.Bifunctor.Join as X
 import Data.Functor.Classes
+import Data.Functor.Classes.Generic
+import Data.Monoid.Generic
+import GHC.Generics
 
 -- | A computation over both sides of a pair.
-type Both = Join (,)
-
--- | Given two operands returns a functor operating on `Both`. This is a curried synonym for Both.
-both :: a -> a -> Both a
-both = curry Join
+data Both a = Both a a
+  deriving (Eq, Show, Ord, Functor, Foldable, Traversable, Generic1, Generic)
+  deriving Semigroup via GenericSemigroup (Both a)
+  deriving Monoid    via GenericMonoid (Both a)
+  deriving (Eq1, Show1, Ord1) via Generically Both
 
 -- | Apply a function to `Both` sides of a computation.
+-- The eliminator/catamorphism over 'Both'.
 runBothWith :: (a -> a -> b) -> Both a -> b
-runBothWith f = uncurry f . runJoin
-
-
-instance (Semigroup a, Monoid a) => Monoid (Join (,) a) where
-  mempty = pure mempty
-  mappend = (<>)
-
-
-instance (Semigroup a) => Semigroup (Join (,) a) where
-  a <> b = Join $ runJoin a <> runJoin b
-
-
-instance Eq2 p => Eq1 (Join p) where
-  liftEq eq (Join a1) (Join a2) = liftEq2 eq eq a1 a2
-
-instance Show2 p => Show1 (Join p) where
-  liftShowsPrec sp sl d = showsUnaryWith (liftShowsPrec2 sp sl sp sl) "Join" d . runJoin
+runBothWith f (Both a b) = f a b

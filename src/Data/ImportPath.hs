@@ -2,21 +2,23 @@
 module Data.ImportPath (IsRelative(..), ImportPath(..), importPath, toName, defaultAlias) where
 
 import Prologue
+
 import           Data.Aeson
 import qualified Data.Text as T
-import Data.Abstract.Name
 import           Proto3.Suite
 import qualified Proto3.Wire.Decode as Decode
 import qualified Proto3.Wire.Encode as Encode
-import           Data.Abstract.Path (stripQuotes)
 import           System.FilePath.Posix
+
+import Data.Abstract.Name
+import Data.Abstract.Path (stripQuotes)
 
 data IsRelative = Unknown | Relative | NonRelative
   deriving (Bounded, Enum, Finite, MessageField, Named, Eq, Generic, Hashable, Ord, Show, ToJSON, NFData)
 
 instance Primitive IsRelative where
   encodePrimitive = Encode.enum
-  decodePrimitive = either (const def) id <$> Decode.enum
+  decodePrimitive = fromRight def <$> Decode.enum
   primType _ = Named (Single (nameOf (Proxy @IsRelative)))
 
 instance HasDefault IsRelative where

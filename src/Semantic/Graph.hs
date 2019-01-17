@@ -31,7 +31,7 @@ import Prelude hiding (readFile)
 import           Analysis.Abstract.Caching.FlowInsensitive
 import           Analysis.Abstract.Collecting
 import           Analysis.Abstract.Graph as Graph
-import           Control.Abstract
+import           Control.Abstract hiding (String)
 import           Control.Abstract.PythonPackage as PythonPackage
 import           Data.Abstract.Address.Hole as Hole
 import           Data.Abstract.Address.Monovariant as Monovariant
@@ -134,9 +134,9 @@ runCallGraph lang includePackages modules package
   . providingLiveSet
   . runModuleTable
   . runModules (ModuleTable.modulePaths (packageModules package))
-  $ evaluate lang perModule perTerm modules
+  $ evaluate lang perModule modules
   where perTerm = evalTerm (withTermSpans . graphingTerms . cachingTerms)
-        perModule = (if includePackages then graphingPackages else id) . convergingModules . graphingModules
+        perModule = (if includePackages then graphingPackages else id) . convergingModules . graphingModules $ runDomainEffects perTerm
 
 
 runModuleTable :: Carrier sig m
@@ -159,7 +159,7 @@ runImportGraphToModuleInfos :: ( Declarations term
                             -> Package term
                             -> Eff m (Graph ControlFlowVertex)
 runImportGraphToModuleInfos lang (package :: Package term) = runImportGraph lang package allModuleInfos
-  where allModuleInfos info = maybe (vertex (unknownModuleVertex info)) (foldMap (vertex . moduleVertex . moduleInfo)) (ModuleTable.lookup (modulePath info) (packageModules package))
+  where allModuleInfos info = vertex (maybe (unknownModuleVertex info) (moduleVertex . moduleInfo) (ModuleTable.lookup (modulePath info) (packageModules package)))
 
 runImportGraphToModules :: ( Declarations term
                            , Evaluatable (Base term)
@@ -176,7 +176,7 @@ runImportGraphToModules :: ( Declarations term
                         -> Package term
                         -> Eff m (Graph (Module term))
 runImportGraphToModules lang (package :: Package term) = runImportGraph lang package resolveOrLowerBound
-  where resolveOrLowerBound info = maybe lowerBound (foldMap vertex) (ModuleTable.lookup (modulePath info) (packageModules package))
+  where resolveOrLowerBound info = maybe lowerBound vertex (ModuleTable.lookup (modulePath info) (packageModules package))
 
 runImportGraph :: ( Declarations term
                   , Evaluatable (Base term)
@@ -214,7 +214,7 @@ runImportGraph lang (package :: Package term) f
   . raiseHandler (runReader (lowerBound @Span))
   . raiseHandler (runState (lowerBound @(ScopeGraph (Hole (Maybe Name) Precise))))
   . runAllocator
-  $ evaluate lang graphingModuleInfo (evalTerm id) (ModuleTable.toPairs (packageModules package) >>= toList . snd)
+  $ evaluate lang (graphingModuleInfo (runDomainEffects (evalTerm id))) (snd <$> ModuleTable.toPairs (packageModules package))
 
 runHeap :: (Carrier sig m, Effect sig)
         => Evaluator term address value (StateC (Heap address address value) (Eff m)) a
@@ -289,7 +289,7 @@ parsePythonPackage parser project = do
   strat <- case find ((== (projectRootDir project </> "setup.py")) . filePath) (projectFiles project) of
     Just setupFile -> do
       setupModule <- fmap snd <$> parseModule project parser setupFile
-      fst <$> runAnalysis (evaluate (Proxy @'Language.Python) id (runPythonPackaging . evalTerm id) [ setupModule ])
+      fst <$> runAnalysis (evaluate (Proxy @'Language.Python) (runDomainEffects (runPythonPackaging . evalTerm id)) [ setupModule ])
     Nothing -> pure PythonPackage.Unknown
   case strat of
     PythonPackage.Unknown -> do
