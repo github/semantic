@@ -218,7 +218,7 @@ declareModule eval identifier statements = do
 
         withScopeAndFrame childFrame (void moduleBody)
 
-        moduleSlot <- lookupDeclaration (Declaration name)
+        moduleSlot <- lookupSlot (Declaration name)
         assign moduleSlot =<< namespace name childFrame
 
         pure unit
@@ -262,7 +262,7 @@ instance Evaluatable AbstractClass where
     superScopes <- for classHeritage $ \superclass -> do
       name <- maybeM (throwNoNameError superclass) (declaredName superclass)
       scope <- associatedScope (Declaration name)
-      slot <- lookupDeclaration (Declaration name)
+      slot <- lookupSlot (Declaration name)
       superclassFrame <- scopedEnvironment =<< deref slot
       pure $ case (scope, superclassFrame) of
         (Just scope, Just frame) -> Just (scope, frame)
@@ -280,7 +280,7 @@ instance Evaluatable AbstractClass where
     withScopeAndFrame childFrame $ do
       void $ eval classBody
 
-    classSlot <- lookupDeclaration (Declaration name)
+    classSlot <- lookupSlot (Declaration name)
     assign classSlot =<< klass (Declaration name) childFrame
 
     pure unit

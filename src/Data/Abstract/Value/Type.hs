@@ -271,8 +271,8 @@ instance ( Member (Allocator address) sig
       res <- withScopeAndFrame frame $ do
         tvars <- foldr (\ param rest -> do
           tvar <- Var <$> fresh
-          address <- lookupDeclaration (Declaration param)
-          assign address tvar
+          slot <- lookupSlot (Declaration param)
+          assign slot tvar
           (tvar :) <$> rest) (pure []) params
         -- TODO: We may still want to represent this as a closure and not a function type
         (zeroOrMoreProduct tvars :->) <$> catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body)))

@@ -12,7 +12,7 @@ module Control.Abstract.Heap
 , alloc
 , dealloc
 , maybeLookupDeclaration
-, lookupDeclaration
+, lookupSlot
 , lookupDeclarationFrame
 , deref
 , assign
@@ -182,7 +182,7 @@ define :: ( HasCallStack
 define declaration rel accessControl def = withCurrentCallStack callStack $ do
   -- TODO: This span is still wrong.
   declare declaration rel accessControl emptySpan Nothing
-  slot <- lookupDeclaration declaration
+  slot <- lookupSlot declaration
   value <- def
   assign slot value
 
@@ -257,7 +257,7 @@ maybeLookupDeclaration decl = do
       pure (Just (Slot frameAddress (Heap.pathPosition path)))
     Nothing -> pure Nothing
 
-lookupDeclaration :: ( Carrier sig m
+lookupSlot :: ( Carrier sig m
                      , Member (Reader (CurrentFrame address)) sig
                      , Member (Reader (CurrentScope address)) sig
                      , Member (Reader ModuleInfo) sig
@@ -270,7 +270,7 @@ lookupDeclaration :: ( Carrier sig m
                      )
                   => Declaration
                   -> Evaluator term address value m (Slot address)
-lookupDeclaration decl = do
+lookupSlot decl = do
   path <- lookupScopePath decl
   frameAddress <- lookupFrameAddress path
   pure (Slot frameAddress (Heap.pathPosition path))

@@ -144,7 +144,7 @@ instance Evaluatable Import where
     -- Add declaration of the alias name to the current scope (within our current module).
     declare (Declaration aliasName) Default Public span (Just importScope)
     -- Retrieve the frame slot for the new declaration.
-    aliasSlot <- lookupDeclaration (Declaration aliasName)
+    aliasSlot <- lookupSlot (Declaration aliasName)
     assign aliasSlot =<< object aliasFrame
 
     pure unit
@@ -211,7 +211,7 @@ instance Evaluatable QualifiedImport where
         span <- ask @Span
         scopeAddress <- newScope mempty
         declare (Declaration name) Default Public span (Just scopeAddress)
-        aliasSlot <- lookupDeclaration (Declaration name)
+        aliasSlot <- lookupSlot (Declaration name)
         -- a.b.c
         withScope scopeAddress $
           mkScopeMap modulePath (\scopeMap -> do
@@ -246,7 +246,7 @@ instance Evaluatable QualifiedAliasedImport where
     declare (Declaration alias) Default Public span (Just scopeAddress)
     objFrame <- newFrame scopeAddress mempty
     val <- object objFrame
-    aliasSlot <- lookupDeclaration (Declaration alias)
+    aliasSlot <- lookupSlot (Declaration alias)
     assign aliasSlot val
 
     withScopeAndFrame objFrame .

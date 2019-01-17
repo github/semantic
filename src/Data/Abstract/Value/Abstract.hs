@@ -48,8 +48,8 @@ instance ( Member (Allocator address) sig
       frame <- newFrame scope frameLinks
       res <- withScopeAndFrame frame $ do
         for_ params $ \param -> do
-          address <- lookupDeclaration (Declaration param)
-          assign address Abstract
+          slot <- lookupSlot (Declaration param)
+          assign slot Abstract
         catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body)))
       Evaluator $ runFunctionC (k res) eval
     BuiltIn _ _ k -> runFunctionC (k Abstract) eval
