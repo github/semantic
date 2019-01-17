@@ -20,6 +20,7 @@ module Control.Abstract.ScopeGraph
   , insertLexicalEdge
   , withScope
   , associatedScope
+  , declarationByName
   , declarationsByAccessControl
   , declarationsByRelation
   , putDeclarationScope
@@ -181,6 +182,20 @@ declarationsByRelation :: ( Member (State (ScopeGraph address)) sig
                        -> Evaluator term address value m [ Info address ]
 declarationsByRelation scope relation = ScopeGraph.declarationsByRelation scope relation <$> get
 
+declarationByName :: ( Member (Resumable (BaseError (ScopeError address))) sig
+                     , Member (Reader ModuleInfo) sig
+                     , Member (Reader Span) sig
+                     , Member (State (ScopeGraph address)) sig
+                     , Carrier sig m
+                     , Ord address
+                     )
+                  => address
+                  -> Declaration
+                  -> Evaluator term address value m (Info address)
+declarationByName scope name = do
+  scopeGraph <- get
+  maybeM (throwScopeError $ DeclarationByNameError name) (ScopeGraph.declarationByName scope name scopeGraph)
+
 declarationsByAccessControl :: ( Member (State (ScopeGraph address)) sig
                                , Carrier sig m
                                , Ord address
@@ -285,6 +300,7 @@ data ScopeError address return where
   ImportReferenceError :: ScopeError address (Scope address)
   LookupPathError :: Declaration -> ScopeError address (ScopeGraph.Path address)
   LookupDeclarationScopeError :: Declaration -> ScopeError address address
+  DeclarationByNameError :: Declaration -> ScopeError address (Info address)
   CurrentScopeError :: ScopeError address address
 
 deriving instance Eq (ScopeError address return)
