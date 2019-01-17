@@ -60,7 +60,7 @@ instance Evaluatable QualifiedAliasedImport where
 
     alias <- maybeM (throwNoNameError aliasTerm) (declaredName aliasTerm)
     declare (Declaration alias) Default Public span (Just importScope)
-    aliasSlot <- lookupDeclaration (Declaration alias)
+    aliasSlot <- lookupSlot (Declaration alias)
     assign aliasSlot =<< object aliasFrame
 
     pure unit
@@ -137,7 +137,7 @@ instance Evaluatable DefaultExport where
           valueRef <- eval term
           let declaration = Declaration $ Name.name "__default"
           declare declaration Default Public exportSpan Nothing
-          defaultSlot <- lookupDeclaration declaration
+          defaultSlot <- lookupSlot declaration
           assign defaultSlot valueRef
 
         insertExportEdge exportScope

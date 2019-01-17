@@ -417,7 +417,7 @@ instance Evaluatable MemberAccess where
       Just lhsFrame ->
         withScopeAndFrame lhsFrame $ do
           reference (Reference rhs) (Declaration rhs)
-          lookupDeclaration (Declaration rhs)
+          lookupSlot (Declaration rhs)
       -- Throw a ReferenceError since we're attempting to reference a name within a value that is not an Object.
       Nothing -> throwEvalError (ReferenceError lhsValue rhs)
 
@@ -440,7 +440,7 @@ instance Evaluatable MemberAccess where
       Just lhsFrame ->
         withScopeAndFrame lhsFrame $ do
           reference (Reference rhs) (Declaration rhs)
-          lookupDeclaration (Declaration rhs)
+          lookupSlot (Declaration rhs)
       -- Throw a ReferenceError since we're attempting to reference a name within a value that is not an Object.
       Nothing -> throwEvalError (ReferenceError lhsValue rhs)
 
@@ -539,7 +539,7 @@ instance Evaluatable New where
     name <- maybeM (throwNoNameError newSubject) (declaredName newSubject)
     assocScope <- maybeM (throwEvalError $ ConstructorError name) =<< associatedScope (Declaration name)
     objectScope <- newScope (Map.singleton Superclass [ assocScope ])
-    slot <- lookupDeclaration (Declaration name)
+    slot <- lookupSlot (Declaration name)
     classVal <- deref slot
     classFrame <- maybeM (throwEvalError $ ScopedEnvError classVal) =<< scopedEnvironment classVal
 
@@ -556,7 +556,7 @@ instance Evaluatable New where
       -- TODO: This is a typescript specific name and we should allow languages to customize it.
       let constructorName = Name.name "constructor"
       reference (Reference constructorName) (Declaration constructorName)
-      constructor <- deref =<< lookupDeclaration (Declaration constructorName)
+      constructor <- deref =<< lookupSlot (Declaration constructorName)
       args <- traverse eval newArguments
       boundConstructor <- bindThis objectVal constructor
       call boundConstructor args
@@ -589,7 +589,7 @@ instance Tokenize This where
 instance Evaluatable This where
   eval _ _ This = do
     reference (Reference __self) (Declaration __self)
-    deref =<< lookupDeclaration (Declaration __self)
+    deref =<< lookupSlot (Declaration __self)
 
 instance AccessControls1 This where
   liftTermToAccessControl _ _ = Just Private

@@ -80,7 +80,7 @@ instance Evaluatable QualifiedImport where
     span <- ask @Span
     scopeAddress <- newScope mempty
     declare (Declaration alias) Default Public span (Just scopeAddress)
-    aliasSlot <- lookupDeclaration (Declaration alias)
+    aliasSlot <- lookupSlot (Declaration alias)
 
     withScope scopeAddress $ do
       let

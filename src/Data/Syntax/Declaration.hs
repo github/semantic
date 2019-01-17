@@ -38,7 +38,7 @@ instance Evaluatable Function where
       param <- maybeM (throwNoNameError paramNode) (declaredName paramNode)
       param <$ declare (Declaration param) Default ScopeGraph.Public span Nothing
 
-    addr <- lookupDeclaration (Declaration name)
+    addr <- lookupSlot (Declaration name)
     v <- function name params functionBody associatedScope
     v <$ assign addr v
 
@@ -115,7 +115,7 @@ instance Evaluatable Method where
         param <- maybeM (throwNoNameError paramNode) (declaredName paramNode)
         param <$ declare (Declaration param) Default ScopeGraph.Public span Nothing
 
-    addr <- lookupDeclaration (Declaration name)
+    addr <- lookupSlot (Declaration name)
     v <- function name params methodBody associatedScope
     v <$ assign addr v
 
@@ -213,7 +213,7 @@ instance Evaluatable PublicFieldDefinition where
     propertyName <- maybeM (throwNoNameError publicFieldPropertyName) (declaredName publicFieldPropertyName)
 
     declare (Declaration propertyName) Instance (fromMaybe (ScopeGraph.Public) (termToAccessControl publicFieldVisibility)) span Nothing
-    slot <- lookupDeclaration (Declaration propertyName)
+    slot <- lookupSlot (Declaration propertyName)
     value <- eval publicFieldValue
     assign slot value
     pure unit
@@ -243,7 +243,7 @@ instance Evaluatable Class where
     superScopes <- for classSuperclasses $ \superclass -> do
       name <- maybeM (throwNoNameError superclass) (declaredName superclass)
       scope <- associatedScope (Declaration name)
-      slot <- lookupDeclaration (Declaration name)
+      slot <- lookupSlot (Declaration name)
       superclassFrame <- scopedEnvironment =<< deref slot
       pure $ case (scope, superclassFrame) of
         (Just scope, Just frame) -> Just (scope, frame)
@@ -258,7 +258,7 @@ instance Evaluatable Class where
     let frameEdges = Map.singleton Superclass (Map.fromList (catMaybes superScopes))
     classFrame <- newFrame classScope frameEdges
 
-    classSlot <- lookupDeclaration (Declaration name)
+    classSlot <- lookupSlot (Declaration name)
     assign classSlot =<< klass (Declaration name) classFrame
 
     withScopeAndFrame classFrame $ do
@@ -331,8 +331,8 @@ instance Evaluatable TypeAlias where
     -- TODO: Should we consider a special Relation for `TypeAlias`?
     declare (Declaration name) Default ScopeGraph.Public span assocScope
 
-    slot <- lookupDeclaration (Declaration name)
-    kindSlot <- lookupDeclaration (Declaration kindName)
+    slot <- lookupSlot (Declaration name)
+    kindSlot <- lookupSlot (Declaration kindName)
     assign slot =<< deref kindSlot
 
     pure unit

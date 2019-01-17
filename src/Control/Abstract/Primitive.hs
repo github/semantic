@@ -48,7 +48,7 @@ defineBuiltIn declaration rel accessControl value = withCurrentCallStack callSta
   withScope associatedScope $ do
     declare (Declaration param) rel accessControl emptySpan Nothing
 
-  slot <- lookupDeclaration declaration
+  slot <- lookupSlot declaration
   value <- builtIn associatedScope value
   assign slot value
 
