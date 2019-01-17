@@ -26,13 +26,13 @@ module Semantic.API.Types
   ) where
 
 import           Data.Aeson
+import           Data.Bifunctor (first)
 import           Data.ByteString.Lazy.Char8 as BC
 import qualified Data.Text as T
 import           GHC.Generics
+import           Network.HTTP.Media ((//))
 import           Proto3.Suite as Proto3
-import Network.HTTP.Media ((//))
 import           Servant.API
-import Data.Bifunctor (first)
 
 -- TODO: Remove dependence on these:
 import Data.Blob
