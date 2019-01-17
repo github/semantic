@@ -164,12 +164,12 @@ spec config = parallel $ do
         Right (Just (Module _ (_, value))) -> value `shouldBe` (Concrete.Float (Number.Decimal 9.0))
         other                              -> expectationFailure (show other)
 
-    -- it "prevents lookup of private members external to the instance" $ do
-    --   (_, (_, res)) <- evaluate ["class-private1.ts", "class-private2.ts"]
-    --   case ModuleTable.lookup "class-private1.ts" <$> res of
-    --     Left (SomeError (BaseError _ _ (DerefError (Closure _ _ maybeName _ _ _ _ _)))) -> maybeName `shouldBe` (Just "private_add")
-    --     other                                                                           -> expectationFailure (show other)
-
+    it "prevents lookup of private members external to the instance" $ do
+      (_, (_, res)) <- evaluate ["class-private1.ts", "class-private2.ts"]
+      let accessControlError = "SomeError (BaseError (ModuleInfo \"class-private2.ts\") [18, 1]..[18, 8] (AccessControlError (\"adder\",Public) (\"y\",Private) (Float 3.0)))"
+      case res of
+        Left err -> show err `shouldBe` accessControlError
+        other -> expectationFailure (show other)
 
   where
     fixtures = "test/fixtures/typescript/analysis/"
