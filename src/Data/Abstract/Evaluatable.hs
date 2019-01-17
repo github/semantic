@@ -239,15 +239,16 @@ instance (NFData term, NFData value, NFData return) => NFData (EvalError term ad
   rnf = liftRnf rnf
 
 instance (Eq term, Eq value) => Eq1 (EvalError term address value) where
-  liftEq _ (DerefError v) (DerefError v2)                  = v == v2
-  liftEq _ DefaultExportError DefaultExportError           = True
-  liftEq _ (ExportError a b) (ExportError c d)             = (a == c) && (b == d)
-  liftEq _ (FloatFormatError a) (FloatFormatError b)       = a == b
-  liftEq _ (IntegerFormatError a) (IntegerFormatError b)   = a == b
-  liftEq _ (NoNameError t1)       (NoNameError t2)         = t1 == t2
-  liftEq _ (RationalFormatError a) (RationalFormatError b) = a == b
-  liftEq _ (ReferenceError v n) (ReferenceError v2 n2)     = (v == v2) && (n == n2)
-  liftEq _ _ _                                             = False
+  liftEq _ (AccessControlError a b c) (AccessControlError a' b' c') = a == a' && b == b' && c == c'
+  liftEq _ (DerefError v) (DerefError v2)                           = v == v2
+  liftEq _ DefaultExportError DefaultExportError                    = True
+  liftEq _ (ExportError a b) (ExportError c d)                      = a == c && b == d
+  liftEq _ (FloatFormatError a) (FloatFormatError b)                = a == b
+  liftEq _ (IntegerFormatError a) (IntegerFormatError b)            = a == b
+  liftEq _ (NoNameError t1)       (NoNameError t2)                  = t1 == t2
+  liftEq _ (RationalFormatError a) (RationalFormatError b)          = a == b
+  liftEq _ (ReferenceError v n) (ReferenceError v2 n2)              = v == v2 && n == n2
+  liftEq _ _ _                                                      = False
 
 instance (Show term, Show value) => Show1 (EvalError term address value) where
   liftShowsPrec _ _ = showsPrec
