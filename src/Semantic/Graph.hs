@@ -462,7 +462,8 @@ resumingScopeError = runScopeErrorWith (\ baseError -> traceError "ScopeError" b
   LookupScopeError -> pure hole
   LookupPathError _ -> pure hole
   CurrentScopeError -> pure hole
-  LookupDeclarationScopeError _ -> pure hole)
+  LookupDeclarationScopeError _ -> pure hole
+  DeclarationByNameError _ -> pure hole)
 
 resumingTypeError :: ( Carrier sig m
                      , Member NonDet sig

@@ -3,6 +3,7 @@ module Data.Abstract.ScopeGraph
   ( Slot(..)
   , Info(..)
   , associatedScope
+  , declarationByName
   , declarationsByAccessControl
   , declarationsByRelation
   , Declaration(..) -- TODO don't export these constructors
@@ -81,6 +82,9 @@ instance Ord AccessControl where
 
 data Relation = Default | Instance deriving (Eq, Show, Ord, Generic, NFData)
 
+instance Lower Relation where
+  lowerBound = Default
+
 data Info scopeAddress = Info
   { infoDeclaration :: Declaration
   , infoRelation :: Relation
@@ -88,6 +92,9 @@ data Info scopeAddress = Info
   , infoSpan :: Span
   , infoAssociatedScope :: Maybe scopeAddress
   } deriving (Eq, Show, Ord, Generic, NFData)
+
+instance Lower (Info scopeAddress) where
+  lowerBound = Info lowerBound lowerBound Unknown lowerBound Nothing
 
 -- Offsets and frame addresses in the heap should be addresses?
 data Scope address = Scope
@@ -104,6 +111,9 @@ instance AbstractHole (Scope scopeAddress) where
 
 instance AbstractHole address => AbstractHole (Slot address) where
   hole = Slot hole (Position 0)
+
+instance AbstractHole (Info address) where
+  hole = lowerBound
 
 newtype Position = Position { unPosition :: Int }
   deriving (Eq, Show, Ord, Generic, NFData)
@@ -156,15 +166,20 @@ ddataOfScope scope = fmap declarations . Map.lookup scope . unScopeGraph
 linksOfScope :: Ord scope => scope -> ScopeGraph scope -> Maybe (Map EdgeLabel [scope])
 linksOfScope scope = fmap edges . Map.lookup scope . unScopeGraph
 
+declarationsByAccessControl :: Ord scope => scope -> AccessControl -> ScopeGraph scope -> [ Info scope ]
+declarationsByAccessControl scope accessControl g = fromMaybe mempty $ do
+  dataSeq <- ddataOfScope scope g
+  pure . toList $ Seq.filter (\Info{..} -> accessControl <= infoAccessControl) dataSeq
+
 declarationsByRelation :: Ord scope => scope -> Relation -> ScopeGraph scope -> [ Info scope ]
 declarationsByRelation scope relation g = fromMaybe mempty $ do
   dataSeq <- ddataOfScope scope g
   pure . toList $ Seq.filter (\Info{..} -> infoRelation == relation) dataSeq
 
-declarationsByAccessControl :: Ord scope => scope -> AccessControl -> ScopeGraph scope -> [ Info scope ]
-declarationsByAccessControl scope accessControl g = fromMaybe mempty $ do
+declarationByName :: Ord scope => scope -> Declaration -> ScopeGraph scope -> Maybe (Info scope)
+declarationByName scope name g = do
   dataSeq <- ddataOfScope scope g
-  pure . toList $ Seq.filter (\Info{..} -> accessControl <= infoAccessControl) dataSeq
+  find (\Info{..} -> infoDeclaration == name) dataSeq
 
 -- Lookup a scope in the scope graph.
 lookupScope :: Ord scope => scope -> ScopeGraph scope -> Maybe (Scope scope)
@@ -319,8 +334,14 @@ associatedScope Declaration{..} g@(ScopeGraph graph) = go (Map.keys graph)
 newtype Reference = Reference { unReference :: Name }
   deriving (Eq, Ord, Show, Generic, NFData)
 
+instance Lower Reference where
+  lowerBound = Reference $ name ""
+
 newtype Declaration = Declaration { unDeclaration :: Name }
   deriving (Eq, Ord, Show, Generic, NFData)
+
+instance Lower Declaration where
+  lowerBound = Declaration $ name ""
 
 -- | The type of edge from a scope to its parent scopes.
 -- Either a lexical edge or an import edge in the case of non-lexical edges.
