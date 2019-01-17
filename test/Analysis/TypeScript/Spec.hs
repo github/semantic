@@ -166,10 +166,8 @@ spec config = parallel $ do
 
     it "prevents lookup of private members external to the instance" $ do
       (_, (_, res)) <- evaluate ["class-private1.ts", "class-private2.ts"]
-      let accessControlError = "SomeError (BaseError (ModuleInfo \"class-private2.ts\") [18, 1]..[18, 8] (AccessControlError (\"adder\",Public) (\"y\",Private) (Float 3.0)))"
-      case res of
-        Left err -> show err `shouldBe` accessControlError
-        other -> expectationFailure (show other)
+      let expected = Left (SomeError (inject @(BaseError (EvalError (Quieterm (Sum TypeScript.Syntax) Location) Precise (Concrete.Value (Quieterm (Sum TypeScript.Syntax) Location) Precise))) (BaseError (ModuleInfo "class-private2.ts") (Span (Pos 18 1) (Pos 18 8)) (AccessControlError ("adder", Public) ("y", Private) (Concrete.Float (Decimal 3.0))))))
+      res `shouldBe` expected
 
   where
     fixtures = "test/fixtures/typescript/analysis/"
