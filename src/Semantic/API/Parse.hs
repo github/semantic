@@ -1,5 +1,9 @@
-{-# LANGUAGE GADTs, TypeOperators, DerivingStrategies #-}
-module Semantic.API.Parse (doParse, TermConstraints) where
+{-# LANGUAGE GADTs, ConstraintKinds, TypeOperators, DerivingStrategies #-}
+module Semantic.API.Parse
+  ( doParse
+  , ParseEffects
+  , TermConstraints
+  ) where
 
 import           Analysis.ConstructorName (ConstructorName)
 import           Control.Effect
@@ -22,6 +26,9 @@ import           Semantic.Task as Task
 import           Servant.API
 import           Tags.Taggable
 
+
+type ParseEffects sig m = (Member (Error SomeException) sig, Member Task sig, Carrier sig m, Monad m)
+
 type TermConstraints =
  '[ Taggable
   , Declarations1
@@ -29,7 +36,7 @@ type TermConstraints =
   , HasTextElement
   ]
 
-doParse :: (Member (Error SomeException) sig, Member Task sig, Carrier sig m, Monad m)
+doParse :: (ParseEffects sig m)
   => Language -> Blob -> (Blob -> SomeTerm TermConstraints Location -> output) -> m output
 doParse lang blob render = case lang of
   Go         -> render blob . SomeTerm <$> parse goParser blob

@@ -186,8 +186,14 @@ library
                      , Reprinting.Pipeline
                      -- High-level flow & operational functionality (logging, stats, etc.)
                      , Semantic.Analysis
+                     -- API
+                     , Semantic.API
+                     , Semantic.API.Diff
+                     , Semantic.API.Converters
                      , Semantic.API.Parse
                      , Semantic.API.Symbols
+                     , Semantic.API.TOCSummaries
+                     , Semantic.API.Types
                      , Semantic.AST
                      , Semantic.CLI
                      , Semantic.Config
@@ -213,7 +219,6 @@ library
                      -- Serialization
                      , Serializing.Format
                      , Serializing.SExpression
-                     , Service.CodeAnalysis
                      , Tags.Taggable
                      , Tags.Tagging
                      -- Custom Prelude
@@ -249,6 +254,7 @@ library
                      , http-client
                      , http-client-tls
                      , http-types
+                     , http-media
                      , kdt
                      , machines
                      , mersenne-random-pure64
