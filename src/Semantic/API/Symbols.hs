@@ -1,10 +1,11 @@
 {-# LANGUAGE GADTs, TypeOperators, DerivingStrategies #-}
-module Semantic.API.Symbols (parseToSymbols) where
+module Semantic.API.Symbols (parseToSymbols, parseToSymbols') where
 
 import           Control.Effect
 import           Control.Effect.Error
 import           Control.Exception
 import           Data.Blob
+import           Data.ByteString.Builder
 import           Data.Location
 import           Data.Maybe
 import           Data.Term
@@ -14,11 +15,16 @@ import           Semantic.API.Converters
 import           Semantic.API.Parse
 import           Semantic.API.Types
 import           Semantic.Task as Task
+import           Serializing.Format
 import           Tags.Taggable
 import           Tags.Tagging
 
-parseToSymbols :: (Member Distribute sig, ParseEffects sig m, Traversable t) => t Blob -> m [File]
-parseToSymbols = distributeFoldMap go
+parseToSymbols' :: (Member Distribute sig, ParseEffects sig m, Traversable t)
+  => Format ParseTreeSymbolResponse -> t Blob -> m Builder
+parseToSymbols' format blobs = runSerialize Plain format <$> parseToSymbols blobs
+
+parseToSymbols :: (Member Distribute sig, ParseEffects sig m, Traversable t) => t Blob -> m ParseTreeSymbolResponse
+parseToSymbols blobs = ParseTreeSymbolResponse <$> distributeFoldMap go blobs
   where
     go :: (Member (Error SomeException) sig, Member Task sig, Carrier sig m, Monad m) => Blob -> m [File]
     go blob@Blob{..} = doParse blobLanguage blob render `catchError` (\(SomeException _) -> pure (pure emptyFile))

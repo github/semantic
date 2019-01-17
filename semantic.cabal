@@ -178,7 +178,6 @@ library
                      , Rendering.Graph
                      , Rendering.JSON
                      , Rendering.Renderer
-                     , Rendering.Symbol
                      , Rendering.TOC
                      , Reprinting.Tokenize
                      , Reprinting.Translate

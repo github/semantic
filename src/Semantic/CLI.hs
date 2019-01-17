@@ -16,6 +16,7 @@ import           Data.Project
 import           Options.Applicative hiding (style)
 import           Prologue
 import           Rendering.Renderer
+import           Semantic.API (parseToSymbols')
 import qualified Semantic.AST as AST
 import           Semantic.Config
 import qualified Semantic.Diff as Diff
@@ -82,19 +83,12 @@ parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate pa
       renderer <- flag  (Parse.runParse SExpressionTermRenderer) (Parse.runParse SExpressionTermRenderer) (long "sexpression" <> help "Output s-expression parse trees (default)")
               <|> flag'                                          (Parse.runParse JSONTermRenderer)        (long "json"        <> help "Output JSON parse trees")
               <|> flag'                                          (Parse.runParse JSONGraphTermRenderer)   (long "json-graph"  <> help "Output JSON adjacency list")
-              <|> flag'                                          (Parse.runParse . SymbolsTermRenderer)   (long "symbols"     <> help "Output JSON symbol list")
-                   <*> (option symbolFieldsReader (  long "fields"
-                                                 <> help "Comma delimited list of specific fields to return (symbols output only)."
-                                                 <> metavar "FIELDS")
-                  <|> pure defaultSymbolFields)
+              <|> flag'                                          (parseToSymbols' JSON)                   (long "symbols"     <> help "Output JSON symbol list")
               <|> flag'                                          (Parse.runParse DOTTermRenderer)         (long "dot"          <> help "Output DOT graph parse trees")
               <|> flag'                                          (Parse.runParse ShowTermRenderer)        (long "show"         <> help "Output using the Show instance (debug only, format subject to change without notice)")
               <|> flag'                                          (Parse.runParse QuietTermRenderer)       (long "quiet"        <> help "Don't produce output, but show timing stats")
       filesOrStdin <- Right <$> some (argument filePathReader (metavar "FILES...")) <|> pure (Left stdin)
       pure $ Task.readBlobs filesOrStdin >>= renderer
-
-    -- Example: semantic parse --symbols --fields=symbol,path,language,kind,line,span
-    symbolFieldsReader = eitherReader (Right . parseSymbolFields)
 
 tsParseCommand :: Mod CommandFields (Task.TaskEff Builder)
 tsParseCommand = command "ts-parse" (info tsParseArgumentsParser (progDesc "Don't produce output, but show timing stats"))

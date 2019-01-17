@@ -36,7 +36,7 @@ parseFixtures =
   , (show JSONTermRenderer, runParse JSONTermRenderer, path, prefix </> "parse-tree.json")
   , (show JSONTermRenderer, runParse JSONTermRenderer, path', prefix </> "parse-trees.json")
   , (show JSONTermRenderer, runParse JSONTermRenderer, [], prefix </> "parse-tree-empty.json")
-  , (show (SymbolsTermRenderer defaultSymbolFields), runParse (SymbolsTermRenderer defaultSymbolFields), path'', prefix </> "parse-tree.symbols.json")
+  -- , (show (SymbolsTermRenderer defaultSymbolFields), runParse (SymbolsTermRenderer defaultSymbolFields), path'', prefix </> "parse-tree.symbols.json")
   ]
   where path = [File "test/fixtures/ruby/corpus/and-or.A.rb" Ruby]
         path' = [File "test/fixtures/ruby/corpus/and-or.A.rb" Ruby, File "test/fixtures/ruby/corpus/and-or.B.rb" Ruby]

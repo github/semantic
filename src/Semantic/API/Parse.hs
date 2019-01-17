@@ -5,27 +5,16 @@ module Semantic.API.Parse
   , TermConstraints
   ) where
 
-import           Analysis.ConstructorName (ConstructorName)
-import           Control.Effect
-import           Control.Effect.Error
-import           Control.Exception
-import           Data.Abstract.Declarations
-import           Data.Aeson
-import           Data.Bifunctor (first)
-import           Data.Blob
-import           Data.Language
-import           Data.Location
-import           Data.Term
-import qualified Data.Text as T
-import           GHC.Generics
-import           Parsing.Parser
-import qualified Proto3.Suite as Proto3
-import qualified Proto3.Suite.Types as P
-import           Rendering.Symbol
-import           Semantic.Task as Task
-import           Servant.API
-import           Tags.Taggable
-
+import Analysis.ConstructorName (ConstructorName)
+import Control.Effect
+import Control.Exception
+import Data.Abstract.Declarations
+import Data.Blob
+import Data.Language
+import Data.Location
+import Parsing.Parser
+import Semantic.Task as Task
+import Tags.Taggable
 
 type ParseEffects sig m = (Member (Error SomeException) sig, Member Task sig, Carrier sig m, Monad m)
 
