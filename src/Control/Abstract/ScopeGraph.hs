@@ -317,6 +317,7 @@ instance Eq1 (ScopeError address) where
 
 instance NFData1 (ScopeError address) where
   liftRnf _ x = case x of
+    DeclarationByNameError n      -> rnf n
     ScopeError d s                -> rnf d `seq` rnf s
     LookupScopeError              -> ()
     ImportReferenceError          -> ()
