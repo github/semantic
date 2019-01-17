@@ -185,6 +185,7 @@ defineSelf = do
 
 -- | The type of error thrown when failing to evaluate a term.
 data EvalError term address value return where
+  AccessControlError  :: (Name, AccessControl) -> (Name, AccessControl) -> value -> EvalError term address value value
   ConstructorError    :: Name -> EvalError term address value address
   DefaultExportError  :: EvalError term address value ()
   DerefError          :: value -> EvalError term address value value
@@ -211,6 +212,7 @@ deriving instance (Show term, Show value) => Show (EvalError term address value 
 
 instance (NFData term, NFData value) => NFData1 (EvalError term address value) where
   liftRnf _ x = case x of
+    AccessControlError requester requested v -> rnf requester `seq` rnf requested `seq` rnf v
     ConstructorError n -> rnf n
     DefaultExportError -> ()
     DerefError v -> rnf v
