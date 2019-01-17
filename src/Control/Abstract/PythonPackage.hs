@@ -2,13 +2,12 @@
 module Control.Abstract.PythonPackage
 ( runPythonPackaging, Strategy(..) ) where
 
-import Control.Abstract
+import           Control.Abstract as Abstract
 import           Control.Effect.Carrier
 import           Control.Effect.Sum
-import           Data.Abstract.Evaluatable
 import           Data.Abstract.Name (name)
 import           Data.Abstract.Path (stripQuotes)
-import           Data.Abstract.Value.Concrete (Value (..), ValueError (..))
+import           Data.Abstract.Value.Concrete (Value (..))
 import qualified Data.Map as Map
 import           Prologue
 
@@ -16,23 +15,9 @@ data Strategy = Unknown | Packages [Text] | FindPackages [Text]
   deriving (Show, Eq)
 
 runPythonPackaging :: ( Carrier sig m
-                      , Ord address
-                      , Show address
-                      , Show term
-                      , Member Trace sig
-                      , Member (Boolean (Value term address)) sig
-                      , Member (State (Heap address address (Value term address))) sig
-                      , Member (Resumable (BaseError (AddressError address (Value term address)))) sig
-                      , Member (Resumable (BaseError (ValueError term address))) sig
-                      , Member Fresh sig
+                      , Member (Abstract.String (Value term address)) sig
+                      , Member (Abstract.Array (Value term address)) sig
                       , Member (State Strategy) sig
-                      , Member (Allocator address) sig
-                      , Member (Deref (Value term address)) sig
-                      , Member (Error (LoopControl (Value term address))) sig
-                      , Member (Error (Return (Value term address))) sig
-                      , Member (Reader ModuleInfo) sig
-                      , Member (Reader PackageInfo) sig
-                      , Member (Reader Span) sig
                       , Member (Function term address (Value term address)) sig)
                    => Evaluator term address (Value term address) (PythonPackagingC term address (Eff m)) a
                    -> Evaluator term address (Value term address) m a
@@ -45,24 +30,10 @@ wrap :: Evaluator term address (Value term address) m a -> PythonPackagingC term
 wrap = PythonPackagingC . runEvaluator
 
 instance ( Carrier sig m
-         , Member (Allocator address) sig
-         , Member (Boolean (Value term address)) sig
-         , Member (Deref (Value term address)) sig
-         , Member (Error (LoopControl (Value term address))) sig
-         , Member (Error (Return (Value term address))) sig
-         , Member Fresh sig
          , Member (Function term address (Value term address)) sig
-         , Member (Reader ModuleInfo) sig
-         , Member (Reader PackageInfo) sig
-         , Member (Reader Span) sig
-         , Member (Resumable (BaseError (AddressError address (Value term address)))) sig
-         , Member (Resumable (BaseError (ValueError term address))) sig
-         , Member (State (Heap address address (Value term address))) sig
          , Member (State Strategy) sig
-         , Member Trace sig
-         , Ord address
-         , Show address
-         , Show term
+         , Member (Abstract.String (Value term address)) sig
+         , Member (Abstract.Array (Value term address)) sig
          )
       => Carrier sig (PythonPackagingC term address (Eff m)) where
   ret = PythonPackagingC . ret

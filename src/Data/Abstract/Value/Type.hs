@@ -13,7 +13,7 @@ module Data.Abstract.Value.Type
 
 import Control.Abstract.ScopeGraph
 import qualified Control.Abstract as Abstract
-import Control.Abstract hiding (Boolean(..), Function(..), While(..))
+import Control.Abstract hiding (Boolean(..), Function(..), Numeric(..), Object(..), Array(..), Hash(..), String(..), Unit(..), While(..))
 import Control.Effect.Carrier
 import Control.Effect.Sum
 import Data.Abstract.BaseError
@@ -29,8 +29,6 @@ data Type
   = Int                 -- ^ Primitive int type.
   | Bool                -- ^ Primitive boolean type.
   | String              -- ^ Primitive string type.
-  | Symbol              -- ^ Type of unique symbols.
-  | Regex               -- ^ Primitive regex type.
   | Unit                -- ^ The unit type.
   | Float               -- ^ Floating-point type.
   | Rational            -- ^ Rational type.
@@ -168,8 +166,6 @@ occur id = prune >=> \case
   Int -> pure False
   Bool -> pure False
   String -> pure False
-  Symbol -> pure False
-  Regex -> pure False
   Unit -> pure False
   Float -> pure False
   Rational -> pure False
@@ -317,23 +313,101 @@ instance ( Member (Abstract.Boolean Type) sig
     (eff . handleCoercible)
     (\ (Abstract.While cond body k) -> do
       cond' <- runWhileC cond
-      ifthenelse cond' (runWhileC body *> empty) (runWhileC (k unit)))
+      ifthenelse cond' (runWhileC body *> empty) (runWhileC (k Unit)))
+
+
+instance Carrier sig m
+      => Carrier (Abstract.Unit Type :+: sig) (UnitC Type m) where
+  ret = UnitC . ret
+  eff = UnitC . handleSum
+    (eff . handleCoercible)
+    (\ (Abstract.Unit k) -> runUnitC (k Unit))
+
+instance ( Member (Reader ModuleInfo) sig
+         , Member (Reader Span) sig
+         , Member (Resumable (BaseError TypeError)) sig
+         , Member (State TypeMap) sig
+         , Carrier sig m
+         , Alternative m
+         , Monad m
+         )
+      => Carrier (Abstract.String Type :+: sig) (StringC Type m) where
+  ret = StringC . ret
+  eff = StringC . handleSum (eff . handleCoercible) (\case
+    Abstract.String   _ k -> runStringC (k String)
+    Abstract.AsString t k -> unify t String *> runStringC (k ""))
+
+instance ( Member (Reader ModuleInfo) sig
+         , Member (Reader Span) sig
+         , Member (Resumable (BaseError TypeError)) sig
+         , Member (State TypeMap) sig
+         , Carrier sig m
+         , Monad m
+         )
+      => Carrier (Abstract.Numeric Type :+: sig) (NumericC Type m) where
+  ret = NumericC . ret
+  eff = NumericC . handleSum (eff . handleCoercible) (\case
+    Abstract.Integer _ k -> runNumericC (k Int)
+    Abstract.Float _ k -> runNumericC (k Float)
+    Abstract.Rational _ k -> runNumericC (k Rational)
+    Abstract.LiftNumeric _ t k -> unify (Int :+ Float :+ Rational) t >>= runNumericC . k
+    Abstract.LiftNumeric2 _ left right k -> case (left, right) of
+      (Float, Int) -> runNumericC (k Float)
+      (Int, Float) -> runNumericC (k Float)
+      _            -> unify left right >>= runNumericC . k)
+
+instance ( Member (Reader ModuleInfo) sig
+         , Member (Reader Span) sig
+         , Member (Resumable (BaseError TypeError)) sig
+         , Member (State TypeMap) sig
+         , Carrier sig m
+         , Monad m
+         )
+      => Carrier (Abstract.Bitwise Type :+: sig) (BitwiseC Type m) where
+  ret = BitwiseC . ret
+  eff = BitwiseC . handleSum (eff . handleCoercible) (\case
+    CastToInteger t k -> unify t (Int :+ Float :+ Rational) >> runBitwiseC (k Int)
+    LiftBitwise _ t k -> unify t Int >>= runBitwiseC . k
+    LiftBitwise2 _ t1 t2 k -> unify Int t1 >>= unify t2 >>= runBitwiseC . k
+    UnsignedRShift t1 t2 k -> unify Int t2 *> unify Int t1 >>= runBitwiseC . k)
+
+instance ( Carrier sig m ) => Carrier (Abstract.Object address Type :+: sig) (ObjectC address Type m) where
+  ret = ObjectC . ret
+  eff = ObjectC . handleSum (eff . handleCoercible) (\case
+    Abstract.Object _ k -> runObjectC (k Object)
+    Abstract.ScopedEnvironment _ k -> runObjectC (k Nothing)
+    Abstract.Klass _ _ k -> runObjectC (k Object))
+
+instance ( Member Fresh sig
+         , Member (Reader ModuleInfo) sig
+         , Member (Reader Span) sig
+         , Member (Resumable (BaseError TypeError)) sig
+         , Member (State TypeMap) sig
+         , Carrier sig m
+         , Monad m
+         )
+      => Carrier (Abstract.Array Type :+: sig) (ArrayC Type m) where
+  ret = ArrayC . ret
+  eff = ArrayC . handleSum (eff . handleCoercible) (\case
+    Abstract.Array fieldTypes k -> do
+          var <- fresh
+          fieldType <- foldr (\ t1 -> (unify t1 =<<)) (pure (Var var)) fieldTypes
+          runArrayC (k (Array fieldType))
+    Abstract.AsArray t k -> do
+          field <- fresh
+          unify t (Array (Var field)) >> runArrayC (k mempty))
+
+instance ( Carrier sig m ) => Carrier (Abstract.Hash Type :+: sig) (HashC Type m) where
+  ret = HashC . ret
+  eff = HashC . handleSum (eff . handleCoercible) (\case
+    Abstract.Hash t k -> runHashC (k (Hash t))
+    Abstract.KvPair t1 t2 k -> runHashC (k (t1 :* t2)))
 
 
 instance AbstractHole Type where
   hole = Hole
 
 instance AbstractIntro Type where
-  unit       = Unit
-  integer _  = Int
-  string _   = String
-  float _    = Float
-  symbol _   = Symbol
-  regex _    = Regex
-  rational _ = Rational
-  hash       = Hash
-  kvPair k v = k :* v
-
   null        = Null
 
 -- | Discard the value arguments (if any), constructing a 'Type' instead.
@@ -345,44 +419,20 @@ instance ( Member Fresh sig
          , Carrier sig m
          )
       => AbstractValue term address Type m where
-  array fieldTypes = do
-    var <- fresh
-    Array <$> foldr (\ t1 -> (unify t1 =<<)) (pure (Var var)) fieldTypes
-
   tuple fields = pure $ zeroOrMoreProduct fields
 
-  klass _ _       = pure Object
   namespace _ _   = pure Unit
 
-  scopedEnvironment _ = pure Nothing
-
-  object _ = pure Object
-
-  asString t = unify t String $> ""
   asPair t   = do
     t1 <- fresh
     t2 <- fresh
     unify t (Var t1 :* Var t2) $> (Var t1, Var t2)
-  asArray t = do
-    field <- fresh
-    unify t (Array (Var field)) $> mempty
 
   index arr sub = do
     _ <- unify sub Int
     field <- fresh
     _ <- unify (Array (Var field)) arr
     pure (Var field)
-
-  liftNumeric _ = unify (Int :+ Float :+ Rational)
-  liftNumeric2 _ left right = case (left, right) of
-    (Float, Int) -> pure Float
-    (Int, Float) -> pure Float
-    _            -> unify left right
-
-  liftBitwise _ = unify Int
-  liftBitwise2 _ t1 t2   = unify Int t1 >>= flip unify t2
-
-  unsignedRShift t1 t2 = unify Int t2 *> unify Int t1
 
   liftComparison (Concrete _) left right = case (left, right) of
     (Float, Int) ->                     pure Bool
@@ -392,5 +442,3 @@ instance ( Member Fresh sig
     (Float, Int) ->                     pure Int
     (Int, Float) ->                     pure Int
     _                 -> unify left right $> Bool
-
-  castToInteger t = unify t (Int :+ Float :+ Rational) $> Int

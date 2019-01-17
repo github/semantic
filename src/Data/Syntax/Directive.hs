@@ -20,7 +20,7 @@ data File a = File
   deriving (Eq1, Show1, Ord1) via Generically File
 
 instance Evaluatable File where
-  eval _ _ File = string . T.pack . modulePath <$> currentModule
+  eval _ _ File = currentModule >>= string . T.pack . modulePath
 
 -- We may need a separate token class for these given additional languages
 instance Tokenize File where
@@ -33,7 +33,7 @@ data Line a = Line
   deriving (Eq1, Show1, Ord1) via Generically Line
 
 instance Evaluatable Line where
-  eval _ _ Line = integer . fromIntegral . posLine . spanStart <$> currentSpan
+  eval _ _ Line = currentSpan >>= integer . fromIntegral . posLine . spanStart
 
 -- PT TODO: proper token for this
 instance Tokenize Line where

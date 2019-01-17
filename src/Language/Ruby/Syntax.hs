@@ -7,7 +7,7 @@ import qualified Data.Text as T
 import           Prologue
 import           System.FilePath.Posix
 
-import           Control.Abstract as Abstract hiding (Load)
+import           Control.Abstract as Abstract hiding (Load, String)
 import           Control.Abstract.Heap (Heap, HeapError, insertFrameLink)
 import           Control.Abstract.ScopeGraph (insertImportEdge)
 import           Control.Abstract.Value (Boolean)
@@ -221,7 +221,7 @@ instance Evaluatable Class where
         classSlot <- lookupSlot (Declaration name)
         assign classSlot =<< klass (Declaration name) childFrame
 
-        pure unit
+        unit
 
 instance Declarations1 Class where
   liftDeclaredName declaredName = declaredName . classIdentifier
@@ -246,7 +246,7 @@ instance Evaluatable Module where
     currentScope' <- currentScope
 
     let declaration = Declaration name
-        moduleBody = maybe (pure unit) (runApp . foldMap1 (App . eval)) (nonEmpty moduleStatements)
+        moduleBody = maybe unit (runApp . foldMap1 (App . eval)) (nonEmpty moduleStatements)
     maybeSlot <- maybeLookupDeclaration declaration
 
     case maybeSlot of
@@ -271,7 +271,7 @@ instance Evaluatable Module where
         moduleSlot <- lookupSlot (Declaration name)
         assign moduleSlot =<< klass (Declaration name) childFrame
 
-        pure unit
+        unit
 
 instance Declarations1 Module where
   liftDeclaredName declaredName = declaredName . moduleIdentifier
