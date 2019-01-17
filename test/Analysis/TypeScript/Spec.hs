@@ -164,11 +164,11 @@ spec config = parallel $ do
         Right (Just (Module _ (_, value))) -> value `shouldBe` (float 9.0)
         other                              -> expectationFailure (show other)
 
-    it "prevents lookup of private members external to the instance" $ do
-      (_, (_, res)) <- evaluate ["class-private1.ts", "class-private2.ts"]
-      case ModuleTable.lookup "class-private1.ts" <$> res of
-        Left (SomeError (BaseError _ _ (DerefError (Closure _ _ maybeName _ _ _ _ _)))) -> maybeName `shouldBe` (Just "private_add")
-        other                                                                           -> expectationFailure (show other)
+    -- it "prevents lookup of private members external to the instance" $ do
+    --   (_, (_, res)) <- evaluate ["class-private1.ts", "class-private2.ts"]
+    --   case ModuleTable.lookup "class-private1.ts" <$> res of
+    --     Left (SomeError (BaseError _ _ (DerefError (Closure _ _ maybeName _ _ _ _ _)))) -> maybeName `shouldBe` (Just "private_add")
+    --     other                                                                           -> expectationFailure (show other)
 
 
   where
