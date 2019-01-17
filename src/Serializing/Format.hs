@@ -25,6 +25,7 @@ data Format input where
   Show        :: Show input                                                                   => Format input
   Proto       :: Message input                                                                => Format input
 
+-- TODO: move this ^.
 data FormatStyle = Colourful | Plain
 
 runSerialize :: FormatStyle -> Format input -> input -> Builder

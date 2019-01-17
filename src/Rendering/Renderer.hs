@@ -29,8 +29,6 @@ import Rendering.TOC as R
 
 -- | Specification of renderers for diffs, producing output in the parameter type.
 data DiffRenderer output where
-  -- | Compute a table of contents for the diff & encode it as JSON.
-  ToCDiffRenderer :: DiffRenderer Summaries
   -- | Render to JSON with the format documented in docs/json-format.md
   JSONDiffRenderer :: DiffRenderer (JSON "diffs" SomeJSON)
   -- | Render to JSON as an adjacency list.
