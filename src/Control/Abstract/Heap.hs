@@ -375,7 +375,7 @@ assign :: ( Member (Deref value) sig
        -> Evaluator term address value m ()
 assign addr value = do
   heap <- getHeap
-  cell <- send (AssignCell value (fromMaybe lowerBound (Heap.getSlot addr heap)) ret)
+  cell <- send (AssignCell value (fromMaybe lowerBound (Heap.getSlotValue addr heap)) ret)
   putHeap (Heap.setSlot addr cell heap)
 
 dealloc :: ( Carrier sig m
