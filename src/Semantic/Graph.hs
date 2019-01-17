@@ -372,6 +372,7 @@ resumingEvalError :: ( Carrier sig m
                                                   m)) a
                   -> Evaluator term address value m a
 resumingEvalError = runEvalErrorWith (\ baseError -> traceError "EvalError" baseError *> case baseErrorException baseError of
+  AccessControlError{}  -> pure hole
   ConstructorError{}    -> pure hole
   DefaultExportError{}  -> pure ()
   DerefError{}          -> pure hole
@@ -450,6 +451,7 @@ resumingScopeError :: ( Carrier sig m
                      , AbstractHole (Slot address)
                      , AbstractHole (Scope address)
                      , AbstractHole (Path address)
+                     , AbstractHole (Info address)
                      , AbstractHole address
                      )
                     => Evaluator term address value (ResumableWithC (BaseError (ScopeError address)) (Eff m)) a

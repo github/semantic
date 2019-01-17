@@ -413,6 +413,7 @@ instance Evaluatable MemberAccess where
   eval eval _ MemberAccess{..} = do
     lhsValue <- eval lhs
     lhsFrame <- Abstract.scopedEnvironment lhsValue
+
     rhsSlot <- case lhsFrame of
       Just lhsFrame ->
         withScopeAndFrame lhsFrame $ do
@@ -427,11 +428,15 @@ instance Evaluatable MemberAccess where
     let lhsAccessControl = fromMaybe Public (termToAccessControl lhs)
     infos <- declarationsByAccessControl rhsScope lhsAccessControl
 
-    traceShowM (infos)
+    rhsValue' <- case (find (\Info{..} -> (Declaration rhs) == infoDeclaration) infos) of
+      Just _  -> pure rhsValue
+      Nothing -> do
+        let lhsName = fromMaybe (name "") (declaredName lhs)
+        info <- declarationByName rhsScope (Declaration rhs)
+        throwEvalError $ AccessControlError (lhsName, lhsAccessControl) (rhs, (infoAccessControl info)) rhsValue
 
-    case (find (\Info{..} -> (Declaration rhs) == infoDeclaration) infos) of
-      Just _  -> bindThis lhsValue rhsValue
-      Nothing -> bindThis lhsValue =<< (throwEvalError $ DerefError rhsValue)
+    bindThis lhsValue rhsValue'
+
 
   ref eval _ MemberAccess{..} = do
     lhsValue <- eval lhs
