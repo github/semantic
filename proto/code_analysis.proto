@@ -4,7 +4,6 @@ syntax = "proto3";
 package github.semantic;
 
 import "types.proto";
-import "terms.proto";
 
 option java_package = "com.github.semantic.analysis";
 option go_package = "github.com/semantic/analysis/;analysis";
@@ -14,8 +13,9 @@ option go_package = "github.com/semantic/analysis/;analysis";
 service CodeAnalysis {
   // Check health & status of the service.
   rpc Ping (PingRequest) returns (PingResponse);
-  // Retrieve c-tags like symbols for blobs.
+  // Calculate c-tags like symbols for blobs.
   rpc ParseTreeSymbols (ParseTreeRequest) returns (ParseTreeSymbolResponse);
+  // Calculate table of contents style diff summaries.
   rpc DiffTreeTOC (DiffTreeRequest) returns (DiffTreeTOCResponse);
 }
 
@@ -42,14 +42,19 @@ message DiffTreeRequest {
   repeated BlobPair blobs = 1;
 }
 
-message Summaries {
-  TOCSummary changes = 1;
-  ErrorSummary errors = 1;
+message DiffTreeTOCResponse {
+  repeated TOCSummaryChange changes = 1;
+  repeated TOCSummaryError errors = 2;
 }
 
-message TOCSummary {
-  string summaryCategoryName = 1;
-  string summaryTermName = 1;
-  Span summarySpan = 1;
-  string summaryChangeType = 1;
+message TOCSummaryChange {
+  string category = 1;
+  string term = 2;
+  Span span = 3;
+  string changeType = 4;
+}
+
+message TOCSummaryError {
+  string error = 1;
+  Span span = 2;
 }

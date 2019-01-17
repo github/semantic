@@ -21,130 +21,10 @@ enum Language {
   PHP = 11;
 }
 
-message BlobPair {
-  Blob before = 1;
-  Blob after = 2;
-}
-
 message Blob {
   bytes blobSource = 1;
   string blobPath = 2;
   Language blobLanguage = 3;
-}
-
-message ErrorSite {
-  string errorMessage = 1;
-  SrcLoc errorLocation = 2;
-}
-
-message Position {
-  int64 line = 1;
-  int64 column = 2;
-}
-
-message Project {
-  string projectRootDir = 1;
-  repeated Blob projectBlobs = 2;
-  Language projectLanguage = 3;
-  repeated string projectExcludeDirs = 4[packed = false] ;
-}
-
-message Span {
-  Position start = 1;
-  Position end = 2;
-}
-
-message Range {
-  int64 start = 1;
-  int64 end = 2;
-}
-
-message SrcLoc {
-  string srcLocPackage = 1;
-  string srcLocModule = 2;
-  string srcLocFile = 3;
-  int64 srcLocStartLine = 4;
-  int64 srcLocStartCol = 5;
-  int64 srcLocEndLine = 6;
-  int64 srcLocEndCol = 7;
-}
-
-message ControlFlowGraph {
-  repeated ControlFlowVertex vertices = 1;
-  repeated ControlFlowEdge edges = 2;
-}
-
-message ControlFlowEdge {
-  int64 source = 1;
-  int64 target = 2;
-}
-
-message ControlFlowVertex {
-  oneof vertex {
-    Package package = 1;
-    Module module = 2;
-    UnknownModule unknownModule = 3;
-    Variable variable = 4;
-    Method method = 5;
-    Function function = 6;
-  }
-  message Package {
-    int64 id = 1;
-    string name = 2;
-    string description = 3;
-  }
-  message Module {
-    int64 id = 1;
-    string name = 2;
-    string description = 3;
-  }
-  message UnknownModule {
-    int64 id = 1;
-    string name = 2;
-    string description = 3;
-  }
-  message Variable {
-    int64 id = 1;
-    string name = 2;
-    string description = 3;
-    string moduleName = 4;
-    Span span = 5;
-  }
-  message Method {
-    int64 id = 1;
-    string name = 2;
-    string description = 3;
-    string moduleName = 4;
-    Span span = 5;
-  }
-  message Function {
-    int64 id = 1;
-    string name = 2;
-    string description = 3;
-    string moduleName = 4;
-    Span span = 5;
-  }
-}
-
-message TermGraph {
-  repeated TermVertex vertices = 1;
-  repeated TermEdge edges = 2;
-}
-
-message TermEdge {
-  int64 source = 1;
-  int64 target = 2;
-}
-
-message TermVertex {
-  int64 id = 1;
-  string name = 2;
-  TermAnnotation annotation = 3;
-}
-
-message TermAnnotation {
-  Range range = 1;
-  Span span = 2;
 }
 
 message File {
@@ -155,10 +35,22 @@ message File {
 
 message Symbol {
   string symbolName = 1;
-  string symbolPath = 2;
-  string symbolLang = 3;
-  string symbolKind = 4;
-  string symbolLine = 5;
-  Span symbolSpan = 6;
-  string symbolDocs = 7;
+  string symbolKind = 2;
+  string symbolLine = 3;
+  Span symbolSpan = 4;
+}
+
+message Position {
+  int64 line = 1;
+  int64 column = 2;
+}
+
+message Span {
+  Position start = 1;
+  Position end = 2;
+}
+
+message BlobPair {
+  Blob before = 1;
+  Blob after = 2;
 }
