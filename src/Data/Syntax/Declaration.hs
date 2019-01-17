@@ -212,7 +212,7 @@ instance Evaluatable PublicFieldDefinition where
     span <- ask @Span
     propertyName <- maybeM (throwNoNameError publicFieldPropertyName) (declaredName publicFieldPropertyName)
 
-    declare (Declaration propertyName) Instance (fromMaybe (ScopeGraph.Public) (termToAccessControl publicFieldVisibility)) span Nothing
+    declare (Declaration propertyName) Instance (fromMaybe ScopeGraph.Public (termToAccessControl publicFieldVisibility)) span Nothing
     slot <- lookupSlot (Declaration propertyName)
     value <- eval publicFieldValue
     assign slot value
