@@ -219,7 +219,11 @@ deref :: ( Member (Deref value) sig
          )
       => Slot address
       -> Evaluator term address value m value
-deref slot@Slot{..} = gets (Heap.getSlot slot) >>= maybeM (throwAddressError (UnallocatedSlot slot)) >>= send . flip DerefCell ret >>= maybeM (throwAddressError $ UninitializedSlot slot)
+deref slot@Slot{..} = do
+  maybeSlotValue <- gets (Heap.getSlotValue slot)
+  slotValue <- maybeM (throwAddressError (UnallocatedSlot slot)) maybeSlotValue
+  eff <- send $ DerefCell slotValue ret
+  maybeM (throwAddressError $ UninitializedSlot slot) eff
 
 putSlotDeclarationScope :: ( Member (State (Heap address address value)) sig
                            , Member (State (ScopeGraph address)) sig
