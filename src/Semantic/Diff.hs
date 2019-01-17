@@ -28,7 +28,6 @@ import           Serializing.Format
 
 -- | Using the specified renderer, diff a list of 'BlobPair's to produce a 'Builder' output.
 runDiff :: (Member Distribute sig, Member (Error SomeException) sig, Member Task sig, Member Telemetry sig, MonadIO m, Carrier sig m) => DiffRenderer output -> [BlobPair] -> m Builder
-runDiff ToCDiffRenderer         = withParsedBlobPairs' renderJSONSummaryError (decorate . declarationAlgebra) (render . renderToCDiff) >=> serialize JSON
 runDiff JSONDiffRenderer        = withParsedBlobPairs' renderJSONDiffError (const pure) (render . renderJSONDiff) >=> serialize JSON
 runDiff JSONGraphDiffRenderer   = withParsedBlobPairs' renderJSONDiffError (const pure) (render . renderAdjGraph) >=> serialize JSON
   where renderAdjGraph :: (Recursive t, ToTreeGraph DiffVertex (Base t)) => BlobPair -> t -> JSON.JSON "diffs" SomeJSON

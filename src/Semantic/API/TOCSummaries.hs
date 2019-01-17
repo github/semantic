@@ -1,14 +1,19 @@
 {-# LANGUAGE GADTs, TypeOperators, DerivingStrategies #-}
-module Semantic.API.TOCSummaries (diffSummary) where
+module Semantic.API.TOCSummaries (diffSummary, diffSummaryBuilder) where
 
 import Analysis.TOCSummary (Declaration, declarationAlgebra)
 import Data.Blob
+import Data.ByteString.Builder
 import Data.Diff
 import Rendering.TOC
 import Semantic.API.Converters
 import Semantic.API.Diff
 import Semantic.API.Types
 import Semantic.Task as Task
+import Serializing.Format
+
+diffSummaryBuilder :: (DiffEffects sig m) => Format DiffTreeTOCResponse -> [BlobPair] -> m Builder
+diffSummaryBuilder format blobs = runSerialize Plain format <$> diffSummary blobs
 
 diffSummary :: (DiffEffects sig m) => [BlobPair] -> m DiffTreeTOCResponse
 diffSummary = distributeFoldMap go

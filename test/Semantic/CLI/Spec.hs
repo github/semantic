@@ -4,7 +4,7 @@ import           Control.Monad (when)
 import qualified Data.ByteString as B
 import           Data.ByteString.Builder
 import           Data.Foldable (for_)
-import           Semantic.API (parseSymbolsBuilder)
+import           Semantic.API (parseSymbolsBuilder, diffSummaryBuilder)
 import           Semantic.CLI
 import           Semantic.IO
 import           Semantic.Task
@@ -49,7 +49,7 @@ diffFixtures :: [(String, [BlobPair] -> TaskEff Builder, [Both File], FilePath)]
 diffFixtures =
   [ (show JSONDiffRenderer, runDiff JSONDiffRenderer, pathMode, prefix </> "diff-tree.json")
   , (show SExpressionDiffRenderer, runDiff SExpressionDiffRenderer, pathMode, "test/fixtures/ruby/corpus/method-declaration.diffA-B.txt")
-  , (show ToCDiffRenderer, runDiff ToCDiffRenderer, pathMode, prefix </> "diff-tree.toc.json")
+  , ("toc summaries", diffSummaryBuilder Serializing.Format.JSON, pathMode, prefix </> "diff-tree.toc.json")
   ]
   where pathMode = [Both (File "test/fixtures/ruby/corpus/method-declaration.A.rb" Ruby) (File "test/fixtures/ruby/corpus/method-declaration.B.rb"  Ruby)]
         prefix = "test/fixtures/cli"
