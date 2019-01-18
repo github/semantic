@@ -83,7 +83,7 @@ import Data.Set (Set)
 import qualified Semantic.IO as IO
 import Semantic.Config (Config)
 import Semantic.Telemetry (LogQueue, StatQueue)
-import Semantic.API (parseSExpressionBuilder)
+import Semantic.API (parseTermBuilder, TermOutputFormat(..))
 import System.Exit (die)
 import Control.Exception (displayException)
 
@@ -100,7 +100,7 @@ diffFilePaths (TaskConfig config logger statter) paths = readFilePair paths >>= 
 
 -- | Returns an s-expression parse tree for the specified FilePath.
 parseFilePath :: TaskConfig -> FilePath -> IO ByteString
-parseFilePath (TaskConfig config logger statter) path = (fromJust <$> readBlobFromFile (file path)) >>= runTaskWithConfig config logger statter . parseSExpressionBuilder @[] . pure >>= either (die . displayException) (pure . runBuilder)
+parseFilePath (TaskConfig config logger statter) path = (fromJust <$> readBlobFromFile (file path)) >>= runTaskWithConfig config logger statter . parseTermBuilder @[] TermSExpression . pure >>= either (die . displayException) (pure . runBuilder)
 
 -- | Read two files to a BlobPair.
 readFilePair :: Both FilePath -> IO BlobPair

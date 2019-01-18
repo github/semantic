@@ -1,7 +1,6 @@
 {-# LANGUAGE DataKinds, GADTs, MultiParamTypeClasses, StandaloneDeriving, TypeOperators #-}
 module Rendering.Renderer
 ( DiffRenderer(..)
-, TermRenderer(..)
 , renderJSONDiff
 , renderJSONAdjDiff
 , renderJSONTerm
@@ -42,15 +41,3 @@ data DiffRenderer output where
 
 deriving instance Eq (DiffRenderer output)
 deriving instance Show (DiffRenderer output)
-
--- | Specification of renderers for terms, producing output in the parameter type.
-data TermRenderer output where
-  -- | Render to JSON with the format documented in docs/json-format.md under “Term.”
-  JSONTermRenderer :: TermRenderer (JSON "trees" SomeJSON)
-  -- | Render to JSON as an adjacency list represenation.
-  JSONGraphTermRenderer :: TermRenderer (JSON "trees" SomeJSON)
-  -- | Render to a 'ByteString' formatted as a DOT description of the term.
-  DOTTermRenderer :: TermRenderer (Graph TermVertex)
-
-deriving instance Eq (TermRenderer output)
-deriving instance Show (TermRenderer output)

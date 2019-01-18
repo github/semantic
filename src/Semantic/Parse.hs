@@ -1,5 +1,5 @@
 {-# LANGUAGE GADTs, RankNTypes #-}
-module Semantic.Parse ( runParse, runParse', parseSomeBlob ) where
+module Semantic.Parse (runParse', parseSomeBlob ) where
 
 import           Analysis.ConstructorName (ConstructorName)
 import           Analysis.PackageDef (HasPackageDef)
@@ -24,14 +24,6 @@ import           Rendering.Renderer
 import           Semantic.Task
 import           Serializing.Format
 import           Tags.Taggable
-
--- | Using the specified renderer, parse a list of 'Blob's to produce a 'Builder' output.
-runParse :: (Member Distribute sig, Member (Error SomeException) sig, Member Task sig, Carrier sig m, MonadIO m) => TermRenderer output -> [Blob] -> m Builder
-runParse JSONTermRenderer             = withParsedBlobs' renderJSONError (render . renderJSONTerm) >=> serialize JSON
-runParse JSONGraphTermRenderer        = withParsedBlobs' renderJSONError (render . renderAdjGraph) >=> serialize JSON
-  where renderAdjGraph :: (Recursive t, ToTreeGraph TermVertex (Base t)) => Blob -> t -> JSON.JSON "trees" SomeJSON
-        renderAdjGraph blob term = renderJSONAdjTerm blob (renderTreeGraph term)
-runParse DOTTermRenderer              = withParsedBlobs (const (render renderTreeGraph)) >=> serialize (DOT (termStyle "terms"))
 
 -- | For testing and running parse-examples.
 runParse' :: (Member (Error SomeException) sig, Member Task sig, Monad m, Carrier sig m) => Blob -> m Builder
