@@ -32,8 +32,6 @@ import Data.Location
 import Data.Term
 import qualified Data.Text as T
 import Proto3.Suite as Proto3
-import qualified Proto3.Wire.Decode as Decode
-import qualified Proto3.Wire.Encode as Encode
 
 renderJSONSummaryError :: BlobPair -> String -> Summaries
 renderJSONSummaryError pair e = Summaries mempty (Map.singleton path [object ["error" .= e]])
