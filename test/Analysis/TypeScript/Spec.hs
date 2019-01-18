@@ -164,9 +164,9 @@ spec config = parallel $ do
         Right (Just (Module _ (_, value))) -> value `shouldBe` (Concrete.Float (Number.Decimal 9.0))
         other                              -> expectationFailure (show other)
 
-    it "prevents lookup of private members external to the instance" $ do
-      (_, (_, res)) <- evaluate ["class-private1.ts", "class-private2.ts"]
-      let expected = Left (SomeError (inject @(BaseError (EvalError (Quieterm (Sum TypeScript.Syntax) Location) Precise (Concrete.Value (Quieterm (Sum TypeScript.Syntax) Location) Precise))) (BaseError (ModuleInfo "class-private2.ts") (Span (Pos 18 1) (Pos 18 8)) (AccessControlError ("adder", Public) ("y", Private) (Concrete.Float (Decimal 3.0))))))
+    it "member access of private public field definition throws AccessControlError" $ do
+      (_, (_, res)) <- evaluate ["access_control/adder.ts", "access_control/private_field_definition.ts"]
+      let expected = Left (SomeError (inject @(BaseError (EvalError (Quieterm (Sum TypeScript.Syntax) Location) Precise (Concrete.Value (Quieterm (Sum TypeScript.Syntax) Location) Precise))) (BaseError (ModuleInfo "private_field_definition.ts") (Span (Pos 4 1) (Pos 4 6)) (AccessControlError ("foo", ScopeGraph.Public) ("y", ScopeGraph.Private) (Concrete.Float (Decimal 2.0))))))
       res `shouldBe` expected
 
   where
