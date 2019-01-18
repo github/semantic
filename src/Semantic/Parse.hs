@@ -31,14 +31,7 @@ runParse JSONTermRenderer             = withParsedBlobs' renderJSONError (render
 runParse JSONGraphTermRenderer        = withParsedBlobs' renderJSONError (render . renderAdjGraph) >=> serialize JSON
   where renderAdjGraph :: (Recursive t, ToTreeGraph TermVertex (Base t)) => Blob -> t -> JSON.JSON "trees" SomeJSON
         renderAdjGraph blob term = renderJSONAdjTerm blob (renderTreeGraph term)
-runParse ShowTermRenderer             = withParsedBlobs (const (serialize Show . quieterm))
 runParse DOTTermRenderer              = withParsedBlobs (const (render renderTreeGraph)) >=> serialize (DOT (termStyle "terms"))
-runParse QuietTermRenderer            = distributeFoldMap $ \blob ->
-  showTiming blob <$> time' ((parseSomeBlob blob >>= withSomeTerm (fmap (const (Right ())) . serialize Show . quieterm)) `catchError` \(SomeException e) -> pure (Left (show e)))
-  where
-    showTiming Blob{..} (res, duration) =
-      let status = if isLeft res then "ERR" else "OK"
-      in stringUtf8 (status <> "\t" <> show blobLanguage <> "\t" <> blobPath <> "\t" <> show duration <> " ms\n")
 
 -- | For testing and running parse-examples.
 runParse' :: (Member (Error SomeException) sig, Member Task sig, Monad m, Carrier sig m) => Blob -> m Builder

@@ -51,10 +51,6 @@ data TermRenderer output where
   JSONGraphTermRenderer :: TermRenderer (JSON "trees" SomeJSON)
   -- | Render to a 'ByteString' formatted as a DOT description of the term.
   DOTTermRenderer :: TermRenderer (Graph TermVertex)
-  -- | Render to a 'ByteString' formatted using the 'Show' instance.
-  ShowTermRenderer :: TermRenderer Builder
-  -- | Render just to tracking timing metrics
-  QuietTermRenderer :: TermRenderer Builder
 
 deriving instance Eq (TermRenderer output)
 deriving instance Show (TermRenderer output)

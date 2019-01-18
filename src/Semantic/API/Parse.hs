@@ -3,13 +3,17 @@ module Semantic.API.Parse
   ( doParse
   , ParseEffects
   , TermConstraints
+
+  , SomeTerm(..)
+  , withSomeTerm
   ) where
 
 import Analysis.ConstructorName (ConstructorName)
 import Control.Effect
-import Control.Exception
+import Control.Effect.Error
 import Data.Abstract.Declarations
 import Data.Blob
+import Data.JSON.Fields
 import Data.Language
 import Data.Location
 import Parsing.Parser
@@ -23,20 +27,20 @@ type TermConstraints =
   , Declarations1
   , ConstructorName
   , HasTextElement
+  , ToJSONFields1
   ]
 
-doParse :: (ParseEffects sig m)
-  => Language -> Blob -> (Blob -> SomeTerm TermConstraints Location -> output) -> m output
-doParse lang blob render = case lang of
-  Go         -> render blob . SomeTerm <$> parse goParser blob
-  Haskell    -> render blob . SomeTerm <$> parse haskellParser blob
-  Java       -> render blob . SomeTerm <$> parse javaParser blob
-  JavaScript -> render blob . SomeTerm <$> parse typescriptParser blob
-  JSON       -> render blob . SomeTerm <$> parse jsonParser blob
-  JSX        -> render blob . SomeTerm <$> parse typescriptParser blob
-  Markdown   -> render blob . SomeTerm <$> parse markdownParser blob
-  Python     -> render blob . SomeTerm <$> parse pythonParser blob
-  Ruby       -> render blob . SomeTerm <$> parse rubyParser blob
-  TypeScript -> render blob . SomeTerm <$> parse typescriptParser blob
-  PHP        -> render blob . SomeTerm <$> parse phpParser blob
-  _          -> noLanguageForBlob (blobPath blob)
+doParse :: (ParseEffects sig m) => Blob -> m (SomeTerm TermConstraints Location)
+doParse blob@Blob{..} = case blobLanguage of
+  Go         -> SomeTerm <$> parse goParser blob
+  Haskell    -> SomeTerm <$> parse haskellParser blob
+  Java       -> SomeTerm <$> parse javaParser blob
+  JavaScript -> SomeTerm <$> parse typescriptParser blob
+  JSON       -> SomeTerm <$> parse jsonParser blob
+  JSX        -> SomeTerm <$> parse typescriptParser blob
+  Markdown   -> SomeTerm <$> parse markdownParser blob
+  Python     -> SomeTerm <$> parse pythonParser blob
+  Ruby       -> SomeTerm <$> parse rubyParser blob
+  TypeScript -> SomeTerm <$> parse typescriptParser blob
+  PHP        -> SomeTerm <$> parse phpParser blob
+  _          -> noLanguageForBlob blobPath
