@@ -80,13 +80,13 @@ parseCommand :: Mod CommandFields (Task.TaskEff Builder)
 parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate parse trees for path(s)"))
   where
     parseArgumentsParser = do
-      renderer <- flag  parseSExpressionBuilder                  parseSExpressionBuilder                  (long "sexpression" <> help "Output s-expression parse trees (default)")
-              <|> flag'                                          (Parse.runParse JSONTermRenderer)        (long "json"        <> help "Output JSON parse trees")
-              <|> flag'                                          (Parse.runParse JSONGraphTermRenderer)   (long "json-graph"  <> help "Output JSON adjacency list")
-              <|> flag'                                          (parseSymbolsBuilder JSON)               (long "symbols"     <> help "Output JSON symbol list")
-              <|> flag'                                          (Parse.runParse DOTTermRenderer)         (long "dot"          <> help "Output DOT graph parse trees")
-              <|> flag'                                          (Parse.runParse ShowTermRenderer)        (long "show"         <> help "Output using the Show instance (debug only, format subject to change without notice)")
-              <|> flag'                                          (Parse.runParse QuietTermRenderer)       (long "quiet"        <> help "Don't produce output, but show timing stats")
+      renderer <- flag  parseSExpressionBuilder parseSExpressionBuilder                  (long "sexpression" <> help "Output s-expression parse trees (default)")
+              <|> flag'                         (Parse.runParse JSONTermRenderer)        (long "json"        <> help "Output JSON parse trees")
+              <|> flag'                         (Parse.runParse JSONGraphTermRenderer)   (long "json-graph"  <> help "Output JSON adjacency list")
+              <|> flag'                         (parseSymbolsBuilder JSON)               (long "symbols"     <> help "Output JSON symbol list")
+              <|> flag'                         (Parse.runParse DOTTermRenderer)         (long "dot"          <> help "Output DOT graph parse trees")
+              <|> flag'                         (Parse.runParse ShowTermRenderer)        (long "show"         <> help "Output using the Show instance (debug only, format subject to change without notice)")
+              <|> flag'                         (Parse.runParse QuietTermRenderer)       (long "quiet"        <> help "Don't produce output, but show timing stats")
       filesOrStdin <- Right <$> some (argument filePathReader (metavar "FILES...")) <|> pure (Left stdin)
       pure $ Task.readBlobs filesOrStdin >>= renderer
 
