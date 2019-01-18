@@ -1,4 +1,4 @@
-{-# LANGUAGE DerivingStrategies, DeriveAnyClass, DuplicateRecordFields #-}
+{-# LANGUAGE DerivingVia, DerivingStrategies, DeriveAnyClass, DuplicateRecordFields #-}
 module Semantic.API.Types
   (
   -- Symbols for jump-to-definition
@@ -10,6 +10,7 @@ module Semantic.API.Types
   -- TOC Summaries
   , DiffTreeRequest(..)
   , DiffTreeTOCResponse(..)
+  , TOCSummaryFile(..)
   , TOCSummaryChange(..)
   , TOCSummaryError(..)
 
@@ -92,18 +93,18 @@ newtype DiffTreeRequest = DiffTreeRequest { blobs :: [BlobPair] }
   deriving stock (Eq, Show, Generic)
   deriving anyclass (Message, Named, FromJSON)
 
-data DiffTreeTOCResponse = DiffTreeTOCResponse
-  { changes :: [TOCSummaryChange]
-  , errors  :: [TOCSummaryError]
-  }
+newtype DiffTreeTOCResponse = DiffTreeTOCResponse { files :: [TOCSummaryFile] }
   deriving stock (Eq, Show, Generic)
   deriving anyclass (Message, Named, ToJSON)
 
-instance Semigroup DiffTreeTOCResponse where
-  (DiffTreeTOCResponse c1 e1) <> (DiffTreeTOCResponse c2 e2) = DiffTreeTOCResponse (c1 <> c2) (e1 <> e2)
-
-instance Monoid DiffTreeTOCResponse where
-  mempty = DiffTreeTOCResponse mempty mempty
+data TOCSummaryFile = TOCSummaryFile
+  { filePath :: T.Text
+  , fileLanguage :: T.Text
+  , fileChanges :: [TOCSummaryChange]
+  , fileErrors  :: [TOCSummaryError]
+  }
+  deriving stock (Eq, Show, Generic)
+  deriving anyclass (Message, Named, ToJSON)
 
 data TOCSummaryChange = TOCSummaryChange
   { category :: T.Text

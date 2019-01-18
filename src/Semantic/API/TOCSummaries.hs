@@ -11,19 +11,25 @@ import Semantic.API.Diff
 import Semantic.API.Types
 import Semantic.Task as Task
 import Serializing.Format
+import qualified Data.Text as T
 
 diffSummaryBuilder :: (DiffEffects sig m) => Format DiffTreeTOCResponse -> [BlobPair] -> m Builder
 diffSummaryBuilder format blobs = runSerialize Plain format <$> diffSummary blobs
 
 diffSummary :: (DiffEffects sig m) => [BlobPair] -> m DiffTreeTOCResponse
-diffSummary = distributeFoldMap go
+diffSummary blobs = DiffTreeTOCResponse <$> distributeFor blobs go
   where
-    go :: (DiffEffects sig m) => BlobPair -> m DiffTreeTOCResponse
+    go :: (DiffEffects sig m) => BlobPair -> m TOCSummaryFile
     go blobPair = doDiff blobPair (decorate . declarationAlgebra) render
 
-    render :: (Foldable syntax, Functor syntax, Applicative m) => BlobPair -> Diff syntax (Maybe Declaration) (Maybe Declaration) -> m DiffTreeTOCResponse
-    render _ diff = pure $ foldr (\x acc -> acc <> toResponse x) mempty (diffTOC diff)
+    render :: (Foldable syntax, Functor syntax, Applicative m) => BlobPair -> Diff syntax (Maybe Declaration) (Maybe Declaration) -> m TOCSummaryFile
+    render blobPair diff = pure $ foldr go (TOCSummaryFile path lang mempty mempty) (diffTOC diff)
       where
-        toResponse :: TOCSummary -> DiffTreeTOCResponse
-        toResponse TOCSummary{..}   = DiffTreeTOCResponse [TOCSummaryChange summaryCategoryName summaryTermName (spanToSpan summarySpan) summaryChangeType] mempty
-        toResponse ErrorSummary{..} = DiffTreeTOCResponse mempty [TOCSummaryError errorText (spanToSpan errorSpan)]
+        path = T.pack $ pathKeyForBlobPair blobPair
+        lang = T.pack . show $ languageForBlobPair blobPair
+
+        go :: TOCSummary -> TOCSummaryFile -> TOCSummaryFile
+        go TOCSummary{..} TOCSummaryFile{..}
+          = TOCSummaryFile filePath fileLanguage (TOCSummaryChange summaryCategoryName summaryTermName (spanToSpan summarySpan) summaryChangeType : fileChanges) fileErrors
+        go ErrorSummary{..} TOCSummaryFile{..}
+          = TOCSummaryFile filePath fileLanguage fileChanges (TOCSummaryError errorText (spanToSpan errorSpan) : fileErrors)
