@@ -48,6 +48,7 @@ declareFunction :: ( Carrier sig m
                    , Member (State (ScopeGraph address)) sig
                    , Member (Allocator address) sig
                    , Member (Reader (CurrentScope address)) sig
+                   , Member (Reader ModuleInfo) sig
                    , Member Fresh sig
                    , Ord address
                    )
