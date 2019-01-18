@@ -19,7 +19,7 @@ message JavaSyntax {
     InterfaceDeclaration interfaceDeclaration = 3;
     Method method = 4;
     VariableDeclaration variableDeclaration = 5;
-    Visibility visibility = 6;
+    AccessControl accessControl = 6;
     Plus plus = 7;
     Minus minus = 8;
     Times times = 9;
@@ -158,7 +158,7 @@ message VariableDeclaration {
   repeated JavaTerm variableDeclarations = 1;
 }
 
-message Visibility { }
+message AccessControl { }
 
 message Plus {
   JavaTerm lhs = 1;

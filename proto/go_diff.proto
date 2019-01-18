@@ -39,7 +39,7 @@ message GoSyntax {
     MethodSignature methodSignature = 5;
     Type type = 6;
     TypeAlias typeAlias = 7;
-    Visibility visibility = 8;
+    AccessControl accessControl = 8;
     Plus plus = 9;
     Minus minus = 10;
     Times times = 11;
@@ -178,7 +178,7 @@ message TypeAlias {
   GoDiff typeAliasKind = 3;
 }
 
-message Visibility { }
+message AccessControl { }
 
 message Plus {
   GoDiff lhs = 1;

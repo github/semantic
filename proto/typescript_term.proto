@@ -24,7 +24,7 @@ message TypeScriptSyntax {
     PublicFieldDefinition publicFieldDefinition = 8;
     VariableDeclaration variableDeclaration = 9;
     TypeAlias typeAlias = 10;
-    Visibility visibility = 11;
+    AccessControl accessControl = 11;
     Plus plus = 12;
     Minus minus = 13;
     Times times = 14;
@@ -245,7 +245,7 @@ message TypeAlias {
   TypeScriptTerm typeAliasKind = 3;
 }
 
-message Visibility { }
+message AccessControl { }
 
 message Plus {
   TypeScriptTerm lhs = 1;

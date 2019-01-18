@@ -35,7 +35,7 @@ message RubySyntax {
     Comment comment = 1;
     Function function = 2;
     Method method = 3;
-    Visibility visibility = 4;
+    AccessControl accessControl = 4;
     File file = 5;
     Line line = 6;
     Plus plus = 7;
@@ -143,7 +143,7 @@ message Method {
   RubyDiff methodBody = 6;
 }
 
-message Visibility { }
+message AccessControl { }
 
 message File { }
 
