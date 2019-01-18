@@ -31,7 +31,6 @@ runParse JSONTermRenderer             = withParsedBlobs' renderJSONError (render
 runParse JSONGraphTermRenderer        = withParsedBlobs' renderJSONError (render . renderAdjGraph) >=> serialize JSON
   where renderAdjGraph :: (Recursive t, ToTreeGraph TermVertex (Base t)) => Blob -> t -> JSON.JSON "trees" SomeJSON
         renderAdjGraph blob term = renderJSONAdjTerm blob (renderTreeGraph term)
-runParse SExpressionTermRenderer      = withParsedBlobs (const (serialize (SExpression ByConstructorName)))
 runParse ShowTermRenderer             = withParsedBlobs (const (serialize Show . quieterm))
 runParse DOTTermRenderer              = withParsedBlobs (const (render renderTreeGraph)) >=> serialize (DOT (termStyle "terms"))
 runParse QuietTermRenderer            = distributeFoldMap $ \blob ->

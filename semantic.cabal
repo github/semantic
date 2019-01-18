@@ -190,6 +190,7 @@ library
                      , Semantic.API.Diff
                      , Semantic.API.Converters
                      , Semantic.API.Parse
+                     , Semantic.API.SExpressions
                      , Semantic.API.Symbols
                      , Semantic.API.TOCSummaries
                      , Semantic.API.Types
