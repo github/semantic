@@ -176,6 +176,11 @@ spec config = parallel $ do
       let expected = Left (SomeError (inject @(BaseError (EvalError (Quieterm (Sum TypeScript.Syntax) Location) Precise (Concrete.Value (Quieterm (Sum TypeScript.Syntax) Location) Precise))) (BaseError (ModuleInfo "private_static_field_definition.ts") (Span (Pos 3 1) (Pos 3 8)) (AccessControlError ("Adder", ScopeGraph.Public) ("z", ScopeGraph.Private) Unit))))
       res `shouldBe` expected
 
+    it "member access of private methods throws AccessControlError" $ do
+      (_, (_, res)) <- evaluate ["access_control/adder.ts", "access_control/private_method.ts"]
+      let expected = "Left (SomeError (BaseError (ModuleInfo \"private_method.ts\") [4, 1]..[4, 16] (AccessControlError (\"foo\",Public) (\"private_add\",Private) (Closure (PackageInfo {packageName = \"access_control\", packageResolutions = fromList []}) (ModuleInfo \"adder.ts\") (Just \"private_add\") Nothing [] (Right (StatementBlock [])) (Precise 20) (Precise 18)))))"
+      show res `shouldBe` expected
+
   where
     fixtures = "test/fixtures/typescript/analysis/"
     evaluate = evalTypeScriptProject . map (fixtures <>)
