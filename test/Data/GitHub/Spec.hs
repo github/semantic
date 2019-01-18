@@ -19,11 +19,9 @@ spec :: Spec
 spec =
   describe "RepositoryPush protobuf serialization" $
     it "should round-trip correctly" $ do
-      (Right decoded) <- fromByteString @Envelope sampleEnvelope
+      let (Right decoded) = fromByteString @Envelope sampleEnvelope
       envelopeId decoded `shouldBe` "f1ef901a-ca31-4d6b-aff1-a5ea1e2a940e"
-      (Right message) <- fromByteString @RepositoryPush (envelopeMessage decoded)
+      let (Right message) = fromByteString @RepositoryPush (envelopeMessage decoded)
       let (Present mona) = pushActor message
       userLogin mona `shouldBe` "monalisa"
       toByteString decoded `shouldBe` sampleEnvelope
-      
-  
