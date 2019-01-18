@@ -67,3 +67,6 @@ doParse blobPair decorate = case languageForBlobPair blobPair of
 
 data SomeTermPair typeclasses ann where
   SomeTermPair :: ApplyAll typeclasses syntax => Join These (Term syntax ann) -> SomeTermPair typeclasses ann
+
+withSomeTermPair :: (forall syntax . ApplyAll typeclasses syntax => Join These (Term syntax ann) -> a) -> SomeTermPair typeclasses ann -> a
+withSomeTermPair with (SomeTermPair terms) = with terms

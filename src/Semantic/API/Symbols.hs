@@ -19,22 +19,18 @@ import Serializing.Format
 import Tags.Taggable
 import Tags.Tagging
 
-parseSymbolsBuilder :: (Member Distribute sig, ParseEffects sig m, Traversable t)
-  => Format ParseTreeSymbolResponse -> t Blob -> m Builder
-parseSymbolsBuilder format blobs = runSerialize Plain format <$> parseSymbols blobs
+parseSymbolsBuilder :: (Member Distribute sig, ParseEffects sig m, Traversable t) => t Blob -> m Builder
+parseSymbolsBuilder blobs = parseSymbols blobs >>= serialize JSON
 
 parseSymbols :: (Member Distribute sig, ParseEffects sig m, Traversable t) => t Blob -> m ParseTreeSymbolResponse
 parseSymbols blobs = ParseTreeSymbolResponse <$> distributeFoldMap go blobs
   where
     go :: (Member (Error SomeException) sig, Member Task sig, Carrier sig m, Monad m) => Blob -> m [File]
-    go blob@Blob{..} = doParse blobLanguage blob render `catchError` (\(SomeException _) -> pure (pure emptyFile))
+    go blob@Blob{..} = (doParse blob >>= withSomeTerm (renderToSymbols blob)) `catchError` (\(SomeException _) -> pure (pure emptyFile))
       where emptyFile = File (pack blobPath) (pack (show blobLanguage)) []
 
-    render :: Blob -> SomeTerm TermConstraints Location -> [File]
-    render blob (SomeTerm term) = renderToSymbols blob term
-
-    renderToSymbols :: (IsTaggable f) => Blob -> Term f Location -> [File]
-    renderToSymbols blob term = either mempty (pure . tagsToFile blob) (runTagging blob term)
+    renderToSymbols :: (IsTaggable f, Applicative m) => Blob -> Term f Location -> m [File]
+    renderToSymbols blob term = pure $ either mempty (pure . tagsToFile blob) (runTagging blob term)
 
     tagsToFile :: Blob -> [Tag] -> File
     tagsToFile Blob{..} tags = File (pack blobPath) (pack (show blobLanguage)) (fmap tagToSymbol tags)
