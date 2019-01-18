@@ -45,15 +45,6 @@ data Summaries = Summaries { changes, errors :: Map.Map T.Text [Value] }
   deriving Semigroup via GenericSemigroup Summaries
   deriving Monoid via GenericMonoid Summaries
 
--- TODO: Get this to auto generate. The following is incomplete.
-instance Message Summaries where
-  encodeMessage = undefined
-  decodeMessage = undefined
-  dotProto _ =
-    [ DotProtoMessageField $ DotProtoField 1 (Prim . Named $ Single "TOCSummary") (Single "changes") [] Nothing
-    , DotProtoMessageField $ DotProtoField 1 (Prim . Named $ Single "ErrorSummary") (Single "errors") [] Nothing
-    ]
-
 instance ToJSON Summaries where
   toJSON Summaries{..} = object [ "changes" .= changes, "errors" .= errors ]
 
