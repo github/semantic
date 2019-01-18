@@ -4,7 +4,7 @@ import           Control.Monad (when)
 import qualified Data.ByteString as B
 import           Data.ByteString.Builder
 import           Data.Foldable (for_)
-import           Semantic.API (parseSymbolsBuilder, diffSummaryBuilder)
+import           Semantic.API (parseSymbolsBuilder, parseSExpressionBuilder, diffSummaryBuilder)
 import           Semantic.CLI
 import           Semantic.IO
 import           Semantic.Task
@@ -34,7 +34,7 @@ spec = parallel $ do
 
 parseFixtures :: [(String, [Blob] -> TaskEff Builder, [File], FilePath)]
 parseFixtures =
-  [ (show SExpressionTermRenderer, runParse SExpressionTermRenderer, path, "test/fixtures/ruby/corpus/and-or.parseA.txt")
+  [ ("s-expression", parseSExpressionBuilder, path, "test/fixtures/ruby/corpus/and-or.parseA.txt")
   , (show JSONTermRenderer, runParse JSONTermRenderer, path, prefix </> "parse-tree.json")
   , (show JSONTermRenderer, runParse JSONTermRenderer, path', prefix </> "parse-trees.json")
   , (show JSONTermRenderer, runParse JSONTermRenderer, [], prefix </> "parse-tree-empty.json")

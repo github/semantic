@@ -49,8 +49,6 @@ data TermRenderer output where
   JSONTermRenderer :: TermRenderer (JSON "trees" SomeJSON)
   -- | Render to JSON as an adjacency list represenation.
   JSONGraphTermRenderer :: TermRenderer (JSON "trees" SomeJSON)
-  -- | Render to a 'ByteString' formatted as nested s-expressions.
-  SExpressionTermRenderer :: TermRenderer Builder
   -- | Render to a 'ByteString' formatted as a DOT description of the term.
   DOTTermRenderer :: TermRenderer (Graph TermVertex)
   -- | Render to a 'ByteString' formatted using the 'Show' instance.
