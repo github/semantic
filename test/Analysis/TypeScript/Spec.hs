@@ -1,7 +1,8 @@
 {-# Language GADTs #-}
 module Analysis.TypeScript.Spec (spec) where
 
-import           Control.Abstract.ScopeGraph
+import qualified Data.Abstract.ScopeGraph as ScopeGraph (AccessControl(..))
+import           Control.Abstract.ScopeGraph hiding (AccessControl(..))
 import           Control.Abstract.Value as Value hiding (String, Unit)
 import           Control.Arrow ((&&&))
 import           Data.Abstract.Evaluatable
@@ -15,6 +16,7 @@ import           Data.Abstract.Value.Concrete as Concrete
 import qualified Data.Language as Language
 import qualified Data.List.NonEmpty as NonEmpty
 import           Data.Location
+import qualified Data.Map.Internal as Map
 import           Data.Quieterm
 import           Data.Scientific (scientific)
 import           Data.Sum
