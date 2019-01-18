@@ -4,7 +4,7 @@ import           Control.Monad (when)
 import qualified Data.ByteString as B
 import           Data.ByteString.Builder
 import           Data.Foldable (for_)
-import           Semantic.API (parseSymbolsBuilder, parseSExpressionBuilder, diffSummaryBuilder)
+import           Semantic.API (parseSymbolsBuilder, parseTermBuilder, TermOutputFormat(..), diffSummaryBuilder)
 import           Semantic.CLI
 import           Semantic.IO
 import           Semantic.Task
@@ -21,9 +21,9 @@ spec = parallel $ do
         output <- runTask $ readBlobPairs (Right files) >>= runDiff
         runBuilder output `shouldBe'` expected
 
-  describe "runParse" $
-    for_ parseFixtures $ \ (parseTreeRenderer, runParse, files, expected) ->
-      it ("renders to " <> parseTreeRenderer <> " with files " <> show files) $ do
+  describe "parseTermBuilder" $
+    for_ parseFixtures $ \ (format, runParse, files, expected) ->
+      it ("renders to " <> format <> " with files " <> show files) $ do
         output <- runTask $ readBlobs (Right files) >>= runParse
         runBuilder output `shouldBe'` expected
   where
@@ -34,11 +34,11 @@ spec = parallel $ do
 
 parseFixtures :: [(String, [Blob] -> TaskEff Builder, [File], FilePath)]
 parseFixtures =
-  [ ("s-expression", parseSExpressionBuilder, path, "test/fixtures/ruby/corpus/and-or.parseA.txt")
-  , (show JSONTermRenderer, runParse JSONTermRenderer, path, prefix </> "parse-tree.json")
-  , (show JSONTermRenderer, runParse JSONTermRenderer, path', prefix </> "parse-trees.json")
-  , (show JSONTermRenderer, runParse JSONTermRenderer, [], prefix </> "parse-tree-empty.json")
-  , ("symbols", parseSymbolsBuilder Serializing.Format.JSON, path'', prefix </> "parse-tree.symbols.json")
+  [ ("s-expression", parseTermBuilder TermSExpression, path, "test/fixtures/ruby/corpus/and-or.parseA.txt")
+  , ("json", parseTermBuilder TermJSONTree, path, prefix </> "parse-tree.json")
+  , ("json", parseTermBuilder TermJSONTree, path', prefix </> "parse-trees.json")
+  , ("json", parseTermBuilder TermJSONTree, [], prefix </> "parse-tree-empty.json")
+  , ("symbols", parseSymbolsBuilder, path'', prefix </> "parse-tree.symbols.json")
   ]
   where path = [File "test/fixtures/ruby/corpus/and-or.A.rb" Ruby]
         path' = [File "test/fixtures/ruby/corpus/and-or.A.rb" Ruby, File "test/fixtures/ruby/corpus/and-or.B.rb" Ruby]
