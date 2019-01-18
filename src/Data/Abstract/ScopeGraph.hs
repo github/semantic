@@ -44,6 +44,7 @@ import qualified Data.Set as Set
 import           Data.Span
 import           Prelude hiding (lookup)
 import           Prologue
+import Data.Abstract.Module
 
 -- A slot is a location in the heap where a value is stored.
 data Slot address = Slot { frameAddress :: address, position :: Position }
@@ -54,6 +55,7 @@ data Relation = Default | Instance | Prelude
 
 data Info scopeAddress = Info
   { infoDeclaration :: Declaration
+  , infoModule :: ModuleInfo
   , infoRelation :: Relation
   , infoSpan :: Span
   , infoKind :: Kind
@@ -63,6 +65,7 @@ data Info scopeAddress = Info
 data ReferenceInfo = ReferenceInfo
   { refSpan :: Span
   , refKind :: Kind
+  , refModule :: ModuleInfo
   }
   deriving (Eq, Show, Ord, Generic, NFData)
 
@@ -154,29 +157,29 @@ lookupScope scope = Map.lookup scope . unScopeGraph
 
 -- Declare a declaration with a span and an associated scope in the scope graph.
 -- TODO: Return the whole value in Maybe or Either.
-declare :: Ord scope => Declaration -> Relation -> Span -> Kind -> Maybe scope -> scope -> ScopeGraph scope -> (ScopeGraph scope, Maybe Position)
-declare decl rel declSpan kind assocScope currentScope g = fromMaybe (g, Nothing) $ do
+declare :: Ord scope => Declaration -> ModuleInfo -> Relation -> Span -> Kind -> Maybe scope -> scope -> ScopeGraph scope -> (ScopeGraph scope, Maybe Position)
+declare decl moduleInfo rel declSpan kind assocScope currentScope g = fromMaybe (g, Nothing) $ do
   scope <- lookupScope currentScope g
 
   dataSeq <- ddataOfScope currentScope g
   case Seq.findIndexR (\Info{..} -> decl == infoDeclaration && declSpan == infoSpan && rel == infoRelation) dataSeq of
     Just index -> pure (g, Just (Position index))
     Nothing -> do
-      let newScope = scope { declarations = declarations scope Seq.|> Info decl rel declSpan kind assocScope }
+      let newScope = scope { declarations = declarations scope Seq.|> Info decl moduleInfo rel declSpan kind assocScope }
       pure (insertScope currentScope newScope g, Just (Position (length (declarations newScope))))
 
 -- | Add a reference to a declaration in the scope graph.
 -- Returns the original scope graph if the declaration could not be found.
-reference :: Ord scope => Reference -> Span -> Kind -> Declaration -> scope -> ScopeGraph scope -> ScopeGraph scope
-reference ref span kind decl currentAddress g = fromMaybe g $ do
+reference :: Ord scope => Reference -> ModuleInfo -> Span -> Kind -> Declaration -> scope -> ScopeGraph scope -> ScopeGraph scope
+reference ref moduleInfo span kind decl currentAddress g = fromMaybe g $ do
   -- Start from the current address
   currentScope' <- lookupScope currentAddress g
   -- Build a path up to the declaration
-  flip (insertScope currentAddress) g . flip (insertReference ref span kind) currentScope' <$> findPath (const Nothing) decl currentAddress g
+  flip (insertScope currentAddress) g . flip (insertReference ref moduleInfo span kind) currentScope' <$> findPath (const Nothing) decl currentAddress g
 
 -- | Insert a reference into the given scope by constructing a resolution path to the declaration within the given scope graph.
-insertImportReference :: Ord address => Reference -> Span -> Kind -> Declaration -> address -> ScopeGraph address -> Scope address -> Maybe (Scope address)
-insertImportReference ref span kind decl currentAddress g scope = flip (insertReference ref span kind) scope . EPath Import currentAddress <$> findPath (const Nothing) decl currentAddress g
+insertImportReference :: Ord address => Reference -> ModuleInfo -> Span -> Kind -> Declaration -> address -> ScopeGraph address -> Scope address -> Maybe (Scope address)
+insertImportReference ref moduleInfo span kind decl currentAddress g scope = flip (insertReference ref moduleInfo span kind) scope . EPath Import currentAddress <$> findPath (const Nothing) decl currentAddress g
 
 lookupScopePath :: Ord scopeAddress => Name -> scopeAddress -> ScopeGraph scopeAddress -> Maybe (Path scopeAddress)
 lookupScopePath declaration currentAddress g = findPath (flip (lookupReference declaration) g) (Declaration declaration) currentAddress g
@@ -203,10 +206,10 @@ foldGraph combine address graph = go lowerBound address
 pathToDeclaration :: Ord scopeAddress => Declaration -> scopeAddress -> ScopeGraph scopeAddress -> Maybe (Path scopeAddress)
 pathToDeclaration decl address g = DPath decl . snd <$> lookupDeclaration (unDeclaration decl) address g
 
-insertReference :: Reference -> Span -> Kind -> Path scopeAddress -> Scope scopeAddress -> Scope scopeAddress
-insertReference ref span kind path scope = scope { references = Map.alter (\case
-  Nothing -> pure ([ ReferenceInfo span kind ], path)
-  Just (refInfos, path) -> pure (ReferenceInfo span kind : refInfos, path)) ref (references scope) }
+insertReference :: Reference -> ModuleInfo -> Span -> Kind -> Path scopeAddress -> Scope scopeAddress -> Scope scopeAddress
+insertReference ref moduleInfo span kind path scope = scope { references = Map.alter (\case
+  Nothing -> pure ([ ReferenceInfo span kind moduleInfo ], path)
+  Just (refInfos, path) -> pure (ReferenceInfo span kind moduleInfo : refInfos, path)) ref (references scope) }
 
 lookupDeclaration :: Ord scopeAddress => Name -> scopeAddress -> ScopeGraph scopeAddress -> Maybe (Info scopeAddress, Position)
 lookupDeclaration name scope g = do
