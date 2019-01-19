@@ -18,8 +18,17 @@ import Rendering.JSON hiding (JSON)
 import Semantic.API.Parse
 import Semantic.Task as Task
 import Serializing.Format
-
 import qualified Rendering.JSON
+
+data DiffOutputFormat
+  = DiffJSONTree
+  deriving (Eq, Show)
+
+parseDiffBuilder :: (Traversable t)
+  => DiffOutputFormat -> t BlobPair -> m Builder
+parseDiffBuilder DiffJSONTree = distributeFoldMap jsonDiff >=> serialize JSON
+
+jsonDiff blobPair = doDiff blobPair (const pure) (pure . renderJSONDiff)
 
 data TermOutputFormat
   = TermJSONTree
@@ -32,12 +41,12 @@ data TermOutputFormat
 
 parseTermBuilder :: (Traversable t, Member Distribute sig, ParseEffects sig m, MonadIO m)
   => TermOutputFormat-> t Blob -> m Builder
-parseTermBuilder TermJSONTree = distributeFoldMap jsonTerm >=> serialize JSON
-parseTermBuilder TermJSONGraph = distributeFoldMap jsonGraph >=> serialize JSON
+parseTermBuilder TermJSONTree    = distributeFoldMap jsonTerm >=> serialize JSON
+parseTermBuilder TermJSONGraph   = distributeFoldMap jsonGraph >=> serialize JSON
 parseTermBuilder TermSExpression = distributeFoldMap sexpTerm
-parseTermBuilder TermDotGraph = distributeFoldMap dotGraphTerm
-parseTermBuilder TermShow = distributeFoldMap showTerm
-parseTermBuilder TermQuiet = distributeFoldMap quietTerm
+parseTermBuilder TermDotGraph    = distributeFoldMap dotGraphTerm
+parseTermBuilder TermShow        = distributeFoldMap showTerm
+parseTermBuilder TermQuiet       = distributeFoldMap quietTerm
 
 jsonTerm :: (ParseEffects sig m) => Blob -> m (Rendering.JSON.JSON "trees" SomeJSON)
 jsonTerm blob = (doParse blob >>= withSomeTerm (pure . renderJSONTerm blob)) `catchError` jsonError blob
