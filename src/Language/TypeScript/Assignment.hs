@@ -505,7 +505,7 @@ readonly' = makeTerm <$> symbol Readonly <*> (Type.Readonly <$ rawSource)
 methodDefinition :: Assignment Term
 methodDefinition = makeMethod <$>
   symbol MethodDefinition
-  <*> children ((,,,,,) <$> (term accessibilityModifier' <|> emptyTerm) <*> (term readonly' <|> emptyTerm) <*> emptyTerm <*> term propertyName <*> callSignatureParts <*> term statementBlock)
+  <*> children ((,,,,,) <$> (term accessibilityModifier' <|> publicAccessControl) <*> (term readonly' <|> emptyTerm) <*> emptyTerm <*> term propertyName <*> callSignatureParts <*> term statementBlock)
   where
     makeMethod loc (modifier, readonly, receiver, propertyName', (typeParameters', params, ty'), statements) = makeTerm loc (Declaration.Method [readonly, typeParameters', ty'] modifier receiver propertyName' params statements)
 
@@ -530,8 +530,8 @@ indexSignature :: Assignment Term
 indexSignature = makeTerm <$> symbol Grammar.IndexSignature <*> children (TypeScript.Syntax.IndexSignature <$> term identifier <*> predefinedTy <*> term typeAnnotation')
 
 methodSignature :: Assignment Term
-methodSignature = makeMethodSignature <$> symbol Grammar.MethodSignature <*> children ((,,,) <$> (term accessibilityModifier' <|> emptyTerm) <*> (term readonly' <|> emptyTerm) <*> term propertyName <*> callSignatureParts)
-  where makeMethodSignature loc (modifier, readonly, propertyName, (typeParams, params, annotation)) = makeTerm loc (Declaration.MethodSignature [modifier, readonly, typeParams, annotation] propertyName params)
+methodSignature = makeMethodSignature <$> symbol Grammar.MethodSignature <*> children ((,,,) <$> (term accessibilityModifier' <|> publicAccessControl) <*> (term readonly' <|> emptyTerm) <*> term propertyName <*> callSignatureParts)
+  where makeMethodSignature loc (accessControl, readonly, propertyName, (typeParams, params, annotation)) = makeTerm loc (Declaration.MethodSignature [readonly, typeParams, annotation] accessControl propertyName params)
 
 formalParameters :: Assignment [Term]
 formalParameters = symbol FormalParameters *> children (contextualize' <$> Assignment.manyThrough comment (postContextualize' <$> (concat <$> many ((\as b -> as <> [b]) <$> manyTerm decorator <*> term parameter)) <*> many comment))
@@ -679,7 +679,7 @@ publicAccessControl = makeTerm <$> location <*> pure Declaration.Public
 
 publicFieldDefinition :: Assignment Term
 publicFieldDefinition = makeField <$> symbol Grammar.PublicFieldDefinition <*> children ((,,,,) <$> (term accessibilityModifier' <|> term publicAccessControl) <*> (term readonly' <|> emptyTerm) <*> term propertyName <*> (term typeAnnotation' <|> emptyTerm) <*> (term expression <|> emptyTerm))
-  where makeField loc (modifier, readonly, propertyName, annotation, expression) = makeTerm loc (Declaration.PublicFieldDefinition [readonly, annotation] propertyName modifier expression)
+  where makeField loc (accessControl, readonly, propertyName, annotation, expression) = makeTerm loc (Declaration.PublicFieldDefinition [readonly, annotation] accessControl propertyName expression)
 
 
 statement :: Assignment Term

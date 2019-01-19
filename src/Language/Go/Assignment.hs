@@ -31,13 +31,13 @@ import Data.ImportPath (importPath, defaultAlias)
 
 type Syntax =
   '[ Comment.Comment
+   , Declaration.AccessControl
    , Declaration.Constructor
    , Declaration.Function
    , Declaration.Method
    , Declaration.MethodSignature
    , Declaration.Type
    , Declaration.TypeAlias
-   , Declaration.AccessControl
    , Expression.Plus
    , Expression.Minus
    , Expression.Times
@@ -459,21 +459,23 @@ indexExpression :: Assignment Term
 indexExpression = makeTerm <$> symbol IndexExpression <*> children (Expression.Subscript <$> expression <*> manyTerm expression)
 
 methodDeclaration :: Assignment Term
-methodDeclaration = makeTerm <$> symbol MethodDeclaration <*> children (mkTypedMethodDeclaration <$> receiver <*> accessibility <*> term fieldIdentifier <*> params <*> returnParameters <*> (term block <|> emptyTerm))
+methodDeclaration = makeTerm <$> symbol MethodDeclaration <*> children (mkTypedMethodDeclaration <$> receiver <*> unknownAccessControl <*> term fieldIdentifier <*> params <*> returnParameters <*> (term block <|> emptyTerm))
   where
     params = symbol ParameterList *> children (manyTerm expression)
     receiver = symbol ParameterList *> children expressions
-    mkTypedMethodDeclaration receiver' accessibility' name' parameters' type'' body' = Declaration.Method type'' accessibility' receiver' name' parameters' body'
-    accessibility = makeTerm <$> location <*> pure Declaration.Unknown
+    mkTypedMethodDeclaration receiver' accessControl name' parameters' type'' body' = Declaration.Method type'' accessControl receiver' name' parameters' body'
     returnParameters = (symbol ParameterList *> children (manyTerm expression))
                     <|> pure <$> expression
                     <|> pure []
 
 methodSpec :: Assignment Term
-methodSpec =  makeTerm <$> symbol MethodSpec <*> children (mkMethodSpec <$> expression <*> params <*> (expression <|> emptyTerm))
+methodSpec =  makeTerm <$> symbol MethodSpec <*> children (mkMethodSpec <$> unknownAccessControl <*> expression <*> params <*> (expression <|> emptyTerm))
   where
     params = symbol ParameterList *> children (manyTerm expression)
-    mkMethodSpec name' params optionalTypeLiteral = Declaration.MethodSignature [optionalTypeLiteral] name' params
+    mkMethodSpec accessControl name' params optionalTypeLiteral = Declaration.MethodSignature [optionalTypeLiteral] accessControl name' params
+
+unknownAccessControl :: Assignment Term
+unknownAccessControl = makeTerm <$> location <*> pure Declaration.Unknown
 
 methodSpecList :: Assignment Term
 methodSpecList = symbol MethodSpecList *> children expressions
