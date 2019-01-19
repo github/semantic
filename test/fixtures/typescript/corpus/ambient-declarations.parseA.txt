@@ -4,9 +4,9 @@
       (TypeIdentifier)
       (PublicFieldDefinition
         (Empty)
-        (Empty)
         (Annotation
           (TypeIdentifier))
+        (Public)
         (Identifier)
         (Empty))))
   (AmbientDeclaration
@@ -90,7 +90,7 @@
           (Empty)
           (Empty)
           (Empty)
-          (Empty)
+          (Public)
           (Identifier)
           (RequiredParameter
             (Empty)
@@ -101,15 +101,15 @@
             (Empty)))
         (PublicFieldDefinition
           (Empty)
-          (Empty)
           (Annotation
             (PredefinedType))
+          (Public)
           (Identifier)
           (Empty))
         (MethodSignature
           (Empty)
           (Empty)
-          (Empty)
           (Annotation
             (PredefinedType))
+          (Public)
           (Identifier))))))

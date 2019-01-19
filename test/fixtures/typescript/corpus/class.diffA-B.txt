@@ -15,23 +15,7 @@
       {+(Empty)+}
       {+(Empty)+}
       {+(Empty)+}
-      {+(Empty)+}
-      {+(Empty)+}
-      {+(Identifier)+}
-      {+(RequiredParameter
-        {+(Empty)+}
-        {+(Empty)+}
-        {+(Empty)+}
-        {+(Identifier)+}
-        {+(Empty)+})+}
-      {+(StatementBlock
-        {+(Return
-          {+(Identifier)+})+})+})+}
-    {+(Method
-      {+(Empty)+}
-      {+(Empty)+}
-      {+(Empty)+}
-      {+(Empty)+}
+      {+(Public)+}
       {+(Empty)+}
       {+(Identifier)+}
       {+(RequiredParameter
@@ -47,7 +31,23 @@
       {+(Empty)+}
       {+(Empty)+}
       {+(Empty)+}
+      {+(Public)+}
       {+(Empty)+}
+      {+(Identifier)+}
+      {+(RequiredParameter
+        {+(Empty)+}
+        {+(Empty)+}
+        {+(Empty)+}
+        {+(Identifier)+}
+        {+(Empty)+})+}
+      {+(StatementBlock
+        {+(Return
+          {+(Identifier)+})+})+})+}
+    {+(Method
+      {+(Empty)+}
+      {+(Empty)+}
+      {+(Empty)+}
+      {+(Public)+}
       {+(Empty)+}
       {+(Identifier)+}
       {+(RequiredParameter
@@ -62,30 +62,14 @@
     {-(PublicFieldDefinition
       {-(Empty)-}
       {-(Empty)-}
-      {-(Empty)-}
+      {-(Public)-}
       {-(Identifier)-}
       {-(Float)-})-}
     {-(Method
       {-(Empty)-}
       {-(Empty)-}
       {-(Empty)-}
-      {-(Empty)-}
-      {-(Empty)-}
-      {-(Identifier)-}
-      {-(RequiredParameter
-        {-(Empty)-}
-        {-(Empty)-}
-        {-(Empty)-}
-        {-(Identifier)-}
-        {-(Empty)-})-}
-      {-(StatementBlock
-        {-(Return
-          {-(Identifier)-})-})-})-}
-    {-(Method
-      {-(Empty)-}
-      {-(Empty)-}
-      {-(Empty)-}
-      {-(Empty)-}
+      {-(Public)-}
       {-(Empty)-}
       {-(Identifier)-}
       {-(RequiredParameter
@@ -101,7 +85,23 @@
       {-(Empty)-}
       {-(Empty)-}
       {-(Empty)-}
+      {-(Public)-}
       {-(Empty)-}
+      {-(Identifier)-}
+      {-(RequiredParameter
+        {-(Empty)-}
+        {-(Empty)-}
+        {-(Empty)-}
+        {-(Identifier)-}
+        {-(Empty)-})-}
+      {-(StatementBlock
+        {-(Return
+          {-(Identifier)-})-})-})-}
+    {-(Method
+      {-(Empty)-}
+      {-(Empty)-}
+      {-(Empty)-}
+      {-(Public)-}
       {-(Empty)-}
       {-(Identifier)-}
       {-(RequiredParameter

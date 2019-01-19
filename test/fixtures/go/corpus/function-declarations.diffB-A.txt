@@ -41,14 +41,10 @@
   { (Identifier)
   ->(Identifier) }
     (Statements))
-  (Function
+{+(Function
   {+(Identifier)+}
-  {-(Statements)-}
-  { (Identifier)
-  ->(Identifier) }
-  { (NoOp
-    {-(Empty)-})
-  ->(Empty) })
+  {+(Identifier)+}
+  {+(Empty)+})+}
 {+(Function
   {+(Context
     {+(Comment)+}
@@ -59,6 +55,11 @@
     {+(Pointer
       {+(Identifier)+})+})+}
   {+(Statements)+})+}
+{-(Function
+  {-(Statements)-}
+  {-(Identifier)-}
+  {-(NoOp
+    {-(Empty)-})-})-}
 {-(Function
   {-(Identifier)-}
   {-(Identifier)-}

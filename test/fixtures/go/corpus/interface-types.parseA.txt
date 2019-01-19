@@ -25,6 +25,7 @@
                 (Identifier))
               (MethodSignature
                 (Identifier)
+                (Unknown)
                 (Identifier)
                 (Statements
                   (Identifier)
@@ -37,4 +38,5 @@
             (Interface
               (MethodSignature
                 (Empty)
+                (Unknown)
                 (Identifier)))))))))

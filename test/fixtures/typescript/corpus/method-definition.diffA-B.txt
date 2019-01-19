@@ -2,7 +2,6 @@
   (Class
     (TypeIdentifier)
     (Method
-      (Identifier)
     {+(Readonly)+}
       (Empty)
     {+(Annotation
@@ -10,6 +9,7 @@
     {-(Empty)-}
     {-(Annotation
       {-(TypeIdentifier)-})-}
+      (Public)
       (Empty)
       (Identifier)
       (StatementBlock))))
