@@ -3,75 +3,75 @@
     (TypeIdentifier)
     (Statements
       (PublicFieldDefinition
-        (Empty)
         (Readonly)
         (Empty)
+        (Public)
         (Identifier)
         (Empty))
       (PublicFieldDefinition
-        (Empty)
         (Readonly)
         (Empty)
+        (Public)
         (Identifier)
         (Empty))
       (PublicFieldDefinition
-        (Identifier)
         (Readonly)
         (Empty)
+        (Public)
         (Identifier)
         (Empty))
       (PublicFieldDefinition
-        (Identifier)
         (Readonly)
         (Annotation
           (TypeIdentifier))
+        (Public)
         (Identifier)
         (Float))
       (PublicFieldDefinition
-        (Identifier)
         (Empty)
         (Annotation
           (TypeIdentifier))
+        (Private)
         (Identifier)
         (Float))
       (PublicFieldDefinition
-        (Empty)
         (Empty)
         (Annotation
           (TypeIdentifier))
+        (Public)
         (Identifier)
         (Float))
       (PublicFieldDefinition
-        (Empty)
         (Empty)
         (Annotation
           (TypeIdentifier))
+        (Public)
         (Identifier)
         (Float))
       (PublicFieldDefinition
-        (Identifier)
         (Empty)
         (Annotation
           (TypeIdentifier))
+        (Public)
         (Identifier)
         (Float))
       (PublicFieldDefinition
-        (Identifier)
         (Readonly)
         (Annotation
           (TypeIdentifier))
+        (Protected)
         (Identifier)
         (TextElement))
       (PublicFieldDefinition
         (Empty)
-        (Empty)
         (Annotation
           (TypeIdentifier))
+        (Public)
         (Identifier)
         (Float))
       (PublicFieldDefinition
         (Empty)
         (Empty)
-        (Empty)
+        (Public)
         (Identifier)
         (Float)))))

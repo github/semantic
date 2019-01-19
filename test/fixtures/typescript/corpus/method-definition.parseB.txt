@@ -2,11 +2,11 @@
   (Class
     (TypeIdentifier)
     (Method
-      (Identifier)
       (Readonly)
       (Empty)
       (Annotation
         (PredefinedType))
+      (Public)
       (Empty)
       (Identifier)
       (StatementBlock))))
