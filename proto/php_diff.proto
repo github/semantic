@@ -178,7 +178,7 @@ message Function {
 
 message Method {
   repeated PHPDiff methodContext = 1;
-  PHPDiff methodVisibility = 2;
+  PHPDiff methodAccessControl = 2;
   PHPDiff methodReceiver = 3;
   PHPDiff methodName = 4;
   repeated PHPDiff methodParameters = 5;

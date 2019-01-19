@@ -147,7 +147,7 @@ message InterfaceDeclaration {
 
 message Method {
   repeated JavaTerm methodContext = 1;
-  JavaTerm methodVisibility = 2;
+  JavaTerm methodAccessControl = 2;
   JavaTerm methodReceiver = 3;
   JavaTerm methodName = 4;
   repeated JavaTerm methodParameters = 5;

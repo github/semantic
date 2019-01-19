@@ -226,7 +226,7 @@ message Function {
 
 message Method {
   repeated TypeScriptDiff methodContext = 1;
-  TypeScriptDiff methodVisibility = 2;
+  TypeScriptDiff methodAccessControl = 2;
   TypeScriptDiff methodReceiver = 3;
   TypeScriptDiff methodName = 4;
   repeated TypeScriptDiff methodParameters = 5;
@@ -235,8 +235,9 @@ message Method {
 
 message MethodSignature {
   repeated TypeScriptDiff methodSignatureContext = 1;
-  TypeScriptDiff methodSignatureName = 2;
-  repeated TypeScriptDiff methodSignatureParameters = 3;
+  TypeScriptDiff methodSignatureAccessControl = 2;
+  TypeScriptDiff methodSignatureName = 3;
+  repeated TypeScriptDiff methodSignatureParameters = 4;
 }
 
 message InterfaceDeclaration {
@@ -248,8 +249,8 @@ message InterfaceDeclaration {
 
 message PublicFieldDefinition {
   repeated TypeScriptDiff publicFieldContext = 1;
-  TypeScriptDiff publicFieldPropertyName = 2;
-  TypeScriptDiff publicFieldVisibility = 3;
+  TypeScriptDiff publicFieldAccessControl = 2;
+  TypeScriptDiff publicFieldPropertyName = 3;
   TypeScriptDiff publicFieldValue = 4;
 }
 

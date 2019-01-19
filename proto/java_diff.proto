@@ -165,7 +165,7 @@ message InterfaceDeclaration {
 
 message Method {
   repeated JavaDiff methodContext = 1;
-  JavaDiff methodVisibility = 2;
+  JavaDiff methodAccessControl = 2;
   JavaDiff methodReceiver = 3;
   JavaDiff methodName = 4;
   repeated JavaDiff methodParameters = 5;

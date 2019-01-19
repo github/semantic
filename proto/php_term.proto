@@ -160,7 +160,7 @@ message Function {
 
 message Method {
   repeated PHPTerm methodContext = 1;
-  PHPTerm methodVisibility = 2;
+  PHPTerm methodAccessControl = 2;
   PHPTerm methodReceiver = 3;
   PHPTerm methodName = 4;
   repeated PHPTerm methodParameters = 5;

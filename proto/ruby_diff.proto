@@ -136,7 +136,7 @@ message Function {
 
 message Method {
   repeated RubyDiff methodContext = 1;
-  RubyDiff methodVisibility = 2;
+  RubyDiff methodAccessControl = 2;
   RubyDiff methodReceiver = 3;
   RubyDiff methodName = 4;
   repeated RubyDiff methodParameters = 5;

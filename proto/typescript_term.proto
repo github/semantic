@@ -208,7 +208,7 @@ message Function {
 
 message Method {
   repeated TypeScriptTerm methodContext = 1;
-  TypeScriptTerm methodVisibility = 2;
+  TypeScriptTerm methodAccessControl = 2;
   TypeScriptTerm methodReceiver = 3;
   TypeScriptTerm methodName = 4;
   repeated TypeScriptTerm methodParameters = 5;
@@ -217,8 +217,9 @@ message Method {
 
 message MethodSignature {
   repeated TypeScriptTerm methodSignatureContext = 1;
-  TypeScriptTerm methodSignatureName = 2;
-  repeated TypeScriptTerm methodSignatureParameters = 3;
+  TypeScriptTerm methodSignatureAccessControl = 2;
+  TypeScriptTerm methodSignatureName = 3;
+  repeated TypeScriptTerm methodSignatureParameters = 4;
 }
 
 message InterfaceDeclaration {
@@ -230,8 +231,8 @@ message InterfaceDeclaration {
 
 message PublicFieldDefinition {
   repeated TypeScriptTerm publicFieldContext = 1;
-  TypeScriptTerm publicFieldPropertyName = 2;
-  TypeScriptTerm publicFieldVisibility = 3;
+  TypeScriptTerm publicFieldAccessControl = 2;
+  TypeScriptTerm publicFieldPropertyName = 3;
   TypeScriptTerm publicFieldValue = 4;
 }
 

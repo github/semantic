@@ -118,7 +118,7 @@ message Function {
 
 message Method {
   repeated RubyTerm methodContext = 1;
-  RubyTerm methodVisibility = 2;
+  RubyTerm methodAccessControl = 2;
   RubyTerm methodReceiver = 3;
   RubyTerm methodName = 4;
   repeated RubyTerm methodParameters = 5;

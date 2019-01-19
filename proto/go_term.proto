@@ -15,13 +15,13 @@ message GoTerm {
 message GoSyntax {
   oneof syntax {
     Comment comment = 1;
-    Constructor constructor = 2;
-    Function function = 3;
-    Method method = 4;
-    MethodSignature methodSignature = 5;
-    Type type = 6;
-    TypeAlias typeAlias = 7;
-    AccessControl accessControl = 8;
+    AccessControl accessControl = 2;
+    Constructor constructor = 3;
+    Function function = 4;
+    Method method = 5;
+    MethodSignature methodSignature = 6;
+    Type type = 7;
+    TypeAlias typeAlias = 8;
     Plus plus = 9;
     Minus minus = 10;
     Times times = 11;
@@ -121,6 +121,8 @@ message Comment {
   string commentContent = 1;
 }
 
+message AccessControl { }
+
 message Constructor {
   repeated GoTerm constructorContext = 1;
   GoTerm constructorName = 2;
@@ -136,7 +138,7 @@ message Function {
 
 message Method {
   repeated GoTerm methodContext = 1;
-  GoTerm methodVisibility = 2;
+  GoTerm methodAccessControl = 2;
   GoTerm methodReceiver = 3;
   GoTerm methodName = 4;
   repeated GoTerm methodParameters = 5;
@@ -145,8 +147,9 @@ message Method {
 
 message MethodSignature {
   repeated GoTerm methodSignatureContext = 1;
-  GoTerm methodSignatureName = 2;
-  repeated GoTerm methodSignatureParameters = 3;
+  GoTerm methodSignatureAccessControl = 2;
+  GoTerm methodSignatureName = 3;
+  repeated GoTerm methodSignatureParameters = 4;
 }
 
 message Type {
@@ -159,8 +162,6 @@ message TypeAlias {
   GoTerm typeAliasIdentifier = 2;
   GoTerm typeAliasKind = 3;
 }
-
-message AccessControl { }
 
 message Plus {
   GoTerm lhs = 1;

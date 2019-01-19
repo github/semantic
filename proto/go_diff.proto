@@ -33,13 +33,13 @@ message GoDiff {
 message GoSyntax {
   oneof syntax {
     Comment comment = 1;
-    Constructor constructor = 2;
-    Function function = 3;
-    Method method = 4;
-    MethodSignature methodSignature = 5;
-    Type type = 6;
-    TypeAlias typeAlias = 7;
-    AccessControl accessControl = 8;
+    AccessControl accessControl = 2;
+    Constructor constructor = 3;
+    Function function = 4;
+    Method method = 5;
+    MethodSignature methodSignature = 6;
+    Type type = 7;
+    TypeAlias typeAlias = 8;
     Plus plus = 9;
     Minus minus = 10;
     Times times = 11;
@@ -139,6 +139,8 @@ message Comment {
   string commentContent = 1;
 }
 
+message AccessControl { }
+
 message Constructor {
   repeated GoDiff constructorContext = 1;
   GoDiff constructorName = 2;
@@ -154,7 +156,7 @@ message Function {
 
 message Method {
   repeated GoDiff methodContext = 1;
-  GoDiff methodVisibility = 2;
+  GoDiff methodAccessControl = 2;
   GoDiff methodReceiver = 3;
   GoDiff methodName = 4;
   repeated GoDiff methodParameters = 5;
@@ -163,8 +165,9 @@ message Method {
 
 message MethodSignature {
   repeated GoDiff methodSignatureContext = 1;
-  GoDiff methodSignatureName = 2;
-  repeated GoDiff methodSignatureParameters = 3;
+  GoDiff methodSignatureAccessControl = 2;
+  GoDiff methodSignatureName = 3;
+  repeated GoDiff methodSignatureParameters = 4;
 }
 
 message Type {
@@ -177,8 +180,6 @@ message TypeAlias {
   GoDiff typeAliasIdentifier = 2;
   GoDiff typeAliasKind = 3;
 }
-
-message AccessControl { }
 
 message Plus {
   GoDiff lhs = 1;
