@@ -2,7 +2,6 @@ module Semantic.Spec (spec) where
 
 import Data.Diff
 import Data.Patch
-import Semantic.Parse
 import Semantic.API
 import System.Exit
 

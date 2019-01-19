@@ -5,21 +5,20 @@ module Semantic.API.Terms
   ) where
 
 
--- import Data.Aeson (ToJSON)
 import Control.Effect
-import Control.Monad
 import Control.Effect.Error
--- import Control.Exception
+import Control.Monad
+import Control.Monad.IO.Class
 import Data.Blob
 import Data.ByteString.Builder
-import Data.Quieterm
-import Semantic.API.Parse
-import Semantic.Task as Task
-import Control.Monad.IO.Class
-import Serializing.Format
 import Data.Either
+import Data.Quieterm
 import Rendering.Graph
 import Rendering.JSON hiding (JSON)
+import Semantic.API.Parse
+import Semantic.Task as Task
+import Serializing.Format
+
 import qualified Rendering.JSON
 
 data TermOutputFormat
@@ -65,20 +64,3 @@ quietTerm blob = showTiming blob <$> time' ( (doParse blob >>= withSomeTerm (fma
     showTiming Blob{..} (res, duration) =
       let status = if isLeft res then "ERR" else "OK"
       in stringUtf8 (status <> "\t" <> show blobLanguage <> "\t" <> blobPath <> "\t" <> show duration <> " ms\n")
-
--- parseTermBuilder format = distributeFoldMap (go format)
---   where
---     go :: (ParseEffects sig m, MonadIO m) => TermOutputFormat -> Blob -> m Builder
---     go TermJSONTree blob    = (doParse blob >>= withSomeTerm (serialize JSON . renderJSONTerm blob)) `catchError` jsonError blob
---     go TermJSONGraph blob   = (doParse blob >>= withSomeTerm (serialize JSON . renderJSONAdjTerm blob . renderTreeGraph)) `catchError` jsonError blob
---     go TermSExpression blob = doParse blob >>= withSomeTerm (serialize (SExpression ByConstructorName))
---     go TermDotGraph blob    = doParse blob >>= withSomeTerm (serialize (DOT (termStyle "terms")) . renderTreeGraph)
---     go TermShow blob        = doParse blob >>= withSomeTerm (serialize Show . quieterm)
---     go TermQuiet blob       = showTiming blob <$> time' ( (doParse blob >>= withSomeTerm (fmap (const (Right ())) . serialize Show . quieterm)) `catchError` timingError )
---
---     jsonError blob (SomeException e) = serialize JSON (renderJSONError blob (show e))
---     timingError (SomeException e) = pure (Left (show e))
---
---     showTiming Blob{..} (res, duration) =
---       let status = if isLeft res then "ERR" else "OK"
---       in stringUtf8 (status <> "\t" <> show blobLanguage <> "\t" <> blobPath <> "\t" <> show duration <> " ms\n")

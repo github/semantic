@@ -58,7 +58,6 @@ import qualified Data.Text.Encoding as T
 import Parsing.Parser as X
 import Rendering.Renderer as X hiding (error)
 import Semantic.Diff as X
-import Semantic.Parse as X
 import Semantic.Task as X hiding (parsePackage)
 import Semantic.Util as X
 import Semantic.Graph (runHeap, runScopeGraph)

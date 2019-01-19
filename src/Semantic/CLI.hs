@@ -20,7 +20,6 @@ import qualified Semantic.AST as AST
 import           Semantic.Config
 import qualified Semantic.Diff as Diff
 import qualified Semantic.Graph as Graph
-import qualified Semantic.Parse as Parse
 import qualified Semantic.Task as Task
 import           Semantic.Task.Files
 import qualified Semantic.Telemetry.Log as Log
