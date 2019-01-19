@@ -333,13 +333,13 @@ parameter = postContextualize comment (term uncontextualizedParameter)
     optionalParameter = symbol OptionalParameter *> children (lhsIdent <* expression)
 
 method :: Assignment Term
-method = makeTerm <$> symbol Method <*> (withNewScope . children) (Declaration.Method [] <$> emptyTerm <*> accessControl <*> methodSelector <*> params <*> expressions')
+method = makeTerm <$> symbol Method <*> (withNewScope . children) (Declaration.Method [] <$> accessControl <*> emptyTerm <*> methodSelector <*> params <*> expressions')
   where params = symbol MethodParameters *> children (many parameter) <|> pure []
         expressions' = makeTerm <$> location <*> many expression
         accessControl = makeTerm <$> location <*> pure Declaration.Unknown
 
 singletonMethod :: Assignment Term
-singletonMethod = makeTerm <$> symbol SingletonMethod <*> (withNewScope . children) (Declaration.Method [] <$> expression <*> accessControl <*> methodSelector <*> params <*> expressions)
+singletonMethod = makeTerm <$> symbol SingletonMethod <*> (withNewScope . children) (Declaration.Method [] <$> accessControl <*> expression <*> methodSelector <*> params <*> expressions)
   where params = symbol MethodParameters *> children (many parameter) <|> pure []
         accessControl = makeTerm <$> location <*> pure Declaration.Unknown
 
