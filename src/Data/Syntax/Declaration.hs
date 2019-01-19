@@ -89,7 +89,7 @@ instance AccessControls1 Data.Syntax.Declaration.AccessControl where
   liftTermToAccessControl _ Data.Syntax.Declaration.Unknown   = Just ScopeGraph.Unknown
 
 data Method a = Method { methodContext :: [a]
-                       , methodVisibility :: a
+                       , methodAccessControl :: a
                        , methodReceiver :: a
                        , methodName :: a
                        , methodParameters :: [a]
@@ -106,7 +106,7 @@ instance Evaluatable Method where
   eval _ _ Method{..} = do
     name <- maybeM (throwNoNameError methodName) (declaredName methodName)
     span <- ask @Span
-    let accessControl = fromMaybe ScopeGraph.Public (termToAccessControl methodVisibility)
+    let accessControl = fromMaybe ScopeGraph.Public (termToAccessControl methodAccessControl)
     associatedScope <- declareFunction name Default accessControl span
 
     params <- withScope associatedScope $ do
@@ -133,7 +133,11 @@ instance FreeVariables1 Method where
 
 
 -- | A method signature in TypeScript or a method spec in Go.
-data MethodSignature a = MethodSignature { methodSignatureContext :: ![a], methodSignatureName :: !a, methodSignatureParameters :: ![a] }
+data MethodSignature a = MethodSignature { methodSignatureContext :: [a]
+                                         , methodSignatureAccessControl :: a
+                                         , methodSignatureName :: a
+                                         , methodSignatureParameters :: [a]
+                                         }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically MethodSignature
 
@@ -199,8 +203,8 @@ instance Declarations a => Declarations (InterfaceDeclaration a) where
 
 -- | A public field definition such as a field definition in a JavaScript class.
 data PublicFieldDefinition a = PublicFieldDefinition { publicFieldContext :: [a]
+                                                     , publicFieldAccessControl :: a
                                                      , publicFieldPropertyName :: a
-                                                     , publicFieldVisibility :: a
                                                      , publicFieldValue :: a
                                                      }
                                                      deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
@@ -212,7 +216,7 @@ instance Evaluatable PublicFieldDefinition where
     span <- ask @Span
     propertyName <- maybeM (throwNoNameError publicFieldPropertyName) (declaredName publicFieldPropertyName)
 
-    declare (Declaration propertyName) Instance (fromMaybe ScopeGraph.Public (termToAccessControl publicFieldVisibility)) span Nothing
+    declare (Declaration propertyName) Instance (fromMaybe ScopeGraph.Public (termToAccessControl publicFieldAccessControl)) span Nothing
     slot <- lookupSlot (Declaration propertyName)
     value <- eval publicFieldValue
     assign slot value
