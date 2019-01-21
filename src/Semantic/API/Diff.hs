@@ -22,6 +22,7 @@ import Semantic.Task as Task
 import Semantic.Telemetry as Stat
 
 import Data.ByteString.Builder
+import           Rendering.Graph
 import Serializing.Format hiding (JSON)
 import qualified Serializing.Format as Format
 import Rendering.JSON hiding (JSON)
@@ -30,16 +31,26 @@ import Data.JSON.Fields
 
 data DiffOutputFormat
   = DiffJSONTree
+  | DiffJSONGraph
   deriving (Eq, Show)
 
 parseDiffBuilder :: (Traversable t, DiffEffects sig m) => DiffOutputFormat -> t BlobPair -> m Builder
-parseDiffBuilder DiffJSONTree = distributeFoldMap jsonDiff >=> serialize Format.JSON
+parseDiffBuilder DiffJSONTree  = distributeFoldMap jsonDiff >=> serialize Format.JSON
+parseDiffBuilder DiffJSONGraph = distributeFoldMap jsonGraph >=> serialize Format.JSON
+
+type RenderJSON syntax = BlobPair -> Diff syntax Location Location -> Rendering.JSON.JSON "diffs" SomeJSON
 
 jsonDiff :: (DiffEffects sig m) => BlobPair -> m (Rendering.JSON.JSON "diffs" SomeJSON)
 jsonDiff blobPair = doDiff blobPair (const pure) render `catchError` jsonError blobPair
   where
     render :: (Applicative m, ToJSONFields1 syntax) => BlobPair -> Diff syntax Location Location -> m (Rendering.JSON.JSON "diffs" SomeJSON)
     render blobPair = pure . renderJSONDiff blobPair
+
+jsonGraph :: (DiffEffects sig m) => BlobPair -> m (Rendering.JSON.JSON "diffs" SomeJSON)
+jsonGraph blobPair = doDiff blobPair (const pure) render `catchError` jsonError blobPair
+  where
+    render :: (Applicative m, ToJSONFields1 syntax, Functor syntax, Foldable syntax, ConstructorName syntax) => BlobPair -> Diff syntax Location Location -> m (Rendering.JSON.JSON "diffs" SomeJSON)
+    render blobPair = pure . renderJSONAdjDiff blobPair . renderTreeGraph
 
 jsonError :: Applicative m => BlobPair -> SomeException -> m (Rendering.JSON.JSON "diffs" SomeJSON)
 jsonError blobPair (SomeException e) = pure $ renderJSONDiffError blobPair (show e)
