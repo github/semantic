@@ -3,7 +3,6 @@ module Semantic.API.Parse
   ( doParse
   , ParseEffects
   , TermConstraints
-
   , SomeTerm(..)
   , withSomeTerm
   ) where
