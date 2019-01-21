@@ -1,6 +1,7 @@
 {-# LANGUAGE GADTs, ConstraintKinds, TypeOperators, RankNTypes #-}
 module Semantic.API.Diff
-  (  doDiff
+  ( parseDiffBuilder
+  , doDiff
   , DiffEffects
   ) where
 
@@ -32,28 +33,30 @@ import Data.JSON.Fields
 data DiffOutputFormat
   = DiffJSONTree
   | DiffJSONGraph
+  | DiffSExpression
   deriving (Eq, Show)
 
 parseDiffBuilder :: (Traversable t, DiffEffects sig m) => DiffOutputFormat -> t BlobPair -> m Builder
-parseDiffBuilder DiffJSONTree  = distributeFoldMap jsonDiff >=> serialize Format.JSON
-parseDiffBuilder DiffJSONGraph = distributeFoldMap jsonGraph >=> serialize Format.JSON
+parseDiffBuilder DiffJSONTree  = distributeFoldMap (jsonDiff renderJSONTree) >=> serialize Format.JSON
+parseDiffBuilder DiffJSONGraph = distributeFoldMap (jsonDiff renderJSONGraph) >=> serialize Format.JSON
+parseDiffBuilder DiffSExpression = distributeFoldMap sexpDiff
 
-type RenderJSON syntax = BlobPair -> Diff syntax Location Location -> Rendering.JSON.JSON "diffs" SomeJSON
+type RenderJSON m syntax = forall syntax . CanDiff syntax => BlobPair -> Diff syntax Location Location -> m (Rendering.JSON.JSON "diffs" SomeJSON)
 
-jsonDiff :: (DiffEffects sig m) => BlobPair -> m (Rendering.JSON.JSON "diffs" SomeJSON)
-jsonDiff blobPair = doDiff blobPair (const pure) render `catchError` jsonError blobPair
-  where
-    render :: (Applicative m, ToJSONFields1 syntax) => BlobPair -> Diff syntax Location Location -> m (Rendering.JSON.JSON "diffs" SomeJSON)
-    render blobPair = pure . renderJSONDiff blobPair
-
-jsonGraph :: (DiffEffects sig m) => BlobPair -> m (Rendering.JSON.JSON "diffs" SomeJSON)
-jsonGraph blobPair = doDiff blobPair (const pure) render `catchError` jsonError blobPair
-  where
-    render :: (Applicative m, ToJSONFields1 syntax, Functor syntax, Foldable syntax, ConstructorName syntax) => BlobPair -> Diff syntax Location Location -> m (Rendering.JSON.JSON "diffs" SomeJSON)
-    render blobPair = pure . renderJSONAdjDiff blobPair . renderTreeGraph
+jsonDiff :: (DiffEffects sig m) => RenderJSON m syntax -> BlobPair -> m (Rendering.JSON.JSON "diffs" SomeJSON)
+jsonDiff f blobPair = doDiff blobPair (const pure) f `catchError` jsonError blobPair
 
 jsonError :: Applicative m => BlobPair -> SomeException -> m (Rendering.JSON.JSON "diffs" SomeJSON)
 jsonError blobPair (SomeException e) = pure $ renderJSONDiffError blobPair (show e)
+
+renderJSONTree :: (Applicative m, ToJSONFields1 syntax) => BlobPair -> Diff syntax Location Location -> m (Rendering.JSON.JSON "diffs" SomeJSON)
+renderJSONTree blobPair = pure . renderJSONDiff blobPair
+
+renderJSONGraph :: (Applicative m, Functor syntax, Foldable syntax, ConstructorName syntax) => BlobPair -> Diff syntax Location Location -> m (Rendering.JSON.JSON "diffs" SomeJSON)
+renderJSONGraph blobPair = pure . renderJSONAdjDiff blobPair . renderTreeGraph
+
+sexpDiff :: (DiffEffects sig m) => BlobPair -> m Builder
+sexpDiff blobPair = doDiff blobPair (const pure) (const (serialize (SExpression ByConstructorName)))
 
 type DiffEffects sig m = (Member (Error SomeException) sig, Member Telemetry sig, Member Distribute sig, Member Task sig, Carrier sig m, MonadIO m)
 
