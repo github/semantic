@@ -7,6 +7,7 @@ module Semantic.API.Diff
 import Analysis.ConstructorName (ConstructorName)
 import Analysis.TOCSummary (HasDeclaration)
 import Control.Effect
+import Control.Effect.Error
 import Control.Exception
 import Control.Monad.IO.Class
 import Data.Blob
@@ -20,9 +21,32 @@ import Prologue
 import Semantic.Task as Task
 import Semantic.Telemetry as Stat
 
+import Data.ByteString.Builder
+import Serializing.Format hiding (JSON)
+import qualified Serializing.Format as Format
+import Rendering.JSON hiding (JSON)
+import qualified Rendering.JSON
+import Data.JSON.Fields
+
+data DiffOutputFormat
+  = DiffJSONTree
+  deriving (Eq, Show)
+
+parseDiffBuilder :: (Traversable t, DiffEffects sig m) => DiffOutputFormat -> t BlobPair -> m Builder
+parseDiffBuilder DiffJSONTree = distributeFoldMap jsonDiff >=> serialize Format.JSON
+
+jsonDiff :: (DiffEffects sig m) => BlobPair -> m (Rendering.JSON.JSON "diffs" SomeJSON)
+jsonDiff blobPair = doDiff blobPair (const pure) render `catchError` jsonError blobPair
+  where
+    render :: (Applicative m, ToJSONFields1 syntax) => BlobPair -> Diff syntax Location Location -> m (Rendering.JSON.JSON "diffs" SomeJSON)
+    render blobPair = pure . renderJSONDiff blobPair
+
+jsonError :: Applicative m => BlobPair -> SomeException -> m (Rendering.JSON.JSON "diffs" SomeJSON)
+jsonError blobPair (SomeException e) = pure $ renderJSONDiffError blobPair (show e)
+
 type DiffEffects sig m = (Member (Error SomeException) sig, Member Telemetry sig, Member Distribute sig, Member Task sig, Carrier sig m, MonadIO m)
 
-type CanDiff syntax = (ConstructorName syntax, Diffable syntax, Eq1 syntax, HasDeclaration syntax, Hashable1 syntax, Show1 syntax, Traversable syntax)
+type CanDiff syntax = (ConstructorName syntax, Diffable syntax, Eq1 syntax, HasDeclaration syntax, Hashable1 syntax, Show1 syntax, ToJSONFields1 syntax, Traversable syntax)
 type Decorate m a b = forall syntax . CanDiff syntax => Blob -> Term syntax a -> m (Term syntax b)
 
 type TermPairConstraints =
@@ -33,6 +57,7 @@ type TermPairConstraints =
   , Hashable1
   , Show1
   , Traversable
+  , ToJSONFields1
   ]
 
 doDiff :: (DiffEffects sig m)

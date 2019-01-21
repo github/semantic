@@ -14,21 +14,11 @@ import Data.ByteString.Builder
 import Data.Either
 import Data.Quieterm
 import Rendering.Graph
-import Rendering.JSON hiding (JSON)
 import Semantic.API.Parse
 import Semantic.Task as Task
 import Serializing.Format
+import Rendering.JSON hiding (JSON)
 import qualified Rendering.JSON
-
-data DiffOutputFormat
-  = DiffJSONTree
-  deriving (Eq, Show)
-
-parseDiffBuilder :: (Traversable t)
-  => DiffOutputFormat -> t BlobPair -> m Builder
-parseDiffBuilder DiffJSONTree = distributeFoldMap jsonDiff >=> serialize JSON
-
-jsonDiff blobPair = doDiff blobPair (const pure) (pure . renderJSONDiff)
 
 data TermOutputFormat
   = TermJSONTree
