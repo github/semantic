@@ -42,7 +42,7 @@ jsonTerm :: (ParseEffects sig m) => Blob -> m (Rendering.JSON.JSON "trees" SomeJ
 jsonTerm blob = (doParse blob >>= withSomeTerm (pure . renderJSONTerm blob)) `catchError` jsonError blob
 
 jsonGraph :: (ParseEffects sig m) => Blob -> m (Rendering.JSON.JSON "trees" SomeJSON)
-jsonGraph blob = (doParse blob >>= withSomeTerm (pure . renderJSONAdjTerm blob)) `catchError` jsonError blob
+jsonGraph blob = (doParse blob >>= withSomeTerm (pure . renderJSONAdjTerm blob . renderTreeGraph)) `catchError` jsonError blob
 
 jsonError :: Applicative m => Blob -> SomeException -> m (Rendering.JSON.JSON "trees" SomeJSON)
 jsonError blob (SomeException e) = pure $ renderJSONError blob (show e)
