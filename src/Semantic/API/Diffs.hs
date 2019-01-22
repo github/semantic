@@ -1,34 +1,34 @@
 {-# LANGUAGE GADTs, ConstraintKinds, TypeOperators, RankNTypes #-}
-module Semantic.API.Diff
+module Semantic.API.Diffs
   ( parseDiffBuilder
+  , DiffOutputFormat(..)
   , doDiff
   , DiffEffects
   ) where
 
-import Analysis.ConstructorName (ConstructorName)
-import Analysis.TOCSummary (HasDeclaration)
-import Control.Effect
-import Control.Effect.Error
-import Control.Exception
-import Control.Monad.IO.Class
-import Data.Blob
-import Data.Diff
-import Data.Language
-import Data.Location
-import Data.Term
-import Diffing.Algorithm (Diffable)
-import Parsing.Parser
-import Prologue
-import Semantic.Task as Task
-import Semantic.Telemetry as Stat
-
-import Data.ByteString.Builder
+import           Analysis.ConstructorName (ConstructorName)
+import           Analysis.TOCSummary (HasDeclaration)
+import           Control.Effect
+import           Control.Effect.Error
+import           Control.Exception
+import           Control.Monad.IO.Class
+import           Data.Blob
+import           Data.ByteString.Builder
+import           Data.Diff
+import           Data.JSON.Fields
+import           Data.Language
+import           Data.Location
+import           Data.Term
+import           Diffing.Algorithm (Diffable)
+import           Parsing.Parser
+import           Prologue
 import           Rendering.Graph
-import Serializing.Format hiding (JSON)
-import qualified Serializing.Format as Format
-import Rendering.JSON hiding (JSON)
+import           Rendering.JSON hiding (JSON)
 import qualified Rendering.JSON
-import Data.JSON.Fields
+import           Semantic.Task as Task
+import           Semantic.Telemetry as Stat
+import           Serializing.Format hiding (JSON)
+import qualified Serializing.Format as Format
 
 data DiffOutputFormat
   = DiffJSONTree
