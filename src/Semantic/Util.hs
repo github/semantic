@@ -135,7 +135,7 @@ evaluatePythonProjects proxy parser lang path = runTaskWithOptions debugOptions 
   package <- fmap quieterm <$> parsePythonPackage parser project
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
-    pure (id @(Evaluator _ (Hole.Hole (Maybe Name) Precise) (Value _ (Hole.Hole (Maybe Name) Precise)) _ _)
+  pure (id @(Evaluator _ (Hole.Hole (Maybe Name) Precise) (Value _ (Hole.Hole (Maybe Name) Precise)) _ _)
        (runModuleTable
        (runModules (ModuleTable.modulePaths (packageModules package))
        (raiseHandler (runReader (packageInfo package))
