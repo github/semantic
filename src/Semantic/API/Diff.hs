@@ -34,12 +34,16 @@ data DiffOutputFormat
   = DiffJSONTree
   | DiffJSONGraph
   | DiffSExpression
+  | DiffShow
+  | DiffDotGraph
   deriving (Eq, Show)
 
 parseDiffBuilder :: (Traversable t, DiffEffects sig m) => DiffOutputFormat -> t BlobPair -> m Builder
-parseDiffBuilder DiffJSONTree  = distributeFoldMap (jsonDiff renderJSONTree) >=> serialize Format.JSON
-parseDiffBuilder DiffJSONGraph = distributeFoldMap (jsonDiff renderJSONGraph) >=> serialize Format.JSON
+parseDiffBuilder DiffJSONTree    = distributeFoldMap (jsonDiff renderJSONTree) >=> serialize Format.JSON
+parseDiffBuilder DiffJSONGraph   = distributeFoldMap (jsonDiff renderJSONGraph) >=> serialize Format.JSON
 parseDiffBuilder DiffSExpression = distributeFoldMap sexpDiff
+parseDiffBuilder DiffShow        = distributeFoldMap showDiff
+parseDiffBuilder DiffDotGraph    = distributeFoldMap dotGraphDiff
 
 type RenderJSON m syntax = forall syntax . CanDiff syntax => BlobPair -> Diff syntax Location Location -> m (Rendering.JSON.JSON "diffs" SomeJSON)
 
@@ -57,6 +61,13 @@ renderJSONGraph blobPair = pure . renderJSONAdjDiff blobPair . renderTreeGraph
 
 sexpDiff :: (DiffEffects sig m) => BlobPair -> m Builder
 sexpDiff blobPair = doDiff blobPair (const pure) (const (serialize (SExpression ByConstructorName)))
+
+showDiff :: (DiffEffects sig m) => BlobPair -> m Builder
+showDiff blobPair = doDiff blobPair (const pure) (const (serialize Show))
+
+dotGraphDiff :: (DiffEffects sig m) => BlobPair -> m Builder
+dotGraphDiff blobPair = doDiff blobPair (const pure) render
+  where render _ = serialize (DOT (diffStyle "diffs")) . renderTreeGraph
 
 type DiffEffects sig m = (Member (Error SomeException) sig, Member Telemetry sig, Member Distribute sig, Member Task sig, Carrier sig m, MonadIO m)
 
