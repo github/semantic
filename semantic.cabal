@@ -177,7 +177,6 @@ library
                      -- Rendering formats
                      , Rendering.Graph
                      , Rendering.JSON
-                     , Rendering.Renderer
                      , Rendering.TOC
                      , Reprinting.Tokenize
                      , Reprinting.Translate
@@ -196,7 +195,6 @@ library
                      , Semantic.AST
                      , Semantic.CLI
                      , Semantic.Config
-                     , Semantic.Diff
                      , Semantic.Distribute
                      , Semantic.Env
                      , Semantic.Graph
