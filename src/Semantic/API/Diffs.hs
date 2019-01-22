@@ -2,8 +2,12 @@
 module Semantic.API.Diffs
   ( parseDiffBuilder
   , DiffOutputFormat(..)
+
   , doDiff
   , DiffEffects
+
+  , SomeTermPair(..)
+  , withSomeTermPair
   ) where
 
 import           Analysis.ConstructorName (ConstructorName)
@@ -39,7 +43,7 @@ data DiffOutputFormat
   deriving (Eq, Show)
 
 parseDiffBuilder :: (Traversable t, DiffEffects sig m) => DiffOutputFormat -> t BlobPair -> m Builder
-parseDiffBuilder DiffJSONTree    = distributeFoldMap (jsonDiff renderJSONTree) >=> serialize Format.JSON
+parseDiffBuilder DiffJSONTree    = distributeFoldMap (jsonDiff renderJSONTree) >=> serialize Format.JSON -- NB: Serialize happens at the top level for these two JSON formats to collect results of multiple blob pairs.
 parseDiffBuilder DiffJSONGraph   = distributeFoldMap (jsonDiff renderJSONGraph) >=> serialize Format.JSON
 parseDiffBuilder DiffSExpression = distributeFoldMap sexpDiff
 parseDiffBuilder DiffShow        = distributeFoldMap showDiff

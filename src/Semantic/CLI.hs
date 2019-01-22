@@ -1,9 +1,5 @@
 {-# LANGUAGE ApplicativeDo, RankNTypes #-}
-module Semantic.CLI
-( main
--- Testing
-, Diff.runDiff
-) where
+module Semantic.CLI (main) where
 
 import           Control.Exception as Exc (displayException)
 import           Data.File
@@ -17,7 +13,6 @@ import           Prologue
 import           Semantic.API hiding (File)
 import qualified Semantic.AST as AST
 import           Semantic.Config
-import qualified Semantic.Diff as Diff
 import qualified Semantic.Graph as Graph
 import qualified Semantic.Task as Task
 import           Semantic.Task.Files

@@ -6,6 +6,9 @@ module Semantic.API.Terms
   , doParse
   , ParseEffects
   , TermConstraints
+
+  , SomeTerm(..)
+  , withSomeTerm
   ) where
 
 
@@ -42,7 +45,7 @@ data TermOutputFormat
 
 parseTermBuilder :: (Traversable t, Member Distribute sig, ParseEffects sig m, MonadIO m)
   => TermOutputFormat-> t Blob -> m Builder
-parseTermBuilder TermJSONTree    = distributeFoldMap jsonTerm >=> serialize Format.JSON
+parseTermBuilder TermJSONTree    = distributeFoldMap jsonTerm >=> serialize Format.JSON -- NB: Serialize happens at the top level for these two JSON formats to collect results of multiple blobs.
 parseTermBuilder TermJSONGraph   = distributeFoldMap jsonGraph >=> serialize Format.JSON
 parseTermBuilder TermSExpression = distributeFoldMap sexpTerm
 parseTermBuilder TermDotGraph    = distributeFoldMap dotGraphTerm

@@ -15,7 +15,7 @@ import SpecHelpers
 
 spec :: Spec
 spec = parallel $ do
-  describe "runDiff" $
+  describe "parseDiffBuilder" $
     for_ diffFixtures $ \ (diffRenderer, runDiff, files, expected) ->
       it ("renders to " <> diffRenderer <> " with files " <> show files) $ do
         output <- runTask $ readBlobPairs (Right files) >>= runDiff
