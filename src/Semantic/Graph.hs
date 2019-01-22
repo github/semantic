@@ -21,7 +21,8 @@ module Semantic.Graph
 , resumingUnspecialized
 , resumingAddressError
 , resumingValueError
--- , resumingEnvironmentError -- TODO: Fix me. Replace with resumingScopeGraphError?
+, resumingHeapError
+, resumingScopeError
 , resumingTypeError
 ) where
 
