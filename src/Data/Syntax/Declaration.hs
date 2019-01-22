@@ -29,16 +29,19 @@ instance Diffable Function where
 -- TODO: How should we represent function types, where applicable?
 
 instance Evaluatable Function where
-  eval _ _ Function{..} = do
+  eval eval _ Function{..} = do
     name <- maybeM (throwNoNameError functionName) (declaredName functionName)
     span <- ask @Span
     associatedScope <- declareFunction name span ScopeGraph.Function
 
     params <- withScope associatedScope . for functionParameters $ \paramNode -> do
       param <- maybeM (throwNoNameError paramNode) (declaredName paramNode)
+      -- TODO: Come up with an easier way to fetch the child node span instead of evaling it.
+      _ <- eval paramNode
+      paramSpan <- get @Span
       -- TODO: This might be a motivation for a typeclass for `declarationKind` since we
       -- sometimes create declarations for our children.
-      param <$ declare (Declaration param) Default span ScopeGraph.Parameter Nothing
+      param <$ declare (Declaration param) Default paramSpan ScopeGraph.Parameter Nothing
 
     addr <- lookupDeclaration (Declaration name)
     v <- function name params functionBody associatedScope
@@ -48,6 +51,7 @@ declareFunction :: ( Carrier sig m
                    , Member (State (ScopeGraph address)) sig
                    , Member (Allocator address) sig
                    , Member (Reader (CurrentScope address)) sig
+                   , Member (Reader ModuleInfo) sig
                    , Member Fresh sig
                    , Ord address
                    )
