@@ -13,6 +13,7 @@ import           Control.Exception (displayException)
 import           Control.Effect.Trace (runTraceByPrinting)
 import           Data.Abstract.Address.Monovariant as Monovariant
 import           Data.Abstract.Address.Precise as Precise
+import           Data.Abstract.Address.Hole as Hole
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import qualified Data.Abstract.ModuleTable as ModuleTable
@@ -54,6 +55,22 @@ justEvaluating
   . runAddressError
   . runValueError
 
+justEvaluatingCatchingErrors
+  = runM
+  . runEvaluator @_ @_ @(Value _ (Hole.Hole (Maybe Name) Precise))
+  . raiseHandler runTraceByPrinting
+  . runHeap
+  . runScopeGraph
+  . raiseHandler runFresh
+  . resumingLoadError
+  . resumingUnspecialized
+  . resumingScopeError
+  . resumingHeapError
+  . resumingEvalError
+  . resumingResolutionError
+  . resumingAddressError
+  . resumingValueError
+
 checking
   = runM
   . runEvaluator
@@ -90,7 +107,7 @@ callGraphProject parser proxy opts paths = runTaskWithOptions opts $ do
   x <- runCallGraph proxy False modules package
   pure (x, (() <$) <$> modules)
 
-evaluatePythonProject = justEvaluating <=< evaluatePythonProjects (Proxy @'Language.Python) pythonParser Language.Python
+evaluatePythonProject = justEvaluatingCatchingErrors <=< evaluatePythonProjects (Proxy @'Language.Python) pythonParser Language.Python
 
 callGraphRubyProject = callGraphProject rubyParser (Proxy @'Language.Ruby) debugOptions
 
@@ -118,7 +135,7 @@ evaluatePythonProjects proxy parser lang path = runTaskWithOptions debugOptions 
   package <- fmap quieterm <$> parsePythonPackage parser project
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
-  pure (id @(Evaluator _ Precise (Value _ Precise) _ _)
+    pure (id @(Evaluator _ (Hole.Hole (Maybe Name) Precise) (Value _ (Hole.Hole (Maybe Name) Precise)) _ _)
        (runModuleTable
        (runModules (ModuleTable.modulePaths (packageModules package))
        (raiseHandler (runReader (packageInfo package))
