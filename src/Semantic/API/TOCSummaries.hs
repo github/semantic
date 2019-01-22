@@ -7,7 +7,7 @@ import Data.ByteString.Builder
 import Data.Diff
 import Rendering.TOC
 import Semantic.API.Converters
-import Semantic.API.Diff
+import Semantic.API.Diffs
 import Semantic.API.Types
 import Semantic.Task as Task
 import Serializing.Format

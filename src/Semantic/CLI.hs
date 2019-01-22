@@ -14,8 +14,7 @@ import           Data.Handle
 import           Data.Project
 import           Options.Applicative hiding (style)
 import           Prologue
-import           Rendering.Renderer
-import           Semantic.API (parseSymbolsBuilder, parseTermBuilder, TermOutputFormat(..), diffSummaryBuilder)
+import           Semantic.API hiding (File)
 import qualified Semantic.AST as AST
 import           Semantic.Config
 import qualified Semantic.Diff as Diff
@@ -65,12 +64,12 @@ diffCommand :: Mod CommandFields (Task.TaskEff Builder)
 diffCommand = command "diff" (info diffArgumentsParser (progDesc "Compute changes between paths"))
   where
     diffArgumentsParser = do
-      renderer <- flag  (Diff.runDiff SExpressionDiffRenderer) (Diff.runDiff SExpressionDiffRenderer) (long "sexpression" <> help "Output s-expression diff tree (default)")
-              <|> flag'                                        (Diff.runDiff JSONDiffRenderer)        (long "json"        <> help "Output JSON diff trees")
-              <|> flag'                                        (Diff.runDiff JSONGraphDiffRenderer)   (long "json-graph"  <> help "Output JSON diff trees")
-              <|> flag'                                        (diffSummaryBuilder JSON)              (long "toc"         <> help "Output JSON table of contents diff summary")
-              <|> flag'                                        (Diff.runDiff DOTDiffRenderer)         (long "dot"         <> help "Output the diff as a DOT graph")
-              <|> flag'                                        (Diff.runDiff ShowDiffRenderer)        (long "show"        <> help "Output using the Show instance (debug only, format subject to change without notice)")
+      renderer <- flag  (parseDiffBuilder DiffSExpression) (parseDiffBuilder DiffSExpression)   (long "sexpression" <> help "Output s-expression diff tree (default)")
+              <|> flag'                                    (parseDiffBuilder DiffJSONTree)  (long "json"        <> help "Output JSON diff trees")
+              <|> flag'                                    (parseDiffBuilder DiffJSONGraph) (long "json-graph"  <> help "Output JSON diff trees")
+              <|> flag'                                    (diffSummaryBuilder JSON)        (long "toc"         <> help "Output JSON table of contents diff summary")
+              <|> flag'                                    (parseDiffBuilder DiffDotGraph)  (long "dot"         <> help "Output the diff as a DOT graph")
+              <|> flag'                                    (parseDiffBuilder DiffShow)      (long "show"        <> help "Output using the Show instance (debug only, format subject to change without notice)")
       filesOrStdin <- Right <$> some (Both <$> argument filePathReader (metavar "FILE_A") <*> argument filePathReader (metavar "FILE_B")) <|> pure (Left stdin)
       pure $ Task.readBlobPairs filesOrStdin >>= renderer
 

@@ -28,8 +28,6 @@ import Rendering.TOC as R
 
 -- | Specification of renderers for diffs, producing output in the parameter type.
 data DiffRenderer output where
-  -- | Render to JSON with the format documented in docs/json-format.md
-  JSONDiffRenderer :: DiffRenderer (JSON "diffs" SomeJSON)
   -- | Render to JSON as an adjacency list.
   JSONGraphDiffRenderer :: DiffRenderer (JSON "diffs" SomeJSON)
   -- | Render to a 'ByteString' formatted as nested s-expressions with patches indicated.

@@ -187,9 +187,8 @@ library
                      , Semantic.Analysis
                      -- API
                      , Semantic.API
-                     , Semantic.API.Diff
                      , Semantic.API.Converters
-                     , Semantic.API.Parse
+                     , Semantic.API.Diffs
                      , Semantic.API.Symbols
                      , Semantic.API.Terms
                      , Semantic.API.TOCSummaries

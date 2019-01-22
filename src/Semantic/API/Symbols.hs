@@ -12,9 +12,9 @@ import Data.Term
 import Data.Text (pack)
 import Parsing.Parser
 import Semantic.API.Converters
-import Semantic.API.Parse
+import Semantic.API.Terms (ParseEffects, doParse)
 import Semantic.API.Types
-import Semantic.Task as Task
+import Semantic.Task
 import Serializing.Format
 import Tags.Taggable
 import Tags.Tagging
