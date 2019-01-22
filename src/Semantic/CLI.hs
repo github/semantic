@@ -44,10 +44,9 @@ optionsParser :: Parser Options
 optionsParser = do
   logLevel <- options [ ("error", Just Log.Error) , ("warning", Just Log.Warning) , ("info", Just Log.Info) , ("debug", Just Log.Debug) , ("none", Nothing)]
                       (long "log-level" <> value (Just Log.Warning) <> help "Log messages at or above this level, or disable logging entirely.")
-  requestId <- optional (strOption $ long "request-id" <> help "A string to use as the request identifier for any logged messages." <> metavar "id")
   failOnWarning <- switch (long "fail-on-warning" <> help "Fail on assignment warnings.")
   failOnParseError <- switch (long "fail-on-parse-error" <> help "Fail on tree-sitter parse errors.")
-  pure $ Options logLevel requestId failOnWarning failOnParseError
+  pure $ Options logLevel Nothing failOnWarning failOnParseError
 
 argumentsParser :: Parser (Task.TaskEff ())
 argumentsParser = do
