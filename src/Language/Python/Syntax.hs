@@ -195,7 +195,9 @@ instance Evaluatable Import where
           aliasName <- maybeM (throwNoNameError aliasTerm) (declaredAlias aliasTerm)
           _ <- eval aliasTerm
           aliasSpan <- get @Span
-          insertImportReference (Reference aliasName) aliasSpan ScopeGraph.Identifier (Declaration aliasValue) scopeAddress
+          if aliasValue /= aliasName then
+            insertImportReference (Reference aliasName) aliasSpan ScopeGraph.Identifier (Declaration aliasValue) scopeAddress
+          else pure ()
 
       let frameLinks = Map.singleton moduleScope moduleFrame
       frameAddress <- newFrame scopeAddress (Map.singleton ScopeGraph.Import frameLinks)
