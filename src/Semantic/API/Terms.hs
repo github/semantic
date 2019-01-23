@@ -1,6 +1,8 @@
 {-# LANGUAGE ConstraintKinds, GADTs, TypeOperators, DerivingStrategies #-}
 module Semantic.API.Terms
-  ( parseTermBuilder
+  (
+    termGraph
+  , parseTermBuilder
   , TermOutputFormat(..)
 
   , doParse
@@ -21,6 +23,7 @@ import           Data.Abstract.Declarations
 import           Data.Blob
 import           Data.ByteString.Builder
 import           Data.Either
+import           Data.Graph
 import           Data.JSON.Fields
 import           Data.Language
 import           Data.Location
@@ -29,10 +32,21 @@ import           Parsing.Parser
 import           Rendering.Graph
 import           Rendering.JSON hiding (JSON)
 import qualified Rendering.JSON
+import           Semantic.API.Types
 import           Semantic.Task
 import           Serializing.Format hiding (JSON)
 import qualified Serializing.Format as Format
 import           Tags.Taggable
+
+termGraph :: (Traversable t, Member Distribute sig, ParseEffects sig m) => t Blob -> m ParseTreeGraphResponse
+termGraph = distributeFoldMap go
+  where
+    go :: ParseEffects sig m => Blob -> m ParseTreeGraphResponse
+    go blob = doParse blob >>= withSomeTerm (pure . render)
+
+    render t = let graph = renderTreeGraph t
+                   toEdge (Edge (a, b)) = TermEdge (vertexId a) (vertexId b)
+               in ParseTreeGraphResponse (vertexList graph) (fmap toEdge (edgeList graph))
 
 data TermOutputFormat
   = TermJSONTree
@@ -46,7 +60,7 @@ data TermOutputFormat
 parseTermBuilder :: (Traversable t, Member Distribute sig, ParseEffects sig m, MonadIO m)
   => TermOutputFormat-> t Blob -> m Builder
 parseTermBuilder TermJSONTree    = distributeFoldMap jsonTerm >=> serialize Format.JSON -- NB: Serialize happens at the top level for these two JSON formats to collect results of multiple blobs.
-parseTermBuilder TermJSONGraph   = distributeFoldMap jsonGraph >=> serialize Format.JSON
+parseTermBuilder TermJSONGraph   = termGraph >=> serialize Format.JSON -- distributeFoldMap jsonGraph >=> serialize Format.JSON
 parseTermBuilder TermSExpression = distributeFoldMap sexpTerm
 parseTermBuilder TermDotGraph    = distributeFoldMap dotGraphTerm
 parseTermBuilder TermShow        = distributeFoldMap showTerm
