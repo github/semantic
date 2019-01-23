@@ -420,7 +420,7 @@ import' =   makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliase
     -- `import a`
     plainImport = makeTerm <$> symbol DottedName <*> children (Python.Syntax.QualifiedImport . NonEmpty.map T.unpack <$> NonEmpty.some1 identifierSource)
     -- `from a import foo `
-    importSymbol = makeNameAliasPair <$> (token Identifier <|> token Identifier') <*> identifier
+    importSymbol = makeNameAliasPair <$> (symbol Identifier <|> symbol Identifier' <|> symbol DottedName) <*> (mkIdentifier <$> location <*> source)
     -- `from a import foo as bar`
     aliasImportSymbol = makeTerm <$> symbol AliasedImport <*> children (Python.Syntax.Alias <$> identifier <*> identifier)
     -- `from a import *`
@@ -433,6 +433,7 @@ import' =   makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliase
     identifierSource = (symbol Identifier <|> symbol Identifier') *> source
 
     makeNameAliasPair location alias = makeTerm location (Python.Syntax.Alias alias alias)
+    mkIdentifier location source = makeTerm location (Syntax.Identifier (name source))
 
 assertStatement :: Assignment Term
 assertStatement = makeTerm <$> symbol AssertStatement <*> children (Expression.Call [] <$> (makeTerm <$> symbol AnonAssert <*> (Syntax.Identifier . name <$> source)) <*> manyTerm expression <*> emptyTerm)
