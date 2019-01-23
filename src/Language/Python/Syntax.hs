@@ -126,6 +126,8 @@ toTuple :: Alias a -> (a, a)
 toTuple Alias{..} = (aliasValue, aliasName)
 
 instance Evaluatable Alias where
+  eval eval _ Alias{..} = eval aliasValue
+  ref _ ref Alias{..} = ref aliasValue
 
 -- | Import declarations (symbols are added directly to the calling environment).
 --
