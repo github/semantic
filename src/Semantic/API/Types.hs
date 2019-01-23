@@ -1,18 +1,34 @@
 {-# LANGUAGE DerivingVia, DerivingStrategies, DeriveAnyClass, DuplicateRecordFields #-}
 module Semantic.API.Types
   (
-  -- Symbols for jump-to-definition
+  -- Parse APIs
     ParseTreeRequest(..)
+
+  -- Symbols for jump-to-definition
   , ParseTreeSymbolResponse(..)
   , File(..)
   , Symbol(..)
 
-  -- TOC Summaries
+  -- Diff APIs
   , DiffTreeRequest(..)
+
+  -- TOC Summaries
   , DiffTreeTOCResponse(..)
   , TOCSummaryFile(..)
   , TOCSummaryChange(..)
   , TOCSummaryError(..)
+
+  -- Diff tree graphs
+  , DiffTreeGraphResponse(..)
+  , DiffTreeEdge(..)
+  , DiffTreeVertex(..)
+  , DiffTreeTerm(..)
+  , DeletedTerm(..)
+  , InsertedTerm(..)
+  , ReplacedTerm(..)
+  , MergedTerm(..)
+
+  , TermVertex(..)
 
   -- Health Check
   , PingRequest(..)
@@ -29,9 +45,11 @@ module Semantic.API.Types
 import           Data.Aeson
 import           Data.Bifunctor (first)
 import           Data.ByteString.Lazy.Char8 as BC
+import           Data.Graph (VertexTag (..))
 import qualified Data.Text as T
 import           GHC.Generics
 import           Network.HTTP.Media ((//))
+import           Prologue
 import           Proto3.Suite as Proto3
 import           Servant.API
 
@@ -122,6 +140,64 @@ data TOCSummaryError = TOCSummaryError
   deriving stock (Eq, Show, Generic)
   deriving anyclass (Message, Named, ToJSON)
 
+--
+-- Diff Tree Graph API
+--
+
+data DiffTreeGraphResponse
+  = DiffTreeGraphResponse
+  { vertices :: [DiffTreeVertex]
+  , edges    :: [DiffTreeEdge]
+  }
+  deriving stock (Eq, Show, Generic)
+  deriving anyclass (Message, Named, ToJSON)
+  deriving Semigroup via GenericSemigroup DiffTreeGraphResponse
+  deriving Monoid via GenericMonoid DiffTreeGraphResponse
+
+
+data DiffTreeEdge = DiffTreeEdge { source :: Int, target :: Int }
+  deriving stock (Eq, Ord, Show, Generic)
+  deriving anyclass (Message, Named, ToJSON)
+
+data DiffTreeVertex = DiffTreeVertex { diffVertexId :: Int, term :: Maybe DiffTreeTerm }
+  deriving stock (Eq, Ord, Show, Generic)
+  deriving anyclass (Message, Named, ToJSON)
+instance VertexTag DiffTreeVertex where uniqueTag = diffVertexId
+
+data TermVertex = TermVertex
+  { vertexId :: Int
+  , name :: String
+  , span :: Maybe Span
+  }
+  deriving stock (Eq, Ord, Show, Generic)
+  deriving anyclass (Message, Named, ToJSON)
+instance VertexTag TermVertex where uniqueTag = vertexId
+
+-- NB: Current proto generation only supports sum types with single named fields.
+data DiffTreeTerm
+  = Deleted  { deletedTerm   :: Maybe DeletedTerm }
+  | Inserted { insertedTerm  :: Maybe InsertedTerm }
+  | Replaced { replacedTerm  :: Maybe ReplacedTerm }
+  | Merged   { mergedTerm    :: Maybe MergedTerm }
+  deriving stock (Eq, Ord, Show, Generic)
+  deriving anyclass (Message, Named, ToJSON)
+
+data DeletedTerm = DeletedTerm { deletedTermName :: String, beforeSpan :: Maybe Span }
+  deriving stock (Eq, Ord, Show, Generic)
+  deriving anyclass (Message, Named, ToJSON)
+
+data InsertedTerm = InsertedTerm { insertedTermName :: String, afterSpan :: Maybe Span }
+  deriving stock (Eq, Ord, Show, Generic)
+  deriving anyclass (Message, Named, ToJSON)
+
+data ReplacedTerm = ReplacedTerm { beforeTermName :: String, beforeSpan :: Maybe Span, afterTermName :: String, afterSpan :: Maybe Span }
+  deriving stock (Eq, Ord, Show, Generic)
+  deriving anyclass (Message, Named, ToJSON)
+
+data MergedTerm = MergedTerm { mergedTermName :: String, beforeSpan :: Maybe Span, afterSpan :: Maybe Span }
+  deriving stock (Eq, Ord, Show, Generic)
+  deriving anyclass (Message, Named, ToJSON)
+
 
 --
 -- Health Check API
@@ -138,7 +214,7 @@ data PingResponse
   , timestamp :: String
   , sha :: String
   }
-  deriving stock (Eq, Show, Generic)
+  deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (Message, Named, ToJSON)
 
 instance MimeRender PlainText PingResponse where
