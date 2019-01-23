@@ -63,6 +63,7 @@ newtype TypeIdentifier a = TypeIdentifier { contents :: T.Text }
 
 instance Declarations1 TypeIdentifier where
   liftDeclaredName _ (TypeIdentifier identifier) = Just (Evaluatable.name identifier)
+  liftDeclaredAlias _ (TypeIdentifier identifier) = Just (Evaluatable.name identifier)
 
 -- TODO: TypeIdentifier shouldn't evaluate to an address in the heap?
 instance Evaluatable TypeIdentifier where
