@@ -419,9 +419,9 @@ import' =   makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliase
     -- `import a`
     plainImport = makeTerm <$> symbol DottedName <*> children (Python.Syntax.QualifiedImport . NonEmpty.map T.unpack <$> NonEmpty.some1 identifierSource)
     -- `from a import foo `
-    importSymbol = makeNameAliasPair <$> aliasIdentifier <*> pure Nothing
+    importSymbol = makeNameAliasPair <$> identifier
     -- `from a import foo as bar`
-    aliasImportSymbol = symbol AliasedImport *> children (makeNameAliasPair <$> aliasIdentifier <*> (Just <$> aliasIdentifier))
+    aliasImportSymbol = makeTerm <$> symbol AliasedImport <*> children (Python.Syntax.Alias <$> identifier <*> identifier)
     -- `from a import *`
     wildcard = symbol WildcardImport *> (name <$> source) $> []
 
@@ -431,9 +431,7 @@ import' =   makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliase
     importPrefix = symbol ImportPrefix *> source
     identifierSource = (symbol Identifier <|> symbol Identifier') *> source
 
-    aliasIdentifier = (symbol Identifier <|> symbol Identifier') *> (name <$> source) <|> symbol DottedName *> (name <$> source)
-    makeNameAliasPair from (Just alias) = Python.Syntax.Alias from alias
-    makeNameAliasPair from Nothing = Python.Syntax.Alias from from
+    makeNameAliasPair alias = Python.Syntax.Alias alias alias
 
 assertStatement :: Assignment Term
 assertStatement = makeTerm <$> symbol AssertStatement <*> children (Expression.Call [] <$> (makeTerm <$> symbol AnonAssert <*> (Syntax.Identifier . name <$> source)) <*> manyTerm expression <*> emptyTerm)

@@ -115,25 +115,30 @@ resolvePythonModules q = do
       modulePath <- resolve searchPaths
       maybeM (throwResolutionError $ NotFoundError path searchPaths Language.Python) modulePath
 
+data Alias a = Alias { aliasValue :: a, aliasName :: a}
+  deriving (Generic1, Diffable, Eq, Foldable, FreeVariables1, Functor, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
+  deriving (Eq1, Show1, Ord1) via Generically Alias
+
+instance Declarations1 Alias where
+  liftDeclaredName declaredName = declaredName . aliasValue
+  liftDeclaredAlias declaredAlias = declaredAlias . aliasName
+
+toTuple :: Alias a -> (a, a)
+toTuple Alias{..} = (aliasValue, aliasName)
+
 
 -- | Import declarations (symbols are added directly to the calling environment).
 --
 -- If the list of symbols is empty copy everything to the calling environment.
-data Import a = Import { importFrom :: QualifiedName, importSymbols :: ![Alias] }
+data Import a = Import { importFrom :: QualifiedName, importSymbols :: ![a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Import
 
-newtype FutureImport a = FutureImport { futureImportSymbols :: [Alias] }
+newtype FutureImport a = FutureImport { futureImportSymbols :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically FutureImport
 
 instance Evaluatable FutureImport where
-
-data Alias = Alias { aliasValue :: Name, aliasName :: Name }
-  deriving (Eq, Generic, Hashable, Ord, Show, Message, Named, ToJSON, NFData)
-
-toTuple :: Alias -> (Name, Name)
-toTuple Alias{..} = (aliasValue, aliasName)
 
 
 -- from a import b
@@ -141,8 +146,9 @@ instance Evaluatable Import where
   -- from . import moduleY            -- aliasValue = moduleY, aliasName = moduleY
   -- from . import moduleY as moduleZ -- aliasValue = moduleY, aliasName = moduleZ
   -- This is a bit of a special case in the syntax as this actually behaves like a qualified relative import.
-  eval _ _ (Import (RelativeQualifiedName n Nothing) [Alias{..}]) = do
-    path <- NonEmpty.last <$> resolvePythonModules (RelativeQualifiedName n (Just (qualifiedName (formatName aliasValue :| []))))
+  eval _ _ (Import (RelativeQualifiedName n Nothing) [aliasTerm]) = do
+    aliasValue' <- maybeM (throwNoNameError aliasTerm) (declaredName aliasTerm)
+    path <- NonEmpty.last <$> resolvePythonModules (RelativeQualifiedName n (Just (qualifiedName (formatName aliasValue' :| []))))
     ((moduleScope, moduleFrame), _) <- require path
 
     span <- ask @Span
@@ -154,6 +160,7 @@ instance Evaluatable Import where
     aliasFrame <- newFrame importScope (Map.singleton ScopeGraph.Import scopeMap)
 
     -- Add declaration of the alias name to the current scope (within our current module).
+    aliasName <- maybeM (throwNoNameError aliasTerm) (declaredAlias aliasTerm)
     declare (Declaration aliasName) Default span ScopeGraph.UnqualifiedImport (Just importScope)
     -- Retrieve the frame slot for the new declaration.
     aliasSlot <- lookupDeclaration (Declaration aliasName)
@@ -165,7 +172,7 @@ instance Evaluatable Import where
   -- from a import b as c
   -- from a import *
   -- from .moduleY import b
-  eval _ _ (Import name xs) = do
+  eval eval _ (Import name xs) = do
     modulePaths <- resolvePythonModules name
 
     -- Eval parent modules first
@@ -181,8 +188,12 @@ instance Evaluatable Import where
       let scopeEdges = Map.singleton ScopeGraph.Import [ moduleScope ]
       scopeAddress <- newScope scopeEdges
       withScope moduleScope .
-        for_ xs $ \Alias{..} ->
-          insertImportReference (Reference aliasName) emptySpan ScopeGraph.Identifier (Declaration aliasValue) scopeAddress
+        for_ xs $ \aliasTerm -> do
+          aliasValue <- maybeM (throwNoNameError aliasTerm) (declaredName aliasTerm)
+          aliasName <- maybeM (throwNoNameError aliasTerm) (declaredAlias aliasTerm)
+          _ <- eval aliasTerm
+          aliasSpan <- get @Span
+          insertImportReference (Reference aliasName) aliasSpan ScopeGraph.Identifier (Declaration aliasValue) scopeAddress
 
       let frameLinks = Map.singleton moduleScope moduleFrame
       frameAddress <- newFrame scopeAddress (Map.singleton ScopeGraph.Import frameLinks)

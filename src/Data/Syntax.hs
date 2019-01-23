@@ -182,6 +182,7 @@ instance FreeVariables1 Identifier where
 
 instance Declarations1 Identifier where
   liftDeclaredName _ (Identifier x) = pure x
+  liftDeclaredAlias _ (Identifier x) = pure x
 
 -- | An accessibility modifier, e.g. private, public, protected, etc.
 newtype AccessibilityModifier a = AccessibilityModifier { contents :: Text }
