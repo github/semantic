@@ -1,4 +1,3 @@
-{-# Language GADTs #-}
 module Analysis.TypeScript.Spec (spec) where
 
 import qualified Data.Abstract.ScopeGraph as ScopeGraph (AccessControl(..))
