@@ -237,6 +237,7 @@ instance Evaluatable QualifiedImport where
       go ((name, modulePath) : namesAndPaths) = do
         span <- ask @Span
         scopeAddress <- newScope mempty
+        -- FIXME: Change QualifiedImport to take terms and iterate through their spans
         declare (Declaration name) Default span ScopeGraph.QualifiedImport (Just scopeAddress)
         aliasSlot <- lookupDeclaration (Declaration name)
         -- a.b.c
