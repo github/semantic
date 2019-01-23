@@ -13,6 +13,8 @@ service CodeAnalysis {
   rpc Ping (PingRequest) returns (PingResponse);
   // Calculate c-tags like symbols for blobs.
   rpc ParseTreeSymbols (ParseTreeRequest) returns (ParseTreeSymbolResponse);
+  // Parse trees in adjacency graph representation.
+  rpc ParseTreeGraph (ParseTreeRequest) returns (ParseTreeGraphResponse);
   // Calculate table of contents style diff summaries.
   rpc DiffTreeTOC (DiffTreeRequest) returns (DiffTreeTOCResponse);
   // Tree diffs in adjacency graph representation.
@@ -36,6 +38,22 @@ message ParseTreeRequest {
 
 message ParseTreeSymbolResponse {
   repeated File files = 1;
+}
+
+message ParseTreeGraphResponse {
+  repeated TermVertex vertices = 1;
+  repeated TermEdge edges = 2;
+}
+
+message TermEdge {
+  int64 source = 1;
+  int64 target = 2;
+}
+
+message TermVertex {
+  int64 vertexId = 1;
+  string name = 2;
+  Span span = 3;
 }
 
 message DiffTreeRequest {

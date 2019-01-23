@@ -28,7 +28,10 @@ module Semantic.API.Types
   , ReplacedTerm(..)
   , MergedTerm(..)
 
+  -- Parse tree graphs
+  , ParseTreeGraphResponse(..)
   , TermVertex(..)
+  , TermEdge(..)
 
   -- Health Check
   , PingRequest(..)
@@ -57,13 +60,16 @@ import           Servant.API
 import Data.Blob
 
 --
--- Symbols API
+-- Parse/Term APIs
 --
 
 newtype ParseTreeRequest = ParseTreeRequest { blobs :: [Blob] }
   deriving stock (Eq, Show, Generic)
   deriving anyclass (Message, Named, FromJSON)
 
+--
+-- Symbols API
+--
 newtype ParseTreeSymbolResponse = ParseTreeSymbolResponse { files :: [File] }
   deriving stock (Eq, Show, Generic)
   deriving anyclass (Message, Named, ToJSON)
@@ -102,15 +108,35 @@ instance ToJSON Symbol where
              , "span"   .= symbolSpan
              ]
 
+--
+-- Term Graph API
+--
+data ParseTreeGraphResponse = ParseTreeGraphResponse { vertices :: [TermVertex], edges :: [TermEdge] }
+  deriving stock (Eq, Show, Generic)
+  deriving anyclass (Message, Named, ToJSON)
+  deriving Semigroup via GenericSemigroup ParseTreeGraphResponse
+  deriving Monoid via GenericMonoid ParseTreeGraphResponse
+
+data TermEdge = TermEdge { source :: Int, target :: Int }
+  deriving stock (Eq, Ord, Show, Generic)
+  deriving anyclass (Message, Named, ToJSON)
+
+data TermVertex = TermVertex { vertexId :: Int, name :: String, span :: Maybe Span }
+  deriving stock (Eq, Ord, Show, Generic)
+  deriving anyclass (Message, Named, ToJSON)
+instance VertexTag TermVertex where uniqueTag = vertexId
 
 --
--- TOC Summaries API
+-- Diff APIs
 --
 
 newtype DiffTreeRequest = DiffTreeRequest { blobs :: [BlobPair] }
   deriving stock (Eq, Show, Generic)
   deriving anyclass (Message, Named, FromJSON)
 
+--
+-- TOC Summaries API
+--
 newtype DiffTreeTOCResponse = DiffTreeTOCResponse { files :: [TOCSummaryFile] }
   deriving stock (Eq, Show, Generic)
   deriving anyclass (Message, Named, ToJSON)
@@ -144,16 +170,11 @@ data TOCSummaryError = TOCSummaryError
 -- Diff Tree Graph API
 --
 
-data DiffTreeGraphResponse
-  = DiffTreeGraphResponse
-  { vertices :: [DiffTreeVertex]
-  , edges    :: [DiffTreeEdge]
-  }
+data DiffTreeGraphResponse = DiffTreeGraphResponse { vertices :: [DiffTreeVertex], edges :: [DiffTreeEdge] }
   deriving stock (Eq, Show, Generic)
   deriving anyclass (Message, Named, ToJSON)
   deriving Semigroup via GenericSemigroup DiffTreeGraphResponse
   deriving Monoid via GenericMonoid DiffTreeGraphResponse
-
 
 data DiffTreeEdge = DiffTreeEdge { source :: Int, target :: Int }
   deriving stock (Eq, Ord, Show, Generic)
@@ -163,15 +184,6 @@ data DiffTreeVertex = DiffTreeVertex { diffVertexId :: Int, term :: Maybe DiffTr
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (Message, Named, ToJSON)
 instance VertexTag DiffTreeVertex where uniqueTag = diffVertexId
-
-data TermVertex = TermVertex
-  { vertexId :: Int
-  , name :: String
-  , span :: Maybe Span
-  }
-  deriving stock (Eq, Ord, Show, Generic)
-  deriving anyclass (Message, Named, ToJSON)
-instance VertexTag TermVertex where uniqueTag = vertexId
 
 -- NB: Current proto generation only supports sum types with single named fields.
 data DiffTreeTerm

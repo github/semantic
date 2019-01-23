@@ -83,8 +83,6 @@ library
                      , Data.Functor.Classes.Generic
                      , Data.Graph
                      , Data.Graph.ControlFlowVertex
-                     , Data.Graph.TermVertex
-                     , Data.Graph.DiffVertex
                      , Data.Handle
                      , Data.History
                      , Data.ImportPath
