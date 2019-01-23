@@ -165,12 +165,12 @@ spec config = parallel $ do
         Right (Just (Module _ (_, value))) -> value `shouldBe` (Concrete.Float (Number.Decimal 9.0))
         other                              -> expectationFailure (show other)
 
-    it "member access of private public field definition throws AccessControlError" $ do
+    it "member access of private field definition throws AccessControlError" $ do
       (_, (_, res)) <- evaluate ["access_control/adder.ts", "access_control/private_field_definition.ts"]
       let expected = Left (SomeError (inject @(BaseError (EvalError (Quieterm (Sum TypeScript.Syntax) Location) Precise (Concrete.Value (Quieterm (Sum TypeScript.Syntax) Location) Precise))) (BaseError (ModuleInfo "private_field_definition.ts") (Span (Pos 4 1) (Pos 4 6)) (AccessControlError ("foo", ScopeGraph.Public) ("y", ScopeGraph.Private) (Concrete.Float (Decimal 2.0))))))
       res `shouldBe` expected
 
-    it "member access of private static public field definition throws AccessControlError" $ do
+    it "member access of private static field definition throws AccessControlError" $ do
       (_, (_, res)) <- evaluate ["access_control/adder.ts", "access_control/private_static_field_definition.ts"]
       let expected = Left (SomeError (inject @(BaseError (EvalError (Quieterm (Sum TypeScript.Syntax) Location) Precise (Concrete.Value (Quieterm (Sum TypeScript.Syntax) Location) Precise))) (BaseError (ModuleInfo "private_static_field_definition.ts") (Span (Pos 3 1) (Pos 3 8)) (AccessControlError ("Adder", ScopeGraph.Public) ("z", ScopeGraph.Private) Unit))))
       res `shouldBe` expected
