@@ -16,7 +16,6 @@ import qualified Data.Language as Language
 import qualified Data.List as List
 import qualified Data.List.NonEmpty as NonEmpty
 import qualified Data.Map.Strict as Map
-import           Data.Span
 import qualified Data.Text as T
 import           Diffing.Algorithm
 import           GHC.Generics
@@ -126,6 +125,7 @@ instance Declarations1 Alias where
 toTuple :: Alias a -> (a, a)
 toTuple Alias{..} = (aliasValue, aliasName)
 
+instance Evaluatable Alias where
 
 -- | Import declarations (symbols are added directly to the calling environment).
 --

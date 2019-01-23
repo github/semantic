@@ -116,6 +116,7 @@ type Syntax =
    , Syntax.Error
    , Syntax.Identifier
    , Type.Annotation
+   , Python.Syntax.Alias
    , []
    ]
 
@@ -419,7 +420,7 @@ import' =   makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliase
     -- `import a`
     plainImport = makeTerm <$> symbol DottedName <*> children (Python.Syntax.QualifiedImport . NonEmpty.map T.unpack <$> NonEmpty.some1 identifierSource)
     -- `from a import foo `
-    importSymbol = makeNameAliasPair <$> identifier
+    importSymbol = makeNameAliasPair <$> (token Identifier <|> token Identifier') <*> identifier
     -- `from a import foo as bar`
     aliasImportSymbol = makeTerm <$> symbol AliasedImport <*> children (Python.Syntax.Alias <$> identifier <*> identifier)
     -- `from a import *`
@@ -431,7 +432,7 @@ import' =   makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliase
     importPrefix = symbol ImportPrefix *> source
     identifierSource = (symbol Identifier <|> symbol Identifier') *> source
 
-    makeNameAliasPair alias = Python.Syntax.Alias alias alias
+    makeNameAliasPair location alias = makeTerm location (Python.Syntax.Alias alias alias)
 
 assertStatement :: Assignment Term
 assertStatement = makeTerm <$> symbol AssertStatement <*> children (Expression.Call [] <$> (makeTerm <$> symbol AnonAssert <*> (Syntax.Identifier . name <$> source)) <*> manyTerm expression <*> emptyTerm)
