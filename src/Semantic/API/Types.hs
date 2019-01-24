@@ -32,6 +32,7 @@ module Semantic.API.Types
   , ParseTreeGraphResponse(..)
   , TermVertex(..)
   , TermEdge(..)
+  , TermError(..)
 
   -- Health Check
   , PingRequest(..)
@@ -111,7 +112,12 @@ instance ToJSON Symbol where
 --
 -- Term Graph API
 --
-data ParseTreeGraphResponse = ParseTreeGraphResponse { vertices :: [TermVertex], edges :: [TermEdge] }
+data ParseTreeGraphResponse
+  = ParseTreeGraphResponse
+  { vertices :: [TermVertex]
+  , edges :: [TermEdge]
+  , errors :: [TermError]
+  }
   deriving stock (Eq, Show, Generic)
   deriving anyclass (Message, Named, ToJSON)
   deriving Semigroup via GenericSemigroup ParseTreeGraphResponse
@@ -125,6 +131,10 @@ data TermVertex = TermVertex { vertexId :: Int, name :: String, span :: Maybe Sp
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (Message, Named, ToJSON)
 instance VertexTag TermVertex where uniqueTag = vertexId
+
+data TermError = TermError { path :: String, error :: String }
+  deriving stock (Eq, Ord, Show, Generic)
+  deriving anyclass (Message, Named, ToJSON)
 
 --
 -- Diff APIs
