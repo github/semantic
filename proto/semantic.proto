@@ -43,6 +43,7 @@ message ParseTreeSymbolResponse {
 message ParseTreeGraphResponse {
   repeated TermVertex vertices = 1;
   repeated TermEdge edges = 2;
+  repeated TermError errors = 3;
 }
 
 message TermEdge {
@@ -54,6 +55,11 @@ message TermVertex {
   int64 vertexId = 1;
   string name = 2;
   Span span = 3;
+}
+
+message TermError {
+  string path = 1;
+  string error = 2;
 }
 
 message DiffTreeRequest {

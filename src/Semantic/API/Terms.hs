@@ -42,11 +42,13 @@ termGraph :: (Traversable t, Member Distribute sig, ParseEffects sig m) => t Blo
 termGraph = distributeFoldMap go
   where
     go :: ParseEffects sig m => Blob -> m ParseTreeGraphResponse
-    go blob = doParse blob >>= withSomeTerm (pure . render)
+    go blob = (doParse blob >>= withSomeTerm (pure . render))
+      `catchError` \(SomeException e) ->
+        pure (ParseTreeGraphResponse mempty mempty [TermError (blobPath blob) (show e)])
 
     render t = let graph = renderTreeGraph t
                    toEdge (Edge (a, b)) = TermEdge (vertexId a) (vertexId b)
-               in ParseTreeGraphResponse (vertexList graph) (fmap toEdge (edgeList graph))
+               in ParseTreeGraphResponse (vertexList graph) (fmap toEdge (edgeList graph)) mempty
 
 data TermOutputFormat
   = TermJSONTree
