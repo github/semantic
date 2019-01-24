@@ -8,15 +8,9 @@ module Semantic.API.LegacyTypes
   ) where
 
 import           Data.Aeson
-import           Data.Bifunctor (first)
-import           Data.ByteString.Lazy.Char8 as BC
-import           Data.Graph (VertexTag (..))
 import qualified Data.Text as T
 import           GHC.Generics
-import           Network.HTTP.Media ((//))
-import           Prologue
 import           Proto3.Suite as Proto3
-import           Servant.API
 
 --
 -- Legacy Symbols API

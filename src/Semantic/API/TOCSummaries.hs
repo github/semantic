@@ -42,6 +42,6 @@ diffSummary blobs = DiffTreeTOCResponse <$> distributeFor blobs go
 
         go :: TOCSummary -> TOCSummaryFile -> TOCSummaryFile
         go TOCSummary{..} TOCSummaryFile{..}
-          = TOCSummaryFile path language (TOCSummaryChange summaryCategoryName summaryTermName (spanToSpan summarySpan) summaryChangeType : changes) errors
+          = TOCSummaryFile path language (TOCSummaryChange summaryCategoryName summaryTermName (spanToSpan summarySpan) (toChangeType summaryChangeType) : changes) errors
         go ErrorSummary{..} TOCSummaryFile{..}
           = TOCSummaryFile path language changes (TOCSummaryError errorText (spanToSpan errorSpan) : errors)
