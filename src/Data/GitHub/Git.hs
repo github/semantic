@@ -4,6 +4,7 @@ module Data.GitHub.Git
   ( OID (..)
   , Ref (..)
   , SHA (..)
+  , nullSHA
   ) where
 
 import Prologue
@@ -21,3 +22,6 @@ newtype Ref = Ref Text
 newtype SHA = SHA Text
   deriving stock (Eq, Show, Ord)
   deriving newtype (MessageField, Primitive)
+
+nullSHA :: SHA
+nullSHA = SHA mempty
