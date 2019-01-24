@@ -84,7 +84,7 @@ library
                      , Data.GitHub.Auth
                      , Data.GitHub.Envelope
                      , Data.GitHub.Event.RepositoryPush
-                     , Data.GitHub.Git
+                     , Data.Git
                      , Data.GitHub.IPVersion
                      , Proto3.Google.Timestamp
                      , Data.GitHub.Request.Context
