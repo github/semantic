@@ -38,7 +38,7 @@ module Semantic.API.Types
   , PingRequest(..)
   , PingResponse(..)
 
-  -- Types
+  -- Common Types
   , Span(..)
   , Position(..)
 
@@ -81,15 +81,7 @@ data File = File
   , fileSymbols :: [Symbol]
   }
   deriving stock (Generic, Eq, Show)
-  deriving anyclass (Named, Message)
-
--- TODO: Can remove custom ToJSON once clients migrate to twirp/proto.
-instance ToJSON File where
-  toJSON File{..}
-    = object [ "path"     .= filePath
-             , "language" .= fileLanguage
-             , "symbols"  .= fileSymbols
-             ]
+  deriving anyclass (Named, Message, ToJSON)
 
 data Symbol = Symbol
   { symbolName :: T.Text
@@ -98,16 +90,7 @@ data Symbol = Symbol
   , symbolSpan :: Maybe Span
   }
   deriving stock (Generic, Eq, Show)
-  deriving anyclass (Named, Message)
-
--- TODO: Can remove custom ToJSON once clients migrate to twirp/proto.
-instance ToJSON Symbol where
-  toJSON Symbol{..}
-    = object [ "symbol" .= symbolName
-             , "kind"   .= symbolKind
-             , "line"   .= symbolLine
-             , "span"   .= symbolSpan
-             ]
+  deriving anyclass (Named, Message, ToJSON)
 
 --
 -- Term Graph API
@@ -248,58 +231,12 @@ instance MimeRender PlainText PingResponse where
 -- Common Types
 --
 
--- TODO: Custom Types for Blob, Source, etc.
-
--- data Language
---     = Unknown
---     | Go
---     | Haskell
---     | Java
---     | JavaScript
---     | JSON
---     | JSX
---     | Markdown
---     | Python
---     | Ruby
---     | TypeScript
---     | PHP
---   deriving stock (Eq, Ord, Show, Generic)
---   deriving anyclass (Named, Enum, MessageField, ToJSON)
---
--- -- This ensures that the protobuf file is generated with ALL_CAPS_NAMES.
--- instance Finite Language where
---   enumerate _ = fmap go [Unknown ..] where
---     go x = (fromString (fmap toUpper (show x)), fromEnum x)
---
--- instance FromJSON Language where
---   parseJSON = withText "Language" $ \l -> pure $ case T.toLower l of
---     "go"         -> Go
---     "haskell"    -> Haskell
---     "java"       -> Java
---     "javascript" -> JavaScript
---     "json"       -> JSON
---     "jsx"        -> JSX
---     "markdown"   -> Markdown
---     "python"     -> Python
---     "ruby"       -> Ruby
---     "typescript" -> TypeScript
---     "php"        -> PHP
---     _            -> Unknown
-
-
 data Position = Position
   { line :: Int
   , column :: Int
   }
   deriving stock (Eq, Ord, Show, Generic)
-  deriving anyclass (Message, Named)
-
--- TODO: Can remove custom ToJSON once clients migrate to twirp/proto.
-instance ToJSON Position where toJSON Position{..} = toJSON [line, column]
-instance FromJSON Position where
-  parseJSON arr = do
-    [line, col] <- parseJSON arr
-    pure $ Position line col
+  deriving anyclass (Message, Named, ToJSON)
 
 data Span = Span
   { start :: Maybe Position
