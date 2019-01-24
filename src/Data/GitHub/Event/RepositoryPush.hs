@@ -12,7 +12,7 @@ import Proto3.Suite
 import qualified Data.Git as Git
 import Data.GitHub.Request.Context
 import Data.GitHub.User
-import Data.GitHub.Repository
+import Proto3.GitHub.Repository
 
 data ChangedFile = ChangedFile
   { filePreviousOID  :: Git.OID

@@ -1,6 +1,6 @@
 {-# LANGUAGE DerivingStrategies, GeneralizedNewtypeDeriving #-}
 
-module Data.GitHub.Git
+module Data.Git
   ( OID (..)
   , Ref (..)
   , SHA (..)
