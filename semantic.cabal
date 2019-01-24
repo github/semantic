@@ -87,7 +87,6 @@ library
                      , Data.GitHub.IPVersion
                      , Proto3.Google.Timestamp
                      , Data.GitHub.Spamurai
-                     , Data.GitHub.User
                      , Data.Graph
                      , Data.Graph.ControlFlowVertex
                      , Data.Graph.TermVertex
