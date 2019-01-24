@@ -9,7 +9,7 @@ import Proto3.Suite
 import Proto3.Suite.Exts
 
 import Data.GitHub.Envelope
-import Data.GitHub.Event.RepositoryPush
+import Proto3.GitHub.Event.RepositoryPush
 import Data.GitHub.User
 
 sampleEnvelope :: ByteString

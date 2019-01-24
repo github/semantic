@@ -83,12 +83,9 @@ library
                      , Data.Functor.Classes.Generic
                      , Data.GitHub.Auth
                      , Data.GitHub.Envelope
-                     , Data.GitHub.Event.RepositoryPush
                      , Data.Git
                      , Data.GitHub.IPVersion
                      , Proto3.Google.Timestamp
-                     , Data.GitHub.Request.Context
-                     , Data.GitHub.Request.Method
                      , Data.GitHub.Spamurai
                      , Data.GitHub.User
                      , Data.Graph
