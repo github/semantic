@@ -25,3 +25,4 @@ newtype SHA = SHA Text
 
 nullSHA :: SHA
 nullSHA = SHA mempty
+  

@@ -6,7 +6,6 @@ module Data.GitHub.Spec
 import SpecHelpers
 
 import Proto3.Suite
-import Proto3.Suite.Exts
 
 import Proto3.GitHub.Envelope
 import Proto3.GitHub.Event.RepositoryPush

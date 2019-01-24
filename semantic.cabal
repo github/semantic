@@ -180,7 +180,6 @@ library
                      , Parsing.TreeSitter
                      , Paths_semantic
                      , Proto3.Google.Wrapped
-                     , Proto3.Suite.Exts
                      -- Rendering formats
                      , Rendering.Graph
                      , Rendering.JSON
