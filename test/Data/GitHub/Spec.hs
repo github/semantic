@@ -8,7 +8,7 @@ import SpecHelpers
 import Proto3.Suite
 import Proto3.Suite.Exts
 
-import Data.GitHub.Envelope
+import Proto3.GitHub.Envelope
 import Proto3.GitHub.Event.RepositoryPush
 import Proto3.GitHub.User
 

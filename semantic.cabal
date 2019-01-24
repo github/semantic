@@ -82,7 +82,6 @@ library
                      , Data.Functor.Both
                      , Data.Functor.Classes.Generic
                      , Data.GitHub.Auth
-                     , Data.GitHub.Envelope
                      , Data.Git
                      , Data.GitHub.IPVersion
                      , Proto3.Google.Timestamp
