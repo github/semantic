@@ -186,6 +186,7 @@ library
                      , Semantic.API
                      , Semantic.API.Converters
                      , Semantic.API.Diffs
+                     , Semantic.API.LegacyTypes
                      , Semantic.API.Symbols
                      , Semantic.API.Terms
                      , Semantic.API.TOCSummaries
