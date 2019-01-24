@@ -9,7 +9,7 @@ import Prologue
 
 import Proto3.Suite
 
-import qualified Data.GitHub.Git as Git
+import qualified Data.Git as Git
 import Data.GitHub.Request.Context
 import Data.GitHub.User
 import Data.GitHub.Repository
