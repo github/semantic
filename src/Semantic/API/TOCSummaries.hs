@@ -38,10 +38,10 @@ diffSummary blobs = DiffTreeTOCResponse <$> distributeFor blobs go
     render blobPair diff = pure $ foldr go (TOCSummaryFile path lang mempty mempty) (diffTOC diff)
       where
         path = T.pack $ pathKeyForBlobPair blobPair
-        lang = T.pack . show $ languageForBlobPair blobPair
+        lang = languageForBlobPair blobPair
 
         go :: TOCSummary -> TOCSummaryFile -> TOCSummaryFile
         go TOCSummary{..} TOCSummaryFile{..}
-          = TOCSummaryFile filePath fileLanguage (TOCSummaryChange summaryCategoryName summaryTermName (spanToSpan summarySpan) summaryChangeType : fileChanges) fileErrors
+          = TOCSummaryFile path language (TOCSummaryChange summaryCategoryName summaryTermName (spanToSpan summarySpan) summaryChangeType : changes) errors
         go ErrorSummary{..} TOCSummaryFile{..}
-          = TOCSummaryFile filePath fileLanguage fileChanges (TOCSummaryError errorText (spanToSpan errorSpan) : fileErrors)
+          = TOCSummaryFile path language changes (TOCSummaryError errorText (spanToSpan errorSpan) : errors)

@@ -59,6 +59,26 @@ import           Servant.API
 
 -- TODO: Remove dependence on these:
 import Data.Blob
+import Data.Language
+
+-- These types represent the public API of semantic and are used to generate
+-- `proto/semantic.proto`.
+--
+-- Some guidelines:
+--
+--   * Don't write Message, Named, ToJSON, or FromJSON instances by hand, derive
+--     them.
+--
+--   * For non-primative types, you'll always want to use Maybe as protobuf
+--     fields are always optional.
+--
+--   * It's usually best to map internal types to these API types so that the
+--     API contract can be changed intentionally. This also makes it so that core
+--     functionality doesn't have to deal with all the Maybes.
+--
+--   * Keep field names short and meaningful for external consumers. It's better
+--     to skirt Haskell naming conventions in favor of consistency in our proto
+--     files.
 
 --
 -- Parse/Term APIs
@@ -75,19 +95,21 @@ newtype ParseTreeSymbolResponse = ParseTreeSymbolResponse { files :: [File] }
   deriving stock (Eq, Show, Generic)
   deriving anyclass (Message, Named, ToJSON)
 
-data File = File
-  { filePath :: T.Text
-  , fileLanguage :: T.Text
-  , fileSymbols :: [Symbol]
+data File
+  = File
+  { path :: T.Text
+  , language :: Language
+  , symbols :: [Symbol]
   }
   deriving stock (Generic, Eq, Show)
   deriving anyclass (Named, Message, ToJSON)
 
-data Symbol = Symbol
-  { symbolName :: T.Text
-  , symbolKind :: T.Text
-  , symbolLine :: T.Text
-  , symbolSpan :: Maybe Span
+data Symbol
+  = Symbol
+  { symbol :: T.Text
+  , kind :: T.Text
+  , line :: T.Text
+  , span :: Maybe Span
   }
   deriving stock (Generic, Eq, Show)
   deriving anyclass (Named, Message, ToJSON)
@@ -135,10 +157,10 @@ newtype DiffTreeTOCResponse = DiffTreeTOCResponse { files :: [TOCSummaryFile] }
   deriving anyclass (Message, Named, ToJSON)
 
 data TOCSummaryFile = TOCSummaryFile
-  { filePath :: T.Text
-  , fileLanguage :: T.Text
-  , fileChanges :: [TOCSummaryChange]
-  , fileErrors  :: [TOCSummaryError]
+  { path :: T.Text
+  , language :: Language
+  , changes :: [TOCSummaryChange]
+  , errors  :: [TOCSummaryError]
   }
   deriving stock (Eq, Show, Generic)
   deriving anyclass (Message, Named, ToJSON)
@@ -147,7 +169,7 @@ data TOCSummaryChange = TOCSummaryChange
   { category :: T.Text
   , term :: T.Text
   , span :: Maybe Span
-  , changeType :: T.Text -- TODO: could be enum
+  , change_type :: T.Text -- TODO: could be enum
   }
   deriving stock (Eq, Show, Generic)
   deriving anyclass (Message, Named, ToJSON)
@@ -163,7 +185,8 @@ data TOCSummaryError = TOCSummaryError
 -- Diff Tree Graph API
 --
 
-data DiffTreeGraphResponse = DiffTreeGraphResponse { vertices :: [DiffTreeVertex], edges :: [DiffTreeEdge] }
+data DiffTreeGraphResponse
+  = DiffTreeGraphResponse { vertices :: [DiffTreeVertex], edges :: [DiffTreeEdge] }
   deriving stock (Eq, Show, Generic)
   deriving anyclass (Message, Named, ToJSON)
   deriving Semigroup via GenericSemigroup DiffTreeGraphResponse

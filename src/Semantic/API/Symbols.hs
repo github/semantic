@@ -57,19 +57,19 @@ parseSymbols blobs = ParseTreeSymbolResponse <$> distributeFoldMap go blobs
   where
     go :: (Member (Error SomeException) sig, Member Task sig, Carrier sig m, Monad m) => Blob -> m [File]
     go blob@Blob{..} = (doParse blob >>= withSomeTerm (renderToSymbols blob)) `catchError` (\(SomeException _) -> pure (pure emptyFile))
-      where emptyFile = File (pack blobPath) (pack (show blobLanguage)) []
+      where emptyFile = File (pack blobPath) blobLanguage []
 
     renderToSymbols :: (IsTaggable f, Applicative m) => Blob -> Term f Location -> m [File]
     renderToSymbols blob term = pure $ either mempty (pure . tagsToFile blob) (runTagging blob term)
 
     tagsToFile :: Blob -> [Tag] -> File
-    tagsToFile Blob{..} tags = File (pack blobPath) (pack (show blobLanguage)) (fmap tagToSymbol tags)
+    tagsToFile Blob{..} tags = File (pack blobPath) blobLanguage (fmap tagToSymbol tags)
 
     tagToSymbol :: Tag -> Symbol
     tagToSymbol Tag{..}
       = Symbol
-      { symbolName = name
-      , symbolKind = kind
-      , symbolLine = fromMaybe mempty line
-      , symbolSpan = spanToSpan span
+      { symbol = name
+      , kind = kind
+      , line = fromMaybe mempty line
+      , span = spanToSpan span
       }
