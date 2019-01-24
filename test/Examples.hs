@@ -1,7 +1,9 @@
+{-# LANGUAGE TypeApplications #-}
 module Main (main) where
 
 import           Control.Exception (displayException)
 import           Control.Monad
+import           Control.Monad.IO.Class
 import           Control.Effect
 import qualified Data.ByteString as B
 import           Data.ByteString.Builder
@@ -15,10 +17,8 @@ import           Data.Quieterm
 import           Data.Typeable (cast)
 import           Data.Void
 import           Parsing.Parser
-import           Rendering.Renderer
 import           Semantic.Config (Config (..), Options (..), defaultOptions)
 import qualified Semantic.IO as IO
--- import           Semantic.Parse
 import           Semantic.API (parseTermBuilder, TermOutputFormat(..))
 import           Semantic.Task
 import           Semantic.Task.Files
@@ -102,8 +102,8 @@ languages =
   -- , ("php", ".php") -- TODO: No parse-examples in tree-sitter yet
   ]
 
-parseFilePath :: (Member (Error SomeException) sig, Member Task sig, Member Files sig, Carrier sig m, Monad m) => FilePath -> m Bool
-parseFilePath path = readBlob (file path) >>= parseTermBuilder TermShow >>= const (pure True)
+parseFilePath :: (Member (Error SomeException) sig, Member Distribute sig, Member Task sig, Member Files sig, Carrier sig m, MonadIO m) => FilePath -> m Bool
+parseFilePath path = readBlob (file path) >>= parseTermBuilder @[] TermShow . pure >>= const (pure True)
 
 languagesDir :: FilePath
 languagesDir = "vendor/haskell-tree-sitter/languages"
