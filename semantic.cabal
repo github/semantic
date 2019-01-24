@@ -89,7 +89,6 @@ library
                      , Proto3.Google.Timestamp
                      , Data.GitHub.Request.Context
                      , Data.GitHub.Request.Method
-                     , Data.GitHub.Repository
                      , Data.GitHub.Spamurai
                      , Data.GitHub.User
                      , Data.Graph
