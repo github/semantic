@@ -7,7 +7,6 @@ module Data.GitHub.IPVersion
 import Prologue
 
 import Proto3.Suite
-import Proto3.Suite.Exts
 
 data IPVersion
   = Unknown

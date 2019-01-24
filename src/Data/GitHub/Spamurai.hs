@@ -7,7 +7,6 @@ module Data.GitHub.Spamurai
 import Prologue
 
 import Proto3.Suite
-import Proto3.Suite.Exts
 
 data SpamuraiClassification
   = Unknown
