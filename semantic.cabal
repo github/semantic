@@ -81,11 +81,8 @@ library
                      , Data.File
                      , Data.Functor.Both
                      , Data.Functor.Classes.Generic
-                     , Data.GitHub.Auth
                      , Data.Git
-                     , Data.GitHub.IPVersion
                      , Proto3.Google.Timestamp
-                     , Data.GitHub.Spamurai
                      , Data.Graph
                      , Data.Graph.ControlFlowVertex
                      , Data.Graph.TermVertex
