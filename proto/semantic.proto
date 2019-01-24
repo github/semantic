@@ -71,17 +71,17 @@ message DiffTreeTOCResponse {
 }
 
 message TOCSummaryFile {
-  string filePath = 1;
-  string fileLanguage = 2;
-  repeated TOCSummaryChange fileChanges = 3;
-  repeated TOCSummaryError fileErrors = 4;
+  string path = 1;
+  Language language = 2;
+  repeated TOCSummaryChange changes = 3;
+  repeated TOCSummaryError errors = 4;
 }
 
 message TOCSummaryChange {
   string category = 1;
   string term = 2;
   Span span = 3;
-  string changeType = 4;
+  string change_type = 4;
 }
 
 message TOCSummaryError {
@@ -163,16 +163,16 @@ message BlobPair {
 }
 
 message File {
-  string filePath = 1;
-  string fileLanguage = 2;
-  repeated Symbol fileSymbols = 3;
+  string path = 1;
+  Language language = 2;
+  repeated Symbol symbols = 3;
 }
 
 message Symbol {
-  string symbolName = 1;
-  string symbolKind = 2;
-  string symbolLine = 3;
-  Span symbolSpan = 4;
+  string symbol = 1;
+  string kind = 2;
+  string line = 3;
+  Span span = 4;
 }
 
 message Position {
