@@ -1,4 +1,4 @@
-{-# LANGUAGE DerivingVia, DerivingStrategies, DeriveAnyClass, DuplicateRecordFields #-}
+{-# LANGUAGE DerivingVia, DerivingStrategies, DeriveAnyClass, DuplicateRecordFields, LambdaCase #-}
 module Semantic.API.Types
   (
   -- Parse APIs
@@ -17,6 +17,7 @@ module Semantic.API.Types
   , TOCSummaryFile(..)
   , TOCSummaryChange(..)
   , TOCSummaryError(..)
+  , ChangeType(..)
 
   -- Diff tree graphs
   , DiffTreeGraphResponse(..)
@@ -49,7 +50,9 @@ module Semantic.API.Types
 import           Data.Aeson
 import           Data.Bifunctor (first)
 import           Data.ByteString.Lazy.Char8 as BC
+import           Data.Char (toUpper)
 import           Data.Graph (VertexTag (..))
+import           Data.String
 import qualified Data.Text as T
 import           GHC.Generics
 import           Network.HTTP.Media ((//))
@@ -169,10 +172,31 @@ data TOCSummaryChange = TOCSummaryChange
   { category :: T.Text
   , term :: T.Text
   , span :: Maybe Span
-  , change_type :: T.Text -- TODO: could be enum
+  , changeType :: ChangeType
   }
   deriving stock (Eq, Show, Generic)
   deriving anyclass (Message, Named, ToJSON)
+
+data ChangeType
+  = None
+  | Added
+  | Removed
+  | Modified
+  deriving stock (Eq, Ord, Show, Enum, Bounded, Generic)
+  deriving anyclass (Named, MessageField, ToJSON)
+
+instance HasDefault ChangeType where def = None
+
+instance Finite ChangeType where
+  enumerate _ = fmap go [None ..] where
+    go x = (fromString (fmap toUpper (show x)), fromEnum x)
+
+instance Primitive ChangeType where
+  primType _ = primType (Proxy @(Enumerated ChangeType))
+  encodePrimitive f = encodePrimitive f . Enumerated . Right
+  decodePrimitive   = decodePrimitive >>= \case
+    (Enumerated (Right r)) -> pure r
+    other                  -> Prelude.fail ("ChangeType decodeMessageField: unexpected value" <> show other)
 
 data TOCSummaryError = TOCSummaryError
   { error :: T.Text
@@ -203,26 +227,26 @@ instance VertexTag DiffTreeVertex where uniqueTag = diffVertexId
 
 -- NB: Current proto generation only supports sum types with single named fields.
 data DiffTreeTerm
-  = Deleted  { deletedTerm   :: Maybe DeletedTerm }
-  | Inserted { insertedTerm  :: Maybe InsertedTerm }
-  | Replaced { replacedTerm  :: Maybe ReplacedTerm }
-  | Merged   { mergedTerm    :: Maybe MergedTerm }
+  = Deleted  { deleted  :: Maybe DeletedTerm }
+  | Inserted { inserted :: Maybe InsertedTerm }
+  | Replaced { replaced :: Maybe ReplacedTerm }
+  | Merged   { merged   :: Maybe MergedTerm }
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (Message, Named, ToJSON)
 
-data DeletedTerm = DeletedTerm { deletedTermName :: String, beforeSpan :: Maybe Span }
+data DeletedTerm = DeletedTerm { term :: String, span :: Maybe Span }
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (Message, Named, ToJSON)
 
-data InsertedTerm = InsertedTerm { insertedTermName :: String, afterSpan :: Maybe Span }
+data InsertedTerm = InsertedTerm { term :: String, span :: Maybe Span }
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (Message, Named, ToJSON)
 
-data ReplacedTerm = ReplacedTerm { beforeTermName :: String, beforeSpan :: Maybe Span, afterTermName :: String, afterSpan :: Maybe Span }
+data ReplacedTerm = ReplacedTerm { beforeTerm :: String, beforeSpan :: Maybe Span, afterTerm :: String, afterSpan :: Maybe Span }
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (Message, Named, ToJSON)
 
-data MergedTerm = MergedTerm { mergedTermName :: String, beforeSpan :: Maybe Span, afterSpan :: Maybe Span }
+data MergedTerm = MergedTerm { term :: String, beforeSpan :: Maybe Span, afterSpan :: Maybe Span }
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (Message, Named, ToJSON)
 

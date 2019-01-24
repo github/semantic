@@ -45,10 +45,10 @@ diffStyle name = (defaultStyle (fromString . show . diffVertexId))
   { graphName = fromString (quote name)
   , vertexAttributes = vertexAttributes }
   where quote a = "\"" <> a <> "\""
-        vertexAttributes (DiffTreeVertex _ (Just (Deleted  (Just DeletedTerm{..}))))  = [ "label" := fromString deletedTermName,  "color" := "red" ]
-        vertexAttributes (DiffTreeVertex _ (Just (Inserted (Just InsertedTerm{..})))) = [ "label" := fromString insertedTermName, "color" := "green" ]
+        vertexAttributes (DiffTreeVertex _ (Just (Deleted  (Just DeletedTerm{..}))))  = [ "label" := fromString term,  "color" := "red" ]
+        vertexAttributes (DiffTreeVertex _ (Just (Inserted (Just InsertedTerm{..})))) = [ "label" := fromString term, "color" := "green" ]
         vertexAttributes (DiffTreeVertex _ (Just (Replaced (Just ReplacedTerm{..})))) = [ "label" := "Replacement",               "color" := "orange", "style" := "dashed" ]
-        vertexAttributes (DiffTreeVertex _ (Just (Merged   (Just MergedTerm{..}))))   = [ "label" := fromString mergedTermName ]
+        vertexAttributes (DiffTreeVertex _ (Just (Merged   (Just MergedTerm{..}))))   = [ "label" := fromString term ]
         vertexAttributes _ = []
 
 class ToTreeGraph vertex t | t -> vertex where
