@@ -3,8 +3,8 @@ module Control.Abstract.Value
 ( AbstractValue(..)
 , AbstractIntro(..)
 , Comparator(..)
--- * Value effects
--- $valueEffects
+-- * Domain effects
+-- $domainEffects
 , function
 , BuiltIn(..)
 , bindThis
@@ -25,6 +25,46 @@ module Control.Abstract.Value
 , While(..)
 , runWhile
 , WhileC(..)
+, unit
+, Unit(..)
+, runUnit
+, UnitC(..)
+, string
+, asString
+, String(..)
+, StringC(..)
+, runString
+, integer
+, float
+, rational
+, liftNumeric
+, liftNumeric2
+, Numeric(..)
+, NumericC(..)
+, object
+, scopedEnvironment
+, klass
+, Object(..)
+, ObjectC(..)
+, runObject
+, runNumeric
+, castToInteger
+, liftBitwise
+, liftBitwise2
+, unsignedRShift
+, Bitwise(..)
+, BitwiseC(..)
+, runBitwise
+, array
+, asArray
+, Array(..)
+, ArrayC(..)
+, runArray
+, hash
+, kvPair
+, Hash(..)
+, runHash
+, HashC(..)
 ) where
 
 import Control.Abstract.Evaluator
@@ -34,10 +74,11 @@ import Control.Effect.Carrier
 import Data.Abstract.BaseError
 import Data.Abstract.Module
 import Data.Abstract.Name
-import Data.Abstract.Number as Number
+import Data.Abstract.Number (Number, SomeNumber)
 import Data.Scientific (Scientific)
 import Data.Span
-import Prologue hiding (TypeError)
+import Prelude hiding (String)
+import Prologue hiding (TypeError, hash)
 
 -- | This datum is passed into liftComparison to handle the fact that Ruby and PHP
 --   have built-in generalized-comparison ("spaceship") operators. If you want to
@@ -49,9 +90,9 @@ data Comparator
   = Concrete (forall a . Ord a => a -> a -> Bool)
   | Generalized
 
--- Value effects
+-- Domain effects
 
--- $valueEffects
+-- $domainEffects
 -- Value effects are effects modelling the /introduction/ & /elimination/ of some specific kind of value.
 --
 -- Modelling each of these as effects has several advantages∷
@@ -84,9 +125,9 @@ bindThis :: (Member (Function term address value) sig, Carrier sig m) => value -
 bindThis this that = sendFunction (Bind this that ret)
 
 data Function term address value (m :: * -> *) k
-  =  Function Name [Name] term address (value -> k) -- ^ A function is parameterized by its name, parameter names, body, parent scope, and returns a ValueRef.
-  | BuiltIn address BuiltIn (value -> k)            -- ^ A built-in is parameterized by its parent scope, BuiltIn type, and returns a value.
-  | Call value [value] (value -> k)                 -- ^ A Call takes a set of values as parameters and returns a ValueRef.
+  = Function Name [Name] term address (value -> k) -- ^ A function is parameterized by its name, parameter names, body, parent scope, and returns a ValueRef.
+  | BuiltIn address BuiltIn (value -> k)           -- ^ A built-in is parameterized by its parent scope, BuiltIn type, and returns a value.
+  | Call value [value] (value -> k)                -- ^ A Call takes a set of values as parameters and returns a ValueRef.
   | Bind value value (value -> k)
   deriving (Functor)
 
@@ -182,7 +223,6 @@ data While value m k
 instance HFunctor (While value) where
   hmap f (While cond body k) = While (f cond) (f body) k
 
-
 runWhile :: Carrier (While value :+: sig) (WhileC value (Eff m))
          => Evaluator term address value (WhileC value (Eff m)) a
          -> Evaluator term address value m a
@@ -191,36 +231,247 @@ runWhile = raiseHandler $ runWhileC . interpret
 newtype WhileC value m a = WhileC { runWhileC :: m a }
 
 
+-- | Construct an abstract unit value.
+unit :: (Carrier sig m, Member (Unit value) sig) => Evaluator term address value m value
+unit = send (Unit ret)
+
+newtype Unit value (m :: * -> *) k
+  = Unit (value -> k)
+  deriving (Functor)
+
+instance HFunctor (Unit value) where
+  hmap _ = coerce
+  {-# INLINE hmap #-}
+
+instance Effect (Unit value) where
+  handle state handler (Unit k) = Unit (handler . (<$ state) . k)
+
+runUnit :: Carrier (Unit value :+: sig) (UnitC value (Eff m))
+        => Evaluator term address value (UnitC value (Eff m)) a
+        -> Evaluator term address value m a
+runUnit = raiseHandler $ runUnitC . interpret
+
+newtype UnitC value m a = UnitC { runUnitC :: m a }
+
+
+-- | Construct a String value in the abstract domain.
+string :: (Member (String value) sig, Carrier sig m) => Text -> m value
+string t = send (String t ret)
+
+-- | Extract 'Text' from a given value.
+asString :: (Member (String value) sig, Carrier sig m) => value -> m Text
+asString v = send (AsString v ret)
+
+data String value (m :: * -> *) k
+  = String Text (value -> k)
+  | AsString value (Text -> k)
+  deriving (Functor)
+
+instance HFunctor (String value) where
+  hmap _ = coerce
+  {-# INLINE hmap #-}
+
+instance Effect (String value) where
+  handle state handler (String text k) = String text (handler . (<$ state) . k)
+  handle state handler (AsString v k) = AsString v (handler . (<$ state) . k)
+
+newtype StringC value m a = StringC { runStringC :: m a }
+
+runString :: Carrier (String value :+: sig) (StringC value (Eff m))
+          => Evaluator term address value (StringC value (Eff m)) a
+          -> Evaluator term address value m a
+runString = raiseHandler $ runStringC . interpret
+
+
+-- | Construct an abstract integral value.
+integer :: (Member (Numeric value) sig, Carrier sig m) => Integer -> m value
+integer t = send (Integer t ret)
+
+-- | Construct a floating-point value.
+float :: (Member (Numeric value) sig, Carrier sig m) => Scientific -> m value
+float t = send (Float t ret)
+
+-- | Construct a rational value.
+rational :: (Member (Numeric value) sig, Carrier sig m) => Rational -> m value
+rational t = send (Rational t ret)
+
+-- | Lift a unary operator over a 'Num' to a function on 'value's.
+liftNumeric  :: (Member (Numeric value) sig, Carrier sig m)
+             => (forall a . Num a => a -> a)
+             -> value
+             -> m value
+liftNumeric t v = send (LiftNumeric t v ret)
+
+-- | Lift a pair of binary operators to a function on 'value's.
+--   You usually pass the same operator as both arguments, except in the cases where
+--   Haskell provides different functions for integral and fractional operations, such
+--   as division, exponentiation, and modulus.
+liftNumeric2 :: (Member (Numeric value) sig, Carrier sig m)
+             => (forall a b. Number a -> Number b -> SomeNumber)
+             -> value
+             -> value
+             -> m value
+liftNumeric2 t v1 v2 = send (LiftNumeric2 t v1 v2 ret)
+
+data Numeric value (m :: * -> *) k
+  = Integer Integer (value -> k)
+  | Float Scientific (value -> k)
+  | Rational Rational (value -> k)
+  | LiftNumeric (forall a . Num a => a -> a) value (value -> k)
+  | LiftNumeric2 (forall a b. Number a -> Number b -> SomeNumber) value value (value -> k)
+  deriving (Functor)
+
+instance HFunctor (Numeric value) where
+  hmap _ = coerce
+  {-# INLINE hmap #-}
+
+instance Effect (Numeric value) where
+  handle state handler = coerce . fmap (handler . (<$ state))
+
+newtype NumericC value m a = NumericC { runNumericC :: m a }
+
+runNumeric :: Carrier (Numeric value :+: sig) (NumericC value (Eff m))
+           => Evaluator term address value (NumericC value (Eff m)) a
+           -> Evaluator term address value m a
+runNumeric = raiseHandler $ runNumericC . interpret
+
+
+-- | Cast numbers to integers
+castToInteger :: (Member (Bitwise value) sig, Carrier sig m) => value -> m value
+castToInteger t = send (CastToInteger t ret)
+
+-- | Lift a unary bitwise operator to values. This is usually 'complement'.
+liftBitwise :: (Member (Bitwise value) sig, Carrier sig m)
+            => (forall a . Bits a => a -> a)
+            -> value
+            -> m value
+liftBitwise t v = send (LiftBitwise t v ret)
+
+-- | Lift a binary bitwise operator to values. The Integral constraint is
+--   necessary to satisfy implementation details of Haskell left/right shift,
+--   but it's fine, since these are only ever operating on integral values.
+liftBitwise2 :: (Member (Bitwise value) sig, Carrier sig m)
+             => (forall a . (Integral a, Bits a) => a -> a -> a)
+             -> value
+             -> value
+             -> m value
+liftBitwise2 t v1 v2 = send (LiftBitwise2 t v1 v2 ret)
+
+unsignedRShift :: (Member (Bitwise value) sig, Carrier sig m)
+               => value
+               -> value
+               -> m value
+unsignedRShift v1 v2 = send (UnsignedRShift v1 v2 ret)
+
+data Bitwise value (m :: * -> *) k
+  = CastToInteger value (value -> k)
+  | LiftBitwise (forall a . Bits a => a -> a) value (value -> k)
+  | LiftBitwise2 (forall a . (Integral a, Bits a) => a -> a -> a) value value (value -> k)
+  | UnsignedRShift value value (value -> k)
+  deriving (Functor)
+
+instance HFunctor (Bitwise value) where
+  hmap _ = coerce
+  {-# INLINE hmap #-}
+
+instance Effect (Bitwise value) where
+  handle state handler = coerce . fmap (handler . (<$ state))
+
+runBitwise :: Carrier (Bitwise value :+: sig) (BitwiseC value (Eff m))
+           => Evaluator term address value (BitwiseC value (Eff m)) a
+           -> Evaluator term address value m a
+runBitwise = raiseHandler $ runBitwiseC . interpret
+
+newtype BitwiseC value m a = BitwiseC { runBitwiseC :: m a }
+
+
+object :: (Member (Object address value) sig, Carrier sig m) => address -> m value
+object address = send (Object address ret)
+
+-- | Extract the environment from any scoped object (e.g. classes, namespaces, etc).
+scopedEnvironment :: (Member (Object address value) sig, Carrier sig m) => value -> m (Maybe address)
+scopedEnvironment value = send (ScopedEnvironment value ret)
+
+-- | Build a class value from a name and environment.
+-- declaration is the new class's identifier
+-- address is the environment to capture
+klass :: (Member (Object address value) sig, Carrier sig m) => Declaration -> address -> m value
+klass d a = send (Klass d a ret)
+
+data Object address value (m :: * -> *) k
+  = Object address (value -> k)
+  | ScopedEnvironment value (Maybe address -> k)
+  | Klass Declaration address (value -> k)
+  deriving (Functor)
+
+instance HFunctor (Object address value) where
+    hmap _ = coerce
+    {-# INLINE hmap #-}
+
+instance Effect (Object address value) where
+    handle state handler = coerce . fmap (handler . (<$ state))
+
+newtype ObjectC address value m a = ObjectC { runObjectC :: m a }
+
+runObject :: Carrier (Object address value :+: sig) (ObjectC address value (Eff m))
+           => Evaluator term address value (ObjectC address value (Eff m)) a
+           -> Evaluator term address value m a
+runObject = raiseHandler $ runObjectC . interpret
+
+-- | Construct an array of zero or more values.
+array :: (Member (Array value) sig, Carrier sig m) => [value] -> m value
+array v = send (Array v ret)
+
+asArray :: (Member (Array value) sig, Carrier sig m) => value -> m [value]
+asArray v = send (AsArray v ret)
+
+data Array value (m :: * -> *) k
+  = Array [value] (value -> k)
+  | AsArray value ([value] -> k)
+  deriving (Functor)
+
+instance HFunctor (Array value) where
+    hmap _ = coerce
+    {-# INLINE hmap #-}
+
+instance Effect (Array value) where
+    handle state handler = coerce . fmap (handler . (<$ state))
+
+newtype ArrayC value m a = ArrayC { runArrayC :: m a }
+
+runArray :: Carrier (Array value :+: sig) (ArrayC value (Eff m))
+           => Evaluator term address value (ArrayC value (Eff m)) a
+           -> Evaluator term address value m a
+runArray = raiseHandler $ runArrayC . interpret
+
+-- | Construct a hash out of pairs.
+hash :: (Member (Hash value) sig, Carrier sig m) => [(value, value)] -> m value
+hash v = send (Hash v ret)
+
+-- | Construct a key-value pair for use in a hash.
+kvPair :: (Member (Hash value) sig, Carrier sig m) => value -> value -> m value
+kvPair v1 v2 = send (KvPair v1 v2 ret)
+
+data Hash value (m :: * -> *) k
+  = Hash [(value, value)] (value -> k)
+  | KvPair value value (value -> k)
+  deriving (Functor)
+
+instance HFunctor (Hash value) where
+    hmap _ = coerce
+    {-# INLINE hmap #-}
+
+instance Effect (Hash value) where
+    handle state handler = coerce . fmap (handler . (<$ state))
+
+newtype HashC value m a = HashC { runHashC :: m a }
+
+runHash :: Carrier (Hash value :+: sig) (HashC value (Eff m))
+           => Evaluator term address value (HashC value (Eff m)) a
+           -> Evaluator term address value m a
+runHash = raiseHandler $ runHashC . interpret
+
 class Show value => AbstractIntro value where
-  -- | Construct an abstract unit value.
-  --   TODO: This might be the same as the empty tuple for some value types
-  unit :: value
-
-  -- | Construct an abstract string value.
-  string :: Text -> value
-
-  -- | Construct a self-evaluating symbol value.
-  --   TODO: Should these be interned in some table to provide stronger uniqueness guarantees?
-  symbol :: Text -> value
-
-  -- | Construct an abstract regex value.
-  regex :: Text -> value
-
-  -- | Construct an abstract integral value.
-  integer :: Integer -> value
-
-  -- | Construct a floating-point value.
-  float :: Scientific -> value
-
-  -- | Construct a rational value.
-  rational :: Rational -> value
-
-  -- | Construct a key-value pair for use in a hash.
-  kvPair :: value -> value -> value
-
-  -- | Construct a hash out of pairs.
-  hash :: [(value, value)] -> value
-
   -- | Construct the nil/null datatype.
   null :: value
 
@@ -228,57 +479,17 @@ class Show value => AbstractIntro value where
 --
 --   This allows us to abstract the choice of whether to evaluate under binders for different value types.
 class AbstractIntro value => AbstractValue term address value carrier where
-  -- | Cast numbers to integers
-  castToInteger :: value -> Evaluator term address value carrier value
-
-
-  -- | Lift a unary operator over a 'Num' to a function on 'value's.
-  liftNumeric  :: (forall a . Num a => a -> a)
-               -> (value -> Evaluator term address value carrier value)
-
-  -- | Lift a pair of binary operators to a function on 'value's.
-  --   You usually pass the same operator as both arguments, except in the cases where
-  --   Haskell provides different functions for integral and fractional operations, such
-  --   as division, exponentiation, and modulus.
-  liftNumeric2 :: (forall a b. Number a -> Number b -> SomeNumber)
-               -> (value -> value -> Evaluator term address value carrier value)
-
   -- | Lift a Comparator (usually wrapping a function like == or <=) to a function on values.
   liftComparison :: Comparator -> (value -> value -> Evaluator term address value carrier value)
-
-  -- | Lift a unary bitwise operator to values. This is usually 'complement'.
-  liftBitwise :: (forall a . Bits a => a -> a)
-              -> (value -> Evaluator term address value carrier value)
-
-  -- | Lift a binary bitwise operator to values. The Integral constraint is
-  --   necessary to satisfy implementation details of Haskell left/right shift,
-  --   but it's fine, since these are only ever operating on integral values.
-  liftBitwise2 :: (forall a . (Integral a, Bits a) => a -> a -> a)
-               -> (value -> value -> Evaluator term address value carrier value)
-
-  unsignedRShift :: value -> value -> Evaluator term address value carrier value
 
   -- | Construct an N-ary tuple of multiple (possibly-disjoint) values
   tuple :: [value] -> Evaluator term address value carrier value
 
-  -- | Construct an array of zero or more values.
-  array :: [value] -> Evaluator term address value carrier value
-
-  asArray :: value -> Evaluator term address value carrier [value]
-
   -- | Extract the contents of a key-value pair as a tuple.
   asPair :: value -> Evaluator term address value carrier (value, value)
 
-  -- | Extract a 'Text' from a given value.
-  asString :: value -> Evaluator term address value carrier Text
-
   -- | @index x i@ computes @x[i]@, with zero-indexing.
   index :: value -> value -> Evaluator term address value carrier value
-
-  -- | Build a class value from a name and environment.
-  klass :: Declaration      -- ^ The new class's identifier
-        -> address          -- ^ The environment to capture
-        -> Evaluator term address value carrier value
 
   -- | Build a namespace value from a name and environment stack
   --
@@ -286,8 +497,3 @@ class AbstractIntro value => AbstractValue term address value carrier where
   namespace :: Name                 -- ^ The namespace's identifier
             -> address              -- ^ The frame of the namespace.
             -> Evaluator term address value carrier value
-
-  -- | Extract the environment from any scoped object (e.g. classes, namespaces, etc).
-  scopedEnvironment :: value -> Evaluator term address value carrier (Maybe address)
-
-  object :: address -> Evaluator term address value carrier value

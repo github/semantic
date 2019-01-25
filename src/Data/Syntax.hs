@@ -197,7 +197,7 @@ data Empty a = Empty
   deriving (Eq1, Show1, Ord1) via Generically Empty
 
 instance Evaluatable Empty where
-  eval _ _ _ = pure unit
+  eval _ _ _ = unit
 
 instance Tokenize Empty where
   tokenize = ignore
