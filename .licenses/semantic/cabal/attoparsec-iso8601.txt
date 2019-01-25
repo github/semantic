@@ -4,7 +4,7 @@ name: attoparsec-iso8601
 version: 1.0.1.0
 summary: Parsing of ISO 8601 dates, originally from aeson.
 homepage: https://github.com/bos/aeson
-license: other
+license: bsd-3-clause
 ---
 Copyright (c) 2011, MailRank, Inc.
 

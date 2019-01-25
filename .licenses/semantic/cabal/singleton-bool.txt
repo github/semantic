@@ -4,7 +4,7 @@ name: singleton-bool
 version: 0.1.4
 summary: Type level booleans
 homepage: https://github.com/phadej/singleton-bool
-license: other
+license: bsd-3-clause
 ---
 Copyright (c) 2016, Oleg Grenrus
 

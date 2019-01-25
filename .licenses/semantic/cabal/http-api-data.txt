@@ -4,7 +4,7 @@ name: http-api-data
 version: '0.4'
 summary: Converting to/from HTTP API data like URL pieces, headers and query parameters.
 homepage: https://github.com/fizruk/http-api-data
-license: other
+license: bsd-2-clause
 ---
 The following license covers this documentation, and the source code, except
 where otherwise indicated.
