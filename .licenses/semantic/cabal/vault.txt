@@ -4,7 +4,7 @@ name: vault
 version: 0.3.1.2
 summary: a persistent store for values of arbitrary types
 homepage: https://github.com/HeinrichApfelmus/vault
-license: other
+license: bsd-3-clause
 ---
 Copyright (c)2011, Heinrich Apfelmus
 

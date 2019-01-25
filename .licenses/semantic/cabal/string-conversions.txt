@@ -4,7 +4,7 @@ name: string-conversions
 version: 0.4.0.1
 summary: Simplifies dealing with different types for strings
 homepage: https://github.com/soenkehahn/string-conversions
-license: other
+license: bsd-3-clause
 ---
 Copyright (c) 2012, Sönke Hahn
 
