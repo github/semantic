@@ -164,7 +164,7 @@ members :: EdgeLabel
         -> ScopeGraph Precise
         -> Value term Precise
         -> Maybe [Name]
-members edgeLabel heap scopeGraph (Object frame)    = frameNames [ edgeLabel ] heap scopeGraph frame
+members edgeLabel heap scopeGraph (Data.Abstract.Value.Concrete.Object frame)    = frameNames [ edgeLabel ] heap scopeGraph frame
 members edgeLabel heap scopeGraph (Class _ _ frame) = frameNames [ edgeLabel ] heap scopeGraph frame
 members _ _ _ _                                     = Nothing
 

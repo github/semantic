@@ -42,7 +42,7 @@ instance Evaluatable Import where
       -- Create edges from the current scope/frame to the import scope/frame.
       insertImportEdge scopeAddress
       insertFrameLink ScopeGraph.Import (Map.singleton scopeAddress frameAddress)
-    pure unit
+    unit
 
 data QualifiedAliasedImport a = QualifiedAliasedImport { qualifiedAliasedImportAlias :: !a, qualifiedAliasedImportFrom :: ImportPath }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
@@ -63,7 +63,7 @@ instance Evaluatable QualifiedAliasedImport where
     aliasSlot <- lookupDeclaration (Declaration alias)
     assign aliasSlot =<< object aliasFrame
 
-    pure unit
+    unit
 
 newtype SideEffectImport a = SideEffectImport { sideEffectImportFrom :: ImportPath }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
@@ -73,7 +73,7 @@ instance Evaluatable SideEffectImport where
   eval _ _ (SideEffectImport importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
     void $ require modulePath
-    pure unit
+    unit
 
 -- | Qualified Export declarations
 newtype QualifiedExport a = QualifiedExport { qualifiedExportSymbols :: [Alias] }
@@ -92,7 +92,7 @@ instance Evaluatable QualifiedExport where
         reference (Reference aliasName) (Declaration aliasValue)
 
     -- Create an export edge from a new scope to the qualifed export's scope.
-    pure unit
+    unit
 
 data Alias = Alias { aliasValue :: Name, aliasName :: Name }
   deriving (Eq, Generic, Hashable, Ord, Show, Message, Named, ToJSON, NFData)
@@ -120,7 +120,7 @@ instance Evaluatable QualifiedExportFrom where
     insertExportEdge exportScope
     insertFrameLink ScopeGraph.Export (Map.singleton exportScope exportFrame)
 
-    pure unit
+    unit
 
 newtype DefaultExport a = DefaultExport { defaultExport :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
@@ -143,7 +143,7 @@ instance Evaluatable DefaultExport where
         insertExportEdge exportScope
         insertFrameLink ScopeGraph.Export (Map.singleton exportScope exportFrame)
       Nothing -> throwEvalError DefaultExportError
-    pure unit
+    unit
 
 data ImportRequireClause a = ImportRequireClause { importRequireIdentifier :: !a, importRequireSubject :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
