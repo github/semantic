@@ -1,7 +1,6 @@
 {-# LANGUAGE UndecidableInstances #-}
 module Prologue
   ( module X
-  , eitherA
   , eitherM
   , foldMapA
   , maybeM
@@ -82,7 +81,3 @@ maybeM f = maybe f pure
 
 eitherM :: Applicative f => (a -> f b) -> Either a b -> f b
 eitherM f = either f pure
-
--- Promote a function to either-applicatives.
-eitherA :: Applicative f => (b -> f (Either a c)) -> Either a b -> f (Either a c)
-eitherA = either (pure . Left)
