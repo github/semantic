@@ -46,11 +46,10 @@ legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> distributeFoldMap 
       , symbolSpan = spanToLegacySpan span
       }
 
--- TODO: Switch away from legacy format on CLI too.
--- parseSymbolsBuilder :: (Member Distribute sig, ParseEffects sig m, Traversable t) => t Blob -> m Builder
--- parseSymbolsBuilder blobs = parseSymbols blobs >>= serialize JSON
 parseSymbolsBuilder :: (Member Distribute sig, ParseEffects sig m, Traversable t) => t Blob -> m Builder
-parseSymbolsBuilder blobs = legacyParseSymbols blobs >>= serialize JSON
+parseSymbolsBuilder blobs
+  -- TODO: Switch away from legacy format on CLI too.
+  = legacyParseSymbols blobs >>= serialize JSON
 
 parseSymbols :: (Member Distribute sig, ParseEffects sig m, Traversable t) => t Blob -> m ParseTreeSymbolResponse
 parseSymbols blobs = ParseTreeSymbolResponse <$> distributeFoldMap go blobs

@@ -37,18 +37,6 @@ import           Semantic.Telemetry as Stat
 import           Serializing.Format hiding (JSON)
 import qualified Serializing.Format as Format
 
-diffGraph :: (Traversable t, DiffEffects sig m) => t BlobPair -> m DiffTreeGraphResponse
-diffGraph = distributeFoldMap go
-  where
-    go :: (DiffEffects sig m) => BlobPair -> m DiffTreeGraphResponse
-    go blobPair = doDiff blobPair (const pure) render
-
-    render :: (Foldable syntax, Functor syntax, ConstructorName syntax, Applicative m) => BlobPair -> Diff syntax Location Location -> m DiffTreeGraphResponse
-    render _ diff =
-      let graph = renderTreeGraph diff
-          toEdge (Edge (a, b)) = DiffTreeEdge (diffVertexId a) (diffVertexId b)
-      in pure $ DiffTreeGraphResponse (vertexList graph) (fmap toEdge (edgeList graph))
-
 data DiffOutputFormat
   = DiffJSONTree
   | DiffJSONGraph
@@ -60,6 +48,8 @@ data DiffOutputFormat
 parseDiffBuilder :: (Traversable t, DiffEffects sig m) => DiffOutputFormat -> t BlobPair -> m Builder
 parseDiffBuilder DiffJSONTree    = distributeFoldMap (jsonDiff renderJSONTree) >=> serialize Format.JSON -- NB: Serialize happens at the top level for these two JSON formats to collect results of multiple blob pairs.
 parseDiffBuilder DiffJSONGraph   = distributeFoldMap (jsonDiff renderJSONGraph) >=> serialize Format.JSON
+-- TODO: Switch Diff Graph output on CLI to new format like this:
+-- parseDiffBuilder DiffJSONGraph   = diffGraph >=> serialize Format.JSON
 parseDiffBuilder DiffSExpression = distributeFoldMap sexpDiff
 parseDiffBuilder DiffShow        = distributeFoldMap showDiff
 parseDiffBuilder DiffDotGraph    = distributeFoldMap dotGraphDiff
@@ -77,6 +67,19 @@ renderJSONTree blobPair = pure . renderJSONDiff blobPair
 
 renderJSONGraph :: (Applicative m, Functor syntax, Foldable syntax, ConstructorName syntax) => BlobPair -> Diff syntax Location Location -> m (Rendering.JSON.JSON "diffs" SomeJSON)
 renderJSONGraph blobPair = pure . renderJSONAdjDiff blobPair . renderTreeGraph
+
+diffGraph :: (Traversable t, DiffEffects sig m) => t BlobPair -> m DiffTreeGraphResponse
+diffGraph = distributeFoldMap go
+  where
+    go :: (DiffEffects sig m) => BlobPair -> m DiffTreeGraphResponse
+    go blobPair = doDiff blobPair (const pure) render
+
+    render :: (Foldable syntax, Functor syntax, ConstructorName syntax, Applicative m) => BlobPair -> Diff syntax Location Location -> m DiffTreeGraphResponse
+    render _ diff =
+      let graph = renderTreeGraph diff
+          toEdge (Edge (a, b)) = DiffTreeEdge (diffVertexId a) (diffVertexId b)
+      in pure $ DiffTreeGraphResponse (vertexList graph) (fmap toEdge (edgeList graph))
+
 
 sexpDiff :: (DiffEffects sig m) => BlobPair -> m Builder
 sexpDiff blobPair = doDiff blobPair (const pure) (const (serialize (SExpression ByConstructorName)))
