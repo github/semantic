@@ -3,11 +3,8 @@ module Parsing.Parser
 ( Parser(..)
 , SomeTerm(..)
 , withSomeTerm
-, SomeSyntaxTerm
-, withSomeSyntaxTerm
 , SomeAnalysisParser(..)
 , SomeASTParser(..)
-, someParser
 , someASTParser
 , someAnalysisParser
 , ApplyAll
@@ -124,36 +121,6 @@ type family ApplyAll (typeclasses :: [(* -> *) -> Constraint]) (syntax :: * -> *
   ApplyAll (typeclass ': typeclasses) syntax = (typeclass syntax, ApplyAll typeclasses syntax)
   ApplyAll '[] syntax = ()
 
--- | Construct a 'Parser' given a proxy for a list of typeclasses and the 'Language' to be parsed, all of which must be satisfied by all of the types in the syntaxes of our supported languages.
---
---   This can be used to perform operations uniformly over terms produced by blobs with different 'Language's, and which therefore have different types in general. For example, given some 'Blob', we can parse and 'show' the parsed & assigned 'Term' like so:
---
---   > runTask (parse (someParser @'[Show1] language) blob) >>= putStrLn . withSomeTerm show
-someParser :: ( ApplyAll typeclasses (Sum Go.Syntax)
-              , ApplyAll typeclasses (Sum Haskell.Syntax)
-              , ApplyAll typeclasses (Sum Java.Syntax)
-              , ApplyAll typeclasses (Sum JSON.Syntax)
-              , ApplyAll typeclasses (Sum Markdown.Syntax)
-              , ApplyAll typeclasses (Sum Python.Syntax)
-              , ApplyAll typeclasses (Sum Ruby.Syntax)
-              , ApplyAll typeclasses (Sum TypeScript.Syntax)
-              , ApplyAll typeclasses (Sum PHP.Syntax)
-              )
-           => Language                                       -- ^ The 'Language' to select.
-           -> Maybe (Parser (SomeTerm typeclasses Location)) -- ^ A 'SomeParser' abstracting the syntax type to be produced.
-someParser Go         = Just (SomeParser goParser)
-someParser Java       = Just (SomeParser javaParser)
-someParser JavaScript = Just (SomeParser typescriptParser)
-someParser JSON       = Just (SomeParser jsonParser)
-someParser Haskell    = Just (SomeParser haskellParser)
-someParser JSX        = Just (SomeParser typescriptParser)
-someParser Markdown   = Just (SomeParser markdownParser)
-someParser Python     = Just (SomeParser pythonParser)
-someParser Ruby       = Just (SomeParser rubyParser)
-someParser TypeScript = Just (SomeParser typescriptParser)
-someParser PHP        = Just (SomeParser phpParser)
-someParser Unknown    = Nothing
-
 
 goParser :: Parser Go.Term
 goParser = AssignmentParser (ASTParser tree_sitter_go) Go.assignment
@@ -200,12 +167,6 @@ data SomeTerm typeclasses ann where
 
 withSomeTerm :: (forall syntax . ApplyAll typeclasses syntax => Term syntax ann -> a) -> SomeTerm typeclasses ann -> a
 withSomeTerm with (SomeTerm term) = with term
-
-data SomeSyntaxTerm syntax ann where
-  SomeSyntaxTerm :: Term syntax ann -> SomeSyntaxTerm syntax ann
-
-withSomeSyntaxTerm :: (forall syntax . Term syntax ann -> a) -> SomeSyntaxTerm syntax ann -> a
-withSomeSyntaxTerm with (SomeSyntaxTerm term) = with term
 
 -- | A parser for producing specialized (tree-sitter) ASTs.
 data SomeASTParser where
