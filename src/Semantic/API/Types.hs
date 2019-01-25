@@ -135,7 +135,7 @@ data TermEdge = TermEdge { source :: Int, target :: Int }
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (Message, Named, ToJSON)
 
-data TermVertex = TermVertex { vertexId :: Int, name :: String, span :: Maybe Span }
+data TermVertex = TermVertex { vertexId :: Int, term :: String, span :: Maybe Span }
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (Message, Named, ToJSON)
 instance VertexTag TermVertex where uniqueTag = vertexId

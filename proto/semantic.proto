@@ -53,7 +53,7 @@ message TermEdge {
 
 message TermVertex {
   int64 vertexId = 1;
-  string name = 2;
+  string term = 2;
   Span span = 3;
 }
 
