@@ -90,8 +90,6 @@ library
                      , Data.Language
                      , Data.Location
                      , Data.Map.Monoidal
-                     , Data.Proto.DiffTree
-                     , Data.Proto.ParseTree
                      , Data.Patch
                      , Data.Project
                      , Data.Quieterm

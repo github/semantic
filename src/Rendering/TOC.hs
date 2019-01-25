@@ -1,9 +1,7 @@
-{-# LANGUAGE DerivingVia, DerivingStrategies, DeriveAnyClass, RankNTypes, ScopedTypeVariables #-}
+{-# LANGUAGE DerivingVia, DerivingStrategies, RankNTypes, ScopedTypeVariables #-}
 module Rendering.TOC
 ( renderToCDiff
-, renderRPCToCDiff
 , renderToCTerm
-, renderJSONSummaryError
 , diffTOC
 , Summaries(..)
 , TOCSummary(..)
@@ -31,15 +29,9 @@ import Data.Patch
 import Data.Location
 import Data.Term
 import qualified Data.Text as T
-import Proto3.Suite as Proto3
-
-renderJSONSummaryError :: BlobPair -> String -> Summaries
-renderJSONSummaryError pair e = Summaries mempty (Map.singleton path [object ["error" .= e]])
-  where path = T.pack (pathKeyForBlobPair pair)
 
 data Summaries = Summaries { changes, errors :: Map.Map T.Text [Value] }
   deriving stock (Eq, Show, Generic)
-  deriving anyclass (Named)
   deriving Semigroup via GenericSemigroup Summaries
   deriving Monoid via GenericMonoid Summaries
 
@@ -55,18 +47,6 @@ data TOCSummary
     }
   | ErrorSummary { errorText :: T.Text, errorSpan :: Span, errorLanguage :: Language }
   deriving stock (Generic, Eq, Show)
-  deriving anyclass (Named)
-
--- TODO: Get this to auto generate. The following is incomplete.
-instance Message TOCSummary where
-  encodeMessage = undefined
-  decodeMessage = undefined
-  dotProto _ =
-    [ DotProtoMessageField $ DotProtoField 1 (Prim Proto3.String) (Single "summaryCategoryName") [] Nothing
-    , DotProtoMessageField $ DotProtoField 1 (Prim Proto3.String) (Single "summaryTermName") [] Nothing
-    , DotProtoMessageField $ DotProtoField 1 (Prim . Named $ Single "Span") (Single "summarySpan") [] Nothing
-    , DotProtoMessageField $ DotProtoField 1 (Prim Proto3.String) (Single "summaryChangeType") [] Nothing
-    ]
 
 instance ToJSON TOCSummary where
   toJSON TOCSummary{..} = object [ "changeType" .= summaryChangeType, "category" .= summaryCategoryName, "term" .= summaryTermName, "span" .= summarySpan ]
@@ -159,9 +139,6 @@ renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isV
   where toMap [] = mempty
         toMap as = Map.singleton summaryKey (toJSON <$> as)
         summaryKey = T.pack $ pathKeyForBlobPair blobs
-
-renderRPCToCDiff :: (Foldable f, Functor f) => BlobPair -> Diff f (Maybe Declaration) (Maybe Declaration) -> ([TOCSummary], [TOCSummary])
-renderRPCToCDiff _ = List.partition isValidSummary . diffTOC
 
 diffTOC :: (Foldable f, Functor f) => Diff f (Maybe Declaration) (Maybe Declaration) -> [TOCSummary]
 diffTOC = fmap entrySummary . dedupe . tableOfContentsBy declaration
