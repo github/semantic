@@ -1,23 +1,22 @@
 {-# LANGUAGE GADTs, TypeOperators, DerivingStrategies #-}
 module Semantic.API.TOCSummaries (diffSummary, legacyDiffSummary, diffSummaryBuilder) where
 
-import Analysis.TOCSummary (Declaration, declarationAlgebra)
-import Data.Blob
-import Data.ByteString.Builder
-import Data.Diff
-import Rendering.TOC
-import Semantic.API.Converters
-import Semantic.API.Diffs
-import Semantic.API.Types
-import Semantic.Task as Task
-import Serializing.Format
+import           Analysis.TOCSummary (Declaration, declarationAlgebra)
+import           Data.Blob
+import           Data.ByteString.Builder
+import           Data.Diff
 import qualified Data.Text as T
+import           Rendering.TOC
+import           Semantic.API.Converters
+import           Semantic.API.Diffs
+import           Semantic.API.Types
+import           Semantic.Task as Task
+import           Serializing.Format
 
--- TODO: Switch away from legacy format on CLI too.
--- diffSummaryBuilder :: (DiffEffects sig m) => Format DiffTreeTOCResponse -> [BlobPair] -> m Builder
--- diffSummaryBuilder format blobs = runSerialize Plain format <$> diffSummary blobs
 diffSummaryBuilder :: (DiffEffects sig m) => Format Summaries -> [BlobPair] -> m Builder
-diffSummaryBuilder format blobs = runSerialize Plain format <$> legacyDiffSummary blobs
+diffSummaryBuilder format blobs
+  -- TODO: Switch away from legacy format on CLI too.
+  = legacyDiffSummary blobs >>= serialize format
 
 legacyDiffSummary :: (DiffEffects sig m) => [BlobPair] -> m Summaries
 legacyDiffSummary = distributeFoldMap go

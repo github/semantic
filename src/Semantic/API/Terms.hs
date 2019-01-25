@@ -63,6 +63,8 @@ parseTermBuilder :: (Traversable t, Member Distribute sig, ParseEffects sig m, M
   => TermOutputFormat-> t Blob -> m Builder
 parseTermBuilder TermJSONTree    = distributeFoldMap jsonTerm >=> serialize Format.JSON -- NB: Serialize happens at the top level for these two JSON formats to collect results of multiple blobs.
 parseTermBuilder TermJSONGraph   = distributeFoldMap jsonGraph >=> serialize Format.JSON -- termGraph >=> serialize Format.JSON
+-- TODO: Switch Term Graph output on CLI to new format like this:
+-- parseTermBuilder TermJSONGraph   = termGraph >=> serialize Format.JSON
 parseTermBuilder TermSExpression = distributeFoldMap sexpTerm
 parseTermBuilder TermDotGraph    = distributeFoldMap dotGraphTerm
 parseTermBuilder TermShow        = distributeFoldMap showTerm
