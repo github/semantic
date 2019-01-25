@@ -482,16 +482,10 @@ parameter =  requiredParameter
          <|> optionalParameter
 
 accessibilityModifier' :: Assignment Term
-accessibilityModifier' = makeTerm'
-                      <$> symbol AccessibilityModifier
-                      <*> children (inject <$> (textToAccessControl <$> source))
-
-textToAccessControl :: Text -> Declaration.AccessControl a
-textToAccessControl = \case
-  "protected" -> Declaration.Protected
-  "private"   -> Declaration.Private
-  -- | The catchall case is public.
-  _           -> Declaration.Public
+accessibilityModifier' = makeTerm <$> symbol AccessibilityModifier <*> children (public <|> protected <|> private)
+  where public    = symbol AnonPublic *> pure Declaration.Public
+        protected = symbol AnonProtected *> pure Declaration.Protected
+        private   = symbol AnonPrivate *> pure Declaration.Private
 
 destructuringPattern :: Assignment Term
 destructuringPattern = object <|> array
