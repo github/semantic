@@ -239,8 +239,14 @@ instance Listable1 Declaration.Function where
 instance Listable1 Declaration.Method where
   liftTiers tiers = liftCons6 (liftTiers tiers) tiers tiers tiers (liftTiers tiers) tiers Declaration.Method
 
-instance Listable1 Declaration.AccessControl where
-  liftTiers tiers = cons0 Declaration.Public -- \/ cons0 Declaration.Protected \/ cons0 Declaration.Private \/ cons0 Declaration.Unknown
+instance Listable1 Declaration.Public where
+  liftTiers tiers = cons0 Declaration.Public
+
+instance Listable1 Declaration.Protected where
+  liftTiers tiers = cons0 Declaration.Protected
+
+instance Listable1 Declaration.Private where
+  liftTiers tiers = cons0 Declaration.Private
 
 instance Listable1 Statement.If where
   liftTiers tiers = liftCons3 tiers tiers tiers Statement.If
