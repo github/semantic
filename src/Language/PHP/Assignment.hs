@@ -43,7 +43,6 @@ type Syntax = '[
   , Declaration.Function
   , Declaration.Method
   , Declaration.VariableDeclaration
-  , Declaration.AccessControl
   , Expression.Plus
   , Expression.Minus
   , Expression.Times
@@ -160,7 +159,11 @@ type Syntax = '[
   , Syntax.UseClause
   , Syntax.VariableName
   , Type.Annotation
-  , [] ]
+  , []
+  , Declaration.Public
+  , Declaration.Protected
+  , Declaration.Private
+  ]
 
 type Term = Term.Term (Sum Syntax) Location
 type Assignment = Assignment.Assignment [] Grammar

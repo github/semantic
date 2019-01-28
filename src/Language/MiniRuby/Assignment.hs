@@ -41,7 +41,6 @@ type Syntax =
   '[ Comment.Comment
    , Declaration.Function
    , Declaration.Method
-   , Declaration.AccessControl
    , Expression.Minus
    , Expression.Plus
    , Expression.Times
@@ -53,6 +52,9 @@ type Syntax =
    , Syntax.Identifier
    , Literal.Integer
    , []
+   , Declaration.Public
+   , Declaration.Protected
+   , Declaration.Private
    ]
 
 type Term = Term.Term (Sum Syntax) Location
@@ -107,7 +109,7 @@ method :: Assignment Term
 method = makeTerm <$> symbol Method <*> (withNewScope . children) (Declaration.Method [] <$> emptyTerm <*> accessibility <*> methodSelector <*> params <*> expressions')
   where params = symbol MethodParameters *> children (many parameter) <|> pure []
         expressions' = makeTerm <$> location <*> many expression
-        accessibility = makeTerm <$> location <*> pure Declaration.Unknown
+        accessibility = makeTerm <$> location <*> pure Declaration.Public
 
 methodSelector :: Assignment Term
 methodSelector = makeTerm <$> symbols <*> (Syntax.Identifier <$> (name <$> source))
