@@ -9,9 +9,9 @@
         (Array
           (Identifier))
         (Statements
+        { (Integer)
+        ->(Integer) }
         {+(Integer)+}
-        {+(Integer)+}
-        {+(Integer)+}
-        {-(Integer)-}
-        {-(Integer)-}
+        { (Integer)
+        ->(Integer) }
         {-(Integer)-})))))

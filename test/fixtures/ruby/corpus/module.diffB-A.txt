@@ -2,7 +2,7 @@
   (Module
     (Identifier)
   {-(Method
-    {-(Unknown)-}
+    {-(Public)-}
     {-(Empty)-}
     {-(Identifier)-}
     {-(Statements)-})-})

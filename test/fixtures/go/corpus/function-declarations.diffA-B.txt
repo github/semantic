@@ -41,17 +41,18 @@
   { (Identifier)
   ->(Identifier) }
     (Statements))
-{+(Function
-  {+(Statements)+}
-  {+(Identifier)+}
-  {+(NoOp
-    {+(Empty)+})+})+}
   (Function
+  {+(Statements)+}
+  {-(Identifier)-}
   { (Identifier)
   ->(Identifier) }
-  { (Identifier)
-  ->(Identifier) }
-    (Empty))
+  { (Empty)
+  ->(NoOp
+    {+(Empty)+}) })
+{+(Function
+  {+(Identifier)+}
+  {+(Identifier)+}
+  {+(Empty)+})+}
   (Function
     (Context
       (Comment)

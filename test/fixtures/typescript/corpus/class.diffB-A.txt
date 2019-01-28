@@ -17,22 +17,6 @@
       {+(Public)+}
       {+(Identifier)+}
       {+(Float)+})+}
-    {+(Method
-      {+(Empty)+}
-      {+(Empty)+}
-      {+(Empty)+}
-      {+(Public)+}
-      {+(Empty)+}
-      {+(Identifier)+}
-      {+(RequiredParameter
-        {+(Empty)+}
-        {+(Empty)+}
-        {+(Empty)+}
-        {+(Identifier)+}
-        {+(Empty)+})+}
-      {+(StatementBlock
-        {+(Return
-          {+(Identifier)+})+})+})+}
       (Method
         (Empty)
         (Empty)
@@ -45,58 +29,42 @@
           (Empty)
           (Empty)
           (Empty)
-        { (Identifier)
-        ->(Identifier) }
+          (Identifier)
           (Empty))
         (StatementBlock
           (Return
-          { (Identifier)
-          ->(Identifier) })))
-    {+(Method
-      {+(Empty)+}
-      {+(Empty)+}
-      {+(Empty)+}
-      {+(Public)+}
-      {+(Empty)+}
-      {+(Identifier)+}
-      {+(RequiredParameter
-        {+(Empty)+}
-        {+(Empty)+}
-        {+(Empty)+}
-        {+(Identifier)+}
-        {+(Empty)+})+}
-      {+(StatementBlock
-        {+(Return
-          {+(Identifier)+})+})+})+}
-    {-(Method
-      {-(Empty)-}
-      {-(Empty)-}
-      {-(Empty)-}
-      {-(Public)-}
-      {-(Empty)-}
-      {-(Identifier)-}
-      {-(RequiredParameter
-        {-(Empty)-}
-        {-(Empty)-}
-        {-(Empty)-}
-        {-(Identifier)-}
-        {-(Empty)-})-}
-      {-(StatementBlock
-        {-(Return
-          {-(Identifier)-})-})-})-}
-    {-(Method
-      {-(Empty)-}
-      {-(Empty)-}
-      {-(Empty)-}
-      {-(Public)-}
-      {-(Empty)-}
-      {-(Identifier)-}
-      {-(RequiredParameter
-        {-(Empty)-}
-        {-(Empty)-}
-        {-(Empty)-}
-        {-(Identifier)-}
-        {-(Empty)-})-}
-      {-(StatementBlock
-        {-(Return
-          {-(Identifier)-})-})-})-})))
+            (Identifier))))
+      (Method
+        (Empty)
+        (Empty)
+        (Empty)
+        (Public)
+        (Empty)
+      { (Identifier)
+      ->(Identifier) }
+        (RequiredParameter
+          (Empty)
+          (Empty)
+          (Empty)
+          (Identifier)
+          (Empty))
+        (StatementBlock
+          (Return
+            (Identifier))))
+      (Method
+        (Empty)
+        (Empty)
+        (Empty)
+        (Public)
+        (Empty)
+      { (Identifier)
+      ->(Identifier) }
+        (RequiredParameter
+          (Empty)
+          (Empty)
+          (Empty)
+          (Identifier)
+          (Empty))
+        (StatementBlock
+          (Return
+            (Identifier)))))))

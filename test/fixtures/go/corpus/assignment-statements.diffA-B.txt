@@ -43,15 +43,11 @@
       {+(RShift
         {+(Identifier)+}
         {+(Integer)+})+})+}
-      (Assignment
-      { (Identifier)
-      ->(Identifier) }
-      { (Times
-        {-(Identifier)-}
-        {-(Integer)-})
-      ->(DividedBy
+    {+(Assignment
+      {+(Identifier)+}
+      {+(DividedBy
         {+(Identifier)+}
-        {+(Integer)+}) })
+        {+(Integer)+})+})+}
     {+(Assignment
       {+(Identifier)+}
       {+(BXOr
@@ -80,6 +76,11 @@
               {+(KeyValue
                 {+(Identifier)+}
                 {+(Integer)+})+})+})+})+})+})+}
+    {-(Assignment
+      {-(Identifier)-}
+      {-(Times
+        {-(Identifier)-}
+        {-(Integer)-})-})-}
     {-(Assignment
       {-(Identifier)-}
       {-(Plus
