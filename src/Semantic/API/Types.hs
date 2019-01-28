@@ -54,6 +54,7 @@ import           Data.Bifunctor (first)
 import           Data.ByteString.Lazy.Char8 as BC
 import           Data.Char (toUpper)
 import           Data.Graph (VertexTag (..))
+import           Data.Language
 import           Data.String
 import qualified Data.Text as T
 import           GHC.Generics
@@ -61,9 +62,6 @@ import           Network.HTTP.Media ((//))
 import           Prologue
 import           Proto3.Suite as Proto3
 import           Servant.API
-
--- TODO: Remove dependence on these:
-import Data.Language
 
 -- These types represent the public API of semantic and are used to generate
 -- `proto/semantic.proto`.
