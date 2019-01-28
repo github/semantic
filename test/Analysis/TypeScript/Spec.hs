@@ -1,5 +1,6 @@
 module Analysis.TypeScript.Spec (spec) where
 
+import           Data.Syntax.Statement (StatementBlock(..))
 import qualified Data.Abstract.ScopeGraph as ScopeGraph (AccessControl(..))
 import           Control.Abstract.ScopeGraph hiding (AccessControl(..))
 import           Control.Abstract.Value as Value hiding (String, Unit)
@@ -177,8 +178,8 @@ spec config = parallel $ do
 
     it "member access of private methods throws AccessControlError" $ do
       (_, (_, res)) <- evaluate ["access_control/adder.ts", "access_control/private_method.ts"]
-      let expected = "Left (SomeError (BaseError (ModuleInfo \"private_method.ts\") [4, 1]..[4, 16] (AccessControlError (\"foo\",Public) (\"private_add\",Private) (Closure (PackageInfo {packageName = \"access_control\", packageResolutions = fromList []}) (ModuleInfo \"adder.ts\") (Just \"private_add\") Nothing [] (Right (StatementBlock [])) (Precise 20) (Precise 18)))))"
-      show res `shouldBe` expected
+      let expected = Left (SomeError (inject @(BaseError (EvalError (Quieterm (Sum TypeScript.Syntax) Location) Precise (Concrete.Value (Quieterm (Sum TypeScript.Syntax) Location) Precise))) (BaseError (ModuleInfo "private_method.ts") (Span (Pos 4 1) (Pos 4 16)) (AccessControlError ("foo", ScopeGraph.Public) ("private_add", ScopeGraph.Private) (Closure (PackageInfo "access_control" mempty) (ModuleInfo "adder.ts") (Just "private_add") Nothing [] (Right (Quieterm (In (Location (Range 1 4) (Span (Pos 4 1) (Pos 4 16))) (inject (StatementBlock []))))) (Precise 20) (Precise 18))))))
+      res `shouldBe` expected
 
   where
     fixtures = "test/fixtures/typescript/analysis/"
