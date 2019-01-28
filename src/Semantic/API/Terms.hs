@@ -32,9 +32,9 @@ import           Parsing.Parser
 import           Rendering.Graph
 import           Rendering.JSON hiding (JSON)
 import qualified Rendering.JSON
+import           Semantic.API.Helpers
 import           Semantic.API.Types hiding (Blob)
 import qualified Semantic.API.Types as API
-import Semantic.API.Helpers
 import           Semantic.Task
 import           Serializing.Format hiding (JSON)
 import qualified Serializing.Format as Format

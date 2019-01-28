@@ -5,25 +5,25 @@ module Semantic.API.Symbols
   , parseSymbolsBuilder
   ) where
 
-import Control.Effect
-import Control.Effect.Error
-import Control.Exception
-import Data.Blob
-import Data.ByteString.Builder
-import Data.Location
-import Data.Maybe
-import Data.Term
-import Data.Text (pack)
-import Parsing.Parser
-import Semantic.API.Helpers
-import Semantic.API.Terms (ParseEffects, doParse)
-import Semantic.API.Types hiding (Blob)
-import qualified Semantic.API.Types as API
+import           Control.Effect
+import           Control.Effect.Error
+import           Control.Exception
+import           Data.Blob
+import           Data.ByteString.Builder
+import           Data.Location
+import           Data.Maybe
+import           Data.Term
+import           Data.Text (pack)
+import           Parsing.Parser
+import           Semantic.API.Helpers
 import qualified Semantic.API.LegacyTypes as Legacy
-import Semantic.Task
-import Serializing.Format
-import Tags.Taggable
-import Tags.Tagging
+import           Semantic.API.Terms (ParseEffects, doParse)
+import           Semantic.API.Types hiding (Blob)
+import qualified Semantic.API.Types as API
+import           Semantic.Task
+import           Serializing.Format
+import           Tags.Taggable
+import           Tags.Tagging
 
 legacyParseSymbols :: (Member Distribute sig, ParseEffects sig m, Traversable t) => t Blob -> m Legacy.ParseTreeSymbolResponse
 legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> distributeFoldMap go blobs

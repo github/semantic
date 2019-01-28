@@ -31,9 +31,9 @@ import           Prologue
 import           Rendering.Graph
 import           Rendering.JSON hiding (JSON)
 import qualified Rendering.JSON
+import           Semantic.API.Helpers
 import           Semantic.API.Types hiding (Blob, BlobPair)
 import qualified Semantic.API.Types as API
-import Semantic.API.Helpers
 import           Semantic.Task as Task
 import           Semantic.Telemetry as Stat
 import           Serializing.Format hiding (JSON)
