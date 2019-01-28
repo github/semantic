@@ -7,15 +7,15 @@ module Semantic.API.Helpers
   , apiBlobPairToBlobPair
   ) where
 
-import qualified Semantic.API.Types as API
-import qualified Semantic.API.LegacyTypes as Legacy
+import           Data.Bifunctor.Join
+import qualified Data.Blob as Data
+import           Data.Language (languageForScope)
+import           Data.Source (fromText)
 import qualified Data.Span as Data
 import qualified Data.Text as T
-import qualified Data.Blob as Data
-import Data.Bifunctor.Join
-import Data.These
-import Data.Source (fromText)
-import Data.Language (languageForScope)
+import           Data.These
+import qualified Semantic.API.LegacyTypes as Legacy
+import qualified Semantic.API.Types as API
 
 spanToSpan :: Data.Span -> Maybe API.Span
 spanToSpan Data.Span{..} = Just $ API.Span (toPos spanStart) (toPos spanEnd)

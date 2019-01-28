@@ -7,8 +7,8 @@ import           Data.ByteString.Builder
 import           Data.Diff
 import qualified Data.Text as T
 import           Rendering.TOC
-import           Semantic.API.Helpers
 import           Semantic.API.Diffs
+import           Semantic.API.Helpers
 import           Semantic.API.Types hiding (Blob, BlobPair)
 import qualified Semantic.API.Types as API
 import           Semantic.Task as Task
