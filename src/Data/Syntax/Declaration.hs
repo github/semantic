@@ -73,20 +73,32 @@ instance Declarations1 Function where
 instance FreeVariables1 Function where
   liftFreeVariables freeVariables f@Function{..} = foldMap freeVariables f `Set.difference` foldMap freeVariables functionParameters
 
-data AccessControl a = Public
-                     | Protected
-                     | Private
-                     | Unknown
-                     deriving (Declarations1, Diffable, Eq, Ord, Show, Foldable, Traversable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Named1, Message1, NFData1)
-                     deriving (Eq1, Show1, Ord1) via Generically Data.Syntax.Declaration.AccessControl
+data Public a = Public
+  deriving (Declarations1, Diffable, Eq, Ord, Show, Foldable, Traversable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Named1, Message1, NFData1)
+  deriving (Eq1, Show1, Ord1) via Generically Public
 
-instance Evaluatable Data.Syntax.Declaration.AccessControl
+instance Evaluatable Public
 
-instance AccessControls1 Data.Syntax.Declaration.AccessControl where
-  liftTermToAccessControl _ Data.Syntax.Declaration.Public    = Just ScopeGraph.Public
-  liftTermToAccessControl _ Data.Syntax.Declaration.Protected = Just ScopeGraph.Protected
-  liftTermToAccessControl _ Data.Syntax.Declaration.Private   = Just ScopeGraph.Private
-  liftTermToAccessControl _ Data.Syntax.Declaration.Unknown   = Just ScopeGraph.Unknown
+instance AccessControls1 Public where
+  liftTermToAccessControl _ _ = Just ScopeGraph.Public
+
+data Protected a = Protected
+  deriving (Declarations1, Diffable, Eq, Ord, Show, Foldable, Traversable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Named1, Message1, NFData1)
+  deriving (Eq1, Show1, Ord1) via Generically Protected
+
+instance Evaluatable Protected
+
+instance AccessControls1 Protected where
+  liftTermToAccessControl _ _ = Just ScopeGraph.Protected
+
+data Private a = Private
+  deriving (Declarations1, Diffable, Eq, Ord, Show, Foldable, Traversable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Named1, Message1, NFData1)
+  deriving (Eq1, Show1, Ord1) via Generically Private
+
+instance Evaluatable Private
+
+instance AccessControls1 Private where
+  liftTermToAccessControl _ _ = Just ScopeGraph.Private
 
 data Method a = Method { methodContext :: [a]
                        , methodAccessControl :: a
