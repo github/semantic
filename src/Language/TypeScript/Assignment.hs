@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, LambdaCase, RankNTypes, TypeOperators #-}
+{-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-} -- FIXME
 module Language.TypeScript.Assignment
 ( assignment
@@ -483,9 +483,9 @@ parameter =  requiredParameter
 
 accessibilityModifier' :: Assignment Term
 accessibilityModifier' = makeTerm <$> symbol AccessibilityModifier <*> children (public <|> protected <|> private)
-  where public    = symbol AnonPublic *> pure Declaration.Public
-        protected = symbol AnonProtected *> pure Declaration.Protected
-        private   = symbol AnonPrivate *> pure Declaration.Private
+  where public    = symbol AnonPublic $> Declaration.Public
+        protected = symbol AnonProtected $> Declaration.Protected
+        private   = symbol AnonPrivate $> Declaration.Private
 
 destructuringPattern :: Assignment Term
 destructuringPattern = object <|> array
