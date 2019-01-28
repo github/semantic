@@ -70,19 +70,23 @@
         {-(Identifier)-})
       ->(MemberAccess
         {+(Identifier)+}) })
-      (Call
-      { (MemberAccess
-        {-(Identifier)-})
-      ->(MemberAccess
-        {+(Identifier)+}) }
-      { (Identifier)
-      ->(Identifier) }
-        (Empty))
-      (Call
-      { (MemberAccess
-        {-(Identifier)-})
-      ->(MemberAccess
-        {+(Identifier)+}) }
-      { (Identifier)
-      ->(Identifier) }
-        (Empty)))))
+    {+(Call
+      {+(MemberAccess
+        {+(Identifier)+})+}
+      {+(Identifier)+}
+      {+(Empty)+})+}
+    {+(Call
+      {+(MemberAccess
+        {+(Identifier)+})+}
+      {+(Identifier)+}
+      {+(Empty)+})+}
+    {-(Call
+      {-(MemberAccess
+        {-(Identifier)-})-}
+      {-(Identifier)-}
+      {-(Empty)-})-}
+    {-(Call
+      {-(MemberAccess
+        {-(Identifier)-})-}
+      {-(Identifier)-}
+      {-(Empty)-})-})))

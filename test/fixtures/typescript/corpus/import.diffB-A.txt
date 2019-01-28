@@ -2,8 +2,7 @@
 {+(Import)+}
 {+(QualifiedAliasedImport
   {+(Identifier)+})+}
-{ (Import)
-->(Import) }
+{+(Import)+}
 {+(Import)+}
 {+(Import)+}
 {+(Statements
@@ -14,10 +13,11 @@
   {+(QualifiedAliasedImport
     {+(Identifier)+})+})+}
 {+(SideEffectImport)+}
-{ (QualifiedAliasedImport
-  {-(Identifier)-})
-->(QualifiedAliasedImport
-  {+(Identifier)+}) }
+{+(QualifiedAliasedImport
+  {+(Identifier)+})+}
+{-(Import)-}
+{-(QualifiedAliasedImport
+  {-(Identifier)-})-}
 {-(Import)-}
 {-(Import)-}
 {-(Import)-}

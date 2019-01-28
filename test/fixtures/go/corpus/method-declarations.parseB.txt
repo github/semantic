@@ -5,14 +5,14 @@
     (Identifier)
     (Statements))
   (Method
-    (Unknown)
+    (Public)
     (Statements
       (Identifier))
     (Identifier)
     (Empty))
   (Method
     (Identifier)
-    (Unknown)
+    (Public)
     (Statements
       (Identifier)
       (Identifier))
@@ -23,7 +23,7 @@
     (Statements))
   (Method
     (Identifier)
-    (Unknown)
+    (Public)
     (Statements
       (Identifier)
       (Pointer
@@ -73,7 +73,7 @@
           (MemberAccess
             (Identifier))
           (Identifier))))
-    (Unknown)
+    (Public)
     (Statements
       (Identifier)
       (Pointer
@@ -85,7 +85,7 @@
     (Empty))
   (Method
     (Identifier)
-    (Unknown)
+    (Public)
     (Statements
       (Identifier)
       (Pointer
