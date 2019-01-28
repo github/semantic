@@ -31,7 +31,9 @@ import           Prologue
 import           Rendering.Graph
 import           Rendering.JSON hiding (JSON)
 import qualified Rendering.JSON
-import           Semantic.API.Types
+import           Semantic.API.Types hiding (Blob, BlobPair)
+import qualified Semantic.API.Types as API
+import Semantic.API.Helpers
 import           Semantic.Task as Task
 import           Semantic.Telemetry as Stat
 import           Serializing.Format hiding (JSON)
@@ -68,8 +70,8 @@ renderJSONTree blobPair = pure . renderJSONDiff blobPair
 renderJSONGraph :: (Applicative m, Functor syntax, Foldable syntax, ConstructorName syntax) => BlobPair -> Diff syntax Location Location -> m (Rendering.JSON.JSON "diffs" SomeJSON)
 renderJSONGraph blobPair = pure . renderJSONAdjDiff blobPair . renderTreeGraph
 
-diffGraph :: (Traversable t, DiffEffects sig m) => t BlobPair -> m DiffTreeGraphResponse
-diffGraph = distributeFoldMap go
+diffGraph :: (Traversable t, DiffEffects sig m) => t API.BlobPair -> m DiffTreeGraphResponse
+diffGraph blobs = distributeFoldMap go (apiBlobPairToBlobPair <$> blobs)
   where
     go :: (DiffEffects sig m) => BlobPair -> m DiffTreeGraphResponse
     go blobPair = doDiff blobPair (const pure) render

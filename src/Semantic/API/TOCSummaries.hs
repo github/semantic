@@ -7,9 +7,10 @@ import           Data.ByteString.Builder
 import           Data.Diff
 import qualified Data.Text as T
 import           Rendering.TOC
-import           Semantic.API.Converters
+import           Semantic.API.Helpers
 import           Semantic.API.Diffs
-import           Semantic.API.Types
+import           Semantic.API.Types hiding (Blob, BlobPair)
+import qualified Semantic.API.Types as API
 import           Semantic.Task as Task
 import           Serializing.Format
 
@@ -27,8 +28,8 @@ legacyDiffSummary = distributeFoldMap go
     render :: (Foldable syntax, Functor syntax, Applicative m) => BlobPair -> Diff syntax (Maybe Declaration) (Maybe Declaration) -> m Summaries
     render blobPair = pure . renderToCDiff blobPair
 
-diffSummary :: (DiffEffects sig m) => [BlobPair] -> m DiffTreeTOCResponse
-diffSummary blobs = DiffTreeTOCResponse <$> distributeFor blobs go
+diffSummary :: (DiffEffects sig m) => [API.BlobPair] -> m DiffTreeTOCResponse
+diffSummary blobs = DiffTreeTOCResponse <$> distributeFor (apiBlobPairToBlobPair <$> blobs) go
   where
     go :: (DiffEffects sig m) => BlobPair -> m TOCSummaryFile
     go blobPair = doDiff blobPair (decorate . declarationAlgebra) render

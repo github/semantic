@@ -32,14 +32,16 @@ import           Parsing.Parser
 import           Rendering.Graph
 import           Rendering.JSON hiding (JSON)
 import qualified Rendering.JSON
-import           Semantic.API.Types
+import           Semantic.API.Types hiding (Blob)
+import qualified Semantic.API.Types as API
+import Semantic.API.Helpers
 import           Semantic.Task
 import           Serializing.Format hiding (JSON)
 import qualified Serializing.Format as Format
 import           Tags.Taggable
 
-termGraph :: (Traversable t, Member Distribute sig, ParseEffects sig m) => t Blob -> m ParseTreeGraphResponse
-termGraph = distributeFoldMap go
+termGraph :: (Traversable t, Member Distribute sig, ParseEffects sig m) => t API.Blob -> m ParseTreeGraphResponse
+termGraph blobs = distributeFoldMap go (fmap apiBlobToBlob blobs)
   where
     go :: ParseEffects sig m => Blob -> m ParseTreeGraphResponse
     go blob = (doParse blob >>= withSomeTerm (pure . render))

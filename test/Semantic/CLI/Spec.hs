@@ -4,7 +4,7 @@ import           Control.Monad (when)
 import qualified Data.ByteString as B
 import           Data.ByteString.Builder
 import           Data.Foldable (for_)
-import           Semantic.API hiding (File)
+import           Semantic.API hiding (File, Blob, BlobPair)
 import           Semantic.CLI
 import           Semantic.IO
 import           Semantic.Task

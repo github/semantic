@@ -15,9 +15,10 @@ import Data.Maybe
 import Data.Term
 import Data.Text (pack)
 import Parsing.Parser
-import Semantic.API.Converters
+import Semantic.API.Helpers
 import Semantic.API.Terms (ParseEffects, doParse)
-import Semantic.API.Types
+import Semantic.API.Types hiding (Blob)
+import qualified Semantic.API.Types as API
 import qualified Semantic.API.LegacyTypes as Legacy
 import Semantic.Task
 import Serializing.Format
@@ -51,8 +52,8 @@ parseSymbolsBuilder blobs
   -- TODO: Switch away from legacy format on CLI too.
   = legacyParseSymbols blobs >>= serialize JSON
 
-parseSymbols :: (Member Distribute sig, ParseEffects sig m, Traversable t) => t Blob -> m ParseTreeSymbolResponse
-parseSymbols blobs = ParseTreeSymbolResponse <$> distributeFoldMap go blobs
+parseSymbols :: (Member Distribute sig, ParseEffects sig m, Traversable t) => t API.Blob -> m ParseTreeSymbolResponse
+parseSymbols blobs = ParseTreeSymbolResponse <$> distributeFoldMap go (apiBlobToBlob <$> blobs)
   where
     go :: (Member (Error SomeException) sig, Member Task sig, Carrier sig m, Monad m) => Blob -> m [File]
     go blob@Blob{..} = (doParse blob >>= withSomeTerm (renderToSymbols blob)) `catchError` (\(SomeException _) -> pure (pure emptyFile))

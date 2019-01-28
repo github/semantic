@@ -2,7 +2,7 @@ module Semantic.Spec (spec) where
 
 import Data.Diff
 import Data.Patch
-import Semantic.API
+import Semantic.API hiding (Blob)
 import System.Exit
 
 import SpecHelpers

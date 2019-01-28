@@ -6,6 +6,7 @@ module Data.Language
   , extensionsForLanguage
   , knownLanguage
   , languageForFilePath
+  , languageForScope
   , languageForType
   ) where
 
@@ -95,6 +96,7 @@ instance FromJSON Language where
     "php"        -> PHP
     _            -> Unknown
 
+
 -- | Predicate failing on 'Unknown' and passing in all other cases.
 knownLanguage :: Language -> Bool
 knownLanguage = (/= Unknown)
@@ -133,6 +135,12 @@ languageForType mediaType = case mediaType of
     ".php"  -> PHP
     ".phpt" -> PHP
     _       -> Unknown
+
+-- | Returns a Language for a TextMate Scope.
+languageForScope :: String -> Language
+languageForScope = \case
+  "source.ruby" -> Ruby
+  _             -> Unknown
 
 extensionsForLanguage :: Language -> [String]
 extensionsForLanguage language = case language of
