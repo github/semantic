@@ -35,91 +35,93 @@ message RubySyntax {
     Comment comment = 1;
     Function function = 2;
     Method method = 3;
-    AccessControl accessControl = 4;
-    File file = 5;
-    Line line = 6;
-    Plus plus = 7;
-    Minus minus = 8;
-    Times times = 9;
-    DividedBy dividedBy = 10;
-    Modulo modulo = 11;
-    Power power = 12;
-    Negate negate = 13;
-    FloorDivision floorDivision = 14;
-    BAnd bAnd = 15;
-    BOr bOr = 16;
-    BXOr bXOr = 17;
-    LShift lShift = 18;
-    RShift rShift = 19;
-    Complement complement = 20;
-    And and = 21;
-    Not not = 22;
-    Or or = 23;
-    XOr xOr = 24;
-    Call call = 25;
-    LessThan lessThan = 26;
-    LessThanEqual lessThanEqual = 27;
-    GreaterThan greaterThan = 28;
-    GreaterThanEqual greaterThanEqual = 29;
-    Equal equal = 30;
-    StrictEqual strictEqual = 31;
-    Comparison comparison = 32;
-    Enumeration enumeration = 33;
-    Matches matches = 34;
-    NotMatches notMatches = 35;
-    MemberAccess memberAccess = 36;
-    ScopeResolution scopeResolution = 37;
-    Subscript subscript = 38;
-    Member member = 39;
-    This this = 40;
-    Array array = 41;
-    Boolean boolean = 42;
-    Character character = 43;
-    Complex complex = 44;
-    EscapeSequence escapeSequence = 45;
-    Float float = 46;
-    Hash hash = 47;
-    Integer integer = 48;
-    InterpolationElement interpolationElement = 49;
-    KeyValue keyValue = 50;
-    Null null = 51;
-    Rational rational = 52;
-    Regex regex = 53;
-    String string = 54;
-    Symbol symbol = 55;
-    SymbolElement symbolElement = 56;
-    TextElement textElement = 57;
-    Assignment assignment = 58;
-    Break break = 59;
-    Catch catch = 60;
-    Continue continue = 61;
-    Else else = 62;
-    Finally finally = 63;
-    ForEach forEach = 64;
-    If if = 65;
-    Match match = 66;
-    Pattern pattern = 67;
-    Retry retry = 68;
-    Return return = 69;
-    ScopeEntry scopeEntry = 70;
-    ScopeExit scopeExit = 71;
-    Statements statements = 72;
-    Try try = 73;
-    While while = 74;
-    Yield yield = 75;
-    Context context = 76;
-    Empty empty = 77;
-    Error error = 78;
-    Identifier identifier = 79;
-    Class class = 80;
-    Load load = 81;
-    LowPrecedenceAnd lowPrecedenceAnd = 82;
-    LowPrecedenceOr lowPrecedenceOr = 83;
-    Module module = 84;
-    Require require = 85;
-    Send send = 86;
-    ZSuper zSuper = 87;
-    List list = 88;
+    File file = 4;
+    Line line = 5;
+    Plus plus = 6;
+    Minus minus = 7;
+    Times times = 8;
+    DividedBy dividedBy = 9;
+    Modulo modulo = 10;
+    Power power = 11;
+    Negate negate = 12;
+    FloorDivision floorDivision = 13;
+    BAnd bAnd = 14;
+    BOr bOr = 15;
+    BXOr bXOr = 16;
+    LShift lShift = 17;
+    RShift rShift = 18;
+    Complement complement = 19;
+    And and = 20;
+    Not not = 21;
+    Or or = 22;
+    XOr xOr = 23;
+    Call call = 24;
+    LessThan lessThan = 25;
+    LessThanEqual lessThanEqual = 26;
+    GreaterThan greaterThan = 27;
+    GreaterThanEqual greaterThanEqual = 28;
+    Equal equal = 29;
+    StrictEqual strictEqual = 30;
+    Comparison comparison = 31;
+    Enumeration enumeration = 32;
+    Matches matches = 33;
+    NotMatches notMatches = 34;
+    MemberAccess memberAccess = 35;
+    ScopeResolution scopeResolution = 36;
+    Subscript subscript = 37;
+    Member member = 38;
+    This this = 39;
+    Array array = 40;
+    Boolean boolean = 41;
+    Character character = 42;
+    Complex complex = 43;
+    EscapeSequence escapeSequence = 44;
+    Float float = 45;
+    Hash hash = 46;
+    Integer integer = 47;
+    InterpolationElement interpolationElement = 48;
+    KeyValue keyValue = 49;
+    Null null = 50;
+    Rational rational = 51;
+    Regex regex = 52;
+    String string = 53;
+    Symbol symbol = 54;
+    SymbolElement symbolElement = 55;
+    TextElement textElement = 56;
+    Assignment assignment = 57;
+    Break break = 58;
+    Catch catch = 59;
+    Continue continue = 60;
+    Else else = 61;
+    Finally finally = 62;
+    ForEach forEach = 63;
+    If if = 64;
+    Match match = 65;
+    Pattern pattern = 66;
+    Retry retry = 67;
+    Return return = 68;
+    ScopeEntry scopeEntry = 69;
+    ScopeExit scopeExit = 70;
+    Statements statements = 71;
+    Try try = 72;
+    While while = 73;
+    Yield yield = 74;
+    Context context = 75;
+    Empty empty = 76;
+    Error error = 77;
+    Identifier identifier = 78;
+    Class class = 79;
+    Load load = 80;
+    LowPrecedenceAnd lowPrecedenceAnd = 81;
+    LowPrecedenceOr lowPrecedenceOr = 82;
+    Module module = 83;
+    Require require = 84;
+    Send send = 85;
+    ZSuper zSuper = 86;
+    List list = 87;
+    Public public = 88;
+    Protected protected = 89;
+    Private private = 90;
   }
 }
 
@@ -142,8 +144,6 @@ message Method {
   repeated RubyDiff methodParameters = 5;
   RubyDiff methodBody = 6;
 }
-
-message AccessControl { }
 
 message File { }
 
@@ -527,3 +527,9 @@ message ZSuper { }
 message List {
   repeated RubyDiff listContent = 1;
 }
+
+message Public { }
+
+message Protected { }
+
+message Private { }

@@ -15,113 +15,113 @@ message GoTerm {
 message GoSyntax {
   oneof syntax {
     Comment comment = 1;
-    AccessControl accessControl = 2;
-    Constructor constructor = 3;
-    Function function = 4;
-    Method method = 5;
-    MethodSignature methodSignature = 6;
-    Type type = 7;
-    TypeAlias typeAlias = 8;
-    Plus plus = 9;
-    Minus minus = 10;
-    Times times = 11;
-    DividedBy dividedBy = 12;
-    Modulo modulo = 13;
-    Power power = 14;
-    Negate negate = 15;
-    FloorDivision floorDivision = 16;
-    BOr bOr = 17;
-    BAnd bAnd = 18;
-    BXOr bXOr = 19;
-    LShift lShift = 20;
-    RShift rShift = 21;
-    UnsignedRShift unsignedRShift = 22;
-    Complement complement = 23;
-    Call call = 24;
-    LessThan lessThan = 25;
-    LessThanEqual lessThanEqual = 26;
-    GreaterThan greaterThan = 27;
-    GreaterThanEqual greaterThanEqual = 28;
-    Equal equal = 29;
-    StrictEqual strictEqual = 30;
-    Comparison comparison = 31;
-    Subscript subscript = 32;
-    Member member = 33;
-    PostDecrement postDecrement = 34;
-    PostIncrement postIncrement = 35;
-    MemberAccess memberAccess = 36;
-    And and = 37;
-    Not not = 38;
-    Or or = 39;
-    XOr xOr = 40;
-    Composite composite = 41;
-    DefaultPattern defaultPattern = 42;
-    Defer defer = 43;
-    Field field = 44;
-    Go go = 45;
-    Label label = 46;
-    Package package = 47;
-    Receive receive = 48;
-    ReceiveOperator receiveOperator = 49;
-    Rune rune = 50;
-    Select select = 51;
-    Send send = 52;
-    Slice slice = 53;
-    TypeAssertion typeAssertion = 54;
-    TypeConversion typeConversion = 55;
-    TypeSwitch typeSwitch = 56;
-    TypeSwitchGuard typeSwitchGuard = 57;
-    Variadic variadic = 58;
-    BidirectionalChannel bidirectionalChannel = 59;
-    ReceiveChannel receiveChannel = 60;
-    SendChannel sendChannel = 61;
-    Import import = 62;
-    QualifiedImport qualifiedImport = 63;
-    SideEffectImport sideEffectImport = 64;
-    Array array = 65;
-    Complex complex = 66;
-    Float float = 67;
-    Hash hash = 68;
-    Integer integer = 69;
-    KeyValue keyValue = 70;
-    Pointer pointer = 71;
-    Reference reference = 72;
-    TextElement textElement = 73;
-    Assignment assignment = 74;
-    Break break = 75;
-    Continue continue = 76;
-    For for = 77;
-    ForEach forEach = 78;
-    Goto goto = 79;
-    If if = 80;
-    Match match = 81;
-    NoOp noOp = 82;
-    Pattern pattern = 83;
-    Return return = 84;
-    Statements statements = 85;
-    Context context = 86;
-    Error error = 87;
-    Empty empty = 88;
-    Identifier identifier = 89;
-    Annotation annotation = 90;
-    TypeArray typeArray = 91;
-    TypeFunction typeFunction = 92;
-    Interface interface = 93;
-    Map map = 94;
-    Parenthesized parenthesized = 95;
-    TypePointer typePointer = 96;
-    TypeSlice typeSlice = 97;
-    List list = 98;
-    String string = 99;
-    EscapeSequence escapeSequence = 100;
+    Constructor constructor = 2;
+    Function function = 3;
+    Method method = 4;
+    MethodSignature methodSignature = 5;
+    Type type = 6;
+    TypeAlias typeAlias = 7;
+    Plus plus = 8;
+    Minus minus = 9;
+    Times times = 10;
+    DividedBy dividedBy = 11;
+    Modulo modulo = 12;
+    Power power = 13;
+    Negate negate = 14;
+    FloorDivision floorDivision = 15;
+    BOr bOr = 16;
+    BAnd bAnd = 17;
+    BXOr bXOr = 18;
+    LShift lShift = 19;
+    RShift rShift = 20;
+    UnsignedRShift unsignedRShift = 21;
+    Complement complement = 22;
+    Call call = 23;
+    LessThan lessThan = 24;
+    LessThanEqual lessThanEqual = 25;
+    GreaterThan greaterThan = 26;
+    GreaterThanEqual greaterThanEqual = 27;
+    Equal equal = 28;
+    StrictEqual strictEqual = 29;
+    Comparison comparison = 30;
+    Subscript subscript = 31;
+    Member member = 32;
+    PostDecrement postDecrement = 33;
+    PostIncrement postIncrement = 34;
+    MemberAccess memberAccess = 35;
+    And and = 36;
+    Not not = 37;
+    Or or = 38;
+    XOr xOr = 39;
+    Composite composite = 40;
+    DefaultPattern defaultPattern = 41;
+    Defer defer = 42;
+    Field field = 43;
+    Go go = 44;
+    Label label = 45;
+    Package package = 46;
+    Receive receive = 47;
+    ReceiveOperator receiveOperator = 48;
+    Rune rune = 49;
+    Select select = 50;
+    Send send = 51;
+    Slice slice = 52;
+    TypeAssertion typeAssertion = 53;
+    TypeConversion typeConversion = 54;
+    TypeSwitch typeSwitch = 55;
+    TypeSwitchGuard typeSwitchGuard = 56;
+    Variadic variadic = 57;
+    BidirectionalChannel bidirectionalChannel = 58;
+    ReceiveChannel receiveChannel = 59;
+    SendChannel sendChannel = 60;
+    Import import = 61;
+    QualifiedImport qualifiedImport = 62;
+    SideEffectImport sideEffectImport = 63;
+    Array array = 64;
+    Complex complex = 65;
+    Float float = 66;
+    Hash hash = 67;
+    Integer integer = 68;
+    KeyValue keyValue = 69;
+    Pointer pointer = 70;
+    Reference reference = 71;
+    TextElement textElement = 72;
+    Assignment assignment = 73;
+    Break break = 74;
+    Continue continue = 75;
+    For for = 76;
+    ForEach forEach = 77;
+    Goto goto = 78;
+    If if = 79;
+    Match match = 80;
+    NoOp noOp = 81;
+    Pattern pattern = 82;
+    Return return = 83;
+    Statements statements = 84;
+    Context context = 85;
+    Error error = 86;
+    Empty empty = 87;
+    Identifier identifier = 88;
+    Annotation annotation = 89;
+    TypeArray typeArray = 90;
+    TypeFunction typeFunction = 91;
+    Interface interface = 92;
+    Map map = 93;
+    Parenthesized parenthesized = 94;
+    TypePointer typePointer = 95;
+    TypeSlice typeSlice = 96;
+    List list = 97;
+    String string = 98;
+    EscapeSequence escapeSequence = 99;
+    Public public = 100;
+    Protected protected = 101;
+    Private private = 102;
   }
 }
 
 message Comment {
   string commentContent = 1;
 }
-
-message AccessControl { }
 
 message Constructor {
   repeated GoTerm constructorContext = 1;
@@ -593,6 +593,12 @@ message String {
 message EscapeSequence {
   string value = 1;
 }
+
+message Public { }
+
+message Protected { }
+
+message Private { }
 
 message ImportPath {
   string unPath = 1;
