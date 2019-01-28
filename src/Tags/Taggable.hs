@@ -331,13 +331,15 @@ instance Taggable Declaration.Decorator
 instance Taggable Declaration.InterfaceDeclaration
 instance Taggable Declaration.MethodSignature
 instance Taggable Declaration.OptionalParameter
+instance Taggable Declaration.Private
+instance Taggable Declaration.Protected
+instance Taggable Declaration.Public
 instance Taggable Declaration.PublicFieldDefinition
 instance Taggable Declaration.RequiredParameter
 instance Taggable Declaration.Type
 instance Taggable Declaration.TypeAlias
 instance Taggable Declaration.Variable
 instance Taggable Declaration.VariableDeclaration
-instance Taggable Declaration.AccessControl
 
 instance Taggable Directive.File
 instance Taggable Directive.Line
