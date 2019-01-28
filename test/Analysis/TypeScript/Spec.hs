@@ -168,20 +168,23 @@ spec config = parallel $ do
 
     it "member access of private field definition throws AccessControlError" $ do
       (_, (_, res)) <- evaluate ["access_control/adder.ts", "access_control/private_field_definition.ts"]
-      let expected = Left (SomeError (inject @(BaseError (EvalError (Quieterm (Sum TypeScript.Syntax) Location) Precise (Concrete.Value (Quieterm (Sum TypeScript.Syntax) Location) Precise))) (BaseError (ModuleInfo "private_field_definition.ts") (Span (Pos 4 1) (Pos 4 6)) (AccessControlError ("foo", ScopeGraph.Public) ("y", ScopeGraph.Private) (Concrete.Float (Decimal 2.0))))))
+      let expected = Left (SomeError (inject @TypeScriptEvalError (BaseError (ModuleInfo "private_field_definition.ts") (Span (Pos 4 1) (Pos 4 6)) (AccessControlError ("foo", ScopeGraph.Public) ("y", ScopeGraph.Private) (Concrete.Float (Decimal 2.0))))))
       res `shouldBe` expected
 
     it "member access of private static field definition throws AccessControlError" $ do
       (_, (_, res)) <- evaluate ["access_control/adder.ts", "access_control/private_static_field_definition.ts"]
-      let expected = Left (SomeError (inject @(BaseError (EvalError (Quieterm (Sum TypeScript.Syntax) Location) Precise (Concrete.Value (Quieterm (Sum TypeScript.Syntax) Location) Precise))) (BaseError (ModuleInfo "private_static_field_definition.ts") (Span (Pos 3 1) (Pos 3 8)) (AccessControlError ("Adder", ScopeGraph.Public) ("z", ScopeGraph.Private) Unit))))
+      let expected = Left (SomeError (inject @TypeScriptEvalError (BaseError (ModuleInfo "private_static_field_definition.ts") (Span (Pos 3 1) (Pos 3 8)) (AccessControlError ("Adder", ScopeGraph.Public) ("z", ScopeGraph.Private) Unit))))
       res `shouldBe` expected
 
     it "member access of private methods throws AccessControlError" $ do
       (_, (_, res)) <- evaluate ["access_control/adder.ts", "access_control/private_method.ts"]
-      let expected = Left (SomeError (inject @(BaseError (EvalError (Quieterm (Sum TypeScript.Syntax) Location) Precise (Concrete.Value (Quieterm (Sum TypeScript.Syntax) Location) Precise))) (BaseError (ModuleInfo "private_method.ts") (Span (Pos 4 1) (Pos 4 16)) (AccessControlError ("foo", ScopeGraph.Public) ("private_add", ScopeGraph.Private) (Closure (PackageInfo "access_control" mempty) (ModuleInfo "adder.ts") (Just "private_add") Nothing [] (Right (Quieterm (In (Location (Range 146 148) (Span (Pos 7 27) (Pos 7 29))) (inject (StatementBlock []))))) (Precise 20) (Precise 18))))))
+      let expected = Left (SomeError (inject @TypeScriptEvalError (BaseError (ModuleInfo "private_method.ts") (Span (Pos 4 1) (Pos 4 16)) (AccessControlError ("foo", ScopeGraph.Public) ("private_add", ScopeGraph.Private) (Closure (PackageInfo "access_control" mempty) (ModuleInfo "adder.ts") (Just "private_add") Nothing [] (Right (Quieterm (In (Location (Range 146 148) (Span (Pos 7 27) (Pos 7 29))) (inject (StatementBlock []))))) (Precise 20) (Precise 18))))))
       res `shouldBe` expected
 
   where
     fixtures = "test/fixtures/typescript/analysis/"
     evaluate = evalTypeScriptProject . map (fixtures <>)
     evalTypeScriptProject = testEvaluating <=< (evaluateProject' config (Proxy :: Proxy 'Language.TypeScript) typescriptParser)
+
+type TypeScriptTerm = Quieterm (Sum TypeScript.Syntax) Location
+type TypeScriptEvalError = BaseError (EvalError TypeScriptTerm Precise (Concrete.Value TypeScriptTerm Precise))
