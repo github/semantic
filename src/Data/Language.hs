@@ -139,8 +139,20 @@ languageForType mediaType = case mediaType of
 -- | Returns a Language for a TextMate Scope.
 languageForScope :: String -> Language
 languageForScope = \case
-  "source.ruby" -> Ruby
-  _             -> Unknown
+  "source.gfm"     -> Markdown
+  "source.go"      -> Go
+  "source.haskell" -> Haskell
+  "source.java"    -> Java
+  "source.js.jsx"  -> JSX
+  "source.js"      -> TypeScript
+  "source.json"    -> JSON
+  "source.md"      -> Markdown
+  "source.php"     -> PHP
+  "source.python"  -> Python
+  "source.ruby"    -> Ruby
+  "source.ts"      -> TypeScript
+  "source.tsx"     -> TypeScript
+  _                -> Unknown
 
 extensionsForLanguage :: Language -> [String]
 extensionsForLanguage language = case language of
