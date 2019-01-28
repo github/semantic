@@ -3,6 +3,8 @@ module Semantic.API.Types
   (
   -- Parse APIs
     ParseTreeRequest(..)
+  , Blob(..)
+  , BlobPair(..)
 
   -- Symbols for jump-to-definition
   , ParseTreeSymbolResponse(..)
@@ -61,7 +63,6 @@ import           Proto3.Suite as Proto3
 import           Servant.API
 
 -- TODO: Remove dependence on these:
-import Data.Blob
 import Data.Language
 
 -- These types represent the public API of semantic and are used to generate
@@ -72,7 +73,7 @@ import Data.Language
 --   * Don't write Message, Named, ToJSON, or FromJSON instances by hand, derive
 --     them.
 --
---   * For non-primative types, you'll always want to use Maybe as protobuf
+--   * For non-primitive types, you'll always want to use Maybe as protobuf
 --     fields are always optional.
 --
 --   * It's usually best to map internal types to these API types so that the
@@ -88,6 +89,23 @@ import Data.Language
 --
 
 newtype ParseTreeRequest = ParseTreeRequest { blobs :: [Blob] }
+  deriving stock (Eq, Show, Generic)
+  deriving anyclass (Message, Named, FromJSON)
+
+data Blob
+  = Blob
+  { content :: T.Text
+  , path :: FilePath
+  , scope :: String
+  }
+  deriving stock (Eq, Show, Generic)
+  deriving anyclass (Message, Named, FromJSON)
+
+data BlobPair
+  = BlobPair
+  { before :: Maybe Blob
+  , after :: Maybe Blob
+  }
   deriving stock (Eq, Show, Generic)
   deriving anyclass (Message, Named, FromJSON)
 

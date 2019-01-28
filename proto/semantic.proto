@@ -159,9 +159,9 @@ enum Language {
 }
 
 message Blob {
-  bytes blobSource = 1;
-  string blobPath = 2;
-  Language blobLanguage = 3;
+  string content = 1;
+  string path = 2;
+  string scope = 3;
 }
 
 message BlobPair {

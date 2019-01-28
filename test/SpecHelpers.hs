@@ -80,7 +80,7 @@ import Data.Set (Set)
 import qualified Semantic.IO as IO
 import Semantic.Config (Config)
 import Semantic.Telemetry (LogQueue, StatQueue)
-import Semantic.API hiding (File)
+import Semantic.API hiding (File, Blob, BlobPair)
 import System.Exit (die)
 import Control.Exception (displayException)
 

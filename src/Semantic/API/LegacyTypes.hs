@@ -1,6 +1,8 @@
 {-# LANGUAGE DerivingVia, DerivingStrategies, DeriveAnyClass, DuplicateRecordFields #-}
 module Semantic.API.LegacyTypes
-  ( ParseTreeSymbolResponse(..)
+  ( DiffTreeRequest(..)
+  , ParseTreeRequest(..)
+  , ParseTreeSymbolResponse(..)
   , File(..)
   , Symbol(..)
   , Span(..)
@@ -8,13 +10,23 @@ module Semantic.API.LegacyTypes
   ) where
 
 import           Data.Aeson
+import           Data.Blob
 import qualified Data.Text as T
 import           GHC.Generics
 import           Proto3.Suite as Proto3
 
+newtype DiffTreeRequest = DiffTreeRequest { blobs :: [BlobPair] }
+  deriving stock (Eq, Show, Generic)
+  deriving anyclass (Message, Named, FromJSON)
+
 --
 -- Legacy Symbols API
 --
+
+newtype ParseTreeRequest = ParseTreeRequest { blobs :: [Blob] }
+  deriving stock (Eq, Show, Generic)
+  deriving anyclass (Message, Named, FromJSON)
+
 newtype ParseTreeSymbolResponse = ParseTreeSymbolResponse { files :: [File] }
   deriving stock (Eq, Show, Generic)
   deriving anyclass (Message, Named, ToJSON)

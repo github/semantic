@@ -18,7 +18,7 @@ import Data.Patch
 import Data.String (IsString (..))
 import Data.Term
 import Prologue
-import Semantic.API.Converters
+import Semantic.API.Helpers
 import Semantic.API.Types
 
 -- TODO: rename as this isn't a render
