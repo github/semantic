@@ -31,7 +31,6 @@ import Data.ImportPath (importPath, defaultAlias)
 
 type Syntax =
   '[ Comment.Comment
-   , Declaration.AccessControl
    , Declaration.Constructor
    , Declaration.Function
    , Declaration.Method
@@ -130,6 +129,9 @@ type Syntax =
    , []
    , Literal.String
    , Literal.EscapeSequence
+   , Declaration.Public
+   , Declaration.Protected
+   , Declaration.Private
    ]
 
 type Term = Term.Term (Sum Syntax) Location
@@ -459,7 +461,7 @@ indexExpression :: Assignment Term
 indexExpression = makeTerm <$> symbol IndexExpression <*> children (Expression.Subscript <$> expression <*> manyTerm expression)
 
 methodDeclaration :: Assignment Term
-methodDeclaration = makeTerm <$> symbol MethodDeclaration <*> children (mkTypedMethodDeclaration <$> receiver <*> unknownAccessControl <*> term fieldIdentifier <*> params <*> returnParameters <*> (term block <|> emptyTerm))
+methodDeclaration = makeTerm <$> symbol MethodDeclaration <*> children (mkTypedMethodDeclaration <$> receiver <*> publicAccessControl <*> term fieldIdentifier <*> params <*> returnParameters <*> (term block <|> emptyTerm))
   where
     params = symbol ParameterList *> children (manyTerm expression)
     receiver = symbol ParameterList *> children expressions
@@ -469,13 +471,13 @@ methodDeclaration = makeTerm <$> symbol MethodDeclaration <*> children (mkTypedM
                     <|> pure []
 
 methodSpec :: Assignment Term
-methodSpec =  makeTerm <$> symbol MethodSpec <*> children (mkMethodSpec <$> unknownAccessControl <*> expression <*> params <*> (expression <|> emptyTerm))
+methodSpec =  makeTerm <$> symbol MethodSpec <*> children (mkMethodSpec <$> publicAccessControl <*> expression <*> params <*> (expression <|> emptyTerm))
   where
     params = symbol ParameterList *> children (manyTerm expression)
     mkMethodSpec accessControl name' params optionalTypeLiteral = Declaration.MethodSignature [optionalTypeLiteral] accessControl name' params
 
-unknownAccessControl :: Assignment Term
-unknownAccessControl = makeTerm <$> location <*> pure Declaration.Unknown
+publicAccessControl :: Assignment Term
+publicAccessControl = makeTerm <$> location <*> pure Declaration.Public
 
 methodSpecList :: Assignment Term
 methodSpecList = symbol MethodSpecList *> children expressions
