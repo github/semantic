@@ -44,7 +44,6 @@ type Syntax = '[
     Comment.Comment
   , Declaration.Function
   , Declaration.Method
-  , Declaration.AccessControl
   , Directive.File
   , Directive.Line
   , Expression.Plus
@@ -129,6 +128,9 @@ type Syntax = '[
   , Ruby.Syntax.Send
   , Ruby.Syntax.ZSuper
   , []
+  , Declaration.Public
+  , Declaration.Protected
+  , Declaration.Private
   ]
 
 type Term = Term.Term (Sum Syntax) Location
@@ -336,12 +338,12 @@ method :: Assignment Term
 method = makeTerm <$> symbol Method <*> (withNewScope . children) (Declaration.Method [] <$> accessControl <*> emptyTerm <*> methodSelector <*> params <*> expressions')
   where params = symbol MethodParameters *> children (many parameter) <|> pure []
         expressions' = makeTerm <$> location <*> many expression
-        accessControl = makeTerm <$> location <*> pure Declaration.Unknown
+        accessControl = makeTerm <$> location <*> pure Declaration.Public
 
 singletonMethod :: Assignment Term
 singletonMethod = makeTerm <$> symbol SingletonMethod <*> (withNewScope . children) (Declaration.Method [] <$> accessControl <*> expression <*> methodSelector <*> params <*> expressions)
   where params = symbol MethodParameters *> children (many parameter) <|> pure []
-        accessControl = makeTerm <$> location <*> pure Declaration.Unknown
+        accessControl = makeTerm <$> location <*> pure Declaration.Public
 
 lambda :: Assignment Term
 lambda = makeTerm <$> symbol Lambda <*> (withExtendedScope . children) (

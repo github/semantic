@@ -46,7 +46,6 @@ type Syntax =
    , Declaration.InterfaceDeclaration
    , Declaration.Method
    , Declaration.VariableDeclaration
-   , Declaration.AccessControl
    , Expression.Plus
    , Expression.Minus
    , Expression.Times
@@ -151,6 +150,9 @@ type Syntax =
    , Type.Annotation
    , Statement.Return
    , []
+   , Declaration.Public
+   , Declaration.Protected
+   , Declaration.Private
    ]
 
 type Term = Term.Term (Sum Syntax) Location
@@ -339,7 +341,7 @@ method = makeTerm <$> symbol MethodDeclaration <*> children (makeMethod <$> many
   where
     methodBody = symbol MethodBody *> children (term expression <|> emptyTerm)
     methodDeclarator = symbol MethodDeclarator *> children ( (,) <$> identifier <*> formalParameters)
-    accessibility = makeTerm <$> location <*> pure Declaration.Unknown
+    accessibility = makeTerm <$> location <*> pure Declaration.Public
     methodHeader = symbol MethodHeader *> children ((,,,,) <$> (typeParameters <|> pure []) <*> manyTerm annotation <*> type' <*> methodDeclarator <*> (throws <|> pure []))
     makeMethod modifiers receiver accessibility (typeParams, annotations, returnType, (name, params), throws) = Declaration.Method (returnType : modifiers <> typeParams <> annotations <> throws) receiver accessibility name params
 

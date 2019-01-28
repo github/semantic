@@ -50,7 +50,6 @@ type Syntax = '[
   , Declaration.PublicFieldDefinition
   , Declaration.VariableDeclaration
   , Declaration.TypeAlias
-  , Declaration.AccessControl
   , Expression.Plus
   , Expression.Minus
   , Expression.Times
@@ -207,6 +206,9 @@ type Syntax = '[
   , []
   , Statement.StatementBlock
   , TypeScript.Syntax.MetaProperty
+  , Declaration.Public
+  , Declaration.Protected
+  , Declaration.Private
   ]
 
 type Term = Term.Term (Sum Syntax) Location
@@ -482,10 +484,10 @@ parameter =  requiredParameter
          <|> optionalParameter
 
 accessibilityModifier' :: Assignment Term
-accessibilityModifier' = makeTerm <$> symbol AccessibilityModifier <*> children (public <|> protected <|> private)
-  where public    = symbol AnonPublic $> Declaration.Public
-        protected = symbol AnonProtected $> Declaration.Protected
-        private   = symbol AnonPrivate $> Declaration.Private
+accessibilityModifier' = makeTerm' <$> symbol AccessibilityModifier <*> children (public <|> protected <|> private)
+  where public    = symbol AnonPublic $> inject Declaration.Public
+        protected = symbol AnonProtected $> inject Declaration.Protected
+        private   = symbol AnonPrivate $> inject Declaration.Private
 
 destructuringPattern :: Assignment Term
 destructuringPattern = object <|> array
