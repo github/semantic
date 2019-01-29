@@ -12,6 +12,7 @@ import Prologue
 import           Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
 import qualified Data.Abstract.Name as Name
+import qualified Data.Abstract.ScopeGraph as ScopeGraph (AccessControl(..))
 import qualified Data.Diff as Diff
 import qualified Data.List.NonEmpty as NonEmpty
 import           Data.Syntax
@@ -160,9 +161,6 @@ type Syntax = '[
   , Syntax.VariableName
   , Type.Annotation
   , []
-  , Declaration.Public
-  , Declaration.Protected
-  , Declaration.Private
   ]
 
 type Term = Term.Term (Sum Syntax) Location
@@ -447,17 +445,17 @@ classMemberDeclaration = choice [
   traitUseClause
   ]
 
--- TODO: What should the `location` be for implicit `public` access control modifier?
-publicAccessControl :: Assignment Term
-publicAccessControl = makeTerm <$> location <*> pure Declaration.Public
+publicAccessControl :: ScopeGraph.AccessControl
+publicAccessControl = ScopeGraph.Public
 
+-- TODO: Update to check for AccessControl.
 methodDeclaration :: Assignment Term
-methodDeclaration =  (makeTerm <$> symbol MethodDeclaration <*> children (makeMethod1 <$> (accessControlModifier <|> publicAccessControl) <*> manyTerm methodModifier <*> emptyTerm <*> functionDefinitionParts))
-                 <|> makeTerm <$> symbol MethodDeclaration <*> children (makeMethod2 <$> (accessControlModifier <|> publicAccessControl) <*> someTerm methodModifier <*> emptyTerm <*> term name <*> parameters <*> term (returnType <|> emptyTerm) <*> emptyTerm)
+methodDeclaration =  (makeTerm <$> symbol MethodDeclaration <*> children (makeMethod1 <$> pure publicAccessControl <*> manyTerm methodModifier <*> emptyTerm <*> functionDefinitionParts))
+                 <|> makeTerm <$> symbol MethodDeclaration <*> children (makeMethod2 <$> pure publicAccessControl <*> someTerm methodModifier <*> emptyTerm <*> term name <*> parameters <*> term (returnType <|> emptyTerm) <*> emptyTerm)
   where
     functionDefinitionParts = symbol FunctionDefinition *> children ((,,,) <$> term name <*> parameters <*> term (returnType <|> emptyTerm) <*> (term compoundStatement <|> emptyTerm))
-    makeMethod1 accessControl modifiers receiver (name, params, returnType, compoundStatement) = Declaration.Method (modifiers <> [returnType]) receiver accessControl name params compoundStatement
-    makeMethod2 accessControl modifiers receiver name params returnType compoundStatement      = Declaration.Method (modifiers <> [returnType]) receiver accessControl name params compoundStatement
+    makeMethod1 accessControl modifiers receiver (name, params, returnType, compoundStatement) = Declaration.Method (modifiers <> [returnType]) receiver name params compoundStatement accessControl
+    makeMethod2 accessControl modifiers receiver name params returnType compoundStatement      = Declaration.Method (modifiers <> [returnType]) receiver name params compoundStatement accessControl
 
 classBaseClause :: Assignment Term
 classBaseClause = makeTerm <$> symbol ClassBaseClause <*> children (Syntax.ClassBaseClause <$> term qualifiedName)
@@ -468,6 +466,7 @@ classInterfaceClause = makeTerm <$> symbol ClassInterfaceClause <*> children (Sy
 classConstDeclaration :: Assignment Term
 classConstDeclaration = makeTerm <$> symbol ClassConstDeclaration <*> children (Syntax.ClassConstDeclaration <$> (term accessControlModifier <|> emptyTerm) <*> manyTerm constElement)
 
+-- TODO: Update to ScopeGraph.AccessControl
 accessControlModifier :: Assignment Term
 accessControlModifier = makeTerm <$> symbol VisibilityModifier <*> (Syntax.Identifier . Name.name <$> source)
 
