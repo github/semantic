@@ -100,7 +100,7 @@ instance CustomHasDeclaration whole Declaration.Function where
 
 -- | Produce a 'MethodDeclaration' for 'Declaration.Method' nodes. If the method’s receiver is non-empty (defined as having a non-empty 'Range'), the 'declarationIdentifier' will be formatted as 'receiver.method_name'; otherwise it will be simply 'method_name'.
 instance CustomHasDeclaration whole Declaration.Method where
-  customToDeclaration blob@Blob{..} ann decl@(Declaration.Method _ _ (Term (In receiverAnn receiverF), _) (Term (In identifierAnn _), _) _ _)
+  customToDeclaration blob@Blob{..} ann decl@(Declaration.Method _ (Term (In receiverAnn receiverF), _) (Term (In identifierAnn _), _) _ _ _)
     -- Methods without a receiver
     | isEmpty receiverAnn = Just $ MethodDeclaration (getSource blobSource identifierAnn) methodSource (locationSpan ann) blobLanguage Nothing
     -- Methods with a receiver type and an identifier (e.g. (a *Type) in Go).
