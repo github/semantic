@@ -33,7 +33,6 @@ import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
-import qualified Data.Text as T
 import           Language.Python.Grammar as Grammar
 import           Language.Python.Syntax as Python.Syntax
 import           Prologue
@@ -116,6 +115,7 @@ type Syntax =
    , Syntax.Error
    , Syntax.Identifier
    , Type.Annotation
+   , Python.Syntax.Alias
    , []
    ]
 
@@ -379,9 +379,6 @@ yield = makeTerm <$> symbol Yield <*> (Statement.Yield <$> children (term ( expr
 identifier :: Assignment Term
 identifier = makeTerm <$> (symbol Identifier <|> symbol Identifier' <|> symbol DottedName) <*> (Syntax.Identifier . name <$> source)
 
-identifier' :: Assignment Name
-identifier' = (symbol Identifier <|> symbol Identifier' <|> symbol DottedName) *> (name <$> source)
-
 set :: Assignment Term
 set = makeTerm <$> symbol Set <*> children (Literal.Set <$> manyTerm expression)
 
@@ -417,9 +414,9 @@ import' =   makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliase
     -- `import a as b`
     aliasedImport = makeTerm <$> symbol AliasedImport <*> children (Python.Syntax.QualifiedAliasedImport  <$> importPath <*> expression)
     -- `import a`
-    plainImport = makeTerm <$> symbol DottedName <*> children (Python.Syntax.QualifiedImport . NonEmpty.map T.unpack <$> NonEmpty.some1 identifierSource)
+    plainImport = makeTerm <$> symbol DottedName <*> children (Python.Syntax.QualifiedImport  <$> NonEmpty.some1 identifier)
     -- `from a import foo `
-    importSymbol = makeNameAliasPair <$> identifier
+    importSymbol = makeNameAliasPair <$> (symbol Identifier <|> symbol Identifier' <|> symbol DottedName) <*> (mkIdentifier <$> location <*> source)
     -- `from a import foo as bar`
     aliasImportSymbol = makeTerm <$> symbol AliasedImport <*> children (Python.Syntax.Alias <$> identifier <*> identifier)
     -- `from a import *`
@@ -431,7 +428,8 @@ import' =   makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliase
     importPrefix = symbol ImportPrefix *> source
     identifierSource = (symbol Identifier <|> symbol Identifier') *> source
 
-    makeNameAliasPair alias = Python.Syntax.Alias alias alias
+    makeNameAliasPair location alias = makeTerm location (Python.Syntax.Alias alias alias)
+    mkIdentifier location source = makeTerm location (Syntax.Identifier (name source))
 
 assertStatement :: Assignment Term
 assertStatement = makeTerm <$> symbol AssertStatement <*> children (Expression.Call [] <$> (makeTerm <$> symbol AnonAssert <*> (Syntax.Identifier . name <$> source)) <*> manyTerm expression <*> emptyTerm)

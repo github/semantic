@@ -17,7 +17,7 @@ import           Data.Span
 import           Diffing.Algorithm
 import           Language.TypeScript.Resolution
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
-import Data.Aeson hiding (object)
+import Data.Aeson hiding (object, Object)
 import qualified Data.Abstract.Name as Name
 
 -- | ShorthandPropertyIdentifier used in object patterns such as var baz = { foo } to mean var baz = { foo: foo }
