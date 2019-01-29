@@ -42,6 +42,9 @@ import qualified Data.Set as Set
 import           Data.Span
 import           Prelude hiding (lookup)
 import           Prologue
+import qualified Proto3.Suite       as Proto
+import qualified Proto3.Wire.Encode as Encode
+import qualified Proto3.Wire.Decode as Decode
 
 -- A slot is a location in the heap where a value is stored.
 data Slot address = Slot { frameAddress :: address, position :: Position }
@@ -50,8 +53,20 @@ data Slot address = Slot { frameAddress :: address, position :: Position }
 data AccessControl = Public
                    | Protected
                    | Private
-                   | Unknown
-                   deriving (Eq, Show, Generic, NFData)
+                   deriving (Eq, Show, Generic, Hashable, ToJSON, Proto.Named, NFData)
+
+instance Proto.HasDefault AccessControl where
+  def = Public
+
+instance Proto.Message AccessControl where
+  encodeMessage = Proto.encodeMessageField
+  decodeMessage = Decode.at Proto.decodeMessageField
+  dotProto _ = [ Proto.DotProtoMessageField $ Proto.protoType (Proxy @AccessControl) ]
+
+instance Proto.MessageField AccessControl where
+  encodeMessageField num = Encode.embedded num . Proto.encodeMessage num
+  decodeMessageField = fromMaybe Proto.def <$> Decode.embedded (Proto.decodeMessage (Proto.fieldNumber 1))
+  protoType _ = Proto.messageField (Proto.Prim $ Proto.Named (Proto.Single (Proto.nameOf (Proxy @AccessControl)))) Nothing
 
 -- | The Ord AccessControl instance represents an order specification of AccessControls.
 -- It is helpful to consider `Public <= Private` as saying "Can a Public syntax term access a Private syntax term?"
