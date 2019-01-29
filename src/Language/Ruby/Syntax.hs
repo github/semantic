@@ -326,7 +326,7 @@ instance Evaluatable Assignment where
     lhsName <- maybeM (throwNoNameError assignmentTarget) (declaredName assignmentTarget)
     maybeSlot <- maybeLookupDeclaration (Declaration lhsName)
     assignmentSpan <- ask @Span
-    maybe (declare (Declaration lhsName) Default Unknown assignmentSpan Nothing) (const (pure ())) maybeSlot
+    maybe (declare (Declaration lhsName) Default Public assignmentSpan Nothing) (const (pure ())) maybeSlot
 
     lhs <- ref assignmentTarget
     rhs <- eval assignmentValue
