@@ -33,7 +33,6 @@ import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
-import qualified Data.Text as T
 import           Language.Python.Grammar as Grammar
 import           Language.Python.Syntax as Python.Syntax
 import           Prologue
@@ -380,9 +379,6 @@ yield = makeTerm <$> symbol Yield <*> (Statement.Yield <$> children (term ( expr
 identifier :: Assignment Term
 identifier = makeTerm <$> (symbol Identifier <|> symbol Identifier' <|> symbol DottedName) <*> (Syntax.Identifier . name <$> source)
 
-identifier' :: Assignment Name
-identifier' = (symbol Identifier <|> symbol Identifier' <|> symbol DottedName) *> (name <$> source)
-
 set :: Assignment Term
 set = makeTerm <$> symbol Set <*> children (Literal.Set <$> manyTerm expression)
 
@@ -418,7 +414,7 @@ import' =   makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliase
     -- `import a as b`
     aliasedImport = makeTerm <$> symbol AliasedImport <*> children (Python.Syntax.QualifiedAliasedImport  <$> importPath <*> expression)
     -- `import a`
-    plainImport = makeTerm <$> symbol DottedName <*> children (Python.Syntax.QualifiedImport . NonEmpty.map T.unpack <$> NonEmpty.some1 identifierSource)
+    plainImport = makeTerm <$> symbol DottedName <*> children (Python.Syntax.QualifiedImport  <$> NonEmpty.some1 identifier)
     -- `from a import foo `
     importSymbol = makeNameAliasPair <$> (symbol Identifier <|> symbol Identifier' <|> symbol DottedName) <*> (mkIdentifier <$> location <*> source)
     -- `from a import foo as bar`

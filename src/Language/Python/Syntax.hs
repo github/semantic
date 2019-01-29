@@ -32,7 +32,6 @@ import           Proto3.Suite
     , Primitive (..)
     , messageField
     )
-import qualified Proto3.Suite as Proto
 import qualified Proto3.Wire.Decode as Decode
 import qualified Proto3.Wire.Encode as Encode
 import           System.FilePath.Posix
@@ -207,15 +206,11 @@ instance Evaluatable Import where
 
     unit
 
+deriving instance Hashable1 NonEmpty
 
-newtype QualifiedImport a = QualifiedImport { qualifiedImportFrom :: NonEmpty String }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
+newtype QualifiedImport a = QualifiedImport { qualifiedImportFrom :: NonEmpty a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1, Message1)
   deriving (Eq1, Show1, Ord1) via Generically QualifiedImport
-
-instance Message1 QualifiedImport where
-  liftEncodeMessage _ _ QualifiedImport{..} = encodeMessageField 1 qualifiedImportFrom
-  liftDecodeMessage _ _ = QualifiedImport <$> Decode.at decodeMessageField 1
-  liftDotProto _ = [ Proto.DotProtoMessageField $ Proto.DotProtoField 1 (Repeated Proto.String) (Single "qualifiedImportFrom") [] Nothing ]
 
 instance Named Prelude.String where nameOf _ = "string"
 
@@ -226,18 +221,19 @@ instance Message Prelude.String where
 
 -- import a.b.c
 instance Evaluatable QualifiedImport where
-  eval _ _ (QualifiedImport qualifiedName) = do
+  eval eval _ (QualifiedImport qualifiedNames) = do
+    qualifiedName <- fmap (T.unpack . formatName) <$> traverse (\term -> maybeM (throwNoNameError term) (declaredName term)) qualifiedNames
     modulePaths <- resolvePythonModules (QualifiedName qualifiedName)
-    let namesAndPaths = toList (NonEmpty.zip (Data.Abstract.Evaluatable.name . T.pack <$> qualifiedName) modulePaths)
+    let namesAndPaths = toList (NonEmpty.zip (NonEmpty.zip qualifiedNames (Data.Abstract.Evaluatable.name . T.pack <$> qualifiedName)) modulePaths)
 
     go namesAndPaths
     unit
     where
       go [] = pure ()
-      go ((name, modulePath) : namesAndPaths) = do
-        span <- ask @Span
+      go (((nameTerm, name), modulePath) : namesAndPaths) = do
+        _ <- eval nameTerm
+        span <- get @Span
         scopeAddress <- newScope mempty
-        -- FIXME: Change QualifiedImport to take terms and iterate through their spans
         declare (Declaration name) Default span ScopeGraph.QualifiedImport (Just scopeAddress)
         aliasSlot <- lookupDeclaration (Declaration name)
         -- a.b.c
@@ -248,7 +244,7 @@ instance Evaluatable QualifiedImport where
               assign aliasSlot val
 
               withFrame objFrame $ do
-                let (namePaths, rest) = List.partition ((== name) . fst) namesAndPaths
+                let (namePaths, rest) = List.partition ((== name) . snd . fst) namesAndPaths
                 for_ namePaths $ \(_, modulePath) -> do
                   mkScopeMap modulePath $ \scopeMap -> do
                     withFrame objFrame $ do
