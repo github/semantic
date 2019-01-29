@@ -147,12 +147,11 @@ instance Evaluatable Import where
   -- from . import moduleY            -- aliasValue = moduleY, aliasName = moduleY
   -- from . import moduleY as moduleZ -- aliasValue = moduleY, aliasName = moduleZ
   -- This is a bit of a special case in the syntax as this actually behaves like a qualified relative import.
-  eval _ _ (Import (RelativeQualifiedName n Nothing) [aliasTerm]) = do
+  eval eval _ (Import (RelativeQualifiedName n Nothing) [aliasTerm]) = do
     aliasValue' <- maybeM (throwNoNameError aliasTerm) (declaredName aliasTerm)
     path <- NonEmpty.last <$> resolvePythonModules (RelativeQualifiedName n (Just (qualifiedName (formatName aliasValue' :| []))))
     ((moduleScope, moduleFrame), _) <- require path
 
-    span <- ask @Span
     -- Construct a proxy scope containing an import edge to the imported module's last returned scope.
     importScope <- newScope (Map.singleton ScopeGraph.Import [ moduleScope ])
 
@@ -162,7 +161,9 @@ instance Evaluatable Import where
 
     -- Add declaration of the alias name to the current scope (within our current module).
     aliasName <- maybeM (throwNoNameError aliasTerm) (declaredAlias aliasTerm)
-    declare (Declaration aliasName) Default span ScopeGraph.UnqualifiedImport (Just importScope)
+    _ <- eval aliasTerm
+    aliasSpan <- get @Span
+    declare (Declaration aliasName) Default aliasSpan ScopeGraph.UnqualifiedImport (Just importScope)
     -- Retrieve the frame slot for the new declaration.
     aliasSlot <- lookupDeclaration (Declaration aliasName)
     assign aliasSlot =<< object aliasFrame
