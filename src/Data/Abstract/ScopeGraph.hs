@@ -74,15 +74,10 @@ instance Proto.MessageField AccessControl where
   protoType _ = Proto.messageField (Proto.Prim $ Proto.Named (Proto.Single (Proto.nameOf (Proxy @AccessControl)))) Nothing
 
 -- | The Ord AccessControl instance represents an order specification of AccessControls.
--- It is helpful to consider `Public <= Private` as saying "Can a Public syntax term access a Private syntax term?"
 -- AccessControls that are less than or equal to another AccessControl implies access.
+-- It is helpful to consider `Public <= Private` as saying "Can a Public syntax term access a Private syntax term?"
 -- In this way, Public AccessControl is the top of the order specification, and Private AccessControl is the bottom.
--- Unknown AccessControl represents an absurd value, whose comparison is not meaningful, and always defaults to True. We simply do not have enough information to perform the comparison in a meaningful way.
 instance Ord AccessControl where
-  -- | We cannot meaningfully compare Unknown AccessControl, so this always defaults to True.
-  (<=) Unknown _           = True
-  (<=) _       Unknown     = True
-
   -- | Private AccessControl represents the least overlap or accessibility with other AccessControls.
   -- When asking if the AccessControl "on the left" is less than the AccessControl "on the right", Private AccessControl on the left always implies access to the thing on the right.
   (<=) Private _           = True
@@ -99,7 +94,6 @@ instance Ord AccessControl where
   (<=) Public _            = False
 
 
-
 data Relation = Default | Instance deriving (Eq, Show, Ord, Generic, NFData)
 
 instance Lower Relation where
@@ -114,7 +108,7 @@ data Info scopeAddress = Info
   } deriving (Eq, Show, Ord, Generic, NFData)
 
 instance Lower (Info scopeAddress) where
-  lowerBound = Info lowerBound lowerBound Unknown lowerBound Nothing
+  lowerBound = Info lowerBound lowerBound Public lowerBound Nothing
 
 -- Offsets and frame addresses in the heap should be addresses?
 data Scope address = Scope
