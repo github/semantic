@@ -120,11 +120,12 @@ instance FreeVariables1 Method where
 
 
 -- | A method signature in TypeScript or a method spec in Go.
-data MethodSignature a = MethodSignature { methodSignatureContext :: [a]
-                                         , methodSignatureAccessControl :: a
-                                         , methodSignatureName :: a
-                                         , methodSignatureParameters :: [a]
-                                         }
+data MethodSignature a = MethodSignature
+  { methodSignatureContext :: [a]
+  , methodSignatureName :: a
+  , methodSignatureParameters :: [a]
+  , methodSignatureAccessControl :: AccessControl
+  }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically MethodSignature
 
