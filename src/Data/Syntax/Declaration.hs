@@ -190,13 +190,14 @@ instance Declarations a => Declarations (InterfaceDeclaration a) where
 
 
 -- | A public field definition such as a field definition in a JavaScript class.
-data PublicFieldDefinition a = PublicFieldDefinition { publicFieldContext :: [a]
-                                                     , publicFieldAccessControl :: a
-                                                     , publicFieldPropertyName :: a
-                                                     , publicFieldValue :: a
-                                                     }
-                                                     deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
-                                                     deriving (Eq1, Show1, Ord1) via Generically PublicFieldDefinition
+data PublicFieldDefinition a = PublicFieldDefinition
+  { publicFieldContext :: [a]
+  , publicFieldPropertyName :: a
+  , publicFieldValue :: a
+  , publicFieldAccessControl :: AccessControl
+  }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Eq1, Show1, Ord1) via Generically PublicFieldDefinition
 
 -- TODO: Implement Eval instance for PublicFieldDefinition
 instance Evaluatable PublicFieldDefinition where
