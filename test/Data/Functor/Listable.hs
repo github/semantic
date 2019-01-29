@@ -241,7 +241,7 @@ instance Listable1 Declaration.Function where
   liftTiers tiers = liftCons4 (liftTiers tiers) tiers (liftTiers tiers) tiers Declaration.Function
 
 instance Listable1 Declaration.Method where
-  liftTiers tiers = liftCons6 (liftTiers tiers) tiers tiers tiers (liftTiers tiers) tiers Declaration.Method
+  liftTiers tiers = liftCons6 (liftTiers tiers) tiers tiers (liftTiers tiers) tiers (cons0 Public) Declaration.Method
 
 instance Listable1 Statement.If where
   liftTiers tiers = liftCons3 tiers tiers tiers Statement.If
