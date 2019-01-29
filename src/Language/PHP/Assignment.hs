@@ -450,8 +450,8 @@ publicAccessControl = ScopeGraph.Public
 
 -- TODO: Update to check for AccessControl.
 methodDeclaration :: Assignment Term
-methodDeclaration =  (makeTerm <$> symbol MethodDeclaration <*> children (makeMethod1 <$> pure publicAccessControl <*> manyTerm methodModifier <*> emptyTerm <*> functionDefinitionParts))
-                 <|> makeTerm <$> symbol MethodDeclaration <*> children (makeMethod2 <$> pure publicAccessControl <*> someTerm methodModifier <*> emptyTerm <*> term name <*> parameters <*> term (returnType <|> emptyTerm) <*> emptyTerm)
+methodDeclaration =  (makeTerm <$> symbol MethodDeclaration <*> children (makeMethod1 publicAccessControl <$> manyTerm methodModifier <*> emptyTerm <*> functionDefinitionParts))
+                 <|> makeTerm <$> symbol MethodDeclaration <*> children (makeMethod2 publicAccessControl <$> someTerm methodModifier <*> emptyTerm <*> term name <*> parameters <*> term (returnType <|> emptyTerm) <*> emptyTerm)
   where
     functionDefinitionParts = symbol FunctionDefinition *> children ((,,,) <$> term name <*> parameters <*> term (returnType <|> emptyTerm) <*> (term compoundStatement <|> emptyTerm))
     makeMethod1 accessControl modifiers receiver (name, params, returnType, compoundStatement) = Declaration.Method (modifiers <> [returnType]) receiver name params compoundStatement accessControl
