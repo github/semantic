@@ -254,7 +254,7 @@ evaluateProjectForScopeGraph proxy parser project = runTaskWithOptions debugOpti
        (raiseHandler (runReader (packageInfo package))
        (raiseHandler (evalState (lowerBound @Span))
        (raiseHandler (runReader (lowerBound @Span))
-       (evaluate proxy id (evalTerm withTermSpans) modules)))))))
+       (evaluate proxy (runDomainEffects (evalTerm withTermSpans)) modules)))))))
 
 evaluateProjectWithCaching proxy parser path = runTaskWithOptions debugOptions $ do
   project <- readProject Nothing path (Language.reflect proxy) []
