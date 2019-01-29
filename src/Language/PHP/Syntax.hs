@@ -2,6 +2,7 @@
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Language.PHP.Syntax where
 
+import           Control.Abstract as Abstract
 import           Data.Abstract.BaseError
 import           Data.Abstract.Evaluatable as Abstract
 import           Data.Abstract.Module
@@ -12,7 +13,6 @@ import qualified Data.Text as T
 import           Diffing.Algorithm
 import           Prologue hiding (Text)
 import           Proto3.Suite.Class
-import Control.Abstract
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import qualified Data.Map.Strict as Map
 
@@ -50,8 +50,7 @@ resolvePHPName n = do
   where name = toName n
         toName = T.unpack . dropRelativePrefix . stripQuotes
 
-include :: ( AbstractValue term address value m
-           , Carrier sig m
+include :: ( Carrier sig m
            , Member (Modules address value) sig
            , Member (Reader (CurrentFrame address)) sig
            , Member (Reader (CurrentScope address)) sig
@@ -61,6 +60,7 @@ include :: ( AbstractValue term address value m
            , Member (State (ScopeGraph address)) sig
            , Member (Resumable (BaseError ResolutionError)) sig
            , Member (State (Heap address address value)) sig
+           , Member (Abstract.String value) sig
            , Member Trace sig
            , Ord address
            )
@@ -193,7 +193,7 @@ instance Evaluatable QualifiedName where
           deref address
       Nothing ->
         -- TODO: Throw an ReferenceError because we can't find the associated child scope for `obj`.
-        pure unit
+        unit
 
 newtype NamespaceName a = NamespaceName { names :: NonEmpty a }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1, NFData1)

@@ -52,8 +52,7 @@ defineBuiltIn declaration rel value = withCurrentCallStack callStack $ do
   value <- builtIn associatedScope value
   assign slot value
 
-defineClass :: ( AbstractValue term address value m
-               , Carrier sig m
+defineClass :: ( Carrier sig m
                , HasCallStack
                , Member (Allocator address) sig
                , Member (Deref value) sig
@@ -66,6 +65,7 @@ defineClass :: ( AbstractValue term address value m
                , Member (Resumable (BaseError (ScopeError address))) sig
                , Member (State (Heap address address value)) sig
                , Member (State (ScopeGraph address)) sig
+               , Member (Unit value) sig
                , Ord address
                )
             => Declaration
@@ -86,7 +86,7 @@ defineClass declaration superclasses body = void . define declaration Default $ 
     withScope childScope $ do
       void body
 
-    pure unit
+    unit
 
 defineNamespace :: ( AbstractValue term address value m
                    , Carrier sig m

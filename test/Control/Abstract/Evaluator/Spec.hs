@@ -26,7 +26,7 @@ import           System.IO.Unsafe (unsafePerformIO)
 spec :: Spec
 spec = parallel $ do
   it "constructs integers" $ do
-    (_, (_, (_, expected))) <- evaluate (pure (integer 123))
+    (_, (_, (_, expected))) <- evaluate (integer 123)
     expected `shouldBe` Right (Value.Integer (Number.Integer 123))
 
   it "calls functions" $ do
@@ -40,9 +40,9 @@ spec = parallel $ do
         declare (Declaration x) Default emptySpan ScopeGraph.Unknown Nothing
       identity <- function "identity" [ x ]
         (SpecEff (Heap.lookupDeclaration (ScopeGraph.Declaration (SpecHelpers.name "x")) >>= deref)) associatedScope
-      val <- pure (integer 123)
+      val <- integer 123
       call identity [val]
-    expected `shouldBe` Right (integer 123)
+    expected `shouldBe` Right (Value.Integer (Number.Integer 123))
 
 evaluate
   = runM
@@ -73,6 +73,7 @@ evaluate
         . runAllocator
         . runReturn
         . runLoopControl
+        . runNumeric
         . runBoolean
         . runFunction runSpecEff
         $ action
@@ -85,6 +86,7 @@ type Val = Value SpecEff Precise
 newtype SpecEff = SpecEff
   { runSpecEff :: Evaluator SpecEff Precise Val (FunctionC SpecEff Precise Val
                  (Eff (BooleanC Val
+                 (Eff (NumericC Val
                  (Eff (ErrorC (LoopControl Val)
                  (Eff (ErrorC (Return Val)
                  (Eff (AllocatorC Precise
@@ -105,7 +107,7 @@ newtype SpecEff = SpecEff
                  (Eff (StateC (Heap Precise Precise Val)
                  (Eff (StateC (ScopeGraph Precise)
                  (Eff (TraceByIgnoringC
-                 (Eff (LiftC IO)))))))))))))))))))))))))))))))))))))))))))))
+                 (Eff (LiftC IO)))))))))))))))))))))))))))))))))))))))))))))))
                  Val
   }
 
@@ -116,5 +118,5 @@ instance FreeVariables SpecEff where freeVariables _ = lowerBound
 instance Declarations SpecEff where
   declaredName eff =
     case unsafePerformIO (evaluate (runSpecEff eff)) of
-      (_, (_, (_, Right (Value.Symbol text)))) -> Just (SpecHelpers.name text)
+      (_, (_, (_, Right (Value.String text)))) -> Just (SpecHelpers.name text)
       _                                        -> error "declaredName for SpecEff should return an RVal"

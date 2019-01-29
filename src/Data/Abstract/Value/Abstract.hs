@@ -75,7 +75,63 @@ instance ( Member (Abstract.Boolean Abstract) sig
     (eff . handleCoercible)
     (\ (Abstract.While cond body k) -> do
       cond' <- runWhileC cond
-      ifthenelse cond' (runWhileC body *> empty) (runWhileC (k unit)))
+      ifthenelse cond' (runWhileC body *> empty) (runWhileC (k Abstract)))
+
+
+instance Carrier sig m
+      => Carrier (Unit Abstract :+: sig) (UnitC Abstract m) where
+  ret = UnitC . ret
+  eff = UnitC . handleSum
+    (eff . handleCoercible)
+    (\ (Abstract.Unit k) -> runUnitC (k Abstract))
+
+instance Carrier sig m
+      => Carrier (Abstract.String Abstract :+: sig) (StringC Abstract m) where
+  ret = StringC . ret
+  eff = StringC . handleSum (eff . handleCoercible) (\case
+    Abstract.String _ k -> runStringC (k Abstract)
+    AsString        _ k -> runStringC (k ""))
+
+instance Carrier sig m
+      => Carrier (Numeric Abstract :+: sig) (NumericC Abstract m) where
+  ret = NumericC . ret
+  eff = NumericC . handleSum (eff . handleCoercible) (\case
+    Integer _ k -> runNumericC (k Abstract)
+    Float _ k -> runNumericC (k Abstract)
+    Rational _ k -> runNumericC (k Abstract)
+    LiftNumeric _ _ k -> runNumericC (k Abstract)
+    LiftNumeric2 _ _ _ k -> runNumericC (k Abstract))
+
+instance Carrier sig m
+      => Carrier (Bitwise Abstract :+: sig) (BitwiseC Abstract m) where
+  ret = BitwiseC . ret
+  eff = BitwiseC . handleSum (eff . handleCoercible) (\case
+    CastToInteger _ k -> runBitwiseC (k Abstract)
+    LiftBitwise _ _ k -> runBitwiseC (k Abstract)
+    LiftBitwise2 _ _ _ k -> runBitwiseC (k Abstract)
+    UnsignedRShift _ _ k -> runBitwiseC (k Abstract))
+
+instance Carrier sig m
+      => Carrier (Object address Abstract :+: sig) (ObjectC address Abstract m) where
+  ret = ObjectC . ret
+  eff = ObjectC . handleSum (eff . handleCoercible) (\case
+    Object _ k -> runObjectC (k Abstract)
+    ScopedEnvironment _ k -> runObjectC (k Nothing)
+    Klass _ _ k -> runObjectC (k Abstract))
+
+instance Carrier sig m
+      => Carrier (Array Abstract :+: sig) (ArrayC Abstract m) where
+  ret = ArrayC . ret
+  eff = ArrayC . handleSum (eff . handleCoercible) (\case
+    Array _ k -> runArrayC (k Abstract)
+    AsArray _ k -> runArrayC (k []))
+
+instance Carrier sig m
+      => Carrier (Hash Abstract :+: sig) (HashC Abstract m) where
+  ret = HashC . ret
+  eff = HashC . handleSum (eff . handleCoercible) (\case
+    Hash _ k -> runHashC (k Abstract)
+    KvPair _ _ k -> runHashC (k Abstract))
 
 
 instance Ord address => ValueRoots address Abstract where
@@ -85,42 +141,15 @@ instance AbstractHole Abstract where
   hole = Abstract
 
 instance AbstractIntro Abstract where
-  unit       = Abstract
-  integer _  = Abstract
-  string _   = Abstract
-  float _    = Abstract
-  symbol _   = Abstract
-  regex _    = Abstract
-  rational _ = Abstract
-  hash _     = Abstract
-  kvPair _ _ = Abstract
   null       = Abstract
 
 instance AbstractValue term address Abstract m where
-  array _ = pure Abstract
-
   tuple _ = pure Abstract
 
-  klass _ _     = pure Abstract
   namespace _ _ = pure Abstract
 
-  scopedEnvironment _ = pure Nothing
-
-  asString _ = pure ""
   asPair _ = pure (Abstract, Abstract)
-  asArray _ = pure mempty
 
   index _ _ = pure Abstract
 
-  liftNumeric _ _ = pure Abstract
-  liftNumeric2 _ _ _ = pure Abstract
-
-  liftBitwise _ _ = pure Abstract
-  liftBitwise2 _ _ _ = pure Abstract
-
-  unsignedRShift _ _ = pure Abstract
-
   liftComparison _ _ _ = pure Abstract
-
-  castToInteger _ = pure Abstract
-  object _ = pure Abstract

@@ -1,16 +1,18 @@
 {-# LANGUAGE TypeFamilies, TypeOperators #-}
 module Semantic.Analysis
 ( evaluate
+, runDomainEffects
 , evalTerm
 ) where
 
-import Control.Abstract
+import Control.Abstract as Abstract
 import Control.Abstract.ScopeGraph (runAllocator)
 import Control.Effect.Interpose
 import Data.Abstract.Evaluatable
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
 import Data.Function
+import Data.Language (Language)
 import Prologue
 import qualified Data.Map.Strict as Map
 
@@ -24,62 +26,40 @@ type ModuleC address value m
   ( ReaderC ModuleInfo             (Eff
     m)))))))))))))
 
-type ValueC term address value m
+type DomainC term address value m
   = FunctionC term address value                                          (Eff
   ( WhileC value                                                          (Eff
   ( BooleanC value                                                        (Eff
+  ( StringC value                                                         (Eff
+  ( NumericC value                                                        (Eff
+  ( BitwiseC value                                                        (Eff
+  ( ObjectC address value                                                 (Eff
+  ( ArrayC value                                                          (Eff
+  ( HashC value                                                          (Eff
+  ( UnitC value                                                           (Eff
   ( InterposeC (Resumable (BaseError (UnspecializedError address value))) (Eff
-    m)))))))
+    m)))))))))))))))))))))
 
 -- | Evaluate a list of modules with the prelude for the passed language available, and applying the passed function to every module.
-evaluate :: ( AbstractValue term address value (ValueC term address value inner)
-            , Carrier innerSig inner
-            , Carrier outerSig outer
+evaluate :: ( Carrier outerSig outer
             , derefSig ~ (Deref value :+: allocatorSig)
             , derefC ~ (DerefC address value (Eff allocatorC))
             , Carrier derefSig derefC
             , allocatorSig ~ (Allocator address :+: Reader ModuleInfo :+: outerSig)
             , allocatorC ~ (AllocatorC address (Eff (ReaderC ModuleInfo (Eff outer))))
             , Carrier allocatorSig allocatorC
-            , booleanC ~ BooleanC value (Eff (InterposeC (Resumable (BaseError (UnspecializedError address value))) (Eff inner)))
-            , booleanSig ~ (Boolean value :+: Interpose (Resumable (BaseError (UnspecializedError address value))) :+: innerSig)
-            , Carrier booleanSig booleanC
-            , whileC ~ WhileC value (Eff booleanC)
-            , whileSig ~ (While value :+: booleanSig)
-            , Carrier whileSig whileC
-            , functionC ~ FunctionC term address value (Eff whileC)
-            , functionSig ~ (Function term address value :+: whileSig)
-            , Carrier functionSig functionC
             , Effect outerSig
-            , HasPrelude lang
             , Member Fresh outerSig
-            , Member (Allocator address) innerSig
-            , Member (Deref value) innerSig
-            , Member Fresh innerSig
-            , Member (Reader ModuleInfo) innerSig
             , Member (Reader (ModuleTable (Module (ModuleResult address value)))) outerSig
-            , Member (Reader Span) innerSig
-            , Member (Resumable (BaseError (AddressError address value))) innerSig
-            , Member (Resumable (BaseError (UnspecializedError address value))) innerSig
-            , Member (State (Heap address address value)) innerSig
-            , Member (State (ScopeGraph address)) innerSig
             , Member (State (Heap address address value)) outerSig
             , Member (State (ScopeGraph address)) outerSig
-            , Member (Reader (CurrentFrame address)) innerSig
-            , Member (Reader (CurrentScope address)) innerSig
-            , Member (Resumable (BaseError (HeapError address))) innerSig
-            , Member (Resumable (BaseError (ScopeError address))) innerSig
-            , Member Trace innerSig
             , Ord address
-            , Show address
             )
-         => proxy lang
-         -> (  (Module (Either (proxy lang) term) -> Evaluator term address value inner value)
-            -> (Module (Either (proxy lang) term) -> Evaluator term address value (ModuleC address value outer) value))
-         -> (term -> Evaluator term address value (ValueC term address value inner) value)
+         => proxy (lang :: Language)
+         -> (Module (Either (proxy lang) term) -> Evaluator term address value (ModuleC address value outer) value)
          -> [Module term]
          -> Evaluator term address value outer (ModuleTable (Module (ModuleResult address value)))
-evaluate lang perModule runTerm modules = do
+evaluate lang runModule modules = do
   let prelude = Module moduleInfoFromCallStack (Left lang)
   ((preludeScopeAddress, preludeFrameAddress), _) <- evalModule Nothing Nothing prelude
   foldr (run preludeScopeAddress preludeFrameAddress . fmap Right) ask modules
@@ -95,7 +75,7 @@ evaluate lang perModule runTerm modules = do
                 _ -> mempty
           scopeAddress <- if Prologue.null scopeEdges then newPreludeScope scopeEdges else newScope scopeEdges
           frameAddress <- newFrame scopeAddress frameLinks
-          val <- runInModule scopeAddress frameAddress (perModule (runValueEffects . moduleBody) m)
+          val <- runInModule scopeAddress frameAddress m
           pure ((scopeAddress, frameAddress), val)
           where runInModule scopeAddress frameAddress
                   = runDeref
@@ -103,24 +83,96 @@ evaluate lang perModule runTerm modules = do
                   . raiseHandler (runReader (CurrentScope scopeAddress))
                   . runReturn
                   . runLoopControl
+                  . runModule
 
-        runValueEffects = raiseHandler runInterpose . runBoolean . runWhile . runFunction runTerm . either ((unit <$) . definePrelude) runTerm
+runDomainEffects :: ( AbstractValue term address value (DomainC term address value m)
+                    , Carrier sig m
+                    , unitC ~ UnitC value (Eff (InterposeC (Resumable (BaseError (UnspecializedError address value))) (Eff m)))
+                    , unitSig ~ (Unit value :+: Interpose (Resumable (BaseError (UnspecializedError address value))) :+: sig)
+                    , Carrier unitSig unitC
+                    , hashC ~ HashC value (Eff unitC)
+                    , hashSig ~ (Abstract.Hash value :+: unitSig)
+                    , Carrier hashSig hashC
+                    , arrayC ~ ArrayC value (Eff hashC)
+                    , arraySig ~ (Abstract.Array value :+: hashSig)
+                    , Carrier arraySig arrayC
+                    , objectC ~ ObjectC address value (Eff arrayC)
+                    , objectSig ~ (Abstract.Object address value :+: arraySig)
+                    , Carrier objectSig objectC
+                    , bitwiseC ~ BitwiseC value (Eff objectC)
+                    , bitwiseSig ~ (Abstract.Bitwise value :+: objectSig)
+                    , Carrier bitwiseSig bitwiseC
+                    , numericC ~ NumericC value (Eff bitwiseC)
+                    , numericSig ~ (Abstract.Numeric value :+: bitwiseSig)
+                    , Carrier numericSig numericC
+                    , stringC ~ StringC value (Eff numericC)
+                    , stringSig ~ (Abstract.String value :+: numericSig)
+                    , Carrier stringSig stringC
+                    , booleanC ~ BooleanC value (Eff stringC)
+                    , booleanSig ~ (Boolean value :+: stringSig)
+                    , Carrier booleanSig booleanC
+                    , whileC ~ WhileC value (Eff booleanC)
+                    , whileSig ~ (While value :+: booleanSig)
+                    , Carrier whileSig whileC
+                    , functionC ~ FunctionC term address value (Eff whileC)
+                    , functionSig ~ (Function term address value :+: whileSig)
+                    , Carrier functionSig functionC
+                    , HasPrelude lang
+                    , Member (Allocator address) sig
+                    , Member (Deref value) sig
+                    , Member Fresh sig
+                    , Member (Reader (CurrentFrame address)) sig
+                    , Member (Reader (CurrentScope address)) sig
+                    , Member (Reader ModuleInfo) sig
+                    , Member (Reader Span) sig
+                    , Member (Resumable (BaseError (AddressError address value))) sig
+                    , Member (Resumable (BaseError (HeapError address))) sig
+                    , Member (Resumable (BaseError (ScopeError address))) sig
+                    , Member (Resumable (BaseError (UnspecializedError address value))) sig
+                    , Member (State (Heap address address value)) sig
+                    , Member (State (ScopeGraph address)) sig
+                    , Member Trace sig
+                    , Ord address
+                    , Show address
+                    )
+                 => (term -> Evaluator term address value (DomainC term address value m) value)
+                 -> Module (Either (proxy lang) term)
+                 -> Evaluator term address value m value
+runDomainEffects runTerm
+  = raiseHandler runInterpose
+  . runUnit
+  . runHash
+  . runArray
+  . runObject
+  . runBitwise
+  . runNumeric
+  . runString
+  . runBoolean
+  . runWhile
+  . runFunction runTerm
+  . either ((unit <*) . definePrelude) runTerm
+  . moduleBody
 
 -- | Evaluate a term recursively, applying the passed function at every recursive position.
 --
---   This calls out to the 'Evaluatable' instances, will be passed to 'runValueEffects', and can have other functions composed after it to e.g. intercept effects arising in the evaluation of the term.
+--   This calls out to the 'Evaluatable' instances, and can have other functions composed after it to e.g. intercept effects arising in the evaluation of the term.
 evalTerm :: ( Carrier sig m
             , Declarations term
             , Evaluatable (Base term)
             , FreeVariables term
             , AbstractValue term address value m
             , Member (Allocator address) sig
+            , Member (Bitwise value) sig
             , Member (Boolean value) sig
             , Member (Deref value) sig
             , Member (Error (LoopControl value)) sig
             , Member (Error (Return value)) sig
             , Member (Function term address value) sig
             , Member (Modules address value) sig
+            , Member (Numeric value) sig
+            , Member (Object address value) sig
+            , Member (Array value) sig
+            , Member (Hash value) sig
             , Member (Reader ModuleInfo) sig
             , Member (Reader PackageInfo) sig
             , Member (Reader Span) sig
@@ -132,9 +184,11 @@ evalTerm :: ( Carrier sig m
             , Member (Resumable (BaseError ResolutionError)) sig
             , Member (State (Heap address address value)) sig
             , Member (State (ScopeGraph address)) sig
+            , Member (Abstract.String value) sig
             , Member (Reader (CurrentFrame address)) sig
             , Member (Reader (CurrentScope address)) sig
             , Member (State Span) sig
+            , Member (Unit value) sig
             , Member (While value) sig
             , Member Fresh sig
             , Member Trace sig
