@@ -42,18 +42,19 @@ instance Evaluatable Function where
     v <- function name params functionBody associatedScope
     v <$ assign addr v
 
-declareFunction :: ( Carrier sig m
-                   , Member (State (ScopeGraph address)) sig
-                   , Member (Allocator address) sig
-                   , Member (Reader (CurrentScope address)) sig
-                   , Member Fresh sig
-                   , Ord address
-                   )
-                => Name
-                -> Relation
-                -> ScopeGraph.AccessControl
-                -> Span
-                -> Evaluator term address value m address
+declareFunction ::
+  ( Carrier sig m
+  , Member (State (ScopeGraph address)) sig
+  , Member (Allocator address) sig
+  , Member (Reader (CurrentScope address)) sig
+  , Member Fresh sig
+  , Ord address
+  )
+  => Name
+  -> Relation
+  -> AccessControl
+  -> Span
+  -> Evaluator term address value m address
 declareFunction name relation accessControl span = do
   currentScope' <- currentScope
   let lexicalEdges = Map.singleton Lexical [ currentScope' ]
