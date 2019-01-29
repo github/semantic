@@ -73,12 +73,14 @@ instance Declarations1 Function where
 instance FreeVariables1 Function where
   liftFreeVariables freeVariables f@Function{..} = foldMap freeVariables f `Set.difference` foldMap freeVariables functionParameters
 
-data Method a = Method { methodContext :: [a]
-                       , methodAccessControl :: a
-                       , methodReceiver :: a
-                       , methodName :: a
-                       , methodParameters :: [a]
-                       , methodBody :: a }
+data Method a = Method
+  { methodContext :: [a]
+  , methodReceiver :: a
+  , methodName :: a
+  , methodParameters :: [a]
+  , methodBody :: a
+  , methodAccessControl :: AccessControl
+  }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, ToJSONFields1, Named1, Message1, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Method
 
