@@ -38,6 +38,10 @@ import           Semantic.Telemetry (LogQueue, StatQueue)
 import           System.Exit (die)
 import           System.FilePath.Posix (takeDirectory)
 
+import qualified Data.Abstract.Value.Concrete as Concrete
+import Data.Quieterm
+import Data.Location
+
 justEvaluating
   = runM
   . runEvaluator
@@ -54,6 +58,100 @@ justEvaluating
   . runResolutionError
   . runAddressError
   . runValueError
+
+justEvaluatingCatchingErrors ::
+  (Apply Show1 lang) => Evaluator
+       (Quieterm (Sum lang) Location)
+       (Hole (Maybe Name) Precise)
+       (Concrete.Value
+          (Quieterm (Sum lang) Location)
+          (Hole (Maybe Name) Precise))
+       (ResumableWithC
+          (BaseError
+             (ValueError
+                (Quieterm (Sum lang) Location)
+                (Hole (Maybe Name) Precise)))
+          (Eff
+             (ResumableWithC
+                (BaseError
+                   (AddressError
+                      (Hole (Maybe Name) Precise)
+                      (Concrete.Value
+                         (Quieterm (Sum lang) Location)
+                         (Hole (Maybe Name) Precise))))
+                (Eff
+                   (ResumableWithC
+                      (BaseError ResolutionError)
+                      (Eff
+                         (ResumableWithC
+                            (BaseError
+                               (EvalError
+                                  (Quieterm (Sum lang) Location)
+                                  (Hole (Maybe Name) Precise)
+                                  (Concrete.Value
+                                     (Quieterm (Sum lang) Location)
+                                     (Hole (Maybe Name) Precise))))
+                            (Eff
+                               (ResumableWithC
+                                  (BaseError (HeapError (Hole (Maybe Name) Precise)))
+                                  (Eff
+                                     (ResumableWithC
+                                        (BaseError (ScopeError (Hole (Maybe Name) Precise)))
+                                        (Eff
+                                           (ResumableWithC
+                                              (BaseError
+                                                 (UnspecializedError
+                                                    (Hole (Maybe Name) Precise)
+                                                    (Concrete.Value
+                                                       (Quieterm
+                                                          (Sum lang)
+                                                          Location)
+                                                       (Hole (Maybe Name) Precise))))
+                                              (Eff
+                                                 (ResumableWithC
+                                                    (BaseError
+                                                       (LoadError
+                                                          (Hole (Maybe Name) Precise)
+                                                          (Concrete.Value
+                                                             (Quieterm
+                                                                (Sum
+                                                                   lang)
+                                                                Location)
+                                                             (Hole (Maybe Name) Precise))))
+                                                    (Eff
+                                                       (FreshC
+                                                          (Eff
+                                                             (StateC
+                                                                (ScopeGraph
+                                                                   (Hole (Maybe Name) Precise))
+                                                                (Eff
+                                                                   (StateC
+                                                                      (Heap
+                                                                         (Hole (Maybe Name) Precise)
+                                                                         (Hole (Maybe Name) Precise)
+                                                                         (Concrete.Value
+                                                                            (Quieterm
+                                                                               (Sum
+                                                                                  lang)
+                                                                               Location)
+                                                                            (Hole
+                                                                               (Maybe Name)
+                                                                               Precise)))
+                                                                      (Eff
+                                                                         (TraceByPrintingC
+                                                                            (Eff
+                                                                               (LiftC
+                                                                                  IO)))))))))))))))))))))))))
+       a
+     -> IO
+          (Heap
+             (Hole (Maybe Name) Precise)
+             (Hole (Maybe Name) Precise)
+             (Concrete.Value
+                (Quieterm (Sum lang) Location)
+                (Hole (Maybe Name) Precise)),
+           (ScopeGraph (Hole (Maybe Name) Precise), a))
+
 
 justEvaluatingCatchingErrors
   = runM
@@ -109,6 +207,9 @@ callGraphProject parser proxy opts paths = runTaskWithOptions opts $ do
 
 evaluatePythonProject = justEvaluatingCatchingErrors <=< evaluatePythonProjects (Proxy @'Language.Python) pythonParser Language.Python
 
+--scopeGraphRubyProject   = justEvaluatingCatchingErrors <=< evaluateProjectForScopeGraph (Proxy @'Language.Ruby) rubyParser
+scopeGraphPythonProject = justEvaluatingCatchingErrors <=< evaluateProjectForScopeGraph (Proxy @'Language.Python) pythonParser
+
 callGraphRubyProject = callGraphProject rubyParser (Proxy @'Language.Ruby) debugOptions
 
 -- Evaluate a project consisting of the listed paths.
@@ -143,6 +244,17 @@ evaluatePythonProjects proxy parser lang path = runTaskWithOptions debugOptions 
        (raiseHandler (runReader (lowerBound @Span))
        (evaluate proxy id (evalTerm withTermSpans) modules)))))))
 
+evaluateProjectForScopeGraph proxy parser project = runTaskWithOptions debugOptions $ do
+  package <- fmap quieterm <$> parsePythonPackage parser project
+  modules <- topologicalSort <$> runImportGraphToModules proxy package
+  trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
+  pure (id @(Evaluator _ (Hole.Hole (Maybe Name) Precise) (Value _ (Hole.Hole (Maybe Name) Precise)) _ _)
+       (runModuleTable
+       (runModules (ModuleTable.modulePaths (packageModules package))
+       (raiseHandler (runReader (packageInfo package))
+       (raiseHandler (evalState (lowerBound @Span))
+       (raiseHandler (runReader (lowerBound @Span))
+       (evaluate proxy id (evalTerm withTermSpans) modules)))))))
 
 evaluateProjectWithCaching proxy parser path = runTaskWithOptions debugOptions $ do
   project <- readProject Nothing path (Language.reflect proxy) []
