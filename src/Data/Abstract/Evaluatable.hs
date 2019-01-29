@@ -17,11 +17,12 @@ module Data.Abstract.Evaluatable
 , throwUnspecializedError
 ) where
 
-import Control.Abstract hiding (Load)
+import Control.Abstract hiding (Load, String)
+import qualified Control.Abstract as Abstract
 import Control.Abstract.Context as X
 import Control.Abstract.Evaluator as X hiding (LoopControl(..), Return(..), catchLoopControl, runLoopControl, catchReturn, runReturn)
 import Control.Abstract.Modules as X (Modules, ModuleResult, ResolutionError(..), load, lookupModule, listModulesInDir, require, resolve, throwResolutionError)
-import Control.Abstract.Value as X hiding (Boolean(..), Function(..), While(..))
+import Control.Abstract.Value as X hiding (Bitwise(..), Boolean(..), Function(..), Numeric(..), Object(..), Array(..), Hash(..), String(..), Unit(..), While(..))
 import Data.Abstract.BaseError as X
 import Data.Abstract.Declarations as X
 import Data.Abstract.FreeVariables as X
@@ -44,6 +45,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Declarations term
           , FreeVariables term
           , Member (Allocator address) sig
+          , Member (Bitwise value) sig
           , Member (Boolean value) sig
           , Member (While value) sig
           , Member (Deref value) sig
@@ -53,10 +55,15 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Member Fresh sig
           , Member (Function term address value) sig
           , Member (Modules address value) sig
+          , Member (Numeric value) sig
+          , Member (Object address value) sig
+          , Member (Array value) sig
+          , Member (Hash value) sig
           , Member (Reader ModuleInfo) sig
           , Member (Reader PackageInfo) sig
           , Member (Reader Span) sig
           , Member (State Span) sig
+          , Member (Abstract.String value) sig
           , Member (Reader (CurrentFrame address)) sig
           , Member (Reader (CurrentScope address)) sig
           , Member (Resumable (BaseError (ScopeError address))) sig
@@ -67,6 +74,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Member (Resumable (BaseError ResolutionError)) sig
           , Member (State (Heap address address value)) sig
           , Member Trace sig
+          , Member (Unit value) sig
           , Ord address
           , Show address
           )
@@ -80,6 +88,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
   ref :: ( AbstractValue term address value m
          , Carrier sig m
          , Declarations term
+         , Member (Object address value) sig
          , Member (Reader (CurrentFrame address)) sig
          , Member (Reader (CurrentScope address)) sig
          , Member (Reader ModuleInfo) sig
@@ -123,6 +132,8 @@ class HasPrelude (language :: Language) where
                    , Member (Reader (CurrentFrame address)) sig
                    , Member (Reader (CurrentScope address)) sig
                    , Member Trace sig
+                   , Member (Unit value) sig
+                   , Member (Object address value) sig
                    , Ord address
                    , Show address
                    )
@@ -158,8 +169,7 @@ instance HasPrelude 'JavaScript where
     defineSelf
     defineNamespace (Declaration (X.name "console")) $ defineBuiltIn (Declaration $ X.name "log") Default Print
 
-defineSelf :: ( AbstractValue term address value m
-              , Carrier sig m
+defineSelf :: ( Carrier sig m
               , Member (State (ScopeGraph address)) sig
               , Member (Resumable (BaseError (ScopeError address))) sig
               , Member (Resumable (BaseError (HeapError address))) sig
@@ -169,6 +179,7 @@ defineSelf :: ( AbstractValue term address value m
               , Member (State (Heap address address value)) sig
               , Member (Reader (CurrentFrame address)) sig
               , Member (Reader (CurrentScope address)) sig
+              , Member (Object address value) sig
               , Ord address
               )
            => Evaluator term address value m ()
@@ -320,4 +331,4 @@ instance (Evaluatable s, Show a) => Evaluatable (TermF s a) where
 --   3. Only the last statement’s return value is returned.
 instance Evaluatable [] where
   -- 'nonEmpty' and 'foldMap1' enable us to return the last statement’s result instead of 'unit' for non-empty lists.
-  eval eval _ = maybe (pure unit) (runApp . foldMap1 (App . eval)) . nonEmpty
+  eval eval _ = maybe unit (runApp . foldMap1 (App . eval)) . nonEmpty

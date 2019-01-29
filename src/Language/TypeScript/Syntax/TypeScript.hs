@@ -17,7 +17,7 @@ import           Data.Span
 import           Diffing.Algorithm
 import           Language.TypeScript.Resolution
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
-import Data.Aeson hiding (object)
+import Data.Aeson hiding (object, Object)
 import qualified Data.Abstract.Name as Name
 
 -- | ShorthandPropertyIdentifier used in object patterns such as var baz = { foo } to mean var baz = { foo: foo }
@@ -118,7 +118,7 @@ instance Evaluatable ExtendsClause where
   eval eval _ ExtendsClause{..} = do
     -- Evaluate subterms
     traverse_ eval extendsClauses
-    pure unit
+    unit
 
 data PropertySignature a = PropertySignature { modifiers :: ![a], propertySignaturePropertyName :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
@@ -178,6 +178,7 @@ declareModule :: ( AbstractValue term address value m
                  , Declarations term
                  , Member (Allocator address) sig
                  , Member (Deref value) sig
+                 , Member (Object address value) sig
                  , Member (Reader (CurrentFrame address)) sig
                  , Member (Reader (CurrentScope address)) sig
                  , Member (Reader Span) sig
@@ -189,6 +190,7 @@ declareModule :: ( AbstractValue term address value m
                  , Member (Resumable (BaseError (AddressError address value))) sig
                  , Member (Resumable (BaseError (HeapError address))) sig
                  , Member (Resumable (BaseError (ScopeError address))) sig
+                 , Member (Unit value) sig
                  , Ord address
                  )
                 => (term -> Evaluator term address value m value)
@@ -201,7 +203,7 @@ declareModule eval identifier statements = do
     currentScope' <- currentScope
 
     let declaration = Declaration name
-        moduleBody = maybe (pure unit) (runApp . foldMap1 (App . eval)) (nonEmpty statements)
+        moduleBody = maybe unit (runApp . foldMap1 (App . eval)) (nonEmpty statements)
     maybeSlot <- maybeLookupDeclaration declaration
 
     case maybeSlot of
@@ -226,7 +228,7 @@ declareModule eval identifier statements = do
         moduleSlot <- lookupDeclaration (Declaration name)
         assign moduleSlot =<< namespace name childFrame
 
-        pure unit
+        unit
 
 instance Evaluatable Module where
   eval eval _ Module{..} = declareModule eval moduleIdentifier moduleStatements
@@ -288,7 +290,7 @@ instance Evaluatable AbstractClass where
     classSlot <- lookupDeclaration (Declaration name)
     assign classSlot =<< klass (Declaration name) childFrame
 
-    pure unit
+    unit
 
 data MetaProperty a = MetaProperty
   deriving (Diffable, Eq, Foldable, Functor,  Generic1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1, Named1, Message1, NFData1)

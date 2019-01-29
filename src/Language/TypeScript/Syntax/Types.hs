@@ -63,6 +63,7 @@ newtype TypeIdentifier a = TypeIdentifier { contents :: T.Text }
 
 instance Declarations1 TypeIdentifier where
   liftDeclaredName _ (TypeIdentifier identifier) = Just (Evaluatable.name identifier)
+  liftDeclaredAlias _ (TypeIdentifier identifier) = Just (Evaluatable.name identifier)
 
 -- TODO: TypeIdentifier shouldn't evaluate to an address in the heap?
 instance Evaluatable TypeIdentifier where
@@ -70,7 +71,7 @@ instance Evaluatable TypeIdentifier where
     -- Add a reference to the type identifier in the current scope.
     span <- ask @Span
     reference (Reference (Evaluatable.name contents)) span ScopeGraph.TypeIdentifier (Declaration (Evaluatable.name contents))
-    pure unit
+    unit
 
 data NestedTypeIdentifier a = NestedTypeIdentifier { left :: !a, right :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
@@ -142,4 +143,4 @@ newtype LiteralType a = LiteralType { literalTypeSubject :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
   deriving (Eq1, Show1, Ord1) via Generically LiteralType
 
-instance Evaluatable LiteralType         
+instance Evaluatable LiteralType
