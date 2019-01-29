@@ -15,7 +15,7 @@ newtype Comment a = Comment { commentContent :: Text }
   deriving (Eq1, Show1, Ord1) via Generically Comment
 
 instance Evaluatable Comment where
-  eval _ _ _ = pure unit
+  eval _ _ _ = unit
 
 instance Tokenize Comment where
   tokenize = yield . Run . commentContent

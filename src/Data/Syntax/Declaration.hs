@@ -151,7 +151,7 @@ newtype VariableDeclaration a = VariableDeclaration { variableDeclarations :: [a
   deriving (Eq1, Show1, Ord1) via Generically VariableDeclaration
 
 instance Evaluatable VariableDeclaration where
-  eval _    _ (VariableDeclaration [])   = pure unit
+  eval _    _ (VariableDeclaration [])   = unit
   eval eval _ (VariableDeclaration decs) = do
     for_ decs $ \declaration -> do
       name <- maybeM (throwNoNameError declaration) (declaredName declaration)
@@ -162,7 +162,7 @@ instance Evaluatable VariableDeclaration where
         pure (subtermSpan, ref)
 
       putDeclarationSpan (Declaration name) span
-    pure unit
+    unit
 
 instance Declarations a => Declarations (VariableDeclaration a) where
   declaredName (VariableDeclaration vars) = case vars of
@@ -198,7 +198,7 @@ instance Evaluatable PublicFieldDefinition where
     slot <- lookupDeclaration (Declaration propertyName)
     value <- eval publicFieldValue
     assign slot value
-    pure unit
+    unit
 
 data Variable a = Variable { variableName :: !a, variableType :: !a, variableValue :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
@@ -247,7 +247,7 @@ instance Evaluatable Class where
     withScopeAndFrame classFrame $ do
       void $ eval classBody
 
-    pure unit
+    unit
 
 instance Declarations1 Class where
   liftDeclaredName declaredName = declaredName . classIdentifier
@@ -318,7 +318,7 @@ instance Evaluatable TypeAlias where
     kindSlot <- lookupDeclaration (Declaration kindName)
     assign slot =<< deref kindSlot
 
-    pure unit
+    unit
 
 instance Declarations a => Declarations (TypeAlias a) where
   declaredName TypeAlias{..} = declaredName typeAliasIdentifier

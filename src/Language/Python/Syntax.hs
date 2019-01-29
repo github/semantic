@@ -166,7 +166,7 @@ instance Evaluatable Import where
     aliasSlot <- lookupDeclaration (Declaration aliasName)
     assign aliasSlot =<< object aliasFrame
 
-    pure unit
+    unit
 
   -- from a import b
   -- from a import b as c
@@ -201,7 +201,7 @@ instance Evaluatable Import where
       insertImportEdge scopeAddress
       insertFrameLink ScopeGraph.Import (Map.singleton scopeAddress frameAddress)
 
-    pure unit
+    unit
 
 
 newtype QualifiedImport a = QualifiedImport { qualifiedImportFrom :: NonEmpty String }
@@ -227,7 +227,7 @@ instance Evaluatable QualifiedImport where
     let namesAndPaths = toList (NonEmpty.zip (Data.Abstract.Evaluatable.name . T.pack <$> qualifiedName) modulePaths)
 
     go namesAndPaths
-    pure unit
+    unit
     where
       go [] = pure ()
       go ((name, modulePath) : namesAndPaths) = do
@@ -278,7 +278,7 @@ instance Evaluatable QualifiedAliasedImport where
         insertImportEdge moduleScope
         insertFrameLink ScopeGraph.Import (Map.singleton moduleScope moduleFrame)
 
-    pure unit
+    unit
 
 -- | Ellipsis (used in splice expressions and alternatively can be used as a fill in expression, like `undefined` in Haskell)
 data Ellipsis a = Ellipsis
