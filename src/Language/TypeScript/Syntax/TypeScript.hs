@@ -9,6 +9,7 @@ import           Proto3.Suite
 
 import           Control.Abstract hiding (Import)
 import           Data.Abstract.Evaluatable as Evaluatable
+import           Data.Abstract.ScopeGraph (AccessControl(..))
 import           Data.JSON.Fields
 import qualified Data.Map.Strict as Map
 import           Data.Semigroup.App
@@ -115,7 +116,7 @@ instance Evaluatable ExtendsClause where
     traverse_ eval extendsClauses
     unit
 
-data PropertySignature a = PropertySignature { modifiers :: ![a], propertySignaturePropertyName :: !a }
+data PropertySignature a = PropertySignature { modifiers :: [a], propertySignaturePropertyName :: a, propertySignatureAccessControl :: AccessControl }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
   deriving (Eq1, Show1, Ord1) via Generically PropertySignature
 
@@ -140,7 +141,7 @@ data IndexSignature a = IndexSignature { subject :: a, subjectType :: a, typeAnn
 
 instance Evaluatable IndexSignature
 
-data AbstractMethodSignature a = AbstractMethodSignature { abstractMethodSignatureContext :: ![a], abstractMethodSignatureName :: !a, abstractMethodSignatureParameters :: ![a] }
+data AbstractMethodSignature a = AbstractMethodSignature { abstractMethodSignatureContext :: ![a], abstractMethodSignatureName :: a, abstractMethodSignatureParameters :: [a], abstractMethodAccessControl :: AccessControl }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
   deriving (Eq1, Show1, Ord1) via Generically AbstractMethodSignature
 
