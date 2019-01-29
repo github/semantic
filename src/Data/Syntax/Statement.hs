@@ -33,7 +33,7 @@ instance ToJSON1 Statements
 
 instance Evaluatable Statements where
   eval eval _ (Statements xs) =
-    maybe (pure unit) (runApp . foldMap1 (App . eval)) (nonEmpty xs)
+    maybe unit (runApp . foldMap1 (App . eval)) (nonEmpty xs)
 
 instance Tokenize Statements where
   tokenize = imperative
@@ -46,7 +46,7 @@ instance ToJSON1 StatementBlock
 
 instance Evaluatable StatementBlock where
   eval eval _ (StatementBlock xs) =
-    maybe (pure unit) (runApp . foldMap1 (App . eval)) (nonEmpty xs)
+    maybe unit (runApp . foldMap1 (App . eval)) (nonEmpty xs)
 
 instance Tokenize StatementBlock where
   tokenize = imperative
@@ -134,7 +134,7 @@ instance Evaluatable Let where
       slot <- lookupDeclaration (Declaration name)
       assign slot letVal
       eval letBody
-    pure unit
+    unit
 
 
 -- Assignment
@@ -263,7 +263,7 @@ newtype NoOp a = NoOp { value :: a }
   deriving (Eq1, Show1, Ord1) via Generically NoOp
 
 instance Evaluatable NoOp where
-  eval _ _ _ = pure unit
+  eval _ _ _ = unit
 
 -- Loops
 

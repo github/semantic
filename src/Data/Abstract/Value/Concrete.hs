@@ -9,7 +9,7 @@ module Data.Abstract.Value.Concrete
 import Control.Abstract.ScopeGraph (Allocator, ScopeError)
 import Control.Abstract.Heap (scopeLookup)
 import qualified Control.Abstract as Abstract
-import Control.Abstract hiding (Boolean(..), Function(..), While(..))
+import Control.Abstract hiding (Boolean(..), Function(..), Numeric(..), Object(..), Array(..), Hash(..), String(..), Unit(..), While(..))
 import Control.Effect.Carrier
 import Control.Effect.Interpose
 import Control.Effect.Sum
@@ -36,8 +36,6 @@ data Value term address
   | Rational (Number.Number Rational)
   | Float    (Number.Number Scientific)
   | String Text
-  | Symbol Text
-  | Regex Text
   | Tuple [Value term address]
   | Array [Value term address]
   | Class Declaration [Value term address] address
@@ -135,12 +133,10 @@ instance ( Member (Reader ModuleInfo) sig
     Abstract.AsBool other       k -> throwBaseError (BoolError other) >>= runBooleanC . k)
 
 
-instance forall sig m term address. ( Carrier sig m
+instance ( Carrier sig m
          , Member (Abstract.Boolean (Value term address)) sig
          , Member (Error (LoopControl (Value term address))) sig
          , Member (Interpose (Resumable (BaseError (UnspecializedError address (Value term address))))) sig
-         , Show address
-         , Show term
          )
       => Carrier (Abstract.While (Value term address) :+: sig) (WhileC (Value term address) (Eff m)) where
   ret = WhileC . ret
@@ -160,45 +156,142 @@ instance forall sig m term address. ( Carrier sig m
     where
       loop x = catchLoopControl (fix x) $ \case
         Break value -> pure value
-        Abort -> pure unit
+        Abort -> pure Unit
         -- FIXME: Figure out how to deal with this. Ruby treats this as the result
         -- of the current block iteration, while PHP specifies a breakout level
         -- and TypeScript appears to take a label.
         Continue _  -> loop x
 
 
+instance Carrier sig m
+      => Carrier (Abstract.Unit (Value term address) :+: sig) (UnitC (Value term address) m) where
+  ret = UnitC . ret
+  eff = UnitC . handleSum
+    (eff . handleCoercible)
+    (\ (Abstract.Unit k) -> runUnitC (k Unit))
+
+instance ( Member (Reader ModuleInfo) sig
+         , Member (Reader Span) sig
+         , Member (Resumable (BaseError (ValueError term address))) sig
+         , Carrier sig m
+         , Monad m
+         )
+      => Carrier (Abstract.String (Value term address) :+: sig) (StringC (Value term address) m) where
+  ret = StringC . ret
+  eff = StringC . handleSum (eff . handleCoercible) (\case
+    Abstract.String   t          k -> runStringC (k (String t))
+    Abstract.AsString (String t) k -> runStringC (k t)
+    Abstract.AsString other      k -> throwBaseError (StringError other) >>= runStringC . k)
+
+instance ( Member (Reader ModuleInfo) sig
+         , Member (Reader Span) sig
+         , Member (Resumable (BaseError (ValueError term address))) sig
+         , Carrier sig m
+         , Monad m
+         )
+      => Carrier (Abstract.Numeric (Value term address) :+: sig) (NumericC (Value term address) m) where
+  ret = NumericC . ret
+  eff = NumericC . handleSum (eff . handleCoercible) (\case
+    Abstract.Integer  t k -> runNumericC (k (Integer (Number.Integer t)))
+    Abstract.Float    t k -> runNumericC (k (Float (Number.Decimal t)))
+    Abstract.Rational t k -> runNumericC (k (Rational (Number.Ratio t)))
+    Abstract.LiftNumeric f arg k -> runNumericC . k =<< case arg of
+      Integer (Number.Integer i) -> pure $ Integer (Number.Integer (f i))
+      Float (Number.Decimal d)   -> pure $ Float (Number.Decimal (f d))
+      Rational (Number.Ratio r)  -> pure $ Rational (Number.Ratio (f r))
+      other                      -> throwBaseError (NumericError other)
+    Abstract.LiftNumeric2 f left right k -> runNumericC . k =<< case (left, right) of
+      (Integer  i, Integer j)  -> attemptUnsafeArithmetic (f i j) & specialize
+      (Integer  i, Rational j) -> attemptUnsafeArithmetic (f i j) & specialize
+      (Integer  i, Float j)    -> attemptUnsafeArithmetic (f i j) & specialize
+      (Rational i, Integer j)  -> attemptUnsafeArithmetic (f i j) & specialize
+      (Rational i, Rational j) -> attemptUnsafeArithmetic (f i j) & specialize
+      (Rational i, Float j)    -> attemptUnsafeArithmetic (f i j) & specialize
+      (Float    i, Integer j)  -> attemptUnsafeArithmetic (f i j) & specialize
+      (Float    i, Rational j) -> attemptUnsafeArithmetic (f i j) & specialize
+      (Float    i, Float j)    -> attemptUnsafeArithmetic (f i j) & specialize
+      _                        -> throwBaseError (Numeric2Error left right))
+
+-- Dispatch whatever's contained inside a 'Number.SomeNumber' to its appropriate 'MonadValue' ctor
+specialize :: ( Member (Reader ModuleInfo) sig
+              , Member (Reader Span) sig
+              , Member (Resumable (BaseError (ValueError term address))) sig
+              , Carrier sig m
+              , Monad m
+              )
+           => Either ArithException Number.SomeNumber
+           -> m (Value term address)
+specialize (Left exc) = throwBaseError (ArithmeticError exc)
+specialize (Right (Number.SomeNumber (Number.Integer t))) = pure (Integer (Number.Integer t))
+specialize (Right (Number.SomeNumber (Number.Decimal t)))   = pure (Float (Number.Decimal t))
+specialize (Right (Number.SomeNumber (Number.Ratio t))) = pure (Rational (Number.Ratio t))
+
+
+instance ( Member (Reader ModuleInfo) sig
+         , Member (Reader Span) sig
+         , Member (Resumable (BaseError (ValueError term address))) sig
+         , Carrier sig m
+         , Monad m
+         )
+      => Carrier (Abstract.Bitwise (Value term address) :+: sig) (BitwiseC (Value term address) m) where
+  ret = BitwiseC . ret
+  eff = BitwiseC . handleSum (eff . handleCoercible) (\case
+    CastToInteger (Integer (Number.Integer i)) k -> runBitwiseC (k (Integer (Number.Integer i)))
+    CastToInteger (Float (Number.Decimal i)) k -> runBitwiseC (k (Integer (Number.Integer (coefficient (normalize i)))))
+    CastToInteger i k -> throwBaseError (NumericError i) >>= runBitwiseC . k
+    LiftBitwise operator (Integer (Number.Integer i)) k -> runBitwiseC . k . Integer . Number.Integer . operator $ i
+    LiftBitwise _ other k -> throwBaseError (BitwiseError other) >>= runBitwiseC . k
+    LiftBitwise2 operator (Integer (Number.Integer i)) (Integer (Number.Integer j)) k -> runBitwiseC . k . Integer . Number.Integer $ operator i j
+    LiftBitwise2 _ left right k -> throwBaseError (Bitwise2Error left right) >>= runBitwiseC . k
+    UnsignedRShift (Integer (Number.Integer i)) (Integer (Number.Integer j)) k | i >= 0 -> runBitwiseC . k . Integer . Number.Integer $ ourShift (fromIntegral i) (fromIntegral j)
+    UnsignedRShift left right k -> throwBaseError (Bitwise2Error left right) >>= runBitwiseC . k)
+
+ourShift :: Word64 -> Int -> Integer
+ourShift a b = toInteger (shiftR a b)
+
+
+instance Carrier sig m => Carrier (Abstract.Object address (Value term address) :+: sig) (ObjectC address (Value term address) m) where
+  ret = ObjectC . ret
+  eff = ObjectC . handleSum (eff . handleCoercible) (\case
+    Abstract.Object address k -> runObjectC (k (Object address))
+    Abstract.ScopedEnvironment (Object address) k -> runObjectC (k (Just address))
+    Abstract.ScopedEnvironment (Class _ _ address) k -> runObjectC (k (Just address))
+    Abstract.ScopedEnvironment (Namespace _ address) k -> runObjectC (k (Just address))
+    Abstract.ScopedEnvironment _ k -> runObjectC (k Nothing)
+    Abstract.Klass n frame k -> runObjectC (k (Class n mempty frame))
+    )
+
+instance ( Member (Reader ModuleInfo) sig
+       , Member (Reader Span) sig
+       , Member (Resumable (BaseError (ValueError term address))) sig
+       , Carrier sig m
+       , Monad m
+       )
+      => Carrier (Abstract.Array (Value term address) :+: sig) (ArrayC (Value term address) m) where
+  ret = ArrayC . ret
+  eff = ArrayC . handleSum (eff . handleCoercible) (\case
+    Abstract.Array t k -> runArrayC (k (Array t))
+    Abstract.AsArray (Array addresses) k -> runArrayC (k addresses)
+    Abstract.AsArray val k -> throwBaseError (ArrayError val) >>= runArrayC . k)
+
+instance ( Carrier sig m ) => Carrier (Abstract.Hash (Value term address) :+: sig) (HashC (Value term address) m) where
+  ret = HashC . ret
+  eff = HashC . handleSum (eff . handleCoercible) (\case
+    Abstract.Hash t k -> runHashC (k ((Hash . map (uncurry KVPair)) t))
+    Abstract.KvPair t v k -> runHashC (k (KVPair t v)))
+
+
 instance AbstractHole (Value term address) where
   hole = Hole
 
 instance (Show address, Show term) => AbstractIntro (Value term address) where
-  unit     = Unit
-  integer  = Integer . Number.Integer
-  string   = String
-  float    = Float . Number.Decimal
-  symbol   = Symbol
-  rational = Rational . Number.Ratio
-  regex    = Regex
-
-  kvPair = KVPair
-  hash = Hash . map (uncurry KVPair)
-
   null     = Null
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
-instance ( Member (Allocator address) sig
-         , Member (Abstract.Boolean (Value term address)) sig
-         , Member (Deref (Value term address)) sig
-         , Member (Error (LoopControl (Value term address))) sig
-         , Member (Error (Return (Value term address))) sig
-         , Member Fresh sig
+instance ( Member (Abstract.Boolean (Value term address)) sig
          , Member (Reader ModuleInfo) sig
-         , Member (Reader PackageInfo) sig
          , Member (Reader Span) sig
          , Member (Resumable (BaseError (ValueError term address))) sig
-         , Member (Resumable (BaseError (AddressError address (Value term address)))) sig
-         , Member (State (Heap address address (Value term address))) sig
-         , Member Trace sig
-         , Ord address
          , Show address
          , Show term
          , Carrier sig m
@@ -209,27 +302,8 @@ instance ( Member (Allocator address) sig
     | otherwise = throwValueError $ KeyValueError val
 
   tuple = pure . Tuple
-  array = pure . Array
-
-  asArray val
-    | Array addresses <- val = pure addresses
-    | otherwise = throwValueError $ ArrayError val
-
-  klass n frame = do
-    pure $ Class n mempty frame
 
   namespace name = pure . Namespace name
-
-  scopedEnvironment v
-    | Object address <- v = pure (Just address)
-    | Class _ _ address <- v = pure (Just address)
-    | Namespace _ address <- v = pure (Just address)
-    | otherwise = pure Nothing
-
-  asString v
-    | String n <- v = pure n
-    | otherwise     = throwValueError $ StringError v
-
 
   index = go where
     tryIdx list ii
@@ -239,36 +313,6 @@ instance ( Member (Allocator address) sig
       | (Array arr, Integer (Number.Integer i)) <- (arr, idx) = tryIdx arr i
       | (Tuple tup, Integer (Number.Integer i)) <- (arr, idx) = tryIdx tup i
       | otherwise = throwValueError (IndexError arr idx)
-
-  liftNumeric f arg
-    | Integer (Number.Integer i) <- arg = pure . integer  $ f i
-    | Float (Number.Decimal d)   <- arg = pure . float    $ f d
-    | Rational (Number.Ratio r)  <- arg = pure . rational $ f r
-    | otherwise = throwValueError (NumericError arg)
-
-  liftNumeric2 f left right
-    | (Integer  i, Integer j)  <- pair = tentative f i j & specialize
-    | (Integer  i, Rational j) <- pair = tentative f i j & specialize
-    | (Integer  i, Float j)    <- pair = tentative f i j & specialize
-    | (Rational i, Integer j)  <- pair = tentative f i j & specialize
-    | (Rational i, Rational j) <- pair = tentative f i j & specialize
-    | (Rational i, Float j)    <- pair = tentative f i j & specialize
-    | (Float    i, Integer j)  <- pair = tentative f i j & specialize
-    | (Float    i, Rational j) <- pair = tentative f i j & specialize
-    | (Float    i, Float j)    <- pair = tentative f i j & specialize
-    | otherwise = throwValueError (Numeric2Error left right)
-      where
-        tentative x i j = attemptUnsafeArithmetic (x i j)
-
-        -- Dispatch whatever's contained inside a 'Number.SomeNumber' to its appropriate 'MonadValue' ctor
-        specialize :: AbstractValue term address (Value term address) m
-                   => Either ArithException Number.SomeNumber
-                   -> Evaluator term address (Value term address) m (Value term address)
-        specialize (Left exc) = throwValueError (ArithmeticError exc)
-        specialize (Right (Number.SomeNumber (Number.Integer i))) = pure $ integer i
-        specialize (Right (Number.SomeNumber (Number.Ratio r)))   = pure $ rational r
-        specialize (Right (Number.SomeNumber (Number.Decimal d))) = pure $ float d
-        pair = (left, right)
 
   liftComparison comparator left right
     | (Integer (Number.Integer i), Integer (Number.Integer j)) <- pair = go i j
@@ -282,41 +326,16 @@ instance ( Member (Allocator address) sig
       where
         -- Explicit type signature is necessary here because we're passing all sorts of things
         -- to these comparison functions.
-        go :: (AbstractValue term address (Value term address) m, Ord a) => a -> a -> Evaluator term address (Value term address) m (Value term address)
+        go :: Ord a => a -> a -> Evaluator term address (Value term address) m (Value term address)
         go l r = case comparator of
           Concrete f  -> boolean (f l r)
-          Generalized -> pure $ integer (orderingToInt (compare l r))
+          Generalized -> pure $ Integer (Number.Integer (orderingToInt (compare l r)))
 
         -- Map from [LT, EQ, GT] to [-1, 0, 1]
         orderingToInt :: Ordering -> Prelude.Integer
         orderingToInt = toInteger . pred . fromEnum
 
         pair = (left, right)
-
-  liftBitwise operator target
-    | Integer (Number.Integer i) <- target = pure . integer $ operator i
-    | otherwise = throwValueError (BitwiseError target)
-
-  liftBitwise2 operator left right
-    | (Integer (Number.Integer i), Integer (Number.Integer j)) <- pair = pure . integer $ operator i j
-    | otherwise = throwValueError (Bitwise2Error left right)
-      where pair = (left, right)
-
-  unsignedRShift left right
-    | (Integer (Number.Integer i), Integer (Number.Integer j)) <- pair =
-      if i >= 0 then pure . integer $ ourShift (fromIntegral i) (fromIntegral j)
-      else throwValueError (Bitwise2Error left right)
-    | otherwise = throwValueError (Bitwise2Error left right)
-      where
-        pair = (left, right)
-        ourShift :: Word64 -> Int -> Integer
-        ourShift a b = toInteger (shiftR a b)
-
-  castToInteger (Integer (Number.Integer i)) = pure (Integer (Number.Integer i))
-  castToInteger (Float (Number.Decimal i)) = pure (Integer (Number.Integer (coefficient (normalize i))))
-  castToInteger i = throwValueError (NumericError i)
-
-  object frameAddress = pure (Object frameAddress)
 
 -- | The type of exceptions that can be thrown when constructing values in 'Value'’s 'MonadValue' instance.
 data ValueError term address resume where

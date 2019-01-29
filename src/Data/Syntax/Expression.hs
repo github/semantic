@@ -9,7 +9,7 @@ import Data.Fixed
 import Data.List (intersperse)
 import Proto3.Suite.Class
 
-import           Control.Abstract hiding (Call, Member, Void)
+import           Control.Abstract hiding (Bitwise(..), Call, Member, Void)
 import           Data.Abstract.Evaluatable as Abstract hiding (Member, Void)
 import           Data.Abstract.Name as Name
 import           Data.Abstract.Number (liftIntegralFrac, liftReal, liftedExponent, liftedFloorDiv)
@@ -282,7 +282,7 @@ newtype Delete a = Delete { value :: a }
   deriving (Eq1, Show1, Ord1) via Generically Delete
 
 instance Evaluatable Delete where
-  eval _ ref (Delete a) = ref a >>= dealloc >> pure unit
+  eval _ ref (Delete a) = ref a >>= dealloc >> unit
 
 -- | A sequence expression such as Javascript or C's comma operator.
 data SequenceExpression a = SequenceExpression { firstExpression :: !a, secondExpression :: !a }
