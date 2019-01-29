@@ -21,6 +21,7 @@ import Analysis.CyclomaticComplexity
 import Analysis.TOCSummary
 import Control.Monad.Free as Free
 import Control.Monad.Trans.Free as FreeF
+import Data.Abstract.ScopeGraph (AccessControl(..))
 import Data.Bifunctor.Join
 import Data.ByteString (ByteString)
 import Data.Char (chr)
@@ -205,6 +206,9 @@ instance (Listable1 syntax) => Listable3 (DiffF syntax) where
 
 instance (Listable1 syntax, Listable ann1, Listable ann2, Listable recur) => Listable (DiffF syntax ann1 ann2 recur) where
   tiers = tiers3
+
+instance Listable AccessControl where
+  tiers = cons0 Public \/ cons0 Protected \/ cons0 Private
 
 instance Listable1 f => Listable2 (Diff f) where
   liftTiers2 annTiers1 annTiers2 = go where go = liftCons1 (liftTiers3 annTiers1 annTiers2 go) Diff
