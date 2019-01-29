@@ -36,6 +36,8 @@ module Data.Abstract.ScopeGraph
 
 import           Control.Abstract.Hole
 import           Data.Abstract.Name
+import           Data.Aeson
+import           Data.JSON.Fields (ToJSONFields(..))
 import qualified Data.Map.Strict as Map
 import qualified Data.Sequence as Seq
 import qualified Data.Set as Set
@@ -57,6 +59,9 @@ data AccessControl = Public
 
 instance Proto.HasDefault AccessControl where
   def = Public
+
+instance ToJSONFields AccessControl where
+  toJSONFields accessControl = ["accessControl" .= accessControl]
 
 instance Proto.Message AccessControl where
   encodeMessage = Proto.encodeMessageField
