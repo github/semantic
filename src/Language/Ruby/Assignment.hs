@@ -12,6 +12,7 @@ import Prologue hiding (for, unless)
 import           Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
 import           Data.Abstract.Name (name)
+import qualified Data.Abstract.ScopeGraph as ScopeGraph (AccessControl(..))
 import           Data.List (elem)
 import qualified Data.List.NonEmpty as NonEmpty
 import           Data.Syntax
@@ -128,9 +129,6 @@ type Syntax = '[
   , Ruby.Syntax.Send
   , Ruby.Syntax.ZSuper
   , []
-  , Declaration.Public
-  , Declaration.Protected
-  , Declaration.Private
   ]
 
 type Term = Term.Term (Sum Syntax) Location
@@ -334,16 +332,17 @@ parameter = postContextualize comment (term uncontextualizedParameter)
     keywordParameter = symbol KeywordParameter *> children (lhsIdent <* optional expression)
     optionalParameter = symbol OptionalParameter *> children (lhsIdent <* expression)
 
+publicAccessControl :: ScopeGraph.AccessControl
+publicAccessControl = ScopeGraph.Public
+
 method :: Assignment Term
-method = makeTerm <$> symbol Method <*> (withNewScope . children) (Declaration.Method [] <$> accessControl <*> emptyTerm <*> methodSelector <*> params <*> expressions')
+method = makeTerm <$> symbol Method <*> (withNewScope . children) (Declaration.Method [] <$> emptyTerm <*> methodSelector <*> params <*> expressions' <*> pure publicAccessControl)
   where params = symbol MethodParameters *> children (many parameter) <|> pure []
         expressions' = makeTerm <$> location <*> many expression
-        accessControl = makeTerm <$> location <*> pure Declaration.Public
 
 singletonMethod :: Assignment Term
-singletonMethod = makeTerm <$> symbol SingletonMethod <*> (withNewScope . children) (Declaration.Method [] <$> accessControl <*> expression <*> methodSelector <*> params <*> expressions)
+singletonMethod = makeTerm <$> symbol SingletonMethod <*> (withNewScope . children) (Declaration.Method [] <$> expression <*> methodSelector <*> params <*> expressions <*> pure publicAccessControl)
   where params = symbol MethodParameters *> children (many parameter) <|> pure []
-        accessControl = makeTerm <$> location <*> pure Declaration.Public
 
 lambda :: Assignment Term
 lambda = makeTerm <$> symbol Lambda <*> (withExtendedScope . children) (
