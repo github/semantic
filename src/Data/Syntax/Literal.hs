@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DerivingVia, DuplicateRecordFields, ScopedTypeVariables, ViewPatterns #-}
+{-# LANGUAGE DeriveAnyClass, DerivingVia, DuplicateRecordFields, ScopedTypeVariables #-}
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Data.Syntax.Literal where
 
@@ -43,7 +43,7 @@ newtype Integer a = Integer { integerContent :: Text }
 instance Evaluatable Data.Syntax.Literal.Integer where
   -- TODO: We should use something more robust than shelling out to readMaybe.
   eval _ _ (Data.Syntax.Literal.Integer x) =
-    integer <$> either (const (throwEvalError (IntegerFormatError x))) pure (parseInteger x)
+    either (const (throwEvalError (IntegerFormatError x))) pure (parseInteger x) >>= integer
 
 instance Tokenize Data.Syntax.Literal.Integer where
   tokenize = yield . Run . integerContent
@@ -57,7 +57,7 @@ newtype Float a = Float { floatContent :: Text }
 
 instance Evaluatable Data.Syntax.Literal.Float where
   eval _ _ (Float s) =
-    float <$> either (const (throwEvalError (FloatFormatError s))) pure (parseScientific s)
+    either (const (throwEvalError (FloatFormatError s))) pure (parseScientific s) >>= float
 
 instance Tokenize Data.Syntax.Literal.Float where
   tokenize = yield . Run . floatContent
@@ -72,7 +72,7 @@ instance Evaluatable Data.Syntax.Literal.Rational where
     let
       trimmed = T.takeWhile (/= 'r') r
       parsed = readMaybe @Prelude.Integer (T.unpack trimmed)
-    in rational <$> maybe (throwEvalError (RationalFormatError r)) (pure . toRational) parsed
+    in maybe (throwEvalError (RationalFormatError r)) (pure . toRational) parsed >>= rational
 
 instance Tokenize Data.Syntax.Literal.Rational where
   tokenize (Rational t) = yield . Run $ t
@@ -128,7 +128,7 @@ newtype TextElement a = TextElement { textElementContent :: Text }
   deriving (Eq1, Ord1, Show1) via Generically TextElement
 
 instance Evaluatable TextElement where
-  eval _ _ (TextElement x) = pure (string x)
+  eval _ _ (TextElement x) = string x
 
 instance Tokenize TextElement where
   tokenize = yield . Run . textElementContent
@@ -176,7 +176,7 @@ newtype SymbolElement a = SymbolElement { symbolContent :: Text }
   deriving (Eq1, Ord1, Show1) via Generically SymbolElement
 
 instance Evaluatable SymbolElement where
-  eval _ _ (SymbolElement s) = pure (symbol s)
+  eval _ _ (SymbolElement s) = string s
 
 instance Tokenize SymbolElement where
   tokenize = yield . Run . symbolContent
@@ -189,7 +189,7 @@ newtype Regex a = Regex { regexContent :: Text }
 
 -- TODO: Implement Eval instance for Regex
 instance Evaluatable Regex where
-  eval _ _ (Regex x) = pure (regex x)
+  eval _ _ (Regex x) = string x
 
 instance Tokenize Regex where
   tokenize = yield . Run . regexContent
@@ -211,7 +211,9 @@ newtype Hash a = Hash { hashElements :: [a] }
   deriving (Eq1, Ord1, Show1) via Generically Hash
 
 instance Evaluatable Hash where
-  eval eval _ t = Eval.hash <$> traverse (eval >=> asPair) (hashElements t)
+  eval eval _ t = do
+    elements <- traverse (eval >=> asPair) (hashElements t)
+    Eval.hash elements
 
 instance Tokenize Hash where
   tokenize = Tok.hash . hashElements
@@ -221,8 +223,10 @@ data KeyValue a = KeyValue { key :: !a, value :: !a }
   deriving (Eq1, Ord1, Show1) via Generically KeyValue
 
 instance Evaluatable KeyValue where
-  eval eval _ (fmap eval -> KeyValue{..}) =
-    kvPair <$> key <*> value
+  eval eval _ KeyValue{..} = do
+    k <- eval key
+    v <- eval value
+    kvPair k v
 
 instance Tokenize KeyValue where
   tokenize (KeyValue k v) = pair k v
