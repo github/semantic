@@ -11,6 +11,7 @@ module Language.MiniRuby.Assignment
 import           Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
 import           Data.Abstract.Name (name)
+import qualified Data.Abstract.ScopeGraph as ScopeGraph (AccessControl(..))
 import           Data.List (elem)
 import           Data.Sum
 import           Data.Syntax
@@ -52,9 +53,6 @@ type Syntax =
    , Syntax.Identifier
    , Literal.Integer
    , []
-   , Declaration.Public
-   , Declaration.Protected
-   , Declaration.Private
    ]
 
 type Term = Term.Term (Sum Syntax) Location
@@ -106,10 +104,10 @@ identifier =
         else pure $ makeTerm loc (Ruby.Syntax.Send Nothing (Just identTerm) [] Nothing)
 
 method :: Assignment Term
-method = makeTerm <$> symbol Method <*> (withNewScope . children) (Declaration.Method [] <$> emptyTerm <*> accessibility <*> methodSelector <*> params <*> expressions')
+method = makeTerm <$> symbol Method <*> (withNewScope . children) (Declaration.Method [] <$> emptyTerm <*> methodSelector <*> params <*> expressions' <*> pure accessibility)
   where params = symbol MethodParameters *> children (many parameter) <|> pure []
         expressions' = makeTerm <$> location <*> many expression
-        accessibility = makeTerm <$> location <*> pure Declaration.Public
+        accessibility = ScopeGraph.Public
 
 methodSelector :: Assignment Term
 methodSelector = makeTerm <$> symbols <*> (Syntax.Identifier <$> (name <$> source))
