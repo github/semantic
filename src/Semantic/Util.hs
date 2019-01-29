@@ -207,8 +207,12 @@ callGraphProject parser proxy opts paths = runTaskWithOptions opts $ do
 
 evaluatePythonProject = justEvaluatingCatchingErrors <=< evaluatePythonProjects (Proxy @'Language.Python) pythonParser Language.Python
 
---scopeGraphRubyProject   = justEvaluatingCatchingErrors <=< evaluateProjectForScopeGraph (Proxy @'Language.Ruby) rubyParser
 scopeGraphPythonProject = justEvaluatingCatchingErrors <=< evaluateProjectForScopeGraph (Proxy @'Language.Python) pythonParser
+scopeGraphRubyProject = justEvaluatingCatchingErrors <=< evaluateProjectForScopeGraph (Proxy @'Language.Ruby) rubyParser
+scopeGraphPHPProject = justEvaluatingCatchingErrors <=< evaluateProjectForScopeGraph (Proxy @'Language.PHP) phpParser
+scopeGraphGoProject = justEvaluatingCatchingErrors <=< evaluateProjectForScopeGraph (Proxy @'Language.Go) goParser
+scopeGraphTypeScriptProject = justEvaluatingCatchingErrors <=< evaluateProjectForScopeGraph (Proxy @'Language.TypeScript) typescriptParser
+scopeGraphJavaScriptProject = justEvaluatingCatchingErrors <=< evaluateProjectForScopeGraph (Proxy @'Language.TypeScript) typescriptParser
 
 callGraphRubyProject = callGraphProject rubyParser (Proxy @'Language.Ruby) debugOptions
 
