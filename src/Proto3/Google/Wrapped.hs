@@ -9,7 +9,7 @@ import Prologue
 import Proto3.Suite
 
 newtype Wrapped a = Wrapped { value :: a }
-  deriving (Eq, Show, Generic)
+  deriving (Eq, Show, Generic, NFData)
 
 instance Named (Wrapped Text) where nameOf _ = "StringValue"
 instance Named (Wrapped ByteString) where nameOf _ = "BytesValue"
