@@ -38,6 +38,10 @@ import           Semantic.Telemetry (LogQueue, StatQueue)
 import           System.Exit (die)
 import           System.FilePath.Posix (takeDirectory)
 
+import qualified Data.Abstract.Value.Concrete as Concrete
+import Data.Quieterm
+import Data.Location
+
 justEvaluating
   = runM
   . runEvaluator
@@ -55,6 +59,30 @@ justEvaluating
   . runAddressError
   . runValueError
 
+-- We can't go with the inferred type because this needs to be
+-- polymorphic in @lang@.
+justEvaluatingCatchingErrors :: ( hole ~ Hole (Maybe Name) Precise
+                                , term ~ Quieterm (Sum lang) Location
+                                , value ~ Concrete.Value term hole
+                                , Apply Show1 lang
+                                )
+  => Evaluator term hole
+       value
+       (ResumableWithC
+          (BaseError (ValueError term hole))
+          (Eff (ResumableWithC (BaseError (AddressError hole value))
+          (Eff (ResumableWithC (BaseError ResolutionError)
+          (Eff (ResumableWithC (BaseError (EvalError term hole value))
+          (Eff (ResumableWithC (BaseError (HeapError hole))
+          (Eff (ResumableWithC (BaseError (ScopeError hole))
+          (Eff (ResumableWithC (BaseError (UnspecializedError hole value))
+          (Eff (ResumableWithC (BaseError (LoadError hole value))
+          (Eff (FreshC
+          (Eff (StateC (ScopeGraph hole)
+          (Eff (StateC (Heap hole hole (Concrete.Value (Quieterm (Sum lang) Location) (Hole (Maybe Name) Precise)))
+          (Eff (TraceByPrintingC
+          (Eff (LiftC IO))))))))))))))))))))))))) a
+     -> IO (Heap hole hole value, (ScopeGraph hole, a))
 justEvaluatingCatchingErrors
   = runM
   . runEvaluator @_ @_ @(Value _ (Hole.Hole (Maybe Name) Precise))
@@ -109,6 +137,13 @@ callGraphProject parser proxy opts paths = runTaskWithOptions opts $ do
 
 evaluatePythonProject = justEvaluatingCatchingErrors <=< evaluatePythonProjects (Proxy @'Language.Python) pythonParser Language.Python
 
+scopeGraphPythonProject = justEvaluatingCatchingErrors <=< evaluateProjectForScopeGraph (Proxy @'Language.Python) pythonParser
+scopeGraphRubyProject = justEvaluatingCatchingErrors <=< evaluateProjectForScopeGraph (Proxy @'Language.Ruby) rubyParser
+scopeGraphPHPProject = justEvaluatingCatchingErrors <=< evaluateProjectForScopeGraph (Proxy @'Language.PHP) phpParser
+scopeGraphGoProject = justEvaluatingCatchingErrors <=< evaluateProjectForScopeGraph (Proxy @'Language.Go) goParser
+scopeGraphTypeScriptProject = justEvaluatingCatchingErrors <=< evaluateProjectForScopeGraph (Proxy @'Language.TypeScript) typescriptParser
+scopeGraphJavaScriptProject = justEvaluatingCatchingErrors <=< evaluateProjectForScopeGraph (Proxy @'Language.TypeScript) typescriptParser
+
 callGraphRubyProject = callGraphProject rubyParser (Proxy @'Language.Ruby) debugOptions
 
 -- Evaluate a project consisting of the listed paths.
@@ -143,6 +178,17 @@ evaluatePythonProjects proxy parser lang path = runTaskWithOptions debugOptions 
        (raiseHandler (runReader (lowerBound @Span))
        (evaluate proxy (runDomainEffects (evalTerm withTermSpans)) modules)))))))
 
+evaluateProjectForScopeGraph proxy parser project = runTaskWithOptions debugOptions $ do
+  package <- fmap quieterm <$> parsePythonPackage parser project
+  modules <- topologicalSort <$> runImportGraphToModules proxy package
+  trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
+  pure (id @(Evaluator _ (Hole.Hole (Maybe Name) Precise) (Value _ (Hole.Hole (Maybe Name) Precise)) _ _)
+       (runModuleTable
+       (runModules (ModuleTable.modulePaths (packageModules package))
+       (raiseHandler (runReader (packageInfo package))
+       (raiseHandler (evalState (lowerBound @Span))
+       (raiseHandler (runReader (lowerBound @Span))
+       (evaluate proxy (runDomainEffects (evalTerm withTermSpans)) modules)))))))
 
 evaluateProjectWithCaching proxy parser path = runTaskWithOptions debugOptions $ do
   project <- readProject Nothing path (Language.reflect proxy) []
