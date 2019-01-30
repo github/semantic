@@ -59,100 +59,30 @@ justEvaluating
   . runAddressError
   . runValueError
 
-justEvaluatingCatchingErrors ::
-  (Apply Show1 lang) => Evaluator
-       (Quieterm (Sum lang) Location)
-       (Hole (Maybe Name) Precise)
-       (Concrete.Value
-          (Quieterm (Sum lang) Location)
-          (Hole (Maybe Name) Precise))
+-- We can't go with the inferred type because this needs to be
+-- polymorphic in @lang@.
+justEvaluatingCatchingErrors :: ( hole ~ Hole (Maybe Name) Precise
+                                , term ~ Quieterm (Sum lang) Location
+                                , value ~ Concrete.Value term hole
+                                , Apply Show1 lang
+                                )
+  => Evaluator term hole
+       value
        (ResumableWithC
-          (BaseError
-             (ValueError
-                (Quieterm (Sum lang) Location)
-                (Hole (Maybe Name) Precise)))
-          (Eff
-             (ResumableWithC
-                (BaseError
-                   (AddressError
-                      (Hole (Maybe Name) Precise)
-                      (Concrete.Value
-                         (Quieterm (Sum lang) Location)
-                         (Hole (Maybe Name) Precise))))
-                (Eff
-                   (ResumableWithC
-                      (BaseError ResolutionError)
-                      (Eff
-                         (ResumableWithC
-                            (BaseError
-                               (EvalError
-                                  (Quieterm (Sum lang) Location)
-                                  (Hole (Maybe Name) Precise)
-                                  (Concrete.Value
-                                     (Quieterm (Sum lang) Location)
-                                     (Hole (Maybe Name) Precise))))
-                            (Eff
-                               (ResumableWithC
-                                  (BaseError (HeapError (Hole (Maybe Name) Precise)))
-                                  (Eff
-                                     (ResumableWithC
-                                        (BaseError (ScopeError (Hole (Maybe Name) Precise)))
-                                        (Eff
-                                           (ResumableWithC
-                                              (BaseError
-                                                 (UnspecializedError
-                                                    (Hole (Maybe Name) Precise)
-                                                    (Concrete.Value
-                                                       (Quieterm
-                                                          (Sum lang)
-                                                          Location)
-                                                       (Hole (Maybe Name) Precise))))
-                                              (Eff
-                                                 (ResumableWithC
-                                                    (BaseError
-                                                       (LoadError
-                                                          (Hole (Maybe Name) Precise)
-                                                          (Concrete.Value
-                                                             (Quieterm
-                                                                (Sum
-                                                                   lang)
-                                                                Location)
-                                                             (Hole (Maybe Name) Precise))))
-                                                    (Eff
-                                                       (FreshC
-                                                          (Eff
-                                                             (StateC
-                                                                (ScopeGraph
-                                                                   (Hole (Maybe Name) Precise))
-                                                                (Eff
-                                                                   (StateC
-                                                                      (Heap
-                                                                         (Hole (Maybe Name) Precise)
-                                                                         (Hole (Maybe Name) Precise)
-                                                                         (Concrete.Value
-                                                                            (Quieterm
-                                                                               (Sum
-                                                                                  lang)
-                                                                               Location)
-                                                                            (Hole
-                                                                               (Maybe Name)
-                                                                               Precise)))
-                                                                      (Eff
-                                                                         (TraceByPrintingC
-                                                                            (Eff
-                                                                               (LiftC
-                                                                                  IO)))))))))))))))))))))))))
-       a
-     -> IO
-          (Heap
-             (Hole (Maybe Name) Precise)
-             (Hole (Maybe Name) Precise)
-             (Concrete.Value
-                (Quieterm (Sum lang) Location)
-                (Hole (Maybe Name) Precise)),
-           (ScopeGraph (Hole (Maybe Name) Precise), a))
-
-
+          (BaseError (ValueError term hole))
+          (Eff (ResumableWithC (BaseError (AddressError hole value))
+          (Eff (ResumableWithC (BaseError ResolutionError)
+          (Eff (ResumableWithC (BaseError (EvalError term hole value))
+          (Eff (ResumableWithC (BaseError (HeapError hole))
+          (Eff (ResumableWithC (BaseError (ScopeError hole))
+          (Eff (ResumableWithC (BaseError (UnspecializedError hole value))
+          (Eff (ResumableWithC (BaseError (LoadError hole value))
+          (Eff (FreshC
+          (Eff (StateC (ScopeGraph hole)
+          (Eff (StateC (Heap hole hole (Concrete.Value (Quieterm (Sum lang) Location) (Hole (Maybe Name) Precise)))
+          (Eff (TraceByPrintingC
+          (Eff (LiftC IO))))))))))))))))))))))))) a
+     -> IO (Heap hole hole value, (ScopeGraph hole, a))
 justEvaluatingCatchingErrors
   = runM
   . runEvaluator @_ @_ @(Value _ (Hole.Hole (Maybe Name) Precise))
