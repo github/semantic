@@ -206,6 +206,7 @@ type Syntax = '[
   , []
   , Statement.StatementBlock
   , TypeScript.Syntax.MetaProperty
+  , TypeScript.Syntax.AnnotatedExpression
   ]
 
 type Term = Term.Term (Sum Syntax) Location
@@ -473,7 +474,11 @@ sequenceExpression :: Assignment Term
 sequenceExpression = makeTerm <$> symbol Grammar.SequenceExpression <*> children (Expression.SequenceExpression <$> term expression <*> term expressions)
 
 expressions :: Assignment Term
-expressions = expression <|> sequenceExpression
+expressions = annotatedExpression <|> expression <|> sequenceExpression
+
+annotatedExpression :: Assignment Term
+annotatedExpression = mkAnnotated <$> location <*> expression <*> typeAnnotation'
+  where mkAnnotated loc expr ann = makeTerm loc (TypeScript.Syntax.AnnotatedExpression expr ann)
 
 parameter :: Assignment Term
 parameter =  requiredParameter
