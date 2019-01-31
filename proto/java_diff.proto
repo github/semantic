@@ -168,6 +168,7 @@ message Method {
   JavaDiff methodName = 3;
   repeated JavaDiff methodParameters = 4;
   JavaDiff methodBody = 5;
+  AccessControl methodAccessControl = 6;
 }
 
 message VariableDeclaration {
@@ -657,4 +658,10 @@ message Return {
 
 message List {
   repeated JavaDiff listContent = 1;
+}
+
+enum AccessControl {
+  Public = 0;
+  Protected = 1;
+  Private = 2;
 }

@@ -11,14 +11,12 @@
     (ObjectType
       (PropertySignature
         (Empty)
-        (Empty)
         (Annotation
           (LiteralType
           { (TextElement)
           ->(TextElement) }))
         (Identifier))
       (PropertySignature
-        (Empty)
         (Readonly)
         (Annotation
         { (TypeIdentifier)

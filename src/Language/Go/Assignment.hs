@@ -11,6 +11,7 @@ import Prologue
 
 import           Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
+import qualified Data.Abstract.ScopeGraph as ScopeGraph (AccessControl(..))
 import           Data.Abstract.Name (Name, name)
 import           Data.Syntax
     (contextualize, emptyTerm, handleError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1, parseError)
@@ -466,20 +467,23 @@ indexExpression :: Assignment Term
 indexExpression = makeTerm <$> symbol IndexExpression <*> children (Expression.Subscript <$> expression <*> manyTerm expression)
 
 methodDeclaration :: Assignment Term
-methodDeclaration = makeTerm <$> symbol MethodDeclaration <*> children (mkTypedMethodDeclaration <$> receiver <*> term fieldIdentifier <*> params <*> returnParameters <*> (term block <|> emptyTerm))
+methodDeclaration = makeTerm <$> symbol MethodDeclaration <*> children (mkTypedMethodDeclaration <$> receiver <*> pure publicAccessControl <*> term fieldIdentifier <*> params <*> returnParameters <*> (term block <|> emptyTerm))
   where
     params = symbol ParameterList *> children (manyTerm expression)
     receiver = symbol ParameterList *> children expressions
-    mkTypedMethodDeclaration receiver' name' parameters' type'' body' = Declaration.Method type'' receiver' name' parameters' body'
+    mkTypedMethodDeclaration receiver' accessControl name' parameters' type'' body' = Declaration.Method type'' receiver' name' parameters' body' accessControl
     returnParameters = (symbol ParameterList *> children (manyTerm expression))
                     <|> pure <$> expression
                     <|> pure []
 
 methodSpec :: Assignment Term
-methodSpec =  makeTerm <$> symbol MethodSpec <*> children (mkMethodSpec <$> expression <*> params <*> (expression <|> emptyTerm))
+methodSpec =  makeTerm <$> symbol MethodSpec <*> children (mkMethodSpec publicAccessControl <$> expression <*> params <*> (expression <|> emptyTerm))
   where
     params = symbol ParameterList *> children (manyTerm expression)
-    mkMethodSpec name' params optionalTypeLiteral = Declaration.MethodSignature [optionalTypeLiteral] name' params
+    mkMethodSpec accessControl name' params optionalTypeLiteral = Declaration.MethodSignature [optionalTypeLiteral] name' params accessControl
+
+publicAccessControl :: ScopeGraph.AccessControl
+publicAccessControl = ScopeGraph.Public
 
 methodSpecList :: Assignment Term
 methodSpecList = symbol MethodSpecList *> children expressions

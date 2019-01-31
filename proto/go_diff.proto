@@ -157,12 +157,14 @@ message Method {
   GoDiff methodName = 3;
   repeated GoDiff methodParameters = 4;
   GoDiff methodBody = 5;
+  AccessControl methodAccessControl = 6;
 }
 
 message MethodSignature {
   repeated GoDiff methodSignatureContext = 1;
   GoDiff methodSignatureName = 2;
   repeated GoDiff methodSignatureParameters = 3;
+  AccessControl methodSignatureAccessControl = 4;
 }
 
 message Type {
@@ -616,4 +618,10 @@ enum IsRelative {
   Unknown = 0;
   Relative = 1;
   NonRelative = 2;
+}
+
+enum AccessControl {
+  Public = 0;
+  Protected = 1;
+  Private = 2;
 }

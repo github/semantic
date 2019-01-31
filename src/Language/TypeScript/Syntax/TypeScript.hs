@@ -9,6 +9,7 @@ import           Proto3.Suite
 
 import           Control.Abstract hiding (Import)
 import           Data.Abstract.Evaluatable as Evaluatable
+import           Data.Abstract.ScopeGraph (AccessControl(..))
 import           Data.JSON.Fields
 import qualified Data.Map.Strict as Map
 import           Data.Semigroup.App
@@ -115,7 +116,7 @@ instance Evaluatable ExtendsClause where
     traverse_ eval extendsClauses
     unit
 
-data PropertySignature a = PropertySignature { modifiers :: ![a], propertySignaturePropertyName :: !a }
+data PropertySignature a = PropertySignature { modifiers :: [a], propertySignaturePropertyName :: a, propertySignatureAccessControl :: AccessControl }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
   deriving (Eq1, Show1, Ord1) via Generically PropertySignature
 
@@ -140,7 +141,7 @@ data IndexSignature a = IndexSignature { subject :: a, subjectType :: a, typeAnn
 
 instance Evaluatable IndexSignature
 
-data AbstractMethodSignature a = AbstractMethodSignature { abstractMethodSignatureContext :: ![a], abstractMethodSignatureName :: !a, abstractMethodSignatureParameters :: ![a] }
+data AbstractMethodSignature a = AbstractMethodSignature { abstractMethodSignatureContext :: ![a], abstractMethodSignatureName :: a, abstractMethodSignatureParameters :: [a], abstractMethodAccessControl :: AccessControl }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
   deriving (Eq1, Show1, Ord1) via Generically AbstractMethodSignature
 
@@ -212,7 +213,7 @@ declareModule eval identifier statements = do
       Nothing -> do
         let edges = Map.singleton Lexical [ currentScope' ]
         childScope <- newScope edges
-        declare (Declaration name) Default span (Just childScope)
+        declare (Declaration name) Default Public span (Just childScope)
 
         currentFrame' <- currentFrame
         let frameEdges = Map.singleton Lexical (Map.singleton currentScope' currentFrame')
@@ -220,7 +221,7 @@ declareModule eval identifier statements = do
 
         withScopeAndFrame childFrame (void moduleBody)
 
-        moduleSlot <- lookupDeclaration (Declaration name)
+        moduleSlot <- lookupSlot (Declaration name)
         assign moduleSlot =<< namespace name childFrame
 
         unit
@@ -264,7 +265,7 @@ instance Evaluatable AbstractClass where
     superScopes <- for classHeritage $ \superclass -> do
       name <- maybeM (throwNoNameError superclass) (declaredName superclass)
       scope <- associatedScope (Declaration name)
-      slot <- lookupDeclaration (Declaration name)
+      slot <- lookupSlot (Declaration name)
       superclassFrame <- scopedEnvironment =<< deref slot
       pure $ case (scope, superclassFrame) of
         (Just scope, Just frame) -> Just (scope, frame)
@@ -274,7 +275,7 @@ instance Evaluatable AbstractClass where
         current = (Lexical, ) <$> pure (pure currentScope')
         edges = Map.fromList (superclassEdges <> current)
     classScope <- newScope edges
-    declare (Declaration name) Default span (Just classScope)
+    declare (Declaration name) Default Public span (Just classScope)
 
     let frameEdges = Map.singleton Superclass (Map.fromList (catMaybes superScopes))
     childFrame <- newFrame classScope frameEdges
@@ -282,7 +283,7 @@ instance Evaluatable AbstractClass where
     withScopeAndFrame childFrame $ do
       void $ eval classBody
 
-    classSlot <- lookupDeclaration (Declaration name)
+    classSlot <- lookupSlot (Declaration name)
     assign classSlot =<< klass (Declaration name) childFrame
 
     unit

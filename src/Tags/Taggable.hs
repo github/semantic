@@ -3,7 +3,7 @@
 Taggable allows projecting syntax terms to a list of named symbols. In order to
 identify a new syntax as Taggable, you need to:
 
-1. Give that syntax a non-derived Taggable instance and implement as least the
+1. Give that syntax a non-derived Taggable instance and implement at least the
 'symbolName' method.
 
 2. Make sure that 'symbolsToSummarize' in Tagging.hs includes the string
@@ -169,12 +169,12 @@ instance Taggable Declaration.Function where
   symbolName = declaredName . Declaration.functionName
 
 instance Taggable Declaration.Method where
-  docsLiteral Python (Declaration.Method _ _ _ _ (Term (In _ bodyF)))
+  docsLiteral Python (Declaration.Method _ _ _ _ (Term (In _ bodyF)) _)
     | (Term (In exprAnn exprF):_) <- toList bodyF
     , isTextElement exprF = Just (locationByteRange exprAnn)
     | otherwise           = Nothing
   docsLiteral _ _         = Nothing
-  snippet ann (Declaration.Method _ _ _ _ (Term (In body _))) = Just $ subtractLocation ann body
+  snippet ann (Declaration.Method _ _ _ _ (Term (In body _)) _) = Just $ subtractLocation ann body
   symbolName = declaredName . Declaration.methodName
 
 instance Taggable Declaration.Class where
