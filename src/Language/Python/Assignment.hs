@@ -302,7 +302,7 @@ ellipsis :: Assignment Term
 ellipsis = makeTerm <$> token Grammar.Ellipsis <*> pure Python.Syntax.Ellipsis
 
 comparisonOperator :: Assignment Term
-comparisonOperator = symbol ComparisonOperator *> children (expression `chainl1Term` choice
+comparisonOperator = symbol ComparisonOperator *> children ((term expression) `chainl1Term` choice
   [ (makeTerm1 .) . Expression.LessThan         <$ symbol AnonLAngle
   , (makeTerm1 .) . Expression.LessThanEqual    <$ symbol AnonLAngleEqual
   , (makeTerm1 .) . Expression.GreaterThan      <$ symbol AnonRAngle
