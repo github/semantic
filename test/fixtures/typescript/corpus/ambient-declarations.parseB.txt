@@ -19,10 +19,8 @@
           (Empty)
           (Empty)
           (Empty)
-          (Public)
           (Identifier)
           (RequiredParameter
-            (Empty)
             (Empty)
             (Annotation
               (PredefinedType))
@@ -32,7 +30,6 @@
           (Empty)
           (Annotation
             (PredefinedType))
-          (Public)
           (Identifier)
           (Empty))
         (MethodSignature
@@ -40,7 +37,6 @@
           (Empty)
           (Annotation
             (PredefinedType))
-          (Public)
           (Identifier)))))
   (AmbientDeclaration
     (AmbientFunction

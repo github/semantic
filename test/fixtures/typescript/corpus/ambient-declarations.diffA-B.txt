@@ -10,7 +10,6 @@
       {-(Empty)-}
       {-(Annotation
         {-(TypeIdentifier)-})-}
-      {-(Public)-}
       {-(Identifier)-}
       {-(Empty)-})
     ->(Statements) }))
@@ -33,7 +32,6 @@
     {-(Identifier)-}
     {-(RequiredParameter
       {-(Empty)-}
-      {-(Empty)-}
       {-(Annotation
         {-(PredefinedType)-})-}
       {-(Identifier)-}
@@ -47,7 +45,6 @@
         {-(PredefinedType)-})-}
       {-(Identifier)-}
       {-(RequiredParameter
-        {-(Empty)-}
         {-(Empty)-}
         {-(Annotation
           {-(PredefinedType)-})-}
@@ -65,7 +62,6 @@
       {-(ObjectType
         {-(PropertySignature
           {-(Empty)-}
-          {-(Empty)-}
           {-(Annotation
             {-(PredefinedType)-})-}
           {-(Identifier)-})-})-})-}
@@ -75,18 +71,15 @@
       {-(ObjectType
         {-(PropertySignature
           {-(Empty)-}
-          {-(Empty)-}
           {-(Annotation
             {-(PredefinedType)-})-}
           {-(Identifier)-})-}
         {-(PropertySignature
           {-(Empty)-}
-          {-(Empty)-}
           {-(Annotation
             {-(PredefinedType)-})-}
           {-(Identifier)-})-}
         {-(PropertySignature
-          {-(Empty)-}
           {-(Empty)-}
           {-(Annotation
             {-(PredefinedType)-})-}
@@ -99,10 +92,8 @@
           (Empty)
           (Empty)
           (Empty)
-          (Public)
           (Identifier)
           (RequiredParameter
-            (Empty)
             (Empty)
             (Annotation
               (PredefinedType))
@@ -112,7 +103,6 @@
           (Empty)
           (Annotation
             (PredefinedType))
-          (Public)
           (Identifier)
           (Empty))
         (MethodSignature
@@ -120,7 +110,6 @@
           (Empty)
           (Annotation
             (PredefinedType))
-          (Public)
           (Identifier)))))
 {+(AmbientDeclaration
   {+(AmbientFunction

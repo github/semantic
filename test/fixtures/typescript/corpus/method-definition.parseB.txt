@@ -6,7 +6,6 @@
       (Empty)
       (Annotation
         (PredefinedType))
-      (Public)
       (Empty)
       (Identifier)
       (StatementBlock))))

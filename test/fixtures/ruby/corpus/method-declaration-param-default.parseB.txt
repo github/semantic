@@ -1,6 +1,5 @@
 (Statements
   (Method
-    (Public)
     (Empty)
     (Identifier)
     (Identifier)

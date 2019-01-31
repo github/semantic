@@ -5,7 +5,6 @@
     (Identifier)
     (Statements))
   (Method
-    (Public)
     (Statements
       (Identifier))
   { (Identifier)
@@ -13,7 +12,6 @@
     (Empty))
   (Method
     (Identifier)
-    (Public)
     (Statements
       (Identifier)
     { (Identifier)
@@ -26,7 +24,6 @@
     (Statements))
   (Method
     (Identifier)
-    (Public)
     (Statements
       (Identifier)
       (Pointer
@@ -87,7 +84,6 @@
           (MemberAccess
             (Identifier))
           (Identifier))))
-    (Public)
     (Statements
     { (Identifier)
     ->(Identifier) }
@@ -101,7 +97,6 @@
     (Empty))
   (Method
     (Identifier)
-    (Public)
     (Statements
       (Identifier)
       (Pointer

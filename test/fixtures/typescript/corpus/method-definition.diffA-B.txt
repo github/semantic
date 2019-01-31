@@ -9,7 +9,6 @@
     {-(Empty)-}
     {-(Annotation
       {-(TypeIdentifier)-})-}
-      (Public)
       (Empty)
       (Identifier)
       (StatementBlock))))
