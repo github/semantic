@@ -61,3 +61,11 @@ data With a = With { withExpression :: !a, withBody :: !a }
   deriving (Eq1, Show1, Ord1) via Generically With
 
 instance Evaluatable With
+
+-- | A sequence expression such as Javascript or C's comma operator.
+data AnnotatedExpression a = AnnotatedExpression { expression :: !a, typeAnnotation :: !a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Eq1, Show1, Ord1) via Generically AnnotatedExpression
+
+instance Evaluatable AnnotatedExpression where
+  eval eval _ (AnnotatedExpression a b) = eval b >> eval a

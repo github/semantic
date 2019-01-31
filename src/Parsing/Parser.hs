@@ -24,6 +24,7 @@ module Parsing.Parser
 , rubyParser
 , miniRubyParser
 , typescriptParser
+, typescriptASTParser
 , phpParser
 , haskellParser
 ) where
@@ -187,6 +188,9 @@ jsonASTParser = ASTParser tree_sitter_json
 
 typescriptParser :: Parser TypeScript.Term
 typescriptParser = AssignmentParser (ASTParser tree_sitter_typescript) TypeScript.assignment
+
+typescriptASTParser :: Parser (AST [] TypeScript.Grammar)
+typescriptASTParser = ASTParser tree_sitter_typescript
 
 haskellParser :: Parser Haskell.Term
 haskellParser = AssignmentParser (ASTParser tree_sitter_haskell) Haskell.assignment
