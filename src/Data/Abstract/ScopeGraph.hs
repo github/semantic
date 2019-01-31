@@ -68,16 +68,6 @@ instance Proto.HasDefault AccessControl where
 instance ToJSONFields AccessControl where
   toJSONFields accessControl = ["accessControl" .= accessControl]
 
-instance Proto.Message AccessControl where
-  encodeMessage = Proto.encodeMessageField
-  decodeMessage = Decode.at Proto.decodeMessageField
-  dotProto _ = [ Proto.DotProtoMessageField $ Proto.protoType (Proxy @AccessControl) ]
-
-instance Proto.MessageField AccessControl where
-  encodeMessageField num = Encode.embedded num . Proto.encodeMessage num
-  decodeMessageField = fromMaybe Proto.def <$> Decode.embedded (Proto.decodeMessage (Proto.fieldNumber 1))
-  protoType _ = Proto.messageField (Proto.Prim $ Proto.Named (Proto.Single (Proto.nameOf (Proxy @AccessControl)))) Nothing
-
 -- | The Ord AccessControl instance represents an order specification of AccessControls.
 -- AccessControls that are less than or equal to another AccessControl implies access.
 -- It is helpful to consider `Public <= Private` as saying "Can a Public syntax term access a Private syntax term?"
