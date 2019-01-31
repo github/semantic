@@ -131,9 +131,6 @@ message GoSyntax {
     List list = 97;
     String string = 98;
     EscapeSequence escapeSequence = 99;
-    Public public = 100;
-    Protected protected = 101;
-    Private private = 102;
   }
 }
 
@@ -156,18 +153,18 @@ message Function {
 
 message Method {
   repeated GoDiff methodContext = 1;
-  GoDiff methodAccessControl = 2;
-  GoDiff methodReceiver = 3;
-  GoDiff methodName = 4;
-  repeated GoDiff methodParameters = 5;
-  GoDiff methodBody = 6;
+  GoDiff methodReceiver = 2;
+  GoDiff methodName = 3;
+  repeated GoDiff methodParameters = 4;
+  GoDiff methodBody = 5;
+  AccessControl methodAccessControl = 6;
 }
 
 message MethodSignature {
   repeated GoDiff methodSignatureContext = 1;
-  GoDiff methodSignatureAccessControl = 2;
-  GoDiff methodSignatureName = 3;
-  repeated GoDiff methodSignatureParameters = 4;
+  GoDiff methodSignatureName = 2;
+  repeated GoDiff methodSignatureParameters = 3;
+  AccessControl methodSignatureAccessControl = 4;
 }
 
 message Type {
@@ -612,12 +609,6 @@ message EscapeSequence {
   string value = 1;
 }
 
-message Public { }
-
-message Protected { }
-
-message Private { }
-
 message ImportPath {
   string unPath = 1;
   IsRelative pathIsRelative = 2;
@@ -627,4 +618,10 @@ enum IsRelative {
   Unknown = 0;
   Relative = 1;
   NonRelative = 2;
+}
+
+enum AccessControl {
+  Public = 0;
+  Protected = 1;
+  Private = 2;
 }

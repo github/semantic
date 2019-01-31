@@ -119,9 +119,6 @@ message RubySyntax {
     Send send = 85;
     ZSuper zSuper = 86;
     List list = 87;
-    Public public = 88;
-    Protected protected = 89;
-    Private private = 90;
   }
 }
 
@@ -138,11 +135,11 @@ message Function {
 
 message Method {
   repeated RubyDiff methodContext = 1;
-  RubyDiff methodAccessControl = 2;
-  RubyDiff methodReceiver = 3;
-  RubyDiff methodName = 4;
-  repeated RubyDiff methodParameters = 5;
-  RubyDiff methodBody = 6;
+  RubyDiff methodReceiver = 2;
+  RubyDiff methodName = 3;
+  repeated RubyDiff methodParameters = 4;
+  RubyDiff methodBody = 5;
+  AccessControl methodAccessControl = 6;
 }
 
 message File { }
@@ -528,8 +525,8 @@ message List {
   repeated RubyDiff listContent = 1;
 }
 
-message Public { }
-
-message Protected { }
-
-message Private { }
+enum AccessControl {
+  Public = 0;
+  Protected = 1;
+  Private = 2;
+}

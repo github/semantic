@@ -198,9 +198,6 @@ message TypeScriptSyntax {
     List list = 164;
     StatementBlock statementBlock = 165;
     MetaProperty metaProperty = 166;
-    Public public = 167;
-    Protected protected = 168;
-    Private private = 169;
   }
 }
 
@@ -228,18 +225,18 @@ message Function {
 
 message Method {
   repeated TypeScriptDiff methodContext = 1;
-  TypeScriptDiff methodAccessControl = 2;
-  TypeScriptDiff methodReceiver = 3;
-  TypeScriptDiff methodName = 4;
-  repeated TypeScriptDiff methodParameters = 5;
-  TypeScriptDiff methodBody = 6;
+  TypeScriptDiff methodReceiver = 2;
+  TypeScriptDiff methodName = 3;
+  repeated TypeScriptDiff methodParameters = 4;
+  TypeScriptDiff methodBody = 5;
+  AccessControl methodAccessControl = 6;
 }
 
 message MethodSignature {
   repeated TypeScriptDiff methodSignatureContext = 1;
-  TypeScriptDiff methodSignatureAccessControl = 2;
-  TypeScriptDiff methodSignatureName = 3;
-  repeated TypeScriptDiff methodSignatureParameters = 4;
+  TypeScriptDiff methodSignatureName = 2;
+  repeated TypeScriptDiff methodSignatureParameters = 3;
+  AccessControl methodSignatureAccessControl = 4;
 }
 
 message InterfaceDeclaration {
@@ -251,9 +248,9 @@ message InterfaceDeclaration {
 
 message PublicFieldDefinition {
   repeated TypeScriptDiff publicFieldContext = 1;
-  TypeScriptDiff publicFieldAccessControl = 2;
-  TypeScriptDiff publicFieldPropertyName = 3;
-  TypeScriptDiff publicFieldValue = 4;
+  TypeScriptDiff publicFieldPropertyName = 2;
+  TypeScriptDiff publicFieldValue = 3;
+  AccessControl publicFieldAccessControl = 4;
 }
 
 message VariableDeclaration {
@@ -730,6 +727,7 @@ message AbstractMethodSignature {
   repeated TypeScriptDiff abstractMethodSignatureContext = 1;
   TypeScriptDiff abstractMethodSignatureName = 2;
   repeated TypeScriptDiff abstractMethodSignatureParameters = 3;
+  AccessControl abstractMethodAccessControl = 4;
 }
 
 message IndexSignature {
@@ -863,12 +861,14 @@ message JsxNamespaceName {
 message OptionalParameter {
   repeated TypeScriptDiff optionalParameterContext = 1;
   TypeScriptDiff optionalParameterSubject = 2;
+  AccessControl optionalParameterAccessControl = 3;
 }
 
 message RequiredParameter {
   repeated TypeScriptDiff requiredParameterContext = 1;
   TypeScriptDiff requiredParameterSubject = 2;
   TypeScriptDiff requiredParameterValue = 3;
+  AccessControl requiredParameterAccessControl = 4;
 }
 
 message RestParameter {
@@ -879,6 +879,7 @@ message RestParameter {
 message PropertySignature {
   repeated TypeScriptDiff modifiers = 1;
   TypeScriptDiff propertySignaturePropertyName = 2;
+  AccessControl propertySignatureAccessControl = 3;
 }
 
 message AmbientDeclaration {
@@ -983,12 +984,6 @@ message StatementBlock {
 
 message MetaProperty { }
 
-message Public { }
-
-message Protected { }
-
-message Private { }
-
 message Alias {
   bytes aliasValue = 1;
   bytes aliasName = 2;
@@ -1003,4 +998,10 @@ enum IsRelative {
   Unknown = 0;
   Relative = 1;
   NonRelative = 2;
+}
+
+enum AccessControl {
+  Public = 0;
+  Protected = 1;
+  Private = 2;
 }

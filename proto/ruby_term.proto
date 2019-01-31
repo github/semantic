@@ -101,9 +101,6 @@ message RubySyntax {
     Send send = 85;
     ZSuper zSuper = 86;
     List list = 87;
-    Public public = 88;
-    Protected protected = 89;
-    Private private = 90;
   }
 }
 
@@ -120,11 +117,11 @@ message Function {
 
 message Method {
   repeated RubyTerm methodContext = 1;
-  RubyTerm methodAccessControl = 2;
-  RubyTerm methodReceiver = 3;
-  RubyTerm methodName = 4;
-  repeated RubyTerm methodParameters = 5;
-  RubyTerm methodBody = 6;
+  RubyTerm methodReceiver = 2;
+  RubyTerm methodName = 3;
+  repeated RubyTerm methodParameters = 4;
+  RubyTerm methodBody = 5;
+  AccessControl methodAccessControl = 6;
 }
 
 message File { }
@@ -510,8 +507,8 @@ message List {
   repeated RubyTerm listContent = 1;
 }
 
-message Public { }
-
-message Protected { }
-
-message Private { }
+enum AccessControl {
+  Public = 0;
+  Protected = 1;
+  Private = 2;
+}

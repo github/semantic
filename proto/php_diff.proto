@@ -154,9 +154,6 @@ message PHPSyntax {
     VariableName variableName = 120;
     Annotation annotation = 121;
     List list = 122;
-    Public public = 123;
-    Protected protected = 124;
-    Private private = 125;
   }
 }
 
@@ -180,11 +177,11 @@ message Function {
 
 message Method {
   repeated PHPDiff methodContext = 1;
-  PHPDiff methodAccessControl = 2;
-  PHPDiff methodReceiver = 3;
-  PHPDiff methodName = 4;
-  repeated PHPDiff methodParameters = 5;
-  PHPDiff methodBody = 6;
+  PHPDiff methodReceiver = 2;
+  PHPDiff methodName = 3;
+  repeated PHPDiff methodParameters = 4;
+  PHPDiff methodBody = 5;
+  AccessControl methodAccessControl = 6;
 }
 
 message VariableDeclaration {
@@ -728,8 +725,24 @@ message List {
   repeated PHPDiff listContent = 1;
 }
 
-message Public { }
+message Alias {
+  bytes aliasValue = 1;
+  bytes aliasName = 2;
+}
 
-message Protected { }
+message ImportPath {
+  string unPath = 1;
+  IsRelative pathIsRelative = 2;
+}
 
-message Private { }
+enum IsRelative {
+  Unknown = 0;
+  Relative = 1;
+  NonRelative = 2;
+}
+
+enum AccessControl {
+  Public = 0;
+  Protected = 1;
+  Private = 2;
+}

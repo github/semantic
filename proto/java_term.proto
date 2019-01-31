@@ -123,9 +123,6 @@ message JavaSyntax {
     Annotation annotation = 107;
     Return return = 108;
     List list = 109;
-    Public public = 110;
-    Protected protected = 111;
-    Private private = 112;
   }
 }
 
@@ -149,11 +146,11 @@ message InterfaceDeclaration {
 
 message Method {
   repeated JavaTerm methodContext = 1;
-  JavaTerm methodAccessControl = 2;
-  JavaTerm methodReceiver = 3;
-  JavaTerm methodName = 4;
-  repeated JavaTerm methodParameters = 5;
-  JavaTerm methodBody = 6;
+  JavaTerm methodReceiver = 2;
+  JavaTerm methodName = 3;
+  repeated JavaTerm methodParameters = 4;
+  JavaTerm methodBody = 5;
+  AccessControl methodAccessControl = 6;
 }
 
 message VariableDeclaration {
@@ -645,8 +642,8 @@ message List {
   repeated JavaTerm listContent = 1;
 }
 
-message Public { }
-
-message Protected { }
-
-message Private { }
+enum AccessControl {
+  Public = 0;
+  Protected = 1;
+  Private = 2;
+}

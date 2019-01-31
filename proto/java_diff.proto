@@ -141,9 +141,6 @@ message JavaSyntax {
     Annotation annotation = 107;
     Return return = 108;
     List list = 109;
-    Public public = 110;
-    Protected protected = 111;
-    Private private = 112;
   }
 }
 
@@ -167,11 +164,11 @@ message InterfaceDeclaration {
 
 message Method {
   repeated JavaDiff methodContext = 1;
-  JavaDiff methodAccessControl = 2;
-  JavaDiff methodReceiver = 3;
-  JavaDiff methodName = 4;
-  repeated JavaDiff methodParameters = 5;
-  JavaDiff methodBody = 6;
+  JavaDiff methodReceiver = 2;
+  JavaDiff methodName = 3;
+  repeated JavaDiff methodParameters = 4;
+  JavaDiff methodBody = 5;
+  AccessControl methodAccessControl = 6;
 }
 
 message VariableDeclaration {
@@ -663,8 +660,8 @@ message List {
   repeated JavaDiff listContent = 1;
 }
 
-message Public { }
-
-message Protected { }
-
-message Private { }
+enum AccessControl {
+  Public = 0;
+  Protected = 1;
+  Private = 2;
+}

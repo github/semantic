@@ -464,3 +464,9 @@ message Alias {
   bytes aliasValue = 1;
   bytes aliasName = 2;
 }
+
+enum AccessControl {
+  Public = 0;
+  Protected = 1;
+  Private = 2;
+}

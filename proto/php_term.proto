@@ -136,9 +136,6 @@ message PHPSyntax {
     VariableName variableName = 120;
     Annotation annotation = 121;
     List list = 122;
-    Public public = 123;
-    Protected protected = 124;
-    Private private = 125;
   }
 }
 
@@ -162,11 +159,11 @@ message Function {
 
 message Method {
   repeated PHPTerm methodContext = 1;
-  PHPTerm methodAccessControl = 2;
-  PHPTerm methodReceiver = 3;
-  PHPTerm methodName = 4;
-  repeated PHPTerm methodParameters = 5;
-  PHPTerm methodBody = 6;
+  PHPTerm methodReceiver = 2;
+  PHPTerm methodName = 3;
+  repeated PHPTerm methodParameters = 4;
+  PHPTerm methodBody = 5;
+  AccessControl methodAccessControl = 6;
 }
 
 message VariableDeclaration {
@@ -710,12 +707,6 @@ message List {
   repeated PHPTerm listContent = 1;
 }
 
-message Public { }
-
-message Protected { }
-
-message Private { }
-
 message Alias {
   bytes aliasValue = 1;
   bytes aliasName = 2;
@@ -730,4 +721,10 @@ enum IsRelative {
   Unknown = 0;
   Relative = 1;
   NonRelative = 2;
+}
+
+enum AccessControl {
+  Public = 0;
+  Protected = 1;
+  Private = 2;
 }
