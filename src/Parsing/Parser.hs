@@ -14,6 +14,7 @@ module Parsing.Parser
 , ApplyAll'
 -- À la carte parsers
 , goParser
+, goASTParser
 , javaParser
 , javaASTParser
 , jsonParser
@@ -157,6 +158,9 @@ someParser Unknown    = Nothing
 
 goParser :: Parser Go.Term
 goParser = AssignmentParser (ASTParser tree_sitter_go) Go.assignment
+
+goASTParser :: Parser (AST [] Go.Grammar)
+goASTParser = ASTParser tree_sitter_go
 
 rubyParser :: Parser Ruby.Term
 rubyParser = AssignmentParser (ASTParser tree_sitter_ruby) Ruby.assignment
