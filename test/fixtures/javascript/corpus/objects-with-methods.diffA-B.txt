@@ -5,17 +5,14 @@
       (Empty)
       (Empty)
       (Empty)
-      (Empty)
     { (Identifier)
     ->(Identifier) }
       (RequiredParameter
         (Empty)
         (Empty)
-        (Empty)
         (Identifier)
         (Empty))
       (RequiredParameter
-        (Empty)
         (Empty)
         (Empty)
         (Identifier)

@@ -6,6 +6,7 @@
         "statements": [{
           "merge": {
             "term": "Method",
+            "methodAccessControl":"Public",
             "methodBody": {
               "merge": {
                 "children": [{
