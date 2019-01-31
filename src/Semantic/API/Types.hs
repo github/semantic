@@ -94,7 +94,7 @@ data Blob
   = Blob
   { content :: T.Text
   , path :: FilePath
-  , scope :: String
+  , language :: Language
   }
   deriving stock (Eq, Show, Generic)
   deriving anyclass (Message, Named, FromJSON)

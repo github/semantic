@@ -9,7 +9,6 @@ module Semantic.API.Helpers
 
 import           Data.Bifunctor.Join
 import qualified Data.Blob as Data
-import           Data.Language (languageForScope)
 import           Data.Source (fromText)
 import qualified Data.Span as Data
 import qualified Data.Text as T
@@ -33,7 +32,7 @@ toChangeType = \case
   _ -> API.None
 
 apiBlobToBlob :: API.Blob -> Data.Blob
-apiBlobToBlob API.Blob{..} = Data.Blob (fromText content) path (languageForScope scope)
+apiBlobToBlob API.Blob{..} = Data.Blob (fromText content) path language
 
 apiBlobPairToBlobPair :: API.BlobPair -> Data.BlobPair
 apiBlobPairToBlobPair (API.BlobPair (Just before) (Just after)) = Join (These (apiBlobToBlob before) (apiBlobToBlob after))
