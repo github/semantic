@@ -15,10 +15,8 @@ import           Data.Quieterm
 import           Data.Typeable (cast)
 import           Data.Void
 import           Parsing.Parser
-import           Rendering.Renderer
 import           Semantic.Config (Config (..), Options (..), defaultOptions)
 import qualified Semantic.IO as IO
-import           Semantic.Parse
 import           Semantic.Task
 import           Semantic.Task.Files
 import           Semantic.Util (TaskConfig (..))
@@ -84,7 +82,7 @@ languages =
   , le "ruby" ".rb" "examples" (Just "script/known_failures.txt")
   , le "typescript" ".ts" "examples" (Just "script/known_failures.txt")
   , le "typescript" ".js" "examples" Nothing -- parse JavaScript with TypeScript parser.
-  
+
   , le "go" ".go" "examples" (Just "script/known-failures.txt")
 
   -- TODO: Java assignment errors need to be investigated
