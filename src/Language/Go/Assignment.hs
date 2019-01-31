@@ -129,6 +129,8 @@ type Syntax =
    , []
    , Literal.String
    , Literal.EscapeSequence
+   , Literal.Null
+   , Literal.Boolean
    ]
 
 type Term = Term.Term (Sum Syntax) Location
@@ -153,6 +155,7 @@ expressionChoices :: [Assignment Term]
 expressionChoices =
   [ argumentList
   , assignment'
+  , boolean
   , binaryExpression
   , block
   , breakStatement
@@ -196,6 +199,7 @@ expressionChoices =
   , methodDeclaration
   , methodSpec
   , methodSpecList
+  , nil
   , packageClause
   , packageIdentifier
   , parameterDeclaration
@@ -269,9 +273,6 @@ floatLiteral = makeTerm <$> symbol FloatLiteral <*> (Literal.Float <$> source)
 identifier :: Assignment Term
 identifier =  makeTerm <$> (symbol Identifier <|> symbol Identifier' <|> symbol Identifier'') <*> (Syntax.Identifier . name <$> source)
 
-identifier' :: Assignment Name
-identifier' =  (symbol Identifier <|> symbol Identifier' <|> symbol Identifier'') *> (name <$> source)
-
 imaginaryLiteral :: Assignment Term
 imaginaryLiteral = makeTerm <$> symbol ImaginaryLiteral <*> (Literal.Complex <$> source)
 
@@ -305,6 +306,13 @@ typeIdentifier = makeTerm <$> symbol TypeIdentifier <*> (Syntax.Identifier . nam
 
 typeIdentifier' :: Assignment Name
 typeIdentifier' = symbol TypeIdentifier *> (name <$> source)
+
+nil :: Assignment Term
+nil = makeTerm <$> symbol Nil <*> (Literal.Null <$ source)
+
+boolean :: Assignment Term
+boolean =  makeTerm <$> token Grammar.True <*> pure Literal.true
+       <|> makeTerm <$> token Grammar.False <*> pure Literal.false
 
 
 -- Primitive Types
@@ -348,7 +356,7 @@ pointerType :: Assignment Term
 pointerType = makeTerm <$> symbol PointerType <*> children (Type.Pointer <$> expression)
 
 qualifiedType :: Assignment Term
-qualifiedType = makeTerm <$> symbol QualifiedType <*> children (Expression.MemberAccess <$> expression <*> (identifier' <|> typeIdentifier'))
+qualifiedType = makeTerm <$> symbol QualifiedType <*> children (Expression.MemberAccess <$> expression <*> typeIdentifier')
 
 sliceType :: Assignment Term
 sliceType = makeTerm <$> symbol SliceType <*> children (Type.Slice <$> expression)
@@ -489,7 +497,7 @@ parenthesizedExpression :: Assignment Term
 parenthesizedExpression = symbol ParenthesizedExpression *> children expressions
 
 selectorExpression :: Assignment Term
-selectorExpression = makeWithContext <$> symbol SelectorExpression <*> children ((,,) <$> expression <*> optional comment <*> (identifier' <|> fieldIdentifier'))
+selectorExpression = makeWithContext <$> symbol SelectorExpression <*> children ((,,) <$> expression <*> optional comment <*> fieldIdentifier')
   where makeWithContext loc (lhs, comment, rhs) = maybe (makeTerm loc (Expression.MemberAccess lhs rhs)) (\c -> makeTerm loc (Syntax.Context (c :| []) (makeTerm loc (Expression.MemberAccess lhs rhs)))) comment
 
 sliceExpression :: Assignment Term
