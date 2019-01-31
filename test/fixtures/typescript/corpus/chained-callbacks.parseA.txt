@@ -9,7 +9,6 @@
       (RequiredParameter
         (Empty)
         (Empty)
-        (Empty)
         (Identifier)
         (Empty))
       (StatementBlock

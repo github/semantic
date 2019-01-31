@@ -86,8 +86,8 @@ graphingTerms recur term@(Term (In a syntax)) = do
     Just (v@Method{}, name) -> recurWithContext v name
     Just (v@Variable{..}, name) -> do
       variableDefinition v
-      addr <- lookupDeclaration (Declaration name)
-      defined <- gets (Map.lookup addr)
+      slot <- lookupSlot (Declaration name)
+      defined <- gets (Map.lookup slot)
       maybe (pure ()) (appendGraph . connect (vertex v) . vertex) defined
       recur term
     _ -> recur term
@@ -97,7 +97,7 @@ graphingTerms recur term@(Term (In a syntax)) = do
       moduleInclusion v
       local (const v) $ do
         valRef <- recur term
-        slot <- lookupDeclaration (Declaration name)
+        slot <- lookupSlot (Declaration name)
         modify (Map.insert slot v)
         pure valRef
 

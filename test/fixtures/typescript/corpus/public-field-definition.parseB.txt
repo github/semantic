@@ -3,32 +3,27 @@
     (TypeIdentifier)
     (Statements
       (PublicFieldDefinition
-        (Empty)
         (Readonly)
         (Empty)
         (Identifier)
         (Empty))
       (PublicFieldDefinition
-        (Empty)
         (Readonly)
         (Empty)
         (Identifier)
         (Empty))
       (PublicFieldDefinition
-        (Identifier)
         (Readonly)
         (Empty)
         (Identifier)
         (Empty))
       (PublicFieldDefinition
-        (Identifier)
         (Readonly)
         (Annotation
           (TypeIdentifier))
         (Identifier)
         (Float))
       (PublicFieldDefinition
-        (Identifier)
         (Empty)
         (Annotation
           (TypeIdentifier))
@@ -36,6 +31,11 @@
         (Float))
       (PublicFieldDefinition
         (Empty)
+        (Annotation
+          (TypeIdentifier))
+        (Identifier)
+        (Float))
+      (PublicFieldDefinition
         (Empty)
         (Annotation
           (TypeIdentifier))
@@ -43,20 +43,11 @@
         (Float))
       (PublicFieldDefinition
         (Empty)
-        (Empty)
         (Annotation
           (TypeIdentifier))
         (Identifier)
         (Float))
       (PublicFieldDefinition
-        (Identifier)
-        (Empty)
-        (Annotation
-          (TypeIdentifier))
-        (Identifier)
-        (Float))
-      (PublicFieldDefinition
-        (Identifier)
         (Readonly)
         (Annotation
           (TypeIdentifier))
@@ -64,13 +55,11 @@
         (TextElement))
       (PublicFieldDefinition
         (Empty)
-        (Empty)
         (Annotation
           (TypeIdentifier))
         (Identifier)
         (Float))
       (PublicFieldDefinition
-        (Empty)
         (Empty)
         (Empty)
         (Identifier)

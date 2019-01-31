@@ -12,13 +12,14 @@ module Control.Abstract.Heap
 , alloc
 , dealloc
 , maybeLookupDeclaration
-, lookupDeclaration
+, lookupSlot
 , lookupDeclarationFrame
 , deref
 , assign
 , newFrame
 , CurrentFrame(..)
 , currentFrame
+, lookupFrame
 , withScopeAndFrame
 , withLexicalScopeAndFrame
 , withChildFrame
@@ -175,12 +176,13 @@ define :: ( HasCallStack
           )
        => Declaration
        -> Relation
+       -> AccessControl
        -> Evaluator term address value m value
        -> Evaluator term address value m ()
-define declaration rel def = withCurrentCallStack callStack $ do
+define declaration rel accessControl def = withCurrentCallStack callStack $ do
   -- TODO: This span is still wrong.
-  declare declaration rel emptySpan Nothing
-  slot <- lookupDeclaration declaration
+  declare declaration rel accessControl emptySpan Nothing
+  slot <- lookupSlot declaration
   value <- def
   assign slot value
 
@@ -217,7 +219,11 @@ deref :: ( Member (Deref value) sig
          )
       => Slot address
       -> Evaluator term address value m value
-deref slot@Slot{..} = gets (Heap.getSlot slot) >>= maybeM (throwAddressError (UnallocatedSlot slot)) >>= send . flip DerefCell ret >>= maybeM (throwAddressError $ UninitializedSlot slot)
+deref slot@Slot{..} = do
+  maybeSlotValue <- gets (Heap.getSlotValue slot)
+  slotValue <- maybeM (throwAddressError (UnallocatedSlot slot)) maybeSlotValue
+  eff <- send $ DerefCell slotValue ret
+  maybeM (throwAddressError $ UninitializedSlot slot) eff
 
 putSlotDeclarationScope :: ( Member (State (Heap address address value)) sig
                            , Member (State (ScopeGraph address)) sig
@@ -255,7 +261,7 @@ maybeLookupDeclaration decl = do
       pure (Just (Slot frameAddress (Heap.pathPosition path)))
     Nothing -> pure Nothing
 
-lookupDeclaration :: ( Carrier sig m
+lookupSlot :: ( Carrier sig m
                      , Member (Reader (CurrentFrame address)) sig
                      , Member (Reader (CurrentScope address)) sig
                      , Member (Reader ModuleInfo) sig
@@ -268,7 +274,7 @@ lookupDeclaration :: ( Carrier sig m
                      )
                   => Declaration
                   -> Evaluator term address value m (Slot address)
-lookupDeclaration decl = do
+lookupSlot decl = do
   path <- lookupScopePath decl
   frameAddress <- lookupFrameAddress path
   pure (Slot frameAddress (Heap.pathPosition path))
@@ -289,6 +295,19 @@ lookupDeclarationFrame :: ( Member (State (Heap address address value)) sig
 lookupDeclarationFrame decl = do
   path <- lookupScopePath decl
   lookupFrameAddress path
+
+lookupFrame :: ( Member (State (Heap address address value)) sig
+               , Member (Reader ModuleInfo) sig
+               , Member (Reader Span) sig
+               , Member (Resumable (BaseError (HeapError address))) sig
+               , Ord address
+               , Carrier sig m
+               )
+             => address
+             -> Evaluator term address value m (Heap.Frame address address value)
+lookupFrame address = do
+  heap <- getHeap
+  maybeM (throwHeapError (LookupFrameError address)) (Heap.frameLookup address heap)
 
 -- | Follow a path through the heap and return the frame address associated with the declaration.
 lookupFrameAddress :: ( Member (State (Heap address address value)) sig
@@ -356,7 +375,7 @@ assign :: ( Member (Deref value) sig
        -> Evaluator term address value m ()
 assign addr value = do
   heap <- getHeap
-  cell <- send (AssignCell value (fromMaybe lowerBound (Heap.getSlot addr heap)) ret)
+  cell <- send (AssignCell value (fromMaybe lowerBound (Heap.getSlotValue addr heap)) ret)
   putHeap (Heap.setSlot addr cell heap)
 
 dealloc :: ( Carrier sig m
@@ -433,7 +452,7 @@ deriving instance Eq address => Eq (HeapError address resume)
 deriving instance Show address => Show (HeapError address resume)
 instance Show address => Show1 (HeapError address) where
   liftShowsPrec _ _ = showsPrec
-  
+
 instance Eq address => Eq1 (HeapError address) where
   liftEq _ CurrentFrameError CurrentFrameError           = True
   liftEq _ (LookupAddressError a) (LookupAddressError b) = a == b

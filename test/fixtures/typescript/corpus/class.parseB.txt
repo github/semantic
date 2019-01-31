@@ -13,10 +13,8 @@
         (Empty)
         (Empty)
         (Empty)
-        (Empty)
         (Identifier)
         (RequiredParameter
-          (Empty)
           (Empty)
           (Empty)
           (Identifier)
@@ -29,10 +27,8 @@
         (Empty)
         (Empty)
         (Empty)
-        (Empty)
         (Identifier)
         (RequiredParameter
-          (Empty)
           (Empty)
           (Empty)
           (Identifier)
@@ -45,10 +41,8 @@
         (Empty)
         (Empty)
         (Empty)
-        (Empty)
         (Identifier)
         (RequiredParameter
-          (Empty)
           (Empty)
           (Empty)
           (Identifier)
