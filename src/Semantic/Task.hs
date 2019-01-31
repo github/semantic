@@ -326,7 +326,7 @@ runParser blob@Blob{..} parser = case parser of
             writeLog Error "failed parsing" (("task", "parse") : blobFields)
             throwError (toException err)
 
-          res <- timeout (configAssignmentTimeout config) . time "parse.assign" languageTag $
+          time "parse.assign" languageTag $
             case assign blobSource assignment ast of
               Left err -> do
                 writeStat (increment "parse.assign_errors" languageTag)
@@ -343,9 +343,9 @@ runParser blob@Blob{..} parser = case parser of
                     logError config Warning blob err (("task", "assign") : blobFields)
                     when (optionsFailOnWarning (configOptions config)) $ throwError (toException err)
                 term <$ writeStat (count "parse.nodes" (length term) languageTag)
-          case res of
-            Just r -> pure r
-            Nothing -> do
-              writeStat (increment "assign.assign_timeouts" languageTag)
-              writeLog Error "assignment timeout" (("task", "assign") : blobFields)
-              throwError (SomeException AssignmentTimedOut)
+          -- case res of
+          --   Just r -> pure r
+          --   Nothing -> do
+          --     writeStat (increment "assign.assign_timeouts" languageTag)
+          --     writeLog Error "assignment timeout" (("task", "assign") : blobFields)
+          --     throwError (SomeException AssignmentTimedOut)
