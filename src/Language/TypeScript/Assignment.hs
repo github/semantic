@@ -825,7 +825,7 @@ propertySignature = makePropertySignature <$> symbol Grammar.PropertySignature <
   where makePropertySignature loc (modifier, readonly, propertyName, annotation) = makeTerm loc (TypeScript.Syntax.PropertySignature [modifier, readonly, annotation] propertyName)
 
 propertyName :: Assignment Term
-propertyName = (makeTerm <$> symbol PropertyIdentifier <*> (Syntax.Identifier . name <$> source)) <|> term string <|> term number <|> term computedPropertyName
+propertyName = term (propertyIdentifier <|> string <|> number <|> computedPropertyName)
 
 computedPropertyName :: Assignment Term
 computedPropertyName = makeTerm <$> symbol Grammar.ComputedPropertyName <*> children (TypeScript.Syntax.ComputedPropertyName <$> term expression)
