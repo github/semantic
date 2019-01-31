@@ -8,7 +8,8 @@ import           Proto3.Suite.Class
 import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
 
-import           Control.Abstract hiding (Function)
+import           Control.Abstract hiding (Function, AccessControl(..))
+import           Data.Abstract.ScopeGraph as ScopeGraph (AccessControl(..))
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Name (__self)
 import           Data.JSON.Fields
@@ -31,31 +32,34 @@ instance Evaluatable Function where
   eval _ _ Function{..} = do
     name <- maybeM (throwNoNameError functionName) (declaredName functionName)
     span <- ask @Span
-    associatedScope <- declareFunction name span
+    associatedScope <- declareFunction name Default ScopeGraph.Public span
 
     params <- withScope associatedScope . for functionParameters $ \paramNode -> do
       param <- maybeM (throwNoNameError paramNode) (declaredName paramNode)
-      param <$ declare (Declaration param) Default span Nothing
+      param <$ declare (Declaration param) Default ScopeGraph.Public span Nothing
 
-    addr <- lookupDeclaration (Declaration name)
+    addr <- lookupSlot (Declaration name)
     v <- function name params functionBody associatedScope
     v <$ assign addr v
 
-declareFunction :: ( Carrier sig m
-                   , Member (State (ScopeGraph address)) sig
-                   , Member (Allocator address) sig
-                   , Member (Reader (CurrentScope address)) sig
-                   , Member Fresh sig
-                   , Ord address
-                   )
-                => Name
-                -> Span
-                -> Evaluator term address value m address
-declareFunction name span = do
+declareFunction ::
+  ( Carrier sig m
+  , Member (State (ScopeGraph address)) sig
+  , Member (Allocator address) sig
+  , Member (Reader (CurrentScope address)) sig
+  , Member Fresh sig
+  , Ord address
+  )
+  => Name
+  -> Relation
+  -> AccessControl
+  -> Span
+  -> Evaluator term address value m address
+declareFunction name relation accessControl span = do
   currentScope' <- currentScope
   let lexicalEdges = Map.singleton Lexical [ currentScope' ]
   associatedScope <- newScope lexicalEdges
-  declare (Declaration name) Default span (Just associatedScope)
+  declare (Declaration name) relation accessControl span (Just associatedScope)
   pure associatedScope
 
 instance Tokenize Function where
@@ -70,8 +74,14 @@ instance Declarations1 Function where
 instance FreeVariables1 Function where
   liftFreeVariables freeVariables f@Function{..} = foldMap freeVariables f `Set.difference` foldMap freeVariables functionParameters
 
-
-data Method a = Method { methodContext :: ![a], methodReceiver :: !a, methodName :: !a, methodParameters :: ![a], methodBody :: !a }
+data Method a = Method
+  { methodContext :: [a]
+  , methodReceiver :: a
+  , methodName :: a
+  , methodParameters :: [a]
+  , methodBody :: a
+  , methodAccessControl :: AccessControl
+  }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, ToJSONFields1, Named1, Message1, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Method
 
@@ -84,16 +94,15 @@ instance Evaluatable Method where
   eval _ _ Method{..} = do
     name <- maybeM (throwNoNameError methodName) (declaredName methodName)
     span <- ask @Span
-    associatedScope <- declareFunction name span
+    associatedScope <- declareFunction name Default methodAccessControl span
 
     params <- withScope associatedScope $ do
-      -- TODO: Should we give `self` a special Relation?
-      declare (Declaration __self) Default emptySpan Nothing
+      declare (Declaration __self) Default ScopeGraph.Public emptySpan Nothing
       for methodParameters $ \paramNode -> do
         param <- maybeM (throwNoNameError paramNode) (declaredName paramNode)
-        param <$ declare (Declaration param) Default span Nothing
+        param <$ declare (Declaration param) Default ScopeGraph.Public span Nothing
 
-    addr <- lookupDeclaration (Declaration name)
+    addr <- lookupSlot (Declaration name)
     v <- function name params methodBody associatedScope
     v <$ assign addr v
 
@@ -111,7 +120,12 @@ instance FreeVariables1 Method where
 
 
 -- | A method signature in TypeScript or a method spec in Go.
-data MethodSignature a = MethodSignature { methodSignatureContext :: ![a], methodSignatureName :: !a, methodSignatureParameters :: ![a] }
+data MethodSignature a = MethodSignature
+  { methodSignatureContext :: [a]
+  , methodSignatureName :: a
+  , methodSignatureParameters :: [a]
+  , methodSignatureAccessControl :: AccessControl
+  }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically MethodSignature
 
@@ -147,7 +161,7 @@ instance Evaluatable VariableDeclaration where
   eval eval _ (VariableDeclaration decs) = do
     for_ decs $ \declaration -> do
       name <- maybeM (throwNoNameError declaration) (declaredName declaration)
-      declare (Declaration name) Default emptySpan Nothing
+      declare (Declaration name) Default ScopeGraph.Public emptySpan Nothing
       (span, _) <- do
         ref <- eval declaration
         subtermSpan <- get @Span
@@ -176,7 +190,12 @@ instance Declarations a => Declarations (InterfaceDeclaration a) where
 
 
 -- | A public field definition such as a field definition in a JavaScript class.
-data PublicFieldDefinition a = PublicFieldDefinition { publicFieldContext :: ![a], publicFieldPropertyName :: !a, publicFieldValue :: !a }
+data PublicFieldDefinition a = PublicFieldDefinition
+  { publicFieldContext :: [a]
+  , publicFieldPropertyName :: a
+  , publicFieldValue :: a
+  , publicFieldAccessControl :: AccessControl
+  }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically PublicFieldDefinition
 
@@ -186,8 +205,8 @@ instance Evaluatable PublicFieldDefinition where
     span <- ask @Span
     propertyName <- maybeM (throwNoNameError publicFieldPropertyName) (declaredName publicFieldPropertyName)
 
-    declare (Declaration propertyName) Instance span Nothing
-    slot <- lookupDeclaration (Declaration propertyName)
+    declare (Declaration propertyName) Instance publicFieldAccessControl span Nothing
+    slot <- lookupSlot (Declaration propertyName)
     value <- eval publicFieldValue
     assign slot value
     unit
@@ -218,7 +237,7 @@ instance Evaluatable Class where
     superScopes <- for classSuperclasses $ \superclass -> do
       name <- maybeM (throwNoNameError superclass) (declaredName superclass)
       scope <- associatedScope (Declaration name)
-      slot <- lookupDeclaration (Declaration name)
+      slot <- lookupSlot (Declaration name)
       superclassFrame <- scopedEnvironment =<< deref slot
       pure $ case (scope, superclassFrame) of
         (Just scope, Just frame) -> Just (scope, frame)
@@ -228,12 +247,12 @@ instance Evaluatable Class where
         current = (Lexical, ) <$> pure (pure currentScope')
         edges = Map.fromList (superclassEdges <> current)
     classScope <- newScope edges
-    declare (Declaration name) Default span (Just classScope)
+    declare (Declaration name) Default ScopeGraph.Public span (Just classScope)
 
     let frameEdges = Map.singleton Superclass (Map.fromList (catMaybes superScopes))
     classFrame <- newFrame classScope frameEdges
 
-    classSlot <- lookupDeclaration (Declaration name)
+    classSlot <- lookupSlot (Declaration name)
     assign classSlot =<< klass (Declaration name) classFrame
 
     withScopeAndFrame classFrame $ do
@@ -304,10 +323,10 @@ instance Evaluatable TypeAlias where
     span <- ask @Span
     assocScope <- associatedScope (Declaration kindName)
     -- TODO: Should we consider a special Relation for `TypeAlias`?
-    declare (Declaration name) Default span assocScope
+    declare (Declaration name) Default ScopeGraph.Public span assocScope
 
-    slot <- lookupDeclaration (Declaration name)
-    kindSlot <- lookupDeclaration (Declaration kindName)
+    slot <- lookupSlot (Declaration name)
+    kindSlot <- lookupSlot (Declaration kindName)
     assign slot =<< deref kindSlot
 
     unit
