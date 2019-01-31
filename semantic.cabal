@@ -1,5 +1,5 @@
 name:                semantic
-version:             0.4.0
+version:             0.5.0
 synopsis:            Framework and service for analyzing and diffing untrusted code.
 description:         Please see README.md
 homepage:            http://github.com/github/semantic#readme
