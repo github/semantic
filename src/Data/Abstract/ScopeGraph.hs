@@ -55,7 +55,12 @@ data Slot address = Slot { frameAddress :: address, position :: Position }
 data AccessControl = Public
                    | Protected
                    | Private
-                   deriving (Eq, Show, Generic, Hashable, ToJSON, Proto.Named, NFData)
+                   deriving (Bounded, Enum, Eq, Proto.Finite, Generic, Hashable, ToJSON, Proto.MessageField, Proto.Named, NFData, Show)
+
+instance Proto.Primitive AccessControl where
+  encodePrimitive = Encode.enum
+  decodePrimitive = fromRight Proto.def <$> Decode.enum
+  primType _ = Proto.Named (Proto.Single (Proto.nameOf (Proxy @AccessControl)))
 
 instance Proto.HasDefault AccessControl where
   def = Public
