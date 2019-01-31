@@ -9,13 +9,11 @@
     (ObjectType
       (PropertySignature
         (Empty)
-        (Empty)
         (Annotation
           (LiteralType
             (TextElement)))
         (Identifier))
       (PropertySignature
-        (Empty)
         (Readonly)
         (Annotation
           (TypeIdentifier))

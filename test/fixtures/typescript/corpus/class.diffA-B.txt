@@ -15,11 +15,9 @@
       {+(Empty)+}
       {+(Empty)+}
       {+(Empty)+}
-      {+(Public)+}
       {+(Empty)+}
       {+(Identifier)+}
       {+(RequiredParameter
-        {+(Empty)+}
         {+(Empty)+}
         {+(Empty)+}
         {+(Identifier)+}
@@ -31,11 +29,9 @@
       {+(Empty)+}
       {+(Empty)+}
       {+(Empty)+}
-      {+(Public)+}
       {+(Empty)+}
       {+(Identifier)+}
       {+(RequiredParameter
-        {+(Empty)+}
         {+(Empty)+}
         {+(Empty)+}
         {+(Identifier)+}
@@ -47,11 +43,9 @@
       {+(Empty)+}
       {+(Empty)+}
       {+(Empty)+}
-      {+(Public)+}
       {+(Empty)+}
       {+(Identifier)+}
       {+(RequiredParameter
-        {+(Empty)+}
         {+(Empty)+}
         {+(Empty)+}
         {+(Identifier)+}
@@ -62,18 +56,15 @@
     {-(PublicFieldDefinition
       {-(Empty)-}
       {-(Empty)-}
-      {-(Public)-}
       {-(Identifier)-}
       {-(Float)-})-}
     {-(Method
       {-(Empty)-}
       {-(Empty)-}
       {-(Empty)-}
-      {-(Public)-}
       {-(Empty)-}
       {-(Identifier)-}
       {-(RequiredParameter
-        {-(Empty)-}
         {-(Empty)-}
         {-(Empty)-}
         {-(Identifier)-}
@@ -85,11 +76,9 @@
       {-(Empty)-}
       {-(Empty)-}
       {-(Empty)-}
-      {-(Public)-}
       {-(Empty)-}
       {-(Identifier)-}
       {-(RequiredParameter
-        {-(Empty)-}
         {-(Empty)-}
         {-(Empty)-}
         {-(Identifier)-}
@@ -101,11 +90,9 @@
       {-(Empty)-}
       {-(Empty)-}
       {-(Empty)-}
-      {-(Public)-}
       {-(Empty)-}
       {-(Identifier)-}
       {-(RequiredParameter
-        {-(Empty)-}
         {-(Empty)-}
         {-(Empty)-}
         {-(Identifier)-}

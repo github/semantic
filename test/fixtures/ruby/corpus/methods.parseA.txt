@@ -1,22 +1,18 @@
 (Statements
   (Method
-    (Public)
     (Empty)
     (Identifier)
     (Statements))
   (Method
-    (Public)
     (Empty)
     (Identifier)
     (Statements))
   (Method
-    (Public)
     (Empty)
     (Identifier)
     (Identifier)
     (Statements))
   (Method
-    (Public)
     (Empty)
     (Identifier)
     (Identifier)
@@ -25,24 +21,20 @@
     (Empty)
     (Statements))
   (Method
-    (Public)
     (Empty)
     (Identifier)
     (Identifier)
     (Statements))
   (Method
-    (Public)
     (Empty)
     (Identifier)
     (Identifier)
     (Statements))
   (Method
-    (Public)
     (This)
     (Identifier)
     (Statements))
   (Method
-    (Public)
     (This)
     (Identifier)
     (Identifier)

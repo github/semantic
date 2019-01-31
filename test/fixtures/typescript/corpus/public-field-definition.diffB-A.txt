@@ -5,19 +5,16 @@
       (PublicFieldDefinition
         (Readonly)
         (Empty)
-        (Public)
         (Identifier)
         (Empty))
       (PublicFieldDefinition
         (Readonly)
         (Empty)
-        (Public)
         (Identifier)
         (Empty))
       (PublicFieldDefinition
         (Readonly)
         (Empty)
-        (Public)
         (Identifier)
         (Empty))
       (PublicFieldDefinition
@@ -25,7 +22,30 @@
       {+(Empty)+}
       {-(Annotation
         {-(TypeIdentifier)-})-}
-        (Public)
+        (Identifier)
+        (Float))
+    { (PublicFieldDefinition
+      {-(Empty)-}
+      {-(Annotation
+        {-(TypeIdentifier)-})-}
+      {-(Identifier)-}
+      {-(Float)-})
+    ->(PublicFieldDefinition
+      {+(Readonly)+}
+      {+(Annotation
+        {+(TypeIdentifier)+})+}
+      {+(Identifier)+}
+      {+(Float)+}) }
+      (PublicFieldDefinition
+        (Empty)
+        (Annotation
+          (TypeIdentifier))
+        (Identifier)
+        (Float))
+      (PublicFieldDefinition
+        (Empty)
+        (Annotation
+          (TypeIdentifier))
         (Identifier)
         (Float))
       (PublicFieldDefinition
@@ -33,54 +53,30 @@
       {-(Empty)-}
         (Annotation
           (TypeIdentifier))
-      { (Private)
-      ->(Public) }
         (Identifier)
         (Float))
-      (PublicFieldDefinition
-        (Empty)
-        (Annotation
-          (TypeIdentifier))
-        (Public)
-        (Identifier)
-        (Float))
-      (PublicFieldDefinition
-        (Empty)
-        (Annotation
-          (TypeIdentifier))
-        (Public)
-        (Identifier)
-        (Float))
-      (PublicFieldDefinition
+    { (PublicFieldDefinition
+      {-(Readonly)-}
+      {-(Annotation
+        {-(TypeIdentifier)-})-}
+      {-(Identifier)-}
+      {-(TextElement)-})
+    ->(PublicFieldDefinition
       {+(Readonly)+}
-      {-(Empty)-}
-        (Annotation
-          (TypeIdentifier))
-        (Public)
-        (Identifier)
-        (Float))
-      (PublicFieldDefinition
-        (Readonly)
-        (Annotation
-        { (TypeIdentifier)
-        ->(TypeIdentifier) })
-      { (Protected)
-      ->(Public) }
-        (Identifier)
-      { (TextElement)
-      ->(Float) })
+      {+(Annotation
+        {+(TypeIdentifier)+})+}
+      {+(Identifier)+}
+      {+(Float)+}) }
       (PublicFieldDefinition
         (Empty)
         (Annotation
           (TypeIdentifier))
-        (Public)
       { (Identifier)
       ->(Identifier) }
         (Float))
       (PublicFieldDefinition
         (Empty)
         (Empty)
-        (Public)
         (Identifier)
       { (Float)
       ->(Float) }))))
