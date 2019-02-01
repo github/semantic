@@ -76,8 +76,10 @@ type Syntax = '[
   , Expression.Enumeration
   , Expression.Matches
   , Expression.NotMatches
+  , Expression.MemberAccess
   , Expression.ScopeResolution
   , Expression.Subscript
+  , Expression.Member
   , Expression.This
   , Literal.Array
   , Literal.Boolean
