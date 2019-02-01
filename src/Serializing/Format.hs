@@ -7,13 +7,14 @@ module Serializing.Format
 , Options(..)
 ) where
 
+import Algebra.Graph.Export.Dot
 import Algebra.Graph.ToGraph
-import Data.Aeson (ToJSON(..), fromEncoding)
+import Data.Aeson (ToJSON (..), fromEncoding)
 import Data.ByteString.Builder
 import Language.Haskell.HsColour
 import Language.Haskell.HsColour.Colourise
 import Prologue
-import Algebra.Graph.Export.Dot
+import Proto3.Suite as Proto3
 import Serializing.SExpression
 import Text.Show.Pretty
 
@@ -22,6 +23,7 @@ data Format input where
   JSON        :: ToJSON input                                                                 => Format input
   SExpression :: (Recursive input, ToSExpression (Base input))        => Options              -> Format input
   Show        :: Show input                                                                   => Format input
+  Proto       :: Message input                                                                => Format input
 
 data FormatStyle = Colourful | Plain
 
@@ -31,3 +33,4 @@ runSerialize _         JSON               = (<> "\n") . fromEncoding . toEncodin
 runSerialize _         (SExpression opts) = serializeSExpression opts
 runSerialize Colourful Show               = (<> "\n") . stringUtf8 . hscolour TTY defaultColourPrefs False False "" False . ppShow
 runSerialize Plain     Show               = (<> "\n") . stringUtf8 . show
+runSerialize _         Proto              = lazyByteString . Proto3.toLazyByteString

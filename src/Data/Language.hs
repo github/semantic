@@ -95,6 +95,7 @@ instance FromJSON Language where
     "php"        -> PHP
     _            -> Unknown
 
+
 -- | Predicate failing on 'Unknown' and passing in all other cases.
 knownLanguage :: Language -> Bool
 knownLanguage = (/= Unknown)
