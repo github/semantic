@@ -1,10 +1,5 @@
 {-# LANGUAGE ApplicativeDo, RankNTypes #-}
-module Semantic.CLI
-( main
--- Testing
-, Diff.runDiff
-, Parse.runParse
-) where
+module Semantic.CLI (main) where
 
 import           Control.Exception as Exc (displayException)
 import           Data.File
@@ -15,12 +10,10 @@ import           Data.Handle
 import           Data.Project
 import           Options.Applicative hiding (style)
 import           Prologue
-import           Rendering.Renderer
+import           Semantic.API hiding (File)
 import qualified Semantic.AST as AST
 import           Semantic.Config
-import qualified Semantic.Diff as Diff
 import qualified Semantic.Graph as Graph
-import qualified Semantic.Parse as Parse
 import qualified Semantic.Task as Task
 import           Semantic.Task.Files
 import qualified Semantic.Telemetry.Log as Log
@@ -51,10 +44,9 @@ optionsParser :: Parser Options
 optionsParser = do
   logLevel <- options [ ("error", Just Log.Error) , ("warning", Just Log.Warning) , ("info", Just Log.Info) , ("debug", Just Log.Debug) , ("none", Nothing)]
                       (long "log-level" <> value (Just Log.Warning) <> help "Log messages at or above this level, or disable logging entirely.")
-  requestId <- optional (strOption $ long "request-id" <> help "A string to use as the request identifier for any logged messages." <> metavar "id")
   failOnWarning <- switch (long "fail-on-warning" <> help "Fail on assignment warnings.")
   failOnParseError <- switch (long "fail-on-parse-error" <> help "Fail on tree-sitter parse errors.")
-  pure $ Options logLevel requestId failOnWarning failOnParseError
+  pure $ Options logLevel Nothing failOnWarning failOnParseError
 
 argumentsParser :: Parser (Task.TaskEff ())
 argumentsParser = do
@@ -66,12 +58,12 @@ diffCommand :: Mod CommandFields (Task.TaskEff Builder)
 diffCommand = command "diff" (info diffArgumentsParser (progDesc "Compute changes between paths"))
   where
     diffArgumentsParser = do
-      renderer <- flag  (Diff.runDiff SExpressionDiffRenderer) (Diff.runDiff SExpressionDiffRenderer) (long "sexpression" <> help "Output s-expression diff tree (default)")
-              <|> flag'                                        (Diff.runDiff JSONDiffRenderer)        (long "json"        <> help "Output JSON diff trees")
-              <|> flag'                                        (Diff.runDiff JSONGraphDiffRenderer)   (long "json-graph"  <> help "Output JSON diff trees")
-              <|> flag'                                        (Diff.runDiff ToCDiffRenderer)         (long "toc"         <> help "Output JSON table of contents diff summary")
-              <|> flag'                                        (Diff.runDiff DOTDiffRenderer)         (long "dot"         <> help "Output the diff as a DOT graph")
-              <|> flag'                                        (Diff.runDiff ShowDiffRenderer)        (long "show"        <> help "Output using the Show instance (debug only, format subject to change without notice)")
+      renderer <- flag  (parseDiffBuilder DiffSExpression) (parseDiffBuilder DiffSExpression)   (long "sexpression" <> help "Output s-expression diff tree (default)")
+              <|> flag'                                    (parseDiffBuilder DiffJSONTree)  (long "json"        <> help "Output JSON diff trees")
+              <|> flag'                                    (parseDiffBuilder DiffJSONGraph) (long "json-graph"  <> help "Output JSON diff trees")
+              <|> flag'                                    (diffSummaryBuilder JSON)        (long "toc"         <> help "Output JSON table of contents diff summary")
+              <|> flag'                                    (parseDiffBuilder DiffDotGraph)  (long "dot"         <> help "Output the diff as a DOT graph")
+              <|> flag'                                    (parseDiffBuilder DiffShow)      (long "show"        <> help "Output using the Show instance (debug only, format subject to change without notice)")
       filesOrStdin <- Right <$> some (Both <$> argument filePathReader (metavar "FILE_A") <*> argument filePathReader (metavar "FILE_B")) <|> pure (Left stdin)
       pure $ Task.readBlobPairs filesOrStdin >>= renderer
 
@@ -79,22 +71,15 @@ parseCommand :: Mod CommandFields (Task.TaskEff Builder)
 parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate parse trees for path(s)"))
   where
     parseArgumentsParser = do
-      renderer <- flag  (Parse.runParse SExpressionTermRenderer) (Parse.runParse SExpressionTermRenderer) (long "sexpression" <> help "Output s-expression parse trees (default)")
-              <|> flag'                                          (Parse.runParse JSONTermRenderer)        (long "json"        <> help "Output JSON parse trees")
-              <|> flag'                                          (Parse.runParse JSONGraphTermRenderer)   (long "json-graph"  <> help "Output JSON adjacency list")
-              <|> flag'                                          (Parse.runParse . SymbolsTermRenderer)   (long "symbols"     <> help "Output JSON symbol list")
-                   <*> (option symbolFieldsReader (  long "fields"
-                                                 <> help "Comma delimited list of specific fields to return (symbols output only)."
-                                                 <> metavar "FIELDS")
-                  <|> pure defaultSymbolFields)
-              <|> flag'                                          (Parse.runParse DOTTermRenderer)         (long "dot"          <> help "Output DOT graph parse trees")
-              <|> flag'                                          (Parse.runParse ShowTermRenderer)        (long "show"         <> help "Output using the Show instance (debug only, format subject to change without notice)")
-              <|> flag'                                          (Parse.runParse QuietTermRenderer)       (long "quiet"        <> help "Don't produce output, but show timing stats")
+      renderer <- flag  (parseTermBuilder TermSExpression) (parseTermBuilder TermSExpression) (long "sexpression" <> help "Output s-expression parse trees (default)")
+              <|> flag'                                    (parseTermBuilder TermJSONTree)    (long "json"        <> help "Output JSON parse trees")
+              <|> flag'                                    (parseTermBuilder TermJSONGraph)   (long "json-graph"  <> help "Output JSON adjacency list")
+              <|> flag'                                    parseSymbolsBuilder                (long "symbols"     <> help "Output JSON symbol list")
+              <|> flag'                                    (parseTermBuilder TermDotGraph)    (long "dot"          <> help "Output DOT graph parse trees")
+              <|> flag'                                    (parseTermBuilder TermShow)        (long "show"         <> help "Output using the Show instance (debug only, format subject to change without notice)")
+              <|> flag'                                    (parseTermBuilder TermQuiet)       (long "quiet"        <> help "Don't produce output, but show timing stats")
       filesOrStdin <- Right <$> some (argument filePathReader (metavar "FILES...")) <|> pure (Left stdin)
       pure $ Task.readBlobs filesOrStdin >>= renderer
-
-    -- Example: semantic parse --symbols --fields=symbol,path,language,kind,line,span
-    symbolFieldsReader = eitherReader (Right . parseSymbolFields)
 
 tsParseCommand :: Mod CommandFields (Task.TaskEff Builder)
 tsParseCommand = command "ts-parse" (info tsParseArgumentsParser (progDesc "Don't produce output, but show timing stats"))
