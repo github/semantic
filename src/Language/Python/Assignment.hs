@@ -302,7 +302,7 @@ ellipsis :: Assignment Term
 ellipsis = makeTerm <$> token Grammar.Ellipsis <*> pure Python.Syntax.Ellipsis
 
 comparisonOperator :: Assignment Term
-comparisonOperator = symbol ComparisonOperator *> children ((term expression) `chainl1Term` choice
+comparisonOperator = symbol ComparisonOperator *> children (expression `chainl1Term` choice
   [ (makeTerm1 .) . Expression.LessThan         <$ symbol AnonLAngle
   , (makeTerm1 .) . Expression.LessThanEqual    <$ symbol AnonLAngleEqual
   , (makeTerm1 .) . Expression.GreaterThan      <$ symbol AnonRAngle
@@ -544,7 +544,9 @@ term term = contextualize comment (postContextualize comment term)
 
 -- | Match a left-associated infix chain of terms, optionally followed by comments. Like 'chainl1' but assigning comment nodes automatically.
 chainl1Term :: Assignment Term -> Assignment (Term -> Term -> Term) -> Assignment Term
-chainl1Term expr op = contextualize (comment <|> symbol AnonLambda *> empty) expr `chainl1` op
+chainl1Term expr op = (contextualize (comment <|> symbol AnonLambda *> empty) expr
+                     <|> postContextualize (comment <|> symbol AnonLambda *> empty) expr)
+                     `chainl1` op
 
 -- | Match a series of terms or comments until a delimiter is matched.
 manyTermsTill :: Assignment Term -> Assignment b -> Assignment [Term]
