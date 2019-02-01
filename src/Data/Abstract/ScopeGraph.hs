@@ -4,7 +4,9 @@ module Data.Abstract.ScopeGraph
   , Info(..)
   , associatedScope
   , lookupDeclaration
-  , relationsOfScope
+  , declarationByName
+  , declarationsByAccessControl
+  , declarationsByRelation
   , Declaration(..) -- TODO don't export these constructors
   , declare
   , formatDeclaration
@@ -34,10 +36,13 @@ module Data.Abstract.ScopeGraph
   , pathDeclarationScope
   , putDeclarationScopeAtPosition
   , declarationNames
+  , AccessControl(..)
   ) where
 
 import           Control.Abstract.Hole
 import           Data.Abstract.Name
+import           Data.Aeson
+import           Data.JSON.Fields (ToJSONFields(..))
 import qualified Data.Map.Strict as Map
 import qualified Data.Sequence as Seq
 import qualified Data.Set as Set
@@ -45,22 +50,70 @@ import           Data.Span
 import           Prelude hiding (lookup)
 import           Prologue
 import Data.Abstract.Module
+import qualified Proto3.Suite       as Proto
+import qualified Proto3.Wire.Encode as Encode
+import qualified Proto3.Wire.Decode as Decode
 
 -- A slot is a location in the heap where a value is stored.
 data Slot address = Slot { frameAddress :: address, position :: Position }
     deriving (Eq, Show, Ord, Generic, NFData)
 
+
+data AccessControl = Public
+                   | Protected
+                   | Private
+                   deriving (Bounded, Enum, Eq, Proto.Finite, Generic, Hashable, ToJSON, Proto.MessageField, Proto.Named, NFData, Show)
+
+instance Proto.Primitive AccessControl where
+  encodePrimitive = Encode.enum
+  decodePrimitive = fromRight Proto.def <$> Decode.enum
+  primType _ = Proto.Named (Proto.Single (Proto.nameOf (Proxy @AccessControl)))
+
+instance Proto.HasDefault AccessControl where
+  def = Public
+
+instance ToJSONFields AccessControl where
+  toJSONFields accessControl = ["accessControl" .= accessControl]
+
+-- | The Ord AccessControl instance represents an order specification of AccessControls.
+-- AccessControls that are less than or equal to another AccessControl implies access.
+-- It is helpful to consider `Public <= Private` as saying "Can a Public syntax term access a Private syntax term?"
+-- In this way, Public AccessControl is the top of the order specification, and Private AccessControl is the bottom.
+instance Ord AccessControl where
+  -- | Private AccessControl represents the least overlap or accessibility with other AccessControls.
+  -- When asking if the AccessControl "on the left" is less than the AccessControl "on the right", Private AccessControl on the left always implies access to the thing on the right.
+  (<=) Private _           = True
+  (<=) _       Private     = False
+
+  -- | Protected AccessControl is inbetween Private and Public in the order specification.
+  -- Protected AccessControl "on the left" has access to Protected or Public AccessControls "on the right".
+  (<=) Protected Public    = True
+  (<=) Protected Protected = True
+
+  -- | Public AccessControl "on the left" has access only to Public AccessControl "on the right".
+  -- In all other cases, Public AccessControl "on the left" implies no access.
+  (<=) Public Public       = True
+  (<=) Public _            = False
+
+
 data Relation = Default | Instance | Prelude
   deriving (Eq, Show, Ord, Generic, NFData)
+
+instance Lower Relation where
+  lowerBound = Default
 
 data Info scopeAddress = Info
   { infoDeclaration :: Declaration
   , infoModule :: ModuleInfo
   , infoRelation :: Relation
+  , infoAccessControl :: AccessControl
   , infoSpan :: Span
   , infoKind :: Kind
   , infoAssociatedScope :: Maybe scopeAddress
   } deriving (Eq, Show, Ord, Generic, NFData)
+
+instance Lower (Info scopeAddress) where
+  lowerBound = Info lowerBound lowerBound lowerBound Public lowerBound lowerBound Nothing
 
 data ReferenceInfo = ReferenceInfo
   { refSpan :: Span
@@ -71,6 +124,9 @@ data ReferenceInfo = ReferenceInfo
 
 data Kind = TypeAlias | Class | Method | QualifiedAliasedImport | QualifiedExport | DefaultExport | Module | AbstractClass | Let | QualifiedImport | UnqualifiedImport | Assignment | RequiredParameter | PublicField | VariableDeclaration | Function | Parameter | Unknown | Identifier | TypeIdentifier | This | New | MemberAccess | Call
   deriving (Eq, Show, Ord, Generic, NFData)
+
+instance Lower Kind where
+  lowerBound = Unknown
 
 -- Offsets and frame addresses in the heap should be addresses?
 data Scope address =
@@ -94,6 +150,9 @@ instance AbstractHole (Scope scopeAddress) where
 
 instance AbstractHole address => AbstractHole (Slot address) where
   hole = Slot hole (Position 0)
+
+instance AbstractHole (Info address) where
+  hole = lowerBound
 
 newtype Position = Position { unPosition :: Int }
   deriving (Eq, Show, Ord, Generic, NFData)
@@ -146,10 +205,20 @@ ddataOfScope scope = fmap declarations . Map.lookup scope . unScopeGraph
 linksOfScope :: Ord scope => scope -> ScopeGraph scope -> Maybe (Map EdgeLabel [scope])
 linksOfScope scope = fmap edges . Map.lookup scope . unScopeGraph
 
-relationsOfScope :: Ord scope => scope -> Relation -> ScopeGraph scope -> [ Info scope ]
-relationsOfScope scope relation g = fromMaybe mempty $ do
+declarationsByAccessControl :: Ord scope => scope -> AccessControl -> ScopeGraph scope -> [ Info scope ]
+declarationsByAccessControl scope accessControl g = fromMaybe mempty $ do
+  dataSeq <- ddataOfScope scope g
+  pure . toList $ Seq.filter (\Info{..} -> accessControl <= infoAccessControl) dataSeq
+
+declarationsByRelation :: Ord scope => scope -> Relation -> ScopeGraph scope -> [ Info scope ]
+declarationsByRelation scope relation g = fromMaybe mempty $ do
   dataSeq <- ddataOfScope scope g
   pure . toList $ Seq.filter (\Info{..} -> infoRelation == relation) dataSeq
+
+declarationByName :: Ord scope => scope -> Declaration -> ScopeGraph scope -> Maybe (Info scope)
+declarationByName scope name g = do
+  dataSeq <- ddataOfScope scope g
+  find (\Info{..} -> infoDeclaration == name) dataSeq
 
 -- Lookup a scope in the scope graph.
 lookupScope :: Ord scope => scope -> ScopeGraph scope -> Maybe (Scope scope)
@@ -157,15 +226,25 @@ lookupScope scope = Map.lookup scope . unScopeGraph
 
 -- Declare a declaration with a span and an associated scope in the scope graph.
 -- TODO: Return the whole value in Maybe or Either.
-declare :: Ord scope => Declaration -> ModuleInfo -> Relation -> Span -> Kind -> Maybe scope -> scope -> ScopeGraph scope -> (ScopeGraph scope, Maybe Position)
-declare decl moduleInfo rel declSpan kind assocScope currentScope g = fromMaybe (g, Nothing) $ do
+declare :: Ord scope
+        => Declaration
+        -> ModuleInfo
+        -> Relation
+        -> AccessControl
+        -> Span
+        -> Kind
+        -> Maybe scope
+        -> scope
+        -> ScopeGraph scope
+        -> (ScopeGraph scope, Maybe Position)
+declare decl moduleInfo rel accessControl declSpan kind assocScope currentScope g = fromMaybe (g, Nothing) $ do
   scope <- lookupScope currentScope g
 
   dataSeq <- ddataOfScope currentScope g
   case Seq.findIndexR (\Info{..} -> decl == infoDeclaration && declSpan == infoSpan && rel == infoRelation) dataSeq of
     Just index -> pure (g, Just (Position index))
     Nothing -> do
-      let newScope = scope { declarations = declarations scope Seq.|> Info decl moduleInfo rel declSpan kind assocScope }
+      let newScope = scope { declarations = declarations scope Seq.|> Info decl moduleInfo rel accessControl declSpan kind assocScope }
       pure (insertScope currentScope newScope g, Just (Position (length (declarations newScope))))
 
 -- | Add a reference to a declaration in the scope graph.
@@ -302,8 +381,14 @@ associatedScope Declaration{..} g@(ScopeGraph graph) = go (Map.keys graph)
 newtype Reference = Reference { unReference :: Name }
   deriving (Eq, Ord, Show, Generic, NFData)
 
+instance Lower Reference where
+  lowerBound = Reference $ name ""
+
 newtype Declaration = Declaration { unDeclaration :: Name }
   deriving (Eq, Ord, Show, Generic, NFData)
+
+instance Lower Declaration where
+  lowerBound = Declaration $ name ""
 
 formatDeclaration :: Declaration -> Text
 formatDeclaration = formatName . unDeclaration

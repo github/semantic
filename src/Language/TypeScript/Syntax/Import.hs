@@ -62,8 +62,8 @@ instance Evaluatable QualifiedAliasedImport where
     aliasFrame <- newFrame importScope (Map.singleton ScopeGraph.Import scopeMap)
 
     alias <- maybeM (throwNoNameError aliasTerm) (declaredName aliasTerm)
-    declare (Declaration alias) Default span ScopeGraph.QualifiedAliasedImport (Just importScope)
-    aliasSlot <- lookupDeclaration (Declaration alias)
+    declare (Declaration alias) Default Public span ScopeGraph.QualifiedAliasedImport (Just importScope)
+    aliasSlot <- lookupSlot (Declaration alias)
     assign aliasSlot =<< object aliasFrame
 
     unit
@@ -141,8 +141,8 @@ instance Evaluatable DefaultExport where
         withScopeAndFrame exportFrame $ do
           valueRef <- eval term
           let declaration = Declaration $ Name.name "__default"
-          declare declaration Default exportSpan ScopeGraph.DefaultExport Nothing
-          defaultSlot <- lookupDeclaration declaration
+          declare declaration Default Public exportSpan ScopeGraph.DefaultExport Nothing
+          defaultSlot <- lookupSlot declaration
           assign defaultSlot valueRef
 
         insertExportEdge exportScope

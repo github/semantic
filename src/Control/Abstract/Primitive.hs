@@ -35,20 +35,21 @@ defineBuiltIn :: ( HasCallStack
                  )
               => Declaration
               -> Relation
+              -> AccessControl
               -> BuiltIn
               -> Evaluator term address value m ()
-defineBuiltIn declaration rel value = withCurrentCallStack callStack $ do
+defineBuiltIn declaration rel accessControl value = withCurrentCallStack callStack $ do
   currentScope' <- currentScope
   let lexicalEdges = Map.singleton Lexical [ currentScope' ]
   associatedScope <- newPreludeScope lexicalEdges
   -- TODO: This span is still wrong.
-  declare declaration rel emptySpan ScopeGraph.Unknown (Just associatedScope)
+  declare declaration rel accessControl emptySpan ScopeGraph.Unknown (Just associatedScope)
 
   param <- gensym
   withScope associatedScope $ do
-    declare (Declaration param) rel emptySpan ScopeGraph.Unknown Nothing
+    declare (Declaration param) rel accessControl emptySpan ScopeGraph.Unknown Nothing
 
-  slot <- lookupDeclaration declaration
+  slot <- lookupSlot declaration
   value <- builtIn associatedScope value
   assign slot value
 
@@ -72,7 +73,7 @@ defineClass :: ( Carrier sig m
             -> [Declaration]
             -> Evaluator term address value m a
             -> Evaluator term address value m ()
-defineClass declaration superclasses body = void . define declaration Default $ do
+defineClass declaration superclasses body = void . define declaration Default Public $ do
     currentScope' <- currentScope
 
     superScopes <- for superclasses associatedScope
@@ -107,7 +108,7 @@ defineNamespace :: ( AbstractValue term address value m
                 => Declaration
                 -> Evaluator term address value m a
                 -> Evaluator term address value m ()
-defineNamespace declaration@Declaration{..} body = void . define declaration Default $ do
+defineNamespace declaration@Declaration{..} body = void . define declaration Default Public $ do
   withChildFrame declaration $ \frame -> do
     _ <- body
     namespace unDeclaration frame

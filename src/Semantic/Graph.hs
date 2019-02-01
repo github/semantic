@@ -47,6 +47,7 @@ import           Data.Abstract.Value.Abstract as Abstract
 import           Data.Abstract.Value.Concrete as Concrete
     (Value, ValueError (..), runValueErrorWith)
 import           Data.Abstract.Value.Type as Type
+import           Data.Abstract.AccessControls.Instances ()
 import           Data.Blob
 import           Data.File
 import           Data.Graph
@@ -68,7 +69,7 @@ import           Text.Show.Pretty (ppShow)
 
 data GraphType = ImportGraph | CallGraph
 
-type AnalysisClasses = '[ Declarations1, Eq1, Evaluatable, FreeVariables1, Foldable, Functor, Ord1, Show1 ]
+type AnalysisClasses = '[ Declarations1, Eq1, Evaluatable, FreeVariables1, AccessControls1, Foldable, Functor, Ord1, Show1 ]
 
 runGraph :: ( Member Distribute sig
             , Member (Error SomeException) sig
@@ -96,6 +97,7 @@ runGraph CallGraph includePackages project
 
 runCallGraph :: ( VertexDeclarationWithStrategy (VertexDeclarationStrategy syntax) syntax syntax
                 , Declarations1 syntax
+                , AccessControls1 syntax
                 , Ord1 syntax
                 , Functor syntax
                 , Evaluatable syntax
@@ -146,6 +148,7 @@ runModuleTable = raiseHandler $ runReader lowerBound
 runImportGraphToModuleInfos :: ( Declarations term
                                , Evaluatable (Base term)
                                , FreeVariables term
+                               , AccessControls term
                                , HasPrelude lang
                                , Member Trace sig
                                , Recursive term
@@ -162,6 +165,7 @@ runImportGraphToModuleInfos lang (package :: Package term) = runImportGraph lang
 runImportGraphToModules :: ( Declarations term
                            , Evaluatable (Base term)
                            , FreeVariables term
+                           , AccessControls term
                            , HasPrelude lang
                            , Member Trace sig
                            , Recursive term
@@ -178,6 +182,7 @@ runImportGraphToModules lang (package :: Package term) = runImportGraph lang pac
 runImportGraph :: ( Declarations term
                   , Evaluatable (Base term)
                   , FreeVariables term
+                  , AccessControls term
                   , HasPrelude lang
                   , Member Trace sig
                   , Recursive term
@@ -246,6 +251,7 @@ parsePythonPackage :: forall syntax sig m term.
                    ( Declarations1 syntax
                    , Evaluatable syntax
                    , FreeVariables1 syntax
+                   , AccessControls1 syntax
                    , Functor syntax
                    , term ~ Term syntax Location
                    , Member (Error SomeException) sig
@@ -367,6 +373,7 @@ resumingEvalError :: ( Carrier sig m
                                                   m)) a
                   -> Evaluator term address value m a
 resumingEvalError = runEvalErrorWith (\ baseError -> traceError "EvalError" baseError *> case baseErrorException baseError of
+  AccessControlError{}  -> pure hole
   ConstructorError{}    -> pure hole
   DefaultExportError{}  -> pure ()
   DerefError{}          -> pure hole
@@ -445,6 +452,7 @@ resumingScopeError :: ( Carrier sig m
                      , AbstractHole (Slot address)
                      , AbstractHole (Scope address)
                      , AbstractHole (Path address)
+                     , AbstractHole (Info address)
                      , AbstractHole address
                      )
                     => Evaluator term address value (ResumableWithC (BaseError (ScopeError address)) (Eff m)) a
@@ -455,7 +463,8 @@ resumingScopeError = runScopeErrorWith (\ baseError -> traceError "ScopeError" b
   LookupScopeError -> pure hole
   LookupPathError _ -> pure hole
   CurrentScopeError -> pure hole
-  LookupDeclarationScopeError _ -> pure hole)
+  LookupDeclarationScopeError _ -> pure hole
+  DeclarationByNameError _ -> pure hole)
 
 resumingTypeError :: ( Carrier sig m
                      , Member NonDet sig

@@ -73,7 +73,7 @@ main = do
       describe "Reprinting.Spec" Reprinting.Spec.spec
       describe "Rewriting.Go" Rewriting.Go.Spec.spec
       describe "Rewriting.JSON" Rewriting.JSON.Spec.spec
-      describe "Rewriting.Python" Rewriting.Python.Spec.spec      
+      describe "Rewriting.Python" Rewriting.Python.Spec.spec
       describe "Tags.Spec" Tags.Spec.spec
       describe "Semantic" Semantic.Spec.spec
       describe "Semantic.CLI" Semantic.CLI.Spec.spec

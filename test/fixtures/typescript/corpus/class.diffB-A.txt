@@ -14,7 +14,6 @@
     {+(PublicFieldDefinition
       {+(Empty)+}
       {+(Empty)+}
-      {+(Empty)+}
       {+(Identifier)+}
       {+(Float)+})+}
       (Method
@@ -22,11 +21,9 @@
         (Empty)
         (Empty)
         (Empty)
-        (Empty)
       { (Identifier)
       ->(Identifier) }
         (RequiredParameter
-          (Empty)
           (Empty)
           (Empty)
           (Identifier)
@@ -39,11 +36,9 @@
         (Empty)
         (Empty)
         (Empty)
-        (Empty)
       { (Identifier)
       ->(Identifier) }
         (RequiredParameter
-          (Empty)
           (Empty)
           (Empty)
           (Identifier)
@@ -56,11 +51,9 @@
         (Empty)
         (Empty)
         (Empty)
-        (Empty)
       { (Identifier)
       ->(Identifier) }
         (RequiredParameter
-          (Empty)
           (Empty)
           (Empty)
           (Identifier)

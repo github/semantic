@@ -11,6 +11,7 @@ import Prologue
 
 import           Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
+import qualified Data.Abstract.ScopeGraph as ScopeGraph (AccessControl(..))
 import           Data.Abstract.Name (Name, name)
 import           Data.Syntax
     (contextualize, emptyTerm, handleError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1, parseError)
@@ -129,6 +130,8 @@ type Syntax =
    , []
    , Literal.String
    , Literal.EscapeSequence
+   , Literal.Null
+   , Literal.Boolean
    ]
 
 type Term = Term.Term (Sum Syntax) Location
@@ -153,6 +156,7 @@ expressionChoices :: [Assignment Term]
 expressionChoices =
   [ argumentList
   , assignment'
+  , boolean
   , binaryExpression
   , block
   , breakStatement
@@ -196,6 +200,7 @@ expressionChoices =
   , methodDeclaration
   , methodSpec
   , methodSpecList
+  , nil
   , packageClause
   , packageIdentifier
   , parameterDeclaration
@@ -260,17 +265,11 @@ element = symbol Element *> children expression
 fieldIdentifier :: Assignment Term
 fieldIdentifier = makeTerm <$> symbol FieldIdentifier <*> (Syntax.Identifier . name <$> source)
 
-fieldIdentifier' :: Assignment Name
-fieldIdentifier' = symbol FieldIdentifier *> (name <$> source)
-
 floatLiteral :: Assignment Term
 floatLiteral = makeTerm <$> symbol FloatLiteral <*> (Literal.Float <$> source)
 
 identifier :: Assignment Term
 identifier =  makeTerm <$> (symbol Identifier <|> symbol Identifier' <|> symbol Identifier'') <*> (Syntax.Identifier . name <$> source)
-
-identifier' :: Assignment Name
-identifier' =  (symbol Identifier <|> symbol Identifier' <|> symbol Identifier'') *> (name <$> source)
 
 imaginaryLiteral :: Assignment Term
 imaginaryLiteral = makeTerm <$> symbol ImaginaryLiteral <*> (Literal.Complex <$> source)
@@ -303,8 +302,12 @@ runeLiteral = makeTerm <$> symbol Grammar.RuneLiteral <*> (Go.Syntax.Rune <$> so
 typeIdentifier :: Assignment Term
 typeIdentifier = makeTerm <$> symbol TypeIdentifier <*> (Syntax.Identifier . name <$> source)
 
-typeIdentifier' :: Assignment Name
-typeIdentifier' = symbol TypeIdentifier *> (name <$> source)
+nil :: Assignment Term
+nil = makeTerm <$> symbol Nil <*> (Literal.Null <$ source)
+
+boolean :: Assignment Term
+boolean =  makeTerm <$> token Grammar.True <*> pure Literal.true
+       <|> makeTerm <$> token Grammar.False <*> pure Literal.false
 
 
 -- Primitive Types
@@ -348,7 +351,7 @@ pointerType :: Assignment Term
 pointerType = makeTerm <$> symbol PointerType <*> children (Type.Pointer <$> expression)
 
 qualifiedType :: Assignment Term
-qualifiedType = makeTerm <$> symbol QualifiedType <*> children (Expression.MemberAccess <$> expression <*> (identifier <|> typeIdentifier))
+qualifiedType = makeTerm <$> symbol QualifiedType <*> children (Expression.MemberAccess <$> expression <*> typeIdentifier)
 
 sliceType :: Assignment Term
 sliceType = makeTerm <$> symbol SliceType <*> children (Type.Slice <$> expression)
@@ -458,20 +461,23 @@ indexExpression :: Assignment Term
 indexExpression = makeTerm <$> symbol IndexExpression <*> children (Expression.Subscript <$> expression <*> manyTerm expression)
 
 methodDeclaration :: Assignment Term
-methodDeclaration = makeTerm <$> symbol MethodDeclaration <*> children (mkTypedMethodDeclaration <$> receiver <*> term fieldIdentifier <*> params <*> returnParameters <*> (term block <|> emptyTerm))
+methodDeclaration = makeTerm <$> symbol MethodDeclaration <*> children (mkTypedMethodDeclaration <$> receiver <*> pure publicAccessControl <*> term fieldIdentifier <*> params <*> returnParameters <*> (term block <|> emptyTerm))
   where
     params = symbol ParameterList *> children (manyTerm expression)
     receiver = symbol ParameterList *> children expressions
-    mkTypedMethodDeclaration receiver' name' parameters' type'' body' = Declaration.Method type'' receiver' name' parameters' body'
+    mkTypedMethodDeclaration receiver' accessControl name' parameters' type'' body' = Declaration.Method type'' receiver' name' parameters' body' accessControl
     returnParameters = (symbol ParameterList *> children (manyTerm expression))
                     <|> pure <$> expression
                     <|> pure []
 
 methodSpec :: Assignment Term
-methodSpec =  makeTerm <$> symbol MethodSpec <*> children (mkMethodSpec <$> expression <*> params <*> (expression <|> emptyTerm))
+methodSpec =  makeTerm <$> symbol MethodSpec <*> children (mkMethodSpec publicAccessControl <$> expression <*> params <*> (expression <|> emptyTerm))
   where
     params = symbol ParameterList *> children (manyTerm expression)
-    mkMethodSpec name' params optionalTypeLiteral = Declaration.MethodSignature [optionalTypeLiteral] name' params
+    mkMethodSpec accessControl name' params optionalTypeLiteral = Declaration.MethodSignature [optionalTypeLiteral] name' params accessControl
+
+publicAccessControl :: ScopeGraph.AccessControl
+publicAccessControl = ScopeGraph.Public
 
 methodSpecList :: Assignment Term
 methodSpecList = symbol MethodSpecList *> children expressions
@@ -489,7 +495,7 @@ parenthesizedExpression :: Assignment Term
 parenthesizedExpression = symbol ParenthesizedExpression *> children expressions
 
 selectorExpression :: Assignment Term
-selectorExpression = makeWithContext <$> symbol SelectorExpression <*> children ((,,) <$> expression <*> optional comment <*> (identifier <|> fieldIdentifier))
+selectorExpression = makeWithContext <$> symbol SelectorExpression <*> children ((,,) <$> expression <*> optional comment <*> fieldIdentifier)
   where makeWithContext loc (lhs, comment, rhs) = maybe (makeTerm loc (Expression.MemberAccess lhs rhs)) (\c -> makeTerm loc (Syntax.Context (c :| []) (makeTerm loc (Expression.MemberAccess lhs rhs)))) comment
 
 sliceExpression :: Assignment Term

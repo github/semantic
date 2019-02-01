@@ -186,11 +186,12 @@ instance Evaluatable QualifiedName where
         currentFrameAddress <- currentFrame
         frameAddress <- newFrame childScope (Map.singleton Lexical (Map.singleton currentScopeAddress currentFrameAddress))
         withScopeAndFrame frameAddress $ do
+          -- FIXME: We shouldn't have to eval iden to get the span
           _ <- eval iden
           propSpan <- get @Span
           reference (Reference propName) propSpan ScopeGraph.Identifier (Declaration propName)
-          address <- lookupDeclaration (Declaration propName)
-          deref address
+          slot <- lookupSlot (Declaration propName)
+          deref slot
       Nothing ->
         -- TODO: Throw an ReferenceError because we can't find the associated child scope for `obj`.
         unit
