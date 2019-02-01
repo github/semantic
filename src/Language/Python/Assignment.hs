@@ -542,11 +542,13 @@ someTerm term = some (contextualize comment term <|> makeTerm1 <$> (Syntax.Conte
 term :: Assignment Term -> Assignment Term
 term term = contextualize comment (postContextualize comment term)
 
+term' :: Assignment Term -> Assignment Term
+term' term = contextualize comment' (postContextualize comment' term)
+  where comment' = choice [ comment, symbol AnonLambda *> empty ]
+
 -- | Match a left-associated infix chain of terms, optionally followed by comments. Like 'chainl1' but assigning comment nodes automatically.
 chainl1Term :: Assignment Term -> Assignment (Term -> Term -> Term) -> Assignment Term
-chainl1Term expr op = (contextualize (comment <|> symbol AnonLambda *> empty) expr
-                     <|> postContextualize (comment <|> symbol AnonLambda *> empty) expr)
-                     `chainl1` op
+chainl1Term expr op = term' expr `chainl1` op
 
 -- | Match a series of terms or comments until a delimiter is matched.
 manyTermsTill :: Assignment Term -> Assignment b -> Assignment [Term]
