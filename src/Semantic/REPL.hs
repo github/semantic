@@ -54,7 +54,7 @@ instance Exception Quit
 
 rubyREPL = repl (Proxy @'Language.Ruby) rubyParser
 
-repl proxy parser paths = defaultConfig debugOptions >>= \ config -> runM . runDistribute . runResource (runM . runDistribute) . runTimeout (runM . runDistribute . runResource (runM . runDistribute)) . runError @_ @_ @SomeException . runTelemetryIgnoringStat (logOptionsFromConfig config) . runTraceInTelemetry . runReader config . Files.runFiles . runResolution . runTaskF $ do
+repl proxy parser paths = defaultConfig debugOptions >>= \ config -> runM . runDistribute . runResource (runM . runDistribute) . runTimeout (runM . runDistribute . runResource (runM . runDistribute)) . runError @SomeException . runTelemetryIgnoringStat (logOptionsFromConfig config) . runTraceInTelemetry . runReader config . Files.runFiles . runResolution . runTaskF $ do
   blobs <- catMaybes <$> traverse readBlobFromFile (flip File (Language.reflect proxy) <$> paths)
   package <- fmap (fmap quieterm) <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs (Language.reflect proxy) [])
   modules <- topologicalSort <$> runImportGraphToModules proxy (snd <$> package)
