@@ -303,16 +303,16 @@ ellipsis = makeTerm <$> token Grammar.Ellipsis <*> pure Python.Syntax.Ellipsis
 
 comparisonOperator :: Assignment Term
 comparisonOperator = symbol ComparisonOperator *> children (expression `chainl1Term` choice
-  [ (makeTerm1 .) . Expression.LessThan         <$ symbol AnonLAngle
-  , (makeTerm1 .) . Expression.LessThanEqual    <$ symbol AnonLAngleEqual
-  , (makeTerm1 .) . Expression.GreaterThan      <$ symbol AnonRAngle
-  , (makeTerm1 .) . Expression.GreaterThanEqual <$ symbol AnonRAngleEqual
-  , (makeTerm1 .) . Expression.Equal            <$ symbol AnonEqualEqual
-  , (makeTerm1 .) . invert Expression.Equal     <$ symbol AnonBangEqual
-  , (makeTerm1 .) . invert Expression.Equal     <$ symbol AnonLAngleRAngle
-  , (makeTerm1 .) . invert Expression.Member    <$ symbol AnonNot
-  , (makeTerm1 .) . Expression.Member           <$ symbol AnonIn
-  , token AnonIs *> ((makeTerm1 .) . invert Expression.Equal <$ symbol AnonNot <|> pure ((makeTerm1 .) . Expression.Equal))
+  [ (makeTerm1 .) . Expression.LessThan         <$ token AnonLAngle
+  , (makeTerm1 .) . Expression.LessThanEqual    <$ token AnonLAngleEqual
+  , (makeTerm1 .) . Expression.GreaterThan      <$ token AnonRAngle
+  , (makeTerm1 .) . Expression.GreaterThanEqual <$ token AnonRAngleEqual
+  , (makeTerm1 .) . Expression.Equal            <$ token AnonEqualEqual
+  , (makeTerm1 .) . invert Expression.Equal     <$ token AnonBangEqual
+  , (makeTerm1 .) . invert Expression.Equal     <$ token AnonLAngleRAngle
+  , (makeTerm1 .) . invert Expression.Member    <$ token AnonNot
+  , (makeTerm1 .) . Expression.Member           <$ token AnonIn
+  , token AnonIs *> ((makeTerm1 .) . invert Expression.Equal <$ token AnonNot <|> pure ((makeTerm1 .) . Expression.Equal))
   ])
   where invert cons a b = Expression.Not (makeTerm1 (cons a b))
 
