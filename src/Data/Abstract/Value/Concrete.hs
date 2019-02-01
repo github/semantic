@@ -113,8 +113,8 @@ instance ( FreeVariables term
                   maybe (pure ()) (`assign` object) maybeSlot
                 Nothing -> pure ()
               for_ (zip names params) $ \(name, param) -> do
-                addr <- lookupDeclaration (Declaration name)
-                assign addr param
+                slot <- lookupSlot (Declaration name)
+                assign slot param
               catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body)))
         _ -> throwValueError (CallError op)
       Evaluator $ runFunctionC (k boxed) eval) op)

@@ -179,6 +179,7 @@ message TypeScriptSyntax {
     JavaScriptRequire javaScriptRequire = 163;
     List list = 164;
     StatementBlock statementBlock = 165;
+    MetaProperty metaProperty = 166;
   }
 }
 
@@ -210,12 +211,14 @@ message Method {
   TypeScriptTerm methodName = 3;
   repeated TypeScriptTerm methodParameters = 4;
   TypeScriptTerm methodBody = 5;
+  AccessControl methodAccessControl = 6;
 }
 
 message MethodSignature {
   repeated TypeScriptTerm methodSignatureContext = 1;
   TypeScriptTerm methodSignatureName = 2;
   repeated TypeScriptTerm methodSignatureParameters = 3;
+  AccessControl methodSignatureAccessControl = 4;
 }
 
 message InterfaceDeclaration {
@@ -229,6 +232,7 @@ message PublicFieldDefinition {
   repeated TypeScriptTerm publicFieldContext = 1;
   TypeScriptTerm publicFieldPropertyName = 2;
   TypeScriptTerm publicFieldValue = 3;
+  AccessControl publicFieldAccessControl = 4;
 }
 
 message VariableDeclaration {
@@ -432,7 +436,9 @@ message InstanceOf {
 }
 
 message New {
-  repeated TypeScriptTerm newSubject = 1;
+  TypeScriptTerm newSubject = 1;
+  TypeScriptTerm newTypeParameters = 2;
+  repeated TypeScriptTerm newArguments = 3;
 }
 
 message Await {
@@ -703,11 +709,13 @@ message AbstractMethodSignature {
   repeated TypeScriptTerm abstractMethodSignatureContext = 1;
   TypeScriptTerm abstractMethodSignatureName = 2;
   repeated TypeScriptTerm abstractMethodSignatureParameters = 3;
+  AccessControl abstractMethodAccessControl = 4;
 }
 
 message IndexSignature {
-  TypeScriptTerm indexSignatureSubject = 1;
-  TypeScriptTerm indexSignatureType = 2;
+  TypeScriptTerm subject = 1;
+  TypeScriptTerm subjectType = 2;
+  TypeScriptTerm typeAnnotation = 3;
 }
 
 message ObjectType {
@@ -835,12 +843,14 @@ message JsxNamespaceName {
 message OptionalParameter {
   repeated TypeScriptTerm optionalParameterContext = 1;
   TypeScriptTerm optionalParameterSubject = 2;
+  AccessControl optionalParameterAccessControl = 3;
 }
 
 message RequiredParameter {
   repeated TypeScriptTerm requiredParameterContext = 1;
   TypeScriptTerm requiredParameterSubject = 2;
   TypeScriptTerm requiredParameterValue = 3;
+  AccessControl requiredParameterAccessControl = 4;
 }
 
 message RestParameter {
@@ -851,6 +861,7 @@ message RestParameter {
 message PropertySignature {
   repeated TypeScriptTerm modifiers = 1;
   TypeScriptTerm propertySignaturePropertyName = 2;
+  AccessControl propertySignatureAccessControl = 3;
 }
 
 message AmbientDeclaration {
@@ -953,6 +964,8 @@ message StatementBlock {
   repeated TypeScriptTerm statements = 1;
 }
 
+message MetaProperty { }
+
 message Alias {
   bytes aliasValue = 1;
   bytes aliasName = 2;
@@ -967,4 +980,10 @@ enum IsRelative {
   Unknown = 0;
   Relative = 1;
   NonRelative = 2;
+}
+
+enum AccessControl {
+  Public = 0;
+  Protected = 1;
+  Private = 2;
 }

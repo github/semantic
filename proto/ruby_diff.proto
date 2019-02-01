@@ -139,6 +139,7 @@ message Method {
   RubyDiff methodName = 3;
   repeated RubyDiff methodParameters = 4;
   RubyDiff methodBody = 5;
+  AccessControl methodAccessControl = 6;
 }
 
 message File { }
@@ -522,4 +523,10 @@ message ZSuper { }
 
 message List {
   repeated RubyDiff listContent = 1;
+}
+
+enum AccessControl {
+  Public = 0;
+  Protected = 1;
+  Private = 2;
 }

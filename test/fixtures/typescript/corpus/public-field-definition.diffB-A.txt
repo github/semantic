@@ -3,105 +3,80 @@
     (TypeIdentifier)
     (Statements
       (PublicFieldDefinition
-        (Empty)
         (Readonly)
         (Empty)
         (Identifier)
         (Empty))
       (PublicFieldDefinition
-        (Empty)
         (Readonly)
         (Empty)
         (Identifier)
         (Empty))
       (PublicFieldDefinition
-        (Identifier)
         (Readonly)
         (Empty)
         (Identifier)
         (Empty))
       (PublicFieldDefinition
-        (Identifier)
         (Readonly)
       {+(Empty)+}
       {-(Annotation
         {-(TypeIdentifier)-})-}
         (Identifier)
         (Float))
-      (PublicFieldDefinition
-      { (Identifier)
-      ->(Identifier) }
-      {+(Readonly)+}
-      {-(Empty)-}
-        (Annotation
-          (TypeIdentifier))
-        (Identifier)
-        (Float))
-      (PublicFieldDefinition
-        (Empty)
-        (Empty)
-        (Annotation
-          (TypeIdentifier))
-        (Identifier)
-        (Float))
-      (PublicFieldDefinition
-        (Empty)
-        (Empty)
-        (Annotation
-          (TypeIdentifier))
-        (Identifier)
-        (Float))
-    {+(PublicFieldDefinition
-      {+(Empty)+}
-      {+(Readonly)+}
-      {+(Annotation
-        {+(TypeIdentifier)+})+}
-      {+(Identifier)+}
-      {+(Float)+})+}
-    {+(PublicFieldDefinition
-      {+(Empty)+}
-      {+(Readonly)+}
-      {+(Annotation
-        {+(TypeIdentifier)+})+}
-      {+(Identifier)+}
-      {+(Float)+})+}
-    {+(PublicFieldDefinition
-      {+(Empty)+}
-      {+(Empty)+}
-      {+(Annotation
-        {+(TypeIdentifier)+})+}
-      {+(Identifier)+}
-      {+(Float)+})+}
-    {+(PublicFieldDefinition
-      {+(Empty)+}
-      {+(Empty)+}
-      {+(Empty)+}
-      {+(Identifier)+}
-      {+(Float)+})+}
-    {-(PublicFieldDefinition
-      {-(Identifier)-}
+    { (PublicFieldDefinition
       {-(Empty)-}
       {-(Annotation
         {-(TypeIdentifier)-})-}
       {-(Identifier)-}
-      {-(Float)-})-}
-    {-(PublicFieldDefinition
-      {-(Identifier)-}
+      {-(Float)-})
+    ->(PublicFieldDefinition
+      {+(Readonly)+}
+      {+(Annotation
+        {+(TypeIdentifier)+})+}
+      {+(Identifier)+}
+      {+(Float)+}) }
+      (PublicFieldDefinition
+        (Empty)
+        (Annotation
+          (TypeIdentifier))
+        (Identifier)
+        (Float))
+      (PublicFieldDefinition
+        (Empty)
+        (Annotation
+          (TypeIdentifier))
+        (Identifier)
+        (Float))
+      (PublicFieldDefinition
+      {+(Readonly)+}
+      {-(Empty)-}
+        (Annotation
+          (TypeIdentifier))
+        (Identifier)
+        (Float))
+    { (PublicFieldDefinition
       {-(Readonly)-}
       {-(Annotation
         {-(TypeIdentifier)-})-}
       {-(Identifier)-}
-      {-(TextElement)-})-}
-    {-(PublicFieldDefinition
-      {-(Empty)-}
-      {-(Empty)-}
-      {-(Annotation
-        {-(TypeIdentifier)-})-}
-      {-(Identifier)-}
-      {-(Float)-})-}
-    {-(PublicFieldDefinition
-      {-(Empty)-}
-      {-(Empty)-}
-      {-(Empty)-}
-      {-(Identifier)-}
-      {-(Float)-})-})))
+      {-(TextElement)-})
+    ->(PublicFieldDefinition
+      {+(Readonly)+}
+      {+(Annotation
+        {+(TypeIdentifier)+})+}
+      {+(Identifier)+}
+      {+(Float)+}) }
+      (PublicFieldDefinition
+        (Empty)
+        (Annotation
+          (TypeIdentifier))
+      { (Identifier)
+      ->(Identifier) }
+        (Float))
+      (PublicFieldDefinition
+        (Empty)
+        (Empty)
+        (Identifier)
+      { (Float)
+      ->(Float) }))))

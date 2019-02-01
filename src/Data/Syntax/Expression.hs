@@ -28,7 +28,7 @@ data Call a = Call { callContext :: ![a], callFunction :: !a, callParams :: ![a]
 
 instance Declarations1 Call where
   liftDeclaredName declaredName Call{..} = declaredName callFunction
-  
+
 instance Evaluatable Call where
   eval eval _ Call{..} = do
     op <- eval callFunction
@@ -413,15 +413,30 @@ instance Evaluatable MemberAccess where
   eval eval _ MemberAccess{..} = do
     lhsValue <- eval lhs
     lhsFrame <- Abstract.scopedEnvironment lhsValue
-    slot <- case lhsFrame of
+
+    rhsSlot <- case lhsFrame of
       Just lhsFrame ->
         withScopeAndFrame lhsFrame $ do
           reference (Reference rhs) (Declaration rhs)
-          lookupDeclaration (Declaration rhs)
+          lookupSlot (Declaration rhs)
       -- Throw a ReferenceError since we're attempting to reference a name within a value that is not an Object.
       Nothing -> throwEvalError (ReferenceError lhsValue rhs)
-    value <- deref slot
-    bindThis lhsValue value
+
+    rhsValue <- deref rhsSlot
+    rhsScope <- scopeLookup (frameAddress rhsSlot)
+
+    let lhsAccessControl = fromMaybe Public (termToAccessControl lhs)
+    infos <- declarationsByAccessControl rhsScope lhsAccessControl
+
+    rhsValue' <- case find (\Info{..} -> Declaration rhs == infoDeclaration) infos of
+      Just _  -> pure rhsValue
+      Nothing -> do
+        let lhsName = fromMaybe (name "") (declaredName lhs)
+        info <- declarationByName rhsScope (Declaration rhs)
+        throwEvalError $ AccessControlError (lhsName, lhsAccessControl) (rhs, infoAccessControl info) rhsValue
+
+    bindThis lhsValue rhsValue'
+
 
   ref eval _ MemberAccess{..} = do
     lhsValue <- eval lhs
@@ -430,7 +445,7 @@ instance Evaluatable MemberAccess where
       Just lhsFrame ->
         withScopeAndFrame lhsFrame $ do
           reference (Reference rhs) (Declaration rhs)
-          lookupDeclaration (Declaration rhs)
+          lookupSlot (Declaration rhs)
       -- Throw a ReferenceError since we're attempting to reference a name within a value that is not an Object.
       Nothing -> throwEvalError (ReferenceError lhsValue rhs)
 
@@ -516,20 +531,20 @@ instance Evaluatable Await where
   eval eval _ (Await a) = eval a
 
 -- | An object constructor call in Javascript, Java, etc.
-data New a = New { subject :: a , typeParameters :: a, arguments :: [a] }
+data New a = New { newSubject :: a , newTypeParameters :: a, newArguments :: [a] }
   deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically New
 
 instance Declarations1 New where
-  liftDeclaredName declaredName New{..} = declaredName subject
+  liftDeclaredName declaredName New{..} = declaredName newSubject
 
 -- TODO: Implement Eval instance for New
 instance Evaluatable New where
   eval eval _ New{..} = do
-    name <- maybeM (throwNoNameError subject) (declaredName subject)
+    name <- maybeM (throwNoNameError newSubject) (declaredName newSubject)
     assocScope <- maybeM (throwEvalError $ ConstructorError name) =<< associatedScope (Declaration name)
     objectScope <- newScope (Map.singleton Superclass [ assocScope ])
-    slot <- lookupDeclaration (Declaration name)
+    slot <- lookupSlot (Declaration name)
     classVal <- deref slot
     classFrame <- maybeM (throwEvalError $ ScopedEnvError classVal) =<< scopedEnvironment classVal
 
@@ -537,17 +552,17 @@ instance Evaluatable New where
     objectVal <- object objectFrame
 
     classScope <- scopeLookup classFrame
-    instanceMembers <- relationsOfScope classScope Instance
+    instanceMembers <- declarationsByRelation classScope Instance
 
     void . withScopeAndFrame objectFrame $ do
       for_ instanceMembers $ \Info{..} -> do
-        declare infoDeclaration Default infoSpan infoAssociatedScope
+        declare infoDeclaration Default infoAccessControl infoSpan infoAssociatedScope
 
       -- TODO: This is a typescript specific name and we should allow languages to customize it.
       let constructorName = Name.name "constructor"
       reference (Reference constructorName) (Declaration constructorName)
-      constructor <- deref =<< lookupDeclaration (Declaration constructorName)
-      args <- traverse eval arguments
+      constructor <- deref =<< lookupSlot (Declaration constructorName)
+      args <- traverse eval newArguments
       boundConstructor <- bindThis objectVal constructor
       call boundConstructor args
 
@@ -579,4 +594,7 @@ instance Tokenize This where
 instance Evaluatable This where
   eval _ _ This = do
     reference (Reference __self) (Declaration __self)
-    deref =<< lookupDeclaration (Declaration __self)
+    deref =<< lookupSlot (Declaration __self)
+
+instance AccessControls1 This where
+  liftTermToAccessControl _ _ = Just Private

@@ -181,6 +181,7 @@ message Method {
   PHPDiff methodName = 3;
   repeated PHPDiff methodParameters = 4;
   PHPDiff methodBody = 5;
+  AccessControl methodAccessControl = 6;
 }
 
 message VariableDeclaration {
@@ -328,7 +329,9 @@ message MemberAccess {
 }
 
 message New {
-  repeated PHPDiff newSubject = 1;
+  PHPDiff newSubject = 1;
+  PHPDiff newTypeParameters = 2;
+  repeated PHPDiff newArguments = 3;
 }
 
 message SequenceExpression {
@@ -720,4 +723,26 @@ message Annotation {
 
 message List {
   repeated PHPDiff listContent = 1;
+}
+
+message Alias {
+  bytes aliasValue = 1;
+  bytes aliasName = 2;
+}
+
+message ImportPath {
+  string unPath = 1;
+  IsRelative pathIsRelative = 2;
+}
+
+enum IsRelative {
+  Unknown = 0;
+  Relative = 1;
+  NonRelative = 2;
+}
+
+enum AccessControl {
+  Public = 0;
+  Protected = 1;
+  Private = 2;
 }

@@ -26,7 +26,7 @@ import qualified Proto3.Suite.DotProto as Proto
 import qualified Proto3.Wire.Encode as Encode
 import qualified Proto3.Wire.Decode as Decode
 import Control.Abstract.ScopeGraph (reference, Reference(..), Declaration(..))
-import Control.Abstract.Heap (deref, lookupDeclaration)
+import Control.Abstract.Heap (deref, lookupSlot)
 
 -- Combinators
 
@@ -167,7 +167,7 @@ instance Evaluatable Identifier where
 
   ref _ _ (Identifier name) = do
     reference (Reference name) (Declaration name)
-    lookupDeclaration (Declaration name)
+    lookupSlot (Declaration name)
 
 
 instance Tokenize Identifier where

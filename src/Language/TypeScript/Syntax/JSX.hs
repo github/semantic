@@ -8,6 +8,7 @@ import qualified Data.Text as T
 import           Proto3.Suite
 
 import           Data.Abstract.Evaluatable
+import           Data.Abstract.ScopeGraph (AccessControl(..))
 import           Data.JSON.Fields
 import           Diffing.Algorithm
 import qualified Data.Map.Strict as Map
@@ -61,13 +62,13 @@ newtype ImplementsClause a = ImplementsClause { implementsClauseTypes :: [a] }
 
 instance Evaluatable ImplementsClause
 
-data OptionalParameter a = OptionalParameter { optionalParameterContext :: ![a], optionalParameterSubject :: !a }
+data OptionalParameter a = OptionalParameter { optionalParameterContext :: ![a], optionalParameterSubject :: !a, optionalParameterAccessControl :: AccessControl }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
   deriving (Eq1, Show1, Ord1) via Generically OptionalParameter
 
 instance Evaluatable OptionalParameter
 
-data RequiredParameter a = RequiredParameter { requiredParameterContext :: [a], requiredParameterSubject :: a, requiredParameterValue :: a }
+data RequiredParameter a = RequiredParameter { requiredParameterContext :: [a], requiredParameterSubject :: a, requiredParameterValue :: a, requiredParameterAccessControl :: AccessControl }
   deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
   deriving (Eq1, Show1, Ord1) via Generically RequiredParameter
 
@@ -78,7 +79,7 @@ instance Evaluatable RequiredParameter where
   eval eval ref RequiredParameter{..} = do
     name <- maybeM (throwNoNameError requiredParameterSubject) (declaredName requiredParameterSubject)
     span <- ask @Span
-    declare (Declaration name) Default span Nothing
+    declare (Declaration name) Default Public span Nothing
 
     lhs <- ref requiredParameterSubject
     rhs <- eval requiredParameterValue
