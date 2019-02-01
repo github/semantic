@@ -31,7 +31,7 @@ resolveGoImport :: ( Member (Modules address value) sig
                    )
                 => ImportPath
                 -> Evaluator term address value m [ModulePath]
-resolveGoImport (ImportPath path Unknown) = throwResolutionError $ GoImportError path
+resolveGoImport (ImportPath path Data.ImportPath.Unknown) = throwResolutionError $ GoImportError path
 resolveGoImport (ImportPath path Relative) = do
   ModuleInfo{..} <- currentModule
   paths <- listModulesInDir (joinPaths (takeDirectory modulePath) path)
@@ -79,8 +79,8 @@ instance Evaluatable QualifiedImport where
     alias <- maybeM (throwNoNameError aliasTerm) (declaredName aliasTerm)
     span <- ask @Span
     scopeAddress <- newScope mempty
-    declare (Declaration alias) Default span ScopeGraph.QualifiedImport (Just scopeAddress)
-    aliasSlot <- lookupDeclaration (Declaration alias)
+    declare (Declaration alias) Default Public span ScopeGraph.QualifiedImport (Just scopeAddress)
+    aliasSlot <- lookupSlot (Declaration alias)
 
     withScope scopeAddress $ do
       let

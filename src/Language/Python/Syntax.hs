@@ -163,9 +163,9 @@ instance Evaluatable Import where
     aliasName <- maybeM (throwNoNameError aliasTerm) (declaredAlias aliasTerm)
     _ <- eval aliasTerm
     aliasSpan <- get @Span
-    declare (Declaration aliasName) Default aliasSpan ScopeGraph.UnqualifiedImport (Just importScope)
+    declare (Declaration aliasName) Default Public aliasSpan ScopeGraph.UnqualifiedImport (Just importScope)
     -- Retrieve the frame slot for the new declaration.
-    aliasSlot <- lookupDeclaration (Declaration aliasName)
+    aliasSlot <- lookupSlot (Declaration aliasName)
     assign aliasSlot =<< object aliasFrame
 
     unit
@@ -235,8 +235,8 @@ instance Evaluatable QualifiedImport where
         _ <- eval nameTerm
         span <- get @Span
         scopeAddress <- newScope mempty
-        declare (Declaration name) Default span ScopeGraph.QualifiedImport (Just scopeAddress)
-        aliasSlot <- lookupDeclaration (Declaration name)
+        declare (Declaration name) Default Public span ScopeGraph.QualifiedImport (Just scopeAddress)
+        aliasSlot <- lookupSlot (Declaration name)
         -- a.b.c
         withScope scopeAddress $
           mkScopeMap modulePath (\scopeMap -> do
@@ -268,10 +268,10 @@ instance Evaluatable QualifiedAliasedImport where
     span <- ask @Span
     scopeAddress <- newScope mempty
     alias <- maybeM (throwNoNameError aliasTerm) (declaredName aliasTerm)
-    declare (Declaration alias) Default span ScopeGraph.QualifiedAliasedImport (Just scopeAddress)
+    declare (Declaration alias) Default Public span ScopeGraph.QualifiedAliasedImport (Just scopeAddress)
     objFrame <- newFrame scopeAddress mempty
     val <- object objFrame
-    aliasSlot <- lookupDeclaration (Declaration alias)
+    aliasSlot <- lookupSlot (Declaration alias)
     assign aliasSlot val
 
     withScopeAndFrame objFrame .

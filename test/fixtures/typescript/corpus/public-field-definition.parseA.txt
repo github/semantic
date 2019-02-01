@@ -3,31 +3,26 @@
     (TypeIdentifier)
     (Statements
       (PublicFieldDefinition
-        (Empty)
         (Readonly)
         (Empty)
         (Identifier)
         (Empty))
       (PublicFieldDefinition
-        (Empty)
         (Readonly)
         (Empty)
         (Identifier)
         (Empty))
       (PublicFieldDefinition
-        (Identifier)
         (Readonly)
         (Empty)
         (Identifier)
         (Empty))
       (PublicFieldDefinition
-        (Identifier)
         (Readonly)
         (Empty)
         (Identifier)
         (Float))
       (PublicFieldDefinition
-        (Identifier)
         (Readonly)
         (Annotation
           (TypeIdentifier))
@@ -35,20 +30,23 @@
         (Float))
       (PublicFieldDefinition
         (Empty)
-        (Empty)
         (Annotation
           (TypeIdentifier))
         (Identifier)
         (Float))
       (PublicFieldDefinition
         (Empty)
-        (Empty)
         (Annotation
           (TypeIdentifier))
         (Identifier)
         (Float))
       (PublicFieldDefinition
-        (Empty)
+        (Readonly)
+        (Annotation
+          (TypeIdentifier))
+        (Identifier)
+        (Float))
+      (PublicFieldDefinition
         (Readonly)
         (Annotation
           (TypeIdentifier))
@@ -56,20 +54,11 @@
         (Float))
       (PublicFieldDefinition
         (Empty)
-        (Readonly)
         (Annotation
           (TypeIdentifier))
         (Identifier)
         (Float))
       (PublicFieldDefinition
-        (Empty)
-        (Empty)
-        (Annotation
-          (TypeIdentifier))
-        (Identifier)
-        (Float))
-      (PublicFieldDefinition
-        (Empty)
         (Empty)
         (Empty)
         (Identifier)

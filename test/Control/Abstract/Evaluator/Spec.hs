@@ -35,11 +35,11 @@ spec = parallel $ do
       let lexicalEdges = Map.singleton Lexical [ currentScope' ]
           x =  SpecHelpers.name "x"
       associatedScope <- newScope lexicalEdges
-      declare (ScopeGraph.Declaration "identity") Default emptySpan ScopeGraph.Unknown (Just associatedScope)
+      declare (ScopeGraph.Declaration "identity") Default Public emptySpan ScopeGraph.Unknown (Just associatedScope)
       withScope associatedScope $ do
-        declare (Declaration x) Default emptySpan ScopeGraph.Unknown Nothing
+        declare (Declaration x) Default Public emptySpan ScopeGraph.Unknown Nothing
       identity <- function "identity" [ x ]
-        (SpecEff (Heap.lookupDeclaration (ScopeGraph.Declaration (SpecHelpers.name "x")) >>= deref)) associatedScope
+        (SpecEff (Heap.lookupSlot (ScopeGraph.Declaration (SpecHelpers.name "x")) >>= deref)) associatedScope
       val <- integer 123
       call identity [val]
     expected `shouldBe` Right (Value.Integer (Number.Integer 123))

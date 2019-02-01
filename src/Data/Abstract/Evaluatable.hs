@@ -29,6 +29,8 @@ import Data.Abstract.FreeVariables as X
 import Data.Abstract.Module
 import Data.Abstract.Name as X
 import qualified Data.Abstract.ScopeGraph as ScopeGraph 
+import Data.Abstract.ScopeGraph (Relation(..))
+import Data.Abstract.AccessControls.Class as X
 import Data.Language
 import Data.Scientific (Scientific)
 import Data.Semigroup.App
@@ -44,6 +46,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Carrier sig m
           , Declarations term
           , FreeVariables term
+          , AccessControls term
           , Member (Allocator address) sig
           , Member (Bitwise value) sig
           , Member (Boolean value) sig
@@ -148,26 +151,26 @@ instance HasPrelude 'PHP
 
 instance HasPrelude 'Python where
   definePrelude _ =
-    defineBuiltIn (Declaration $ X.name "print") Default Print
+    defineBuiltIn (Declaration $ X.name "print") Default Public Print
 
 instance HasPrelude 'Ruby where
   definePrelude _ = do
     defineSelf
 
-    defineBuiltIn (Declaration $ X.name "puts") Default Print
+    defineBuiltIn (Declaration $ X.name "puts") Default Public Print
 
     defineClass (Declaration (X.name "Object")) [] $ do
-      defineBuiltIn (Declaration $ X.name "inspect") Default Show
+      defineBuiltIn (Declaration $ X.name "inspect") Default Public Show
 
 instance HasPrelude 'TypeScript where
   definePrelude _ = do
     defineSelf
-    defineNamespace (Declaration (X.name "console")) $ defineBuiltIn (Declaration $ X.name "log") Default Print
+    defineNamespace (Declaration (X.name "console")) $ defineBuiltIn (Declaration $ X.name "log") Default Public Print
 
 instance HasPrelude 'JavaScript where
   definePrelude _ = do
     defineSelf
-    defineNamespace (Declaration (X.name "console")) $ defineBuiltIn (Declaration $ X.name "log") Default Print
+    defineNamespace (Declaration (X.name "console")) $ defineBuiltIn (Declaration $ X.name "log") Default Public Print
 
 defineSelf :: ( Carrier sig m
               , Member (State (ScopeGraph address)) sig
@@ -185,8 +188,8 @@ defineSelf :: ( Carrier sig m
            => Evaluator term address value m ()
 defineSelf = do
   let self = Declaration X.__self
-  declare self Prelude emptySpan ScopeGraph.Unknown Nothing
-  slot <- lookupDeclaration self
+  declare self Default Public emptySpan ScopeGraph.Unknown Nothing
+  slot <- lookupSlot self
   assign slot =<< object =<< currentFrame
 
 
@@ -194,6 +197,7 @@ defineSelf = do
 
 -- | The type of error thrown when failing to evaluate a term.
 data EvalError term address value return where
+  AccessControlError  :: (Name, AccessControl) -> (Name, AccessControl) -> value -> EvalError term address value value
   ConstructorError    :: Name -> EvalError term address value address
   DefaultExportError  :: EvalError term address value ()
   DerefError          :: value -> EvalError term address value value
@@ -220,6 +224,7 @@ deriving instance (Show term, Show value) => Show (EvalError term address value 
 
 instance (NFData term, NFData value) => NFData1 (EvalError term address value) where
   liftRnf _ x = case x of
+    AccessControlError requester requested v -> rnf requester `seq` rnf requested `seq` rnf v
     ConstructorError n -> rnf n
     DefaultExportError -> ()
     DerefError v -> rnf v
@@ -235,15 +240,16 @@ instance (NFData term, NFData value, NFData return) => NFData (EvalError term ad
   rnf = liftRnf rnf
 
 instance (Eq term, Eq value) => Eq1 (EvalError term address value) where
-  liftEq _ (DerefError v) (DerefError v2)                  = v == v2
-  liftEq _ DefaultExportError DefaultExportError           = True
-  liftEq _ (ExportError a b) (ExportError c d)             = (a == c) && (b == d)
-  liftEq _ (FloatFormatError a) (FloatFormatError b)       = a == b
-  liftEq _ (IntegerFormatError a) (IntegerFormatError b)   = a == b
-  liftEq _ (NoNameError t1)       (NoNameError t2)         = t1 == t2
-  liftEq _ (RationalFormatError a) (RationalFormatError b) = a == b
-  liftEq _ (ReferenceError v n) (ReferenceError v2 n2)     = (v == v2) && (n == n2)
-  liftEq _ _ _                                             = False
+  liftEq _ (AccessControlError a b c) (AccessControlError a' b' c') = a == a' && b == b' && c == c'
+  liftEq _ (DerefError v) (DerefError v2)                           = v == v2
+  liftEq _ DefaultExportError DefaultExportError                    = True
+  liftEq _ (ExportError a b) (ExportError c d)                      = a == c && b == d
+  liftEq _ (FloatFormatError a) (FloatFormatError b)                = a == b
+  liftEq _ (IntegerFormatError a) (IntegerFormatError b)            = a == b
+  liftEq _ (NoNameError t1)       (NoNameError t2)                  = t1 == t2
+  liftEq _ (RationalFormatError a) (RationalFormatError b)          = a == b
+  liftEq _ (ReferenceError v n) (ReferenceError v2 n2)              = v == v2 && n == n2
+  liftEq _ _ _                                                      = False
 
 instance (Show term, Show value) => Show1 (EvalError term address value) where
   liftShowsPrec _ _ = showsPrec

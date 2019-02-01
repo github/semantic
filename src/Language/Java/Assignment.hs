@@ -13,6 +13,7 @@ import Prologue hiding (for, try, This, catches, finally)
 import           Assigning.Assignment hiding (Assignment, Error, try)
 import qualified Assigning.Assignment as Assignment
 import           Data.Abstract.Name
+import qualified Data.Abstract.ScopeGraph as ScopeGraph (AccessControl(..))
 import           Data.Functor (($>))
 import           Data.List.NonEmpty (some1)
 import           Data.Syntax
@@ -334,12 +335,13 @@ fieldDeclaration :: Assignment Term
 fieldDeclaration = makeTerm <$> symbol FieldDeclaration <*> children ((,) <$> manyTerm modifier <*> type' <**> variableDeclaratorList)
 
 method :: Assignment Term
-method = makeTerm <$> symbol MethodDeclaration <*> children (makeMethod <$> many modifier <*> emptyTerm <*> methodHeader <*> methodBody)
+method = makeTerm <$> symbol MethodDeclaration <*> children (makeMethod <$> many modifier <*> emptyTerm <*> pure accessibility <*> methodHeader <*> methodBody)
   where
     methodBody = symbol MethodBody *> children (term expression <|> emptyTerm)
     methodDeclarator = symbol MethodDeclarator *> children ( (,) <$> identifier <*> formalParameters)
+    accessibility = ScopeGraph.Public
     methodHeader = symbol MethodHeader *> children ((,,,,) <$> (typeParameters <|> pure []) <*> manyTerm annotation <*> type' <*> methodDeclarator <*> (throws <|> pure []))
-    makeMethod modifiers receiver (typeParams, annotations, returnType, (name, params), throws) = Declaration.Method (returnType : modifiers <> typeParams <> annotations <> throws) receiver name params
+    makeMethod modifiers receiver accessibility (typeParams, annotations, returnType, (name, params), throws) methodBody = Declaration.Method (returnType : modifiers <> typeParams <> annotations <> throws) receiver name params methodBody accessibility
 
 generic :: Assignment Term
 generic = makeTerm <$> symbol Grammar.GenericType <*> children(Java.Syntax.GenericType <$> term type' <*> manyTerm type')

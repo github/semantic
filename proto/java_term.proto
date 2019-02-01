@@ -150,6 +150,7 @@ message Method {
   JavaTerm methodName = 3;
   repeated JavaTerm methodParameters = 4;
   JavaTerm methodBody = 5;
+  AccessControl methodAccessControl = 6;
 }
 
 message VariableDeclaration {
@@ -639,4 +640,10 @@ message Return {
 
 message List {
   repeated JavaTerm listContent = 1;
+}
+
+enum AccessControl {
+  Public = 0;
+  Protected = 1;
+  Private = 2;
 }
