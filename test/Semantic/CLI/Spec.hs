@@ -18,13 +18,13 @@ spec = parallel $ do
   describe "parseDiffBuilder" $
     for_ diffFixtures $ \ (diffRenderer, runDiff, files, expected) ->
       it ("renders to " <> diffRenderer <> " with files " <> show files) $ do
-        output <- runTask $ readBlobPairs (Right files) >>= runDiff
+        output <- runTaskOrDie $ readBlobPairs (Right files) >>= runDiff
         runBuilder output `shouldBe'` expected
 
   describe "parseTermBuilder" $
     for_ parseFixtures $ \ (format, runParse, files, expected) ->
       it ("renders to " <> format <> " with files " <> show files) $ do
-        output <- runTask $ readBlobs (Right files) >>= runParse
+        output <- runTaskOrDie $ readBlobs (Right files) >>= runParse
         runBuilder output `shouldBe'` expected
   where
     shouldBe' actual' expectedFile = do

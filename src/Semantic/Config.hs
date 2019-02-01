@@ -52,16 +52,15 @@ data Config
 data Options
   = Options
   { optionsLogLevel         :: Maybe Level   -- ^ What level of messages to log. 'Nothing' disables logging.
-  , optionsRequestID        :: Maybe String  -- ^ Optional request id for tracing across systems.
   , optionsFailOnWarning    :: Bool          -- ^ Should semantic fail fast on assignment warnings (for testing)
   , optionsFailOnParseError :: Bool          -- ^ Should semantic fail fast on tree-sitter parser errors (for testing)
   }
 
 defaultOptions :: Options
-defaultOptions = Options (Just Warning) Nothing False False
+defaultOptions = Options (Just Warning) False False
 
 debugOptions :: Options
-debugOptions = Options (Just Debug) Nothing False False
+debugOptions = Options (Just Debug) False False
 
 defaultConfig :: Options -> IO Config
 defaultConfig options@Options{..} = do
@@ -111,8 +110,7 @@ logOptionsFromConfig Config{..} = LogOptions
                    , ("hostname", configHostName)
                    , ("sha", fromMaybe "development" configSHA)
                    ]
-                   <> [("request_id", x) | x <- toList (optionsRequestID configOptions) ]
-          _ -> []
+          _     -> []
 
 
 withLoggerFromConfig :: Config -> (LogQueue -> IO c) -> IO c

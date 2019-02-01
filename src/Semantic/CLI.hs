@@ -15,8 +15,9 @@ import qualified Semantic.AST as AST
 import           Semantic.Config
 import qualified Semantic.Graph as Graph
 import qualified Semantic.Task as Task
-import           Semantic.Task.Files
 import qualified Semantic.Telemetry.Log as Log
+import           Semantic.Task.Files
+import           Semantic.Telemetry
 import           Semantic.Version
 import           System.Exit (die)
 import           System.FilePath
@@ -26,8 +27,9 @@ import           Text.Read
 main :: IO ()
 main = do
   (options, task) <- customExecParser (prefs showHelpOnEmpty) arguments
-  res <- Task.withOptions options $ \ config logger statter ->
-    Task.runTaskWithConfig config { configSHA = Just buildSHA } logger statter task
+  config <- defaultConfig options
+  res <- withTelemetry config $ \ (TelemetryQueues logger statter _) ->
+    Task.runTask (Task.TaskSession config "-" logger statter) task
   either (die . displayException) pure res
 
 -- | A parser for the application's command-line arguments.
@@ -46,7 +48,7 @@ optionsParser = do
                       (long "log-level" <> value (Just Log.Warning) <> help "Log messages at or above this level, or disable logging entirely.")
   failOnWarning <- switch (long "fail-on-warning" <> help "Fail on assignment warnings.")
   failOnParseError <- switch (long "fail-on-parse-error" <> help "Fail on tree-sitter parse errors.")
-  pure $ Options logLevel Nothing failOnWarning failOnParseError
+  pure $ Options logLevel failOnWarning failOnParseError
 
 argumentsParser :: Parser (Task.TaskEff ())
 argumentsParser = do
