@@ -8,7 +8,6 @@
     ->(TypeIdentifier) }
     { (PublicFieldDefinition
       {-(Empty)-}
-      {-(Empty)-}
       {-(Annotation
         {-(TypeIdentifier)-})-}
       {-(Identifier)-}
@@ -33,7 +32,6 @@
     {-(Identifier)-}
     {-(RequiredParameter
       {-(Empty)-}
-      {-(Empty)-}
       {-(Annotation
         {-(PredefinedType)-})-}
       {-(Identifier)-}
@@ -47,7 +45,6 @@
         {-(PredefinedType)-})-}
       {-(Identifier)-}
       {-(RequiredParameter
-        {-(Empty)-}
         {-(Empty)-}
         {-(Annotation
           {-(PredefinedType)-})-}
@@ -65,7 +62,6 @@
       {-(ObjectType
         {-(PropertySignature
           {-(Empty)-}
-          {-(Empty)-}
           {-(Annotation
             {-(PredefinedType)-})-}
           {-(Identifier)-})-})-})-}
@@ -75,18 +71,15 @@
       {-(ObjectType
         {-(PropertySignature
           {-(Empty)-}
-          {-(Empty)-}
           {-(Annotation
             {-(PredefinedType)-})-}
           {-(Identifier)-})-}
         {-(PropertySignature
           {-(Empty)-}
-          {-(Empty)-}
           {-(Annotation
             {-(PredefinedType)-})-}
           {-(Identifier)-})-}
         {-(PropertySignature
-          {-(Empty)-}
           {-(Empty)-}
           {-(Annotation
             {-(PredefinedType)-})-}
@@ -99,10 +92,8 @@
           (Empty)
           (Empty)
           (Empty)
-          (Empty)
           (Identifier)
           (RequiredParameter
-            (Empty)
             (Empty)
             (Annotation
               (PredefinedType))
@@ -110,13 +101,11 @@
             (Empty)))
         (PublicFieldDefinition
           (Empty)
-          (Empty)
           (Annotation
             (PredefinedType))
           (Identifier)
           (Empty))
         (MethodSignature
-          (Empty)
           (Empty)
           (Empty)
           (Annotation

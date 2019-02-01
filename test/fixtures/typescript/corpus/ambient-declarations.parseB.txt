@@ -19,10 +19,8 @@
           (Empty)
           (Empty)
           (Empty)
-          (Empty)
           (Identifier)
           (RequiredParameter
-            (Empty)
             (Empty)
             (Annotation
               (PredefinedType))
@@ -30,13 +28,11 @@
             (Empty)))
         (PublicFieldDefinition
           (Empty)
-          (Empty)
           (Annotation
             (PredefinedType))
           (Identifier)
           (Empty))
         (MethodSignature
-          (Empty)
           (Empty)
           (Empty)
           (Annotation

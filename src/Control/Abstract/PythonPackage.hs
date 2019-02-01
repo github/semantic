@@ -50,7 +50,7 @@ instance ( Carrier sig m
               put (FindPackages as)
             else if Just (name "setup") == name' then do
               packageState <- get
-              if packageState == Unknown then do
+              if packageState == Control.Abstract.PythonPackage.Unknown then do
                 as <- maybe (pure mempty) (fmap (fmap stripQuotes) . asStrings) (Map.lookup (name "packages") bindings)
                 put (Packages as)
                 else

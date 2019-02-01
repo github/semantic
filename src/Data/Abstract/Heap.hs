@@ -6,7 +6,7 @@ module Data.Abstract.Heap
   , scopeLookup
   , frameSlots
   , frameLinks
-  , getSlot
+  , getSlotValue
   , setSlot
   , deleteSlot
   , initFrame
@@ -77,8 +77,8 @@ frameSlots address = fmap slots . frameLookup address
 frameLinks :: Ord address => address -> Heap scope address value -> Maybe (Map EdgeLabel (Map scope address))
 frameLinks address = fmap links . frameLookup address
 
-getSlot :: Ord address => Slot address -> Heap address address value -> Maybe (Set value)
-getSlot Slot{..} = (IntMap.lookup (unPosition position) =<<) . frameSlots frameAddress
+getSlotValue :: Ord address => Slot address -> Heap address address value -> Maybe (Set value)
+getSlotValue Slot{..} = (IntMap.lookup (unPosition position) =<<) . frameSlots frameAddress
 
 setSlot :: Ord address => Slot address -> Set value -> Heap scope address value -> Heap scope address value
 setSlot Slot{..} value h@(Heap heap) = case frameLookup frameAddress h of
@@ -92,7 +92,12 @@ deleteSlot Slot{..} h@(Heap heap) = case frameLookup frameAddress h of
     Heap (Map.insert frameAddress (frame { slots = IntMap.delete (unPosition position) slotMap }) heap)
   Nothing -> h
 
-lookupDeclaration :: Ord address => Declaration -> (address, address) -> ScopeGraph address -> Heap address address value -> Maybe (Slot address)
+lookupDeclaration :: Ord address
+                  => Declaration
+                  -> (address, address)
+                  -> ScopeGraph address
+                  -> Heap address address value
+                  -> Maybe (Slot address)
 lookupDeclaration Declaration{..} (currentScope, currentFrame) scopeGraph heap = do
   path <- lookupScopePath unDeclaration currentScope scopeGraph
   frameAddress <- lookupFrameAddress path  currentFrame heap

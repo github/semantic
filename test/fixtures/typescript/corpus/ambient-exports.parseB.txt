@@ -6,13 +6,11 @@
       (Identifier)
       (RequiredParameter
         (Empty)
-        (Empty)
         (Annotation
           (PredefinedType))
         (Identifier)
         (Empty))
       (RequiredParameter
-        (Empty)
         (Empty)
         (Annotation
           (PredefinedType))

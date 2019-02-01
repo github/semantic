@@ -43,7 +43,7 @@ spec = parallel $ do
       \sp -> shouldRoundtrip @BlobPair sp
   describe "spans" $
     prop "roundtrips" $
-      \x -> shouldRoundtrip @Span x 
+      \x -> shouldRoundtrip @Span x
   describe "pos" $
     prop "roundtrips" $
       \x -> shouldRoundtrip @Pos x
@@ -93,9 +93,9 @@ spec = parallel $ do
     prop "roundtrips" $
       \sp -> shouldRoundtrip1 @Statement.Statements @(Term (Sum Syntax) ()) (unListableF sp)
 
-  describe "methods" $
-    prop "roundtrips" $
-      \sp -> shouldRoundtrip1 @Declaration.Method @(Term (Sum Syntax) ()) (unListableF sp)
+  -- describe "methods" $
+  --   prop "roundtrips" $
+  --     \sp -> shouldRoundtrip1 @Declaration.Method @(Term (Sum Syntax) ()) (unListableF sp)
 
   describe "blobs" $ do
     it "should roundtrip given a Message instance" $ do

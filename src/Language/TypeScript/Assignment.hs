@@ -9,6 +9,7 @@ module Language.TypeScript.Assignment
 
 import Assigning.Assignment hiding (Assignment, Error)
 import Data.Abstract.Name (Name, name)
+import qualified Data.Abstract.ScopeGraph as ScopeGraph (AccessControl(..))
 import qualified Assigning.Assignment as Assignment
 import Data.Sum
 import Data.Syntax
@@ -363,8 +364,8 @@ abstractClass :: Assignment Term
 abstractClass = makeTerm <$> symbol Grammar.AbstractClass <*> children (TypeScript.Syntax.AbstractClass <$> term typeIdentifier <*> (term typeParameters <|> emptyTerm) <*> (classHeritage' <|> pure []) <*> classBodyStatements)
 
 abstractMethodSignature :: Assignment Term
-abstractMethodSignature = makeSignature <$> symbol Grammar.AbstractMethodSignature <*> children ((,,) <$> (term accessibilityModifier' <|> emptyTerm) <*> term propertyName <*> callSignatureParts)
-  where makeSignature loc (modifier, propertyName, (typeParams, params, annotation)) = makeTerm loc (TypeScript.Syntax.AbstractMethodSignature [modifier, typeParams, annotation] propertyName params)
+abstractMethodSignature = makeSignature <$> symbol Grammar.AbstractMethodSignature <*> children ((,,) <$> accessibilityModifier' <*> term propertyName <*> callSignatureParts)
+  where makeSignature loc (modifier, propertyName, (typeParams, params, annotation)) = makeTerm loc (TypeScript.Syntax.AbstractMethodSignature [typeParams, annotation] propertyName params modifier)
 
 classHeritage' :: Assignment [Term]
 classHeritage' = symbol Grammar.ClassHeritage *> children ((mappend `on` toList) <$> optional (term extendsClause) <*> optional (term implementsClause'))
@@ -485,8 +486,13 @@ parameter =  requiredParameter
          <|> restParameter
          <|> optionalParameter
 
-accessibilityModifier' :: Assignment Term
-accessibilityModifier' = makeTerm <$> symbol AccessibilityModifier <*> children (Syntax.Identifier . name <$> source)
+accessibilityModifier' :: Assignment ScopeGraph.AccessControl
+accessibilityModifier' = (symbol AccessibilityModifier >> children (public <|> protected <|> private)) <|> default'
+  where public    = symbol AnonPublic    >> pure ScopeGraph.Public
+        protected = symbol AnonProtected >> pure ScopeGraph.Protected
+        private   = symbol AnonPrivate   >> pure ScopeGraph.Private
+        default'  = pure ScopeGraph.Public
+
 
 destructuringPattern :: Assignment Term
 destructuringPattern = object <|> array
@@ -500,9 +506,9 @@ readonly' = makeTerm <$> symbol Readonly <*> (Type.Readonly <$ rawSource)
 methodDefinition :: Assignment Term
 methodDefinition = makeMethod <$>
   symbol MethodDefinition
-  <*> children ((,,,,,) <$> (term accessibilityModifier' <|> emptyTerm) <*> (term readonly' <|> emptyTerm) <*> emptyTerm <*> term propertyName <*> callSignatureParts <*> term statementBlock)
+  <*> children ((,,,,,) <$> accessibilityModifier' <*> (term readonly' <|> emptyTerm) <*> emptyTerm <*> term propertyName <*> callSignatureParts <*> term statementBlock)
   where
-    makeMethod loc (modifier, readonly, receiver, propertyName', (typeParameters', params, ty'), statements) = makeTerm loc (Declaration.Method [modifier, readonly, typeParameters', ty'] receiver propertyName' params statements)
+    makeMethod loc (modifier, readonly, receiver, propertyName', (typeParameters', params, ty'), statements) = makeTerm loc (Declaration.Method [readonly, typeParameters', ty'] receiver propertyName' params statements modifier)
 
 callSignatureParts :: Assignment (Term, [Term], Term)
 callSignatureParts = contextualize' <$> Assignment.manyThrough comment (postContextualize' <$> callSignature' <*> many comment)
@@ -525,8 +531,8 @@ indexSignature :: Assignment Term
 indexSignature = makeTerm <$> symbol Grammar.IndexSignature <*> children (TypeScript.Syntax.IndexSignature <$> term identifier <*> predefinedTy <*> term typeAnnotation')
 
 methodSignature :: Assignment Term
-methodSignature = makeMethodSignature <$> symbol Grammar.MethodSignature <*> children ((,,,) <$> (term accessibilityModifier' <|> emptyTerm) <*> (term readonly' <|> emptyTerm) <*> term propertyName <*> callSignatureParts)
-  where makeMethodSignature loc (modifier, readonly, propertyName, (typeParams, params, annotation)) = makeTerm loc (Declaration.MethodSignature [modifier, readonly, typeParams, annotation] propertyName params)
+methodSignature = makeMethodSignature <$> symbol Grammar.MethodSignature <*> children ((,,,) <$> accessibilityModifier' <*> (term readonly' <|> emptyTerm) <*> term propertyName <*> callSignatureParts)
+  where makeMethodSignature loc (accessControl, readonly, propertyName, (typeParams, params, annotation)) = makeTerm loc (Declaration.MethodSignature [readonly, typeParams, annotation] propertyName params accessControl)
 
 formalParameters :: Assignment [Term]
 formalParameters = symbol FormalParameters *> children (contextualize' <$> Assignment.manyThrough comment (postContextualize' <$> (concat <$> many ((\as b -> as <> [b]) <$> manyTerm decorator <*> term parameter)) <*> many comment))
@@ -670,8 +676,8 @@ classBodyStatements = makeTerm'' <$> symbol ClassBody <*> children (contextualiz
       Nothing -> formalParams
 
 publicFieldDefinition :: Assignment Term
-publicFieldDefinition = makeField <$> symbol Grammar.PublicFieldDefinition <*> children ((,,,,) <$> (term accessibilityModifier' <|> emptyTerm) <*> (term readonly' <|> emptyTerm) <*> term propertyName <*> (term typeAnnotation' <|> emptyTerm) <*> (term expression <|> emptyTerm))
-  where makeField loc (modifier, readonly, propertyName, annotation, expression) = makeTerm loc (Declaration.PublicFieldDefinition [modifier, readonly, annotation] propertyName expression)
+publicFieldDefinition = makeField <$> symbol Grammar.PublicFieldDefinition <*> children ((,,,,) <$> accessibilityModifier' <*> (term readonly' <|> emptyTerm) <*> term propertyName <*> (term typeAnnotation' <|> emptyTerm) <*> (term expression <|> emptyTerm))
+  where makeField loc (accessControl, readonly, propertyName, annotation, expression) = makeTerm loc (Declaration.PublicFieldDefinition [readonly, annotation] propertyName expression accessControl)
 
 
 statement :: Assignment Term
@@ -826,8 +832,8 @@ exportStatement = makeTerm <$> symbol Grammar.ExportStatement <*> children (flip
     fromClause = symbol Grammar.String *> (TypeScript.Resolution.importPath <$> source)
 
 propertySignature :: Assignment Term
-propertySignature = makePropertySignature <$> symbol Grammar.PropertySignature <*> children ((,,,) <$> (term accessibilityModifier' <|> emptyTerm) <*> (term readonly' <|> emptyTerm) <*> term propertyName <*> (term typeAnnotation' <|> emptyTerm))
-  where makePropertySignature loc (modifier, readonly, propertyName, annotation) = makeTerm loc (TypeScript.Syntax.PropertySignature [modifier, readonly, annotation] propertyName)
+propertySignature = makePropertySignature <$> symbol Grammar.PropertySignature <*> children ((,,,) <$> accessibilityModifier' <*> (term readonly' <|> emptyTerm) <*> term propertyName <*> (term typeAnnotation' <|> emptyTerm))
+  where makePropertySignature loc (modifier, readonly, propertyName, annotation) = makeTerm loc (TypeScript.Syntax.PropertySignature [readonly, annotation] propertyName modifier)
 
 propertyName :: Assignment Term
 propertyName = term (propertyIdentifier <|> string <|> number <|> computedPropertyName)
@@ -845,21 +851,21 @@ requiredParameter :: Assignment Term
 requiredParameter = makeRequiredParameter
                  <$> symbol Grammar.RequiredParameter
                  <*> children ( (,,,,)
-                             <$> (term accessibilityModifier' <|> emptyTerm)
+                             <$> accessibilityModifier'
                              <*> (term readonly' <|> emptyTerm)
                              <*> term (identifier <|> destructuringPattern <|> this)
                              <*> (term typeAnnotation' <|> emptyTerm)
                              <*> (term expression <|> emptyTerm))
   where
-    makeRequiredParameter loc (modifier, readonly, identifier, annotation, initializer) = makeTerm loc (TypeScript.Syntax.RequiredParameter [modifier, readonly, annotation] identifier initializer)
+    makeRequiredParameter loc (modifier, readonly, identifier, annotation, initializer) = makeTerm loc (TypeScript.Syntax.RequiredParameter [readonly, annotation] identifier initializer modifier)
 
 restParameter :: Assignment Term
 restParameter = makeRestParameter <$> symbol Grammar.RestParameter <*> children ((,) <$> term identifier <*> (term typeAnnotation' <|> emptyTerm))
   where makeRestParameter loc (identifier, annotation) = makeTerm loc (TypeScript.Syntax.RestParameter [annotation] identifier)
 
 optionalParameter :: Assignment Term
-optionalParameter = makeOptionalParam <$> symbol Grammar.OptionalParameter <*> children ((,,,,) <$> (term accessibilityModifier' <|> emptyTerm) <*> (term readonly' <|> emptyTerm) <*> (term identifier <|> destructuringPattern) <*> (term typeAnnotation' <|> emptyTerm) <*> (term expression <|> emptyTerm))
-  where makeOptionalParam loc (modifier, readonly, subject, annotation, initializer) = makeTerm loc (TypeScript.Syntax.OptionalParameter [modifier, readonly, annotation] (makeTerm loc (Statement.Assignment [] subject initializer)))
+optionalParameter = makeOptionalParam <$> symbol Grammar.OptionalParameter <*> children ((,,,,) <$> accessibilityModifier' <*> (term readonly' <|> emptyTerm) <*> (term identifier <|> destructuringPattern) <*> (term typeAnnotation' <|> emptyTerm) <*> (term expression <|> emptyTerm))
+  where makeOptionalParam loc (modifier, readonly, subject, annotation, initializer) = makeTerm loc (TypeScript.Syntax.OptionalParameter [readonly, annotation] (makeTerm loc (Statement.Assignment [] subject initializer)) modifier)
 
 internalModule :: Assignment Term
 internalModule = makeTerm <$> symbol Grammar.InternalModule <*> children (TypeScript.Syntax.InternalModule <$> term (string <|> identifier <|> nestedIdentifier) <*> statements)

@@ -73,13 +73,13 @@ instance Evaluatable Send where
              Nothing  ->
                pure (Name.name "call")
 
-    let self = deref =<< lookupDeclaration (Declaration __self)
+    let self = deref =<< lookupSlot (Declaration __self)
     lhsValue <- maybe self eval sendReceiver
     lhsFrame <- Abstract.scopedEnvironment lhsValue
 
     let callFunction = do
           reference (Reference sel) (Declaration sel)
-          func <- deref =<< lookupDeclaration (Declaration sel)
+          func <- deref =<< lookupSlot (Declaration sel)
           args <- traverse eval sendArgs
           boundFunc <- bindThis lhsValue func
           call boundFunc args -- TODO pass through sendBlock
@@ -200,7 +200,7 @@ instance Evaluatable Class where
         superScopes <- for classSuperclasses $ \superclass -> do
           name <- maybeM (throwNoNameError superclass) (declaredName superclass)
           scope <- associatedScope (Declaration name)
-          slot <- lookupDeclaration (Declaration name)
+          slot <- lookupSlot (Declaration name)
           superclassFrame <- scopedEnvironment =<< deref slot
           pure $ case (scope, superclassFrame) of
             (Just scope, Just frame) -> Just (scope, frame)
@@ -210,7 +210,7 @@ instance Evaluatable Class where
             current = (Lexical, ) <$> pure (pure currentScope')
             edges = Map.fromList (superclassEdges <> current)
         classScope <- newScope edges
-        declare (Declaration name) Default span (Just classScope)
+        declare (Declaration name) Default Public span (Just classScope)
 
         let frameEdges = Map.singleton Superclass (Map.fromList (catMaybes superScopes))
         childFrame <- newFrame classScope frameEdges
@@ -218,7 +218,7 @@ instance Evaluatable Class where
         withScopeAndFrame childFrame $ do
           void $ eval classBody
 
-        classSlot <- lookupDeclaration (Declaration name)
+        classSlot <- lookupSlot (Declaration name)
         assign classSlot =<< klass (Declaration name) childFrame
 
         unit
@@ -260,7 +260,7 @@ instance Evaluatable Module where
       Nothing -> do
         let edges = Map.singleton Lexical [ currentScope' ]
         classScope <- newScope edges
-        declare (Declaration name) Default span (Just classScope)
+        declare (Declaration name) Default Public span (Just classScope)
 
         currentFrame' <- currentFrame
         let frameEdges = Map.singleton Lexical (Map.singleton currentScope' currentFrame')
@@ -268,7 +268,7 @@ instance Evaluatable Module where
 
         withScopeAndFrame childFrame (void moduleBody)
 
-        moduleSlot <- lookupDeclaration (Declaration name)
+        moduleSlot <- lookupSlot (Declaration name)
         assign moduleSlot =<< klass (Declaration name) childFrame
 
         unit
@@ -326,7 +326,7 @@ instance Evaluatable Assignment where
     lhsName <- maybeM (throwNoNameError assignmentTarget) (declaredName assignmentTarget)
     maybeSlot <- maybeLookupDeclaration (Declaration lhsName)
     assignmentSpan <- ask @Span
-    maybe (declare (Declaration lhsName) Default assignmentSpan Nothing) (const (pure ())) maybeSlot
+    maybe (declare (Declaration lhsName) Default Public assignmentSpan Nothing) (const (pure ())) maybeSlot
 
     lhs <- ref assignmentTarget
     rhs <- eval assignmentValue
