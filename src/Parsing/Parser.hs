@@ -21,6 +21,7 @@ module Parsing.Parser
 , jsonASTParser
 , markdownParser
 , pythonParser
+, pythonASTParser
 , miniPythonParser
 , rubyParser
 , miniRubyParser
@@ -174,6 +175,9 @@ phpParser = AssignmentParser (ASTParser tree_sitter_php) PHP.assignment
 
 pythonParser :: Parser Python.Term
 pythonParser = AssignmentParser (ASTParser tree_sitter_python) Python.assignment
+
+pythonASTParser :: Parser (AST [] Python.Grammar)
+pythonASTParser = ASTParser tree_sitter_python
 
 miniPythonParser :: Parser MiniPython.Term
 miniPythonParser = AssignmentParser (ASTParser tree_sitter_python) MiniPython.assignment
