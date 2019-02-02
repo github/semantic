@@ -10,7 +10,8 @@
         "end": [2, 4]
       },
       "kind": "Method",
-      "symbol": "foo"
+      "symbol": "foo",
+      "line": "def foo"
     }],
     "language": "Ruby"
   }]
