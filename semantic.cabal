@@ -412,15 +412,6 @@ test-suite test
                      , StandaloneDeriving
                      , TypeApplications
 
-test-suite lint
-  type:                exitcode-stdio-1.0
-  hs-source-dirs:      test
-  main-is:             Lint.hs
-  default-language:    Haskell2010
-  ghc-options:         -dynamic -threaded -j
-  build-depends:       base
-                     , hlint
-
 test-suite parse-examples
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
