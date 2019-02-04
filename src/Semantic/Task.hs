@@ -152,10 +152,10 @@ serialize format input = send (Serialize format input ret)
 
 data TaskSession
   = TaskSession
-  { config :: Config
+  { config    :: Config
   , requestID :: String
-  , logger :: LogQueue
-  , statter :: StatQueue
+  , logger    :: LogQueue
+  , statter   :: StatQueue
   }
 
 -- | Execute a 'TaskEff' yielding its result value in 'IO'.
