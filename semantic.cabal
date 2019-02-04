@@ -1,5 +1,5 @@
 name:                semantic
-version:             0.4.0
+version:             0.5.0
 synopsis:            Framework and service for analyzing and diffing untrusted code.
 description:         Please see README.md
 homepage:            http://github.com/github/semantic#readme
@@ -88,8 +88,6 @@ library
                      , Proto3.Google.Timestamp
                      , Data.Graph
                      , Data.Graph.ControlFlowVertex
-                     , Data.Graph.TermVertex
-                     , Data.Graph.DiffVertex
                      , Data.Handle
                      , Data.History
                      , Data.ImportPath
@@ -97,8 +95,6 @@ library
                      , Data.Language
                      , Data.Location
                      , Data.Map.Monoidal
-                     , Data.Proto.DiffTree
-                     , Data.Proto.ParseTree
                      , Data.Patch
                      , Data.Project
                      , Data.Quieterm
@@ -183,8 +179,6 @@ library
                      -- Rendering formats
                      , Rendering.Graph
                      , Rendering.JSON
-                     , Rendering.Renderer
-                     , Rendering.Symbol
                      , Rendering.TOC
                      , Reprinting.Tokenize
                      , Reprinting.Translate
@@ -192,15 +186,22 @@ library
                      , Reprinting.Pipeline
                      -- High-level flow & operational functionality (logging, stats, etc.)
                      , Semantic.Analysis
+                     -- API
+                     , Semantic.API
+                     , Semantic.API.Diffs
+                     , Semantic.API.Helpers
+                     , Semantic.API.LegacyTypes
+                     , Semantic.API.Symbols
+                     , Semantic.API.Terms
+                     , Semantic.API.TOCSummaries
+                     , Semantic.API.Types
                      , Semantic.AST
                      , Semantic.CLI
                      , Semantic.Config
-                     , Semantic.Diff
                      , Semantic.Distribute
                      , Semantic.Env
                      , Semantic.Graph
                      , Semantic.IO
-                     , Semantic.Parse
                      , Semantic.REPL
                      , Semantic.Resolution
                      , Semantic.Task
@@ -252,6 +253,7 @@ library
                      , http-client
                      , http-client-tls
                      , http-types
+                     , http-media
                      , kdt
                      , machines
                      , mersenne-random-pure64
@@ -269,6 +271,7 @@ library
                      , scientific
                      , semigroupoids
                      , semilattices
+                     , servant
                      , split
                      , stm-chans
                      , template-haskell

@@ -24,6 +24,8 @@ import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import Rendering.TOC
 import Semantic.Config
+import Semantic.API (diffSummaryBuilder)
+import Serializing.Format as Format
 
 import SpecHelpers
 
@@ -146,22 +148,22 @@ spec = parallel $ do
   describe "diff with ToCDiffRenderer'" $ do
     it "produces JSON output" $ do
       blobs <- blobsForPaths (Both "ruby/toc/methods.A.rb" "ruby/toc/methods.B.rb")
-      output <- runTask (runDiff ToCDiffRenderer [blobs])
+      output <- runTask (diffSummaryBuilder Format.JSON [blobs])
       runBuilder output `shouldBe` ("{\"changes\":{\"test/fixtures/ruby/toc/methods.A.rb -> test/fixtures/ruby/toc/methods.B.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"self.foo\",\"changeType\":\"added\"},{\"span\":{\"start\":[4,1],\"end\":[6,4]},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"modified\"},{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{}}\n" :: ByteString)
 
     it "produces JSON output if there are parse errors" $ do
       blobs <- blobsForPaths (Both "ruby/toc/methods.A.rb" "ruby/toc/methods.X.rb")
-      output <- runTaskWithOptions (defaultOptions { optionsLogLevel = Nothing }) (runDiff ToCDiffRenderer [blobs])
+      output <- runTaskWithOptions (defaultOptions { optionsLogLevel = Nothing }) (diffSummaryBuilder Format.JSON [blobs])
       runBuilder output `shouldBe` ("{\"changes\":{\"test/fixtures/ruby/toc/methods.A.rb -> test/fixtures/ruby/toc/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"removed\"},{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{\"test/fixtures/ruby/toc/methods.A.rb -> test/fixtures/ruby/toc/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,3]},\"error\":\"expected end of input nodes, but got ParseError\",\"language\":\"Ruby\"}]}}\n" :: ByteString)
 
     it "ignores anonymous functions" $ do
       blobs <- blobsForPaths (Both "ruby/toc/lambda.A.rb" "ruby/toc/lambda.B.rb")
-      output <- runTask (runDiff ToCDiffRenderer [blobs])
+      output <- runTask (diffSummaryBuilder Format.JSON [blobs])
       runBuilder output `shouldBe` ("{\"changes\":{},\"errors\":{}}\n" :: ByteString)
 
     it "summarizes Markdown headings" $ do
       blobs <- blobsForPaths (Both "markdown/toc/headings.A.md" "markdown/toc/headings.B.md")
-      output <- runTask (runDiff ToCDiffRenderer [blobs])
+      output <- runTask (diffSummaryBuilder Format.JSON [blobs])
       runBuilder output `shouldBe` ("{\"changes\":{\"test/fixtures/markdown/toc/headings.A.md -> test/fixtures/markdown/toc/headings.B.md\":[{\"span\":{\"start\":[1,1],\"end\":[3,16]},\"category\":\"Heading 1\",\"term\":\"Introduction\",\"changeType\":\"removed\"},{\"span\":{\"start\":[5,1],\"end\":[7,4]},\"category\":\"Heading 2\",\"term\":\"Two\",\"changeType\":\"modified\"},{\"span\":{\"start\":[9,1],\"end\":[11,10]},\"category\":\"Heading 3\",\"term\":\"This heading is new\",\"changeType\":\"added\"},{\"span\":{\"start\":[13,1],\"end\":[14,4]},\"category\":\"Heading 1\",\"term\":\"Final\",\"changeType\":\"added\"}]},\"errors\":{}}\n" :: ByteString)
 
 

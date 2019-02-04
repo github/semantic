@@ -451,6 +451,7 @@ instance AccessControls1 Ruby.LowPrecedenceOr
 instance AccessControls1 Ruby.Module
 instance AccessControls1 Ruby.ZSuper
 
+instance AccessControls1 TypeScript.AnnotatedExpression
 instance AccessControls1 TypeScript.JavaScriptRequire
 instance AccessControls1 TypeScript.Debugger
 instance AccessControls1 TypeScript.Super
