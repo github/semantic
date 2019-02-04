@@ -1,4 +1,4 @@
-{-# LANGUAGE DerivingVia, DerivingStrategies, DeriveAnyClass, DuplicateRecordFields, LambdaCase #-}
+{-# LANGUAGE DerivingVia, DeriveAnyClass, DuplicateRecordFields, LambdaCase #-}
 module Semantic.API.Types
   (
   -- Parse APIs
