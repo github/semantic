@@ -1,9 +1,7 @@
-{-# LANGUAGE DerivingVia, RankNTypes, ScopedTypeVariables #-}
+{-# LANGUAGE DerivingVia, DerivingStrategies, RankNTypes, ScopedTypeVariables #-}
 module Rendering.TOC
 ( renderToCDiff
-, renderRPCToCDiff
 , renderToCTerm
-, renderJSONSummaryError
 , diffTOC
 , Summaries(..)
 , TOCSummary(..)
@@ -32,18 +30,13 @@ import Data.Location
 import Data.Term
 import qualified Data.Text as T
 
-renderJSONSummaryError :: BlobPair -> String -> Summaries
-renderJSONSummaryError pair e = Summaries mempty (Map.singleton path [object ["error" .= e]])
-  where path = T.pack (pathKeyForBlobPair pair)
-
 data Summaries = Summaries { changes, errors :: Map.Map T.Text [Value] }
-  deriving (Eq, Show, Generic)
+  deriving stock (Eq, Show, Generic)
   deriving Semigroup via GenericSemigroup Summaries
   deriving Monoid via GenericMonoid Summaries
 
 instance ToJSON Summaries where
   toJSON Summaries{..} = object [ "changes" .= changes, "errors" .= errors ]
-
 
 data TOCSummary
   = TOCSummary
@@ -53,7 +46,7 @@ data TOCSummary
     , summaryChangeType :: T.Text
     }
   | ErrorSummary { errorText :: T.Text, errorSpan :: Span, errorLanguage :: Language }
-  deriving (Generic, Eq, Show)
+  deriving stock (Generic, Eq, Show)
 
 instance ToJSON TOCSummary where
   toJSON TOCSummary{..} = object [ "changeType" .= summaryChangeType, "category" .= summaryCategoryName, "term" .= summaryTermName, "span" .= summarySpan ]
@@ -146,9 +139,6 @@ renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isV
   where toMap [] = mempty
         toMap as = Map.singleton summaryKey (toJSON <$> as)
         summaryKey = T.pack $ pathKeyForBlobPair blobs
-
-renderRPCToCDiff :: (Foldable f, Functor f) => BlobPair -> Diff f (Maybe Declaration) (Maybe Declaration) -> ([TOCSummary], [TOCSummary])
-renderRPCToCDiff _ = List.partition isValidSummary . diffTOC
 
 diffTOC :: (Foldable f, Functor f) => Diff f (Maybe Declaration) (Maybe Declaration) -> [TOCSummary]
 diffTOC = fmap entrySummary . dedupe . tableOfContentsBy declaration

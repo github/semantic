@@ -207,6 +207,7 @@ type Syntax = '[
   , []
   , Statement.StatementBlock
   , TypeScript.Syntax.MetaProperty
+  , TypeScript.Syntax.AnnotatedExpression
   ]
 
 type Term = Term.Term (Sum Syntax) Location
@@ -474,7 +475,11 @@ sequenceExpression :: Assignment Term
 sequenceExpression = makeTerm <$> symbol Grammar.SequenceExpression <*> children (Expression.SequenceExpression <$> term expression <*> term expressions)
 
 expressions :: Assignment Term
-expressions = expression <|> sequenceExpression
+expressions = annotatedExpression <|> expression <|> sequenceExpression
+
+annotatedExpression :: Assignment Term
+annotatedExpression = mkAnnotated <$> location <*> expression <*> typeAnnotation'
+  where mkAnnotated loc expr ann = makeTerm loc (TypeScript.Syntax.AnnotatedExpression expr ann)
 
 parameter :: Assignment Term
 parameter =  requiredParameter
@@ -810,7 +815,7 @@ interfaceDeclaration = makeInterfaceDecl <$> symbol Grammar.InterfaceDeclaration
   where makeInterfaceDecl loc (identifier, typeParams, clause, objectType) = makeTerm loc (Declaration.InterfaceDeclaration [typeParams] identifier (toList clause) objectType)
 
 ambientDeclaration :: Assignment Term
-ambientDeclaration = makeTerm <$> symbol Grammar.AmbientDeclaration <*> children (TypeScript.Syntax.AmbientDeclaration <$> term (choice [declaration, statementBlock]))
+ambientDeclaration = makeTerm <$> symbol Grammar.AmbientDeclaration <*> children (TypeScript.Syntax.AmbientDeclaration <$> term (choice [propertyIdentifier *> ty, declaration, statementBlock]))
 
 exportStatement :: Assignment Term
 exportStatement = makeTerm <$> symbol Grammar.ExportStatement <*> children (flip TypeScript.Syntax.QualifiedExportFrom <$> exportClause <*> fromClause)
@@ -831,7 +836,7 @@ propertySignature = makePropertySignature <$> symbol Grammar.PropertySignature <
   where makePropertySignature loc (modifier, readonly, propertyName, annotation) = makeTerm loc (TypeScript.Syntax.PropertySignature [readonly, annotation] propertyName modifier)
 
 propertyName :: Assignment Term
-propertyName = (makeTerm <$> symbol PropertyIdentifier <*> (Syntax.Identifier . name <$> source)) <|> term string <|> term number <|> term computedPropertyName
+propertyName = term (propertyIdentifier <|> string <|> number <|> computedPropertyName)
 
 computedPropertyName :: Assignment Term
 computedPropertyName = makeTerm <$> symbol Grammar.ComputedPropertyName <*> children (TypeScript.Syntax.ComputedPropertyName <$> term expression)
