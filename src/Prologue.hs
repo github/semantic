@@ -78,6 +78,8 @@ fromMaybeLast b = fromMaybe b . getLast . foldMap (Last . Just)
 -- | Extract the 'Just' of a 'Maybe' in an 'Applicative' context or, given 'Nothing', run the provided action.
 maybeM :: Applicative f => f a -> Maybe a -> f a
 maybeM f = maybe f pure
+{-# INLINE maybeM #-}
 
 eitherM :: Applicative f => (a -> f b) -> Either a b -> f b
 eitherM f = either f pure
+{-# INLINE eitherM #-}
