@@ -1,4 +1,4 @@
-{-# LANGUAGE DerivingVia, DerivingStrategies, RankNTypes, ScopedTypeVariables #-}
+{-# LANGUAGE DerivingVia, RankNTypes, ScopedTypeVariables #-}
 module Rendering.TOC
 ( renderToCDiff
 , renderToCTerm

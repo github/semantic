@@ -1,4 +1,4 @@
-{-# LANGUAGE DerivingVia, DerivingStrategies, DeriveAnyClass, DuplicateRecordFields #-}
+{-# LANGUAGE DerivingVia, DeriveAnyClass, DuplicateRecordFields #-}
 module Semantic.API.LegacyTypes
   ( DiffTreeRequest(..)
   , ParseTreeRequest(..)
