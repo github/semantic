@@ -56,9 +56,6 @@ import Data.Term as X
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
 import Parsing.Parser as X
-import Rendering.Renderer as X hiding (error)
-import Semantic.Diff as X
-import Semantic.Parse as X
 import Semantic.Task as X hiding (parsePackage)
 import Semantic.Util as X
 import Semantic.Graph (runHeap, runScopeGraph)
@@ -83,6 +80,7 @@ import Data.Set (Set)
 import qualified Semantic.IO as IO
 import Semantic.Config (Config)
 import Semantic.Telemetry (LogQueue, StatQueue)
+import Semantic.API hiding (File, Blob, BlobPair)
 import System.Exit (die)
 import Control.Exception (displayException)
 
@@ -95,11 +93,11 @@ instance IsString Name where
 
 -- | Returns an s-expression formatted diff for the specified FilePath pair.
 diffFilePaths :: TaskConfig -> Both FilePath -> IO ByteString
-diffFilePaths (TaskConfig config logger statter) paths = readFilePair paths >>= runTaskWithConfig config logger statter . runDiff SExpressionDiffRenderer . pure >>= either (die . displayException) (pure . runBuilder)
+diffFilePaths (TaskConfig config logger statter) paths = readFilePair paths >>= runTaskWithConfig config logger statter . parseDiffBuilder @[] DiffSExpression . pure >>= either (die . displayException) (pure . runBuilder)
 
 -- | Returns an s-expression parse tree for the specified FilePath.
 parseFilePath :: TaskConfig -> FilePath -> IO ByteString
-parseFilePath (TaskConfig config logger statter) path = (fromJust <$> readBlobFromFile (file path)) >>= runTaskWithConfig config logger statter . runParse SExpressionTermRenderer . pure >>= either (die . displayException) (pure . runBuilder)
+parseFilePath (TaskConfig config logger statter) path = (fromJust <$> readBlobFromFile (file path)) >>= runTaskWithConfig config logger statter . parseTermBuilder @[] TermSExpression . pure >>= either (die . displayException) (pure . runBuilder)
 
 -- | Read two files to a BlobPair.
 readFilePair :: Both FilePath -> IO BlobPair

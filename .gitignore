@@ -12,7 +12,7 @@ dist-newstyle
 .ghc.environment.*
 
 tmp/
-bin/
+/bin/
 
 /semanticd/test/current
 /semanticd/test/rover-example-config/semantic.log
@@ -26,6 +26,7 @@ bin/
 /*.html
 
 .bundle/
+.licenses/bin
 .licenses/vendor/gems
 .licenses/log/
 
