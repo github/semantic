@@ -490,7 +490,7 @@ continueStatement :: Assignment Term
 continueStatement = makeTerm <$> symbol ContinueStatement <*> (Statement.Continue <$> emptyTerm <* advance)
 
 memberAccess :: Assignment Term
-memberAccess = makeTerm <$> symbol Attribute <*> children (Expression.MemberAccess <$> expression <*> identifier')
+memberAccess = makeTerm <$> symbol Attribute <*> children (Expression.MemberAccess <$> term expression <*> identifier')
 
 subscript :: Assignment Term
 subscript = makeTerm <$> symbol Subscript <*> children (Expression.Subscript <$> term expression <*> manyTerm expression)
@@ -544,7 +544,9 @@ term term = contextualize comment (postContextualize comment term)
 
 -- | Match a left-associated infix chain of terms, optionally followed by comments. Like 'chainl1' but assigning comment nodes automatically.
 chainl1Term :: Assignment Term -> Assignment (Term -> Term -> Term) -> Assignment Term
-chainl1Term expr op = postContextualize (comment <|> symbol AnonLambda *> empty) expr `chainl1` op
+chainl1Term expr op = (contextualize (comment <|> symbol AnonLambda *> empty) expr
+                     <|> postContextualize (comment <|> symbol AnonLambda *> empty) expr)
+                     `chainl1` op
 
 -- | Match a series of terms or comments until a delimiter is matched.
 manyTermsTill :: Assignment Term -> Assignment b -> Assignment [Term]
