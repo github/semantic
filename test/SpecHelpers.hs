@@ -7,6 +7,8 @@ module SpecHelpers
 , parseFilePath
 , parseTestFile
 , readFilePair
+, runTaskOrDie
+, TaskSession(..)
 , testEvaluating
 , verbatim
 , Verbatim(..)
@@ -78,7 +80,7 @@ import qualified Data.ByteString as B
 import qualified Data.Set as Set
 import Data.Set (Set)
 import qualified Semantic.IO as IO
-import Semantic.Config (Config)
+import Semantic.Config (Config(..), optionsLogLevel)
 import Semantic.Telemetry (LogQueue, StatQueue)
 import Semantic.API hiding (File, Blob, BlobPair)
 import System.Exit (die)
@@ -92,12 +94,12 @@ instance IsString Name where
   fromString = X.name . fromString
 
 -- | Returns an s-expression formatted diff for the specified FilePath pair.
-diffFilePaths :: TaskConfig -> Both FilePath -> IO ByteString
-diffFilePaths (TaskConfig config logger statter) paths = readFilePair paths >>= runTaskWithConfig config logger statter . parseDiffBuilder @[] DiffSExpression . pure >>= either (die . displayException) (pure . runBuilder)
+diffFilePaths :: TaskSession -> Both FilePath -> IO ByteString
+diffFilePaths session paths = readFilePair paths >>= runTask session . parseDiffBuilder @[] DiffSExpression . pure >>= either (die . displayException) (pure . runBuilder)
 
 -- | Returns an s-expression parse tree for the specified FilePath.
-parseFilePath :: TaskConfig -> FilePath -> IO ByteString
-parseFilePath (TaskConfig config logger statter) path = (fromJust <$> readBlobFromFile (file path)) >>= runTaskWithConfig config logger statter . parseTermBuilder @[] TermSExpression . pure >>= either (die . displayException) (pure . runBuilder)
+parseFilePath :: TaskSession -> FilePath -> IO ByteString
+parseFilePath session path = (fromJust <$> readBlobFromFile (file path)) >>= runTask session . parseTermBuilder @[] TermSExpression . pure >>= either (die . displayException) (pure . runBuilder)
 
 -- | Read two files to a BlobPair.
 readFilePair :: Both FilePath -> IO BlobPair
@@ -105,10 +107,14 @@ readFilePair paths = let paths' = fmap file paths in
                      runBothWith F.readFilePair paths'
 
 parseTestFile :: Parser term -> FilePath -> IO (Blob, term)
-parseTestFile parser path = runTask $ do
+parseTestFile parser path = runTaskOrDie $ do
   blob <- readBlob (file path)
   term <- parse parser blob
   pure (blob, term)
+
+-- Run a Task and call `die` if it returns an Exception.  
+runTaskOrDie :: TaskEff a -> IO a
+runTaskOrDie task = runTaskWithOptions defaultOptions { optionsLogLevel = Nothing } task >>= either (die . displayException) pure
 
 type TestEvaluatingC term
   = ResumableC (BaseError (AddressError Precise (Val term))) (Eff

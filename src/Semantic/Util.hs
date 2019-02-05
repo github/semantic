@@ -33,7 +33,6 @@ import           Semantic.Analysis
 import           Semantic.Config
 import           Semantic.Graph
 import           Semantic.Task
-import           Semantic.Telemetry (LogQueue, StatQueue)
 import           System.Exit (die)
 import           System.FilePath.Posix (takeDirectory)
 
@@ -83,7 +82,7 @@ evalTypeScriptProject = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Lang
 typecheckGoFile = checking <=< evaluateProjectWithCaching (Proxy :: Proxy 'Language.Go) goParser
 typecheckRubyFile = checking <=< evaluateProjectWithCaching (Proxy :: Proxy 'Language.Ruby) rubyParser
 
-callGraphProject parser proxy opts paths = runTaskWithOptions opts $ do
+callGraphProject parser proxy paths = runTask' $ do
   blobs <- catMaybes <$> traverse readBlobFromFile (flip File (Language.reflect proxy) <$> paths)
   package <- fmap snd <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs (Language.reflect proxy) [])
   modules <- topologicalSort <$> runImportGraphToModules proxy package
@@ -92,28 +91,29 @@ callGraphProject parser proxy opts paths = runTaskWithOptions opts $ do
 
 evaluatePythonProject = justEvaluating <=< evaluatePythonProjects (Proxy @'Language.Python) pythonParser Language.Python
 
-callGraphRubyProject = callGraphProject rubyParser (Proxy @'Language.Ruby) debugOptions
+callGraphRubyProject = callGraphProject rubyParser (Proxy @'Language.Ruby)
+
+evaluateProject proxy parser paths = withOptions debugOptions $ \ config logger statter ->
+  evaluateProject' (TaskSession config "-" logger statter) proxy parser paths
 
 -- Evaluate a project consisting of the listed paths.
-evaluateProject proxy parser paths = withOptions debugOptions $ \ config logger statter ->
-  evaluateProject' (TaskConfig config logger statter) proxy parser paths
+-- TODO: This is used by our specs and should be moved into SpecHelpers.hs
+evaluateProject' session proxy parser paths = do
+  res <- runTask session $ do
+    blobs <- catMaybes <$> traverse readBlobFromFile (flip File (Language.reflect proxy) <$> paths)
+    package <- fmap (quieterm . snd) <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs (Language.reflect proxy) [])
+    modules <- topologicalSort <$> runImportGraphToModules proxy package
+    trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
+    pure (id @(Evaluator _ Precise (Value _ Precise) _ _)
+         (runModuleTable
+         (runModules (ModuleTable.modulePaths (packageModules package))
+         (raiseHandler (runReader (packageInfo package))
+         (raiseHandler (evalState (lowerBound @Span))
+         (raiseHandler (runReader (lowerBound @Span))
+         (evaluate proxy (runDomainEffects (evalTerm withTermSpans)) modules)))))))
+  either (die . displayException) pure res
 
-data TaskConfig = TaskConfig Config LogQueue StatQueue
-
-evaluateProject' (TaskConfig config logger statter) proxy parser paths = either (die . displayException) pure <=< runTaskWithConfig config logger statter $ do
-  blobs <- catMaybes <$> traverse readBlobFromFile (flip File (Language.reflect proxy) <$> paths)
-  package <- fmap (quieterm . snd) <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs (Language.reflect proxy) [])
-  modules <- topologicalSort <$> runImportGraphToModules proxy package
-  trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
-  pure (id @(Evaluator _ Precise (Value _ Precise) _ _)
-       (runModuleTable
-       (runModules (ModuleTable.modulePaths (packageModules package))
-       (raiseHandler (runReader (packageInfo package))
-       (raiseHandler (evalState (lowerBound @Span))
-       (raiseHandler (runReader (lowerBound @Span))
-       (evaluate proxy (runDomainEffects (evalTerm withTermSpans)) modules)))))))
-
-evaluatePythonProjects proxy parser lang path = runTaskWithOptions debugOptions $ do
+evaluatePythonProjects proxy parser lang path = runTask' $ do
   project <- readProject Nothing path lang []
   package <- fmap quieterm <$> parsePythonPackage parser project
   modules <- topologicalSort <$> runImportGraphToModules proxy package
@@ -127,7 +127,7 @@ evaluatePythonProjects proxy parser lang path = runTaskWithOptions debugOptions 
        (evaluate proxy (runDomainEffects (evalTerm withTermSpans)) modules)))))))
 
 
-evaluateProjectWithCaching proxy parser path = runTaskWithOptions debugOptions $ do
+evaluateProjectWithCaching proxy parser path = runTask' $ do
   project <- readProject Nothing path (Language.reflect proxy) []
   package <- fmap (quieterm . snd) <$> parsePackage parser project
   modules <- topologicalSort <$> runImportGraphToModules proxy package
@@ -141,10 +141,13 @@ evaluateProjectWithCaching proxy parser path = runTaskWithOptions debugOptions $
 
 
 parseFile :: Parser term -> FilePath -> IO term
-parseFile parser = runTask . (parse parser <=< readBlob . file)
+parseFile parser = runTask' . (parse parser <=< readBlob . file)
 
 blob :: FilePath -> IO Blob
-blob = runTask . readBlob . file
+blob = runTask' . readBlob . file
+
+runTask' :: TaskEff a -> IO a
+runTask' task = runTaskWithOptions debugOptions task >>= either (die . displayException) pure
 
 mergeErrors :: Either (SomeError (Sum errs)) (Either (SomeError err) result) -> Either (SomeError (Sum (err ': errs))) result
 mergeErrors = either (\ (SomeError sum) -> Left (SomeError (weaken sum))) (either (\ (SomeError err) -> Left (SomeError (inject err))) Right)
