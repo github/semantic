@@ -23,6 +23,7 @@ module Semantic.API.Types
 
   -- Diff tree graphs
   , DiffTreeGraphResponse(..)
+  , DiffTreeFileGraph(..)
   , DiffTreeEdge(..)
   , DiffTreeVertex(..)
   , DiffTreeTerm(..)
@@ -33,6 +34,7 @@ module Semantic.API.Types
 
   -- Parse tree graphs
   , ParseTreeGraphResponse(..)
+  , ParseTreeFileGraph(..)
   , TermVertex(..)
   , TermEdge(..)
   , ParseError(..)
@@ -119,6 +121,7 @@ data File
   { path     :: T.Text
   , language :: Language
   , symbols  :: [Symbol]
+  , errors   :: [ParseError]
   }
   deriving stock (Generic, Eq, Show)
   deriving anyclass (Named, Message, ToJSON)
@@ -136,16 +139,20 @@ data Symbol
 --
 -- Term Graph API
 --
-data ParseTreeGraphResponse
-  = ParseTreeGraphResponse
-  { vertices :: [TermVertex]
+newtype ParseTreeGraphResponse = ParseTreeGraphResponse { files :: [ParseTreeFileGraph] }
+  deriving stock (Eq, Show, Generic)
+  deriving anyclass (Message, Named, ToJSON)
+
+data ParseTreeFileGraph
+  = ParseTreeFileGraph
+  { path     :: T.Text
+  , language :: Language
+  , vertices :: [TermVertex]
   , edges    :: [TermEdge]
   , errors   :: [ParseError]
   }
   deriving stock (Eq, Show, Generic)
   deriving anyclass (Message, Named, ToJSON)
-  deriving Semigroup via GenericSemigroup ParseTreeGraphResponse
-  deriving Monoid via GenericMonoid ParseTreeGraphResponse
 
 data TermEdge = TermEdge { source :: Int, target :: Int }
   deriving stock (Eq, Ord, Show, Generic)
@@ -156,11 +163,7 @@ data TermVertex = TermVertex { vertexId :: Int, term :: String, span :: Maybe Sp
   deriving anyclass (Message, Named, ToJSON)
 instance VertexTag TermVertex where uniqueTag = vertexId
 
-data ParseError
-  = ParseError
-  { path  :: String
-  , error :: String
-  }
+newtype ParseError = ParseError { error :: String }
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (Message, Named, ToJSON)
 
@@ -229,16 +232,22 @@ data TOCSummaryError = TOCSummaryError
 -- Diff Tree Graph API
 --
 
-data DiffTreeGraphResponse
-  = DiffTreeGraphResponse
-  { vertices :: [DiffTreeVertex]
+newtype DiffTreeGraphResponse = DiffTreeGraphResponse { files :: [DiffTreeFileGraph] }
+  deriving stock (Eq, Show, Generic)
+  deriving anyclass (Message, Named, ToJSON)
+  -- deriving Semigroup via GenericSemigroup DiffTreeGraphResponse
+  -- deriving Monoid via GenericMonoid DiffTreeGraphResponse
+
+data DiffTreeFileGraph
+  = DiffTreeFileGraph
+  { path     :: T.Text
+  , language :: Language
+  , vertices :: [DiffTreeVertex]
   , edges    :: [DiffTreeEdge]
   , errors   :: [ParseError]
   }
   deriving stock (Eq, Show, Generic)
   deriving anyclass (Message, Named, ToJSON)
-  deriving Semigroup via GenericSemigroup DiffTreeGraphResponse
-  deriving Monoid via GenericMonoid DiffTreeGraphResponse
 
 data DiffTreeEdge = DiffTreeEdge { source :: Int, target :: Int }
   deriving stock (Eq, Ord, Show, Generic)
