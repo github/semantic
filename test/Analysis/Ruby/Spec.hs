@@ -14,8 +14,8 @@ import           Data.Sum
 import SpecHelpers
 
 
-spec :: TaskConfig -> Spec
-spec config = parallel $ do
+spec :: TaskSession -> Spec
+spec session = parallel $ do
   describe "Ruby" $ do
     it "evaluates require_relative" $ do
       (scopeGraph, (heap, res)) <- evaluate ["main.rb", "foo.rb"]
@@ -101,4 +101,4 @@ spec config = parallel $ do
   where
     fixtures = "test/fixtures/ruby/analysis/"
     evaluate = evalRubyProject . map (fixtures <>)
-    evalRubyProject = testEvaluating <=< evaluateProject' config (Proxy :: Proxy 'Language.Ruby) rubyParser
+    evalRubyProject = testEvaluating <=< evaluateProject' session (Proxy :: Proxy 'Language.Ruby) rubyParser
