@@ -85,7 +85,7 @@ parseToAST parseTimeout language Blob{..} = bracket (liftIO TS.ts_parser_new) (l
     Just (Succeeded ast) -> Just ast <$ trace ("tree-sitter: parsing succeeded " <> blobPath)
     Nothing -> do
       trace $ "tree-sitter: parsing timed out " <> blobPath
-      _ <- liftIO $ TS.ts_parser_set_enabled parser (CBool 0)
+      liftIO (TS.ts_parser_set_enabled parser (CBool 0))
       Nothing <$ liftIO (wait parsing)
 
 
