@@ -2,9 +2,13 @@
 module Semantic.API.TOCSummaries (diffSummary, legacyDiffSummary, diffSummaryBuilder) where
 
 import           Analysis.TOCSummary (Declaration, declarationAlgebra)
+import           Control.Effect.Error
+import           Data.Aeson
 import           Data.Blob
 import           Data.ByteString.Builder
 import           Data.Diff
+import qualified Data.Map.Monoidal as Map
+import           Data.Span (emptySpan)
 import qualified Data.Text as T
 import           Rendering.TOC
 import           Semantic.API.Diffs
@@ -24,6 +28,10 @@ legacyDiffSummary = distributeFoldMap go
   where
     go :: (DiffEffects sig m) => BlobPair -> m Summaries
     go blobPair = doDiff blobPair (decorate . declarationAlgebra) render
+      `catchError` \(SomeException e) ->
+        pure $ Summaries mempty (Map.singleton path [toJSON (ErrorSummary (T.pack (show e)) emptySpan lang)])
+      where path = T.pack $ pathKeyForBlobPair blobPair
+            lang = languageForBlobPair blobPair
 
     render :: (Foldable syntax, Functor syntax, Applicative m) => BlobPair -> Diff syntax (Maybe Declaration) (Maybe Declaration) -> m Summaries
     render blobPair = pure . renderToCDiff blobPair
@@ -33,6 +41,10 @@ diffSummary blobs = DiffTreeTOCResponse <$> distributeFor (apiBlobPairToBlobPair
   where
     go :: (DiffEffects sig m) => BlobPair -> m TOCSummaryFile
     go blobPair = doDiff blobPair (decorate . declarationAlgebra) render
+      `catchError` \(SomeException e) ->
+        pure $ TOCSummaryFile path lang mempty [TOCSummaryError (T.pack (show e)) Nothing]
+      where path = T.pack $ pathKeyForBlobPair blobPair
+            lang = languageForBlobPair blobPair
 
     render :: (Foldable syntax, Functor syntax, Applicative m) => BlobPair -> Diff syntax (Maybe Declaration) (Maybe Declaration) -> m TOCSummaryFile
     render blobPair diff = pure $ foldr go (TOCSummaryFile path lang mempty mempty) (diffTOC diff)
@@ -45,3 +57,8 @@ diffSummary blobs = DiffTreeTOCResponse <$> distributeFor (apiBlobPairToBlobPair
           = TOCSummaryFile path language (TOCSummaryChange summaryCategoryName summaryTermName (spanToSpan summarySpan) (toChangeType summaryChangeType) : changes) errors
         go ErrorSummary{..} TOCSummaryFile{..}
           = TOCSummaryFile path language changes (TOCSummaryError errorText (spanToSpan errorSpan) : errors)
+
+fileError :: BlobPair -> String -> TOCSummaryFile
+fileError blobPair e = TOCSummaryFile path lang mempty [TOCSummaryError (T.pack e) Nothing]
+  where path = T.pack $ pathKeyForBlobPair blobPair
+        lang = languageForBlobPair blobPair
