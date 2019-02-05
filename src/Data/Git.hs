@@ -1,5 +1,7 @@
 {-# LANGUAGE DerivingStrategies, GeneralizedNewtypeDeriving #-}
 
+-- | Core data types for Git repositories, suitable for
+-- sharing between different storage backends.
 module Data.Git
   ( OID (..)
   , Ref (..)
