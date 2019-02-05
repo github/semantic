@@ -92,8 +92,8 @@ newtype ParseTreeRequest = ParseTreeRequest { blobs :: [Blob] }
 
 data Blob
   = Blob
-  { content :: T.Text
-  , path :: FilePath
+  { content  :: T.Text
+  , path     :: FilePath
   , language :: Language
   }
   deriving stock (Eq, Show, Generic)
@@ -102,7 +102,7 @@ data Blob
 data BlobPair
   = BlobPair
   { before :: Maybe Blob
-  , after :: Maybe Blob
+  , after  :: Maybe Blob
   }
   deriving stock (Eq, Show, Generic)
   deriving anyclass (Message, Named, FromJSON)
@@ -116,9 +116,9 @@ newtype ParseTreeSymbolResponse = ParseTreeSymbolResponse { files :: [File] }
 
 data File
   = File
-  { path :: T.Text
+  { path     :: T.Text
   , language :: Language
-  , symbols :: [Symbol]
+  , symbols  :: [Symbol]
   }
   deriving stock (Generic, Eq, Show)
   deriving anyclass (Named, Message, ToJSON)
@@ -126,9 +126,9 @@ data File
 data Symbol
   = Symbol
   { symbol :: T.Text
-  , kind :: T.Text
-  , line :: T.Text
-  , span :: Maybe Span
+  , kind   :: T.Text
+  , line   :: T.Text
+  , span   :: Maybe Span
   }
   deriving stock (Generic, Eq, Show)
   deriving anyclass (Named, Message, ToJSON)
@@ -216,7 +216,7 @@ instance Primitive ChangeType where
 
 data TOCSummaryError = TOCSummaryError
   { error :: T.Text
-  , span :: Maybe Span
+  , span  :: Maybe Span
   }
   deriving stock (Eq, Show, Generic)
   deriving anyclass (Message, Named, ToJSON)
@@ -295,7 +295,7 @@ instance MimeRender PlainText PingResponse where
 --
 
 data Position = Position
-  { line :: Int
+  { line   :: Int
   , column :: Int
   }
   deriving stock (Eq, Ord, Show, Generic)
@@ -303,7 +303,7 @@ data Position = Position
 
 data Span = Span
   { start :: Maybe Position
-  , end :: Maybe Position
+  , end   :: Maybe Position
   }
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (Message, Named, ToJSON)
