@@ -339,8 +339,9 @@ runParser blob@Blob{..} parser = case parser of
                     when (optionsFailOnWarning (configOptions config)) $ throwError (toException err)
                 term <$ writeStat (count "parse.nodes" (length term) languageTag)
           case res of
-            Just r -> pure r
-            Nothing -> do
+            Just r | not (configFailParsingForTesting config)
+              -> pure r
+            _ -> do
               writeStat (increment "assign.assign_timeouts" languageTag)
               writeLog Error "assignment timeout" (("task", "assign") : blobFields)
               throwError (SomeException AssignmentTimedOut)
