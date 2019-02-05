@@ -57,8 +57,3 @@ diffSummary blobs = DiffTreeTOCResponse <$> distributeFor (apiBlobPairToBlobPair
           = TOCSummaryFile path language (TOCSummaryChange summaryCategoryName summaryTermName (spanToSpan summarySpan) (toChangeType summaryChangeType) : changes) errors
         go ErrorSummary{..} TOCSummaryFile{..}
           = TOCSummaryFile path language changes (TOCSummaryError errorText (spanToSpan errorSpan) : errors)
-
-fileError :: BlobPair -> String -> TOCSummaryFile
-fileError blobPair e = TOCSummaryFile path lang mempty [TOCSummaryError (T.pack e) Nothing]
-  where path = T.pack $ pathKeyForBlobPair blobPair
-        lang = languageForBlobPair blobPair
