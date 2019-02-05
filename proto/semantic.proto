@@ -43,7 +43,7 @@ message ParseTreeSymbolResponse {
 message ParseTreeGraphResponse {
   repeated TermVertex vertices = 1;
   repeated TermEdge edges = 2;
-  repeated TermError errors = 3;
+  repeated ParseError errors = 3;
 }
 
 message TermEdge {
@@ -57,7 +57,7 @@ message TermVertex {
   Span span = 3;
 }
 
-message TermError {
+message ParseError {
   string path = 1;
   string error = 2;
 }
@@ -99,6 +99,7 @@ enum ChangeType {
 message DiffTreeGraphResponse {
   repeated DiffTreeVertex vertices = 1;
   repeated DiffTreeEdge edges = 2;
+  repeated ParseError errors = 3;
 }
 
 message DiffTreeEdge {
@@ -108,7 +109,7 @@ message DiffTreeEdge {
 
 message DiffTreeVertex {
   int64 diffVertexId = 1;
-  DiffTreeTerm term = 2;
+  DiffTreeTerm diffTerm = 2;
 }
 
 message DiffTreeTerm {
