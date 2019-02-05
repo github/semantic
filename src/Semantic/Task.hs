@@ -32,6 +32,7 @@ module Semantic.Task
 , distributeFoldMap
 -- * Configuration
 , debugOptions
+, defaultOptions
 , defaultConfig
 , terminalFormatter
 , logfmtFormatter
@@ -39,7 +40,7 @@ module Semantic.Task
 , runTask
 , runTaskWithOptions
 , withOptions
-, runTaskWithConfig
+, TaskSession(..)
 , runTraceInTelemetry
 , runTaskF
 -- * Exceptions
@@ -91,7 +92,6 @@ import           Semantic.Timeout
 import           Semantic.Resolution
 import           Semantic.Telemetry
 import           Serializing.Format hiding (Options)
-import           System.Exit (die)
 
 -- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
 type TaskEff
@@ -150,33 +150,17 @@ serialize :: (Member Task sig, Carrier sig m)
           -> m Builder
 serialize format input = send (Serialize format input ret)
 
--- | Execute a 'Task' with the 'defaultOptions', yielding its result value in 'IO'.
---
--- > runTask = runTaskWithOptions defaultOptions
-runTask :: TaskEff a
-        -> IO a
-runTask = runTaskWithOptions defaultOptions
-
--- | Execute a 'TaskEff' with the passed 'Options', yielding its result value in 'IO'.
-runTaskWithOptions :: Options
-                   -> TaskEff a
-                   -> IO a
-runTaskWithOptions opts task = withOptions opts (\ config logger statter -> runTaskWithConfig config logger statter task) >>= either (die . displayException) pure
-
-withOptions :: Options
-            -> (Config -> LogQueue -> StatQueue -> IO a)
-            -> IO a
-withOptions options with = do
-  config <- defaultConfig options
-  withTelemetry config (\ (TelemetryQueues logger statter _) -> with config logger statter)
+data TaskSession
+  = TaskSession
+  { config    :: Config
+  , requestID :: String
+  , logger    :: LogQueue
+  , statter   :: StatQueue
+  }
 
 -- | Execute a 'TaskEff' yielding its result value in 'IO'.
-runTaskWithConfig :: Config
-                  -> LogQueue
-                  -> StatQueue
-                  -> TaskEff a
-                  -> IO (Either SomeException a)
-runTaskWithConfig options logger statter task = do
+runTask :: TaskSession -> TaskEff a -> IO (Either SomeException a)
+runTask TaskSession{..} task = do
   (result, stat) <- withTiming "run" [] $ do
     let run :: TaskEff a -> IO (Either SomeException a)
         run
@@ -187,13 +171,24 @@ runTaskWithConfig options logger statter task = do
           . runError
           . runTelemetry logger statter
           . runTraceInTelemetry
-          . runReader options
+          . runReader config
           . Files.runFiles
           . runResolution
           . runTaskF
     run task
   queueStat statter stat
   pure result
+
+-- | Execute a 'TaskEff' yielding its result value in 'IO' using all default options and configuration.
+runTaskWithOptions :: Options -> TaskEff a -> IO (Either SomeException a)
+runTaskWithOptions options task = withOptions options $ \ config logger statter ->
+  runTask (TaskSession config "-" logger statter) task
+
+-- | Yield config and telemetry queues for options.
+withOptions :: Options -> (Config -> LogQueue -> StatQueue -> IO a) -> IO a
+withOptions options with = do
+  config <- defaultConfig options
+  withTelemetry config (\ (TelemetryQueues logger statter _) -> with config logger statter)
 
 runTraceInTelemetry :: (Member Telemetry sig, Carrier sig m, Monad m)
                     => Eff (TraceInTelemetryC m) a
