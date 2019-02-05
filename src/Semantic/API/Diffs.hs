@@ -75,12 +75,14 @@ diffGraph blobs = distributeFoldMap go (apiBlobPairToBlobPair <$> blobs)
   where
     go :: (DiffEffects sig m) => BlobPair -> m DiffTreeGraphResponse
     go blobPair = doDiff blobPair (const pure) render
+      `catchError` \(SomeException e) ->
+        pure (DiffTreeGraphResponse mempty mempty [ParseError (pathForBlobPair blobPair) (show e)])
 
     render :: (Foldable syntax, Functor syntax, ConstructorName syntax, Applicative m) => BlobPair -> Diff syntax Location Location -> m DiffTreeGraphResponse
     render _ diff =
       let graph = renderTreeGraph diff
           toEdge (Edge (a, b)) = DiffTreeEdge (diffVertexId a) (diffVertexId b)
-      in pure $ DiffTreeGraphResponse (vertexList graph) (fmap toEdge (edgeList graph))
+      in pure $ DiffTreeGraphResponse (vertexList graph) (fmap toEdge (edgeList graph)) mempty
 
 
 sexpDiff :: (DiffEffects sig m) => BlobPair -> m Builder

@@ -35,7 +35,7 @@ module Semantic.API.Types
   , ParseTreeGraphResponse(..)
   , TermVertex(..)
   , TermEdge(..)
-  , TermError(..)
+  , ParseError(..)
 
   -- Health Check
   , PingRequest(..)
@@ -139,8 +139,8 @@ data Symbol
 data ParseTreeGraphResponse
   = ParseTreeGraphResponse
   { vertices :: [TermVertex]
-  , edges :: [TermEdge]
-  , errors :: [TermError]
+  , edges    :: [TermEdge]
+  , errors   :: [ParseError]
   }
   deriving stock (Eq, Show, Generic)
   deriving anyclass (Message, Named, ToJSON)
@@ -156,7 +156,11 @@ data TermVertex = TermVertex { vertexId :: Int, term :: String, span :: Maybe Sp
   deriving anyclass (Message, Named, ToJSON)
 instance VertexTag TermVertex where uniqueTag = vertexId
 
-data TermError = TermError { path :: String, error :: String }
+data ParseError
+  = ParseError
+  { path  :: String
+  , error :: String
+  }
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (Message, Named, ToJSON)
 
@@ -226,7 +230,11 @@ data TOCSummaryError = TOCSummaryError
 --
 
 data DiffTreeGraphResponse
-  = DiffTreeGraphResponse { vertices :: [DiffTreeVertex], edges :: [DiffTreeEdge] }
+  = DiffTreeGraphResponse
+  { vertices :: [DiffTreeVertex]
+  , edges    :: [DiffTreeEdge]
+  , errors   :: [ParseError]
+  }
   deriving stock (Eq, Show, Generic)
   deriving anyclass (Message, Named, ToJSON)
   deriving Semigroup via GenericSemigroup DiffTreeGraphResponse
@@ -236,7 +244,7 @@ data DiffTreeEdge = DiffTreeEdge { source :: Int, target :: Int }
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (Message, Named, ToJSON)
 
-data DiffTreeVertex = DiffTreeVertex { diffVertexId :: Int, term :: Maybe DiffTreeTerm }
+data DiffTreeVertex = DiffTreeVertex { diffVertexId :: Int, diffTerm :: Maybe DiffTreeTerm }
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (Message, Named, ToJSON)
 instance VertexTag DiffTreeVertex where uniqueTag = diffVertexId
