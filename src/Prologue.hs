@@ -80,6 +80,7 @@ maybeM :: Applicative f => f a -> Maybe a -> f a
 maybeM f = maybe f pure
 {-# INLINE maybeM #-}
 
+-- Promote a function to either-applicatives.
 eitherM :: Applicative f => (a -> f b) -> Either a b -> f b
 eitherM f = either f pure
 {-# INLINE eitherM #-}
