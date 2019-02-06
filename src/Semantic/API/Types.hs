@@ -235,8 +235,6 @@ data TOCSummaryError = TOCSummaryError
 newtype DiffTreeGraphResponse = DiffTreeGraphResponse { files :: [DiffTreeFileGraph] }
   deriving stock (Eq, Show, Generic)
   deriving anyclass (Message, Named, ToJSON)
-  -- deriving Semigroup via GenericSemigroup DiffTreeGraphResponse
-  -- deriving Monoid via GenericMonoid DiffTreeGraphResponse
 
 data DiffTreeFileGraph
   = DiffTreeFileGraph
