@@ -23,11 +23,9 @@ import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
-import qualified Data.Diff as Diff
 import           Language.Go.Grammar as Grammar
 import           Language.Go.Syntax as Go.Syntax hiding (runeLiteral, labelName)
 import           Language.Go.Type as Go.Type
-import           Proto3.Suite (Named (..), Named1 (..))
 import Data.ImportPath (importPath, defaultAlias)
 
 type Syntax =
@@ -136,11 +134,6 @@ type Syntax =
 
 type Term = Term.Term (Sum Syntax) Location
 type Assignment = Assignment.Assignment [] Grammar
-
--- For Protobuf serialization
-instance Named1 (Sum Syntax) where nameOf1 _ = "GoSyntax"
-instance Named (Term.Term (Sum Syntax) ()) where nameOf _ = "GoTerm"
-instance Named (Diff.Diff (Sum Syntax) () ()) where nameOf _ = "GoDiff"
 
 -- | Assignment from AST in Go's grammar onto a program in Go's syntax.
 assignment :: Assignment Term

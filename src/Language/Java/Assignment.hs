@@ -36,10 +36,8 @@ import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
-import qualified Data.Diff as Diff
 import           Language.Java.Grammar as Grammar
 import qualified Language.Java.Syntax as Java.Syntax
-import           Proto3.Suite (Named (..), Named1 (..))
 
 type Syntax =
   '[ Comment.Comment
@@ -155,11 +153,6 @@ type Syntax =
 
 type Term = Term.Term (Sum Syntax) Location
 type Assignment = Assignment.Assignment [] Grammar
-
--- For Protobuf serialization
-instance Named1 (Sum Syntax) where nameOf1 _ = "JavaSyntax"
-instance Named (Term.Term (Sum Syntax) ()) where nameOf _ = "JavaTerm"
-instance Named (Diff.Diff (Sum Syntax) () ()) where nameOf _ = "JavaDiff"
 
 -- | Assignment from AST in Java's grammar onto a program in Java's syntax.
 assignment :: Assignment Term

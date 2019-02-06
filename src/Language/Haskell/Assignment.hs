@@ -23,10 +23,8 @@ import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
-import qualified Data.Diff as Diff
 import           Language.Haskell.Grammar as Grammar
 import qualified Language.Haskell.Syntax as Syntax
-import           Proto3.Suite (Named (..), Named1 (..))
 
 type Syntax = '[
     Comment.Comment
@@ -173,11 +171,6 @@ type Syntax = '[
 
 type Term = Term.Term (Sum Syntax) Location
 type Assignment = Assignment.Assignment [] Grammar
-
--- For Protobuf serialization
-instance Named1 (Sum Syntax) where nameOf1 _ = "HaskellSyntax"
-instance Named (Term.Term (Sum Syntax) ()) where nameOf _ = "HaskellTerm"
-instance Named (Diff.Diff (Sum Syntax) () ()) where nameOf _ = "HaskellDiff"
 
 assignment :: Assignment Term
 assignment = handleError $ module' <|> parseError
