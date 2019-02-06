@@ -84,7 +84,6 @@ languages =
   , le "ruby" ".rb" "examples" (Just "script/known_failures.txt")
   , le "typescript" ".ts" "examples" (Just "script/known_failures.txt")
   , le "typescript" ".js" "examples" Nothing -- parse JavaScript with TypeScript parser.
-
   , le "go" ".go" "examples" (Just "script/known-failures.txt")
 
   -- TODO: Java assignment errors need to be investigated

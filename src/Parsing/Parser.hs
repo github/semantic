@@ -18,10 +18,12 @@ module Parsing.Parser
 , jsonASTParser
 , markdownParser
 , pythonParser
+, pythonASTParser
 , miniPythonParser
 , rubyParser
 , miniRubyParser
 , typescriptParser
+, typescriptASTParser
 , phpParser
 , haskellParser
 ) where
@@ -141,6 +143,9 @@ phpParser = AssignmentParser (ASTParser tree_sitter_php) PHP.assignment
 pythonParser :: Parser Python.Term
 pythonParser = AssignmentParser (ASTParser tree_sitter_python) Python.assignment
 
+pythonASTParser :: Parser (AST [] Python.Grammar)
+pythonASTParser = ASTParser tree_sitter_python
+
 miniPythonParser :: Parser MiniPython.Term
 miniPythonParser = AssignmentParser (ASTParser tree_sitter_python) MiniPython.assignment
 
@@ -158,6 +163,9 @@ jsonASTParser = ASTParser tree_sitter_json
 
 typescriptParser :: Parser TypeScript.Term
 typescriptParser = AssignmentParser (ASTParser tree_sitter_typescript) TypeScript.assignment
+
+typescriptASTParser :: Parser (AST [] TypeScript.Grammar)
+typescriptASTParser = ASTParser tree_sitter_typescript
 
 haskellParser :: Parser Haskell.Term
 haskellParser = AssignmentParser (ASTParser tree_sitter_haskell) Haskell.assignment
