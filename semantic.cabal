@@ -352,7 +352,6 @@ test-suite test
                      , Graphing.Calls.Spec
                      , Integration.Spec
                      , Numeric.Spec
-                     , Proto3.Roundtrip
                      , Reprinting.Spec
                      , Rewriting.Go.Spec
                      , Rewriting.JSON.Spec

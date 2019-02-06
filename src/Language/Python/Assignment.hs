@@ -10,7 +10,6 @@ module Language.Python.Assignment
 import           Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
 import           Data.Abstract.Name (Name, name)
-import qualified Data.Diff as Diff
 import qualified Data.List.NonEmpty as NonEmpty
 import           Data.Sum
 import           Data.Syntax
@@ -37,7 +36,6 @@ import qualified Data.Text as T
 import           Language.Python.Grammar as Grammar
 import           Language.Python.Syntax as Python.Syntax
 import           Prologue
-import           Proto3.Suite (Named (..), Named1 (..))
 
 
 -- | The type of Python syntax.
@@ -121,15 +119,6 @@ type Syntax =
 
 type Term = Term.Term (Sum Syntax) Location
 type Assignment = Assignment.Assignment [] Grammar
-
-instance Named1 (Sum Syntax) where
-  nameOf1 _ = "PythonSyntax"
-
-instance Named (Term.Term (Sum Syntax) ()) where
-  nameOf _ = "PythonTerm"
-
-instance Named (Diff.Diff (Sum Syntax) () ()) where
-  nameOf _ = "PythonDiff"
 
 -- | Assignment from AST in Python's grammar onto a program in Python's syntax.
 assignment :: Assignment Term
