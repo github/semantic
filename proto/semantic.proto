@@ -41,9 +41,15 @@ message ParseTreeSymbolResponse {
 }
 
 message ParseTreeGraphResponse {
-  repeated TermVertex vertices = 1;
-  repeated TermEdge edges = 2;
-  repeated TermError errors = 3;
+  repeated ParseTreeFileGraph files = 1;
+}
+
+message ParseTreeFileGraph {
+  string path = 1;
+  Language language = 2;
+  repeated TermVertex vertices = 3;
+  repeated TermEdge edges = 4;
+  repeated ParseError errors = 5;
 }
 
 message TermEdge {
@@ -57,9 +63,8 @@ message TermVertex {
   Span span = 3;
 }
 
-message TermError {
-  string path = 1;
-  string error = 2;
+message ParseError {
+  string error = 1;
 }
 
 message DiffTreeRequest {
@@ -97,8 +102,15 @@ enum ChangeType {
 }
 
 message DiffTreeGraphResponse {
-  repeated DiffTreeVertex vertices = 1;
-  repeated DiffTreeEdge edges = 2;
+  repeated DiffTreeFileGraph files = 1;
+}
+
+message DiffTreeFileGraph {
+  string path = 1;
+  Language language = 2;
+  repeated DiffTreeVertex vertices = 3;
+  repeated DiffTreeEdge edges = 4;
+  repeated ParseError errors = 5;
 }
 
 message DiffTreeEdge {
@@ -108,7 +120,7 @@ message DiffTreeEdge {
 
 message DiffTreeVertex {
   int64 diffVertexId = 1;
-  DiffTreeTerm term = 2;
+  DiffTreeTerm diffTerm = 2;
 }
 
 message DiffTreeTerm {
@@ -173,6 +185,7 @@ message File {
   string path = 1;
   Language language = 2;
   repeated Symbol symbols = 3;
+  repeated ParseError errors = 4;
 }
 
 message Symbol {

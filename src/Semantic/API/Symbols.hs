@@ -15,6 +15,7 @@ import           Data.Maybe
 import           Data.Term
 import           Data.Text (pack)
 import           Parsing.Parser
+import           Prologue
 import           Semantic.API.Helpers
 import qualified Semantic.API.LegacyTypes as Legacy
 import           Semantic.API.Terms (ParseEffects, doParse)
@@ -53,23 +54,24 @@ parseSymbolsBuilder blobs
   = legacyParseSymbols blobs >>= serialize JSON
 
 parseSymbols :: (Member Distribute sig, ParseEffects sig m, Traversable t) => t API.Blob -> m ParseTreeSymbolResponse
-parseSymbols blobs = ParseTreeSymbolResponse <$> distributeFoldMap go (apiBlobToBlob <$> blobs)
+parseSymbols blobs = ParseTreeSymbolResponse . toList <$> distributeFor (apiBlobToBlob <$> blobs) go
   where
-    go :: (Member (Error SomeException) sig, Member Task sig, Carrier sig m, Monad m) => Blob -> m [File]
-    go blob@Blob{..} = (doParse blob >>= withSomeTerm (renderToSymbols blob)) `catchError` (\(SomeException _) -> pure (pure emptyFile))
-      where emptyFile = File (pack blobPath) blobLanguage []
+    go :: (Member (Error SomeException) sig, Member Task sig, Carrier sig m, Monad m) => Blob -> m File
+    go blob@Blob{..} = (doParse blob >>= withSomeTerm (renderToSymbols blob)) `catchError` (\(SomeException e) -> pure $ errorFile (show e))
+      where
+        errorFile e = File (pack blobPath) blobLanguage mempty [ParseError e]
 
-    renderToSymbols :: (IsTaggable f, Applicative m) => Blob -> Term f Location -> m [File]
-    renderToSymbols blob term = pure $ either mempty (pure . tagsToFile blob) (runTagging blob term)
+        renderToSymbols :: (IsTaggable f, Applicative m) => Blob -> Term f Location -> m File
+        renderToSymbols blob@Blob{..} term = pure $ either (errorFile . show) (tagsToFile blob) (runTagging blob term)
 
-    tagsToFile :: Blob -> [Tag] -> File
-    tagsToFile Blob{..} tags = File (pack blobPath) blobLanguage (fmap tagToSymbol tags)
+        tagsToFile :: Blob -> [Tag] -> File
+        tagsToFile Blob{..} tags = File (pack blobPath) blobLanguage (fmap tagToSymbol tags) mempty
 
-    tagToSymbol :: Tag -> Symbol
-    tagToSymbol Tag{..}
-      = Symbol
-      { symbol = name
-      , kind = kind
-      , line = fromMaybe mempty line
-      , span = spanToSpan span
-      }
+        tagToSymbol :: Tag -> Symbol
+        tagToSymbol Tag{..}
+          = Symbol
+          { symbol = name
+          , kind = kind
+          , line = fromMaybe mempty line
+          , span = spanToSpan span
+          }
