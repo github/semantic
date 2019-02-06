@@ -44,6 +44,7 @@ data Config
   , configLogPrintSource         :: Bool         -- ^ Whether to print the source reference when logging errors (set automatically at runtime).
   , configLogFormatter           :: LogFormatter -- ^ Log formatter to use (set automaticaly at runtime).
   , configSHA                    :: Maybe String -- ^ Optional SHA to include in log messages.
+  , configFailParsingForTesting  :: Bool         -- ^ Simulate internal parse failure for testing (default: False).
 
   , configOptions                :: Options      -- ^ Options configurable via command line arguments.
   }
@@ -87,6 +88,7 @@ defaultConfig options@Options{..} = do
     , configLogPrintSource = isTerminal
     , configLogFormatter = if isTerminal then terminalFormatter else logfmtFormatter
     , configSHA = Nothing
+    , configFailParsingForTesting = False
 
     , configOptions = options
     }

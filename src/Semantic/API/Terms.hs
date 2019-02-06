@@ -28,7 +28,9 @@ import           Data.JSON.Fields
 import           Data.Language
 import           Data.Location
 import           Data.Quieterm
+import qualified Data.Text as T
 import           Parsing.Parser
+import           Prologue
 import           Rendering.Graph
 import           Rendering.JSON hiding (JSON)
 import qualified Rendering.JSON
@@ -39,18 +41,23 @@ import           Semantic.Task
 import           Serializing.Format hiding (JSON)
 import qualified Serializing.Format as Format
 import           Tags.Taggable
+import Data.Term
 
 termGraph :: (Traversable t, Member Distribute sig, ParseEffects sig m) => t API.Blob -> m ParseTreeGraphResponse
-termGraph blobs = distributeFoldMap go (fmap apiBlobToBlob blobs)
+termGraph blobs = ParseTreeGraphResponse . toList <$> distributeFor (fmap apiBlobToBlob blobs) go
   where
-    go :: ParseEffects sig m => Blob -> m ParseTreeGraphResponse
+    go :: ParseEffects sig m => Blob -> m ParseTreeFileGraph
     go blob = (doParse blob >>= withSomeTerm (pure . render))
       `catchError` \(SomeException e) ->
-        pure (ParseTreeGraphResponse mempty mempty [TermError (blobPath blob) (show e)])
+        pure (ParseTreeFileGraph path lang mempty mempty [ParseError (show e)])
+      where
+        path = T.pack (blobPath blob)
+        lang = blobLanguage blob
 
-    render t = let graph = renderTreeGraph t
-                   toEdge (Edge (a, b)) = TermEdge (vertexId a) (vertexId b)
-               in ParseTreeGraphResponse (vertexList graph) (fmap toEdge (edgeList graph)) mempty
+        render :: (Foldable syntax, Functor syntax, ConstructorName syntax) => Term syntax Location -> ParseTreeFileGraph
+        render t = let graph = renderTreeGraph t
+                       toEdge (Edge (a, b)) = TermEdge (vertexId a) (vertexId b)
+                   in ParseTreeFileGraph path lang (vertexList graph) (fmap toEdge (edgeList graph)) mempty
 
 data TermOutputFormat
   = TermJSONTree

@@ -1,4 +1,4 @@
-{-# LANGUAGE DerivingVia, DerivingStrategies, DeriveAnyClass, DuplicateRecordFields, LambdaCase #-}
+{-# LANGUAGE DerivingVia, DeriveAnyClass, DuplicateRecordFields, LambdaCase #-}
 module Semantic.API.Types
   (
   -- Parse APIs
@@ -23,6 +23,7 @@ module Semantic.API.Types
 
   -- Diff tree graphs
   , DiffTreeGraphResponse(..)
+  , DiffTreeFileGraph(..)
   , DiffTreeEdge(..)
   , DiffTreeVertex(..)
   , DiffTreeTerm(..)
@@ -33,9 +34,10 @@ module Semantic.API.Types
 
   -- Parse tree graphs
   , ParseTreeGraphResponse(..)
+  , ParseTreeFileGraph(..)
   , TermVertex(..)
   , TermEdge(..)
-  , TermError(..)
+  , ParseError(..)
 
   -- Health Check
   , PingRequest(..)
@@ -92,8 +94,8 @@ newtype ParseTreeRequest = ParseTreeRequest { blobs :: [Blob] }
 
 data Blob
   = Blob
-  { content :: T.Text
-  , path :: FilePath
+  { content  :: T.Text
+  , path     :: FilePath
   , language :: Language
   }
   deriving stock (Eq, Show, Generic)
@@ -102,7 +104,7 @@ data Blob
 data BlobPair
   = BlobPair
   { before :: Maybe Blob
-  , after :: Maybe Blob
+  , after  :: Maybe Blob
   }
   deriving stock (Eq, Show, Generic)
   deriving anyclass (Message, Named, FromJSON)
@@ -116,9 +118,10 @@ newtype ParseTreeSymbolResponse = ParseTreeSymbolResponse { files :: [File] }
 
 data File
   = File
-  { path :: T.Text
+  { path     :: T.Text
   , language :: Language
-  , symbols :: [Symbol]
+  , symbols  :: [Symbol]
+  , errors   :: [ParseError]
   }
   deriving stock (Generic, Eq, Show)
   deriving anyclass (Named, Message, ToJSON)
@@ -126,9 +129,9 @@ data File
 data Symbol
   = Symbol
   { symbol :: T.Text
-  , kind :: T.Text
-  , line :: T.Text
-  , span :: Maybe Span
+  , kind   :: T.Text
+  , line   :: T.Text
+  , span   :: Maybe Span
   }
   deriving stock (Generic, Eq, Show)
   deriving anyclass (Named, Message, ToJSON)
@@ -136,16 +139,20 @@ data Symbol
 --
 -- Term Graph API
 --
-data ParseTreeGraphResponse
-  = ParseTreeGraphResponse
-  { vertices :: [TermVertex]
-  , edges :: [TermEdge]
-  , errors :: [TermError]
+newtype ParseTreeGraphResponse = ParseTreeGraphResponse { files :: [ParseTreeFileGraph] }
+  deriving stock (Eq, Show, Generic)
+  deriving anyclass (Message, Named, ToJSON)
+
+data ParseTreeFileGraph
+  = ParseTreeFileGraph
+  { path     :: T.Text
+  , language :: Language
+  , vertices :: [TermVertex]
+  , edges    :: [TermEdge]
+  , errors   :: [ParseError]
   }
   deriving stock (Eq, Show, Generic)
   deriving anyclass (Message, Named, ToJSON)
-  deriving Semigroup via GenericSemigroup ParseTreeGraphResponse
-  deriving Monoid via GenericMonoid ParseTreeGraphResponse
 
 data TermEdge = TermEdge { source :: Int, target :: Int }
   deriving stock (Eq, Ord, Show, Generic)
@@ -156,7 +163,7 @@ data TermVertex = TermVertex { vertexId :: Int, term :: String, span :: Maybe Sp
   deriving anyclass (Message, Named, ToJSON)
 instance VertexTag TermVertex where uniqueTag = vertexId
 
-data TermError = TermError { path :: String, error :: String }
+newtype ParseError = ParseError { error :: String }
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (Message, Named, ToJSON)
 
@@ -216,7 +223,7 @@ instance Primitive ChangeType where
 
 data TOCSummaryError = TOCSummaryError
   { error :: T.Text
-  , span :: Maybe Span
+  , span  :: Maybe Span
   }
   deriving stock (Eq, Show, Generic)
   deriving anyclass (Message, Named, ToJSON)
@@ -225,18 +232,26 @@ data TOCSummaryError = TOCSummaryError
 -- Diff Tree Graph API
 --
 
-data DiffTreeGraphResponse
-  = DiffTreeGraphResponse { vertices :: [DiffTreeVertex], edges :: [DiffTreeEdge] }
+newtype DiffTreeGraphResponse = DiffTreeGraphResponse { files :: [DiffTreeFileGraph] }
   deriving stock (Eq, Show, Generic)
   deriving anyclass (Message, Named, ToJSON)
-  deriving Semigroup via GenericSemigroup DiffTreeGraphResponse
-  deriving Monoid via GenericMonoid DiffTreeGraphResponse
+
+data DiffTreeFileGraph
+  = DiffTreeFileGraph
+  { path     :: T.Text
+  , language :: Language
+  , vertices :: [DiffTreeVertex]
+  , edges    :: [DiffTreeEdge]
+  , errors   :: [ParseError]
+  }
+  deriving stock (Eq, Show, Generic)
+  deriving anyclass (Message, Named, ToJSON)
 
 data DiffTreeEdge = DiffTreeEdge { source :: Int, target :: Int }
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (Message, Named, ToJSON)
 
-data DiffTreeVertex = DiffTreeVertex { diffVertexId :: Int, term :: Maybe DiffTreeTerm }
+data DiffTreeVertex = DiffTreeVertex { diffVertexId :: Int, diffTerm :: Maybe DiffTreeTerm }
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (Message, Named, ToJSON)
 instance VertexTag DiffTreeVertex where uniqueTag = diffVertexId
@@ -295,7 +310,7 @@ instance MimeRender PlainText PingResponse where
 --
 
 data Position = Position
-  { line :: Int
+  { line   :: Int
   , column :: Int
   }
   deriving stock (Eq, Ord, Show, Generic)
@@ -303,7 +318,7 @@ data Position = Position
 
 data Span = Span
   { start :: Maybe Position
-  , end :: Maybe Position
+  , end   :: Maybe Position
   }
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (Message, Named, ToJSON)
