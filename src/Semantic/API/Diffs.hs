@@ -25,6 +25,7 @@ import           Data.JSON.Fields
 import           Data.Language
 import           Data.Location
 import           Data.Term
+import qualified Data.Text as T
 import           Diffing.Algorithm (Diffable)
 import           Parsing.Parser
 import           Prologue
@@ -71,16 +72,21 @@ renderJSONGraph :: (Applicative m, Functor syntax, Foldable syntax, ConstructorN
 renderJSONGraph blobPair = pure . renderJSONAdjDiff blobPair . renderTreeGraph
 
 diffGraph :: (Traversable t, DiffEffects sig m) => t API.BlobPair -> m DiffTreeGraphResponse
-diffGraph blobs = distributeFoldMap go (apiBlobPairToBlobPair <$> blobs)
+diffGraph blobs = DiffTreeGraphResponse . toList <$> distributeFor (apiBlobPairToBlobPair <$> blobs) go
   where
-    go :: (DiffEffects sig m) => BlobPair -> m DiffTreeGraphResponse
+    go :: (DiffEffects sig m) => BlobPair -> m DiffTreeFileGraph
     go blobPair = doDiff blobPair (const pure) render
+      `catchError` \(SomeException e) ->
+        pure (DiffTreeFileGraph path lang mempty mempty [ParseError (show e)])
+      where
+        path = T.pack $ pathForBlobPair blobPair
+        lang = languageForBlobPair blobPair
 
-    render :: (Foldable syntax, Functor syntax, ConstructorName syntax, Applicative m) => BlobPair -> Diff syntax Location Location -> m DiffTreeGraphResponse
-    render _ diff =
-      let graph = renderTreeGraph diff
-          toEdge (Edge (a, b)) = DiffTreeEdge (diffVertexId a) (diffVertexId b)
-      in pure $ DiffTreeGraphResponse (vertexList graph) (fmap toEdge (edgeList graph))
+        render :: (Foldable syntax, Functor syntax, ConstructorName syntax, Applicative m) => BlobPair -> Diff syntax Location Location -> m DiffTreeFileGraph
+        render _ diff =
+          let graph = renderTreeGraph diff
+              toEdge (Edge (a, b)) = DiffTreeEdge (diffVertexId a) (diffVertexId b)
+          in pure $ DiffTreeFileGraph path lang (vertexList graph) (fmap toEdge (edgeList graph)) mempty
 
 
 sexpDiff :: (DiffEffects sig m) => BlobPair -> m Builder
