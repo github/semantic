@@ -14,12 +14,8 @@ import           Data.JSON.Fields
 import qualified Data.Map.Strict as Map
 import           Data.Semigroup.App
 import           Data.Semigroup.Foldable
-import           Data.Span
 import           Diffing.Algorithm
-import           Language.TypeScript.Resolution
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
-import Data.Aeson hiding (object, Object)
-import qualified Data.Abstract.Name as Name
 
 -- | ShorthandPropertyIdentifier used in object patterns such as var baz = { foo } to mean var baz = { foo: foo }
 newtype ShorthandPropertyIdentifier a = ShorthandPropertyIdentifier { contents :: T.Text }
