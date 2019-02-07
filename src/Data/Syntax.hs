@@ -1,5 +1,5 @@
 {-# LANGUAGE AllowAmbiguousTypes, DeriveAnyClass, DerivingVia, GADTs, TypeOperators, MultiParamTypeClasses, UndecidableInstances, ScopedTypeVariables, KindSignatures, RankNTypes, ConstraintKinds, GeneralizedNewtypeDeriving #-}
-{-# OPTIONS_GHC -Wno-missing-export-lists -Wno-redundant-constraints -fno-warn-orphans #-} -- For HasCallStack
+{-# OPTIONS_GHC -Wno-missing-export-lists -Wno-redundant-constraints #-} -- For HasCallStack
 module Data.Syntax where
 
 import Data.Abstract.Evaluatable hiding (Empty, Error)
