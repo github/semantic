@@ -26,7 +26,6 @@ import           Data.Graph (topologicalSort)
 import qualified Data.Language as Language
 import           Data.List (uncons)
 import           Data.Project hiding (readFile)
-import           Data.Quieterm (quieterm)
 import           Data.Sum (weaken)
 import           Parsing.Parser
 import           Prologue
