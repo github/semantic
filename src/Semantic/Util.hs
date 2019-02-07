@@ -37,7 +37,6 @@ import           Semantic.Telemetry (LogQueue, StatQueue)
 import           System.Exit (die)
 import           System.FilePath.Posix (takeDirectory)
 
-import qualified Data.Abstract.Value.Concrete as Concrete
 import Data.Quieterm
 import Data.Location
 
