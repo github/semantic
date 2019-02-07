@@ -200,6 +200,15 @@ instance Evaluatable Import where
 
     unit
 
+evalAliasNameAndSpan :: (Carrier sig m
+                       , Declarations t
+                       , Member (State Span) sig
+                       , Member (Reader ModuleInfo) sig
+                       , Member (Reader Span) sig
+                       , Member (Resumable (BaseError (EvalError t address value))) sig)
+                     => (t -> Evaluator t address value m a)
+                     -> t
+                     -> Evaluator t address value m (Name, Span)
 evalAliasNameAndSpan eval aliasTerm = do
   aliasName <- maybeM (throwNoNameError aliasTerm) (declaredAlias aliasTerm)
   _ <- eval aliasTerm
