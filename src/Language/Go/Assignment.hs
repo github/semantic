@@ -12,6 +12,7 @@ import Prologue
 import           Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
 import qualified Data.Abstract.ScopeGraph as ScopeGraph (AccessControl(..))
+import           Data.Abstract.Name (name)
 import           Data.Syntax
     (contextualize, emptyTerm, handleError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1, parseError)
 import qualified Data.Syntax as Syntax
