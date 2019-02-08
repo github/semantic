@@ -190,7 +190,7 @@ library
                      , Semantic.API.Symbols
                      , Semantic.API.Terms
                      , Semantic.API.TOCSummaries
-                     , Semantic.API.Types
+                     , Semantic.Api.V1.CodeAnalysisPB
                      , Semantic.AST
                      , Semantic.CLI
                      , Semantic.Config

@@ -33,8 +33,8 @@ import           Rendering.Graph
 import           Rendering.JSON hiding (JSON)
 import qualified Rendering.JSON
 import           Semantic.API.Helpers
-import           Semantic.API.Types hiding (Blob, BlobPair)
-import qualified Semantic.API.Types as API
+import           Semantic.Api.V1.CodeAnalysisPB hiding (Blob, BlobPair, Language(..))
+import qualified Semantic.Api.V1.CodeAnalysisPB as API
 import           Semantic.Task as Task
 import           Semantic.Telemetry as Stat
 import           Serializing.Format hiding (JSON)
@@ -77,10 +77,10 @@ diffGraph blobs = DiffTreeGraphResponse . toList <$> distributeFor (apiBlobPairT
     go :: (DiffEffects sig m) => BlobPair -> m DiffTreeFileGraph
     go blobPair = doDiff blobPair (const pure) render
       `catchError` \(SomeException e) ->
-        pure (DiffTreeFileGraph path lang mempty mempty [ParseError (show e)])
+        pure (DiffTreeFileGraph path lang mempty mempty [ParseError (T.pack (show e))])
       where
         path = T.pack $ pathForBlobPair blobPair
-        lang = languageForBlobPair blobPair
+        lang = languageToApiLanguage $ languageForBlobPair blobPair
 
         render :: (Foldable syntax, Functor syntax, ConstructorName syntax, Applicative m) => BlobPair -> Diff syntax Location Location -> m DiffTreeFileGraph
         render _ diff =

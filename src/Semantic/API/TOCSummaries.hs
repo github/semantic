@@ -13,8 +13,8 @@ import qualified Data.Text as T
 import           Rendering.TOC
 import           Semantic.API.Diffs
 import           Semantic.API.Helpers
-import           Semantic.API.Types hiding (Blob, BlobPair)
-import qualified Semantic.API.Types as API
+import           Semantic.Api.V1.CodeAnalysisPB hiding (Blob, BlobPair)
+import qualified Semantic.Api.V1.CodeAnalysisPB as API
 import           Semantic.Task as Task
 import           Serializing.Format
 
@@ -44,13 +44,13 @@ diffSummary blobs = DiffTreeTOCResponse <$> distributeFor (apiBlobPairToBlobPair
       `catchError` \(SomeException e) ->
         pure $ TOCSummaryFile path lang mempty [TOCSummaryError (T.pack (show e)) Nothing]
       where path = T.pack $ pathKeyForBlobPair blobPair
-            lang = languageForBlobPair blobPair
+            lang = languageToApiLanguage $ languageForBlobPair blobPair
 
     render :: (Foldable syntax, Functor syntax, Applicative m) => BlobPair -> Diff syntax (Maybe Declaration) (Maybe Declaration) -> m TOCSummaryFile
     render blobPair diff = pure $ foldr go (TOCSummaryFile path lang mempty mempty) (diffTOC diff)
       where
         path = T.pack $ pathKeyForBlobPair blobPair
-        lang = languageForBlobPair blobPair
+        lang = languageToApiLanguage $ languageForBlobPair blobPair
 
         go :: TOCSummary -> TOCSummaryFile -> TOCSummaryFile
         go TOCSummary{..} TOCSummaryFile{..}

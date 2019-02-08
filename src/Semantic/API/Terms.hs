@@ -35,8 +35,8 @@ import           Rendering.Graph
 import           Rendering.JSON hiding (JSON)
 import qualified Rendering.JSON
 import           Semantic.API.Helpers
-import           Semantic.API.Types hiding (Blob)
-import qualified Semantic.API.Types as API
+import           Semantic.Api.V1.CodeAnalysisPB hiding (Blob, Language(..))
+import qualified Semantic.Api.V1.CodeAnalysisPB as API
 import           Semantic.Task
 import           Serializing.Format hiding (JSON)
 import qualified Serializing.Format as Format
@@ -49,10 +49,10 @@ termGraph blobs = ParseTreeGraphResponse . toList <$> distributeFor (fmap apiBlo
     go :: ParseEffects sig m => Blob -> m ParseTreeFileGraph
     go blob = (doParse blob >>= withSomeTerm (pure . render))
       `catchError` \(SomeException e) ->
-        pure (ParseTreeFileGraph path lang mempty mempty [ParseError (show e)])
+        pure (ParseTreeFileGraph path lang mempty mempty [ParseError (T.pack (show e))])
       where
-        path = T.pack (blobPath blob)
-        lang = blobLanguage blob
+        path = T.pack $ blobPath blob
+        lang = languageToApiLanguage $ blobLanguage blob
 
         render :: (Foldable syntax, Functor syntax, ConstructorName syntax) => Term syntax Location -> ParseTreeFileGraph
         render t = let graph = renderTreeGraph t
