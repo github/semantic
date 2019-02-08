@@ -35,6 +35,7 @@ import           Proto3.Suite
 import qualified Proto3.Wire.Decode as Decode
 import qualified Proto3.Wire.Encode as Encode
 import           System.FilePath.Posix
+import Data.Span
 
 data QualifiedName
   = QualifiedName { paths :: NonEmpty FilePath }
@@ -241,10 +242,8 @@ instance Evaluatable QualifiedImport where
     where
       go [] = pure ()
       go (((nameTerm, name), modulePath) : namesAndPaths) = do
-        _ <- eval nameTerm
-        span <- get @Span
         scopeAddress <- newScope mempty
-        declare (Declaration name) Default Public span ScopeGraph.QualifiedImport (Just scopeAddress)
+        declare (Declaration name) Default Public emptySpan ScopeGraph.QualifiedImport (Just scopeAddress)
         aliasSlot <- lookupSlot (Declaration name)
         -- a.b.c
         withScope scopeAddress $
@@ -260,6 +259,10 @@ instance Evaluatable QualifiedImport where
                     withFrame objFrame $ do
                       insertFrameLink ScopeGraph.Import scopeMap
                 go rest)
+
+        _ <- eval nameTerm
+        span <- get @Span
+        putDeclarationSpan (Declaration name) span
       mkScopeMap modulePath fun = do
         ((moduleScope, moduleFrame), _) <- require modulePath
         insertImportEdge moduleScope
