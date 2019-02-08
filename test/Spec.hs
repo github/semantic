@@ -11,7 +11,6 @@ import qualified Data.Diff.Spec
 import qualified Data.Abstract.Name.Spec
 import qualified Data.Abstract.Path.Spec
 import qualified Data.Functor.Classes.Generic.Spec
-import qualified Data.GitHub.Spec
 import qualified Data.Graph.Spec
 import qualified Data.Range.Spec
 import qualified Data.Scientific.Spec
