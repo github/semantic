@@ -13,14 +13,15 @@ import           Data.ByteString.Builder
 import           Data.Location
 import           Data.Maybe
 import           Data.Term
+import qualified Data.Text as T
 import           Data.Text (pack)
 import           Parsing.Parser
 import           Prologue
 import           Semantic.API.Helpers
 import qualified Semantic.API.LegacyTypes as Legacy
 import           Semantic.API.Terms (ParseEffects, doParse)
-import           Semantic.API.Types hiding (Blob)
-import qualified Semantic.API.Types as API
+import           Semantic.Api.V1.CodeAnalysisPB hiding (Blob)
+import qualified Semantic.Api.V1.CodeAnalysisPB as API
 import           Semantic.Task
 import           Serializing.Format
 import           Tags.Taggable
@@ -59,13 +60,13 @@ parseSymbols blobs = ParseTreeSymbolResponse . toList <$> distributeFor (apiBlob
     go :: (Member (Error SomeException) sig, Member Task sig, Carrier sig m, Monad m) => Blob -> m File
     go blob@Blob{..} = (doParse blob >>= withSomeTerm (renderToSymbols blob)) `catchError` (\(SomeException e) -> pure $ errorFile (show e))
       where
-        errorFile e = File (pack blobPath) blobLanguage mempty [ParseError e]
+        errorFile e = File (pack blobPath) (languageToApiLanguage blobLanguage) mempty [ParseError (T.pack e)]
 
         renderToSymbols :: (IsTaggable f, Applicative m) => Blob -> Term f Location -> m File
         renderToSymbols blob@Blob{..} term = pure $ either (errorFile . show) (tagsToFile blob) (runTagging blob term)
 
         tagsToFile :: Blob -> [Tag] -> File
-        tagsToFile Blob{..} tags = File (pack blobPath) blobLanguage (fmap tagToSymbol tags) mempty
+        tagsToFile Blob{..} tags = File (pack blobPath) (languageToApiLanguage blobLanguage) (fmap tagToSymbol tags) mempty
 
         tagToSymbol :: Tag -> Symbol
         tagToSymbol Tag{..}

@@ -19,7 +19,9 @@ import Data.String (IsString (..))
 import Data.Term
 import Prologue
 import Semantic.API.Helpers
-import Semantic.API.Types
+import Semantic.Api.V1.CodeAnalysisPB
+
+import qualified Data.Text as T
 
 -- TODO: rename as this isn't a render
 renderTreeGraph :: (Ord vertex, Recursive t, ToTreeGraph vertex (Base t)) => t -> Graph vertex
@@ -45,10 +47,10 @@ diffStyle name = (defaultStyle (fromString . show . diffVertexId))
   { graphName = fromString (quote name)
   , vertexAttributes = vertexAttributes }
   where quote a = "\"" <> a <> "\""
-        vertexAttributes (DiffTreeVertex _ (Just (Deleted  (Just DeletedTerm{..}))))  = [ "label" := fromString term,  "color" := "red" ]
-        vertexAttributes (DiffTreeVertex _ (Just (Inserted (Just InsertedTerm{..})))) = [ "label" := fromString term, "color" := "green" ]
+        vertexAttributes (DiffTreeVertex _ (Just (Deleted  (Just DeletedTerm{..}))))  = [ "label" := fromString (T.unpack term),  "color" := "red" ]
+        vertexAttributes (DiffTreeVertex _ (Just (Inserted (Just InsertedTerm{..})))) = [ "label" := fromString (T.unpack term), "color" := "green" ]
         vertexAttributes (DiffTreeVertex _ (Just (Replaced (Just ReplacedTerm{..})))) = [ "label" := "Replacement",               "color" := "orange", "style" := "dashed" ]
-        vertexAttributes (DiffTreeVertex _ (Just (Merged   (Just MergedTerm{..}))))   = [ "label" := fromString term ]
+        vertexAttributes (DiffTreeVertex _ (Just (Merged   (Just MergedTerm{..}))))   = [ "label" := fromString (T.unpack term) ]
         vertexAttributes _ = []
 
 class ToTreeGraph vertex t | t -> vertex where
@@ -70,22 +72,22 @@ instance (ConstructorName syntax, Foldable syntax) =>
     termAlgebra (In ann syntax) = do
       i <- fresh
       parent <- ask
-      let root = vertex (TermVertex i (constructorName syntax) (spanToSpan (locationSpan ann)))
+      let root = vertex (TermVertex (fromIntegral i) (T.pack (constructorName syntax)) (spanToSpan (locationSpan ann)))
       subGraph <- foldl' (\acc x -> overlay <$> acc <*> local (const root) x) (pure mempty) syntax
       pure (parent `connect` root `overlay` subGraph)
 
 instance (ConstructorName syntax, Foldable syntax) =>
   ToTreeGraph DiffTreeVertex (DiffF syntax Location Location) where
   toTreeGraph d = case d of
-    Merge t@(In (a1, a2) syntax)     -> diffAlgebra t  (Merged   (Just (MergedTerm (constructorName syntax) (ann a1) (ann a2))))
-    Patch (Delete t1@(In a1 syntax)) -> diffAlgebra t1 (Deleted  (Just (DeletedTerm (constructorName syntax) (ann a1))))
-    Patch (Insert t2@(In a2 syntax)) -> diffAlgebra t2 (Inserted (Just (InsertedTerm (constructorName syntax) (ann a2))))
+    Merge t@(In (a1, a2) syntax)     -> diffAlgebra t  (Merged   (Just (MergedTerm (T.pack (constructorName syntax)) (ann a1) (ann a2))))
+    Patch (Delete t1@(In a1 syntax)) -> diffAlgebra t1 (Deleted  (Just (DeletedTerm (T.pack (constructorName syntax)) (ann a1))))
+    Patch (Insert t2@(In a2 syntax)) -> diffAlgebra t2 (Inserted (Just (InsertedTerm (T.pack (constructorName syntax)) (ann a2))))
     Patch (Replace t1@(In a1 syntax1) t2@(In a2 syntax2)) -> do
       i <- fresh
       parent <- ask
-      let (beforeName, beforeSpan) = (constructorName syntax1, ann a1)
-      let (afterName,  afterSpan) = (constructorName syntax2, ann a2)
-      let replace = vertex (DiffTreeVertex i (Just (Replaced (Just (ReplacedTerm beforeName beforeSpan afterName afterSpan)))))
+      let (beforeName, beforeSpan) = (T.pack (constructorName syntax1), ann a1)
+      let (afterName,  afterSpan) = (T.pack (constructorName syntax2), ann a2)
+      let replace = vertex (DiffTreeVertex (fromIntegral i) (Just (Replaced (Just (ReplacedTerm beforeName beforeSpan afterName afterSpan)))))
       graph <- local (const replace) (overlay <$> diffAlgebra t1 (Deleted (Just (DeletedTerm beforeName beforeSpan))) <*> diffAlgebra t2 (Inserted (Just (InsertedTerm afterName afterSpan))))
       pure (parent `connect` replace `overlay` graph)
     where
@@ -96,10 +98,10 @@ instance (ConstructorName syntax, Foldable syntax) =>
         , Member (Reader (Graph DiffTreeVertex)) sig
         , Carrier sig m
         , Monad m
-        ) => f (m (Graph DiffTreeVertex)) -> DiffTreeTerm -> m (Graph DiffTreeVertex)
+        ) => f (m (Graph DiffTreeVertex)) -> DiffTreeVertexDiffTerm -> m (Graph DiffTreeVertex)
       diffAlgebra syntax a = do
         i <- fresh
         parent <- ask
-        let root = vertex (DiffTreeVertex i (Just a))
+        let root = vertex (DiffTreeVertex (fromIntegral i) (Just a))
         subGraph <- foldl' (\acc x -> overlay <$> acc <*> local (const root) x) (pure mempty) syntax
         pure (parent `connect` root `overlay` subGraph)

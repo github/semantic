@@ -11,4 +11,4 @@ import Semantic.API.Diffs as DiffsAPI
 import Semantic.API.Symbols as SymbolsAPI
 import Semantic.API.Terms as TermsAPI
 import Semantic.API.TOCSummaries as TOCSummariesAPI
-import Semantic.API.Types as Types
+import Semantic.Api.V1.CodeAnalysisPB as Types hiding (Language(..))
