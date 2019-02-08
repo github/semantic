@@ -13,7 +13,6 @@ import           Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
 import qualified Data.Abstract.Name as Name
 import qualified Data.Abstract.ScopeGraph as ScopeGraph (AccessControl(..))
-import qualified Data.Diff as Diff
 import qualified Data.List.NonEmpty as NonEmpty
 import           Data.Syntax
     ( contextualize
@@ -36,7 +35,6 @@ import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
 import           Language.PHP.Grammar as Grammar
 import qualified Language.PHP.Syntax as Syntax
-import           Proto3.Suite (Named (..), Named1 (..))
 
 type Syntax = '[
     Comment.Comment
@@ -165,11 +163,6 @@ type Syntax = '[
 
 type Term = Term.Term (Sum Syntax) Location
 type Assignment = Assignment.Assignment [] Grammar
-
--- For Protobuf serialization
-instance Named1 (Sum Syntax) where nameOf1 _ = "PHPSyntax"
-instance Named (Term.Term (Sum Syntax) ()) where nameOf _ = "PHPTerm"
-instance Named (Diff.Diff (Sum Syntax) () ()) where nameOf _ = "PHPDiff"
 
 -- | Assignment from AST in PHP's grammar onto a program in PHP's syntax.
 assignment :: Assignment Term

@@ -5,15 +5,13 @@ module Data.Syntax.Expression where
 import Prelude hiding (null)
 import Prologue hiding (This, index, null)
 
-import Data.Fixed
-import Data.List (intersperse)
-import Proto3.Suite.Class
-
-import           Control.Abstract hiding (Bitwise(..), Call, Member, Void)
+import           Control.Abstract hiding (Bitwise (..), Call, Member, Void)
 import           Data.Abstract.Evaluatable as Abstract hiding (Member, Void)
 import           Data.Abstract.Name as Name
 import           Data.Abstract.Number (liftIntegralFrac, liftReal, liftedExponent, liftedFloorDiv)
+import           Data.Fixed
 import           Data.JSON.Fields
+import           Data.List (intersperse)
 import qualified Data.List.NonEmpty as NonEmpty
 import qualified Data.Map.Strict as Map
 import qualified Data.Reprinting.Scope as Scope
@@ -23,7 +21,7 @@ import           Reprinting.Tokenize hiding (Superclass)
 
 -- | Typical prefix function application, like `f(x)` in many languages, or `f x` in Haskell.
 data Call a = Call { callContext :: ![a], callFunction :: !a, callParams :: ![a], callBlock :: !a }
-  deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Call
 
 instance Declarations1 Call where
@@ -43,7 +41,7 @@ instance Tokenize Call where
     callBlock
 
 data LessThan a = LessThan { lhs :: a, rhs :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically LessThan
 
 instance Evaluatable LessThan where
@@ -54,7 +52,7 @@ instance Tokenize LessThan where
   tokenize LessThan{..} = within' (Scope.InfixL (Compare Less) 4) $ lhs *> yield Token.Sym <* rhs
 
 data LessThanEqual a = LessThanEqual { lhs :: a, rhs :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically LessThanEqual
 
 instance Evaluatable LessThanEqual where
@@ -65,7 +63,7 @@ instance Tokenize LessThanEqual where
   tokenize LessThanEqual{..} = within' (Scope.InfixL (CompareEql Less) 4) $ lhs *> yield Token.Sym <* rhs
 
 data GreaterThan a = GreaterThan { lhs :: a, rhs :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically GreaterThan
 
 instance Evaluatable GreaterThan where
@@ -76,7 +74,7 @@ instance Tokenize GreaterThan where
   tokenize GreaterThan{..} = within' (Scope.InfixL (Compare Greater) 4) $ lhs *> yield Token.Sym <* rhs
 
 data GreaterThanEqual a = GreaterThanEqual { lhs :: a, rhs :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically GreaterThanEqual
 
 instance Evaluatable GreaterThanEqual where
@@ -87,7 +85,7 @@ instance Tokenize GreaterThanEqual where
   tokenize GreaterThanEqual{..} = within' (Scope.InfixL (CompareEql Greater) 4) $ lhs *> yield Token.Sym <* rhs
 
 data Equal a = Equal { lhs :: a, rhs :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Equal
 
 instance Evaluatable Equal where
@@ -100,7 +98,7 @@ instance Tokenize Equal where
   tokenize Equal{..} = within' (Scope.InfixL Eql 4) $ lhs *> yield Token.Sym <* rhs
 
 data StrictEqual a = StrictEqual { lhs :: a, rhs :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically StrictEqual
 
 instance Evaluatable StrictEqual where
@@ -113,7 +111,7 @@ instance Tokenize StrictEqual where
   tokenize StrictEqual{..} = within' (Scope.InfixL StrictEql 4) $ lhs *> yield Token.Sym <* rhs
 
 data Comparison a = Comparison { lhs :: a, rhs :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Comparison
 
 instance Evaluatable Comparison where
@@ -124,7 +122,7 @@ instance Tokenize Comparison where
   tokenize Comparison{..} = within' (Scope.InfixL Spaceship 4) $ lhs *> yield Token.Sym <* rhs
 
 data Plus a = Plus { lhs :: a, rhs :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Plus
 
 instance Evaluatable Plus where
@@ -135,7 +133,7 @@ instance Tokenize Plus where
   tokenize Plus{..} = within' (Scope.InfixL Add 6) $ lhs *> yield Token.Sym <* rhs
 
 data Minus a = Minus { lhs :: a, rhs :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Minus
 
 instance Evaluatable Minus where
@@ -146,7 +144,7 @@ instance Tokenize Minus where
   tokenize Minus{..} = within' (Scope.InfixL Subtract 6) $ lhs *> yield Token.Sym <* rhs
 
 data Times a = Times { lhs :: a, rhs :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Times
 
 instance Evaluatable Times where
@@ -157,7 +155,7 @@ instance Tokenize Times where
   tokenize Times{..} = within' (Scope.InfixL Multiply 7) $ lhs *> yield Token.Sym <* rhs
 
 data DividedBy a = DividedBy { lhs :: a, rhs :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically DividedBy
 
 instance Evaluatable DividedBy where
@@ -168,7 +166,7 @@ instance Tokenize DividedBy where
   tokenize DividedBy{..} = within' (Scope.InfixL Divide 7) $ lhs *> yield Token.Sym <* rhs
 
 data Modulo a = Modulo { lhs :: a, rhs :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Modulo
 
 instance Evaluatable Modulo where
@@ -179,7 +177,7 @@ instance Tokenize Modulo where
   tokenize Modulo{..} = within' (Scope.InfixL Modulus 7) $ lhs *> yield Token.Sym <* rhs
 
 data Power a = Power { lhs :: a, rhs :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Power
 
 instance Evaluatable Power where
@@ -190,7 +188,7 @@ instance Tokenize Power where
   tokenize Power{..} = within' (Scope.InfixL Raise 9) $ lhs *> yield Token.Sym <* rhs
 
 newtype Negate a = Negate { value :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Negate
 
 instance Evaluatable Negate where
@@ -201,7 +199,7 @@ instance Tokenize Negate where
   tokenize Negate{..} = within' (Scope.Prefix NumericNegate) $ yield Token.Sym <* value
 
 data FloorDivision a = FloorDivision { lhs :: a, rhs :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically FloorDivision
 
 instance Evaluatable FloorDivision where
@@ -213,7 +211,7 @@ instance Tokenize FloorDivision where
 
 -- | Regex matching operators (Ruby's =~ and ~!)
 data Matches a = Matches { lhs :: a, rhs :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Matches
 
 instance Evaluatable Matches
@@ -222,7 +220,7 @@ instance Tokenize Matches where
   tokenize Matches{..} = within' (Scope.InfixL RegexMatch 1) $ lhs *> yield Token.Sym <* rhs
 
 data NotMatches a = NotMatches { lhs :: a, rhs :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically NotMatches
 
 instance Evaluatable NotMatches
@@ -231,7 +229,7 @@ instance Tokenize NotMatches where
   tokenize NotMatches{..} = within' (Scope.InfixL RegexNotMatch 1) $ lhs *> yield Token.Sym <* rhs
 
 data Or a = Or { lhs :: a, rhs :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Or
 
 instance Evaluatable Or where
@@ -243,7 +241,7 @@ instance Tokenize Or where
   tokenize Or{..} = within' (Scope.InfixL LogicalOr 2) $ lhs *> yield Token.Sym <* rhs
 
 data And a = And { lhs :: a, rhs :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically And
 
 instance Evaluatable And where
@@ -255,7 +253,7 @@ instance Tokenize And where
   tokenize And{..} = within' (Scope.InfixL LogicalAnd 2) $ lhs *> yield Token.Sym <* rhs
 
 newtype Not a = Not { value :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Not
 
 instance Evaluatable Not where
@@ -265,7 +263,7 @@ instance Tokenize Not where
   tokenize Not{..} = within' (Scope.Prefix LogicalNot) $ yield Token.Sym <* value
 
 data XOr a = XOr { lhs :: a, rhs :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically XOr
 
 instance Evaluatable XOr where
@@ -277,7 +275,7 @@ instance Tokenize XOr where
 
 -- | Javascript delete operator
 newtype Delete a = Delete { value :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Delete
 
 instance Evaluatable Delete where
@@ -285,7 +283,7 @@ instance Evaluatable Delete where
 
 -- | A sequence expression such as Javascript or C's comma operator.
 data SequenceExpression a = SequenceExpression { firstExpression :: !a, secondExpression :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically SequenceExpression
 
 instance Evaluatable SequenceExpression where
@@ -294,7 +292,7 @@ instance Evaluatable SequenceExpression where
 
 -- | Javascript void operator
 newtype Void a = Void { value :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Void
 
 instance Evaluatable Void where
@@ -303,7 +301,7 @@ instance Evaluatable Void where
 
 -- | Javascript typeof operator
 newtype Typeof a = Typeof { value :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Typeof
 
 -- TODO: Implement Eval instance for Typeof
@@ -311,7 +309,7 @@ instance Evaluatable Typeof
 
 -- | Bitwise operators.
 data BOr a = BOr { lhs :: a, rhs :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically BOr
 
 instance Evaluatable BOr where
@@ -324,7 +322,7 @@ instance Tokenize BOr where
   tokenize BOr{..} = within' (Scope.InfixL BinaryOr 4) $ lhs *> yield Token.Sym <* rhs
 
 data BAnd a = BAnd { lhs :: a, rhs :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically BAnd
 
 instance Evaluatable BAnd where
@@ -337,7 +335,7 @@ instance Tokenize BAnd where
   tokenize BAnd{..} = within' (Scope.InfixL BinaryAnd 5) $ lhs *> yield Token.Sym <* rhs
 
 data BXOr a = BXOr { lhs :: a, rhs :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically BXOr
 
 instance Evaluatable BXOr where
@@ -350,7 +348,7 @@ instance Tokenize BXOr where
   tokenize BXOr{..} = within' (Scope.InfixL BinaryXor 5) $ lhs *> yield Token.Sym <* rhs
 
 data LShift a = LShift { lhs :: a, rhs :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically LShift
 
 instance Evaluatable LShift where
@@ -365,7 +363,7 @@ instance Tokenize LShift where
   tokenize LShift{..} = within' (Scope.InfixL LeftShift 4) $ lhs *> yield Token.Sym <* rhs
 
 data RShift a = RShift { lhs :: a, rhs :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically RShift
 
 instance Evaluatable RShift where
@@ -380,7 +378,7 @@ instance Tokenize RShift where
   tokenize RShift{..} = within' (Scope.InfixL RightShift 4) $ lhs *> yield Token.Sym <* rhs
 
 data UnsignedRShift a = UnsignedRShift { lhs :: a, rhs :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically UnsignedRShift
 
 instance Evaluatable UnsignedRShift where
@@ -390,7 +388,7 @@ instance Evaluatable UnsignedRShift where
     unsignedRShift a' b'
 
 newtype Complement a = Complement { value :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Complement
 
 instance Evaluatable Complement where
@@ -403,7 +401,7 @@ instance Tokenize Complement where
 
 -- | Member Access (e.g. a.b)
 data MemberAccess a = MemberAccess { lhs :: a, rhs :: Name }
-  deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically MemberAccess
 
 instance Declarations1 MemberAccess where
@@ -455,7 +453,7 @@ instance Tokenize MemberAccess where
 
 -- | Subscript (e.g a[1])
 data Subscript a = Subscript { lhs :: a, rhs :: [a] }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Subscript
 
 -- TODO: Finish Eval instance for Subscript
@@ -468,7 +466,7 @@ instance Tokenize Subscript where
   tokenize Subscript{..} = lhs *> within' Scope.Indexing (sequenceA_ (intersperse (yield Token.Sep) rhs))
 
 data Member a = Member { lhs :: a, rhs :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Member
 
 instance Evaluatable Member where
@@ -478,7 +476,7 @@ instance Tokenize Member where
 
 -- | Enumeration (e.g. a[1:10:1] in Python (start at index 1, stop at index 10, step 1 element from start to stop))
 data Enumeration a = Enumeration { enumerationStart :: !a, enumerationEnd :: !a, enumerationStep :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Enumeration
 
 -- TODO: Implement Eval instance for Enumeration
@@ -489,7 +487,7 @@ instance Tokenize Enumeration where
 
 -- | InstanceOf (e.g. a instanceof b in JavaScript
 data InstanceOf a = InstanceOf { instanceOfSubject :: !a, instanceOfObject :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically InstanceOf
 
 -- TODO: Implement Eval instance for InstanceOf
@@ -498,7 +496,7 @@ instance Evaluatable InstanceOf
 
 -- | ScopeResolution (e.g. import a.b in Python or a::b in C++)
 newtype ScopeResolution a = ScopeResolution { scopes :: NonEmpty a }
-  deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically ScopeResolution
 
 instance Hashable1 ScopeResolution where liftHashWithSalt = foldl
@@ -514,7 +512,7 @@ instance Declarations1 ScopeResolution where
 
 -- | A non-null expression such as Typescript or Swift's ! expression.
 newtype NonNullExpression a = NonNullExpression { nonNullExpression :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically NonNullExpression
 
 -- TODO: Implement Eval instance for NonNullExpression
@@ -523,7 +521,7 @@ instance Evaluatable NonNullExpression
 
 -- | An await expression in Javascript or C#.
 newtype Await a = Await { awaitSubject :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Await
 -- TODO: Improve this to model asynchrony or capture some data suggesting async calls are not a problem.
 --       We are currently dealing with an asynchronous construct synchronously.
@@ -532,7 +530,7 @@ instance Evaluatable Await where
 
 -- | An object constructor call in Javascript, Java, etc.
 data New a = New { newSubject :: a , newTypeParameters :: a, newArguments :: [a] }
-  deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically New
 
 instance Declarations1 New where
@@ -570,13 +568,13 @@ instance Evaluatable New where
 
 -- | A cast expression to a specified type.
 data Cast a =  Cast { castSubject :: !a, castType :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Cast
 
 instance Evaluatable Cast
 
 data Super a = Super
-  deriving (Diffable, Eq, Foldable, Functor,  Generic1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1, Named1, Message1, NFData1)
+  deriving (Diffable, Eq, Foldable, Functor,  Generic1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Super
 
 instance Evaluatable Super
@@ -585,7 +583,7 @@ instance Tokenize Super where
   tokenize _ = yield Token.Superclass
 
 data This a = This
-  deriving (Diffable, Eq, Foldable, Functor,  Generic1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1, Named1, Message1, NFData1)
+  deriving (Diffable, Eq, Foldable, Functor,  Generic1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically This
 
 instance Tokenize This where

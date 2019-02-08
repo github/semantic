@@ -3,42 +3,29 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-} -- FIXME
 module Language.Python.Syntax where
 
+import           Control.Abstract.Heap
+import           Control.Abstract.ScopeGraph hiding (Import)
 import           Data.Abstract.BaseError
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
+import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.Aeson hiding (object)
 import           Data.Functor.Classes.Generic
 import           Data.JSON.Fields
 import qualified Data.Language as Language
+import qualified Data.List as List
 import qualified Data.List.NonEmpty as NonEmpty
+import qualified Data.Map.Strict as Map
 import qualified Data.Text as T
 import           Diffing.Algorithm
 import           GHC.Generics
 import           Prologue
 import           System.FilePath.Posix
-import Proto3.Suite (Primitive(..), Message(..), Message1(..), Named1(..), Named(..), MessageField(..), DotProtoIdentifier(..), DotProtoPrimType(..), DotProtoType(..), messageField)
-import qualified Proto3.Suite as Proto
-import qualified Proto3.Wire.Encode as Encode
-import qualified Proto3.Wire.Decode as Decode
-import Control.Abstract.ScopeGraph hiding (Import)
-import Control.Abstract.Heap
-import qualified Data.Abstract.ScopeGraph as ScopeGraph
-import qualified Data.Map.Strict as Map
-import qualified Data.List as List
 
 data QualifiedName
   = QualifiedName { paths :: NonEmpty FilePath }
   | RelativeQualifiedName { path :: FilePath, maybeQualifiedName ::  Maybe QualifiedName }
-  deriving (Eq, Generic, Hashable, Ord, Show, ToJSON, Named, Message, NFData)
-
-instance MessageField QualifiedName where
-  encodeMessageField num QualifiedName{..} = Encode.embedded num (encodeMessageField 1 paths)
-  encodeMessageField num RelativeQualifiedName{..} = Encode.embedded num (encodeMessageField 1 path <> encodeMessageField 2 maybeQualifiedName)
-  decodeMessageField = Decode.embedded'' (qualifiedName <|> relativeQualifiedName)
-    where
-      qualifiedName = QualifiedName <$> Decode.at decodeMessageField 1
-      relativeQualifiedName = RelativeQualifiedName <$> Decode.at decodeMessageField 1 <*> Decode.at decodeMessageField 2
-  protoType _ = messageField (Prim $ Named (Single (nameOf (Proxy @QualifiedName)))) Nothing
+  deriving (Eq, Generic, Hashable, Ord, Show, ToJSON, NFData)
 
 qualifiedName :: NonEmpty Text -> QualifiedName
 qualifiedName xs = QualifiedName (T.unpack <$> xs)
@@ -108,17 +95,17 @@ resolvePythonModules q = do
 --
 -- If the list of symbols is empty copy everything to the calling environment.
 data Import a = Import { importFrom :: QualifiedName, importSymbols :: ![Alias] }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Import
 
 newtype FutureImport a = FutureImport { futureImportSymbols :: [Alias] }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically FutureImport
 
 instance Evaluatable FutureImport where
 
 data Alias = Alias { aliasValue :: Name, aliasName :: Name }
-  deriving (Eq, Generic, Hashable, Ord, Show, Message, Named, ToJSON, NFData)
+  deriving (Eq, Generic, Hashable, Ord, Show, ToJSON, NFData)
 
 toTuple :: Alias -> (Name, Name)
 toTuple Alias{..} = (aliasValue, aliasName)
@@ -182,20 +169,8 @@ instance Evaluatable Import where
 
 
 newtype QualifiedImport a = QualifiedImport { qualifiedImportFrom :: NonEmpty String }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically QualifiedImport
-
-instance Message1 QualifiedImport where
-  liftEncodeMessage _ _ QualifiedImport{..} = encodeMessageField 1 qualifiedImportFrom
-  liftDecodeMessage _ _ = QualifiedImport <$> Decode.at decodeMessageField 1
-  liftDotProto _ = [ Proto.DotProtoMessageField $ Proto.DotProtoField 1 (Repeated Proto.String) (Single "qualifiedImportFrom") [] Nothing ]
-
-instance Named Prelude.String where nameOf _ = "string"
-
-instance Message Prelude.String where
-  encodeMessage _ = encodePrimitive 1
-  decodeMessage _ = Decode.at (Decode.one decodePrimitive mempty) 1
-  dotProto = undefined
 
 -- import a.b.c
 instance Evaluatable QualifiedImport where
@@ -232,7 +207,7 @@ instance Evaluatable QualifiedImport where
         fun (Map.singleton moduleScope moduleFrame)
 
 data QualifiedAliasedImport a = QualifiedAliasedImport { qualifiedAliasedImportFrom :: QualifiedName, qualifiedAliasedImportAlias :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically QualifiedAliasedImport
 
 -- import a.b.c as e
@@ -259,14 +234,14 @@ instance Evaluatable QualifiedAliasedImport where
 
 -- | Ellipsis (used in splice expressions and alternatively can be used as a fill in expression, like `undefined` in Haskell)
 data Ellipsis a = Ellipsis
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Ellipsis
 
 -- TODO: Implement Eval instance for Ellipsis
 instance Evaluatable Ellipsis
 
 data Redirect a = Redirect { lhs :: a, rhs :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Redirect
 
 -- TODO: Implement Eval instance for Redirect
