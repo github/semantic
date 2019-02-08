@@ -773,6 +773,9 @@ requireOnceExpression = makeTerm <$> symbol RequireOnceExpression <*> children (
 variableName :: Assignment Term
 variableName = makeTerm <$> symbol VariableName <*> children (Syntax.VariableName <$> term name)
 
+name :: Assignment Term
+name = makeTerm <$> (symbol Name <|> symbol Name') <*> (Syntax.Identifier . Name.name <$> source)
+
 functionStaticDeclaration :: Assignment Term
 functionStaticDeclaration = makeTerm <$> symbol FunctionStaticDeclaration <*> children (Declaration.VariableDeclaration <$> manyTerm staticVariableDeclaration)
 

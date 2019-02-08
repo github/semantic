@@ -8,7 +8,7 @@ module Language.TypeScript.Assignment
 ) where
 
 import Assigning.Assignment hiding (Assignment, Error)
-import Data.Abstract.Name (Name, name)
+import Data.Abstract.Name (name)
 import qualified Data.Abstract.ScopeGraph as ScopeGraph (AccessControl(..))
 import qualified Assigning.Assignment as Assignment
 import Data.Sum
