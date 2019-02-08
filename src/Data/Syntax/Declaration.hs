@@ -142,11 +142,20 @@ instance Evaluatable MethodSignature
 
 
 newtype RequiredParameter a = RequiredParameter { requiredParameter :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically RequiredParameter
 
+instance Declarations1 RequiredParameter where
+  liftDeclaredName declaredName = declaredName . requiredParameter
+
 -- TODO: Implement Eval instance for RequiredParameter
-instance Evaluatable RequiredParameter
+instance Evaluatable RequiredParameter where
+  eval _ _ RequiredParameter{..} = do
+    name <- maybeM (throwNoNameError requiredParameter) (declaredName requiredParameter)
+    span <- ask @Span
+    declare (Declaration name) Default ScopeGraph.Public span ScopeGraph.RequiredParameter Nothing
+    unit
+
 
 newtype OptionalParameter a = OptionalParameter { optionalParameter :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
