@@ -4,9 +4,7 @@ module Data.Project (
   -- * Projects
     ProjectF (..)
   , Project
-  , PBProject
   , ProjectException (..)
-  , fromPB
   , projectExtensions
   , projectName
   , projectFiles
@@ -23,7 +21,6 @@ import           Data.Blob
 import           Data.File
 import           Data.Language
 import qualified Data.Text as T
-import           Proto3.Suite
 import           System.FilePath.Posix
 import           Semantic.IO
 
@@ -47,22 +44,6 @@ deriving instance (Show path, Show (blobs Blob), Show (paths path)) => Show (Pro
 -- course of diffing, evaluation, and graphing. You probably want to
 -- use this one.
 type Project = ProjectF [] [] FilePath
-
--- | This 'Project' type is protobuf-compatible, and corresponds with
--- the @Project@ message declaration present in types.proto.
-type PBProject = ProjectF NestedVec UnpackedVec Text
-
-deriving instance Message PBProject
-instance Named PBProject where nameOf _ = "Project"
-
--- | Convert from a packed protobuf representation to a more useful one.
-fromPB :: PBProject -> Project
-fromPB Project {..} = Project
-  { projectRootDir     = T.unpack projectRootDir
-  , projectBlobs       = toList projectBlobs
-  , projectLanguage    = projectLanguage
-  , projectExcludeDirs = T.unpack <$> toList projectExcludeDirs
-  }
 
 projectName :: Project -> Text
 projectName = T.pack . dropExtensions . takeFileName . projectRootDir

@@ -1,10 +1,9 @@
 {-# LANGUAGE AllowAmbiguousTypes, DeriveAnyClass, DerivingVia, GADTs, TypeOperators, MultiParamTypeClasses, UndecidableInstances, ScopedTypeVariables, KindSignatures, RankNTypes, ConstraintKinds, GeneralizedNewtypeDeriving #-}
-{-# OPTIONS_GHC -Wno-missing-export-lists -Wno-redundant-constraints -fno-warn-orphans #-} -- For HasCallStack
+{-# OPTIONS_GHC -Wno-missing-export-lists -Wno-redundant-constraints #-} -- For HasCallStack
 module Data.Syntax where
 
 import Data.Abstract.Evaluatable hiding (Empty, Error)
 import Data.Aeson as Aeson (ToJSON(..), object)
-import Data.Char (toLower)
 import Data.JSON.Fields
 import Data.Range
 import Data.Location
@@ -20,11 +19,6 @@ import Prologue
 import Reprinting.Tokenize hiding (Element)
 import qualified Assigning.Assignment as Assignment
 import qualified Data.Error as Error
-import Proto3.Suite.Class
-import Proto3.Wire.Types
-import qualified Proto3.Suite.DotProto as Proto
-import qualified Proto3.Wire.Encode as Encode
-import qualified Proto3.Wire.Decode as Decode
 import Control.Abstract.ScopeGraph (reference, Reference(..), Declaration(..))
 import Control.Abstract.Heap (deref, lookupSlot)
 
@@ -107,30 +101,6 @@ infixContext :: (Context :< syntaxes, Assignment.Parsing m, Semigroup ann, HasCa
              -> m (Sum syntaxes (Term (Sum syntaxes) ann))
 infixContext context left right operators = uncurry (&) <$> postContextualizeThrough context left (asum operators) <*> postContextualize context right
 
-instance (Apply Message1 fs, Generate Message1 fs fs, Generate Named1 fs fs) => Message1 (Sum fs) where
-  liftEncodeMessage encodeMessage _ fs = Encode.embedded (fromIntegral . succ $ elemIndex fs) message
-    where message = apply @Message1 (liftEncodeMessage encodeMessage 1) fs
-  liftDecodeMessage decodeMessage subMessageNum = Decode.oneof undefined listOfParsers
-    where
-      listOfParsers =
-        generate @Message1 @fs @fs (\ (_ :: proxy f) i ->
-          let
-            num = fromInteger (succ i)
-          in
-            [(num, trustMe <$> Decode.embedded (inject @f @fs <$> liftDecodeMessage decodeMessage subMessageNum))])
-      trustMe (Just a) = a
-      trustMe Nothing = error "liftDecodeMessage (Sum): embedded parser returned Nothing"
-  liftDotProto _ =
-    [Proto.DotProtoMessageOneOf (Proto.Single "syntax") (generate @Named1 @fs @fs (\ (_ :: proxy f) i ->
-      let
-        num = FieldNumber (fromInteger (succ i))
-        fieldType = Proto.Prim (Proto.Named . Proto.Single $ nameOf1 (Proxy @f))
-        fieldName = Proto.Single (camelCase $ nameOf1 (Proxy @f))
-        camelCase (x : xs) = toLower x : xs
-        camelCase [] = []
-      in
-        [ Proto.DotProtoField num fieldType fieldName [] Nothing ]))]
-
 class Generate (c :: (* -> *) -> Constraint) (all :: [* -> *]) (fs :: [* -> *]) where
   generate :: Monoid b => (forall f proxy. (Element f all, c f) => proxy f -> Integer -> b) -> b
 
@@ -140,17 +110,6 @@ instance Generate c all '[] where
 instance (Element f all, c f, Generate c all fs) => Generate c all (f ': fs) where
   generate each = each (Proxy @f) (natVal (Proxy @(ElemIndex f all))) `mappend` generate @c @all @fs each
 
-instance Named1 [] where
-  nameOf1 _ = "List"
-
-instance Message1 [] where
-  liftEncodeMessage encodeMessage num = foldMap (Encode.embedded num . encodeMessage (fieldNumber 1))
-  liftDecodeMessage decodeMessage num = toList <$> Decode.repeated (Decode.embedded' oneMsg) `Decode.at` num
-    where
-      oneMsg = decodeMessage (fieldNumber 1)
-  liftDotProto (_ :: Proxy [a]) =  [ Proto.DotProtoMessageField $ Proto.DotProtoField (fieldNumber 1) ty (Proto.Single "listContent") [] Nothing ]
-    where ty = Proto.NestedRepeated (Proto.Named (Proto.Single (nameOf (Proxy @a))))
-
 
 -- Common
 
@@ -158,7 +117,7 @@ instance Message1 [] where
 newtype Identifier a = Identifier { name :: Name }
   deriving newtype (Eq, Ord, Show)
   deriving stock (Foldable, Functor, Generic1, Traversable)
-  deriving anyclass (Diffable, Hashable1, Message1, Named1, ToJSONFields1, NFData1)
+  deriving anyclass (Diffable, Hashable1, ToJSONFields1, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Identifier
 
 
@@ -183,7 +142,7 @@ instance Declarations1 Identifier where
 newtype AccessibilityModifier a = AccessibilityModifier { contents :: Text }
   deriving newtype (Eq, Ord, Show)
   deriving stock (Foldable, Functor, Generic1, Traversable)
-  deriving anyclass (Declarations1, Diffable, FreeVariables1, Hashable1, Message1, Named1, ToJSONFields1, NFData1)
+  deriving anyclass (Declarations1, Diffable, FreeVariables1, Hashable1, ToJSONFields1, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically AccessibilityModifier
 
 -- TODO: Implement Eval instance for AccessibilityModifier
@@ -193,7 +152,7 @@ instance Evaluatable AccessibilityModifier
 --
 --   This can be used to represent an implicit no-op, e.g. the alternative in an 'if' statement without an 'else'.
 data Empty a = Empty
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1, NFData1)
+  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Empty
 
 instance Evaluatable Empty where
@@ -204,7 +163,7 @@ instance Tokenize Empty where
 
 -- | Syntax representing a parsing or assignment error.
 data Error a = Error { errorCallStack :: ErrorStack, errorExpected :: [String], errorActual :: Maybe String, errorChildren :: [a] }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Error
 
 instance Evaluatable Error
@@ -212,14 +171,6 @@ instance Evaluatable Error
 instance Tokenize Error where
   -- TODO: Considering producing comments like "ERROR: due to.." instead of ignoring.
   tokenize = ignore
-
-instance Named String where
-  nameOf _ = "string"
-
-instance Message String where
-  encodeMessage = encodeMessageField
-  decodeMessage = Decode.at decodeMessageField
-  dotProto _ = [ Proto.DotProtoMessageField $ protoType (Proxy @String) ]
 
 errorSyntax :: Error.Error String -> [a] -> Error a
 errorSyntax Error.Error{..} = Error (ErrorStack $ errorSite <$> getCallStack callStack) errorExpected errorActual
@@ -229,7 +180,7 @@ unError span Error{..} = Error.Error span errorExpected errorActual stack
   where stack = fromCallSiteList $ unErrorSite <$> unErrorStack errorCallStack
 
 data ErrorSite = ErrorSite { errorMessage :: String, errorLocation :: SrcLoc }
-  deriving (Eq, Show, Generic, Named, Message, NFData)
+  deriving (Eq, Show, Generic, NFData)
 
 errorSite :: (String, SrcLoc) -> ErrorSite
 errorSite = uncurry ErrorSite
@@ -239,22 +190,7 @@ unErrorSite ErrorSite{..} = (errorMessage, errorLocation)
 
 newtype ErrorStack = ErrorStack { unErrorStack :: [ErrorSite] }
   deriving stock (Eq, Show, Generic)
-  deriving anyclass (Named, Message, NFData)
-  deriving newtype (MessageField)
-
-instance HasDefault ErrorStack where
-  def = ErrorStack mempty
-
-deriving instance Generic SrcLoc
-deriving instance Message SrcLoc
-deriving instance Named SrcLoc
-instance MessageField SrcLoc where
-  encodeMessageField num = Encode.embedded num . encodeMessage (fieldNumber 1)
-  decodeMessageField = fromMaybe def <$> Decode.embedded (decodeMessage (fieldNumber 1))
-  protoType _ = messageField (Proto.Prim (Proto.Named (Proto.Single (nameOf (Proxy @SrcLoc))))) Nothing
-
-instance HasDefault SrcLoc where
-  def = SrcLoc mempty mempty mempty 1 1 1 1
+  deriving anyclass (NFData)
 
 instance ToJSON ErrorStack where
   toJSON (ErrorStack es) = toJSON (jSite <$> es) where
@@ -285,7 +221,7 @@ instance Ord ErrorStack where
 
 
 data Context a = Context { contextTerms :: NonEmpty a, contextSubject :: a }
-  deriving (Eq, Foldable, FreeVariables1, Functor, Generic1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
+  deriving (Eq, Foldable, FreeVariables1, Functor, Generic1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Context
 
 instance Diffable Context where
