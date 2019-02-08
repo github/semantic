@@ -17,23 +17,13 @@ import           Data.Blob
 import           Data.Location
 import           Data.Machine as Machine
 import qualified Data.Source as Source
+import           Data.Tag
 import           Data.Term
 import           Data.Text hiding (empty)
 import           Tags.Taggable
 
 symbolsToSummarize :: [Text]
 symbolsToSummarize = ["Function", "Method", "Class", "Module"]
-
-data Tag
-  = Tag
-  { name :: Text
-  , kind :: Text
-  , span :: Span
-  , context :: [Text]
-  , line :: Maybe Text
-  , docs :: Maybe Text
-  }
-  deriving (Eq, Show, Generic, ToJSON)
 
 runTagging :: (IsTaggable syntax)
   => Blob
