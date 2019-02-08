@@ -43,7 +43,7 @@ instance Evaluatable Function where
       paramSpan <- get @Span
       -- TODO: This might be a motivation for a typeclass for `declarationKind` since we
       -- sometimes create declarations for our children.
-      param <$ declare (Declaration param) Default ScopeGraph.Public span ScopeGraph.Parameter Nothing
+      param <$ declare (Declaration param) Default ScopeGraph.Public paramSpan ScopeGraph.Parameter Nothing
 
     addr <- lookupSlot (Declaration name)
     v <- function name params functionBody associatedScope
