@@ -84,7 +84,6 @@ library
                      , Data.File
                      , Data.Functor.Both
                      , Data.Functor.Classes.Generic
-                     , Data.Git
                      , Proto3.Google.Timestamp
                      , Data.Graph
                      , Data.Graph.ControlFlowVertex
