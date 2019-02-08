@@ -46,6 +46,7 @@ type Syntax =
    , Declaration.Comprehension
    , Declaration.Decorator
    , Declaration.Function
+   , Declaration.RequiredParameter
    , Expression.Plus
    , Expression.Minus
    , Expression.Times
@@ -275,9 +276,17 @@ exceptClause = makeTerm <$> symbol ExceptClause <*> children
                       <|> expressions)
                    <*> expressions)
 
+functionParam :: Assignment Term
+functionParam = (makeParameter <$> location <*> identifier)
+  <|> tuple
+  <|> parameter
+  <|> listSplat
+  <|> dictionarySplat
+  where makeParameter loc term = makeTerm loc (Declaration.RequiredParameter term)
+
 functionDefinition :: Assignment Term
 functionDefinition =
-      makeFunctionDeclaration <$> symbol FunctionDefinition <*> children ((,,,) <$> term expression <* symbol Parameters <*> children (manyTerm expression) <*> optional (symbol Type *> children (term expression)) <*> expressions')
+      makeFunctionDeclaration <$> symbol FunctionDefinition <*> children ((,,,) <$> term expression <* symbol Parameters <*> children (manyTerm functionParam) <*> optional (symbol Type *> children (term expression)) <*> expressions')
   <|> makeFunctionDeclaration <$> (symbol Lambda' <|> symbol Lambda) <*> children ((,,,) <$ token AnonLambda <*> emptyTerm <*> (symbol LambdaParameters *> children (manyTerm expression) <|> pure []) <*> optional (symbol Type *> children (term expression)) <*> expressions')
   where
     expressions' = makeTerm <$> location <*> manyTerm expression
