@@ -488,9 +488,6 @@ newVariable = makeTerm <$> symbol NewVariable <*> children (Syntax.NewVariable <
 memberName :: Assignment Term
 memberName = name <|> simpleVariable' <|> expression
 
-memberName' :: Assignment Name.Name
-memberName' = name' <|> simpleVariable''
-
 relativeScope :: Assignment Term
 relativeScope = makeTerm <$> symbol RelativeScope <*> (Syntax.RelativeScope <$> source)
 
@@ -752,9 +749,6 @@ simpleVariable = makeTerm <$> symbol SimpleVariable <*> children (Syntax.SimpleV
 simpleVariable' :: Assignment Term
 simpleVariable' = choice [simpleVariable, variableName]
 
-simpleVariable'' :: Assignment Name.Name
-simpleVariable'' = variableName'
-
 
 yieldExpression :: Assignment Term
 yieldExpression = makeTerm <$> symbol YieldExpression <*> children (Statement.Yield <$> term (arrayElementInitializer <|> expression))
@@ -778,15 +772,6 @@ requireOnceExpression = makeTerm <$> symbol RequireOnceExpression <*> children (
 
 variableName :: Assignment Term
 variableName = makeTerm <$> symbol VariableName <*> children (Syntax.VariableName <$> term name)
-
-variableName' :: Assignment Name.Name
-variableName' = symbol VariableName *> children name'
-
-name :: Assignment Term
-name = makeTerm <$> (symbol Name <|> symbol Name') <*> (Syntax.Identifier . Name.name <$> source)
-
-name' :: Assignment Name.Name
-name' = (symbol Name <|> symbol Name') *> (Name.name <$> source)
 
 functionStaticDeclaration :: Assignment Term
 functionStaticDeclaration = makeTerm <$> symbol FunctionStaticDeclaration <*> children (Declaration.VariableDeclaration <$> manyTerm staticVariableDeclaration)
