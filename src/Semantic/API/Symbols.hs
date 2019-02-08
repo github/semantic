@@ -5,6 +5,8 @@ module Semantic.API.Symbols
   , parseSymbolsBuilder
   ) where
 
+import Prelude hiding (span)
+
 import           Control.Effect
 import           Control.Effect.Error
 import           Control.Exception
@@ -44,7 +46,7 @@ legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> distributeFoldMap 
       { symbolName = name
       , symbolKind = kind
       , symbolLine = fromMaybe mempty line
-      , symbolSpan = spanToLegacySpan span
+      , symbolSpan = spanToLegacySpan tagSpan
       }
 
 parseSymbolsBuilder :: (Member Distribute sig, ParseEffects sig m, Traversable t) => t Blob -> m Builder
@@ -71,5 +73,5 @@ parseSymbols blobs = ParseTreeSymbolResponse <$> distributeFoldMap go (apiBlobTo
       { symbol = name
       , kind = kind
       , line = fromMaybe mempty line
-      , span = spanToSpan span
+      , span = spanToSpan tagSpan
       }

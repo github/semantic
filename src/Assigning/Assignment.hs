@@ -104,7 +104,7 @@ import Data.Error
 import Data.Range
 import qualified Data.Location as L
 import qualified Data.Source as Source (Source, slice, sourceBytes)
-import Data.Span
+import Data.Span hiding (HasSpan(..))
 import Data.Term
 import Data.Text (Text)
 import Data.Text.Encoding (decodeUtf8')
