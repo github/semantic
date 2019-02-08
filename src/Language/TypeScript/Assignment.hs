@@ -468,9 +468,6 @@ jsxAttribute = makeTerm <$> symbol Grammar.JsxAttribute <*> children (TypeScript
 propertyIdentifier :: Assignment Term
 propertyIdentifier = makeTerm <$> symbol PropertyIdentifier <*> (Syntax.Identifier . name <$> source)
 
-propertyIdentifier' :: Assignment Name
-propertyIdentifier' = symbol PropertyIdentifier *> (name <$> source)
-
 sequenceExpression :: Assignment Term
 sequenceExpression = makeTerm <$> symbol Grammar.SequenceExpression <*> children (Expression.SequenceExpression <$> term expression <*> term expressions)
 

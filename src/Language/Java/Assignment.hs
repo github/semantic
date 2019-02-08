@@ -309,9 +309,6 @@ identifier = makeTerm <$> symbol Identifier <*> (Syntax.Identifier . name <$> so
 typeIdentifier :: Assignment Term
 typeIdentifier = makeTerm <$> symbol TypeIdentifier <*> (Syntax.Identifier . name <$> source)
 
-identifier' :: Assignment Name
-identifier' = (symbol Identifier <|> symbol TypeIdentifier <|> symbol Identifier') *> (name <$> source)
-
 scopedIdentifier :: Assignment Term
 scopedIdentifier = makeTerm <$> symbol ScopedIdentifier <*> children (Expression.MemberAccess <$> term expression <*> identifier)
 

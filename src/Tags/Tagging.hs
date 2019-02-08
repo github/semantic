@@ -12,7 +12,6 @@ import           Control.Effect as Eff
 import           Control.Effect.Error as Error
 import qualified Control.Effect.State as State
 import           Control.Monad.Trans
-import           Data.Aeson
 import           Data.Blob
 import           Data.Location
 import           Data.Machine as Machine
