@@ -26,7 +26,6 @@ import           Data.Graph (topologicalSort)
 import qualified Data.Language as Language
 import           Data.List (uncons)
 import           Data.Project hiding (readFile)
-import           Data.Quieterm (quieterm)
 import           Data.Sum (weaken)
 import           Parsing.Parser
 import           Prologue
@@ -38,7 +37,6 @@ import           Semantic.Telemetry (LogQueue, StatQueue)
 import           System.Exit (die)
 import           System.FilePath.Posix (takeDirectory)
 
-import qualified Data.Abstract.Value.Concrete as Concrete
 import Data.Quieterm
 import Data.Location
 

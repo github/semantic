@@ -157,9 +157,7 @@ instance Evaluatable Import where
     aliasFrame <- newFrame importScope (Map.singleton ScopeGraph.Import scopeMap)
 
     -- Add declaration of the alias name to the current scope (within our current module).
-    aliasName <- maybeM (throwNoNameError aliasTerm) (declaredAlias aliasTerm)
-    _ <- eval aliasTerm
-    aliasSpan <- get @Span
+    (aliasName, aliasSpan) <- evalAliasNameAndSpan eval aliasTerm
     declare (Declaration aliasName) Default Public aliasSpan ScopeGraph.UnqualifiedImport (Just importScope)
     -- Retrieve the frame slot for the new declaration.
     aliasSlot <- lookupSlot (Declaration aliasName)
@@ -188,10 +186,8 @@ instance Evaluatable Import where
       scopeAddress <- newScope scopeEdges
       withScope moduleScope .
         for_ xs $ \aliasTerm -> do
+          (aliasName, aliasSpan) <- evalAliasNameAndSpan eval aliasTerm
           aliasValue <- maybeM (throwNoNameError aliasTerm) (declaredName aliasTerm)
-          aliasName <- maybeM (throwNoNameError aliasTerm) (declaredAlias aliasTerm)
-          _ <- eval aliasTerm
-          aliasSpan <- get @Span
           if aliasValue /= aliasName then
             insertImportReference (Reference aliasName) aliasSpan ScopeGraph.Identifier (Declaration aliasValue) scopeAddress
           else pure ()
@@ -203,6 +199,22 @@ instance Evaluatable Import where
       insertFrameLink ScopeGraph.Import (Map.singleton scopeAddress frameAddress)
 
     unit
+
+evalAliasNameAndSpan :: (Carrier sig m
+                       , Declarations t
+                       , Member (State Span) sig
+                       , Member (Reader ModuleInfo) sig
+                       , Member (Reader Span) sig
+                       , Member (Resumable (BaseError (EvalError t address value))) sig)
+                     => (t -> Evaluator t address value m a)
+                     -> t
+                     -> Evaluator t address value m (Name, Span)
+evalAliasNameAndSpan eval aliasTerm = do
+  aliasName <- maybeM (throwNoNameError aliasTerm) (declaredAlias aliasTerm)
+  _ <- eval aliasTerm
+  aliasSpan <- get @Span
+  pure (aliasName, aliasSpan)
+
 
 deriving instance Hashable1 NonEmpty
 
