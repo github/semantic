@@ -256,6 +256,7 @@ library
                      , http-types
                      , http-media
                      , kdt
+                     , lens
                      , machines
                      , mersenne-random-pure64
                      , mtl
