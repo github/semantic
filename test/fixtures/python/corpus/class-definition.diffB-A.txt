@@ -28,4 +28,21 @@
         (Statements
           (Return
           { (Identifier)
-          ->(Empty) }))))))
+          ->(Empty) })))))
+  (Class
+  { (Identifier)
+  ->(Identifier) }
+    (Identifier)
+    (Statements
+      (Assignment
+        (Identifier)
+      { (Identifier)
+      ->(Identifier) }
+        (Empty))
+      (Assignment
+        (Subscript
+          (Identifier)
+          (Identifier))
+      { (Identifier)
+      ->(Identifier) }
+        (Empty)))))

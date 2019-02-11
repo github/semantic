@@ -17,4 +17,18 @@
         (Identifier)
         (Statements
           (Return
-            (Identifier)))))))
+            (Identifier))))))
+  (Class
+    (Identifier)
+    (Identifier)
+    (Statements
+      (Assignment
+        (Identifier)
+        (Identifier)
+        (Empty))
+      (Assignment
+        (Subscript
+          (Identifier)
+          (Identifier))
+        (Identifier)
+        (Empty)))))
