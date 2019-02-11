@@ -19,9 +19,6 @@ import Prologue
 import           Control.Lens.Lens
 import           Data.Aeson ((.:), (.=))
 import qualified Data.Aeson as A
-import           Proto3.Suite
-import           Proto3.Wire.Decode as Decode
-import           Proto3.Wire.Encode as Encode
 
 import Data.JSON.Fields
 
