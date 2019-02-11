@@ -10,7 +10,6 @@ module Language.Python.Assignment
 import           Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
 import           Data.Abstract.Name (name)
-import qualified Data.Diff as Diff
 import qualified Data.List.NonEmpty as NonEmpty
 import           Data.Sum
 import           Data.Syntax
@@ -36,7 +35,6 @@ import qualified Data.Term as Term
 import           Language.Python.Grammar as Grammar
 import           Language.Python.Syntax as Python.Syntax
 import           Prologue
-import           Proto3.Suite (Named (..), Named1 (..))
 
 
 -- | The type of Python syntax.
@@ -122,15 +120,6 @@ type Syntax =
 
 type Term = Term.Term (Sum Syntax) Location
 type Assignment = Assignment.Assignment [] Grammar
-
-instance Named1 (Sum Syntax) where
-  nameOf1 _ = "PythonSyntax"
-
-instance Named (Term.Term (Sum Syntax) ()) where
-  nameOf _ = "PythonTerm"
-
-instance Named (Diff.Diff (Sum Syntax) () ()) where
-  nameOf _ = "PythonDiff"
 
 -- | Assignment from AST in Python's grammar onto a program in Python's syntax.
 assignment :: Assignment Term
@@ -377,7 +366,7 @@ assignment' =  makeAssignment <$> symbol Assignment <*> children ((,,) <$> term 
                   , assign Expression.LShift    <$ symbol AnonLAngleLAngleEqual
                   , assign Expression.BXOr      <$ symbol AnonCaretEqual
                   ])
-  where rvalue = expressionList <|> assignment' <|> yield
+  where rvalue = expressionList <|> assignment' <|> yield <|> emptyTerm
         makeAssignment loc (lhs, maybeType, rhs) = makeTerm loc (Statement.Assignment (maybeToList maybeType) lhs rhs)
         assign :: (f :< Syntax) => (Term -> Term -> f Term) -> Term -> Term -> Sum Syntax Term
         assign c l r = inject (Statement.Assignment [] l (makeTerm1 (c l r)))

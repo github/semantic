@@ -47,14 +47,11 @@ import           Data.Aeson
 import qualified Data.Map.Strict as Map
 import qualified Data.Sequence as Seq
 import qualified Data.Set as Set
-import qualified Proto3.Suite as Proto
-import qualified Proto3.Wire.Decode as Decode
-import qualified Proto3.Wire.Encode as Encode
 
+import Data.JSON.Fields (ToJSONFields (..))
 import Control.Abstract.Hole
 import Data.Abstract.Module
 import Data.Abstract.Name
-import Data.JSON.Fields (ToJSONFields (..))
 import Data.Span
 
 -- A slot is a location in the heap where a value is stored.
@@ -65,15 +62,7 @@ data Slot address = Slot { frameAddress :: address, position :: Position }
 data AccessControl = Public
                    | Protected
                    | Private
-                   deriving (Bounded, Enum, Eq, Proto.Finite, Generic, Hashable, ToJSON, Proto.MessageField, Proto.Named, NFData, Show)
-
-instance Proto.Primitive AccessControl where
-  encodePrimitive = Encode.enum
-  decodePrimitive = fromRight Proto.def <$> Decode.enum
-  primType _ = Proto.Named (Proto.Single (Proto.nameOf (Proxy @AccessControl)))
-
-instance Proto.HasDefault AccessControl where
-  def = Public
+                   deriving (Bounded, Enum, Eq, Generic, Hashable, ToJSON, NFData, Show)
 
 instance ToJSONFields AccessControl where
   toJSONFields accessControl = ["accessControl" .= accessControl]

@@ -36,7 +36,6 @@ import           Data.List (span)
 import           Data.String (IsString (..))
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
-import           Proto3.Suite
 
 import Data.Range
 import Data.Span hiding (HasSpan (..))
@@ -46,7 +45,7 @@ import Data.Span hiding (HasSpan (..))
 -- 'ByteString' under the hood. Construct these with 'fromUTF8'; obviously,
 -- passing 'fromUTF8' non-UTF8 bytes will cause crashes.
 newtype Source = Source { sourceBytes :: B.ByteString }
-  deriving (Eq, Semigroup, Monoid, IsString, Show, Generic, MessageField)
+  deriving (Eq, Semigroup, Monoid, IsString, Show, Generic)
 
 fromUTF8 :: B.ByteString -> Source
 fromUTF8 = Source
