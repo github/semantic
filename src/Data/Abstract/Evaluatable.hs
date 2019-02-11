@@ -5,6 +5,8 @@ module Data.Abstract.Evaluatable
 , traceResolve
 -- * Preludes
 , HasPrelude(..)
+-- * Spans
+, HasSpan(..)
 -- * Effects
 , EvalError(..)
 , throwEvalError
@@ -39,14 +41,16 @@ import Data.Span (emptySpan)
 import Data.Sum hiding (project)
 import Data.Term
 import Prologue
+import Data.Abstract.HasSpan
 
 -- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
 class (Show1 constr, Foldable constr) => Evaluatable constr where
   eval :: ( AbstractValue term address value m
+          , AccessControls term
           , Carrier sig m
           , Declarations term
           , FreeVariables term
-          , AccessControls term
+          , HasSpan term
           , Member (Allocator address) sig
           , Member (Bitwise value) sig
           , Member (Boolean value) sig

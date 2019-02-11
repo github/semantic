@@ -174,8 +174,7 @@ data QualifiedName a = QualifiedName { name :: a, identifier :: a }
 instance Evaluatable QualifiedName where
   eval eval _ (QualifiedName obj iden) = do
     name <- maybeM (throwNoNameError obj) (declaredName obj)
-    _ <- eval obj
-    objSpan <- get @Span
+    let objSpan = getSpan obj
     reference (Reference name) objSpan ScopeGraph.Identifier (Declaration name)
     childScope <- associatedScope (Declaration name)
 
@@ -186,9 +185,7 @@ instance Evaluatable QualifiedName where
         currentFrameAddress <- currentFrame
         frameAddress <- newFrame childScope (Map.singleton Lexical (Map.singleton currentScopeAddress currentFrameAddress))
         withScopeAndFrame frameAddress $ do
-          -- FIXME: We shouldn't have to eval iden to get the span
-          _ <- eval iden
-          propSpan <- get @Span
+          let propSpan = getSpan iden
           reference (Reference propName) propSpan ScopeGraph.Identifier (Declaration propName)
           slot <- lookupSlot (Declaration propName)
           deref slot

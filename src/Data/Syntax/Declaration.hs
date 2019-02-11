@@ -30,7 +30,7 @@ instance Diffable Function where
 -- TODO: How should we represent function types, where applicable?
 
 instance Evaluatable Function where
-  eval eval _ Function{..} = do
+  eval _ _ Function{..} = do
     name <- maybeM (throwNoNameError functionName) (declaredName functionName)
     span <- ask @Span
     associatedScope <- declareFunction name ScopeGraph.Public span ScopeGraph.Function
@@ -38,9 +38,7 @@ instance Evaluatable Function where
     params <- withScope associatedScope . for functionParameters $ \paramNode -> do
       param <- maybeM (throwNoNameError paramNode) (declaredName paramNode)
 
-      -- TODO: Come up with an easier way to fetch the child node span instead of evaling it.
-      _ <- eval paramNode
-      paramSpan <- get @Span
+      let paramSpan = getSpan paramNode
       -- TODO: This might be a motivation for a typeclass for `declarationKind` since we
       -- sometimes create declarations for our children.
       param <$ declare (Declaration param) Default ScopeGraph.Public paramSpan ScopeGraph.Parameter Nothing
@@ -178,13 +176,8 @@ instance Evaluatable VariableDeclaration where
   eval eval _ (VariableDeclaration decs) = do
     for_ decs $ \declaration -> do
       name <- maybeM (throwNoNameError declaration) (declaredName declaration)
-      declare (Declaration name) Default ScopeGraph.Public emptySpan ScopeGraph.VariableDeclaration Nothing
-      (span, _) <- do
-        ref <- eval declaration
-        subtermSpan <- get @Span
-        pure (subtermSpan, ref)
-
-      putDeclarationSpan (Declaration name) span
+      let declarationSpan = getSpan declaration
+      declare (Declaration name) Default ScopeGraph.Public declarationSpan ScopeGraph.VariableDeclaration Nothing
     unit
 
 instance Declarations a => Declarations (VariableDeclaration a) where
