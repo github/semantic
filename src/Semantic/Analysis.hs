@@ -157,11 +157,12 @@ runDomainEffects runTerm
 --
 --   This calls out to the 'Evaluatable' instances, and can have other functions composed after it to e.g. intercept effects arising in the evaluation of the term.
 evalTerm :: ( Carrier sig m
+            , AbstractValue term address value m
+            , AccessControls term
             , Declarations term
             , Evaluatable (Base term)
             , FreeVariables term
-            , AccessControls term
-            , AbstractValue term address value m
+            , HasSpan term
             , Member (Allocator address) sig
             , Member (Bitwise value) sig
             , Member (Boolean value) sig

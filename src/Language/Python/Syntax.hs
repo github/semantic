@@ -35,7 +35,6 @@ import           Proto3.Suite
 import qualified Proto3.Wire.Decode as Decode
 import qualified Proto3.Wire.Encode as Encode
 import           System.FilePath.Posix
-import Data.Span
 
 data QualifiedName
   = QualifiedName { paths :: NonEmpty FilePath }
@@ -123,8 +122,6 @@ instance Declarations1 Alias where
   liftDeclaredAlias declaredAlias = declaredAlias . aliasName
 
 instance Evaluatable Alias where
-  eval eval _ Alias{..} = eval aliasValue
-  ref _ ref Alias{..} = ref aliasValue
 
 -- | Import declarations (symbols are added directly to the calling environment).
 --
@@ -145,7 +142,7 @@ instance Evaluatable Import where
   -- from . import moduleY            -- aliasValue = moduleY, aliasName = moduleY
   -- from . import moduleY as moduleZ -- aliasValue = moduleY, aliasName = moduleZ
   -- This is a bit of a special case in the syntax as this actually behaves like a qualified relative import.
-  eval eval _ (Import (RelativeQualifiedName n Nothing) [aliasTerm]) = do
+  eval _ _ (Import (RelativeQualifiedName n Nothing) [aliasTerm]) = do
     aliasValue' <- maybeM (throwNoNameError aliasTerm) (declaredName aliasTerm)
     path <- NonEmpty.last <$> resolvePythonModules (RelativeQualifiedName n (Just (qualifiedName (formatName aliasValue' :| []))))
     ((moduleScope, moduleFrame), _) <- require path
@@ -158,7 +155,8 @@ instance Evaluatable Import where
     aliasFrame <- newFrame importScope (Map.singleton ScopeGraph.Import scopeMap)
 
     -- Add declaration of the alias name to the current scope (within our current module).
-    (aliasName, aliasSpan) <- evalAliasNameAndSpan eval aliasTerm
+    aliasName <- maybeM (throwNoNameError aliasTerm) (declaredAlias aliasTerm)
+    let aliasSpan = getSpan aliasTerm
     declare (Declaration aliasName) Default Public aliasSpan ScopeGraph.UnqualifiedImport (Just importScope)
     -- Retrieve the frame slot for the new declaration.
     aliasSlot <- lookupSlot (Declaration aliasName)
@@ -170,7 +168,7 @@ instance Evaluatable Import where
   -- from a import b as c
   -- from a import *
   -- from .moduleY import b
-  eval eval _ (Import name xs) = do
+  eval _ _ (Import name xs) = do
     modulePaths <- resolvePythonModules name
 
     -- Eval parent modules first
@@ -185,13 +183,6 @@ instance Evaluatable Import where
     else do
       let scopeEdges = Map.singleton ScopeGraph.Import [ moduleScope ]
       scopeAddress <- newScope scopeEdges
-      withScope moduleScope .
-        for_ xs $ \aliasTerm -> do
-          (aliasName, aliasSpan) <- evalAliasNameAndSpan eval aliasTerm
-          aliasValue <- maybeM (throwNoNameError aliasTerm) (declaredName aliasTerm)
-          if aliasValue /= aliasName then
-            insertImportReference (Reference aliasName) aliasSpan ScopeGraph.Identifier (Declaration aliasValue) scopeAddress
-          else pure ()
 
       let frameLinks = Map.singleton moduleScope moduleFrame
       frameAddress <- newFrame scopeAddress (Map.singleton ScopeGraph.Import frameLinks)
@@ -199,23 +190,17 @@ instance Evaluatable Import where
       insertImportEdge scopeAddress
       insertFrameLink ScopeGraph.Import (Map.singleton scopeAddress frameAddress)
 
+      withScope moduleScope .
+        for_ xs $ \aliasTerm -> do
+          aliasName <- maybeM (throwNoNameError aliasTerm) (declaredAlias aliasTerm)
+          aliasValue <- maybeM (throwNoNameError aliasTerm) (declaredName aliasTerm)
+          if aliasValue /= aliasName then do
+            let aliasSpan = getSpan aliasTerm
+            insertImportReference (Reference aliasName) aliasSpan ScopeGraph.Identifier (Declaration aliasValue) scopeAddress
+          else
+            pure ()
+
     unit
-
-evalAliasNameAndSpan :: (Carrier sig m
-                       , Declarations t
-                       , Member (State Span) sig
-                       , Member (Reader ModuleInfo) sig
-                       , Member (Reader Span) sig
-                       , Member (Resumable (BaseError (EvalError t address value))) sig)
-                     => (t -> Evaluator t address value m a)
-                     -> t
-                     -> Evaluator t address value m (Name, Span)
-evalAliasNameAndSpan eval aliasTerm = do
-  aliasName <- maybeM (throwNoNameError aliasTerm) (declaredAlias aliasTerm)
-  _ <- eval aliasTerm
-  aliasSpan <- get @Span
-  pure (aliasName, aliasSpan)
-
 
 deriving instance Hashable1 NonEmpty
 
@@ -232,7 +217,7 @@ instance Message Prelude.String where
 
 -- import a.b.c
 instance Evaluatable QualifiedImport where
-  eval eval _ (QualifiedImport qualifiedNames) = do
+  eval _ _ (QualifiedImport qualifiedNames) = do
     qualifiedName <- fmap (T.unpack . formatName) <$> traverse (\term -> maybeM (throwNoNameError term) (declaredName term)) qualifiedNames
     modulePaths <- resolvePythonModules (QualifiedName qualifiedName)
     let namesAndPaths = toList (NonEmpty.zip (NonEmpty.zip qualifiedNames (Data.Abstract.Evaluatable.name . T.pack <$> qualifiedName)) modulePaths)
@@ -243,7 +228,8 @@ instance Evaluatable QualifiedImport where
       go [] = pure ()
       go (((nameTerm, name), modulePath) : namesAndPaths) = do
         scopeAddress <- newScope mempty
-        declare (Declaration name) Default Public emptySpan ScopeGraph.QualifiedImport (Just scopeAddress)
+        let nameSpan = getSpan nameTerm
+        declare (Declaration name) Default Public nameSpan ScopeGraph.QualifiedImport (Just scopeAddress)
         aliasSlot <- lookupSlot (Declaration name)
         -- a.b.c
         withScope scopeAddress $
@@ -259,10 +245,6 @@ instance Evaluatable QualifiedImport where
                     withFrame objFrame $ do
                       insertFrameLink ScopeGraph.Import scopeMap
                 go rest)
-
-        _ <- eval nameTerm
-        span <- get @Span
-        putDeclarationSpan (Declaration name) span
       mkScopeMap modulePath fun = do
         ((moduleScope, moduleFrame), _) <- require modulePath
         insertImportEdge moduleScope
