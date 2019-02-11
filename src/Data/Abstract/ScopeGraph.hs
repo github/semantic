@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DuplicateRecordFields, TupleSections, LambdaCase #-}
+{-# LANGUAGE DeriveAnyClass, DuplicateRecordFields, LambdaCase, TupleSections #-}
 module Data.Abstract.ScopeGraph
   ( Slot(..)
   , Info(..)
@@ -39,20 +39,23 @@ module Data.Abstract.ScopeGraph
   , AccessControl(..)
   ) where
 
-import           Control.Abstract.Hole
-import           Data.Abstract.Name
+import Prelude hiding (lookup)
+import Prologue
+
+import           Control.Lens.Lens
 import           Data.Aeson
-import           Data.JSON.Fields (ToJSONFields(..))
 import qualified Data.Map.Strict as Map
 import qualified Data.Sequence as Seq
 import qualified Data.Set as Set
-import           Data.Span
-import           Prelude hiding (lookup)
-import           Prologue
-import Data.Abstract.Module
-import qualified Proto3.Suite       as Proto
-import qualified Proto3.Wire.Encode as Encode
+import qualified Proto3.Suite as Proto
 import qualified Proto3.Wire.Decode as Decode
+import qualified Proto3.Wire.Encode as Encode
+
+import Control.Abstract.Hole
+import Data.Abstract.Module
+import Data.Abstract.Name
+import Data.JSON.Fields (ToJSONFields (..))
+import Data.Span
 
 -- A slot is a location in the heap where a value is stored.
 data Slot address = Slot { frameAddress :: address, position :: Position }
@@ -103,24 +106,31 @@ instance Lower Relation where
   lowerBound = Default
 
 data Info scopeAddress = Info
-  { infoDeclaration :: Declaration
-  , infoModule :: ModuleInfo
-  , infoRelation :: Relation
-  , infoAccessControl :: AccessControl
-  , infoSpan :: Span
-  , infoKind :: Kind
+  { infoDeclaration     :: Declaration
+  , infoModule          :: ModuleInfo
+  , infoRelation        :: Relation
+  , infoAccessControl   :: AccessControl
+  , infoSpan            :: Span
+  , infoKind            :: Kind
   , infoAssociatedScope :: Maybe scopeAddress
   } deriving (Eq, Show, Ord, Generic, NFData)
+
+instance HasSpan (Info scopeAddress) where
+  span = lens infoSpan (\i s -> i { infoSpan = s })
+  {-# INLINE span #-}
 
 instance Lower (Info scopeAddress) where
   lowerBound = Info lowerBound lowerBound lowerBound Public lowerBound lowerBound Nothing
 
 data ReferenceInfo = ReferenceInfo
-  { refSpan :: Span
-  , refKind :: Kind
+  { refSpan   :: Span
+  , refKind   :: Kind
   , refModule :: ModuleInfo
-  }
-  deriving (Eq, Show, Ord, Generic, NFData)
+  } deriving (Eq, Show, Ord, Generic, NFData)
+
+instance HasSpan ReferenceInfo where
+  span = lens refSpan (\r s -> r { refSpan = s })
+  {-# INLINE span #-}
 
 data Kind = TypeAlias | Class | Method | QualifiedAliasedImport | QualifiedExport | DefaultExport | Module | AbstractClass | Let | QualifiedImport | UnqualifiedImport | Assignment | RequiredParameter | PublicField | VariableDeclaration | Function | Parameter | Unknown | Identifier | TypeIdentifier | This | New | MemberAccess | Call
   deriving (Eq, Show, Ord, Generic, NFData)
