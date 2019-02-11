@@ -172,7 +172,7 @@ data QualifiedName a = QualifiedName { name :: a, identifier :: a }
   deriving (Eq1, Show1, Ord1) via Generically QualifiedName
 
 instance Evaluatable QualifiedName where
-  eval eval _ (QualifiedName obj iden) = do
+  eval _ _ (QualifiedName obj iden) = do
     name <- maybeM (throwNoNameError obj) (declaredName obj)
     let objSpan = getSpan obj
     reference (Reference name) objSpan ScopeGraph.Identifier (Declaration name)
