@@ -176,19 +176,17 @@ evaluatePythonProjects proxy parser lang path = runTask' $ do
        (raiseHandler (runReader (lowerBound @Span))
        (evaluate proxy (runDomainEffects (evalTerm withTermSpans)) modules)))))))
 
-evaluateProjectForScopeGraph proxy parser project = do
-  res <- runTaskWithOptions debugOptions $ do
-    package <- fmap quieterm <$> parsePythonPackage parser project
-    modules <- topologicalSort <$> runImportGraphToModules proxy package
-    trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
-    pure (id @(Evaluator _ (Hole.Hole (Maybe Name) Precise) (Value _ (Hole.Hole (Maybe Name) Precise)) _ _)
-         (runModuleTable
-         (runModules (ModuleTable.modulePaths (packageModules package))
-         (raiseHandler (runReader (packageInfo package))
-         (raiseHandler (evalState (lowerBound @Span))
-         (raiseHandler (runReader (lowerBound @Span))
-         (evaluate proxy (runDomainEffects (evalTerm withTermSpans)) modules)))))))
-  either (die . displayException) pure res
+evaluateProjectForScopeGraph proxy parser project = runTask' $ do
+  package <- fmap quieterm <$> parsePythonPackage parser project
+  modules <- topologicalSort <$> runImportGraphToModules proxy package
+  trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
+  pure (id @(Evaluator _ (Hole.Hole (Maybe Name) Precise) (Value _ (Hole.Hole (Maybe Name) Precise)) _ _)
+       (runModuleTable
+       (runModules (ModuleTable.modulePaths (packageModules package))
+       (raiseHandler (runReader (packageInfo package))
+       (raiseHandler (evalState (lowerBound @Span))
+       (raiseHandler (runReader (lowerBound @Span))
+       (evaluate proxy (runDomainEffects (evalTerm withTermSpans)) modules)))))))
    
 
 evaluateProjectWithCaching proxy parser path = runTask' $ do
