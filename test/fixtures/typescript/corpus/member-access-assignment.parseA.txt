@@ -1,5 +1,6 @@
 (Statements
   (Assignment
     (MemberAccess
+      (Identifier)
       (Identifier))
     (Float)))

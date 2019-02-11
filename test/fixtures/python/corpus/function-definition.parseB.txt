@@ -1,17 +1,19 @@
 (Statements
   (Function
     (Identifier)
-    (Identifier)
-    (Identifier)
-    (Statements
-      (Identifier)))
-  (Function
+    (RequiredParameter
+      (Identifier))
     (Identifier)
     (Statements
       (Identifier)))
   (Function
     (Identifier)
+    (Statements
+      (Identifier)))
+  (Function
     (Identifier)
+    (RequiredParameter
+      (Identifier))
     (Statements
       (Identifier)))
   (Function

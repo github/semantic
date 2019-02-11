@@ -1,10 +1,15 @@
 (Statements
   (Statements
-    (QualifiedImport)
+    (QualifiedImport
+      (Identifier))
     (QualifiedAliasedImport
       (Identifier)))
   (Statements
     (QualifiedAliasedImport
       (Identifier))
-    (QualifiedImport))
-  (QualifiedImport))
+    (QualifiedImport
+      (Identifier)))
+  (QualifiedImport
+    (Identifier)
+    (Identifier)
+    (Identifier)))

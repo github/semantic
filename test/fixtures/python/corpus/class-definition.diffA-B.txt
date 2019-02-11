@@ -4,7 +4,8 @@
   {-(Statements
     {-(Function
       {-(Identifier)-}
-      {-(Identifier)-}
+      {-(RequiredParameter
+        {-(Identifier)-})-}
       {-(Statements
         {-(Return
           {-(Identifier)-})-})-})-})-})-}
@@ -19,7 +20,8 @@
   {-(Statements
     {-(Function
       {-(Identifier)-}
-      {-(Identifier)-}
+      {-(RequiredParameter
+        {-(Identifier)-})-}
       {-(Statements
         {-(Return
           {-(Empty)-})-})-})-})-})-}
@@ -30,7 +32,8 @@
     (Statements
     {+(Function
       {+(Identifier)+}
-      {+(Identifier)+}
+      {+(RequiredParameter
+        {+(Identifier)+})+}
       {+(Statements
         {+(Return
           {+(Empty)+})+})+})+}
@@ -49,7 +52,8 @@
   {+(Statements
     {+(Function
       {+(Identifier)+}
-      {+(Identifier)+}
+      {+(RequiredParameter
+        {+(Identifier)+})+}
       {+(Statements
         {+(Return
           {+(Identifier)+})+})+})+})+})+}
