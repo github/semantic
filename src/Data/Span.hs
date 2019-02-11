@@ -5,34 +5,62 @@
 --   Mostly taken from purescript's SourcePos definition.
 module Data.Span
 ( Span(..)
+, HasSpan(..)
 , Pos(..)
+, line
+, column
 , spanFromSrcLoc
 , emptySpan
 ) where
 
-import Data.Aeson ((.=), (.:))
-import Proto3.Suite
-import Proto3.Wire.Decode as Decode
-import Proto3.Wire.Encode as Encode
-import qualified Data.Aeson as A
-import Data.JSON.Fields
-import GHC.Stack
+import Prelude hiding (span)
 import Prologue
+
+import           Control.Lens.Lens
+import           Data.Aeson ((.:), (.=))
+import qualified Data.Aeson as A
+import           GHC.Stack
+import           Proto3.Suite
+import           Proto3.Wire.Decode as Decode
+import           Proto3.Wire.Encode as Encode
+
+import Data.JSON.Fields
 
 -- | Source position information (1 indexed)
 data Pos = Pos
   { posLine   :: !Int
   , posColumn :: !Int
-  }
-  deriving (Eq, Ord, Generic, Hashable, NFData)
+  } deriving (Eq, Ord, Generic, Hashable, NFData)
+
+line, column :: Lens' Pos Int
+line   = lens posLine   (\p l -> p { posLine   = l })
+column = lens posColumn (\p l -> p { posColumn = l })
 
 -- | A Span of position information
 data Span = Span
   { spanStart :: Pos
   , spanEnd   :: Pos
-  }
-  deriving (Eq, Ord, Generic, Hashable, Named, NFData)
+  } deriving (Eq, Ord, Generic, Hashable, Named, NFData)
 
+-- | "Classy-fields" interface for data types that have spans.
+class HasSpan a where
+  span  :: Lens' a Span
+
+  start :: Lens' a Pos
+  start = span.start
+
+  end :: Lens' a Pos
+  end = span.end
+
+instance HasSpan Span where
+  span  = id
+  {-# INLINE span #-}
+
+  start = lens spanStart (\s t -> s { spanStart = t })
+  {-# INLINE start #-}
+
+  end = lens spanEnd   (\s t -> s { spanEnd   = t })
+  {-# INLINE end #-}
 
 -- Instances
 

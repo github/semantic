@@ -85,7 +85,6 @@ library
                      , Data.File
                      , Data.Functor.Both
                      , Data.Functor.Classes.Generic
-                     , Data.Git
                      , Proto3.Google.Timestamp
                      , Data.Graph
                      , Data.Graph.ControlFlowVertex
@@ -257,6 +256,7 @@ library
                      , http-types
                      , http-media
                      , kdt
+                     , lens
                      , machines
                      , mersenne-random-pure64
                      , mtl

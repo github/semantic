@@ -5,6 +5,8 @@ module Semantic.API.Symbols
   , parseSymbolsBuilder
   ) where
 
+import Prelude hiding (span)
+
 import           Control.Effect
 import           Control.Effect.Error
 import           Control.Exception
