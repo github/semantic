@@ -6,13 +6,18 @@
           (MemberAccess
             (Call
               (MemberAccess
+                (Identifier)
                 (Identifier))
-              (Empty)))
+              (Empty))
+            (Identifier))
           (MemberAccess
           { (Identifier)
-          ->(Identifier) })
-          (Empty)))
+          ->(Identifier) }
+            (Identifier))
+          (Empty))
+        (Identifier))
       (MemberAccess
       { (Identifier)
-      ->(Identifier) })
+      ->(Identifier) }
+        (Identifier))
       (Empty))))

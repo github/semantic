@@ -7,4 +7,5 @@
       (Type
         (Identifier)
         (MemberAccess
+          (Identifier)
           (Identifier))))))

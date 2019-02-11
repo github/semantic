@@ -170,11 +170,12 @@ newtype VariableDeclaration a = VariableDeclaration { variableDeclarations :: [a
 
 instance Evaluatable VariableDeclaration where
   eval _    _ (VariableDeclaration [])   = unit
-  eval _ _ (VariableDeclaration decs) = do
+  eval eval' _ (VariableDeclaration decs) = do
     for_ decs $ \declaration -> do
       name <- maybeM (throwNoNameError declaration) (declaredName declaration)
       let declarationSpan = getSpan declaration
       declare (Declaration name) Default ScopeGraph.Public declarationSpan ScopeGraph.VariableDeclaration Nothing
+      eval' declaration
     unit
 
 instance Declarations a => Declarations (VariableDeclaration a) where

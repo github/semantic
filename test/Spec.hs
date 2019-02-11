@@ -74,5 +74,4 @@ main = do
       describe "Semantic" Semantic.Spec.spec
       describe "Semantic.CLI" Semantic.CLI.Spec.spec
       describe "Semantic.IO" Semantic.IO.Spec.spec
-      describe "Protobuf roundtripping" Proto3.Roundtrip.spec
       describe "Integration" (Integration.Spec.spec args)
