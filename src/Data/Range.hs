@@ -12,12 +12,10 @@ import Prologue
 
 import Data.Aeson
 import Data.JSON.Fields
-import Proto3.Suite
-import Proto3.Wire.Decode as Decode
 
 -- | A half-open interval of integers, defined by start & end indices.
 data Range = Range { start :: {-# UNPACK #-} !Int, end :: {-# UNPACK #-} !Int }
-  deriving (Eq, Generic, Named, NFData)
+  deriving (Eq, Generic, NFData)
 
 emptyRange :: Range
 emptyRange = Range 0 0
@@ -55,14 +53,3 @@ instance ToJSONFields Range where
 
 instance Lower Range where
   lowerBound = Range 0 0
-
-instance HasDefault Range where
-  def = lowerBound @Range
-
-instance Message Range where
-  encodeMessage _ Range{..} = encodeMessageField 1 start <> encodeMessageField 2 end
-  decodeMessage _ = Range <$> Decode.at decodeMessageField 1 <*> Decode.at decodeMessageField 2
-  dotProto _ =
-    [ DotProtoMessageField $ DotProtoField 1 (Prim Int64) (Single "start") [] Nothing
-    , DotProtoMessageField $ DotProtoField 2 (Prim Int64) (Single "end") [] Nothing
-    ]

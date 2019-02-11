@@ -13,9 +13,7 @@ import Data.Location
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Term as Term
-import qualified Data.Diff as Diff
 import Language.JSON.Grammar as Grammar
-import Proto3.Suite (Named1(..), Named(..))
 import Prologue
 import Text.Parser.Combinators
 
@@ -32,16 +30,6 @@ type Syntax =
 
 type Term = Term.Term (Sum Syntax) Location
 type Assignment = Deterministic.Assignment Grammar
-
-instance Named1 (Sum Syntax) where
-  nameOf1 _ = "JSONSyntax"
-
-instance Named (Term.Term (Sum Syntax) ()) where
-  nameOf _ = "JSONTerm"
-
-instance Named (Diff.Diff (Sum Syntax) () ()) where
-  nameOf _ = "JSONDiff"
-
 
 assignment :: Assignment Term
 assignment = value <|> parseError

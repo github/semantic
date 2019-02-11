@@ -4,20 +4,18 @@ module Data.Syntax.Statement where
 
 import Prologue
 
-import           Data.Aeson (ToJSON1 (..))
-import qualified Data.Map.Strict as Map
-import           Data.Semigroup.App
-import           Data.Semigroup.Foldable
-import           Proto3.Suite.Class
-
 import           Control.Abstract hiding (Break, Continue, Return, While)
 import           Data.Abstract.Evaluatable as Abstract
+import           Data.Aeson (ToJSON1 (..))
 import           Data.JSON.Fields
-import qualified Data.Reprinting.Scope as Scope
-import qualified Data.Reprinting.Token as Token
+import           Data.Semigroup.App
+import           Data.Semigroup.Foldable
 import           Diffing.Algorithm
 import           Reprinting.Tokenize (Tokenize (..), imperative, within', yield)
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
+import qualified Data.Map.Strict as Map
+import qualified Data.Reprinting.Scope as Scope
+import qualified Data.Reprinting.Token as Token
 
 -- | Imperative sequence of statements/declarations s.t.:
 --
@@ -26,7 +24,7 @@ import qualified Data.Abstract.ScopeGraph as ScopeGraph
 --   3. Only the last statement’s return value is returned.
 --   TODO: Separate top-level statement nodes into non-lexical Statement and lexical StatementBlock nodes
 newtype Statements a = Statements { statements :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1, NFData1)
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Statements
 
 instance ToJSON1 Statements
@@ -39,7 +37,7 @@ instance Tokenize Statements where
   tokenize = imperative
 
 newtype StatementBlock a = StatementBlock { statements :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1, NFData1)
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically StatementBlock
 
 instance ToJSON1 StatementBlock
@@ -53,7 +51,7 @@ instance Tokenize StatementBlock where
 
 -- | Conditional. This must have an else block, which can be filled with some default value when omitted in the source, e.g. 'pure ()' for C-style if-without-else or 'pure Nothing' for Ruby-style, in both cases assuming some appropriate Applicative context into which the If will be lifted.
 data If a = If { ifCondition :: !a, ifThenBody :: !a, ifElseBody :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically If
 
 instance Evaluatable If where
@@ -71,7 +69,7 @@ instance Tokenize If where
 
 -- | Else statement. The else condition is any term, that upon successful completion, continues evaluation to the elseBody, e.g. `for ... else` in Python.
 data Else a = Else { elseCondition :: !a, elseBody :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Else
 
 -- TODO: Implement Eval instance for Else
@@ -84,7 +82,7 @@ instance Tokenize Else where
 
 -- | Goto statement (e.g. `goto a` in Go).
 newtype Goto a = Goto { gotoLocation :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Goto
 
 -- TODO: Implement Eval instance for Goto
@@ -92,7 +90,7 @@ instance Evaluatable Goto
 
 -- | A pattern-matching or computed jump control-flow statement, like 'switch' in C or JavaScript, or 'case' in Ruby or Haskell.
 data Match a = Match { matchSubject :: !a, matchPatterns :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Match
 
 -- TODO: Implement Eval instance for Match
@@ -107,7 +105,7 @@ instance Tokenize Match where
 
 -- | A pattern in a pattern-matching or computed jump control-flow statement, like 'case' in C or JavaScript, 'when' in Ruby, or the left-hand side of '->' in the body of Haskell 'case' expressions.
 data Pattern a = Pattern { value :: !a, patternBody :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Pattern
 
 -- TODO: Implement Eval instance for Pattern
@@ -118,7 +116,7 @@ instance Tokenize Pattern where
 
 -- | A let statement or local binding, like 'a as b' or 'let a = b'.
 data Let a  = Let { letVariable :: !a, letValue :: !a, letBody :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Let
 
 instance Evaluatable Let where
@@ -141,7 +139,7 @@ instance Evaluatable Let where
 
 -- | Assignment to a variable or other lvalue.
 data Assignment a = Assignment { assignmentContext :: ![a], assignmentTarget :: !a, assignmentValue :: !a }
-  deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Assignment
 
 instance Declarations1 Assignment where
@@ -172,7 +170,7 @@ instance Tokenize Assignment where
 
 -- | Post increment operator (e.g. 1++ in Go, or i++ in C).
 newtype PostIncrement a = PostIncrement { value :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically PostIncrement
 
 -- TODO: Implement Eval instance for PostIncrement
@@ -181,7 +179,7 @@ instance Evaluatable PostIncrement
 
 -- | Post decrement operator (e.g. 1-- in Go, or i-- in C).
 newtype PostDecrement a = PostDecrement { value :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically PostDecrement
 
 -- TODO: Implement Eval instance for PostDecrement
@@ -189,7 +187,7 @@ instance Evaluatable PostDecrement
 
 -- | Pre increment operator (e.g. ++1 in C or Java).
 newtype PreIncrement a = PreIncrement { value :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically PreIncrement
 
 -- TODO: Implement Eval instance for PreIncrement
@@ -198,7 +196,7 @@ instance Evaluatable PreIncrement
 
 -- | Pre decrement operator (e.g. --1 in C or Java).
 newtype PreDecrement a = PreDecrement { value :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically PreDecrement
 
 -- TODO: Implement Eval instance for PreDecrement
@@ -208,7 +206,7 @@ instance Evaluatable PreDecrement
 -- Returns
 
 newtype Return a = Return { value :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Return
 
 instance Evaluatable Return where
@@ -218,7 +216,7 @@ instance Tokenize Return where
   tokenize (Return x) = within' Scope.Return x
 
 newtype Yield a = Yield { value :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Yield
 
 -- TODO: Implement Eval instance for Yield
@@ -229,7 +227,7 @@ instance Tokenize Yield where
 
 
 newtype Break a = Break { value :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Break
 
 instance Evaluatable Break where
@@ -239,7 +237,7 @@ instance Tokenize Break where
   tokenize (Break b) = yield (Token.Flow Token.Break) *> b
 
 newtype Continue a = Continue { value :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Continue
 
 instance Evaluatable Continue where
@@ -249,7 +247,7 @@ instance Tokenize Continue where
   tokenize (Continue c) = yield (Token.Flow Token.Continue) *> c
 
 newtype Retry a = Retry { value :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Retry
 
 -- TODO: Implement Eval instance for Retry
@@ -259,7 +257,7 @@ instance Tokenize Retry where
   tokenize (Retry r) = yield (Token.Flow Token.Retry) *> r
 
 newtype NoOp a = NoOp { value :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically NoOp
 
 instance Evaluatable NoOp where
@@ -268,14 +266,14 @@ instance Evaluatable NoOp where
 -- Loops
 
 data For a = For { forBefore :: !a, forCondition :: !a, forStep :: !a, forBody :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically For
 
 instance Evaluatable For where
   eval eval _ (fmap eval -> For before cond step body) = forLoop before cond step body
 
 data ForEach a = ForEach { forEachBinding :: !a, forEachSubject :: !a, forEachBody :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically ForEach
 
 -- TODO: Implement Eval instance for ForEach
@@ -290,7 +288,7 @@ instance Tokenize ForEach where
     forEachBody
 
 data While a = While { whileCondition :: !a, whileBody :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically While
 
 instance Evaluatable While where
@@ -303,7 +301,7 @@ instance Tokenize While where
     whileBody
 
 data DoWhile a = DoWhile { doWhileCondition :: !a, doWhileBody :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically DoWhile
 
 instance Evaluatable DoWhile where
@@ -312,7 +310,7 @@ instance Evaluatable DoWhile where
 -- Exception handling
 
 newtype Throw a = Throw { value :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Throw
 
 -- TODO: Implement Eval instance for Throw
@@ -320,7 +318,7 @@ instance Evaluatable Throw
 
 
 data Try a = Try { tryBody :: !a, tryCatch :: ![a] }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Try
 
 -- TODO: Implement Eval instance for Try
@@ -334,7 +332,7 @@ instance Tokenize Try where
     sequenceA_ tryCatch
 
 data Catch a = Catch { catchException :: !a, catchBody :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Catch
 
 -- TODO: Implement Eval instance for Catch
@@ -344,7 +342,7 @@ instance Tokenize Catch where
   tokenize Data.Syntax.Statement.Catch{..} = within' Scope.Catch $ catchException *> catchBody
 
 newtype Finally a = Finally { value :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Finally
 
 -- TODO: Implement Eval instance for Finally
@@ -357,7 +355,7 @@ instance Tokenize Finally where
 
 -- | ScopeEntry (e.g. `BEGIN {}` block in Ruby or Perl).
 newtype ScopeEntry a = ScopeEntry { terms :: [a] }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically ScopeEntry
 
 -- TODO: Implement Eval instance for ScopeEntry
@@ -369,7 +367,7 @@ instance Tokenize ScopeEntry where
 
 -- | ScopeExit (e.g. `END {}` block in Ruby or Perl).
 newtype ScopeExit a = ScopeExit { terms :: [a] }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically ScopeExit
 
 -- TODO: Implement Eval instance for ScopeExit

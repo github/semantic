@@ -2,15 +2,13 @@
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Language.Ruby.Syntax where
 
-import           Control.Monad (unless)
-import qualified Data.Text as T
-import           Prologue
-import           System.FilePath.Posix
+import Prologue
 
 import           Control.Abstract as Abstract hiding (Load, String)
 import           Control.Abstract.Heap (Heap, HeapError, insertFrameLink)
 import           Control.Abstract.ScopeGraph (insertImportEdge)
 import           Control.Abstract.Value (Boolean)
+import           Control.Monad (unless)
 import           Data.Abstract.BaseError
 import           Data.Abstract.Evaluatable
 import qualified Data.Abstract.Module as M
@@ -24,9 +22,10 @@ import qualified Data.Reprinting.Scope as Scope
 import qualified Data.Reprinting.Token as Token
 import           Data.Semigroup.App
 import           Data.Semigroup.Foldable
+import qualified Data.Text as T
 import           Diffing.Algorithm
-import           Proto3.Suite.Class
 import           Reprinting.Tokenize hiding (Superclass)
+import           System.FilePath.Posix
 
 -- TODO: Fully sort out ruby require/load mechanics
 --
@@ -63,7 +62,7 @@ cleanNameOrPath :: Text -> String
 cleanNameOrPath = T.unpack . dropRelativePrefix . stripQuotes
 
 data Send a = Send { sendReceiver :: Maybe a, sendSelector :: Maybe a, sendArgs :: [a], sendBlock :: Maybe a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Send
 
 instance Evaluatable Send where
@@ -94,7 +93,7 @@ instance Tokenize Send where
     fromMaybe (pure ()) sendBlock
 
 data Require a = Require { requireRelative :: Bool, requirePath :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Require
 
 instance Evaluatable Require where
@@ -128,7 +127,7 @@ doRequire path = do
 
 
 data Load a = Load { loadPath :: a, loadWrap :: Maybe a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Load
 
 instance Tokenize Load where
@@ -174,7 +173,7 @@ doLoad path shouldWrap = do
 -- TODO: autoload
 
 data Class a = Class { classIdentifier :: !a, classSuperClass :: !(Maybe a), classBody :: !a }
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, FreeVariables1, ToJSONFields1, Named1, Message1, NFData1)
+  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, FreeVariables1, ToJSONFields1, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Class
 
 instance Diffable Class where
@@ -237,7 +236,7 @@ instance Tokenize Class where
 
 
 data Module a = Module { moduleIdentifier :: !a, moduleStatements :: ![a] }
-  deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Module
 
 instance Evaluatable Module where
@@ -285,7 +284,7 @@ instance Tokenize Module where
 
 
 data LowPrecedenceAnd a = LowPrecedenceAnd { lhs :: a, rhs :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically LowPrecedenceAnd
 
 instance Evaluatable LowPrecedenceAnd where
@@ -302,7 +301,7 @@ instance Tokenize LowPrecedenceAnd where
   tokenize LowPrecedenceAnd{..} = lhs *> yield (Token.Run "and") <* rhs
 
 data LowPrecedenceOr a = LowPrecedenceOr { lhs :: a, rhs :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically LowPrecedenceOr
 
 instance Evaluatable LowPrecedenceOr where
@@ -316,7 +315,7 @@ instance Tokenize LowPrecedenceOr where
   tokenize LowPrecedenceOr{..} = lhs *> yield (Token.Run "or") <* rhs
 
 data Assignment a = Assignment { assignmentContext :: ![a], assignmentTarget :: !a, assignmentValue :: !a }
-  deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Assignment
 
 instance Declarations1 Assignment where
@@ -354,7 +353,7 @@ instance Tokenize Assignment where
 -- the semantics of invoking @super()@ but implicitly passing the current function's
 -- arguments to the @super()@ invocation.
 data ZSuper a = ZSuper
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically ZSuper
 
 instance Evaluatable ZSuper

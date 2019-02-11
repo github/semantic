@@ -1,4 +1,4 @@
-{-# LANGUAGE DerivingVia, DerivingStrategies, DeriveAnyClass, DuplicateRecordFields #-}
+{-# LANGUAGE DerivingVia, DeriveAnyClass, DuplicateRecordFields #-}
 module Semantic.API.LegacyTypes
   ( DiffTreeRequest(..)
   , ParseTreeRequest(..)
@@ -12,11 +12,10 @@ module Semantic.API.LegacyTypes
 import Data.Aeson
 import Data.Blob
 import Prologue
-import Proto3.Suite
 
 newtype DiffTreeRequest = DiffTreeRequest { blobs :: [BlobPair] }
   deriving stock (Eq, Show, Generic)
-  deriving anyclass (Message, Named, FromJSON)
+  deriving anyclass (FromJSON)
 
 --
 -- Legacy Symbols API
@@ -24,11 +23,11 @@ newtype DiffTreeRequest = DiffTreeRequest { blobs :: [BlobPair] }
 
 newtype ParseTreeRequest = ParseTreeRequest { blobs :: [Blob] }
   deriving stock (Eq, Show, Generic)
-  deriving anyclass (Message, Named, FromJSON)
+  deriving anyclass (FromJSON)
 
 newtype ParseTreeSymbolResponse = ParseTreeSymbolResponse { files :: [File] }
   deriving stock (Eq, Show, Generic)
-  deriving anyclass (Message, Named, ToJSON)
+  deriving anyclass (ToJSON)
 
 data File = File
   { filePath :: Text
@@ -36,7 +35,6 @@ data File = File
   , fileSymbols :: [Symbol]
   }
   deriving stock (Generic, Eq, Show)
-  deriving anyclass (Named, Message)
 
 instance ToJSON File where
   toJSON File{..}
@@ -52,7 +50,6 @@ data Symbol = Symbol
   , symbolSpan :: Maybe Span
   }
   deriving stock (Generic, Eq, Show)
-  deriving anyclass (Named, Message)
 
 instance ToJSON Symbol where
   toJSON Symbol{..}
@@ -64,11 +61,10 @@ instance ToJSON Symbol where
 
 data Position = Position { line :: Int, column :: Int }
   deriving stock (Eq, Ord, Show, Generic)
-  deriving anyclass (Message, Named)
 
 instance ToJSON Position
   where toJSON Position{..} = toJSON [line, column]
 
 data Span = Span { start :: Maybe Position, end :: Maybe Position }
   deriving stock (Eq, Ord, Show, Generic)
-  deriving anyclass (Message, Named, ToJSON)
+  deriving anyclass (ToJSON)
