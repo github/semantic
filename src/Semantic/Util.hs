@@ -530,29 +530,6 @@ evaluateProject proxy parser paths = withOptions debugOptions $ \ config logger 
 
 -- Evaluate a project consisting of the listed paths.
 -- TODO: This is used by our specs and should be moved into SpecHelpers.hs
-evaluateProject' :: ( term ~ Term (Sum syntax) Location
-                    , qterm ~ Quieterm (Sum syntax) Location
-                    , Language.SLanguage lang
-                    , HasPrelude lang
-                    , Apply Eq1 syntax
-                    , Apply Ord1 syntax
-                    , Apply Show1 syntax
-                    , Apply Functor syntax
-                    , Apply Foldable syntax
-                    , Apply Evaluatable syntax
-                    , Apply Declarations1 syntax
-                    , Apply AccessControls1 syntax
-                    , Apply FreeVariables1 syntax
-                    )
-                 => TaskSession
-                 -> Proxy lang
-                 -> Parser term
-                 -> [FilePath]
-                 -> IO (Evaluator qterm Precise
-                         (Value qterm Precise)
-                         (EvalEffects qterm)
-                       (ModuleTable (Module
-                          (ModuleResult Precise (Value qterm Precise)))))
 evaluateProject' session proxy parser paths = do
   res <- runTask session $ do
     blobs <- catMaybes <$> traverse readBlobFromFile (flip File (Language.reflect proxy) <$> paths)
