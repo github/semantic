@@ -487,7 +487,7 @@ evaluatePythonProject :: ( syntax ~ Language.Python.Assignment.Syntax
                 result))
 evaluatePythonProject = justEvaluating <=< evaluatePythonProjects (Proxy @'Language.Python) pythonParser Language.Python
 
-callGraphRubyProject :: [FilePath] -> IO (Graph ControlFlowVertex, [Module.Module ()])
+callGraphRubyProject :: [FilePath] -> IO (Graph ControlFlowVertex, [Module ()])
 callGraphRubyProject = callGraphProject rubyParser (Proxy @'Language.Ruby)
 
 type EvalEffects qterm = ResumableC (BaseError (ValueError qterm Precise))
