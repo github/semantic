@@ -1,4 +1,4 @@
-module Semantic.API
+module Semantic.Api
   (
     module DiffsAPI
   , module SymbolsAPI
@@ -7,8 +7,8 @@ module Semantic.API
   , module Types
   ) where
 
-import Semantic.API.Diffs as DiffsAPI
-import Semantic.API.Symbols as SymbolsAPI
-import Semantic.API.Terms as TermsAPI
-import Semantic.API.TOCSummaries as TOCSummariesAPI
+import Semantic.Api.Diffs as DiffsAPI
+import Semantic.Api.Symbols as SymbolsAPI
+import Semantic.Api.Terms as TermsAPI
+import Semantic.Api.TOCSummaries as TOCSummariesAPI
 import Semantic.Api.V1.CodeAnalysisPB as Types hiding (Language(..))

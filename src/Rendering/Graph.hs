@@ -18,7 +18,7 @@ import Data.Patch
 import Data.String (IsString (..))
 import Data.Term
 import Prologue
-import Semantic.API.Helpers
+import Semantic.Api.Helpers
 import Semantic.Api.V1.CodeAnalysisPB
 
 import qualified Data.Text as T

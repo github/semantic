@@ -1,5 +1,5 @@
 {-# LANGUAGE GADTs, TypeOperators, DerivingStrategies #-}
-module Semantic.API.Symbols
+module Semantic.Api.Symbols
   ( legacyParseSymbols
   , parseSymbols
   , parseSymbolsBuilder
@@ -18,9 +18,9 @@ import qualified Data.Vector as V
 import           Data.Text (pack)
 import           Parsing.Parser
 import           Prologue
-import           Semantic.API.Helpers
-import qualified Semantic.API.LegacyTypes as Legacy
-import           Semantic.API.Terms (ParseEffects, doParse)
+import           Semantic.Api.Helpers
+import qualified Semantic.Api.LegacyTypes as Legacy
+import           Semantic.Api.Terms (ParseEffects, doParse)
 import           Semantic.Api.V1.CodeAnalysisPB hiding (Blob)
 import qualified Semantic.Api.V1.CodeAnalysisPB as API
 import           Semantic.Task
