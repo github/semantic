@@ -1,4 +1,4 @@
-{-# LANGUAGE ScopedTypeVariables, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE ScopedTypeVariables, TypeFamilies, TypeOperators, Rank2Types #-}
 {-# OPTIONS_GHC -Wno-missing-signatures -Wno-missing-export-lists #-}
 module Semantic.Util where
 
@@ -653,11 +653,78 @@ evaluatePythonProject = justEvaluating <=< evaluatePythonProjects (Proxy @'Langu
 
 callGraphRubyProject = callGraphProject rubyParser (Proxy @'Language.Ruby)
 
+evaluateProject :: ( term ~ Term (Sum syntax) Location
+                    , qterm ~ Quieterm (Sum syntax) Location
+                    , Language.SLanguage lang
+                    , HasPrelude lang
+                    , Apply Eq1 syntax
+                    , Apply Ord1 syntax
+                    , Apply Show1 syntax
+                    , Apply Functor syntax
+                    , Apply Foldable syntax
+                    , Apply Evaluatable syntax
+                    , Apply Declarations1 syntax
+                    , Apply AccessControls1 syntax
+                    , Apply FreeVariables1 syntax
+                    )
+                 => Proxy lang
+                 -> Parser term
+                 -> [FilePath]
+                 -> IO (Evaluator qterm Precise
+                         (Value qterm Precise)
+                         (ResumableC (BaseError (ValueError qterm Precise))
+                         (Eff (ResumableC (BaseError (AddressError Precise (Value qterm Precise)))
+                         (Eff (ResumableC (BaseError ResolutionError)
+                         (Eff (ResumableC (BaseError (EvalError qterm Precise (Value qterm Precise)))
+                         (Eff (ResumableC (BaseError (HeapError Precise))
+                         (Eff (ResumableC (BaseError (ScopeError Precise))
+                         (Eff (ResumableC (BaseError (UnspecializedError Precise (Value qterm Precise)))
+                         (Eff (ResumableC (BaseError (LoadError Precise (Value qterm Precise)))
+                         (Eff (FreshC (Eff (StateC (ScopeGraph Precise)
+                         (Eff (StateC (Heap Precise Precise (Value qterm Precise))
+                         (Eff (TraceByPrintingC
+                         (Eff (LiftC IO)))))))))))))))))))))))))
+                       (ModuleTable (Module
+                          (ModuleResult Precise (Value qterm Precise)))))
 evaluateProject proxy parser paths = withOptions debugOptions $ \ config logger statter ->
   evaluateProject' (TaskSession config "-" logger statter) proxy parser paths
 
 -- Evaluate a project consisting of the listed paths.
 -- TODO: This is used by our specs and should be moved into SpecHelpers.hs
+evaluateProject' :: ( term ~ Term (Sum syntax) Location
+                    , qterm ~ Quieterm (Sum syntax) Location
+                    , Language.SLanguage lang
+                    , HasPrelude lang
+                    , Apply Eq1 syntax
+                    , Apply Ord1 syntax
+                    , Apply Show1 syntax
+                    , Apply Functor syntax
+                    , Apply Foldable syntax
+                    , Apply Evaluatable syntax
+                    , Apply Declarations1 syntax
+                    , Apply AccessControls1 syntax
+                    , Apply FreeVariables1 syntax
+                    )
+                 => TaskSession
+                 -> Proxy lang
+                 -> Parser term
+                 -> [FilePath]
+                 -> IO (Evaluator qterm Precise
+                         (Value qterm Precise)
+                         (ResumableC (BaseError (ValueError qterm Precise))
+                         (Eff (ResumableC (BaseError (AddressError Precise (Value qterm Precise)))
+                         (Eff (ResumableC (BaseError ResolutionError)
+                         (Eff (ResumableC (BaseError (EvalError qterm Precise (Value qterm Precise)))
+                         (Eff (ResumableC (BaseError (HeapError Precise))
+                         (Eff (ResumableC (BaseError (ScopeError Precise))
+                         (Eff (ResumableC (BaseError (UnspecializedError Precise (Value qterm Precise)))
+                         (Eff (ResumableC (BaseError (LoadError Precise (Value qterm Precise)))
+                         (Eff (FreshC (Eff (StateC (ScopeGraph Precise)
+                         (Eff (StateC (Heap Precise Precise (Value qterm Precise))
+                         (Eff (TraceByPrintingC
+                         (Eff (LiftC IO)))))))))))))))))))))))))
+                       (ModuleTable (Module
+                          (ModuleResult Precise (Value qterm Precise)))))
 evaluateProject' session proxy parser paths = do
   res <- runTask session $ do
     blobs <- catMaybes <$> traverse readBlobFromFile (flip File (Language.reflect proxy) <$> paths)
