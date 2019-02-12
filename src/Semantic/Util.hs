@@ -40,7 +40,6 @@ import           Prologue
 import           Semantic.Analysis
 import           Semantic.Config
 import           Semantic.Graph
-import           Semantic.Graph (resumingScopeError)
 import           Semantic.Task
 import           System.Exit (die)
 import           System.FilePath.Posix (takeDirectory)
