@@ -14,6 +14,7 @@ import           Data.Location
 import           Data.Maybe
 import           Data.Term
 import qualified Data.Text as T
+import qualified Data.Vector as V
 import           Data.Text (pack)
 import           Parsing.Parser
 import           Prologue
@@ -55,18 +56,18 @@ parseSymbolsBuilder blobs
   = legacyParseSymbols blobs >>= serialize JSON
 
 parseSymbols :: (Member Distribute sig, ParseEffects sig m, Traversable t) => t API.Blob -> m ParseTreeSymbolResponse
-parseSymbols blobs = ParseTreeSymbolResponse . toList <$> distributeFor (apiBlobToBlob <$> blobs) go
+parseSymbols blobs = ParseTreeSymbolResponse . V.fromList . toList <$> distributeFor (apiBlobToBlob <$> blobs) go
   where
     go :: (Member (Error SomeException) sig, Member Task sig, Carrier sig m, Monad m) => Blob -> m File
     go blob@Blob{..} = (doParse blob >>= withSomeTerm (renderToSymbols blob)) `catchError` (\(SomeException e) -> pure $ errorFile (show e))
       where
-        errorFile e = File (pack blobPath) (languageToApiLanguage blobLanguage) mempty [ParseError (T.pack e)]
+        errorFile e = File (pack blobPath) (languageToApiLanguage blobLanguage) mempty (V.fromList [ParseError (T.pack e)])
 
         renderToSymbols :: (IsTaggable f, Applicative m) => Blob -> Term f Location -> m File
         renderToSymbols blob@Blob{..} term = pure $ either (errorFile . show) (tagsToFile blob) (runTagging blob term)
 
         tagsToFile :: Blob -> [Tag] -> File
-        tagsToFile Blob{..} tags = File (pack blobPath) (languageToApiLanguage blobLanguage) (fmap tagToSymbol tags) mempty
+        tagsToFile Blob{..} tags = File (pack blobPath) (languageToApiLanguage blobLanguage) (V.fromList (fmap tagToSymbol tags)) mempty
 
         tagToSymbol :: Tag -> Symbol
         tagToSymbol Tag{..}
