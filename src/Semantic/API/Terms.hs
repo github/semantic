@@ -1,5 +1,5 @@
 {-# LANGUAGE ConstraintKinds, GADTs, TypeOperators, DerivingStrategies #-}
-module Semantic.API.Terms
+module Semantic.Api.Terms
   (
     termGraph
   , parseTermBuilder
@@ -36,7 +36,7 @@ import           Prologue
 import           Rendering.Graph
 import           Rendering.JSON hiding (JSON)
 import qualified Rendering.JSON
-import           Semantic.API.Helpers
+import           Semantic.Api.Helpers
 import           Semantic.Api.V1.CodeAnalysisPB hiding (Blob, Language (..))
 import qualified Semantic.Api.V1.CodeAnalysisPB as API
 import           Semantic.Task

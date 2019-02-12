@@ -1,5 +1,5 @@
 {-# LANGUAGE GADTs, ConstraintKinds, TypeOperators, RankNTypes #-}
-module Semantic.API.Diffs
+module Semantic.Api.Diffs
   ( parseDiffBuilder
   , DiffOutputFormat(..)
   , diffGraph
@@ -33,7 +33,7 @@ import           Prologue
 import           Rendering.Graph
 import           Rendering.JSON hiding (JSON)
 import qualified Rendering.JSON
-import           Semantic.API.Helpers
+import           Semantic.Api.Helpers
 import           Semantic.Api.V1.CodeAnalysisPB hiding (Blob, BlobPair, Language(..))
 import qualified Semantic.Api.V1.CodeAnalysisPB as API
 import           Semantic.Task as Task

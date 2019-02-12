@@ -1,5 +1,5 @@
 {-# LANGUAGE GADTs, TypeOperators, DerivingStrategies #-}
-module Semantic.API.TOCSummaries (diffSummary, legacyDiffSummary, diffSummaryBuilder) where
+module Semantic.Api.TOCSummaries (diffSummary, legacyDiffSummary, diffSummaryBuilder) where
 
 import           Analysis.TOCSummary (Declaration, declarationAlgebra)
 import           Control.Effect.Error
@@ -12,8 +12,8 @@ import           Data.Span (emptySpan)
 import qualified Data.Text as T
 import qualified Data.Vector as V
 import           Rendering.TOC
-import           Semantic.API.Diffs
-import           Semantic.API.Helpers
+import           Semantic.Api.Diffs
+import           Semantic.Api.Helpers
 import           Semantic.Api.V1.CodeAnalysisPB hiding (Blob, BlobPair)
 import qualified Semantic.Api.V1.CodeAnalysisPB as API
 import           Semantic.Task as Task

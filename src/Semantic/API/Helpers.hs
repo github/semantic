@@ -1,5 +1,5 @@
 {-# LANGUAGE LambdaCase #-}
-module Semantic.API.Helpers
+module Semantic.Api.Helpers
   ( spanToSpan
   , spanToLegacySpan
   , toChangeType
@@ -16,7 +16,7 @@ import           Data.Source (fromText)
 import qualified Data.Span as Data
 import qualified Data.Text as T
 import           Data.These
-import qualified Semantic.API.LegacyTypes as Legacy
+import qualified Semantic.Api.LegacyTypes as Legacy
 import qualified Semantic.Api.V1.CodeAnalysisPB as API
 
 spanToSpan :: Data.Span -> Maybe API.Span
