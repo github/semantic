@@ -9,8 +9,8 @@ import           Analysis.Abstract.Collecting
 import           Control.Abstract
 import           Control.Abstract.Heap (runHeapError)
 import           Control.Abstract.ScopeGraph (runScopeError)
-import           Control.Exception (displayException)
 import           Control.Effect.Trace (runTraceByPrinting)
+import           Control.Exception (displayException)
 import           Data.Abstract.Address.Monovariant as Monovariant
 import           Data.Abstract.Address.Precise as Precise
 import           Data.Abstract.Evaluatable
@@ -19,14 +19,17 @@ import qualified Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Package
 import           Data.Abstract.Value.Concrete as Concrete
 import           Data.Abstract.Value.Type as Type
+import qualified Language.Python.Assignment
 import           Data.Blob
 import           Data.File
 import           Data.Graph (topologicalSort)
 import qualified Data.Language as Language
 import           Data.List (uncons)
+import           Data.Location
 import           Data.Project hiding (readFile)
-import           Data.Quieterm (quieterm)
+import           Data.Quieterm (Quieterm, quieterm)
 import           Data.Sum (weaken)
+import           Data.Term
 import           Parsing.Parser
 import           Prologue
 import           Semantic.Analysis
@@ -113,6 +116,29 @@ evaluateProject' session proxy parser paths = do
          (evaluate proxy (runDomainEffects (evalTerm withTermSpans)) modules)))))))
   either (die . displayException) pure res
 
+evaluatePythonProjects :: ( term ~ Term (Sum Language.Python.Assignment.Syntax) Location
+                          , qterm ~ Quieterm (Sum Language.Python.Assignment.Syntax) Location
+                          )
+                       => Proxy 'Language.Python
+                       -> Parser term
+                       -> Language.Language
+                       -> FilePath
+                       -> IO (Evaluator qterm Precise
+                               (Value qterm Precise)
+                               (ResumableC (BaseError (ValueError qterm Precise))
+                               (Eff (ResumableC (BaseError (AddressError Precise (Value qterm Precise)))
+                               (Eff (ResumableC (BaseError ResolutionError)
+                               (Eff (ResumableC (BaseError (EvalError qterm Precise (Value qterm Precise)))
+                               (Eff (ResumableC (BaseError (HeapError Precise))
+                               (Eff (ResumableC (BaseError (ScopeError Precise))
+                               (Eff (ResumableC (BaseError (UnspecializedError Precise (Value qterm Precise)))
+                               (Eff (ResumableC (BaseError (LoadError Precise (Value qterm Precise)))
+                               (Eff (FreshC (Eff (StateC (ScopeGraph Precise)
+                               (Eff (StateC (Heap Precise Precise (Value qterm Precise))
+                               (Eff (TraceByPrintingC
+                               (Eff (LiftC IO)))))))))))))))))))))))))
+                             (ModuleTable (Module
+                                (ModuleResult Precise (Value qterm Precise)))))
 evaluatePythonProjects proxy parser lang path = runTask' $ do
   project <- readProject Nothing path lang []
   package <- fmap quieterm <$> parsePythonPackage parser project
@@ -126,7 +152,42 @@ evaluatePythonProjects proxy parser lang path = runTask' $ do
        (raiseHandler (runReader (lowerBound @Span))
        (evaluate proxy (runDomainEffects (evalTerm withTermSpans)) modules)))))))
 
-
+evaluateProjectWithCaching :: ( Language.SLanguage lang
+                              , HasPrelude lang
+                              , Apply Eq1 syntax
+                              , Apply Ord1 syntax
+                              , Apply Show1 syntax
+                              , Apply Functor syntax
+                              , Apply Foldable syntax
+                              , Apply Evaluatable syntax
+                              , Apply Declarations1 syntax
+                              , Apply AccessControls1 syntax
+                              , Apply FreeVariables1 syntax
+                              , term ~ Term (Sum syntax) Location
+                              , qterm ~ Quieterm (Sum syntax) Location
+                              )
+                           => Proxy (lang :: Language.Language)
+                           -> Parser term
+                          -> FilePath
+                          -> IO (Evaluator qterm Monovariant Type
+                                  (ResumableC (BaseError Type.TypeError)
+                                  (Eff (StateC TypeMap
+                                  (Eff (ResumableC (BaseError (AddressError Monovariant Type))
+                                  (Eff (ResumableC (BaseError (EvalError qterm Monovariant Type))
+                                  (Eff (ResumableC (BaseError ResolutionError)
+                                  (Eff (ResumableC (BaseError (HeapError Monovariant))
+                                  (Eff (ResumableC (BaseError (ScopeError Monovariant))
+                                  (Eff (ResumableC (BaseError (UnspecializedError Monovariant Type))
+                                  (Eff (ResumableC (BaseError (LoadError Monovariant Type))
+                                  (Eff (ReaderC (Live Monovariant)
+                                  (Eff (AltC []
+                                  (Eff (ReaderC (Analysis.Abstract.Caching.FlowSensitive.Cache (Data.Quieterm.Quieterm (Sum syntax) Data.Location.Location) Monovariant Type)
+                                  (Eff (StateC (Analysis.Abstract.Caching.FlowSensitive.Cache (Data.Quieterm.Quieterm (Sum syntax) Data.Location.Location) Monovariant Type)
+                                  (Eff (FreshC
+                                  (Eff (StateC (ScopeGraph Monovariant)
+                                  (Eff (StateC (Heap Monovariant Monovariant Type)
+                                  (Eff (TraceByPrintingC (Eff (LiftC IO)))))))))))))))))))))))))))))))))))
+                                 (ModuleTable (Module (ModuleResult Monovariant Type))))
 evaluateProjectWithCaching proxy parser path = runTask' $ do
   project <- readProject Nothing path (Language.reflect proxy) []
   package <- fmap (quieterm . snd) <$> parsePackage parser project
@@ -138,7 +199,6 @@ evaluateProjectWithCaching proxy parser path = runTask' $ do
        (runModuleTable
        (runModules (ModuleTable.modulePaths (packageModules package))
        (evaluate proxy (runDomainEffects (evalTerm withTermSpans)) modules)))))))
-
 
 parseFile :: Parser term -> FilePath -> IO term
 parseFile parser = runTask' . (parse parser <=< readBlob . file)
