@@ -1,4 +1,4 @@
-{-# LANGUAGE ScopedTypeVariables, TypeFamilies, TypeOperators, Rank2Types #-}
+{-# LANGUAGE Rank2Types, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 {-# OPTIONS_GHC -Wno-missing-signatures -Wno-missing-export-lists #-}
 module Semantic.Util where
 
@@ -11,6 +11,7 @@ import           Control.Abstract.Heap (runHeapError)
 import           Control.Abstract.ScopeGraph (runScopeError)
 import           Control.Effect.Trace (runTraceByPrinting)
 import           Control.Exception (displayException)
+import           Data.Abstract.Address.Hole as Hole
 import           Data.Abstract.Address.Monovariant as Monovariant
 import           Data.Abstract.Address.Precise as Precise
 import           Data.Abstract.Evaluatable
@@ -19,12 +20,6 @@ import qualified Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Package
 import           Data.Abstract.Value.Concrete as Concrete
 import           Data.Abstract.Value.Type as Type
-import           Data.Abstract.Address.Hole as Hole
-import qualified Language.Python.Assignment
-import qualified Language.TypeScript.Assignment
-import qualified Language.Go.Assignment
-import qualified Language.Ruby.Assignment
-import qualified Language.PHP.Assignment
 import           Data.Blob
 import           Data.File
 import           Data.Graph (topologicalSort)
@@ -35,15 +30,20 @@ import           Data.Project hiding (readFile)
 import           Data.Quieterm (Quieterm, quieterm)
 import           Data.Sum (weaken)
 import           Data.Term
+import qualified Language.Go.Assignment
+import qualified Language.PHP.Assignment
+import qualified Language.Python.Assignment
+import qualified Language.Ruby.Assignment
+import qualified Language.TypeScript.Assignment
 import           Parsing.Parser
 import           Prologue
 import           Semantic.Analysis
 import           Semantic.Config
 import           Semantic.Graph
+import           Semantic.Graph (resumingScopeError)
 import           Semantic.Task
 import           System.Exit (die)
 import           System.FilePath.Posix (takeDirectory)
-import Semantic.Graph (resumingScopeError)
 
 justEvaluating
   = runM
@@ -250,299 +250,78 @@ checking
   . runAddressError
   . runTypes
 
-evalGoProject :: ( qterm ~ Quieterm (Sum Language.Go.Assignment.Syntax) Location ) => [FilePath] -> IO
-                          (Heap
-                             Precise
-                             Precise
-                             (Value
-                                qterm Precise),
-                           (ScopeGraph Precise,
-                            Either
-                              (SomeError
-                                 (Sum
-                                    '[BaseError
-                                        (ValueError
-                                           qterm
-                                           Precise),
-                                      BaseError
-                                        (AddressError
-                                           Precise
-                                           (Value
-                                              qterm
-                                              Precise)),
-                                      BaseError ResolutionError,
-                                      BaseError
-                                        (EvalError
-                                           qterm
-                                           Precise
-                                           (Value
-                                              qterm
-                                              Precise)),
-                                      BaseError (HeapError Precise), BaseError (ScopeError Precise),
-                                      BaseError
-                                        (UnspecializedError
-                                           Precise
-                                           (Value
-                                              qterm
-                                              Precise)),
-                                      BaseError
-                                        (LoadError
-                                           Precise
-                                           (Value
-                                              qterm
-                                              Precise))]))
-                              (ModuleTable
-                                 (Module
-                                    (ModuleResult
-                                       Precise
-                                       (Value
-                                          qterm
-                                          Precise))))))
-evalGoProject         = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Go)         goParser
-evalRubyProject :: ( qterm ~ Quieterm (Sum Language.Ruby.Assignment.Syntax) Location ) => [FilePath] -> IO
-                          (Heap
-                             Precise
-                             Precise
-                             (Value
-                                qterm Precise),
-                           (ScopeGraph Precise,
-                            Either
-                              (SomeError
-                                 (Sum
-                                    '[BaseError
-                                        (ValueError
-                                           qterm
-                                           Precise),
-                                      BaseError
-                                        (AddressError
-                                           Precise
-                                           (Value
-                                              qterm
-                                              Precise)),
-                                      BaseError ResolutionError,
-                                      BaseError
-                                        (EvalError
-                                           qterm
-                                           Precise
-                                           (Value
-                                              qterm
-                                              Precise)),
-                                      BaseError (HeapError Precise), BaseError (ScopeError Precise),
-                                      BaseError
-                                        (UnspecializedError
-                                           Precise
-                                           (Value
-                                              qterm
-                                              Precise)),
-                                      BaseError
-                                        (LoadError
-                                           Precise
-                                           (Value
-                                              qterm
-                                              Precise))]))
-                              (ModuleTable
-                                 (Module
-                                    (ModuleResult
-                                       Precise
-                                       (Value
-                                          qterm
-                                          Precise))))))
-evalRubyProject       = justEvaluating <=< evaluateProject (Proxy @'Language.Ruby)               rubyParser
-evalPHPProject :: ( qterm ~ Quieterm (Sum Language.PHP.Assignment.Syntax) Location ) => [FilePath] -> IO
-                          (Heap
-                             Precise
-                             Precise
-                             (Value
-                                qterm Precise),
-                           (ScopeGraph Precise,
-                            Either
-                              (SomeError
-                                 (Sum
-                                    '[BaseError
-                                        (ValueError
-                                           qterm
-                                           Precise),
-                                      BaseError
-                                        (AddressError
-                                           Precise
-                                           (Value
-                                              qterm
-                                              Precise)),
-                                      BaseError ResolutionError,
-                                      BaseError
-                                        (EvalError
-                                           qterm
-                                           Precise
-                                           (Value
-                                              qterm
-                                              Precise)),
-                                      BaseError (HeapError Precise), BaseError (ScopeError Precise),
-                                      BaseError
-                                        (UnspecializedError
-                                           Precise
-                                           (Value
-                                              qterm
-                                              Precise)),
-                                      BaseError
-                                        (LoadError
-                                           Precise
-                                           (Value
-                                              qterm
-                                              Precise))]))
-                              (ModuleTable
-                                 (Module
-                                    (ModuleResult
-                                       Precise
-                                       (Value
-                                          qterm
-                                          Precise))))))
-evalPHPProject        = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.PHP)        phpParser
-evalPythonProject :: ( qterm ~ Quieterm (Sum Language.Python.Assignment.Syntax) Location ) => [FilePath] -> IO
-                          (Heap
-                             Precise
-                             Precise
-                             (Value
-                                qterm Precise),
-                           (ScopeGraph Precise,
-                            Either
-                              (SomeError
-                                 (Sum
-                                    '[BaseError
-                                        (ValueError
-                                           qterm
-                                           Precise),
-                                      BaseError
-                                        (AddressError
-                                           Precise
-                                           (Value
-                                              qterm
-                                              Precise)),
-                                      BaseError ResolutionError,
-                                      BaseError
-                                        (EvalError
-                                           qterm
-                                           Precise
-                                           (Value
-                                              qterm
-                                              Precise)),
-                                      BaseError (HeapError Precise), BaseError (ScopeError Precise),
-                                      BaseError
-                                        (UnspecializedError
-                                           Precise
-                                           (Value
-                                              qterm
-                                              Precise)),
-                                      BaseError
-                                        (LoadError
-                                           Precise
-                                           (Value
-                                              qterm
-                                              Precise))]))
-                              (ModuleTable
-                                 (Module
-                                    (ModuleResult
-                                       Precise
-                                       (Value
-                                          qterm
-                                          Precise))))))
+type FileEvaluator syntax =
+  [FilePath]
+  -> IO
+       (Heap
+          Precise
+          Precise
+          (Value
+             (Quieterm (Sum syntax) Location) Precise),
+        (ScopeGraph Precise,
+         Either
+           (SomeError
+              (Sum
+                 '[BaseError
+                     (ValueError
+                        (Quieterm (Sum syntax) Location)
+                        Precise),
+                   BaseError
+                     (AddressError
+                        Precise
+                        (Value
+                           (Quieterm
+                              (Sum syntax) Location)
+                           Precise)),
+                   BaseError ResolutionError,
+                   BaseError
+                     (EvalError
+                        (Quieterm (Sum syntax) Location)
+                        Precise
+                        (Value
+                           (Quieterm
+                              (Sum syntax) Location)
+                           Precise)),
+                   BaseError (HeapError Precise),
+                   BaseError (ScopeError Precise),
+                   BaseError
+                     (UnspecializedError
+                        Precise
+                        (Value
+                           (Quieterm
+                              (Sum syntax) Location)
+                           Precise)),
+                   BaseError
+                     (LoadError
+                        Precise
+                        (Value
+                           (Quieterm
+                              (Sum syntax) Location)
+                           Precise))]))
+           (ModuleTable
+              (Module
+                 (ModuleResult
+                    Precise
+                    (Value
+                       (Quieterm (Sum syntax) Location)
+                       Precise))))))
+
+evalGoProject :: FileEvaluator Language.Go.Assignment.Syntax
+evalGoProject = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Go) goParser
+
+evalRubyProject :: FileEvaluator Language.Ruby.Assignment.Syntax
+evalRubyProject = justEvaluating <=< evaluateProject (Proxy @'Language.Ruby)               rubyParser
+
+evalPHPProject :: FileEvaluator Language.PHP.Assignment.Syntax
+evalPHPProject  = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.PHP)        phpParser
+
+evalPythonProject :: FileEvaluator Language.Python.Assignment.Syntax
 evalPythonProject     = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Python)     pythonParser
-evalJavaScriptProject :: ( qterm ~ Quieterm (Sum Language.TypeScript.Assignment.Syntax) Location ) => [FilePath] -> IO
-                          (Heap
-                             Precise
-                             Precise
-                             (Value
-                                qterm Precise),
-                           (ScopeGraph Precise,
-                            Either
-                              (SomeError
-                                 (Sum
-                                    '[BaseError
-                                        (ValueError
-                                           qterm
-                                           Precise),
-                                      BaseError
-                                        (AddressError
-                                           Precise
-                                           (Value
-                                              qterm
-                                              Precise)),
-                                      BaseError ResolutionError,
-                                      BaseError
-                                        (EvalError
-                                           qterm
-                                           Precise
-                                           (Value
-                                              qterm
-                                              Precise)),
-                                      BaseError (HeapError Precise), BaseError (ScopeError Precise),
-                                      BaseError
-                                        (UnspecializedError
-                                           Precise
-                                           (Value
-                                              qterm
-                                              Precise)),
-                                      BaseError
-                                        (LoadError
-                                           Precise
-                                           (Value
-                                              qterm
-                                              Precise))]))
-                              (ModuleTable
-                                 (Module
-                                    (ModuleResult
-                                       Precise
-                                       (Value
-                                          qterm
-                                          Precise))))))
+
+evalJavaScriptProject :: FileEvaluator Language.TypeScript.Assignment.Syntax
 evalJavaScriptProject = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.JavaScript) typescriptParser
-evalTypeScriptProject :: ( qterm ~ Quieterm (Sum Language.TypeScript.Assignment.Syntax) Location ) => [FilePath] -> IO
-                          (Heap
-                             Precise
-                             Precise
-                             (Value
-                                qterm Precise),
-                           (ScopeGraph Precise,
-                            Either
-                              (SomeError
-                                 (Sum
-                                    '[BaseError
-                                        (ValueError
-                                           qterm
-                                           Precise),
-                                      BaseError
-                                        (AddressError
-                                           Precise
-                                           (Value
-                                              qterm
-                                              Precise)),
-                                      BaseError ResolutionError,
-                                      BaseError
-                                        (EvalError
-                                           qterm
-                                           Precise
-                                           (Value
-                                              qterm
-                                              Precise)),
-                                      BaseError (HeapError Precise), BaseError (ScopeError Precise),
-                                      BaseError
-                                        (UnspecializedError
-                                           Precise
-                                           (Value
-                                              qterm
-                                              Precise)),
-                                      BaseError
-                                        (LoadError
-                                           Precise
-                                           (Value
-                                              qterm
-                                              Precise))]))
-                              (ModuleTable
-                                 (Module
-                                    (ModuleResult
-                                       Precise
-                                       (Value
-                                          qterm
-                                          Precise))))))
+
+evalTypeScriptProject :: FileEvaluator Language.TypeScript.Assignment.Syntax
 evalTypeScriptProject = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.TypeScript) typescriptParser
 
 typecheckGoFile :: ( syntax ~ Language.Go.Assignment.Syntax
@@ -653,6 +432,19 @@ evaluatePythonProject = justEvaluating <=< evaluatePythonProjects (Proxy @'Langu
 
 callGraphRubyProject = callGraphProject rubyParser (Proxy @'Language.Ruby)
 
+type EvalEffects qterm = ResumableC (BaseError (ValueError qterm Precise))
+                         (Eff (ResumableC (BaseError (AddressError Precise (Value qterm Precise)))
+                         (Eff (ResumableC (BaseError ResolutionError)
+                         (Eff (ResumableC (BaseError (EvalError qterm Precise (Value qterm Precise)))
+                         (Eff (ResumableC (BaseError (HeapError Precise))
+                         (Eff (ResumableC (BaseError (ScopeError Precise))
+                         (Eff (ResumableC (BaseError (UnspecializedError Precise (Value qterm Precise)))
+                         (Eff (ResumableC (BaseError (LoadError Precise (Value qterm Precise)))
+                         (Eff (FreshC (Eff (StateC (ScopeGraph Precise)
+                         (Eff (StateC (Heap Precise Precise (Value qterm Precise))
+                         (Eff (TraceByPrintingC
+                         (Eff (LiftC IO))))))))))))))))))))))))
+
 evaluateProject :: ( term ~ Term (Sum syntax) Location
                     , qterm ~ Quieterm (Sum syntax) Location
                     , Language.SLanguage lang
@@ -672,18 +464,7 @@ evaluateProject :: ( term ~ Term (Sum syntax) Location
                  -> [FilePath]
                  -> IO (Evaluator qterm Precise
                          (Value qterm Precise)
-                         (ResumableC (BaseError (ValueError qterm Precise))
-                         (Eff (ResumableC (BaseError (AddressError Precise (Value qterm Precise)))
-                         (Eff (ResumableC (BaseError ResolutionError)
-                         (Eff (ResumableC (BaseError (EvalError qterm Precise (Value qterm Precise)))
-                         (Eff (ResumableC (BaseError (HeapError Precise))
-                         (Eff (ResumableC (BaseError (ScopeError Precise))
-                         (Eff (ResumableC (BaseError (UnspecializedError Precise (Value qterm Precise)))
-                         (Eff (ResumableC (BaseError (LoadError Precise (Value qterm Precise)))
-                         (Eff (FreshC (Eff (StateC (ScopeGraph Precise)
-                         (Eff (StateC (Heap Precise Precise (Value qterm Precise))
-                         (Eff (TraceByPrintingC
-                         (Eff (LiftC IO)))))))))))))))))))))))))
+                         (EvalEffects qterm)
                        (ModuleTable (Module
                           (ModuleResult Precise (Value qterm Precise)))))
 evaluateProject proxy parser paths = withOptions debugOptions $ \ config logger statter ->
@@ -711,18 +492,7 @@ evaluateProject' :: ( term ~ Term (Sum syntax) Location
                  -> [FilePath]
                  -> IO (Evaluator qterm Precise
                          (Value qterm Precise)
-                         (ResumableC (BaseError (ValueError qterm Precise))
-                         (Eff (ResumableC (BaseError (AddressError Precise (Value qterm Precise)))
-                         (Eff (ResumableC (BaseError ResolutionError)
-                         (Eff (ResumableC (BaseError (EvalError qterm Precise (Value qterm Precise)))
-                         (Eff (ResumableC (BaseError (HeapError Precise))
-                         (Eff (ResumableC (BaseError (ScopeError Precise))
-                         (Eff (ResumableC (BaseError (UnspecializedError Precise (Value qterm Precise)))
-                         (Eff (ResumableC (BaseError (LoadError Precise (Value qterm Precise)))
-                         (Eff (FreshC (Eff (StateC (ScopeGraph Precise)
-                         (Eff (StateC (Heap Precise Precise (Value qterm Precise))
-                         (Eff (TraceByPrintingC
-                         (Eff (LiftC IO)))))))))))))))))))))))))
+                         (EvalEffects qterm)
                        (ModuleTable (Module
                           (ModuleResult Precise (Value qterm Precise)))))
 evaluateProject' session proxy parser paths = do
