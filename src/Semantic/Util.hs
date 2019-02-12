@@ -1,4 +1,4 @@
-{-# LANGUAGE ScopedTypeVariables, TypeFamilies, TypeOperators, Rank2Types #-}
+{-# LANGUAGE Rank2Types, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 {-# OPTIONS_GHC -Wno-missing-signatures -Wno-missing-export-lists #-}
 module Semantic.Util where
 
@@ -11,6 +11,7 @@ import           Control.Abstract.Heap (runHeapError)
 import           Control.Abstract.ScopeGraph (runScopeError)
 import           Control.Effect.Trace (runTraceByPrinting)
 import           Control.Exception (displayException)
+import           Data.Abstract.Address.Hole as Hole
 import           Data.Abstract.Address.Monovariant as Monovariant
 import           Data.Abstract.Address.Precise as Precise
 import           Data.Abstract.Evaluatable
@@ -19,12 +20,6 @@ import qualified Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Package
 import           Data.Abstract.Value.Concrete as Concrete
 import           Data.Abstract.Value.Type as Type
-import           Data.Abstract.Address.Hole as Hole
-import qualified Language.Python.Assignment
-import qualified Language.TypeScript.Assignment
-import qualified Language.Go.Assignment
-import qualified Language.Ruby.Assignment
-import qualified Language.PHP.Assignment
 import           Data.Blob
 import           Data.File
 import           Data.Graph (topologicalSort)
@@ -35,15 +30,21 @@ import           Data.Project hiding (readFile)
 import           Data.Quieterm (Quieterm, quieterm)
 import           Data.Sum (weaken)
 import           Data.Term
+import qualified Language.Go.Assignment
+import qualified Language.PHP.Assignment
+import qualified Language.Python.Assignment
+import qualified Language.Ruby.Assignment
+import qualified Language.TypeScript.Assignment
 import           Parsing.Parser
 import           Prologue
 import           Semantic.Analysis
 import           Semantic.Config
 import           Semantic.Graph
+import           Semantic.Graph (resumingScopeError)
 import           Semantic.Task
 import           System.Exit (die)
 import           System.FilePath.Posix (takeDirectory)
-import Semantic.Graph (resumingScopeError)
+import Data.Graph.ControlFlowVertex
 
 justEvaluating
   = runM
@@ -642,6 +643,24 @@ typecheckRubyFile :: ( syntax ~ Language.Ruby.Assignment.Syntax
                 result])))
 typecheckRubyFile = checking <=< evaluateProjectWithCaching (Proxy :: Proxy 'Language.Ruby) rubyParser
 
+callGraphProject
+  :: (Language.SLanguage lang, Ord1 syntax,
+      Declarations1 syntax,
+      Evaluatable syntax,
+      FreeVariables1 syntax,
+      AccessControls1 syntax,
+      HasPrelude lang, Functor syntax,
+      VertexDeclarationWithStrategy
+        (VertexDeclarationStrategy syntax)
+        syntax
+        syntax) =>
+     Parser
+       (Term syntax Location)
+     -> Proxy lang
+     -> [FilePath]
+     -> IO
+          (Graph ControlFlowVertex,
+           [Module ()])
 callGraphProject parser proxy paths = runTask' $ do
   blobs <- catMaybes <$> traverse readBlobFromFile (flip File (Language.reflect proxy) <$> paths)
   package <- fmap snd <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs (Language.reflect proxy) [])
@@ -649,6 +668,45 @@ callGraphProject parser proxy paths = runTask' $ do
   x <- runCallGraph proxy False modules package
   pure (x, (() <$) <$> modules)
 
+evaluatePythonProject :: ( syntax ~ Language.Python.Assignment.Syntax
+                   , qterm ~ Quieterm (Sum syntax) Location
+                   , value ~ (Concrete.Value qterm address)
+                   , address ~ Precise
+                   , result ~ (ModuleTable (Module (ModuleResult address value)))) => FilePath
+     -> IO
+          (Heap address address value,
+           (ScopeGraph address,
+             Either
+                (SomeError
+                   (Sum
+                      '[BaseError
+                          (ValueError qterm address),
+                        BaseError
+                          (AddressError
+                             address
+                             value),
+                        BaseError
+                          ResolutionError,
+                        BaseError
+                          (EvalError
+                             qterm
+                             address
+                             value),
+                        BaseError
+                          (HeapError
+                             address),
+                        BaseError
+                          (ScopeError
+                             address),
+                        BaseError
+                          (UnspecializedError
+                             address
+                             value),
+                        BaseError
+                          (LoadError
+                             address
+                             value)]))
+                result))
 evaluatePythonProject = justEvaluating <=< evaluatePythonProjects (Proxy @'Language.Python) pythonParser Language.Python
 
 callGraphRubyProject = callGraphProject rubyParser (Proxy @'Language.Ruby)
