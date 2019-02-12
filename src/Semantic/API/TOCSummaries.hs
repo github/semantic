@@ -10,6 +10,7 @@ import           Data.Diff
 import qualified Data.Map.Monoidal as Map
 import           Data.Span (emptySpan)
 import qualified Data.Text as T
+import qualified Data.Vector as V
 import           Rendering.TOC
 import           Semantic.API.Diffs
 import           Semantic.API.Helpers
@@ -37,12 +38,12 @@ legacyDiffSummary = distributeFoldMap go
     render blobPair = pure . renderToCDiff blobPair
 
 diffSummary :: (DiffEffects sig m) => [API.BlobPair] -> m DiffTreeTOCResponse
-diffSummary blobs = DiffTreeTOCResponse <$> distributeFor (apiBlobPairToBlobPair <$> blobs) go
+diffSummary blobs = DiffTreeTOCResponse . V.fromList <$> distributeFor (apiBlobPairToBlobPair <$> blobs) go
   where
     go :: (DiffEffects sig m) => BlobPair -> m TOCSummaryFile
     go blobPair = doDiff blobPair (decorate . declarationAlgebra) render
       `catchError` \(SomeException e) ->
-        pure $ TOCSummaryFile path lang mempty [TOCSummaryError (T.pack (show e)) Nothing]
+        pure $ TOCSummaryFile path lang mempty (V.fromList [TOCSummaryError (T.pack (show e)) Nothing])
       where path = T.pack $ pathKeyForBlobPair blobPair
             lang = languageToApiLanguage $ languageForBlobPair blobPair
 
@@ -54,6 +55,6 @@ diffSummary blobs = DiffTreeTOCResponse <$> distributeFor (apiBlobPairToBlobPair
 
         go :: TOCSummary -> TOCSummaryFile -> TOCSummaryFile
         go TOCSummary{..} TOCSummaryFile{..}
-          = TOCSummaryFile path language (TOCSummaryChange summaryCategoryName summaryTermName (spanToSpan summarySpan) (toChangeType summaryChangeType) : changes) errors
+          = TOCSummaryFile path language (V.cons (TOCSummaryChange summaryCategoryName summaryTermName (spanToSpan summarySpan) (toChangeType summaryChangeType)) changes) errors
         go ErrorSummary{..} TOCSummaryFile{..}
-          = TOCSummaryFile path language changes (TOCSummaryError errorText (spanToSpan errorSpan) : errors)
+          = TOCSummaryFile path language changes (V.cons (TOCSummaryError errorText (spanToSpan errorSpan)) errors)
