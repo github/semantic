@@ -45,6 +45,74 @@ import           Semantic.Task
 import           System.Exit (die)
 import           System.FilePath.Posix (takeDirectory)
 
+justEvaluating :: Evaluator
+                        term
+                        Precise
+                        (Value term Precise)
+                        (ResumableC
+                           (BaseError (ValueError term Precise))
+                           (Eff
+                              (ResumableC
+                                 (BaseError (AddressError Precise (Value term Precise)))
+                                 (Eff
+                                    (ResumableC
+                                       (BaseError ResolutionError)
+                                       (Eff
+                                          (ResumableC
+                                             (BaseError
+                                                (EvalError term Precise (Value term Precise)))
+                                             (Eff
+                                                (ResumableC
+                                                   (BaseError (HeapError Precise))
+                                                   (Eff
+                                                      (ResumableC
+                                                         (BaseError (ScopeError Precise))
+                                                         (Eff
+                                                            (ResumableC
+                                                               (BaseError
+                                                                  (UnspecializedError
+                                                                     Precise (Value term Precise)))
+                                                               (Eff
+                                                                  (ResumableC
+                                                                     (BaseError
+                                                                        (LoadError
+                                                                           Precise
+                                                                           (Value term Precise)))
+                                                                     (Eff
+                                                                        (FreshC
+                                                                           (Eff
+                                                                              (StateC
+                                                                                 (ScopeGraph
+                                                                                    Precise)
+                                                                                 (Eff
+                                                                                    (StateC
+                                                                                       (Heap
+                                                                                          Precise
+                                                                                          Precise
+                                                                                          (Value
+                                                                                             term
+                                                                                             Precise))
+                                                                                       (Eff
+                                                                                          (TraceByPrintingC
+                                                                                             (Eff
+                                                                                                (LiftC
+                                                                                                   IO)))))))))))))))))))))))))
+                        result
+                      -> IO
+                           (Heap Precise Precise (Value term Precise),
+                            (ScopeGraph Precise,
+                             Either
+                               (SomeError
+                                  (Sum
+                                     '[BaseError (ValueError term Precise),
+                                       BaseError (AddressError Precise (Value term Precise)),
+                                       BaseError ResolutionError,
+                                       BaseError (EvalError term Precise (Value term Precise)),
+                                       BaseError (HeapError Precise),
+                                       BaseError (ScopeError Precise),
+                                       BaseError (UnspecializedError Precise (Value term Precise)),
+                                       BaseError (LoadError Precise (Value term Precise))]))
+                               result))
 justEvaluating
   = runM
   . runEvaluator
@@ -396,7 +464,7 @@ evaluatePythonProject = justEvaluating <=< evaluatePythonProjects (Proxy @'Langu
 
 callGraphRubyProject = callGraphProject rubyParser (Proxy @'Language.Ruby)
 
-type EvalEffects qterm = ResumableC (BaseError (ValueError qterm Precise))
+type EvalEffects qterm err = ResumableC (BaseError err)
                          (Eff (ResumableC (BaseError (AddressError Precise (Value qterm Precise)))
                          (Eff (ResumableC (BaseError ResolutionError)
                          (Eff (ResumableC (BaseError (EvalError qterm Precise (Value qterm Precise)))
@@ -421,34 +489,10 @@ type LanguageSyntax lang syntax = ( Language.SLanguage lang
                                   , Apply AccessControls1 syntax
                                   , Apply FreeVariables1 syntax)
 
-evaluateProject :: ( term ~ Term (Sum syntax) Location
-                   , qterm ~ Quieterm (Sum syntax) Location
-                   , LanguageSyntax lang syntax
-                   )
-                => Proxy lang
-                -> Parser term
-                -> [FilePath]
-                -> IO (Evaluator qterm Precise
-                        (Value qterm Precise)
-                        (EvalEffects qterm)
-                        (ModuleTable (Module (ModuleResult Precise (Value qterm Precise)))))
 evaluateProject proxy parser paths = withOptions debugOptions $ \ config logger statter ->
   evaluateProject' (TaskSession config "-" logger statter) proxy parser paths
 
--- Evaluate a project consisting of the listed paths.
--- TODO: This is used by our specs and should be moved into SpecHelpers.hs
-evaluateProject' :: ( term ~ Term (Sum syntax) Location
-                    , qterm ~ Quieterm (Sum syntax) Location
-                    , LanguageSyntax lang syntax
-                    )
-                 => TaskSession
-                 -> Proxy lang
-                 -> Parser term
-                 -> [FilePath]
-                 -> IO (Evaluator qterm Precise
-                         (Value qterm Precise)
-                         (EvalEffects qterm)
-                         (ModuleTable (Module (ModuleResult Precise (Value qterm Precise)))))
+
 evaluateProject' session proxy parser paths = do
   res <- runTask session $ do
     blobs <- catMaybes <$> traverse readBlobFromFile (flip File (Language.reflect proxy) <$> paths)
@@ -473,7 +517,7 @@ evaluatePythonProjects :: ( term ~ Term (Sum Language.Python.Assignment.Syntax) 
                        -> FilePath
                        -> IO (Evaluator qterm Precise
                                (Value qterm Precise)
-                               (EvalEffects qterm)
+                               (EvalEffects qterm (ValueError qterm Precise))
                                (ModuleTable (Module (ModuleResult Precise (Value qterm Precise)))))
 evaluatePythonProjects proxy parser lang path = runTask' $ do
   project <- readProject Nothing path lang []
