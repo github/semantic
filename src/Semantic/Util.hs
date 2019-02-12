@@ -709,6 +709,7 @@ evaluatePythonProject :: ( syntax ~ Language.Python.Assignment.Syntax
                 result))
 evaluatePythonProject = justEvaluating <=< evaluatePythonProjects (Proxy @'Language.Python) pythonParser Language.Python
 
+callGraphRubyProject :: [FilePath] -> IO (Graph ControlFlowVertex, [Module.Module ()])
 callGraphRubyProject = callGraphProject rubyParser (Proxy @'Language.Ruby)
 
 evaluateProject :: ( term ~ Term (Sum syntax) Location
