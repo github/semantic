@@ -40,10 +40,10 @@ import           Prologue
 import           Semantic.Analysis
 import           Semantic.Config
 import           Semantic.Graph
-import           Semantic.Graph (resumingScopeError)
 import           Semantic.Task
 import           System.Exit (die)
 import           System.FilePath.Posix (takeDirectory)
+import Data.Graph.ControlFlowVertex
 
 justEvaluating :: Evaluator
                         term
@@ -453,6 +453,24 @@ typecheckRubyFile :: ( syntax ~ Language.Ruby.Assignment.Syntax
                   => FileTypechecker syntax qterm value address result
 typecheckRubyFile = checking <=< evaluateProjectWithCaching (Proxy :: Proxy 'Language.Ruby) rubyParser
 
+callGraphProject
+  :: (Language.SLanguage lang, Ord1 syntax,
+      Declarations1 syntax,
+      Evaluatable syntax,
+      FreeVariables1 syntax,
+      AccessControls1 syntax,
+      HasPrelude lang, Functor syntax,
+      VertexDeclarationWithStrategy
+        (VertexDeclarationStrategy syntax)
+        syntax
+        syntax) =>
+     Parser
+       (Term syntax Location)
+     -> Proxy lang
+     -> [FilePath]
+     -> IO
+          (Graph ControlFlowVertex,
+           [Module ()])
 callGraphProject parser proxy paths = runTask' $ do
   blobs <- catMaybes <$> traverse readBlobFromFile (flip File (Language.reflect proxy) <$> paths)
   package <- fmap snd <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs (Language.reflect proxy) [])
@@ -460,8 +478,48 @@ callGraphProject parser proxy paths = runTask' $ do
   x <- runCallGraph proxy False modules package
   pure (x, (() <$) <$> modules)
 
+evaluatePythonProject :: ( syntax ~ Language.Python.Assignment.Syntax
+                   , qterm ~ Quieterm (Sum syntax) Location
+                   , value ~ (Concrete.Value qterm address)
+                   , address ~ Precise
+                   , result ~ (ModuleTable (Module (ModuleResult address value)))) => FilePath
+     -> IO
+          (Heap address address value,
+           (ScopeGraph address,
+             Either
+                (SomeError
+                   (Sum
+                      '[BaseError
+                          (ValueError qterm address),
+                        BaseError
+                          (AddressError
+                             address
+                             value),
+                        BaseError
+                          ResolutionError,
+                        BaseError
+                          (EvalError
+                             qterm
+                             address
+                             value),
+                        BaseError
+                          (HeapError
+                             address),
+                        BaseError
+                          (ScopeError
+                             address),
+                        BaseError
+                          (UnspecializedError
+                             address
+                             value),
+                        BaseError
+                          (LoadError
+                             address
+                             value)]))
+                result))
 evaluatePythonProject = justEvaluating <=< evaluatePythonProjects (Proxy @'Language.Python) pythonParser Language.Python
 
+callGraphRubyProject :: [FilePath] -> IO (Graph ControlFlowVertex, [Module ()])
 callGraphRubyProject = callGraphProject rubyParser (Proxy @'Language.Ruby)
 
 type EvalEffects qterm err = ResumableC (BaseError err)
@@ -492,7 +550,8 @@ type LanguageSyntax lang syntax = ( Language.SLanguage lang
 evaluateProject proxy parser paths = withOptions debugOptions $ \ config logger statter ->
   evaluateProject' (TaskSession config "-" logger statter) proxy parser paths
 
-
+-- Evaluate a project consisting of the listed paths.
+-- TODO: This is used by our specs and should be moved into SpecHelpers.hs
 evaluateProject' session proxy parser paths = do
   res <- runTask session $ do
     blobs <- catMaybes <$> traverse readBlobFromFile (flip File (Language.reflect proxy) <$> paths)
