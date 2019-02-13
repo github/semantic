@@ -251,6 +251,23 @@ checking
   . runAddressError
   . runTypes
 
+type ProjectEvaluator syntax =
+  Project
+  -> IO
+      (Heap
+      (Hole (Maybe Name) Precise)
+      (Hole (Maybe Name) Precise)
+      (Value
+      (Quieterm (Sum syntax) Location)
+      (Hole (Maybe Name) Precise)),
+      (ScopeGraph (Hole (Maybe Name) Precise),
+      ModuleTable
+      (Module
+              (ModuleResult
+              (Hole (Maybe Name) Precise)
+              (Value
+              (Quieterm (Sum syntax) Location)
+              (Hole (Maybe Name) Precise))))))
 type FileEvaluator syntax =
   [FilePath]
   -> IO
@@ -447,10 +464,15 @@ callGraphProject parser proxy paths = runTask' $ do
   x <- runCallGraph proxy False modules package
   pure (x, (() <$) <$> modules)
 
+scopeGraphRubyProject :: ProjectEvaluator Language.Ruby.Assignment.Syntax
 scopeGraphRubyProject = justEvaluatingCatchingErrors <=< evaluateProjectForScopeGraph (Proxy @'Language.Ruby) rubyParser
+scopeGraphPHPProject :: ProjectEvaluator Language.PHP.Assignment.Syntax
 scopeGraphPHPProject = justEvaluatingCatchingErrors <=< evaluateProjectForScopeGraph (Proxy @'Language.PHP) phpParser
+scopeGraphGoProject :: ProjectEvaluator Language.Go.Assignment.Syntax
 scopeGraphGoProject = justEvaluatingCatchingErrors <=< evaluateProjectForScopeGraph (Proxy @'Language.Go) goParser
+scopeGraphTypeScriptProject :: ProjectEvaluator Language.TypeScript.Assignment.Syntax
 scopeGraphTypeScriptProject = justEvaluatingCatchingErrors <=< evaluateProjectForScopeGraph (Proxy @'Language.TypeScript) typescriptParser
+scopeGraphJavaScriptProject :: ProjectEvaluator Language.TypeScript.Assignment.Syntax
 scopeGraphJavaScriptProject = justEvaluatingCatchingErrors <=< evaluateProjectForScopeGraph (Proxy @'Language.TypeScript) typescriptParser
 
 evaluatePythonProject :: ( syntax ~ Language.Python.Assignment.Syntax
@@ -588,6 +610,40 @@ evaluatePythonProjects proxy parser lang path = runTask' $ do
        (raiseHandler (runReader (lowerBound @Span))
        (evaluate proxy (runDomainEffects (evalTerm withTermSpans)) modules)))))))
 
+evaluateProjectForScopeGraph :: ( HasPrelude lang
+                              , Apply Eq1 syntax
+                              , Apply Ord1 syntax
+                              , Apply Show1 syntax
+                              , Apply Functor syntax
+                              , Apply Foldable syntax
+                              , Apply Evaluatable syntax
+                              , Apply Declarations1 syntax
+                              , Apply AccessControls1 syntax
+                              , Apply FreeVariables1 syntax
+                              , term ~ Term (Sum syntax) Location
+                              , qterm ~ Quieterm (Sum syntax) Location
+                              , address ~ Hole (Maybe Name) Precise
+                              )
+                             => Proxy (lang :: Language.Language)
+                             -> Parser term
+                             -> Project
+                             -> IO (Evaluator qterm address
+                                    (Value qterm address)
+                                    (ResumableWithC (BaseError (ValueError qterm address))
+                               (Eff (ResumableWithC (BaseError (AddressError address (Value qterm address)))
+                               (Eff (ResumableWithC (BaseError ResolutionError)
+                               (Eff (ResumableWithC (BaseError (EvalError qterm address (Value qterm address)))
+                               (Eff (ResumableWithC (BaseError (HeapError address))
+                               (Eff (ResumableWithC (BaseError (ScopeError address))
+                               (Eff (ResumableWithC (BaseError (UnspecializedError address (Value qterm address)))
+                               (Eff (ResumableWithC (BaseError (LoadError address (Value qterm address)))
+                               (Eff (FreshC
+                               (Eff (StateC (ScopeGraph address)
+                               (Eff (StateC (Heap address address (Value qterm address))
+                               (Eff (TraceByPrintingC
+                               (Eff (LiftC IO)))))))))))))))))))))))))
+                             (ModuleTable (Module
+                                (ModuleResult address (Value qterm address)))))
 evaluateProjectForScopeGraph proxy parser project = runTask' $ do
   package <- fmap quieterm <$> parsePythonPackage parser project
   modules <- topologicalSort <$> runImportGraphToModules proxy package
