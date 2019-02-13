@@ -8,14 +8,14 @@ import           Control.Abstract hiding (Break, Continue, Return, While)
 import           Data.Abstract.Evaluatable as Abstract
 import           Data.Aeson (ToJSON1 (..))
 import           Data.JSON.Fields
-import           Data.Semigroup.App
-import           Data.Semigroup.Foldable
-import           Diffing.Algorithm
-import           Reprinting.Tokenize (Tokenize (..), imperative, within', yield)
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import qualified Data.Map.Strict as Map
 import qualified Data.Reprinting.Scope as Scope
 import qualified Data.Reprinting.Token as Token
+import           Data.Semigroup.App
+import           Data.Semigroup.Foldable
+import           Diffing.Algorithm
+import           Reprinting.Tokenize (Tokenize (..), imperative, within', yield)
 
 -- | Imperative sequence of statements/declarations s.t.:
 --
