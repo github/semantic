@@ -1,4 +1,4 @@
-{-# LANGUAGE Rank2Types, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE ConstraintKinds, Rank2Types, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 {-# OPTIONS_GHC -Wno-missing-signatures -Wno-missing-export-lists #-}
 module Semantic.Util where
 
@@ -46,6 +46,80 @@ import           System.FilePath.Posix (takeDirectory)
 import Data.Location
 import Data.Quieterm
 
+-- The type signatures in these functions are pretty gnarly, but these functions
+-- are hit sufficiently often in the CLI and test suite so as to merit avoiding
+-- the overhead of repeated type inference. If you have to hack on these functions,
+-- it's recommended to remove all the type signatures and add them back when you
+-- are done (type holes in GHCi will help here).
+
+justEvaluating :: Evaluator
+                        term
+                        Precise
+                        (Value term Precise)
+                        (ResumableC
+                           (BaseError (ValueError term Precise))
+                           (Eff
+                              (ResumableC
+                                 (BaseError (AddressError Precise (Value term Precise)))
+                                 (Eff
+                                    (ResumableC
+                                       (BaseError ResolutionError)
+                                       (Eff
+                                          (ResumableC
+                                             (BaseError
+                                                (EvalError term Precise (Value term Precise)))
+                                             (Eff
+                                                (ResumableC
+                                                   (BaseError (HeapError Precise))
+                                                   (Eff
+                                                      (ResumableC
+                                                         (BaseError (ScopeError Precise))
+                                                         (Eff
+                                                            (ResumableC
+                                                               (BaseError
+                                                                  (UnspecializedError
+                                                                     Precise (Value term Precise)))
+                                                               (Eff
+                                                                  (ResumableC
+                                                                     (BaseError
+                                                                        (LoadError
+                                                                           Precise
+                                                                           (Value term Precise)))
+                                                                     (Eff
+                                                                        (FreshC
+                                                                           (Eff
+                                                                              (StateC
+                                                                                 (ScopeGraph
+                                                                                    Precise)
+                                                                                 (Eff
+                                                                                    (StateC
+                                                                                       (Heap
+                                                                                          Precise
+                                                                                          Precise
+                                                                                          (Value
+                                                                                             term
+                                                                                             Precise))
+                                                                                       (Eff
+                                                                                          (TraceByPrintingC
+                                                                                             (Eff
+                                                                                                (LiftC
+                                                                                                   IO)))))))))))))))))))))))))
+                        result
+                      -> IO
+                           (Heap Precise Precise (Value term Precise),
+                            (ScopeGraph Precise,
+                             Either
+                               (SomeError
+                                  (Sum
+                                     '[BaseError (ValueError term Precise),
+                                       BaseError (AddressError Precise (Value term Precise)),
+                                       BaseError ResolutionError,
+                                       BaseError (EvalError term Precise (Value term Precise)),
+                                       BaseError (HeapError Precise),
+                                       BaseError (ScopeError Precise),
+                                       BaseError (UnspecializedError Precise (Value term Precise)),
+                                       BaseError (LoadError Precise (Value term Precise))]))
+                               result))
 justEvaluating
   = runM
   . runEvaluator
@@ -342,101 +416,65 @@ evalJavaScriptProject = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Lang
 evalTypeScriptProject :: FileEvaluator Language.TypeScript.Assignment.Syntax
 evalTypeScriptProject = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.TypeScript) typescriptParser
 
+type FileTypechecker (syntax :: [* -> *]) qterm value address result
+  = FilePath
+  -> IO
+       (Heap
+          address
+          address
+          value,
+        (ScopeGraph
+           address,
+         (Cache
+            qterm
+            address
+            value,
+          [Either
+             (SomeError
+                (Sum
+                   '[BaseError
+                       Type.TypeError,
+                     BaseError
+                       (AddressError
+                          address
+                          value),
+                     BaseError
+                       (EvalError
+                          qterm
+                          address
+                          value),
+                     BaseError
+                       ResolutionError,
+                     BaseError
+                       (HeapError
+                          address),
+                     BaseError
+                       (ScopeError
+                          address),
+                     BaseError
+                       (UnspecializedError
+                          address
+                          value),
+                     BaseError
+                       (LoadError
+                          address
+                          value)]))
+             result])))
+
 typecheckGoFile :: ( syntax ~ Language.Go.Assignment.Syntax
                    , qterm ~ Quieterm (Sum syntax) Location
                    , value ~ Type
                    , address ~ Monovariant
-                   , result ~ (ModuleTable (Module (ModuleResult address value)))) => FilePath
-     -> IO
-          (Heap
-             address
-             address
-             value,
-           (ScopeGraph
-              address,
-            (Cache
-               qterm
-               address
-               value,
-             [Either
-                (SomeError
-                   (Sum
-                      '[BaseError
-                          Type.TypeError,
-                        BaseError
-                          (AddressError
-                             address
-                             value),
-                        BaseError
-                          (EvalError
-                             qterm
-                             address
-                             value),
-                        BaseError
-                          ResolutionError,
-                        BaseError
-                          (HeapError
-                             address),
-                        BaseError
-                          (ScopeError
-                             address),
-                        BaseError
-                          (UnspecializedError
-                             address
-                             value),
-                        BaseError
-                          (LoadError
-                             address
-                             value)]))
-                result])))
+                   , result ~ (ModuleTable (Module (ModuleResult address value))))
+                => FileTypechecker syntax qterm value address result
 typecheckGoFile = checking <=< evaluateProjectWithCaching (Proxy :: Proxy 'Language.Go) goParser
+
 typecheckRubyFile :: ( syntax ~ Language.Ruby.Assignment.Syntax
                    , qterm ~ Quieterm (Sum syntax) Location
                    , value ~ Type
                    , address ~ Monovariant
-                   , result ~ (ModuleTable (Module (ModuleResult address value)))) => FilePath
-     -> IO
-          (Heap
-             address
-             address
-             value,
-           (ScopeGraph
-              address,
-            (Cache
-               qterm
-               address
-               value,
-             [Either
-                (SomeError
-                   (Sum
-                      '[BaseError
-                          Type.TypeError,
-                        BaseError
-                          (AddressError
-                             address
-                             value),
-                        BaseError
-                          (EvalError
-                             qterm
-                             address
-                             value),
-                        BaseError
-                          ResolutionError,
-                        BaseError
-                          (HeapError
-                             address),
-                        BaseError
-                          (ScopeError
-                             address),
-                        BaseError
-                          (UnspecializedError
-                             address
-                             value),
-                        BaseError
-                          (LoadError
-                             address
-                             value)]))
-                result])))
+                   , result ~ (ModuleTable (Module (ModuleResult address value))))
+                  => FileTypechecker syntax qterm value address result
 typecheckRubyFile = checking <=< evaluateProjectWithCaching (Proxy :: Proxy 'Language.Ruby) rubyParser
 
 callGraphProject
@@ -519,7 +557,7 @@ evaluatePythonProject = justEvaluating <=< evaluatePythonProjects (Proxy @'Langu
 callGraphRubyProject :: [FilePath] -> IO (Graph ControlFlowVertex, [Module ()])
 callGraphRubyProject = callGraphProject rubyParser (Proxy @'Language.Ruby)
 
-type EvalEffects qterm = ResumableC (BaseError (ValueError qterm Precise))
+type EvalEffects qterm err = ResumableC (BaseError err)
                          (Eff (ResumableC (BaseError (AddressError Precise (Value qterm Precise)))
                          (Eff (ResumableC (BaseError ResolutionError)
                          (Eff (ResumableC (BaseError (EvalError qterm Precise (Value qterm Precise)))
@@ -532,28 +570,18 @@ type EvalEffects qterm = ResumableC (BaseError (ValueError qterm Precise))
                          (Eff (TraceByPrintingC
                          (Eff (LiftC IO))))))))))))))))))))))))
 
-evaluateProject :: ( term ~ Term (Sum syntax) Location
-                    , qterm ~ Quieterm (Sum syntax) Location
-                    , Language.SLanguage lang
-                    , HasPrelude lang
-                    , Apply Eq1 syntax
-                    , Apply Ord1 syntax
-                    , Apply Show1 syntax
-                    , Apply Functor syntax
-                    , Apply Foldable syntax
-                    , Apply Evaluatable syntax
-                    , Apply Declarations1 syntax
-                    , Apply AccessControls1 syntax
-                    , Apply FreeVariables1 syntax
-                    )
-                 => Proxy lang
-                 -> Parser term
-                 -> [FilePath]
-                 -> IO (Evaluator qterm Precise
-                         (Value qterm Precise)
-                         (EvalEffects qterm)
-                       (ModuleTable (Module
-                          (ModuleResult Precise (Value qterm Precise)))))
+type LanguageSyntax lang syntax = ( Language.SLanguage lang
+                                  , HasPrelude lang
+                                  , Apply Eq1 syntax
+                                  , Apply Ord1 syntax
+                                  , Apply Show1 syntax
+                                  , Apply Functor syntax
+                                  , Apply Foldable syntax
+                                  , Apply Evaluatable syntax
+                                  , Apply Declarations1 syntax
+                                  , Apply AccessControls1 syntax
+                                  , Apply FreeVariables1 syntax)
+
 evaluateProject proxy parser paths = withOptions debugOptions $ \ config logger statter ->
   evaluateProject' (TaskSession config "-" logger statter) proxy parser paths
 
@@ -583,20 +611,8 @@ evaluatePythonProjects :: ( term ~ Term (Sum Language.Python.Assignment.Syntax) 
                        -> FilePath
                        -> IO (Evaluator qterm Precise
                                (Value qterm Precise)
-                               (ResumableC (BaseError (ValueError qterm Precise))
-                               (Eff (ResumableC (BaseError (AddressError Precise (Value qterm Precise)))
-                               (Eff (ResumableC (BaseError ResolutionError)
-                               (Eff (ResumableC (BaseError (EvalError qterm Precise (Value qterm Precise)))
-                               (Eff (ResumableC (BaseError (HeapError Precise))
-                               (Eff (ResumableC (BaseError (ScopeError Precise))
-                               (Eff (ResumableC (BaseError (UnspecializedError Precise (Value qterm Precise)))
-                               (Eff (ResumableC (BaseError (LoadError Precise (Value qterm Precise)))
-                               (Eff (FreshC (Eff (StateC (ScopeGraph Precise)
-                               (Eff (StateC (Heap Precise Precise (Value qterm Precise))
-                               (Eff (TraceByPrintingC
-                               (Eff (LiftC IO)))))))))))))))))))))))))
-                             (ModuleTable (Module
-                                (ModuleResult Precise (Value qterm Precise)))))
+                               (EvalEffects qterm (ValueError qterm Precise))
+                               (ModuleTable (Module (ModuleResult Precise (Value qterm Precise)))))
 evaluatePythonProjects proxy parser lang path = runTask' $ do
   project <- readProject Nothing path lang []
   package <- fmap quieterm <$> parsePythonPackage parser project
@@ -610,19 +626,10 @@ evaluatePythonProjects proxy parser lang path = runTask' $ do
        (raiseHandler (runReader (lowerBound @Span))
        (evaluate proxy (runDomainEffects (evalTerm withTermSpans)) modules)))))))
 
-evaluateProjectForScopeGraph :: ( HasPrelude lang
-                              , Apply Eq1 syntax
-                              , Apply Ord1 syntax
-                              , Apply Show1 syntax
-                              , Apply Functor syntax
-                              , Apply Foldable syntax
-                              , Apply Evaluatable syntax
-                              , Apply Declarations1 syntax
-                              , Apply AccessControls1 syntax
-                              , Apply FreeVariables1 syntax
-                              , term ~ Term (Sum syntax) Location
+evaluateProjectForScopeGraph :: ( term ~ Term (Sum syntax) Location
                               , qterm ~ Quieterm (Sum syntax) Location
                               , address ~ Hole (Maybe Name) Precise
+                              , LanguageSyntax lang syntax
                               )
                              => Proxy (lang :: Language.Language)
                              -> Parser term
@@ -657,19 +664,9 @@ evaluateProjectForScopeGraph proxy parser project = runTask' $ do
        (evaluate proxy (runDomainEffects (evalTerm withTermSpans)) modules)))))))
 
 
-evaluateProjectWithCaching :: ( Language.SLanguage lang
-                              , HasPrelude lang
-                              , Apply Eq1 syntax
-                              , Apply Ord1 syntax
-                              , Apply Show1 syntax
-                              , Apply Functor syntax
-                              , Apply Foldable syntax
-                              , Apply Evaluatable syntax
-                              , Apply Declarations1 syntax
-                              , Apply AccessControls1 syntax
-                              , Apply FreeVariables1 syntax
-                              , term ~ Term (Sum syntax) Location
+evaluateProjectWithCaching :: ( term ~ Term (Sum syntax) Location
                               , qterm ~ Quieterm (Sum syntax) Location
+                              , LanguageSyntax lang syntax
                               )
                            => Proxy (lang :: Language.Language)
                            -> Parser term
