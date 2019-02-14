@@ -45,6 +45,12 @@ import           System.Exit (die)
 import           System.FilePath.Posix (takeDirectory)
 import Data.Graph.ControlFlowVertex
 
+-- The type signatures in these functions are pretty gnarly, but these functions
+-- are hit sufficiently often in the CLI and test suite so as to merit avoiding
+-- the overhead of repeated type inference. If you have to hack on these functions,
+-- it's recommended to remove all the type signatures and add them back when you
+-- are done (type holes in GHCi will help here).
+
 justEvaluating :: Evaluator
                         term
                         Precise
