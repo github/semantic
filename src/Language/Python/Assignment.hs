@@ -357,7 +357,7 @@ assignment' =  makeAssignment <$> symbol Assignment <*> children ((,,) <$> term 
                   , assign Expression.LShift    <$ symbol AnonLAngleLAngleEqual
                   , assign Expression.BXOr      <$ symbol AnonCaretEqual
                   ])
-  where rvalue = expressionList <|> assignment' <|> yield
+  where rvalue = expressionList <|> assignment' <|> yield <|> emptyTerm
         makeAssignment loc (lhs, maybeType, rhs) = makeTerm loc (Statement.Assignment (maybeToList maybeType) lhs rhs)
         assign :: (f :< Syntax) => (Term -> Term -> f Term) -> Term -> Term -> Sum Syntax Term
         assign c l r = inject (Statement.Assignment [] l (makeTerm1 (c l r)))

@@ -5,3 +5,7 @@ class D(method1):
 class B:
   def b(self):
     return c
+
+class E(e):
+    g: str
+    h: Optional[int]
