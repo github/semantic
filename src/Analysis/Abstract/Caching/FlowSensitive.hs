@@ -1,6 +1,7 @@
 {-# LANGUAGE ConstraintKinds, GADTs, GeneralizedNewtypeDeriving, TypeOperators #-}
 module Analysis.Abstract.Caching.FlowSensitive
-( cachingTerms
+( Cache
+, cachingTerms
 , convergingModules
 , caching
 ) where
