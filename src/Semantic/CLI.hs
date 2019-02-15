@@ -84,7 +84,7 @@ parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate pa
       pure $ Task.readBlobs filesOrStdin >>= renderer
 
 tsParseCommand :: Mod CommandFields (Task.TaskEff Builder)
-tsParseCommand = command "ts-parse" (info tsParseArgumentsParser (progDesc "Don't produce output, but show timing stats"))
+tsParseCommand = command "ts-parse" (info tsParseArgumentsParser (progDesc "Generate raw tree-sitter parse trees for path(s)"))
   where
     tsParseArgumentsParser = do
       format <- flag  AST.SExpression AST.SExpression (long "sexpression" <> help "Output s-expression ASTs (default)")
