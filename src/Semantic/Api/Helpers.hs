@@ -6,6 +6,7 @@ module Semantic.Api.Helpers
   , apiBlobToBlob
   , apiBlobPairToBlobPair
   , apiLanguageToLanguage
+  , apiBlobPairsToBlobPairs
   , languageToApiLanguage
   ) where
 
@@ -15,6 +16,7 @@ import qualified Data.Language as Data
 import           Data.Source (fromText)
 import qualified Data.Span as Data
 import qualified Data.Text as T
+import qualified Data.Vector as V
 import           Data.These
 import qualified Semantic.Api.LegacyTypes as Legacy
 import qualified Semantic.Api.V1.CodeAnalysisPB as API
@@ -66,6 +68,9 @@ languageToApiLanguage = \case
   Data.Ruby -> API.Ruby
   Data.TypeScript -> API.Typescript
   Data.PHP -> API.Php
+
+apiBlobPairsToBlobPairs :: V.Vector API.BlobPair -> [Data.BlobPair]
+apiBlobPairsToBlobPairs = V.toList . fmap apiBlobPairToBlobPair
 
 apiBlobPairToBlobPair :: API.BlobPair -> Data.BlobPair
 apiBlobPairToBlobPair (API.BlobPair (Just before) (Just after)) = Join (These (apiBlobToBlob before) (apiBlobToBlob after))
