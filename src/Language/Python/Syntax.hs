@@ -20,35 +20,12 @@ import qualified Data.Text as T
 import           Diffing.Algorithm
 import           GHC.Generics
 import           Prologue
-import           Proto3.Suite
-    ( DotProtoIdentifier (..)
-    , DotProtoPrimType (..)
-    , DotProtoType (..)
-    , Message (..)
-    , Message1 (..)
-    , MessageField (..)
-    , Named (..)
-    , Named1 (..)
-    , Primitive (..)
-    , messageField
-    )
-import qualified Proto3.Wire.Decode as Decode
-import qualified Proto3.Wire.Encode as Encode
 import           System.FilePath.Posix
 
 data QualifiedName
   = QualifiedName { paths :: NonEmpty FilePath }
   | RelativeQualifiedName { path :: FilePath, maybeQualifiedName ::  Maybe QualifiedName }
-  deriving (Eq, Generic, Hashable, Ord, Show, ToJSON, Named, Message, NFData)
-
-instance MessageField QualifiedName where
-  encodeMessageField num QualifiedName{..} = Encode.embedded num (encodeMessageField 1 paths)
-  encodeMessageField num RelativeQualifiedName{..} = Encode.embedded num (encodeMessageField 1 path <> encodeMessageField 2 maybeQualifiedName)
-  decodeMessageField = Decode.embedded'' (qualifiedName <|> relativeQualifiedName)
-    where
-      qualifiedName = QualifiedName <$> Decode.at decodeMessageField 1
-      relativeQualifiedName = RelativeQualifiedName <$> Decode.at decodeMessageField 1 <*> Decode.at decodeMessageField 2
-  protoType _ = messageField (Prim $ Named (Single (nameOf (Proxy @QualifiedName)))) Nothing
+  deriving (Eq, Generic, Hashable, Ord, Show, ToJSON, NFData)
 
 qualifiedName :: NonEmpty Text -> QualifiedName
 qualifiedName xs = QualifiedName (T.unpack <$> xs)
@@ -113,30 +90,25 @@ resolvePythonModules q = do
       modulePath <- resolve searchPaths
       maybeM (throwResolutionError $ NotFoundError path searchPaths Language.Python) modulePath
 
-data Alias a = Alias { aliasValue :: a, aliasName :: a}
-  deriving (Generic1, Diffable, Eq, Foldable, FreeVariables1, Functor, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
-  deriving (Eq1, Show1, Ord1) via Generically Alias
-
-instance Declarations1 Alias where
-  liftDeclaredName declaredName = declaredName . aliasValue
-  liftDeclaredAlias declaredAlias = declaredAlias . aliasName
-
-instance Evaluatable Alias where
-  eval eval _ Alias{..} = eval aliasValue
-  ref _ ref Alias{..} = ref aliasValue
 
 -- | Import declarations (symbols are added directly to the calling environment).
 --
 -- If the list of symbols is empty copy everything to the calling environment.
-data Import a = Import { importFrom :: QualifiedName, importSymbols :: ![a] }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
+data Import a = Import { importFrom :: QualifiedName, importSymbols :: ![Alias] }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Import
 
-newtype FutureImport a = FutureImport { futureImportSymbols :: [a] }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
+newtype FutureImport a = FutureImport { futureImportSymbols :: [Alias] }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically FutureImport
 
 instance Evaluatable FutureImport where
+
+data Alias = Alias { aliasValue :: Name, aliasName :: Name }
+  deriving (Eq, Generic, Hashable, Ord, Show, ToJSON, NFData)
+
+toTuple :: Alias -> (Name, Name)
+toTuple Alias{..} = (aliasValue, aliasName)
 
 
 -- from a import b
@@ -144,11 +116,11 @@ instance Evaluatable Import where
   -- from . import moduleY            -- aliasValue = moduleY, aliasName = moduleY
   -- from . import moduleY as moduleZ -- aliasValue = moduleY, aliasName = moduleZ
   -- This is a bit of a special case in the syntax as this actually behaves like a qualified relative import.
-  eval eval _ (Import (RelativeQualifiedName n Nothing) [aliasTerm]) = do
-    aliasValue' <- maybeM (throwNoNameError aliasTerm) (declaredName aliasTerm)
-    path <- NonEmpty.last <$> resolvePythonModules (RelativeQualifiedName n (Just (qualifiedName (formatName aliasValue' :| []))))
+  eval _ _ (Import (RelativeQualifiedName n Nothing) [Alias{..}]) = do
+    path <- NonEmpty.last <$> resolvePythonModules (RelativeQualifiedName n (Just (qualifiedName (formatName aliasValue :| []))))
     ((moduleScope, moduleFrame), _) <- require path
 
+    span <- ask @Span
     -- Construct a proxy scope containing an import edge to the imported module's last returned scope.
     importScope <- newScope (Map.singleton ScopeGraph.Import [ moduleScope ])
 
@@ -157,8 +129,7 @@ instance Evaluatable Import where
     aliasFrame <- newFrame importScope (Map.singleton ScopeGraph.Import scopeMap)
 
     -- Add declaration of the alias name to the current scope (within our current module).
-    (aliasName, aliasSpan) <- evalAliasNameAndSpan eval aliasTerm
-    declare (Declaration aliasName) Default Public aliasSpan ScopeGraph.UnqualifiedImport (Just importScope)
+    declare (Declaration aliasName) Default Public span (Just importScope)
     -- Retrieve the frame slot for the new declaration.
     aliasSlot <- lookupSlot (Declaration aliasName)
     assign aliasSlot =<< object aliasFrame
@@ -169,7 +140,7 @@ instance Evaluatable Import where
   -- from a import b as c
   -- from a import *
   -- from .moduleY import b
-  eval eval _ (Import name xs) = do
+  eval _ _ (Import name xs) = do
     modulePaths <- resolvePythonModules name
 
     -- Eval parent modules first
@@ -185,12 +156,8 @@ instance Evaluatable Import where
       let scopeEdges = Map.singleton ScopeGraph.Import [ moduleScope ]
       scopeAddress <- newScope scopeEdges
       withScope moduleScope .
-        for_ xs $ \aliasTerm -> do
-          (aliasName, aliasSpan) <- evalAliasNameAndSpan eval aliasTerm
-          aliasValue <- maybeM (throwNoNameError aliasTerm) (declaredName aliasTerm)
-          if aliasValue /= aliasName then
-            insertImportReference (Reference aliasName) aliasSpan ScopeGraph.Identifier (Declaration aliasValue) scopeAddress
-          else pure ()
+        for_ xs $ \Alias{..} ->
+          insertImportReference (Reference aliasName) (Declaration aliasValue) scopeAddress
 
       let frameLinks = Map.singleton moduleScope moduleFrame
       frameAddress <- newFrame scopeAddress (Map.singleton ScopeGraph.Import frameLinks)
@@ -200,51 +167,25 @@ instance Evaluatable Import where
 
     unit
 
-evalAliasNameAndSpan :: (Carrier sig m
-                       , Declarations t
-                       , Member (State Span) sig
-                       , Member (Reader ModuleInfo) sig
-                       , Member (Reader Span) sig
-                       , Member (Resumable (BaseError (EvalError t address value))) sig)
-                     => (t -> Evaluator t address value m a)
-                     -> t
-                     -> Evaluator t address value m (Name, Span)
-evalAliasNameAndSpan eval aliasTerm = do
-  aliasName <- maybeM (throwNoNameError aliasTerm) (declaredAlias aliasTerm)
-  _ <- eval aliasTerm
-  aliasSpan <- get @Span
-  pure (aliasName, aliasSpan)
 
-
-deriving instance Hashable1 NonEmpty
-
-newtype QualifiedImport a = QualifiedImport { qualifiedImportFrom :: NonEmpty a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1, Message1)
+newtype QualifiedImport a = QualifiedImport { qualifiedImportFrom :: NonEmpty String }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically QualifiedImport
-
-instance Named Prelude.String where nameOf _ = "string"
-
-instance Message Prelude.String where
-  encodeMessage _ = encodePrimitive 1
-  decodeMessage _ = Decode.at (Decode.one decodePrimitive mempty) 1
-  dotProto = undefined
 
 -- import a.b.c
 instance Evaluatable QualifiedImport where
-  eval eval _ (QualifiedImport qualifiedNames) = do
-    qualifiedName <- fmap (T.unpack . formatName) <$> traverse (\term -> maybeM (throwNoNameError term) (declaredName term)) qualifiedNames
+  eval _ _ (QualifiedImport qualifiedName) = do
     modulePaths <- resolvePythonModules (QualifiedName qualifiedName)
-    let namesAndPaths = toList (NonEmpty.zip (NonEmpty.zip qualifiedNames (Data.Abstract.Evaluatable.name . T.pack <$> qualifiedName)) modulePaths)
+    let namesAndPaths = toList (NonEmpty.zip (Data.Abstract.Evaluatable.name . T.pack <$> qualifiedName) modulePaths)
 
     go namesAndPaths
     unit
     where
       go [] = pure ()
-      go (((nameTerm, name), modulePath) : namesAndPaths) = do
-        _ <- eval nameTerm
-        span <- get @Span
+      go ((name, modulePath) : namesAndPaths) = do
+        span <- ask @Span
         scopeAddress <- newScope mempty
-        declare (Declaration name) Default Public span ScopeGraph.QualifiedImport (Just scopeAddress)
+        declare (Declaration name) Default Public span (Just scopeAddress)
         aliasSlot <- lookupSlot (Declaration name)
         -- a.b.c
         withScope scopeAddress $
@@ -254,7 +195,7 @@ instance Evaluatable QualifiedImport where
               assign aliasSlot val
 
               withFrame objFrame $ do
-                let (namePaths, rest) = List.partition ((== name) . snd . fst) namesAndPaths
+                let (namePaths, rest) = List.partition ((== name) . fst) namesAndPaths
                 for_ namePaths $ \(_, modulePath) -> do
                   mkScopeMap modulePath $ \scopeMap -> do
                     withFrame objFrame $ do
@@ -266,7 +207,7 @@ instance Evaluatable QualifiedImport where
         fun (Map.singleton moduleScope moduleFrame)
 
 data QualifiedAliasedImport a = QualifiedAliasedImport { qualifiedAliasedImportFrom :: QualifiedName, qualifiedAliasedImportAlias :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically QualifiedAliasedImport
 
 -- import a.b.c as e
@@ -277,7 +218,7 @@ instance Evaluatable QualifiedAliasedImport where
     span <- ask @Span
     scopeAddress <- newScope mempty
     alias <- maybeM (throwNoNameError aliasTerm) (declaredName aliasTerm)
-    declare (Declaration alias) Default Public span ScopeGraph.QualifiedAliasedImport (Just scopeAddress)
+    declare (Declaration alias) Default Public span (Just scopeAddress)
     objFrame <- newFrame scopeAddress mempty
     val <- object objFrame
     aliasSlot <- lookupSlot (Declaration alias)
@@ -293,14 +234,14 @@ instance Evaluatable QualifiedAliasedImport where
 
 -- | Ellipsis (used in splice expressions and alternatively can be used as a fill in expression, like `undefined` in Haskell)
 data Ellipsis a = Ellipsis
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Ellipsis
 
 -- TODO: Implement Eval instance for Ellipsis
 instance Evaluatable Ellipsis
 
 data Redirect a = Redirect { lhs :: a, rhs :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Redirect
 
 -- TODO: Implement Eval instance for Redirect

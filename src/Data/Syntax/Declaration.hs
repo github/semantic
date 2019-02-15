@@ -4,23 +4,20 @@ module Data.Syntax.Declaration where
 
 import           Prologue
 
-import           Proto3.Suite.Class
-import qualified Data.Map.Strict as Map
-import qualified Data.Set as Set
-
-import           Control.Abstract hiding (Function, AccessControl(..))
-import           Data.Abstract.ScopeGraph as ScopeGraph (AccessControl(..))
+import           Control.Abstract hiding (AccessControl (..), Function)
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Name (__self)
-import qualified Data.Abstract.ScopeGraph as ScopeGraph
+import           Data.Abstract.ScopeGraph as ScopeGraph (AccessControl (..))
 import           Data.JSON.Fields
+import qualified Data.Map.Strict as Map
 import qualified Data.Reprinting.Scope as Scope
+import qualified Data.Set as Set
 import           Data.Span (emptySpan)
 import           Diffing.Algorithm
 import           Reprinting.Tokenize hiding (Superclass)
 
 data Function a = Function { functionContext :: ![a], functionName :: !a, functionParameters :: ![a], functionBody :: !a }
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, ToJSONFields1, Named1, Message1, NFData1)
+  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, ToJSONFields1, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Function
 
 instance Diffable Function where
@@ -30,43 +27,37 @@ instance Diffable Function where
 -- TODO: How should we represent function types, where applicable?
 
 instance Evaluatable Function where
-  eval eval _ Function{..} = do
+  eval _ _ Function{..} = do
     name <- maybeM (throwNoNameError functionName) (declaredName functionName)
     span <- ask @Span
-    associatedScope <- declareFunction name ScopeGraph.Public span ScopeGraph.Function
+    associatedScope <- declareFunction name Default ScopeGraph.Public span
 
     params <- withScope associatedScope . for functionParameters $ \paramNode -> do
       param <- maybeM (throwNoNameError paramNode) (declaredName paramNode)
-
-      -- TODO: Come up with an easier way to fetch the child node span instead of evaling it.
-      _ <- eval paramNode
-      paramSpan <- get @Span
-      -- TODO: This might be a motivation for a typeclass for `declarationKind` since we
-      -- sometimes create declarations for our children.
-      param <$ declare (Declaration param) Default ScopeGraph.Public paramSpan ScopeGraph.Parameter Nothing
+      param <$ declare (Declaration param) Default ScopeGraph.Public span Nothing
 
     addr <- lookupSlot (Declaration name)
     v <- function name params functionBody associatedScope
     v <$ assign addr v
 
-declareFunction :: ( Carrier sig m
-                   , Member (State (ScopeGraph address)) sig
-                   , Member (Allocator address) sig
-                   , Member (Reader (CurrentScope address)) sig
-                   , Member (Reader ModuleInfo) sig
-                   , Member Fresh sig
-                   , Ord address
-                   )
-                => Name
-                -> AccessControl
-                -> Span
-                -> ScopeGraph.Kind
-                -> Evaluator term address value m address
-declareFunction name accessControl span kind = do
+declareFunction ::
+  ( Carrier sig m
+  , Member (State (ScopeGraph address)) sig
+  , Member (Allocator address) sig
+  , Member (Reader (CurrentScope address)) sig
+  , Member Fresh sig
+  , Ord address
+  )
+  => Name
+  -> Relation
+  -> AccessControl
+  -> Span
+  -> Evaluator term address value m address
+declareFunction name relation accessControl span = do
   currentScope' <- currentScope
   let lexicalEdges = Map.singleton Lexical [ currentScope' ]
   associatedScope <- newScope lexicalEdges
-  declare (Declaration name) Default accessControl span kind (Just associatedScope)
+  declare (Declaration name) relation accessControl span (Just associatedScope)
   pure associatedScope
 
 instance Tokenize Function where
@@ -89,7 +80,7 @@ data Method a = Method
   , methodBody :: a
   , methodAccessControl :: AccessControl
   }
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, ToJSONFields1, Named1, Message1, NFData1)
+  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, ToJSONFields1, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Method
 
 instance Diffable Method where
@@ -101,14 +92,13 @@ instance Evaluatable Method where
   eval _ _ Method{..} = do
     name <- maybeM (throwNoNameError methodName) (declaredName methodName)
     span <- ask @Span
-    associatedScope <- declareFunction name methodAccessControl span ScopeGraph.Method
+    associatedScope <- declareFunction name Default methodAccessControl span
 
     params <- withScope associatedScope $ do
-      -- TODO: Should we give `self` a special Relation?
-      declare (Declaration __self) Prelude ScopeGraph.Public emptySpan ScopeGraph.Unknown Nothing
+      declare (Declaration __self) Default ScopeGraph.Public emptySpan Nothing
       for methodParameters $ \paramNode -> do
         param <- maybeM (throwNoNameError paramNode) (declaredName paramNode)
-        param <$ declare (Declaration param) Default ScopeGraph.Public span ScopeGraph.Parameter Nothing
+        param <$ declare (Declaration param) Default ScopeGraph.Public span Nothing
 
     addr <- lookupSlot (Declaration name)
     v <- function name params methodBody associatedScope
@@ -134,7 +124,7 @@ data MethodSignature a = MethodSignature
   , methodSignatureParameters :: [a]
   , methodSignatureAccessControl :: AccessControl
   }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically MethodSignature
 
 -- TODO: Implement Eval instance for MethodSignature
@@ -142,14 +132,14 @@ instance Evaluatable MethodSignature
 
 
 newtype RequiredParameter a = RequiredParameter { requiredParameter :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically RequiredParameter
 
 -- TODO: Implement Eval instance for RequiredParameter
 instance Evaluatable RequiredParameter
 
 newtype OptionalParameter a = OptionalParameter { optionalParameter :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically OptionalParameter
 
 -- TODO: Implement Eval instance for OptionalParameter
@@ -161,7 +151,7 @@ instance Evaluatable OptionalParameter
 -- TODO: It would be really nice to have a more meaningful type contained in here than [a]
 -- | A declaration of possibly many variables such as var foo = 5, bar = 6 in JavaScript.
 newtype VariableDeclaration a = VariableDeclaration { variableDeclarations :: [a] }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically VariableDeclaration
 
 instance Evaluatable VariableDeclaration where
@@ -169,7 +159,7 @@ instance Evaluatable VariableDeclaration where
   eval eval _ (VariableDeclaration decs) = do
     for_ decs $ \declaration -> do
       name <- maybeM (throwNoNameError declaration) (declaredName declaration)
-      declare (Declaration name) Default ScopeGraph.Public emptySpan ScopeGraph.VariableDeclaration Nothing
+      declare (Declaration name) Default ScopeGraph.Public emptySpan Nothing
       (span, _) <- do
         ref <- eval declaration
         subtermSpan <- get @Span
@@ -187,7 +177,7 @@ instance Declarations a => Declarations (VariableDeclaration a) where
 -- | A TypeScript/Java style interface declaration to implement.
 
 data InterfaceDeclaration a = InterfaceDeclaration { interfaceDeclarationContext :: ![a], interfaceDeclarationIdentifier :: !a, interfaceDeclarationSuperInterfaces :: ![a], interfaceDeclarationBody :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically InterfaceDeclaration
 
 -- TODO: Implement Eval instance for InterfaceDeclaration
@@ -204,7 +194,7 @@ data PublicFieldDefinition a = PublicFieldDefinition
   , publicFieldValue :: a
   , publicFieldAccessControl :: AccessControl
   }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically PublicFieldDefinition
 
 -- TODO: Implement Eval instance for PublicFieldDefinition
@@ -213,21 +203,21 @@ instance Evaluatable PublicFieldDefinition where
     span <- ask @Span
     propertyName <- maybeM (throwNoNameError publicFieldPropertyName) (declaredName publicFieldPropertyName)
 
-    declare (Declaration propertyName) Instance publicFieldAccessControl span ScopeGraph.PublicField Nothing
+    declare (Declaration propertyName) Instance publicFieldAccessControl span Nothing
     slot <- lookupSlot (Declaration propertyName)
     value <- eval publicFieldValue
     assign slot value
     unit
 
 data Variable a = Variable { variableName :: !a, variableType :: !a, variableValue :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Variable
 
 -- TODO: Implement Eval instance for Variable
 instance Evaluatable Variable
 
 data Class a = Class { classContext :: ![a], classIdentifier :: !a, classSuperclasses :: ![a], classBody :: !a }
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, FreeVariables1, ToJSONFields1, Named1, Message1, NFData1)
+  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, FreeVariables1, ToJSONFields1, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Class
 
 instance Declarations a => Declarations (Class a) where
@@ -249,13 +239,13 @@ instance Evaluatable Class where
       superclassFrame <- scopedEnvironment =<< deref slot
       pure $ case (scope, superclassFrame) of
         (Just scope, Just frame) -> Just (scope, frame)
-        _                        -> Nothing
+        _ -> Nothing
 
     let superclassEdges = (Superclass, ) . pure . fst <$> catMaybes superScopes
         current = (Lexical, ) <$> pure (pure currentScope')
         edges = Map.fromList (superclassEdges <> current)
     classScope <- newScope edges
-    declare (Declaration name) Default ScopeGraph.Public span ScopeGraph.Class (Just classScope)
+    declare (Declaration name) Default ScopeGraph.Public span (Just classScope)
 
     let frameEdges = Map.singleton Superclass (Map.fromList (catMaybes superScopes))
     classFrame <- newFrame classScope frameEdges
@@ -273,7 +263,7 @@ instance Declarations1 Class where
 
 -- | A decorator in Python
 data Decorator a = Decorator { decoratorIdentifier :: !a, decoratorParamaters :: ![a], decoratorBody :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Decorator
 
 -- TODO: Implement Eval instance for Decorator
@@ -284,7 +274,7 @@ instance Evaluatable Decorator
 
 -- | An ADT, i.e. a disjoint sum of products, like 'data' in Haskell, or 'enum' in Rust or Swift.
 data Datatype a = Datatype { datatypeContext :: a, datatypeName :: a, datatypeConstructors :: [a], datatypeDeriving :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Datatype
 
 -- TODO: Implement Eval instance for Datatype
@@ -293,7 +283,7 @@ instance Evaluatable Data.Syntax.Declaration.Datatype
 
 -- | A single constructor in a datatype, or equally a 'struct' in C, Rust, or Swift.
 data Constructor a = Constructor { constructorContext :: [a], constructorName :: a, constructorFields :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Constructor
 
 -- TODO: Implement Eval instance for Constructor
@@ -302,7 +292,7 @@ instance Evaluatable Data.Syntax.Declaration.Constructor
 
 -- | Comprehension (e.g. ((a for b in c if a()) in Python)
 data Comprehension a = Comprehension { comprehensionValue :: !a, comprehensionBody :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Comprehension
 
 -- TODO: Implement Eval instance for Comprehension
@@ -311,7 +301,7 @@ instance Evaluatable Comprehension
 
 -- | A declared type (e.g. `a []int` in Go).
 data Type a = Type { typeName :: !a, typeKind :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Type
 
 -- TODO: Implement Eval instance for Type
@@ -320,7 +310,7 @@ instance Evaluatable Type
 
 -- | Type alias declarations in Javascript/Haskell, etc.
 data TypeAlias a = TypeAlias { typeAliasContext :: ![a], typeAliasIdentifier :: !a, typeAliasKind :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically TypeAlias
 
 instance Evaluatable TypeAlias where
@@ -331,7 +321,7 @@ instance Evaluatable TypeAlias where
     span <- ask @Span
     assocScope <- associatedScope (Declaration kindName)
     -- TODO: Should we consider a special Relation for `TypeAlias`?
-    declare (Declaration name) Default ScopeGraph.Public span ScopeGraph.TypeAlias assocScope
+    declare (Declaration name) Default ScopeGraph.Public span assocScope
 
     slot <- lookupSlot (Declaration name)
     kindSlot <- lookupSlot (Declaration kindName)

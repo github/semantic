@@ -28,7 +28,6 @@ import Data.Abstract.Declarations as X
 import Data.Abstract.FreeVariables as X
 import Data.Abstract.Module
 import Data.Abstract.Name as X
-import qualified Data.Abstract.ScopeGraph as ScopeGraph 
 import Data.Abstract.ScopeGraph (Relation(..))
 import Data.Abstract.AccessControls.Class as X
 import Data.Language
@@ -188,7 +187,7 @@ defineSelf :: ( Carrier sig m
            => Evaluator term address value m ()
 defineSelf = do
   let self = Declaration X.__self
-  declare self Default Public emptySpan ScopeGraph.Unknown Nothing
+  declare self Default Public emptySpan Nothing
   slot <- lookupSlot self
   assign slot =<< object =<< currentFrame
 
@@ -207,7 +206,7 @@ data EvalError term address value return where
   IntegerFormatError  :: Text -> EvalError term address value Integer
   NoNameError         :: term -> EvalError term address value Name
   RationalFormatError :: Text -> EvalError term address value Rational
-  ReferenceError      :: value -> term -> EvalError term address value (Slot address)
+  ReferenceError      :: value -> Name -> EvalError term address value (Slot address)
   ScopedEnvError      :: value -> EvalError term address value address
 
 throwNoNameError :: ( Carrier sig m
