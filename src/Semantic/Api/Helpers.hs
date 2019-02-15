@@ -3,11 +3,12 @@ module Semantic.Api.Helpers
   ( spanToSpan
   , spanToLegacySpan
   , toChangeType
-  , apiBlobToBlob
-  , apiBlobPairToBlobPair
-  , apiLanguageToLanguage
-  , apiBlobPairsToBlobPairs
   , languageToApiLanguage
+  , apiLanguageToLanguage
+  , apiBlobsToBlobs
+  , apiBlobToBlob
+  , apiBlobPairsToBlobPairs
+  , apiBlobPairToBlobPair
   ) where
 
 import           Data.Bifunctor.Join
@@ -36,8 +37,20 @@ toChangeType = \case
   "removed" -> API.Removed
   _ -> API.None
 
-apiBlobToBlob :: API.Blob -> Data.Blob
-apiBlobToBlob API.Blob{..} = Data.Blob (fromText content) (T.unpack path) (apiLanguageToLanguage language)
+languageToApiLanguage :: Data.Language -> API.Language
+languageToApiLanguage = \case
+  Data.Unknown -> API.Unknown
+  Data.Go -> API.Go
+  Data.Haskell -> API.Haskell
+  Data.Java -> API.Java
+  Data.JavaScript -> API.Javascript
+  Data.JSON -> API.Json
+  Data.JSX -> API.Jsx
+  Data.Markdown -> API.Markdown
+  Data.Python -> API.Python
+  Data.Ruby -> API.Ruby
+  Data.TypeScript -> API.Typescript
+  Data.PHP -> API.Php
 
 apiLanguageToLanguage :: API.Language -> Data.Language
 apiLanguageToLanguage = \case
@@ -54,20 +67,11 @@ apiLanguageToLanguage = \case
   API.Typescript -> Data.TypeScript
   API.Php -> Data.PHP
 
-languageToApiLanguage :: Data.Language -> API.Language
-languageToApiLanguage = \case
-  Data.Unknown -> API.Unknown
-  Data.Go -> API.Go
-  Data.Haskell -> API.Haskell
-  Data.Java -> API.Java
-  Data.JavaScript -> API.Javascript
-  Data.JSON -> API.Json
-  Data.JSX -> API.Jsx
-  Data.Markdown -> API.Markdown
-  Data.Python -> API.Python
-  Data.Ruby -> API.Ruby
-  Data.TypeScript -> API.Typescript
-  Data.PHP -> API.Php
+apiBlobsToBlobs :: V.Vector API.Blob -> [Data.Blob]
+apiBlobsToBlobs = V.toList . fmap apiBlobToBlob
+
+apiBlobToBlob :: API.Blob -> Data.Blob
+apiBlobToBlob API.Blob{..} = Data.Blob (fromText content) (T.unpack path) (apiLanguageToLanguage language)
 
 apiBlobPairsToBlobPairs :: V.Vector API.BlobPair -> [Data.BlobPair]
 apiBlobPairsToBlobPairs = V.toList . fmap apiBlobPairToBlobPair
