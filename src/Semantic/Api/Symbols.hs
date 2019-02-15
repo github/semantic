@@ -22,7 +22,6 @@ import           Semantic.Api.Helpers
 import qualified Semantic.Api.LegacyTypes as Legacy
 import           Semantic.Api.Terms (ParseEffects, doParse)
 import           Semantic.Api.V1.CodeAnalysisPB hiding (Blob)
-import qualified Semantic.Api.V1.CodeAnalysisPB as API
 import           Semantic.Task
 import           Serializing.Format
 import           Tags.Taggable
