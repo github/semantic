@@ -23,11 +23,9 @@ import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
-import qualified Data.Diff as Diff
 import           Language.Go.Grammar as Grammar
 import           Language.Go.Syntax as Go.Syntax hiding (runeLiteral, labelName)
 import           Language.Go.Type as Go.Type
-import           Proto3.Suite (Named (..), Named1 (..))
 import Data.ImportPath (importPath, defaultAlias)
 
 type Syntax =
@@ -136,11 +134,6 @@ type Syntax =
 
 type Term = Term.Term (Sum Syntax) Location
 type Assignment = Assignment.Assignment [] Grammar
-
--- For Protobuf serialization
-instance Named1 (Sum Syntax) where nameOf1 _ = "GoSyntax"
-instance Named (Term.Term (Sum Syntax) ()) where nameOf _ = "GoTerm"
-instance Named (Diff.Diff (Sum Syntax) () ()) where nameOf _ = "GoDiff"
 
 -- | Assignment from AST in Go's grammar onto a program in Go's syntax.
 assignment :: Assignment Term
@@ -265,6 +258,9 @@ element = symbol Element *> children expression
 fieldIdentifier :: Assignment Term
 fieldIdentifier = makeTerm <$> symbol FieldIdentifier <*> (Syntax.Identifier . name <$> source)
 
+fieldIdentifier' :: Assignment Name
+fieldIdentifier' = symbol FieldIdentifier *> (name <$> source)
+
 floatLiteral :: Assignment Term
 floatLiteral = makeTerm <$> symbol FloatLiteral <*> (Literal.Float <$> source)
 
@@ -301,6 +297,9 @@ runeLiteral = makeTerm <$> symbol Grammar.RuneLiteral <*> (Go.Syntax.Rune <$> so
 
 typeIdentifier :: Assignment Term
 typeIdentifier = makeTerm <$> symbol TypeIdentifier <*> (Syntax.Identifier . name <$> source)
+
+typeIdentifier' :: Assignment Name
+typeIdentifier' = symbol TypeIdentifier *> (name <$> source)
 
 nil :: Assignment Term
 nil = makeTerm <$> symbol Nil <*> (Literal.Null <$ source)
@@ -351,7 +350,7 @@ pointerType :: Assignment Term
 pointerType = makeTerm <$> symbol PointerType <*> children (Type.Pointer <$> expression)
 
 qualifiedType :: Assignment Term
-qualifiedType = makeTerm <$> symbol QualifiedType <*> children (Expression.MemberAccess <$> expression <*> typeIdentifier)
+qualifiedType = makeTerm <$> symbol QualifiedType <*> children (Expression.MemberAccess <$> expression <*> typeIdentifier')
 
 sliceType :: Assignment Term
 sliceType = makeTerm <$> symbol SliceType <*> children (Type.Slice <$> expression)
@@ -495,7 +494,7 @@ parenthesizedExpression :: Assignment Term
 parenthesizedExpression = symbol ParenthesizedExpression *> children expressions
 
 selectorExpression :: Assignment Term
-selectorExpression = makeWithContext <$> symbol SelectorExpression <*> children ((,,) <$> expression <*> optional comment <*> fieldIdentifier)
+selectorExpression = makeWithContext <$> symbol SelectorExpression <*> children ((,,) <$> expression <*> optional comment <*> fieldIdentifier')
   where makeWithContext loc (lhs, comment, rhs) = maybe (makeTerm loc (Expression.MemberAccess lhs rhs)) (\c -> makeTerm loc (Syntax.Context (c :| []) (makeTerm loc (Expression.MemberAccess lhs rhs)))) comment
 
 sliceExpression :: Assignment Term

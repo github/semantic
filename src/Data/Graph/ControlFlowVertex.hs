@@ -29,11 +29,7 @@ import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Expression as Expression
 import           Data.Term
 import qualified Data.Text as T
-import           GHC.Exts (fromList)
 import           Prologue
-import           Proto3.Suite
-import qualified Proto3.Suite as PB
-import qualified Proto3.Wire.Encode as Encode
 
 -- | A vertex of representing some node in a control flow graph.
 data ControlFlowVertex
@@ -43,7 +39,7 @@ data ControlFlowVertex
   | Variable      { vertexName :: Text, vertexModuleName :: Text, vertexSpan :: Span }
   | Method        { vertexName :: Text, vertexModuleName :: Text, vertexSpan :: Span }
   | Function      { vertexName :: Text, vertexModuleName :: Text, vertexSpan :: Span }
-  deriving (Eq, Ord, Show, Generic, Hashable, Named, NFData)
+  deriving (Eq, Ord, Show, Generic, Hashable, NFData)
 
 packageVertex :: PackageInfo -> ControlFlowVertex
 packageVertex (PackageInfo name _) = Package (formatName name)
@@ -86,69 +82,11 @@ vertexToType Function{}      = "Function"
 
 -- Instances
 
-instance Named (G.Graph ControlFlowVertex) where nameOf _ = "ControlFlowGraph"
-
-instance Message (G.Graph ControlFlowVertex) where
-  encodeMessage _ graph =  encodeMessageField 1 (NestedVec (fromList (G.vertexList graph)))
-                        <> encodeMessageField 2 (NestedVec (fromList (G.edgeList graph)))
-  decodeMessage = error "decodeMessage not implemented for (G.Graph ControlFlowVertex)"
-  dotProto _ =
-    [ DotProtoMessageField $ DotProtoField 1 (Repeated . Named $ Single "ControlFlowVertex") (Single "vertices") [] Nothing
-    , DotProtoMessageField $ DotProtoField 2 (Repeated . Named $ Single "ControlFlowEdge")  (Single "edges") [] Nothing
-    ]
-
 instance Lower ControlFlowVertex where lowerBound = Package ""
 instance VertexTag ControlFlowVertex where uniqueTag = hash . vertexIdentifier
 
 instance ToJSON ControlFlowVertex where
   toJSON v = object [ "name" .= vertexIdentifier v, "type" .= vertexToType v ]
-
-instance Message ControlFlowVertex where
-  encodeMessage _ v@Package{..}       = Encode.embedded 1 (encodePrimitive 1 (uniqueTag v) <> encodePrimitive 2 vertexName <> encodePrimitive 3 (vertexIdentifier v))
-  encodeMessage _ v@Module{..}        = Encode.embedded 2 (encodePrimitive 1 (uniqueTag v) <> encodePrimitive 2 vertexName <> encodePrimitive 3 (vertexIdentifier v))
-  encodeMessage _ v@UnknownModule{..} = Encode.embedded 3 (encodePrimitive 1 (uniqueTag v) <> encodePrimitive 2 vertexName <> encodePrimitive 3 (vertexIdentifier v))
-  encodeMessage _ v@Variable{..}      = Encode.embedded 4 (encodePrimitive 1 (uniqueTag v) <> encodePrimitive 2 vertexName <> encodePrimitive 3 (vertexIdentifier v) <> encodePrimitive 4 vertexModuleName <> Encode.embedded 5 (encodeMessage 1 vertexSpan))
-  encodeMessage _ v@Method{..}        = Encode.embedded 5 (encodePrimitive 1 (uniqueTag v) <> encodePrimitive 2 vertexName <> encodePrimitive 3 (vertexIdentifier v) <> encodePrimitive 4 vertexModuleName <> Encode.embedded 5 (encodeMessage 1 vertexSpan))
-  encodeMessage _ v@Function{..}      = Encode.embedded 6 (encodePrimitive 1 (uniqueTag v) <> encodePrimitive 2 vertexName <> encodePrimitive 3 (vertexIdentifier v) <> encodePrimitive 4 vertexModuleName <> Encode.embedded 5 (encodeMessage 1 vertexSpan))
-  decodeMessage = error "decodeMessage not implemented for ControlFlowVertex"
-  dotProto _ =
-    [ DotProtoMessageOneOf (Single "vertex")
-      [ DotProtoField 1 (Prim . Named $ Single "Package") (Single "package") [] Nothing
-      , DotProtoField 2 (Prim . Named $ Single "Module") (Single "module") [] Nothing
-      , DotProtoField 3 (Prim . Named $ Single "UnknownModule") (Single "unknownModule") [] Nothing
-      , DotProtoField 4 (Prim . Named $ Single "Variable") (Single "variable") [] Nothing
-      , DotProtoField 5 (Prim . Named $ Single "Method") (Single "method") [] Nothing
-      , DotProtoField 6 (Prim . Named $ Single "Function") (Single "function") [] Nothing
-      ]
-    ]
-    <> gen "Package" mempty
-    <> gen "Module" mempty
-    <> gen "UnknownModule" mempty
-    <> gen "Variable" [ genModuleName, genSpan ]
-    <> gen "Method" [ genModuleName, genSpan ]
-    <> gen "Function" [ genModuleName, genSpan ]
-    where
-      genModuleName = DotProtoMessageField $ DotProtoField 4 (Prim PB.String) (Single "moduleName") [] Nothing
-      genSpan = DotProtoMessageField $ DotProtoField 5 (Prim . Named $ Single (nameOf (Proxy @Span))) (Single "span") [] Nothing
-      gen name extras =
-        [ DotProtoMessageDefinition . DotProtoMessage (Single name) $
-            (DotProtoMessageField $ DotProtoField 1 (Prim PB.Int64) (Single "id") [] Nothing)
-            : (DotProtoMessageField $ DotProtoField 2 (Prim PB.String) (Single "name") [] Nothing)
-            : (DotProtoMessageField $ DotProtoField 3 (Prim PB.String) (Single "description") [] Nothing)
-            : extras
-        ]
-
-
-instance Named (G.Edge ControlFlowVertex) where nameOf _ = "ControlFlowEdge"
-
-instance Message (G.Edge ControlFlowVertex) where
-  encodeMessage _ (G.Edge (from, to)) = encodePrimitive 1 (uniqueTag from) <> encodePrimitive 2 (uniqueTag to)
-  decodeMessage = error "decodeMessage not implemented for (G.Edge ControlFlowVertex)"
-  dotProto _ =
-    [ DotProtoMessageField $ DotProtoField 1 (Prim PB.Int64) (Single "source") [] Nothing
-    , DotProtoMessageField $ DotProtoField 2 (Prim PB.Int64) (Single "target")   [] Nothing
-    ]
-
 
 -- TODO: This is potentially valuable just to get name's out of declarable things.
 -- Typeclasses to create 'ControlFlowVertex's from 'Term's. Also extracts
@@ -209,8 +147,7 @@ instance VertexDeclarationWithStrategy 'Custom whole Declaration.Method where
   toVertexWithStrategy _ ann info term@Declaration.Method{} = (\n -> (methodVertex (formatName n) info (locationSpan ann), n)) <$> liftDeclaredName declaredName term
 
 instance VertexDeclarationWithStrategy 'Custom whole whole => VertexDeclarationWithStrategy 'Custom whole Expression.MemberAccess where
-  toVertexWithStrategy proxy ann info (Expression.MemberAccess (Term (In lhsAnn lhs)) (Term (In rhsAnn rhs))) =
-    case (toVertexWithStrategy proxy lhsAnn info lhs, toVertexWithStrategy proxy rhsAnn info rhs) of
-      (Just (Variable n _ _, _), Just (_, name)) -> Just (variableVertex (n <> "." <> formatName name) info (locationSpan ann), name)
-      (_, Just (_, name)) -> Just (variableVertex (formatName name) info (locationSpan ann), name)
-      _ -> Nothing
+  toVertexWithStrategy proxy ann info (Expression.MemberAccess (Term (In lhsAnn lhs)) name) =
+    case toVertexWithStrategy proxy lhsAnn info lhs of
+      Just (Variable n _ _, _) -> Just (variableVertex (n <> "." <> formatName name) info (locationSpan ann), name)
+      _ -> Just (variableVertex (formatName name) info (locationSpan ann), name)

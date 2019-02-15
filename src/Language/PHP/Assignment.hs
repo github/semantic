@@ -13,7 +13,6 @@ import           Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
 import qualified Data.Abstract.Name as Name
 import qualified Data.Abstract.ScopeGraph as ScopeGraph (AccessControl(..))
-import qualified Data.Diff as Diff
 import qualified Data.List.NonEmpty as NonEmpty
 import           Data.Syntax
     ( contextualize
@@ -36,7 +35,6 @@ import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
 import           Language.PHP.Grammar as Grammar
 import qualified Language.PHP.Syntax as Syntax
-import           Proto3.Suite (Named (..), Named1 (..))
 
 type Syntax = '[
     Comment.Comment
@@ -165,11 +163,6 @@ type Syntax = '[
 
 type Term = Term.Term (Sum Syntax) Location
 type Assignment = Assignment.Assignment [] Grammar
-
--- For Protobuf serialization
-instance Named1 (Sum Syntax) where nameOf1 _ = "PHPSyntax"
-instance Named (Term.Term (Sum Syntax) ()) where nameOf _ = "PHPTerm"
-instance Named (Diff.Diff (Sum Syntax) () ()) where nameOf _ = "PHPDiff"
 
 -- | Assignment from AST in PHP's grammar onto a program in PHP's syntax.
 assignment :: Assignment Term
@@ -310,7 +303,7 @@ parenthesizedExpression :: Assignment Term
 parenthesizedExpression = symbol ParenthesizedExpression *> children (term expression)
 
 classConstantAccessExpression :: Assignment Term
-classConstantAccessExpression = makeTerm <$> symbol ClassConstantAccessExpression <*> children (Expression.MemberAccess <$> term scopeResolutionQualifier <*> name)
+classConstantAccessExpression = makeTerm <$> symbol ClassConstantAccessExpression <*> children (Expression.MemberAccess <$> term scopeResolutionQualifier <*> name')
 
 variable :: Assignment Term
 variable = callableVariable <|> scopedPropertyAccessExpression <|> memberAccessExpression <|> castExpression
@@ -325,11 +318,11 @@ callableVariable = choice [
   ]
 
 memberCallExpression :: Assignment Term
-memberCallExpression = makeTerm <$> symbol MemberCallExpression <*> children (Expression.Call [] <$> (makeMemberAccess <$> location <*> term dereferencableExpression <*> memberName) <*> arguments <*> emptyTerm)
+memberCallExpression = makeTerm <$> symbol MemberCallExpression <*> children (Expression.Call [] <$> (makeMemberAccess <$> location <*> term dereferencableExpression <*> memberName') <*> arguments <*> emptyTerm)
   where makeMemberAccess loc expr memberName = makeTerm loc (Expression.MemberAccess expr memberName)
 
 scopedCallExpression :: Assignment Term
-scopedCallExpression = makeTerm <$> symbol ScopedCallExpression <*> children (Expression.Call [] <$> (makeMemberAccess <$> location <*> term scopeResolutionQualifier <*> memberName) <*> arguments <*> emptyTerm)
+scopedCallExpression = makeTerm <$> symbol ScopedCallExpression <*> children (Expression.Call [] <$> (makeMemberAccess <$> location <*> term scopeResolutionQualifier <*> memberName') <*> arguments <*> emptyTerm)
   where makeMemberAccess loc expr memberName = makeTerm loc (Expression.MemberAccess expr memberName)
 
 functionCallExpression :: Assignment Term
@@ -347,13 +340,13 @@ subscriptExpression :: Assignment Term
 subscriptExpression = makeTerm <$> symbol SubscriptExpression <*> children (Expression.Subscript <$> term dereferencableExpression <*> (pure <$> (term expression <|> emptyTerm)))
 
 memberAccessExpression :: Assignment Term
-memberAccessExpression = makeTerm <$> symbol MemberAccessExpression <*> children (Expression.MemberAccess <$> term dereferencableExpression <*> memberName)
+memberAccessExpression = makeTerm <$> symbol MemberAccessExpression <*> children (Expression.MemberAccess <$> term dereferencableExpression <*> memberName')
 
 dereferencableExpression :: Assignment Term
 dereferencableExpression = symbol DereferencableExpression *> children (term (variable <|> expression <|> arrayCreationExpression <|> string))
 
 scopedPropertyAccessExpression :: Assignment Term
-scopedPropertyAccessExpression = makeTerm <$> symbol ScopedPropertyAccessExpression <*> children (Expression.MemberAccess <$> term scopeResolutionQualifier <*> simpleVariable')
+scopedPropertyAccessExpression = makeTerm <$> symbol ScopedPropertyAccessExpression <*> children (Expression.MemberAccess <$> term scopeResolutionQualifier <*> simpleVariable'')
 
 scopeResolutionQualifier :: Assignment Term
 scopeResolutionQualifier = choice [

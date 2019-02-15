@@ -38,9 +38,6 @@ newtype ModuleInfo = ModuleInfo { modulePath :: ModulePath }
   deriving stock (Eq, Ord, Generic)
   deriving anyclass (NFData)
 
-instance Lower ModuleInfo where
-  lowerBound = ModuleInfo mempty
-
 instance Show ModuleInfo where
   showsPrec d = showsUnaryWith showsPrec "ModuleInfo" d . modulePath
 

@@ -32,12 +32,10 @@ import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
-import qualified Data.Diff as Diff
 import Language.TypeScript.Grammar as Grammar
 import qualified Language.TypeScript.Syntax as TypeScript.Syntax
 import qualified Language.TypeScript.Resolution as TypeScript.Resolution
 import Prologue
-import Proto3.Suite (Named1(..), Named(..))
 
 -- | The type of TypeScript syntax.
 type Syntax = '[
@@ -213,15 +211,6 @@ type Syntax = '[
 type Term = Term.Term (Sum Syntax) Location
 type Assignment = Assignment.Assignment [] Grammar
 
-instance Named1 (Sum Syntax) where
-  nameOf1 _ = "TypeScriptSyntax"
-
-instance Named (Term.Term (Sum Syntax) ()) where
-  nameOf _ = "TypeScriptTerm"
-
-instance Named (Diff.Diff (Sum Syntax) () ()) where
-  nameOf _ = "TypeScriptDiff"
-
 -- | Assignment from AST in TypeScript’s grammar onto a program in TypeScript’s syntax.
 assignment :: Assignment Term
 assignment = handleError $ makeTerm <$> symbol Program <*> children (Statement.Statements <$> manyTerm statement) <|> parseError
@@ -309,7 +298,7 @@ ternaryExpression :: Assignment Term
 ternaryExpression = makeTerm <$> symbol Grammar.TernaryExpression <*> children (Statement.If <$> term expression <*> term expression <*> term expression)
 
 memberExpression :: Assignment Term
-memberExpression = makeTerm <$> (symbol Grammar.MemberExpression <|> symbol Grammar.MemberExpression') <*> children (Expression.MemberAccess <$> term expression <*> propertyIdentifier)
+memberExpression = makeTerm <$> (symbol Grammar.MemberExpression <|> symbol Grammar.MemberExpression') <*> children (Expression.MemberAccess <$> term expression <*> propertyIdentifier')
 
 newExpression :: Assignment Term
 newExpression = makeTerm <$> symbol Grammar.NewExpression <*> children (Expression.New  <$> term constructableExpression <*> (typeArguments' <|> emptyTerm) <*> (arguments <|> pure []))

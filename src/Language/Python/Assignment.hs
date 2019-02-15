@@ -10,7 +10,6 @@ module Language.Python.Assignment
 import           Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
 import           Data.Abstract.Name (Name, name)
-import qualified Data.Diff as Diff
 import qualified Data.List.NonEmpty as NonEmpty
 import           Data.Sum
 import           Data.Syntax
@@ -33,10 +32,10 @@ import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
+import qualified Data.Text as T
 import           Language.Python.Grammar as Grammar
 import           Language.Python.Syntax as Python.Syntax
 import           Prologue
-import           Proto3.Suite (Named (..), Named1 (..))
 
 
 -- | The type of Python syntax.
@@ -115,21 +114,11 @@ type Syntax =
    , Syntax.Error
    , Syntax.Identifier
    , Type.Annotation
-   , Python.Syntax.Alias
    , []
    ]
 
 type Term = Term.Term (Sum Syntax) Location
 type Assignment = Assignment.Assignment [] Grammar
-
-instance Named1 (Sum Syntax) where
-  nameOf1 _ = "PythonSyntax"
-
-instance Named (Term.Term (Sum Syntax) ()) where
-  nameOf _ = "PythonTerm"
-
-instance Named (Diff.Diff (Sum Syntax) () ()) where
-  nameOf _ = "PythonDiff"
 
 -- | Assignment from AST in Python's grammar onto a program in Python's syntax.
 assignment :: Assignment Term
@@ -368,7 +357,7 @@ assignment' =  makeAssignment <$> symbol Assignment <*> children ((,,) <$> term 
                   , assign Expression.LShift    <$ symbol AnonLAngleLAngleEqual
                   , assign Expression.BXOr      <$ symbol AnonCaretEqual
                   ])
-  where rvalue = expressionList <|> assignment' <|> yield
+  where rvalue = expressionList <|> assignment' <|> yield <|> emptyTerm
         makeAssignment loc (lhs, maybeType, rhs) = makeTerm loc (Statement.Assignment (maybeToList maybeType) lhs rhs)
         assign :: (f :< Syntax) => (Term -> Term -> f Term) -> Term -> Term -> Sum Syntax Term
         assign c l r = inject (Statement.Assignment [] l (makeTerm1 (c l r)))
@@ -378,6 +367,9 @@ yield = makeTerm <$> symbol Yield <*> (Statement.Yield <$> children (term ( expr
 
 identifier :: Assignment Term
 identifier = makeTerm <$> (symbol Identifier <|> symbol Identifier' <|> symbol DottedName) <*> (Syntax.Identifier . name <$> source)
+
+identifier' :: Assignment Name
+identifier' = (symbol Identifier <|> symbol Identifier' <|> symbol DottedName) *> (name <$> source)
 
 set :: Assignment Term
 set = makeTerm <$> symbol Set <*> children (Literal.Set <$> manyTerm expression)
@@ -414,11 +406,11 @@ import' =   makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliase
     -- `import a as b`
     aliasedImport = makeTerm <$> symbol AliasedImport <*> children (Python.Syntax.QualifiedAliasedImport  <$> importPath <*> expression)
     -- `import a`
-    plainImport = makeTerm <$> symbol DottedName <*> children (Python.Syntax.QualifiedImport  <$> NonEmpty.some1 identifier)
+    plainImport = makeTerm <$> symbol DottedName <*> children (Python.Syntax.QualifiedImport . NonEmpty.map T.unpack <$> NonEmpty.some1 identifierSource)
     -- `from a import foo `
-    importSymbol = makeNameAliasPair <$> (symbol Identifier <|> symbol Identifier' <|> symbol DottedName) <*> (mkIdentifier <$> location <*> source)
+    importSymbol = makeNameAliasPair <$> aliasIdentifier <*> pure Nothing
     -- `from a import foo as bar`
-    aliasImportSymbol = makeTerm <$> symbol AliasedImport <*> children (Python.Syntax.Alias <$> identifier <*> identifier)
+    aliasImportSymbol = symbol AliasedImport *> children (makeNameAliasPair <$> aliasIdentifier <*> (Just <$> aliasIdentifier))
     -- `from a import *`
     wildcard = symbol WildcardImport *> (name <$> source) $> []
 
@@ -428,8 +420,9 @@ import' =   makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliase
     importPrefix = symbol ImportPrefix *> source
     identifierSource = (symbol Identifier <|> symbol Identifier') *> source
 
-    makeNameAliasPair location alias = makeTerm location (Python.Syntax.Alias alias alias)
-    mkIdentifier location source = makeTerm location (Syntax.Identifier (name source))
+    aliasIdentifier = (symbol Identifier <|> symbol Identifier') *> (name <$> source) <|> symbol DottedName *> (name <$> source)
+    makeNameAliasPair from (Just alias) = Python.Syntax.Alias from alias
+    makeNameAliasPair from Nothing = Python.Syntax.Alias from from
 
 assertStatement :: Assignment Term
 assertStatement = makeTerm <$> symbol AssertStatement <*> children (Expression.Call [] <$> (makeTerm <$> symbol AnonAssert <*> (Syntax.Identifier . name <$> source)) <*> manyTerm expression <*> emptyTerm)
@@ -486,7 +479,7 @@ continueStatement :: Assignment Term
 continueStatement = makeTerm <$> symbol ContinueStatement <*> (Statement.Continue <$> emptyTerm <* advance)
 
 memberAccess :: Assignment Term
-memberAccess = makeTerm <$> symbol Attribute <*> children (Expression.MemberAccess <$> term expression <*> identifier)
+memberAccess = makeTerm <$> symbol Attribute <*> children (Expression.MemberAccess <$> term expression <*> identifier')
 
 subscript :: Assignment Term
 subscript = makeTerm <$> symbol Subscript <*> children (Expression.Subscript <$> term expression <*> manyTerm expression)
