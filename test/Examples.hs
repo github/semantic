@@ -17,7 +17,7 @@ import           Data.Quieterm
 import           Data.Typeable (cast)
 import           Data.Void
 import           Parsing.Parser
-import           Semantic.API (TermOutputFormat (..), parseTermBuilder)
+import           Semantic.Api (TermOutputFormat (..), parseTermBuilder)
 import           Semantic.Config (Config (..), Options (..), defaultOptions)
 import qualified Semantic.IO as IO
 import           Semantic.Task

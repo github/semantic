@@ -183,14 +183,14 @@ library
                      -- High-level flow & operational functionality (logging, stats, etc.)
                      , Semantic.Analysis
                      -- API
-                     , Semantic.API
-                     , Semantic.API.Diffs
-                     , Semantic.API.Helpers
-                     , Semantic.API.LegacyTypes
-                     , Semantic.API.Symbols
-                     , Semantic.API.Terms
-                     , Semantic.API.TOCSummaries
-                     , Semantic.API.Types
+                     , Semantic.Api
+                     , Semantic.Api.Diffs
+                     , Semantic.Api.Helpers
+                     , Semantic.Api.LegacyTypes
+                     , Semantic.Api.Symbols
+                     , Semantic.Api.Terms
+                     , Semantic.Api.TOCSummaries
+                     , Semantic.Api.V1.CodeAnalysisPB
                      , Semantic.AST
                      , Semantic.CLI
                      , Semantic.Config

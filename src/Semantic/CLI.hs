@@ -10,7 +10,7 @@ import           Data.Handle
 import           Data.Project
 import           Options.Applicative hiding (style)
 import           Prologue
-import           Semantic.API hiding (File)
+import           Semantic.Api hiding (File)
 import qualified Semantic.AST as AST
 import           Semantic.Config
 import qualified Semantic.Graph as Graph
