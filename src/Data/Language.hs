@@ -2,7 +2,6 @@
 module Data.Language
   ( Language (..)
   , SLanguage (..)
-  , ensureLanguage
   , extensionsForLanguage
   , knownLanguage
   , languageForFilePath
@@ -99,11 +98,6 @@ instance FromJSON Language where
 -- | Predicate failing on 'Unknown' and passing in all other cases.
 knownLanguage :: Language -> Bool
 knownLanguage = (/= Unknown)
-
--- | Returns 'Nothing' when passed 'Unknown'.
-ensureLanguage :: Language -> Maybe Language
-ensureLanguage Unknown = Nothing
-ensureLanguage x       = Just x
 
 -- | Defaults to 'Unknown'.
 instance HasDefault Language where def = Unknown
