@@ -11,7 +11,7 @@ import SpecHelpers
 languages :: [FilePath]
 languages = ["go", "javascript", "json", "python", "ruby", "typescript"]
 
-spec :: TaskConfig -> Spec
+spec :: TaskSession -> Spec
 spec config = parallel $ do
   for_ languages $ \language -> do
     let dir = "test/fixtures" </> language </> "corpus"
@@ -81,13 +81,13 @@ examples directory = do
 normalizeName :: FilePath -> FilePath
 normalizeName path = dropExtension $ dropExtension path
 
-testParse :: TaskConfig -> FilePath -> FilePath -> Expectation
-testParse config path expectedOutput = do
-  actual <- verbatim <$> parseFilePath config path
+testParse :: TaskSession -> FilePath -> FilePath -> Expectation
+testParse session path expectedOutput = do
+  actual <- verbatim <$> parseFilePath session path
   expected <- verbatim <$> B.readFile expectedOutput
   actual `shouldBe` expected
 
-testDiff :: TaskConfig -> Both FilePath -> FilePath -> Expectation
+testDiff :: TaskSession -> Both FilePath -> FilePath -> Expectation
 testDiff config paths expectedOutput = do
   actual <- verbatim <$> diffFilePaths config paths
   expected <- verbatim <$> B.readFile expectedOutput

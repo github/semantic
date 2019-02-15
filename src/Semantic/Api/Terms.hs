@@ -1,5 +1,5 @@
 {-# LANGUAGE ConstraintKinds, GADTs, TypeOperators, DerivingStrategies #-}
-module Semantic.API.Terms
+module Semantic.Api.Terms
   (
     termGraph
   , parseTermBuilder
@@ -28,29 +28,37 @@ import           Data.JSON.Fields
 import           Data.Language
 import           Data.Location
 import           Data.Quieterm
+import           Data.Term
+import qualified Data.Text as T
+import qualified Data.Vector as V
 import           Parsing.Parser
+import           Prologue
 import           Rendering.Graph
 import           Rendering.JSON hiding (JSON)
 import qualified Rendering.JSON
-import           Semantic.API.Helpers
-import           Semantic.API.Types hiding (Blob)
-import qualified Semantic.API.Types as API
+import           Semantic.Api.Helpers
+import           Semantic.Api.V1.CodeAnalysisPB hiding (Blob, Language (..))
+import qualified Semantic.Api.V1.CodeAnalysisPB as API
 import           Semantic.Task
 import           Serializing.Format hiding (JSON)
 import qualified Serializing.Format as Format
 import           Tags.Taggable
 
 termGraph :: (Traversable t, Member Distribute sig, ParseEffects sig m) => t API.Blob -> m ParseTreeGraphResponse
-termGraph blobs = distributeFoldMap go (fmap apiBlobToBlob blobs)
+termGraph blobs = ParseTreeGraphResponse . V.fromList . toList <$> distributeFor (fmap apiBlobToBlob blobs) go
   where
-    go :: ParseEffects sig m => Blob -> m ParseTreeGraphResponse
+    go :: ParseEffects sig m => Blob -> m ParseTreeFileGraph
     go blob = (doParse blob >>= withSomeTerm (pure . render))
       `catchError` \(SomeException e) ->
-        pure (ParseTreeGraphResponse mempty mempty [TermError (blobPath blob) (show e)])
+        pure (ParseTreeFileGraph path lang mempty mempty (V.fromList [ParseError (T.pack (show e))]))
+      where
+        path = T.pack $ blobPath blob
+        lang = languageToApiLanguage $ blobLanguage blob
 
-    render t = let graph = renderTreeGraph t
-                   toEdge (Edge (a, b)) = TermEdge (vertexId a) (vertexId b)
-               in ParseTreeGraphResponse (vertexList graph) (fmap toEdge (edgeList graph)) mempty
+        render :: (Foldable syntax, Functor syntax, ConstructorName syntax) => Term syntax Location -> ParseTreeFileGraph
+        render t = let graph = renderTreeGraph t
+                       toEdge (Edge (a, b)) = TermEdge (vertexId a) (vertexId b)
+                   in ParseTreeFileGraph path lang (V.fromList (vertexList graph)) (V.fromList (fmap toEdge (edgeList graph))) mempty
 
 data TermOutputFormat
   = TermJSONTree

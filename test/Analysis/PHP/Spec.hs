@@ -9,8 +9,8 @@ import qualified Language.PHP.Assignment as PHP
 import           SpecHelpers
 
 
-spec :: TaskConfig -> Spec
-spec config = parallel $ do
+spec :: TaskSession -> Spec
+spec session = parallel $ do
   describe "PHP" $ do
     xit "evaluates include and require" $ do
       (scopeGraph, (heap, res)) <- evaluate ["main.php", "foo.php", "bar.php"]
@@ -46,4 +46,4 @@ spec config = parallel $ do
   where
     fixtures = "test/fixtures/php/analysis/"
     evaluate = evalPHPProject . map (fixtures <>)
-    evalPHPProject = testEvaluating <=< evaluateProject' config (Proxy :: Proxy 'Language.PHP) phpParser
+    evalPHPProject = testEvaluating <=< evaluateProject' session (Proxy :: Proxy 'Language.PHP) phpParser

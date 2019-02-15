@@ -67,15 +67,6 @@ instance HasSpan Span where
 instance Show Pos where
   showsPrec _ Pos{..} = showChar '[' . shows posLine . showString ", " . shows posColumn . showChar ']'
 
-instance Named Pos where nameOf _ = "Position"
-instance Message Pos where
-  encodeMessage _ Pos{..} = encodeMessageField 1 posLine <> encodeMessageField 2 posColumn
-  decodeMessage _ = Pos <$> Decode.at decodeMessageField 1 <*> Decode.at decodeMessageField 2
-  dotProto _ =
-    [ DotProtoMessageField $ DotProtoField 1 (Prim Int64) (Single "line") [] Nothing
-    , DotProtoMessageField $ DotProtoField 2 (Prim Int64) (Single "column") [] Nothing
-    ]
-
 instance A.ToJSON Pos where
   toJSON Pos{..} =
     A.toJSON [posLine, posColumn]
@@ -88,21 +79,8 @@ instance A.FromJSON Pos where
 instance Lower Pos where
   lowerBound = Pos 1 1
 
-instance HasDefault Pos where
-  def = lowerBound @Pos
-
-
 instance Show Span where
   showsPrec _ Span{..} = shows spanStart . showString ".." . shows spanEnd
-
-instance Message Span where
-  encodeMessage _ Span{..} = Encode.embedded 1 (encodeMessage 1 spanStart) <> Encode.embedded 2 (encodeMessage 1 spanEnd)
-  decodeMessage _ = Span <$> embeddedAt (decodeMessage 1) 1 <*> embeddedAt (decodeMessage 1) 2
-    where embeddedAt parser = Decode.at (Decode.embedded'' parser)
-  dotProto _ =
-    [ DotProtoMessageField $ DotProtoField 1 (Prim . Named $ Single (nameOf (Proxy @Pos))) (Single "start") [] Nothing
-    , DotProtoMessageField $ DotProtoField 2 (Prim . Named $ Single (nameOf (Proxy @Pos))) (Single "end") [] Nothing
-    ]
 
 spanFromSrcLoc :: SrcLoc -> Span
 spanFromSrcLoc = Span . (Pos . srcLocStartLine <*> srcLocStartCol) <*> (Pos . srcLocEndLine <*> srcLocEndCol)
@@ -130,6 +108,3 @@ instance ToJSONFields Span where
 
 instance Lower Span where
   lowerBound = emptySpan
-
-instance HasDefault Span where
-  def = emptySpan

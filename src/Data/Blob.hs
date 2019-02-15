@@ -24,13 +24,9 @@ import           Control.Effect
 import           Control.Effect.Error
 import           Data.Aeson
 import qualified Data.ByteString.Lazy as BL
-import           Proto3.Suite
-import qualified Proto3.Wire.Decode as Decode
-import qualified Proto3.Wire.Encode as Encode
-
-import Data.JSON.Fields
-import Data.Language
-import Data.Source as Source
+import           Data.JSON.Fields
+import           Data.Language
+import           Data.Source as Source
 
 -- | The source, path, and language of a blob.
 data Blob = Blob
@@ -38,7 +34,7 @@ data Blob = Blob
   , blobPath     :: FilePath -- ^ The file path to the blob.
   , blobLanguage :: Language -- ^ The language of this blob.
   }
-  deriving (Show, Eq, Generic, Message, Named)
+  deriving (Show, Eq, Generic)
 
 newtype Blobs a = Blobs { blobs :: [a] }
   deriving (Generic, FromJSON)
@@ -73,25 +69,6 @@ noLanguageForBlob blobPath = throwError (SomeException (NoLanguageForBlob blobPa
 -- | Represents a blobs suitable for diffing which can be either a blob to
 -- delete, a blob to insert, or a pair of blobs to diff.
 type BlobPair = Join These Blob
-
-instance Message BlobPair where
-  encodeMessage _ pair = case pair of
-    (Join (These a b)) -> Encode.embedded 1 (encodeMessage 1 a) <> Encode.embedded 2 (encodeMessage 1 b)
-    (Join (This a))    -> Encode.embedded 1 (encodeMessage 1 a)
-    (Join (That b))    -> Encode.embedded 2 (encodeMessage 1 b)
-  decodeMessage _ = Join <$> (these <|> this <|> that)
-    where
-      embeddedAt parser = Decode.at (Decode.embedded'' parser)
-      these = These <$> embeddedAt (decodeMessage 1) 1 <*> embeddedAt (decodeMessage 1) 2
-      this = This <$> embeddedAt (decodeMessage 1) 1
-      that = That <$> embeddedAt (decodeMessage 1) 2
-  dotProto _ =
-    [ DotProtoMessageField $ DotProtoField 1 (Prim . Named $ Single "Blob") (Single "before") [] Nothing
-    , DotProtoMessageField $ DotProtoField 2 (Prim . Named $ Single "Blob") (Single "after") [] Nothing
-    ]
-
-instance Named BlobPair where
-  nameOf _ = "BlobPair"
 
 instance FromJSON BlobPair where
   parseJSON = withObject "BlobPair" $ \o -> do
