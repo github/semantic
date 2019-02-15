@@ -24,8 +24,8 @@ import           Data.Text (pack)
 import qualified Language.TypeScript.Assignment as TypeScript
 import           SpecHelpers
 
-spec :: TaskConfig -> Spec
-spec config = parallel $ do
+spec :: TaskSession -> Spec
+spec session = parallel $ do
   describe "TypeScript" $ do
     it "qualified export from" $ do
       (scopeGraph, (heap, res)) <- evaluate ["main6.ts", "baz.ts", "foo.ts"]
@@ -184,7 +184,7 @@ spec config = parallel $ do
   where
     fixtures = "test/fixtures/typescript/analysis/"
     evaluate = evalTypeScriptProject . map (fixtures <>)
-    evalTypeScriptProject = testEvaluating <=< (evaluateProject' config (Proxy :: Proxy 'Language.TypeScript) typescriptParser)
+    evalTypeScriptProject = testEvaluating <=< (evaluateProject' session (Proxy :: Proxy 'Language.TypeScript) typescriptParser)
 
 type TypeScriptTerm = Quieterm (Sum TypeScript.Syntax) Location
 type TypeScriptEvalError = BaseError (EvalError TypeScriptTerm Precise (Concrete.Value TypeScriptTerm Precise))

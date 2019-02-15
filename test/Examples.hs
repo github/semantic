@@ -17,12 +17,11 @@ import           Data.Quieterm
 import           Data.Typeable (cast)
 import           Data.Void
 import           Parsing.Parser
-import           Semantic.API (TermOutputFormat (..), parseTermBuilder)
+import           Semantic.Api (TermOutputFormat (..), parseTermBuilder)
 import           Semantic.Config (Config (..), Options (..), defaultOptions)
 import qualified Semantic.IO as IO
 import           Semantic.Task
 import           Semantic.Task.Files
-import           Semantic.Util (TaskConfig (..))
 import           System.Directory
 import           System.Exit (die)
 import           System.FilePath.Glob
@@ -33,7 +32,7 @@ import           Test.Hspec
 
 main :: IO ()
 main = withOptions opts $ \ config logger statter -> hspec . parallel $ do
-  let args = TaskConfig config logger statter
+  let args = TaskSession config "-" logger statter
 
   runIO setupExampleRepos
 
@@ -42,11 +41,11 @@ main = withOptions opts $ \ config logger statter -> hspec . parallel $ do
     parallel . describe languageName $ parseExamples args lang tsDir
 
   where
-    parseExamples (TaskConfig config logger statter) LanguageExample{..} tsDir = do
+    parseExamples session LanguageExample{..} tsDir = do
       knownFailures <- runIO $ knownFailuresForPath tsDir languageKnownFailuresTxt
       files <- runIO $ globDir1 (compile ("**/*" <> languageExtension)) (tsDir </> languageExampleDir)
       for_ files $ \file -> it file $ do
-        res <- runTaskWithConfig config logger statter (parseFilePath file)
+        res <- runTask session (parseFilePath file)
         case res of
           Left (SomeException e) -> case cast e of
             -- We have a number of known assignment timeouts, consider these pending specs instead of failing the build.

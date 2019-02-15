@@ -21,8 +21,8 @@ module Semantic.Graph
 , resumingUnspecialized
 , resumingAddressError
 , resumingValueError
-, resumingHeapError
 , resumingScopeError
+, resumingHeapError
 , resumingTypeError
 ) where
 

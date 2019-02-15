@@ -44,6 +44,7 @@ data Config
   , configLogPrintSource         :: Bool         -- ^ Whether to print the source reference when logging errors (set automatically at runtime).
   , configLogFormatter           :: LogFormatter -- ^ Log formatter to use (set automaticaly at runtime).
   , configSHA                    :: Maybe String -- ^ Optional SHA to include in log messages.
+  , configFailParsingForTesting  :: Bool         -- ^ Simulate internal parse failure for testing (default: False).
 
   , configOptions                :: Options      -- ^ Options configurable via command line arguments.
   }
@@ -52,16 +53,15 @@ data Config
 data Options
   = Options
   { optionsLogLevel         :: Maybe Level   -- ^ What level of messages to log. 'Nothing' disables logging.
-  , optionsRequestID        :: Maybe String  -- ^ Optional request id for tracing across systems.
   , optionsFailOnWarning    :: Bool          -- ^ Should semantic fail fast on assignment warnings (for testing)
   , optionsFailOnParseError :: Bool          -- ^ Should semantic fail fast on tree-sitter parser errors (for testing)
   }
 
 defaultOptions :: Options
-defaultOptions = Options (Just Warning) Nothing False False
+defaultOptions = Options (Just Warning) False False
 
 debugOptions :: Options
-debugOptions = Options (Just Debug) Nothing False False
+debugOptions = Options (Just Debug) False False
 
 defaultConfig :: Options -> IO Config
 defaultConfig options@Options{..} = do
@@ -88,6 +88,7 @@ defaultConfig options@Options{..} = do
     , configLogPrintSource = isTerminal
     , configLogFormatter = if isTerminal then terminalFormatter else logfmtFormatter
     , configSHA = Nothing
+    , configFailParsingForTesting = False
 
     , configOptions = options
     }
@@ -111,8 +112,7 @@ logOptionsFromConfig Config{..} = LogOptions
                    , ("hostname", configHostName)
                    , ("sha", fromMaybe "development" configSHA)
                    ]
-                   <> [("request_id", x) | x <- toList (optionsRequestID configOptions) ]
-          _ -> []
+          _     -> []
 
 
 withLoggerFromConfig :: Config -> (LogQueue -> IO c) -> IO c

@@ -34,16 +34,14 @@ import qualified Semantic.Spec
 import qualified Semantic.CLI.Spec
 import qualified Semantic.IO.Spec
 import qualified Semantic.Stat.Spec
-import Semantic.Config (defaultOptions)
-import Semantic.Task (withOptions)
-import Semantic.Util (TaskConfig(..))
-import qualified Proto3.Roundtrip
+import Semantic.Config (defaultOptions, optionsLogLevel)
+import Semantic.Task (withOptions, TaskSession(..))
 import Test.Hspec
 
 main :: IO ()
 main = do
-  withOptions defaultOptions $ \ config logger statter -> hspec $ do
-    let args = TaskConfig config logger statter
+  withOptions defaultOptions { optionsLogLevel = Nothing } $ \ config logger statter -> hspec $ do
+    let args = TaskSession config "-" logger statter
     describe "Semantic.Stat" Semantic.Stat.Spec.spec
     parallel $ do
       describe "Analysis.Go" (Analysis.Go.Spec.spec args)
@@ -78,5 +76,4 @@ main = do
       describe "Semantic" Semantic.Spec.spec
       describe "Semantic.CLI" Semantic.CLI.Spec.spec
       describe "Semantic.IO" Semantic.IO.Spec.spec
-      -- describe "Integration" (Integration.Spec.spec args)
-      describe "Protobuf roundtripping" Proto3.Roundtrip.spec
+      describe "Integration" (Integration.Spec.spec args)

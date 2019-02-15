@@ -187,14 +187,14 @@ library
                      -- High-level flow & operational functionality (logging, stats, etc.)
                      , Semantic.Analysis
                      -- API
-                     , Semantic.API
-                     , Semantic.API.Diffs
-                     , Semantic.API.Helpers
-                     , Semantic.API.LegacyTypes
-                     , Semantic.API.Symbols
-                     , Semantic.API.Terms
-                     , Semantic.API.TOCSummaries
-                     , Semantic.API.Types
+                     , Semantic.Api
+                     , Semantic.Api.Diffs
+                     , Semantic.Api.Helpers
+                     , Semantic.Api.LegacyTypes
+                     , Semantic.Api.Symbols
+                     , Semantic.Api.Terms
+                     , Semantic.Api.TOCSummaries
+                     , Semantic.Api.V1.CodeAnalysisPB
                      , Semantic.AST
                      , Semantic.CLI
                      , Semantic.Config
@@ -358,7 +358,6 @@ test-suite test
                      , Graphing.Calls.Spec
                      , Integration.Spec
                      , Numeric.Spec
-                     , Proto3.Roundtrip
                      , Reprinting.Spec
                      , Rewriting.Go.Spec
                      , Rewriting.JSON.Spec
@@ -417,15 +416,6 @@ test-suite test
                      , RecordWildCards
                      , StandaloneDeriving
                      , TypeApplications
-
-test-suite lint
-  type:                exitcode-stdio-1.0
-  hs-source-dirs:      test
-  main-is:             Lint.hs
-  default-language:    Haskell2010
-  ghc-options:         -dynamic -threaded -j
-  build-depends:       base
-                     , hlint
 
 test-suite parse-examples
   type:                exitcode-stdio-1.0
