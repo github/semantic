@@ -51,12 +51,10 @@ legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> distributeFoldMap 
       }
 
 parseSymbolsBuilder :: (Member Distribute sig, ParseEffects sig m, Traversable t) => t Blob -> m Builder
-parseSymbolsBuilder blobs
-  -- TODO: Switch away from legacy format on CLI too.
-  = legacyParseSymbols blobs >>= serialize JSON
+parseSymbolsBuilder blobs = parseSymbols blobs >>= serialize JSON
 
-parseSymbols :: (Member Distribute sig, ParseEffects sig m, Traversable t) => t API.Blob -> m ParseTreeSymbolResponse
-parseSymbols blobs = ParseTreeSymbolResponse . V.fromList . toList <$> distributeFor (apiBlobToBlob <$> blobs) go
+parseSymbols :: (Member Distribute sig, ParseEffects sig m, Traversable t) => t Blob -> m ParseTreeSymbolResponse
+parseSymbols blobs = ParseTreeSymbolResponse . V.fromList . toList <$> distributeFor blobs go
   where
     go :: (Member (Error SomeException) sig, Member Task sig, Carrier sig m, Monad m) => Blob -> m File
     go blob@Blob{..} = (doParse blob >>= withSomeTerm (renderToSymbols blob)) `catchError` (\(SomeException e) -> pure $ errorFile (show e))
