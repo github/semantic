@@ -15,7 +15,6 @@ import           Rendering.TOC
 import           Semantic.Api.Diffs
 import           Semantic.Api.Helpers
 import           Semantic.Api.V1.CodeAnalysisPB hiding (Blob, BlobPair)
-import qualified Semantic.Api.V1.CodeAnalysisPB as API
 import           Semantic.Task as Task
 import           Serializing.Format
 
