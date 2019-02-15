@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, DeriveAnyClass, LambdaCase, RankNTypes, TypeOperators, ScopedTypeVariables, UndecidableInstances #-}
+{-# LANGUAGE GADTs, LambdaCase, RankNTypes, TypeOperators, ScopedTypeVariables, UndecidableInstances #-}
 module Tags.Tagging
 ( runTagging
 , Tag(..)
