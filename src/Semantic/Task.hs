@@ -154,6 +154,7 @@ data TaskSession
   = TaskSession
   { config    :: Config
   , requestID :: String
+  , isPublic  :: Bool
   , logger    :: LogQueue
   , statter   :: StatQueue
   }
@@ -182,7 +183,7 @@ runTask TaskSession{..} task = do
 -- | Execute a 'TaskEff' yielding its result value in 'IO' using all default options and configuration.
 runTaskWithOptions :: Options -> TaskEff a -> IO (Either SomeException a)
 runTaskWithOptions options task = withOptions options $ \ config logger statter ->
-  runTask (TaskSession config "-" logger statter) task
+  runTask (TaskSession config "-" False logger statter) task
 
 -- | Yield config and telemetry queues for options.
 withOptions :: Options -> (Config -> LogQueue -> StatQueue -> IO a) -> IO a
