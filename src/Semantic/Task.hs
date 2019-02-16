@@ -98,7 +98,7 @@ type TaskEff
   = Eff (TaskC
   ( Eff (ResolutionC
   ( Eff (Files.FilesC
-  ( Eff (ReaderC Config
+  ( Eff (ReaderC TaskSession
   ( Eff (TraceInTelemetryC
   ( Eff (TelemetryC
   ( Eff (ErrorC SomeException
@@ -161,7 +161,7 @@ data TaskSession
 
 -- | Execute a 'TaskEff' yielding its result value in 'IO'.
 runTask :: TaskSession -> TaskEff a -> IO (Either SomeException a)
-runTask TaskSession{..} task = do
+runTask taskSession@TaskSession{..} task = do
   (result, stat) <- withTiming "run" [] $ do
     let run :: TaskEff a -> IO (Either SomeException a)
         run
@@ -172,7 +172,7 @@ runTask TaskSession{..} task = do
           . runError
           . runTelemetry logger statter
           . runTraceInTelemetry
-          . runReader config
+          . runReader taskSession
           . Files.runFiles
           . runResolution
           . runTaskF
@@ -230,7 +230,7 @@ instance Effect Task where
 -- | Run a 'Task' effect by performing the actions in 'IO'.
 runTaskF :: ( Member (Error SomeException) sig
             , Member (Lift IO) sig
-            , Member (Reader Config) sig
+            , Member (Reader TaskSession) sig
             , Member Resource sig
             , Member Telemetry sig
             , Member Timeout sig
@@ -244,7 +244,7 @@ runTaskF = runTaskC . interpret
 
 newtype TaskC m a = TaskC { runTaskC :: m a }
 
-instance (Member (Error SomeException) sig, Member (Lift IO) sig, Member (Reader Config) sig, Member Resource sig, Member Telemetry sig, Member Timeout sig, Member Trace sig, Carrier sig m, MonadIO m) => Carrier (Task :+: sig) (TaskC m) where
+instance (Member (Error SomeException) sig, Member (Lift IO) sig, Member (Reader TaskSession) sig, Member Resource sig, Member Telemetry sig, Member Timeout sig, Member Trace sig, Carrier sig m, MonadIO m) => Carrier (Task :+: sig) (TaskC m) where
   ret = TaskC . ret
   eff = TaskC . handleSum (eff . handleCoercible) (\case
     Parse parser blob k -> runParser blob parser >>= runTaskC . k
@@ -253,19 +253,22 @@ instance (Member (Error SomeException) sig, Member (Lift IO) sig, Member (Reader
     Semantic.Task.Diff terms k -> runTaskC (k (diffTermPair terms))
     Render renderer input k -> runTaskC (k (renderer input))
     Serialize format input k -> do
-      formatStyle <- asks (bool Plain Colourful . configIsTerminal)
+      formatStyle <- asks (bool Plain Colourful . configIsTerminal . config)
       runTaskC (k (runSerialize formatStyle format input)))
 
 
 -- | Log an 'Error.Error' at the specified 'Level'.
 logError :: (Member Telemetry sig, Carrier sig m)
-         => Config
+         => TaskSession
          -> Level
          -> Blob
          -> Error.Error String
          -> [(String, String)]
          -> m ()
-logError Config{..} level blob err = writeLog level (Error.formatError configLogPrintSource configIsTerminal blob err)
+logError TaskSession{..} level blob err =
+  let configLogPrintSource' = configLogPrintSource config
+      configIsTerminal' = configIsTerminal config
+  in writeLog level (Error.formatError configLogPrintSource' configIsTerminal' blob err)
 
 data ParserCancelled = ParserTimedOut | AssignmentTimedOut
   deriving (Show, Typeable)
@@ -273,14 +276,14 @@ data ParserCancelled = ParserTimedOut | AssignmentTimedOut
 instance Exception ParserCancelled
 
 -- | Parse a 'Blob' in 'IO'.
-runParser :: (Member (Error SomeException) sig, Member (Lift IO) sig, Member (Reader Config) sig, Member Resource sig, Member Telemetry sig, Member Timeout sig, Member Trace sig, Carrier sig m, MonadIO m)
+runParser :: (Member (Error SomeException) sig, Member (Lift IO) sig, Member (Reader TaskSession) sig, Member Resource sig, Member Telemetry sig, Member Timeout sig, Member Trace sig, Carrier sig m, MonadIO m)
           => Blob
           -> Parser term
           -> m term
 runParser blob@Blob{..} parser = case parser of
   ASTParser language ->
     time "parse.tree_sitter_ast_parse" languageTag $ do
-      config <- ask
+      config <- asks config
       parseToAST (configTreeSitterParseTimeout config) language blob
         >>= maybeM (throwError (SomeException ParserTimedOut))
 
@@ -302,7 +305,7 @@ runParser blob@Blob{..} parser = case parser of
                          , Element Syntax.Error syntaxes
                          , Member (Error SomeException) sig
                          , Member (Lift IO) sig
-                         , Member (Reader Config) sig
+                         , Member (Reader TaskSession) sig
                          , Member Resource sig
                          , Member Telemetry sig
                          , Member Timeout sig
@@ -315,34 +318,37 @@ runParser blob@Blob{..} parser = case parser of
                       -> assignment (Term (Sum syntaxes) Assignment.Location)
                       -> m (Term (Sum syntaxes) Assignment.Location)
         runAssignment assign parser assignment = do
-          config <- ask
-          let blobFields = ("path", if configLogPrintSource config then blobPath else "<filtered>") : languageTag
+          taskSession <- ask
+          let requestID' = ("github_request_id", requestID taskSession)
+          let isPublic'  = ("github_is_public", show (isPublic taskSession))
+          let blobFields = ("path", if isPublic taskSession || configLogPrintSource (config taskSession) then blobPath else "<filtered>")
+          let logFields = requestID' : isPublic' : blobFields : languageTag
           ast <- runParser blob parser `catchError` \ (SomeException err) -> do
             writeStat (increment "parse.parse_failures" languageTag)
-            writeLog Error "failed parsing" (("task", "parse") : blobFields)
+            writeLog Error "failed parsing" (("task", "parse") : logFields)
             throwError (toException err)
 
-          res <- timeout (configAssignmentTimeout config) . time "parse.assign" languageTag $
+          res <- timeout (configAssignmentTimeout (config taskSession)) . time "parse.assign" languageTag $
             case assign blobSource assignment ast of
               Left err -> do
                 writeStat (increment "parse.assign_errors" languageTag)
-                logError config Error blob err (("task", "assign") : blobFields)
+                logError taskSession Error blob err (("task", "assign") : logFields)
                 throwError (toException err)
               Right term -> do
                 for_ (zip (errors term) [(0::Integer)..]) $ \ (err, i) -> case Error.errorActual err of
                   Just "ParseError" -> do
                     when (i == 0) $ writeStat (increment "parse.parse_errors" languageTag)
-                    logError config Warning blob err (("task", "parse") : blobFields)
-                    when (optionsFailOnParseError (configOptions config)) $ throwError (toException err)
+                    logError taskSession Warning blob err (("task", "parse") : logFields)
+                    when (optionsFailOnParseError (configOptions (config taskSession))) $ throwError (toException err)
                   _ -> do
                     when (i == 0) $ writeStat (increment "parse.assign_warnings" languageTag)
-                    logError config Warning blob err (("task", "assign") : blobFields)
-                    when (optionsFailOnWarning (configOptions config)) $ throwError (toException err)
+                    logError taskSession Warning blob err (("task", "assign") : logFields)
+                    when (optionsFailOnWarning (configOptions (config taskSession))) $ throwError (toException err)
                 term <$ writeStat (count "parse.nodes" (length term) languageTag)
           case res of
-            Just r | not (configFailParsingForTesting config)
+            Just r | not (configFailParsingForTesting (config taskSession))
               -> pure r
             _ -> do
               writeStat (increment "assign.assign_timeouts" languageTag)
-              writeLog Error "assignment timeout" (("task", "assign") : blobFields)
+              writeLog Error "assignment timeout" (("task", "assign") : logFields)
               throwError (SomeException AssignmentTimedOut)
