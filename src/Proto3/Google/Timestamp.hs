@@ -4,6 +4,7 @@ module Proto3.Google.Timestamp (Timestamp (..)) where
 
 import Prologue
 
+import Data.Aeson
 import Proto3.Suite
 
 -- | Predefined timestamp message provided by Google. The schema can be found
@@ -11,4 +12,4 @@ import Proto3.Suite
 data Timestamp = Timestamp
   { timestampSeconds :: Int64
   , timestampNanos   :: Int32
-  } deriving (Eq, Ord, Show, Generic, Message, Named, NFData)
+  } deriving (Eq, Ord, Show, Generic, Message, Named, NFData, FromJSON, ToJSON)
