@@ -1,3 +1,4 @@
+cabal-version:       2.2
 name:                semantic
 version:             0.5.0
 synopsis:            Framework and service for analyzing and diffing untrusted code.
@@ -8,14 +9,31 @@ maintainer:          rob.rix@github.com
 copyright:           2016 GitHub
 category:            Web
 build-type:          Simple
--- extra-source-files:
-cabal-version:       >=1.10
 
 flag release
   description: Build with optimizations on (for CI or deployment builds)
   default:     False
 
+-- GHC extensions shared between targets
+common haskell
+  default-language:    Haskell2010
+  default-extensions:  DataKinds
+                     , DeriveFoldable
+                     , DeriveFunctor
+                     , DeriveGeneric
+                     , DeriveTraversable
+                     , FlexibleContexts
+                     , FlexibleInstances
+                     , MonadFailDesugaring
+                     , MultiParamTypeClasses
+                     , OverloadedStrings
+                     , RecordWildCards
+                     , StandaloneDeriving
+                     , StrictData
+                     , TypeApplications
+
 library
+  import:              haskell
   hs-source-dirs:      src
   exposed-modules:
                      -- Analyses & term annotations
@@ -288,21 +306,6 @@ library
                      , tree-sitter-ruby
                      , tree-sitter-typescript
                      , tree-sitter-java
-  default-language:    Haskell2010
-  default-extensions:  DataKinds
-                     , DeriveFoldable
-                     , DeriveFunctor
-                     , DeriveGeneric
-                     , DeriveTraversable
-                     , FlexibleContexts
-                     , FlexibleInstances
-                     , MonadFailDesugaring
-                     , MultiParamTypeClasses
-                     , OverloadedStrings
-                     , RecordWildCards
-                     , StandaloneDeriving
-                     , StrictData
-                     , TypeApplications
   if flag(release)
     ghc-options:       -Wall -Werror -Wmissing-export-lists -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -fno-warn-name-shadowing -O1 -j -DCOMPUTE_GIT_SHA
   else
@@ -310,6 +313,7 @@ library
   ghc-prof-options:    -fprof-auto
 
 executable semantic
+  import:              haskell
   hs-source-dirs:      app
   main-is:             Main.hs
   if flag(release)
@@ -320,10 +324,9 @@ executable semantic
   cpp-options:         -DU_STATIC_IMPLEMENTATION=1
   build-depends:       base
                      , semantic
-  default-language:    Haskell2010
-  default-extensions:  FlexibleInstances, OverloadedStrings, RecordWildCards
 
 test-suite test
+  import:              haskell
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
@@ -398,24 +401,12 @@ test-suite test
     ghc-options:       -threaded -rtsopts -with-rtsopts=-N -j -O0
   else
     ghc-options:       -threaded -rtsopts -with-rtsopts=-N -j -O0 -dynamic
-  default-language:    Haskell2010
-  default-extensions:  DataKinds
-                     , DeriveFunctor
-                     , DeriveGeneric
-                     , FlexibleContexts
-                     , FlexibleInstances
-                     , MonadFailDesugaring
-                     , MultiParamTypeClasses
-                     , OverloadedStrings
-                     , RecordWildCards
-                     , StandaloneDeriving
-                     , TypeApplications
 
 test-suite parse-examples
+  import:              haskell
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Examples.hs
-  default-language:    Haskell2010
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N -j
   build-depends:       base
                      , bytestring
@@ -429,17 +420,15 @@ test-suite parse-examples
                      , hspec-expectations-pretty-diff
                      , process
                      , semantic
-  default-extensions:  RecordWildCards
-                     , FlexibleContexts
 
 benchmark evaluation
+  import:              haskell
   hs-source-dirs:      bench/evaluation
   type:                exitcode-stdio-1.0
   main-is:             Main.hs
   ghc-options:         -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m -T" -static -j -O1
   cc-options:          -DU_STATIC_IMPLEMENTATION=1
   cpp-options:         -DU_STATIC_IMPLEMENTATION=1
-  default-language:    Haskell2010
   build-depends:       base
                      , criterion
                      , semantic
