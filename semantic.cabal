@@ -393,6 +393,7 @@ test-suite parse-examples
                      , hspec >= 2.4.1
                      , hspec-core
                      , hspec-expectations-pretty-diff
+                     , process
 
 benchmark evaluation
   import:              haskell, executable-flags
