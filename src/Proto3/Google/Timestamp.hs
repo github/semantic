@@ -11,4 +11,4 @@ import Proto3.Suite
 data Timestamp = Timestamp
   { timestampSeconds :: Int64
   , timestampNanos   :: Int32
-  } deriving (Eq, Show, Generic, Message, Named, NFData)
+  } deriving (Eq, Ord, Show, Generic, Message, Named, NFData)
