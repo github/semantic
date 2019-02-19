@@ -19,7 +19,8 @@
       },
       "kind": "Method",
       "symbol": "foo",
-      "line": "def foo"
+      "line": "def foo",
+      "docs": null
     }],
     "language": "Ruby",
     "errors": []
