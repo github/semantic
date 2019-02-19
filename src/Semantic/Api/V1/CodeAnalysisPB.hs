@@ -470,6 +470,7 @@ data Symbol = Symbol
   , kind :: Text
   , line :: Text
   , span :: Maybe Span
+  , docs :: Maybe Docstring
   } deriving stock (Eq, Ord, Show, Generic)
     deriving anyclass (Named, FromJSON, ToJSON)
 
@@ -479,12 +480,27 @@ instance Message Symbol where
     , encodeMessageField 2 kind
     , encodeMessageField 3 line
     , encodeMessageField 4 (Nested span)
+    , encodeMessageField 5 (Nested docs)
     ]
   decodeMessage _ = Symbol
     <$> at decodeMessageField 1
     <*> at decodeMessageField 2
     <*> at decodeMessageField 3
     <*> at decodeMessageField 4
+    <*> at decodeMessageField 5
+  dotProto = undefined
+
+data Docstring = Docstring
+  { docstring :: Text
+  } deriving stock (Eq, Ord, Show, Generic)
+    deriving anyclass (Named, FromJSON, ToJSON)
+
+instance Message Docstring where
+  encodeMessage _ Docstring{..} = mconcat
+    [ encodeMessageField 1 docstring
+    ]
+  decodeMessage _ = Docstring
+    <$> at decodeMessageField 1
   dotProto = undefined
 
 data Position = Position
