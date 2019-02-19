@@ -3,7 +3,7 @@ module Semantic.CLI (main) where
 
 import           Control.Exception as Exc (displayException)
 import           Data.File
-import           Data.Language (ensureLanguage, languageForFilePath)
+import           Data.Language (languageForFilePath)
 import           Data.List (intercalate, uncons)
 import           Data.List.Split (splitWhen)
 import           Data.Handle
@@ -84,7 +84,7 @@ parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate pa
       pure $ Task.readBlobs filesOrStdin >>= renderer
 
 tsParseCommand :: Mod CommandFields (Task.TaskEff Builder)
-tsParseCommand = command "ts-parse" (info tsParseArgumentsParser (progDesc "Don't produce output, but show timing stats"))
+tsParseCommand = command "ts-parse" (info tsParseArgumentsParser (progDesc "Generate raw tree-sitter parse trees for path(s)"))
   where
     tsParseArgumentsParser = do
       format <- flag  AST.SExpression AST.SExpression (long "sexpression" <> help "Output s-expression ASTs (default)")
@@ -126,9 +126,9 @@ filePathReader :: ReadM File
 filePathReader = eitherReader parseFilePath
   where
     parseFilePath arg = case splitWhen (== ':') arg of
-        [a, b] | Just lang <- readMaybe b >>= ensureLanguage -> Right (File a lang)
-               | Just lang <- readMaybe a >>= ensureLanguage -> Right (File b lang)
-        [path] -> maybe (Left $ "Cannot identify language for path: " <> path) (Right . File path) (ensureLanguage (languageForFilePath path))
+        [a, b] | Just lang <- readMaybe a -> Right (File a lang)
+               | Just lang <- readMaybe b -> Right (File b lang)
+        [path] -> Right (File path (languageForFilePath path))
         args -> Left ("cannot parse `" <> join args <> "`\nexpecting FILE:LANGUAGE or just FILE")
 
 options :: Eq a => [(String, a)] -> Mod OptionFields a -> Parser a
