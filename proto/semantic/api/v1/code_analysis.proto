@@ -187,6 +187,11 @@ message Symbol {
   string kind = 2;
   string line = 3;
   Span span = 4;
+  Docstring docs = 5;
+}
+
+message Docstring {
+  string docstring = 1;
 }
 
 message Position {
