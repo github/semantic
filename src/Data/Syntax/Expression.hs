@@ -405,18 +405,18 @@ data MemberAccess a = MemberAccess { lhs :: a, rhs :: a }
   deriving (Eq1, Show1, Ord1) via Generically MemberAccess
 
 instance Declarations1 MemberAccess where
-  liftDeclaredName _ MemberAccess{..} = Just rhs
+  liftDeclaredName declaredName MemberAccess{..} = declaredName rhs
 
 instance Evaluatable MemberAccess where
-  eval eval _ MemberAccess{..} = do
+  eval eval ref MemberAccess{..} = do
     lhsValue <- eval lhs
     lhsFrame <- Abstract.scopedEnvironment lhsValue
 
     rhsSlot <- case lhsFrame of
       Just lhsFrame ->
-        withScopeAndFrame lhsFrame $ do
-          reference (Reference rhs) (Declaration rhs)
-          lookupSlot (Declaration rhs)
+        -- FIXME: The span is not set up correctly when calling `ref` so we have to eval
+        -- it first
+        withScopeAndFrame lhsFrame (eval rhs >> ref rhs)
       -- Throw a ReferenceError since we're attempting to reference a name within a value that is not an Object.
       Nothing -> throwEvalError (ReferenceError lhsValue rhs)
 
@@ -426,30 +426,28 @@ instance Evaluatable MemberAccess where
     let lhsAccessControl = fromMaybe Public (termToAccessControl lhs)
     infos <- declarationsByAccessControl rhsScope lhsAccessControl
 
-    rhsValue' <- case find (\Info{..} -> Declaration rhs == infoDeclaration) infos of
+    rhsName <- maybeM (throwNoNameError rhs) (declaredName rhs)
+    rhsValue' <- case find (\Info{..} -> Declaration rhsName == infoDeclaration) infos of
       Just _  -> pure rhsValue
       Nothing -> do
         let lhsName = fromMaybe (name "") (declaredName lhs)
-        info <- declarationByName rhsScope (Declaration rhs)
-        throwEvalError $ AccessControlError (lhsName, lhsAccessControl) (rhs, infoAccessControl info) rhsValue
+        info <- declarationByName rhsScope (Declaration rhsName)
+        throwEvalError $ AccessControlError (lhsName, lhsAccessControl) (rhsName, infoAccessControl info) rhsValue
 
     bindThis lhsValue rhsValue'
 
 
-  ref eval _ MemberAccess{..} = do
+  ref eval ref' MemberAccess{..} = do
     lhsValue <- eval lhs
     lhsFrame <- Abstract.scopedEnvironment lhsValue
     case lhsFrame of
-      Just lhsFrame ->
-        withScopeAndFrame lhsFrame $ do
-          reference (Reference rhs) (Declaration rhs)
-          lookupSlot (Declaration rhs)
+      Just lhsFrame -> withScopeAndFrame lhsFrame (ref' rhs)
       -- Throw a ReferenceError since we're attempting to reference a name within a value that is not an Object.
       Nothing -> throwEvalError (ReferenceError lhsValue rhs)
 
 
 instance Tokenize MemberAccess where
-  tokenize MemberAccess{..} = lhs *> yield Access *> yield (Run (formatName rhs))
+  tokenize MemberAccess{..} = lhs *> yield Access <* rhs
 
 -- | Subscript (e.g a[1])
 data Subscript a = Subscript { lhs :: a, rhs :: [a] }
@@ -554,15 +552,20 @@ instance Evaluatable New where
 
     void . withScopeAndFrame objectFrame $ do
       for_ instanceMembers $ \Info{..} -> do
-        declare infoDeclaration Default infoAccessControl infoSpan infoAssociatedScope
+        declare infoDeclaration Default infoAccessControl infoSpan infoKind infoAssociatedScope
 
       -- TODO: This is a typescript specific name and we should allow languages to customize it.
       let constructorName = Name.name "constructor"
-      reference (Reference constructorName) (Declaration constructorName)
-      constructor <- deref =<< lookupSlot (Declaration constructorName)
-      args <- traverse eval newArguments
-      boundConstructor <- bindThis objectVal constructor
-      call boundConstructor args
+      maybeConstructor <- maybeLookupDeclaration (Declaration constructorName)
+      case maybeConstructor of
+        Just slot -> do
+          span <- ask @Span
+          reference (Reference constructorName) span ScopeGraph.New (Declaration constructorName)
+          constructor <- deref slot
+          args <- traverse eval newArguments
+          boundConstructor <- bindThis objectVal constructor
+          call boundConstructor args
+        Nothing -> pure objectVal
 
     pure objectVal
 
@@ -591,7 +594,8 @@ instance Tokenize This where
 
 instance Evaluatable This where
   eval _ _ This = do
-    reference (Reference __self) (Declaration __self)
+    span <- ask @Span
+    reference (Reference __self) span ScopeGraph.This (Declaration __self)
     deref =<< lookupSlot (Declaration __self)
 
 instance AccessControls1 This where

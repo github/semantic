@@ -73,7 +73,7 @@ evaluate lang runModule modules = do
           let (scopeEdges, frameLinks) = case (parentScope, parentFrame) of
                 (Just parentScope, Just parentFrame) -> (Map.singleton Lexical [ parentScope ], Map.singleton Lexical (Map.singleton parentScope parentFrame))
                 _ -> mempty
-          scopeAddress <- newScope scopeEdges
+          scopeAddress <- if Prologue.null scopeEdges then newPreludeScope scopeEdges else newScope scopeEdges
           frameAddress <- newFrame scopeAddress frameLinks
           val <- runInModule scopeAddress frameAddress m
           pure ((scopeAddress, frameAddress), val)

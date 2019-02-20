@@ -1,18 +1,21 @@
-{-# LANGUAGE DeriveAnyClass, DuplicateRecordFields, TupleSections #-}
+{-# LANGUAGE DeriveAnyClass, DuplicateRecordFields, LambdaCase, TupleSections #-}
 module Data.Abstract.ScopeGraph
   ( Slot(..)
   , Info(..)
   , associatedScope
+  , lookupDeclaration
   , declarationByName
   , declarationsByAccessControl
   , declarationsByRelation
   , Declaration(..) -- TODO don't export these constructors
   , declare
+  , formatDeclaration
   , EdgeLabel(..)
   , insertDeclarationScope
   , insertDeclarationSpan
   , insertImportReference
   , newScope
+  , newPreludeScope
   , insertScope
   , insertEdge
   , Path(..)
@@ -22,8 +25,10 @@ module Data.Abstract.ScopeGraph
   , Position(..)
   , reference
   , Reference(..) -- TODO don't export these constructors
+  , ReferenceInfo(..)
   , Relation(..)
   , ScopeGraph(..)
+  , Kind(..)
   , lookupScope
   , lookupScopePath
   , Scope(..)
@@ -34,14 +39,22 @@ module Data.Abstract.ScopeGraph
   , AccessControl(..)
   ) where
 
-import           Control.Abstract.Hole
-import           Data.Abstract.Name
+import Prelude hiding (lookup)
+import Prologue
+
+import           Control.Lens.Lens
 import           Data.Aeson
-import           Data.JSON.Fields (ToJSONFields(..))
 import qualified Data.Map.Strict as Map
 import qualified Data.Sequence as Seq
 import qualified Data.Set as Set
 import Data.Span
+import Control.Abstract.Hole
+import Data.Abstract.Module
+import Data.JSON.Fields
+import Data.Abstract.Name
+import Proto3.Suite as Proto hiding (Path)
+import Proto3.Wire.Encode as Encode
+import Proto3.Wire.Decode as Decode
 
 import Prologue
 
@@ -49,10 +62,10 @@ import Prologue
 data Slot address = Slot { frameAddress :: address, position :: Position }
     deriving (Eq, Show, Ord, Generic, NFData)
 
+
 data AccessControl = Public
                    | Protected
                    | Private
-                   deriving (Bounded, Enum, Eq, Generic, Hashable, ToJSON, NFData, Show)
 
 instance ToJSONFields AccessControl where
   toJSONFields accessControl = ["accessControl" .= accessControl]
@@ -78,28 +91,58 @@ instance Ord AccessControl where
   (<=) Public _            = False
 
 
-data Relation = Default | Instance deriving (Eq, Show, Ord, Generic, NFData)
+data Relation = Default | Instance | Prelude
+  deriving (Eq, Show, Ord, Generic, NFData)
 
 instance Lower Relation where
   lowerBound = Default
 
 data Info scopeAddress = Info
-  { infoDeclaration :: Declaration
-  , infoRelation :: Relation
-  , infoAccessControl :: AccessControl
-  , infoSpan :: Span
+  { infoDeclaration     :: Declaration
+  , infoModule          :: ModuleInfo
+  , infoRelation        :: Relation
+  , infoAccessControl   :: AccessControl
+  , infoSpan            :: Span
+  , infoKind            :: Kind
   , infoAssociatedScope :: Maybe scopeAddress
   } deriving (Eq, Show, Ord, Generic, NFData)
 
+instance HasSpan (Info scopeAddress) where
+  span = lens infoSpan (\i s -> i { infoSpan = s })
+  {-# INLINE span #-}
+
 instance Lower (Info scopeAddress) where
-  lowerBound = Info lowerBound lowerBound Public lowerBound Nothing
+  lowerBound = Info lowerBound lowerBound lowerBound Public lowerBound lowerBound Nothing
+
+data ReferenceInfo = ReferenceInfo
+  { refSpan   :: Span
+  , refKind   :: Kind
+  , refModule :: ModuleInfo
+  } deriving (Eq, Show, Ord, Generic, NFData)
+
+instance HasSpan ReferenceInfo where
+  span = lens refSpan (\r s -> r { refSpan = s })
+  {-# INLINE span #-}
+
+data Kind = TypeAlias | Class | Method | QualifiedAliasedImport | QualifiedExport | DefaultExport | Module | AbstractClass | Let | QualifiedImport | UnqualifiedImport | Assignment | RequiredParameter | PublicField | VariableDeclaration | Function | Parameter | Unknown | Identifier | TypeIdentifier | This | New | MemberAccess | Call
+  deriving (Eq, Show, Ord, Generic, NFData)
+
+instance Lower Kind where
+  lowerBound = Unknown
 
 -- Offsets and frame addresses in the heap should be addresses?
-data Scope address = Scope
-  { edges        :: Map EdgeLabel [address]
-  , references   :: Map Reference (Path address)
-  , declarations :: Seq (Info address)
-  } deriving (Eq, Show, Ord, Generic, NFData)
+data Scope address =
+    Scope {
+      edges        :: Map EdgeLabel [address]
+    , references   :: Map Reference ([ReferenceInfo], Path address)
+    , declarations :: Seq (Info address)
+    }
+  | PreludeScope {
+      edges        :: Map EdgeLabel [address]
+    , references   :: Map Reference ([ReferenceInfo], Path address)
+    , declarations :: Seq (Info address)
+    }
+  deriving (Eq, Show, Ord, Generic, NFData)
 
 instance Lower (Scope scopeAddress) where
   lowerBound = Scope mempty mempty mempty
@@ -153,7 +196,7 @@ pathPosition (DPath _ p)   = p
 pathPosition (EPath _ _ p) = pathPosition p
 
 -- Returns the reference paths of a scope in a scope graph.
-pathsOfScope :: Ord scope => scope -> ScopeGraph scope -> Maybe (Map Reference (Path scope))
+pathsOfScope :: Ord scope => scope -> ScopeGraph scope -> Maybe (Map Reference ([ReferenceInfo], Path scope))
 pathsOfScope scope = fmap references . Map.lookup scope . unScopeGraph
 
 -- Returns the declaration data of a scope in a scope graph.
@@ -187,35 +230,37 @@ lookupScope scope = Map.lookup scope . unScopeGraph
 -- TODO: Return the whole value in Maybe or Either.
 declare :: Ord scope
         => Declaration
+        -> ModuleInfo
         -> Relation
         -> AccessControl
         -> Span
+        -> Kind
         -> Maybe scope
         -> scope
         -> ScopeGraph scope
         -> (ScopeGraph scope, Maybe Position)
-declare decl rel accessControl declSpan assocScope currentScope g = fromMaybe (g, Nothing) $ do
+declare decl moduleInfo rel accessControl declSpan kind assocScope currentScope g = fromMaybe (g, Nothing) $ do
   scope <- lookupScope currentScope g
 
   dataSeq <- ddataOfScope currentScope g
   case Seq.findIndexR (\Info{..} -> decl == infoDeclaration && declSpan == infoSpan && rel == infoRelation) dataSeq of
     Just index -> pure (g, Just (Position index))
     Nothing -> do
-      let newScope = scope { declarations = declarations scope Seq.|> Info decl rel accessControl declSpan assocScope }
+      let newScope = scope { declarations = declarations scope Seq.|> Info decl moduleInfo rel accessControl declSpan kind assocScope }
       pure (insertScope currentScope newScope g, Just (Position (length (declarations newScope))))
 
 -- | Add a reference to a declaration in the scope graph.
 -- Returns the original scope graph if the declaration could not be found.
-reference :: Ord scope => Reference -> Declaration -> scope -> ScopeGraph scope -> ScopeGraph scope
-reference ref decl currentAddress g = fromMaybe g $ do
+reference :: Ord scope => Reference -> ModuleInfo -> Span -> Kind -> Declaration -> scope -> ScopeGraph scope -> ScopeGraph scope
+reference ref moduleInfo span kind decl currentAddress g = fromMaybe g $ do
   -- Start from the current address
   currentScope' <- lookupScope currentAddress g
   -- Build a path up to the declaration
-  flip (insertScope currentAddress) g . flip (insertReference ref) currentScope' <$> findPath (const Nothing) decl currentAddress g
+  flip (insertScope currentAddress) g . flip (insertReference ref moduleInfo span kind) currentScope' <$> findPath (const Nothing) decl currentAddress g
 
 -- | Insert a reference into the given scope by constructing a resolution path to the declaration within the given scope graph.
-insertImportReference :: Ord address => Reference -> Declaration -> address -> ScopeGraph address -> Scope address -> Maybe (Scope address)
-insertImportReference ref decl currentAddress g scope = flip (insertReference ref) scope . EPath Import currentAddress <$> findPath (const Nothing) decl currentAddress g
+insertImportReference :: Ord address => Reference -> ModuleInfo -> Span -> Kind -> Declaration -> address -> ScopeGraph address -> Scope address -> Maybe (Scope address)
+insertImportReference ref moduleInfo span kind decl currentAddress g scope = flip (insertReference ref moduleInfo span kind) scope . EPath Import currentAddress <$> findPath (const Nothing) decl currentAddress g
 
 lookupScopePath :: Ord scopeAddress => Name -> scopeAddress -> ScopeGraph scopeAddress -> Maybe (Path scopeAddress)
 lookupScopePath declaration currentAddress g = findPath (flip (lookupReference declaration) g) (Declaration declaration) currentAddress g
@@ -242,8 +287,10 @@ foldGraph combine address graph = go lowerBound address
 pathToDeclaration :: Ord scopeAddress => Declaration -> scopeAddress -> ScopeGraph scopeAddress -> Maybe (Path scopeAddress)
 pathToDeclaration decl address g = DPath decl . snd <$> lookupDeclaration (unDeclaration decl) address g
 
-insertReference :: Reference -> Path scopeAddress -> Scope scopeAddress -> Scope scopeAddress
-insertReference ref path scope = scope { references = Map.insert ref path (references scope) }
+insertReference :: Reference -> ModuleInfo -> Span -> Kind -> Path scopeAddress -> Scope scopeAddress -> Scope scopeAddress
+insertReference ref moduleInfo span kind path scope = scope { references = Map.alter (\case
+  Nothing -> pure ([ ReferenceInfo span kind moduleInfo ], path)
+  Just (refInfos, path) -> pure (ReferenceInfo span kind moduleInfo : refInfos, path)) ref (references scope) }
 
 lookupDeclaration :: Ord scopeAddress => Name -> scopeAddress -> ScopeGraph scopeAddress -> Maybe (Info scopeAddress, Position)
 lookupDeclaration name scope g = do
@@ -265,7 +312,7 @@ putDeclarationScopeAtPosition scope position assocScope g@(ScopeGraph graph) = f
   pure $ ScopeGraph (Map.adjust (\s -> s { declarations = seq }) scope graph)
 
 lookupReference :: Ord scopeAddress => Name -> scopeAddress -> ScopeGraph scopeAddress -> Maybe (Path scopeAddress)
-lookupReference  name scope g = Map.lookup (Reference name) =<< pathsOfScope scope g
+lookupReference  name scope g = fmap snd . Map.lookup (Reference name) =<< pathsOfScope scope g
 
 insertEdge :: Ord scopeAddress => EdgeLabel -> scopeAddress -> scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
 insertEdge label target currentAddress g@(ScopeGraph graph) = fromMaybe g $ do
@@ -296,6 +343,10 @@ insertDeclarationSpan decl@Declaration{..} span g = fromMaybe g $ do
 newScope :: Ord address => address -> Map EdgeLabel [address] -> ScopeGraph address -> ScopeGraph address
 newScope address edges = insertScope address (Scope edges mempty mempty)
 
+-- | Insert a new scope with the given address and edges into the scope graph.
+newPreludeScope :: Ord address => address -> Map EdgeLabel [address] -> ScopeGraph address -> ScopeGraph address
+newPreludeScope address edges = insertScope address (PreludeScope edges mempty mempty)
+
 insertScope :: Ord address => address -> Scope address -> ScopeGraph address -> ScopeGraph address
 insertScope address scope = ScopeGraph . Map.insert address scope . unScopeGraph
 
@@ -314,7 +365,7 @@ pathOfRef :: (Ord scope) => Reference -> ScopeGraph scope -> Maybe (Path scope)
 pathOfRef ref graph = do
   scope <- scopeOfRef ref graph
   pathsMap <- pathsOfScope scope graph
-  Map.lookup ref pathsMap
+  snd <$> Map.lookup ref pathsMap
 
 -- Returns the scope the declaration was declared in.
 scopeOfDeclaration :: Ord scope => Declaration -> ScopeGraph scope -> Maybe scope
@@ -340,6 +391,9 @@ newtype Declaration = Declaration { unDeclaration :: Name }
 
 instance Lower Declaration where
   lowerBound = Declaration $ name ""
+
+formatDeclaration :: Declaration -> Text
+formatDeclaration = formatName . unDeclaration
 
 -- | The type of edge from a scope to its parent scopes.
 -- Either a lexical edge or an import edge in the case of non-lexical edges.
