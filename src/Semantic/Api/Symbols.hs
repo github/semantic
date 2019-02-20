@@ -78,4 +78,5 @@ parseSymbols blobs = ParseTreeSymbolResponse . V.fromList . toList <$> distribut
           , kind = kind
           , line = fromMaybe mempty line
           , span = spanToSpan span
+          , docs = fmap Docstring docs
           }

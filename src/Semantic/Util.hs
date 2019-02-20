@@ -554,7 +554,7 @@ type LanguageSyntax lang syntax = ( Language.SLanguage lang
                                   , Apply FreeVariables1 syntax)
 
 evaluateProject proxy parser paths = withOptions debugOptions $ \ config logger statter ->
-  evaluateProject' (TaskSession config "-" logger statter) proxy parser paths
+  evaluateProject' (TaskSession config "-" False logger statter) proxy parser paths
 
 -- Evaluate a project consisting of the listed paths.
 -- TODO: This is used by our specs and should be moved into SpecHelpers.hs
