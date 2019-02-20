@@ -11,7 +11,6 @@ import           Data.JSON.Fields
 import qualified Data.Text as T
 import           Diffing.Algorithm
 import qualified Data.Map.Strict as Map
-import Control.Abstract as Abstract
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 
 data JsxElement a = JsxElement { jsxOpeningElement :: !a,  jsxElements :: ![a], jsxClosingElement :: !a }
