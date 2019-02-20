@@ -29,7 +29,7 @@ main = do
   (options, task) <- customExecParser (prefs showHelpOnEmpty) arguments
   config <- defaultConfig options
   res <- withTelemetry config $ \ (TelemetryQueues logger statter _) ->
-    Task.runTask (Task.TaskSession config "-" logger statter) task
+    Task.runTask (Task.TaskSession config "-" False logger statter) task
   either (die . displayException) pure res
 
 -- | A parser for the application's command-line arguments.
