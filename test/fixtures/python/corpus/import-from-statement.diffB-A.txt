@@ -11,10 +11,6 @@
     {+(Identifier)+}
     {+(Identifier)+})+})+}
 {+(Import)+}
-{+(Import
-  {+(Alias
-    {+(Identifier)+}
-    {+(Identifier)+})+})+}
 { (Import
   {-(Alias
     {-(Identifier)-}
@@ -23,6 +19,10 @@
   {+(Alias
     {+(Identifier)+}
     {+(Identifier)+})+}) }
+{+(Import
+  {+(Alias
+    {+(Identifier)+}
+    {+(Identifier)+})+})+}
 {-(Import
   {-(Alias
     {-(Identifier)-}
