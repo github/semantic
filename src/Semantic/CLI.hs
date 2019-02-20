@@ -126,8 +126,8 @@ filePathReader :: ReadM File
 filePathReader = eitherReader parseFilePath
   where
     parseFilePath arg = case splitWhen (== ':') arg of
-        [a, b] | Just lang <- readMaybe a -> Right (File a lang)
-               | Just lang <- readMaybe b -> Right (File b lang)
+        [a, b] | Just lang <- readMaybe b -> Right (File a lang)
+               | Just lang <- readMaybe a -> Right (File b lang)
         [path] -> Right (File path (languageForFilePath path))
         args -> Left ("cannot parse `" <> join args <> "`\nexpecting FILE:LANGUAGE or just FILE")
 
