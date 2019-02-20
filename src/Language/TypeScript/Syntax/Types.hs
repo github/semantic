@@ -9,6 +9,7 @@ import           Data.Abstract.Evaluatable as Evaluatable
 import           Data.JSON.Fields
 import qualified Data.Text as T
 import           Diffing.Algorithm
+import qualified Data.Abstract.ScopeGraph as ScopeGraph
 
 -- | Lookup type for a type-level key in a typescript map.
 data LookupType a = LookupType { lookupTypeIdentifier :: a, lookupTypeKey :: a }

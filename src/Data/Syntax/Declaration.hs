@@ -27,10 +27,10 @@ instance Diffable Function where
 -- TODO: How should we represent function types, where applicable?
 
 instance Evaluatable Function where
-  eval _ _ Function{..} = do
+  eval eval _ Function{..} = do
     name <- maybeM (throwNoNameError functionName) (declaredName functionName)
     span <- ask @Span
-    associatedScope <- declareFunction name Default ScopeGraph.Public span
+    associatedScope <- declareFunction name ScopeGraph.Public span ScopeGraph.Function
 
     params <- withScope associatedScope . for functionParameters $ \paramNode -> do
       param <- maybeM (throwNoNameError paramNode) (declaredName paramNode)
@@ -59,7 +59,7 @@ declareFunction name accessControl span kind = do
   currentScope' <- currentScope
   let lexicalEdges = Map.singleton Lexical [ currentScope' ]
   associatedScope <- newScope lexicalEdges
-  declare (Declaration name) relation accessControl span (Just associatedScope)
+  declare (Declaration name) Default accessControl span kind (Just associatedScope)
   pure associatedScope
 
 instance Tokenize Function where
@@ -94,13 +94,14 @@ instance Evaluatable Method where
   eval _ _ Method{..} = do
     name <- maybeM (throwNoNameError methodName) (declaredName methodName)
     span <- ask @Span
-    associatedScope <- declareFunction name Default methodAccessControl span
+    associatedScope <- declareFunction name methodAccessControl span ScopeGraph.Method
 
     params <- withScope associatedScope $ do
-      declare (Declaration __self) Default ScopeGraph.Public emptySpan Nothing
+      -- TODO: Should we give `self` a special Relation?
+      declare (Declaration __self) Prelude ScopeGraph.Public emptySpan ScopeGraph.Unknown Nothing
       for methodParameters $ \paramNode -> do
         param <- maybeM (throwNoNameError paramNode) (declaredName paramNode)
-        param <$ declare (Declaration param) Default ScopeGraph.Public span Nothing
+        param <$ declare (Declaration param) Default ScopeGraph.Public span ScopeGraph.Parameter Nothing
 
     addr <- lookupSlot (Declaration name)
     v <- function name params methodBody associatedScope
@@ -210,7 +211,7 @@ instance Evaluatable PublicFieldDefinition where
     span <- ask @Span
     propertyName <- maybeM (throwNoNameError publicFieldPropertyName) (declaredName publicFieldPropertyName)
 
-    declare (Declaration propertyName) Instance publicFieldAccessControl span Nothing
+    declare (Declaration propertyName) Instance publicFieldAccessControl span ScopeGraph.PublicField Nothing
     slot <- lookupSlot (Declaration propertyName)
     value <- eval publicFieldValue
     assign slot value
@@ -246,13 +247,13 @@ instance Evaluatable Class where
       superclassFrame <- scopedEnvironment =<< deref slot
       pure $ case (scope, superclassFrame) of
         (Just scope, Just frame) -> Just (scope, frame)
-        _ -> Nothing
+        _                        -> Nothing
 
     let superclassEdges = (Superclass, ) . pure . fst <$> catMaybes superScopes
         current = (Lexical, ) <$> pure (pure currentScope')
         edges = Map.fromList (superclassEdges <> current)
     classScope <- newScope edges
-    declare (Declaration name) Default ScopeGraph.Public span (Just classScope)
+    declare (Declaration name) Default ScopeGraph.Public span ScopeGraph.Class (Just classScope)
 
     let frameEdges = Map.singleton Superclass (Map.fromList (catMaybes superScopes))
     classFrame <- newFrame classScope frameEdges
@@ -328,7 +329,7 @@ instance Evaluatable TypeAlias where
     span <- ask @Span
     assocScope <- associatedScope (Declaration kindName)
     -- TODO: Should we consider a special Relation for `TypeAlias`?
-    declare (Declaration name) Default ScopeGraph.Public span assocScope
+    declare (Declaration name) Default ScopeGraph.Public span ScopeGraph.TypeAlias assocScope
 
     slot <- lookupSlot (Declaration name)
     kindSlot <- lookupSlot (Declaration kindName)
