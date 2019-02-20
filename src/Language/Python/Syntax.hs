@@ -123,7 +123,6 @@ instance Evaluatable Import where
     path <- NonEmpty.last <$> resolvePythonModules (RelativeQualifiedName n (Just (qualifiedName (formatName aliasValue' :| []))))
     ((moduleScope, moduleFrame), _) <- require path
 
-    span <- ask @Span
     -- Construct a proxy scope containing an import edge to the imported module's last returned scope.
     importScope <- newScope (Map.singleton ScopeGraph.Import [ moduleScope ])
 

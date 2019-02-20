@@ -27,7 +27,7 @@ instance Diffable Function where
 -- TODO: How should we represent function types, where applicable?
 
 instance Evaluatable Function where
-  eval eval _ Function{..} = do
+  eval _ _ Function{..} = do
     name <- maybeM (throwNoNameError functionName) (declaredName functionName)
     span <- ask @Span
     associatedScope <- declareFunction name ScopeGraph.Public span ScopeGraph.Function
