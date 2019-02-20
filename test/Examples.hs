@@ -17,7 +17,7 @@ import           Data.Quieterm
 import           Data.Typeable (cast)
 import           Data.Void
 import           Parsing.Parser
-import           Semantic.API (TermOutputFormat (..), parseTermBuilder)
+import           Semantic.Api (TermOutputFormat (..), parseTermBuilder)
 import           Semantic.Config (Config (..), Options (..), defaultOptions)
 import qualified Semantic.IO as IO
 import           Semantic.Task
@@ -32,7 +32,7 @@ import           Test.Hspec
 
 main :: IO ()
 main = withOptions opts $ \ config logger statter -> hspec . parallel $ do
-  let args = TaskSession config "-" logger statter
+  let args = TaskSession config "-" False logger statter
 
   runIO setupExampleRepos
 

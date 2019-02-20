@@ -27,6 +27,7 @@ import           Data.Graph.ControlFlowVertex
 import qualified Data.Language as Language
 import           Data.List (uncons)
 import           Data.Project hiding (readFile)
+import           Data.Quieterm (Quieterm, quieterm)
 import           Data.Sum (weaken)
 import           Data.Term
 import qualified Language.Go.Assignment
@@ -44,7 +45,6 @@ import           System.Exit (die)
 import           System.FilePath.Posix (takeDirectory)
 
 import Data.Location
-import Data.Quieterm
 
 -- The type signatures in these functions are pretty gnarly, but these functions
 -- are hit sufficiently often in the CLI and test suite so as to merit avoiding
@@ -583,7 +583,7 @@ type LanguageSyntax lang syntax = ( Language.SLanguage lang
                                   , Apply FreeVariables1 syntax)
 
 evaluateProject proxy parser paths = withOptions debugOptions $ \ config logger statter ->
-  evaluateProject' (TaskSession config "-" logger statter) proxy parser paths
+  evaluateProject' (TaskSession config "-" False logger statter) proxy parser paths
 
 -- Evaluate a project consisting of the listed paths.
 -- TODO: This is used by our specs and should be moved into SpecHelpers.hs
@@ -662,7 +662,6 @@ evaluateProjectForScopeGraph proxy parser project = runTask' $ do
        (raiseHandler (evalState (lowerBound @Span))
        (raiseHandler (runReader (lowerBound @Span))
        (evaluate proxy (runDomainEffects (evalTerm withTermSpans)) modules)))))))
-
 
 evaluateProjectWithCaching :: ( term ~ Term (Sum syntax) Location
                               , qterm ~ Quieterm (Sum syntax) Location

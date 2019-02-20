@@ -56,7 +56,7 @@ import qualified Data.Abstract.Heap as Heap
 import           Data.Abstract.Live
 import           Data.Abstract.Module (ModuleInfo)
 import           Data.Abstract.Name
-import           Data.Abstract.ScopeGraph (Kind(..), Path (..), Relation(..), putDeclarationScopeAtPosition)
+import           Data.Abstract.ScopeGraph (Path (..), Relation(..), putDeclarationScopeAtPosition)
 import qualified Data.Map.Strict as Map
 import           Data.Span (Span, emptySpan)
 import           Prologue
@@ -181,7 +181,7 @@ define :: ( HasCallStack
        -> Evaluator term address value m ()
 define declaration rel accessControl def = withCurrentCallStack callStack $ do
   -- TODO: This span is still wrong.
-  declare declaration rel accessControl emptySpan Unknown Nothing
+  declare declaration rel accessControl emptySpan Nothing
   slot <- lookupSlot declaration
   value <- def
   assign slot value
@@ -203,7 +203,7 @@ withChildFrame :: ( Member (Allocator address) sig
                 -> (address -> Evaluator term address value m a)
                 -> Evaluator term address value m a
 withChildFrame declaration body = do
-  scope <- newPreludeScope mempty
+  scope <- newScope mempty
   putDeclarationScope declaration scope
   frame <- newFrame scope mempty
   withScopeAndFrame frame (body frame)

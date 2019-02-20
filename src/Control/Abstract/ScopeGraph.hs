@@ -5,7 +5,6 @@ module Control.Abstract.ScopeGraph
   , declare
   , reference
   , newScope
-  , newPreludeScope
   , Declaration(..)
   , ScopeGraph
   , ScopeError(..)
@@ -48,7 +47,7 @@ import           Control.Effect.Carrier
 import           Data.Abstract.BaseError
 import           Data.Abstract.Module
 import           Data.Abstract.Name hiding (name)
-import           Data.Abstract.ScopeGraph (Kind, Declaration(..), EdgeLabel, Reference, Relation(..), Scope (..), ScopeGraph, Slot(..), Info(..), AccessControl(..))
+import           Data.Abstract.ScopeGraph (Declaration(..), EdgeLabel, Reference, Relation(..), Scope (..), ScopeGraph, Slot(..), Info(..), AccessControl(..))
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.Span
 import           Prelude hiding (lookup)
@@ -64,20 +63,17 @@ lookup ref = ScopeGraph.scopeOfRef ref <$> get
 declare :: ( Carrier sig m
            , Member (State (ScopeGraph address)) sig
            , Member (Reader (CurrentScope address)) sig
-           , Member (Reader ModuleInfo) sig
            , Ord address
            )
         => Declaration
         -> Relation
         -> AccessControl
         -> Span
-        -> Kind
         -> Maybe address
         -> Evaluator term address value m ()
-declare decl rel accessControl span kind scope = do
+declare decl rel accessControl span scope = do
   currentAddress <- currentScope
-  moduleInfo <- ask @ModuleInfo
-  modify (fst . ScopeGraph.declare decl moduleInfo rel accessControl span kind scope currentAddress)
+  modify (fst . ScopeGraph.declare decl rel accessControl span scope currentAddress)
 
 putDeclarationScope :: ( Ord address
                        , Member (Reader (CurrentScope address)) sig
@@ -105,18 +101,14 @@ reference :: forall address sig m term value .
              ( Ord address
              , Member (State (ScopeGraph address)) sig
              , Member (Reader (CurrentScope address)) sig
-             , Member (Reader ModuleInfo) sig
              , Carrier sig m
              )
           => Reference
-          -> Span
-          -> Kind
           -> Declaration
           -> Evaluator term address value m ()
-reference ref span kind decl = do
+reference ref decl = do
   currentAddress <- currentScope
-  moduleInfo <- ask @ModuleInfo
-  modify @(ScopeGraph address) (ScopeGraph.reference ref moduleInfo span kind decl currentAddress)
+  modify @(ScopeGraph address) (ScopeGraph.reference ref decl currentAddress)
 
 -- | Combinator to insert an export edge from the current scope to the provided scope address.
 insertExportEdge :: (Member (Reader (CurrentScope scopeAddress)) sig, Member (State (ScopeGraph scopeAddress)) sig, Carrier sig m, Ord scopeAddress)
@@ -161,21 +153,6 @@ newScope edges = do
   name <- gensym
   address <- alloc name
   address <$ modify (ScopeGraph.newScope address edges)
-
--- | Inserts a new scope into the scope graph with the given edges.
-newPreludeScope :: ( Member (Allocator address) sig
-            , Member (State (ScopeGraph address)) sig
-            , Member Fresh sig
-            , Carrier sig m
-            , Ord address
-            )
-         => Map EdgeLabel [address]
-         -> Evaluator term address value m address
-newPreludeScope edges = do
-  -- Take the edges and construct a new scope
-  name <- gensym
-  address <- alloc name
-  address <$ modify (ScopeGraph.newPreludeScope address edges)
 
 newtype CurrentScope address = CurrentScope { unCurrentScope :: address }
 
@@ -237,17 +214,14 @@ insertImportReference :: ( Member (Resumable (BaseError (ScopeError address))) s
                         , Ord address
                         )
                       => Reference
-                      -> Span
-                      -> Kind
                       -> Declaration
                       -> address
                       -> Evaluator term address value m ()
-insertImportReference ref span kind decl scopeAddress = do
+insertImportReference ref decl scopeAddress = do
   scopeGraph <- get
   scope <- lookupScope scopeAddress
   currentAddress <- currentScope
-  moduleInfo <- ask @ModuleInfo
-  newScope <- maybeM (throwScopeError ImportReferenceError) (ScopeGraph.insertImportReference ref moduleInfo span kind decl currentAddress scopeGraph scope)
+  newScope <- maybeM (throwScopeError ImportReferenceError) (ScopeGraph.insertImportReference ref decl currentAddress scopeGraph scope)
   insertScope scopeAddress newScope
 
 insertScope :: ( Member (State (ScopeGraph address)) sig

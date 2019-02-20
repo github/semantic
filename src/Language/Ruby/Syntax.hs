@@ -77,8 +77,7 @@ instance Evaluatable Send where
     lhsFrame <- Abstract.scopedEnvironment lhsValue
 
     let callFunction = do
-          span <- ask @Span
-          reference (Reference sel) span ScopeGraph.Call (Declaration sel)
+          reference (Reference sel) (Declaration sel)
           func <- deref =<< lookupSlot (Declaration sel)
           args <- traverse eval sendArgs
           boundFunc <- bindThis lhsValue func
@@ -210,7 +209,7 @@ instance Evaluatable Class where
             current = (Lexical, ) <$> pure (pure currentScope')
             edges = Map.fromList (superclassEdges <> current)
         classScope <- newScope edges
-        declare (Declaration name) Default Public span ScopeGraph.Class (Just classScope)
+        declare (Declaration name) Default Public span (Just classScope)
 
         let frameEdges = Map.singleton Superclass (Map.fromList (catMaybes superScopes))
         childFrame <- newFrame classScope frameEdges
@@ -260,7 +259,7 @@ instance Evaluatable Module where
       Nothing -> do
         let edges = Map.singleton Lexical [ currentScope' ]
         classScope <- newScope edges
-        declare (Declaration name) Default Public span ScopeGraph.Module (Just classScope)
+        declare (Declaration name) Default Public span (Just classScope)
 
         currentFrame' <- currentFrame
         let frameEdges = Map.singleton Lexical (Map.singleton currentScope' currentFrame')
@@ -326,7 +325,7 @@ instance Evaluatable Assignment where
     lhsName <- maybeM (throwNoNameError assignmentTarget) (declaredName assignmentTarget)
     maybeSlot <- maybeLookupDeclaration (Declaration lhsName)
     assignmentSpan <- ask @Span
-    maybe (declare (Declaration lhsName) Default Public assignmentSpan ScopeGraph.Assignment Nothing) (const (pure ())) maybeSlot
+    maybe (declare (Declaration lhsName) Default Public assignmentSpan Nothing) (const (pure ())) maybeSlot
 
     lhs <- ref assignmentTarget
     rhs <- eval assignmentValue

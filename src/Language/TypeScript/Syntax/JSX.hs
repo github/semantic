@@ -78,7 +78,7 @@ instance Evaluatable RequiredParameter where
   eval eval ref RequiredParameter{..} = do
     name <- maybeM (throwNoNameError requiredParameterSubject) (declaredName requiredParameterSubject)
     span <- ask @Span
-    declare (Declaration name) Default Public span ScopeGraph.RequiredParameter Nothing
+    declare (Declaration name) Default Public span Nothing
 
     lhs <- ref requiredParameterSubject
     rhs <- eval requiredParameterValue

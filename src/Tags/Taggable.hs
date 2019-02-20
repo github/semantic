@@ -496,7 +496,6 @@ instance Taggable Java.TryWithResources
 instance Taggable Java.AssertStatement
 instance Taggable Java.AnnotationTypeElement
 
-instance Taggable Python.Alias
 instance Taggable Python.Ellipsis
 instance Taggable Python.FutureImport
 instance Taggable Python.Import

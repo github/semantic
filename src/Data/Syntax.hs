@@ -20,7 +20,6 @@ import Reprinting.Tokenize hiding (Element)
 import qualified Assigning.Assignment as Assignment
 import qualified Data.Error as Error
 import Control.Abstract.ScopeGraph (reference, Reference(..), Declaration(..))
-import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import Control.Abstract.Heap (deref, lookupSlot)
 
 -- Combinators
@@ -123,13 +122,10 @@ newtype Identifier a = Identifier { name :: Name }
 
 
 instance Evaluatable Identifier where
-  eval eval ref' term@(Identifier name) = do
-    -- FIXME: Set the span up correctly in ref so we can move the `reference` call there.
-    span <- ask @Span
-    reference (Reference name) span ScopeGraph.Identifier (Declaration name)
-    deref =<< ref eval ref' term
+  eval eval ref' = ref eval ref' >=> deref
 
   ref _ _ (Identifier name) = do
+    reference (Reference name) (Declaration name)
     lookupSlot (Declaration name)
 
 
@@ -141,7 +137,6 @@ instance FreeVariables1 Identifier where
 
 instance Declarations1 Identifier where
   liftDeclaredName _ (Identifier x) = pure x
-  liftDeclaredAlias _ (Identifier x) = pure x
 
 -- | An accessibility modifier, e.g. private, public, protected, etc.
 newtype AccessibilityModifier a = AccessibilityModifier { contents :: Text }

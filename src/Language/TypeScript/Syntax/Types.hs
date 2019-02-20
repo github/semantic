@@ -9,7 +9,6 @@ import           Data.Abstract.Evaluatable as Evaluatable
 import           Data.JSON.Fields
 import qualified Data.Text as T
 import           Diffing.Algorithm
-import qualified Data.Abstract.ScopeGraph as ScopeGraph
 
 -- | Lookup type for a type-level key in a typescript map.
 data LookupType a = LookupType { lookupTypeIdentifier :: a, lookupTypeKey :: a }
@@ -61,14 +60,12 @@ newtype TypeIdentifier a = TypeIdentifier { contents :: T.Text }
 
 instance Declarations1 TypeIdentifier where
   liftDeclaredName _ (TypeIdentifier identifier) = Just (Evaluatable.name identifier)
-  liftDeclaredAlias _ (TypeIdentifier identifier) = Just (Evaluatable.name identifier)
 
 -- TODO: TypeIdentifier shouldn't evaluate to an address in the heap?
 instance Evaluatable TypeIdentifier where
   eval _ _ TypeIdentifier{..} = do
     -- Add a reference to the type identifier in the current scope.
-    span <- ask @Span
-    reference (Reference (Evaluatable.name contents)) span ScopeGraph.TypeIdentifier (Declaration (Evaluatable.name contents))
+    reference (Reference (Evaluatable.name contents)) (Declaration (Evaluatable.name contents))
     unit
 
 data NestedTypeIdentifier a = NestedTypeIdentifier { left :: !a, right :: !a }

@@ -258,6 +258,9 @@ element = symbol Element *> children expression
 fieldIdentifier :: Assignment Term
 fieldIdentifier = makeTerm <$> symbol FieldIdentifier <*> (Syntax.Identifier . name <$> source)
 
+fieldIdentifier' :: Assignment Name
+fieldIdentifier' = symbol FieldIdentifier *> (name <$> source)
+
 floatLiteral :: Assignment Term
 floatLiteral = makeTerm <$> symbol FloatLiteral <*> (Literal.Float <$> source)
 
@@ -294,6 +297,9 @@ runeLiteral = makeTerm <$> symbol Grammar.RuneLiteral <*> (Go.Syntax.Rune <$> so
 
 typeIdentifier :: Assignment Term
 typeIdentifier = makeTerm <$> symbol TypeIdentifier <*> (Syntax.Identifier . name <$> source)
+
+typeIdentifier' :: Assignment Name
+typeIdentifier' = symbol TypeIdentifier *> (name <$> source)
 
 nil :: Assignment Term
 nil = makeTerm <$> symbol Nil <*> (Literal.Null <$ source)
@@ -344,7 +350,7 @@ pointerType :: Assignment Term
 pointerType = makeTerm <$> symbol PointerType <*> children (Type.Pointer <$> expression)
 
 qualifiedType :: Assignment Term
-qualifiedType = makeTerm <$> symbol QualifiedType <*> children (Expression.MemberAccess <$> expression <*> typeIdentifier)
+qualifiedType = makeTerm <$> symbol QualifiedType <*> children (Expression.MemberAccess <$> expression <*> typeIdentifier')
 
 sliceType :: Assignment Term
 sliceType = makeTerm <$> symbol SliceType <*> children (Type.Slice <$> expression)
@@ -488,7 +494,7 @@ parenthesizedExpression :: Assignment Term
 parenthesizedExpression = symbol ParenthesizedExpression *> children expressions
 
 selectorExpression :: Assignment Term
-selectorExpression = makeWithContext <$> symbol SelectorExpression <*> children ((,,) <$> expression <*> optional comment <*> fieldIdentifier)
+selectorExpression = makeWithContext <$> symbol SelectorExpression <*> children ((,,) <$> expression <*> optional comment <*> fieldIdentifier')
   where makeWithContext loc (lhs, comment, rhs) = maybe (makeTerm loc (Expression.MemberAccess lhs rhs)) (\c -> makeTerm loc (Syntax.Context (c :| []) (makeTerm loc (Expression.MemberAccess lhs rhs)))) comment
 
 sliceExpression :: Assignment Term
