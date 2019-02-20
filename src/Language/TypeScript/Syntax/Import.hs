@@ -12,6 +12,8 @@ import           Data.JSON.Fields
 import           Diffing.Algorithm
 import           Language.TypeScript.Resolution
 import Data.Span (emptySpan)
+import qualified Data.Map.Strict as Map
+import Data.Aeson (ToJSON)
 
 data Import a = Import { importSymbols :: ![Alias], importFrom :: ImportPath }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, Ord, Show, ToJSONFields1, Traversable)

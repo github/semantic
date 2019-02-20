@@ -13,6 +13,7 @@ import           Data.Semigroup.App
 import           Data.Semigroup.Foldable
 import qualified Data.Text as T
 import           Diffing.Algorithm
+import qualified Data.Abstract.ScopeGraph as ScopeGraph
 
 -- | ShorthandPropertyIdentifier used in object patterns such as var baz = { foo } to mean var baz = { foo: foo }
 newtype ShorthandPropertyIdentifier a = ShorthandPropertyIdentifier { contents :: T.Text }

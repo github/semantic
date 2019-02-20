@@ -335,6 +335,7 @@ instance AccessControls1 Java.TryWithResources
 instance AccessControls1 Java.AssertStatement
 instance AccessControls1 Java.AnnotationTypeElement
 
+instance AccessControls1 Python.Alias
 instance AccessControls1 Python.Ellipsis
 instance AccessControls1 Python.FutureImport
 instance AccessControls1 Python.Import
