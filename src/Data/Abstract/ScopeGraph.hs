@@ -66,7 +66,7 @@ data Slot address = Slot { frameAddress :: address, position :: Position }
 data AccessControl = Public
                    | Protected
                    | Private
-                   deriving (Bounded, Enum, Eq, Proto.Finite, Generic, Hashable, ToJSON, Proto.MessageField, Proto.Named, NFData, Show)
+                   deriving (Bounded, Enum, Eq, Proto.Finite, Generic, Hashable, ToJSON, NFData, Show)
 
 instance ToJSONFields AccessControl where
   toJSONFields accessControl = ["accessControl" .= accessControl]
