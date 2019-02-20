@@ -223,7 +223,6 @@ language_extensions:
   - DeriveFunctor
   - DeriveGeneric
   - DeriveTraversable
-  - DerivingStrategies
   - DerivingVia
   - ExplicitNamespaces
   - FlexibleContexts
