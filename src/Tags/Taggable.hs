@@ -43,7 +43,6 @@ import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
-
 import qualified Language.Go.Syntax as Go
 import qualified Language.Go.Type as Go
 import qualified Language.Haskell.Syntax as Haskell
@@ -54,10 +53,9 @@ import qualified Language.Python.Syntax as Python
 import qualified Language.Ruby.Syntax as Ruby
 import qualified Language.TypeScript.Syntax as TypeScript
 
-subtractLocation :: Location -> Location -> Range
-subtractLocation a b = subtractRange (locationByteRange a) (locationByteRange b)
 
--- TODO: Move to src/Data
+
+ -- TODO: Move to src/Data
 data Token
   = Enter { tokenName :: Text, tokenSnippetRange :: Maybe Range }
   | Exit  { tokenName :: Text, tokenSnippetRange :: Maybe Range}
@@ -142,6 +140,9 @@ descend lang t@(In loc _) = do
   maybe (pure ()) (emitIden (locationSpan loc) litRange) (symbolName term)
   traverse_ subtermRef t
   exit (constructorName term) snippetRange
+
+subtractLocation :: Location -> Location -> Range
+subtractLocation a b = subtractRange (locationByteRange a) (locationByteRange b)
 
 -- Instances
 
