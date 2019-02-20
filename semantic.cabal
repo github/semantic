@@ -1,3 +1,4 @@
+cabal-version:       2.2
 name:                semantic
 version:             0.5.0
 synopsis:            Framework and service for analyzing and diffing untrusted code.
@@ -5,17 +6,65 @@ description:         Please see README.md
 homepage:            http://github.com/github/semantic#readme
 author:              Rob Rix, Josh Vera
 maintainer:          rob.rix@github.com
-copyright:           2016 GitHub
+copyright:           (c) 2016-2019 GitHub, Inc.
 category:            Web
 build-type:          Simple
--- extra-source-files:
-cabal-version:       >=1.10
+stability:           alpha
 
 flag release
   description: Build with optimizations on (for CI or deployment builds)
   default:     False
 
+-- GHC extensions shared between targets
+common haskell
+  default-language:    Haskell2010
+  default-extensions:  DataKinds
+                     , DeriveFoldable
+                     , DeriveFunctor
+                     , DeriveGeneric
+                     , DeriveTraversable
+                     , FlexibleContexts
+                     , FlexibleInstances
+                     , MonadFailDesugaring
+                     , MultiParamTypeClasses
+                     , OverloadedStrings
+                     , RecordWildCards
+                     , StandaloneDeriving
+                     , StrictData
+                     , TypeApplications
+
+common dependencies
+  build-depends:       base >= 4.8 && < 5
+                     , aeson
+                     , algebraic-graphs
+                     , async
+                     , bifunctors
+                     , bytestring
+                     , containers
+                     , directory
+                     , fastsum
+                     , filepath
+                     , free
+                     , fused-effects
+                     , Glob
+                     , hashable
+                     , haskell-tree-sitter
+                     , machines
+                     , mtl
+                     , network
+                     , recursion-schemes
+                     , scientific
+                     , semilattices
+                     , text
+                     , these
+                     , proto3-suite
+                     , proto3-wire
+
+common executable-flags
+  ghc-options:         -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m"
+
 library
+  import:              haskell, dependencies
   hs-source-dirs:      src
   exposed-modules:
                      -- Analyses & term annotations
@@ -219,30 +268,17 @@ library
                      -- Custom Prelude
                      , Prologue
   build-depends:       base >= 4.8 && < 5
-                     , aeson
-                     , algebraic-graphs
                      , ansi-terminal
                      , array
-                     , async
                      , attoparsec
-                     , bifunctors
-                     , bytestring
                      , cmark-gfm
-                     , containers
                      , cryptohash
                      , deepseq
-                     , directory
                      , directory-tree
-                     , fastsum
-                     , filepath
-                     , free
                      , freer-cofreer
-                     , fused-effects
                      , generic-monoid
                      , ghc-prim
                      , gitrev
-                     , Glob
-                     , hashable
                      , haskeline
                      , hostname
                      , hscolour
@@ -251,10 +287,7 @@ library
                      , http-types
                      , http-media
                      , kdt
-                     , machines
                      , mersenne-random-pure64
-                     , mtl
-                     , network
                      , network-uri
                      , optparse-applicative
                      , parallel
@@ -262,23 +295,16 @@ library
                      , prettyprinter
                      , pretty-show
                      , profunctors
-                     , recursion-schemes
                      , reducers
-                     , scientific
                      , semigroupoids
-                     , semilattices
                      , servant
                      , split
                      , stm-chans
                      , template-haskell
-                     , text >= 1.2.1.3
-                     , these
                      , time
                      , unix
                      , unordered-containers
                      , vector
-                     , proto3-suite
-                     , proto3-wire
                      , haskell-tree-sitter
                      , tree-sitter-go
                      , tree-sitter-haskell
@@ -288,42 +314,26 @@ library
                      , tree-sitter-ruby
                      , tree-sitter-typescript
                      , tree-sitter-java
-  default-language:    Haskell2010
-  default-extensions:  DataKinds
-                     , DeriveFoldable
-                     , DeriveFunctor
-                     , DeriveGeneric
-                     , DeriveTraversable
-                     , FlexibleContexts
-                     , FlexibleInstances
-                     , MonadFailDesugaring
-                     , MultiParamTypeClasses
-                     , OverloadedStrings
-                     , RecordWildCards
-                     , StandaloneDeriving
-                     , StrictData
-                     , TypeApplications
+  ghc-options:         -Wall -Wmissing-export-lists -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -fno-warn-name-shadowing -j
   if flag(release)
-    ghc-options:       -Wall -Werror -Wmissing-export-lists -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -fno-warn-name-shadowing -O1 -j -DCOMPUTE_GIT_SHA
+    ghc-options:       -Werror -O1 -DCOMPUTE_GIT_SHA
   else
-    ghc-options:       -Wall -Wmissing-export-lists -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -fno-warn-name-shadowing -O0 -j +RTS -A128m -n2m -RTS
+    ghc-options:       -O0 +RTS -A128m -n2m -RTS
   ghc-prof-options:    -fprof-auto
 
 executable semantic
+  import:              haskell, dependencies, executable-flags
   hs-source-dirs:      app
   main-is:             Main.hs
   if flag(release)
-    ghc-options:       -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m" -static -j -O1 -DCOMPUTE_GIT_SHA
+    ghc-options:       -O1 -DCOMPUTE_GIT_SHA
   else
-    ghc-options:       -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m" -j -O0 -dynamic
-  cc-options:          -DU_STATIC_IMPLEMENTATION=1
-  cpp-options:         -DU_STATIC_IMPLEMENTATION=1
+    ghc-options:       -O0 -dynamic
   build-depends:       base
                      , semantic
-  default-language:    Haskell2010
-  default-extensions:  FlexibleInstances, OverloadedStrings, RecordWildCards
 
 test-suite test
+  import:              haskell, dependencies, executable-flags
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
@@ -364,82 +374,33 @@ test-suite test
                      , Tags.Spec
                      , SpecHelpers
                      , Test.Hspec.LeanCheck
-  build-depends:       aeson
-                     , algebraic-graphs
-                     , async
-                     , base
-                     , bifunctors
-                     , bytestring
-                     , containers
-                     , fastsum
-                     , filepath
-                     , free
-                     , fused-effects
-                     , Glob
-                     , hashable
-                     , haskell-tree-sitter
+  build-depends:       semantic
                      , hspec >= 2.4.1
                      , hspec-core
                      , hspec-expectations-pretty-diff
                      , HUnit
                      , leancheck
-                     , machines
-                     , mtl
-                     , network
-                     , proto3-suite
-                     , proto3-wire
-                     , recursion-schemes >= 4.1
-                     , semilattices
-                     , semantic
-                     , scientific
-                     , text >= 1.2.1.3
-                     , these
+  ghc-options:         -O0
   if flag(release)
-    ghc-options:       -threaded -rtsopts -with-rtsopts=-N -j -O0
-  else
-    ghc-options:       -threaded -rtsopts -with-rtsopts=-N -j -O0 -dynamic
-  default-language:    Haskell2010
-  default-extensions:  DataKinds
-                     , DeriveFunctor
-                     , DeriveGeneric
-                     , FlexibleContexts
-                     , FlexibleInstances
-                     , MonadFailDesugaring
-                     , MultiParamTypeClasses
-                     , OverloadedStrings
-                     , RecordWildCards
-                     , StandaloneDeriving
-                     , TypeApplications
+    ghc-options:       -dynamic
 
 test-suite parse-examples
+  import:              haskell, dependencies
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Examples.hs
-  default-language:    Haskell2010
-  ghc-options:         -threaded -rtsopts -with-rtsopts=-N -j
-  build-depends:       base
-                     , bytestring
-                     , directory
-                     , fastsum
-                     , filepath
-                     , fused-effects
-                     , Glob
+  build-depends:       semantic
                      , hspec >= 2.4.1
                      , hspec-core
                      , hspec-expectations-pretty-diff
                      , process
-                     , semantic
-  default-extensions:  RecordWildCards
-                     , FlexibleContexts
 
 benchmark evaluation
+  import:              haskell, executable-flags
   hs-source-dirs:      bench/evaluation
   type:                exitcode-stdio-1.0
   main-is:             Main.hs
-  ghc-options:         -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m -T" -static -j -O1
-  cc-options:          -DU_STATIC_IMPLEMENTATION=1
-  cpp-options:         -DU_STATIC_IMPLEMENTATION=1
-  default-language:    Haskell2010
+  ghc-options:         -static -O1
   build-depends:       base
                      , criterion
                      , semantic
