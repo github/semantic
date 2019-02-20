@@ -48,6 +48,7 @@
 - ignore: {name: Use ., within: [Analysis.Abstract.Graph.graphingModules]}
 
 - ignore: {name: Reduce duplication, within: [Semantic.Util]}
+- ignore: {name: Use newtype instead of data, within: [Semantic.Api.V1.CodeAnalysisPB]}
 
 # Our customized warnings
 

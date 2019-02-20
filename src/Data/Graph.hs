@@ -24,6 +24,7 @@ import           Control.Effect
 import           Control.Effect.State
 import           Data.Aeson
 import qualified Data.Set as Set
+import Semantic.Api.V1.CodeAnalysisPB
 
 -- | An algebraic graph with 'Ord', 'Semigroup', and 'Monoid' instances.
 newtype Graph vertex = Graph { unGraph :: G.Graph vertex }
@@ -99,6 +100,9 @@ instance Ord vertex => Ord (Graph vertex) where
 
 class VertexTag vertex where
   uniqueTag :: vertex -> Int
+
+instance VertexTag DiffTreeVertex where uniqueTag = fromIntegral . diffVertexId
+instance VertexTag TermVertex where uniqueTag = fromIntegral . vertexId
 
 instance (Ord vertex, ToJSON vertex, VertexTag vertex) => ToJSON (Graph vertex) where
   toJSON     (Graph graph) = object ["vertices" .= G.vertexList graph,   "edges" .= (Edge <$> G.edgeList graph)]

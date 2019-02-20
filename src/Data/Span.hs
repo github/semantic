@@ -19,6 +19,7 @@ import Prologue
 import           Control.Lens.Lens
 import           Data.Aeson ((.:), (.=))
 import qualified Data.Aeson as A
+import           Proto3.Suite
 
 import Data.JSON.Fields
 
@@ -36,7 +37,7 @@ column = lens posColumn (\p l -> p { posColumn = l })
 data Span = Span
   { spanStart :: Pos
   , spanEnd   :: Pos
-  } deriving (Eq, Ord, Generic, Hashable, NFData)
+  } deriving (Eq, Ord, Generic, Hashable, Named, NFData)
 
 -- | "Classy-fields" interface for data types that have spans.
 class HasSpan a where

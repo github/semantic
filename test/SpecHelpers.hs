@@ -51,7 +51,7 @@ import Data.List.NonEmpty as X (NonEmpty(..))
 import Data.Range as X
 import Data.Semilattice.Lower as X
 import Data.Source as X
-import Data.Span as X hiding (start, end)
+import Data.Span as X hiding (HasSpan(..))
 import Data.String
 import Data.Sum
 import Data.Term as X
@@ -82,7 +82,7 @@ import Data.Set (Set)
 import qualified Semantic.IO as IO
 import Semantic.Config (Config(..), optionsLogLevel)
 import Semantic.Telemetry (LogQueue, StatQueue)
-import Semantic.API hiding (File, Blob, BlobPair)
+import Semantic.Api hiding (File, Blob, BlobPair)
 import System.Exit (die)
 import Control.Exception (displayException)
 
@@ -112,7 +112,7 @@ parseTestFile parser path = runTaskOrDie $ do
   term <- parse parser blob
   pure (blob, term)
 
--- Run a Task and call `die` if it returns an Exception.  
+-- Run a Task and call `die` if it returns an Exception.
 runTaskOrDie :: TaskEff a -> IO a
 runTaskOrDie task = runTaskWithOptions defaultOptions { optionsLogLevel = Nothing } task >>= either (die . displayException) pure
 

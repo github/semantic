@@ -13,7 +13,6 @@ import           Data.JSON.Fields
 import qualified Data.Map.Strict as Map
 import           Diffing.Algorithm
 import           Language.TypeScript.Resolution
-import Data.Span (emptySpan)
 
 data Import a = Import { importSymbols :: ![Alias], importFrom :: ImportPath }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, Ord, Show, ToJSONFields1, Traversable)
@@ -36,9 +35,7 @@ instance Evaluatable Import where
       -- Insert import references into the import scope starting from the perspective of the import scope.
       withScopeAndFrame moduleFrame $ do
         for_ symbols $ \Alias{..} ->
-          -- TODO: Need an easier way to get the span of an Alias. It's difficult because we no longer have a term.
-          -- Even if we had one we'd have to evaluate it at the moment.
-          insertImportReference (Reference aliasName) emptySpan ScopeGraph.Identifier (Declaration aliasValue) scopeAddress
+          insertImportReference (Reference aliasName) (Declaration aliasValue) scopeAddress
 
       -- Create edges from the current scope/frame to the import scope/frame.
       insertImportEdge scopeAddress
@@ -60,7 +57,7 @@ instance Evaluatable QualifiedAliasedImport where
     aliasFrame <- newFrame importScope (Map.singleton ScopeGraph.Import scopeMap)
 
     alias <- maybeM (throwNoNameError aliasTerm) (declaredName aliasTerm)
-    declare (Declaration alias) Default Public span ScopeGraph.QualifiedAliasedImport (Just importScope)
+    declare (Declaration alias) Default Public span (Just importScope)
     aliasSlot <- lookupSlot (Declaration alias)
     assign aliasSlot =<< object aliasFrame
 
@@ -90,8 +87,7 @@ instance Evaluatable QualifiedExport where
     insertExportEdge exportScope -- Create an export edge from the current scope to the export scope
     withScope exportScope .
       for_ exportSymbols $ \Alias{..} -> do
-        -- TODO: Replace Alias in QualifedExport with terms and use a real span
-        reference (Reference aliasName) emptySpan ScopeGraph.Identifier (Declaration aliasValue)
+        reference (Reference aliasName) (Declaration aliasValue)
 
     -- Create an export edge from a new scope to the qualifed export's scope.
     unit
@@ -117,8 +113,7 @@ instance Evaluatable QualifiedExportFrom where
 
     withScopeAndFrame moduleFrame .
       for_ exportSymbols $ \Alias{..} -> do
-        -- TODO: Replace Alias with terms in QualifiedExportFrom and use a real span below.
-        insertImportReference (Reference aliasName) emptySpan ScopeGraph.Identifier (Declaration aliasValue) exportScope
+        insertImportReference (Reference aliasName) (Declaration aliasValue) exportScope
 
     insertExportEdge exportScope
     insertFrameLink ScopeGraph.Export (Map.singleton exportScope exportFrame)
@@ -139,7 +134,7 @@ instance Evaluatable DefaultExport where
         withScopeAndFrame exportFrame $ do
           valueRef <- eval term
           let declaration = Declaration $ Name.name "__default"
-          declare declaration Default Public exportSpan ScopeGraph.DefaultExport Nothing
+          declare declaration Default Public exportSpan Nothing
           defaultSlot <- lookupSlot declaration
           assign defaultSlot valueRef
 
