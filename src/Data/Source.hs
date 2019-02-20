@@ -39,9 +39,6 @@ import           Data.String (IsString (..))
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
 
-import Data.Range
-import Data.Span hiding (HasSpan (..))
-
 
 -- | The contents of a source file. This is represented as a UTF-8
 -- 'ByteString' under the hood. Construct these with 'fromUTF8'; obviously,

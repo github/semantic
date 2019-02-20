@@ -25,17 +25,18 @@
 {+(Equal
   {+(Identifier)+}
   {+(Identifier)+})+}
-  (Not
-  { (Equal
-    {-(Identifier)-}
-    {-(Identifier)-})
-  ->(Member
+{+(Not
+  {+(Member
     {+(Identifier)+}
-    {+(Identifier)+}) })
+    {+(Identifier)+})+})+}
 {+(Not
   {+(Equal
     {+(Identifier)+}
     {+(Identifier)+})+})+}
+{-(Not
+  {-(Equal
+    {-(Identifier)-}
+    {-(Identifier)-})-})-}
 {-(Not
   {-(Member
     {-(Identifier)-}
