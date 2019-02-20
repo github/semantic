@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DerivingStrategies, DerivingVia, DuplicateRecordFields #-}
+{-# LANGUAGE DeriveAnyClass, DerivingVia, DuplicateRecordFields #-}
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Language.TypeScript.Syntax.Import where
 
