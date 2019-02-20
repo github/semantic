@@ -54,45 +54,47 @@ instance Exception Quit
 
 rubyREPL = repl (Proxy @'Language.Ruby) rubyParser
 
-repl proxy parser paths = defaultConfig debugOptions >>= \ config -> runM . runDistribute . runResource (runM . runDistribute) . runTimeout (runM . runDistribute . runResource (runM . runDistribute)) . runError @_ @_ @SomeException . runTelemetryIgnoringStat (logOptionsFromConfig config) . runTraceInTelemetry . runReader config . Files.runFiles . runResolution . runTaskF $ do
-  blobs <- catMaybes <$> traverse readBlobFromFile (flip File (Language.reflect proxy) <$> paths)
-  package <- fmap (fmap quieterm) <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs (Language.reflect proxy) [])
-  modules <- topologicalSort <$> runImportGraphToModules proxy (snd <$> package)
-  homeDir <- liftIO getHomeDirectory
-  prefs <- liftIO (readPrefs (homeDir <> "/.haskeline"))
-  let settingsDir = homeDir <> "/.local/semantic"
-  liftIO $ createDirectoryIfMissing True settingsDir
-  let settings = Settings
-        { complete = noCompletion
-        , historyFile = Just (settingsDir <> "/repl_history")
-        , autoAddHistory = True
-        }
-  runEvaluator
-    . runREPL prefs settings
-    . fmap snd
-    . runState ([] @Breakpoint)
-    . runReader Step
-    . runEvaluator
-    . id @(Evaluator _ Precise (Value _ Precise) _ _)
-    . raiseHandler runTraceByPrinting
-    . runHeap
-    . runScopeGraph
-    . raiseHandler runFresh
-    . fmap reassociate
-    . runLoadError
-    . runUnspecialized
-    . runScopeError
-    . runHeapError
-    . runEvalError
-    . runResolutionError
-    . runAddressError
-    . runValueError
-    . runModuleTable
-    . runModules (ModuleTable.modulePaths (packageModules (snd <$> package)))
-    . raiseHandler (runReader (packageInfo package))
-    . raiseHandler (runState (lowerBound @Span))
-    . raiseHandler (runReader (lowerBound @Span))
-    $ evaluate proxy (runDomainEffects (evalTerm (withTermSpans . step (fmap moduleBody <$> ModuleTable.toPairs (packageModules (fst <$> package)))))) modules
+repl proxy parser paths =
+  withOptions debugOptions $ \config logger statter ->
+    runM . runDistribute . runResource (runM . runDistribute) . runTimeout (runM . runDistribute . runResource (runM . runDistribute)) . runError @_ @_ @SomeException . runTelemetryIgnoringStat (logOptionsFromConfig config) . runTraceInTelemetry . runReader (TaskSession config "-" False logger statter) . Files.runFiles . runResolution . runTaskF $ do
+      blobs <- catMaybes <$> traverse readBlobFromFile (flip File (Language.reflect proxy) <$> paths)
+      package <- fmap (fmap quieterm) <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs (Language.reflect proxy) [])
+      modules <- topologicalSort <$> runImportGraphToModules proxy (snd <$> package)
+      homeDir <- liftIO getHomeDirectory
+      prefs <- liftIO (readPrefs (homeDir <> "/.haskeline"))
+      let settingsDir = homeDir <> "/.local/semantic"
+      liftIO $ createDirectoryIfMissing True settingsDir
+      let settings = Settings
+            { complete = noCompletion
+            , historyFile = Just (settingsDir <> "/repl_history")
+            , autoAddHistory = True
+            }
+      runEvaluator
+        . runREPL prefs settings
+        . fmap snd
+        . runState ([] @Breakpoint)
+        . runReader Step
+        . runEvaluator
+        . id @(Evaluator _ Precise (Value _ Precise) _ _)
+        . raiseHandler runTraceByPrinting
+        . runHeap
+        . runScopeGraph
+        . raiseHandler runFresh
+        . fmap reassociate
+        . runLoadError
+        . runUnspecialized
+        . runScopeError
+        . runHeapError
+        . runEvalError
+        . runResolutionError
+        . runAddressError
+        . runValueError
+        . runModuleTable
+        . runModules (ModuleTable.modulePaths (packageModules (snd <$> package)))
+        . raiseHandler (runReader (packageInfo package))
+        . raiseHandler (runState (lowerBound @Span))
+        . raiseHandler (runReader (lowerBound @Span))
+        $ evaluate proxy (runDomainEffects (evalTerm (withTermSpans . step (fmap moduleBody <$> ModuleTable.toPairs (packageModules (fst <$> package)))))) modules
 
 -- TODO: REPL for typechecking/abstract semantics
 -- TODO: drive the flow from within the REPL instead of from without
