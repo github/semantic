@@ -3,11 +3,12 @@ module Semantic.CLI (main) where
 
 import           Control.Exception as Exc (displayException)
 import           Data.File
-import           Data.Language (languageForFilePath)
+import           Data.Handle
+import           Data.Language (languageForFilePath, parseLanguage)
 import           Data.List (intercalate, uncons)
 import           Data.List.Split (splitWhen)
-import           Data.Handle
 import           Data.Project
+import qualified Data.Text as T
 import           Options.Applicative hiding (style)
 import           Prologue
 import           Semantic.Api hiding (File)
@@ -15,14 +16,13 @@ import qualified Semantic.AST as AST
 import           Semantic.Config
 import qualified Semantic.Graph as Graph
 import qualified Semantic.Task as Task
-import qualified Semantic.Telemetry.Log as Log
 import           Semantic.Task.Files
 import           Semantic.Telemetry
+import qualified Semantic.Telemetry.Log as Log
 import           Semantic.Version
+import           Serializing.Format hiding (Options)
 import           System.Exit (die)
 import           System.FilePath
-import           Serializing.Format hiding (Options)
-import           Text.Read
 
 main :: IO ()
 main = do
@@ -126,8 +126,8 @@ filePathReader :: ReadM File
 filePathReader = eitherReader parseFilePath
   where
     parseFilePath arg = case splitWhen (== ':') arg of
-        [a, b] | Just lang <- readMaybe b -> Right (File a lang)
-               | Just lang <- readMaybe a -> Right (File b lang)
+        [a, b] | Just lang <- parseLanguage (T.pack b) -> Right (File a lang)
+               | Just lang <- parseLanguage (T.pack a) -> Right (File b lang)
         [path] -> Right (File path (languageForFilePath path))
         args -> Left ("cannot parse `" <> join args <> "`\nexpecting FILE:LANGUAGE or just FILE")
 
