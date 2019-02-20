@@ -129,7 +129,7 @@ filePathReader = eitherReader parseFilePath
         [a, b] | Just lang <- parseLanguage (T.pack b) -> Right (File a lang)
                | Just lang <- parseLanguage (T.pack a) -> Right (File b lang)
         [path] -> Right (File path (languageForFilePath path))
-        args -> Left ("cannot parse `" <> join args <> "`\nexpecting FILE:LANGUAGE or just FILE")
+        args -> Left ("cannot parse `" <> arg <> "`\nexpecting FILE:LANGUAGE or just FILE")
 
 options :: Eq a => [(String, a)] -> Mod OptionFields a -> Parser a
 options options fields = option (optionsReader options) (fields <> showDefaultWith (findOption options) <> metavar (intercalate "|" (fmap fst options)))
