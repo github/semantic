@@ -40,7 +40,7 @@ import Test.Hspec
 main :: IO ()
 main = do
   withOptions defaultOptions { optionsLogLevel = Nothing } $ \ config logger statter -> hspec $ do
-    let args = TaskSession config "-" logger statter
+    let args = TaskSession config "-" False logger statter
     describe "Semantic.Stat" Semantic.Stat.Spec.spec
     parallel $ do
       describe "Analysis.Go" (Analysis.Go.Spec.spec args)
