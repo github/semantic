@@ -21,6 +21,7 @@ import qualified Assigning.Assignment as Assignment
 import qualified Data.Error as Error
 import Control.Abstract.ScopeGraph (reference, Reference(..), Declaration(..))
 import Control.Abstract.Heap (deref, lookupSlot)
+import qualified Data.Abstract.ScopeGraph as ScopeGraph
 
 -- Combinators
 

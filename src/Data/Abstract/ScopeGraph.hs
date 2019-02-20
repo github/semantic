@@ -53,10 +53,7 @@ import Data.Abstract.Module
 import Data.JSON.Fields
 import Data.Abstract.Name
 import Proto3.Suite as Proto hiding (Path)
-import Proto3.Wire.Encode as Encode
-import Proto3.Wire.Decode as Decode
 
-import Prologue
 
 -- A slot is a location in the heap where a value is stored.
 data Slot address = Slot { frameAddress :: address, position :: Position }

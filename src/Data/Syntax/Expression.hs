@@ -18,6 +18,7 @@ import qualified Data.Reprinting.Scope as Scope
 import qualified Data.Reprinting.Token as Token
 import           Diffing.Algorithm hiding (Delete)
 import           Reprinting.Tokenize hiding (Superclass)
+import qualified Data.Abstract.ScopeGraph as ScopeGraph
 
 -- | Typical prefix function application, like `f(x)` in many languages, or `f x` in Haskell.
 data Call a = Call { callContext :: ![a], callFunction :: !a, callParams :: ![a], callBlock :: !a }
