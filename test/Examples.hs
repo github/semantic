@@ -32,7 +32,7 @@ import           Test.Hspec
 
 main :: IO ()
 main = withOptions opts $ \ config logger statter -> hspec . parallel $ do
-  let args = TaskSession config "-" logger statter
+  let args = TaskSession config "-" False logger statter
 
   runIO setupExampleRepos
 
