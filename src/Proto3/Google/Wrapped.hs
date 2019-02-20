@@ -14,7 +14,7 @@ import Proto3.Suite
 -- a separate data type for each of these wrappers: we just need to declare 'Named' instances for each instance
 -- for which we want to link the Google-named wrapped types.
 newtype Wrapped a = Wrapped { value :: a }
-  deriving (Eq, Show, Generic, NFData)
+  deriving (Eq, Show, Ord, Generic, NFData)
 
 instance Named (Wrapped Text) where nameOf _ = "StringValue"
 instance Named (Wrapped ByteString) where nameOf _ = "BytesValue"
