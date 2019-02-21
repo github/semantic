@@ -1,18 +1,27 @@
 {
-  "changes":
+  "files": [
   {
-    "test/fixtures/ruby/corpus/method-declaration.A.rb -> test/fixtures/ruby/corpus/method-declaration.B.rb": [
+    "path": "test/fixtures/ruby/corpus/method-declaration.A.rb -> test/fixtures/ruby/corpus/method-declaration.B.rb",
+    "changes": [
     {
       "span":
       {
-        "start": [1, 1],
-        "end": [3, 4]
+        "start":
+        {
+          "line": 1,
+          "column": 1
+        },
+        "end":
+        {
+          "line": 3,
+          "column": 4
+        }
       },
       "category": "Method",
       "term": "bar",
-      "changeType": "modified"
-    }]
-  },
-  "errors":
-  {}
+      "changeType": "Modified"
+    }],
+    "language": "Ruby",
+    "errors": []
+  }]
 }

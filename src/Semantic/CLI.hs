@@ -3,11 +3,12 @@ module Semantic.CLI (main) where
 
 import           Control.Exception as Exc (displayException)
 import           Data.File
-import           Data.Language (languageForFilePath)
+import           Data.Handle
+import           Data.Language (languageForFilePath, parseLanguage)
 import           Data.List (intercalate, uncons)
 import           Data.List.Split (splitWhen)
-import           Data.Handle
 import           Data.Project
+import qualified Data.Text as T
 import           Options.Applicative hiding (style)
 import           Prologue
 import           Semantic.Api hiding (File)
@@ -15,14 +16,13 @@ import qualified Semantic.AST as AST
 import           Semantic.Config
 import qualified Semantic.Graph as Graph
 import qualified Semantic.Task as Task
-import qualified Semantic.Telemetry.Log as Log
 import           Semantic.Task.Files
 import           Semantic.Telemetry
+import qualified Semantic.Telemetry.Log as Log
 import           Semantic.Version
+import           Serializing.Format hiding (Options)
 import           System.Exit (die)
 import           System.FilePath
-import           Serializing.Format hiding (Options)
-import           Text.Read
 
 main :: IO ()
 main = do
@@ -60,12 +60,12 @@ diffCommand :: Mod CommandFields (Task.TaskEff Builder)
 diffCommand = command "diff" (info diffArgumentsParser (progDesc "Compute changes between paths"))
   where
     diffArgumentsParser = do
-      renderer <- flag  (parseDiffBuilder DiffSExpression) (parseDiffBuilder DiffSExpression)   (long "sexpression" <> help "Output s-expression diff tree (default)")
-              <|> flag'                                    (parseDiffBuilder DiffJSONTree)  (long "json"        <> help "Output JSON diff trees")
-              <|> flag'                                    (parseDiffBuilder DiffJSONGraph) (long "json-graph"  <> help "Output JSON diff trees")
-              <|> flag'                                    (diffSummaryBuilder JSON)        (long "toc"         <> help "Output JSON table of contents diff summary")
-              <|> flag'                                    (parseDiffBuilder DiffDotGraph)  (long "dot"         <> help "Output the diff as a DOT graph")
-              <|> flag'                                    (parseDiffBuilder DiffShow)      (long "show"        <> help "Output using the Show instance (debug only, format subject to change without notice)")
+      renderer <- flag  (parseDiffBuilder DiffSExpression) (parseDiffBuilder DiffSExpression) (long "sexpression" <> help "Output s-expression diff tree (default)")
+              <|> flag'                                    (parseDiffBuilder DiffJSONTree)    (long "json"        <> help "Output JSON diff trees")
+              <|> flag'                                    (parseDiffBuilder DiffJSONGraph)   (long "json-graph"  <> help "Output JSON diff trees")
+              <|> flag'                                    (diffSummaryBuilder JSON)          (long "toc"         <> help "Output JSON table of contents diff summary")
+              <|> flag'                                    (parseDiffBuilder DiffDotGraph)    (long "dot"         <> help "Output the diff as a DOT graph")
+              <|> flag'                                    (parseDiffBuilder DiffShow)        (long "show"        <> help "Output using the Show instance (debug only, format subject to change without notice)")
       filesOrStdin <- Right <$> some (Both <$> argument filePathReader (metavar "FILE_A") <*> argument filePathReader (metavar "FILE_B")) <|> pure (Left stdin)
       pure $ Task.readBlobPairs filesOrStdin >>= renderer
 
@@ -77,9 +77,9 @@ parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate pa
               <|> flag'                                    (parseTermBuilder TermJSONTree)    (long "json"        <> help "Output JSON parse trees")
               <|> flag'                                    (parseTermBuilder TermJSONGraph)   (long "json-graph"  <> help "Output JSON adjacency list")
               <|> flag'                                    parseSymbolsBuilder                (long "symbols"     <> help "Output JSON symbol list")
-              <|> flag'                                    (parseTermBuilder TermDotGraph)    (long "dot"          <> help "Output DOT graph parse trees")
-              <|> flag'                                    (parseTermBuilder TermShow)        (long "show"         <> help "Output using the Show instance (debug only, format subject to change without notice)")
-              <|> flag'                                    (parseTermBuilder TermQuiet)       (long "quiet"        <> help "Don't produce output, but show timing stats")
+              <|> flag'                                    (parseTermBuilder TermDotGraph)    (long "dot"         <> help "Output DOT graph parse trees")
+              <|> flag'                                    (parseTermBuilder TermShow)        (long "show"        <> help "Output using the Show instance (debug only, format subject to change without notice)")
+              <|> flag'                                    (parseTermBuilder TermQuiet)       (long "quiet"       <> help "Don't produce output, but show timing stats")
       filesOrStdin <- Right <$> some (argument filePathReader (metavar "FILES...")) <|> pure (Left stdin)
       pure $ Task.readBlobs filesOrStdin >>= renderer
 
@@ -126,10 +126,10 @@ filePathReader :: ReadM File
 filePathReader = eitherReader parseFilePath
   where
     parseFilePath arg = case splitWhen (== ':') arg of
-        [a, b] | Just lang <- readMaybe a -> Right (File a lang)
-               | Just lang <- readMaybe b -> Right (File b lang)
+        [a, b] | Just lang <- parseLanguage (T.pack b) -> Right (File a lang)
+               | Just lang <- parseLanguage (T.pack a) -> Right (File b lang)
         [path] -> Right (File path (languageForFilePath path))
-        args -> Left ("cannot parse `" <> join args <> "`\nexpecting FILE:LANGUAGE or just FILE")
+        _ -> Left ("cannot parse `" <> arg <> "`\nexpecting FILE:LANGUAGE or just FILE")
 
 options :: Eq a => [(String, a)] -> Mod OptionFields a -> Parser a
 options options fields = option (optionsReader options) (fields <> showDefaultWith (findOption options) <> metavar (intercalate "|" (fmap fst options)))
