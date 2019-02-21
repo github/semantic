@@ -502,16 +502,22 @@ callGraphProject parser proxy paths = runTask' $ do
   x <- runCallGraph proxy False modules package
   pure (x, (() <$) <$> modules)
 
+
 scopeGraphRubyProject :: ProjectEvaluator Language.Ruby.Assignment.Syntax
 scopeGraphRubyProject = justEvaluatingCatchingErrors <=< evaluateProjectForScopeGraph (Proxy @'Language.Ruby) rubyParser
+
 scopeGraphPHPProject :: ProjectEvaluator Language.PHP.Assignment.Syntax
 scopeGraphPHPProject = justEvaluatingCatchingErrors <=< evaluateProjectForScopeGraph (Proxy @'Language.PHP) phpParser
+
 scopeGraphGoProject :: ProjectEvaluator Language.Go.Assignment.Syntax
 scopeGraphGoProject = justEvaluatingCatchingErrors <=< evaluateProjectForScopeGraph (Proxy @'Language.Go) goParser
+
 scopeGraphTypeScriptProject :: ProjectEvaluator Language.TypeScript.Assignment.Syntax
 scopeGraphTypeScriptProject = justEvaluatingCatchingErrors <=< evaluateProjectForScopeGraph (Proxy @'Language.TypeScript) typescriptParser
+
 scopeGraphJavaScriptProject :: ProjectEvaluator Language.TypeScript.Assignment.Syntax
 scopeGraphJavaScriptProject = justEvaluatingCatchingErrors <=< evaluateProjectForScopeGraph (Proxy @'Language.TypeScript) typescriptParser
+
 
 evaluatePythonProject :: ( syntax ~ Language.Python.Assignment.Syntax
                    , qterm ~ Quieterm (Sum syntax) Location
