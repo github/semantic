@@ -15,14 +15,11 @@ import           Rendering.TOC
 import           Semantic.Api.Diffs
 import           Semantic.Api.Helpers
 import           Semantic.Api.V1.CodeAnalysisPB hiding (Blob, BlobPair)
-import qualified Semantic.Api.V1.CodeAnalysisPB as API
 import           Semantic.Task as Task
 import           Serializing.Format
 
-diffSummaryBuilder :: (DiffEffects sig m) => Format Summaries -> [BlobPair] -> m Builder
-diffSummaryBuilder format blobs
-  -- TODO: Switch away from legacy format on CLI too.
-  = legacyDiffSummary blobs >>= serialize format
+diffSummaryBuilder :: (DiffEffects sig m) => Format DiffTreeTOCResponse -> [BlobPair] -> m Builder
+diffSummaryBuilder format blobs = diffSummary blobs >>= serialize format
 
 legacyDiffSummary :: (DiffEffects sig m) => [BlobPair] -> m Summaries
 legacyDiffSummary = distributeFoldMap go
@@ -37,8 +34,8 @@ legacyDiffSummary = distributeFoldMap go
     render :: (Foldable syntax, Functor syntax, Applicative m) => BlobPair -> Diff syntax (Maybe Declaration) (Maybe Declaration) -> m Summaries
     render blobPair = pure . renderToCDiff blobPair
 
-diffSummary :: (DiffEffects sig m) => [API.BlobPair] -> m DiffTreeTOCResponse
-diffSummary blobs = DiffTreeTOCResponse . V.fromList <$> distributeFor (apiBlobPairToBlobPair <$> blobs) go
+diffSummary :: (DiffEffects sig m) => [BlobPair] -> m DiffTreeTOCResponse
+diffSummary blobs = DiffTreeTOCResponse . V.fromList <$> distributeFor blobs go
   where
     go :: (DiffEffects sig m) => BlobPair -> m TOCSummaryFile
     go blobPair = doDiff blobPair (decorate . declarationAlgebra) render
