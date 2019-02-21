@@ -123,7 +123,6 @@ instance Evaluatable Import where
     path <- NonEmpty.last <$> resolvePythonModules (RelativeQualifiedName n (Just (qualifiedName (formatName aliasValue' :| []))))
     ((moduleScope, moduleFrame), _) <- require path
 
-    span <- ask @Span
     -- Construct a proxy scope containing an import edge to the imported module's last returned scope.
     importScope <- newScope (Map.singleton ScopeGraph.Import [ moduleScope ])
 
@@ -190,7 +189,7 @@ instance Evaluatable QualifiedImport where
   eval _ _ (QualifiedImport qualifiedNames) = do
     qualifiedName <- fmap (T.unpack . formatName) <$> traverse (\term -> maybeM (throwNoNameError term) (declaredName term)) qualifiedNames
     modulePaths <- resolvePythonModules (QualifiedName qualifiedName)
-    let namesAndPaths = toList (NonEmpty.zip (Data.Abstract.Evaluatable.name . T.pack <$> qualifiedName) modulePaths)
+    let namesAndPaths = toList (NonEmpty.zip (NonEmpty.zip qualifiedNames (Data.Abstract.Evaluatable.name . T.pack <$> qualifiedName)) modulePaths)
 
     go namesAndPaths
     unit
@@ -209,7 +208,7 @@ instance Evaluatable QualifiedImport where
               assign aliasSlot val
 
               withFrame objFrame $ do
-                let (namePaths, rest) = List.partition ((== name) . fst) namesAndPaths
+                let (namePaths, rest) = List.partition ((== name) . snd . fst) namesAndPaths
                 for_ namePaths $ \(_, modulePath) -> do
                   mkScopeMap modulePath $ \scopeMap -> do
                     withFrame objFrame $ do
@@ -232,7 +231,7 @@ instance Evaluatable QualifiedAliasedImport where
     span <- ask @Span
     scopeAddress <- newScope mempty
     alias <- maybeM (throwNoNameError aliasTerm) (declaredName aliasTerm)
-    declare (Declaration alias) Default Public span (Just scopeAddress)
+    declare (Declaration alias) Default Public span ScopeGraph.QualifiedAliasedImport (Just scopeAddress)
     objFrame <- newFrame scopeAddress mempty
     val <- object objFrame
     aliasSlot <- lookupSlot (Declaration alias)

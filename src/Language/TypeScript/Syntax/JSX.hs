@@ -6,12 +6,12 @@ import Prologue
 
 import           Control.Abstract as Abstract
 import           Data.Abstract.Evaluatable
-import           Data.Abstract.ScopeGraph (AccessControl (..))
+import           Data.Abstract.ScopeGraph (AccessControl(..))
 import           Data.JSON.Fields
-import qualified Data.Map.Strict as Map
-import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import qualified Data.Text as T
 import           Diffing.Algorithm
+import qualified Data.Map.Strict as Map
+import qualified Data.Abstract.ScopeGraph as ScopeGraph
 
 data JsxElement a = JsxElement { jsxOpeningElement :: !a,  jsxElements :: ![a], jsxClosingElement :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, Ord, Show, ToJSONFields1, Traversable)
@@ -78,7 +78,7 @@ instance Evaluatable RequiredParameter where
   eval eval ref RequiredParameter{..} = do
     name <- maybeM (throwNoNameError requiredParameterSubject) (declaredName requiredParameterSubject)
     span <- ask @Span
-    declare (Declaration name) Default Public span Nothing
+    declare (Declaration name) Default Public span ScopeGraph.RequiredParameter Nothing
 
     lhs <- ref requiredParameterSubject
     rhs <- eval requiredParameterValue
