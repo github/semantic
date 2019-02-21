@@ -25,7 +25,7 @@ Source for each package is available at
 License and other copyright information for each package is included in the
 image at `/usr/share/doc/licenses/cabal/{package}.txt`.
 
-Additional information for each package is available at
+Source and additional information for each package is available at
 `https://hackage.haskell.org/package/{package}`.
 
 ## Docker
