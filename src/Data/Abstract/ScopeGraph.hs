@@ -41,8 +41,8 @@ import           Data.JSON.Fields (ToJSONFields(..))
 import qualified Data.Map.Strict as Map
 import qualified Data.Sequence as Seq
 import qualified Data.Set as Set
-import Data.Span
 
+import Data.Span
 import Prologue
 
 -- A slot is a location in the heap where a value is stored.
@@ -73,7 +73,6 @@ instance Ord AccessControl where
   (<=) Protected Protected = True
 
   -- | Public AccessControl "on the left" has access only to Public AccessControl "on the right".
-  -- In all other cases, Public AccessControl "on the left" implies no access.
   (<=) Public Public       = True
   (<=) Public _            = False
 
