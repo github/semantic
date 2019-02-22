@@ -35,7 +35,6 @@ import           Rendering.JSON hiding (JSON)
 import qualified Rendering.JSON
 import           Semantic.Api.Helpers
 import           Semantic.Api.V1.CodeAnalysisPB hiding (Blob, BlobPair, Language(..))
-import qualified Semantic.Api.V1.CodeAnalysisPB as API
 import           Semantic.Task as Task
 import           Semantic.Telemetry as Stat
 import           Serializing.Format hiding (JSON)
@@ -51,9 +50,7 @@ data DiffOutputFormat
 
 parseDiffBuilder :: (Traversable t, DiffEffects sig m) => DiffOutputFormat -> t BlobPair -> m Builder
 parseDiffBuilder DiffJSONTree    = distributeFoldMap (jsonDiff renderJSONTree) >=> serialize Format.JSON -- NB: Serialize happens at the top level for these two JSON formats to collect results of multiple blob pairs.
-parseDiffBuilder DiffJSONGraph   = distributeFoldMap (jsonDiff renderJSONGraph) >=> serialize Format.JSON
--- TODO: Switch Diff Graph output on CLI to new format like this:
--- parseDiffBuilder DiffJSONGraph   = diffGraph >=> serialize Format.JSON
+parseDiffBuilder DiffJSONGraph   = diffGraph >=> serialize Format.JSON
 parseDiffBuilder DiffSExpression = distributeFoldMap sexpDiff
 parseDiffBuilder DiffShow        = distributeFoldMap showDiff
 parseDiffBuilder DiffDotGraph    = distributeFoldMap dotGraphDiff
@@ -69,11 +66,8 @@ jsonError blobPair (SomeException e) = pure $ renderJSONDiffError blobPair (show
 renderJSONTree :: (Applicative m, ToJSONFields1 syntax) => BlobPair -> Diff syntax Location Location -> m (Rendering.JSON.JSON "diffs" SomeJSON)
 renderJSONTree blobPair = pure . renderJSONDiff blobPair
 
-renderJSONGraph :: (Applicative m, Functor syntax, Foldable syntax, ConstructorName syntax) => BlobPair -> Diff syntax Location Location -> m (Rendering.JSON.JSON "diffs" SomeJSON)
-renderJSONGraph blobPair = pure . renderJSONAdjDiff blobPair . renderTreeGraph
-
-diffGraph :: (Traversable t, DiffEffects sig m) => t API.BlobPair -> m DiffTreeGraphResponse
-diffGraph blobs = DiffTreeGraphResponse . V.fromList . toList <$> distributeFor (apiBlobPairToBlobPair <$> blobs) go
+diffGraph :: (Traversable t, DiffEffects sig m) => t BlobPair -> m DiffTreeGraphResponse
+diffGraph blobs = DiffTreeGraphResponse . V.fromList . toList <$> distributeFor blobs go
   where
     go :: (DiffEffects sig m) => BlobPair -> m DiffTreeFileGraph
     go blobPair = doDiff blobPair (const pure) render
