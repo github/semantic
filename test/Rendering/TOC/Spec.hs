@@ -149,22 +149,22 @@ spec = parallel $ do
     it "produces JSON output" $ do
       blobs <- blobsForPaths (Both "ruby/toc/methods.A.rb" "ruby/toc/methods.B.rb")
       output <- runTaskOrDie (diffSummaryBuilder Format.JSON [blobs])
-      runBuilder output `shouldBe` ("{\"changes\":{\"test/fixtures/ruby/toc/methods.A.rb -> test/fixtures/ruby/toc/methods.B.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"self.foo\",\"changeType\":\"added\"},{\"span\":{\"start\":[4,1],\"end\":[6,4]},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"modified\"},{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{}}\n" :: ByteString)
+      runBuilder output `shouldBe` ("{\"files\":[{\"path\":\"test/fixtures/ruby/toc/methods.A.rb -> test/fixtures/ruby/toc/methods.B.rb\",\"changes\":[{\"span\":{\"start\":{\"line\":1,\"column\":1},\"end\":{\"line\":2,\"column\":4}},\"category\":\"Method\",\"term\":\"self.foo\",\"changeType\":\"Added\"},{\"span\":{\"start\":{\"line\":4,\"column\":1},\"end\":{\"line\":6,\"column\":4}},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"Modified\"},{\"span\":{\"start\":{\"line\":4,\"column\":1},\"end\":{\"line\":5,\"column\":4}},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"Removed\"}],\"language\":\"Ruby\",\"errors\":[]}]}\n" :: ByteString)
 
     it "produces JSON output if there are parse errors" $ do
       blobs <- blobsForPaths (Both "ruby/toc/methods.A.rb" "ruby/toc/methods.X.rb")
       output <- runTaskOrDie (diffSummaryBuilder Format.JSON [blobs])
-      runBuilder output `shouldBe` ("{\"changes\":{\"test/fixtures/ruby/toc/methods.A.rb -> test/fixtures/ruby/toc/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"removed\"},{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{\"test/fixtures/ruby/toc/methods.A.rb -> test/fixtures/ruby/toc/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,3]},\"error\":\"expected end of input nodes, but got ParseError\",\"language\":\"Ruby\"}]}}\n" :: ByteString)
+      runBuilder output `shouldBe` ("{\"files\":[{\"path\":\"test/fixtures/ruby/toc/methods.A.rb -> test/fixtures/ruby/toc/methods.X.rb\",\"changes\":[{\"span\":{\"start\":{\"line\":1,\"column\":1},\"end\":{\"line\":2,\"column\":4}},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"Removed\"},{\"span\":{\"start\":{\"line\":4,\"column\":1},\"end\":{\"line\":5,\"column\":4}},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"Removed\"}],\"language\":\"Ruby\",\"errors\":[{\"span\":{\"start\":{\"line\":1,\"column\":1},\"end\":{\"line\":2,\"column\":3}},\"error\":\"expected end of input nodes, but got ParseError\"}]}]}\n" :: ByteString)
 
     it "ignores anonymous functions" $ do
       blobs <- blobsForPaths (Both "ruby/toc/lambda.A.rb" "ruby/toc/lambda.B.rb")
       output <- runTaskOrDie (diffSummaryBuilder Format.JSON [blobs])
-      runBuilder output `shouldBe` ("{\"changes\":{},\"errors\":{}}\n" :: ByteString)
+      runBuilder output `shouldBe` ("{\"files\":[{\"path\":\"test/fixtures/ruby/toc/lambda.A.rb -> test/fixtures/ruby/toc/lambda.B.rb\",\"changes\":[],\"language\":\"Ruby\",\"errors\":[]}]}\n" :: ByteString)
 
     it "summarizes Markdown headings" $ do
       blobs <- blobsForPaths (Both "markdown/toc/headings.A.md" "markdown/toc/headings.B.md")
       output <- runTaskOrDie (diffSummaryBuilder Format.JSON [blobs])
-      runBuilder output `shouldBe` ("{\"changes\":{\"test/fixtures/markdown/toc/headings.A.md -> test/fixtures/markdown/toc/headings.B.md\":[{\"span\":{\"start\":[1,1],\"end\":[3,16]},\"category\":\"Heading 1\",\"term\":\"Introduction\",\"changeType\":\"removed\"},{\"span\":{\"start\":[5,1],\"end\":[7,4]},\"category\":\"Heading 2\",\"term\":\"Two\",\"changeType\":\"modified\"},{\"span\":{\"start\":[9,1],\"end\":[11,10]},\"category\":\"Heading 3\",\"term\":\"This heading is new\",\"changeType\":\"added\"},{\"span\":{\"start\":[13,1],\"end\":[14,4]},\"category\":\"Heading 1\",\"term\":\"Final\",\"changeType\":\"added\"}]},\"errors\":{}}\n" :: ByteString)
+      runBuilder output `shouldBe` ("{\"files\":[{\"path\":\"test/fixtures/markdown/toc/headings.A.md -> test/fixtures/markdown/toc/headings.B.md\",\"changes\":[{\"span\":{\"start\":{\"line\":1,\"column\":1},\"end\":{\"line\":3,\"column\":16}},\"category\":\"Heading 1\",\"term\":\"Introduction\",\"changeType\":\"Removed\"},{\"span\":{\"start\":{\"line\":5,\"column\":1},\"end\":{\"line\":7,\"column\":4}},\"category\":\"Heading 2\",\"term\":\"Two\",\"changeType\":\"Modified\"},{\"span\":{\"start\":{\"line\":9,\"column\":1},\"end\":{\"line\":11,\"column\":10}},\"category\":\"Heading 3\",\"term\":\"This heading is new\",\"changeType\":\"Added\"},{\"span\":{\"start\":{\"line\":13,\"column\":1},\"end\":{\"line\":14,\"column\":4}},\"category\":\"Heading 1\",\"term\":\"Final\",\"changeType\":\"Added\"}],\"language\":\"Markdown\",\"errors\":[]}]}\n" :: ByteString)
 
 
 type Diff' = Diff ListableSyntax (Maybe Declaration) (Maybe Declaration)

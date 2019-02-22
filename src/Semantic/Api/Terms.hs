@@ -38,14 +38,13 @@ import           Rendering.JSON hiding (JSON)
 import qualified Rendering.JSON
 import           Semantic.Api.Helpers
 import           Semantic.Api.V1.CodeAnalysisPB hiding (Blob, Language (..))
-import qualified Semantic.Api.V1.CodeAnalysisPB as API
 import           Semantic.Task
 import           Serializing.Format hiding (JSON)
 import qualified Serializing.Format as Format
 import           Tags.Taggable
 
-termGraph :: (Traversable t, Member Distribute sig, ParseEffects sig m) => t API.Blob -> m ParseTreeGraphResponse
-termGraph blobs = ParseTreeGraphResponse . V.fromList . toList <$> distributeFor (fmap apiBlobToBlob blobs) go
+termGraph :: (Traversable t, Member Distribute sig, ParseEffects sig m) => t Blob -> m ParseTreeGraphResponse
+termGraph blobs = ParseTreeGraphResponse . V.fromList . toList <$> distributeFor blobs go
   where
     go :: ParseEffects sig m => Blob -> m ParseTreeFileGraph
     go blob = (doParse blob >>= withSomeTerm (pure . render))
@@ -72,9 +71,7 @@ data TermOutputFormat
 parseTermBuilder :: (Traversable t, Member Distribute sig, ParseEffects sig m, MonadIO m)
   => TermOutputFormat-> t Blob -> m Builder
 parseTermBuilder TermJSONTree    = distributeFoldMap jsonTerm >=> serialize Format.JSON -- NB: Serialize happens at the top level for these two JSON formats to collect results of multiple blobs.
-parseTermBuilder TermJSONGraph   = distributeFoldMap jsonGraph >=> serialize Format.JSON -- termGraph >=> serialize Format.JSON
--- TODO: Switch Term Graph output on CLI to new format like this:
--- parseTermBuilder TermJSONGraph   = termGraph >=> serialize Format.JSON
+parseTermBuilder TermJSONGraph   = termGraph >=> serialize Format.JSON
 parseTermBuilder TermSExpression = distributeFoldMap sexpTerm
 parseTermBuilder TermDotGraph    = distributeFoldMap dotGraphTerm
 parseTermBuilder TermShow        = distributeFoldMap showTerm
@@ -82,9 +79,6 @@ parseTermBuilder TermQuiet       = distributeFoldMap quietTerm
 
 jsonTerm :: (ParseEffects sig m) => Blob -> m (Rendering.JSON.JSON "trees" SomeJSON)
 jsonTerm blob = (doParse blob >>= withSomeTerm (pure . renderJSONTerm blob)) `catchError` jsonError blob
-
-jsonGraph :: (ParseEffects sig m) => Blob -> m (Rendering.JSON.JSON "trees" SomeJSON)
-jsonGraph blob = (doParse blob >>= withSomeTerm (pure . renderJSONAdjTerm blob . renderTreeGraph)) `catchError` jsonError blob
 
 jsonError :: Applicative m => Blob -> SomeException -> m (Rendering.JSON.JSON "trees" SomeJSON)
 jsonError blob (SomeException e) = pure $ renderJSONError blob (show e)
