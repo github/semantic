@@ -1,7 +1,7 @@
 {-# LANGUAGE UndecidableInstances #-}
 module Prologue
   ( module X
-  , eitherA
+  , eitherM
   , foldMapA
   , maybeM
   , maybeLast
@@ -15,6 +15,7 @@ import Data.Bifunctor.Join as X
 import Data.Bits as X
 import Data.ByteString as X (ByteString)
 import Data.Coerce as X
+import Data.Int as X (Int8, Int16, Int32, Int64)
 import Data.Functor.Both as X (Both (Both), runBothWith)
 import Data.Either as X (fromLeft, fromRight)
 import Data.IntMap as X (IntMap)
@@ -30,6 +31,7 @@ import Data.Set as X (Set)
 import Data.Sum as X (Sum, Element, Elements, (:<), (:<:), Apply (..), inject)
 import Data.Text as X (Text)
 import Data.These as X
+import Data.Word as X (Word8, Word16, Word32, Word64)
 
 import Control.Exception as X hiding (Handler (..), assert, evaluate, throw, throwIO, throwTo)
 
@@ -76,7 +78,9 @@ fromMaybeLast b = fromMaybe b . getLast . foldMap (Last . Just)
 -- | Extract the 'Just' of a 'Maybe' in an 'Applicative' context or, given 'Nothing', run the provided action.
 maybeM :: Applicative f => f a -> Maybe a -> f a
 maybeM f = maybe f pure
+{-# INLINE maybeM #-}
 
 -- Promote a function to either-applicatives.
-eitherA :: Applicative f => (b -> f (Either a c)) -> Either a b -> f (Either a c)
-eitherA = either (pure . Left)
+eitherM :: Applicative f => (a -> f b) -> Either a b -> f b
+eitherM f = either f pure
+{-# INLINE eitherM #-}

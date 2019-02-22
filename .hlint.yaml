@@ -1,7 +1,7 @@
 # HLint configuration file
 # https://github.com/ndmitchell/hlint
 
-- arguments: [--color=auto, -XDataKinds, -XDeriveFoldable, -XDeriveFunctor, -XDeriveGeneric, -XDeriveTraversable, -XFlexibleContexts, -XFlexibleInstances, -XMultiParamTypeClasses, -XOverloadedStrings, -XRecordWildCards, -XStandaloneDeriving, -XStrictData, -XTypeApplications]
+- arguments: [--color=auto, -XDataKinds, -XDeriveFoldable, -XDeriveFunctor, -XDeriveGeneric, -XDeriveTraversable, -XFlexibleContexts, -XFlexibleInstances, -XMultiParamTypeClasses, -XOverloadedStrings, -XRecordWildCards, -XStandaloneDeriving, -XStrictData, -XTypeApplications, -XDerivingVia]
 
 # Blacklist some functions by default.
 - functions:

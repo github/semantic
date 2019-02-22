@@ -56,7 +56,7 @@ rubyREPL = repl (Proxy @'Language.Ruby) rubyParser
 
 repl proxy parser paths =
   withOptions debugOptions $ \config logger statter ->
-    runM . runDistribute . runResource (runM . runDistribute) . runTimeout (runM . runDistribute . runResource (runM . runDistribute)) . runError @_ @_ @SomeException . runTelemetryIgnoringStat (logOptionsFromConfig config) . runTraceInTelemetry . runReader (TaskSession config "-" False logger statter) . Files.runFiles . runResolution . runTaskF $ do
+    runM . runDistribute . runResource (runM . runDistribute) . runTimeout (runM . runDistribute . runResource (runM . runDistribute)) . runError @SomeException . runTelemetryIgnoringStat (logOptionsFromConfig config) . runTraceInTelemetry . runReader (TaskSession config "-" False logger statter) . Files.runFiles . runResolution . runTaskF $ do
       blobs <- catMaybes <$> traverse readBlobFromFile (flip File (Language.reflect proxy) <$> paths)
       package <- fmap (fmap quieterm) <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs (Language.reflect proxy) [])
       modules <- topologicalSort <$> runImportGraphToModules proxy (snd <$> package)
