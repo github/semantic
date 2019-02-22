@@ -16,7 +16,7 @@ import qualified Data.IntSet as IntSet
 import Data.Range
 import Data.Location
 import Data.Source as Source
-import Data.Span
+import Data.Span hiding (HasSpan (..))
 import qualified Data.Syntax as Syntax
 import Data.Term (Term, termIn, termAnnotation, termOut)
 import Data.Text.Encoding (decodeUtf8')

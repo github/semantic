@@ -97,6 +97,7 @@ library
                      , Control.Abstract.ScopeGraph
                      , Control.Abstract.Value
                      -- Effects
+                     , Control.Effect.Catch
                      , Control.Effect.Interpose
                      , Control.Effect.REPL
                      , Control.Rewriting
@@ -132,6 +133,7 @@ library
                      , Data.File
                      , Data.Functor.Both
                      , Data.Functor.Classes.Generic
+                     , Proto3.Google.Timestamp
                      , Data.Graph
                      , Data.Graph.ControlFlowVertex
                      , Data.Handle
@@ -164,6 +166,7 @@ library
                      , Data.Syntax.Literal
                      , Data.Syntax.Statement
                      , Data.Syntax.Type
+                     , Data.Tag
                      , Data.Term
                      -- Diffing algorithms & interpretation thereof
                      , Diffing.Algorithm
@@ -221,6 +224,7 @@ library
                      , Parsing.Parser
                      , Parsing.TreeSitter
                      , Paths_semantic
+                     , Proto3.Google.Wrapped
                      -- Rendering formats
                      , Rendering.Graph
                      , Rendering.JSON
@@ -287,6 +291,7 @@ library
                      , http-types
                      , http-media
                      , kdt
+                     , lens
                      , mersenne-random-pure64
                      , network-uri
                      , optparse-applicative

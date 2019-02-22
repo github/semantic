@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, DeriveAnyClass, LambdaCase, RankNTypes, TypeOperators, ScopedTypeVariables, UndecidableInstances #-}
+{-# LANGUAGE GADTs, LambdaCase, RankNTypes, TypeOperators, ScopedTypeVariables, UndecidableInstances #-}
 module Tags.Tagging
 ( runTagging
 , Tag(..)
@@ -12,28 +12,17 @@ import           Control.Effect as Eff
 import           Control.Effect.Error as Error
 import qualified Control.Effect.State as State
 import           Control.Monad.Trans
-import           Data.Aeson
 import           Data.Blob
 import           Data.Location
 import           Data.Machine as Machine
 import qualified Data.Source as Source
+import           Data.Tag
 import           Data.Term
 import           Data.Text hiding (empty)
 import           Tags.Taggable
 
 symbolsToSummarize :: [Text]
 symbolsToSummarize = ["Function", "Method", "Class", "Module"]
-
-data Tag
-  = Tag
-  { name :: Text
-  , kind :: Text
-  , span :: Span
-  , context :: [Text]
-  , line :: Maybe Text
-  , docs :: Maybe Text
-  }
-  deriving (Eq, Show, Generic, ToJSON)
 
 runTagging :: (IsTaggable syntax)
   => Blob

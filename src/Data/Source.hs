@@ -27,14 +27,15 @@ module Data.Source
 ) where
 
 import Prologue
-import Data.Array
-import Data.Aeson (FromJSON (..), withText)
+
+import           Data.Aeson (FromJSON (..), withText)
+import           Data.Array
 import qualified Data.ByteString as B
-import Data.Char (ord)
-import Data.List (span)
-import Data.Range
-import Data.Span
-import Data.String (IsString(..))
+import           Data.Char (ord)
+import           Data.List (span)
+import           Data.Range
+import           Data.Span hiding (HasSpan (..))
+import           Data.String (IsString (..))
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
 
