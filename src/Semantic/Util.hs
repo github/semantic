@@ -509,6 +509,9 @@ scopeGraphRubyProject = justEvaluatingCatchingErrors <=< evaluateProjectForScope
 scopeGraphPHPProject :: ProjectEvaluator Language.PHP.Assignment.Syntax
 scopeGraphPHPProject = justEvaluatingCatchingErrors <=< evaluateProjectForScopeGraph (Proxy @'Language.PHP) phpParser
 
+scopeGraphPythonProject :: ProjectEvaluator Language.Python.Assignment.Syntax
+scopeGraphPythonProject = justEvaluatingCatchingErrors <=< evaluateProjectForScopeGraph (Proxy @'Language.Python) pythonParser
+
 scopeGraphGoProject :: ProjectEvaluator Language.Go.Assignment.Syntax
 scopeGraphGoProject = justEvaluatingCatchingErrors <=< evaluateProjectForScopeGraph (Proxy @'Language.Go) goParser
 
