@@ -129,8 +129,7 @@ instance Evaluatable Identifier where
     reference (Reference name) span ScopeGraph.Identifier (Declaration name)
     deref =<< ref eval ref' term
 
-  ref _ _ (Identifier name) = do
-    lookupSlot (Declaration name)
+  ref _ _ (Identifier name) = lookupSlot (Declaration name)
 
 
 instance Tokenize Identifier where
