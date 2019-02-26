@@ -5,13 +5,15 @@
     {-(Identifier)-})-})-}
 {-(Function
   {-(Identifier)-}
-  {-(Identifier)-}
+  {-(RequiredParameter
+    {-(Identifier)-})-}
   {-(Statements
     {-(Identifier)-})-})-}
   (Function
     (Identifier)
-  { (Identifier)
-  ->(Identifier) }
+    (RequiredParameter
+    { (Identifier)
+    ->(Identifier) })
   { (Identifier)
   ->(Identifier) }
     (Statements
@@ -28,7 +30,8 @@
     ->(Identifier) }))
 {+(Function
   {+(Identifier)+}
-  {+(Identifier)+}
+  {+(RequiredParameter
+    {+(Identifier)+})+}
   {+(Statements
     {+(Identifier)+})+})+}
   (Function

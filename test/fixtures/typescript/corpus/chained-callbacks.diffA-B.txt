@@ -1,9 +1,9 @@
 (Statements
   (Call
-  { (MemberAccess
-    {-(This)-})
-  ->(MemberAccess
-    {+(This)+}) }
+    (MemberAccess
+      (This)
+    { (Identifier)
+    ->(Identifier) })
     (Function
       (Empty)
       (Empty)
@@ -15,8 +15,9 @@
         (Empty))
       (StatementBlock
         (Return
-        { (MemberAccess
-          {-(Identifier)-})
-        ->(MemberAccess
-          {+(Identifier)+}) })))
+          (MemberAccess
+          { (Identifier)
+          ->(Identifier) }
+          { (Identifier)
+          ->(Identifier) }))))
     (Empty)))

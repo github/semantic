@@ -6,17 +6,19 @@
     (Statements
       (Defer
         (Call
-        { (MemberAccess
-          {-(Identifier)-})
-        ->(MemberAccess
-          {+(Identifier)+}) }
+          (MemberAccess
+          { (Identifier)
+          ->(Identifier) }
+          { (Identifier)
+          ->(Identifier) })
           (Statements)
           (Empty)))
       (Go
         (Call
-        { (MemberAccess
-          {-(Identifier)-})
-        ->(MemberAccess
-          {+(Identifier)+}) }
+          (MemberAccess
+          { (Identifier)
+          ->(Identifier) }
+          { (Identifier)
+          ->(Identifier) })
           (Statements)
           (Empty))))))

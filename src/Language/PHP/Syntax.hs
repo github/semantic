@@ -173,7 +173,8 @@ data QualifiedName a = QualifiedName { name :: a, identifier :: a }
 instance Evaluatable QualifiedName where
   eval _ _ (QualifiedName obj iden) = do
     name <- maybeM (throwNoNameError obj) (declaredName obj)
-    reference (Reference name) (Declaration name)
+    let objSpan = getSpan obj
+    reference (Reference name) objSpan ScopeGraph.Identifier (Declaration name)
     childScope <- associatedScope (Declaration name)
 
     propName <- maybeM (throwNoNameError iden) (declaredName iden)
@@ -183,7 +184,8 @@ instance Evaluatable QualifiedName where
         currentFrameAddress <- currentFrame
         frameAddress <- newFrame childScope (Map.singleton Lexical (Map.singleton currentScopeAddress currentFrameAddress))
         withScopeAndFrame frameAddress $ do
-          reference (Reference propName) (Declaration propName)
+          let propSpan = getSpan iden
+          reference (Reference propName) propSpan ScopeGraph.Identifier (Declaration propName)
           slot <- lookupSlot (Declaration propName)
           deref slot
       Nothing ->

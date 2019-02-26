@@ -8,6 +8,7 @@ import           Control.Abstract hiding (Break, Continue, Return, While)
 import           Data.Abstract.Evaluatable as Abstract
 import           Data.Aeson (ToJSON1 (..))
 import           Data.JSON.Fields
+import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import qualified Data.Map.Strict as Map
 import qualified Data.Reprinting.Scope as Scope
 import qualified Data.Reprinting.Token as Token
@@ -126,7 +127,7 @@ instance Evaluatable Let where
     assocScope <- associatedScope (Declaration valueName)
 
     _ <- withLexicalScopeAndFrame $ do
-      declare (Declaration name) Default Public letSpan assocScope
+      declare (Declaration name) Default Public letSpan ScopeGraph.Let assocScope
       letVal <- eval letValue
       slot <- lookupSlot (Declaration name)
       assign slot letVal
