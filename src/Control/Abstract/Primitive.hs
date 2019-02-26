@@ -11,6 +11,7 @@ import Control.Abstract.Heap
 import Control.Abstract.ScopeGraph
 import Control.Abstract.Value
 import Data.Abstract.BaseError
+import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import Data.Abstract.Name
 import Data.Map.Strict as Map
 import Data.Span
@@ -40,13 +41,13 @@ defineBuiltIn :: ( HasCallStack
 defineBuiltIn declaration rel accessControl value = withCurrentCallStack callStack $ do
   currentScope' <- currentScope
   let lexicalEdges = Map.singleton Lexical [ currentScope' ]
-  associatedScope <- newScope lexicalEdges
+  associatedScope <- newPreludeScope lexicalEdges
   -- TODO: This span is still wrong.
-  declare declaration rel accessControl emptySpan (Just associatedScope)
+  declare declaration rel accessControl emptySpan ScopeGraph.Unknown (Just associatedScope)
 
   param <- gensym
   withScope associatedScope $ do
-    declare (Declaration param) rel accessControl emptySpan Nothing
+    declare (Declaration param) rel accessControl emptySpan ScopeGraph.Unknown Nothing
 
   slot <- lookupSlot declaration
   value <- builtIn associatedScope value
@@ -80,7 +81,7 @@ defineClass declaration superclasses body = void . define declaration Default Pu
     let superclassEdges = (Superclass, ) <$> (fmap pure . catMaybes $ superScopes)
         current = fmap (Lexical, ) . pure . pure $ currentScope'
         edges = Map.fromList (superclassEdges <> current)
-    childScope <- newScope edges
+    childScope <- newPreludeScope edges
     putDeclarationScope declaration childScope
 
     withScope childScope $ do

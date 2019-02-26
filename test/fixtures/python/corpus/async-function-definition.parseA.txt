@@ -5,12 +5,15 @@
       (Identifier)))
   (Function
     (Identifier)
-    (Identifier)
-    (Identifier)
+    (RequiredParameter
+      (Identifier))
+    (RequiredParameter
+      (Identifier))
     (Statements
       (Identifier)))
   (Function
     (Identifier)
-    (Identifier)
+    (RequiredParameter
+      (Identifier))
     (Statements
       (Identifier))))

@@ -29,12 +29,14 @@
   {+(Member
     {+(Identifier)+}
     {+(Identifier)+})+})+}
-  (Not
-    (Equal
-    { (Identifier)
-    ->(Identifier) }
-    { (Identifier)
-    ->(Identifier) }))
+{+(Not
+  {+(Equal
+    {+(Identifier)+}
+    {+(Identifier)+})+})+}
+{-(Not
+  {-(Equal
+    {-(Identifier)-}
+    {-(Identifier)-})-})-}
 {-(Not
   {-(Member
     {-(Identifier)-}

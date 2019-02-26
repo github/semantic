@@ -23,6 +23,7 @@ import qualified Language.PHP.Syntax as PHP
 import qualified Language.Python.Syntax as Python
 import qualified Language.Ruby.Syntax as Ruby
 import qualified Language.TypeScript.Syntax as TypeScript
+import Data.Quieterm
 
 deriving instance AccessControls1 syntax => AccessControls (Term syntax ann)
 
@@ -31,6 +32,8 @@ instance (AccessControls recur, AccessControls1 syntax) => AccessControls (TermF
 
 instance Apply AccessControls1 fs => AccessControls1 (Sum fs) where
   liftTermToAccessControl f = apply @AccessControls1 (liftTermToAccessControl f)
+
+deriving instance AccessControls1 syntax => AccessControls (Quieterm syntax ann)
 
 instance AccessControls1 []
 instance AccessControls1 Comment.Comment
@@ -332,6 +335,7 @@ instance AccessControls1 Java.TryWithResources
 instance AccessControls1 Java.AssertStatement
 instance AccessControls1 Java.AnnotationTypeElement
 
+instance AccessControls1 Python.Alias
 instance AccessControls1 Python.Ellipsis
 instance AccessControls1 Python.FutureImport
 instance AccessControls1 Python.Import
