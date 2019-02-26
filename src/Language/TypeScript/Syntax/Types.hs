@@ -9,6 +9,7 @@ import           Data.Abstract.Evaluatable as Evaluatable
 import           Data.JSON.Fields
 import qualified Data.Text as T
 import           Diffing.Algorithm
+import qualified Data.Abstract.ScopeGraph as ScopeGraph
 
 -- | Lookup type for a type-level key in a typescript map.
 data LookupType a = LookupType { lookupTypeIdentifier :: a, lookupTypeKey :: a }
@@ -65,7 +66,8 @@ instance Declarations1 TypeIdentifier where
 instance Evaluatable TypeIdentifier where
   eval _ _ TypeIdentifier{..} = do
     -- Add a reference to the type identifier in the current scope.
-    reference (Reference (Evaluatable.name contents)) (Declaration (Evaluatable.name contents))
+    span <- ask @Span
+    reference (Reference (Evaluatable.name contents)) span ScopeGraph.TypeIdentifier (Declaration (Evaluatable.name contents))
     unit
 
 data NestedTypeIdentifier a = NestedTypeIdentifier { left :: !a, right :: !a }

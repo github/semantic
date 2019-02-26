@@ -1,6 +1,8 @@
 (Statements
-{ (MemberAccess
-  {-(MemberAccess
-    {-(Identifier)-})-})
-->(MemberAccess
-  {+(Identifier)+}) })
+  (MemberAccess
+  { (MemberAccess
+    {-(Identifier)-}
+    {-(Identifier)-})
+  ->(Identifier) }
+  { (Identifier)
+  ->(Identifier) }))

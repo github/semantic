@@ -1,7 +1,8 @@
 (Statements
   (Call
     (MemberAccess
-      (This))
+      (This)
+      (Identifier))
     (Function
       (Empty)
       (Empty)
@@ -14,5 +15,6 @@
       (StatementBlock
         (Return
           (MemberAccess
+            (Identifier)
             (Identifier)))))
     (Empty)))
