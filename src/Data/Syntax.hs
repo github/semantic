@@ -124,7 +124,7 @@ newtype Identifier a = Identifier { name :: Name }
 
 instance Evaluatable Identifier where
   eval eval ref' term@(Identifier name) = do
-    -- FIXME: Set the span up correctly in ref so we can move the `reference` call there.
+    -- TODO: Set the span up correctly in ref so we can move the `reference` call there.
     span <- ask @Span
     reference (Reference name) span ScopeGraph.Identifier (Declaration name)
     deref =<< ref eval ref' term
