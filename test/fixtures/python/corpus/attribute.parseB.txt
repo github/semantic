@@ -1,4 +1,6 @@
 (Statements
   (MemberAccess
     (MemberAccess
-      (Identifier))))
+      (Identifier)
+      (Identifier))
+    (Identifier)))

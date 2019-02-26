@@ -37,6 +37,7 @@
               (Field
                 (Statements
                   (MemberAccess
+                    (Identifier)
                     (Identifier))))
               (Field
                 (Identifier)

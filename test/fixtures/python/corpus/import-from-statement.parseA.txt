@@ -1,6 +1,21 @@
 (Statements
+  (Import
+    (Alias
+      (Identifier)
+      (Identifier)))
+  (Import
+    (Alias
+      (Identifier)
+      (Identifier))
+    (Alias
+      (Identifier)
+      (Identifier)))
   (Import)
-  (Import)
-  (Import)
-  (Import)
-  (Import))
+  (Import
+    (Alias
+      (Identifier)
+      (Identifier)))
+  (Import
+    (Alias
+      (Identifier)
+      (Identifier))))

@@ -17,6 +17,7 @@
               (Identifier)
               (Pointer
                 (MemberAccess
+                  (Identifier)
                   (Identifier))))
             (Statements))
           (Context
@@ -49,6 +50,7 @@
             (Identifier)
             (Call
               (MemberAccess
+                (Identifier)
                 (Identifier))
               (Statements
                 (TextElement)
@@ -60,6 +62,7 @@
             (Identifier)
             (Call
               (MemberAccess
+                (Identifier)
                 (Identifier))
               (Statements
                 (TextElement)
@@ -80,6 +83,7 @@
                   (Integer)))
               (Call
                 (MemberAccess
+                  (Identifier)
                   (Identifier))
                 (Statements
                   (TextElement)

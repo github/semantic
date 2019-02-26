@@ -502,10 +502,10 @@ instance Listable Python.Syntax.QualifiedName where
   tiers = liftCons1 tiers1 Python.Syntax.QualifiedName \/ liftCons2 tiers tiers1 Python.Syntax.RelativeQualifiedName
 
 instance Listable1 Python.Syntax.Import where
-  liftTiers tiers = cons2 Python.Syntax.Import
+  liftTiers tiers' = liftCons2 tiers (liftTiers tiers') Python.Syntax.Import
 
-instance Listable Python.Syntax.Alias where
-  tiers = cons2 Python.Syntax.Alias
+instance Listable1 Python.Syntax.Alias where
+  liftTiers tiers = liftCons2 tiers tiers Python.Syntax.Alias
 
 
 type ListableSyntax = Sum
