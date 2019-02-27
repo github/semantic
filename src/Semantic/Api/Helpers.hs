@@ -4,6 +4,7 @@ module Semantic.Api.Helpers
   , spanToLegacySpan
   , toChangeType
   , languageToApiLanguage
+  , apiSpanToSpan
   , apiLanguageToLanguage
   , apiBlobsToBlobs
   , apiBlobToBlob
@@ -29,6 +30,12 @@ spanToSpan Data.Span{..} = Just $ API.Span (toPos spanStart) (toPos spanEnd)
 spanToLegacySpan :: Data.Span -> Maybe Legacy.Span
 spanToLegacySpan Data.Span{..} = Just $ Legacy.Span (toPos spanStart) (toPos spanEnd)
   where toPos Data.Pos{..} = Just $ Legacy.Position posLine posColumn
+
+apiSpanToSpan :: Maybe API.Span -> Data.Span
+apiSpanToSpan (Just API.Span{..}) = Data.Span (toPos start) (toPos end)
+  where toPos (Just API.Position{..}) = Data.Pos (fromIntegral line) (fromIntegral column)
+        toPos Nothing = Data.Pos 1 1
+apiSpanToSpan Nothing = Data.emptySpan
 
 toChangeType :: T.Text -> API.ChangeType
 toChangeType = \case
