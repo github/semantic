@@ -5,7 +5,8 @@
     (Statements
       (Function
         (Identifier)
-        (Identifier)
+        (RequiredParameter
+          (Identifier))
         (Statements
           (Return
             (Empty))))))
@@ -14,7 +15,8 @@
     (Statements
       (Function
         (Identifier)
-        (Identifier)
+        (RequiredParameter
+          (Identifier))
         (Statements
           (Return
             (Identifier))))))

@@ -5,6 +5,8 @@ module Data.Abstract.Evaluatable
 , traceResolve
 -- * Preludes
 , HasPrelude(..)
+-- * Spans
+, HasSpan(..)
 -- * Effects
 , EvalError(..)
 , throwEvalError
@@ -28,6 +30,7 @@ import Data.Abstract.Declarations as X
 import Data.Abstract.FreeVariables as X
 import Data.Abstract.Module
 import Data.Abstract.Name as X
+import qualified Data.Abstract.ScopeGraph as ScopeGraph 
 import Data.Abstract.ScopeGraph (Relation(..))
 import Data.Abstract.AccessControls.Class as X
 import Data.Language
@@ -38,14 +41,16 @@ import Data.Span (emptySpan)
 import Data.Sum hiding (project)
 import Data.Term
 import Prologue
+import Data.Abstract.HasSpan
 
 -- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
 class (Show1 constr, Foldable constr) => Evaluatable constr where
   eval :: ( AbstractValue term address value m
+          , AccessControls term
           , Carrier sig m
           , Declarations term
           , FreeVariables term
-          , AccessControls term
+          , HasSpan term
           , Member (Allocator address) sig
           , Member (Bitwise value) sig
           , Member (Boolean value) sig
@@ -187,7 +192,7 @@ defineSelf :: ( Carrier sig m
            => Evaluator term address value m ()
 defineSelf = do
   let self = Declaration X.__self
-  declare self Default Public emptySpan Nothing
+  declare self Default Public emptySpan ScopeGraph.Unknown Nothing
   slot <- lookupSlot self
   assign slot =<< object =<< currentFrame
 
@@ -206,7 +211,7 @@ data EvalError term address value return where
   IntegerFormatError  :: Text -> EvalError term address value Integer
   NoNameError         :: term -> EvalError term address value Name
   RationalFormatError :: Text -> EvalError term address value Rational
-  ReferenceError      :: value -> Name -> EvalError term address value (Slot address)
+  ReferenceError      :: value -> term -> EvalError term address value (Slot address)
   ScopedEnvError      :: value -> EvalError term address value address
 
 throwNoNameError :: ( Carrier sig m

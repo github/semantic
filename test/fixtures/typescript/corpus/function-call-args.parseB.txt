@@ -20,6 +20,7 @@
       (StatementBlock
         (Call
           (MemberAccess
+            (Identifier)
             (Identifier))
           (Identifier)
           (Empty))

@@ -1,15 +1,20 @@
 (Statements
 {+(Assignment
   {+(MemberAccess
+    {+(Identifier)+}
     {+(Identifier)+})+}
   {+(If
     {+(MemberAccess
+      {+(Identifier)+}
       {+(Identifier)+})+}
     {+(MemberAccess
+      {+(Identifier)+}
       {+(Identifier)+})+}
     {+(MemberAccess
       {+(MemberAccess
-        {+(Identifier)+})+})+})+})+}
+        {+(Identifier)+}
+        {+(Identifier)+})+}
+      {+(Identifier)+})+})+})+}
 {-(If
   {-(Identifier)-}
   {-(Identifier)-}

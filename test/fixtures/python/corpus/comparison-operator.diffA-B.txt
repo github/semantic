@@ -30,11 +30,12 @@
 {+(LessThanEqual
   {+(Identifier)+}
   {+(Identifier)+})+}
-  (LessThan
-  { (Identifier)
-  ->(Identifier) }
-  { (Identifier)
-  ->(Identifier) })
+{+(LessThan
+  {+(Identifier)+}
+  {+(Identifier)+})+}
+{-(LessThan
+  {-(Identifier)-}
+  {-(Identifier)-})-}
 {-(LessThanEqual
   {-(Identifier)-}
   {-(Identifier)-})-}
