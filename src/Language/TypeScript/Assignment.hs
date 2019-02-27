@@ -8,7 +8,7 @@ module Language.TypeScript.Assignment
 ) where
 
 import Assigning.Assignment hiding (Assignment, Error)
-import Data.Abstract.Name (Name, name)
+import Data.Abstract.Name (name)
 import qualified Data.Abstract.ScopeGraph as ScopeGraph (AccessControl(..))
 import qualified Assigning.Assignment as Assignment
 import Data.Sum
@@ -298,7 +298,7 @@ ternaryExpression :: Assignment Term
 ternaryExpression = makeTerm <$> symbol Grammar.TernaryExpression <*> children (Statement.If <$> term expression <*> term expression <*> term expression)
 
 memberExpression :: Assignment Term
-memberExpression = makeTerm <$> (symbol Grammar.MemberExpression <|> symbol Grammar.MemberExpression') <*> children (Expression.MemberAccess <$> term expression <*> propertyIdentifier')
+memberExpression = makeTerm <$> (symbol Grammar.MemberExpression <|> symbol Grammar.MemberExpression') <*> children (Expression.MemberAccess <$> term expression <*> propertyIdentifier)
 
 newExpression :: Assignment Term
 newExpression = makeTerm <$> symbol Grammar.NewExpression <*> children (Expression.New  <$> term constructableExpression <*> (typeArguments' <|> emptyTerm) <*> (arguments <|> pure []))
@@ -456,9 +456,6 @@ jsxAttribute = makeTerm <$> symbol Grammar.JsxAttribute <*> children (TypeScript
 
 propertyIdentifier :: Assignment Term
 propertyIdentifier = makeTerm <$> symbol PropertyIdentifier <*> (Syntax.Identifier . name <$> source)
-
-propertyIdentifier' :: Assignment Name
-propertyIdentifier' = symbol PropertyIdentifier *> (name <$> source)
 
 sequenceExpression :: Assignment Term
 sequenceExpression = makeTerm <$> symbol Grammar.SequenceExpression <*> children (Expression.SequenceExpression <$> term expression <*> term expressions)

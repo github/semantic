@@ -4,11 +4,13 @@
   (Function
     (Identifier)
     (Call
-    { (MemberAccess
-      {-(MemberAccess
-        {-(Identifier)-})-})
-    ->(MemberAccess
-      {+(MemberAccess
-        {+(Identifier)+})+}) }
+      (MemberAccess
+        (MemberAccess
+        { (Identifier)
+        ->(Identifier) }
+        { (Identifier)
+        ->(Identifier) })
+      { (Identifier)
+      ->(Identifier) })
       (Statements)
       (Empty))))

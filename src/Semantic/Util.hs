@@ -23,9 +23,9 @@ import           Data.Abstract.Value.Type as Type
 import           Data.Blob
 import           Data.File
 import           Data.Graph (topologicalSort)
+import           Data.Graph.ControlFlowVertex
 import qualified Data.Language as Language
 import           Data.List (uncons)
-import           Data.Location
 import           Data.Project hiding (readFile)
 import           Data.Quieterm (Quieterm, quieterm)
 import           Data.Sum (weaken)
@@ -43,7 +43,8 @@ import           Semantic.Graph
 import           Semantic.Task
 import           System.Exit (die)
 import           System.FilePath.Posix (takeDirectory)
-import Data.Graph.ControlFlowVertex
+
+import Data.Location
 
 -- The type signatures in these functions are pretty gnarly, but these functions
 -- are hit sufficiently often in the CLI and test suite so as to merit avoiding
@@ -324,6 +325,23 @@ checking
   . runAddressError
   . runTypes
 
+type ProjectEvaluator syntax =
+  Project
+  -> IO
+      (Heap
+      (Hole (Maybe Name) Precise)
+      (Hole (Maybe Name) Precise)
+      (Value
+      (Quieterm (Sum syntax) Location)
+      (Hole (Maybe Name) Precise)),
+      (ScopeGraph (Hole (Maybe Name) Precise),
+      ModuleTable
+      (Module
+              (ModuleResult
+              (Hole (Maybe Name) Precise)
+              (Value
+              (Quieterm (Sum syntax) Location)
+              (Hole (Maybe Name) Precise))))))
 type FileEvaluator syntax =
   [FilePath]
   -> IO
@@ -484,6 +502,23 @@ callGraphProject parser proxy paths = runTask' $ do
   x <- runCallGraph proxy False modules package
   pure (x, (() <$) <$> modules)
 
+
+scopeGraphRubyProject :: ProjectEvaluator Language.Ruby.Assignment.Syntax
+scopeGraphRubyProject = justEvaluatingCatchingErrors <=< evaluateProjectForScopeGraph (Proxy @'Language.Ruby) rubyParser
+
+scopeGraphPHPProject :: ProjectEvaluator Language.PHP.Assignment.Syntax
+scopeGraphPHPProject = justEvaluatingCatchingErrors <=< evaluateProjectForScopeGraph (Proxy @'Language.PHP) phpParser
+
+scopeGraphGoProject :: ProjectEvaluator Language.Go.Assignment.Syntax
+scopeGraphGoProject = justEvaluatingCatchingErrors <=< evaluateProjectForScopeGraph (Proxy @'Language.Go) goParser
+
+scopeGraphTypeScriptProject :: ProjectEvaluator Language.TypeScript.Assignment.Syntax
+scopeGraphTypeScriptProject = justEvaluatingCatchingErrors <=< evaluateProjectForScopeGraph (Proxy @'Language.TypeScript) typescriptParser
+
+scopeGraphJavaScriptProject :: ProjectEvaluator Language.TypeScript.Assignment.Syntax
+scopeGraphJavaScriptProject = justEvaluatingCatchingErrors <=< evaluateProjectForScopeGraph (Proxy @'Language.TypeScript) typescriptParser
+
+
 evaluatePythonProject :: ( syntax ~ Language.Python.Assignment.Syntax
                    , qterm ~ Quieterm (Sum syntax) Location
                    , value ~ (Concrete.Value qterm address)
@@ -590,6 +625,43 @@ evaluatePythonProjects proxy parser lang path = runTask' $ do
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
   pure (id @(Evaluator _ Precise (Value _ Precise) _ _)
+       (runModuleTable
+       (runModules (ModuleTable.modulePaths (packageModules package))
+       (raiseHandler (runReader (packageInfo package))
+       (raiseHandler (evalState (lowerBound @Span))
+       (raiseHandler (runReader (lowerBound @Span))
+       (evaluate proxy (runDomainEffects (evalTerm withTermSpans)) modules)))))))
+
+evaluateProjectForScopeGraph :: ( term ~ Term (Sum syntax) Location
+                              , qterm ~ Quieterm (Sum syntax) Location
+                              , address ~ Hole (Maybe Name) Precise
+                              , LanguageSyntax lang syntax
+                              )
+                             => Proxy (lang :: Language.Language)
+                             -> Parser term
+                             -> Project
+                             -> IO (Evaluator qterm address
+                                    (Value qterm address)
+                                    (ResumableWithC (BaseError (ValueError qterm address))
+                               (Eff (ResumableWithC (BaseError (AddressError address (Value qterm address)))
+                               (Eff (ResumableWithC (BaseError ResolutionError)
+                               (Eff (ResumableWithC (BaseError (EvalError qterm address (Value qterm address)))
+                               (Eff (ResumableWithC (BaseError (HeapError address))
+                               (Eff (ResumableWithC (BaseError (ScopeError address))
+                               (Eff (ResumableWithC (BaseError (UnspecializedError address (Value qterm address)))
+                               (Eff (ResumableWithC (BaseError (LoadError address (Value qterm address)))
+                               (Eff (FreshC
+                               (Eff (StateC (ScopeGraph address)
+                               (Eff (StateC (Heap address address (Value qterm address))
+                               (Eff (TraceByPrintingC
+                               (Eff (LiftC IO)))))))))))))))))))))))))
+                             (ModuleTable (Module
+                                (ModuleResult address (Value qterm address)))))
+evaluateProjectForScopeGraph proxy parser project = runTask' $ do
+  package <- fmap quieterm <$> parsePythonPackage parser project
+  modules <- topologicalSort <$> runImportGraphToModules proxy package
+  trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
+  pure (id @(Evaluator _ (Hole.Hole (Maybe Name) Precise) (Value _ (Hole.Hole (Maybe Name) Precise)) _ _)
        (runModuleTable
        (runModules (ModuleTable.modulePaths (packageModules package))
        (raiseHandler (runReader (packageInfo package))

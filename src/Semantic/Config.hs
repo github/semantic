@@ -6,6 +6,7 @@ module Semantic.Config
   , Options (..)
   , defaultOptions
   , debugOptions
+  , infoOptions
   , lookupStatsAddr
   , withHaystackFromConfig
   , logOptionsFromConfig
@@ -62,6 +63,9 @@ defaultOptions = Options (Just Warning) False False
 
 debugOptions :: Options
 debugOptions = Options (Just Debug) False False
+
+infoOptions :: Options
+infoOptions = Options (Just Info) False False
 
 defaultConfig :: Options -> IO Config
 defaultConfig options@Options{..} = do

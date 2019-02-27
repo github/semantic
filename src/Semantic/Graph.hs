@@ -21,8 +21,8 @@ module Semantic.Graph
 , resumingUnspecialized
 , resumingAddressError
 , resumingValueError
-, resumingScopeError
 , resumingHeapError
+, resumingScopeError
 , resumingTypeError
 ) where
 
@@ -149,6 +149,7 @@ runImportGraphToModuleInfos :: ( Declarations term
                                , Evaluatable (Base term)
                                , FreeVariables term
                                , AccessControls term
+                               , HasSpan term
                                , HasPrelude lang
                                , Member Trace sig
                                , Recursive term
@@ -166,6 +167,7 @@ runImportGraphToModules :: ( Declarations term
                            , Evaluatable (Base term)
                            , FreeVariables term
                            , AccessControls term
+                           , HasSpan term
                            , HasPrelude lang
                            , Member Trace sig
                            , Recursive term
@@ -179,10 +181,11 @@ runImportGraphToModules :: ( Declarations term
 runImportGraphToModules lang (package :: Package term) = runImportGraph lang package resolveOrLowerBound
   where resolveOrLowerBound info = maybe lowerBound vertex (ModuleTable.lookup (modulePath info) (packageModules package))
 
-runImportGraph :: ( Declarations term
+runImportGraph :: ( AccessControls term
                   , Evaluatable (Base term)
                   , FreeVariables term
-                  , AccessControls term
+                  , HasSpan term
+                  , Declarations term
                   , HasPrelude lang
                   , Member Trace sig
                   , Recursive term

@@ -29,33 +29,42 @@
     (Return
       (Call
         (MemberAccess
+          (Identifier)
           (Identifier))
         (Plus
           (Times
             (MemberAccess
+              (Identifier)
               (Identifier))
             (MemberAccess
+              (Identifier)
               (Identifier)))
           (Times
             (MemberAccess
+              (Identifier)
               (Identifier))
             (MemberAccess
+              (Identifier)
               (Identifier))))
         (Empty))))
   (Method
     (Statements
       (Assignment
         (MemberAccess
+          (Identifier)
           (Identifier))
         (Times
           (MemberAccess
+            (Identifier)
             (Identifier))
           (Identifier)))
       (Assignment
         (MemberAccess
+          (Identifier)
           (Identifier))
         (Times
           (MemberAccess
+            (Identifier)
             (Identifier))
           (Identifier))))
     (Statements

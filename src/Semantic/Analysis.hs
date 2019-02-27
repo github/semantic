@@ -73,7 +73,7 @@ evaluate lang runModule modules = do
           let (scopeEdges, frameLinks) = case (parentScope, parentFrame) of
                 (Just parentScope, Just parentFrame) -> (Map.singleton Lexical [ parentScope ], Map.singleton Lexical (Map.singleton parentScope parentFrame))
                 _ -> mempty
-          scopeAddress <- newScope scopeEdges
+          scopeAddress <- if Prologue.null scopeEdges then newPreludeScope scopeEdges else newScope scopeEdges
           frameAddress <- newFrame scopeAddress frameLinks
           val <- runInModule scopeAddress frameAddress m
           pure ((scopeAddress, frameAddress), val)
@@ -157,11 +157,12 @@ runDomainEffects runTerm
 --
 --   This calls out to the 'Evaluatable' instances, and can have other functions composed after it to e.g. intercept effects arising in the evaluation of the term.
 evalTerm :: ( Carrier sig m
+            , AbstractValue term address value m
+            , AccessControls term
             , Declarations term
             , Evaluatable (Base term)
             , FreeVariables term
-            , AccessControls term
-            , AbstractValue term address value m
+            , HasSpan term
             , Member (Allocator address) sig
             , Member (Bitwise value) sig
             , Member (Boolean value) sig

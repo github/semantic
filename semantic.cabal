@@ -111,6 +111,7 @@ library
                      , Data.Abstract.FreeVariables
                      , Data.Abstract.AccessControls.Class
                      , Data.Abstract.AccessControls.Instances
+                     , Data.Abstract.HasSpan
                      , Data.Abstract.Heap
                      , Data.Abstract.Live
                      , Data.Abstract.Module
@@ -321,7 +322,8 @@ library
                      , tree-sitter-java
   ghc-options:         -Wall -Wmissing-export-lists -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -fno-warn-name-shadowing -j
   if flag(release)
-    ghc-options:       -Werror -O1 -DCOMPUTE_GIT_SHA
+    ghc-options:       -Werror -O1
+    cpp-options:       -DCOMPUTE_GIT_SHA
   else
     ghc-options:       -O0 +RTS -A128m -n2m -RTS
   ghc-prof-options:    -fprof-auto
@@ -331,7 +333,8 @@ executable semantic
   hs-source-dirs:      app
   main-is:             Main.hs
   if flag(release)
-    ghc-options:       -O1 -DCOMPUTE_GIT_SHA
+    ghc-options:       -O1
+    cpp-options:       -DCOMPUTE_GIT_SHA
   else
     ghc-options:       -O0 -dynamic
   build-depends:       base
