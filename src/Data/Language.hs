@@ -3,6 +3,7 @@ module Data.Language
   ( Language (..)
   , SLanguage (..)
   , extensionsForLanguage
+  , parseLanguage
   , knownLanguage
   , languageForFilePath
   , languageForType
@@ -80,20 +81,23 @@ instance Finite Language where
     go x = (fromString (fmap toUpper (show x)), fromEnum x)
 
 instance FromJSON Language where
-  parseJSON = withText "Language" $ \l -> pure $ case T.toLower l of
-    "go"         -> Go
-    "haskell"    -> Haskell
-    "java"       -> Java
-    "javascript" -> JavaScript
-    "json"       -> JSON
-    "jsx"        -> JSX
-    "markdown"   -> Markdown
-    "python"     -> Python
-    "ruby"       -> Ruby
-    "typescript" -> TypeScript
-    "php"        -> PHP
-    _            -> Unknown
+  parseJSON = withText "Language" $ \l ->
+    pure $ fromMaybe Unknown (parseLanguage l)
 
+parseLanguage :: Text -> Maybe Language
+parseLanguage l = case T.toLower l of
+  "go"         -> Just Go
+  "haskell"    -> Just Haskell
+  "java"       -> Just Java
+  "javascript" -> Just JavaScript
+  "json"       -> Just JSON
+  "jsx"        -> Just JSX
+  "markdown"   -> Just Markdown
+  "python"     -> Just Python
+  "ruby"       -> Just Ruby
+  "typescript" -> Just TypeScript
+  "php"        -> Just PHP
+  _            -> Nothing
 
 -- | Predicate failing on 'Unknown' and passing in all other cases.
 knownLanguage :: Language -> Bool
