@@ -73,7 +73,7 @@ instance (ConstructorName syntax, Foldable syntax) =>
     termAlgebra (In ann syntax) = do
       i <- fresh
       parent <- ask
-      let root = vertex (TermVertex (fromIntegral i) (T.pack (constructorName syntax)) (locationSpan ann ^? re bridging))
+      let root = vertex (TermVertex (fromIntegral i) (T.pack (constructorName syntax)) (bridging #? locationSpan ann))
       subGraph <- foldl' (\acc x -> overlay <$> acc <*> local (const root) x) (pure mempty) syntax
       pure (parent `connect` root `overlay` subGraph)
 
@@ -92,7 +92,7 @@ instance (ConstructorName syntax, Foldable syntax) =>
       graph <- local (const replace) (overlay <$> diffAlgebra t1 (Deleted (Just (DeletedTerm beforeName beforeSpan))) <*> diffAlgebra t2 (Inserted (Just (InsertedTerm afterName afterSpan))))
       pure (parent `connect` replace `overlay` graph)
     where
-      ann a = a ^? to locationSpan . re bridging
+      ann a = bridging #? locationSpan a
       diffAlgebra ::
         ( Foldable f
         , Member Fresh sig
