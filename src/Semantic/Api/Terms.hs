@@ -17,6 +17,7 @@ module Semantic.Api.Terms
 import           Analysis.ConstructorName (ConstructorName)
 import           Control.Effect
 import           Control.Effect.Error
+import           Control.Lens
 import           Control.Monad
 import           Control.Monad.IO.Class
 import           Data.Abstract.Declarations
@@ -52,7 +53,7 @@ termGraph blobs = ParseTreeGraphResponse . V.fromList . toList <$> distributeFor
         pure (ParseTreeFileGraph path lang mempty mempty (V.fromList [ParseError (T.pack (show e))]))
       where
         path = T.pack $ blobPath blob
-        lang = languageToApiLanguage $ blobLanguage blob
+        lang = bridging # blobLanguage blob
 
         render :: (Foldable syntax, Functor syntax, ConstructorName syntax) => Term syntax Location -> ParseTreeFileGraph
         render t = let graph = renderTreeGraph t
