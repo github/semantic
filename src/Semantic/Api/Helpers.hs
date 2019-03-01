@@ -84,7 +84,7 @@ apiBlobPairsToBlobPairs :: V.Vector API.BlobPair -> [Data.BlobPair]
 apiBlobPairsToBlobPairs = V.toList . fmap apiBlobPairToBlobPair
 
 apiBlobPairToBlobPair :: API.BlobPair -> Data.BlobPair
-apiBlobPairToBlobPair (API.BlobPair (Just before) (Just after)) = Join (These (apiBlobToBlob before) (apiBlobToBlob after))
-apiBlobPairToBlobPair (API.BlobPair (Just before) Nothing) = Join (This (apiBlobToBlob before))
-apiBlobPairToBlobPair (API.BlobPair Nothing (Just after)) = Join (That (apiBlobToBlob after))
+apiBlobPairToBlobPair (API.BlobPair (Just before) (Just after)) = Data.Diffing (apiBlobToBlob before) (apiBlobToBlob after)
+apiBlobPairToBlobPair (API.BlobPair (Just before) Nothing) = Data.Deleting (apiBlobToBlob before)
+apiBlobPairToBlobPair (API.BlobPair Nothing (Just after)) = Data.Inserting (apiBlobToBlob after)
 apiBlobPairToBlobPair _ = Prelude.error "Expected BlobPair to have either 'before' and/or 'after'."
