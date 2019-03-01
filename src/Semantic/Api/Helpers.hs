@@ -78,7 +78,9 @@ apiBlobsToBlobs :: V.Vector API.Blob -> [Data.Blob]
 apiBlobsToBlobs = V.toList . fmap apiBlobToBlob
 
 apiBlobToBlob :: API.Blob -> Data.Blob
-apiBlobToBlob API.Blob{..} = Data.Blob (fromText content) (T.unpack path) (apiLanguageToLanguage language)
+apiBlobToBlob API.Blob{..} = case parseRelFile (T.unpack path) of
+  Just p -> Data.Blob (fromText content) p (apiLanguageToLanguage language)
+  Nothing -> error "Expected API blob to have a relative path"
 
 apiBlobPairsToBlobPairs :: V.Vector API.BlobPair -> [Data.BlobPair]
 apiBlobPairsToBlobPairs = V.toList . fmap apiBlobPairToBlobPair

@@ -75,9 +75,9 @@ instance FromJSON BlobPair where
     before <- o .:? "before"
     after <- o .:? "after"
     case (before, after) of
-      (Just b, Just a)  -> pure $ Join (These b a)
-      (Just b, Nothing) -> pure $ Join (This b)
-      (Nothing, Just a) -> pure $ Join (That a)
+      (Just b, Just a)  -> pure $ Diffing b a
+      (Just b, Nothing) -> pure $ Deleting b
+      (Nothing, Just a) -> pure $ Inserting a
       _                 -> Prelude.fail "Expected object with 'before' and/or 'after' keys only"
 
 pattern Diffing :: Blob -> Blob -> BlobPair
