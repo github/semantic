@@ -20,7 +20,6 @@ import Data.Term
 import Prologue
 import Semantic.Api.Bridge
 import Semantic.Api.V1.CodeAnalysisPB
-import Control.Lens
 
 import qualified Data.Text as T
 
