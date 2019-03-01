@@ -2,6 +2,7 @@
 module Semantic.Api.Bridge
   ( APIBridge (..)
   , APIConvert (..)
+  , (#?)
   ) where
 
 import           Control.Lens
@@ -12,6 +13,12 @@ import qualified Data.Span as Data
 import qualified Data.Text as T
 import qualified Semantic.Api.LegacyTypes as Legacy
 import qualified Semantic.Api.V1.CodeAnalysisPB as API
+
+-- | A helper function for turning 'bridging' around and
+-- extracting 'Just' values from it.
+(#?) :: AReview t s -> s -> Maybe t
+rev #? item = item ^? re rev
+infixr 8 #?
 
 class APIConvert api native | api -> native where
   converting :: Prism' api native
@@ -31,13 +38,13 @@ instance APIBridge API.Position Data.Pos where
 
 instance APIBridge API.Span Data.Span where
   bridging = iso fromAPI toAPI where
-    toAPI Data.Span{..} = API.Span (spanStart ^? re bridging) (spanEnd ^? re bridging)
+    toAPI Data.Span{..} = API.Span (bridging #? spanStart) (bridging #? spanEnd)
     fromAPI API.Span{..} = Data.Span (start^.non single.bridging) (end^.non single.bridging)
     single = API.Position 1 1
 
 instance APIConvert Legacy.Span Data.Span where
   converting = prism' dataToLegacy legacyToData where
-    dataToLegacy Data.Span{..} = Legacy.Span (spanStart ^? re bridging) (spanEnd ^? re bridging)
+    dataToLegacy Data.Span{..} = Legacy.Span (bridging #? spanStart) (bridging #? spanEnd)
     legacyToData Legacy.Span {..} = Data.Span <$> (start >>= preview bridging) <*> (end >>= preview bridging)
 
 instance APIBridge API.Language Data.Language where
@@ -87,6 +94,6 @@ instance APIConvert API.BlobPair Data.BlobPair where
     apiBlobPairToBlobPair _ = Nothing
 
 
-    blobPairToApiBlobPair (Data.Diffing before after) = API.BlobPair (before ^? re bridging) (after ^? re bridging)
-    blobPairToApiBlobPair (Data.Inserting after)      = API.BlobPair Nothing (after ^? re bridging)
-    blobPairToApiBlobPair (Data.Deleting before)      = API.BlobPair (before ^? re bridging) Nothing
+    blobPairToApiBlobPair (Data.Diffing before after) = API.BlobPair (bridging #? before) (bridging #? after)
+    blobPairToApiBlobPair (Data.Inserting after)      = API.BlobPair Nothing (bridging #? after)
+    blobPairToApiBlobPair (Data.Deleting before)      = API.BlobPair (bridging #? before) Nothing
