@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveAnyClass, ExplicitNamespaces, PatternSynonyms #-}
 module Data.Blob
 ( Blob(..)
 , Blobs(..)
@@ -6,11 +6,10 @@ module Data.Blob
 , nullBlob
 , sourceBlob
 , noLanguageForBlob
-, BlobPair
-, These(..)
-, blobPairDiffing
-, blobPairInserting
-, blobPairDeleting
+, type BlobPair
+, pattern Diffing
+, pattern Inserting
+, pattern Deleting
 , decodeBlobPairs
 , languageForBlobPair
 , languageTagForBlobPair
@@ -80,28 +79,30 @@ instance FromJSON BlobPair where
       (Nothing, Just a) -> pure $ Join (That a)
       _                 -> Prelude.fail "Expected object with 'before' and/or 'after' keys only"
 
-blobPairDiffing :: Blob -> Blob -> BlobPair
-blobPairDiffing a b = Join (These a b)
+pattern Diffing :: Blob -> Blob -> BlobPair
+pattern Diffing a b = Join (These a b)
 
-blobPairInserting :: Blob -> BlobPair
-blobPairInserting = Join . That
+pattern Inserting :: Blob -> BlobPair
+pattern Inserting a = Join (That a)
 
-blobPairDeleting :: Blob -> BlobPair
-blobPairDeleting = Join . This
+pattern Deleting :: Blob -> BlobPair
+pattern Deleting b = Join (This b)
+
+{-# COMPLETE Diffing, Inserting, Deleting #-}
 
 languageForBlobPair :: BlobPair -> Language
-languageForBlobPair (Join (This Blob{..})) = blobLanguage
-languageForBlobPair (Join (That Blob{..})) = blobLanguage
-languageForBlobPair (Join (These a b))
+languageForBlobPair (Deleting Blob{..})  = blobLanguage
+languageForBlobPair (Inserting Blob{..}) = blobLanguage
+languageForBlobPair (Diffing a b)
   | blobLanguage a == Unknown || blobLanguage b == Unknown
     = Unknown
   | otherwise
     = blobLanguage b
 
 pathForBlobPair :: BlobPair -> FilePath
-pathForBlobPair (Join (This Blob{..}))    = blobPath
-pathForBlobPair (Join (That Blob{..}))    = blobPath
-pathForBlobPair (Join (These _ Blob{..})) = blobPath
+pathForBlobPair (Deleting Blob{..})  = blobPath
+pathForBlobPair (Inserting Blob{..}) = blobPath
+pathForBlobPair (Diffing _ Blob{..}) = blobPath
 
 languageTagForBlobPair :: BlobPair -> [(String, String)]
 languageTagForBlobPair pair = showLanguage (languageForBlobPair pair)
