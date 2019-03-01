@@ -14,17 +14,32 @@ import qualified Data.Text as T
 import qualified Semantic.Api.LegacyTypes as Legacy
 import qualified Semantic.Api.V1.CodeAnalysisPB as API
 
+-- | An @APIBridge x y@ instance describes an isomorphism between @x@ and @y@.
+-- This is suitable for types such as 'Pos' which are representationally equal
+-- in their API, legacy, and native forms. All 'Lens' laws apply.
+--
+-- Foreign to native: @x^.bridging@
+-- Native to foreign: @bridging # x@
+-- Native to 'Just' foreign: @bridging #? x@.
+class APIBridge api native | api -> native where
+  bridging :: Iso' api native
+
+-- | An @APIConvert x y@ instance describes a partial isomorphism between @x@ and @y@.
+-- This is suitable for types containing nested records therein, such as 'Span'.
+-- (The isomorphism must be partial, given that a protobuf record can have Nothing
+-- for all its fields, which means we cannot convert to a native format.)
+--
+-- Foreign to 'Maybe' native: @x^?converting@
+-- Native to foreign: @converting # x@
+-- Native to 'Just' foreign: @converting #? x@
+class APIConvert api native | api -> native where
+  converting :: Prism' api native
+
 -- | A helper function for turning 'bridging' around and
 -- extracting 'Just' values from it.
 (#?) :: AReview t s -> s -> Maybe t
 rev #? item = item ^? re rev
 infixr 8 #?
-
-class APIConvert api native | api -> native where
-  converting :: Prism' api native
-
-class APIBridge api native | api -> native where
-  bridging :: Iso' api native
 
 instance APIBridge Legacy.Position Data.Pos where
   bridging = iso fromAPI toAPI where
@@ -42,9 +57,9 @@ instance APIConvert API.Span Data.Span where
     fromAPI API.Span{..} = Data.Span <$> (start >>= preview bridging) <*> (end >>= preview bridging)
 
 instance APIConvert Legacy.Span Data.Span where
-  converting = prism' dataToLegacy legacyToData where
-    dataToLegacy Data.Span{..} = Legacy.Span (bridging #? spanStart) (bridging #? spanEnd)
-    legacyToData Legacy.Span {..} = Data.Span <$> (start >>= preview bridging) <*> (end >>= preview bridging)
+  converting = prism' toAPI fromAPI where
+    toAPI Data.Span{..} = Legacy.Span (bridging #? spanStart) (bridging #? spanEnd)
+    fromAPI Legacy.Span {..} = Data.Span <$> (start >>= preview bridging) <*> (end >>= preview bridging)
 
 instance APIBridge API.Language Data.Language where
   bridging = iso apiLanguageToLanguage languageToApiLanguage where
@@ -91,7 +106,6 @@ instance APIConvert API.BlobPair Data.BlobPair where
     apiBlobPairToBlobPair (API.BlobPair (Just before) Nothing) = Just $ Data.Deleting (before^.bridging)
     apiBlobPairToBlobPair (API.BlobPair Nothing (Just after)) = Just $ Data.Inserting (after^.bridging)
     apiBlobPairToBlobPair _ = Nothing
-
 
     blobPairToApiBlobPair (Data.Diffing before after) = API.BlobPair (bridging #? before) (bridging #? after)
     blobPairToApiBlobPair (Data.Inserting after)      = API.BlobPair Nothing (bridging #? after)
