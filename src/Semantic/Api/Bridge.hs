@@ -36,11 +36,10 @@ instance APIBridge API.Position Data.Pos where
     toAPI Data.Pos{..}          = API.Position (fromIntegral posLine) (fromIntegral posColumn)
     fromAPI API.Position{..}    = Data.Pos (fromIntegral line) (fromIntegral column)
 
-instance APIBridge API.Span Data.Span where
-  bridging = iso fromAPI toAPI where
+instance APIConvert API.Span Data.Span where
+  converting = prism' toAPI fromAPI where
     toAPI Data.Span{..} = API.Span (bridging #? spanStart) (bridging #? spanEnd)
-    fromAPI API.Span{..} = Data.Span (start^.non single.bridging) (end^.non single.bridging)
-    single = API.Position 1 1
+    fromAPI API.Span{..} = Data.Span <$> (start >>= preview bridging) <*> (end >>= preview bridging)
 
 instance APIConvert Legacy.Span Data.Span where
   converting = prism' dataToLegacy legacyToData where
