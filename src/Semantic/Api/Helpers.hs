@@ -12,14 +12,12 @@ module Semantic.Api.Helpers
   , apiBlobPairToBlobPair
   ) where
 
-import           Data.Bifunctor.Join
 import qualified Data.Blob as Data
 import qualified Data.Language as Data
 import           Data.Source (fromText)
 import qualified Data.Span as Data
 import qualified Data.Text as T
 import qualified Data.Vector as V
-import           Data.These
 import qualified Semantic.Api.LegacyTypes as Legacy
 import qualified Semantic.Api.V1.CodeAnalysisPB as API
 
