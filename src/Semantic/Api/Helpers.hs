@@ -1,11 +1,8 @@
 {-# LANGUAGE FunctionalDependencies, LambdaCase, MultiParamTypeClasses #-}
 module Semantic.Api.Helpers
   ( APIBridge (..)
-  , toChangeType
-  , apiBlobsToBlobs
+  , APIConvert (..)
   ) where
-
-import Prologue
 
 import           Control.Lens
 import qualified Data.Blob as Data
@@ -13,7 +10,6 @@ import qualified Data.Language as Data
 import           Data.Source (fromText, toText)
 import qualified Data.Span as Data
 import qualified Data.Text as T
-import qualified Data.Vector as V
 import qualified Semantic.Api.LegacyTypes as Legacy
 import qualified Semantic.Api.V1.CodeAnalysisPB as API
 
@@ -33,11 +29,16 @@ instance APIBridge API.Position Data.Pos where
     toAPI Data.Pos{..}          = API.Position (fromIntegral posLine) (fromIntegral posColumn)
     fromAPI API.Position{..}    = Data.Pos (fromIntegral line) (fromIntegral column)
 
-instance APIBridge Data.Span API.Span where
-  bridging = iso toAPI fromAPI where
+instance APIBridge API.Span Data.Span where
+  bridging = iso fromAPI toAPI where
     toAPI Data.Span{..} = API.Span (spanStart ^? re bridging) (spanEnd ^? re bridging)
     fromAPI API.Span{..} = Data.Span (start^.non single.bridging) (end^.non single.bridging)
     single = API.Position 1 1
+
+instance APIConvert Legacy.Span Data.Span where
+  converting = prism' dataToLegacy legacyToData where
+    dataToLegacy Data.Span{..} = Legacy.Span (spanStart ^? re bridging) (spanEnd ^? re bridging)
+    legacyToData Legacy.Span {..} = Data.Span <$> (start >>= preview bridging) <*> (end >>= preview bridging)
 
 instance APIBridge API.Language Data.Language where
   bridging = iso apiLanguageToLanguage languageToApiLanguage where
@@ -89,13 +90,3 @@ instance APIConvert API.BlobPair Data.BlobPair where
     blobPairToApiBlobPair (Data.Diffing before after) = API.BlobPair (before ^? re bridging) (after ^? re bridging)
     blobPairToApiBlobPair (Data.Inserting after)      = API.BlobPair Nothing (after ^? re bridging)
     blobPairToApiBlobPair (Data.Deleting before)      = API.BlobPair (before ^? re bridging) Nothing
-
-toChangeType :: T.Text -> API.ChangeType
-toChangeType = \case
-  "added" -> API.Added
-  "modified" -> API.Modified
-  "removed" -> API.Removed
-  _ -> API.None
-
-apiBlobsToBlobs :: V.Vector API.Blob -> [Data.Blob]
-apiBlobsToBlobs = V.toList . fmap (^.bridging)

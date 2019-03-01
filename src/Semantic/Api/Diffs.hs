@@ -16,6 +16,7 @@ import           Analysis.TOCSummary (HasDeclaration)
 import           Control.Effect
 import           Control.Effect.Error
 import           Control.Exception
+import           Control.Lens
 import           Control.Monad.IO.Class
 import           Data.Blob
 import           Data.ByteString.Builder
@@ -75,7 +76,7 @@ diffGraph blobs = DiffTreeGraphResponse . V.fromList . toList <$> distributeFor 
         pure (DiffTreeFileGraph path lang mempty mempty (V.fromList [ParseError (T.pack (show e))]))
       where
         path = T.pack $ pathForBlobPair blobPair
-        lang = languageToApiLanguage $ languageForBlobPair blobPair
+        lang = bridging # languageForBlobPair blobPair
 
         render :: (Foldable syntax, Functor syntax, ConstructorName syntax, Applicative m) => BlobPair -> Diff syntax Location Location -> m DiffTreeFileGraph
         render _ diff =

@@ -1,8 +1,9 @@
-{-# LANGUAGE GADTs, TypeOperators, DerivingStrategies #-}
+{-# LANGUAGE GADTs, TypeOperators, DerivingStrategies, LambdaCase #-}
 module Semantic.Api.TOCSummaries (diffSummary, legacyDiffSummary, diffSummaryBuilder) where
 
 import           Analysis.TOCSummary (Declaration, declarationAlgebra)
 import           Control.Effect.Error
+import           Control.Lens
 import           Data.Aeson
 import           Data.Blob
 import           Data.ByteString.Builder
@@ -42,16 +43,22 @@ diffSummary blobs = DiffTreeTOCResponse . V.fromList <$> distributeFor blobs go
       `catchError` \(SomeException e) ->
         pure $ TOCSummaryFile path lang mempty (V.fromList [TOCSummaryError (T.pack (show e)) Nothing])
       where path = T.pack $ pathKeyForBlobPair blobPair
-            lang = languageToApiLanguage $ languageForBlobPair blobPair
+            lang = bridging # languageForBlobPair blobPair
 
     render :: (Foldable syntax, Functor syntax, Applicative m) => BlobPair -> Diff syntax (Maybe Declaration) (Maybe Declaration) -> m TOCSummaryFile
     render blobPair diff = pure $ foldr go (TOCSummaryFile path lang mempty mempty) (diffTOC diff)
       where
         path = T.pack $ pathKeyForBlobPair blobPair
-        lang = languageToApiLanguage $ languageForBlobPair blobPair
+        lang = bridging # languageForBlobPair blobPair
+
+        toChangeType = \case
+          "added" -> Added
+          "modified" -> Modified
+          "removed" -> Removed
+          _ -> None
 
         go :: TOCSummary -> TOCSummaryFile -> TOCSummaryFile
         go TOCSummary{..} TOCSummaryFile{..}
-          = TOCSummaryFile path language (V.cons (TOCSummaryChange summaryCategoryName summaryTermName (spanToSpan summarySpan) (toChangeType summaryChangeType)) changes) errors
+          = TOCSummaryFile path language (V.cons (TOCSummaryChange summaryCategoryName summaryTermName (summarySpan ^? re bridging) (toChangeType summaryChangeType)) changes) errors
         go ErrorSummary{..} TOCSummaryFile{..}
-          = TOCSummaryFile path language changes (V.cons (TOCSummaryError errorText (spanToSpan errorSpan)) errors)
+          = TOCSummaryFile path language changes (V.cons (TOCSummaryError errorText (errorSpan ^? re bridging)) errors)
