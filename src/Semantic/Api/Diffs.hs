@@ -34,7 +34,7 @@ import           Prologue
 import           Rendering.Graph
 import           Rendering.JSON hiding (JSON)
 import qualified Rendering.JSON
-import           Semantic.Api.Helpers
+import           Semantic.Api.Bridge
 import           Semantic.Api.V1.CodeAnalysisPB hiding (Blob, BlobPair, Language(..))
 import           Semantic.Task as Task
 import           Semantic.Telemetry as Stat

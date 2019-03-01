@@ -21,7 +21,7 @@ import qualified Data.Vector as V
 import           Data.Text (pack)
 import           Parsing.Parser
 import           Prologue
-import           Semantic.Api.Helpers
+import           Semantic.Api.Bridge
 import qualified Semantic.Api.LegacyTypes as Legacy
 import           Semantic.Api.Terms (ParseEffects, doParse)
 import           Semantic.Api.V1.CodeAnalysisPB hiding (Blob)
