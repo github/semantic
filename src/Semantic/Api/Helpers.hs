@@ -1,39 +1,94 @@
-{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE FunctionalDependencies, LambdaCase, MultiParamTypeClasses #-}
 module Semantic.Api.Helpers
-  ( spanToSpan
-  , spanToLegacySpan
+  ( APIBridge (..)
   , toChangeType
-  , languageToApiLanguage
-  , apiSpanToSpan
-  , apiLanguageToLanguage
   , apiBlobsToBlobs
-  , apiBlobToBlob
-  , apiBlobPairsToBlobPairs
-  , apiBlobPairToBlobPair
   ) where
 
+import Prologue
+
+import           Control.Lens
 import qualified Data.Blob as Data
 import qualified Data.Language as Data
-import           Data.Source (fromText)
+import           Data.Source (fromText, toText)
 import qualified Data.Span as Data
 import qualified Data.Text as T
 import qualified Data.Vector as V
 import qualified Semantic.Api.LegacyTypes as Legacy
 import qualified Semantic.Api.V1.CodeAnalysisPB as API
 
-spanToSpan :: Data.Span -> Maybe API.Span
-spanToSpan Data.Span{..} = Just $ API.Span (toPos spanStart) (toPos spanEnd)
-  where toPos Data.Pos{..} = Just $ API.Position (fromIntegral posLine) (fromIntegral posColumn)
+class APIConvert api native | api -> native where
+  converting :: Prism' api native
 
-spanToLegacySpan :: Data.Span -> Maybe Legacy.Span
-spanToLegacySpan Data.Span{..} = Just $ Legacy.Span (toPos spanStart) (toPos spanEnd)
-  where toPos Data.Pos{..} = Just $ Legacy.Position posLine posColumn
+class APIBridge api native | api -> native where
+  bridging :: Iso' api native
 
-apiSpanToSpan :: Maybe API.Span -> Data.Span
-apiSpanToSpan (Just API.Span{..}) = Data.Span (toPos start) (toPos end)
-  where toPos (Just API.Position{..}) = Data.Pos (fromIntegral line) (fromIntegral column)
-        toPos Nothing = Data.Pos 1 1
-apiSpanToSpan Nothing = Data.emptySpan
+instance APIBridge Legacy.Position Data.Pos where
+  bridging = iso fromAPI toAPI where
+    toAPI Data.Pos{..}          = Legacy.Position posLine posColumn
+    fromAPI Legacy.Position{..} = Data.Pos line column
+
+instance APIBridge API.Position Data.Pos where
+  bridging = iso fromAPI toAPI where
+    toAPI Data.Pos{..}          = API.Position (fromIntegral posLine) (fromIntegral posColumn)
+    fromAPI API.Position{..}    = Data.Pos (fromIntegral line) (fromIntegral column)
+
+instance APIBridge Data.Span API.Span where
+  bridging = iso toAPI fromAPI where
+    toAPI Data.Span{..} = API.Span (spanStart ^? re bridging) (spanEnd ^? re bridging)
+    fromAPI API.Span{..} = Data.Span (start^.non single.bridging) (end^.non single.bridging)
+    single = API.Position 1 1
+
+instance APIBridge API.Language Data.Language where
+  bridging = iso apiLanguageToLanguage languageToApiLanguage where
+    languageToApiLanguage :: Data.Language -> API.Language
+    languageToApiLanguage = \case
+      Data.Unknown -> API.Unknown
+      Data.Go -> API.Go
+      Data.Haskell -> API.Haskell
+      Data.Java -> API.Java
+      Data.JavaScript -> API.Javascript
+      Data.JSON -> API.Json
+      Data.JSX -> API.Jsx
+      Data.Markdown -> API.Markdown
+      Data.Python -> API.Python
+      Data.Ruby -> API.Ruby
+      Data.TypeScript -> API.Typescript
+      Data.PHP -> API.Php
+
+    apiLanguageToLanguage :: API.Language -> Data.Language
+    apiLanguageToLanguage = \case
+      API.Unknown -> Data.Unknown
+      API.Go -> Data.Go
+      API.Haskell -> Data.Haskell
+      API.Java -> Data.Java
+      API.Javascript -> Data.JavaScript
+      API.Json -> Data.JSON
+      API.Jsx -> Data.JSX
+      API.Markdown -> Data.Markdown
+      API.Python -> Data.Python
+      API.Ruby -> Data.Ruby
+      API.Typescript -> Data.TypeScript
+      API.Php -> Data.PHP
+
+instance APIBridge API.Blob Data.Blob where
+  bridging = iso apiBlobToBlob blobToApiBlob where
+    blobToApiBlob Data.Blob{..} = API.Blob (toText blobSource) (T.pack blobPath) (bridging # blobLanguage)
+    apiBlobToBlob API.Blob{..} = Data.Blob (fromText content) (T.unpack path) (language ^. bridging)
+
+
+instance APIConvert API.BlobPair Data.BlobPair where
+  converting = prism' blobPairToApiBlobPair apiBlobPairToBlobPair where
+
+    apiBlobPairToBlobPair (API.BlobPair (Just before) (Just after)) = Just $ Data.Diffing (before^.bridging) (after^.bridging)
+    apiBlobPairToBlobPair (API.BlobPair (Just before) Nothing) = Just $ Data.Deleting (before^.bridging)
+    apiBlobPairToBlobPair (API.BlobPair Nothing (Just after)) = Just $ Data.Inserting (after^.bridging)
+    apiBlobPairToBlobPair _ = Nothing
+
+
+    blobPairToApiBlobPair (Data.Diffing before after) = API.BlobPair (before ^? re bridging) (after ^? re bridging)
+    blobPairToApiBlobPair (Data.Inserting after)      = API.BlobPair Nothing (after ^? re bridging)
+    blobPairToApiBlobPair (Data.Deleting before)      = API.BlobPair (before ^? re bridging) Nothing
 
 toChangeType :: T.Text -> API.ChangeType
 toChangeType = \case
@@ -42,47 +97,5 @@ toChangeType = \case
   "removed" -> API.Removed
   _ -> API.None
 
-languageToApiLanguage :: Data.Language -> API.Language
-languageToApiLanguage = \case
-  Data.Unknown -> API.Unknown
-  Data.Go -> API.Go
-  Data.Haskell -> API.Haskell
-  Data.Java -> API.Java
-  Data.JavaScript -> API.Javascript
-  Data.JSON -> API.Json
-  Data.JSX -> API.Jsx
-  Data.Markdown -> API.Markdown
-  Data.Python -> API.Python
-  Data.Ruby -> API.Ruby
-  Data.TypeScript -> API.Typescript
-  Data.PHP -> API.Php
-
-apiLanguageToLanguage :: API.Language -> Data.Language
-apiLanguageToLanguage = \case
-  API.Unknown -> Data.Unknown
-  API.Go -> Data.Go
-  API.Haskell -> Data.Haskell
-  API.Java -> Data.Java
-  API.Javascript -> Data.JavaScript
-  API.Json -> Data.JSON
-  API.Jsx -> Data.JSX
-  API.Markdown -> Data.Markdown
-  API.Python -> Data.Python
-  API.Ruby -> Data.Ruby
-  API.Typescript -> Data.TypeScript
-  API.Php -> Data.PHP
-
 apiBlobsToBlobs :: V.Vector API.Blob -> [Data.Blob]
-apiBlobsToBlobs = V.toList . fmap apiBlobToBlob
-
-apiBlobToBlob :: API.Blob -> Data.Blob
-apiBlobToBlob API.Blob{..} = Data.Blob (fromText content) (T.unpack path) (apiLanguageToLanguage language)
-
-apiBlobPairsToBlobPairs :: V.Vector API.BlobPair -> [Data.BlobPair]
-apiBlobPairsToBlobPairs = V.toList . fmap apiBlobPairToBlobPair
-
-apiBlobPairToBlobPair :: API.BlobPair -> Data.BlobPair
-apiBlobPairToBlobPair (API.BlobPair (Just before) (Just after)) = Data.Diffing (apiBlobToBlob before) (apiBlobToBlob after)
-apiBlobPairToBlobPair (API.BlobPair (Just before) Nothing) = Data.Deleting (apiBlobToBlob before)
-apiBlobPairToBlobPair (API.BlobPair Nothing (Just after)) = Data.Inserting (apiBlobToBlob after)
-apiBlobPairToBlobPair _ = Prelude.error "Expected BlobPair to have either 'before' and/or 'after'."
+apiBlobsToBlobs = V.toList . fmap (^.bridging)
