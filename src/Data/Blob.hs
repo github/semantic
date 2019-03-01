@@ -10,6 +10,7 @@ module Data.Blob
 , pattern Diffing
 , pattern Inserting
 , pattern Deleting
+, maybeBlobPair
 , decodeBlobPairs
 , languageForBlobPair
 , languageTagForBlobPair
@@ -89,6 +90,13 @@ pattern Deleting :: Blob -> BlobPair
 pattern Deleting b = Join (This b)
 
 {-# COMPLETE Diffing, Inserting, Deleting #-}
+
+maybeBlobPair :: MonadFail m => Maybe Blob -> Maybe Blob -> m BlobPair
+maybeBlobPair a b = case (a, b) of
+  (Just a, Nothing) -> pure (Deleting a)
+  (Nothing, Just b) -> pure (Inserting b)
+  (Just a, Just b)  -> pure (Diffing a b)
+  _                 -> Prologue.fail "expected file pair with content on at least one side"
 
 languageForBlobPair :: BlobPair -> Language
 languageForBlobPair (Deleting Blob{..})  = blobLanguage
