@@ -8,7 +8,6 @@ module Data.File
   , readBlobFromFile'
   , readBlobsFromDir
   , readFilePair
-  , maybeThese
   ) where
 
 import Prologue
@@ -56,4 +55,7 @@ readBlobsFromDir path = do
   pure (catMaybes blobs)
 
 readFilePair :: forall m. (MonadFail m, MonadIO m) => File -> File -> m BlobPair
-readFilePair a b = maybeBlobPair <$> readBlobFromFile a <*> readBlobFromFile b
+readFilePair a b = do
+  before <- readBlobFromFile a
+  after  <- readBlobFromFile b
+  maybeBlobPair before after
