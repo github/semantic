@@ -424,7 +424,7 @@ import' =   makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliase
     importDottedName = symbol DottedName *> children (qualifiedName <$> NonEmpty.some1 identifierSource)
     importRelative = symbol RelativeImport *> children (relativeQualifiedName <$> importPrefix <*> ((symbol DottedName *> children (many identifierSource)) <|> pure []))
     importPrefix = symbol ImportPrefix *> source
-    identifierSource = (symbol Identifier) *> source
+    identifierSource = symbol Identifier *> source
 
     makeNameAliasPair location alias = makeTerm location (Python.Syntax.Alias alias alias)
     mkIdentifier location source = makeTerm location (Syntax.Identifier (name source))
