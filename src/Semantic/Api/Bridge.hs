@@ -1,5 +1,5 @@
 {-# LANGUAGE FunctionalDependencies, LambdaCase, MultiParamTypeClasses #-}
-module Semantic.Api.Helpers
+module Semantic.Api.Bridge
   ( APIBridge (..)
   , APIConvert (..)
   ) where

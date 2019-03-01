@@ -14,7 +14,7 @@ import qualified Data.Text as T
 import qualified Data.Vector as V
 import           Rendering.TOC
 import           Semantic.Api.Diffs
-import           Semantic.Api.Helpers
+import           Semantic.Api.Bridge
 import           Semantic.Api.V1.CodeAnalysisPB hiding (Blob, BlobPair)
 import           Semantic.Task as Task
 import           Serializing.Format
