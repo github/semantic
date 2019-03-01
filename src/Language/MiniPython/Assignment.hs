@@ -110,7 +110,7 @@ binaryOperator = makeTerm' <$> symbol BinaryOperator <*> children (infixTerm exp
   ])
 
 identifier :: Assignment Term
-identifier = makeTerm <$> (symbol Identifier <|> symbol Identifier' <|> symbol DottedName) <*> (Syntax.Identifier . name <$> source)
+identifier = makeTerm <$> (symbol Identifier <|> symbol DottedName) <*> (Syntax.Identifier . name <$> source)
 
 integer :: Assignment Term
 integer = makeTerm <$> symbol Integer <*> (Literal.Integer <$> source)
