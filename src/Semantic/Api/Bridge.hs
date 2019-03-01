@@ -21,6 +21,7 @@ import qualified Semantic.Api.V1.CodeAnalysisPB as API
 -- Foreign to native: @x^.bridging@
 -- Native to foreign: @bridging # x@
 -- Native to 'Just' foreign: @bridging #? x@.
+-- Maybe 'Just' to 'Just' native: @x >>= preview bridging@
 class APIBridge api native | api -> native where
   bridging :: Iso' api native
 
