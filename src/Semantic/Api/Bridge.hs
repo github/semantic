@@ -30,6 +30,7 @@ class APIBridge api native | api -> native where
 -- (The isomorphism must be partial, given that a protobuf record can have Nothing
 -- for all its fields, which means we cannot convert to a native format.)
 --
+-- Foreign to native: this is a type error, unless the native is a Monoid
 -- Foreign to 'Maybe' native: @x^?converting@
 -- Native to foreign: @converting # x@
 -- Native to 'Just' foreign: @converting #? x@
