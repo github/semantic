@@ -77,47 +77,48 @@ instance ( FreeVariables term
          , Show address
          , Show term
          )
-      => Carrier (Abstract.Function term address (Value term address) :+: sig) (Abstract.FunctionC term address (Value term address) (Eff m)) where
-  ret = FunctionC . const . ret
-  eff op =
+      => Carrier (Abstract.Function term address (Value term address) :+: sig) (Abstract.FunctionC term address (Value term address) m) where
+  eff (R other) = FunctionC . eff . R . handleCoercible $ other
+  eff (L op) = runEvaluator $ do
+    eval <- Evaluator . FunctionC $ ask
     let closure maybeName params body scope = do
           packageInfo <- currentPackage
           moduleInfo <- currentModule
           Closure packageInfo moduleInfo maybeName Nothing params body scope <$> currentFrame
 
-    in FunctionC (\ eval -> handleSum (eff . handleReader eval runFunctionC) (\case
-    Abstract.Function name params body scope k -> runEvaluator $ do
-      val <- closure (Just name) params (Right body) scope
-      Evaluator $ runFunctionC (k val) eval
-    Abstract.BuiltIn associatedScope builtIn k -> runEvaluator $ do
-      val <- closure Nothing [] (Left builtIn) associatedScope
-      Evaluator $ runFunctionC (k val) eval
-    Abstract.Bind obj@Object{} (Closure packageInfo moduleInfo name _ names body scope parentFrame) k ->
-      runFunctionC (k (Closure packageInfo moduleInfo name (Just obj) names body scope parentFrame)) eval
-    Abstract.Bind _ value k -> runFunctionC (k value) eval
-    Abstract.Call op params k -> runEvaluator $ do
-      boxed <- case op of
-        Closure _ _ _ _ _ (Left Print) _ _ -> traverse (trace . show) params $> Unit
-        Closure _ _ _ _ _ (Left Show) _ _ -> pure . String . pack $ show params
-        Closure packageInfo moduleInfo _ maybeSelf names (Right body) associatedScope parentFrame -> do
-          -- Evaluate the bindings and body with the closure’s package/module info in scope in order to
-          -- charge them to the closure's origin.
-          withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
-            parentScope <- scopeLookup parentFrame
-            let frameEdges = Map.singleton Lexical (Map.singleton parentScope parentFrame)
-            frameAddress <- newFrame associatedScope frameEdges
-            withScopeAndFrame frameAddress $ do
-              case maybeSelf of
-                Just object -> do
-                  maybeSlot <- maybeLookupDeclaration (Declaration __self)
-                  maybe (pure ()) (`assign` object) maybeSlot
-                Nothing -> pure ()
-              for_ (zip names params) $ \(name, param) -> do
-                slot <- lookupSlot (Declaration name)
-                assign slot param
-              catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body)))
-        _ -> throwValueError (CallError op)
-      Evaluator $ runFunctionC (k boxed) eval) op)
+    case op of
+      Abstract.Function name params body scope k -> do
+        val <- closure (Just name) params (Right body) scope
+        Evaluator (k val)
+      Abstract.BuiltIn associatedScope builtIn k -> do
+        val <- closure Nothing [] (Left builtIn) associatedScope
+        Evaluator (k val)
+      Abstract.Bind obj@Object{} (Closure packageInfo moduleInfo name _ names body scope parentFrame) k ->
+        Evaluator (k (Closure packageInfo moduleInfo name (Just obj) names body scope parentFrame))
+      Abstract.Bind _ value k -> Evaluator (k value)
+      Abstract.Call op params k -> do
+        boxed <- case op of
+          Closure _ _ _ _ _ (Left Print) _ _ -> traverse (trace . show) params $> Unit
+          Closure _ _ _ _ _ (Left Show) _ _ -> pure . String . pack $ show params
+          Closure packageInfo moduleInfo _ maybeSelf names (Right body) associatedScope parentFrame -> do
+            -- Evaluate the bindings and body with the closure’s package/module info in scope in order to
+            -- charge them to the closure's origin.
+            withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
+              parentScope <- scopeLookup parentFrame
+              let frameEdges = Map.singleton Lexical (Map.singleton parentScope parentFrame)
+              frameAddress <- newFrame associatedScope frameEdges
+              withScopeAndFrame frameAddress $ do
+                case maybeSelf of
+                  Just object -> do
+                    maybeSlot <- maybeLookupDeclaration (Declaration __self)
+                    maybe (pure ()) (`assign` object) maybeSlot
+                  Nothing -> pure ()
+                for_ (zip names params) $ \(name, param) -> do
+                  slot <- lookupSlot (Declaration name)
+                  assign slot param
+                catchReturn (Evaluator (eval body))
+          _ -> throwValueError (CallError op)
+        Evaluator (k boxed)
 
 instance ( Member (Reader ModuleInfo) sig
          , Member (Reader Span) sig
@@ -126,11 +127,11 @@ instance ( Member (Reader ModuleInfo) sig
          , Monad m
          )
       => Carrier (Abstract.Boolean (Value term address) :+: sig) (BooleanC (Value term address) m) where
-  ret = BooleanC . ret
-  eff = BooleanC . handleSum (eff . handleCoercible) (\case
-    Abstract.Boolean b          k -> runBooleanC . k $! Boolean b
-    Abstract.AsBool (Boolean b) k -> runBooleanC (k b)
-    Abstract.AsBool other       k -> throwBaseError (BoolError other) >>= runBooleanC . k)
+  eff (R other) = BooleanC . eff . handleCoercible $ other
+  eff (L op) = case op of
+    Abstract.Boolean b          k -> k $! Boolean b
+    Abstract.AsBool (Boolean b) k -> k b
+    Abstract.AsBool other       k -> throwBaseError (BoolError other) >>= k
 
 
 instance ( Carrier sig m
@@ -138,8 +139,7 @@ instance ( Carrier sig m
          , Member (Error (LoopControl (Value term address))) sig
          , Member (Interpose (Resumable (BaseError (UnspecializedError address (Value term address))))) sig
          )
-      => Carrier (Abstract.While (Value term address) :+: sig) (WhileC (Value term address) (Eff m)) where
-  ret = WhileC . ret
+      => Carrier (Abstract.While (Value term address) :+: sig) (WhileC (Value term address) m) where
   eff = WhileC . handleSum (eff . handleCoercible) (\case
     Abstract.While cond body k -> interpose @(Resumable (BaseError (UnspecializedError address (Value term address)))) (runEvaluator (loop (\continue -> do
       cond' <- Evaluator (runWhileC cond)
@@ -165,10 +165,8 @@ instance ( Carrier sig m
 
 instance Carrier sig m
       => Carrier (Abstract.Unit (Value term address) :+: sig) (UnitC (Value term address) m) where
-  ret = UnitC . ret
-  eff = UnitC . handleSum
-    (eff . handleCoercible)
-    (\ (Abstract.Unit k) -> runUnitC (k Unit))
+  eff (R other) = UnitC . eff . handleCoercible $ other
+  eff (L (Abstract.Unit k )) = k Unit
 
 instance ( Member (Reader ModuleInfo) sig
          , Member (Reader Span) sig
@@ -177,11 +175,11 @@ instance ( Member (Reader ModuleInfo) sig
          , Monad m
          )
       => Carrier (Abstract.String (Value term address) :+: sig) (StringC (Value term address) m) where
-  ret = StringC . ret
-  eff = StringC . handleSum (eff . handleCoercible) (\case
-    Abstract.String   t          k -> runStringC (k (String t))
-    Abstract.AsString (String t) k -> runStringC (k t)
-    Abstract.AsString other      k -> throwBaseError (StringError other) >>= runStringC . k)
+  eff (R other) = StringC . eff . handleCoercible $ other
+  eff (L op) = case op of
+    Abstract.String   t          k -> k (String t)
+    Abstract.AsString (String t) k -> k t
+    Abstract.AsString other      k -> throwBaseError (StringError other) >>= k
 
 instance ( Member (Reader ModuleInfo) sig
          , Member (Reader Span) sig
@@ -190,17 +188,17 @@ instance ( Member (Reader ModuleInfo) sig
          , Monad m
          )
       => Carrier (Abstract.Numeric (Value term address) :+: sig) (NumericC (Value term address) m) where
-  ret = NumericC . ret
-  eff = NumericC . handleSum (eff . handleCoercible) (\case
-    Abstract.Integer  t k -> runNumericC (k (Integer (Number.Integer t)))
-    Abstract.Float    t k -> runNumericC (k (Float (Number.Decimal t)))
-    Abstract.Rational t k -> runNumericC (k (Rational (Number.Ratio t)))
-    Abstract.LiftNumeric f arg k -> runNumericC . k =<< case arg of
+  eff (R other) = NumericC . eff . handleCoercible $ other
+  eff (L op) = case op of
+    Abstract.Integer  t k -> k (Integer (Number.Integer t))
+    Abstract.Float    t k -> k (Float (Number.Decimal t))
+    Abstract.Rational t k -> k (Rational (Number.Ratio t))
+    Abstract.LiftNumeric f arg k -> k =<< case arg of
       Integer (Number.Integer i) -> pure $ Integer (Number.Integer (f i))
       Float (Number.Decimal d)   -> pure $ Float (Number.Decimal (f d))
       Rational (Number.Ratio r)  -> pure $ Rational (Number.Ratio (f r))
       other                      -> throwBaseError (NumericError other)
-    Abstract.LiftNumeric2 f left right k -> runNumericC . k =<< case (left, right) of
+    Abstract.LiftNumeric2 f left right k -> k =<< case (left, right) of
       (Integer  i, Integer j)  -> attemptUnsafeArithmetic (f i j) & specialize
       (Integer  i, Rational j) -> attemptUnsafeArithmetic (f i j) & specialize
       (Integer  i, Float j)    -> attemptUnsafeArithmetic (f i j) & specialize
@@ -210,7 +208,7 @@ instance ( Member (Reader ModuleInfo) sig
       (Float    i, Integer j)  -> attemptUnsafeArithmetic (f i j) & specialize
       (Float    i, Rational j) -> attemptUnsafeArithmetic (f i j) & specialize
       (Float    i, Float j)    -> attemptUnsafeArithmetic (f i j) & specialize
-      _                        -> throwBaseError (Numeric2Error left right))
+      _                        -> throwBaseError (Numeric2Error left right)
 
 -- Dispatch whatever's contained inside a 'Number.SomeNumber' to its appropriate 'MonadValue' ctor
 specialize :: ( Member (Reader ModuleInfo) sig
@@ -223,8 +221,8 @@ specialize :: ( Member (Reader ModuleInfo) sig
            -> m (Value term address)
 specialize (Left exc) = throwBaseError (ArithmeticError exc)
 specialize (Right (Number.SomeNumber (Number.Integer t))) = pure (Integer (Number.Integer t))
-specialize (Right (Number.SomeNumber (Number.Decimal t)))   = pure (Float (Number.Decimal t))
-specialize (Right (Number.SomeNumber (Number.Ratio t))) = pure (Rational (Number.Ratio t))
+specialize (Right (Number.SomeNumber (Number.Decimal t))) = pure (Float (Number.Decimal t))
+specialize (Right (Number.SomeNumber (Number.Ratio t)))   = pure (Rational (Number.Ratio t))
 
 
 instance ( Member (Reader ModuleInfo) sig
@@ -234,32 +232,31 @@ instance ( Member (Reader ModuleInfo) sig
          , Monad m
          )
       => Carrier (Abstract.Bitwise (Value term address) :+: sig) (BitwiseC (Value term address) m) where
-  ret = BitwiseC . ret
-  eff = BitwiseC . handleSum (eff . handleCoercible) (\case
-    CastToInteger (Integer (Number.Integer i)) k -> runBitwiseC (k (Integer (Number.Integer i)))
-    CastToInteger (Float (Number.Decimal i)) k -> runBitwiseC (k (Integer (Number.Integer (coefficient (normalize i)))))
-    CastToInteger i k -> throwBaseError (NumericError i) >>= runBitwiseC . k
-    LiftBitwise operator (Integer (Number.Integer i)) k -> runBitwiseC . k . Integer . Number.Integer . operator $ i
-    LiftBitwise _ other k -> throwBaseError (BitwiseError other) >>= runBitwiseC . k
-    LiftBitwise2 operator (Integer (Number.Integer i)) (Integer (Number.Integer j)) k -> runBitwiseC . k . Integer . Number.Integer $ operator i j
-    LiftBitwise2 _ left right k -> throwBaseError (Bitwise2Error left right) >>= runBitwiseC . k
-    UnsignedRShift (Integer (Number.Integer i)) (Integer (Number.Integer j)) k | i >= 0 -> runBitwiseC . k . Integer . Number.Integer $ ourShift (fromIntegral i) (fromIntegral j)
-    UnsignedRShift left right k -> throwBaseError (Bitwise2Error left right) >>= runBitwiseC . k)
+  eff (R other) = BitwiseC . eff . handleCoercible $ other
+  eff (L op) = case op of
+    CastToInteger (Integer (Number.Integer i)) k -> k (Integer (Number.Integer i))
+    CastToInteger (Float (Number.Decimal i)) k -> k (Integer (Number.Integer (coefficient (normalize i))))
+    CastToInteger i k -> throwBaseError (NumericError i) >>= k
+    LiftBitwise operator (Integer (Number.Integer i)) k -> k . Integer . Number.Integer . operator $ i
+    LiftBitwise _ other k -> throwBaseError (BitwiseError other) >>= k
+    LiftBitwise2 operator (Integer (Number.Integer i)) (Integer (Number.Integer j)) k -> k . Integer . Number.Integer $ operator i j
+    LiftBitwise2 _ left right k -> throwBaseError (Bitwise2Error left right) >>= k
+    UnsignedRShift (Integer (Number.Integer i)) (Integer (Number.Integer j)) k | i >= 0 -> k . Integer . Number.Integer $ ourShift (fromIntegral i) (fromIntegral j)
+    UnsignedRShift left right k -> throwBaseError (Bitwise2Error left right) >>= k
 
 ourShift :: Word64 -> Int -> Integer
 ourShift a b = toInteger (shiftR a b)
 
 
 instance Carrier sig m => Carrier (Abstract.Object address (Value term address) :+: sig) (ObjectC address (Value term address) m) where
-  ret = ObjectC . ret
-  eff = ObjectC . handleSum (eff . handleCoercible) (\case
-    Abstract.Object address k -> runObjectC (k (Object address))
-    Abstract.ScopedEnvironment (Object address) k -> runObjectC (k (Just address))
-    Abstract.ScopedEnvironment (Class _ _ address) k -> runObjectC (k (Just address))
-    Abstract.ScopedEnvironment (Namespace _ address) k -> runObjectC (k (Just address))
-    Abstract.ScopedEnvironment _ k -> runObjectC (k Nothing)
-    Abstract.Klass n frame k -> runObjectC (k (Class n mempty frame))
-    )
+  eff (R other) = ObjectC . eff . handleCoercible $ other
+  eff (L op) = case op of
+    Abstract.Object address k -> k (Object address)
+    Abstract.ScopedEnvironment (Object address) k -> k (Just address)
+    Abstract.ScopedEnvironment (Class _ _ address) k -> k (Just address)
+    Abstract.ScopedEnvironment (Namespace _ address) k -> k (Just address)
+    Abstract.ScopedEnvironment _ k -> k Nothing
+    Abstract.Klass n frame k -> k (Class n mempty frame)
 
 instance ( Member (Reader ModuleInfo) sig
        , Member (Reader Span) sig
@@ -268,17 +265,17 @@ instance ( Member (Reader ModuleInfo) sig
        , Monad m
        )
       => Carrier (Abstract.Array (Value term address) :+: sig) (ArrayC (Value term address) m) where
-  ret = ArrayC . ret
-  eff = ArrayC . handleSum (eff . handleCoercible) (\case
-    Abstract.Array t k -> runArrayC (k (Array t))
-    Abstract.AsArray (Array addresses) k -> runArrayC (k addresses)
-    Abstract.AsArray val k -> throwBaseError (ArrayError val) >>= runArrayC . k)
+  eff (R other) = ArrayC . eff . handleCoercible $ other
+  eff (L op) = case op of
+    Abstract.Array t k -> k (Array t)
+    Abstract.AsArray (Array addresses) k -> k addresses
+    Abstract.AsArray val k -> throwBaseError (ArrayError val) >>= k
 
 instance ( Carrier sig m ) => Carrier (Abstract.Hash (Value term address) :+: sig) (HashC (Value term address) m) where
-  ret = HashC . ret
-  eff = HashC . handleSum (eff . handleCoercible) (\case
-    Abstract.Hash t k -> runHashC (k ((Hash . map (uncurry KVPair)) t))
-    Abstract.KvPair t v k -> runHashC (k (KVPair t v)))
+  eff (R other) = ArrayC . eff . handleCoercible $ other
+  eff (L op) = case op of
+    Abstract.Hash t k -> k ((Hash . map (uncurry KVPair)) t)
+    Abstract.KvPair t v k -> k (KVPair t v)
 
 
 instance AbstractHole (Value term address) where
@@ -392,13 +389,13 @@ instance (Show address, Show term) => Show1 (ValueError term address) where
   liftShowsPrec _ _ = showsPrec
 
 runValueError :: (Carrier sig m, Effect sig)
-              => Evaluator term address (Value term address) (ResumableC (BaseError (ValueError term address)) (Eff m)) a
+              => Evaluator term address (Value term address) (ResumableC (BaseError (ValueError term address)) m) a
               -> Evaluator term address (Value term address) m (Either (SomeError (BaseError (ValueError term address))) a)
 runValueError = Evaluator . runResumable . runEvaluator
 
 runValueErrorWith :: Carrier sig m
                   => (forall resume . BaseError (ValueError term address) resume -> Evaluator term address (Value term address) m resume)
-                  -> Evaluator term address (Value term address) (ResumableWithC (BaseError (ValueError term address)) (Eff m)) a
+                  -> Evaluator term address (Value term address) (ResumableWithC (BaseError (ValueError term address)) m) a
                   -> Evaluator term address (Value term address) m a
 runValueErrorWith f = Evaluator . runResumableWith (runEvaluator . f) . runEvaluator
 

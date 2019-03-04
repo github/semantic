@@ -17,28 +17,28 @@ import Prologue
 import qualified Data.Map.Strict as Map
 
 type ModuleC address value m
-  = ErrorC (LoopControl value)     (Eff
-  ( ErrorC (Return value)          (Eff
-  ( ReaderC (CurrentScope address) (Eff
-  ( ReaderC (CurrentFrame address) (Eff
-  ( DerefC address value           (Eff
-  ( AllocatorC address             (Eff
-  ( ReaderC ModuleInfo             (Eff
-    m)))))))))))))
+  = ErrorC (LoopControl value)
+  ( ErrorC (Return value)
+  ( ReaderC (CurrentScope address)
+  ( ReaderC (CurrentFrame address)
+  ( DerefC address value
+  ( AllocatorC address
+  ( ReaderC ModuleInfo
+    m))))))
 
 type DomainC term address value m
-  = FunctionC term address value                                          (Eff
-  ( WhileC value                                                          (Eff
-  ( BooleanC value                                                        (Eff
-  ( StringC value                                                         (Eff
-  ( NumericC value                                                        (Eff
-  ( BitwiseC value                                                        (Eff
-  ( ObjectC address value                                                 (Eff
-  ( ArrayC value                                                          (Eff
-  ( HashC value                                                          (Eff
-  ( UnitC value                                                           (Eff
-  ( InterposeC (Resumable (BaseError (UnspecializedError address value))) (Eff
-    m)))))))))))))))))))))
+  = FunctionC term address value
+  ( WhileC value
+  ( BooleanC value
+  ( StringC value
+  ( NumericC value
+  ( BitwiseC value
+  ( ObjectC address value
+  ( ArrayC value
+  ( HashC value
+  ( UnitC value
+  ( InterposeC (Resumable (BaseError (UnspecializedError address value)))
+    m))))))))))
 
 -- | Evaluate a list of modules with the prelude for the passed language available, and applying the passed function to every module.
 evaluate :: ( Carrier outerSig outer

@@ -38,30 +38,31 @@ instance ( Member (Allocator address) sig
          , Show address
          , Carrier sig m
          )
-      => Carrier (Abstract.Function term address Abstract :+: sig) (FunctionC term address Abstract (Eff m)) where
-  ret = FunctionC . const . ret
-  eff op = FunctionC (\ eval -> handleSum (eff . handleReader eval runFunctionC) (\case
-    Function _ params body scope k -> runEvaluator $ do
-      currentScope' <- currentScope
-      currentFrame' <- currentFrame
-      let frameLinks = Map.singleton Lexical (Map.singleton currentScope' currentFrame')
-      frame <- newFrame scope frameLinks
-      res <- withScopeAndFrame frame $ do
-        for_ params $ \param -> do
-          slot <- lookupSlot (Declaration param)
-          assign slot Abstract
-        catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body)))
-      Evaluator $ runFunctionC (k res) eval
-    BuiltIn _ _ k -> runFunctionC (k Abstract) eval
-    Bind _ _ k -> runFunctionC (k Abstract) eval
-    Call _ _ k -> runFunctionC (k Abstract) eval) op)
+      => Carrier (Abstract.Function term address Abstract :+: sig) (FunctionC term address Abstract m) where
+  eff (R other) = FunctionC . eff . R . handleCoercible $ other
+  eff (L op) = runEvaluator $ do
+    eval <- Evaluator . FunctionC $ ask
+    case op of
+      Function _ params body scope k -> do
+        currentScope' <- currentScope
+        currentFrame' <- currentFrame
+        let frameLinks = Map.singleton Lexical (Map.singleton currentScope' currentFrame')
+        frame <- newFrame scope frameLinks
+        res <- withScopeAndFrame frame $ do
+          for_ params $ \param -> do
+            slot <- lookupSlot (Declaration param)
+            assign slot Abstract
+          catchReturn (Evaluator (eval body))
+        Evaluator (k res)
+      BuiltIn _ _ k -> Evaluator (k Abstract)
+      Bind _ _ k -> Evaluator (k Abstract)
+      Call _ _ k -> Evaluator (k Abstract)
 
 
 instance (Carrier sig m, Alternative m) => Carrier (Boolean Abstract :+: sig) (BooleanC Abstract m) where
-  ret = BooleanC . ret
-  eff = BooleanC . handleSum (eff . handleCoercible) (\case
-    Boolean _ k -> runBooleanC (k Abstract)
-    AsBool  _ k -> runBooleanC (k True) <|> runBooleanC (k False))
+  eff (L (Boolean _ k)) = k Abstract
+  eff (L (AsBool  _ k)) = k True <|> k False
+  eff (R other)         = BooleanC . eff . handleCoercible $ other
 
 
 instance ( Member (Abstract.Boolean Abstract) sig
@@ -70,7 +71,6 @@ instance ( Member (Abstract.Boolean Abstract) sig
          , Monad m
          )
       => Carrier (While Abstract :+: sig) (WhileC Abstract m) where
-  ret = WhileC . ret
   eff = WhileC . handleSum
     (eff . handleCoercible)
     (\ (Abstract.While cond body k) -> do
@@ -80,21 +80,18 @@ instance ( Member (Abstract.Boolean Abstract) sig
 
 instance Carrier sig m
       => Carrier (Unit Abstract :+: sig) (UnitC Abstract m) where
-  ret = UnitC . ret
   eff = UnitC . handleSum
     (eff . handleCoercible)
     (\ (Abstract.Unit k) -> runUnitC (k Abstract))
 
 instance Carrier sig m
       => Carrier (Abstract.String Abstract :+: sig) (StringC Abstract m) where
-  ret = StringC . ret
   eff = StringC . handleSum (eff . handleCoercible) (\case
     Abstract.String _ k -> runStringC (k Abstract)
     AsString        _ k -> runStringC (k ""))
 
 instance Carrier sig m
       => Carrier (Numeric Abstract :+: sig) (NumericC Abstract m) where
-  ret = NumericC . ret
   eff = NumericC . handleSum (eff . handleCoercible) (\case
     Integer _ k -> runNumericC (k Abstract)
     Float _ k -> runNumericC (k Abstract)
@@ -104,7 +101,6 @@ instance Carrier sig m
 
 instance Carrier sig m
       => Carrier (Bitwise Abstract :+: sig) (BitwiseC Abstract m) where
-  ret = BitwiseC . ret
   eff = BitwiseC . handleSum (eff . handleCoercible) (\case
     CastToInteger _ k -> runBitwiseC (k Abstract)
     LiftBitwise _ _ k -> runBitwiseC (k Abstract)
@@ -113,7 +109,6 @@ instance Carrier sig m
 
 instance Carrier sig m
       => Carrier (Object address Abstract :+: sig) (ObjectC address Abstract m) where
-  ret = ObjectC . ret
   eff = ObjectC . handleSum (eff . handleCoercible) (\case
     Object _ k -> runObjectC (k Abstract)
     ScopedEnvironment _ k -> runObjectC (k Nothing)
@@ -121,14 +116,12 @@ instance Carrier sig m
 
 instance Carrier sig m
       => Carrier (Array Abstract :+: sig) (ArrayC Abstract m) where
-  ret = ArrayC . ret
   eff = ArrayC . handleSum (eff . handleCoercible) (\case
     Array _ k -> runArrayC (k Abstract)
     AsArray _ k -> runArrayC (k []))
 
 instance Carrier sig m
       => Carrier (Hash Abstract :+: sig) (HashC Abstract m) where
-  ret = HashC . ret
   eff = HashC . handleSum (eff . handleCoercible) (\case
     Hash _ k -> runHashC (k Abstract)
     KvPair _ _ k -> runHashC (k Abstract))

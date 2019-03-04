@@ -85,7 +85,7 @@ convergingModules :: ( Eq value
                      , Carrier sig m
                      , Effect sig
                      )
-                  => (Module (Either prelude term) -> Evaluator term address value (AltC Maybe (Eff m)) value)
+                  => (Module (Either prelude term) -> Evaluator term address value (AltC Maybe m) value)
                   -> (Module (Either prelude term) -> Evaluator term address value m value)
 convergingModules recur m@(Module _ (Left _)) = raiseHandler runNonDet (recur m) >>= maybeM empty
 convergingModules recur m@(Module _ (Right term)) = do
@@ -130,10 +130,10 @@ getConfiguration term = Configuration term <$> askRoots
 
 
 caching :: (Carrier sig m, Effect sig)
-        => Evaluator term address value (AltC B (Eff
-                                        (ReaderC (Cache term address value) (Eff
-                                        (StateC (Cache term address value) (Eff
-                                        m)))))) a
+        => Evaluator term address value (AltC B
+                                        (ReaderC (Cache term address value)
+                                        (StateC (Cache term address value)
+                                        m))) a
         -> Evaluator term address value m (Cache term address value, [a])
 caching
   = raiseHandler (runState  lowerBound)
