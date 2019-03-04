@@ -15,7 +15,7 @@ import qualified Semantic.Api.LegacyTypes as Legacy
 import qualified Semantic.Api.V1.CodeAnalysisPB as API
 
 -- | An @APIBridge x y@ instance describes an isomorphism between @x@ and @y@.
--- This is suitable for types such as 'Pos' which are representationally equal
+-- This is suitable for types such as 'Pos' which are representationally equivalent
 -- in their API, legacy, and native forms. All 'Lens' laws apply.
 --
 -- Foreign to native: @x^.bridging@
