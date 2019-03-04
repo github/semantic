@@ -87,10 +87,10 @@ instance Ord1  TypeError where
 
 instance Show1 TypeError where liftShowsPrec _ _ = showsPrec
 
-runTypeError :: (Carrier sig m, Effect sig) => Evaluator term address value (ResumableC (BaseError TypeError) (Eff m)) a -> Evaluator term address value m (Either (SomeError (BaseError TypeError)) a)
+runTypeError :: (Carrier sig m, Effect sig) => Evaluator term address value (ResumableC (BaseError TypeError) m) a -> Evaluator term address value m (Either (SomeError (BaseError TypeError)) a)
 runTypeError = raiseHandler runResumable
 
-runTypeErrorWith :: Carrier sig m => (forall resume . (BaseError TypeError) resume -> Evaluator term address value m resume) -> Evaluator term address value (ResumableWithC (BaseError TypeError) (Eff m)) a -> Evaluator term address value m a
+runTypeErrorWith :: Carrier sig m => (forall resume . (BaseError TypeError) resume -> Evaluator term address value m resume) -> Evaluator term address value (ResumableWithC (BaseError TypeError) m) a -> Evaluator term address value m a
 runTypeErrorWith f = raiseHandler $ runResumableWith (runEvaluator . f)
 
 
@@ -105,22 +105,21 @@ throwTypeError :: ( Member (Resumable (BaseError TypeError)) sig
 throwTypeError = throwBaseError
 
 runTypeMap :: (Carrier sig m, Effect sig)
-           => Evaluator term address Type (StateC TypeMap (Eff m)) a
+           => Evaluator term address Type (StateC TypeMap m) a
            -> Evaluator term address Type m a
 runTypeMap = raiseHandler $ fmap snd . runState emptyTypeMap
 
 runTypes :: (Carrier sig m, Effect sig)
-         => Evaluator term address Type (ResumableC (BaseError TypeError) (Eff
-                                        (StateC TypeMap (Eff
-                                        m)))) a
+         => Evaluator term address Type (ResumableC (BaseError TypeError)
+                                         (StateC TypeMap m)) a
          -> Evaluator term address Type m (Either (SomeError (BaseError TypeError)) a)
 runTypes = runTypeMap . runTypeError
 
 runTypesWith :: (Carrier sig m, Effect sig)
-             => (forall resume . (BaseError TypeError) resume -> Evaluator term address Type (StateC TypeMap (Eff m)) resume)
-             -> Evaluator term address Type (ResumableWithC (BaseError TypeError) (Eff
-                                            (StateC TypeMap (Eff
-                                            m)))) a
+             => (forall resume . (BaseError TypeError) resume -> Evaluator term address Type (StateC TypeMap m) resume)
+             -> Evaluator term address Type (ResumableWithC (BaseError TypeError)
+                                            (StateC TypeMap
+                                            m)) a
              -> Evaluator term address Type m a
 runTypesWith with = runTypeMap . runTypeErrorWith with
 
@@ -256,35 +255,38 @@ instance ( Member (Allocator address) sig
          , Show address
          , Carrier sig m
          )
-      => Carrier (Abstract.Function term address Type :+: sig) (FunctionC term address Type (Eff m)) where
-  ret = FunctionC . const . ret
-  eff op = FunctionC (\ eval -> handleSum (eff . handleReader eval runFunctionC) (\case
-    Abstract.Function _ params body scope k -> runEvaluator $ do
-      currentScope' <- currentScope
-      currentFrame' <- currentFrame
-      let frameLinks = Map.singleton Lexical (Map.singleton currentScope' currentFrame')
-      frame <- newFrame scope frameLinks
-      res <- withScopeAndFrame frame $ do
-        tvars <- foldr (\ param rest -> do
-          tvar <- Var <$> fresh
-          slot <- lookupSlot (Declaration param)
-          assign slot tvar
-          (tvar :) <$> rest) (pure []) params
-        -- TODO: We may still want to represent this as a closure and not a function type
-        (zeroOrMoreProduct tvars :->) <$> catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body)))
-      Evaluator (runFunctionC (k res) eval)
+      => Carrier (Abstract.Function term address Type :+: sig) (FunctionC term address Type m) where
+  eff (R other) = FunctionC (eff (R (handleCoercible other)))
+  eff (L op) = runEvaluator $ do
+    eval <- Evaluator . FunctionC $ ask
+    case op of
+      Abstract.Function _ params body scope k -> do
+        currentScope' <- currentScope
+        currentFrame' <- currentFrame
+        let frameLinks = Map.singleton Lexical (Map.singleton currentScope' currentFrame')
+        frame <- newFrame scope frameLinks
+        res <- withScopeAndFrame frame $ do
+          tvars <- foldr (\ param rest -> do
+            tvar <- Var <$> fresh
+            slot <- lookupSlot (Declaration param)
+            assign slot tvar
+            (tvar :) <$> rest) (pure []) params
+          -- TODO: We may still want to represent this as a closure and not a function type
+          (zeroOrMoreProduct tvars :->) <$> catchReturn (Evaluator (eval body))
+        Evaluator (k res)
 
-    Abstract.BuiltIn _ Print k -> runFunctionC (k (String :-> Unit)) eval
-    Abstract.BuiltIn _ Show  k -> runFunctionC (k (Object :-> String)) eval
-    Abstract.Bind _ value k -> runFunctionC (k value) eval
-    Abstract.Call op paramTypes k -> runEvaluator $ do
-      tvar <- fresh
-      let needed = zeroOrMoreProduct paramTypes :-> Var tvar
-      unified <- op `unify` needed
-      boxed <- case unified of
-        _ :-> ret -> pure ret
-        actual    -> throwTypeError (UnificationError needed actual)
-      Evaluator $ runFunctionC (k boxed) eval) op)
+      Abstract.BuiltIn _ Print k -> Evaluator $ k (String :-> Unit)
+      Abstract.BuiltIn _ Show  k -> Evaluator $ k (Object :-> String)
+      Abstract.Bind _ value k -> Evaluator $ k value
+      Abstract.Call op paramTypes k -> do
+        tvar <- fresh
+        let needed = zeroOrMoreProduct paramTypes :-> Var tvar
+        unified <- op `unify` needed
+        boxed <- case unified of
+          _ :-> ret -> pure ret
+          actual    -> throwTypeError (UnificationError needed actual)
+        Evaluator (k boxed)
+
 
 
 instance ( Member (Reader ModuleInfo) sig
@@ -296,10 +298,10 @@ instance ( Member (Reader ModuleInfo) sig
          , Monad m
          )
       => Carrier (Abstract.Boolean Type :+: sig) (BooleanC Type m) where
-  ret = BooleanC . ret
-  eff = BooleanC . handleSum (eff . handleCoercible) (\case
-    Abstract.Boolean _ k -> runBooleanC (k Bool)
-    Abstract.AsBool  t k -> unify t Bool *> (runBooleanC (k True) <|> runBooleanC (k False)))
+  eff (R other) = BooleanC . eff . handleCoercible $ other
+  eff (L (Abstract.Boolean _ k)) = k Bool
+  eff (L (Abstract.AsBool t k))  = unify t Bool *> (k True <|> k False)
+
 
 
 instance ( Member (Abstract.Boolean Type) sig
@@ -308,20 +310,16 @@ instance ( Member (Abstract.Boolean Type) sig
          , Monad m
          )
       => Carrier (Abstract.While Type :+: sig) (WhileC Type m) where
-  ret = WhileC . ret
-  eff = WhileC . handleSum
-    (eff . handleCoercible)
-    (\ (Abstract.While cond body k) -> do
-      cond' <- runWhileC cond
-      ifthenelse cond' (runWhileC body *> empty) (runWhileC (k Unit)))
+  eff (R other) = WhileC . eff . handleCoercible $ other
+  eff (L (Abstract.While cond body k)) = do
+    cond' <- cond
+    ifthenelse cond' (body *> empty) (k Unit)
 
 
 instance Carrier sig m
       => Carrier (Abstract.Unit Type :+: sig) (UnitC Type m) where
-  ret = UnitC . ret
-  eff = UnitC . handleSum
-    (eff . handleCoercible)
-    (\ (Abstract.Unit k) -> runUnitC (k Unit))
+  eff (R other) = UnitC . eff . handleCoercible $ other
+  eff (L (Abstract.Unit k)) = k Unit
 
 instance ( Member (Reader ModuleInfo) sig
          , Member (Reader Span) sig
@@ -332,10 +330,9 @@ instance ( Member (Reader ModuleInfo) sig
          , Monad m
          )
       => Carrier (Abstract.String Type :+: sig) (StringC Type m) where
-  ret = StringC . ret
-  eff = StringC . handleSum (eff . handleCoercible) (\case
-    Abstract.String   _ k -> runStringC (k String)
-    Abstract.AsString t k -> unify t String *> runStringC (k ""))
+  eff (R other) = StringC . eff . handleCoercible $ other
+  eff (L (Abstract.String _ k)) = k String
+  eff (L (Abstract.AsString t k)) = unify t String *> k ""
 
 instance ( Member (Reader ModuleInfo) sig
          , Member (Reader Span) sig
@@ -345,16 +342,16 @@ instance ( Member (Reader ModuleInfo) sig
          , Monad m
          )
       => Carrier (Abstract.Numeric Type :+: sig) (NumericC Type m) where
-  ret = NumericC . ret
-  eff = NumericC . handleSum (eff . handleCoercible) (\case
-    Abstract.Integer _ k -> runNumericC (k Int)
-    Abstract.Float _ k -> runNumericC (k Float)
-    Abstract.Rational _ k -> runNumericC (k Rational)
-    Abstract.LiftNumeric _ t k -> unify (Int :+ Float :+ Rational) t >>= runNumericC . k
+  eff (R other) = NumericC . eff . handleCoercible $ other
+  eff (L op) = case op of
+    Abstract.Integer _ k -> k Int
+    Abstract.Float _ k -> k Float
+    Abstract.Rational _ k -> k Rational
+    Abstract.LiftNumeric _ t k -> unify (Int :+ Float :+ Rational) t >>= k
     Abstract.LiftNumeric2 _ left right k -> case (left, right) of
-      (Float, Int) -> runNumericC (k Float)
-      (Int, Float) -> runNumericC (k Float)
-      _            -> unify left right >>= runNumericC . k)
+      (Float, Int) -> k Float
+      (Int, Float) -> k Float
+      _            -> unify left right >>= k
 
 instance ( Member (Reader ModuleInfo) sig
          , Member (Reader Span) sig
@@ -364,19 +361,19 @@ instance ( Member (Reader ModuleInfo) sig
          , Monad m
          )
       => Carrier (Abstract.Bitwise Type :+: sig) (BitwiseC Type m) where
-  ret = BitwiseC . ret
-  eff = BitwiseC . handleSum (eff . handleCoercible) (\case
-    CastToInteger t k -> unify t (Int :+ Float :+ Rational) >> runBitwiseC (k Int)
-    LiftBitwise _ t k -> unify t Int >>= runBitwiseC . k
-    LiftBitwise2 _ t1 t2 k -> unify Int t1 >>= unify t2 >>= runBitwiseC . k
-    UnsignedRShift t1 t2 k -> unify Int t2 *> unify Int t1 >>= runBitwiseC . k)
+  eff (R other) = BitwiseC . eff . handleCoercible $ other
+  eff (L op) = case op of
+    CastToInteger t k -> unify t (Int :+ Float :+ Rational) *> k Int
+    LiftBitwise _ t k -> unify t Int >>= k
+    LiftBitwise2 _ t1 t2 k -> unify Int t1 >>= unify t2 >>= k
+    UnsignedRShift t1 t2 k -> unify Int t2 *> unify Int t1 >>= k
 
 instance ( Carrier sig m ) => Carrier (Abstract.Object address Type :+: sig) (ObjectC address Type m) where
-  ret = ObjectC . ret
-  eff = ObjectC . handleSum (eff . handleCoercible) (\case
-    Abstract.Object _ k -> runObjectC (k Object)
-    Abstract.ScopedEnvironment _ k -> runObjectC (k Nothing)
-    Abstract.Klass _ _ k -> runObjectC (k Object))
+  eff (R other) = ObjectC . eff . handleCoercible $ other
+  eff (L op) = case op of
+    Abstract.Object _ k -> k Object
+    Abstract.ScopedEnvironment _ k -> k Nothing
+    Abstract.Klass _ _ k -> k Object
 
 instance ( Member Fresh sig
          , Member (Reader ModuleInfo) sig
@@ -387,21 +384,19 @@ instance ( Member Fresh sig
          , Monad m
          )
       => Carrier (Abstract.Array Type :+: sig) (ArrayC Type m) where
-  ret = ArrayC . ret
-  eff = ArrayC . handleSum (eff . handleCoercible) (\case
-    Abstract.Array fieldTypes k -> do
-          var <- fresh
-          fieldType <- foldr (\ t1 -> (unify t1 =<<)) (pure (Var var)) fieldTypes
-          runArrayC (k (Array fieldType))
-    Abstract.AsArray t k -> do
-          field <- fresh
-          unify t (Array (Var field)) >> runArrayC (k mempty))
+  eff (R other) = ArrayC . eff . handleCoercible $ other
+  eff (L (Abstract.Array fieldTypes k)) = do
+    var <- fresh
+    fieldType <- foldr (\ t1 -> (unify t1 =<<)) (pure (Var var)) fieldTypes
+    k (Array fieldType)
+  eff (L (Abstract.AsArray t k)) = do
+    field <- fresh
+    unify t (Array (Var field)) >> k mempty
 
 instance ( Carrier sig m ) => Carrier (Abstract.Hash Type :+: sig) (HashC Type m) where
-  ret = HashC . ret
-  eff = HashC . handleSum (eff . handleCoercible) (\case
-    Abstract.Hash t k -> runHashC (k (Hash t))
-    Abstract.KvPair t1 t2 k -> runHashC (k (t1 :* t2)))
+  eff (R other) = HashC . eff . handleCoercible $ other
+  eff (L (Abstract.Hash t k)) = k (Hash t)
+  eff (L (Abstract.KvPair t1 t2 k)) = k (t1 :* t2)
 
 
 instance AbstractHole Type where

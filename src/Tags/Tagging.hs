@@ -38,9 +38,9 @@ runTagging blob tree
 type ContextToken = (Text, Maybe Range)
 
 type Contextualizer
-  = Eff (StateC [ContextToken]
-  ( Eff (ErrorC TranslationError
-  ( Eff VoidC))))
+  = StateC [ContextToken]
+  ( ErrorC TranslationError
+  ( VoidC))
 
 contextualizing :: Blob -> Machine.ProcessT Contextualizer Token Tag
 contextualizing Blob{..} = repeatedly $ await >>= \case

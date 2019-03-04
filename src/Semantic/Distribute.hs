@@ -48,12 +48,12 @@ instance Effect Distribute where
 
 
 -- | Evaluate a 'Distribute' effect concurrently.
-runDistribute :: DistributeC (LiftC IO) a -> Eff (LiftC IO) a
+runDistribute :: DistributeC (LiftC IO) a -> LiftC IO a
 runDistribute = runDistributeC
 
 newtype DistributeC m a = DistributeC { runDistributeC :: m a }
   deriving (Functor, Applicative, Monad)
 
-instance Carrier (Distribute :+: Lift IO) (DistributeC (Eff (LiftC IO))) where
+instance Carrier (Distribute :+: Lift IO) (DistributeC (LiftC IO)) where
   eff (L (Distribute task k)) = liftIO (Async.runConcurrently (Async.Concurrently (runM task))) >>= k
   eff (R other) = DistributeC (eff (handleCoercible other))

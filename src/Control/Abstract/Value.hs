@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, GADTs, GeneralizedNewtypeDeriving, KindSignatures, LambdaCase, Rank2Types, ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE DeriveAnyClass, DerivingStrategies, GADTs, GeneralizedNewtypeDeriving, KindSignatures, LambdaCase, Rank2Types, ScopedTypeVariables, TypeOperators #-}
 module Control.Abstract.Value
 ( AbstractValue(..)
 , AbstractIntro(..)
@@ -141,10 +141,10 @@ instance Effect (Function term address value) where
 runFunction :: (term -> Evaluator term address value (FunctionC term address value m) value)
             -> Evaluator term address value (FunctionC term address value m) a
             -> Evaluator term address value m a
-runFunction eval = raiseHandler (runReader eval . coerce)
+runFunction eval = raiseHandler (runReader (runEvaluator . eval) . runFunctionC)
 
 newtype FunctionC term address value m a = FunctionC { runFunctionC :: ReaderC (term -> FunctionC term address value m value) m a }
-  deriving (Applicative, Functor, Monad)
+  deriving newtype (Applicative, Functor, Monad)
 
 -- | Construct a boolean value in the abstract domain.
 boolean :: (Member (Boolean value) sig, Carrier sig m) => Bool -> m value
@@ -172,12 +172,13 @@ instance Effect (Boolean value) where
     Boolean b k -> Boolean b (handler . (<$ state) . k)
     AsBool  v k -> AsBool  v (handler . (<$ state) . k)
 
-runBoolean :: Carrier (Boolean value :+: sig) (BooleanC value m)
-           => Evaluator term address value (BooleanC value m) a
+runBoolean :: Evaluator term address value (BooleanC value m) a
            -> Evaluator term address value m a
 runBoolean = raiseHandler $ runBooleanC
 
 newtype BooleanC value m a = BooleanC { runBooleanC :: m a }
+  deriving stock Functor
+  deriving newtype (Alternative, Applicative, Monad)
 
 
 -- | The fundamental looping primitive, built on top of 'ifthenelse'.
@@ -222,13 +223,13 @@ data While value m k
 instance HFunctor (While value) where
   hmap f (While cond body k) = While (f cond) (f body) k
 
-runWhile :: Carrier (While value :+: sig) (WhileC value m)
-         => Evaluator term address value (WhileC value m) a
+runWhile :: Evaluator term address value (WhileC value m) a
          -> Evaluator term address value m a
 runWhile = raiseHandler $ runWhileC
 
 newtype WhileC value m a = WhileC { runWhileC :: m a }
-
+  deriving stock Functor
+  deriving newtype (Alternative, Applicative, Monad)
 
 -- | Construct an abstract unit value.
 unit :: (Carrier sig m, Member (Unit value) sig) => Evaluator term address value m value
@@ -236,7 +237,7 @@ unit = send (Unit pure)
 
 newtype Unit value (m :: * -> *) k
   = Unit (value -> k)
-  deriving (Functor)
+  deriving stock Functor
 
 instance HFunctor (Unit value) where
   hmap _ = coerce
@@ -245,13 +246,13 @@ instance HFunctor (Unit value) where
 instance Effect (Unit value) where
   handle state handler (Unit k) = Unit (handler . (<$ state) . k)
 
-runUnit :: Carrier (Unit value :+: sig) (UnitC value m)
-        => Evaluator term address value (UnitC value m) a
+runUnit :: Evaluator term address value (UnitC value m) a
         -> Evaluator term address value m a
 runUnit = raiseHandler $ runUnitC
 
 newtype UnitC value m a = UnitC { runUnitC :: m a }
-
+  deriving stock Functor
+  deriving newtype (Applicative, Monad)
 
 -- | Construct a String value in the abstract domain.
 string :: (Member (String value) sig, Carrier sig m) => Text -> m value
@@ -275,9 +276,10 @@ instance Effect (String value) where
   handle state handler (AsString v k) = AsString v (handler . (<$ state) . k)
 
 newtype StringC value m a = StringC { runStringC :: m a }
+  deriving stock Functor
+  deriving newtype (Applicative, Monad)
 
-runString :: Carrier (String value :+: sig) (StringC value m)
-          => Evaluator term address value (StringC value m) a
+runString :: Evaluator term address value (StringC value m) a
           -> Evaluator term address value m a
 runString = raiseHandler $ runStringC
 
@@ -328,9 +330,10 @@ instance Effect (Numeric value) where
   handle state handler = coerce . fmap (handler . (<$ state))
 
 newtype NumericC value m a = NumericC { runNumericC :: m a }
+  deriving stock Functor
+  deriving newtype (Applicative, Monad)
 
-runNumeric :: Carrier (Numeric value :+: sig) (NumericC value m)
-           => Evaluator term address value (NumericC value m) a
+runNumeric :: Evaluator term address value (NumericC value m) a
            -> Evaluator term address value m a
 runNumeric = raiseHandler $ runNumericC
 
@@ -376,13 +379,13 @@ instance HFunctor (Bitwise value) where
 instance Effect (Bitwise value) where
   handle state handler = coerce . fmap (handler . (<$ state))
 
-runBitwise :: Carrier (Bitwise value :+: sig) (BitwiseC value m)
-           => Evaluator term address value (BitwiseC value m) a
+runBitwise :: Evaluator term address value (BitwiseC value m) a
            -> Evaluator term address value m a
 runBitwise = raiseHandler $ runBitwiseC
 
 newtype BitwiseC value m a = BitwiseC { runBitwiseC :: m a }
-
+  deriving stock Functor
+  deriving newtype (Applicative, Monad)
 
 object :: (Member (Object address value) sig, Carrier sig m) => address -> m value
 object address = send (Object address pure)
@@ -411,10 +414,11 @@ instance Effect (Object address value) where
     handle state handler = coerce . fmap (handler . (<$ state))
 
 newtype ObjectC address value m a = ObjectC { runObjectC :: m a }
+  deriving stock Functor
+  deriving newtype (Applicative, Monad)
 
-runObject :: Carrier (Object address value :+: sig) (ObjectC address value m)
-           => Evaluator term address value (ObjectC address value m) a
-           -> Evaluator term address value m a
+runObject :: Evaluator term address value (ObjectC address value m) a
+          -> Evaluator term address value m a
 runObject = raiseHandler $ runObjectC
 
 -- | Construct an array of zero or more values.
@@ -437,10 +441,11 @@ instance Effect (Array value) where
     handle state handler = coerce . fmap (handler . (<$ state))
 
 newtype ArrayC value m a = ArrayC { runArrayC :: m a }
+  deriving stock Functor
+  deriving newtype (Applicative, Monad)
 
-runArray :: Carrier (Array value :+: sig) (ArrayC value m)
-           => Evaluator term address value (ArrayC value m) a
-           -> Evaluator term address value m a
+runArray :: Evaluator term address value (ArrayC value m) a
+         -> Evaluator term address value m a
 runArray = raiseHandler $ runArrayC
 
 -- | Construct a hash out of pairs.
@@ -464,10 +469,11 @@ instance Effect (Hash value) where
     handle state handler = coerce . fmap (handler . (<$ state))
 
 newtype HashC value m a = HashC { runHashC :: m a }
+  deriving stock Functor
+  deriving newtype (Applicative, Monad)
 
-runHash :: Carrier (Hash value :+: sig) (HashC value m)
-           => Evaluator term address value (HashC value m) a
-           -> Evaluator term address value m a
+runHash :: Evaluator term address value (HashC value m) a
+        -> Evaluator term address value m a
 runHash = raiseHandler $ runHashC
 
 class Show value => AbstractIntro value where

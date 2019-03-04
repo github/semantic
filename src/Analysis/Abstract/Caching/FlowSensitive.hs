@@ -83,7 +83,7 @@ convergingModules :: ( Cacheable term address value
                      , Carrier sig m
                      , Effect sig
                      )
-                  => (Module (Either prelude term) -> Evaluator term address value (AltC Maybe (Eff m)) value)
+                  => (Module (Either prelude term) -> Evaluator term address value (AltC Maybe m) value)
                   -> (Module (Either prelude term) -> Evaluator term address value m value)
 convergingModules recur m@(Module _ (Left _)) = raiseHandler runNonDet (recur m) >>= maybeM empty
 convergingModules recur m@(Module _ (Right term)) = do

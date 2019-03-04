@@ -30,7 +30,7 @@ import Data.Abstract.Declarations as X
 import Data.Abstract.FreeVariables as X
 import Data.Abstract.Module
 import Data.Abstract.Name as X
-import qualified Data.Abstract.ScopeGraph as ScopeGraph 
+import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import Data.Abstract.ScopeGraph (Relation(..))
 import Data.Abstract.AccessControls.Class as X
 import Data.Language
@@ -258,10 +258,13 @@ instance (Eq term, Eq value) => Eq1 (EvalError term address value) where
 instance (Show term, Show value) => Show1 (EvalError term address value) where
   liftShowsPrec _ _ = showsPrec
 
-runEvalError :: (Carrier sig m, Effect sig) => Evaluator term address value (ResumableC (BaseError (EvalError term address value)) (Eff m)) a -> Evaluator term address value m (Either (SomeError (BaseError (EvalError term address value))) a)
+runEvalError :: Evaluator term address value (ResumableC (BaseError (EvalError term address value)) m) a
+             -> Evaluator term address value m (Either (SomeError (BaseError (EvalError term address value))) a)
 runEvalError = raiseHandler runResumable
 
-runEvalErrorWith :: Carrier sig m => (forall resume . (BaseError (EvalError term address value)) resume -> Evaluator term address value m resume) -> Evaluator term address value (ResumableWithC (BaseError (EvalError term address value)) (Eff m)) a -> Evaluator term address value m a
+runEvalErrorWith :: (forall resume . (BaseError (EvalError term address value)) resume -> Evaluator term address value m resume)
+                 -> Evaluator term address value (ResumableWithC (BaseError (EvalError term address value)) m) a
+                 -> Evaluator term address value m a
 runEvalErrorWith f = raiseHandler $ runResumableWith (runEvaluator . f)
 
 throwEvalError :: ( Member (Reader ModuleInfo) sig
@@ -297,14 +300,12 @@ instance Eq1 (UnspecializedError address value) where
 instance Show1 (UnspecializedError address value) where
   liftShowsPrec _ _ = showsPrec
 
-runUnspecialized :: (Carrier sig m, Effect sig)
-                 => Evaluator term address value (ResumableC (BaseError (UnspecializedError address value)) (Eff m)) a
+runUnspecialized :: Evaluator term address value (ResumableC (BaseError (UnspecializedError address value)) m) a
                  -> Evaluator term address value m (Either (SomeError (BaseError (UnspecializedError address value))) a)
 runUnspecialized = raiseHandler runResumable
 
-runUnspecializedWith :: Carrier sig m
-                     => (forall resume . BaseError (UnspecializedError address value) resume -> Evaluator term address value m resume)
-                     -> Evaluator term address value (ResumableWithC (BaseError (UnspecializedError address value)) (Eff m)) a
+runUnspecializedWith :: (forall resume . BaseError (UnspecializedError address value) resume -> Evaluator term address value m resume)
+                     -> Evaluator term address value (ResumableWithC (BaseError (UnspecializedError address value)) m) a
                      -> Evaluator term address value m a
 runUnspecializedWith f = raiseHandler $ runResumableWith (runEvaluator . f)
 
