@@ -43,11 +43,11 @@ defineBuiltIn declaration rel accessControl value = withCurrentCallStack callSta
   let lexicalEdges = Map.singleton Lexical [ currentScope' ]
   associatedScope <- newPreludeScope lexicalEdges
   -- TODO: This span is still wrong.
-  declare declaration rel accessControl emptySpan ScopeGraph.Unknown (Just associatedScope)
+  declare declaration rel accessControl emptySpan ScopeGraph.UnknownKind (Just associatedScope)
 
   param <- gensym
   withScope associatedScope $ do
-    declare (Declaration param) rel accessControl emptySpan ScopeGraph.Unknown Nothing
+    declare (Declaration param) rel accessControl emptySpan ScopeGraph.UnknownKind Nothing
 
   slot <- lookupSlot declaration
   value <- builtIn associatedScope value
