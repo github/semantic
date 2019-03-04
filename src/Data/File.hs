@@ -8,7 +8,6 @@ module Data.File
   , readBlobFromFile'
   , readBlobsFromDir
   , readFilePair
-  , maybeThese
   ) where
 
 import Prologue
@@ -56,11 +55,7 @@ readBlobsFromDir path = do
   pure (catMaybes blobs)
 
 readFilePair :: forall m. (MonadFail m, MonadIO m) => File -> File -> m BlobPair
-readFilePair a b = Join <$> join (maybeThese <$> readBlobFromFile a <*> readBlobFromFile b)
-
-maybeThese :: MonadFail m => Maybe a -> Maybe b -> m (These a b)
-maybeThese a b = case (a, b) of
-  (Just a, Nothing) -> pure (This a)
-  (Nothing, Just b) -> pure (That b)
-  (Just a, Just b)  -> pure (These a b)
-  _                 -> Prologue.fail "expected file pair with content on at least one side"
+readFilePair a b = do
+  before <- readBlobFromFile a
+  after  <- readBlobFromFile b
+  maybeBlobPair before after
