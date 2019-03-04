@@ -38,34 +38,34 @@ spec = parallel $ do
       putStrLn "step 1"
       blobs <- blobsFromFilePath "test/fixtures/cli/diff.json"
       putStrLn "done"
-      blobs `shouldBe` [blobPairDiffing a b]
+      blobs `shouldBe` [Diffing a b]
 
     it "returns blobs when there's no before" $ do
       blobs <- blobsFromFilePath "test/fixtures/cli/diff-no-before.json"
-      blobs `shouldBe` [blobPairInserting b]
+      blobs `shouldBe` [Inserting b]
 
     it "returns blobs when there's null before" $ do
       blobs <- blobsFromFilePath "test/fixtures/cli/diff-null-before.json"
-      blobs `shouldBe` [blobPairInserting b]
+      blobs `shouldBe` [Inserting b]
 
     it "returns blobs when there's no after" $ do
       blobs <- blobsFromFilePath "test/fixtures/cli/diff-no-after.json"
-      blobs `shouldBe` [blobPairDeleting a]
+      blobs `shouldBe` [Deleting a]
 
     it "returns blobs when there's null after" $ do
       blobs <- blobsFromFilePath "test/fixtures/cli/diff-null-after.json"
-      blobs `shouldBe` [blobPairDeleting a]
+      blobs `shouldBe` [Deleting a]
 
 
     it "returns blobs for unsupported language" $ do
       h <- openFileForReading "test/fixtures/cli/diff-unsupported-language.json"
       blobs <- readBlobPairsFromHandle h
       let b' = sourceBlob "test.kt" Unknown "fun main(args: Array<String>) {\nprintln(\"hi\")\n}\n"
-      blobs `shouldBe` [blobPairInserting b']
+      blobs `shouldBe` [Inserting b']
 
     it "detects language based on filepath for empty language" $ do
       blobs <- blobsFromFilePath "test/fixtures/cli/diff-empty-language.json"
-      blobs `shouldBe` [blobPairDiffing a b]
+      blobs `shouldBe` [Diffing a b]
 
     it "throws on blank input" $ do
       h <- openFileForReading "test/fixtures/cli/blank.json"
