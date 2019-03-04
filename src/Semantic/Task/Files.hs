@@ -59,22 +59,23 @@ instance Effect Files where
   handle state handler (Write destination builder k) = Write destination builder (handler (k <$ state))
 
 -- | Run a 'Files' effect in 'IO'.
-runFiles :: (Member (Error SomeException) sig, MonadIO m, Carrier sig m) => Eff (FilesC m) a -> m a
-runFiles = runFilesC . interpret
+runFiles :: (Member (Error SomeException) sig, MonadIO m, Carrier sig m) => FilesC m a -> m a
+runFiles = runFilesC
 
 newtype FilesC m a = FilesC { runFilesC :: m a }
+  deriving (Functor, Applicative, Monad)
 
 instance (Member (Error SomeException) sig, MonadIO m, Carrier sig m) => Carrier (Files :+: sig) (FilesC m) where
-  ret = FilesC . ret
-  eff = FilesC . handleSum (eff . handleCoercible) (\case
-    Read (FromPath path) k -> (readBlobFromFile' path `catchIO` (throwError . toException @SomeException)) >>= runFilesC . k
-    Read (FromHandle handle) k -> (readBlobsFromHandle handle  `catchIO` (throwError . toException @SomeException)) >>= runFilesC . k
-    Read (FromPathPair paths) k -> (runBothWith readFilePair paths `catchIO` (throwError . toException @SomeException)) >>= runFilesC . k
-    Read (FromPairHandle handle) k -> (readBlobPairsFromHandle handle `catchIO` (throwError . toException @SomeException)) >>= runFilesC . k
-    ReadProject rootDir dir language excludeDirs k -> (readProjectFromPaths rootDir dir language excludeDirs `catchIO` (throwError . toException @SomeException)) >>= runFilesC . k
-    FindFiles dir exts excludeDirs k -> (findFilesInDir dir exts excludeDirs `catchIO` (throwError . toException @SomeException)) >>= runFilesC . k
+  eff (L op) = case op of
+    Read (FromPath path) k -> (readBlobFromFile' path `catchIO` (throwError . toException @SomeException)) >>= k
+    Read (FromHandle handle) k -> (readBlobsFromHandle handle  `catchIO` (throwError . toException @SomeException)) >>= k
+    Read (FromPathPair paths) k -> (runBothWith readFilePair paths `catchIO` (throwError . toException @SomeException)) >>= k
+    Read (FromPairHandle handle) k -> (readBlobPairsFromHandle handle `catchIO` (throwError . toException @SomeException)) >>= k
+    ReadProject rootDir dir language excludeDirs k -> (readProjectFromPaths rootDir dir language excludeDirs `catchIO` (throwError . toException @SomeException)) >>= k
+    FindFiles dir exts excludeDirs k -> (findFilesInDir dir exts excludeDirs `catchIO` (throwError . toException @SomeException)) >>= k
     Write (ToPath path) builder k -> liftIO (IO.withBinaryFile path IO.WriteMode (`B.hPutBuilder` builder)) >> runFilesC k
     Write (ToHandle (WriteHandle handle)) builder k -> liftIO (B.hPutBuilder handle builder) >> runFilesC k)
+  eff (R other) = FilesC (eff (handleCoercible other))
 
 
 readBlob :: (Member Files sig, Carrier sig m) => File -> m Blob

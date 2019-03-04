@@ -47,14 +47,13 @@ instance Effect (Diff term1 term2 diff) where
   handle state handler = coerce . fmap (handler . (<$ state))
 
 
-newtype Algorithm term1 term2 diff m a = Algorithm { runAlgorithm :: Eff m a }
+newtype Algorithm term1 term2 diff m a = Algorithm { runAlgorithm :: m a }
   deriving (Applicative, Functor, Monad)
 
 deriving instance (Carrier sig m, Member NonDet sig) => Alternative (Algorithm term1 term2 diff m)
 
 instance Carrier sig m => Carrier sig (Algorithm term1 term2 diff m) where
-  ret = Algorithm . ret
-  eff = Algorithm . eff . handleCoercible
+  eff = Algorithm . eff
 
 
 -- DSL

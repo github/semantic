@@ -37,7 +37,7 @@ instance ( Carrier (Allocator address :+: sig) (AllocatorC address m)
 promoteD :: DerefC address value m a -> DerefC (Hole context address) value m a
 promoteD = DerefC . runDerefC
 
-instance (Carrier (Deref value :+: sig) (DerefC address value m), Carrier sig m, Monad m)
+instance (Carrier (Deref value :+: sig) (DerefC address value m), Carrier sig m)
       => Carrier (Deref value :+: sig) (DerefC (Hole context address) value m) where
   ret = promoteD . ret
   eff = handleSum (DerefC . eff . handleCoercible) (\case

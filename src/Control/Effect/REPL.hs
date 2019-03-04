@@ -34,16 +34,16 @@ prompt p = send (Prompt p ret)
 output :: (Member REPL sig, Carrier sig m) => Text -> m ()
 output s = send (Output s (ret ()))
 
-runREPL :: (MonadIO m, Carrier sig m) => Prefs -> Settings IO -> Eff (REPLC m) a -> m a
+runREPL :: (MonadIO m, Carrier sig m) => Prefs -> Settings IO -> REPLC m a -> m a
 runREPL prefs settings = flip runREPLC (prefs, settings) . interpret
 
 newtype REPLC m a = REPLC { runREPLC :: (Prefs, Settings IO) -> m a }
 
 instance (Carrier sig m, MonadIO m) => Carrier (REPL :+: sig) (REPLC m) where
-  ret = REPLC . const . ret
-  eff op = REPLC (\ args -> handleSum (eff . handleReader args runREPLC) (\case
-    Prompt p k -> liftIO (uncurry runInputTWithPrefs args (fmap (fmap T.pack) (getInputLine (cyan <> T.unpack p <> plain)))) >>= flip runREPLC args . k
-    Output s k -> liftIO (uncurry runInputTWithPrefs args (outputStrLn (T.unpack s))) *> runREPLC k args) op)
+  eff (L (Prompt p k)) = REPLC (liftIO (uncurry runInputTWithPrefs args (fmap (fmap T.pack) (getInputLine (cyan <> T.unpack p <> plain)))) >>= k)
+  eff (L (Output s k)) = REPLC (liftIO (uncurry runInputTWithPrefs args (outputStrLn (T.unpack s))) *> k)
+  eff (R other)        = REPLC (eff (handleCoercible other))
+
 
 cyan :: String
 cyan = "\ESC[1;36m\STX"

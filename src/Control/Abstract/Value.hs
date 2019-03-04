@@ -156,7 +156,7 @@ asBool :: (Member (Boolean value) sig, Carrier sig m) => value -> m Bool
 asBool = send . flip AsBool ret
 
 -- | Eliminate boolean values. TODO: s/boolean/truthy
-ifthenelse :: (Member (Boolean value) sig, Carrier sig m, Monad m) => value -> m a -> m a -> m a
+ifthenelse :: (Member (Boolean value) sig, Carrier sig m) => value -> m a -> m a -> m a
 ifthenelse v t e = asBool v >>= \ c -> if c then t else e
 
 data Boolean value (m :: * -> *) k

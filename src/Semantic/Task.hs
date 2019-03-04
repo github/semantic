@@ -191,14 +191,14 @@ withOptions options with = do
   config <- defaultConfig options
   withTelemetry config (\ (TelemetryQueues logger statter _) -> with config logger statter)
 
-runTraceInTelemetry :: (Member Telemetry sig, Carrier sig m, Monad m)
+runTraceInTelemetry :: (Member Telemetry sig, Carrier sig m)
                     => Eff (TraceInTelemetryC m) a
                     -> m a
 runTraceInTelemetry = runTraceInTelemetryC . interpret
 
 newtype TraceInTelemetryC m a = TraceInTelemetryC { runTraceInTelemetryC :: m a }
 
-instance (Member Telemetry sig, Carrier sig m, Monad m) => Carrier (Trace :+: sig) (TraceInTelemetryC m) where
+instance (Member Telemetry sig, Carrier sig m) => Carrier (Trace :+: sig) (TraceInTelemetryC m) where
   ret = TraceInTelemetryC . ret
   eff = TraceInTelemetryC . handleSum
     (eff . handleCoercible)

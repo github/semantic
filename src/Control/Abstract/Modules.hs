@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, LambdaCase, KindSignatures, RankNTypes, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, LambdaCase, KindSignatures, RankNTypes, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Control.Abstract.Modules
 ( ModuleResult
 , lookupModule
@@ -87,24 +87,26 @@ runModules :: ( Member (Reader (ModuleTable (Module (ModuleResult address value)
               , Carrier sig m
               )
            => Set ModulePath
-           -> Evaluator term address value (ModulesC address value (Eff m)) a
+           -> Evaluator term address value (ModulesC address value m) a
            -> Evaluator term address value m a
-runModules paths = raiseHandler $ flip runModulesC paths . interpret
+runModules paths = raiseHandler $ flip runModulesC paths
 
-newtype ModulesC address value m a = ModulesC { runModulesC :: Set ModulePath -> m a }
+newtype ModulesC address value m a = ModulesC { runModulesC :: ReaderC (Set ModulePath) m a }
+  deriving (Alternative, Applicative, Functor, Monad, MonadIO)
 
 instance ( Member (Reader (ModuleTable (Module (ModuleResult address value)))) sig
          , Member (Resumable (BaseError (LoadError address value))) sig
          , Carrier sig m
-         , Monad m
          )
       => Carrier (Modules address value :+: sig) (ModulesC address value m) where
-  ret = ModulesC . const . ret
-  eff op = ModulesC (\ paths -> handleSum (eff . handleReader paths runModulesC) (\case
-    Load    name  k -> askModuleTable >>= maybeM (throwLoadError (ModuleNotFoundError name)) . fmap moduleBody . ModuleTable.lookup name >>= flip runModulesC paths . k
-    Lookup  path  k -> askModuleTable >>= flip runModulesC paths . k . fmap moduleBody . ModuleTable.lookup path
-    Resolve names k -> runModulesC (k (find (`Set.member` paths) names)) paths
-    List    dir   k -> runModulesC (k (filter ((dir ==) . takeDirectory) (toList paths))) paths) op)
+  eff (L op) = do
+    paths <- ModulesC ask
+    case op of
+      Load    name  k -> askModuleTable >>= maybeM (throwLoadError (ModuleNotFoundError name)) . fmap moduleBody . ModuleTable.lookup name >>= k
+      Lookup  path  k -> askModuleTable >>= k . fmap moduleBody . ModuleTable.lookup path
+      Resolve names k -> k (find (`Set.member` paths))
+      List    dir   k -> k (filter ((dir ==) . takeDirectory) (toList paths))
+  eff (R other) = ModulesC (eff (R (handleCoercible other)))
 
 askModuleTable :: (Member (Reader (ModuleTable (Module (ModuleResult address value)))) sig, Carrier sig m) => m (ModuleTable (Module (ModuleResult address value)))
 askModuleTable = ask
