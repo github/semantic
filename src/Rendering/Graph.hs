@@ -54,7 +54,7 @@ diffStyle name = (defaultStyle (fromString . show . diffVertexId))
         vertexAttributes _ = []
 
 class ToTreeGraph vertex t | t -> vertex where
-  toTreeGraph :: (Member Fresh sig, Member (Reader (Graph vertex)) sig, Carrier sig m, Monad m) => t (m (Graph vertex)) -> m (Graph vertex)
+  toTreeGraph :: (Member Fresh sig, Member (Reader (Graph vertex)) sig, Carrier sig m) => t (m (Graph vertex)) -> m (Graph vertex)
 
 instance (ConstructorName syntax, Foldable syntax) =>
   ToTreeGraph TermVertex (TermF syntax Location) where

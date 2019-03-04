@@ -151,16 +151,20 @@ instance Effect Telemetry where
   handle state handler (WriteLog level message pairs k) = WriteLog level message pairs (handler (k <$ state))
 
 -- | Run a 'Telemetry' effect by expecting a 'Reader' of 'Queue's to write stats and logs to.
-runTelemetry :: (Carrier sig m, MonadIO m) => LogQueue -> StatQueue -> Eff (TelemetryC m) a -> m a
-runTelemetry logger statter = flip runTelemetryC (logger, statter) . interpret
+runTelemetry :: (Carrier sig m, MonadIO m) => LogQueue -> StatQueue -> TelemetryC m a -> m a
+runTelemetry logger statter = flip runTelemetryC (logger, statter)
 
 newtype TelemetryC m a = TelemetryC { runTelemetryC :: (LogQueue, StatQueue) -> m a }
+  deriving stock Functor
+  deriving (Applicative, Monad) via (ReaderC (LogQueue, StatQueue))
 
 instance (Carrier sig m, MonadIO m) => Carrier (Telemetry :+: sig) (TelemetryC m) where
-  ret = TelemetryC . const . ret
-  eff op = TelemetryC (\ queues -> handleSum (eff . handleReader queues runTelemetryC) (\case
-    WriteStat stat               k -> queueStat (snd queues) stat *> runTelemetryC k queues
-    WriteLog level message pairs k -> queueLogMessage (fst queues) level message pairs *> runTelemetryC k queues) op)
+  eff (L op) = TelemetryC (\ queues -> case op of
+    WriteStat stat k -> queueStat (snd queues) stat *> runTelemetryC k queues
+    WriteLog level message pairs k -> queueLogMessage (fst queues) level message pairs *> runTelemetryC k queues)
+  eff (R other) = TelemetryC (\queues -> eff (handlePure (flip runTelemetryC queues) other))
+
+
 
 
 -- | Run a 'Telemetry' effect by ignoring statting/logging.

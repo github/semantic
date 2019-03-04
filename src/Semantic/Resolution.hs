@@ -24,7 +24,7 @@ import           Semantic.Task.Files
 import           System.FilePath.Posix
 
 
-nodeJSResolutionMap :: (Member Files sig, Carrier sig m, Monad m) => FilePath -> Text -> [FilePath] -> m (Map FilePath FilePath)
+nodeJSResolutionMap :: (Member Files sig, Carrier sig m) => FilePath -> Text -> [FilePath] -> m (Map FilePath FilePath)
 nodeJSResolutionMap rootDir prop excludeDirs = do
   files <- findFiles rootDir [".json"] excludeDirs
   let packageFiles = file <$> filter ((==) "package.json" . takeFileName) files
@@ -57,12 +57,12 @@ instance Effect Resolution where
   handle state handler (NodeJSResolution path key paths k) = NodeJSResolution path key paths (handler . (<$ state) . k)
   handle state handler (NoResolution k) = NoResolution (handler . (<$ state) . k)
 
-runResolution :: (Member Files sig, Carrier sig m, Monad m) => Eff (ResolutionC m) a -> m a
+runResolution :: (Member Files sig, Carrier sig m) => Eff (ResolutionC m) a -> m a
 runResolution = runResolutionC . interpret
 
 newtype ResolutionC m a = ResolutionC { runResolutionC :: m a }
 
-instance (Member Files sig, Carrier sig m, Monad m) => Carrier (Resolution :+: sig) (ResolutionC m) where
+instance (Member Files sig, Carrier sig m) => Carrier (Resolution :+: sig) (ResolutionC m) where
   ret = ResolutionC . ret
   eff = ResolutionC . handleSum (eff . handleCoercible) (\case
     NodeJSResolution dir prop excludeDirs k -> nodeJSResolutionMap dir prop excludeDirs >>= runResolutionC . k

@@ -367,14 +367,13 @@ instance HFunctor (Allocator address) where
 instance Effect (Allocator address) where
   handle state handler (Alloc name k) = Alloc name (handler . (<$ state) . k)
 
-runAllocator :: Carrier (Allocator address :+: sig) (AllocatorC address (Eff m))
-             => Evaluator term address value (AllocatorC address (Eff m)) a
+runAllocator :: Carrier (Allocator address :+: sig) (AllocatorC address m)
+             => Evaluator term address value (AllocatorC address m) a
              -> Evaluator term address value m a
-runAllocator = raiseHandler $ runAllocatorC . interpret
+runAllocator = raiseHandler runAllocatorC
 
 newtype AllocatorC address m a = AllocatorC { runAllocatorC :: m a }
   deriving (Alternative, Applicative, Functor, Monad)
-
 
 runScopeErrorWith :: Carrier sig m
                   => (forall resume . BaseError (ScopeError address) resume -> Evaluator term address value m resume)
@@ -383,6 +382,6 @@ runScopeErrorWith :: Carrier sig m
 runScopeErrorWith f = raiseHandler $ runResumableWith (runEvaluator . f)
 
 runScopeError :: (Carrier sig m, Effect sig)
-              => Evaluator term address value (ResumableC (BaseError (ScopeError address)) (Eff m)) a
+              => Evaluator term address value (ResumableC (BaseError (ScopeError address)) m) a
               -> Evaluator term address value m (Either (SomeError (BaseError (ScopeError address))) a)
 runScopeError = raiseHandler runResumable

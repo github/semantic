@@ -101,7 +101,7 @@ quietTerm blob = showTiming blob <$> time' ( (doParse blob >>= withSomeTerm (fma
       in stringUtf8 (status <> "\t" <> show blobLanguage <> "\t" <> blobPath <> "\t" <> show duration <> " ms\n")
 
 
-type ParseEffects sig m = (Member (Error SomeException) sig, Member Task sig, Carrier sig m, Monad m)
+type ParseEffects sig m = (Member (Error SomeException) sig, Member Task sig, Carrier sig m)
 
 type TermConstraints =
  '[ Taggable

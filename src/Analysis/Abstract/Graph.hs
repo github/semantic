@@ -202,7 +202,7 @@ variableDefinition var = do
   context <- ask
   appendGraph (vertex context `connect` vertex var)
 
-appendGraph :: (Member (State (Graph v)) sig, Carrier sig m, Monad m) => Graph v -> m ()
+appendGraph :: (Member (State (Graph v)) sig, Carrier sig m) => Graph v -> m ()
 appendGraph = modify . (<>)
 
 
