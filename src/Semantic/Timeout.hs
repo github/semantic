@@ -1,4 +1,4 @@
-{-# LANGUAGE ExistentialQuantification, TypeOperators, RankNTypes, UndecidableInstances #-}
+{-# LANGUAGE ExistentialQuantification, GeneralizedNewtypeDeriving, TypeOperators, RankNTypes, UndecidableInstances #-}
 module Semantic.Timeout
 ( timeout
 , Timeout

@@ -36,14 +36,14 @@ type ModuleResult address value = ((address, address), value)
 
 -- | Retrieve an evaluated module, if any. @Nothing@ means we’ve never tried to load it, and @Just (env, value)@ indicates the result of a completed load.
 lookupModule :: (Member (Modules address value) sig, Carrier sig m) => ModulePath -> Evaluator term address value m (Maybe (ModuleResult address value))
-lookupModule = sendModules . flip Lookup ret
+lookupModule = sendModules . flip Lookup pure
 
 -- | Resolve a list of module paths to a possible module table entry.
 resolve :: (Member (Modules address value) sig, Carrier sig m) => [FilePath] -> Evaluator term address value m (Maybe ModulePath)
-resolve = sendModules . flip Resolve ret
+resolve = sendModules . flip Resolve pure
 
 listModulesInDir :: (Member (Modules address value) sig, Carrier sig m) => FilePath -> Evaluator term address value m [ModulePath]
-listModulesInDir = sendModules . flip List ret
+listModulesInDir = sendModules . flip List pure
 
 
 -- | Require/import another module by name and return its environment and value.
@@ -56,7 +56,7 @@ require path = lookupModule path >>= maybeM (load path)
 --
 -- Always loads/evaluates.
 load :: (Member (Modules address value) sig, Carrier sig m) => ModulePath -> Evaluator term address value m (ModuleResult address value)
-load path = sendModules (Load path ret)
+load path = sendModules (Load path pure)
 
 
 data Modules address value (m :: * -> *) k
@@ -82,14 +82,10 @@ sendModules :: ( Member (Modules address value) sig
             -> Evaluator term address value m return
 sendModules = send
 
-runModules :: ( Member (Reader (ModuleTable (Module (ModuleResult address value)))) sig
-              , Member (Resumable (BaseError (LoadError address value))) sig
-              , Carrier sig m
-              )
-           => Set ModulePath
+runModules :: Set ModulePath
            -> Evaluator term address value (ModulesC address value m) a
            -> Evaluator term address value m a
-runModules paths = raiseHandler $ flip runModulesC paths
+runModules paths = raiseHandler (runReader paths . runModulesC)
 
 newtype ModulesC address value m a = ModulesC { runModulesC :: ReaderC (Set ModulePath) m a }
   deriving (Alternative, Applicative, Functor, Monad, MonadIO)
@@ -104,7 +100,7 @@ instance ( Member (Reader (ModuleTable (Module (ModuleResult address value)))) s
     case op of
       Load    name  k -> askModuleTable >>= maybeM (throwLoadError (ModuleNotFoundError name)) . fmap moduleBody . ModuleTable.lookup name >>= k
       Lookup  path  k -> askModuleTable >>= k . fmap moduleBody . ModuleTable.lookup path
-      Resolve names k -> k (find (`Set.member` paths))
+      Resolve names k -> k (find (`Set.member` paths) names)
       List    dir   k -> k (filter ((dir ==) . takeDirectory) (toList paths))
   eff (R other) = ModulesC (eff (R (handleCoercible other)))
 
@@ -126,14 +122,12 @@ instance Eq1 (LoadError address value) where
 instance NFData1 (LoadError address value) where
   liftRnf _ (ModuleNotFoundError p) = rnf p
 
-runLoadError :: (Carrier sig m, Effect sig)
-             => Evaluator term address value (ResumableC (BaseError (LoadError address value)) (Eff m)) a
+runLoadError :: Evaluator term address value (ResumableC (BaseError (LoadError address value)) m) a
              -> Evaluator term address value m (Either (SomeError (BaseError (LoadError address value))) a)
 runLoadError = raiseHandler runResumable
 
-runLoadErrorWith :: Carrier sig m
-                 => (forall resume . (BaseError (LoadError address value)) resume -> Evaluator term address value m resume)
-                 -> Evaluator term address value (ResumableWithC (BaseError (LoadError address value)) (Eff m)) a
+runLoadErrorWith :: (forall resume . (BaseError (LoadError address value)) resume -> Evaluator term address value m resume)
+                 -> Evaluator term address value (ResumableWithC (BaseError (LoadError address value)) m) a
                  -> Evaluator term address value m a
 runLoadErrorWith f = raiseHandler $ runResumableWith (runEvaluator . f)
 
@@ -164,14 +158,12 @@ instance NFData1 ResolutionError where
     NotFoundError p ps l -> rnf p `seq` rnf ps `seq` rnf l
     GoImportError p      -> rnf p
 
-runResolutionError :: (Carrier sig m, Effect sig)
-                   => Evaluator term address value (ResumableC (BaseError ResolutionError) (Eff m)) a
+runResolutionError :: Evaluator term address value (ResumableC (BaseError ResolutionError) m) a
                    -> Evaluator term address value m (Either (SomeError (BaseError ResolutionError)) a)
 runResolutionError = raiseHandler runResumable
 
-runResolutionErrorWith :: Carrier sig m
-                       => (forall resume . (BaseError ResolutionError) resume -> Evaluator term address value m resume)
-                       -> Evaluator term address value (ResumableWithC (BaseError ResolutionError) (Eff m)) a
+runResolutionErrorWith :: (forall resume . (BaseError ResolutionError) resume -> Evaluator term address value m resume)
+                       -> Evaluator term address value (ResumableWithC (BaseError ResolutionError) m) a
                        -> Evaluator term address value m a
 runResolutionErrorWith f = raiseHandler $ runResumableWith (runEvaluator . f)
 

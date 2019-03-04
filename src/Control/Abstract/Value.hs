@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, GADTs, KindSignatures, LambdaCase, Rank2Types, ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE DeriveAnyClass, GADTs, GeneralizedNewtypeDeriving, KindSignatures, LambdaCase, Rank2Types, ScopedTypeVariables, TypeOperators #-}
 module Control.Abstract.Value
 ( AbstractValue(..)
 , AbstractIntro(..)
@@ -105,7 +105,7 @@ data Comparator
 -- In the concrete domain, introductions & eliminations respectively construct & pattern match against values, while in abstract domains they respectively construct & project finite sets of discrete observations of abstract values. For example, an abstract domain modelling integers as a sign (-, 0, or +) would introduce abstract values by mapping integers to their sign and eliminate them by mapping signs back to some canonical integer, e.g. - -> -1, 0 -> 0, + -> 1.
 
 function :: (Member (Function term address value) sig, Carrier sig m) => Name -> [Name] -> term -> address -> Evaluator term address value m value
-function name params body scope = sendFunction (Function name params body scope ret)
+function name params body scope = sendFunction (Function name params body scope pure)
 
 data BuiltIn
   = Print
@@ -113,16 +113,16 @@ data BuiltIn
   deriving (Eq, Ord, Show, Generic, NFData)
 
 builtIn :: (Member (Function term address value) sig, Carrier sig m) => address -> BuiltIn -> Evaluator term address value m value
-builtIn address = sendFunction . flip (BuiltIn address) ret
+builtIn address = sendFunction . flip (BuiltIn address) pure
 
 call :: (Member (Function term address value) sig, Carrier sig m) => value -> [value] -> Evaluator term address value m value
-call fn args = sendFunction (Call fn args ret)
+call fn args = sendFunction (Call fn args pure)
 
 sendFunction :: (Member (Function term address value) sig, Carrier sig m) => Function term address value (Evaluator term address value m) (Evaluator term address value m a) -> Evaluator term address value m a
 sendFunction = send
 
 bindThis :: (Member (Function term address value) sig, Carrier sig m) => value -> value -> Evaluator term address value m value
-bindThis this that = sendFunction (Bind this that ret)
+bindThis this that = sendFunction (Bind this that pure)
 
 data Function term address value (m :: * -> *) k
   = Function Name [Name] term address (value -> k) -- ^ A function is parameterized by its name, parameter names, body, parent scope, and returns a ValueRef.
@@ -138,22 +138,21 @@ instance Effect (Function term address value) where
   handle state handler = coerce . fmap (handler . (<$ state))
 
 
-runFunction :: Carrier (Function term address value :+: sig) (FunctionC term address value (Eff m))
-            => (term -> Evaluator term address value (FunctionC term address value (Eff m)) value)
-            -> Evaluator term address value (FunctionC term address value (Eff m)) a
+runFunction :: (term -> Evaluator term address value (FunctionC term address value m) value)
+            -> Evaluator term address value (FunctionC term address value m) a
             -> Evaluator term address value m a
-runFunction eval = raiseHandler (flip runFunctionC (runEvaluator . eval) . interpret)
+runFunction eval = raiseHandler (runReader eval . coerce)
 
-newtype FunctionC term address value m a = FunctionC { runFunctionC :: (term -> Eff (FunctionC term address value m) value) -> m a }
-
+newtype FunctionC term address value m a = FunctionC { runFunctionC :: ReaderC (term -> FunctionC term address value m value) m a }
+  deriving (Applicative, Functor, Monad)
 
 -- | Construct a boolean value in the abstract domain.
 boolean :: (Member (Boolean value) sig, Carrier sig m) => Bool -> m value
-boolean = send . flip Boolean ret
+boolean = send . flip Boolean pure
 
 -- | Extract a 'Bool' from a given value.
 asBool :: (Member (Boolean value) sig, Carrier sig m) => value -> m Bool
-asBool = send . flip AsBool ret
+asBool = send . flip AsBool pure
 
 -- | Eliminate boolean values. TODO: s/boolean/truthy
 ifthenelse :: (Member (Boolean value) sig, Carrier sig m) => value -> m a -> m a -> m a
@@ -173,10 +172,10 @@ instance Effect (Boolean value) where
     Boolean b k -> Boolean b (handler . (<$ state) . k)
     AsBool  v k -> AsBool  v (handler . (<$ state) . k)
 
-runBoolean :: Carrier (Boolean value :+: sig) (BooleanC value (Eff m))
-           => Evaluator term address value (BooleanC value (Eff m)) a
+runBoolean :: Carrier (Boolean value :+: sig) (BooleanC value m)
+           => Evaluator term address value (BooleanC value m) a
            -> Evaluator term address value m a
-runBoolean = raiseHandler $ runBooleanC . interpret
+runBoolean = raiseHandler $ runBooleanC
 
 newtype BooleanC value m a = BooleanC { runBooleanC :: m a }
 
@@ -186,7 +185,7 @@ while :: (Member (While value) sig, Carrier sig m)
       => Evaluator term address value m value -- ^ Condition
       -> Evaluator term address value m value -- ^ Body
       -> Evaluator term address value m value
-while cond body = send (While cond body ret)
+while cond body = send (While cond body pure)
 
 -- | Do-while loop, built on top of while.
 doWhile :: (Member (While value) sig, Carrier sig m)
@@ -223,17 +222,17 @@ data While value m k
 instance HFunctor (While value) where
   hmap f (While cond body k) = While (f cond) (f body) k
 
-runWhile :: Carrier (While value :+: sig) (WhileC value (Eff m))
-         => Evaluator term address value (WhileC value (Eff m)) a
+runWhile :: Carrier (While value :+: sig) (WhileC value m)
+         => Evaluator term address value (WhileC value m) a
          -> Evaluator term address value m a
-runWhile = raiseHandler $ runWhileC . interpret
+runWhile = raiseHandler $ runWhileC
 
 newtype WhileC value m a = WhileC { runWhileC :: m a }
 
 
 -- | Construct an abstract unit value.
 unit :: (Carrier sig m, Member (Unit value) sig) => Evaluator term address value m value
-unit = send (Unit ret)
+unit = send (Unit pure)
 
 newtype Unit value (m :: * -> *) k
   = Unit (value -> k)
@@ -246,21 +245,21 @@ instance HFunctor (Unit value) where
 instance Effect (Unit value) where
   handle state handler (Unit k) = Unit (handler . (<$ state) . k)
 
-runUnit :: Carrier (Unit value :+: sig) (UnitC value (Eff m))
-        => Evaluator term address value (UnitC value (Eff m)) a
+runUnit :: Carrier (Unit value :+: sig) (UnitC value m)
+        => Evaluator term address value (UnitC value m) a
         -> Evaluator term address value m a
-runUnit = raiseHandler $ runUnitC . interpret
+runUnit = raiseHandler $ runUnitC
 
 newtype UnitC value m a = UnitC { runUnitC :: m a }
 
 
 -- | Construct a String value in the abstract domain.
 string :: (Member (String value) sig, Carrier sig m) => Text -> m value
-string t = send (String t ret)
+string t = send (String t pure)
 
 -- | Extract 'Text' from a given value.
 asString :: (Member (String value) sig, Carrier sig m) => value -> m Text
-asString v = send (AsString v ret)
+asString v = send (AsString v pure)
 
 data String value (m :: * -> *) k
   = String Text (value -> k)
@@ -277,30 +276,30 @@ instance Effect (String value) where
 
 newtype StringC value m a = StringC { runStringC :: m a }
 
-runString :: Carrier (String value :+: sig) (StringC value (Eff m))
-          => Evaluator term address value (StringC value (Eff m)) a
+runString :: Carrier (String value :+: sig) (StringC value m)
+          => Evaluator term address value (StringC value m) a
           -> Evaluator term address value m a
-runString = raiseHandler $ runStringC . interpret
+runString = raiseHandler $ runStringC
 
 
 -- | Construct an abstract integral value.
 integer :: (Member (Numeric value) sig, Carrier sig m) => Integer -> m value
-integer t = send (Integer t ret)
+integer t = send (Integer t pure)
 
 -- | Construct a floating-point value.
 float :: (Member (Numeric value) sig, Carrier sig m) => Scientific -> m value
-float t = send (Float t ret)
+float t = send (Float t pure)
 
 -- | Construct a rational value.
 rational :: (Member (Numeric value) sig, Carrier sig m) => Rational -> m value
-rational t = send (Rational t ret)
+rational t = send (Rational t pure)
 
 -- | Lift a unary operator over a 'Num' to a function on 'value's.
 liftNumeric  :: (Member (Numeric value) sig, Carrier sig m)
              => (forall a . Num a => a -> a)
              -> value
              -> m value
-liftNumeric t v = send (LiftNumeric t v ret)
+liftNumeric t v = send (LiftNumeric t v pure)
 
 -- | Lift a pair of binary operators to a function on 'value's.
 --   You usually pass the same operator as both arguments, except in the cases where
@@ -311,7 +310,7 @@ liftNumeric2 :: (Member (Numeric value) sig, Carrier sig m)
              -> value
              -> value
              -> m value
-liftNumeric2 t v1 v2 = send (LiftNumeric2 t v1 v2 ret)
+liftNumeric2 t v1 v2 = send (LiftNumeric2 t v1 v2 pure)
 
 data Numeric value (m :: * -> *) k
   = Integer Integer (value -> k)
@@ -330,22 +329,22 @@ instance Effect (Numeric value) where
 
 newtype NumericC value m a = NumericC { runNumericC :: m a }
 
-runNumeric :: Carrier (Numeric value :+: sig) (NumericC value (Eff m))
-           => Evaluator term address value (NumericC value (Eff m)) a
+runNumeric :: Carrier (Numeric value :+: sig) (NumericC value m)
+           => Evaluator term address value (NumericC value m) a
            -> Evaluator term address value m a
-runNumeric = raiseHandler $ runNumericC . interpret
+runNumeric = raiseHandler $ runNumericC
 
 
 -- | Cast numbers to integers
 castToInteger :: (Member (Bitwise value) sig, Carrier sig m) => value -> m value
-castToInteger t = send (CastToInteger t ret)
+castToInteger t = send (CastToInteger t pure)
 
 -- | Lift a unary bitwise operator to values. This is usually 'complement'.
 liftBitwise :: (Member (Bitwise value) sig, Carrier sig m)
             => (forall a . Bits a => a -> a)
             -> value
             -> m value
-liftBitwise t v = send (LiftBitwise t v ret)
+liftBitwise t v = send (LiftBitwise t v pure)
 
 -- | Lift a binary bitwise operator to values. The Integral constraint is
 --   necessary to satisfy implementation details of Haskell left/right shift,
@@ -355,13 +354,13 @@ liftBitwise2 :: (Member (Bitwise value) sig, Carrier sig m)
              -> value
              -> value
              -> m value
-liftBitwise2 t v1 v2 = send (LiftBitwise2 t v1 v2 ret)
+liftBitwise2 t v1 v2 = send (LiftBitwise2 t v1 v2 pure)
 
 unsignedRShift :: (Member (Bitwise value) sig, Carrier sig m)
                => value
                -> value
                -> m value
-unsignedRShift v1 v2 = send (UnsignedRShift v1 v2 ret)
+unsignedRShift v1 v2 = send (UnsignedRShift v1 v2 pure)
 
 data Bitwise value (m :: * -> *) k
   = CastToInteger value (value -> k)
@@ -377,26 +376,26 @@ instance HFunctor (Bitwise value) where
 instance Effect (Bitwise value) where
   handle state handler = coerce . fmap (handler . (<$ state))
 
-runBitwise :: Carrier (Bitwise value :+: sig) (BitwiseC value (Eff m))
-           => Evaluator term address value (BitwiseC value (Eff m)) a
+runBitwise :: Carrier (Bitwise value :+: sig) (BitwiseC value m)
+           => Evaluator term address value (BitwiseC value m) a
            -> Evaluator term address value m a
-runBitwise = raiseHandler $ runBitwiseC . interpret
+runBitwise = raiseHandler $ runBitwiseC
 
 newtype BitwiseC value m a = BitwiseC { runBitwiseC :: m a }
 
 
 object :: (Member (Object address value) sig, Carrier sig m) => address -> m value
-object address = send (Object address ret)
+object address = send (Object address pure)
 
 -- | Extract the environment from any scoped object (e.g. classes, namespaces, etc).
 scopedEnvironment :: (Member (Object address value) sig, Carrier sig m) => value -> m (Maybe address)
-scopedEnvironment value = send (ScopedEnvironment value ret)
+scopedEnvironment value = send (ScopedEnvironment value pure)
 
 -- | Build a class value from a name and environment.
 -- declaration is the new class's identifier
 -- address is the environment to capture
 klass :: (Member (Object address value) sig, Carrier sig m) => Declaration -> address -> m value
-klass d a = send (Klass d a ret)
+klass d a = send (Klass d a pure)
 
 data Object address value (m :: * -> *) k
   = Object address (value -> k)
@@ -413,17 +412,17 @@ instance Effect (Object address value) where
 
 newtype ObjectC address value m a = ObjectC { runObjectC :: m a }
 
-runObject :: Carrier (Object address value :+: sig) (ObjectC address value (Eff m))
-           => Evaluator term address value (ObjectC address value (Eff m)) a
+runObject :: Carrier (Object address value :+: sig) (ObjectC address value m)
+           => Evaluator term address value (ObjectC address value m) a
            -> Evaluator term address value m a
-runObject = raiseHandler $ runObjectC . interpret
+runObject = raiseHandler $ runObjectC
 
 -- | Construct an array of zero or more values.
 array :: (Member (Array value) sig, Carrier sig m) => [value] -> m value
-array v = send (Array v ret)
+array v = send (Array v pure)
 
 asArray :: (Member (Array value) sig, Carrier sig m) => value -> m [value]
-asArray v = send (AsArray v ret)
+asArray v = send (AsArray v pure)
 
 data Array value (m :: * -> *) k
   = Array [value] (value -> k)
@@ -439,18 +438,18 @@ instance Effect (Array value) where
 
 newtype ArrayC value m a = ArrayC { runArrayC :: m a }
 
-runArray :: Carrier (Array value :+: sig) (ArrayC value (Eff m))
-           => Evaluator term address value (ArrayC value (Eff m)) a
+runArray :: Carrier (Array value :+: sig) (ArrayC value m)
+           => Evaluator term address value (ArrayC value m) a
            -> Evaluator term address value m a
-runArray = raiseHandler $ runArrayC . interpret
+runArray = raiseHandler $ runArrayC
 
 -- | Construct a hash out of pairs.
 hash :: (Member (Hash value) sig, Carrier sig m) => [(value, value)] -> m value
-hash v = send (Hash v ret)
+hash v = send (Hash v pure)
 
 -- | Construct a key-value pair for use in a hash.
 kvPair :: (Member (Hash value) sig, Carrier sig m) => value -> value -> m value
-kvPair v1 v2 = send (KvPair v1 v2 ret)
+kvPair v1 v2 = send (KvPair v1 v2 pure)
 
 data Hash value (m :: * -> *) k
   = Hash [(value, value)] (value -> k)
@@ -466,10 +465,10 @@ instance Effect (Hash value) where
 
 newtype HashC value m a = HashC { runHashC :: m a }
 
-runHash :: Carrier (Hash value :+: sig) (HashC value (Eff m))
-           => Evaluator term address value (HashC value (Eff m)) a
+runHash :: Carrier (Hash value :+: sig) (HashC value m)
+           => Evaluator term address value (HashC value m) a
            -> Evaluator term address value m a
-runHash = raiseHandler $ runHashC . interpret
+runHash = raiseHandler $ runHashC
 
 class Show value => AbstractIntro value where
   -- | Construct the nil/null datatype.

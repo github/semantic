@@ -27,9 +27,9 @@ import qualified Data.Text as T
 renderTreeGraph :: (Ord vertex, Recursive t, ToTreeGraph vertex (Base t)) => t -> Graph vertex
 renderTreeGraph = simplify . runGraph . cata toTreeGraph
 
-runGraph :: Eff (ReaderC (Graph vertex)
-           (Eff (FreshC
-           (Eff VoidC)))) (Graph vertex)
+runGraph :: ReaderC (Graph vertex)
+           (FreshC
+           (VoidC)) (Graph vertex)
          -> Graph vertex
 runGraph = run . runFresh . runReader mempty
 
