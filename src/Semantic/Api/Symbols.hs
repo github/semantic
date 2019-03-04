@@ -49,7 +49,7 @@ legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> distributeFoldMap 
       { symbolName = name
       , symbolKind = kind
       , symbolLine = fromMaybe mempty line
-      , symbolSpan = span ^? re converting
+      , symbolSpan = converting #? span
       }
 
 parseSymbolsBuilder :: (Member Distribute sig, ParseEffects sig m, Traversable t) => t Blob -> m Builder
