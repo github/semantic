@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, KindSignatures, LambdaCase, RankNTypes, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DerivingStrategies, GADTs, KindSignatures, LambdaCase, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Semantic.Telemetry
 (
   -- Async telemetry interface
@@ -154,18 +154,16 @@ instance Effect Telemetry where
 runTelemetry :: (Carrier sig m, MonadIO m) => LogQueue -> StatQueue -> TelemetryC m a -> m a
 runTelemetry logger statter = flip runTelemetryC (logger, statter)
 
-newtype TelemetryC m a = TelemetryC { runTelemetryC :: (LogQueue, StatQueue) -> m a }
-  deriving stock Functor
-  deriving (Applicative, Monad) via (ReaderC (LogQueue, StatQueue))
+newtype TelemetryC m a = TelemetryC { runTelemetryC :: ReaderC (LogQueue, StatQueue) m a }
+  deriving (Applicative, Functor, Monad, MonadIO)
 
 instance (Carrier sig m, MonadIO m) => Carrier (Telemetry :+: sig) (TelemetryC m) where
-  eff (L op) = TelemetryC (\ queues -> case op of
-    WriteStat stat k -> queueStat (snd queues) stat *> runTelemetryC k queues
-    WriteLog level message pairs k -> queueLogMessage (fst queues) level message pairs *> runTelemetryC k queues)
-  eff (R other) = TelemetryC (\queues -> eff (handlePure (flip runTelemetryC queues) other))
-
-
-
+  eff (L op) = do
+    queues <- TelemetryC ask
+    case op of
+      WriteStat stat k               -> queueStat (snd queues) stat *> k
+      WriteLog level message pairs k -> queueLogMessage (fst queues) level message pairs *> k
+  eff (R other) = TelemetryC (eff (R (handleCoercible other)))
 
 -- | Run a 'Telemetry' effect by ignoring statting/logging.
 ignoreTelemetry :: Carrier sig m => Eff (IgnoreTelemetryC m) a -> m a

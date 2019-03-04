@@ -48,19 +48,17 @@ instance Effect (Diff term1 term2 diff) where
 
 
 newtype Algorithm term1 term2 diff m a = Algorithm { runAlgorithm :: m a }
-  deriving (Applicative, Functor, Monad)
-
-deriving instance (Carrier sig m, Member NonDet sig) => Alternative (Algorithm term1 term2 diff m)
+  deriving (Applicative, Alternative, Functor, Monad)
 
 instance Carrier sig m => Carrier sig (Algorithm term1 term2 diff m) where
-  eff = Algorithm . eff
+  eff = Algorithm . eff . handleCoercible
 
 
 -- DSL
 
 -- | Diff two terms without specifying the algorithm to be used.
 diff :: (Carrier sig m, Member (Diff term1 term2 diff) sig) => term1 -> term2 -> m diff
-diff a1 a2 = send (Diff a1 a2 ret)
+diff a1 a2 = send (Diff a1 a2 pure)
 
 -- | Diff a These of terms without specifying the algorithm to be used.
 diffThese :: (Carrier sig m, Member (Diff term1 term2 diff) sig) => These term1 term2 -> Algorithm term1 term2 diff m diff
@@ -75,30 +73,30 @@ diffMaybe _         _         = pure Nothing
 
 -- | Diff two terms linearly.
 linearly :: (Carrier sig m, Member (Diff term1 term2 diff) sig) => term1 -> term2 -> Algorithm term1 term2 diff m diff
-linearly f1 f2 = send (Linear f1 f2 ret)
+linearly f1 f2 = send (Linear f1 f2 pure)
 
 -- | Diff two terms using RWS.
 byRWS :: (Carrier sig m, Member (Diff term1 term2 diff) sig) => [term1] -> [term2] -> Algorithm term1 term2 diff m [diff]
-byRWS as1 as2 = send (RWS as1 as2 ret)
+byRWS as1 as2 = send (RWS as1 as2 pure)
 
 -- | Delete a term.
 byDeleting :: (Carrier sig m, Member (Diff term1 term2 diff) sig) => term1 -> Algorithm term1 term2 diff m diff
-byDeleting a1 = sendDiff (Delete a1 ret)
+byDeleting a1 = sendDiff (Delete a1 pure)
 
 -- | Insert a term.
 byInserting :: (Carrier sig m, Member (Diff term1 term2 diff) sig) => term2 -> Algorithm term1 term2 diff m diff
-byInserting a2 = sendDiff (Insert a2 ret)
+byInserting a2 = sendDiff (Insert a2 pure)
 
 -- | Replace one term with another.
 byReplacing :: (Carrier sig m, Member (Diff term1 term2 diff) sig) => term1 -> term2 -> Algorithm term1 term2 diff m diff
-byReplacing a1 a2 = send (Replace a1 a2 ret)
+byReplacing a1 a2 = send (Replace a1 a2 pure)
 
-sendDiff :: (Carrier sig m, Member (Diff term1 term2 diff) sig) => Diff term1 term2 diff (Eff m) (Eff m a) -> Algorithm term1 term2 diff m a
+sendDiff :: (Carrier sig m, Member (Diff term1 term2 diff) sig) => Diff term1 term2 diff m (m a) -> Algorithm term1 term2 diff m a
 sendDiff = Algorithm . send
 
 
 -- | Diff two terms based on their 'Diffable' instances, performing substructural comparisons iff the initial comparison fails.
-algorithmForTerms :: (Carrier sig m, Diffable syntax, Member (Diff (Term syntax ann1) (Term syntax ann2) (Diff.Diff syntax ann1 ann2)) sig, Member NonDet sig)
+algorithmForTerms :: (Carrier sig m, Diffable syntax, Member (Diff (Term syntax ann1) (Term syntax ann2) (Diff.Diff syntax ann1 ann2)) sig, Member NonDet sig, Alternative m)
                   => Term syntax ann1
                   -> Term syntax ann2
                   -> Algorithm (Term syntax ann1) (Term syntax ann2) (Diff.Diff syntax ann1 ann2) m (Diff.Diff syntax ann1 ann2)
@@ -141,12 +139,12 @@ instance Alternative Equivalence where
 -- | A type class for determining what algorithm to use for diffing two terms.
 class Diffable f where
   -- | Construct an algorithm to diff a pair of @f@s populated with disjoint terms.
-  algorithmFor :: (Carrier sig m, Member (Diff term1 term2 diff) sig, Member NonDet sig)
+  algorithmFor :: (Alternative m, Carrier sig m, Member (Diff term1 term2 diff) sig, Member NonDet sig)
                => f term1
                -> f term2
                -> Algorithm term1 term2 diff m (f diff)
   default
-    algorithmFor :: (Carrier sig m, Generic1 f, GDiffable (Rep1 f), Member (Diff term1 term2 diff) sig, Member NonDet sig)
+    algorithmFor :: (Alternative m, Carrier sig m, Generic1 f, GDiffable (Rep1 f), Member (Diff term1 term2 diff) sig, Member NonDet sig)
                  => f term1
                  -> f term2
                  -> Algorithm term1 term2 diff m (f diff)
@@ -189,7 +187,7 @@ class Diffable f where
   default comparableTo :: (Generic1 f, GDiffable (Rep1 f)) => f term1 -> f term2 -> Bool
   comparableTo = genericComparableTo
 
-genericAlgorithmFor :: (Carrier sig m, Generic1 f, GDiffable (Rep1 f), Member (Diff term1 term2 diff) sig, Member NonDet sig)
+genericAlgorithmFor :: (Alternative m, Carrier sig m, Generic1 f, GDiffable (Rep1 f), Member (Diff term1 term2 diff) sig, Member NonDet sig)
                     => f term1
                     -> f term2
                     -> Algorithm term1 term2 diff m (f diff)
@@ -237,7 +235,7 @@ instance Diffable NonEmpty where
 
 -- | A generic type class for diffing two terms defined by the Generic1 interface.
 class GDiffable f where
-  galgorithmFor :: (Carrier sig m, Member (Diff term1 term2 diff) sig, Member NonDet sig) => f term1 -> f term2 -> Algorithm term1 term2 diff m (f diff)
+  galgorithmFor :: (Alternative m, Carrier sig m, Member (Diff term1 term2 diff) sig, Member NonDet sig) => f term1 -> f term2 -> Algorithm term1 term2 diff m (f diff)
 
   gtryAlignWith :: Alternative g => (These a1 a2 -> g b) -> f a1 -> f a2 -> g (f b)
 

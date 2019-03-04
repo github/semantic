@@ -36,17 +36,19 @@ interpose m f = send (Interpose m f pure)
 runInterpose :: InterposeC eff m a -> m a
 runInterpose = runReader Nothing . runInterposeC
 
-newtype InterposeC eff m a = InterposeC { runInterposeC :: ReaderC (Maybe (Listener eff m)) m a }
+newtype InterposeC eff m a = InterposeC { runInterposeC :: ReaderC (Maybe (Listener eff (InterposeC eff m))) m a }
   deriving (Alternative, Applicative, Functor, Monad)
 
 newtype Listener eff m = Listener (forall n x . eff n (n x) -> m x)
 
-runListener :: Listener eff m -> eff (InterposeC eff m) (InterposeC eff m a) -> InterposeC eff m a
-runListener l@(Listener listen) = undefined --listen . runReader (Just l) . runInterposeC
+-- TODO: Document the implementation of this, as it is extremely subtle.
+
+runListener :: Listener eff (InterposeC eff m) -> eff (InterposeC eff m) (InterposeC eff m a) -> InterposeC eff m a
+runListener (Listener listen) = listen
 
 instance (Carrier sig m, Member eff sig) => Carrier (Interpose eff :+: sig) (InterposeC eff m) where
   eff (L (Interpose m h k)) =
-    local (const _) m >>= k
+    InterposeC (local (const (Just (Listener h))) (runInterposeC m)) >>= k
   eff (R other) = do
     listener <- InterposeC ask
     case (listener, prj other) of
