@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveAnyClass, ExplicitNamespaces, PatternSynonyms #-}
 module Data.Blob
 ( Blob(..)
 , Blobs(..)
@@ -6,11 +6,11 @@ module Data.Blob
 , nullBlob
 , sourceBlob
 , noLanguageForBlob
-, BlobPair
-, These(..)
-, blobPairDiffing
-, blobPairInserting
-, blobPairDeleting
+, type BlobPair
+, pattern Diffing
+, pattern Inserting
+, pattern Deleting
+, maybeBlobPair
 , decodeBlobPairs
 , languageForBlobPair
 , languageTagForBlobPair
@@ -75,33 +75,42 @@ instance FromJSON BlobPair where
     before <- o .:? "before"
     after <- o .:? "after"
     case (before, after) of
-      (Just b, Just a)  -> pure $ Join (These b a)
-      (Just b, Nothing) -> pure $ Join (This b)
-      (Nothing, Just a) -> pure $ Join (That a)
+      (Just b, Just a)  -> pure $ Diffing b a
+      (Just b, Nothing) -> pure $ Deleting b
+      (Nothing, Just a) -> pure $ Inserting a
       _                 -> Prelude.fail "Expected object with 'before' and/or 'after' keys only"
 
-blobPairDiffing :: Blob -> Blob -> BlobPair
-blobPairDiffing a b = Join (These a b)
+pattern Diffing :: Blob -> Blob -> BlobPair
+pattern Diffing a b = Join (These a b)
 
-blobPairInserting :: Blob -> BlobPair
-blobPairInserting = Join . That
+pattern Inserting :: Blob -> BlobPair
+pattern Inserting a = Join (That a)
 
-blobPairDeleting :: Blob -> BlobPair
-blobPairDeleting = Join . This
+pattern Deleting :: Blob -> BlobPair
+pattern Deleting b = Join (This b)
+
+{-# COMPLETE Diffing, Inserting, Deleting #-}
+
+maybeBlobPair :: MonadFail m => Maybe Blob -> Maybe Blob -> m BlobPair
+maybeBlobPair a b = case (a, b) of
+  (Just a, Nothing) -> pure (Deleting a)
+  (Nothing, Just b) -> pure (Inserting b)
+  (Just a, Just b)  -> pure (Diffing a b)
+  _                 -> Prologue.fail "expected file pair with content on at least one side"
 
 languageForBlobPair :: BlobPair -> Language
-languageForBlobPair (Join (This Blob{..})) = blobLanguage
-languageForBlobPair (Join (That Blob{..})) = blobLanguage
-languageForBlobPair (Join (These a b))
+languageForBlobPair (Deleting Blob{..})  = blobLanguage
+languageForBlobPair (Inserting Blob{..}) = blobLanguage
+languageForBlobPair (Diffing a b)
   | blobLanguage a == Unknown || blobLanguage b == Unknown
     = Unknown
   | otherwise
     = blobLanguage b
 
 pathForBlobPair :: BlobPair -> FilePath
-pathForBlobPair (Join (This Blob{..}))    = blobPath
-pathForBlobPair (Join (That Blob{..}))    = blobPath
-pathForBlobPair (Join (These _ Blob{..})) = blobPath
+pathForBlobPair (Deleting Blob{..})  = blobPath
+pathForBlobPair (Inserting Blob{..}) = blobPath
+pathForBlobPair (Diffing _ Blob{..}) = blobPath
 
 languageTagForBlobPair :: BlobPair -> [(String, String)]
 languageTagForBlobPair pair = showLanguage (languageForBlobPair pair)
