@@ -19,12 +19,12 @@ instance Show Precise where
 
 
 instance (Member Fresh sig, Carrier sig m) => Carrier (Allocator Precise :+: sig) (AllocatorC Precise m) where
-  eff = AllocatorC . handleSum
-    (eff . handleCoercible)
-    (\ (Alloc _ k) -> Precise <$> fresh >>= runAllocatorC . k)
+  eff (R other) = AllocatorC . eff . handleCoercible $ other
+  eff (L (Alloc _ k)) = Precise <$> fresh >>= k
 
 
 instance Carrier sig m => Carrier (Deref value :+: sig) (DerefC Precise value m) where
-  eff = DerefC . handleSum (eff . handleCoercible) (\case
-    DerefCell        cell k -> runDerefC (k (fst <$> Set.minView cell))
-    AssignCell value _    k -> runDerefC (k (Set.singleton value)))
+  eff (R other) = DerefC . eff . handleCoercible $ other
+  eff (L op) = case op of
+    DerefCell        cell k -> k (fst <$> Set.minView cell)
+    AssignCell value _    k -> k (Set.singleton value)

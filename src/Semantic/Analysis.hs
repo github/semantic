@@ -43,10 +43,10 @@ type DomainC term address value m
 -- | Evaluate a list of modules with the prelude for the passed language available, and applying the passed function to every module.
 evaluate :: ( Carrier outerSig outer
             , derefSig ~ (Deref value :+: allocatorSig)
-            , derefC ~ (DerefC address value (Eff allocatorC))
+            , derefC ~ (DerefC address value allocatorC)
             , Carrier derefSig derefC
             , allocatorSig ~ (Allocator address :+: Reader ModuleInfo :+: outerSig)
-            , allocatorC ~ (AllocatorC address (Eff (ReaderC ModuleInfo (Eff outer))))
+            , allocatorC ~ (AllocatorC address (ReaderC ModuleInfo outer))
             , Carrier allocatorSig allocatorC
             , Effect outerSig
             , Member Fresh outerSig
