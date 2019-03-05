@@ -65,7 +65,6 @@ instance (ConstructorName syntax, Foldable syntax) =>
       , Member Fresh sig
       , Member (Reader (Graph TermVertex)) sig
       , Carrier sig m
-      , Monad m
       )
       => TermF syntax Location (m (Graph TermVertex))
       -> m (Graph TermVertex)
@@ -97,7 +96,6 @@ instance (ConstructorName syntax, Foldable syntax) =>
         , Member Fresh sig
         , Member (Reader (Graph DiffTreeVertex)) sig
         , Carrier sig m
-        , Monad m
         ) => f (m (Graph DiffTreeVertex)) -> DiffTreeVertexDiffTerm -> m (Graph DiffTreeVertex)
       diffAlgebra syntax a = do
         i <- fresh

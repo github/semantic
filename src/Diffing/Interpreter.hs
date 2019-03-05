@@ -37,8 +37,7 @@ diffTermPair = these Diff.deleting Diff.inserting diffTerms
 
 
 -- | Run an 'Algorithm' to completion in an 'Alternative' context using the supplied comparability & equivalence relations.
-runDiff :: (Alternative m, Carrier sig m, Diffable syntax, Eq1 syntax, Member NonDet sig, Monad m, Traversable syntax)
-        => Algorithm
+runDiff :: Algorithm
              (Term syntax (FeatureVector, ann))
              (Term syntax (FeatureVector, ann))
              (Diff.Diff syntax (FeatureVector, ann) (FeatureVector, ann))

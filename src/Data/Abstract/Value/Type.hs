@@ -87,10 +87,13 @@ instance Ord1  TypeError where
 
 instance Show1 TypeError where liftShowsPrec _ _ = showsPrec
 
-runTypeError :: (Carrier sig m, Effect sig) => Evaluator term address value (ResumableC (BaseError TypeError) m) a -> Evaluator term address value m (Either (SomeError (BaseError TypeError)) a)
+runTypeError :: Evaluator term address value (ResumableC (BaseError TypeError) m) a
+             -> Evaluator term address value m (Either (SomeError (BaseError TypeError)) a)
 runTypeError = raiseHandler runResumable
 
-runTypeErrorWith :: Carrier sig m => (forall resume . (BaseError TypeError) resume -> Evaluator term address value m resume) -> Evaluator term address value (ResumableWithC (BaseError TypeError) m) a -> Evaluator term address value m a
+runTypeErrorWith :: (forall resume . (BaseError TypeError) resume -> Evaluator term address value m resume)
+                 -> Evaluator term address value (ResumableWithC (BaseError TypeError) m) a
+                 -> Evaluator term address value m a
 runTypeErrorWith f = raiseHandler $ runResumableWith (runEvaluator . f)
 
 
@@ -98,24 +101,23 @@ throwTypeError :: ( Member (Resumable (BaseError TypeError)) sig
                   , Member (Reader ModuleInfo) sig
                   , Member (Reader Span) sig
                   , Carrier sig m
-                  , Monad m
                   )
                => TypeError resume
                -> m resume
 throwTypeError = throwBaseError
 
-runTypeMap :: (Carrier sig m, Effect sig)
+runTypeMap :: Carrier sig m
            => Evaluator term address Type (StateC TypeMap m) a
            -> Evaluator term address Type m a
 runTypeMap = raiseHandler $ fmap snd . runState emptyTypeMap
 
-runTypes :: (Carrier sig m, Effect sig)
+runTypes :: Carrier sig m
          => Evaluator term address Type (ResumableC (BaseError TypeError)
                                          (StateC TypeMap m)) a
          -> Evaluator term address Type m (Either (SomeError (BaseError TypeError)) a)
 runTypes = runTypeMap . runTypeError
 
-runTypesWith :: (Carrier sig m, Effect sig)
+runTypesWith :: Carrier sig m
              => (forall resume . (BaseError TypeError) resume -> Evaluator term address Type (StateC TypeMap m) resume)
              -> Evaluator term address Type (ResumableWithC (BaseError TypeError)
                                             (StateC TypeMap
@@ -131,7 +133,6 @@ emptyTypeMap = TypeMap Map.empty
 
 modifyTypeMap :: ( Member (State TypeMap) sig
                  , Carrier sig m
-                 , Monad m
                  )
               => (Map.Map TName Type -> Map.Map TName Type)
               -> m ()
@@ -140,7 +141,6 @@ modifyTypeMap f = modify (TypeMap . f . unTypeMap)
 -- | Prunes substituted type variables
 prune :: ( Member (State TypeMap) sig
          , Carrier sig m
-         , Monad m
          )
       => Type
       -> m Type
@@ -156,7 +156,6 @@ prune ty = pure ty
 --   function is used in 'substitute' to prevent unification of infinite types
 occur :: ( Member (State TypeMap) sig
          , Carrier sig m
-         , Monad m
          )
       => TName
       -> Type
@@ -188,7 +187,6 @@ substitute :: ( Member (Reader ModuleInfo) sig
               , Member (Resumable (BaseError TypeError)) sig
               , Member (State TypeMap) sig
               , Carrier sig m
-              , Monad m
               )
            => TName
            -> Type
@@ -207,7 +205,6 @@ unify :: ( Member (Reader ModuleInfo) sig
          , Member (Resumable (BaseError TypeError)) sig
          , Member (State TypeMap) sig
          , Carrier sig m
-         , Monad m
          )
       => Type
       -> Type
@@ -295,7 +292,6 @@ instance ( Member (Reader ModuleInfo) sig
          , Member (State TypeMap) sig
          , Carrier sig m
          , Alternative m
-         , Monad m
          )
       => Carrier (Abstract.Boolean Type :+: sig) (BooleanC Type m) where
   eff (R other) = BooleanC . eff . handleCoercible $ other
@@ -307,7 +303,6 @@ instance ( Member (Reader ModuleInfo) sig
 instance ( Member (Abstract.Boolean Type) sig
          , Carrier sig m
          , Alternative m
-         , Monad m
          )
       => Carrier (Abstract.While Type :+: sig) (WhileC Type m) where
   eff (R other) = WhileC . eff . handleCoercible $ other
@@ -327,7 +322,6 @@ instance ( Member (Reader ModuleInfo) sig
          , Member (State TypeMap) sig
          , Carrier sig m
          , Alternative m
-         , Monad m
          )
       => Carrier (Abstract.String Type :+: sig) (StringC Type m) where
   eff (R other) = StringC . eff . handleCoercible $ other
