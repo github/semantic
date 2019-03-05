@@ -570,7 +570,7 @@ instance Listable Span where
 instance Listable Blob where
   tiers = cons3 Blob
 
-instance Listable (Join These Blob) where
+instance Listable BlobPair where
   tiers = liftTiers tiers
 
 instance Listable Source where
