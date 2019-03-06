@@ -143,26 +143,24 @@ instance ( Carrier sig m
   eff (R other) = WhileC . eff . handleCoercible $ other
   eff (L (Abstract.While cond body k)) = do
 
-    let loop x = catchLoopControl (fix x) $ \case
-          Break value -> let foo = pure value in traceM "Break" *> foo
-          Abort -> traceM "abort" *> pure Unit
+    let loop x = catchError x $ \case
+          Break value -> pure value
+          Abort -> pure Unit
           -- FIXME: Figure out how to deal with this. Ruby treats this as the result
           -- of the current block iteration, while PHP specifies a breakout level
           -- and TypeScript appears to take a label.
-          Continue _  -> traceM "Continue" *> loop x
+          Continue _  -> loop x
 
-    res <- interpose @(Resumable (BaseError (UnspecializedError address (Value term address)))) (runEvaluator (loop (\continue -> do
-      cond' <- Evaluator cond
+    interpose @(Resumable (BaseError (UnspecializedError address (Value term address)))) (loop (do
+      cond' <- cond
 
       -- `interpose` is used to handle 'UnspecializedError's and abort out of the
       -- loop, otherwise under concrete semantics we run the risk of the
       -- conditional always being true and getting stuck in an infinite loop.
-      traceM "ifthenelse"
-      ifthenelse cond' (Evaluator body *> continue) (pure Unit))))
+      ifthenelse cond' (body *> throwError (Continue @(Value term address) Unit)) (pure Unit)))
       (\case
         Resumable (BaseError _ _ (UnspecializedError _))    _ -> traceM "unspecialized" *> throwError (Abort @(Value term address))
-        Resumable (BaseError _ _ (RefUnspecializedError _)) _ -> traceM "refun" *> throwError (Abort @(Value term address)))
-    k res
+        Resumable (BaseError _ _ (RefUnspecializedError _)) _ -> traceM "refun" *> throwError (Abort @(Value term address))) >>= k
 
 
 
