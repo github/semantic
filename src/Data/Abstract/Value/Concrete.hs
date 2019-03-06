@@ -26,6 +26,7 @@ import Data.Text (pack)
 import Data.Word
 import Prologue
 import qualified Data.Map.Strict as Map
+import Debug.Trace (traceM)
 
 data Value term address
     -- TODO: Split Closure up into a separate data type.                                                  Scope   Frame
@@ -140,26 +141,30 @@ instance ( Carrier sig m
          )
       => Carrier (Abstract.While (Value term address) :+: sig) (WhileC (Value term address) m) where
   eff (R other) = WhileC . eff . handleCoercible $ other
-  eff (L (Abstract.While cond body k)) = WhileC $ (interpose @(Resumable (BaseError (UnspecializedError address (Value term address)))) (runEvaluator (loop (\continue -> do
-      cond' <- Evaluator (runWhileC cond)
+  eff (L (Abstract.While cond body k)) = do
+
+    let loop x = catchLoopControl (fix x) $ \case
+          Break value -> let foo = pure value in traceM "Break" *> foo
+          Abort -> traceM "abort" *> pure Unit
+          -- FIXME: Figure out how to deal with this. Ruby treats this as the result
+          -- of the current block iteration, while PHP specifies a breakout level
+          -- and TypeScript appears to take a label.
+          Continue _  -> traceM "Continue" *> loop x
+
+    res <- interpose @(Resumable (BaseError (UnspecializedError address (Value term address)))) (runEvaluator (loop (\continue -> do
+      cond' <- Evaluator cond
 
       -- `interpose` is used to handle 'UnspecializedError's and abort out of the
       -- loop, otherwise under concrete semantics we run the risk of the
       -- conditional always being true and getting stuck in an infinite loop.
-
-      ifthenelse cond' (Evaluator (runWhileC body) *> continue) (pure Unit))))
+      traceM "ifthenelse"
+      ifthenelse cond' (Evaluator body *> continue) (pure Unit))))
       (\case
         Resumable (BaseError _ _ (UnspecializedError _))    _ -> throwError (Abort @(Value term address))
-        Resumable (BaseError _ _ (RefUnspecializedError _)) _ -> throwError (Abort @(Value term address))))
-        >>= runWhileC . k
-    where
-      loop x = catchLoopControl (fix x) $ \case
-        Break value -> pure value
-        Abort -> pure Unit
-        -- FIXME: Figure out how to deal with this. Ruby treats this as the result
-        -- of the current block iteration, while PHP specifies a breakout level
-        -- and TypeScript appears to take a label.
-        Continue _  -> loop x
+        Resumable (BaseError _ _ (RefUnspecializedError _)) _ -> throwError (Abort @(Value term address)))
+    k res
+
+
 
   --   Abstract.While cond body k -> interpose @(Resumable (BaseError (UnspecializedError address (Value term address)))) (runEvaluator (loop (\continue -> do      cond' <- Evaluator (runWhileC cond)
 

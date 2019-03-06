@@ -100,7 +100,7 @@ repl proxy parser paths =
 -- TODO: drive the flow from within the REPL instead of from without
 
 
-runTelemetryIgnoringStat :: (Carrier sig m, MonadIO m) => LogOptions -> TelemetryIgnoringStatC m a -> m a
+runTelemetryIgnoringStat :: LogOptions -> TelemetryIgnoringStatC m a -> m a
 runTelemetryIgnoringStat logOptions = runReader logOptions . runTelemetryIgnoringStatC
 
 newtype TelemetryIgnoringStatC m a = TelemetryIgnoringStatC { runTelemetryIgnoringStatC :: ReaderC LogOptions m a }
