@@ -1,4 +1,4 @@
-{-# LANGUAGE DerivingStrategies, GADTs, GeneralizedNewtypeDeriving, KindSignatures, LambdaCase, RankNTypes, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DerivingStrategies, GADTs, GeneralizedNewtypeDeriving, KindSignatures, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Semantic.Telemetry
 (
   -- Async telemetry interface

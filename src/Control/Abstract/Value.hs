@@ -174,7 +174,7 @@ instance Effect (Boolean value) where
 
 runBoolean :: Evaluator term address value (BooleanC value m) a
            -> Evaluator term address value m a
-runBoolean = raiseHandler $ runBooleanC
+runBoolean = raiseHandler runBooleanC
 
 newtype BooleanC value m a = BooleanC { runBooleanC :: m a }
   deriving stock Functor
@@ -225,7 +225,7 @@ instance HFunctor (While value) where
 
 runWhile :: Evaluator term address value (WhileC value m) a
          -> Evaluator term address value m a
-runWhile = raiseHandler $ runWhileC
+runWhile = raiseHandler runWhileC
 
 newtype WhileC value m a = WhileC { runWhileC :: m a }
   deriving stock Functor
@@ -248,7 +248,7 @@ instance Effect (Unit value) where
 
 runUnit :: Evaluator term address value (UnitC value m) a
         -> Evaluator term address value m a
-runUnit = raiseHandler $ runUnitC
+runUnit = raiseHandler runUnitC
 
 newtype UnitC value m a = UnitC { runUnitC :: m a }
   deriving stock Functor
@@ -281,7 +281,7 @@ newtype StringC value m a = StringC { runStringC :: m a }
 
 runString :: Evaluator term address value (StringC value m) a
           -> Evaluator term address value m a
-runString = raiseHandler $ runStringC
+runString = raiseHandler runStringC
 
 
 -- | Construct an abstract integral value.
@@ -335,7 +335,7 @@ newtype NumericC value m a = NumericC { runNumericC :: m a }
 
 runNumeric :: Evaluator term address value (NumericC value m) a
            -> Evaluator term address value m a
-runNumeric = raiseHandler $ runNumericC
+runNumeric = raiseHandler runNumericC
 
 
 -- | Cast numbers to integers
@@ -381,7 +381,7 @@ instance Effect (Bitwise value) where
 
 runBitwise :: Evaluator term address value (BitwiseC value m) a
            -> Evaluator term address value m a
-runBitwise = raiseHandler $ runBitwiseC
+runBitwise = raiseHandler runBitwiseC
 
 newtype BitwiseC value m a = BitwiseC { runBitwiseC :: m a }
   deriving stock Functor
@@ -419,7 +419,7 @@ newtype ObjectC address value m a = ObjectC { runObjectC :: m a }
 
 runObject :: Evaluator term address value (ObjectC address value m) a
           -> Evaluator term address value m a
-runObject = raiseHandler $ runObjectC
+runObject = raiseHandler runObjectC
 
 -- | Construct an array of zero or more values.
 array :: (Member (Array value) sig, Carrier sig m) => [value] -> m value
@@ -446,7 +446,7 @@ newtype ArrayC value m a = ArrayC { runArrayC :: m a }
 
 runArray :: Evaluator term address value (ArrayC value m) a
          -> Evaluator term address value m a
-runArray = raiseHandler $ runArrayC
+runArray = raiseHandler runArrayC
 
 -- | Construct a hash out of pairs.
 hash :: (Member (Hash value) sig, Carrier sig m) => [(value, value)] -> m value
@@ -474,7 +474,7 @@ newtype HashC value m a = HashC { runHashC :: m a }
 
 runHash :: Evaluator term address value (HashC value m) a
         -> Evaluator term address value m a
-runHash = raiseHandler $ runHashC
+runHash = raiseHandler runHashC
 
 class Show value => AbstractIntro value where
   -- | Construct the nil/null datatype.

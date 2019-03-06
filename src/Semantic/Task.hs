@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, ExistentialQuantification, GADTs, GeneralizedNewtypeDeriving, KindSignatures, LambdaCase, ScopedTypeVariables, StandaloneDeriving, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE ConstraintKinds, ExistentialQuantification, GADTs, GeneralizedNewtypeDeriving, KindSignatures, ScopedTypeVariables, StandaloneDeriving, TypeOperators, UndecidableInstances #-}
 module Semantic.Task
 ( Task
 , TaskEff

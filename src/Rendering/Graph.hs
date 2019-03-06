@@ -28,8 +28,7 @@ renderTreeGraph :: (Ord vertex, Recursive t, ToTreeGraph vertex (Base t)) => t -
 renderTreeGraph = simplify . runGraph . cata toTreeGraph
 
 runGraph :: ReaderC (Graph vertex)
-           (FreshC
-           (VoidC)) (Graph vertex)
+           (FreshC VoidC) (Graph vertex)
          -> Graph vertex
 runGraph = run . runFresh . runReader mempty
 

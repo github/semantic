@@ -20,8 +20,7 @@ import qualified Data.Source as Source
 
 type Translator
   = StateC [Scope]
-  ( ErrorC TranslationError
-  ( VoidC ))
+  ( ErrorC TranslationError VoidC)
 
 contextualizing :: ProcessT Translator Token Fragment
 contextualizing = repeatedly $ await >>= \case
