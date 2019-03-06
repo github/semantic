@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, LambdaCase, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DerivingVia, GeneralizedNewtypeDeriving, LambdaCase, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Graph
 ( Graph(..)
 , ControlFlowVertex(..)
@@ -149,19 +149,18 @@ graphingModuleInfo recur m = do
 eavesdrop :: Evaluator term address value (EavesdropC address value m) a
           -> (forall x . Modules address value m (m x) -> Evaluator term address value m ())
           -> Evaluator term address value m a
-eavesdrop m f = raiseHandler (runHandler (Handler (runEvaluator . f))) m
+eavesdrop m f = raiseHandler (runEavesdropC (runEvaluator . f)) m
 
-newtype Handler address value m = Handler (forall x . Modules address value m (m x) -> m ())
+newtype EavesdropC address value m a = EavesdropC ((forall x . Modules address value m (m x) -> m ()) -> m a)
+  deriving (Alternative, Applicative, Functor, Monad) via (ReaderC (forall x . Modules address value m (m x) -> m ()) m)
 
-newtype EavesdropC address value m a = EavesdropC
-  { runEavesdropC :: ReaderC (Handler address value m) m a
-  } deriving (Alternative, Applicative, Functor, Monad)
+runEavesdropC :: (forall x . Modules address value m (m x) -> m ()) -> EavesdropC address value m a -> m a
+runEavesdropC f (EavesdropC m) = m f
 
-runHandler :: Handler address value m -> EavesdropC address value m a -> m a
-runHandler h = runReader h . runEavesdropC
-
-instance forall sig m address value . (Carrier sig m, Member (Modules address value) sig, Applicative m) => Carrier sig (EavesdropC address value m) where
-
+instance (Carrier sig m, Member (Modules address value) sig, Applicative m) => Carrier sig (EavesdropC address value m) where
+  eff op
+    | Just eff <- prj op = EavesdropC (\ handler -> let eff' = handlePure (runEavesdropC handler) eff in handler eff' *> send eff')
+    | otherwise          = EavesdropC (\ handler -> eff (handlePure (runEavesdropC handler) op))
 
 -- | Add an edge from the current package to the passed vertex.
 packageInclusion :: ( Member (Reader PackageInfo) sig
