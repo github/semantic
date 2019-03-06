@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, ExistentialQuantification, GADTs, KindSignatures, LambdaCase, ScopedTypeVariables, StandaloneDeriving, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE ConstraintKinds, ExistentialQuantification, GADTs, GeneralizedNewtypeDeriving, KindSignatures, LambdaCase, ScopedTypeVariables, StandaloneDeriving, TypeOperators, UndecidableInstances #-}
 module Semantic.Task
 ( Task
 , TaskEff
@@ -47,7 +47,6 @@ module Semantic.Task
 , ParserCancelled(..)
 -- * Re-exports
 , Distribute
-, Eff
 , Error
 , Lift
 , throwError
@@ -95,17 +94,17 @@ import           Serializing.Format hiding (Options)
 
 -- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
 type TaskEff
-  = Eff (TaskC
-  ( Eff (ResolutionC
-  ( Eff (Files.FilesC
-  ( Eff (ReaderC TaskSession
-  ( Eff (TraceInTelemetryC
-  ( Eff (TelemetryC
-  ( Eff (ErrorC SomeException
-  ( Eff (TimeoutC
-  ( Eff (ResourceC
-  ( Eff (DistributeC
-  ( Eff (LiftC IO)))))))))))))))))))))
+  = TaskC
+  ( ResolutionC
+  ( Files.FilesC
+  ( ReaderC TaskSession
+  ( TraceInTelemetryC
+  ( TelemetryC
+  ( ErrorC SomeException
+  ( TimeoutC
+  ( ResourceC
+  ( DistributeC
+  ( LiftC IO))))))))))
 
 -- | A function to render terms or diffs.
 type Renderer i o = i -> o
@@ -115,40 +114,40 @@ parse :: (Member Task sig, Carrier sig m)
       => Parser term
       -> Blob
       -> m term
-parse parser blob = send (Parse parser blob ret)
+parse parser blob = send (Parse parser blob pure)
 
 -- | A task running some 'Analysis.Evaluator' to completion.
 analyze :: (Member Task sig, Carrier sig m)
         => (Analysis.Evaluator term address value m a -> result)
         -> Analysis.Evaluator term address value m a
         -> m result
-analyze interpret analysis = send (Analyze interpret analysis ret)
+analyze interpret analysis = send (Analyze interpret analysis pure)
 
 -- | A task which decorates a 'Term' with values computed using the supplied 'RAlgebra' function.
 decorate :: (Functor f, Member Task sig, Carrier sig m)
          => RAlgebra (TermF f Location) (Term f Location) field
          -> Term f Location
          -> m (Term f field)
-decorate algebra term = send (Decorate algebra term ret)
+decorate algebra term = send (Decorate algebra term pure)
 
 -- | A task which diffs a pair of terms using the supplied 'Differ' function.
 diff :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax, Member Task sig, Carrier sig m)
      => These (Term syntax ann) (Term syntax ann)
      -> m (Diff syntax ann ann)
-diff terms = send (Semantic.Task.Diff terms ret)
+diff terms = send (Semantic.Task.Diff terms pure)
 
 -- | A task which renders some input using the supplied 'Renderer' function.
 render :: (Member Task sig, Carrier sig m)
        => Renderer input output
        -> input
        -> m output
-render renderer input = send (Render renderer input ret)
+render renderer input = send (Render renderer input pure)
 
 serialize :: (Member Task sig, Carrier sig m)
           => Format input
           -> input
           -> m Builder
-serialize format input = send (Serialize format input ret)
+serialize format input = send (Serialize format input pure)
 
 data TaskSession
   = TaskSession
@@ -191,18 +190,16 @@ withOptions options with = do
   config <- defaultConfig options
   withTelemetry config (\ (TelemetryQueues logger statter _) -> with config logger statter)
 
-runTraceInTelemetry :: (Member Telemetry sig, Carrier sig m)
-                    => Eff (TraceInTelemetryC m) a
+runTraceInTelemetry :: TraceInTelemetryC m a
                     -> m a
-runTraceInTelemetry = runTraceInTelemetryC . interpret
+runTraceInTelemetry = runTraceInTelemetryC
 
 newtype TraceInTelemetryC m a = TraceInTelemetryC { runTraceInTelemetryC :: m a }
+  deriving (Applicative, Functor, Monad, MonadIO)
 
 instance (Member Telemetry sig, Carrier sig m) => Carrier (Trace :+: sig) (TraceInTelemetryC m) where
-  ret = TraceInTelemetryC . ret
-  eff = TraceInTelemetryC . handleSum
-    (eff . handleCoercible)
-    (\ (Trace str k) -> writeLog Debug str [] >> runTraceInTelemetryC k)
+  eff (R other) = TraceInTelemetryC . eff . handleCoercible $ other
+  eff (L (Trace str k)) = writeLog Debug str [] >> k
 
 
 -- | An effect describing high-level tasks to be performed.
@@ -228,33 +225,23 @@ instance Effect Task where
   handle state handler (Serialize format input k) = Serialize format input (handler . (<$ state) . k)
 
 -- | Run a 'Task' effect by performing the actions in 'IO'.
-runTaskF :: ( Member (Error SomeException) sig
-            , Member (Lift IO) sig
-            , Member (Reader TaskSession) sig
-            , Member Resource sig
-            , Member Telemetry sig
-            , Member Timeout sig
-            , Member Trace sig
-            , Carrier sig m
-            , MonadIO m
-            )
-         => Eff (TaskC m) a
-         -> m a
-runTaskF = runTaskC . interpret
+runTaskF :: TaskC m a -> m a
+runTaskF = runTaskC
 
 newtype TaskC m a = TaskC { runTaskC :: m a }
+  deriving (Applicative, Functor, Monad, MonadIO)
 
 instance (Member (Error SomeException) sig, Member (Lift IO) sig, Member (Reader TaskSession) sig, Member Resource sig, Member Telemetry sig, Member Timeout sig, Member Trace sig, Carrier sig m, MonadIO m) => Carrier (Task :+: sig) (TaskC m) where
-  ret = TaskC . ret
-  eff = TaskC . handleSum (eff . handleCoercible) (\case
-    Parse parser blob k -> runParser blob parser >>= runTaskC . k
-    Analyze interpret analysis k -> runTaskC (k (interpret analysis))
-    Decorate algebra term k -> runTaskC (k (decoratorWithAlgebra algebra term))
-    Semantic.Task.Diff terms k -> runTaskC (k (diffTermPair terms))
-    Render renderer input k -> runTaskC (k (renderer input))
+  eff (R other) = TaskC . eff . handleCoercible $ other
+  eff (L op) = case op of
+    Parse parser blob k -> runParser blob parser >>= k
+    Analyze interpret analysis k -> k . interpret $ analysis
+    Decorate algebra term k -> k (decoratorWithAlgebra algebra term)
+    Semantic.Task.Diff terms k -> k (diffTermPair terms)
+    Render renderer input k -> k (renderer input)
     Serialize format input k -> do
       formatStyle <- asks (bool Plain Colourful . configIsTerminal . config)
-      runTaskC (k (runSerialize formatStyle format input)))
+      k (runSerialize formatStyle format input)
 
 
 -- | Log an 'Error.Error' at the specified 'Level'.

@@ -144,7 +144,7 @@ runFunction :: (term -> Evaluator term address value (FunctionC term address val
 runFunction eval = raiseHandler (runReader (runEvaluator . eval) . runFunctionC)
 
 newtype FunctionC term address value m a = FunctionC { runFunctionC :: ReaderC (term -> FunctionC term address value m value) m a }
-  deriving newtype (Applicative, Functor, Monad)
+  deriving newtype (Alternative, Applicative, Functor, Monad)
 
 -- | Construct a boolean value in the abstract domain.
 boolean :: (Member (Boolean value) sig, Carrier sig m) => Bool -> m value
@@ -252,7 +252,7 @@ runUnit = raiseHandler $ runUnitC
 
 newtype UnitC value m a = UnitC { runUnitC :: m a }
   deriving stock Functor
-  deriving newtype (Applicative, Monad)
+  deriving newtype (Alternative, Applicative, Monad)
 
 -- | Construct a String value in the abstract domain.
 string :: (Member (String value) sig, Carrier sig m) => Text -> m value
@@ -277,7 +277,7 @@ instance Effect (String value) where
 
 newtype StringC value m a = StringC { runStringC :: m a }
   deriving stock Functor
-  deriving newtype (Applicative, Monad)
+  deriving newtype (Alternative, Applicative, Monad)
 
 runString :: Evaluator term address value (StringC value m) a
           -> Evaluator term address value m a
@@ -331,7 +331,7 @@ instance Effect (Numeric value) where
 
 newtype NumericC value m a = NumericC { runNumericC :: m a }
   deriving stock Functor
-  deriving newtype (Applicative, Monad)
+  deriving newtype (Alternative, Applicative, Monad)
 
 runNumeric :: Evaluator term address value (NumericC value m) a
            -> Evaluator term address value m a
@@ -385,7 +385,7 @@ runBitwise = raiseHandler $ runBitwiseC
 
 newtype BitwiseC value m a = BitwiseC { runBitwiseC :: m a }
   deriving stock Functor
-  deriving newtype (Applicative, Monad)
+  deriving newtype (Alternative, Applicative, Monad)
 
 object :: (Member (Object address value) sig, Carrier sig m) => address -> m value
 object address = send (Object address pure)
@@ -415,7 +415,7 @@ instance Effect (Object address value) where
 
 newtype ObjectC address value m a = ObjectC { runObjectC :: m a }
   deriving stock Functor
-  deriving newtype (Applicative, Monad)
+  deriving newtype (Alternative, Applicative, Monad)
 
 runObject :: Evaluator term address value (ObjectC address value m) a
           -> Evaluator term address value m a
@@ -442,7 +442,7 @@ instance Effect (Array value) where
 
 newtype ArrayC value m a = ArrayC { runArrayC :: m a }
   deriving stock Functor
-  deriving newtype (Applicative, Monad)
+  deriving newtype (Alternative, Applicative, Monad)
 
 runArray :: Evaluator term address value (ArrayC value m) a
          -> Evaluator term address value m a
@@ -470,7 +470,7 @@ instance Effect (Hash value) where
 
 newtype HashC value m a = HashC { runHashC :: m a }
   deriving stock Functor
-  deriving newtype (Applicative, Monad)
+  deriving newtype (Alternative, Applicative, Monad)
 
 runHash :: Evaluator term address value (HashC value m) a
         -> Evaluator term address value m a

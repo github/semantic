@@ -14,12 +14,7 @@ import           Prologue
 data Strategy = Unknown | Packages [Text] | FindPackages [Text]
   deriving (Show, Eq)
 
-runPythonPackaging :: ( Carrier sig m
-                      , Member (Abstract.String (Value term address)) sig
-                      , Member (Abstract.Array (Value term address)) sig
-                      , Member (State Strategy) sig
-                      , Member (Function term address (Value term address)) sig)
-                   => Evaluator term address (Value term address) (PythonPackagingC term address m) a
+runPythonPackaging :: Evaluator term address (Value term address) (PythonPackagingC term address m) a
                    -> Evaluator term address (Value term address) m a
 runPythonPackaging = raiseHandler runPythonPackagingC
 

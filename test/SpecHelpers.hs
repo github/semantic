@@ -117,19 +117,19 @@ runTaskOrDie :: TaskEff a -> IO a
 runTaskOrDie task = runTaskWithOptions defaultOptions { optionsLogLevel = Nothing } task >>= either (die . displayException) pure
 
 type TestEvaluatingC term
-  = ResumableC (BaseError (AddressError Precise (Val term))) (Eff
-  ( ResumableC (BaseError (ValueError term Precise)) (Eff
-  ( ResumableC (BaseError ResolutionError) (Eff
-  ( ResumableC (BaseError (EvalError term Precise (Val term))) (Eff
-  ( ResumableC (BaseError (HeapError Precise)) (Eff
-  ( ResumableC (BaseError (ScopeError Precise)) (Eff
-  ( ResumableC (BaseError (UnspecializedError Precise (Val term))) (Eff
-  ( ResumableC (BaseError (LoadError Precise (Val term))) (Eff
-  ( StateC (Heap Precise Precise (Val term)) (Eff
-  ( StateC (ScopeGraph Precise) (Eff
-  ( FreshC (Eff
-  ( TraceByIgnoringC (Eff
-  ( LiftC IO))))))))))))))))))))))))
+  = ResumableC (BaseError (AddressError Precise (Val term)))
+  ( ResumableC (BaseError (ValueError term Precise))
+  ( ResumableC (BaseError ResolutionError)
+  ( ResumableC (BaseError (EvalError term Precise (Val term)))
+  ( ResumableC (BaseError (HeapError Precise))
+  ( ResumableC (BaseError (ScopeError Precise))
+  ( ResumableC (BaseError (UnspecializedError Precise (Val term)))
+  ( ResumableC (BaseError (LoadError Precise (Val term)))
+  ( StateC (Heap Precise Precise (Val term))
+  ( StateC (ScopeGraph Precise)
+  ( FreshC
+  ( TraceByIgnoringC
+  ( LiftC IO))))))))))))
 type TestEvaluatingErrors term
   = '[ BaseError (AddressError Precise (Val term))
      , BaseError (ValueError term Precise)

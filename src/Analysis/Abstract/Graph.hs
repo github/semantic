@@ -1,4 +1,4 @@
-{-# LANGUAGE LambdaCase, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, LambdaCase, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Graph
 ( Graph(..)
 , ControlFlowVertex(..)
@@ -106,20 +106,18 @@ graphingPackages :: ( Member (Reader PackageInfo) sig
                     , Member (State (Graph ControlFlowVertex)) sig
                     , Member (Reader ControlFlowVertex) sig
                     , Carrier sig m
-                    , Monad m
                     )
                  => Open (Module term -> m a)
 graphingPackages recur m =
   let v = moduleVertex (moduleInfo m) in packageInclusion v *> local (const v) (recur m)
 
 -- | Add vertices to the graph for imported modules.
-graphingModules :: ( Member (Modules address value) sig
-                   , Member (Reader ModuleInfo) sig
+graphingModules :: ( Member (Reader ModuleInfo) sig
                    , Member (State (Graph ControlFlowVertex)) sig
                    , Member (Reader ControlFlowVertex) sig
                    , Carrier sig m
                    )
-                => (Module body -> Evaluator term address value (EavesdropC address value (Eff m)) a)
+                => (Module body -> Evaluator term address value (EavesdropC address value m) a)
                 -> (Module body -> Evaluator term address value m a)
 graphingModules recur m = do
   let v = moduleVertex (moduleInfo m)
@@ -135,12 +133,11 @@ graphingModules recur m = do
       in moduleInclusion (moduleVertex (ModuleInfo path'))
 
 -- | Add vertices to the graph for imported modules.
-graphingModuleInfo :: ( Member (Modules address value) sig
-                      , Member (Reader ModuleInfo) sig
+graphingModuleInfo :: ( Member (Reader ModuleInfo) sig
                       , Member (State (Graph ModuleInfo)) sig
                       , Carrier sig m
                       )
-                   => (Module body -> Evaluator term address value (EavesdropC address value (Eff m)) a)
+                   => (Module body -> Evaluator term address value (EavesdropC address value m) a)
                    -> (Module body -> Evaluator term address value m a)
 graphingModuleInfo recur m = do
   appendGraph (vertex (moduleInfo m))
@@ -149,28 +146,32 @@ graphingModuleInfo recur m = do
     Lookup path _ -> currentModule >>= appendGraph . (`connect` vertex (ModuleInfo path)) . vertex
     _             -> pure ()
 
-eavesdrop :: (Carrier sig m, Member (Modules address value) sig)
-          => Evaluator term address value (EavesdropC address value (Eff m)) a
-          -> (forall x . Modules address value (Eff m) (Eff m x) -> Evaluator term address value m ())
+eavesdrop :: Evaluator term address value (EavesdropC address value m) a
+          -> (forall x . Modules address value m (m x) -> Evaluator term address value m ())
           -> Evaluator term address value m a
-eavesdrop m f = raiseHandler (runEavesdropC (runEvaluator . f) . interpret) m
+eavesdrop m f = raiseHandler (runHandler (Handler (runEvaluator . f))) m
 
-newtype EavesdropC address value m a = EavesdropC ((forall x . Modules address value m (m x) -> m ()) -> m a)
+newtype Handler address value m = Handler (forall x . Modules address value m (m x) -> m ())
 
-runEavesdropC :: (forall x . Modules address value m (m x) -> m ()) -> EavesdropC address value m a -> m a
-runEavesdropC f (EavesdropC m) = m f
+newtype EavesdropC address value m a = EavesdropC
+  { runEavesdropC :: ReaderC (Handler address value m) m a
+  } deriving (Alternative, Applicative, Functor, Monad)
+
+runHandler :: Handler address value m -> EavesdropC address value m a -> m a
+runHandler h = runReader h . runEavesdropC
 
 instance (Carrier sig m, Member (Modules address value) sig, Applicative m) => Carrier sig (EavesdropC address value m) where
-  ret a = EavesdropC (const (ret a))
-  eff op
-    | Just eff <- prj op = EavesdropC (\ handler -> let eff' = handlePure (runEavesdropC handler) eff in handler eff' *> send eff')
-    | otherwise          = EavesdropC (\ handler -> eff (handlePure (runEavesdropC handler) op))
+  -- eff (R other) = _ other
+  -- eff (L op) = do
+  --   handler <- EavesdropC ask
+  --   case prj op of
+  --     Just e  -> runHandler handler e *> send e
+  --     Nothing -> undefined
 
 -- | Add an edge from the current package to the passed vertex.
 packageInclusion :: ( Member (Reader PackageInfo) sig
                     , Member (State (Graph ControlFlowVertex)) sig
                     , Carrier sig m
-                    , Monad m
                     )
                  => ControlFlowVertex
                  -> m ()
@@ -182,7 +183,6 @@ packageInclusion v = do
 moduleInclusion :: ( Member (Reader ModuleInfo) sig
                    , Member (State (Graph ControlFlowVertex)) sig
                    , Carrier sig m
-                   , Monad m
                    )
                 => ControlFlowVertex
                 -> m ()
@@ -194,7 +194,6 @@ moduleInclusion v = do
 variableDefinition :: ( Member (State (Graph ControlFlowVertex)) sig
                       , Member (Reader ControlFlowVertex) sig
                       , Carrier sig m
-                      , Monad m
                       )
                    => ControlFlowVertex
                    -> m ()
@@ -206,9 +205,9 @@ appendGraph :: (Member (State (Graph v)) sig, Carrier sig m) => Graph v -> m ()
 appendGraph = modify . (<>)
 
 
-graphing :: (Carrier sig m, Effect sig)
-         => Evaluator term address value (StateC (Map (Slot address) ControlFlowVertex) (Eff
-                                         (StateC (Graph ControlFlowVertex) (Eff
-                                         m)))) result
+graphing :: Carrier sig m
+         => Evaluator term address value (StateC (Map (Slot address) ControlFlowVertex)
+                                         (StateC (Graph ControlFlowVertex)
+                                         m)) result
          -> Evaluator term address value m (Graph ControlFlowVertex, result)
 graphing = raiseHandler $ runState mempty . fmap snd . runState lowerBound
