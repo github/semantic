@@ -210,8 +210,7 @@ checking
                                                              (ReaderC
                                                                 (Live
                                                                    Monovariant)
-                                                                   (AltC
-                                                                      []
+                                                                   (NonDetC
                                                                          (ReaderC
                                                                             (Cache
                                                                                term
@@ -659,7 +658,7 @@ evaluateProjectWithCaching :: ( term ~ Term (Sum syntax) Location
                                   (ResumableC (BaseError (UnspecializedError Monovariant Type))
                                   (ResumableC (BaseError (LoadError Monovariant Type))
                                   (ReaderC (Live Monovariant)
-                                  (AltC []
+                                  (NonDetC
                                   (ReaderC (Analysis.Abstract.Caching.FlowSensitive.Cache (Data.Quieterm.Quieterm (Sum syntax) Data.Location.Location) Monovariant Type)
                                   (StateC (Analysis.Abstract.Caching.FlowSensitive.Cache (Data.Quieterm.Quieterm (Sum syntax) Data.Location.Location) Monovariant Type)
                                   (FreshC

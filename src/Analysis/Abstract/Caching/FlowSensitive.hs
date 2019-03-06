@@ -82,7 +82,7 @@ convergingModules :: ( Cacheable term address value
                      , Carrier sig m
                      , Alternative m
                      )
-                  => (Module (Either prelude term) -> Evaluator term address value (AltC Maybe m) value)
+                  => (Module (Either prelude term) -> Evaluator term address value (NonDetC m) value)
                   -> (Module (Either prelude term) -> Evaluator term address value m value)
 convergingModules recur m@(Module _ (Left _)) = raiseHandler runNonDet (recur m) >>= maybeM empty
 convergingModules recur m@(Module _ (Right term)) = do
@@ -97,7 +97,7 @@ convergingModules recur m@(Module _ (Right term)) = do
     -- that it doesn't "leak" to the calling context and diverge (otherwise this
     -- would never complete). We don’t need to use the values, so we 'gather' the
     -- nondeterministic values into @()@.
-      withOracle prevCache (raiseHandler runNonDet (recur m)))
+      withOracle prevCache (raiseHandler (runNonDet @Maybe) (recur m)))
   maybe empty scatter (cacheLookup c cache)
 
 -- | Iterate a monadic action starting from some initial seed until the results converge.
@@ -126,7 +126,8 @@ getConfiguration :: (Member (Reader (Live address)) sig, Member (State (Heap add
 getConfiguration term = Configuration term <$> askRoots <*> getHeap
 
 
-caching :: Evaluator term address value (AltC []
+caching :: Monad m
+        => Evaluator term address value ( NonDetC
                                         (ReaderC (Cache term address value)
                                         (StateC (Cache term address value)
                                         m))) a
