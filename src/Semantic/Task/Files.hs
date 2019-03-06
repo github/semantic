@@ -1,4 +1,4 @@
-{-# LANGUAGE ExistentialQuantification, GADTs, LambdaCase, KindSignatures, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE ExistentialQuantification, GADTs, GeneralizedNewtypeDeriving, LambdaCase, KindSignatures, TypeOperators, UndecidableInstances #-}
 
 module Semantic.Task.Files
   ( Files
@@ -59,11 +59,11 @@ instance Effect Files where
   handle state handler (Write destination builder k) = Write destination builder (handler (k <$ state))
 
 -- | Run a 'Files' effect in 'IO'.
-runFiles :: (Member (Error SomeException) sig, MonadIO m, Carrier sig m) => FilesC m a -> m a
+runFiles :: FilesC m a -> m a
 runFiles = runFilesC
 
 newtype FilesC m a = FilesC { runFilesC :: m a }
-  deriving (Functor, Applicative, Monad)
+  deriving (Functor, Applicative, Monad, MonadIO)
 
 instance (Member (Error SomeException) sig, MonadIO m, Carrier sig m) => Carrier (Files :+: sig) (FilesC m) where
   eff (L op) = case op of
@@ -73,33 +73,33 @@ instance (Member (Error SomeException) sig, MonadIO m, Carrier sig m) => Carrier
     Read (FromPairHandle handle) k -> (readBlobPairsFromHandle handle `catchIO` (throwError . toException @SomeException)) >>= k
     ReadProject rootDir dir language excludeDirs k -> (readProjectFromPaths rootDir dir language excludeDirs `catchIO` (throwError . toException @SomeException)) >>= k
     FindFiles dir exts excludeDirs k -> (findFilesInDir dir exts excludeDirs `catchIO` (throwError . toException @SomeException)) >>= k
-    Write (ToPath path) builder k -> liftIO (IO.withBinaryFile path IO.WriteMode (`B.hPutBuilder` builder)) >> runFilesC k
-    Write (ToHandle (WriteHandle handle)) builder k -> liftIO (B.hPutBuilder handle builder) >> runFilesC k)
+    Write (ToPath path) builder k -> liftIO (IO.withBinaryFile path IO.WriteMode (`B.hPutBuilder` builder)) >> k
+    Write (ToHandle (WriteHandle handle)) builder k -> liftIO (B.hPutBuilder handle builder) >> k
   eff (R other) = FilesC (eff (handleCoercible other))
 
 
 readBlob :: (Member Files sig, Carrier sig m) => File -> m Blob
-readBlob file = send (Read (FromPath file) ret)
+readBlob file = send (Read (FromPath file) pure)
 
 -- | A task which reads a list of 'Blob's from a 'Handle' or a list of 'FilePath's optionally paired with 'Language's.
-readBlobs :: (Member Files sig, Carrier sig m, Applicative m) => Either (Handle 'IO.ReadMode) [File] -> m [Blob]
-readBlobs (Left handle) = send (Read (FromHandle handle) ret)
-readBlobs (Right paths) = traverse (send . flip Read ret . FromPath) paths
+readBlobs :: (Member Files sig, Carrier sig m) => Either (Handle 'IO.ReadMode) [File] -> m [Blob]
+readBlobs (Left handle) = send (Read (FromHandle handle) pure)
+readBlobs (Right paths) = traverse (send . flip Read pure . FromPath) paths
 
 -- | A task which reads a list of pairs of 'Blob's from a 'Handle' or a list of pairs of 'FilePath's optionally paired with 'Language's.
-readBlobPairs :: (Member Files sig, Carrier sig m, Applicative m) => Either (Handle 'IO.ReadMode) [Both File] -> m [BlobPair]
-readBlobPairs (Left handle) = send (Read (FromPairHandle handle) ret)
-readBlobPairs (Right paths) = traverse (send . flip Read ret . FromPathPair) paths
+readBlobPairs :: (Member Files sig, Carrier sig m) => Either (Handle 'IO.ReadMode) [Both File] -> m [BlobPair]
+readBlobPairs (Left handle) = send (Read (FromPairHandle handle) pure)
+readBlobPairs (Right paths) = traverse (send . flip Read pure . FromPathPair) paths
 
 readProject :: (Member Files sig, Carrier sig m) => Maybe FilePath -> FilePath -> Language -> [FilePath] -> m Project
-readProject rootDir dir lang excludeDirs = send (ReadProject rootDir dir lang excludeDirs ret)
+readProject rootDir dir lang excludeDirs = send (ReadProject rootDir dir lang excludeDirs pure)
 
 findFiles :: (Member Files sig, Carrier sig m) => FilePath -> [String] -> [FilePath] -> m [FilePath]
-findFiles dir exts paths = send (FindFiles dir exts paths ret)
+findFiles dir exts paths = send (FindFiles dir exts paths pure)
 
 -- | A task which writes a 'B.Builder' to a 'Handle' or a 'FilePath'.
 write :: (Member Files sig, Carrier sig m) => Destination -> B.Builder -> m ()
-write dest builder = send (Write dest builder (ret ()))
+write dest builder = send (Write dest builder (pure ()))
 
 
 -- | Generalize 'Exc.catch' to other 'MonadIO' contexts for the handler and result.

@@ -9,6 +9,7 @@ module Semantic.Timeout
 
 import           Control.Effect
 import           Control.Effect.Carrier
+import           Control.Effect.Reader
 import           Control.Effect.Sum
 import           Control.Monad.IO.Class
 import           Data.Duration
@@ -18,7 +19,7 @@ import qualified System.Timeout as System
 -- within the specified duration. Uses 'System.Timeout.timeout' so all caveats
 -- about not operating over FFI boundaries apply.
 timeout :: (Member Timeout sig, Carrier sig m) => Duration -> m output -> m (Maybe output)
-timeout n = send . flip (Timeout n) ret
+timeout n = send . flip (Timeout n) pure
 
 -- | 'Timeout' effects run other effects, aborting them if they exceed the
 -- specified duration.
