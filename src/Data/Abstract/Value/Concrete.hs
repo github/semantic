@@ -160,8 +160,8 @@ instance ( Carrier sig m
       traceM "ifthenelse"
       ifthenelse cond' (Evaluator body *> continue) (pure Unit))))
       (\case
-        Resumable (BaseError _ _ (UnspecializedError _))    _ -> throwError (Abort @(Value term address))
-        Resumable (BaseError _ _ (RefUnspecializedError _)) _ -> throwError (Abort @(Value term address)))
+        Resumable (BaseError _ _ (UnspecializedError _))    _ -> traceM "unspecialized" *> throwError (Abort @(Value term address))
+        Resumable (BaseError _ _ (RefUnspecializedError _)) _ -> traceM "refun" *> throwError (Abort @(Value term address)))
     k res
 
 
