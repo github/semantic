@@ -160,13 +160,8 @@ newtype EavesdropC address value m a = EavesdropC
 runHandler :: Handler address value m -> EavesdropC address value m a -> m a
 runHandler h = runReader h . runEavesdropC
 
-instance (Carrier sig m, Member (Modules address value) sig, Applicative m) => Carrier sig (EavesdropC address value m) where
-  -- eff (R other) = _ other
-  -- eff (L op) = do
-  --   handler <- EavesdropC ask
-  --   case prj op of
-  --     Just e  -> runHandler handler e *> send e
-  --     Nothing -> undefined
+instance forall sig m address value . (Carrier sig m, Member (Modules address value) sig, Applicative m) => Carrier sig (EavesdropC address value m) where
+
 
 -- | Add an edge from the current package to the passed vertex.
 packageInclusion :: ( Member (Reader PackageInfo) sig
