@@ -39,8 +39,7 @@ type ContextToken = (Text, Maybe Range)
 
 type Contextualizer
   = StateC [ContextToken]
-  ( ErrorC TranslationError
-  ( VoidC))
+  ( ErrorC TranslationError VoidC)
 
 contextualizing :: Blob -> Machine.ProcessT Contextualizer Token Tag
 contextualizing Blob{..} = repeatedly $ await >>= \case

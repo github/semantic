@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, GADTs, RankNTypes, TypeOperators, UndecidableInstances, LambdaCase, ScopedTypeVariables #-}
+{-# LANGUAGE DeriveAnyClass, GADTs, RankNTypes, TypeOperators, UndecidableInstances, ScopedTypeVariables #-}
 module Data.Abstract.Value.Concrete
   ( Value (..)
   , ValueError (..)

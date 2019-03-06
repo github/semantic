@@ -1,4 +1,4 @@
-{-# LANGUAGE ExistentialQuantification, GADTs, GeneralizedNewtypeDeriving, LambdaCase, KindSignatures, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE ExistentialQuantification, GADTs, GeneralizedNewtypeDeriving, KindSignatures, TypeOperators, UndecidableInstances #-}
 
 module Semantic.Task.Files
   ( Files

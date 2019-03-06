@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, KindSignatures, LambdaCase, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, KindSignatures, TypeOperators, UndecidableInstances #-}
 
 module Control.Effect.REPL
   ( REPL (..)

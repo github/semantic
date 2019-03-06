@@ -1,4 +1,4 @@
-{-# LANGUAGE LambdaCase, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Address.Monovariant
 ( Monovariant(..)
 ) where
