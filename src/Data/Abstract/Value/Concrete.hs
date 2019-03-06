@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, GADTs, RankNTypes, TypeOperators, UndecidableInstances, ScopedTypeVariables #-}
+{-# LANGUAGE DeriveAnyClass, GADTs, LambdaCase, RankNTypes, TypeOperators, UndecidableInstances, ScopedTypeVariables #-}
 module Data.Abstract.Value.Concrete
   ( Value (..)
   , ValueError (..)
@@ -141,7 +141,28 @@ instance ( Carrier sig m
          , Member (Interpose (Resumable (BaseError (UnspecializedError address (Value term address))))) sig
          )
       => Carrier (Abstract.While (Value term address) :+: sig) (WhileC (Value term address) m) where
-  -- eff = WhileC . handleSum (eff . handleCoercible) (\case
+  eff (R other) = WhileC . eff . handleCoercible $ other
+  eff (L (Abstract.While cond body k)) = do
+    let loop x = catchLoopControl (fix x) $ \case
+          Break value -> pure value
+          Abort -> pure Unit
+          -- FIXME: Figure out how to deal with this. Ruby treats this as the result
+          -- of the current block iteration, while PHP specifies a breakout level
+          -- and TypeScript appears to take a label.
+          Continue _  -> loop x
+
+    let eval = runEvaluator . loop $ \continue -> do
+          cond' <- Evaluator cond
+          ifthenelse cond' (Evaluator body *> continue) (pure Unit)
+
+    interpose @(Resumable (BaseError (UnspecializedError address (Value term address)))) eval
+      (\case
+          -- We can't move this case outside the 'interpose' because
+          -- otherwise we hit errors about untouchable type variables
+          Resumable (BaseError _ _ (UnspecializedError _)) _ -> throwError (Abort @(Value term address))
+          Resumable (BaseError _ _ (RefUnspecializedError _)) _ -> throwError (Abort @(Value term address))
+      ) >>= k
+
   --   Abstract.While cond body k -> interpose @(Resumable (BaseError (UnspecializedError address (Value term address)))) (runEvaluator (loop (\continue -> do      cond' <- Evaluator (runWhileC cond)
 
   --     -- `interpose` is used to handle 'UnspecializedError's and abort out of the
@@ -149,9 +170,7 @@ instance ( Carrier sig m
   --     -- conditional always being true and getting stuck in an infinite loop.
 
   --     ifthenelse cond' (Evaluator (runWhileC body) *> continue) (pure Unit))))
-  --     (\case
-  --       Resumable (BaseError _ _ (UnspecializedError _))    _ -> throwError (Abort @(Value term address))
-  --       Resumable (BaseError _ _ (RefUnspecializedError _)) _ -> throwError (Abort @(Value term address)))
+  --     (
   --       >>= runWhileC . k)
   --   where
   --     loop x = catchLoopControl (fix x) $ \case
@@ -161,6 +180,19 @@ instance ( Carrier sig m
   --       -- of the current block iteration, while PHP specifies a breakout level
   --       -- and TypeScript appears to take a label.
   --       Continue _  -> loop x
+
+    -- case op of
+    --   Abstract.While cond body k -> interpose @(Resumable (BaseError (UnspecializedError address (Value term address)))) (runEvaluator (loop (\continue -> do
+    --     cond' <- Evaluator (runWhileC cond)
+
+    --     -- `interpose` is used to handle 'UnspecializedError's and abort out of the
+    --     -- loop, otherwise under concrete semantics we run the risk of the
+    --     -- conditional always being true and getting stuck in an infinite loop.
+
+    --     ifthenelse cond' (Evaluator (runWhileC body) *> continue) (pure Unit)
+    --     case _ of
+    --       Resumable (BaseError _ _ (UnspecializedError _))    _ -> throwError (Abort @(Value term address)) >>= k
+    --       Resumable (BaseError _ _ (RefUnspecializedError _)) _ -> throwError (Abort @(Value term address))) >>= k
 
 
 instance Carrier sig m
