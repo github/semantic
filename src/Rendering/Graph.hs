@@ -27,9 +27,8 @@ import qualified Data.Text as T
 renderTreeGraph :: (Ord vertex, Recursive t, ToTreeGraph vertex (Base t)) => t -> Graph vertex
 renderTreeGraph = simplify . runGraph . cata toTreeGraph
 
-runGraph :: Eff (ReaderC (Graph vertex)
-           (Eff (FreshC
-           (Eff VoidC)))) (Graph vertex)
+runGraph :: ReaderC (Graph vertex)
+           (FreshC VoidC) (Graph vertex)
          -> Graph vertex
 runGraph = run . runFresh . runReader mempty
 
@@ -54,7 +53,7 @@ diffStyle name = (defaultStyle (fromString . show . diffVertexId))
         vertexAttributes _ = []
 
 class ToTreeGraph vertex t | t -> vertex where
-  toTreeGraph :: (Member Fresh sig, Member (Reader (Graph vertex)) sig, Carrier sig m, Monad m) => t (m (Graph vertex)) -> m (Graph vertex)
+  toTreeGraph :: (Member Fresh sig, Member (Reader (Graph vertex)) sig, Carrier sig m) => t (m (Graph vertex)) -> m (Graph vertex)
 
 instance (ConstructorName syntax, Foldable syntax) =>
   ToTreeGraph TermVertex (TermF syntax Location) where
@@ -65,7 +64,6 @@ instance (ConstructorName syntax, Foldable syntax) =>
       , Member Fresh sig
       , Member (Reader (Graph TermVertex)) sig
       , Carrier sig m
-      , Monad m
       )
       => TermF syntax Location (m (Graph TermVertex))
       -> m (Graph TermVertex)
@@ -97,7 +95,6 @@ instance (ConstructorName syntax, Foldable syntax) =>
         , Member Fresh sig
         , Member (Reader (Graph DiffTreeVertex)) sig
         , Carrier sig m
-        , Monad m
         ) => f (m (Graph DiffTreeVertex)) -> DiffTreeVertexDiffTerm -> m (Graph DiffTreeVertex)
       diffAlgebra syntax a = do
         i <- fresh
