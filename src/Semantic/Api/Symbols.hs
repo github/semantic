@@ -10,6 +10,7 @@ import Prelude hiding (span)
 import           Control.Effect
 import           Control.Effect.Error
 import           Control.Exception
+import           Control.Lens
 import           Data.Blob
 import           Data.ByteString.Builder
 import           Data.Location
@@ -20,7 +21,7 @@ import qualified Data.Vector as V
 import           Data.Text (pack)
 import           Parsing.Parser
 import           Prologue
-import           Semantic.Api.Helpers
+import           Semantic.Api.Bridge
 import qualified Semantic.Api.LegacyTypes as Legacy
 import           Semantic.Api.Terms (ParseEffects, doParse)
 import           Semantic.Api.V1.CodeAnalysisPB hiding (Blob)
@@ -48,7 +49,7 @@ legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> distributeFoldMap 
       { symbolName = name
       , symbolKind = kind
       , symbolLine = fromMaybe mempty line
-      , symbolSpan = spanToLegacySpan span
+      , symbolSpan = converting #? span
       }
 
 parseSymbolsBuilder :: (Member Distribute sig, ParseEffects sig m, Traversable t) => t Blob -> m Builder
@@ -60,13 +61,13 @@ parseSymbols blobs = ParseTreeSymbolResponse . V.fromList . toList <$> distribut
     go :: (Member (Error SomeException) sig, Member Task sig, Carrier sig m, Monad m) => Blob -> m File
     go blob@Blob{..} = (doParse blob >>= withSomeTerm (renderToSymbols blob)) `catchError` (\(SomeException e) -> pure $ errorFile (show e))
       where
-        errorFile e = File (pack blobPath) (languageToApiLanguage blobLanguage) mempty (V.fromList [ParseError (T.pack e)])
+        errorFile e = File (pack blobPath) (bridging # blobLanguage) mempty (V.fromList [ParseError (T.pack e)])
 
         renderToSymbols :: (IsTaggable f, Applicative m) => Blob -> Term f Location -> m File
         renderToSymbols blob@Blob{..} term = pure $ either (errorFile . show) (tagsToFile blob) (runTagging blob term)
 
         tagsToFile :: Blob -> [Tag] -> File
-        tagsToFile Blob{..} tags = File (pack blobPath) (languageToApiLanguage blobLanguage) (V.fromList (fmap tagToSymbol tags)) mempty
+        tagsToFile Blob{..} tags = File (pack blobPath) (bridging # blobLanguage) (V.fromList (fmap tagToSymbol tags)) mempty
 
         tagToSymbol :: Tag -> Symbol
         tagToSymbol Tag{..}
@@ -74,6 +75,6 @@ parseSymbols blobs = ParseTreeSymbolResponse . V.fromList . toList <$> distribut
           { symbol = name
           , kind = kind
           , line = fromMaybe mempty line
-          , span = spanToSpan span
+          , span = converting #? span
           , docs = fmap Docstring docs
           }
