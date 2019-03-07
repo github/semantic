@@ -1,4 +1,4 @@
-{-# LANGUAGE DerivingVia, GeneralizedNewtypeDeriving, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DerivingVia, LambdaCase, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Graph
 ( Graph(..)
 , ControlFlowVertex(..)
