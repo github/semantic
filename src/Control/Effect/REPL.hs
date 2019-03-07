@@ -1,4 +1,4 @@
-{-# LANGUAGE KindSignatures, LambdaCase, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, KindSignatures, TypeOperators, UndecidableInstances #-}
 
 module Control.Effect.REPL
   ( REPL (..)
@@ -13,6 +13,7 @@ import Prologue
 import Control.Effect
 import Control.Effect.Carrier
 import Control.Effect.Sum
+import Control.Effect.Reader
 import System.Console.Haskeline
 import qualified Data.Text as T
 
@@ -29,21 +30,25 @@ instance Effect REPL where
   handle state handler (Output s k) = Output s (handler (k <$ state))
 
 prompt :: (Member REPL sig, Carrier sig m) => Text -> m (Maybe Text)
-prompt p = send (Prompt p ret)
+prompt p = send (Prompt p pure)
 
 output :: (Member REPL sig, Carrier sig m) => Text -> m ()
-output s = send (Output s (ret ()))
+output s = send (Output s (pure ()))
 
-runREPL :: (MonadIO m, Carrier sig m) => Prefs -> Settings IO -> Eff (REPLC m) a -> m a
-runREPL prefs settings = flip runREPLC (prefs, settings) . interpret
+runREPL :: Prefs -> Settings IO -> REPLC m a -> m a
+runREPL prefs settings = runReader (prefs, settings) . runREPLC
 
-newtype REPLC m a = REPLC { runREPLC :: (Prefs, Settings IO) -> m a }
+newtype REPLC m a = REPLC { runREPLC :: ReaderC (Prefs, Settings IO) m a }
+  deriving (Functor, Applicative, Monad, MonadIO)
 
 instance (Carrier sig m, MonadIO m) => Carrier (REPL :+: sig) (REPLC m) where
-  ret = REPLC . const . ret
-  eff op = REPLC (\ args -> handleSum (eff . handleReader args runREPLC) (\case
-    Prompt p k -> liftIO (uncurry runInputTWithPrefs args (fmap (fmap T.pack) (getInputLine (cyan <> T.unpack p <> plain)))) >>= flip runREPLC args . k
-    Output s k -> liftIO (uncurry runInputTWithPrefs args (outputStrLn (T.unpack s))) *> runREPLC k args) op)
+  eff (L op) = do
+    args <- REPLC ask
+    case op of
+      Prompt p k -> liftIO (uncurry runInputTWithPrefs args (fmap (fmap T.pack) (getInputLine (cyan <> T.unpack p <> plain)))) >>= k
+      Output s k -> liftIO (uncurry runInputTWithPrefs args (outputStrLn (T.unpack s))) *> k
+  eff (R other) = REPLC (eff (R (handleCoercible other)))
+
 
 cyan :: String
 cyan = "\ESC[1;36m\STX"

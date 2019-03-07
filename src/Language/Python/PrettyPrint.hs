@@ -14,10 +14,10 @@ import Data.Reprinting.Scope
 import Data.Reprinting.Operator
 
 -- | Print Python syntax.
-printingPython :: (Member (Error TranslationError) sig, Carrier sig m, Monad m) => ProcessT m Fragment Splice
+printingPython :: (Member (Error TranslationError) sig, Carrier sig m) => ProcessT m Fragment Splice
 printingPython = repeatedly (await >>= step)
 
-step :: (Member (Error TranslationError) sig, Carrier sig m, Monad m) => Fragment -> PlanT k Splice m ()
+step :: (Member (Error TranslationError) sig, Carrier sig m) => Fragment -> PlanT k Splice m ()
 step (Verbatim txt) = emit txt
 step (New _ _ txt)  = emit txt
 step (Defer el cs)  = case (el, cs) of
