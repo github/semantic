@@ -54,14 +54,14 @@ isolateCache action = putCache lowerBound *> action *> ((,) <$> get <*> get)
 
 
 -- | Analyze a term using the in-cache as an oracle & storing the results of the analysis in the out-cache.
-cachingTerms :: ( Member NonDet sig
-                , Member (Reader (Cache term address value)) sig
+cachingTerms :: ( Member (Reader (Cache term address value)) sig
                 , Member (Reader (Live address)) sig
                 , Member (State (Cache term address value)) sig
                 , Carrier sig m
                 , Ord address
                 , Ord term
                 , Ord value
+                , Alternative m
                 )
              => Open (term -> Evaluator term address value m value)
 cachingTerms recur term = do
@@ -75,7 +75,6 @@ cachingTerms recur term = do
 
 convergingModules :: ( Eq value
                      , Member Fresh sig
-                     , Member NonDet sig
                      , Member (Reader (Cache term address value)) sig
                      , Member (Reader (Live address)) sig
                      , Member (State (Cache term address value)) sig
@@ -83,9 +82,9 @@ convergingModules :: ( Eq value
                      , Ord address
                      , Ord term
                      , Carrier sig m
-                     , Effect sig
+                     , Alternative m
                      )
-                  => (Module (Either prelude term) -> Evaluator term address value (AltC Maybe (Eff m)) value)
+                  => (Module (Either prelude term) -> Evaluator term address value (NonDetC m) value)
                   -> (Module (Either prelude term) -> Evaluator term address value m value)
 convergingModules recur m@(Module _ (Left _)) = raiseHandler runNonDet (recur m) >>= maybeM empty
 convergingModules recur m@(Module _ (Right term)) = do
@@ -100,7 +99,7 @@ convergingModules recur m@(Module _ (Right term)) = do
     -- that it doesn't "leak" to the calling context and diverge (otherwise this
     -- would never complete). We don’t need to use the values, so we 'gather' the
     -- nondeterministic values into @()@.
-      withOracle prevCache (raiseHandler runNonDet (recur m)))
+      withOracle prevCache (raiseHandler (runNonDet @Maybe) (recur m)))
   maybe empty scatter (cacheLookup c cache)
 
 -- | Iterate a monadic action starting from some initial seed until the results converge.
@@ -119,7 +118,7 @@ converge seed f = loop seed
             loop x'
 
 -- | Nondeterministically write each of a collection of stores & return their associated results.
-scatter :: (Foldable t, Member NonDet sig, Carrier sig m) => t value -> Evaluator term address value m value
+scatter :: (Foldable t, Carrier sig m, Alternative m) => t value -> Evaluator term address value m value
 scatter = foldMapA pure
 
 -- | Get the current 'Configuration' with a passed-in term.
@@ -129,16 +128,16 @@ getConfiguration :: (Member (Reader (Live address)) sig, Carrier sig m)
 getConfiguration term = Configuration term <$> askRoots
 
 
-caching :: (Carrier sig m, Effect sig)
-        => Evaluator term address value (AltC B (Eff
-                                        (ReaderC (Cache term address value) (Eff
-                                        (StateC (Cache term address value) (Eff
-                                        m)))))) a
+caching :: Carrier sig m
+        => Evaluator term address value (NonDetC
+                                        (ReaderC (Cache term address value)
+                                        (StateC (Cache term address value)
+                                        m))) a
         -> Evaluator term address value m (Cache term address value, [a])
 caching
   = raiseHandler (runState  lowerBound)
   . raiseHandler (runReader lowerBound)
-  . fmap toList
+  . fmap (toList @B)
   . raiseHandler runNonDet
 
 data B a = E | L a | B (B a) (B a)

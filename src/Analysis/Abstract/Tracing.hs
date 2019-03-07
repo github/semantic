@@ -12,18 +12,24 @@ import Data.Semigroup.Reducer as Reducer
 --
 --   Instantiating @trace@ to @[]@ yields a linear trace analysis, while @Set@ yields a reachable state analysis.
 tracingTerms :: ( Member (State (Heap address address value)) sig
-                , Member (Writer (trace (Configuration term address value))) sig
-                , Carrier sig m
-                , Reducer (Configuration term address value) (trace (Configuration term address value))
-                )
+               , Member (Writer (trace (Configuration term address value))) sig
+               , Carrier sig m
+               , Reducer (Configuration term address value) (trace (Configuration term address value))
+               )
              => trace (Configuration term address value)
              -> Open (term -> Evaluator term address value m a)
 tracingTerms proxy recur term = getConfiguration term >>= trace . (`asTypeOf` proxy) . Reducer.unit >> recur term
 
-trace :: (Member (Writer (trace (Configuration term address value))) sig, Carrier sig m) => trace (Configuration term address value) -> Evaluator term address value m ()
+trace :: ( Member (Writer (trace (Configuration term address value))) sig
+        , Carrier sig m
+        )
+      => trace (Configuration term address value)
+      -> Evaluator term address value m ()
 trace = tell
 
-tracing :: (Monoid (trace (Configuration term address value)), Carrier sig m, Effect sig) => Evaluator term address value (WriterC (trace (Configuration term address value)) (Evaluator term address value m)) a -> Evaluator term address value m (trace (Configuration term address value), a)
+tracing :: (Monoid (trace (Configuration term address value)))
+        => Evaluator term address value (WriterC (trace (Configuration term address value)) (Evaluator term address value m)) a
+        -> Evaluator term address value m (trace (Configuration term address value), a)
 tracing = runWriter . runEvaluator
 
 

@@ -39,7 +39,6 @@ throwBaseError :: ( Member (Resumable (BaseError exc)) sig
                   , Member (Reader M.ModuleInfo) sig
                   , Member (Reader S.Span) sig
                   , Carrier sig m
-                  , Monad m
                   )
                 => exc resume
                 -> m resume

@@ -58,7 +58,7 @@ newtype ProjectException
   = FileNotFound FilePath
     deriving (Show, Eq, Typeable, Exception)
 
-readFile :: (Member (Error SomeException) sig, Applicative m, Carrier sig m)
+readFile :: (Member (Error SomeException) sig, Carrier sig m)
          => Project
          -> File
          -> m (Maybe Blob)

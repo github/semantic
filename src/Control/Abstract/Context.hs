@@ -45,7 +45,7 @@ currentSpan = ask
 withCurrentSpan :: (Member (Reader Span) sig, Carrier sig m) => Span -> m a -> m a
 withCurrentSpan = local . const
 
-modifyChildSpan :: (Member (State Span) sig, Carrier sig m, Monad m) => Span -> m a -> m a
+modifyChildSpan :: (Member (State Span) sig, Carrier sig m) => Span -> m a -> m a
 modifyChildSpan span m = m <* put span
 
 -- | Run an action with locally-replaced 'ModuleInfo' & 'Span' derived from the passed 'SrcLoc'.

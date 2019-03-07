@@ -24,7 +24,7 @@ data Name
   deriving (Eq, Ord, Generic, NFData)
 
 -- | Generate a fresh (unused) name for use in synthesized variables/closures/etc.
-gensym :: (Member Fresh sig, Carrier sig m, Functor m) => m Name
+gensym :: (Member Fresh sig, Carrier sig m) => m Name
 gensym = I <$> fresh
 
 -- | Construct a 'Name' from a 'Text'.
