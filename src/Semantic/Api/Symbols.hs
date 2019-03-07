@@ -33,7 +33,7 @@ import           Tags.Tagging
 legacyParseSymbols :: (Member Distribute sig, ParseEffects sig m, Traversable t) => t Blob -> m Legacy.ParseTreeSymbolResponse
 legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> distributeFoldMap go blobs
   where
-    go :: (Member (Error SomeException) sig, Member Task sig, Carrier sig m, Monad m) => Blob -> m [Legacy.File]
+    go :: (Member (Error SomeException) sig, Member Task sig, Carrier sig m) => Blob -> m [Legacy.File]
     go blob@Blob{..} = (doParse blob >>= withSomeTerm (renderToSymbols blob)) `catchError` (\(SomeException _) -> pure (pure emptyFile))
       where emptyFile = Legacy.File (pack blobPath) (pack (show blobLanguage)) []
 
@@ -58,7 +58,7 @@ parseSymbolsBuilder blobs = parseSymbols blobs >>= serialize JSON
 parseSymbols :: (Member Distribute sig, ParseEffects sig m, Traversable t) => t Blob -> m ParseTreeSymbolResponse
 parseSymbols blobs = ParseTreeSymbolResponse . V.fromList . toList <$> distributeFor blobs go
   where
-    go :: (Member (Error SomeException) sig, Member Task sig, Carrier sig m, Monad m) => Blob -> m File
+    go :: (Member (Error SomeException) sig, Member Task sig, Carrier sig m) => Blob -> m File
     go blob@Blob{..} = (doParse blob >>= withSomeTerm (renderToSymbols blob)) `catchError` (\(SomeException e) -> pure $ errorFile (show e))
       where
         errorFile e = File (pack blobPath) (bridging # blobLanguage) mempty (V.fromList [ParseError (T.pack e)])

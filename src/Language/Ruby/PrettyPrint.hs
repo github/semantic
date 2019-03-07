@@ -14,10 +14,10 @@ import Data.Reprinting.Splice
 import Data.Reprinting.Token as Token
 
 -- | Print Ruby syntax.
-printingRuby :: (Member (Error TranslationError) sig, Carrier sig m, Monad m) => ProcessT m Fragment Splice
+printingRuby :: (Member (Error TranslationError) sig, Carrier sig m) => ProcessT m Fragment Splice
 printingRuby = repeatedly (await >>= step)
 
-step :: (Member (Error TranslationError) sig, Carrier sig m, Monad m) => Fragment -> PlanT k Splice m ()
+step :: (Member (Error TranslationError) sig, Carrier sig m) => Fragment -> PlanT k Splice m ()
 step (Verbatim txt) = emit txt
 step (New _ _ txt)  = emit txt
 step (Defer el cs)  = case (el, cs) of
