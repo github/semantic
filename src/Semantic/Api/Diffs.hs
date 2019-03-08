@@ -125,7 +125,7 @@ diffTerms blobs terms = time "diff" languageTag $ do
   diff <$ writeStat (Stat.count "diff.nodes" (bilength diff) languageTag)
   where languageTag = languageTagForBlobPair blobs
 
-doParse :: (Member (Error SomeException) sig, Member Distribute sig, Member Task sig, Carrier sig m, Monad m)
+doParse :: (Member (Error SomeException) sig, Member Distribute sig, Member Task sig, Carrier sig m)
   => BlobPair -> Decorate m Location ann -> m (SomeTermPair TermPairConstraints ann)
 doParse blobPair decorate = case languageForBlobPair blobPair of
   Go         -> SomeTermPair <$> distributeFor blobPair (\ blob -> parse goParser blob >>= decorate blob)

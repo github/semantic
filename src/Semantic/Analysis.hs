@@ -17,36 +17,36 @@ import Prologue
 import qualified Data.Map.Strict as Map
 
 type ModuleC address value m
-  = ErrorC (LoopControl value)     (Eff
-  ( ErrorC (Return value)          (Eff
-  ( ReaderC (CurrentScope address) (Eff
-  ( ReaderC (CurrentFrame address) (Eff
-  ( DerefC address value           (Eff
-  ( AllocatorC address             (Eff
-  ( ReaderC ModuleInfo             (Eff
-    m)))))))))))))
+  = ErrorC (LoopControl value)
+  ( ErrorC (Return value)
+  ( ReaderC (CurrentScope address)
+  ( ReaderC (CurrentFrame address)
+  ( DerefC address value
+  ( AllocatorC address
+  ( ReaderC ModuleInfo
+    m))))))
 
 type DomainC term address value m
-  = FunctionC term address value                                          (Eff
-  ( WhileC value                                                          (Eff
-  ( BooleanC value                                                        (Eff
-  ( StringC value                                                         (Eff
-  ( NumericC value                                                        (Eff
-  ( BitwiseC value                                                        (Eff
-  ( ObjectC address value                                                 (Eff
-  ( ArrayC value                                                          (Eff
-  ( HashC value                                                          (Eff
-  ( UnitC value                                                           (Eff
-  ( InterposeC (Resumable (BaseError (UnspecializedError address value))) (Eff
-    m)))))))))))))))))))))
+  = FunctionC term address value
+  ( WhileC value
+  ( BooleanC value
+  ( StringC value
+  ( NumericC value
+  ( BitwiseC value
+  ( ObjectC address value
+  ( ArrayC value
+  ( HashC value
+  ( UnitC value
+  ( InterposeC (Resumable (BaseError (UnspecializedError address value)))
+    m))))))))))
 
 -- | Evaluate a list of modules with the prelude for the passed language available, and applying the passed function to every module.
 evaluate :: ( Carrier outerSig outer
             , derefSig ~ (Deref value :+: allocatorSig)
-            , derefC ~ (DerefC address value (Eff allocatorC))
+            , derefC ~ (DerefC address value allocatorC)
             , Carrier derefSig derefC
             , allocatorSig ~ (Allocator address :+: Reader ModuleInfo :+: outerSig)
-            , allocatorC ~ (AllocatorC address (Eff (ReaderC ModuleInfo (Eff outer))))
+            , allocatorC ~ (AllocatorC address (ReaderC ModuleInfo outer))
             , Carrier allocatorSig allocatorC
             , Effect outerSig
             , Member Fresh outerSig
@@ -86,35 +86,25 @@ evaluate lang runModule modules = do
                   . runModule
 
 runDomainEffects :: ( AbstractValue term address value (DomainC term address value m)
-                    , Carrier sig m
-                    , unitC ~ UnitC value (Eff (InterposeC (Resumable (BaseError (UnspecializedError address value))) (Eff m)))
+                    , unitC ~ UnitC value (InterposeC (Resumable (BaseError (UnspecializedError address value))) m)
                     , unitSig ~ (Unit value :+: Interpose (Resumable (BaseError (UnspecializedError address value))) :+: sig)
-                    , Carrier unitSig unitC
-                    , hashC ~ HashC value (Eff unitC)
+                    , hashC ~ HashC value unitC
                     , hashSig ~ (Abstract.Hash value :+: unitSig)
-                    , Carrier hashSig hashC
-                    , arrayC ~ ArrayC value (Eff hashC)
+                    , arrayC ~ ArrayC value hashC
                     , arraySig ~ (Abstract.Array value :+: hashSig)
-                    , Carrier arraySig arrayC
-                    , objectC ~ ObjectC address value (Eff arrayC)
+                    , objectC ~ ObjectC address value arrayC
                     , objectSig ~ (Abstract.Object address value :+: arraySig)
-                    , Carrier objectSig objectC
-                    , bitwiseC ~ BitwiseC value (Eff objectC)
+                    , bitwiseC ~ BitwiseC value objectC
                     , bitwiseSig ~ (Abstract.Bitwise value :+: objectSig)
-                    , Carrier bitwiseSig bitwiseC
-                    , numericC ~ NumericC value (Eff bitwiseC)
+                    , numericC ~ NumericC value bitwiseC
                     , numericSig ~ (Abstract.Numeric value :+: bitwiseSig)
-                    , Carrier numericSig numericC
-                    , stringC ~ StringC value (Eff numericC)
+                    , stringC ~ StringC value numericC
                     , stringSig ~ (Abstract.String value :+: numericSig)
-                    , Carrier stringSig stringC
-                    , booleanC ~ BooleanC value (Eff stringC)
+                    , booleanC ~ BooleanC value stringC
                     , booleanSig ~ (Boolean value :+: stringSig)
-                    , Carrier booleanSig booleanC
-                    , whileC ~ WhileC value (Eff booleanC)
+                    , whileC ~ WhileC value booleanC
                     , whileSig ~ (While value :+: booleanSig)
-                    , Carrier whileSig whileC
-                    , functionC ~ FunctionC term address value (Eff whileC)
+                    , functionC ~ FunctionC term address value whileC
                     , functionSig ~ (Function term address value :+: whileSig)
                     , Carrier functionSig functionC
                     , HasPrelude lang
@@ -128,7 +118,6 @@ runDomainEffects :: ( AbstractValue term address value (DomainC term address val
                     , Member (Resumable (BaseError (AddressError address value))) sig
                     , Member (Resumable (BaseError (HeapError address))) sig
                     , Member (Resumable (BaseError (ScopeError address))) sig
-                    , Member (Resumable (BaseError (UnspecializedError address value))) sig
                     , Member (State (Heap address address value)) sig
                     , Member (State (ScopeGraph address)) sig
                     , Member Trace sig

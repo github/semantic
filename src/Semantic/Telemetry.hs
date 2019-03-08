@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, KindSignatures, LambdaCase, RankNTypes, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DerivingStrategies, GADTs, GeneralizedNewtypeDeriving, KindSignatures, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Semantic.Telemetry
 (
   -- Async telemetry interface
@@ -52,6 +52,7 @@ module Semantic.Telemetry
 
 import           Control.Effect
 import           Control.Effect.Carrier
+import           Control.Effect.Reader
 import           Control.Effect.Sum
 import           Control.Exception
 import           Control.Monad.IO.Class
@@ -121,11 +122,11 @@ queueStat q = liftIO . writeAsyncQueue q
 
 -- | A task which logs a message at a specific log level to stderr.
 writeLog :: (Member Telemetry sig, Carrier sig m) => Level -> String -> [(String, String)] -> m ()
-writeLog level message pairs = send (WriteLog level message pairs (ret ()))
+writeLog level message pairs = send (WriteLog level message pairs (pure ()))
 
 -- | A task which writes a stat.
 writeStat :: (Member Telemetry sig, Carrier sig m) => Stat -> m ()
-writeStat stat = send (WriteStat stat (ret ()))
+writeStat stat = send (WriteStat stat (pure ()))
 
 -- | A task which measures and stats the timing of another task.
 time :: (Member Telemetry sig, Carrier sig m, MonadIO m) => String -> [(String, String)] -> m output -> m output
@@ -151,26 +152,28 @@ instance Effect Telemetry where
   handle state handler (WriteLog level message pairs k) = WriteLog level message pairs (handler (k <$ state))
 
 -- | Run a 'Telemetry' effect by expecting a 'Reader' of 'Queue's to write stats and logs to.
-runTelemetry :: (Carrier sig m, MonadIO m) => LogQueue -> StatQueue -> Eff (TelemetryC m) a -> m a
-runTelemetry logger statter = flip runTelemetryC (logger, statter) . interpret
+runTelemetry :: LogQueue -> StatQueue -> TelemetryC m a -> m a
+runTelemetry logger statter = runReader (logger, statter) . runTelemetryC
 
-newtype TelemetryC m a = TelemetryC { runTelemetryC :: (LogQueue, StatQueue) -> m a }
+newtype TelemetryC m a = TelemetryC { runTelemetryC :: ReaderC (LogQueue, StatQueue) m a }
+  deriving (Applicative, Functor, Monad, MonadIO)
 
 instance (Carrier sig m, MonadIO m) => Carrier (Telemetry :+: sig) (TelemetryC m) where
-  ret = TelemetryC . const . ret
-  eff op = TelemetryC (\ queues -> handleSum (eff . handleReader queues runTelemetryC) (\case
-    WriteStat stat               k -> queueStat (snd queues) stat *> runTelemetryC k queues
-    WriteLog level message pairs k -> queueLogMessage (fst queues) level message pairs *> runTelemetryC k queues) op)
-
+  eff (L op) = do
+    queues <- TelemetryC ask
+    case op of
+      WriteStat stat k               -> queueStat (snd queues) stat *> k
+      WriteLog level message pairs k -> queueLogMessage (fst queues) level message pairs *> k
+  eff (R other) = TelemetryC (eff (R (handleCoercible other)))
 
 -- | Run a 'Telemetry' effect by ignoring statting/logging.
-ignoreTelemetry :: Carrier sig m => Eff (IgnoreTelemetryC m) a -> m a
-ignoreTelemetry = runIgnoreTelemetryC . interpret
+ignoreTelemetry :: IgnoreTelemetryC m a -> m a
+ignoreTelemetry = runIgnoreTelemetryC
 
 newtype IgnoreTelemetryC m a = IgnoreTelemetryC { runIgnoreTelemetryC :: m a }
+  deriving (Applicative, Functor, Monad)
 
 instance Carrier sig m => Carrier (Telemetry :+: sig) (IgnoreTelemetryC m) where
-  ret = IgnoreTelemetryC . ret
-  eff = handleSum (IgnoreTelemetryC . eff . handlePure runIgnoreTelemetryC) (\case
-    WriteStat _    k -> k
-    WriteLog _ _ _ k -> k)
+  eff (R other) = IgnoreTelemetryC . eff . handleCoercible $ other
+  eff (L (WriteStat _ k))    = k
+  eff (L (WriteLog _ _ _ k)) = k

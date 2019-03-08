@@ -222,7 +222,7 @@ deref :: ( Member (Deref value) sig
 deref slot@Slot{..} = do
   maybeSlotValue <- gets (Heap.getSlotValue slot)
   slotValue <- maybeM (throwAddressError (UnallocatedSlot slot)) maybeSlotValue
-  eff <- send $ DerefCell slotValue ret
+  eff <- send $ DerefCell slotValue pure
   maybeM (throwAddressError $ UninitializedSlot slot) eff
 
 putSlotDeclarationScope :: ( Member (State (Heap address address value)) sig
@@ -375,7 +375,7 @@ assign :: ( Member (Deref value) sig
        -> Evaluator term address value m ()
 assign addr value = do
   heap <- getHeap
-  cell <- send (AssignCell value (fromMaybe lowerBound (Heap.getSlotValue addr heap)) ret)
+  cell <- send (AssignCell value (fromMaybe lowerBound (Heap.getSlotValue addr heap)) pure)
   putHeap (Heap.setSlot addr cell heap)
 
 dealloc :: ( Carrier sig m
@@ -431,10 +431,9 @@ instance Effect (Deref value) where
   handle state handler (DerefCell        cell k) = DerefCell        cell (handler . (<$ state) . k)
   handle state handler (AssignCell value cell k) = AssignCell value cell (handler . (<$ state) . k)
 
-runDeref :: Carrier (Deref value :+: sig) (DerefC address value (Eff m))
-         => Evaluator term address value (DerefC address value (Eff m)) a
+runDeref :: Evaluator term address value (DerefC address value m) a
          -> Evaluator term address value m a
-runDeref = raiseHandler $ runDerefC . interpret
+runDeref = raiseHandler runDerefC
 
 newtype DerefC address value m a = DerefC { runDerefC :: m a }
   deriving (Alternative, Applicative, Functor, Monad)
@@ -481,14 +480,12 @@ throwHeapError  :: ( Member (Resumable (BaseError (HeapError address))) sig
                 -> Evaluator term address value m resume
 throwHeapError = throwBaseError
 
-runHeapError :: (Carrier sig m, Effect sig)
-                => Evaluator term address value (ResumableC (BaseError (HeapError address)) (Eff m)) a
-                -> Evaluator term address value m (Either (SomeError (BaseError (HeapError address))) a)
+runHeapError :: Evaluator term address value (ResumableC (BaseError (HeapError address)) m) a
+             -> Evaluator term address value m (Either (SomeError (BaseError (HeapError address))) a)
 runHeapError = raiseHandler runResumable
 
-runHeapErrorWith :: Carrier sig m
-                 => (forall resume. (BaseError (HeapError address)) resume -> Evaluator term address value m resume)
-                 -> Evaluator term address value (ResumableWithC (BaseError (HeapError address)) (Eff m)) a
+runHeapErrorWith :: (forall resume. (BaseError (HeapError address)) resume -> Evaluator term address value m resume)
+                 -> Evaluator term address value (ResumableWithC (BaseError (HeapError address)) m) a
                  -> Evaluator term address value m a
 runHeapErrorWith f = raiseHandler $ runResumableWith (runEvaluator . f)
 
@@ -522,13 +519,11 @@ throwAddressError :: ( Member (Resumable (BaseError (AddressError address body))
                   -> Evaluator term address value m resume
 throwAddressError = throwBaseError
 
-runAddressError :: (Carrier sig m, Effect sig)
-                => Evaluator term address value (ResumableC (BaseError (AddressError address value)) (Eff m)) a
+runAddressError :: Evaluator term address value (ResumableC (BaseError (AddressError address value)) m) a
                 -> Evaluator term address value m (Either (SomeError (BaseError (AddressError address value))) a)
 runAddressError = raiseHandler runResumable
 
-runAddressErrorWith :: Carrier sig m
-                    => (forall resume . (BaseError (AddressError address value)) resume -> Evaluator term address value m resume)
-                    -> Evaluator term address value (ResumableWithC (BaseError (AddressError address value)) (Eff m)) a
+runAddressErrorWith :: (forall resume . (BaseError (AddressError address value)) resume -> Evaluator term address value m resume)
+                    -> Evaluator term address value (ResumableWithC (BaseError (AddressError address value)) m) a
                     -> Evaluator term address value m a
 runAddressErrorWith f = raiseHandler $ runResumableWith (runEvaluator . f)

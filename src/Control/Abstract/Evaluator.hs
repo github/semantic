@@ -29,24 +29,19 @@ import Control.Effect.Trace as X
 import Control.Monad.IO.Class
 import Data.Coerce
 
--- | An 'Evaluator' is a thin wrapper around 'Eff' with (phantom) type parameters for the address, term, and value types.
+-- | An 'Evaluator' is a thin wrapper around a monad with (phantom) type parameters for the address, term, and value types.
 --
 --   These parameters enable us to constrain the types of effects using them s.t. we can avoid both ambiguous types when they aren’t mentioned outside of the context, and lengthy, redundant annotations on the use sites of functions employing these effects.
 --
 --   These effects will typically include the environment, heap, module table, etc. effects necessary for evaluation of modules and terms, but may also include any other effects so long as they’re eventually handled.
-newtype Evaluator term address value m a = Evaluator { runEvaluator :: Eff m a }
-  deriving (Applicative, Functor, Monad)
-
-deriving instance (Member NonDet sig, Carrier sig m) => Alternative (Evaluator term address value m)
-deriving instance (Member (Lift IO) sig, Carrier sig m) => MonadIO (Evaluator term address value m)
+newtype Evaluator term address value m a = Evaluator { runEvaluator :: m a }
+  deriving (Alternative, Applicative, Functor, Monad, MonadIO)
 
 instance Carrier sig m => Carrier sig (Evaluator term address value m) where
-  ret = Evaluator . ret
-  eff = Evaluator . eff . handlePure runEvaluator
+  eff = Evaluator . eff . handleCoercible
 
-
--- | Raise a handler on 'Eff's into a handler on 'Evaluator's.
-raiseHandler :: (Eff m a -> Eff n b)
+-- | Raise a handler on monads into a handler on 'Evaluator's over those monads.
+raiseHandler :: (m a -> n b)
              -> Evaluator term address value m a
              -> Evaluator term address value n b
 raiseHandler = coerce
@@ -69,10 +64,14 @@ earlyReturn :: ( Member (Error (Return value)) sig
             -> Evaluator term address value m value
 earlyReturn = throwError . Return
 
-catchReturn :: (Member (Error (Return value)) sig, Carrier sig m) => Evaluator term address value m value -> Evaluator term address value m value
+catchReturn :: (Member (Error (Return value)) sig, Carrier sig m)
+            => Evaluator term address value m value
+            -> Evaluator term address value m value
 catchReturn = flip catchError (\ (Return value) -> pure value)
 
-runReturn :: (Carrier sig m, Effect sig) => Evaluator term address value (ErrorC (Return value) (Eff m)) value -> Evaluator term address value m value
+runReturn :: Carrier sig m
+          => Evaluator term address value (ErrorC (Return value) m) value
+          -> Evaluator term address value m value
 runReturn = raiseHandler $ fmap (either unReturn id) . runError
 
 
@@ -105,7 +104,7 @@ catchLoopControl :: ( Member (Error (LoopControl value)) sig
                  -> Evaluator term address value m a
 catchLoopControl = catchError
 
-runLoopControl :: (Carrier sig m, Effect sig)
-               => Evaluator term address value (ErrorC (LoopControl value) (Eff m)) value
+runLoopControl :: Carrier sig m
+               => Evaluator term address value (ErrorC (LoopControl value) m) value
                -> Evaluator term address value m value
 runLoopControl = raiseHandler $ fmap (either unLoopControl id) . runError
