@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, GADTs, KindSignatures, LambdaCase, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE ConstraintKinds, GADTs, GeneralizedNewtypeDeriving, KindSignatures, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Semantic.Resolution
   ( Resolution (..)
   , nodeJSResolutionMap
@@ -24,7 +24,7 @@ import           Semantic.Task.Files
 import           System.FilePath.Posix
 
 
-nodeJSResolutionMap :: (Member Files sig, Carrier sig m, Monad m) => FilePath -> Text -> [FilePath] -> m (Map FilePath FilePath)
+nodeJSResolutionMap :: (Member Files sig, Carrier sig m) => FilePath -> Text -> [FilePath] -> m (Map FilePath FilePath)
 nodeJSResolutionMap rootDir prop excludeDirs = do
   files <- findFiles rootDir [".json"] excludeDirs
   let packageFiles = file <$> filter ((==) "package.json" . takeFileName) files
@@ -41,9 +41,9 @@ nodeJSResolutionMap rootDir prop excludeDirs = do
 
 resolutionMap :: (Member Resolution sig, Carrier sig m) => Project -> m (Map FilePath FilePath)
 resolutionMap Project{..} = case projectLanguage of
-  TypeScript -> send (NodeJSResolution projectRootDir "types" projectExcludeDirs ret)
-  JavaScript -> send (NodeJSResolution projectRootDir "main"  projectExcludeDirs ret)
-  _          -> send (NoResolution ret)
+  TypeScript -> send (NodeJSResolution projectRootDir "types" projectExcludeDirs pure)
+  JavaScript -> send (NodeJSResolution projectRootDir "main"  projectExcludeDirs pure)
+  _          -> send (NoResolution pure)
 
 data Resolution (m :: * -> *) k
   = NodeJSResolution FilePath Text [FilePath] (Map FilePath FilePath -> k)
@@ -57,13 +57,14 @@ instance Effect Resolution where
   handle state handler (NodeJSResolution path key paths k) = NodeJSResolution path key paths (handler . (<$ state) . k)
   handle state handler (NoResolution k) = NoResolution (handler . (<$ state) . k)
 
-runResolution :: (Member Files sig, Carrier sig m, Monad m) => Eff (ResolutionC m) a -> m a
-runResolution = runResolutionC . interpret
+runResolution :: ResolutionC m a -> m a
+runResolution = runResolutionC
 
 newtype ResolutionC m a = ResolutionC { runResolutionC :: m a }
+  deriving (Applicative, Functor, Monad, MonadIO)
 
-instance (Member Files sig, Carrier sig m, Monad m) => Carrier (Resolution :+: sig) (ResolutionC m) where
-  ret = ResolutionC . ret
-  eff = ResolutionC . handleSum (eff . handleCoercible) (\case
-    NodeJSResolution dir prop excludeDirs k -> nodeJSResolutionMap dir prop excludeDirs >>= runResolutionC . k
-    NoResolution                          k -> runResolutionC (k Map.empty))
+instance (Member Files sig, Carrier sig m) => Carrier (Resolution :+: sig) (ResolutionC m) where
+  eff (R other) = ResolutionC . eff . handleCoercible $ other
+  eff (L op) = case op of
+    NodeJSResolution dir prop excludeDirs k -> nodeJSResolutionMap dir prop excludeDirs >>= k
+    NoResolution                          k -> k Map.empty

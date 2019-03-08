@@ -49,7 +49,7 @@ topologicalSort = go . Class.toAdjacencyMap . G.transpose . unGraph
           . traverse_ visit
           . A.vertexList
           $ graph
-          where visit :: (Member (State (Visited v)) sig, Carrier sig m, Monad m) => v -> m ()
+          where visit :: (Member (State (Visited v)) sig, Carrier sig m) => v -> m ()
                 visit v = do
                   isMarked <- Set.member v . visitedVertices <$> get
                   if isMarked then
