@@ -3,6 +3,7 @@
 {-# OPTIONS_GHC -Wno-unused-imports -Wno-missing-export-lists #-}
 module Semantic.Api.V1.CodeAnalysisPB where
 
+import Control.DeepSeq
 import Data.Aeson
 import Data.ByteString (ByteString)
 import Data.Int
@@ -16,7 +17,7 @@ import Proto3.Wire (at, oneof)
 data PingRequest = PingRequest
   { service :: Text
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, FromJSON, ToJSON)
+    deriving anyclass (Named, FromJSON, ToJSON, NFData)
 
 instance Message PingRequest where
   encodeMessage _ PingRequest{..} = mconcat
@@ -32,7 +33,7 @@ data PingResponse = PingResponse
   , timestamp :: Text
   , sha :: Text
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, FromJSON, ToJSON)
+    deriving anyclass (Named, FromJSON, ToJSON, NFData)
 
 instance Message PingResponse where
   encodeMessage _ PingResponse{..} = mconcat
@@ -51,7 +52,7 @@ instance Message PingResponse where
 data ParseTreeRequest = ParseTreeRequest
   { blobs :: Vector Blob
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, FromJSON, ToJSON)
+    deriving anyclass (Named, FromJSON, ToJSON, NFData)
 
 instance Message ParseTreeRequest where
   encodeMessage _ ParseTreeRequest{..} = mconcat
@@ -64,7 +65,7 @@ instance Message ParseTreeRequest where
 data ParseTreeSymbolResponse = ParseTreeSymbolResponse
   { files :: Vector File
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, FromJSON, ToJSON)
+    deriving anyclass (Named, FromJSON, ToJSON, NFData)
 
 instance Message ParseTreeSymbolResponse where
   encodeMessage _ ParseTreeSymbolResponse{..} = mconcat
@@ -77,7 +78,7 @@ instance Message ParseTreeSymbolResponse where
 data ParseTreeGraphResponse = ParseTreeGraphResponse
   { files :: Vector ParseTreeFileGraph
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, FromJSON, ToJSON)
+    deriving anyclass (Named, FromJSON, ToJSON, NFData)
 
 instance Message ParseTreeGraphResponse where
   encodeMessage _ ParseTreeGraphResponse{..} = mconcat
@@ -94,7 +95,7 @@ data ParseTreeFileGraph = ParseTreeFileGraph
   , edges :: Vector TermEdge
   , errors :: Vector ParseError
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, FromJSON, ToJSON)
+    deriving anyclass (Named, FromJSON, ToJSON, NFData)
 
 instance Message ParseTreeFileGraph where
   encodeMessage _ ParseTreeFileGraph{..} = mconcat
@@ -116,7 +117,7 @@ data TermEdge = TermEdge
   { source :: Int64
   , target :: Int64
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, FromJSON, ToJSON)
+    deriving anyclass (Named, FromJSON, ToJSON, NFData)
 
 instance Message TermEdge where
   encodeMessage _ TermEdge{..} = mconcat
@@ -133,7 +134,7 @@ data TermVertex = TermVertex
   , term :: Text
   , span :: Maybe Span
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, FromJSON, ToJSON)
+    deriving anyclass (Named, FromJSON, ToJSON, NFData)
 
 instance Message TermVertex where
   encodeMessage _ TermVertex{..} = mconcat
@@ -150,7 +151,7 @@ instance Message TermVertex where
 data ParseError = ParseError
   { error :: Text
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, FromJSON, ToJSON)
+    deriving anyclass (Named, FromJSON, ToJSON, NFData)
 
 instance Message ParseError where
   encodeMessage _ ParseError{..} = mconcat
@@ -163,7 +164,7 @@ instance Message ParseError where
 data DiffTreeRequest = DiffTreeRequest
   { blobs :: Vector BlobPair
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, FromJSON, ToJSON)
+    deriving anyclass (Named, FromJSON, ToJSON, NFData)
 
 instance Message DiffTreeRequest where
   encodeMessage _ DiffTreeRequest{..} = mconcat
@@ -176,7 +177,7 @@ instance Message DiffTreeRequest where
 data DiffTreeTOCResponse = DiffTreeTOCResponse
   { files :: Vector TOCSummaryFile
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, FromJSON, ToJSON)
+    deriving anyclass (Named, FromJSON, ToJSON, NFData)
 
 instance Message DiffTreeTOCResponse where
   encodeMessage _ DiffTreeTOCResponse{..} = mconcat
@@ -192,7 +193,7 @@ data TOCSummaryFile = TOCSummaryFile
   , changes :: Vector TOCSummaryChange
   , errors :: Vector TOCSummaryError
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, FromJSON, ToJSON)
+    deriving anyclass (Named, FromJSON, ToJSON, NFData)
 
 instance Message TOCSummaryFile where
   encodeMessage _ TOCSummaryFile{..} = mconcat
@@ -214,7 +215,7 @@ data TOCSummaryChange = TOCSummaryChange
   , span :: Maybe Span
   , changeType :: ChangeType
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, FromJSON, ToJSON)
+    deriving anyclass (Named, FromJSON, ToJSON, NFData)
 
 instance Message TOCSummaryChange where
   encodeMessage _ TOCSummaryChange{..} = mconcat
@@ -234,7 +235,7 @@ data TOCSummaryError = TOCSummaryError
   { error :: Text
   , span :: Maybe Span
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, FromJSON, ToJSON)
+    deriving anyclass (Named, FromJSON, ToJSON, NFData)
 
 instance Message TOCSummaryError where
   encodeMessage _ TOCSummaryError{..} = mconcat
@@ -249,7 +250,7 @@ instance Message TOCSummaryError where
 data DiffTreeGraphResponse = DiffTreeGraphResponse
   { files :: Vector DiffTreeFileGraph
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, FromJSON, ToJSON)
+    deriving anyclass (Named, FromJSON, ToJSON, NFData)
 
 instance Message DiffTreeGraphResponse where
   encodeMessage _ DiffTreeGraphResponse{..} = mconcat
@@ -266,7 +267,7 @@ data DiffTreeFileGraph = DiffTreeFileGraph
   , edges :: Vector DiffTreeEdge
   , errors :: Vector ParseError
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, FromJSON, ToJSON)
+    deriving anyclass (Named, FromJSON, ToJSON, NFData)
 
 instance Message DiffTreeFileGraph where
   encodeMessage _ DiffTreeFileGraph{..} = mconcat
@@ -288,7 +289,7 @@ data DiffTreeEdge = DiffTreeEdge
   { source :: Int64
   , target :: Int64
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, FromJSON, ToJSON)
+    deriving anyclass (Named, FromJSON, ToJSON, NFData)
 
 instance Message DiffTreeEdge where
   encodeMessage _ DiffTreeEdge{..} = mconcat
@@ -306,13 +307,13 @@ data DiffTreeVertexDiffTerm
   | Replaced { replaced :: Maybe ReplacedTerm }
   | Merged { merged :: Maybe MergedTerm }
   deriving stock (Eq, Ord, Show, Generic)
-  deriving anyclass (Message, Named, FromJSON, ToJSON)
+  deriving anyclass (Message, Named, FromJSON, ToJSON, NFData)
 
 data DiffTreeVertex = DiffTreeVertex
   { diffVertexId :: Int64
   , diffTerm :: Maybe DiffTreeVertexDiffTerm
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, FromJSON, ToJSON)
+    deriving anyclass (Named, FromJSON, ToJSON, NFData)
 
 instance Message DiffTreeVertex where
   encodeMessage _ DiffTreeVertex{..} = mconcat
@@ -339,7 +340,7 @@ data DeletedTerm = DeletedTerm
   { term :: Text
   , span :: Maybe Span
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, FromJSON, ToJSON)
+    deriving anyclass (Named, FromJSON, ToJSON, NFData)
 
 instance Message DeletedTerm where
   encodeMessage _ DeletedTerm{..} = mconcat
@@ -355,7 +356,7 @@ data InsertedTerm = InsertedTerm
   { term :: Text
   , span :: Maybe Span
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, FromJSON, ToJSON)
+    deriving anyclass (Named, FromJSON, ToJSON, NFData)
 
 instance Message InsertedTerm where
   encodeMessage _ InsertedTerm{..} = mconcat
@@ -373,7 +374,7 @@ data ReplacedTerm = ReplacedTerm
   , afterTerm :: Text
   , afterSpan :: Maybe Span
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, FromJSON, ToJSON)
+    deriving anyclass (Named, FromJSON, ToJSON, NFData)
 
 instance Message ReplacedTerm where
   encodeMessage _ ReplacedTerm{..} = mconcat
@@ -394,7 +395,7 @@ data MergedTerm = MergedTerm
   , beforeSpan :: Maybe Span
   , afterSpan :: Maybe Span
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, FromJSON, ToJSON)
+    deriving anyclass (Named, FromJSON, ToJSON, NFData)
 
 instance Message MergedTerm where
   encodeMessage _ MergedTerm{..} = mconcat
@@ -413,7 +414,7 @@ data Blob = Blob
   , path :: Text
   , language :: Language
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, FromJSON, ToJSON)
+    deriving anyclass (Named, FromJSON, ToJSON, NFData)
 
 instance Message Blob where
   encodeMessage _ Blob{..} = mconcat
@@ -431,7 +432,7 @@ data BlobPair = BlobPair
   { before :: Maybe Blob
   , after :: Maybe Blob
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, FromJSON, ToJSON)
+    deriving anyclass (Named, FromJSON, ToJSON, NFData)
 
 instance Message BlobPair where
   encodeMessage _ BlobPair{..} = mconcat
@@ -449,7 +450,7 @@ data File = File
   , symbols :: Vector Symbol
   , errors :: Vector ParseError
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, FromJSON, ToJSON)
+    deriving anyclass (Named, FromJSON, ToJSON, NFData)
 
 instance Message File where
   encodeMessage _ File{..} = mconcat
@@ -472,7 +473,7 @@ data Symbol = Symbol
   , span :: Maybe Span
   , docs :: Maybe Docstring
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, FromJSON, ToJSON)
+    deriving anyclass (Named, FromJSON, ToJSON, NFData)
 
 instance Message Symbol where
   encodeMessage _ Symbol{..} = mconcat
@@ -493,7 +494,7 @@ instance Message Symbol where
 data Docstring = Docstring
   { docstring :: Text
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, FromJSON, ToJSON)
+    deriving anyclass (Named, FromJSON, ToJSON, NFData)
 
 instance Message Docstring where
   encodeMessage _ Docstring{..} = mconcat
@@ -507,7 +508,7 @@ data Position = Position
   { line :: Int64
   , column :: Int64
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, FromJSON, ToJSON)
+    deriving anyclass (Named, FromJSON, ToJSON, NFData)
 
 instance Message Position where
   encodeMessage _ Position{..} = mconcat
@@ -523,7 +524,7 @@ data Span = Span
   { start :: Maybe Position
   , end :: Maybe Position
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, FromJSON, ToJSON)
+    deriving anyclass (Named, FromJSON, ToJSON, NFData)
 
 instance Message Span where
   encodeMessage _ Span{..} = mconcat
@@ -541,7 +542,7 @@ data ChangeType
   | Removed
   | Modified
   deriving stock (Eq, Ord, Show, Enum, Bounded, Generic)
-  deriving anyclass (Named, MessageField, FromJSON, ToJSON)
+  deriving anyclass (Named, MessageField, FromJSON, ToJSON, NFData)
   deriving Primitive via PrimitiveEnum ChangeType
 instance HasDefault ChangeType where def = None
 
@@ -559,6 +560,6 @@ data Language
   | Typescript
   | Php
   deriving stock (Eq, Ord, Show, Enum, Bounded, Generic)
-  deriving anyclass (Named, MessageField, FromJSON, ToJSON)
+  deriving anyclass (Named, MessageField, FromJSON, ToJSON, NFData)
   deriving Primitive via PrimitiveEnum Language
 instance HasDefault Language where def = Unknown

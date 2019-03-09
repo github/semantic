@@ -1,4 +1,4 @@
-{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, UndecidableInstances #-}
 module Control.Abstract.PythonPackage
 ( runPythonPackaging, Strategy(..) ) where
 
@@ -14,19 +14,15 @@ import           Prologue
 data Strategy = Unknown | Packages [Text] | FindPackages [Text]
   deriving (Show, Eq)
 
-runPythonPackaging :: ( Carrier sig m
-                      , Member (Abstract.String (Value term address)) sig
-                      , Member (Abstract.Array (Value term address)) sig
-                      , Member (State Strategy) sig
-                      , Member (Function term address (Value term address)) sig)
-                   => Evaluator term address (Value term address) (PythonPackagingC term address (Eff m)) a
+runPythonPackaging :: Evaluator term address (Value term address) (PythonPackagingC term address m) a
                    -> Evaluator term address (Value term address) m a
-runPythonPackaging = raiseHandler (runPythonPackagingC . interpret)
+runPythonPackaging = raiseHandler runPythonPackagingC
 
 
 newtype PythonPackagingC term address m a = PythonPackagingC { runPythonPackagingC :: m a }
+  deriving (Applicative, Functor, Monad)
 
-wrap :: Evaluator term address (Value term address) m a -> PythonPackagingC term address (Eff m) a
+wrap :: Evaluator term address (Value term address) m a -> PythonPackagingC term address m a
 wrap = PythonPackagingC . runEvaluator
 
 instance ( Carrier sig m
@@ -35,8 +31,7 @@ instance ( Carrier sig m
          , Member (Abstract.String (Value term address)) sig
          , Member (Abstract.Array (Value term address)) sig
          )
-      => Carrier sig (PythonPackagingC term address (Eff m)) where
-  ret = PythonPackagingC . ret
+      => Carrier sig (PythonPackagingC term address m) where
   eff op
     | Just e <- prj op = wrap $ case handleCoercible e of
       Call callName params k -> Evaluator . k =<< do
@@ -61,4 +56,4 @@ instance ( Carrier sig m
       Function name params body scope k -> function name params body scope >>= Evaluator . k
       BuiltIn n b k -> builtIn n b >>= Evaluator . k
       Bind obj value k -> bindThis obj value >>= Evaluator . k
-    | otherwise        = PythonPackagingC (eff (handleCoercible op))
+    | otherwise = PythonPackagingC . eff $ handleCoercible op

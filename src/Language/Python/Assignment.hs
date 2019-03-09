@@ -375,7 +375,7 @@ yield :: Assignment Term
 yield = makeTerm <$> symbol Yield <*> (Statement.Yield <$> children (term ( expression <|> emptyTerm )))
 
 identifier :: Assignment Term
-identifier = makeTerm <$> (symbol Identifier <|> symbol Identifier' <|> symbol DottedName) <*> (Syntax.Identifier . name <$> source)
+identifier = makeTerm <$> (symbol Identifier <|> symbol DottedName) <*> (Syntax.Identifier . name <$> source)
 
 set :: Assignment Term
 set = makeTerm <$> symbol Set <*> children (Literal.Set <$> manyTerm expression)
@@ -414,7 +414,7 @@ import' =   makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliase
     -- `import a`
     plainImport = makeTerm <$> symbol DottedName <*> children (Python.Syntax.QualifiedImport  <$> NonEmpty.some1 identifier)
     -- `from a import foo `
-    importSymbol = makeNameAliasPair <$> (symbol Identifier <|> symbol Identifier' <|> symbol DottedName) <*> (mkIdentifier <$> location <*> source)
+    importSymbol = makeNameAliasPair <$> (symbol Identifier <|> symbol DottedName) <*> (mkIdentifier <$> location <*> source)
     -- `from a import foo as bar`
     aliasImportSymbol = makeTerm <$> symbol AliasedImport <*> children (Python.Syntax.Alias <$> identifier <*> identifier)
     -- `from a import *`
@@ -424,7 +424,7 @@ import' =   makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliase
     importDottedName = symbol DottedName *> children (qualifiedName <$> NonEmpty.some1 identifierSource)
     importRelative = symbol RelativeImport *> children (relativeQualifiedName <$> importPrefix <*> ((symbol DottedName *> children (many identifierSource)) <|> pure []))
     importPrefix = symbol ImportPrefix *> source
-    identifierSource = (symbol Identifier <|> symbol Identifier') *> source
+    identifierSource = symbol Identifier *> source
 
     makeNameAliasPair location alias = makeTerm location (Python.Syntax.Alias alias alias)
     mkIdentifier location source = makeTerm location (Syntax.Identifier (name source))
