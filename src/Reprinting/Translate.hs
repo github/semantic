@@ -19,9 +19,8 @@ import           Data.Reprinting.Scope
 import qualified Data.Source as Source
 
 type Translator
-  = Eff (StateC [Scope]
-  ( Eff (ErrorC TranslationError
-  ( Eff VoidC))))
+  = StateC [Scope]
+  ( ErrorC TranslationError VoidC)
 
 contextualizing :: ProcessT Translator Token Fragment
 contextualizing = repeatedly $ await >>= \case

@@ -27,7 +27,7 @@ data SomeAST where
 withSomeAST :: (forall grammar . Show grammar => AST [] grammar -> a) -> SomeAST -> a
 withSomeAST f (SomeAST ast) = f ast
 
-astParseBlob :: (Member (Error SomeException) sig, Member Task sig, Carrier sig m, Functor m) => Blob -> m SomeAST
+astParseBlob :: (Member (Error SomeException) sig, Member Task sig, Carrier sig m) => Blob -> m SomeAST
 astParseBlob blob@Blob{..}
   | Just (SomeASTParser parser) <- someASTParser blobLanguage = SomeAST <$> parse parser blob
   | otherwise = noLanguageForBlob blobPath

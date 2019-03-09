@@ -16,6 +16,7 @@ import           Analysis.TOCSummary (HasDeclaration)
 import           Control.Effect
 import           Control.Effect.Error
 import           Control.Exception
+import           Control.Lens
 import           Control.Monad.IO.Class
 import           Data.Blob
 import           Data.ByteString.Builder
@@ -33,7 +34,7 @@ import           Prologue
 import           Rendering.Graph
 import           Rendering.JSON hiding (JSON)
 import qualified Rendering.JSON
-import           Semantic.Api.Helpers
+import           Semantic.Api.Bridge
 import           Semantic.Api.V1.CodeAnalysisPB hiding (Blob, BlobPair, Language(..))
 import           Semantic.Task as Task
 import           Semantic.Telemetry as Stat
@@ -75,7 +76,7 @@ diffGraph blobs = DiffTreeGraphResponse . V.fromList . toList <$> distributeFor 
         pure (DiffTreeFileGraph path lang mempty mempty (V.fromList [ParseError (T.pack (show e))]))
       where
         path = T.pack $ pathForBlobPair blobPair
-        lang = languageToApiLanguage $ languageForBlobPair blobPair
+        lang = bridging # languageForBlobPair blobPair
 
         render :: (Foldable syntax, Functor syntax, ConstructorName syntax, Applicative m) => BlobPair -> Diff syntax Location Location -> m DiffTreeFileGraph
         render _ diff =
@@ -124,7 +125,7 @@ diffTerms blobs terms = time "diff" languageTag $ do
   diff <$ writeStat (Stat.count "diff.nodes" (bilength diff) languageTag)
   where languageTag = languageTagForBlobPair blobs
 
-doParse :: (Member (Error SomeException) sig, Member Distribute sig, Member Task sig, Carrier sig m, Monad m)
+doParse :: (Member (Error SomeException) sig, Member Distribute sig, Member Task sig, Carrier sig m)
   => BlobPair -> Decorate m Location ann -> m (SomeTermPair TermPairConstraints ann)
 doParse blobPair decorate = case languageForBlobPair blobPair of
   Go         -> SomeTermPair <$> distributeFor blobPair (\ blob -> parse goParser blob >>= decorate blob)
