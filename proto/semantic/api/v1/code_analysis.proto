@@ -51,12 +51,12 @@ message ParseTreeFileGraph {
 }
 
 message TermEdge {
-  int64 source = 1;
-  int64 target = 2;
+  int32 source = 1;
+  int32 target = 2;
 }
 
 message TermVertex {
-  int64 vertex_id = 1;
+  int32 vertex_id = 1;
   string term = 2;
   Span span = 3;
 }
@@ -112,12 +112,12 @@ message DiffTreeFileGraph {
 }
 
 message DiffTreeEdge {
-  int64 source = 1;
-  int64 target = 2;
+  int32 source = 1;
+  int32 target = 2;
 }
 
 message DiffTreeVertex {
-  int64 diff_vertex_id = 1;
+  int32 diff_vertex_id = 1;
   oneof diff_term {
     DeletedTerm deleted = 2;
     InsertedTerm inserted = 3;
@@ -195,8 +195,8 @@ message Docstring {
 }
 
 message Position {
-  int64 line = 1;
-  int64 column = 2;
+  int32 line = 1;
+  int32 column = 2;
 }
 
 message Span {
