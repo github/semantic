@@ -19,7 +19,7 @@ import Data.Reprinting.Token
 import Data.Reprinting.Scope
 
 -- | Default printing pipeline for JSON.
-defaultJSONPipeline :: (Member (Error TranslationError) sig, Carrier sig m, Monad m)
+defaultJSONPipeline :: (Member (Error TranslationError) sig, Carrier sig m)
   => ProcessT m Fragment Splice
 defaultJSONPipeline
   = printingJSON
@@ -56,7 +56,7 @@ defaultBeautyOpts :: JSONBeautyOpts
 defaultBeautyOpts = JSONBeautyOpts 2 False
 
 -- | Produce JSON with configurable whitespace and layout.
-beautifyingJSON :: (Member (Error TranslationError) sig, Carrier sig m, Monad m)
+beautifyingJSON :: (Member (Error TranslationError) sig, Carrier sig m)
   => JSONBeautyOpts -> ProcessT m Fragment Splice
 beautifyingJSON _ = repeatedly (await >>= step) where
   step (Defer el cs)   = lift (throwError (NoTranslation el cs))
@@ -70,7 +70,7 @@ beautifyingJSON _ = repeatedly (await >>= step) where
     _                    -> emit txt
 
 -- | Produce whitespace minimal JSON.
-minimizingJSON :: (Member (Error TranslationError) sig, Carrier sig m, Monad m)
+minimizingJSON :: (Member (Error TranslationError) sig, Carrier sig m)
   => ProcessT m Fragment Splice
 minimizingJSON = repeatedly (await >>= step) where
   step (Defer el cs)  = lift (throwError (NoTranslation el cs))

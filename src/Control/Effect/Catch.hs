@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveFunctor, ExistentialQuantification, FlexibleContexts, FlexibleInstances, LambdaCase,
+{-# LANGUAGE DeriveFunctor, ExistentialQuantification, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving,
              MultiParamTypeClasses, RankNTypes, StandaloneDeriving, TypeOperators, UndecidableInstances #-}
 
 -- | An effect that enables catching exceptions thrown from
@@ -11,7 +11,7 @@ module Control.Effect.Catch
   ) where
 
 import           Control.Effect.Carrier
-import           Control.Effect.Internal
+import           Control.Effect.Reader
 import           Control.Effect.Sum
 import qualified Control.Exception as Exc
 import           Control.Monad.IO.Class
@@ -37,26 +37,25 @@ catch :: (Member Catch sig, Carrier sig m, Exc.Exception e)
         => m a
         -> (e -> m a)
         -> m a
-catch go cleanup = send (CatchIO go cleanup ret)
+catch go cleanup = send (CatchIO go cleanup pure)
 
-runCatch :: (Carrier sig m, MonadIO m)
-         => (forall x . m x -> IO x)
-         -> Eff (CatchC m) a
-         -> m a
-runCatch handler = runCatchC handler . interpret
 
-newtype CatchC m a = CatchC ((forall x . m x -> IO x) -> m a)
+-- | Evaulate a 'Catch' effect.
+runCatch :: (forall x . m x -> IO x)
+           -> CatchC m a
+           -> m a
+runCatch handler = runReader (Handler handler) . runCatchC
 
-runCatchC :: (forall x . m x -> IO x) -> CatchC m a -> m a
-runCatchC handler (CatchC m) = m handler
+newtype Handler m = Handler (forall x . m x -> IO x)
+
+runHandler :: Handler m -> CatchC m a -> IO a
+runHandler h@(Handler handler) = handler . runReader h . runCatchC
+
+newtype CatchC m a = CatchC { runCatchC :: ReaderC (Handler m) m a }
+  deriving (Functor, Applicative, Monad, MonadIO)
 
 instance (Carrier sig m, MonadIO m) => Carrier (Catch :+: sig) (CatchC m) where
-  ret a = CatchC (const (ret a))
-  eff op = CatchC (\ handler -> handleSum
-    (eff . handlePure (runCatchC handler))
-    (\case
-        CatchIO go cleanup k -> liftIO (Exc.catch
-                                         (handler (runCatchC handler go))
-                                         (handler . runCatchC handler . cleanup))
-                                >>= runCatchC handler . k
-    ) op)
+  eff (L (CatchIO act cleanup k)) = do
+    handler <- CatchC ask
+    liftIO (Exc.catch (runHandler handler act) (runHandler handler . cleanup)) >>= k
+  eff (R other) = CatchC (eff (R (handleCoercible other)))
