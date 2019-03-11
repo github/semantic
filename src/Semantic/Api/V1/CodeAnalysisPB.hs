@@ -28,11 +28,11 @@ instance FromJSONPB PingRequest where
     <$> obj .: "service"
 
 instance ToJSONPB PingRequest where
-  toJSONPB PingRequest{..} = object $
+  toJSONPB PingRequest{..} = object
     [
       "service" .= service
     ]
-  toEncodingPB PingRequest{..} = pairs $
+  toEncodingPB PingRequest{..} = pairs
     [
       "service" .= service
     ]
@@ -69,14 +69,14 @@ instance FromJSONPB PingResponse where
     <*> obj .: "sha"
 
 instance ToJSONPB PingResponse where
-  toJSONPB PingResponse{..} = object $
+  toJSONPB PingResponse{..} = object
     [
       "status" .= status
     , "hostname" .= hostname
     , "timestamp" .= timestamp
     , "sha" .= sha
     ]
-  toEncodingPB PingResponse{..} = pairs $
+  toEncodingPB PingResponse{..} = pairs
     [
       "status" .= status
     , "hostname" .= hostname
@@ -116,11 +116,11 @@ instance FromJSONPB ParseTreeRequest where
     <$> obj .: "blobs"
 
 instance ToJSONPB ParseTreeRequest where
-  toJSONPB ParseTreeRequest{..} = object $
+  toJSONPB ParseTreeRequest{..} = object
     [
       "blobs" .= blobs
     ]
-  toEncodingPB ParseTreeRequest{..} = pairs $
+  toEncodingPB ParseTreeRequest{..} = pairs
     [
       "blobs" .= blobs
     ]
@@ -151,11 +151,11 @@ instance FromJSONPB ParseTreeSymbolResponse where
     <$> obj .: "files"
 
 instance ToJSONPB ParseTreeSymbolResponse where
-  toJSONPB ParseTreeSymbolResponse{..} = object $
+  toJSONPB ParseTreeSymbolResponse{..} = object
     [
       "files" .= files
     ]
-  toEncodingPB ParseTreeSymbolResponse{..} = pairs $
+  toEncodingPB ParseTreeSymbolResponse{..} = pairs
     [
       "files" .= files
     ]
@@ -186,11 +186,11 @@ instance FromJSONPB ParseTreeGraphResponse where
     <$> obj .: "files"
 
 instance ToJSONPB ParseTreeGraphResponse where
-  toJSONPB ParseTreeGraphResponse{..} = object $
+  toJSONPB ParseTreeGraphResponse{..} = object
     [
       "files" .= files
     ]
-  toEncodingPB ParseTreeGraphResponse{..} = pairs $
+  toEncodingPB ParseTreeGraphResponse{..} = pairs
     [
       "files" .= files
     ]
@@ -229,7 +229,7 @@ instance FromJSONPB ParseTreeFileGraph where
     <*> obj .: "errors"
 
 instance ToJSONPB ParseTreeFileGraph where
-  toJSONPB ParseTreeFileGraph{..} = object $
+  toJSONPB ParseTreeFileGraph{..} = object
     [
       "path" .= path
     , "language" .= language
@@ -237,7 +237,7 @@ instance ToJSONPB ParseTreeFileGraph where
     , "edges" .= edges
     , "errors" .= errors
     ]
-  toEncodingPB ParseTreeFileGraph{..} = pairs $
+  toEncodingPB ParseTreeFileGraph{..} = pairs
     [
       "path" .= path
     , "language" .= language
@@ -282,12 +282,12 @@ instance FromJSONPB TermEdge where
     <*> obj .: "target"
 
 instance ToJSONPB TermEdge where
-  toJSONPB TermEdge{..} = object $
+  toJSONPB TermEdge{..} = object
     [
       "source" .= source
     , "target" .= target
     ]
-  toEncodingPB TermEdge{..} = pairs $
+  toEncodingPB TermEdge{..} = pairs
     [
       "source" .= source
     , "target" .= target
@@ -325,13 +325,13 @@ instance FromJSONPB TermVertex where
     <*> obj .: "span"
 
 instance ToJSONPB TermVertex where
-  toJSONPB TermVertex{..} = object $
+  toJSONPB TermVertex{..} = object
     [
       "vertexId" .= vertexId
     , "term" .= term
     , "span" .= span
     ]
-  toEncodingPB TermVertex{..} = pairs $
+  toEncodingPB TermVertex{..} = pairs
     [
       "vertexId" .= vertexId
     , "term" .= term
@@ -368,11 +368,11 @@ instance FromJSONPB ParseError where
     <$> obj .: "error"
 
 instance ToJSONPB ParseError where
-  toJSONPB ParseError{..} = object $
+  toJSONPB ParseError{..} = object
     [
       "error" .= error
     ]
-  toEncodingPB ParseError{..} = pairs $
+  toEncodingPB ParseError{..} = pairs
     [
       "error" .= error
     ]
@@ -403,11 +403,11 @@ instance FromJSONPB DiffTreeRequest where
     <$> obj .: "blobs"
 
 instance ToJSONPB DiffTreeRequest where
-  toJSONPB DiffTreeRequest{..} = object $
+  toJSONPB DiffTreeRequest{..} = object
     [
       "blobs" .= blobs
     ]
-  toEncodingPB DiffTreeRequest{..} = pairs $
+  toEncodingPB DiffTreeRequest{..} = pairs
     [
       "blobs" .= blobs
     ]
@@ -438,11 +438,11 @@ instance FromJSONPB DiffTreeTOCResponse where
     <$> obj .: "files"
 
 instance ToJSONPB DiffTreeTOCResponse where
-  toJSONPB DiffTreeTOCResponse{..} = object $
+  toJSONPB DiffTreeTOCResponse{..} = object
     [
       "files" .= files
     ]
-  toEncodingPB DiffTreeTOCResponse{..} = pairs $
+  toEncodingPB DiffTreeTOCResponse{..} = pairs
     [
       "files" .= files
     ]
@@ -479,14 +479,14 @@ instance FromJSONPB TOCSummaryFile where
     <*> obj .: "errors"
 
 instance ToJSONPB TOCSummaryFile where
-  toJSONPB TOCSummaryFile{..} = object $
+  toJSONPB TOCSummaryFile{..} = object
     [
       "path" .= path
     , "language" .= language
     , "changes" .= changes
     , "errors" .= errors
     ]
-  toEncodingPB TOCSummaryFile{..} = pairs $
+  toEncodingPB TOCSummaryFile{..} = pairs
     [
       "path" .= path
     , "language" .= language
@@ -532,14 +532,14 @@ instance FromJSONPB TOCSummaryChange where
     <*> obj .: "changeType"
 
 instance ToJSONPB TOCSummaryChange where
-  toJSONPB TOCSummaryChange{..} = object $
+  toJSONPB TOCSummaryChange{..} = object
     [
       "category" .= category
     , "term" .= term
     , "span" .= span
     , "changeType" .= changeType
     ]
-  toEncodingPB TOCSummaryChange{..} = pairs $
+  toEncodingPB TOCSummaryChange{..} = pairs
     [
       "category" .= category
     , "term" .= term
@@ -581,12 +581,12 @@ instance FromJSONPB TOCSummaryError where
     <*> obj .: "span"
 
 instance ToJSONPB TOCSummaryError where
-  toJSONPB TOCSummaryError{..} = object $
+  toJSONPB TOCSummaryError{..} = object
     [
       "error" .= error
     , "span" .= span
     ]
-  toEncodingPB TOCSummaryError{..} = pairs $
+  toEncodingPB TOCSummaryError{..} = pairs
     [
       "error" .= error
     , "span" .= span
@@ -620,11 +620,11 @@ instance FromJSONPB DiffTreeGraphResponse where
     <$> obj .: "files"
 
 instance ToJSONPB DiffTreeGraphResponse where
-  toJSONPB DiffTreeGraphResponse{..} = object $
+  toJSONPB DiffTreeGraphResponse{..} = object
     [
       "files" .= files
     ]
-  toEncodingPB DiffTreeGraphResponse{..} = pairs $
+  toEncodingPB DiffTreeGraphResponse{..} = pairs
     [
       "files" .= files
     ]
@@ -663,7 +663,7 @@ instance FromJSONPB DiffTreeFileGraph where
     <*> obj .: "errors"
 
 instance ToJSONPB DiffTreeFileGraph where
-  toJSONPB DiffTreeFileGraph{..} = object $
+  toJSONPB DiffTreeFileGraph{..} = object
     [
       "path" .= path
     , "language" .= language
@@ -671,7 +671,7 @@ instance ToJSONPB DiffTreeFileGraph where
     , "edges" .= edges
     , "errors" .= errors
     ]
-  toEncodingPB DiffTreeFileGraph{..} = pairs $
+  toEncodingPB DiffTreeFileGraph{..} = pairs
     [
       "path" .= path
     , "language" .= language
@@ -716,12 +716,12 @@ instance FromJSONPB DiffTreeEdge where
     <*> obj .: "target"
 
 instance ToJSONPB DiffTreeEdge where
-  toJSONPB DiffTreeEdge{..} = object $
+  toJSONPB DiffTreeEdge{..} = object
     [
       "source" .= source
     , "target" .= target
     ]
-  toEncodingPB DiffTreeEdge{..} = pairs $
+  toEncodingPB DiffTreeEdge{..} = pairs
     [
       "source" .= source
     , "target" .= target
@@ -791,12 +791,12 @@ instance FromJSONPB DiffTreeVertex where
     <*> obj .: "diffTerm"
 
 instance ToJSONPB DiffTreeVertex where
-  toJSONPB DiffTreeVertex{..} = object $
+  toJSONPB DiffTreeVertex{..} = object
     [
       "diffVertexId" .= diffVertexId
     , "diffTerm" .= diffTerm
     ]
-  toEncodingPB DiffTreeVertex{..} = pairs $
+  toEncodingPB DiffTreeVertex{..} = pairs
     [
       "diffVertexId" .= diffVertexId
     , "diffTerm" .= diffTerm
@@ -844,12 +844,12 @@ instance FromJSONPB DeletedTerm where
     <*> obj .: "span"
 
 instance ToJSONPB DeletedTerm where
-  toJSONPB DeletedTerm{..} = object $
+  toJSONPB DeletedTerm{..} = object
     [
       "term" .= term
     , "span" .= span
     ]
-  toEncodingPB DeletedTerm{..} = pairs $
+  toEncodingPB DeletedTerm{..} = pairs
     [
       "term" .= term
     , "span" .= span
@@ -885,12 +885,12 @@ instance FromJSONPB InsertedTerm where
     <*> obj .: "span"
 
 instance ToJSONPB InsertedTerm where
-  toJSONPB InsertedTerm{..} = object $
+  toJSONPB InsertedTerm{..} = object
     [
       "term" .= term
     , "span" .= span
     ]
-  toEncodingPB InsertedTerm{..} = pairs $
+  toEncodingPB InsertedTerm{..} = pairs
     [
       "term" .= term
     , "span" .= span
@@ -930,14 +930,14 @@ instance FromJSONPB ReplacedTerm where
     <*> obj .: "afterSpan"
 
 instance ToJSONPB ReplacedTerm where
-  toJSONPB ReplacedTerm{..} = object $
+  toJSONPB ReplacedTerm{..} = object
     [
       "beforeTerm" .= beforeTerm
     , "beforeSpan" .= beforeSpan
     , "afterTerm" .= afterTerm
     , "afterSpan" .= afterSpan
     ]
-  toEncodingPB ReplacedTerm{..} = pairs $
+  toEncodingPB ReplacedTerm{..} = pairs
     [
       "beforeTerm" .= beforeTerm
     , "beforeSpan" .= beforeSpan
@@ -981,13 +981,13 @@ instance FromJSONPB MergedTerm where
     <*> obj .: "afterSpan"
 
 instance ToJSONPB MergedTerm where
-  toJSONPB MergedTerm{..} = object $
+  toJSONPB MergedTerm{..} = object
     [
       "term" .= term
     , "beforeSpan" .= beforeSpan
     , "afterSpan" .= afterSpan
     ]
-  toEncodingPB MergedTerm{..} = pairs $
+  toEncodingPB MergedTerm{..} = pairs
     [
       "term" .= term
     , "beforeSpan" .= beforeSpan
@@ -1028,13 +1028,13 @@ instance FromJSONPB Blob where
     <*> obj .: "language"
 
 instance ToJSONPB Blob where
-  toJSONPB Blob{..} = object $
+  toJSONPB Blob{..} = object
     [
       "content" .= content
     , "path" .= path
     , "language" .= language
     ]
-  toEncodingPB Blob{..} = pairs $
+  toEncodingPB Blob{..} = pairs
     [
       "content" .= content
     , "path" .= path
@@ -1073,12 +1073,12 @@ instance FromJSONPB BlobPair where
     <*> obj .: "after"
 
 instance ToJSONPB BlobPair where
-  toJSONPB BlobPair{..} = object $
+  toJSONPB BlobPair{..} = object
     [
       "before" .= before
     , "after" .= after
     ]
-  toEncodingPB BlobPair{..} = pairs $
+  toEncodingPB BlobPair{..} = pairs
     [
       "before" .= before
     , "after" .= after
@@ -1118,14 +1118,14 @@ instance FromJSONPB File where
     <*> obj .: "errors"
 
 instance ToJSONPB File where
-  toJSONPB File{..} = object $
+  toJSONPB File{..} = object
     [
       "path" .= path
     , "language" .= language
     , "symbols" .= symbols
     , "errors" .= errors
     ]
-  toEncodingPB File{..} = pairs $
+  toEncodingPB File{..} = pairs
     [
       "path" .= path
     , "language" .= language
@@ -1173,7 +1173,7 @@ instance FromJSONPB Symbol where
     <*> obj .: "docs"
 
 instance ToJSONPB Symbol where
-  toJSONPB Symbol{..} = object $
+  toJSONPB Symbol{..} = object
     [
       "symbol" .= symbol
     , "kind" .= kind
@@ -1181,7 +1181,7 @@ instance ToJSONPB Symbol where
     , "span" .= span
     , "docs" .= docs
     ]
-  toEncodingPB Symbol{..} = pairs $
+  toEncodingPB Symbol{..} = pairs
     [
       "symbol" .= symbol
     , "kind" .= kind
@@ -1224,11 +1224,11 @@ instance FromJSONPB Docstring where
     <$> obj .: "docstring"
 
 instance ToJSONPB Docstring where
-  toJSONPB Docstring{..} = object $
+  toJSONPB Docstring{..} = object
     [
       "docstring" .= docstring
     ]
-  toEncodingPB Docstring{..} = pairs $
+  toEncodingPB Docstring{..} = pairs
     [
       "docstring" .= docstring
     ]
@@ -1261,12 +1261,12 @@ instance FromJSONPB Position where
     <*> obj .: "column"
 
 instance ToJSONPB Position where
-  toJSONPB Position{..} = object $
+  toJSONPB Position{..} = object
     [
       "line" .= line
     , "column" .= column
     ]
-  toEncodingPB Position{..} = pairs $
+  toEncodingPB Position{..} = pairs
     [
       "line" .= line
     , "column" .= column
@@ -1302,12 +1302,12 @@ instance FromJSONPB Span where
     <*> obj .: "end"
 
 instance ToJSONPB Span where
-  toJSONPB Span{..} = object $
+  toJSONPB Span{..} = object
     [
       "start" .= start
     , "end" .= end
     ]
-  toEncodingPB Span{..} = pairs $
+  toEncodingPB Span{..} = pairs
     [
       "start" .= start
     , "end" .= end
