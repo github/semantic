@@ -213,7 +213,7 @@ instance Message ParseTreeGraphResponse where
 
 data ParseTreeFileGraph = ParseTreeFileGraph
   { path :: Text
-  , language :: Language
+  , language :: Text
   , vertices :: Vector TermVertex
   , edges :: Vector TermEdge
   , errors :: Vector ParseError
@@ -465,7 +465,7 @@ instance Message DiffTreeTOCResponse where
 
 data TOCSummaryFile = TOCSummaryFile
   { path :: Text
-  , language :: Language
+  , language :: Text
   , changes :: Vector TOCSummaryChange
   , errors :: Vector TOCSummaryError
   } deriving stock (Eq, Ord, Show, Generic)
@@ -647,7 +647,7 @@ instance Message DiffTreeGraphResponse where
 
 data DiffTreeFileGraph = DiffTreeFileGraph
   { path :: Text
-  , language :: Language
+  , language :: Text
   , vertices :: Vector DiffTreeVertex
   , edges :: Vector DiffTreeEdge
   , errors :: Vector ParseError
@@ -1017,7 +1017,7 @@ instance Message MergedTerm where
 data Blob = Blob
   { content :: Text
   , path :: Text
-  , language :: Language
+  , language :: Text
   } deriving stock (Eq, Ord, Show, Generic)
     deriving anyclass (Named, NFData)
 
@@ -1104,7 +1104,7 @@ instance Message BlobPair where
 
 data File = File
   { path :: Text
-  , language :: Language
+  , language :: Text
   , symbols :: Vector Symbol
   , errors :: Vector ParseError
   } deriving stock (Eq, Ord, Show, Generic)
@@ -1357,50 +1357,5 @@ instance FromJSON ChangeType where
   parseJSON = parseJSONPB
 
 instance ToJSON ChangeType where
-  toJSON = toAesonValue
-  toEncoding = toAesonEncoding
-
-data Language
-  = Unknown
-  | Go
-  | Haskell
-  | Java
-  | Javascript
-  | Json
-  | Jsx
-  | Markdown
-  | Python
-  | Ruby
-  | Typescript
-  | Php
-  deriving stock (Eq, Ord, Show, Enum, Bounded, Generic)
-  deriving anyclass (Named, MessageField, NFData)
-  deriving Primitive via PrimitiveEnum Language
-
-instance HasDefault Language where def = Unknown
-
-instance FromJSONPB Language where
-  parseJSONPB (JSONPB.String "UNKNOWN") = pure Unknown
-  parseJSONPB (JSONPB.String "GO") = pure Go
-  parseJSONPB (JSONPB.String "HASKELL") = pure Haskell
-  parseJSONPB (JSONPB.String "JAVA") = pure Java
-  parseJSONPB (JSONPB.String "JAVASCRIPT") = pure Javascript
-  parseJSONPB (JSONPB.String "JSON") = pure Json
-  parseJSONPB (JSONPB.String "JSX") = pure Jsx
-  parseJSONPB (JSONPB.String "MARKDOWN") = pure Markdown
-  parseJSONPB (JSONPB.String "PYTHON") = pure Python
-  parseJSONPB (JSONPB.String "RUBY") = pure Ruby
-  parseJSONPB (JSONPB.String "TYPESCRIPT") = pure Typescript
-  parseJSONPB (JSONPB.String "PHP") = pure Php
-  parseJSONPB x = typeMismatch "Language" x
-
-instance ToJSONPB Language where
-  toJSONPB x _ = A.String . T.toUpper . T.pack $ show x
-  toEncodingPB x _ = E.text . T.toUpper . T.pack  $ show x
-
-instance FromJSON Language where
-  parseJSON = parseJSONPB
-
-instance ToJSON Language where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding
