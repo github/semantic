@@ -314,7 +314,7 @@ instance Message TermEdge where
 data TermVertex = TermVertex
   { vertexId :: Int32
   , term :: Text
-  , span :: (Maybe Span)
+  , span :: Maybe Span
   } deriving stock (Eq, Ord, Show, Generic)
     deriving anyclass (Named, NFData)
 
@@ -519,7 +519,7 @@ instance Message TOCSummaryFile where
 data TOCSummaryChange = TOCSummaryChange
   { category :: Text
   , term :: Text
-  , span :: (Maybe Span)
+  , span :: Maybe Span
   , changeType :: ChangeType
   } deriving stock (Eq, Ord, Show, Generic)
     deriving anyclass (Named, NFData)
@@ -571,7 +571,7 @@ instance Message TOCSummaryChange where
 
 data TOCSummaryError = TOCSummaryError
   { error :: Text
-  , span :: (Maybe Span)
+  , span :: Maybe Span
   } deriving stock (Eq, Ord, Show, Generic)
     deriving anyclass (Named, NFData)
 
@@ -834,7 +834,7 @@ instance Message DiffTreeVertex where
 
 data DeletedTerm = DeletedTerm
   { term :: Text
-  , span :: (Maybe Span)
+  , span :: Maybe Span
   } deriving stock (Eq, Ord, Show, Generic)
     deriving anyclass (Named, NFData)
 
@@ -875,7 +875,7 @@ instance Message DeletedTerm where
 
 data InsertedTerm = InsertedTerm
   { term :: Text
-  , span :: (Maybe Span)
+  , span :: Maybe Span
   } deriving stock (Eq, Ord, Show, Generic)
     deriving anyclass (Named, NFData)
 
@@ -916,9 +916,9 @@ instance Message InsertedTerm where
 
 data ReplacedTerm = ReplacedTerm
   { beforeTerm :: Text
-  , beforeSpan :: (Maybe Span)
+  , beforeSpan :: Maybe Span
   , afterTerm :: Text
-  , afterSpan :: (Maybe Span)
+  , afterSpan :: Maybe Span
   } deriving stock (Eq, Ord, Show, Generic)
     deriving anyclass (Named, NFData)
 
@@ -969,8 +969,8 @@ instance Message ReplacedTerm where
 
 data MergedTerm = MergedTerm
   { term :: Text
-  , beforeSpan :: (Maybe Span)
-  , afterSpan :: (Maybe Span)
+  , beforeSpan :: Maybe Span
+  , afterSpan :: Maybe Span
   } deriving stock (Eq, Ord, Show, Generic)
     deriving anyclass (Named, NFData)
 
@@ -1062,8 +1062,8 @@ instance Message Blob where
   dotProto = undefined
 
 data BlobPair = BlobPair
-  { before :: (Maybe Blob)
-  , after :: (Maybe Blob)
+  { before :: Maybe Blob
+  , after :: Maybe Blob
   } deriving stock (Eq, Ord, Show, Generic)
     deriving anyclass (Named, NFData)
 
@@ -1159,8 +1159,8 @@ data Symbol = Symbol
   { symbol :: Text
   , kind :: Text
   , line :: Text
-  , span :: (Maybe Span)
-  , docs :: (Maybe Docstring)
+  , span :: Maybe Span
+  , docs :: Maybe Docstring
   } deriving stock (Eq, Ord, Show, Generic)
     deriving anyclass (Named, NFData)
 
@@ -1291,8 +1291,8 @@ instance Message Position where
   dotProto = undefined
 
 data Span = Span
-  { start :: (Maybe Position)
-  , end :: (Maybe Position)
+  { start :: Maybe Position
+  , end :: Maybe Position
   } deriving stock (Eq, Ord, Show, Generic)
     deriving anyclass (Named, NFData)
 
