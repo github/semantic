@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: semigroupoids
-version: 5.3.1
+version: 5.3.2
 summary: 'Semigroupoids: Category sans id'
 homepage: https://github.com/ekmett/semigroupoids
 license: bsd-2-clause
