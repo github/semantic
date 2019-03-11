@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: parser-combinators
-version: 1.0.0
+version: 1.0.1
 summary: Lightweight package providing commonly useful parser combinators
 homepage: https://github.com/mrkkrp/parser-combinators
 license: bsd-3-clause

@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: vector-builder
-version: 0.3.6
+version: 0.3.7.2
 summary: Vector builder
 homepage: https://github.com/nikita-volkov/vector-builder
 license: mit
