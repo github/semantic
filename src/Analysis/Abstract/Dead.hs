@@ -32,20 +32,21 @@ subterms term = term `cons` para (foldMap (uncurry cons)) term
 
 
 revivingTerms :: ( Member (State (Dead term)) sig
-                 , Ord term
-                 , Carrier sig m
-                 )
+                , Ord term
+                , Carrier sig m
+                )
               => Open (term -> Evaluator term address value m a)
 revivingTerms recur term = revive term *> recur term
 
 killingModules :: ( Foldable (Base term)
-                  , Member (State (Dead term)) sig
-                  , Ord term
-                  , Recursive term
-                  , Carrier sig m
-                  )
+                 , Member (State (Dead term)) sig
+                 , Ord term
+                 , Recursive term
+                 , Carrier sig m
+                 )
                => Open (Module term -> Evaluator term address value m a)
 killingModules recur m = killAll (subterms (moduleBody m)) *> recur m
 
-providingDeadSet :: (Carrier sig m, Effect sig) => Evaluator term address value (StateC (Dead term) (Evaluator term address value m)) a -> Evaluator term address value m (Dead term, a)
+providingDeadSet :: Evaluator term address value (StateC (Dead term) (Evaluator term address value m)) a
+                 -> Evaluator term address value m (Dead term, a)
 providingDeadSet = runState lowerBound . runEvaluator

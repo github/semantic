@@ -239,7 +239,7 @@ library
                      -- API
                      , Semantic.Api
                      , Semantic.Api.Diffs
-                     , Semantic.Api.Helpers
+                     , Semantic.Api.Bridge
                      , Semantic.Api.LegacyTypes
                      , Semantic.Api.Symbols
                      , Semantic.Api.Terms

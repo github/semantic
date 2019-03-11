@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, LambdaCase, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, TypeOperators, UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-missing-signatures #-}
 module Semantic.REPL
 ( rubyREPL
@@ -100,20 +100,23 @@ repl proxy parser paths =
 -- TODO: drive the flow from within the REPL instead of from without
 
 
-runTelemetryIgnoringStat :: (Carrier sig m, MonadIO m) => LogOptions -> Eff (TelemetryIgnoringStatC m) a -> m a
-runTelemetryIgnoringStat logOptions = flip runTelemetryIgnoringStatC logOptions . interpret
+runTelemetryIgnoringStat :: LogOptions -> TelemetryIgnoringStatC m a -> m a
+runTelemetryIgnoringStat logOptions = runReader logOptions . runTelemetryIgnoringStatC
 
-newtype TelemetryIgnoringStatC m a = TelemetryIgnoringStatC { runTelemetryIgnoringStatC :: LogOptions -> m a }
+newtype TelemetryIgnoringStatC m a = TelemetryIgnoringStatC { runTelemetryIgnoringStatC :: ReaderC LogOptions m a }
+  deriving (Applicative, Functor, Monad, MonadIO)
 
 instance (Carrier sig m, MonadIO m) => Carrier (Telemetry :+: sig) (TelemetryIgnoringStatC m) where
-  ret = TelemetryIgnoringStatC . const . ret
-  eff op = TelemetryIgnoringStatC (\ logOptions -> handleSum (eff . handleReader logOptions runTelemetryIgnoringStatC) (\case
-    WriteStat _                  k -> runTelemetryIgnoringStatC k logOptions
-    WriteLog level message pairs k -> do
-      time <- liftIO Time.getCurrentTime
-      zonedTime <- liftIO (LocalTime.utcToLocalZonedTime time)
-      writeLogMessage logOptions (Message level message pairs zonedTime)
-      runTelemetryIgnoringStatC k logOptions) op)
+  eff (R other) = TelemetryIgnoringStatC . eff . R . handleCoercible $ other
+  eff (L op) = do
+    logOptions <- TelemetryIgnoringStatC ask
+    case op of
+      WriteStat _                  k -> k
+      WriteLog level message pairs k -> do
+        time <- liftIO Time.getCurrentTime
+        zonedTime <- liftIO (LocalTime.utcToLocalZonedTime time)
+        writeLogMessage logOptions (Message level message pairs zonedTime)
+        k
 
 step :: ( Member (Error SomeException) sig
         , Member REPL sig

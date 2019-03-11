@@ -58,40 +58,30 @@ justEvaluating :: Evaluator
                         (Value term Precise)
                         (ResumableC
                            (BaseError (ValueError term Precise))
-                           (Eff
                               (ResumableC
                                  (BaseError (AddressError Precise (Value term Precise)))
-                                 (Eff
                                     (ResumableC
                                        (BaseError ResolutionError)
-                                       (Eff
                                           (ResumableC
                                              (BaseError
                                                 (EvalError term Precise (Value term Precise)))
-                                             (Eff
                                                 (ResumableC
                                                    (BaseError (HeapError Precise))
-                                                   (Eff
                                                       (ResumableC
                                                          (BaseError (ScopeError Precise))
-                                                         (Eff
                                                             (ResumableC
                                                                (BaseError
                                                                   (UnspecializedError
                                                                      Precise (Value term Precise)))
-                                                               (Eff
                                                                   (ResumableC
                                                                      (BaseError
                                                                         (LoadError
                                                                            Precise
                                                                            (Value term Precise)))
-                                                                     (Eff
                                                                         (FreshC
-                                                                           (Eff
                                                                               (StateC
                                                                                  (ScopeGraph
                                                                                     Precise)
-                                                                                 (Eff
                                                                                     (StateC
                                                                                        (Heap
                                                                                           Precise
@@ -99,11 +89,9 @@ justEvaluating :: Evaluator
                                                                                           (Value
                                                                                              term
                                                                                              Precise))
-                                                                                       (Eff
                                                                                           (TraceByPrintingC
-                                                                                             (Eff
                                                                                                 (LiftC
-                                                                                                   IO)))))))))))))))))))))))))
+                                                                                                   IO)))))))))))))
                         result
                       -> IO
                            (Heap Precise Precise (Value term Precise),
@@ -148,18 +136,18 @@ justEvaluatingCatchingErrors :: ( hole ~ Hole (Maybe Name) Precise
        value
        (ResumableWithC
           (BaseError (ValueError term hole))
-          (Eff (ResumableWithC (BaseError (AddressError hole value))
-          (Eff (ResumableWithC (BaseError ResolutionError)
-          (Eff (ResumableWithC (BaseError (EvalError term hole value))
-          (Eff (ResumableWithC (BaseError (HeapError hole))
-          (Eff (ResumableWithC (BaseError (ScopeError hole))
-          (Eff (ResumableWithC (BaseError (UnspecializedError hole value))
-          (Eff (ResumableWithC (BaseError (LoadError hole value))
-          (Eff (FreshC
-          (Eff (StateC (ScopeGraph hole)
-          (Eff (StateC (Heap hole hole (Concrete.Value (Quieterm (Sum lang) Location) (Hole (Maybe Name) Precise)))
-          (Eff (TraceByPrintingC
-          (Eff (LiftC IO))))))))))))))))))))))))) a
+          (ResumableWithC (BaseError (AddressError hole value))
+          (ResumableWithC (BaseError ResolutionError)
+          (ResumableWithC (BaseError (EvalError term hole value))
+          (ResumableWithC (BaseError (HeapError hole))
+          (ResumableWithC (BaseError (ScopeError hole))
+          (ResumableWithC (BaseError (UnspecializedError hole value))
+          (ResumableWithC (BaseError (LoadError hole value))
+          (FreshC
+          (StateC (ScopeGraph hole)
+          (StateC (Heap hole hole (Concrete.Value (Quieterm (Sum lang) Location) (Hole (Maybe Name) Precise)))
+          (TraceByPrintingC
+          (LiftC IO))))))))))))) a
      -> IO (Heap hole hole value, (ScopeGraph hole, a))
 justEvaluatingCatchingErrors
   = runM
@@ -185,84 +173,66 @@ checking
        (ResumableC
           (BaseError
              Type.TypeError)
-          (Eff
              (StateC
                 Type.TypeMap
-                (Eff
                    (ResumableC
                       (BaseError
                          (AddressError
                             Monovariant
                             Type.Type))
-                      (Eff
                          (ResumableC
                             (BaseError
                                (EvalError
                                   term
                                   Monovariant
                                   Type.Type))
-                            (Eff
                                (ResumableC
                                   (BaseError
                                      ResolutionError)
-                                  (Eff
                                      (ResumableC
                                         (BaseError
                                            (HeapError
                                               Monovariant))
-                                        (Eff
                                            (ResumableC
                                               (BaseError
                                                  (ScopeError
                                                     Monovariant))
-                                              (Eff
                                                  (ResumableC
                                                     (BaseError
                                                        (UnspecializedError
                                                           Monovariant
                                                           Type.Type))
-                                                    (Eff
                                                        (ResumableC
                                                           (BaseError
                                                              (LoadError
                                                                 Monovariant
                                                                 Type.Type))
-                                                          (Eff
                                                              (ReaderC
                                                                 (Live
                                                                    Monovariant)
-                                                                (Eff
-                                                                   (AltC
-                                                                      []
-                                                                      (Eff
+                                                                   (NonDetC
                                                                          (ReaderC
                                                                             (Cache
                                                                                term
                                                                                Monovariant
                                                                                Type.Type)
-                                                                            (Eff
                                                                                (StateC
                                                                                   (Cache
                                                                                      term
                                                                                      Monovariant
                                                                                      Type.Type)
-                                                                                  (Eff
                                                                                      (FreshC
-                                                                                        (Eff
                                                                                            (StateC
                                                                                               (ScopeGraph
                                                                                                  Monovariant)
-                                                                                              (Eff
                                                                                                  (StateC
                                                                                                     (Heap
                                                                                                        Monovariant
                                                                                                        Monovariant
                                                                                                        Type.Type)
-                                                                                                    (Eff
                                                                                                        (TraceByPrintingC
-                                                                                                          (Eff
                                                                                                              (LiftC
-                                                                                                                IO)))))))))))))))))))))))))))))))))))
+                                                                                                                IO))))))))))))))))))
        result
      -> IO
           (Heap
@@ -567,17 +537,18 @@ callGraphRubyProject :: [FilePath] -> IO (Graph ControlFlowVertex, [Module ()])
 callGraphRubyProject = callGraphProject rubyParser (Proxy @'Language.Ruby)
 
 type EvalEffects qterm err = ResumableC (BaseError err)
-                         (Eff (ResumableC (BaseError (AddressError Precise (Value qterm Precise)))
-                         (Eff (ResumableC (BaseError ResolutionError)
-                         (Eff (ResumableC (BaseError (EvalError qterm Precise (Value qterm Precise)))
-                         (Eff (ResumableC (BaseError (HeapError Precise))
-                         (Eff (ResumableC (BaseError (ScopeError Precise))
-                         (Eff (ResumableC (BaseError (UnspecializedError Precise (Value qterm Precise)))
-                         (Eff (ResumableC (BaseError (LoadError Precise (Value qterm Precise)))
-                         (Eff (FreshC (Eff (StateC (ScopeGraph Precise)
-                         (Eff (StateC (Heap Precise Precise (Value qterm Precise))
-                         (Eff (TraceByPrintingC
-                         (Eff (LiftC IO))))))))))))))))))))))))
+                         (ResumableC (BaseError (AddressError Precise (Value qterm Precise)))
+                         (ResumableC (BaseError ResolutionError)
+                         (ResumableC (BaseError (EvalError qterm Precise (Value qterm Precise)))
+                         (ResumableC (BaseError (HeapError Precise))
+                         (ResumableC (BaseError (ScopeError Precise))
+                         (ResumableC (BaseError (UnspecializedError Precise (Value qterm Precise)))
+                         (ResumableC (BaseError (LoadError Precise (Value qterm Precise)))
+                         (FreshC
+                         (StateC (ScopeGraph Precise)
+                         (StateC (Heap Precise Precise (Value qterm Precise))
+                         (TraceByPrintingC
+                         (LiftC IO))))))))))))
 
 type LanguageSyntax lang syntax = ( Language.SLanguage lang
                                   , HasPrelude lang
@@ -646,18 +617,18 @@ evaluateProjectForScopeGraph :: ( term ~ Term (Sum syntax) Location
                              -> IO (Evaluator qterm address
                                     (Value qterm address)
                                     (ResumableWithC (BaseError (ValueError qterm address))
-                               (Eff (ResumableWithC (BaseError (AddressError address (Value qterm address)))
-                               (Eff (ResumableWithC (BaseError ResolutionError)
-                               (Eff (ResumableWithC (BaseError (EvalError qterm address (Value qterm address)))
-                               (Eff (ResumableWithC (BaseError (HeapError address))
-                               (Eff (ResumableWithC (BaseError (ScopeError address))
-                               (Eff (ResumableWithC (BaseError (UnspecializedError address (Value qterm address)))
-                               (Eff (ResumableWithC (BaseError (LoadError address (Value qterm address)))
-                               (Eff (FreshC
-                               (Eff (StateC (ScopeGraph address)
-                               (Eff (StateC (Heap address address (Value qterm address))
-                               (Eff (TraceByPrintingC
-                               (Eff (LiftC IO)))))))))))))))))))))))))
+                               (ResumableWithC (BaseError (AddressError address (Value qterm address)))
+                               (ResumableWithC (BaseError ResolutionError)
+                               (ResumableWithC (BaseError (EvalError qterm address (Value qterm address)))
+                               (ResumableWithC (BaseError (HeapError address))
+                               (ResumableWithC (BaseError (ScopeError address))
+                               (ResumableWithC (BaseError (UnspecializedError address (Value qterm address)))
+                               (ResumableWithC (BaseError (LoadError address (Value qterm address)))
+                               (FreshC
+                               (StateC (ScopeGraph address)
+                               (StateC (Heap address address (Value qterm address))
+                               (TraceByPrintingC
+                               (LiftC IO)))))))))))))
                              (ModuleTable (Module
                                 (ModuleResult address (Value qterm address)))))
 evaluateProjectForScopeGraph proxy parser project = runTask' $ do
@@ -681,22 +652,23 @@ evaluateProjectWithCaching :: ( term ~ Term (Sum syntax) Location
                           -> FilePath
                           -> IO (Evaluator qterm Monovariant Type
                                   (ResumableC (BaseError Type.TypeError)
-                                  (Eff (StateC TypeMap
-                                  (Eff (ResumableC (BaseError (AddressError Monovariant Type))
-                                  (Eff (ResumableC (BaseError (EvalError qterm Monovariant Type))
-                                  (Eff (ResumableC (BaseError ResolutionError)
-                                  (Eff (ResumableC (BaseError (HeapError Monovariant))
-                                  (Eff (ResumableC (BaseError (ScopeError Monovariant))
-                                  (Eff (ResumableC (BaseError (UnspecializedError Monovariant Type))
-                                  (Eff (ResumableC (BaseError (LoadError Monovariant Type))
-                                  (Eff (ReaderC (Live Monovariant)
-                                  (Eff (AltC []
-                                  (Eff (ReaderC (Analysis.Abstract.Caching.FlowSensitive.Cache (Data.Quieterm.Quieterm (Sum syntax) Data.Location.Location) Monovariant Type)
-                                  (Eff (StateC (Analysis.Abstract.Caching.FlowSensitive.Cache (Data.Quieterm.Quieterm (Sum syntax) Data.Location.Location) Monovariant Type)
-                                  (Eff (FreshC
-                                  (Eff (StateC (ScopeGraph Monovariant)
-                                  (Eff (StateC (Heap Monovariant Monovariant Type)
-                                  (Eff (TraceByPrintingC (Eff (LiftC IO)))))))))))))))))))))))))))))))))))
+                                  (StateC TypeMap
+                                  (ResumableC (BaseError (AddressError Monovariant Type))
+                                  (ResumableC (BaseError (EvalError qterm Monovariant Type))
+                                  (ResumableC (BaseError ResolutionError)
+                                  (ResumableC (BaseError (HeapError Monovariant))
+                                  (ResumableC (BaseError (ScopeError Monovariant))
+                                  (ResumableC (BaseError (UnspecializedError Monovariant Type))
+                                  (ResumableC (BaseError (LoadError Monovariant Type))
+                                  (ReaderC (Live Monovariant)
+                                  (NonDetC
+                                  (ReaderC (Analysis.Abstract.Caching.FlowSensitive.Cache (Data.Quieterm.Quieterm (Sum syntax) Data.Location.Location) Monovariant Type)
+                                  (StateC (Analysis.Abstract.Caching.FlowSensitive.Cache (Data.Quieterm.Quieterm (Sum syntax) Data.Location.Location) Monovariant Type)
+                                  (FreshC
+                                  (StateC (ScopeGraph Monovariant)
+                                  (StateC (Heap Monovariant Monovariant Type)
+                                  (TraceByPrintingC
+                                   (LiftC IO))))))))))))))))))
                                  (ModuleTable (Module (ModuleResult Monovariant Type))))
 evaluateProjectWithCaching proxy parser path = runTask' $ do
   project <- readProject Nothing path (Language.reflect proxy) []

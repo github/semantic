@@ -69,7 +69,7 @@ evaluate
         . runValueError
         . runAddressError
         . runEvalError
-        . runDeref @Val
+        . runDeref @SpecEff
         . runAllocator
         . runReturn
         . runLoopControl
@@ -85,29 +85,29 @@ reassociate = mergeErrors . mergeErrors . mergeErrors . mergeErrors . mergeError
 type Val = Value SpecEff Precise
 newtype SpecEff = SpecEff
   { runSpecEff :: Evaluator SpecEff Precise Val (FunctionC SpecEff Precise Val
-                 (Eff (BooleanC Val
-                 (Eff (NumericC Val
-                 (Eff (ErrorC (LoopControl Val)
-                 (Eff (ErrorC (Return Val)
-                 (Eff (AllocatorC Precise
-                 (Eff (DerefC Precise Val
-                 (Eff (ResumableC (BaseError (EvalError SpecEff Precise Val))
-                 (Eff (ResumableC (BaseError (AddressError Precise Val))
-                 (Eff (ResumableC (BaseError (ValueError SpecEff Precise))
-                 (Eff (ResumableC (BaseError (HeapError Precise))
-                 (Eff (ResumableC (BaseError (ScopeError Precise))
-                 (Eff (ReaderC (CurrentFrame Precise)
-                 (Eff (ReaderC (CurrentScope Precise)
-                 (Eff (AllocatorC Precise
-                 (Eff (ReaderC Span
-                 (Eff (StateC Span
-                 (Eff (ReaderC ModuleInfo
-                 (Eff (ReaderC PackageInfo
-                 (Eff (FreshC
-                 (Eff (StateC (Heap Precise Precise Val)
-                 (Eff (StateC (ScopeGraph Precise)
-                 (Eff (TraceByIgnoringC
-                 (Eff (LiftC IO)))))))))))))))))))))))))))))))))))))))))))))))
+                 (BooleanC Val
+                 (NumericC Val
+                 (ErrorC (LoopControl Val)
+                 (ErrorC (Return Val)
+                 (AllocatorC Precise
+                 (DerefC Precise Val
+                 (ResumableC (BaseError (EvalError SpecEff Precise Val))
+                 (ResumableC (BaseError (AddressError Precise Val))
+                 (ResumableC (BaseError (ValueError SpecEff Precise))
+                 (ResumableC (BaseError (HeapError Precise))
+                 (ResumableC (BaseError (ScopeError Precise))
+                 (ReaderC (CurrentFrame Precise)
+                 (ReaderC (CurrentScope Precise)
+                 (AllocatorC Precise
+                 (ReaderC Span
+                 (StateC Span
+                 (ReaderC ModuleInfo
+                 (ReaderC PackageInfo
+                 (FreshC
+                 (StateC (Heap Precise Precise Val)
+                 (StateC (ScopeGraph Precise)
+                 (TraceByIgnoringC
+                 (LiftC IO))))))))))))))))))))))))
                  Val
   }
 

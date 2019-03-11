@@ -1,4 +1,4 @@
-{-# LANGUAGE ExistentialQuantification, TypeOperators, RankNTypes, UndecidableInstances #-}
+{-# LANGUAGE ExistentialQuantification, GeneralizedNewtypeDeriving, TypeOperators, RankNTypes, UndecidableInstances #-}
 module Semantic.Timeout
 ( timeout
 , Timeout
@@ -9,6 +9,7 @@ module Semantic.Timeout
 
 import           Control.Effect
 import           Control.Effect.Carrier
+import           Control.Effect.Reader
 import           Control.Effect.Sum
 import           Control.Monad.IO.Class
 import           Data.Duration
@@ -18,7 +19,7 @@ import qualified System.Timeout as System
 -- within the specified duration. Uses 'System.Timeout.timeout' so all caveats
 -- about not operating over FFI boundaries apply.
 timeout :: (Member Timeout sig, Carrier sig m) => Duration -> m output -> m (Maybe output)
-timeout n = send . flip (Timeout n) ret
+timeout n = send . flip (Timeout n) pure
 
 -- | 'Timeout' effects run other effects, aborting them if they exceed the
 -- specified duration.
@@ -33,20 +34,22 @@ instance HFunctor Timeout where
 instance Effect Timeout where
   handle state handler (Timeout n task k) = Timeout n (handler (task <$ state)) (handler . maybe (k Nothing <$ state) (fmap (k . Just)))
 
--- | Evaulate a 'Timeoute' effect.
-runTimeout :: (Carrier sig m, MonadIO m)
-           => (forall x . m x -> IO x)
-           -> Eff (TimeoutC m) a
+-- | Evaulate a 'Timeout' effect.
+runTimeout :: (forall x . m x -> IO x)
+           -> TimeoutC m a
            -> m a
-runTimeout handler = runTimeoutC handler . interpret
+runTimeout handler = runReader (Handler handler) . runTimeoutC
 
-newtype TimeoutC m a = TimeoutC ((forall x . m x -> IO x) -> m a)
+newtype Handler m = Handler (forall x . m x -> IO x)
 
-runTimeoutC :: (forall x . m x -> IO x) -> TimeoutC m a -> m a
-runTimeoutC f (TimeoutC m) = m f
+runHandler :: Handler m -> TimeoutC m a -> IO a
+runHandler h@(Handler handler) = handler . runReader h . runTimeoutC
+
+newtype TimeoutC m a = TimeoutC { runTimeoutC :: ReaderC (Handler m) m a }
+  deriving (Functor, Applicative, Monad, MonadIO)
 
 instance (Carrier sig m, MonadIO m) => Carrier (Timeout :+: sig) (TimeoutC m) where
-  ret a = TimeoutC (const (ret a))
-  eff op = TimeoutC (\ handler -> handleSum
-    (eff . handlePure (runTimeoutC handler))
-    (\ (Timeout n task k) -> liftIO (System.timeout (toMicroseconds n) (handler (runTimeoutC handler task))) >>= runTimeoutC handler . k) op)
+  eff (L (Timeout n task k)) = do
+    handler <- TimeoutC ask
+    liftIO (System.timeout (toMicroseconds n) (runHandler handler task)) >>= k
+  eff (R other) = TimeoutC (eff (R (handleCoercible other)))
