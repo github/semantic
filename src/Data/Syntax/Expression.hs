@@ -561,7 +561,7 @@ instance Evaluatable New where
       case maybeConstructor of
         Just slot -> do
           span <- ask @Span
-          reference (Reference constructorName) span ScopeGraph.NewKind (Declaration constructorName)
+          reference (Reference constructorName) span ScopeGraph.New (Declaration constructorName)
           constructor <- deref slot
           args <- traverse eval newArguments
           boundConstructor <- bindThis objectVal constructor
@@ -596,7 +596,7 @@ instance Tokenize This where
 instance Evaluatable This where
   eval _ _ This = do
     span <- ask @Span
-    reference (Reference __self) span ScopeGraph.ThisKind (Declaration __self)
+    reference (Reference __self) span ScopeGraph.This (Declaration __self)
     deref =<< lookupSlot (Declaration __self)
 
 instance AccessControls1 This where

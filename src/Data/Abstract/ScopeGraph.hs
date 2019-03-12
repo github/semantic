@@ -119,34 +119,11 @@ instance HasSpan ReferenceInfo where
   span = lens refSpan (\r s -> r { refSpan = s })
   {-# INLINE span #-}
 
-data Kind = AbstractClassKind
-          | AssignmentKind
-          | CallKind
-          | ClassKind
-          | DefaultExportKind
-          | FunctionKind
-          | IdentifierKind
-          | LetKind
-          | MemberAccessKind
-          | MethodKind
-          | ModuleKind
-          | NewKind
-          | ParameterKind
-          | PublicFieldKind
-          | QualifiedAliasedImportKind
-          | QualifiedExportKind
-          | QualifiedImportKind
-          | RequiredParameterKind
-          | ThisKind
-          | TypeAliasKind
-          | TypeIdentifierKind
-          | UnknownKind
-          | UnqualifiedImportKind
-          | VariableDeclarationKind
+data Kind = TypeAlias | Class | Method | QualifiedAliasedImport | QualifiedExport | DefaultExport | Module | AbstractClass | Let | QualifiedImport | UnqualifiedImport | Assignment | RequiredParameter | PublicField | VariableDeclaration | Function | Parameter | Unknown | Identifier | TypeIdentifier | This | New | MemberAccess | Call
   deriving (Eq, Show, Ord, Generic, NFData)
 
 instance Lower Kind where
-  lowerBound = UnknownKind
+  lowerBound = Unknown
 
 -- Offsets and frame addresses in the heap should be addresses?
 data Scope address =

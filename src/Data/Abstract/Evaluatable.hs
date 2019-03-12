@@ -30,7 +30,7 @@ import Data.Abstract.Declarations as X
 import Data.Abstract.FreeVariables as X
 import Data.Abstract.Module
 import Data.Abstract.Name as X
-import qualified Data.Abstract.ScopeGraph as ScopeGraph
+import qualified Data.Abstract.ScopeGraph as ScopeGraph 
 import Data.Abstract.ScopeGraph (Relation(..))
 import Data.Abstract.AccessControls.Class as X
 import Data.Language
@@ -192,7 +192,7 @@ defineSelf :: ( Carrier sig m
            => Evaluator term address value m ()
 defineSelf = do
   let self = Declaration X.__self
-  declare self Default Public emptySpan ScopeGraph.UnknownKind Nothing
+  declare self Default Public emptySpan ScopeGraph.Unknown Nothing
   slot <- lookupSlot self
   assign slot =<< object =<< currentFrame
 
