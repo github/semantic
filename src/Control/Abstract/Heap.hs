@@ -181,7 +181,7 @@ define :: ( HasCallStack
        -> Evaluator term address value m ()
 define declaration rel accessControl def = withCurrentCallStack callStack $ do
   -- TODO: This span is still wrong.
-  declare declaration rel accessControl emptySpan UnknownKind Nothing
+  declare declaration rel accessControl emptySpan Unknown Nothing
   slot <- lookupSlot declaration
   value <- def
   assign slot value

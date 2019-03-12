@@ -133,7 +133,7 @@ instance Evaluatable Import where
     -- Add declaration of the alias name to the current scope (within our current module).
     aliasName <- maybeM (throwNoNameError aliasTerm) (declaredAlias aliasTerm)
     let aliasSpan = getSpan aliasTerm
-    declare (Declaration aliasName) Default Public aliasSpan ScopeGraph.UnqualifiedImportKind (Just importScope)
+    declare (Declaration aliasName) Default Public aliasSpan ScopeGraph.UnqualifiedImport (Just importScope)
     -- Retrieve the frame slot for the new declaration.
     aliasSlot <- lookupSlot (Declaration aliasName)
     assign aliasSlot =<< object aliasFrame
@@ -172,7 +172,7 @@ instance Evaluatable Import where
           aliasValue <- maybeM (throwNoNameError aliasTerm) (declaredName aliasTerm)
           if aliasValue /= aliasName then do
             let aliasSpan = getSpan aliasTerm
-            insertImportReference (Reference aliasName) aliasSpan ScopeGraph.IdentifierKind (Declaration aliasValue) scopeAddress
+            insertImportReference (Reference aliasName) aliasSpan ScopeGraph.Identifier (Declaration aliasValue) scopeAddress
           else
             pure ()
 
@@ -198,7 +198,7 @@ instance Evaluatable QualifiedImport where
       go (((nameTerm, name), modulePath) : namesAndPaths) = do
         scopeAddress <- newScope mempty
         let nameSpan = getSpan nameTerm
-        declare (Declaration name) Default Public nameSpan ScopeGraph.QualifiedImportKind (Just scopeAddress)
+        declare (Declaration name) Default Public nameSpan ScopeGraph.QualifiedImport (Just scopeAddress)
         aliasSlot <- lookupSlot (Declaration name)
         -- a.b.c
         withScope scopeAddress $
@@ -231,7 +231,7 @@ instance Evaluatable QualifiedAliasedImport where
     span <- ask @Span
     scopeAddress <- newScope mempty
     alias <- maybeM (throwNoNameError aliasTerm) (declaredName aliasTerm)
-    declare (Declaration alias) Default Public span ScopeGraph.QualifiedAliasedImportKind (Just scopeAddress)
+    declare (Declaration alias) Default Public span ScopeGraph.QualifiedAliasedImport (Just scopeAddress)
     objFrame <- newFrame scopeAddress mempty
     val <- object objFrame
     aliasSlot <- lookupSlot (Declaration alias)

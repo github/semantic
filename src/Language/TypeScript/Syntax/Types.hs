@@ -67,7 +67,7 @@ instance Evaluatable TypeIdentifier where
   eval _ _ TypeIdentifier{..} = do
     -- Add a reference to the type identifier in the current scope.
     span <- ask @Span
-    reference (Reference (Evaluatable.name contents)) span ScopeGraph.TypeIdentifierKind (Declaration (Evaluatable.name contents))
+    reference (Reference (Evaluatable.name contents)) span ScopeGraph.TypeIdentifier (Declaration (Evaluatable.name contents))
     unit
 
 data NestedTypeIdentifier a = NestedTypeIdentifier { left :: !a, right :: !a }
