@@ -14,14 +14,15 @@ import qualified Data.Text as T
 import           Data.Vector (Vector)
 import           Data.Word
 import           GHC.Generics
-import           Proto3.Suite
+import           Proto3.Suite (decodeMessageField, encodeMessageField, nestedvec, packedvec)
+import qualified Proto3.Suite as Proto3
 import           Proto3.Suite.JSONPB as JSONPB
 import           Proto3.Wire (at, oneof)
 
 data PingRequest = PingRequest
   { service :: Text
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, NFData)
+    deriving anyclass (Proto3.Named, NFData)
 
 instance FromJSONPB PingRequest where
   parseJSONPB = A.withObject "PingRequest" $ \obj -> PingRequest
@@ -44,7 +45,7 @@ instance ToJSON PingRequest where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding
 
-instance Message PingRequest where
+instance Proto3.Message PingRequest where
   encodeMessage _ PingRequest{..} = mconcat
     [
       encodeMessageField 1 service
@@ -59,7 +60,7 @@ data PingResponse = PingResponse
   , timestamp :: Text
   , sha :: Text
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, NFData)
+    deriving anyclass (Proto3.Named, NFData)
 
 instance FromJSONPB PingResponse where
   parseJSONPB = A.withObject "PingResponse" $ \obj -> PingResponse
@@ -91,7 +92,7 @@ instance ToJSON PingResponse where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding
 
-instance Message PingResponse where
+instance Proto3.Message PingResponse where
   encodeMessage _ PingResponse{..} = mconcat
     [
       encodeMessageField 1 status
@@ -109,7 +110,7 @@ instance Message PingResponse where
 data ParseTreeRequest = ParseTreeRequest
   { blobs :: Vector Blob
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, NFData)
+    deriving anyclass (Proto3.Named, NFData)
 
 instance FromJSONPB ParseTreeRequest where
   parseJSONPB = A.withObject "ParseTreeRequest" $ \obj -> ParseTreeRequest
@@ -132,10 +133,10 @@ instance ToJSON ParseTreeRequest where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding
 
-instance Message ParseTreeRequest where
+instance Proto3.Message ParseTreeRequest where
   encodeMessage _ ParseTreeRequest{..} = mconcat
     [
-      encodeMessageField 1 (NestedVec blobs)
+      encodeMessageField 1 (Proto3.NestedVec blobs)
     ]
   decodeMessage _ = ParseTreeRequest
     <$> (nestedvec <$> at decodeMessageField 1)
@@ -144,7 +145,7 @@ instance Message ParseTreeRequest where
 data ParseTreeSymbolResponse = ParseTreeSymbolResponse
   { files :: Vector File
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, NFData)
+    deriving anyclass (Proto3.Named, NFData)
 
 instance FromJSONPB ParseTreeSymbolResponse where
   parseJSONPB = A.withObject "ParseTreeSymbolResponse" $ \obj -> ParseTreeSymbolResponse
@@ -167,10 +168,10 @@ instance ToJSON ParseTreeSymbolResponse where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding
 
-instance Message ParseTreeSymbolResponse where
+instance Proto3.Message ParseTreeSymbolResponse where
   encodeMessage _ ParseTreeSymbolResponse{..} = mconcat
     [
-      encodeMessageField 1 (NestedVec files)
+      encodeMessageField 1 (Proto3.NestedVec files)
     ]
   decodeMessage _ = ParseTreeSymbolResponse
     <$> (nestedvec <$> at decodeMessageField 1)
@@ -179,7 +180,7 @@ instance Message ParseTreeSymbolResponse where
 data ParseTreeGraphResponse = ParseTreeGraphResponse
   { files :: Vector ParseTreeFileGraph
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, NFData)
+    deriving anyclass (Proto3.Named, NFData)
 
 instance FromJSONPB ParseTreeGraphResponse where
   parseJSONPB = A.withObject "ParseTreeGraphResponse" $ \obj -> ParseTreeGraphResponse
@@ -202,10 +203,10 @@ instance ToJSON ParseTreeGraphResponse where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding
 
-instance Message ParseTreeGraphResponse where
+instance Proto3.Message ParseTreeGraphResponse where
   encodeMessage _ ParseTreeGraphResponse{..} = mconcat
     [
-      encodeMessageField 1 (NestedVec files)
+      encodeMessageField 1 (Proto3.NestedVec files)
     ]
   decodeMessage _ = ParseTreeGraphResponse
     <$> (nestedvec <$> at decodeMessageField 1)
@@ -218,7 +219,7 @@ data ParseTreeFileGraph = ParseTreeFileGraph
   , edges :: Vector TermEdge
   , errors :: Vector ParseError
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, NFData)
+    deriving anyclass (Proto3.Named, NFData)
 
 instance FromJSONPB ParseTreeFileGraph where
   parseJSONPB = A.withObject "ParseTreeFileGraph" $ \obj -> ParseTreeFileGraph
@@ -253,14 +254,14 @@ instance ToJSON ParseTreeFileGraph where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding
 
-instance Message ParseTreeFileGraph where
+instance Proto3.Message ParseTreeFileGraph where
   encodeMessage _ ParseTreeFileGraph{..} = mconcat
     [
       encodeMessageField 1 path
     , encodeMessageField 2 language
-    , encodeMessageField 3 (NestedVec vertices)
-    , encodeMessageField 4 (NestedVec edges)
-    , encodeMessageField 5 (NestedVec errors)
+    , encodeMessageField 3 (Proto3.NestedVec vertices)
+    , encodeMessageField 4 (Proto3.NestedVec edges)
+    , encodeMessageField 5 (Proto3.NestedVec errors)
     ]
   decodeMessage _ = ParseTreeFileGraph
     <$> at decodeMessageField 1
@@ -274,7 +275,7 @@ data TermEdge = TermEdge
   { source :: Int32
   , target :: Int32
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, NFData)
+    deriving anyclass (Proto3.Named, NFData)
 
 instance FromJSONPB TermEdge where
   parseJSONPB = A.withObject "TermEdge" $ \obj -> TermEdge
@@ -300,7 +301,7 @@ instance ToJSON TermEdge where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding
 
-instance Message TermEdge where
+instance Proto3.Message TermEdge where
   encodeMessage _ TermEdge{..} = mconcat
     [
       encodeMessageField 1 source
@@ -316,7 +317,7 @@ data TermVertex = TermVertex
   , term :: Text
   , span :: Maybe Span
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, NFData)
+    deriving anyclass (Proto3.Named, NFData)
 
 instance FromJSONPB TermVertex where
   parseJSONPB = A.withObject "TermVertex" $ \obj -> TermVertex
@@ -345,12 +346,12 @@ instance ToJSON TermVertex where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding
 
-instance Message TermVertex where
+instance Proto3.Message TermVertex where
   encodeMessage _ TermVertex{..} = mconcat
     [
       encodeMessageField 1 vertexId
     , encodeMessageField 2 term
-    , encodeMessageField 3 (Nested span)
+    , encodeMessageField 3 (Proto3.Nested span)
     ]
   decodeMessage _ = TermVertex
     <$> at decodeMessageField 1
@@ -361,7 +362,7 @@ instance Message TermVertex where
 data ParseError = ParseError
   { error :: Text
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, NFData)
+    deriving anyclass (Proto3.Named, NFData)
 
 instance FromJSONPB ParseError where
   parseJSONPB = A.withObject "ParseError" $ \obj -> ParseError
@@ -384,7 +385,7 @@ instance ToJSON ParseError where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding
 
-instance Message ParseError where
+instance Proto3.Message ParseError where
   encodeMessage _ ParseError{..} = mconcat
     [
       encodeMessageField 1 error
@@ -396,7 +397,7 @@ instance Message ParseError where
 data DiffTreeRequest = DiffTreeRequest
   { blobs :: Vector BlobPair
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, NFData)
+    deriving anyclass (Proto3.Named, NFData)
 
 instance FromJSONPB DiffTreeRequest where
   parseJSONPB = A.withObject "DiffTreeRequest" $ \obj -> DiffTreeRequest
@@ -419,10 +420,10 @@ instance ToJSON DiffTreeRequest where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding
 
-instance Message DiffTreeRequest where
+instance Proto3.Message DiffTreeRequest where
   encodeMessage _ DiffTreeRequest{..} = mconcat
     [
-      encodeMessageField 1 (NestedVec blobs)
+      encodeMessageField 1 (Proto3.NestedVec blobs)
     ]
   decodeMessage _ = DiffTreeRequest
     <$> (nestedvec <$> at decodeMessageField 1)
@@ -431,7 +432,7 @@ instance Message DiffTreeRequest where
 data DiffTreeTOCResponse = DiffTreeTOCResponse
   { files :: Vector TOCSummaryFile
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, NFData)
+    deriving anyclass (Proto3.Named, NFData)
 
 instance FromJSONPB DiffTreeTOCResponse where
   parseJSONPB = A.withObject "DiffTreeTOCResponse" $ \obj -> DiffTreeTOCResponse
@@ -454,10 +455,10 @@ instance ToJSON DiffTreeTOCResponse where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding
 
-instance Message DiffTreeTOCResponse where
+instance Proto3.Message DiffTreeTOCResponse where
   encodeMessage _ DiffTreeTOCResponse{..} = mconcat
     [
-      encodeMessageField 1 (NestedVec files)
+      encodeMessageField 1 (Proto3.NestedVec files)
     ]
   decodeMessage _ = DiffTreeTOCResponse
     <$> (nestedvec <$> at decodeMessageField 1)
@@ -469,7 +470,7 @@ data TOCSummaryFile = TOCSummaryFile
   , changes :: Vector TOCSummaryChange
   , errors :: Vector TOCSummaryError
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, NFData)
+    deriving anyclass (Proto3.Named, NFData)
 
 instance FromJSONPB TOCSummaryFile where
   parseJSONPB = A.withObject "TOCSummaryFile" $ \obj -> TOCSummaryFile
@@ -501,13 +502,13 @@ instance ToJSON TOCSummaryFile where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding
 
-instance Message TOCSummaryFile where
+instance Proto3.Message TOCSummaryFile where
   encodeMessage _ TOCSummaryFile{..} = mconcat
     [
       encodeMessageField 1 path
     , encodeMessageField 2 language
-    , encodeMessageField 3 (NestedVec changes)
-    , encodeMessageField 4 (NestedVec errors)
+    , encodeMessageField 3 (Proto3.NestedVec changes)
+    , encodeMessageField 4 (Proto3.NestedVec errors)
     ]
   decodeMessage _ = TOCSummaryFile
     <$> at decodeMessageField 1
@@ -522,7 +523,7 @@ data TOCSummaryChange = TOCSummaryChange
   , span :: Maybe Span
   , changeType :: ChangeType
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, NFData)
+    deriving anyclass (Proto3.Named, NFData)
 
 instance FromJSONPB TOCSummaryChange where
   parseJSONPB = A.withObject "TOCSummaryChange" $ \obj -> TOCSummaryChange
@@ -554,12 +555,12 @@ instance ToJSON TOCSummaryChange where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding
 
-instance Message TOCSummaryChange where
+instance Proto3.Message TOCSummaryChange where
   encodeMessage _ TOCSummaryChange{..} = mconcat
     [
       encodeMessageField 1 category
     , encodeMessageField 2 term
-    , encodeMessageField 3 (Nested span)
+    , encodeMessageField 3 (Proto3.Nested span)
     , encodeMessageField 4 changeType
     ]
   decodeMessage _ = TOCSummaryChange
@@ -573,7 +574,7 @@ data TOCSummaryError = TOCSummaryError
   { error :: Text
   , span :: Maybe Span
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, NFData)
+    deriving anyclass (Proto3.Named, NFData)
 
 instance FromJSONPB TOCSummaryError where
   parseJSONPB = A.withObject "TOCSummaryError" $ \obj -> TOCSummaryError
@@ -599,11 +600,11 @@ instance ToJSON TOCSummaryError where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding
 
-instance Message TOCSummaryError where
+instance Proto3.Message TOCSummaryError where
   encodeMessage _ TOCSummaryError{..} = mconcat
     [
       encodeMessageField 1 error
-    , encodeMessageField 2 (Nested span)
+    , encodeMessageField 2 (Proto3.Nested span)
     ]
   decodeMessage _ = TOCSummaryError
     <$> at decodeMessageField 1
@@ -613,7 +614,7 @@ instance Message TOCSummaryError where
 data DiffTreeGraphResponse = DiffTreeGraphResponse
   { files :: Vector DiffTreeFileGraph
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, NFData)
+    deriving anyclass (Proto3.Named, NFData)
 
 instance FromJSONPB DiffTreeGraphResponse where
   parseJSONPB = A.withObject "DiffTreeGraphResponse" $ \obj -> DiffTreeGraphResponse
@@ -636,10 +637,10 @@ instance ToJSON DiffTreeGraphResponse where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding
 
-instance Message DiffTreeGraphResponse where
+instance Proto3.Message DiffTreeGraphResponse where
   encodeMessage _ DiffTreeGraphResponse{..} = mconcat
     [
-      encodeMessageField 1 (NestedVec files)
+      encodeMessageField 1 (Proto3.NestedVec files)
     ]
   decodeMessage _ = DiffTreeGraphResponse
     <$> (nestedvec <$> at decodeMessageField 1)
@@ -652,7 +653,7 @@ data DiffTreeFileGraph = DiffTreeFileGraph
   , edges :: Vector DiffTreeEdge
   , errors :: Vector ParseError
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, NFData)
+    deriving anyclass (Proto3.Named, NFData)
 
 instance FromJSONPB DiffTreeFileGraph where
   parseJSONPB = A.withObject "DiffTreeFileGraph" $ \obj -> DiffTreeFileGraph
@@ -687,14 +688,14 @@ instance ToJSON DiffTreeFileGraph where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding
 
-instance Message DiffTreeFileGraph where
+instance Proto3.Message DiffTreeFileGraph where
   encodeMessage _ DiffTreeFileGraph{..} = mconcat
     [
       encodeMessageField 1 path
     , encodeMessageField 2 language
-    , encodeMessageField 3 (NestedVec vertices)
-    , encodeMessageField 4 (NestedVec edges)
-    , encodeMessageField 5 (NestedVec errors)
+    , encodeMessageField 3 (Proto3.NestedVec vertices)
+    , encodeMessageField 4 (Proto3.NestedVec edges)
+    , encodeMessageField 5 (Proto3.NestedVec errors)
     ]
   decodeMessage _ = DiffTreeFileGraph
     <$> at decodeMessageField 1
@@ -708,7 +709,7 @@ data DiffTreeEdge = DiffTreeEdge
   { source :: Int32
   , target :: Int32
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, NFData)
+    deriving anyclass (Proto3.Named, NFData)
 
 instance FromJSONPB DiffTreeEdge where
   parseJSONPB = A.withObject "DiffTreeEdge" $ \obj -> DiffTreeEdge
@@ -734,7 +735,7 @@ instance ToJSON DiffTreeEdge where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding
 
-instance Message DiffTreeEdge where
+instance Proto3.Message DiffTreeEdge where
   encodeMessage _ DiffTreeEdge{..} = mconcat
     [
       encodeMessageField 1 source
@@ -751,7 +752,7 @@ data DiffTreeVertexDiffTerm
   | Replaced (Maybe ReplacedTerm)
   | Merged (Maybe MergedTerm)
   deriving stock (Eq, Ord, Show, Generic)
-  deriving anyclass (Message, Named, NFData)
+  deriving anyclass (Proto3.Message, Proto3.Named, NFData)
 
 instance FromJSONPB DiffTreeVertexDiffTerm where
   parseJSONPB = A.withObject "DiffTreeVertexDiffTerm" $ \obj -> msum
@@ -783,7 +784,7 @@ data DiffTreeVertex = DiffTreeVertex
   { diffVertexId :: Int32
   , diffTerm :: Maybe DiffTreeVertexDiffTerm
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, NFData)
+    deriving anyclass (Proto3.Named, NFData)
 
 instance FromJSONPB DiffTreeVertex where
   parseJSONPB = A.withObject "DiffTreeVertex" $ \obj -> DiffTreeVertex
@@ -809,7 +810,7 @@ instance ToJSON DiffTreeVertex where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding
 
-instance Message DiffTreeVertex where
+instance Proto3.Message DiffTreeVertex where
   encodeMessage _ DiffTreeVertex{..} = mconcat
     [
       encodeMessageField 1 diffVertexId
@@ -836,7 +837,7 @@ data DeletedTerm = DeletedTerm
   { term :: Text
   , span :: Maybe Span
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, NFData)
+    deriving anyclass (Proto3.Named, NFData)
 
 instance FromJSONPB DeletedTerm where
   parseJSONPB = A.withObject "DeletedTerm" $ \obj -> DeletedTerm
@@ -862,11 +863,11 @@ instance ToJSON DeletedTerm where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding
 
-instance Message DeletedTerm where
+instance Proto3.Message DeletedTerm where
   encodeMessage _ DeletedTerm{..} = mconcat
     [
       encodeMessageField 1 term
-    , encodeMessageField 2 (Nested span)
+    , encodeMessageField 2 (Proto3.Nested span)
     ]
   decodeMessage _ = DeletedTerm
     <$> at decodeMessageField 1
@@ -877,7 +878,7 @@ data InsertedTerm = InsertedTerm
   { term :: Text
   , span :: Maybe Span
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, NFData)
+    deriving anyclass (Proto3.Named, NFData)
 
 instance FromJSONPB InsertedTerm where
   parseJSONPB = A.withObject "InsertedTerm" $ \obj -> InsertedTerm
@@ -903,11 +904,11 @@ instance ToJSON InsertedTerm where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding
 
-instance Message InsertedTerm where
+instance Proto3.Message InsertedTerm where
   encodeMessage _ InsertedTerm{..} = mconcat
     [
       encodeMessageField 1 term
-    , encodeMessageField 2 (Nested span)
+    , encodeMessageField 2 (Proto3.Nested span)
     ]
   decodeMessage _ = InsertedTerm
     <$> at decodeMessageField 1
@@ -920,7 +921,7 @@ data ReplacedTerm = ReplacedTerm
   , afterTerm :: Text
   , afterSpan :: Maybe Span
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, NFData)
+    deriving anyclass (Proto3.Named, NFData)
 
 instance FromJSONPB ReplacedTerm where
   parseJSONPB = A.withObject "ReplacedTerm" $ \obj -> ReplacedTerm
@@ -952,13 +953,13 @@ instance ToJSON ReplacedTerm where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding
 
-instance Message ReplacedTerm where
+instance Proto3.Message ReplacedTerm where
   encodeMessage _ ReplacedTerm{..} = mconcat
     [
       encodeMessageField 1 beforeTerm
-    , encodeMessageField 2 (Nested beforeSpan)
+    , encodeMessageField 2 (Proto3.Nested beforeSpan)
     , encodeMessageField 3 afterTerm
-    , encodeMessageField 4 (Nested afterSpan)
+    , encodeMessageField 4 (Proto3.Nested afterSpan)
     ]
   decodeMessage _ = ReplacedTerm
     <$> at decodeMessageField 1
@@ -972,7 +973,7 @@ data MergedTerm = MergedTerm
   , beforeSpan :: Maybe Span
   , afterSpan :: Maybe Span
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, NFData)
+    deriving anyclass (Proto3.Named, NFData)
 
 instance FromJSONPB MergedTerm where
   parseJSONPB = A.withObject "MergedTerm" $ \obj -> MergedTerm
@@ -1001,12 +1002,12 @@ instance ToJSON MergedTerm where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding
 
-instance Message MergedTerm where
+instance Proto3.Message MergedTerm where
   encodeMessage _ MergedTerm{..} = mconcat
     [
       encodeMessageField 1 term
-    , encodeMessageField 2 (Nested beforeSpan)
-    , encodeMessageField 3 (Nested afterSpan)
+    , encodeMessageField 2 (Proto3.Nested beforeSpan)
+    , encodeMessageField 3 (Proto3.Nested afterSpan)
     ]
   decodeMessage _ = MergedTerm
     <$> at decodeMessageField 1
@@ -1019,7 +1020,7 @@ data Blob = Blob
   , path :: Text
   , language :: Text
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, NFData)
+    deriving anyclass (Proto3.Named, NFData)
 
 instance FromJSONPB Blob where
   parseJSONPB = A.withObject "Blob" $ \obj -> Blob
@@ -1048,7 +1049,7 @@ instance ToJSON Blob where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding
 
-instance Message Blob where
+instance Proto3.Message Blob where
   encodeMessage _ Blob{..} = mconcat
     [
       encodeMessageField 1 content
@@ -1065,7 +1066,7 @@ data BlobPair = BlobPair
   { before :: Maybe Blob
   , after :: Maybe Blob
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, NFData)
+    deriving anyclass (Proto3.Named, NFData)
 
 instance FromJSONPB BlobPair where
   parseJSONPB = A.withObject "BlobPair" $ \obj -> BlobPair
@@ -1091,11 +1092,11 @@ instance ToJSON BlobPair where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding
 
-instance Message BlobPair where
+instance Proto3.Message BlobPair where
   encodeMessage _ BlobPair{..} = mconcat
     [
-      encodeMessageField 1 (Nested before)
-    , encodeMessageField 2 (Nested after)
+      encodeMessageField 1 (Proto3.Nested before)
+    , encodeMessageField 2 (Proto3.Nested after)
     ]
   decodeMessage _ = BlobPair
     <$> at decodeMessageField 1
@@ -1108,7 +1109,7 @@ data File = File
   , symbols :: Vector Symbol
   , errors :: Vector ParseError
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, NFData)
+    deriving anyclass (Proto3.Named, NFData)
 
 instance FromJSONPB File where
   parseJSONPB = A.withObject "File" $ \obj -> File
@@ -1140,13 +1141,13 @@ instance ToJSON File where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding
 
-instance Message File where
+instance Proto3.Message File where
   encodeMessage _ File{..} = mconcat
     [
       encodeMessageField 1 path
     , encodeMessageField 2 language
-    , encodeMessageField 3 (NestedVec symbols)
-    , encodeMessageField 4 (NestedVec errors)
+    , encodeMessageField 3 (Proto3.NestedVec symbols)
+    , encodeMessageField 4 (Proto3.NestedVec errors)
     ]
   decodeMessage _ = File
     <$> at decodeMessageField 1
@@ -1162,7 +1163,7 @@ data Symbol = Symbol
   , span :: Maybe Span
   , docs :: Maybe Docstring
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, NFData)
+    deriving anyclass (Proto3.Named, NFData)
 
 instance FromJSONPB Symbol where
   parseJSONPB = A.withObject "Symbol" $ \obj -> Symbol
@@ -1197,14 +1198,14 @@ instance ToJSON Symbol where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding
 
-instance Message Symbol where
+instance Proto3.Message Symbol where
   encodeMessage _ Symbol{..} = mconcat
     [
       encodeMessageField 1 symbol
     , encodeMessageField 2 kind
     , encodeMessageField 3 line
-    , encodeMessageField 4 (Nested span)
-    , encodeMessageField 5 (Nested docs)
+    , encodeMessageField 4 (Proto3.Nested span)
+    , encodeMessageField 5 (Proto3.Nested docs)
     ]
   decodeMessage _ = Symbol
     <$> at decodeMessageField 1
@@ -1217,7 +1218,7 @@ instance Message Symbol where
 data Docstring = Docstring
   { docstring :: Text
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, NFData)
+    deriving anyclass (Proto3.Named, NFData)
 
 instance FromJSONPB Docstring where
   parseJSONPB = A.withObject "Docstring" $ \obj -> Docstring
@@ -1240,7 +1241,7 @@ instance ToJSON Docstring where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding
 
-instance Message Docstring where
+instance Proto3.Message Docstring where
   encodeMessage _ Docstring{..} = mconcat
     [
       encodeMessageField 1 docstring
@@ -1253,7 +1254,7 @@ data Position = Position
   { line :: Int32
   , column :: Int32
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, NFData)
+    deriving anyclass (Proto3.Named, NFData)
 
 instance FromJSONPB Position where
   parseJSONPB = A.withObject "Position" $ \obj -> Position
@@ -1279,7 +1280,7 @@ instance ToJSON Position where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding
 
-instance Message Position where
+instance Proto3.Message Position where
   encodeMessage _ Position{..} = mconcat
     [
       encodeMessageField 1 line
@@ -1294,7 +1295,7 @@ data Span = Span
   { start :: Maybe Position
   , end :: Maybe Position
   } deriving stock (Eq, Ord, Show, Generic)
-    deriving anyclass (Named, NFData)
+    deriving anyclass (Proto3.Named, NFData)
 
 instance FromJSONPB Span where
   parseJSONPB = A.withObject "Span" $ \obj -> Span
@@ -1320,11 +1321,11 @@ instance ToJSON Span where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding
 
-instance Message Span where
+instance Proto3.Message Span where
   encodeMessage _ Span{..} = mconcat
     [
-      encodeMessageField 1 (Nested start)
-    , encodeMessageField 2 (Nested end)
+      encodeMessageField 1 (Proto3.Nested start)
+    , encodeMessageField 2 (Proto3.Nested end)
     ]
   decodeMessage _ = Span
     <$> at decodeMessageField 1
@@ -1337,10 +1338,10 @@ data ChangeType
   | Removed
   | Modified
   deriving stock (Eq, Ord, Show, Enum, Bounded, Generic)
-  deriving anyclass (Named, MessageField, NFData)
-  deriving Primitive via PrimitiveEnum ChangeType
+  deriving anyclass (Proto3.Named, Proto3.MessageField, NFData)
+  deriving Proto3.Primitive via Proto3.PrimitiveEnum ChangeType
 
-instance HasDefault ChangeType where def = None
+instance Proto3.HasDefault ChangeType where def = None
 
 instance FromJSONPB ChangeType where
   parseJSONPB (JSONPB.String "NONE") = pure None
