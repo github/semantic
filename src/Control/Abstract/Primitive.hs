@@ -47,7 +47,7 @@ defineBuiltIn declaration rel accessControl value = withCurrentCallStack callSta
 
   param <- gensym
   withScope associatedScope $ do
-    declare (Declaration param) rel accessControl emptySpan ScopeGraph.Unknown Nothing
+    declare (Declaration param) ScopeGraph.Gensym accessControl emptySpan ScopeGraph.Unknown Nothing
 
   slot <- lookupSlot declaration
   value <- builtIn associatedScope value
