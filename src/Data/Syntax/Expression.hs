@@ -5,8 +5,8 @@ module Data.Syntax.Expression where
 import Prelude hiding (null)
 import Prologue hiding (This, index, null)
 
-import           Control.Abstract hiding (Bitwise (..), Call, Member, Void)
-import           Data.Abstract.Evaluatable as Abstract hiding (Member, Void)
+import           Control.Abstract hiding (Bitwise (..), Call, Member)
+import           Data.Abstract.Evaluatable as Abstract hiding (Member)
 import           Data.Abstract.Name as Name
 import           Data.Abstract.Number (liftIntegralFrac, liftReal, liftedExponent, liftedFloorDiv)
 import           Data.Fixed
