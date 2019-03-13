@@ -33,10 +33,14 @@ instance Evaluatable Function where
     associatedScope <- declareFunction name ScopeGraph.Public span ScopeGraph.Function
 
     params <- withScope associatedScope . for functionParameters $ \paramNode -> do
-      param <- maybeM (throwNoNameError paramNode) (declaredName paramNode)
-
+      declare (Declaration __self) ScopeGraph.Prelude ScopeGraph.Public emptySpan ScopeGraph.Unknown Nothing
       let paramSpan = getSpan paramNode
-      param <$ declare (Declaration param) Default ScopeGraph.Public paramSpan ScopeGraph.Parameter Nothing
+      for methodParameters $ \paramNode -> do
+        case declaredName paramNode of
+          Nothing -> do
+            unknownName <- gensym
+            unknownName <$ declare (Declaration unknownName) ScopeGraph.Gensym ScopeGraph.Public paramSpan ScopeGraph.Parameter Nothing
+          Just name -> name <$ declare (Declaration name) Default ScopeGraph.Public paramSpan ScopeGraph.Parameter Nothing
 
     addr <- lookupSlot (Declaration name)
     v <- function name params functionBody associatedScope
@@ -100,8 +104,11 @@ instance Evaluatable Method where
       -- TODO: Should we give `self` a special Relation?
       declare (Declaration __self) ScopeGraph.Prelude ScopeGraph.Public emptySpan ScopeGraph.Unknown Nothing
       for methodParameters $ \paramNode -> do
-        param <- maybeM (throwNoNameError paramNode) (declaredName paramNode)
-        param <$ declare (Declaration param) Default ScopeGraph.Public span ScopeGraph.Parameter Nothing
+        case declaredName paramNode of
+          Nothing -> do
+            unknownName <- gensym
+            unknownName <$ declare (Declaration unknownName) ScopeGraph.Gensym ScopeGraph.Public span ScopeGraph.Parameter Nothing
+          Just name -> name <$ declare (Declaration name) Default ScopeGraph.Public span ScopeGraph.Parameter Nothing
 
     addr <- lookupSlot (Declaration name)
     v <- function name params methodBody associatedScope
