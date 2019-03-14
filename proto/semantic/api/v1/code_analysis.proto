@@ -44,19 +44,19 @@ message ParseTreeGraphResponse {
 
 message ParseTreeFileGraph {
   string path = 1;
-  Language language = 2;
+  string language = 2;
   repeated TermVertex vertices = 3;
   repeated TermEdge edges = 4;
   repeated ParseError errors = 5;
 }
 
 message TermEdge {
-  int64 source = 1;
-  int64 target = 2;
+  int32 source = 1;
+  int32 target = 2;
 }
 
 message TermVertex {
-  int64 vertex_id = 1;
+  int32 vertex_id = 1;
   string term = 2;
   Span span = 3;
 }
@@ -75,7 +75,7 @@ message DiffTreeTOCResponse {
 
 message TOCSummaryFile {
   string path = 1;
-  Language language = 2;
+  string language = 2;
   repeated TOCSummaryChange changes = 3;
   repeated TOCSummaryError errors = 4;
 }
@@ -105,19 +105,19 @@ message DiffTreeGraphResponse {
 
 message DiffTreeFileGraph {
   string path = 1;
-  Language language = 2;
+  string language = 2;
   repeated DiffTreeVertex vertices = 3;
   repeated DiffTreeEdge edges = 4;
   repeated ParseError errors = 5;
 }
 
 message DiffTreeEdge {
-  int64 source = 1;
-  int64 target = 2;
+  int32 source = 1;
+  int32 target = 2;
 }
 
 message DiffTreeVertex {
-  int64 diff_vertex_id = 1;
+  int32 diff_vertex_id = 1;
   oneof diff_term {
     DeletedTerm deleted = 2;
     InsertedTerm inserted = 3;
@@ -149,25 +149,10 @@ message MergedTerm {
   Span after_span = 3;
 }
 
-enum Language {
-  UNKNOWN = 0;
-  GO = 1;
-  HASKELL = 2;
-  JAVA = 3;
-  JAVASCRIPT = 4;
-  JSON = 5;
-  JSX = 6;
-  MARKDOWN = 7;
-  PYTHON = 8;
-  RUBY = 9;
-  TYPESCRIPT = 10;
-  PHP = 11;
-}
-
 message Blob {
   string content = 1;
   string path = 2;
-  Language language = 3;
+  string language = 3;
 }
 
 message BlobPair {
@@ -177,7 +162,7 @@ message BlobPair {
 
 message File {
   string path = 1;
-  Language language = 2;
+  string language = 2;
   repeated Symbol symbols = 3;
   repeated ParseError errors = 4;
 }
@@ -195,8 +180,8 @@ message Docstring {
 }
 
 message Position {
-  int64 line = 1;
-  int64 column = 2;
+  int32 line = 1;
+  int32 column = 2;
 }
 
 message Span {
