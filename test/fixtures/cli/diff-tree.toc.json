@@ -2,8 +2,11 @@
   "files": [
   {
     "path": "test/fixtures/ruby/corpus/method-declaration.A.rb -> test/fixtures/ruby/corpus/method-declaration.B.rb",
+    "language": "Ruby",
     "changes": [
     {
+      "category": "Method",
+      "term": "bar",
       "span":
       {
         "start":
@@ -17,11 +20,7 @@
           "column": 4
         }
       },
-      "category": "Method",
-      "term": "bar",
-      "changeType": "Modified"
-    }],
-    "language": "Ruby",
-    "errors": []
+      "changeType": "MODIFIED"
+    }]
   }]
 }

@@ -2,8 +2,12 @@
   "files": [
   {
     "path": "test/fixtures/ruby/corpus/method-declaration.A.rb",
+    "language": "Ruby",
     "symbols": [
     {
+      "symbol": "foo",
+      "kind": "Method",
+      "line": "def foo",
       "span":
       {
         "start":
@@ -16,13 +20,7 @@
           "line": 2,
           "column": 4
         }
-      },
-      "kind": "Method",
-      "symbol": "foo",
-      "line": "def foo",
-      "docs": null
-    }],
-    "language": "Ruby",
-    "errors": []
+      }
+    }]
   }]
 }
