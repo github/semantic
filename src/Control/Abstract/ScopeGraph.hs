@@ -80,6 +80,8 @@ declare decl rel accessControl span kind scope = do
   moduleInfo <- ask @ModuleInfo
   modify (fst . ScopeGraph.declare decl moduleInfo rel accessControl span kind scope currentAddress)
 
+-- | If the provided name is 'Nothing' we want to reflect that the declaration's name was a generated name (gensym).
+-- We use the 'Gensym' relation to indicate that. Otherwise, we use the provided 'relation'.
 declareMaybeName :: ( Carrier sig m
                     , Member (State (ScopeGraph address)) sig
                     , Member (Reader (CurrentScope address)) sig
