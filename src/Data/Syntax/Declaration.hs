@@ -33,6 +33,7 @@ instance Evaluatable Function where
     associatedScope <- declareFunction name ScopeGraph.Public span ScopeGraph.Function
 
     params <- withScope associatedScope . for functionParameters $ \paramNode -> do
+      -- TODO: Is this right? Do we want to declare `__self` for every parameter for functions?
       declare (Declaration __self) ScopeGraph.Prelude ScopeGraph.Public emptySpan ScopeGraph.Unknown Nothing
       declareMaybeName (declaredName paramNode) Default ScopeGraph.Public (getSpan paramNode) ScopeGraph.Parameter Nothing
 
