@@ -204,10 +204,8 @@ data PublicFieldDefinition a = PublicFieldDefinition
 instance Evaluatable PublicFieldDefinition where
   eval eval _ PublicFieldDefinition{..} = do
     span <- ask @Span
-    propertyName <- maybeM (throwNoNameError publicFieldPropertyName) (declaredName publicFieldPropertyName)
-
-    declare (Declaration propertyName) Instance publicFieldAccessControl span ScopeGraph.PublicField Nothing
-    slot <- lookupSlot (Declaration propertyName)
+    name <- declareMaybeName (declaredName publicFieldPropertyName) Instance publicFieldAccessControl span ScopeGraph.PublicField Nothing
+    slot <- lookupSlot (Declaration name)
     value <- eval publicFieldValue
     assign slot value
     unit
