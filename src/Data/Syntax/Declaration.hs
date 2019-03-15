@@ -103,8 +103,7 @@ instance Evaluatable Method where
     params <- withScope associatedScope $ do
       -- TODO: Should we give `self` a special Relation?
       declare (Declaration __self) ScopeGraph.Prelude ScopeGraph.Public emptySpan ScopeGraph.Unknown Nothing
-      for methodParameters $ \paramNode -> do
-        declareMaybeName (declaredName paramNode) Default ScopeGraph.Public (getSpan paramNode) ScopeGraph.Parameter Nothing
+      for methodParameters $ \paramNode -> declareMaybeName (declaredName paramNode) Default ScopeGraph.Public (getSpan paramNode) ScopeGraph.Parameter Nothing
 
     addr <- lookupSlot (Declaration name)
     v <- function name params methodBody associatedScope
