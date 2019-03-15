@@ -11,6 +11,7 @@ import Analysis.ConstructorName
 import Control.Effect
 import Control.Effect.Fresh
 import Control.Effect.Reader
+import Control.Effect.State
 import Data.Diff
 import Data.Graph
 import Data.Location
@@ -28,9 +29,13 @@ renderTreeGraph :: (Ord vertex, Recursive t, ToTreeGraph vertex (Base t)) => t -
 renderTreeGraph = simplify . runGraph . cata toTreeGraph
 
 runGraph :: ReaderC (Graph vertex)
-           (FreshC VoidC) (Graph vertex)
+           (FreshC PureC) (Graph vertex)
          -> Graph vertex
-runGraph = run . runFresh . runReader mempty
+runGraph = run . runFresh' . runReader mempty
+  where
+    -- NB: custom runFresh so that we count starting at 1 in order to avoid
+    -- default values for proto encoding.
+    runFresh' = evalState 1 . runFreshC
 
 -- | GraphViz styling for terms
 termStyle :: (IsString string, Monoid string) => String -> Style TermVertex string
