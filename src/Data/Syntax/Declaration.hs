@@ -139,9 +139,8 @@ instance Declarations1 RequiredParameter where
 -- TODO: Implement Eval instance for RequiredParameter
 instance Evaluatable RequiredParameter where
   eval _ _ RequiredParameter{..} = do
-    name <- maybeM (throwNoNameError requiredParameter) (declaredName requiredParameter)
     span <- ask @Span
-    declare (Declaration name) Default ScopeGraph.Public span ScopeGraph.RequiredParameter Nothing
+    _ <- declareMaybeName (declaredName requiredParameter) Default ScopeGraph.Public span ScopeGraph.RequiredParameter Nothing
     unit
 
 
