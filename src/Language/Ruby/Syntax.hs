@@ -181,7 +181,6 @@ instance Diffable Class where
 
 instance Evaluatable Class where
   eval eval _ Class{..} = do
-    -- Need to specify Relation when resolving the 'declaredName' of a 'Class' for the subsequent scope graph declaration.
     (name, relation) <- case declaredName classIdentifier of
                           Just name -> pure (name, Default)
                           _         -> gensym >>= \name -> pure (name, Gensym)

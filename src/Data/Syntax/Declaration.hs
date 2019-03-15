@@ -230,8 +230,6 @@ instance Evaluatable Class where
     superScopes <- for classSuperclasses $ \superclass -> do
       name <- case declaredName superclass of
                 Just name -> pure name
-                -- TODO: if the evaluated superclass's name was gensym'ed, how do we align the names properly?
-                -- I think this is an existing problem with the `throwNoNameError` approach, too.
                 Nothing   -> gensym
       scope <- associatedScope (Declaration name)
       slot <- lookupSlot (Declaration name)
@@ -314,8 +312,6 @@ data TypeAlias a = TypeAlias { typeAliasContext :: ![a], typeAliasIdentifier :: 
 
 instance Evaluatable TypeAlias where
   eval _ _ TypeAlias{..} = do
-    -- TODO: How is the gensym'ed name going to line up correctly in the case where we throw
-    -- a NoNameError when first evaluating the typeAliasKind?
     -- This use of `throwNoNameError` is good -- we aren't declaring something new so `declareMaybeName` is not useful here.
     kindName <- maybeM (throwNoNameError typeAliasKind) (declaredName typeAliasKind)
     span <- ask @Span
