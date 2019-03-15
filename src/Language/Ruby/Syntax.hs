@@ -328,7 +328,7 @@ instance Declarations1 Assignment where
 
 instance Evaluatable Assignment where
   eval eval ref Assignment{..} = do
-    (lhsName, relation) <- case (declaredName assignmentTarget) of
+    (lhsName, relation) <- case declaredName assignmentTarget of
                              Just name -> pure (name, Default)
                              _         -> gensym >>= \name -> pure (name, Gensym)
     maybeSlot <- maybeLookupDeclaration (Declaration lhsName)
