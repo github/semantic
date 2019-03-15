@@ -34,13 +34,7 @@ instance Evaluatable Function where
 
     params <- withScope associatedScope . for functionParameters $ \paramNode -> do
       declare (Declaration __self) ScopeGraph.Prelude ScopeGraph.Public emptySpan ScopeGraph.Unknown Nothing
-      let paramSpan = getSpan paramNode
-      for methodParameters $ \paramNode -> do
-        case declaredName paramNode of
-          Nothing -> do
-            unknownName <- gensym
-            unknownName <$ declare (Declaration unknownName) ScopeGraph.Gensym ScopeGraph.Public paramSpan ScopeGraph.Parameter Nothing
-          Just name -> name <$ declare (Declaration name) Default ScopeGraph.Public paramSpan ScopeGraph.Parameter Nothing
+      declareMaybeName (declaredName paramNode) Default ScopeGraph.Public (getSpan paramNode) ScopeGraph.Parameter Nothing
 
     addr <- lookupSlot (Declaration name)
     v <- function name params functionBody associatedScope
