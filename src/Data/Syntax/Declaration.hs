@@ -235,7 +235,11 @@ instance Evaluatable Class where
     currentScope' <- currentScope
 
     superScopes <- for classSuperclasses $ \superclass -> do
-      name <- maybeM (throwNoNameError superclass) (declaredName superclass)
+      name <- case declaredName superclass of
+                Just name -> pure name
+                -- TODO: if the evaluated superclass's name was gensym'ed, how do we align the names properly?
+                -- I think this is an existing problem with the `throwNoNameError` approach, too.
+                Nothing   -> gensym
       scope <- associatedScope (Declaration name)
       slot <- lookupSlot (Declaration name)
       superclassFrame <- scopedEnvironment =<< deref slot
