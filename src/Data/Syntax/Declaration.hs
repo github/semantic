@@ -104,11 +104,7 @@ instance Evaluatable Method where
       -- TODO: Should we give `self` a special Relation?
       declare (Declaration __self) ScopeGraph.Prelude ScopeGraph.Public emptySpan ScopeGraph.Unknown Nothing
       for methodParameters $ \paramNode -> do
-        case declaredName paramNode of
-          Nothing -> do
-            unknownName <- gensym
-            unknownName <$ declare (Declaration unknownName) ScopeGraph.Gensym ScopeGraph.Public span ScopeGraph.Parameter Nothing
-          Just name -> name <$ declare (Declaration name) Default ScopeGraph.Public span ScopeGraph.Parameter Nothing
+        declareMaybeName (declaredName paramNode) Default ScopeGraph.Public (getSpan paramNode) ScopeGraph.Parameter Nothing
 
     addr <- lookupSlot (Declaration name)
     v <- function name params methodBody associatedScope
