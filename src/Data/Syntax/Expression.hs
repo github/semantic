@@ -427,6 +427,7 @@ instance Evaluatable MemberAccess where
     let lhsAccessControl = fromMaybe Public (termToAccessControl lhs)
     infos <- declarationsByAccessControl rhsScope lhsAccessControl
 
+    -- This means we always throw an 'AccessControlError' whenever we have a rhs term whose 'declaredName' is 'Nothing'.
     rhsName <- maybeM (throwNoNameError rhs) (declaredName rhs)
     rhsValue' <- case find (\Info{..} -> Declaration rhsName == infoDeclaration) infos of
       Just _  -> pure rhsValue
