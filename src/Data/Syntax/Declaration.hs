@@ -231,7 +231,6 @@ instance Diffable Class where
 
 instance Evaluatable Class where
   eval eval _ Class{..} = do
-    name <- maybeM (throwNoNameError classIdentifier) (declaredName classIdentifier)
     span <- ask @Span
     currentScope' <- currentScope
 
@@ -248,7 +247,7 @@ instance Evaluatable Class where
         current = (Lexical, ) <$> pure (pure currentScope')
         edges = Map.fromList (superclassEdges <> current)
     classScope <- newScope edges
-    declare (Declaration name) Default ScopeGraph.Public span ScopeGraph.Class (Just classScope)
+    name <- declareMaybeName (declaredName classIdentifier) Default ScopeGraph.Public span ScopeGraph.Class (Just classScope)
 
     let frameEdges = Map.singleton Superclass (Map.fromList (catMaybes superScopes))
     classFrame <- newFrame classScope frameEdges
