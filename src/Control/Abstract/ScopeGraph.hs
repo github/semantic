@@ -3,6 +3,7 @@
 module Control.Abstract.ScopeGraph
   ( lookup
   , declare
+  , declareMaybeName
   , reference
   , newScope
   , newPreludeScope
@@ -78,6 +79,25 @@ declare decl rel accessControl span kind scope = do
   currentAddress <- currentScope
   moduleInfo <- ask @ModuleInfo
   modify (fst . ScopeGraph.declare decl moduleInfo rel accessControl span kind scope currentAddress)
+
+declareMaybeName :: ( Carrier sig m
+                    , Member (State (ScopeGraph address)) sig
+                    , Member (Reader (CurrentScope address)) sig
+                    , Member (Reader ModuleInfo) sig
+                    , Member Fresh sig
+                    , Ord address
+                    )
+                 => Maybe Name
+                 -> Relation
+                 -> AccessControl
+                 -> Span
+                 -> Kind
+                 -> Maybe address
+                 -> Evaluator term address value m Name
+declareMaybeName maybeName relation ac span kind scope = do
+  case maybeName of
+    Just name -> declare (Declaration name) relation ac span kind scope >> pure name
+    _         -> gensym >>= \name -> declare (Declaration name) Gensym ac span kind scope >> pure name
 
 putDeclarationScope :: ( Ord address
                        , Member (Reader (CurrentScope address)) sig
