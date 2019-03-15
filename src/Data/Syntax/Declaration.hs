@@ -165,9 +165,8 @@ instance Evaluatable VariableDeclaration where
   eval _    _ (VariableDeclaration [])   = unit
   eval eval _ (VariableDeclaration decs) = do
     for_ decs $ \declaration -> do
-      name <- maybeM (throwNoNameError declaration) (declaredName declaration)
-      let declarationSpan = getSpan declaration
-      declare (Declaration name) Default ScopeGraph.Public declarationSpan ScopeGraph.VariableDeclaration Nothing
+      let span = getSpan declaration
+      _ <- declareMaybeName (declaredName declaration) Default ScopeGraph.Public span ScopeGraph.VariableDeclaration Nothing
       eval declaration
     unit
 
