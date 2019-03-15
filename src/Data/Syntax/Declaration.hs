@@ -317,13 +317,13 @@ data TypeAlias a = TypeAlias { typeAliasContext :: ![a], typeAliasIdentifier :: 
 
 instance Evaluatable TypeAlias where
   eval _ _ TypeAlias{..} = do
-    name <- maybeM (throwNoNameError typeAliasIdentifier) (declaredName typeAliasIdentifier)
+    -- TODO: How is the gensym'ed name going to line up correctly in the case where we throw
+    -- a NoNameError when first evaluating the typeAliasKind?
+    -- This use of `throwNoNameError` is good -- we aren't declaring something new so `declareMaybeName` is not useful here.
     kindName <- maybeM (throwNoNameError typeAliasKind) (declaredName typeAliasKind)
-
     span <- ask @Span
     assocScope <- associatedScope (Declaration kindName)
-    -- TODO: Should we consider a special Relation for `TypeAlias`?
-    declare (Declaration name) Default ScopeGraph.Public span ScopeGraph.TypeAlias assocScope
+    name <- declareMaybeName (declaredName typeAliasIdentifier) Default ScopeGraph.Public span ScopeGraph.TypeAlias assocScope
 
     slot <- lookupSlot (Declaration name)
     kindSlot <- lookupSlot (Declaration kindName)
