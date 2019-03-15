@@ -28,9 +28,8 @@ instance Diffable Function where
 
 instance Evaluatable Function where
   eval _ _ Function{..} = do
-    name <- maybeM (throwNoNameError functionName) (declaredName functionName)
     span <- ask @Span
-    associatedScope <- declareFunction name ScopeGraph.Public span ScopeGraph.Function
+    (name, associatedScope) <- declareFunction (declaredName functionName) ScopeGraph.Public span ScopeGraph.Function
 
     params <- withScope associatedScope . for functionParameters $ \paramNode -> do
       -- TODO: Is this right? Do we want to declare `__self` for every parameter for functions?
@@ -49,17 +48,17 @@ declareFunction :: ( Carrier sig m
                    , Member Fresh sig
                    , Ord address
                    )
-                => Name
+                => Maybe Name
                 -> ScopeGraph.AccessControl
                 -> Span
                 -> ScopeGraph.Kind
-                -> Evaluator term address value m address
+                -> Evaluator term address value m (Name, address)
 declareFunction name accessControl span kind = do
   currentScope' <- currentScope
   let lexicalEdges = Map.singleton Lexical [ currentScope' ]
   associatedScope <- newScope lexicalEdges
-  declare (Declaration name) Default accessControl span kind (Just associatedScope)
-  pure associatedScope
+  name' <- declareMaybeName name Default accessControl span kind (Just associatedScope)
+  pure (name', associatedScope)
 
 instance Tokenize Function where
   tokenize Function{..} = within' Scope.Function $ do
@@ -91,9 +90,8 @@ instance Diffable Method where
 -- local environment.
 instance Evaluatable Method where
   eval _ _ Method{..} = do
-    name <- maybeM (throwNoNameError methodName) (declaredName methodName)
     span <- ask @Span
-    associatedScope <- declareFunction name methodAccessControl span ScopeGraph.Method
+    (name, associatedScope) <- declareFunction (declaredName methodName) methodAccessControl span ScopeGraph.Method
 
     params <- withScope associatedScope $ do
       -- TODO: Should we give `self` a special Relation?
