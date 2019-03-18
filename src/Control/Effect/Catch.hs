@@ -6,6 +6,7 @@
 module Control.Effect.Catch
   ( Catch (..)
   , catch
+  , catchSync
   , runCatch
   , CatchC (..)
   ) where
@@ -14,6 +15,7 @@ import           Control.Effect.Carrier
 import           Control.Effect.Reader
 import           Control.Effect.Sum
 import qualified Control.Exception as Exc
+import           Control.Exception.Safe (isSyncException)
 import           Control.Monad.IO.Class
 
 data Catch m k
@@ -39,6 +41,16 @@ catch :: (Member Catch sig, Carrier sig m, Exc.Exception e)
         -> m a
 catch go cleanup = send (CatchIO go cleanup pure)
 
+catchSync :: (Member Catch sig, Carrier sig m, Exc.Exception e, MonadIO m)
+        => m a
+        -> (e -> m a)
+        -> m a
+catchSync f g = f `catch` \e ->
+    if isSyncException e
+        then g e
+        -- intentionally rethrowing an async exception synchronously,
+        -- since we want to preserve async behavior
+        else liftIO (Exc.throw e)
 
 -- | Evaulate a 'Catch' effect.
 runCatch :: (forall x . m x -> IO x)

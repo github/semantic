@@ -54,6 +54,7 @@ common dependencies
                      , network
                      , recursion-schemes
                      , scientific
+                     , safe-exceptions
                      , semilattices
                      , text
                      , these
