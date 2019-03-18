@@ -121,13 +121,13 @@ data Let a  = Let { letVariable :: !a, letValue :: !a, letBody :: !a }
 
 instance Evaluatable Let where
   eval eval _ Let{..} = do
-    name <- maybeM (throwNoNameError letVariable) (declaredName letVariable)
-    letSpan <- ask @Span
+    -- This use of 'throwNoNameError' is okay until we have a better way of mapping gensym names to terms in the scope graph.
     valueName <- maybeM (throwNoNameError letValue) (declaredName letValue)
     assocScope <- associatedScope (Declaration valueName)
 
     _ <- withLexicalScopeAndFrame $ do
-      declare (Declaration name) Default Public letSpan ScopeGraph.Let assocScope
+      letSpan <- ask @Span
+      name <- declareMaybeName (declaredName letVariable) Default Public letSpan ScopeGraph.Let assocScope
       letVal <- eval letValue
       slot <- lookupSlot (Declaration name)
       assign slot letVal
