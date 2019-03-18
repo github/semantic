@@ -6,7 +6,6 @@ module Parsing.TreeSitter
 
 import Prologue hiding (bracket)
 
-import           Control.Concurrent.Async
 import qualified Control.Exception as Exc (bracket)
 import           Control.Effect
 import           Control.Effect.Resource
@@ -60,7 +59,6 @@ parseToAST :: ( Bounded grammar
               , Carrier sig m
               , Enum grammar
               , Member Resource sig
-              , Member Timeout sig
               , Member Trace sig
               , MonadIO m
               )
@@ -69,25 +67,15 @@ parseToAST :: ( Bounded grammar
            -> Blob
            -> m (Maybe (AST [] grammar))
 parseToAST parseTimeout language Blob{..} = bracket (liftIO TS.ts_parser_new) (liftIO . TS.ts_parser_delete) $ \ parser -> do
-  liftIO $ do
+  result <- liftIO $ do
+    let timeoutMicros = fromIntegral $ toMicroseconds parseTimeout
+    TS.ts_parser_set_timeout_micros parser timeoutMicros
     TS.ts_parser_halt_on_error parser (CBool 1)
     TS.ts_parser_set_language parser language
-
-  trace $ "tree-sitter: beginning parsing " <> blobPath
-
-  parsing <- liftIO . async $ runParser parser blobSource
-
-  -- Kick the parser off asynchronously and wait according to the provided timeout.
-  res <- timeout parseTimeout $ liftIO (wait parsing)
-
-  case res of
-    Just Failed          -> Nothing  <$ trace ("tree-sitter: parsing failed " <> blobPath)
-    Just (Succeeded ast) -> Just ast <$ trace ("tree-sitter: parsing succeeded " <> blobPath)
-    Nothing -> do
-      trace $ "tree-sitter: parsing timed out " <> blobPath
-      liftIO (TS.ts_parser_set_enabled parser (CBool 0))
-      Nothing <$ liftIO (wait parsing)
-
+    runParser parser blobSource
+  case result of
+    Failed          -> Nothing  <$ trace ("tree-sitter: parsing failed " <> blobPath)
+    (Succeeded ast) -> Just ast <$ trace ("tree-sitter: parsing succeeded " <> blobPath)
 
 toAST :: forall grammar . (Bounded grammar, Enum grammar) => TS.Node -> IO (Base (AST [] grammar) TS.Node)
 toAST node@TS.Node{..} = do
