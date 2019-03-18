@@ -11,13 +11,18 @@ spec = parallel $ do
     it "produces tags for functions with docs" $ do
       (blob, tree) <- parseTestFile goParser "test/fixtures/go/tags/simple_functions.go"
       runTagging blob symbolsToSummarize tree `shouldBe` Right
-        [ Tag "TestFromBits" "Function" (Span (Pos 6 1) (Pos 7 2)) ["Statements"] (Just "func TestFromBits(t *testing.T)") (Just "// TestFromBits ...")
-        , Tag "Hi" "Function" (Span (Pos 9 1) (Pos 10 2)) ["Statements"] (Just "func Hi()") Nothing ]
+        [ Tag "TestFromBits" "Function" (Span (Pos 6 1) (Pos 8 2)) ["Statements"] (Just "func TestFromBits(t *testing.T) {") (Just "// TestFromBits ...")
+        , Tag "Hi" "Function" (Span (Pos 10 1) (Pos 11 2)) ["Statements"] (Just "func Hi()") Nothing ]
 
     it "produces tags for methods" $ do
       (blob, tree) <- parseTestFile goParser "test/fixtures/go/tags/method.go"
       runTagging blob symbolsToSummarize tree `shouldBe` Right
         [ Tag "CheckAuth" "Method" (Span (Pos 3 1) (Pos 3 100)) ["Statements"] (Just "func (c *apiClient) CheckAuth(req *http.Request, user, repo string) (*authenticatedActor, error)") Nothing]
+
+    it "produces tags for calls" $ do
+      (blob, tree) <- parseTestFile goParser "test/fixtures/go/tags/simple_functions.go"
+      runTagging blob ["Call"] tree `shouldBe` Right
+        [ Tag "Hi" "Call" (Span (Pos 7 2) (Pos 7 6)) ["Function", "Context", "Statements"] (Just "Hi()") Nothing]
 
   describe "javascript and typescript" $ do
     it "produces tags for functions with docs" $ do
@@ -65,7 +70,15 @@ spec = parallel $ do
     it "produces tags for methods" $ do
       (blob, tree) <- parseTestFile rubyParser "test/fixtures/ruby/tags/simple_method.rb"
       runTagging blob symbolsToSummarize tree `shouldBe` Right
-        [ Tag "foo" "Method" (Span (Pos 1 1) (Pos 2 4)) ["Statements"] (Just "def foo") Nothing ]
+        [ Tag "foo" "Method" (Span (Pos 1 1) (Pos 4 4)) ["Statements"] (Just "def foo") Nothing ]
+
+    it "produces tags for sends" $ do
+      (blob, tree) <- parseTestFile rubyParser "test/fixtures/ruby/tags/simple_method.rb"
+      runTagging blob ["Send"] tree `shouldBe` Right
+        [ Tag "puts" "Send" (Span (Pos 2 3) (Pos 2 12)) ["Statements", "Method", "Statements"] (Just "puts \"hi\"") Nothing
+        , Tag "bar" "Send" (Span (Pos 3 3) (Pos 3 8)) ["Statements", "Method", "Statements"] (Just "a.bar") Nothing
+        , Tag "a" "Send" (Span (Pos 3 3) (Pos 3 4)) ["Send", "Statements", "Method", "Statements"] (Just "a") Nothing
+        ]
 
     it "produces tags for methods with docs" $ do
       (blob, tree) <- parseTestFile rubyParser "test/fixtures/ruby/tags/simple_method_with_docs.rb"
