@@ -200,6 +200,17 @@ instance Taggable TypeScript.Module where
   snippet ann (TypeScript.Module _ _                   ) = Just $ locationByteRange ann
   symbolName = declaredName . TypeScript.moduleIdentifier
 
+instance Taggable Expression.Call where
+  snippet ann (Expression.Call _ _ _ (Term (In body _))) = Just $ subtractLocation ann body
+  symbolName = declaredName . Expression.callFunction
+
+instance Taggable Ruby.Send where
+  snippet ann (Ruby.Send _ _ _ (Just (Term (In body _)))) = Just $ subtractLocation ann body
+  snippet ann _                                           = Just $ locationByteRange ann
+  symbolName Ruby.Send{..} = case sendSelector of
+    Just sel -> maybeM Nothing (declaredName sel)
+    Nothing  -> Just (name "call")
+
 instance Taggable []
 instance Taggable Comment.Comment
 instance Taggable Comment.HashBang
@@ -209,7 +220,6 @@ instance Taggable Expression.Await
 instance Taggable Expression.BAnd
 instance Taggable Expression.BOr
 instance Taggable Expression.BXOr
-instance Taggable Expression.Call
 instance Taggable Expression.Cast
 instance Taggable Expression.Comparison
 instance Taggable Expression.Complement
@@ -606,7 +616,6 @@ instance Taggable PHP.PropertyModifier
 instance Taggable PHP.InterfaceDeclaration
 instance Taggable PHP.Declare
 
-instance Taggable Ruby.Send
 instance Taggable Ruby.Require
 instance Taggable Ruby.Load
 instance Taggable Ruby.LowPrecedenceAnd

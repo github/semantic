@@ -21,19 +21,17 @@ import           Data.Term
 import           Data.Text hiding (empty)
 import           Tags.Taggable
 
-symbolsToSummarize :: [Text]
-symbolsToSummarize = ["Function", "Method", "Class", "Module"]
-
 runTagging :: (IsTaggable syntax)
   => Blob
+  -> [Text]
   -> Term syntax Location
   -> Either TranslationError [Tag]
-runTagging blob tree
+runTagging blob symbolsToSummarize tree
   = Eff.run
   . Error.runError
   . State.evalState mempty
   . runT $ source (tagging blob tree)
-      ~> contextualizing blob
+      ~> contextualizing blob symbolsToSummarize
 
 type ContextToken = (Text, Maybe Range)
 
@@ -41,8 +39,8 @@ type Contextualizer
   = StateC [ContextToken]
   ( ErrorC TranslationError PureC)
 
-contextualizing :: Blob -> Machine.ProcessT Contextualizer Token Tag
-contextualizing Blob{..} = repeatedly $ await >>= \case
+contextualizing :: Blob -> [Text] -> Machine.ProcessT Contextualizer Token Tag
+contextualizing Blob{..} symbolsToSummarize = repeatedly $ await >>= \case
   Enter x r -> enterScope (x, r)
   Exit  x r -> exitScope (x, r)
   Iden iden span docsLiteralRange -> lift State.get >>= \case
