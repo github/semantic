@@ -193,7 +193,9 @@ declareModule :: ( AbstractValue term address value m
                 -> [term]
                 -> Evaluator term address value m value
 declareModule eval identifier statements = do
-    name <- maybeM (throwNoNameError identifier) (declaredName identifier)
+    (name, relation) <- case declaredName identifier of
+                          Just name -> pure (name, Default)
+                          _         -> gensym >>= \name -> pure (name, Gensym)
     span <- ask @Span
     currentScope' <- currentScope
 
@@ -212,7 +214,7 @@ declareModule eval identifier statements = do
       Nothing -> do
         let edges = Map.singleton Lexical [ currentScope' ]
         childScope <- newScope edges
-        declare (Declaration name) Default Public span ScopeGraph.Module (Just childScope)
+        declare (Declaration name) relation Public span ScopeGraph.Module (Just childScope)
 
         currentFrame' <- currentFrame
         let frameEdges = Map.singleton Lexical (Map.singleton currentScope' currentFrame')
@@ -257,7 +259,6 @@ instance Declarations a => Declarations (AbstractClass a) where
 
 instance Evaluatable AbstractClass where
   eval eval _ AbstractClass{..} = do
-    name <- maybeM (throwNoNameError abstractClassIdentifier) (declaredName abstractClassIdentifier)
     span <- ask @Span
     currentScope' <- currentScope
 
@@ -274,7 +275,7 @@ instance Evaluatable AbstractClass where
         current = (Lexical, ) <$> pure (pure currentScope')
         edges = Map.fromList (superclassEdges <> current)
     classScope <- newScope edges
-    declare (Declaration name) Default Public span ScopeGraph.AbstractClass (Just classScope)
+    name <- declareMaybeName (declaredName abstractClassIdentifier) Default Public span ScopeGraph.AbstractClass (Just classScope)
 
     let frameEdges = Map.singleton Superclass (Map.fromList (catMaybes superScopes))
     childFrame <- newFrame classScope frameEdges
