@@ -63,37 +63,37 @@ instance APIConvert Legacy.Span Data.Span where
     toAPI Data.Span{..} = Legacy.Span (bridging #? spanStart) (bridging #? spanEnd)
     fromAPI Legacy.Span {..} = Data.Span <$> (start >>= preview bridging) <*> (end >>= preview bridging)
 
-instance APIBridge API.Language Data.Language where
+instance APIBridge T.Text Data.Language where
   bridging = iso apiLanguageToLanguage languageToApiLanguage where
-    languageToApiLanguage :: Data.Language -> API.Language
+    languageToApiLanguage :: Data.Language -> T.Text
     languageToApiLanguage = \case
-      Data.Unknown -> API.Unknown
-      Data.Go -> API.Go
-      Data.Haskell -> API.Haskell
-      Data.Java -> API.Java
-      Data.JavaScript -> API.Javascript
-      Data.JSON -> API.Json
-      Data.JSX -> API.Jsx
-      Data.Markdown -> API.Markdown
-      Data.Python -> API.Python
-      Data.Ruby -> API.Ruby
-      Data.TypeScript -> API.Typescript
-      Data.PHP -> API.Php
+      Data.Unknown -> "Unknown"
+      Data.Go -> "Go"
+      Data.Haskell -> "Haskell"
+      Data.Java -> "Java"
+      Data.JavaScript -> "JavaScript"
+      Data.JSON -> "JSON"
+      Data.JSX -> "JSX"
+      Data.Markdown -> "Markdown"
+      Data.Python -> "Python"
+      Data.Ruby -> "Ruby"
+      Data.TypeScript -> "TypeScript"
+      Data.PHP -> "PHP"
 
-    apiLanguageToLanguage :: API.Language -> Data.Language
+    apiLanguageToLanguage :: T.Text -> Data.Language
     apiLanguageToLanguage = \case
-      API.Unknown -> Data.Unknown
-      API.Go -> Data.Go
-      API.Haskell -> Data.Haskell
-      API.Java -> Data.Java
-      API.Javascript -> Data.JavaScript
-      API.Json -> Data.JSON
-      API.Jsx -> Data.JSX
-      API.Markdown -> Data.Markdown
-      API.Python -> Data.Python
-      API.Ruby -> Data.Ruby
-      API.Typescript -> Data.TypeScript
-      API.Php -> Data.PHP
+      "Go" -> Data.Go
+      "Haskell" -> Data.Haskell
+      "Java" -> Data.Java
+      "JavaScript" -> Data.JavaScript
+      "JSON" -> Data.JSON
+      "JSX" -> Data.JSX
+      "Markdown" -> Data.Markdown
+      "Python" -> Data.Python
+      "Ruby" -> Data.Ruby
+      "TypeScript" -> Data.TypeScript
+      "PHP" -> Data.PHP
+      _ -> Data.Unknown
 
 instance APIBridge API.Blob Data.Blob where
   bridging = iso apiBlobToBlob blobToApiBlob where
