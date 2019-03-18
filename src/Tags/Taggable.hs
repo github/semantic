@@ -207,9 +207,7 @@ instance Taggable Expression.Call where
 instance Taggable Ruby.Send where
   snippet ann (Ruby.Send _ _ _ (Just (Term (In body _)))) = Just $ subtractLocation ann body
   snippet ann _                                           = Just $ locationByteRange ann
-  symbolName Ruby.Send{..} = case sendSelector of
-    Just sel -> maybeM Nothing (declaredName sel)
-    Nothing  -> Just (name "call")
+  symbolName Ruby.Send{..} = maybe Nothing declaredName sendSelector
 
 instance Taggable []
 instance Taggable Comment.Comment
