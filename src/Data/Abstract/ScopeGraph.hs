@@ -86,7 +86,7 @@ instance Ord AccessControl where
   (<=) Public _            = False
 
 
-data Relation = Default | Instance | Prelude
+data Relation = Default | Instance | Prelude | Gensym
   deriving (Eq, Show, Ord, Generic, NFData)
 
 instance Lower Relation where

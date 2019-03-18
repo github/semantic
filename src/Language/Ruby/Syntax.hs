@@ -181,7 +181,9 @@ instance Diffable Class where
 
 instance Evaluatable Class where
   eval eval _ Class{..} = do
-    name <- maybeM (throwNoNameError classIdentifier) (declaredName classIdentifier)
+    (name, relation) <- case declaredName classIdentifier of
+                          Just name -> pure (name, Default)
+                          _         -> gensym >>= \name -> pure (name, Gensym)
     span <- ask @Span
     currentScope' <- currentScope
 
@@ -210,7 +212,7 @@ instance Evaluatable Class where
             current = (Lexical, ) <$> pure (pure currentScope')
             edges = Map.fromList (superclassEdges <> current)
         classScope <- newScope edges
-        declare (Declaration name) Default Public span ScopeGraph.Class (Just classScope)
+        declare (Declaration name) relation Public span ScopeGraph.Class (Just classScope)
 
         let frameEdges = Map.singleton Superclass (Map.fromList (catMaybes superScopes))
         childFrame <- newFrame classScope frameEdges
@@ -241,7 +243,9 @@ data Module a = Module { moduleIdentifier :: !a, moduleStatements :: ![a] }
 
 instance Evaluatable Module where
   eval eval _ Module{..} =  do
-    name <- maybeM (throwNoNameError moduleIdentifier) (declaredName moduleIdentifier)
+    (name, relation) <- case declaredName moduleIdentifier of
+                          Just name -> pure (name, Default)
+                          _         -> gensym >>= \name -> pure (name, Gensym)
     span <- ask @Span
     currentScope' <- currentScope
 
@@ -260,7 +264,7 @@ instance Evaluatable Module where
       Nothing -> do
         let edges = Map.singleton Lexical [ currentScope' ]
         classScope <- newScope edges
-        declare (Declaration name) Default Public span ScopeGraph.Module (Just classScope)
+        declare (Declaration name) relation Public span ScopeGraph.Module (Just classScope)
 
         currentFrame' <- currentFrame
         let frameEdges = Map.singleton Lexical (Map.singleton currentScope' currentFrame')
@@ -323,10 +327,12 @@ instance Declarations1 Assignment where
 
 instance Evaluatable Assignment where
   eval eval ref Assignment{..} = do
-    lhsName <- maybeM (throwNoNameError assignmentTarget) (declaredName assignmentTarget)
+    (lhsName, relation) <- case declaredName assignmentTarget of
+                             Just name -> pure (name, Default)
+                             _         -> gensym >>= \name -> pure (name, Gensym)
     maybeSlot <- maybeLookupDeclaration (Declaration lhsName)
     assignmentSpan <- ask @Span
-    maybe (declare (Declaration lhsName) Default Public assignmentSpan ScopeGraph.Assignment Nothing) (const (pure ())) maybeSlot
+    maybe (declare (Declaration lhsName) relation Public assignmentSpan ScopeGraph.Assignment Nothing) (const (pure ())) maybeSlot
 
     lhs <- ref assignmentTarget
     rhs <- eval assignmentValue
