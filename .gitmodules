@@ -16,3 +16,12 @@
 [submodule "vendor/fused-effects"]
 	path = vendor/fused-effects
 	url = https://github.com/robrix/fused-effects.git
+[submodule "vendor/proto3-suite"]
+	path = vendor/proto3-suite
+	url = https://github.com/joshvera/proto3-suite.git
+[submodule "vendor/proto3-wire"]
+	path = vendor/proto3-wire
+	url = https://github.com/joshvera/proto3-wire.git
+[submodule "vendor/cmark-gfm"]
+	path = vendor/cmark-gfm
+	url = git@github.com:kivikakk/cmark-gfm-hs.git
