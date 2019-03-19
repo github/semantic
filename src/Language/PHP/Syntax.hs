@@ -172,6 +172,7 @@ data QualifiedName a = QualifiedName { name :: a, identifier :: a }
 
 instance Evaluatable QualifiedName where
   eval _ _ (QualifiedName obj iden) = do
+    -- TODO: Consider gensym'ed names used for References.
     name <- maybeM (throwNoNameError obj) (declaredName obj)
     let objSpan = getSpan obj
     reference (Reference name) objSpan ScopeGraph.Identifier (Declaration name)

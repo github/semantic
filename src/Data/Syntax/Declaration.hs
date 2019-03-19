@@ -28,15 +28,10 @@ instance Diffable Function where
 
 instance Evaluatable Function where
   eval _ _ Function{..} = do
-    name <- maybeM (throwNoNameError functionName) (declaredName functionName)
     span <- ask @Span
-    associatedScope <- declareFunction name ScopeGraph.Public span ScopeGraph.Function
+    (name, associatedScope) <- declareFunction (declaredName functionName) ScopeGraph.Public span ScopeGraph.Function
 
-    params <- withScope associatedScope . for functionParameters $ \paramNode -> do
-      param <- maybeM (throwNoNameError paramNode) (declaredName paramNode)
-
-      let paramSpan = getSpan paramNode
-      param <$ declare (Declaration param) Default ScopeGraph.Public paramSpan ScopeGraph.Parameter Nothing
+    params <- withScope associatedScope . for functionParameters $ \paramNode -> declareMaybeName (declaredName paramNode) Default ScopeGraph.Public (getSpan paramNode) ScopeGraph.Parameter Nothing
 
     addr <- lookupSlot (Declaration name)
     v <- function name params functionBody associatedScope
@@ -50,17 +45,17 @@ declareFunction :: ( Carrier sig m
                    , Member Fresh sig
                    , Ord address
                    )
-                => Name
+                => Maybe Name
                 -> ScopeGraph.AccessControl
                 -> Span
                 -> ScopeGraph.Kind
-                -> Evaluator term address value m address
+                -> Evaluator term address value m (Name, address)
 declareFunction name accessControl span kind = do
   currentScope' <- currentScope
   let lexicalEdges = Map.singleton Lexical [ currentScope' ]
   associatedScope <- newScope lexicalEdges
-  declare (Declaration name) Default accessControl span kind (Just associatedScope)
-  pure associatedScope
+  name' <- declareMaybeName name Default accessControl span kind (Just associatedScope)
+  pure (name', associatedScope)
 
 instance Tokenize Function where
   tokenize Function{..} = within' Scope.Function $ do
@@ -92,16 +87,13 @@ instance Diffable Method where
 -- local environment.
 instance Evaluatable Method where
   eval _ _ Method{..} = do
-    name <- maybeM (throwNoNameError methodName) (declaredName methodName)
     span <- ask @Span
-    associatedScope <- declareFunction name methodAccessControl span ScopeGraph.Method
+    (name, associatedScope) <- declareFunction (declaredName methodName) methodAccessControl span ScopeGraph.Method
 
     params <- withScope associatedScope $ do
       -- TODO: Should we give `self` a special Relation?
-      declare (Declaration __self) Prelude ScopeGraph.Public emptySpan ScopeGraph.Unknown Nothing
-      for methodParameters $ \paramNode -> do
-        param <- maybeM (throwNoNameError paramNode) (declaredName paramNode)
-        param <$ declare (Declaration param) Default ScopeGraph.Public span ScopeGraph.Parameter Nothing
+      declare (Declaration __self) ScopeGraph.Prelude ScopeGraph.Public emptySpan ScopeGraph.Unknown Nothing
+      for methodParameters $ \paramNode -> declareMaybeName (declaredName paramNode) Default ScopeGraph.Public (getSpan paramNode) ScopeGraph.Parameter Nothing
 
     addr <- lookupSlot (Declaration name)
     v <- function name params methodBody associatedScope
@@ -144,9 +136,8 @@ instance Declarations1 RequiredParameter where
 -- TODO: Implement Eval instance for RequiredParameter
 instance Evaluatable RequiredParameter where
   eval _ _ RequiredParameter{..} = do
-    name <- maybeM (throwNoNameError requiredParameter) (declaredName requiredParameter)
     span <- ask @Span
-    declare (Declaration name) Default ScopeGraph.Public span ScopeGraph.RequiredParameter Nothing
+    _ <- declareMaybeName (declaredName requiredParameter) Default ScopeGraph.Public span ScopeGraph.RequiredParameter Nothing
     unit
 
 
@@ -170,9 +161,8 @@ instance Evaluatable VariableDeclaration where
   eval _    _ (VariableDeclaration [])   = unit
   eval eval _ (VariableDeclaration decs) = do
     for_ decs $ \declaration -> do
-      name <- maybeM (throwNoNameError declaration) (declaredName declaration)
-      let declarationSpan = getSpan declaration
-      declare (Declaration name) Default ScopeGraph.Public declarationSpan ScopeGraph.VariableDeclaration Nothing
+      let span = getSpan declaration
+      _ <- declareMaybeName (declaredName declaration) Default ScopeGraph.Public span ScopeGraph.VariableDeclaration Nothing
       eval declaration
     unit
 
@@ -209,10 +199,8 @@ data PublicFieldDefinition a = PublicFieldDefinition
 instance Evaluatable PublicFieldDefinition where
   eval eval _ PublicFieldDefinition{..} = do
     span <- ask @Span
-    propertyName <- maybeM (throwNoNameError publicFieldPropertyName) (declaredName publicFieldPropertyName)
-
-    declare (Declaration propertyName) Instance publicFieldAccessControl span ScopeGraph.PublicField Nothing
-    slot <- lookupSlot (Declaration propertyName)
+    name <- declareMaybeName (declaredName publicFieldPropertyName) Instance publicFieldAccessControl span ScopeGraph.PublicField Nothing
+    slot <- lookupSlot (Declaration name)
     value <- eval publicFieldValue
     assign slot value
     unit
@@ -236,12 +224,13 @@ instance Diffable Class where
 
 instance Evaluatable Class where
   eval eval _ Class{..} = do
-    name <- maybeM (throwNoNameError classIdentifier) (declaredName classIdentifier)
     span <- ask @Span
     currentScope' <- currentScope
 
     superScopes <- for classSuperclasses $ \superclass -> do
-      name <- maybeM (throwNoNameError superclass) (declaredName superclass)
+      name <- case declaredName superclass of
+                Just name -> pure name
+                Nothing   -> gensym
       scope <- associatedScope (Declaration name)
       slot <- lookupSlot (Declaration name)
       superclassFrame <- scopedEnvironment =<< deref slot
@@ -253,7 +242,7 @@ instance Evaluatable Class where
         current = (Lexical, ) <$> pure (pure currentScope')
         edges = Map.fromList (superclassEdges <> current)
     classScope <- newScope edges
-    declare (Declaration name) Default ScopeGraph.Public span ScopeGraph.Class (Just classScope)
+    name <- declareMaybeName (declaredName classIdentifier) Default ScopeGraph.Public span ScopeGraph.Class (Just classScope)
 
     let frameEdges = Map.singleton Superclass (Map.fromList (catMaybes superScopes))
     classFrame <- newFrame classScope frameEdges
@@ -323,13 +312,11 @@ data TypeAlias a = TypeAlias { typeAliasContext :: ![a], typeAliasIdentifier :: 
 
 instance Evaluatable TypeAlias where
   eval _ _ TypeAlias{..} = do
-    name <- maybeM (throwNoNameError typeAliasIdentifier) (declaredName typeAliasIdentifier)
+    -- This use of `throwNoNameError` is good -- we aren't declaring something new so `declareMaybeName` is not useful here.
     kindName <- maybeM (throwNoNameError typeAliasKind) (declaredName typeAliasKind)
-
     span <- ask @Span
     assocScope <- associatedScope (Declaration kindName)
-    -- TODO: Should we consider a special Relation for `TypeAlias`?
-    declare (Declaration name) Default ScopeGraph.Public span ScopeGraph.TypeAlias assocScope
+    name <- declareMaybeName (declaredName typeAliasIdentifier) Default ScopeGraph.Public span ScopeGraph.TypeAlias assocScope
 
     slot <- lookupSlot (Declaration name)
     kindSlot <- lookupSlot (Declaration kindName)
