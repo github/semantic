@@ -1,9 +1,9 @@
 ---
 type: cabal
 name: ghc-heap
-version: 8.6.3
+version: 8.6.4
 summary: Functions for walking GHC's heap
-homepage: 
+
 license: bsd-3-clause
 ---
 Copyright (c) 2012-2013, Joachim Breitner
