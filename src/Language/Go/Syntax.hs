@@ -75,11 +75,10 @@ data QualifiedImport a = QualifiedImport { qualifiedImportFrom :: !ImportPath, q
 instance Evaluatable QualifiedImport where
   eval _ _ (QualifiedImport importPath aliasTerm) = do
     paths <- resolveGoImport importPath
-    alias <- maybeM (throwNoNameError aliasTerm) (declaredName aliasTerm)
     span <- ask @Span
     scopeAddress <- newScope mempty
-    declare (Declaration alias) Default Public span ScopeGraph.QualifiedImport (Just scopeAddress)
-    aliasSlot <- lookupSlot (Declaration alias)
+    name <- declareMaybeName (declaredName aliasTerm) Default Public span ScopeGraph.QualifiedImport (Just scopeAddress)
+    aliasSlot <- lookupSlot (Declaration name)
 
     withScope scopeAddress $ do
       let
