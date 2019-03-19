@@ -1,9 +1,9 @@
 ---
 type: cabal
 name: ghc-boot
-version: 8.6.3
+version: 8.6.4
 summary: Shared functionality between GHC and its boot libraries
-homepage: 
+
 license: bsd-3-clause
 ---
 The Glasgow Haskell Compiler License
