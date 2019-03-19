@@ -187,6 +187,7 @@ newtype QualifiedImport a = QualifiedImport { qualifiedImportFrom :: NonEmpty a 
 -- import a.b.c
 instance Evaluatable QualifiedImport where
   eval _ _ (QualifiedImport qualifiedNames) = do
+    -- TODO: Consider gensym'ed names for imports.
     qualifiedName <- fmap (T.unpack . formatName) <$> traverse (\term -> maybeM (throwNoNameError term) (declaredName term)) qualifiedNames
     modulePaths <- resolvePythonModules (QualifiedName qualifiedName)
     let namesAndPaths = toList (NonEmpty.zip (NonEmpty.zip qualifiedNames (Data.Abstract.Evaluatable.name . T.pack <$> qualifiedName)) modulePaths)
