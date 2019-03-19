@@ -22,7 +22,6 @@ import Data.Location
 import Data.Source
 import Data.Span
 import Data.Term
-import Semantic.Timeout
 
 import qualified TreeSitter.Language as TS
 import qualified TreeSitter.Node as TS
