@@ -58,10 +58,8 @@ instance Evaluatable QualifiedAliasedImport where
     importScope <- newScope (Map.singleton ScopeGraph.Import [ moduleScope ])
     let scopeMap = Map.singleton moduleScope moduleFrame
     aliasFrame <- newFrame importScope (Map.singleton ScopeGraph.Import scopeMap)
-
-    alias <- maybeM (throwNoNameError aliasTerm) (declaredName aliasTerm)
-    declare (Declaration alias) Default Public span ScopeGraph.QualifiedAliasedImport (Just importScope)
-    aliasSlot <- lookupSlot (Declaration alias)
+    name <- declareMaybeName (declaredName aliasTerm) Default Public span ScopeGraph.QualifiedAliasedImport (Just importScope)
+    aliasSlot <- lookupSlot (Declaration name)
     assign aliasSlot =<< object aliasFrame
 
     unit
