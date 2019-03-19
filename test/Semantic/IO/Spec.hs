@@ -11,11 +11,6 @@ import System.IO (IOMode (..))
 import Parsing.TreeSitter
 import System.Timeout
 
-import qualified TreeSitter.Language as TS
-import qualified TreeSitter.Node as TS
-import qualified TreeSitter.Parser as TS
-import qualified TreeSitter.Tree as TS
-
 import Data.Blob
 import Data.Handle
 import SpecHelpers hiding (readFile)
@@ -78,24 +73,6 @@ spec = parallel $ do
     it "throws if null on before and after" $ do
       h <- openFileForReading "test/fixtures/cli/diff-null-both-sides.json"
       readBlobPairsFromHandle h `shouldThrow` (== ExitFailure 1)
-
-  describe "cancelable parsing" $
-    it "should be cancelable asynchronously" $ do
-      p <- TS.ts_parser_new
-
-      churn <- async $ do
-        TS.ts_parser_loop_until_cancelled p nullPtr nullPtr 0
-        pure True
-
-      res <- timeout 2500 (wait churn)
-      res `shouldBe` Nothing
-
-      TS.ts_parser_set_enabled p (CBool 0)
-      done <- timeout 2500 (wait churn)
-
-      done `shouldBe` (Just True)
-
-      TS.ts_parser_delete p
 
   describe "readBlobsFromHandle" $ do
     it "returns blobs for valid JSON encoded parse input" $ do

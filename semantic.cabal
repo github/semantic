@@ -98,7 +98,6 @@ library
                      , Control.Abstract.ScopeGraph
                      , Control.Abstract.Value
                      -- Effects
-                     , Control.Effect.Catch
                      , Control.Effect.Interpose
                      , Control.Effect.REPL
                      , Control.Rewriting
@@ -371,6 +370,7 @@ test-suite test
                      , Graphing.Calls.Spec
                      , Integration.Spec
                      , Numeric.Spec
+                     , Parsing.Spec
                      , Reprinting.Spec
                      , Rewriting.Go.Spec
                      , Rewriting.JSON.Spec
@@ -384,6 +384,7 @@ test-suite test
                      , SpecHelpers
                      , Test.Hspec.LeanCheck
   build-depends:       semantic
+                     , tree-sitter-json
                      , hspec >= 2.4.1
                      , hspec-core
                      , hspec-expectations-pretty-diff
