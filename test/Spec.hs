@@ -23,6 +23,7 @@ import qualified Diffing.Interpreter.Spec
 import qualified Graphing.Calls.Spec
 import qualified Integration.Spec
 import qualified Numeric.Spec
+import qualified Parsing.Spec
 import qualified Rendering.TOC.Spec
 import qualified Reprinting.Spec
 import qualified Rewriting.Go.Spec
@@ -75,3 +76,4 @@ main = do
       describe "Semantic.CLI" Semantic.CLI.Spec.spec
       describe "Semantic.IO" Semantic.IO.Spec.spec
       describe "Integration" (Integration.Spec.spec args)
+      describe "Parsing" Parsing.Spec.spec
