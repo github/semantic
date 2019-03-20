@@ -119,7 +119,30 @@ instance HasSpan ReferenceInfo where
   span = lens refSpan (\r s -> r { refSpan = s })
   {-# INLINE span #-}
 
-data Kind = TypeAlias | Class | Method | QualifiedAliasedImport | QualifiedExport | DefaultExport | Module | AbstractClass | Let | QualifiedImport | UnqualifiedImport | Assignment | RequiredParameter | PublicField | VariableDeclaration | Function | Parameter | Unknown | Identifier | TypeIdentifier | This | New | MemberAccess | Call
+data Kind = AbstractClass
+          | Assignment
+          | Call
+          | Class
+          | DefaultExport
+          | Function
+          | Identifier
+          | Let
+          | MemberAccess
+          | Method
+          | Module
+          | New
+          | Parameter
+          | PublicField
+          | QualifiedAliasedImport
+          | QualifiedExport
+          | QualifiedImport
+          | RequiredParameter
+          | This
+          | TypeAlias
+          | TypeIdentifier
+          | Unknown
+          | UnqualifiedImport
+          | VariableDeclaration
   deriving (Eq, Show, Ord, Generic, NFData)
 
 instance Lower Kind where
