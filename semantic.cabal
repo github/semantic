@@ -3,9 +3,11 @@ name:                semantic
 version:             0.6.0
 synopsis:            Framework and service for analyzing and diffing untrusted code.
 description:         Please see README.md
-homepage:            http://github.com/github/semantic#readme
+homepage:            http://github.com/github/semantic-open-source#readme
 author:              Rob Rix, Josh Vera
-maintainer:          rob.rix@github.com
+maintainer:          opensource+semantic@github.com
+license:             MIT
+license-file:        LICENSE
 copyright:           (c) 2016-2019 GitHub, Inc.
 category:            Web
 build-type:          Simple
