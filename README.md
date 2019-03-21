@@ -8,6 +8,7 @@
 | [Language support](#language-support) |
 | [Development](#development) |
 | [Technology and architecture](#technology-and-architecture) |
+| [Licensing](#licensing) |
 
 ## Usage
 
@@ -117,3 +118,13 @@ Semantic leverages a number of interesting algorithms and techniques:
 [RWS]: https://db.in.tum.de/~finis/papers/RWS-Diff.pdf
 [adi]: https://plum-umd.github.io/abstracting-definitional-interpreters/
 [tree-sitter]: https://github.com/tree-sitter/tree-sitter
+
+## Contributions
+
+Contributions are welcome!  Please see our [contribution
+guidelines](CONTRIBUTING.md) and our [code of conduct](CODE_OF_CONDUCT.md) for
+details on how to participate in our community.
+
+## Licensing
+
+Semantic is licensed under the [MIT license](LICENSE).
