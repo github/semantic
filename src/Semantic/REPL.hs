@@ -18,8 +18,9 @@ import Data.Abstract.ModuleTable as ModuleTable
 import Data.Abstract.Package
 import Data.Abstract.Value.Concrete as Concrete
 import Data.Blob (Blob(..))
-import Data.Error (showExcerpt)
+import Data.Error (Colourize, showExcerpt)
 import Data.File (File (..), readBlobFromFile)
+import Data.Flag (flag)
 import Data.Graph (topologicalSort)
 import Data.Language as Language
 import Data.List (uncons)
@@ -138,7 +139,7 @@ step blobs recur term = do
   where list = do
           path <- asks modulePath
           span <- ask
-          maybe (pure ()) (\ blob -> output (T.pack (showExcerpt True span blob ""))) (Prelude.lookup path blobs)
+          maybe (pure ()) (\ blob -> output (T.pack (showExcerpt (flag @Colourize True) span blob ""))) (Prelude.lookup path blobs)
         help = do
           output "Commands available from the prompt:"
           output ""

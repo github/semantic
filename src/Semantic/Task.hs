@@ -73,6 +73,7 @@ import           Data.ByteString.Builder
 import           Data.Coerce
 import           Data.Diff
 import qualified Data.Error as Error
+import qualified Data.Flag as Flag
 import           Data.Location
 import           Data.Source (Source)
 import           Data.Sum
@@ -240,7 +241,7 @@ instance (Member (Error SomeException) sig, Member (Lift IO) sig, Member (Reader
     Semantic.Task.Diff terms k -> k (diffTermPair terms)
     Render renderer input k -> k (renderer input)
     Serialize format input k -> do
-      formatStyle <- asks (bool Plain Colourful . configIsTerminal . config)
+      formatStyle <- asks (Flag.choose IsTerminal Plain Colourful . configIsTerminal . config)
       k (runSerialize formatStyle format input)
 
 
@@ -253,9 +254,9 @@ logError :: (Member Telemetry sig, Carrier sig m)
          -> [(String, String)]
          -> m ()
 logError TaskSession{..} level blob err =
-  let configLogPrintSource' = configLogPrintSource config
-      configIsTerminal' = configIsTerminal config
-  in writeLog level (Error.formatError configLogPrintSource' configIsTerminal' blob err)
+  let shouldLogSource = configLogPrintSource config
+      shouldColorize = Flag.switch IsTerminal Error.Colourize $ configIsTerminal config
+  in writeLog level (Error.formatError shouldLogSource shouldColorize blob err)
 
 data ParserCancelled = ParserTimedOut | AssignmentTimedOut
   deriving (Show, Typeable)
@@ -308,7 +309,8 @@ runParser blob@Blob{..} parser = case parser of
           taskSession <- ask
           let requestID' = ("github_request_id", requestID taskSession)
           let isPublic'  = ("github_is_public", show (isPublic taskSession))
-          let blobFields = ("path", if isPublic taskSession || configLogPrintSource (config taskSession) then blobPath else "<filtered>")
+          let logPrintFlag = configLogPrintSource . config $ taskSession
+          let blobFields = ("path", if isPublic taskSession || Flag.toBool LogPrintSource logPrintFlag then blobPath else "<filtered>")
           let logFields = requestID' : isPublic' : blobFields : languageTag
           ast <- runParser blob parser `catchError` \ (SomeException err) -> do
             writeStat (increment "parse.parse_failures" languageTag)
@@ -332,9 +334,9 @@ runParser blob@Blob{..} parser = case parser of
                     logError taskSession Warning blob err (("task", "assign") : logFields)
                     when (optionsFailOnWarning (configOptions (config taskSession))) $ throwError (toException err)
                 term <$ writeStat (count "parse.nodes" (length term) languageTag)
+          let shouldFail = configFailParsingForTesting $ config taskSession
           case res of
-            Just r | not (configFailParsingForTesting (config taskSession))
-              -> pure r
+            Just r | not (Flag.toBool FailTestParsing shouldFail) -> pure r
             _ -> do
               writeStat (increment "assign.assign_timeouts" languageTag)
               writeLog Error "assignment timeout" (("task", "assign") : logFields)
