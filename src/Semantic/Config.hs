@@ -1,5 +1,3 @@
-{-# LANGUAGE LambdaCase #-}
-
 module Semantic.Config
   ( Config (..)
   , defaultConfig
