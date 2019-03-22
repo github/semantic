@@ -98,7 +98,6 @@ library
                      , Control.Abstract.ScopeGraph
                      , Control.Abstract.Value
                      -- Effects
-                     , Control.Effect.Catch
                      , Control.Effect.Interpose
                      , Control.Effect.REPL
                      , Control.Rewriting
