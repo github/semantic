@@ -68,7 +68,7 @@ data Options
   }
 
 defaultOptions :: Options
-defaultOptions = Options (Just Warning) (flag @FailOnWarning False) (flag @FailOnParseError False)
+defaultOptions = Options (Just Warning) (flag FailOnWarning False) (flag FailOnParseError False)
 
 debugOptions :: Options
 debugOptions = defaultOptions { optionsLogLevel = Just Debug }
@@ -97,11 +97,11 @@ defaultConfig options@Options{..} = do
     , configTreeSitterParseTimeout = fromMilliseconds parseTimeout
     , configAssignmentTimeout = fromMilliseconds assignTimeout
     , configMaxTelemetyQueueSize = size
-    , configIsTerminal = flag @IsTerminal isTerminal
-    , configLogPrintSource = flag @LogPrintSource isTerminal
+    , configIsTerminal = flag IsTerminal isTerminal
+    , configLogPrintSource = flag LogPrintSource isTerminal
     , configLogFormatter = if isTerminal then terminalFormatter else logfmtFormatter
     , configSHA = Nothing
-    , configFailParsingForTesting = flag @FailTestParsing False
+    , configFailParsingForTesting = flag FailTestParsing False
 
     , configOptions = options
     }

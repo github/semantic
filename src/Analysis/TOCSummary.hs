@@ -10,7 +10,7 @@ import Prologue hiding (project)
 import           Control.Arrow
 import           Control.Rewriting
 import           Data.Blob
-import           Data.Error (Error (..), Colourize, showExpectation)
+import           Data.Error (Error (..), Colourize (..), showExpectation)
 import           Data.Flag
 import           Data.Language as Language
 import           Data.Location
@@ -87,7 +87,7 @@ instance CustomHasDeclaration whole Markdown.Heading where
 instance CustomHasDeclaration whole Syntax.Error where
   customToDeclaration Blob{..} ann err@Syntax.Error{}
     = Just $ ErrorDeclaration (T.pack (formatTOCError (Syntax.unError (locationSpan ann) err))) mempty (locationSpan ann) blobLanguage
-    where formatTOCError e = showExpectation (flag @Colourize False) (errorExpected e) (errorActual e) ""
+    where formatTOCError e = showExpectation (flag Colourize False) (errorExpected e) (errorActual e) ""
 
 -- | Produce a 'FunctionDeclaration' for 'Declaration.Function' nodes so long as their identifier is non-empty (defined as having a non-empty 'Range').
 instance CustomHasDeclaration whole Declaration.Function where

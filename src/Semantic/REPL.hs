@@ -139,7 +139,7 @@ step blobs recur term = do
   where list = do
           path <- asks modulePath
           span <- ask
-          maybe (pure ()) (\ blob -> output (T.pack (showExcerpt (flag @Colourize True) span blob ""))) (Prelude.lookup path blobs)
+          maybe (pure ()) (\ blob -> output (T.pack (showExcerpt (flag Colourize True) span blob ""))) (Prelude.lookup path blobs)
         help = do
           output "Commands available from the prompt:"
           output ""
