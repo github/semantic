@@ -8,7 +8,7 @@ module Semantic.Telemetry.Log
   , writeLogMessage
   ) where
 
-import           Data.Error (Colourize, withSGRCode)
+import           Data.Error (Colourize (..), withSGRCode)
 import           Data.Flag as Flag
 import           Data.List (intersperse)
 import qualified Data.Time.Format as Time
@@ -76,7 +76,7 @@ terminalFormatter LogOptions{..} (Message level message pairs time) =
   . showPairs (pairs <> logOptionsContext)
   . showChar '\n' $ ""
   where
-    colourize = flag @Colourize True
+    colourize = flag Colourize True
     showLevel Error = withSGRCode colourize [SetColor Foreground Vivid Red, SetConsoleIntensity BoldIntensity] (showString "ERROR")
     showLevel Warning = withSGRCode colourize [SetColor Foreground Vivid Yellow, SetConsoleIntensity BoldIntensity] (showString " WARN")
     showLevel Info = withSGRCode colourize [SetColor Foreground Vivid Cyan, SetConsoleIntensity BoldIntensity] (showString " INFO")
