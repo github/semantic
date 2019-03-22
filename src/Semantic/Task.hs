@@ -312,6 +312,10 @@ runParser blob@Blob{..} parser = case parser of
           let logPrintFlag = configLogPrintSource . config $ taskSession
           let blobFields = ("path", if isPublic taskSession || Flag.toBool LogPrintSource logPrintFlag then blobPath else "<filtered>")
           let logFields = requestID' : isPublic' : blobFields : languageTag
+          let shouldFailForTesting = configFailParsingForTesting $ config taskSession
+          let shouldFailOnParsing = optionsFailOnParseError . configOptions $ config taskSession
+          let shouldFailOnWarning = optionsFailOnWarning . configOptions $ config taskSession
+
           ast <- runParser blob parser `catchError` \ (SomeException err) -> do
             writeStat (increment "parse.parse_failures" languageTag)
             writeLog Error "failed parsing" (("task", "parse") : logFields)
@@ -328,15 +332,14 @@ runParser blob@Blob{..} parser = case parser of
                   Just "ParseError" -> do
                     when (i == 0) $ writeStat (increment "parse.parse_errors" languageTag)
                     logError taskSession Warning blob err (("task", "parse") : logFields)
-                    when (optionsFailOnParseError (configOptions (config taskSession))) $ throwError (toException err)
+                    when (Flag.toBool FailOnParseError shouldFailOnParsing) (throwError (toException err))
                   _ -> do
                     when (i == 0) $ writeStat (increment "parse.assign_warnings" languageTag)
                     logError taskSession Warning blob err (("task", "assign") : logFields)
-                    when (optionsFailOnWarning (configOptions (config taskSession))) $ throwError (toException err)
+                    when (Flag.toBool FailOnWarning shouldFailOnWarning) (throwError (toException err))
                 term <$ writeStat (count "parse.nodes" (length term) languageTag)
-          let shouldFail = configFailParsingForTesting $ config taskSession
           case res of
-            Just r | not (Flag.toBool FailTestParsing shouldFail) -> pure r
+            Just r | not (Flag.toBool FailTestParsing shouldFailForTesting) -> pure r
             _ -> do
               writeStat (increment "assign.assign_timeouts" languageTag)
               writeLog Error "assignment timeout" (("task", "assign") : logFields)

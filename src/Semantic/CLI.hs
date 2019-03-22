@@ -9,6 +9,7 @@ import           Data.List (intercalate, uncons)
 import           Data.List.Split (splitWhen)
 import           Data.Project
 import qualified Data.Text as T
+import qualified Data.Flag as Flag
 import           Options.Applicative hiding (style)
 import           Prologue
 import           Semantic.Api hiding (File)
@@ -48,7 +49,7 @@ optionsParser = do
                       (long "log-level" <> value (Just Log.Warning) <> help "Log messages at or above this level, or disable logging entirely.")
   failOnWarning <- switch (long "fail-on-warning" <> help "Fail on assignment warnings.")
   failOnParseError <- switch (long "fail-on-parse-error" <> help "Fail on tree-sitter parse errors.")
-  pure $ Options logLevel failOnWarning failOnParseError
+  pure $ Options logLevel (Flag.flag @FailOnWarning failOnWarning) (Flag.flag @FailOnParseError failOnParseError)
 
 argumentsParser :: Parser (Task.TaskEff ())
 argumentsParser = do

@@ -15,6 +15,8 @@ module Semantic.Config
   , IsTerminal      (..)
   , LogPrintSource  (..)
   , FailTestParsing (..)
+  , FailOnWarning   (..)
+  , FailOnParseError (..)
   ) where
 
 import           Data.Duration
@@ -33,8 +35,10 @@ import           System.IO (hIsTerminalDevice, stdout)
 import           System.Posix.Process
 import           System.Posix.Types
 
-data IsTerminal      = IsTerminal
-data FailTestParsing = FailTestParsing
+data IsTerminal       = IsTerminal
+data FailTestParsing  = FailTestParsing
+data FailOnWarning    = FailOnWarning
+data FailOnParseError = FailOnParseError
 
 data Config
   = Config
@@ -58,19 +62,19 @@ data Config
 -- Options configurable via command line arguments.
 data Options
   = Options
-  { optionsLogLevel         :: Maybe Level   -- ^ What level of messages to log. 'Nothing' disables logging.
-  , optionsFailOnWarning    :: Bool          -- ^ Should semantic fail fast on assignment warnings (for testing)
-  , optionsFailOnParseError :: Bool          -- ^ Should semantic fail fast on tree-sitter parser errors (for testing)
+  { optionsLogLevel         :: Maybe Level           -- ^ What level of messages to log. 'Nothing' disables logging.
+  , optionsFailOnWarning    :: Flag FailOnWarning    -- ^ Should semantic fail fast on assignment warnings (for testing)
+  , optionsFailOnParseError :: Flag FailOnParseError -- ^ Should semantic fail fast on tree-sitter parser errors (for testing)
   }
 
 defaultOptions :: Options
-defaultOptions = Options (Just Warning) False False
+defaultOptions = Options (Just Warning) (flag @FailOnWarning False) (flag @FailOnParseError False)
 
 debugOptions :: Options
-debugOptions = Options (Just Debug) False False
+debugOptions = defaultOptions { optionsLogLevel = Just Debug }
 
 infoOptions :: Options
-infoOptions = Options (Just Info) False False
+infoOptions = defaultOptions { optionsLogLevel = Just Info }
 
 defaultConfig :: Options -> IO Config
 defaultConfig options@Options{..} = do
