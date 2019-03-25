@@ -13,6 +13,8 @@ category:            Web
 build-type:          Simple
 stability:           alpha
 
+tested-with:         GHC == 8.6.4
+
 flag release
   description: Build with optimizations on (for CI or deployment builds)
   default:     False
