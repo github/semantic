@@ -37,8 +37,9 @@ common haskell
                      , StrictData
                      , TypeApplications
 
--- Packages left without version bounds are vendored/
--- Currently pinned to lts-13.13.
+-- Except in case of vendored dependencies, these deps should be expressed
+-- as caret-operator bounds relative to a version in Stackage.
+-- These are currently pinned to lts-13.13.
 common dependencies
   build-depends:       base >= 4.8 && < 5
                      , aeson ^>= 1.4.2.0
@@ -278,8 +279,7 @@ library
                      , Tags.Tagging
                      -- Custom Prelude
                      , Prologue
-  -- Except in case of vendored dependencies, these deps should be expressed
-  -- as caret-operator bounds relative to a version in Stackage.
+
   build-depends:       base >= 4.8 && < 5
                      , ansi-terminal ^>= 0.8.2
                      , array ^>= 0.5.3.0
