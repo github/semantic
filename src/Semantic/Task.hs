@@ -68,7 +68,6 @@ import           Control.Effect.Trace
 import           Control.Monad
 import           Control.Monad.IO.Class
 import           Data.Blob
-import           Data.Bool
 import           Data.ByteString.Builder
 import           Data.Coerce
 import           Data.Diff

@@ -18,7 +18,7 @@ import Data.Abstract.ModuleTable as ModuleTable
 import Data.Abstract.Package
 import Data.Abstract.Value.Concrete as Concrete
 import Data.Blob (Blob(..))
-import Data.Error (Colourize, showExcerpt)
+import Data.Error (Colourize (..), showExcerpt)
 import Data.File (File (..), readBlobFromFile)
 import Data.Flag (flag)
 import Data.Graph (topologicalSort)
