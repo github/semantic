@@ -22,4 +22,4 @@ spec = parallel $ do
       output <- fmap runBuilder . runTaskOrDie $ parseTermBuilder TermSExpression [methodsBlob]
       output `shouldBe` "(Statements\n  (Method\n    (Empty)\n    (Identifier)\n    (Statements)))\n"
   where
-    methodsBlob = Blob "def foo\nend\n" "methods.rb" Ruby
+    methodsBlob = Blob "def foo\nend\n" "methods.rb" Ruby mempty
