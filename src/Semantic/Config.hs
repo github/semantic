@@ -1,5 +1,3 @@
-{-# LANGUAGE LambdaCase #-}
-
 module Semantic.Config
   ( Config (..)
   , defaultConfig
@@ -13,9 +11,17 @@ module Semantic.Config
   , withLoggerFromConfig
   , withStatterFromConfig
   , withTelemetry
+  -- * Flags
+  , IsTerminal      (..)
+  , LogPrintSource  (..)
+  , FailTestParsing (..)
+  , FailOnWarning   (..)
+  , FailOnParseError (..)
   ) where
 
 import           Data.Duration
+import           Data.Error (LogPrintSource(..))
+import           Data.Flag
 import           Network.HostName
 import           Network.HTTP.Client.TLS
 import           Network.URI
@@ -29,43 +35,46 @@ import           System.IO (hIsTerminalDevice, stdout)
 import           System.Posix.Process
 import           System.Posix.Types
 
+data IsTerminal       = IsTerminal
+data FailTestParsing  = FailTestParsing
+data FailOnWarning    = FailOnWarning
+data FailOnParseError = FailOnParseError
+
 data Config
   = Config
-  { configAppName                :: String       -- ^ Application name ("semantic")
-  , configHostName               :: String       -- ^ HostName from getHostName
-  , configProcessID              :: ProcessID    -- ^ ProcessID from getProcessID
-  , configHaystackURL            :: Maybe String -- ^ URL of Haystack (with creds) from environment
-  , configStatsHost              :: Stat.Host    -- ^ Host of statsd/datadog (default: "127.0.0.1")
-  , configStatsPort              :: Stat.Port    -- ^ Port of statsd/datadog (default: "28125")
-
-  , configTreeSitterParseTimeout :: Duration     -- ^ Timeout in milliseconds before canceling tree-sitter parsing (default: 6000).
-  , configAssignmentTimeout      :: Duration     -- ^ Millisecond timeout for assignment (default: 4000)
-  , configMaxTelemetyQueueSize   :: Int          -- ^ Max size of telemetry queues before messages are dropped (default: 1000).
-  , configIsTerminal             :: Bool         -- ^ Whether a terminal is attached (set automaticaly at runtime).
-  , configLogPrintSource         :: Bool         -- ^ Whether to print the source reference when logging errors (set automatically at runtime).
-  , configLogFormatter           :: LogFormatter -- ^ Log formatter to use (set automaticaly at runtime).
-  , configSHA                    :: Maybe String -- ^ Optional SHA to include in log messages.
-  , configFailParsingForTesting  :: Bool         -- ^ Simulate internal parse failure for testing (default: False).
-
-  , configOptions                :: Options      -- ^ Options configurable via command line arguments.
+  { configAppName                :: String               -- ^ Application name ("semantic")
+  , configHostName               :: String               -- ^ HostName from getHostName
+  , configProcessID              :: ProcessID            -- ^ ProcessID from getProcessID
+  , configHaystackURL            :: Maybe String         -- ^ URL of Haystack (with creds) from environment
+  , configStatsHost              :: Stat.Host            -- ^ Host of statsd/datadog (default: "127.0.0.1")
+  , configStatsPort              :: Stat.Port            -- ^ Port of statsd/datadog (default: "28125")
+  , configTreeSitterParseTimeout :: Duration             -- ^ Timeout in milliseconds before canceling tree-sitter parsing (default: 6000).
+  , configAssignmentTimeout      :: Duration             -- ^ Millisecond timeout for assignment (default: 4000)
+  , configMaxTelemetyQueueSize   :: Int                  -- ^ Max size of telemetry queues before messages are dropped (default: 1000).
+  , configIsTerminal             :: Flag IsTerminal      -- ^ Whether a terminal is attached (set automaticaly at runtime).
+  , configLogPrintSource         :: Flag LogPrintSource  -- ^ Whether to print the source reference when logging errors (set automatically at runtime).
+  , configLogFormatter           :: LogFormatter         -- ^ Log formatter to use (set automatically at runtime).
+  , configSHA                    :: Maybe String         -- ^ Optional SHA to include in log messages.
+  , configFailParsingForTesting  :: Flag FailTestParsing -- ^ Simulate internal parse failure for testing (default: False).
+  , configOptions                :: Options              -- ^ Options configurable via command line arguments.
   }
 
 -- Options configurable via command line arguments.
 data Options
   = Options
-  { optionsLogLevel         :: Maybe Level   -- ^ What level of messages to log. 'Nothing' disables logging.
-  , optionsFailOnWarning    :: Bool          -- ^ Should semantic fail fast on assignment warnings (for testing)
-  , optionsFailOnParseError :: Bool          -- ^ Should semantic fail fast on tree-sitter parser errors (for testing)
+  { optionsLogLevel         :: Maybe Level           -- ^ What level of messages to log. 'Nothing' disables logging.
+  , optionsFailOnWarning    :: Flag FailOnWarning    -- ^ Should semantic fail fast on assignment warnings (for testing)
+  , optionsFailOnParseError :: Flag FailOnParseError -- ^ Should semantic fail fast on tree-sitter parser errors (for testing)
   }
 
 defaultOptions :: Options
-defaultOptions = Options (Just Warning) False False
+defaultOptions = Options (Just Warning) (flag FailOnWarning False) (flag FailOnParseError False)
 
 debugOptions :: Options
-debugOptions = Options (Just Debug) False False
+debugOptions = defaultOptions { optionsLogLevel = Just Debug }
 
 infoOptions :: Options
-infoOptions = Options (Just Info) False False
+infoOptions = defaultOptions { optionsLogLevel = Just Info }
 
 defaultConfig :: Options -> IO Config
 defaultConfig options@Options{..} = do
@@ -88,11 +97,11 @@ defaultConfig options@Options{..} = do
     , configTreeSitterParseTimeout = fromMilliseconds parseTimeout
     , configAssignmentTimeout = fromMilliseconds assignTimeout
     , configMaxTelemetyQueueSize = size
-    , configIsTerminal = isTerminal
-    , configLogPrintSource = isTerminal
+    , configIsTerminal = flag IsTerminal isTerminal
+    , configLogPrintSource = flag LogPrintSource isTerminal
     , configLogFormatter = if isTerminal then terminalFormatter else logfmtFormatter
     , configSHA = Nothing
-    , configFailParsingForTesting = False
+    , configFailParsingForTesting = flag FailTestParsing False
 
     , configOptions = options
     }
@@ -108,15 +117,15 @@ logOptionsFromConfig :: Config -> LogOptions
 logOptionsFromConfig Config{..} = LogOptions
   { logOptionsLevel     = optionsLogLevel configOptions
   , logOptionsFormatter = configLogFormatter
-  , logOptionsContext   = logOptionsContext' configIsTerminal
+  , logOptionsContext   = logOptionsContext'
   }
-  where logOptionsContext' = \case
-          False -> [ ("app", configAppName)
-                   , ("pid", show configProcessID)
-                   , ("hostname", configHostName)
-                   , ("sha", fromMaybe "development" configSHA)
-                   ]
-          _     -> []
+  where logOptionsContext'
+          | toBool IsTerminal configIsTerminal = []
+          | otherwise = [ ("app", configAppName)
+                        , ("pid", show configProcessID)
+                        , ("hostname", configHostName)
+                        , ("sha", fromMaybe "development" configSHA)
+                        ]
 
 
 withLoggerFromConfig :: Config -> (LogQueue -> IO c) -> IO c

@@ -10,6 +10,7 @@ import           Data.ByteString.Builder
 import qualified Data.ByteString.Char8 as BC
 import           Data.Either
 import           Data.File (file)
+import           Data.Flag
 import           Data.Foldable
 import           Data.List
 import           Data.Maybe
@@ -18,7 +19,7 @@ import           Data.Typeable (cast)
 import           Data.Void
 import           Parsing.Parser
 import           Semantic.Api (TermOutputFormat (..), parseTermBuilder)
-import           Semantic.Config (Config (..), Options (..), defaultOptions)
+import           Semantic.Config (Config (..), Options (..), FailOnWarning (..), defaultOptions)
 import qualified Semantic.IO as IO
 import           Semantic.Task
 import           Semantic.Task.Files
@@ -58,7 +59,7 @@ main = withOptions opts $ \ config logger statter -> hspec . parallel $ do
                   else res `shouldSatisfy` isRight
 
     setupExampleRepos = readProcess "script/clone-example-repos" mempty mempty >>= print
-    opts = defaultOptions { optionsFailOnWarning = True, optionsLogLevel = Nothing }
+    opts = defaultOptions { optionsFailOnWarning = flag FailOnWarning True, optionsLogLevel = Nothing }
 
     knownFailuresForPath :: FilePath -> Maybe FilePath -> IO [FilePath]
     knownFailuresForPath _     Nothing     = pure []
