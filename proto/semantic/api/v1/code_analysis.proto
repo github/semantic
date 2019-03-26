@@ -153,6 +153,7 @@ message Blob {
   string content = 1;
   string path = 2;
   string language = 3;
+  string oid = 4;
 }
 
 message BlobPair {
@@ -165,6 +166,7 @@ message File {
   string language = 2;
   repeated Symbol symbols = 3;
   repeated ParseError errors = 4;
+  string blob_oid = 5;
 }
 
 message Symbol {

@@ -97,8 +97,8 @@ instance APIBridge T.Text Data.Language where
 
 instance APIBridge API.Blob Data.Blob where
   bridging = iso apiBlobToBlob blobToApiBlob where
-    blobToApiBlob Data.Blob{..} = API.Blob (toText blobSource) (T.pack blobPath) (bridging # blobLanguage)
-    apiBlobToBlob API.Blob{..} = Data.Blob (fromText content) (T.unpack path) (language ^. bridging) mempty
+    blobToApiBlob Data.Blob{..} = API.Blob (toText blobSource) (T.pack blobPath) (bridging # blobLanguage) blobOid
+    apiBlobToBlob API.Blob{..} = Data.Blob (fromText content) (T.unpack path) (language ^. bridging) oid
 
 
 instance APIConvert API.BlobPair Data.BlobPair where
