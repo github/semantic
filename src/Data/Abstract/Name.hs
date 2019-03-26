@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveAnyClass #-}
 module Data.Abstract.Name
-( Name(..)
+( Name
 -- * Constructors
 , gensym
 , name
