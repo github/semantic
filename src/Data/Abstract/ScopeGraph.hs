@@ -87,7 +87,7 @@ instance Ord AccessControl where
 
 
 data Relation = Default | Instance | Prelude | Gensym
-  deriving (Eq, Show, Ord, Generic, NFData)
+  deriving (Bounded, Enum, Eq, Show, Ord, Generic, NFData)
 
 instance Lower Relation where
   lowerBound = Default
@@ -143,7 +143,7 @@ data Kind = AbstractClass
           | Unknown
           | UnqualifiedImport
           | VariableDeclaration
-  deriving (Eq, Show, Ord, Generic, NFData)
+  deriving (Bounded, Enum, Eq, Show, Ord, Generic, NFData)
 
 instance Lower Kind where
   lowerBound = Unknown
@@ -416,4 +416,4 @@ formatDeclaration = formatName . unDeclaration
 -- | The type of edge from a scope to its parent scopes.
 -- Either a lexical edge or an import edge in the case of non-lexical edges.
 data EdgeLabel = Lexical | Import | Export | Superclass
-  deriving (Eq, Ord, Show, Generic, NFData)
+  deriving (Bounded, Enum, Eq, Ord, Show, Generic, NFData)
