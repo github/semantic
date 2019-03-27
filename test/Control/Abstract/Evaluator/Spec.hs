@@ -17,6 +17,7 @@ import           Data.Abstract.Value.Concrete as Value
 import           Data.Algebra
 import           Data.Bifunctor (first)
 import           Data.Functor.Const
+import qualified Data.Language as Language
 import qualified Data.Map.Strict as Map
 import           Data.Sum
 import           Data.Text (pack)
@@ -51,7 +52,7 @@ evaluate
   . runState (lowerBound @(Heap Precise Precise Val))
   . runFresh
   . runReader (PackageInfo (SpecHelpers.name "test") mempty)
-  . runReader (ModuleInfo "test/Control/Abstract/Evaluator/Spec.hs")
+  . runReader (ModuleInfo "test/Control/Abstract/Evaluator/Spec.hs" Language.Haskell mempty)
   . evalState (lowerBound @Span)
   . runReader (lowerBound @Span)
   . runEvaluator
