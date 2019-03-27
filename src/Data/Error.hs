@@ -6,6 +6,9 @@ module Data.Error
   , showExpectation
   , showExcerpt
   , withSGRCode
+  -- * Flags affecting 'Error' values
+  , LogPrintSource (..)
+  , Colourize (..)
   ) where
 
 import Prologue
@@ -16,8 +19,12 @@ import Data.List (intersperse, isSuffixOf)
 import System.Console.ANSI
 
 import Data.Blob
+import Data.Flag as Flag
 import Data.Source
 import Data.Span
+
+data LogPrintSource = LogPrintSource
+data Colourize = Colourize
 
 -- | Rather than using the Error constructor directly, you probably
 -- want to call 'makeError', which takes care of inserting the call
@@ -38,21 +45,18 @@ instance Exception (Error String)
 makeError :: HasCallStack => Span -> [grammar] -> Maybe grammar -> Error grammar
 makeError s e a = withFrozenCallStack (Error s e a callStack)
 
-type IncludeSource = Bool
-type Colourize = Bool
-
 -- | Format an 'Error', optionally with reference to the source where it occurred.
-formatError :: IncludeSource -> Colourize -> Blob -> Error String -> String
+formatError :: Flag LogPrintSource -> Flag Colourize -> Blob -> Error String -> String
 formatError includeSource colourize blob@Blob{..} Error{..}
   = ($ "")
   $ withSGRCode colourize [SetConsoleIntensity BoldIntensity] (showSpan path errorSpan . showString ": ")
   . withSGRCode colourize [SetColor Foreground Vivid Red] (showString "error") . showString ": " . showExpectation colourize errorExpected errorActual . showChar '\n'
-  . (if includeSource then showExcerpt colourize errorSpan blob else id)
+  . (if Flag.toBool LogPrintSource includeSource then showExcerpt colourize errorSpan blob else id)
   . showCallStack colourize callStack . showChar '\n'
   where
-    path = Just $ if includeSource then blobPath else "<filtered>"
+    path = Just $ if Flag.toBool LogPrintSource includeSource then blobPath else "<filtered>"
 
-showExcerpt :: Colourize -> Span -> Blob -> ShowS
+showExcerpt :: Flag Colourize -> Span -> Blob -> ShowS
 showExcerpt colourize Span{..} Blob{..}
   = showString context . (if "\n" `isSuffixOf` context then id else showChar '\n')
   . showString (replicate (caretPaddingWidth + lineNumberDigits) ' ') . withSGRCode colourize [SetColor Foreground Vivid Green] (showString caret) . showChar '\n'
@@ -67,23 +71,19 @@ showExcerpt colourize Span{..} Blob{..}
         caret | posLine spanStart == posLine spanEnd = replicate (max 1 (posColumn spanEnd - posColumn spanStart)) '^'
               | otherwise                            = "^..."
 
-withSGRCode :: Colourize -> [SGR] -> ShowS -> ShowS
-withSGRCode useColour code content =
-  if useColour then
-    showString (setSGRCode code)
-    . content
-    . showString (setSGRCode [])
-  else
-    content
+withSGRCode :: Flag Colourize -> [SGR] -> ShowS -> ShowS
+withSGRCode useColour code content
+  | Flag.toBool Colourize useColour = showString (setSGRCode code) . content . showString (setSGRCode [])
+  | otherwise = content
 
-showExpectation :: Colourize -> [String] -> Maybe String -> ShowS
+showExpectation :: Flag Colourize -> [String] -> Maybe String -> ShowS
 showExpectation colourize = go
   where go [] Nothing = showString "no rule to match at " . showActual "end of branch"
         go expected Nothing = showString "expected " . showSymbols colourize expected . showString " at " . showActual "end of branch"
         go expected (Just actual) = showString "expected " . showSymbols colourize expected . showString ", but got " . showActual actual
         showActual = withSGRCode colourize [SetColor Foreground Vivid Green] . showString
 
-showSymbols :: Colourize -> [String] -> ShowS
+showSymbols :: Flag Colourize -> [String] -> ShowS
 showSymbols colourize = go
   where go []        = showString "end of input nodes"
         go [symbol]  = showSymbol symbol
@@ -96,8 +96,8 @@ showSpan :: Maybe FilePath -> Span -> ShowS
 showSpan path Span{..} = maybe (showParen True (showString "interactive")) showString path . showChar ':' . (if spanStart == spanEnd then showPos spanStart else showPos spanStart . showChar '-' . showPos spanEnd)
   where showPos Pos{..} = shows posLine . showChar ':' . shows posColumn
 
-showCallStack :: Colourize -> CallStack -> ShowS
+showCallStack :: Flag Colourize -> CallStack -> ShowS
 showCallStack colourize callStack = foldr (.) id (intersperse (showChar '\n') (uncurry (showCallSite colourize) <$> getCallStack callStack))
 
-showCallSite :: Colourize -> String -> SrcLoc -> ShowS
+showCallSite :: Flag Colourize -> String -> SrcLoc -> ShowS
 showCallSite colourize symbol loc@SrcLoc{..} = showString symbol . showChar ' ' . withSGRCode colourize [SetConsoleIntensity BoldIntensity] (showParen True (showSpan (Just srcLocFile) (spanFromSrcLoc loc)))
