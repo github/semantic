@@ -132,6 +132,7 @@ library
                      , Data.Duration
                      , Data.Error
                      , Data.File
+                     , Data.Flag
                      , Data.Functor.Both
                      , Data.Functor.Classes.Generic
                      , Proto3.Google.Timestamp
