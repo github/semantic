@@ -192,7 +192,7 @@ defineSelf :: ( Carrier sig m
            => Evaluator term address value m ()
 defineSelf = do
   let self = Declaration X.__self
-  declare self ScopeGraph.Gensym Public emptySpan ScopeGraph.Unknown Nothing
+  declare self ScopeGraph.Prelude Public emptySpan ScopeGraph.Unknown Nothing
   slot <- lookupSlot self
   assign slot =<< object =<< currentFrame
 
