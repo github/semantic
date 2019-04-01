@@ -1,3 +1,4 @@
+Up to date
 (Module
   (Empty)
   (Statements
@@ -664,21 +665,23 @@
     (Function
       (VariableIdentifier)
       (Statements
-        (App
-          (VariableIdentifier)
-          (TypeApp
-            (ConstructorIdentifier))
-          (TextElement))))
+        (VariableIdentifier)
+        (TypeApp
+          (ConstructorPattern
+            (Statements
+              (ConstructorIdentifier)
+              (TextElement))))))
     (Function
       (VariableIdentifier)
       (Statements
-        (App
-          (VariableIdentifier)
-          (TypeApp
-            (QualifiedConstructorIdentifier
-              (ModuleIdentifier)
-              (ConstructorIdentifier)))
-          (TextElement))))
+        (VariableIdentifier)
+        (TypeApp
+          (ConstructorPattern
+            (Statements
+              (QualifiedConstructorIdentifier
+                (ModuleIdentifier)
+                (ConstructorIdentifier))
+              (TextElement))))))
     (Function
       (VariableIdentifier)
       (Statements
@@ -994,7 +997,7 @@
         (VariableIdentifier)))
     (TypeSignature
       (VariableIdentifier)
-      (Context'
+      (ContextAlt
         (TypeSignature
           (ImplicitParameterIdentifier)
           (FunctionType
@@ -1052,7 +1055,7 @@
         (VariableIdentifier)))
     (TypeSignature
       (VariableIdentifier)
-      (Context'
+      (ContextAlt
         (Statements
           (Class
             (TypeClassIdentifier)
@@ -1099,72 +1102,40 @@
     (Function
       (VariableIdentifier)
       (VariableIdentifier)
-      (VariableIdentifier)
-      (VariableIdentifier)
       (Statements
-        (FunctionGuardPattern
-          (Guard
-            (PatternGuard
-              (ConstructorPattern
-                (Statements
-                  (ConstructorIdentifier)
-                  (VariableIdentifier)))
-              (VariableIdentifier)))
-          (Do
-            (BindPattern
-              (VariableIdentifier)
-              (App
-                (VariableIdentifier)
-                (Empty)
-                (VariableIdentifier)))
-            (BindPattern
-              (VariableIdentifier)
-              (App
-                (VariableIdentifier)
-                (Empty)
-                (VariableIdentifier)))
-            (Let
-              (Function
-                (VariableIdentifier)
-                (Statements
-                  (LabeledUpdate
-                    (VariableIdentifier)
-                    (FieldBind
-                      (VariableIdentifier)
-                      (TextElement))
-                    (FieldBind
-                      (VariableIdentifier)
-                      (InfixOperatorApp
-                        (Tuple
-                          (TextElement)
-                          (TextElement))
+        (App
+          (VariableIdentifier)
+          (Empty)
+          (VariableIdentifier))
+        (Statements
+          (Function
+            (VariableIdentifier)
+            (LabeledPattern
+              (Statements
+                (ConstructorIdentifier)
+                (RecordWildCards)))
+            (Statements
+              (Let
+                (Function
+                  (VariableIdentifier)
+                  (Statements
+                    (App
+                      (App
+                        (VariableIdentifier)
                         (Empty)
-                        (ConstructorOperator
-                          (ConstructorSymbol))
-                        (App
-                          (VariableIdentifier)
-                          (Empty)
-                          (VariableIdentifier)))))))
-              (Empty))
-            (InfixOperatorApp
-              (VariableIdentifier)
-              (Empty)
-              (VariableOperator
-                (VariableSymbol))
-              (App
+                        (RightOperatorSection
+                          (VariableOperator
+                            (VariableSymbol))
+                          (Character)))
+                      (Empty)
+                      (App
+                        (VariableIdentifier)
+                        (Empty)
+                        (VariableIdentifier)))))
                 (App
                   (App
-                    (ConstructorIdentifier)
+                    (VariableIdentifier)
                     (Empty)
                     (VariableIdentifier))
                   (Empty)
-                  (VariableIdentifier))
-                (Empty)
-                (VariableIdentifier)))))
-        (FunctionGuardPattern
-          (Guard
-            (VariableIdentifier))
-          (App
-            (VariableIdentifier)
-            (Empty)
-            (ConstructorIdentifier)))))))
+                  (VariableIdentifier))))))))))

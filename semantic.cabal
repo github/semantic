@@ -266,7 +266,7 @@ library
                      , Semantic.Task.Files
                      , Semantic.Telemetry
                      , Semantic.Telemetry.AsyncQueue
-                     , Semantic.Telemetry.Haystack
+                     , Semantic.Telemetry.Error
                      , Semantic.Telemetry.Log
                      , Semantic.Telemetry.Stat
                      , Semantic.Timeout
