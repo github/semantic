@@ -33,6 +33,7 @@ data Blob = Blob
   { blobSource   :: Source   -- ^ The UTF-8 encoded source text of the blob.
   , blobPath     :: FilePath -- ^ The file path to the blob.
   , blobLanguage :: Language -- ^ The language of this blob.
+  , blobOid      :: Text     -- ^ Git OID for this blob, mempty if blob is not from a git db.
   }
   deriving (Show, Eq, Generic)
 
@@ -49,12 +50,12 @@ nullBlob :: Blob -> Bool
 nullBlob Blob{..} = nullSource blobSource
 
 sourceBlob :: FilePath -> Language -> Source -> Blob
-sourceBlob filepath language source = Blob source filepath language
+sourceBlob filepath language source = Blob source filepath language mempty
 
 inferringLanguage :: Source -> FilePath -> Language -> Blob
 inferringLanguage src pth lang
-  | knownLanguage lang = Blob src pth lang
-  | otherwise = Blob src pth (languageForFilePath pth)
+  | knownLanguage lang = Blob src pth lang mempty
+  | otherwise = Blob src pth (languageForFilePath pth) mempty
 
 decodeBlobs :: BL.ByteString -> Either String [Blob]
 decodeBlobs = fmap blobs <$> eitherDecode
