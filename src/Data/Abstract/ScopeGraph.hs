@@ -87,7 +87,7 @@ instance Ord AccessControl where
 
 
 data Relation = Default | Instance | Prelude | Gensym
-  deriving (Eq, Show, Ord, Generic, NFData)
+  deriving (Bounded, Enum, Eq, Show, Ord, Generic, NFData)
 
 instance Lower Relation where
   lowerBound = Default
@@ -119,8 +119,31 @@ instance HasSpan ReferenceInfo where
   span = lens refSpan (\r s -> r { refSpan = s })
   {-# INLINE span #-}
 
-data Kind = TypeAlias | Class | Method | QualifiedAliasedImport | QualifiedExport | DefaultExport | Module | AbstractClass | Let | QualifiedImport | UnqualifiedImport | Assignment | RequiredParameter | PublicField | VariableDeclaration | Function | Parameter | Unknown | Identifier | TypeIdentifier | This | New | MemberAccess | Call
-  deriving (Eq, Show, Ord, Generic, NFData)
+data Kind = AbstractClass
+          | Assignment
+          | Call
+          | Class
+          | DefaultExport
+          | Function
+          | Identifier
+          | Let
+          | MemberAccess
+          | Method
+          | Module
+          | New
+          | Parameter
+          | PublicField
+          | QualifiedAliasedImport
+          | QualifiedExport
+          | QualifiedImport
+          | RequiredParameter
+          | This
+          | TypeAlias
+          | TypeIdentifier
+          | Unknown
+          | UnqualifiedImport
+          | VariableDeclaration
+  deriving (Bounded, Enum, Eq, Show, Ord, Generic, NFData)
 
 instance Lower Kind where
   lowerBound = Unknown
@@ -393,4 +416,4 @@ formatDeclaration = formatName . unDeclaration
 -- | The type of edge from a scope to its parent scopes.
 -- Either a lexical edge or an import edge in the case of non-lexical edges.
 data EdgeLabel = Lexical | Import | Export | Superclass
-  deriving (Eq, Ord, Show, Generic, NFData)
+  deriving (Bounded, Enum, Eq, Ord, Show, Generic, NFData)

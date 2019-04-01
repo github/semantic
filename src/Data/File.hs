@@ -32,7 +32,7 @@ file path = File path (languageForFilePath path)
 -- This is kind of a wart; Blob and File should be two views of
 -- the same higher-kinded datatype.
 toFile :: Blob -> File
-toFile (Blob _ p l) = File p l
+toFile (Blob _ p l _) = File p l
 
 -- | Read a utf8-encoded file to a 'Blob'.
 readBlobFromFile :: forall m. MonadIO m => File -> m (Maybe Blob)
