@@ -129,8 +129,10 @@ graphingModules recur m = do
       _             -> pure ()
   where
     -- NB: path is null for Languages like Ruby that have module imports that require concrete value semantics.
-    includeModule path = let path' = if Prologue.null path then "unknown, concrete semantics required" else path
-      in moduleInclusion (moduleVertex (ModuleInfo path'))
+    includeModule path
+      = let path' = if Prologue.null path then "unknown, concrete semantics required" else path
+            info = moduleInfo m
+      in moduleInclusion (moduleVertex (ModuleInfo path' (moduleLanguage info) (moduleOid info)))
 
 -- | Add vertices to the graph for imported modules.
 graphingModuleInfo :: ( Member (Reader ModuleInfo) sig
@@ -140,10 +142,11 @@ graphingModuleInfo :: ( Member (Reader ModuleInfo) sig
                    => (Module body -> Evaluator term address value (EavesdropC address value m) a)
                    -> (Module body -> Evaluator term address value m a)
 graphingModuleInfo recur m = do
-  appendGraph (vertex (moduleInfo m))
+  let info = moduleInfo m
+  appendGraph (vertex info)
   eavesdrop (recur m) $ \case
-    Load   path _ -> currentModule >>= appendGraph . (`connect` vertex (ModuleInfo path)) . vertex
-    Lookup path _ -> currentModule >>= appendGraph . (`connect` vertex (ModuleInfo path)) . vertex
+    Load   path _ -> currentModule >>= appendGraph . (`connect` vertex (ModuleInfo path (moduleLanguage info) (moduleOid info))) . vertex
+    Lookup path _ -> currentModule >>= appendGraph . (`connect` vertex (ModuleInfo path (moduleLanguage info) (moduleOid info))) . vertex
     _             -> pure ()
 
 eavesdrop :: Evaluator term address value (EavesdropC address value m) a

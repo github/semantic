@@ -134,7 +134,8 @@ runLoadErrorWith f = raiseHandler $ runResumableWith (runEvaluator . f)
 throwLoadError :: (Member (Resumable (BaseError (LoadError address value))) sig, Carrier sig m)
                => LoadError address value resume
                -> m resume
-throwLoadError err@(ModuleNotFoundError name) = throwResumable $ BaseError (ModuleInfo name) emptySpan err
+throwLoadError err@(ModuleNotFoundError name) = throwResumable $ BaseError (ModuleInfo name Unknown mempty) emptySpan err
+-- TODO: Might be able to get rest of ModuleInfo from the env ^.
 
 
 -- | An error thrown when we can't resolve a module from a qualified name.

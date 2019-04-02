@@ -35,7 +35,7 @@ spec session = parallel $ do
 
     it "evaluates load with wrapper" $ do
       (_, (_, res)) <- evaluate ["load-wrap.rb", "foo.rb"]
-      res `shouldBe` Left (SomeError (inject @(BaseError (ScopeError Precise)) (BaseError (ModuleInfo "load-wrap.rb") (Span (Pos 3 1) (Pos 3 7)) (LookupPathError (Declaration "foo")))))
+      res `shouldBe` Left (SomeError (inject @(BaseError (ScopeError Precise)) (BaseError (ModuleInfo "load-wrap.rb" Language.Ruby mempty) (Span (Pos 3 1) (Pos 3 7)) (LookupPathError (Declaration "foo")))))
 
     it "evaluates subclass" $ do
       (scopeGraph, (heap, res)) <- evaluate ["subclass.rb"]

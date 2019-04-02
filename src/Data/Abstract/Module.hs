@@ -10,6 +10,7 @@ module Data.Abstract.Module
 ) where
 
 import Data.Blob
+import Data.Language
 import GHC.Stack
 import Prologue
 import System.FilePath.Posix
@@ -29,24 +30,24 @@ moduleForBlob :: Maybe FilePath -- ^ The root directory relative to which the mo
               -> Module term    -- ^ A 'Module' named appropriate for the 'Blob', holding the @term@, and constructed relative to the root 'FilePath', if any.
 moduleForBlob rootDir Blob{..} = Module info
   where root = fromMaybe (takeDirectory blobPath) rootDir
-        info = ModuleInfo (makeRelative root blobPath)
+        info = ModuleInfo (makeRelative root blobPath) blobLanguage blobOid
 
 
 type ModulePath = FilePath
 
-newtype ModuleInfo = ModuleInfo { modulePath :: ModulePath }
+data ModuleInfo = ModuleInfo { modulePath :: ModulePath, moduleLanguage :: Language, moduleOid :: Text }
   deriving stock (Eq, Ord, Generic)
   deriving anyclass (NFData)
 
 instance Lower ModuleInfo where
-  lowerBound = ModuleInfo mempty
+  lowerBound = ModuleInfo mempty Unknown mempty
 
 instance Show ModuleInfo where
   showsPrec d = showsUnaryWith showsPrec "ModuleInfo" d . modulePath
 
 moduleInfoFromSrcLoc :: SrcLoc -> ModuleInfo
-moduleInfoFromSrcLoc = ModuleInfo . srcLocModule
+moduleInfoFromSrcLoc loc = ModuleInfo (srcLocModule loc) Unknown mempty
 
 -- | Produce 'ModuleInfo' from the top location on the Haskell call stack (i.e. the file where the call to 'moduleInfoFromCallStack' was made).
 moduleInfoFromCallStack :: HasCallStack => ModuleInfo
-moduleInfoFromCallStack = maybe (ModuleInfo "?") (moduleInfoFromSrcLoc . snd) (listToMaybe (getCallStack callStack))
+moduleInfoFromCallStack = maybe (ModuleInfo "?" Unknown mempty) (moduleInfoFromSrcLoc . snd) (listToMaybe (getCallStack callStack))
