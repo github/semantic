@@ -3,11 +3,11 @@ module Semantic.Telemetry
 (
   -- Async telemetry interface
   withLogger
-, withHaystack
+, withErrorReporter
 , withStatter
 , LogQueue
 , StatQueue
-, HaystackQueue
+, ErrorQueue
 , TelemetryQueues(..)
 , queueLogMessage
 , queueErrorReport
@@ -27,9 +27,8 @@ module Semantic.Telemetry
 , statsClient
 , StatsClient
 
--- Haystack client
-, haystackClient
-, HaystackClient
+-- Error reporters
+, nullErrorReporter
 
 -- Logging options and formatters
 , Level(..)
@@ -59,21 +58,20 @@ import           Control.Monad.IO.Class
 import           Data.Coerce
 import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
 import qualified Data.Time.LocalTime as LocalTime
-import           Network.HTTP.Client
 import           Semantic.Telemetry.AsyncQueue
-import           Semantic.Telemetry.Haystack
+import           Semantic.Telemetry.Error
 import           Semantic.Telemetry.Log
 import           Semantic.Telemetry.Stat as Stat
 
 type LogQueue = AsyncQueue Message LogOptions
 type StatQueue = AsyncQueue Stat StatsClient
-type HaystackQueue = AsyncQueue ErrorReport HaystackClient
+type ErrorQueue = AsyncQueue ErrorReport ErrorReporter
 
 data TelemetryQueues
   = TelemetryQueues
-  { telemetryLogger   :: LogQueue
-  , telemetryStatter  :: StatQueue
-  , telemetryHaystack :: HaystackQueue
+  { telemetryLogger        :: LogQueue
+  , telemetryStatter       :: StatQueue
+  , telemetryErrorReporter :: ErrorQueue
   }
 
 -- | Execute an action in IO with access to a logger (async log queue).
@@ -84,10 +82,10 @@ withLogger :: LogOptions         -- ^ Log options
 withLogger options size = bracket setup closeAsyncQueue
   where setup = newAsyncQueue size writeLogMessage options
 
--- | Execute an action in IO with access to haystack (async error reporting queue).
-withHaystack :: Maybe String -> ManagerSettings -> String -> ErrorLogger -> Int -> (HaystackQueue -> IO c) -> IO c
-withHaystack url settings appName errorLogger size = bracket setup closeAsyncQueue
-  where setup = haystackClient url settings appName >>= newAsyncQueue size (reportError errorLogger)
+-- | Execute an action in IO with access to an error reporter (async error reporting queue).
+withErrorReporter :: IO ErrorReporter -> Int -> (ErrorQueue -> IO c) -> IO c
+withErrorReporter errorReporter size = bracket setup closeAsyncQueue
+  where setup = errorReporter >>= newAsyncQueue size ($)
 
 -- | Execute an action in IO with access to a statter (async stat queue).
 -- Handles the bracketed setup and teardown of the underlying 'AsyncQueue' and
@@ -109,8 +107,8 @@ queueLogMessage q@AsyncQueue{..} level message pairs
   , level <= logLevel = liftIO Time.getCurrentTime >>= liftIO . LocalTime.utcToLocalZonedTime >>= liftIO . writeAsyncQueue q . Message level message pairs
   | otherwise = pure ()
 
--- | Queue an error to be reported to haystack.
-queueErrorReport :: MonadIO io => HaystackQueue -> SomeException -> [(String, String)] -> io ()
+-- | Queue an error to be reported.
+queueErrorReport :: MonadIO io => ErrorQueue -> SomeException -> [(String, String)] -> io ()
 queueErrorReport q@AsyncQueue{..} message = liftIO . writeAsyncQueue q . ErrorReport message
 
 -- | Queue a stat to be sent to statsd.
