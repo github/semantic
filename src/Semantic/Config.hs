@@ -6,7 +6,7 @@ module Semantic.Config
   , debugOptions
   , infoOptions
   , lookupStatsAddr
-  , withHaystackFromConfig
+  , withErrorReporterFromConfig
   , logOptionsFromConfig
   , withLoggerFromConfig
   , withStatterFromConfig
@@ -23,12 +23,11 @@ import           Data.Duration
 import           Data.Error (LogPrintSource(..))
 import           Data.Flag
 import           Network.HostName
-import           Network.HTTP.Client.TLS
 import           Network.URI
 import           Prologue
 import           Semantic.Env
 import           Semantic.Telemetry
-import qualified Semantic.Telemetry.Haystack as Haystack
+import qualified Semantic.Telemetry.Error as Error
 import qualified Semantic.Telemetry.Stat as Stat
 import           System.Environment
 import           System.IO (hIsTerminalDevice, stdout)
@@ -45,7 +44,6 @@ data Config
   { configAppName                :: String               -- ^ Application name ("semantic")
   , configHostName               :: String               -- ^ HostName from getHostName
   , configProcessID              :: ProcessID            -- ^ ProcessID from getProcessID
-  , configHaystackURL            :: Maybe String         -- ^ URL of Haystack (with creds) from environment
   , configStatsHost              :: Stat.Host            -- ^ Host of statsd/datadog (default: "127.0.0.1")
   , configStatsPort              :: Stat.Port            -- ^ Port of statsd/datadog (default: "28125")
   , configTreeSitterParseTimeout :: Duration             -- ^ Timeout in milliseconds before canceling tree-sitter parsing (default: 6000).
@@ -81,7 +79,6 @@ defaultConfig options@Options{..} = do
   pid <- getProcessID
   hostName <- getHostName
   isTerminal <- hIsTerminalDevice stdout
-  haystackURL <- lookupEnv "HAYSTACK_URL"
   (statsHost, statsPort) <- lookupStatsAddr
   size <- envLookupNum 1000 "MAX_TELEMETRY_QUEUE_SIZE"
   parseTimeout <- envLookupNum 6000 "TREE_SITTER_PARSE_TIMEOUT"
@@ -90,7 +87,6 @@ defaultConfig options@Options{..} = do
     { configAppName = "semantic"
     , configHostName = hostName
     , configProcessID = pid
-    , configHaystackURL = haystackURL
     , configStatsHost = statsHost
     , configStatsPort = statsPort
 
@@ -109,9 +105,9 @@ defaultConfig options@Options{..} = do
 withTelemetry :: Config -> (TelemetryQueues -> IO c) -> IO c
 withTelemetry config action =
   withLoggerFromConfig config $ \logger ->
-  withHaystackFromConfig config (queueLogMessage logger Error) $ \haystack ->
+  withErrorReporterFromConfig config (queueLogMessage logger Error) $ \errorReporter ->
   withStatterFromConfig config $ \statter ->
-    action (TelemetryQueues logger statter haystack)
+    action (TelemetryQueues logger statter errorReporter)
 
 logOptionsFromConfig :: Config -> LogOptions
 logOptionsFromConfig Config{..} = LogOptions
@@ -132,9 +128,9 @@ withLoggerFromConfig :: Config -> (LogQueue -> IO c) -> IO c
 withLoggerFromConfig config = withLogger (logOptionsFromConfig config) (configMaxTelemetyQueueSize config)
 
 
-withHaystackFromConfig :: Config -> Haystack.ErrorLogger -> (HaystackQueue -> IO c) -> IO c
-withHaystackFromConfig Config{..} errorLogger =
-  withHaystack configHaystackURL tlsManagerSettings configAppName errorLogger configMaxTelemetyQueueSize
+withErrorReporterFromConfig :: Config -> Error.ErrorLogger -> (ErrorQueue -> IO c) -> IO c
+withErrorReporterFromConfig Config{..} errorLogger =
+  withErrorReporter (nullErrorReporter errorLogger) configMaxTelemetyQueueSize
 
 withStatterFromConfig :: Config -> (StatQueue -> IO c) -> IO c
 withStatterFromConfig Config{..} =

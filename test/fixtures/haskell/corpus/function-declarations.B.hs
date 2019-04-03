@@ -148,13 +148,8 @@ g :: ( IvoryStore a
        -> Ivory eff a
        -> Ivory eff a
 
-needlestackClient maybeURL directorSettings appName
-  | Just url <- maybeURL = do
-      director  <- newDirector directorSettings
-      request' <- parseRequest url
-      let request = request'
-            { method = "POST"
-            , requestHeaders = ("Content-Type", "application/json; charset=utf-8") : requestHeaders request'
-            }
-      pure $ NeedlestackClient request director appName
-  | otherwise = pure NullNeedlestackClient
+emptyErrorReporter logger = pure reportError
+  where
+    reportError ErrorReport{..} = let
+      msg = takeWhile (/= '\n') (displayException errorReportException)
+      in logger msg errorReportContext
