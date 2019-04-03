@@ -94,9 +94,21 @@ Available options:
 
 ## Development
 
-`semantic` is built using [`cabal`](https://www.haskell.org/cabal/) and the [ghc](https://www.haskell.org/ghc/) compiler. To get started:
+We use `cabal's` [Nix-style local builds][nix] for development. To get started quickly:
 
-1. **TBD**
+```bash
+git clone git@github.com:github/semantic.git
+cd semantic
+git submodule sync --recursive && git submodule update --init --recursive --force
+cabal new-build
+cabal new-test
+```
+
+`semantic` requires GHC 8.6.4. We recommend using [`ghcup`][ghcup] to sandbox GHC versions. Our version bounds are based on [Stackage][stackage] LTS versions. The current LTS version is 13.13; `stack` build should also work if you prefer.
+
+[nix]: https://www.haskell.org/cabal/users-guide/nix-local-build-overview.html
+[stackage]: https://stackage.org
+[ghcup]: https://www.haskell.org/ghcup/
 
 ## Technology and architecture
 
