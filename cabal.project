@@ -1,0 +1,3 @@
+packages: vendor/* vendor/proto3-suite vendor/haskell-tree-sitter/languages/* semantic.cabal
+
+package proto3-suite
