@@ -37,20 +37,20 @@ generate_example () {
 
   if [ -e "$fileA" ]; then
     status $parseFileA
-    stack exec semantic -- parse --sexpression $fileA > $parseFileA
+    cabal new-run semantic -- parse --sexpression $fileA > $parseFileA
   fi
 
   if [ -e "$fileB" ]; then
     status $parseFileB
-    stack exec semantic -- parse --sexpression $fileB > $parseFileB
+    cabal new-run semantic -- parse --sexpression $fileB > $parseFileB
   fi
 
   if [ -e "$fileA" -a -e "$fileB" ]; then
     status $diffFileAB
-    stack exec semantic -- diff --sexpression $fileA $fileB > $diffFileAB
+    cabal new-run semantic -- diff --sexpression $fileA $fileB > $diffFileAB
 
     status $diffFileBA
-    stack exec semantic -- diff --sexpression $fileB $fileA > $diffFileBA
+    cabal new-run semantic -- diff --sexpression $fileB $fileA > $diffFileBA
   fi
 }
 
