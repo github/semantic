@@ -46,7 +46,6 @@ common dependencies
                      , filepath
                      , free
                      , fused-effects
-                     , Glob
                      , hashable
                      , haskell-tree-sitter
                      , machines

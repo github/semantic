@@ -97,7 +97,6 @@ tsParseCommand = command "ts-parse" (info tsParseArgumentsParser (progDesc "Gene
             <|> flag'                 AST.JSON        (long "json"        <> help "Output JSON ASTs")
             <|> flag'                 AST.Quiet       (long "quiet"       <> help "Don't produce output, but show timing stats")
             <|> flag'                 AST.Show        (long "show"        <> help "Output using the Show instance (debug only, format subject to change without notice)")
-      -- filesOrStdin <- FilesFromGitRepo <$> argument gitDirReader (metavar "GIT_REPO") <*> argument shaReader (metavar "COMMIT_SHA")
       filesOrStdin <- FilesFromGitRepo <$> option str (long "gitDir") <*> option shaReader (long "sha")
                   <|> FilesFromPaths <$> some (argument filePathReader (metavar "FILES..."))
                   <|> pure (FilesFromHandle stdin)
@@ -130,12 +129,6 @@ graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute a g
       <*> argument filePathReader (metavar "DIR:LANGUAGE | FILE")
     makeReadProjectRecursivelyTask rootDir excludeDirs File{..} = Task.readProject rootDir filePath fileLanguage excludeDirs
     makeGraphTask graphType includePackages serializer projectTask = projectTask >>= Graph.runGraph graphType includePackages >>= serializer
-
-gitDirReader :: ReadM FilePath
-gitDirReader = eitherReader parseGitDir
-  where parseGitDir arg = case takeExtension arg of
-          ".git" -> Right arg
-          _ -> Left (arg <> " is not a git dir, expected path to a .git directory")
 
 shaReader :: ReadM Git.OID
 shaReader = eitherReader parseSha

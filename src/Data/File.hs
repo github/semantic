@@ -6,7 +6,7 @@ module Data.File
   , toFile
   , readBlobFromFile
   , readBlobFromFile'
-  , readBlobsFromDir'
+  , readBlobsFromDir
   , readBlobsFromGitRepo
   , readFilePair
   ) where
@@ -19,7 +19,6 @@ import           Data.Source
 import           Prologue
 import qualified Semantic.Git as Git
 import           Semantic.IO
-import           System.FilePath.Glob
 import           System.FilePath.Posix
 
 data File = File
@@ -49,10 +48,12 @@ readBlobFromFile' file = do
   maybeFile <- readBlobFromFile file
   maybeM (Prelude.fail ("cannot read '" <> show file <> "', file not found or language not supported.")) maybeFile
 
-readBlobsFromDir' :: MonadIO m => FilePath -> m [Blob]
-readBlobsFromDir' path = liftIO . fmap catMaybes $
+-- | Read all blobs in the directory with Language.supportedExts
+readBlobsFromDir :: MonadIO m => FilePath -> m [Blob]
+readBlobsFromDir path = liftIO . fmap catMaybes $
   findFilesInDir path supportedExts mempty >>= Async.mapConcurrently (readBlobFromFile . file)
 
+-- | Read all blobs from the Git repo with Language.supportedExts
 readBlobsFromGitRepo :: MonadIO m => FilePath -> Git.OID -> m [Blob]
 readBlobsFromGitRepo path oid = liftIO . fmap catMaybes $
   Git.lsTree path oid >>= Async.mapConcurrently (blobFromTreeEntry path)
