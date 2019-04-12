@@ -16,6 +16,8 @@ module Semantic.Task.Files
   ) where
 
 import           Control.Effect
+import qualified Control.Concurrent.Async as Async
+import           Control.Parallel.Strategies
 import           Control.Effect.Carrier
 import           Control.Effect.Error
 import           Control.Effect.Sum
@@ -35,6 +37,7 @@ import qualified System.IO as IO
 data Source blob where
   FromPath       :: File                -> Source Blob
   FromHandle     :: Handle 'IO.ReadMode -> Source [Blob]
+  FromDir        :: FilePath            -> Source [Blob]
   FromPathPair   :: Both File           -> Source BlobPair
   FromPairHandle :: Handle 'IO.ReadMode -> Source [BlobPair]
 
@@ -69,6 +72,10 @@ instance (Member (Error SomeException) sig, MonadIO m, Carrier sig m) => Carrier
   eff (L op) = case op of
     Read (FromPath path) k -> (readBlobFromFile' path `catchIO` (throwError . toException @SomeException)) >>= k
     Read (FromHandle handle) k -> (readBlobsFromHandle handle  `catchIO` (throwError . toException @SomeException)) >>= k
+    Read (FromDir dir) k -> do
+      paths <- findFilesInDir dir supportedExts mempty `catchIO` (throwError . toException @SomeException)
+      blobs <- liftIO (Async.mapConcurrently (readBlobFromFile' . file) paths) `catchIO` (throwError . toException @SomeException)
+      k blobs
     Read (FromPathPair paths) k -> (runBothWith readFilePair paths `catchIO` (throwError . toException @SomeException)) >>= k
     Read (FromPairHandle handle) k -> (readBlobPairsFromHandle handle `catchIO` (throwError . toException @SomeException)) >>= k
     ReadProject rootDir dir language excludeDirs k -> (readProjectFromPaths rootDir dir language excludeDirs `catchIO` (throwError . toException @SomeException)) >>= k
@@ -82,8 +89,13 @@ readBlob :: (Member Files sig, Carrier sig m) => File -> m Blob
 readBlob file = send (Read (FromPath file) pure)
 
 -- | A task which reads a list of 'Blob's from a 'Handle' or a list of 'FilePath's optionally paired with 'Language's.
-readBlobs :: (Member Files sig, Carrier sig m) => Either (Handle 'IO.ReadMode) [File] -> m [Blob]
+readBlobs :: (Member Files sig, Carrier sig m, MonadIO m) => Either (Handle 'IO.ReadMode) [File] -> m [Blob]
 readBlobs (Left handle) = send (Read (FromHandle handle) pure)
+readBlobs (Right [path]) = do
+  isDir <- isDirectory (filePath path)
+  if isDir
+    then send (Read (FromDir (filePath path)) pure)
+    else pure <$> send (Read (FromPath path) pure)
 readBlobs (Right paths) = traverse (send . flip Read pure . FromPath) paths
 
 -- | A task which reads a list of pairs of 'Blob's from a 'Handle' or a list of pairs of 'FilePath's optionally paired with 'Language's.
