@@ -8,6 +8,7 @@ module Data.Language
   , languageForFilePath
   , languageForType
   , supportedExts
+  , codeNavLanguages
   ) where
 
 import           Data.Aeson
@@ -151,3 +152,6 @@ languageForFilePath = languageForType . takeExtension
 
 supportedExts :: [String]
 supportedExts = [".go", ".py", ".rb", ".js", ".ts"]
+
+codeNavLanguages :: [Language]
+codeNavLanguages = [Go, Ruby, Python, JavaScript, TypeScript]

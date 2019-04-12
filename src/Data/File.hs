@@ -62,7 +62,7 @@ readBlobsFromGitRepo path oid = liftIO . fmap catMaybes $
     blobFromTreeEntry :: FilePath -> Git.TreeEntry -> IO (Maybe Blob)
     blobFromTreeEntry gitDir (Git.TreeEntry Git.NormalMode Git.BlobObject oid path)
       | lang <- languageForFilePath path
-      , lang /= Unknown
+      , lang `elem` codeNavLanguages
       = Just . sourceBlob' path lang oid . fromText <$> Git.catFile gitDir oid
     blobFromTreeEntry _ _ = pure Nothing
 
