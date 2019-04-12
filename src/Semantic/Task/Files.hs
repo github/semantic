@@ -32,6 +32,7 @@ import           Prelude hiding (readFile)
 import           Prologue
 import qualified Semantic.Git as Git
 import           Semantic.IO
+import           Semantic.Telemetry
 import qualified System.IO as IO
 
 data Source blob where
@@ -69,12 +70,12 @@ runFiles = runFilesC
 newtype FilesC m a = FilesC { runFilesC :: m a }
   deriving (Functor, Applicative, Monad, MonadIO)
 
-instance (Member (Error SomeException) sig, MonadIO m, Carrier sig m) => Carrier (Files :+: sig) (FilesC m) where
+instance (Member (Error SomeException) sig, Member Telemetry sig, MonadIO m, Carrier sig m) => Carrier (Files :+: sig) (FilesC m) where
   eff (L op) = case op of
     Read (FromPath path) k -> (readBlobFromFile' path `catchIO` (throwError . toException @SomeException)) >>= k
     Read (FromHandle handle) k -> (readBlobsFromHandle handle  `catchIO` (throwError . toException @SomeException)) >>= k
     Read (FromDir dir) k -> (readBlobsFromDir dir `catchIO` (throwError . toException @SomeException)) >>= k
-    Read (FromGitRepo path sha) k -> (readBlobsFromGitRepo path sha `catchIO` (throwError . toException @SomeException)) >>= k
+    Read (FromGitRepo path sha) k -> time "task.read_git_repo" mempty (readBlobsFromGitRepo path sha `catchIO` (throwError . toException @SomeException)) >>= k
     Read (FromPathPair paths) k -> (runBothWith readFilePair paths `catchIO` (throwError . toException @SomeException)) >>= k
     Read (FromPairHandle handle) k -> (readBlobPairsFromHandle handle `catchIO` (throwError . toException @SomeException)) >>= k
     ReadProject rootDir dir language excludeDirs k -> (readProjectFromPaths rootDir dir language excludeDirs `catchIO` (throwError . toException @SomeException)) >>= k
