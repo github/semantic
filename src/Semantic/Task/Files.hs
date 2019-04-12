@@ -91,7 +91,8 @@ readBlob file = send (Read (FromPath file) pure)
 data FilesArg
   = FilesFromHandle (Handle 'IO.ReadMode)
   | FilesFromPaths [File]
-  | FilesFromGitRepo FilePath Git.OID
+  | FilesFromGitRepo FilePath Git.OID [FilePath]
+-- TODO: Use excludes ^ to filter what we read from the git repo
 
 -- | A task which reads a list of 'Blob's from a 'Handle' or a list of 'FilePath's optionally paired with 'Language's.
 readBlobs :: (Member Files sig, Carrier sig m, MonadIO m) => FilesArg -> m [Blob]
@@ -102,7 +103,7 @@ readBlobs (FilesFromPaths [path]) = do
     then send (Read (FromDir (filePath path)) pure)
     else pure <$> send (Read (FromPath path) pure)
 readBlobs (FilesFromPaths paths) = traverse (send . flip Read pure . FromPath) paths
-readBlobs (FilesFromGitRepo path sha) = send (Read (FromGitRepo path sha) pure)
+readBlobs (FilesFromGitRepo path sha _) = send (Read (FromGitRepo path sha) pure)
 
 -- | A task which reads a list of pairs of 'Blob's from a 'Handle' or a list of pairs of 'FilePath's optionally paired with 'Language's.
 readBlobPairs :: (Member Files sig, Carrier sig m) => Either (Handle 'IO.ReadMode) [Both File] -> m [BlobPair]

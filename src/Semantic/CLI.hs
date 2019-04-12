@@ -84,7 +84,10 @@ parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate pa
               <|> flag'                                    (parseTermBuilder TermDotGraph)    (long "dot"         <> help "Output DOT graph parse trees")
               <|> flag'                                    (parseTermBuilder TermShow)        (long "show"        <> help "Output using the Show instance (debug only, format subject to change without notice)")
               <|> flag'                                    (parseTermBuilder TermQuiet)       (long "quiet"       <> help "Don't produce output, but show timing stats")
-      filesOrStdin <- FilesFromGitRepo <$> option str (long "gitDir") <*> option shaReader (long "sha")
+      filesOrStdin <- FilesFromGitRepo
+                      <$> option str (long "gitDir")
+                      <*> option shaReader (long "sha")
+                      <*> many (option str (long "exclude"))
                   <|> FilesFromPaths <$> some (argument filePathReader (metavar "FILES..."))
                   <|> pure (FilesFromHandle stdin)
       pure $ Task.readBlobs filesOrStdin >>= renderer
@@ -97,7 +100,10 @@ tsParseCommand = command "ts-parse" (info tsParseArgumentsParser (progDesc "Gene
             <|> flag'                 AST.JSON        (long "json"        <> help "Output JSON ASTs")
             <|> flag'                 AST.Quiet       (long "quiet"       <> help "Don't produce output, but show timing stats")
             <|> flag'                 AST.Show        (long "show"        <> help "Output using the Show instance (debug only, format subject to change without notice)")
-      filesOrStdin <- FilesFromGitRepo <$> option str (long "gitDir") <*> option shaReader (long "sha")
+      filesOrStdin <- FilesFromGitRepo
+                      <$> option str (long "gitDir")
+                      <*> option shaReader (long "sha")
+                      <*> many (option str (long "exclude"))
                   <|> FilesFromPaths <$> some (argument filePathReader (metavar "FILES..."))
                   <|> pure (FilesFromHandle stdin)
       pure $ Task.readBlobs filesOrStdin >>= AST.runASTParse format
