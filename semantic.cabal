@@ -239,8 +239,8 @@ library
                      , Semantic.Analysis
                      -- API
                      , Semantic.Api
-                     , Semantic.Api.Diffs
                      , Semantic.Api.Bridge
+                     , Semantic.Api.Diffs
                      , Semantic.Api.LegacyTypes
                      , Semantic.Api.Symbols
                      , Semantic.Api.Terms
@@ -251,6 +251,7 @@ library
                      , Semantic.Config
                      , Semantic.Distribute
                      , Semantic.Env
+                     , Semantic.Git
                      , Semantic.Graph
                      , Semantic.IO
                      , Semantic.REPL
@@ -299,12 +300,13 @@ library
                      , optparse-applicative
                      , parallel
                      , parsers
-                     , prettyprinter
                      , pretty-show
+                     , prettyprinter
                      , profunctors
                      , reducers
                      , semigroupoids
                      , servant
+                     , shelly
                      , split
                      , stm-chans
                      , template-haskell
