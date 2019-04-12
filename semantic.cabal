@@ -403,6 +403,7 @@ test-suite parse-examples
   hs-source-dirs:      test
   main-is:             Examples.hs
   build-depends:       semantic
+                     , Glob
                      , hspec >= 2.4.1
                      , hspec-core
                      , hspec-expectations-pretty-diff
