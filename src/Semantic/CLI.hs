@@ -17,6 +17,7 @@ import qualified Semantic.AST as AST
 import           Semantic.Config
 import qualified Semantic.Graph as Graph
 import qualified Semantic.Task as Task
+import qualified Semantic.Git as Git
 import           Semantic.Task.Files
 import           Semantic.Telemetry
 import qualified Semantic.Telemetry.Log as Log
@@ -83,7 +84,9 @@ parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate pa
               <|> flag'                                    (parseTermBuilder TermDotGraph)    (long "dot"         <> help "Output DOT graph parse trees")
               <|> flag'                                    (parseTermBuilder TermShow)        (long "show"        <> help "Output using the Show instance (debug only, format subject to change without notice)")
               <|> flag'                                    (parseTermBuilder TermQuiet)       (long "quiet"       <> help "Don't produce output, but show timing stats")
-      filesOrStdin <- Right <$> some (argument filePathReader (metavar "FILES...")) <|> pure (Left stdin)
+      filesOrStdin <- FilesFromGitRepo <$> option str (long "gitDir") <*> option shaReader (long "sha")
+                  <|> FilesFromPaths <$> some (argument filePathReader (metavar "FILES..."))
+                  <|> pure (FilesFromHandle stdin)
       pure $ Task.readBlobs filesOrStdin >>= renderer
 
 tsParseCommand :: Mod CommandFields (Task.TaskEff Builder)
@@ -94,7 +97,10 @@ tsParseCommand = command "ts-parse" (info tsParseArgumentsParser (progDesc "Gene
             <|> flag'                 AST.JSON        (long "json"        <> help "Output JSON ASTs")
             <|> flag'                 AST.Quiet       (long "quiet"       <> help "Don't produce output, but show timing stats")
             <|> flag'                 AST.Show        (long "show"        <> help "Output using the Show instance (debug only, format subject to change without notice)")
-      filesOrStdin <- Right <$> some (argument filePathReader (metavar "FILES...")) <|> pure (Left stdin)
+      -- filesOrStdin <- FilesFromGitRepo <$> argument gitDirReader (metavar "GIT_REPO") <*> argument shaReader (metavar "COMMIT_SHA")
+      filesOrStdin <- FilesFromGitRepo <$> option str (long "gitDir") <*> option shaReader (long "sha")
+                  <|> FilesFromPaths <$> some (argument filePathReader (metavar "FILES..."))
+                  <|> pure (FilesFromHandle stdin)
       pure $ Task.readBlobs filesOrStdin >>= AST.runASTParse format
 
 graphCommand :: Mod CommandFields (Task.TaskEff Builder)
@@ -124,6 +130,18 @@ graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute a g
       <*> argument filePathReader (metavar "DIR:LANGUAGE | FILE")
     makeReadProjectRecursivelyTask rootDir excludeDirs File{..} = Task.readProject rootDir filePath fileLanguage excludeDirs
     makeGraphTask graphType includePackages serializer projectTask = projectTask >>= Graph.runGraph graphType includePackages >>= serializer
+
+gitDirReader :: ReadM FilePath
+gitDirReader = eitherReader parseGitDir
+  where parseGitDir arg = case takeExtension arg of
+          ".git" -> Right arg
+          _ -> Left (arg <> " is not a git dir, expected path to a .git directory")
+
+shaReader :: ReadM Git.OID
+shaReader = eitherReader parseSha
+  where parseSha arg = if length arg == 40
+          then Right (Git.OID (T.pack arg))
+          else Left (arg <> " is not a valid sha1")
 
 filePathReader :: ReadM File
 filePathReader = eitherReader parseFilePath

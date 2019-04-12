@@ -28,7 +28,7 @@ nodeJSResolutionMap :: (Member Files sig, Carrier sig m, MonadIO m) => FilePath 
 nodeJSResolutionMap rootDir prop excludeDirs = do
   files <- findFiles rootDir [".json"] excludeDirs
   let packageFiles = file <$> filter ((==) "package.json" . takeFileName) files
-  blobs <- readBlobs (Right packageFiles)
+  blobs <- readBlobs (FilesFromPaths packageFiles)
   pure $ fold (mapMaybe (lookup prop) blobs)
   where
     lookup :: Text -> Blob -> Maybe (Map FilePath FilePath)
