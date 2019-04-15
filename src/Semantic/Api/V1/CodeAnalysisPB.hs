@@ -1108,6 +1108,7 @@ data File = File
   , language :: Text
   , symbols :: Vector Symbol
   , errors :: Vector ParseError
+  , blobOid :: Text
   } deriving stock (Eq, Ord, Show, Generic)
     deriving anyclass (Proto3.Named, NFData)
 
@@ -1117,6 +1118,7 @@ instance FromJSONPB File where
     <*> obj .: "language"
     <*> obj .: "symbols"
     <*> obj .: "errors"
+    <*> obj .: "blobOid"
 
 instance ToJSONPB File where
   toJSONPB File{..} = object
@@ -1125,6 +1127,7 @@ instance ToJSONPB File where
     , "language" .= language
     , "symbols" .= symbols
     , "errors" .= errors
+    , "blobOid" .= blobOid
     ]
   toEncodingPB File{..} = pairs
     [
@@ -1132,6 +1135,7 @@ instance ToJSONPB File where
     , "language" .= language
     , "symbols" .= symbols
     , "errors" .= errors
+    , "blobOid" .= blobOid
     ]
 
 instance FromJSON File where
@@ -1148,12 +1152,14 @@ instance Proto3.Message File where
     , encodeMessageField 2 language
     , encodeMessageField 3 (Proto3.NestedVec symbols)
     , encodeMessageField 4 (Proto3.NestedVec errors)
+    , encodeMessageField 5 blobOid
     ]
   decodeMessage _ = File
     <$> at decodeMessageField 1
     <*> at decodeMessageField 2
     <*> (nestedvec <$> at decodeMessageField 3)
     <*> (nestedvec <$> at decodeMessageField 4)
+    <*> at decodeMessageField 5
   dotProto = undefined
 
 data Symbol = Symbol

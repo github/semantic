@@ -7,6 +7,8 @@ module Data.Language
   , knownLanguage
   , languageForFilePath
   , languageForType
+  , supportedExts
+  , codeNavLanguages
   ) where
 
 import           Data.Aeson
@@ -147,3 +149,9 @@ extensionsForLanguage language = case language of
 -- | Return a language based on a FilePath's extension, or Nothing if extension is not found or not supported.
 languageForFilePath :: FilePath -> Language
 languageForFilePath = languageForType . takeExtension
+
+supportedExts :: [String]
+supportedExts = [".go", ".py", ".rb", ".js", ".ts"]
+
+codeNavLanguages :: [Language]
+codeNavLanguages = [Go, Ruby, Python, JavaScript, TypeScript]

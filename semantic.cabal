@@ -46,7 +46,6 @@ common dependencies
                      , filepath
                      , free
                      , fused-effects
-                     , Glob
                      , hashable
                      , haskell-tree-sitter
                      , machines
@@ -239,8 +238,8 @@ library
                      , Semantic.Analysis
                      -- API
                      , Semantic.Api
-                     , Semantic.Api.Diffs
                      , Semantic.Api.Bridge
+                     , Semantic.Api.Diffs
                      , Semantic.Api.LegacyTypes
                      , Semantic.Api.Symbols
                      , Semantic.Api.Terms
@@ -251,6 +250,7 @@ library
                      , Semantic.Config
                      , Semantic.Distribute
                      , Semantic.Env
+                     , Semantic.Git
                      , Semantic.Graph
                      , Semantic.IO
                      , Semantic.REPL
@@ -299,12 +299,13 @@ library
                      , optparse-applicative
                      , parallel
                      , parsers
-                     , prettyprinter
                      , pretty-show
+                     , prettyprinter
                      , profunctors
                      , reducers
                      , semigroupoids
                      , servant
+                     , shelly
                      , split
                      , stm-chans
                      , template-haskell
@@ -386,6 +387,7 @@ test-suite test
                      , Test.Hspec.LeanCheck
   build-depends:       semantic
                      , tree-sitter-json
+                     , Glob
                      , hspec >= 2.4.1
                      , hspec-core
                      , hspec-expectations-pretty-diff
@@ -401,6 +403,7 @@ test-suite parse-examples
   hs-source-dirs:      test
   main-is:             Examples.hs
   build-depends:       semantic
+                     , Glob
                      , hspec >= 2.4.1
                      , hspec-core
                      , hspec-expectations-pretty-diff

@@ -11,6 +11,7 @@ module Semantic.Task
 , Files.readProject
 , Files.findFiles
 , Files.write
+, Files.FilesArg(..)
 -- * Module Resolution
 , resolutionMap
 , Resolution

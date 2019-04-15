@@ -13,6 +13,7 @@ module Semantic.Task.Files
   , write
   , Handle (..)
   , FilesC(..)
+  , FilesArg(..)
   ) where
 
 import           Control.Effect
@@ -20,8 +21,8 @@ import           Control.Effect.Carrier
 import           Control.Effect.Error
 import           Control.Effect.Sum
 import           Control.Exception as Exc
-import qualified Data.ByteString.Builder as B
 import           Data.Blob
+import qualified Data.ByteString.Builder as B
 import           Data.Coerce
 import           Data.File
 import           Data.Handle
@@ -29,14 +30,18 @@ import           Data.Language
 import           Data.Project hiding (readFile)
 import           Prelude hiding (readFile)
 import           Prologue
+import qualified Semantic.Git as Git
 import           Semantic.IO
+import           Semantic.Telemetry
 import qualified System.IO as IO
 
 data Source blob where
-  FromPath       :: File                -> Source Blob
-  FromHandle     :: Handle 'IO.ReadMode -> Source [Blob]
-  FromPathPair   :: Both File           -> Source BlobPair
-  FromPairHandle :: Handle 'IO.ReadMode -> Source [BlobPair]
+  FromPath       :: File                              -> Source Blob
+  FromHandle     :: Handle 'IO.ReadMode               -> Source [Blob]
+  FromDir        :: FilePath                          -> Source [Blob]
+  FromGitRepo    :: FilePath -> Git.OID -> [FilePath] -> Source [Blob]
+  FromPathPair   :: Both File                         -> Source BlobPair
+  FromPairHandle :: Handle 'IO.ReadMode               -> Source [BlobPair]
 
 data Destination = ToPath FilePath | ToHandle (Handle 'IO.WriteMode)
 
@@ -65,10 +70,12 @@ runFiles = runFilesC
 newtype FilesC m a = FilesC { runFilesC :: m a }
   deriving (Functor, Applicative, Monad, MonadIO)
 
-instance (Member (Error SomeException) sig, MonadIO m, Carrier sig m) => Carrier (Files :+: sig) (FilesC m) where
+instance (Member (Error SomeException) sig, Member Telemetry sig, MonadIO m, Carrier sig m) => Carrier (Files :+: sig) (FilesC m) where
   eff (L op) = case op of
     Read (FromPath path) k -> (readBlobFromFile' path `catchIO` (throwError . toException @SomeException)) >>= k
     Read (FromHandle handle) k -> (readBlobsFromHandle handle  `catchIO` (throwError . toException @SomeException)) >>= k
+    Read (FromDir dir) k -> (readBlobsFromDir dir `catchIO` (throwError . toException @SomeException)) >>= k
+    Read (FromGitRepo path sha excludePaths) k -> time "task.read_git_repo" mempty (readBlobsFromGitRepo path sha excludePaths `catchIO` (throwError . toException @SomeException)) >>= k
     Read (FromPathPair paths) k -> (runBothWith readFilePair paths `catchIO` (throwError . toException @SomeException)) >>= k
     Read (FromPairHandle handle) k -> (readBlobPairsFromHandle handle `catchIO` (throwError . toException @SomeException)) >>= k
     ReadProject rootDir dir language excludeDirs k -> (readProjectFromPaths rootDir dir language excludeDirs `catchIO` (throwError . toException @SomeException)) >>= k
@@ -77,14 +84,25 @@ instance (Member (Error SomeException) sig, MonadIO m, Carrier sig m) => Carrier
     Write (ToHandle (WriteHandle handle)) builder k -> liftIO (B.hPutBuilder handle builder) >> k
   eff (R other) = FilesC (eff (handleCoercible other))
 
-
 readBlob :: (Member Files sig, Carrier sig m) => File -> m Blob
 readBlob file = send (Read (FromPath file) pure)
 
+-- Various ways to read in files
+data FilesArg
+  = FilesFromHandle (Handle 'IO.ReadMode)
+  | FilesFromPaths [File]
+  | FilesFromGitRepo FilePath Git.OID [FilePath]
+
 -- | A task which reads a list of 'Blob's from a 'Handle' or a list of 'FilePath's optionally paired with 'Language's.
-readBlobs :: (Member Files sig, Carrier sig m) => Either (Handle 'IO.ReadMode) [File] -> m [Blob]
-readBlobs (Left handle) = send (Read (FromHandle handle) pure)
-readBlobs (Right paths) = traverse (send . flip Read pure . FromPath) paths
+readBlobs :: (Member Files sig, Carrier sig m, MonadIO m) => FilesArg -> m [Blob]
+readBlobs (FilesFromHandle handle) = send (Read (FromHandle handle) pure)
+readBlobs (FilesFromPaths [path]) = do
+  isDir <- isDirectory (filePath path)
+  if isDir
+    then send (Read (FromDir (filePath path)) pure)
+    else pure <$> send (Read (FromPath path) pure)
+readBlobs (FilesFromPaths paths) = traverse (send . flip Read pure . FromPath) paths
+readBlobs (FilesFromGitRepo path sha excludePaths) = send (Read (FromGitRepo path sha excludePaths) pure)
 
 -- | A task which reads a list of pairs of 'Blob's from a 'Handle' or a list of pairs of 'FilePath's optionally paired with 'Language's.
 readBlobPairs :: (Member Files sig, Carrier sig m) => Either (Handle 'IO.ReadMode) [Both File] -> m [BlobPair]

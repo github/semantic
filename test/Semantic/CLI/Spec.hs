@@ -24,7 +24,7 @@ spec = parallel $ do
   describe "parseTermBuilder" $
     for_ parseFixtures $ \ (format, runParse, files, expected) ->
       it ("renders to " <> format <> " with files " <> show files) $ do
-        output <- runTaskOrDie $ readBlobs (Right files) >>= runParse
+        output <- runTaskOrDie $ readBlobs (FilesFromPaths files) >>= runParse
         runBuilder output `shouldBe'` expected
   where
     shouldBe' actual' expectedFile = do
@@ -38,7 +38,7 @@ parseFixtures =
   , ("json", parseTermBuilder TermJSONTree, path, prefix </> "parse-tree.json")
   , ("json", parseTermBuilder TermJSONTree, path', prefix </> "parse-trees.json")
   , ("json", parseTermBuilder TermJSONTree, [], prefix </> "parse-tree-empty.json")
-  , ("symbols", parseSymbolsBuilder, path'', prefix </> "parse-tree.symbols.json")
+  , ("symbols", parseSymbolsBuilder Serializing.Format.JSON, path'', prefix </> "parse-tree.symbols.json")
   ]
   where path = [File "test/fixtures/ruby/corpus/and-or.A.rb" Ruby]
         path' = [File "test/fixtures/ruby/corpus/and-or.A.rb" Ruby, File "test/fixtures/ruby/corpus/and-or.B.rb" Ruby]

@@ -165,6 +165,7 @@ message File {
   string language = 2;
   repeated Symbol symbols = 3;
   repeated ParseError errors = 4;
+  string blob_oid = 5;
 }
 
 message Symbol {

@@ -56,8 +56,8 @@ legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> distributeFoldMap 
       , symbolSpan = converting #? span
       }
 
-parseSymbolsBuilder :: (Member Distribute sig, ParseEffects sig m, Traversable t) => t Blob -> m Builder
-parseSymbolsBuilder blobs = parseSymbols blobs >>= serialize JSON
+parseSymbolsBuilder :: (Member Distribute sig, ParseEffects sig m, Traversable t) => Format ParseTreeSymbolResponse -> t Blob -> m Builder
+parseSymbolsBuilder format blobs = parseSymbols blobs >>= serialize format
 
 parseSymbols :: (Member Distribute sig, ParseEffects sig m, Traversable t) => t Blob -> m ParseTreeSymbolResponse
 parseSymbols blobs = ParseTreeSymbolResponse . V.fromList . toList <$> distributeFor blobs go
@@ -65,7 +65,7 @@ parseSymbols blobs = ParseTreeSymbolResponse . V.fromList . toList <$> distribut
     go :: (Member (Error SomeException) sig, Member Task sig, Carrier sig m) => Blob -> m File
     go blob@Blob{..} = (doParse blob >>= withSomeTerm (renderToSymbols blob)) `catchError` (\(SomeException e) -> pure $ errorFile (show e))
       where
-        errorFile e = File (pack blobPath) (bridging # blobLanguage) mempty (V.fromList [ParseError (T.pack e)])
+        errorFile e = File (pack blobPath) (bridging # blobLanguage) mempty (V.fromList [ParseError (T.pack e)]) blobOid
 
         symbolsToSummarize :: [Text]
         symbolsToSummarize = ["Function", "Method", "Class", "Module", "Call", "Send"]
@@ -74,7 +74,7 @@ parseSymbols blobs = ParseTreeSymbolResponse . V.fromList . toList <$> distribut
         renderToSymbols blob@Blob{..} term = pure $ either (errorFile . show) (tagsToFile blob) (runTagging blob symbolsToSummarize term)
 
         tagsToFile :: Blob -> [Tag] -> File
-        tagsToFile Blob{..} tags = File (pack blobPath) (bridging # blobLanguage) (V.fromList (fmap tagToSymbol tags)) mempty
+        tagsToFile Blob{..} tags = File (pack blobPath) (bridging # blobLanguage) (V.fromList (fmap tagToSymbol tags)) mempty blobOid
 
         tagToSymbol :: Tag -> Symbol
         tagToSymbol Tag{..}

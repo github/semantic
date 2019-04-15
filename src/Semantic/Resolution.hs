@@ -24,11 +24,11 @@ import           Semantic.Task.Files
 import           System.FilePath.Posix
 
 
-nodeJSResolutionMap :: (Member Files sig, Carrier sig m) => FilePath -> Text -> [FilePath] -> m (Map FilePath FilePath)
+nodeJSResolutionMap :: (Member Files sig, Carrier sig m, MonadIO m) => FilePath -> Text -> [FilePath] -> m (Map FilePath FilePath)
 nodeJSResolutionMap rootDir prop excludeDirs = do
   files <- findFiles rootDir [".json"] excludeDirs
   let packageFiles = file <$> filter ((==) "package.json" . takeFileName) files
-  blobs <- readBlobs (Right packageFiles)
+  blobs <- readBlobs (FilesFromPaths packageFiles)
   pure $ fold (mapMaybe (lookup prop) blobs)
   where
     lookup :: Text -> Blob -> Maybe (Map FilePath FilePath)
@@ -63,7 +63,7 @@ runResolution = runResolutionC
 newtype ResolutionC m a = ResolutionC { runResolutionC :: m a }
   deriving (Applicative, Functor, Monad, MonadIO)
 
-instance (Member Files sig, Carrier sig m) => Carrier (Resolution :+: sig) (ResolutionC m) where
+instance (Member Files sig, Carrier sig m, MonadIO m) => Carrier (Resolution :+: sig) (ResolutionC m) where
   eff (R other) = ResolutionC . eff . handleCoercible $ other
   eff (L op) = case op of
     NodeJSResolution dir prop excludeDirs k -> nodeJSResolutionMap dir prop excludeDirs >>= k

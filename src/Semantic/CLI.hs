@@ -17,6 +17,7 @@ import qualified Semantic.AST as AST
 import           Semantic.Config
 import qualified Semantic.Graph as Graph
 import qualified Semantic.Task as Task
+import qualified Semantic.Git as Git
 import           Semantic.Task.Files
 import           Semantic.Telemetry
 import qualified Semantic.Telemetry.Log as Log
@@ -77,11 +78,18 @@ parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate pa
       renderer <- flag  (parseTermBuilder TermSExpression) (parseTermBuilder TermSExpression) (long "sexpression" <> help "Output s-expression parse trees (default)")
               <|> flag'                                    (parseTermBuilder TermJSONTree)    (long "json"        <> help "Output JSON parse trees")
               <|> flag'                                    (parseTermBuilder TermJSONGraph)   (long "json-graph"  <> help "Output JSON adjacency list")
-              <|> flag'                                    parseSymbolsBuilder                (long "symbols"     <> help "Output JSON symbol list")
+              <|> flag'                                    (parseSymbolsBuilder JSON)         (long "symbols"       <> help "Output JSON symbol list")
+              <|> flag'                                    (parseSymbolsBuilder JSON)         (long "json-symbols"  <> help "Output JSON symbol list")
+              <|> flag'                                    (parseSymbolsBuilder Proto)        (long "proto-symbols" <> help "Output JSON symbol list")
               <|> flag'                                    (parseTermBuilder TermDotGraph)    (long "dot"         <> help "Output DOT graph parse trees")
               <|> flag'                                    (parseTermBuilder TermShow)        (long "show"        <> help "Output using the Show instance (debug only, format subject to change without notice)")
               <|> flag'                                    (parseTermBuilder TermQuiet)       (long "quiet"       <> help "Don't produce output, but show timing stats")
-      filesOrStdin <- Right <$> some (argument filePathReader (metavar "FILES...")) <|> pure (Left stdin)
+      filesOrStdin <- FilesFromGitRepo
+                      <$> option str (long "gitDir" <> help "A .git directory to read from")
+                      <*> option shaReader (long "sha" <> help "The commit SHA1 to read from")
+                      <*> many (option str (long "exclude" <> short 'x' <> help "Paths to exclude"))
+                  <|> FilesFromPaths <$> some (argument filePathReader (metavar "FILES..."))
+                  <|> pure (FilesFromHandle stdin)
       pure $ Task.readBlobs filesOrStdin >>= renderer
 
 tsParseCommand :: Mod CommandFields (Task.TaskEff Builder)
@@ -92,7 +100,12 @@ tsParseCommand = command "ts-parse" (info tsParseArgumentsParser (progDesc "Gene
             <|> flag'                 AST.JSON        (long "json"        <> help "Output JSON ASTs")
             <|> flag'                 AST.Quiet       (long "quiet"       <> help "Don't produce output, but show timing stats")
             <|> flag'                 AST.Show        (long "show"        <> help "Output using the Show instance (debug only, format subject to change without notice)")
-      filesOrStdin <- Right <$> some (argument filePathReader (metavar "FILES...")) <|> pure (Left stdin)
+      filesOrStdin <- FilesFromGitRepo
+                      <$> option str (long "gitDir" <> help "A .git directory to read from")
+                      <*> option shaReader (long "sha" <> help "The commit SHA1 to read from")
+                      <*> many (option str (long "exclude" <> short 'x' <> help "Paths to exclude"))
+                  <|> FilesFromPaths <$> some (argument filePathReader (metavar "FILES..."))
+                  <|> pure (FilesFromHandle stdin)
       pure $ Task.readBlobs filesOrStdin >>= AST.runASTParse format
 
 graphCommand :: Mod CommandFields (Task.TaskEff Builder)
@@ -122,6 +135,12 @@ graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute a g
       <*> argument filePathReader (metavar "DIR:LANGUAGE | FILE")
     makeReadProjectRecursivelyTask rootDir excludeDirs File{..} = Task.readProject rootDir filePath fileLanguage excludeDirs
     makeGraphTask graphType includePackages serializer projectTask = projectTask >>= Graph.runGraph graphType includePackages >>= serializer
+
+shaReader :: ReadM Git.OID
+shaReader = eitherReader parseSha
+  where parseSha arg = if length arg == 40
+          then Right (Git.OID (T.pack arg))
+          else Left (arg <> " is not a valid sha1")
 
 filePathReader :: ReadM File
 filePathReader = eitherReader parseFilePath
