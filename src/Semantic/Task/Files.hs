@@ -92,7 +92,6 @@ data FilesArg
   = FilesFromHandle (Handle 'IO.ReadMode)
   | FilesFromPaths [File]
   | FilesFromGitRepo FilePath Git.OID [FilePath]
--- TODO: Use excludes ^ to filter what we read from the git repo
 
 -- | A task which reads a list of 'Blob's from a 'Handle' or a list of 'FilePath's optionally paired with 'Language's.
 readBlobs :: (Member Files sig, Carrier sig m, MonadIO m) => FilesArg -> m [Blob]
