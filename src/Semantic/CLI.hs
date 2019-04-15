@@ -85,9 +85,9 @@ parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate pa
               <|> flag'                                    (parseTermBuilder TermShow)        (long "show"        <> help "Output using the Show instance (debug only, format subject to change without notice)")
               <|> flag'                                    (parseTermBuilder TermQuiet)       (long "quiet"       <> help "Don't produce output, but show timing stats")
       filesOrStdin <- FilesFromGitRepo
-                      <$> option str (long "gitDir")
-                      <*> option shaReader (long "sha")
-                      <*> many (option str (long "exclude"))
+                      <$> option str (long "gitDir" <> help "A .git directory to read from")
+                      <*> option shaReader (long "sha" <> help "The commit SHA1 to read from")
+                      <*> many (option str (long "exclude" <> short 'x' <> help "Paths to exclude"))
                   <|> FilesFromPaths <$> some (argument filePathReader (metavar "FILES..."))
                   <|> pure (FilesFromHandle stdin)
       pure $ Task.readBlobs filesOrStdin >>= renderer
@@ -101,9 +101,9 @@ tsParseCommand = command "ts-parse" (info tsParseArgumentsParser (progDesc "Gene
             <|> flag'                 AST.Quiet       (long "quiet"       <> help "Don't produce output, but show timing stats")
             <|> flag'                 AST.Show        (long "show"        <> help "Output using the Show instance (debug only, format subject to change without notice)")
       filesOrStdin <- FilesFromGitRepo
-                      <$> option str (long "gitDir")
-                      <*> option shaReader (long "sha")
-                      <*> many (option str (long "exclude"))
+                      <$> option str (long "gitDir" <> help "A .git directory to read from")
+                      <*> option shaReader (long "sha" <> help "The commit SHA1 to read from")
+                      <*> many (option str (long "exclude" <> short 'x' <> help "Paths to exclude"))
                   <|> FilesFromPaths <$> some (argument filePathReader (metavar "FILES..."))
                   <|> pure (FilesFromHandle stdin)
       pure $ Task.readBlobs filesOrStdin >>= AST.runASTParse format

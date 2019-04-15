@@ -36,12 +36,12 @@ import           Semantic.Telemetry
 import qualified System.IO as IO
 
 data Source blob where
-  FromPath       :: File                -> Source Blob
-  FromHandle     :: Handle 'IO.ReadMode -> Source [Blob]
-  FromDir        :: FilePath            -> Source [Blob]
-  FromGitRepo    :: FilePath -> Git.OID -> Source [Blob]
-  FromPathPair   :: Both File           -> Source BlobPair
-  FromPairHandle :: Handle 'IO.ReadMode -> Source [BlobPair]
+  FromPath       :: File                              -> Source Blob
+  FromHandle     :: Handle 'IO.ReadMode               -> Source [Blob]
+  FromDir        :: FilePath                          -> Source [Blob]
+  FromGitRepo    :: FilePath -> Git.OID -> [FilePath] -> Source [Blob]
+  FromPathPair   :: Both File                         -> Source BlobPair
+  FromPairHandle :: Handle 'IO.ReadMode               -> Source [BlobPair]
 
 data Destination = ToPath FilePath | ToHandle (Handle 'IO.WriteMode)
 
@@ -75,7 +75,7 @@ instance (Member (Error SomeException) sig, Member Telemetry sig, MonadIO m, Car
     Read (FromPath path) k -> (readBlobFromFile' path `catchIO` (throwError . toException @SomeException)) >>= k
     Read (FromHandle handle) k -> (readBlobsFromHandle handle  `catchIO` (throwError . toException @SomeException)) >>= k
     Read (FromDir dir) k -> (readBlobsFromDir dir `catchIO` (throwError . toException @SomeException)) >>= k
-    Read (FromGitRepo path sha) k -> time "task.read_git_repo" mempty (readBlobsFromGitRepo path sha `catchIO` (throwError . toException @SomeException)) >>= k
+    Read (FromGitRepo path sha excludePaths) k -> time "task.read_git_repo" mempty (readBlobsFromGitRepo path sha excludePaths `catchIO` (throwError . toException @SomeException)) >>= k
     Read (FromPathPair paths) k -> (runBothWith readFilePair paths `catchIO` (throwError . toException @SomeException)) >>= k
     Read (FromPairHandle handle) k -> (readBlobPairsFromHandle handle `catchIO` (throwError . toException @SomeException)) >>= k
     ReadProject rootDir dir language excludeDirs k -> (readProjectFromPaths rootDir dir language excludeDirs `catchIO` (throwError . toException @SomeException)) >>= k
@@ -103,7 +103,7 @@ readBlobs (FilesFromPaths [path]) = do
     then send (Read (FromDir (filePath path)) pure)
     else pure <$> send (Read (FromPath path) pure)
 readBlobs (FilesFromPaths paths) = traverse (send . flip Read pure . FromPath) paths
-readBlobs (FilesFromGitRepo path sha _) = send (Read (FromGitRepo path sha) pure)
+readBlobs (FilesFromGitRepo path sha excludePaths) = send (Read (FromGitRepo path sha excludePaths) pure)
 
 -- | A task which reads a list of pairs of 'Blob's from a 'Handle' or a list of pairs of 'FilePath's optionally paired with 'Language's.
 readBlobPairs :: (Member Files sig, Carrier sig m) => Either (Handle 'IO.ReadMode) [Both File] -> m [BlobPair]

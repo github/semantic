@@ -54,8 +54,8 @@ readBlobsFromDir path = liftIO . fmap catMaybes $
   findFilesInDir path supportedExts mempty >>= Async.mapConcurrently (readBlobFromFile . file)
 
 -- | Read all blobs from the Git repo with Language.supportedExts
-readBlobsFromGitRepo :: MonadIO m => FilePath -> Git.OID -> m [Blob]
-readBlobsFromGitRepo path oid = liftIO . fmap catMaybes $
+readBlobsFromGitRepo :: MonadIO m => FilePath -> Git.OID -> [FilePath] -> m [Blob]
+readBlobsFromGitRepo path oid excludePaths = liftIO . fmap catMaybes $
   Git.lsTree path oid >>= Async.mapConcurrently (blobFromTreeEntry path)
   where
     -- Only read tree entries that are normal mode blobs in a language we can parse.
@@ -63,6 +63,7 @@ readBlobsFromGitRepo path oid = liftIO . fmap catMaybes $
     blobFromTreeEntry gitDir (Git.TreeEntry Git.NormalMode Git.BlobObject oid path)
       | lang <- languageForFilePath path
       , lang `elem` codeNavLanguages
+      , path `notElem` excludePaths
       = Just . sourceBlob' path lang oid . fromText <$> Git.catFile gitDir oid
     blobFromTreeEntry _ _ = pure Nothing
 
