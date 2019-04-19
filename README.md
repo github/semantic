@@ -114,7 +114,7 @@ cabal new-test
 
 Architecturally, `lexicon`:
 1. Reads blobs.
-2. Generates parse trees for those blobs with [tree-sitter][tree-sitter] (an incremental parsing system for programmings tools).
+2. Generates parse trees for those blobs with [tree-sitter][tree-sitter] (an incremental parsing system for programming tools).
 3. Assigns those trees into a generalized representation of syntax.
 4. Performs analysis, computes diffs, or just returns parse trees.
 5. Renders output in one of many supported formats.
