@@ -17,7 +17,7 @@ import Prologue
 -- then use the @flag MyFlag@ to create one from a 'Bool'.
 -- This is more verbose than using 'Bool' for everything but prevents classes of errors when
 -- working with multiple flag values in flight, as the 'toBool' deconstructor provides a witness
--- that you really want the given semantic flag value from the flag datum.
+-- that you really want the given lexicon flag value from the flag datum.
 newtype Flag (t :: *) = Flag Bool
   deriving stock (Eq, Show)
   deriving newtype NFData

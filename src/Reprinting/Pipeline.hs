@@ -1,6 +1,6 @@
 {- |
 
-This module represents the top-level interface for @semantic@'s
+This module represents the top-level interface for @lexicon@'s
 reprinting functionality. Reprinting here is defined as the
 conversion, given some 'Source' code, of the parsed (and possibly
 modified) syntax tree corresponding to that source, back into a
@@ -21,7 +21,7 @@ The reprinter was designed with the following goals in mind:
 * Generality: each syntax node should have one and only one
   declaration that describes how reprinting takes place. No node
   should be concerned with language-specific syntactic issues.
-* Precedence-sensitivity: semantic syntax nodes do not contain
+* Precedence-sensitivity: lexicon syntax nodes do not contain
   information about parenthesization of binary operators.
   Binary operators should report their precedence and the
   pipeline should insert parentheses as necessary.

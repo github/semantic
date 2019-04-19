@@ -1,4 +1,4 @@
-Haskell is a syntactically-flexible language, which gives the programmer a tremendous amount of leeway regarding the appearance of their code. This is a set of best practices that we use in `semantic` and its related projects.
+Haskell is a syntactically-flexible language, which gives the programmer a tremendous amount of leeway regarding the appearance of their code. This is a set of best practices that we use in `lexicon` and its related projects.
 
 This file draws from the style guides written by [Johan Tibbel](https://github.com/tibbe/haskell-style-guide/blob/master/haskell-style.md) and [Kowainik](https://kowainik.github.io/posts/2019-02-06-style-guide).
 

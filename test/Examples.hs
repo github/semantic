@@ -18,11 +18,11 @@ import           Data.Quieterm
 import           Data.Typeable (cast)
 import           Data.Void
 import           Parsing.Parser
-import           Semantic.Api (TermOutputFormat (..), parseTermBuilder)
-import           Semantic.Config (Config (..), Options (..), FailOnWarning (..), defaultOptions)
-import qualified Semantic.IO as IO
-import           Semantic.Task
-import           Semantic.Task.Files
+import           Lexicon.Api (TermOutputFormat (..), parseTermBuilder)
+import           Lexicon.Config (Config (..), Options (..), FailOnWarning (..), defaultOptions)
+import qualified Lexicon.IO as IO
+import           Lexicon.Task
+import           Lexicon.Task.Files
 import           System.Directory
 import           System.Exit (die)
 import           System.FilePath.Glob

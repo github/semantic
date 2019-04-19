@@ -22,9 +22,9 @@ import           Data.File
 import           Data.Language
 import qualified Data.Text as T
 import           System.FilePath.Posix
-import           Semantic.IO
+import           Lexicon.IO
 
--- | A 'ProjectF' contains all the information that semantic needs
+-- | A 'ProjectF' contains all the information that lexicon needs
 -- to execute an analysis, diffing, or graphing pass. It is higher-kinded
 -- in terms of the container type for paths and blobs, as well as the
 -- path type (this is necessary because protobuf uses different vector
@@ -40,7 +40,7 @@ data ProjectF (blobs :: * -> *) (paths :: * -> *) path = Project
 deriving instance (Eq path, Eq (blobs Blob), Eq (paths path)) => Eq (ProjectF blobs paths path)
 deriving instance (Show path, Show (blobs Blob), Show (paths path)) => Show (ProjectF blobs paths path)
 
--- | This 'Project' type is the one used during semantic's normal
+-- | This 'Project' type is the one used during lexicon's normal
 -- course of diffing, evaluation, and graphing. You probably want to
 -- use this one.
 type Project = ProjectF [] [] FilePath

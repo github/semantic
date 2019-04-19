@@ -58,9 +58,9 @@ import Data.Term as X
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
 import Parsing.Parser as X
-import Semantic.Task as X hiding (parsePackage)
-import Semantic.Util as X
-import Semantic.Graph (runHeap, runScopeGraph)
+import Lexicon.Task as X hiding (parsePackage)
+import Lexicon.Util as X
+import Lexicon.Graph (runHeap, runScopeGraph)
 import System.FilePath as X
 import Debug.Trace as X (traceShowM, traceM)
 
@@ -79,10 +79,10 @@ import Test.LeanCheck as X
 import qualified Data.ByteString as B
 import qualified Data.Set as Set
 import Data.Set (Set)
-import qualified Semantic.IO as IO
-import Semantic.Config (Config(..), optionsLogLevel)
-import Semantic.Telemetry (LogQueue, StatQueue)
-import Semantic.Api hiding (File, Blob, BlobPair)
+import qualified Lexicon.IO as IO
+import Lexicon.Config (Config(..), optionsLogLevel)
+import Lexicon.Telemetry (LogQueue, StatQueue)
+import Lexicon.Api hiding (File, Blob, BlobPair)
 import System.Exit (die)
 import Control.Exception (displayException)
 

@@ -37,20 +37,20 @@ generate_example () {
 
   if [ -e "$fileA" ]; then
     status $parseFileA
-    cabal new-run --verbose=0 semantic -- parse --sexpression $fileA > $parseFileA
+    cabal new-run --verbose=0 lexicon -- parse --sexpression $fileA > $parseFileA
   fi
 
   if [ -e "$fileB" ]; then
     status $parseFileB
-    cabal new-run --verbose=0 semantic -- parse --sexpression $fileB > $parseFileB
+    cabal new-run --verbose=0 lexicon -- parse --sexpression $fileB > $parseFileB
   fi
 
   if [ -e "$fileA" -a -e "$fileB" ]; then
     status $diffFileAB
-    cabal new-run --verbose=0 semantic -- diff --sexpression $fileA $fileB > $diffFileAB
+    cabal new-run --verbose=0 lexicon -- diff --sexpression $fileA $fileB > $diffFileAB
 
     status $diffFileBA
-    cabal new-run --verbose=0 semantic -- diff --sexpression $fileB $fileA > $diffFileBA
+    cabal new-run --verbose=0 lexicon -- diff --sexpression $fileB $fileA > $diffFileBA
   fi
 }
 

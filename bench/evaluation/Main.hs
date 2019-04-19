@@ -7,9 +7,9 @@ import           Criterion.Main
 import qualified Data.Language as Language
 import           Data.Proxy
 import           Parsing.Parser
-import           Semantic.Config (defaultOptions)
-import           Semantic.Task (withOptions)
-import           Semantic.Util hiding (evalRubyProject, evalPythonProject, evaluateProject)
+import           Lexicon.Config (defaultOptions)
+import           Lexicon.Task (withOptions)
+import           Lexicon.Util hiding (evalRubyProject, evalPythonProject, evaluateProject)
 
 -- Duplicating this stuff from Util to shut off the logging
 evalRubyProject       = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Ruby)       rubyParser

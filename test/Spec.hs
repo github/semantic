@@ -30,19 +30,19 @@ import qualified Rewriting.Go.Spec
 import qualified Rewriting.JSON.Spec
 import qualified Rewriting.Python.Spec
 import qualified Tags.Spec
-import qualified Semantic.Spec
-import qualified Semantic.CLI.Spec
-import qualified Semantic.IO.Spec
-import qualified Semantic.Stat.Spec
-import Semantic.Config (defaultOptions, optionsLogLevel)
-import Semantic.Task (withOptions, TaskSession(..))
+import qualified Lexicon.Spec
+import qualified Lexicon.CLI.Spec
+import qualified Lexicon.IO.Spec
+import qualified Lexicon.Stat.Spec
+import Lexicon.Config (defaultOptions, optionsLogLevel)
+import Lexicon.Task (withOptions, TaskSession(..))
 import Test.Hspec
 
 main :: IO ()
 main = do
   withOptions defaultOptions { optionsLogLevel = Nothing } $ \ config logger statter -> hspec $ do
     let args = TaskSession config "-" False logger statter
-    describe "Semantic.Stat" Semantic.Stat.Spec.spec
+    describe "Lexicon.Stat" Lexicon.Stat.Spec.spec
     parallel $ do
       describe "Analysis.Go" (Analysis.Go.Spec.spec args)
       describe "Analysis.PHP" (Analysis.PHP.Spec.spec args)
@@ -72,8 +72,8 @@ main = do
       describe "Rewriting.JSON" Rewriting.JSON.Spec.spec
       describe "Rewriting.Python" Rewriting.Python.Spec.spec
       describe "Tags.Spec" Tags.Spec.spec
-      describe "Semantic" Semantic.Spec.spec
-      describe "Semantic.CLI" Semantic.CLI.Spec.spec
-      describe "Semantic.IO" Semantic.IO.Spec.spec
+      describe "Lexicon" Lexicon.Spec.spec
+      describe "Lexicon.CLI" Lexicon.CLI.Spec.spec
+      describe "Lexicon.IO" Lexicon.IO.Spec.spec
       describe "Integration" (Integration.Spec.spec args)
       describe "Parsing" Parsing.Spec.spec

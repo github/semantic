@@ -10,7 +10,7 @@ import Data.Maybe
 import Data.Source
 import Language.JSON.Grammar (Grammar)
 import Parsing.TreeSitter
-import Semantic.Config
+import Lexicon.Config
 import SpecHelpers
 import System.Timeout
 import TreeSitter.JSON

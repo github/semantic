@@ -1,6 +1,6 @@
-# Semantic
+# Lexicon
 
-`semantic` is a Haskell library and command line tool for parsing, analyzing, and comparing source code.
+`lexicon` is a Haskell library and command line tool for parsing, analyzing, and comparing source code.
 
 | Table of Contents |
 | :------------- |
@@ -12,11 +12,11 @@
 
 ## Usage
 
-Run `semantic --help` for complete list of up-to-date options.
+Run `lexicon --help` for complete list of up-to-date options.
 
 #### Parse
 ```
-Usage: semantic parse ([--sexpression] | [--json] | [--json-graph] | [--symbols]
+Usage: lexicon parse ([--sexpression] | [--json] | [--json-graph] | [--symbols]
                       | [--dot] | [--show] | [--quiet]) [FILES...]
   Generate parse trees for path(s)
 
@@ -33,7 +33,7 @@ Available options:
 
 #### Diff
 ```
-Usage: semantic diff ([--sexpression] | [--json] | [--json-graph] | [--toc] |
+Usage: lexicon diff ([--sexpression] | [--json] | [--json-graph] | [--toc] |
                      [--dot] | [--show]) [FILE_A] [FILE_B]
   Compute changes between paths
 
@@ -49,7 +49,7 @@ Available options:
 
 #### Graph
 ```
-Usage: semantic graph ([--imports] | [--calls]) [--packages] ([--dot] | [--json]
+Usage: lexicon graph ([--imports] | [--calls]) [--packages] ([--dot] | [--json]
                       | [--show]) ([--root DIR] [--exclude-dir DIR]
                       DIR:LANGUAGE | FILE | --language ARG (FILES... | --stdin))
   Compute a graph for a directory or from a top-level entry point module
@@ -112,14 +112,14 @@ cabal new-test
 
 ## Technology and architecture
 
-Architecturally, `semantic`:
+Architecturally, `lexicon`:
 1. Reads blobs.
 2. Generates parse trees for those blobs with [tree-sitter][tree-sitter] (an incremental parsing system for programmings tools).
 3. Assigns those trees into a generalized representation of syntax.
 4. Performs analysis, computes diffs, or just returns parse trees.
 5. Renders output in one of many supported formats.
 
-Semantic leverages a number of interesting algorithms and techniques:
+Lexicon leverages a number of interesting algorithms and techniques:
 
 - Myers' algorithm (SES) as described in the paper [*An O(ND) Difference Algorithm and Its Variations*][SES]
 - RWS as described in the paper [*RWS-Diff: Flexible and Efficient Change Detection in Hierarchical Data*][RWS].
@@ -139,4 +139,4 @@ details on how to participate in our community.
 
 ## Licensing
 
-Semantic is licensed under the [MIT license](LICENSE).
+Lexicon is licensed under the [MIT license](LICENSE).

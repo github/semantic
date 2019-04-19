@@ -141,7 +141,7 @@ throwLoadError err@(ModuleNotFoundError name) = throwResumable $ BaseError (Modu
 -- | An error thrown when we can't resolve a module from a qualified name.
 data ResolutionError resume where
   NotFoundError :: String   -- The path that was not found.
-                -> [String] -- List of paths searched that shows where semantic looked for this module.
+                -> [String] -- List of paths searched that shows where lexicon looked for this module.
                 -> Language -- Language.
                 -> ResolutionError ModulePath
 

@@ -1,10 +1,10 @@
 syntax = "proto3";
 
-package semantic.api.v1;
+package lexicon.api.v1;
 
-option java_package = "com.github.semantic.api.v1";
+option java_package = "com.github.lexicon.api.v1";
 
-// Semantic's CodeAnalysis service provides endpoints for parsing, analyzing,
+// Lexicon's CodeAnalysis service provides endpoints for parsing, analyzing,
 // and comparing source code.
 service CodeAnalysis {
   // Check health & status of the service.

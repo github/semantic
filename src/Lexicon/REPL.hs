@@ -1,0 +1,205 @@
+{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, TypeOperators, UndecidableInstances #-}
+{-# OPTIONS_GHC -Wno-missing-signatures #-}
+module Lexicon.REPL
+( rubyREPL
+) where
+
+import Control.Abstract hiding (Continue, List, string)
+import Control.Abstract.ScopeGraph (runScopeError)
+import Control.Abstract.Heap (runHeapError)
+import Control.Effect.Carrier
+import Control.Effect.Resource
+import Control.Effect.Sum
+import Control.Effect.REPL
+import Data.Abstract.Address.Precise as Precise
+import Data.Abstract.Evaluatable hiding (string)
+import Data.Abstract.Module
+import Data.Abstract.ModuleTable as ModuleTable
+import Data.Abstract.Package
+import Data.Abstract.Value.Concrete as Concrete
+import Data.Blob (Blob(..))
+import Data.Error (Colourize (..), showExcerpt)
+import Data.File (File (..), readBlobFromFile)
+import Data.Flag (flag)
+import Data.Graph (topologicalSort)
+import Data.Language as Language
+import Data.List (uncons)
+import Data.Project
+import Data.Quieterm
+import Data.Span
+import qualified Data.Text as T
+import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
+import qualified Data.Time.LocalTime as LocalTime
+import Numeric (readDec)
+import Parsing.Parser (rubyParser)
+import Prologue
+import Lexicon.Analysis
+import Lexicon.Config (logOptionsFromConfig)
+import Lexicon.Distribute
+import Lexicon.Graph
+import Lexicon.Resolution
+import Lexicon.Task hiding (Error)
+import qualified Lexicon.Task.Files as Files
+import Lexicon.Telemetry
+import Lexicon.Timeout
+import Lexicon.Telemetry.Log (LogOptions, Message(..), writeLogMessage)
+import Lexicon.Util
+import System.Console.Haskeline
+import System.Directory (createDirectoryIfMissing, getHomeDirectory)
+import System.FilePath
+
+data Quit = Quit
+  deriving Show
+
+instance Exception Quit
+
+rubyREPL = repl (Proxy @'Language.Ruby) rubyParser
+
+repl proxy parser paths =
+  withOptions debugOptions $ \config logger statter ->
+    runM . runDistribute . runResource (runM . runDistribute) . runTimeout (runM . runDistribute . runResource (runM . runDistribute)) . runError @SomeException . runTelemetryIgnoringStat (logOptionsFromConfig config) . runTraceInTelemetry . runReader (TaskSession config "-" False logger statter) . Files.runFiles . runResolution . runTaskF $ do
+      blobs <- catMaybes <$> traverse readBlobFromFile (flip File (Language.reflect proxy) <$> paths)
+      package <- fmap (fmap quieterm) <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs (Language.reflect proxy) [])
+      modules <- topologicalSort <$> runImportGraphToModules proxy (snd <$> package)
+      homeDir <- liftIO getHomeDirectory
+      prefs <- liftIO (readPrefs (homeDir <> "/.haskeline"))
+      let settingsDir = homeDir <> "/.local/lexicon"
+      liftIO $ createDirectoryIfMissing True settingsDir
+      let settings = Settings
+            { complete = noCompletion
+            , historyFile = Just (settingsDir <> "/repl_history")
+            , autoAddHistory = True
+            }
+      runEvaluator
+        . runREPL prefs settings
+        . fmap snd
+        . runState ([] @Breakpoint)
+        . runReader Step
+        . runEvaluator
+        . id @(Evaluator _ Precise (Value _ Precise) _ _)
+        . raiseHandler runTraceByPrinting
+        . runHeap
+        . runScopeGraph
+        . raiseHandler runFresh
+        . fmap reassociate
+        . runLoadError
+        . runUnspecialized
+        . runScopeError
+        . runHeapError
+        . runEvalError
+        . runResolutionError
+        . runAddressError
+        . runValueError
+        . runModuleTable
+        . runModules (ModuleTable.modulePaths (packageModules (snd <$> package)))
+        . raiseHandler (runReader (packageInfo package))
+        . raiseHandler (runState (lowerBound @Span))
+        . raiseHandler (runReader (lowerBound @Span))
+        $ evaluate proxy (runDomainEffects (evalTerm (withTermSpans . step (fmap moduleBody <$> ModuleTable.toPairs (packageModules (fst <$> package)))))) modules
+
+-- TODO: REPL for typechecking/abstract semantics
+-- TODO: drive the flow from within the REPL instead of from without
+
+
+runTelemetryIgnoringStat :: LogOptions -> TelemetryIgnoringStatC m a -> m a
+runTelemetryIgnoringStat logOptions = runReader logOptions . runTelemetryIgnoringStatC
+
+newtype TelemetryIgnoringStatC m a = TelemetryIgnoringStatC { runTelemetryIgnoringStatC :: ReaderC LogOptions m a }
+  deriving (Applicative, Functor, Monad, MonadIO)
+
+instance (Carrier sig m, MonadIO m) => Carrier (Telemetry :+: sig) (TelemetryIgnoringStatC m) where
+  eff (R other) = TelemetryIgnoringStatC . eff . R . handleCoercible $ other
+  eff (L op) = do
+    logOptions <- TelemetryIgnoringStatC ask
+    case op of
+      WriteStat _                  k -> k
+      WriteLog level message pairs k -> do
+        time <- liftIO Time.getCurrentTime
+        zonedTime <- liftIO (LocalTime.utcToLocalZonedTime time)
+        writeLogMessage logOptions (Message level message pairs zonedTime)
+        k
+
+step :: ( Member (Error SomeException) sig
+        , Member REPL sig
+        , Member (Reader ModuleInfo) sig
+        , Member (Reader Span) sig
+        , Member (Reader Step) sig
+        , Member (State [Breakpoint]) sig
+        , Carrier sig m
+        )
+     => [(ModulePath, Blob)]
+     -> Open (term -> Evaluator term address value m a)
+step blobs recur term = do
+  break <- shouldBreak
+  if break then do
+    list
+    runCommands (recur term)
+  else
+    recur term
+  where list = do
+          path <- asks modulePath
+          span <- ask
+          maybe (pure ()) (\ blob -> output (T.pack (showExcerpt (flag Colourize True) span blob ""))) (Prelude.lookup path blobs)
+        help = do
+          output "Commands available from the prompt:"
+          output ""
+          output "  :help, :?                   display this list of commands"
+          output "  :list                       show the source code around current breakpoint"
+          output "  :step                       single-step after stopping at a breakpoint"
+          output "  :continue                   continue evaluation until the next breakpoint"
+          output "  :show bindings              show the current bindings"
+          output "  :quit, :q, :abandon         abandon the current evaluation and exit the repl"
+        -- TODO: showScopeGraph option for REPL.
+        -- showBindings = do
+        --   bindings <- Env.head <$> getEnv
+        --   output . T.pack $ unlines (uncurry showBinding <$> Env.pairs bindings)
+        -- showBinding name addr = show name <> " = " <> show addr
+        runCommand run [":step"]     = local (const Step) run
+        runCommand run [":continue"] = local (const Continue) run
+        runCommand run [":break", s]
+          | [(i, "")] <- readDec (T.unpack s) = modify (OnLine i :) >> runCommands run
+        -- TODO: :show breakpoints
+        -- TODO: :delete breakpoints
+        runCommand run [":list"] = list >> runCommands run
+        -- TODO: Show the scope graph
+        -- runCommand run [":show", "bindings"] = showBindings >> runCommands run
+        -- TODO: show the value(s) in the heap
+        -- TODO: can we call functions somehow? Maybe parse expressions with the current parser?
+        runCommand _   [quit] | quit `elem` [":quit", ":q", ":abandon"] = throwError (SomeException Quit)
+        runCommand run [":help"] = help >> runCommands run
+        runCommand run [":?"] = help >> runCommands run
+        runCommand run [] = runCommands run
+        runCommand run other = output ("unknown command '" <> T.unwords other <> "'") >> output "use :? for help" >> runCommands run
+        runCommands run = do
+          str <- prompt "repl: "
+          maybe (runCommands run) (runCommand run . T.words) str
+
+
+newtype Breakpoint
+  = OnLine Int
+  deriving Show
+
+-- FIXME: OnLine should take a module, defaulting to the current module
+-- TODO: OnPos, taking a column number as well as line number and module
+-- TODO: OnSymbol, taking a function/method name? This could be tricky to implement cross-language
+
+data Step
+  = Step
+  | Continue
+  deriving Show
+
+-- TODO: StepLocal/StepModule
+
+shouldBreak :: (Member (State [Breakpoint]) sig, Member (Reader Span) sig, Member (Reader Step) sig, Carrier sig m) => Evaluator term address value m Bool
+shouldBreak = do
+  step <- ask
+  case step of
+    Step -> pure True
+    Continue -> do
+      breakpoints <- get
+      span <- ask
+      pure (any @[] (matching span) breakpoints)
+  where matching Span{..} (OnLine n)
+          | n >= posLine spanStart
+          , n <= posLine spanEnd   = True
+          | otherwise              = False

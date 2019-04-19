@@ -3,7 +3,7 @@
 
 -- See docs/💡ProTip!.md
 :undef pretty
-:def pretty \ _ -> return ":set -interactive-print Semantic.Util.Pretty.prettyShow"
+:def pretty \ _ -> return ":set -interactive-print Lexicon.Util.Pretty.prettyShow"
 
 -- See docs/💡ProTip!.md
 :undef no-pretty
@@ -27,7 +27,7 @@ assignmentExample lang = case lang of
   "Java" -> mk "java" "java"
   "PHP" -> mk "php" "php"
   _ -> mk "" ""
-  where mk fileExtension parser = putStrLn ("example: fmap (() <$) . runTask . parse " ++ parser ++ "Parser =<< Semantic.Util.blob \"example." ++ fileExtension ++ "\"") >> return ("import Parsing.Parser\nimport Semantic.Task\nimport Semantic.Util")
+  where mk fileExtension parser = putStrLn ("example: fmap (() <$) . runTask . parse " ++ parser ++ "Parser =<< Lexicon.Util.blob \"example." ++ fileExtension ++ "\"") >> return ("import Parsing.Parser\nimport Lexicon.Task\nimport Lexicon.Util")
 :}
 :undef assignment
 :def assignment assignmentExample

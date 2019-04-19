@@ -1,2 +1,2 @@
 module Main (main) where
-import Semantic.CLI (main)
+import Lexicon.CLI (main)

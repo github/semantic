@@ -21,7 +21,7 @@ import           Language.Python.PrettyPrint
 import           Language.Ruby.PrettyPrint
 import           Reprinting.Pipeline
 import           Reprinting.Tokenize
-import           Semantic.IO
+import           Lexicon.IO
 
 increaseNumbers :: (Literal.Float :< fs, Apply Functor fs) => Rule (Term (Sum fs) History)
 increaseNumbers = do

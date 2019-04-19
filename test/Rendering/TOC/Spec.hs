@@ -23,8 +23,8 @@ import Prelude
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import Rendering.TOC
-import Semantic.Config
-import Semantic.Api (diffSummaryBuilder)
+import Lexicon.Config
+import Lexicon.Api (diffSummaryBuilder)
 import Serializing.Format as Format
 
 import SpecHelpers

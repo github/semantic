@@ -1,7 +1,7 @@
 ## Contributing
 
-[fork]: https://github.com/github/semantic-open-source/fork
-[pr]: https://github.com/github/semantic-open-source/compare
+[fork]: https://github.com/github/lexicon/fork
+[pr]: https://github.com/github/lexicon/compare
 [style]: docs/coding-style.md
 [code-of-conduct]: CODE_OF_CONDUCT.md
 

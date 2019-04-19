@@ -4,7 +4,7 @@ module Data.Graph.Spec where
 
 import SpecHelpers
 
-import "semantic" Data.Graph
+import "lexicon" Data.Graph
 import qualified Algebra.Graph.Class as Class
 
 spec :: Spec
