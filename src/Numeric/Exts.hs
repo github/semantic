@@ -13,7 +13,6 @@ import Data.Attoparsec.Text
 import Data.Char (isDigit, isOctDigit, isHexDigit)
 import Data.Text
 import Numeric
-import Debug.Trace
 import Prelude hiding (fail, filter)
 import Prologue
 import Text.Read (readMaybe)
@@ -55,7 +54,6 @@ bin = do
   skip (inClass "bB")
   let isBin = inClass "01_"
   digs <- unpack . stripUnder <$> (takeWhile1 isBin <* lengths)
-  traceM ("digits are " <> digs)
   let c2b c = case c of
         '0' -> 0
         '1' -> 1
