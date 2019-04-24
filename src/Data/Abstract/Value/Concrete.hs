@@ -26,7 +26,6 @@ import Data.Text (pack)
 import Data.Word
 import Prologue
 import qualified Data.Map.Strict as Map
-import Debug.Trace (traceM)
 
 data Value term address
     -- TODO: Split Closure up into a separate data type.                                                  Scope   Frame
@@ -159,8 +158,8 @@ instance ( Carrier sig m
       -- conditional always being true and getting stuck in an infinite loop.
       ifthenelse cond' (body *> throwError (Continue @(Value term address) Unit)) (pure Unit)))
       (\case
-        Resumable (BaseError _ _ (UnspecializedError _))    _ -> traceM "unspecialized" *> throwError (Abort @(Value term address))
-        Resumable (BaseError _ _ (RefUnspecializedError _)) _ -> traceM "refun" *> throwError (Abort @(Value term address))) >>= k
+        Resumable (BaseError _ _ (UnspecializedError _))    _ -> throwError (Abort @(Value term address))
+        Resumable (BaseError _ _ (RefUnspecializedError _)) _ -> throwError (Abort @(Value term address))) >>= k
 
 
 
