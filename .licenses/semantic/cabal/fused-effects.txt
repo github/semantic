@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: fused-effects
-version: 0.2.0.1
+version: 0.3.1.0
 summary: A fast, flexible, fused effect system.
 homepage: https://github.com/robrix/fused-effects
 license: bsd-3-clause
