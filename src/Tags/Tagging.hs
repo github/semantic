@@ -18,7 +18,7 @@ import           Data.Machine as Machine
 import qualified Data.Source as Source
 import           Data.Tag
 import           Data.Term
-import           Data.Text hiding (empty)
+import           Data.Text as T hiding (empty)
 import           Tags.Taggable
 
 runTagging :: (IsTaggable syntax)
@@ -51,7 +51,7 @@ contextualizing Blob{..} symbolsToSummarize = repeatedly $ await >>= \case
     _ -> pure ()
   where
     slice = fmap (stripEnd . Source.toText . flip Source.slice blobSource)
-    firstLine = fmap (fst . breakOn "\n")
+    firstLine = fmap (T.take 180 . fst . breakOn "\n")
 
 enterScope, exitScope :: ContextToken -> Machine.PlanT k Tag Contextualizer ()
 enterScope c = lift (State.modify (c :))
