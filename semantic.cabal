@@ -134,7 +134,6 @@ library
                      , Data.Flag
                      , Data.Functor.Both
                      , Data.Functor.Classes.Generic
-                     , Proto3.Google.Timestamp
                      , Data.Graph
                      , Data.Graph.ControlFlowVertex
                      , Data.Handle
@@ -225,7 +224,6 @@ library
                      , Parsing.Parser
                      , Parsing.TreeSitter
                      , Paths_semantic
-                     , Proto3.Google.Wrapped
                      -- Rendering formats
                      , Rendering.Graph
                      , Rendering.JSON
