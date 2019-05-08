@@ -388,7 +388,7 @@ runAllocator :: Evaluator term address value (AllocatorC address m) a
 runAllocator = raiseHandler runAllocatorC
 
 newtype AllocatorC address m a = AllocatorC { runAllocatorC :: m a }
-  deriving (Alternative, Applicative, Functor, Monad)
+  deriving newtype (Alternative, Applicative, Functor, Monad)
 
 runScopeErrorWith :: (forall resume . BaseError (ScopeError address) resume -> Evaluator term address value m resume)
                   -> Evaluator term address value (ResumableWithC (BaseError (ScopeError address)) m) a

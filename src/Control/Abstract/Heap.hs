@@ -428,7 +428,7 @@ runDeref :: Evaluator term address value (DerefC address value m) a
 runDeref = raiseHandler runDerefC
 
 newtype DerefC address value m a = DerefC { runDerefC :: m a }
-  deriving (Alternative, Applicative, Functor, Monad)
+  deriving newtype (Alternative, Applicative, Functor, Monad)
 
 
 

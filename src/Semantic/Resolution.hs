@@ -13,7 +13,6 @@ import           Control.Effect.Sum
 import           Data.Aeson
 import           Data.Aeson.Types (parseMaybe)
 import           Data.Blob
-import           Data.Coerce
 import           Data.File
 import           Data.Project
 import qualified Data.Map as Map
@@ -55,7 +54,7 @@ runResolution :: ResolutionC m a -> m a
 runResolution = runResolutionC
 
 newtype ResolutionC m a = ResolutionC { runResolutionC :: m a }
-  deriving (Applicative, Functor, Monad, MonadIO)
+  deriving newtype (Applicative, Functor, Monad, MonadIO)
 
 instance (Member Files sig, Carrier sig m, MonadIO m) => Carrier (Resolution :+: sig) (ResolutionC m) where
   eff (R other) = ResolutionC . eff . handleCoercible $ other

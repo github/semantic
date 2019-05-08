@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DerivingStrategies, GADTs, GeneralizedNewtypeDeriving, KindSignatures, LambdaCase, Rank2Types, ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE DeriveAnyClass, DerivingStrategies, GADTs, GeneralizedNewtypeDeriving, KindSignatures, , Rank2Types, ScopedTypeVariables, TypeOperators #-}
 module Control.Abstract.Value
 ( AbstractValue(..)
 , AbstractIntro(..)

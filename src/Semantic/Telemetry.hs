@@ -56,7 +56,6 @@ import           Control.Effect.Reader
 import           Control.Effect.Sum
 import           Control.Exception
 import           Control.Monad.IO.Class
-import           Data.Coerce
 import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
 import qualified Data.Time.LocalTime as LocalTime
 import           Network.HTTP.Client
@@ -150,7 +149,7 @@ runTelemetry :: LogQueue -> StatQueue -> TelemetryC m a -> m a
 runTelemetry logger statter = runReader (logger, statter) . runTelemetryC
 
 newtype TelemetryC m a = TelemetryC { runTelemetryC :: ReaderC (LogQueue, StatQueue) m a }
-  deriving (Applicative, Functor, Monad, MonadIO)
+  deriving newtype (Applicative, Functor, Monad, MonadIO)
 
 instance (Carrier sig m, MonadIO m) => Carrier (Telemetry :+: sig) (TelemetryC m) where
   eff (L op) = do
@@ -165,7 +164,7 @@ ignoreTelemetry :: IgnoreTelemetryC m a -> m a
 ignoreTelemetry = runIgnoreTelemetryC
 
 newtype IgnoreTelemetryC m a = IgnoreTelemetryC { runIgnoreTelemetryC :: m a }
-  deriving (Applicative, Functor, Monad)
+  deriving newtype (Applicative, Functor, Monad)
 
 instance Carrier sig m => Carrier (Telemetry :+: sig) (IgnoreTelemetryC m) where
   eff (R other) = IgnoreTelemetryC . eff . handleCoercible $ other

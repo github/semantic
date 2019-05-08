@@ -16,7 +16,6 @@ module Diffing.Algorithm
 
 import Control.Effect hiding ((:+:))
 import Control.Effect.Carrier
-import Data.Coerce (coerce)
 import qualified Data.Diff as Diff
 import Data.Sum
 import Data.Term
