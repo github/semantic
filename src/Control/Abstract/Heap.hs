@@ -1,5 +1,4 @@
-{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, KindSignatures, RankNTypes, ScopedTypeVariables, TypeOperators,
-             UndecidableInstances #-}
+{-# LANGUAGE DeriveAnyClass, DerivingStrategies, GADTs, GeneralizedNewtypeDeriving, KindSignatures, RankNTypes, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Control.Abstract.Heap
 ( Heap
 , HeapError(..)
@@ -421,15 +420,8 @@ reachable roots heap = go mempty roots
 data Deref value (m :: * -> *) k
   = DerefCell        (Set value) (Maybe value -> k)
   | AssignCell value (Set value) (Set value   -> k)
-  deriving (Functor)
-
-instance HFunctor (Deref value) where
-  hmap _ (DerefCell        cell k) = DerefCell        cell k
-  hmap _ (AssignCell value cell k) = AssignCell value cell k
-
-instance Effect (Deref value) where
-  handle state handler (DerefCell        cell k) = DerefCell        cell (handler . (<$ state) . k)
-  handle state handler (AssignCell value cell k) = AssignCell value cell (handler . (<$ state) . k)
+  deriving stock Functor
+  deriving anyclass (HFunctor, Effect)
 
 runDeref :: Evaluator term address value (DerefC address value m) a
          -> Evaluator term address value m a
