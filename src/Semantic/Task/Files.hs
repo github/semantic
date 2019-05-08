@@ -23,7 +23,6 @@ import           Control.Effect.Sum
 import           Control.Exception as Exc
 import           Data.Blob
 import qualified Data.ByteString.Builder as B
-import           Data.Coerce
 import           Data.File
 import           Data.Handle
 import           Data.Language
@@ -53,15 +52,8 @@ data Files (m :: * -> *) k
   | Write Destination B.Builder                               k
 
 deriving instance Functor (Files m)
-
-instance HFunctor Files where
-  hmap _ = coerce
-
-instance Effect Files where
-  handle state handler (Read source k) = Read source (handler . (<$ state) . k)
-  handle state handler (ReadProject rootDir dir language excludeDirs k) = ReadProject rootDir dir language excludeDirs (handler . (<$ state) . k)
-  handle state handler (FindFiles dir exts paths k) = FindFiles dir exts paths (handler . (<$ state) . k)
-  handle state handler (Write destination builder k) = Write destination builder (handler (k <$ state))
+instance HFunctor Files
+instance Effect Files
 
 -- | Run a 'Files' effect in 'IO'.
 runFiles :: FilesC m a -> m a
