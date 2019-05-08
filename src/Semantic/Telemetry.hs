@@ -1,4 +1,4 @@
-{-# LANGUAGE DerivingStrategies, GADTs, GeneralizedNewtypeDeriving, KindSignatures, RankNTypes, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DeriveAnyClass, DerivingStrategies, GADTs, GeneralizedNewtypeDeriving, KindSignatures, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Semantic.Telemetry
 (
   -- Async telemetry interface
@@ -142,14 +142,8 @@ time' = withTiming'
 data Telemetry (m :: * -> *) k
   = WriteStat Stat k
   | WriteLog Level String [(String, String)] k
-  deriving (Functor)
-
-instance HFunctor Telemetry where
-  hmap _ = coerce
-
-instance Effect Telemetry where
-  handle state handler (WriteStat stat k) = WriteStat stat (handler (k <$ state))
-  handle state handler (WriteLog level message pairs k) = WriteLog level message pairs (handler (k <$ state))
+  deriving stock Functor
+  deriving anyclass (HFunctor, Effect)
 
 -- | Run a 'Telemetry' effect by expecting a 'Reader' of 'Queue's to write stats and logs to.
 runTelemetry :: LogQueue -> StatQueue -> TelemetryC m a -> m a
