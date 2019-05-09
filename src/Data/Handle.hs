@@ -52,9 +52,7 @@ readBlobsFromHandle = fmap blobs <$> readFromHandle
 
 -- | Read line delimited paths from a handle
 readPathsFromHandle :: MonadIO m => Handle 'IO.ReadMode -> m [FilePath]
-readPathsFromHandle (ReadHandle h) = do
-  input <- liftIO $ BL.hGetContents h
-  pure $ BLC.unpack <$> BLC.lines input
+readPathsFromHandle (ReadHandle h) = liftIO $ fmap BLC.unpack . BLC.lines <$> BL.hGetContents h
 
 -- | Read JSON encoded blob pairs from a handle.
 readBlobPairsFromHandle :: MonadIO m => Handle 'IO.ReadMode -> m [BlobPair]
