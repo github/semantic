@@ -7,6 +7,7 @@ module Data.Handle
   , stdout
   , stderr
   , readBlobsFromHandle
+  , readPathsFromHandle
   , readBlobPairsFromHandle
   , readFromHandle
   , openFileForReading
@@ -16,6 +17,7 @@ import Prologue
 
 import           Data.Aeson
 import qualified Data.ByteString.Lazy as BL
+import qualified Data.ByteString.Lazy.Char8 as BLC
 import           System.Exit
 import qualified System.IO as IO
 
@@ -47,6 +49,12 @@ openFileForReading path = ReadHandle <$> IO.openFile path IO.ReadMode
 -- | Read JSON encoded blobs from a handle.
 readBlobsFromHandle :: MonadIO m => Handle 'IO.ReadMode -> m [Blob]
 readBlobsFromHandle = fmap blobs <$> readFromHandle
+
+-- | Read line delimited paths from a handle
+readPathsFromHandle :: MonadIO m => Handle 'IO.ReadMode -> m [FilePath]
+readPathsFromHandle (ReadHandle h) = do
+  input <- liftIO $ BL.hGetContents h
+  pure $ BLC.unpack <$> BLC.lines input
 
 -- | Read JSON encoded blob pairs from a handle.
 readBlobPairsFromHandle :: MonadIO m => Handle 'IO.ReadMode -> m [BlobPair]
