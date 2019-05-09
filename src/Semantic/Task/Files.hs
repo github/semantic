@@ -80,7 +80,7 @@ instance (Member (Error SomeException) sig, Member Telemetry sig, MonadIO m, Car
     Read (FromPath path) k -> (readBlobFromFile' path `catchIO` (throwError . toException @SomeException)) >>= k
     Read (FromHandle handle) k -> (readBlobsFromHandle handle  `catchIO` (throwError . toException @SomeException)) >>= k
     Read (FromDir dir) k -> (readBlobsFromDir dir `catchIO` (throwError . toException @SomeException)) >>= k
-    Read (FromGitRepo path sha (ExcludePaths excludePaths)) k -> time "task.read_git_repo" mempty (readBlobsFromGitRepo path sha excludePaths `catchIO` (throwError . toException @SomeException)) >>= k
+    Read (FromGitRepo path sha (ExcludePaths excludePaths)) k -> (readBlobsFromGitRepo path sha excludePaths `catchIO` (throwError . toException @SomeException)) >>= k
     Read (FromGitRepo path sha (ExcludeFromHandle handle)) k -> (readPathsFromHandle handle >>= readBlobsFromGitRepo path sha) `catchIO` (throwError . toException @SomeException) >>= k
     Read (FromPathPair paths) k -> (runBothWith readFilePair paths `catchIO` (throwError . toException @SomeException)) >>= k
     Read (FromPairHandle handle) k -> (readBlobPairsFromHandle handle `catchIO` (throwError . toException @SomeException)) >>= k
