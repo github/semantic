@@ -1,4 +1,4 @@
-{-# LANGUAGE DefaultSignatures, GeneralizedNewtypeDeriving, KindSignatures, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DeriveAnyClass, DefaultSignatures, DerivingStrategies, GeneralizedNewtypeDeriving, KindSignatures, TypeOperators, UndecidableInstances #-}
 module Diffing.Algorithm
   ( Diff (..)
   , Algorithm(..)
@@ -16,7 +16,6 @@ module Diffing.Algorithm
 
 import Control.Effect hiding ((:+:))
 import Control.Effect.Carrier
-import Data.Coerce (coerce)
 import qualified Data.Diff as Diff
 import Data.Sum
 import Data.Term
@@ -37,18 +36,11 @@ data Diff term1 term2 diff (m :: * -> *) k
   | Insert term2 (diff -> k)
   -- | Replace one term with another.
   | Replace term1 term2 (diff -> k)
-  deriving (Functor)
-
-instance HFunctor (Diff term1 term2 diff) where
-  hmap _ = coerce
-  {-# INLINE hmap #-}
-
-instance Effect (Diff term1 term2 diff) where
-  handle state handler = coerce . fmap (handler . (<$ state))
-
+  deriving stock Functor
+  deriving anyclass (HFunctor, Effect)
 
 newtype Algorithm term1 term2 diff m a = Algorithm { runAlgorithm :: m a }
-  deriving (Applicative, Alternative, Functor, Monad)
+  deriving newtype (Applicative, Alternative, Functor, Monad)
 
 instance Carrier sig m => Carrier sig (Algorithm term1 term2 diff m) where
   eff = Algorithm . eff . handleCoercible

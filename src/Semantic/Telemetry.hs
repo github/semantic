@@ -1,4 +1,4 @@
-{-# LANGUAGE DerivingStrategies, GADTs, GeneralizedNewtypeDeriving, KindSignatures, RankNTypes, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DeriveAnyClass, DerivingStrategies, GADTs, GeneralizedNewtypeDeriving, KindSignatures, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Semantic.Telemetry
 (
   -- Async telemetry interface
@@ -56,7 +56,6 @@ import           Control.Effect.Reader
 import           Control.Effect.Sum
 import           Control.Exception
 import           Control.Monad.IO.Class
-import           Data.Coerce
 import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
 import qualified Data.Time.LocalTime as LocalTime
 import           Network.HTTP.Client
@@ -142,21 +141,15 @@ time' = withTiming'
 data Telemetry (m :: * -> *) k
   = WriteStat Stat k
   | WriteLog Level String [(String, String)] k
-  deriving (Functor)
-
-instance HFunctor Telemetry where
-  hmap _ = coerce
-
-instance Effect Telemetry where
-  handle state handler (WriteStat stat k) = WriteStat stat (handler (k <$ state))
-  handle state handler (WriteLog level message pairs k) = WriteLog level message pairs (handler (k <$ state))
+  deriving stock Functor
+  deriving anyclass (HFunctor, Effect)
 
 -- | Run a 'Telemetry' effect by expecting a 'Reader' of 'Queue's to write stats and logs to.
 runTelemetry :: LogQueue -> StatQueue -> TelemetryC m a -> m a
 runTelemetry logger statter = runReader (logger, statter) . runTelemetryC
 
 newtype TelemetryC m a = TelemetryC { runTelemetryC :: ReaderC (LogQueue, StatQueue) m a }
-  deriving (Applicative, Functor, Monad, MonadIO)
+  deriving newtype (Applicative, Functor, Monad, MonadIO)
 
 instance (Carrier sig m, MonadIO m) => Carrier (Telemetry :+: sig) (TelemetryC m) where
   eff (L op) = do
@@ -171,7 +164,7 @@ ignoreTelemetry :: IgnoreTelemetryC m a -> m a
 ignoreTelemetry = runIgnoreTelemetryC
 
 newtype IgnoreTelemetryC m a = IgnoreTelemetryC { runIgnoreTelemetryC :: m a }
-  deriving (Applicative, Functor, Monad)
+  deriving newtype (Applicative, Functor, Monad)
 
 instance Carrier sig m => Carrier (Telemetry :+: sig) (IgnoreTelemetryC m) where
   eff (R other) = IgnoreTelemetryC . eff . handleCoercible $ other
