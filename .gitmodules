@@ -10,6 +10,3 @@
 [submodule "vendor/fastsum"]
 	path = vendor/fastsum
 	url = https://github.com/patrickt/fastsum.git
-[submodule "vendor/fused-effects"]
-	path = vendor/fused-effects
-	url = https://github.com/robrix/fused-effects.git
