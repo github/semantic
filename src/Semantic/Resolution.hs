@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, GADTs, GeneralizedNewtypeDeriving, KindSignatures, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE ConstraintKinds, DeriveAnyClass, DerivingStrategies, GADTs, GeneralizedNewtypeDeriving, KindSignatures, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Semantic.Resolution
   ( Resolution (..)
   , nodeJSResolutionMap
@@ -13,7 +13,6 @@ import           Control.Effect.Sum
 import           Data.Aeson
 import           Data.Aeson.Types (parseMaybe)
 import           Data.Blob
-import           Data.Coerce
 import           Data.File
 import           Data.Project
 import qualified Data.Map as Map
@@ -48,20 +47,14 @@ resolutionMap Project{..} = case projectLanguage of
 data Resolution (m :: * -> *) k
   = NodeJSResolution FilePath Text [FilePath] (Map FilePath FilePath -> k)
   | NoResolution                              (Map FilePath FilePath -> k)
-  deriving (Functor)
-
-instance HFunctor Resolution where
-  hmap _ = coerce
-
-instance Effect Resolution where
-  handle state handler (NodeJSResolution path key paths k) = NodeJSResolution path key paths (handler . (<$ state) . k)
-  handle state handler (NoResolution k) = NoResolution (handler . (<$ state) . k)
+  deriving stock Functor
+  deriving anyclass (HFunctor, Effect)
 
 runResolution :: ResolutionC m a -> m a
 runResolution = runResolutionC
 
 newtype ResolutionC m a = ResolutionC { runResolutionC :: m a }
-  deriving (Applicative, Functor, Monad, MonadIO)
+  deriving newtype (Applicative, Functor, Monad, MonadIO)
 
 instance (Member Files sig, Carrier sig m, MonadIO m) => Carrier (Resolution :+: sig) (ResolutionC m) where
   eff (R other) = ResolutionC . eff . handleCoercible $ other
