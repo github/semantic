@@ -10,9 +10,6 @@
 [submodule "vendor/fastsum"]
 	path = vendor/fastsum
 	url = https://github.com/patrickt/fastsum.git
-[submodule "vendor/semilattices"]
-	path = vendor/semilattices
-	url = https://github.com/robrix/semilattices.git
 [submodule "vendor/fused-effects"]
 	path = vendor/fused-effects
 	url = https://github.com/robrix/fused-effects.git
