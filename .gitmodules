@@ -7,6 +7,3 @@
 [submodule "vendor/freer-cofreer"]
 	path = vendor/freer-cofreer
 	url = https://github.com/robrix/freer-cofreer.git
-[submodule "vendor/fastsum"]
-	path = vendor/fastsum
-	url = https://github.com/patrickt/fastsum.git
