@@ -116,5 +116,6 @@ findFiles dir exts paths = send (FindFiles dir exts paths pure)
 write :: (Member Files sig, Carrier sig m) => Destination -> B.Builder -> m ()
 write dest builder = send (Write dest builder (pure ()))
 
+-- | Catch exceptions thrown in 'IO' and rethrow them in an 'Error' effect.
 rethrowing :: (Member Catch sig, Member (Error SomeException) sig, Carrier sig m) => m a -> m a
 rethrowing act = act `catchSync` (throwError @SomeException)
