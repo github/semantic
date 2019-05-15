@@ -60,9 +60,9 @@ repl proxy parser paths =
   withOptions debugOptions $ \config logger statter ->
     runM
     . runDistribute
-    . runCatch (runM . runDistribute)
-    . runResource (runM . runDistribute . runCatch (runM . runDistribute))
-    . runTimeout (runM . runDistribute . runCatch (runM . runDistribute) . runResource (runM . runDistribute . runCatch (runM . runDistribute)))
+    . withCatch
+    . withResource
+    . withTimeout
     . runError @SomeException
     . runTelemetryIgnoringStat (logOptionsFromConfig config)
     . runTraceInTelemetry

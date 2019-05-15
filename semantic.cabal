@@ -310,6 +310,7 @@ library
                      , template-haskell
                      , time
                      , unix
+                     , unliftio-core
                      , unordered-containers
                      , vector
                      , haskell-tree-sitter

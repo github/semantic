@@ -169,9 +169,9 @@ runTask taskSession@TaskSession{..} task = do
         run
           = runM
           . runDistribute
-          . runCatch (runM . runDistribute)
-          . runResource (runM . runDistribute . runCatch (runM . runDistribute))
-          . runTimeout (runM . runDistribute . runCatch (runM . runDistribute) . runResource (runM . runDistribute . runCatch (runM . runDistribute)))
+          . withCatch
+          . withResource
+          . withTimeout
           . runError
           . runTelemetry logger statter
           . runTraceInTelemetry
