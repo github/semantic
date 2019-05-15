@@ -60,7 +60,7 @@ instance Carrier (Distribute :+: Lift IO) (DistributeC (LiftC IO)) where
   eff (R other) = DistributeC (eff (handleCoercible other))
 
 instance MonadUnliftIO m => MonadUnliftIO (DistributeC m) where
-  askUnliftIO = DistributeC $ withUnliftIO $ \u -> return (UnliftIO (unliftIO u . runDistributeC))
+  askUnliftIO = DistributeC $ withUnliftIO $ \u -> pure (UnliftIO (unliftIO u . runDistributeC))
   {-# INLINE askUnliftIO #-}
   withRunInIO inner = DistributeC $ withRunInIO $ \run -> inner (run . runDistributeC)
   {-# INLINE withRunInIO #-}
