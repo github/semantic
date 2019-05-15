@@ -19,9 +19,9 @@ module Semantic.Task.Files
 
 import           Control.Effect
 import           Control.Effect.Carrier
+import           Control.Effect.Catch
 import           Control.Effect.Error
 import           Control.Effect.Sum
-import           Control.Exception as Exc
 import           Data.Blob
 import qualified Data.ByteString.Builder as B
 import           Data.File
@@ -29,7 +29,7 @@ import           Data.Handle
 import           Data.Language
 import           Data.Project hiding (readFile)
 import           Prelude hiding (readFile)
-import           Prologue
+import           Prologue hiding (catch)
 import qualified Semantic.Git as Git
 import           Semantic.IO
 import           Semantic.Telemetry
@@ -60,27 +60,27 @@ deriving instance Functor (Files m)
 instance HFunctor Files
 instance Effect Files
 
--- | Run a 'Files' effect in 'IO'.
+-- | Run a 'Files' effect in 'IO'
 runFiles :: FilesC m a -> m a
 runFiles = runFilesC
 
 newtype FilesC m a = FilesC { runFilesC :: m a }
   deriving (Functor, Applicative, Monad, MonadIO)
 
-instance (Member (Error SomeException) sig, Member Telemetry sig, MonadIO m, Carrier sig m) => Carrier (Files :+: sig) (FilesC m) where
-  eff (L op) = case op of
-    Read (FromPath path) k -> (readBlobFromFile' path `catchIO` (throwError . toException @SomeException)) >>= k
-    Read (FromHandle handle) k -> (readBlobsFromHandle handle  `catchIO` (throwError . toException @SomeException)) >>= k
-    Read (FromDir dir) k -> (readBlobsFromDir dir `catchIO` (throwError . toException @SomeException)) >>= k
-    Read (FromGitRepo path sha (ExcludePaths excludePaths)) k -> (readBlobsFromGitRepo path sha excludePaths `catchIO` (throwError . toException @SomeException)) >>= k
-    Read (FromGitRepo path sha (ExcludeFromHandle handle)) k -> (readPathsFromHandle handle >>= readBlobsFromGitRepo path sha) `catchIO` (throwError . toException @SomeException) >>= k
-    Read (FromPathPair paths) k -> (runBothWith readFilePair paths `catchIO` (throwError . toException @SomeException)) >>= k
-    Read (FromPairHandle handle) k -> (readBlobPairsFromHandle handle `catchIO` (throwError . toException @SomeException)) >>= k
-    ReadProject rootDir dir language excludeDirs k -> (readProjectFromPaths rootDir dir language excludeDirs `catchIO` (throwError . toException @SomeException)) >>= k
-    FindFiles dir exts excludeDirs k -> (findFilesInDir dir exts excludeDirs `catchIO` (throwError . toException @SomeException)) >>= k
-    Write (ToPath path) builder k -> liftIO (IO.withBinaryFile path IO.WriteMode (`B.hPutBuilder` builder)) >> k
-    Write (ToHandle (WriteHandle handle)) builder k -> liftIO (B.hPutBuilder handle builder) >> k
+instance (Member (Error SomeException) sig, Member Catch sig, Member Telemetry sig, MonadIO m, Carrier sig m) => Carrier (Files :+: sig) (FilesC m) where
   eff (R other) = FilesC (eff (handleCoercible other))
+  eff (L op) = case op of
+    Read (FromPath path) k                                    -> rethrowing (readBlobFromFile' path) >>= k
+    Read (FromHandle handle) k                                -> rethrowing (readBlobsFromHandle handle) >>= k
+    Read (FromDir dir) k                                      -> rethrowing (readBlobsFromDir dir) >>= k
+    Read (FromGitRepo path sha (ExcludePaths excludePaths)) k -> rethrowing (readBlobsFromGitRepo path sha excludePaths) >>= k
+    Read (FromGitRepo path sha (ExcludeFromHandle handle)) k  -> rethrowing (readPathsFromHandle handle >>= readBlobsFromGitRepo path sha) >>= k
+    Read (FromPathPair paths) k                               -> rethrowing (runBothWith readFilePair paths) >>= k
+    Read (FromPairHandle handle) k                            -> rethrowing (readBlobPairsFromHandle handle) >>= k
+    ReadProject rootDir dir language excludeDirs k            -> rethrowing (readProjectFromPaths rootDir dir language excludeDirs) >>= k
+    FindFiles dir exts excludeDirs k                          -> rethrowing (findFilesInDir dir exts excludeDirs) >>= k
+    Write (ToPath path) builder k                             -> rethrowing (liftIO (IO.withBinaryFile path IO.WriteMode (`B.hPutBuilder` builder))) >> k
+    Write (ToHandle (WriteHandle handle)) builder k           -> rethrowing (liftIO (B.hPutBuilder handle builder)) >> k
 
 readBlob :: (Member Files sig, Carrier sig m) => File -> m Blob
 readBlob file = send (Read (FromPath file) pure)
@@ -117,12 +117,5 @@ findFiles dir exts paths = send (FindFiles dir exts paths pure)
 write :: (Member Files sig, Carrier sig m) => Destination -> B.Builder -> m ()
 write dest builder = send (Write dest builder (pure ()))
 
-
--- | Generalize 'Exc.catch' to other 'MonadIO' contexts for the handler and result.
-catchIO :: ( Exc.Exception exc
-           , MonadIO m
-           )
-        => IO a
-        -> (exc -> m a)
-        -> m a
-catchIO m handler = liftIO (Exc.try m) >>= either handler pure
+rethrowing :: (Member Catch sig, Member (Error SomeException) sig, Carrier sig m) => m a -> m a
+rethrowing act = act `catch` (throwError @SomeException)
