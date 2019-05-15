@@ -6,6 +6,7 @@ module Data.Language
   , parseLanguage
   , knownLanguage
   , languageForFilePath
+  , pathIsMinified
   , languageForType
   , supportedExts
   , codeNavLanguages
@@ -155,3 +156,6 @@ supportedExts = [".go", ".py", ".rb", ".js", ".ts"]
 
 codeNavLanguages :: [Language]
 codeNavLanguages = [Go, Ruby, Python, JavaScript, TypeScript]
+
+pathIsMinified :: FilePath -> Bool
+pathIsMinified = isExtensionOf ".min.js"
