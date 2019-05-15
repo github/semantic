@@ -61,6 +61,7 @@ import qualified Assigning.Assignment.Deterministic as Deterministic
 import qualified Control.Abstract as Analysis
 import           Control.Effect
 import           Control.Effect.Carrier
+import           Control.Effect.Catch
 import           Control.Effect.Error
 import           Control.Effect.Reader
 import           Control.Effect.Resource
@@ -104,8 +105,9 @@ type TaskEff
   ( ErrorC SomeException
   ( TimeoutC
   ( ResourceC
+  ( CatchC
   ( DistributeC
-  ( LiftC IO))))))))))
+  ( LiftC IO)))))))))))
 
 -- | A function to render terms or diffs.
 type Renderer i o = i -> o
@@ -167,8 +169,9 @@ runTask taskSession@TaskSession{..} task = do
         run
           = runM
           . runDistribute
-          . runResource (runM . runDistribute)
-          . runTimeout (runM . runDistribute . runResource (runM . runDistribute))
+          . runCatch (runM . runDistribute)
+          . runResource (runM . runDistribute . runCatch (runM . runDistribute))
+          . runTimeout (runM . runDistribute . runCatch (runM . runDistribute) . runResource (runM . runDistribute . runCatch (runM . runDistribute)))
           . runError
           . runTelemetry logger statter
           . runTraceInTelemetry
