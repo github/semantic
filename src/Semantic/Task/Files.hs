@@ -32,7 +32,6 @@ import           Prelude hiding (readFile)
 import           Prologue hiding (catch)
 import qualified Semantic.Git as Git
 import           Semantic.IO
-import           Semantic.Telemetry
 import qualified System.IO as IO
 
 data Source blob where
@@ -67,7 +66,7 @@ runFiles = runFilesC
 newtype FilesC m a = FilesC { runFilesC :: m a }
   deriving (Functor, Applicative, Monad, MonadIO)
 
-instance (Member (Error SomeException) sig, Member Catch sig, Member Telemetry sig, MonadIO m, Carrier sig m) => Carrier (Files :+: sig) (FilesC m) where
+instance (Member (Error SomeException) sig, Member Catch sig, MonadIO m, Carrier sig m) => Carrier (Files :+: sig) (FilesC m) where
   eff (R other) = FilesC (eff (handleCoercible other))
   eff (L op) = case op of
     Read (FromPath path) k                                    -> rethrowing (readBlobFromFile' path) >>= k
@@ -118,4 +117,4 @@ write :: (Member Files sig, Carrier sig m) => Destination -> B.Builder -> m ()
 write dest builder = send (Write dest builder (pure ()))
 
 rethrowing :: (Member Catch sig, Member (Error SomeException) sig, Carrier sig m) => m a -> m a
-rethrowing act = act `catch` (throwError @SomeException)
+rethrowing act = act `catchSync` (throwError @SomeException)
