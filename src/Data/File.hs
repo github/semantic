@@ -58,11 +58,12 @@ readBlobsFromGitRepo :: MonadIO m => FilePath -> Git.OID -> [FilePath] -> m [Blo
 readBlobsFromGitRepo path oid excludePaths = liftIO . fmap catMaybes $
   Git.lsTree path oid >>= Async.mapConcurrently (blobFromTreeEntry path)
   where
-    -- Only read tree entries that are normal mode blobs in a language we can parse.
+    -- Only read tree entries that are normal mode, non-minified blobs in a language we can parse.
     blobFromTreeEntry :: FilePath -> Git.TreeEntry -> IO (Maybe Blob)
     blobFromTreeEntry gitDir (Git.TreeEntry Git.NormalMode Git.BlobObject oid path)
       | lang <- languageForFilePath path
       , lang `elem` codeNavLanguages
+      , not (pathIsMinified path)
       , path `notElem` excludePaths
       = Just . sourceBlob' path lang oid . fromText <$> Git.catFile gitDir oid
     blobFromTreeEntry _ _ = pure Nothing

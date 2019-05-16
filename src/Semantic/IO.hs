@@ -7,6 +7,7 @@ module Semantic.IO
 import Prelude hiding (readFile)
 import Prologue
 
+import           Data.Language
 import           System.Directory (doesDirectoryExist)
 import           System.Directory.Tree (AnchoredDirTree (..))
 import qualified System.Directory.Tree as Tree
@@ -28,6 +29,7 @@ findFilesInDir path exts excludeDirs = do
 
     -- Predicate for Files with one of the extensions in 'exts'.
     withExtensions exts (Tree.File n _)
+      | pathIsMinified n            = False
       | takeExtension n `elem` exts = True
       | otherwise                   = False
     withExtensions _ _              = True
