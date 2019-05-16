@@ -13,6 +13,7 @@ import           Control.Effect
 import           Control.Effect.Carrier
 import           Control.Effect.Sum
 import           Control.Parallel.Strategies
+import           Control.Monad.IO.Unlift
 import           Prologue
 
 -- | Distribute a 'Traversable' container of tasks over the available cores (i.e. execute them concurrently), collecting their results.
@@ -57,3 +58,9 @@ newtype DistributeC m a = DistributeC { runDistributeC :: m a }
 instance Carrier (Distribute :+: Lift IO) (DistributeC (LiftC IO)) where
   eff (L (Distribute task k)) = liftIO (Async.runConcurrently (Async.Concurrently (runM . runDistributeC $ task))) >>= k
   eff (R other) = DistributeC (eff (handleCoercible other))
+
+instance MonadUnliftIO m => MonadUnliftIO (DistributeC m) where
+  askUnliftIO = DistributeC $ withUnliftIO $ \u -> pure (UnliftIO (unliftIO u . runDistributeC))
+  {-# INLINE askUnliftIO #-}
+  withRunInIO inner = DistributeC $ withRunInIO $ \run -> inner (run . runDistributeC)
+  {-# INLINE withRunInIO #-}

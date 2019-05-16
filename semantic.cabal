@@ -46,6 +46,7 @@ common dependencies
                      , filepath
                      , free
                      , fused-effects
+                     , fused-effects-exceptions
                      , hashable
                      , haskell-tree-sitter
                      , machines
@@ -309,6 +310,7 @@ library
                      , template-haskell
                      , time
                      , unix
+                     , unliftio-core
                      , unordered-containers
                      , vector
                      , haskell-tree-sitter
