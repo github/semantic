@@ -70,8 +70,8 @@ readBlobsFromGitRepo path oid excludePaths = liftIO . fmap catMaybes $
 
     sourceBlob' filepath language (Git.OID oid) source = Blob source filepath language oid
 
-readFilePair :: forall m. (MonadFail m, MonadIO m) => File -> File -> m BlobPair
+readFilePair :: MonadIO m => File -> File -> m BlobPair
 readFilePair a b = do
   before <- readBlobFromFile a
   after  <- readBlobFromFile b
-  maybeBlobPair before after
+  liftIO $ maybeBlobPair before after

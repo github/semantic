@@ -3,6 +3,7 @@ module Semantic.Timeout
 ( timeout
 , Timeout
 , runTimeout
+, withTimeout
 , TimeoutC(..)
 , Duration(..)
 ) where
@@ -12,6 +13,7 @@ import           Control.Effect.Carrier
 import           Control.Effect.Reader
 import           Control.Effect.Sum
 import           Control.Monad.IO.Class
+import           Control.Monad.IO.Unlift
 import           Data.Duration
 import qualified System.Timeout as System
 
@@ -40,6 +42,13 @@ runTimeout :: (forall x . m x -> IO x)
            -> m a
 runTimeout handler = runReader (Handler handler) . runTimeoutC
 
+-- | A helper for 'runTimeout' that uses 'withRunInIO' to automatically
+-- select a correct unlifting function.
+withTimeout :: MonadUnliftIO m
+            => TimeoutC m a
+            -> m a
+withTimeout r = withRunInIO (\f -> runHandler (Handler f) r)
+
 newtype Handler m = Handler (forall x . m x -> IO x)
 
 runHandler :: Handler m -> TimeoutC m a -> IO a
@@ -47,6 +56,10 @@ runHandler h@(Handler handler) = handler . runReader h . runTimeoutC
 
 newtype TimeoutC m a = TimeoutC { runTimeoutC :: ReaderC (Handler m) m a }
   deriving (Functor, Applicative, Monad, MonadIO)
+
+instance MonadUnliftIO m => MonadUnliftIO (TimeoutC m) where
+  askUnliftIO = TimeoutC . ReaderC $ \(Handler h) ->
+    withUnliftIO $ \u -> pure (UnliftIO $ \r -> unliftIO u (runTimeout h r))
 
 instance (Carrier sig m, MonadIO m) => Carrier (Timeout :+: sig) (TimeoutC m) where
   eff (L (Timeout n task k)) = do
