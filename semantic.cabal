@@ -52,8 +52,8 @@ common dependencies
                      , fastsum
                      , filepath ^>= 1.4.2.1
                      , free ^>= 5.1
-                     , fused-effects
-                     , fused-effects-exceptions
+                     , fused-effects ^>= 0.4.0.0
+                     , fused-effects-exceptions ^>= 0.1.1.0
                      , hashable ^>= 1.2.7.0
                      , haskell-tree-sitter
                      , machines ^>= 0.6.4
