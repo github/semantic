@@ -41,14 +41,14 @@ installSignalHandlers :: IO ()
 installSignalHandlers = do
   main_thread_id <- myThreadId
   weak_tid <- mkWeakThreadId main_thread_id
-  forM_ [ sigABRT, sigBUS, sigHUP, sigILL, sigQUIT, sigSEGV,
+  for_ [ sigABRT, sigBUS, sigHUP, sigILL, sigQUIT, sigSEGV,
           sigSYS, sigTERM, sigUSR1, sigUSR2, sigXCPU, sigXFSZ ] $ \sig ->
     installHandler sig (Catch $ send_exception weak_tid sig) Nothing
   where
     send_exception weak_tid sig = do
       m <- deRefWeak weak_tid
       case m of
-        Nothing  -> return ()
+        Nothing  -> pure ()
         Just tid -> throwTo tid (toException $ SignalException sig)
 
 main :: IO ()
