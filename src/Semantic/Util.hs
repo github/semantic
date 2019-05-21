@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, Rank2Types, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE CPP, ConstraintKinds, Rank2Types, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 {-# OPTIONS_GHC -Wno-missing-signatures -Wno-missing-export-lists #-}
 module Semantic.Util where
 
@@ -43,6 +43,8 @@ import           Semantic.Graph
 import           Semantic.Task
 import           System.Exit (die)
 import           System.FilePath.Posix (takeDirectory)
+
+
 
 import Data.Location
 
@@ -431,22 +433,6 @@ type FileTypechecker (syntax :: [* -> *]) qterm value address result
                           value)]))
              result])))
 
-typecheckGoFile :: ( syntax ~ Language.Go.Assignment.Syntax
-                   , qterm ~ Quieterm (Sum syntax) Location
-                   , value ~ Type
-                   , address ~ Monovariant
-                   , result ~ (ModuleTable (Module (ModuleResult address value))))
-                => FileTypechecker syntax qterm value address result
-typecheckGoFile = checking <=< evaluateProjectWithCaching (Proxy :: Proxy 'Language.Go) goParser
-
-typecheckRubyFile :: ( syntax ~ Language.Ruby.Assignment.Syntax
-                   , qterm ~ Quieterm (Sum syntax) Location
-                   , value ~ Type
-                   , address ~ Monovariant
-                   , result ~ (ModuleTable (Module (ModuleResult address value))))
-                  => FileTypechecker syntax qterm value address result
-typecheckRubyFile = checking <=< evaluateProjectWithCaching (Proxy :: Proxy 'Language.Ruby) rubyParser
-
 callGraphProject
   :: (Language.SLanguage lang, Ord1 syntax,
       Declarations1 syntax,
@@ -473,69 +459,6 @@ callGraphProject parser proxy paths = runTask' $ do
   pure (x, (() <$) <$> modules)
 
 
-scopeGraphRubyProject :: ProjectEvaluator Language.Ruby.Assignment.Syntax
-scopeGraphRubyProject = justEvaluatingCatchingErrors <=< evaluateProjectForScopeGraph (Proxy @'Language.Ruby) rubyParser
-
-scopeGraphPHPProject :: ProjectEvaluator Language.PHP.Assignment.Syntax
-scopeGraphPHPProject = justEvaluatingCatchingErrors <=< evaluateProjectForScopeGraph (Proxy @'Language.PHP) phpParser
-
-scopeGraphPythonProject :: ProjectEvaluator Language.Python.Assignment.Syntax
-scopeGraphPythonProject = justEvaluatingCatchingErrors <=< evaluateProjectForScopeGraph (Proxy @'Language.Python) pythonParser
-
-scopeGraphGoProject :: ProjectEvaluator Language.Go.Assignment.Syntax
-scopeGraphGoProject = justEvaluatingCatchingErrors <=< evaluateProjectForScopeGraph (Proxy @'Language.Go) goParser
-
-scopeGraphTypeScriptProject :: ProjectEvaluator Language.TypeScript.Assignment.Syntax
-scopeGraphTypeScriptProject = justEvaluatingCatchingErrors <=< evaluateProjectForScopeGraph (Proxy @'Language.TypeScript) typescriptParser
-
-scopeGraphJavaScriptProject :: ProjectEvaluator Language.TypeScript.Assignment.Syntax
-scopeGraphJavaScriptProject = justEvaluatingCatchingErrors <=< evaluateProjectForScopeGraph (Proxy @'Language.TypeScript) typescriptParser
-
-
-evaluatePythonProject :: ( syntax ~ Language.Python.Assignment.Syntax
-                   , qterm ~ Quieterm (Sum syntax) Location
-                   , value ~ (Concrete.Value qterm address)
-                   , address ~ Precise
-                   , result ~ (ModuleTable (Module (ModuleResult address value)))) => FilePath
-     -> IO
-          (Heap address address value,
-           (ScopeGraph address,
-             Either
-                (SomeError
-                   (Sum
-                      '[BaseError
-                          (ValueError qterm address),
-                        BaseError
-                          (AddressError
-                             address
-                             value),
-                        BaseError
-                          ResolutionError,
-                        BaseError
-                          (EvalError
-                             qterm
-                             address
-                             value),
-                        BaseError
-                          (HeapError
-                             address),
-                        BaseError
-                          (ScopeError
-                             address),
-                        BaseError
-                          (UnspecializedError
-                             address
-                             value),
-                        BaseError
-                          (LoadError
-                             address
-                             value)]))
-                result))
-evaluatePythonProject = justEvaluating <=< evaluatePythonProjects (Proxy @'Language.Python) pythonParser Language.Python
-
-callGraphRubyProject :: [FilePath] -> IO (Graph ControlFlowVertex, [Module ()])
-callGraphRubyProject = callGraphProject rubyParser (Proxy @'Language.Ruby)
-
 type EvalEffects qterm err = ResumableC (BaseError err)
                          (ResumableC (BaseError (AddressError Precise (Value qterm Precise)))
                          (ResumableC (BaseError ResolutionError)
@@ -550,23 +473,10 @@ type EvalEffects qterm err = ResumableC (BaseError err)
                          (TraceByPrintingC
                          (LiftC IO))))))))))))
 
-type LanguageSyntax lang syntax = ( Language.SLanguage lang
-                                  , HasPrelude lang
-                                  , Apply Eq1 syntax
-                                  , Apply Ord1 syntax
-                                  , Apply Show1 syntax
-                                  , Apply Functor syntax
-                                  , Apply Foldable syntax
-                                  , Apply Evaluatable syntax
-                                  , Apply Declarations1 syntax
-                                  , Apply AccessControls1 syntax
-                                  , Apply FreeVariables1 syntax)
-
 evaluateProject proxy parser paths = withOptions debugOptions $ \ config logger statter ->
   evaluateProject' (TaskSession config "-" False logger statter) proxy parser paths
 
 -- Evaluate a project consisting of the listed paths.
--- TODO: This is used by our specs and should be moved into SpecHelpers.hs
 evaluateProject' session proxy parser paths = do
   res <- runTask session $ do
     blobs <- catMaybes <$> traverse readBlobFromFile (flip File (Language.reflect proxy) <$> paths)
@@ -581,106 +491,6 @@ evaluateProject' session proxy parser paths = do
          (raiseHandler (runReader (lowerBound @Span))
          (evaluate proxy (runDomainEffects (evalTerm withTermSpans)) modules)))))))
   either (die . displayException) pure res
-
-evaluatePythonProjects :: ( term ~ Term (Sum Language.Python.Assignment.Syntax) Location
-                          , qterm ~ Quieterm (Sum Language.Python.Assignment.Syntax) Location
-                          )
-                       => Proxy 'Language.Python
-                       -> Parser term
-                       -> Language.Language
-                       -> FilePath
-                       -> IO (Evaluator qterm Precise
-                               (Value qterm Precise)
-                               (EvalEffects qterm (ValueError qterm Precise))
-                               (ModuleTable (Module (ModuleResult Precise (Value qterm Precise)))))
-evaluatePythonProjects proxy parser lang path = runTask' $ do
-  project <- readProject Nothing path lang []
-  package <- fmap quieterm <$> parsePythonPackage parser project
-  modules <- topologicalSort <$> runImportGraphToModules proxy package
-  trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
-  pure (id @(Evaluator _ Precise (Value _ Precise) _ _)
-       (runModuleTable
-       (runModules (ModuleTable.modulePaths (packageModules package))
-       (raiseHandler (runReader (packageInfo package))
-       (raiseHandler (evalState (lowerBound @Span))
-       (raiseHandler (runReader (lowerBound @Span))
-       (evaluate proxy (runDomainEffects (evalTerm withTermSpans)) modules)))))))
-
-evaluateProjectForScopeGraph :: ( term ~ Term (Sum syntax) Location
-                              , qterm ~ Quieterm (Sum syntax) Location
-                              , address ~ Hole (Maybe Name) Precise
-                              , LanguageSyntax lang syntax
-                              )
-                             => Proxy (lang :: Language.Language)
-                             -> Parser term
-                             -> Project
-                             -> IO (Evaluator qterm address
-                                    (Value qterm address)
-                                    (ResumableWithC (BaseError (ValueError qterm address))
-                               (ResumableWithC (BaseError (AddressError address (Value qterm address)))
-                               (ResumableWithC (BaseError ResolutionError)
-                               (ResumableWithC (BaseError (EvalError qterm address (Value qterm address)))
-                               (ResumableWithC (BaseError (HeapError address))
-                               (ResumableWithC (BaseError (ScopeError address))
-                               (ResumableWithC (BaseError (UnspecializedError address (Value qterm address)))
-                               (ResumableWithC (BaseError (LoadError address (Value qterm address)))
-                               (FreshC
-                               (StateC (ScopeGraph address)
-                               (StateC (Heap address address (Value qterm address))
-                               (TraceByPrintingC
-                               (LiftC IO)))))))))))))
-                             (ModuleTable (Module
-                                (ModuleResult address (Value qterm address)))))
-evaluateProjectForScopeGraph proxy parser project = runTask' $ do
-  package <- fmap quieterm <$> parsePythonPackage parser project
-  modules <- topologicalSort <$> runImportGraphToModules proxy package
-  trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
-  pure (id @(Evaluator _ (Hole.Hole (Maybe Name) Precise) (Value _ (Hole.Hole (Maybe Name) Precise)) _ _)
-       (runModuleTable
-       (runModules (ModuleTable.modulePaths (packageModules package))
-       (raiseHandler (runReader (packageInfo package))
-       (raiseHandler (evalState (lowerBound @Span))
-       (raiseHandler (runReader (lowerBound @Span))
-       (evaluate proxy (runDomainEffects (evalTerm withTermSpans)) modules)))))))
-
-evaluateProjectWithCaching :: ( term ~ Term (Sum syntax) Location
-                              , qterm ~ Quieterm (Sum syntax) Location
-                              , LanguageSyntax lang syntax
-                              )
-                           => Proxy (lang :: Language.Language)
-                           -> Parser term
-                          -> FilePath
-                          -> IO (Evaluator qterm Monovariant Type
-                                  (ResumableC (BaseError Type.TypeError)
-                                  (StateC TypeMap
-                                  (ResumableC (BaseError (AddressError Monovariant Type))
-                                  (ResumableC (BaseError (EvalError qterm Monovariant Type))
-                                  (ResumableC (BaseError ResolutionError)
-                                  (ResumableC (BaseError (HeapError Monovariant))
-                                  (ResumableC (BaseError (ScopeError Monovariant))
-                                  (ResumableC (BaseError (UnspecializedError Monovariant Type))
-                                  (ResumableC (BaseError (LoadError Monovariant Type))
-                                  (ReaderC (Live Monovariant)
-                                  (NonDetC
-                                  (ReaderC (Analysis.Abstract.Caching.FlowSensitive.Cache (Data.Quieterm.Quieterm (Sum syntax) Data.Location.Location) Monovariant Type)
-                                  (StateC (Analysis.Abstract.Caching.FlowSensitive.Cache (Data.Quieterm.Quieterm (Sum syntax) Data.Location.Location) Monovariant Type)
-                                  (FreshC
-                                  (StateC (ScopeGraph Monovariant)
-                                  (StateC (Heap Monovariant Monovariant Type)
-                                  (TraceByPrintingC
-                                   (LiftC IO))))))))))))))))))
-                                 (ModuleTable (Module (ModuleResult Monovariant Type))))
-evaluateProjectWithCaching proxy parser path = runTask' $ do
-  project <- readProject Nothing path (Language.reflect proxy) []
-  package <- fmap (quieterm . snd) <$> parsePackage parser project
-  modules <- topologicalSort <$> runImportGraphToModules proxy package
-  pure (id @(Evaluator _ Monovariant _ _ _)
-       (raiseHandler (runReader (packageInfo package))
-       (raiseHandler (evalState (lowerBound @Span))
-       (raiseHandler (runReader (lowerBound @Span))
-       (runModuleTable
-       (runModules (ModuleTable.modulePaths (packageModules package))
-       (evaluate proxy (runDomainEffects (evalTerm withTermSpans)) modules)))))))
 
 parseFile :: Parser term -> FilePath -> IO term
 parseFile parser = runTask' . (parse parser <=< readBlob . file)
