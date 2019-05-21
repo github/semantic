@@ -39,14 +39,14 @@ instance Exception SignalException
 
 installSignalHandlers :: IO ()
 installSignalHandlers = do
-  main_thread_id <- myThreadId
-  weak_tid <- mkWeakThreadId main_thread_id
+  mainThreadId <- myThreadId
+  weakTid <- mkWeakThreadId mainThreadId
   for_ [ sigABRT, sigBUS, sigHUP, sigILL, sigQUIT, sigSEGV,
           sigSYS, sigTERM, sigUSR1, sigUSR2, sigXCPU, sigXFSZ ] $ \sig ->
-    installHandler sig (Catch $ send_exception weak_tid sig) Nothing
+    installHandler sig (Catch $ sendException weakTid sig) Nothing
   where
-    send_exception weak_tid sig = do
-      m <- deRefWeak weak_tid
+    sendException weakTid sig = do
+      m <- deRefWeak weakTid
       case m of
         Nothing  -> pure ()
         Just tid -> throwTo tid (toException $ SignalException sig)
