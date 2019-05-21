@@ -59,7 +59,7 @@ rubyREPL = repl (Proxy @'Language.Ruby) rubyParser
 repl proxy parser paths =
   withOptions debugOptions $ \config logger statter ->
     runM
-    . runDistribute
+    . withDistribute
     . withCatch
     . withResource
     . withTimeout
