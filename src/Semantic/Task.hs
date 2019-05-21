@@ -168,7 +168,7 @@ runTask taskSession@TaskSession{..} task = do
     let run :: TaskEff a -> IO (Either SomeException a)
         run
           = runM
-          . runDistribute
+          . withDistribute
           . withCatch
           . withResource
           . withTimeout

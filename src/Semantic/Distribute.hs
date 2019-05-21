@@ -5,15 +5,17 @@ module Semantic.Distribute
 , distributeFoldMap
 , Distribute
 , runDistribute
+, withDistribute
 , DistributeC(..)
 ) where
 
 import qualified Control.Concurrent.Async as Async
 import           Control.Effect
 import           Control.Effect.Carrier
+import           Control.Effect.Reader
 import           Control.Effect.Sum
-import           Control.Parallel.Strategies
 import           Control.Monad.IO.Unlift
+import           Control.Parallel.Strategies
 import           Prologue
 
 -- | Distribute a 'Traversable' container of tasks over the available cores (i.e. execute them concurrently), collecting their results.
@@ -49,18 +51,22 @@ instance Effect Distribute where
 
 
 -- | Evaluate a 'Distribute' effect concurrently.
-runDistribute :: DistributeC (LiftC IO) a -> LiftC IO a
-runDistribute = runDistributeC
+runDistribute :: UnliftIO m -> DistributeC m a -> IO a
+runDistribute u@(UnliftIO unlift) = unlift . runReader u . runDistributeC
 
-newtype DistributeC m a = DistributeC { runDistributeC :: m a }
+withDistribute :: MonadUnliftIO m => DistributeC m a -> m a
+withDistribute r = withUnliftIO (`runDistribute` r)
+
+newtype DistributeC m a = DistributeC { runDistributeC :: ReaderC (UnliftIO m) m a }
   deriving (Functor, Applicative, Monad, MonadIO)
 
-instance Carrier (Distribute :+: Lift IO) (DistributeC (LiftC IO)) where
-  eff (L (Distribute task k)) = liftIO (Async.runConcurrently (Async.Concurrently (runM . runDistributeC $ task))) >>= k
-  eff (R other) = DistributeC (eff (handleCoercible other))
+-- This can be simpler if we add an instance to fused-effects that takes
+-- care of this folderol for us (then we can justt derive the MonadUnliftIO instance)
+instance (MonadIO m, Carrier sig m) => MonadUnliftIO (DistributeC m) where
+  askUnliftIO = DistributeC . ReaderC $ \ u -> pure (UnliftIO (runDistribute u))
 
-instance MonadUnliftIO m => MonadUnliftIO (DistributeC m) where
-  askUnliftIO = DistributeC $ withUnliftIO $ \u -> pure (UnliftIO (unliftIO u . runDistributeC))
-  {-# INLINE askUnliftIO #-}
-  withRunInIO inner = DistributeC $ withRunInIO $ \run -> inner (run . runDistributeC)
-  {-# INLINE withRunInIO #-}
+instance (Carrier sig m, MonadIO m) => Carrier (Distribute :+: sig) (DistributeC m) where
+  eff (L (Distribute task k)) = do
+    handler <- DistributeC ask
+    liftIO (Async.runConcurrently (Async.Concurrently (runDistribute handler task))) >>= k
+  eff (R other) = DistributeC (eff (R (handleCoercible other)))
