@@ -26,8 +26,33 @@ import           Serializing.Format hiding (Options)
 import           System.Exit (die)
 import           System.FilePath
 
+import Control.Concurrent (mkWeakThreadId, myThreadId)
+import Control.Exception (Exception(..), throwTo)
+import Data.Typeable (Typeable)
+import System.Posix.Signals
+import System.Mem.Weak (deRefWeak)
+
+newtype SignalException = SignalException Signal
+  deriving (Show, Typeable)
+instance Exception SignalException
+
+installSignalHandlers :: IO ()
+installSignalHandlers = do
+  mainThreadId <- myThreadId
+  weakTid <- mkWeakThreadId mainThreadId
+  for_ [ sigABRT, sigBUS, sigHUP, sigILL, sigQUIT, sigSEGV,
+          sigSYS, sigTERM, sigUSR1, sigUSR2, sigXCPU, sigXFSZ ] $ \sig ->
+    installHandler sig (Catch $ sendException weakTid sig) Nothing
+  where
+    sendException weakTid sig = do
+      m <- deRefWeak weakTid
+      case m of
+        Nothing  -> pure ()
+        Just tid -> throwTo tid (toException $ SignalException sig)
+
 main :: IO ()
 main = do
+  installSignalHandlers
   (options, task) <- customExecParser (prefs showHelpOnEmpty) arguments
   config <- defaultConfig options
   res <- withTelemetry config $ \ (TelemetryQueues logger statter _) ->
