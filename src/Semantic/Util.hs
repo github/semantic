@@ -25,7 +25,6 @@ import           Data.Abstract.Module
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Package
 import           Data.Abstract.Value.Concrete as Concrete
-import           Data.Blob
 import           Data.File
 import           Data.Graph (topologicalSort)
 import qualified Data.Language as Language
