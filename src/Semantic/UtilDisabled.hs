@@ -53,6 +53,166 @@ import           System.FilePath.Posix (takeDirectory)
 
 import Data.Location
 
+type ProjectEvaluator syntax =
+  Project
+  -> IO
+      (Heap
+      (Hole (Maybe Name) Precise)
+      (Hole (Maybe Name) Precise)
+      (Value
+      (Quieterm (Sum syntax) Location)
+      (Hole (Maybe Name) Precise)),
+      (ScopeGraph (Hole (Maybe Name) Precise),
+      ModuleTable
+      (Module
+              (ModuleResult
+              (Hole (Maybe Name) Precise)
+              (Value
+              (Quieterm (Sum syntax) Location)
+              (Hole (Maybe Name) Precise))))))
+
+type FileTypechecker (syntax :: [* -> *]) qterm value address result
+  = FilePath
+  -> IO
+       (Heap
+          address
+          address
+          value,
+        (ScopeGraph
+           address,
+         (Cache
+            qterm
+            address
+            value,
+          [Either
+             (SomeError
+                (Sum
+                   '[BaseError
+                       Type.TypeError,
+                     BaseError
+                       (AddressError
+                          address
+                          value),
+                     BaseError
+                       (EvalError
+                          qterm
+                          address
+                          value),
+                     BaseError
+                       ResolutionError,
+                     BaseError
+                       (HeapError                          address),
+                     BaseError
+                       (ScopeError
+                          address),
+                     BaseError
+                       (UnspecializedError
+                          address
+                          value),
+                     BaseError
+                       (LoadError
+                          address
+                          value)]))
+             result])))
+
+type EvalEffects qterm err = ResumableC (BaseError err)
+                         (ResumableC (BaseError (AddressError Precise (Value qterm Precise)))
+                         (ResumableC (BaseError ResolutionError)
+                         (ResumableC (BaseError (EvalError qterm Precise (Value qterm Precise)))
+                         (ResumableC (BaseError (HeapError Precise))
+                         (ResumableC (BaseError (ScopeError Precise))
+                         (ResumableC (BaseError (UnspecializedError Precise (Value qterm Precise)))
+                         (ResumableC (BaseError (LoadError Precise (Value qterm Precise)))
+                         (FreshC
+                         (StateC (ScopeGraph Precise)
+                         (StateC (Heap Precise Precise (Value qterm Precise))
+                         (TraceByPrintingC
+                         (LiftC IO))))))))))))
+
+-- We can't go with the inferred type because this needs to be
+-- polymorphic in @lang@.
+justEvaluatingCatchingErrors :: ( hole ~ Hole (Maybe Name) Precise
+                                , term ~ Quieterm (Sum lang) Location
+                                , value ~ Concrete.Value term hole
+                                , Apply Show1 lang
+                                )
+  => Evaluator term hole
+       value
+       (ResumableWithC
+          (BaseError (ValueError term hole))
+          (ResumableWithC (BaseError (AddressError hole value))
+          (ResumableWithC (BaseError ResolutionError)
+          (ResumableWithC (BaseError (EvalError term hole value))
+          (ResumableWithC (BaseError (HeapError hole))
+          (ResumableWithC (BaseError (ScopeError hole))
+          (ResumableWithC (BaseError (UnspecializedError hole value))
+          (ResumableWithC (BaseError (LoadError hole value))
+          (FreshC
+          (StateC (ScopeGraph hole)
+          (StateC (Heap hole hole (Concrete.Value (Quieterm (Sum lang) Location) (Hole (Maybe Name) Precise)))
+          (TraceByPrintingC
+          (LiftC IO))))))))))))) a
+     -> IO (Heap hole hole value, (ScopeGraph hole, a))
+justEvaluatingCatchingErrors
+  = runM
+  . runEvaluator @_ @_ @(Value _ (Hole.Hole (Maybe Name) Precise))
+  . raiseHandler runTraceByPrinting
+  . runHeap
+  . runScopeGraph
+  . raiseHandler runFresh
+  . resumingLoadError
+  . resumingUnspecialized
+  . resumingScopeError
+  . resumingHeapError
+  . resumingEvalError
+  . resumingResolutionError
+  . resumingAddressError
+  . resumingValueError
+
+checking
+  = runM
+  . runEvaluator
+  . raiseHandler runTraceByPrinting
+  . runHeap
+  . runScopeGraph
+  . raiseHandler runFresh
+  . caching
+  . providingLiveSet
+  . fmap reassociate
+  . runLoadError
+  . runUnspecialized
+  . runScopeError
+  . runHeapError
+  . runResolutionError
+  . runEvalError
+  . runAddressError
+  . runTypes
+
+callGraphProject
+  :: (Language.SLanguage lang, Ord1 syntax,
+      Declarations1 syntax,
+      Evaluatable syntax,
+      FreeVariables1 syntax,
+      AccessControls1 syntax,
+      HasPrelude lang, Functor syntax,
+      VertexDeclarationWithStrategy
+        (VertexDeclarationStrategy syntax)
+        syntax
+        syntax) =>
+     Parser
+       (Term syntax Location)
+     -> Proxy lang
+     -> [FilePath]
+     -> IO
+          (Graph ControlFlowVertex,
+           [Module ()])
+callGraphProject parser proxy paths = runTask' $ do
+  blobs <- catMaybes <$> traverse readBlobFromFile (flip File (Language.reflect proxy) <$> paths)
+  package <- fmap snd <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs (Language.reflect proxy) [])
+  modules <- topologicalSort <$> runImportGraphToModules proxy package
+  x <- runCallGraph proxy False modules package
+  pure (x, (() <$) <$> modules)
+
 scopeGraphRubyProject :: ProjectEvaluator Language.Ruby.Assignment.Syntax
 scopeGraphRubyProject = justEvaluatingCatchingErrors <=< evaluateProjectForScopeGraph (Proxy @'Language.Ruby) rubyParser
 
@@ -73,6 +233,9 @@ scopeGraphJavaScriptProject = justEvaluatingCatchingErrors <=< evaluateProjectFo
 
 callGraphRubyProject :: [FilePath] -> IO (Graph ControlFlowVertex, [Module ()])
 callGraphRubyProject = callGraphProject rubyParser (Proxy @'Language.Ruby)
+
+evalJavaScriptProject :: FileEvaluator Language.TypeScript.Assignment.Syntax
+evalJavaScriptProject = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.JavaScript) typescriptParser
 
 typecheckGoFile :: ( syntax ~ Language.Go.Assignment.Syntax
                    , qterm ~ Quieterm (Sum syntax) Location
