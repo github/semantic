@@ -28,7 +28,6 @@ import           System.FilePath
 
 import Control.Concurrent (mkWeakThreadId, myThreadId)
 import Control.Exception (Exception(..), throwTo)
-import Control.Monad (forM_)
 import Data.Typeable (Typeable)
 import System.Posix.Signals
 import System.Mem.Weak (deRefWeak)
