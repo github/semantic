@@ -47,10 +47,6 @@ import           Semantic.Task
 import           System.Exit (die)
 import           System.FilePath.Posix (takeDirectory)
 
-
-
-
-
 import Data.Location
 
 -- The type signatures in these functions are pretty gnarly, but these functions
