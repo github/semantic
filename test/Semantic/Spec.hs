@@ -9,7 +9,7 @@ import SpecHelpers
 
  -- we need some lenses here, oof
 setBlobLanguage :: Language -> Blob -> Blob
-setBlobLanguage lang b = b { blobInfo = (blobInfo b) { fileLanguage = lang }}
+setBlobLanguage lang b = b { blobFile = (blobFile b) { fileLanguage = lang }}
 
 spec :: Spec
 spec = parallel $ do

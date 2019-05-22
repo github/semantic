@@ -45,15 +45,15 @@ fileForPath p = File p (languageForFilePath p)
 -- | The source, path information, and language of a file read from disk.
 data Blob = Blob
   { blobSource   :: Source -- ^ The UTF-8 encoded source text of the blob.
-  , blobInfo     :: File   -- ^ Path/language information for this blob.
+  , blobFile     :: File   -- ^ Path/language information for this blob.
   , blobOid      :: Text   -- ^ Git OID for this blob, mempty if blob is not from a git db.
   } deriving (Show, Eq, Generic)
 
 blobLanguage :: Blob -> Language
-blobLanguage = fileLanguage . blobInfo
+blobLanguage = fileLanguage . blobFile
 
 blobPath :: Blob -> FilePath
-blobPath = filePath . blobInfo
+blobPath = filePath . blobFile
 
 legacyMakeBlob :: Source -> FilePath -> Language -> Text -> Blob
 legacyMakeBlob s p l = Blob s (File p l)

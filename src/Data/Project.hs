@@ -52,7 +52,7 @@ projectExtensions :: Project -> [String]
 projectExtensions = extensionsForLanguage . projectLanguage
 
 projectFiles :: Project -> [File]
-projectFiles = fmap blobInfo . projectBlobs
+projectFiles = fmap blobFile . projectBlobs
 
 newtype ProjectException
   = FileNotFound FilePath

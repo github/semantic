@@ -1,4 +1,4 @@
-{-# LANGUAGE Rank2Types #-}
+{-# LANGUAGE RankNTypes #-}
 
 -- | These are primitive file IO methods for use in ghci and as internal functions.
 -- Instead of using these, consider if you can use the Files DSL instead.
