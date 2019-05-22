@@ -67,5 +67,5 @@ spec = describe "reprinting" $ do
       it "should be able to parse the output of a refactor" $ do
         let (Just tagged) = rewrite (mark Unmodified tree) (topDownAny increaseNumbers)
         let (Right printed) = runReprinter src defaultJSONPipeline tagged
-        tree' <- runTaskOrDie (parse jsonParser (Blob printed path Language.JSON mempty))
+        tree' <- runTaskOrDie (parse jsonParser (legacyMakeBlob printed path Language.JSON mempty))
         length tree' `shouldSatisfy` (/= 0)

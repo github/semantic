@@ -568,7 +568,7 @@ instance Listable Span where
   tiers = cons2 Span
 
 instance Listable Blob where
-  tiers = cons4 Blob
+  tiers = cons4 legacyMakeBlob
 
 instance Listable BlobPair where
   tiers = liftTiers tiers

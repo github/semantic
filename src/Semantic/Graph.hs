@@ -49,7 +49,6 @@ import           Data.Abstract.Value.Concrete as Concrete
 import           Data.Abstract.Value.Type as Type
 import           Data.Abstract.AccessControls.Instances ()
 import           Data.Blob
-import           Data.Blob.IO
 import           Data.Graph
 import           Data.Graph.ControlFlowVertex (VertexDeclarationStrategy, VertexDeclarationWithStrategy)
 import           Data.Language as Language

@@ -1,4 +1,5 @@
 {-# LANGUAGE GADTs, TypeOperators, DerivingStrategies #-}
+{-# OPTIONS_GHC -Wname-shadowing -Werror #-}
 module Semantic.Api.Symbols
   ( legacyParseSymbols
   , parseSymbols
@@ -35,7 +36,7 @@ legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> distributeFoldMap 
   where
     go :: (Member (Error SomeException) sig, Member Task sig, Carrier sig m) => Blob -> m [Legacy.File]
     go blob@Blob{..} = (doParse blob >>= withSomeTerm (renderToSymbols blob)) `catchError` (\(SomeException _) -> pure (pure emptyFile))
-      where emptyFile = Legacy.File (pack (blobPath blob)) (pack (show (blobLanguage blob))) []
+      where emptyFile = tagsToFile blob []
 
     -- Legacy symbols output doesn't include Function Calls.
     symbolsToSummarize :: [Text]
@@ -45,7 +46,7 @@ legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> distributeFoldMap 
     renderToSymbols blob term = pure $ either mempty (pure . tagsToFile blob) (runTagging blob symbolsToSummarize term)
 
     tagsToFile :: Blob -> [Tag] -> Legacy.File
-    tagsToFile b@Blob{..} tags = Legacy.File (pack (blobPath b)) (pack (show (blobLanguage b))) (fmap tagToSymbol tags)
+    tagsToFile b tags = Legacy.File (pack (blobPath b)) (pack (show (blobLanguage b))) (fmap tagToSymbol tags)
 
     tagToSymbol :: Tag -> Legacy.Symbol
     tagToSymbol Tag{..}

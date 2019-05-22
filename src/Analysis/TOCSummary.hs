@@ -105,7 +105,7 @@ instance CustomHasDeclaration whole Declaration.Method where
     -- Methods without a receiver
     | isEmpty receiverAnn = Just $ MethodDeclaration (getSource blobSource identifierAnn) methodSource (locationSpan ann) (blobLanguage blob) Nothing
     -- Methods with a receiver type and an identifier (e.g. (a *Type) in Go).
-    | (blobLanguage blob) == Go
+    | blobLanguage blob == Go
     , [ _, Term (In receiverType _) ] <- toList receiverF = Just $ MethodDeclaration (getSource blobSource identifierAnn) methodSource (locationSpan ann) (blobLanguage blob) (Just (getSource blobSource receiverType))
     -- Methods with a receiver (class methods) are formatted like `receiver.method_name`
     | otherwise           = Just $ MethodDeclaration (getSource blobSource identifierAnn) methodSource (locationSpan ann) (blobLanguage blob) (Just (getSource blobSource receiverAnn))

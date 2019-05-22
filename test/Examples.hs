@@ -9,7 +9,7 @@ import qualified Data.ByteString as B
 import           Data.ByteString.Builder
 import qualified Data.ByteString.Char8 as BC
 import           Data.Either
-import           Data.Blob.IO (file)
+import           Data.Blob (fileForPath)
 import           Data.Flag
 import           Data.Foldable
 import           Data.List
@@ -101,7 +101,7 @@ languages =
   ]
 
 parseFilePath :: (Member (Error SomeException) sig, Member Distribute sig, Member Task sig, Member Files sig, Carrier sig m, MonadIO m) => FilePath -> m Bool
-parseFilePath path = readBlob (file path) >>= parseTermBuilder @[] TermShow . pure >>= const (pure True)
+parseFilePath path = readBlob (fileForPath path) >>= parseTermBuilder @[] TermShow . pure >>= const (pure True)
 
 languagesDir :: FilePath
 languagesDir = "vendor/haskell-tree-sitter/languages"

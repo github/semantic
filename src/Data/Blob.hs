@@ -33,19 +33,20 @@ import           Data.JSON.Fields
 import           Data.Language
 import           Data.Source as Source
 
+-- | A 'FilePath' / 'Language' pair to save on lookup calls.
 data File = File
-  { filePath    :: FilePath
+  { filePath     :: FilePath
   , fileLanguage :: Language
   } deriving (Show, Eq, Generic)
 
 fileForPath :: FilePath  -> File
 fileForPath p = File p (languageForFilePath p)
 
--- | The source, path, and language of a blob.
+-- | The source, path information, and language of a file read from disk.
 data Blob = Blob
-  { blobSource   :: Source   -- ^ The UTF-8 encoded source text of the blob.
-  , blobInfo     :: File -- ^ Path/language information for this blob.
-  , blobOid      :: Text     -- ^ Git OID for this blob, mempty if blob is not from a git db.
+  { blobSource   :: Source -- ^ The UTF-8 encoded source text of the blob.
+  , blobInfo     :: File   -- ^ Path/language information for this blob.
+  , blobOid      :: Text   -- ^ Git OID for this blob, mempty if blob is not from a git db.
   } deriving (Show, Eq, Generic)
 
 blobLanguage :: Blob -> Language
