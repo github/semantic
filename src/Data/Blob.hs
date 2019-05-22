@@ -33,7 +33,7 @@ import           Data.JSON.Fields
 import           Data.Language
 import           Data.Source as Source
 
--- | A 'FilePath' / 'Language' pair to save on lookup calls.
+-- | A 'FilePath' paired with its corresponding 'Language'.
 data File = File
   { filePath     :: FilePath
   , fileLanguage :: Language
