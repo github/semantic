@@ -99,7 +99,7 @@ quietTerm blob = showTiming blob <$> time' ( (doParse blob >>= withSomeTerm (fma
     timingError (SomeException e) = pure (Left (show e))
     showTiming Blob{..} (res, duration) =
       let status = if isLeft res then "ERR" else "OK"
-      in stringUtf8 (status <> "\t" <> show blobLanguage <> "\t" <> blobPath <> "\t" <> show duration <> " ms\n")
+      in stringUtf8 (status <> "\t" <> show (blobLanguage blob) <> "\t" <> blobPath blob <> "\t" <> show duration <> " ms\n")
 
 
 type ParseEffects sig m = (Member (Error SomeException) sig, Member Task sig, Carrier sig m)
@@ -113,7 +113,7 @@ type TermConstraints =
   ]
 
 doParse :: (ParseEffects sig m) => Blob -> m (SomeTerm TermConstraints Location)
-doParse blob@Blob{..} = case blobLanguage of
+doParse blob@Blob{..} = case blobLanguage blob of
   Go         -> SomeTerm <$> parse goParser blob
   Haskell    -> SomeTerm <$> parse haskellParser blob
   Java       -> SomeTerm <$> parse javaParser blob
@@ -125,4 +125,4 @@ doParse blob@Blob{..} = case blobLanguage of
   Ruby       -> SomeTerm <$> parse rubyParser blob
   TypeScript -> SomeTerm <$> parse typescriptParser blob
   PHP        -> SomeTerm <$> parse phpParser blob
-  _          -> noLanguageForBlob blobPath
+  _          -> noLanguageForBlob (blobPath blob)

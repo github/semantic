@@ -11,7 +11,7 @@ import           Control.Effect
 import           Control.Effect.Error
 import           Control.Exception
 import           Control.Lens
-import           Data.Blob
+import           Data.Blob hiding (File (..))
 import           Data.ByteString.Builder
 import           Data.Location
 import           Data.Maybe
@@ -35,7 +35,7 @@ legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> distributeFoldMap 
   where
     go :: (Member (Error SomeException) sig, Member Task sig, Carrier sig m) => Blob -> m [Legacy.File]
     go blob@Blob{..} = (doParse blob >>= withSomeTerm (renderToSymbols blob)) `catchError` (\(SomeException _) -> pure (pure emptyFile))
-      where emptyFile = Legacy.File (pack blobPath) (pack (show blobLanguage)) []
+      where emptyFile = Legacy.File (pack (blobPath blob)) (pack (show (blobLanguage blob))) []
 
     -- Legacy symbols output doesn't include Function Calls.
     symbolsToSummarize :: [Text]
@@ -45,7 +45,7 @@ legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> distributeFoldMap 
     renderToSymbols blob term = pure $ either mempty (pure . tagsToFile blob) (runTagging blob symbolsToSummarize term)
 
     tagsToFile :: Blob -> [Tag] -> Legacy.File
-    tagsToFile Blob{..} tags = Legacy.File (pack blobPath) (pack (show blobLanguage)) (fmap tagToSymbol tags)
+    tagsToFile b@Blob{..} tags = Legacy.File (pack (blobPath b)) (pack (show (blobLanguage b))) (fmap tagToSymbol tags)
 
     tagToSymbol :: Tag -> Legacy.Symbol
     tagToSymbol Tag{..}
@@ -65,7 +65,7 @@ parseSymbols blobs = ParseTreeSymbolResponse . V.fromList . toList <$> distribut
     go :: (Member (Error SomeException) sig, Member Task sig, Carrier sig m) => Blob -> m File
     go blob@Blob{..} = (doParse blob >>= withSomeTerm (renderToSymbols blob)) `catchError` (\(SomeException e) -> pure $ errorFile (show e))
       where
-        errorFile e = File (pack blobPath) (bridging # blobLanguage) mempty (V.fromList [ParseError (T.pack e)]) blobOid
+        errorFile e = File (pack (blobPath blob)) (bridging # blobLanguage blob) mempty (V.fromList [ParseError (T.pack e)]) blobOid
 
         symbolsToSummarize :: [Text]
         symbolsToSummarize = ["Function", "Method", "Class", "Module", "Call", "Send"]
@@ -74,7 +74,7 @@ parseSymbols blobs = ParseTreeSymbolResponse . V.fromList . toList <$> distribut
         renderToSymbols blob@Blob{..} term = pure $ either (errorFile . show) (tagsToFile blob) (runTagging blob symbolsToSummarize term)
 
         tagsToFile :: Blob -> [Tag] -> File
-        tagsToFile Blob{..} tags = File (pack blobPath) (bridging # blobLanguage) (V.fromList (fmap tagToSymbol tags)) mempty blobOid
+        tagsToFile b@Blob{..} tags = File (pack (blobPath b)) (bridging # blobLanguage b) (V.fromList (fmap tagToSymbol tags)) mempty blobOid
 
         tagToSymbol :: Tag -> Symbol
         tagToSymbol Tag{..}

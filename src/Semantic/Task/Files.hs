@@ -23,8 +23,8 @@ import           Control.Effect.Catch
 import           Control.Effect.Error
 import           Control.Effect.Sum
 import           Data.Blob
+import           Data.Blob.IO
 import qualified Data.ByteString.Builder as B
-import           Data.File
 import           Data.Handle
 import           Data.Language
 import           Data.Project hiding (readFile)

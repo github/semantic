@@ -29,8 +29,8 @@ withSomeAST f (SomeAST ast) = f ast
 
 astParseBlob :: (Member (Error SomeException) sig, Member Task sig, Carrier sig m) => Blob -> m SomeAST
 astParseBlob blob@Blob{..}
-  | Just (SomeASTParser parser) <- someASTParser blobLanguage = SomeAST <$> parse parser blob
-  | otherwise = noLanguageForBlob blobPath
+  | Just (SomeASTParser parser) <- someASTParser (blobLanguage blob) = SomeAST <$> parse parser blob
+  | otherwise = noLanguageForBlob (blobPath blob)
 
 
 data ASTFormat = SExpression | JSON | Show | Quiet

@@ -76,8 +76,8 @@ class CustomHasDeclaration whole syntax where
 
 -- | Produce a 'HeadingDeclaration' from the first line of the heading of a 'Markdown.Heading' node.
 instance CustomHasDeclaration whole Markdown.Heading where
-  customToDeclaration Blob{..} ann (Markdown.Heading level terms _)
-    = Just $ HeadingDeclaration (headingText terms) mempty (locationSpan ann) blobLanguage level
+  customToDeclaration blob@Blob{..} ann (Markdown.Heading level terms _)
+    = Just $ HeadingDeclaration (headingText terms) mempty (locationSpan ann) (blobLanguage blob) level
     where headingText terms = getSource $ maybe (locationByteRange ann) sconcat (nonEmpty (headingByteRange <$> toList terms))
           headingByteRange (Term (In ann _), _) = locationByteRange ann
           getSource = firstLine . toText . flip Source.slice blobSource
@@ -85,8 +85,8 @@ instance CustomHasDeclaration whole Markdown.Heading where
 
 -- | Produce an 'ErrorDeclaration' for 'Syntax.Error' nodes.
 instance CustomHasDeclaration whole Syntax.Error where
-  customToDeclaration Blob{..} ann err@Syntax.Error{}
-    = Just $ ErrorDeclaration (T.pack (formatTOCError (Syntax.unError (locationSpan ann) err))) mempty (locationSpan ann) blobLanguage
+  customToDeclaration blob@Blob{..} ann err@Syntax.Error{}
+    = Just $ ErrorDeclaration (T.pack (formatTOCError (Syntax.unError (locationSpan ann) err))) mempty (locationSpan ann) (blobLanguage blob)
     where formatTOCError e = showExpectation (flag Colourize False) (errorExpected e) (errorActual e) ""
 
 -- | Produce a 'FunctionDeclaration' for 'Declaration.Function' nodes so long as their identifier is non-empty (defined as having a non-empty 'Range').
@@ -95,7 +95,7 @@ instance CustomHasDeclaration whole Declaration.Function where
     -- Do not summarize anonymous functions
     | isEmpty identifierAnn = Nothing
     -- Named functions
-    | otherwise             = Just $ FunctionDeclaration (getSource blobSource identifierAnn) functionSource (locationSpan ann) blobLanguage
+    | otherwise             = Just $ FunctionDeclaration (getSource blobSource identifierAnn) functionSource (locationSpan ann) (blobLanguage blob)
     where isEmpty = (== 0) . rangeLength . locationByteRange
           functionSource = getIdentifier (arr Declaration.functionBody) blob (In ann decl)
 
@@ -103,12 +103,12 @@ instance CustomHasDeclaration whole Declaration.Function where
 instance CustomHasDeclaration whole Declaration.Method where
   customToDeclaration blob@Blob{..} ann decl@(Declaration.Method _ (Term (In receiverAnn receiverF), _) (Term (In identifierAnn _), _) _ _ _)
     -- Methods without a receiver
-    | isEmpty receiverAnn = Just $ MethodDeclaration (getSource blobSource identifierAnn) methodSource (locationSpan ann) blobLanguage Nothing
+    | isEmpty receiverAnn = Just $ MethodDeclaration (getSource blobSource identifierAnn) methodSource (locationSpan ann) (blobLanguage blob) Nothing
     -- Methods with a receiver type and an identifier (e.g. (a *Type) in Go).
-    | blobLanguage == Go
-    , [ _, Term (In receiverType _) ] <- toList receiverF = Just $ MethodDeclaration (getSource blobSource identifierAnn) methodSource (locationSpan ann) blobLanguage (Just (getSource blobSource receiverType))
+    | (blobLanguage blob) == Go
+    , [ _, Term (In receiverType _) ] <- toList receiverF = Just $ MethodDeclaration (getSource blobSource identifierAnn) methodSource (locationSpan ann) (blobLanguage blob) (Just (getSource blobSource receiverType))
     -- Methods with a receiver (class methods) are formatted like `receiver.method_name`
-    | otherwise           = Just $ MethodDeclaration (getSource blobSource identifierAnn) methodSource (locationSpan ann) blobLanguage (Just (getSource blobSource receiverAnn))
+    | otherwise           = Just $ MethodDeclaration (getSource blobSource identifierAnn) methodSource (locationSpan ann) (blobLanguage blob) (Just (getSource blobSource receiverAnn))
     where
       isEmpty = (== 0) . rangeLength . locationByteRange
       methodSource = getIdentifier (arr Declaration.methodBody) blob (In ann decl)

@@ -144,10 +144,10 @@ diffTOC :: (Foldable f, Functor f) => Diff f (Maybe Declaration) (Maybe Declarat
 diffTOC = fmap entrySummary . dedupe . tableOfContentsBy declaration
 
 renderToCTerm :: (Foldable f, Functor f) => Blob -> Term f (Maybe Declaration) -> Summaries
-renderToCTerm Blob{..} = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . termToC
+renderToCTerm b@Blob{..} = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . termToC
   where
     toMap [] = mempty
-    toMap as = Map.singleton (T.pack blobPath) (toJSON <$> as)
+    toMap as = Map.singleton (T.pack (blobPath b)) (toJSON <$> as)
 
     termToC :: (Foldable f, Functor f) => Term f (Maybe Declaration) -> [TOCSummary]
     termToC = fmap (recordSummary "unchanged") . termTableOfContentsBy declaration

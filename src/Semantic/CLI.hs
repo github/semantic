@@ -2,7 +2,8 @@
 module Semantic.CLI (main) where
 
 import           Control.Exception as Exc (displayException)
-import           Data.File
+import           Data.Blob
+import           Data.Blob.IO
 import           Data.Handle
 import           Data.Language (languageForFilePath, parseLanguage)
 import           Data.List (intercalate, uncons)

@@ -38,12 +38,11 @@ import Data.Abstract.Name as X
 import Data.Abstract.Value.Concrete (Value(..), ValueError, runValueError)
 import Data.Bifunctor (first)
 import Data.Blob as X
+import Data.Blob.IO as X hiding (readFilePair)
 import Data.ByteString.Builder (toLazyByteString)
 import Data.ByteString.Lazy (toStrict)
 import Data.Project as X
 import Data.Proxy as X
-import qualified Data.File as F
-import Data.File as X hiding (readFilePair)
 import Data.Foldable (toList)
 import Data.Functor.Listable as X
 import Data.Language as X

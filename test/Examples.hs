@@ -9,7 +9,7 @@ import qualified Data.ByteString as B
 import           Data.ByteString.Builder
 import qualified Data.ByteString.Char8 as BC
 import           Data.Either
-import           Data.File (file)
+import           Data.Blob.IO (file)
 import           Data.Flag
 import           Data.Foldable
 import           Data.List

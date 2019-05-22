@@ -18,7 +18,7 @@ import Prologue
 import           Control.Effect
 import           Control.Effect.Error
 import           Data.Blob
-import           Data.File
+import           Data.Blob.IO
 import           Data.Language
 import qualified Data.Text as T
 import           System.FilePath.Posix
@@ -52,7 +52,7 @@ projectExtensions :: Project -> [String]
 projectExtensions = extensionsForLanguage . projectLanguage
 
 projectFiles :: Project -> [File]
-projectFiles = fmap toFile . projectBlobs
+projectFiles = fmap blobInfo . projectBlobs
 
 newtype ProjectException
   = FileNotFound FilePath
