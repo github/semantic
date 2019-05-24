@@ -13,7 +13,6 @@ import           Control.Effect.Sum
 import           Data.Aeson
 import           Data.Aeson.Types (parseMaybe)
 import           Data.Blob
-import           Data.File
 import           Data.Project
 import qualified Data.Map as Map
 import           Data.Source
@@ -26,12 +25,12 @@ import           System.FilePath.Posix
 nodeJSResolutionMap :: (Member Files sig, Carrier sig m, MonadIO m) => FilePath -> Text -> [FilePath] -> m (Map FilePath FilePath)
 nodeJSResolutionMap rootDir prop excludeDirs = do
   files <- findFiles rootDir [".json"] excludeDirs
-  let packageFiles = file <$> filter ((==) "package.json" . takeFileName) files
+  let packageFiles = fileForPath <$> filter ((==) "package.json" . takeFileName) files
   blobs <- readBlobs (FilesFromPaths packageFiles)
   pure $ fold (mapMaybe (lookup prop) blobs)
   where
     lookup :: Text -> Blob -> Maybe (Map FilePath FilePath)
-    lookup k Blob{..} = decodeStrict (sourceBytes blobSource) >>= lookupProp blobPath k
+    lookup k b@Blob{..} = decodeStrict (sourceBytes blobSource) >>= lookupProp (blobPath b) k
 
     lookupProp :: FilePath -> Text -> Object -> Maybe (Map FilePath FilePath)
     lookupProp path k res = flip parseMaybe res $ \obj -> Map.singleton relPkgDotJSONPath . relEntryPath <$> obj .: k

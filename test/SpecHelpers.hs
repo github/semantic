@@ -6,7 +6,7 @@ module SpecHelpers
 , diffFilePaths
 , parseFilePath
 , parseTestFile
-, readFilePair
+, readFilePathPair
 , runTaskOrDie
 , TaskSession(..)
 , testEvaluating
@@ -38,12 +38,11 @@ import Data.Abstract.Name as X
 import Data.Abstract.Value.Concrete (Value(..), ValueError, runValueError)
 import Data.Bifunctor (first)
 import Data.Blob as X
+import Data.Blob.IO as X
 import Data.ByteString.Builder (toLazyByteString)
 import Data.ByteString.Lazy (toStrict)
 import Data.Project as X
 import Data.Proxy as X
-import qualified Data.File as F
-import Data.File as X hiding (readFilePair)
 import Data.Foldable (toList)
 import Data.Functor.Listable as X
 import Data.Language as X
@@ -95,20 +94,20 @@ instance IsString Name where
 
 -- | Returns an s-expression formatted diff for the specified FilePath pair.
 diffFilePaths :: TaskSession -> Both FilePath -> IO ByteString
-diffFilePaths session paths = readFilePair paths >>= runTask session . parseDiffBuilder @[] DiffSExpression . pure >>= either (die . displayException) (pure . runBuilder)
+diffFilePaths session paths = readFilePathPair paths >>= runTask session . parseDiffBuilder @[] DiffSExpression . pure >>= either (die . displayException) (pure . runBuilder)
 
 -- | Returns an s-expression parse tree for the specified FilePath.
 parseFilePath :: TaskSession -> FilePath -> IO ByteString
-parseFilePath session path = (fromJust <$> readBlobFromFile (file path)) >>= runTask session . parseTermBuilder @[] TermSExpression . pure >>= either (die . displayException) (pure . runBuilder)
+parseFilePath session path = (fromJust <$> readBlobFromFile (fileForPath path)) >>= runTask session . parseTermBuilder @[] TermSExpression . pure >>= either (die . displayException) (pure . runBuilder)
 
 -- | Read two files to a BlobPair.
-readFilePair :: Both FilePath -> IO BlobPair
-readFilePair paths = let paths' = fmap file paths in
-                     runBothWith F.readFilePair paths'
+readFilePathPair :: Both FilePath -> IO BlobPair
+readFilePathPair paths = let paths' = fmap fileForPath paths in
+                     runBothWith readFilePair paths'
 
 parseTestFile :: Parser term -> FilePath -> IO (Blob, term)
 parseTestFile parser path = runTaskOrDie $ do
-  blob <- readBlob (file path)
+  blob <- readBlob (fileForPath path)
   term <- parse parser blob
   pure (blob, term)
 

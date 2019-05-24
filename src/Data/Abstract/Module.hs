@@ -28,9 +28,9 @@ moduleForBlob :: Maybe FilePath -- ^ The root directory relative to which the mo
               -> Blob           -- ^ The 'Blob' containing the module.
               -> term           -- ^ The @term@ representing the body of the module.
               -> Module term    -- ^ A 'Module' named appropriate for the 'Blob', holding the @term@, and constructed relative to the root 'FilePath', if any.
-moduleForBlob rootDir Blob{..} = Module info
-  where root = fromMaybe (takeDirectory blobPath) rootDir
-        info = ModuleInfo (makeRelative root blobPath) blobLanguage blobOid
+moduleForBlob rootDir b = Module info
+  where root = fromMaybe (takeDirectory (blobPath b)) rootDir
+        info = ModuleInfo (makeRelative root (blobPath b)) (blobLanguage b) (blobOid b)
 
 
 type ModulePath = FilePath

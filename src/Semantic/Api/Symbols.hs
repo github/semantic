@@ -11,7 +11,7 @@ import           Control.Effect
 import           Control.Effect.Error
 import           Control.Exception
 import           Control.Lens
-import           Data.Blob
+import           Data.Blob hiding (File (..))
 import           Data.ByteString.Builder
 import           Data.Location
 import           Data.Maybe
@@ -34,27 +34,28 @@ legacyParseSymbols :: (Member Distribute sig, ParseEffects sig m, Traversable t)
 legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> distributeFoldMap go blobs
   where
     go :: (Member (Error SomeException) sig, Member Task sig, Carrier sig m) => Blob -> m [Legacy.File]
-    go blob@Blob{..} = (doParse blob >>= withSomeTerm (renderToSymbols blob)) `catchError` (\(SomeException _) -> pure (pure emptyFile))
-      where emptyFile = Legacy.File (pack blobPath) (pack (show blobLanguage)) []
+    go blob@Blob{..} = (doParse blob >>= withSomeTerm renderToSymbols) `catchError` (\(SomeException _) -> pure (pure emptyFile))
+      where
+        emptyFile = tagsToFile []
 
-    -- Legacy symbols output doesn't include Function Calls.
-    symbolsToSummarize :: [Text]
-    symbolsToSummarize = ["Function", "Method", "Class", "Module"]
+        -- Legacy symbols output doesn't include Function Calls.
+        symbolsToSummarize :: [Text]
+        symbolsToSummarize = ["Function", "Method", "Class", "Module"]
 
-    renderToSymbols :: (IsTaggable f, Applicative m) => Blob -> Term f Location -> m [Legacy.File]
-    renderToSymbols blob term = pure $ either mempty (pure . tagsToFile blob) (runTagging blob symbolsToSummarize term)
+        renderToSymbols :: (IsTaggable f, Applicative m) => Term f Location -> m [Legacy.File]
+        renderToSymbols term = pure $ either mempty (pure . tagsToFile) (runTagging blob symbolsToSummarize term)
 
-    tagsToFile :: Blob -> [Tag] -> Legacy.File
-    tagsToFile Blob{..} tags = Legacy.File (pack blobPath) (pack (show blobLanguage)) (fmap tagToSymbol tags)
+        tagsToFile :: [Tag] -> Legacy.File
+        tagsToFile tags = Legacy.File (pack (blobPath blob)) (pack (show (blobLanguage blob))) (fmap tagToSymbol tags)
 
-    tagToSymbol :: Tag -> Legacy.Symbol
-    tagToSymbol Tag{..}
-      = Legacy.Symbol
-      { symbolName = name
-      , symbolKind = kind
-      , symbolLine = fromMaybe mempty line
-      , symbolSpan = converting #? span
-      }
+        tagToSymbol :: Tag -> Legacy.Symbol
+        tagToSymbol Tag{..}
+          = Legacy.Symbol
+          { symbolName = name
+          , symbolKind = kind
+          , symbolLine = fromMaybe mempty line
+          , symbolSpan = converting #? span
+          }
 
 parseSymbolsBuilder :: (Member Distribute sig, ParseEffects sig m, Traversable t) => Format ParseTreeSymbolResponse -> t Blob -> m Builder
 parseSymbolsBuilder format blobs = parseSymbols blobs >>= serialize format
@@ -63,18 +64,20 @@ parseSymbols :: (Member Distribute sig, ParseEffects sig m, Traversable t) => t 
 parseSymbols blobs = ParseTreeSymbolResponse . V.fromList . toList <$> distributeFor blobs go
   where
     go :: (Member (Error SomeException) sig, Member Task sig, Carrier sig m) => Blob -> m File
-    go blob@Blob{..} = (doParse blob >>= withSomeTerm (renderToSymbols blob)) `catchError` (\(SomeException e) -> pure $ errorFile (show e))
+    go blob@Blob{..} = (doParse blob >>= withSomeTerm renderToSymbols) `catchError` (\(SomeException e) -> pure $ errorFile (show e))
       where
-        errorFile e = File (pack blobPath) (bridging # blobLanguage) mempty (V.fromList [ParseError (T.pack e)]) blobOid
+        blobLanguage' = blobLanguage blob
+        blobPath' = pack $ blobPath blob
+        errorFile e = File blobPath' (bridging # blobLanguage blob) mempty (V.fromList [ParseError (T.pack e)]) blobOid
 
         symbolsToSummarize :: [Text]
         symbolsToSummarize = ["Function", "Method", "Class", "Module", "Call", "Send"]
 
-        renderToSymbols :: (IsTaggable f, Applicative m) => Blob -> Term f Location -> m File
-        renderToSymbols blob@Blob{..} term = pure $ either (errorFile . show) (tagsToFile blob) (runTagging blob symbolsToSummarize term)
+        renderToSymbols :: (IsTaggable f, Applicative m) => Term f Location -> m File
+        renderToSymbols term = pure $ either (errorFile . show) tagsToFile (runTagging blob symbolsToSummarize term)
 
-        tagsToFile :: Blob -> [Tag] -> File
-        tagsToFile Blob{..} tags = File (pack blobPath) (bridging # blobLanguage) (V.fromList (fmap tagToSymbol tags)) mempty blobOid
+        tagsToFile :: [Tag] -> File
+        tagsToFile tags = File blobPath' (bridging # blobLanguage') (V.fromList (fmap tagToSymbol tags)) mempty blobOid
 
         tagToSymbol :: Tag -> Symbol
         tagToSymbol Tag{..}
