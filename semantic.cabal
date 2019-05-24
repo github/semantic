@@ -128,10 +128,10 @@ library
                      , Data.Algebra
                      , Data.AST
                      , Data.Blob
+                     , Data.Blob.IO
                      , Data.Diff
                      , Data.Duration
                      , Data.Error
-                     , Data.File
                      , Data.Flag
                      , Data.Functor.Both
                      , Data.Functor.Classes.Generic

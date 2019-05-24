@@ -286,7 +286,7 @@ runParser blob@Blob{..} parser = case parser of
       let term = cmarkParser blobSource
       in length term `seq` pure term
   SomeParser parser -> SomeTerm <$> runParser blob parser
-  where languageTag = pure . (,) ("language" :: String) . show $ blobLanguage
+  where languageTag = pure . (,) ("language" :: String) . show $ blobLanguage blob
         errors :: (Syntax.Error :< fs, Apply Foldable fs, Apply Functor fs) => Term (Sum fs) Assignment.Location -> [Error.Error String]
         errors = cata $ \ (In Assignment.Location{..} syntax) -> case syntax of
           _ | Just err@Syntax.Error{} <- project syntax -> [Syntax.unError locationSpan err]
@@ -313,7 +313,7 @@ runParser blob@Blob{..} parser = case parser of
           let requestID' = ("github_request_id", requestID taskSession)
           let isPublic'  = ("github_is_public", show (isPublic taskSession))
           let logPrintFlag = configLogPrintSource . config $ taskSession
-          let blobFields = ("path", if isPublic taskSession || Flag.toBool LogPrintSource logPrintFlag then blobPath else "<filtered>")
+          let blobFields = ("path", if isPublic taskSession || Flag.toBool LogPrintSource logPrintFlag then blobPath blob else "<filtered>")
           let logFields = requestID' : isPublic' : blobFields : languageTag
           let shouldFailForTesting = configFailParsingForTesting $ config taskSession
           let shouldFailOnParsing = optionsFailOnParseError . configOptions $ config taskSession

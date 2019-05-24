@@ -105,10 +105,11 @@ renderJSONError blob e = JSON [ renderError blob e ]
 
 -- | Render an error for a particular blob.
 renderError :: ToJSON a => Blob -> a -> SomeJSON
-renderError Blob{..} e = SomeJSON $ object
-  [ "error" .= e
-  , "path" .= blobPath
-  , "language" .= blobLanguage ]
+renderError b e = SomeJSON $ object
+  [ "error"    .= e
+  , "path"     .= blobPath b
+  , "language" .= blobLanguage b
+  ]
 
 -- | Render an error for diffs.
 renderJSONDiffError :: BlobPair -> String -> JSON "diffs" SomeJSON

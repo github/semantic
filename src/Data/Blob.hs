@@ -1,7 +1,12 @@
 {-# LANGUAGE DeriveAnyClass, ExplicitNamespaces, PatternSynonyms #-}
 module Data.Blob
-( Blob(..)
+( File(..)
+, fileForPath
+, Blob(..)
 , Blobs(..)
+, blobLanguage
+, blobPath
+, makeBlob
 , decodeBlobs
 , nullBlob
 , sourceBlob
@@ -28,14 +33,32 @@ import           Data.JSON.Fields
 import           Data.Language
 import           Data.Source as Source
 
--- | The source, path, and language of a blob.
+-- | A 'FilePath' paired with its corresponding 'Language'.
+-- Unpacked to have the same size overhead as (FilePath, Language).
+data File = File
+  { filePath     :: FilePath
+  , fileLanguage :: Language
+  } deriving (Show, Eq, Generic)
+
+fileForPath :: FilePath  -> File
+fileForPath p = File p (languageForFilePath p)
+
+-- | The source, path information, and language of a file read from disk.
 data Blob = Blob
-  { blobSource   :: Source   -- ^ The UTF-8 encoded source text of the blob.
-  , blobPath     :: FilePath -- ^ The file path to the blob.
-  , blobLanguage :: Language -- ^ The language of this blob.
-  , blobOid      :: Text     -- ^ Git OID for this blob, mempty if blob is not from a git db.
-  }
-  deriving (Show, Eq, Generic)
+  { blobSource   :: Source -- ^ The UTF-8 encoded source text of the blob.
+  , blobFile     :: File   -- ^ Path/language information for this blob.
+  , blobOid      :: Text   -- ^ Git OID for this blob, mempty if blob is not from a git db.
+  } deriving (Show, Eq, Generic)
+
+blobLanguage :: Blob -> Language
+blobLanguage = fileLanguage . blobFile
+
+blobPath :: Blob -> FilePath
+blobPath = filePath . blobFile
+
+makeBlob :: Source -> FilePath -> Language -> Text -> Blob
+makeBlob s p l = Blob s (File p l)
+{-# INLINE makeBlob #-}
 
 newtype Blobs a = Blobs { blobs :: [a] }
   deriving (Generic, FromJSON)
@@ -50,12 +73,12 @@ nullBlob :: Blob -> Bool
 nullBlob Blob{..} = nullSource blobSource
 
 sourceBlob :: FilePath -> Language -> Source -> Blob
-sourceBlob filepath language source = Blob source filepath language mempty
+sourceBlob filepath language source = makeBlob source filepath language mempty
 
 inferringLanguage :: Source -> FilePath -> Language -> Blob
 inferringLanguage src pth lang
-  | knownLanguage lang = Blob src pth lang mempty
-  | otherwise = Blob src pth (languageForFilePath pth) mempty
+  | knownLanguage lang = makeBlob src pth lang mempty
+  | otherwise = makeBlob src pth (languageForFilePath pth) mempty
 
 decodeBlobs :: BL.ByteString -> Either String [Blob]
 decodeBlobs = fmap blobs <$> eitherDecode
@@ -100,8 +123,8 @@ maybeBlobPair a b = case (a, b) of
   _                 -> Prologue.fail "expected file pair with content on at least one side"
 
 languageForBlobPair :: BlobPair -> Language
-languageForBlobPair (Deleting Blob{..})  = blobLanguage
-languageForBlobPair (Inserting Blob{..}) = blobLanguage
+languageForBlobPair (Deleting b)  = blobLanguage b
+languageForBlobPair (Inserting b) = blobLanguage b
 languageForBlobPair (Diffing a b)
   | blobLanguage a == Unknown || blobLanguage b == Unknown
     = Unknown
@@ -109,9 +132,10 @@ languageForBlobPair (Diffing a b)
     = blobLanguage b
 
 pathForBlobPair :: BlobPair -> FilePath
-pathForBlobPair (Deleting Blob{..})  = blobPath
-pathForBlobPair (Inserting Blob{..}) = blobPath
-pathForBlobPair (Diffing _ Blob{..}) = blobPath
+pathForBlobPair x = blobPath $ case x of
+  (Inserting b) -> b
+  (Deleting b)  -> b
+  (Diffing _ b) -> b
 
 languageTagForBlobPair :: BlobPair -> [(String, String)]
 languageTagForBlobPair pair = showLanguage (languageForBlobPair pair)
@@ -125,7 +149,7 @@ pathKeyForBlobPair blobs = case bimap blobPath blobPath (runJoin blobs) of
                       | otherwise -> before <> " -> " <> after
 
 instance ToJSONFields Blob where
-  toJSONFields Blob{..} = [ "path" .= blobPath, "language" .= blobLanguage ]
+  toJSONFields p = [ "path" .= blobPath p, "language" .= blobLanguage p]
 
 decodeBlobPairs :: BL.ByteString -> Either String [BlobPair]
 decodeBlobPairs = fmap blobs <$> eitherDecode

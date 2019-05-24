@@ -28,7 +28,7 @@ import           Data.Abstract.Package
 import           Data.Abstract.Value.Concrete as Concrete
 import           Data.Abstract.Value.Type as Type
 import           Data.Blob
-import           Data.File
+import           Data.Blob.IO
 import           Data.Graph (topologicalSort)
 import           Data.Graph.ControlFlowVertex
 import qualified Data.Language as Language
