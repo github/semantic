@@ -6,7 +6,7 @@ module Data.Blob
 , Blobs(..)
 , blobLanguage
 , blobPath
-, legacyMakeBlob
+, makeBlob
 , decodeBlobs
 , nullBlob
 , sourceBlob
@@ -34,9 +34,10 @@ import           Data.Language
 import           Data.Source as Source
 
 -- | A 'FilePath' paired with its corresponding 'Language'.
+-- Unpacked to have the same size overhead as (FilePath, Language).
 data File = File
-  { filePath     :: FilePath
-  , fileLanguage :: Language
+  { filePath     :: {-# UNPACK #-} !FilePath
+  , fileLanguage :: {-# UNPACK #-} !Language
   } deriving (Show, Eq, Generic)
 
 fileForPath :: FilePath  -> File
@@ -55,8 +56,9 @@ blobLanguage = fileLanguage . blobFile
 blobPath :: Blob -> FilePath
 blobPath = filePath . blobFile
 
-legacyMakeBlob :: Source -> FilePath -> Language -> Text -> Blob
-legacyMakeBlob s p l = Blob s (File p l)
+makeBlob :: Source -> FilePath -> Language -> Text -> Blob
+makeBlob s p l = Blob s (File p l)
+{-# INLINE makeBlob #-}
 
 newtype Blobs a = Blobs { blobs :: [a] }
   deriving (Generic, FromJSON)
@@ -71,12 +73,12 @@ nullBlob :: Blob -> Bool
 nullBlob Blob{..} = nullSource blobSource
 
 sourceBlob :: FilePath -> Language -> Source -> Blob
-sourceBlob filepath language source = legacyMakeBlob source filepath language mempty
+sourceBlob filepath language source = makeBlob source filepath language mempty
 
 inferringLanguage :: Source -> FilePath -> Language -> Blob
 inferringLanguage src pth lang
-  | knownLanguage lang = legacyMakeBlob src pth lang mempty
-  | otherwise = legacyMakeBlob src pth (languageForFilePath pth) mempty
+  | knownLanguage lang = makeBlob src pth lang mempty
+  | otherwise = makeBlob src pth (languageForFilePath pth) mempty
 
 decodeBlobs :: BL.ByteString -> Either String [Blob]
 decodeBlobs = fmap blobs <$> eitherDecode

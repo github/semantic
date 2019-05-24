@@ -53,7 +53,7 @@ readBlobsFromGitRepo path oid excludePaths = liftIO . fmap catMaybes $
       = Just . sourceBlob' path lang oid . fromText <$> Git.catFile gitDir oid
     blobFromTreeEntry _ _ = pure Nothing
 
-    sourceBlob' filepath language (Git.OID oid) source = legacyMakeBlob source filepath language oid
+    sourceBlob' filepath language (Git.OID oid) source = makeBlob source filepath language oid
 
 readFilePair :: MonadIO m => File -> File -> m BlobPair
 readFilePair a b = do
