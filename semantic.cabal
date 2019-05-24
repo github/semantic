@@ -398,7 +398,7 @@ test-suite test
     ghc-options:       -dynamic
 
 test-suite parse-examples
-  import:              haskell, dependencies
+  import:              haskell, dependencies, executable-flags
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Examples.hs
