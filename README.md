@@ -88,7 +88,7 @@ Available options:
 |          | Markdown       | ✅     | ✅     | ✅    | 🔶  | N/A     | N/A          | N/A | &nbsp; |
 
 * ✅ — Supported
-* 🔶 — Partial support (staff shipped)
+* 🔶 — Partial support
 * 🚧 — Under development
 
 
@@ -97,14 +97,14 @@ Available options:
 We use `cabal's` [Nix-style local builds][nix] for development. To get started quickly:
 
 ```bash
-git clone git@github.com:github/lexicon.git
-cd lexicon
+git clone git@github.com:github/semantic.git
+cd semantic
 git submodule sync --recursive && git submodule update --init --recursive --force
 cabal new-build
 cabal new-test
 ```
 
-`lexicon` requires GHC 8.6.4. We recommend using [`ghcup`][ghcup] to sandbox GHC versions. Our version bounds are based on [Stackage][stackage] LTS versions. The current LTS version is 13.13; `stack` build should also work if you prefer.
+`semantic` requires GHC 8.6.4. We recommend using [`ghcup`][ghcup] to sandbox GHC versions. Our version bounds are based on [Stackage][stackage] LTS versions. The current LTS version is 13.13; `stack` build should also work if you prefer.
 
 [nix]: https://www.haskell.org/cabal/users-guide/nix-local-build-overview.html
 [stackage]: https://stackage.org
