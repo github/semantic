@@ -36,8 +36,8 @@ import           Data.Source as Source
 -- | A 'FilePath' paired with its corresponding 'Language'.
 -- Unpacked to have the same size overhead as (FilePath, Language).
 data File = File
-  { filePath     :: {-# UNPACK #-} !FilePath
-  , fileLanguage :: {-# UNPACK #-} !Language
+  { filePath     :: FilePath
+  , fileLanguage :: Language
   } deriving (Show, Eq, Generic)
 
 fileForPath :: FilePath  -> File
