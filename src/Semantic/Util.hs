@@ -1,5 +1,5 @@
 {-# LANGUAGE CPP, ConstraintKinds, Rank2Types, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
-{-# OPTIONS_GHC -Wno-missing-signatures #-}
+{-# OPTIONS_GHC -Wno-missing-signatures -O0 #-}
 module Semantic.Util
   ( evalGoProject
   , evalPHPProject
