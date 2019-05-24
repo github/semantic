@@ -65,7 +65,7 @@ parseToAST :: ( Bounded grammar
            -> Ptr TS.Language
            -> Blob
            -> m (Maybe (AST [] grammar))
-parseToAST parseTimeout language Blob{..} = bracket (liftIO TS.ts_parser_new) (liftIO . TS.ts_parser_delete) $ \ parser -> do
+parseToAST parseTimeout language b@Blob{..} = bracket (liftIO TS.ts_parser_new) (liftIO . TS.ts_parser_delete) $ \ parser -> do
   result <- liftIO $ do
     let timeoutMicros = fromIntegral $ toMicroseconds parseTimeout
     TS.ts_parser_set_timeout_micros parser timeoutMicros
@@ -73,8 +73,8 @@ parseToAST parseTimeout language Blob{..} = bracket (liftIO TS.ts_parser_new) (l
     TS.ts_parser_set_language parser language
     runParser parser blobSource
   case result of
-    Failed          -> Nothing  <$ trace ("tree-sitter: parsing failed " <> blobPath)
-    (Succeeded ast) -> Just ast <$ trace ("tree-sitter: parsing succeeded " <> blobPath)
+    Failed          -> Nothing  <$ trace ("tree-sitter: parsing failed " <> blobPath b)
+    (Succeeded ast) -> Just ast <$ trace ("tree-sitter: parsing succeeded " <> blobPath b)
 
 toAST :: forall grammar . (Bounded grammar, Enum grammar) => TS.Node -> IO (Base (AST [] grammar) TS.Node)
 toAST node@TS.Node{..} = do

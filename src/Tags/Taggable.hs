@@ -118,9 +118,9 @@ tagging :: (IsTaggable syntax)
   => Blob
   -> Term syntax Location
   -> Machine.Source Token
-tagging Blob{..} term = pipe
+tagging b term = pipe
   where pipe = Machine.construct $ compile go
-        go   = foldSubterms (descend blobLanguage) term
+        go   = foldSubterms (descend (blobLanguage b)) term
 
 descend ::
   ( Taggable (TermF syntax Location)

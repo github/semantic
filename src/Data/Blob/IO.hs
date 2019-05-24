@@ -1,39 +1,24 @@
 {-# LANGUAGE RankNTypes #-}
 
-module Data.File
-  ( File (..)
-  , file
-  , toFile
-  , readBlobFromFile
+-- | These are primitive file IO methods for use in ghci and as internal functions.
+-- Instead of using these, consider if you can use the Files DSL instead.
+module Data.Blob.IO
+  ( readBlobFromFile
   , readBlobFromFile'
   , readBlobsFromDir
   , readBlobsFromGitRepo
   , readFilePair
   ) where
 
-import qualified Control.Concurrent.Async as Async
-import           Data.Blob
-import qualified Data.ByteString as B
-import           Data.Language
-import           Data.Source
-import           Prologue
+import Prologue
+
+import Data.Blob
+import Data.Language
+import Semantic.IO
+import Data.Source
 import qualified Semantic.Git as Git
-import           Semantic.IO
-import           System.FilePath.Posix
-
-data File = File
-  { filePath     :: FilePath
-  , fileLanguage :: Language
-  } deriving (Eq, Ord, Show)
-
-file :: FilePath -> File
-file path = File path (languageForFilePath path)
-  where languageForFilePath = languageForType . takeExtension
-
--- This is kind of a wart; Blob and File should be two views of
--- the same higher-kinded datatype.
-toFile :: Blob -> File
-toFile (Blob _ p l _) = File p l
+import qualified Control.Concurrent.Async as Async
+import qualified Data.ByteString as B
 
 -- | Read a utf8-encoded file to a 'Blob'.
 readBlobFromFile :: forall m. MonadIO m => File -> m (Maybe Blob)
@@ -51,7 +36,7 @@ readBlobFromFile' file = do
 -- | Read all blobs in the directory with Language.supportedExts
 readBlobsFromDir :: MonadIO m => FilePath -> m [Blob]
 readBlobsFromDir path = liftIO . fmap catMaybes $
-  findFilesInDir path supportedExts mempty >>= Async.mapConcurrently (readBlobFromFile . file)
+  findFilesInDir path supportedExts mempty >>= Async.mapConcurrently (readBlobFromFile . fileForPath)
 
 -- | Read all blobs from the Git repo with Language.supportedExts
 readBlobsFromGitRepo :: MonadIO m => FilePath -> Git.OID -> [FilePath] -> m [Blob]
@@ -68,7 +53,7 @@ readBlobsFromGitRepo path oid excludePaths = liftIO . fmap catMaybes $
       = Just . sourceBlob' path lang oid . fromText <$> Git.catFile gitDir oid
     blobFromTreeEntry _ _ = pure Nothing
 
-    sourceBlob' filepath language (Git.OID oid) source = Blob source filepath language oid
+    sourceBlob' filepath language (Git.OID oid) source = makeBlob source filepath language oid
 
 readFilePair :: MonadIO m => File -> File -> m BlobPair
 readFilePair a b = do

@@ -25,7 +25,8 @@ import           Data.Abstract.Module
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Package
 import           Data.Abstract.Value.Concrete as Concrete
-import           Data.File
+import           Data.Blob
+import           Data.Blob.IO
 import           Data.Graph (topologicalSort)
 import qualified Data.Language as Language
 import           Data.List (uncons)
@@ -218,7 +219,7 @@ evaluateProject' session proxy parser paths = do
   either (die . displayException) pure res
 
 parseFile :: Parser term -> FilePath -> IO term
-parseFile parser = runTask' . (parse parser <=< readBlob . file)
+parseFile parser = runTask' . (parse parser <=< readBlob . fileForPath)
 
 runTask' :: TaskEff a -> IO a
 runTask' task = runTaskWithOptions debugOptions task >>= either (die . displayException) pure
