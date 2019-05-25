@@ -43,7 +43,7 @@ legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> distributeFoldMap 
         symbolsToSummarize = ["Function", "Method", "Class", "Module"]
 
         renderToSymbols :: (IsTaggable f, Applicative m) => Term f Location -> m [Legacy.File]
-        renderToSymbols term = pure $ either mempty (pure . tagsToFile) (runTagging blob symbolsToSummarize term)
+        renderToSymbols = pure . pure . tagsToFile . runTagging blob symbolsToSummarize
 
         tagsToFile :: [Tag] -> Legacy.File
         tagsToFile tags = Legacy.File (pack (blobPath blob)) (pack (show (blobLanguage blob))) (fmap tagToSymbol tags)
@@ -74,7 +74,7 @@ parseSymbols blobs = ParseTreeSymbolResponse . V.fromList . toList <$> distribut
         symbolsToSummarize = ["Function", "Method", "Class", "Module", "Call", "Send"]
 
         renderToSymbols :: (IsTaggable f, Applicative m) => Term f Location -> m File
-        renderToSymbols term = pure $ either (errorFile . show) tagsToFile (runTagging blob symbolsToSummarize term)
+        renderToSymbols term = pure $ tagsToFile (runTagging blob symbolsToSummarize term)
 
         tagsToFile :: [Tag] -> File
         tagsToFile tags = File blobPath' (bridging # blobLanguage') (V.fromList (fmap tagToSymbol tags)) mempty blobOid
