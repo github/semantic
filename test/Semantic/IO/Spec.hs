@@ -16,7 +16,7 @@ import qualified Semantic.Git as Git
 
 
 spec :: Spec
-spec = do
+spec = parallel $ do
   describe "readBlobsFromGitRepo" $ do
     hasGit <- runIO $ isJust <$> findExecutable "git"
     when hasGit . it "should read from a git directory" $ do
