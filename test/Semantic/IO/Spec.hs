@@ -1,23 +1,44 @@
+{-# LANGUAGE ScopedTypeVariables #-}
+
 module Semantic.IO.Spec (spec) where
 
 import Prelude hiding (readFile)
 
 import Control.Concurrent.Async
+import Control.Monad.IO.Class
+import Data.List
 import Foreign
 import Foreign.C.Types (CBool (..))
+import Parsing.TreeSitter
 import Semantic.IO
+import System.Directory
 import System.Exit (ExitCode (..))
 import System.IO (IOMode (..))
-import Parsing.TreeSitter
+import System.IO.Temp
+import System.Process
 import System.Timeout
 
 import Data.Blob
 import Data.Handle
 import SpecHelpers hiding (readFile)
+import qualified Semantic.Git as Git
 
 
 spec :: Spec
-spec = parallel $ do
+spec = do
+  describe "readBlobsFromGitRepo" $ do
+    hasGit <- runIO $ isJust <$> findExecutable "git"
+    when hasGit . it "should read from a git directory" $ do
+      -- This temporary directory will be cleaned after use.
+      blobs <- liftIO . withSystemTempDirectory "semantic-temp-git-repo" $ \dir -> do
+        exit <- system ("cd " <> dir <> " && git init && touch foo.py && touch bar.rb && git add foo.py bar.rb && git commit -am 'Test commit'")
+        when (exit /= ExitSuccess) (fail ("Couldn't run git properly in dir " <> dir))
+        readBlobsFromGitRepo (dir </> ".git") (Git.OID "HEAD") []
+      let files = sortOn fileLanguage (blobFile <$> blobs)
+      files `shouldBe` [ File "foo.py" Python
+                       , File "bar.rb" Ruby
+                       ]
+
   describe "readFile" $ do
     it "returns a blob for extant files" $ do
       Just blob <- readBlobFromFile (File "semantic.cabal" Unknown)
