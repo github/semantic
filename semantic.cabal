@@ -338,7 +338,7 @@ executable semantic
     ghc-options:       -O1
     cpp-options:       -DCOMPUTE_GIT_SHA
   else
-    ghc-options:       -O0 -dynamic
+    ghc-options:       -O0
   build-depends:       base
                      , semantic
 
