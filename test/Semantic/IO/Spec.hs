@@ -1,22 +1,13 @@
-{-# LANGUAGE ScopedTypeVariables #-}
-
 module Semantic.IO.Spec (spec) where
 
 import Prelude hiding (readFile)
 
-import Control.Concurrent.Async
 import Control.Monad.IO.Class
 import Data.List
-import Foreign
-import Foreign.C.Types (CBool (..))
-import Parsing.TreeSitter
-import Semantic.IO
 import System.Directory
 import System.Exit (ExitCode (..))
-import System.IO (IOMode (..))
 import System.IO.Temp
 import System.Process
-import System.Timeout
 
 import Data.Blob
 import Data.Handle
