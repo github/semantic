@@ -9,8 +9,7 @@ import Prelude hiding (fail, filter, log)
 import Prologue hiding (Element, hash)
 
 import           Control.Effect as Eff
-import           Control.Effect.Error as Error
-import qualified Control.Effect.State as State
+import           Control.Effect.State
 import           Control.Monad.Trans
 import           Data.Blob
 import           Data.Location
@@ -25,25 +24,25 @@ runTagging :: (IsTaggable syntax)
   => Blob
   -> [Text]
   -> Term syntax Location
-  -> Either TranslationError [Tag]
+  -> [Tag]
 runTagging blob symbolsToSummarize tree
   = Eff.run
-  . Error.runError
-  . State.evalState mempty
+  . evalState @[ContextToken] []
   . runT $ source (tagging blob tree)
       ~> contextualizing blob symbolsToSummarize
 
 type ContextToken = (Text, Maybe Range)
 
-type Contextualizer
-  = StateC [ContextToken]
-  ( ErrorC TranslationError PureC)
-
-contextualizing :: Blob -> [Text] -> Machine.ProcessT Contextualizer Token Tag
+contextualizing :: ( Member (State [ContextToken]) sig
+                   , Carrier sig m
+                   )
+                => Blob
+                -> [Text]
+                -> Machine.ProcessT m Token Tag
 contextualizing Blob{..} symbolsToSummarize = repeatedly $ await >>= \case
-  Enter x r -> enterScope (x, r)
-  Exit  x r -> exitScope (x, r)
-  Iden iden span docsLiteralRange -> lift State.get >>= \case
+  Enter x r -> lift (enterScope (x, r))
+  Exit  x r -> lift (exitScope (x, r))
+  Iden iden span docsLiteralRange -> lift (get @[ContextToken]) >>= \case
     ((x, r):("Context", cr):xs) | x `elem` symbolsToSummarize
       -> yield $ Tag iden x span (fmap fst xs) (firstLine (slice r)) (slice cr)
     ((x, r):xs) | x `elem` symbolsToSummarize
@@ -53,11 +52,14 @@ contextualizing Blob{..} symbolsToSummarize = repeatedly $ await >>= \case
     slice = fmap (stripEnd . Source.toText . flip Source.slice blobSource)
     firstLine = fmap (T.take 180 . fst . breakOn "\n")
 
-enterScope, exitScope :: ContextToken -> Machine.PlanT k Tag Contextualizer ()
-enterScope c = lift (State.modify (c :))
-exitScope  c = lift State.get >>= \case
-  (x:xs) -> when (x == c) (lift (State.modify (const xs)))
-  cs     -> lift (State.modify (const cs)) -- Just continue on if it's unbalanced
-
-data TranslationError = UnbalancedPair ContextToken [ContextToken]
-  deriving (Eq, Show)
+enterScope, exitScope :: ( Member (State [ContextToken]) sig
+                         , Carrier sig m
+                         )
+                      => ContextToken
+                      -> m ()
+enterScope c = modify @[ContextToken] (c :)
+exitScope c = get @[ContextToken] >>= \case
+  x:xs -> when (x == c) (put xs)
+  -- If we run out of scopes to match, we've hit a tag balance issue;
+  -- just continue onwards.
+  []   -> pure ()
