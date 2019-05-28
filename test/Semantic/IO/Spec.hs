@@ -22,7 +22,15 @@ spec = do
     when hasGit . it "should read from a git directory" $ do
       -- This temporary directory will be cleaned after use.
       blobs <- liftIO . withSystemTempDirectory "semantic-temp-git-repo" $ \dir -> do
-        exit <- system ("cd " <> dir <> " && git init && touch foo.py && touch bar.rb && git add foo.py bar.rb && git config user.name 'Test' && git config user.email 'test@test.test' && git commit -am 'Test commit'")
+        let commands = [ "cd " <> dir
+                       , "git init"
+                       , "touch foo.py bar.rb"
+                       , "git add foo.py bar.rb"
+                       , "git config user.name 'Test'"
+                       , "git config user.email 'test@test.test'"
+                       , "git commit -am 'test commit'"
+                       ]
+        exit <- system (intercalate " && " commands)
         when (exit /= ExitSuccess) (fail ("Couldn't run git properly in dir " <> dir))
         readBlobsFromGitRepo (dir </> ".git") (Git.OID "HEAD") []
       let files = sortOn fileLanguage (blobFile <$> blobs)
