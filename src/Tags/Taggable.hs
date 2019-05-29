@@ -10,7 +10,7 @@ identify a new syntax as Taggable, you need to:
 constructor name of this syntax.
 
 -}
-{-# LANGUAGE AllowAmbiguousTypes, GADTs, ConstraintKinds, LambdaCase, RankNTypes, TypeFamilies, TypeOperators, ScopedTypeVariables, UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes, GADTs, ConstraintKinds, RankNTypes, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Tags.Taggable
 ( Tagger
 , Token(..)
@@ -28,6 +28,7 @@ import Analysis.HasTextElement
 import Data.Abstract.Declarations
 import Data.Abstract.Name
 import Data.Blob
+import Data.Functor.Identity
 import Data.Language
 import Data.Location
 import Data.Machine as Machine
@@ -62,31 +63,14 @@ data Token
   | Iden  { identifierName :: Text, tokenSpan :: Span, docsLiteralRange :: Maybe Range }
   deriving (Eq, Show)
 
-data Tagger a where
-  Pure :: a -> Tagger a
-  Bind :: Tagger a -> (a -> Tagger b) -> Tagger b
-  Tell :: Token -> Tagger ()
+type Tagger k a = PlanT k Token Identity a
 
-compile :: Tagger a -> Machine.Plan k Token a
-compile = \case
-  Pure a   -> pure a
-  Bind a f -> compile a >>= compile . f
-  Tell t   -> Machine.yield t $> ()
+enter, exit :: String -> Maybe Range -> Tagger k ()
+enter c = yield . Enter (pack c)
+exit c = yield . Exit (pack c)
 
-instance Functor Tagger where fmap = liftA
-
-instance Applicative Tagger where
-  pure  = Pure
-  (<*>) = ap
-
-instance Monad Tagger where (>>=) = Bind
-
-enter, exit :: String -> Maybe Range -> Tagger ()
-enter c = Tell . Enter (pack c)
-exit c = Tell . Exit (pack c)
-
-emitIden :: Span -> Maybe Range -> Name -> Tagger ()
-emitIden span docsLiteralRange name = Tell (Iden (formatName name) span docsLiteralRange)
+emitIden :: Span -> Maybe Range -> Name -> Tagger k ()
+emitIden span docsLiteralRange name = yield (Iden (formatName name) span docsLiteralRange)
 
 class (Show1 constr, Traversable constr) => Taggable constr where
   docsLiteral ::
@@ -115,12 +99,10 @@ type IsTaggable syntax =
   )
 
 tagging :: (IsTaggable syntax)
-  => Blob
-  -> Term syntax Location
-  -> Machine.Source Token
-tagging b term = pipe
-  where pipe = Machine.construct $ compile go
-        go   = foldSubterms (descend (blobLanguage b)) term
+        => Blob
+        -> Term syntax Location
+        -> Machine.MachineT Identity k Token
+tagging b = Machine.construct . foldSubterms (descend (blobLanguage b))
 
 descend ::
   ( Taggable (TermF syntax Location)
@@ -130,7 +112,7 @@ descend ::
   , HasTextElement syntax
   , Declarations1 syntax
   )
-  => Language -> SubtermAlgebra (TermF syntax Location) (Term syntax Location) (Tagger ())
+  => Language -> SubtermAlgebra (TermF syntax Location) (Term syntax Location) (Tagger k ())
 descend lang t@(In loc _) = do
   let term = fmap subterm t
   let snippetRange = snippet loc term
