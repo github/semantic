@@ -52,12 +52,14 @@ common dependencies
                      , machines
                      , mtl
                      , network
+                     , process
                      , recursion-schemes
                      , scientific
                      , safe-exceptions
                      , semilattices
                      , text
                      , these
+                     , unix
                      , proto3-suite
                      , proto3-wire
 
@@ -309,7 +311,6 @@ library
                      , stm-chans
                      , template-haskell
                      , time
-                     , unix
                      , unliftio-core
                      , unordered-containers
                      , vector
@@ -393,6 +394,7 @@ test-suite test
                      , hspec-expectations-pretty-diff
                      , HUnit
                      , leancheck
+                     , temporary
   ghc-options:         -O0
   if flag(release)
     ghc-options:       -dynamic
@@ -407,7 +409,6 @@ test-suite parse-examples
                      , hspec >= 2.4.1
                      , hspec-core
                      , hspec-expectations-pretty-diff
-                     , process
 
 benchmark evaluation
   import:              haskell, executable-flags
