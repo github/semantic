@@ -10,7 +10,7 @@ identify a new syntax as Taggable, you need to:
 constructor name of this syntax.
 
 -}
-{-# LANGUAGE AllowAmbiguousTypes, GADTs, ConstraintKinds, LambdaCase, RankNTypes, TypeFamilies, TypeOperators, ScopedTypeVariables, UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes, GADTs, ConstraintKinds, RankNTypes, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Tags.Taggable
 ( Tagger
 , Token(..)
