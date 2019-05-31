@@ -52,4 +52,4 @@ At this point, we are pretty firmly attached to Haskell's language features to e
 [Stack]: https://docs.haskellstack.org/en/stable/README/
 [GHC]: https://en.wikipedia.org/wiki/Glasgow_Haskell_Compiler
 [Facebook]: https://github.com/facebook/Haxl
-[Advanced Overlap]: https://wiki.haskell.org/GHC/AdvancedOverlap.
+[Advanced Overlap]: https://wiki.haskell.org/GHC/AdvancedOverlap
