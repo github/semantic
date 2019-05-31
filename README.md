@@ -100,7 +100,7 @@ We use `cabal's` [Nix-style local builds][nix] for development. To get started q
 git clone git@github.com:github/semantic.git
 cd semantic
 git submodule sync --recursive && git submodule update --init --recursive --force
-cabal update
+cabal new-update
 cabal new-build
 cabal new-test
 cabal new-run semantic -- --help
