@@ -100,8 +100,10 @@ We use `cabal's` [Nix-style local builds][nix] for development. To get started q
 git clone git@github.com:github/semantic.git
 cd semantic
 git submodule sync --recursive && git submodule update --init --recursive --force
+cabal new-update
 cabal new-build
 cabal new-test
+cabal new-run semantic -- --help
 ```
 
 `semantic` requires GHC 8.6.4. We recommend using [`ghcup`][ghcup] to sandbox GHC versions. Our version bounds are based on [Stackage][stackage] LTS versions. The current LTS version is 13.13; `stack` build should also work if you prefer.
