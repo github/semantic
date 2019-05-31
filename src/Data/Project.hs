@@ -1,9 +1,7 @@
 {-# LANGUAGE DeriveAnyClass, KindSignatures, MultiWayIf #-}
 
-module Data.Project (
-  -- * Projects
-    ProjectF (..)
-  , Project
+module Data.Project
+  ( Project (..)
   , ProjectException (..)
   , projectExtensions
   , projectName
@@ -24,26 +22,14 @@ import qualified Data.Text as T
 import           System.FilePath.Posix
 import           Semantic.IO
 
--- | A 'ProjectF' contains all the information that semantic needs
--- to execute an analysis, diffing, or graphing pass. It is higher-kinded
--- in terms of the container type for paths and blobs, as well as the
--- path type (this is necessary because protobuf uses different vector
--- representations for @repeated string@ and @repeated Blob@.
--- You probably want to use the 'Project' or 'PB' type aliases.
-data ProjectF (blobs :: * -> *) (paths :: * -> *) path = Project
-  { projectRootDir     :: path
-  , projectBlobs       :: blobs Blob
+-- | A 'Project' contains all the information that semantic needs
+-- to execute an analysis, diffing, or graphing pass.
+data Project = Project
+  { projectRootDir     :: FilePath
+  , projectBlobs       :: [Blob]
   , projectLanguage    :: Language
-  , projectExcludeDirs :: paths path
-  } deriving (Functor, Generic)
-
-deriving instance (Eq path, Eq (blobs Blob), Eq (paths path)) => Eq (ProjectF blobs paths path)
-deriving instance (Show path, Show (blobs Blob), Show (paths path)) => Show (ProjectF blobs paths path)
-
--- | This 'Project' type is the one used during semantic's normal
--- course of diffing, evaluation, and graphing. You probably want to
--- use this one.
-type Project = ProjectF [] [] FilePath
+  , projectExcludeDirs :: [FilePath]
+  } deriving (Eq, Show, Generic)
 
 projectName :: Project -> Text
 projectName = T.pack . dropExtensions . takeFileName . projectRootDir
