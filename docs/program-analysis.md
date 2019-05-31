@@ -3,9 +3,9 @@
 Program analysis allows us to ask questions about and analyze the behavior of computer programs. Analyzing this behavior allows us to (eventually) answer subtle but powerful questions such as, will this use more than 8 GB of RAM? Does this present a user interface? We perform program analysis statically—that is, without executing the program.
 
 We’re able to compute the following end results using evaluation:
-1. **[Import graph](https://github.com/github/semantic/blob/master/docs/import-graph.md):** graph representing all dependencies (`import`s, `require`s, etc.)
-2. **[Call graph](https://github.com/orgs/github/projects/390):** a control flow graph that represents calling relationships (ie., how one particular function calls other functions). This information is often vital for debugging purposes and determining where code is failing.
-3. **[Control flow graph](https://github.com/orgs/github/projects/471#card-11585654):** representation of _all_ paths that might be traversed through a program during its execution.
+1. **Import graph:** graph representing all dependencies (`import`s, `require`s, etc.)
+2. **Call graph:** a control flow graph that represents calling relationships (ie., how one particular function calls other functions). This information is often vital for debugging purposes and determining where code is failing.
+3. **Control flow graph:** representation of _all_ paths that might be traversed through a program during its execution.
 
 ### Abstract interpretation
 To do program analysis, we implement an approach based on the paper [Abstracting Definitional Interpreters](https://plum-umd.github.io/abstracting-definitional-interpreters/), which we've extended to work with our [à la carte representation of syntaxes](http://www.cs.ru.nl/~W.Swierstra/Publications/DataTypesALaCarte.pdf). This allows us to build a library of interpreters that do different things, but are written with the _same_ evaluation semantics. This approach offers several advantages; we can define _one_ evaluator and get different behaviors out of it (via type-directed polymorphism).
@@ -55,7 +55,7 @@ We compute effects non-deterministically.
 
 <!--- WIP: come back and briefly talk about why this is useful for program analysis --->
 
-<!--- WIP: come back and briefly talk about why this is useful for runEvaluator ---> 
+<!--- WIP: come back and briefly talk about why this is useful for runEvaluator --->
 
 ### Potential use-cases
 
