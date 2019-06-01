@@ -21,7 +21,7 @@ The [`Evaluatable`](https://github.com/github/semantic/blob/master/src/Data/Abst
 
 We have yet to finish implementing `Evaluatable` instances for the various à la carte syntaxes. Doing so requires knowledge of the type and value evaluation semantics of a particular syntax and familiarity with the functions for interacting with the environment and store.
 
-#### Implemeneting `Evaluatable` instances
+#### Implementing `Evaluatable` instances
 The following is a brief guide to working with the definitional interpreters and implementing instances of `Evaluatable` for the various pieces of syntax. `Semantil.Util` defines a series of language-specific wrapper functions for working in ghci to do evaluation.
 
 _Helpers:_
