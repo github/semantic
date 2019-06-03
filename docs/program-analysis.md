@@ -26,7 +26,7 @@ The following is a brief guide to working with the definitional interpreters and
 
 _Helpers:_
 - `parseFile`: parses one file.
-- `evaluateLanguageProject` takes a list of files and evaluates them usually under concrete semantics.
+- `evaluateLanguageProject`: takes a list of files and evaluates them usually under concrete semantics.
 - `callGraphLanguageProject`: uses the same mechanism for evaluating, but uses abstract semantics.
 - `typeCheckLanguageFile`: allows us to evaluate under type checking semantics.
 
