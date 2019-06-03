@@ -98,7 +98,6 @@ import Prologue
 import Prelude hiding (fail)
 import qualified Assigning.Assignment.Table as Table
 import Control.Monad.Except (MonadError (..))
-import Control.Monad.Free.Freer
 import Data.AST
 import Data.Error
 import Data.Range
@@ -380,3 +379,56 @@ instance (Enum grammar, Eq1 ast, Ix grammar, Show grammar) => MonadError (Error 
     Choose choices atEnd Nothing -> Tracing cs (Choose (fmap (>>= continue) choices) (fmap (>>= continue) atEnd) (Just handler)) `Then` pure
     Choose choices atEnd (Just onError) -> Tracing cs (Choose (fmap (>>= continue) choices) (fmap (>>= continue) atEnd) (Just (\ err -> (onError err >>= continue) <|> handler err))) `Then` pure
     _ -> Tracing cs assignment `Then` ((`catchError` handler) . continue)) (fmap pure rule)
+
+
+-- Freer
+
+data Freer f a where
+  Return :: a -> Freer f a
+  Then :: f x -> (x -> Freer f a) -> Freer f a
+
+infixl 1 `Then`
+
+instance Functor (Freer f) where
+  fmap f = go
+    where go (Return result) = Return (f result)
+          go (Then step yield) = Then step (go . yield)
+          {-# INLINE go #-}
+  {-# INLINE fmap #-}
+
+instance Applicative (Freer f) where
+  pure = Return
+  {-# INLINE pure #-}
+
+  Return f <*> param = fmap f param
+  Then action yield <*> param = Then action ((<*> param) . yield)
+  {-# INLINE (<*>) #-}
+
+  Return _ *> a = a
+  Then r f *> a = Then r ((*> a) . f)
+  {-# INLINE (*>) #-}
+
+  Return a <* b = b *> Return a
+  Then r f <* a = Then r ((<* a) . f)
+  {-# INLINE (<*) #-}
+
+instance Monad (Freer f) where
+  return = pure
+  {-# INLINE return #-}
+
+  Return a >>= f = f a
+  Then r f >>= g = Then r (g <=< f)
+  {-# INLINE (>>=) #-}
+
+  (>>) = (*>)
+  {-# INLINE (>>) #-}
+
+-- | Tear down a 'Freer' 'Monad' using iteration with an explicit continuation.
+--
+--   This is analogous to 'iter' with a continuation for the interior values, and is therefore suitable for defining interpreters for GADTs/types lacking a 'Functor' instance.
+iterFreer :: (forall x. (x -> a) -> f x -> a) -> Freer f a -> a
+iterFreer algebra = go
+  where go (Return result) = result
+        go (Then action continue) = algebra (go . continue) action
+        {-# INLINE go #-}
+{-# INLINE iterFreer #-}
