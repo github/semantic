@@ -290,7 +290,6 @@ library
                      , cryptohash ^>= 0.11.9
                      , deepseq ^>= 1.4.4.0
                      , directory-tree ^>= 0.12.1
-                     , freer-cofreer
                      , generic-monoid ^>= 0.1.0.0
                      , ghc-prim ^>= 0.5.3
                      , gitrev ^>= 1.3.1
