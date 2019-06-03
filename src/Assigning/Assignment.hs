@@ -98,7 +98,6 @@ import Prologue
 import Prelude hiding (fail)
 import qualified Assigning.Assignment.Table as Table
 import Control.Monad.Except (MonadError (..))
-import Control.Monad.Free.Freer
 import Data.AST
 import Data.Error
 import Data.Range
@@ -200,7 +199,7 @@ choice :: (Enum grammar, Eq1 ast, Ix grammar, HasCallStack) => [Assignment ast g
 choice [] = empty
 choice alternatives
   | null choices = asum alternatives
-  | otherwise    = tracing (Choose (Table.fromListWith (<|>) choices) (wrap . tracing . Alt . toList <$> nonEmpty atEnd) (mergeHandlers handlers)) `Then` pure
+  | otherwise    = tracing (Choose (Table.fromListWith (<|>) choices) ((`Then` id) . tracing . Alt . toList <$> nonEmpty atEnd) (mergeHandlers handlers)) `Then` pure
   where (choices, atEnd, handlers) = foldMap toChoices alternatives
         toChoices :: (Enum grammar, Ix grammar) => Assignment ast grammar a -> ([(grammar, Assignment ast grammar a)], [Assignment ast grammar a], [Error (Either String grammar) -> Assignment ast grammar a])
         toChoices rule = case rule of
@@ -356,7 +355,7 @@ instance MonadFail (Assignment ast grammar) where
   fail :: HasCallStack => String -> Assignment ast grammar a
   fail s = tracing (Fail s) `Then` pure
 
-instance (Enum grammar, Eq1 ast, Ix grammar, Show grammar, Show1 ast) => Parsing (Assignment ast grammar) where
+instance (Enum grammar, Eq1 ast, Ix grammar, Show grammar) => Parsing (Assignment ast grammar) where
   try = id
 
   (<?>) :: HasCallStack => Assignment ast grammar a -> String -> Assignment ast grammar a
@@ -369,7 +368,7 @@ instance (Enum grammar, Eq1 ast, Ix grammar, Show grammar, Show1 ast) => Parsing
   eof = tracing End `Then` pure
 
   notFollowedBy :: (HasCallStack, Show a) => Assignment ast grammar a -> Assignment ast grammar ()
-  notFollowedBy a = a *> unexpected (show a) <|> pure ()
+  notFollowedBy a = (a >>= unexpected . show) <|> pure ()
 
 instance (Enum grammar, Eq1 ast, Ix grammar, Show grammar) => MonadError (Error (Either String grammar)) (Assignment ast grammar) where
   throwError :: HasCallStack => Error (Either String grammar) -> Assignment ast grammar a
@@ -381,22 +380,55 @@ instance (Enum grammar, Eq1 ast, Ix grammar, Show grammar) => MonadError (Error 
     Choose choices atEnd (Just onError) -> Tracing cs (Choose (fmap (>>= continue) choices) (fmap (>>= continue) atEnd) (Just (\ err -> (onError err >>= continue) <|> handler err))) `Then` pure
     _ -> Tracing cs assignment `Then` ((`catchError` handler) . continue)) (fmap pure rule)
 
-instance Show1 f => Show1 (Tracing f) where
-  liftShowsPrec sp sl d = liftShowsPrec sp sl d . runTracing
 
-instance (Enum grammar, Ix grammar, Show grammar, Show1 ast) => Show1 (AssignmentF ast grammar) where
-  liftShowsPrec sp sl d a = case a of
-    End -> showString "End" . showChar ' ' . sp d ()
-    Location -> showString "Location" . sp d (L.Location (Range 0 0) (Span (Pos 1 1) (Pos 1 1)))
-    CurrentNode -> showString "CurrentNode"
-    Source -> showString "Source" . showChar ' ' . sp d ""
-    Children a -> showsUnaryWith showChild "Children" d a
-    Choose choices atEnd _ -> showsBinaryWith (liftShowsPrec showChild showChildren) (liftShowsPrec showChild showChildren) "Choose" d choices atEnd
-    Many a -> showsUnaryWith (liftShowsPrec (\ d a -> sp d [a]) (sl . pure)) "Many" d a
-    Alt as -> showsUnaryWith (const sl) "Alt" d (toList as)
-    Label child string -> showsBinaryWith (liftShowsPrec sp sl) showsPrec "Label" d child string
-    Fail s -> showsUnaryWith showsPrec "Fail" d s
-    GetLocals -> showString "GetLocals"
-    PutLocals locals -> showsUnaryWith showsPrec "PutLocals" d locals
-    where showChild = liftShowsPrec sp sl
-          showChildren = liftShowList sp sl
+-- Freer
+
+data Freer f a where
+  Return :: a -> Freer f a
+  Then :: f x -> (x -> Freer f a) -> Freer f a
+
+infixl 1 `Then`
+
+instance Functor (Freer f) where
+  fmap f = go
+    where go (Return result) = Return (f result)
+          go (Then step yield) = Then step (go . yield)
+          {-# INLINE go #-}
+  {-# INLINE fmap #-}
+
+instance Applicative (Freer f) where
+  pure = Return
+  {-# INLINE pure #-}
+
+  Return f <*> param = fmap f param
+  Then action yield <*> param = Then action ((<*> param) . yield)
+  {-# INLINE (<*>) #-}
+
+  Return _ *> a = a
+  Then r f *> a = Then r ((*> a) . f)
+  {-# INLINE (*>) #-}
+
+  Return a <* b = b *> Return a
+  Then r f <* a = Then r ((<* a) . f)
+  {-# INLINE (<*) #-}
+
+instance Monad (Freer f) where
+  return = pure
+  {-# INLINE return #-}
+
+  Return a >>= f = f a
+  Then r f >>= g = Then r (g <=< f)
+  {-# INLINE (>>=) #-}
+
+  (>>) = (*>)
+  {-# INLINE (>>) #-}
+
+-- | Tear down a 'Freer' 'Monad' using iteration with an explicit continuation.
+--
+--   This is analogous to 'iter' with a continuation for the interior values, and is therefore suitable for defining interpreters for GADTs/types lacking a 'Functor' instance.
+iterFreer :: (forall x. (x -> a) -> f x -> a) -> Freer f a -> a
+iterFreer algebra = go
+  where go (Return result) = result
+        go (Then action continue) = algebra (go . continue) action
+        {-# INLINE go #-}
+{-# INLINE iterFreer #-}
