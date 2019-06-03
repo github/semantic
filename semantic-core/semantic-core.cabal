@@ -27,9 +27,9 @@ library
                      , Control.Effect.Readline
                      , Data.File
                      , Data.Loc
+                     , Data.Name
                      , Data.Stack
                      , Semantic.Core
-                     , Semantic.Name
   -- other-modules:
   -- other-extensions:
   build-depends:       algebraic-graphs ^>= 0.3

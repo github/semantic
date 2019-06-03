@@ -27,9 +27,9 @@ import qualified Data.IntSet as IntSet
 import           Data.Loc
 import qualified Data.Map as Map
 import           Data.Monoid (Alt(..))
+import           Data.Name
 import           Prelude hiding (fail)
 import qualified Semantic.Core as Core
-import           Semantic.Name
 
 type Precise = Int
 type Env = Map.Map Name Precise

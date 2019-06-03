@@ -19,10 +19,10 @@ import           Data.Function (fix)
 import           Data.List.NonEmpty (nonEmpty)
 import           Data.Loc
 import qualified Data.Map as Map
+import           Data.Name
 import qualified Data.Set as Set
 import           Prelude hiding (fail)
 import qualified Semantic.Core as Core
-import           Semantic.Name
 
 type ImportGraph = Map.Map FilePath (Set.Set FilePath)
 

@@ -1,5 +1,5 @@
 {-# LANGUAGE DeriveFunctor, ExistentialQuantification, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, LambdaCase, MultiParamTypeClasses, OverloadedStrings, StandaloneDeriving, TypeOperators, UndecidableInstances #-}
-module Semantic.Name
+module Data.Name
 ( User
 , Namespaced
 , Name(..)

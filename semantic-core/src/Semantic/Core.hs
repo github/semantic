@@ -15,12 +15,12 @@ module Semantic.Core
 import           Control.Applicative (Alternative (..))
 import           Data.Foldable (foldl')
 import           Data.Loc
+import           Data.Name
 import           Data.Stack
 import           Data.Text.Prettyprint.Doc (Pretty (..), (<+>), vsep)
 import qualified Data.Text.Prettyprint.Doc as Pretty
 import qualified Data.Text.Prettyprint.Doc.Render.String as Pretty
 import           GHC.Stack
-import           Semantic.Name
 
 data Core
   = Var Name
