@@ -32,10 +32,10 @@ import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
-import Language.TypeScript.Grammar as Grammar
 import qualified Language.TypeScript.Syntax as TypeScript.Syntax
 import qualified Language.TypeScript.Resolution as TypeScript.Resolution
 import Prologue
+import TreeSitter.TypeScript as Grammar
 
 -- | The type of TypeScript syntax.
 type Syntax = '[

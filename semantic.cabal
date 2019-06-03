@@ -187,11 +187,9 @@ library
                      -- Language-specific grammar/syntax types, & assignments
                      , Language.Markdown.Assignment
                      , Language.Markdown.Syntax
-                     , Language.Go.Grammar
                      , Language.Go.Assignment
                      , Language.Go.Syntax
                      , Language.Go.Type
-                     , Language.Haskell.Grammar
                      , Language.Haskell.Assignment
                      , Language.Haskell.Syntax
                      , Language.Haskell.Syntax.Constructor
@@ -200,17 +198,14 @@ library
                      , Language.Haskell.Syntax.Pattern
                      , Language.Haskell.Syntax.QuasiQuote
                      , Language.Haskell.Syntax.Type
-                     , Language.JSON.Grammar
                      , Language.JSON.Assignment
                      , Language.JSON.PrettyPrint
                      , Language.MiniRuby.Assignment
                      , Language.MiniPython.Assignment
-                     , Language.Ruby.Grammar
                      , Language.Ruby.Assignment
                      , Language.Ruby.PrettyPrint
                      , Language.Ruby.Syntax
                      , Language.TypeScript.Assignment
-                     , Language.TypeScript.Grammar
                      , Language.TypeScript.Resolution
                      , Language.TypeScript.Syntax
                      , Language.TypeScript.Syntax.Import
@@ -219,14 +214,11 @@ library
                      , Language.TypeScript.Syntax.TypeScript
                      , Language.TypeScript.Syntax.Types
                      , Language.PHP.Assignment
-                     , Language.PHP.Grammar
                      , Language.PHP.Syntax
                      , Language.Python.Assignment
-                     , Language.Python.Grammar
                      , Language.Python.PrettyPrint
                      , Language.Python.Syntax
                      , Language.Java.Assignment
-                     , Language.Java.Grammar
                      , Language.Java.Syntax
                      , Numeric.Exts
                      -- Parser glue

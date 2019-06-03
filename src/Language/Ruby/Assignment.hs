@@ -35,8 +35,8 @@ import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Term as Term
-import           Language.Ruby.Grammar as Grammar
 import qualified Language.Ruby.Syntax as Ruby.Syntax
+import           TreeSitter.Ruby as Grammar
 
 -- | The type of Ruby syntax.
 type Syntax = '[
