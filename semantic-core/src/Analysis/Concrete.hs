@@ -1,5 +1,5 @@
 {-# LANGUAGE FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, LambdaCase, MultiParamTypeClasses, NamedFieldPuns, RecordWildCards, TypeApplications, TypeOperators, UndecidableInstances #-}
-module Semantic.Eval.Concrete
+module Analysis.Concrete
 ( Concrete(..)
 , concrete
 , concreteAnalysis

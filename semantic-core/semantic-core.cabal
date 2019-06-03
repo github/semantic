@@ -18,17 +18,17 @@ extra-source-files:  README.md
 tested-with:         GHC == 8.6.4
 
 library
-  exposed-modules:     Analysis.FlowInsensitive
+  exposed-modules:     Analysis.Concrete
+                     , Analysis.FlowInsensitive
                      , Analysis.ImportGraph
                      , Analysis.ScopeGraph
+                     , Analysis.Typecheck
                      , Control.Effect.Readline
                      , Data.File
                      , Data.Loc
                      , Data.Stack
                      , Semantic.Core
                      , Semantic.Eval
-                     , Semantic.Eval.Concrete
-                     , Semantic.Eval.Typecheck
                      , Semantic.Name
   -- other-modules:
   -- other-extensions:

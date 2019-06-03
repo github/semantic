@@ -1,11 +1,11 @@
 {-# LANGUAGE DeriveFunctor, FlexibleContexts, FlexibleInstances, LambdaCase, RecordWildCards, ScopedTypeVariables, TypeApplications #-}
-module Semantic.Eval.Typecheck
+module Analysis.Typecheck
 ( Monotype (..)
 , Meta
 , Polytype (PForAll, PBool, PFree, PArr)
 , Scope
-, Semantic.Eval.Typecheck.bind
-, Semantic.Eval.Typecheck.instantiate
+, Analysis.Typecheck.bind
+, Analysis.Typecheck.instantiate
 , typecheckingFlowInsensitive
 , typecheckingAnalysis
 ) where
@@ -60,7 +60,7 @@ newtype Scope = Scope Polytype
   deriving (Eq, Ord, Show)
 
 forAll :: Gensym -> Polytype -> Polytype
-forAll n body = PForAll (Semantic.Eval.Typecheck.bind n body)
+forAll n body = PForAll (Analysis.Typecheck.bind n body)
 
 forAlls :: Foldable t => t Gensym -> Polytype -> Polytype
 forAlls ns body = foldr forAll body ns
