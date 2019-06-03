@@ -10,6 +10,7 @@ module Analysis.Typecheck
 , typecheckingAnalysis
 ) where
 
+import           Analysis.Eval
 import           Analysis.FlowInsensitive
 import           Control.Applicative (Alternative (..))
 import           Control.Effect
@@ -30,7 +31,6 @@ import qualified Data.Map as Map
 import qualified Data.Set as Set
 import           Prelude hiding (fail)
 import qualified Semantic.Core as Core
-import           Semantic.Eval
 import           Semantic.Name
 
 data Monotype a

@@ -11,6 +11,7 @@ module Analysis.Concrete
 
 import qualified Algebra.Graph as G
 import qualified Algebra.Graph.Export.Dot as G
+import           Analysis.Eval
 import           Control.Applicative (Alternative (..))
 import           Control.Effect
 import           Control.Effect.Fail
@@ -28,7 +29,6 @@ import qualified Data.Map as Map
 import           Data.Monoid (Alt(..))
 import           Prelude hiding (fail)
 import qualified Semantic.Core as Core
-import           Semantic.Eval
 import           Semantic.Name
 
 type Precise = Int

@@ -1,5 +1,5 @@
 {-# LANGUAGE FlexibleContexts, GeneralizedNewtypeDeriving, LambdaCase, RankNTypes, RecordWildCards #-}
-module Semantic.Eval
+module Analysis.Eval
 ( eval
 , prog1
 , prog2

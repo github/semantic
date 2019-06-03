@@ -19,6 +19,7 @@ tested-with:         GHC == 8.6.4
 
 library
   exposed-modules:     Analysis.Concrete
+                     , Analysis.Eval
                      , Analysis.FlowInsensitive
                      , Analysis.ImportGraph
                      , Analysis.ScopeGraph
@@ -28,7 +29,6 @@ library
                      , Data.Loc
                      , Data.Stack
                      , Semantic.Core
-                     , Semantic.Eval
                      , Semantic.Name
   -- other-modules:
   -- other-extensions:
