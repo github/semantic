@@ -25,11 +25,11 @@ library
                      , Analysis.ScopeGraph
                      , Analysis.Typecheck
                      , Control.Effect.Readline
+                     , Data.Core
                      , Data.File
                      , Data.Loc
                      , Data.Name
                      , Data.Stack
-                     , Semantic.Core
   -- other-modules:
   -- other-extensions:
   build-depends:       algebraic-graphs ^>= 0.3

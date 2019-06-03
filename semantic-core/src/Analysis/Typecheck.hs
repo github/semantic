@@ -19,6 +19,7 @@ import           Control.Effect.Fresh
 import           Control.Effect.Reader hiding (Local)
 import           Control.Effect.State
 import           Control.Monad (unless)
+import qualified Data.Core as Core
 import           Data.File
 import           Data.Foldable (foldl', for_)
 import           Data.Function (fix)
@@ -31,7 +32,6 @@ import qualified Data.Map as Map
 import           Data.Name
 import qualified Data.Set as Set
 import           Prelude hiding (fail)
-import qualified Semantic.Core as Core
 
 data Monotype a
   = MBool

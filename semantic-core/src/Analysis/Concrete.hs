@@ -20,6 +20,7 @@ import           Control.Effect.NonDet
 import           Control.Effect.Reader hiding (Local)
 import           Control.Effect.State
 import           Control.Monad ((<=<), guard)
+import qualified Data.Core as Core
 import           Data.File
 import           Data.Function (fix)
 import qualified Data.IntMap as IntMap
@@ -29,7 +30,6 @@ import qualified Data.Map as Map
 import           Data.Monoid (Alt(..))
 import           Data.Name
 import           Prelude hiding (fail)
-import qualified Semantic.Core as Core
 
 type Precise = Int
 type Env = Map.Map Name Precise

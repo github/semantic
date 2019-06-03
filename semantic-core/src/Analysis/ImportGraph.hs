@@ -13,6 +13,7 @@ import           Control.Effect.Fail
 import           Control.Effect.Fresh
 import           Control.Effect.Reader
 import           Control.Effect.State
+import qualified Data.Core as Core
 import           Data.File
 import           Data.Foldable (fold)
 import           Data.Function (fix)
@@ -22,7 +23,6 @@ import qualified Data.Map as Map
 import           Data.Name
 import qualified Data.Set as Set
 import           Prelude hiding (fail)
-import qualified Semantic.Core as Core
 
 type ImportGraph = Map.Map FilePath (Set.Set FilePath)
 

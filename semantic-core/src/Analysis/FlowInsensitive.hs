@@ -13,12 +13,12 @@ import           Control.Effect.Fresh
 import           Control.Effect.NonDet
 import           Control.Effect.Reader
 import           Control.Effect.State
+import qualified Data.Core as Core
 import qualified Data.Map as Map
 import           Data.Maybe (fromMaybe)
 import           Data.Monoid (Alt(..))
 import           Data.Name
 import qualified Data.Set as Set
-import qualified Semantic.Core as Core
 
 type Cache a = Map.Map Core.Core (Set.Set a)
 type Heap a = Map.Map Name (Set.Set a)

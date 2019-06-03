@@ -15,6 +15,7 @@ import Control.Effect
 import Control.Effect.Fail
 import Control.Effect.Reader
 import Control.Monad ((>=>))
+import Data.Core as Core
 import Data.File
 import Data.Functor
 import Data.Loc
@@ -22,7 +23,6 @@ import Data.Maybe (fromJust)
 import Data.Name
 import GHC.Stack
 import Prelude hiding (fail)
-import Semantic.Core as Core
 
 eval :: (Carrier sig m, Member (Reader Loc) sig, MonadFail m) => Analysis address value m -> (Core -> m value) -> Core -> m value
 eval Analysis{..} eval = \case

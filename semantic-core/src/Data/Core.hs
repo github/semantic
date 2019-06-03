@@ -1,5 +1,5 @@
 {-# LANGUAGE DeriveTraversable, FlexibleContexts, LambdaCase, OverloadedStrings, RecordWildCards #-}
-module Semantic.Core
+module Data.Core
 ( Core(..)
 , Edge(..)
 , showCore
