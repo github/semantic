@@ -356,7 +356,7 @@ instance MonadFail (Assignment ast grammar) where
   fail :: HasCallStack => String -> Assignment ast grammar a
   fail s = tracing (Fail s) `Then` pure
 
-instance (Enum grammar, Eq1 ast, Ix grammar, Show grammar, Show1 ast) => Parsing (Assignment ast grammar) where
+instance (Enum grammar, Eq1 ast, Ix grammar, Show grammar) => Parsing (Assignment ast grammar) where
   try = id
 
   (<?>) :: HasCallStack => Assignment ast grammar a -> String -> Assignment ast grammar a
@@ -369,7 +369,7 @@ instance (Enum grammar, Eq1 ast, Ix grammar, Show grammar, Show1 ast) => Parsing
   eof = tracing End `Then` pure
 
   notFollowedBy :: (HasCallStack, Show a) => Assignment ast grammar a -> Assignment ast grammar ()
-  notFollowedBy a = a *> unexpected (show a) <|> pure ()
+  notFollowedBy a = (a >>= unexpected . show) <|> pure ()
 
 instance (Enum grammar, Eq1 ast, Ix grammar, Show grammar) => MonadError (Error (Either String grammar)) (Assignment ast grammar) where
   throwError :: HasCallStack => Error (Either String grammar) -> Assignment ast grammar a
