@@ -8,12 +8,11 @@ import Data.Duration
 import Data.Language
 import Data.Maybe
 import Data.Source
-import Language.JSON.Grammar (Grammar)
 import Parsing.TreeSitter
 import Semantic.Config
 import SpecHelpers
 import System.Timeout
-import TreeSitter.JSON
+import TreeSitter.JSON (tree_sitter_json, Grammar)
 
 spec :: Spec
 spec = parallel $ do
