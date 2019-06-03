@@ -200,7 +200,7 @@ choice :: (Enum grammar, Eq1 ast, Ix grammar, HasCallStack) => [Assignment ast g
 choice [] = empty
 choice alternatives
   | null choices = asum alternatives
-  | otherwise    = tracing (Choose (Table.fromListWith (<|>) choices) (wrap . tracing . Alt . toList <$> nonEmpty atEnd) (mergeHandlers handlers)) `Then` pure
+  | otherwise    = tracing (Choose (Table.fromListWith (<|>) choices) ((`Then` id) . tracing . Alt . toList <$> nonEmpty atEnd) (mergeHandlers handlers)) `Then` pure
   where (choices, atEnd, handlers) = foldMap toChoices alternatives
         toChoices :: (Enum grammar, Ix grammar) => Assignment ast grammar a -> ([(grammar, Assignment ast grammar a)], [Assignment ast grammar a], [Error (Either String grammar) -> Assignment ast grammar a])
         toChoices rule = case rule of
