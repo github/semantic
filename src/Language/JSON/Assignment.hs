@@ -13,9 +13,9 @@ import Data.Location
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Term as Term
-import Language.JSON.Grammar as Grammar
 import Prologue
 import Text.Parser.Combinators
+import TreeSitter.JSON as Grammar
 
 type Syntax =
   [ Literal.Null

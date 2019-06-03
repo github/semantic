@@ -200,7 +200,6 @@ library
                      , Language.Haskell.Syntax.Pattern
                      , Language.Haskell.Syntax.QuasiQuote
                      , Language.Haskell.Syntax.Type
-                     , Language.JSON.Grammar
                      , Language.JSON.Assignment
                      , Language.JSON.PrettyPrint
                      , Language.MiniRuby.Assignment
