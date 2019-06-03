@@ -76,7 +76,7 @@ foo = Heap.lookup thing
 ```
 
 Unlike many Haskell projects, we rely in places on variable shadowing (especially in open-recursive functions).
-Avoid variable shadowing if possible, as it can lead to unintuitive error messages; you are free to disable shadowing on in a per-file basis with `{-# OPTIONS_GHC -Wshadow #-}`
+Avoid variable shadowing if possible, as it can lead to unintuitive error messages; you are free to disable shadowing on a per-file basis with `{-# OPTIONS_GHC -Wshadow #-}`
 
 # Functions
 

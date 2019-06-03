@@ -105,7 +105,7 @@ Here are some things that might help:
 
 - **Inline:** Adding a rule to the `inline` array strips out the whole node as though it has been removed from the grammar. Each occurrence of this rule in the grammar is replaced with a copy of its definition. Similar to making something hidden, this makes your AST more compact. Inlining doesn't create these nodes at runtime, whereas  making something hidden acknowledges the node at runtime but hides it from the AST.
 
--  **Make `seq` visible and `choice` hidden** Sequences typically have meaning. Choices are just containers that point to other things.
+-  **Make `seq` visible and `choice` hidden:** Sequences typically have meaning. Choices are just containers that point to other things.
 
 - **Making things hidden:** Preceding a rule with an underscore (`_rule`) allows you to omit displaying a rule in the AST. This allows you to make a tree more compact.
 
@@ -117,7 +117,7 @@ Here are some guidelines to determine what approach to take when removing superf
 
 2. **Add it to the inline array.** If the rule is used more than once and its definition is not simple, make it `inline`. If this does not cause parsing problems, this is the best approach, because it will avoid intermediate node allocations and parsing operations at runtime. One possible side-effect of `inline` is that is sometimes makes the parser much larger in terms of number of states. To evaluate whether this has happened, it’s worth looking at the `STATE_COUNT` in `parser.c` before and after. If the state count goes way up, it may not be worth adding the rule to `inline` since more states mean more one-time memory footprint for the parser. If it goes up a few percent (or goes down), it’s fine to add.
 
-3. **Mark it hidden**. If `inline` causes conflicts or drastically increases the size of the parse table, it's better to mark it as hidden. This is often useful when two two nodes can not exist without one another. For example, `class_body_declaration` was a child of `class_body` and occurred together 100% of the time. Similarly, `type_arguments` can not exist independent of its child node, `type_argument`. In both cases, it makes sense to hide the former.
+3. **Mark it hidden.** If `inline` causes conflicts or drastically increases the size of the parse table, it's better to mark it as hidden. This is often useful when two nodes can not exist without one another. For example, `class_body_declaration` was a child of `class_body` and occurred together 100% of the time. Similarly, `type_arguments` can not exist independent of its child node, `type_argument`. In both cases, it makes sense to hide the former.
     ```diff
         (generic_type
           (type_identifier)
@@ -134,7 +134,7 @@ Once you have developed a significant portion of the grammar, find a file from a
 Use [a script like this](https://github.com/tree-sitter/tree-sitter-java/blob/master/script/parse-examples.rb) is one way to mass test a large repo quickly.
 
 ### Sequence your work
-Most languages have a long-tail of features that are not frequently utilized in the wild. When supporting a language, our aim is always to be able to parse 100% of a language (or ideally more, since the intent is to support multiple versions). However, this does necessarily all in one go. A good way to do this is to develop the structure and documentation necessary to support open source contribution. 
+Most languages have a long-tail of features that are not frequently utilized in the wild. When supporting a language, our aim is always to be able to parse 100% of a language (or ideally more, since the intent is to support multiple versions). However, this doesn't necessarily happen all in one go. A good way to do this is to develop the structure and documentation necessary to support open source contribution.
 
 ### Handling conflicts
 
@@ -148,23 +148,23 @@ Conflicts may arise due to ambiguities in the grammar. This is when the parser c
   - `commaSep1` - creates a repeating sequence of 1 or more tokens separated by a comma
   - `sep1`- creates a repeating sequence of 0 or more tokens separated by the specified delimiter
 
-- **Specify associativity and/or precedence.** Another way of resolving a conflict is through associativity and precedence. Specifying precedence allows us to prioritize productions in the grammar. If there are two or more ways to proceed, the production with the higher precedence will get preference. Left and right associativity can also be used to reflect how to proceed. For instance, a left-associative evaluation is `(a Q b) Q c` vs. a right-associative evaluation would render `a Q (b Q c)`. In this way, associativity changes the meaning of the expression. Resolving conflicts this way is a compile time solution as opposed to the "Add a conflict" section below which means the parser will try deal with the ambiguity at runtime.
+- **Specify associativity and/or precedence.** Another way of resolving a conflict is through associativity and precedence. Specifying precedence allows us to prioritize productions in the grammar. If there are two or more ways to proceed, the production with the higher precedence will get preference. Left and right associativity can also be used to reflect how to proceed. For instance, a left-associative evaluation is `(a Q b) Q c` vs. a right-associative evaluation would render `a Q (b Q c)`. In this way, associativity changes the meaning of the expression. Resolving conflicts this way is a compile time solution as opposed to the "Add a conflict" section below which means the parser will try to deal with the ambiguity at runtime.
 
 - **Add a conflict.** Adding conflicts allows the parser to pursue multiple paths in parallel, and decide which one to proceed with further along the process. Adding a conflict for one rule prevents the parser from recursively descending.
 
 _Workflow:_
-1. Add a conflict to the `conflicts` if there are 2 rules conflicting (to test that the conflict is the problem and gets the right parse output)
-2. Try `prec.left` or `prec.right` based on the options (if that’s not clear, then try both `prec.left` and `prec.right` and compare their outputs)
+1. Add a conflict to the `conflicts` if there are 2 rules conflicting (to test that the conflict is the problem and gets the right parse output).
+2. Try `prec.left` or `prec.right` based on the options (if that’s not clear, then try both `prec.left` and `prec.right` and compare their outputs).
 3. Look at adding a precedence number, usually `1` or `+1`, based on the rule you want to succeed first.
 4. Make sure there aren’t duplicate paths to get to the same rule from sibling rules (like having `_literal` in both `_statement` and `_expression`).
-And then once things are working in the tree output looks good, remove the conflict rule and try to solve it with associativity or precedence only. This helps confirm the solution before expending too much time adjusting precedence.
+And then once things are working and the tree output looks good, remove the conflict rule and try to solve it with associativity or precedence only. This helps confirm the solution before expending too much time adjusting precedence.
 
 ### Debugging errors
 
-Tree-sitter's error-handling is great, but sometimes works too well and hides helpful info that help to understand why errors are happening. The following tips can help detect where errors are occurring.
+Tree-sitter's error-handling is great, but sometimes works too well and hides helpful info that helps to understand why errors are happening. The following tips can help detect where errors are occurring.
 
 - **Narrow down your problem space.** Triangulate the error by starting with a simple example and progressively adding complexity to better understand where the parser is having trouble.
 - **Consult the spec.** Eliminate the possibility of typos or oversights in your logic by looking at the definition of your rule in the spec.
-- **Run your code.** Execute your test code to see verify it is valid. Use errors (if any) to get additional information about where the problem may lie.
+- **Run your code.** Execute your test code to verify it is valid. Use errors (if any) to get additional information about where the problem may lie.
 - **Use visual debug output.** Analyze the forks and look at individual production rules to hone in on the problem.
-- **Test all permutations of a particular language construct** This will help you find the edges of your language and ensure your grammar supports them.
+- **Test all permutations of a particular language construct.** This will help you find the edges of your language and ensure your grammar supports them.
