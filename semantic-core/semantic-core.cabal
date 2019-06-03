@@ -24,8 +24,8 @@ library
                      , Control.Effect.Readline
                      , Data.File
                      , Data.Loc
+                     , Data.Stack
                      , Semantic.Core
-                     , Semantic.Data.Stack
                      , Semantic.Eval
                      , Semantic.Eval.Concrete
                      , Semantic.Eval.Typecheck
