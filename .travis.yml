@@ -35,4 +35,3 @@ install:
 script:
 - cabal new-build -j
 - cabal new-test semantic:test
-- cabal check
