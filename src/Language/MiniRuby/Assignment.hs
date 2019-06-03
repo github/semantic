@@ -33,9 +33,9 @@ import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Term as Term
-import           Language.Ruby.Grammar as Grammar
 import qualified Language.Ruby.Syntax as Ruby.Syntax
 import           Prologue hiding (for)
+import           TreeSitter.Ruby as Grammar
 
 -- | Small version of Ruby syntax for testing the code rewriting pipeline.
 type Syntax =

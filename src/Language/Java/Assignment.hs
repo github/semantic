@@ -36,8 +36,8 @@ import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
-import           Language.Java.Grammar as Grammar
 import qualified Language.Java.Syntax as Java.Syntax
+import           TreeSitter.Java as Grammar
 
 type Syntax =
   '[ Comment.Comment
