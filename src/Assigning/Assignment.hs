@@ -380,23 +380,3 @@ instance (Enum grammar, Eq1 ast, Ix grammar, Show grammar) => MonadError (Error 
     Choose choices atEnd Nothing -> Tracing cs (Choose (fmap (>>= continue) choices) (fmap (>>= continue) atEnd) (Just handler)) `Then` pure
     Choose choices atEnd (Just onError) -> Tracing cs (Choose (fmap (>>= continue) choices) (fmap (>>= continue) atEnd) (Just (\ err -> (onError err >>= continue) <|> handler err))) `Then` pure
     _ -> Tracing cs assignment `Then` ((`catchError` handler) . continue)) (fmap pure rule)
-
-instance Show1 f => Show1 (Tracing f) where
-  liftShowsPrec sp sl d = liftShowsPrec sp sl d . runTracing
-
-instance (Enum grammar, Ix grammar, Show grammar, Show1 ast) => Show1 (AssignmentF ast grammar) where
-  liftShowsPrec sp sl d a = case a of
-    End -> showString "End" . showChar ' ' . sp d ()
-    Location -> showString "Location" . sp d (L.Location (Range 0 0) (Span (Pos 1 1) (Pos 1 1)))
-    CurrentNode -> showString "CurrentNode"
-    Source -> showString "Source" . showChar ' ' . sp d ""
-    Children a -> showsUnaryWith showChild "Children" d a
-    Choose choices atEnd _ -> showsBinaryWith (liftShowsPrec showChild showChildren) (liftShowsPrec showChild showChildren) "Choose" d choices atEnd
-    Many a -> showsUnaryWith (liftShowsPrec (\ d a -> sp d [a]) (sl . pure)) "Many" d a
-    Alt as -> showsUnaryWith (const sl) "Alt" d (toList as)
-    Label child string -> showsBinaryWith (liftShowsPrec sp sl) showsPrec "Label" d child string
-    Fail s -> showsUnaryWith showsPrec "Fail" d s
-    GetLocals -> showString "GetLocals"
-    PutLocals locals -> showsUnaryWith showsPrec "PutLocals" d locals
-    where showChild = liftShowsPrec sp sl
-          showChildren = liftShowList sp sl
