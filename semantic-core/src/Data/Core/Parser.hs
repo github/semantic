@@ -47,7 +47,7 @@ core :: (TokenParsing m, Monad m) => m Core
 core = expr
 
 expr :: (TokenParsing m, Monad m) => m Core
-expr = chainl1 atom go where
+expr = atom `chainl1` go where
   go = choice [ (:.) <$ dot
               , (:$) <$ notFollowedBy dot
               ]
@@ -64,7 +64,7 @@ atom = choice
   ]
 
 comp :: (TokenParsing m, Monad m) => m Core
-comp = braces (sconcat <$> sepEndByNonEmpty expr semi)
+comp = braces (sconcat <$> sepEndByNonEmpty expr semi) <?> "compound statement"
 
 ifthenelse :: (TokenParsing m, Monad m) => m Core
 ifthenelse = If
@@ -74,7 +74,7 @@ ifthenelse = If
   <?> "if-then-else statement"
 
 assign :: (TokenParsing m, Monad m) => m Core
-assign = (:=) <$> try (lvalue <* symbolic '=') <*> core
+assign = (:=) <$> try (lvalue <* symbolic '=') <*> core <?> "assignment"
 
 edge :: (TokenParsing m, Monad m) => m Core
 edge = kw <*> expr where kw = choice [ Edge Lexical <$ reserved "lexical"
