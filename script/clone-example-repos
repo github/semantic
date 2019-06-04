@@ -49,11 +49,11 @@ ts_examples="$dir/typescript/vendor/tree-sitter-typescript/examples"
 clone_repo "$ts_examples/desktop" desktop/desktop d1324f56d02dd9afca5d2e9da545905a7d41d671
 
 java_examples="$dir/java/vendor/tree-sitter-java/examples"
-clone_repo "$java_examples/elasticsearch" elastic/elasticsearch 4d62640bf116af7e825d89c7319a39c3f2f325b4
+# clone_repo "$java_examples/elasticsearch" elastic/elasticsearch 4d62640bf116af7e825d89c7319a39c3f2f325b4
 clone_repo "$java_examples/guava" google/guava e24fddc5fff7fd36d33ea38737b6606a7e476845
 clone_repo "$java_examples/RxJava" ReactiveX/RxJava 8a6bf14fc9a61f7c1c0016ca217be02ca86211d2
 
-clone_repo "$ts_examples/npm" npm/npm ee147fbbca6f2707d3b16f4fa78f4c4606b2d9b1
+# clone_repo "$ts_examples/npm" npm/npm ee147fbbca6f2707d3b16f4fa78f4c4606b2d9b1
 
 haskell_examples="$dir/haskell/vendor/tree-sitter-haskell/examples"
 clone_repo "$haskell_examples/effects" joshvera/effects 08f5f36f2600362685af593f4b327e933b60bf97
@@ -61,7 +61,7 @@ clone_repo "$haskell_examples/postgrest" PostgRest/postgrest f80cfbf165f951a062b
 clone_repo "$haskell_examples/ivory" GaloisInc/ivory 3d00324ad1c113c7e70957ff6a6d636d271d0fc4
 
 go_examples="$dir/go/vendor/tree-sitter-go/examples"
-clone_repo "$go_examples/go" "golang/go" "870e12d7bfaea70fb0d743842f5864eb059cb939"
+# clone_repo "$go_examples/go" "golang/go" "870e12d7bfaea70fb0d743842f5864eb059cb939"
 clone_repo "$go_examples/moby" "moby/moby" "f57f260b49b6142366e6bc1274204ee0a1205945"
 
 ruby_examples="$dir/ruby/vendor/tree-sitter-ruby/examples"
