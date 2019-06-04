@@ -2,6 +2,8 @@
 
 `semantic` is a Haskell library and command line tool for parsing, analyzing, and comparing source code.
 
+In a hurry? Check out our documentation of [example uses for the `semantic` command line tool](docs/examples.md).
+
 | Table of Contents |
 | :------------- |
 | [Usage](#usage) |
