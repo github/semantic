@@ -134,7 +134,7 @@ $ semantic graph main.py | dot -Tsvg > main.html && open main.html
 
 You'll get something that looks like this:
 
-![an import graph](images/import-graph.svg)
+![an import graph](images/import_graph.svg)
 
 ## Call graphs
 
@@ -144,4 +144,4 @@ Call graphs, expand on the import graphing capabilities by adding in some additi
 $ semantic graph --calls main.py | dot -Tsvg > main.html && open main.html
 ```
 
-![an import graph](images/import-graph.svg)
+![a call graph](images/call_graph.svg)
