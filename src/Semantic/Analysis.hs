@@ -5,16 +5,18 @@ module Semantic.Analysis
 , evalTerm
 ) where
 
+import Prologue
+
+import qualified Data.Map.Strict as Map
+
 import Control.Abstract as Abstract
 import Control.Abstract.ScopeGraph (runAllocator)
 import Control.Effect.Interpose
 import Data.Abstract.Evaluatable
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
-import Data.Function
 import Data.Language (Language)
-import Prologue
-import qualified Data.Map.Strict as Map
+import Data.Span
 
 type ModuleC address value m
   = ErrorC (LoopControl value)
