@@ -1,8 +1,11 @@
-{-# LANGUAGE DeriveFunctor, ExistentialQuantification, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, LambdaCase, MultiParamTypeClasses, OverloadedStrings, StandaloneDeriving, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DeriveFunctor, ExistentialQuantification, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, LambdaCase, MultiParamTypeClasses, OverloadedLists, OverloadedStrings,StandaloneDeriving, TypeOperators, UndecidableInstances #-}
 module Data.Name
 ( User
 , Namespaced
 , Name(..)
+, reservedNames
+, isSimpleCharacter
+, needsQuotation
 , Gensym(..)
 , (//)
 , gensym
@@ -20,6 +23,9 @@ import           Control.Effect.State
 import           Control.Effect.Sum
 import           Control.Monad.Fail
 import           Control.Monad.IO.Class
+import qualified Data.Char as Char
+import           Data.HashSet (HashSet)
+import qualified Data.HashSet as HashSet
 import           Data.Text.Prettyprint.Doc (Pretty (..))
 import qualified Data.Text.Prettyprint.Doc as Pretty
 
@@ -49,6 +55,25 @@ instance Pretty Name where
     Gen p  -> pretty p
     User n -> pretty n
     Path p -> pretty (show p)
+
+reservedNames :: HashSet User
+reservedNames = [ "#true", "#false", "let", "#frame", "if", "then", "else"
+                , "lexical", "import", "#unit", "load"]
+
+-- | Returns true if any character would require quotation or if the
+-- name conflicts with a Core primitive.
+needsQuotation :: User -> Bool
+needsQuotation u = HashSet.member u reservedNames || any (not . isSimpleCharacter) u
+
+-- | A ‘simple’ character is, loosely defined, a character that is compatible
+-- with identifiers in most ASCII-oriented programming languages. This is defined
+-- as the alphanumeric set plus @$@ and @_@.
+isSimpleCharacter :: Char -> Bool
+isSimpleCharacter = \case
+  '$'  -> True -- common in JS
+  '_'  -> True
+  '?'  -> True -- common in Ruby
+  c    -> Char.isAlphaNum c
 
 data Gensym
   = Root String
