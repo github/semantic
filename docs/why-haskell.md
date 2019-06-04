@@ -10,7 +10,7 @@ Haskell is a standardized, general-purpose, compiled, purely functional programm
 
 *Or more specifically, why is Semantic written in Haskell?*
 
-The Semantic project is concerned with parsing, analyzing (evaluating), and comparing source code and as such we are firmly rooted in the academic domain of programming language theory (PLT) and spend significant time applying existing research to the real world problem of analyzing source code on GitHub. Haskell is well suited to this domain. Its language features allow concise, correct, and elegant expression of the data structures and algorithms we work with. The language has enabled us to construct an algebraic representation of programming language syntax terms and diffs, where we represent each programing language we support as an open union of syntax terms.
+The Semantic project is concerned with parsing, analyzing (evaluating), and comparing source code and as such we are firmly rooted in the academic domain of programming language theory (PLT) and spend significant time applying existing research to the real world problem of analyzing source code on GitHub. Haskell is well suited to this domain. Its language features allow concise, correct, and elegant expression of the data structures and algorithms we work with. The language has enabled us to construct an algebraic representation of programming language syntax terms and diffs, where we represent each programming language we support as an open union of syntax terms.
 
 There are many aspects of Haskell that make a project as ambitious as Semantic feasible: strong typing, lazy evaluation, and purity, to name but a few. Yet Haskell is essential for a separate reason: its support for rich, user-defined control flow.
 
