@@ -5,6 +5,7 @@ module Data.Name
 , Name(..)
 , reservedNames
 , isSimpleCharacter
+, needsQuotation
 , Gensym(..)
 , (//)
 , gensym
@@ -24,6 +25,7 @@ import           Control.Monad.Fail
 import           Control.Monad.IO.Class
 import qualified Data.Char as Char
 import           Data.HashSet (HashSet)
+import qualified Data.HashSet as HashSet
 import           Data.Text.Prettyprint.Doc (Pretty (..))
 import qualified Data.Text.Prettyprint.Doc as Pretty
 
@@ -57,6 +59,11 @@ instance Pretty Name where
 reservedNames :: HashSet User
 reservedNames = [ "#true", "#false", "let", "#frame", "if", "then", "else"
                 , "lexical", "import", "#unit", "load"]
+
+-- | Returns true if any character would require quotation or if the
+-- name conflicts with a Core primitive.
+needsQuotation :: User -> Bool
+needsQuotation u = HashSet.member u reservedNames || any (not . isSimpleCharacter) u
 
 -- | A ‘simple’ character is, loosely defined, a character that is compatible
 -- with identifiers in most ASCII-oriented programming languages. This is defined

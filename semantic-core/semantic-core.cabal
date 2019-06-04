@@ -27,25 +27,28 @@ library
                      , Control.Effect.Readline
                      , Data.Core
                      , Data.Core.Parser
+                     , Data.Core.Pretty
                      , Data.File
                      , Data.Loc
                      , Data.Name
                      , Data.Stack
   -- other-modules:
   -- other-extensions:
-  build-depends:       algebraic-graphs     ^>= 0.3
-                     , base                 >= 4.11 && < 5
-                     , containers           ^>= 0.6
-                     , directory            ^>= 1.3
-                     , filepath             ^>= 1.4
-                     , fused-effects        ^>= 0.4
-                     , haskeline            ^>= 0.7.5
-                     , parsers              ^>= 0.12.10
-                     , prettyprinter        ^>= 1.2.1
-                     , semigroupoids        ^>= 5.3
-                     , transformers         ^>= 0.5.6
-                     , trifecta             ^>= 2
-                     , unordered-containers ^>= 0.2.10
+  build-depends:       algebraic-graphs            ^>= 0.3
+                     , base                         >= 4.11 && < 5
+                     , containers                  ^>= 0.6
+                     , directory                   ^>= 1.3
+                     , filepath                    ^>= 1.4
+                     , fused-effects               ^>= 0.4
+                     , haskeline                   ^>= 0.7.5
+                     , parsers                     ^>= 0.12.10
+                     , prettyprinter               ^>= 1.2.1
+                     , prettyprinter-ansi-terminal ^>= 1.1.1
+                     , recursion-schemes           ^>= 5.1
+                     , semigroupoids               ^>= 5.3
+                     , transformers                ^>= 0.5.6
+                     , trifecta                    ^>= 2
+                     , unordered-containers        ^>= 0.2.10
   hs-source-dirs:      src
   default-language:    Haskell2010
   ghc-options:         -Weverything -Wno-missing-local-signatures -Wno-missing-import-lists -Wno-implicit-prelude -Wno-safe -Wno-unsafe -Wno-name-shadowing -Wno-monomorphism-restriction -Wno-missed-specialisations -Wno-all-missed-specialisations
