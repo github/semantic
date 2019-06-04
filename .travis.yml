@@ -35,3 +35,4 @@ install:
 script:
 - cabal new-build -j semantic-core semantic:exe:semantic
 - cabal new-test semantic:test semantic-core:spec
+- cabal new-run semantic:parse-examples
