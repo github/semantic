@@ -33,5 +33,5 @@ install:
 - cabal new-build --only-dependencies -j
 
 script:
-- cabal new-build -j
-- cabal new-test semantic:test
+- cabal new-build -j semantic-core semantic:exe:semantic
+- cabal new-test semantic:test semantic-core:spec
