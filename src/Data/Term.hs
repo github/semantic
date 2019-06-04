@@ -1,4 +1,4 @@
-{-# LANGUAGE RankNTypes, TypeFamilies, TypeOperators, ScopedTypeVariables, FunctionalDependencies #-}
+{-# LANGUAGE FunctionalDependencies, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 module Data.Term
 ( Term(..)
 , termIn
@@ -14,11 +14,15 @@ module Data.Term
 , Annotated (..)
 ) where
 
+import Prelude hiding (span)
 import Prologue
-import Data.Aeson
-import Data.JSON.Fields
-import Text.Show
+
+import           Control.Lens.Lens
+import           Data.Aeson
+import           Data.JSON.Fields
+import           Data.Span
 import qualified Data.Sum as Sum
+import           Text.Show
 
 -- | A Term with an abstract syntax tree and an annotation.
 newtype Term syntax ann = Term { unTerm :: TermF syntax ann (Term syntax ann) }
@@ -39,6 +43,18 @@ guardTerm = Sum.projectGuard . termOut
 
 data TermF syntax ann recur = In { termFAnnotation :: ann, termFOut :: syntax recur }
   deriving (Eq, Ord, Foldable, Functor, Show, Traversable, Generic1)
+
+annotationLens :: Lens' (TermF syntax ann recur) ann
+annotationLens = lens termFAnnotation (\t a -> t { termFAnnotation = a })
+{-# INLINE annotationLens #-}
+
+instance HasSpan ann => HasSpan (TermF syntax ann recur) where
+  span = annotationLens.span
+  {-# INLINE span #-}
+
+instance HasSpan ann => HasSpan (Term syntax ann) where
+  span = inner.span where inner = lens unTerm (\t i -> t { unTerm = i })
+  {-# INLINE span #-}
 
 -- | A convenience typeclass to get the annotation out of a 'Term' or 'TermF'.
 -- Useful in term-rewriting algebras.

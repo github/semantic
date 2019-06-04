@@ -55,6 +55,7 @@ import           Data.Language as Language
 import           Data.List (isPrefixOf, isSuffixOf)
 import           Data.Project
 import           Data.Location
+import           Data.Span
 import           Data.Term
 import           Data.Text (pack, unpack)
 import           Language.Haskell.HsColour

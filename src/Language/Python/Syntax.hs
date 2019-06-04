@@ -3,24 +3,27 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-} -- FIXME
 module Language.Python.Syntax where
 
+import Prelude hiding (span)
+import Prologue
+
+import           Control.Lens.Getter
+import           Data.Aeson hiding (object)
+import qualified Data.List as List
+import qualified Data.List.NonEmpty as NonEmpty
+import qualified Data.Map.Strict as Map
+import qualified Data.Text as T
+import           System.FilePath.Posix
+
 import           Control.Abstract.Heap
 import           Control.Abstract.ScopeGraph hiding (Import)
 import           Data.Abstract.BaseError
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
-import           Data.Aeson hiding (object)
-import           Data.Functor.Classes.Generic
 import           Data.JSON.Fields
 import qualified Data.Language as Language
-import qualified Data.List as List
-import qualified Data.List.NonEmpty as NonEmpty
-import qualified Data.Map.Strict as Map
-import qualified Data.Text as T
+import           Data.Span
 import           Diffing.Algorithm
-import           GHC.Generics
-import           Prologue
-import           System.FilePath.Posix
 
 data QualifiedName
   = QualifiedName { paths :: NonEmpty FilePath }
@@ -132,8 +135,7 @@ instance Evaluatable Import where
 
     -- Add declaration of the alias name to the current scope (within our current module).
     aliasName <- maybeM (throwNoNameError aliasTerm) (declaredAlias aliasTerm)
-    let aliasSpan = getSpan aliasTerm
-    declare (Declaration aliasName) Default Public aliasSpan ScopeGraph.UnqualifiedImport (Just importScope)
+    declare (Declaration aliasName) Default Public (aliasTerm^.span) ScopeGraph.UnqualifiedImport (Just importScope)
     -- Retrieve the frame slot for the new declaration.
     aliasSlot <- lookupSlot (Declaration aliasName)
     assign aliasSlot =<< object aliasFrame
@@ -171,8 +173,7 @@ instance Evaluatable Import where
           aliasName <- maybeM (throwNoNameError aliasTerm) (declaredAlias aliasTerm)
           aliasValue <- maybeM (throwNoNameError aliasTerm) (declaredName aliasTerm)
           if aliasValue /= aliasName then do
-            let aliasSpan = getSpan aliasTerm
-            insertImportReference (Reference aliasName) aliasSpan ScopeGraph.Identifier (Declaration aliasValue) scopeAddress
+            insertImportReference (Reference aliasName) (aliasTerm^.span) ScopeGraph.Identifier (Declaration aliasValue) scopeAddress
           else
             pure ()
 
@@ -198,8 +199,7 @@ instance Evaluatable QualifiedImport where
       go [] = pure ()
       go (((nameTerm, name), modulePath) : namesAndPaths) = do
         scopeAddress <- newScope mempty
-        let nameSpan = getSpan nameTerm
-        declare (Declaration name) Default Public nameSpan ScopeGraph.QualifiedImport (Just scopeAddress)
+        declare (Declaration name) Default Public (nameTerm^.span) ScopeGraph.QualifiedImport (Just scopeAddress)
         aliasSlot <- lookupSlot (Declaration name)
         -- a.b.c
         withScope scopeAddress $

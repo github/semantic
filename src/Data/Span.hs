@@ -45,9 +45,11 @@ class HasSpan a where
 
   start :: Lens' a Pos
   start = span.start
+  {-# INLINE start #-}
 
   end :: Lens' a Pos
   end = span.end
+  {-# INLINE end #-}
 
 instance HasSpan Span where
   span  = id

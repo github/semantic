@@ -120,7 +120,6 @@ library
                      , Data.Abstract.FreeVariables
                      , Data.Abstract.AccessControls.Class
                      , Data.Abstract.AccessControls.Instances
-                     , Data.Abstract.HasSpan
                      , Data.Abstract.Heap
                      , Data.Abstract.Live
                      , Data.Abstract.Module

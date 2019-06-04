@@ -1,14 +1,18 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, RankNTypes, TypeFamilies #-}
 module Data.Quieterm
 ( Quieterm(..)
 , quieterm
 ) where
 
+import Prelude hiding (span)
+
+import Control.Lens
 import Control.DeepSeq
 import Data.Abstract.Declarations (Declarations)
 import Data.Abstract.FreeVariables (FreeVariables)
 import Data.Functor.Classes
 import Data.Functor.Foldable
+import Data.Span
 import Data.Term
 import Text.Show (showListWith)
 
@@ -42,6 +46,10 @@ instance NFData1 f => NFData1 (Quieterm f) where
 
 instance (NFData1 f, NFData a) => NFData (Quieterm f a) where
   rnf = liftRnf rnf
+
+instance HasSpan ann => HasSpan (Quieterm syntax ann) where
+  span = lens (view span . unQuieterm) (\(Quieterm i) s -> Quieterm (set span s i))
+  {-# INLINE span #-}
 
 quieterm :: (Recursive term, Base term ~ TermF syntax ann) => term -> Quieterm syntax ann
 quieterm = cata Quieterm
