@@ -39,7 +39,7 @@ symbol  = annotate (Pretty.color Pretty.Yellow)
 strlit  = annotate (Pretty.colorDull Pretty.Green)
 primitive = keyword . mappend "#"
 
-type Prec    = Int
+type Prec = Int
 
 data Style = Unicode | Ascii
 
@@ -54,7 +54,7 @@ arrow = ask @Style >>= \case
 name :: Name -> AnsiDoc
 name = \case
   Gen p  -> pretty p
-  Path p -> strlit (Pretty.viaShow p  )
+  Path p -> strlit (Pretty.viaShow p)
   User n -> encloseIf (needsQuotation n) (symbol "#{") (symbol "}") (pretty n)
 
 with :: (Member (Reader Prec) sig, Carrier sig m) => Prec -> m a -> m a
@@ -81,12 +81,12 @@ prettify = \case
     fore <- with 12 a
     aft  <- with 12 b
 
-    let open  = symbol (if 12 > prec then "{" <> softline else "")
-        close = symbol (if 12 > prec then softline <> "}" else "")
+    let open  = symbol ("{" <> softline)
+        close = symbol (softline <> "}")
         separator = ";" <> Pretty.line
         body = fore <> separator <> aft
 
-    pure . Pretty.align $ open <> Pretty.align body <> close
+    pure . Pretty.align $ encloseIf (12 > prec) open close (Pretty.align body)
 
   LamF x f  -> inParens 11 $ do
     body <- f
