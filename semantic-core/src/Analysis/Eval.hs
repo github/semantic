@@ -119,7 +119,7 @@ prog6 =
       ]
     ]
   , File (Loc "main" (locSpan (fromJust here))) $ block
-    [ Load (String "dep")
+    [ Load (Var (Path "dep"))
     , Let (User "thing") := Var (Path "dep") :. Var (User "var")
     ]
   ]

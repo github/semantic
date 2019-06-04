@@ -64,3 +64,17 @@ test-suite doctest
                      , semantic-core
   hs-source-dirs:      test
   default-language:    Haskell2010
+
+test-suite spec
+  type:                exitcode-stdio-1.0
+  main-is:             Spec.hs
+  other-modules:       Generators
+  build-depends:       base
+                     , semantic-core
+                     , hedgehog >= 0.6 && <1
+                     , tasty >= 1.2 && <2
+                     , tasty-hedgehog >= 0.2 && <1
+                     , tasty-hunit >= 0.10 && <1
+                     , trifecta
+  hs-source-dirs:      test
+  default-language:    Haskell2010
