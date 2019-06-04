@@ -166,7 +166,7 @@ graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute a g
 
 shaReader :: ReadM Git.OID
 shaReader = eitherReader parseSha
-  where parseSha arg = if length arg == 40
+  where parseSha arg = if length arg == 40 || arg == "HEAD"
           then Right (Git.OID (T.pack arg))
           else Left (arg <> " is not a valid sha1")
 
