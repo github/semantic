@@ -88,11 +88,11 @@ $ semantic diff test.A.py test.B.py
     (Empty)))
 ```
 
-Notice the difference? Instead of showing that entire lines where added and removed, the semantic diff is aware that the identifier of the function declaration and function call changed. Pretty cool.
+Notice the difference? Instead of showing that entire lines were added and removed, the semantic diff is aware that the identifier of the function declaration and function call changed. Pretty cool.
 
 ## Import graphs
 
-OK, now for the fun stuff. Semantic can currently produce a couple of different graph analysis for source code, let's first take a look at import graphs. An import graph shows how files include other files within a software project. For this example, we are going to write a little bit more code in order to see this work. Start by creating a couple of new files:
+OK, now for the fun stuff. Semantic can currently produce a couple of different graph-based views of source code, let's first take a look at import graphs. An import graph shows how files include other files within a software project. For this example, we are going to write a little bit more code in order to see this work. Start by creating a couple of new files:
 
 ``` python
 # main.py
@@ -138,7 +138,7 @@ You'll get something that looks like this:
 
 ## Call graphs
 
-Call graphs, expand on the import graphing capabilities by adding in some additional vertices and edges to the graph to identify named symbols and the connections between them. Taking the same example code, simply add `--call` to the invocation of semantic:
+Call graphs expand on the import graphing capabilities by adding in some additional vertices and edges to the graph to identify named symbols and the connections between them. Taking the same example code, simply add `--call` to the invocation of semantic:
 
 ```
 $ semantic graph --calls main.py | dot -Tsvg > main.html && open main.html
