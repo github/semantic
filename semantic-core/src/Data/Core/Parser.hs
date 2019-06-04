@@ -1,6 +1,3 @@
-{-# LANGUAGE ExplicitForAll, FlexibleInstances, LambdaCase, MultiParamTypeClasses, OverloadedLists,
-             ScopedTypeVariables #-}
-
 module Data.Core.Parser
   ( module Text.Trifecta
   , core
