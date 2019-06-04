@@ -106,7 +106,7 @@ cabal new-test
 cabal new-run semantic -- --help
 ```
 
-`semantic` requires GHC 8.6.4. We recommend using [`ghcup`][ghcup] to sandbox GHC versions. Our version bounds are based on [Stackage][stackage] LTS versions. The current LTS version is 13.13; `stack` build should also work if you prefer.
+`semantic` requires GHC 8.6.4. We recommend using [`ghcup`][ghcup] to sandbox GHC versions. Our version bounds are based on [Stackage][stackage] LTS versions. The current LTS version is 13.13; `stack` build should also work if you prefer, there is an unofficial [`stack.yaml`](https://gist.github.com/jkachmar/f200caee83280f1f25e9cfa2dd2b16bb).
 
 [nix]: https://www.haskell.org/cabal/users-guide/nix-local-build-overview.html
 [stackage]: https://stackage.org
