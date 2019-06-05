@@ -198,6 +198,9 @@ expressionChoices =
 expressions :: Assignment Term
 expressions = makeTerm'' <$> location <*> manyTerm expression
 
+block :: Assignment Term
+block = symbol Block *> children (makeTerm <$> location <*> manyTerm expression)
+
 expressionStatement :: Assignment Term
 expressionStatement = makeTerm'' <$> symbol ExpressionStatement <*> children (someTerm expression)
 
