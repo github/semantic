@@ -253,7 +253,7 @@ forStatement = symbol ForStatement >>= \ loc -> children (make loc <$> (symbol V
       Just a -> makeTerm loc (Statement.Else (makeTerm loc $ Statement.ForEach binding subject body) a)
 
 whileStatement :: Assignment Term
-whileStatement = symbol WhileStatement >>= \ loc -> children (make loc <$> term expression <*> block <*> optional (symbol ElseClause *> children expressions))
+whileStatement = symbol WhileStatement >>= \ loc -> children (make loc <$> term expression <*> expressions <*> optional (symbol ElseClause *> children expressions))
   where
     make loc whileCondition whileBody whileElseClause = case whileElseClause of
       Nothing -> makeTerm loc (Statement.While whileCondition whileBody)
@@ -279,8 +279,8 @@ functionParam = (makeParameter <$> location <*> identifier)
 
 functionDefinition :: Assignment Term
 functionDefinition =
-      makeFunctionDeclaration <$> symbol FunctionDefinition <*> children ((,,,) <$> term expression <* symbol Parameters <*> children (manyTerm functionParam) <*> optional (symbol Type *> children (term expression)) <*> block)
-  <|> makeFunctionDeclaration <$> (symbol Lambda' <|> symbol Lambda) <*> children ((,,,) <$ token AnonLambda <*> emptyTerm <*> (symbol LambdaParameters *> children (manyTerm expression) <|> pure []) <*> optional (symbol Type *> children (term expression)) <*> block)
+      makeFunctionDeclaration <$> symbol FunctionDefinition <*> children ((,,,) <$> term expression <* symbol Parameters <*> children (manyTerm functionParam) <*> optional (symbol Type *> children (term expression)) <*> expressions)
+  <|> makeFunctionDeclaration <$> (symbol Lambda' <|> symbol Lambda) <*> children ((,,,) <$ token AnonLambda <*> emptyTerm <*> (symbol LambdaParameters *> children (manyTerm expression) <|> pure []) <*> optional (symbol Type *> children (term expression)) <*> expressions)
   where
     makeFunctionDeclaration loc (functionName', functionParameters, ty, functionBody)
       = let fn = makeTerm loc (Declaration.Function [] functionName' functionParameters functionBody)
