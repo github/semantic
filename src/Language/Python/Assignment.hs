@@ -240,11 +240,10 @@ argumentList :: Assignment Term
 argumentList = symbol ArgumentList *> children expressions
 
 withStatement :: Assignment Term
-withStatement = makeTerm'' <$> symbol WithStatement <*> children (someTerm with)
+withStatement = symbol WithStatement *> children (flip (foldr make) <$> some withItem <*> term block')
   where
-    with = makeTerm <$> location <*> (withItem <*> term (makeTerm <$> location <*> manyTermsTill expression (void (symbol WithItem) <|> eof)))
-    withItem = symbol WithItem *> children (flip Statement.Let <$> term expression <*> term (expression <|> emptyTerm))
-            <|> flip Statement.Let <$> term expression <*> emptyTerm
+    make (val, name) = makeTerm1 . Statement.Let name val
+    withItem = symbol WithItem *> children ((,) <$> term expression <*> term (expression <|> emptyTerm))
 
 forStatement :: Assignment Term
 forStatement = symbol ForStatement >>= \ loc -> children (make loc <$> (symbol Variables *> children expressions) <*> term expressionList <*> term block' <*> optional (symbol ElseClause *> children expressions))
