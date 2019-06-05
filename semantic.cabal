@@ -199,8 +199,6 @@ library
                      , Language.Haskell.Syntax.Type
                      , Language.JSON.Assignment
                      , Language.JSON.PrettyPrint
-                     , Language.MiniRuby.Assignment
-                     , Language.MiniPython.Assignment
                      , Language.Ruby.Assignment
                      , Language.Ruby.PrettyPrint
                      , Language.Ruby.Syntax
