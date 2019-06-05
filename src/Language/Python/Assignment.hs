@@ -278,10 +278,9 @@ functionParam = (makeParameter <$> location <*> identifier)
 
 functionDefinition :: Assignment Term
 functionDefinition =
-      makeFunctionDeclaration <$> symbol FunctionDefinition <*> children ((,,,) <$> term expression <* symbol Parameters <*> children (manyTerm functionParam) <*> optional (symbol Type *> children (term expression)) <*> expressions')
-  <|> makeFunctionDeclaration <$> (symbol Lambda' <|> symbol Lambda) <*> children ((,,,) <$ token AnonLambda <*> emptyTerm <*> (symbol LambdaParameters *> children (manyTerm expression) <|> pure []) <*> optional (symbol Type *> children (term expression)) <*> expressions')
+      makeFunctionDeclaration <$> symbol FunctionDefinition <*> children ((,,,) <$> term expression <* symbol Parameters <*> children (manyTerm functionParam) <*> optional (symbol Type *> children (term expression)) <*> block)
+  <|> makeFunctionDeclaration <$> (symbol Lambda' <|> symbol Lambda) <*> children ((,,,) <$ token AnonLambda <*> emptyTerm <*> (symbol LambdaParameters *> children (manyTerm expression) <|> pure []) <*> optional (symbol Type *> children (term expression)) <*> block)
   where
-    expressions' = makeTerm <$> location <*> manyTerm expression
     makeFunctionDeclaration loc (functionName', functionParameters, ty, functionBody)
       = let fn = makeTerm loc (Declaration.Function [] functionName' functionParameters functionBody)
         in maybe fn (makeTerm loc . Type.Annotation fn) ty
