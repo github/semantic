@@ -1,12 +1,3 @@
-[submodule "vendor/hspec-expectations-pretty-diff"]
-	path = vendor/hspec-expectations-pretty-diff
-	url = https://github.com/rewinfrey/hspec-expectations-pretty-diff
 [submodule "vendor/haskell-tree-sitter"]
 	path = vendor/haskell-tree-sitter
 	url = https://github.com/tree-sitter/haskell-tree-sitter.git
-[submodule "vendor/proto3-suite"]
-	path = vendor/proto3-suite
-	url = https://github.com/joshvera/proto3-suite.git
-[submodule "vendor/proto3-wire"]
-	path = vendor/proto3-wire
-	url = https://github.com/joshvera/proto3-wire.git
