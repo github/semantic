@@ -136,6 +136,7 @@ expressionChoices =
   , assignment'
   , await
   , binaryOperator
+  , block
   , boolean
   , booleanOperator
   , breakStatement
