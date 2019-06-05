@@ -98,6 +98,7 @@ someAnalysisParser _ PHP        = SomeAnalysisParser phpParser        (Proxy :: 
 someAnalysisParser _ Python     = SomeAnalysisParser pythonParser     (Proxy :: Proxy 'Python)
 someAnalysisParser _ Ruby       = SomeAnalysisParser rubyParser       (Proxy :: Proxy 'Ruby)
 someAnalysisParser _ TypeScript = SomeAnalysisParser typescriptParser (Proxy :: Proxy 'TypeScript)
+someAnalysisParser _ TSX        = SomeAnalysisParser typescriptParser (Proxy :: Proxy 'TSX)
 someAnalysisParser _ l          = error $ "Analysis not supported for: " <> show l
 
 

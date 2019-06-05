@@ -320,6 +320,7 @@ library
                      , tree-sitter-python
                      , tree-sitter-ruby
                      , tree-sitter-typescript
+                     , tree-sitter-tsx
                      , tree-sitter-java
   ghc-options:         -Wall -Wmissing-export-lists -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -fno-warn-name-shadowing -j
   if flag(release)

@@ -78,6 +78,7 @@ instance APIBridge T.Text Data.Language where
       Data.Python -> "Python"
       Data.Ruby -> "Ruby"
       Data.TypeScript -> "TypeScript"
+      Data.TSX -> "TSX"
       Data.PHP -> "PHP"
 
     apiLanguageToLanguage :: T.Text -> Data.Language
@@ -92,6 +93,7 @@ instance APIBridge T.Text Data.Language where
       "Python" -> Data.Python
       "Ruby" -> Data.Ruby
       "TypeScript" -> Data.TypeScript
+      "TSX" -> Data.TSX
       "PHP" -> Data.PHP
       _ -> Data.Unknown
 
