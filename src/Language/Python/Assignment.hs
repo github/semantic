@@ -280,7 +280,7 @@ functionParam = (makeParameter <$> location <*> identifier)
 
 functionDefinition :: Assignment Term
 functionDefinition =
-      makeFunctionDeclaration <$> symbol FunctionDefinition <*> children ((,,,) <$> term expression <* symbol Parameters <*> children (manyTerm functionParam) <*> optional (symbol Type *> children (term expression)) <*> expressions')
+      makeFunctionDeclaration <$> symbol FunctionDefinition <*> children ((,,,) <$> term expression <* symbol Parameters <*> children (manyTerm functionParam) <*> optional (symbol Type *> children (term expression)) <*> term block')
   <|> makeFunctionDeclaration <$> (symbol Lambda' <|> symbol Lambda) <*> children ((,,,) <$ token AnonLambda <*> emptyTerm <*> (symbol LambdaParameters *> children (manyTerm expression) <|> pure []) <*> optional (symbol Type *> children (term expression)) <*> expressions')
   where
     expressions' = makeTerm <$> location <*> manyTerm expression
