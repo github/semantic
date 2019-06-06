@@ -9,12 +9,18 @@ module Semantic.Git
   , ObjectType(..)
   , ObjectMode(..)
   , OID(..)
+
+  -- Testing Purposes
+  , parseEntries
+  , parseEntry
   ) where
 
 import Control.Monad.IO.Class
-import Data.Text as Text
-import Shelly hiding (FilePath)
-import System.IO (hSetBinaryMode)
+import Data.Attoparsec.Text   (Parser)
+import Data.Attoparsec.Text   as AP
+import Data.Text              as Text
+import Shelly                 hiding (FilePath)
+import System.IO              (hSetBinaryMode)
 
 -- | git clone --bare
 clone :: Text -> FilePath -> IO ()
@@ -30,15 +36,44 @@ catFile gitDir (OID oid) = sh $ do
 lsTree :: FilePath -> OID -> IO [TreeEntry]
 lsTree gitDir (OID sha) = sh $ do
   out <- run "git" [pack ("--git-dir=" <> gitDir), "ls-tree", "-rz", sha]
-  pure $ mkEntry <$> splitOn "\NUL" out
-  where
-    mkEntry row | [mode, ty, rest] <- splitOn " " row
-                , [oid, path] <- splitOn "\t" rest
-                = TreeEntry (objectMode mode) (objectType ty) (OID oid) (unpack path)
-                | otherwise = nullTreeEntry
+  pure $ parseEntries out
 
 sh :: MonadIO m => Sh a -> m a
 sh = shelly . silently . onCommandHandles (initOutputHandles (`hSetBinaryMode` True))
+
+-- | Parses an list of entries separated by \NUL, and on failure return []
+parseEntries :: Text -> [TreeEntry]
+parseEntries = either (const []) id . AP.parseOnly (AP.sepBy entryParser (AP.char '\NUL'))
+
+-- | Parse the entire input with entryParser, and on failure return a default
+-- For testing purposes only
+parseEntry :: Text -> TreeEntry
+parseEntry = either (const nullTreeEntry) id . AP.parseOnly entryParser
+
+-- | Parses an entry successfully, falling back to the failure case if necessary.
+entryParser :: Parser TreeEntry
+entryParser = AP.choice [entrySuccessParser, entryDefaultParser]
+
+-- | Attoparsec parser for a block af text ending with \NUL
+-- in order to consume invalid input
+entryDefaultParser :: Parser TreeEntry
+entryDefaultParser = do
+  _ <- AP.takeWhile (/= '\NUL') 
+  pure $ nullTreeEntry
+
+-- | Attoparsec parser for a single line of git ls-tree -rz output
+entrySuccessParser :: Parser TreeEntry
+entrySuccessParser = do
+  mode <- takeWhileToNul (/= ' ')
+  _ <- AP.char ' '
+  ty <- takeWhileToNul (/= ' ')
+  _ <- AP.char ' '
+  oid <- takeWhileToNul (/= '\t')
+  _ <- AP.char '\t'
+  path <- takeWhileToNul (const True)
+  pure $ TreeEntry (objectMode mode) (objectType ty) (OID oid) (unpack path)
+    where
+      takeWhileToNul f = AP.takeWhile (\x -> f x && x /= '\NUL')
 
 newtype OID = OID Text
   deriving (Eq, Show, Ord)
