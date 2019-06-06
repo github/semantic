@@ -219,7 +219,6 @@ expression :: Assignment Term
 expression = handleError everything
   where
     everything = choice [
-      typeAssertion,
       asExpression,
       nonNullExpression',
       importAlias',
@@ -371,9 +370,6 @@ implementsClause' = makeTerm <$> symbol Grammar.ImplementsClause <*> children (T
 super :: Assignment Term
 super = makeTerm <$> symbol Grammar.Super <*> (TSX.Syntax.Super <$ rawSource)
 
-typeAssertion :: Assignment Term
-typeAssertion = makeTerm <$> symbol Grammar.TypeAssertion <*> children (TSX.Syntax.TypeAssertion <$> term typeArguments' <*> term expression)
-
 asExpression :: Assignment Term
 asExpression = makeTerm <$> symbol AsExpression <*> children (Expression.Cast <$> term expression <*> term (ty <|> templateString))
 
@@ -402,7 +398,7 @@ false :: Assignment Term
 false = makeTerm <$> symbol Grammar.False <*> (Literal.false <$ rawSource)
 
 identifier :: Assignment Term
-identifier = makeTerm <$> (symbol Identifier <|> symbol Identifier' <|> symbol Identifier'') <*> (Syntax.Identifier . name <$> source)
+identifier = makeTerm <$> symbol Identifier <*> (Syntax.Identifier . name <$> source)
 
 class' :: Assignment Term
 class' = makeClass <$> symbol Class <*> children ((,,,,) <$> manyTerm decorator <*> term typeIdentifier <*> (symbol TypeParameters *> children (manyTerm typeParameter') <|> pure []) <*> (classHeritage' <|> pure []) <*> classBodyStatements)
@@ -754,7 +750,7 @@ importStatement =   makeImportTerm <$> symbol Grammar.ImportStatement <*> childr
     makeImportTerm loc ([x], from) = makeImportTerm1 loc from x
     makeImportTerm loc (xs, from) = makeTerm loc $ fmap (makeImportTerm1 loc from) xs
     importSymbol = symbol Grammar.ImportSpecifier *> children (makeNameAliasPair <$> rawIdentifier <*> ((Just <$> rawIdentifier) <|> pure Nothing))
-    rawIdentifier = (symbol Identifier <|> symbol Identifier' <|> symbol Identifier'') *> (name <$> source)
+    rawIdentifier = symbol Identifier *> (name <$> source)
     makeNameAliasPair from (Just alias) = (from, alias)
     makeNameAliasPair from Nothing = (from, from)
 
@@ -813,7 +809,7 @@ exportStatement = makeTerm <$> symbol Grammar.ExportStatement <*> children (flip
                  <|> symbol Grammar.ExportSpecifier *> children (makeNameAliasPair <$> rawIdentifier <*> pure Nothing)
     makeNameAliasPair from (Just alias) = TSX.Syntax.Alias from alias
     makeNameAliasPair from Nothing = TSX.Syntax.Alias from from
-    rawIdentifier = (symbol Identifier <|> symbol Identifier' <|> symbol Identifier'') *> (name <$> source)
+    rawIdentifier = symbol Identifier *> (name <$> source)
     -- TODO: Need to validate that inline comments are still handled with this change in assigning to Path and not a Term.
     fromClause = symbol Grammar.String *> (TypeScript.Resolution.importPath <$> source)
 
@@ -889,7 +885,7 @@ variableDeclarator =
   where
     makeVarDecl loc (subject, annotations, value) = makeTerm loc (Statement.Assignment [annotations] subject value)
 
-    requireCall = symbol CallExpression *> children ((symbol Identifier <|> symbol Identifier' <|> symbol Identifier'') *> do
+    requireCall = symbol CallExpression *> children (symbol Identifier *> do
       s <- source
       guard (s == "require")
       symbol Arguments *> children (symbol Grammar.String *> (TypeScript.Resolution.importPath <$> source))

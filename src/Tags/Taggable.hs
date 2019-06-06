@@ -52,8 +52,8 @@ import qualified Language.Markdown.Syntax as Markdown
 import qualified Language.PHP.Syntax as PHP
 import qualified Language.Python.Syntax as Python
 import qualified Language.Ruby.Syntax as Ruby
+import qualified Language.TSX.Syntax as TSX
 import qualified Language.TypeScript.Syntax as TypeScript
-
 
 
  -- TODO: Move to src/Data
@@ -603,24 +603,25 @@ instance Taggable Ruby.LowPrecedenceOr
 instance Taggable Ruby.Assignment
 instance Taggable Ruby.ZSuper
 
+instance Taggable TSX.JsxElement
+instance Taggable TSX.JsxOpeningElement
+instance Taggable TSX.JsxSelfClosingElement
+instance Taggable TSX.JsxAttribute
+instance Taggable TSX.JsxText
+instance Taggable TSX.JsxExpression
+instance Taggable TSX.JsxClosingElement
+instance Taggable TSX.JsxFragment
+instance Taggable TSX.JsxNamespaceName
+
 instance Taggable TypeScript.JavaScriptRequire
 instance Taggable TypeScript.Debugger
 instance Taggable TypeScript.Super
 instance Taggable TypeScript.Undefined
 instance Taggable TypeScript.With
-instance Taggable TypeScript.JsxElement
-instance Taggable TypeScript.JsxOpeningElement
-instance Taggable TypeScript.JsxSelfClosingElement
-instance Taggable TypeScript.JsxAttribute
 instance Taggable TypeScript.OptionalParameter
 instance Taggable TypeScript.RequiredParameter
 instance Taggable TypeScript.RestParameter
-instance Taggable TypeScript.JsxNamespaceName
-instance Taggable TypeScript.JsxText
-instance Taggable TypeScript.JsxExpression
-instance Taggable TypeScript.JsxClosingElement
 instance Taggable TypeScript.ImplementsClause
-instance Taggable TypeScript.JsxFragment
 instance Taggable TypeScript.Import
 instance Taggable TypeScript.QualifiedAliasedImport
 instance Taggable TypeScript.QualifiedExportFrom

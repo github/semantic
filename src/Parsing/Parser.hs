@@ -20,6 +20,7 @@ module Parsing.Parser
 , pythonParser
 , pythonASTParser
 , rubyParser
+, tsxParser
 , typescriptParser
 , typescriptASTParser
 , phpParser
@@ -46,6 +47,7 @@ import qualified Language.Markdown.Assignment as Markdown
 import qualified Language.PHP.Assignment as PHP
 import qualified Language.Python.Assignment as Python
 import qualified Language.Ruby.Assignment as Ruby
+import qualified Language.TSX.Assignment as TSX
 import qualified Language.TypeScript.Assignment as TypeScript
 import           Prologue
 import           TreeSitter.Go
@@ -56,6 +58,7 @@ import qualified TreeSitter.Language as TS (Language, Symbol)
 import           TreeSitter.PHP
 import           TreeSitter.Python
 import           TreeSitter.Ruby
+import           TreeSitter.TSX
 import           TreeSitter.TypeScript
 
 
@@ -155,6 +158,9 @@ jsonASTParser = ASTParser tree_sitter_json
 typescriptParser :: Parser TypeScript.Term
 typescriptParser = AssignmentParser (ASTParser tree_sitter_typescript) TypeScript.assignment
 
+tsxParser :: Parser TSX.Term
+tsxParser = AssignmentParser (ASTParser tree_sitter_tsx) TSX.assignment
+
 typescriptASTParser :: Parser (AST [] TypeScript.Grammar)
 typescriptASTParser = ASTParser tree_sitter_typescript
 
@@ -187,6 +193,7 @@ someASTParser JSX        = Just (SomeASTParser (ASTParser tree_sitter_typescript
 someASTParser Python     = Just (SomeASTParser (ASTParser tree_sitter_python :: Parser (AST [] Python.Grammar)))
 someASTParser Ruby       = Just (SomeASTParser (ASTParser tree_sitter_ruby :: Parser (AST [] Ruby.Grammar)))
 someASTParser TypeScript = Just (SomeASTParser (ASTParser tree_sitter_typescript :: Parser (AST [] TypeScript.Grammar)))
+someASTParser TSX        = Just (SomeASTParser (ASTParser tree_sitter_tsx :: Parser (AST [] TSX.Grammar)))
 someASTParser PHP        = Just (SomeASTParser (ASTParser tree_sitter_php :: Parser (AST [] PHP.Grammar)))
 someASTParser Markdown   = Nothing
 someASTParser Unknown    = Nothing

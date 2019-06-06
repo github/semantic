@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveAnyClass, DerivingVia, DuplicateRecordFields #-}
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
-module Language.TypeScript.Syntax.JSX where
+module Language.TSX.Syntax.JSX where
 
 import Prologue
 
@@ -54,53 +54,6 @@ data JsxAttribute a = JsxAttribute { jsxAttributeTarget :: !a, jsxAttributeValue
   deriving (Eq1, Show1, Ord1) via Generically JsxAttribute
 
 instance Evaluatable JsxAttribute
-
-newtype ImplementsClause a = ImplementsClause { implementsClauseTypes :: [a] }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, Ord, Show, ToJSONFields1, Traversable)
-  deriving (Eq1, Show1, Ord1) via Generically ImplementsClause
-
-instance Evaluatable ImplementsClause
-
-data OptionalParameter a = OptionalParameter { optionalParameterContext :: ![a], optionalParameterSubject :: !a, optionalParameterAccessControl :: AccessControl }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, Ord, Show, ToJSONFields1, Traversable)
-  deriving (Eq1, Show1, Ord1) via Generically OptionalParameter
-
-instance Evaluatable OptionalParameter
-
-data RequiredParameter a = RequiredParameter { requiredParameterContext :: [a], requiredParameterSubject :: a, requiredParameterValue :: a, requiredParameterAccessControl :: AccessControl }
-  deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, Ord, Show, ToJSONFields1, Traversable)
-  deriving (Eq1, Show1, Ord1) via Generically RequiredParameter
-
-instance Declarations1 RequiredParameter where
-  liftDeclaredName declaredName RequiredParameter{..} = declaredName requiredParameterSubject
-
-instance Evaluatable RequiredParameter where
-  eval eval ref RequiredParameter{..} = do
-    span <- ask @Span
-    _ <- declareMaybeName (declaredName requiredParameterSubject) Default Public span ScopeGraph.RequiredParameter Nothing
-
-    lhs <- ref requiredParameterSubject
-    rhs <- eval requiredParameterValue
-
-    case declaredName requiredParameterValue of
-      Just rhsName -> do
-        assocScope <- associatedScope (Declaration rhsName)
-        case assocScope of
-          Just assocScope' -> do
-            objectScope <- newScope (Map.singleton Import [ assocScope' ])
-            putSlotDeclarationScope lhs (Just objectScope) -- TODO: not sure if this is right
-          Nothing ->
-            pure ()
-      Nothing ->
-        pure ()
-    assign lhs rhs
-    pure rhs
-
-data RestParameter a = RestParameter { restParameterContext :: ![a], restParameterSubject :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, Ord, Show, ToJSONFields1, Traversable)
-  deriving (Eq1, Show1, Ord1) via Generically RestParameter
-
-instance Evaluatable RestParameter
 
 newtype JsxFragment a = JsxFragment { terms :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, Ord, Show, ToJSONFields1, Traversable)

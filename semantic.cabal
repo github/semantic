@@ -202,12 +202,14 @@ library
                      , Language.Ruby.Assignment
                      , Language.Ruby.PrettyPrint
                      , Language.Ruby.Syntax
+                     , Language.TSX.Assignment
+                     , Language.TSX.Syntax
+                     , Language.TSX.Syntax.JSX
                      , Language.TypeScript.Assignment
                      , Language.TypeScript.Resolution
                      , Language.TypeScript.Syntax
                      , Language.TypeScript.Syntax.Import
                      , Language.TypeScript.Syntax.JavaScript
-                     , Language.TypeScript.Syntax.JSX
                      , Language.TypeScript.Syntax.TypeScript
                      , Language.TypeScript.Syntax.Types
                      , Language.PHP.Assignment

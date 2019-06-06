@@ -169,15 +169,6 @@ type Syntax = '[
   , TypeScript.Syntax.ClassHeritage
   , TypeScript.Syntax.AbstractClass
   , TypeScript.Syntax.ImplementsClause
-  , TypeScript.Syntax.JsxElement
-  , TypeScript.Syntax.JsxSelfClosingElement
-  , TypeScript.Syntax.JsxOpeningElement
-  , TypeScript.Syntax.JsxText
-  , TypeScript.Syntax.JsxClosingElement
-  , TypeScript.Syntax.JsxExpression
-  , TypeScript.Syntax.JsxAttribute
-  , TypeScript.Syntax.JsxFragment
-  , TypeScript.Syntax.JsxNamespaceName
   , TypeScript.Syntax.OptionalParameter
   , TypeScript.Syntax.RequiredParameter
   , TypeScript.Syntax.RestParameter
@@ -227,8 +218,6 @@ expression = handleError everything
       super,
       object,
       array,
-      jsxElement',
-      jsxFragment,
       class',
       anonymousClass,
       function,
@@ -402,7 +391,7 @@ false :: Assignment Term
 false = makeTerm <$> symbol Grammar.False <*> (Literal.false <$ rawSource)
 
 identifier :: Assignment Term
-identifier = makeTerm <$> (symbol Identifier <|> symbol Identifier' <|> symbol Identifier'') <*> (Syntax.Identifier . name <$> source)
+identifier = makeTerm <$> symbol Identifier <*> (Syntax.Identifier . name <$> source)
 
 class' :: Assignment Term
 class' = makeClass <$> symbol Class <*> children ((,,,,) <$> manyTerm decorator <*> term typeIdentifier <*> (symbol TypeParameters *> children (manyTerm typeParameter') <|> pure []) <*> (classHeritage' <|> pure []) <*> classBodyStatements)
@@ -413,46 +402,6 @@ object = makeTerm <$> (symbol Object <|> symbol ObjectPattern) <*> children (Lit
 
 array :: Assignment Term
 array = makeTerm <$> (symbol Array <|> symbol ArrayPattern) <*> children (Literal.Array <$> manyTerm (expression <|> spreadElement))
-
-jsxElement' :: Assignment Term
-jsxElement' = choice [ jsxElement, jsxSelfClosingElement ]
-
-jsxElement :: Assignment Term
-jsxElement = makeTerm <$> symbol Grammar.JsxElement <*> children (TypeScript.Syntax.JsxElement <$> term jsxOpeningElement' <*> manyTerm jsxChild <*> term jsxClosingElement')
-
-jsxFragment :: Assignment Term
-jsxFragment = makeTerm <$> symbol Grammar.JsxFragment <*> children (TypeScript.Syntax.JsxFragment <$> manyTerm jsxChild)
-
-jsxChild :: Assignment Term
-jsxChild = choice [ jsxElement', jsxExpression', jsxText ]
-
-jsxSelfClosingElement :: Assignment Term
-jsxSelfClosingElement = makeTerm <$> symbol Grammar.JsxSelfClosingElement <*> children (TypeScript.Syntax.JsxSelfClosingElement <$> term jsxElementName <*> manyTerm jsxAttribute')
-
-jsxAttribute' :: Assignment Term
-jsxAttribute' = jsxAttribute <|> jsxExpression'
-
-jsxOpeningElement' :: Assignment Term
-jsxOpeningElement' = makeTerm <$> symbol Grammar.JsxOpeningElement <*> children (TypeScript.Syntax.JsxOpeningElement <$> term jsxElementName <*> manyTerm jsxAttribute')
-
-jsxElementName :: Assignment Term
-jsxElementName = choice [ identifier, nestedIdentifier, jsxNamespaceName ]
-
-jsxNamespaceName :: Assignment Term
-jsxNamespaceName = makeTerm <$> symbol Grammar.JsxNamespaceName <*> children (TypeScript.Syntax.JsxNamespaceName <$> identifier <*> identifier)
-
-jsxExpression' :: Assignment Term
-jsxExpression' = makeTerm <$> symbol Grammar.JsxExpression <*> children (TypeScript.Syntax.JsxExpression <$> term (expressions <|> spreadElement <|> emptyTerm))
-
-jsxText :: Assignment Term
-jsxText = makeTerm <$> symbol Grammar.JsxText <*> (TypeScript.Syntax.JsxText <$> source)
-
-jsxClosingElement' :: Assignment Term
-jsxClosingElement' = makeTerm <$> symbol Grammar.JsxClosingElement <*> children (TypeScript.Syntax.JsxClosingElement <$> term jsxElementName)
-
-jsxAttribute :: Assignment Term
-jsxAttribute = makeTerm <$> symbol Grammar.JsxAttribute <*> children (TypeScript.Syntax.JsxAttribute <$> term (propertyIdentifier <|> jsxNamespaceName) <*> (term jsxAttributeValue <|> emptyTerm))
-  where jsxAttributeValue = choice [ string, jsxExpression', jsxElement', jsxFragment ]
 
 propertyIdentifier :: Assignment Term
 propertyIdentifier = makeTerm <$> symbol PropertyIdentifier <*> (Syntax.Identifier . name <$> source)
@@ -754,7 +703,7 @@ importStatement =   makeImportTerm <$> symbol Grammar.ImportStatement <*> childr
     makeImportTerm loc ([x], from) = makeImportTerm1 loc from x
     makeImportTerm loc (xs, from) = makeTerm loc $ fmap (makeImportTerm1 loc from) xs
     importSymbol = symbol Grammar.ImportSpecifier *> children (makeNameAliasPair <$> rawIdentifier <*> ((Just <$> rawIdentifier) <|> pure Nothing))
-    rawIdentifier = (symbol Identifier <|> symbol Identifier' <|> symbol Identifier'') *> (name <$> source)
+    rawIdentifier = symbol Identifier *> (name <$> source)
     makeNameAliasPair from (Just alias) = (from, alias)
     makeNameAliasPair from Nothing = (from, from)
 
@@ -813,7 +762,7 @@ exportStatement = makeTerm <$> symbol Grammar.ExportStatement <*> children (flip
                  <|> symbol Grammar.ExportSpecifier *> children (makeNameAliasPair <$> rawIdentifier <*> pure Nothing)
     makeNameAliasPair from (Just alias) = TypeScript.Syntax.Alias from alias
     makeNameAliasPair from Nothing = TypeScript.Syntax.Alias from from
-    rawIdentifier = (symbol Identifier <|> symbol Identifier' <|> symbol Identifier'') *> (name <$> source)
+    rawIdentifier = symbol Identifier *> (name <$> source)
     -- TODO: Need to validate that inline comments are still handled with this change in assigning to Path and not a Term.
     fromClause = symbol Grammar.String *> (TypeScript.Resolution.importPath <$> source)
 
@@ -889,7 +838,7 @@ variableDeclarator =
   where
     makeVarDecl loc (subject, annotations, value) = makeTerm loc (Statement.Assignment [annotations] subject value)
 
-    requireCall = symbol CallExpression *> children ((symbol Identifier <|> symbol Identifier' <|> symbol Identifier'') *> do
+    requireCall = symbol CallExpression *> children (symbol Identifier *> do
       s <- source
       guard (s == "require")
       symbol Arguments *> children (symbol Grammar.String *> (TypeScript.Resolution.importPath <$> source))
