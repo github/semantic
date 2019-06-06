@@ -58,7 +58,7 @@ entryParser = AP.choice [entrySuccessParser, entryDefaultParser]
 -- in order to consume invalid input
 entryDefaultParser :: Parser TreeEntry
 entryDefaultParser = do
-  _ <- AP.takeWhile (/= '\NUL') 
+  _ <- AP.takeWhile (/= '\NUL')
   pure $ nullTreeEntry
 
 -- | Attoparsec parser for a single line of git ls-tree -rz output
