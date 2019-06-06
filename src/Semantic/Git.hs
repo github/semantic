@@ -11,10 +11,12 @@ module Semantic.Git
   , OID(..)
   ) where
 
-import Control.Monad.IO.Class
-import Data.Text as Text
-import Shelly hiding (FilePath)
-import System.IO (hSetBinaryMode)
+import           Control.Monad.IO.Class
+import           Data.Char (isSpace)
+import qualified Data.Attoparsec.Text as Parser
+import           Data.Text as Text
+import           Shelly hiding (FilePath)
+import           System.IO (hSetBinaryMode)
 
 -- | git clone --bare
 clone :: Text -> FilePath -> IO ()
@@ -30,12 +32,25 @@ catFile gitDir (OID oid) = sh $ do
 lsTree :: FilePath -> OID -> IO [TreeEntry]
 lsTree gitDir (OID sha) = sh $ do
   out <- run "git" [pack ("--git-dir=" <> gitDir), "ls-tree", "-rz", sha]
-  pure $ mkEntry <$> splitOn "\NUL" out
-  where
-    mkEntry row | [mode, ty, rest] <- splitOn " " row
-                , [oid, path] <- splitOn "\t" rest
-                = TreeEntry (objectMode mode) (objectType ty) (OID oid) (unpack path)
-                | otherwise = nullTreeEntry
+  pure $ either mempty id (Parser.parseOnly treeEntriesParser out)
+
+
+treeEntryParser :: Parser.Parser TreeEntry
+treeEntryParser = do
+  mode <- Parser.takeTill isSpace
+  Parser.skipSpace
+  ty <- Parser.takeTill isSpace
+  Parser.skipSpace
+  oid <- Parser.takeTill (== '\t')
+  _ <- Parser.char '\t'
+  Parser.skipSpace
+  path <- Parser.takeTill (== '\NUL')
+  pure $ TreeEntry (objectMode mode) (objectType ty) (OID oid) (Text.unpack path)
+
+
+treeEntriesParser :: Parser.Parser [TreeEntry]
+treeEntriesParser =  Parser.sepBy treeEntryParser (Parser.char '\NUL')
+
 
 sh :: MonadIO m => Sh a -> m a
 sh = shelly . silently . onCommandHandles (initOutputHandles (`hSetBinaryMode` True))
