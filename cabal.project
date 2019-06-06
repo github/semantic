@@ -3,7 +3,7 @@ packages: vendor/* vendor/haskell-tree-sitter/languages/* . semantic-core
 source-repository-package
   type: git
   location: https://github.com/joshvera/proto3-suite.git
-  tag: e13c7099789867733f42f47a25349a826937d870
+  tag: 83f3352f0c7c94ea091e6087f60692eda9991fae
 
 source-repository-package
   type: git
