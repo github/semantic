@@ -41,7 +41,7 @@ common haskell
 -- as caret-operator bounds relative to a version in Stackage.
 -- These are currently pinned to lts-13.13.
 common dependencies
-  build-depends:       base >= 4.8 && < 5
+  build-depends:       base >= 4.12 && < 5
                      , aeson ^>= 1.4.2.0
                      , algebraic-graphs ^>= 0.3
                      , async ^>= 2.2.1
@@ -273,7 +273,7 @@ library
                      -- Custom Prelude
                      , Prologue
 
-  build-depends:       base >= 4.8 && < 5
+  build-depends:       base >= 4.12 && < 5
                      , ansi-terminal ^>= 0.8.2
                      , array ^>= 0.5.3.0
                      , attoparsec ^>= 0.13.2.2
