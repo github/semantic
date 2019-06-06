@@ -8,18 +8,16 @@
       (Assignment
         (Identifier)
         (Boolean))))
-  (Statements
-    (Let
-      (Empty)
-      (Call
-        (MemberAccess
-          (Identifier)
-          (Identifier))
+  (Let
+    (Empty)
+    (Call
+      (MemberAccess
         (Identifier)
-        (TextElement)
-        (Identifier)
-        (Empty))
-      (Statements))
+        (Identifier))
+      (Identifier)
+      (TextElement)
+      (Identifier)
+      (Empty))
     (Let
       (Empty)
       (Call

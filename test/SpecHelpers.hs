@@ -97,8 +97,11 @@ diffFilePaths :: TaskSession -> Both FilePath -> IO ByteString
 diffFilePaths session paths = readFilePathPair paths >>= runTask session . parseDiffBuilder @[] DiffSExpression . pure >>= either (die . displayException) (pure . runBuilder)
 
 -- | Returns an s-expression parse tree for the specified FilePath.
-parseFilePath :: TaskSession -> FilePath -> IO ByteString
-parseFilePath session path = (fromJust <$> readBlobFromFile (fileForPath path)) >>= runTask session . parseTermBuilder @[] TermSExpression . pure >>= either (die . displayException) (pure . runBuilder)
+parseFilePath :: TaskSession -> FilePath -> IO (Either SomeException ByteString)
+parseFilePath session path = do
+  blob <- readBlobFromFile (fileForPath path)
+  res <- runTask session $ parseTermBuilder TermSExpression (toList blob)
+  pure (runBuilder <$> res)
 
 -- | Read two files to a BlobPair.
 readFilePathPair :: Both FilePath -> IO BlobPair

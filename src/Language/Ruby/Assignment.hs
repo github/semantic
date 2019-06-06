@@ -266,7 +266,7 @@ literal =
       (children (inject . Literal.String <$> some (interpolation <|> escapeSequence)) <|> inject . Literal.TextElement <$> source)
 
     symbol' :: Assignment Term
-    symbol' = makeTerm' <$> (symbol Symbol <|> symbol Symbol' <|> symbol Symbol'' <|> symbol BareSymbol) <*>
+    symbol' = makeTerm' <$> (symbol Symbol <|> symbol Symbol' <|> symbol BareSymbol) <*>
       (children (inject . Literal.Symbol <$> some interpolation) <|> inject . Literal.SymbolElement <$> source)
 
 interpolation :: Assignment Term
@@ -517,7 +517,7 @@ binary = makeTerm' <$> symbol Binary <*> children (infixTerm expression expressi
   , (inject .) . Expression.Minus             <$ (symbol AnonMinus <|> symbol AnonMinus' <|> symbol AnonMinus'')
   , (inject .) . Expression.Times             <$ (symbol AnonStar <|> symbol AnonStar')
   , (inject .) . Expression.Power             <$ symbol AnonStarStar
-  , (inject .) . Expression.DividedBy         <$ (symbol AnonSlash <|> symbol AnonSlash' <|> symbol AnonSlash'')
+  , (inject .) . Expression.DividedBy         <$ (symbol AnonSlash <|> symbol AnonSlash')
   , (inject .) . Expression.Modulo            <$ symbol AnonPercent
   , (inject .) . Expression.And               <$ symbol AnonAmpersandAmpersand
   , (inject .) . Ruby.Syntax.LowPrecedenceAnd <$ symbol AnonAnd

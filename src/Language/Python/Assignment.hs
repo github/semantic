@@ -136,6 +136,7 @@ expressionChoices =
   , assignment'
   , await
   , binaryOperator
+  , block
   , boolean
   , booleanOperator
   , breakStatement
@@ -198,6 +199,12 @@ expressionChoices =
 expressions :: Assignment Term
 expressions = makeTerm'' <$> location <*> manyTerm expression
 
+block :: Assignment Term
+block = symbol Block *> children (makeTerm'' <$> location <*> manyTerm expression)
+
+block' :: Assignment Term
+block' = symbol Block *> children (makeTerm <$> location <*> manyTerm expression)
+
 expressionStatement :: Assignment Term
 expressionStatement = makeTerm'' <$> symbol ExpressionStatement <*> children (someTerm expression)
 
@@ -233,31 +240,28 @@ argumentList :: Assignment Term
 argumentList = symbol ArgumentList *> children expressions
 
 withStatement :: Assignment Term
-withStatement = mk <$> symbol WithStatement <*> children (someTerm with)
+withStatement = symbol WithStatement *> children (flip (foldr make) <$> some withItem <*> term block')
   where
-    mk _ [child] = child
-    mk l children = makeTerm l children
-    with = makeTerm <$> location <*> (withItem <*> term (makeTerm <$> location <*> manyTermsTill expression (void (symbol WithItem) <|> eof)))
-    withItem = symbol WithItem *> children (flip Statement.Let <$> term expression <*> term (expression <|> emptyTerm))
-            <|> flip Statement.Let <$> term expression <*> emptyTerm
+    make (val, name) = makeTerm1 . Statement.Let name val
+    withItem = symbol WithItem *> children ((,) <$> term expression <*> term (expression <|> emptyTerm))
 
 forStatement :: Assignment Term
-forStatement = symbol ForStatement >>= \ loc -> children (make loc <$> (symbol Variables *> children expressions) <*> term expressionList <*> (makeTerm <$> location <*> manyTermsTill expression (void (symbol ElseClause) <|> eof)) <*> optional (symbol ElseClause *> children expressions))
+forStatement = symbol ForStatement >>= \ loc -> children (make loc <$> (symbol Variables *> children expressions) <*> term expressionList <*> term block' <*> optional (symbol ElseClause *> children expressions))
   where
     make loc binding subject body forElseClause = case forElseClause of
       Nothing -> makeTerm loc (Statement.ForEach binding subject body)
       Just a -> makeTerm loc (Statement.Else (makeTerm loc $ Statement.ForEach binding subject body) a)
 
 whileStatement :: Assignment Term
-whileStatement = symbol WhileStatement >>= \ loc -> children (make loc <$> term expression <*> (makeTerm <$> location <*> manyTermsTill expression (void (symbol ElseClause) <|> eof)) <*> optional (symbol ElseClause *> children expressions))
+whileStatement = symbol WhileStatement >>= \ loc -> children (make loc <$> term expression <*> term block <*> optional (symbol ElseClause *> children expressions))
   where
     make loc whileCondition whileBody whileElseClause = case whileElseClause of
       Nothing -> makeTerm loc (Statement.While whileCondition whileBody)
       Just a -> makeTerm loc (Statement.Else (makeTerm loc $ Statement.While whileCondition whileBody) a)
 
 tryStatement :: Assignment Term
-tryStatement = makeTerm <$> symbol TryStatement <*> children (Statement.Try <$> term expression <*> manyTerm (expression <|> elseClause))
-  where elseClause = makeTerm <$> symbol ElseClause <*> children (Statement.Else <$> emptyTerm <*> expressions)
+tryStatement = makeTerm <$> symbol TryStatement <*> children (Statement.Try <$> term block <*> manyTerm (expression <|> elseClause))
+  where elseClause = makeTerm <$> symbol ElseClause <*> children (Statement.Else <$> emptyTerm <*> term block)
 
 exceptClause :: Assignment Term
 exceptClause = makeTerm <$> symbol ExceptClause <*> children
@@ -275,7 +279,7 @@ functionParam = (makeParameter <$> location <*> identifier)
 
 functionDefinition :: Assignment Term
 functionDefinition =
-      makeFunctionDeclaration <$> symbol FunctionDefinition <*> children ((,,,) <$> term expression <* symbol Parameters <*> children (manyTerm functionParam) <*> optional (symbol Type *> children (term expression)) <*> expressions')
+      makeFunctionDeclaration <$> symbol FunctionDefinition <*> children ((,,,) <$> term expression <* symbol Parameters <*> children (manyTerm functionParam) <*> optional (symbol Type *> children (term expression)) <*> term block')
   <|> makeFunctionDeclaration <$> (symbol Lambda' <|> symbol Lambda) <*> children ((,,,) <$ token AnonLambda <*> emptyTerm <*> (symbol LambdaParameters *> children (manyTerm expression) <|> pure []) <*> optional (symbol Type *> children (term expression)) <*> expressions')
   where
     expressions' = makeTerm <$> location <*> manyTerm expression
@@ -284,9 +288,8 @@ functionDefinition =
         in maybe fn (makeTerm loc . Type.Annotation fn) ty
 
 classDefinition :: Assignment Term
-classDefinition = makeTerm <$> symbol ClassDefinition <*> children (Declaration.Class [] <$> term expression <*> argumentList <*> expressions')
+classDefinition = makeTerm <$> symbol ClassDefinition <*> children (Declaration.Class [] <$> term expression <*> argumentList <*> term block')
   where
-    expressions' = makeTerm <$> location <*> manyTerm expression
     argumentList = symbol ArgumentList *> children (manyTerm expression)
                     <|> pure []
 
@@ -466,8 +469,8 @@ ifStatement :: Assignment Term
 ifStatement = makeTerm <$> symbol IfStatement <*> children if'
   where
     if' = Statement.If <$> term expression <*> thenClause <*> (elseClause <|> emptyTerm)
-    thenClause = makeTerm <$> location <*> manyTermsTill expression (void (symbol ElseClause) <|> void (symbol ElifClause) <|> eof)
-    elseClause = makeTerm <$> location <*> many (comment <|> elif <|> else')
+    thenClause = makeTerm'' <$> location <*> manyTermsTill expression (void (symbol ElseClause) <|> void (symbol ElifClause) <|> eof)
+    elseClause = makeTerm'' <$> location <*> many (comment <|> elif <|> else')
     elif = makeTerm <$> symbol ElifClause <*> children if'
     else' = symbol ElseClause *> children expressions
 
