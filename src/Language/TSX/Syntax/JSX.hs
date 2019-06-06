@@ -4,14 +4,11 @@ module Language.TSX.Syntax.JSX where
 
 import Prologue
 
-import           Control.Abstract as Abstract
 import           Data.Abstract.Evaluatable
-import           Data.Abstract.ScopeGraph (AccessControl(..))
 import           Data.JSON.Fields
 import qualified Data.Text as T
 import           Diffing.Algorithm
-import qualified Data.Map.Strict as Map
-import qualified Data.Abstract.ScopeGraph as ScopeGraph
+
 
 data JsxElement a = JsxElement { jsxOpeningElement :: !a,  jsxElements :: ![a], jsxClosingElement :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, Ord, Show, ToJSONFields1, Traversable)
