@@ -35,7 +35,7 @@ library
   -- other-modules:
   -- other-extensions:
   build-depends:       algebraic-graphs            ^>= 0.3
-                     , base                         >= 4.11 && < 5
+                     , base                         >= 4.12 && < 5
                      , containers                  ^>= 0.6
                      , directory                   ^>= 1.3
                      , filepath                    ^>= 1.4

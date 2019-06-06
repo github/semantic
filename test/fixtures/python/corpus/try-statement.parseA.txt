@@ -1,12 +1,14 @@
 (Statements
   (Try
-    (Identifier)
-    (Identifier)
+    (Statements
+      (Identifier)
+      (Identifier))
     (Catch
       (Statements
         (Identifier)
-        (Identifier)
-        (Identifier))
+        (Statements
+          (Identifier)
+          (Identifier)))
       (Statements))
     (Catch
       (Let
@@ -20,8 +22,9 @@
       (Statements
         (Identifier)
         (Identifier)
-        (Identifier)
-        (Identifier))
+        (Statements
+          (Identifier)
+          (Identifier)))
       (Statements))
     (Catch
       (Statements
@@ -29,8 +32,9 @@
         (Identifier))
       (Statements)))
   (Try
-    (Identifier)
-    (Identifier)
+    (Statements
+      (Identifier)
+      (Identifier))
     (Finally
       (Statements
         (Identifier)

@@ -1,3 +1,16 @@
-packages: vendor/* vendor/proto3-suite vendor/haskell-tree-sitter/languages/* semantic.cabal semantic-core/semantic-core.cabal
+packages: vendor/* vendor/haskell-tree-sitter/languages/* . semantic-core
 
-package proto3-suite
+source-repository-package
+  type: git
+  location: https://github.com/joshvera/proto3-suite.git
+  tag: 83f3352f0c7c94ea091e6087f60692eda9991fae
+
+source-repository-package
+  type: git
+  location: https://github.com/joshvera/proto3-wire.git
+  tag: 84664e22f01beb67870368f1f88ada5d0ad01f56
+
+source-repository-package
+  type: git
+  location: https://github.com/rewinfrey/hspec-expectations-pretty-diff
+  tag: 94af5871c24ba319f7f72fefa53c1a4d074c9a29
