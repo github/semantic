@@ -83,7 +83,8 @@ languages :: [LanguageExample]
 languages =
   [ le "python" ".py" "examples" (Just "script/known_failures.txt")
   , le "ruby" ".rb" "examples" (Just "script/known_failures.txt")
-  , le "typescript" ".ts" "examples" (Just "script/known_failures.txt")
+  , le "typescript" ".ts" "examples" (Just "typescript/script/known_failures.txt")
+  , le "typescript" ".tsx" "examples" (Just "typescript/script/known_failures.txt")
   , le "typescript" ".js" "examples" Nothing -- parse JavaScript with TypeScript parser.
   , le "go" ".go" "examples" (Just "script/known-failures.txt")
 

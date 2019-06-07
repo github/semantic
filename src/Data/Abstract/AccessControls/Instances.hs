@@ -22,6 +22,7 @@ import qualified Language.Markdown.Syntax as Markdown
 import qualified Language.PHP.Syntax as PHP
 import qualified Language.Python.Syntax as Python
 import qualified Language.Ruby.Syntax as Ruby
+import qualified Language.TSX.Syntax as TSX
 import qualified Language.TypeScript.Syntax as TypeScript
 import Data.Quieterm
 
@@ -454,25 +455,26 @@ instance AccessControls1 Ruby.LowPrecedenceOr
 instance AccessControls1 Ruby.Module
 instance AccessControls1 Ruby.ZSuper
 
+instance AccessControls1 TSX.JsxElement
+instance AccessControls1 TSX.JsxOpeningElement
+instance AccessControls1 TSX.JsxSelfClosingElement
+instance AccessControls1 TSX.JsxAttribute
+instance AccessControls1 TSX.JsxNamespaceName
+instance AccessControls1 TSX.JsxText
+instance AccessControls1 TSX.JsxExpression
+instance AccessControls1 TSX.JsxClosingElement
+instance AccessControls1 TSX.JsxFragment
+
 instance AccessControls1 TypeScript.AnnotatedExpression
 instance AccessControls1 TypeScript.JavaScriptRequire
 instance AccessControls1 TypeScript.Debugger
 instance AccessControls1 TypeScript.Super
 instance AccessControls1 TypeScript.Undefined
 instance AccessControls1 TypeScript.With
-instance AccessControls1 TypeScript.JsxElement
-instance AccessControls1 TypeScript.JsxOpeningElement
-instance AccessControls1 TypeScript.JsxSelfClosingElement
-instance AccessControls1 TypeScript.JsxAttribute
 instance AccessControls1 TypeScript.OptionalParameter
 instance AccessControls1 TypeScript.RequiredParameter
 instance AccessControls1 TypeScript.RestParameter
-instance AccessControls1 TypeScript.JsxNamespaceName
-instance AccessControls1 TypeScript.JsxText
-instance AccessControls1 TypeScript.JsxExpression
-instance AccessControls1 TypeScript.JsxClosingElement
 instance AccessControls1 TypeScript.ImplementsClause
-instance AccessControls1 TypeScript.JsxFragment
 instance AccessControls1 TypeScript.Import
 instance AccessControls1 TypeScript.QualifiedAliasedImport
 instance AccessControls1 TypeScript.QualifiedExportFrom
