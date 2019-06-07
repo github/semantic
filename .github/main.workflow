@@ -1,10 +1,11 @@
 workflow "Build and publish to GitHub Package Registry" {
-  on = "push"
   resolves = [
     "Docker Registry",
     "Docker Build",
     "GitHub Action for Docker",
+    "Master Only",
   ]
+  on = "push"
 }
 
 action "Docker Registry" {
@@ -14,8 +15,8 @@ action "Docker Registry" {
 }
 
 action "Docker Build" {
-  uses = "actions/docker/cli@8cdf801b322af5f369e00d85e9cf3a7122f49108"
-  args = "build -t github/semantic ."
+  uses = "./"
+  args = "--version"
 }
 
 action "Docker Tag" {
@@ -28,4 +29,9 @@ action "GitHub Action for Docker" {
   uses = "actions/docker/cli@8cdf801b322af5f369e00d85e9cf3a7122f49108"
   needs = ["Docker Tag"]
   args = "docker push docker.pkg.github.com/github/semantic"
+}
+
+action "Master Only" {
+  uses = "actions/bin/filter@3c0b4f0e63ea54ea5df2914b4fabf383368cd0da"
+  args = "branch master"
 }
