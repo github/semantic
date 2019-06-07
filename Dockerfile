@@ -18,7 +18,7 @@ RUN cabal new-update
 RUN cabal new-build
 
 # A fake `install` target until we can get `cabal new-install` to work
-RUN cp $(find dist-newstyle -name semantic -type f -perm -u=x) /usr/local/bin/semantic
+RUN cp $(find dist-newstyle/build/x86_64-linux -name semantic -type f -perm -u=x) /usr/local/bin/semantic
 
 # Create a fresh image containing only the compiled CLI program, so that the
 # image isn't bulked up by all of the extra build state.
