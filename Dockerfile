@@ -14,6 +14,7 @@ WORKDIR /build
 # Once the dependencies are built, copy in the rest of the code and compile
 # semantic itself.
 COPY . .
+RUN git submodule sync --recursive && git submodule update --init --recursive --force
 RUN cabal new-update
 RUN cabal new-build
 
