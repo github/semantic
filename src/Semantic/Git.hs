@@ -43,8 +43,8 @@ sh = shelly . silently . onCommandHandles (initOutputHandles (`hSetBinaryMode` T
 parseEntries :: Text -> [TreeEntry]
 parseEntries text = case parseOnly everything text of
   Done "" ls -> ls
-  other -> error ("There was an error parsing the Git output: " <> show other)
-  where 
+  other      -> error ("There was an error parsing the Git output: " <> show other)
+  where
     everything = AP.sepBy entryParser "\NUL" <* ("\NUL\n" <?> "End sequence") <* AP.endOfInput <?> "Everything"
     parseOnly p t = AP.feed (AP.parse p t) ""
 
