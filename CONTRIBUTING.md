@@ -28,6 +28,8 @@ Here are a few things you can do that will increase the likelihood of your pull 
 - Keep your change as focused as possible. If there are multiple changes you would like to make that are not dependent upon each other, consider submitting them as separate pull requests.
 - Write a [good commit message](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html).
 
+Please be aware that contributions to Semantic may be sent through multiple periods of review—we are grateful for all community involvement, but because Semantic powers real systems, we must maintain a high standard of code quality. For reasons of compatibility with production Semantic uses within GitHub, we may also reject or require modifications to changes that would affect these systems. We may also reject patches that don't fit with our vision of the project; should this be the case, we encourage you to fork this S, as a healthy fork ecosystem is a sign of a robust community with varying requirements.
+
 ## Resources
 
 - [How to Contribute to Open Source](https://opensource.guide/how-to-contribute/)
