@@ -1,18 +1,22 @@
 # Development Guide
 
-`semantic` is built using the [`stack`](https://github.com/commercialhaskell/stack) build system and the [ghc](https://www.haskell.org/ghc/) compiler. It’s packaged using [Cabal](https://www.haskell.org/cabal/), and uses dependencies from [Hackage](http://hackage.haskell.org/).
+`semantic` is compiled with the [ghc](https://www.haskell.org/ghc/) compiler and built/packaged with [`cabal`](https://cabal.readthedocs.io/en/latest/). It uses Cabal's [Nix-style local builds](https://www.haskell.org/cabal/users-guide/nix-local-build-overview.html) and uses dependencies from [Hackage](http://hackage.haskell.org/). We recommend using [`ghcup`](https://www.haskell.org/ghcup/) to sandbox your installation of GHC.
 
 | Tool | Explanation |
 | :-------------: |-------------|
 | [`ghc`](https://www.haskell.org/ghc/) | The Glasgow Haskell Compiler is the open source compiler and interactive environment for the Haskell programming language. |
 | [`cabal`](https://www.haskell.org/cabal/) | Cabal is a system for building and packaging Haskell libraries and programs. It is similar to having `make` files instead of having to type several complicated calls to `ghc` to compile and link a project. |
-| [`stack`](https://docs.haskellstack.org/en/stable/README/) | Stack is used to develop Haskell projects. It is a layer on top of `cabal` and `ghc` that aims to make it much easier to build cross-platform Haskell projects. It lets us use different versions of `ghc` and has snapshots of packages that are known to work together. It defers to `cabal` for much of its work. Historically, we used `cabal` directly, but ran into a variety of tooling issues that [brought us back to stack](https://github.com/github/semantic/pull/1335). Officially, `stack` uses [stackage](https://www.stackage.org/) as its package archive, and `cabal-install` uses hackage. |
 | [`hackage`](https://hackage.haskell.org/) | Hackage is the most widely used package archive of open source libraries and programs. `cabal-install` is used to download and install packages. |
+| [`ghcup`](https://www.haskell.org/ghcup/) | `ghcup` takes care of managing different versions of GHC on your system. We aggressively track new versions of GHC; sandboxing makes upgrading to new versions safe and easy. |
 | [`ghci`](https://downloads.haskell.org/~ghc/5.04/docs/html/users_guide/ghci.html) | `ghci` is GHC's interactive environment. This is where Haskell expressions can be interactively evaluated and programs can be interpreted. |
+
+### Nix-style local builds
+
+`semantic` is a complicated app with a very large dependency tree. Because managing large dependency trees in a system-wide `ghc` installation is difficult, especially when developing on multiple Haskell projects, `cabal` enables "local" builds: each dependency is linked in per-project, not globally. In practice, this means that you should prefix your commands with the `new-` prefix: `cabal new-build` builds the project, `new-clean` purges its build artifacts, etc. (With versions of the `cabal` command line tool newer than 2.6, local builds become the default, with the `v1-` prefix required to yield old behavior.)
 
 ### Running a REPL
 
-Running `stack ghci semantic` will boot a GHCi with the right environment for Semantic set up.
+Running `cabal new-repl semantic:lib` will boot a GHCi with the right environment for Semantic set up.
 
 See the [💡ProTips](💡ProTip!.md#ghci) for more info.
 
