@@ -26,20 +26,20 @@ spec = parallel $ do
       output <- fmap runBuilder . runTaskOrDie $ parseTermBuilder TermSExpression [methodsBlob]
       output `shouldBe` "(Statements\n  (Method\n    (Empty)\n    (Identifier)\n    (Statements)))\n"
 
-  describe "gitParsing" $ do
+  describe "git ls-tree parsing" $ do
     it "parses a git output string" $ do
-      let input = "100644 tree ThisIsTheOid\t/this/is/the/path"
-      let expected = TreeEntry NormalMode TreeObject (OID "ThisIsTheOid") "/this/is/the/path"
+      let input = "100644 tree abcdef\t/this/is/the/path"
+      let expected = TreeEntry NormalMode TreeObject (OID "abcdef") "/this/is/the/path"
       parseEntry input `shouldBe` expected
 
-    it "parses nonsense into a default value" $ do
-      let input = "iel jgh\nf2 8i4p\r8f2y4fpoxin u3y2 unz"
-      let expected = TreeEntry OtherMode OtherObjectType (OID mempty) mempty
+    it "allows whitespace in the path" $ do
+      let input = "100644 tree 12345\t/this\n/is\t/the /path\r"
+      let expected = TreeEntry NormalMode TreeObject (OID "12345") "/this\n/is\t/the /path\r"
       parseEntry input `shouldBe` expected
 
     it "parses many outputs separated by \\NUL" $ do
-      let input = "100644 tree ThisIsTheOid\t/this/is/the/path\NULiel jgh\nf2 8i4p\r8f2y4fpoxin u3y2 unz\NUL120000 blob 17776\t/dev/urandom"
-      let expected = [ TreeEntry NormalMode TreeObject (OID "ThisIsTheOid") "/this/is/the/path", TreeEntry OtherMode OtherObjectType (OID mempty) mempty, TreeEntry SymlinkMode BlobObject (OID "17776") "/dev/urandom"]
+      let input = "100644 tree abcdef\t/this/is/the/path\NUL120000 blob 17776\t/dev/urandom\NUL\n"
+      let expected = [ TreeEntry NormalMode TreeObject (OID "abcdef") "/this/is/the/path", TreeEntry SymlinkMode BlobObject (OID "17776") "/dev/urandom"]
       parseEntries input `shouldBe` expected
 
   where

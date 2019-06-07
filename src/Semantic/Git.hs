@@ -30,50 +30,39 @@ clone url path = sh $ do
 -- | git cat-file -p
 catFile :: FilePath -> OID -> IO Text
 catFile gitDir (OID oid) = sh $ do
-  run "git" [pack ("--git-dir=" <> gitDir), "cat-file", "-p", oid]
+  run "git" ["-C", pack gitDir, "cat-file", "-p", oid]
 
 -- | git ls-tree -rz
 lsTree :: FilePath -> OID -> IO [TreeEntry]
-lsTree gitDir (OID sha) = sh $ do
-  out <- run "git" [pack ("--git-dir=" <> gitDir), "ls-tree", "-rz", sha]
-  pure $ parseEntries out
+lsTree gitDir (OID sha) = sh $ parseEntries <$> run "git" ["-C", pack gitDir, "ls-tree", "-rz", sha]
 
 sh :: MonadIO m => Sh a -> m a
 sh = shelly . silently . onCommandHandles (initOutputHandles (`hSetBinaryMode` True))
 
 -- | Parses an list of entries separated by \NUL, and on failure return []
 parseEntries :: Text -> [TreeEntry]
-parseEntries = either (const []) id . AP.parseOnly (AP.sepBy entryParser (AP.char '\NUL'))
+parseEntries text = case parseOnly everything text of
+  Done "" ls -> ls
+  other -> error ("There was an error parsing the Git output: " <> show other)
+  where 
+    everything = AP.sepBy entryParser "\NUL" <* ("\NUL\n" <?> "End sequence") <* AP.endOfInput <?> "Everything"
+    parseOnly p t = AP.feed (AP.parse p t) ""
 
 -- | Parse the entire input with entryParser, and on failure return a default
 -- For testing purposes only
 parseEntry :: Text -> TreeEntry
-parseEntry = either (const nullTreeEntry) id . AP.parseOnly entryParser
+parseEntry = either (const nullTreeEntry) id . AP.parseOnly (entryParser <* AP.endOfInput)
 
--- | Parses an entry successfully, falling back to the failure case if necessary.
+-- | Parses a TreeEntry
 entryParser :: Parser TreeEntry
-entryParser = AP.choice [entrySuccessParser, entryDefaultParser]
-
--- | Attoparsec parser for a block af text ending with \NUL
--- in order to consume invalid input
-entryDefaultParser :: Parser TreeEntry
-entryDefaultParser = do
-  _ <- AP.takeWhile (/= '\NUL')
-  pure $ nullTreeEntry
-
--- | Attoparsec parser for a single line of git ls-tree -rz output
-entrySuccessParser :: Parser TreeEntry
-entrySuccessParser = do
-  mode <- takeWhileToNul (/= ' ')
-  _ <- AP.char ' '
-  ty <- takeWhileToNul (/= ' ')
-  _ <- AP.char ' '
-  oid <- takeWhileToNul (/= '\t')
-  _ <- AP.char '\t'
-  path <- takeWhileToNul (const True)
-  pure $ TreeEntry (objectMode mode) (objectType ty) (OID oid) (unpack path)
+entryParser = TreeEntry
+  <$> modeParser <* (" " <?> "First Space")
+  <*> typeParser <* (" " <?> "Second Space")
+  <*> (OID <$> AP.takeWhile (AP.inClass "0123456789abcdef") <?> "OID Parser") <* ("\t" <?> "Tab")
+  <*> (unpack <$> AP.takeWhile (/= '\NUL') <?> "Filepath") <?> "Entry Parser"
     where
-      takeWhileToNul f = AP.takeWhile (\x -> f x && x /= '\NUL')
+      typeParser = AP.choice [BlobObject <$ "blob", TreeObject <$ "tree"] <?> "Type Parser"
+      modeParser = AP.choice [NormalMode <$ "100644", ExecutableMode <$ "100755", SymlinkMode <$ "120000", TreeMode <$ "040000"] <?> "Mode Parser"
 
 newtype OID = OID Text
   deriving (Eq, Show, Ord)
@@ -86,23 +75,11 @@ data ObjectMode
   | OtherMode
   deriving (Eq, Show)
 
-objectMode :: Text -> ObjectMode
-objectMode "100644" = NormalMode
-objectMode "100755" = ExecutableMode
-objectMode "120000" = SymlinkMode
-objectMode "040000" = TreeMode
-objectMode _        = OtherMode
-
 data ObjectType
   = BlobObject
   | TreeObject
   | OtherObjectType
   deriving (Eq, Show)
-
-objectType :: Text -> ObjectType
-objectType "blob" = BlobObject
-objectType "tree" = TreeObject
-objectType _      = OtherObjectType
 
 data TreeEntry
   = TreeEntry
