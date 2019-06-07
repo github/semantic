@@ -10,7 +10,7 @@ import System.FilePath.Posix
 import SpecHelpers
 
 languages :: [FilePath]
-languages = ["go", "javascript", "json", "python", "ruby", "typescript"]
+languages = ["go", "javascript", "json", "python", "ruby", "typescript", "tsx"]
 
 spec :: TaskSession -> Spec
 spec config = parallel $ do
