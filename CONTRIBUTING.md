@@ -19,7 +19,7 @@ Please note that this project is released with a [Contributor Code of Conduct][c
 0. Create a new branch: `git checkout -b my-branch-name`
 0. Make your change, add tests, and make sure the tests still pass
 0. Push to your fork and [submit a pull request][pr]
-0. Pat your self on the back and wait for your pull request to be reviewed and merged.
+0. Pat yourself on the back and wait for your pull request to be reviewed and merged.
 
 Here are a few things you can do that will increase the likelihood of your pull request being accepted:
 
@@ -28,7 +28,7 @@ Here are a few things you can do that will increase the likelihood of your pull 
 - Keep your change as focused as possible. If there are multiple changes you would like to make that are not dependent upon each other, consider submitting them as separate pull requests.
 - Write a [good commit message](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html).
 
-Please be aware that contributions to Semantic may be sent through multiple cycles of code review—we are grateful for all community involvement, but because Semantic powers real systems, we must maintain a high standard of code quality. For reasons of compatibility with production Semantic uses within GitHub, we may also reject or require modifications to changes that would affect these systems. We may also reject patches that don't fit with our vision of the project; should this be the case, we encourage you to start your own fork, as a healthy fork ecosystem is a sign of a robust community with varying requirements.
+Please be aware that contributions to Semantic may multiple cycles of code review—we are grateful for all community involvement, but because Semantic powers real systems, we must maintain a high standard of code quality. For reasons of compatibility with production uses of Semantic within GitHub, we may also reject or require modifications to changes that would affect these systems. We may also reject patches that don't fit with our vision of the project; should this be the case, we will be clear about our rationale.
 
 ## Resources
 
