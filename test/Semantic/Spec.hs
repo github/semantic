@@ -29,12 +29,12 @@ spec = parallel $ do
   describe "git ls-tree parsing" $ do
     it "parses a git output string" $ do
       let input = "100644 tree abcdef\t/this/is/the/path"
-      let expected = TreeEntry NormalMode TreeObject (OID "abcdef") "/this/is/the/path"
+      let expected = Right $ TreeEntry NormalMode TreeObject (OID "abcdef") "/this/is/the/path"
       parseEntry input `shouldBe` expected
 
     it "allows whitespace in the path" $ do
       let input = "100644 tree 12345\t/this\n/is\t/the /path\r"
-      let expected = TreeEntry NormalMode TreeObject (OID "12345") "/this\n/is\t/the /path\r"
+      let expected = Right $ TreeEntry NormalMode TreeObject (OID "12345") "/this\n/is\t/the /path\r"
       parseEntry input `shouldBe` expected
 
     it "parses many outputs separated by \\NUL" $ do

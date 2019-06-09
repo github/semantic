@@ -18,6 +18,7 @@ module Semantic.Git
 import Control.Monad.IO.Class
 import Data.Attoparsec.Text   (Parser)
 import Data.Attoparsec.Text   as AP
+import Data.Char
 import Data.Text              as Text
 import Shelly                 hiding (FilePath)
 import System.IO              (hSetBinaryMode)
@@ -41,28 +42,26 @@ sh = shelly . silently . onCommandHandles (initOutputHandles (`hSetBinaryMode` T
 
 -- | Parses an list of entries separated by \NUL, and on failure return []
 parseEntries :: Text -> [TreeEntry]
-parseEntries text = case parseOnly everything text of
-  Done "" ls -> ls
-  other      -> error ("There was an error parsing the Git output: " <> show other)
+parseEntries = either (const []) id . AP.parseOnly everything
   where
-    everything = AP.sepBy entryParser "\NUL" <* ("\NUL\n" <?> "End sequence") <* AP.endOfInput <?> "Everything"
-    parseOnly p t = AP.feed (AP.parse p t) ""
+    everything = AP.sepBy entryParser "\NUL" <* "\NUL\n" <* AP.endOfInput
 
 -- | Parse the entire input with entryParser, and on failure return a default
 -- For testing purposes only
-parseEntry :: Text -> TreeEntry
-parseEntry = either (const nullTreeEntry) id . AP.parseOnly (entryParser <* AP.endOfInput)
+parseEntry :: Text -> Either String TreeEntry
+parseEntry = AP.parseOnly (entryParser <* AP.endOfInput)
 
 -- | Parses a TreeEntry
 entryParser :: Parser TreeEntry
 entryParser = TreeEntry
-  <$> modeParser <* (" " <?> "First Space")
-  <*> typeParser <* (" " <?> "Second Space")
-  <*> (OID <$> AP.takeWhile (AP.inClass "0123456789abcdef") <?> "OID Parser") <* ("\t" <?> "Tab")
-  <*> (unpack <$> AP.takeWhile (/= '\NUL') <?> "Filepath") <?> "Entry Parser"
+  <$> modeParser <* AP.char ' '
+  <*> typeParser <* AP.char ' '
+  <*> oidParser <* AP.char '\t'
+  <*> (unpack <$> AP.takeWhile (/= '\NUL'))
     where
-      typeParser = AP.choice [BlobObject <$ "blob", TreeObject <$ "tree"] <?> "Type Parser"
-      modeParser = AP.choice [NormalMode <$ "100644", ExecutableMode <$ "100755", SymlinkMode <$ "120000", TreeMode <$ "040000"] <?> "Mode Parser"
+      typeParser = AP.choice [BlobObject <$ "blob", TreeObject <$ "tree"]
+      modeParser = AP.choice [NormalMode <$ "100644", ExecutableMode <$ "100755", SymlinkMode <$ "120000", TreeMode <$ "040000"]
+      oidParser = OID <$> AP.takeWhile isHexDigit
 
 newtype OID = OID Text
   deriving (Eq, Show, Ord)
@@ -89,5 +88,3 @@ data TreeEntry
   , treeEntryPath :: FilePath
   } deriving (Eq, Show)
 
-nullTreeEntry :: TreeEntry
-nullTreeEntry = TreeEntry OtherMode OtherObjectType (OID mempty) mempty
