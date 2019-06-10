@@ -9,12 +9,19 @@ module Semantic.Git
   , ObjectType(..)
   , ObjectMode(..)
   , OID(..)
+
+  -- Testing Purposes
+  , parseEntries
+  , parseEntry
   ) where
 
 import Control.Monad.IO.Class
-import Data.Text as Text
-import Shelly hiding (FilePath)
-import System.IO (hSetBinaryMode)
+import Data.Attoparsec.Text   (Parser)
+import Data.Attoparsec.Text   as AP
+import Data.Char
+import Data.Text              as Text
+import Shelly                 hiding (FilePath)
+import System.IO              (hSetBinaryMode)
 
 -- | git clone --bare
 clone :: Text -> FilePath -> IO ()
@@ -24,21 +31,37 @@ clone url path = sh $ do
 -- | git cat-file -p
 catFile :: FilePath -> OID -> IO Text
 catFile gitDir (OID oid) = sh $ do
-  run "git" [pack ("--git-dir=" <> gitDir), "cat-file", "-p", oid]
+  run "git" ["-C", pack gitDir, "cat-file", "-p", oid]
 
 -- | git ls-tree -rz
 lsTree :: FilePath -> OID -> IO [TreeEntry]
-lsTree gitDir (OID sha) = sh $ do
-  out <- run "git" [pack ("--git-dir=" <> gitDir), "ls-tree", "-rz", sha]
-  pure $ mkEntry <$> splitOn "\NUL" out
-  where
-    mkEntry row | [mode, ty, rest] <- splitOn " " row
-                , [oid, path] <- splitOn "\t" rest
-                = TreeEntry (objectMode mode) (objectType ty) (OID oid) (unpack path)
-                | otherwise = nullTreeEntry
+lsTree gitDir (OID sha) = sh $ parseEntries <$> run "git" ["-C", pack gitDir, "ls-tree", "-rz", sha]
 
 sh :: MonadIO m => Sh a -> m a
 sh = shelly . silently . onCommandHandles (initOutputHandles (`hSetBinaryMode` True))
+
+-- | Parses an list of entries separated by \NUL, and on failure return []
+parseEntries :: Text -> [TreeEntry]
+parseEntries = either (const []) id . AP.parseOnly everything
+  where
+    everything = AP.sepBy entryParser "\NUL" <* "\NUL\n" <* AP.endOfInput
+
+-- | Parse the entire input with entryParser, and on failure return a default
+-- For testing purposes only
+parseEntry :: Text -> Either String TreeEntry
+parseEntry = AP.parseOnly (entryParser <* AP.endOfInput)
+
+-- | Parses a TreeEntry
+entryParser :: Parser TreeEntry
+entryParser = TreeEntry
+  <$> modeParser <* AP.char ' '
+  <*> typeParser <* AP.char ' '
+  <*> oidParser <* AP.char '\t'
+  <*> (unpack <$> AP.takeWhile (/= '\NUL'))
+    where
+      typeParser = AP.choice [BlobObject <$ "blob", TreeObject <$ "tree"]
+      modeParser = AP.choice [NormalMode <$ "100644", ExecutableMode <$ "100755", SymlinkMode <$ "120000", TreeMode <$ "040000"]
+      oidParser = OID <$> AP.takeWhile isHexDigit
 
 newtype OID = OID Text
   deriving (Eq, Show, Ord)
@@ -51,23 +74,11 @@ data ObjectMode
   | OtherMode
   deriving (Eq, Show)
 
-objectMode :: Text -> ObjectMode
-objectMode "100644" = NormalMode
-objectMode "100755" = ExecutableMode
-objectMode "120000" = SymlinkMode
-objectMode "040000" = TreeMode
-objectMode _        = OtherMode
-
 data ObjectType
   = BlobObject
   | TreeObject
   | OtherObjectType
   deriving (Eq, Show)
-
-objectType :: Text -> ObjectType
-objectType "blob" = BlobObject
-objectType "tree" = TreeObject
-objectType _      = OtherObjectType
 
 data TreeEntry
   = TreeEntry
@@ -77,5 +88,3 @@ data TreeEntry
   , treeEntryPath :: FilePath
   } deriving (Eq, Show)
 
-nullTreeEntry :: TreeEntry
-nullTreeEntry = TreeEntry OtherMode OtherObjectType (OID mempty) mempty
