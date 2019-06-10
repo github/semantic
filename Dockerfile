@@ -1,8 +1,14 @@
 FROM haskell:8.6 as build
 WORKDIR /build
 
-RUN cabal new-update
+# Build and cache the dependencies first so we can cache these layers.
+COPY semantic.cabal .
+COPY semantic-core semantic-core
+RUN cabal new-update hackage.haskell.org,HEAD
+RUN cabal new-configure semantic semantic-core
+RUN cabal new-build --only-dependencies
 
+# Copy in and build the entire project
 COPY . .
 RUN cabal new-build --flags="release" semantic:exe:semantic
 
