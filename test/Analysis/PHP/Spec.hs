@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -O0 #-}
 module Analysis.PHP.Spec (spec) where
 
 import           Control.Abstract

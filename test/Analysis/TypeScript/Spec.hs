@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -O0 #-}
+
 module Analysis.TypeScript.Spec (spec) where
 
 import           Data.Syntax.Statement (StatementBlock(..))
