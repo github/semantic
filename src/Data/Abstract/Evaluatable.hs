@@ -163,6 +163,8 @@ instance HasPrelude 'Ruby where
     defineClass (Declaration (X.name "Object")) [] $ do
       defineBuiltIn (Declaration $ X.name "inspect") Default Public Show
 
+instance HasPrelude 'TSX
+
 instance HasPrelude 'TypeScript where
   definePrelude _ = do
     defineSelf

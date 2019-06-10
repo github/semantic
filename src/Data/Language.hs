@@ -36,6 +36,7 @@ data Language
     | Ruby
     | TypeScript
     | PHP
+    | TSX
     deriving (Eq, Generic, Ord, Read, Show, Bounded, Hashable, ToJSON, Named, Enum, MessageField, NFData)
 
 class SLanguage (lang :: Language) where
@@ -129,7 +130,7 @@ languageForType mediaType = case mediaType of
     ".go"   -> Go
     ".js"   -> JavaScript
     ".ts"   -> TypeScript
-    ".tsx"  -> TypeScript
+    ".tsx"  -> TSX
     ".jsx"  -> JSX
     ".py"   -> Python
     ".php"  -> PHP
@@ -144,7 +145,9 @@ extensionsForLanguage language = case language of
   PHP        -> [".php"]
   Python     -> [".py"]
   Ruby       -> [".rb"]
-  TypeScript -> [".ts", ".tsx", ".d.tsx"]
+  TypeScript -> [".ts"]
+  TSX        -> [".tsx", ".d.tsx"]
+  JSX        -> [".jsx"]
   _          -> []
 
 -- | Return a language based on a FilePath's extension, or Nothing if extension is not found or not supported.
