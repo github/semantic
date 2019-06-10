@@ -28,7 +28,7 @@ before_install:
 - cabal --version
 
 install:
-- cabal new-update
+- cabal new-update hackage.haskell.org,HEAD
 - cabal new-configure --enable-tests --write-ghc-environment-files=always
 - cabal new-build --only-dependencies -j
 

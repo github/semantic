@@ -55,7 +55,7 @@ common dependencies
                      , fused-effects ^>= 0.4.0.0
                      , fused-effects-exceptions ^>= 0.1.1.0
                      , hashable ^>= 1.2.7.0
-                     , haskell-tree-sitter
+                     , tree-sitter ^>= 0.1.0.0
                      , machines ^>= 0.6.4
                      , mtl ^>= 2.2.2
                      , network ^>= 2.8.0.0
@@ -304,7 +304,7 @@ library
                      , reducers ^>= 3.12.3
                      , semigroupoids ^>= 5.3.2
                      , servant ^>= 0.15
-                     , shelly
+                     , shelly >= 1.5 && <2
                      , split ^>= 0.2.3.3
                      , stm-chans ^>= 3.0.0.4
                      , template-haskell ^>= 2.14
@@ -312,16 +312,15 @@ library
                      , unliftio-core
                      , unordered-containers ^>= 0.2.9.0
                      , vector ^>= 0.12.0.2
-                     , haskell-tree-sitter
-                     , tree-sitter-go
+                     , tree-sitter-go ^>= 0.1.0.0
                      , tree-sitter-haskell
-                     , tree-sitter-json
-                     , tree-sitter-php
-                     , tree-sitter-python
-                     , tree-sitter-ruby
-                     , tree-sitter-typescript
-                     , tree-sitter-tsx
-                     , tree-sitter-java
+                     , tree-sitter-json ^>= 0.1.0.0
+                     , tree-sitter-php ^>= 0.1.0.0
+                     , tree-sitter-python ^>= 0.1.0.1
+                     , tree-sitter-ruby ^>= 0.1.0.0
+                     , tree-sitter-typescript ^>= 0.1.0.0
+                     , tree-sitter-tsx ^>= 0.1.0.0
+                     , tree-sitter-java ^>= 0.1.0.0
   ghc-options:         -Wall -Wmissing-export-lists -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -fno-warn-name-shadowing -j
   if flag(release)
     ghc-options:       -Werror -O1

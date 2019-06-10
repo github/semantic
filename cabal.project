@@ -1,4 +1,4 @@
-packages: vendor/* vendor/haskell-tree-sitter/languages/* . semantic-core
+packages: . semantic-core
 
 source-repository-package
   type: git
