@@ -1,8 +1,8 @@
 cabal-version:       2.2
 name:                semantic
-version:             0.6.0
-synopsis:            Framework and service for analyzing and diffing untrusted code.
-description:         Please see README.md
+version:             0.6.0.0
+synopsis:            Framework and executable for analyzing and diffing untrusted code.
+description:         Semantic is a library for parsing, analyzing, and comparing source code across many languages.
 homepage:            http://github.com/github/semantic#readme
 author:              The Semantic authors
 maintainer:          opensource+semantic@github.com
@@ -224,7 +224,6 @@ library
                      , Parsing.CMark
                      , Parsing.Parser
                      , Parsing.TreeSitter
-                     , Paths_semantic
                      -- Rendering formats
                      , Rendering.Graph
                      , Rendering.JSON
@@ -272,7 +271,8 @@ library
                      , Tags.Tagging
                      -- Custom Prelude
                      , Prologue
-
+  autogen-modules:     Paths_semantic
+  other-modules:       Paths_semantic
   build-depends:       base >= 4.12 && < 5
                      , ansi-terminal ^>= 0.8.2
                      , array ^>= 0.5.3.0
@@ -321,23 +321,18 @@ library
                      , tree-sitter-typescript ^>= 0.1.0.0
                      , tree-sitter-tsx ^>= 0.1.0.0
                      , tree-sitter-java ^>= 0.1.0.0
-  ghc-options:         -Wall -Wmissing-export-lists -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -fno-warn-name-shadowing -j
+  ghc-options:         -Wall -Wmissing-export-lists -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -fno-warn-name-shadowing
   if flag(release)
-    ghc-options:       -Werror -O1
     cpp-options:       -DCOMPUTE_GIT_SHA
   else
-    ghc-options:       -O0 +RTS -A128m -n2m -RTS
-  ghc-prof-options:    -fprof-auto
+    ghc-options:       +RTS -A128m -n2m -RTS
 
 executable semantic
   import:              haskell, dependencies, executable-flags
   hs-source-dirs:      app
   main-is:             Main.hs
   if flag(release)
-    ghc-options:       -O1
     cpp-options:       -DCOMPUTE_GIT_SHA
-  else
-    ghc-options:       -O0
   build-depends:       base
                      , semantic
 
@@ -393,7 +388,6 @@ test-suite test
                      , HUnit ^>= 1.6.0.0
                      , leancheck >= 0.8 && <1
                      , temporary
-  ghc-options:         -O0
   if flag(release)
     ghc-options:       -dynamic
 
@@ -413,7 +407,7 @@ benchmark evaluation
   hs-source-dirs:      bench/evaluation
   type:                exitcode-stdio-1.0
   main-is:             Main.hs
-  ghc-options:         -static -O1
+  ghc-options:         -static
   build-depends:       base
                      , criterion
                      , semantic
