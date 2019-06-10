@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DeriveGeneric, KindSignatures, LambdaCase #-}
+{-# LANGUAGE DeriveAnyClass, DerivingVia, DeriveGeneric, KindSignatures, LambdaCase #-}
 module Data.Language
   ( Language (..)
   , SLanguage (..)
@@ -38,6 +38,7 @@ data Language
     | PHP
     | TSX
     deriving (Eq, Generic, Ord, Read, Show, Bounded, Hashable, ToJSON, Named, Enum, MessageField, NFData)
+    deriving Primitive via Proto3.PrimitiveEnum ChangeType
 
 class SLanguage (lang :: Language) where
   reflect :: proxy lang -> Language
@@ -109,15 +110,6 @@ knownLanguage = (/= Unknown)
 
 -- | Defaults to 'Unknown'.
 instance HasDefault Language where def = Unknown
-
--- | Piggybacks on top of the 'Enumerated' instance, as the generated code would.
--- This instance will get easier when we have DerivingVia.
-instance Primitive Language where
-  primType _ = primType (Proxy @(Enumerated Language))
-  encodePrimitive f = encodePrimitive f . Enumerated . Right
-  decodePrimitive   = decodePrimitive >>= \case
-    (Enumerated (Right r)) -> pure r
-    other                  -> Prelude.fail ("Language decodeMessageField: unexpected value" <> show other)
 
 -- | Returns a Language based on the file extension (including the ".").
 languageForType :: String -> Language
