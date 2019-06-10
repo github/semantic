@@ -19,9 +19,8 @@ module Parsing.Parser
 , markdownParser
 , pythonParser
 , pythonASTParser
-, miniPythonParser
 , rubyParser
-, miniRubyParser
+, tsxParser
 , typescriptParser
 , typescriptASTParser
 , phpParser
@@ -48,8 +47,7 @@ import qualified Language.Markdown.Assignment as Markdown
 import qualified Language.PHP.Assignment as PHP
 import qualified Language.Python.Assignment as Python
 import qualified Language.Ruby.Assignment as Ruby
-import qualified Language.MiniRuby.Assignment as MiniRuby
-import qualified Language.MiniPython.Assignment as MiniPython
+import qualified Language.TSX.Assignment as TSX
 import qualified Language.TypeScript.Assignment as TypeScript
 import           Prologue
 import           TreeSitter.Go
@@ -60,6 +58,7 @@ import qualified TreeSitter.Language as TS (Language, Symbol)
 import           TreeSitter.PHP
 import           TreeSitter.Python
 import           TreeSitter.Ruby
+import           TreeSitter.TSX
 import           TreeSitter.TypeScript
 
 
@@ -98,6 +97,7 @@ someAnalysisParser _ PHP        = SomeAnalysisParser phpParser        (Proxy :: 
 someAnalysisParser _ Python     = SomeAnalysisParser pythonParser     (Proxy :: Proxy 'Python)
 someAnalysisParser _ Ruby       = SomeAnalysisParser rubyParser       (Proxy :: Proxy 'Ruby)
 someAnalysisParser _ TypeScript = SomeAnalysisParser typescriptParser (Proxy :: Proxy 'TypeScript)
+someAnalysisParser _ TSX        = SomeAnalysisParser typescriptParser (Proxy :: Proxy 'TSX)
 someAnalysisParser _ l          = error $ "Analysis not supported for: " <> show l
 
 
@@ -134,9 +134,6 @@ goASTParser = ASTParser tree_sitter_go
 rubyParser :: Parser Ruby.Term
 rubyParser = AssignmentParser (ASTParser tree_sitter_ruby) Ruby.assignment
 
-miniRubyParser :: Parser MiniRuby.Term
-miniRubyParser = AssignmentParser (ASTParser tree_sitter_ruby) MiniRuby.assignment
-
 phpParser :: Parser PHP.Term
 phpParser = AssignmentParser (ASTParser tree_sitter_php) PHP.assignment
 
@@ -145,9 +142,6 @@ pythonParser = AssignmentParser (ASTParser tree_sitter_python) Python.assignment
 
 pythonASTParser :: Parser (AST [] Python.Grammar)
 pythonASTParser = ASTParser tree_sitter_python
-
-miniPythonParser :: Parser MiniPython.Term
-miniPythonParser = AssignmentParser (ASTParser tree_sitter_python) MiniPython.assignment
 
 javaParser :: Parser Java.Term
 javaParser = AssignmentParser javaASTParser Java.assignment
@@ -163,6 +157,9 @@ jsonASTParser = ASTParser tree_sitter_json
 
 typescriptParser :: Parser TypeScript.Term
 typescriptParser = AssignmentParser (ASTParser tree_sitter_typescript) TypeScript.assignment
+
+tsxParser :: Parser TSX.Term
+tsxParser = AssignmentParser (ASTParser tree_sitter_tsx) TSX.assignment
 
 typescriptASTParser :: Parser (AST [] TypeScript.Grammar)
 typescriptASTParser = ASTParser tree_sitter_typescript
@@ -196,6 +193,7 @@ someASTParser JSX        = Just (SomeASTParser (ASTParser tree_sitter_typescript
 someASTParser Python     = Just (SomeASTParser (ASTParser tree_sitter_python :: Parser (AST [] Python.Grammar)))
 someASTParser Ruby       = Just (SomeASTParser (ASTParser tree_sitter_ruby :: Parser (AST [] Ruby.Grammar)))
 someASTParser TypeScript = Just (SomeASTParser (ASTParser tree_sitter_typescript :: Parser (AST [] TypeScript.Grammar)))
+someASTParser TSX        = Just (SomeASTParser (ASTParser tree_sitter_tsx :: Parser (AST [] TSX.Grammar)))
 someASTParser PHP        = Just (SomeASTParser (ASTParser tree_sitter_php :: Parser (AST [] PHP.Grammar)))
 someASTParser Markdown   = Nothing
 someASTParser Unknown    = Nothing

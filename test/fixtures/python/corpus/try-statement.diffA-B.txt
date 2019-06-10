@@ -1,15 +1,17 @@
 (Statements
   (Try
-  { (Identifier)
+  { (Statements
+    {-(Identifier)-}
+    {-(Identifier)-})
   ->(Identifier) }
   {+(Finally
     {+(Identifier)+})+}
-  {-(Identifier)-}
   {-(Catch
     {-(Statements
       {-(Identifier)-}
-      {-(Identifier)-}
-      {-(Identifier)-})-}
+      {-(Statements
+        {-(Identifier)-}
+        {-(Identifier)-})-})-}
     {-(Statements)-})-}
   {-(Catch
     {-(Let
@@ -23,8 +25,9 @@
     {-(Statements
       {-(Identifier)-}
       {-(Identifier)-}
-      {-(Identifier)-}
-      {-(Identifier)-})-}
+      {-(Statements
+        {-(Identifier)-}
+        {-(Identifier)-})-})-}
     {-(Statements)-})-}
   {-(Catch
     {-(Statements
@@ -32,7 +35,9 @@
       {-(Identifier)-})-}
     {-(Statements)-})-})
   (Try
-  { (Identifier)
+  { (Statements
+    {-(Identifier)-}
+    {-(Identifier)-})
   ->(Identifier) }
   {+(Catch
     {+(Statements
@@ -54,7 +59,6 @@
   {+(Catch
     {+(Identifier)+}
     {+(Statements)+})+}
-  {-(Identifier)-}
   {-(Finally
     {-(Statements
       {-(Identifier)-}

@@ -39,8 +39,6 @@
     name: Eta reduce
     within:
     - Language.Go.Assignment
-    - Language.MiniPython.Assignment
-    - Language.MiniRuby.Assignment
     - Language.PHP.Assignment
     - Language.Python.Assignment
     - Language.Ruby.Assignment

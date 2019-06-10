@@ -66,12 +66,15 @@ parseToAST :: ( Bounded grammar
            -> Blob
            -> m (Maybe (AST [] grammar))
 parseToAST parseTimeout language b@Blob{..} = bracket (liftIO TS.ts_parser_new) (liftIO . TS.ts_parser_delete) $ \ parser -> do
-  result <- liftIO $ do
+  compatible <- liftIO $ do
     let timeoutMicros = fromIntegral $ toMicroseconds parseTimeout
     TS.ts_parser_set_timeout_micros parser timeoutMicros
     TS.ts_parser_halt_on_error parser (CBool 1)
     TS.ts_parser_set_language parser language
-    runParser parser blobSource
+  result <- if compatible then
+    liftIO $ runParser parser blobSource
+  else
+    Failed <$ trace "tree-sitter: incompatible versions"
   case result of
     Failed          -> Nothing  <$ trace ("tree-sitter: parsing failed " <> blobPath b)
     (Succeeded ast) -> Just ast <$ trace ("tree-sitter: parsing succeeded " <> blobPath b)

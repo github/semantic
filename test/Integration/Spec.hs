@@ -1,5 +1,6 @@
 module Integration.Spec (spec) where
 
+import Control.Exception (throw)
 import Data.Foldable (find, traverse_, for_)
 import Data.List (union, concat, transpose)
 import qualified Data.ByteString as B
@@ -9,7 +10,7 @@ import System.FilePath.Posix
 import SpecHelpers
 
 languages :: [FilePath]
-languages = ["go", "javascript", "json", "python", "ruby", "typescript"]
+languages = ["go", "javascript", "json", "python", "ruby", "typescript", "tsx"]
 
 spec :: TaskSession -> Spec
 spec config = parallel $ do
@@ -83,9 +84,12 @@ normalizeName path = dropExtension $ dropExtension path
 
 testParse :: TaskSession -> FilePath -> FilePath -> Expectation
 testParse session path expectedOutput = do
-  actual <- verbatim <$> parseFilePath session path
-  expected <- verbatim <$> B.readFile expectedOutput
-  actual `shouldBe` expected
+  actual <- fmap verbatim <$> parseFilePath session path
+  case actual of
+    Left err -> throw err
+    Right actual -> do
+      expected <- verbatim <$> B.readFile expectedOutput
+      actual `shouldBe` expected
 
 testDiff :: TaskSession -> Both FilePath -> FilePath -> Expectation
 testDiff config paths expectedOutput = do

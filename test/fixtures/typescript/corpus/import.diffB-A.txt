@@ -1,7 +1,10 @@
 (Statements
-{+(Import)+}
-{+(QualifiedAliasedImport
-  {+(Identifier)+})+}
+{ (Import)
+->(Import) }
+{ (QualifiedAliasedImport
+  {-(Identifier)-})
+->(QualifiedAliasedImport
+  {+(Identifier)+}) }
 {+(Import)+}
 {+(Import)+}
 {+(Import)+}
@@ -15,9 +18,6 @@
 {+(SideEffectImport)+}
 {+(QualifiedAliasedImport
   {+(Identifier)+})+}
-{-(Import)-}
-{-(QualifiedAliasedImport
-  {-(Identifier)-})-}
 {-(Import)-}
 {-(Import)-}
 {-(Import)-}
