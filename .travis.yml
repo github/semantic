@@ -33,8 +33,9 @@ install:
 - cabal new-build --only-dependencies -j
 
 script:
-- cabal new-build -j semantic-core semantic:exe:semantic
-- cabal new-test semantic:test semantic-core:spec
+- cabal new-build -j
+- cabal new-run semantic:test
+- cabal new-run semantic-core:spec
 - cabal new-run semantic:parse-examples
 
 # Any branch linked with a pull request will be built, as well as the non-PR
