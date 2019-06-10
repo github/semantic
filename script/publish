@@ -21,6 +21,6 @@ docker run --rm $DOCKER_IMAGE --version
 docker tag $DOCKER_IMAGE $DOCKER_IMAGE:latest
 docker tag $DOCKER_IMAGE $DOCKER_IMAGE:$VERSION
 docker tag $DOCKER_IMAGE $DOCKER_IMAGE:sha_$BUILD_SHA
-docker push $DOCKER_IMAGE:latest
-docker push $DOCKER_IMAGE:$VERSION
 docker push $DOCKER_IMAGE:sha_$BUILD_SHA
+docker push $DOCKER_IMAGE:$VERSION
+docker push $DOCKER_IMAGE:latest
