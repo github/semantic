@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -O0 #-}
 {-# LANGUAGE TupleSections #-}
 module Analysis.Ruby.Spec (spec) where
 

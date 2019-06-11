@@ -49,7 +49,7 @@ common dependencies
                      , bytestring ^>= 0.10.8.2
                      , containers ^>= 0.6.0.1
                      , directory ^>= 1.3.3.0
-                     , fastsum
+                     , fastsum ^>= 0.1.1.0
                      , filepath ^>= 1.4.2.1
                      , free ^>= 5.1
                      , fused-effects ^>= 0.4.0.0
@@ -59,11 +59,11 @@ common dependencies
                      , machines ^>= 0.6.4
                      , mtl ^>= 2.2.2
                      , network ^>= 2.8.0.0
-                     , process
+                     , process ^>= 1.6.3.0
                      , recursion-schemes ^>= 5.1
                      , scientific ^>= 0.3.6.2
-                     , safe-exceptions
-                     , semilattices
+                     , safe-exceptions ^>= 0.1.7.0
+                     , semilattices ^>= 0.0.0.3
                      , text ^>= 1.2.3.1
                      , these >= 0.7 && <1
                      , unix ^>= 2.7.2.2
@@ -309,11 +309,11 @@ library
                      , stm-chans ^>= 3.0.0.4
                      , template-haskell ^>= 2.14
                      , time ^>= 1.8.0.2
-                     , unliftio-core
+                     , unliftio-core ^>= 0.1.2.0
                      , unordered-containers ^>= 0.2.9.0
                      , vector ^>= 0.12.0.2
                      , tree-sitter-go ^>= 0.1.0.0
-                     , tree-sitter-haskell
+                     , tree-sitter-haskell ^>= 0.1.0.0
                      , tree-sitter-json ^>= 0.1.0.0
                      , tree-sitter-php ^>= 0.1.0.0
                      , tree-sitter-python ^>= 0.1.0.1

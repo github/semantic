@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -O0 #-}
 module Analysis.Go.Spec (spec) where
 
 import Data.Abstract.Evaluatable (EvalError(..))

@@ -2,6 +2,9 @@ packages: . semantic-core
 
 jobs: $ncpus
 
+package semantic
+  ghc-options: +RTS -A128m -n2m -RTS
+
 source-repository-package
   type: git
   location: https://github.com/joshvera/proto3-suite.git
