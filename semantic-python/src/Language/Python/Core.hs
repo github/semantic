@@ -21,16 +21,13 @@ defaultCompile t = fail $ "compilation unimplemented for " <> show t
 instance (Compile l, Compile r) => Compile (Either l r) where
   compile = either compile compile
 
-instance Compile Py.Module where
-  compile (Module Nothing) = pure Unit
-  compile (Module (Just statements)) = block <$> traverse compile statements
-
-deriving via CompileSum Py.CompoundStatement instance Compile Py.CompoundStatement
-
 instance Compile Py.AssertStatement
 instance Compile Py.Block
 instance Compile Py.BreakStatement
 instance Compile Py.ClassDefinition
+
+deriving via CompileSum Py.CompoundStatement instance Compile Py.CompoundStatement
+
 instance Compile Py.ContinueStatement
 instance Compile Py.DecoratedDefinition
 instance Compile Py.DeleteStatement
@@ -51,6 +48,11 @@ instance Compile Py.IfStatement where
 
 instance Compile Py.ImportFromStatement
 instance Compile Py.ImportStatement
+
+instance Compile Py.Module where
+  compile (Module Nothing) = pure Unit
+  compile (Module (Just statements)) = block <$> traverse compile statements
+
 instance Compile Py.NonlocalStatement
 instance Compile Py.PassStatement
 instance Compile Py.PrintStatement
