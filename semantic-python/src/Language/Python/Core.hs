@@ -11,9 +11,9 @@ class Compile t where
   -- FIXME: we should really try not to fail
   compile :: MonadFail m => t -> m Core
 
+instance (Compile l, Compile r) => Compile (Either l r) where
+  compile = either compile compile
+
 instance Compile Py.Module where
   compile (Module Nothing) = pure Unit
   compile (Module (Just _)) = pure Unit
-
-instance (Compile l, Compile r) => Compile (Either l r) where
-  compile = either compile compile
