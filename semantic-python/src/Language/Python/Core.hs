@@ -1,4 +1,4 @@
-{-# LANGUAGE DefaultSignatures, DeriveGeneric, FlexibleContexts, FlexibleInstances, RecordWildCards, StandaloneDeriving, TypeOperators #-}
+{-# LANGUAGE DefaultSignatures, DeriveGeneric, DerivingVia, FlexibleContexts, FlexibleInstances, RecordWildCards, StandaloneDeriving, TypeOperators, UndecidableInstances #-}
 module Language.Python.Core
 ( compile
 ) where
@@ -25,7 +25,7 @@ instance Compile Py.Module where
   compile (Module Nothing) = pure Unit
   compile (Module (Just statements)) = block <$> traverse compile statements
 
-instance Compile Py.CompoundStatement where compile = compileSum
+deriving via CompileSum Py.CompoundStatement instance Compile Py.CompoundStatement
 
 instance Compile Py.IfStatement where
   compile IfStatement{..} = If <$> compile condition <*> compile consequence <*> case alternative of
@@ -47,9 +47,6 @@ instance Compile Py.WithStatement
 instance Compile Py.SimpleStatement
 
 
-compileSum :: (Generic t, GCompileSum (Rep t), MonadFail m) => t -> m Core
-compileSum = gcompileSum . from
-
 class GCompileSum f where
   gcompileSum :: MonadFail m => f a -> m Core
 
@@ -65,3 +62,10 @@ instance Compile t => GCompileSum (M1 C c (M1 S s (K1 R t))) where
 
 
 deriving instance Generic Py.CompoundStatement
+
+
+newtype CompileSum t = CompileSum { unCompileSum :: t }
+  deriving (Eq, Ord, Show)
+
+instance (Generic t, GCompileSum (Rep t)) => Compile (CompileSum t) where
+  compile = gcompileSum . from . unCompileSum
