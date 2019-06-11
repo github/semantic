@@ -1,4 +1,4 @@
-{-# LANGUAGE DefaultSignatures, DeriveGeneric, DerivingVia, FlexibleContexts, FlexibleInstances, RecordWildCards, StandaloneDeriving, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DefaultSignatures, DeriveGeneric, FlexibleContexts, FlexibleInstances, RecordWildCards, StandaloneDeriving, TypeOperators #-}
 module Language.Python.Core
 ( compile
 ) where
@@ -18,7 +18,7 @@ class Compile t where
 defaultCompile :: (MonadFail m, Show t) => t -> m Core
 defaultCompile t = fail $ "compilation unimplemented for " <> show t
 
-deriving via CompileSum (Either l r) instance (Compile l, Compile r) => Compile (Either l r)
+instance (Compile l, Compile r) => Compile (Either l r) where compile = compileSum
 
 instance Compile Py.AssertStatement
 instance Compile Py.Await
@@ -28,7 +28,7 @@ instance Compile Py.BreakStatement
 instance Compile Py.ClassDefinition
 instance Compile Py.ComparisonOperator
 
-deriving via CompileSum Py.CompoundStatement instance Compile Py.CompoundStatement
+instance Compile Py.CompoundStatement where compile = compileSum
 
 instance Compile Py.ConditionalExpression
 instance Compile Py.ContinueStatement
@@ -36,7 +36,7 @@ instance Compile Py.DecoratedDefinition
 instance Compile Py.DeleteStatement
 instance Compile Py.ExecStatement
 
-deriving via CompileSum Py.Expression instance Compile Py.Expression
+instance Compile Py.Expression where compile = compileSum
 
 instance Compile Py.ExpressionStatement
 instance Compile Py.ForStatement
@@ -68,12 +68,15 @@ instance Compile Py.PrintStatement
 instance Compile Py.ReturnStatement
 instance Compile Py.RaiseStatement
 
-deriving via CompileSum Py.SimpleStatement instance Compile Py.SimpleStatement
+instance Compile Py.SimpleStatement where compile = compileSum
 
 instance Compile Py.TryStatement
 instance Compile Py.WhileStatement
 instance Compile Py.WithStatement
 
+
+compileSum :: (Generic t, GCompileSum (Rep t), MonadFail m) => t -> m Core
+compileSum = gcompileSum . from
 
 class GCompileSum f where
   gcompileSum :: MonadFail m => f a -> m Core
@@ -93,10 +96,3 @@ instance Compile t => GCompileSum (M1 C c (M1 S s (K1 R t))) where
 deriving instance Generic Py.CompoundStatement
 deriving instance Generic Py.Expression
 deriving instance Generic Py.SimpleStatement
-
-
-newtype CompileSum t = CompileSum { unCompileSum :: t }
-  deriving (Eq, Ord, Show)
-
-instance (Generic t, GCompileSum (Rep t)) => Compile (CompileSum t) where
-  compile = gcompileSum . from . unCompileSum
