@@ -19,4 +19,7 @@ instance (Compile l, Compile r) => Compile (Either l r) where
 
 instance Compile Py.Module where
   compile (Module Nothing) = pure Unit
-  compile (Module (Just _)) = pure Unit
+  compile (Module (Just statements)) = block <$> traverse compile statements
+
+instance Compile Py.CompoundStatement
+instance Compile Py.SimpleStatement
