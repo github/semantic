@@ -8,7 +8,7 @@ author:              The Semantic authors
 maintainer:          opensource+semantic@github.com
 license:             MIT
 license-file:        LICENSE
-copyright:           (c) 2016-2019 GitHub, Inc.
+copyright:           (c) 2015-2019 GitHub, Inc.
 category:            Web
 build-type:          Simple
 stability:           alpha
