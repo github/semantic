@@ -61,8 +61,8 @@ instance Compile Py.IfStatement where
   compile IfStatement{..} = If <$> compile condition <*> compile consequence <*> case alternative of
     Nothing -> pure Unit
     Just clauses -> foldr clause (pure Unit) clauses
-    where clause (Left  (ElifClause{..}))  rest = If <$> compile condition <*> compile consequence <*> rest
-          clause (Right (ElseClause body)) _    = compile body
+    where clause (Left  ElifClause{..}) rest = If <$> compile condition <*> compile consequence <*> rest
+          clause (Right ElseClause{..}) _    = compile body
 
 instance Compile Py.ImportFromStatement
 instance Compile Py.ImportStatement
