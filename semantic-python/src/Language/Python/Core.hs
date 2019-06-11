@@ -44,7 +44,23 @@ instance Compile Py.TryStatement
 instance Compile Py.WhileStatement
 instance Compile Py.WithStatement
 
-instance Compile Py.SimpleStatement
+deriving via CompileSum Py.SimpleStatement instance Compile Py.SimpleStatement
+
+instance Compile Py.AssertStatement
+instance Compile Py.BreakStatement
+instance Compile Py.ContinueStatement
+instance Compile Py.DeleteStatement
+instance Compile Py.ExecStatement
+instance Compile Py.ExpressionStatement
+instance Compile Py.FutureImportStatement
+instance Compile Py.GlobalStatement
+instance Compile Py.ImportFromStatement
+instance Compile Py.ImportStatement
+instance Compile Py.NonlocalStatement
+instance Compile Py.PassStatement
+instance Compile Py.PrintStatement
+instance Compile Py.ReturnStatement
+instance Compile Py.RaiseStatement
 
 
 class GCompileSum f where
@@ -62,6 +78,7 @@ instance Compile t => GCompileSum (M1 C c (M1 S s (K1 R t))) where
 
 
 deriving instance Generic Py.CompoundStatement
+deriving instance Generic Py.SimpleStatement
 
 
 newtype CompileSum t = CompileSum { unCompileSum :: t }
