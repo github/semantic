@@ -21,17 +21,23 @@ defaultCompile t = fail $ "compilation unimplemented for " <> show t
 deriving via CompileSum (Either l r) instance (Compile l, Compile r) => Compile (Either l r)
 
 instance Compile Py.AssertStatement
+instance Compile Py.Await
 instance Compile Py.Block
+instance Compile Py.BooleanOperator
 instance Compile Py.BreakStatement
 instance Compile Py.ClassDefinition
+instance Compile Py.ComparisonOperator
 
 deriving via CompileSum Py.CompoundStatement instance Compile Py.CompoundStatement
 
+instance Compile Py.ConditionalExpression
 instance Compile Py.ContinueStatement
 instance Compile Py.DecoratedDefinition
 instance Compile Py.DeleteStatement
 instance Compile Py.ExecStatement
-instance Compile Py.Expression
+
+deriving via CompileSum Py.Expression instance Compile Py.Expression
+
 instance Compile Py.ExpressionStatement
 instance Compile Py.ForStatement
 instance Compile Py.FunctionDefinition
@@ -47,13 +53,17 @@ instance Compile Py.IfStatement where
 
 instance Compile Py.ImportFromStatement
 instance Compile Py.ImportStatement
+instance Compile Py.Lambda
 
 instance Compile Py.Module where
   compile (Module Nothing) = pure Unit
   compile (Module (Just statements)) = block <$> traverse compile statements
 
+instance Compile Py.NamedExpression
 instance Compile Py.NonlocalStatement
+instance Compile Py.NotOperator
 instance Compile Py.PassStatement
+instance Compile Py.PrimaryExpression
 instance Compile Py.PrintStatement
 instance Compile Py.ReturnStatement
 instance Compile Py.RaiseStatement
@@ -81,6 +91,7 @@ instance Compile t => GCompileSum (M1 C c (M1 S s (K1 R t))) where
 
 -- FIXME: depend on https://github.com/tree-sitter/haskell-tree-sitter/pull/90 so we can get rid of these orphan instances
 deriving instance Generic Py.CompoundStatement
+deriving instance Generic Py.Expression
 deriving instance Generic Py.SimpleStatement
 
 
