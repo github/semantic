@@ -120,10 +120,3 @@ instance (GCompileSum l, GCompileSum r) => GCompileSum (l :+: r) where
 
 instance Compile t => GCompileSum (M1 C c (M1 S s (K1 R t))) where
   gcompileSum (M1 (M1 (K1 t))) = compile t
-
-
--- FIXME: depend on https://github.com/tree-sitter/haskell-tree-sitter/pull/90 so we can get rid of these orphan instances
-deriving instance Generic Py.CompoundStatement
-deriving instance Generic Py.Expression
-deriving instance Generic Py.PrimaryExpression
-deriving instance Generic Py.SimpleStatement
