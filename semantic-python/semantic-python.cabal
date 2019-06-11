@@ -18,7 +18,8 @@ extra-source-files:  README.md
 tested-with:         GHC == 8.6.4
 
 library
-  -- exposed-modules:
+  exposed-modules:
+    Language.Python.Core
   -- other-modules:
   -- other-extensions:
   build-depends:       base ^>=4.12.0.0
