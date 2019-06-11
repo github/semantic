@@ -36,7 +36,8 @@ script:
 - cabal new-build -j
 - cabal new-run semantic:test
 - cabal new-run semantic-core:spec
-- cabal new-run semantic:parse-examples
+# parse-examples is disabled because it slaughters our CI
+# - cabal new-run semantic:parse-examples
 
 # Any branch linked with a pull request will be built, as well as the non-PR
 # branches listed below:
