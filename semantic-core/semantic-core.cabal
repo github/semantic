@@ -13,6 +13,7 @@ maintainer:          opensource+semantic@github.com
 copyright:           (c) 2019 GitHub, Inc.
 category:            Language
 build-type:          Simple
+stability:           alpha
 extra-source-files:  README.md
 
 tested-with:         GHC == 8.6.4
