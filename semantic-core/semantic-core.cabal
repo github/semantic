@@ -52,9 +52,7 @@ library
                      , unordered-containers        ^>= 0.2.10
   hs-source-dirs:      src
   default-language:    Haskell2010
-  ghc-options:         -Weverything -Wno-missing-local-signatures -Wno-missing-import-lists -Wno-implicit-prelude -Wno-safe -Wno-unsafe -Wno-name-shadowing -Wno-monomorphism-restriction -Wno-missed-specialisations -Wno-all-missed-specialisations
-  if (impl(ghc >= 8.6))
-    ghc-options:       -Wno-star-is-type
+  ghc-options:         -Weverything -Wno-missing-local-signatures -Wno-missing-import-lists -Wno-implicit-prelude -Wno-safe -Wno-unsafe -Wno-name-shadowing -Wno-monomorphism-restriction -Wno-missed-specialisations -Wno-all-missed-specialisations -Wno-star-is-type
 
 test-suite doctest
   type:                exitcode-stdio-1.0
