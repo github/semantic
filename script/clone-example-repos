@@ -13,8 +13,8 @@
 set -e
 cd $(dirname "$0")/..
 
-mkdir -p test/examplerepos
-git clone --single-branch --recurse-submodules https://github.com/tree-sitter/haskell-tree-sitter.git tmp/haskell-tree-sitter
+mkdir -p test/examplerepos || true
+git clone --single-branch --recurse-submodules https://github.com/tree-sitter/haskell-tree-sitter.git tmp/haskell-tree-sitter || true
 
 dir="tmp/haskell-tree-sitter/languages"
 
