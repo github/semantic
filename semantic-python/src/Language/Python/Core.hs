@@ -2,7 +2,7 @@ module Language.Python.Core
 ( compileModule
 ) where
 
-import TreeSitter.Python.AST
+import TreeSitter.Python.AST as Py
 
-compileModule :: Module -> ()
+compileModule :: Py.Module -> ()
 compileModule _ = ()
