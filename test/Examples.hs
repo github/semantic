@@ -105,4 +105,4 @@ parseFilePath :: (Member (Error SomeException) sig, Member Distribute sig, Membe
 parseFilePath path = readBlob (fileForPath path) >>= parseTermBuilder @[] TermShow . pure >>= const (pure True)
 
 languagesDir :: FilePath
-languagesDir = "vendor/haskell-tree-sitter/languages"
+languagesDir = "tmp/haskell-tree-sitter/languages"
