@@ -1,1 +1,2 @@
-module Language.Python.Core where
+module Language.Python.Core
+() where
