@@ -12,7 +12,10 @@ class Compile t where
   -- FIXME: we should really try not to fail
   compile :: MonadFail m => t -> m Core
   default compile :: (MonadFail m, Show t) => t -> m Core
-  compile t = fail $ "compilation unimplemented for " <> show t
+  compile = defaultCompile
+
+defaultCompile :: (MonadFail m, Show t) => t -> m Core
+defaultCompile t = fail $ "compilation unimplemented for " <> show t
 
 instance (Compile l, Compile r) => Compile (Either l r) where
   compile = either compile compile
