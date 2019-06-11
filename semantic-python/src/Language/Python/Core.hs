@@ -1,4 +1,4 @@
-{-# LANGUAGE DefaultSignatures #-}
+{-# LANGUAGE DefaultSignatures, RecordWildCards #-}
 module Language.Python.Core
 ( compile
 ) where
@@ -24,5 +24,18 @@ instance Compile Py.Module where
   compile (Module Nothing) = pure Unit
   compile (Module (Just statements)) = block <$> traverse compile statements
 
-instance Compile Py.CompoundStatement
+instance Compile Py.CompoundStatement where
+  compile (IfStatementCompoundStatement statement) = compile statement
+  compile other = defaultCompile other
+
+instance Compile Py.IfStatement where
+  compile IfStatement{..} = If <$> compile condition <*> compile consequence <*> case alternative of
+    Nothing -> pure Unit
+    Just clauses -> foldr clause (pure Unit) clauses
+    where clause (Left  (ElifClause{..}))  rest = If <$> compile condition <*> compile consequence <*> rest
+          clause (Right (ElseClause body)) _    = compile body
+
+instance Compile Py.Expression
+instance Compile Py.Block
+
 instance Compile Py.SimpleStatement
