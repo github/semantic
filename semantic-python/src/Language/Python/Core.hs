@@ -27,10 +27,8 @@ instance Compile Py.Module where
 
 deriving via CompileSum Py.CompoundStatement instance Compile Py.CompoundStatement
 
-instance Compile Py.Block
 instance Compile Py.ClassDefinition
 instance Compile Py.DecoratedDefinition
-instance Compile Py.Expression
 
 instance Compile Py.IfStatement where
   compile IfStatement{..} = If <$> compile condition <*> compile consequence <*> case alternative of
@@ -38,6 +36,9 @@ instance Compile Py.IfStatement where
     Just clauses -> foldr clause (pure Unit) clauses
     where clause (Left  (ElifClause{..}))  rest = If <$> compile condition <*> compile consequence <*> rest
           clause (Right (ElseClause body)) _    = compile body
+
+instance Compile Py.Block
+instance Compile Py.Expression
 
 instance Compile Py.ForStatement
 instance Compile Py.FunctionDefinition
