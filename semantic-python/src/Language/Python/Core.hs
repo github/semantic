@@ -27,8 +27,20 @@ instance Compile Py.Module where
 
 deriving via CompileSum Py.CompoundStatement instance Compile Py.CompoundStatement
 
+instance Compile Py.AssertStatement
+instance Compile Py.Block
+instance Compile Py.BreakStatement
 instance Compile Py.ClassDefinition
+instance Compile Py.ContinueStatement
 instance Compile Py.DecoratedDefinition
+instance Compile Py.DeleteStatement
+instance Compile Py.ExecStatement
+instance Compile Py.Expression
+instance Compile Py.ExpressionStatement
+instance Compile Py.ForStatement
+instance Compile Py.FunctionDefinition
+instance Compile Py.FutureImportStatement
+instance Compile Py.GlobalStatement
 
 instance Compile Py.IfStatement where
   compile IfStatement{..} = If <$> compile condition <*> compile consequence <*> case alternative of
@@ -37,25 +49,6 @@ instance Compile Py.IfStatement where
     where clause (Left  (ElifClause{..}))  rest = If <$> compile condition <*> compile consequence <*> rest
           clause (Right (ElseClause body)) _    = compile body
 
-instance Compile Py.Block
-instance Compile Py.Expression
-
-instance Compile Py.ForStatement
-instance Compile Py.FunctionDefinition
-instance Compile Py.TryStatement
-instance Compile Py.WhileStatement
-instance Compile Py.WithStatement
-
-deriving via CompileSum Py.SimpleStatement instance Compile Py.SimpleStatement
-
-instance Compile Py.AssertStatement
-instance Compile Py.BreakStatement
-instance Compile Py.ContinueStatement
-instance Compile Py.DeleteStatement
-instance Compile Py.ExecStatement
-instance Compile Py.ExpressionStatement
-instance Compile Py.FutureImportStatement
-instance Compile Py.GlobalStatement
 instance Compile Py.ImportFromStatement
 instance Compile Py.ImportStatement
 instance Compile Py.NonlocalStatement
@@ -63,6 +56,12 @@ instance Compile Py.PassStatement
 instance Compile Py.PrintStatement
 instance Compile Py.ReturnStatement
 instance Compile Py.RaiseStatement
+
+deriving via CompileSum Py.SimpleStatement instance Compile Py.SimpleStatement
+
+instance Compile Py.TryStatement
+instance Compile Py.WhileStatement
+instance Compile Py.WithStatement
 
 
 class GCompileSum f where
