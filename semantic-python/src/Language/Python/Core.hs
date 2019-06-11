@@ -14,3 +14,6 @@ class Compile t where
 instance Compile Py.Module where
   compile (Module Nothing) = pure Unit
   compile (Module (Just _)) = pure Unit
+
+instance (Compile l, Compile r) => Compile (Either l r) where
+  compile = either compile compile
