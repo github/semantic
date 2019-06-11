@@ -4,13 +4,13 @@ name:                semantic-core
 version:             0.0.0.0
 synopsis:            Semantic core intermediate language
 -- description:
-homepage:            https://github.com/github/semantic-core
+homepage:            https://github.com/github/semantic/tree/master/semantic-core#readme
 -- bug-reports:
 license:             MIT
 license-file:        LICENSE
-author:              Rob Rix
-maintainer:          robrix@github.com
--- copyright:
+author:              The Semantic authors
+maintainer:          opensource+semantic@github.com
+copyright:           (c) 2019 GitHub, Inc.
 category:            Language
 build-type:          Simple
 extra-source-files:  README.md
