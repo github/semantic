@@ -46,7 +46,9 @@ instance Compile Py.ExecStatement
 instance Compile Py.Expression where compile = compileSum
 
 instance Compile Py.ExpressionStatement
-instance Compile Py.False
+
+instance Compile Py.False where compile _ = pure (Bool Prelude.False)
+
 instance Compile Py.Float
 instance Compile Py.ForStatement
 instance Compile Py.FunctionDefinition
@@ -93,7 +95,9 @@ instance Compile Py.SimpleStatement where compile = compileSum
 
 instance Compile Py.String
 instance Compile Py.Subscript
-instance Compile Py.True
+
+instance Compile Py.True where compile _ = pure (Bool Prelude.True)
+
 instance Compile Py.TryStatement
 instance Compile Py.Tuple
 instance Compile Py.UnaryOperator
