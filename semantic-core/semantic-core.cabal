@@ -5,7 +5,7 @@ version:             0.0.0.0
 synopsis:            Semantic core intermediate language
 -- description:
 homepage:            https://github.com/github/semantic/tree/master/semantic-core#readme
--- bug-reports:
+bug-reports:         https://github.com/github/semantic/issues
 license:             MIT
 license-file:        LICENSE
 author:              The Semantic authors
