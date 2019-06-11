@@ -18,8 +18,7 @@ class Compile t where
 defaultCompile :: (MonadFail m, Show t) => t -> m Core
 defaultCompile t = fail $ "compilation unimplemented for " <> show t
 
-instance (Compile l, Compile r) => Compile (Either l r) where
-  compile = either compile compile
+deriving via CompileSum (Either l r) instance (Compile l, Compile r) => Compile (Either l r)
 
 instance Compile Py.AssertStatement
 instance Compile Py.Block
