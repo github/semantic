@@ -38,7 +38,7 @@ main = withOptions opts $ \ config logger statter -> hspec . parallel $ do
   runIO setupExampleRepos
 
   for_ languages $ \ lang@LanguageExample{..} -> do
-    let tsDir = languagesDir </> languageName </> ("tree-sitter-" <> languageName)
+    let tsDir = languagesDir </> languageName </> ("vendor/tree-sitter-" <> languageName)
     parallel . describe languageName $ parseExamples args lang tsDir
 
   where
