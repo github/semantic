@@ -11,7 +11,7 @@ license-file:        LICENSE
 author:              The Semantic authors
 maintainer:          opensource+semantic@github.com
 copyright:           (c) 2015-2019 GitHub, Inc.
-category:            Web
+category:            Language
 build-type:          Simple
 stability:           alpha
 
