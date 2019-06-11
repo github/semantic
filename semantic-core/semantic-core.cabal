@@ -3,7 +3,7 @@ cabal-version:       2.2
 name:                semantic-core
 version:             0.0.0.0
 synopsis:            Semantic core intermediate language
--- description:
+description:         Core intermediate language for program analysis using abstract definitional interpretation.
 homepage:            https://github.com/github/semantic/tree/master/semantic-core#readme
 bug-reports:         https://github.com/github/semantic/issues
 license:             MIT
