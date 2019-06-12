@@ -3,50 +3,57 @@ module Data.Functor.Classes.Generic.Spec (spec) where
 import Data.Functor.Classes.Generic
 import Data.Functor.Listable
 import GHC.Generics
-import Test.Hspec
-import Test.Hspec.LeanCheck
 
-spec :: Spec
-spec = parallel $ do
-  describe "Eq1" $ do
-    describe "genericLiftEq" $ do
-      prop "equivalent to derived (==) for product types" $
-        \ a b -> genericLiftEq (==) a b `shouldBe` a == (b :: Product Int)
+import Test.Tasty
+import Test.Tasty.LeanCheck
+import Test.Tasty.HUnit
 
-      prop "equivalent to derived (==) for sum types" $
-        \ a b -> genericLiftEq (==) a b `shouldBe` a == (b :: Sum Int)
+-- Hacky operator that provides a lower-precedence == operator so that
+-- we don't have to parenthesize every comparison in the properties
+(===) :: Eq a => a -> a -> Bool
+(===) = (==)
+infix 3 ===
 
-      prop "equivalent to derived (==) for recursive types" $
-        \ a b -> genericLiftEq (==) a b `shouldBe` a == (b :: Tree Int)
+spec :: TestTree
+spec = testGroup "Data.Functor.Classes.Generic"
+  [ testGroup "Eq1/genericLiftEq"
+    [ testProperty "equivalent to derived (==) for product types" $
+        \ a b -> genericLiftEq (==) a b === a == (b :: Product Int)
 
-  describe "Ord1" $ do
-    describe "genericLiftCompare" $ do
-      prop "equivalent to derived compare for product types" $
-        \ a b -> genericLiftCompare compare a b `shouldBe` compare a (b :: Product Int)
+    , testProperty "equivalent to derived (==) for sum types" $
+        \ a b -> genericLiftEq (==) a b === a == (b :: Sum Int)
 
-      prop "equivalent to derived compare for sum types" $
-        \ a b -> genericLiftCompare compare a b `shouldBe` compare a (b :: Sum Int)
+    , testProperty "equivalent to derived (==) for recursive types" $
+        \ a b -> genericLiftEq (==) a b === a == (b :: Tree Int)
+    ]
 
-      prop "equivalent to derived compare for recursive types" $
-        \ a b -> genericLiftCompare compare a b `shouldBe` compare a (b :: Tree Int)
+  , testGroup "Ord1/genericLiftCompare"
+    [ testProperty "equivalent to derived compare for product types" $
+        \ a b -> genericLiftCompare compare a b === compare a (b :: Product Int)
 
-  describe "Show1" $ do
-    describe "genericLiftShowsPrec" $ do
-      prop "equivalent to derived showsPrec for product types" $
-        \ a -> genericLiftShowsPrec showsPrec showList 0 a "" `shouldBe` showsPrec 0 (a :: Product Int) ""
+    , testProperty "equivalent to derived compare for sum types" $
+        \ a b -> genericLiftCompare compare a b === compare a (b :: Sum Int)
 
-      prop "equivalent to derived showsPrec for sum types" $
-        \ a -> genericLiftShowsPrec showsPrec showList 0 a "" `shouldBe` showsPrec 0 (a :: Sum Int) ""
+    , testProperty "equivalent to derived compare for recursive types" $
+        \ a b -> genericLiftCompare compare a b === compare a (b :: Tree Int)
+    ]
+  , testGroup "Show1/genericLiftShowsPrec"
+    [ testProperty "equivalent to derived showsPrec for product types" $
+        \ a -> genericLiftShowsPrec showsPrec showList 0 a "" === showsPrec 0 (a :: Product Int) ""
 
-      prop "equivalent to derived showsPrec for recursive types" $
-        \ a -> genericLiftShowsPrec showsPrec showList 0 a "" `shouldBe` showsPrec 0 (a :: Tree Int) ""
+    , testProperty "equivalent to derived showsPrec for sum types" $
+        \ a -> genericLiftShowsPrec showsPrec showList 0 a "" === showsPrec 0 (a :: Sum Int) ""
 
-      prop "equivalent to derived showsPrec for record selectors" $
-        \ a -> genericLiftShowsPrecWithOptions defaultGShow1Options { optionsUseRecordSyntax = True } showsPrec showList 0 a "" `shouldBe` showsPrec 0 (a :: Record Int) ""
+    , testProperty "equivalent to derived showsPrec for recursive types" $
+        \ a -> genericLiftShowsPrec showsPrec showList 0 a "" === showsPrec 0 (a :: Tree Int) ""
 
-      prop "equivalent to derived showsPrec for infix constructors" $
-        \ a -> genericLiftShowsPrec showsPrec showList 0 a "" `shouldBe` showsPrec 0 (a :: Infix Int) ""
+    , testProperty "equivalent to derived showsPrec for record selectors" $
+        \ a -> genericLiftShowsPrecWithOptions defaultGShow1Options { optionsUseRecordSyntax = True } showsPrec showList 0 a "" === showsPrec 0 (a :: Record Int) ""
 
+    , testProperty "equivalent to derived showsPrec for infix constructors" $
+        \ a -> genericLiftShowsPrec showsPrec showList 0 a "" === showsPrec 0 (a :: Infix Int) ""
+    ]
+  ]
 
 data Product a = Product a a a
   deriving (Eq, Generic1, Ord, Show)

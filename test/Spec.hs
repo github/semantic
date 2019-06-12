@@ -57,7 +57,7 @@ tastySpecs args
   : Data.Graph.Spec.spec
   -- : "Data.Abstract.Path" Data.Abstract.Path.Spec.spec
   : Data.Abstract.Name.Spec.spec
-  -- : "Data.Functor.Classes.Generic" Data.Functor.Classes.Generic.Spec.spec
+  : Data.Functor.Classes.Generic.Spec.spec
   : Data.Range.Spec.spec
   : Data.Scientific.Spec.spec
   : Data.Semigroup.App.Spec.spec
@@ -89,7 +89,6 @@ hspecSpecs args =
     describe "Analysis.Ruby" (Analysis.Ruby.Spec.spec args)
     describe "Analysis.TypeScript" (Analysis.TypeScript.Spec.spec args)
     describe "Assigning.Assignment" Assigning.Assignment.Spec.spec
-    describe "Data.Functor.Classes.Generic" Data.Functor.Classes.Generic.Spec.spec
     describe "Data.Source" Data.Source.Spec.spec
     describe "Diffing.Algorithm.RWS" Diffing.Algorithm.RWS.Spec.spec
     describe "Diffing.Algorithm.SES" Diffing.Algorithm.SES.Spec.spec
