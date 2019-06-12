@@ -1,6 +1,5 @@
 module Parsing.Spec (spec) where
 
-import Control.Effect
 import Data.AST
 import Data.Blob
 import Data.ByteString.Char8 (pack)
@@ -9,9 +8,7 @@ import Data.Language
 import Data.Maybe
 import Data.Source
 import Parsing.TreeSitter
-import Semantic.Config
 import SpecHelpers
-import System.Timeout
 import TreeSitter.JSON (tree_sitter_json, Grammar)
 
 spec :: Spec

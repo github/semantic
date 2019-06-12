@@ -7,12 +7,12 @@
     (Float))
   (KeyValue
   { (TextElement)
-  ->(TextElement)}
+  ->(TextElement) }
     (Float))
   (KeyValue
     (TextElement)
   { (Float)
-  ->(Float)})
+  ->(Float) })
 {-(KeyValue
   {-(TextElement)-}
   {-(Float)-})-})

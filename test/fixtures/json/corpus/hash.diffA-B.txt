@@ -1,7 +1,7 @@
 (Hash
-  {-(KeyValue
-    {-(TextElement)-}
-    {-(Float)-})-}
+{-(KeyValue
+  {-(TextElement)-}
+  {-(Float)-})-}
   (KeyValue
     (TextElement)
     (Float))
@@ -12,7 +12,7 @@
   (KeyValue
     (TextElement)
   { (Float)
-  ->(Float)})
-  {+(KeyValue
+  ->(Float) })
+{+(KeyValue
   {+(TextElement)+}
   {+(Float)+})+})

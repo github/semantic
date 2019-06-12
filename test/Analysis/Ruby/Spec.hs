@@ -2,14 +2,13 @@
 {-# LANGUAGE TupleSections #-}
 module Analysis.Ruby.Spec (spec) where
 
-import           Control.Abstract (Declaration (..), ScopeError (..), runDeref)
+import           Control.Abstract (Declaration (..), ScopeError (..))
 import           Control.Effect.Resumable (SomeError (..))
 import           Data.Abstract.Evaluatable
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Number as Number
 import           Data.Abstract.Value.Concrete as Value
 import qualified Data.Language as Language
-import           Data.List.NonEmpty (NonEmpty (..))
 import           Data.Sum
 
 import SpecHelpers
