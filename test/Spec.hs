@@ -43,7 +43,9 @@ import Control.Exception
 
 tastySpecs :: TaskSession -> [TestTree]
 tastySpecs args
-  = Semantic.Stat.Spec.spec
+  = Integration.Spec.spec args
+  : Semantic.Stat.Spec.spec
+
   -- : "Analysis.Go" (Analysis.Go.Spec.spec args)
   -- : "Analysis.PHP" (Analysis.PHP.Spec.spec args)
   -- : "Analysis.Python" (Analysis.Python.Spec.spec args)
@@ -71,11 +73,10 @@ tastySpecs args
   : Rewriting.Go.Spec.spec
   -- : "Rewriting.JSON" Rewriting.JSON.Spec.spec
   : Rewriting.Python.Spec.spec
-  -- : "Tags.Spec" Tags.Spec.spec
+  : Tags.Spec.spec
   -- : "Semantic" Semantic.Spec.spec
-  -- : "Semantic.CLI" Semantic.CLI.Spec.spec
+  : Semantic.CLI.Spec.spec
   -- : "Semantic.IO" Semantic.IO.Spec.spec
-  : Integration.Spec.spec args
   : Parsing.Spec.spec
   : []
 
@@ -97,9 +98,7 @@ hspecSpecs args =
     describe "Rendering.TOC" Rendering.TOC.Spec.spec
     describe "Reprinting.Spec" Reprinting.Spec.spec
     describe "Rewriting.JSON" Rewriting.JSON.Spec.spec
-    describe "Tags.Spec" Tags.Spec.spec
     describe "Semantic" Semantic.Spec.spec
-    describe "Semantic.CLI" Semantic.CLI.Spec.spec
     describe "Semantic.IO" Semantic.IO.Spec.spec
 
 main :: IO ()

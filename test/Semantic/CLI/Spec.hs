@@ -11,26 +11,39 @@ import           Semantic.Task
 import           Serializing.Format
 
 import SpecHelpers
+import Test.Tasty
+import Test.Tasty.Golden
 
+spec :: TestTree
+spec = testGroup "Semantic.CLI"
+  [ testGroup "parseDiffBuilder" $ fmap testForDiffFixture diffFixtures
+  ]
 
-spec :: Spec
-spec = parallel $ do
-  describe "parseDiffBuilder" $
-    for_ diffFixtures $ \ (diffRenderer, runDiff, files, expected) ->
-      it ("renders to " <> diffRenderer <> " with files " <> show files) $ do
-        output <- runTaskOrDie $ readBlobPairs (Right files) >>= runDiff
-        runBuilder output `shouldBe'` expected
+testForDiffFixture (diffRenderer, runDiff, files, expected) =
+  goldenVsStringDiff
+    (diffRenderer <> " with " <> show files)
+    (\ref new -> ["git", "diff", ref, new])
+    expected
+    (fmap toLazyByteString . runTaskOrDie $ readBlobPairs (Right files) >>= runDiff)
 
-  describe "parseTermBuilder" $
-    for_ parseFixtures $ \ (format, runParse, files, expected) ->
-      it ("renders to " <> format <> " with files " <> show files) $ do
-        output <- runTaskOrDie $ readBlobs (FilesFromPaths files) >>= runParse
-        runBuilder output `shouldBe'` expected
-  where
-    shouldBe' actual' expectedFile = do
-      let actual = verbatim actual'
-      expected <- verbatim <$> B.readFile expectedFile
-      actual `shouldBe` expected
+-- spec :: Spec
+-- spec = parallel $ do
+--   describe "parseDiffBuilder" $
+--     for_ diffFixtures $ \ (diffRenderer, runDiff, files, expected) ->
+--       it ("renders to " <> diffRenderer <> " with files " <> show files) $ do
+--         output <- runTaskOrDie $ readBlobPairs (Right files) >>= runDiff
+--         runBuilder output `shouldBe'` expected
+
+--   describe "parseTermBuilder" $
+--     for_ parseFixtures $ \ (format, runParse, files, expected) ->
+--       it ("renders to " <> format <> " with files " <> show files) $ do
+--         output <- runTaskOrDie $ readBlobs (FilesFromPaths files) >>= runParse
+--         runBuilder output `shouldBe'` expected
+--   where
+--     shouldBe' actual' expectedFile = do
+--       let actual = verbatim actual'
+--       expected <- verbatim <$> B.readFile expectedFile
+--       actual `shouldBe` expected
 
 parseFixtures :: [(String, [Blob] -> TaskEff Builder, [File], FilePath)]
 parseFixtures =

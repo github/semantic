@@ -20,7 +20,7 @@ languages :: [FilePath]
 languages = ["go", "javascript", "json", "python", "ruby", "typescript", "tsx"]
 
 spec :: TaskSession -> TestTree
-spec config = let ?session = config in testGroup "Integration" $ fmap testsForLanguage languages
+spec config = let ?session = config in testGroup "Integration (golden tests)" $ fmap testsForLanguage languages
 
 testsForLanguage :: (?session :: TaskSession) => FilePath -> TestTree
 testsForLanguage language = do

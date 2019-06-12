@@ -6,6 +6,6 @@ import Test.Tasty
 import Test.Tasty.LeanCheck
 
 spec :: TestTree
-spec =
+spec = testGroup "Data.Range" . pure .
   testProperty "Data.Range: should have an associative Semigroup instance" $
     \(a, b, c) -> a <> (b <> c) == (a <> b) <> (c :: Range)
