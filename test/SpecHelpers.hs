@@ -10,8 +10,6 @@ module SpecHelpers
 , runTaskOrDie
 , TaskSession(..)
 , testEvaluating
-, verbatim
-, Verbatim(..)
 , toList
 , Config
 , LogQueue
@@ -195,17 +193,3 @@ lookupDeclaration name (currentScope, currentFrame) heap scopeGraph = do
   path <- ScopeGraph.lookupScopePath name currentScope scopeGraph
   frameAddress <- Heap.lookupFrameAddress path currentFrame heap
   toList <$> Heap.getSlotValue (Slot frameAddress (Heap.pathPosition path)) heap
-
-newtype Verbatim = Verbatim ByteString
-  deriving (Eq)
-
-instance Show Verbatim where
-  showsPrec _ (Verbatim byteString) = (T.unpack (T.decodeUtf8 byteString) ++)
-
-verbatim :: ByteString -> Verbatim
-verbatim = Verbatim . stripWhitespace
-  where
-    stripWhitespace :: ByteString -> ByteString
-    stripWhitespace = B.foldl' go B.empty
-      where go acc x | x `B.elem` " \t\n" = acc
-                     | otherwise = B.snoc acc x
