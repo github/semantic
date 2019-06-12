@@ -26,7 +26,7 @@ To serve these goals, the following options were considered alongside `tree-sitt
 5. **Performance is decoupled from specific algorithm.** Similarly, grammar specifications are intimately coupled to performance characteristics using whatever algorithms will support them; a grammar which parses very efficiently with one algorithm may be a worst case for another.
 6. **There isn’t a universally accepted format for grammar specification.** BNF, and EBNF, are under-specified, and often unsupported; useful only for informal specification to humans, and not for formal specification to machines.
 7. **Language specifications are complex.** Some languages’ grammar specs turn out to be complex, for example [Java's language specification](https://docs.oracle.com/javase/specs/jls/se9/html/index.html). Similarly problematic is [Swift's spec](https://developer.apple.com/library/content/documentation/Swift/Conceptual/Swift_Programming_Language/TheBasics.html), described by @robrix as "a subtle and intricate work of fiction".
-8. **Open source.** By using tree-sitter—we can lean on open source contributors to do grammar development work.
+8. **Open source.** By using tree-sitter we can lean on open source contributors to do grammar development work.
 9. **Low learning curve.** Writing grammars in JavaScript (as opposed to some custom notation/language) is quite powerful.
 10. **Multiple algorithms for handling ambiguity.** Precedence annotations at compile time, GLR at runtime.
 11. **External scanner support.** In case you need to parse a context free grammar. An example of an external scanner is in [Ruby's language support](https://github.com/tree-sitter/tree-sitter-ruby/blob/master/src/scanner.cc).
