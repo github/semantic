@@ -29,6 +29,7 @@ import           Data.Loc
 import qualified Data.Map as Map
 import           Data.Monoid (Alt(..))
 import           Data.Name
+import           Data.Text (Text)
 import           Prelude hiding (fail)
 
 type Precise = Int
@@ -41,7 +42,7 @@ data Concrete
   = Closure Loc Name Core.Core Precise
   | Unit
   | Bool Bool
-  | String String
+  | String Text
   | Obj Frame
   deriving (Eq, Ord, Show)
 

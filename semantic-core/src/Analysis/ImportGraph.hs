@@ -22,6 +22,7 @@ import           Data.Loc
 import qualified Data.Map as Map
 import           Data.Name
 import qualified Data.Set as Set
+import           Data.Text (Text)
 import           Prelude hiding (fail)
 
 type ImportGraph = Map.Map FilePath (Set.Set FilePath)
@@ -41,7 +42,7 @@ instance Monoid Value where
 data Semi
   = Closure Loc Name Core.Core Name
   -- FIXME: Bound String values.
-  | String String
+  | String Text
   | Abstract
   deriving (Eq, Ord, Show)
 
@@ -98,7 +99,7 @@ importGraphAnalysis = Analysis{..}
         asBool _ = pure True <|> pure False
         string s = pure (Value (String s) mempty)
         asString (Value (String s) _) = pure s
-        asString _ = pure ""
+        asString _ = pure mempty
         frame = pure mempty
         edge Core.Import (Path to) = do
           Loc{locPath=from} <- ask

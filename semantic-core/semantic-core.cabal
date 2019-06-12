@@ -47,6 +47,7 @@ library
                      , prettyprinter-ansi-terminal ^>= 1.1.1
                      , recursion-schemes           ^>= 5.1
                      , semigroupoids               ^>= 5.3
+                     , text                        ^>= 1.2.3.1
                      , transformers                ^>= 0.5.6
                      , trifecta                    ^>= 2
                      , unordered-containers        ^>= 0.2.10

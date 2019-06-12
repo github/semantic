@@ -21,6 +21,7 @@ import Data.Functor
 import Data.Loc
 import Data.Maybe (fromJust)
 import Data.Name
+import Data.Text (Text, unpack)
 import GHC.Stack
 import Prelude hiding (fail)
 
@@ -42,7 +43,7 @@ eval Analysis{..} eval = \case
   String s -> string s
   Load p -> do
     path <- eval p >>= asString
-    lookupEnv' (Path path) >>= deref' (Path path)
+    lookupEnv' (Path (unpack path)) >>= deref' (Path (unpack path))
   Edge e a -> ref a >>= edge e >> unit
   Frame -> frame
   a :. b -> do
@@ -207,8 +208,8 @@ data Analysis address value m = Analysis
   , unit        :: m value
   , bool        :: Bool -> m value
   , asBool      :: value -> m Bool
-  , string      :: String -> m value -- FIXME: Text
-  , asString    :: value -> m String
+  , string      :: Text -> m value -- FIXME: Text
+  , asString    :: value -> m Text
   , frame       :: m value
   , edge        :: Edge -> address -> m ()
   , (...)       :: forall a . address -> m a -> m a
