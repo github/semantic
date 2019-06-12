@@ -3,11 +3,11 @@ module Language.Python.Core
 ( compile
 ) where
 
-import Control.Monad.Fail
-import Data.Core as Core
-import GHC.Generics
-import Prelude hiding (fail)
-import TreeSitter.Python.AST as Py
+import           Control.Monad.Fail
+import           Data.Core as Core
+import           GHC.Generics
+import           Prelude hiding (fail)
+import qualified TreeSitter.Python.AST as Py
 
 class Compile t where
   -- FIXME: we should really try not to fail
@@ -47,7 +47,7 @@ instance Compile Py.Expression where compile = compileSum
 
 instance Compile Py.ExpressionStatement
 
-instance Compile Py.False where compile _ = pure (Bool Prelude.False)
+instance Compile Py.False where compile _ = pure (Bool False)
 
 instance Compile Py.Float
 instance Compile Py.ForStatement
@@ -58,11 +58,11 @@ instance Compile Py.GlobalStatement
 instance Compile Py.Identifier
 
 instance Compile Py.IfStatement where
-  compile IfStatement{..} = If <$> compile condition <*> compile consequence <*> case alternative of
-    Nothing -> pure Unit
+  compile Py.IfStatement{..} = If <$> compile condition <*> compile consequence <*> case alternative of
+    Nothing      -> pure Unit
     Just clauses -> foldr clause (pure Unit) clauses
-    where clause (Left  ElifClause{..}) rest = If <$> compile condition <*> compile consequence <*> rest
-          clause (Right ElseClause{..}) _    = compile body
+    where clause (Left  Py.ElifClause{..}) rest = If <$> compile condition <*> compile consequence <*> rest
+          clause (Right Py.ElseClause{..}) _    = compile body
 
 instance Compile Py.ImportFromStatement
 instance Compile Py.ImportStatement
@@ -73,8 +73,8 @@ instance Compile Py.List
 instance Compile Py.ListComprehension
 
 instance Compile Py.Module where
-  compile (Module Nothing) = pure Unit
-  compile (Module (Just statements)) = block <$> traverse compile statements
+  compile (Py.Module Nothing)           = pure Unit
+  compile (Py.Module (Just statements)) = block <$> traverse compile statements
 
 instance Compile Py.NamedExpression
 instance Compile Py.None
@@ -96,7 +96,7 @@ instance Compile Py.SimpleStatement where compile = compileSum
 instance Compile Py.String
 instance Compile Py.Subscript
 
-instance Compile Py.True where compile _ = pure (Bool Prelude.True)
+instance Compile Py.True where compile _ = pure (Bool True)
 
 instance Compile Py.TryStatement
 instance Compile Py.Tuple
