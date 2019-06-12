@@ -26,7 +26,7 @@ toJSONSource = fromUTF8 . pack . show
 source = toJSONSource $ take 10000 [1..]
 largeBlob = sourceBlob "large.json" JSON source
 
-case_parseToAST_returns_result_when_timeout_zer = do
+case_parseToAST_returns_result_when_timeout_zero = do
   let timeout = fromMicroseconds 0 -- Zero microseconds indicates no timeout
   let parseTask = parseToAST timeout tree_sitter_json largeBlob :: TaskEff (Maybe (AST [] Grammar))
   result <- runTaskOrDie parseTask
