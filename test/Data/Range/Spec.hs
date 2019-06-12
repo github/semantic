@@ -1,11 +1,11 @@
-{-# LANGUAGE ScopedTypeVariables #-}
-
 module Data.Range.Spec where
 
+import Data.Functor.Listable
 import Data.Range
-import SpecHelpers
+import Test.Tasty
+import Test.Tasty.LeanCheck
 
-spec :: Spec
-spec = describe "Data.Range" $
-  prop "should have an associative Semigroup instance" $
-    \(a, b, c) -> a <> (b <> c) `shouldBe` (a <> b) <> (c :: Range)
+spec :: TestTree
+spec =
+  testProperty "Data.Range: should have an associative Semigroup instance" $
+    \(a, b, c) -> a <> (b <> c) == (a <> b) <> (c :: Range)

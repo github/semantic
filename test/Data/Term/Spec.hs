@@ -3,12 +3,10 @@ module Data.Term.Spec (spec) where
 
 import Data.Functor.Listable
 import Data.Term
-import Test.Hspec (Spec, describe, parallel)
-import Test.Hspec.Expectations.Pretty
-import Test.Hspec.LeanCheck
+import Test.Tasty
+import Test.Tasty.LeanCheck
 
-spec :: Spec
-spec = parallel $ do
-  describe "Term" $ do
-    prop "equality is reflexive" $
-      \ a -> a `shouldBe` (a :: Term ListableSyntax ())
+spec :: TestTree
+spec =
+  testProperty "Data.Term: equality is reflexive" $
+    \ a -> a == (a :: Term ListableSyntax ())

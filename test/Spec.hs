@@ -1,3 +1,4 @@
+{-# LANGUAGE ScopedTypeVariables #-}
 module Main where
 
 import qualified Analysis.Go.Spec
@@ -36,44 +37,86 @@ import qualified Semantic.IO.Spec
 import qualified Semantic.Stat.Spec
 import Semantic.Config (defaultOptions, optionsLogLevel)
 import Semantic.Task (withOptions, TaskSession(..))
+import Test.Tasty
 import Test.Hspec
+import Control.Exception
+
+tastySpecs :: TaskSession -> [TestTree]
+tastySpecs args
+  = Semantic.Stat.Spec.spec
+  -- : "Analysis.Go" (Analysis.Go.Spec.spec args)
+  -- : "Analysis.PHP" (Analysis.PHP.Spec.spec args)
+  -- : "Analysis.Python" (Analysis.Python.Spec.spec args)
+  -- : "Analysis.Ruby" (Analysis.Ruby.Spec.spec args)
+  -- : "Analysis.TypeScript" (Analysis.TypeScript.Spec.spec args)
+  -- : "Assigning.Assignment" Assigning.Assignment.Spec.spec
+  -- : "Control.Abstract.Evaluator" Control.Abstract.Evaluator.Spec.spec
+  -- : "Data.Diff" Data.Diff.Spec.spec
+  -- : "Data.Graph" Data.Graph.Spec.spec
+  -- : "Data.Abstract.Path" Data.Abstract.Path.Spec.spec
+  -- : "Data.Abstract.Name" Data.Abstract.Name.Spec.spec
+  -- : "Data.Functor.Classes.Generic" Data.Functor.Classes.Generic.Spec.spec
+  : Data.Range.Spec.spec
+  -- : "Data.Scientific" Data.Scientific.Spec.spec
+  -- : "Data.Semigroup.App" Data.Semigroup.App.Spec.spec
+  -- : "Data.Source" Data.Source.Spec.spec
+  : Data.Term.Spec.spec
+  -- : "Diffing.Algorithm.RWS" Diffing.Algorithm.RWS.Spec.spec
+  -- : "Diffing.Algorithm.SES" Diffing.Algorithm.SES.Spec.spec
+  -- : "Diffing.Interpreter" Diffing.Interpreter.Spec.spec
+  -- : "Graphing.Calls" Graphing.Calls.Spec.spec
+  : Numeric.Spec.spec
+  -- : "Rendering.TOC" Rendering.TOC.Spec.spec
+  -- : "Reprinting.Spec" Reprinting.Spec.spec
+  -- : "Rewriting.Go" Rewriting.Go.Spec.spec
+  -- : "Rewriting.JSON" Rewriting.JSON.Spec.spec
+  -- : "Rewriting.Python" Rewriting.Python.Spec.spec
+  -- : "Tags.Spec" Tags.Spec.spec
+  -- : "Semantic" Semantic.Spec.spec
+  -- : "Semantic.CLI" Semantic.CLI.Spec.spec
+  -- : "Semantic.IO" Semantic.IO.Spec.spec
+  -- : "Integration" (Integration.Spec.spec args)
+  -- : "Parsing" Parsing.Spec.spec
+  : []
+
+hspecSpecs :: TaskSession -> Spec
+hspecSpecs args =
+  parallel $ do
+    describe "Analysis.Go" (Analysis.Go.Spec.spec args)
+    describe "Analysis.PHP" (Analysis.PHP.Spec.spec args)
+    describe "Analysis.Python" (Analysis.Python.Spec.spec args)
+    describe "Analysis.Ruby" (Analysis.Ruby.Spec.spec args)
+    describe "Analysis.TypeScript" (Analysis.TypeScript.Spec.spec args)
+    describe "Assigning.Assignment" Assigning.Assignment.Spec.spec
+    describe "Control.Abstract.Evaluator" Control.Abstract.Evaluator.Spec.spec
+    describe "Data.Diff" Data.Diff.Spec.spec
+    describe "Data.Graph" Data.Graph.Spec.spec
+    describe "Data.Abstract.Path" Data.Abstract.Path.Spec.spec
+    describe "Data.Abstract.Name" Data.Abstract.Name.Spec.spec
+    describe "Data.Functor.Classes.Generic" Data.Functor.Classes.Generic.Spec.spec
+    describe "Data.Scientific" Data.Scientific.Spec.spec
+    describe "Data.Semigroup.App" Data.Semigroup.App.Spec.spec
+    describe "Data.Source" Data.Source.Spec.spec
+    describe "Diffing.Algorithm.RWS" Diffing.Algorithm.RWS.Spec.spec
+    describe "Diffing.Algorithm.SES" Diffing.Algorithm.SES.Spec.spec
+    describe "Diffing.Interpreter" Diffing.Interpreter.Spec.spec
+    describe "Graphing.Calls" Graphing.Calls.Spec.spec
+    describe "Rendering.TOC" Rendering.TOC.Spec.spec
+    describe "Reprinting.Spec" Reprinting.Spec.spec
+    describe "Rewriting.Go" Rewriting.Go.Spec.spec
+    describe "Rewriting.JSON" Rewriting.JSON.Spec.spec
+    describe "Rewriting.Python" Rewriting.Python.Spec.spec
+    describe "Tags.Spec" Tags.Spec.spec
+    describe "Semantic" Semantic.Spec.spec
+    describe "Semantic.CLI" Semantic.CLI.Spec.spec
+    describe "Semantic.IO" Semantic.IO.Spec.spec
+    describe "Integration" (Integration.Spec.spec args)
+    describe "Parsing" Parsing.Spec.spec
 
 main :: IO ()
 main = do
-  withOptions defaultOptions { optionsLogLevel = Nothing } $ \ config logger statter -> hspec $ do
+  withOptions defaultOptions { optionsLogLevel = Nothing } $ \ config logger statter -> do
     let args = TaskSession config "-" False logger statter
-    describe "Semantic.Stat" Semantic.Stat.Spec.spec
-    parallel $ do
-      describe "Analysis.Go" (Analysis.Go.Spec.spec args)
-      describe "Analysis.PHP" (Analysis.PHP.Spec.spec args)
-      describe "Analysis.Python" (Analysis.Python.Spec.spec args)
-      describe "Analysis.Ruby" (Analysis.Ruby.Spec.spec args)
-      describe "Analysis.TypeScript" (Analysis.TypeScript.Spec.spec args)
-      describe "Assigning.Assignment" Assigning.Assignment.Spec.spec
-      describe "Control.Abstract.Evaluator" Control.Abstract.Evaluator.Spec.spec
-      describe "Data.Diff" Data.Diff.Spec.spec
-      describe "Data.Graph" Data.Graph.Spec.spec
-      describe "Data.Abstract.Path" Data.Abstract.Path.Spec.spec
-      describe "Data.Abstract.Name" Data.Abstract.Name.Spec.spec
-      describe "Data.Functor.Classes.Generic" Data.Functor.Classes.Generic.Spec.spec
-      describe "Data.Range" Data.Range.Spec.spec
-      describe "Data.Scientific" Data.Scientific.Spec.spec
-      describe "Data.Semigroup.App" Data.Semigroup.App.Spec.spec
-      describe "Data.Source" Data.Source.Spec.spec
-      describe "Data.Term" Data.Term.Spec.spec
-      describe "Diffing.Algorithm.RWS" Diffing.Algorithm.RWS.Spec.spec
-      describe "Diffing.Algorithm.SES" Diffing.Algorithm.SES.Spec.spec
-      describe "Diffing.Interpreter" Diffing.Interpreter.Spec.spec
-      describe "Graphing.Calls" Graphing.Calls.Spec.spec
-      describe "Numeric" Numeric.Spec.spec
-      describe "Rendering.TOC" Rendering.TOC.Spec.spec
-      describe "Reprinting.Spec" Reprinting.Spec.spec
-      describe "Rewriting.Go" Rewriting.Go.Spec.spec
-      describe "Rewriting.JSON" Rewriting.JSON.Spec.spec
-      describe "Rewriting.Python" Rewriting.Python.Spec.spec
-      describe "Tags.Spec" Tags.Spec.spec
-      describe "Semantic" Semantic.Spec.spec
-      describe "Semantic.CLI" Semantic.CLI.Spec.spec
-      describe "Semantic.IO" Semantic.IO.Spec.spec
-      describe "Integration" (Integration.Spec.spec args)
-      describe "Parsing" Parsing.Spec.spec
+    hspec (hspecSpecs args) `catch` (\(e :: SomeException) -> pure ())
+    defaultMain (testGroup "Semantic" (tastySpecs args))
+
