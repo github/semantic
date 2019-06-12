@@ -1,5 +1,5 @@
 {-# LANGUAGE ImplicitParams #-}
-
+{-# OPTIONS_GHC -O0 #-}
 module Analysis.Python.Spec (spec) where
 
 import qualified Data.Abstract.ModuleTable as ModuleTable
