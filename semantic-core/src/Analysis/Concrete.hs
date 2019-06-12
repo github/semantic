@@ -187,7 +187,7 @@ heapAddressGraph = heapGraph (\ addr v -> (Value v, addr)) (fmap G.vertex . (,) 
 
 addressStyle :: Heap -> G.Style (EdgeType, Precise) Text
 addressStyle heap = (G.defaultStyle vertex) { G.edgeAttributes }
-  where vertex (_, addr) = maybe (pack (show addr) <> " = ?") (((pack (show addr) <> " = ") <>) . fromConcrete) (IntMap.lookup addr heap)
+  where vertex (_, addr) = pack (show addr) <> " = " <> maybe "?" fromConcrete (IntMap.lookup addr heap)
         edgeAttributes _ (Slot name,         _) = ["label" G.:= fromName name]
         edgeAttributes _ (Edge Core.Import,  _) = ["color" G.:= "blue"]
         edgeAttributes _ (Edge Core.Lexical, _) = ["color" G.:= "green"]
