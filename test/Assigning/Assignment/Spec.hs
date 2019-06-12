@@ -16,9 +16,12 @@ import GHC.Stack (getCallStack)
 import Prelude hiding (words)
 import Test.Hspec
 import TreeSitter.Language (Symbol (..), SymbolType (..))
+import Test.Tasty
+import System.IO.Unsafe
+import Test.Tasty.Hspec
 
-spec :: Spec
-spec = do
+spec :: TestTree
+spec = unsafePerformIO . testSpec "Assigning.Assignment" $ parallel $ do
   describe "Applicative" $
     it "matches in sequence" $
       fst <$> runAssignment "helloworld" ((,) <$> red <*> red) (makeState [node Red 0 5 [], node Red 5 10 []])

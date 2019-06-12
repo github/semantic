@@ -61,7 +61,7 @@ tastySpecs args
   : Data.Range.Spec.spec
   : Data.Scientific.Spec.spec
   : Data.Semigroup.App.Spec.spec
-  -- : "Data.Source" Data.Source.Spec.spec
+  : Data.Source.Spec.spec
   : Data.Term.Spec.spec
   -- : "Diffing.Algorithm.RWS" Diffing.Algorithm.RWS.Spec.spec
   -- : "Diffing.Algorithm.SES" Diffing.Algorithm.SES.Spec.spec
@@ -88,8 +88,6 @@ hspecSpecs args =
     describe "Analysis.Python" (Analysis.Python.Spec.spec args)
     describe "Analysis.Ruby" (Analysis.Ruby.Spec.spec args)
     describe "Analysis.TypeScript" (Analysis.TypeScript.Spec.spec args)
-    describe "Assigning.Assignment" Assigning.Assignment.Spec.spec
-    describe "Data.Source" Data.Source.Spec.spec
     describe "Diffing.Algorithm.RWS" Diffing.Algorithm.RWS.Spec.spec
     describe "Diffing.Algorithm.SES" Diffing.Algorithm.SES.Spec.spec
     describe "Diffing.Interpreter" Diffing.Interpreter.Spec.spec
