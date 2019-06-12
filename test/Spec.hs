@@ -59,7 +59,8 @@ allTests session = do
 -- stanza: it is only there to prevent massive rewrites, and is
 -- converted into a Tasty TestTree in 'main'. (Quoth the tasty-hspec
 -- documentation: "hspec and tasty serve similar purposes; consider
--- using one or the other.") Instead,
+-- using one or the other.") Instead, create a new TestTree value
+-- in your spec module and add it to the above 'tests' list.
 legacySpecs :: TaskSession -> Spec
 legacySpecs args = do
   describe "Semantic.Stat" Semantic.Stat.Spec.spec
