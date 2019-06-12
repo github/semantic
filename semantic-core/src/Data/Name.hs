@@ -26,12 +26,12 @@ import           Control.Monad.IO.Class
 import qualified Data.Char as Char
 import           Data.HashSet (HashSet)
 import qualified Data.HashSet as HashSet
-import           Data.Text (Text)
+import           Data.Text as Text (Text, any, unpack)
 import           Data.Text.Prettyprint.Doc (Pretty (..))
 import qualified Data.Text.Prettyprint.Doc as Pretty
 
 -- | User-specified and -relevant names.
-type User = String
+type User = Text
 
 -- | The type of namespaced actions, i.e. actions occurring within some outer name.
 --
@@ -57,14 +57,14 @@ instance Pretty Name where
     User n -> pretty n
     Path p -> pretty (show p)
 
-reservedNames :: HashSet User
+reservedNames :: HashSet String
 reservedNames = [ "#true", "#false", "let", "#frame", "if", "then", "else"
                 , "lexical", "import", "#unit", "load"]
 
 -- | Returns true if any character would require quotation or if the
 -- name conflicts with a Core primitive.
 needsQuotation :: User -> Bool
-needsQuotation u = HashSet.member u reservedNames || any (not . isSimpleCharacter) u
+needsQuotation u = HashSet.member (unpack u) reservedNames || Text.any (not . isSimpleCharacter) u
 
 -- | A ‘simple’ character is, loosely defined, a character that is compatible
 -- with identifiers in most ASCII-oriented programming languages. This is defined
