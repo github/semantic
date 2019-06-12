@@ -44,6 +44,7 @@ import Test.Tasty.Options as Tasty
 tests :: TaskSession -> [TestTree]
 tests session =
   [ Integration.Spec.spec session
+  , Semantic.CLI.Spec.spec
   ]
 
 -- We can't bring this out of the IO monad until we divest
@@ -93,7 +94,6 @@ legacySpecs args = do
     describe "Rewriting.Python" Rewriting.Python.Spec.spec
     describe "Tags.Spec" Tags.Spec.spec
     describe "Semantic" Semantic.Spec.spec
-    describe "Semantic.CLI" Semantic.CLI.Spec.spec
     describe "Semantic.IO" Semantic.IO.Spec.spec
     describe "Parsing" Parsing.Spec.spec
 
