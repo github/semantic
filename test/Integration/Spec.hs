@@ -2,9 +2,8 @@
 module Integration.Spec (spec) where
 
 import Control.Exception (throw)
-import Data.Foldable (find, traverse_, for_)
+import Data.Foldable (find)
 import Data.List (union, concat, transpose)
-import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL
 import System.FilePath.Glob
 import System.FilePath.Posix

@@ -39,7 +39,6 @@ import Semantic.Task (withOptions, TaskSession(..))
 import Test.Hspec
 import Test.Tasty as Tasty
 import Test.Tasty.Hspec as Tasty
-import Test.Tasty.Options as Tasty
 
 tests :: TaskSession -> [TestTree]
 tests session =
