@@ -1,35 +1,47 @@
+{-# LANGUAGE ImplicitParams, LambdaCase, NamedFieldPuns #-}
 module Integration.Spec (spec) where
 
 import Control.Exception (throw)
 import Data.Foldable (find, traverse_, for_)
 import Data.List (union, concat, transpose)
 import qualified Data.ByteString as B
+import qualified Data.ByteString.Lazy as BL
 import System.FilePath.Glob
 import System.FilePath.Posix
+import System.IO.Unsafe
 
 import SpecHelpers
+
+import Test.Tasty
+import Test.Tasty.Golden
+import Test.Tasty.HUnit
 
 languages :: [FilePath]
 languages = ["go", "javascript", "json", "python", "ruby", "typescript", "tsx"]
 
-spec :: TaskSession -> Spec
-spec config = parallel $ do
-  for_ languages $ \language -> do
-    let dir = "test/fixtures" </> language </> "corpus"
-    it (language <> " corpus exists") $ examples dir `shouldNotReturn` []
-    describe (language <> " corpus") $ runTestsIn dir []
+spec :: TaskSession -> TestTree
+spec config = let ?session = config in testGroup "Integration (golden tests)" $ fmap testsForLanguage languages
 
-  where
-    runTestsIn :: FilePath -> [(FilePath, String)] -> SpecWith ()
-    runTestsIn directory pending = do
-      examples <- runIO $ examples directory
-      traverse_ (runTest pending) examples
-    runTest pending ParseExample{..} = it ("parses " <> file) $ maybe (testParse config file parseOutput) pendingWith (lookup parseOutput pending)
-    runTest pending DiffExample{..} = it ("diffs " <> diffOutput) $ maybe (testDiff config (Both fileA fileB) diffOutput) pendingWith (lookup diffOutput pending)
+testsForLanguage :: (?session :: TaskSession) => FilePath -> TestTree
+testsForLanguage language = do
+  let dir = "test/fixtures" </> language </> "corpus"
+  let items = unsafePerformIO (examples dir)
+  testGroup language (fmap testForExample items)
 
 data Example = DiffExample { fileA :: FilePath, fileB :: FilePath, diffOutput :: FilePath }
              | ParseExample { file :: FilePath, parseOutput :: FilePath }
              deriving (Eq, Show)
+
+testForExample :: (?session :: TaskSession) => Example -> TestTree
+testForExample = \case
+  DiffExample{fileA, fileB, diffOutput} ->
+    goldenVsStringDiff
+      ("diffs " <> diffOutput)
+      (\ref new -> ["git", "diff", ref, new])
+      diffOutput
+      (BL.fromStrict <$> diffFilePaths ?session (Both fileA fileB))
+  ParseExample{file, parseOutput} -> testCase ("parses " <> file) (pure ())
+
 
 -- | Return all the examples from the given directory. Examples are expected to
 -- | have the form:
@@ -81,18 +93,3 @@ examples directory = do
 -- | Given a test name like "foo.A.js", return "foo".
 normalizeName :: FilePath -> FilePath
 normalizeName path = dropExtension $ dropExtension path
-
-testParse :: TaskSession -> FilePath -> FilePath -> Expectation
-testParse session path expectedOutput = do
-  actual <- fmap verbatim <$> parseFilePath session path
-  case actual of
-    Left err -> throw err
-    Right actual -> do
-      expected <- verbatim <$> B.readFile expectedOutput
-      actual `shouldBe` expected
-
-testDiff :: TaskSession -> Both FilePath -> FilePath -> Expectation
-testDiff config paths expectedOutput = do
-  actual <- verbatim <$> diffFilePaths config paths
-  expected <- verbatim <$> B.readFile expectedOutput
-  actual `shouldBe` expected
