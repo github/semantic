@@ -25,7 +25,7 @@ testsForLanguage :: (?session :: TaskSession) => FilePath -> TestTree
 testsForLanguage language = do
   let dir = "test/fixtures" </> language </> "corpus"
   let items = unsafePerformIO (examples dir)
-  testGroup language (fmap testForExample items)
+  localOption (mkTimeout 3000000) $ testGroup language $ fmap testForExample items
 {-# NOINLINE testsForLanguage #-}
 
 data Example = DiffExample { fileA :: FilePath, fileB :: FilePath, diffOutput :: FilePath }
