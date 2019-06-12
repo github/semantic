@@ -340,6 +340,7 @@ test-suite test
   import:              haskell, dependencies, executable-flags
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
+  ghc-options:         -Wunused-imports
   main-is:             Spec.hs
   other-modules:       Analysis.Go.Spec
                      , Analysis.PHP.Spec

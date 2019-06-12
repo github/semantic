@@ -1,17 +1,11 @@
 module Semantic.CLI.Spec (spec) where
 
-import           Control.Monad (when)
-import qualified Data.ByteString as B
 import           Data.ByteString.Builder
-import           Data.Foldable (for_)
 import           Semantic.Api hiding (Blob, BlobPair, File)
-import           Semantic.CLI
-import           Semantic.IO
 import           Semantic.Task
 import           Serializing.Format
 import           System.Directory
 import           System.IO.Unsafe
-import           System.Process
 
 import SpecHelpers
 import Test.Tasty

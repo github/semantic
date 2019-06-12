@@ -23,7 +23,6 @@ import Control.Abstract hiding (lookupDeclaration)
 import Data.Abstract.ScopeGraph (EdgeLabel(..))
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import qualified Data.Abstract.Heap as Heap
-import Control.Arrow ((&&&))
 import Control.Effect.Trace as X (runTraceByIgnoring, runTraceByReturning)
 import Control.Monad ((>=>))
 import Data.Traversable as X (for)
@@ -34,7 +33,6 @@ import Data.Abstract.Module as X
 import Data.Abstract.ModuleTable as X hiding (lookup)
 import Data.Abstract.Name as X
 import Data.Abstract.Value.Concrete (Value(..), ValueError, runValueError)
-import Data.Bifunctor (first)
 import Data.Blob as X
 import Data.Blob.IO as X
 import Data.ByteString.Builder (toLazyByteString)
@@ -52,8 +50,6 @@ import Data.Span as X hiding (HasSpan(..))
 import Data.String
 import Data.Sum
 import Data.Term as X
-import qualified Data.Text as T
-import qualified Data.Text.Encoding as T
 import Parsing.Parser as X
 import Semantic.Task as X hiding (parsePackage)
 import Semantic.Util as X
@@ -73,10 +69,6 @@ import Test.Hspec.Expectations as X
 import Test.Hspec.LeanCheck as X
 import Test.LeanCheck as X
 
-import qualified Data.ByteString as B
-import qualified Data.Set as Set
-import Data.Set (Set)
-import qualified Semantic.IO as IO
 import Semantic.Config (Config(..), optionsLogLevel)
 import Semantic.Telemetry (LogQueue, StatQueue)
 import Semantic.Api hiding (File, Blob, BlobPair)

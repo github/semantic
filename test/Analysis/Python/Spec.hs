@@ -1,9 +1,7 @@
 module Analysis.Python.Spec (spec) where
 
-import Data.Abstract.Evaluatable (EvalError(..))
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import Data.Abstract.Value.Concrete
-import qualified Language.Python.Assignment as Python
 import qualified Data.Language as Language
 
 import SpecHelpers
