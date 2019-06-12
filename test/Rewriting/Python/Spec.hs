@@ -4,13 +4,9 @@ module Rewriting.Python.Spec (spec) where
 
 import           Control.Arrow
 import           Control.Rewriting
-import           Data.Abstract.Module
-import           Data.List
 import           Data.Sum
 import qualified Data.Syntax.Declaration as Decl
 import qualified Data.Syntax.Literal as Lit
-import qualified Data.Syntax.Statement as Stmt
-import           Data.Text (Text)
 import           SpecHelpers
 
 -- This gets the Text contents of all integers

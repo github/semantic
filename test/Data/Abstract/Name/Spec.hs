@@ -2,8 +2,6 @@ module Data.Abstract.Name.Spec where
 
 import SpecHelpers
 
-import Data.Abstract.Name
-
 spec :: Spec
 spec = describe "Data.Abstract.Name" $
   it "should format anonymous names correctly" $ do

@@ -1,10 +1,8 @@
 {-# OPTIONS_GHC -O0 #-}
 module Analysis.Go.Spec (spec) where
 
-import Data.Abstract.Evaluatable (EvalError(..))
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import qualified Data.Language as Language
-import qualified Language.Go.Assignment as Go
 import SpecHelpers
 
 

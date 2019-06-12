@@ -107,7 +107,5 @@ spec = parallel $ do
 
   where blobsFromFilePath path = do
           h <- openFileForReading path
-          putStrLn "got handle"
           blobs <- readBlobPairsFromHandle h
-          putStrLn "got blobs"
           pure blobs

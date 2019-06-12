@@ -5,23 +5,17 @@ module Reprinting.Spec where
 import SpecHelpers hiding (inject, project)
 
 import           Data.Foldable
-import           Data.Functor.Foldable (cata, embed)
 import qualified Data.Machine as Machine
 
 import           Control.Rewriting hiding (context)
-import           Data.Algebra
-import           Data.Blob
 import qualified Data.Language as Language
 import           Data.Reprinting.Scope
 import           Data.Reprinting.Token
 import           Data.Sum
 import qualified Data.Syntax.Literal as Literal
 import           Language.JSON.PrettyPrint
-import           Language.Python.PrettyPrint
-import           Language.Ruby.PrettyPrint
 import           Reprinting.Pipeline
 import           Reprinting.Tokenize
-import           Semantic.IO
 
 increaseNumbers :: (Literal.Float :< fs, Apply Functor fs) => Rule (Term (Sum fs) History)
 increaseNumbers = do

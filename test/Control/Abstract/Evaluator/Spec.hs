@@ -8,19 +8,14 @@ import qualified Control.Abstract.Heap as Heap
 import           Data.Abstract.Address.Precise as Precise
 import           Data.Abstract.BaseError
 import           Data.Abstract.Evaluatable
-import           Data.Abstract.FreeVariables
 import           Data.Abstract.Module
 import qualified Data.Abstract.Number as Number
 import           Data.Abstract.Package
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.Abstract.Value.Concrete as Value
-import           Data.Algebra
-import           Data.Bifunctor (first)
-import           Data.Functor.Const
 import qualified Data.Language as Language
 import qualified Data.Map.Strict as Map
 import           Data.Sum
-import           Data.Text (pack)
 import           SpecHelpers hiding (reassociate)
 import           System.IO.Unsafe (unsafePerformIO)
 

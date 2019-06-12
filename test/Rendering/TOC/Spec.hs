@@ -10,20 +10,17 @@ import Data.Diff
 import Data.Functor.Classes
 import Data.Hashable.Lifted
 import Data.Patch
-import Data.Range
 import Data.Location
 import Data.Span
 import Data.Sum
 import Data.Term
 import Data.Text (Text)
-import Data.Text.Encoding (encodeUtf8)
 import Diffing.Algorithm hiding (Diff)
 import Diffing.Interpreter
 import Prelude
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import Rendering.TOC
-import Semantic.Config
 import Semantic.Api (diffSummaryBuilder)
 import Serializing.Format as Format
 

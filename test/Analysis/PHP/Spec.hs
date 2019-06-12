@@ -1,12 +1,9 @@
 {-# OPTIONS_GHC -O0 #-}
 module Analysis.PHP.Spec (spec) where
 
-import           Control.Abstract
-import           Data.Abstract.Evaluatable (EvalError (..))
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import qualified Data.Abstract.Value.Concrete as Value
 import qualified Data.Language as Language
-import qualified Language.PHP.Assignment as PHP
 import           SpecHelpers
 
 
