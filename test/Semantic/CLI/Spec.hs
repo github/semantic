@@ -23,9 +23,11 @@ spec = testGroup "Semantic.CLI"
   , testGroup "parseTermBuilder" $ fmap testForParseFixture parseFixtures
   ]
 
--- If you're investigating these tests and find this output hard to read
--- the `jd` CLI tool (https://github.com/josephburnett/jd) will print
--- a detailed summary of the differences between these JSON files.
+-- We provide this function to the golden tests so as to have better
+-- output when diffing JSON outputs. If you're investigating these
+-- tests and find this output hard to read, install the `jd` CLI tool
+-- (https://github.com/josephburnett/jd), which will print a detailed
+-- summary of the differences between these JSON files.
 renderDiff :: String -> String -> [String]
 renderDiff ref new = unsafePerformIO $ do
   useJD <- (isExtensionOf ".json" ref &&) <$> fmap isJust (findExecutable "jd")
@@ -34,19 +36,16 @@ renderDiff ref new = unsafePerformIO $ do
     else ["git", "diff", ref, new]
 {-# NOINLINE renderDiff #-}
 
-
--- PT TODO: reduce duplication
-
 testForDiffFixture (diffRenderer, runDiff, files, expected) =
   goldenVsStringDiff
-    ("renders to " <> diffRenderer)
+    ("diff fixture renders to " <> diffRenderer <> " " <> show files)
     renderDiff
     expected
     (fmap toLazyByteString . runTaskOrDie $ readBlobPairs (Right files) >>= runDiff)
 
 testForParseFixture (format, runParse, files, expected) =
   goldenVsStringDiff
-    ("renders to " <> format)
+    ("diff fixture renders to " <> format <> " " <> show files)
     renderDiff
     expected
     (fmap toLazyByteString . runTaskOrDie $ readBlobs (FilesFromPaths files) >>= runParse)
