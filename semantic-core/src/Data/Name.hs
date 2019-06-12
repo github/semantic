@@ -77,8 +77,8 @@ isSimpleCharacter = \case
   c    -> Char.isAlphaNum c
 
 data Gensym
-  = Root String
-  | Gensym :/ (String, Int)
+  = Root Text
+  | Gensym :/ (Text, Int)
   deriving (Eq, Ord, Show)
 
 instance Pretty Gensym where
@@ -86,21 +86,21 @@ instance Pretty Gensym where
     Root s      -> pretty s
     p :/ (n, x) -> Pretty.hcat [pretty p, "/", pretty n, "^", pretty x]
 
-(//) :: Gensym -> String -> Gensym
+(//) :: Gensym -> Text -> Gensym
 root // s = root :/ (s, 0)
 
 infixl 6 //
 
-gensym :: (Carrier sig m, Member Naming sig) => String -> m Gensym
+gensym :: (Carrier sig m, Member Naming sig) => Text -> m Gensym
 gensym s = send (Gensym s pure)
 
-namespace :: (Carrier sig m, Member Naming sig) => String -> m a -> m a
+namespace :: (Carrier sig m, Member Naming sig) => Text -> m a -> m a
 namespace s m = send (Namespace s m pure)
 
 
 data Naming m k
-  = Gensym String (Gensym -> k)
-  | forall a . Namespace String (m a) (a -> k)
+  = Gensym Text (Gensym -> k)
+  | forall a . Namespace Text (m a) (a -> k)
 
 deriving instance Functor (Naming m)
 

@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, RecordWildCards #-}
+{-# LANGUAGE FlexibleContexts, OverloadedStrings, RecordWildCards #-}
 module Analysis.ImportGraph
 ( ImportGraph
 , importGraph

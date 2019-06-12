@@ -202,8 +202,8 @@ addressStyle heap = (G.defaultStyle vertex) { G.edgeAttributes }
         fromName (User s)  = s
         fromName (Gen sym) = fromGensym sym
         fromName (Path p)  = pack $ show p
-        fromGensym (Root s) = pack s
-        fromGensym (ss :/ (s, i)) = fromGensym ss <> "." <> pack s <> pack (show i)
+        fromGensym (Root s) = s
+        fromGensym (ss :/ (s, i)) = fromGensym ss <> "." <> s <> pack (show i)
 
 data EdgeType
   = Edge Core.Edge

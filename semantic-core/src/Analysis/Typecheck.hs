@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveFunctor, FlexibleContexts, FlexibleInstances, LambdaCase, RecordWildCards, ScopedTypeVariables, TypeApplications #-}
+{-# LANGUAGE DeriveFunctor, FlexibleContexts, FlexibleInstances, LambdaCase, OverloadedStrings, RecordWildCards, ScopedTypeVariables, TypeApplications #-}
 module Analysis.Typecheck
 ( Monotype (..)
 , Meta
