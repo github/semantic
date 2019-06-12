@@ -75,7 +75,7 @@ tastySpecs args
   -- : "Semantic" Semantic.Spec.spec
   -- : "Semantic.CLI" Semantic.CLI.Spec.spec
   -- : "Semantic.IO" Semantic.IO.Spec.spec
-  -- : "Integration" (Integration.Spec.spec args)
+  : Integration.Spec.spec args
   : Parsing.Spec.spec
   : []
 
@@ -101,7 +101,6 @@ hspecSpecs args =
     describe "Semantic" Semantic.Spec.spec
     describe "Semantic.CLI" Semantic.CLI.Spec.spec
     describe "Semantic.IO" Semantic.IO.Spec.spec
-    describe "Integration" (Integration.Spec.spec args)
 
 main :: IO ()
 main = do

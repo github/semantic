@@ -383,6 +383,7 @@ test-suite test
                      , tree-sitter-json
                      , Glob
                      , tasty ^>= 1.2.3
+                     , tasty-golden ^>= 2.3.2
                      , tasty-leancheck ^>= 0.0.1
                      , tasty-hedgehog ^>= 1.0.0.1
                      , tasty-hunit ^>= 0.10.0.2
