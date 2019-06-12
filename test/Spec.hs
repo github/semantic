@@ -68,7 +68,7 @@ tastySpecs args
   : Numeric.Spec.spec
   -- : "Rendering.TOC" Rendering.TOC.Spec.spec
   -- : "Reprinting.Spec" Reprinting.Spec.spec
-  -- : "Rewriting.Go" Rewriting.Go.Spec.spec
+  : Rewriting.Go.Spec.spec
   -- : "Rewriting.JSON" Rewriting.JSON.Spec.spec
   -- : "Rewriting.Python" Rewriting.Python.Spec.spec
   -- : "Tags.Spec" Tags.Spec.spec
@@ -103,7 +103,6 @@ hspecSpecs args =
     describe "Graphing.Calls" Graphing.Calls.Spec.spec
     describe "Rendering.TOC" Rendering.TOC.Spec.spec
     describe "Reprinting.Spec" Reprinting.Spec.spec
-    describe "Rewriting.Go" Rewriting.Go.Spec.spec
     describe "Rewriting.JSON" Rewriting.JSON.Spec.spec
     describe "Rewriting.Python" Rewriting.Python.Spec.spec
     describe "Tags.Spec" Tags.Spec.spec
