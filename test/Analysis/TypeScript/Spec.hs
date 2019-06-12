@@ -1,3 +1,4 @@
+{-# LANGUAGE ImplicitParams #-}
 {-# OPTIONS_GHC -O0 #-}
 
 module Analysis.TypeScript.Spec (spec) where
@@ -21,8 +22,8 @@ import           Data.Text (pack)
 import qualified Language.TypeScript.Assignment as TypeScript
 import           SpecHelpers
 
-spec :: TaskSession -> Spec
-spec session = parallel $ do
+spec :: (?session :: TaskSession) => Spec
+spec = parallel $ do
   describe "TypeScript" $ do
     it "qualified export from" $ do
       (scopeGraph, (heap, res)) <- evaluate ["main6.ts", "baz.ts", "foo.ts"]
@@ -181,7 +182,7 @@ spec session = parallel $ do
   where
     fixtures = "test/fixtures/typescript/analysis/"
     evaluate = evalTypeScriptProject . map (fixtures <>)
-    evalTypeScriptProject = testEvaluating <=< (evaluateProject' session (Proxy :: Proxy 'Language.TypeScript) typescriptParser)
+    evalTypeScriptProject = testEvaluating <=< (evaluateProject' ?session (Proxy :: Proxy 'Language.TypeScript) typescriptParser)
 
 type TypeScriptTerm = Quieterm (Sum TypeScript.Syntax) Location
 type TypeScriptEvalError = BaseError (EvalError TypeScriptTerm Precise (Concrete.Value TypeScriptTerm Precise))

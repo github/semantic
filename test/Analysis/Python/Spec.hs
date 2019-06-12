@@ -1,3 +1,5 @@
+{-# LANGUAGE ImplicitParams #-}
+
 module Analysis.Python.Spec (spec) where
 
 import qualified Data.Abstract.ModuleTable as ModuleTable
@@ -7,8 +9,8 @@ import qualified Data.Language as Language
 import SpecHelpers
 
 
-spec :: TaskSession -> Spec
-spec session = parallel $ do
+spec :: (?session :: TaskSession) => Spec
+spec = parallel $ do
   describe "Python" $ do
     it "imports" $ do
       (scopeGraph, (heap, res)) <- evaluate ["main.py", "a.py", "b/__init__.py", "b/c.py"]
@@ -70,4 +72,4 @@ spec session = parallel $ do
   where
     fixtures = "test/fixtures/python/analysis/"
     evaluate = evalPythonProject . map (fixtures <>)
-    evalPythonProject = testEvaluating <=< evaluateProject' session (Proxy :: Proxy 'Language.Python) pythonParser
+    evalPythonProject = testEvaluating <=< evaluateProject' ?session (Proxy :: Proxy 'Language.Python) pythonParser

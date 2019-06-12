@@ -1,3 +1,4 @@
+{-# LANGUAGE ImplicitParams #-}
 {-# OPTIONS_GHC -O0 #-}
 module Analysis.Go.Spec (spec) where
 
@@ -6,8 +7,8 @@ import qualified Data.Language as Language
 import SpecHelpers
 
 
-spec :: TaskSession -> Spec
-spec session = parallel $ do
+spec :: (?session :: TaskSession) => Spec
+spec = parallel $ do
   describe "Go" $ do
     it "imports and wildcard imports" $ do
       (scopeGraph, (heap, res)) <- evaluate ["main.go", "foo/foo.go", "bar/bar.go", "bar/rab.go"]
@@ -32,4 +33,4 @@ spec session = parallel $ do
   where
     fixtures = "test/fixtures/go/analysis/"
     evaluate = evalGoProject . map (fixtures <>)
-    evalGoProject = testEvaluating <=< evaluateProject' session (Proxy :: Proxy 'Language.Go) goParser
+    evalGoProject = testEvaluating <=< evaluateProject' ?session (Proxy :: Proxy 'Language.Go) goParser
