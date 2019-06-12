@@ -14,7 +14,6 @@ import SpecHelpers
 
 import Test.Tasty
 import Test.Tasty.Golden
-import Test.Tasty.HUnit
 
 languages :: [FilePath]
 languages = ["go", "javascript", "json", "python", "ruby", "typescript", "tsx"]
@@ -27,6 +26,7 @@ testsForLanguage language = do
   let dir = "test/fixtures" </> language </> "corpus"
   let items = unsafePerformIO (examples dir)
   testGroup language (fmap testForExample items)
+{-# NOINLINE testsForLanguage #-}
 
 data Example = DiffExample { fileA :: FilePath, fileB :: FilePath, diffOutput :: FilePath }
              | ParseExample { file :: FilePath, parseOutput :: FilePath }
@@ -40,7 +40,12 @@ testForExample = \case
       (\ref new -> ["git", "diff", ref, new])
       diffOutput
       (BL.fromStrict <$> diffFilePaths ?session (Both fileA fileB))
-  ParseExample{file, parseOutput} -> testCase ("parses " <> file) (pure ())
+  ParseExample{file, parseOutput} ->
+    goldenVsStringDiff
+      ("parses " <> parseOutput)
+      (\ref new -> ["git", "diff", ref, new])
+      parseOutput
+      (parseFilePath ?session file >>= either throw (pure . BL.fromStrict))
 
 
 -- | Return all the examples from the given directory. Examples are expected to

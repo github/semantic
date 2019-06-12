@@ -71,7 +71,7 @@ import Data.Semigroup as X (Semigroup(..))
 import Control.Monad as X
 
 import Test.Hspec as X (Spec, SpecWith, context, describe, it, xit, parallel, pendingWith, around, runIO)
-import Test.Hspec.Expectations.Pretty as X
+import Test.Hspec.Expectations as X
 import Test.Hspec.LeanCheck as X
 import Test.LeanCheck as X
 
