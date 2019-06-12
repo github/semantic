@@ -6,15 +6,17 @@ import SpecHelpers
 
 import "semantic" Data.Graph
 import qualified Algebra.Graph.Class as Class
+import Test.Tasty
+import Test.Tasty.HUnit
 
-spec :: Spec
-spec = describe "Data.Graph" $
-  it "has a valid topological sort" $ do
+spec :: TestTree
+spec = testGroup "Data.Graph" . pure .
+  testCase "has an in-visited-order topological sort" $ do
     let topo = topologicalSort
-    topo (Class.path "ab") `shouldBe` "ba"
-    topo (Class.path "abc") `shouldBe` "cba"
-    topo ((vertex 'a' `connect` vertex 'b') `connect` vertex 'c') `shouldBe` "cba"
-    topo (vertex 'a' `connect` (vertex 'b' `connect` vertex 'c')) `shouldBe` "cba"
-    topo ((vertex 'a' `connect` vertex 'b') <> (vertex 'a' `connect` vertex 'c')) `shouldBe` "cba"
-    topo (Class.path "abd" <> Class.path "acd") `shouldBe` "dcba"
-    topo (Class.path "aba") `shouldBe` "ab"
+    topo (Class.path "ab") @?= "ba"
+    topo (Class.path "abc") @?= "cba"
+    topo ((vertex 'a' `connect` vertex 'b') `connect` vertex 'c') @?= "cba"
+    topo (vertex 'a' `connect` (vertex 'b' `connect` vertex 'c')) @?= "cba"
+    topo ((vertex 'a' `connect` vertex 'b') <> (vertex 'a' `connect` vertex 'c')) @?= "cba"
+    topo (Class.path "abd" <> Class.path "acd") @?= "dcba"
+    topo (Class.path "aba") @?= "ab"

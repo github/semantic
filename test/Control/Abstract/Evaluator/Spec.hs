@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE TemplateHaskell, TypeOperators #-}
 module Control.Abstract.Evaluator.Spec
 ( spec
 ) where
@@ -8,42 +8,42 @@ import qualified Control.Abstract.Heap as Heap
 import           Data.Abstract.Address.Precise as Precise
 import           Data.Abstract.BaseError
 import           Data.Abstract.Evaluatable
-import           Data.Abstract.FreeVariables
 import           Data.Abstract.Module
 import qualified Data.Abstract.Number as Number
 import           Data.Abstract.Package
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.Abstract.Value.Concrete as Value
-import           Data.Algebra
-import           Data.Bifunctor (first)
-import           Data.Functor.Const
 import qualified Data.Language as Language
 import qualified Data.Map.Strict as Map
 import           Data.Sum
-import           Data.Text (pack)
 import           SpecHelpers hiding (reassociate)
 import           System.IO.Unsafe (unsafePerformIO)
 
-spec :: Spec
-spec = parallel $ do
-  it "constructs integers" $ do
-    (_, (_, (_, expected))) <- evaluate (integer 123)
-    expected `shouldBe` Right (Value.Integer (Number.Integer 123))
+import Test.Tasty
+import Test.Tasty.HUnit
+import Test.Tasty.TH
 
-  it "calls functions" $ do
-    (_, (_, (_, expected))) <- evaluate . withLexicalScopeAndFrame $ do
-      currentScope' <- currentScope
-      let lexicalEdges = Map.singleton Lexical [ currentScope' ]
-          x =  SpecHelpers.name "x"
-      associatedScope <- newScope lexicalEdges
-      declare (ScopeGraph.Declaration "identity") Default Public emptySpan ScopeGraph.Function (Just associatedScope)
-      withScope associatedScope $ do
-        declare (Declaration x) Default Public emptySpan ScopeGraph.RequiredParameter Nothing
-      identity <- function "identity" [ x ]
-        (SpecEff (Heap.lookupSlot (ScopeGraph.Declaration (SpecHelpers.name "x")) >>= deref)) associatedScope
-      val <- integer 123
-      call identity [val]
-    expected `shouldBe` Right (Value.Integer (Number.Integer 123))
+spec :: TestTree
+spec = $(testGroupGenerator)
+
+case_constructs_integers = do
+  (_, (_, (_, expected))) <- evaluate (integer 123)
+  expected @?= Right (Value.Integer (Number.Integer 123))
+
+case_calls_functions = do
+  (_, (_, (_, expected))) <- evaluate . withLexicalScopeAndFrame $ do
+    currentScope' <- currentScope
+    let lexicalEdges = Map.singleton Lexical [ currentScope' ]
+        x =  SpecHelpers.name "x"
+    associatedScope <- newScope lexicalEdges
+    declare (ScopeGraph.Declaration "identity") Default Public emptySpan ScopeGraph.Function (Just associatedScope)
+    withScope associatedScope $ do
+      declare (Declaration x) Default Public emptySpan ScopeGraph.RequiredParameter Nothing
+    identity <- function "identity" [ x ]
+      (SpecEff (Heap.lookupSlot (ScopeGraph.Declaration (SpecHelpers.name "x")) >>= deref)) associatedScope
+    val <- integer 123
+    call identity [val]
+  expected @?= Right (Value.Integer (Number.Integer 123))
 
 evaluate
   = runM

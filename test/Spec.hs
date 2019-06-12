@@ -50,15 +50,15 @@ tastySpecs args
   -- : "Analysis.Ruby" (Analysis.Ruby.Spec.spec args)
   -- : "Analysis.TypeScript" (Analysis.TypeScript.Spec.spec args)
   -- : "Assigning.Assignment" Assigning.Assignment.Spec.spec
-  -- : "Control.Abstract.Evaluator" Control.Abstract.Evaluator.Spec.spec
-  -- : "Data.Diff" Data.Diff.Spec.spec
-  -- : "Data.Graph" Data.Graph.Spec.spec
+  : Control.Abstract.Evaluator.Spec.spec
+  : Data.Diff.Spec.spec
+  : Data.Graph.Spec.spec
   -- : "Data.Abstract.Path" Data.Abstract.Path.Spec.spec
-  -- : "Data.Abstract.Name" Data.Abstract.Name.Spec.spec
+  : Data.Abstract.Name.Spec.spec
   -- : "Data.Functor.Classes.Generic" Data.Functor.Classes.Generic.Spec.spec
   : Data.Range.Spec.spec
-  -- : "Data.Scientific" Data.Scientific.Spec.spec
-  -- : "Data.Semigroup.App" Data.Semigroup.App.Spec.spec
+  : Data.Scientific.Spec.spec
+  : Data.Semigroup.App.Spec.spec
   -- : "Data.Source" Data.Source.Spec.spec
   : Data.Term.Spec.spec
   -- : "Diffing.Algorithm.RWS" Diffing.Algorithm.RWS.Spec.spec
@@ -70,13 +70,13 @@ tastySpecs args
   -- : "Reprinting.Spec" Reprinting.Spec.spec
   : Rewriting.Go.Spec.spec
   -- : "Rewriting.JSON" Rewriting.JSON.Spec.spec
-  -- : "Rewriting.Python" Rewriting.Python.Spec.spec
+  : Rewriting.Python.Spec.spec
   -- : "Tags.Spec" Tags.Spec.spec
   -- : "Semantic" Semantic.Spec.spec
   -- : "Semantic.CLI" Semantic.CLI.Spec.spec
   -- : "Semantic.IO" Semantic.IO.Spec.spec
   -- : "Integration" (Integration.Spec.spec args)
-  -- : "Parsing" Parsing.Spec.spec
+  : Parsing.Spec.spec
   : []
 
 hspecSpecs :: TaskSession -> Spec
@@ -88,14 +88,7 @@ hspecSpecs args =
     describe "Analysis.Ruby" (Analysis.Ruby.Spec.spec args)
     describe "Analysis.TypeScript" (Analysis.TypeScript.Spec.spec args)
     describe "Assigning.Assignment" Assigning.Assignment.Spec.spec
-    describe "Control.Abstract.Evaluator" Control.Abstract.Evaluator.Spec.spec
-    describe "Data.Diff" Data.Diff.Spec.spec
-    describe "Data.Graph" Data.Graph.Spec.spec
-    describe "Data.Abstract.Path" Data.Abstract.Path.Spec.spec
-    describe "Data.Abstract.Name" Data.Abstract.Name.Spec.spec
     describe "Data.Functor.Classes.Generic" Data.Functor.Classes.Generic.Spec.spec
-    describe "Data.Scientific" Data.Scientific.Spec.spec
-    describe "Data.Semigroup.App" Data.Semigroup.App.Spec.spec
     describe "Data.Source" Data.Source.Spec.spec
     describe "Diffing.Algorithm.RWS" Diffing.Algorithm.RWS.Spec.spec
     describe "Diffing.Algorithm.SES" Diffing.Algorithm.SES.Spec.spec
@@ -104,13 +97,11 @@ hspecSpecs args =
     describe "Rendering.TOC" Rendering.TOC.Spec.spec
     describe "Reprinting.Spec" Reprinting.Spec.spec
     describe "Rewriting.JSON" Rewriting.JSON.Spec.spec
-    describe "Rewriting.Python" Rewriting.Python.Spec.spec
     describe "Tags.Spec" Tags.Spec.spec
     describe "Semantic" Semantic.Spec.spec
     describe "Semantic.CLI" Semantic.CLI.Spec.spec
     describe "Semantic.IO" Semantic.IO.Spec.spec
     describe "Integration" (Integration.Spec.spec args)
-    describe "Parsing" Parsing.Spec.spec
 
 main :: IO ()
 main = do

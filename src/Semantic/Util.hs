@@ -222,7 +222,7 @@ parseFile :: Parser term -> FilePath -> IO term
 parseFile parser = runTask' . (parse parser <=< readBlob . fileForPath)
 
 runTask' :: TaskEff a -> IO a
-runTask' task = runTaskWithOptions debugOptions task >>= either (die . displayException) pure
+runTask' task = runTaskWithOptions defaultOptions task >>= either (die . displayException) pure
 
 mergeErrors :: Either (SomeError (Sum errs)) (Either (SomeError err) result) -> Either (SomeError (Sum (err ': errs))) result
 mergeErrors = either (\ (SomeError sum) -> Left (SomeError (weaken sum))) (either (\ (SomeError err) -> Left (SomeError (inject err))) Right)

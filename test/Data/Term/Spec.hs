@@ -7,6 +7,6 @@ import Test.Tasty
 import Test.Tasty.LeanCheck
 
 spec :: TestTree
-spec =
-  testProperty "Data.Term: equality is reflexive" $
+spec = testGroup "Data.Term" . pure .
+  testProperty "equality is reflexive" $
     \ a -> a == (a :: Term ListableSyntax ())

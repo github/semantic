@@ -3,10 +3,10 @@ module Data.Diff.Spec (spec) where
 
 import Data.Diff
 import Data.Functor.Listable (ListableSyntax)
-import Test.Hspec
-import Test.Hspec.LeanCheck
+import Test.Tasty
+import Test.Tasty.LeanCheck
 
-spec :: Spec
-spec = parallel $ do
-  prop "equality is reflexive" $
-    \ diff -> diff `shouldBe` (diff :: Diff ListableSyntax () ())
+spec :: TestTree
+spec = testGroup "Data.Term" . pure .
+  testProperty "equality is reflexive" $
+    \ a -> a == (a :: Diff ListableSyntax () ())
