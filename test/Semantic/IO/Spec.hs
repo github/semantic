@@ -8,106 +8,112 @@ import System.Directory
 import System.Exit (ExitCode (..))
 import System.IO.Temp
 import System.Process
+import Control.Exception
 
 import Data.Blob
 import Data.Handle
-import SpecHelpers hiding (readFile)
+import SpecHelpers hiding (readFile, shouldThrow)
 import qualified Semantic.Git as Git
 
+import Test.Tasty
+import Test.Tasty.HUnit
 
-spec :: Spec
-spec = parallel $ do
-  describe "readBlobsFromGitRepo" $ do
-    hasGit <- runIO $ isJust <$> findExecutable "git"
-    when hasGit . it "should read from a git directory" $ do
-      -- This temporary directory will be cleaned after use.
-      blobs <- liftIO . withSystemTempDirectory "semantic-temp-git-repo" $ \dir -> do
-        let commands = [ "cd " <> dir
-                       , "git init"
-                       , "touch foo.py bar.rb"
-                       , "git add foo.py bar.rb"
-                       , "git config user.name 'Test'"
-                       , "git config user.email 'test@test.test'"
-                       , "git commit -am 'test commit'"
-                       ]
-        exit <- system (intercalate " && " commands)
-        when (exit /= ExitSuccess) (fail ("Couldn't run git properly in dir " <> dir))
-        readBlobsFromGitRepo (dir </> ".git") (Git.OID "HEAD") []
-      let files = sortOn fileLanguage (blobFile <$> blobs)
-      files `shouldBe` [ File "foo.py" Python
-                       , File "bar.rb" Ruby
-                       ]
+shouldThrow :: Exception e => IO a -> (e -> Bool) -> Assertion
+shouldThrow act pred = void act `catch` (\e -> pred e @? "didn't pass predicate")
 
-  describe "readFile" $ do
-    it "returns a blob for extant files" $ do
+spec :: TestTree
+spec = testGroup "Semantic.IO"
+  [ testCase "readBlobsFromGitRepo" $ do
+      hasGit <- isJust <$> findExecutable "git"
+      when hasGit $ do
+        -- This temporary directory will be cleaned after use.
+        blobs <- liftIO . withSystemTempDirectory "semantic-temp-git-repo" $ \dir -> do
+          let commands = [ "cd " <> dir
+                         , "git init"
+                         , "touch foo.py bar.rb"
+                         , "git add foo.py bar.rb"
+                         , "git config user.name 'Test'"
+                         , "git config user.email 'test@test.test'"
+                         , "git commit -am 'test commit'"
+                         ]
+          exit <- system (intercalate " && " commands)
+          when (exit /= ExitSuccess) (fail ("Couldn't run git properly in dir " <> dir))
+          readBlobsFromGitRepo (dir </> ".git") (Git.OID "HEAD") []
+        let files = sortOn fileLanguage (blobFile <$> blobs)
+        files @?= [ File "foo.py" Python
+                         , File "bar.rb" Ruby
+                         ]
+
+  , testGroup "readFile"
+    [ testCase "returns a blob for extant files" $ do
       Just blob <- readBlobFromFile (File "semantic.cabal" Unknown)
-      blobPath blob `shouldBe` "semantic.cabal"
+      blobPath blob @?= "semantic.cabal"
 
-    it "throws for absent files" $ do
-      readBlobFromFile (File "this file should not exist" Unknown) `shouldThrow` anyIOException
+    , testCase "throws for absent files" $
+        readBlobFromFile (File "this file should not exist" Unknown) `shouldThrow` const @_ @IOException True
 
-  describe "readBlobPairsFromHandle" $ do
+    ]
+
+  , testGroup "readBlobPairsFromHandle" $
     let a = sourceBlob "method.rb" Ruby "def foo; end"
-    let b = sourceBlob "method.rb" Ruby "def bar(x); end"
-    it "returns blobs for valid JSON encoded diff input" $ do
-      putStrLn "step 1"
-      blobs <- blobsFromFilePath "test/fixtures/cli/diff.json"
-      putStrLn "done"
-      blobs `shouldBe` [Diffing a b]
+        b = sourceBlob "method.rb" Ruby "def bar(x); end"
+    in [ testCase "returns blobs for valid JSON encoded diff input" $ do
+           putStrLn "step 1"
+           blobs <- blobsFromFilePath "test/fixtures/cli/diff.json"
+           putStrLn "done"
+           blobs @?= [Diffing a b]
 
-    it "returns blobs when there's no before" $ do
-      blobs <- blobsFromFilePath "test/fixtures/cli/diff-no-before.json"
-      blobs `shouldBe` [Inserting b]
+       , testCase "returns blobs when there's no before" $ do
+           blobs <- blobsFromFilePath "test/fixtures/cli/diff-no-before.json"
+           blobs @?= [Inserting b]
 
-    it "returns blobs when there's null before" $ do
-      blobs <- blobsFromFilePath "test/fixtures/cli/diff-null-before.json"
-      blobs `shouldBe` [Inserting b]
+       , testCase "returns blobs when there's null before" $ do
+           blobs <- blobsFromFilePath "test/fixtures/cli/diff-null-before.json"
+           blobs @?= [Inserting b]
 
-    it "returns blobs when there's no after" $ do
-      blobs <- blobsFromFilePath "test/fixtures/cli/diff-no-after.json"
-      blobs `shouldBe` [Deleting a]
+       , testCase "returns blobs when there's no after" $ do
+           blobs <- blobsFromFilePath "test/fixtures/cli/diff-no-after.json"
+           blobs @?= [Deleting a]
 
-    it "returns blobs when there's null after" $ do
-      blobs <- blobsFromFilePath "test/fixtures/cli/diff-null-after.json"
-      blobs `shouldBe` [Deleting a]
+       , testCase "returns blobs when there's null after" $ do
+           blobs <- blobsFromFilePath "test/fixtures/cli/diff-null-after.json"
+           blobs @?= [Deleting a]
 
 
-    it "returns blobs for unsupported language" $ do
-      h <- openFileForReading "test/fixtures/cli/diff-unsupported-language.json"
-      blobs <- readBlobPairsFromHandle h
-      let b' = sourceBlob "test.kt" Unknown "fun main(args: Array<String>) {\nprintln(\"hi\")\n}\n"
-      blobs `shouldBe` [Inserting b']
+       , testCase "returns blobs for unsupported language" $ do
+           h <- openFileForReading "test/fixtures/cli/diff-unsupported-language.json"
+           blobs <- readBlobPairsFromHandle h
+           let b' = sourceBlob "test.kt" Unknown "fun main(args: Array<String>) {\nprintln(\"hi\")\n}\n"
+           blobs @?= [Inserting b']
 
-    it "detects language based on filepath for empty language" $ do
-      blobs <- blobsFromFilePath "test/fixtures/cli/diff-empty-language.json"
-      blobs `shouldBe` [Diffing a b]
+       , testCase "detects language based on filepath for empty language" $ do
+           blobs <- blobsFromFilePath "test/fixtures/cli/diff-empty-language.json"
+           blobs @?= [Diffing a b]
 
-    it "throws on blank input" $ do
+       , testCase "throws on blank input" $ do
+           h <- openFileForReading "test/fixtures/cli/blank.json"
+           readBlobPairsFromHandle h `shouldThrow` (== ExitFailure 1)
+
+       , testCase "throws if language field not given" $ do
+           h <- openFileForReading "test/fixtures/cli/diff-no-language.json"
+           readBlobsFromHandle h `shouldThrow` (== ExitFailure 1)
+
+       , testCase "throws if null on before and after" $ do
+           h <- openFileForReading "test/fixtures/cli/diff-null-both-sides.json"
+           readBlobPairsFromHandle h `shouldThrow` (== ExitFailure 1)
+       ]
+
+  , testGroup "readBlobsFromHandle"
+    [ testCase "returns blobs for valid JSON encoded parse input" $ do
+        h <- openFileForReading "test/fixtures/cli/parse.json"
+        blobs <- readBlobsFromHandle h
+        let a = sourceBlob "method.rb" Ruby "def foo; end"
+        blobs @?= [a]
+
+    , testCase "throws on blank input" $ do
       h <- openFileForReading "test/fixtures/cli/blank.json"
-      readBlobPairsFromHandle h `shouldThrow` (== ExitFailure 1)
-
-    it "throws if language field not given" $ do
-      h <- openFileForReading "test/fixtures/cli/diff-no-language.json"
       readBlobsFromHandle h `shouldThrow` (== ExitFailure 1)
+    ]
+  ]
 
-    it "throws if null on before and after" $ do
-      h <- openFileForReading "test/fixtures/cli/diff-null-both-sides.json"
-      readBlobPairsFromHandle h `shouldThrow` (== ExitFailure 1)
-
-  describe "readBlobsFromHandle" $ do
-    it "returns blobs for valid JSON encoded parse input" $ do
-      h <- openFileForReading "test/fixtures/cli/parse.json"
-      blobs <- readBlobsFromHandle h
-      let a = sourceBlob "method.rb" Ruby "def foo; end"
-      blobs `shouldBe` [a]
-
-    it "throws on blank input" $ do
-      h <- openFileForReading "test/fixtures/cli/blank.json"
-      readBlobsFromHandle h `shouldThrow` (== ExitFailure 1)
-
-  where blobsFromFilePath path = do
-          h <- openFileForReading path
-          putStrLn "got handle"
-          blobs <- readBlobPairsFromHandle h
-          putStrLn "got blobs"
-          pure blobs
+blobsFromFilePath path = openFileForReading path >>= readBlobPairsFromHandle

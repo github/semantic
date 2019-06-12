@@ -76,7 +76,7 @@ tastySpecs args
   : Tags.Spec.spec
   -- : "Semantic" Semantic.Spec.spec
   : Semantic.CLI.Spec.spec
-  -- : "Semantic.IO" Semantic.IO.Spec.spec
+  : Semantic.IO.Spec.spec
   : Parsing.Spec.spec
   : []
 
@@ -98,12 +98,11 @@ hspecSpecs args =
     describe "Reprinting.Spec" Reprinting.Spec.spec
     describe "Rewriting.JSON" Rewriting.JSON.Spec.spec
     describe "Semantic" Semantic.Spec.spec
-    describe "Semantic.IO" Semantic.IO.Spec.spec
 
 main :: IO ()
 main = do
   withOptions defaultOptions { optionsLogLevel = Nothing } $ \ config logger statter -> do
     let args = TaskSession config "-" False logger statter
-    hspec (hspecSpecs args) `catch` (\(e :: SomeException) -> pure ())
+    --hspec (hspecSpecs args) `catch` (\(e :: SomeException) -> pure ())
     defaultMain (testGroup "Semantic" (tastySpecs args))
 
