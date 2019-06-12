@@ -381,7 +381,7 @@ test-suite test
                      , Test.Hspec.LeanCheck
   build-depends:       semantic
                      , tree-sitter-json
-                     , Glob
+                     , Glob ^>= 0.10.0
                      , hspec >= 2.6 && <3
                      , hspec-core >= 2.6 && <3
                      , hspec-expectations ^>= 0.8.2
@@ -390,7 +390,7 @@ test-suite test
                      , tasty-hspec ^>= 1.1.5.1
                      , HUnit ^>= 1.6.0.0
                      , leancheck >= 0.8 && <1
-                     , temporary
+                     , temporary ^>= 1.3
   if flag(release)
     ghc-options:       -dynamic
 
@@ -401,7 +401,7 @@ test-suite parse-examples
   main-is:             Examples.hs
   build-depends:       semantic
                      , Glob
-                     , hspec >= 2.4.1
+                     , hspec
                      , hspec-core
                      , hspec-expectations
 
@@ -412,7 +412,7 @@ benchmark evaluation
   main-is:             Main.hs
   ghc-options:         -static
   build-depends:       base
-                     , criterion
+                     , criterion ^>= 1.5
                      , semantic
 
 source-repository head
