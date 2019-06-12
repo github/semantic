@@ -25,7 +25,7 @@ import qualified Data.Set as Set
 import           Data.Text (Text)
 import           Prelude hiding (fail)
 
-type ImportGraph = Map.Map FilePath (Set.Set FilePath)
+type ImportGraph = Map.Map Text (Set.Set Text)
 
 data Value = Value
   { valueSemi  :: Semi

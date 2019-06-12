@@ -29,7 +29,7 @@ import           Data.Loc
 import qualified Data.Map as Map
 import           Data.Monoid (Alt(..))
 import           Data.Name
-import           Data.Text (Text)
+import           Data.Text (Text, unpack)
 import           Prelude hiding (fail)
 
 type Precise = Int
@@ -196,7 +196,7 @@ addressStyle heap = (G.defaultStyle vertex) { G.edgeAttributes }
           Unit ->  "()"
           Bool b -> show b
           String s -> show s
-          Closure (Loc p (Span s e)) n _ _ -> "\\\\ " <> fromName n <> " [" <> p <> ":" <> showPos s <> "-" <> showPos e <> "]"
+          Closure (Loc p (Span s e)) n _ _ -> "\\\\ " <> fromName n <> " [" <> unpack p <> ":" <> showPos s <> "-" <> showPos e <> "]"
           Obj _ -> "{}"
         showPos (Pos l c) = show l <> ":" <> show c
         fromName (User s)  = s

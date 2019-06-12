@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, GeneralizedNewtypeDeriving, LambdaCase, RankNTypes, RecordWildCards #-}
+{-# LANGUAGE FlexibleContexts, GeneralizedNewtypeDeriving, LambdaCase, OverloadedStrings, RankNTypes, RecordWildCards #-}
 module Analysis.Eval
 ( eval
 , prog1
@@ -21,7 +21,7 @@ import Data.Functor
 import Data.Loc
 import Data.Maybe (fromJust)
 import Data.Name
-import Data.Text (Text, unpack)
+import Data.Text (Text)
 import GHC.Stack
 import Prelude hiding (fail)
 
@@ -43,7 +43,7 @@ eval Analysis{..} eval = \case
   String s -> string s
   Load p -> do
     path <- eval p >>= asString
-    lookupEnv' (Path (unpack path)) >>= deref' (Path (unpack path))
+    lookupEnv' (Path path) >>= deref' (Path path)
   Edge e a -> ref a >>= edge e >> unit
   Frame -> frame
   a :. b -> do

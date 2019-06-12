@@ -14,6 +14,7 @@ import           Data.Core
 import           Data.Name
 import           Data.Semigroup
 import           Data.String
+import           Data.Text (pack)
 import qualified Text.Parser.Token as Token
 import qualified Text.Parser.Token.Highlight as Highlight
 import           Text.Trifecta hiding (ident)
@@ -94,7 +95,7 @@ lvalue = choice
 name :: (TokenParsing m, Monad m) => m Name
 name = choice [regular, strpath] <?> "name" where
   regular = User <$> identifier
-  strpath = Path <$> between (symbolic '"') (symbolic '"') (some $ noneOf "\"")
+  strpath = Path . pack <$> between (symbolic '"') (symbolic '"') (some $ noneOf "\"")
 
 lit :: (TokenParsing m, Monad m) => m Core
 lit = let x `given` n = x <$ reserved n in choice
@@ -112,4 +113,3 @@ lambda = Lam <$ lambduh <*> name <* arrow <*> core <?> "lambda" where
 
 ident :: (Monad m, TokenParsing m) => m Core
 ident = Var <$> name <?> "identifier"
-

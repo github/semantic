@@ -26,6 +26,7 @@ import           Control.Monad.IO.Class
 import qualified Data.Char as Char
 import           Data.HashSet (HashSet)
 import qualified Data.HashSet as HashSet
+import           Data.Text (Text)
 import           Data.Text.Prettyprint.Doc (Pretty (..))
 import qualified Data.Text.Prettyprint.Doc as Pretty
 
@@ -47,7 +48,7 @@ data Name
   --   This should be used for names which the user provided and which other code (other functions, other modules, other packages) could call, e.g. declaration names.
   | User User
   -- | A variable name represented as the path to a source file. Used for loading modules at a specific name.
-  | Path FilePath
+  | Path Text
   deriving (Eq, Ord, Show)
 
 instance Pretty Name where
