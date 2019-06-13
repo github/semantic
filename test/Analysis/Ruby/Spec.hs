@@ -1,5 +1,5 @@
 {-# OPTIONS_GHC -O0 #-}
-{-# LANGUAGE TupleSections #-}
+{-# LANGUAGE ImplicitParams, TupleSections #-}
 module Analysis.Ruby.Spec (spec) where
 
 import           Control.Abstract (Declaration (..), ScopeError (..))
@@ -14,8 +14,8 @@ import           Data.Sum
 import SpecHelpers
 
 
-spec :: TaskSession -> Spec
-spec session = parallel $ do
+spec :: (?session :: TaskSession) =>  Spec
+spec = parallel $ do
   describe "Ruby" $ do
     it "evaluates require_relative" $ do
       (scopeGraph, (heap, res)) <- evaluate ["main.rb", "foo.rb"]
@@ -101,4 +101,4 @@ spec session = parallel $ do
   where
     fixtures = "test/fixtures/ruby/analysis/"
     evaluate = evalRubyProject . map (fixtures <>)
-    evalRubyProject = testEvaluating <=< evaluateProject' session (Proxy :: Proxy 'Language.Ruby) rubyParser
+    evalRubyProject = testEvaluating <=< evaluateProject' ?session (Proxy :: Proxy 'Language.Ruby) rubyParser
