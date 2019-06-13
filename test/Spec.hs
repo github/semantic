@@ -1,3 +1,5 @@
+{-# LANGUAGE ImplicitParams #-}
+
 module Main where
 
 import qualified Analysis.Go.Spec
@@ -40,19 +42,18 @@ import Test.Hspec
 import Test.Tasty as Tasty
 import Test.Tasty.Hspec as Tasty
 
-tests :: TaskSession -> [TestTree]
-tests session =
-  [ Integration.Spec.spec session
+tests :: (?session :: TaskSession) => [TestTree]
+tests =
+  [ Integration.Spec.spec
   , Semantic.CLI.Spec.spec
   ]
 
 -- We can't bring this out of the IO monad until we divest
 -- from hspec, since testSpec operates in IO.
-allTests :: TaskSession -> IO TestTree
-allTests session = do
-  let nativeSpecs = tests session
-  asTastySpecs <- Tasty.testSpecs $ legacySpecs session
-  let allSpecs = nativeSpecs <> asTastySpecs
+allTests :: (?session :: TaskSession) => IO TestTree
+allTests = do
+  asTastySpecs <- Tasty.testSpecs legacySpecs
+  let allSpecs = tests <> asTastySpecs
   pure . Tasty.localOption Tasty.Success $ testGroup "semantic" allSpecs
 
 -- If you're writing new test modules, please don't add to this
@@ -61,15 +62,15 @@ allTests session = do
 -- documentation: "hspec and tasty serve similar purposes; consider
 -- using one or the other.") Instead, create a new TestTree value
 -- in your spec module and add it to the above 'tests' list.
-legacySpecs :: TaskSession -> Spec
-legacySpecs args = do
+legacySpecs :: (?session :: TaskSession) => Spec
+legacySpecs = do
   describe "Semantic.Stat" Semantic.Stat.Spec.spec
   parallel $ do
-    describe "Analysis.Go" (Analysis.Go.Spec.spec args)
-    describe "Analysis.PHP" (Analysis.PHP.Spec.spec args)
-    describe "Analysis.Python" (Analysis.Python.Spec.spec args)
-    describe "Analysis.Ruby" (Analysis.Ruby.Spec.spec args)
-    describe "Analysis.TypeScript" (Analysis.TypeScript.Spec.spec args)
+    describe "Analysis.Go" Analysis.Go.Spec.spec
+    describe "Analysis.PHP" Analysis.PHP.Spec.spec
+    describe "Analysis.Python" Analysis.Python.Spec.spec
+    describe "Analysis.Ruby" Analysis.Ruby.Spec.spec
+    describe "Analysis.TypeScript" Analysis.TypeScript.Spec.spec
     describe "Assigning.Assignment" Assigning.Assignment.Spec.spec
     describe "Control.Abstract.Evaluator" Control.Abstract.Evaluator.Spec.spec
     describe "Data.Diff" Data.Diff.Spec.spec
@@ -101,6 +102,6 @@ legacySpecs args = do
 main :: IO ()
 main = do
   withOptions defaultOptions { optionsLogLevel = Nothing } $ \ config logger statter ->
-    let session = TaskSession config "-" False logger statter
-    in allTests session >>= defaultMain
+    let ?session = TaskSession config "-" False logger statter
+    in allTests >>= defaultMain
 
