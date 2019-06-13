@@ -77,12 +77,6 @@ instance SLanguage 'TypeScript where
 instance SLanguage 'PHP where
   reflect _ = PHP
 
-
--- This ensures that the protobuf file is generated with ALL_CAPS_NAMES.
-instance Finite Language where
-  enumerate _ = fmap go [Unknown ..] where
-    go x = (fromString (fmap toUpper (show x)), fromEnum x)
-
 instance FromJSON Language where
   parseJSON = withText "Language" $ \l ->
     pure $ fromMaybe Unknown (parseLanguage l)
