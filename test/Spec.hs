@@ -46,6 +46,7 @@ tests :: (?session :: TaskSession) => [TestTree]
 tests =
   [ Integration.Spec.spec
   , Semantic.CLI.Spec.spec
+  , Data.Source.Spec.testTree
   ]
 
 -- We can't bring this out of the IO monad until we divest
