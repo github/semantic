@@ -1,4 +1,4 @@
-cabal-version:       2.2
+cabal-version:       2.4
 name:                semantic
 version:             0.6.0.0
 synopsis:            Framework and executable for analyzing and diffing untrusted code.
