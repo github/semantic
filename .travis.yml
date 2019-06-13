@@ -29,7 +29,7 @@ before_install:
 
 install:
 - cabal new-update -v
-- cabal new-configure --enable-tests --write-ghc-environment-files=always --jobs=2
+- cabal new-configure --enable-tests --disable-optimization --write-ghc-environment-files=always --jobs=2
 - cabal new-build --only-dependencies
 
 script:
