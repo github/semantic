@@ -17,8 +17,8 @@ import Test.Tasty.Golden
 languages :: [FilePath]
 languages = ["go", "javascript", "json", "python", "ruby", "typescript", "tsx"]
 
-spec :: TaskSession -> TestTree
-spec config = let ?session = config in testGroup "Integration (golden tests)" $ fmap testsForLanguage languages
+spec :: (?session :: TaskSession) => TestTree
+spec = testGroup "Integration (golden tests)" $ fmap testsForLanguage languages
 
 testsForLanguage :: (?session :: TaskSession) => FilePath -> TestTree
 testsForLanguage language = do
