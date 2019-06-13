@@ -36,7 +36,7 @@ data Language
     | TypeScript
     | PHP
     | TSX
-    deriving (Eq, Generic, Ord, Read, Show, Bounded, Hashable, ToJSON, Named, Enum, MessageField, NFData)
+    deriving (Eq, Generic, Ord, Read, Show, Bounded, Hashable, ToJSON, Enum, NFData)
 
 class SLanguage (lang :: Language) where
   reflect :: proxy lang -> Language
