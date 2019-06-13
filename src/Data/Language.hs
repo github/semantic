@@ -17,7 +17,6 @@ import           Data.Char (toUpper)
 import           Data.String
 import qualified Data.Text as T
 import           Prologue
-import           Proto3.Suite
 import           System.FilePath.Posix
 
 -- | The various languages we support.
@@ -106,18 +105,6 @@ parseLanguage l = case T.toLower l of
 -- | Predicate failing on 'Unknown' and passing in all other cases.
 knownLanguage :: Language -> Bool
 knownLanguage = (/= Unknown)
-
--- | Defaults to 'Unknown'.
-instance HasDefault Language where def = Unknown
-
--- | Piggybacks on top of the 'Enumerated' instance, as the generated code would.
--- This instance will get easier when we have DerivingVia.
-instance Primitive Language where
-  primType _ = primType (Proxy @(Enumerated Language))
-  encodePrimitive f = encodePrimitive f . Enumerated . Right
-  decodePrimitive   = decodePrimitive >>= \case
-    (Enumerated (Right r)) -> pure r
-    other                  -> Prelude.fail ("Language decodeMessageField: unexpected value" <> show other)
 
 -- | Returns a Language based on the file extension (including the ".").
 languageForType :: String -> Language
