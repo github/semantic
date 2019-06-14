@@ -15,6 +15,15 @@ Please note that this list of steps reflects the state of Semantic as is, not wh
 5. **Implement `Evaluatable` instances and add new [`Value` effects](https://github.com/github/semantic/blob/master/src/Control/Abstract/Value.hs) as is needed to describe the control flow of your language.** While several features of Semantic (e.g. `semantic parse --symbols` and `semantic diff`) will become fully available given a working assignment step, further features based on concrete or abstract interpretation (such as `semantic graph`) require implementing the `Evaluatable` typeclass and providing value-style effects for each control flow feature provided by the language. This means that language support is a spectrum: Semantic can provide useful information without any knowledge of a language's semantics, but each successive addition to its interpretive capabilities enables more functionality.
 6. **Add tests for diffing, tagging, graphing, and evaluating code written in that language.** Because tree-sitter grammars often change, we require extensive testing so as to avoid the unhappy situation of bitrotted languages that break as soon as a new grammar comes down the line.
 
+To summarize, each interaction made possible by the Semantic CLI corresponds to one (or more) of the above steps:
+
+| Step | Interaction     |
+|------|-----------------|
+| 1, 2 | `ts-parse`      |
+| 3, 4 | `parse`, `diff` |
+| 5, 6 | `graph`         |
+
+
 # FAQs
 
 **This sounds hard.** You're right! It is currently a lot of work: just because the Semantic architecture is extensible in the expression-problem manner does not mean that adding new support is trivial.
