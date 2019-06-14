@@ -1,0 +1,4 @@
+#!/bin/bash
+# Requires hlint to be available on the PATH.
+
+hlint src
