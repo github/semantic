@@ -13,8 +13,6 @@ module Data.Language
   ) where
 
 import           Data.Aeson
-import           Data.Char (toUpper)
-import           Data.String
 import qualified Data.Text as T
 import           Prologue
 import           System.FilePath.Posix
