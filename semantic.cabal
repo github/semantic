@@ -1,4 +1,4 @@
-cabal-version:       2.2
+cabal-version:       2.4
 name:                semantic
 version:             0.6.0.0
 synopsis:            Framework and executable for analyzing and diffing untrusted code.
@@ -73,8 +73,11 @@ common dependencies
 common executable-flags
   ghc-options:         -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m"
 
+common ghc-warnings
+  ghc-options:         -Wall -Wmissing-export-lists -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -Wno-name-shadowing
+
 library
-  import:              haskell, dependencies
+  import:              haskell, dependencies, ghc-warnings
   hs-source-dirs:      src
   exposed-modules:
                      -- Analyses & term annotations
@@ -321,7 +324,6 @@ library
                      , tree-sitter-typescript ^>= 0.1.0.0
                      , tree-sitter-tsx ^>= 0.1.0.0
                      , tree-sitter-java ^>= 0.1.0.0
-  ghc-options:         -Wall -Wmissing-export-lists -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -fno-warn-name-shadowing
   if flag(release)
     cpp-options:       -DCOMPUTE_GIT_SHA
   else
@@ -337,10 +339,9 @@ executable semantic
                      , semantic
 
 test-suite test
-  import:              haskell, dependencies, executable-flags
+  import:              haskell, dependencies, executable-flags, ghc-warnings
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
-  ghc-options:         -Wunused-imports
   main-is:             Spec.hs
   other-modules:       Analysis.Go.Spec
                      , Analysis.PHP.Spec

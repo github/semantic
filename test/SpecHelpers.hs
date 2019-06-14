@@ -19,7 +19,7 @@ module SpecHelpers
 , EdgeLabel(..)
 ) where
 
-import Control.Abstract hiding (lookupDeclaration)
+import Control.Abstract
 import Data.Abstract.ScopeGraph (EdgeLabel(..))
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import qualified Data.Abstract.Heap as Heap
@@ -27,7 +27,7 @@ import Control.Effect.Trace as X (runTraceByIgnoring, runTraceByReturning)
 import Control.Monad ((>=>))
 import Data.Traversable as X (for)
 import Data.Abstract.Address.Precise as X
-import Data.Abstract.Evaluatable hiding (lookupDeclaration)
+import Data.Abstract.Evaluatable
 import Data.Abstract.FreeVariables as X
 import Data.Abstract.Module as X
 import Data.Abstract.ModuleTable as X hiding (lookup)
@@ -51,7 +51,7 @@ import Data.String
 import Data.Sum
 import Data.Term as X
 import Parsing.Parser as X
-import Semantic.Task as X hiding (parsePackage)
+import Semantic.Task as X
 import Semantic.Util as X
 import Semantic.Graph (runHeap, runScopeGraph)
 import System.FilePath as X

@@ -4,6 +4,7 @@ cache:
   directories:
     - $HOME/.cabal/packages
     - $HOME/.cabal/store
+    - $TRAVIS_BUILD_DIR/dist-newstyle
 
 before_cache:
   - rm -fv $HOME/.cabal/packages/hackage.haskell.org/build-reports.log
@@ -28,12 +29,12 @@ before_install:
 - cabal --version
 
 install:
-- cabal new-update -v hackage.haskell.org
-- cabal new-configure --enable-tests --write-ghc-environment-files=always
-- cabal new-build --only-dependencies -j
+- cabal new-update -v
+- cabal new-configure --enable-tests --disable-optimization --write-ghc-environment-files=always --jobs=2
+- cabal new-build --only-dependencies
 
 script:
-- cabal new-build -j
+- cabal new-build
 - cabal new-run semantic:test
 - cabal new-run semantic-core:spec
 # parse-examples is disabled because it slaughters our CI

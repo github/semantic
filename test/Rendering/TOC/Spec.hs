@@ -225,7 +225,6 @@ blankDiff = merge (Nothing, Nothing) (inject [ inserting (termIn Nothing (inject
 
 -- Diff helpers
 diffWithParser :: ( Eq1 syntax
-                  , Show1 syntax
                   , Traversable syntax
                   , Diffable syntax
                   , HasDeclaration syntax
@@ -233,7 +232,6 @@ diffWithParser :: ( Eq1 syntax
                   , Member Distribute sig
                   , Member Task sig
                   , Carrier sig m
-                  , Monad m
                   )
                => Parser (Term syntax Location)
                -> BlobPair

@@ -1,4 +1,4 @@
-{-# LANGUAGE ApplicativeDo, RankNTypes #-}
+{-# LANGUAGE ApplicativeDo #-}
 module Semantic.CLI (main) where
 
 import           Control.Exception as Exc (displayException)
