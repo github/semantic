@@ -566,20 +566,3 @@ instance Listable Pos where
 
 instance Listable Span where
   tiers = cons2 Span
-
-instance Listable Blob where
-  tiers = cons4 makeBlob
-
-instance Listable BlobPair where
-  tiers = liftTiers tiers
-
-instance Listable Source where
-  tiers = fromUTF8 `mapT` tiers
-
-instance Listable ByteString where
-  tiers = (T.encodeUtf8 . T.pack) `mapT` strings
-    where strings = foldr ((\\//) . listsOf . toTiers) []
-            [ ['a'..'z'] <> ['A'..'Z'] <> ['0'..'9']
-            , [' '..'/'] <> [':'..'@'] <> ['['..'`'] <> ['{'..'~']
-            , [chr 0x00..chr 0x1f] <> [chr 127] -- Control characters.
-            , [chr 0xa0..chr 0x24f] ] -- Non-ASCII.

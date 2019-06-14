@@ -381,14 +381,17 @@ test-suite test
                      , Tags.Spec
                      , SpecHelpers
                      , Test.Hspec.LeanCheck
+                     , Generators
   build-depends:       semantic
                      , tree-sitter-json
                      , Glob ^>= 0.10.0
+                     , hedgehog ^>= 1
                      , hspec >= 2.6 && <3
                      , hspec-core >= 2.6 && <3
                      , hspec-expectations ^>= 0.8.2
                      , tasty ^>= 1.2.3
                      , tasty-golden ^>= 2.3.2
+                     , tasty-hedgehog ^>= 1.0.0.1
                      , tasty-hspec ^>= 1.1.5.1
                      , HUnit ^>= 1.6.0.0
                      , leancheck >= 0.8 && <1
