@@ -4,6 +4,7 @@ cache:
   directories:
     - $HOME/.cabal/packages
     - $HOME/.cabal/store
+    - $TRAVIS_BUILD_DIR/dist-newstyle
 
 before_cache:
   - rm -fv $HOME/.cabal/packages/hackage.haskell.org/build-reports.log
