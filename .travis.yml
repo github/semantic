@@ -35,7 +35,7 @@ install:
 - cabal new-build --only-dependencies
 
 script:
-- script/lint
+- cabal new-exec script/lint
 - cabal new-build
 - cabal new-run semantic:test
 - cabal new-run semantic-core:spec
