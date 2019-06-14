@@ -2,12 +2,12 @@
 
 module Reprinting.Spec where
 
-import SpecHelpers hiding (inject, project)
+import SpecHelpers
 
 import           Data.Foldable
 import qualified Data.Machine as Machine
 
-import           Control.Rewriting hiding (context)
+import           Control.Rewriting
 import qualified Data.Language as Language
 import           Data.Reprinting.Scope
 import           Data.Reprinting.Token
