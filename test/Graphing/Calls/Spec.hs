@@ -13,6 +13,7 @@ import           Data.Graph.ControlFlowVertex
 import qualified Data.Language as Language
 import           Semantic.Graph
 
+callGraphPythonProject :: [FilePath] -> IO (Semantic.Graph.Graph ControlFlowVertex)
 callGraphPythonProject paths = runTaskOrDie $ do
   let proxy = Proxy @'Language.Python
   let lang = Language.Python

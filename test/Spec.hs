@@ -1,6 +1,6 @@
 {-# LANGUAGE ImplicitParams #-}
 
-module Main where
+module Main (allTests, legacySpecs, main, tests) where
 
 import qualified Analysis.Go.Spec
 import qualified Analysis.PHP.Spec
@@ -105,4 +105,3 @@ main = do
   withOptions defaultOptions { optionsLogLevel = Nothing } $ \ config logger statter ->
     let ?session = TaskSession config "-" False logger statter
     in allTests >>= defaultMain
-

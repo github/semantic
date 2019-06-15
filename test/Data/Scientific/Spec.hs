@@ -1,4 +1,4 @@
-module Data.Scientific.Spec where
+module Data.Scientific.Spec (spec) where
 
 import Data.Scientific.Exts
 import Data.Either

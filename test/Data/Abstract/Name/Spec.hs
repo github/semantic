@@ -1,4 +1,4 @@
-module Data.Abstract.Name.Spec where
+module Data.Abstract.Name.Spec (spec) where
 
 import SpecHelpers
 

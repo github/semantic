@@ -1,6 +1,6 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Data.Range.Spec where
+module Data.Range.Spec (spec) where
 
 import Data.Range
 import SpecHelpers

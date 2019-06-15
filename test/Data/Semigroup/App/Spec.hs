@@ -1,4 +1,4 @@
-module Data.Semigroup.App.Spec where
+module Data.Semigroup.App.Spec (spec) where
 
 import SpecHelpers
 import Data.Semigroup.App

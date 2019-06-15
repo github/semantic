@@ -50,7 +50,7 @@ spec = parallel $ do
     it "evaluates modules" $ do
       (scopeGraph, (heap, res)) <- evaluate ["modules.rb"]
       case ModuleTable.lookup "modules.rb" <$> res of
-        Right (Just (Module _ (scopeAndFrame, value))) -> do
+        Right (Just (Module _ (scopeAndFrame, _))) -> do
           const () <$> SpecHelpers.lookupDeclaration "Bar" scopeAndFrame heap scopeGraph `shouldBe` Just ()
         other -> expectationFailure (show other)
 
