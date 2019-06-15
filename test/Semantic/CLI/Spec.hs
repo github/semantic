@@ -30,6 +30,7 @@ renderDiff ref new = unsafePerformIO $ do
     else ["git", "diff", ref, new]
 {-# NOINLINE renderDiff #-}
 
+testForDiffFixture :: (String, [BlobPair] -> TaskEff Builder, [Both File], FilePath) -> TestTree
 testForDiffFixture (diffRenderer, runDiff, files, expected) =
   goldenVsStringDiff
     ("diff fixture renders to " <> diffRenderer <> " " <> show files)
@@ -37,6 +38,7 @@ testForDiffFixture (diffRenderer, runDiff, files, expected) =
     expected
     (fmap toLazyByteString . runTaskOrDie $ readBlobPairs (Right files) >>= runDiff)
 
+testForParseFixture :: (String, [Blob] -> TaskEff Builder, [File], FilePath) -> TestTree
 testForParseFixture (format, runParse, files, expected) =
   goldenVsStringDiff
     ("diff fixture renders to " <> format <> " " <> show files)

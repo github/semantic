@@ -74,7 +74,7 @@ spec = parallel $ do
     it "side effect only imports dont expose exports" $ do
       (scopeGraph, (heap, res)) <- evaluate ["main3.ts", "a.ts"]
       case ModuleTable.lookup "main3.ts" <$> res of
-        Right (Just (Module _ (scopeAndFrame@(currentScope, currentFrame), value))) -> do
+        Right (Just (Module _ (scopeAndFrame, value))) -> do
           () <$ SpecHelpers.lookupDeclaration "baz" scopeAndFrame heap scopeGraph `shouldBe` Nothing
           value `shouldBe` Unit
           Heap.heapSize heap `shouldBe` 4
@@ -87,14 +87,14 @@ spec = parallel $ do
     it "evaluates early return statements" $ do
       (scopeGraph, (heap, res)) <- evaluate ["early-return.ts"]
       case ModuleTable.lookup "early-return.ts" <$> res of
-        Right (Just (Module _ (scopeAndFrame, value))) ->
+        Right (Just (Module _ (scopeAndFrame, _))) ->
           const () <$> SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
         other -> expectationFailure (show other)
 
     it "evaluates sequence expressions" $ do
       (scopeGraph, (heap, res)) <- evaluate ["sequence-expression.ts"]
       case ModuleTable.lookup "sequence-expression.ts" <$> res of
-        Right (Just (Module _ (scopeAndFrame, value))) ->
+        Right (Just (Module _ (scopeAndFrame, _))) ->
           SpecHelpers.lookupDeclaration "x" scopeAndFrame heap scopeGraph `shouldBe` Just [ Concrete.Float (Number.Decimal (scientific 3 0)) ]
         other -> expectationFailure (show other)
 
@@ -115,7 +115,7 @@ spec = parallel $ do
     it "evaluates await" $ do
       (scopeGraph, (heap, res)) <- evaluate ["await.ts"]
       case ModuleTable.lookup "await.ts" <$> res of
-        Right (Just (Module _ (scopeAndFrame, value))) -> do
+        Right (Just (Module _ (scopeAndFrame, _))) -> do
           -- Test that f2 is in the scopegraph and heap.
           const () <$> SpecHelpers.lookupDeclaration "f2" scopeAndFrame heap scopeGraph `shouldBe` Just ()
           -- Test we can't reference y from outside the function
@@ -159,7 +159,7 @@ spec = parallel $ do
         other                              -> expectationFailure (show other)
 
     it "uniquely tracks public fields for instances" $ do
-      (scopeGraph, (heap, res)) <- evaluate ["class1.ts", "class2.ts"]
+      (_, (_, res)) <- evaluate ["class1.ts", "class2.ts"]
       case ModuleTable.lookup "class1.ts" <$> res of
         Right (Just (Module _ (_, value))) -> value `shouldBe` (Concrete.Float (Number.Decimal 9.0))
         other                              -> expectationFailure (show other)

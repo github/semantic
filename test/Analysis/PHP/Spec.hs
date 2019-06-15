@@ -32,7 +32,7 @@ spec = parallel $ do
     xit "evaluates namespaces" $ do
       (scopeGraph, (heap, res)) <- evaluate ["namespaces.php"]
       case ModuleTable.lookup "namespaces.php" <$> res of
-        Right (Just (Module _ (scopeAndFrame, value))) -> do
+        Right (Just (Module _ (scopeAndFrame, _))) -> do
           const () <$> SpecHelpers.lookupDeclaration "Foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
           const () <$> SpecHelpers.lookupDeclaration "NS1" scopeAndFrame heap scopeGraph `shouldBe` Just ()
 

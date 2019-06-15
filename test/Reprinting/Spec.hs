@@ -1,6 +1,6 @@
 {-# LANGUAGE GADTs, OverloadedLists, TypeOperators #-}
 
-module Reprinting.Spec where
+module Reprinting.Spec (spec) where
 
 import SpecHelpers
 
@@ -59,7 +59,11 @@ spec = describe "reprinting" $ do
         printed `shouldBe` Right src
 
       it "should be able to parse the output of a refactor" $ do
-        let (Just tagged) = rewrite (mark Unmodified tree) (topDownAny increaseNumbers)
-        let (Right printed) = runReprinter src defaultJSONPipeline tagged
+        let maybeTagged = rewrite (mark Unmodified tree) (topDownAny increaseNumbers)
+        tagged <- maybe (fail "rewrite failed") pure maybeTagged
+
+        let eitherPrinted = runReprinter src defaultJSONPipeline tagged
+        printed <- either (fail "reprinter failed") pure eitherPrinted
+
         tree' <- runTaskOrDie (parse jsonParser (makeBlob printed path Language.JSON mempty))
         length tree' `shouldSatisfy` (/= 0)

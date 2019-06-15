@@ -27,7 +27,7 @@ spec = parallel $ do
     it "imports with aliases" $ do
       (scopeGraph, (heap, res)) <- evaluate ["main1.py", "a.py", "b/__init__.py", "b/c.py"]
       case ModuleTable.lookup "main1.py" <$> res of
-        Right (Just (Module _ (scopeAndFrame, value))) -> do
+        Right (Just (Module _ (scopeAndFrame, _))) -> do
           const () <$> SpecHelpers.lookupDeclaration "b" scopeAndFrame heap scopeGraph `shouldBe` Just ()
           const () <$> SpecHelpers.lookupDeclaration "e" scopeAndFrame heap scopeGraph `shouldBe` Just ()
         other -> expectationFailure (show other)
@@ -35,7 +35,7 @@ spec = parallel $ do
     it "imports using from syntax" $ do
       (scopeGraph, (heap, res)) <- evaluate ["main2.py", "a.py", "b/__init__.py", "b/c.py"]
       case ModuleTable.lookup "main2.py" <$> res of
-        Right (Just (Module _ (scopeAndFrame, value))) -> do
+        Right (Just (Module _ (scopeAndFrame, _))) -> do
           const () <$> SpecHelpers.lookupDeclaration "bar" scopeAndFrame heap scopeGraph `shouldBe` Just ()
           const () <$> SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
 
@@ -46,7 +46,7 @@ spec = parallel $ do
     it "imports with relative syntax" $ do
       (scopeGraph, (heap, res)) <- evaluate ["main3.py", "c/__init__.py", "c/utils.py"]
       case ModuleTable.lookup "main3.py" <$> res of
-        Right (Just (Module _ (scopeAndFrame, value))) -> do
+        Right (Just (Module _ (scopeAndFrame, _))) -> do
           const () <$> SpecHelpers.lookupDeclaration "utils" scopeAndFrame heap scopeGraph `shouldBe` Just ()
           -- (lookupDeclaration "utils" heap >>= deNamespace heap) `shouldBe` Just ("utils", ["to_s"])
         other -> expectationFailure (show other)

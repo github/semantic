@@ -35,7 +35,7 @@ import Data.Abstract.Name as X
 import Data.Abstract.Value.Concrete (Value(..), ValueError, runValueError)
 import Data.Blob as X
 import Data.Blob.IO as X
-import Data.ByteString.Builder (toLazyByteString)
+import Data.ByteString.Builder (Builder, toLazyByteString)
 import Data.ByteString.Lazy (toStrict)
 import Data.Project as X
 import Data.Proxy as X
@@ -75,6 +75,7 @@ import Semantic.Api hiding (File, Blob, BlobPair)
 import System.Exit (die)
 import Control.Exception (displayException)
 
+runBuilder :: Builder -> ByteString
 runBuilder = toStrict . toLazyByteString
 
 -- | This orphan instance is so we don't have to insert @name@ calls
