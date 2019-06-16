@@ -22,7 +22,7 @@ spec = parallel $ do
       case ModuleTable.lookup "main.rb" <$> res of
         Right (Just (Module _ (scopeAndFrame, value))) -> do
           value `shouldBe` Value.Integer (Number.Integer 1)
-          () <$ SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
+          SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldSatisfy` isJust
         other -> expectationFailure (show other)
 
     it "evaluates load" $ do
@@ -30,7 +30,7 @@ spec = parallel $ do
       case ModuleTable.lookup "load.rb" <$> res of
         Right (Just (Module _ (scopeAndFrame, value))) -> do
           value `shouldBe` Value.Integer (Number.Integer 1)
-          () <$ SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
+          SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldSatisfy` isJust
         other -> expectationFailure (show other)
 
     it "evaluates load with wrapper" $ do
@@ -42,8 +42,8 @@ spec = parallel $ do
       case ModuleTable.lookup "subclass.rb" <$> res of
         Right (Just (Module _ (scopeAndFrame, value))) -> do
           value `shouldBe` String "\"<bar>\""
-          () <$ SpecHelpers.lookupDeclaration "Bar" scopeAndFrame heap scopeGraph `shouldBe` Just ()
-          () <$ SpecHelpers.lookupDeclaration "Foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
+          SpecHelpers.lookupDeclaration "Bar" scopeAndFrame heap scopeGraph `shouldSatisfy` isJust
+          SpecHelpers.lookupDeclaration "Foo" scopeAndFrame heap scopeGraph `shouldSatisfy` isJust
           SpecHelpers.lookupMembers "Bar" Superclass scopeAndFrame heap scopeGraph `shouldBe` Just ["baz", "foo", "inspect"]
         other -> expectationFailure (show other)
 
@@ -51,7 +51,7 @@ spec = parallel $ do
       (scopeGraph, (heap, res)) <- evaluate ["modules.rb"]
       case ModuleTable.lookup "modules.rb" <$> res of
         Right (Just (Module _ (scopeAndFrame, _))) -> do
-          () <$ SpecHelpers.lookupDeclaration "Bar" scopeAndFrame heap scopeGraph `shouldBe` Just ()
+          SpecHelpers.lookupDeclaration "Bar" scopeAndFrame heap scopeGraph `shouldSatisfy` isJust
         other -> expectationFailure (show other)
 
     it "handles break correctly" $ do
@@ -95,7 +95,7 @@ spec = parallel $ do
       case ModuleTable.lookup "puts.rb" <$> res of
         Right (Just (Module _ (scopeAndFrame, value))) -> do
           value `shouldBe` Unit
-          () <$ SpecHelpers.lookupDeclaration "puts" scopeAndFrame heap scopeGraph `shouldBe` Just ()
+          SpecHelpers.lookupDeclaration "puts" scopeAndFrame heap scopeGraph `shouldSatisfy` isJust
         other -> expectationFailure (show other)
 
   where
