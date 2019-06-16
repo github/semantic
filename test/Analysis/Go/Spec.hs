@@ -4,7 +4,7 @@ module Analysis.Go.Spec (spec) where
 
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import qualified Data.Language as Language
-import SpecHelpers
+import           SpecHelpers
 
 
 spec :: (?session :: TaskSession) => Spec
@@ -25,8 +25,8 @@ spec = parallel $ do
       (scopeGraph, (heap, res)) <- evaluate ["main1.go", "foo/foo.go", "bar/bar.go", "bar/rab.go"]
       case ModuleTable.lookup "main1.go" <$> res of
         Right (Just (Module _ (scopeAndFrame, _))) -> do
-          const () <$> SpecHelpers.lookupDeclaration "f" scopeAndFrame heap scopeGraph `shouldBe` Just ()
-          const () <$> SpecHelpers.lookupDeclaration "main" scopeAndFrame heap scopeGraph `shouldBe` Just ()
+          () <$ SpecHelpers.lookupDeclaration "f" scopeAndFrame heap scopeGraph `shouldBe` Just ()
+          () <$ SpecHelpers.lookupDeclaration "main" scopeAndFrame heap scopeGraph `shouldBe` Just ()
           -- (lookupDeclaration "f" heap >>= deNamespace heap) `shouldBe` Just ("f",  ["New"])
         other -> expectationFailure (show other)
 

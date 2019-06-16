@@ -28,7 +28,7 @@ onTrees = do
   guard (null els)
   k <- create $ Literal.TextElement "\"hi\""
   v <- create $ Literal.TextElement "\"bye\""
-  pair <- create $ (Literal.KeyValue k v)
+  pair <- create $ Literal.KeyValue k v
   create (Literal.Hash (pair : els))
 
 -- Matches only "hi" string literals.

@@ -4,12 +4,13 @@ module Numeric.Spec
 
 import SpecHelpers
 import Data.Either
+import Data.Foldable (for_)
 import Numeric.Exts
 
 spec :: Spec
 spec = describe "Integer parsing" $ do
 
-  let go cases = forM_ cases $ \(s, v) -> parseInteger s `shouldBe` Right v
+  let go cases = for_ cases $ \(s, v) -> parseInteger s `shouldBe` Right v
 
   it "should handle Python integers" $
     go [ ("-1", (negate 1))

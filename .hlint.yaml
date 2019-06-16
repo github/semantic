@@ -67,7 +67,7 @@
 # Conveniences
 - warning: {lhs: maybe a pure, rhs: maybeM a, name: Use maybeM}
 - warning: {lhs: either (const a) id, rhs: fromRight a, name: use fromRight}
-- warning: {lhs: either id (const a), rhs: fromLeft a, name: use fromRight}
+- warning: {lhs: either id (const a), rhs: fromLeft a, name: use fromLeft}
 
 # Applicative style
 - warning: {lhs: f <$> pure a <*> b, rhs: f a <$> b, name: Avoid redundant pure}

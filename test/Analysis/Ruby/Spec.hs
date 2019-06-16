@@ -1,5 +1,5 @@
 {-# OPTIONS_GHC -O0 #-}
-{-# LANGUAGE ImplicitParams, TupleSections #-}
+{-# LANGUAGE ImplicitParams #-}
 module Analysis.Ruby.Spec (spec) where
 
 import           Control.Abstract (Declaration (..), ScopeError (..))
@@ -51,7 +51,7 @@ spec = parallel $ do
       (scopeGraph, (heap, res)) <- evaluate ["modules.rb"]
       case ModuleTable.lookup "modules.rb" <$> res of
         Right (Just (Module _ (scopeAndFrame, _))) -> do
-          const () <$> SpecHelpers.lookupDeclaration "Bar" scopeAndFrame heap scopeGraph `shouldBe` Just ()
+          () <$ SpecHelpers.lookupDeclaration "Bar" scopeAndFrame heap scopeGraph `shouldBe` Just ()
         other -> expectationFailure (show other)
 
     it "handles break correctly" $ do
@@ -95,7 +95,7 @@ spec = parallel $ do
       case ModuleTable.lookup "puts.rb" <$> res of
         Right (Just (Module _ (scopeAndFrame, value))) -> do
           value `shouldBe` Unit
-          const () <$> SpecHelpers.lookupDeclaration "puts" scopeAndFrame heap scopeGraph `shouldBe` Just ()
+          () <$ SpecHelpers.lookupDeclaration "puts" scopeAndFrame heap scopeGraph `shouldBe` Just ()
         other -> expectationFailure (show other)
 
   where
