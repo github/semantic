@@ -81,7 +81,7 @@ instance (Carrier sig m, Effect sig, MonadException m, MonadIO m) => Carrier (Re
 
 runReadlineWithHistory :: MonadException m => ReadlineC m a -> m a
 runReadlineWithHistory block = do
-  homeDir <- liftIO $ getHomeDirectory
+  homeDir <- liftIO getHomeDirectory
   prefs <- liftIO $ readPrefs (homeDir </> ".haskeline")
   let settingsDir = homeDir </> ".local/semantic-core"
       settings = Settings

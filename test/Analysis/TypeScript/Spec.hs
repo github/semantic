@@ -29,15 +29,15 @@ spec = parallel $ do
       (scopeGraph, (heap, res)) <- evaluate ["main6.ts", "baz.ts", "foo.ts"]
       case ModuleTable.lookup "main6.ts" <$> res of
         Right (Just (Module _ (scopeAndFrame, _))) -> do
-          () <$ SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
+          SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldSatisfy` isJust
         other -> expectationFailure (show other)
 
     it "imports with aliased symbols" $ do
       (scopeGraph, (heap, res)) <- evaluate ["main.ts", "foo.ts", "foo/b.ts"]
       case ModuleTable.lookup "main.ts" <$> res of
         Right (Just (Module _ (scopeAndFrame, _))) -> do
-          const () <$> SpecHelpers.lookupDeclaration "bar" scopeAndFrame heap scopeGraph `shouldBe` Just ()
-          const () <$> SpecHelpers.lookupDeclaration "quz" scopeAndFrame heap scopeGraph `shouldBe` Just ()
+          SpecHelpers.lookupDeclaration "bar" scopeAndFrame heap scopeGraph `shouldSatisfy` isJust
+          SpecHelpers.lookupDeclaration "quz" scopeAndFrame heap scopeGraph `shouldSatisfy` isJust
 
         other -> expectationFailure (show other)
 
@@ -45,21 +45,21 @@ spec = parallel $ do
       (scopeGraph, (heap, res)) <- evaluate ["main1.ts", "foo.ts", "a.ts"]
       case ModuleTable.lookup "main1.ts" <$> res of
         Right (Just (Module _ (scopeAndFrame, _))) -> do
-          () <$ SpecHelpers.lookupDeclaration "b" scopeAndFrame heap scopeGraph `shouldBe` Just ()
-          () <$ SpecHelpers.lookupDeclaration "z" scopeAndFrame heap scopeGraph `shouldBe` Just ()
+          SpecHelpers.lookupDeclaration "b" scopeAndFrame heap scopeGraph `shouldSatisfy` isJust
+          SpecHelpers.lookupDeclaration "z" scopeAndFrame heap scopeGraph `shouldSatisfy` isJust
 
           lookupMembers "b" Import scopeAndFrame heap scopeGraph `shouldBe` Just  [ "baz", "foo" ]
           lookupMembers "z" Import scopeAndFrame heap scopeGraph `shouldBe` Just  [ "baz", "foo" ]
 
-          () <$ SpecHelpers.lookupDeclaration "baz" scopeAndFrame heap scopeGraph `shouldBe` Nothing
-          () <$ SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldBe` Nothing
+          SpecHelpers.lookupDeclaration "baz" scopeAndFrame heap scopeGraph `shouldBe` Nothing
+          SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldBe` Nothing
         other -> expectationFailure (show other)
 
     it "stores function declaration in scope graph" $ do
       (scopeGraph, (heap, res)) <- evaluate ["a.ts"]
       case ModuleTable.lookup "a.ts" <$> res of
         Right (Just (Module _ (scopeAndFrame, value))) -> do
-          const () <$> SpecHelpers.lookupDeclaration "baz" scopeAndFrame heap scopeGraph `shouldBe` Just ()
+          SpecHelpers.lookupDeclaration "baz" scopeAndFrame heap scopeGraph `shouldSatisfy` isJust
           value `shouldBe` Unit
         other -> expectationFailure (show other)
 
@@ -67,7 +67,7 @@ spec = parallel $ do
       (scopeGraph, (heap, res)) <- evaluate ["main4.ts", "foo.ts"]
       case ModuleTable.lookup "main4.ts" <$> res of
         Right (Just (Module _ (scopeAndFrame, value))) -> do
-          const () <$> SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
+          SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldSatisfy` isJust
           value `shouldBe` String (pack "\"this is the foo function\"")
         other -> expectationFailure (show other)
 
@@ -75,7 +75,7 @@ spec = parallel $ do
       (scopeGraph, (heap, res)) <- evaluate ["main3.ts", "a.ts"]
       case ModuleTable.lookup "main3.ts" <$> res of
         Right (Just (Module _ (scopeAndFrame, value))) -> do
-          () <$ SpecHelpers.lookupDeclaration "baz" scopeAndFrame heap scopeGraph `shouldBe` Nothing
+          SpecHelpers.lookupDeclaration "baz" scopeAndFrame heap scopeGraph `shouldBe` Nothing
           value `shouldBe` Unit
           Heap.heapSize heap `shouldBe` 4
         other -> expectationFailure (show other)
@@ -88,7 +88,7 @@ spec = parallel $ do
       (scopeGraph, (heap, res)) <- evaluate ["early-return.ts"]
       case ModuleTable.lookup "early-return.ts" <$> res of
         Right (Just (Module _ (scopeAndFrame, _))) ->
-          const () <$> SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
+          SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldSatisfy` isJust
         other -> expectationFailure (show other)
 
     it "evaluates sequence expressions" $ do
@@ -117,7 +117,7 @@ spec = parallel $ do
       case ModuleTable.lookup "await.ts" <$> res of
         Right (Just (Module _ (scopeAndFrame, _))) -> do
           -- Test that f2 is in the scopegraph and heap.
-          const () <$> SpecHelpers.lookupDeclaration "f2" scopeAndFrame heap scopeGraph `shouldBe` Just ()
+          SpecHelpers.lookupDeclaration "f2" scopeAndFrame heap scopeGraph `shouldSatisfy` isJust
           -- Test we can't reference y from outside the function
           SpecHelpers.lookupDeclaration "y" scopeAndFrame heap scopeGraph `shouldBe` Nothing
         other -> expectationFailure (show other)
