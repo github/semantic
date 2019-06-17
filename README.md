@@ -96,6 +96,8 @@ Available options:
 
 ## Development
 
+`semantic` requires at least GHC 8.6.4 and Cabal 2.4. We strongly recommend using [`ghcup`][ghcup] to sandbox GHC versions, as GHC packages installed through your OS's package manager may not install statically-linked versions of the GHC boot libraries.
+
 We use `cabal's` [Nix-style local builds][nix] for development. To get started quickly:
 
 ```bash
@@ -108,7 +110,7 @@ cabal new-test
 cabal new-run semantic -- --help
 ```
 
-`semantic` requires at least GHC 8.6.4 and Cabal 2.4. We recommend using [`ghcup`][ghcup] to sandbox GHC versions. `stack` as a build tool is not officially supported; there is an unofficial [`stack.yaml`](https://gist.github.com/jkachmar/f200caee83280f1f25e9cfa2dd2b16bb) available, though we cannot make guarantees as to its stability.
+ `stack` as a build tool is not officially supported; there is an unofficial [`stack.yaml`](https://gist.github.com/jkachmar/f200caee83280f1f25e9cfa2dd2b16bb) available, though we cannot make guarantees as to its stability.
 
 [nix]: https://www.haskell.org/cabal/users-guide/nix-local-build-overview.html
 [stackage]: https://stackage.org
