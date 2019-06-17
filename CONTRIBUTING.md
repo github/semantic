@@ -28,6 +28,8 @@ Here are a few things you can do that will increase the likelihood of your pull 
 - Keep your change as focused as possible. If there are multiple changes you would like to make that are not dependent upon each other, consider submitting them as separate pull requests.
 - Write a [good commit message](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html).
 
+Unless you are a member of the Semantic team or a code owner, we ask that you refrain from leaving approvals or change requests on in-progress pull requests, as spurious reviews make it difficult to discern which patches are truly ready for integration.
+
 Please be aware that contributions to Semantic may multiple cycles of code review—we are grateful for all community involvement, but because Semantic powers real systems, we must maintain a high standard of code quality. For reasons of compatibility with production uses of Semantic within GitHub, we may also reject or require modifications to changes that would affect these systems. We may also reject patches that don't fit with our vision of the project; should this be the case, we will be clear about our rationale.
 
 ## Resources
