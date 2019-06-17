@@ -1,0 +1,4 @@
+#!/bin/bash
+
+git submodule sync --recursive && git submodule update --init --recursive --force
+cabal new-update
