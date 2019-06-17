@@ -23,8 +23,6 @@ import Control.Monad.Free as Free
 import Control.Monad.Trans.Free as FreeF
 import Data.Abstract.ScopeGraph (AccessControl(..))
 import Data.Bifunctor.Join
-import Data.ByteString (ByteString)
-import Data.Char (chr)
 import Data.Diff
 import Data.Functor.Both
 import qualified Data.Language as Language
@@ -32,10 +30,7 @@ import Data.List.NonEmpty
 import Data.Patch
 import Data.Range
 import Data.Location
-import Data.Semigroup (Semigroup(..))
 import Data.Semigroup.App
-import Data.Source
-import Data.Blob
 import Data.Span
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Literal as Literal
@@ -49,7 +44,6 @@ import qualified Language.Python.Syntax as Python.Syntax
 import qualified Data.Abstract.Name as Name
 import Data.Term
 import Data.Text as T (Text, pack)
-import qualified Data.Text.Encoding as T
 import Data.These
 import Data.Sum
 import Diffing.Algorithm.RWS
@@ -265,28 +259,28 @@ instance Listable1 Literal.Array where
   liftTiers tiers = liftCons1 (liftTiers tiers) Literal.Array
 
 instance Listable1 Literal.Boolean where
-  liftTiers tiers = cons1 Literal.Boolean
+  liftTiers _ = cons1 Literal.Boolean
 
 instance Listable1 Literal.Hash where
   liftTiers tiers = liftCons1 (liftTiers tiers) Literal.Hash
 
 instance Listable1 Literal.Float where
-  liftTiers tiers = cons1 Literal.Float
+  liftTiers _ = cons1 Literal.Float
 
 instance Listable1 Literal.Null where
-  liftTiers tiers = cons0 Literal.Null
+  liftTiers _ = cons0 Literal.Null
 
 instance Listable1 Literal.TextElement where
-  liftTiers tiers = cons1 Literal.TextElement
+  liftTiers _ = cons1 Literal.TextElement
 
 instance Listable1 Literal.EscapeSequence where
-  liftTiers tiers = cons1 Literal.EscapeSequence
+  liftTiers _ = cons1 Literal.EscapeSequence
 
 instance Listable1 Literal.InterpolationElement where
   liftTiers tiers = liftCons1 tiers Literal.InterpolationElement
 
 instance Listable1 Literal.Character where
-  liftTiers tiers = cons1 Literal.Character
+  liftTiers _ = cons1 Literal.Character
 
 instance Listable1 Statement.Statements where
   liftTiers tiers = liftCons1 (liftTiers tiers) Statement.Statements
@@ -295,10 +289,10 @@ instance Listable1 Syntax.Error where
   liftTiers tiers = liftCons4 mempty mempty mempty (liftTiers tiers) Syntax.Error
 
 instance Listable1 Directive.File where
-  liftTiers tiers = cons0 Directive.File
+  liftTiers _ = cons0 Directive.File
 
 instance Listable1 Directive.Line where
-  liftTiers tiers = cons0 Directive.Line
+  liftTiers _ = cons0 Directive.Line
 
 instance Listable1 Expression.Plus where
   liftTiers tiers = liftCons2 tiers tiers Expression.Plus
@@ -403,19 +397,19 @@ instance Listable1 Expression.Member where
   liftTiers tiers = liftCons2 tiers tiers Expression.Member
 
 instance Listable1 Expression.This where
-  liftTiers tiers = cons0 Expression.This
+  liftTiers _ = cons0 Expression.This
 
 instance Listable1 Literal.Complex where
-  liftTiers tiers = cons1 Literal.Complex
+  liftTiers _ = cons1 Literal.Complex
 
 instance Listable1 Literal.Integer where
-  liftTiers tiers = cons1 Literal.Integer
+  liftTiers _ = cons1 Literal.Integer
 
 instance Listable1 Literal.Rational where
-  liftTiers tiers = cons1 Literal.Rational
+  liftTiers _ = cons1 Literal.Rational
 
 instance Listable1 Literal.Regex where
-  liftTiers tiers = cons1 Literal.Regex
+  liftTiers _ = cons1 Literal.Regex
 
 instance Listable1 Literal.String where
   liftTiers tiers = liftCons1 (liftTiers tiers) Literal.String
@@ -424,7 +418,7 @@ instance Listable1 Literal.Symbol where
   liftTiers tiers = liftCons1 (liftTiers tiers) Literal.Symbol
 
 instance Listable1 Literal.SymbolElement where
-  liftTiers tiers = cons1 Literal.SymbolElement
+  liftTiers _ = cons1 Literal.SymbolElement
 
 instance Listable1 Statement.Assignment where
   liftTiers tiers = liftCons3 (liftTiers tiers) tiers tiers Statement.Assignment
@@ -493,7 +487,7 @@ instance Listable1 Ruby.Syntax.Require where
   liftTiers tiers' = liftCons2 tiers tiers' Ruby.Syntax.Require
 
 instance Listable1 Ruby.Syntax.ZSuper where
-  liftTiers tiers = cons0 Ruby.Syntax.ZSuper
+  liftTiers _ = cons0 Ruby.Syntax.ZSuper
 
 instance Listable1 Ruby.Syntax.Send where
   liftTiers tiers = liftCons4 (liftTiers tiers) (liftTiers tiers) (liftTiers tiers) (liftTiers tiers) Ruby.Syntax.Send
@@ -566,20 +560,3 @@ instance Listable Pos where
 
 instance Listable Span where
   tiers = cons2 Span
-
-instance Listable Blob where
-  tiers = cons4 makeBlob
-
-instance Listable BlobPair where
-  tiers = liftTiers tiers
-
-instance Listable Source where
-  tiers = fromUTF8 `mapT` tiers
-
-instance Listable ByteString where
-  tiers = (T.encodeUtf8 . T.pack) `mapT` strings
-    where strings = foldr ((\\//) . listsOf . toTiers) []
-            [ ['a'..'z'] <> ['A'..'Z'] <> ['0'..'9']
-            , [' '..'/'] <> [':'..'@'] <> ['['..'`'] <> ['{'..'~']
-            , [chr 0x00..chr 0x1f] <> [chr 127] -- Control characters.
-            , [chr 0xa0..chr 0x24f] ] -- Non-ASCII.

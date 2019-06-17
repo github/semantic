@@ -8,15 +8,12 @@ import SpecHelpers hiding (readFile)
 import Algebra.Graph
 import Data.List (uncons)
 
-import           Data.Abstract.Module
 import           "semantic" Data.Graph (Graph (..), topologicalSort)
 import           Data.Graph.ControlFlowVertex
-import           Data.Span
 import qualified Data.Language as Language
-import           Semantic.Config (defaultOptions)
 import           Semantic.Graph
-import           Semantic.IO
 
+callGraphPythonProject :: [FilePath] -> IO (Semantic.Graph.Graph ControlFlowVertex)
 callGraphPythonProject paths = runTaskOrDie $ do
   let proxy = Proxy @'Language.Python
   let lang = Language.Python

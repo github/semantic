@@ -55,7 +55,7 @@ main = withOptions opts $ \ config logger statter -> hspec . parallel $ do
             -- Other exceptions are true failures
             _ -> expectationFailure (show (displayException e))
           _ -> if file `elem` knownFailures
-                  then pendingWith $ "Known parse failures " <> show (const "Assignment: OK" <$> res)
+                  then pendingWith $ "Known parse failures " <> show ("Assignment: OK" <$ res)
                   else res `shouldSatisfy` isRight
 
     setupExampleRepos = readProcess "script/clone-example-repos" mempty mempty >>= print
@@ -105,4 +105,4 @@ parseFilePath :: (Member (Error SomeException) sig, Member Distribute sig, Membe
 parseFilePath path = readBlob (fileForPath path) >>= parseTermBuilder @[] TermShow . pure >>= const (pure True)
 
 languagesDir :: FilePath
-languagesDir = "vendor/haskell-tree-sitter/languages"
+languagesDir = "tmp/haskell-tree-sitter/languages"

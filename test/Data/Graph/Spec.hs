@@ -1,6 +1,6 @@
 {-# LANGUAGE PackageImports #-}
 
-module Data.Graph.Spec where
+module Data.Graph.Spec (spec) where
 
 import SpecHelpers
 

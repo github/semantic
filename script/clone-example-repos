@@ -13,10 +13,10 @@
 set -e
 cd $(dirname "$0")/..
 
-mkdir vendor || true
-git clone --single-branch --recurse-submodules https://github.com/tree-sitter/haskell-tree-sitter.git vendor/haskell-tree-sitter
+mkdir -p test/examplerepos || true
+git clone --single-branch --recurse-submodules https://github.com/tree-sitter/haskell-tree-sitter.git tmp/haskell-tree-sitter || true
 
-dir="vendor/haskell-tree-sitter/languages"
+dir="tmp/haskell-tree-sitter/languages"
 
 # clone_repo LOCAL_PATH URL SHA
 function clone_repo {

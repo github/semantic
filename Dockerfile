@@ -1,23 +1,19 @@
 FROM haskell:8.6 as build
 WORKDIR /build
-RUN cabal new-update
 
-# Build our upstream dependencies after copying in only enough to tell cabal
-# what they are.  This will make these layers cache better even as we change the
-# code of semantic itself.
+# Build and cache the dependencies first so we can cache these layers.
 COPY semantic.cabal .
-COPY cabal.project .
-COPY semantic-core/semantic-core.cabal ./semantic-core/
-COPY vendor ./vendor
+COPY semantic-core semantic-core
+RUN cabal new-update hackage.haskell.org,HEAD
+RUN cabal new-configure semantic semantic-core
 RUN cabal new-build --only-dependencies
 
-# Once the dependencies are built, copy in the rest of the code and compile
-# semantic itself.
-COPY . /build
-RUN cabal new-build semantic:exe:semantic
+# Copy in and build the entire project
+COPY . .
+RUN cabal new-build --flags="release" semantic:exe:semantic
 
 # A fake `install` target until we can get `cabal new-install` to work
-RUN cp $(find dist-newstyle -name semantic -type f -perm -u=x) /usr/local/bin/semantic
+RUN cp $(find dist-newstyle/build/x86_64-linux -name semantic -type f -perm -u=x) /usr/local/bin/semantic
 
 # Create a fresh image containing only the compiled CLI program, so that the
 # image isn't bulked up by all of the extra build state.

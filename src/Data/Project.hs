@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, KindSignatures, MultiWayIf #-}
+{-# LANGUAGE DeriveAnyClass, MultiWayIf #-}
 
 module Data.Project
   ( Project (..)

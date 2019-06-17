@@ -1,29 +1,28 @@
 {-# OPTIONS_GHC -O0 #-}
-{-# LANGUAGE TupleSections #-}
+{-# LANGUAGE ImplicitParams #-}
 module Analysis.Ruby.Spec (spec) where
 
-import           Control.Abstract (Declaration (..), ScopeError (..), runDeref)
+import           Control.Abstract (Declaration (..), ScopeError (..))
 import           Control.Effect.Resumable (SomeError (..))
 import           Data.Abstract.Evaluatable
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Number as Number
 import           Data.Abstract.Value.Concrete as Value
 import qualified Data.Language as Language
-import           Data.List.NonEmpty (NonEmpty (..))
 import           Data.Sum
 
 import SpecHelpers
 
 
-spec :: TaskSession -> Spec
-spec session = parallel $ do
+spec :: (?session :: TaskSession) =>  Spec
+spec = parallel $ do
   describe "Ruby" $ do
     it "evaluates require_relative" $ do
       (scopeGraph, (heap, res)) <- evaluate ["main.rb", "foo.rb"]
       case ModuleTable.lookup "main.rb" <$> res of
         Right (Just (Module _ (scopeAndFrame, value))) -> do
           value `shouldBe` Value.Integer (Number.Integer 1)
-          () <$ SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
+          SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldSatisfy` isJust
         other -> expectationFailure (show other)
 
     it "evaluates load" $ do
@@ -31,7 +30,7 @@ spec session = parallel $ do
       case ModuleTable.lookup "load.rb" <$> res of
         Right (Just (Module _ (scopeAndFrame, value))) -> do
           value `shouldBe` Value.Integer (Number.Integer 1)
-          () <$ SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
+          SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldSatisfy` isJust
         other -> expectationFailure (show other)
 
     it "evaluates load with wrapper" $ do
@@ -43,16 +42,16 @@ spec session = parallel $ do
       case ModuleTable.lookup "subclass.rb" <$> res of
         Right (Just (Module _ (scopeAndFrame, value))) -> do
           value `shouldBe` String "\"<bar>\""
-          () <$ SpecHelpers.lookupDeclaration "Bar" scopeAndFrame heap scopeGraph `shouldBe` Just ()
-          () <$ SpecHelpers.lookupDeclaration "Foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
+          SpecHelpers.lookupDeclaration "Bar" scopeAndFrame heap scopeGraph `shouldSatisfy` isJust
+          SpecHelpers.lookupDeclaration "Foo" scopeAndFrame heap scopeGraph `shouldSatisfy` isJust
           SpecHelpers.lookupMembers "Bar" Superclass scopeAndFrame heap scopeGraph `shouldBe` Just ["baz", "foo", "inspect"]
         other -> expectationFailure (show other)
 
     it "evaluates modules" $ do
       (scopeGraph, (heap, res)) <- evaluate ["modules.rb"]
       case ModuleTable.lookup "modules.rb" <$> res of
-        Right (Just (Module _ (scopeAndFrame, value))) -> do
-          const () <$> SpecHelpers.lookupDeclaration "Bar" scopeAndFrame heap scopeGraph `shouldBe` Just ()
+        Right (Just (Module _ (scopeAndFrame, _))) -> do
+          SpecHelpers.lookupDeclaration "Bar" scopeAndFrame heap scopeGraph `shouldSatisfy` isJust
         other -> expectationFailure (show other)
 
     it "handles break correctly" $ do
@@ -96,10 +95,10 @@ spec session = parallel $ do
       case ModuleTable.lookup "puts.rb" <$> res of
         Right (Just (Module _ (scopeAndFrame, value))) -> do
           value `shouldBe` Unit
-          const () <$> SpecHelpers.lookupDeclaration "puts" scopeAndFrame heap scopeGraph `shouldBe` Just ()
+          SpecHelpers.lookupDeclaration "puts" scopeAndFrame heap scopeGraph `shouldSatisfy` isJust
         other -> expectationFailure (show other)
 
   where
     fixtures = "test/fixtures/ruby/analysis/"
     evaluate = evalRubyProject . map (fixtures <>)
-    evalRubyProject = testEvaluating <=< evaluateProject' session (Proxy :: Proxy 'Language.Ruby) rubyParser
+    evalRubyProject = testEvaluating <=< evaluateProject' ?session (Proxy :: Proxy 'Language.Ruby) rubyParser

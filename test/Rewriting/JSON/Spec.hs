@@ -1,21 +1,18 @@
-{-# LANGUAGE TypeOperators, TypeFamilies #-}
+{-# LANGUAGE TypeFamilies, TypeOperators #-}
 
 module Rewriting.JSON.Spec (spec) where
 
-import           Prelude hiding (id, (.))
-
+import Prelude hiding (id, (.))
 import SpecHelpers
-
-import qualified Data.ByteString as B
-import           Data.Either
-import           Data.Text (Text)
 
 import           Control.Category
 import           Control.Rewriting as Rewriting
+import qualified Data.ByteString as B
 import           Data.History as History
 import qualified Data.Source as Source
 import           Data.Sum
 import qualified Data.Syntax.Literal as Literal
+import           Data.Text (Text)
 import           Language.JSON.PrettyPrint
 import           Reprinting.Pipeline
 
@@ -31,7 +28,7 @@ onTrees = do
   guard (null els)
   k <- create $ Literal.TextElement "\"hi\""
   v <- create $ Literal.TextElement "\"bye\""
-  pair <- create $ (Literal.KeyValue k v)
+  pair <- create $ Literal.KeyValue k v
   create (Literal.Hash (pair : els))
 
 -- Matches only "hi" string literals.
@@ -48,7 +45,7 @@ spec = describe "rewriting" $ do
 
   refactored <- runIO $ do
     json <- parseFile jsonParser path
-    let result = rewrite @Maybe (History.mark Unmodified json) (topDownAny onTrees) 
+    let result = rewrite @Maybe (History.mark Unmodified json) (topDownAny onTrees)
     maybe (fail "rewrite failed") pure result
 
   it "should add keys to JSON values" $ do

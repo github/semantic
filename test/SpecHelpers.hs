@@ -10,8 +10,6 @@ module SpecHelpers
 , runTaskOrDie
 , TaskSession(..)
 , testEvaluating
-, verbatim
-, Verbatim(..)
 , toList
 , Config
 , LogQueue
@@ -21,25 +19,23 @@ module SpecHelpers
 , EdgeLabel(..)
 ) where
 
-import Control.Abstract hiding (lookupDeclaration)
+import Control.Abstract
 import Data.Abstract.ScopeGraph (EdgeLabel(..))
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import qualified Data.Abstract.Heap as Heap
-import Control.Arrow ((&&&))
 import Control.Effect.Trace as X (runTraceByIgnoring, runTraceByReturning)
 import Control.Monad ((>=>))
 import Data.Traversable as X (for)
 import Data.Abstract.Address.Precise as X
-import Data.Abstract.Evaluatable hiding (lookupDeclaration)
+import Data.Abstract.Evaluatable
 import Data.Abstract.FreeVariables as X
 import Data.Abstract.Module as X
 import Data.Abstract.ModuleTable as X hiding (lookup)
 import Data.Abstract.Name as X
 import Data.Abstract.Value.Concrete (Value(..), ValueError, runValueError)
-import Data.Bifunctor (first)
 import Data.Blob as X
 import Data.Blob.IO as X
-import Data.ByteString.Builder (toLazyByteString)
+import Data.ByteString.Builder (Builder, toLazyByteString)
 import Data.ByteString.Lazy (toStrict)
 import Data.Project as X
 import Data.Proxy as X
@@ -54,10 +50,8 @@ import Data.Span as X hiding (HasSpan(..))
 import Data.String
 import Data.Sum
 import Data.Term as X
-import qualified Data.Text as T
-import qualified Data.Text.Encoding as T
 import Parsing.Parser as X
-import Semantic.Task as X hiding (parsePackage)
+import Semantic.Task as X
 import Semantic.Util as X
 import Semantic.Graph (runHeap, runScopeGraph)
 import System.FilePath as X
@@ -71,20 +65,17 @@ import Data.Semigroup as X (Semigroup(..))
 import Control.Monad as X
 
 import Test.Hspec as X (Spec, SpecWith, context, describe, it, xit, parallel, pendingWith, around, runIO)
-import Test.Hspec.Expectations.Pretty as X
+import Test.Hspec.Expectations as X
 import Test.Hspec.LeanCheck as X
 import Test.LeanCheck as X
 
-import qualified Data.ByteString as B
-import qualified Data.Set as Set
-import Data.Set (Set)
-import qualified Semantic.IO as IO
 import Semantic.Config (Config(..), optionsLogLevel)
 import Semantic.Telemetry (LogQueue, StatQueue)
 import Semantic.Api hiding (File, Blob, BlobPair)
 import System.Exit (die)
 import Control.Exception (displayException)
 
+runBuilder :: Builder -> ByteString
 runBuilder = toStrict . toLazyByteString
 
 -- | This orphan instance is so we don't have to insert @name@ calls
@@ -195,17 +186,3 @@ lookupDeclaration name (currentScope, currentFrame) heap scopeGraph = do
   path <- ScopeGraph.lookupScopePath name currentScope scopeGraph
   frameAddress <- Heap.lookupFrameAddress path currentFrame heap
   toList <$> Heap.getSlotValue (Slot frameAddress (Heap.pathPosition path)) heap
-
-newtype Verbatim = Verbatim ByteString
-  deriving (Eq)
-
-instance Show Verbatim where
-  showsPrec _ (Verbatim byteString) = (T.unpack (T.decodeUtf8 byteString) ++)
-
-verbatim :: ByteString -> Verbatim
-verbatim = Verbatim . stripWhitespace
-  where
-    stripWhitespace :: ByteString -> ByteString
-    stripWhitespace = B.foldl' go B.empty
-      where go acc x | x `B.elem` " \t\n" = acc
-                     | otherwise = B.snoc acc x

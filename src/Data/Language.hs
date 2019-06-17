@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DeriveGeneric, KindSignatures, LambdaCase #-}
+{-# LANGUAGE DeriveAnyClass, DeriveGeneric, KindSignatures #-}
 module Data.Language
   ( Language (..)
   , SLanguage (..)
@@ -13,11 +13,8 @@ module Data.Language
   ) where
 
 import           Data.Aeson
-import           Data.Char (toUpper)
-import           Data.String
 import qualified Data.Text as T
 import           Prologue
-import           Proto3.Suite
 import           System.FilePath.Posix
 
 -- | The various languages we support.
@@ -37,7 +34,7 @@ data Language
     | TypeScript
     | PHP
     | TSX
-    deriving (Eq, Generic, Ord, Read, Show, Bounded, Hashable, ToJSON, Named, Enum, MessageField, NFData)
+    deriving (Eq, Generic, Ord, Read, Show, Bounded, Hashable, ToJSON, Enum, NFData)
 
 class SLanguage (lang :: Language) where
   reflect :: proxy lang -> Language
@@ -78,12 +75,6 @@ instance SLanguage 'TypeScript where
 instance SLanguage 'PHP where
   reflect _ = PHP
 
-
--- This ensures that the protobuf file is generated with ALL_CAPS_NAMES.
-instance Finite Language where
-  enumerate _ = fmap go [Unknown ..] where
-    go x = (fromString (fmap toUpper (show x)), fromEnum x)
-
 instance FromJSON Language where
   parseJSON = withText "Language" $ \l ->
     pure $ fromMaybe Unknown (parseLanguage l)
@@ -106,18 +97,6 @@ parseLanguage l = case T.toLower l of
 -- | Predicate failing on 'Unknown' and passing in all other cases.
 knownLanguage :: Language -> Bool
 knownLanguage = (/= Unknown)
-
--- | Defaults to 'Unknown'.
-instance HasDefault Language where def = Unknown
-
--- | Piggybacks on top of the 'Enumerated' instance, as the generated code would.
--- This instance will get easier when we have DerivingVia.
-instance Primitive Language where
-  primType _ = primType (Proxy @(Enumerated Language))
-  encodePrimitive f = encodePrimitive f . Enumerated . Right
-  decodePrimitive   = decodePrimitive >>= \case
-    (Enumerated (Right r)) -> pure r
-    other                  -> Prelude.fail ("Language decodeMessageField: unexpected value" <> show other)
 
 -- | Returns a Language based on the file extension (including the ".").
 languageForType :: String -> Language

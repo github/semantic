@@ -1,4 +1,4 @@
-cabal-version:       2.2
+cabal-version:       2.4
 
 name:                semantic-core
 version:             0.0.0.0
@@ -82,9 +82,9 @@ test-suite spec
   other-modules:       Generators
   build-depends:       base
                      , semantic-core
-                     , hedgehog >= 0.6 && <1
+                     , hedgehog ^>= 1
                      , tasty >= 1.2 && <2
-                     , tasty-hedgehog >= 0.2 && <1
+                     , tasty-hedgehog ^>= 1.0.0.1
                      , tasty-hunit >= 0.10 && <1
                      , trifecta
   hs-source-dirs:      test

@@ -1,7 +1,5 @@
 module Semantic.Spec (spec) where
 
-import Data.Diff
-import Data.Patch
 import Semantic.Api hiding (Blob)
 import Semantic.Git
 import System.Exit

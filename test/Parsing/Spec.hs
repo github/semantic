@@ -1,6 +1,5 @@
 module Parsing.Spec (spec) where
 
-import Control.Effect
 import Data.AST
 import Data.Blob
 import Data.ByteString.Char8 (pack)
@@ -9,15 +8,13 @@ import Data.Language
 import Data.Maybe
 import Data.Source
 import Parsing.TreeSitter
-import Semantic.Config
 import SpecHelpers
-import System.Timeout
 import TreeSitter.JSON (tree_sitter_json, Grammar)
 
 spec :: Spec
 spec = parallel $ do
   describe "parseToAST" $ do
-    let source = toJSONSource $ take 10000 [1..]
+    let source = toJSONSource [1 :: Int .. 10000]
     let largeBlob = sourceBlob "large.json" JSON source
 
     it "returns a result when the timeout does not expire" $ do
