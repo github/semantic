@@ -5,6 +5,7 @@ module Language.Python.Core
 
 import           Control.Monad.Fail
 import           Data.Core as Core
+import           Data.Name as Name
 import           GHC.Generics
 import           Prelude hiding (fail)
 import qualified TreeSitter.Python.AST as Py
@@ -55,7 +56,9 @@ instance Compile Py.FunctionDefinition
 instance Compile Py.FutureImportStatement
 instance Compile Py.GeneratorExpression
 instance Compile Py.GlobalStatement
-instance Compile Py.Identifier
+
+instance Compile Py.Identifier where
+  compile (Py.Identifier text) = pure (Var (User text))
 
 instance Compile Py.IfStatement where
   compile Py.IfStatement{..} = If <$> compile condition <*> compile consequence <*> case alternative of
