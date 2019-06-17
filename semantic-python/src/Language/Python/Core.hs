@@ -52,7 +52,29 @@ instance Compile Py.False where compile _ = pure (Bool False)
 
 instance Compile Py.Float
 instance Compile Py.ForStatement
-instance Compile Py.FunctionDefinition
+
+instance Compile Py.FunctionDefinition where
+  compile Py.FunctionDefinition
+    { name       = Py.Identifier name
+    , parameters = Py.Parameters parameters
+    , ..
+    } = do
+      parameters' <- params
+      body' <- compile body
+      pure (Let (User name) := lams parameters' body')
+    where params = case parameters of
+            Nothing -> pure []
+            Just p  -> traverse param [p] -- FIXME: this is wrong in node-types.json, @p@ should already be a list
+          param (Left Py.AnonymousComma{}) = fail "lol what"
+          param (Right (Left Py.DefaultParameter{..})) = fail "lol what"
+          param (Right (Right (Left Py.DictionarySplat{..}))) = fail "lol what"
+          param (Right (Right (Right (Left (Py.Identifier name))))) = pure (User name)
+          param (Right (Right (Right (Right (Left Py.KeywordIdentifier{..}))))) = fail "lol what"
+          param (Right (Right (Right (Right (Right (Left Py.ListSplat{..})))))) = fail "lol what"
+          param (Right (Right (Right (Right (Right (Right (Left Py.Tuple{..}))))))) = fail "lol what"
+          param (Right (Right (Right (Right (Right (Right (Right (Left Py.TypedDefaultParameter{..})))))))) = fail "lol what"
+          param (Right (Right (Right (Right (Right (Right (Right (Right Py.TypedParameter{..})))))))) = fail "lol what"
+
 instance Compile Py.FutureImportStatement
 instance Compile Py.GeneratorExpression
 instance Compile Py.GlobalStatement
