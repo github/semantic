@@ -7,6 +7,8 @@
 
 Hi there! We're thrilled that you'd like to contribute to this project. Your help is essential for keeping it great.
 
+We're happy to accept code and documentation contributions, as well as issues suggesting new features, asking questions about how things work, or generally about what we're trying to accomplish! However, we are not opening up the code review process to the public. PRs should _only_ be reviewed by one of the project maintainers. Therefore, we ask that you refrain from leaving approvals or change requests on in-progress pull requests, as spurious reviews make it difficult to discern which patches are truly ready for integration.
+
 Contributions to this project are [released](https://help.github.com/articles/github-terms-of-service/#6-contributions-under-repository-license) to the public under the [project's open source license](LICENSE.md).
 
 Please note that this project is released with a [Contributor Code of Conduct][code-of-conduct]. By participating in this project you agree to abide by its terms.
