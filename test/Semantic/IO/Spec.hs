@@ -84,15 +84,15 @@ spec = parallel $ do
 
     it "throws on blank input" $ do
       h <- openFileForReading "test/fixtures/cli/blank.json"
-      readBlobPairsFromHandle h `shouldThrow` (== ExitFailure 1)
+      readBlobPairsFromHandle h `shouldThrow` jsonException
 
     it "throws if language field not given" $ do
       h <- openFileForReading "test/fixtures/cli/diff-no-language.json"
-      readBlobsFromHandle h `shouldThrow` (== ExitFailure 1)
+      readBlobsFromHandle h `shouldThrow` jsonException
 
     it "throws if null on before and after" $ do
       h <- openFileForReading "test/fixtures/cli/diff-null-both-sides.json"
-      readBlobPairsFromHandle h `shouldThrow` (== ExitFailure 1)
+      readBlobPairsFromHandle h `shouldThrow` jsonException
 
   describe "readBlobsFromHandle" $ do
     it "returns blobs for valid JSON encoded parse input" $ do
@@ -103,9 +103,13 @@ spec = parallel $ do
 
     it "throws on blank input" $ do
       h <- openFileForReading "test/fixtures/cli/blank.json"
-      readBlobsFromHandle h `shouldThrow` (== ExitFailure 1)
+      readBlobsFromHandle h `shouldThrow` jsonException
 
   where blobsFromFilePath path = do
           h <- openFileForReading path
           blobs <- readBlobPairsFromHandle h
           pure blobs
+
+jsonException :: Selector InvalidJSONException
+jsonException = const True
+
