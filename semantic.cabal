@@ -393,6 +393,7 @@ test-suite test
                      , tasty-golden ^>= 2.3.2
                      , tasty-hedgehog ^>= 1.0.0.1
                      , tasty-hspec ^>= 1.1.5.1
+                     , tasty-hunit ^>= 0.10.0.2
                      , HUnit ^>= 1.6.0.0
                      , leancheck >= 0.8 && <1
                      , temporary ^>= 1.3

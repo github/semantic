@@ -47,6 +47,7 @@ tests =
   [ Integration.Spec.spec
   , Semantic.CLI.Spec.spec
   , Data.Source.Spec.testTree
+  , Semantic.Stat.Spec.testTree
   ]
 
 -- We can't bring this out of the IO monad until we divest
@@ -64,8 +65,7 @@ allTests = do
 -- using one or the other.") Instead, create a new TestTree value
 -- in your spec module and add it to the above 'tests' list.
 legacySpecs :: (?session :: TaskSession) => Spec
-legacySpecs = do
-  describe "Semantic.Stat" Semantic.Stat.Spec.spec
+legacySpecs = parallel $ do
   describe "Analysis.Go" Analysis.Go.Spec.spec
   describe "Analysis.PHP" Analysis.PHP.Spec.spec
   describe "Analysis.Python" Analysis.Python.Spec.spec
