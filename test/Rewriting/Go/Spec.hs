@@ -30,11 +30,11 @@ loopMatcher = target <* go where
 spec :: Spec
 spec = describe "recursively" $ do
   it "extracts integers" $ do
-    parsed <- parseFile goParser "test/fixtures/go/matching/integers.go"
+    parsed <- parseFileQuiet goParser "test/fixtures/go/matching/integers.go"
     let matched = recursively integerMatcher parsed
     sort matched `shouldBe` ["1", "2", "3"]
 
   it "counts for loops" $ do
-    parsed <- parseFile goParser "test/fixtures/go/matching/for.go"
+    parsed <- parseFileQuiet goParser "test/fixtures/go/matching/for.go"
     let matched = recursively @[] @(Term _ _) loopMatcher parsed
     length matched `shouldBe` 2

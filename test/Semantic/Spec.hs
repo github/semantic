@@ -1,10 +1,11 @@
 module Semantic.Spec (spec) where
 
+import Data.Either
+import SpecHelpers
+
+import Data.Blob (NoLanguageForBlob (..))
 import Semantic.Api hiding (Blob)
 import Semantic.Git
-import System.Exit
-
-import SpecHelpers
 
  -- we need some lenses here, oof
 setBlobLanguage :: Language -> Blob -> Blob
@@ -18,7 +19,8 @@ spec = parallel $ do
       output `shouldBe` "{\"trees\":[{\"path\":\"methods.rb\",\"error\":\"NoLanguageForBlob \\\"methods.rb\\\"\",\"language\":\"Unknown\"}]}\n"
 
     it "throws if given an unknown language for sexpression output" $ do
-      runTaskOrDie (parseTermBuilder TermSExpression [setBlobLanguage Unknown methodsBlob]) `shouldThrow` (== ExitFailure 1)
+      res <- runTaskWithOptions defaultOptions (parseTermBuilder TermSExpression [setBlobLanguage Unknown methodsBlob])
+      void res `shouldBe` Left (NoLanguageForBlob "methods.rb")
 
     it "renders with the specified renderer" $ do
       output <- fmap runBuilder . runTaskOrDie $ parseTermBuilder TermSExpression [methodsBlob]

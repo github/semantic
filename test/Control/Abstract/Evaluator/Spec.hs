@@ -1,4 +1,5 @@
 {-# LANGUAGE TypeOperators #-}
+{-# OPTIONS_GHC -fno-warn-missing-signatures #-}
 module Control.Abstract.Evaluator.Spec
 ( spec
 ) where

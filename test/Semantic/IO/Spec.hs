@@ -7,13 +7,13 @@ import Data.List
 import System.Directory
 import System.Exit (ExitCode (..))
 import System.IO.Temp
-import System.Process
+import Data.String
 
 import Data.Blob
 import Data.Handle
 import SpecHelpers hiding (readFile)
 import qualified Semantic.Git as Git
-
+import Shelly (shelly, silently, cd, run_)
 
 spec :: Spec
 spec = parallel $ do
@@ -22,16 +22,16 @@ spec = parallel $ do
     when hasGit . it "should read from a git directory" $ do
       -- This temporary directory will be cleaned after use.
       blobs <- liftIO . withSystemTempDirectory "semantic-temp-git-repo" $ \dir -> do
-        let commands = [ "cd " <> dir
-                       , "git init"
-                       , "touch foo.py bar.rb"
-                       , "git add foo.py bar.rb"
-                       , "git config user.name 'Test'"
-                       , "git config user.email 'test@test.test'"
-                       , "git commit -am 'test commit'"
-                       ]
-        exit <- system (intercalate " && " commands)
-        when (exit /= ExitSuccess) (fail ("Couldn't run git properly in dir " <> dir))
+        shelly $ silently $ do
+          cd (fromString dir)
+          let git = run_ "git"
+          git ["init"]
+          run_ "touch" ["foo.py", "bar.rb"]
+          git ["add", "foo.py", "bar.rb"]
+          git ["config", "user.name", "'Test'"]
+          git ["config", "user.email", "'test@test.test'"]
+          git ["commit", "-am", "'test commit'"]
+
         readBlobsFromGitRepo (dir </> ".git") (Git.OID "HEAD") []
       let files = sortOn fileLanguage (blobFile <$> blobs)
       files `shouldBe` [ File "foo.py" Python
