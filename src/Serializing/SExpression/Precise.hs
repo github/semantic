@@ -13,6 +13,14 @@ serializeSExpression :: ToSExpression t => t -> Builder
 serializeSExpression t = toSExpression t 0 <> "\n"
 
 
+nl :: Int -> Builder
+nl n | n <= 0    = ""
+     | otherwise = "\n"
+
+pad :: Int -> Builder
+pad n = stringUtf8 (replicate (2 * n) ' ')
+
+
 class ToSExpression t where
   toSExpression :: t -> Int -> Builder
 
@@ -33,7 +41,7 @@ instance Show t => ToSExpressionWithStrategy 'Show t where
   toSExpressionWithStrategy _ t _ = stringUtf8 (show t)
 
 instance (Generic t, GToSExpression (Rep t)) => ToSExpressionWithStrategy 'Generic t where
-  toSExpressionWithStrategy _ t n = "(" <> fold (intersperse " " (gtoSExpression (from t) n)) <> ")"
+  toSExpressionWithStrategy _ t n = nl n <> pad n <> "(" <> fold (intersperse " " (gtoSExpression (from t) n)) <> ")"
 
 
 class GToSExpression f where
