@@ -51,3 +51,6 @@ instance (Constructor c, GToSExpression f) => GToSExpression (M1 C c f) where
 
 instance (GToSExpression f, GToSExpression g) => GToSExpression (f :*: g) where
   gtoSExpression (l :*: r) = gtoSExpression l <> gtoSExpression r
+
+instance GToSExpression U1 where
+  gtoSExpression _ _ = []
