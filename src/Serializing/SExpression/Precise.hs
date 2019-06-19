@@ -11,3 +11,6 @@ serializeSExpression t = gtoSExpression (from t) 0 <> "\n"
 
 class GToSExpression f where
   gtoSExpression :: f (Int -> Builder) -> (Int -> Builder)
+
+instance GToSExpression f => GToSExpression (M1 D d f) where
+  gtoSExpression = gtoSExpression . unM1
