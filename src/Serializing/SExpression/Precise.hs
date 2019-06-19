@@ -55,5 +55,8 @@ instance (GToSExpression f, GToSExpression g) => GToSExpression (f :*: g) where
 instance GToSExpression U1 where
   gtoSExpression _ _ = []
 
+instance GToSExpression f => GToSExpression (M1 S s f) where
+  gtoSExpression = gtoSExpression . unM1 -- FIXME: show the selector name, if any
+
 instance ToSExpression k => GToSExpression (K1 R k) where
   gtoSExpression k = pure . toSExpression (unK1 k)
