@@ -8,7 +8,7 @@ import Test.Hspec.Expectations
 import Test.Hspec.LeanCheck
 
 spec :: Spec
-spec = parallel $ do
+spec = do
   describe "Term" $ do
     prop "equality is reflexive" $
       \ a -> a `shouldBe` (a :: Term ListableSyntax ())

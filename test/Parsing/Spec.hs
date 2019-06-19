@@ -12,7 +12,7 @@ import SpecHelpers
 import TreeSitter.JSON (tree_sitter_json, Grammar)
 
 spec :: Spec
-spec = parallel $ do
+spec = do
   describe "parseToAST" $ do
     let source = toJSONSource [1 :: Int .. 10000]
     let largeBlob = sourceBlob "large.json" JSON source

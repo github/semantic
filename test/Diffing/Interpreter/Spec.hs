@@ -21,7 +21,7 @@ import Test.LeanCheck.Core
 import SpecHelpers ()
 
 spec :: Spec
-spec = parallel $ do
+spec = do
   describe "diffTerms" $ do
     it "returns a replacement when comparing two unicode equivalent terms" $
       let termA = termIn emptyAnnotation (inject (Syntax.Identifier "t\776"))

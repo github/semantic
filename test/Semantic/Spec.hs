@@ -12,7 +12,7 @@ setBlobLanguage :: Language -> Blob -> Blob
 setBlobLanguage lang b = b { blobFile = (blobFile b) { fileLanguage = lang }}
 
 spec :: Spec
-spec = parallel $ do
+spec = do
   describe "parseBlob" $ do
     it "returns error if given an unknown language (json)" $ do
       output <- fmap runBuilder . runTaskOrDie $ parseTermBuilder TermJSONTree [ setBlobLanguage Unknown methodsBlob ]

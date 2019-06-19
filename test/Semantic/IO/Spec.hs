@@ -16,7 +16,7 @@ import qualified Semantic.Git as Git
 import Shelly (shelly, silently, cd, run_)
 
 spec :: Spec
-spec = parallel $ do
+spec = do
   describe "readBlobsFromGitRepo" $ do
     hasGit <- runIO $ isJust <$> findExecutable "git"
     when hasGit . it "should read from a git directory" $ do
@@ -50,9 +50,7 @@ spec = parallel $ do
     let a = sourceBlob "method.rb" Ruby "def foo; end"
     let b = sourceBlob "method.rb" Ruby "def bar(x); end"
     it "returns blobs for valid JSON encoded diff input" $ do
-      putStrLn "step 1"
       blobs <- blobsFromFilePath "test/fixtures/cli/diff.json"
-      putStrLn "done"
       blobs `shouldBe` [Diffing a b]
 
     it "returns blobs when there's no before" $ do

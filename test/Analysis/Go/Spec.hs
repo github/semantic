@@ -8,7 +8,7 @@ import           SpecHelpers
 
 
 spec :: (?session :: TaskSession) => Spec
-spec = parallel $ do
+spec = do
   describe "Go" $ do
     it "imports and wildcard imports" $ do
       (scopeGraph, (heap, res)) <- evaluate ["main.go", "foo/foo.go", "bar/bar.go", "bar/rab.go"]
