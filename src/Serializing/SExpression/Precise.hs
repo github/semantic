@@ -26,3 +26,6 @@ instance (GToSExpression f, GToSExpression g) => GToSExpression (f :+: g) where
 
 instance (Constructor c, GToSExpression f) => GToSExpression (M1 C c f) where
   gtoSExpression' m n = stringUtf8 (conName m) : gtoSExpression' (unM1 m) (n + 1)
+
+instance (GToSExpression f, GToSExpression g) => GToSExpression (f :*: g) where
+  gtoSExpression' (l :*: r) = gtoSExpression' l <> gtoSExpression' r
