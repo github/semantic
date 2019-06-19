@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, FlexibleInstances, OverloadedStrings #-}
+{-# LANGUAGE FlexibleContexts, FlexibleInstances, OverloadedStrings, TypeOperators #-}
 module Serializing.SExpression.Precise
 ( serializeSExpression
 ) where
@@ -19,6 +19,10 @@ class GToSExpression f where
 
 instance GToSExpression f => GToSExpression (M1 D d f) where
   gtoSExpression' = gtoSExpression' . unM1
+
+instance (GToSExpression f, GToSExpression g) => GToSExpression (f :+: g) where
+  gtoSExpression' (L1 l) = gtoSExpression' l
+  gtoSExpression' (R1 r) = gtoSExpression' r
 
 instance (Constructor c, GToSExpression f) => GToSExpression (M1 C c f) where
   gtoSExpression' m n = stringUtf8 (conName m) : gtoSExpression' (unM1 m) (n + 1)
