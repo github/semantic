@@ -1,6 +1,6 @@
 module Semantic.Spec (spec) where
 
-import Data.Either
+import Control.Exception (fromException)
 import SpecHelpers
 
 import Data.Blob (NoLanguageForBlob (..))
@@ -20,7 +20,9 @@ spec = parallel $ do
 
     it "throws if given an unknown language for sexpression output" $ do
       res <- runTaskWithOptions defaultOptions (parseTermBuilder TermSExpression [setBlobLanguage Unknown methodsBlob])
-      void res `shouldBe` Left (NoLanguageForBlob "methods.rb")
+      case res of
+        Left exc    -> fromException exc `shouldBe` Just (NoLanguageForBlob "methods.rb")
+        Right _bad  -> fail "Expected parseTermBuilder to fail for an unknown language"
 
     it "renders with the specified renderer" $ do
       output <- fmap runBuilder . runTaskOrDie $ parseTermBuilder TermSExpression [methodsBlob]
