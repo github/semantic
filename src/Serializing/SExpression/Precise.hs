@@ -20,16 +20,16 @@ instance (ToSExpressionWithStrategy strategy t, strategy ~ ToSExpressionStrategy
   toSExpression = toSExpressionWithStrategy @strategy undefined
 
 
-data Strategy = Generic | Custom
+data Strategy = Generic | Show
 
 type family ToSExpressionStrategy t :: Strategy where
-  ToSExpressionStrategy Text = 'Custom
+  ToSExpressionStrategy Text = 'Show
   ToSExpressionStrategy _    = 'Generic
 
 class ToSExpressionWithStrategy (strategy :: Strategy) t where
   toSExpressionWithStrategy :: proxy strategy -> t -> Int -> Builder
 
-instance ToSExpressionWithStrategy 'Custom Text where
+instance Show t => ToSExpressionWithStrategy 'Show t where
   toSExpressionWithStrategy _ t _ = stringUtf8 (show t)
 
 instance (Generic t, GToSExpression (Rep t)) => ToSExpressionWithStrategy 'Generic t where
