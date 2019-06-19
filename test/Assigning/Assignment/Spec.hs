@@ -44,35 +44,37 @@ spec = do
       `shouldBe`
         Right [Out "hello"]
 
-    it "distributes through overlapping committed choices, matching the left alternative" $
-      fst <$> runAssignment "(red (green))" (symbol Red *> children green <|> symbol Red *> children blue) (makeState [node Red 0 13 [node Green 5 12 []]])
-      `shouldBe`
-      Right (Out "(green)")
+    describe "distributing through overlapping committed choices" $ do
 
-    it "distributes through overlapping committed choices, matching the right alternative" $
-      fst <$> runAssignment "(red (blue))" (symbol Red *> children green <|> symbol Red *> children blue) (makeState [node Red 0 12 [node Blue 5 11 []]])
-      `shouldBe`
-      Right (Out "(blue)")
+      it "matches the left alternative" $
+        fst <$> runAssignment "(red (green))" (symbol Red *> children green <|> symbol Red *> children blue) (makeState [node Red 0 13 [node Green 5 12 []]])
+        `shouldBe`
+        Right (Out "(green)")
 
-    it "distributes through overlapping committed choices, matching the left alternatives" $
-      fst <$> runAssignment "magenta green green" (symbol Magenta *> many green <|> symbol Magenta *> many blue) (makeState [node Magenta 0 7 [], node Green 8 13 [], node Green 14 19 []])
-      `shouldBe`
-      Right [Out "green", Out "green"]
+      it "matches the right alternative" $
+        fst <$> runAssignment "(red (blue))" (symbol Red *> children green <|> symbol Red *> children blue) (makeState [node Red 0 12 [node Blue 5 11 []]])
+        `shouldBe`
+        Right (Out "(blue)")
 
-    it "distributes through overlapping committed choices, matching the empty list" $
-      fst <$> runAssignment "magenta" (symbol Magenta *> (Left <$> many green) <|> symbol Magenta *> (Right <$> many blue)) (makeState [node Magenta 0 7 []])
-      `shouldBe`
-      Right (Left [])
+      it "matches the left alternatives" $
+        fst <$> runAssignment "magenta green green" (symbol Magenta *> many green <|> symbol Magenta *> many blue) (makeState [node Magenta 0 7 [], node Green 8 13 [], node Green 14 19 []])
+        `shouldBe`
+        Right [Out "green", Out "green"]
 
-    it "distributes through overlapping committed choices, dropping anonymous nodes & matching the left alternative" $
-      fst <$> runAssignment "magenta green" (symbol Magenta *> green <|> symbol Magenta *> blue) (makeState [node Magenta 0 7 [], node Green 8 13 []])
-      `shouldBe`
-      Right (Out "green")
+      it "matches the empty list" $
+        fst <$> runAssignment "magenta" (symbol Magenta *> (Left <$> many green) <|> symbol Magenta *> (Right <$> many blue)) (makeState [node Magenta 0 7 []])
+        `shouldBe`
+        Right (Left [])
 
-    it "distributes through overlapping committed choices, dropping anonymous nodes & matching the right alternative" $
-      fst <$> runAssignment "magenta blue" (symbol Magenta *> green <|> symbol Magenta *> blue) (makeState [node Magenta 0 7 [], node Blue 8 12 []])
-      `shouldBe`
-      Right (Out "blue")
+      it "drops anonymous nodes & matches the left alternative" $
+        fst <$> runAssignment "magenta green" (symbol Magenta *> green <|> symbol Magenta *> blue) (makeState [node Magenta 0 7 [], node Green 8 13 []])
+        `shouldBe`
+        Right (Out "green")
+
+      it "drops anonymous nodes & matches the right alternative" $
+        fst <$> runAssignment "magenta blue" (symbol Magenta *> green <|> symbol Magenta *> blue) (makeState [node Magenta 0 7 [], node Blue 8 12 []])
+        `shouldBe`
+        Right (Out "blue")
 
     it "alternates repetitions, matching the left alternative" $
       fst <$> runAssignment "green green" (many green <|> many blue) (makeState [node Green 0 5 [], node Green 6 11 []])
