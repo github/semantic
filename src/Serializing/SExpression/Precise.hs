@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, FlexibleInstances, OverloadedStrings, TypeOperators #-}
+{-# LANGUAGE DataKinds, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, OverloadedStrings, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Serializing.SExpression.Precise
 ( serializeSExpression
 ) where
@@ -6,26 +6,48 @@ module Serializing.SExpression.Precise
 import Data.ByteString.Builder
 import Data.Foldable (fold)
 import Data.List (intersperse)
+import Data.Text (Text)
 import GHC.Generics
 
-serializeSExpression :: (Generic t, GToSExpression (Rep t)) => t -> Builder
-serializeSExpression t = gtoSExpression (from t) 0 <> "\n"
+serializeSExpression :: ToSExpression t => t -> Builder
+serializeSExpression t = toSExpression t 0 <> "\n"
 
-gtoSExpression :: GToSExpression f => f (Int -> Builder) -> (Int -> Builder)
-gtoSExpression f n = "(" <> fold (intersperse " " (gtoSExpression' f n)) <> ")"
+
+class ToSExpression t where
+  toSExpression :: t -> Int -> Builder
+
+instance (ToSExpressionWithStrategy strategy t, strategy ~ ToSExpressionStrategy t) => ToSExpression t where
+  toSExpression = toSExpressionWithStrategy @strategy undefined
+
+
+data Strategy = Generic | Custom
+
+type family ToSExpressionStrategy t :: Strategy where
+  ToSExpressionStrategy Text = 'Custom
+  ToSExpressionStrategy _    = 'Generic
+
+class ToSExpressionWithStrategy (strategy :: Strategy) t where
+  toSExpressionWithStrategy :: proxy strategy -> t -> Int -> Builder
+
+instance ToSExpressionWithStrategy 'Custom Text where
+  toSExpressionWithStrategy _ t _ = stringUtf8 (show t)
+
+instance (Generic t, GToSExpression (Rep t)) => ToSExpressionWithStrategy 'Generic t where
+  toSExpressionWithStrategy _ t n = "(" <> fold (intersperse " " (gtoSExpression (from t) n)) <> ")"
+
 
 class GToSExpression f where
-  gtoSExpression' :: f (Int -> Builder) -> (Int -> [Builder])
+  gtoSExpression :: f (Int -> Builder) -> (Int -> [Builder])
 
 instance GToSExpression f => GToSExpression (M1 D d f) where
-  gtoSExpression' = gtoSExpression' . unM1
+  gtoSExpression = gtoSExpression . unM1
 
 instance (GToSExpression f, GToSExpression g) => GToSExpression (f :+: g) where
-  gtoSExpression' (L1 l) = gtoSExpression' l
-  gtoSExpression' (R1 r) = gtoSExpression' r
+  gtoSExpression (L1 l) = gtoSExpression l
+  gtoSExpression (R1 r) = gtoSExpression r
 
 instance (Constructor c, GToSExpression f) => GToSExpression (M1 C c f) where
-  gtoSExpression' m n = stringUtf8 (conName m) : gtoSExpression' (unM1 m) (n + 1)
+  gtoSExpression m n = stringUtf8 (conName m) : gtoSExpression (unM1 m) (n + 1)
 
 instance (GToSExpression f, GToSExpression g) => GToSExpression (f :*: g) where
-  gtoSExpression' (l :*: r) = gtoSExpression' l <> gtoSExpression' r
+  gtoSExpression (l :*: r) = gtoSExpression l <> gtoSExpression r
