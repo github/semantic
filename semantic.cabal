@@ -271,6 +271,7 @@ library
                      -- Serialization
                      , Serializing.Format
                      , Serializing.SExpression
+                     , Serializing.SExpression.Precise
                      , Tags.Taggable
                      , Tags.Tagging
                      -- Custom Prelude
