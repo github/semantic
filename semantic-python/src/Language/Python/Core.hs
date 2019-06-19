@@ -65,15 +65,9 @@ instance Compile Py.FunctionDefinition where
     where params = case parameters of
             Nothing -> pure []
             Just p  -> traverse param [p] -- FIXME: this is wrong in node-types.json, @p@ should already be a list
-          param (Left Py.AnonymousComma{}) = fail "lol what"
-          param (Right (Left Py.DefaultParameter{..})) = fail "lol what"
-          param (Right (Right (Left Py.DictionarySplat{..}))) = fail "lol what"
           param (Right (Right (Right (Left (Py.Identifier name))))) = pure (User name)
-          param (Right (Right (Right (Right (Left Py.KeywordIdentifier{..}))))) = fail "lol what"
-          param (Right (Right (Right (Right (Right (Left Py.ListSplat{..})))))) = fail "lol what"
-          param (Right (Right (Right (Right (Right (Right (Left Py.Tuple{..}))))))) = fail "lol what"
-          param (Right (Right (Right (Right (Right (Right (Right (Left Py.TypedDefaultParameter{..})))))))) = fail "lol what"
-          param (Right (Right (Right (Right (Right (Right (Right (Right Py.TypedParameter{..})))))))) = fail "lol what"
+          param x = unimplemented x
+          unimplemented x = fail $ "unimplemented: " <> show x
 
 instance Compile Py.FutureImportStatement
 instance Compile Py.GeneratorExpression
