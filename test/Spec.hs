@@ -44,8 +44,8 @@ import Test.Tasty.Hspec as Tasty
 
 tests :: (?session :: TaskSession) => [TestTree]
 tests =
-  [ Integration.Spec.spec
-  , Semantic.CLI.Spec.spec
+  [ Integration.Spec.testTree
+  , Semantic.CLI.Spec.testTree
   , Data.Source.Spec.testTree
   , Semantic.Stat.Spec.testTree
   ]

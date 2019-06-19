@@ -1,4 +1,4 @@
-module Semantic.CLI.Spec (spec) where
+module Semantic.CLI.Spec (testTree) where
 
 import           Data.ByteString.Builder
 import           Semantic.Api hiding (Blob, BlobPair, File)
@@ -11,8 +11,8 @@ import SpecHelpers
 import Test.Tasty
 import Test.Tasty.Golden
 
-spec :: TestTree
-spec = testGroup "Semantic.CLI"
+testTree :: TestTree
+testTree = testGroup "Semantic.CLI"
   [ testGroup "parseDiffBuilder" $ fmap testForDiffFixture diffFixtures
   , testGroup "parseTermBuilder" $ fmap testForParseFixture parseFixtures
   ]
