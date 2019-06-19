@@ -3,7 +3,7 @@ module Data.Term.Spec (spec) where
 
 import Data.Functor.Listable
 import Data.Term
-import Test.Hspec (Spec, describe, parallel)
+import Test.Hspec (Spec, describe)
 import Test.Hspec.Expectations
 import Test.Hspec.LeanCheck
 

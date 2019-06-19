@@ -14,7 +14,7 @@ import Data.Term
 import Data.These
 import Diffing.Interpreter
 import qualified Data.Syntax as Syntax
-import Test.Hspec (Spec, describe, it, parallel)
+import Test.Hspec (Spec, describe, it)
 import Test.Hspec.Expectations
 import Test.Hspec.LeanCheck
 import Test.LeanCheck.Core
