@@ -54,3 +54,6 @@ instance (GToSExpression f, GToSExpression g) => GToSExpression (f :*: g) where
 
 instance GToSExpression U1 where
   gtoSExpression _ _ = []
+
+instance ToSExpression k => GToSExpression (K1 R k) where
+  gtoSExpression k = pure . toSExpression (unK1 k)
