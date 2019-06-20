@@ -53,6 +53,7 @@ parseFixtures =
   , ("json", parseTermBuilder TermJSONTree, path', prefix </> "parse-trees.json")
   , ("json", parseTermBuilder TermJSONTree, [], prefix </> "parse-tree-empty.json")
   , ("symbols", parseSymbolsBuilder Serializing.Format.JSON, path'', prefix </> "parse-tree.symbols.json")
+  , ("protobuf symbols", parseSymbolsBuilder Serializing.Format.Proto, path'', prefix </> "parse-tree.symbols.protobuf.bin")
   ]
   where path = [File "test/fixtures/ruby/corpus/and-or.A.rb" Ruby]
         path' = [File "test/fixtures/ruby/corpus/and-or.A.rb" Ruby, File "test/fixtures/ruby/corpus/and-or.B.rb" Ruby]
@@ -64,6 +65,7 @@ diffFixtures =
   [ ("json diff", parseDiffBuilder DiffJSONTree, pathMode, prefix </> "diff-tree.json")
   , ("s-expression diff", parseDiffBuilder DiffSExpression, pathMode, "test/fixtures/ruby/corpus/method-declaration.diffA-B.txt")
   , ("toc summaries diff", diffSummaryBuilder Serializing.Format.JSON, pathMode, prefix </> "diff-tree.toc.json")
+  , ("protobuf diff", diffSummaryBuilder Serializing.Format.Proto, pathMode, prefix </> "diff-tree.toc.protobuf.bin")
   ]
   where pathMode = [Both (File "test/fixtures/ruby/corpus/method-declaration.A.rb" Ruby) (File "test/fixtures/ruby/corpus/method-declaration.B.rb"  Ruby)]
         prefix = "test/fixtures/cli"
