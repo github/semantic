@@ -1,8 +1,6 @@
-{-# LANGUAGE DataKinds, DeriveGeneric, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, OverloadedStrings, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, OverloadedStrings, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Serializing.SExpression.Precise
 ( serializeSExpression
-, Expr(..)
-, Identifier(..)
 ) where
 
 import Data.ByteString.Builder
@@ -33,9 +31,8 @@ instance (ToSExpressionWithStrategy strategy t, strategy ~ ToSExpressionStrategy
 data Strategy = Generic | Show
 
 type family ToSExpressionStrategy t :: Strategy where
-  ToSExpressionStrategy Text    = 'Show
-  ToSExpressionStrategy Integer = 'Show
-  ToSExpressionStrategy _       = 'Generic
+  ToSExpressionStrategy Text = 'Show
+  ToSExpressionStrategy _    = 'Generic
 
 class ToSExpressionWithStrategy (strategy :: Strategy) t where
   toSExpressionWithStrategy :: proxy strategy -> t -> Int -> Builder
@@ -71,10 +68,3 @@ instance GToSExpression f => GToSExpression (M1 S s f) where
 
 instance ToSExpression k => GToSExpression (K1 R k) where
   gtoSExpression k = pure . toSExpression (unK1 k)
-
-
-data Expr = Var Identifier | Lam Identifier Expr | App Expr Expr | Int Integer
-  deriving (Generic)
-
-newtype Identifier = Identifier Text
-  deriving (Generic)
