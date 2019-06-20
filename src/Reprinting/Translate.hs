@@ -1,8 +1,8 @@
 {-# LANGUAGE LambdaCase #-}
 
 module Reprinting.Translate
-  ( Translator
-  , contextualizing
+  ( contextualizing
+  , TranslatorC
   ) where
 
 import           Control.Effect
@@ -20,25 +20,33 @@ import           Data.Reprinting.Splice
 import           Data.Reprinting.Token
 import qualified Data.Source as Source
 
-type Translator
+type TranslatorC
   = StateC [Scope]
   ( ErrorC TranslationError PureC)
 
-contextualizing :: Stream (Of Token) Translator a
-                -> Stream (Of Fragment) Translator a
+contextualizing :: Stream (Of Token) TranslatorC a
+                -> Stream (Of Fragment) TranslatorC a
 contextualizing s = Streaming.for s $ \case
   Chunk source -> yield . Verbatim . Source.toText $ source
   Element t -> case t of
     Run f -> lift get >>= \c -> yield (New t c f)
     _     -> lift get >>= yield . Defer t
   Control ctl -> case ctl of
-    Enter c -> enterScope c
-    Exit c  -> exitScope c
+    Enter c -> lift (enterScope c)
+    Exit c  -> lift (exitScope c)
     _       -> pure ()
 
--- PT TODO: this can be nicer
-enterScope, exitScope :: Scope -> Stream (Of Fragment) Translator ()
-enterScope c = lift (modify (c :))
-exitScope c = lift get >>= \case
-  (x:xs) -> when (x == c) (lift (modify (const xs)))
-  cs     -> lift (throwError (UnbalancedPair c cs))
+enterScope :: (Member (State [Scope]) sig, Carrier sig m)
+           => Scope
+           -> m ()
+enterScope c = modify (c :)
+
+exitScope :: ( Member (State [Scope]) sig
+             , Member (Error TranslationError) sig
+             , Carrier sig m
+             )
+          => Scope
+          -> m ()
+exitScope c = get >>= \case
+  (x:xs) -> when (x == c) (put xs)
+  cs     -> throwError (UnbalancedPair c cs)

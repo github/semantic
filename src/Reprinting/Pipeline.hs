@@ -126,7 +126,7 @@ import           Reprinting.Typeset
 -- translation function (as a function over 'Stream's) and the provided 'Term'.
 runReprinter :: Tokenize a
              => Source.Source
-             -> (Stream (Of Fragment) _ () -> Stream (Of Splice) _ ())
+             -> (Stream (Of Fragment) TranslatorC () -> Stream (Of Splice) TranslatorC ())
              -> Term a History
              -> Either TranslationError Source.Source
 runReprinter src translating
@@ -153,9 +153,9 @@ runTokenizing src
 
 -- | Run the reprinting pipeline up to contextualizing.
 runContextualizing :: Tokenize a
-  => Source.Source
-  -> Term a History
-  -> Either TranslationError [Fragment]
+                   => Source.Source
+                   -> Term a History
+                   -> Either TranslationError [Fragment]
 runContextualizing src
   = Effect.run
   . Effect.runError
@@ -165,10 +165,10 @@ runContextualizing src
   . tokenizing src
 
 runTranslating :: Tokenize a
-  => Source.Source
-  -> (Stream (Of Fragment) _ () -> Stream (Of Splice) _ ())
-  -> Term a History
-  -> Either TranslationError [Splice]
+               => Source.Source
+               -> (Stream (Of Fragment) TranslatorC () -> Stream (Of Splice) TranslatorC ())
+               -> Term a History
+               -> Either TranslationError [Splice]
 runTranslating src translating
   = Effect.run
   . Effect.runError
