@@ -11,35 +11,41 @@ import Prologue hiding (Element, hash)
 import           Control.Effect as Eff
 import           Control.Effect.State
 import           Control.Monad.Trans
+import           Data.Text as T hiding (empty)
+import           Streaming
+import           Streaming.Prelude (yield)
+import qualified Streaming.Prelude as Streaming
+
 import           Data.Blob
 import           Data.Location
-import           Data.Machine as Machine
 import qualified Data.Source as Source
 import           Data.Tag
 import           Data.Term
-import           Data.Text as T hiding (empty)
 import           Tags.Taggable
 
 runTagging :: (IsTaggable syntax)
-  => Blob
-  -> [Text]
-  -> Term syntax Location
-  -> [Tag]
-runTagging blob symbolsToSummarize tree
+           => Blob
+           -> [Text]
+           -> Term syntax Location
+           -> [Tag]
+runTagging blob symbolsToSummarize
   = Eff.run
   . evalState @[ContextToken] []
-  . runT $ source (tagging blob tree)
-      ~> contextualizing blob symbolsToSummarize
+  . Streaming.toList_
+  . contextualizing blob symbolsToSummarize
+  . tagging blob
 
 type ContextToken = (Text, Maybe Range)
 
+-- PT TODO: fix me as well
 contextualizing :: ( Member (State [ContextToken]) sig
                    , Carrier sig m
                    )
                 => Blob
                 -> [Text]
-                -> Machine.ProcessT m Token Tag
-contextualizing Blob{..} symbolsToSummarize = repeatedly $ await >>= \case
+                -> Stream (Of Token) m a
+                -> Stream (Of Tag) m a
+contextualizing Blob{..} symbolsToSummarize s = Streaming.for s $ \case
   Enter x r -> lift (enterScope (x, r))
   Exit  x r -> lift (exitScope (x, r))
   Iden iden span docsLiteralRange -> lift (get @[ContextToken]) >>= \case

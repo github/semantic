@@ -5,7 +5,8 @@ module Language.Ruby.PrettyPrint ( printingRuby ) where
 import Control.Effect
 import Control.Effect.Error
 import Control.Monad.Trans (lift)
-import Data.Machine
+import Streaming
+import qualified Streaming.Prelude as Streaming
 
 import Data.Reprinting.Scope
 import Data.Reprinting.Errors
@@ -14,10 +15,14 @@ import Data.Reprinting.Splice
 import Data.Reprinting.Token as Token
 
 -- | Print Ruby syntax.
-printingRuby :: (Member (Error TranslationError) sig, Carrier sig m) => ProcessT m Fragment Splice
-printingRuby = repeatedly (await >>= step)
+printingRuby :: (Member (Error TranslationError) sig, Carrier sig m)
+             => Stream (Of Fragment) m a
+             -> Stream (Of Splice) m a
+printingRuby s = Streaming.for s step
 
-step :: (Member (Error TranslationError) sig, Carrier sig m) => Fragment -> PlanT k Splice m ()
+step :: (Member (Error TranslationError) sig, Carrier sig m)
+     => Fragment
+     -> Stream (Of Splice) m ()
 step (Verbatim txt) = emit txt
 step (New _ _ txt)  = emit txt
 step (Defer el cs)  = case (el, cs) of

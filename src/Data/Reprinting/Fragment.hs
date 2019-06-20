@@ -7,8 +7,9 @@ module Data.Reprinting.Fragment
   , defer
   ) where
 
-import Data.Machine
 import Data.Text (Text)
+import Streaming
+import Streaming.Prelude (yield)
 
 import Data.Reprinting.Scope
 import Data.Reprinting.Token
@@ -25,13 +26,13 @@ data Fragment
   deriving (Eq, Show)
 
 -- | Copy along some original, un-refactored 'Text'.
-copy :: Text -> Plan k Fragment ()
+copy :: Monad m => Text -> Stream (Of Fragment) m ()
 copy = yield . Verbatim
 
 -- | Insert some new 'Text'.
-insert :: Element -> [Scope] -> Text -> Plan k Fragment ()
+insert :: Monad m => Element -> [Scope] -> Text -> Stream (Of Fragment) m ()
 insert el c = yield . New el c
 
 -- | Defer processing an element to a later stage.
-defer :: Element -> [Scope] -> Plan k Fragment ()
+defer :: Monad m => Element -> [Scope] -> Stream (Of Fragment) m ()
 defer el = yield . Defer el

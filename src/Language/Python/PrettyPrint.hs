@@ -5,7 +5,8 @@ module Language.Python.PrettyPrint ( printingPython ) where
 import Control.Effect
 import Control.Effect.Error
 import Control.Monad.Trans (lift)
-import Data.Machine
+import Streaming
+import qualified Streaming.Prelude as Streaming
 
 import Data.Reprinting.Errors
 import Data.Reprinting.Splice
@@ -14,10 +15,12 @@ import Data.Reprinting.Scope
 import Data.Reprinting.Operator
 
 -- | Print Python syntax.
-printingPython :: (Member (Error TranslationError) sig, Carrier sig m) => ProcessT m Fragment Splice
-printingPython = repeatedly (await >>= step)
+printingPython :: (Member (Error TranslationError) sig, Carrier sig m)
+               => Stream (Of Fragment) m a
+               -> Stream (Of Splice) m a
+printingPython s = Streaming.for s step
 
-step :: (Member (Error TranslationError) sig, Carrier sig m) => Fragment -> PlanT k Splice m ()
+step :: (Member (Error TranslationError) sig, Carrier sig m) => Fragment -> Stream (Of Splice) m ()
 step (Verbatim txt) = emit txt
 step (New _ _ txt)  = emit txt
 step (Defer el cs)  = case (el, cs) of

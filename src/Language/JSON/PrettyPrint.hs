@@ -11,7 +11,8 @@ import Prologue
 import Control.Effect
 import Control.Effect.Error
 import Control.Monad.Trans (lift)
-import Data.Machine
+import Streaming
+import qualified Streaming.Prelude as Streaming
 
 import Data.Reprinting.Errors
 import Data.Reprinting.Splice
@@ -20,16 +21,19 @@ import Data.Reprinting.Scope
 
 -- | Default printing pipeline for JSON.
 defaultJSONPipeline :: (Member (Error TranslationError) sig, Carrier sig m)
-  => ProcessT m Fragment Splice
+                    => Stream (Of Fragment) m a
+                    -> Stream (Of Splice) m a
 defaultJSONPipeline
-  = printingJSON
-  ~> beautifyingJSON defaultBeautyOpts
+  = beautifyingJSON defaultBeautyOpts
+  . printingJSON
 
 -- | Print JSON syntax.
-printingJSON :: Monad m => ProcessT m Fragment Fragment
-printingJSON = repeatedly (await >>= step) where
+printingJSON :: Monad m
+             => Stream (Of Fragment) m a
+             -> Stream (Of Fragment) m a
+printingJSON = Streaming.map step where
   step s@(Defer el cs) =
-    let ins = yield . New el cs
+    let ins = New el cs
     in case (el, listToMaybe cs) of
       (Truth True, _)      -> ins "true"
       (Truth False, _)     -> ins "false"
@@ -44,8 +48,8 @@ printingJSON = repeatedly (await >>= step) where
       (Sep, Just Pair)   -> ins ":"
       (Sep, Just Hash)   -> ins ","
 
-      _                    -> yield s
-  step x = yield x
+      _                    -> s
+  step x = x
 
 -- TODO: Fill out and implement configurable options like indentation count,
 -- tabs vs. spaces, etc.
@@ -57,8 +61,10 @@ defaultBeautyOpts = JSONBeautyOpts 2 False
 
 -- | Produce JSON with configurable whitespace and layout.
 beautifyingJSON :: (Member (Error TranslationError) sig, Carrier sig m)
-  => JSONBeautyOpts -> ProcessT m Fragment Splice
-beautifyingJSON _ = repeatedly (await >>= step) where
+                => JSONBeautyOpts
+                -> Stream (Of Fragment) m a
+                -> Stream (Of Splice) m a
+beautifyingJSON _ s = Streaming.for s step where
   step (Defer el cs)   = lift (throwError (NoTranslation el cs))
   step (Verbatim txt)  = emit txt
   step (New el cs txt) = case (el, cs) of
@@ -71,8 +77,9 @@ beautifyingJSON _ = repeatedly (await >>= step) where
 
 -- | Produce whitespace minimal JSON.
 minimizingJSON :: (Member (Error TranslationError) sig, Carrier sig m)
-  => ProcessT m Fragment Splice
-minimizingJSON = repeatedly (await >>= step) where
+               => Stream (Of Fragment) m a
+               -> Stream (Of Splice) m a
+minimizingJSON s = Streaming.for s step where
   step (Defer el cs)  = lift (throwError (NoTranslation el cs))
   step (Verbatim txt) = emit txt
   step (New _ _ txt)  = emit txt

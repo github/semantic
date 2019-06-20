@@ -5,25 +5,28 @@ module Reprinting.Translate
   , contextualizing
   ) where
 
-import           Control.Monad
 import           Control.Effect
 import           Control.Effect.Error
 import           Control.Effect.State
+import           Control.Monad
 import           Control.Monad.Trans
-import           Data.Machine
+import           Streaming
+import           Streaming.Prelude (yield)
+import qualified Streaming.Prelude as Streaming
 
 import           Data.Reprinting.Errors
+import           Data.Reprinting.Scope
 import           Data.Reprinting.Splice
 import           Data.Reprinting.Token
-import           Data.Reprinting.Scope
 import qualified Data.Source as Source
 
 type Translator
   = StateC [Scope]
   ( ErrorC TranslationError PureC)
 
-contextualizing :: ProcessT Translator Token Fragment
-contextualizing = repeatedly $ await >>= \case
+contextualizing :: Stream (Of Token) Translator a
+                -> Stream (Of Fragment) Translator a
+contextualizing s = Streaming.for s $ \case
   Chunk source -> yield . Verbatim . Source.toText $ source
   Element t -> case t of
     Run f -> lift get >>= \c -> yield (New t c f)
@@ -33,10 +36,9 @@ contextualizing = repeatedly $ await >>= \case
     Exit c  -> exitScope c
     _       -> pure ()
 
-enterScope, exitScope :: Scope -> PlanT k Fragment Translator ()
-
+-- PT TODO: this can be nicer
+enterScope, exitScope :: Scope -> Stream (Of Fragment) Translator ()
 enterScope c = lift (modify (c :))
-
 exitScope c = lift get >>= \case
   (x:xs) -> when (x == c) (lift (modify (const xs)))
   cs     -> lift (throwError (UnbalancedPair c cs))
