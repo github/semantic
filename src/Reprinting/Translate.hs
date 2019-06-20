@@ -9,9 +9,7 @@ import           Control.Effect
 import           Control.Effect.Error
 import           Control.Effect.State
 import           Control.Monad
-import           Control.Monad.Trans
 import           Streaming
-import           Streaming.Prelude (yield)
 import qualified Streaming.Prelude as Streaming
 
 import           Data.Reprinting.Errors
@@ -26,14 +24,14 @@ type TranslatorC
 
 contextualizing :: Stream (Of Token) TranslatorC a
                 -> Stream (Of Fragment) TranslatorC a
-contextualizing s = Streaming.for s $ \case
-  Chunk source -> yield . Verbatim . Source.toText $ source
-  Element t -> case t of
-    Run f -> lift get >>= \c -> yield (New t c f)
-    _     -> lift get >>= yield . Defer t
-  Control ctl -> case ctl of
-    Enter c -> lift (enterScope c)
-    Exit c  -> lift (exitScope c)
+contextualizing = Streaming.mapMaybeM $ \case
+  Chunk source -> pure . Just . Verbatim . Source.toText $ source
+  Element t -> Just <$> case t of
+    Run f -> get >>= \c -> pure (New t c f)
+    _     -> get >>= pure . Defer t
+  Control ctl -> Nothing <$ case ctl of
+    Enter c -> enterScope c
+    Exit c  -> exitScope c
     _       -> pure ()
 
 enterScope :: (Member (State [Scope]) sig, Carrier sig m)
