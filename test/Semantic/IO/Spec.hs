@@ -5,7 +5,6 @@ import Prelude hiding (readFile)
 import Control.Monad.IO.Class
 import Data.List
 import System.Directory
-import System.Exit (ExitCode (..))
 import System.IO.Temp
 import Data.String
 

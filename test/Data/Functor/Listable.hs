@@ -107,8 +107,8 @@ liftCons4 tiers1 tiers2 tiers3 tiers4 f = mapT (uncurry4 f) (tiers1 >< tiers2 ><
 -- | Lifts a quinary constructor to a list of tiers, given lists of tiers for its arguments.
 --
 --   Commonly used in the definition of 'Listable1' and 'Listable2' instances.
-liftCons5 :: [Tier a] -> [Tier b] -> [Tier c] -> [Tier d] -> [Tier e] -> (a -> b -> c -> d -> e -> f) -> [Tier f]
-liftCons5 tiers1 tiers2 tiers3 tiers4 tiers5 f = mapT (uncurry5 f) (tiers1 >< tiers2 >< tiers3 >< tiers4 >< tiers5) `addWeight` 1
+_liftCons5 :: [Tier a] -> [Tier b] -> [Tier c] -> [Tier d] -> [Tier e] -> (a -> b -> c -> d -> e -> f) -> [Tier f]
+_liftCons5 tiers1 tiers2 tiers3 tiers4 tiers5 f = mapT (uncurry5 f) (tiers1 >< tiers2 >< tiers3 >< tiers4 >< tiers5) `addWeight` 1
   where uncurry5 f (a, (b, (c, (d, e)))) = f a b c d e
 
 -- | Lifts a senary constructor to a list of tiers, given lists of tiers for its arguments.
