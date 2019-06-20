@@ -52,9 +52,9 @@ step (Defer el cs)  = case (el, cs) of
   (Close, [Imperative])         -> layout HardWrap
   (Close, Imperative:xs)        -> indent 2 (pred (imperativeDepth xs))
 
-  (Sep, Call:_)                -> emit "."
+  (Sep, Call:_)                 -> emit "."
 
-  _                              -> lift (throwError (NoTranslation el cs))
+  _                             -> effect (throwError (NoTranslation el cs))
 
   where
     endContext times = layout HardWrap *> indent 2 (pred times)

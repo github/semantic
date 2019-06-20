@@ -4,7 +4,6 @@ module Language.Python.PrettyPrint ( printingPython ) where
 
 import Control.Effect
 import Control.Effect.Error
-import Control.Monad.Trans (lift)
 import Streaming
 import qualified Streaming.Prelude as Streaming
 
@@ -66,7 +65,7 @@ step (Defer el cs)  = case (el, cs) of
   (Sep,   Imperative:xs)        -> layout HardWrap *> indent 4 (imperativeDepth xs)
   (Close, Imperative:_)         -> pure ()
 
-  _                              -> lift (throwError (NoTranslation el cs))
+  _                             -> effect (throwError (NoTranslation el cs))
 
   where
     endContext times = layout HardWrap *> indent 4 (pred times)

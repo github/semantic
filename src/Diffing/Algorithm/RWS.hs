@@ -14,7 +14,7 @@ module Diffing.Algorithm.RWS
 , equalTerms
 ) where
 
-import Control.Monad.State.Strict
+import Control.Monad.Trans.State.Strict
 import Data.Diff (DiffF(..), deleting, inserting, merge, replacing)
 import qualified Data.KdMap.Static as KdMap
 import Data.List (sortOn)
