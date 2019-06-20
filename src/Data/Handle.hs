@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs #-}
+{-# LANGUAGE DeriveAnyClass, GADTs #-}
 
 module Data.Handle
   ( Handle (..)
@@ -11,14 +11,15 @@ module Data.Handle
   , readBlobPairsFromHandle
   , readFromHandle
   , openFileForReading
+  , InvalidJSONException (..)
   ) where
 
 import Prologue
 
+import           Control.Exception (throw)
 import           Data.Aeson
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.ByteString.Lazy.Char8 as BLC
-import           System.Exit
 import qualified System.IO as IO
 
 import Data.Blob
@@ -58,9 +59,14 @@ readPathsFromHandle (ReadHandle h) = liftIO $ fmap BLC.unpack . BLC.lines <$> BL
 readBlobPairsFromHandle :: MonadIO m => Handle 'IO.ReadMode -> m [BlobPair]
 readBlobPairsFromHandle = fmap blobs <$> readFromHandle
 
+newtype InvalidJSONException = InvalidJSONException String
+  deriving (Eq, Show, Exception)
+
+-- | Read JSON-encoded data from a 'Handle'. Throws
+-- 'InvalidJSONException' on parse failure.
 readFromHandle :: (FromJSON a, MonadIO m) => Handle 'IO.ReadMode -> m a
 readFromHandle (ReadHandle h) = do
   input <- liftIO $ BL.hGetContents h
   case eitherDecode input of
-    Left e  -> liftIO (die (e <> ". Invalid input on " <> show h <> ", expecting JSON"))
+    Left e  -> throw (InvalidJSONException e)
     Right d -> pure d

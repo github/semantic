@@ -6,7 +6,7 @@ import Tags.Tagging
 
 
 spec :: Spec
-spec = parallel $ do
+spec = do
   describe "go" $ do
     it "produces tags for functions with docs" $ do
       (blob, tree) <- parseTestFile goParser "test/fixtures/go/tags/simple_functions.go"

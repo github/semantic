@@ -1,4 +1,5 @@
 {-# LANGUAGE TypeOperators #-}
+{-# OPTIONS_GHC -fno-warn-missing-signatures #-}
 module Control.Abstract.Evaluator.Spec
 ( spec
 ) where
@@ -20,7 +21,7 @@ import           SpecHelpers hiding (reassociate)
 import           System.IO.Unsafe (unsafePerformIO)
 
 spec :: Spec
-spec = parallel $ do
+spec = do
   it "constructs integers" $ do
     (_, (_, (_, expected))) <- evaluate (integer 123)
     expected `shouldBe` Right (Value.Integer (Number.Integer 123))

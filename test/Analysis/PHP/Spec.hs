@@ -9,7 +9,7 @@ import           SpecHelpers
 
 
 spec :: (?session :: TaskSession) => Spec
-spec = parallel $ do
+spec = do
   describe "PHP" $ do
     xit "evaluates include and require" $ do
       (scopeGraph, (heap, res)) <- evaluate ["main.php", "foo.php", "bar.php"]

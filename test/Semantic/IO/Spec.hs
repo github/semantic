@@ -7,31 +7,31 @@ import Data.List
 import System.Directory
 import System.Exit (ExitCode (..))
 import System.IO.Temp
-import System.Process
+import Data.String
 
 import Data.Blob
 import Data.Handle
 import SpecHelpers hiding (readFile)
 import qualified Semantic.Git as Git
-
+import Shelly (shelly, silently, cd, run_)
 
 spec :: Spec
-spec = parallel $ do
+spec = do
   describe "readBlobsFromGitRepo" $ do
     hasGit <- runIO $ isJust <$> findExecutable "git"
     when hasGit . it "should read from a git directory" $ do
       -- This temporary directory will be cleaned after use.
       blobs <- liftIO . withSystemTempDirectory "semantic-temp-git-repo" $ \dir -> do
-        let commands = [ "cd " <> dir
-                       , "git init"
-                       , "touch foo.py bar.rb"
-                       , "git add foo.py bar.rb"
-                       , "git config user.name 'Test'"
-                       , "git config user.email 'test@test.test'"
-                       , "git commit -am 'test commit'"
-                       ]
-        exit <- system (intercalate " && " commands)
-        when (exit /= ExitSuccess) (fail ("Couldn't run git properly in dir " <> dir))
+        shelly $ silently $ do
+          cd (fromString dir)
+          let git = run_ "git"
+          git ["init"]
+          run_ "touch" ["foo.py", "bar.rb"]
+          git ["add", "foo.py", "bar.rb"]
+          git ["config", "user.name", "'Test'"]
+          git ["config", "user.email", "'test@test.test'"]
+          git ["commit", "-am", "'test commit'"]
+
         readBlobsFromGitRepo (dir </> ".git") (Git.OID "HEAD") []
       let files = sortOn fileLanguage (blobFile <$> blobs)
       files `shouldBe` [ File "foo.py" Python
@@ -50,9 +50,7 @@ spec = parallel $ do
     let a = sourceBlob "method.rb" Ruby "def foo; end"
     let b = sourceBlob "method.rb" Ruby "def bar(x); end"
     it "returns blobs for valid JSON encoded diff input" $ do
-      putStrLn "step 1"
       blobs <- blobsFromFilePath "test/fixtures/cli/diff.json"
-      putStrLn "done"
       blobs `shouldBe` [Diffing a b]
 
     it "returns blobs when there's no before" $ do
@@ -84,15 +82,15 @@ spec = parallel $ do
 
     it "throws on blank input" $ do
       h <- openFileForReading "test/fixtures/cli/blank.json"
-      readBlobPairsFromHandle h `shouldThrow` (== ExitFailure 1)
+      readBlobPairsFromHandle h `shouldThrow` jsonException
 
     it "throws if language field not given" $ do
       h <- openFileForReading "test/fixtures/cli/diff-no-language.json"
-      readBlobsFromHandle h `shouldThrow` (== ExitFailure 1)
+      readBlobsFromHandle h `shouldThrow` jsonException
 
     it "throws if null on before and after" $ do
       h <- openFileForReading "test/fixtures/cli/diff-null-both-sides.json"
-      readBlobPairsFromHandle h `shouldThrow` (== ExitFailure 1)
+      readBlobPairsFromHandle h `shouldThrow` jsonException
 
   describe "readBlobsFromHandle" $ do
     it "returns blobs for valid JSON encoded parse input" $ do
@@ -103,9 +101,13 @@ spec = parallel $ do
 
     it "throws on blank input" $ do
       h <- openFileForReading "test/fixtures/cli/blank.json"
-      readBlobsFromHandle h `shouldThrow` (== ExitFailure 1)
+      readBlobsFromHandle h `shouldThrow` jsonException
 
   where blobsFromFilePath path = do
           h <- openFileForReading path
           blobs <- readBlobPairsFromHandle h
           pure blobs
+
+jsonException :: Selector InvalidJSONException
+jsonException = const True
+

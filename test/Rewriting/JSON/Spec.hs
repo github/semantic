@@ -44,7 +44,7 @@ spec = describe "rewriting" $ do
   bytes <- runIO $ Source.fromUTF8 <$> B.readFile path
 
   refactored <- runIO $ do
-    json <- parseFile jsonParser path
+    json <- parseFileQuiet jsonParser path
     let result = rewrite @Maybe (History.mark Unmodified json) (topDownAny onTrees)
     maybe (fail "rewrite failed") pure result
 

@@ -7,7 +7,7 @@ import Test.Hspec
 import Test.Hspec.LeanCheck
 
 spec :: Spec
-spec = parallel $ do
+spec = do
   describe "Eq1" $ do
     describe "genericLiftEq" $ do
       prop "equivalent to derived (==) for product types" $
