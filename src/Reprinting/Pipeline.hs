@@ -95,8 +95,7 @@ stages of the pipeline follows:
 
 -}
 
-{-# LANGUAGE AllowAmbiguousTypes, PartialTypeSignatures, RankNTypes, ScopedTypeVariables #-}
-{-# OPTIONS_GHC -Wno-partial-type-signatures #-}
+{-# LANGUAGE AllowAmbiguousTypes, RankNTypes, ScopedTypeVariables #-}
 module Reprinting.Pipeline
   ( runReprinter
   , runTokenizing
