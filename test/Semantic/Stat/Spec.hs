@@ -11,7 +11,6 @@ import System.Environment
 
 import Test.Tasty
 import Test.Tasty.HUnit
-import Test.Tasty.Runners
 
 withSocketPair :: ((Socket, Socket) -> IO c) -> IO c
 withSocketPair = bracket create release
@@ -32,7 +31,7 @@ testTree = testCaseSteps "Semantic.Stat.Spec" $ \step -> do
   step "Handles stats addr with just hostname"
   case_handles_stats_addr_with_just_hostname
   step "takes dogstats host from environment"
-  case_takes_stats_addr_from_environment
+  case_takes_dogstats_host_from_environment
   step "rendering"
   case_render_counters *> case_render_tags
   step "stats deliver datagram"
