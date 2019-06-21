@@ -28,7 +28,7 @@ import SpecHelpers
 
 
 spec :: Spec
-spec = parallel $ do
+spec = do
   describe "tableOfContentsBy" $ do
     prop "drops all nodes with the constant Nothing function" $
       \ diff -> tableOfContentsBy (const Nothing :: a -> Maybe ()) (diff :: Diff ListableSyntax () ()) `shouldBe` []

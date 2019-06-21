@@ -64,6 +64,7 @@ common dependencies
                      , scientific ^>= 0.3.6.2
                      , safe-exceptions ^>= 0.1.7.0
                      , semilattices ^>= 0.0.0.3
+                     , shelly >= 1.5 && <2
                      , text ^>= 1.2.3.1
                      , these >= 0.7 && <1
                      , unix ^>= 2.7.2.2
@@ -270,6 +271,7 @@ library
                      -- Serialization
                      , Serializing.Format
                      , Serializing.SExpression
+                     , Serializing.SExpression.Precise
                      , Tags.Taggable
                      , Tags.Tagging
                      -- Custom Prelude
@@ -307,7 +309,6 @@ library
                      , reducers ^>= 3.12.3
                      , semigroupoids ^>= 5.3.2
                      , servant ^>= 0.15
-                     , shelly >= 1.5 && <2
                      , split ^>= 0.2.3.3
                      , stm-chans ^>= 3.0.0.4
                      , template-haskell ^>= 2.14
@@ -393,6 +394,7 @@ test-suite test
                      , tasty-golden ^>= 2.3.2
                      , tasty-hedgehog ^>= 1.0.0.1
                      , tasty-hspec ^>= 1.1.5.1
+                     , tasty-hunit ^>= 0.10.0.2
                      , HUnit ^>= 1.6.0.0
                      , leancheck >= 0.8 && <1
                      , temporary ^>= 1.3

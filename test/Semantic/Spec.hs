@@ -1,24 +1,28 @@
 module Semantic.Spec (spec) where
 
+import Control.Exception (fromException)
+import SpecHelpers
+
+import Data.Blob (NoLanguageForBlob (..))
 import Semantic.Api hiding (Blob)
 import Semantic.Git
-import System.Exit
-
-import SpecHelpers
 
  -- we need some lenses here, oof
 setBlobLanguage :: Language -> Blob -> Blob
 setBlobLanguage lang b = b { blobFile = (blobFile b) { fileLanguage = lang }}
 
 spec :: Spec
-spec = parallel $ do
+spec = do
   describe "parseBlob" $ do
     it "returns error if given an unknown language (json)" $ do
       output <- fmap runBuilder . runTaskOrDie $ parseTermBuilder TermJSONTree [ setBlobLanguage Unknown methodsBlob ]
       output `shouldBe` "{\"trees\":[{\"path\":\"methods.rb\",\"error\":\"NoLanguageForBlob \\\"methods.rb\\\"\",\"language\":\"Unknown\"}]}\n"
 
     it "throws if given an unknown language for sexpression output" $ do
-      runTaskOrDie (parseTermBuilder TermSExpression [setBlobLanguage Unknown methodsBlob]) `shouldThrow` (== ExitFailure 1)
+      res <- runTaskWithOptions defaultOptions (parseTermBuilder TermSExpression [setBlobLanguage Unknown methodsBlob])
+      case res of
+        Left exc    -> fromException exc `shouldBe` Just (NoLanguageForBlob "methods.rb")
+        Right _bad  -> fail "Expected parseTermBuilder to fail for an unknown language"
 
     it "renders with the specified renderer" $ do
       output <- fmap runBuilder . runTaskOrDie $ parseTermBuilder TermSExpression [methodsBlob]

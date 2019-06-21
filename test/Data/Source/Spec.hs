@@ -70,7 +70,7 @@ testTree = Tasty.testGroup "Data.Source"
   ]
 
 spec :: Spec
-spec = parallel $ do
+spec = do
   describe "newlineIndices" $ do
     it "finds \\n" $
       let source = "a\nb" in

@@ -15,7 +15,7 @@ import SpecHelpers
 
 
 spec :: (?session :: TaskSession) =>  Spec
-spec = parallel $ do
+spec = do
   describe "Ruby" $ do
     it "evaluates require_relative" $ do
       (scopeGraph, (heap, res)) <- evaluate ["main.rb", "foo.rb"]

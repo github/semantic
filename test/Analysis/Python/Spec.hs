@@ -10,7 +10,7 @@ import SpecHelpers
 
 
 spec :: (?session :: TaskSession) => Spec
-spec = parallel $ do
+spec = do
   describe "Python" $ do
     it "imports" $ do
       (scopeGraph, (heap, res)) <- evaluate ["main.py", "a.py", "b/__init__.py", "b/c.py"]

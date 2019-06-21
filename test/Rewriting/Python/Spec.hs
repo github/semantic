@@ -25,11 +25,11 @@ docstringMatcher =
 spec :: Spec
 spec = describe "matching/python" $ do
   it "matches top-level docstrings" $ do
-    parsed <- parseFile pythonParser "test/fixtures/python/matching/docstrings.py"
+    parsed <- parseFileQuiet pythonParser "test/fixtures/python/matching/docstrings.py"
     let matched = recursively @[] docstringMatcher parsed
     length matched `shouldBe` 2
 
   it "matches docstrings recursively" $ do
-    parsed <- parseFile pythonParser "test/fixtures/python/matching/docstrings_nested.py"
+    parsed <- parseFileQuiet pythonParser "test/fixtures/python/matching/docstrings_nested.py"
     let matched = recursively @[] docstringMatcher parsed
     length matched `shouldBe` 3
