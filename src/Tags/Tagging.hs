@@ -10,26 +10,28 @@ import Prologue hiding (Element, hash)
 
 import           Control.Effect as Eff
 import           Control.Effect.State
-import           Control.Monad.Trans
+import           Data.Text as T hiding (empty)
+import           Streaming
+import qualified Streaming.Prelude as Streaming
+
 import           Data.Blob
 import           Data.Location
-import           Data.Machine as Machine
 import qualified Data.Source as Source
 import           Data.Tag
 import           Data.Term
-import           Data.Text as T hiding (empty)
 import           Tags.Taggable
 
 runTagging :: (IsTaggable syntax)
-  => Blob
-  -> [Text]
-  -> Term syntax Location
-  -> [Tag]
-runTagging blob symbolsToSummarize tree
+           => Blob
+           -> [Text]
+           -> Term syntax Location
+           -> [Tag]
+runTagging blob symbolsToSummarize
   = Eff.run
   . evalState @[ContextToken] []
-  . runT $ source (tagging blob tree)
-      ~> contextualizing blob symbolsToSummarize
+  . Streaming.toList_
+  . contextualizing blob symbolsToSummarize
+  . tagging blob
 
 type ContextToken = (Text, Maybe Range)
 
@@ -38,16 +40,17 @@ contextualizing :: ( Member (State [ContextToken]) sig
                    )
                 => Blob
                 -> [Text]
-                -> Machine.ProcessT m Token Tag
-contextualizing Blob{..} symbolsToSummarize = repeatedly $ await >>= \case
-  Enter x r -> lift (enterScope (x, r))
-  Exit  x r -> lift (exitScope (x, r))
-  Iden iden span docsLiteralRange -> lift (get @[ContextToken]) >>= \case
+                -> Stream (Of Token) m a
+                -> Stream (Of Tag) m a
+contextualizing Blob{..} symbolsToSummarize = Streaming.mapMaybeM $ \case
+  Enter x r -> Nothing <$ enterScope (x, r)
+  Exit  x r -> Nothing <$ exitScope (x, r)
+  Iden iden span docsLiteralRange -> get @[ContextToken] >>= pure . \case
     ((x, r):("Context", cr):xs) | x `elem` symbolsToSummarize
-      -> yield $ Tag iden x span (fmap fst xs) (firstLine (slice r)) (slice cr)
+      -> Just $ Tag iden x span (fmap fst xs) (firstLine (slice r)) (slice cr)
     ((x, r):xs) | x `elem` symbolsToSummarize
-      -> yield $ Tag iden x span (fmap fst xs) (firstLine (slice r)) (slice docsLiteralRange)
-    _ -> pure ()
+      -> Just $ Tag iden x span (fmap fst xs) (firstLine (slice r)) (slice docsLiteralRange)
+    _ -> Nothing
   where
     slice = fmap (stripEnd . Source.toText . flip Source.slice blobSource)
     firstLine = fmap (T.take 180 . fst . breakOn "\n")

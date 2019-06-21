@@ -18,7 +18,8 @@ module Data.Reprinting.Splice
 
 import Prologue hiding (Element)
 
-import Data.Machine
+import Streaming
+import Streaming.Prelude (yield)
 
 import Data.Reprinting.Fragment
 
@@ -29,29 +30,29 @@ data Splice
   deriving (Eq, Show)
 
 -- | Emit some 'Text' as a 'Splice'.
-emit :: Text -> Plan k Splice ()
+emit :: Monad m => Text -> Stream (Of Splice) m ()
 emit = yield . Emit
 
 -- | Emit the provided 'Text' if the given predicate is true.
-emitIf :: Bool -> Text -> Plan k Splice ()
+emitIf :: Monad m => Bool -> Text -> Stream (Of Splice) m ()
 emitIf p = when p . emit
 
 -- | Construct a layout 'Splice'.
-layout :: Whitespace -> Plan k Splice ()
+layout :: Monad m => Whitespace -> Stream (Of Splice) m ()
 layout = yield . Layout
 
 -- | @indent w n@ emits @w@ 'Spaces' @n@ times.
-indent :: Int -> Int -> Plan k Splice ()
+indent :: Monad m => Int -> Int -> Stream (Of Splice) m ()
 indent width times
   | times > 0 = replicateM_ times (layout (Indent width Spaces))
   | otherwise = pure ()
 
 -- | Construct multiple layouts.
-layouts :: [Whitespace] -> Plan k Splice ()
+layouts :: Monad m => [Whitespace] -> Stream (Of Splice) m ()
 layouts = traverse_ (yield . Layout)
 
 -- | Single space.
-space :: Plan k Splice ()
+space :: Monad m => Stream (Of Splice) m ()
 space = yield (Layout Space)
 
 -- | Indentation, spacing, and other whitespace.
