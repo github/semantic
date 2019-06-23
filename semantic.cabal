@@ -308,7 +308,6 @@ library
                      , profunctors ^>= 5.3
                      , reducers ^>= 3.12.3
                      , semigroupoids ^>= 5.3.2
-                     , servant ^>= 0.15
                      , split ^>= 0.2.3.3
                      , stm-chans ^>= 3.0.0.4
                      , template-haskell ^>= 2.14
