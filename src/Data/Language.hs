@@ -134,10 +134,10 @@ languageForFilePath :: FilePath -> Language
 languageForFilePath = languageForType . takeExtension
 
 supportedExts :: [String]
-supportedExts = [".go", ".py", ".rb", ".js", ".ts"]
+supportedExts = [".go", ".py", ".rb", ".js", ".ts", ".php", ".phpt"]
 
 codeNavLanguages :: [Language]
-codeNavLanguages = [Go, Ruby, Python, JavaScript, TypeScript]
+codeNavLanguages = [Go, Ruby, Python, JavaScript, TypeScript, PHP]
 
 pathIsMinified :: FilePath -> Bool
 pathIsMinified = isExtensionOf ".min.js"
