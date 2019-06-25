@@ -12,23 +12,22 @@ import           Control.Effect
 import           Control.Effect.Reader
 import           Data.Core
 import           Data.File
-import           Data.Functor.Foldable
 import           Data.Name
 import           Data.Text.Prettyprint.Doc (Pretty (..), annotate, softline, (<+>))
 import qualified Data.Text.Prettyprint.Doc as Pretty
 import qualified Data.Text.Prettyprint.Doc.Render.String as Pretty
 import qualified Data.Text.Prettyprint.Doc.Render.Terminal as Pretty
 
-showCore :: Core -> String
+showCore :: Core Name -> String
 showCore = Pretty.renderString . Pretty.layoutSmart Pretty.defaultLayoutOptions . Pretty.unAnnotate . prettyCore Ascii
 
-printCore :: Core -> IO ()
+printCore :: Core Name -> IO ()
 printCore p = Pretty.putDoc (prettyCore Unicode p) *> putStrLn ""
 
-showFile :: File Core -> String
+showFile :: File (Core Name) -> String
 showFile = showCore . fileBody
 
-printFile :: File Core -> IO ()
+printFile :: File (Core Name) -> IO ()
 printFile = printCore . fileBody
 
 type AnsiDoc = Pretty.Doc Pretty.AnsiStyle
@@ -70,16 +69,16 @@ encloseIf :: Monoid m => Bool -> m -> m -> m -> m
 encloseIf True  l r x = l <> x <> r
 encloseIf False _ _ x = x
 
-prettify :: (Member (Reader Prec) sig, Member (Reader Style) sig, Carrier sig m)
-         => CoreF (m AnsiDoc)
+prettify :: (Member Naming sig, Member (Reader Prec) sig, Member (Reader Style) sig, Carrier sig m)
+         => Core Name
          -> m AnsiDoc
 prettify = \case
-  VarF a -> pure $ name a
-  LetF a -> pure $ keyword "let" <+> name a
-  a :>>$ b -> do
+  Var a -> pure $ name a
+  Let a -> pure $ keyword "let" <+> name a
+  a :>> b -> do
     prec <- ask @Prec
-    fore <- with 12 a
-    aft  <- with 12 b
+    fore <- with 12 (prettify a)
+    aft  <- with 12 (prettify b)
 
     let open  = symbol ("{" <> softline)
         close = symbol (softline <> "}")
@@ -88,43 +87,44 @@ prettify = \case
 
     pure . Pretty.align $ encloseIf (12 > prec) open close (Pretty.align body)
 
-  LamF x f  -> inParens 11 $ do
-    body <- f
+  Lam f  -> inParens 11 $ do
+    x    <- Gen <$> gensym ""
+    body <- prettify (instantiate (pure x) f)
     lam  <- lambda
     arr  <- arrow
     pure (lam <> name x <+> arr <+> body)
 
-  FrameF    -> pure $ primitive "frame"
-  UnitF     -> pure $ primitive "unit"
-  BoolF b   -> pure $ primitive (if b then "true" else "false")
-  StringF s -> pure . strlit $ Pretty.viaShow s
+  Frame    -> pure $ primitive "frame"
+  Unit     -> pure $ primitive "unit"
+  Bool b   -> pure $ primitive (if b then "true" else "false")
+  String s -> pure . strlit $ Pretty.viaShow s
 
-  f :$$ x -> inParens 11 $ (<+>) <$> f <*> x
+  f :$ x -> inParens 11 $ (<+>) <$> prettify f <*> prettify x
 
-  IfF con tru fal -> do
-    con' <- "if"   `appending` con
-    tru' <- "then" `appending` tru
-    fal' <- "else" `appending` fal
+  If con tru fal -> do
+    con' <- "if"   `appending` prettify con
+    tru' <- "then" `appending` prettify tru
+    fal' <- "else" `appending` prettify fal
     pure $ Pretty.sep [con', tru', fal']
 
-  LoadF p   -> "load" `appending` p
-  EdgeF Lexical n -> "lexical" `appending` n
-  EdgeF Import n -> "import" `appending` n
-  item :.$ body   -> inParens 5 $ do
-    f <- item
-    g <- body
+  Load p   -> "load" `appending` prettify p
+  Edge Lexical n -> "lexical" `appending` prettify n
+  Edge Import n -> "import" `appending` prettify n
+  item :. body   -> inParens 5 $ do
+    f <- prettify item
+    g <- prettify body
     pure (f <> symbol "." <> g)
 
-  lhs :=$ rhs -> inParens 4 $ do
-    f <- lhs
-    g <- rhs
+  lhs := rhs -> inParens 4 $ do
+    f <- prettify lhs
+    g <- prettify rhs
     pure (f <+> symbol "=" <+> g)
 
   -- Annotations are not pretty-printed, as it lowers the signal/noise ratio too profoundly.
-  AnnF _ c -> c
+  Ann _ c -> prettify c
 
 appending :: Functor f => AnsiDoc -> f AnsiDoc -> f AnsiDoc
 appending k item = (keyword k <+>) <$> item
 
-prettyCore :: Style -> Core -> AnsiDoc
-prettyCore s = run . runReader @Prec 0 . runReader s . cata prettify
+prettyCore :: Style -> Core Name -> AnsiDoc
+prettyCore s = run . runNaming (Root "prettyCore") . runReader @Prec 0 . runReader s . prettify
