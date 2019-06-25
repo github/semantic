@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveFunctor, ExistentialQuantification, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, LambdaCase, MultiParamTypeClasses, OverloadedLists, OverloadedStrings,StandaloneDeriving, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DeriveTraversable, ExistentialQuantification, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, LambdaCase, MultiParamTypeClasses, OverloadedLists, OverloadedStrings,StandaloneDeriving, TypeOperators, UndecidableInstances #-}
 module Data.Name
 ( User
 , Namespaced
@@ -13,6 +13,7 @@ module Data.Name
 , Naming(..)
 , runNaming
 , NamingC(..)
+, Incr(..)
 ) where
 
 import           Control.Applicative
@@ -123,3 +124,9 @@ instance (Carrier sig m, Effect sig) => Carrier (Naming :+: sig) (NamingC m) whe
   eff (L (Gensym    s   k)) = NamingC (StateC (\ i -> (:/ (s, i)) <$> ask >>= runState (succ i) . runNamingC . k))
   eff (L (Namespace s m k)) = NamingC (StateC (\ i -> local (// s) (evalState 0 (runNamingC m)) >>= runState i . runNamingC . k))
   eff (R other)             = NamingC (eff (R (R (handleCoercible other))))
+
+
+data Incr a
+  = Z
+  | S a
+  deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
