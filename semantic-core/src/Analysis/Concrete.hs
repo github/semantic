@@ -210,3 +210,7 @@ data EdgeType
   | Slot Name
   | Value Concrete
   deriving (Eq, Ord, Show)
+
+
+-- $setup
+-- >>> :seti -XOverloadedStrings
