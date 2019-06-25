@@ -208,7 +208,7 @@ data Analysis address value m = Analysis
   , unit        :: m value
   , bool        :: Bool -> m value
   , asBool      :: value -> m Bool
-  , string      :: Text -> m value -- FIXME: Text
+  , string      :: Text -> m value
   , asString    :: value -> m Text
   , frame       :: m value
   , edge        :: Edge -> address -> m ()
