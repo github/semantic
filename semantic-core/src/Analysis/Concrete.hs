@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, FlexibleInstances, LambdaCase, MultiParamTypeClasses, NamedFieldPuns, RecordWildCards, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE FlexibleContexts, FlexibleInstances, LambdaCase, MultiParamTypeClasses, NamedFieldPuns, OverloadedStrings, RecordWildCards, TypeOperators, UndecidableInstances #-}
 module Analysis.Concrete
 ( Concrete(..)
 , concrete
@@ -29,6 +29,7 @@ import           Data.Loc
 import qualified Data.Map as Map
 import           Data.Monoid (Alt(..))
 import           Data.Name
+import           Data.Text (Text, pack)
 import           Prelude hiding (fail)
 
 type Precise = Int
@@ -41,7 +42,7 @@ data Concrete
   = Closure Loc Name Core.Core Precise
   | Unit
   | Bool Bool
-  | String String
+  | String Text
   | Obj Frame
   deriving (Eq, Ord, Show)
 
@@ -60,7 +61,7 @@ type Heap = IntMap.IntMap Concrete
 
 -- | Concrete evaluation of a term to a value.
 --
---   >>> snd (concrete [File (Loc "bool" emptySpan) (Core.Bool True)])
+--   >>> map fileBody (snd (concrete [File (Loc "bool" emptySpan) (Core.Bool True)]))
 --   [Right (Bool True)]
 concrete :: [File Core.Core] -> (Heap, [File (Either (Loc, String) Concrete)])
 concrete
@@ -184,28 +185,32 @@ heapValueGraph h = heapGraph (const id) (const fromAddr) h
 heapAddressGraph :: Heap -> G.Graph (EdgeType, Precise)
 heapAddressGraph = heapGraph (\ addr v -> (Value v, addr)) (fmap G.vertex . (,) . either Edge Slot)
 
-addressStyle :: Heap -> G.Style (EdgeType, Precise) String
+addressStyle :: Heap -> G.Style (EdgeType, Precise) Text
 addressStyle heap = (G.defaultStyle vertex) { G.edgeAttributes }
-  where vertex (_, addr) = maybe (show addr <> " = ?") (((show addr <> " = ") <>) . fromConcrete) (IntMap.lookup addr heap)
+  where vertex (_, addr) = pack (show addr) <> " = " <> maybe "?" fromConcrete (IntMap.lookup addr heap)
         edgeAttributes _ (Slot name,         _) = ["label" G.:= fromName name]
         edgeAttributes _ (Edge Core.Import,  _) = ["color" G.:= "blue"]
         edgeAttributes _ (Edge Core.Lexical, _) = ["color" G.:= "green"]
         edgeAttributes _ _                      = []
         fromConcrete = \case
           Unit ->  "()"
-          Bool b -> show b
-          String s -> show s
+          Bool b -> pack $ show b
+          String s -> pack $ show s
           Closure (Loc p (Span s e)) n _ _ -> "\\\\ " <> fromName n <> " [" <> p <> ":" <> showPos s <> "-" <> showPos e <> "]"
           Obj _ -> "{}"
-        showPos (Pos l c) = show l <> ":" <> show c
+        showPos (Pos l c) = pack (show l) <> ":" <> pack (show c)
         fromName (User s)  = s
         fromName (Gen sym) = fromGensym sym
-        fromName (Path p)  = show p
+        fromName (Path p)  = pack $ show p
         fromGensym (Root s) = s
-        fromGensym (ss :/ (s, i)) = fromGensym ss <> "." <> s <> show i
+        fromGensym (ss :/ (s, i)) = fromGensym ss <> "." <> s <> pack (show i)
 
 data EdgeType
   = Edge Core.Edge
   | Slot Name
   | Value Concrete
   deriving (Eq, Ord, Show)
+
+
+-- $setup
+-- >>> :seti -XOverloadedStrings
