@@ -1,8 +1,7 @@
-{-# LANGUAGE DeriveTraversable, FlexibleContexts, LambdaCase, OverloadedStrings, RankNTypes, RecordWildCards,
-             ScopedTypeVariables, TemplateHaskell, TypeFamilies #-}
+{-# LANGUAGE DeriveTraversable, FlexibleContexts, LambdaCase, OverloadedStrings, RankNTypes, ScopedTypeVariables,
+             TypeFamilies #-}
 module Data.Core
 ( Core(..)
-, CoreF(..)
 , Edge(..)
 , lams
 , ($$*)
@@ -11,14 +10,11 @@ module Data.Core
 , block
 , ann
 , annWith
-, stripAnnotations
 ) where
 
 import Control.Applicative (Alternative (..))
 import Control.Monad (ap)
 import Data.Foldable (foldl')
-import Data.Functor.Foldable hiding (ListF (..))
-import Data.Functor.Foldable.TH
 import Data.Loc
 import Data.Name
 import Data.Stack
@@ -55,13 +51,6 @@ infixl 2 :$
 infixr 1 :>>
 infix  3 :=
 infixl 4 :.
-
-makeBaseFunctor ''Core
-
-infixl 2 :$$
-infixr 1 :>>$
-infix  3 :=$
-infixl 4 :.$
 
 instance Semigroup (Core a) where
   (<>) = (:>>)
@@ -105,11 +94,6 @@ ann = annWith callStack
 
 annWith :: CallStack -> Core a -> Core a
 annWith callStack c = maybe c (flip Ann c) (stackLoc callStack)
-
-stripAnnotations :: Core a -> Core a
-stripAnnotations = cata go where
-  go (AnnF _ item) = item
-  go item          = embed item
 
 
 gfoldT :: forall m n b
