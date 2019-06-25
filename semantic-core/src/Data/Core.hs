@@ -20,6 +20,7 @@ import           Data.Foldable (foldl')
 import           Data.Loc
 import           Data.Name
 import           Data.Stack
+import           Data.Text (Text)
 import           GHC.Stack
 
 data Edge = Lexical | Import
@@ -36,7 +37,7 @@ data Core
   | Unit
   | Bool Bool
   | If Core Core Core
-  | String String -- FIXME: Text
+  | String Text
   -- | Load the specified file (by path).
   | Load Core
   | Edge Edge Core
