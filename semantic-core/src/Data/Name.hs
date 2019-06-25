@@ -26,11 +26,12 @@ import           Control.Monad.IO.Class
 import qualified Data.Char as Char
 import           Data.HashSet (HashSet)
 import qualified Data.HashSet as HashSet
+import           Data.Text as Text (Text, any, unpack)
 import           Data.Text.Prettyprint.Doc (Pretty (..))
 import qualified Data.Text.Prettyprint.Doc as Pretty
 
 -- | User-specified and -relevant names.
-type User = String
+type User = Text
 
 -- | The type of namespaced actions, i.e. actions occurring within some outer name.
 --
@@ -47,7 +48,7 @@ data Name
   --   This should be used for names which the user provided and which other code (other functions, other modules, other packages) could call, e.g. declaration names.
   | User User
   -- | A variable name represented as the path to a source file. Used for loading modules at a specific name.
-  | Path FilePath
+  | Path Text
   deriving (Eq, Ord, Show)
 
 instance Pretty Name where
@@ -56,14 +57,14 @@ instance Pretty Name where
     User n -> pretty n
     Path p -> pretty (show p)
 
-reservedNames :: HashSet User
+reservedNames :: HashSet String
 reservedNames = [ "#true", "#false", "let", "#frame", "if", "then", "else"
                 , "lexical", "import", "#unit", "load"]
 
 -- | Returns true if any character would require quotation or if the
 -- name conflicts with a Core primitive.
 needsQuotation :: User -> Bool
-needsQuotation u = HashSet.member u reservedNames || any (not . isSimpleCharacter) u
+needsQuotation u = HashSet.member (unpack u) reservedNames || Text.any (not . isSimpleCharacter) u
 
 -- | A ‘simple’ character is, loosely defined, a character that is compatible
 -- with identifiers in most ASCII-oriented programming languages. This is defined
@@ -76,8 +77,8 @@ isSimpleCharacter = \case
   c    -> Char.isAlphaNum c
 
 data Gensym
-  = Root String
-  | Gensym :/ (String, Int)
+  = Root Text
+  | Gensym :/ (Text, Int)
   deriving (Eq, Ord, Show)
 
 instance Pretty Gensym where
@@ -85,21 +86,21 @@ instance Pretty Gensym where
     Root s      -> pretty s
     p :/ (n, x) -> Pretty.hcat [pretty p, "/", pretty n, "^", pretty x]
 
-(//) :: Gensym -> String -> Gensym
+(//) :: Gensym -> Text -> Gensym
 root // s = root :/ (s, 0)
 
 infixl 6 //
 
-gensym :: (Carrier sig m, Member Naming sig) => String -> m Gensym
+gensym :: (Carrier sig m, Member Naming sig) => Text -> m Gensym
 gensym s = send (Gensym s pure)
 
-namespace :: (Carrier sig m, Member Naming sig) => String -> m a -> m a
+namespace :: (Carrier sig m, Member Naming sig) => Text -> m a -> m a
 namespace s m = send (Namespace s m pure)
 
 
 data Naming m k
-  = Gensym String (Gensym -> k)
-  | forall a . Namespace String (m a) (a -> k)
+  = Gensym Text (Gensym -> k)
+  | forall a . Namespace Text (m a) (a -> k)
 
 deriving instance Functor (Naming m)
 

@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, ScopedTypeVariables #-}
+{-# LANGUAGE FlexibleContexts, OverloadedStrings, ScopedTypeVariables #-}
 module Analysis.FlowInsensitive
 ( Heap
 , FrameId(..)

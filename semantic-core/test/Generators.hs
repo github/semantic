@@ -24,7 +24,7 @@ import Data.Name
 -- interesting property as they parse regardless.
 name :: MonadGen m => m Name
 name = Gen.prune (User <$> names) where
-  names = Gen.string (Range.linear 1 10) Gen.lower
+  names = Gen.text (Range.linear 1 10) Gen.lower
 
 boolean :: MonadGen m => m Core
 boolean = Bool <$> Gen.bool

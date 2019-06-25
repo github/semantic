@@ -1,17 +1,20 @@
 cabal-version:       2.4
+
 name:                semantic
 version:             0.6.0.0
 synopsis:            Framework and executable for analyzing and diffing untrusted code.
 description:         Semantic is a library for parsing, analyzing, and comparing source code across many languages.
 homepage:            http://github.com/github/semantic#readme
-author:              The Semantic authors
-maintainer:          opensource+semantic@github.com
+bug-reports:         https://github.com/github/semantic/issues
 license:             MIT
 license-file:        LICENSE
-copyright:           (c) 2016-2019 GitHub, Inc.
-category:            Web
+author:              The Semantic authors
+maintainer:          opensource+semantic@github.com
+copyright:           (c) 2015-2019 GitHub, Inc.
+category:            Language
 build-type:          Simple
 stability:           alpha
+extra-source-files:  README.md
 
 tested-with:         GHC == 8.6.4
 

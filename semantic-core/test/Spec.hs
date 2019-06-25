@@ -25,7 +25,7 @@ true, false :: Core
 true  = Bool True
 false = Bool False
 
-instance IsString Name where fromString = User
+instance IsString Name where fromString = User . fromString
 
 parseEither :: Trifecta.Parser a -> String -> Either String a
 parseEither p = Trifecta.foldResult (Left . show . Trifecta._errDoc) Right . Trifecta.parseString (p <* Trifecta.eof) mempty
