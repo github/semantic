@@ -135,6 +135,6 @@ gfoldT var let' seq' lam app unit bool if' string load edge frame dot assign ann
           Ann loc t -> ann loc (go t)
 
 
--- | Bind occurrences of a name in a 'Value' term, producing a 'Core' in which the name is bound.
+-- | Bind occurrences of a name in a 'Core' term, producing a 'Core' in which the name is bound.
 bind :: Eq a => a -> Core a -> Core (Incr a)
 bind name = fmap (match name)
