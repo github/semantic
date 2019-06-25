@@ -121,7 +121,7 @@ extensionsForLanguage language = case language of
   Go         -> [".go"]
   Haskell    -> [".hs"]
   JavaScript -> [".js"]
-  PHP        -> [".php"]
+  PHP        -> [".php", ".phpt"]
   Python     -> [".py"]
   Ruby       -> [".rb"]
   TypeScript -> [".ts"]
