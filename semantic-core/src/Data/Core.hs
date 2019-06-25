@@ -1,4 +1,5 @@
-{-# LANGUAGE DeriveTraversable, FlexibleContexts, LambdaCase, OverloadedStrings, RecordWildCards, TemplateHaskell, TypeFamilies #-}
+{-# LANGUAGE DeriveTraversable, FlexibleContexts, LambdaCase, OverloadedStrings, RecordWildCards, TemplateHaskell,
+             TypeFamilies #-}
 module Data.Core
 ( Core(..)
 , CoreF(..)
@@ -13,15 +14,15 @@ module Data.Core
 , stripAnnotations
 ) where
 
-import           Control.Applicative (Alternative (..))
-import           Data.Functor.Foldable hiding (ListF(..))
-import           Data.Functor.Foldable.TH
-import           Data.Foldable (foldl')
-import           Data.Loc
-import           Data.Name
-import           Data.Stack
-import           Data.Text (Text)
-import           GHC.Stack
+import Control.Applicative (Alternative (..))
+import Data.Foldable (foldl')
+import Data.Functor.Foldable hiding (ListF (..))
+import Data.Functor.Foldable.TH
+import Data.Loc
+import Data.Name
+import Data.Stack
+import Data.Text (Text)
+import GHC.Stack
 
 data Edge = Lexical | Import
   deriving (Eq, Ord, Show)
