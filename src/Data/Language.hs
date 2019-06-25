@@ -122,7 +122,7 @@ extensionsForLanguage language = case language of
   Go         -> [".go"]
   Haskell    -> [".hs"]
   JavaScript -> [".js", ".mjs"]
-  PHP        -> [".php"]
+  PHP        -> [".php", ".phpt"]
   Python     -> [".py"]
   Ruby       -> [".rb"]
   TypeScript -> [".ts"]
@@ -138,7 +138,7 @@ supportedExts :: [String]
 supportedExts = [".go", ".py", ".rb", ".js", ".mjs", ".ts", ".php", ".phpt"]
 
 codeNavLanguages :: [Language]
-codeNavLanguages = [Go, Ruby, Python, JavaScript, PHP, TypeScript]
+codeNavLanguages = [Go, Ruby, Python, JavaScript, TypeScript, PHP]
 
 pathIsMinified :: FilePath -> Bool
 pathIsMinified = isExtensionOf ".min.js"
