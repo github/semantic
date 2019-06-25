@@ -14,6 +14,9 @@ module Data.Name
 , runNaming
 , NamingC(..)
 , Incr(..)
+, match
+, subst
+, incr
 ) where
 
 import           Control.Applicative
@@ -130,3 +133,13 @@ data Incr a
   = Z
   | S a
   deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
+
+match :: Eq a => a -> a -> Incr a
+match x y | x == y    = Z
+          | otherwise = S y
+
+subst :: a -> Incr a -> a
+subst a = incr a id
+
+incr :: b -> (a -> b) -> Incr a -> b
+incr z s = \case { Z -> z ; S a -> s a }
