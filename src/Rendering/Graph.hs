@@ -51,10 +51,10 @@ diffStyle name = (defaultStyle (fromString . show . diffVertexId))
   { graphName = fromString (quote name)
   , vertexAttributes = vertexAttributes }
   where quote a = "\"" <> a <> "\""
-        vertexAttributes (DiffTreeVertex _ (Just (Deleted  (Just DeletedTerm{..}))))  = [ "label" := fromString (T.unpack term),  "color" := "red" ]
-        vertexAttributes (DiffTreeVertex _ (Just (Inserted (Just InsertedTerm{..})))) = [ "label" := fromString (T.unpack term), "color" := "green" ]
-        vertexAttributes (DiffTreeVertex _ (Just (Replaced (Just ReplacedTerm{..})))) = [ "label" := "Replacement",               "color" := "orange", "style" := "dashed" ]
-        vertexAttributes (DiffTreeVertex _ (Just (Merged   (Just MergedTerm{..}))))   = [ "label" := fromString (T.unpack term) ]
+        vertexAttributes (DiffTreeVertex _ (Just (Deleted  DeletedTerm{..})))  = [ "label" := fromString (T.unpack term),  "color" := "red" ]
+        vertexAttributes (DiffTreeVertex _ (Just (Inserted InsertedTerm{..}))) = [ "label" := fromString (T.unpack term), "color" := "green" ]
+        vertexAttributes (DiffTreeVertex _ (Just (Replaced ReplacedTerm{..}))) = [ "label" := "Replacement",               "color" := "orange", "style" := "dashed" ]
+        vertexAttributes (DiffTreeVertex _ (Just (Merged MergedTerm{..})))     = [ "label" := fromString (T.unpack term) ]
         vertexAttributes _ = []
 
 class ToTreeGraph vertex t | t -> vertex where
@@ -82,16 +82,16 @@ instance (ConstructorName syntax, Foldable syntax) =>
 instance (ConstructorName syntax, Foldable syntax) =>
   ToTreeGraph DiffTreeVertex (DiffF syntax Location Location) where
   toTreeGraph d = case d of
-    Merge t@(In (a1, a2) syntax)     -> diffAlgebra t  (Merged   (Just (MergedTerm (T.pack (constructorName syntax)) (ann a1) (ann a2))))
-    Patch (Delete t1@(In a1 syntax)) -> diffAlgebra t1 (Deleted  (Just (DeletedTerm (T.pack (constructorName syntax)) (ann a1))))
-    Patch (Insert t2@(In a2 syntax)) -> diffAlgebra t2 (Inserted (Just (InsertedTerm (T.pack (constructorName syntax)) (ann a2))))
+    Merge t@(In (a1, a2) syntax)     -> diffAlgebra t  (Merged   (MergedTerm (T.pack (constructorName syntax)) (ann a1) (ann a2)))
+    Patch (Delete t1@(In a1 syntax)) -> diffAlgebra t1 (Deleted  (DeletedTerm (T.pack (constructorName syntax)) (ann a1)))
+    Patch (Insert t2@(In a2 syntax)) -> diffAlgebra t2 (Inserted (InsertedTerm (T.pack (constructorName syntax)) (ann a2)))
     Patch (Replace t1@(In a1 syntax1) t2@(In a2 syntax2)) -> do
       i <- fresh
       parent <- ask
       let (beforeName, beforeSpan) = (T.pack (constructorName syntax1), ann a1)
       let (afterName,  afterSpan) = (T.pack (constructorName syntax2), ann a2)
-      let replace = vertex (DiffTreeVertex (fromIntegral i) (Just (Replaced (Just (ReplacedTerm beforeName beforeSpan afterName afterSpan)))))
-      graph <- local (const replace) (overlay <$> diffAlgebra t1 (Deleted (Just (DeletedTerm beforeName beforeSpan))) <*> diffAlgebra t2 (Inserted (Just (InsertedTerm afterName afterSpan))))
+      let replace = vertex (DiffTreeVertex (fromIntegral i) (Just (Replaced (ReplacedTerm beforeName beforeSpan afterName afterSpan))))
+      graph <- local (const replace) (overlay <$> diffAlgebra t1 (Deleted (DeletedTerm beforeName beforeSpan))) <*> diffAlgebra t2 (Inserted (InsertedTerm afterName afterSpan))
       pure (parent `connect` replace `overlay` graph)
     where
       ann a = converting #? locationSpan a
