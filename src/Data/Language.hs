@@ -108,6 +108,7 @@ languageForType mediaType = case mediaType of
     ".rb"   -> Ruby
     ".go"   -> Go
     ".js"   -> JavaScript
+    ".mjs"  -> JavaScript
     ".ts"   -> TypeScript
     ".tsx"  -> TSX
     ".jsx"  -> JSX
@@ -120,7 +121,7 @@ extensionsForLanguage :: Language -> [String]
 extensionsForLanguage language = case language of
   Go         -> [".go"]
   Haskell    -> [".hs"]
-  JavaScript -> [".js"]
+  JavaScript -> [".js", ".mjs"]
   PHP        -> [".php"]
   Python     -> [".py"]
   Ruby       -> [".rb"]
@@ -134,10 +135,10 @@ languageForFilePath :: FilePath -> Language
 languageForFilePath = languageForType . takeExtension
 
 supportedExts :: [String]
-supportedExts = [".go", ".py", ".rb", ".js", ".ts"]
+supportedExts = [".go", ".py", ".rb", ".js", ".mjs", ".ts", ".php", ".phpt"]
 
 codeNavLanguages :: [Language]
-codeNavLanguages = [Go, Ruby, Python, JavaScript, TypeScript]
+codeNavLanguages = [Go, Ruby, Python, JavaScript, PHP, TypeScript]
 
 pathIsMinified :: FilePath -> Bool
 pathIsMinified = isExtensionOf ".min.js"

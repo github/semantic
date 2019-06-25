@@ -14,14 +14,14 @@ import Data.Term
 import Data.These
 import Diffing.Interpreter
 import qualified Data.Syntax as Syntax
-import Test.Hspec (Spec, describe, it, parallel)
+import Test.Hspec (Spec, describe, it)
 import Test.Hspec.Expectations
 import Test.Hspec.LeanCheck
 import Test.LeanCheck.Core
 import SpecHelpers ()
 
 spec :: Spec
-spec = parallel $ do
+spec = do
   describe "diffTerms" $ do
     it "returns a replacement when comparing two unicode equivalent terms" $
       let termA = termIn emptyAnnotation (inject (Syntax.Identifier "t\776"))

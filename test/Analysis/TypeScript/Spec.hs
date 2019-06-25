@@ -23,7 +23,7 @@ import qualified Language.TypeScript.Assignment as TypeScript
 import           SpecHelpers
 
 spec :: (?session :: TaskSession) => Spec
-spec = parallel $ do
+spec = do
   describe "TypeScript" $ do
     it "qualified export from" $ do
       (scopeGraph, (heap, res)) <- evaluate ["main6.ts", "baz.ts", "foo.ts"]

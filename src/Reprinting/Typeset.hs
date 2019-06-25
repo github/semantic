@@ -5,12 +5,14 @@ module Reprinting.Typeset
 
 import Prologue
 
-import Data.Machine
+import Streaming
+import qualified Streaming.Prelude as Streaming
 import Data.Reprinting.Splice hiding (space)
 import Data.Text.Prettyprint.Doc
 
-typesetting :: Monad m => ProcessT m Splice (Doc a)
-typesetting = auto step
+typesetting :: Monad m => Stream (Of Splice) m x
+                       -> Stream (Of (Doc a)) m x
+typesetting = Streaming.map step
 
 step :: Splice -> Doc a
 step (Emit t)                   = pretty t
@@ -23,8 +25,10 @@ step (Layout (Indent 0 Tabs))   = mempty
 step (Layout (Indent n Tabs))   = stimes n "\t"
 
 -- | Typeset, but show whitespace with printable characters for debugging purposes.
-typesettingWithVisualWhitespace :: Monad m => ProcessT m Splice (Doc a)
-typesettingWithVisualWhitespace = auto step where
+typesettingWithVisualWhitespace :: Monad m
+                                => Stream (Of Splice) m x
+                                -> Stream (Of (Doc a)) m x
+typesettingWithVisualWhitespace = Streaming.map step where
   step :: Splice -> Doc a
   step (Emit t)                   = pretty t
   step (Layout SoftWrap)          = softline

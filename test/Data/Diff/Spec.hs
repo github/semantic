@@ -7,6 +7,6 @@ import Test.Hspec
 import Test.Hspec.LeanCheck
 
 spec :: Spec
-spec = parallel $ do
+spec = do
   prop "equality is reflexive" $
     \ diff -> diff `shouldBe` (diff :: Diff ListableSyntax () ())

@@ -5,7 +5,8 @@ module Reprinting.Spec (spec) where
 import SpecHelpers
 
 import           Data.Foldable
-import qualified Data.Machine as Machine
+import           Streaming hiding (Sum)
+import qualified Streaming.Prelude as Streaming
 
 import           Control.Rewriting
 import qualified Data.Language as Language
@@ -28,20 +29,20 @@ spec = describe "reprinting" $ do
     let path = "test/fixtures/javascript/reprinting/map.json"
     (src, tree) <- runIO $ do
       src  <- blobSource <$> readBlobFromFile' (File path Language.JSON)
-      tree <- parseFile jsonParser path
+      tree <- parseFileQuiet jsonParser path
       pure (src, tree)
 
     describe "tokenization" $ do
 
       it "should pass over a pristine tree" $ do
         let tagged = mark Unmodified tree
-        let toks = Machine.run $ tokenizing src tagged
+        let toks = runIdentity . Streaming.toList_ $ tokenizing src tagged
         toks `shouldSatisfy` not . null
         head toks `shouldSatisfy` isControl
         last toks `shouldSatisfy` isChunk
 
       it "should emit control tokens but only 1 chunk for a wholly-modified tree" $ do
-        let toks = Machine.run $ tokenizing src (mark Refactored tree)
+        let toks = runIdentity . Streaming.toList_ $ tokenizing src (mark Refactored tree)
         for_ @[] [List, Hash] $ \t -> do
           toks `shouldSatisfy` elem (Control (Enter t))
           toks `shouldSatisfy` elem (Control (Exit t))

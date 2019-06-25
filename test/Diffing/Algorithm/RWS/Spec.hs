@@ -16,7 +16,7 @@ import Test.Hspec.LeanCheck
 import SpecHelpers
 
 spec :: Spec
-spec = parallel $ do
+spec = do
   let positively = succ . abs
   describe "pqGramDecorator" $ do
     prop "produces grams with stems of the specified length" $
