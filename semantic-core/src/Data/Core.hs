@@ -3,6 +3,7 @@
 module Data.Core
 ( Core(..)
 , Edge(..)
+, lam
 , lams
 , ($$*)
 , unapply
