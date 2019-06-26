@@ -7,6 +7,7 @@ module Data.Core
 , lams
 , unlam
 , unseq
+, unseqs
 , ($$*)
 , unapply
 , unapplies
@@ -20,6 +21,7 @@ module Data.Core
 import Control.Applicative (Alternative (..))
 import Control.Monad (ap)
 import Data.Foldable (foldl')
+import Data.List.NonEmpty
 import Data.Loc
 import Data.Name
 import Data.Stack
@@ -81,6 +83,12 @@ unlam _ _       = empty
 unseq :: Alternative m => Core a -> m (Core a, Core a)
 unseq (a :>> b) = pure (a, b)
 unseq _         = empty
+
+unseqs :: Core a -> NonEmpty (Core a)
+unseqs = go
+  where go t = case unseq t of
+          Just (l, r) -> go l <> go r
+          Nothing     -> t :| []
 
 -- | Application of a function to a sequence of arguments.
 ($$*) :: Foldable t => Core a -> t (Core a) -> Core a
