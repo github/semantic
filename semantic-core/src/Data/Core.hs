@@ -133,7 +133,7 @@ gfold :: forall m n b
       -> (forall a . n a -> n a -> n a)
       -> (forall a . n a -> n a -> n a)
       -> (forall a . Loc -> n a -> n a)
-      -> (forall a . Incr a -> m (Incr a))
+      -> (forall a . Incr (n a) -> m (Incr (n a)))
       -> Core (m b)
       -> n b
 gfold var let' seq' lam app unit bool if' string load edge frame dot assign ann k = go
