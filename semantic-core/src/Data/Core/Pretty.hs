@@ -84,9 +84,7 @@ prettify' style = unP 0 . gfold var let' seq' lam app unit bool if' string load 
               separator = ";" <> Pretty.line
               body = fore <> separator <> aft
           in Pretty.align $ encloseIf (12 > prec) open close (Pretty.align body)
-        lam f =
-          let x = Gen (Root "x") --Gen <$> gensym ""
-          in p 0 (lambda <> name x <+> arrow <+> unP 0 f)
+        lam f = p 0 (lambda <+> arrow <+> unP 0 f)
         f `app` x = p 10 (unP 10 f <+> unP 11 x)
         unit = konst $ primitive "unit"
         bool b = konst $ primitive (if b then "true" else "false")
