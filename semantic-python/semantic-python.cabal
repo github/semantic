@@ -26,7 +26,7 @@ library
   build-depends:       base ^>=4.12.0.0
                      , semantic-core ^>= 0.0.0.0
                      , tree-sitter ^>= 0.1.0.0
-                     , tree-sitter-python ^>= 0.1.0.1
+                     , tree-sitter-python ^>= 0.1.1.0
   hs-source-dirs:      src
   default-language:    Haskell2010
   ghc-options:
@@ -41,3 +41,14 @@ library
     -Wno-missed-specialisations
     -Wno-all-missed-specialisations
     -Wno-star-is-type
+
+test-suite spec
+  type:                exitcode-stdio-1.0
+  hs-source-dirs:      test
+  main-is:             Main.hs
+  build-depends:       base
+                     , semantic-python
+                     , hedgehog ^>= 1
+                     , semantic-core
+                     , tree-sitter
+                     , tree-sitter-python

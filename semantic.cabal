@@ -322,7 +322,7 @@ library
                      , tree-sitter-haskell ^>= 0.1.0.0
                      , tree-sitter-json ^>= 0.1.0.0
                      , tree-sitter-php ^>= 0.1.0.0
-                     , tree-sitter-python ^>= 0.1.0.1
+                     , tree-sitter-python ^>= 0.1.1.0
                      , tree-sitter-ruby ^>= 0.1.0.0
                      , tree-sitter-typescript ^>= 0.1.0.0
                      , tree-sitter-tsx ^>= 0.1.0.0

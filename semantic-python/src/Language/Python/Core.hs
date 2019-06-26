@@ -1,4 +1,5 @@
 {-# LANGUAGE DefaultSignatures, DeriveGeneric, FlexibleContexts, FlexibleInstances, RecordWildCards, StandaloneDeriving, TypeOperators #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 module Language.Python.Core
 ( compile
 ) where
@@ -86,7 +87,7 @@ instance Compile Py.IfStatement where
 instance Compile Py.ImportFromStatement
 instance Compile Py.ImportStatement
 instance Compile Py.Integer
-instance Compile Py.KeywordIdentifier
+--instance Compile Py.KeywordIdentifier
 instance Compile Py.Lambda
 instance Compile Py.List
 instance Compile Py.ListComprehension
@@ -100,7 +101,8 @@ instance Compile Py.None
 instance Compile Py.NonlocalStatement
 instance Compile Py.NotOperator
 instance Compile Py.ParenthesizedExpression
-instance Compile Py.PassStatement
+
+instance Compile Py.PassStatement where compile _ = pure Unit
 
 instance Compile Py.PrimaryExpression where compile = compileSum
 
