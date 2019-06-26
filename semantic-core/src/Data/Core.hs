@@ -123,13 +123,13 @@ gfold :: forall m n b
       -> (forall a . Incr (m a) -> m (Incr a))
       -> Core (m b)
       -> n b
-gfold var let' seq' lam app unit bool if' string load edge frame dot assign ann dist = go
+gfold var let' seq' lam app unit bool if' string load edge frame dot assign ann k = go
   where go :: Core (m x) -> n x
         go = \case
           Var a -> var a
           Let a -> let' a
           a :>> b -> go a `seq'` go b
-          Lam b -> lam (go (dist <$> b))
+          Lam b -> lam (go (k <$> b))
           f :$ a -> go f `app` go a
           Unit -> unit
           Bool b -> bool b
