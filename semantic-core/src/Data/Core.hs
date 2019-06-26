@@ -11,6 +11,7 @@ module Data.Core
 , block
 , ann
 , annWith
+, gfold
 , instantiate
 ) where
 
@@ -62,7 +63,7 @@ instance Applicative Core where
   (<*>) = ap
 
 instance Monad Core where
-  a >>= f = gfoldT id Let (:>>) Lam (:$) Unit Bool If String Load Edge Frame (:.) (:=) Ann (incr (pure Z) (fmap S)) (f <$> a)
+  a >>= f = gfold id Let (:>>) Lam (:$) Unit Bool If String Load Edge Frame (:.) (:=) Ann (incr (pure Z) (fmap S)) (f <$> a)
 
 
 lam :: Eq a => a -> Core a -> Core a
@@ -98,26 +99,26 @@ annWith :: CallStack -> Core a -> Core a
 annWith callStack c = maybe c (flip Ann c) (stackLoc callStack)
 
 
-gfoldT :: forall m n b
-       .  (forall a . m a -> n a)
-       -> (forall a . Name -> n a)
-       -> (forall a . n a -> n a -> n a)
-       -> (forall a . n (Incr a) -> n a)
-       -> (forall a . n a -> n a -> n a)
-       -> (forall a . n a)
-       -> (forall a . Bool -> n a)
-       -> (forall a . n a -> n a -> n a -> n a)
-       -> (forall a . Text -> n a)
-       -> (forall a . n a -> n a)
-       -> (forall a . Edge -> n a -> n a)
-       -> (forall a . n a)
-       -> (forall a . n a -> n a -> n a)
-       -> (forall a . n a -> n a -> n a)
-       -> (forall a . Loc -> n a -> n a)
-       -> (forall a . Incr (m a) -> m (Incr a))
-       -> Core (m b)
-       -> n b
-gfoldT var let' seq' lam app unit bool if' string load edge frame dot assign ann dist = go
+gfold :: forall m n b
+      .  (forall a . m a -> n a)
+      -> (forall a . Name -> n a)
+      -> (forall a . n a -> n a -> n a)
+      -> (forall a . n (Incr a) -> n a)
+      -> (forall a . n a -> n a -> n a)
+      -> (forall a . n a)
+      -> (forall a . Bool -> n a)
+      -> (forall a . n a -> n a -> n a -> n a)
+      -> (forall a . Text -> n a)
+      -> (forall a . n a -> n a)
+      -> (forall a . Edge -> n a -> n a)
+      -> (forall a . n a)
+      -> (forall a . n a -> n a -> n a)
+      -> (forall a . n a -> n a -> n a)
+      -> (forall a . Loc -> n a -> n a)
+      -> (forall a . Incr (m a) -> m (Incr a))
+      -> Core (m b)
+      -> n b
+gfold var let' seq' lam app unit bool if' string load edge frame dot assign ann dist = go
   where go :: Core (m x) -> n x
         go = \case
           Var a -> var a
