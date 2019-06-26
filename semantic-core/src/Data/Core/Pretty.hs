@@ -69,14 +69,13 @@ encloseIf :: Monoid m => Bool -> m -> m -> m -> m
 encloseIf True  l r x = l <> x <> r
 encloseIf False _ _ x = x
 
-newtype P a b = P { getP :: Prec -> a }
 newtype K a b = K { getK :: a }
 
 prettify' :: Style -> Core Name -> AnsiDoc
 prettify' style = unP 0 0 . gfold var let' seq' lam app unit bool if' string load edge frame dot assign ann k . fmap (K . const . name)
-  where var = P . const . getK
+  where var = K . const . getK
         let' a = konst $ keyword "let" <+> name a
-        a `seq'` b = P $ \ prec v ->
+        a `seq'` b = K $ \ prec v ->
           let fore = unP 12 v a
               aft = unP 12 v b
               open  = symbol ("{" <> softline)
@@ -102,14 +101,14 @@ prettify' style = unP 0 0 . gfold var let' seq' lam app unit bool if' string loa
         lhs `assign` rhs = p 4 (\ v -> unP 4 v lhs <+> symbol "=" <+> unP 5 v rhs)
         -- Annotations are not pretty-printed, as it lowers the signal/noise ratio too profoundly.
         ann _ c = c
-        k :: Incr (P (Int -> AnsiDoc) b) -> K (Int -> AnsiDoc) (Incr (P (Int -> AnsiDoc) b))
+        k :: Incr (K (Prec -> Int -> AnsiDoc) b) -> K (Int -> AnsiDoc) (Incr (K (Prec -> Int -> AnsiDoc) b))
         k Z     = K $ \ v -> pretty v
         k (S n) = K $ \ v -> unP 0 (pred v) n
 
-        p max b = P $ \ actual -> encloseIf (actual > max) (symbol "(") (symbol ")") . b
-        unP n i f = getP f n i
+        p max b = K $ \ actual -> encloseIf (actual > max) (symbol "(") (symbol ")") . b
+        unP n i f = getK f n i
 
-        konst b = P $ \ _ _ -> b
+        konst b = K $ \ _ _ -> b
         lambda = case style of
           Unicode -> symbol "λ"
           Ascii   -> symbol "\\"
