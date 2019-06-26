@@ -72,7 +72,7 @@ encloseIf False _ _ x = x
 newtype K a b = K { getK :: a }
 
 prettify' :: Style -> Core Name -> AnsiDoc
-prettify' style = unP 0 (pred 0) . gfold var let' seq' lam app unit bool if' string load edge frame dot assign ann k . fmap (K . const . name)
+prettify' style = unP (0 :: Int) (pred (0 :: Int)) . gfold var let' seq' lam app unit bool if' string load edge frame dot assign ann k . fmap (K . const . name)
   where var = K . const . getK
         let' a = konst $ keyword "let" <+> name a
         a `seq'` b = K $ \ prec v ->
@@ -101,7 +101,6 @@ prettify' style = unP 0 (pred 0) . gfold var let' seq' lam app unit bool if' str
         lhs `assign` rhs = p 4 (\ v -> unP 4 v lhs <+> symbol "=" <+> unP 5 v rhs)
         -- Annotations are not pretty-printed, as it lowers the signal/noise ratio too profoundly.
         ann _ c = c
-        k :: Incr (K (Prec -> Int -> AnsiDoc) b) -> K (Int -> AnsiDoc) (Incr (K (Prec -> Int -> AnsiDoc) b))
         k Z     = K $ \ v -> pretty v
         k (S n) = K $ \ v -> unP 0 (pred v) n
 
