@@ -73,42 +73,43 @@ newtype P a b = P { getP :: Prec -> a }
 newtype K a b = K { getK :: a }
 
 prettify' :: Namespaced (Style -> Core Name -> AnsiDoc)
-prettify' root style = unP 0 . gfold var let' seq' lam app unit bool if' string load edge frame dot assign ann k . fmap (K . name)
-  where var = konst . getK
+prettify' root style = unP 0 0 . gfold var let' seq' lam app unit bool if' string load edge frame dot assign ann k . fmap (K . const . name)
+  where var = P . const . getK
         let' a = konst $ keyword "let" <+> name a
-        a `seq'` b = P $ \ prec ->
-          let fore = unP 12 a
-              aft = unP 12 b
+        a `seq'` b = P $ \ prec v ->
+          let fore = unP 12 v a
+              aft = unP 12 v b
               open  = symbol ("{" <> softline)
               close = symbol (softline <> "}")
               separator = ";" <> Pretty.line
               body = fore <> separator <> aft
           in Pretty.align $ encloseIf (12 > prec) open close (Pretty.align body)
-        lam f = p 0 (lambda <+> arrow <+> unP 0 f)
-        f `app` x = p 10 (unP 10 f <+> unP 11 x)
+        lam f = p 0 (\ v -> lambda <> pretty (succ v) <+> arrow <+> unP 0 (succ v) f)
+        f `app` x = p 10 (\ v -> unP 10 v f <+> unP 11 v x)
         unit = konst $ primitive "unit"
         bool b = konst $ primitive (if b then "true" else "false")
-        if' con tru fal =
-          let con' = keyword "if"   <+> unP 0 con
-              tru' = keyword "then" <+> unP 0 tru
-              fal' = keyword "else" <+> unP 0 fal
-          in p 0 $ Pretty.sep [con', tru', fal']
+        if' con tru fal = p 0 $ \ v ->
+          let con' = keyword "if"   <+> unP 0 v con
+              tru' = keyword "then" <+> unP 0 v tru
+              fal' = keyword "else" <+> unP 0 v fal
+          in Pretty.sep [con', tru', fal']
         string s = konst . strlit $ Pretty.viaShow s
-        load path = p 0 $ keyword "load" <+> unP 0 path
-        edge Lexical n = p 0 $ "lexical" <+> unP 0 n
-        edge Import n = p 0 $ "import" <+> unP 0 n
+        load path = p 0 $ \ v -> keyword "load" <+> unP 0 v path
+        edge Lexical n = p 0 $ \ v -> "lexical" <+> unP 0 v n
+        edge Import n = p 0 $ \ v -> "import" <+> unP 0 v n
         frame = konst $ primitive "frame"
-        item `dot` body   = p 5 (unP 5 item <> symbol "." <> unP 6 body)
-        lhs `assign` rhs = p 4 (unP 4 lhs <+> symbol "=" <+> unP 5 rhs)
+        item `dot` body   = p 5 (\ v -> unP 5 v item <> symbol "." <> unP 6 v body)
+        lhs `assign` rhs = p 4 (\ v -> unP 4 v lhs <+> symbol "=" <+> unP 5 v rhs)
         -- Annotations are not pretty-printed, as it lowers the signal/noise ratio too profoundly.
         ann _ c = c
-        k Z     = K "0"
-        k (S n) = K ("S" <> unP 0 n)
+        k :: Incr (P (Int -> AnsiDoc) b) -> K (Int -> AnsiDoc) (Incr (P (Int -> AnsiDoc) b))
+        k Z     = K $ \ v -> pretty v
+        k (S n) = K $ \ v -> unP 0 (pred v) n
 
-        p max b = P $ \ actual -> encloseIf (actual > max) (symbol "(") (symbol ")") b
-        unP n f = getP f n
+        p max b = P $ \ actual -> encloseIf (actual > max) (symbol "(") (symbol ")") . b
+        unP n i f = getP f n i
 
-        konst = P . const
+        konst b = P $ \ _ _ -> b
         lambda = case style of
           Unicode -> symbol "λ"
           Ascii   -> symbol "\\"
