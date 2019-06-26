@@ -106,9 +106,9 @@ prettify' root style = unP 0 . gfold var let' seq' lam app unit bool if' string 
         k (S n) = K ("S" <> unP 0 n)
 
         p max b = P $ \ actual -> encloseIf (actual > max) (symbol "(") (symbol ")") b
+        unP n = ($ n) . getP
 
         konst = P . const
-        unP n = ($ n) . getP
         lambda = case style of
           Unicode -> symbol "λ"
           Ascii   -> symbol "\\"
