@@ -72,7 +72,7 @@ encloseIf False _ _ x = x
 newtype K a b = K { getK :: a }
 
 prettify' :: Style -> Core Name -> AnsiDoc
-prettify' style = unP 0 0 . gfold var let' seq' lam app unit bool if' string load edge frame dot assign ann k . fmap (K . const . name)
+prettify' style = unP 0 (pred 0) . gfold var let' seq' lam app unit bool if' string load edge frame dot assign ann k . fmap (K . const . name)
   where var = K . const . getK
         let' a = konst $ keyword "let" <+> name a
         a `seq'` b = K $ \ prec v ->
