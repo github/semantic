@@ -72,8 +72,8 @@ encloseIf False _ _ x = x
 newtype P a b = P { getP :: Prec -> a }
 newtype K a b = K { getK :: a }
 
-prettify' :: Namespaced (Style -> Core Name -> AnsiDoc)
-prettify' root style = unP 0 0 . gfold var let' seq' lam app unit bool if' string load edge frame dot assign ann k . fmap (K . const . name)
+prettify' :: Style -> Core Name -> AnsiDoc
+prettify' style = unP 0 0 . gfold var let' seq' lam app unit bool if' string load edge frame dot assign ann k . fmap (K . const . name)
   where var = P . const . getK
         let' a = konst $ keyword "let" <+> name a
         a `seq'` b = P $ \ prec v ->
@@ -176,4 +176,4 @@ appending k item = (keyword k <+>) <$> item
 
 prettyCore :: Style -> Core Name -> AnsiDoc
 prettyCore s = run . runNaming (Root "prettyCore") . runReader @Prec 0 . runReader s . prettify
-prettyCore s = prettify' (Root "prettyCore") s
+prettyCore s = prettify' s
