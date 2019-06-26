@@ -5,6 +5,7 @@ module Data.Core
 , Edge(..)
 , lam
 , lams
+, unlam
 , ($$*)
 , unapply
 , unapplies
@@ -71,6 +72,10 @@ lam n b = Lam (bind n b)
 
 lams :: (Eq a, Foldable t) => t a -> Core a -> Core a
 lams names body = foldr lam body names
+
+unlam :: Alternative m => a -> Core a -> m (a, Core a)
+unlam n (Lam b) = pure (n, instantiate (pure n) b)
+unlam _ _       = empty
 
 -- | Application of a function to a sequence of arguments.
 ($$*) :: Foldable t => Core a -> t (Core a) -> Core a
