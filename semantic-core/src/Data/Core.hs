@@ -6,6 +6,7 @@ module Data.Core
 , lam
 , lams
 , unlam
+, unseq
 , ($$*)
 , unapply
 , unapplies
@@ -76,6 +77,10 @@ lams names body = foldr lam body names
 unlam :: Alternative m => a -> Core a -> m (a, Core a)
 unlam n (Lam b) = pure (n, instantiate (pure n) b)
 unlam _ _       = empty
+
+unseq :: Alternative m => Core a -> m (Core a, Core a)
+unseq (a :>> b) = pure (a, b)
+unseq _         = empty
 
 -- | Application of a function to a sequence of arguments.
 ($$*) :: Foldable t => Core a -> t (Core a) -> Core a
