@@ -97,7 +97,7 @@ prettify' style = unP (0 :: Int) (pred (0 :: Int)) . gfold var let' seq' lam app
         edge Lexical n = p 0 $ \ v -> "lexical" <+> unP 0 v n
         edge Import n = p 0 $ \ v -> "import" <+> unP 0 v n
         frame = konst $ primitive "frame"
-        item `dot` body   = p 5 (\ v -> unP 5 v item <> symbol "." <> unP 6 v body)
+        item `dot` body  = p 5 (\ v -> unP 5 v item <> symbol "." <> unP 6 v body)
         lhs `assign` rhs = p 4 (\ v -> unP 4 v lhs <+> symbol "=" <+> unP 5 v rhs)
         -- Annotations are not pretty-printed, as it lowers the signal/noise ratio too profoundly.
         ann _ c = c
