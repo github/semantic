@@ -106,7 +106,7 @@ prettify' root style = unP 0 . gfold var let' seq' lam app unit bool if' string 
         k (S n) = K ("S" <> unP 0 n)
 
         p max b = P $ \ actual -> encloseIf (actual > max) (symbol "(") (symbol ")") b
-        unP n = ($ n) . getP
+        unP n f = getP f n
 
         konst = P . const
         lambda = case style of
