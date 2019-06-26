@@ -102,7 +102,6 @@ prettify' style = unP 0 . gfold var let' seq' lam app unit bool if' string load 
         lhs `assign` rhs = p 4 (unP 4 lhs <+> symbol "=" <+> unP 5 rhs)
         -- Annotations are not pretty-printed, as it lowers the signal/noise ratio too profoundly.
         ann _ c = c
-        k :: Incr (P AnsiDoc a) -> K AnsiDoc (Incr (P AnsiDoc a))
         k Z     = K "0"
         k (S n) = K ("S" <> unP 0 n)
 
