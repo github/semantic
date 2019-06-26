@@ -40,14 +40,14 @@ instance Monoid Value where
   mempty = Value Abstract mempty
 
 data Semi
-  = Closure Loc Name Core.Core Name
+  = Closure Loc Name (Core.Core Name) Name
   -- FIXME: Bound String values.
   | String Text
   | Abstract
   deriving (Eq, Ord, Show)
 
 
-importGraph :: [File Core.Core] -> (Heap Value, [File (Either (Loc, String) Value)])
+importGraph :: [File (Core.Core Name)] -> (Heap Value, [File (Either (Loc, String) Value)])
 importGraph
   = run
   . runFresh
@@ -58,10 +58,11 @@ importGraph
 runFile :: ( Carrier sig m
            , Effect sig
            , Member Fresh sig
+           , Member Naming sig
            , Member (Reader FrameId) sig
            , Member (State (Heap Value)) sig
            )
-        => File Core.Core
+        => File (Core.Core Name)
         -> m (File (Either (Loc, String) Value))
 runFile file = traverse run file
   where run = runReader (fileLoc file)

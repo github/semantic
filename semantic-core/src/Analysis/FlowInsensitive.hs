@@ -20,7 +20,7 @@ import           Data.Monoid (Alt(..))
 import           Data.Name
 import qualified Data.Set as Set
 
-type Cache a = Map.Map Core.Core (Set.Set a)
+type Cache a = Map.Map (Core.Core Name) (Set.Set a)
 type Heap a = Map.Map Name (Set.Set a)
 
 newtype FrameId = FrameId { unFrameId :: Name }
@@ -34,8 +34,8 @@ convergeTerm :: forall m sig a
                 , Member (State (Heap a)) sig
                 , Ord a
                 )
-             => (Core.Core -> NonDetC (ReaderC (Cache a) (StateC (Cache a) m)) a)
-             -> Core.Core
+             => (Core.Core Name -> NonDetC (ReaderC (Cache a) (StateC (Cache a) m)) a)
+             -> Core.Core Name
              -> m (Set.Set a)
 convergeTerm eval body = do
   heap <- get
@@ -51,8 +51,8 @@ cacheTerm :: forall m sig a
              , Member (State  (Cache a)) sig
              , Ord a
              )
-          => (Core.Core -> m a)
-          -> (Core.Core -> m a)
+          => (Core.Core Name -> m a)
+          -> (Core.Core Name -> m a)
 cacheTerm eval term = do
   cached <- gets (Map.lookup term)
   case cached :: Maybe (Set.Set a) of

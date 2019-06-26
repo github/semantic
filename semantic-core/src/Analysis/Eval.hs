@@ -25,12 +25,14 @@ import Data.Text (Text)
 import GHC.Stack
 import Prelude hiding (fail)
 
-eval :: (Carrier sig m, Member (Reader Loc) sig, MonadFail m) => Analysis address value m -> (Core -> m value) -> Core -> m value
+eval :: (Carrier sig m, Member Naming sig, Member (Reader Loc) sig, MonadFail m) => Analysis address value m -> (Core Name -> m value) -> Core Name -> m value
 eval Analysis{..} eval = \case
   Var n -> lookupEnv' n >>= deref' n
   Let n -> alloc n >>= bind n >> unit
   a :>> b -> eval a >> eval b
-  Lam n b -> abstract eval n b
+  Lam b -> do
+    n <- Gen <$> gensym "lam"
+    abstract eval n (instantiate (pure n) b)
   f :$ a -> do
     f' <- eval f
     a' <- eval a
@@ -76,25 +78,25 @@ eval Analysis{..} eval = \case
           c -> invalidRef (show c)
 
 
-prog1 :: File Core
-prog1 = fromBody $ Lam foo
+prog1 :: File (Core Name)
+prog1 = fromBody $ lam foo
   (   Let bar := Var foo
   :>> If (Var bar)
     (Bool False)
     (Bool True))
   where (foo, bar) = (User "foo", User "bar")
 
-prog2 :: File Core
+prog2 :: File (Core Name)
 prog2 = fromBody $ fileBody prog1 :$ Bool True
 
-prog3 :: File Core
+prog3 :: File (Core Name)
 prog3 = fromBody $ lams [foo, bar, quux]
   (If (Var quux)
     (Var bar)
     (Var foo))
   where (foo, bar, quux) = (User "foo", User "bar", User "quux")
 
-prog4 :: File Core
+prog4 :: File (Core Name)
 prog4 = fromBody
   $   Let foo := Bool True
   :>> If (Var foo)
@@ -102,16 +104,16 @@ prog4 = fromBody
     (Bool False)
   where foo = User "foo"
 
-prog5 :: File Core
+prog5 :: File (Core Name)
 prog5 = fromBody
-  $   Let (User "mkPoint") := Lam (User "_x") (Lam (User "_y")
+  $   Let (User "mkPoint") := lam (User "_x") (lam (User "_y")
     (   Let (User "x") := Var (User "_x")
     :>> Let (User "y") := Var (User "_y")))
   :>> Let (User "point") := Var (User "mkPoint") :$ Bool True :$ Bool False
   :>> Var (User "point") :. Var (User "x")
   :>> Var (User "point") :. Var (User "y") := Var (User "point") :. Var (User "x")
 
-prog6 :: [File Core]
+prog6 :: [File (Core Name)]
 prog6 =
   [ File (Loc "dep"  (locSpan (fromJust here))) $ block
     [ Let (Path "dep") := Frame
@@ -125,11 +127,11 @@ prog6 =
     ]
   ]
 
-ruby :: File Core
+ruby :: File (Core Name)
 ruby = fromBody . ann . block $
   [ ann (Let (User "Class") := Frame)
   , ann (Var (User "Class") :.
-    (ann (Let (User "new") := Lam (User "self") (block
+    (ann (Let (User "new") := lam (User "self") (block
       [ ann (Let (User "instance") := Frame)
       , ann (Var (User "instance") :. Edge Import (Var (User "self")))
       , ann (Var (User "instance") $$ "initialize")
@@ -140,9 +142,9 @@ ruby = fromBody . ann . block $
   , ann (Let (User "Object") := Frame)
   , ann (Var (User "Object") :. block
     [ ann (Edge Import (Var (User "(Object)")))
-    , ann (Let (User "nil?") := Lam (User "_") false)
-    , ann (Let (User "initialize") := Lam (User "self") (Var (User "self")))
-    , ann (Let __semantic_truthy := Lam (User "_") (Bool True))
+    , ann (Let (User "nil?") := lam (User "_") false)
+    , ann (Let (User "initialize") := lam (User "self") (Var (User "self")))
+    , ann (Let __semantic_truthy := lam (User "_") (Bool True))
     ])
 
   , ann (Var (User "Class") :. Edge Import (Var (User "Object")))
@@ -156,8 +158,8 @@ ruby = fromBody . ann . block $
   , ann (Var (User "NilClass") :. block
     [ ann (Edge Import (Var (User "(NilClass)")))
     , ann (Edge Import (Var (User "Object")))
-    , ann (Let (User "nil?") := Lam (User "_") true)
-    , ann (Let __semantic_truthy := Lam (User "_") (Bool False))
+    , ann (Let (User "nil?") := lam (User "_") true)
+    , ann (Let __semantic_truthy := lam (User "_") (Bool False))
     ])
 
   , ann (Let (User "(TrueClass)") := Frame)
@@ -180,19 +182,19 @@ ruby = fromBody . ann . block $
   , ann (Var (User "FalseClass") :. block
     [ ann (Edge Import (Var (User "(FalseClass)")))
     , ann (Edge Import (Var (User "Object")))
-    , ann (Let __semantic_truthy := Lam (User "_") (Bool False))
+    , ann (Let __semantic_truthy := lam (User "_") (Bool False))
     ])
 
   , ann (Let (User "nil")   := Var (User "NilClass")   $$ "new")
   , ann (Let (User "true")  := Var (User "TrueClass")  $$ "new")
   , ann (Let (User "false") := Var (User "FalseClass") $$ "new")
 
-  , ann (Let (User "require") := Lam (User "path") (Load (Var (User "path"))))
+  , ann (Let (User "require") := lam (User "path") (Load (Var (User "path"))))
   ]
   where _nil  = Var (User "nil")
         true  = Var (User "true")
         false = Var (User "false")
-        self $$ method = annWith callStack $ Lam (User "_x") (Var (User "_x") :. Var (User method) :$ Var (User "_x")) :$ self
+        self $$ method = annWith callStack $ lam (User "_x") (Var (User "_x") :. Var (User method) :$ Var (User "_x")) :$ self
 
         __semantic_truthy = User "__semantic_truthy"
 
@@ -203,8 +205,8 @@ data Analysis address value m = Analysis
   , lookupEnv   :: Name -> m (Maybe address)
   , deref       :: address -> m (Maybe value)
   , assign      :: address -> value -> m ()
-  , abstract    :: (Core -> m value) -> Name -> Core -> m value
-  , apply       :: (Core -> m value) -> value -> value -> m value
+  , abstract    :: (Core Name -> m value) -> Name -> Core Name -> m value
+  , apply       :: (Core Name -> m value) -> value -> value -> m value
   , unit        :: m value
   , bool        :: Bool -> m value
   , asBool      :: value -> m Bool

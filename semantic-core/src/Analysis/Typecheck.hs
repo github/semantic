@@ -101,7 +101,7 @@ substIn free bound = go 0
         go i (PRecord fs)           = PRecord (go i <$> fs)
 
 
-typecheckingFlowInsensitive :: [File Core.Core] -> (Heap (Monotype Meta), [File (Either (Loc, String) Polytype)])
+typecheckingFlowInsensitive :: [File (Core.Core Name)] -> (Heap (Monotype Meta), [File (Either (Loc, String) Polytype)])
 typecheckingFlowInsensitive
   = run
   . runFresh
@@ -113,9 +113,10 @@ typecheckingFlowInsensitive
 runFile :: ( Carrier sig m
            , Effect sig
            , Member Fresh sig
+           , Member Naming sig
            , Member (State (Heap (Monotype Meta))) sig
            )
-        => File Core.Core
+        => File (Core.Core Name)
         -> m (File (Either (Loc, String) (Monotype Meta)))
 runFile file = traverse run file
   where run

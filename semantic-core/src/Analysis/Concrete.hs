@@ -39,7 +39,7 @@ newtype FrameId = FrameId { unFrameId :: Precise }
   deriving (Eq, Ord, Show)
 
 data Concrete
-  = Closure Loc Name Core.Core Precise
+  = Closure Loc Name (Core.Core Name) Precise
   | Unit
   | Bool Bool
   | String Text
@@ -63,20 +63,22 @@ type Heap = IntMap.IntMap Concrete
 --
 --   >>> map fileBody (snd (concrete [File (Loc "bool" emptySpan) (Core.Bool True)]))
 --   [Right (Bool True)]
-concrete :: [File Core.Core] -> (Heap, [File (Either (Loc, String) Concrete)])
+concrete :: [File (Core.Core Name)] -> (Heap, [File (Either (Loc, String) Concrete)])
 concrete
   = run
   . runFresh
+  . runNaming (Root "concrete")
   . runHeap
   . traverse runFile
 
 runFile :: ( Carrier sig m
            , Effect sig
            , Member Fresh sig
+           , Member Naming sig
            , Member (Reader FrameId) sig
            , Member (State Heap) sig
            )
-        => File Core.Core
+        => File (Core.Core Name)
         -> m (File (Either (Loc, String) Concrete))
 runFile file = traverse run file
   where run = runReader (fileLoc file)
