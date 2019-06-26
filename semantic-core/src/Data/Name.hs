@@ -95,6 +95,7 @@ root // s = root :/ (s, 0)
 
 infixl 6 //
 
+
 gensym :: (Carrier sig m, Member Naming sig) => Text -> m Gensym
 gensym s = send (Gensym s pure)
 
