@@ -69,6 +69,56 @@ encloseIf :: Monoid m => Bool -> m -> m -> m -> m
 encloseIf True  l r x = l <> x <> r
 encloseIf False _ _ x = x
 
+newtype P a b = P { getP :: Prec -> a }
+newtype K a b = K { getK :: a }
+
+prettify' :: Style -> Core Name -> AnsiDoc
+prettify' style = unP 0 . gfold var let' seq' lam app unit bool if' string load edge frame dot assign ann k . fmap (K . name)
+  where var = konst . getK
+        let' a = konst $ keyword "let" <+> name a
+        a `seq'` b = P $ \ prec ->
+          let fore = unP 12 a
+              aft = unP 12 b
+              open  = symbol ("{" <> softline)
+              close = symbol (softline <> "}")
+              separator = ";" <> Pretty.line
+              body = fore <> separator <> aft
+          in Pretty.align $ encloseIf (12 > prec) open close (Pretty.align body)
+        lam f =
+          let x = Gen (Root "x") --Gen <$> gensym ""
+          in p 0 (lambda <> name x <+> arrow <+> unP 0 f)
+        f `app` x = p 10 (unP 10 f <+> unP 11 x)
+        unit = konst $ primitive "unit"
+        bool b = konst $ primitive (if b then "true" else "false")
+        if' con tru fal =
+          let con' = keyword "if"   <+> unP 0 con
+              tru' = keyword "then" <+> unP 0 tru
+              fal' = keyword "else" <+> unP 0 fal
+          in p 0 $ Pretty.sep [con', tru', fal']
+        string s = konst . strlit $ Pretty.viaShow s
+        load path = p 0 $ keyword "load" <+> unP 0 path
+        edge Lexical n = p 0 $ "lexical" <+> unP 0 n
+        edge Import n = p 0 $ "import" <+> unP 0 n
+        frame = konst $ primitive "frame"
+        item `dot` body   = p 5 (unP 5 item <> symbol "." <> unP 6 body)
+        lhs `assign` rhs = p 4 (unP 4 lhs <+> symbol "=" <+> unP 5 rhs)
+        -- Annotations are not pretty-printed, as it lowers the signal/noise ratio too profoundly.
+        ann _ c = c
+        k :: Incr (P AnsiDoc a) -> K AnsiDoc (Incr (P AnsiDoc a))
+        k Z     = K "0"
+        k (S n) = K ("S" <> unP 0 n)
+
+        p max b = P $ \ actual -> encloseIf (actual > max) (symbol "(") (symbol ")") b
+
+        konst = P . const
+        unP n = ($ n) . getP
+        lambda = case style of
+          Unicode -> symbol "λ"
+          Ascii   -> symbol "\\"
+        arrow = case style of
+          Unicode -> symbol "→"
+          Ascii   -> symbol "->"
+
 prettify :: (Member Naming sig, Member (Reader Prec) sig, Member (Reader Style) sig, Carrier sig m)
          => Core Name
          -> m AnsiDoc
@@ -128,3 +178,4 @@ appending k item = (keyword k <+>) <$> item
 
 prettyCore :: Style -> Core Name -> AnsiDoc
 prettyCore s = run . runNaming (Root "prettyCore") . runReader @Prec 0 . runReader s . prettify
+prettyCore s = prettify' s
