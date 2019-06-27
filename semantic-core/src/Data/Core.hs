@@ -45,12 +45,13 @@ import GHC.Stack
 data Edge = Lexical | Import
   deriving (Eq, Ord, Show)
 
-newtype Core a = Core { unCore :: CoreF Core a }
+data Core a
+  = Var a
+  | Core (CoreF Core a)
   deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
 
 data CoreF f a
-  = Var a
-  | Let Name
+  = Let Name
   -- | Sequencing without binding; analogous to '>>' or '*>'.
   | f a :>> f a
   | Lam (f (Incr (f a)))
@@ -85,7 +86,7 @@ instance Semigroup (Core a) where
   a <> b = Core (a :>> b)
 
 instance Applicative Core where
-  pure = Core . Var
+  pure = Var
   (<*>) = ap
 
 instance Monad Core where
@@ -200,7 +201,7 @@ gfold :: forall m n b
 gfold var let' seq' lam app unit bool if' string load edge frame dot assign ann k = go
   where go :: Core (m x) -> n x
         go = \case
-          Core (Var a) -> var a
+          Var a -> var a
           Core (Let a) -> let' a
           Core (a :>> b) -> go a `seq'` go b
           Core (Lam b) -> lam (go (k . fmap go <$> b))

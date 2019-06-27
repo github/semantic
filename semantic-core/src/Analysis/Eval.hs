@@ -27,7 +27,7 @@ import Prelude hiding (fail)
 
 eval :: (Carrier sig m, Member Naming sig, Member (Reader Loc) sig, MonadFail m) => Analysis address value m -> (Core Name -> m value) -> Core Name -> m value
 eval Analysis{..} eval = \case
-  Core (Var n) -> lookupEnv' n >>= deref' n
+  Var n -> lookupEnv' n >>= deref' n
   Core (Let n) -> alloc n >>= bind n >> unit
   Core (a :>> b) -> eval a >> eval b
   Core (Lam b) -> do
@@ -64,7 +64,7 @@ eval Analysis{..} eval = \case
         deref' n = deref >=> maybe (uninitialized (show n)) pure
 
         ref = \case
-          Core (Var n) -> lookupEnv' n
+          Var n -> lookupEnv' n
           Core (Let n) -> do
             addr <- alloc n
             addr <$ bind n addr

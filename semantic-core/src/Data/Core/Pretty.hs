@@ -115,7 +115,7 @@ prettify :: (Member Naming sig, Member (Reader Prec) sig, Member (Reader Style) 
          => Core Name
          -> m AnsiDoc
 prettify = \case
-  Core (Var a) -> pure $ name a
+  Var a -> pure $ name a
   Core (Let a) -> pure $ keyword "let" <+> name a
   Core (a :>> b) -> do
     prec <- ask @Prec
