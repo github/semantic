@@ -73,7 +73,7 @@ prettify' :: Style -> Core Name -> AnsiDoc
 prettify' style = unP (0 :: Int) (pred (0 :: Int)) . kfold var let' seq' lam app unit bool if' string load edge frame dot assign ann k . fmap (const . name)
   where var = const
         let' a = konst $ keyword "let" <+> name a
-        a `seq'` b = \ prec v ->
+        seq' a b prec v =
           let fore = unP 12 v a
               aft = unP 12 v b
               open  = symbol ("{" <> softline)
