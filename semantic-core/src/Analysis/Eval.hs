@@ -99,8 +99,8 @@ prog3 = fromBody $ lams [foo, bar, quux]
 
 prog4 :: File (Core Name)
 prog4 = fromBody
-  $   let' foo .= Core.bool True
-  >>> if' (pure foo)
+  $  let' foo .= Core.bool True
+  <> if' (pure foo)
     (Core.bool True)
     (Core.bool False)
   where foo = User "foo"

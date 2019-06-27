@@ -5,7 +5,6 @@ module Data.Core
 , CoreF(..)
 , Edge(..)
 , let'
-, (>>>)
 , block
 , lam
 , lams
@@ -83,28 +82,23 @@ infix  3 :=
 infixl 4 :.
 
 instance Semigroup (Core a) where
-  (<>) = fmap Core . (:>>)
+  a <> b = Core (a :>> b)
 
 instance Applicative Core where
   pure = Core . Var
   (<*>) = ap
 
 instance Monad Core where
-  a >>= f = gfold id let' (>>>) (Core . Lam) ($$) unit bool if' string load edge frame (...) (.=) (fmap Core . Ann) pure (f <$> a)
+  a >>= f = gfold id let' (<>) (Core . Lam) ($$) unit bool if' string load edge frame (...) (.=) (fmap Core . Ann) pure (f <$> a)
 
 
 let' :: Name -> Core a
 let' = Core . Let
 
-(>>>) :: Core a -> Core a -> Core a
-a >>> b = Core (a :>> b)
-
-infixr 1 >>>
-
 block :: Foldable t => t (Core a) -> Core a
 block cs
   | null cs   = unit
-  | otherwise = foldr1 (>>>) cs
+  | otherwise = foldr1 (<>) cs
 
 lam :: Eq a => a -> Core a -> Core a
 lam n b = Core (Lam (bind n b))
