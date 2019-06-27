@@ -118,9 +118,9 @@ prettify :: (Member Naming sig, Member (Reader Prec) sig, Member (Reader Style) 
          => Core Name
          -> m AnsiDoc
 prettify = \case
-  Var a -> pure $ name a
-  Let a -> pure $ keyword "let" <+> name a
-  a :>> b -> do
+  Core (Var a) -> pure $ name a
+  Core (Let a) -> pure $ keyword "let" <+> name a
+  Core (a :>> b) -> do
     prec <- ask @Prec
     fore <- with 12 (prettify a)
     aft  <- with 12 (prettify b)
@@ -132,41 +132,41 @@ prettify = \case
 
     pure . Pretty.align $ encloseIf (12 > prec) open close (Pretty.align body)
 
-  Lam f  -> inParens 11 $ do
+  Core (Lam f)  -> inParens 11 $ do
     x    <- Gen <$> gensym ""
     body <- prettify (instantiate (pure x) f)
     lam  <- lambda
     arr  <- arrow
     pure (lam <> name x <+> arr <+> body)
 
-  Frame    -> pure $ primitive "frame"
-  Unit     -> pure $ primitive "unit"
-  Bool b   -> pure $ primitive (if b then "true" else "false")
-  String s -> pure . strlit $ Pretty.viaShow s
+  Core Frame      -> pure $ primitive "frame"
+  Core Unit       -> pure $ primitive "unit"
+  Core (Bool b)   -> pure $ primitive (if b then "true" else "false")
+  Core (String s) -> pure . strlit $ Pretty.viaShow s
 
-  f :$ x -> inParens 11 $ (<+>) <$> prettify f <*> prettify x
+  Core (f :$ x) -> inParens 11 $ (<+>) <$> prettify f <*> prettify x
 
-  If con tru fal -> do
+  Core (If con tru fal) -> do
     con' <- "if"   `appending` prettify con
     tru' <- "then" `appending` prettify tru
     fal' <- "else" `appending` prettify fal
     pure $ Pretty.sep [con', tru', fal']
 
-  Load p   -> "load" `appending` prettify p
-  Edge Lexical n -> "lexical" `appending` prettify n
-  Edge Import n -> "import" `appending` prettify n
-  item :. body   -> inParens 5 $ do
+  Core (Load p)   -> "load" `appending` prettify p
+  Core (Edge Lexical n) -> "lexical" `appending` prettify n
+  Core (Edge Import n) -> "import" `appending` prettify n
+  Core (item :. body)   -> inParens 5 $ do
     f <- prettify item
     g <- prettify body
     pure (f <> symbol "." <> g)
 
-  lhs := rhs -> inParens 4 $ do
+  Core (lhs := rhs) -> inParens 4 $ do
     f <- prettify lhs
     g <- prettify rhs
     pure (f <+> symbol "=" <+> g)
 
   -- Annotations are not pretty-printed, as it lowers the signal/noise ratio too profoundly.
-  Ann _ c -> prettify c
+  Core (Ann _ c) -> prettify c
 
 appending :: Functor f => AnsiDoc -> f AnsiDoc -> f AnsiDoc
 appending k item = (keyword k <+>) <$> item

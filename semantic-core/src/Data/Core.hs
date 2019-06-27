@@ -1,17 +1,29 @@
-{-# LANGUAGE DeriveTraversable, FlexibleContexts, LambdaCase, OverloadedStrings, RankNTypes, ScopedTypeVariables,
+{-# LANGUAGE DeriveTraversable, FlexibleContexts, LambdaCase, OverloadedStrings, QuantifiedConstraints, RankNTypes, ScopedTypeVariables, StandaloneDeriving,
              TypeFamilies #-}
 module Data.Core
 ( Core(..)
+, CoreF(..)
 , Edge(..)
+, let'
+, (>>>)
+, block
 , lam
 , lams
 , unlam
 , unseq
 , unseqs
+, ($$)
 , ($$*)
 , unapply
 , unapplies
-, block
+, unit
+, bool
+, if'
+, load
+, edge
+, frame
+, (...)
+, (.=)
 , ann
 , annWith
 , gfold
@@ -33,28 +45,36 @@ import GHC.Stack
 data Edge = Lexical | Import
   deriving (Eq, Ord, Show)
 
-data Core a
+newtype Core a = Core { unCore :: CoreF Core a }
+  deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
+
+data CoreF f a
   = Var a
   | Let Name
   -- | Sequencing without binding; analogous to '>>' or '*>'.
-  | Core a :>> Core a
-  | Lam (Core (Incr (Core a)))
+  | f a :>> f a
+  | Lam (f (Incr (f a)))
   -- | Function application; analogous to '$'.
-  | Core a :$ Core a
+  | f a :$ f a
   | Unit
   | Bool Bool
-  | If (Core a) (Core a) (Core a)
+  | If (f a) (f a) (f a)
   | String Text
   -- | Load the specified file (by path).
-  | Load (Core a)
-  | Edge Edge (Core a)
+  | Load (f a)
+  | Edge Edge (f a)
   -- | Allocation of a new frame.
   | Frame
-  | Core a :. Core a
+  | f a :. f a
   -- | Assignment of a value to the reference returned by the lhs.
-  | Core a := Core a
-  | Ann Loc (Core a)
-  deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
+  | f a := f a
+  | Ann Loc (f a)
+  deriving (Foldable, Functor, Traversable)
+
+deriving instance (Eq   a, forall x . Eq   x => Eq   (f x)) => Eq   (CoreF f a)
+deriving instance (Ord  a, forall x . Eq   x => Eq   (f x)
+                         , forall x . Ord  x => Ord  (f x)) => Ord  (CoreF f a)
+deriving instance (Show a, forall x . Show x => Show (f x)) => Show (CoreF f a)
 
 infixl 2 :$
 infixr 1 :>>
@@ -62,29 +82,42 @@ infix  3 :=
 infixl 4 :.
 
 instance Semigroup (Core a) where
-  (<>) = (:>>)
+  (<>) = fmap Core . (:>>)
 
 instance Applicative Core where
-  pure = Var
+  pure = Core . Var
   (<*>) = ap
 
 instance Monad Core where
-  a >>= f = gfold id Let (:>>) Lam (:$) Unit Bool If String Load Edge Frame (:.) (:=) Ann pure (f <$> a)
+  a >>= f = gfold id (Core . Let) (fmap Core . (:>>)) (Core . Lam) (fmap Core . (:$)) (Core Unit) (Core . Bool) (\ c t e -> Core (If c t e)) (Core . String) (Core . Load) (fmap Core . Edge) (Core Frame) (fmap Core . (:.)) (fmap Core . (:=)) (fmap Core . Ann) pure (f <$> a)
 
+
+let' :: Name -> Core a
+let' = Core . Let
+
+(>>>) :: Core a -> Core a -> Core a
+a >>> b = Core (a :>> b)
+
+infixr 1 >>>
+
+block :: Foldable t => t (Core a) -> Core a
+block cs
+  | null cs   = unit
+  | otherwise = foldr1 (>>>) cs
 
 lam :: Eq a => a -> Core a -> Core a
-lam n b = Lam (bind n b)
+lam n b = Core (Lam (bind n b))
 
 lams :: (Eq a, Foldable t) => t a -> Core a -> Core a
 lams names body = foldr lam body names
 
 unlam :: Alternative m => a -> Core a -> m (a, Core a)
-unlam n (Lam b) = pure (n, instantiate (pure n) b)
-unlam _ _       = empty
+unlam n (Core (Lam b)) = pure (n, instantiate (pure n) b)
+unlam _ _              = empty
 
 unseq :: Alternative m => Core a -> m (Core a, Core a)
-unseq (a :>> b) = pure (a, b)
-unseq _         = empty
+unseq (Core (a :>> b)) = pure (a, b)
+unseq _                = empty
 
 unseqs :: Core a -> NonEmpty (Core a)
 unseqs = go
@@ -92,31 +125,59 @@ unseqs = go
           Just (l, r) -> go l <> go r
           Nothing     -> t :| []
 
+($$) :: Core a -> Core a -> Core a
+f $$ a = Core (f :$ a)
+
+infixl 2 $$
+
 -- | Application of a function to a sequence of arguments.
 ($$*) :: Foldable t => Core a -> t (Core a) -> Core a
-($$*) = foldl' (:$)
+($$*) = foldl' ($$)
 
 infixl 9 $$*
 
 unapply :: Alternative m => Core a -> m (Core a, Core a)
-unapply (f :$ a) = pure (f, a)
-unapply _        = empty
+unapply (Core (f :$ a)) = pure (f, a)
+unapply _               = empty
 
 unapplies :: Core a -> (Core a, Stack (Core a))
 unapplies core = case unapply core of
   Just (f, a) -> (:> a) <$> unapplies f
   Nothing     -> (core, Nil)
 
-block :: Foldable t => t (Core a) -> Core a
-block cs
-  | null cs   = Unit
-  | otherwise = foldr1 (:>>) cs
+unit :: Core a
+unit = Core Unit
+
+bool :: Bool -> Core a
+bool = Core . Bool
+
+if' :: Core a -> Core a -> Core a -> Core a
+if' c t e = Core (If c t e)
+
+load :: Core a -> Core a
+load = Core . Load
+
+edge :: Edge -> Core a -> Core a
+edge e b = Core (Edge e b)
+
+frame :: Core a
+frame = Core Frame
+
+(...) :: Core a -> Core a -> Core a
+a ... b = Core (a :. b)
+
+infixl 4 ...
+
+(.=) :: Core a -> Core a -> Core a
+a .= b = Core (a := b)
+
+infix 3 .=
 
 ann :: HasCallStack => Core a -> Core a
 ann = annWith callStack
 
 annWith :: CallStack -> Core a -> Core a
-annWith callStack c = maybe c (flip Ann c) (stackLoc callStack)
+annWith callStack c = maybe c (flip (fmap Core . Ann) c) (stackLoc callStack)
 
 
 gfold :: forall m n b
@@ -141,21 +202,21 @@ gfold :: forall m n b
 gfold var let' seq' lam app unit bool if' string load edge frame dot assign ann k = go
   where go :: Core (m x) -> n x
         go = \case
-          Var a -> var a
-          Let a -> let' a
-          a :>> b -> go a `seq'` go b
-          Lam b -> lam (go (k . fmap go <$> b))
-          f :$ a -> go f `app` go a
-          Unit -> unit
-          Bool b -> bool b
-          If c t e -> if' (go c) (go t) (go e)
-          String s -> string s
-          Load t -> load (go t)
-          Edge e t -> edge e (go t)
-          Frame -> frame
-          a :. b -> go a `dot` go b
-          a := b -> go a `assign` go b
-          Ann loc t -> ann loc (go t)
+          Core (Var a) -> var a
+          Core (Let a) -> let' a
+          Core (a :>> b) -> go a `seq'` go b
+          Core (Lam b) -> lam (go (k . fmap go <$> b))
+          Core (f :$ a) -> go f `app` go a
+          Core Unit -> unit
+          Core (Bool b) -> bool b
+          Core (If c t e) -> if' (go c) (go t) (go e)
+          Core (String s) -> string s
+          Core (Load t) -> load (go t)
+          Core (Edge e t) -> edge e (go t)
+          Core Frame -> frame
+          Core (a :. b) -> go a `dot` go b
+          Core (a := b) -> go a `assign` go b
+          Core (Ann loc t) -> ann loc (go t)
 
 kfold :: (a -> b)
       -> (Name -> b)
