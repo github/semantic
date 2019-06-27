@@ -19,6 +19,7 @@ module Data.Core
 , unit
 , bool
 , if'
+  , string
 , load
 , edge
 , frame
@@ -153,6 +154,9 @@ bool = Core . Bool
 
 if' :: Core a -> Core a -> Core a -> Core a
 if' c t e = Core (If c t e)
+
+string :: Text -> Core a
+string = Core . String
 
 load :: Core a -> Core a
 load = Core . Load

@@ -10,7 +10,7 @@ module Data.Core.Parser
 
 import           Control.Applicative
 import qualified Data.Char as Char
-import           Data.Core hiding (edge)
+import           Data.Core hiding (edge, string)
 import qualified Data.Core as Core
 import           Data.Name
 import           Data.Semigroup
