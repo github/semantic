@@ -15,11 +15,13 @@ module Data.Core
 , ann
 , annWith
 , gfold
+, kfold
 , instantiate
 ) where
 
-import Control.Applicative (Alternative (..))
+import Control.Applicative (Alternative (..), Const (..))
 import Control.Monad (ap)
+import Data.Coerce
 import Data.Foldable (foldl')
 import Data.List.NonEmpty
 import Data.Loc
@@ -154,6 +156,26 @@ gfold var let' seq' lam app unit bool if' string load edge frame dot assign ann 
           a :. b -> go a `dot` go b
           a := b -> go a `assign` go b
           Ann loc t -> ann loc (go t)
+
+kfold :: (a -> b)
+      -> (Name -> b)
+      -> (b -> b -> b)
+      -> (b -> b)
+      -> (b -> b -> b)
+      -> b
+      -> (Bool -> b)
+      -> (b -> b -> b -> b)
+      -> (Text -> b)
+      -> (b -> b)
+      -> (Edge -> b -> b)
+      -> b
+      -> (b -> b -> b)
+      -> (b -> b -> b)
+      -> (Loc -> b -> b)
+      -> (Incr b -> a)
+      -> Core a
+      -> b
+kfold var let' seq' lam app unit bool if' string load edge frame dot assign ann k = getConst . gfold (coerce var) (coerce let') (coerce seq') (coerce lam) (coerce app) (coerce unit) (coerce bool) (coerce if') (coerce string) (coerce load) (coerce edge) (coerce frame) (coerce dot) (coerce assign) (coerce ann) (coerce k) . fmap Const
 
 
 -- | Bind occurrences of a name in a 'Core' term, producing a 'Core' in which the name is bound.
