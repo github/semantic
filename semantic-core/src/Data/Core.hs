@@ -90,7 +90,7 @@ instance Applicative Core where
   (<*>) = ap
 
 instance Monad Core where
-  a >>= f = gfold id (Core . Let) (fmap Core . (:>>)) (Core . Lam) (fmap Core . (:$)) (Core Unit) (Core . Bool) (\ c t e -> Core (If c t e)) (Core . String) (Core . Load) (fmap Core . Edge) (Core Frame) (fmap Core . (:.)) (fmap Core . (:=)) (fmap Core . Ann) pure (f <$> a)
+  a >>= f = gfold id let' (>>>) (Core . Lam) ($$) unit bool if' string load edge frame (...) (.=) (fmap Core . Ann) pure (f <$> a)
 
 
 let' :: Name -> Core a
