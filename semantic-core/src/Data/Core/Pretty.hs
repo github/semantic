@@ -12,6 +12,7 @@ import           Control.Effect
 import           Control.Effect.Reader
 import           Data.Core
 import           Data.File
+import           Data.Functor.Const
 import           Data.Name
 import           Data.Text.Prettyprint.Doc (Pretty (..), annotate, softline, (<+>))
 import qualified Data.Text.Prettyprint.Doc as Pretty
@@ -69,13 +70,11 @@ encloseIf :: Monoid m => Bool -> m -> m -> m -> m
 encloseIf True  l r x = l <> x <> r
 encloseIf False _ _ x = x
 
-newtype K a b = K { getK :: a }
-
 prettify' :: Style -> Core Name -> AnsiDoc
-prettify' style = unP (0 :: Int) (pred (0 :: Int)) . gfold var let' seq' lam app unit bool if' string load edge frame dot assign ann k . fmap (K . const . name)
-  where var = K . const . getK
+prettify' style = unP (0 :: Int) (pred (0 :: Int)) . gfold var let' seq' lam app unit bool if' string load edge frame dot assign ann k . fmap (Const . const . name)
+  where var = Const . const . getConst
         let' a = konst $ keyword "let" <+> name a
-        a `seq'` b = K $ \ prec v ->
+        a `seq'` b = Const $ \ prec v ->
           let fore = unP 12 v a
               aft = unP 12 v b
               open  = symbol ("{" <> softline)
@@ -101,13 +100,13 @@ prettify' style = unP (0 :: Int) (pred (0 :: Int)) . gfold var let' seq' lam app
         lhs `assign` rhs = p 4 (\ v -> unP 4 v lhs <+> symbol "=" <+> unP 5 v rhs)
         -- Annotations are not pretty-printed, as it lowers the signal/noise ratio too profoundly.
         ann _ c = c
-        k Z     = K $ \ v -> pretty v
-        k (S n) = K $ \ v -> unP 0 (pred v) n
+        k Z     = Const $ \ v -> pretty v
+        k (S n) = Const $ \ v -> unP 0 (pred v) n
 
-        p max b = K $ \ actual -> encloseIf (actual > max) (symbol "(") (symbol ")") . b
-        unP n i f = getK f n i
+        p max b = Const $ \ actual -> encloseIf (actual > max) (symbol "(") (symbol ")") . b
+        unP n i f = getConst f n i
 
-        konst b = K $ \ _ _ -> b
+        konst b = Const $ \ _ _ -> b
         lambda = case style of
           Unicode -> symbol "λ"
           Ascii   -> symbol "\\"
