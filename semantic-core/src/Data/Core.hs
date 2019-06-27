@@ -18,7 +18,7 @@ module Data.Core
 , unit
 , bool
 , if'
-  , string
+, string
 , load
 , edge
 , frame
