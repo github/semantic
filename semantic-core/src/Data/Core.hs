@@ -28,6 +28,7 @@ module Data.Core
 , annWith
 , gfold
 , efold
+, eiter
 , kfold
 , instantiate
 ) where
@@ -264,6 +265,19 @@ efold var let' seq' lam app unit bool if' string load edge frame dot assign ann 
           Core (a :. b) -> go h a `dot` go h b
           Core (a := b) -> go h a `assign` go h b
           Core (Ann loc t) -> ann loc (go h t)
+
+-- | Efficient Mendler-style iteration.
+eiter :: forall l m n z b
+      .  (forall a . m a -> n a)
+      -> (forall a l' n' z' . Functor n' => (forall l'' z'' x . (l'' x -> m (z'' x)) -> n' (l'' x) -> n (z'' x)) -> (l' a -> m (z' a)) -> CoreF n' (l' a) -> n (z' a))
+      -> (l b -> m (z b))
+      -> Core (l b)
+      -> n (z b)
+eiter var alg = go
+  where go :: forall l' z' x . (l' x -> m (z' x)) -> Core (l' x) -> n (z' x)
+        go h = \case
+          Var a -> var (h a)
+          Core b -> alg go h b
 
 kfold :: (a -> b)
       -> (Name -> b)
