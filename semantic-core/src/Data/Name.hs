@@ -14,9 +14,6 @@ module Data.Name
 , runNaming
 , NamingC(..)
 , Incr(..)
-, match
-, subst
-, incr
 , bind
 , instantiate
 ) where
