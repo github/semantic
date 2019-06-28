@@ -53,7 +53,6 @@ arrow = ask @Style >>= \case
 name :: Name -> AnsiDoc
 name = \case
   Gen p  -> pretty p
-  Path p -> strlit (Pretty.viaShow p)
   User n -> encloseIf (needsQuotation n) (symbol "#{") (symbol "}") (pretty n)
 
 with :: (Member (Reader Prec) sig, Carrier sig m) => Prec -> m a -> m a

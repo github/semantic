@@ -102,7 +102,7 @@ importGraphAnalysis = Analysis{..}
         asString (Value (String s) _) = pure s
         asString _ = pure mempty
         frame = pure mempty
-        edge Core.Import (Path to) = do
+        edge Core.Import (User to) = do -- FIXME: figure out some other way to do this
           Loc{locPath=from} <- ask
           () <$ pure (Value Abstract (Map.singleton from (Set.singleton to)))
         edge _ _ = pure ()

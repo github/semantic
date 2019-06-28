@@ -203,7 +203,6 @@ addressStyle heap = (G.defaultStyle vertex) { G.edgeAttributes }
         showPos (Pos l c) = pack (show l) <> ":" <> pack (show c)
         fromName (User s)  = s
         fromName (Gen sym) = fromGensym sym
-        fromName (Path p)  = pack $ show p
         fromGensym (Root s) = s
         fromGensym (ss :/ (s, i)) = fromGensym ss <> "." <> s <> pack (show i)
 

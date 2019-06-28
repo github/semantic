@@ -93,9 +93,7 @@ lvalue = choice
 -- * Literals
 
 name :: (TokenParsing m, Monad m) => m Name
-name = choice [regular, strpath] <?> "name" where
-  regular = User <$> identifier
-  strpath = Path . pack <$> between (symbolic '"') (symbolic '"') (some $ noneOf "\"")
+name = User <$> identifier <?> "name" where
 
 lit :: (TokenParsing m, Monad m) => m (Core Name)
 lit = let x `given` n = x <$ reserved n in choice

@@ -43,9 +43,7 @@ eval Analysis{..} eval = \case
     c' <- eval c >>= asBool
     if c' then eval t else eval e
   String s -> string s
-  Load p -> do
-    path <- eval p >>= asString
-    lookupEnv' (Path path) >>= deref' (Path path)
+  Load p -> eval p >>= asString >> unit -- FIXME: add a load command or something
   Edge e a -> ref a >>= edge e >> unit
   Frame -> frame
   a :. b -> do
@@ -118,14 +116,14 @@ prog5 = fromBody $ block
 prog6 :: [File (Core Name)]
 prog6 =
   [ File (Loc "dep"  (locSpan (fromJust here))) $ block
-    [ Let (Path "dep") := Frame
-    , pure (Path "dep") :. block
+    [ Let (User "dep") := Frame
+    , pure (User "dep") :. block
       [ Let (User "var") := Bool True
       ]
     ]
   , File (Loc "main" (locSpan (fromJust here))) $ block
-    [ Load (pure (Path "dep"))
-    , Let (User "thing") := pure (Path "dep") :. pure (User "var")
+    [ Load (String "dep")
+    , Let (User "thing") := pure (User "dep") :. pure (User "var")
     ]
   ]
 

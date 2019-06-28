@@ -51,15 +51,12 @@ data Name
   --
   --   This should be used for names which the user provided and which other code (other functions, other modules, other packages) could call, e.g. declaration names.
   | User User
-  -- | A variable name represented as the path to a source file. Used for loading modules at a specific name.
-  | Path Text
   deriving (Eq, Ord, Show)
 
 instance Pretty Name where
   pretty = \case
     Gen p  -> pretty p
     User n -> pretty n
-    Path p -> pretty (show p)
 
 reservedNames :: HashSet String
 reservedNames = [ "#true", "#false", "let", "#frame", "if", "then", "else"
