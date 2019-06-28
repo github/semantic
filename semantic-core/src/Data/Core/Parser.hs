@@ -10,8 +10,7 @@ module Data.Core.Parser
 
 import           Control.Applicative
 import qualified Data.Char as Char
-import           Data.Core hiding (edge, string)
-import qualified Data.Core as Core
+import           Data.Core
 import           Data.Name
 import           Data.Semigroup
 import           Data.String
@@ -50,8 +49,8 @@ core = expr
 
 expr :: (TokenParsing m, Monad m) => m (Core Name)
 expr = atom `chainl1` go where
-  go = choice [ (...) <$ dot
-              , ($$) <$ notFollowedBy dot
+  go = choice [ (:.) <$ dot
+              , (:$) <$ notFollowedBy dot
               ]
 
 atom :: (TokenParsing m, Monad m) => m (Core Name)
@@ -69,24 +68,24 @@ comp :: (TokenParsing m, Monad m) => m (Core Name)
 comp = braces (sconcat <$> sepEndByNonEmpty expr semi) <?> "compound statement"
 
 ifthenelse :: (TokenParsing m, Monad m) => m (Core Name)
-ifthenelse = if'
+ifthenelse = If
   <$ reserved "if"   <*> core
   <* reserved "then" <*> core
   <* reserved "else" <*> core
   <?> "if-then-else statement"
 
 assign :: (TokenParsing m, Monad m) => m (Core Name)
-assign = fmap Core . (:=) <$> try (lvalue <* symbolic '=') <*> core <?> "assignment"
+assign = (:=) <$> try (lvalue <* symbolic '=') <*> core <?> "assignment"
 
 edge :: (TokenParsing m, Monad m) => m (Core Name)
-edge = kw <*> expr where kw = choice [ Core.edge Lexical <$ reserved "lexical"
-                                     , Core.edge Import  <$ reserved "import"
-                                     , Core.load         <$ reserved "load"
+edge = kw <*> expr where kw = choice [ Edge Lexical <$ reserved "lexical"
+                                     , Edge Import  <$ reserved "import"
+                                     , Load         <$ reserved "load"
                                      ]
 
 lvalue :: (TokenParsing m, Monad m) => m (Core Name)
 lvalue = choice
-  [ let' <$ reserved "let" <*> name
+  [ Let <$ reserved "let" <*> name
   , ident
   , parens expr
   ]
@@ -100,10 +99,10 @@ name = choice [regular, strpath] <?> "name" where
 
 lit :: (TokenParsing m, Monad m) => m (Core Name)
 lit = let x `given` n = x <$ reserved n in choice
-  [ Core.bool True  `given` "#true"
-  , Core.bool False `given` "#false"
-  , Core.unit       `given` "#unit"
-  , Core.frame      `given` "#frame"
+  [ Bool True  `given` "#true"
+  , Bool False `given` "#false"
+  , Unit       `given` "#unit"
+  , Frame      `given` "#frame"
   , lambda
   ] <?> "literal"
 
