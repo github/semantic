@@ -216,26 +216,27 @@ efold :: forall l m n z b
       -> (l b -> m (z b))
       -> Core (l b)
       -> n (z b)
-efold var let' seq' lam app unit bool if' string load edge frame dot assign ann k = eiter var alg
-  where alg :: forall x l' c z' . (forall a b . Coercible a b => Coercible (c a) (c b)) => (forall l'' z'' x . (l'' x -> m (z'' x)) -> c (l'' x) -> n (z'' x)) -> (l' x -> m (z' x)) -> CoreF c (l' x) -> n (z' x)
-        alg go h = \case
-          LetF a -> let' a
-          a :>>$ b -> go h a `seq'` go h b
-          LamF b -> lam (coerce (go
-                      (coerce (k . fmap (go h))
-                        :: (Incr :.: c :.: l') x -> m ((Incr :.: n :.: z') x))
-                      (coerce b)))
-          a :$$ b -> go h a `app` go h b
-          UnitF -> unit
-          BoolF b -> bool b
-          IfF c t e -> if' (go h c) (go h t) (go h e)
-          StringF s -> string s
-          LoadF t -> load (go h t)
-          EdgeF e t -> edge e (go h t)
-          FrameF -> frame
-          a :.$ b -> go h a `dot` go h b
-          a :=$ b -> go h a `assign` go h b
-          AnnF loc t -> ann loc (go h t)
+efold var let' seq' lam app unit bool if' string load edge frame dot assign ann k = go
+  where go :: forall x l' z' . (l' x -> m (z' x)) -> Core (l' x) -> n (z' x)
+        go h = \case
+          Var a -> var (h a)
+          Let a -> let' a
+          a :>> b -> go h a `seq'` go h b
+          Lam b -> lam (coerce (go
+                     (coerce (k . fmap (go h))
+                       :: (Incr :.: Core :.: l') x -> m ((Incr :.: n :.: z') x))
+                     (coerce b)))
+          a :$ b -> go h a `app` go h b
+          Unit -> unit
+          Bool b -> bool b
+          If c t e -> if' (go h c) (go h t) (go h e)
+          String s -> string s
+          Load t -> load (go h t)
+          Edge e t -> edge e (go h t)
+          Frame -> frame
+          a :. b -> go h a `dot` go h b
+          a := b -> go h a `assign` go h b
+          Ann loc t -> ann loc (go h t)
 
 -- | Efficient Mendler-style iteration.
 eiter :: forall l m n z b
