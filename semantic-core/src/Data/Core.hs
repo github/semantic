@@ -28,6 +28,7 @@ import Control.Applicative (Alternative (..), Const (..))
 import Control.Monad (ap)
 import Data.Coerce
 import Data.Foldable (foldl')
+import Data.Functor.Identity
 import Data.List.NonEmpty
 import Data.Loc
 import Data.Name
@@ -75,7 +76,7 @@ instance Applicative Core where
   (<*>) = ap
 
 instance Monad Core where
-  a >>= f = gfold id Let (:>>) Lam (:$) Unit Bool If String Load Edge Frame (:.) (:=) Ann pure (f <$> a)
+  a >>= f = coerce $ efold id Let (:>>) Lam (:$) Unit Bool If String Load Edge Frame (:.) (:=) Ann pure ((coerce `asTypeOf` fmap Const) . f . runIdentity) (coerce a)
 
 
 project :: Core a -> Either a (CoreF Core a)
