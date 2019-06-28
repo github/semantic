@@ -223,7 +223,7 @@ efold var let' seq' lam app unit bool if' string load edge frame dot assign ann 
           a :>>$ b -> go h a `seq'` go h b
           LamF b -> lam (coerce (go
                       (coerce (k . fmap (go h))
-                        :: ((Incr :.: c :.: l') x -> m ((Incr :.: n :.: z') x)))
+                        :: (Incr :.: c :.: l') x -> m ((Incr :.: n :.: z') x))
                       (coerce b)))
           a :$$ b -> go h a `app` go h b
           UnitF -> unit
