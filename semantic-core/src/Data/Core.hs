@@ -248,10 +248,9 @@ efold var let' seq' lam app unit bool if' string load edge frame dot assign ann 
         alg go h = \case
           Let a -> let' a
           a :>> b -> go h a `seq'` go h b
-          Lam b -> lam (coerce ((go :: ((Incr :.: c :.: l') x -> m ((Incr :.: n :.: z') x))
-                                    -> c ((Incr :.: c :.: l') x)
-                                    -> n ((Incr :.: n :.: z') x))
-                     (coerce (k . fmap (go h)))
+          Lam b -> lam (coerce (go
+                     (coerce (k . fmap (go h))
+                       :: ((Incr :.: c :.: l') x -> m ((Incr :.: n :.: z') x)))
                      (fmap coerce b))) -- FIXME: can we avoid this fmap and just coerce harder?
           a :$ b -> go h a `app` go h b
           Unit -> unit
