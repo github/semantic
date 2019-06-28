@@ -17,7 +17,6 @@ module Data.Core
 , unapplies
 , ann
 , annWith
-, gfold
 , efold
 , eiter
 , kfold
@@ -193,44 +192,6 @@ ann = annWith callStack
 annWith :: CallStack -> Core a -> Core a
 annWith callStack c = maybe c (flip Ann c) (stackLoc callStack)
 
-
-gfold :: forall m n b
-      .  (forall a . m a -> n a)
-      -> (forall a . Name -> n a)
-      -> (forall a . n a -> n a -> n a)
-      -> (forall a . n (Incr (n a)) -> n a)
-      -> (forall a . n a -> n a -> n a)
-      -> (forall a . n a)
-      -> (forall a . Bool -> n a)
-      -> (forall a . n a -> n a -> n a -> n a)
-      -> (forall a . Text -> n a)
-      -> (forall a . n a -> n a)
-      -> (forall a . Edge -> n a -> n a)
-      -> (forall a . n a)
-      -> (forall a . n a -> n a -> n a)
-      -> (forall a . n a -> n a -> n a)
-      -> (forall a . Loc -> n a -> n a)
-      -> (forall a . Incr (n a) -> m (Incr (n a)))
-      -> Core (m b)
-      -> n b
-gfold var let' seq' lam app unit bool if' string load edge frame dot assign ann k = go
-  where go :: Core (m x) -> n x
-        go = \case
-          Var a -> var a
-          Let a -> let' a
-          a :>> b -> go a `seq'` go b
-          Lam b -> lam (go (k . fmap go <$> b))
-          f :$ a -> go f `app` go a
-          Unit -> unit
-          Bool b -> bool b
-          If c t e -> if' (go c) (go t) (go e)
-          String s -> string s
-          Load t -> load (go t)
-          Edge e t -> edge e (go t)
-          Frame -> frame
-          a :. b -> go a `dot` go b
-          a := b -> go a `assign` go b
-          Ann loc t -> ann loc (go t)
 
 efold :: forall l m n z b
       .  ( forall a b . Coercible a b => Coercible (n a) (n b)
