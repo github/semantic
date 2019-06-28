@@ -1,5 +1,5 @@
 {-# LANGUAGE DeriveTraversable, FlexibleContexts, LambdaCase, OverloadedStrings, QuantifiedConstraints, RankNTypes, ScopedTypeVariables, StandaloneDeriving,
-             TypeFamilies #-}
+             TypeFamilies, TypeOperators #-}
 module Data.Core
 ( Core(..)
 , CoreF(..)
@@ -27,6 +27,7 @@ module Data.Core
 , ann
 , annWith
 , gfold
+, efold
 , kfold
 , instantiate
 ) where
@@ -40,6 +41,7 @@ import Data.Loc
 import Data.Name
 import Data.Stack
 import Data.Text (Text)
+import GHC.Generics ((:.:) (..))
 import GHC.Stack
 
 data Edge = Lexical | Import
@@ -216,6 +218,52 @@ gfold var let' seq' lam app unit bool if' string load edge frame dot assign ann 
           Core (a :. b) -> go a `dot` go b
           Core (a := b) -> go a `assign` go b
           Core (Ann loc t) -> ann loc (go t)
+
+efold :: forall l m n z b
+      .  ( forall a b . Coercible a b => Coercible (n a) (n b)
+         , forall a b . Coercible a b => Coercible (m a) (m b)
+         )
+      => (forall a . m a -> n a)
+      -> (forall a . Name -> n a)
+      -> (forall a . n a -> n a -> n a)
+      -> (forall a . n (Incr (n a)) -> n a)
+      -> (forall a . n a -> n a -> n a)
+      -> (forall a . n a)
+      -> (forall a . Bool -> n a)
+      -> (forall a . n a -> n a -> n a -> n a)
+      -> (forall a . Text -> n a)
+      -> (forall a . n a -> n a)
+      -> (forall a . Edge -> n a -> n a)
+      -> (forall a . n a)
+      -> (forall a . n a -> n a -> n a)
+      -> (forall a . n a -> n a -> n a)
+      -> (forall a . Loc -> n a -> n a)
+      -> (forall a . Incr (n a) -> m (Incr (n a)))
+      -> (l b -> m (z b))
+      -> Core (l b)
+      -> n (z b)
+efold var let' seq' lam app unit bool if' string load edge frame dot assign ann k = go
+  where go :: forall l' z' x . (l' x -> m (z' x)) -> Core (l' x) -> n (z' x)
+        go h = \case
+          Var a -> var (h a)
+          Core (Let a) -> let' a
+          Core (a :>> b) -> go h a `seq'` go h b
+          Core (Lam b) -> lam (coerce ((go :: ((Incr :.: Core :.: l') x -> m ((Incr :.: n :.: z') x))
+                                            -> Core ((Incr :.: Core :.: l') x)
+                                            -> n ((Incr :.: n :.: z') x))
+                       (coerce (k . fmap (go h)))
+                       (fmap coerce b))) -- FIXME: can we avoid this fmap and just coerce harder?
+          Core (a :$ b) -> go h a `app` go h b
+          Core Unit -> unit
+          Core (Bool b) -> bool b
+          Core (If c t e) -> if' (go h c) (go h t) (go h e)
+          Core (String s) -> string s
+          Core (Load t) -> load (go h t)
+          Core (Edge e t) -> edge e (go h t)
+          Core Frame -> frame
+          Core (a :. b) -> go h a `dot` go h b
+          Core (a := b) -> go h a `assign` go h b
+          Core (Ann loc t) -> ann loc (go h t)
 
 kfold :: (a -> b)
       -> (Name -> b)
