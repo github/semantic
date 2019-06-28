@@ -255,14 +255,14 @@ efold :: forall l m n z b
       -> Core (l b)
       -> n (z b)
 efold var let' seq' lam app unit bool if' string load edge frame dot assign ann k = eiter var alg
-  where alg :: forall x l' c z' . Functor c => (forall l'' z'' x . (l'' x -> m (z'' x)) -> c (l'' x) -> n (z'' x)) -> (l' x -> m (z' x)) -> CoreF c (l' x) -> n (z' x)
+  where alg :: forall x l' c z' . (forall a b . Coercible a b => Coercible (c a) (c b)) => (forall l'' z'' x . (l'' x -> m (z'' x)) -> c (l'' x) -> n (z'' x)) -> (l' x -> m (z' x)) -> CoreF c (l' x) -> n (z' x)
         alg go h = \case
           LetF a -> let' a
           a :>>$ b -> go h a `seq'` go h b
           LamF b -> lam (coerce (go
                       (coerce (k . fmap (go h))
                         :: ((Incr :.: c :.: l') x -> m ((Incr :.: n :.: z') x)))
-                      (fmap coerce b))) -- FIXME: can we avoid this fmap and just coerce harder?
+                      (coerce b)))
           a :$$ b -> go h a `app` go h b
           UnitF -> unit
           BoolF b -> bool b
@@ -278,7 +278,7 @@ efold var let' seq' lam app unit bool if' string load edge frame dot assign ann 
 -- | Efficient Mendler-style iteration.
 eiter :: forall l m n z b
       .  (forall a . m a -> n a)
-      -> (forall a l' c z' . Functor c => (forall l'' z'' x . (l'' x -> m (z'' x)) -> c (l'' x) -> n (z'' x)) -> (l' a -> m (z' a)) -> CoreF c (l' a) -> n (z' a))
+      -> (forall a l' c z' . (forall a b . Coercible a b => Coercible (c a) (c b)) => (forall l'' z'' x . (l'' x -> m (z'' x)) -> c (l'' x) -> n (z'' x)) -> (l' a -> m (z' a)) -> CoreF c (l' a) -> n (z' a))
       -> (l b -> m (z b))
       -> Core (l b)
       -> n (z b)
