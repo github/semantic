@@ -307,12 +307,3 @@ kfold :: (a -> b)
       -> Core a
       -> b
 kfold var let' seq' lam app unit bool if' string load edge frame dot assign ann k = getConst . gfold (coerce var) (coerce let') (coerce seq') (coerce lam) (coerce app) (coerce unit) (coerce bool) (coerce if') (coerce string) (coerce load) (coerce edge) (coerce frame) (coerce dot) (coerce assign) (coerce ann) (coerce k) . fmap Const
-
-
--- | Bind occurrences of a name in a 'Core' term, producing a 'Core' in which the name is bound.
-bind :: Eq a => a -> Core a -> Core (Incr (Core a))
-bind name = fmap (fmap pure . match name)
-
--- | Substitute a 'Core' term for the free variable in a given 'Core', producing a closed 'Core' term.
-instantiate :: Core a -> Core (Incr (Core a)) -> Core a
-instantiate t b = b >>= subst t
