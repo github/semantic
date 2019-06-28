@@ -2,9 +2,6 @@
              ScopedTypeVariables, StandaloneDeriving, TypeFamilies, TypeOperators #-}
 module Data.Core
 ( Core(..)
-, project
-, embed
-, CoreF(..)
 , Edge(..)
 , block
 , lam
@@ -18,7 +15,6 @@ module Data.Core
 , ann
 , annWith
 , efold
-, eiter
 , kfold
 , instantiate
 ) where
@@ -76,74 +72,6 @@ instance Applicative Core where
 
 instance Monad Core where
   a >>= f = coerce $ efold id Let (:>>) Lam (:$) Unit Bool If String Load Edge Frame (:.) (:=) Ann pure ((coerce `asTypeOf` fmap Const) . f . runIdentity) (coerce a)
-
-
-project :: Core a -> Either a (CoreF Core a)
-project (Var a)    = Left a
-project (Let n)    = Right (LetF n)
-project (a :>> b)  = Right (a :>>$ b)
-project (Lam b)    = Right (LamF b)
-project (f :$ a)   = Right (f :$$ a)
-project Unit       = Right UnitF
-project (Bool b)   = Right (BoolF b)
-project (If c t e) = Right (IfF c t e)
-project (String s) = Right (StringF s)
-project (Load b)   = Right (LoadF b)
-project (Edge e b) = Right (EdgeF e b)
-project Frame      = Right FrameF
-project (a :. b)   = Right (a :.$ b)
-project (a := b)   = Right (a :=$ b)
-project (Ann l b)  = Right (AnnF l b)
-
-embed :: Either a (CoreF Core a) -> Core a
-embed = either Var $ \case
-  LetF n -> Let n
-  a :>>$ b -> a :>> b
-  LamF b -> Lam b
-  f :$$ a -> f :$ a
-  UnitF -> Unit
-  BoolF b -> Bool b
-  IfF c t e -> If c t e
-  StringF s -> String s
-  LoadF b -> Load b
-  EdgeF e b -> Edge e b
-  FrameF -> Frame
-  a :.$ b -> a :. b
-  a :=$ b -> a := b
-  AnnF l b -> Ann l b
-
-
-data CoreF f a
-  = LetF Name
-  -- | Sequencing without binding; analogous to '>>' or '*>'.
-  | f a :>>$ f a
-  | LamF (f (Incr (f a)))
-  -- | Function application; analogous to '$'.
-  | f a :$$ f a
-  | UnitF
-  | BoolF Bool
-  | IfF (f a) (f a) (f a)
-  | StringF Text
-  -- | Load the specified file (by path).
-  | LoadF (f a)
-  | EdgeF Edge (f a)
-  -- | Allocation of a new frame.
-  | FrameF
-  | f a :.$ f a
-  -- | Assignment of a value to the reference returned by the lhs.
-  | f a :=$ f a
-  | AnnF Loc (f a)
-  deriving (Foldable, Functor, Traversable)
-
-deriving instance (Eq   a, forall x . Eq   x => Eq   (f x)) => Eq   (CoreF f a)
-deriving instance (Ord  a, forall x . Eq   x => Eq   (f x)
-                         , forall x . Ord  x => Ord  (f x)) => Ord  (CoreF f a)
-deriving instance (Show a, forall x . Show x => Show (f x)) => Show (CoreF f a)
-
-infixl 2 :$$
-infixr 1 :>>$
-infix  3 :=$
-infixl 4 :.$
 
 
 block :: Foldable t => t (Core a) -> Core a
@@ -237,19 +165,6 @@ efold var let' seq' lam app unit bool if' string load edge frame dot assign ann 
           a :. b -> go h a `dot` go h b
           a := b -> go h a `assign` go h b
           Ann loc t -> ann loc (go h t)
-
--- | Efficient Mendler-style iteration.
-eiter :: forall l m n z b
-      .  (forall a . m a -> n a)
-      -> (forall a l' c z' . (forall a b . Coercible a b => Coercible (c a) (c b)) => (forall l'' z'' x . (l'' x -> m (z'' x)) -> c (l'' x) -> n (z'' x)) -> (l' a -> m (z' a)) -> CoreF c (l' a) -> n (z' a))
-      -> (l b -> m (z b))
-      -> Core (l b)
-      -> n (z b)
-eiter var alg = go
-  where go :: forall l' z' x . (l' x -> m (z' x)) -> Core (l' x) -> n (z' x)
-        go h c = case project c of
-          Left a  -> var (h a)
-          Right b -> alg go h b
 
 kfold :: (a -> b)
       -> (Name -> b)
