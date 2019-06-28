@@ -243,28 +243,27 @@ efold :: forall l m n z b
       -> (l b -> m (z b))
       -> Core (l b)
       -> n (z b)
-efold var let' seq' lam app unit bool if' string load edge frame dot assign ann k = go
-  where go :: forall l' z' x . (l' x -> m (z' x)) -> Core (l' x) -> n (z' x)
-        go h = \case
-          Var a -> var (h a)
-          Core (Let a) -> let' a
-          Core (a :>> b) -> go h a `seq'` go h b
-          Core (Lam b) -> lam (coerce ((go :: ((Incr :.: Core :.: l') x -> m ((Incr :.: n :.: z') x))
-                                            -> Core ((Incr :.: Core :.: l') x)
-                                            -> n ((Incr :.: n :.: z') x))
-                       (coerce (k . fmap (go h)))
-                       (fmap coerce b))) -- FIXME: can we avoid this fmap and just coerce harder?
-          Core (a :$ b) -> go h a `app` go h b
-          Core Unit -> unit
-          Core (Bool b) -> bool b
-          Core (If c t e) -> if' (go h c) (go h t) (go h e)
-          Core (String s) -> string s
-          Core (Load t) -> load (go h t)
-          Core (Edge e t) -> edge e (go h t)
-          Core Frame -> frame
-          Core (a :. b) -> go h a `dot` go h b
-          Core (a := b) -> go h a `assign` go h b
-          Core (Ann loc t) -> ann loc (go h t)
+efold var let' seq' lam app unit bool if' string load edge frame dot assign ann k = eiter var alg
+  where alg :: forall x l' n' z' . Functor n' => (forall l'' z'' x . (l'' x -> m (z'' x)) -> n' (l'' x) -> n (z'' x)) -> (l' x -> m (z' x)) -> CoreF n' (l' x) -> n (z' x)
+        alg go h = \case
+          Let a -> let' a
+          a :>> b -> go h a `seq'` go h b
+          Lam b -> lam (coerce ((go :: ((Incr :.: n' :.: l') x -> m ((Incr :.: n :.: z') x))
+                                    -> n' ((Incr :.: n' :.: l') x)
+                                    -> n ((Incr :.: n :.: z') x))
+                     (coerce (k . fmap (go h)))
+                     (fmap coerce b))) -- FIXME: can we avoid this fmap and just coerce harder?
+          a :$ b -> go h a `app` go h b
+          Unit -> unit
+          Bool b -> bool b
+          If c t e -> if' (go h c) (go h t) (go h e)
+          String s -> string s
+          Load t -> load (go h t)
+          Edge e t -> edge e (go h t)
+          Frame -> frame
+          a :. b -> go h a `dot` go h b
+          a := b -> go h a `assign` go h b
+          Ann loc t -> ann loc (go h t)
 
 -- | Efficient Mendler-style iteration.
 eiter :: forall l m n z b
