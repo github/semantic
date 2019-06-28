@@ -306,4 +306,4 @@ kfold :: (a -> b)
       -> (Incr b -> a)
       -> Core a
       -> b
-kfold var let' seq' lam app unit bool if' string load edge frame dot assign ann k = getConst . gfold (coerce var) (coerce let') (coerce seq') (coerce lam) (coerce app) (coerce unit) (coerce bool) (coerce if') (coerce string) (coerce load) (coerce edge) (coerce frame) (coerce dot) (coerce assign) (coerce ann) (coerce k) . (coerce `asTypeOf` fmap Const)
+kfold var let' seq' lam app unit bool if' string load edge frame dot assign ann k = getConst . efold (Const . var . getConst) (coerce let') (coerce seq') (coerce lam) (coerce app) (coerce unit) (coerce bool) (coerce if') (coerce string) (coerce load) (coerce edge) (coerce frame) (coerce dot) (coerce assign) (coerce ann) (coerce k) coerce . (coerce `asTypeOf` fmap Const)
