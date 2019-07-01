@@ -1,23 +1,42 @@
 {-# LANGUAGE DefaultSignatures, DeriveGeneric, FlexibleContexts, FlexibleInstances, RecordWildCards, StandaloneDeriving, TypeOperators #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Language.Python.Core
-( compile
+( Compile
+, compile
 ) where
 
 import           Control.Monad.Fail
 import           Data.Core as Core
+import           Data.Name (Name)
 import           Data.Name as Name
 import           GHC.Generics
 import           Prelude hiding (fail)
 import qualified TreeSitter.Python.AST as Py
 
+-- We can separate syntax nodes into several classes:
+-- user references (Var)
+-- user assignments (Let)
+-- user definitions (Frame and :.)
+-- simple values (Unit and :$)
+-- preluded values, language builtins provided by Prelude
+-- local control flow (for, while, continue, anything that stays within a scope)
+-- external control flow (exception throwing, handling, await, yield, eval)
+-- package relations (creation of a new module, import)
+-- irresolvable
+
+class MonadFail m => MonadPrelude m where
+  lookupBuiltin :: Name -> m Core
+
+instance MonadPrelude Maybe where
+  lookupBuiltin = const Nothing
+
 class Compile t where
   -- FIXME: we should really try not to fail
-  compile :: MonadFail m => t -> m Core
-  default compile :: (MonadFail m, Show t) => t -> m Core
+  compile :: MonadPrelude m => t -> m Core
+  default compile :: (MonadPrelude m, Show t) => t -> m Core
   compile = defaultCompile
 
-defaultCompile :: (MonadFail m, Show t) => t -> m Core
+defaultCompile :: (MonadPrelude m, Show t) => t -> m Core
 defaultCompile t = fail $ "compilation unimplemented for " <> show t
 
 instance (Compile l, Compile r) => Compile (Either l r) where compile = compileSum
@@ -49,7 +68,7 @@ instance Compile Py.Expression where compile = compileSum
 
 instance Compile Py.ExpressionStatement
 
-instance Compile Py.False where compile _ = pure (Bool False)
+instance Compile Py.False where compile _ = lookupBuiltin (User "False")
 
 instance Compile Py.Float
 instance Compile Py.ForStatement
@@ -115,9 +134,10 @@ instance Compile Py.SetComprehension
 instance Compile Py.SimpleStatement where compile = compileSum
 
 instance Compile Py.String
+
 instance Compile Py.Subscript
 
-instance Compile Py.True where compile _ = pure (Bool True)
+instance Compile Py.True where compile _ = lookupBuiltin (User "True")
 
 instance Compile Py.TryStatement
 instance Compile Py.Tuple
@@ -126,11 +146,11 @@ instance Compile Py.WhileStatement
 instance Compile Py.WithStatement
 
 
-compileSum :: (Generic t, GCompileSum (Rep t), MonadFail m) => t -> m Core
+compileSum :: (Generic t, GCompileSum (Rep t), MonadPrelude m) => t -> m Core
 compileSum = gcompileSum . from
 
 class GCompileSum f where
-  gcompileSum :: MonadFail m => f a -> m Core
+  gcompileSum :: MonadPrelude m => f a -> m Core
 
 instance GCompileSum f => GCompileSum (M1 D d f) where
   gcompileSum (M1 f) = gcompileSum f

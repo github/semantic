@@ -33,6 +33,7 @@ library
                      , Data.Loc
                      , Data.Name
                      , Data.Stack
+                     , Language.Preface
   -- other-modules:
   -- other-extensions:
   build-depends:       algebraic-graphs            ^>= 0.3
