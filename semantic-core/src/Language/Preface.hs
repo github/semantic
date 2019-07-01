@@ -20,20 +20,21 @@ module Language.Preface
 
 import Control.Effect.Carrier
 import Control.Effect.Sum
+import Data.Text (Text)
 import GHC.Stack
 import Unsafe.Coerce
 
 data Preface m k
-  = forall a. Def CallStack String (m a) (a -> k)
-  | forall a. Klass CallStack String (m a) (a -> k)
-  | forall a. Method CallStack String [String] (m a) (a -> k)
-  | forall a. Open String (m a) (a -> k)
-  | Metaclass CallStack String k
-  | Inherit String k
+  = forall a. Def CallStack Text (m a) (a -> k)
+  | forall a. Klass CallStack Text (m a) (a -> k)
+  | forall a. Method CallStack Text [Text] (m a) (a -> k)
+  | forall a. Open Text (m a) (a -> k)
+  | Metaclass CallStack Text k
+  | Inherit Text k
   | Frame k
-  | Call String String [String] k
-  | New String k
-  | Var String k
+  | Call Text Text [Text] k
+  | New Text k
+  | Var Text k
 
 deriving instance Functor (Preface m)
 
@@ -57,32 +58,32 @@ instance Effect Preface where
   handle state handler (New s k) = New s (handler (k <$ state))
   handle state handler (Var s k) = Var s (handler (k <$ state))
 
-def :: (HasCallStack, Member Preface sig, Carrier sig m) => String -> m a -> m a
+def :: (HasCallStack, Member Preface sig, Carrier sig m) => Text -> m a -> m a
 def n m = withFrozenCallStack $ send (Def callStack n m pure)
 
-klass :: (HasCallStack, Member Preface sig, Carrier sig m) => String -> m a -> m a
+klass :: (HasCallStack, Member Preface sig, Carrier sig m) => Text -> m a -> m a
 klass n m = withFrozenCallStack $ send (Klass callStack n m pure)
 
-method :: (HasCallStack, Member Preface sig, Carrier sig m) => String -> [String] -> m a -> m a
+method :: (HasCallStack, Member Preface sig, Carrier sig m) => Text -> [Text] -> m a -> m a
 method n ps m = withFrozenCallStack $ send (Method callStack n ps m pure)
 
-open :: (Member Preface sig, Carrier sig m) => String -> m a -> m a
+open :: (Member Preface sig, Carrier sig m) => Text -> m a -> m a
 open n m = send (Open n m pure)
 
-metaclass :: (HasCallStack, Member Preface sig, Carrier sig m) => String -> m ()
+metaclass :: (HasCallStack, Member Preface sig, Carrier sig m) => Text -> m ()
 metaclass n = withFrozenCallStack $ send (Metaclass callStack n (pure ()))
 
-inherit :: (Member Preface sig, Carrier sig m) => String -> m ()
+inherit :: (Member Preface sig, Carrier sig m) => Text -> m ()
 inherit n = send (Inherit n (pure ()))
 
 frame :: (Member Preface sig, Carrier sig m) => m ()
 frame = send (Frame (pure ()))
 
-call :: (Member Preface sig, Carrier sig m) => String -> String -> [String] -> m ()
+call :: (Member Preface sig, Carrier sig m) => Text -> Text -> [Text] -> m ()
 call l r args = send (Call l r args (pure ()))
 
-new :: (Member Preface sig, Carrier sig m) => String -> m ()
+new :: (Member Preface sig, Carrier sig m) => Text -> m ()
 new n = send (New n (pure ()))
 
-var :: (Member Preface sig, Carrier sig m) => String -> m ()
+var :: (Member Preface sig, Carrier sig m) => Text -> m ()
 var n = send (Var n (pure ()))

@@ -26,6 +26,7 @@ library
   -- other-modules:
   -- other-extensions:
   build-depends:       base ^>=4.12.0.0
+                     , containers >= 0.6
                      , semantic-core ^>= 0.0.0.0
                      , hedgehog ^>= 1
                      , tree-sitter ^>= 0.1.0.0
