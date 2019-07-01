@@ -4,6 +4,7 @@ WORKDIR /build
 # Build and cache the dependencies first so we can cache these layers.
 COPY semantic.cabal .
 COPY semantic-core semantic-core
+COPY cabal.project.release-build.freeze cabal.project.freeze
 RUN cabal new-update hackage.haskell.org,HEAD
 RUN cabal new-configure semantic semantic-core
 RUN cabal new-build --only-dependencies
