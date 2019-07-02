@@ -3,6 +3,7 @@ module Data.Name
 ( User
 , Namespaced
 , Name(..)
+, Named(..)
 , reservedNames
 , isSimpleCharacter
 , needsQuotation
@@ -63,6 +64,14 @@ instance Pretty Name where
   pretty = \case
     Gen p  -> pretty p
     User n -> pretty n
+
+
+newtype Named = Named User
+  deriving (Show)
+
+instance Eq  Named where _ == _ = True
+instance Ord Named where compare _ _ = EQ
+
 
 reservedNames :: HashSet String
 reservedNames = [ "#true", "#false", "let", "#frame", "if", "then", "else"
