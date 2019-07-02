@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveTraversable, ExistentialQuantification, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, LambdaCase, MultiParamTypeClasses, OverloadedLists, OverloadedStrings, QuantifiedConstraints, StandaloneDeriving, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DeriveTraversable, ExistentialQuantification, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, LambdaCase, MultiParamTypeClasses, OverloadedLists, OverloadedStrings, QuantifiedConstraints, RankNTypes, StandaloneDeriving, TypeOperators, UndecidableInstances #-}
 module Data.Name
 ( User
 , Namespaced
@@ -16,6 +16,7 @@ module Data.Name
 , Incr(..)
 , incr
 , Scope(..)
+, foldScope
 , bind
 , instantiate
 ) where
@@ -177,6 +178,13 @@ instance Monad f => Monad (Scope f) where
 
 instance MonadTrans Scope where
   lift = Scope . pure . S
+
+foldScope :: (forall a . Incr (n a) -> m (Incr (n a)))
+          -> (forall x y . (x -> m y) -> f x -> n y)
+          -> (a -> m b)
+          -> Scope f a
+          -> Scope n b
+foldScope k go h = Scope . go (k . fmap (go h)) . unScope
 
 -- | Bind occurrences of a variable in a term, producing a term in which the variable is bound.
 bind :: (Applicative f, Eq a) => a -> f a -> f (Incr (f a))
