@@ -203,40 +203,10 @@ iter var alg k = go
             a := b -> alg (go h a := go h b)
             Ann loc t -> alg (Ann loc (go h t))
 
-cata :: forall a b x
-     .  (a -> b)
-     -> (Name -> b)
-     -> (b -> b -> b)
-     -> (b -> b)
-     -> (b -> b -> b)
-     -> b
-     -> (Bool -> b)
-     -> (b -> b -> b -> b)
-     -> (Text -> b)
-     -> (b -> b)
-     -> (Edge -> b -> b)
-     -> b
-     -> (b -> b -> b)
-     -> (b -> b -> b)
-     -> (Loc -> b -> b)
+cata :: (a -> b)
+     -> (forall a . CoreF (Const b) a -> b)
      -> (Incr b -> a)
      -> (x -> a)
      -> Core x
      -> b
-cata var let' seq' lam app unit bool if' string load edge frame dot assign ann k h = getConst . iter (Const . var . getConst) (coerce alg) (coerce k) (Const . h)
-  where alg :: CoreF (Const b) z -> b
-        alg = \case
-          Let n -> let' n
-          Const a :>> Const b -> a `seq'` b
-          Lam (Scope (Const b)) -> lam b
-          Const a :$ Const b -> a `app` b
-          Unit -> unit
-          Bool b -> bool b
-          If (Const c) (Const t) (Const e) -> if' c t e
-          String s -> string s
-          Load (Const b) -> load b
-          Edge e (Const b) -> edge e b
-          Frame -> frame
-          Const a :. Const b -> a `dot` b
-          Const a := Const b -> a `assign` b
-          Ann l (Const b) -> ann l b
+cata var alg k h = getConst . iter (coerce var) (coerce alg) (coerce k) (Const . h)
