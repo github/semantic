@@ -27,7 +27,7 @@ module Data.Core
 , ann
 , annWith
 , iter
-, kfold
+, cata
 , instantiate
 ) where
 
@@ -203,27 +203,27 @@ iter var alg k = go
             a := b -> alg (go h a := go h b)
             Ann loc t -> alg (Ann loc (go h t))
 
-kfold :: forall a b x
-      .  (a -> b)
-      -> (Name -> b)
-      -> (b -> b -> b)
-      -> (b -> b)
-      -> (b -> b -> b)
-      -> b
-      -> (Bool -> b)
-      -> (b -> b -> b -> b)
-      -> (Text -> b)
-      -> (b -> b)
-      -> (Edge -> b -> b)
-      -> b
-      -> (b -> b -> b)
-      -> (b -> b -> b)
-      -> (Loc -> b -> b)
-      -> (Incr b -> a)
-      -> (x -> a)
-      -> Core x
-      -> b
-kfold var let' seq' lam app unit bool if' string load edge frame dot assign ann k h = getConst . iter (Const . var . getConst) (coerce alg) (coerce k) (Const . h)
+cata :: forall a b x
+     .  (a -> b)
+     -> (Name -> b)
+     -> (b -> b -> b)
+     -> (b -> b)
+     -> (b -> b -> b)
+     -> b
+     -> (Bool -> b)
+     -> (b -> b -> b -> b)
+     -> (Text -> b)
+     -> (b -> b)
+     -> (Edge -> b -> b)
+     -> b
+     -> (b -> b -> b)
+     -> (b -> b -> b)
+     -> (Loc -> b -> b)
+     -> (Incr b -> a)
+     -> (x -> a)
+     -> Core x
+     -> b
+cata var let' seq' lam app unit bool if' string load edge frame dot assign ann k h = getConst . iter (Const . var . getConst) (coerce alg) (coerce k) (Const . h)
   where alg :: CoreF (Const b) z -> b
         alg = \case
           Let n -> let' n

@@ -69,7 +69,7 @@ encloseIf True  l r x = l <> x <> r
 encloseIf False _ _ x = x
 
 prettify' :: Style -> Core Name -> AnsiDoc
-prettify' style core = kfold var let' seq' lam app unit bool if' string load edge frame dot assign ann k (const . name) core (0 :: Int) (pred (0 :: Int))
+prettify' style core = cata var let' seq' lam app unit bool if' string load edge frame dot assign ann k (const . name) core (0 :: Int) (pred (0 :: Int))
   where var = const
         let' a _ _ = keyword "let" <+> name a
         seq' a b prec v =
