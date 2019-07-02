@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveTraversable, FlexibleContexts, LambdaCase, OverloadedStrings, QuantifiedConstraints, RankNTypes,
+{-# LANGUAGE DeriveTraversable, FlexibleContexts, LambdaCase, OverloadedStrings, RankNTypes,
              ScopedTypeVariables, StandaloneDeriving, TypeFamilies, TypeOperators #-}
 module Data.Core
 ( Core(..)
@@ -23,13 +23,11 @@ import Control.Applicative (Alternative (..), Const (..))
 import Control.Monad (ap)
 import Data.Coerce
 import Data.Foldable (foldl')
-import Data.Functor.Identity
 import Data.List.NonEmpty
 import Data.Loc
 import Data.Name
 import Data.Stack
 import Data.Text (Text)
-import GHC.Generics ((:.:) (..))
 import GHC.Stack
 
 data Edge = Lexical | Import
@@ -71,7 +69,7 @@ instance Applicative Core where
   (<*>) = ap
 
 instance Monad Core where
-  a >>= f = coerce $ efold id Let (:>>) Lam (:$) Unit Bool If String Load Edge Frame (:.) (:=) Ann pure ((coerce `asTypeOf` fmap Const) . f . runIdentity) (coerce a)
+  a >>= f = efold id Let (:>>) Lam (:$) Unit Bool If String Load Edge Frame (:.) (:=) Ann pure f a
 
 
 block :: Foldable t => t (Core a) -> Core a
@@ -121,11 +119,8 @@ annWith :: CallStack -> Core a -> Core a
 annWith callStack c = maybe c (flip Ann c) (stackLoc callStack)
 
 
-efold :: forall l m n z b
-      .  ( forall a b . Coercible a b => Coercible (n a) (n b)
-         , forall a b . Coercible a b => Coercible (m a) (m b)
-         )
-      => (forall a . m a -> n a)
+efold :: forall m n a b
+      .  (forall a . m a -> n a)
       -> (forall a . Name -> n a)
       -> (forall a . n a -> n a -> n a)
       -> (forall a . n (Incr (n a)) -> n a)
@@ -141,19 +136,16 @@ efold :: forall l m n z b
       -> (forall a . n a -> n a -> n a)
       -> (forall a . Loc -> n a -> n a)
       -> (forall a . Incr (n a) -> m (Incr (n a)))
-      -> (l b -> m (z b))
-      -> Core (l b)
-      -> n (z b)
+      -> (a -> m b)
+      -> Core a
+      -> n b
 efold var let' seq' lam app unit bool if' string load edge frame dot assign ann k = go
-  where go :: forall x l' z' . (l' x -> m (z' x)) -> Core (l' x) -> n (z' x)
+  where go :: forall x y . (x -> m y) -> Core x -> n y
         go h = \case
           Var a -> var (h a)
           Let a -> let' a
           a :>> b -> go h a `seq'` go h b
-          Lam b -> lam (coerce (go
-                     (coerce (k . fmap (go h))
-                       :: (Incr :.: Core :.: l') x -> m ((Incr :.: n :.: z') x))
-                     (coerce b)))
+          Lam b -> lam (go (k . fmap (go h)) b)
           a :$ b -> go h a `app` go h b
           Unit -> unit
           Bool b -> bool b
@@ -182,6 +174,7 @@ kfold :: (a -> b)
       -> (b -> b -> b)
       -> (Loc -> b -> b)
       -> (Incr b -> a)
-      -> Core a
+      -> (x -> a)
+      -> Core x
       -> b
-kfold var let' seq' lam app unit bool if' string load edge frame dot assign ann k = getConst . efold (Const . var . getConst) (coerce let') (coerce seq') (coerce lam) (coerce app) (coerce unit) (coerce bool) (coerce if') (coerce string) (coerce load) (coerce edge) (coerce frame) (coerce dot) (coerce assign) (coerce ann) (coerce k) coerce . (coerce `asTypeOf` fmap Const)
+kfold var let' seq' lam app unit bool if' string load edge frame dot assign ann k h = getConst . efold (Const . var . getConst) (coerce let') (coerce seq') (coerce lam) (coerce app) (coerce unit) (coerce bool) (coerce if') (coerce string) (coerce load) (coerce edge) (coerce frame) (coerce dot) (coerce assign) (coerce ann) (coerce k) (Const . h)
