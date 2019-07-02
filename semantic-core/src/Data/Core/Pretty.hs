@@ -43,14 +43,6 @@ type Prec = Int
 
 data Style = Unicode | Ascii
 
-lambda, arrow :: (Member (Reader Style) sig, Carrier sig m) => m AnsiDoc
-lambda = ask @Style >>= \case
-  Unicode -> pure $ symbol "λ"
-  Ascii   -> pure $ symbol "\\"
-arrow = ask @Style >>= \case
-  Unicode -> pure $ symbol "→"
-  Ascii   -> pure $ symbol "->"
-
 name :: Name -> AnsiDoc
 name = \case
   Gen p  -> pretty p
@@ -112,64 +104,72 @@ prettify' style core = cata var alg k (const . name) core (0 :: Int) (pred (0 ::
           Unicode -> symbol "→"
           Ascii   -> symbol "->"
 
-prettify :: (Member Naming sig, Member (Reader Prec) sig, Member (Reader Style) sig, Carrier sig m)
-         => Core Name
+prettify :: (Member Naming sig, Member (Reader Prec) sig, Carrier sig m)
+         => Style
+         -> Core Name
          -> m AnsiDoc
-prettify = \case
-  Var a -> pure $ name a
-  Core c -> case c of
-    Let a -> pure $ keyword "let" <+> name a
-    a :>> b -> do
-      prec <- ask @Prec
-      fore <- with 12 (prettify a)
-      aft  <- with 12 (prettify b)
+prettify style = go where
+  go = \case
+    Var a -> pure $ name a
+    Core c -> case c of
+      Let a -> pure $ keyword "let" <+> name a
+      a :>> b -> do
+        prec <- ask @Prec
+        fore <- with 12 (go a)
+        aft  <- with 12 (go b)
 
-      let open  = symbol ("{" <> softline)
-          close = symbol (softline <> "}")
-          separator = ";" <> Pretty.line
-          body = fore <> separator <> aft
+        let open  = symbol ("{" <> softline)
+            close = symbol (softline <> "}")
+            separator = ";" <> Pretty.line
+            body = fore <> separator <> aft
 
-      pure . Pretty.align $ encloseIf (12 > prec) open close (Pretty.align body)
+        pure . Pretty.align $ encloseIf (12 > prec) open close (Pretty.align body)
 
-    Lam f  -> inParens 11 $ do
-      x    <- Gen <$> gensym ""
-      body <- prettify (instantiate (pure x) f)
-      lam  <- lambda
-      arr  <- arrow
-      pure (lam <> name x <+> arr <+> body)
+      Lam f  -> inParens 11 $ do
+        x    <- Gen <$> gensym ""
+        body <- go (instantiate (pure x) f)
+        pure (lambda <> name x <+> arrow <+> body)
 
-    Frame    -> pure $ primitive "frame"
-    Unit     -> pure $ primitive "unit"
-    Bool b   -> pure $ primitive (if b then "true" else "false")
-    String s -> pure . strlit $ Pretty.viaShow s
+      Frame    -> pure $ primitive "frame"
+      Unit     -> pure $ primitive "unit"
+      Bool b   -> pure $ primitive (if b then "true" else "false")
+      String s -> pure . strlit $ Pretty.viaShow s
 
-    f :$ x -> inParens 11 $ (<+>) <$> prettify f <*> prettify x
+      f :$ x -> inParens 11 $ (<+>) <$> go f <*> go x
 
-    If con tru fal -> do
-      con' <- "if"   `appending` prettify con
-      tru' <- "then" `appending` prettify tru
-      fal' <- "else" `appending` prettify fal
-      pure $ Pretty.sep [con', tru', fal']
+      If con tru fal -> do
+        con' <- "if"   `appending` go con
+        tru' <- "then" `appending` go tru
+        fal' <- "else" `appending` go fal
+        pure $ Pretty.sep [con', tru', fal']
 
-    Load p   -> "load" `appending` prettify p
-    Edge Lexical n -> "lexical" `appending` prettify n
-    Edge Import n -> "import" `appending` prettify n
-    item :. body   -> inParens 5 $ do
-      f <- prettify item
-      g <- prettify body
-      pure (f <> symbol "." <> g)
+      Load p   -> "load" `appending` go p
+      Edge Lexical n -> "lexical" `appending` go n
+      Edge Import n -> "import" `appending` go n
+      item :. body   -> inParens 5 $ do
+        f <- go item
+        g <- go body
+        pure (f <> symbol "." <> g)
 
-    lhs := rhs -> inParens 4 $ do
-      f <- prettify lhs
-      g <- prettify rhs
-      pure (f <+> symbol "=" <+> g)
+      lhs := rhs -> inParens 4 $ do
+        f <- go lhs
+        g <- go rhs
+        pure (f <+> symbol "=" <+> g)
 
-    -- Annotations are not pretty-printed, as it lowers the signal/noise ratio too profoundly.
-    Ann _ c -> prettify c
+      -- Annotations are not pretty-printed, as it lowers the signal/noise ratio too profoundly.
+      Ann _ c -> go c
+
+  lambda = case style of
+    Unicode -> symbol "λ"
+    Ascii   -> symbol "\\"
+  arrow = case style of
+    Unicode -> symbol "→"
+    Ascii   -> symbol "->"
+
 
 appending :: Functor f => AnsiDoc -> f AnsiDoc -> f AnsiDoc
 appending k item = (keyword k <+>) <$> item
 
 prettyCore :: Style -> Core Name -> AnsiDoc
-prettyCore s = run . runNaming (Root "prettyCore") . runReader @Prec 0 . runReader s . prettify
+prettyCore s = run . runNaming (Root "prettyCore") . runReader @Prec 0 . prettify s
 prettyCore s = prettify' s
