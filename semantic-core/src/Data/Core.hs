@@ -173,7 +173,7 @@ ann :: HasCallStack => Core a -> Core a
 ann = annWith callStack
 
 annWith :: CallStack -> Core a -> Core a
-annWith callStack c = maybe c (flip (fmap Core . Ann) c) (stackLoc callStack)
+annWith callStack = maybe id (fmap Core . Ann) (stackLoc callStack)
 
 
 iter :: forall m n a b
