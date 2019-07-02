@@ -111,5 +111,5 @@ instance (Ord vertex, ToJSON vertex, VertexTag vertex) => ToJSON (Graph vertex) 
 newtype Edge vertex = Edge (vertex, vertex)
 
 instance (ToJSON vertex, VertexTag vertex) => ToJSON (Edge vertex) where
-  toJSON     (Edge (a, b)) = object ["source" .= uniqueTag a,   "target" .= uniqueTag b]
-  toEncoding (Edge (a, b)) = pairs  ("source" .= uniqueTag a <> "target" .= uniqueTag b)
+  toJSON     (Edge (a, b)) = object ["source" .= show (uniqueTag a),   "target" .= show (uniqueTag b)]
+  toEncoding (Edge (a, b)) = pairs  ("source" .= show (uniqueTag a) <>  "target" .= show (uniqueTag b))
