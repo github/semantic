@@ -26,7 +26,7 @@ module Data.Core
 , (.=)
 , ann
 , annWith
-, efold
+, iter
 , kfold
 , instantiate
 ) where
@@ -58,7 +58,7 @@ instance Applicative Core where
   (<*>) = ap
 
 instance Monad Core where
-  a >>= f = efold id let' (<>) (Core . Lam) ($$) unit bool if' string load edge frame (...) (.=) (fmap Core . Ann) pure f a
+  a >>= f = iter id Core Var f a
 
 
 data CoreF f a
@@ -176,47 +176,35 @@ annWith :: CallStack -> Core a -> Core a
 annWith callStack c = maybe c (flip (fmap Core . Ann) c) (stackLoc callStack)
 
 
-efold :: forall m n a b
-      .  (forall a . m a -> n a)
-      -> (forall a . Name -> n a)
-      -> (forall a . n a -> n a -> n a)
-      -> (forall a . Scope n a -> n a)
-      -> (forall a . n a -> n a -> n a)
-      -> (forall a . n a)
-      -> (forall a . Bool -> n a)
-      -> (forall a . n a -> n a -> n a -> n a)
-      -> (forall a . Text -> n a)
-      -> (forall a . n a -> n a)
-      -> (forall a . Edge -> n a -> n a)
-      -> (forall a . n a)
-      -> (forall a . n a -> n a -> n a)
-      -> (forall a . n a -> n a -> n a)
-      -> (forall a . Loc -> n a -> n a)
-      -> (forall a . Incr (n a) -> m (Incr (n a)))
-      -> (a -> m b)
-      -> Core a
-      -> n b
-efold var let' seq' lam app unit bool if' string load edge frame dot assign ann k = go
+iter :: forall m n a b
+     .  (forall a . m a -> n a)
+     -> (forall a . CoreF n a -> n a)
+     -> (forall a . Incr (n a) -> m (Incr (n a)))
+     -> (a -> m b)
+     -> Core a
+     -> n b
+iter var alg k = go
   where go :: forall x y . (x -> m y) -> Core x -> n y
         go h = \case
           Var a -> var (h a)
           Core c -> case c of
-            Let a -> let' a
-            a :>> b -> go h a `seq'` go h b
-            Lam b -> lam (foldScope k go h b)
-            a :$ b -> go h a `app` go h b
-            Unit -> unit
-            Bool b -> bool b
-            If c t e -> if' (go h c) (go h t) (go h e)
-            String s -> string s
-            Load t -> load (go h t)
-            Edge e t -> edge e (go h t)
-            Frame -> frame
-            a :. b -> go h a `dot` go h b
-            a := b -> go h a `assign` go h b
-            Ann loc t -> ann loc (go h t)
+            Let a -> alg (Let a)
+            a :>> b -> alg (go h a :>> go h b)
+            Lam b -> alg (Lam (foldScope k go h b))
+            a :$ b -> alg (go h a :$ go h b)
+            Unit -> alg Unit
+            Bool b -> alg (Bool b)
+            If c t e -> alg (If (go h c) (go h t) (go h e))
+            String s -> alg (String s)
+            Load t -> alg (Load (go h t))
+            Edge e t -> alg (Edge e (go h t))
+            Frame -> alg Frame
+            a :. b -> alg (go h a :. go h b)
+            a := b -> alg (go h a := go h b)
+            Ann loc t -> alg (Ann loc (go h t))
 
-kfold :: (a -> b)
+kfold :: forall a b x
+      .  (a -> b)
       -> (Name -> b)
       -> (b -> b -> b)
       -> (b -> b)
@@ -235,4 +223,20 @@ kfold :: (a -> b)
       -> (x -> a)
       -> Core x
       -> b
-kfold var let' seq' lam app unit bool if' string load edge frame dot assign ann k h = getConst . efold (Const . var . getConst) (coerce let') (coerce seq') (coerce lam) (coerce app) (coerce unit) (coerce bool) (coerce if') (coerce string) (coerce load) (coerce edge) (coerce frame) (coerce dot) (coerce assign) (coerce ann) (coerce k) (Const . h)
+kfold var let' seq' lam app unit bool if' string load edge frame dot assign ann k h = getConst . iter (Const . var . getConst) (coerce alg) (coerce k) (Const . h)
+  where alg :: CoreF (Const b) z -> b
+        alg = \case
+          Let n -> let' n
+          Const a :>> Const b -> a `seq'` b
+          Lam (Scope (Const b)) -> lam b
+          Const a :$ Const b -> a `app` b
+          Unit -> unit
+          Bool b -> bool b
+          If (Const c) (Const t) (Const e) -> if' c t e
+          String s -> string s
+          Load (Const b) -> load b
+          Edge e (Const b) -> edge e b
+          Frame -> frame
+          Const a :. Const b -> a `dot` b
+          Const a := Const b -> a `assign` b
+          Ann l (Const b) -> ann l b
