@@ -28,6 +28,7 @@ import           Control.Effect.Sum
 import           Control.Monad ((>=>))
 import           Control.Monad.Fail
 import           Control.Monad.IO.Class
+import           Control.Monad.Trans.Class
 import qualified Data.Char as Char
 import           Data.Function (on)
 import           Data.HashSet (HashSet)
@@ -173,6 +174,8 @@ instance Applicative f => Applicative (Scope f) where
 instance Monad f => Monad (Scope f) where
   Scope e >>= f = Scope (e >>= incr (pure Z) (>>= unScope . f))
 
+instance MonadTrans Scope where
+  lift = Scope . pure . S
 
 -- | Bind occurrences of a variable in a term, producing a term in which the variable is bound.
 bind :: (Applicative f, Eq a) => a -> f a -> f (Incr (f a))
