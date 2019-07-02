@@ -65,7 +65,7 @@ data CoreF f a
   = Let Name
   -- | Sequencing without binding; analogous to '>>' or '*>'.
   | f a :>> f a
-  | Lam (f (Incr (f a)))
+  | Lam (Scope f a)
   -- | Function application; analogous to '$'.
   | f a :$ f a
   | Unit
@@ -83,10 +83,10 @@ data CoreF f a
   | Ann Loc (f a)
   deriving (Foldable, Functor, Traversable)
 
-deriving instance (Eq   a, forall a . Eq   a => Eq   (f a)) => Eq   (CoreF f a)
+deriving instance (Eq   a, forall a . Eq   a => Eq   (f a), Monad f) => Eq   (CoreF f a)
 deriving instance (Ord  a, forall a . Eq   a => Eq   (f a)
-                         , forall a . Ord  a => Ord  (f a)) => Ord  (CoreF f a)
-deriving instance (Show a, forall a . Show a => Show (f a)) => Show (CoreF f a)
+                         , forall a . Ord  a => Ord  (f a), Monad f) => Ord  (CoreF f a)
+deriving instance (Show a, forall a . Show a => Show (f a))          => Show (CoreF f a)
 
 infixl 2 :$
 infixr 1 :>>
@@ -180,7 +180,7 @@ efold :: forall m n a b
       .  (forall a . m a -> n a)
       -> (forall a . Name -> n a)
       -> (forall a . n a -> n a -> n a)
-      -> (forall a . n (Incr (n a)) -> n a)
+      -> (forall a . Scope n a -> n a)
       -> (forall a . n a -> n a -> n a)
       -> (forall a . n a)
       -> (forall a . Bool -> n a)
@@ -203,7 +203,7 @@ efold var let' seq' lam app unit bool if' string load edge frame dot assign ann 
           Core c -> case c of
             Let a -> let' a
             a :>> b -> go h a `seq'` go h b
-            Lam b -> lam (go (k . fmap (go h)) b)
+            Lam b -> lam (foldScope k go h b)
             a :$ b -> go h a `app` go h b
             Unit -> unit
             Bool b -> bool b

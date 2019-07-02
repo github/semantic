@@ -187,9 +187,9 @@ foldScope :: (forall a . Incr (n a) -> m (Incr (n a)))
 foldScope k go h = Scope . go (k . fmap (go h)) . unScope
 
 -- | Bind occurrences of a variable in a term, producing a term in which the variable is bound.
-bind :: (Applicative f, Eq a) => a -> f a -> f (Incr (f a))
-bind name = fmap (match name)
+bind :: (Applicative f, Eq a) => a -> f a -> Scope f a
+bind name = Scope . fmap (match name)
 
 -- | Substitute a term for the free variable in a given term, producing a closed term.
-instantiate :: Monad f => f a -> f (Incr (f a)) -> f a
-instantiate t b = b >>= fromIncr t
+instantiate :: Monad f => f a -> Scope f a -> f a
+instantiate t = unScope >=> fromIncr t
