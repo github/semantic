@@ -122,8 +122,8 @@ prettify style = \case
 
     pure . Pretty.align $ encloseIf (12 > prec) open close (Pretty.align body)
 
-  Lam (Scope (Const f))  -> inParens 11 . bind $ \ x -> do
-    body <- f
+  Lam f -> inParens 11 $ do
+    (x, body) <- bind f
     pure (lambda <> x <+> arrow <+> body)
 
   Frame    -> pure $ primitive "frame"
@@ -156,7 +156,7 @@ prettify style = \case
   Ann _ (Const c) -> c
   where bind f = do
           x <- name . Gen <$> gensym ""
-          local (x:) (f x)
+          (,) x <$> local (x:) (getConst (unScope f))
         lambda = case style of
           Unicode -> symbol "λ"
           Ascii   -> symbol "\\"
