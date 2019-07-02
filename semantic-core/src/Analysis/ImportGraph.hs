@@ -47,7 +47,7 @@ data Semi
   deriving (Eq, Ord, Show)
 
 
-importGraph :: [File (Core.Core Name)] -> (Heap Value, [File (Either (Loc, String) Value)])
+importGraph :: [File (Core.Core Name)] -> (Heap Name Value, [File (Either (Loc, String) Value)])
 importGraph
   = run
   . runFresh
@@ -60,7 +60,7 @@ runFile :: ( Carrier sig m
            , Member Fresh sig
            , Member Naming sig
            , Member (Reader FrameId) sig
-           , Member (State (Heap Value)) sig
+           , Member (State (Heap Name Value)) sig
            )
         => File (Core.Core Name)
         -> m (File (Either (Loc, String) Value))
@@ -75,7 +75,7 @@ importGraphAnalysis :: ( Alternative m
                        , Carrier sig m
                        , Member (Reader FrameId) sig
                        , Member (Reader Loc) sig
-                       , Member (State (Heap Value)) sig
+                       , Member (State (Heap Name Value)) sig
                        , MonadFail m
                        )
                     => Analysis Name Value m

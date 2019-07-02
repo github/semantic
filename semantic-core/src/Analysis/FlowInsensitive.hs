@@ -20,39 +20,41 @@ import           Data.Monoid (Alt(..))
 import           Data.Name
 import qualified Data.Set as Set
 
-type Cache a = Map.Map (Core.Core Name) (Set.Set a)
-type Heap a = Map.Map Name (Set.Set a)
+type Cache name a = Map.Map (Core.Core name) (Set.Set a)
+type Heap name a = Map.Map name (Set.Set a)
 
 newtype FrameId = FrameId { unFrameId :: Name }
   deriving (Eq, Ord, Show)
 
 
-convergeTerm :: forall m sig a
+convergeTerm :: forall m sig a name
              .  ( Carrier sig m
                 , Effect sig
                 , Member Fresh sig
-                , Member (State (Heap a)) sig
+                , Member (State (Heap name a)) sig
                 , Ord a
+                , Ord name
                 )
-             => (Core.Core Name -> NonDetC (ReaderC (Cache a) (StateC (Cache a) m)) a)
-             -> Core.Core Name
+             => (Core.Core name -> NonDetC (ReaderC (Cache name a) (StateC (Cache name a) m)) a)
+             -> Core.Core name
              -> m (Set.Set a)
 convergeTerm eval body = do
   heap <- get
-  (cache, _) <- converge (Map.empty :: Cache a, heap :: Heap a) $ \ (prevCache, _) -> runState Map.empty . runReader prevCache $ do
+  (cache, _) <- converge (Map.empty :: Cache name a, heap :: Heap name a) $ \ (prevCache, _) -> runState Map.empty . runReader prevCache $ do
     _ <- resetFresh . runNonDetM Set.singleton $ eval body
     get
   pure (fromMaybe mempty (Map.lookup body cache))
 
-cacheTerm :: forall m sig a
+cacheTerm :: forall m sig a name
           .  ( Alternative m
              , Carrier sig m
-             , Member (Reader (Cache a)) sig
-             , Member (State  (Cache a)) sig
+             , Member (Reader (Cache name a)) sig
+             , Member (State  (Cache name a)) sig
              , Ord a
+             , Ord name
              )
-          => (Core.Core Name -> m a)
-          -> (Core.Core Name -> m a)
+          => (Core.Core name -> m a)
+          -> (Core.Core name -> m a)
 cacheTerm eval term = do
   cached <- gets (Map.lookup term)
   case cached :: Maybe (Set.Set a) of
@@ -63,7 +65,7 @@ cacheTerm eval term = do
       result <- eval term
       result <$ modify (Map.insertWith (<>) term (Set.singleton (result :: a)))
 
-runHeap :: (Carrier sig m, Member Naming sig) => ReaderC FrameId (StateC (Heap a) m) b -> m (Heap a, b)
+runHeap :: (Carrier sig m, Member Naming sig) => ReaderC FrameId (StateC (Heap Name a) m) b -> m (Heap Name a, b)
 runHeap m = do
   addr <- Gen <$> gensym "root"
   runState (Map.singleton addr Set.empty) (runReader (FrameId addr) m)

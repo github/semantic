@@ -101,7 +101,7 @@ substIn free bound = go 0
         go i (PRecord fs)           = PRecord (go i <$> fs)
 
 
-typecheckingFlowInsensitive :: [File (Core.Core Name)] -> (Heap (Monotype Meta), [File (Either (Loc, String) Polytype)])
+typecheckingFlowInsensitive :: [File (Core.Core Name)] -> (Heap Name (Monotype Meta), [File (Either (Loc, String) Polytype)])
 typecheckingFlowInsensitive
   = run
   . runFresh
@@ -114,7 +114,7 @@ runFile :: ( Carrier sig m
            , Effect sig
            , Member Fresh sig
            , Member Naming sig
-           , Member (State (Heap (Monotype Meta))) sig
+           , Member (State (Heap Name (Monotype Meta))) sig
            )
         => File (Core.Core Name)
         -> m (File (Either (Loc, String) (Monotype Meta)))
@@ -122,7 +122,7 @@ runFile file = traverse run file
   where run
           = (\ m -> do
               (subst, t) <- m
-              modify @(Heap (Monotype Meta)) (substAll subst)
+              modify @(Heap Name (Monotype Meta)) (substAll subst)
               pure (substAll subst <$> t))
           . runState (mempty :: Substitution)
           . runReader (fileLoc file)
@@ -137,7 +137,7 @@ runFile file = traverse run file
               v <$ for_ bs (unify v))
           . convergeTerm (fix (cacheTerm . eval typecheckingAnalysis))
 
-typecheckingAnalysis :: (Alternative m, Carrier sig m, Member Fresh sig, Member (State (Set.Set Constraint)) sig, Member (State (Heap (Monotype Meta))) sig, MonadFail m) => Analysis Name (Monotype Meta) m
+typecheckingAnalysis :: (Alternative m, Carrier sig m, Member Fresh sig, Member (State (Set.Set Constraint)) sig, Member (State (Heap Name (Monotype Meta))) sig, MonadFail m) => Analysis Name (Monotype Meta) m
 typecheckingAnalysis = Analysis{..}
   where alloc = pure
         bind _ _ = pure ()
