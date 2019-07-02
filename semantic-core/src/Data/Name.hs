@@ -66,6 +66,7 @@ instance Pretty Name where
     User n -> pretty n
 
 
+-- | A newtype around 'User' which doesn’t affect alpha-equivalence. This is ensured by treating all comparisons between 'Named' values as equal.
 newtype Named = Named User
   deriving (Show)
 
