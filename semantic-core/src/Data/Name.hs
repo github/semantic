@@ -15,6 +15,7 @@ module Data.Name
 , NamingC(..)
 , Incr(..)
 , incr
+, Scope(..)
 , bind
 , instantiate
 ) where
