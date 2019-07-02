@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveTraversable, ExistentialQuantification, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, LambdaCase, MultiParamTypeClasses, OverloadedLists, OverloadedStrings,StandaloneDeriving, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DeriveTraversable, ExistentialQuantification, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, LambdaCase, MultiParamTypeClasses, OverloadedLists, OverloadedStrings, QuantifiedConstraints, StandaloneDeriving, TypeOperators, UndecidableInstances #-}
 module Data.Name
 ( User
 , Namespaced
@@ -25,9 +25,11 @@ import           Control.Effect.Carrier
 import           Control.Effect.Reader
 import           Control.Effect.State
 import           Control.Effect.Sum
+import           Control.Monad ((>=>))
 import           Control.Monad.Fail
 import           Control.Monad.IO.Class
 import qualified Data.Char as Char
+import           Data.Function (on)
 import           Data.HashSet (HashSet)
 import qualified Data.HashSet as HashSet
 import           Data.Text as Text (Text, any, unpack)
@@ -141,6 +143,20 @@ subst a = incr a id
 
 incr :: b -> (a -> b) -> Incr a -> b
 incr z s = \case { Z -> z ; S a -> s a }
+
+
+newtype Scope f a = Scope { unScope :: f (Incr (f a)) }
+  deriving (Foldable, Functor, Traversable)
+
+instance (Eq   a, forall a . Eq   a => Eq   (f a), Monad f) => Eq   (Scope f a) where
+  (==) = (==) `on` (unScope >=> sequenceA)
+
+instance (Ord  a, forall a . Eq   a => Eq   (f a)
+                , forall a . Ord  a => Ord  (f a), Monad f) => Ord  (Scope f a) where
+  compare = compare `on` (unScope >=> sequenceA)
+
+deriving instance (Show a, forall a . Show a => Show (f a)) => Show (Scope f a)
+
 
 -- | Bind occurrences of a variable in a term, producing a term in which the variable is bound.
 bind :: (Applicative f, Eq a) => a -> f a -> f (Incr (f a))
