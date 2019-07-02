@@ -138,8 +138,8 @@ match :: (Applicative f, Eq a) => a -> a -> Incr (f a)
 match x y | x == y    = Z
           | otherwise = S (pure y)
 
-subst :: a -> Incr a -> a
-subst a = incr a id
+fromIncr :: a -> Incr a -> a
+fromIncr a = incr a id
 
 incr :: b -> (a -> b) -> Incr a -> b
 incr z s = \case { Z -> z ; S a -> s a }
@@ -164,4 +164,4 @@ bind name = fmap (match name)
 
 -- | Substitute a term for the free variable in a given term, producing a closed term.
 instantiate :: Monad f => f a -> f (Incr (f a)) -> f a
-instantiate t b = b >>= subst t
+instantiate t b = b >>= fromIncr t
