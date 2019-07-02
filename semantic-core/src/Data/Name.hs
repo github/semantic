@@ -6,6 +6,7 @@ module Data.Name
 , reservedNames
 , isSimpleCharacter
 , needsQuotation
+, encloseIf
 , Gensym(..)
 , (//)
 , gensym
@@ -71,6 +72,10 @@ reservedNames = [ "#true", "#false", "let", "#frame", "if", "then", "else"
 -- name conflicts with a Core primitive.
 needsQuotation :: User -> Bool
 needsQuotation u = HashSet.member (unpack u) reservedNames || Text.any (not . isSimpleCharacter) u
+
+encloseIf :: Monoid m => Bool -> m -> m -> m -> m
+encloseIf True  l r x = l <> x <> r
+encloseIf False _ _ x = x
 
 -- | A ‘simple’ character is, loosely defined, a character that is compatible
 -- with identifiers in most ASCII-oriented programming languages. This is defined

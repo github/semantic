@@ -57,10 +57,6 @@ inParens amount go = do
   body <- with amount go
   pure (encloseIf (amount >= prec) (symbol "(") (symbol ")") body)
 
-encloseIf :: Monoid m => Bool -> m -> m -> m -> m
-encloseIf True  l r x = l <> x <> r
-encloseIf False _ _ x = x
-
 prettify :: (Member Naming sig, Member (Reader [AnsiDoc]) sig, Member (Reader Prec) sig, Carrier sig m)
          => Style
          -> CoreF (Const (m AnsiDoc)) a
