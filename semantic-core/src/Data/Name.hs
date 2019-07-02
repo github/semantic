@@ -162,39 +162,39 @@ incr :: (a -> c) -> (b -> c) -> Incr a b -> c
 incr z s = \case { Z a -> z a ; S b -> s b }
 
 
-newtype Scope f a = Scope { unScope :: f (Incr () (f a)) }
+newtype Scope a f b = Scope { unScope :: f (Incr a (f b)) }
   deriving (Foldable, Functor, Traversable)
 
-instance (Eq   a, forall a . Eq   a => Eq   (f a), Monad f) => Eq   (Scope f a) where
+instance (Eq   a, Eq   b, forall a . Eq   a => Eq   (f a), Monad f) => Eq   (Scope a f b) where
   (==) = (==) `on` (unScope >=> sequenceA)
 
-instance (Ord  a, forall a . Eq   a => Eq   (f a)
-                , forall a . Ord  a => Ord  (f a), Monad f) => Ord  (Scope f a) where
+instance (Ord  a, Ord  b, forall a . Eq   a => Eq   (f a)
+                        , forall a . Ord  a => Ord  (f a), Monad f) => Ord  (Scope a f b) where
   compare = compare `on` (unScope >=> sequenceA)
 
-deriving instance (Show a, forall a . Show a => Show (f a)) => Show (Scope f a)
+deriving instance (Show a, Show b, forall a . Show a => Show (f a)) => Show (Scope a f b)
 
-instance Applicative f => Applicative (Scope f) where
+instance Applicative f => Applicative (Scope a f) where
   pure = Scope . pure . S . pure
   Scope f <*> Scope a = Scope (liftA2 (liftA2 (<*>)) f a)
 
-instance Monad f => Monad (Scope f) where
+instance Monad f => Monad (Scope a f) where
   Scope e >>= f = Scope (e >>= incr (pure . Z) (>>= unScope . f))
 
-instance MonadTrans Scope where
+instance MonadTrans (Scope a) where
   lift = Scope . pure . S
 
-foldScope :: (forall a . Incr () (n a) -> m (Incr () (n a)))
+foldScope :: (forall a . Incr z (n a) -> m (Incr z (n a)))
           -> (forall x y . (x -> m y) -> f x -> n y)
           -> (a -> m b)
-          -> Scope f a
-          -> Scope n b
+          -> Scope z f a
+          -> Scope z n b
 foldScope k go h = Scope . go (k . fmap (go h)) . unScope
 
 -- | Bind occurrences of a variable in a term, producing a term in which the variable is bound.
-bind :: (Applicative f, Eq a) => a -> f a -> Scope f a
+bind :: (Applicative f, Eq a) => a -> f a -> Scope () f a
 bind name = Scope . fmap (match name) -- FIXME: succ as little of the expression as possible, cf https://twitter.com/ollfredo/status/1145776391826358273 — can this even be done generically?
 
 -- | Substitute a term for the free variable in a given term, producing a closed term.
-instantiate :: Monad f => f a -> Scope f a -> f a
+instantiate :: Monad f => f a -> Scope () f a -> f a
 instantiate t = unScope >=> fromIncr t

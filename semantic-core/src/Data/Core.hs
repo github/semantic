@@ -65,7 +65,7 @@ data CoreF f a
   = Let Name
   -- | Sequencing without binding; analogous to '>>' or '*>'.
   | f a :>> f a
-  | Lam (Scope f a)
+  | Lam (Scope () f a)
   -- | Function application; analogous to '$'.
   | f a :$ f a
   | Unit
