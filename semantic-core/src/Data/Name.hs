@@ -7,6 +7,7 @@ module Data.Name
 , named
 , namedName
 , namedValue
+, Ignored(..)
 , reservedNames
 , isSimpleCharacter
 , needsQuotation
