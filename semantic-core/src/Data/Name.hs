@@ -66,12 +66,15 @@ instance Pretty Name where
     User n -> pretty n
 
 
--- | A newtype around 'User' which doesn’t affect alpha-equivalence. This is ensured by treating all comparisons between 'Named' values as equal.
-newtype Named = Named User
-  deriving (Show)
+-- | Annotates an @a@ with a 'User'-provided name, which is ignored for '==' and 'compare'.
+data Named a = Named User a
+  deriving (Foldable, Functor, Show, Traversable)
 
-instance Eq  Named where _ == _ = True
-instance Ord Named where compare _ _ = EQ
+instance Eq  a => Eq  (Named a) where (==) = (==) `on` namedValue
+instance Ord a => Ord (Named a) where compare = compare `on` namedValue
+
+namedValue :: Named a -> a
+namedValue (Named _ a) = a
 
 
 reservedNames :: HashSet String
