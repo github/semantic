@@ -33,7 +33,7 @@ eval Analysis{..} eval = \case
     a :>> b -> eval a >> eval b
     Lam b -> do
       n <- Gen <$> gensym "lam"
-      abstract eval n (instantiate (pure n) b)
+      abstract eval n (instantiate (const (pure n)) b)
     f :$ a -> do
       f' <- eval f
       a' <- eval a

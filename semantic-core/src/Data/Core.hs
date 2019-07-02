@@ -111,7 +111,7 @@ lams :: (Eq a, Foldable t) => t a -> Core a -> Core a
 lams names body = foldr lam body names
 
 unlam :: Alternative m => a -> Core a -> m (a, Core a)
-unlam n (Core (Lam b)) = pure (n, instantiate (pure n) b)
+unlam n (Core (Lam b)) = pure (n, instantiate (const (pure n)) b)
 unlam _ _              = empty
 
 unseq :: Alternative m => Core a -> m (Core a, Core a)

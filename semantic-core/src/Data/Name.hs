@@ -155,8 +155,8 @@ match :: Applicative f => (b -> Maybe a) -> b -> Incr a (f b)
 match f x | Just y <- f x = Z y
           | otherwise     = S (pure x)
 
-fromIncr :: a -> Incr () a -> a
-fromIncr a = incr (const a) id
+fromIncr :: (a -> b) -> Incr a b -> b
+fromIncr f = incr f id
 
 incr :: (a -> c) -> (b -> c) -> Incr a b -> c
 incr z s = \case { Z a -> z a ; S b -> s b }
@@ -196,5 +196,5 @@ bind :: Applicative f => (b -> Maybe a) -> f b -> Scope a f b
 bind name = Scope . fmap (match name) -- FIXME: succ as little of the expression as possible, cf https://twitter.com/ollfredo/status/1145776391826358273 — can this even be done generically?
 
 -- | Substitute a term for the free variable in a given term, producing a closed term.
-instantiate :: Monad f => f a -> Scope () f a -> f a
-instantiate t = unScope >=> fromIncr t
+instantiate :: Monad f => (a -> f b) -> Scope a f b -> f b
+instantiate f = unScope >=> fromIncr f
