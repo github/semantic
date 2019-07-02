@@ -134,9 +134,9 @@ data Incr a
   | S a
   deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
 
-match :: Eq a => a -> a -> Incr a
+match :: (Applicative f, Eq a) => a -> a -> Incr (f a)
 match x y | x == y    = Z
-          | otherwise = S y
+          | otherwise = S (pure y)
 
 subst :: a -> Incr a -> a
 subst a = incr a id
@@ -160,7 +160,7 @@ deriving instance (Show a, forall a . Show a => Show (f a)) => Show (Scope f a)
 
 -- | Bind occurrences of a variable in a term, producing a term in which the variable is bound.
 bind :: (Applicative f, Eq a) => a -> f a -> f (Incr (f a))
-bind name = fmap (fmap pure . match name)
+bind name = fmap (match name)
 
 -- | Substitute a term for the free variable in a given term, producing a closed term.
 instantiate :: Monad f => f a -> f (Incr (f a)) -> f a
