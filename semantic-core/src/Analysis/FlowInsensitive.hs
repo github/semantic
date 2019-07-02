@@ -23,7 +23,7 @@ import qualified Data.Set as Set
 type Cache name a = Map.Map (Core.Core name) (Set.Set a)
 type Heap name a = Map.Map name (Set.Set a)
 
-newtype FrameId = FrameId { unFrameId :: Name }
+newtype FrameId name = FrameId { unFrameId :: name }
   deriving (Eq, Ord, Show)
 
 

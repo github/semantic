@@ -59,7 +59,7 @@ runFile :: ( Carrier sig m
            , Effect sig
            , Member Fresh sig
            , Member Naming sig
-           , Member (Reader FrameId) sig
+           , Member (Reader (FrameId Name)) sig
            , Member (State (Heap Name Value)) sig
            )
         => File (Core.Core Name)
@@ -73,7 +73,7 @@ runFile file = traverse run file
 -- FIXME: decompose into a product domain and two atomic domains
 importGraphAnalysis :: ( Alternative m
                        , Carrier sig m
-                       , Member (Reader FrameId) sig
+                       , Member (Reader (FrameId Name)) sig
                        , Member (Reader Loc) sig
                        , Member (State (Heap Name Value)) sig
                        , MonadFail m
