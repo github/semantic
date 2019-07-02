@@ -166,6 +166,10 @@ instance (Ord  a, forall a . Eq   a => Eq   (f a)
 
 deriving instance (Show a, forall a . Show a => Show (f a)) => Show (Scope f a)
 
+instance Applicative f => Applicative (Scope f) where
+  pure = Scope . pure . S . pure
+  Scope f <*> Scope a = Scope (liftA2 (liftA2 (<*>)) f a)
+
 
 -- | Bind occurrences of a variable in a term, producing a term in which the variable is bound.
 bind :: (Applicative f, Eq a) => a -> f a -> f (Incr (f a))
