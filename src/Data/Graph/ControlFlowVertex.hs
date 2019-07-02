@@ -86,7 +86,14 @@ instance Lower ControlFlowVertex where lowerBound = Package ""
 instance VertexTag ControlFlowVertex where uniqueTag = hash . vertexIdentifier
 
 instance ToJSON ControlFlowVertex where
-  toJSON v = object [ "name" .= vertexIdentifier v, "type" .= vertexToType v ]
+  toJSON v = object [ "name" .= vertexIdentifier v
+                    , "type" .= vertexToType v
+                    , "id"   .= show (uniqueTag v)
+                    ]
+  toEncoding v = pairs $ mconcat [ "name" .= vertexIdentifier v
+                                 , "type" .= vertexToType v
+                                 , "id"   .= show (uniqueTag v)
+                                 ]
 
 -- TODO: This is potentially valuable just to get name's out of declarable things.
 -- Typeclasses to create 'ControlFlowVertex's from 'Term's. Also extracts
