@@ -255,7 +255,7 @@ binaryExpression = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm
   , (inject .) . Expression.Or                 <$ symbol AnonQuestionQuestion -- Not sure if this is right.
   , (inject .) . Expression.Equal              <$ symbol AnonEqualEqual
   , (inject .) . Expression.StrictEqual        <$ symbol AnonEqualEqualEqual
-  , (inject .) . invert Expression.Equal       <$ (symbol AnonBangEqual <|> symbol AnonLAngleRAngle <|> symbol AnonBangEqualEqual)
+  , (inject .) . invert Expression.Equal       <$ (symbol AnonBangEqual <|> symbol AnonLAngleRAngle)
   , (inject .) . invert Expression.StrictEqual <$ symbol AnonBangEqualEqual
   , (inject .) . Expression.LessThan           <$ symbol AnonLAngle
   , (inject .) . Expression.GreaterThan        <$ symbol AnonRAngle
