@@ -14,7 +14,6 @@ import           Data.Core
 import           Data.Name
 import           Data.Semigroup
 import           Data.String
-import           Data.Text (pack)
 import qualified Text.Parser.Token as Token
 import qualified Text.Parser.Token.Highlight as Highlight
 import           Text.Trifecta hiding (ident)
