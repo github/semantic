@@ -134,6 +134,11 @@ data Incr a
   | S a
   deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
 
+instance Applicative Incr where
+  pure = S
+  Z   <*> _ = Z
+  S f <*> a = f <$> a
+
 match :: (Applicative f, Eq a) => a -> a -> Incr (f a)
 match x y | x == y    = Z
           | otherwise = S (pure y)
