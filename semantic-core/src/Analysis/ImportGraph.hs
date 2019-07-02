@@ -51,7 +51,7 @@ importGraph :: [File (Core.Core Name)] -> (Heap Value, [File (Either (Loc, Strin
 importGraph
   = run
   . runFresh
-  . runNaming (Root "import-graph")
+  . runNaming
   . runHeap
   . traverse runFile
 

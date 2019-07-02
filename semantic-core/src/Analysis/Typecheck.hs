@@ -105,7 +105,7 @@ typecheckingFlowInsensitive :: [File (Core.Core Name)] -> (Heap (Monotype Meta),
 typecheckingFlowInsensitive
   = run
   . runFresh
-  . runNaming (Root "typechecking-flow-insensitive")
+  . runNaming
   . runHeap
   . (>>= traverse (traverse (traverse generalize)))
   . traverse runFile

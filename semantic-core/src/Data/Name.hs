@@ -83,13 +83,13 @@ isSimpleCharacter = \case
   c    -> Char.isAlphaNum c
 
 data Gensym
-  = Root Text
+  = Root
   | Gensym :/ (Text, Int)
   deriving (Eq, Ord, Show)
 
 instance Pretty Gensym where
   pretty = \case
-    Root s      -> pretty s
+    Root        -> pretty '◊'
     p :/ (n, x) -> Pretty.hcat [pretty p, "/", pretty n, "^", pretty x]
 
 (//) :: Gensym -> Text -> Gensym
@@ -120,8 +120,8 @@ instance Effect Naming where
   handle state handler (Namespace s m k) = Namespace s (handler (m <$ state)) (handler . fmap k)
 
 
-runNaming :: Functor m => Gensym -> NamingC m a -> m a
-runNaming root = runReader root . evalState 0 . runNamingC
+runNaming :: Functor m => NamingC m a -> m a
+runNaming = runReader Root . evalState 0 . runNamingC
 
 newtype NamingC m a = NamingC { runNamingC :: StateC Int (ReaderC Gensym m) a }
   deriving (Alternative, Applicative, Functor, Monad, MonadFail, MonadIO)
