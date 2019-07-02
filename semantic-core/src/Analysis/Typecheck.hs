@@ -106,7 +106,7 @@ typecheckingFlowInsensitive
   = run
   . runFresh
   . runNaming
-  . runHeap
+  . runHeap (Gen (Root // "root"))
   . (>>= traverse (traverse (traverse generalize)))
   . traverse runFile
 

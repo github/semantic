@@ -17,7 +17,6 @@ import qualified Data.Core as Core
 import qualified Data.Map as Map
 import           Data.Maybe (fromMaybe)
 import           Data.Monoid (Alt(..))
-import           Data.Name
 import qualified Data.Set as Set
 
 type Cache name a = Map.Map (Core.Core name) (Set.Set a)
@@ -65,10 +64,8 @@ cacheTerm eval term = do
       result <- eval term
       result <$ modify (Map.insertWith (<>) term (Set.singleton (result :: a)))
 
-runHeap :: (Carrier sig m, Member Naming sig) => ReaderC FrameId (StateC (Heap Name a) m) b -> m (Heap Name a, b)
-runHeap m = do
-  addr <- Gen <$> gensym "root"
-  runState (Map.singleton addr Set.empty) (runReader (FrameId addr) m)
+runHeap :: name -> ReaderC (FrameId name) (StateC (Heap name a) m) b -> m (Heap name a, b)
+runHeap addr m = runState (Map.singleton addr Set.empty) (runReader (FrameId addr) m)
 
 -- | Fold a collection by mapping each element onto an 'Alternative' action.
 foldMapA :: (Alternative m, Foldable t) => (b -> m a) -> t b -> m a
