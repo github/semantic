@@ -188,7 +188,7 @@ foldScope k go h = Scope . go (k . fmap (go h)) . unScope
 
 -- | Bind occurrences of a variable in a term, producing a term in which the variable is bound.
 bind :: (Applicative f, Eq a) => a -> f a -> Scope f a
-bind name = Scope . fmap (match name)
+bind name = Scope . fmap (match name) -- FIXME: succ as little of the expression as possible, cf https://twitter.com/ollfredo/status/1145776391826358273 — can this even be done generically?
 
 -- | Substitute a term for the free variable in a given term, producing a closed term.
 instantiate :: Monad f => f a -> Scope f a -> f a
