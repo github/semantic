@@ -179,7 +179,7 @@ annWith callStack = maybe id (fmap Core . Ann) (stackLoc callStack)
 iter :: forall m n a b
      .  (forall a . m a -> n a)
      -> (forall a . CoreF n a -> n a)
-     -> (forall a . Incr (n a) -> m (Incr (n a)))
+     -> (forall a . Incr () (n a) -> m (Incr () (n a)))
      -> (a -> m b)
      -> Core a
      -> n b
@@ -191,13 +191,13 @@ iter var alg k = go
 
 cata :: (a -> b)
      -> (forall a . CoreF (Const b) a -> b)
-     -> (Incr b -> a)
+     -> (Incr () b -> a)
      -> (x -> a)
      -> Core x
      -> b
 cata var alg k h = getConst . iter (coerce var) (coerce alg) (coerce k) (Const . h)
 
-foldCoreF :: (forall a . Incr (n a) -> m (Incr (n a)))
+foldCoreF :: (forall a . Incr () (n a) -> m (Incr () (n a)))
           -> (forall x y . (x -> m y) -> f x -> n y)
           -> (a -> m b)
           -> CoreF f a

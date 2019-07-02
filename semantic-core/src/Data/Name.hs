@@ -137,32 +137,32 @@ instance (Carrier sig m, Effect sig) => Carrier (Naming :+: sig) (NamingC m) whe
   eff (R other)             = NamingC (eff (R (R (handleCoercible other))))
 
 
-data Incr a
-  = Z
-  | S a
+data Incr a b
+  = Z a
+  | S b
   deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
 
-instance Applicative Incr where
+instance Applicative (Incr a) where
   pure = S
-  Z   <*> _ = Z
+  Z a <*> _ = Z a
   S f <*> a = f <$> a
 
-instance Monad Incr where
-  Z   >>= _ = Z
+instance Monad (Incr a) where
+  Z a >>= _ = Z a
   S a >>= f = f a
 
-match :: (Applicative f, Eq a) => a -> a -> Incr (f a)
-match x y | x == y    = Z
+match :: (Applicative f, Eq a) => a -> a -> Incr () (f a)
+match x y | x == y    = Z ()
           | otherwise = S (pure y)
 
-fromIncr :: a -> Incr a -> a
-fromIncr a = incr a id
+fromIncr :: a -> Incr () a -> a
+fromIncr a = incr (const a) id
 
-incr :: b -> (a -> b) -> Incr a -> b
-incr z s = \case { Z -> z ; S a -> s a }
+incr :: (a -> c) -> (b -> c) -> Incr a b -> c
+incr z s = \case { Z a -> z a ; S b -> s b }
 
 
-newtype Scope f a = Scope { unScope :: f (Incr (f a)) }
+newtype Scope f a = Scope { unScope :: f (Incr () (f a)) }
   deriving (Foldable, Functor, Traversable)
 
 instance (Eq   a, forall a . Eq   a => Eq   (f a), Monad f) => Eq   (Scope f a) where
@@ -179,12 +179,12 @@ instance Applicative f => Applicative (Scope f) where
   Scope f <*> Scope a = Scope (liftA2 (liftA2 (<*>)) f a)
 
 instance Monad f => Monad (Scope f) where
-  Scope e >>= f = Scope (e >>= incr (pure Z) (>>= unScope . f))
+  Scope e >>= f = Scope (e >>= incr (pure . Z) (>>= unScope . f))
 
 instance MonadTrans Scope where
   lift = Scope . pure . S
 
-foldScope :: (forall a . Incr (n a) -> m (Incr (n a)))
+foldScope :: (forall a . Incr () (n a) -> m (Incr () (n a)))
           -> (forall x y . (x -> m y) -> f x -> n y)
           -> (a -> m b)
           -> Scope f a
