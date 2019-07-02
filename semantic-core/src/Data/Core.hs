@@ -7,7 +7,9 @@ module Data.Core
 , let'
 , block
 , lam
+, lam'
 , lams
+, lams'
 , unlam
 , unseq
 , unseqs
@@ -62,10 +64,10 @@ instance Monad Core where
 
 
 data CoreF f a
-  = Let Name
+  = Let User
   -- | Sequencing without binding; analogous to '>>' or '*>'.
   | f a :>> f a
-  | Lam (Scope () f a)
+  | Lam (Ignored User) (Scope (Named ()) f a)
   -- | Function application; analogous to '$'.
   | f a :$ f a
   | Unit
@@ -94,7 +96,7 @@ infix  3 :=
 infixl 4 :.
 
 
-let' :: Name -> Core a
+let' :: User -> Core a
 let' = Core . Let
 
 block :: Foldable t => t (Core a) -> Core a
@@ -102,17 +104,23 @@ block cs
   | null cs   = unit
   | otherwise = foldr1 (<>) cs
 
-lam :: Eq a => a -> Core a -> Core a
-lam n b = Core (Lam (bind matching b))
-  where matching x | x == n    = Just ()
+lam :: Eq a => Named a -> Core a -> Core a
+lam (Named u n) b = Core (Lam u (bind matching b))
+  where matching x | x == n    = Just (Named u ())
                    | otherwise = Nothing
 
-lams :: (Eq a, Foldable t) => t a -> Core a -> Core a
+lam' :: User -> Core User -> Core User
+lam' u = lam (named u u)
+
+lams :: (Eq a, Foldable t) => t (Named a) -> Core a -> Core a
 lams names body = foldr lam body names
 
-unlam :: Alternative m => a -> Core a -> m (a, Core a)
-unlam n (Core (Lam b)) = pure (n, instantiate (const (pure n)) b)
-unlam _ _              = empty
+lams' :: Foldable t => t User -> Core User -> Core User
+lams' names body = foldr lam' body names
+
+unlam :: Alternative m => a -> Core a -> m (Named a, Core a)
+unlam n (Core (Lam v b)) = pure (Named v n, instantiate (const (pure n)) b)
+unlam _ _                = empty
 
 unseq :: Alternative m => Core a -> m (Core a, Core a)
 unseq (Core (a :>> b)) = pure (a, b)
@@ -181,7 +189,7 @@ annWith callStack = maybe id (fmap Core . Ann) (stackLoc callStack)
 iter :: forall m n a b
      .  (forall a . m a -> n a)
      -> (forall a . CoreF n a -> n a)
-     -> (forall a . Incr () (n a) -> m (Incr () (n a)))
+     -> (forall a . Incr (Named ()) (n a) -> m (Incr (Named ()) (n a)))
      -> (a -> m b)
      -> Core a
      -> n b
@@ -193,13 +201,13 @@ iter var alg k = go
 
 cata :: (a -> b)
      -> (forall a . CoreF (Const b) a -> b)
-     -> (Incr () b -> a)
+     -> (Incr (Named ()) b -> a)
      -> (x -> a)
      -> Core x
      -> b
 cata var alg k h = getConst . iter (coerce var) (coerce alg) (coerce k) (Const . h)
 
-foldCoreF :: (forall a . Incr () (n a) -> m (Incr () (n a)))
+foldCoreF :: (forall a . Incr (Named ()) (n a) -> m (Incr (Named ()) (n a)))
           -> (forall x y . (x -> m y) -> f x -> n y)
           -> (a -> m b)
           -> CoreF f a
@@ -207,7 +215,7 @@ foldCoreF :: (forall a . Incr () (n a) -> m (Incr () (n a)))
 foldCoreF k go h = \case
   Let a -> Let a
   a :>> b -> go h a :>> go h b
-  Lam b -> Lam (foldScope k go h b)
+  Lam u b -> Lam u (foldScope k go h b)
   a :$ b -> go h a :$ go h b
   Unit -> Unit
   Bool b -> Bool b

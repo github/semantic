@@ -57,12 +57,12 @@ inParens amount go = do
   body <- with amount go
   pure (encloseIf (amount >= prec) (symbol "(") (symbol ")") body)
 
-prettify :: (Member Naming sig, Member (Reader [AnsiDoc]) sig, Member (Reader Prec) sig, Carrier sig m)
+prettify :: (Member (Reader [AnsiDoc]) sig, Member (Reader Prec) sig, Carrier sig m)
          => Style
          -> CoreF (Const (m AnsiDoc)) a
          -> m AnsiDoc
 prettify style = \case
-  Let a -> pure $ keyword "let" <+> name a
+  Let a -> pure $ keyword "let" <+> name (User a)
   Const a :>> Const b -> do
     prec <- ask @Prec
     fore <- with 12 a
@@ -75,8 +75,8 @@ prettify style = \case
 
     pure . Pretty.align $ encloseIf (12 > prec) open close (Pretty.align body)
 
-  Lam f -> inParens 11 $ do
-    (x, body) <- bind f
+  Lam n f -> inParens 11 $ do
+    (x, body) <- bind n f
     pure (lambda <> x <+> arrow <+> body)
 
   Frame    -> pure $ primitive "frame"
@@ -107,9 +107,7 @@ prettify style = \case
 
   -- Annotations are not pretty-printed, as it lowers the signal/noise ratio too profoundly.
   Ann _ (Const c) -> c
-  where bind f = do
-          x <- name . Gen <$> gensym ""
-          (,) x <$> local (x:) (getConst (unScope f))
+  where bind (Ignored x) f = let x' = name (User x) in (,) x' <$> local (x':) (getConst (unScope f))
         lambda = case style of
           Unicode -> symbol "λ"
           Ascii   -> symbol "\\"
@@ -122,6 +120,6 @@ appending :: Functor f => AnsiDoc -> f AnsiDoc -> f AnsiDoc
 appending k item = (keyword k <+>) <$> item
 
 prettyCore :: Style -> Core Name -> AnsiDoc
-prettyCore s = run . runNaming . runReader @Prec 0 . runReader @[AnsiDoc] [] . cata id (prettify s) k (pure . name)
-  where k (Z ()) = asks head
-        k (S n)  = local (tail @AnsiDoc) n
+prettyCore s = run . runReader @Prec 0 . runReader @[AnsiDoc] [] . cata id (prettify s) k (pure . name)
+  where k (Z n) = pure (name (User (namedName n)))
+        k (S n) = local (tail @AnsiDoc) n

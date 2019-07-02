@@ -85,15 +85,15 @@ edge = kw <*> expr where kw = choice [ Core.edge Lexical <$ reserved "lexical"
 
 lvalue :: (TokenParsing m, Monad m) => m (Core Name)
 lvalue = choice
-  [ Core.let' <$ reserved "let" <*> name
+  [ Core.let' . namedValue <$ reserved "let" <*> name
   , ident
   , parens expr
   ]
 
 -- * Literals
 
-name :: (TokenParsing m, Monad m) => m Name
-name = User <$> identifier <?> "name" where
+name :: (TokenParsing m, Monad m) => m (Named User)
+name = (named <*> id) <$> identifier <?> "name" where
 
 lit :: (TokenParsing m, Monad m) => m (Core Name)
 lit = let x `given` n = x <$ reserved n in choice
@@ -105,9 +105,9 @@ lit = let x `given` n = x <$ reserved n in choice
   ] <?> "literal"
 
 lambda :: (TokenParsing m, Monad m) => m (Core Name)
-lambda = Core.lam <$ lambduh <*> name <* arrow <*> core <?> "lambda" where
+lambda = Core.lam <$ lambduh <*> (fmap User <$> name) <* arrow <*> core <?> "lambda" where
   lambduh = symbolic 'λ' <|> symbolic '\\'
   arrow   = symbol "→"   <|> symbol "->"
 
 ident :: (Monad m, TokenParsing m) => m (Core Name)
-ident = pure <$> name <?> "identifier"
+ident = pure . User . namedValue <$> name <?> "identifier"
