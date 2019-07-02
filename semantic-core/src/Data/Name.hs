@@ -170,6 +170,9 @@ instance Applicative f => Applicative (Scope f) where
   pure = Scope . pure . S . pure
   Scope f <*> Scope a = Scope (liftA2 (liftA2 (<*>)) f a)
 
+instance Monad f => Monad (Scope f) where
+  Scope e >>= f = Scope (e >>= incr (pure Z) (>>= unScope . f))
+
 
 -- | Bind occurrences of a variable in a term, producing a term in which the variable is bound.
 bind :: (Applicative f, Eq a) => a -> f a -> f (Incr (f a))
