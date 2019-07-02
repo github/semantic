@@ -151,9 +151,9 @@ instance Monad (Incr a) where
   Z a >>= _ = Z a
   S a >>= f = f a
 
-match :: (Applicative f, Eq a) => a -> a -> Incr () (f a)
-match x y | x == y    = Z ()
-          | otherwise = S (pure y)
+match :: Applicative f => (b -> Maybe a) -> b -> Incr a (f b)
+match f x | Just y <- f x = Z y
+          | otherwise     = S (pure x)
 
 fromIncr :: a -> Incr () a -> a
 fromIncr a = incr (const a) id
@@ -192,7 +192,7 @@ foldScope :: (forall a . Incr z (n a) -> m (Incr z (n a)))
 foldScope k go h = Scope . go (k . fmap (go h)) . unScope
 
 -- | Bind occurrences of a variable in a term, producing a term in which the variable is bound.
-bind :: (Applicative f, Eq a) => a -> f a -> Scope () f a
+bind :: Applicative f => (b -> Maybe a) -> f b -> Scope a f b
 bind name = Scope . fmap (match name) -- FIXME: succ as little of the expression as possible, cf https://twitter.com/ollfredo/status/1145776391826358273 — can this even be done generically?
 
 -- | Substitute a term for the free variable in a given term, producing a closed term.

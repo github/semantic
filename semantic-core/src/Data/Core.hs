@@ -103,7 +103,9 @@ block cs
   | otherwise = foldr1 (<>) cs
 
 lam :: Eq a => a -> Core a -> Core a
-lam n b = Core (Lam (bind n b))
+lam n b = Core (Lam (bind matching b))
+  where matching x | x == n    = Just ()
+                   | otherwise = Nothing
 
 lams :: (Eq a, Foldable t) => t a -> Core a -> Core a
 lams names body = foldr lam body names
