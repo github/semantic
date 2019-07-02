@@ -61,49 +61,6 @@ encloseIf :: Monoid m => Bool -> m -> m -> m -> m
 encloseIf True  l r x = l <> x <> r
 encloseIf False _ _ x = x
 
-prettify' :: Style -> Core Name -> AnsiDoc
-prettify' style core = cata var alg k (const . name) core (0 :: Int) (pred (0 :: Int))
-  where var = const
-        alg = \case
-          Let a -> \ _ _ -> keyword "let" <+> name a
-          Const a :>> Const b -> \ prec v ->
-            let fore = a 12 v
-                aft = b 12 v
-                open  = symbol ("{" <> softline)
-                close = symbol (softline <> "}")
-                separator = ";" <> Pretty.line
-                body = fore <> separator <> aft
-            in Pretty.align $ encloseIf (12 > prec) open close (Pretty.align body)
-          Lam (Scope (Const f)) -> p 0 (\ v -> lambda <> pretty (succ v) <+> arrow <+> f 0 (succ v))
-          Const f :$ Const x -> p 10 (\ v -> f 10 v <+> x 11 v)
-          Unit -> \ _ _ -> primitive "unit"
-          Bool b -> \ _ _ -> primitive (if b then "true" else "false")
-          If (Const con) (Const tru) (Const fal) -> p 0 $ \ v ->
-            let con' = keyword "if"   <+> con 0 v
-                tru' = keyword "then" <+> tru 0 v
-                fal' = keyword "else" <+> fal 0 v
-            in Pretty.sep [con', tru', fal']
-          String s -> \ _ _ -> strlit $ Pretty.viaShow s
-          Load (Const path) -> p 0 $ \ v -> keyword "load" <+> path 0 v
-          Edge Lexical (Const n) -> p 0 $ \ v -> "lexical" <+> n 0 v
-          Edge Import (Const n) -> p 0 $ \ v -> "import" <+> n 0 v
-          Frame -> \ _ _ -> primitive "frame"
-          Const item :. Const body -> p 5 (\ v -> item 5 v <> symbol "." <> body 6 v)
-          Const lhs := Const rhs -> p 4 (\ v -> lhs 4 v <+> symbol "=" <+> rhs 5 v)
-          -- Annotations are not pretty-printed, as it lowers the signal/noise ratio too profoundly.
-          Ann _ (Const c) -> c
-        k Z     v = pretty v
-        k (S n) v = n 0 (pred v)
-
-        p max b actual = encloseIf (actual > max) (symbol "(") (symbol ")") . b
-
-        lambda = case style of
-          Unicode -> symbol "λ"
-          Ascii   -> symbol "\\"
-        arrow = case style of
-          Unicode -> symbol "→"
-          Ascii   -> symbol "->"
-
 prettify :: (Member Naming sig, Member (Reader [AnsiDoc]) sig, Member (Reader Prec) sig, Carrier sig m)
          => Style
          -> CoreF (Const (m AnsiDoc)) a
@@ -172,5 +129,3 @@ prettyCore :: Style -> Core Name -> AnsiDoc
 prettyCore s = run . runNaming (Root "prettyCore") . runReader @Prec 0 . runReader @[AnsiDoc] [] . cata id (prettify s) k (pure . name)
   where k Z     = asks head
         k (S n) = local (tail @AnsiDoc) n
-
-prettyCore s = prettify' s
