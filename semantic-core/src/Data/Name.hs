@@ -4,7 +4,9 @@ module Data.Name
 , Namespaced
 , Name(..)
 , Named(..)
+, named
 , namedName
+, namedValue
 , reservedNames
 , isSimpleCharacter
 , needsQuotation
@@ -68,17 +70,23 @@ instance Pretty Name where
 
 
 -- | Annotates an @a@ with a 'User'-provided name, which is ignored for '==' and 'compare'.
-data Named a = Named User a
-  deriving (Foldable, Functor, Show, Traversable)
+data Named a = Named (Ignored User) a
+  deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
 
-instance Eq  a => Eq  (Named a) where (==) = (==) `on` namedValue
-instance Ord a => Ord (Named a) where compare = compare `on` namedValue
+named :: User -> a -> Named a
+named = Named . Ignored
 
 namedName :: Named a -> User
-namedName (Named n _) = n
+namedName (Named (Ignored n) _) = n
 
 namedValue :: Named a -> a
 namedValue (Named _ a) = a
+
+newtype Ignored a = Ignored a
+  deriving (Foldable, Functor, Show, Traversable)
+
+instance Eq  (Ignored a) where _ == _ = True
+instance Ord (Ignored a) where compare _ _ = EQ
 
 
 reservedNames :: HashSet String
