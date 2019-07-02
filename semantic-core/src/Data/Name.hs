@@ -4,6 +4,7 @@ module Data.Name
 , Namespaced
 , Name(..)
 , Named(..)
+, namedName
 , reservedNames
 , isSimpleCharacter
 , needsQuotation
@@ -72,6 +73,9 @@ data Named a = Named User a
 
 instance Eq  a => Eq  (Named a) where (==) = (==) `on` namedValue
 instance Ord a => Ord (Named a) where compare = compare `on` namedValue
+
+namedName :: Named a -> User
+namedName (Named n _) = n
 
 namedValue :: Named a -> a
 namedValue (Named _ a) = a
