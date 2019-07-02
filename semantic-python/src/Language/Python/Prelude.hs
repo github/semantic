@@ -14,7 +14,7 @@ import Control.Effect.Sum
 import Language.Preface
 import Data.Maybe
 import Control.Effect
-import Data.Sequence (Seq)
+import Data.Sequence (Seq ((:|>), Empty))
 import qualified Data.Sequence as Seq
 import Language.Preface
 import GHC.Exts
@@ -28,6 +28,11 @@ newtype PythonC m a = PythonC { runPythonC :: WriterC (Seq Core) m a }
 emit :: (Member (Writer (Seq Core)) sig, Carrier sig m) => Core -> m ()
 emit = tell @(Seq Core) . pure
 
+block :: Seq Core -> Core
+block Seq.Empty = Core.Unit
+block (xs :|> Core.Unit) = Core.block (Seq.filter (/= Core.Unit) xs :|> Core.Unit)
+block xs = Core.block (Seq.filter (/= Core.Unit) xs)
+
 instance (Carrier sig m, Effect sig) => Carrier (Preface :+: sig) (PythonC m) where
   eff (R other) = PythonC (eff (R (handleCoercible other)))
   eff (L other) = PythonC $ case other of
@@ -36,20 +41,20 @@ instance (Carrier sig m, Effect sig) => Carrier (Preface :+: sig) (PythonC m) wh
     Klass stack name go k -> do
       emit (annWith stack (Core.Let (User name) := Core.Frame))
       (bod, res) <- censor @(Seq Core) (const (pure Core.Unit)) $ listen @(Seq Core) (runPythonC go)
-      emit (annWith stack (Core.Var (User name) :. Core.block bod))
+      emit (annWith stack (Core.Var (User name) :. block bod))
       runPythonC $ k res
     Def stack name go k -> do
       (bod, res) <- censor @(Seq Core) (const (pure Core.Unit)) $ listen @(Seq Core) (runPythonC go)
-      emit (annWith stack (Core.Let (User name)) := Core.block bod)
+      emit (annWith stack (Core.Let (User name)) := block bod)
       runPythonC $ k res
     Method stack name args go k -> do
       let arg = GHC.Exts.the args
       (bod, res) <- censor @(Seq Core) (const (pure Core.Unit)) $ listen @(Seq Core) (runPythonC go)
-      emit (annWith stack (Core.Let (User name)) := Core.Lam (User arg) (Core.block bod))
+      emit (annWith stack (Core.Let (User name)) := Core.Lam (User arg) (block bod))
       runPythonC $ k res
     Open name go k -> do
       (bod, res) <- censor @(Seq Core) (const (pure Core.Unit)) $ listen @(Seq Core) (runPythonC go)
-      emit (Core.Var (User name) :. Core.block bod)
+      emit (Core.Var (User name) :. block bod)
       runPythonC $ k res
     Inherit s k ->
       emit (Core.Edge Core.Import (Core.Var (User s))) *> runPythonC k
@@ -68,7 +73,7 @@ scribe :: (Monad m, HasCallStack) => PythonC m a -> m (File Core.Core, a)
 scribe go = do
   (acc, res) <- runWriter $ runPythonC go
   let loc = fromMaybe (Loc.Loc "✏️" Loc.emptySpan) Loc.here
-  pure (File loc (Core.block acc), res)
+  pure (File loc (block acc), res)
 
 
 prelude :: (Member Preface sig, Carrier sig m) => m ()
