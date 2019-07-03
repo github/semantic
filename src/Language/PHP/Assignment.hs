@@ -146,6 +146,7 @@ type Syntax = '[
   , Syntax.ReturnType
   , Syntax.ScalarType
   , Syntax.ShellCommand
+  , Syntax.Concat
   , Syntax.SimpleVariable
   , Syntax.Static
   , Syntax.Text
@@ -233,7 +234,7 @@ augmentedAssignmentExpression = makeTerm' <$> symbol AugmentedAssignmentExpressi
   , assign Expression.DividedBy <$ symbol AnonSlashEqual
   , assign Expression.Plus <$ symbol AnonPlusEqual
   , assign Expression.Minus <$ symbol AnonMinusEqual
-  , assign Expression.Times <$ symbol AnonDotEqual
+  , assign Syntax.Concat <$ symbol AnonDotEqual
   , assign Expression.LShift <$ symbol AnonLAngleLAngleEqual
   , assign Expression.RShift <$ symbol AnonRAngleRAngleEqual
   , assign Expression.BAnd <$ symbol AnonAmpersandEqual
@@ -266,7 +267,8 @@ binaryExpression = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm
   , (inject .) . Expression.RShift             <$ symbol AnonRAngleRAngle
   , (inject .) . Expression.Plus               <$ symbol AnonPlus
   , (inject .) . Expression.Minus              <$ symbol AnonMinus
-  , (inject .) . Expression.Times              <$ (symbol AnonStar <|> symbol AnonDot)
+  , (inject .) . Expression.Times              <$ symbol AnonStar
+  , (inject .) . Syntax.Concat                 <$ symbol AnonDot
   , (inject .) . Expression.DividedBy          <$ symbol AnonSlash
   , (inject .) . Expression.Modulo             <$ symbol AnonPercent
   , (inject .) . Expression.InstanceOf         <$ symbol AnonInstanceof
