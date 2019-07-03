@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveFunctor, FlexibleContexts, FlexibleInstances, LambdaCase, RecordWildCards, ScopedTypeVariables, TypeApplications #-}
+{-# LANGUAGE DeriveFunctor, FlexibleContexts, FlexibleInstances, LambdaCase, OverloadedStrings, RecordWildCards, ScopedTypeVariables, TypeApplications #-}
 module Analysis.Typecheck
 ( Monotype (..)
 , Meta
@@ -160,7 +160,7 @@ typecheckingAnalysis = Analysis{..}
         bool _ = pure MBool
         asBool b = unify MBool b >> pure True <|> pure False
         string _ = pure MString
-        asString s = unify MString s *> pure ""
+        asString s = unify MString s $> mempty
         frame = fail "unimplemented"
         edge _ _ = pure ()
         _ ... m = m

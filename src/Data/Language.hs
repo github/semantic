@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DeriveGeneric, KindSignatures, LambdaCase #-}
+{-# LANGUAGE DeriveAnyClass, DeriveGeneric, KindSignatures #-}
 module Data.Language
   ( Language (..)
   , SLanguage (..)
@@ -108,6 +108,7 @@ languageForType mediaType = case mediaType of
     ".rb"   -> Ruby
     ".go"   -> Go
     ".js"   -> JavaScript
+    ".mjs"  -> JavaScript
     ".ts"   -> TypeScript
     ".tsx"  -> TSX
     ".jsx"  -> JSX
@@ -120,8 +121,8 @@ extensionsForLanguage :: Language -> [String]
 extensionsForLanguage language = case language of
   Go         -> [".go"]
   Haskell    -> [".hs"]
-  JavaScript -> [".js"]
-  PHP        -> [".php"]
+  JavaScript -> [".js", ".mjs"]
+  PHP        -> [".php", ".phpt"]
   Python     -> [".py"]
   Ruby       -> [".rb"]
   TypeScript -> [".ts"]
@@ -134,10 +135,10 @@ languageForFilePath :: FilePath -> Language
 languageForFilePath = languageForType . takeExtension
 
 supportedExts :: [String]
-supportedExts = [".go", ".py", ".rb", ".js", ".ts"]
+supportedExts = [".go", ".py", ".rb", ".js", ".mjs", ".ts", ".php", ".phpt"]
 
 codeNavLanguages :: [Language]
-codeNavLanguages = [Go, Ruby, Python, JavaScript, TypeScript]
+codeNavLanguages = [Go, Ruby, Python, JavaScript, TypeScript, PHP]
 
 pathIsMinified :: FilePath -> Bool
 pathIsMinified = isExtensionOf ".min.js"

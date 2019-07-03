@@ -9,15 +9,15 @@ import           SpecHelpers
 
 
 spec :: (?session :: TaskSession) => Spec
-spec = parallel $ do
+spec = do
   describe "PHP" $ do
     xit "evaluates include and require" $ do
       (scopeGraph, (heap, res)) <- evaluate ["main.php", "foo.php", "bar.php"]
       case ModuleTable.lookup "main.php" <$> res of
         Right (Just (Module _ (scopeAndFrame, value))) -> do
           value `shouldBe` Value.Unit
-          const () <$> SpecHelpers.lookupDeclaration "bar" scopeAndFrame heap scopeGraph `shouldBe` Just ()
-          const () <$> SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
+          SpecHelpers.lookupDeclaration "bar" scopeAndFrame heap scopeGraph `shouldSatisfy` isJust
+          SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldSatisfy` isJust
         other -> expectationFailure (show other)
 
     xit "evaluates include_once and require_once" $ do
@@ -25,16 +25,16 @@ spec = parallel $ do
       case ModuleTable.lookup "main_once.php" <$> res of
         Right (Just (Module _ (scopeAndFrame, value))) -> do
           value `shouldBe` Value.Unit
-          const () <$> SpecHelpers.lookupDeclaration "bar" scopeAndFrame heap scopeGraph `shouldBe` Just ()
-          const () <$> SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
+          SpecHelpers.lookupDeclaration "bar" scopeAndFrame heap scopeGraph `shouldSatisfy` isJust
+          SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldSatisfy` isJust
         other -> expectationFailure (show other)
 
     xit "evaluates namespaces" $ do
       (scopeGraph, (heap, res)) <- evaluate ["namespaces.php"]
       case ModuleTable.lookup "namespaces.php" <$> res of
         Right (Just (Module _ (scopeAndFrame, _))) -> do
-          const () <$> SpecHelpers.lookupDeclaration "Foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
-          const () <$> SpecHelpers.lookupDeclaration "NS1" scopeAndFrame heap scopeGraph `shouldBe` Just ()
+          SpecHelpers.lookupDeclaration "Foo" scopeAndFrame heap scopeGraph `shouldSatisfy` isJust
+          SpecHelpers.lookupDeclaration "NS1" scopeAndFrame heap scopeGraph `shouldSatisfy` isJust
 
           undefined
           -- (derefQName heap ("NS1" :| [])               env >>= deNamespace heap) `shouldBe` Just ("NS1",  ["Sub1", "b", "c"])

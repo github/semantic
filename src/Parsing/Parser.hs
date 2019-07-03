@@ -24,6 +24,7 @@ module Parsing.Parser
 , typescriptParser
 , typescriptASTParser
 , phpParser
+, phpASTParser
 , haskellParser
 ) where
 
@@ -136,6 +137,9 @@ rubyParser = AssignmentParser (ASTParser tree_sitter_ruby) Ruby.assignment
 
 phpParser :: Parser PHP.Term
 phpParser = AssignmentParser (ASTParser tree_sitter_php) PHP.assignment
+
+phpASTParser :: Parser (AST [] PHP.Grammar)
+phpASTParser = ASTParser tree_sitter_php
 
 pythonParser :: Parser Python.Term
 pythonParser = AssignmentParser (ASTParser tree_sitter_python) Python.assignment

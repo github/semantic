@@ -95,7 +95,7 @@ stages of the pipeline follows:
 
 -}
 
-{-# LANGUAGE AllowAmbiguousTypes, ScopedTypeVariables, RankNTypes #-}
+{-# LANGUAGE AllowAmbiguousTypes, RankNTypes, ScopedTypeVariables #-}
 module Reprinting.Pipeline
   ( runReprinter
   , runTokenizing
@@ -106,10 +106,10 @@ module Reprinting.Pipeline
 import           Control.Effect as Effect
 import           Control.Effect.Error as Effect
 import           Control.Effect.State as Effect
-import           Data.Machine hiding (Source)
-import           Data.Machine.Runner
 import           Data.Text.Prettyprint.Doc
 import           Data.Text.Prettyprint.Doc.Render.Text
+import           Streaming
+import qualified Streaming.Prelude as Streaming
 
 import           Data.Reprinting.Errors
 import           Data.Reprinting.Scope
@@ -121,57 +121,58 @@ import           Reprinting.Tokenize
 import           Reprinting.Translate
 import           Reprinting.Typeset
 
-
--- | Run the reprinting pipeline given the original 'Source', a language
--- specific machine (`ProcessT`) and the provided 'Term'.
+-- | Run the reprinting pipeline given the original 'Source', a language specific
+-- translation function (as a function over 'Stream's) and the provided 'Term'.
 runReprinter :: Tokenize a
-  => Source.Source
-  -> ProcessT Translator Fragment Splice
-  -> Term a History
-  -> Either TranslationError Source.Source
-runReprinter src translating tree
+             => Source.Source
+             -> (Stream (Of Fragment) TranslatorC () -> Stream (Of Splice) TranslatorC ())
+             -> Term a History
+             -> Either TranslationError Source.Source
+runReprinter src translating
   = fmap go
   . Effect.run
   . Effect.runError
-  . fmap snd
-  . runState (mempty :: [Scope])
-  . foldT $ source (tokenizing src tree)
-      ~> contextualizing
-      ~> translating
-      ~> typesetting
+  . evalState @[Scope] mempty
+  . Streaming.mconcat_
+  . typesetting
+  . translating
+  . contextualizing
+  . tokenizing src
   where go = Source.fromText . renderStrict . layoutPretty defaultLayoutOptions
 
 -- | Run the reprinting pipeline up to tokenizing.
 runTokenizing :: Tokenize a
-  => Source.Source
-  -> Term a History
-  -> [Token]
-runTokenizing src tree
-  = Data.Machine.run $ source (tokenizing src tree)
+              => Source.Source
+              -> Term a History
+              -> [Token]
+runTokenizing src
+  = runIdentity
+  . Streaming.toList_
+  . tokenizing src
 
 -- | Run the reprinting pipeline up to contextualizing.
 runContextualizing :: Tokenize a
-  => Source.Source
-  -> Term a History
-  -> Either TranslationError [Fragment]
-runContextualizing src tree
+                   => Source.Source
+                   -> Term a History
+                   -> Either TranslationError [Fragment]
+runContextualizing src
   = Effect.run
   . Effect.runError
-  . fmap snd
-  . runState (mempty :: [Scope])
-  . runT $ source (tokenizing src tree)
-      ~> contextualizing
+  . evalState @[Scope] mempty
+  . Streaming.toList_
+  . contextualizing
+  . tokenizing src
 
 runTranslating :: Tokenize a
-  => Source.Source
-  -> ProcessT Translator Fragment Splice
-  -> Term a History
-  -> Either TranslationError [Splice]
-runTranslating src translating tree
+               => Source.Source
+               -> (Stream (Of Fragment) TranslatorC () -> Stream (Of Splice) TranslatorC ())
+               -> Term a History
+               -> Either TranslationError [Splice]
+runTranslating src translating
   = Effect.run
   . Effect.runError
-  . fmap snd
-  . runState (mempty :: [Scope])
-  . runT $ source (tokenizing src tree)
-      ~> contextualizing
-      ~> translating
+  . evalState @[Scope] mempty
+  . Streaming.toList_
+  . translating
+  . contextualizing
+  . tokenizing src

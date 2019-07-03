@@ -28,13 +28,14 @@ import Analysis.HasTextElement
 import Data.Abstract.Declarations
 import Data.Abstract.Name
 import Data.Blob
-import Data.Functor.Identity
 import Data.Language
 import Data.Location
-import Data.Machine as Machine
 import Data.Range
 import Data.Term
 import Data.Text hiding (empty)
+
+import Streaming hiding (Sum)
+import Streaming.Prelude (yield)
 
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
@@ -63,13 +64,13 @@ data Token
   | Iden  { identifierName :: Text, tokenSpan :: Span, docsLiteralRange :: Maybe Range }
   deriving (Eq, Show)
 
-type Tagger k a = PlanT k Token Identity a
+type Tagger = Stream (Of Token)
 
-enter, exit :: String -> Maybe Range -> Tagger k ()
+enter, exit :: Monad m => String -> Maybe Range -> Tagger m ()
 enter c = yield . Enter (pack c)
 exit c = yield . Exit (pack c)
 
-emitIden :: Span -> Maybe Range -> Name -> Tagger k ()
+emitIden :: Monad m => Span -> Maybe Range -> Name -> Tagger m ()
 emitIden span docsLiteralRange name = yield (Iden (formatName name) span docsLiteralRange)
 
 class (Show1 constr, Traversable constr) => Taggable constr where
@@ -98,11 +99,11 @@ type IsTaggable syntax =
   , HasTextElement syntax
   )
 
-tagging :: (IsTaggable syntax)
+tagging :: (Monad m, IsTaggable syntax)
         => Blob
         -> Term syntax Location
-        -> Machine.MachineT Identity k Token
-tagging b = Machine.construct . foldSubterms (descend (blobLanguage b))
+        -> Stream (Of Token) m ()
+tagging b = foldSubterms (descend (blobLanguage b))
 
 descend ::
   ( Taggable (TermF syntax Location)
@@ -111,8 +112,9 @@ descend ::
   , Foldable syntax
   , HasTextElement syntax
   , Declarations1 syntax
+  , Monad m
   )
-  => Language -> SubtermAlgebra (TermF syntax Location) (Term syntax Location) (Tagger k ())
+  => Language -> SubtermAlgebra (TermF syntax Location) (Term syntax Location) (Tagger m ())
 descend lang t@(In loc _) = do
   let term = fmap subterm t
   let snippetRange = snippet loc term
@@ -189,7 +191,7 @@ instance Taggable Expression.Call where
 instance Taggable Ruby.Send where
   snippet ann (Ruby.Send _ _ _ (Just (Term (In body _)))) = Just $ subtractLocation ann body
   snippet ann _                                           = Just $ locationByteRange ann
-  symbolName Ruby.Send{..} = maybe Nothing declaredName sendSelector
+  symbolName Ruby.Send{..} = declaredName =<< sendSelector
 
 instance Taggable []
 instance Taggable Comment.Comment

@@ -388,7 +388,7 @@ anonymousFunctionCreationExpression = makeTerm <$> symbol AnonymousFunctionCreat
     makeFunction identifier parameters functionUseClause returnType statement = Declaration.Function [functionUseClause, returnType] identifier parameters statement
 
 parameters :: Assignment [Term]
-parameters = manyTerm (simpleParameter <|> variadicParameter)
+parameters = symbol FormalParameters *> children (manyTerm (simpleParameter <|> variadicParameter))
 
 simpleParameter :: Assignment Term
 simpleParameter = makeTerm <$> symbol SimpleParameter <*> children (makeAnnotation <$> (term typeDeclaration <|> emptyTerm) <*> (makeAssignment <$> location <*> term variableName <*> (term defaultArgumentSpecifier <|> emptyTerm)))
