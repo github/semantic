@@ -1,5 +1,5 @@
 {-# LANGUAGE ImplicitParams, LambdaCase, NamedFieldPuns #-}
-module Integration.Spec (spec) where
+module Integration.Spec (testTree) where
 
 import Control.Exception (throw)
 import Data.Foldable (find)
@@ -17,8 +17,8 @@ import Test.Tasty.Golden
 languages :: [FilePath]
 languages = ["go", "javascript", "json", "python", "ruby", "typescript", "tsx"]
 
-spec :: (?session :: TaskSession) => TestTree
-spec = testGroup "Integration (golden tests)" $ fmap testsForLanguage languages
+testTree :: (?session :: TaskSession) => TestTree
+testTree = testGroup "Integration (golden tests)" $ fmap testsForLanguage languages
 
 testsForLanguage :: (?session :: TaskSession) => FilePath -> TestTree
 testsForLanguage language = do

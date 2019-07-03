@@ -5,6 +5,7 @@ module Data.Blob
 , Blob(..)
 , Blobs(..)
 , blobLanguage
+, NoLanguageForBlob (..)
 , blobPath
 , makeBlob
 , decodeBlobs

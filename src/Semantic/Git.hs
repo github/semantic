@@ -19,6 +19,7 @@ import Control.Monad.IO.Class
 import Data.Attoparsec.Text   (Parser)
 import Data.Attoparsec.Text   as AP
 import Data.Char
+import Data.Either            (fromRight)
 import Data.Text              as Text
 import Shelly                 hiding (FilePath)
 import System.IO              (hSetBinaryMode)
@@ -42,7 +43,7 @@ sh = shelly . silently . onCommandHandles (initOutputHandles (`hSetBinaryMode` T
 
 -- | Parses an list of entries separated by \NUL, and on failure return []
 parseEntries :: Text -> [TreeEntry]
-parseEntries = either (const []) id . AP.parseOnly everything
+parseEntries = fromRight [] . AP.parseOnly everything
   where
     everything = AP.sepBy entryParser "\NUL" <* "\NUL\n" <* AP.endOfInput
 
@@ -87,4 +88,3 @@ data TreeEntry
   , treeEntryOid  :: OID
   , treeEntryPath :: FilePath
   } deriving (Eq, Show)
-

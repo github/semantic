@@ -16,12 +16,13 @@ import Control.Effect.Error
 import Control.Effect.Fail
 import Control.Effect.Reader
 import Control.Effect.Sum
+import Data.Text (Text, pack)
 import Data.Text.Prettyprint.Doc (Pretty (..))
 import GHC.Stack
 import Prelude hiding (fail)
 
 data Loc = Loc
-  { locPath :: !FilePath
+  { locPath :: !Text
   , locSpan :: {-# UNPACK #-} !Span
   }
   deriving (Eq, Ord, Show)
@@ -58,7 +59,7 @@ stackLoc cs = case getCallStack cs of
   _             -> Nothing
 
 fromGHCSrcLoc :: SrcLoc -> Loc
-fromGHCSrcLoc SrcLoc{..} = Loc srcLocFile (Span (Pos srcLocStartLine srcLocStartCol) (Pos srcLocEndLine srcLocEndCol))
+fromGHCSrcLoc SrcLoc{..} = Loc (pack srcLocFile) (Span (Pos srcLocStartLine srcLocStartCol) (Pos srcLocEndLine srcLocEndCol))
 
 
 runFailWithLoc :: FailWithLocC m a -> m (Either (Loc, String) a)

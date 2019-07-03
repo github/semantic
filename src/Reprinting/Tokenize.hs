@@ -29,10 +29,11 @@ module Reprinting.Tokenize
 
 import Prelude hiding (fail, log, filter)
 import Prologue hiding (Element, hash)
+import Streaming hiding (Sum)
+import qualified Streaming.Prelude as Streaming
 
 import           Data.History
 import           Data.List (intersperse)
-import qualified Data.Machine as Machine
 import           Data.Range
 import           Data.Reprinting.Scope (Scope)
 import qualified Data.Reprinting.Scope as Scope
@@ -55,15 +56,14 @@ data Tokenizer a where
   Get :: Tokenizer State
   Put :: State -> Tokenizer ()
 
--- Tokenizers are compiled into a Plan capable of being converted
--- to a Source. Note that the state parameter is internal to the
--- tokenizer being run: the invoker of 'tokenizing' doesn't need
--- to keep track of it at all.
-compile :: State -> Tokenizer a -> Machine.Plan k Token (State, a)
+-- Tokenizers are compiled directly into Stream values. Note that the
+-- state parameter is internal to the tokenizer being run: the invoker
+-- of 'tokenizing' doesn't need to keep track of it at all.
+compile :: Monad m => State -> Tokenizer a -> Stream (Of Token) m (State, a)
 compile p = \case
   Pure a   -> pure (p, a)
   Bind a f -> compile p a >>= (\(new, v) -> compile new (f v))
-  Tell t   -> Machine.yield t $> (p, ())
+  Tell t   -> Streaming.yield t $> (p, ())
   Get      -> pure (p, p)
   Put p'   -> pure (p', ())
 
@@ -229,12 +229,12 @@ class (Show1 constr, Traversable constr) => Tokenize constr where
   -- | Should emit control and data tokens.
   tokenize :: FAlgebra constr (Tokenizer ())
 
-tokenizing :: Tokenize a
+tokenizing :: (Monad m, Tokenize a)
            => Source
            -> Term a History
-           -> Machine.Source Token
+           -> Stream (Of Token) m ()
 tokenizing src term = pipe
-  where pipe  = Machine.construct . fmap snd $ compile state go
+  where pipe  = fmap snd $ compile state go
         state = State src (termAnnotation term) Reprinting 0 ForbidData
         go    = forbidData *> foldSubterms descend term <* finish
 

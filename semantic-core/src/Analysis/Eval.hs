@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, GeneralizedNewtypeDeriving, LambdaCase, RankNTypes, RecordWildCards #-}
+{-# LANGUAGE FlexibleContexts, LambdaCase, OverloadedStrings, RankNTypes, RecordWildCards #-}
 module Analysis.Eval
 ( eval
 , prog1
@@ -21,6 +21,7 @@ import Data.Functor
 import Data.Loc
 import Data.Maybe (fromJust)
 import Data.Name
+import Data.Text (Text)
 import GHC.Stack
 import Prelude hiding (fail)
 
@@ -207,8 +208,8 @@ data Analysis address value m = Analysis
   , unit        :: m value
   , bool        :: Bool -> m value
   , asBool      :: value -> m Bool
-  , string      :: String -> m value -- FIXME: Text
-  , asString    :: value -> m String
+  , string      :: Text -> m value
+  , asString    :: value -> m Text
   , frame       :: m value
   , edge        :: Edge -> address -> m ()
   , (...)       :: forall a . address -> m a -> m a

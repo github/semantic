@@ -2,12 +2,13 @@ module Data.Scientific.Spec (spec) where
 
 import Data.Scientific.Exts
 import Data.Either
+import Data.Foldable (for_)
 import SpecHelpers
 
 spec :: Spec
 spec = describe "Scientific parsing" $ do
 
-  let go cases = forM_ cases $ \(s, v) -> parseScientific s `shouldBe` Right v
+  let go cases = for_ cases $ \(s, v) -> parseScientific s `shouldBe` Right v
 
   -- TODO: hexadecimal floats, someday (0x1.999999999999ap-4)
 
