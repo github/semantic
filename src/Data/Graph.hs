@@ -24,7 +24,7 @@ import           Control.Effect
 import           Control.Effect.State
 import           Data.Aeson
 import qualified Data.Set as Set
-import Semantic.Api.V1.CodeAnalysisPB
+import           Semantic.Proto.SemanticPB
 
 -- | An algebraic graph with 'Ord', 'Semigroup', and 'Monoid' instances.
 newtype Graph vertex = Graph { unGraph :: G.Graph vertex }

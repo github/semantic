@@ -1,34 +1,11 @@
 syntax = "proto3";
 
-package semantic.api.v1;
+import "pkg/gen/haskell/haskell.proto";
 
-option java_package = "com.github.semantic.api.v1";
+package github.semantic;
 
-// Semantic's CodeAnalysis service provides endpoints for parsing, analyzing,
-// and comparing source code.
-service CodeAnalysis {
-  // Check health & status of the service.
-  rpc Ping (PingRequest) returns (PingResponse);
-  // Calculate c-tags like symbols for blobs.
-  rpc ParseTreeSymbols (ParseTreeRequest) returns (ParseTreeSymbolResponse);
-  // Parse trees in adjacency graph representation.
-  rpc ParseTreeGraph (ParseTreeRequest) returns (ParseTreeGraphResponse);
-  // Calculate table of contents style diff summaries.
-  rpc DiffTreeTOC (DiffTreeRequest) returns (DiffTreeTOCResponse);
-  // Tree diffs in adjacency graph representation.
-  rpc DiffTreeGraph (DiffTreeRequest) returns (DiffTreeGraphResponse);
-}
-
-message PingRequest {
-  string service = 1;
-}
-
-message PingResponse {
-  string status = 1;
-  string hostname = 2;
-  string timestamp = 3;
-  string sha = 4;
-}
+option (haskell.haskell_package) = "Semantic.Proto";
+option ruby_package = "Semantic::Proto";
 
 message ParseTreeRequest {
   repeated Blob blobs = 1;

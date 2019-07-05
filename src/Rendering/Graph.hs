@@ -20,7 +20,7 @@ import Data.String (IsString (..))
 import Data.Term
 import Prologue
 import Semantic.Api.Bridge
-import Semantic.Api.V1.CodeAnalysisPB
+import Semantic.Proto.SemanticPB
 
 import qualified Data.Text as T
 
