@@ -7,6 +7,17 @@ package github.semantic;
 option (haskell.haskell_package) = "Semantic.Proto";
 option ruby_package = "Semantic::Proto";
 
+message PingRequest {
+  string service = 1;
+}
+
+message PingResponse {
+  string status = 1;
+  string hostname = 2;
+  string timestamp = 3;
+  string sha = 4;
+}
+
 message ParseTreeRequest {
   repeated Blob blobs = 1;
 }

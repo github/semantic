@@ -19,6 +19,94 @@ import qualified Proto3.Suite as Proto3
 import           Proto3.Suite.JSONPB as JSONPB
 import           Proto3.Wire (at, oneof)
 
+data PingRequest = PingRequest
+  { service :: Text
+  } deriving stock (Eq, Ord, Show, Generic)
+    deriving anyclass (Proto3.Named, NFData)
+
+instance FromJSONPB PingRequest where
+  parseJSONPB = A.withObject "PingRequest" $ \obj -> PingRequest
+    <$> obj .: "service"
+
+instance ToJSONPB PingRequest where
+  toJSONPB PingRequest{..} = object
+    [
+      "service" .= service
+    ]
+  toEncodingPB PingRequest{..} = pairs
+    [
+      "service" .= service
+    ]
+
+instance FromJSON PingRequest where
+  parseJSON = parseJSONPB
+
+instance ToJSON PingRequest where
+  toJSON = toAesonValue
+  toEncoding = toAesonEncoding
+
+instance Proto3.Message PingRequest where
+  encodeMessage _ PingRequest{..} = mconcat
+    [
+      encodeMessageField 1 service
+    ]
+  decodeMessage _ = PingRequest
+    <$> at decodeMessageField 1
+  dotProto = undefined
+
+data PingResponse = PingResponse
+  { status :: Text
+  , hostname :: Text
+  , timestamp :: Text
+  , sha :: Text
+  } deriving stock (Eq, Ord, Show, Generic)
+    deriving anyclass (Proto3.Named, NFData)
+
+instance FromJSONPB PingResponse where
+  parseJSONPB = A.withObject "PingResponse" $ \obj -> PingResponse
+    <$> obj .: "status"
+    <*> obj .: "hostname"
+    <*> obj .: "timestamp"
+    <*> obj .: "sha"
+
+instance ToJSONPB PingResponse where
+  toJSONPB PingResponse{..} = object
+    [
+      "status" .= status
+    , "hostname" .= hostname
+    , "timestamp" .= timestamp
+    , "sha" .= sha
+    ]
+  toEncodingPB PingResponse{..} = pairs
+    [
+      "status" .= status
+    , "hostname" .= hostname
+    , "timestamp" .= timestamp
+    , "sha" .= sha
+    ]
+
+instance FromJSON PingResponse where
+  parseJSON = parseJSONPB
+
+instance ToJSON PingResponse where
+  toJSON = toAesonValue
+  toEncoding = toAesonEncoding
+
+instance Proto3.Message PingResponse where
+  encodeMessage _ PingResponse{..} = mconcat
+    [
+      encodeMessageField 1 status
+    , encodeMessageField 2 hostname
+    , encodeMessageField 3 timestamp
+    , encodeMessageField 4 sha
+    ]
+  decodeMessage _ = PingResponse
+    <$> at decodeMessageField 1
+    <*> at decodeMessageField 2
+    <*> at decodeMessageField 3
+    <*> at decodeMessageField 4
+  dotProto = undefined
+
 data ParseTreeRequest = ParseTreeRequest
   { blobs :: Vector Blob
   } deriving stock (Eq, Ord, Show, Generic)
