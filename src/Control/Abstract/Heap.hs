@@ -420,7 +420,7 @@ reachable roots heap = go mempty roots
 data Deref value (m :: * -> *) k
   = DerefCell        (Set value) (Maybe value -> k)
   | AssignCell value (Set value) (Set value   -> k)
-  deriving stock Functor
+  deriving stock (Functor, Generic1)
   deriving anyclass (HFunctor, Effect)
 
 runDeref :: Evaluator term address value (DerefC address value m) a

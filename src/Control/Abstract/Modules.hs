@@ -64,7 +64,7 @@ data Modules address value (m :: * -> *) k
   | Lookup  ModulePath (Maybe (ModuleResult address value) -> k)
   | Resolve [FilePath] (Maybe ModulePath -> k)
   | List    FilePath   ([ModulePath] -> k)
-  deriving stock Functor
+  deriving stock (Functor, Generic1)
   deriving anyclass (HFunctor, Effect)
 
 

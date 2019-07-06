@@ -129,7 +129,7 @@ data Function term address value (m :: * -> *) k
   | BuiltIn address BuiltIn (value -> k)           -- ^ A built-in is parameterized by its parent scope, BuiltIn type, and returns a value.
   | Call value [value] (value -> k)                -- ^ A Call takes a set of values as parameters and returns a ValueRef.
   | Bind value value (value -> k)
-  deriving stock Functor
+  deriving stock (Functor, Generic1)
   deriving anyclass (HFunctor, Effect)
 
 
@@ -156,7 +156,7 @@ ifthenelse v t e = asBool v >>= \ c -> if c then t else e
 data Boolean value (m :: * -> *) k
   = Boolean Bool (value -> k)
   | AsBool value (Bool -> k)
-  deriving stock Functor
+  deriving stock (Functor, Generic1)
   deriving anyclass (HFunctor, Effect)
 
 runBoolean :: Evaluator term address value (BooleanC value m) a
@@ -224,7 +224,7 @@ unit = send (Unit pure)
 
 newtype Unit value (m :: * -> *) k
   = Unit (value -> k)
-  deriving stock Functor
+  deriving stock (Functor, Generic1)
 
 instance HFunctor (Unit value) where
   hmap _ = coerce
@@ -252,7 +252,7 @@ asString v = send (AsString v pure)
 data String value (m :: * -> *) k
   = String Text (value -> k)
   | AsString value (Text -> k)
-  deriving stock Functor
+  deriving stock (Functor, Generic1)
   deriving anyclass (HFunctor, Effect)
 
 newtype StringC value m a = StringC { runStringC :: m a }
@@ -300,7 +300,7 @@ data Numeric value (m :: * -> *) k
   | Rational Rational (value -> k)
   | LiftNumeric (forall a . Num a => a -> a) value (value -> k)
   | LiftNumeric2 (forall a b. Number a -> Number b -> SomeNumber) value value (value -> k)
-  deriving stock Functor
+  deriving stock (Functor, Generic1)
   deriving anyclass (HFunctor, Effect)
 
 newtype NumericC value m a = NumericC { runNumericC :: m a }
@@ -344,7 +344,7 @@ data Bitwise value (m :: * -> *) k
   | LiftBitwise (forall a . Bits a => a -> a) value (value -> k)
   | LiftBitwise2 (forall a . (Integral a, Bits a) => a -> a -> a) value value (value -> k)
   | UnsignedRShift value value (value -> k)
-  deriving stock Functor
+  deriving stock (Functor, Generic1)
   deriving anyclass (HFunctor, Effect)
 
 runBitwise :: Evaluator term address value (BitwiseC value m) a
@@ -372,7 +372,7 @@ data Object address value (m :: * -> *) k
   = Object address (value -> k)
   | ScopedEnvironment value (Maybe address -> k)
   | Klass Declaration address (value -> k)
-  deriving stock Functor
+  deriving stock (Functor, Generic1)
   deriving anyclass (HFunctor, Effect)
 
 newtype ObjectC address value m a = ObjectC { runObjectC :: m a }
@@ -393,7 +393,7 @@ asArray v = send (AsArray v pure)
 data Array value (m :: * -> *) k
   = Array [value] (value -> k)
   | AsArray value ([value] -> k)
-  deriving stock Functor
+  deriving stock (Functor, Generic1)
   deriving anyclass (HFunctor, Effect)
 
 newtype ArrayC value m a = ArrayC { runArrayC :: m a }
@@ -415,7 +415,7 @@ kvPair v1 v2 = send (KvPair v1 v2 pure)
 data Hash value (m :: * -> *) k
   = Hash [(value, value)] (value -> k)
   | KvPair value value (value -> k)
-  deriving stock Functor
+  deriving stock (Functor, Generic1)
   deriving anyclass (HFunctor, Effect)
 
 newtype HashC value m a = HashC { runHashC :: m a }

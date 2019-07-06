@@ -50,10 +50,10 @@ data Excludes
 
 -- | An effect to read/write 'Blob's from 'Handle's or 'FilePath's.
 data Files (m :: * -> *) k
-  = forall a . Read (Source a)                                (a -> k)
-  | ReadProject (Maybe FilePath) FilePath Language [FilePath] (Project -> k)
-  | FindFiles FilePath [String] [FilePath]                    ([FilePath] -> k)
-  | Write Destination B.Builder                               k
+  = forall a . Read (Source a)                                     (a -> m k)
+  | ReadProject (Maybe FilePath) FilePath Language [FilePath] (Project -> m k)
+  | FindFiles FilePath [String] [FilePath]                    ([FilePath] -> m k)
+  | Write Destination B.Builder                               (m k)
 
 deriving instance Functor (Files m)
 instance HFunctor Files

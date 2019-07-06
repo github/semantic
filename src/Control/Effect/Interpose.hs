@@ -13,12 +13,12 @@ import Control.Effect.Reader
 import Control.Effect.Sum
 
 data Interpose eff m k
-  = forall a . Interpose (m a) (forall n x . eff n (n x) -> m x) (a -> k)
+  = forall a . Interpose (m a) (forall n x . eff n (n x) -> m x) (a -> m k)
 
-deriving instance Functor (Interpose eff m)
+deriving instance Functor m => Functor (Interpose eff m)
 
 instance HFunctor (Interpose eff) where
-  hmap f (Interpose m h k) = Interpose (f m) (f . h) k
+  hmap f (Interpose m h k) = Interpose (f m) (f . h) (f . k)
 
 -- | Respond to requests for some specific effect with a handler.
 --
@@ -48,7 +48,7 @@ runListener (Listener listen) = listen
 
 instance (Carrier sig m, Member eff sig) => Carrier (Interpose eff :+: sig) (InterposeC eff m) where
   eff (L (Interpose m h k)) =
-    InterposeC (local (const (Just (Listener h))) (runInterposeC m)) >>= k
+    InterposeC (local (const (Just (Listener h))) (runInterposeC m)) >>= _ k
   eff (R other) = do
     listener <- InterposeC ask
     case (listener, prj other) of

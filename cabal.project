@@ -7,6 +7,16 @@ package semantic
 
 source-repository-package
   type: git
+  location: https://github.com/fused-effects/fused-effects.git
+  tag: fa8694da51698d1f0a7176816550457ae1067497
+
+source-repository-package
+  type: git
+  location: https://github.com/fused-effects/fused-effects-exceptions.git
+  tag: 57b1dc8b5deadbe741ce22398d836a14dbba7577
+
+source-repository-package
+  type: git
   location: https://github.com/joshvera/proto3-suite.git
   tag: 83f3352f0c7c94ea091e6087f60692eda9991fae
 

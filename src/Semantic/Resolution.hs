@@ -46,7 +46,7 @@ resolutionMap Project{..} = case projectLanguage of
 data Resolution (m :: * -> *) k
   = NodeJSResolution FilePath Text [FilePath] (Map FilePath FilePath -> k)
   | NoResolution                              (Map FilePath FilePath -> k)
-  deriving stock Functor
+  deriving stock (Functor, Generic1)
   deriving anyclass (HFunctor, Effect)
 
 runResolution :: ResolutionC m a -> m a

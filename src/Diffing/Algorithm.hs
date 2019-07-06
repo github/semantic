@@ -36,7 +36,7 @@ data Diff term1 term2 diff (m :: * -> *) k
   | Insert term2 (diff -> k)
   -- | Replace one term with another.
   | Replace term1 term2 (diff -> k)
-  deriving stock Functor
+  deriving stock (Functor, Generic1)
   deriving anyclass (HFunctor, Effect)
 
 newtype Algorithm term1 term2 diff m a = Algorithm { runAlgorithm :: m a }

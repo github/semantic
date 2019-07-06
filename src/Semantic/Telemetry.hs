@@ -139,7 +139,7 @@ time' = withTiming'
 data Telemetry (m :: * -> *) k
   = WriteStat Stat k
   | WriteLog Level String [(String, String)] k
-  deriving stock Functor
+  deriving stock (Functor, Generic1)
   deriving anyclass (HFunctor, Effect)
 
 -- | Run a 'Telemetry' effect by expecting a 'Reader' of 'Queue's to write stats and logs to.

@@ -39,9 +39,9 @@ distributeFoldMap toTask inputs = fmap fold (distribute (fmap toTask inputs))
 
 -- | Distribute effects run tasks concurrently.
 data Distribute m k
-  = forall a . Distribute (m a) (a -> k)
+  = forall a . Distribute (m a) (a -> m k)
 
-deriving instance Functor (Distribute m)
+deriving instance Functor m => Functor (Distribute m)
 
 instance HFunctor Distribute where
   hmap f (Distribute m k) = Distribute (f m) k
