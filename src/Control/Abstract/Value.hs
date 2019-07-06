@@ -51,6 +51,8 @@ module Control.Abstract.Value
 , runNumericFunction
 , runNumeric2Function
 , castToInteger
+, runBitwiseFunction
+, runBitwise2Function
 , liftBitwise
 , liftBitwise2
 , unsignedRShift
@@ -346,7 +348,14 @@ unsignedRShift :: (Member (Bitwise value) sig, Carrier sig m)
 unsignedRShift v1 v2 = send (UnsignedRShift v1 v2 pure)
 
 data BitwiseFunction = BitwiseFunction (forall a . Bits a => a -> a)
+
+runBitwiseFunction :: Bits a => BitwiseFunction -> a -> a
+runBitwiseFunction (BitwiseFunction f) a = f a
+
 data Bitwise2Function = Bitwise2Function (forall a . (Integral a, Bits a) => a -> a -> a)
+
+runBitwise2Function :: (Integral a, Bits a) => Bitwise2Function -> a -> a -> a
+runBitwise2Function (Bitwise2Function f) a b = f a b
 
 data Bitwise value (m :: * -> *) k
   = CastToInteger value (value -> m k)

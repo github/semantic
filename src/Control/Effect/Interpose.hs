@@ -36,10 +36,11 @@ interpose m f = send (Interpose m f pure)
 runInterpose :: InterposeC eff m a -> m a
 runInterpose = runReader Nothing . runInterposeC
 
-newtype InterposeC eff m a = InterposeC { runInterposeC :: ReaderC (Maybe (Listener eff (InterposeC eff m))) m a }
-  deriving (Alternative, Applicative, Functor, Monad)
+newtype InterposeC (eff :: (* -> *) -> * -> *) m a = InterposeC
+  { runInterposeC :: ReaderC (Maybe (Listener eff (InterposeC eff m))) m a
+  } deriving (Alternative, Applicative, Functor, Monad)
 
-newtype Listener eff m = Listener (forall n x . eff n x -> m x)
+newtype Listener (eff :: (* -> *) -> * -> *) m = Listener (forall n x . eff n x -> m x)
 
 -- -- TODO: Document the implementation of this, as it is extremely subtle.
 

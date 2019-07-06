@@ -226,9 +226,9 @@ instance ( Member (Reader ModuleInfo) sig
     Abstract.Float    t k -> k (Float (Number.Decimal t))
     Abstract.Rational t k -> k (Rational (Number.Ratio t))
     Abstract.LiftNumeric f arg k -> k =<< case arg of
-      Integer (Number.Integer i) -> pure $ Integer (Number.Integer (f i))
-      Float (Number.Decimal d)   -> pure $ Float (Number.Decimal (f d))
-      Rational (Number.Ratio r)  -> pure $ Rational (Number.Ratio (f r))
+      Integer (Number.Integer i) -> pure $ Integer (Number.Integer (runNumericFunction f i))
+      Float (Number.Decimal d)   -> pure $ Float (Number.Decimal (runNumericFunction f d))
+      Rational (Number.Ratio r)  -> pure $ Rational (Number.Ratio (runNumericFunction f r))
       other                      -> throwBaseError (NumericError other)
     Abstract.LiftNumeric2 f left right k -> k =<< case (left, right) of
       (Integer  i, Integer j)  -> attemptUnsafeArithmetic (runNumeric2Function f i j) & specialize
@@ -268,7 +268,7 @@ instance ( Member (Reader ModuleInfo) sig
     CastToInteger (Integer (Number.Integer i)) k -> k (Integer (Number.Integer i))
     CastToInteger (Float (Number.Decimal i)) k -> k (Integer (Number.Integer (coefficient (normalize i))))
     CastToInteger i k -> throwBaseError (NumericError i) >>= k
-    LiftBitwise operator (Integer (Number.Integer i)) k -> k . Integer . Number.Integer . operator $ i
+    LiftBitwise operator (Integer (Number.Integer i)) k -> k . Integer . Number.Integer . runNumericFunction operator $ i
     LiftBitwise _ other k -> throwBaseError (BitwiseError other) >>= k
     LiftBitwise2 operator (Integer (Number.Integer i)) (Integer (Number.Integer j)) k -> k . Integer . Number.Integer $ operator i j
     LiftBitwise2 _ left right k -> throwBaseError (Bitwise2Error left right) >>= k
