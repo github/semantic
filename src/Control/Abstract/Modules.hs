@@ -60,17 +60,17 @@ load path = sendModules (Load path pure)
 
 
 data Modules address value (m :: * -> *) k
-  = Load    ModulePath (ModuleResult address value -> k)
-  | Lookup  ModulePath (Maybe (ModuleResult address value) -> k)
-  | Resolve [FilePath] (Maybe ModulePath -> k)
-  | List    FilePath   ([ModulePath] -> k)
+  = Load    ModulePath (ModuleResult address value -> m k)
+  | Lookup  ModulePath (Maybe (ModuleResult address value) -> m k)
+  | Resolve [FilePath] (Maybe ModulePath -> m k)
+  | List    FilePath   ([ModulePath] -> m k)
   deriving stock (Functor, Generic1)
   deriving anyclass (HFunctor, Effect)
 
 
 sendModules :: ( Member (Modules address value) sig
                , Carrier sig m)
-            => Modules address value (Evaluator term address value m) (Evaluator term address value m return)
+            => Modules address value (Evaluator term address value m) return
             -> Evaluator term address value m return
 sendModules = send
 

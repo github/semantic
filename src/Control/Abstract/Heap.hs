@@ -418,8 +418,8 @@ reachable roots heap = go mempty roots
 -- Effects
 
 data Deref value (m :: * -> *) k
-  = DerefCell        (Set value) (Maybe value -> k)
-  | AssignCell value (Set value) (Set value   -> k)
+  = DerefCell        (Set value) (Maybe value -> m k)
+  | AssignCell value (Set value) (Set value   -> m k)
   deriving stock (Functor, Generic1)
   deriving anyclass (HFunctor, Effect)
 
