@@ -234,7 +234,7 @@ instance (Member (Error SomeException) sig, Member (Lift IO) sig, Member (Reader
   eff (L op) = case op of
     Parse parser blob k -> runParser blob parser >>= k
     Decorate algebra term k -> k (decoratorWithAlgebra algebra term)
-    Semantic.Task.Diff terms k -> diffTermPair terms & k
+    Semantic.Task.Diff terms k -> k (diffTermPair terms)
     Render renderer input k -> k (renderer input)
     Serialize format input k -> do
       formatStyle <- asks (Flag.choose IsTerminal Plain Colourful . configIsTerminal . config)
