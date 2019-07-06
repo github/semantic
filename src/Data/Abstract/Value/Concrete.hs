@@ -268,9 +268,9 @@ instance ( Member (Reader ModuleInfo) sig
     CastToInteger (Integer (Number.Integer i)) k -> k (Integer (Number.Integer i))
     CastToInteger (Float (Number.Decimal i)) k -> k (Integer (Number.Integer (coefficient (normalize i))))
     CastToInteger i k -> throwBaseError (NumericError i) >>= k
-    LiftBitwise operator (Integer (Number.Integer i)) k -> k . Integer . Number.Integer . runNumericFunction operator $ i
+    LiftBitwise operator (Integer (Number.Integer i)) k -> k . Integer . Number.Integer . runBitwiseFunction operator $ i
     LiftBitwise _ other k -> throwBaseError (BitwiseError other) >>= k
-    LiftBitwise2 operator (Integer (Number.Integer i)) (Integer (Number.Integer j)) k -> k . Integer . Number.Integer $ operator i j
+    LiftBitwise2 operator (Integer (Number.Integer i)) (Integer (Number.Integer j)) k -> k . Integer . Number.Integer $ runBitwise2Function operator i j
     LiftBitwise2 _ left right k -> throwBaseError (Bitwise2Error left right) >>= k
     UnsignedRShift (Integer (Number.Integer i)) (Integer (Number.Integer j)) k | i >= 0 -> k . Integer . Number.Integer $ ourShift (fromIntegral i) (fromIntegral j)
     UnsignedRShift left right k -> throwBaseError (Bitwise2Error left right) >>= k

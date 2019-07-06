@@ -31,7 +31,7 @@ data Timeout m k
 deriving instance Functor m => Functor (Timeout m)
 
 instance HFunctor Timeout where
-  hmap f (Timeout n task k) = Timeout n (f task) k
+  hmap f (Timeout n task k) = Timeout n (f task) (f . k)
 
 instance Effect Timeout where
   handle state handler (Timeout n task k) = Timeout n (handler (task <$ state)) (handler . maybe (k Nothing <$ state) (fmap (k . Just)))

@@ -57,6 +57,7 @@ import           Control.Exception
 import           Control.Monad.IO.Class
 import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
 import qualified Data.Time.LocalTime as LocalTime
+import           GHC.Generics (Generic1)
 import           Semantic.Telemetry.AsyncQueue
 import           Semantic.Telemetry.Error
 import           Semantic.Telemetry.Log
@@ -137,8 +138,8 @@ time' = withTiming'
 
 -- | Statting and logging effects.
 data Telemetry (m :: * -> *) k
-  = WriteStat Stat k
-  | WriteLog Level String [(String, String)] k
+  = WriteStat Stat (m k)
+  | WriteLog Level String [(String, String)] (m k)
   deriving stock (Functor, Generic1)
   deriving anyclass (HFunctor, Effect)
 

@@ -18,6 +18,7 @@ import qualified Data.Map as Map
 import           Data.Source
 import           Data.Language
 import           Prologue
+import           GHC.Generics (Generic1)
 import           Semantic.Task.Files
 import           System.FilePath.Posix
 
@@ -44,8 +45,8 @@ resolutionMap Project{..} = case projectLanguage of
   _          -> send (NoResolution pure)
 
 data Resolution (m :: * -> *) k
-  = NodeJSResolution FilePath Text [FilePath] (Map FilePath FilePath -> k)
-  | NoResolution                              (Map FilePath FilePath -> k)
+  = NodeJSResolution FilePath Text [FilePath] (Map FilePath FilePath -> m k)
+  | NoResolution                              (Map FilePath FilePath -> m k)
   deriving stock (Functor, Generic1)
   deriving anyclass (HFunctor, Effect)
 

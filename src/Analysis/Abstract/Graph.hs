@@ -150,14 +150,14 @@ graphingModuleInfo recur m = do
     _             -> pure ()
 
 eavesdrop :: Evaluator term address value (EavesdropC address value m) a
-          -> (forall x . Modules address value m (m x) -> Evaluator term address value m ())
+          -> (forall x . Modules address value m x -> Evaluator term address value m ())
           -> Evaluator term address value m a
 eavesdrop m f = raiseHandler (runEavesdropC (runEvaluator . f)) m
 
-newtype EavesdropC address value m a = EavesdropC ((forall x . Modules address value m (m x) -> m ()) -> m a)
-  deriving (Alternative, Applicative, Functor, Monad) via (ReaderC (forall x . Modules address value m (m x) -> m ()) m)
+newtype EavesdropC address value m a = EavesdropC ((forall x . Modules address value m x -> m ()) -> m a)
+  deriving (Alternative, Applicative, Functor, Monad) via (ReaderC (forall x . Modules address value m x -> m ()) m)
 
-runEavesdropC :: (forall x . Modules address value m (m x) -> m ()) -> EavesdropC address value m a -> m a
+runEavesdropC :: (forall x . Modules address value m x -> m ()) -> EavesdropC address value m a -> m a
 runEavesdropC f (EavesdropC m) = m f
 
 instance (Carrier sig m, Member (Modules address value) sig, Applicative m) => Carrier sig (EavesdropC address value m) where

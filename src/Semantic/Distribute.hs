@@ -44,7 +44,7 @@ data Distribute m k
 deriving instance Functor m => Functor (Distribute m)
 
 instance HFunctor Distribute where
-  hmap f (Distribute m k) = Distribute (f m) k
+  hmap f (Distribute m k) = Distribute (f m) (f . k)
 
 instance Effect Distribute where
   handle state handler (Distribute task k) = Distribute (handler (task <$ state)) (handler . fmap k)
