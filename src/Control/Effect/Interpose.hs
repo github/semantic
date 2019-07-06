@@ -42,17 +42,15 @@ newtype InterposeC (eff :: (* -> *) -> * -> *) m a = InterposeC
 
 newtype Listener (eff :: (* -> *) -> * -> *) m = Listener (forall n x . eff n x -> m x)
 
--- -- TODO: Document the implementation of this, as it is extremely subtle.
-
--- runListener :: Listener eff (InterposeC eff m) -> eff (InterposeC eff m) (InterposeC eff m a) -> InterposeC eff m a
--- runListener (Listener listen) = listen
+-- Normally we can't just extract the existentials out of the Listener type. In this case,
+-- we can constrain the foralled 'n' variable to be 'Interpose', which lets it by the typechecker.
+runListener :: Listener eff (InterposeC eff m) -> eff (InterposeC eff m) a -> InterposeC eff m a
+runListener (Listener listen) = listen
 
 instance (Carrier sig m, Member eff sig) => Carrier (Interpose eff :+: sig) (InterposeC eff m) where
-  eff = undefined
-  -- eff (L (Interpose m h k)) =
-  --   InterposeC (local (const (Just (Listener h))) (runInterposeC m)) >>= _ k
-  -- eff (R other) = do
-  --   listener <- InterposeC ask
-  --   case (listener, prj other) of
-  --     (Just listener, Just eff) -> runListener listener eff
-  --     _                         -> InterposeC (eff (R (handleCoercible other)))
+  eff (L (Interpose m h k)) = InterposeC (local (const (Just (Listener h))) (runInterposeC m)) >>= k
+  eff (R other) = do
+    listener <- InterposeC ask
+    case (listener, prj other) of
+      (Just listener, Just eff) -> runListener listener eff
+      _                         -> InterposeC (eff (R (handleCoercible other)))
