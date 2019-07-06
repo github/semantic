@@ -48,7 +48,8 @@ runListener :: Listener eff (InterposeC eff m) -> eff (InterposeC eff m) a -> In
 runListener (Listener listen) = listen
 
 instance (Carrier sig m, Member eff sig) => Carrier (Interpose eff :+: sig) (InterposeC eff m) where
-  eff (L (Interpose m h k)) = InterposeC (local (const (Just (Listener h))) (runInterposeC m)) >>= k
+  eff (L (Interpose m h k)) =
+    InterposeC (local (const (Just (Listener h))) (runInterposeC m)) >>= k
   eff (R other) = do
     listener <- InterposeC ask
     case (listener, prj other) of
