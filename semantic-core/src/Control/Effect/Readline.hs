@@ -24,7 +24,6 @@ import Control.Effect.Sum
 import Control.Monad
 import Control.Monad.IO.Class
 import Control.Monad.Trans.Class
-import Data.Coerce
 import Data.Int
 import Data.String
 import Data.Text.Prettyprint.Doc
@@ -34,17 +33,17 @@ import System.Directory
 import System.FilePath
 
 data Readline (m :: * -> *) k
-  = Prompt String (Maybe String -> k)
-  | forall a . Print (Doc a) k
-  | AskLine (Line -> k)
+  = Prompt String (Maybe String -> m k)
+  | forall a . Print (Doc a) (m k)
+  | AskLine (Line -> m k)
 
-deriving instance Functor (Readline m)
+deriving instance Functor m => Functor (Readline m)
 
 instance HFunctor Readline where
-  hmap _ = coerce
+  hmap f (Prompt s k) = Prompt s (f . k)
+  hmap f (Print d k) = Print d (f k)
+  hmap f (AskLine k) = AskLine (f . k)
 
-instance Effect Readline where
-  handle state handler = coerce . fmap (handler . (<$ state))
 
 prompt :: (IsString str, Member Readline sig, Carrier sig m) => String -> m (Maybe str)
 prompt p = fmap fromString <$> send (Prompt p pure)
