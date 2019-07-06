@@ -1,4 +1,4 @@
-{-# LANGUAGE ExistentialQuantification, GeneralizedNewtypeDeriving, RankNTypes, StandaloneDeriving, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE ExistentialQuantification, GeneralizedNewtypeDeriving, KindSignatures, RankNTypes, StandaloneDeriving, TypeOperators, UndecidableInstances #-}
 module Control.Effect.Interpose
 ( Interpose(..)
 , interpose
@@ -12,7 +12,7 @@ import Control.Effect.Carrier
 import Control.Effect.Reader
 import Control.Effect.Sum
 
-data Interpose eff m k
+data Interpose (eff :: (* -> *) -> * -> *) m k
   = forall a . Interpose (m a) (forall n x . eff n x -> m x) (a -> m k)
 
 -- deriving instance Functor m => Functor (Interpose eff m)

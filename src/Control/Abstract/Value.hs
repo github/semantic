@@ -48,6 +48,8 @@ module Control.Abstract.Value
 , ObjectC(..)
 , runObject
 , runNumeric
+, runNumericFunction
+, runNumeric2Function
 , castToInteger
 , liftBitwise
 , liftBitwise2
@@ -289,7 +291,14 @@ liftNumeric2 :: (Member (Numeric value) sig, Carrier sig m)
 liftNumeric2 t v1 v2 = send (LiftNumeric2 (Numeric2Function t) v1 v2 pure)
 
 data NumericFunction = NumericFunction (forall a . Num a => a -> a)
+
+runNumericFunction :: Num a => NumericFunction -> a -> a
+runNumericFunction (NumericFunction f) a = f a
+
 data Numeric2Function = Numeric2Function (forall a b. Number a -> Number b -> SomeNumber)
+
+runNumeric2Function :: Numeric2Function -> Number a -> Number b -> SomeNumber
+runNumeric2Function (Numeric2Function f) a b = f a b
 
 data Numeric value (m :: * -> *) k
   = Integer Integer (value -> m k)

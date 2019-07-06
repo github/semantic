@@ -231,15 +231,15 @@ instance ( Member (Reader ModuleInfo) sig
       Rational (Number.Ratio r)  -> pure $ Rational (Number.Ratio (f r))
       other                      -> throwBaseError (NumericError other)
     Abstract.LiftNumeric2 f left right k -> k =<< case (left, right) of
-      (Integer  i, Integer j)  -> attemptUnsafeArithmetic (f i j) & specialize
-      (Integer  i, Rational j) -> attemptUnsafeArithmetic (f i j) & specialize
-      (Integer  i, Float j)    -> attemptUnsafeArithmetic (f i j) & specialize
-      (Rational i, Integer j)  -> attemptUnsafeArithmetic (f i j) & specialize
-      (Rational i, Rational j) -> attemptUnsafeArithmetic (f i j) & specialize
-      (Rational i, Float j)    -> attemptUnsafeArithmetic (f i j) & specialize
-      (Float    i, Integer j)  -> attemptUnsafeArithmetic (f i j) & specialize
-      (Float    i, Rational j) -> attemptUnsafeArithmetic (f i j) & specialize
-      (Float    i, Float j)    -> attemptUnsafeArithmetic (f i j) & specialize
+      (Integer  i, Integer j)  -> attemptUnsafeArithmetic (runNumeric2Function f i j) & specialize
+      (Integer  i, Rational j) -> attemptUnsafeArithmetic (runNumeric2Function f i j) & specialize
+      (Integer  i, Float j)    -> attemptUnsafeArithmetic (runNumeric2Function f i j) & specialize
+      (Rational i, Integer j)  -> attemptUnsafeArithmetic (runNumeric2Function f i j) & specialize
+      (Rational i, Rational j) -> attemptUnsafeArithmetic (runNumeric2Function f i j) & specialize
+      (Rational i, Float j)    -> attemptUnsafeArithmetic (runNumeric2Function f i j) & specialize
+      (Float    i, Integer j)  -> attemptUnsafeArithmetic (runNumeric2Function f i j) & specialize
+      (Float    i, Rational j) -> attemptUnsafeArithmetic (runNumeric2Function f i j) & specialize
+      (Float    i, Float j)    -> attemptUnsafeArithmetic (runNumeric2Function f i j) & specialize
       _                        -> throwBaseError (Numeric2Error left right)
 
 -- Dispatch whatever's contained inside a 'Number.SomeNumber' to its appropriate 'MonadValue' ctor
