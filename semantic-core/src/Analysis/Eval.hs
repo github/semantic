@@ -30,8 +30,8 @@ eval Analysis{..} eval = \case
   Core c -> case c of
     Let n -> alloc (User n) >>= bind (User n) >> unit
     a :>> b -> eval a >> eval b
-    Lam (Ignored n) b -> do
-      n <- Gen <$> fresh n
+    Lam _ b -> do
+      n <- Gen <$> fresh
       abstract eval n (instantiate (const (pure n)) b)
     f :$ a -> do
       f' <- eval f

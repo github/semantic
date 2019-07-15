@@ -22,6 +22,7 @@ import           Control.Effect.State
 import           Control.Monad ((<=<), guard)
 import qualified Data.Core as Core
 import           Data.File
+import           Data.Foldable (foldl')
 import           Data.Function (fix)
 import qualified Data.IntMap as IntMap
 import qualified Data.IntSet as IntSet
@@ -202,9 +203,7 @@ addressStyle heap = (G.defaultStyle vertex) { G.edgeAttributes }
           Obj _ -> "{}"
         showPos (Pos l c) = pack (show l) <> ":" <> pack (show c)
         fromName (User s)  = s
-        fromName (Gen sym) = fromGensym sym
-        fromGensym Root = "◊"
-        fromGensym (ss :/ (s, i)) = fromGensym ss <> "." <> s <> pack (show i)
+        fromName (Gen (Gensym ss i)) = foldl' (\ ss s -> ss <> "." <> s) (pack (show i)) ss
 
 data EdgeType
   = Edge Core.Edge

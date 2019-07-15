@@ -31,6 +31,7 @@ import           Data.Loc
 import qualified Data.Map as Map
 import           Data.Name as Name
 import qualified Data.Set as Set
+import           Data.Stack
 import           Prelude hiding (fail)
 
 data Monotype a
@@ -67,13 +68,13 @@ forAlls ns body = foldr forAll body ns
 
 generalize :: (Carrier sig m, Member Naming sig) => Monotype Meta -> m Polytype
 generalize ty = namespace "generalize" $ do
-  root <- Name.fresh ""
-  pure (forAlls (map ((root :/) . (,) "") (IntSet.toList (mvs ty))) (fold root ty))
+  Gensym root _ <- Name.fresh
+  pure (forAlls (map (Gensym root) (IntSet.toList (mvs ty))) (fold root ty))
   where fold root = \case
           MUnit      -> PUnit
           MBool      -> PBool
           MString    -> PString
-          MMeta i    -> PFree (root :/ ("", i))
+          MMeta i    -> PFree (Gensym root i)
           MFree n    -> PFree n
           MArr a b   -> PArr (fold root a) (fold root b)
           MRecord fs -> PRecord (fold root <$> fs)
@@ -106,7 +107,7 @@ typecheckingFlowInsensitive
   = run
   . runFresh
   . runNaming
-  . runHeap (Gen (Root :/ ("root", 0)))
+  . runHeap (Gen (Gensym (Nil :> "root") 0))
   . (>>= traverse (traverse (traverse generalize)))
   . traverse runFile
 

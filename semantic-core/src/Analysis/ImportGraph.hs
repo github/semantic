@@ -22,6 +22,7 @@ import           Data.Loc
 import qualified Data.Map as Map
 import           Data.Name
 import qualified Data.Set as Set
+import           Data.Stack
 import           Data.Text (Text)
 import           Prelude hiding (fail)
 
@@ -52,7 +53,7 @@ importGraph
   = run
   . runFresh
   . runNaming
-  . runHeap (Gen (Root :/ ("root", 0)))
+  . runHeap (Gen (Gensym (Nil :> "root") 0))
   . traverse runFile
 
 runFile :: ( Carrier sig m
