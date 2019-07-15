@@ -11,7 +11,6 @@ module Analysis.Eval
 , Analysis(..)
 ) where
 
-import Control.Effect
 import Control.Effect.Fail
 import Control.Effect.Reader
 import Control.Monad ((>=>))

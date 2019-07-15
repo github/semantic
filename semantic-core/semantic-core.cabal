@@ -41,7 +41,7 @@ library
                      , containers                  ^>= 0.6
                      , directory                   ^>= 1.3
                      , filepath                    ^>= 1.4
-                     , fused-effects               ^>= 0.4
+                     , fused-effects               ^>= 0.5
                      , haskeline                   ^>= 0.7.5
                      , parsers                     ^>= 0.12.10
                      , prettyprinter               ^>= 1.2.1

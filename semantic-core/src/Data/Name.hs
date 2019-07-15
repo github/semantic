@@ -22,11 +22,9 @@ module Data.Name
 ) where
 
 import           Control.Applicative
-import           Control.Effect
 import           Control.Effect.Carrier
 import           Control.Effect.Reader
 import           Control.Effect.State
-import           Control.Effect.Sum
 import           Control.Monad.Fail
 import           Control.Monad.IO.Class
 import qualified Data.Char as Char
@@ -128,14 +126,14 @@ namespace s m = send (Namespace s m pure)
 
 
 data Naming m k
-  = Gensym Text (Gensym -> k)
-  | forall a . Namespace Text (m a) (a -> k)
+  = Gensym Text (Gensym -> m k)
+  | forall a . Namespace Text (m a) (a -> m k)
 
-deriving instance Functor (Naming m)
+deriving instance Functor m => Functor (Naming m)
 
 instance HFunctor Naming where
-  hmap _ (Gensym    s   k) = Gensym    s       k
-  hmap f (Namespace s m k) = Namespace s (f m) k
+  hmap f (Gensym    s   k) = Gensym    s       (f . k)
+  hmap f (Namespace s m k) = Namespace s (f m) (f . k)
 
 instance Effect Naming where
   handle state handler (Gensym    s   k) = Gensym    s                        (handler . (<$ state) . k)
