@@ -108,7 +108,7 @@ infixl 4 :.
 let' :: (Carrier sig m, Member CoreF sig) => User -> m a
 let' = send . Let
 
-block :: Foldable t => t (Core a) -> Core a
+block :: (Foldable t, Carrier sig m, Member CoreF sig, Semigroup (m a)) => t (m a) -> m a
 block = fromMaybe unit . foldMap Just
 
 lam :: (Eq a, Carrier sig m, Member CoreF sig) => Named a -> m a -> m a
