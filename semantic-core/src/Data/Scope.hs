@@ -9,8 +9,8 @@ module Data.Scope
 ) where
 
 import Control.Applicative (liftA2)
-import Control.Monad.Trans.Class
 import Control.Monad ((>=>))
+import Control.Monad.Trans.Class
 import Data.Function (on)
 
 data Incr a b
