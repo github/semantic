@@ -29,7 +29,7 @@ import qualified Data.IntSet as IntSet
 import           Data.List.NonEmpty (nonEmpty)
 import           Data.Loc
 import qualified Data.Map as Map
-import           Data.Name hiding (Scope)
+import           Data.Name
 import qualified Data.Set as Set
 import           Prelude hiding (fail)
 

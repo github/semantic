@@ -40,6 +40,7 @@ import Data.Foldable (foldl')
 import Data.List.NonEmpty
 import Data.Loc
 import Data.Name
+import Data.Scope
 import Data.Stack
 import Data.Text (Text)
 import GHC.Stack

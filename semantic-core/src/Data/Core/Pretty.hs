@@ -14,6 +14,7 @@ import           Data.Core
 import           Data.File
 import           Data.Functor.Const
 import           Data.Name
+import           Data.Scope
 import           Data.Text.Prettyprint.Doc (Pretty (..), annotate, softline, (<+>))
 import qualified Data.Text.Prettyprint.Doc as Pretty
 import qualified Data.Text.Prettyprint.Doc.Render.String as Pretty
