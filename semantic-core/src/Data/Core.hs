@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveTraversable, FlexibleContexts, LambdaCase, OverloadedStrings, QuantifiedConstraints, RankNTypes,
+{-# LANGUAGE DeriveGeneric, DeriveTraversable, FlexibleContexts, LambdaCase, OverloadedStrings, QuantifiedConstraints, RankNTypes,
              ScopedTypeVariables, StandaloneDeriving, TypeFamilies, TypeOperators #-}
 module Data.Core
 ( Core(..)
@@ -34,6 +34,7 @@ module Data.Core
 ) where
 
 import Control.Applicative (Alternative (..), Const (..))
+import Control.Effect.Carrier
 import Control.Monad (ap)
 import Data.Coerce
 import Data.Foldable (foldl')
@@ -44,6 +45,7 @@ import Data.Name
 import Data.Scope
 import Data.Stack
 import Data.Text (Text)
+import GHC.Generics (Generic1)
 import GHC.Stack
 
 data Edge = Lexical | Import
@@ -85,7 +87,9 @@ data CoreF f a
   -- | Assignment of a value to the reference returned by the lhs.
   | f a := f a
   | Ann Loc (f a)
-  deriving (Foldable, Functor, Traversable)
+  deriving (Foldable, Functor, Generic1, Traversable)
+
+instance HFunctor CoreF
 
 deriving instance (Eq   a, forall a . Eq   a => Eq   (f a), Monad f) => Eq   (CoreF f a)
 deriving instance (Ord  a, forall a . Eq   a => Eq   (f a)
