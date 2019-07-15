@@ -1,4 +1,4 @@
-# Put protoc and twirp tooling in it's own image
+# Put protoc and twirp tooling in its own image
 FROM golang:1.12-stretch AS protoc
 RUN apt-get update && apt-get install -y unzip
 ENV PROTOBUF_VERSION=3.7.1
