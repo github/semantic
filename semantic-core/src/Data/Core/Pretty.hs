@@ -121,6 +121,6 @@ appending :: Functor f => AnsiDoc -> f AnsiDoc -> f AnsiDoc
 appending k item = (keyword k <+>) <$> item
 
 prettyCore :: Style -> Core Name -> AnsiDoc
-prettyCore s = run . runReader @Prec 0 . runReader @[AnsiDoc] [] . cata id (prettify s) k (pure . name)
-  where k (Z _) = asks (head @AnsiDoc)
-        k (S n) = local (tail @AnsiDoc) n
+prettyCore s = run . runReader @Prec 0 . runReader @[AnsiDoc] [] . cata id (prettify s) bound (pure . name)
+  where bound (Z _) = asks (head @AnsiDoc)
+        bound (S n) = local (tail @AnsiDoc) n
