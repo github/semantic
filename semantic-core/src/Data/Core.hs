@@ -68,7 +68,7 @@ data CoreF f a
   = Let User
   -- | Sequencing without binding; analogous to '>>' or '*>'.
   | f a :>> f a
-  | Lam (Ignored User) (Scope (Named ()) f a)
+  | Lam (Ignored User) (Scope () f a)
   -- | Function application; analogous to '$'.
   | f a :$ f a
   | Unit
@@ -106,9 +106,7 @@ block cs
   | otherwise = foldr1 (<>) cs
 
 lam :: Eq a => Named a -> Core a -> Core a
-lam (Named u n) b = Core (Lam u (bind matching b))
-  where matching x | x == n    = Just (Named u ())
-                   | otherwise = Nothing
+lam (Named u n) b = Core (Lam u (bind1 n b))
 
 lam' :: User -> Core User -> Core User
 lam' u = lam (named u u)
@@ -190,7 +188,7 @@ annWith callStack = maybe id (fmap Core . Ann) (stackLoc callStack)
 iter :: forall m n a b
      .  (forall a . m a -> n a)
      -> (forall a . CoreF n a -> n a)
-     -> (forall a . Incr (Named ()) (n a) -> m (Incr (Named ()) (n a)))
+     -> (forall a . Incr () (n a) -> m (Incr () (n a)))
      -> (a -> m b)
      -> Core a
      -> n b
@@ -202,13 +200,13 @@ iter var alg k = go
 
 cata :: (a -> b)
      -> (forall a . CoreF (Const b) a -> b)
-     -> (Incr (Named ()) b -> a)
+     -> (Incr () b -> a)
      -> (x -> a)
      -> Core x
      -> b
 cata var alg k h = getConst . iter (coerce var) (coerce alg) (coerce k) (Const . h)
 
-foldCoreF :: (forall a . Incr (Named ()) (n a) -> m (Incr (Named ()) (n a)))
+foldCoreF :: (forall a . Incr () (n a) -> m (Incr () (n a)))
           -> (forall x y . (x -> m y) -> f x -> n y)
           -> (a -> m b)
           -> CoreF f a
