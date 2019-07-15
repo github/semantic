@@ -158,7 +158,7 @@ runTask taskSession@TaskSession{..} task = do
         run
           = runM
           . withDistribute
-          . withCatch
+          . runCatch
           . runResource
           . withTimeout
           . runError
