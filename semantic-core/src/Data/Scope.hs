@@ -15,6 +15,7 @@ module Data.Scope
 ) where
 
 import Control.Applicative (liftA2)
+import Control.Effect.Carrier
 import Control.Monad ((>=>), guard)
 import Control.Monad.Trans.Class
 import Data.Function (on)
@@ -45,6 +46,9 @@ incr z s = \case { Z a -> z a ; S b -> s b }
 
 newtype Scope a f b = Scope { unScope :: f (Incr a (f b)) }
   deriving (Foldable, Functor, Traversable)
+
+instance HFunctor (Scope a) where
+  hmap f = Scope . f . fmap (fmap f) . unScope
 
 instance (Eq   a, Eq   b, forall a . Eq   a => Eq   (f a), Monad f) => Eq   (Scope a f b) where
   (==) = (==) `on` (unScope >=> sequenceA)
