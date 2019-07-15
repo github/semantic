@@ -11,7 +11,6 @@ module Control.Effect.Readline
 , ReadlineC (..)
 , runReadline
 , runReadlineWithHistory
-, TransC (..)
 , ControlIOC (..)
 , runControlIO
 ) where
@@ -21,7 +20,6 @@ import Prelude hiding (print)
 import Control.Effect.Carrier
 import Control.Effect.Lift
 import Control.Effect.Reader
-import Control.Monad
 import Control.Monad.IO.Class
 import Control.Monad.Trans.Class
 import Data.Int
@@ -88,13 +86,6 @@ runReadlineWithHistory block = do
   liftIO $ createDirectoryIfMissing True settingsDir
 
   runReadline prefs settings block
-
--- | Promote a monad transformer into an effect.
-newtype TransC t (m :: * -> *) a = TransC { runTransC :: t m a }
-  deriving newtype (Applicative, Functor, Monad, MonadIO, MonadTrans)
-
-instance (Carrier sig m, Effect sig, Monad (t m), MonadTrans t) => Carrier sig (TransC t m) where
-  eff = TransC . join . lift . eff . handle (pure ()) (pure . (runTransC =<<))
 
 runControlIO :: (forall x . m x -> IO x) -> ControlIOC m a -> m a
 runControlIO handler = runReader (Handler handler) . runControlIOC
