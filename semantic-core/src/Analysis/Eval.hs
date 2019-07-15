@@ -31,7 +31,7 @@ eval Analysis{..} eval = \case
     Let n -> alloc (User n) >>= bind (User n) >> unit
     a :>> b -> eval a >> eval b
     Lam (Ignored n) b -> do
-      n <- Gen <$> gensym n
+      n <- Gen <$> fresh n
       abstract eval n (instantiate (const (pure n)) b)
     f :$ a -> do
       f' <- eval f

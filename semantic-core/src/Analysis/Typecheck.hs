@@ -15,7 +15,7 @@ import           Analysis.FlowInsensitive
 import           Control.Applicative (Alternative (..))
 import           Control.Effect
 import           Control.Effect.Fail
-import           Control.Effect.Fresh
+import           Control.Effect.Fresh as Fresh
 import           Control.Effect.Reader hiding (Local)
 import           Control.Effect.State
 import           Control.Monad (unless)
@@ -29,7 +29,7 @@ import qualified Data.IntSet as IntSet
 import           Data.List.NonEmpty (nonEmpty)
 import           Data.Loc
 import qualified Data.Map as Map
-import           Data.Name
+import           Data.Name as Name
 import qualified Data.Set as Set
 import           Prelude hiding (fail)
 
@@ -67,7 +67,7 @@ forAlls ns body = foldr forAll body ns
 
 generalize :: (Carrier sig m, Member Naming sig) => Monotype Meta -> m Polytype
 generalize ty = namespace "generalize" $ do
-  root <- gensym ""
+  root <- Name.fresh ""
   pure (forAlls (map ((root :/) . (,) "") (IntSet.toList (mvs ty))) (fold root ty))
   where fold root = \case
           MUnit      -> PUnit
@@ -179,7 +179,7 @@ data Solution
 infix 5 :=
 
 meta :: (Carrier sig m, Member Fresh sig) => m (Monotype Meta)
-meta = MMeta <$> fresh
+meta = MMeta <$> Fresh.fresh
 
 unify :: (Carrier sig m, Member (State (Set.Set Constraint)) sig) => Monotype Meta -> Monotype Meta -> m ()
 unify t1 t2

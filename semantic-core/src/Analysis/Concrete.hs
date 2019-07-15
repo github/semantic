@@ -28,7 +28,7 @@ import qualified Data.IntSet as IntSet
 import           Data.Loc
 import qualified Data.Map as Map
 import           Data.Monoid (Alt(..))
-import           Data.Name
+import           Data.Name hiding (fresh)
 import           Data.Text (Text, pack)
 import           Prelude hiding (fail)
 

@@ -13,7 +13,7 @@ module Data.Name
 , needsQuotation
 , encloseIf
 , Gensym(..)
-, gensym
+, fresh
 , namespace
 , Naming(..)
 , runNaming
@@ -112,8 +112,8 @@ instance Pretty Gensym where
     p :/ (n, x) -> Pretty.hcat [pretty p, "/", pretty n, "^", pretty x]
 
 
-gensym :: (Carrier sig m, Member Naming sig) => Text -> m Gensym
-gensym s = send (Fresh s pure)
+fresh :: (Carrier sig m, Member Naming sig) => Text -> m Gensym
+fresh s = send (Fresh s pure)
 
 namespace :: (Carrier sig m, Member Naming sig) => Text -> m a -> m a
 namespace s m = send (Namespace s m pure)
