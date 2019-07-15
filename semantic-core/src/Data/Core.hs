@@ -105,22 +105,22 @@ infix  3 :=
 infixl 4 :.
 
 
-let' :: User -> Core a
-let' = Core . Let
+let' :: (Carrier sig m, Member CoreF sig) => User -> m a
+let' = send . Let
 
 block :: Foldable t => t (Core a) -> Core a
 block = fromMaybe unit . foldMap Just
 
-lam :: Eq a => Named a -> Core a -> Core a
-lam (Named u n) b = Core (Lam u (bind1 n b))
+lam :: (Eq a, Carrier sig m, Member CoreF sig) => Named a -> m a -> m a
+lam (Named u n) b = send (Lam u (bind1 n b))
 
-lam' :: User -> Core User -> Core User
+lam' :: (Carrier sig m, Member CoreF sig) => User -> m User -> m User
 lam' u = lam (named u u)
 
-lams :: (Eq a, Foldable t) => t (Named a) -> Core a -> Core a
+lams :: (Eq a, Foldable t, Carrier sig m, Member CoreF sig) => t (Named a) -> m a -> m a
 lams names body = foldr lam body names
 
-lams' :: Foldable t => t User -> Core User -> Core User
+lams' :: (Foldable t, Carrier sig m, Member CoreF sig) => t User -> m User -> m User
 lams' names body = foldr lam' body names
 
 unlam :: Alternative m => a -> Core a -> m (Named a, Core a)
@@ -137,13 +137,13 @@ unseqs = go
           Just (l, r) -> go l <> go r
           Nothing     -> t :| []
 
-($$) :: Core a -> Core a -> Core a
-f $$ a = Core (f :$ a)
+($$) :: (Carrier sig m, Member CoreF sig) => m a -> m a -> m a
+f $$ a = send (f :$ a)
 
 infixl 2 $$
 
 -- | Application of a function to a sequence of arguments.
-($$*) :: Foldable t => Core a -> t (Core a) -> Core a
+($$*) :: (Foldable t, Carrier sig m, Member CoreF sig) => m a -> t (m a) -> m a
 ($$*) = foldl' ($$)
 
 infixl 9 $$*
@@ -157,38 +157,38 @@ unapplies core = case unapply core of
   Just (f, a) -> (:> a) <$> unapplies f
   Nothing     -> (core, Nil)
 
-unit :: Core a
-unit = Core Unit
+unit :: (Carrier sig m, Member CoreF sig) => m a
+unit = send Unit
 
-bool :: Bool -> Core a
-bool = Core . Bool
+bool :: (Carrier sig m, Member CoreF sig) => Bool -> m a
+bool = send . Bool
 
-if' :: Core a -> Core a -> Core a -> Core a
-if' c t e = Core (If c t e)
+if' :: (Carrier sig m, Member CoreF sig) => m a -> m a -> m a -> m a
+if' c t e = send (If c t e)
 
-string :: Text -> Core a
-string = Core . String
+string :: (Carrier sig m, Member CoreF sig) => Text -> m a
+string = send . String
 
-load :: Core a -> Core a
-load = Core . Load
+load :: (Carrier sig m, Member CoreF sig) => m a -> m a
+load = send . Load
 
-edge :: Edge -> Core a -> Core a
-edge e b = Core (Edge e b)
+edge :: (Carrier sig m, Member CoreF sig) => Edge -> m a -> m a
+edge e b = send (Edge e b)
 
-frame :: Core a
-frame = Core Frame
+frame :: (Carrier sig m, Member CoreF sig) => m a
+frame = send Frame
 
-(...) :: Core a -> Core a -> Core a
-a ... b = Core (a :. b)
+(...) :: (Carrier sig m, Member CoreF sig) => m a -> m a -> m a
+a ... b = send (a :. b)
 
-(.=) :: Core a -> Core a -> Core a
-a .= b = Core (a := b)
+(.=) :: (Carrier sig m, Member CoreF sig) => m a -> m a -> m a
+a .= b = send (a := b)
 
-ann :: HasCallStack => Core a -> Core a
+ann :: (Carrier sig m, Member CoreF sig) => HasCallStack => m a -> m a
 ann = annWith callStack
 
-annWith :: CallStack -> Core a -> Core a
-annWith callStack = maybe id (fmap Core . Ann) (stackLoc callStack)
+annWith :: (Carrier sig m, Member CoreF sig) => CallStack -> m a -> m a
+annWith callStack = maybe id (fmap send . Ann) (stackLoc callStack)
 
 
 iter :: forall m n a b
