@@ -13,7 +13,6 @@ module Data.Name
 , needsQuotation
 , encloseIf
 , Gensym(..)
-, (//)
 , gensym
 , namespace
 , Naming(..)
@@ -112,11 +111,6 @@ instance Pretty Gensym where
     Root        -> pretty '◊'
     p :/ (n, x) -> Pretty.hcat [pretty p, "/", pretty n, "^", pretty x]
 
-(//) :: Gensym -> Text -> Gensym
-root // s = root :/ (s, 0)
-
-infixl 6 //
-
 
 gensym :: (Carrier sig m, Member Naming sig) => Text -> m Gensym
 gensym s = send (Gensym s pure)
@@ -148,5 +142,5 @@ newtype NamingC m a = NamingC { runNamingC :: StateC Int (ReaderC Gensym m) a }
 
 instance (Carrier sig m, Effect sig) => Carrier (Naming :+: sig) (NamingC m) where
   eff (L (Gensym    s   k)) = NamingC (StateC (\ i -> (:/ (s, i)) <$> ask >>= runState (succ i) . runNamingC . k))
-  eff (L (Namespace s m k)) = NamingC (StateC (\ i -> local (// s) (evalState 0 (runNamingC m)) >>= runState i . runNamingC . k))
+  eff (L (Namespace s m k)) = NamingC (StateC (\ i -> local (:/ (s, 0)) (evalState 0 (runNamingC m)) >>= runState i . runNamingC . k))
   eff (R other)             = NamingC (eff (R (R (handleCoercible other))))

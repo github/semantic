@@ -52,7 +52,7 @@ importGraph
   = run
   . runFresh
   . runNaming
-  . runHeap (Gen (Root // "root"))
+  . runHeap (Gen (Root :/ ("root", 0)))
   . traverse runFile
 
 runFile :: ( Carrier sig m
