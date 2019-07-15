@@ -113,24 +113,24 @@ instance Pretty Gensym where
 
 
 gensym :: (Carrier sig m, Member Naming sig) => Text -> m Gensym
-gensym s = send (Gensym s pure)
+gensym s = send (Fresh s pure)
 
 namespace :: (Carrier sig m, Member Naming sig) => Text -> m a -> m a
 namespace s m = send (Namespace s m pure)
 
 
 data Naming m k
-  = Gensym Text (Gensym -> m k)
+  = Fresh Text (Gensym -> m k)
   | forall a . Namespace Text (m a) (a -> m k)
 
 deriving instance Functor m => Functor (Naming m)
 
 instance HFunctor Naming where
-  hmap f (Gensym    s   k) = Gensym    s       (f . k)
+  hmap f (Fresh     s   k) = Fresh     s       (f . k)
   hmap f (Namespace s m k) = Namespace s (f m) (f . k)
 
 instance Effect Naming where
-  handle state handler (Gensym    s   k) = Gensym    s                        (handler . (<$ state) . k)
+  handle state handler (Fresh     s   k) = Fresh     s                        (handler . (<$ state) . k)
   handle state handler (Namespace s m k) = Namespace s (handler (m <$ state)) (handler . fmap k)
 
 
@@ -141,6 +141,6 @@ newtype NamingC m a = NamingC { runNamingC :: StateC Int (ReaderC Gensym m) a }
   deriving (Alternative, Applicative, Functor, Monad, MonadFail, MonadIO)
 
 instance (Carrier sig m, Effect sig) => Carrier (Naming :+: sig) (NamingC m) where
-  eff (L (Gensym    s   k)) = NamingC (StateC (\ i -> (:/ (s, i)) <$> ask >>= runState (succ i) . runNamingC . k))
+  eff (L (Fresh     s   k)) = NamingC (StateC (\ i -> (:/ (s, i)) <$> ask >>= runState (succ i) . runNamingC . k))
   eff (L (Namespace s m k)) = NamingC (StateC (\ i -> local (:/ (s, 0)) (evalState 0 (runNamingC m)) >>= runState i . runNamingC . k))
   eff (R other)             = NamingC (eff (R (R (handleCoercible other))))
