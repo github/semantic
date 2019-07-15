@@ -4,12 +4,18 @@ module Data.Scope
 , incr
 , Scope(..)
 , foldScope
+, fromScope
+, toScope
+, bind1
 , bind
+, bindEither
+, instantiate1
 , instantiate
+, instantiateEither
 ) where
 
 import Control.Applicative (liftA2)
-import Control.Monad ((>=>))
+import Control.Monad ((>=>), guard)
 import Control.Monad.Trans.Class
 import Data.Function (on)
 
@@ -27,12 +33,11 @@ instance Monad (Incr a) where
   Z a >>= _ = Z a
   S a >>= f = f a
 
-match :: Applicative f => (b -> Maybe a) -> b -> Incr a (f b)
-match f x | Just y <- f x = Z y
-          | otherwise     = S (pure x)
+match :: Applicative f => (b -> Either a c) -> b -> Incr a (f c)
+match f x = either Z (S . pure) (f x)
 
-fromIncr :: (a -> b) -> Incr a b -> b
-fromIncr f = incr f id
+matchMaybe :: (b -> Maybe a) -> (b -> Either a b)
+matchMaybe f a = maybe (Right a) Left (f a)
 
 incr :: (a -> c) -> (b -> c) -> Incr a b -> c
 incr z s = \case { Z a -> z a ; S b -> s b }
@@ -67,10 +72,31 @@ foldScope :: (forall a . Incr z (n a) -> m (Incr z (n a)))
           -> Scope z n b
 foldScope k go h = Scope . go (k . fmap (go h)) . unScope
 
+
+fromScope :: Monad f => Scope a f b -> f (Incr a b)
+fromScope = unScope >=> sequenceA
+
+toScope :: Applicative f => f (Incr a b) -> Scope a f b
+toScope = Scope . fmap (fmap pure)
+
+
 -- | Bind occurrences of a variable in a term, producing a term in which the variable is bound.
+bind1 :: (Applicative f, Eq a) => a -> f a -> Scope () f a
+bind1 n = bind (guard . (== n))
+
 bind :: Applicative f => (b -> Maybe a) -> f b -> Scope a f b
-bind name = Scope . fmap (match name) -- FIXME: succ as little of the expression as possible, cf https://twitter.com/ollfredo/status/1145776391826358273 — can this even be done generically?
+bind f = bindEither (matchMaybe f)
+
+bindEither :: Applicative f => (b -> Either a c) -> f b -> Scope a f c
+bindEither f = Scope . fmap (match f) -- FIXME: succ as little of the expression as possible, cf https://twitter.com/ollfredo/status/1145776391826358273
+
 
 -- | Substitute a term for the free variable in a given term, producing a closed term.
+instantiate1 :: Monad f => f b -> Scope a f b -> f b
+instantiate1 t = instantiate (const t)
+
 instantiate :: Monad f => (a -> f b) -> Scope a f b -> f b
-instantiate f = unScope >=> fromIncr f
+instantiate f = instantiateEither (either f pure)
+
+instantiateEither :: Monad f => (Either a b -> f c) -> Scope a f b -> f c
+instantiateEither f = unScope >=> incr (f . Left) (>>= f . Right)
