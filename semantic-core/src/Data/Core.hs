@@ -39,6 +39,7 @@ import Data.Coerce
 import Data.Foldable (foldl')
 import Data.List.NonEmpty
 import Data.Loc
+import Data.Maybe
 import Data.Name
 import Data.Scope
 import Data.Stack
@@ -101,9 +102,7 @@ let' :: User -> Core a
 let' = Core . Let
 
 block :: Foldable t => t (Core a) -> Core a
-block cs
-  | null cs   = unit
-  | otherwise = foldr1 (<>) cs
+block = fromMaybe unit . foldMap Just
 
 lam :: Eq a => Named a -> Core a -> Core a
 lam (Named u n) b = Core (Lam u (bind1 n b))
