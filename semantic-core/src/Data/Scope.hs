@@ -65,6 +65,7 @@ instance Monad f => Monad (Scope a f) where
 instance MonadTrans (Scope a) where
   lift = Scope . pure . S
 
+
 foldScope :: (forall a . Incr z (n a) -> m (Incr z (n a)))
           -> (forall x y . (x -> m y) -> f x -> n y)
           -> (a -> m b)
