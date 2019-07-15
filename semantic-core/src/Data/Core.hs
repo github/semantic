@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveGeneric, DeriveTraversable, FlexibleContexts, LambdaCase, OverloadedStrings, QuantifiedConstraints, RankNTypes,
+{-# LANGUAGE DeriveGeneric, DeriveTraversable, FlexibleContexts, LambdaCase, MultiParamTypeClasses, OverloadedStrings, QuantifiedConstraints, RankNTypes,
              ScopedTypeVariables, StandaloneDeriving, TypeFamilies, TypeOperators #-}
 module Data.Core
 ( Core(..)
@@ -65,6 +65,9 @@ instance Applicative Core where
 
 instance Monad Core where
   a >>= f = iter id Core Var f a
+
+instance Carrier CoreF Core where
+  eff = Core
 
 
 data CoreF f a
