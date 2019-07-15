@@ -60,7 +60,7 @@ repl proxy parser paths =
   withOptions debugOptions $ \config logger statter ->
     runM
     . withDistribute
-    . withCatch
+    . runCatch
     . runResource
     . withTimeout
     . runError @SomeException
