@@ -11,6 +11,7 @@ import qualified Data.Map.Strict as Map
 
 import Control.Abstract as Abstract
 import Control.Abstract.ScopeGraph (runAllocator)
+import Control.Effect.Carrier
 import Control.Effect.Interpose
 import Data.Abstract.Evaluatable
 import Data.Abstract.Module

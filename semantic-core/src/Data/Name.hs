@@ -16,11 +16,9 @@ module Data.Name
 ) where
 
 import           Control.Applicative
-import           Control.Effect
 import           Control.Effect.Carrier
 import           Control.Effect.Reader
 import           Control.Effect.State
-import           Control.Effect.Sum
 import           Control.Monad.Fail
 import           Control.Monad.IO.Class
 import qualified Data.Char as Char

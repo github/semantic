@@ -23,6 +23,7 @@ import Control.Abstract
 import Data.Abstract.ScopeGraph (EdgeLabel(..))
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import qualified Data.Abstract.Heap as Heap
+import Control.Effect.Lift
 import Control.Effect.Trace as X (runTraceByIgnoring, runTraceByReturning)
 import Control.Monad ((>=>))
 import Data.Traversable as X (for)

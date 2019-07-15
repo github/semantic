@@ -8,10 +8,8 @@ module Semantic.Timeout
 , Duration(..)
 ) where
 
-import           Control.Effect
 import           Control.Effect.Carrier
 import           Control.Effect.Reader
-import           Control.Effect.Sum
 import           Control.Monad.IO.Class
 import           Control.Monad.IO.Unlift
 import           Data.Duration

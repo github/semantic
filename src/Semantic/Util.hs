@@ -19,6 +19,7 @@ import Prelude hiding (readFile)
 import           Control.Abstract
 import           Control.Abstract.Heap (runHeapError)
 import           Control.Abstract.ScopeGraph (runScopeError)
+import           Control.Effect.Lift
 import           Control.Effect.Trace (runTraceByPrinting)
 import           Control.Exception (displayException)
 import           Data.Abstract.Address.Precise as Precise

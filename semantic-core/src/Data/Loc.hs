@@ -15,7 +15,6 @@ import Control.Effect.Carrier
 import Control.Effect.Error
 import Control.Effect.Fail
 import Control.Effect.Reader
-import Control.Effect.Sum
 import Data.Text (Text, pack)
 import Data.Text.Prettyprint.Doc (Pretty (..))
 import GHC.Stack

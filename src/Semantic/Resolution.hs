@@ -7,9 +7,7 @@ module Semantic.Resolution
   , ResolutionC(..)
   ) where
 
-import           Control.Effect
 import           Control.Effect.Carrier
-import           Control.Effect.Sum
 import           Data.Aeson
 import           Data.Aeson.Types (parseMaybe)
 import           Data.Blob

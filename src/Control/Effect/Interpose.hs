@@ -10,7 +10,6 @@ module Control.Effect.Interpose
 import Control.Applicative
 import Control.Effect.Carrier
 import Control.Effect.Reader
-import Control.Effect.Sum
 
 data Interpose (eff :: (* -> *) -> * -> *) m k
   = forall a . Interpose (m a) (forall n x . eff n x -> m x) (a -> m k)

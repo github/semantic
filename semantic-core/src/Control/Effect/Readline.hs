@@ -20,7 +20,6 @@ import Prelude hiding (print)
 
 import Control.Effect.Carrier
 import Control.Effect.Reader
-import Control.Effect.Sum
 import Control.Monad
 import Control.Monad.IO.Class
 import Control.Monad.Trans.Class

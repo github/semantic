@@ -6,6 +6,7 @@ module Control.Abstract.Evaluator.Spec
 
 import           Control.Abstract as Abstract
 import qualified Control.Abstract.Heap as Heap
+import           Control.Effect.Lift
 import           Data.Abstract.Address.Precise as Precise
 import           Data.Abstract.BaseError
 import           Data.Abstract.Evaluatable

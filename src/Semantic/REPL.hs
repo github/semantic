@@ -10,7 +10,7 @@ import Control.Abstract.Heap (runHeapError)
 import Control.Effect.Carrier
 import Control.Effect.Catch
 import Control.Effect.Resource
-import Control.Effect.Sum
+import Control.Effect.Lift
 import Control.Effect.REPL
 import Data.Abstract.Address.Precise as Precise
 import Data.Abstract.Evaluatable hiding (string)

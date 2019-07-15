@@ -12,7 +12,6 @@ import qualified Control.Abstract as Abstract
 import Control.Abstract hiding (Boolean(..), Function(..), Numeric(..), Object(..), Array(..), Hash(..), String(..), Unit(..), While(..))
 import Control.Effect.Carrier
 import Control.Effect.Interpose
-import Control.Effect.Sum
 import Data.Abstract.BaseError
 import Data.Abstract.Evaluatable (UnspecializedError(..), EvalError(..), Declarations)
 import Data.Abstract.FreeVariables

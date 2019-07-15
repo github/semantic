@@ -49,10 +49,8 @@ module Semantic.Telemetry
 , IgnoreTelemetryC(..)
 ) where
 
-import           Control.Effect
 import           Control.Effect.Carrier
 import           Control.Effect.Reader
-import           Control.Effect.Sum
 import           Control.Exception
 import           Control.Monad.IO.Class
 import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)

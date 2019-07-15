@@ -17,7 +17,6 @@ module Control.Abstract.Evaluator
   , module X
   ) where
 
-import Control.Effect as X
 import Control.Effect.Carrier
 import Control.Effect.Error as X
 import Control.Effect.Fresh as X

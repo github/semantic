@@ -6,7 +6,6 @@ module Data.Abstract.Address.Hole
 
 import Control.Abstract
 import Control.Effect.Carrier
-import Control.Effect.Sum
 import Prologue
 
 data Hole context a = Partial context | Total a

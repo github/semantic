@@ -10,10 +10,8 @@ module Semantic.Distribute
 ) where
 
 import qualified Control.Concurrent.Async as Async
-import           Control.Effect
 import           Control.Effect.Carrier
 import           Control.Effect.Reader
-import           Control.Effect.Sum
 import           Control.Monad.IO.Unlift
 import           Control.Parallel.Strategies
 import           Prologue
