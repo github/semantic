@@ -19,6 +19,7 @@ module Control.Effect.Readline
 import Prelude hiding (print)
 
 import Control.Effect.Carrier
+import Control.Effect.Lift
 import Control.Effect.Reader
 import Control.Monad
 import Control.Monad.IO.Class
@@ -58,15 +59,15 @@ newtype Line = Line Int64
 increment :: Line -> Line
 increment (Line n) = Line (n + 1)
 
-newtype ReadlineC m a = ReadlineC { runReadlineC :: ReaderC Line (TransC InputT m) a }
+newtype ReadlineC m a = ReadlineC { runReadlineC :: ReaderC Line (LiftC (InputT m)) a }
   deriving newtype (Applicative, Functor, Monad, MonadIO)
 
 runReadline :: MonadException m => Prefs -> Settings m -> ReadlineC m a -> m a
-runReadline prefs settings = runInputTWithPrefs prefs settings . runTransC . runReader (Line 0) . runReadlineC
+runReadline prefs settings = runInputTWithPrefs prefs settings . runM . runReader (Line 0) . runReadlineC
 
-instance (Carrier sig m, Effect sig, MonadException m, MonadIO m) => Carrier (Readline :+: sig) (ReadlineC m) where
+instance (MonadException m, MonadIO m) => Carrier (Readline :+: Lift (InputT m)) (ReadlineC m) where
   eff (L (Prompt prompt k)) = ReadlineC $ do
-    str <- lift (TransC (getInputLine (cyan <> prompt <> plain)))
+    str <- lift (lift (getInputLine (cyan <> prompt <> plain)))
     local increment (runReadlineC (k str))
     where cyan = "\ESC[1;36m\STX"
           plain = "\ESC[0m\STX"
