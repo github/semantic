@@ -7,7 +7,6 @@ module Parsing.TreeSitter
 import Prologue hiding (bracket)
 
 import qualified Control.Exception as Exc (bracket)
-import           Control.Effect
 import           Control.Effect.Resource
 import           Control.Effect.Trace
 import           Data.ByteString.Unsafe (unsafeUseAsCStringLen)

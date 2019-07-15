@@ -87,7 +87,6 @@ runReadlineWithHistory block = do
 
   runReadline prefs settings block
 
-
 runControlIO :: (forall x . m x -> IO x) -> ControlIOC m a -> m a
 runControlIO handler = runReader (Handler handler) . runControlIOC
 

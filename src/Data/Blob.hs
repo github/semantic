@@ -26,7 +26,6 @@ module Data.Blob
 
 import Prologue
 
-import           Control.Effect
 import           Control.Effect.Error
 import           Data.Aeson
 import qualified Data.ByteString.Lazy as BL

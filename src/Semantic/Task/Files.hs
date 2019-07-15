@@ -17,11 +17,9 @@ module Semantic.Task.Files
   , Excludes(..)
   ) where
 
-import           Control.Effect
 import           Control.Effect.Carrier
 import           Control.Effect.Catch
 import           Control.Effect.Error
-import           Control.Effect.Sum
 import           Data.Blob
 import           Data.Blob.IO
 import qualified Data.ByteString.Builder as B

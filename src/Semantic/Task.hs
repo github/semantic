@@ -57,20 +57,17 @@ module Semantic.Task
 import           Analysis.Decorator (decoratorWithAlgebra)
 import qualified Assigning.Assignment as Assignment
 import qualified Assigning.Assignment.Deterministic as Deterministic
-import qualified Control.Abstract as Analysis
-import           Control.Effect
 import           Control.Effect.Carrier
 import           Control.Effect.Catch
 import           Control.Effect.Error
+import           Control.Effect.Lift
 import           Control.Effect.Reader
 import           Control.Effect.Resource
-import           Control.Effect.Sum
 import           Control.Effect.Trace
 import           Control.Monad
 import           Control.Monad.IO.Class
 import           Data.Blob
 import           Data.ByteString.Builder
-import           Data.Coerce
 import           Data.Diff
 import qualified Data.Error as Error
 import qualified Data.Flag as Flag

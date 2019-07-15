@@ -6,7 +6,6 @@ module Data.Abstract.Address.Precise
 import Control.Abstract
 import Control.Abstract.ScopeGraph (AllocatorC(..))
 import Control.Effect.Carrier
-import Control.Effect.Sum
 import qualified Data.Set as Set
 import Prologue
 

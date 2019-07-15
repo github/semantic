@@ -8,8 +8,7 @@ where
 import Prelude hiding (fail, filter, log)
 import Prologue hiding (Element, hash)
 
-import           Control.Effect as Eff
-import           Control.Effect.State
+import           Control.Effect.State as Eff
 import           Data.Text as T hiding (empty)
 import           Streaming
 import qualified Streaming.Prelude as Streaming

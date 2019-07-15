@@ -14,8 +14,8 @@ module Diffing.Algorithm
   , algorithmForTerms
   ) where
 
-import Control.Effect hiding ((:+:))
-import Control.Effect.Carrier
+import Control.Effect.Carrier hiding ((:+:))
+import Control.Effect.NonDet
 import qualified Data.Diff as Diff
 import Data.Sum
 import Data.Term

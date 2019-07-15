@@ -10,9 +10,7 @@ module Control.Effect.REPL
 
 import Prologue
 
-import Control.Effect
 import Control.Effect.Carrier
-import Control.Effect.Sum
 import Control.Effect.Reader
 import System.Console.Haskeline
 import qualified Data.Text as T
