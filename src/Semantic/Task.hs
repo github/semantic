@@ -22,7 +22,6 @@ module Semantic.Task
 , time'
 -- * High-level flow
 , parse
-, analyze
 , decorate
 , diff
 , render
@@ -119,13 +118,6 @@ parse :: (Member Task sig, Carrier sig m)
       -> m term
 parse parser blob = send (Parse parser blob pure)
 
--- | A task running some 'Analysis.Evaluator' to completion.
-analyze :: (Member Task sig, Carrier sig m)
-        => (Analysis.Evaluator term address value m a -> result)
-        -> Analysis.Evaluator term address value m a
-        -> m result
-analyze interpret analysis = send (Analyze interpret analysis pure)
-
 -- | A task which decorates a 'Term' with values computed using the supplied 'RAlgebra' function.
 decorate :: (Functor f, Member Task sig, Carrier sig m)
          => RAlgebra (TermF f Location) (Term f Location) field
@@ -170,7 +162,7 @@ runTask taskSession@TaskSession{..} task = do
           = runM
           . withDistribute
           . withCatch
-          . withResource
+          . runResource
           . withTimeout
           . runError
           . runTelemetry logger statter
@@ -208,21 +200,23 @@ instance (Member Telemetry sig, Carrier sig m) => Carrier (Trace :+: sig) (Trace
 
 -- | An effect describing high-level tasks to be performed.
 data Task (m :: * -> *) k
-  = forall term . Parse (Parser term) Blob (term -> k)
-  | forall term address value m a result . Analyze (Analysis.Evaluator term address value m a -> result) (Analysis.Evaluator term address value m a) (result -> k)
-  | forall f field . Functor f => Decorate (RAlgebra (TermF f Location) (Term f Location) field) (Term f Location) (Term f field -> k)
-  | forall syntax ann . (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => Diff (These (Term syntax ann) (Term syntax ann)) (Diff syntax ann ann -> k)
-  | forall input output . Render (Renderer input output) input (output -> k)
-  | forall input . Serialize (Format input) input (Builder -> k)
+  = forall term . Parse (Parser term) Blob (term -> m k)
+  | forall f field . Functor f => Decorate (RAlgebra (TermF f Location) (Term f Location) field) (Term f Location) (Term f field -> m k)
+  | forall syntax ann . (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => Diff (These (Term syntax ann) (Term syntax ann)) (Diff syntax ann ann -> m k)
+  | forall input output . Render (Renderer input output) input (output -> m k)
+  | forall input . Serialize (Format input) input (Builder -> m k)
 
-deriving instance Functor (Task m)
+deriving instance Functor m => Functor (Task m)
 
 instance HFunctor Task where
-  hmap _ = coerce
+  hmap f (Parse parser blob k) = Parse parser blob (f . k)
+  hmap f (Decorate decorator term k) = Decorate decorator term (f . k)
+  hmap f (Semantic.Task.Diff terms k) = Semantic.Task.Diff terms (f . k)
+  hmap f (Render renderer input k) = Render renderer input (f . k)
+  hmap f (Serialize format input k) = Serialize format input (f . k)
 
 instance Effect Task where
   handle state handler (Parse parser blob k) = Parse parser blob (handler . (<$ state) . k)
-  handle state handler (Analyze run analysis k) = Analyze run analysis (handler . (<$ state) . k)
   handle state handler (Decorate decorator term k) = Decorate decorator term (handler . (<$ state) . k)
   handle state handler (Semantic.Task.Diff terms k) = Semantic.Task.Diff terms (handler . (<$ state) . k)
   handle state handler (Render renderer input k) = Render renderer input (handler . (<$ state) . k)
@@ -239,7 +233,6 @@ instance (Member (Error SomeException) sig, Member (Lift IO) sig, Member (Reader
   eff (R other) = TaskC . eff . handleCoercible $ other
   eff (L op) = case op of
     Parse parser blob k -> runParser blob parser >>= k
-    Analyze interpret analysis k -> k . interpret $ analysis
     Decorate algebra term k -> k (decoratorWithAlgebra algebra term)
     Semantic.Task.Diff terms k -> k (diffTermPair terms)
     Render renderer input k -> k (renderer input)

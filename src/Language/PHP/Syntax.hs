@@ -128,6 +128,12 @@ newtype SimpleVariable a = SimpleVariable { value :: a }
 
 instance Evaluatable SimpleVariable
 
+data Concat a = Concat { lhs :: a, rhs :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
+  deriving (Eq1, Show1, Ord1) via Generically Concat
+
+instance Evaluatable Concat
+
 -- | TODO: Unify with TypeScript's PredefinedType
 newtype CastType a = CastType { _castType :: T.Text }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)

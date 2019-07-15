@@ -398,6 +398,7 @@ instance AccessControls1 PHP.IncludeOnce
 instance AccessControls1 PHP.ArrayElement
 instance AccessControls1 PHP.GlobalDeclaration
 instance AccessControls1 PHP.SimpleVariable
+instance AccessControls1 PHP.Concat
 instance AccessControls1 PHP.CastType
 instance AccessControls1 PHP.ErrorControl
 instance AccessControls1 PHP.Clone

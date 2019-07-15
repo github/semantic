@@ -55,8 +55,8 @@ common dependencies
                      , fastsum ^>= 0.1.1.0
                      , filepath ^>= 1.4.2.1
                      , free ^>= 5.1
-                     , fused-effects-exceptions ^>= 0.1.1.0
-                     , fused-effects ^>= 0.5
+                     , fused-effects ^>= 0.5.0.0
+                     , fused-effects-exceptions ^>= 0.2.0.0
                      , hashable ^>= 1.2.7.0
                      , tree-sitter ^>= 0.1.0.0
                      , mtl ^>= 2.2.2

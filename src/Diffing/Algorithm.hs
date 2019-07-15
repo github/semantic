@@ -25,19 +25,20 @@ import Prologue
 -- | A single step in a diffing algorithm, parameterized by the types of terms, diffs, and the result of the applicable algorithm.
 data Diff term1 term2 diff (m :: * -> *) k
   -- | Diff two terms with the choice of algorithm left to the interpreter’s discretion.
-  = Diff term1 term2 (diff -> k)
+  = Diff term1 term2 (diff -> m k)
   -- | Diff two terms recursively in O(n) time, resulting in a single diff node.
-  | Linear term1 term2 (diff -> k)
+  | Linear term1 term2 (diff -> m k)
   -- | Diff two lists of terms by each element’s similarity in O(n³ log n), resulting in a list of diffs.
-  | RWS [term1] [term2] ([diff] -> k)
+  | RWS [term1] [term2] ([diff] -> m k)
   -- | Delete a term.
-  | Delete term1 (diff -> k)
+  | Delete term1 (diff -> m k)
   -- | Insert a term.
-  | Insert term2 (diff -> k)
+  | Insert term2 (diff -> m k)
   -- | Replace one term with another.
-  | Replace term1 term2 (diff -> k)
-  deriving stock Functor
+  | Replace term1 term2 (diff -> m k)
+  deriving stock (Functor, Generic1)
   deriving anyclass (HFunctor, Effect)
+
 
 newtype Algorithm term1 term2 diff m a = Algorithm { runAlgorithm :: m a }
   deriving newtype (Applicative, Alternative, Functor, Monad)
@@ -83,7 +84,7 @@ byInserting a2 = sendDiff (Insert a2 pure)
 byReplacing :: (Carrier sig m, Member (Diff term1 term2 diff) sig) => term1 -> term2 -> Algorithm term1 term2 diff m diff
 byReplacing a1 a2 = send (Replace a1 a2 pure)
 
-sendDiff :: (Carrier sig m, Member (Diff term1 term2 diff) sig) => Diff term1 term2 diff m (m a) -> Algorithm term1 term2 diff m a
+sendDiff :: (Carrier sig m, Member (Diff term1 term2 diff) sig) => Diff term1 term2 diff m a -> Algorithm term1 term2 diff m a
 sendDiff = Algorithm . send
 
 

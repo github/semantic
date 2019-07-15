@@ -61,7 +61,7 @@ repl proxy parser paths =
     runM
     . withDistribute
     . withCatch
-    . withResource
+    . runResource
     . withTimeout
     . runError @SomeException
     . runTelemetryIgnoringStat (logOptionsFromConfig config)

@@ -551,6 +551,7 @@ instance Taggable PHP.IncludeOnce
 instance Taggable PHP.ArrayElement
 instance Taggable PHP.GlobalDeclaration
 instance Taggable PHP.SimpleVariable
+instance Taggable PHP.Concat
 instance Taggable PHP.CastType
 instance Taggable PHP.ErrorControl
 instance Taggable PHP.Clone
