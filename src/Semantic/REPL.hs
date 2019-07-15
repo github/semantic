@@ -9,9 +9,9 @@ import Control.Abstract.ScopeGraph (runScopeError)
 import Control.Abstract.Heap (runHeapError)
 import Control.Effect.Carrier
 import Control.Effect.Catch
-import Control.Effect.Resource
 import Control.Effect.Lift
 import Control.Effect.REPL
+import Control.Effect.Resource
 import Data.Abstract.Address.Precise as Precise
 import Data.Abstract.Evaluatable hiding (string)
 import Data.Abstract.Module
