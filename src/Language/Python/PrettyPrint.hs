@@ -2,7 +2,6 @@
 
 module Language.Python.PrettyPrint ( printingPython ) where
 
-import Control.Effect
 import Control.Effect.Error
 import Streaming
 import qualified Streaming.Prelude as Streaming

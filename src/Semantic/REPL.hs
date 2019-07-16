@@ -9,9 +9,9 @@ import Control.Abstract.ScopeGraph (runScopeError)
 import Control.Abstract.Heap (runHeapError)
 import Control.Effect.Carrier
 import Control.Effect.Catch
-import Control.Effect.Resource
-import Control.Effect.Sum
+import Control.Effect.Lift
 import Control.Effect.REPL
+import Control.Effect.Resource
 import Data.Abstract.Address.Precise as Precise
 import Data.Abstract.Evaluatable hiding (string)
 import Data.Abstract.Module
@@ -60,8 +60,8 @@ repl proxy parser paths =
   withOptions debugOptions $ \config logger statter ->
     runM
     . withDistribute
-    . withCatch
-    . withResource
+    . runCatch
+    . runResource
     . withTimeout
     . runError @SomeException
     . runTelemetryIgnoringStat (logOptionsFromConfig config)

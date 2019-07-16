@@ -7,7 +7,6 @@ module Semantic.Api.Symbols
 
 import Prelude hiding (span)
 
-import           Control.Effect
 import           Control.Effect.Error
 import           Control.Exception
 import           Control.Lens

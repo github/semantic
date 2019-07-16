@@ -4,7 +4,6 @@ module Control.Abstract.PythonPackage
 
 import           Control.Abstract as Abstract
 import           Control.Effect.Carrier
-import           Control.Effect.Sum
 import           Data.Abstract.Name (name)
 import           Data.Abstract.Path (stripQuotes)
 import           Data.Abstract.Value.Concrete (Value (..))

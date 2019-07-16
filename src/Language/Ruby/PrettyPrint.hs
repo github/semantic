@@ -2,9 +2,7 @@
 
 module Language.Ruby.PrettyPrint ( printingRuby ) where
 
-import Control.Effect
 import Control.Effect.Error
-import Control.Monad.Trans (lift)
 import Streaming
 import qualified Streaming.Prelude as Streaming
 

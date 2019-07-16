@@ -5,8 +5,8 @@ module Reprinting.Translate
   , TranslatorC
   ) where
 
-import           Control.Effect
 import           Control.Effect.Error
+import           Control.Effect.Pure
 import           Control.Effect.State
 import           Control.Monad
 import           Streaming

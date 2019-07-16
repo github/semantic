@@ -13,7 +13,6 @@ module Semantic.Api.Diffs
 
 import           Analysis.ConstructorName (ConstructorName)
 import           Analysis.TOCSummary (HasDeclaration)
-import           Control.Effect
 import           Control.Effect.Error
 import           Control.Exception
 import           Control.Lens

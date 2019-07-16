@@ -12,7 +12,6 @@ module Control.Abstract.Context
 , withCurrentCallStack
 ) where
 
-import Control.Effect
 import Control.Effect.Reader
 import Control.Effect.State
 import Data.Abstract.Module

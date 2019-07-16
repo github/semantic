@@ -10,10 +10,8 @@ module Semantic.Distribute
 ) where
 
 import qualified Control.Concurrent.Async as Async
-import           Control.Effect
 import           Control.Effect.Carrier
 import           Control.Effect.Reader
-import           Control.Effect.Sum
 import           Control.Monad.IO.Unlift
 import           Control.Parallel.Strategies
 import           Prologue
@@ -39,12 +37,12 @@ distributeFoldMap toTask inputs = fmap fold (distribute (fmap toTask inputs))
 
 -- | Distribute effects run tasks concurrently.
 data Distribute m k
-  = forall a . Distribute (m a) (a -> k)
+  = forall a . Distribute (m a) (a -> m k)
 
-deriving instance Functor (Distribute m)
+deriving instance Functor m => Functor (Distribute m)
 
 instance HFunctor Distribute where
-  hmap f (Distribute m k) = Distribute (f m) k
+  hmap f (Distribute m k) = Distribute (f m) (f . k)
 
 instance Effect Distribute where
   handle state handler (Distribute task k) = Distribute (handler (task <$ state)) (handler . fmap k)

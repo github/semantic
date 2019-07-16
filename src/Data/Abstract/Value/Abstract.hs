@@ -8,7 +8,6 @@ module Data.Abstract.Value.Abstract
 
 import Control.Abstract as Abstract
 import Control.Effect.Carrier
-import Control.Effect.Sum
 import Data.Abstract.BaseError
 import Data.Abstract.Evaluatable
 import qualified Data.Map.Strict as Map

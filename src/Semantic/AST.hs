@@ -12,7 +12,6 @@ import Prologue
 import Data.ByteString.Builder
 import Data.List (intersperse)
 
-import           Control.Effect
 import           Control.Effect.Error
 import           Data.AST
 import           Data.Blob

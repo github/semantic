@@ -10,17 +10,15 @@ module Control.Effect.REPL
 
 import Prologue
 
-import Control.Effect
 import Control.Effect.Carrier
-import Control.Effect.Sum
 import Control.Effect.Reader
 import System.Console.Haskeline
 import qualified Data.Text as T
 
 data REPL (m :: * -> *) k
-  = Prompt Text (Maybe Text -> k)
-  | Output Text k
-  deriving stock Functor
+  = Prompt Text (Maybe Text -> m k)
+  | Output Text (m k)
+  deriving stock (Functor, Generic1)
   deriving anyclass (HFunctor, Effect)
 
 prompt :: (Member REPL sig, Carrier sig m) => Text -> m (Maybe Text)

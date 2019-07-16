@@ -8,7 +8,6 @@ module Language.JSON.PrettyPrint
 
 import Prologue
 
-import           Control.Effect
 import           Control.Effect.Error
 import           Streaming
 import qualified Streaming.Prelude as Streaming

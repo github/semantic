@@ -12,7 +12,6 @@ import qualified Control.Abstract as Abstract
 import Control.Abstract hiding (Boolean(..), Function(..), Numeric(..), Object(..), Array(..), Hash(..), String(..), Unit(..), While(..))
 import Control.Effect.Carrier
 import Control.Effect.Interpose
-import Control.Effect.Sum
 import Data.Abstract.BaseError
 import Data.Abstract.Evaluatable (UnspecializedError(..), EvalError(..), Declarations)
 import Data.Abstract.FreeVariables
@@ -226,20 +225,20 @@ instance ( Member (Reader ModuleInfo) sig
     Abstract.Float    t k -> k (Float (Number.Decimal t))
     Abstract.Rational t k -> k (Rational (Number.Ratio t))
     Abstract.LiftNumeric f arg k -> k =<< case arg of
-      Integer (Number.Integer i) -> pure $ Integer (Number.Integer (f i))
-      Float (Number.Decimal d)   -> pure $ Float (Number.Decimal (f d))
-      Rational (Number.Ratio r)  -> pure $ Rational (Number.Ratio (f r))
+      Integer (Number.Integer i) -> pure $ Integer (Number.Integer (runNumericFunction f i))
+      Float (Number.Decimal d)   -> pure $ Float (Number.Decimal (runNumericFunction f d))
+      Rational (Number.Ratio r)  -> pure $ Rational (Number.Ratio (runNumericFunction f r))
       other                      -> throwBaseError (NumericError other)
     Abstract.LiftNumeric2 f left right k -> k =<< case (left, right) of
-      (Integer  i, Integer j)  -> attemptUnsafeArithmetic (f i j) & specialize
-      (Integer  i, Rational j) -> attemptUnsafeArithmetic (f i j) & specialize
-      (Integer  i, Float j)    -> attemptUnsafeArithmetic (f i j) & specialize
-      (Rational i, Integer j)  -> attemptUnsafeArithmetic (f i j) & specialize
-      (Rational i, Rational j) -> attemptUnsafeArithmetic (f i j) & specialize
-      (Rational i, Float j)    -> attemptUnsafeArithmetic (f i j) & specialize
-      (Float    i, Integer j)  -> attemptUnsafeArithmetic (f i j) & specialize
-      (Float    i, Rational j) -> attemptUnsafeArithmetic (f i j) & specialize
-      (Float    i, Float j)    -> attemptUnsafeArithmetic (f i j) & specialize
+      (Integer  i, Integer j)  -> attemptUnsafeArithmetic (runNumeric2Function f i j) & specialize
+      (Integer  i, Rational j) -> attemptUnsafeArithmetic (runNumeric2Function f i j) & specialize
+      (Integer  i, Float j)    -> attemptUnsafeArithmetic (runNumeric2Function f i j) & specialize
+      (Rational i, Integer j)  -> attemptUnsafeArithmetic (runNumeric2Function f i j) & specialize
+      (Rational i, Rational j) -> attemptUnsafeArithmetic (runNumeric2Function f i j) & specialize
+      (Rational i, Float j)    -> attemptUnsafeArithmetic (runNumeric2Function f i j) & specialize
+      (Float    i, Integer j)  -> attemptUnsafeArithmetic (runNumeric2Function f i j) & specialize
+      (Float    i, Rational j) -> attemptUnsafeArithmetic (runNumeric2Function f i j) & specialize
+      (Float    i, Float j)    -> attemptUnsafeArithmetic (runNumeric2Function f i j) & specialize
       _                        -> throwBaseError (Numeric2Error left right)
 
 -- Dispatch whatever's contained inside a 'Number.SomeNumber' to its appropriate 'MonadValue' ctor
@@ -268,9 +267,9 @@ instance ( Member (Reader ModuleInfo) sig
     CastToInteger (Integer (Number.Integer i)) k -> k (Integer (Number.Integer i))
     CastToInteger (Float (Number.Decimal i)) k -> k (Integer (Number.Integer (coefficient (normalize i))))
     CastToInteger i k -> throwBaseError (NumericError i) >>= k
-    LiftBitwise operator (Integer (Number.Integer i)) k -> k . Integer . Number.Integer . operator $ i
+    LiftBitwise operator (Integer (Number.Integer i)) k -> k . Integer . Number.Integer . runBitwiseFunction operator $ i
     LiftBitwise _ other k -> throwBaseError (BitwiseError other) >>= k
-    LiftBitwise2 operator (Integer (Number.Integer i)) (Integer (Number.Integer j)) k -> k . Integer . Number.Integer $ operator i j
+    LiftBitwise2 operator (Integer (Number.Integer i)) (Integer (Number.Integer j)) k -> k . Integer . Number.Integer $ runBitwise2Function operator i j
     LiftBitwise2 _ left right k -> throwBaseError (Bitwise2Error left right) >>= k
     UnsignedRShift (Integer (Number.Integer i)) (Integer (Number.Integer j)) k | i >= 0 -> k . Integer . Number.Integer $ ourShift (fromIntegral i) (fromIntegral j)
     UnsignedRShift left right k -> throwBaseError (Bitwise2Error left right) >>= k

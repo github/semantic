@@ -8,8 +8,8 @@ module Rendering.Graph
 
 import Algebra.Graph.Export.Dot
 import Analysis.ConstructorName
-import Control.Effect
 import Control.Effect.Fresh
+import Control.Effect.Pure
 import Control.Effect.Reader
 import Control.Effect.State
 import Data.Diff

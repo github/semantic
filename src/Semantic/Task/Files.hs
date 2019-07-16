@@ -17,11 +17,9 @@ module Semantic.Task.Files
   , Excludes(..)
   ) where
 
-import           Control.Effect
 import           Control.Effect.Carrier
 import           Control.Effect.Catch
 import           Control.Effect.Error
-import           Control.Effect.Sum
 import           Data.Blob
 import           Data.Blob.IO
 import qualified Data.ByteString.Builder as B
@@ -50,14 +48,24 @@ data Excludes
 
 -- | An effect to read/write 'Blob's from 'Handle's or 'FilePath's.
 data Files (m :: * -> *) k
-  = forall a . Read (Source a)                                (a -> k)
-  | ReadProject (Maybe FilePath) FilePath Language [FilePath] (Project -> k)
-  | FindFiles FilePath [String] [FilePath]                    ([FilePath] -> k)
-  | Write Destination B.Builder                               k
+  = forall a . Read (Source a)                                     (a -> m k)
+  | ReadProject (Maybe FilePath) FilePath Language [FilePath] (Project -> m k)
+  | FindFiles FilePath [String] [FilePath]                    ([FilePath] -> m k)
+  | Write Destination B.Builder                               (m k)
 
-deriving instance Functor (Files m)
-instance HFunctor Files
-instance Effect Files
+deriving instance Functor m => Functor (Files m)
+
+instance HFunctor Files where
+  hmap f (Read s k) = Read s (f . k)
+  hmap f (ReadProject mp p l ps k) = ReadProject mp p l ps (f . k)
+  hmap f (FindFiles p s ps k) = FindFiles p s ps (f . k)
+  hmap f (Write d b k) = Write d b (f k)
+
+instance Effect Files where
+  handle state handler (Read s k) = Read s (handler . (<$ state) . k)
+  handle state handler (ReadProject mp p l ps k) = ReadProject mp p l ps (handler . (<$ state) . k)
+  handle state handler (FindFiles p s ps k) = FindFiles p s ps (handler . (<$ state) . k)
+  handle state handler (Write d b k) = Write d b (handler . (<$ state) $ k)
 
 -- | Run a 'Files' effect in 'IO'
 runFiles :: FilesC m a -> m a

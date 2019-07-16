@@ -15,7 +15,6 @@ module Semantic.Api.Terms
 
 
 import           Analysis.ConstructorName (ConstructorName)
-import           Control.Effect
 import           Control.Effect.Error
 import           Control.Lens
 import           Control.Monad
