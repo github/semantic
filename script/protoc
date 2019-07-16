@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+#/ Usage: script/protoc
+#/
+#/ Generate code from .proto files
+
+set -ex
+cd "$(dirname "$0")/.."
+
+docker build -t semantic-protoc --target protoc .
+
+PARENT_DIR=$(dirname $(pwd))
+
+export PROJECT="github.com/github/semantic"
+
+# Generate Haskell for semantic's protobuf types
+docker run --rm --user $(id -u):$(id -g) -v $(pwd):/go/src/$PROJECT -w /go/src/$PROJECT \
+    semantic-protoc \
+    --proto_path=proto --haskell_out=src/Semantic/Proto \
+    semantic.proto
