@@ -8,7 +8,6 @@ module Data.Core.Pretty
   , prettyCore
   ) where
 
-import           Control.Effect
 import           Control.Effect.Reader
 import           Data.Core
 import           Data.File

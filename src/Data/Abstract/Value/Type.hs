@@ -15,7 +15,6 @@ import Control.Abstract.ScopeGraph
 import qualified Control.Abstract as Abstract
 import Control.Abstract hiding (Boolean(..), Function(..), Numeric(..), Object(..), Array(..), Hash(..), String(..), Unit(..), While(..))
 import Control.Effect.Carrier
-import Control.Effect.Sum
 import Data.Abstract.BaseError
 import Data.Semigroup.Foldable (foldMap1)
 import qualified Data.Map as Map

@@ -19,7 +19,6 @@ module Analysis.Abstract.Graph
 import           Algebra.Graph.Export.Dot hiding (vertexName)
 import           Control.Abstract hiding (Function(..))
 import           Control.Effect.Carrier
-import           Control.Effect.Sum
 import           Data.Abstract.BaseError
 import           Data.Abstract.Declarations
 import           Data.Abstract.Module (Module (moduleInfo), ModuleInfo (..))
@@ -150,20 +149,20 @@ graphingModuleInfo recur m = do
     _             -> pure ()
 
 eavesdrop :: Evaluator term address value (EavesdropC address value m) a
-          -> (forall x . Modules address value m (m x) -> Evaluator term address value m ())
+          -> (forall x . Modules address value m x -> Evaluator term address value m ())
           -> Evaluator term address value m a
 eavesdrop m f = raiseHandler (runEavesdropC (runEvaluator . f)) m
 
-newtype EavesdropC address value m a = EavesdropC ((forall x . Modules address value m (m x) -> m ()) -> m a)
-  deriving (Alternative, Applicative, Functor, Monad) via (ReaderC (forall x . Modules address value m (m x) -> m ()) m)
+newtype EavesdropC address value m a = EavesdropC ((forall x . Modules address value m x -> m ()) -> m a)
+  deriving (Alternative, Applicative, Functor, Monad) via (ReaderC (forall x . Modules address value m x -> m ()) m)
 
-runEavesdropC :: (forall x . Modules address value m (m x) -> m ()) -> EavesdropC address value m a -> m a
+runEavesdropC :: (forall x . Modules address value m x -> m ()) -> EavesdropC address value m a -> m a
 runEavesdropC f (EavesdropC m) = m f
 
 instance (Carrier sig m, Member (Modules address value) sig, Applicative m) => Carrier sig (EavesdropC address value m) where
   eff op
-    | Just eff <- prj op = EavesdropC (\ handler -> let eff' = handlePure (runEavesdropC handler) eff in handler eff' *> send eff')
-    | otherwise          = EavesdropC (\ handler -> eff (handlePure (runEavesdropC handler) op))
+    | Just eff <- prj op = EavesdropC (\ handler -> let eff' = hmap (runEavesdropC handler) eff in handler eff' *> send eff')
+    | otherwise          = EavesdropC (\ handler -> eff (hmap (runEavesdropC handler) op))
 
 -- | Add an edge from the current package to the passed vertex.
 packageInclusion :: ( Member (Reader PackageInfo) sig

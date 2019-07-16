@@ -48,7 +48,11 @@ module Control.Abstract.Value
 , ObjectC(..)
 , runObject
 , runNumeric
+, runNumericFunction
+, runNumeric2Function
 , castToInteger
+, runBitwiseFunction
+, runBitwise2Function
 , liftBitwise
 , liftBitwise2
 , unsignedRShift
@@ -118,18 +122,18 @@ builtIn address = sendFunction . flip (BuiltIn address) pure
 call :: (Member (Function term address value) sig, Carrier sig m) => value -> [value] -> Evaluator term address value m value
 call fn args = sendFunction (Call fn args pure)
 
-sendFunction :: (Member (Function term address value) sig, Carrier sig m) => Function term address value (Evaluator term address value m) (Evaluator term address value m a) -> Evaluator term address value m a
+sendFunction :: (Member (Function term address value) sig, Carrier sig m) => Function term address value (Evaluator term address value m) a -> Evaluator term address value m a
 sendFunction = send
 
 bindThis :: (Member (Function term address value) sig, Carrier sig m) => value -> value -> Evaluator term address value m value
 bindThis this that = sendFunction (Bind this that pure)
 
 data Function term address value (m :: * -> *) k
-  = Function Name [Name] term address (value -> k) -- ^ A function is parameterized by its name, parameter names, body, parent scope, and returns a ValueRef.
-  | BuiltIn address BuiltIn (value -> k)           -- ^ A built-in is parameterized by its parent scope, BuiltIn type, and returns a value.
-  | Call value [value] (value -> k)                -- ^ A Call takes a set of values as parameters and returns a ValueRef.
-  | Bind value value (value -> k)
-  deriving stock Functor
+  = Function Name [Name] term address (value -> m k) -- ^ A function is parameterized by its name, parameter names, body, parent scope, and returns a ValueRef.
+  | BuiltIn address BuiltIn (value -> m k)           -- ^ A built-in is parameterized by its parent scope, BuiltIn type, and returns a value.
+  | Call value [value] (value -> m k)                -- ^ A Call takes a set of values as parameters and returns a ValueRef.
+  | Bind value value (value -> m k)
+  deriving stock (Functor, Generic1)
   deriving anyclass (HFunctor, Effect)
 
 
@@ -154,9 +158,9 @@ ifthenelse :: (Member (Boolean value) sig, Carrier sig m) => value -> m a -> m a
 ifthenelse v t e = asBool v >>= \ c -> if c then t else e
 
 data Boolean value (m :: * -> *) k
-  = Boolean Bool (value -> k)
-  | AsBool value (Bool -> k)
-  deriving stock Functor
+  = Boolean Bool (value -> m k)
+  | AsBool value (Bool -> m k)
+  deriving stock (Functor, Generic1)
   deriving anyclass (HFunctor, Effect)
 
 runBoolean :: Evaluator term address value (BooleanC value m) a
@@ -204,11 +208,11 @@ forLoop :: ( Carrier sig m
 forLoop initial cond step body = initial *> while cond (withLexicalScopeAndFrame body *> step)
 
 data While value m k
-  = While (m value) (m value) (value -> k)
-  deriving (Functor)
+  = While (m value) (m value) (value -> m k)
+  deriving stock (Functor, Generic1)
 
 instance HFunctor (While value) where
-  hmap f (While cond body k) = While (f cond) (f body) k
+  hmap f (While cond body k) = While (f cond) (f body) (f . k)
 
 runWhile :: Evaluator term address value (WhileC value m) a
          -> Evaluator term address value m a
@@ -223,15 +227,9 @@ unit :: (Carrier sig m, Member (Unit value) sig) => Evaluator term address value
 unit = send (Unit pure)
 
 newtype Unit value (m :: * -> *) k
-  = Unit (value -> k)
-  deriving stock Functor
-
-instance HFunctor (Unit value) where
-  hmap _ = coerce
-  {-# INLINE hmap #-}
-
-instance Effect (Unit value) where
-  handle state handler (Unit k) = Unit (handler . (<$ state) . k)
+  = Unit (value -> m k)
+  deriving stock (Functor, Generic1)
+  deriving anyclass (HFunctor, Effect)
 
 runUnit :: Evaluator term address value (UnitC value m) a
         -> Evaluator term address value m a
@@ -250,9 +248,9 @@ asString :: (Member (String value) sig, Carrier sig m) => value -> m Text
 asString v = send (AsString v pure)
 
 data String value (m :: * -> *) k
-  = String Text (value -> k)
-  | AsString value (Text -> k)
-  deriving stock Functor
+  = String Text (value -> m k)
+  | AsString value (Text -> m k)
+  deriving stock (Functor, Generic1)
   deriving anyclass (HFunctor, Effect)
 
 newtype StringC value m a = StringC { runStringC :: m a }
@@ -281,7 +279,7 @@ liftNumeric  :: (Member (Numeric value) sig, Carrier sig m)
              => (forall a . Num a => a -> a)
              -> value
              -> m value
-liftNumeric t v = send (LiftNumeric t v pure)
+liftNumeric t v = send (LiftNumeric (NumericFunction t) v pure)
 
 -- | Lift a pair of binary operators to a function on 'value's.
 --   You usually pass the same operator as both arguments, except in the cases where
@@ -292,15 +290,25 @@ liftNumeric2 :: (Member (Numeric value) sig, Carrier sig m)
              -> value
              -> value
              -> m value
-liftNumeric2 t v1 v2 = send (LiftNumeric2 t v1 v2 pure)
+liftNumeric2 t v1 v2 = send (LiftNumeric2 (Numeric2Function t) v1 v2 pure)
+
+data NumericFunction = NumericFunction (forall a . Num a => a -> a)
+
+runNumericFunction :: Num a => NumericFunction -> a -> a
+runNumericFunction (NumericFunction f) a = f a
+
+data Numeric2Function = Numeric2Function (forall a b. Number a -> Number b -> SomeNumber)
+
+runNumeric2Function :: Numeric2Function -> Number a -> Number b -> SomeNumber
+runNumeric2Function (Numeric2Function f) a b = f a b
 
 data Numeric value (m :: * -> *) k
-  = Integer Integer (value -> k)
-  | Float Scientific (value -> k)
-  | Rational Rational (value -> k)
-  | LiftNumeric (forall a . Num a => a -> a) value (value -> k)
-  | LiftNumeric2 (forall a b. Number a -> Number b -> SomeNumber) value value (value -> k)
-  deriving stock Functor
+  = Integer Integer (value -> m k)
+  | Float Scientific (value -> m k)
+  | Rational Rational (value -> m k)
+  | LiftNumeric NumericFunction value (value -> m k)
+  | LiftNumeric2 Numeric2Function value value (value -> m k)
+  deriving stock (Functor, Generic1)
   deriving anyclass (HFunctor, Effect)
 
 newtype NumericC value m a = NumericC { runNumericC :: m a }
@@ -321,7 +329,7 @@ liftBitwise :: (Member (Bitwise value) sig, Carrier sig m)
             => (forall a . Bits a => a -> a)
             -> value
             -> m value
-liftBitwise t v = send (LiftBitwise t v pure)
+liftBitwise t v = send (LiftBitwise (BitwiseFunction t) v pure)
 
 -- | Lift a binary bitwise operator to values. The Integral constraint is
 --   necessary to satisfy implementation details of Haskell left/right shift,
@@ -331,7 +339,7 @@ liftBitwise2 :: (Member (Bitwise value) sig, Carrier sig m)
              -> value
              -> value
              -> m value
-liftBitwise2 t v1 v2 = send (LiftBitwise2 t v1 v2 pure)
+liftBitwise2 t v1 v2 = send (LiftBitwise2 (Bitwise2Function t) v1 v2 pure)
 
 unsignedRShift :: (Member (Bitwise value) sig, Carrier sig m)
                => value
@@ -339,12 +347,22 @@ unsignedRShift :: (Member (Bitwise value) sig, Carrier sig m)
                -> m value
 unsignedRShift v1 v2 = send (UnsignedRShift v1 v2 pure)
 
+data BitwiseFunction = BitwiseFunction (forall a . Bits a => a -> a)
+
+runBitwiseFunction :: Bits a => BitwiseFunction -> a -> a
+runBitwiseFunction (BitwiseFunction f) a = f a
+
+data Bitwise2Function = Bitwise2Function (forall a . (Integral a, Bits a) => a -> a -> a)
+
+runBitwise2Function :: (Integral a, Bits a) => Bitwise2Function -> a -> a -> a
+runBitwise2Function (Bitwise2Function f) a b = f a b
+
 data Bitwise value (m :: * -> *) k
-  = CastToInteger value (value -> k)
-  | LiftBitwise (forall a . Bits a => a -> a) value (value -> k)
-  | LiftBitwise2 (forall a . (Integral a, Bits a) => a -> a -> a) value value (value -> k)
-  | UnsignedRShift value value (value -> k)
-  deriving stock Functor
+  = CastToInteger value (value -> m k)
+  | LiftBitwise BitwiseFunction value (value -> m k)
+  | LiftBitwise2 Bitwise2Function value value (value -> m k)
+  | UnsignedRShift value value (value -> m k)
+  deriving stock (Functor, Generic1)
   deriving anyclass (HFunctor, Effect)
 
 runBitwise :: Evaluator term address value (BitwiseC value m) a
@@ -368,11 +386,11 @@ scopedEnvironment value = send (ScopedEnvironment value pure)
 klass :: (Member (Object address value) sig, Carrier sig m) => Declaration -> address -> m value
 klass d a = send (Klass d a pure)
 
-data Object address value (m :: * -> *) k
-  = Object address (value -> k)
-  | ScopedEnvironment value (Maybe address -> k)
-  | Klass Declaration address (value -> k)
-  deriving stock Functor
+data Object address value m k
+  = Object address (value -> m k)
+  | ScopedEnvironment value (Maybe address -> m k)
+  | Klass Declaration address (value -> m k)
+  deriving stock (Functor, Generic1)
   deriving anyclass (HFunctor, Effect)
 
 newtype ObjectC address value m a = ObjectC { runObjectC :: m a }
@@ -391,9 +409,9 @@ asArray :: (Member (Array value) sig, Carrier sig m) => value -> m [value]
 asArray v = send (AsArray v pure)
 
 data Array value (m :: * -> *) k
-  = Array [value] (value -> k)
-  | AsArray value ([value] -> k)
-  deriving stock Functor
+  = Array [value] (value -> m k)
+  | AsArray value ([value] -> m k)
+  deriving stock (Functor, Generic1)
   deriving anyclass (HFunctor, Effect)
 
 newtype ArrayC value m a = ArrayC { runArrayC :: m a }
@@ -413,9 +431,9 @@ kvPair :: (Member (Hash value) sig, Carrier sig m) => value -> value -> m value
 kvPair v1 v2 = send (KvPair v1 v2 pure)
 
 data Hash value (m :: * -> *) k
-  = Hash [(value, value)] (value -> k)
-  | KvPair value value (value -> k)
-  deriving stock Functor
+  = Hash [(value, value)] (value -> m k)
+  | KvPair value value (value -> m k)
+  deriving stock (Functor, Generic1)
   deriving anyclass (HFunctor, Effect)
 
 newtype HashC value m a = HashC { runHashC :: m a }

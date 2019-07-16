@@ -5,7 +5,6 @@ module Data.Abstract.Address.Monovariant
 
 import Control.Abstract
 import Control.Effect.Carrier
-import Control.Effect.Sum
 import Data.Abstract.Name
 import qualified Data.Set as Set
 import Prologue

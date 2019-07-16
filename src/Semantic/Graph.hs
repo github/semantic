@@ -34,6 +34,7 @@ import           Analysis.Abstract.Collecting
 import           Analysis.Abstract.Graph as Graph
 import           Control.Abstract hiding (String)
 import           Control.Abstract.PythonPackage as PythonPackage
+import           Control.Effect.Carrier
 import           Data.Abstract.Address.Hole as Hole
 import           Data.Abstract.Address.Monovariant as Monovariant
 import           Data.Abstract.Address.Precise as Precise

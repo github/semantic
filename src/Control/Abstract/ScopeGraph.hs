@@ -379,8 +379,8 @@ alloc :: (Member (Allocator address) sig, Carrier sig m) => Name -> Evaluator te
 alloc = send . flip Alloc pure
 
 data Allocator address (m :: * -> *) k
-  = Alloc Name (address -> k)
-  deriving stock Functor
+  = Alloc Name (address -> m k)
+  deriving stock (Functor, Generic1)
   deriving anyclass (HFunctor, Effect)
 
 runAllocator :: Evaluator term address value (AllocatorC address m) a

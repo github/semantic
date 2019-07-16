@@ -8,10 +8,8 @@ module Semantic.Timeout
 , Duration(..)
 ) where
 
-import           Control.Effect
 import           Control.Effect.Carrier
 import           Control.Effect.Reader
-import           Control.Effect.Sum
 import           Control.Monad.IO.Class
 import           Control.Monad.IO.Unlift
 import           Data.Duration
@@ -26,12 +24,12 @@ timeout n = send . flip (Timeout n) pure
 -- | 'Timeout' effects run other effects, aborting them if they exceed the
 -- specified duration.
 data Timeout m k
-  = forall a . Timeout Duration (m a) (Maybe a -> k)
+  = forall a . Timeout Duration (m a) (Maybe a -> m k)
 
-deriving instance Functor (Timeout m)
+deriving instance Functor m => Functor (Timeout m)
 
 instance HFunctor Timeout where
-  hmap f (Timeout n task k) = Timeout n (f task) k
+  hmap f (Timeout n task k) = Timeout n (f task) (f . k)
 
 instance Effect Timeout where
   handle state handler (Timeout n task k) = Timeout n (handler (task <$ state)) (handler . maybe (k Nothing <$ state) (fmap (k . Just)))

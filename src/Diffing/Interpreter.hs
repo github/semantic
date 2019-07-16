@@ -5,11 +5,9 @@ module Diffing.Interpreter
 , stripDiff
 ) where
 
-import Control.Effect
 import Control.Effect.Carrier
 import Control.Effect.Cull
 import Control.Effect.NonDet
-import Control.Effect.Sum
 import qualified Data.Diff as Diff
 import Data.Term
 import Diffing.Algorithm

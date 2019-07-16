@@ -13,7 +13,6 @@ module Data.Project
 import Prelude hiding (readFile)
 import Prologue
 
-import           Control.Effect
 import           Control.Effect.Error
 import           Data.Blob
 import           Data.Blob.IO
