@@ -66,7 +66,8 @@ instance Applicative Core where
   (<*>) = ap
 
 instance Monad Core where
-  a >>= f = iter id Core Var f a
+  Var a  >>= f = f a
+  Core c >>= f = Core (c >>=* f)
 
 instance Carrier CoreF Core where
   eff = Core
