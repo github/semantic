@@ -51,3 +51,6 @@ class (HFunctor sig, forall g . Functor g => Functor (sig g)) => Syntax sig wher
              -> (a -> m b)
              -> sig f a
              -> sig n b
+
+instance Syntax (Scope ()) where
+  foldSyntax go bound free = Scope . go (bound . fmap (go free)) . unScope
