@@ -17,6 +17,7 @@ module Data.Scope
 import Control.Applicative (liftA2)
 import Control.Effect.Carrier
 import Control.Monad ((>=>), guard)
+import Control.Monad.Module
 import Control.Monad.Trans.Class
 import Data.Function (on)
 
@@ -68,6 +69,9 @@ instance Monad f => Monad (Scope a f) where
 
 instance MonadTrans (Scope a) where
   lift = Scope . pure . S
+
+instance RightModule (Scope a) where
+  Scope m >>=* f = Scope (fmap (>>= f) <$> m)
 
 
 foldScope :: (forall a . Incr z (n a) -> m (Incr z (n a)))
