@@ -20,16 +20,16 @@ import qualified Data.Text.Prettyprint.Doc as Pretty
 import qualified Data.Text.Prettyprint.Doc.Render.String as Pretty
 import qualified Data.Text.Prettyprint.Doc.Render.Terminal as Pretty
 
-showCore :: Term Core Name -> String
+showCore :: Term Core User -> String
 showCore = Pretty.renderString . Pretty.layoutSmart Pretty.defaultLayoutOptions . Pretty.unAnnotate . prettyCore Ascii
 
-printCore :: Term Core Name -> IO ()
+printCore :: Term Core User -> IO ()
 printCore p = Pretty.putDoc (prettyCore Unicode p) *> putStrLn ""
 
-showFile :: File (Term Core Name) -> String
+showFile :: File (Term Core User) -> String
 showFile = showCore . fileBody
 
-printFile :: File (Term Core Name) -> IO ()
+printFile :: File (Term Core User) -> IO ()
 printFile = printCore . fileBody
 
 type AnsiDoc = Pretty.Doc Pretty.AnsiStyle
@@ -44,10 +44,8 @@ type Prec = Int
 
 data Style = Unicode | Ascii
 
-name :: Name -> AnsiDoc
-name = \case
-  Gen p  -> pretty p
-  User n -> encloseIf (needsQuotation n) (symbol "#{") (symbol "}") (pretty n)
+name :: User -> AnsiDoc
+name n = encloseIf (needsQuotation n) (symbol "#{") (symbol "}") (pretty n)
 
 with :: (Member (Reader Prec) sig, Carrier sig m) => Prec -> m a -> m a
 with n = local (const n)
@@ -63,7 +61,7 @@ prettify :: (Member (Reader [AnsiDoc]) sig, Member (Reader Prec) sig, Carrier si
          -> Core (Const (m AnsiDoc)) a
          -> m AnsiDoc
 prettify style = \case
-  Let a -> pure $ keyword "let" <+> name (User a)
+  Let a -> pure $ keyword "let" <+> name a
   Const a :>> Const b -> do
     prec <- ask @Prec
     fore <- with 12 a
@@ -108,7 +106,7 @@ prettify style = \case
 
   -- Annotations are not pretty-printed, as it lowers the signal/noise ratio too profoundly.
   Ann _ (Const c) -> c
-  where bind (Ignored x) f = let x' = name (User x) in (,) x' <$> local (x':) (getConst (unScope f))
+  where bind (Ignored x) f = let x' = name x in (,) x' <$> local (x':) (getConst (unScope f))
         lambda = case style of
           Unicode -> symbol "λ"
           Ascii   -> symbol "\\"
@@ -120,7 +118,7 @@ prettify style = \case
 appending :: Functor f => AnsiDoc -> f AnsiDoc -> f AnsiDoc
 appending k item = (keyword k <+>) <$> item
 
-prettyCore :: Style -> Term Core Name -> AnsiDoc
+prettyCore :: Style -> Term Core User -> AnsiDoc
 prettyCore s = run . runReader @Prec 0 . runReader @[AnsiDoc] [] . cata id (prettify s) bound (pure . name)
   where bound (Z _) = asks (head @AnsiDoc)
         bound (S n) = local (tail @AnsiDoc) n
