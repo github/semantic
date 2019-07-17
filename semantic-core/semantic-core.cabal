@@ -26,6 +26,7 @@ library
                      , Analysis.ScopeGraph
                      , Analysis.Typecheck
                      , Control.Effect.Readline
+                     , Control.Monad.Module
                      , Data.Core
                      , Data.Core.Parser
                      , Data.Core.Pretty
