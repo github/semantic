@@ -71,6 +71,11 @@ data Core f a
   | Ann Loc (f a)
   deriving (Foldable, Functor, Generic1, Traversable)
 
+infixl 2 :$
+infixr 1 :>>
+infix  3 :=
+infixl 4 :.
+
 instance HFunctor Core
 
 deriving instance (Eq   a, forall a . Eq   a => Eq   (f a), Monad f) => Eq   (Core f a)
@@ -93,11 +98,6 @@ instance RightModule Core where
   (a :. b)  >>=* f = (a >>= f) :. (b >>= f)
   (a := b)  >>=* f = (a >>= f) := (b >>= f)
   Ann l b   >>=* f = Ann l (b >>= f)
-
-infixl 2 :$
-infixr 1 :>>
-infix  3 :=
-infixl 4 :.
 
 
 let' :: (Carrier sig m, Member Core sig) => User -> m a
