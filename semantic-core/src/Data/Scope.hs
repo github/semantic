@@ -3,7 +3,6 @@ module Data.Scope
 ( Incr(..)
 , incr
 , Scope(..)
-, foldScope
 , fromScope
 , toScope
 , bind1
@@ -72,14 +71,6 @@ instance MonadTrans (Scope a) where
 
 instance RightModule (Scope a) where
   Scope m >>=* f = Scope (fmap (>>= f) <$> m)
-
-
-foldScope :: (forall a . Incr z (n a) -> m (Incr z (n a)))
-          -> (forall x y . (x -> m y) -> f x -> n y)
-          -> (a -> m b)
-          -> Scope z f a
-          -> Scope z n b
-foldScope k go h = Scope . go (k . fmap (go h)) . unScope
 
 
 fromScope :: Monad f => Scope a f b -> f (Incr a b)

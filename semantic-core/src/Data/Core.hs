@@ -44,6 +44,7 @@ import Data.Maybe
 import Data.Name
 import Data.Scope
 import Data.Stack
+import Data.Term (Syntax (..))
 import Data.Text (Text)
 import GHC.Generics (Generic1)
 import GHC.Stack
@@ -220,7 +221,7 @@ foldCoreF :: (forall a . Incr () (n a) -> m (Incr () (n a)))
 foldCoreF k go h = \case
   Let a -> Let a
   a :>> b -> go h a :>> go h b
-  Lam u b -> Lam u (foldScope k go h b)
+  Lam u b -> Lam u (foldSyntax go k h b)
   a :$ b -> go h a :$ go h b
   Unit -> Unit
   Bool b -> Bool b
