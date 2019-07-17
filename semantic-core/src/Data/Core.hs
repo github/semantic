@@ -203,7 +203,7 @@ iter var alg k = go
   where go :: forall x y . (x -> m y) -> Core x -> n y
         go h = \case
           Var a -> var (h a)
-          Core c -> alg (foldCoreF k go h c)
+          Core c -> alg (foldSyntax go k h c)
 
 cata :: (a -> b)
      -> (forall a . CoreF (Const b) a -> b)
@@ -213,23 +213,19 @@ cata :: (a -> b)
      -> b
 cata var alg k h = getConst . iter (coerce var) (coerce alg) (coerce k) (Const . h)
 
-foldCoreF :: (forall a . Incr () (n a) -> m (Incr () (n a)))
-          -> (forall x y . (x -> m y) -> f x -> n y)
-          -> (a -> m b)
-          -> CoreF f a
-          -> CoreF n b
-foldCoreF k go h = \case
-  Let a -> Let a
-  a :>> b -> go h a :>> go h b
-  Lam u b -> Lam u (foldSyntax go k h b)
-  a :$ b -> go h a :$ go h b
-  Unit -> Unit
-  Bool b -> Bool b
-  If c t e -> If (go h c) (go h t) (go h e)
-  String s -> String s
-  Load t -> Load (go h t)
-  Edge e t -> Edge e (go h t)
-  Frame -> Frame
-  a :. b -> go h a :. go h b
-  a := b -> go h a := go h b
-  Ann loc t -> Ann loc (go h t)
+instance Syntax CoreF where
+  foldSyntax go k h = \case
+    Let a -> Let a
+    a :>> b -> go h a :>> go h b
+    Lam u b -> Lam u (foldSyntax go k h b)
+    a :$ b -> go h a :$ go h b
+    Unit -> Unit
+    Bool b -> Bool b
+    If c t e -> If (go h c) (go h t) (go h e)
+    String s -> String s
+    Load t -> Load (go h t)
+    Edge e t -> Edge e (go h t)
+    Frame -> Frame
+    a :. b -> go h a :. go h b
+    a := b -> go h a := go h b
+    Ann loc t -> Ann loc (go h t)
