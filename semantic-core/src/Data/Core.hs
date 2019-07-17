@@ -57,9 +57,6 @@ data Core a
   | Core (CoreF Core a)
   deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
 
-instance Semigroup (Core a) where
-  a <> b = Core (a :>> b)
-
 instance Applicative Core where
   pure = Var
   (<*>) = ap

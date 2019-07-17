@@ -13,7 +13,6 @@ import qualified Data.Char as Char
 import           Data.Core (Core, Edge(..))
 import qualified Data.Core as Core
 import           Data.Name
-import           Data.Semigroup
 import           Data.String
 import qualified Text.Parser.Token as Token
 import qualified Text.Parser.Token.Highlight as Highlight
@@ -65,7 +64,7 @@ atom = choice
   ]
 
 comp :: (TokenParsing m, Monad m) => m (Core User)
-comp = braces (sconcat <$> sepEndByNonEmpty expr semi) <?> "compound statement"
+comp = braces (Core.block <$> sepEndByNonEmpty expr semi) <?> "compound statement"
 
 ifthenelse :: (TokenParsing m, Monad m) => m (Core User)
 ifthenelse = Core.if'

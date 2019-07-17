@@ -97,11 +97,12 @@ prog3 = fromBody $ lams' [foo, bar, quux]
   where (foo, bar, quux) = ("foo", "bar", "quux")
 
 prog4 :: File (Core User)
-prog4 = fromBody
-  $  let' foo .= Core.bool True
-  <> Core.if' (pure foo)
+prog4 = fromBody $ block
+  [ let' foo .= Core.bool True
+  , Core.if' (pure foo)
     (Core.bool True)
     (Core.bool False)
+  ]
   where foo = "foo"
 
 prog5 :: File (Core User)
