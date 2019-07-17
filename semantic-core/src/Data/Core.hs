@@ -70,10 +70,10 @@ data Core f a
   | Ann Loc (f a)
   deriving (Foldable, Functor, Generic1, Traversable)
 
-infixl 2 :$
 infixr 1 :>>
-infix  3 :=
+infixl 2 :$
 infixl 4 :.
+infix  3 :=
 
 instance HFunctor Core
 
