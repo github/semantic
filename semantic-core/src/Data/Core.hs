@@ -180,8 +180,12 @@ frame = send Frame
 (...) :: (Carrier sig m, Member Core sig) => m a -> m a -> m a
 a ... b = send (a :. b)
 
+infixl 4 ...
+
 (.=) :: (Carrier sig m, Member Core sig) => m a -> m a -> m a
 a .= b = send (a := b)
+
+infix 3 .=
 
 ann :: (Carrier sig m, Member Core sig) => HasCallStack => m a -> m a
 ann = annWith callStack
