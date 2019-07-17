@@ -36,6 +36,7 @@ module Data.Core
 import Control.Applicative (Alternative (..), Const (..))
 import Control.Effect.Carrier
 import Control.Monad (ap)
+import Control.Monad.Module
 import Data.Coerce
 import Data.Foldable (foldl')
 import Data.List.NonEmpty
@@ -99,6 +100,22 @@ deriving instance (Eq   a, forall a . Eq   a => Eq   (f a), Monad f) => Eq   (Co
 deriving instance (Ord  a, forall a . Eq   a => Eq   (f a)
                          , forall a . Ord  a => Ord  (f a), Monad f) => Ord  (CoreF f a)
 deriving instance (Show a, forall a . Show a => Show (f a))          => Show (CoreF f a)
+
+instance RightModule CoreF where
+  Let u     >>=* _ = Let u
+  (a :>> b) >>=* f = (a >>= f) :>> (b >>= f)
+  Lam v b   >>=* f = Lam v (b >>=* f)
+  (a :$ b)  >>=* f = (a >>= f) :$ (b >>= f)
+  Unit      >>=* _ = Unit
+  Bool b    >>=* _ = Bool b
+  If c t e  >>=* f = If (c >>= f) (t >>= f) (e >>= f)
+  String s  >>=* _ = String s
+  Load b    >>=* f = Load (b >>= f)
+  Edge e b  >>=* f = Edge e (b >>= f)
+  Frame     >>=* _ = Frame
+  (a :. b)  >>=* f = (a >>= f) :. (b >>= f)
+  (a := b)  >>=* f = (a >>= f) := (b >>= f)
+  Ann l b   >>=* f = Ann l (b >>= f)
 
 infixl 2 :$
 infixr 1 :>>
