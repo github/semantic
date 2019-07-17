@@ -101,6 +101,7 @@ lit = let x `given` n = x <$ reserved n in choice
   , Core.bool False `given` "#false"
   , Core.unit       `given` "#unit"
   , Core.frame      `given` "#frame"
+  , between (string "\"") (string "\"") (Core.string . fromString <$> many ('"' <$ string "\\\"" <|> noneOf "\""))
   , lambda
   ] <?> "literal"
 
