@@ -4,6 +4,7 @@ module Data.Term
 , Syntax(..)
 , iter
 , cata
+, interpret
 ) where
 
 import Control.Effect.Carrier
@@ -86,3 +87,7 @@ cata :: Syntax sig
      -> Term sig x
      -> b
 cata var alg k h = getConst . iter (coerce var) (Const . alg) (coerce k) (Const . h)
+
+
+interpret :: (Carrier sig m, Member eff sig, Syntax eff) => (forall a . Incr () (m a) -> m (Incr () (m a))) -> (a -> m b) -> Term eff a -> m b
+interpret = iter id send
