@@ -1,8 +1,9 @@
-{-# LANGUAGE DeriveTraversable, QuantifiedConstraints, StandaloneDeriving, UndecidableInstances #-}
+{-# LANGUAGE DeriveTraversable, FlexibleInstances, MultiParamTypeClasses, QuantifiedConstraints, StandaloneDeriving, UndecidableInstances #-}
 module Data.Term
 ( Term(..)
 ) where
 
+import Control.Effect.Carrier
 import Control.Monad (ap)
 import Control.Monad.Module
 
@@ -37,3 +38,6 @@ instance RightModule sig => Applicative (Term sig) where
 instance RightModule sig => Monad (Term sig) where
   Var  a >>= f = f a
   Term t >>= f = Term (t >>=* f)
+
+instance RightModule sig => Carrier sig (Term sig) where
+  eff = Term
