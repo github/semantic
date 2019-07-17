@@ -3,11 +3,14 @@ module Data.Term
 ( Term(..)
 , Syntax(..)
 , iter
+, cata
 ) where
 
 import Control.Effect.Carrier
 import Control.Monad (ap)
 import Control.Monad.Module
+import Data.Coerce (coerce)
+import Data.Functor.Const
 import Data.Scope
 
 data Term sig a
@@ -74,3 +77,12 @@ iter var alg bound = go
         go free = \case
           Var a -> var (free a)
           Term t -> alg (foldSyntax go bound free t)
+
+cata :: Syntax sig
+     => (a -> b)
+     -> (forall a . sig (Const b) a -> b)
+     -> (Incr () b -> a)
+     -> (x -> a)
+     -> Term sig x
+     -> b
+cata var alg k h = getConst . iter (coerce var) (Const . alg) (coerce k) (Const . h)
