@@ -94,12 +94,12 @@ prettify style = \case
   Load (Const p)   -> "load" `appending` p
   Edge Lexical (Const n) -> "lexical" `appending` n
   Edge Import (Const n) -> "import" `appending` n
-  Const item :. Const body   -> inParens 5 $ do
+  Const item :. Const body   -> inParens 4 $ do
     f <- item
     g <- body
     pure (f <> symbol "." <> g)
 
-  Const lhs := Const rhs -> inParens 4 $ do
+  Const lhs := Const rhs -> inParens 3 $ do
     f <- lhs
     g <- rhs
     pure (f <+> symbol "=" <+> g)
