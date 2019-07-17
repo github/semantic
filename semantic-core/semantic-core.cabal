@@ -35,6 +35,7 @@ library
                      , Data.Name
                      , Data.Scope
                      , Data.Stack
+                     , Data.Term
   -- other-modules:
   -- other-extensions:
   build-depends:       algebraic-graphs            ^>= 0.3
