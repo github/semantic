@@ -100,7 +100,7 @@ parserSpecs = testGroup "Parsing: simple specs"
   ]
 
 assert_roundtrips :: File (Term Core User) -> Assertion
-assert_roundtrips (File _ core) = parseEither Parse.core (showCore core) @?= Right core
+assert_roundtrips (File _ core) = parseEither Parse.core (showCore core) @?= Right (stripAnnotations core)
 
 parserExamples :: TestTree
 parserExamples = testGroup "Parsing: Eval.hs examples"

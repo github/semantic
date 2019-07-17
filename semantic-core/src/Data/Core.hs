@@ -28,6 +28,7 @@ module Data.Core
 , ann
 , annWith
 , instantiate
+, stripAnnotations
 ) where
 
 import Control.Applicative (Alternative (..))
@@ -187,6 +188,12 @@ ann = annWith callStack
 
 annWith :: (Carrier sig m, Member Core sig) => CallStack -> m a -> m a
 annWith callStack = maybe id (fmap send . Ann) (stackLoc callStack)
+
+
+stripAnnotations :: (Member Core sig, Syntax sig) => Term sig a -> Term sig a
+stripAnnotations = iter id alg Var Var
+  where alg t | Just c <- prj t, Ann _ b <- c = b
+              | otherwise                     = Term t
 
 
 instance Syntax Core where
