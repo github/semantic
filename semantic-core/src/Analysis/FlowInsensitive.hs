@@ -18,8 +18,9 @@ import qualified Data.Map as Map
 import           Data.Maybe (fromMaybe)
 import           Data.Monoid (Alt(..))
 import qualified Data.Set as Set
+import           Data.Term (Term)
 
-type Cache name a = Map.Map (Core.Core name) (Set.Set a)
+type Cache name a = Map.Map (Term Core.Core name) (Set.Set a)
 type Heap name a = Map.Map name (Set.Set a)
 
 newtype FrameId name = FrameId { unFrameId :: name }
@@ -34,8 +35,8 @@ convergeTerm :: forall m sig a name
                 , Ord a
                 , Ord name
                 )
-             => (Core.Core name -> NonDetC (ReaderC (Cache name a) (StateC (Cache name a) m)) a)
-             -> Core.Core name
+             => (Term Core.Core name -> NonDetC (ReaderC (Cache name a) (StateC (Cache name a) m)) a)
+             -> Term Core.Core name
              -> m (Set.Set a)
 convergeTerm eval body = do
   heap <- get
@@ -52,8 +53,8 @@ cacheTerm :: forall m sig a name
              , Ord a
              , Ord name
              )
-          => (Core.Core name -> m a)
-          -> (Core.Core name -> m a)
+          => (Term Core.Core name -> m a)
+          -> (Term Core.Core name -> m a)
 cacheTerm eval term = do
   cached <- gets (Map.lookup term)
   case cached :: Maybe (Set.Set a) of

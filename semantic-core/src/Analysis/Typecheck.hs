@@ -32,6 +32,7 @@ import qualified Data.Map as Map
 import           Data.Name as Name
 import qualified Data.Set as Set
 import           Data.Stack
+import           Data.Term
 import           Prelude hiding (fail)
 
 data Monotype a
@@ -102,7 +103,7 @@ substIn free bound = go 0
         go i (PRecord fs)           = PRecord (go i <$> fs)
 
 
-typecheckingFlowInsensitive :: [File (Core.Core Name)] -> (Heap Name (Monotype Meta), [File (Either (Loc, String) Polytype)])
+typecheckingFlowInsensitive :: [File (Term Core.Core Name)] -> (Heap Name (Monotype Meta), [File (Either (Loc, String) Polytype)])
 typecheckingFlowInsensitive
   = run
   . runFresh
@@ -117,7 +118,7 @@ runFile :: ( Carrier sig m
            , Member Naming sig
            , Member (State (Heap Name (Monotype Meta))) sig
            )
-        => File (Core.Core Name)
+        => File (Term Core.Core Name)
         -> m (File (Either (Loc, String) (Monotype Meta)))
 runFile file = traverse run file
   where run

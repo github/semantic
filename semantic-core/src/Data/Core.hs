@@ -2,7 +2,6 @@
              ScopedTypeVariables, StandaloneDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Data.Core
 ( Core(..)
-, CoreF(..)
 , Edge(..)
 , let'
 , block
@@ -33,18 +32,16 @@ module Data.Core
 , instantiate
 ) where
 
-import Control.Applicative (Alternative (..), Const (..))
+import Control.Applicative (Alternative (..))
 import Control.Effect.Carrier
-import Control.Monad (ap)
 import Control.Monad.Module
-import Data.Coerce
 import Data.Foldable (foldl')
 import Data.List.NonEmpty
 import Data.Loc
 import Data.Name
 import Data.Scope
 import Data.Stack
-import Data.Term (Syntax (..))
+import Data.Term
 import Data.Text (Text)
 import GHC.Generics (Generic1)
 import GHC.Stack
@@ -52,24 +49,7 @@ import GHC.Stack
 data Edge = Lexical | Import
   deriving (Eq, Ord, Show)
 
-data Core a
-  = Var a
-  | Core (CoreF Core a)
-  deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
-
-instance Applicative Core where
-  pure = Var
-  (<*>) = ap
-
-instance Monad Core where
-  Var a  >>= f = f a
-  Core c >>= f = Core (c >>=* f)
-
-instance Carrier CoreF Core where
-  eff = Core
-
-
-data CoreF f a
+data Core f a
   = Let User
   -- | Sequencing without binding; analogous to '>>' or '*>'.
   | f a :>> f a
@@ -91,14 +71,14 @@ data CoreF f a
   | Ann Loc (f a)
   deriving (Foldable, Functor, Generic1, Traversable)
 
-instance HFunctor CoreF
+instance HFunctor Core
 
-deriving instance (Eq   a, forall a . Eq   a => Eq   (f a), Monad f) => Eq   (CoreF f a)
+deriving instance (Eq   a, forall a . Eq   a => Eq   (f a), Monad f) => Eq   (Core f a)
 deriving instance (Ord  a, forall a . Eq   a => Eq   (f a)
-                         , forall a . Ord  a => Ord  (f a), Monad f) => Ord  (CoreF f a)
-deriving instance (Show a, forall a . Show a => Show (f a))          => Show (CoreF f a)
+                         , forall a . Ord  a => Ord  (f a), Monad f) => Ord  (Core f a)
+deriving instance (Show a, forall a . Show a => Show (f a))          => Show (Core f a)
 
-instance RightModule CoreF where
+instance RightModule Core where
   Let u     >>=* _ = Let u
   (a :>> b) >>=* f = (a >>= f) :>> (b >>= f)
   Lam v b   >>=* f = Lam v (b >>=* f)
@@ -120,119 +100,98 @@ infix  3 :=
 infixl 4 :.
 
 
-let' :: (Carrier sig m, Member CoreF sig) => User -> m a
+let' :: (Carrier sig m, Member Core sig) => User -> m a
 let' = send . Let
 
-block :: (Foldable t, Carrier sig m, Member CoreF sig) => t (m a) -> m a
+block :: (Foldable t, Carrier sig m, Member Core sig) => t (m a) -> m a
 block = maybe unit getBlock . foldMap (Just . Block)
 
 newtype Block m a = Block { getBlock :: m a }
 
-instance (Carrier sig m, Member CoreF sig) => Semigroup (Block m a) where
+instance (Carrier sig m, Member Core sig) => Semigroup (Block m a) where
   Block a <> Block b = Block (send (a :>> b))
 
-lam :: (Eq a, Carrier sig m, Member CoreF sig) => Named a -> m a -> m a
+lam :: (Eq a, Carrier sig m, Member Core sig) => Named a -> m a -> m a
 lam (Named u n) b = send (Lam u (bind1 n b))
 
-lam' :: (Carrier sig m, Member CoreF sig) => User -> m User -> m User
+lam' :: (Carrier sig m, Member Core sig) => User -> m User -> m User
 lam' u = lam (named u u)
 
-lams :: (Eq a, Foldable t, Carrier sig m, Member CoreF sig) => t (Named a) -> m a -> m a
+lams :: (Eq a, Foldable t, Carrier sig m, Member Core sig) => t (Named a) -> m a -> m a
 lams names body = foldr lam body names
 
-lams' :: (Foldable t, Carrier sig m, Member CoreF sig) => t User -> m User -> m User
+lams' :: (Foldable t, Carrier sig m, Member Core sig) => t User -> m User -> m User
 lams' names body = foldr lam' body names
 
-unlam :: Alternative m => a -> Core a -> m (Named a, Core a)
-unlam n (Core (Lam v b)) = pure (Named v n, instantiate (const (pure n)) b)
-unlam _ _                = empty
+unlam :: (Alternative m, Member Core sig, RightModule sig) => a -> Term sig a -> m (Named a, Term sig a)
+unlam n (Term sig) | Just (Lam v b) <- prj sig = pure (Named v n, instantiate (const (pure n)) b)
+unlam _ _                                      = empty
 
-unseq :: Alternative m => Core a -> m (Core a, Core a)
-unseq (Core (a :>> b)) = pure (a, b)
-unseq _                = empty
+unseq :: (Alternative m, Member Core sig) => Term sig a -> m (Term sig a, Term sig a)
+unseq (Term sig) | Just (a :>> b) <- prj sig = pure (a, b)
+unseq _                                      = empty
 
-unseqs :: Core a -> NonEmpty (Core a)
+unseqs :: Member Core sig => Term sig a -> NonEmpty (Term sig a)
 unseqs = go
   where go t = case unseq t of
           Just (l, r) -> go l <> go r
           Nothing     -> t :| []
 
-($$) :: (Carrier sig m, Member CoreF sig) => m a -> m a -> m a
+($$) :: (Carrier sig m, Member Core sig) => m a -> m a -> m a
 f $$ a = send (f :$ a)
 
 infixl 2 $$
 
 -- | Application of a function to a sequence of arguments.
-($$*) :: (Foldable t, Carrier sig m, Member CoreF sig) => m a -> t (m a) -> m a
+($$*) :: (Foldable t, Carrier sig m, Member Core sig) => m a -> t (m a) -> m a
 ($$*) = foldl' ($$)
 
 infixl 9 $$*
 
-unapply :: Alternative m => Core a -> m (Core a, Core a)
-unapply (Core (f :$ a)) = pure (f, a)
-unapply _               = empty
+unapply :: (Alternative m, Member Core sig) => Term sig a -> m (Term sig a, Term sig a)
+unapply (Term sig) | Just (f :$ a) <- prj sig = pure (f, a)
+unapply _                                     = empty
 
-unapplies :: Core a -> (Core a, Stack (Core a))
+unapplies :: Member Core sig => Term sig a -> (Term sig a, Stack (Term sig a))
 unapplies core = case unapply core of
   Just (f, a) -> (:> a) <$> unapplies f
   Nothing     -> (core, Nil)
 
-unit :: (Carrier sig m, Member CoreF sig) => m a
+unit :: (Carrier sig m, Member Core sig) => m a
 unit = send Unit
 
-bool :: (Carrier sig m, Member CoreF sig) => Bool -> m a
+bool :: (Carrier sig m, Member Core sig) => Bool -> m a
 bool = send . Bool
 
-if' :: (Carrier sig m, Member CoreF sig) => m a -> m a -> m a -> m a
+if' :: (Carrier sig m, Member Core sig) => m a -> m a -> m a -> m a
 if' c t e = send (If c t e)
 
-string :: (Carrier sig m, Member CoreF sig) => Text -> m a
+string :: (Carrier sig m, Member Core sig) => Text -> m a
 string = send . String
 
-load :: (Carrier sig m, Member CoreF sig) => m a -> m a
+load :: (Carrier sig m, Member Core sig) => m a -> m a
 load = send . Load
 
-edge :: (Carrier sig m, Member CoreF sig) => Edge -> m a -> m a
+edge :: (Carrier sig m, Member Core sig) => Edge -> m a -> m a
 edge e b = send (Edge e b)
 
-frame :: (Carrier sig m, Member CoreF sig) => m a
+frame :: (Carrier sig m, Member Core sig) => m a
 frame = send Frame
 
-(...) :: (Carrier sig m, Member CoreF sig) => m a -> m a -> m a
+(...) :: (Carrier sig m, Member Core sig) => m a -> m a -> m a
 a ... b = send (a :. b)
 
-(.=) :: (Carrier sig m, Member CoreF sig) => m a -> m a -> m a
+(.=) :: (Carrier sig m, Member Core sig) => m a -> m a -> m a
 a .= b = send (a := b)
 
-ann :: (Carrier sig m, Member CoreF sig) => HasCallStack => m a -> m a
+ann :: (Carrier sig m, Member Core sig) => HasCallStack => m a -> m a
 ann = annWith callStack
 
-annWith :: (Carrier sig m, Member CoreF sig) => CallStack -> m a -> m a
+annWith :: (Carrier sig m, Member Core sig) => CallStack -> m a -> m a
 annWith callStack = maybe id (fmap send . Ann) (stackLoc callStack)
 
 
-iter :: forall m n a b
-     .  (forall a . m a -> n a)
-     -> (forall a . CoreF n a -> n a)
-     -> (forall a . Incr () (n a) -> m (Incr () (n a)))
-     -> (a -> m b)
-     -> Core a
-     -> n b
-iter var alg k = go
-  where go :: forall x y . (x -> m y) -> Core x -> n y
-        go h = \case
-          Var a -> var (h a)
-          Core c -> alg (foldSyntax go k h c)
-
-cata :: (a -> b)
-     -> (forall a . CoreF (Const b) a -> b)
-     -> (Incr () b -> a)
-     -> (x -> a)
-     -> Core x
-     -> b
-cata var alg k h = getConst . iter (coerce var) (coerce alg) (coerce k) (Const . h)
-
-instance Syntax CoreF where
+instance Syntax Core where
   foldSyntax go k h = \case
     Let a -> Let a
     a :>> b -> go h a :>> go h b

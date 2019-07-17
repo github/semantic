@@ -30,6 +30,7 @@ import           Data.Loc
 import qualified Data.Map as Map
 import           Data.Monoid (Alt(..))
 import           Data.Name hiding (fresh)
+import           Data.Term
 import           Data.Text (Text, pack)
 import           Prelude hiding (fail)
 
@@ -40,7 +41,7 @@ newtype FrameId = FrameId { unFrameId :: Precise }
   deriving (Eq, Ord, Show)
 
 data Concrete
-  = Closure Loc Name (Core.Core Name) Precise
+  = Closure Loc Name (Term Core.Core Name) Precise
   | Unit
   | Bool Bool
   | String Text
@@ -64,7 +65,7 @@ type Heap = IntMap.IntMap Concrete
 --
 --   >>> map fileBody (snd (concrete [File (Loc "bool" emptySpan) (Core.Bool True)]))
 --   [Right (Bool True)]
-concrete :: [File (Core.Core Name)] -> (Heap, [File (Either (Loc, String) Concrete)])
+concrete :: [File (Term Core.Core Name)] -> (Heap, [File (Either (Loc, String) Concrete)])
 concrete
   = run
   . runFresh
@@ -79,7 +80,7 @@ runFile :: ( Carrier sig m
            , Member (Reader FrameId) sig
            , Member (State Heap) sig
            )
-        => File (Core.Core Name)
+        => File (Term Core.Core Name)
         -> m (File (Either (Loc, String) Concrete))
 runFile file = traverse run file
   where run = runReader (fileLoc file)

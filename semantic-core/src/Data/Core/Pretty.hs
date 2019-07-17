@@ -14,21 +14,22 @@ import           Data.File
 import           Data.Functor.Const
 import           Data.Name
 import           Data.Scope
+import           Data.Term
 import           Data.Text.Prettyprint.Doc (Pretty (..), annotate, softline, (<+>))
 import qualified Data.Text.Prettyprint.Doc as Pretty
 import qualified Data.Text.Prettyprint.Doc.Render.String as Pretty
 import qualified Data.Text.Prettyprint.Doc.Render.Terminal as Pretty
 
-showCore :: Core Name -> String
+showCore :: Term Core Name -> String
 showCore = Pretty.renderString . Pretty.layoutSmart Pretty.defaultLayoutOptions . Pretty.unAnnotate . prettyCore Ascii
 
-printCore :: Core Name -> IO ()
+printCore :: Term Core Name -> IO ()
 printCore p = Pretty.putDoc (prettyCore Unicode p) *> putStrLn ""
 
-showFile :: File (Core Name) -> String
+showFile :: File (Term Core Name) -> String
 showFile = showCore . fileBody
 
-printFile :: File (Core Name) -> IO ()
+printFile :: File (Term Core Name) -> IO ()
 printFile = printCore . fileBody
 
 type AnsiDoc = Pretty.Doc Pretty.AnsiStyle
@@ -59,7 +60,7 @@ inParens amount go = do
 
 prettify :: (Member (Reader [AnsiDoc]) sig, Member (Reader Prec) sig, Carrier sig m)
          => Style
-         -> CoreF (Const (m AnsiDoc)) a
+         -> Core (Const (m AnsiDoc)) a
          -> m AnsiDoc
 prettify style = \case
   Let a -> pure $ keyword "let" <+> name (User a)
@@ -119,7 +120,7 @@ prettify style = \case
 appending :: Functor f => AnsiDoc -> f AnsiDoc -> f AnsiDoc
 appending k item = (keyword k <+>) <$> item
 
-prettyCore :: Style -> Core Name -> AnsiDoc
+prettyCore :: Style -> Term Core Name -> AnsiDoc
 prettyCore s = run . runReader @Prec 0 . runReader @[AnsiDoc] [] . cata id (prettify s) bound (pure . name)
   where bound (Z _) = asks (head @AnsiDoc)
         bound (S n) = local (tail @AnsiDoc) n

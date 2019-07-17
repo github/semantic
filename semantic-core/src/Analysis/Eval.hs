@@ -20,14 +20,15 @@ import Data.Functor
 import Data.Loc
 import Data.Maybe (fromJust)
 import Data.Name
+import Data.Term
 import Data.Text (Text)
 import GHC.Stack
 import Prelude hiding (fail)
 
-eval :: (Carrier sig m, Member Naming sig, Member (Reader Loc) sig, MonadFail m) => Analysis address value m -> (Core Name -> m value) -> Core Name -> m value
+eval :: (Carrier sig m, Member Naming sig, Member (Reader Loc) sig, MonadFail m) => Analysis address value m -> (Term Core Name -> m value) -> Term Core Name -> m value
 eval Analysis{..} eval = \case
   Var n -> lookupEnv' n >>= deref' n
-  Core c -> case c of
+  Term c -> case c of
     Let n -> alloc (User n) >>= bind (User n) >> unit
     a :>> b -> eval a >> eval b
     Lam _ b -> do
@@ -63,7 +64,7 @@ eval Analysis{..} eval = \case
 
         ref = \case
           Var n -> lookupEnv' n
-          Core c -> case c of
+          Term c -> case c of
             Let n -> do
               addr <- alloc (User n)
               addr <$ bind (User n) addr
@@ -77,7 +78,7 @@ eval Analysis{..} eval = \case
             c -> invalidRef (show c)
 
 
-prog1 :: File (Core User)
+prog1 :: File (Term Core User)
 prog1 = fromBody . lam' foo $ block
   [ let' bar .= pure foo
   , Core.if' (pure bar)
@@ -86,17 +87,17 @@ prog1 = fromBody . lam' foo $ block
   ]
   where (foo, bar) = ("foo", "bar")
 
-prog2 :: File (Core User)
+prog2 :: File (Term Core User)
 prog2 = fromBody $ fileBody prog1 $$ Core.bool True
 
-prog3 :: File (Core User)
+prog3 :: File (Term Core User)
 prog3 = fromBody $ lams' [foo, bar, quux]
   (Core.if' (pure quux)
     (pure bar)
     (pure foo))
   where (foo, bar, quux) = ("foo", "bar", "quux")
 
-prog4 :: File (Core User)
+prog4 :: File (Term Core User)
 prog4 = fromBody $ block
   [ let' foo .= Core.bool True
   , Core.if' (pure foo)
@@ -105,7 +106,7 @@ prog4 = fromBody $ block
   ]
   where foo = "foo"
 
-prog5 :: File (Core User)
+prog5 :: File (Term Core User)
 prog5 = fromBody $ block
   [ let' "mkPoint" .= lam' "_x" (lam' "_y" (block
     [ let' "x" .= pure "_x"
@@ -115,7 +116,7 @@ prog5 = fromBody $ block
   , pure "point" Core.... pure "y" .= pure "point" Core.... pure "x"
   ]
 
-prog6 :: [File (Core User)]
+prog6 :: [File (Term Core User)]
 prog6 =
   [ File (Loc "dep"  (locSpan (fromJust here))) $ block
     [ let' "dep" .= Core.frame
@@ -129,7 +130,7 @@ prog6 =
     ]
   ]
 
-ruby :: File (Core User)
+ruby :: File (Term Core User)
 ruby = fromBody . ann . block $
   [ ann (let' "Class" .= Core.frame)
   , ann (pure "Class" Core....
@@ -207,8 +208,8 @@ data Analysis address value m = Analysis
   , lookupEnv   :: Name -> m (Maybe address)
   , deref       :: address -> m (Maybe value)
   , assign      :: address -> value -> m ()
-  , abstract    :: (Core Name -> m value) -> Name -> Core Name -> m value
-  , apply       :: (Core Name -> m value) -> value -> value -> m value
+  , abstract    :: (Term Core Name -> m value) -> Name -> Term Core Name -> m value
+  , apply       :: (Term Core Name -> m value) -> value -> value -> m value
   , unit        :: m value
   , bool        :: Bool -> m value
   , asBool      :: value -> m Bool

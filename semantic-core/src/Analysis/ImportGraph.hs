@@ -23,6 +23,7 @@ import qualified Data.Map as Map
 import           Data.Name
 import qualified Data.Set as Set
 import           Data.Stack
+import           Data.Term
 import           Data.Text (Text)
 import           Prelude hiding (fail)
 
@@ -41,14 +42,14 @@ instance Monoid Value where
   mempty = Value Abstract mempty
 
 data Semi
-  = Closure Loc Name (Core.Core Name) Name
+  = Closure Loc Name (Term Core.Core Name) Name
   -- FIXME: Bound String values.
   | String Text
   | Abstract
   deriving (Eq, Ord, Show)
 
 
-importGraph :: [File (Core.Core Name)] -> (Heap Name Value, [File (Either (Loc, String) Value)])
+importGraph :: [File (Term Core.Core Name)] -> (Heap Name Value, [File (Either (Loc, String) Value)])
 importGraph
   = run
   . runFresh
@@ -63,7 +64,7 @@ runFile :: ( Carrier sig m
            , Member (Reader (FrameId Name)) sig
            , Member (State (Heap Name Value)) sig
            )
-        => File (Core.Core Name)
+        => File (Term Core.Core Name)
         -> m (File (Either (Loc, String) Value))
 runFile file = traverse run file
   where run = runReader (fileLoc file)
