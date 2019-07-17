@@ -27,8 +27,6 @@ module Data.Core
 , (.=)
 , ann
 , annWith
-, iter
-, cata
 , instantiate
 ) where
 
