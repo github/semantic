@@ -93,7 +93,7 @@ lvalue = choice
 -- * Literals
 
 name :: (TokenParsing m, Monad m) => m (Named User)
-name = (named <*> id) <$> identifier <?> "name" where
+name = named' <$> identifier <?> "name" where
 
 lit :: (TokenParsing m, Monad m) => m (Term Core User)
 lit = let x `given` n = x <$ reserved n in choice

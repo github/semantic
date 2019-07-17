@@ -115,7 +115,7 @@ lam :: (Eq a, Carrier sig m, Member Core sig) => Named a -> m a -> m a
 lam (Named u n) b = send (Lam u (bind1 n b))
 
 lam' :: (Carrier sig m, Member Core sig) => User -> m User -> m User
-lam' u = lam (named u u)
+lam' u = lam (named' u)
 
 lams :: (Eq a, Foldable t, Carrier sig m, Member Core sig) => t (Named a) -> m a -> m a
 lams names body = foldr lam body names

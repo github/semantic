@@ -5,6 +5,7 @@ module Data.Name
 , Name(..)
 , Named(..)
 , named
+, named'
 , namedName
 , namedValue
 , Ignored(..)
@@ -64,6 +65,9 @@ data Named a = Named (Ignored User) a
 
 named :: User -> a -> Named a
 named = Named . Ignored
+
+named' :: User -> Named User
+named' u = Named (Ignored u) u
 
 namedName :: Named a -> User
 namedName (Named (Ignored n) _) = n
