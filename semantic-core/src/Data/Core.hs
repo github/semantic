@@ -1,5 +1,5 @@
 {-# LANGUAGE DeriveGeneric, DeriveTraversable, FlexibleContexts, LambdaCase, MultiParamTypeClasses, OverloadedStrings, QuantifiedConstraints, RankNTypes,
-             ScopedTypeVariables, StandaloneDeriving, TypeFamilies, TypeOperators #-}
+             ScopedTypeVariables, StandaloneDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Data.Core
 ( Core(..)
 , CoreF(..)
@@ -41,7 +41,6 @@ import Data.Coerce
 import Data.Foldable (foldl')
 import Data.List.NonEmpty
 import Data.Loc
-import Data.Maybe
 import Data.Name
 import Data.Scope
 import Data.Stack
@@ -127,8 +126,13 @@ infixl 4 :.
 let' :: (Carrier sig m, Member CoreF sig) => User -> m a
 let' = send . Let
 
-block :: (Foldable t, Carrier sig m, Member CoreF sig, Semigroup (m a)) => t (m a) -> m a
-block = fromMaybe unit . foldMap Just
+block :: (Foldable t, Carrier sig m, Member CoreF sig) => t (m a) -> m a
+block = maybe unit getBlock . foldMap (Just . Block)
+
+newtype Block m a = Block { getBlock :: m a }
+
+instance (Carrier sig m, Member CoreF sig) => Semigroup (Block m a) where
+  Block a <> Block b = Block (send (a :>> b))
 
 lam :: (Eq a, Carrier sig m, Member CoreF sig) => Named a -> m a -> m a
 lam (Named u n) b = send (Lam u (bind1 n b))
