@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveTraversable, FlexibleInstances, MultiParamTypeClasses, QuantifiedConstraints, RankNTypes, StandaloneDeriving, UndecidableInstances #-}
+{-# LANGUAGE DeriveTraversable, FlexibleInstances, MultiParamTypeClasses, QuantifiedConstraints, RankNTypes, StandaloneDeriving, TypeOperators, UndecidableInstances #-}
 module Data.Term
 ( Term(..)
 , Syntax(..)
@@ -54,3 +54,7 @@ class (HFunctor sig, forall g . Functor g => Functor (sig g)) => Syntax sig wher
 
 instance Syntax (Scope ()) where
   foldSyntax go bound free = Scope . go (bound . fmap (go free)) . unScope
+
+instance (Syntax l, Syntax r) => Syntax (l :+: r) where
+  foldSyntax go bound free (L l) = L (foldSyntax go bound free l)
+  foldSyntax go bound free (R r) = R (foldSyntax go bound free r)
