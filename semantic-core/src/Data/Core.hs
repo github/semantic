@@ -195,9 +195,10 @@ annWith callStack = maybe id (fmap send . Ann) (stackLoc callStack)
 
 
 stripAnnotations :: (Member Core sig, Syntax sig) => Term sig a -> Term sig a
-stripAnnotations = iter id alg Var Var
-  where alg t | Just c <- prj t, Ann _ b <- c = b
-              | otherwise                     = Term t
+stripAnnotations (Var v)  = Var v
+stripAnnotations (Term t)
+  | Just c <- prj t, Ann _ b <- c = b
+  | otherwise                     = Term (hmap stripAnnotations t)
 
 
 instance Syntax Core where
