@@ -1,13 +1,11 @@
 {-# LANGUAGE DeriveTraversable, FlexibleInstances, LambdaCase, MultiParamTypeClasses, QuantifiedConstraints, RankNTypes, ScopedTypeVariables, StandaloneDeriving, TypeOperators, UndecidableInstances #-}
 module Data.Term
 ( Term(..)
-, Syntax(..)
 ) where
 
 import Control.Effect.Carrier
 import Control.Monad (ap)
 import Control.Monad.Module
-import Data.Scope
 
 data Term sig a
   = Var a
@@ -43,18 +41,3 @@ instance RightModule sig => Monad (Term sig) where
 
 instance RightModule sig => Carrier sig (Term sig) where
   eff = Term
-
-
-class (HFunctor sig, forall g . Functor g => Functor (sig g)) => Syntax sig where
-  foldSyntax :: (forall x y . (x -> m y) -> f x -> n y)
-             -> (forall a . Incr () (n a) -> m (Incr () (n a)))
-             -> (a -> m b)
-             -> sig f a
-             -> sig n b
-
-instance Syntax (Scope ()) where
-  foldSyntax go bound free = Scope . go (bound . fmap (go free)) . unScope
-
-instance (Syntax l, Syntax r) => Syntax (l :+: r) where
-  foldSyntax go bound free (L l) = L (foldSyntax go bound free l)
-  foldSyntax go bound free (R r) = R (foldSyntax go bound free r)
