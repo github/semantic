@@ -64,8 +64,8 @@ prettyCore style = run . runReader @Prec 0 . go (pure . name)
             Let a -> pure $ keyword "let" <+> name a
             a :>> b -> do
               prec <- ask @Prec
-              fore <- with 12 a
-              aft  <- with 12 b
+              fore <- with 12 (go var a)
+              aft  <- with 12 (go var b)
 
               let open  = symbol ("{" <> softline)
                   close = symbol (softline <> "}")
@@ -106,8 +106,7 @@ prettyCore style = run . runReader @Prec 0 . go (pure . name)
 
             -- Annotations are not pretty-printed, as it lowers the signal/noise ratio too profoundly.
             Ann _ c -> go var c
-          where with n m = local (const (n :: Prec)) (go var m)
-                bind (Ignored x) f = let x' = name x in (,) x' <$> go (incr (const (pure x')) var) (fromScope f)
+          where bind (Ignored x) f = let x' = name x in (,) x' <$> go (incr (const (pure x')) var) (fromScope f)
         lambda = case style of
           Unicode -> symbol "λ"
           Ascii   -> symbol "\\"
