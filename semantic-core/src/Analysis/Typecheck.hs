@@ -33,6 +33,7 @@ import           Data.Scope
 import qualified Data.Set as Set
 import           Data.Stack
 import           Data.Term
+import           Data.Void
 import           GHC.Generics (Generic1)
 import           Prelude hiding (fail)
 
@@ -78,11 +79,11 @@ forAll n body = send (PForAll (Data.Scope.bind1 n body))
 forAlls :: (Eq a, Carrier sig m, Member Polytype sig, Foldable t) => t a -> m a -> m a
 forAlls ns body = foldr forAll body ns
 
-generalize :: Term Monotype Meta -> Term (Polytype :+: Monotype) Gensym
+generalize :: Term Monotype Meta -> Term (Polytype :+: Monotype) Void
 generalize ty = fromJust (closed (forAlls (IntSet.toList (mvs ty)) (hoistTerm R ty)))
 
 
-typecheckingFlowInsensitive :: [File (Term Core.Core Name)] -> (Heap Name (Term Monotype Meta), [File (Either (Loc, String) (Term (Polytype :+: Monotype) Gensym))])
+typecheckingFlowInsensitive :: [File (Term Core.Core Name)] -> (Heap Name (Term Monotype Meta), [File (Either (Loc, String) (Term (Polytype :+: Monotype) Void))])
 typecheckingFlowInsensitive
   = run
   . runFresh
