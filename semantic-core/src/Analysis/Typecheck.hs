@@ -192,14 +192,8 @@ substAll :: Substitutable t => Substitution -> t -> t
 substAll s a = foldl' (flip subst) a (map (uncurry (:=)) (IntMap.toList s))
 
 
-class FreeVariables t where
-  mvs :: t -> IntSet.IntSet
-
-instance FreeVariables (Term Monotype Meta) where
-  mvs = foldMap IntSet.singleton
-
-instance FreeVariables Constraint where
-  mvs (t1 :===: t2) = mvs t1 <> mvs t2
+mvs :: Foldable t => t Meta -> IntSet.IntSet
+mvs = foldMap IntSet.singleton
 
 class Substitutable t where
   subst :: Solution -> t -> t
