@@ -2,7 +2,7 @@
 module Analysis.Typecheck
 ( Monotype (..)
 , Meta
-, Polytype (PForAll, PBool, PFree, PArr)
+, Polytype (PForAll, PBool, PArr)
 , Scope
 , typecheckingFlowInsensitive
 , typecheckingAnalysis
@@ -52,8 +52,6 @@ data Polytype f a
   | PUnit
   | PBool
   | PString
-  | PBound Int
-  | PFree Gensym
   | PArr (f a) (f a)
   | PRecord (Map.Map User (f a))
   deriving (Foldable, Functor, Generic1, Traversable)
@@ -64,8 +62,6 @@ instance RightModule Polytype where
   PUnit     >>=* _ = PUnit
   PBool     >>=* _ = PBool
   PString   >>=* _ = PString
-  PBound i  >>=* _ = PBound i
-  PFree n   >>=* _ = PFree n
   PArr a b  >>=* f = PArr (a >>= f) (b >>= f)
   PRecord m >>=* f = PRecord ((>>= f) <$> m)
 
@@ -80,13 +76,13 @@ generalize :: (Carrier sig m, Member Naming sig) => Monotype Meta -> m (Term Pol
 generalize ty = namespace "generalize" $ do
   Gensym root _ <- Name.fresh
   pure (forAlls (map (Gensym root) (IntSet.toList (mvs ty))) (fold root ty))
-  where fold root = Term . \case
-          MUnit      -> PUnit
-          MBool      -> PBool
-          MString    -> PString
-          MMeta i    -> PFree (Gensym root i)
-          MArr a b   -> PArr (fold root a) (fold root b)
-          MRecord fs -> PRecord (fold root <$> fs)
+  where fold root = \case
+          MUnit      -> Term PUnit
+          MBool      -> Term PBool
+          MString    -> Term PString
+          MMeta i    -> Var (Gensym root i)
+          MArr a b   -> Term (PArr (fold root a) (fold root b))
+          MRecord fs -> Term (PRecord (fold root <$> fs))
 
 
 typecheckingFlowInsensitive :: [File (Term Core.Core Name)] -> (Heap Name (Monotype Meta), [File (Either (Loc, String) (Term Polytype Gensym))])
