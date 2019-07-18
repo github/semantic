@@ -36,14 +36,26 @@ import           Data.Term
 import           GHC.Generics (Generic1)
 import           Prelude hiding (fail)
 
-data Monotype a
+data Monotype f a
   = MBool
   | MUnit
   | MString
-  | MMeta a
-  | MArr (Monotype a) (Monotype a)
-  | MRecord (Map.Map User (Monotype a))
-  deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
+  | MArr (f a) (f a)
+  | MRecord (Map.Map User (f a))
+  deriving (Foldable, Functor, Generic1, Traversable)
+
+deriving instance (Eq   a, forall a . Eq   a => Eq   (f a), Monad f) => Eq   (Monotype f a)
+deriving instance (Ord  a, forall a . Eq   a => Eq   (f a)
+                         , forall a . Ord  a => Ord  (f a), Monad f) => Ord  (Monotype f a)
+deriving instance (Show a, forall a . Show a => Show (f a))          => Show (Monotype f a)
+
+instance HFunctor Monotype
+instance RightModule Monotype where
+  MUnit     >>=* _ = MUnit
+  MBool     >>=* _ = MBool
+  MString   >>=* _ = MString
+  MArr a b  >>=* f = MArr (a >>= f) (b >>= f)
+  MRecord m >>=* f = MRecord ((>>= f) <$> m)
 
 type Meta = Int
 
@@ -77,20 +89,21 @@ forAll n body = send (PForAll (Data.Scope.bind1 n body))
 forAlls :: (Eq a, Carrier sig m, Member Polytype sig, Foldable t) => t a -> m a -> m a
 forAlls ns body = foldr forAll body ns
 
-generalize :: (Carrier sig m, Member Naming sig) => Monotype Meta -> m (Term Polytype Gensym)
+generalize :: (Carrier sig m, Member Naming sig) => Term Monotype Meta -> m (Term Polytype Gensym)
 generalize ty = namespace "generalize" $ do
   Gensym root _ <- Name.fresh
   pure (forAlls (map (Gensym root) (IntSet.toList (mvs ty))) (fold root ty))
   where fold root = \case
-          MUnit      -> Term PUnit
-          MBool      -> Term PBool
-          MString    -> Term PString
-          MMeta i    -> Var (Gensym root i)
-          MArr a b   -> Term (PArr (fold root a) (fold root b))
-          MRecord fs -> Term (PRecord (fold root <$> fs))
+          Var v  -> pure (Gensym root v)
+          Term t -> Term $ case t of
+            MUnit      -> PUnit
+            MBool      -> PBool
+            MString    -> PString
+            MArr a b   -> PArr (fold root a) (fold root b)
+            MRecord fs -> PRecord (fold root <$> fs)
 
 
-typecheckingFlowInsensitive :: [File (Term Core.Core Name)] -> (Heap Name (Monotype Meta), [File (Either (Loc, String) (Term Polytype Gensym))])
+typecheckingFlowInsensitive :: [File (Term Core.Core Name)] -> (Heap Name (Term Monotype Meta), [File (Either (Loc, String) (Term Polytype Gensym))])
 typecheckingFlowInsensitive
   = run
   . runFresh
@@ -103,15 +116,15 @@ runFile :: ( Carrier sig m
            , Effect sig
            , Member Fresh sig
            , Member Naming sig
-           , Member (State (Heap Name (Monotype Meta))) sig
+           , Member (State (Heap Name (Term Monotype Meta))) sig
            )
         => File (Term Core.Core Name)
-        -> m (File (Either (Loc, String) (Monotype Meta)))
+        -> m (File (Either (Loc, String) (Term Monotype Meta)))
 runFile file = traverse run file
   where run
           = (\ m -> do
               (subst, t) <- m
-              modify @(Heap Name (Monotype Meta)) (substAll subst)
+              modify @(Heap Name (Term Monotype Meta)) (substAll subst)
               pure (substAll subst <$> t))
           . runState (mempty :: Substitution)
           . runReader (fileLoc file)
@@ -126,7 +139,7 @@ runFile file = traverse run file
               v <$ for_ bs (unify v))
           . convergeTerm (fix (cacheTerm . eval typecheckingAnalysis))
 
-typecheckingAnalysis :: (Alternative m, Carrier sig m, Member Fresh sig, Member (State (Set.Set Constraint)) sig, Member (State (Heap Name (Monotype Meta))) sig, MonadFail m) => Analysis Name (Monotype Meta) m
+typecheckingAnalysis :: (Alternative m, Carrier sig m, Member Fresh sig, Member (State (Set.Set Constraint)) sig, Member (State (Heap Name (Term Monotype Meta))) sig, MonadFail m) => Analysis Name (Term Monotype Meta) m
 typecheckingAnalysis = Analysis{..}
   where alloc = pure
         bind _ _ = pure ()
@@ -139,58 +152,58 @@ typecheckingAnalysis = Analysis{..}
           arg <- meta
           assign addr arg
           ty <- eval body
-          pure (MArr arg ty)
+          pure (Term (MArr arg ty))
         apply _ f a = do
           _A <- meta
           _B <- meta
-          unify (MArr _A _B) f
+          unify (Term (MArr _A _B)) f
           unify _A a
           pure _B
-        unit = pure MUnit
-        bool _ = pure MBool
-        asBool b = unify MBool b >> pure True <|> pure False
-        string _ = pure MString
-        asString s = unify MString s $> mempty
+        unit = pure (Term MUnit)
+        bool _ = pure (Term MBool)
+        asBool b = unify (Term MBool) b >> pure True <|> pure False
+        string _ = pure (Term MString)
+        asString s = unify (Term MString) s $> mempty
         frame = fail "unimplemented"
         edge _ _ = pure ()
         _ ... m = m
 
 
-data Constraint = Monotype Meta :===: Monotype Meta
+data Constraint = Term Monotype Meta :===: Term Monotype Meta
   deriving (Eq, Ord, Show)
 
 infix 4 :===:
 
 data Solution
-  = Int := Monotype Meta
+  = Int := Term Monotype Meta
   deriving (Eq, Ord, Show)
 
 infix 5 :=
 
-meta :: (Carrier sig m, Member Fresh sig) => m (Monotype Meta)
-meta = MMeta <$> Fresh.fresh
+meta :: (Carrier sig m, Member Fresh sig) => m (Term Monotype Meta)
+meta = pure <$> Fresh.fresh
 
-unify :: (Carrier sig m, Member (State (Set.Set Constraint)) sig) => Monotype Meta -> Monotype Meta -> m ()
+unify :: (Carrier sig m, Member (State (Set.Set Constraint)) sig) => Term Monotype Meta -> Term Monotype Meta -> m ()
 unify t1 t2
   | t1 == t2  = pure ()
   | otherwise = modify (<> Set.singleton (t1 :===: t2))
 
-type Substitution = IntMap.IntMap (Monotype Meta)
+type Substitution = IntMap.IntMap (Term Monotype Meta)
 
 solve :: (Carrier sig m, Member (State Substitution) sig, MonadFail m) => Set.Set Constraint -> m ()
 solve cs = for_ cs solve
   where solve = \case
           -- FIXME: how do we enforce proper subtyping? row polymorphism or something?
-          MRecord f1 :===: MRecord f2 -> traverse solve (Map.intersectionWith (:===:) f1 f2) $> ()
-          MArr a1 b1 :===: MArr a2 b2 -> solve (a1 :===: a2) *> solve (b1 :===: b2)
-          MMeta m1   :===: MMeta m2   | m1 == m2 -> pure ()
-          MMeta m1   :===: t2         -> do
+          Term (MRecord f1) :===: Term (MRecord f2) -> traverse solve (Map.intersectionWith (:===:) f1 f2) $> ()
+          Term (MArr a1 b1) :===: Term (MArr a2 b2) -> solve (a1 :===: a2) *> solve (b1 :===: b2)
+          Var m1   :===: Var m2   | m1 == m2 -> pure ()
+          Var m1   :===: t2         -> do
             sol <- solution m1
             case sol of
               Just (_ := t1) -> solve (t1 :===: t2)
               Nothing | m1 `IntSet.member` mvs t2 -> fail ("Occurs check failure: " <> show m1 <> " :===: " <> show t2)
                       | otherwise                 -> modify (IntMap.insert m1 t2 . subst (m1 := t2))
-          t1         :===: MMeta m2   -> solve (MMeta m2 :===: t1)
+          t1         :===: Var m2   -> solve (Var m2 :===: t1)
           t1         :===: t2         -> unless (t1 == t2) $ fail ("Type mismatch:\nexpected: " <> show t1 <> "\n  actual: " <> show t2)
 
         solution m = fmap (m :=) <$> gets (IntMap.lookup m)
@@ -202,13 +215,8 @@ substAll s a = foldl' (flip subst) a (map (uncurry (:=)) (IntMap.toList s))
 class FreeVariables t where
   mvs :: t -> IntSet.IntSet
 
-instance FreeVariables (Monotype Meta) where
-  mvs MUnit        = mempty
-  mvs MBool        = mempty
-  mvs MString      = mempty
-  mvs (MArr a b)   = mvs a <> mvs b
-  mvs (MMeta m)    = IntSet.singleton m
-  mvs (MRecord fs) = foldMap mvs fs
+instance FreeVariables (Term Monotype Meta) where
+  mvs = foldMap IntSet.singleton
 
 instance FreeVariables Constraint where
   mvs (t1 :===: t2) = mvs t1 <> mvs t2
@@ -216,17 +224,8 @@ instance FreeVariables Constraint where
 class Substitutable t where
   subst :: Solution -> t -> t
 
-instance Substitutable (Monotype Meta) where
-  subst s con = case con of
-    MUnit         -> MUnit
-    MBool         -> MBool
-    MString       -> MString
-    MArr a b      -> MArr (subst s a) (subst s b)
-    MMeta m'
-      | m := t <- s
-      , m == m'   -> t
-      | otherwise -> MMeta m'
-    MRecord fs    -> MRecord (subst s <$> fs)
+instance Substitutable (Term Monotype Meta) where
+  subst (i' := t') t = t >>= \ i -> if i == i' then t' else Var i
 
 instance Substitutable Constraint where
   subst s (t1 :===: t2) = subst s t1 :===: subst s t2
