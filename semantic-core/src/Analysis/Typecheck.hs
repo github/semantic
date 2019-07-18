@@ -27,6 +27,7 @@ import qualified Data.IntSet as IntSet
 import           Data.List.NonEmpty (nonEmpty)
 import           Data.Loc
 import qualified Data.Map as Map
+import           Data.Maybe (fromJust)
 import           Data.Name as Name
 import           Data.Scope
 import qualified Data.Set as Set
@@ -77,10 +78,8 @@ forAll n body = send (PForAll (Data.Scope.bind1 n body))
 forAlls :: (Eq a, Carrier sig m, Member Polytype sig, Foldable t) => t a -> m a -> m a
 forAlls ns body = foldr forAll body ns
 
-generalize :: (Carrier sig m, Member Naming sig) => Term Monotype Meta -> m (Term (Polytype :+: Monotype) Gensym)
-generalize ty = namespace "generalize" $ do
-  Gensym root _ <- Name.fresh
-  pure (Gensym root <$> forAlls (IntSet.toList (mvs ty)) (hoistTerm R ty))
+generalize :: Term Monotype Meta -> Term (Polytype :+: Monotype) Gensym
+generalize ty = fromJust (closed (forAlls (IntSet.toList (mvs ty)) (hoistTerm R ty)))
 
 
 typecheckingFlowInsensitive :: [File (Term Core.Core Name)] -> (Heap Name (Term Monotype Meta), [File (Either (Loc, String) (Term (Polytype :+: Monotype) Gensym))])
@@ -89,7 +88,7 @@ typecheckingFlowInsensitive
   . runFresh
   . runNaming
   . runHeap (Gen (Gensym (Nil :> "root") 0))
-  . (>>= traverse (traverse (traverse generalize)))
+  . fmap (fmap (fmap (fmap generalize)))
   . traverse runFile
 
 runFile :: ( Carrier sig m
