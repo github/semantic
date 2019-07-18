@@ -37,11 +37,11 @@ import           GHC.Generics (Generic1)
 import           Prelude hiding (fail)
 
 data Monotype f a
-  = MBool
-  | MUnit
-  | MString
-  | MArr (f a) (f a)
-  | MRecord (Map.Map User (f a))
+  = Bool
+  | Unit
+  | String
+  | Arr (f a) (f a)
+  | Record (Map.Map User (f a))
   deriving (Foldable, Functor, Generic1, Traversable)
 
 deriving instance (Eq   a, forall a . Eq   a => Eq   (f a), Monad f) => Eq   (Monotype f a)
@@ -51,11 +51,11 @@ deriving instance (Show a, forall a . Show a => Show (f a))          => Show (Mo
 
 instance HFunctor Monotype
 instance RightModule Monotype where
-  MUnit     >>=* _ = MUnit
-  MBool     >>=* _ = MBool
-  MString   >>=* _ = MString
-  MArr a b  >>=* f = MArr (a >>= f) (b >>= f)
-  MRecord m >>=* f = MRecord ((>>= f) <$> m)
+  Unit     >>=* _ = Unit
+  Bool     >>=* _ = Bool
+  String   >>=* _ = String
+  Arr a b  >>=* f = Arr (a >>= f) (b >>= f)
+  Record m >>=* f = Record ((>>= f) <$> m)
 
 type Meta = Int
 
@@ -96,11 +96,11 @@ generalize ty = namespace "generalize" $ do
   where fold root = \case
           Var v  -> pure (Gensym root v)
           Term t -> Term $ case t of
-            MUnit      -> PUnit
-            MBool      -> PBool
-            MString    -> PString
-            MArr a b   -> PArr (fold root a) (fold root b)
-            MRecord fs -> PRecord (fold root <$> fs)
+            Unit      -> PUnit
+            Bool      -> PBool
+            String    -> PString
+            Arr a b   -> PArr (fold root a) (fold root b)
+            Record fs -> PRecord (fold root <$> fs)
 
 
 typecheckingFlowInsensitive :: [File (Term Core.Core Name)] -> (Heap Name (Term Monotype Meta), [File (Either (Loc, String) (Term Polytype Gensym))])
@@ -152,18 +152,18 @@ typecheckingAnalysis = Analysis{..}
           arg <- meta
           assign addr arg
           ty <- eval body
-          pure (Term (MArr arg ty))
+          pure (Term (Arr arg ty))
         apply _ f a = do
           _A <- meta
           _B <- meta
-          unify (Term (MArr _A _B)) f
+          unify (Term (Arr _A _B)) f
           unify _A a
           pure _B
-        unit = pure (Term MUnit)
-        bool _ = pure (Term MBool)
-        asBool b = unify (Term MBool) b >> pure True <|> pure False
-        string _ = pure (Term MString)
-        asString s = unify (Term MString) s $> mempty
+        unit = pure (Term Unit)
+        bool _ = pure (Term Bool)
+        asBool b = unify (Term Bool) b >> pure True <|> pure False
+        string _ = pure (Term String)
+        asString s = unify (Term String) s $> mempty
         frame = fail "unimplemented"
         edge _ _ = pure ()
         _ ... m = m
@@ -194,8 +194,8 @@ solve :: (Carrier sig m, Member (State Substitution) sig, MonadFail m) => Set.Se
 solve cs = for_ cs solve
   where solve = \case
           -- FIXME: how do we enforce proper subtyping? row polymorphism or something?
-          Term (MRecord f1) :===: Term (MRecord f2) -> traverse solve (Map.intersectionWith (:===:) f1 f2) $> ()
-          Term (MArr a1 b1) :===: Term (MArr a2 b2) -> solve (a1 :===: a2) *> solve (b1 :===: b2)
+          Term (Record f1) :===: Term (Record f2) -> traverse solve (Map.intersectionWith (:===:) f1 f2) $> ()
+          Term (Arr a1 b1) :===: Term (Arr a2 b2) -> solve (a1 :===: a2) *> solve (b1 :===: b2)
           Var m1   :===: Var m2   | m1 == m2 -> pure ()
           Var m1   :===: t2         -> do
             sol <- solution m1
