@@ -12,7 +12,7 @@ import           Data.Source (fromText, toText)
 import qualified Data.Span as Data
 import qualified Data.Text as T
 import qualified Semantic.Api.LegacyTypes as Legacy
-import qualified Semantic.Api.V1.CodeAnalysisPB as API
+import qualified Semantic.Proto.SemanticPB as API
 
 -- | An @APIBridge x y@ instance describes an isomorphism between @x@ and @y@.
 -- This is suitable for types such as 'Pos' which are representationally equivalent

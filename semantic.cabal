@@ -249,7 +249,7 @@ library
                      , Semantic.Api.Symbols
                      , Semantic.Api.Terms
                      , Semantic.Api.TOCSummaries
-                     , Semantic.Api.V1.CodeAnalysisPB
+                     , Semantic.Proto.SemanticPB
                      , Semantic.AST
                      , Semantic.CLI
                      , Semantic.Config
