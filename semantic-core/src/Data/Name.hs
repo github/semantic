@@ -11,15 +11,12 @@ module Data.Name
 , isSimpleCharacter
 , needsQuotation
 , encloseIf
-, Gensym(..)
 ) where
 
 import qualified Data.Char as Char
 import           Data.HashSet (HashSet)
 import qualified Data.HashSet as HashSet
-import           Data.Stack
 import           Data.Text as Text (Text, any, unpack)
-import           Data.Text.Prettyprint.Doc (Pretty (..))
 
 -- | User-specified and -relevant names.
 type User = Text
@@ -69,12 +66,3 @@ isSimpleCharacter = \case
   '_'  -> True
   '?'  -> True -- common in Ruby
   c    -> Char.isAlphaNum c
-
-
-data Gensym = Gensym (Stack Text) Int
-  deriving (Eq, Ord, Show)
-
-instance Pretty Gensym where
-  pretty (Gensym _ i) = pretty (alphabet !! r : if q > 0 then show q else "")
-    where (q, r) = i `divMod` 26
-          alphabet = ['a'..'z']
