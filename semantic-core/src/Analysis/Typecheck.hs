@@ -80,11 +80,7 @@ forAlls ns body = foldr forAll body ns
 generalize :: (Carrier sig m, Member Naming sig) => Term Monotype Meta -> m (Term (Polytype :+: Monotype) Gensym)
 generalize ty = namespace "generalize" $ do
   Gensym root _ <- Name.fresh
-  pure (Gensym root <$> forAlls (IntSet.toList (mvs ty)) (fold ty))
-  where fold :: Term Monotype a -> Term (Polytype :+: Monotype) a
-        fold = \case
-          Var v  -> Var v
-          Term t -> Term (R (hmap fold t))
+  pure (Gensym root <$> forAlls (IntSet.toList (mvs ty)) (hoistTerm R ty))
 
 
 typecheckingFlowInsensitive :: [File (Term Core.Core Name)] -> (Heap Name (Term Monotype Meta), [File (Either (Loc, String) (Term (Polytype :+: Monotype) Gensym))])
