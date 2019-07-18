@@ -1,3 +1,18 @@
+# Put protoc and twirp tooling in its own image
+FROM golang:1.12-stretch AS protoc
+RUN apt-get update && apt-get install -y unzip
+ENV PROTOBUF_VERSION=3.7.1
+RUN wget "https://github.com/protocolbuffers/protobuf/releases/download/v3.7.1/protoc-$PROTOBUF_VERSION-linux-x86_64.zip" && \
+    unzip "protoc-$PROTOBUF_VERSION-linux-x86_64.zip" -d "/protobuf"
+
+RUN go get github.com/golang/protobuf/proto && \
+    go get github.com/twitchtv/protogen/typemap && \
+    go get github.com/tclem/twirp-haskell/pkg/gen/haskell && \
+    go get github.com/tclem/twirp-haskell/protoc-gen-haskell
+
+ENTRYPOINT ["/protobuf/bin/protoc", "-I/protobuf", "-I=/go/src/github.com/tclem/twirp-haskell"]
+
+# Build semantic
 FROM haskell:8.6 as build
 WORKDIR /build
 
