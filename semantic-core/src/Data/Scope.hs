@@ -2,6 +2,7 @@
 module Data.Scope
 ( Incr(..)
 , incr
+, closed
 , Scope(..)
 , fromScope
 , toScope
@@ -42,6 +43,10 @@ matchMaybe f a = maybe (Right a) Left (f a)
 
 incr :: (a -> c) -> (b -> c) -> Incr a b -> c
 incr z s = \case { Z a -> z a ; S b -> s b }
+
+
+closed :: Traversable f => f a -> Maybe (f b)
+closed = traverse (const Nothing)
 
 
 newtype Scope a f b = Scope { unScope :: f (Incr a (f b)) }
