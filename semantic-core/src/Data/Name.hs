@@ -17,15 +17,9 @@ module Data.Name
 , fresh
 , namespace
 , Naming(..)
-, runNaming
-, NamingC(..)
 ) where
 
 import           Control.Effect.Carrier
-import           Control.Effect.Reader
-import           Control.Effect.State
-import           Control.Monad.Fail
-import           Control.Monad.IO.Class
 import qualified Data.Char as Char
 import           Data.HashSet (HashSet)
 import qualified Data.HashSet as HashSet
@@ -133,15 +127,3 @@ instance HFunctor Naming where
 instance Effect Naming where
   handle state handler (Fresh         k) = Fresh                              (handler . (<$ state) . k)
   handle state handler (Namespace s m k) = Namespace s (handler (m <$ state)) (handler . fmap k)
-
-
-runNaming :: Functor m => NamingC m a -> m a
-runNaming = runReader Nil . evalState 0 . runNamingC
-
-newtype NamingC m a = NamingC { runNamingC :: StateC Int (ReaderC (Stack Text) m) a }
-  deriving (Applicative, Functor, Monad, MonadFail, MonadIO)
-
-instance (Carrier sig m, Effect sig) => Carrier (Naming :+: sig) (NamingC m) where
-  eff (L (Fresh         k)) = NamingC (asks Gensym <*> get <* modify (succ @Int) >>= runNamingC . k)
-  eff (L (Namespace s m k)) = NamingC (StateC (\ i -> local (:> s) (evalState 0 (runNamingC m)) >>= runState i . runNamingC . k))
-  eff (R other)             = NamingC (eff (R (R (handleCoercible other))))
