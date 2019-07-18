@@ -1,7 +1,6 @@
 {-# LANGUAGE DeriveTraversable, ExistentialQuantification, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, LambdaCase, MultiParamTypeClasses, OverloadedLists, OverloadedStrings, StandaloneDeriving, TypeApplications, TypeOperators, UndecidableInstances #-}
 module Data.Name
 ( User
-, Namespaced
 , Named(..)
 , named
 , named'
@@ -24,11 +23,6 @@ import           Data.Text.Prettyprint.Doc (Pretty (..))
 
 -- | User-specified and -relevant names.
 type User = Text
-
--- | The type of namespaced actions, i.e. actions occurring within some outer name.
---
---   This corresponds to the @Agent@ type synonym described in /I Am Not a Number—I Am a Free Variable/.
-type Namespaced a = Gensym -> a
 
 -- | Annotates an @a@ with a 'User'-provided name, which is ignored for '==' and 'compare'.
 data Named a = Named (Ignored User) a
