@@ -14,12 +14,8 @@ module Data.Name
 , needsQuotation
 , encloseIf
 , Gensym(..)
-, fresh
-, namespace
-, Naming(..)
 ) where
 
-import           Control.Effect.Carrier
 import qualified Data.Char as Char
 import           Data.HashSet (HashSet)
 import qualified Data.HashSet as HashSet
@@ -106,24 +102,3 @@ instance Pretty Gensym where
   pretty (Gensym _ i) = pretty (alphabet !! r : if q > 0 then show q else "")
     where (q, r) = i `divMod` 26
           alphabet = ['a'..'z']
-
-fresh :: (Carrier sig m, Member Naming sig) => m Gensym
-fresh = send (Fresh pure)
-
-namespace :: (Carrier sig m, Member Naming sig) => Text -> m a -> m a
-namespace s m = send (Namespace s m pure)
-
-
-data Naming m k
-  = Fresh (Gensym -> m k)
-  | forall a . Namespace Text (m a) (a -> m k)
-
-deriving instance Functor m => Functor (Naming m)
-
-instance HFunctor Naming where
-  hmap f (Fresh         k) = Fresh             (f . k)
-  hmap f (Namespace s m k) = Namespace s (f m) (f . k)
-
-instance Effect Naming where
-  handle state handler (Fresh         k) = Fresh                              (handler . (<$ state) . k)
-  handle state handler (Namespace s m k) = Namespace s (handler (m <$ state)) (handler . fmap k)
