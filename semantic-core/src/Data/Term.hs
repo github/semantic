@@ -1,6 +1,7 @@
-{-# LANGUAGE DeriveTraversable, FlexibleInstances, MultiParamTypeClasses, QuantifiedConstraints, StandaloneDeriving, UndecidableInstances #-}
+{-# LANGUAGE DeriveTraversable, FlexibleInstances, MultiParamTypeClasses, QuantifiedConstraints, RankNTypes, StandaloneDeriving, UndecidableInstances #-}
 module Data.Term
 ( Term(..)
+, hoistTerm
 ) where
 
 import Control.Effect.Carrier
@@ -41,3 +42,9 @@ instance RightModule sig => Monad (Term sig) where
 
 instance RightModule sig => Carrier sig (Term sig) where
   eff = Term
+
+
+hoistTerm :: (HFunctor sig, forall g . Functor g => Functor (sig g)) => (forall m x . sig m x -> sig' m x) -> Term sig a -> Term sig' a
+hoistTerm f = go
+  where go (Var v)  = Var v
+        go (Term t) = Term (f (hmap (hoistTerm f) t))
