@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveGeneric, DeriveTraversable, FlexibleContexts, FlexibleInstances, LambdaCase, OverloadedStrings, RecordWildCards, ScopedTypeVariables, TypeApplications #-}
+{-# LANGUAGE DeriveGeneric, DeriveTraversable, FlexibleContexts, FlexibleInstances, LambdaCase, OverloadedStrings, QuantifiedConstraints, RecordWildCards, ScopedTypeVariables, StandaloneDeriving, TypeApplications #-}
 module Analysis.Typecheck
 ( Monotype (..)
 , Meta
@@ -55,6 +55,11 @@ data Polytype f a
   | PArr (f a) (f a)
   | PRecord (Map.Map User (f a))
   deriving (Foldable, Functor, Generic1, Traversable)
+
+deriving instance (Eq   a, forall a . Eq   a => Eq   (f a), Monad f) => Eq   (Polytype f a)
+deriving instance (Ord  a, forall a . Eq   a => Eq   (f a)
+                         , forall a . Ord  a => Ord  (f a), Monad f) => Ord  (Polytype f a)
+deriving instance (Show a, forall a . Show a => Show (f a))          => Show (Polytype f a)
 
 instance HFunctor Polytype
 instance RightModule Polytype where
