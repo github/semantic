@@ -2,7 +2,6 @@
 module Data.Name
 ( User
 , Namespaced
-, Name(..)
 , Named(..)
 , named
 , named'
@@ -30,23 +29,6 @@ type User = Text
 --
 --   This corresponds to the @Agent@ type synonym described in /I Am Not a Number—I Am a Free Variable/.
 type Namespaced a = Gensym -> a
-
-data Name
-  -- | A locally-bound, machine-generatable name.
-  --
-  --   This should be used for locals, function parameters, and similar names which can’t escape their defining scope.
-  = Gen Gensym
-  -- | A name provided by a user.
-  --
-  --   This should be used for names which the user provided and which other code (other functions, other modules, other packages) could call, e.g. declaration names.
-  | User User
-  deriving (Eq, Ord, Show)
-
-instance Pretty Name where
-  pretty = \case
-    Gen p  -> pretty p
-    User n -> pretty n
-
 
 -- | Annotates an @a@ with a 'User'-provided name, which is ignored for '==' and 'compare'.
 data Named a = Named (Ignored User) a
