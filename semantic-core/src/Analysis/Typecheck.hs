@@ -31,7 +31,6 @@ import           Data.Maybe (fromJust)
 import           Data.Name as Name
 import           Data.Scope
 import qualified Data.Set as Set
-import           Data.Stack
 import           Data.Term
 import           Data.Void
 import           GHC.Generics (Generic1)
@@ -83,28 +82,26 @@ generalize :: Term Monotype Meta -> Term (Polytype :+: Monotype) Void
 generalize ty = fromJust (closed (forAlls (IntSet.toList (mvs ty)) (hoistTerm R ty)))
 
 
-typecheckingFlowInsensitive :: [File (Term Core.Core Name)] -> (Heap Name (Term Monotype Meta), [File (Either (Loc, String) (Term (Polytype :+: Monotype) Void))])
+typecheckingFlowInsensitive :: [File (Term Core.Core User)] -> (Heap User (Term Monotype Meta), [File (Either (Loc, String) (Term (Polytype :+: Monotype) Void))])
 typecheckingFlowInsensitive
   = run
   . runFresh
-  . runNaming
-  . runHeap (Gen (Gensym (Nil :> "root") 0))
+  . runHeap "__semantic_root"
   . fmap (fmap (fmap (fmap generalize)))
   . traverse runFile
 
 runFile :: ( Carrier sig m
            , Effect sig
            , Member Fresh sig
-           , Member Naming sig
-           , Member (State (Heap Name (Term Monotype Meta))) sig
+           , Member (State (Heap User (Term Monotype Meta))) sig
            )
-        => File (Term Core.Core Name)
+        => File (Term Core.Core User)
         -> m (File (Either (Loc, String) (Term Monotype Meta)))
 runFile file = traverse run file
   where run
           = (\ m -> do
               (subst, t) <- m
-              modify @(Heap Name (Term Monotype Meta)) (substAll subst)
+              modify @(Heap User (Term Monotype Meta)) (substAll subst)
               pure (substAll subst <$> t))
           . runState (mempty :: Substitution)
           . runReader (fileLoc file)
@@ -119,7 +116,7 @@ runFile file = traverse run file
               v <$ for_ bs (unify v))
           . convergeTerm (fix (cacheTerm . eval typecheckingAnalysis))
 
-typecheckingAnalysis :: (Alternative m, Carrier sig m, Member Fresh sig, Member (State (Set.Set Constraint)) sig, Member (State (Heap Name (Term Monotype Meta))) sig, MonadFail m) => Analysis Name (Term Monotype Meta) m
+typecheckingAnalysis :: (Alternative m, Carrier sig m, Member Fresh sig, Member (State (Set.Set Constraint)) sig, Member (State (Heap User (Term Monotype Meta))) sig, MonadFail m) => Analysis User (Term Monotype Meta) m
 typecheckingAnalysis = Analysis{..}
   where alloc = pure
         bind _ _ = pure ()

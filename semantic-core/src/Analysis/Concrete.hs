@@ -22,7 +22,6 @@ import           Control.Effect.State
 import           Control.Monad ((<=<), guard)
 import qualified Data.Core as Core
 import           Data.File
-import           Data.Foldable (foldl')
 import           Data.Function (fix)
 import qualified Data.IntMap as IntMap
 import qualified Data.IntSet as IntSet
@@ -35,13 +34,13 @@ import           Data.Text (Text, pack)
 import           Prelude hiding (fail)
 
 type Precise = Int
-type Env = Map.Map Name Precise
+type Env = Map.Map User Precise
 
 newtype FrameId = FrameId { unFrameId :: Precise }
   deriving (Eq, Ord, Show)
 
 data Concrete
-  = Closure Loc Name (Term Core.Core Name) Precise
+  = Closure Loc User (Term Core.Core User) Precise
   | Unit
   | Bool Bool
   | String Text
@@ -65,22 +64,20 @@ type Heap = IntMap.IntMap Concrete
 --
 --   >>> map fileBody (snd (concrete [File (Loc "bool" emptySpan) (Core.bool True)]))
 --   [Right (Bool True)]
-concrete :: [File (Term Core.Core Name)] -> (Heap, [File (Either (Loc, String) Concrete)])
+concrete :: [File (Term Core.Core User)] -> (Heap, [File (Either (Loc, String) Concrete)])
 concrete
   = run
   . runFresh
-  . runNaming
   . runHeap
   . traverse runFile
 
 runFile :: ( Carrier sig m
            , Effect sig
            , Member Fresh sig
-           , Member Naming sig
            , Member (Reader FrameId) sig
            , Member (State Heap) sig
            )
-        => File (Term Core.Core Name)
+        => File (Term Core.Core User)
         -> m (File (Either (Loc, String) Concrete))
 runFile file = traverse run file
   where run = runReader (fileLoc file)
@@ -143,7 +140,7 @@ concreteAnalysis = Analysis{..}
           assign addr (Obj (f frame))
 
 
-lookupConcrete :: Heap -> Name -> Concrete -> Maybe Precise
+lookupConcrete :: Heap -> User -> Concrete -> Maybe Precise
 lookupConcrete heap name = run . evalState IntSet.empty . runNonDet . inConcrete
   where -- look up the name in a concrete value
         inConcrete = inFrame <=< maybeA . objectFrame
@@ -171,7 +168,7 @@ runHeap m = do
 --   > λ let (heap, res) = concrete [ruby]
 --   > λ writeFile "/Users/rob/Desktop/heap.dot" (export (addressStyle heap) (heapAddressGraph heap))
 --   > λ :!dot -Tsvg < ~/Desktop/heap.dot > ~/Desktop/heap.svg
-heapGraph :: (Precise -> Concrete -> a) -> (Either Core.Edge Name -> Precise -> G.Graph a) -> Heap -> G.Graph a
+heapGraph :: (Precise -> Concrete -> a) -> (Either Core.Edge User -> Precise -> G.Graph a) -> Heap -> G.Graph a
 heapGraph vertex edge h = foldr (uncurry graph) G.empty (IntMap.toList h)
   where graph k v rest = (G.vertex (vertex k v) `G.connect` outgoing v) `G.overlay` rest
         outgoing = \case
@@ -192,7 +189,7 @@ heapAddressGraph = heapGraph (\ addr v -> (Value v, addr)) (fmap G.vertex . (,) 
 addressStyle :: Heap -> G.Style (EdgeType, Precise) Text
 addressStyle heap = (G.defaultStyle vertex) { G.edgeAttributes }
   where vertex (_, addr) = pack (show addr) <> " = " <> maybe "?" fromConcrete (IntMap.lookup addr heap)
-        edgeAttributes _ (Slot name,         _) = ["label" G.:= fromName name]
+        edgeAttributes _ (Slot name,         _) = ["label" G.:= name]
         edgeAttributes _ (Edge Core.Import,  _) = ["color" G.:= "blue"]
         edgeAttributes _ (Edge Core.Lexical, _) = ["color" G.:= "green"]
         edgeAttributes _ _                      = []
@@ -200,15 +197,13 @@ addressStyle heap = (G.defaultStyle vertex) { G.edgeAttributes }
           Unit ->  "()"
           Bool b -> pack $ show b
           String s -> pack $ show s
-          Closure (Loc p (Span s e)) n _ _ -> "\\\\ " <> fromName n <> " [" <> p <> ":" <> showPos s <> "-" <> showPos e <> "]"
+          Closure (Loc p (Span s e)) n _ _ -> "\\\\ " <> n <> " [" <> p <> ":" <> showPos s <> "-" <> showPos e <> "]"
           Obj _ -> "{}"
         showPos (Pos l c) = pack (show l) <> ":" <> pack (show c)
-        fromName (User s)  = s
-        fromName (Gen (Gensym ss i)) = foldl' (\ ss s -> ss <> "." <> s) (pack (show i)) ss
 
 data EdgeType
   = Edge Core.Edge
-  | Slot Name
+  | Slot User
   | Value Concrete
   deriving (Eq, Ord, Show)
 

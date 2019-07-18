@@ -20,20 +20,19 @@ import Data.Functor
 import Data.Loc
 import Data.Maybe (fromJust)
 import Data.Name
+import Data.Scope
 import Data.Term
 import Data.Text (Text)
 import GHC.Stack
 import Prelude hiding (fail)
 
-eval :: (Carrier sig m, Member Naming sig, Member (Reader Loc) sig, MonadFail m) => Analysis address value m -> (Term Core Name -> m value) -> Term Core Name -> m value
+eval :: (Carrier sig m, Member (Reader Loc) sig, MonadFail m) => Analysis address value m -> (Term Core User -> m value) -> Term Core User -> m value
 eval Analysis{..} eval = \case
   Var n -> lookupEnv' n >>= deref' n
   Term c -> case c of
-    Let n -> alloc (User n) >>= bind (User n) >> unit
+    Let n -> alloc n >>= bind n >> unit
     a :>> b -> eval a >> eval b
-    Lam _ b -> do
-      n <- Gen <$> fresh
-      abstract eval n (instantiate (const (pure n)) b)
+    Lam (Ignored n) b -> abstract eval n (incr (const n) id <$> fromScope b)
     f :$ a -> do
       f' <- eval f
       a' <- eval a
@@ -66,8 +65,8 @@ eval Analysis{..} eval = \case
           Var n -> lookupEnv' n
           Term c -> case c of
             Let n -> do
-              addr <- alloc (User n)
-              addr <$ bind (User n) addr
+              addr <- alloc n
+              addr <$ bind n addr
             If c t e -> do
               c' <- eval c >>= asBool
               if c' then ref t else ref e
@@ -203,13 +202,13 @@ ruby = fromBody . ann . block $
 
 
 data Analysis address value m = Analysis
-  { alloc       :: Name -> m address
-  , bind        :: Name -> address -> m ()
-  , lookupEnv   :: Name -> m (Maybe address)
+  { alloc       :: User -> m address
+  , bind        :: User -> address -> m ()
+  , lookupEnv   :: User -> m (Maybe address)
   , deref       :: address -> m (Maybe value)
   , assign      :: address -> value -> m ()
-  , abstract    :: (Term Core Name -> m value) -> Name -> Term Core Name -> m value
-  , apply       :: (Term Core Name -> m value) -> value -> value -> m value
+  , abstract    :: (Term Core User -> m value) -> User -> Term Core User -> m value
+  , apply       :: (Term Core User -> m value) -> value -> value -> m value
   , unit        :: m value
   , bool        :: Bool -> m value
   , asBool      :: value -> m Bool
