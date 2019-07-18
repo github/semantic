@@ -14,7 +14,6 @@ module Data.Name
 , needsQuotation
 , encloseIf
 , Gensym(..)
-, prime
 , fresh
 , namespace
 , Naming(..)
@@ -113,10 +112,6 @@ instance Pretty Gensym where
   pretty (Gensym _ i) = pretty (alphabet !! r : if q > 0 then show q else "")
     where (q, r) = i `divMod` 26
           alphabet = ['a'..'z']
-
-prime :: Gensym -> Gensym
-prime (Gensym s i) = Gensym s (succ i)
-
 
 fresh :: (Carrier sig m, Member Naming sig) => m Gensym
 fresh = send (Fresh pure)
