@@ -57,7 +57,7 @@ inParens amount go = do
 
 prettyCore :: Style -> Term Core User -> AnsiDoc
 prettyCore style = run . runReader @Prec 0 . go (pure . name)
-  where go :: (Member (Reader Prec) sig, Carrier sig m) => (a -> m AnsiDoc) ->  Term Core a -> m AnsiDoc
+  where go :: (Member (Reader Prec) sig, Carrier sig m) => (a -> m AnsiDoc) -> Term Core a -> m AnsiDoc
         go var = \case
           Var v -> var v
           Term t -> case t of
