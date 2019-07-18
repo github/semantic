@@ -3,7 +3,6 @@ module Data.Term
 ( Term(..)
 , Syntax(..)
 , iter
-, interpret
 ) where
 
 import Control.Effect.Carrier
@@ -75,7 +74,3 @@ iter var alg bound = go
         go free = \case
           Var a -> var (free a)
           Term t -> alg (foldSyntax go bound free t)
-
-
-interpret :: (Carrier sig m, Member eff sig, Syntax eff) => (forall a . Incr () (m a) -> m (Incr () (m a))) -> (a -> m b) -> Term eff a -> m b
-interpret = iter id send
