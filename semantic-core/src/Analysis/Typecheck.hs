@@ -41,7 +41,6 @@ data Monotype a
   | MUnit
   | MString
   | MMeta a
-  | MFree Gensym
   | MArr (Monotype a) (Monotype a)
   | MRecord (Map.Map User (Monotype a))
   deriving (Eq, Functor, Ord, Show)
@@ -86,7 +85,6 @@ generalize ty = namespace "generalize" $ do
           MBool      -> PBool
           MString    -> PString
           MMeta i    -> PFree (Gensym root i)
-          MFree n    -> PFree n
           MArr a b   -> PArr (fold root a) (fold root b)
           MRecord fs -> PRecord (fold root <$> fs)
 
@@ -209,7 +207,6 @@ instance FreeVariables (Monotype Meta) where
   mvs MString      = mempty
   mvs (MArr a b)   = mvs a <> mvs b
   mvs (MMeta m)    = IntSet.singleton m
-  mvs (MFree _)    = mempty
   mvs (MRecord fs) = foldMap mvs fs
 
 instance FreeVariables Constraint where
@@ -228,7 +225,6 @@ instance Substitutable (Monotype Meta) where
       | m := t <- s
       , m == m'   -> t
       | otherwise -> MMeta m'
-    MFree n       -> MFree n
     MRecord fs    -> MRecord (subst s <$> fs)
 
 instance Substitutable Constraint where
