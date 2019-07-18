@@ -55,11 +55,8 @@ inParens amount go = do
   body <- with amount go
   pure (encloseIf (amount >= prec) (symbol "(") (symbol ")") body)
 
-prettify :: (Member (Reader Prec) sig, Carrier sig m)
-         => Style
-         -> Term Core User
-         -> m AnsiDoc
-prettify style = go (pure . name)
+prettyCore :: Style -> Term Core User -> AnsiDoc
+prettyCore style = run . runReader @Prec 0 . go (pure . name)
   where go :: (Member (Reader Prec) sig, Carrier sig m) => (a -> m AnsiDoc) ->  Term Core a -> m AnsiDoc
         go var = \case
           Var v -> var v
@@ -121,6 +118,3 @@ prettify style = go (pure . name)
 
 appending :: Functor f => AnsiDoc -> f AnsiDoc -> f AnsiDoc
 appending k item = (keyword k <+>) <$> item
-
-prettyCore :: Style -> Term Core User -> AnsiDoc
-prettyCore s = run . runReader @Prec 0 . prettify s
