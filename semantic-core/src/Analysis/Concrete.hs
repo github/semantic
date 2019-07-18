@@ -63,7 +63,7 @@ type Heap = IntMap.IntMap Concrete
 
 -- | Concrete evaluation of a term to a value.
 --
---   >>> map fileBody (snd (concrete [File (Loc "bool" emptySpan) (Core.Bool True)]))
+--   >>> map fileBody (snd (concrete [File (Loc "bool" emptySpan) (Core.bool True)]))
 --   [Right (Bool True)]
 concrete :: [File (Term Core.Core Name)] -> (Heap, [File (Either (Loc, String) Concrete)])
 concrete
