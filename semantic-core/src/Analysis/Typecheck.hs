@@ -43,7 +43,7 @@ data Monotype a
   | MMeta a
   | MArr (Monotype a) (Monotype a)
   | MRecord (Map.Map User (Monotype a))
-  deriving (Eq, Functor, Ord, Show)
+  deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
 
 type Meta = Int
 
