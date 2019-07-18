@@ -1,9 +1,8 @@
-{-# LANGUAGE DeriveGeneric, DeriveTraversable, FlexibleContexts, FlexibleInstances, LambdaCase, OverloadedStrings, QuantifiedConstraints, RecordWildCards, ScopedTypeVariables, StandaloneDeriving, TypeApplications #-}
+{-# LANGUAGE DeriveGeneric, DeriveTraversable, FlexibleContexts, FlexibleInstances, LambdaCase, OverloadedStrings, QuantifiedConstraints, RecordWildCards, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeOperators #-}
 module Analysis.Typecheck
 ( Monotype (..)
 , Meta
-, Polytype (PForAll, PBool, PArr)
-, Scope
+, Polytype (..)
 , typecheckingFlowInsensitive
 , typecheckingAnalysis
 ) where
@@ -59,13 +58,7 @@ instance RightModule Monotype where
 
 type Meta = Int
 
-data Polytype f a
-  = PForAll (Scope () f a)
-  | PUnit
-  | PBool
-  | PString
-  | PArr (f a) (f a)
-  | PRecord (Map.Map User (f a))
+newtype Polytype f a = PForAll (Scope () f a)
   deriving (Foldable, Functor, Generic1, Traversable)
 
 deriving instance (Eq   a, forall a . Eq   a => Eq   (f a), Monad f) => Eq   (Polytype f a)
@@ -76,11 +69,6 @@ deriving instance (Show a, forall a . Show a => Show (f a))          => Show (Po
 instance HFunctor Polytype
 instance RightModule Polytype where
   PForAll b >>=* f = PForAll (b >>=* f)
-  PUnit     >>=* _ = PUnit
-  PBool     >>=* _ = PBool
-  PString   >>=* _ = PString
-  PArr a b  >>=* f = PArr (a >>= f) (b >>= f)
-  PRecord m >>=* f = PRecord ((>>= f) <$> m)
 
 
 forAll :: (Eq a, Carrier sig m, Member Polytype sig) => a -> m a -> m a
@@ -89,21 +77,17 @@ forAll n body = send (PForAll (Data.Scope.bind1 n body))
 forAlls :: (Eq a, Carrier sig m, Member Polytype sig, Foldable t) => t a -> m a -> m a
 forAlls ns body = foldr forAll body ns
 
-generalize :: (Carrier sig m, Member Naming sig) => Term Monotype Meta -> m (Term Polytype Gensym)
+generalize :: (Carrier sig m, Member Naming sig) => Term Monotype Meta -> m (Term (Polytype :+: Monotype) Gensym)
 generalize ty = namespace "generalize" $ do
   Gensym root _ <- Name.fresh
-  pure (forAlls (map (Gensym root) (IntSet.toList (mvs ty))) (fold root ty))
-  where fold root = \case
-          Var v  -> pure (Gensym root v)
-          Term t -> Term $ case t of
-            Unit      -> PUnit
-            Bool      -> PBool
-            String    -> PString
-            Arr a b   -> PArr (fold root a) (fold root b)
-            Record fs -> PRecord (fold root <$> fs)
+  pure (Gensym root <$> forAlls (IntSet.toList (mvs ty)) (fold ty))
+  where fold :: Term Monotype a -> Term (Polytype :+: Monotype) a
+        fold = \case
+          Var v  -> Var v
+          Term t -> Term (R (hmap fold t))
 
 
-typecheckingFlowInsensitive :: [File (Term Core.Core Name)] -> (Heap Name (Term Monotype Meta), [File (Either (Loc, String) (Term Polytype Gensym))])
+typecheckingFlowInsensitive :: [File (Term Core.Core Name)] -> (Heap Name (Term Monotype Meta), [File (Either (Loc, String) (Term (Polytype :+: Monotype) Gensym))])
 typecheckingFlowInsensitive
   = run
   . runFresh
