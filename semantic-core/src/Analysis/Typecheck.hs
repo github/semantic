@@ -1,11 +1,9 @@
-{-# LANGUAGE DeriveFunctor, FlexibleContexts, FlexibleInstances, LambdaCase, OverloadedStrings, RecordWildCards, ScopedTypeVariables, TypeApplications #-}
+{-# LANGUAGE DeriveGeneric, DeriveTraversable, FlexibleContexts, FlexibleInstances, LambdaCase, OverloadedStrings, RecordWildCards, ScopedTypeVariables, TypeApplications #-}
 module Analysis.Typecheck
 ( Monotype (..)
 , Meta
 , Polytype (PForAll, PBool, PFree, PArr)
 , Scope
-, Analysis.Typecheck.bind
-, Analysis.Typecheck.instantiate
 , typecheckingFlowInsensitive
 , typecheckingAnalysis
 ) where
@@ -13,12 +11,13 @@ module Analysis.Typecheck
 import           Analysis.Eval
 import           Analysis.FlowInsensitive
 import           Control.Applicative (Alternative (..))
-import           Control.Effect
+import           Control.Effect.Carrier
 import           Control.Effect.Fail
 import           Control.Effect.Fresh as Fresh
 import           Control.Effect.Reader hiding (Local)
 import           Control.Effect.State
 import           Control.Monad (unless)
+import           Control.Monad.Module
 import qualified Data.Core as Core
 import           Data.File
 import           Data.Foldable (foldl', for_)
@@ -30,9 +29,11 @@ import           Data.List.NonEmpty (nonEmpty)
 import           Data.Loc
 import qualified Data.Map as Map
 import           Data.Name as Name
+import           Data.Scope
 import qualified Data.Set as Set
 import           Data.Stack
 import           Data.Term
+import           GHC.Generics (Generic1)
 import           Prelude hiding (fail)
 
 data Monotype a
@@ -47,31 +48,40 @@ data Monotype a
 
 type Meta = Int
 
-data Polytype
-  = PForAll Scope
+data Polytype f a
+  = PForAll (Scope () f a)
   | PUnit
   | PBool
   | PString
   | PBound Int
   | PFree Gensym
-  | PArr Polytype Polytype
-  | PRecord (Map.Map User Polytype)
-  deriving (Eq, Ord, Show)
+  | PArr (f a) (f a)
+  | PRecord (Map.Map User (f a))
+  deriving (Foldable, Functor, Generic1, Traversable)
 
-newtype Scope = Scope Polytype
-  deriving (Eq, Ord, Show)
+instance HFunctor Polytype
+instance RightModule Polytype where
+  PForAll b >>=* f = PForAll (b >>=* f)
+  PUnit     >>=* _ = PUnit
+  PBool     >>=* _ = PBool
+  PString   >>=* _ = PString
+  PBound i  >>=* _ = PBound i
+  PFree n   >>=* _ = PFree n
+  PArr a b  >>=* f = PArr (a >>= f) (b >>= f)
+  PRecord m >>=* f = PRecord ((>>= f) <$> m)
 
-forAll :: Gensym -> Polytype -> Polytype
-forAll n body = PForAll (Analysis.Typecheck.bind n body)
 
-forAlls :: Foldable t => t Gensym -> Polytype -> Polytype
+forAll :: (Eq a, Carrier sig m, Member Polytype sig) => a -> m a -> m a
+forAll n body = send (PForAll (Data.Scope.bind1 n body))
+
+forAlls :: (Eq a, Carrier sig m, Member Polytype sig, Foldable t) => t a -> m a -> m a
 forAlls ns body = foldr forAll body ns
 
-generalize :: (Carrier sig m, Member Naming sig) => Monotype Meta -> m Polytype
+generalize :: (Carrier sig m, Member Naming sig) => Monotype Meta -> m (Term Polytype Gensym)
 generalize ty = namespace "generalize" $ do
   Gensym root _ <- Name.fresh
   pure (forAlls (map (Gensym root) (IntSet.toList (mvs ty))) (fold root ty))
-  where fold root = \case
+  where fold root = Term . \case
           MUnit      -> PUnit
           MBool      -> PBool
           MString    -> PString
@@ -80,30 +90,8 @@ generalize ty = namespace "generalize" $ do
           MArr a b   -> PArr (fold root a) (fold root b)
           MRecord fs -> PRecord (fold root <$> fs)
 
--- | Bind occurrences of a 'Gensym' in a 'Polytype' term, producing a 'Scope' in which the 'Gensym' is bound.
-bind :: Gensym -> Polytype -> Scope
-bind name = Scope . substIn (\ i n -> if name == n then PBound i else PFree n) (const PBound)
 
--- | Substitute a 'Polytype' term for the free variable in a given 'Scope', producing a closed 'Polytype' term.
-instantiate :: Polytype -> Scope -> Polytype
-instantiate image (Scope body) = substIn (const PFree) (\ i j -> if i == j then image else PBound j) body
-
-substIn :: (Int -> Gensym -> Polytype)
-        -> (Int -> Int -> Polytype)
-        -> Polytype
-        -> Polytype
-substIn free bound = go 0
-  where go i (PFree name)           = free i name
-        go i (PBound j)             = bound i j
-        go i (PForAll (Scope body)) = PForAll (Scope (go (succ i) body))
-        go _ PUnit                  = PUnit
-        go _ PBool                  = PBool
-        go _ PString                = PString
-        go i (PArr a b)             = PArr (go i a) (go i b)
-        go i (PRecord fs)           = PRecord (go i <$> fs)
-
-
-typecheckingFlowInsensitive :: [File (Term Core.Core Name)] -> (Heap Name (Monotype Meta), [File (Either (Loc, String) Polytype)])
+typecheckingFlowInsensitive :: [File (Term Core.Core Name)] -> (Heap Name (Monotype Meta), [File (Either (Loc, String) (Term Polytype Gensym))])
 typecheckingFlowInsensitive
   = run
   . runFresh
