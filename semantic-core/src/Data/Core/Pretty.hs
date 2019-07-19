@@ -105,7 +105,7 @@ prettyCore style = run . runReader @Prec 0 . go
 
             -- Annotations are not pretty-printed, as it lowers the signal/noise ratio too profoundly.
             Ann _ c -> go c
-          where bind (Ignored x) f = (,) x <$> go (fromScope (incr (const (pure x)) id) f)
+          where bind (Ignored x) f = (,) x <$> go (instantiate1 (pure x) f)
         lambda = case style of
           Unicode -> symbol "λ"
           Ascii   -> symbol "\\"
