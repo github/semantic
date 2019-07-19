@@ -56,6 +56,7 @@ data Core f a
   | Rec (Named (Scope () f a))
   -- | Sequencing without binding; analogous to '>>' or '*>'.
   | f a :>> f a
+  | Named (f a) :>>= Scope () f a
   | Lam (Named (Scope () f a))
   -- | Function application; analogous to '$'.
   | f a :$ f a
@@ -77,6 +78,7 @@ data Core f a
   deriving (Foldable, Functor, Generic1, Traversable)
 
 infixr 1 :>>
+infixr 1 :>>=
 infixl 9 :$
 infixl 4 :.
 infix  3 :=
@@ -89,22 +91,23 @@ deriving instance (Ord  a, forall a . Eq   a => Eq   (f a)
 deriving instance (Show a, forall a . Show a => Show (f a))          => Show (Core f a)
 
 instance RightModule Core where
-  Let u     >>=* _ = Let u
-  Rec b     >>=* f = Rec ((>>=* f) <$> b)
-  (a :>> b) >>=* f = (a >>= f) :>> (b >>= f)
-  Lam b     >>=* f = Lam ((>>=* f) <$> b)
-  (a :$ b)  >>=* f = (a >>= f) :$ (b >>= f)
-  Unit      >>=* _ = Unit
-  Bool b    >>=* _ = Bool b
-  If c t e  >>=* f = If (c >>= f) (t >>= f) (e >>= f)
-  String s  >>=* _ = String s
-  Load b    >>=* f = Load (b >>= f)
-  Edge e b  >>=* f = Edge e (b >>= f)
-  Frame     >>=* _ = Frame
-  Record fs >>=* f = Record (map (fmap (>>= f)) fs)
-  (a :. b)  >>=* f = (a >>= f) :. (b >>= f)
-  (a := b)  >>=* f = (a >>= f) := (b >>= f)
-  Ann l b   >>=* f = Ann l (b >>= f)
+  Let u      >>=* _ = Let u
+  Rec b      >>=* f = Rec ((>>=* f) <$> b)
+  (a :>> b)  >>=* f = (a >>= f) :>> (b >>= f)
+  (a :>>= b) >>=* f = ((>>= f) <$> a) :>>= (b >>=* f)
+  Lam b      >>=* f = Lam ((>>=* f) <$> b)
+  (a :$ b)   >>=* f = (a >>= f) :$ (b >>= f)
+  Unit       >>=* _ = Unit
+  Bool b     >>=* _ = Bool b
+  If c t e   >>=* f = If (c >>= f) (t >>= f) (e >>= f)
+  String s   >>=* _ = String s
+  Load b     >>=* f = Load (b >>= f)
+  Edge e b   >>=* f = Edge e (b >>= f)
+  Frame      >>=* _ = Frame
+  Record fs  >>=* f = Record (map (fmap (>>= f)) fs)
+  (a :. b)   >>=* f = (a >>= f) :. (b >>= f)
+  (a := b)   >>=* f = (a >>= f) := (b >>= f)
+  Ann l b    >>=* f = Ann l (b >>= f)
 
 
 let' :: (Carrier sig m, Member Core sig) => User -> m a

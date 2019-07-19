@@ -43,6 +43,12 @@ eval Analysis{..} eval = \case
       v <- eval (instantiate1 (pure n) b)
       v <$ assign addr v
     a :>> b -> eval a >> eval b
+    Named (Ignored n) a :>>= b -> do
+      a' <- eval a
+      addr <- alloc n
+      bind n addr
+      assign addr a'
+      eval (instantiate1 (pure n) b)
     Lam (Named (Ignored n) b) -> abstract eval n (instantiate1 (pure n) b)
     f :$ a -> do
       f' <- eval f
@@ -119,11 +125,9 @@ prog4 = fromBody $ block
 
 prog5 :: File (Term Core User)
 prog5 = fromBody $ block
-  [ let' "mkPoint" .= lam' "_x" (lam' "_y" (block
-    [ let' "this" .= Core.frame
-    , pure "this" Core.... let' "x" .= pure "_x"
-    , pure "this" Core.... let' "y" .= pure "_y"
-    , pure "this"
+  [ let' "mkPoint" .= lam' "_x" (lam' "_y" (Core.record
+    [ ("x", pure "_x")
+    , ("y", pure "_y")
     ]))
   , let' "point" .= pure "mkPoint" $$ Core.bool True $$ Core.bool False
   , pure "point" Core.... pure "x"

@@ -81,6 +81,18 @@ prettyCore style = run . runReader @Prec 0 . go
 
               pure . Pretty.align $ encloseIf (12 > prec) open close (Pretty.align body)
 
+            Named (Ignored x) a :>>= b -> do
+              prec <- ask @Prec
+              fore <- with 12 (go a)
+              aft  <- with 12 (go (instantiate1 (pure x) b))
+
+              let open  = symbol ("{" <> softline)
+                  close = symbol (softline <> "}")
+                  separator = ";" <> Pretty.line
+                  body = name x <+> arrowL <+> fore <> separator <> aft
+
+              pure . Pretty.align $ encloseIf (12 > prec) open close (Pretty.align body)
+
             Lam f -> inParens 11 $ do
               (x, body) <- bind f
               pure (lambda <> name x <+> arrow <+> body)
@@ -124,6 +136,9 @@ prettyCore style = run . runReader @Prec 0 . go
         arrow = case style of
           Unicode -> symbol "→"
           Ascii   -> symbol "->"
+        arrowL = case style of
+          Unicode -> symbol "←"
+          Ascii   -> symbol "<-"
 
 
 appending :: Functor f => AnsiDoc -> f AnsiDoc -> f AnsiDoc
