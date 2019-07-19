@@ -115,7 +115,8 @@ prog5 :: File (Term Core User)
 prog5 = fromBody $ block
   [ let' "mkPoint" .= lam' "_x" (lam' "_y" (block
     [ let' "x" .= pure "_x"
-    , let' "y" .= pure "_y"]))
+    , let' "y" .= pure "_y"
+    ]))
   , let' "point" .= pure "mkPoint" $$ Core.bool True $$ Core.bool False
   , pure "point" Core.... pure "x"
   , pure "point" Core.... pure "y" .= pure "point" Core.... pure "x"
@@ -125,9 +126,7 @@ prog6 :: [File (Term Core User)]
 prog6 =
   [ File (Loc "dep"  (locSpan (fromJust here))) $ block
     [ let' "dep" .= Core.frame
-    , pure "dep" Core.... block
-      [ let' "var" .= Core.bool True
-      ]
+    , pure "dep" Core.... (let' "var" .= Core.bool True)
     ]
   , File (Loc "main" (locSpan (fromJust here))) $ block
     [ load (Core.string "dep")
