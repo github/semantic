@@ -19,7 +19,7 @@ import           Control.Monad (unless)
 import           Control.Monad.Module
 import qualified Data.Core as Core
 import           Data.File
-import           Data.Foldable (foldl', for_)
+import           Data.Foldable (for_)
 import           Data.Function (fix)
 import           Data.Functor (($>))
 import qualified Data.IntMap as IntMap
@@ -27,7 +27,7 @@ import qualified Data.IntSet as IntSet
 import           Data.List.NonEmpty (nonEmpty)
 import           Data.Loc
 import qualified Data.Map as Map
-import           Data.Maybe (fromJust)
+import           Data.Maybe (fromJust, fromMaybe)
 import           Data.Name as Name
 import           Data.Scope
 import qualified Data.Set as Set
@@ -101,7 +101,7 @@ runFile file = traverse run file
   where run
           = (\ m -> do
               (subst, t) <- m
-              modify @(Heap User (Term Monotype Meta)) (substAll subst)
+              modify @(Heap User (Term Monotype Meta)) (fmap (Set.map (substAll subst)))
               pure (substAll subst <$> t))
           . runState (mempty :: Substitution)
           . runReader (fileLoc file)
@@ -179,42 +179,15 @@ solve cs = for_ cs solve
             case sol of
               Just (_ := t1) -> solve (t1 :===: t2)
               Nothing | m1 `IntSet.member` mvs t2 -> fail ("Occurs check failure: " <> show m1 <> " :===: " <> show t2)
-                      | otherwise                 -> modify (IntMap.insert m1 t2 . subst (m1 := t2))
+                      | otherwise                 -> modify (IntMap.insert m1 t2 . fmap (substAll (IntMap.singleton m1 t2)))
           t1         :===: Var m2   -> solve (Var m2 :===: t1)
           t1         :===: t2         -> unless (t1 == t2) $ fail ("Type mismatch:\nexpected: " <> show t1 <> "\n  actual: " <> show t2)
 
         solution m = fmap (m :=) <$> gets (IntMap.lookup m)
 
-substAll :: Substitutable t => Substitution -> t -> t
-substAll s a = foldl' (flip subst) a (map (uncurry (:=)) (IntMap.toList s))
 
+mvs :: Foldable t => t Meta -> IntSet.IntSet
+mvs = foldMap IntSet.singleton
 
-class FreeVariables t where
-  mvs :: t -> IntSet.IntSet
-
-instance FreeVariables (Term Monotype Meta) where
-  mvs = foldMap IntSet.singleton
-
-instance FreeVariables Constraint where
-  mvs (t1 :===: t2) = mvs t1 <> mvs t2
-
-class Substitutable t where
-  subst :: Solution -> t -> t
-
-instance Substitutable (Term Monotype Meta) where
-  subst (i' := t') t = t >>= \ i -> if i == i' then t' else Var i
-
-instance Substitutable Constraint where
-  subst s (t1 :===: t2) = subst s t1 :===: subst s t2
-
-instance Substitutable Solution where
-  subst s (m := t) = m := subst s t
-
-instance Substitutable a => Substitutable (IntMap.IntMap a) where
-  subst s = IntMap.map (subst s)
-
-instance (Ord a, Substitutable a) => Substitutable (Set.Set a) where
-  subst s = Set.map (subst s)
-
-instance Substitutable v => Substitutable (Map.Map k v) where
-  subst s = fmap (subst s)
+substAll :: Monad t => IntMap.IntMap (t Meta) -> t Meta -> t Meta
+substAll s a = a >>= \ i -> fromMaybe (pure i) (IntMap.lookup i s)
