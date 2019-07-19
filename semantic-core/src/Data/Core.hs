@@ -5,6 +5,7 @@ module Data.Core
 , Edge(..)
 , let'
 , rec
+, (>>>)
 , block
 , lam
 , lam'
@@ -111,6 +112,9 @@ let' = send . Let
 
 rec :: (Eq a, Carrier sig m, Member Core sig) => Named a -> m a -> m a
 rec (Named u n) b = send (Rec (Named u (bind1 n b)))
+
+(>>>) :: (Carrier sig m, Member Core sig) => m a -> m a -> m a
+a >>> b = send (a :>> b)
 
 block :: (Foldable t, Carrier sig m, Member Core sig) => t (m a) -> m a
 block = maybe unit getBlock . foldMap (Just . Block)
