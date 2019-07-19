@@ -60,6 +60,7 @@ atom = choice
   , edge
   , lit
   , ident
+  , rec
   , assign
   , parens expr
   ]
@@ -73,6 +74,9 @@ ifthenelse = Core.if'
   <* reserved "then" <*> core
   <* reserved "else" <*> core
   <?> "if-then-else statement"
+
+rec :: (TokenParsing m, Monad m) => m (Term Core User)
+rec = Core.rec <$ reserved "rec" <*> name <* symbolic '=' <*> core <?> "recursive binding"
 
 assign :: (TokenParsing m, Monad m) => m (Term Core User)
 assign = (Core..=) <$> try (lvalue <* symbolic '=') <*> core <?> "assignment"

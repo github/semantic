@@ -45,7 +45,7 @@ instance Ord (Ignored a) where compare _ _ = EQ
 
 reservedNames :: HashSet String
 reservedNames = [ "#true", "#false", "let", "#frame", "if", "then", "else"
-                , "lexical", "import", "#unit", "load"]
+                , "lexical", "import", "#unit", "load", "rec"]
 
 -- | Returns true if any character would require quotation or if the
 -- name conflicts with a Core primitive.
