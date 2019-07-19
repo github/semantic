@@ -52,7 +52,7 @@ data Core f a
   = Let User
   -- | Sequencing without binding; analogous to '>>' or '*>'.
   | f a :>> f a
-  | Lam (Ignored User) (Scope () f a)
+  | Lam (Named (Scope () f a))
   -- | Function application; analogous to '$'.
   | f a :$ f a
   | Unit
@@ -85,7 +85,7 @@ deriving instance (Show a, forall a . Show a => Show (f a))          => Show (Co
 instance RightModule Core where
   Let u     >>=* _ = Let u
   (a :>> b) >>=* f = (a >>= f) :>> (b >>= f)
-  Lam v b   >>=* f = Lam v (b >>=* f)
+  Lam b     >>=* f = Lam ((>>=* f) <$> b)
   (a :$ b)  >>=* f = (a >>= f) :$ (b >>= f)
   Unit      >>=* _ = Unit
   Bool b    >>=* _ = Bool b
@@ -111,7 +111,7 @@ instance (Carrier sig m, Member Core sig) => Semigroup (Block m a) where
   Block a <> Block b = Block (send (a :>> b))
 
 lam :: (Eq a, Carrier sig m, Member Core sig) => Named a -> m a -> m a
-lam (Named u n) b = send (Lam u (bind1 n b))
+lam (Named u n) b = send (Lam (Named u (bind1 n b)))
 
 lam' :: (Carrier sig m, Member Core sig) => User -> m User -> m User
 lam' u = lam (named' u)
@@ -123,8 +123,8 @@ lams' :: (Foldable t, Carrier sig m, Member Core sig) => t User -> m User -> m U
 lams' names body = foldr lam' body names
 
 unlam :: (Alternative m, Member Core sig, RightModule sig) => a -> Term sig a -> m (Named a, Term sig a)
-unlam n (Term sig) | Just (Lam v b) <- prj sig = pure (Named v n, instantiate1 (pure n) b)
-unlam _ _                                      = empty
+unlam n (Term sig) | Just (Lam b) <- prj sig = pure (n <$ b, instantiate1 (pure n) (namedValue b))
+unlam _ _                                    = empty
 
 unseq :: (Alternative m, Member Core sig) => Term sig a -> m (Term sig a, Term sig a)
 unseq (Term sig) | Just (a :>> b) <- prj sig = pure (a, b)

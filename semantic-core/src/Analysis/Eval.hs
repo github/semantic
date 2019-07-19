@@ -38,7 +38,7 @@ eval Analysis{..} eval = \case
   Term c -> case c of
     Let n -> alloc n >>= bind n >> unit
     a :>> b -> eval a >> eval b
-    Lam (Ignored n) b -> abstract eval n (instantiate1 (pure n) b)
+    Lam (Named (Ignored n) b) -> abstract eval n (instantiate1 (pure n) b)
     f :$ a -> do
       f' <- eval f
       a' <- eval a
