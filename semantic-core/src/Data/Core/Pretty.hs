@@ -87,7 +87,7 @@ prettyCore style = run . runReader @Prec 0 . go
 
             Record fs -> do
               fs' <- for fs $ \ (x, v) -> (name x <+> symbol "=" <+>) <$> go v
-              pure $ Pretty.encloseSep Pretty.lbrace Pretty.rbrace Pretty.semi fs'
+              pure $ primitive "record" <+> Pretty.encloseSep Pretty.lbrace Pretty.rbrace Pretty.semi fs'
 
             Frame    -> pure $ primitive "frame"
             Unit     -> pure $ primitive "unit"
