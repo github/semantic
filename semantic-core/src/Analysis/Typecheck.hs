@@ -116,7 +116,15 @@ runFile file = traverse run file
               v <$ for_ bs (unify v))
           . convergeTerm (fix (cacheTerm . eval typecheckingAnalysis))
 
-typecheckingAnalysis :: (Alternative m, Carrier sig m, Member Fresh sig, Member (State (Set.Set Constraint)) sig, Member (State (Heap User (Term Monotype Meta))) sig, MonadFail m) => Analysis User (Term Monotype Meta) m
+typecheckingAnalysis
+  :: ( Alternative m
+     , Carrier sig m
+     , Member Fresh sig
+     , Member (State (Set.Set Constraint)) sig
+     , Member (State (Heap User (Term Monotype Meta))) sig
+     , MonadFail m
+     )
+  => Analysis User (Term Monotype Meta) m
 typecheckingAnalysis = Analysis{..}
   where alloc = pure
         bind _ _ = pure ()
