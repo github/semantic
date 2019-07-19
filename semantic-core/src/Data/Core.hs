@@ -4,6 +4,7 @@ module Data.Core
 ( Core(..)
 , Edge(..)
 , let'
+, rec
 , block
 , lam
 , lam'
@@ -108,6 +109,9 @@ instance RightModule Core where
 
 let' :: (Carrier sig m, Member Core sig) => User -> m a
 let' = send . Let
+
+rec :: (Eq a, Carrier sig m, Member Core sig) => Named a -> m a -> m a
+rec (Named u n) b = send (Rec (Named u (bind1 n b)))
 
 block :: (Foldable t, Carrier sig m, Member Core sig) => t (m a) -> m a
 block = maybe unit getBlock . foldMap (Just . Block)
