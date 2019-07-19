@@ -150,6 +150,8 @@ infixr 1 >>>=
 data a :<- b = a :<- b
   deriving (Eq, Ord, Show)
 
+infix 2 :<-
+
 
 lam :: (Eq a, Carrier sig m, Member Core sig) => Named a -> m a -> m a
 lam (Named u n) b = send (Lam (Named u (bind1 n b)))
