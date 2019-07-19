@@ -23,6 +23,7 @@ module Data.Core
 , load
 , edge
 , frame
+, record
 , (...)
 , (.=)
 , ann
@@ -35,6 +36,7 @@ import Control.Applicative (Alternative (..))
 import Control.Effect.Carrier
 import Control.Monad.Module
 import Data.Foldable (foldl')
+import Data.List (elemIndex)
 import Data.List.NonEmpty (NonEmpty (..))
 import Data.Loc
 import Data.Name
@@ -179,6 +181,10 @@ edge e b = send (Edge e b)
 
 frame :: (Carrier sig m, Member Core sig) => m a
 frame = send Frame
+
+record :: (Eq a, Carrier sig m, Member Core sig) => [(Named a, m a)] -> m a
+record fs = send (Record (map bind' fs))
+  where bind' (n, f) = bind (`elemIndex` map (namedValue . fst) fs) f <$ n
 
 (...) :: (Carrier sig m, Member Core sig) => m a -> m a -> m a
 a ... b = send (a :. b)
