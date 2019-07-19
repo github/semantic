@@ -39,6 +39,10 @@ symbol  = annotate (Pretty.color Pretty.Yellow)
 strlit  = annotate (Pretty.colorDull Pretty.Green)
 primitive = keyword . mappend "#"
 
+encloseIf :: Monoid m => Bool -> m -> m -> m -> m
+encloseIf True  l r x = l <> x <> r
+encloseIf False _ _ x = x
+
 type Prec = Int
 
 data Style = Unicode | Ascii
