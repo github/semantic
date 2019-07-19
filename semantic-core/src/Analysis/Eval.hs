@@ -52,6 +52,7 @@ eval Analysis{..} eval = \case
     Load p -> eval p >>= asString >> unit -- FIXME: add a load command or something
     Edge e a -> ref a >>= edge e >> unit
     Frame -> frame
+    Record _ -> frame -- FIXME: evaluate the body of the record
     a :. b -> do
       a' <- ref a
       a' ... eval b

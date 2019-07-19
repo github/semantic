@@ -18,6 +18,7 @@ import           Data.Text.Prettyprint.Doc (Pretty (..), annotate, softline, (<+
 import qualified Data.Text.Prettyprint.Doc as Pretty
 import qualified Data.Text.Prettyprint.Doc.Render.String as Pretty
 import qualified Data.Text.Prettyprint.Doc.Render.Terminal as Pretty
+import           Data.Traversable (for)
 
 showCore :: Term Core User -> String
 showCore = Pretty.renderString . Pretty.layoutSmart Pretty.defaultLayoutOptions . Pretty.unAnnotate . prettyCore Ascii
@@ -80,6 +81,10 @@ prettyCore style = run . runReader @Prec 0 . go
             Lam f -> inParens 11 $ do
               (x, body) <- bind f
               pure (lambda <> name x <+> arrow <+> body)
+
+            Record fs -> do
+              fs' <- for fs $ \ (Named (Ignored x) v) -> (name x <+> symbol "=" <+>) <$> go (instantiate (pure . namedName . (fs !!)) v)
+              pure $ Pretty.encloseSep Pretty.lbrace Pretty.rbrace Pretty.semi fs'
 
             Frame    -> pure $ primitive "frame"
             Unit     -> pure $ primitive "unit"

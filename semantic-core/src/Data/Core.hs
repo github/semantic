@@ -35,7 +35,7 @@ import Control.Applicative (Alternative (..))
 import Control.Effect.Carrier
 import Control.Monad.Module
 import Data.Foldable (foldl')
-import Data.List.NonEmpty
+import Data.List.NonEmpty (NonEmpty (..))
 import Data.Loc
 import Data.Name
 import Data.Scope
@@ -64,6 +64,8 @@ data Core f a
   | Edge Edge (f a)
   -- | Allocation of a new frame.
   | Frame
+  -- | A record holding simultaneously-bound, potentially mutually-recursive definitions.
+  | Record [Named (Scope Int f a)]
   | f a :. f a
   -- | Assignment of a value to the reference returned by the lhs.
   | f a := f a
@@ -94,6 +96,7 @@ instance RightModule Core where
   Load b    >>=* f = Load (b >>= f)
   Edge e b  >>=* f = Edge e (b >>= f)
   Frame     >>=* _ = Frame
+  Record fs >>=* f = Record (map (fmap (>>=* f)) fs)
   (a :. b)  >>=* f = (a >>= f) :. (b >>= f)
   (a := b)  >>=* f = (a >>= f) := (b >>= f)
   Ann l b   >>=* f = Ann l (b >>= f)
