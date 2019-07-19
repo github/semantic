@@ -72,7 +72,7 @@ data Core f a
   | Edge Edge (f a)
   -- | Allocation of a new frame.
   | Frame
-  -- | A record holding simultaneously-bound, potentially mutually-recursive definitions.
+  -- | A record mapping some keys to some values.
   | Record [(User, f a)]
   -- | Projection from a record.
   | f a :. f a
