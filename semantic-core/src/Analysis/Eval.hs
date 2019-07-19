@@ -114,8 +114,10 @@ prog4 = fromBody $ block
 prog5 :: File (Term Core User)
 prog5 = fromBody $ block
   [ let' "mkPoint" .= lam' "_x" (lam' "_y" (block
-    [ let' "x" .= pure "_x"
-    , let' "y" .= pure "_y"
+    [ let' "this" .= Core.frame
+    , pure "this" Core.... let' "x" .= pure "_x"
+    , pure "this" Core.... let' "y" .= pure "_y"
+    , pure "this"
     ]))
   , let' "point" .= pure "mkPoint" $$ Core.bool True $$ Core.bool False
   , pure "point" Core.... pure "x"
