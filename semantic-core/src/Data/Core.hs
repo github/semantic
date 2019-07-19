@@ -74,6 +74,7 @@ data Core f a
   | Frame
   -- | A record holding simultaneously-bound, potentially mutually-recursive definitions.
   | Record [(User, f a)]
+  -- | Projection from a record.
   | f a :. f a
   -- | Assignment of a value to the reference returned by the lhs.
   | f a := f a
