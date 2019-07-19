@@ -58,6 +58,7 @@ data Core f a
   | Rec (Named (Scope () f a))
   -- | Sequencing without binding; analogous to '>>' or '*>'.
   | f a :>> f a
+  -- | Sequencing with binding; analogous to '>>='.
   | Named (f a) :>>= Scope () f a
   | Lam (Named (Scope () f a))
   -- | Function application; analogous to '$'.
