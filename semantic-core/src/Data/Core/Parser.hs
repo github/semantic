@@ -105,9 +105,13 @@ lit = let x `given` n = x <$ reserved n in choice
   , Core.bool False `given` "#false"
   , Core.unit       `given` "#unit"
   , Core.frame      `given` "#frame"
+  , record
   , between (string "\"") (string "\"") (Core.string . fromString <$> many ('"' <$ string "\\\"" <|> noneOf "\""))
   , lambda
   ] <?> "literal"
+
+record :: (TokenParsing m, Monad m) => m (Term Core User)
+record = Core.record <$ reserved "#record" <*> braces (sepEndBy ((,) <$> identifier <* symbolic '=' <*> core) semi)
 
 lambda :: (TokenParsing m, Monad m) => m (Term Core User)
 lambda = Core.lam <$ lambduh <*> name <* arrow <*> core <?> "lambda" where
