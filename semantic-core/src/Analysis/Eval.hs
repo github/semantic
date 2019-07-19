@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, LambdaCase, OverloadedStrings, RankNTypes, RecordWildCards #-}
+{-# LANGUAGE FlexibleContexts, LambdaCase, OverloadedStrings, RankNTypes, RecordWildCards, ScopedTypeVariables #-}
 module Analysis.Eval
 ( eval
 , prog1
@@ -9,6 +9,7 @@ module Analysis.Eval
 , prog6
 , ruby
 , Analysis(..)
+, fix
 ) where
 
 import Control.Effect.Fail
@@ -25,6 +26,13 @@ import Data.Term
 import Data.Text (Text)
 import GHC.Stack
 import Prelude hiding (fail)
+
+fix :: forall f a b
+    .  ((forall x . (x -> a) -> f x -> b) -> (forall x . (x -> a) -> f x -> b))
+    -> (forall x . (x -> a) -> f x -> b)
+fix f = x
+  where x :: (x -> a) -> f x -> b
+        x = f x
 
 eval :: ( Carrier sig m
         , Member (Reader Loc) sig
