@@ -125,7 +125,7 @@ block = maybe unit getBlock . foldMap (Just . Block)
 newtype Block m a = Block { getBlock :: m a }
 
 instance (Carrier sig m, Member Core sig) => Semigroup (Block m a) where
-  Block a <> Block b = Block (send (a :>> b))
+  Block a <> Block b = Block (a >>> b)
 
 lam :: (Eq a, Carrier sig m, Member Core sig) => Named a -> m a -> m a
 lam (Named u n) b = send (Lam (Named u (bind1 n b)))
