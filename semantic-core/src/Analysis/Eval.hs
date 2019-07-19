@@ -26,7 +26,13 @@ import Data.Text (Text)
 import GHC.Stack
 import Prelude hiding (fail)
 
-eval :: (Carrier sig m, Member (Reader Loc) sig, MonadFail m) => Analysis address value m -> (Term Core User -> m value) -> Term Core User -> m value
+eval :: ( Carrier sig m
+        , Member (Reader Loc) sig
+        , MonadFail m
+        )
+     => Analysis address value m
+     -> (Term Core User -> m value)
+     -> (Term Core User -> m value)
 eval Analysis{..} eval = \case
   Var n -> lookupEnv' n >>= deref' n
   Term c -> case c of
