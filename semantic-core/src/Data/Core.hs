@@ -132,6 +132,16 @@ newtype Block m a = Block { getBlock :: m a }
 instance (Carrier sig m, Member Core sig) => Semigroup (Block m a) where
   Block a <> Block b = Block (a >>> b)
 
+unseq :: (Alternative m, Member Core sig) => Term sig a -> m (Term sig a, Term sig a)
+unseq (Term sig) | Just (a :>> b) <- prj sig = pure (a, b)
+unseq _                                      = empty
+
+unseqs :: Member Core sig => Term sig a -> NonEmpty (Term sig a)
+unseqs = go
+  where go t = case unseq t of
+          Just (l, r) -> go l <> go r
+          Nothing     -> t :| []
+
 (>>>=) :: (Eq a, Carrier sig m, Member Core sig) => (Named a :<- m a) -> m a -> m a
 Named u n :<- a >>>= b = send (Named u a :>>= bind1 n b)
 
@@ -156,16 +166,6 @@ lams' names body = foldr lam' body names
 unlam :: (Alternative m, Member Core sig, RightModule sig) => a -> Term sig a -> m (Named a, Term sig a)
 unlam n (Term sig) | Just (Lam b) <- prj sig = pure (n <$ b, instantiate1 (pure n) (namedValue b))
 unlam _ _                                    = empty
-
-unseq :: (Alternative m, Member Core sig) => Term sig a -> m (Term sig a, Term sig a)
-unseq (Term sig) | Just (a :>> b) <- prj sig = pure (a, b)
-unseq _                                      = empty
-
-unseqs :: Member Core sig => Term sig a -> NonEmpty (Term sig a)
-unseqs = go
-  where go t = case unseq t of
-          Just (l, r) -> go l <> go r
-          Nothing     -> t :| []
 
 ($$) :: (Carrier sig m, Member Core sig) => m a -> m a -> m a
 f $$ a = send (f :$ a)
