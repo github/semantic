@@ -86,7 +86,7 @@ prettyCore style = run . runReader @Prec 0 . go
               pure (lambda <> name x <+> arrow <+> body)
 
             Record fs -> do
-              fs' <- for fs $ \ (Named (Ignored x) v) -> (name x <+> symbol "=" <+>) <$> go (instantiate (pure . namedName . (fs !!)) v)
+              fs' <- for fs $ \ (x, v) -> (name x <+> symbol "=" <+>) <$> go v
               pure $ Pretty.encloseSep Pretty.lbrace Pretty.rbrace Pretty.semi fs'
 
             Frame    -> pure $ primitive "frame"

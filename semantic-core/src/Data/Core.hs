@@ -37,7 +37,6 @@ import Control.Applicative (Alternative (..))
 import Control.Effect.Carrier
 import Control.Monad.Module
 import Data.Foldable (foldl')
-import Data.List (elemIndex)
 import Data.List.NonEmpty (NonEmpty (..))
 import Data.Loc
 import Data.Name
@@ -69,7 +68,7 @@ data Core f a
   -- | Allocation of a new frame.
   | Frame
   -- | A record holding simultaneously-bound, potentially mutually-recursive definitions.
-  | Record [Named (Scope Int f a)]
+  | Record [(User, f a)]
   | f a :. f a
   -- | Assignment of a value to the reference returned by the lhs.
   | f a := f a
@@ -101,7 +100,7 @@ instance RightModule Core where
   Load b    >>=* f = Load (b >>= f)
   Edge e b  >>=* f = Edge e (b >>= f)
   Frame     >>=* _ = Frame
-  Record fs >>=* f = Record (map (fmap (>>=* f)) fs)
+  Record fs >>=* f = Record (map (fmap (>>= f)) fs)
   (a :. b)  >>=* f = (a >>= f) :. (b >>= f)
   (a := b)  >>=* f = (a >>= f) := (b >>= f)
   Ann l b   >>=* f = Ann l (b >>= f)
@@ -188,9 +187,8 @@ edge e b = send (Edge e b)
 frame :: (Carrier sig m, Member Core sig) => m a
 frame = send Frame
 
-record :: (Eq a, Carrier sig m, Member Core sig) => [(Named a, m a)] -> m a
-record fs = send (Record (map bind' fs))
-  where bind' (n, f) = bind (`elemIndex` map (namedValue . fst) fs) f <$ n
+record :: (Carrier sig m, Member Core sig) => [(User, m a)] -> m a
+record fs = send (Record fs)
 
 (...) :: (Carrier sig m, Member Core sig) => m a -> m a -> m a
 a ... b = send (a :. b)
