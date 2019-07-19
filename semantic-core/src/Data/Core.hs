@@ -52,6 +52,7 @@ data Edge = Lexical | Import
 
 data Core f a
   = Let User
+  | Rec (Named (Scope () f a))
   -- | Sequencing without binding; analogous to '>>' or '*>'.
   | f a :>> f a
   | Lam (Named (Scope () f a))
@@ -88,6 +89,7 @@ deriving instance (Show a, forall a . Show a => Show (f a))          => Show (Co
 
 instance RightModule Core where
   Let u     >>=* _ = Let u
+  Rec b     >>=* f = Rec ((>>=* f) <$> b)
   (a :>> b) >>=* f = (a >>= f) :>> (b >>= f)
   Lam b     >>=* f = Lam ((>>=* f) <$> b)
   (a :$ b)  >>=* f = (a >>= f) :$ (b >>= f)

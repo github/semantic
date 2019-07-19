@@ -37,6 +37,11 @@ eval Analysis{..} eval = \case
   Var n -> lookupEnv' n >>= deref' n
   Term c -> case c of
     Let n -> alloc n >>= bind n >> unit
+    Rec (Named (Ignored n) b) -> do
+      addr <- alloc n
+      bind n addr
+      v <- eval (instantiate1 (pure n) b)
+      v <$ assign addr v
     a :>> b -> eval a >> eval b
     Lam (Named (Ignored n) b) -> abstract eval n (instantiate1 (pure n) b)
     f :$ a -> do

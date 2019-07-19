@@ -66,6 +66,9 @@ prettyCore style = run . runReader @Prec 0 . go
           Var v -> pure (name v)
           Term t -> case t of
             Let a -> pure $ keyword "let" <+> name a
+            Rec b -> inParens 11 $ do
+              (x, body) <- bind b
+              pure (keyword "rec" <+> name x <+> symbol "=" <+> body)
             a :>> b -> do
               prec <- ask @Prec
               fore <- with 12 (go a)
