@@ -7,6 +7,8 @@ module Data.Core
 , rec
 , (>>>)
 , block
+, (>>>=)
+, (:<-)(..)
 , lam
 , lam'
 , lams
@@ -128,6 +130,15 @@ newtype Block m a = Block { getBlock :: m a }
 
 instance (Carrier sig m, Member Core sig) => Semigroup (Block m a) where
   Block a <> Block b = Block (a >>> b)
+
+(>>>=) :: (Eq a, Carrier sig m, Member Core sig) => (Named a :<- m a) -> m a -> m a
+Named u n :<- a >>>= b = send (Named u a :>>= bind1 n b)
+
+infixr 1 >>>=
+
+data a :<- b = a :<- b
+  deriving (Eq, Ord, Show)
+
 
 lam :: (Eq a, Carrier sig m, Member Core sig) => Named a -> m a -> m a
 lam (Named u n) b = send (Lam (Named u (bind1 n b)))
