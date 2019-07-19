@@ -123,7 +123,7 @@ lams' :: (Foldable t, Carrier sig m, Member Core sig) => t User -> m User -> m U
 lams' names body = foldr lam' body names
 
 unlam :: (Alternative m, Member Core sig, RightModule sig) => a -> Term sig a -> m (Named a, Term sig a)
-unlam n (Term sig) | Just (Lam v b) <- prj sig = pure (Named v n, instantiate (const (pure n)) b)
+unlam n (Term sig) | Just (Lam v b) <- prj sig = pure (Named v n, instantiate1 (pure n) b)
 unlam _ _                                      = empty
 
 unseq :: (Alternative m, Member Core sig) => Term sig a -> m (Term sig a, Term sig a)
