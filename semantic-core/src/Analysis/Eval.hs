@@ -38,7 +38,7 @@ eval Analysis{..} eval = \case
   Term c -> case c of
     Let n -> alloc n >>= bind n >> unit
     a :>> b -> eval a >> eval b
-    Lam (Ignored n) b -> abstract eval n (incr (const n) id <$> fromScope b)
+    Lam (Ignored n) b -> abstract eval n (fromScope (incr (const (pure n)) id) b)
     f :$ a -> do
       f' <- eval f
       a' <- eval a

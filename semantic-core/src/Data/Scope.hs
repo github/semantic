@@ -56,11 +56,11 @@ instance HFunctor (Scope a) where
   hmap f = Scope . f . fmap (fmap f) . unScope
 
 instance (Eq   a, Eq   b, forall a . Eq   a => Eq   (f a), Monad f) => Eq   (Scope a f b) where
-  (==) = (==) `on` fromScope
+  (==) = (==) `on` fromScope sequenceA
 
 instance (Ord  a, Ord  b, forall a . Eq   a => Eq   (f a)
                         , forall a . Ord  a => Ord  (f a), Monad f) => Ord  (Scope a f b) where
-  compare = compare `on` fromScope
+  compare = compare `on` fromScope sequenceA
 
 deriving instance (Show a, Show b, forall a . Show a => Show (f a)) => Show (Scope a f b)
 
@@ -78,8 +78,8 @@ instance RightModule (Scope a) where
   Scope m >>=* f = Scope (fmap (>>= f) <$> m)
 
 
-fromScope :: Monad f => Scope a f b -> f (Incr a b)
-fromScope = unScope >=> sequenceA
+fromScope :: Monad f => (Incr a (f b) -> f c) -> Scope a f b -> f c
+fromScope f = unScope >=> f
 
 toScope :: Applicative f => f (Incr a b) -> Scope a f b
 toScope = Scope . fmap (fmap pure)
