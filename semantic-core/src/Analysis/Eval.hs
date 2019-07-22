@@ -11,6 +11,7 @@ module Analysis.Eval
 , Analysis(..)
 ) where
 
+import Control.Applicative (Alternative (..))
 import Control.Effect.Fail
 import Control.Effect.Reader
 import Control.Monad ((>=>))
@@ -18,7 +19,7 @@ import Data.Core as Core
 import Data.File
 import Data.Functor
 import Data.Loc
-import Data.Maybe (fromJust)
+import Data.Maybe (fromJust, fromMaybe)
 import Data.Name
 import Data.Scope
 import Data.Term
@@ -132,62 +133,62 @@ prog6 =
   ]
 
 ruby :: File (Term Core User)
-ruby = fromBody $ annWith callStack (rec (named' __semantic_global) (do'
-  bindings
-  (   var "Class" ... __semantic_super .= var "Object"
-  >>> record (map (\ (v :<- _) -> (v, var v)) bindings))))
-  where bindings =
-          [ "Class" :<- record
+ruby = fromBody $ annWith callStack (rec (named' __semantic_global) (do' statements))
+  where statements =
+          [ Just "Class" :<- record
             [ (__semantic_super, Core.record [])
             , ("new", lam "self"
               (    "instance" :<- record [ (__semantic_super, var "self") ]
               >>>= var "instance" $$$ "initialize"))
             ]
 
-          , "(Object)" :<- record [ (__semantic_super, var "Class") ]
-          , "Object" :<- record
+          , Just "(Object)" :<- record [ (__semantic_super, var "Class") ]
+          , Just "Object" :<- record
             [ (__semantic_super, var "(Object)")
             , ("nil?", lam "_" (var __semantic_global ... "false"))
             , ("initialize", lam "self" (var "self"))
             , (__semantic_truthy, lam "_" (bool True))
             ]
 
-          , "(NilClass)" :<- record
+          , Just "(NilClass)" :<- record
             -- FIXME: what should we do about multiple import edges like this
             [ (__semantic_super, var "Class")
             , (__semantic_super, var "(Object)")
             ]
-          , "NilClass" :<- record
+          , Just "NilClass" :<- record
             [ (__semantic_super, var "(NilClass)")
             , (__semantic_super, var "Object")
             , ("nil?", lam "_" (var __semantic_global ... "true"))
             , (__semantic_truthy, lam "_" (bool False))
             ]
 
-          , "(TrueClass)" :<- record
+          , Just "(TrueClass)" :<- record
             [ (__semantic_super, var "Class")
             , (__semantic_super, var "(Object)")
             ]
-          , "TrueClass" :<- record
+          , Just "TrueClass" :<- record
             [ (__semantic_super, var "(TrueClass)")
             , (__semantic_super, var "Object")
             ]
 
-          , "(FalseClass)" :<- record
+          , Just "(FalseClass)" :<- record
             [ (__semantic_super, var "Class")
             , (__semantic_super, var "(Object)")
             ]
-          , "FalseClass" :<- record
+          , Just "FalseClass" :<- record
             [ (__semantic_super, var "(FalseClass)")
             , (__semantic_super, var "Object")
             , (__semantic_truthy, lam "_" (bool False))
             ]
 
-          , "nil"   :<- var "NilClass"   $$$ "new"
-          , "true"  :<- var "TrueClass"  $$$ "new"
-          , "false" :<- var "FalseClass" $$$ "new"
+          , Just "nil"   :<- var "NilClass"   $$$ "new"
+          , Just "true"  :<- var "TrueClass"  $$$ "new"
+          , Just "false" :<- var "FalseClass" $$$ "new"
 
-          , "require" :<- lam "path" (Core.load (var "path"))
+          , Just "require" :<- lam "path" (Core.load (var "path"))
+
+          , Nothing :<- var "Class" ... __semantic_super .= var "Object"
+          , Nothing :<- record (statements >>= \ (v :<- _) -> maybe [] (\ v -> [(v, var v)]) v)
           ]
         self $$$ method = annWith callStack ("_x" :<- self >>>= var "_x" ... method $$ var "_x")
         record ... field = annWith callStack (record Core.... field)
@@ -198,7 +199,8 @@ ruby = fromBody $ annWith callStack (rec (named' __semantic_global) (do'
         infixr 1 >>>
         v :<- a >>>= b = annWith callStack (named' v :<- a Core.>>>= b)
         infixr 1 >>>=
-        do' bindings body = foldr (>>>=) body bindings
+        do' bindings = fromMaybe Core.unit (foldr bind Nothing bindings)
+          where bind (n :<- a) v = maybe (a >>>) ((>>>=) . (:<- a)) n <$> v <|> Just a
         bool b = annWith callStack (Core.bool b)
         a .= b = annWith callStack (a Core..= b)
 
