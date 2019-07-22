@@ -72,7 +72,7 @@ data Core f a
   -- | A record mapping some keys to some values.
   | Record [(User, f a)]
   -- | Projection from a record.
-  | f a :. f a
+  | f a :. User
   -- | Assignment of a value to the reference returned by the lhs.
   | f a := f a
   | Ann Loc (f a)
@@ -103,7 +103,7 @@ instance RightModule Core where
   String s   >>=* _ = String s
   Load b     >>=* f = Load (b >>= f)
   Record fs  >>=* f = Record (map (fmap (>>= f)) fs)
-  (a :. b)   >>=* f = (a >>= f) :. (b >>= f)
+  (a :. b)   >>=* f = (a >>= f) :. b
   (a := b)   >>=* f = (a >>= f) := (b >>= f)
   Ann l b    >>=* f = Ann l (b >>= f)
 
@@ -196,7 +196,7 @@ load = send . Load
 record :: (Carrier sig m, Member Core sig) => [(User, m a)] -> m a
 record fs = send (Record fs)
 
-(...) :: (Carrier sig m, Member Core sig) => m a -> m a -> m a
+(...) :: (Carrier sig m, Member Core sig) => m a -> User -> m a
 a ... b = send (a :. b)
 
 infixl 4 ...

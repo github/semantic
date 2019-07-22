@@ -109,7 +109,7 @@ concreteAnalysis = Analysis{..}
         apply eval (Closure loc name body parentAddr) a = do
           frameAddr <- fresh
           assign frameAddr (Obj (Frame [(Core.Lexical, parentAddr)] mempty))
-          local (const loc) $ frameAddr ... do
+          local (const loc) . local (const (FrameId frameAddr)) $ do
             addr <- alloc name
             assign addr a
             bind name addr
@@ -130,7 +130,10 @@ concreteAnalysis = Analysis{..}
         -- FIXME: throw an error
         -- FIXME: support dynamic imports
         edge e addr = modifyCurrentFrame (\ (Frame ps fs) -> Frame ((e, addr) : ps) fs)
-        addr ... m = local (const (FrameId addr)) m
+        addr ... n = do
+          val <- deref addr
+          heap <- get
+          pure (val >>= lookupConcrete heap n)
 
         updateFrameSlots f frame = frame { frameSlots = f (frameSlots frame) }
 

@@ -151,7 +151,7 @@ typecheckingAnalysis = Analysis{..}
         asString s = unify (Term String) s $> mempty
         frame = fail "unimplemented"
         edge _ _ = pure ()
-        _ ... m = m
+        _ ... m = pure (Just m)
 
 
 data Constraint = Term Monotype Meta :===: Term Monotype Meta

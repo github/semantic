@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, LambdaCase, OverloadedStrings, RankNTypes, RecordWildCards #-}
+{-# LANGUAGE FlexibleContexts, LambdaCase, OverloadedStrings, RecordWildCards #-}
 module Analysis.Eval
 ( eval
 , prog1
@@ -63,7 +63,7 @@ eval Analysis{..} eval = \case
     Record _ -> frame -- FIXME: evaluate the body of the record
     a :. b -> do
       a' <- ref a
-      a' ... eval b
+      a' ... b >>= maybe (freeVariable (show b)) (deref' b)
     a := b -> do
       b' <- eval b
       addr <- ref a
@@ -84,7 +84,7 @@ eval Analysis{..} eval = \case
               if c' then ref t else ref e
             a :. b -> do
               a' <- ref a
-              a' ... ref b
+              a' ... b >>= maybe (freeVariable (show b)) pure
             Ann loc c -> local (const loc) (ref c)
             c -> invalidRef (show c)
 
@@ -120,8 +120,8 @@ prog5 = fromBody $ binds
     ])
   , named' "point" :<- pure "mkPoint" $$ Core.bool True $$ Core.bool False
   ]
-  (   pure "point" Core.... pure "x"
-  >>> pure "point" Core.... pure "y" .= pure "point" Core.... pure "x")
+  (   pure "point" Core.... "x"
+  >>> pure "point" Core.... "y" .= pure "point" Core.... "x")
 
 prog6 :: [File (Term Core User)]
 prog6 =
@@ -129,7 +129,7 @@ prog6 =
     [ ("dep", record [ ("var", Core.bool True) ]) ]
   , File (Loc "main" (locSpan (fromJust here))) $ block
     [ load (Core.string "dep")
-    , record [ ("thing", pure "dep" Core.... pure "var") ]
+    , record [ ("thing", pure "dep" Core.... "var") ]
     ]
   ]
 
@@ -188,7 +188,7 @@ ruby = fromBody . ann . rec (named' __semantic_global) $ record
   , ("require", lam (named' "path") (Core.load (pure "path")))
   ]
   where self $$$ method = annWith callStack $ named' "_x" :<- self >>>= pure "_x" ... method $$ pure "_x"
-        record ... field = annWith callStack $ record Core.... pure field
+        record ... field = annWith callStack $ record Core.... field
 
         __semantic_global = "__semantic_global"
         __semantic_super  = "__semantic_super"
@@ -210,5 +210,5 @@ data Analysis address value m = Analysis
   , asString    :: value -> m Text
   , frame       :: m value
   , edge        :: Edge -> address -> m ()
-  , (...)       :: forall a . address -> m a -> m a
+  , (...)       :: address -> User -> m (Maybe address)
   }

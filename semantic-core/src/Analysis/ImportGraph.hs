@@ -105,4 +105,4 @@ importGraphAnalysis = Analysis{..}
           Loc{locPath=from} <- ask
           () <$ pure (Value Abstract (Map.singleton from (Set.singleton to)))
         edge _ _ = pure ()
-        _ ... m = m
+        _ ... m = pure (Just m)

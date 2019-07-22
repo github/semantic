@@ -115,8 +115,7 @@ prettyCore style = run . runReader @Prec 0 . go
             Load p   -> "load" `appending` go p
             item :. body   -> inParens 4 $ do
               f <- go item
-              g <- go body
-              pure (f <> symbol "." <> g)
+              pure (f <> symbol "." <> name body)
 
             lhs := rhs -> inParens 3 $ do
               f <- go lhs

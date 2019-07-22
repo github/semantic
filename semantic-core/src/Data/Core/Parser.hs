@@ -12,6 +12,7 @@ import           Control.Applicative
 import qualified Data.Char as Char
 import           Data.Core (Core)
 import qualified Data.Core as Core
+import           Data.Foldable (foldl')
 import           Data.Name
 import           Data.String
 import           Data.Term
@@ -48,10 +49,10 @@ core :: (TokenParsing m, Monad m) => m (Term Core User)
 core = expr
 
 expr :: (TokenParsing m, Monad m) => m (Term Core User)
-expr = atom `chainl1` go where
-  go = choice [ (Core....) <$ dot
-              , (Core.$$)  <$ notFollowedBy dot
-              ]
+expr = prj `chainl1` (pure (Core.$$))
+
+prj :: (TokenParsing m, Monad m) => m (Term Core User)
+prj = foldl' (Core....) <$> atom <*> many (namedValue <$> (dot *> name))
 
 atom :: (TokenParsing m, Monad m) => m (Term Core User)
 atom = choice
