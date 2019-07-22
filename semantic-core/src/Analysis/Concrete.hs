@@ -27,7 +27,6 @@ import qualified Data.IntMap as IntMap
 import qualified Data.IntSet as IntSet
 import           Data.Loc
 import qualified Data.Map as Map
-import           Data.Monoid (Alt(..))
 import           Data.Name
 import           Data.Term
 import           Data.Text (Text, pack)
@@ -52,9 +51,8 @@ objectFrame :: Concrete -> Maybe Frame
 objectFrame (Obj frame) = Just frame
 objectFrame _           = Nothing
 
-data Frame = Frame
-  { frameEdges :: [(Core.Edge, Precise)]
-  , frameSlots :: Env
+newtype Frame = Frame
+  { frameSlots :: Env
   }
   deriving (Eq, Ord, Show)
 
@@ -122,7 +120,7 @@ concreteAnalysis = Analysis{..}
             addr <- alloc name
             assign addr value
             pure (name, addr)
-          pure (Obj (Frame [] (Map.fromList fields')))
+          pure (Obj (Frame (Map.fromList fields')))
         addr ... n = do
           val <- deref addr
           heap <- get
@@ -135,9 +133,9 @@ lookupConcrete heap name = run . evalState IntSet.empty . runNonDet . inConcrete
   where -- look up the name in a concrete value
         inConcrete = inFrame <=< maybeA . objectFrame
         -- look up the name in a specific 'Frame', with slots taking precedence over parents
-        inFrame (Frame ps fs) = maybeA (Map.lookup name fs) <|> getAlt (foldMap (Alt . inAddress . snd) ps)
+        inFrame (Frame fs) = maybeA (Map.lookup name fs)
         -- look up the name in the value an address points to, if we haven’t already visited it
-        inAddress addr = do
+        _inAddress addr = do
           visited <- get
           guard (addr `IntSet.notMember` visited)
           -- FIXME: throw an error if we can’t deref @addr@
@@ -165,7 +163,7 @@ heapGraph vertex edge h = foldr (uncurry graph) G.empty (IntMap.toList h)
           String _ -> G.empty
           Closure _ _ _ -> G.empty
           Obj frame -> fromFrame frame
-        fromFrame (Frame es ss) = foldr (G.overlay . uncurry (edge . Left)) (foldr (G.overlay . uncurry (edge . Right)) G.empty (Map.toList ss)) es
+        fromFrame (Frame ss) = foldr (G.overlay . uncurry (edge . Right)) G.empty (Map.toList ss)
 
 heapValueGraph :: Heap -> G.Graph Concrete
 heapValueGraph h = heapGraph (const id) (const fromAddr) h
