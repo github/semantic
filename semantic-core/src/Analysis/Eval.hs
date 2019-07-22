@@ -36,7 +36,6 @@ eval :: ( Carrier sig m
 eval Analysis{..} eval = \case
   Var n -> lookupEnv' n >>= deref' n
   Term c -> case c of
-    Let n -> alloc n >>= bind n >> unit
     Rec (Named (Ignored n) b) -> do
       addr <- alloc n
       bind n addr
@@ -62,7 +61,6 @@ eval Analysis{..} eval = \case
     String s -> string s
     Load p -> eval p >>= asString >> unit -- FIXME: add a load command or something
     Edge e a -> ref a >>= edge e >> unit
-    Frame -> frame
     Record _ -> frame -- FIXME: evaluate the body of the record
     a :. b -> do
       a' <- ref a
@@ -82,9 +80,6 @@ eval Analysis{..} eval = \case
         ref = \case
           Var n -> lookupEnv' n
           Term c -> case c of
-            Let n -> do
-              addr <- alloc n
-              addr <$ bind n addr
             If c t e -> do
               c' <- eval c >>= asBool
               if c' then ref t else ref e
@@ -96,13 +91,11 @@ eval Analysis{..} eval = \case
 
 
 prog1 :: File (Term Core User)
-prog1 = fromBody . lam' foo $ block
-  [ let' bar .= pure foo
-  , Core.if' (pure bar)
+prog1 = fromBody $ lam' "foo"
+  (    named' "bar" :<- pure "foo"
+  >>>= Core.if' (pure "bar")
     (Core.bool False)
-    (Core.bool True)
-  ]
-  where (foo, bar) = ("foo", "bar")
+    (Core.bool True))
 
 prog2 :: File (Term Core User)
 prog2 = fromBody $ fileBody prog1 $$ Core.bool True
@@ -115,106 +108,89 @@ prog3 = fromBody $ lams' [foo, bar, quux]
   where (foo, bar, quux) = ("foo", "bar", "quux")
 
 prog4 :: File (Term Core User)
-prog4 = fromBody $ block
-  [ let' foo .= Core.bool True
-  , Core.if' (pure foo)
+prog4 = fromBody
+  (    named' "foo" :<- Core.bool True
+  >>>= Core.if' (pure "foo")
     (Core.bool True)
-    (Core.bool False)
-  ]
-  where foo = "foo"
+    (Core.bool False))
 
 prog5 :: File (Term Core User)
-prog5 = fromBody $ block
-  [ let' "mkPoint" .= lam' "_x" (lam' "_y" (Core.record
+prog5 = fromBody
+  (    named' "mkPoint" :<- lam' "_x" (lam' "_y" (Core.record
     [ ("x", pure "_x")
     , ("y", pure "_y")
     ]))
-  , let' "point" .= pure "mkPoint" $$ Core.bool True $$ Core.bool False
-  , pure "point" Core.... pure "x"
-  , pure "point" Core.... pure "y" .= pure "point" Core.... pure "x"
-  ]
+  >>>= named' "point" :<- pure "mkPoint" $$ Core.bool True $$ Core.bool False
+  >>>= pure "point" Core.... pure "x"
+  >>>  pure "point" Core.... pure "y" .= pure "point" Core.... pure "x")
 
 prog6 :: [File (Term Core User)]
 prog6 =
-  [ File (Loc "dep"  (locSpan (fromJust here))) $ block
-    [ let' "dep" .= Core.frame
-    , pure "dep" Core.... (let' "var" .= Core.bool True)
-    ]
+  [ File (Loc "dep"  (locSpan (fromJust here))) $ record
+    [ ("dep", Core.record [ ("var", Core.bool True) ]) ]
   , File (Loc "main" (locSpan (fromJust here))) $ block
     [ load (Core.string "dep")
-    , let' "thing" .= pure "dep" Core.... pure "var"
+    , record [ ("thing", pure "dep" Core.... pure "var") ]
     ]
   ]
 
 ruby :: File (Term Core User)
-ruby = fromBody . ann . block $
-  [ ann (let' "Class" .= Core.frame)
-  , ann (pure "Class" Core....
-    (ann (let' "new" .= lam' "self" (block
-      [ ann (let' "instance" .= Core.frame)
-      , ann (pure "instance" Core.... Core.edge Import (pure "self"))
-      , ann (pure "instance" $$$ "initialize")
-      ]))))
-
-  , ann (let' "(Object)" .= Core.frame)
-  , ann (pure "(Object)" Core.... ann (Core.edge Import (pure "Class")))
-  , ann (let' "Object" .= Core.frame)
-  , ann (pure "Object" Core.... block
-    [ ann (Core.edge Import (pure "(Object)"))
-    , ann (let' "nil?" .= lam' "_" false)
-    , ann (let' "initialize" .= lam' "self" (pure "self"))
-    , ann (let' __semantic_truthy .= lam' "_" (Core.bool True))
+ruby = fromBody . ann $ record
+  [ ("Class", Core.record
+    [ (__semantic_super, pure "Object")
+    , ("new", lam' "self"
+      (    named' "instance" :<- Core.record [ (__semantic_super, pure "self") ]
+      >>>= pure "instance" $$$ "initialize"))
     ])
 
-  , ann (pure "Class" Core.... Core.edge Import (pure "Object"))
-
-  , ann (let' "(NilClass)" .= Core.frame)
-  , ann (pure "(NilClass)" Core.... block
-    [ ann (Core.edge Import (pure "Class"))
-    , ann (Core.edge Import (pure "(Object)"))
-    ])
-  , ann (let' "NilClass" .= Core.frame)
-  , ann (pure "NilClass" Core.... block
-    [ ann (Core.edge Import (pure "(NilClass)"))
-    , ann (Core.edge Import (pure "Object"))
-    , ann (let' "nil?" .= lam' "_" true)
-    , ann (let' __semantic_truthy .= lam' "_" (Core.bool False))
+  , ("(Object)", Core.record [ (__semantic_super, pure "Class") ])
+  , ("Object", Core.record
+    [ (__semantic_super, pure "(Object)")
+    , ("nil?", lam' "_" (pure "false"))
+    , ("initialize", lam' "self" (pure "self"))
+    , (__semantic_truthy, lam' "_" (Core.bool True))
     ])
 
-  , ann (let' "(TrueClass)" .= Core.frame)
-  , ann (pure "(TrueClass)" Core.... block
-    [ ann (Core.edge Import (pure "Class"))
-    , ann (Core.edge Import (pure "(Object)"))
+  , ("(NilClass)", Core.record
+    -- FIXME: what should we do about multiple import edges like this
+    [ (__semantic_super, pure "Class")
+    , (__semantic_super, pure "(Object)")
     ])
-  , ann (let' "TrueClass" .= Core.frame)
-  , ann (pure "TrueClass" Core.... block
-    [ ann (Core.edge Import (pure "(TrueClass)"))
-    , ann (Core.edge Import (pure "Object"))
-    ])
-
-  , ann (let' "(FalseClass)" .= Core.frame)
-  , ann (pure "(FalseClass)" Core.... block
-    [ ann (Core.edge Import (pure "Class"))
-    , ann (Core.edge Import (pure "(Object)"))
-    ])
-  , ann (let' "FalseClass" .= Core.frame)
-  , ann (pure "FalseClass" Core.... block
-    [ ann (Core.edge Import (pure "(FalseClass)"))
-    , ann (Core.edge Import (pure "Object"))
-    , ann (let' __semantic_truthy .= lam' "_" (Core.bool False))
+  , ("NilClass", Core.record
+    [ (__semantic_super, pure "(NilClass)")
+    , (__semantic_super, pure "Object")
+    , ("nil?", lam' "_" (pure "true"))
+    , (__semantic_truthy, lam' "_" (Core.bool False))
     ])
 
-  , ann (let' "nil"   .= pure "NilClass"   $$$ "new")
-  , ann (let' "true"  .= pure "TrueClass"  $$$ "new")
-  , ann (let' "false" .= pure "FalseClass" $$$ "new")
+  , ("(TrueClass)", Core.record
+    [ (__semantic_super, pure "Class")
+    , (__semantic_super, pure "(Object)")
+    ])
+  , ("TrueClass", Core.record
+    [ (__semantic_super, pure "(TrueClass)")
+    , (__semantic_super, pure "Object")
+    ])
 
-  , ann (let' "require" .= lam' "path" (Core.load (pure "path")))
+  , ("(FalseClass)", Core.record
+    [ (__semantic_super, pure "Class")
+    , (__semantic_super, pure "(Object)")
+    ])
+  , ("FalseClass", Core.record
+    [ (__semantic_super, pure "(FalseClass)")
+    , (__semantic_super, pure "Object")
+    , (__semantic_truthy, lam' "_" (Core.bool False))
+    ])
+
+  , ("nil"  , pure "NilClass"   $$$ "new")
+  , ("true" , pure "TrueClass"  $$$ "new")
+  , ("false", pure "FalseClass" $$$ "new")
+
+  , ("require", lam' "path" (Core.load (pure "path")))
   ]
-  where -- _nil  = pure "nil"
-        true  = pure "true"
-        false = pure "false"
-        self $$$ method = annWith callStack $ lam' "_x" (pure "_x" Core.... pure method $$ pure "_x") $$ self
+  where self $$$ method = annWith callStack $ lam' "_x" (pure "_x" Core.... pure method $$ pure "_x") $$ self
 
+        __semantic_super  = "__semantic_super"
         __semantic_truthy = "__semantic_truthy"
 
 

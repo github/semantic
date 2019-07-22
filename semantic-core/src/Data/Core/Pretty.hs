@@ -65,7 +65,6 @@ prettyCore style = run . runReader @Prec 0 . go
   where go = \case
           Var v -> pure (name v)
           Term t -> case t of
-            Let a -> pure $ keyword "let" <+> name a
             Rec b -> inParens 11 $ do
               (x, body) <- bind b
               pure (keyword "rec" <+> name x <+> symbol "=" <+> body)
@@ -101,7 +100,6 @@ prettyCore style = run . runReader @Prec 0 . go
               fs' <- for fs $ \ (x, v) -> (name x <+> symbol "=" <+>) <$> go v
               pure $ primitive "record" <+> Pretty.encloseSep Pretty.lbrace Pretty.rbrace Pretty.semi fs'
 
-            Frame    -> pure $ primitive "frame"
             Unit     -> pure $ primitive "unit"
             Bool b   -> pure $ primitive (if b then "true" else "false")
             String s -> pure . strlit $ Pretty.viaShow s

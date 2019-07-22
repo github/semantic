@@ -3,7 +3,6 @@
 module Data.Core
 ( Core(..)
 , Edge(..)
-, let'
 , rec
 , (>>>)
 , block
@@ -26,7 +25,6 @@ module Data.Core
 , string
 , load
 , edge
-, frame
 , record
 , (...)
 , (.=)
@@ -54,8 +52,7 @@ data Edge = Lexical | Import
   deriving (Eq, Ord, Show)
 
 data Core f a
-  = Let User
-  | Rec (Named (Scope () f a))
+  = Rec (Named (Scope () f a))
   -- | Sequencing without binding; analogous to '>>' or '*>'.
   | f a :>> f a
   -- | Sequencing with binding; analogous to '>>='.
@@ -70,8 +67,6 @@ data Core f a
   -- | Load the specified file (by path).
   | Load (f a)
   | Edge Edge (f a)
-  -- | Allocation of a new frame.
-  | Frame
   -- | A record mapping some keys to some values.
   | Record [(User, f a)]
   -- | Projection from a record.
@@ -95,7 +90,6 @@ deriving instance (Ord  a, forall a . Eq   a => Eq   (f a)
 deriving instance (Show a, forall a . Show a => Show (f a))          => Show (Core f a)
 
 instance RightModule Core where
-  Let u      >>=* _ = Let u
   Rec b      >>=* f = Rec ((>>=* f) <$> b)
   (a :>> b)  >>=* f = (a >>= f) :>> (b >>= f)
   (a :>>= b) >>=* f = ((>>= f) <$> a) :>>= (b >>=* f)
@@ -107,15 +101,11 @@ instance RightModule Core where
   String s   >>=* _ = String s
   Load b     >>=* f = Load (b >>= f)
   Edge e b   >>=* f = Edge e (b >>= f)
-  Frame      >>=* _ = Frame
   Record fs  >>=* f = Record (map (fmap (>>= f)) fs)
   (a :. b)   >>=* f = (a >>= f) :. (b >>= f)
   (a := b)   >>=* f = (a >>= f) := (b >>= f)
   Ann l b    >>=* f = Ann l (b >>= f)
 
-
-let' :: (Carrier sig m, Member Core sig) => User -> m a
-let' = send . Let
 
 rec :: (Eq a, Carrier sig m, Member Core sig) => Named a -> m a -> m a
 rec (Named u n) b = send (Rec (Named u (bind1 n b)))
@@ -207,9 +197,6 @@ load = send . Load
 
 edge :: (Carrier sig m, Member Core sig) => Edge -> m a -> m a
 edge e b = send (Edge e b)
-
-frame :: (Carrier sig m, Member Core sig) => m a
-frame = send Frame
 
 record :: (Carrier sig m, Member Core sig) => [(User, m a)] -> m a
 record fs = send (Record fs)

@@ -89,8 +89,7 @@ edge = kw <*> expr where kw = choice [ Core.edge Lexical <$ reserved "lexical"
 
 lvalue :: (TokenParsing m, Monad m) => m (Term Core User)
 lvalue = choice
-  [ Core.let' . namedValue <$ reserved "let" <*> name
-  , ident
+  [ ident
   , parens expr
   ]
 
@@ -104,7 +103,6 @@ lit = let x `given` n = x <$ reserved n in choice
   [ Core.bool True  `given` "#true"
   , Core.bool False `given` "#false"
   , Core.unit       `given` "#unit"
-  , Core.frame      `given` "#frame"
   , record
   , between (string "\"") (string "\"") (Core.string . fromString <$> many ('"' <$ string "\\\"" <|> noneOf "\""))
   , lambda
