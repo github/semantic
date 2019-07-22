@@ -133,51 +133,51 @@ prog6 =
 
 ruby :: File (Term Core User)
 ruby = fromBody . ann . rec (named' __semantic_global) $ Core.record
-  [ ("Class", Core.record
+  [ ("Class", ann (Core.record
     [ (__semantic_super, pure __semantic_global ... "Object")
     , ("new", lam (named' "self")
       (    named' "instance" :<- Core.record [ (__semantic_super, pure "self") ]
       >>>= pure "instance" $$$ "initialize"))
-    ])
+    ]))
 
-  , ("(Object)", Core.record [ (__semantic_super, pure __semantic_global ... "Class") ])
-  , ("Object", Core.record
+  , ("(Object)", ann (Core.record [ (__semantic_super, pure __semantic_global ... "Class") ]))
+  , ("Object", ann (Core.record
     [ (__semantic_super, pure __semantic_global ... "(Object)")
     , ("nil?", lam (named' "_") (pure __semantic_global ... "false"))
     , ("initialize", lam (named' "self") (pure "self"))
     , (__semantic_truthy, lam (named' "_") (Core.bool True))
-    ])
+    ]))
 
-  , ("(NilClass)", Core.record
+  , ("(NilClass)", ann (Core.record
     -- FIXME: what should we do about multiple import edges like this
     [ (__semantic_super, pure __semantic_global ... "Class")
     , (__semantic_super, pure __semantic_global ... "(Object)")
-    ])
-  , ("NilClass", Core.record
+    ]))
+  , ("NilClass", ann (Core.record
     [ (__semantic_super, pure __semantic_global ... "(NilClass)")
     , (__semantic_super, pure __semantic_global ... "Object")
     , ("nil?", lam (named' "_") (pure __semantic_global ... "true"))
     , (__semantic_truthy, lam (named' "_") (Core.bool False))
-    ])
+    ]))
 
-  , ("(TrueClass)", Core.record
+  , ("(TrueClass)", ann (Core.record
     [ (__semantic_super, pure __semantic_global ... "Class")
     , (__semantic_super, pure __semantic_global ... "(Object)")
-    ])
-  , ("TrueClass", Core.record
+    ]))
+  , ("TrueClass", ann (Core.record
     [ (__semantic_super, pure __semantic_global ... "(TrueClass)")
     , (__semantic_super, pure __semantic_global ... "Object")
-    ])
+    ]))
 
-  , ("(FalseClass)", Core.record
+  , ("(FalseClass)", ann (Core.record
     [ (__semantic_super, pure __semantic_global ... "Class")
     , (__semantic_super, pure __semantic_global ... "(Object)")
-    ])
-  , ("FalseClass", Core.record
+    ]))
+  , ("FalseClass", ann (Core.record
     [ (__semantic_super, pure __semantic_global ... "(FalseClass)")
     , (__semantic_super, pure __semantic_global ... "Object")
     , (__semantic_truthy, lam (named' "_") (Core.bool False))
-    ])
+    ]))
 
   , ("nil"  , pure __semantic_global ... "NilClass"   $$$ "new")
   , ("true" , pure __semantic_global ... "TrueClass"  $$$ "new")
