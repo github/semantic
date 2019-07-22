@@ -132,59 +132,79 @@ prog6 =
   ]
 
 ruby :: File (Term Core User)
-ruby = fromBody $ ann (rec (named' __semantic_global) (Core.record
-  [ ("Class", ann (Core.record
-    [ (__semantic_super, pure __semantic_global ... "Object")
-    , ("new", lam (named' "self")
+ruby = fromBody $ annWith callStack (rec (named' __semantic_global) (binds
+  [ named' "Class" :<- ann (Core.record
+    [ ("new", lam (named' "self")
       (    named' "instance" :<- Core.record [ (__semantic_super, pure "self") ]
       >>>= pure "instance" $$$ "initialize"))
-    ]))
+    ])
 
-  , ("(Object)", ann (Core.record [ (__semantic_super, pure __semantic_global ... "Class") ]))
-  , ("Object", ann (Core.record
-    [ (__semantic_super, pure __semantic_global ... "(Object)")
+  , named' "(Object)" :<- ann (Core.record [ (__semantic_super, pure "Class") ])
+  , named' "Object" :<- ann (Core.record
+    [ (__semantic_super, pure "(Object)")
     , ("nil?", lam (named' "_") (pure __semantic_global ... "false"))
     , ("initialize", lam (named' "self") (pure "self"))
     , (__semantic_truthy, lam (named' "_") (Core.bool True))
-    ]))
+    ])
 
-  , ("(NilClass)", ann (Core.record
+  , named' "(NilClass)" :<- ann (Core.record
     -- FIXME: what should we do about multiple import edges like this
-    [ (__semantic_super, pure __semantic_global ... "Class")
-    , (__semantic_super, pure __semantic_global ... "(Object)")
-    ]))
-  , ("NilClass", ann (Core.record
-    [ (__semantic_super, pure __semantic_global ... "(NilClass)")
-    , (__semantic_super, pure __semantic_global ... "Object")
+    [ (__semantic_super, pure "Class")
+    , (__semantic_super, pure "(Object)")
+    ])
+  , named' "NilClass" :<- ann (Core.record
+    [ (__semantic_super, pure "(NilClass)")
+    , (__semantic_super, pure "Object")
     , ("nil?", lam (named' "_") (pure __semantic_global ... "true"))
     , (__semantic_truthy, lam (named' "_") (Core.bool False))
-    ]))
+    ])
 
-  , ("(TrueClass)", ann (Core.record
-    [ (__semantic_super, pure __semantic_global ... "Class")
-    , (__semantic_super, pure __semantic_global ... "(Object)")
-    ]))
-  , ("TrueClass", ann (Core.record
-    [ (__semantic_super, pure __semantic_global ... "(TrueClass)")
-    , (__semantic_super, pure __semantic_global ... "Object")
-    ]))
+  , named' "(TrueClass)" :<- ann (Core.record
+    [ (__semantic_super, pure "Class")
+    , (__semantic_super, pure "(Object)")
+    ])
+  , named' "TrueClass" :<- ann (Core.record
+    [ (__semantic_super, pure "(TrueClass)")
+    , (__semantic_super, pure "Object")
+    ])
 
-  , ("(FalseClass)", ann (Core.record
-    [ (__semantic_super, pure __semantic_global ... "Class")
-    , (__semantic_super, pure __semantic_global ... "(Object)")
-    ]))
-  , ("FalseClass", ann (Core.record
-    [ (__semantic_super, pure __semantic_global ... "(FalseClass)")
-    , (__semantic_super, pure __semantic_global ... "Object")
+  , named' "(FalseClass)" :<- ann (Core.record
+    [ (__semantic_super, pure "Class")
+    , (__semantic_super, pure "(Object)")
+    ])
+  , named' "FalseClass" :<- ann (Core.record
+    [ (__semantic_super, pure "(FalseClass)")
+    , (__semantic_super, pure "Object")
     , (__semantic_truthy, lam (named' "_") (Core.bool False))
-    ]))
+    ])
 
-  , ("nil"  , pure __semantic_global ... "NilClass"   $$$ "new")
-  , ("true" , pure __semantic_global ... "TrueClass"  $$$ "new")
-  , ("false", pure __semantic_global ... "FalseClass" $$$ "new")
+  , named' "nil"   :<- pure "NilClass"   $$$ "new"
+  , named' "true"  :<- pure "TrueClass"  $$$ "new"
+  , named' "false" :<- pure "FalseClass" $$$ "new"
 
-  , ("require", lam (named' "path") (Core.load (pure "path")))
-  ]))
+  , named' "require" :<- lam (named' "path") (Core.load (pure "path"))
+  ]
+  (Core.record (map ((,) <*> pure)
+    [ "Class"
+    , "(Object)"
+    , "Object"
+    , "(NilClass)"
+    , "NilClass"
+    , "(TrueClass)"
+    , "TrueClass"
+    , "(FalseClass)"
+    , "FalseClass"
+    , "nil"
+    , "true"
+    , "false"
+    , "require"
+
+    , "nil"
+    , "true"
+    , "false"
+
+    , "require"
+    ]))))
   where self $$$ method = annWith callStack $ named' "_x" :<- self >>>= pure "_x" ... method $$ pure "_x"
         record ... field = annWith callStack $ record Core.... field
 
