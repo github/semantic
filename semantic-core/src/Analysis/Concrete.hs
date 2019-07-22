@@ -109,7 +109,7 @@ concreteAnalysis = Analysis{..}
         apply eval (Closure loc name body parentAddr) a = do
           frameAddr <- fresh
           assign frameAddr (Obj (Frame [(Core.Lexical, parentAddr)] mempty))
-          local (const loc) . (frameAddr ...) $ do
+          local (const loc) $ frameAddr ... do
             addr <- alloc name
             assign addr a
             bind name addr
