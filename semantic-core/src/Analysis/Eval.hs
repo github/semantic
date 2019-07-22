@@ -115,7 +115,7 @@ prog4 = fromBody
 
 prog5 :: File (Term Core User)
 prog5 = fromBody
-  (    named' "mkPoint" :<- lams [named' "_x", named' "_y"] (Core.record
+  (    named' "mkPoint" :<- lams [named' "_x", named' "_y"] (record
     [ ("x", pure "_x")
     , ("y", pure "_y")
     ])
@@ -126,7 +126,7 @@ prog5 = fromBody
 prog6 :: [File (Term Core User)]
 prog6 =
   [ File (Loc "dep"  (locSpan (fromJust here))) $ record
-    [ ("dep", Core.record [ ("var", Core.bool True) ]) ]
+    [ ("dep", record [ ("var", Core.bool True) ]) ]
   , File (Loc "main" (locSpan (fromJust here))) $ block
     [ load (Core.string "dep")
     , record [ ("thing", pure "dep" Core.... pure "var") ]
@@ -135,47 +135,47 @@ prog6 =
 
 ruby :: File (Term Core User)
 ruby = fromBody . ann . rec (named' __semantic_global) $ record
-  [ ("Class", Core.record
+  [ ("Class", record
     [ (__semantic_super, pure "Object")
     , ("new", lam (named' "self")
-      (    named' "instance" :<- Core.record [ (__semantic_super, pure "self") ]
+      (    named' "instance" :<- record [ (__semantic_super, pure "self") ]
       >>>= pure "instance" $$$ "initialize"))
     ])
 
-  , ("(Object)", Core.record [ (__semantic_super, pure "Class") ])
-  , ("Object", Core.record
+  , ("(Object)", record [ (__semantic_super, pure "Class") ])
+  , ("Object", record
     [ (__semantic_super, pure "(Object)")
     , ("nil?", lam (named' "_") (pure "false"))
     , ("initialize", lam (named' "self") (pure "self"))
     , (__semantic_truthy, lam (named' "_") (Core.bool True))
     ])
 
-  , ("(NilClass)", Core.record
+  , ("(NilClass)", record
     -- FIXME: what should we do about multiple import edges like this
     [ (__semantic_super, pure "Class")
     , (__semantic_super, pure "(Object)")
     ])
-  , ("NilClass", Core.record
+  , ("NilClass", record
     [ (__semantic_super, pure "(NilClass)")
     , (__semantic_super, pure "Object")
     , ("nil?", lam (named' "_") (pure "true"))
     , (__semantic_truthy, lam (named' "_") (Core.bool False))
     ])
 
-  , ("(TrueClass)", Core.record
+  , ("(TrueClass)", record
     [ (__semantic_super, pure "Class")
     , (__semantic_super, pure "(Object)")
     ])
-  , ("TrueClass", Core.record
+  , ("TrueClass", record
     [ (__semantic_super, pure "(TrueClass)")
     , (__semantic_super, pure "Object")
     ])
 
-  , ("(FalseClass)", Core.record
+  , ("(FalseClass)", record
     [ (__semantic_super, pure "Class")
     , (__semantic_super, pure "(Object)")
     ])
-  , ("FalseClass", Core.record
+  , ("FalseClass", record
     [ (__semantic_super, pure "(FalseClass)")
     , (__semantic_super, pure "Object")
     , (__semantic_truthy, lam (named' "_") (Core.bool False))
