@@ -122,7 +122,6 @@ typecheckingAnalysis
      , Member Fresh sig
      , Member (State (Set.Set Constraint)) sig
      , Member (State (Heap User (Term Monotype Meta))) sig
-     , MonadFail m
      )
   => Analysis User (Term Monotype Meta) m
 typecheckingAnalysis = Analysis{..}
@@ -149,7 +148,7 @@ typecheckingAnalysis = Analysis{..}
         asBool b = unify (Term Bool) b >> pure True <|> pure False
         string _ = pure (Term String)
         asString s = unify (Term String) s $> mempty
-        record _ = fail "unimplemented"
+        record fields = pure (Term (Record (Map.fromList fields)))
         _ ... m = pure (Just m)
 
 
