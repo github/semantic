@@ -45,12 +45,12 @@ data Concrete
   | Unit
   | Bool Bool
   | String Text
-  | Obj Env
+  | Record Env
   deriving (Eq, Ord, Show)
 
 objectFrame :: Concrete -> Maybe Env
-objectFrame (Obj frame) = Just frame
-objectFrame _           = Nothing
+objectFrame (Record frame) = Just frame
+objectFrame _              = Nothing
 
 newtype Frame = Frame
   { frameSlots :: Env
@@ -122,7 +122,7 @@ concreteAnalysis = Analysis{..}
             addr <- alloc name
             assign addr value
             pure (name, addr)
-          pure (Obj (Map.fromList fields'))
+          pure (Record (Map.fromList fields'))
         addr ... n = do
           val <- deref addr
           heap <- get
@@ -163,7 +163,7 @@ heapGraph vertex edge h = foldr (uncurry graph) G.empty (IntMap.toList h)
           Bool _ -> G.empty
           String _ -> G.empty
           Closure _ _ _ env -> foldr (G.overlay . edge (Left Core.Lexical)) G.empty env
-          Obj frame -> foldr (G.overlay . uncurry (edge . Right)) G.empty (Map.toList frame)
+          Record frame -> foldr (G.overlay . uncurry (edge . Right)) G.empty (Map.toList frame)
 
 heapValueGraph :: Heap -> G.Graph Concrete
 heapValueGraph h = heapGraph (const id) (const fromAddr) h
@@ -184,7 +184,7 @@ addressStyle heap = (G.defaultStyle vertex) { G.edgeAttributes }
           Bool b -> pack $ show b
           String s -> pack $ show s
           Closure (Loc p (Span s e)) n _ _ -> "\\\\ " <> n <> " [" <> p <> ":" <> showPos s <> "-" <> showPos e <> "]"
-          Obj _ -> "{}"
+          Record _ -> "{}"
         showPos (Pos l c) = pack (show l) <> ":" <> pack (show c)
 
 data EdgeType
