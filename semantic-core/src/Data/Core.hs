@@ -38,6 +38,7 @@ import Control.Monad.Module
 import Data.Foldable (foldl')
 import Data.List.NonEmpty (NonEmpty (..))
 import Data.Loc
+import Data.Maybe (fromMaybe)
 import Data.Name
 import Data.Scope
 import Data.Stack
@@ -139,8 +140,9 @@ Named u n :<- a >>>= b = send (Named u a :>>= abstract1 n b)
 
 infixr 1 >>>=
 
-do' :: (Eq a, Foldable t, Carrier sig m, Member Core sig) => t (Maybe (Named a) :<- m a) -> m a -> m a
-do' bindings body = foldr (\ (n :<- a) -> maybe (a >>>) ((>>>=) . (:<- a)) n) body bindings
+do' :: (Eq a, Foldable t, Carrier sig m, Member Core sig) => t (Maybe (Named a) :<- m a) -> m a
+do' bindings = fromMaybe unit (foldr bind Nothing bindings)
+  where bind (n :<- a) v = maybe (a >>>) ((>>>=) . (:<- a)) n <$> v <|> Just a
 
 data a :<- b = a :<- b
   deriving (Eq, Ord, Show)

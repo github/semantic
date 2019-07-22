@@ -117,9 +117,9 @@ prog5 = fromBody $ ann (do'
     , ("y", ann (pure "_y"))
     ]))
   , Just (named' "point") :<- ann (ann (ann (pure "mkPoint") $$ ann (Core.bool True)) $$ ann (Core.bool False))
-  ]
-  (ann (   ann (ann (pure "point") Core.... "x")
-       >>> ann (ann (pure "point") Core.... "y") .= ann (ann (pure "point") Core.... "x"))))
+  , Nothing :<- ann (ann (pure "point") Core.... "x")
+  , Nothing :<- ann (ann (pure "point") Core.... "y") .= ann (ann (pure "point") Core.... "x")
+  ])
 
 prog6 :: [File (Term Core User)]
 prog6 =
