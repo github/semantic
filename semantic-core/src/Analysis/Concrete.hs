@@ -83,10 +83,12 @@ runFile :: ( Carrier sig m
 runFile file = traverse run file
   where run = runReader (fileLoc file)
             . runFailWithLoc
+            . runReader (mempty :: Env)
             . fix (eval concreteAnalysis)
 
 concreteAnalysis :: ( Carrier sig m
                     , Member Fresh sig
+                    , Member (Reader Env) sig
                     , Member (Reader Loc) sig
                     , Member (Reader FrameId) sig
                     , Member (State Heap) sig
@@ -95,12 +97,8 @@ concreteAnalysis :: ( Carrier sig m
                  => Analysis Precise Concrete m
 concreteAnalysis = Analysis{..}
   where alloc _ = fresh
-        bind name addr m = modifyCurrentFrame (updateFrameSlots (Map.insert name addr)) >> m
-        lookupEnv n = do
-          FrameId frameAddr <- ask
-          val <- deref frameAddr
-          heap <- get
-          pure (val >>= lookupConcrete heap n)
+        bind name addr m = local (Map.insert name addr) m
+        lookupEnv n = asks (Map.lookup n)
         deref = gets . IntMap.lookup
         assign addr value = modify (IntMap.insert addr value)
         abstract _ name body = do
@@ -135,13 +133,6 @@ concreteAnalysis = Analysis{..}
           val <- deref addr
           heap <- get
           pure (val >>= lookupConcrete heap n)
-
-        updateFrameSlots f frame = frame { frameSlots = f (frameSlots frame) }
-
-        modifyCurrentFrame f = do
-          addr <- asks unFrameId
-          Just (Obj frame) <- deref addr
-          assign addr (Obj (f frame))
 
 
 -- FIXME: follow super edges
