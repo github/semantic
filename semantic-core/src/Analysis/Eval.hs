@@ -112,11 +112,11 @@ prog4 = fromBody
 
 prog5 :: File (Term Core User)
 prog5 = fromBody $ ann (binds
-  [ named' "mkPoint" :<- lams [named' "_x", named' "_y"] (ann (Core.record
+  [ Just (named' "mkPoint") :<- lams [named' "_x", named' "_y"] (ann (Core.record
     [ ("x", ann (pure "_x"))
     , ("y", ann (pure "_y"))
     ]))
-  , named' "point" :<- ann (ann (ann (pure "mkPoint") $$ ann (Core.bool True)) $$ ann (Core.bool False))
+  , Just (named' "point") :<- ann (ann (ann (pure "mkPoint") $$ ann (Core.bool True)) $$ ann (Core.bool False))
   ]
   (ann (   ann (ann (pure "point") Core.... "x")
        >>> ann (ann (pure "point") Core.... "y") .= ann (ann (pure "point") Core.... "x"))))
