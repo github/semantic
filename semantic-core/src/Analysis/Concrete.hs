@@ -48,9 +48,9 @@ data Concrete
   | Record Env
   deriving (Eq, Ord, Show)
 
-objectFrame :: Concrete -> Maybe Env
-objectFrame (Record frame) = Just frame
-objectFrame _              = Nothing
+recordFrame :: Concrete -> Maybe Env
+recordFrame (Record frame) = Just frame
+recordFrame _              = Nothing
 
 newtype Frame = Frame
   { frameSlots :: Env
@@ -132,7 +132,7 @@ concreteAnalysis = Analysis{..}
 lookupConcrete :: Heap -> User -> Concrete -> Maybe Precise
 lookupConcrete heap name = run . evalState IntSet.empty . runNonDet . inConcrete
   where -- look up the name in a concrete value
-        inConcrete = inFrame <=< maybeA . objectFrame
+        inConcrete = inFrame <=< maybeA . recordFrame
         -- look up the name in a specific 'Frame', with slots taking precedence over parents
         inFrame fs = maybeA (Map.lookup name fs) <|> (maybeA (Map.lookup "__semantic_super" fs) >>= inAddress)
         -- look up the name in the value an address points to, if we haven’t already visited it
