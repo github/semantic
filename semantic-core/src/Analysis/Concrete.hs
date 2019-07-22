@@ -141,6 +141,7 @@ concreteAnalysis = Analysis{..}
           assign addr (Obj (f frame))
 
 
+-- FIXME: follow super edges
 lookupConcrete :: Heap -> User -> Concrete -> Maybe Precise
 lookupConcrete heap name = run . evalState IntSet.empty . runNonDet . inConcrete
   where -- look up the name in a concrete value
