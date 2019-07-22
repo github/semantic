@@ -109,7 +109,7 @@ instance RightModule Core where
 
 
 rec :: (Eq a, Carrier sig m, Member Core sig) => Named a -> m a -> m a
-rec (Named u n) b = send (Rec (Named u (bind1 n b)))
+rec (Named u n) b = send (Rec (Named u (abstract1 n b)))
 
 (>>>) :: (Carrier sig m, Member Core sig) => m a -> m a -> m a
 a >>> b = send (a :>> b)
@@ -135,7 +135,7 @@ unseqs = go
           Nothing     -> t :| []
 
 (>>>=) :: (Eq a, Carrier sig m, Member Core sig) => (Named a :<- m a) -> m a -> m a
-Named u n :<- a >>>= b = send (Named u a :>>= bind1 n b)
+Named u n :<- a >>>= b = send (Named u a :>>= abstract1 n b)
 
 infixr 1 >>>=
 
@@ -149,7 +149,7 @@ infix 2 :<-
 
 
 lam :: (Eq a, Carrier sig m, Member Core sig) => Named a -> m a -> m a
-lam (Named u n) b = send (Lam (Named u (bind1 n b)))
+lam (Named u n) b = send (Lam (Named u (abstract1 n b)))
 
 lams :: (Eq a, Foldable t, Carrier sig m, Member Core sig) => t (Named a) -> m a -> m a
 lams names body = foldr lam body names

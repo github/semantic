@@ -6,9 +6,9 @@ module Data.Scope
 , Scope(..)
 , fromScope
 , toScope
-, bind1
-, bind
-, bindEither
+, abstract1
+, abstract
+, abstractEither
 , instantiate1
 , instantiate
 , instantiateEither
@@ -86,14 +86,14 @@ toScope = Scope . fmap (fmap pure)
 
 
 -- | Bind occurrences of a variable in a term, producing a term in which the variable is bound.
-bind1 :: (Applicative f, Eq a) => a -> f a -> Scope () f a
-bind1 n = bind (guard . (== n))
+abstract1 :: (Applicative f, Eq a) => a -> f a -> Scope () f a
+abstract1 n = abstract (guard . (== n))
 
-bind :: Applicative f => (b -> Maybe a) -> f b -> Scope a f b
-bind f = bindEither (matchMaybe f)
+abstract :: Applicative f => (b -> Maybe a) -> f b -> Scope a f b
+abstract f = abstractEither (matchMaybe f)
 
-bindEither :: Applicative f => (b -> Either a c) -> f b -> Scope a f c
-bindEither f = Scope . fmap (match f) -- FIXME: succ as little of the expression as possible, cf https://twitter.com/ollfredo/status/1145776391826358273
+abstractEither :: Applicative f => (b -> Either a c) -> f b -> Scope a f c
+abstractEither f = Scope . fmap (match f) -- FIXME: succ as little of the expression as possible, cf https://twitter.com/ollfredo/status/1145776391826358273
 
 
 -- | Substitute a term for the free variable in a given term, producing a closed term.
