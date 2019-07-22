@@ -1,3 +1,4 @@
+{-# LANGUAGE TypeOperators #-}
 module Data.Core.Parser
   ( module Text.Trifecta
   , core
@@ -67,7 +68,13 @@ atom = choice
   ]
 
 comp :: (TokenParsing m, Monad m) => m (Term Core User)
-comp = braces (Core.block <$> sepEndByNonEmpty expr semi) <?> "compound statement"
+comp = braces (Core.do' <$> sepEndByNonEmpty statement semi) <?> "compound statement"
+
+statement :: (TokenParsing m, Monad m) => m (Maybe (Named User) Core.:<- Term Core User)
+statement
+  =   try ((Core.:<-) . Just <$> name <* symbol "<-" <*> expr)
+  <|> (Nothing Core.:<-) <$> expr
+  <?> "statement"
 
 ifthenelse :: (TokenParsing m, Monad m) => m (Term Core User)
 ifthenelse = Core.if'
