@@ -128,7 +128,6 @@ concreteAnalysis = Analysis{..}
           pure (Obj (Frame [(Core.Lexical, lexical)] mempty))
         -- FIXME: throw an error
         -- FIXME: support dynamic imports
-        edge e addr = modifyCurrentFrame (\ (Frame ps fs) -> Frame ((e, addr) : ps) fs)
         addr ... n = do
           val <- deref addr
           heap <- get

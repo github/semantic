@@ -150,7 +150,6 @@ typecheckingAnalysis = Analysis{..}
         string _ = pure (Term String)
         asString s = unify (Term String) s $> mempty
         frame = fail "unimplemented"
-        edge _ _ = pure ()
         _ ... m = pure (Just m)
 
 

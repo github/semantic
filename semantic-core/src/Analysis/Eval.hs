@@ -207,6 +207,5 @@ data Analysis address value m = Analysis
   , string      :: Text -> m value
   , asString    :: value -> m Text
   , frame       :: m value
-  , edge        :: Edge -> address -> m ()
   , (...)       :: address -> User -> m (Maybe address)
   }
