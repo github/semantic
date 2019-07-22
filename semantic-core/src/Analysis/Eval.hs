@@ -134,10 +134,12 @@ prog6 =
 ruby :: File (Term Core User)
 ruby = fromBody $ annWith callStack (rec (named' __semantic_global) (binds
   bindings
-  (record (map (\ (v :<- _) -> (v, var v)) bindings))))
+  (   var "Class" ... __semantic_super .= var "Object"
+  >>> record (map (\ (v :<- _) -> (v, var v)) bindings))))
   where bindings =
           [ "Class" :<- record
-            [ ("new", lam "self"
+            [ (__semantic_super, Core.record [])
+            , ("new", lam "self"
               (    "instance" :<- record [ (__semantic_super, var "self") ]
               >>>= var "instance" $$$ "initialize"))
             ]
@@ -192,10 +194,13 @@ ruby = fromBody $ annWith callStack (rec (named' __semantic_global) (binds
         record bindings = annWith callStack (Core.record bindings)
         var x = annWith callStack (pure x)
         lam v b = annWith callStack (Core.lam (named' v) b)
+        a >>> b = annWith callStack (a Core.>>> b)
+        infixr 1 >>>
         v :<- a >>>= b = annWith callStack (named' v :<- a Core.>>>= b)
         infixr 1 >>>=
         binds bindings body = foldr (>>>=) body bindings
         bool b = annWith callStack (Core.bool b)
+        a .= b = annWith callStack (a Core..= b)
 
         __semantic_global = "__semantic_global"
         __semantic_super  = "__semantic_super"
