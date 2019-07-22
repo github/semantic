@@ -25,7 +25,7 @@ import Data.Term
 -- fresh names for variables, since the length of variable names is not an
 -- interesting property as they parse regardless.
 name :: MonadGen m => m (Named User)
-name = Gen.prune ((Named . Ignored <*> id) <$> names) where
+name = Gen.prune (named' <$> names) where
   names = Gen.text (Range.linear 1 10) Gen.lower
 
 boolean :: MonadGen m => m (Term Core.Core User)
