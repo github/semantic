@@ -28,6 +28,7 @@ import qualified Data.IntSet as IntSet
 import           Data.Loc
 import qualified Data.Map as Map
 import           Data.Name
+import qualified Data.Set as Set
 import           Data.Term
 import           Data.Text (Text, pack)
 import           Data.Traversable (for)
@@ -99,7 +100,7 @@ concreteAnalysis = Analysis{..}
         assign addr value = modify (IntMap.insert addr value)
         abstract _ name body = do
           loc <- ask
-          env <- ask
+          env <- asks (flip Map.restrictKeys (Set.delete name (foldMap Set.singleton body)))
           pure (Closure loc name body env)
         apply eval (Closure loc name body env) a = do
           local (const loc) $ do
