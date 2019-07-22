@@ -81,8 +81,8 @@ data Core f a
 
 infixr 1 :>>
 infixr 1 :>>=
-infixl 9 :$
-infixl 4 :.
+infixl 8 :$
+infixl 9 :.
 infix  3 :=
 
 instance HFunctor Core
@@ -163,13 +163,13 @@ unlam _ _                                    = empty
 ($$) :: (Carrier sig m, Member Core sig) => m a -> m a -> m a
 f $$ a = send (f :$ a)
 
-infixl 9 $$
+infixl 8 $$
 
 -- | Application of a function to a sequence of arguments.
 ($$*) :: (Foldable t, Carrier sig m, Member Core sig) => m a -> t (m a) -> m a
 ($$*) = foldl' ($$)
 
-infixl 9 $$*
+infixl 8 $$*
 
 unapply :: (Alternative m, Member Core sig) => Term sig a -> m (Term sig a, Term sig a)
 unapply (Term sig) | Just (f :$ a) <- prj sig = pure (f, a)
@@ -201,7 +201,7 @@ record fs = send (Record fs)
 (...) :: (Carrier sig m, Member Core sig) => m a -> User -> m a
 a ... b = send (a :. b)
 
-infixl 4 ...
+infixl 9 ...
 
 (.=) :: (Carrier sig m, Member Core sig) => m a -> m a -> m a
 a .= b = send (a := b)
