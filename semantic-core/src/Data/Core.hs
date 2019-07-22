@@ -7,7 +7,7 @@ module Data.Core
 , (>>>)
 , block
 , (>>>=)
-, binds
+, do'
 , (:<-)(..)
 , lam
 , lams
@@ -139,8 +139,8 @@ Named u n :<- a >>>= b = send (Named u a :>>= abstract1 n b)
 
 infixr 1 >>>=
 
-binds :: (Eq a, Foldable t, Carrier sig m, Member Core sig) => t (Maybe (Named a) :<- m a) -> m a -> m a
-binds bindings body = foldr (\ (n :<- a) -> maybe (a >>>) ((>>>=) . (:<- a)) n) body bindings
+do' :: (Eq a, Foldable t, Carrier sig m, Member Core sig) => t (Maybe (Named a) :<- m a) -> m a -> m a
+do' bindings body = foldr (\ (n :<- a) -> maybe (a >>>) ((>>>=) . (:<- a)) n) body bindings
 
 data a :<- b = a :<- b
   deriving (Eq, Ord, Show)

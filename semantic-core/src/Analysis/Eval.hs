@@ -111,7 +111,7 @@ prog4 = fromBody
     (Core.bool False))
 
 prog5 :: File (Term Core User)
-prog5 = fromBody $ ann (binds
+prog5 = fromBody $ ann (do'
   [ Just (named' "mkPoint") :<- lams [named' "_x", named' "_y"] (ann (Core.record
     [ ("x", ann (pure "_x"))
     , ("y", ann (pure "_y"))
@@ -132,7 +132,7 @@ prog6 =
   ]
 
 ruby :: File (Term Core User)
-ruby = fromBody $ annWith callStack (rec (named' __semantic_global) (binds
+ruby = fromBody $ annWith callStack (rec (named' __semantic_global) (do'
   bindings
   (   var "Class" ... __semantic_super .= var "Object"
   >>> record (map (\ (v :<- _) -> (v, var v)) bindings))))
@@ -198,7 +198,7 @@ ruby = fromBody $ annWith callStack (rec (named' __semantic_global) (binds
         infixr 1 >>>
         v :<- a >>>= b = annWith callStack (named' v :<- a Core.>>>= b)
         infixr 1 >>>=
-        binds bindings body = foldr (>>>=) body bindings
+        do' bindings body = foldr (>>>=) body bindings
         bool b = annWith callStack (Core.bool b)
         a .= b = annWith callStack (a Core..= b)
 
