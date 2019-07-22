@@ -44,10 +44,10 @@ data Concrete
   | Unit
   | Bool Bool
   | String Text
-  | Obj Frame
+  | Obj Env
   deriving (Eq, Ord, Show)
 
-objectFrame :: Concrete -> Maybe Frame
+objectFrame :: Concrete -> Maybe Env
 objectFrame (Obj frame) = Just frame
 objectFrame _           = Nothing
 
@@ -120,7 +120,7 @@ concreteAnalysis = Analysis{..}
             addr <- alloc name
             assign addr value
             pure (name, addr)
-          pure (Obj (Frame (Map.fromList fields')))
+          pure (Obj (Map.fromList fields'))
         addr ... n = do
           val <- deref addr
           heap <- get
@@ -133,7 +133,7 @@ lookupConcrete heap name = run . evalState IntSet.empty . runNonDet . inConcrete
   where -- look up the name in a concrete value
         inConcrete = inFrame <=< maybeA . objectFrame
         -- look up the name in a specific 'Frame', with slots taking precedence over parents
-        inFrame (Frame fs) = maybeA (Map.lookup name fs)
+        inFrame fs = maybeA (Map.lookup name fs)
         -- look up the name in the value an address points to, if we haven’t already visited it
         _inAddress addr = do
           visited <- get
@@ -162,8 +162,7 @@ heapGraph vertex edge h = foldr (uncurry graph) G.empty (IntMap.toList h)
           Bool _ -> G.empty
           String _ -> G.empty
           Closure _ _ _ -> G.empty
-          Obj frame -> fromFrame frame
-        fromFrame (Frame ss) = foldr (G.overlay . uncurry (edge . Right)) G.empty (Map.toList ss)
+          Obj frame -> foldr (G.overlay . uncurry (edge . Right)) G.empty (Map.toList frame)
 
 heapValueGraph :: Heap -> G.Graph Concrete
 heapValueGraph h = heapGraph (const id) (const fromAddr) h
