@@ -132,7 +132,7 @@ prog6 =
   ]
 
 ruby :: File (Term Core User)
-ruby = fromBody . ann . rec (named' __semantic_global) $ Core.record
+ruby = fromBody $ ann (rec (named' __semantic_global) (Core.record
   [ ("Class", ann (Core.record
     [ (__semantic_super, pure __semantic_global ... "Object")
     , ("new", lam (named' "self")
@@ -184,7 +184,7 @@ ruby = fromBody . ann . rec (named' __semantic_global) $ Core.record
   , ("false", pure __semantic_global ... "FalseClass" $$$ "new")
 
   , ("require", lam (named' "path") (Core.load (pure "path")))
-  ]
+  ]))
   where self $$$ method = annWith callStack $ named' "_x" :<- self >>>= pure "_x" ... method $$ pure "_x"
         record ... field = annWith callStack $ record Core.... field
 
