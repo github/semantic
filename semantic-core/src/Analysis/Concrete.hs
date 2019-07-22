@@ -31,6 +31,7 @@ import           Data.Monoid (Alt(..))
 import           Data.Name
 import           Data.Term
 import           Data.Text (Text, pack)
+import           Data.Traversable (for)
 import           Prelude hiding (fail)
 
 type Precise = Int
@@ -126,6 +127,13 @@ concreteAnalysis = Analysis{..}
         frame = do
           lexical <- asks unFrameId
           pure (Obj (Frame [(Core.Lexical, lexical)] mempty))
+        record fields = do
+          lexical <- asks unFrameId
+          fields' <- for fields $ \ (name, value) -> do
+            addr <- alloc name
+            assign addr value
+            pure (name, addr)
+          pure (Obj (Frame [(Core.Lexical, lexical)] (Map.fromList fields')))
         addr ... n = do
           val <- deref addr
           heap <- get

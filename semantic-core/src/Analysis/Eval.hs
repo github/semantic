@@ -58,7 +58,7 @@ eval Analysis{..} eval = \case
       if c' then eval t else eval e
     String s -> string s
     Load p -> eval p >>= asString >> unit -- FIXME: add a load command or something
-    Record _ -> frame -- FIXME: evaluate the body of the record
+    Record fields -> traverse (traverse eval) fields >>= record
     a :. b -> do
       a' <- ref a
       a' ... b >>= maybe (freeVariable (show b)) (deref' b)
@@ -112,7 +112,7 @@ prog4 = fromBody
 
 prog5 :: File (Term Core User)
 prog5 = fromBody $ binds
-  [ named' "mkPoint" :<- lams [named' "_x", named' "_y"] (record
+  [ named' "mkPoint" :<- lams [named' "_x", named' "_y"] (Core.record
     [ ("x", pure "_x")
     , ("y", pure "_y")
     ])
@@ -123,57 +123,57 @@ prog5 = fromBody $ binds
 
 prog6 :: [File (Term Core User)]
 prog6 =
-  [ File (Loc "dep"  (locSpan (fromJust here))) $ record
-    [ ("dep", record [ ("var", Core.bool True) ]) ]
+  [ File (Loc "dep"  (locSpan (fromJust here))) $ Core.record
+    [ ("dep", Core.record [ ("var", Core.bool True) ]) ]
   , File (Loc "main" (locSpan (fromJust here))) $ block
     [ load (Core.string "dep")
-    , record [ ("thing", pure "dep" Core.... "var") ]
+    , Core.record [ ("thing", pure "dep" Core.... "var") ]
     ]
   ]
 
 ruby :: File (Term Core User)
-ruby = fromBody . ann . rec (named' __semantic_global) $ record
-  [ ("Class", record
+ruby = fromBody . ann . rec (named' __semantic_global) $ Core.record
+  [ ("Class", Core.record
     [ (__semantic_super, pure __semantic_global ... "Object")
     , ("new", lam (named' "self")
-      (    named' "instance" :<- record [ (__semantic_super, pure "self") ]
+      (    named' "instance" :<- Core.record [ (__semantic_super, pure "self") ]
       >>>= pure "instance" $$$ "initialize"))
     ])
 
-  , ("(Object)", record [ (__semantic_super, pure __semantic_global ... "Class") ])
-  , ("Object", record
+  , ("(Object)", Core.record [ (__semantic_super, pure __semantic_global ... "Class") ])
+  , ("Object", Core.record
     [ (__semantic_super, pure __semantic_global ... "(Object)")
     , ("nil?", lam (named' "_") (pure __semantic_global ... "false"))
     , ("initialize", lam (named' "self") (pure "self"))
     , (__semantic_truthy, lam (named' "_") (Core.bool True))
     ])
 
-  , ("(NilClass)", record
+  , ("(NilClass)", Core.record
     -- FIXME: what should we do about multiple import edges like this
     [ (__semantic_super, pure __semantic_global ... "Class")
     , (__semantic_super, pure __semantic_global ... "(Object)")
     ])
-  , ("NilClass", record
+  , ("NilClass", Core.record
     [ (__semantic_super, pure __semantic_global ... "(NilClass)")
     , (__semantic_super, pure __semantic_global ... "Object")
     , ("nil?", lam (named' "_") (pure __semantic_global ... "true"))
     , (__semantic_truthy, lam (named' "_") (Core.bool False))
     ])
 
-  , ("(TrueClass)", record
+  , ("(TrueClass)", Core.record
     [ (__semantic_super, pure __semantic_global ... "Class")
     , (__semantic_super, pure __semantic_global ... "(Object)")
     ])
-  , ("TrueClass", record
+  , ("TrueClass", Core.record
     [ (__semantic_super, pure __semantic_global ... "(TrueClass)")
     , (__semantic_super, pure __semantic_global ... "Object")
     ])
 
-  , ("(FalseClass)", record
+  , ("(FalseClass)", Core.record
     [ (__semantic_super, pure __semantic_global ... "Class")
     , (__semantic_super, pure __semantic_global ... "(Object)")
     ])
-  , ("FalseClass", record
+  , ("FalseClass", Core.record
     [ (__semantic_super, pure __semantic_global ... "(FalseClass)")
     , (__semantic_super, pure __semantic_global ... "Object")
     , (__semantic_truthy, lam (named' "_") (Core.bool False))
@@ -207,5 +207,6 @@ data Analysis address value m = Analysis
   , string      :: Text -> m value
   , asString    :: value -> m Text
   , frame       :: m value
+  , record      :: [(User, value)] -> m value
   , (...)       :: address -> User -> m (Maybe address)
   }
