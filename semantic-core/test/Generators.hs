@@ -6,6 +6,7 @@ module Generators
   , variable
   , boolean
   , lambda
+  , record
   , apply
   , ifthenelse
   ) where
@@ -50,8 +51,11 @@ lambda bod = do
   arg <- name
   Gen.subterm bod (Core.lam arg)
 
+record :: MonadGen m => m (Term Core.Core User) -> m (Term Core.Core User)
+record bod = Core.record <$> Gen.list (Range.linear 0 5) ((,) . namedValue <$> name <*> bod)
+
 atoms :: MonadGen m => [m (Term Core.Core User)]
 atoms = [boolean, variable, pure Core.unit]
 
 literal :: MonadGen m => m (Term Core.Core User)
-literal = Gen.recursive Gen.choice atoms [lambda literal]
+literal = Gen.recursive Gen.choice atoms [lambda literal, record literal]
