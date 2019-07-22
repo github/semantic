@@ -79,12 +79,6 @@ assert_unicode_lambda_parse = "λa → a" `parsesInto` lam (named' "a") a
 assert_quoted_name_parse :: Assertion
 assert_quoted_name_parse = "#{(NilClass)}" `parsesInto` pure "(NilClass)"
 
-assert_let_dot_precedence :: Assertion
-assert_let_dot_precedence = "let a = f.g.h" `parsesInto` (let' "a" .= (f ... g ... h))
-
-assert_let_in_push_precedence :: Assertion
-assert_let_in_push_precedence = "f.let g = h" `parsesInto` (f ... (let' "g" .= h))
-
 parserSpecs :: TestTree
 parserSpecs = testGroup "Parsing: simple specs"
   [ testCase "true/false" assert_booleans_parse
@@ -95,8 +89,6 @@ parserSpecs = testGroup "Parsing: simple specs"
   , testCase "lambda with ASCII syntax" assert_ascii_lambda_parse
   , testCase "lambda with unicode syntax" assert_unicode_lambda_parse
   , testCase "quoted names" assert_quoted_name_parse
-  , testCase "let + dot precedence" assert_let_dot_precedence
-  , testCase "let in push" assert_let_in_push_precedence
   ]
 
 assert_roundtrips :: File (Term Core User) -> Assertion
