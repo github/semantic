@@ -133,79 +133,61 @@ prog6 =
 
 ruby :: File (Term Core User)
 ruby = fromBody $ annWith callStack (rec (named' __semantic_global) (binds
-  [ named' "Class" :<- ann (Core.record
-    [ ("new", lam (named' "self")
-      (    named' "instance" :<- Core.record [ (__semantic_super, pure "self") ]
-      >>>= pure "instance" $$$ "initialize"))
-    ])
+  bindings
+  (Core.record (map (\ (Named _ v :<- _) -> (v, pure v)) bindings))))
+  where bindings =
+          [ named' "Class" :<- ann (Core.record
+            [ ("new", lam (named' "self")
+              (    named' "instance" :<- Core.record [ (__semantic_super, pure "self") ]
+              >>>= pure "instance" $$$ "initialize"))
+            ])
 
-  , named' "(Object)" :<- ann (Core.record [ (__semantic_super, pure "Class") ])
-  , named' "Object" :<- ann (Core.record
-    [ (__semantic_super, pure "(Object)")
-    , ("nil?", lam (named' "_") (pure __semantic_global ... "false"))
-    , ("initialize", lam (named' "self") (pure "self"))
-    , (__semantic_truthy, lam (named' "_") (Core.bool True))
-    ])
+          , named' "(Object)" :<- ann (Core.record [ (__semantic_super, pure "Class") ])
+          , named' "Object" :<- ann (Core.record
+            [ (__semantic_super, pure "(Object)")
+            , ("nil?", lam (named' "_") (pure __semantic_global ... "false"))
+            , ("initialize", lam (named' "self") (pure "self"))
+            , (__semantic_truthy, lam (named' "_") (Core.bool True))
+            ])
 
-  , named' "(NilClass)" :<- ann (Core.record
-    -- FIXME: what should we do about multiple import edges like this
-    [ (__semantic_super, pure "Class")
-    , (__semantic_super, pure "(Object)")
-    ])
-  , named' "NilClass" :<- ann (Core.record
-    [ (__semantic_super, pure "(NilClass)")
-    , (__semantic_super, pure "Object")
-    , ("nil?", lam (named' "_") (pure __semantic_global ... "true"))
-    , (__semantic_truthy, lam (named' "_") (Core.bool False))
-    ])
+          , named' "(NilClass)" :<- ann (Core.record
+            -- FIXME: what should we do about multiple import edges like this
+            [ (__semantic_super, pure "Class")
+            , (__semantic_super, pure "(Object)")
+            ])
+          , named' "NilClass" :<- ann (Core.record
+            [ (__semantic_super, pure "(NilClass)")
+            , (__semantic_super, pure "Object")
+            , ("nil?", lam (named' "_") (pure __semantic_global ... "true"))
+            , (__semantic_truthy, lam (named' "_") (Core.bool False))
+            ])
 
-  , named' "(TrueClass)" :<- ann (Core.record
-    [ (__semantic_super, pure "Class")
-    , (__semantic_super, pure "(Object)")
-    ])
-  , named' "TrueClass" :<- ann (Core.record
-    [ (__semantic_super, pure "(TrueClass)")
-    , (__semantic_super, pure "Object")
-    ])
+          , named' "(TrueClass)" :<- ann (Core.record
+            [ (__semantic_super, pure "Class")
+            , (__semantic_super, pure "(Object)")
+            ])
+          , named' "TrueClass" :<- ann (Core.record
+            [ (__semantic_super, pure "(TrueClass)")
+            , (__semantic_super, pure "Object")
+            ])
 
-  , named' "(FalseClass)" :<- ann (Core.record
-    [ (__semantic_super, pure "Class")
-    , (__semantic_super, pure "(Object)")
-    ])
-  , named' "FalseClass" :<- ann (Core.record
-    [ (__semantic_super, pure "(FalseClass)")
-    , (__semantic_super, pure "Object")
-    , (__semantic_truthy, lam (named' "_") (Core.bool False))
-    ])
+          , named' "(FalseClass)" :<- ann (Core.record
+            [ (__semantic_super, pure "Class")
+            , (__semantic_super, pure "(Object)")
+            ])
+          , named' "FalseClass" :<- ann (Core.record
+            [ (__semantic_super, pure "(FalseClass)")
+            , (__semantic_super, pure "Object")
+            , (__semantic_truthy, lam (named' "_") (Core.bool False))
+            ])
 
-  , named' "nil"   :<- pure "NilClass"   $$$ "new"
-  , named' "true"  :<- pure "TrueClass"  $$$ "new"
-  , named' "false" :<- pure "FalseClass" $$$ "new"
+          , named' "nil"   :<- pure "NilClass"   $$$ "new"
+          , named' "true"  :<- pure "TrueClass"  $$$ "new"
+          , named' "false" :<- pure "FalseClass" $$$ "new"
 
-  , named' "require" :<- lam (named' "path") (Core.load (pure "path"))
-  ]
-  (Core.record (map ((,) <*> pure)
-    [ "Class"
-    , "(Object)"
-    , "Object"
-    , "(NilClass)"
-    , "NilClass"
-    , "(TrueClass)"
-    , "TrueClass"
-    , "(FalseClass)"
-    , "FalseClass"
-    , "nil"
-    , "true"
-    , "false"
-    , "require"
-
-    , "nil"
-    , "true"
-    , "false"
-
-    , "require"
-    ]))))
-  where self $$$ method = annWith callStack $ named' "_x" :<- self >>>= pure "_x" ... method $$ pure "_x"
+          , named' "require" :<- lam (named' "path") (Core.load (pure "path"))
+          ]
+        self $$$ method = annWith callStack $ named' "_x" :<- self >>>= pure "_x" ... method $$ pure "_x"
         record ... field = annWith callStack $ record Core.... field
 
         __semantic_global = "__semantic_global"
