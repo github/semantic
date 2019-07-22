@@ -157,7 +157,7 @@ ruby = fromBody . ann . block $
       ]))))
 
   , ann (let' "(Object)" .= Core.frame)
-  , ann (pure "(Object)" Core.... ann (Core.edge Import (pure ("Class"))))
+  , ann (pure "(Object)" Core.... ann (Core.edge Import (pure "Class")))
   , ann (let' "Object" .= Core.frame)
   , ann (pure "Object" Core.... block
     [ ann (Core.edge Import (pure "(Object)"))
