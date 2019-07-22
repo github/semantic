@@ -54,6 +54,8 @@ data Core f a
   -- | Sequencing without binding; analogous to '>>' or '*>'.
   | f a :>> f a
   -- | Sequencing with binding; analogous to '>>='.
+  --
+  --   Bindings made with :>>= are sequential, i.e. the name is not bound within the value, only within the consequence.
   | Named (f a) :>>= Scope () f a
   | Lam (Named (Scope () f a))
   -- | Function application; analogous to '$'.
