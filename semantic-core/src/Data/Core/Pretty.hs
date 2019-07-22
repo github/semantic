@@ -82,7 +82,7 @@ prettyCore style = run . runReader @Prec 0 . go
 
             Named (Ignored x) a :>>= b -> do
               prec <- ask @Prec
-              fore <- with 12 (go a)
+              fore <- with 11 (go a)
               aft  <- with 12 (go (instantiate1 (pure x) b))
 
               let open  = symbol ("{" <> softline)
