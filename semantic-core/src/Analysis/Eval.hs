@@ -134,7 +134,7 @@ prog6 =
   ]
 
 ruby :: File (Term Core User)
-ruby = fromBody . ann $ record
+ruby = fromBody . ann . rec (named' __semantic_global) $ record
   [ ("Class", Core.record
     [ (__semantic_super, pure "Object")
     , ("new", lam (named' "self")
@@ -189,6 +189,7 @@ ruby = fromBody . ann $ record
   ]
   where self $$$ method = annWith callStack $ lam (named' "_x") (pure "_x" Core.... pure method $$ pure "_x") $$ self
 
+        __semantic_global = "__semantic_global"
         __semantic_super  = "__semantic_super"
         __semantic_truthy = "__semantic_truthy"
 
