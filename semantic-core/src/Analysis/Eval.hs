@@ -136,58 +136,59 @@ prog6 =
 ruby :: File (Term Core User)
 ruby = fromBody . ann . rec (named' __semantic_global) $ record
   [ ("Class", record
-    [ (__semantic_super, pure "Object")
+    [ (__semantic_super, pure __semantic_global ... "Object")
     , ("new", lam (named' "self")
       (    named' "instance" :<- record [ (__semantic_super, pure "self") ]
       >>>= pure "instance" $$$ "initialize"))
     ])
 
-  , ("(Object)", record [ (__semantic_super, pure "Class") ])
+  , ("(Object)", record [ (__semantic_super, pure __semantic_global ... "Class") ])
   , ("Object", record
-    [ (__semantic_super, pure "(Object)")
-    , ("nil?", lam (named' "_") (pure "false"))
+    [ (__semantic_super, pure __semantic_global ... "(Object)")
+    , ("nil?", lam (named' "_") (pure __semantic_global ... "false"))
     , ("initialize", lam (named' "self") (pure "self"))
     , (__semantic_truthy, lam (named' "_") (Core.bool True))
     ])
 
   , ("(NilClass)", record
     -- FIXME: what should we do about multiple import edges like this
-    [ (__semantic_super, pure "Class")
-    , (__semantic_super, pure "(Object)")
+    [ (__semantic_super, pure __semantic_global ... "Class")
+    , (__semantic_super, pure __semantic_global ... "(Object)")
     ])
   , ("NilClass", record
-    [ (__semantic_super, pure "(NilClass)")
-    , (__semantic_super, pure "Object")
-    , ("nil?", lam (named' "_") (pure "true"))
+    [ (__semantic_super, pure __semantic_global ... "(NilClass)")
+    , (__semantic_super, pure __semantic_global ... "Object")
+    , ("nil?", lam (named' "_") (pure __semantic_global ... "true"))
     , (__semantic_truthy, lam (named' "_") (Core.bool False))
     ])
 
   , ("(TrueClass)", record
-    [ (__semantic_super, pure "Class")
-    , (__semantic_super, pure "(Object)")
+    [ (__semantic_super, pure __semantic_global ... "Class")
+    , (__semantic_super, pure __semantic_global ... "(Object)")
     ])
   , ("TrueClass", record
-    [ (__semantic_super, pure "(TrueClass)")
-    , (__semantic_super, pure "Object")
+    [ (__semantic_super, pure __semantic_global ... "(TrueClass)")
+    , (__semantic_super, pure __semantic_global ... "Object")
     ])
 
   , ("(FalseClass)", record
-    [ (__semantic_super, pure "Class")
-    , (__semantic_super, pure "(Object)")
+    [ (__semantic_super, pure __semantic_global ... "Class")
+    , (__semantic_super, pure __semantic_global ... "(Object)")
     ])
   , ("FalseClass", record
-    [ (__semantic_super, pure "(FalseClass)")
-    , (__semantic_super, pure "Object")
+    [ (__semantic_super, pure __semantic_global ... "(FalseClass)")
+    , (__semantic_super, pure __semantic_global ... "Object")
     , (__semantic_truthy, lam (named' "_") (Core.bool False))
     ])
 
-  , ("nil"  , pure "NilClass"   $$$ "new")
-  , ("true" , pure "TrueClass"  $$$ "new")
-  , ("false", pure "FalseClass" $$$ "new")
+  , ("nil"  , pure __semantic_global ... "NilClass"   $$$ "new")
+  , ("true" , pure __semantic_global ... "TrueClass"  $$$ "new")
+  , ("false", pure __semantic_global ... "FalseClass" $$$ "new")
 
   , ("require", lam (named' "path") (Core.load (pure "path")))
   ]
-  where self $$$ method = annWith callStack $ lam (named' "_x") (pure "_x" Core.... pure method $$ pure "_x") $$ self
+  where self $$$ method = annWith callStack $ lam (named' "_x") (pure "_x" ... method $$ pure "_x") $$ self
+        record ... field = annWith callStack $ record Core.... pure field
 
         __semantic_global = "__semantic_global"
         __semantic_super  = "__semantic_super"
