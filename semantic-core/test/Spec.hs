@@ -68,7 +68,7 @@ assert_application_left_associative :: Assertion
 assert_application_left_associative = "f g h" `parsesInto` (f $$ g $$ h)
 
 assert_push_left_associative :: Assertion
-assert_push_left_associative = "f.g.h" `parsesInto` (f ... g ... h)
+assert_push_left_associative = "f.g.h" `parsesInto` (f ... "g" ... "h")
 
 assert_ascii_lambda_parse :: Assertion
 assert_ascii_lambda_parse = "\\a -> a" `parsesInto` lam (named' "a") a
