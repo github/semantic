@@ -91,7 +91,7 @@ eval Analysis{..} eval = \case
 
 
 prog1 :: File (Term Core User)
-prog1 = fromBody $ lam' "foo"
+prog1 = fromBody $ lam (named' "foo")
   (    named' "bar" :<- pure "foo"
   >>>= Core.if' (pure "bar")
     (Core.bool False)
@@ -101,11 +101,10 @@ prog2 :: File (Term Core User)
 prog2 = fromBody $ fileBody prog1 $$ Core.bool True
 
 prog3 :: File (Term Core User)
-prog3 = fromBody $ lams' [foo, bar, quux]
-  (Core.if' (pure quux)
-    (pure bar)
-    (pure foo))
-  where (foo, bar, quux) = ("foo", "bar", "quux")
+prog3 = fromBody $ lams [named' "foo", named' "bar", named' "quux"]
+  (Core.if' (pure "quux")
+    (pure "bar")
+    (pure "foo"))
 
 prog4 :: File (Term Core User)
 prog4 = fromBody
@@ -116,7 +115,7 @@ prog4 = fromBody
 
 prog5 :: File (Term Core User)
 prog5 = fromBody
-  (    named' "mkPoint" :<- lams' ["_x", "_y"] (Core.record
+  (    named' "mkPoint" :<- lams [named' "_x", named' "_y"] (Core.record
     [ ("x", pure "_x")
     , ("y", pure "_y")
     ])
@@ -138,7 +137,7 @@ ruby :: File (Term Core User)
 ruby = fromBody . ann $ record
   [ ("Class", Core.record
     [ (__semantic_super, pure "Object")
-    , ("new", lam' "self"
+    , ("new", lam (named' "self")
       (    named' "instance" :<- Core.record [ (__semantic_super, pure "self") ]
       >>>= pure "instance" $$$ "initialize"))
     ])
@@ -146,9 +145,9 @@ ruby = fromBody . ann $ record
   , ("(Object)", Core.record [ (__semantic_super, pure "Class") ])
   , ("Object", Core.record
     [ (__semantic_super, pure "(Object)")
-    , ("nil?", lam' "_" (pure "false"))
-    , ("initialize", lam' "self" (pure "self"))
-    , (__semantic_truthy, lam' "_" (Core.bool True))
+    , ("nil?", lam (named' "_") (pure "false"))
+    , ("initialize", lam (named' "self") (pure "self"))
+    , (__semantic_truthy, lam (named' "_") (Core.bool True))
     ])
 
   , ("(NilClass)", Core.record
@@ -159,8 +158,8 @@ ruby = fromBody . ann $ record
   , ("NilClass", Core.record
     [ (__semantic_super, pure "(NilClass)")
     , (__semantic_super, pure "Object")
-    , ("nil?", lam' "_" (pure "true"))
-    , (__semantic_truthy, lam' "_" (Core.bool False))
+    , ("nil?", lam (named' "_") (pure "true"))
+    , (__semantic_truthy, lam (named' "_") (Core.bool False))
     ])
 
   , ("(TrueClass)", Core.record
@@ -179,16 +178,16 @@ ruby = fromBody . ann $ record
   , ("FalseClass", Core.record
     [ (__semantic_super, pure "(FalseClass)")
     , (__semantic_super, pure "Object")
-    , (__semantic_truthy, lam' "_" (Core.bool False))
+    , (__semantic_truthy, lam (named' "_") (Core.bool False))
     ])
 
   , ("nil"  , pure "NilClass"   $$$ "new")
   , ("true" , pure "TrueClass"  $$$ "new")
   , ("false", pure "FalseClass" $$$ "new")
 
-  , ("require", lam' "path" (Core.load (pure "path")))
+  , ("require", lam (named' "path") (Core.load (pure "path")))
   ]
-  where self $$$ method = annWith callStack $ lam' "_x" (pure "_x" Core.... pure method $$ pure "_x") $$ self
+  where self $$$ method = annWith callStack $ lam (named' "_x") (pure "_x" Core.... pure method $$ pure "_x") $$ self
 
         __semantic_super  = "__semantic_super"
         __semantic_truthy = "__semantic_truthy"

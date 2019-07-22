@@ -9,9 +9,7 @@ module Data.Core
 , (>>>=)
 , (:<-)(..)
 , lam
-, lam'
 , lams
-, lams'
 , unlam
 , unseq
 , unseqs
@@ -147,14 +145,8 @@ infix 2 :<-
 lam :: (Eq a, Carrier sig m, Member Core sig) => Named a -> m a -> m a
 lam (Named u n) b = send (Lam (Named u (bind1 n b)))
 
-lam' :: (Carrier sig m, Member Core sig) => User -> m User -> m User
-lam' u = lam (named' u)
-
 lams :: (Eq a, Foldable t, Carrier sig m, Member Core sig) => t (Named a) -> m a -> m a
 lams names body = foldr lam body names
-
-lams' :: (Foldable t, Carrier sig m, Member Core sig) => t User -> m User -> m User
-lams' names body = foldr lam' body names
 
 unlam :: (Alternative m, Member Core sig, RightModule sig) => a -> Term sig a -> m (Named a, Term sig a)
 unlam n (Term sig) | Just (Lam b) <- prj sig = pure (n <$ b, instantiate1 (pure n) (namedValue b))
