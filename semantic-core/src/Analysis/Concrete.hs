@@ -94,7 +94,7 @@ concreteAnalysis :: ( Carrier sig m
                  => Analysis Precise Concrete m
 concreteAnalysis = Analysis{..}
   where alloc _ = fresh
-        bind name addr = modifyCurrentFrame (updateFrameSlots (Map.insert name addr))
+        bind name addr m = modifyCurrentFrame (updateFrameSlots (Map.insert name addr)) >> m
         lookupEnv n = do
           FrameId frameAddr <- ask
           val <- deref frameAddr
@@ -112,8 +112,7 @@ concreteAnalysis = Analysis{..}
           local (const loc) . local (const (FrameId frameAddr)) $ do
             addr <- alloc name
             assign addr a
-            bind name addr
-            eval body
+            bind name addr (eval body)
         apply _ f _ = fail $ "Cannot coerce " <> show f <> " to function"
         unit = pure Unit
         bool b = pure (Bool b)

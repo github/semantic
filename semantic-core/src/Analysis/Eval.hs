@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, LambdaCase, OverloadedStrings, RecordWildCards #-}
+{-# LANGUAGE FlexibleContexts, LambdaCase, OverloadedStrings, RankNTypes, RecordWildCards #-}
 module Analysis.Eval
 ( eval
 , prog1
@@ -38,16 +38,14 @@ eval Analysis{..} eval = \case
   Term c -> case c of
     Rec (Named (Ignored n) b) -> do
       addr <- alloc n
-      bind n addr
-      v <- eval (instantiate1 (pure n) b)
+      v <- bind n addr (eval (instantiate1 (pure n) b))
       v <$ assign addr v
     a :>> b -> eval a >> eval b
     Named (Ignored n) a :>>= b -> do
       a' <- eval a
       addr <- alloc n
-      bind n addr
       assign addr a'
-      eval (instantiate1 (pure n) b)
+      bind n addr (eval (instantiate1 (pure n) b))
     Lam (Named (Ignored n) b) -> abstract eval n (instantiate1 (pure n) b)
     f :$ a -> do
       f' <- eval f
@@ -197,7 +195,7 @@ ruby = fromBody . ann . rec (named' __semantic_global) $ record
 
 data Analysis address value m = Analysis
   { alloc       :: User -> m address
-  , bind        :: User -> address -> m ()
+  , bind        :: forall a . User -> address -> m a -> m a
   , lookupEnv   :: User -> m (Maybe address)
   , deref       :: address -> m (Maybe value)
   , assign      :: address -> value -> m ()

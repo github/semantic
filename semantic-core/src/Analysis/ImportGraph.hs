@@ -80,7 +80,7 @@ importGraphAnalysis :: ( Alternative m
                     => Analysis User Value m
 importGraphAnalysis = Analysis{..}
   where alloc = pure
-        bind _ _ = pure ()
+        bind _ _ m = m
         lookupEnv = pure . Just
         deref addr = gets (Map.lookup addr) >>= maybe (pure Nothing) (foldMapA (pure . Just)) . nonEmpty . maybe [] Set.toList
         assign addr ty = modify (Map.insertWith (<>) addr (Set.singleton ty))
@@ -91,8 +91,7 @@ importGraphAnalysis = Analysis{..}
         apply eval (Value (Closure loc name body _) _) a = local (const loc) $ do
           addr <- alloc name
           assign addr a
-          bind name addr
-          eval body
+          bind name addr (eval body)
         apply _ f _ = fail $ "Cannot coerce " <> show f <> " to function"
         unit = pure mempty
         bool _ = pure mempty

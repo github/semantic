@@ -127,7 +127,7 @@ typecheckingAnalysis
   => Analysis User (Term Monotype Meta) m
 typecheckingAnalysis = Analysis{..}
   where alloc = pure
-        bind _ _ = pure ()
+        bind _ _ m = m
         lookupEnv = pure . Just
         deref addr = gets (Map.lookup addr) >>= maybe (pure Nothing) (foldMapA (pure . Just)) . nonEmpty . maybe [] Set.toList
         assign addr ty = modify (Map.insertWith (<>) addr (Set.singleton ty))
