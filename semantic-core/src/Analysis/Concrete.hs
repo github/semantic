@@ -127,15 +127,14 @@ concreteAnalysis = Analysis{..}
           pure (val >>= lookupConcrete heap n)
 
 
--- FIXME: follow super edges
 lookupConcrete :: Heap -> User -> Concrete -> Maybe Precise
 lookupConcrete heap name = run . evalState IntSet.empty . runNonDet . inConcrete
   where -- look up the name in a concrete value
         inConcrete = inFrame <=< maybeA . objectFrame
         -- look up the name in a specific 'Frame', with slots taking precedence over parents
-        inFrame fs = maybeA (Map.lookup name fs)
+        inFrame fs = maybeA (Map.lookup name fs) <|> (maybeA (Map.lookup "__semantic_super" fs) >>= inAddress)
         -- look up the name in the value an address points to, if we haven’t already visited it
-        _inAddress addr = do
+        inAddress addr = do
           visited <- get
           guard (addr `IntSet.notMember` visited)
           -- FIXME: throw an error if we can’t deref @addr@
