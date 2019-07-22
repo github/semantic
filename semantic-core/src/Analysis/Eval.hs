@@ -114,14 +114,15 @@ prog4 = fromBody
     (Core.bool False))
 
 prog5 :: File (Term Core User)
-prog5 = fromBody
-  (    named' "mkPoint" :<- lams [named' "_x", named' "_y"] (record
+prog5 = fromBody $ binds
+  [ named' "mkPoint" :<- lams [named' "_x", named' "_y"] (record
     [ ("x", pure "_x")
     , ("y", pure "_y")
     ])
-  >>>= named' "point" :<- pure "mkPoint" $$ Core.bool True $$ Core.bool False
-  >>>= pure "point" Core.... pure "x"
-  >>>  pure "point" Core.... pure "y" .= pure "point" Core.... pure "x")
+  , named' "point" :<- pure "mkPoint" $$ Core.bool True $$ Core.bool False
+  ]
+  (   pure "point" Core.... pure "x"
+  >>> pure "point" Core.... pure "y" .= pure "point" Core.... pure "x")
 
 prog6 :: [File (Term Core User)]
 prog6 =

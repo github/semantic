@@ -7,6 +7,7 @@ module Data.Core
 , (>>>)
 , block
 , (>>>=)
+, binds
 , (:<-)(..)
 , lam
 , lams
@@ -135,6 +136,9 @@ unseqs = go
 Named u n :<- a >>>= b = send (Named u a :>>= bind1 n b)
 
 infixr 1 >>>=
+
+binds :: (Eq a, Foldable t, Carrier sig m, Member Core sig) => t (Named a :<- m a) -> m a -> m a
+binds bindings body = foldr (>>>=) body bindings
 
 data a :<- b = a :<- b
   deriving (Eq, Ord, Show)
