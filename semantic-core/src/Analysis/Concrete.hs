@@ -115,8 +115,6 @@ concreteAnalysis = Analysis{..}
         string s = pure (String s)
         asString (String s) = pure s
         asString v          = fail $ "Cannot coerce " <> show v <> " to String"
-        -- FIXME: differential inheritance (reference fields instead of copying)
-        -- FIXME: copy non-lexical parents deeply?
         record fields = do
           fields' <- for fields $ \ (name, value) -> do
             addr <- alloc name
