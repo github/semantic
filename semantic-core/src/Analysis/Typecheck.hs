@@ -73,7 +73,7 @@ instance RightModule Polytype where
 
 
 forAll :: (Eq a, Carrier sig m, Member Polytype sig) => a -> m a -> m a
-forAll n body = send (PForAll (Data.Scope.bind1 n body))
+forAll n body = send (PForAll (bind1 n body))
 
 forAlls :: (Eq a, Carrier sig m, Member Polytype sig, Foldable t) => t a -> m a -> m a
 forAlls ns body = foldr forAll body ns
