@@ -187,7 +187,7 @@ ruby = fromBody . ann . rec (named' __semantic_global) $ record
 
   , ("require", lam (named' "path") (Core.load (pure "path")))
   ]
-  where self $$$ method = annWith callStack $ lam (named' "_x") (pure "_x" ... method $$ pure "_x") $$ self
+  where self $$$ method = annWith callStack $ named' "_x" :<- self >>>= pure "_x" ... method $$ pure "_x"
         record ... field = annWith callStack $ record Core.... pure field
 
         __semantic_global = "__semantic_global"
