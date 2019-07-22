@@ -126,8 +126,6 @@ concreteAnalysis = Analysis{..}
         frame = do
           lexical <- asks unFrameId
           pure (Obj (Frame [(Core.Lexical, lexical)] mempty))
-        -- FIXME: throw an error
-        -- FIXME: support dynamic imports
         addr ... n = do
           val <- deref addr
           heap <- get
