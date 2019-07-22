@@ -9,6 +9,7 @@ module Generators
   , record
   , apply
   , ifthenelse
+  , expr
   ) where
 
 import Prelude hiding (span)
@@ -59,3 +60,14 @@ atoms = [boolean, variable, pure Core.unit]
 
 literal :: MonadGen m => m (Term Core.Core User)
 literal = Gen.recursive Gen.choice atoms [lambda literal, record literal]
+
+expr :: MonadGen m => m (Term Core.Core User)
+expr = Gen.recursive Gen.choice atoms
+  [ lambda expr
+  , record expr
+  , Gen.subterm2 expr expr (Core.$$)
+  , Gen.subterm3 expr expr expr Core.if'
+  , Gen.subterm2 expr expr (Core.>>>)
+  , Gen.subtermM2 expr expr (\ x y -> (Core.>>>= y) . (Core.:<- x) <$> name)
+  , Gen.subtermM expr (\ x -> (x Core....) . namedValue <$> name)
+  ]

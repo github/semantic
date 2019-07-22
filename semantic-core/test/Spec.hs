@@ -41,6 +41,7 @@ parserProps = testGroup "Parsing: roundtripping"
   , testProperty "if/then/else" . prop_roundtrips . Gen.ifthenelse $ Gen.variable
   , testProperty "lambda" . prop_roundtrips $ Gen.lambda Gen.literal
   , testProperty "function application" . prop_roundtrips $ Gen.apply Gen.variable
+  , testProperty "expressions" . prop_roundtrips $ Gen.expr
   ]
 
 -- * Parser specs
