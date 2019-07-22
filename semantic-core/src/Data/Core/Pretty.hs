@@ -113,8 +113,6 @@ prettyCore style = run . runReader @Prec 0 . go
               pure $ Pretty.sep [con', tru', fal']
 
             Load p   -> "load" `appending` go p
-            Edge Lexical n -> "lexical" `appending` go n
-            Edge Import n -> "import" `appending` go n
             item :. body   -> inParens 4 $ do
               f <- go item
               g <- go body

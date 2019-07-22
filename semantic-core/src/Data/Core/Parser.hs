@@ -10,7 +10,7 @@ module Data.Core.Parser
 
 import           Control.Applicative
 import qualified Data.Char as Char
-import           Data.Core (Core, Edge(..))
+import           Data.Core (Core)
 import qualified Data.Core as Core
 import           Data.Name
 import           Data.String
@@ -82,10 +82,7 @@ assign :: (TokenParsing m, Monad m) => m (Term Core User)
 assign = (Core..=) <$> try (lvalue <* symbolic '=') <*> core <?> "assignment"
 
 edge :: (TokenParsing m, Monad m) => m (Term Core User)
-edge = kw <*> expr where kw = choice [ Core.edge Lexical <$ reserved "lexical"
-                                     , Core.edge Import  <$ reserved "import"
-                                     , Core.load         <$ reserved "load"
-                                     ]
+edge = Core.load <$ reserved "load" <*> expr
 
 lvalue :: (TokenParsing m, Monad m) => m (Term Core User)
 lvalue = choice

@@ -23,7 +23,6 @@ module Data.Core
 , if'
 , string
 , load
-, edge
 , record
 , (...)
 , (.=)
@@ -65,7 +64,6 @@ data Core f a
   | String Text
   -- | Load the specified file (by path).
   | Load (f a)
-  | Edge Edge (f a)
   -- | A record mapping some keys to some values.
   | Record [(User, f a)]
   -- | Projection from a record.
@@ -99,7 +97,6 @@ instance RightModule Core where
   If c t e   >>=* f = If (c >>= f) (t >>= f) (e >>= f)
   String s   >>=* _ = String s
   Load b     >>=* f = Load (b >>= f)
-  Edge e b   >>=* f = Edge e (b >>= f)
   Record fs  >>=* f = Record (map (fmap (>>= f)) fs)
   (a :. b)   >>=* f = (a >>= f) :. (b >>= f)
   (a := b)   >>=* f = (a >>= f) := (b >>= f)
@@ -190,9 +187,6 @@ string = send . String
 
 load :: (Carrier sig m, Member Core sig) => m a -> m a
 load = send . Load
-
-edge :: (Carrier sig m, Member Core sig) => Edge -> m a -> m a
-edge e b = send (Edge e b)
 
 record :: (Carrier sig m, Member Core sig) => [(User, m a)] -> m a
 record fs = send (Record fs)
