@@ -40,7 +40,7 @@ newtype FrameId = FrameId { unFrameId :: Precise }
   deriving (Eq, Ord, Show)
 
 data Concrete
-  = Closure Loc User (Term Core.Core User)
+  = Closure Loc User (Term Core.Core User) Env
   | Unit
   | Bool Bool
   | String Text
@@ -99,12 +99,13 @@ concreteAnalysis = Analysis{..}
         assign addr value = modify (IntMap.insert addr value)
         abstract _ name body = do
           loc <- ask
-          pure (Closure loc name body)
-        apply eval (Closure loc name body) a = do
+          env <- ask
+          pure (Closure loc name body env)
+        apply eval (Closure loc name body env) a = do
           local (const loc) $ do
             addr <- alloc name
             assign addr a
-            bind name addr (eval body)
+            local (const (Map.insert name addr env)) (eval body)
         apply _ f _ = fail $ "Cannot coerce " <> show f <> " to function"
         unit = pure Unit
         bool b = pure (Bool b)
@@ -160,7 +161,7 @@ heapGraph vertex edge h = foldr (uncurry graph) G.empty (IntMap.toList h)
           Unit -> G.empty
           Bool _ -> G.empty
           String _ -> G.empty
-          Closure _ _ _ -> G.empty
+          Closure _ _ _ env -> foldr (G.overlay . edge (Left Core.Lexical)) G.empty env
           Obj frame -> foldr (G.overlay . uncurry (edge . Right)) G.empty (Map.toList frame)
 
 heapValueGraph :: Heap -> G.Graph Concrete
@@ -181,7 +182,7 @@ addressStyle heap = (G.defaultStyle vertex) { G.edgeAttributes }
           Unit ->  "()"
           Bool b -> pack $ show b
           String s -> pack $ show s
-          Closure (Loc p (Span s e)) n _ -> "\\\\ " <> n <> " [" <> p <> ":" <> showPos s <> "-" <> showPos e <> "]"
+          Closure (Loc p (Span s e)) n _ _ -> "\\\\ " <> n <> " [" <> p <> ":" <> showPos s <> "-" <> showPos e <> "]"
           Obj _ -> "{}"
         showPos (Pos l c) = pack (show l) <> ":" <> pack (show c)
 
