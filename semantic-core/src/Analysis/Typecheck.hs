@@ -149,7 +149,6 @@ typecheckingAnalysis = Analysis{..}
         asBool b = unify (Term Bool) b >> pure True <|> pure False
         string _ = pure (Term String)
         asString s = unify (Term String) s $> mempty
-        frame = fail "unimplemented"
         record _ = fail "unimplemented"
         _ ... m = pure (Just m)
 

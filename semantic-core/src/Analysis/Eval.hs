@@ -206,7 +206,6 @@ data Analysis address value m = Analysis
   , asBool      :: value -> m Bool
   , string      :: Text -> m value
   , asString    :: value -> m Text
-  , frame       :: m value
   , record      :: [(User, value)] -> m value
   , (...)       :: address -> User -> m (Maybe address)
   }

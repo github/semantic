@@ -124,9 +124,6 @@ concreteAnalysis = Analysis{..}
         asString v          = fail $ "Cannot coerce " <> show v <> " to String"
         -- FIXME: differential inheritance (reference fields instead of copying)
         -- FIXME: copy non-lexical parents deeply?
-        frame = do
-          lexical <- asks unFrameId
-          pure (Obj (Frame [(Core.Lexical, lexical)] mempty))
         record fields = do
           lexical <- asks unFrameId
           fields' <- for fields $ \ (name, value) -> do

@@ -99,6 +99,5 @@ importGraphAnalysis = Analysis{..}
         string s = pure (Value (String s) mempty)
         asString (Value (String s) _) = pure s
         asString _ = pure mempty
-        frame = pure mempty
         record fields = pure (Value Abstract (foldMap (valueGraph . snd) fields))
         _ ... m = pure (Just m)
