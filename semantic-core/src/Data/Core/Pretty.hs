@@ -14,7 +14,7 @@ import           Data.File
 import           Data.Name
 import           Data.Scope
 import           Data.Term
-import           Data.Text.Prettyprint.Doc (Pretty (..), annotate, softline, (<+>))
+import           Data.Text.Prettyprint.Doc (Pretty (..), annotate, (<+>), vsep)
 import qualified Data.Text.Prettyprint.Doc as Pretty
 import qualified Data.Text.Prettyprint.Doc.Render.String as Pretty
 import qualified Data.Text.Prettyprint.Doc.Render.Terminal as Pretty
@@ -58,7 +58,13 @@ inParens :: (Member (Reader Prec) sig, Carrier sig m) => Prec -> m AnsiDoc -> m 
 inParens amount go = do
   prec <- ask
   body <- with amount go
-  pure (encloseIf (amount >= prec) (symbol "(") (symbol ")") body)
+  pure (if amount > prec then Pretty.parens body else body)
+
+inBraces :: (Member (Reader Prec) sig, Carrier sig m) => Prec -> m AnsiDoc -> m AnsiDoc
+inBraces amount go = do
+  prec <- ask
+  body <- with amount go
+  pure (if amount > prec then Pretty.braces body else body)
 
 prettyCore :: Style -> Term Core User -> AnsiDoc
 prettyCore style = run . runReader @Prec 0 . go
@@ -68,29 +74,17 @@ prettyCore style = run . runReader @Prec 0 . go
             Rec b -> inParens 11 $ do
               (x, body) <- bind b
               pure (keyword "rec" <+> name x <+> symbol "=" <+> body)
-            a :>> b -> do
-              prec <- ask @Prec
+            a :>> b -> inBraces 12 $ do
               fore <- with 12 (go a)
               aft  <- with 12 (go b)
 
-              let open  = symbol ("{" <> softline)
-                  close = symbol (softline <> "}")
-                  separator = ";" <> Pretty.line
-                  body = fore <> separator <> aft
+              pure $ vsep [ fore <> Pretty.semi, aft ]
 
-              pure . Pretty.align $ encloseIf (12 > prec) open close (Pretty.align body)
-
-            Named (Ignored x) a :>>= b -> do
-              prec <- ask @Prec
+            Named (Ignored x) a :>>= b -> inBraces 12 $ do
               fore <- with 11 (go a)
               aft  <- with 12 (go (instantiate1 (pure x) b))
 
-              let open  = symbol ("{" <> softline)
-                  close = symbol (softline <> "}")
-                  separator = ";" <> Pretty.line
-                  body = name x <+> arrowL <+> fore <> separator <> aft
-
-              pure . Pretty.align $ encloseIf (12 > prec) open close (Pretty.align body)
+              pure $ vsep [ name x <+> arrowL <+> fore <> Pretty.semi, aft ]
 
             Lam f -> inParens 11 $ do
               (x, body) <- bind f
