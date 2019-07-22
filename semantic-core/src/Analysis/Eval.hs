@@ -125,10 +125,10 @@ prog6 :: [File (Term Core User)]
 prog6 =
   [ File (Loc "dep"  (locSpan (fromJust here))) $ Core.record
     [ ("dep", Core.record [ ("var", Core.bool True) ]) ]
-  , File (Loc "main" (locSpan (fromJust here))) $ block
+  , File (Loc "main" (locSpan (fromJust here))) $ do' (map (Nothing :<-)
     [ load (Core.string "dep")
     , Core.record [ ("thing", pure "dep" Core.... "var") ]
-    ]
+    ])
   ]
 
 ruby :: File (Term Core User)
