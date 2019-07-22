@@ -41,7 +41,7 @@ newtype FrameId = FrameId { unFrameId :: Precise }
   deriving (Eq, Ord, Show)
 
 data Concrete
-  = Closure Loc User (Term Core.Core User) Precise
+  = Closure Loc User (Term Core.Core User)
   | Unit
   | Bool Bool
   | String Text
@@ -75,7 +75,6 @@ concrete
 runFile :: ( Carrier sig m
            , Effect sig
            , Member Fresh sig
-           , Member (Reader FrameId) sig
            , Member (State Heap) sig
            )
         => File (Term Core.Core User)
@@ -90,7 +89,6 @@ concreteAnalysis :: ( Carrier sig m
                     , Member Fresh sig
                     , Member (Reader Env) sig
                     , Member (Reader Loc) sig
-                    , Member (Reader FrameId) sig
                     , Member (State Heap) sig
                     , MonadFail m
                     )
@@ -103,12 +101,9 @@ concreteAnalysis = Analysis{..}
         assign addr value = modify (IntMap.insert addr value)
         abstract _ name body = do
           loc <- ask
-          FrameId parentAddr <- ask
-          pure (Closure loc name body parentAddr)
-        apply eval (Closure loc name body parentAddr) a = do
-          frameAddr <- fresh
-          assign frameAddr (Obj (Frame [(Core.Lexical, parentAddr)] mempty))
-          local (const loc) . local (const (FrameId frameAddr)) $ do
+          pure (Closure loc name body)
+        apply eval (Closure loc name body) a = do
+          local (const loc) $ do
             addr <- alloc name
             assign addr a
             bind name addr (eval body)
@@ -123,12 +118,11 @@ concreteAnalysis = Analysis{..}
         -- FIXME: differential inheritance (reference fields instead of copying)
         -- FIXME: copy non-lexical parents deeply?
         record fields = do
-          lexical <- asks unFrameId
           fields' <- for fields $ \ (name, value) -> do
             addr <- alloc name
             assign addr value
             pure (name, addr)
-          pure (Obj (Frame [(Core.Lexical, lexical)] (Map.fromList fields')))
+          pure (Obj (Frame [] (Map.fromList fields')))
         addr ... n = do
           val <- deref addr
           heap <- get
@@ -153,10 +147,8 @@ lookupConcrete heap name = run . evalState IntSet.empty . runNonDet . inConcrete
         maybeA = maybe empty pure
 
 
-runHeap :: (Carrier sig m, Member Fresh sig) => ReaderC FrameId (StateC Heap m) a -> m (Heap, a)
-runHeap m = do
-  addr <- fresh
-  runState (IntMap.singleton addr (Obj (Frame [] mempty))) (runReader (FrameId addr) m)
+runHeap :: StateC Heap m a -> m (Heap, a)
+runHeap = runState mempty
 
 
 -- | 'heapGraph', 'heapValueGraph', and 'heapAddressGraph' allow us to conveniently export SVGs of the heap:
@@ -171,7 +163,7 @@ heapGraph vertex edge h = foldr (uncurry graph) G.empty (IntMap.toList h)
           Unit -> G.empty
           Bool _ -> G.empty
           String _ -> G.empty
-          Closure _ _ _ parentAddr -> edge (Left Core.Lexical) parentAddr
+          Closure _ _ _ -> G.empty
           Obj frame -> fromFrame frame
         fromFrame (Frame es ss) = foldr (G.overlay . uncurry (edge . Left)) (foldr (G.overlay . uncurry (edge . Right)) G.empty (Map.toList ss)) es
 
@@ -193,7 +185,7 @@ addressStyle heap = (G.defaultStyle vertex) { G.edgeAttributes }
           Unit ->  "()"
           Bool b -> pack $ show b
           String s -> pack $ show s
-          Closure (Loc p (Span s e)) n _ _ -> "\\\\ " <> n <> " [" <> p <> ":" <> showPos s <> "-" <> showPos e <> "]"
+          Closure (Loc p (Span s e)) n _ -> "\\\\ " <> n <> " [" <> p <> ":" <> showPos s <> "-" <> showPos e <> "]"
           Obj _ -> "{}"
         showPos (Pos l c) = pack (show l) <> ":" <> pack (show c)
 
