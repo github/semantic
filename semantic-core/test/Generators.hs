@@ -51,7 +51,7 @@ lambda bod = do
   Gen.subterm bod (lam arg)
 
 atoms :: MonadGen m => [m (Term Core User)]
-atoms = [boolean, variable, pure unit, pure frame]
+atoms = [boolean, variable, pure unit]
 
 literal :: MonadGen m => m (Term Core User)
 literal = Gen.recursive Gen.choice atoms [lambda literal]
