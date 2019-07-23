@@ -64,7 +64,7 @@ prettyCore style = run . runReader @Prec 0 . go . fmap name
           Term t -> case t of
             Rec (Named (Ignored x) b) -> inParens 11 $ do
               body <- go (instantiate1 (pure (name x)) b)
-              pure (keyword "rec" <+> name x <+> symbol "=" <+> body)
+              pure . group . nest 2 $ vsep [ keyword "rec" <+> name x, symbol "=" <+> align body ]
 
             Lam (Named (Ignored x) b) -> inParens 0 $ do
               body <- with 1 (go (instantiate1 (pure (name x)) b))
