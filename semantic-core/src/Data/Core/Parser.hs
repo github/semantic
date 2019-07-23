@@ -64,7 +64,7 @@ projection = foldl' (Core....) <$> atom <*> many (namedValue <$> (dot *> name))
 atom :: (TokenParsing m, Monad m) => m (Term Core User)
 atom = choice
   [ comp
-  , edge
+  , load
   , lit
   , ident
   , parens expr
@@ -89,8 +89,8 @@ ifthenelse = Core.if'
 rec :: (TokenParsing m, Monad m) => m (Term Core User)
 rec = Core.rec <$ reserved "rec" <*> name <* symbolic '=' <*> expr <?> "recursive binding"
 
-edge :: (TokenParsing m, Monad m) => m (Term Core User)
-edge = Core.load <$ reserved "load" <*> expr
+load :: (TokenParsing m, Monad m) => m (Term Core User)
+load = Core.load <$ reserved "load" <*> expr
 
 lvalue :: (TokenParsing m, Monad m) => m (Term Core User)
 lvalue = choice
