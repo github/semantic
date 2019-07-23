@@ -5,6 +5,8 @@ module Data.Core
 , Edge(..)
 , rec
 , (>>>)
+, unseq
+, unseqs
 , (>>>=)
 , unbind
 , do'
@@ -12,8 +14,6 @@ module Data.Core
 , lam
 , lams
 , unlam
-, unseq
-, unseqs
 , ($$)
 , ($$*)
 , unapply
