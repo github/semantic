@@ -114,7 +114,7 @@ lit = let x `given` n = x <$ reserved n in choice
   ] <?> "literal"
 
 record :: (TokenParsing m, Monad m) => m (Term Core User)
-record = Core.record <$ reserved "#record" <*> braces (sepEndBy ((,) <$> identifier <* symbolic ':' <*> core) semi)
+record = Core.record <$ reserved "#record" <*> braces (sepEndBy ((,) <$> identifier <* symbolic ':' <*> core) comma)
 
 lambda :: (TokenParsing m, Monad m) => m (Term Core User)
 lambda = Core.lam <$ lambduh <*> name <* arrow <*> core <?> "lambda" where

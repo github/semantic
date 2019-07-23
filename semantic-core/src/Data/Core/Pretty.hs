@@ -72,7 +72,7 @@ prettyCore style = run . runReader @Prec 0 . go . fmap name
 
             Record fs -> do
               fs' <- for fs $ \ (x, v) -> (name x <+> symbol ":" <+>) <$> go v
-              pure . group . nest 2 $ vsep [ primitive "record", block fs' ]
+              pure . group . nest 2 $ vsep [ primitive "record", block ", " fs' ]
 
             Unit     -> pure $ primitive "unit"
             Bool b   -> pure $ primitive (if b then "true" else "false")
@@ -103,9 +103,9 @@ prettyCore style = run . runReader @Prec 0 . go . fmap name
                   statements = toList (bindings :> (Nothing :<- return))
                   names = zipWith (\ i (n :<- _) -> maybe (pretty @Int i) (name . namedName) n) [0..] statements
               statements' <- traverse (prettyStatement names) statements
-              pure (block statements')
-        block [] = braces mempty
-        block ss = encloseSep "{ " " }" semi ss
+              pure (block "; " statements')
+        block _ [] = braces mempty
+        block s ss = encloseSep "{ " " }" s ss
         prettyStatement names (Just (Named (Ignored u) _) :<- t) = (name u <+> arrowL <+>) <$> go (either (names !!) id <$> t)
         prettyStatement names (Nothing                    :<- t) = go (either (names !!) id <$> t)
         lambda = case style of
@@ -117,7 +117,6 @@ prettyCore style = run . runReader @Prec 0 . go . fmap name
         arrowL = case style of
           Unicode -> symbol "←"
           Ascii   -> symbol "<-"
-        semi = "; "
 
 
 appending :: Functor f => AnsiDoc -> f AnsiDoc -> f AnsiDoc
