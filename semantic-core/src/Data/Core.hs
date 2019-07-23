@@ -2,7 +2,6 @@
              ScopedTypeVariables, StandaloneDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Data.Core
 ( Core(..)
-, Edge(..)
 , rec
 , (>>>)
 , unseq
@@ -49,9 +48,6 @@ import Data.Term
 import Data.Text (Text)
 import GHC.Generics (Generic1)
 import GHC.Stack
-
-data Edge = Lexical | Import
-  deriving (Eq, Ord, Show)
 
 data Core f a
   -- | Recursive local binding of a name in a scope; strict evaluation of the name in the body will diverge.

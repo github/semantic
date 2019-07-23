@@ -59,6 +59,9 @@ newtype Frame = Frame
 
 type Heap = IntMap.IntMap Concrete
 
+data Edge = Lexical | Import
+  deriving (Eq, Ord, Show)
+
 
 -- | Concrete evaluation of a term to a value.
 --
@@ -153,14 +156,14 @@ runHeap = runState mempty
 --   > λ let (heap, res) = concrete [ruby]
 --   > λ writeFile "/Users/rob/Desktop/heap.dot" (export (addressStyle heap) (heapAddressGraph heap))
 --   > λ :!dot -Tsvg < ~/Desktop/heap.dot > ~/Desktop/heap.svg
-heapGraph :: (Precise -> Concrete -> a) -> (Either Core.Edge User -> Precise -> G.Graph a) -> Heap -> G.Graph a
+heapGraph :: (Precise -> Concrete -> a) -> (Either Edge User -> Precise -> G.Graph a) -> Heap -> G.Graph a
 heapGraph vertex edge h = foldr (uncurry graph) G.empty (IntMap.toList h)
   where graph k v rest = (G.vertex (vertex k v) `G.connect` outgoing v) `G.overlay` rest
         outgoing = \case
           Unit -> G.empty
           Bool _ -> G.empty
           String _ -> G.empty
-          Closure _ _ _ env -> foldr (G.overlay . edge (Left Core.Lexical)) G.empty env
+          Closure _ _ _ env -> foldr (G.overlay . edge (Left Lexical)) G.empty env
           Record frame -> foldr (G.overlay . uncurry (edge . Right)) G.empty (Map.toList frame)
 
 heapValueGraph :: Heap -> G.Graph Concrete
@@ -173,10 +176,10 @@ heapAddressGraph = heapGraph (\ addr v -> (Value v, addr)) (fmap G.vertex . (,) 
 addressStyle :: Heap -> G.Style (EdgeType, Precise) Text
 addressStyle heap = (G.defaultStyle vertex) { G.edgeAttributes }
   where vertex (_, addr) = pack (show addr) <> " = " <> maybe "?" fromConcrete (IntMap.lookup addr heap)
-        edgeAttributes _ (Slot name,         _) = ["label" G.:= name]
-        edgeAttributes _ (Edge Core.Import,  _) = ["color" G.:= "blue"]
-        edgeAttributes _ (Edge Core.Lexical, _) = ["color" G.:= "green"]
-        edgeAttributes _ _                      = []
+        edgeAttributes _ (Slot name,    _) = ["label" G.:= name]
+        edgeAttributes _ (Edge Import,  _) = ["color" G.:= "blue"]
+        edgeAttributes _ (Edge Lexical, _) = ["color" G.:= "green"]
+        edgeAttributes _ _                 = []
         fromConcrete = \case
           Unit ->  "()"
           Bool b -> pack $ show b
@@ -186,7 +189,7 @@ addressStyle heap = (G.defaultStyle vertex) { G.edgeAttributes }
         showPos (Pos l c) = pack (show l) <> ":" <> pack (show c)
 
 data EdgeType
-  = Edge Core.Edge
+  = Edge Edge
   | Slot User
   | Value Concrete
   deriving (Eq, Ord, Show)
