@@ -49,7 +49,7 @@ prettyCore style = precBody . go . fmap name
   where go = \case
           Var v -> atom v
           Term t -> case t of
-            Rec (Named (Ignored x) b) -> prec 11 . group . nest 2 $ vsep
+            Rec (Named (Ignored x) b) -> prec 3 . group . nest 2 $ vsep
               [ keyword "rec" <+> name x
               , symbol "=" <+> align (withPrec 0 (go (instantiate1 (pure (name x)) b)))
               ]

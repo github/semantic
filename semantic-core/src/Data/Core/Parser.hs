@@ -50,7 +50,7 @@ core :: (TokenParsing m, Monad m) => m (Term Core User)
 core = expr
 
 expr :: (TokenParsing m, Monad m) => m (Term Core User)
-expr = ifthenelse <|> lambda <|> assign
+expr = ifthenelse <|> lambda <|> rec <|> assign
 
 assign :: (TokenParsing m, Monad m) => m (Term Core User)
 assign = application <**> (flip (Core..=) <$ symbolic '=' <*> application <|> pure id) <?> "assignment"
@@ -67,7 +67,6 @@ atom = choice
   , edge
   , lit
   , ident
-  , rec
   , parens expr
   ]
 
