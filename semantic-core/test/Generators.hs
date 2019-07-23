@@ -63,7 +63,8 @@ literal = Gen.recursive Gen.choice atoms [lambda literal, record literal]
 
 expr :: MonadGen m => m (Term Core.Core User)
 expr = Gen.recursive Gen.choice atoms
-  [ lambda expr
+  [ Gen.subtermM expr (\x -> flip Core.rec x <$> name)
+  , lambda expr
   , record expr
   , Gen.subterm2 expr expr (Core.$$)
   , Gen.subterm3 expr expr expr Core.if'
