@@ -11,8 +11,10 @@ module Data.Core.Pretty
 import           Control.Effect.Reader
 import           Data.Core
 import           Data.File
+import           Data.Foldable (toList)
 import           Data.Name
 import           Data.Scope
+import           Data.Stack
 import           Data.Term
 import           Data.Text.Prettyprint.Doc
 import qualified Data.Text.Prettyprint.Doc.Render.String as Pretty
@@ -55,15 +57,6 @@ inParens amount go = do
   body <- with amount go
   pure (if prec > amount then parens body else body)
 
-inBraces :: (Member (Reader Prec) sig, Carrier sig m) => Prec -> m AnsiDoc -> m AnsiDoc
-inBraces amount go = do
-  prec <- ask
-  body <- with amount go
-  pure (if prec > amount then braces (pad body) else body)
-
-pad :: Doc a -> Doc a
-pad = enclose space space
-
 prettyCore :: Style -> Term Core User -> AnsiDoc
 prettyCore style = run . runReader @Prec 0 . go . fmap name
   where go = \case
@@ -72,17 +65,6 @@ prettyCore style = run . runReader @Prec 0 . go . fmap name
             Rec (Named (Ignored x) b) -> inParens 11 $ do
               body <- go (instantiate1 (pure (name x)) b)
               pure (keyword "rec" <+> name x <+> symbol "=" <+> body)
-            a :>> b -> inBraces 1 $ do
-              fore <- with 1 (go a)
-              aft  <- with 1 (go b)
-
-              pure . group . nest 2 $ vsep [ fore, semi <> aft ]
-
-            Named (Ignored x) a :>>= b -> inBraces 1 $ do
-              fore <- with 2 (go a)
-              aft  <- with 1 (go (instantiate1 (pure (name x)) b))
-
-              pure . group . nest 2 $ vsep [ name x <+> arrowL <+> fore, semi <> aft ]
 
             Lam (Named (Ignored x) b) -> inParens 0 $ do
               body <- with 1 (go (instantiate1 (pure (name x)) b))
@@ -116,6 +98,14 @@ prettyCore style = run . runReader @Prec 0 . go . fmap name
 
             -- Annotations are not pretty-printed, as it lowers the signal/noise ratio too profoundly.
             Ann _ c -> go c
+            statement -> do
+              let (bindings, return) = unstatements (Term statement)
+                  statements = toList (bindings :> (Nothing :<- return))
+                  names = zipWith (\ i (n :<- _) -> maybe (pretty @Int i) (name . namedName) n) [0..] statements
+              statements' <- traverse (prettyStatement names) statements
+              pure (encloseSep "{ " " }" semi statements')
+        prettyStatement names (Just (Named (Ignored u) _) :<- t) = (name u <+> arrowL <+>) <$> go (either (names !!) id <$> t)
+        prettyStatement names (Nothing                    :<- t) = go (either (names !!) id <$> t)
         lambda = case style of
           Unicode -> symbol "λ"
           Ascii   -> symbol "\\"
