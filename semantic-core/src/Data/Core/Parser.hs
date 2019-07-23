@@ -53,10 +53,10 @@ expr :: (TokenParsing m, Monad m) => m (Term Core User)
 expr = application
 
 application :: (TokenParsing m, Monad m) => m (Term Core User)
-application = prj `chainl1` (pure (Core.$$))
+application = projection `chainl1` (pure (Core.$$))
 
-prj :: (TokenParsing m, Monad m) => m (Term Core User)
-prj = foldl' (Core....) <$> atom <*> many (namedValue <$> (dot *> name))
+projection :: (TokenParsing m, Monad m) => m (Term Core User)
+projection = foldl' (Core....) <$> atom <*> many (namedValue <$> (dot *> name))
 
 atom :: (TokenParsing m, Monad m) => m (Term Core User)
 atom = choice
@@ -97,7 +97,7 @@ edge = Core.load <$ reserved "load" <*> expr
 
 lvalue :: (TokenParsing m, Monad m) => m (Term Core User)
 lvalue = choice
-  [ prj
+  [ projection
   , ident
   , parens expr
   ]
