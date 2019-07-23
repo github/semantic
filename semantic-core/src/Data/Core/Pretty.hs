@@ -69,8 +69,8 @@ prettyCore style = run . runReader @Prec 0 . go
   where go = \case
           Var v -> pure (name v)
           Term t -> case t of
-            Rec b -> inParens 11 $ do
-              (x, body) <- bind b
+            Rec (Named (Ignored x) b) -> inParens 11 $ do
+              body <- go (instantiate1 (pure x) b)
               pure (keyword "rec" <+> name x <+> symbol "=" <+> body)
             a :>> b -> inBraces 1 $ do
               fore <- with 1 (go a)
@@ -116,7 +116,6 @@ prettyCore style = run . runReader @Prec 0 . go
 
             -- Annotations are not pretty-printed, as it lowers the signal/noise ratio too profoundly.
             Ann _ c -> go c
-          where bind (Named (Ignored x) f) = (,) x <$> go (instantiate1 (pure x) f)
         lambda = case style of
           Unicode -> symbol "λ"
           Ascii   -> symbol "\\"
