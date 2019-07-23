@@ -54,8 +54,8 @@ prettyCore style = precBody . go . fmap name
               , symbol "=" <+> align (withPrec 0 (go (instantiate1 (pure (name x)) b)))
               ]
 
-            Lam (Named (Ignored x) b) -> prec 0 . group . nest 2 $ vsep
-              [ lambda <> name x, arrow <+> withPrec 0 (go (instantiate1 (pure (name x)) b)) ]
+            Lam (Named (Ignored x) b) -> prec 3 . group . nest 2 $ vsep
+              [ lambda <> name x, arrow <+> withPrec 3 (go (instantiate1 (pure (name x)) b)) ]
 
             Record fs -> atom . group . nest 2 $ vsep [ primitive "record", block ", " (map (uncurry keyValue) fs) ]
 
@@ -65,7 +65,7 @@ prettyCore style = precBody . go . fmap name
 
             f :$ x -> prec 8 (withPrec 8 (go f) <+> withPrec 9 (go x))
 
-            If con tru fal -> prec 8 . group $ vsep
+            If con tru fal -> prec 3 . group $ vsep
               [ keyword "if"   <+> precBody (go con)
               , keyword "then" <+> precBody (go tru)
               , keyword "else" <+> precBody (go fal)
