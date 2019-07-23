@@ -55,7 +55,7 @@ withPrec n = local (const (Prec n))
 inParens :: (Member (Reader Prec) sig, Carrier sig m) => Int -> m AnsiDoc -> m AnsiDoc
 inParens amount go = do
   prec <- ask
-  body <- withPrec amount go
+  body <- go
   pure (if prec > Prec amount then parens body else body)
 
 prettyCore :: Style -> Term Core User -> AnsiDoc
