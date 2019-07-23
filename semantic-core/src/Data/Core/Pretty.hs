@@ -65,12 +65,12 @@ pad :: Doc a -> Doc a
 pad = enclose space space
 
 prettyCore :: Style -> Term Core User -> AnsiDoc
-prettyCore style = run . runReader @Prec 0 . go
+prettyCore style = run . runReader @Prec 0 . go . fmap name
   where go = \case
-          Var v -> pure (name v)
+          Var v -> pure v
           Term t -> case t of
             Rec (Named (Ignored x) b) -> inParens 11 $ do
-              body <- go (instantiate1 (pure x) b)
+              body <- go (instantiate1 (pure (name x)) b)
               pure (keyword "rec" <+> name x <+> symbol "=" <+> body)
             a :>> b -> inBraces 1 $ do
               fore <- with 1 (go a)
@@ -80,12 +80,12 @@ prettyCore style = run . runReader @Prec 0 . go
 
             Named (Ignored x) a :>>= b -> inBraces 1 $ do
               fore <- with 2 (go a)
-              aft  <- with 1 (go (instantiate1 (pure x) b))
+              aft  <- with 1 (go (instantiate1 (pure (name x)) b))
 
               pure . group . nest 2 $ vsep [ name x <+> arrowL <+> fore, semi <> aft ]
 
             Lam (Named (Ignored x) b) -> inParens 0 $ do
-              body <- with 1 (go (instantiate1 (pure x) b))
+              body <- with 1 (go (instantiate1 (pure (name x)) b))
               pure (lambda <> name x <+> arrow <+> body)
 
             Record fs -> do
