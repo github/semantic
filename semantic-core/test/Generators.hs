@@ -70,4 +70,5 @@ expr = Gen.recursive Gen.choice atoms
   , Gen.subterm2 expr expr (Core.>>>)
   , Gen.subtermM2 expr expr (\ x y -> (Core.>>>= y) . (Core.:<- x) <$> name)
   , Gen.subtermM expr (\ x -> (x Core....) . namedValue <$> name)
+  , Gen.subterm2 expr expr (Core..=)
   ]
