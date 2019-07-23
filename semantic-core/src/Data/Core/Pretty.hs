@@ -14,14 +14,13 @@ import           Data.File
 import           Data.Name
 import           Data.Scope
 import           Data.Term
-import           Data.Text.Prettyprint.Doc (Pretty (..), annotate, (<+>), vsep)
-import qualified Data.Text.Prettyprint.Doc as Pretty
+import           Data.Text.Prettyprint.Doc
 import qualified Data.Text.Prettyprint.Doc.Render.String as Pretty
 import qualified Data.Text.Prettyprint.Doc.Render.Terminal as Pretty
 import           Data.Traversable (for)
 
 showCore :: Term Core User -> String
-showCore = Pretty.renderString . Pretty.layoutSmart Pretty.defaultLayoutOptions . Pretty.unAnnotate . prettyCore Ascii
+showCore = Pretty.renderString . layoutSmart defaultLayoutOptions . unAnnotate . prettyCore Ascii
 
 printCore :: Term Core User -> IO ()
 printCore p = Pretty.putDoc (prettyCore Unicode p) *> putStrLn ""
@@ -32,7 +31,7 @@ showFile = showCore . fileBody
 printFile :: File (Term Core User) -> IO ()
 printFile = printCore . fileBody
 
-type AnsiDoc = Pretty.Doc Pretty.AnsiStyle
+type AnsiDoc = Doc Pretty.AnsiStyle
 
 keyword, symbol, strlit, primitive :: AnsiDoc -> AnsiDoc
 keyword = annotate (Pretty.colorDull Pretty.Cyan)
@@ -58,13 +57,13 @@ inParens :: (Member (Reader Prec) sig, Carrier sig m) => Prec -> m AnsiDoc -> m 
 inParens amount go = do
   prec <- ask
   body <- with amount go
-  pure (if prec > amount then Pretty.parens body else body)
+  pure (if prec > amount then parens body else body)
 
 inBraces :: (Member (Reader Prec) sig, Carrier sig m) => Prec -> m AnsiDoc -> m AnsiDoc
 inBraces amount go = do
   prec <- ask
   body <- with amount go
-  pure (if prec > amount then Pretty.braces body else body)
+  pure (if prec > amount then braces body else body)
 
 prettyCore :: Style -> Term Core User -> AnsiDoc
 prettyCore style = run . runReader @Prec 0 . go
@@ -78,13 +77,13 @@ prettyCore style = run . runReader @Prec 0 . go
               fore <- with 1 (go a)
               aft  <- with 1 (go b)
 
-              pure $ vsep [ fore <> Pretty.semi, aft ]
+              pure $ vsep [ fore <> semi, aft ]
 
             Named (Ignored x) a :>>= b -> inBraces 1 $ do
               fore <- with 2 (go a)
               aft  <- with 1 (go (instantiate1 (pure x) b))
 
-              pure $ vsep [ name x <+> arrowL <+> fore <> Pretty.semi, aft ]
+              pure $ vsep [ name x <+> arrowL <+> fore <> semi, aft ]
 
             Lam (Named (Ignored x) b) -> inParens 0 $ do
               body <- with 1 (go (instantiate1 (pure x) b))
@@ -92,11 +91,11 @@ prettyCore style = run . runReader @Prec 0 . go
 
             Record fs -> do
               fs' <- for fs $ \ (x, v) -> (name x <+> symbol "=" <+>) <$> go v
-              pure $ primitive "record" <+> Pretty.encloseSep Pretty.lbrace Pretty.rbrace Pretty.semi fs'
+              pure $ primitive "record" <+> encloseSep lbrace rbrace semi fs'
 
             Unit     -> pure $ primitive "unit"
             Bool b   -> pure $ primitive (if b then "true" else "false")
-            String s -> pure . strlit $ Pretty.viaShow s
+            String s -> pure . strlit $ viaShow s
 
             f :$ x -> inParens 8 $ (<+>) <$> go f <*> with 9 (go x)
 
@@ -104,7 +103,7 @@ prettyCore style = run . runReader @Prec 0 . go
               con' <- "if"   `appending` go con
               tru' <- "then" `appending` go tru
               fal' <- "else" `appending` go fal
-              pure $ Pretty.sep [con', tru', fal']
+              pure $ sep [con', tru', fal']
 
             Load p   -> "load" `appending` go p
             item :. body -> inParens 9 $ do
