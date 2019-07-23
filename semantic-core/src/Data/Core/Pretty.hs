@@ -41,24 +41,25 @@ symbol  = annotate (Pretty.color     Pretty.Yellow)
 strlit  = annotate (Pretty.colorDull Pretty.Green)
 primitive = keyword . mappend "#"
 
-type Prec = Int
+newtype Prec = Prec { unPrec :: Int }
+  deriving (Eq, Ord, Show)
 
 data Style = Unicode | Ascii
 
 name :: User -> AnsiDoc
 name n = if needsQuotation n then enclose (symbol "#{") (symbol "}") (pretty n) else pretty n
 
-with :: (Member (Reader Prec) sig, Carrier sig m) => Prec -> m a -> m a
-with n = local (const n)
+with :: (Member (Reader Prec) sig, Carrier sig m) => Int -> m a -> m a
+with n = local (const (Prec n))
 
-inParens :: (Member (Reader Prec) sig, Carrier sig m) => Prec -> m AnsiDoc -> m AnsiDoc
+inParens :: (Member (Reader Prec) sig, Carrier sig m) => Int -> m AnsiDoc -> m AnsiDoc
 inParens amount go = do
   prec <- ask
   body <- with amount go
-  pure (if prec > amount then parens body else body)
+  pure (if prec > Prec amount then parens body else body)
 
 prettyCore :: Style -> Term Core User -> AnsiDoc
-prettyCore style = run . runReader @Prec 0 . go . fmap name
+prettyCore style = run . runReader (Prec 0) . go . fmap name
   where go = \case
           Var v -> pure v
           Term t -> case t of
