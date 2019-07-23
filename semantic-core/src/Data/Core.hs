@@ -135,7 +135,7 @@ infixr 1 >>>=
 
 unbind :: (Alternative m, Member Core sig, RightModule sig) => a -> Term sig a -> m (Named a :<- Term sig a, Term sig a)
 unbind n (Term sig) | Just (Named u a :>>= b) <- prj sig = pure (Named u n :<- a, instantiate1 (pure n) b)
-unbind _ _                                       = empty
+unbind _ _                                               = empty
 
 do' :: (Eq a, Foldable t, Carrier sig m, Member Core sig) => t (Maybe (Named a) :<- m a) -> m a
 do' bindings = fromMaybe unit (foldr bind Nothing bindings)
