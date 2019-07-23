@@ -12,6 +12,8 @@ module Data.Scope
 , instantiate1
 , instantiate
 , instantiateEither
+, un
+, unEither
 ) where
 
 import Control.Applicative (liftA2)
@@ -20,6 +22,7 @@ import Control.Monad ((>=>), guard)
 import Control.Monad.Module
 import Control.Monad.Trans.Class
 import Data.Function (on)
+import Data.Stack
 
 data Incr a b
   = Z a
@@ -105,3 +108,15 @@ instantiate f = instantiateEither (either f pure)
 
 instantiateEither :: Monad f => (Either a b -> f c) -> Scope a f b -> f c
 instantiateEither f = unScope >=> incr (f . Left) (>>= f . Right)
+
+
+un :: Monad m => (t -> Maybe (m (a, t))) -> t -> m (Stack a, t)
+un from = unEither (\ t -> maybe (Left t) Right (from t))
+
+unEither :: Monad m => (t -> Either b (m (a, t))) -> t -> m (Stack a, b)
+unEither from = go Nil
+  where go names value = case from value of
+          Right a -> do
+            (name, body) <- a
+            go (names :> name) body
+          Left  b -> pure (names, b)
