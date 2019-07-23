@@ -9,6 +9,7 @@ module Data.Core
 , unseqs
 , (>>>=)
 , unbind
+, unstatement
 , do'
 , (:<-)(..)
 , lam
@@ -136,6 +137,9 @@ infixr 1 >>>=
 unbind :: (Alternative m, Member Core sig, RightModule sig) => a -> Term sig a -> m (Named a :<- Term sig a, Term sig a)
 unbind n (Term sig) | Just (Named u a :>>= b) <- prj sig = pure (Named u n :<- a, instantiate1 (pure n) b)
 unbind _ _                                               = empty
+
+unstatement :: (Alternative m, Member Core sig, RightModule sig) => a -> Term sig a -> m (Maybe (Named a) :<- Term sig a, Term sig a)
+unstatement n t = first (first Just) <$> unbind n t <|> first (Nothing :<-) <$> unseq t
 
 do' :: (Eq a, Foldable t, Carrier sig m, Member Core sig) => t (Maybe (Named a) :<- m a) -> m a
 do' bindings = fromMaybe unit (foldr bind Nothing bindings)
