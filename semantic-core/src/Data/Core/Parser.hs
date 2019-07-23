@@ -94,7 +94,8 @@ edge = Core.load <$ reserved "load" <*> expr
 
 lvalue :: (TokenParsing m, Monad m) => m (Term Core User)
 lvalue = choice
-  [ ident
+  [ prj
+  , ident
   , parens expr
   ]
 
