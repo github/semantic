@@ -90,7 +90,7 @@ prettyCore style = run . runReader @Prec 0 . go
 
             Record fs -> do
               fs' <- for fs $ \ (x, v) -> (name x <+> symbol "=" <+>) <$> go v
-              pure $ primitive "record" <+> encloseSep "{ " " }" semi fs'
+              pure . group . nest 2 $ vsep [ primitive "record", encloseSep "{ " " }" semi fs' ]
 
             Unit     -> pure $ primitive "unit"
             Bool b   -> pure $ primitive (if b then "true" else "false")
