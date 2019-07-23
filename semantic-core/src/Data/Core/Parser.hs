@@ -50,7 +50,10 @@ core :: (TokenParsing m, Monad m) => m (Term Core User)
 core = expr
 
 expr :: (TokenParsing m, Monad m) => m (Term Core User)
-expr = application
+expr = assign
+
+assign :: (TokenParsing m, Monad m) => m (Term Core User)
+assign = application <**> (flip (Core..=) <$ symbolic '=' <*> application <|> pure id) <?> "assignment"
 
 application :: (TokenParsing m, Monad m) => m (Term Core User)
 application = projection `chainl1` (pure (Core.$$))
@@ -66,7 +69,6 @@ atom = choice
   , lit
   , ident
   , rec
-  , assign
   , parens expr
   ]
 
@@ -88,9 +90,6 @@ ifthenelse = Core.if'
 
 rec :: (TokenParsing m, Monad m) => m (Term Core User)
 rec = Core.rec <$ reserved "rec" <*> name <* symbolic '=' <*> expr <?> "recursive binding"
-
-assign :: (TokenParsing m, Monad m) => m (Term Core User)
-assign = (Core..=) <$> try (lvalue <* symbolic '=') <*> expr <?> "assignment"
 
 edge :: (TokenParsing m, Monad m) => m (Term Core User)
 edge = Core.load <$ reserved "load" <*> expr
