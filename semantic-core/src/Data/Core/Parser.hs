@@ -112,7 +112,7 @@ lit = let x `given` n = x <$ reserved n in choice
   , between (string "\"") (string "\"") (Core.string . fromString <$> many (escape <|> (noneOf "\"" <?> "non-escaped character")))
   ] <?> "literal"
   where escape = char '\\' *> choice
-          [ '"' <$ string "\""
+          [ '"'  <$ string "\""
           , '\n' <$ string "n"
           , '\r' <$ string "r"
           , '\t' <$ string "t"
