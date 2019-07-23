@@ -59,7 +59,7 @@ application :: (TokenParsing m, Monad m) => m (Term Core User)
 application = projection `chainl1` (pure (Core.$$))
 
 projection :: (TokenParsing m, Monad m) => m (Term Core User)
-projection = foldl' (Core....) <$> atom <*> many (namedValue <$> (dot *> name))
+projection = foldl' (Core....) <$> atom <*> many (namedValue <$ dot <*> name)
 
 atom :: (TokenParsing m, Monad m) => m (Term Core User)
 atom = choice
