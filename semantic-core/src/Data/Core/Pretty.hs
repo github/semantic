@@ -39,16 +39,12 @@ symbol  = annotate (Pretty.color     Pretty.Yellow)
 strlit  = annotate (Pretty.colorDull Pretty.Green)
 primitive = keyword . mappend "#"
 
-encloseIf :: Semigroup m => Bool -> m -> m -> m -> m
-encloseIf True  l r x = l <> x <> r
-encloseIf False _ _ x = x
-
 type Prec = Int
 
 data Style = Unicode | Ascii
 
 name :: User -> AnsiDoc
-name n = encloseIf (needsQuotation n) (symbol "#{") (symbol "}") (pretty n)
+name n = if needsQuotation n then enclose (symbol "#{") (symbol "}") (pretty n) else pretty n
 
 with :: (Member (Reader Prec) sig, Carrier sig m) => Prec -> m a -> m a
 with n = local (const n)
