@@ -109,8 +109,14 @@ lit = let x `given` n = x <$ reserved n in choice
   , Core.bool False `given` "#false"
   , Core.unit       `given` "#unit"
   , record
-  , between (string "\"") (string "\"") (Core.string . fromString <$> many ('"' <$ string "\\\"" <|> noneOf "\""))
+  , between (string "\"") (string "\"") (Core.string . fromString <$> many (escape <|> (noneOf "\"" <?> "non-escaped character")))
   ] <?> "literal"
+  where escape = char '\\' *> choice
+          [ '"' <$ string "\""
+          , '\n' <$ string "n"
+          , '\r' <$ string "r"
+          , '\t' <$ string "t"
+          ] <?> "escape sequence"
 
 record :: (TokenParsing m, Monad m) => m (Term Core User)
 record = Core.record <$ reserved "#record" <*> braces (sepEndBy ((,) <$> identifier <* symbolic ':' <*> expr) comma)
