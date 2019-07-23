@@ -49,13 +49,13 @@ data Style = Unicode | Ascii
 name :: User -> AnsiDoc
 name n = if needsQuotation n then enclose (symbol "#{") (symbol "}") (pretty n) else pretty n
 
-with :: (Member (Reader Prec) sig, Carrier sig m) => Int -> m a -> m a
-with n = local (const (Prec n))
+withPrec :: (Member (Reader Prec) sig, Carrier sig m) => Int -> m a -> m a
+withPrec n = local (const (Prec n))
 
 inParens :: (Member (Reader Prec) sig, Carrier sig m) => Int -> m AnsiDoc -> m AnsiDoc
 inParens amount go = do
   prec <- ask
-  body <- with amount go
+  body <- withPrec amount go
   pure (if prec > Prec amount then parens body else body)
 
 prettyCore :: Style -> Term Core User -> AnsiDoc
@@ -68,7 +68,7 @@ prettyCore style = run . runReader (Prec 0) . go . fmap name
               pure . group . nest 2 $ vsep [ keyword "rec" <+> name x, symbol "=" <+> align body ]
 
             Lam (Named (Ignored x) b) -> inParens 0 $ do
-              body <- with 1 (go (instantiate1 (pure (name x)) b))
+              body <- withPrec 1 (go (instantiate1 (pure (name x)) b))
               pure (lambda <> name x <+> arrow <+> body)
 
             Record fs -> do
@@ -79,7 +79,7 @@ prettyCore style = run . runReader (Prec 0) . go . fmap name
             Bool b   -> pure $ primitive (if b then "true" else "false")
             String s -> pure . strlit $ viaShow s
 
-            f :$ x -> inParens 8 $ (<+>) <$> go f <*> with 9 (go x)
+            f :$ x -> inParens 8 $ (<+>) <$> go f <*> withPrec 9 (go x)
 
             If con tru fal -> do
               con' <- "if"   `appending` go con
