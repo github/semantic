@@ -127,6 +127,7 @@ prettyCore style = run . runReader @Prec 0 . go
         arrowL = case style of
           Unicode -> symbol "←"
           Ascii   -> symbol "<-"
+        semi = "; "
 
 
 appending :: Functor f => AnsiDoc -> f AnsiDoc -> f AnsiDoc
