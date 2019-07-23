@@ -55,7 +55,7 @@ prettyCore style = precBody . go . fmap name
               ]
 
             Lam (Named (Ignored x) b) -> prec 3 . group . nest 2 $ vsep
-              [ lambda <> name x, arrow <+> withPrec 3 (go (instantiate1 (pure (name x)) b)) ]
+              [ lambda <> name x, arrow <+> withPrec 0 (go (instantiate1 (pure (name x)) b)) ]
 
             Record fs -> atom . group . nest 2 $ vsep [ primitive "record", block ", " (map (uncurry keyValue) fs) ]
 
