@@ -36,7 +36,7 @@ type AnsiDoc = Pretty.Doc Pretty.AnsiStyle
 
 keyword, symbol, strlit, primitive :: AnsiDoc -> AnsiDoc
 keyword = annotate (Pretty.colorDull Pretty.Cyan)
-symbol  = annotate (Pretty.color Pretty.Yellow)
+symbol  = annotate (Pretty.color     Pretty.Yellow)
 strlit  = annotate (Pretty.colorDull Pretty.Green)
 primitive = keyword . mappend "#"
 
