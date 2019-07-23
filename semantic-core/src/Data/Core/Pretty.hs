@@ -8,7 +8,6 @@ module Data.Core.Pretty
   , prettyCore
   ) where
 
-import           Control.Effect.Reader
 import           Data.Core
 import           Data.File
 import           Data.Foldable (toList)
@@ -19,7 +18,6 @@ import           Data.Term
 import           Data.Text.Prettyprint.Doc
 import qualified Data.Text.Prettyprint.Doc.Render.String as Pretty
 import qualified Data.Text.Prettyprint.Doc.Render.Terminal as Pretty
-import           Data.Traversable (for)
 
 showCore :: Term Core User -> String
 showCore = Pretty.renderString . layoutSmart defaultLayoutOptions . unAnnotate . prettyCore Ascii
@@ -41,73 +39,59 @@ symbol  = annotate (Pretty.color     Pretty.Yellow)
 strlit  = annotate (Pretty.colorDull Pretty.Green)
 primitive = keyword . mappend "#"
 
-newtype Prec = Prec { unPrec :: Int }
-  deriving (Eq, Ord, Show)
-
 data Style = Unicode | Ascii
 
 name :: User -> AnsiDoc
 name n = if needsQuotation n then enclose (symbol "#{") (symbol "}") (pretty n) else pretty n
 
-withPrec :: (Member (Reader Prec) sig, Carrier sig m) => Int -> m a -> m a
-withPrec n = local (const (Prec n))
-
-inParens :: (Member (Reader Prec) sig, Carrier sig m) => Int -> AnsiDoc -> m AnsiDoc
-inParens amount body = do
-  prec <- ask
-  pure (if prec > Prec amount then parens body else body)
-
 prettyCore :: Style -> Term Core User -> AnsiDoc
-prettyCore style = run . runReader (Prec 0) . go . fmap name
+prettyCore style = precBody . go . fmap name
   where go = \case
-          Var v -> pure v
+          Var v -> atom v
           Term t -> case t of
-            Rec (Named (Ignored x) b) -> do
-              body <- go (instantiate1 (pure (name x)) b)
-              inParens 11 . group . nest 2 $ vsep [ keyword "rec" <+> name x, symbol "=" <+> align body ]
+            Rec (Named (Ignored x) b) -> prec 11 . group . nest 2 $ vsep
+              [ keyword "rec" <+> name x
+              , symbol "=" <+> align (withPrec 0 (go (instantiate1 (pure (name x)) b)))
+              ]
 
-            Lam (Named (Ignored x) b) -> do
-              body <- withPrec 1 (go (instantiate1 (pure (name x)) b))
-              inParens 0 (lambda <> name x <+> arrow <+> body)
+            Lam (Named (Ignored x) b) -> prec 0 . group . nest 2 $ vsep
+              [ lambda <> name x, arrow <+> withPrec 0 (go (instantiate1 (pure (name x)) b)) ]
 
-            Record fs -> do
-              fs' <- for fs $ \ (x, v) -> (name x <+> symbol ":" <+>) <$> go v
-              pure . group . nest 2 $ vsep [ primitive "record", block ", " fs' ]
+            Record fs -> atom . group . nest 2 $ vsep [ primitive "record", block ", " (map (uncurry keyValue) fs) ]
 
-            Unit     -> pure $ primitive "unit"
-            Bool b   -> pure $ primitive (if b then "true" else "false")
-            String s -> pure . strlit $ viaShow s
+            Unit     -> atom $ primitive "unit"
+            Bool b   -> atom $ primitive (if b then "true" else "false")
+            String s -> atom . strlit $ viaShow s
 
-            f :$ x -> (<+>) <$> go f <*> withPrec 9 (go x) >>= inParens 8
+            f :$ x -> prec 8 (withPrec 8 (go f) <+> withPrec 9 (go x))
 
-            If con tru fal -> do
-              con' <- "if"   `appending` go con
-              tru' <- "then" `appending` go tru
-              fal' <- "else" `appending` go fal
-              pure $ sep [con', tru', fal']
+            If con tru fal -> prec 8 . group $ vsep
+              [ keyword "if"   <+> precBody (go con)
+              , keyword "then" <+> precBody (go tru)
+              , keyword "else" <+> precBody (go fal)
+              ]
 
-            Load p -> "load" `appending` go p
-            item :. body -> do
-              f <- go item
-              inParens 9 (f <> symbol "." <> name body)
+            Load p -> prec 8 (keyword "load" <+> withPrec 9 (go p))
+            item :. body -> prec 9 (withPrec 9 (go item) <> symbol "." <> name body)
 
-            lhs := rhs -> do
-              f <- go lhs
-              g <- go rhs
-              inParens 3 (f <+> symbol "=" <+> g)
+            lhs := rhs -> prec 3 . group . nest 2 $ vsep
+              [ withPrec 4 (go lhs)
+              , symbol "=" <+> align (withPrec 4 (go rhs))
+              ]
 
             -- Annotations are not pretty-printed, as it lowers the signal/noise ratio too profoundly.
             Ann _ c -> go c
-            statement -> do
+            statement ->
               let (bindings, return) = unstatements (Term statement)
                   statements = toList (bindings :> (Nothing :<- return))
                   names = zipWith (\ i (n :<- _) -> maybe (pretty @Int i) (name . namedName) n) [0..] statements
-              statements' <- traverse (prettyStatement names) statements
-              pure (block "; " statements')
+                  statements' = map (prettyStatement names) statements
+              in atom (block "; " statements')
         block _ [] = braces mempty
         block s ss = encloseSep "{ " " }" s ss
-        prettyStatement names (Just (Named (Ignored u) _) :<- t) = (name u <+> arrowL <+>) <$> go (either (names !!) id <$> t)
-        prettyStatement names (Nothing                    :<- t) = go (either (names !!) id <$> t)
+        keyValue x v = name x <+> symbol ":" <+> precBody (go v)
+        prettyStatement names (Just (Named (Ignored u) _) :<- t) = name u <+> arrowL <+> precBody (go (either (names !!) id <$> t))
+        prettyStatement names (Nothing                    :<- t) = precBody (go (either (names !!) id <$> t))
         lambda = case style of
           Unicode -> symbol "λ"
           Ascii   -> symbol "\\"
@@ -119,5 +103,19 @@ prettyCore style = run . runReader (Prec 0) . go . fmap name
           Ascii   -> symbol "<-"
 
 
-appending :: Functor f => AnsiDoc -> f AnsiDoc -> f AnsiDoc
-appending k item = (keyword k <+>) <$> item
+data Prec a = Prec
+  { precLevel :: Maybe Int
+  , precBody  :: a
+  }
+  deriving (Eq, Ord, Show)
+
+prec :: Int -> a -> Prec a
+prec = Prec . Just
+
+atom :: a -> Prec a
+atom = Prec Nothing
+
+withPrec :: Int -> Prec AnsiDoc -> AnsiDoc
+withPrec d (Prec d' a)
+  | maybe False (d >) d' = parens a
+  | otherwise            = a
