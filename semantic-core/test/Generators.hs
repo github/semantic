@@ -56,7 +56,7 @@ record :: MonadGen m => m (Term Core.Core User) -> m (Term Core.Core User)
 record bod = Core.record <$> Gen.list (Range.linear 0 5) ((,) . namedValue <$> name <*> bod)
 
 atoms :: MonadGen m => [m (Term Core.Core User)]
-atoms = [boolean, variable, pure Core.unit]
+atoms = [variable, pure Core.unit, boolean]
 
 literal :: MonadGen m => m (Term Core.Core User)
 literal = Gen.recursive Gen.choice atoms [lambda literal, record literal]
