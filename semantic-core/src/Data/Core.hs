@@ -5,7 +5,6 @@ module Data.Core
 , Edge(..)
 , rec
 , (>>>)
-, block
 , (>>>=)
 , do'
 , (:<-)(..)
@@ -116,14 +115,6 @@ rec (Named u n) b = send (Rec (Named u (abstract1 n b)))
 a >>> b = send (a :>> b)
 
 infixr 1 >>>
-
-block :: (Foldable t, Carrier sig m, Member Core sig) => t (m a) -> m a
-block = maybe unit getBlock . foldMap (Just . Block)
-
-newtype Block m a = Block { getBlock :: m a }
-
-instance (Carrier sig m, Member Core sig) => Semigroup (Block m a) where
-  Block a <> Block b = Block (a >>> b)
 
 unseq :: (Alternative m, Member Core sig) => Term sig a -> m (Term sig a, Term sig a)
 unseq (Term sig) | Just (a :>> b) <- prj sig = pure (a, b)
