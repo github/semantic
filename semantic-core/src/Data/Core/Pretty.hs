@@ -72,7 +72,7 @@ prettyCore style = run . runReader @Prec 0 . go . fmap name
 
             Record fs -> do
               fs' <- for fs $ \ (x, v) -> (name x <+> symbol "=" <+>) <$> go v
-              pure . group . nest 2 $ vsep [ primitive "record", encloseSep "{ " " }" semi fs' ]
+              pure . group . nest 2 $ vsep [ primitive "record", block fs' ]
 
             Unit     -> pure $ primitive "unit"
             Bool b   -> pure $ primitive (if b then "true" else "false")
@@ -103,7 +103,9 @@ prettyCore style = run . runReader @Prec 0 . go . fmap name
                   statements = toList (bindings :> (Nothing :<- return))
                   names = zipWith (\ i (n :<- _) -> maybe (pretty @Int i) (name . namedName) n) [0..] statements
               statements' <- traverse (prettyStatement names) statements
-              pure (encloseSep "{ " " }" semi statements')
+              pure (block statements')
+        block [] = braces mempty
+        block ss = encloseSep "{ " " }" semi ss
         prettyStatement names (Just (Named (Ignored u) _) :<- t) = (name u <+> arrowL <+>) <$> go (either (names !!) id <$> t)
         prettyStatement names (Nothing                    :<- t) = go (either (names !!) id <$> t)
         lambda = case style of
