@@ -74,20 +74,20 @@ prettyCore style = run . runReader @Prec 0 . go
             Rec b -> inParens 11 $ do
               (x, body) <- bind b
               pure (keyword "rec" <+> name x <+> symbol "=" <+> body)
-            a :>> b -> inBraces 12 $ do
-              fore <- with 12 (go a)
-              aft  <- with 12 (go b)
+            a :>> b -> inBraces 1 $ do
+              fore <- with 1 (go a)
+              aft  <- with 1 (go b)
 
               pure $ vsep [ fore <> Pretty.semi, aft ]
 
-            Named (Ignored x) a :>>= b -> inBraces 12 $ do
-              fore <- with 11 (go a)
-              aft  <- with 12 (go (instantiate1 (pure x) b))
+            Named (Ignored x) a :>>= b -> inBraces 1 $ do
+              fore <- with 2 (go a)
+              aft  <- with 1 (go (instantiate1 (pure x) b))
 
               pure $ vsep [ name x <+> arrowL <+> fore <> Pretty.semi, aft ]
 
-            Lam f -> inParens 11 $ do
-              (x, body) <- bind f
+            Lam (Named (Ignored x) b) -> inParens 0 $ do
+              body <- with 1 (go (instantiate1 (pure x) b))
               pure (lambda <> name x <+> arrow <+> body)
 
             Record fs -> do
@@ -98,7 +98,7 @@ prettyCore style = run . runReader @Prec 0 . go
             Bool b   -> pure $ primitive (if b then "true" else "false")
             String s -> pure . strlit $ Pretty.viaShow s
 
-            f :$ x -> inParens 11 $ (<+>) <$> go f <*> go x
+            f :$ x -> inParens 8 $ (<+>) <$> go f <*> with 9 (go x)
 
             If con tru fal -> do
               con' <- "if"   `appending` go con
