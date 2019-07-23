@@ -81,16 +81,16 @@ statement
 
 ifthenelse :: (TokenParsing m, Monad m) => m (Term Core User)
 ifthenelse = Core.if'
-  <$ reserved "if"   <*> core
-  <* reserved "then" <*> core
-  <* reserved "else" <*> core
+  <$ reserved "if"   <*> expr
+  <* reserved "then" <*> expr
+  <* reserved "else" <*> expr
   <?> "if-then-else statement"
 
 rec :: (TokenParsing m, Monad m) => m (Term Core User)
-rec = Core.rec <$ reserved "rec" <*> name <* symbolic '=' <*> core <?> "recursive binding"
+rec = Core.rec <$ reserved "rec" <*> name <* symbolic '=' <*> expr <?> "recursive binding"
 
 assign :: (TokenParsing m, Monad m) => m (Term Core User)
-assign = (Core..=) <$> try (lvalue <* symbolic '=') <*> core <?> "assignment"
+assign = (Core..=) <$> try (lvalue <* symbolic '=') <*> expr <?> "assignment"
 
 edge :: (TokenParsing m, Monad m) => m (Term Core User)
 edge = Core.load <$ reserved "load" <*> expr
@@ -118,10 +118,10 @@ lit = let x `given` n = x <$ reserved n in choice
   ] <?> "literal"
 
 record :: (TokenParsing m, Monad m) => m (Term Core User)
-record = Core.record <$ reserved "#record" <*> braces (sepEndBy ((,) <$> identifier <* symbolic ':' <*> core) comma)
+record = Core.record <$ reserved "#record" <*> braces (sepEndBy ((,) <$> identifier <* symbolic ':' <*> expr) comma)
 
 lambda :: (TokenParsing m, Monad m) => m (Term Core User)
-lambda = Core.lam <$ lambduh <*> name <* arrow <*> core <?> "lambda" where
+lambda = Core.lam <$ lambduh <*> name <* arrow <*> expr <?> "lambda" where
   lambduh = symbolic 'λ' <|> symbolic '\\'
   arrow   = symbol "→"   <|> symbol "->"
 
