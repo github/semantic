@@ -87,7 +87,7 @@ prettyCore style = run . runReader (Prec 0) . go . fmap name
               fal' <- "else" `appending` go fal
               pure $ sep [con', tru', fal']
 
-            Load p   -> "load" `appending` go p
+            Load p -> "load" `appending` go p
             item :. body -> inParens 9 $ do
               f <- go item
               pure (f <> symbol "." <> name body)
