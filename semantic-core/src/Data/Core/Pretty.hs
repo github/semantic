@@ -71,7 +71,7 @@ prettyCore style = precBody . go . fmap name
               , keyword "else" <+> precBody (go fal)
               ]
 
-            Load p -> prec 8 (keyword "load" <+> withPrec 9 (go p))
+            Load p -> prec 3 (keyword "load" <+> withPrec 9 (go p))
             item :. body -> prec 9 (withPrec 9 (go item) <> symbol "." <> name body)
 
             lhs := rhs -> prec 3 . group . nest 2 $ vsep
