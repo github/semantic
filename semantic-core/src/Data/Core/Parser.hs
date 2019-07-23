@@ -50,7 +50,7 @@ core :: (TokenParsing m, Monad m) => m (Term Core User)
 core = expr
 
 expr :: (TokenParsing m, Monad m) => m (Term Core User)
-expr = assign
+expr = ifthenelse <|> lambda <|> assign
 
 assign :: (TokenParsing m, Monad m) => m (Term Core User)
 assign = application <**> (flip (Core..=) <$ symbolic '=' <*> application <|> pure id) <?> "assignment"
@@ -64,7 +64,6 @@ projection = foldl' (Core....) <$> atom <*> many (namedValue <$> (dot *> name))
 atom :: (TokenParsing m, Monad m) => m (Term Core User)
 atom = choice
   [ comp
-  , ifthenelse
   , edge
   , lit
   , ident
@@ -113,7 +112,6 @@ lit = let x `given` n = x <$ reserved n in choice
   , Core.unit       `given` "#unit"
   , record
   , between (string "\"") (string "\"") (Core.string . fromString <$> many ('"' <$ string "\\\"" <|> noneOf "\""))
-  , lambda
   ] <?> "literal"
 
 record :: (TokenParsing m, Monad m) => m (Term Core User)
