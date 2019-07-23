@@ -59,7 +59,10 @@ inBraces :: (Member (Reader Prec) sig, Carrier sig m) => Prec -> m AnsiDoc -> m 
 inBraces amount go = do
   prec <- ask
   body <- with amount go
-  pure (if prec > amount then braces body else body)
+  pure (if prec > amount then braces (pad body) else body)
+
+pad :: Doc a -> Doc a
+pad = enclose space space
 
 prettyCore :: Style -> Term Core User -> AnsiDoc
 prettyCore style = run . runReader @Prec 0 . go
