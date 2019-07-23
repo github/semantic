@@ -71,7 +71,7 @@ prettyCore style = run . runReader @Prec 0 . go . fmap name
               pure (lambda <> name x <+> arrow <+> body)
 
             Record fs -> do
-              fs' <- for fs $ \ (x, v) -> (name x <+> symbol "=" <+>) <$> go v
+              fs' <- for fs $ \ (x, v) -> (name x <+> symbol ":" <+>) <$> go v
               pure . group . nest 2 $ vsep [ primitive "record", block fs' ]
 
             Unit     -> pure $ primitive "unit"
