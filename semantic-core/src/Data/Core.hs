@@ -35,6 +35,7 @@ module Data.Core
 import Control.Applicative (Alternative (..))
 import Control.Effect.Carrier
 import Control.Monad.Module
+import Data.Bifunctor (Bifunctor (..))
 import Data.Foldable (foldl')
 import Data.List.NonEmpty (NonEmpty (..))
 import Data.Loc
@@ -144,6 +145,9 @@ data a :<- b = a :<- b
   deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
 
 infix 2 :<-
+
+instance Bifunctor (:<-) where
+  bimap f g (a :<- b) = f a :<- g b
 
 
 lam :: (Eq a, Carrier sig m, Member Core sig) => Named a -> m a -> m a
