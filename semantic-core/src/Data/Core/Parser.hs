@@ -50,7 +50,10 @@ core :: (TokenParsing m, Monad m) => m (Term Core User)
 core = expr
 
 expr :: (TokenParsing m, Monad m) => m (Term Core User)
-expr = prj `chainl1` (pure (Core.$$))
+expr = application
+
+application :: (TokenParsing m, Monad m) => m (Term Core User)
+application = prj `chainl1` (pure (Core.$$))
 
 prj :: (TokenParsing m, Monad m) => m (Term Core User)
 prj = foldl' (Core....) <$> atom <*> many (namedValue <$> (dot *> name))
