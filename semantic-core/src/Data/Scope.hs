@@ -110,13 +110,11 @@ instantiateEither :: Monad f => (Either a b -> f c) -> Scope a f b -> f c
 instantiateEither f = unScope >=> incr (f . Left) (>>= f . Right)
 
 
-un :: Monad m => (t -> Maybe (m (a, t))) -> t -> m (Stack a, t)
-un from = unEither (\ t -> maybe (Left t) Right (from t))
+un :: (t -> Maybe (a, t)) -> t -> (Stack a, t)
+un from = unEither (matchMaybe from)
 
-unEither :: Monad m => (t -> Either b (m (a, t))) -> t -> m (Stack a, b)
-unEither from = go Nil
-  where go names value = case from value of
-          Right a -> do
-            (name, body) <- a
-            go (names :> name) body
-          Left  b -> pure (names, b)
+unEither :: (t -> Either (a, t) b) -> t -> (Stack a, b)
+unEither from = go (0 :: Int) Nil
+  where go i bs t = case from t of
+          Left (b, t) -> go (succ i) (bs :> b) t
+          Right b     -> (bs, b)
