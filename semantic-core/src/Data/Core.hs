@@ -147,10 +147,7 @@ do' bindings = fromMaybe unit (foldr bind Nothing bindings)
   where bind (n :<- a) v = maybe (a >>>) ((>>>=) . (:<- a)) n <$> v <|> Just a
 
 unstatements :: (Member Core sig, RightModule sig) => Term sig a -> (Stack (Maybe (Named (Either Int a)) :<- Term sig (Either Int a)), Term sig (Either Int a))
-unstatements = go Nil (0 :: Int) . fmap Right
-  where go ts i t = case unstatement (Left i) t of
-          Just (t, b) -> go (ts :> t) (succ i) b
-          Nothing     -> (ts, t)
+unstatements = un (unstatement . Left) . fmap Right
 
 data a :<- b = a :<- b
   deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
