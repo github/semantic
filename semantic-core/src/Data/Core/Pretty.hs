@@ -58,13 +58,13 @@ inParens :: (Member (Reader Prec) sig, Carrier sig m) => Prec -> m AnsiDoc -> m 
 inParens amount go = do
   prec <- ask
   body <- with amount go
-  pure (if amount > prec then Pretty.parens body else body)
+  pure (if prec > amount then Pretty.parens body else body)
 
 inBraces :: (Member (Reader Prec) sig, Carrier sig m) => Prec -> m AnsiDoc -> m AnsiDoc
 inBraces amount go = do
   prec <- ask
   body <- with amount go
-  pure (if amount > prec then Pretty.braces body else body)
+  pure (if prec > amount then Pretty.braces body else body)
 
 prettyCore :: Style -> Term Core User -> AnsiDoc
 prettyCore style = run . runReader @Prec 0 . go
