@@ -141,7 +141,7 @@ do' bindings = fromMaybe unit (foldr bind Nothing bindings)
   where bind (n :<- a) v = maybe (a >>>) ((>>>=) . (:<- a)) n <$> v <|> Just a
 
 data a :<- b = a :<- b
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
 
 infix 2 :<-
 
