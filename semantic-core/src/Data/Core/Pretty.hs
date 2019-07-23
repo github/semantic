@@ -52,10 +52,9 @@ name n = if needsQuotation n then enclose (symbol "#{") (symbol "}") (pretty n) 
 withPrec :: (Member (Reader Prec) sig, Carrier sig m) => Int -> m a -> m a
 withPrec n = local (const (Prec n))
 
-inParens :: (Member (Reader Prec) sig, Carrier sig m) => Int -> m AnsiDoc -> m AnsiDoc
-inParens amount go = do
+inParens :: (Member (Reader Prec) sig, Carrier sig m) => Int -> AnsiDoc -> m AnsiDoc
+inParens amount body = do
   prec <- ask
-  body <- go
   pure (if prec > Prec amount then parens body else body)
 
 prettyCore :: Style -> Term Core User -> AnsiDoc
@@ -63,13 +62,13 @@ prettyCore style = run . runReader (Prec 0) . go . fmap name
   where go = \case
           Var v -> pure v
           Term t -> case t of
-            Rec (Named (Ignored x) b) -> inParens 11 $ do
+            Rec (Named (Ignored x) b) -> do
               body <- go (instantiate1 (pure (name x)) b)
-              pure . group . nest 2 $ vsep [ keyword "rec" <+> name x, symbol "=" <+> align body ]
+              inParens 11 . group . nest 2 $ vsep [ keyword "rec" <+> name x, symbol "=" <+> align body ]
 
-            Lam (Named (Ignored x) b) -> inParens 0 $ do
+            Lam (Named (Ignored x) b) -> do
               body <- withPrec 1 (go (instantiate1 (pure (name x)) b))
-              pure (lambda <> name x <+> arrow <+> body)
+              inParens 0 (lambda <> name x <+> arrow <+> body)
 
             Record fs -> do
               fs' <- for fs $ \ (x, v) -> (name x <+> symbol ":" <+>) <$> go v
@@ -79,7 +78,7 @@ prettyCore style = run . runReader (Prec 0) . go . fmap name
             Bool b   -> pure $ primitive (if b then "true" else "false")
             String s -> pure . strlit $ viaShow s
 
-            f :$ x -> inParens 8 $ (<+>) <$> go f <*> withPrec 9 (go x)
+            f :$ x -> (<+>) <$> go f <*> withPrec 9 (go x) >>= inParens 8
 
             If con tru fal -> do
               con' <- "if"   `appending` go con
@@ -88,14 +87,14 @@ prettyCore style = run . runReader (Prec 0) . go . fmap name
               pure $ sep [con', tru', fal']
 
             Load p -> "load" `appending` go p
-            item :. body -> inParens 9 $ do
+            item :. body -> do
               f <- go item
-              pure (f <> symbol "." <> name body)
+              inParens 9 (f <> symbol "." <> name body)
 
-            lhs := rhs -> inParens 3 $ do
+            lhs := rhs -> do
               f <- go lhs
               g <- go rhs
-              pure (f <+> symbol "=" <+> g)
+              inParens 3 (f <+> symbol "=" <+> g)
 
             -- Annotations are not pretty-printed, as it lowers the signal/noise ratio too profoundly.
             Ann _ c -> go c
