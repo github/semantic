@@ -76,13 +76,13 @@ prettyCore style = run . runReader @Prec 0 . go
               fore <- with 1 (go a)
               aft  <- with 1 (go b)
 
-              pure $ vsep [ fore <> semi, aft ]
+              pure . group . nest 2 $ vsep [ fore, semi <> aft ]
 
             Named (Ignored x) a :>>= b -> inBraces 1 $ do
               fore <- with 2 (go a)
               aft  <- with 1 (go (instantiate1 (pure x) b))
 
-              pure $ vsep [ name x <+> arrowL <+> fore <> semi, aft ]
+              pure . group . nest 2 $ vsep [ name x <+> arrowL <+> fore, semi <> aft ]
 
             Lam (Named (Ignored x) b) -> inParens 0 $ do
               body <- with 1 (go (instantiate1 (pure x) b))
