@@ -6,9 +6,10 @@ module Analysis.ScopeGraph
 import           Data.Loc
 import qualified Data.Map as Map
 import qualified Data.Set as Set
+import qualified Data.Text as Text
 
 data Entry = Entry
-  { entrySymbol :: String -- FIXME: Text
+  { entrySymbol :: Text.Text
   , entryLoc    :: Loc
   }
 
