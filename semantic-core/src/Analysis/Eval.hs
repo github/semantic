@@ -30,6 +30,7 @@ import Prelude hiding (fail)
 eval :: ( Carrier sig m
         , Member (Reader Loc) sig
         , MonadFail m
+        , Semigroup value
         )
      => Analysis address value m
      -> (Term Core User -> m value)
@@ -41,12 +42,12 @@ eval Analysis{..} eval = \case
       addr <- alloc n
       v <- bind n addr (eval (instantiate1 (pure n) b))
       v <$ assign addr v
-    a :>> b -> eval a >> eval b
+    a :>> b -> (<>) <$> eval a <*> eval b
     Named (Ignored n) a :>>= b -> do
       a' <- eval a
       addr <- alloc n
       assign addr a'
-      bind n addr (eval (instantiate1 (pure n) b))
+      bind n addr ((a' <>) <$> eval (instantiate1 (pure n) b))
     Lam (Named (Ignored n) b) -> abstract eval n (instantiate1 (pure n) b)
     f :$ a -> do
       f' <- eval f
@@ -210,18 +211,18 @@ ruby = fromBody $ annWith callStack (rec (named' __semantic_global) (do' stateme
 
 
 data Analysis address value m = Analysis
-  { alloc       :: User -> m address
-  , bind        :: forall a . User -> address -> m a -> m a
-  , lookupEnv   :: User -> m (Maybe address)
-  , deref       :: address -> m (Maybe value)
-  , assign      :: address -> value -> m ()
-  , abstract    :: (Term Core User -> m value) -> User -> Term Core User -> m value
-  , apply       :: (Term Core User -> m value) -> value -> value -> m value
-  , unit        :: m value
-  , bool        :: Bool -> m value
-  , asBool      :: value -> m Bool
-  , string      :: Text -> m value
-  , asString    :: value -> m Text
-  , record      :: [(User, value)] -> m value
-  , (...)       :: address -> User -> m (Maybe address)
+  { alloc     :: User -> m address
+  , bind      :: forall a . User -> address -> m a -> m a
+  , lookupEnv :: User -> m (Maybe address)
+  , deref     :: address -> m (Maybe value)
+  , assign    :: address -> value -> m ()
+  , abstract  :: (Term Core User -> m value) -> User -> Term Core User -> m value
+  , apply     :: (Term Core User -> m value) -> value -> value -> m value
+  , unit      :: m value
+  , bool      :: Bool -> m value
+  , asBool    :: value -> m Bool
+  , string    :: Text -> m value
+  , asString  :: value -> m Text
+  , record    :: [(User, value)] -> m value
+  , (...)     :: address -> User -> m (Maybe address)
   }

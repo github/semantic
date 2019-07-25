@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, FlexibleInstances, LambdaCase, MultiParamTypeClasses, NamedFieldPuns, OverloadedStrings, RecordWildCards, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DerivingVia, FlexibleContexts, FlexibleInstances, LambdaCase, MultiParamTypeClasses, NamedFieldPuns, OverloadedStrings, RecordWildCards, TypeOperators, UndecidableInstances #-}
 module Analysis.Concrete
 ( Concrete(..)
 , concrete
@@ -28,6 +28,7 @@ import qualified Data.IntSet as IntSet
 import           Data.Loc
 import qualified Data.Map as Map
 import           Data.Name
+import           Data.Semigroup (Last (..))
 import qualified Data.Set as Set
 import           Data.Term
 import           Data.Text (Text, pack)
@@ -47,6 +48,7 @@ data Concrete
   | String Text
   | Record Env
   deriving (Eq, Ord, Show)
+  deriving Semigroup via Last Concrete
 
 recordFrame :: Concrete -> Maybe Env
 recordFrame (Record frame) = Just frame
