@@ -30,6 +30,7 @@ import Prelude hiding (fail)
 eval :: ( Carrier sig m
         , Member (Reader Loc) sig
         , MonadFail m
+        , Semigroup value
         )
      => Analysis address value m
      -> (Term Core User -> m value)
@@ -41,12 +42,12 @@ eval Analysis{..} eval = \case
       addr <- alloc n
       v <- bind n addr (eval (instantiate1 (pure n) b))
       v <$ assign addr v
-    a :>> b -> eval a >> eval b
+    a :>> b -> (<>) <$> eval a <*> eval b
     Named (Ignored n) a :>>= b -> do
       a' <- eval a
       addr <- alloc n
       assign addr a'
-      bind n addr (eval (instantiate1 (pure n) b))
+      bind n addr ((a' <>) <$> eval (instantiate1 (pure n) b))
     Lam (Named (Ignored n) b) -> abstract eval n (instantiate1 (pure n) b)
     f :$ a -> do
       f' <- eval f
