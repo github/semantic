@@ -210,18 +210,18 @@ ruby = fromBody $ annWith callStack (rec (named' __semantic_global) (do' stateme
 
 
 data Analysis address value m = Analysis
-  { alloc       :: User -> m address
-  , bind        :: forall a . User -> address -> m a -> m a
-  , lookupEnv   :: User -> m (Maybe address)
-  , deref       :: address -> m (Maybe value)
-  , assign      :: address -> value -> m ()
-  , abstract    :: (Term Core User -> m value) -> User -> Term Core User -> m value
-  , apply       :: (Term Core User -> m value) -> value -> value -> m value
-  , unit        :: m value
-  , bool        :: Bool -> m value
-  , asBool      :: value -> m Bool
-  , string      :: Text -> m value
-  , asString    :: value -> m Text
-  , record      :: [(User, value)] -> m value
-  , (...)       :: address -> User -> m (Maybe address)
+  { alloc     :: User -> m address
+  , bind      :: forall a . User -> address -> m a -> m a
+  , lookupEnv :: User -> m (Maybe address)
+  , deref     :: address -> m (Maybe value)
+  , assign    :: address -> value -> m ()
+  , abstract  :: (Term Core User -> m value) -> User -> Term Core User -> m value
+  , apply     :: (Term Core User -> m value) -> value -> value -> m value
+  , unit      :: m value
+  , bool      :: Bool -> m value
+  , asBool    :: value -> m Bool
+  , string    :: Text -> m value
+  , asString  :: value -> m Text
+  , record    :: [(User, value)] -> m value
+  , (...)     :: address -> User -> m (Maybe address)
   }
