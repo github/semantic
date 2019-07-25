@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveGeneric, DeriveTraversable, FlexibleContexts, FlexibleInstances, LambdaCase, OverloadedStrings, QuantifiedConstraints, RecordWildCards, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeOperators #-}
+{-# LANGUAGE DeriveGeneric, DeriveTraversable, DerivingVia, FlexibleContexts, FlexibleInstances, LambdaCase, OverloadedStrings, QuantifiedConstraints, RecordWildCards, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeOperators #-}
 module Analysis.Typecheck
 ( Monotype (..)
 , Meta
@@ -30,6 +30,7 @@ import qualified Data.Map as Map
 import           Data.Maybe (fromJust, fromMaybe)
 import           Data.Name as Name
 import           Data.Scope
+import           Data.Semigroup (Last (..))
 import qualified Data.Set as Set
 import           Data.Term
 import           Data.Void
@@ -43,6 +44,9 @@ data Monotype f a
   | Arr (f a) (f a)
   | Record (Map.Map User (f a))
   deriving (Foldable, Functor, Generic1, Traversable)
+
+-- FIXME: Union the effects/annotations on the operands.
+deriving via (Last (Term Monotype a)) instance Semigroup (Term Monotype a)
 
 deriving instance (Eq   a, forall a . Eq   a => Eq   (f a), Monad f) => Eq   (Monotype f a)
 deriving instance (Ord  a, forall a . Eq   a => Eq   (f a)
