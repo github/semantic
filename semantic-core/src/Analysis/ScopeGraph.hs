@@ -12,5 +12,6 @@ data Entry = Entry
   { entrySymbol :: Text
   , entryLoc    :: Loc
   }
+  deriving (Eq, Ord, Show)
 
 type ScopeGraph = Map.Map Entry (Set.Set Entry)
