@@ -50,8 +50,6 @@ instance Monoid Value where
 
 data Semi
   = Closure Loc User (Term Core.Core User) User
-  -- FIXME: Bound String values.
-  | String Text
   | Abstract
   deriving (Eq, Ord, Show)
 
@@ -106,8 +104,7 @@ scopeGraphAnalysis = Analysis{..}
         unit = pure mempty
         bool _ = pure mempty
         asBool _ = pure True <|> pure False
-        string s = pure (Value (String s) mempty)
-        asString (Value (String s) _) = pure s
+        string _ = pure mempty
         asString _ = pure mempty
         record fields = pure (Value Abstract (foldMap (valueGraph . snd) fields))
         _ ... m = pure (Just m)
