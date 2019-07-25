@@ -90,7 +90,7 @@ typecheckingFlowInsensitive :: [File (Term Core.Core User)] -> (Heap User (Term 
 typecheckingFlowInsensitive
   = run
   . runFresh
-  . runHeap "__semantic_root"
+  . runHeap
   . fmap (fmap (fmap (fmap generalize)))
   . traverse runFile
 

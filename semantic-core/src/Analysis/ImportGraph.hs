@@ -52,7 +52,7 @@ importGraph :: [File (Term Core.Core User)] -> (Heap User Value, [File (Either (
 importGraph
   = run
   . runFresh
-  . runHeap "__semantic_root"
+  . runHeap
   . traverse runFile
 
 runFile :: ( Carrier sig m

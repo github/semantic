@@ -58,7 +58,7 @@ scopeGraph :: [File (Term Core.Core User)] -> (Heap User Value, [File (Either (L
 scopeGraph
   = run
   . runFresh
-  . runHeap "__semantic_root"
+  . runHeap
   . traverse runFile
 
 runFile
