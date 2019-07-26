@@ -13,6 +13,7 @@ import           Control.Effect.Fail
 import           Control.Effect.Fresh
 import           Control.Effect.Reader
 import           Control.Effect.State
+import           Control.Monad ((>=>))
 import qualified Data.Core as Core
 import           Data.File
 import           Data.Foldable (fold)
@@ -83,7 +84,7 @@ importGraphAnalysis = Analysis{..}
   where alloc = pure
         bind _ _ m = m
         lookupEnv = pure . Just
-        deref addr = gets (Map.lookup addr) >>= maybe (pure Nothing) (foldMapA (pure . Just)) . nonEmpty . maybe [] Set.toList
+        deref addr = gets (Map.lookup addr >=> nonEmpty . Set.toList) >>= maybe (pure Nothing) (foldMapA (pure . Just))
         assign addr ty = modify (Map.insertWith (<>) addr (Set.singleton ty))
         abstract _ name body = do
           loc <- ask

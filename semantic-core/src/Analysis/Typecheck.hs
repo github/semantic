@@ -15,7 +15,7 @@ import           Control.Effect.Fail
 import           Control.Effect.Fresh as Fresh
 import           Control.Effect.Reader hiding (Local)
 import           Control.Effect.State
-import           Control.Monad (unless)
+import           Control.Monad ((>=>), unless)
 import           Control.Monad.Module
 import qualified Data.Core as Core
 import           Data.File
@@ -133,7 +133,7 @@ typecheckingAnalysis = Analysis{..}
   where alloc = pure
         bind _ _ m = m
         lookupEnv = pure . Just
-        deref addr = gets (Map.lookup addr) >>= maybe (pure Nothing) (foldMapA (pure . Just)) . nonEmpty . maybe [] Set.toList
+        deref addr = gets (Map.lookup addr >=> nonEmpty . Set.toList) >>= maybe (pure Nothing) (foldMapA (pure . Just))
         assign addr ty = modify (Map.insertWith (<>) addr (Set.singleton ty))
         abstract eval name body = do
           -- FIXME: construct the associated scope
