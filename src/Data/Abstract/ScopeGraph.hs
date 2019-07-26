@@ -76,7 +76,7 @@ instance Ord AccessControl where
   (<=) Private _           = True
   (<=) _       Private     = False
 
-  -- | Protected AccessControl is inbetween Private and Public in the order specification.
+  -- | Protected AccessControl is in between Private and Public in the order specification.
   -- Protected AccessControl "on the left" has access to Protected or Public AccessControls "on the right".
   (<=) Protected Public    = True
   (<=) Protected Protected = True
