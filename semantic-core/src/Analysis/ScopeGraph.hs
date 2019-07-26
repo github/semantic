@@ -80,6 +80,7 @@ scopeGraphAnalysis = Analysis{..}
         assign addr ty = modify (Map.insertWith (<>) addr (Set.singleton ty))
         abstract eval name body = do
           addr <- alloc name
+          assign name (mempty @ScopeGraph)
           bind name addr (eval body)
         apply _ f a = pure (f <> a)
         unit = pure mempty
