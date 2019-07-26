@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, OverloadedStrings, RecordWildCards, TypeApplications #-}
+{-# LANGUAGE FlexibleContexts, GeneralizedNewtypeDeriving, OverloadedStrings, RecordWildCards, TypeApplications #-}
 module Analysis.ScopeGraph
 ( ScopeGraph
 , Entry(..)
@@ -10,7 +10,6 @@ import           Analysis.Eval
 import           Analysis.FlowInsensitive
 import           Control.Applicative (Alternative (..))
 import           Control.Effect.Carrier
-import           Control.Effect.Fail
 import           Control.Effect.Fresh
 import           Control.Effect.Reader
 import           Control.Effect.State
@@ -33,28 +32,13 @@ data Entry = Entry
   }
   deriving (Eq, Ord, Show)
 
-type ScopeGraph = Map.Map Entry (Set.Set Entry)
+newtype ScopeGraph = ScopeGraph { unScopeGraph :: Map.Map Entry (Set.Set Entry) }
+  deriving (Eq, Monoid, Ord, Show)
 
+instance Semigroup ScopeGraph where
+  ScopeGraph a <> ScopeGraph b = ScopeGraph (Map.unionWith (<>) a b)
 
-data Value = Value
-  { valueSemi  :: Semi
-  , valueGraph :: ScopeGraph
-  }
-  deriving (Eq, Ord, Show)
-
-instance Semigroup Value where
-  Value _ g1 <> Value _ g2 = Value Abstract (Map.unionWith (<>) g1 g2)
-
-instance Monoid Value where
-  mempty = Value Abstract mempty
-
-data Semi
-  = Closure Loc User (Term Core.Core User)
-  | Abstract
-  deriving (Eq, Ord, Show)
-
-
-scopeGraph :: [File (Term Core.Core User)] -> (Heap User Value, [File (Either (Loc, String) Value)])
+scopeGraph :: [File (Term Core.Core User)] -> (Heap User ScopeGraph, [File (Either (Loc, String) ScopeGraph)])
 scopeGraph
   = run
   . runFresh
@@ -65,10 +49,10 @@ runFile
   :: ( Carrier sig m
      , Effect sig
      , Member Fresh sig
-     , Member (State (Heap User Value)) sig
+     , Member (State (Heap User ScopeGraph)) sig
      )
   => File (Term Core.Core User)
-  -> m (File (Either (Loc, String) Value))
+  -> m (File (Either (Loc, String) ScopeGraph))
 runFile file = traverse run file
   where run = runReader (fileLoc file)
             . runFailWithLoc
@@ -79,29 +63,23 @@ runFile file = traverse run file
 scopeGraphAnalysis
   :: ( Alternative m
      , Carrier sig m
-     , Member (Reader Loc) sig
-     , Member (State (Heap User Value)) sig
-     , MonadFail m
+     , Member (State (Heap User ScopeGraph)) sig
      )
-  => Analysis User Value m
+  => Analysis User ScopeGraph m
 scopeGraphAnalysis = Analysis{..}
   where alloc = pure
         bind _ _ m = m
         lookupEnv = pure . Just
-        deref addr = gets (Map.lookup addr) >>= maybe (pure Nothing) (foldMapA (pure . Just)) . nonEmpty . maybe [] (Set.toList @Value)
+        deref addr = gets (Map.lookup addr) >>= maybe (pure Nothing) (foldMapA (pure . Just)) . nonEmpty . maybe [] (Set.toList @ScopeGraph)
         assign addr ty = modify (Map.insertWith (<>) addr (Set.singleton ty))
-        abstract _ name body = do
-          loc <- ask
-          pure (Value (Closure loc name body) mempty)
-        apply eval (Value (Closure loc name body) _) a = local (const loc) $ do
+        abstract eval name body = do
           addr <- alloc name
-          assign addr a
           bind name addr (eval body)
-        apply _ f _ = fail $ "Cannot coerce " <> show f <> " to function"
+        apply _ f a = pure (f <> a)
         unit = pure mempty
         bool _ = pure mempty
         asBool _ = pure True <|> pure False
         string _ = pure mempty
         asString _ = pure mempty
-        record fields = pure (Value Abstract (foldMap (valueGraph . snd) fields))
+        record fields = pure (foldMap snd fields)
         _ ... m = pure (Just m)
