@@ -55,6 +55,7 @@ runFile
   -> m (File (Either (Loc, String) ScopeGraph))
 runFile file = traverse run file
   where run = runReader (fileLoc file)
+            . runReader (Map.empty @User @Loc)
             . runFailWithLoc
             . fmap fold
             . convergeTerm (fix (cacheTerm . eval scopeGraphAnalysis))
@@ -63,12 +64,16 @@ runFile file = traverse run file
 scopeGraphAnalysis
   :: ( Alternative m
      , Carrier sig m
+     , Member (Reader Loc) sig
+     , Member (Reader (Map.Map User Loc)) sig
      , Member (State (Heap User ScopeGraph)) sig
      )
   => Analysis User ScopeGraph m
 scopeGraphAnalysis = Analysis{..}
   where alloc = pure
-        bind _ _ m = m
+        bind name _ m = do
+          loc <- ask @Loc
+          local (Map.insert name loc) m
         lookupEnv = pure . Just
         deref addr = gets (Map.lookup addr) >>= maybe (pure Nothing) (foldMapA (pure . Just)) . nonEmpty . maybe [] (Set.toList @ScopeGraph)
         assign addr ty = modify (Map.insertWith (<>) addr (Set.singleton ty))
