@@ -78,10 +78,12 @@ runFile file = traverse run file
 importGraphAnalysis :: ( Alternative m
                        , Carrier sig m
                        , Member (Reader Loc) sig
-                       , Member (State (Heap User (Value (Term (Core.Ann :+: Core.Core) User)))) sig
+                       , Member (State (Heap User (Value (term User)))) sig
                        , MonadFail m
+                       , Ord  (term User)
+                       , Show (term User)
                        )
-                    => Analysis (Term (Core.Ann :+: Core.Core)) User (Value (Term (Core.Ann :+: Core.Core) User)) m
+                    => Analysis term User (Value (term User)) m
 importGraphAnalysis = Analysis{..}
   where alloc = pure
         bind _ _ m = m
