@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, GeneralizedNewtypeDeriving, OverloadedStrings, RankNTypes, RecordWildCards, TypeApplications, TypeOperators #-}
+{-# LANGUAGE FlexibleContexts, OverloadedStrings, RankNTypes, RecordWildCards, TypeApplications, TypeOperators #-}
 module Analysis.ScopeGraph
 ( ScopeGraph(..)
 , Entry(..)
@@ -34,10 +34,13 @@ data Entry = Entry
   deriving (Eq, Ord, Show)
 
 newtype ScopeGraph = ScopeGraph { unScopeGraph :: Map.Map Entry (Set.Set Entry) }
-  deriving (Eq, Monoid, Ord, Show)
+  deriving (Eq, Ord, Show)
 
 instance Semigroup ScopeGraph where
   ScopeGraph a <> ScopeGraph b = ScopeGraph (Map.unionWith (<>) a b)
+
+instance Monoid ScopeGraph where
+  mempty = ScopeGraph Map.empty
 
 scopeGraph
   :: Ord term
