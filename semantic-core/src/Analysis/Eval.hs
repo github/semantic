@@ -90,30 +90,30 @@ eval Analysis{..} eval = \case
           Term (L (Ann loc c)) -> local (const loc) (ref c)
 
 
-prog1 :: File (Term (Ann :+: Core) User)
+prog1 :: (Carrier sig t, Member Core sig) => File (t User)
 prog1 = fromBody $ lam (named' "foo")
   (    named' "bar" :<- pure "foo"
   >>>= Core.if' (pure "bar")
     (Core.bool False)
     (Core.bool True))
 
-prog2 :: File (Term (Ann :+: Core) User)
+prog2 :: (Carrier sig t, Member Core sig) => File (t User)
 prog2 = fromBody $ fileBody prog1 $$ Core.bool True
 
-prog3 :: File (Term (Ann :+: Core) User)
+prog3 :: (Carrier sig t, Member Core sig) => File (t User)
 prog3 = fromBody $ lams [named' "foo", named' "bar", named' "quux"]
   (Core.if' (pure "quux")
     (pure "bar")
     (pure "foo"))
 
-prog4 :: File (Term (Ann :+: Core) User)
+prog4 :: (Carrier sig t, Member Core sig) => File (t User)
 prog4 = fromBody
   (    named' "foo" :<- Core.bool True
   >>>= Core.if' (pure "foo")
     (Core.bool True)
     (Core.bool False))
 
-prog5 :: File (Term (Ann :+: Core) User)
+prog5 :: (Carrier sig t, Member Ann sig, Member Core sig) => File (t User)
 prog5 = fromBody $ ann (do'
   [ Just (named' "mkPoint") :<- lams [named' "_x", named' "_y"] (ann (Core.record
     [ ("x", ann (pure "_x"))
@@ -124,7 +124,7 @@ prog5 = fromBody $ ann (do'
   , Nothing :<- ann (ann (pure "point") Core.... "y") .= ann (ann (pure "point") Core.... "x")
   ])
 
-prog6 :: [File (Term (Ann :+: Core) User)]
+prog6 :: (Carrier sig t, Member Core sig) => [File (t User)]
 prog6 =
   [ File (Loc "dep"  (locSpan (fromJust here))) $ Core.record
     [ ("dep", Core.record [ ("var", Core.bool True) ]) ]
@@ -134,7 +134,7 @@ prog6 =
     ])
   ]
 
-ruby :: File (Term (Ann :+: Core) User)
+ruby :: (Carrier sig t, Member Ann sig, Member Core sig) => File (t User)
 ruby = fromBody $ annWith callStack (rec (named' __semantic_global) (do' statements))
   where statements =
           [ Just "Class" :<- record
