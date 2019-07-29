@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, OverloadedStrings, RecordWildCards #-}
+{-# LANGUAGE FlexibleContexts, OverloadedStrings, RecordWildCards, TypeOperators #-}
 module Analysis.ImportGraph
 ( ImportGraph
 , importGraph
@@ -41,14 +41,14 @@ instance Monoid Value where
   mempty = Value Abstract mempty
 
 data Semi
-  = Closure Loc User (Term Core.Core User) User
+  = Closure Loc User (Term (Core.Ann :+: Core.Core) User) User
   -- FIXME: Bound String values.
   | String Text
   | Abstract
   deriving (Eq, Ord, Show)
 
 
-importGraph :: [File (Term Core.Core User)] -> (Heap User Value, [File (Either (Loc, String) Value)])
+importGraph :: [File (Term (Core.Ann :+: Core.Core) User)] -> (Heap User Value, [File (Either (Loc, String) Value)])
 importGraph
   = run
   . runFresh
@@ -61,7 +61,7 @@ runFile :: ( Carrier sig m
            , Member (Reader (FrameId User)) sig
            , Member (State (Heap User Value)) sig
            )
-        => File (Term Core.Core User)
+        => File (Term (Core.Ann :+: Core.Core) User)
         -> m (File (Either (Loc, String) Value))
 runFile file = traverse run file
   where run = runReader (fileLoc file)
