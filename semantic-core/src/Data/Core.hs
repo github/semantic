@@ -214,14 +214,9 @@ infix 3 .=
 
 data Ann f a
   = Ann Loc (f a)
-  deriving (Foldable, Functor, Generic1, Traversable)
+  deriving (Eq, Foldable, Functor, Generic1, Ord, Show, Traversable)
 
 instance HFunctor Ann
-
-deriving instance (Eq   a, forall a . Eq   a => Eq   (f a), Monad f) => Eq   (Ann f a)
-deriving instance (Ord  a, forall a . Eq   a => Eq   (f a)
-                         , forall a . Ord  a => Ord  (f a), Monad f) => Ord  (Ann f a)
-deriving instance (Show a, forall a . Show a => Show (f a))          => Show (Ann f a)
 
 instance RightModule Ann where
   Ann l b >>=* f = Ann l (b >>= f)
