@@ -1,4 +1,4 @@
-{-# LANGUAGE ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE FlexibleContexts, ScopedTypeVariables #-}
 
 module Generators
   ( literal
@@ -18,7 +18,7 @@ import Hedgehog hiding (Var)
 import qualified Hedgehog.Gen as Gen
 import qualified Hedgehog.Range as Range
 
-import Control.Effect.Sum ((:+:))
+import Control.Effect.Carrier
 import qualified Data.Core as Core
 import Data.Name
 import Data.Term
@@ -30,16 +30,16 @@ name :: MonadGen m => m (Named User)
 name = Gen.prune (named' <$> names) where
   names = Gen.text (Range.linear 1 10) Gen.lower
 
-boolean :: MonadGen m => m (Term (Core.Ann :+: Core.Core) User)
+boolean :: (Carrier sig t, Member Core.Core sig, MonadGen m) => m (t User)
 boolean = Core.bool <$> Gen.bool
 
-variable :: MonadGen m => m (Term (Core.Ann :+: Core.Core) User)
+variable :: (Carrier sig t, Member Core.Core sig, MonadGen m) => m (t User)
 variable = pure . namedValue <$> name
 
-ifthenelse :: MonadGen m => m (Term (Core.Ann :+: Core.Core) User) -> m (Term (Core.Ann :+: Core.Core) User)
+ifthenelse :: (Carrier sig t, Member Core.Core sig, MonadGen m) => m (t User) -> m (t User)
 ifthenelse bod = Gen.subterm3 boolean bod bod Core.if'
 
-apply :: MonadGen m => m (Term (Core.Ann :+: Core.Core) User) -> m (Term (Core.Ann :+: Core.Core) User)
+apply :: (Carrier sig t, Member Core.Core sig, MonadGen m) => m (t User) -> m (t User)
 apply gen = go where
   go = Gen.recursive
     Gen.choice
@@ -48,21 +48,21 @@ apply gen = go where
     , Gen.subtermM go (\x -> Core.lam <$> name <*> pure x)
     ]
 
-lambda :: MonadGen m => m (Term (Core.Ann :+: Core.Core) User) -> m (Term (Core.Ann :+: Core.Core) User)
+lambda :: (Carrier sig t, Member Core.Core sig, MonadGen m) => m (t User) -> m (t User)
 lambda bod = do
   arg <- name
   Gen.subterm bod (Core.lam arg)
 
-record :: MonadGen m => m (Term (Core.Ann :+: Core.Core) User) -> m (Term (Core.Ann :+: Core.Core) User)
+record :: (Carrier sig t, Member Core.Core sig, MonadGen m) => m (t User) -> m (t User)
 record bod = Core.record <$> Gen.list (Range.linear 0 5) ((,) . namedValue <$> name <*> bod)
 
-atoms :: MonadGen m => [m (Term (Core.Ann :+: Core.Core) User)]
+atoms :: (Carrier sig t, Member Core.Core sig, MonadGen m) => [m (t User)]
 atoms = [variable, pure Core.unit, boolean, Core.string <$> Gen.text (Range.linear 1 10) Gen.lower]
 
-literal :: MonadGen m => m (Term (Core.Ann :+: Core.Core) User)
+literal :: (Carrier sig t, Member Core.Core sig, MonadGen m) => m (t User)
 literal = Gen.recursive Gen.choice atoms [lambda literal, record literal]
 
-expr :: MonadGen m => m (Term (Core.Ann :+: Core.Core) User)
+expr :: (Carrier sig t, Member Core.Core sig, MonadGen m) => m (t User)
 expr = Gen.recursive Gen.choice atoms
   [ Gen.subtermM expr (\x -> flip Core.rec x <$> name)
   , Gen.subterm2 expr expr (Core.>>>)
