@@ -128,7 +128,7 @@ typecheckingAnalysis
      , Member (State (Set.Set Constraint)) sig
      , Member (State (Heap User (Term Monotype Meta))) sig
      )
-  => Analysis User (Term Monotype Meta) m
+  => Analysis term User (Term Monotype Meta) m
 typecheckingAnalysis = Analysis{..}
   where alloc = pure
         bind _ _ m = m

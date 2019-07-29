@@ -33,7 +33,7 @@ eval :: ( Carrier sig m
         , MonadFail m
         , Semigroup value
         )
-     => Analysis address value m
+     => Analysis (Term (Ann :+: Core)) address value m
      -> (Term (Ann :+: Core) User -> m value)
      -> (Term (Ann :+: Core) User -> m value)
 eval Analysis{..} eval = \case
@@ -211,14 +211,14 @@ ruby = fromBody $ annWith callStack (rec (named' __semantic_global) (do' stateme
         __semantic_truthy = "__semantic_truthy"
 
 
-data Analysis address value m = Analysis
+data Analysis term address value m = Analysis
   { alloc     :: User -> m address
   , bind      :: forall a . User -> address -> m a -> m a
   , lookupEnv :: User -> m (Maybe address)
   , deref     :: address -> m (Maybe value)
   , assign    :: address -> value -> m ()
-  , abstract  :: (Term (Ann :+: Core) User -> m value) -> User -> Term (Ann :+: Core) User -> m value
-  , apply     :: (Term (Ann :+: Core) User -> m value) -> value -> value -> m value
+  , abstract  :: (term User -> m value) -> User -> term User -> m value
+  , apply     :: (term User -> m value) -> value -> value -> m value
   , unit      :: m value
   , bool      :: Bool -> m value
   , asBool    :: value -> m Bool

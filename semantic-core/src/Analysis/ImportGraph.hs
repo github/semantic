@@ -78,7 +78,7 @@ importGraphAnalysis :: ( Alternative m
                        , Member (State (Heap User Value)) sig
                        , MonadFail m
                        )
-                    => Analysis User Value m
+                    => Analysis (Term (Core.Ann :+: Core.Core)) User Value m
 importGraphAnalysis = Analysis{..}
   where alloc = pure
         bind _ _ m = m
