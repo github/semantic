@@ -84,6 +84,7 @@ test-suite spec
   other-modules:       Generators
   build-depends:       base
                      , semantic-core
+                     , fused-effects
                      , hedgehog ^>= 1
                      , tasty >= 1.2 && <2
                      , tasty-hedgehog ^>= 1.0.0.1
