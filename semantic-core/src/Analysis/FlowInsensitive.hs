@@ -67,8 +67,8 @@ cacheTerm eval term = do
       result <- eval term
       result <$ modify (Cache . Map.insertWith (<>) term (Set.singleton (result :: a)) . unCache)
 
-runHeap :: address -> ReaderC (FrameId address) (StateC (Heap address a) m) b -> m (Heap address a, b)
-runHeap addr m = runState (Map.singleton addr Set.empty) (runReader (FrameId addr) m)
+runHeap :: address -> StateC (Heap address a) m b -> m (Heap address a, b)
+runHeap addr m = runState (Map.singleton addr Set.empty) m
 
 -- | Fold a collection by mapping each element onto an 'Alternative' action.
 foldMapA :: (Alternative m, Foldable t) => (b -> m a) -> t b -> m a
