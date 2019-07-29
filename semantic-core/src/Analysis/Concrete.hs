@@ -41,16 +41,16 @@ type Env = Map.Map User Precise
 newtype FrameId = FrameId { unFrameId :: Precise }
   deriving (Eq, Ord, Show)
 
-data Concrete
-  = Closure Loc User (Term (Core.Ann :+: Core.Core) User) Env
+data Concrete term
+  = Closure Loc User term Env
   | Unit
   | Bool Bool
   | String Text
   | Record Env
   deriving (Eq, Ord, Show)
-  deriving Semigroup via Last Concrete
+  deriving Semigroup via Last (Concrete term)
 
-recordFrame :: Concrete -> Maybe Env
+recordFrame :: Concrete term -> Maybe Env
 recordFrame (Record frame) = Just frame
 recordFrame _              = Nothing
 
@@ -59,7 +59,7 @@ newtype Frame = Frame
   }
   deriving (Eq, Ord, Show)
 
-type Heap = IntMap.IntMap Concrete
+type Heap = IntMap.IntMap (Concrete (Term (Core.Ann :+: Core.Core) User))
 
 data Edge = Lexical | Import
   deriving (Eq, Ord, Show)
@@ -69,7 +69,7 @@ data Edge = Lexical | Import
 --
 --   >>> map fileBody (snd (concrete [File (Loc "bool" emptySpan) (Core.bool True)]))
 --   [Right (Bool True)]
-concrete :: [File (Term (Core.Ann :+: Core.Core) User)] -> (Heap, [File (Either (Loc, String) Concrete)])
+concrete :: [File (Term (Core.Ann :+: Core.Core) User)] -> (Heap, [File (Either (Loc, String) (Concrete (Term (Core.Ann :+: Core.Core) User)))])
 concrete
   = run
   . runFresh
@@ -82,7 +82,7 @@ runFile :: ( Carrier sig m
            , Member (State Heap) sig
            )
         => File (Term (Core.Ann :+: Core.Core) User)
-        -> m (File (Either (Loc, String) Concrete))
+        -> m (File (Either (Loc, String) (Concrete (Term (Core.Ann :+: Core.Core) User))))
 runFile file = traverse run file
   where run = runReader (fileLoc file)
             . runFailWithLoc
@@ -96,7 +96,7 @@ concreteAnalysis :: ( Carrier sig m
                     , Member (State Heap) sig
                     , MonadFail m
                     )
-                 => Analysis (Term (Core.Ann :+: Core.Core) User) Precise Concrete m
+                 => Analysis (Term (Core.Ann :+: Core.Core) User) Precise (Concrete (Term (Core.Ann :+: Core.Core) User)) m
 concreteAnalysis = Analysis{..}
   where alloc _ = fresh
         bind name addr m = local (Map.insert name addr) m
@@ -132,7 +132,7 @@ concreteAnalysis = Analysis{..}
           pure (val >>= lookupConcrete heap n)
 
 
-lookupConcrete :: Heap -> User -> Concrete -> Maybe Precise
+lookupConcrete :: Heap -> User -> Concrete (Term (Core.Ann :+: Core.Core) User) -> Maybe Precise
 lookupConcrete heap name = run . evalState IntSet.empty . runNonDet . inConcrete
   where -- look up the name in a concrete value
         inConcrete = inFrame <=< maybeA . recordFrame
@@ -158,7 +158,7 @@ runHeap = runState mempty
 --   > λ let (heap, res) = concrete [ruby]
 --   > λ writeFile "/Users/rob/Desktop/heap.dot" (export (addressStyle heap) (heapAddressGraph heap))
 --   > λ :!dot -Tsvg < ~/Desktop/heap.dot > ~/Desktop/heap.svg
-heapGraph :: (Precise -> Concrete -> a) -> (Either Edge User -> Precise -> G.Graph a) -> Heap -> G.Graph a
+heapGraph :: (Precise -> Concrete (Term (Core.Ann :+: Core.Core) User) -> a) -> (Either Edge User -> Precise -> G.Graph a) -> Heap -> G.Graph a
 heapGraph vertex edge h = foldr (uncurry graph) G.empty (IntMap.toList h)
   where graph k v rest = (G.vertex (vertex k v) `G.connect` outgoing v) `G.overlay` rest
         outgoing = \case
@@ -168,7 +168,7 @@ heapGraph vertex edge h = foldr (uncurry graph) G.empty (IntMap.toList h)
           Closure _ _ _ env -> foldr (G.overlay . edge (Left Lexical)) G.empty env
           Record frame -> foldr (G.overlay . uncurry (edge . Right)) G.empty (Map.toList frame)
 
-heapValueGraph :: Heap -> G.Graph Concrete
+heapValueGraph :: Heap -> G.Graph (Concrete (Term (Core.Ann :+: Core.Core) User))
 heapValueGraph h = heapGraph (const id) (const fromAddr) h
   where fromAddr addr = maybe G.empty G.vertex (IntMap.lookup addr h)
 
@@ -193,7 +193,7 @@ addressStyle heap = (G.defaultStyle vertex) { G.edgeAttributes }
 data EdgeType
   = Edge Edge
   | Slot User
-  | Value Concrete
+  | Value (Concrete (Term (Core.Ann :+: Core.Core) User))
   deriving (Eq, Ord, Show)
 
 
