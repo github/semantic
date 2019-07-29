@@ -10,8 +10,9 @@ module Data.Core.Parser
 -- Consult @doc/grammar.md@ for an EBNF grammar.
 
 import           Control.Applicative
+import           Control.Effect.Sum
 import qualified Data.Char as Char
-import           Data.Core (Core)
+import           Data.Core (Ann, Core)
 import qualified Data.Core as Core
 import           Data.Foldable (foldl')
 import           Data.Name
@@ -46,22 +47,22 @@ identifier = choice [quote, plain] <?> "identifier" where
 
 -- * Parsers (corresponding to EBNF)
 
-core :: (TokenParsing m, Monad m) => m (Term Core User)
+core :: (TokenParsing m, Monad m) => m (Term (Ann :+: Core) User)
 core = expr
 
-expr :: (TokenParsing m, Monad m) => m (Term Core User)
+expr :: (TokenParsing m, Monad m) => m (Term (Ann :+: Core) User)
 expr = ifthenelse <|> lambda <|> rec <|> load <|> assign
 
-assign :: (TokenParsing m, Monad m) => m (Term Core User)
+assign :: (TokenParsing m, Monad m) => m (Term (Ann :+: Core) User)
 assign = application <**> (flip (Core..=) <$ symbolic '=' <*> application <|> pure id) <?> "assignment"
 
-application :: (TokenParsing m, Monad m) => m (Term Core User)
+application :: (TokenParsing m, Monad m) => m (Term (Ann :+: Core) User)
 application = projection `chainl1` (pure (Core.$$))
 
-projection :: (TokenParsing m, Monad m) => m (Term Core User)
+projection :: (TokenParsing m, Monad m) => m (Term (Ann :+: Core) User)
 projection = foldl' (Core....) <$> atom <*> many (namedValue <$ dot <*> name)
 
-atom :: (TokenParsing m, Monad m) => m (Term Core User)
+atom :: (TokenParsing m, Monad m) => m (Term (Ann :+: Core) User)
 atom = choice
   [ comp
   , lit
@@ -69,29 +70,29 @@ atom = choice
   , parens expr
   ]
 
-comp :: (TokenParsing m, Monad m) => m (Term Core User)
+comp :: (TokenParsing m, Monad m) => m (Term (Ann :+: Core) User)
 comp = braces (Core.do' <$> sepEndByNonEmpty statement semi) <?> "compound statement"
 
-statement :: (TokenParsing m, Monad m) => m (Maybe (Named User) Core.:<- Term Core User)
+statement :: (TokenParsing m, Monad m) => m (Maybe (Named User) Core.:<- Term (Ann :+: Core) User)
 statement
   =   try ((Core.:<-) . Just <$> name <* symbol "<-" <*> expr)
   <|> (Nothing Core.:<-) <$> expr
   <?> "statement"
 
-ifthenelse :: (TokenParsing m, Monad m) => m (Term Core User)
+ifthenelse :: (TokenParsing m, Monad m) => m (Term (Ann :+: Core) User)
 ifthenelse = Core.if'
   <$ reserved "if"   <*> expr
   <* reserved "then" <*> expr
   <* reserved "else" <*> expr
   <?> "if-then-else statement"
 
-rec :: (TokenParsing m, Monad m) => m (Term Core User)
+rec :: (TokenParsing m, Monad m) => m (Term (Ann :+: Core) User)
 rec = Core.rec <$ reserved "rec" <*> name <* symbolic '=' <*> expr <?> "recursive binding"
 
-load :: (TokenParsing m, Monad m) => m (Term Core User)
+load :: (TokenParsing m, Monad m) => m (Term (Ann :+: Core) User)
 load = Core.load <$ reserved "load" <*> expr
 
-lvalue :: (TokenParsing m, Monad m) => m (Term Core User)
+lvalue :: (TokenParsing m, Monad m) => m (Term (Ann :+: Core) User)
 lvalue = choice
   [ projection
   , ident
@@ -103,7 +104,7 @@ lvalue = choice
 name :: (TokenParsing m, Monad m) => m (Named User)
 name = named' <$> identifier <?> "name"
 
-lit :: (TokenParsing m, Monad m) => m (Term Core User)
+lit :: (TokenParsing m, Monad m) => m (Term (Ann :+: Core) User)
 lit = let x `given` n = x <$ reserved n in choice
   [ Core.bool True  `given` "#true"
   , Core.bool False `given` "#false"
@@ -118,13 +119,13 @@ lit = let x `given` n = x <$ reserved n in choice
           , '\t' <$ string "t"
           ] <?> "escape sequence"
 
-record :: (TokenParsing m, Monad m) => m (Term Core User)
+record :: (TokenParsing m, Monad m) => m (Term (Ann :+: Core) User)
 record = Core.record <$ reserved "#record" <*> braces (sepEndBy ((,) <$> identifier <* symbolic ':' <*> expr) comma)
 
-lambda :: (TokenParsing m, Monad m) => m (Term Core User)
+lambda :: (TokenParsing m, Monad m) => m (Term (Ann :+: Core) User)
 lambda = Core.lam <$ lambduh <*> name <* arrow <*> expr <?> "lambda" where
   lambduh = symbolic 'λ' <|> symbolic '\\'
   arrow   = symbol "→"   <|> symbol "->"
 
-ident :: (Monad m, TokenParsing m) => m (Term Core User)
+ident :: (Monad m, TokenParsing m) => m (Term (Ann :+: Core) User)
 ident = pure . namedValue <$> name <?> "identifier"
