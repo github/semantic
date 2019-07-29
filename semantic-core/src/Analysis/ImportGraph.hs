@@ -50,7 +50,11 @@ data Semi term
   deriving (Eq, Ord, Show)
 
 
-importGraph :: [File (Term (Core.Ann :+: Core.Core) User)] -> (Heap User (Value (Term (Core.Ann :+: Core.Core) User)), [File (Either (Loc, String) (Value (Term (Core.Ann :+: Core.Core) User)))])
+importGraph
+  :: [File (Term (Core.Ann :+: Core.Core) User)]
+  -> ( Heap User (Value (Term (Core.Ann :+: Core.Core) User))
+     , [File (Either (Loc, String) (Value (Term (Core.Ann :+: Core.Core) User)))]
+     )
 importGraph
   = run
   . runFresh
