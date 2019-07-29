@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, GeneralizedNewtypeDeriving, OverloadedStrings, RecordWildCards, TypeApplications #-}
+{-# LANGUAGE FlexibleContexts, GeneralizedNewtypeDeriving, OverloadedStrings, RecordWildCards, TypeApplications, TypeOperators #-}
 module Analysis.ScopeGraph
 ( ScopeGraph
 , Entry(..)
@@ -22,6 +22,7 @@ import           Data.List.NonEmpty
 import           Data.Loc
 import qualified Data.Map as Map
 import           Data.Name
+import           Data.Proxy
 import qualified Data.Set as Set
 import           Data.Text (Text)
 import           Data.Term
@@ -39,7 +40,7 @@ newtype ScopeGraph = ScopeGraph { unScopeGraph :: Map.Map Entry (Set.Set Entry) 
 instance Semigroup ScopeGraph where
   ScopeGraph a <> ScopeGraph b = ScopeGraph (Map.unionWith (<>) a b)
 
-scopeGraph :: [File (Term Core.Core User)] -> (Heap User ScopeGraph, [File (Either (Loc, String) ScopeGraph)])
+scopeGraph :: [File (Term (Core.Ann :+: Core.Core) User)] -> (Heap User ScopeGraph, [File (Either (Loc, String) ScopeGraph)])
 scopeGraph
   = run
   . runFresh
@@ -52,14 +53,14 @@ runFile
      , Member Fresh sig
      , Member (State (Heap User ScopeGraph)) sig
      )
-  => File (Term Core.Core User)
+  => File (Term (Core.Ann :+: Core.Core) User)
   -> m (File (Either (Loc, String) ScopeGraph))
 runFile file = traverse run file
   where run = runReader (fileLoc file)
             . runReader (Map.empty @User @Loc)
             . runFailWithLoc
             . fmap fold
-            . convergeTerm (fix (cacheTerm . eval scopeGraphAnalysis))
+            . convergeTerm (Proxy @User) (fix (cacheTerm . eval scopeGraphAnalysis))
 
 -- FIXME: decompose into a product domain and two atomic domains
 scopeGraphAnalysis
@@ -69,7 +70,7 @@ scopeGraphAnalysis
      , Member (Reader (Map.Map User Loc)) sig
      , Member (State (Heap User ScopeGraph)) sig
      )
-  => Analysis User ScopeGraph m
+  => Analysis term User ScopeGraph m
 scopeGraphAnalysis = Analysis{..}
   where alloc = pure
         bind name _ m = do

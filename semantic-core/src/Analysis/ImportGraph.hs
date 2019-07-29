@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, OverloadedStrings, RecordWildCards #-}
+{-# LANGUAGE FlexibleContexts, RankNTypes, RecordWildCards, TypeApplications #-}
 module Analysis.ImportGraph
 ( ImportGraph
 , importGraph
@@ -13,7 +13,7 @@ import           Control.Effect.Fail
 import           Control.Effect.Fresh
 import           Control.Effect.Reader
 import           Control.Effect.State
-import qualified Data.Core as Core
+import           Control.Monad ((>=>))
 import           Data.File
 import           Data.Foldable (fold)
 import           Data.Function (fix)
@@ -21,66 +21,88 @@ import           Data.List.NonEmpty (nonEmpty)
 import           Data.Loc
 import qualified Data.Map as Map
 import           Data.Name
+import           Data.Proxy
 import qualified Data.Set as Set
-import           Data.Term
 import           Data.Text (Text)
 import           Prelude hiding (fail)
 
 type ImportGraph = Map.Map Text (Set.Set Text)
 
-data Value = Value
-  { valueSemi  :: Semi
+data Value term = Value
+  { valueSemi  :: Semi term
   , valueGraph :: ImportGraph
   }
   deriving (Eq, Ord, Show)
 
-instance Semigroup Value where
+instance Semigroup (Value term) where
   Value _ g1 <> Value _ g2 = Value Abstract (Map.unionWith (<>) g1 g2)
 
-instance Monoid Value where
+instance Monoid (Value term) where
   mempty = Value Abstract mempty
 
-data Semi
-  = Closure Loc User (Term Core.Core User)
+data Semi term
+  = Closure Loc User term
   -- FIXME: Bound String values.
   | String Text
   | Abstract
   deriving (Eq, Ord, Show)
 
 
-importGraph :: [File (Term Core.Core User)] -> (Heap User Value, [File (Either (Loc, String) Value)])
 importGraph
+  :: (Ord term, Show term)
+  => (forall sig m
+     .  (Carrier sig m, Member (Reader Loc) sig, MonadFail m)
+     => Analysis term User (Value term) m
+     -> (term -> m (Value term))
+     -> (term -> m (Value term))
+     )
+  -> [File term]
+  -> ( Heap User (Value term)
+     , [File (Either (Loc, String) (Value term))]
+     )
+importGraph eval
   = run
   . runFresh
   . runHeap
-  . traverse runFile
+  . traverse (runFile eval)
 
-runFile :: ( Carrier sig m
-           , Effect sig
-           , Member Fresh sig
-           , Member (State (Heap User Value)) sig
-           )
-        => File (Term Core.Core User)
-        -> m (File (Either (Loc, String) Value))
-runFile file = traverse run file
+runFile
+  :: ( Carrier sig m
+     , Effect sig
+     , Member Fresh sig
+     , Member (State (Heap User (Value term))) sig
+     , Ord  term
+     , Show term
+     )
+  => (forall sig m
+     .  (Carrier sig m, Member (Reader Loc) sig, MonadFail m)
+     => Analysis term User (Value term) m
+     -> (term -> m (Value term))
+     -> (term -> m (Value term))
+     )
+  -> File term
+  -> m (File (Either (Loc, String) (Value term)))
+runFile eval file = traverse run file
   where run = runReader (fileLoc file)
             . runFailWithLoc
             . fmap fold
-            . convergeTerm (fix (cacheTerm . eval importGraphAnalysis))
+            . convergeTerm (Proxy @User) (fix (cacheTerm . eval importGraphAnalysis))
 
 -- FIXME: decompose into a product domain and two atomic domains
 importGraphAnalysis :: ( Alternative m
                        , Carrier sig m
                        , Member (Reader Loc) sig
-                       , Member (State (Heap User Value)) sig
+                       , Member (State (Heap User (Value term))) sig
                        , MonadFail m
+                       , Ord  term
+                       , Show term
                        )
-                    => Analysis User Value m
+                    => Analysis term User (Value term) m
 importGraphAnalysis = Analysis{..}
   where alloc = pure
         bind _ _ m = m
         lookupEnv = pure . Just
-        deref addr = gets (Map.lookup addr) >>= maybe (pure Nothing) (foldMapA (pure . Just)) . nonEmpty . maybe [] Set.toList
+        deref addr = gets (Map.lookup addr >=> nonEmpty . Set.toList) >>= maybe (pure Nothing) (foldMapA (pure . Just))
         assign addr ty = modify (Map.insertWith (<>) addr (Set.singleton ty))
         abstract _ name body = do
           loc <- ask
