@@ -1,6 +1,6 @@
 {-# LANGUAGE FlexibleContexts, GeneralizedNewtypeDeriving, OverloadedStrings, RankNTypes, RecordWildCards, TypeApplications, TypeOperators #-}
 module Analysis.ScopeGraph
-( ScopeGraph
+( ScopeGraph(..)
 , Entry(..)
 , scopeGraph
 , scopeGraphAnalysis
