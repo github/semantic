@@ -65,7 +65,7 @@ data Edge = Lexical | Import
 
 -- | Concrete evaluation of a term to a value.
 --
---   >>> map fileBody (snd (concrete [File (Loc "bool" emptySpan) (Core.bool True)]))
+--   >>> map fileBody (snd (concrete eval [File (Loc "bool" emptySpan) (Core.bool True)]))
 --   [Right (Bool True)]
 concrete
   :: (Foldable term, Show (term User))
@@ -217,3 +217,4 @@ data EdgeType term
 
 -- $setup
 -- >>> :seti -XOverloadedStrings
+-- >>> import qualified Data.Core as Core
