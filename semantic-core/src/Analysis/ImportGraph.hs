@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, OverloadedStrings, RecordWildCards, TypeApplications, TypeOperators #-}
+{-# LANGUAGE FlexibleContexts, OverloadedStrings, RankNTypes, RecordWildCards, TypeApplications, TypeOperators #-}
 module Analysis.ImportGraph
 ( ImportGraph
 , importGraph
@@ -59,16 +59,25 @@ importGraph
   = run
   . runFresh
   . runHeap "__semantic_root"
-  . traverse runFile
+  . traverse (runFile eval)
 
-runFile :: ( Carrier sig m
-           , Effect sig
-           , Member Fresh sig
-           , Member (State (Heap User (Value (Term (Core.Ann :+: Core.Core) User)))) sig
-           )
-        => File (Term (Core.Ann :+: Core.Core) User)
-        -> m (File (Either (Loc, String) (Value (Term (Core.Ann :+: Core.Core) User))))
-runFile file = traverse run file
+runFile
+  :: ( Carrier sig m
+     , Effect sig
+     , Member Fresh sig
+     , Member (State (Heap User (Value (term User)))) sig
+     , Ord  (term User)
+     , Show (term User)
+     )
+  => (forall sig m
+     .  (Carrier sig m, Member (Reader Loc) sig, MonadFail m)
+     => Analysis term User (Value (term User)) m
+     -> (term User -> m (Value (term User)))
+     -> (term User -> m (Value (term User)))
+     )
+  -> File (term User)
+  -> m (File (Either (Loc, String) (Value (term User))))
+runFile eval file = traverse run file
   where run = runReader (fileLoc file)
             . runFailWithLoc
             . fmap fold
