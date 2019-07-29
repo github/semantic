@@ -22,13 +22,15 @@ import           Control.Effect.State
 import           Control.Monad ((<=<), guard)
 import qualified Data.Core as Core
 import           Data.File
+import           Data.Foldable (foldl')
 import           Data.Function (fix)
 import qualified Data.IntMap as IntMap
 import qualified Data.IntSet as IntSet
 import           Data.Loc
 import qualified Data.Map as Map
 import           Data.Monoid (Alt(..))
-import           Data.Name
+import           Data.Name hiding (fresh)
+import           Data.Term
 import           Data.Text (Text, pack)
 import           Prelude hiding (fail)
 
@@ -39,7 +41,7 @@ newtype FrameId = FrameId { unFrameId :: Precise }
   deriving (Eq, Ord, Show)
 
 data Concrete
-  = Closure Loc Name Core.Core Precise
+  = Closure Loc Name (Term Core.Core Name) Precise
   | Unit
   | Bool Bool
   | String Text
@@ -61,22 +63,24 @@ type Heap = IntMap.IntMap Concrete
 
 -- | Concrete evaluation of a term to a value.
 --
---   >>> map fileBody (snd (concrete [File (Loc "bool" emptySpan) (Core.Bool True)]))
+--   >>> map fileBody (snd (concrete [File (Loc "bool" emptySpan) (Core.bool True)]))
 --   [Right (Bool True)]
-concrete :: [File Core.Core] -> (Heap, [File (Either (Loc, String) Concrete)])
+concrete :: [File (Term Core.Core Name)] -> (Heap, [File (Either (Loc, String) Concrete)])
 concrete
   = run
   . runFresh
+  . runNaming
   . runHeap
   . traverse runFile
 
 runFile :: ( Carrier sig m
            , Effect sig
            , Member Fresh sig
+           , Member Naming sig
            , Member (Reader FrameId) sig
            , Member (State Heap) sig
            )
-        => File Core.Core
+        => File (Term Core.Core Name)
         -> m (File (Either (Loc, String) Concrete))
 runFile file = traverse run file
   where run = runReader (fileLoc file)
@@ -200,10 +204,7 @@ addressStyle heap = (G.defaultStyle vertex) { G.edgeAttributes }
           Obj _ -> "{}"
         showPos (Pos l c) = pack (show l) <> ":" <> pack (show c)
         fromName (User s)  = s
-        fromName (Gen sym) = fromGensym sym
-        fromName (Path p)  = pack $ show p
-        fromGensym (Root s) = s
-        fromGensym (ss :/ (s, i)) = fromGensym ss <> "." <> s <> pack (show i)
+        fromName (Gen (Gensym ss i)) = foldl' (\ ss s -> ss <> "." <> s) (pack (show i)) ss
 
 data EdgeType
   = Edge Core.Edge

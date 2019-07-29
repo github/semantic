@@ -20,39 +20,41 @@ import Data.Functor
 import Data.Loc
 import Data.Maybe (fromJust)
 import Data.Name
+import Data.Term
 import Data.Text (Text)
 import GHC.Stack
 import Prelude hiding (fail)
 
-eval :: (Carrier sig m, Member (Reader Loc) sig, MonadFail m) => Analysis address value m -> (Core -> m value) -> Core -> m value
+eval :: (Carrier sig m, Member Naming sig, Member (Reader Loc) sig, MonadFail m) => Analysis address value m -> (Term Core Name -> m value) -> Term Core Name -> m value
 eval Analysis{..} eval = \case
   Var n -> lookupEnv' n >>= deref' n
-  Let n -> alloc n >>= bind n >> unit
-  a :>> b -> eval a >> eval b
-  Lam n b -> abstract eval n b
-  f :$ a -> do
-    f' <- eval f
-    a' <- eval a
-    apply eval f' a'
-  Unit -> unit
-  Bool b -> bool b
-  If c t e -> do
-    c' <- eval c >>= asBool
-    if c' then eval t else eval e
-  String s -> string s
-  Load p -> do
-    path <- eval p >>= asString
-    lookupEnv' (Path path) >>= deref' (Path path)
-  Edge e a -> ref a >>= edge e >> unit
-  Frame -> frame
-  a :. b -> do
-    a' <- ref a
-    a' ... eval b
-  a := b -> do
-    b' <- eval b
-    addr <- ref a
-    b' <$ assign addr b'
-  Ann loc c -> local (const loc) (eval c)
+  Term c -> case c of
+    Let n -> alloc (User n) >>= bind (User n) >> unit
+    a :>> b -> eval a >> eval b
+    Lam _ b -> do
+      n <- Gen <$> fresh
+      abstract eval n (instantiate (const (pure n)) b)
+    f :$ a -> do
+      f' <- eval f
+      a' <- eval a
+      apply eval f' a'
+    Unit -> unit
+    Bool b -> bool b
+    If c t e -> do
+      c' <- eval c >>= asBool
+      if c' then eval t else eval e
+    String s -> string s
+    Load p -> eval p >>= asString >> unit -- FIXME: add a load command or something
+    Edge e a -> ref a >>= edge e >> unit
+    Frame -> frame
+    a :. b -> do
+      a' <- ref a
+      a' ... eval b
+    a := b -> do
+      b' <- eval b
+      addr <- ref a
+      b' <$ assign addr b'
+    Ann loc c -> local (const loc) (eval c)
   where freeVariable s = fail ("free variable: " <> s)
         uninitialized s = fail ("uninitialized variable: " <> s)
         invalidRef s = fail ("invalid ref: " <> s)
@@ -62,138 +64,142 @@ eval Analysis{..} eval = \case
 
         ref = \case
           Var n -> lookupEnv' n
-          Let n -> do
-            addr <- alloc n
-            addr <$ bind n addr
-          If c t e -> do
-            c' <- eval c >>= asBool
-            if c' then ref t else ref e
-          a :. b -> do
-            a' <- ref a
-            a' ... ref b
-          Ann loc c -> local (const loc) (ref c)
-          c -> invalidRef (show c)
+          Term c -> case c of
+            Let n -> do
+              addr <- alloc (User n)
+              addr <$ bind (User n) addr
+            If c t e -> do
+              c' <- eval c >>= asBool
+              if c' then ref t else ref e
+            a :. b -> do
+              a' <- ref a
+              a' ... ref b
+            Ann loc c -> local (const loc) (ref c)
+            c -> invalidRef (show c)
 
 
-prog1 :: File Core
-prog1 = fromBody $ Lam foo
-  (   Let bar := Var foo
-  :>> If (Var bar)
-    (Bool False)
-    (Bool True))
-  where (foo, bar) = (User "foo", User "bar")
+prog1 :: File (Term Core User)
+prog1 = fromBody . lam' foo $ block
+  [ let' bar .= pure foo
+  , Core.if' (pure bar)
+    (Core.bool False)
+    (Core.bool True)
+  ]
+  where (foo, bar) = ("foo", "bar")
 
-prog2 :: File Core
-prog2 = fromBody $ fileBody prog1 :$ Bool True
+prog2 :: File (Term Core User)
+prog2 = fromBody $ fileBody prog1 $$ Core.bool True
 
-prog3 :: File Core
-prog3 = fromBody $ lams [foo, bar, quux]
-  (If (Var quux)
-    (Var bar)
-    (Var foo))
-  where (foo, bar, quux) = (User "foo", User "bar", User "quux")
+prog3 :: File (Term Core User)
+prog3 = fromBody $ lams' [foo, bar, quux]
+  (Core.if' (pure quux)
+    (pure bar)
+    (pure foo))
+  where (foo, bar, quux) = ("foo", "bar", "quux")
 
-prog4 :: File Core
-prog4 = fromBody
-  $   Let foo := Bool True
-  :>> If (Var foo)
-    (Bool True)
-    (Bool False)
-  where foo = User "foo"
+prog4 :: File (Term Core User)
+prog4 = fromBody $ block
+  [ let' foo .= Core.bool True
+  , Core.if' (pure foo)
+    (Core.bool True)
+    (Core.bool False)
+  ]
+  where foo = "foo"
 
-prog5 :: File Core
-prog5 = fromBody
-  $   Let (User "mkPoint") := Lam (User "_x") (Lam (User "_y")
-    (   Let (User "x") := Var (User "_x")
-    :>> Let (User "y") := Var (User "_y")))
-  :>> Let (User "point") := Var (User "mkPoint") :$ Bool True :$ Bool False
-  :>> Var (User "point") :. Var (User "x")
-  :>> Var (User "point") :. Var (User "y") := Var (User "point") :. Var (User "x")
+prog5 :: File (Term Core User)
+prog5 = fromBody $ block
+  [ let' "mkPoint" .= lam' "_x" (lam' "_y" (block
+    [ let' "x" .= pure "_x"
+    , let' "y" .= pure "_y"]))
+  , let' "point" .= pure "mkPoint" $$ Core.bool True $$ Core.bool False
+  , pure "point" Core.... pure "x"
+  , pure "point" Core.... pure "y" .= pure "point" Core.... pure "x"
+  ]
 
-prog6 :: [File Core]
+prog6 :: [File (Term Core User)]
 prog6 =
   [ File (Loc "dep"  (locSpan (fromJust here))) $ block
-    [ Let (Path "dep") := Frame
-    , Var (Path "dep") :. block
-      [ Let (User "var") := Bool True
+    [ let' "dep" .= Core.frame
+    , pure "dep" Core.... block
+      [ let' "var" .= Core.bool True
       ]
     ]
   , File (Loc "main" (locSpan (fromJust here))) $ block
-    [ Load (Var (Path "dep"))
-    , Let (User "thing") := Var (Path "dep") :. Var (User "var")
+    [ load (Core.string "dep")
+    , let' "thing" .= pure "dep" Core.... pure "var"
     ]
   ]
 
-ruby :: File Core
+ruby :: File (Term Core User)
 ruby = fromBody . ann . block $
-  [ ann (Let (User "Class") := Frame)
-  , ann (Var (User "Class") :.
-    (ann (Let (User "new") := Lam (User "self") (block
-      [ ann (Let (User "instance") := Frame)
-      , ann (Var (User "instance") :. Edge Import (Var (User "self")))
-      , ann (Var (User "instance") $$ "initialize")
+  [ ann (let' "Class" .= Core.frame)
+  , ann (pure "Class" Core....
+    (ann (let' "new" .= lam' "self" (block
+      [ ann (let' "instance" .= Core.frame)
+      , ann (pure "instance" Core.... Core.edge Import (pure "self"))
+      , ann (pure "instance" $$$ "initialize")
       ]))))
 
-  , ann (Let (User "(Object)") := Frame)
-  , ann (Var (User "(Object)") :. ann (Edge Import (Var (User "Class"))))
-  , ann (Let (User "Object") := Frame)
-  , ann (Var (User "Object") :. block
-    [ ann (Edge Import (Var (User "(Object)")))
-    , ann (Let (User "nil?") := Lam (User "_") false)
-    , ann (Let (User "initialize") := Lam (User "self") (Var (User "self")))
-    , ann (Let __semantic_truthy := Lam (User "_") (Bool True))
+  , ann (let' "(Object)" .= Core.frame)
+  , ann (pure "(Object)" Core.... ann (Core.edge Import (pure ("Class"))))
+  , ann (let' "Object" .= Core.frame)
+  , ann (pure "Object" Core.... block
+    [ ann (Core.edge Import (pure "(Object)"))
+    , ann (let' "nil?" .= lam' "_" false)
+    , ann (let' "initialize" .= lam' "self" (pure "self"))
+    , ann (let' __semantic_truthy .= lam' "_" (Core.bool True))
     ])
 
-  , ann (Var (User "Class") :. Edge Import (Var (User "Object")))
+  , ann (pure "Class" Core.... Core.edge Import (pure "Object"))
 
-  , ann (Let (User "(NilClass)") := Frame)
-  , ann (Var (User "(NilClass)") :. block
-    [ ann (Edge Import (Var (User "Class")))
-    , ann (Edge Import (Var (User "(Object)")))
+  , ann (let' "(NilClass)" .= Core.frame)
+  , ann (pure "(NilClass)" Core.... block
+    [ ann (Core.edge Import (pure "Class"))
+    , ann (Core.edge Import (pure "(Object)"))
     ])
-  , ann (Let (User "NilClass") := Frame)
-  , ann (Var (User "NilClass") :. block
-    [ ann (Edge Import (Var (User "(NilClass)")))
-    , ann (Edge Import (Var (User "Object")))
-    , ann (Let (User "nil?") := Lam (User "_") true)
-    , ann (Let __semantic_truthy := Lam (User "_") (Bool False))
-    ])
-
-  , ann (Let (User "(TrueClass)") := Frame)
-  , ann (Var (User "(TrueClass)") :. block
-    [ ann (Edge Import (Var (User "Class")))
-    , ann (Edge Import (Var (User "(Object)")))
-    ])
-  , ann (Let (User "TrueClass") := Frame)
-  , ann (Var (User "TrueClass") :. block
-    [ ann (Edge Import (Var (User "(TrueClass)")))
-    , ann (Edge Import (Var (User "Object")))
+  , ann (let' "NilClass" .= Core.frame)
+  , ann (pure "NilClass" Core.... block
+    [ ann (Core.edge Import (pure "(NilClass)"))
+    , ann (Core.edge Import (pure "Object"))
+    , ann (let' "nil?" .= lam' "_" true)
+    , ann (let' __semantic_truthy .= lam' "_" (Core.bool False))
     ])
 
-  , ann (Let (User "(FalseClass)") := Frame)
-  , ann (Var (User "(FalseClass)") :. block
-    [ ann (Edge Import (Var (User "Class")))
-    , ann (Edge Import (Var (User "(Object)")))
+  , ann (let' "(TrueClass)" .= Core.frame)
+  , ann (pure "(TrueClass)" Core.... block
+    [ ann (Core.edge Import (pure "Class"))
+    , ann (Core.edge Import (pure "(Object)"))
     ])
-  , ann (Let (User "FalseClass") := Frame)
-  , ann (Var (User "FalseClass") :. block
-    [ ann (Edge Import (Var (User "(FalseClass)")))
-    , ann (Edge Import (Var (User "Object")))
-    , ann (Let __semantic_truthy := Lam (User "_") (Bool False))
+  , ann (let' "TrueClass" .= Core.frame)
+  , ann (pure "TrueClass" Core.... block
+    [ ann (Core.edge Import (pure "(TrueClass)"))
+    , ann (Core.edge Import (pure "Object"))
     ])
 
-  , ann (Let (User "nil")   := Var (User "NilClass")   $$ "new")
-  , ann (Let (User "true")  := Var (User "TrueClass")  $$ "new")
-  , ann (Let (User "false") := Var (User "FalseClass") $$ "new")
+  , ann (let' "(FalseClass)" .= Core.frame)
+  , ann (pure "(FalseClass)" Core.... block
+    [ ann (Core.edge Import (pure "Class"))
+    , ann (Core.edge Import (pure "(Object)"))
+    ])
+  , ann (let' "FalseClass" .= Core.frame)
+  , ann (pure "FalseClass" Core.... block
+    [ ann (Core.edge Import (pure "(FalseClass)"))
+    , ann (Core.edge Import (pure "Object"))
+    , ann (let' __semantic_truthy .= lam' "_" (Core.bool False))
+    ])
 
-  , ann (Let (User "require") := Lam (User "path") (Load (Var (User "path"))))
+  , ann (let' "nil"   .= pure "NilClass"   $$$ "new")
+  , ann (let' "true"  .= pure "TrueClass"  $$$ "new")
+  , ann (let' "false" .= pure "FalseClass" $$$ "new")
+
+  , ann (let' "require" .= lam' "path" (Core.load (pure "path")))
   ]
-  where _nil  = Var (User "nil")
-        true  = Var (User "true")
-        false = Var (User "false")
-        self $$ method = annWith callStack $ Lam (User "_x") (Var (User "_x") :. Var (User method) :$ Var (User "_x")) :$ self
+  where -- _nil  = pure "nil"
+        true  = pure "true"
+        false = pure "false"
+        self $$$ method = annWith callStack $ lam' "_x" (pure "_x" Core.... pure method $$ pure "_x") $$ self
 
-        __semantic_truthy = User "__semantic_truthy"
+        __semantic_truthy = "__semantic_truthy"
 
 
 data Analysis address value m = Analysis
@@ -202,8 +208,8 @@ data Analysis address value m = Analysis
   , lookupEnv   :: Name -> m (Maybe address)
   , deref       :: address -> m (Maybe value)
   , assign      :: address -> value -> m ()
-  , abstract    :: (Core -> m value) -> Name -> Core -> m value
-  , apply       :: (Core -> m value) -> value -> value -> m value
+  , abstract    :: (Term Core Name -> m value) -> Name -> Term Core Name -> m value
+  , apply       :: (Term Core Name -> m value) -> value -> value -> m value
   , unit        :: m value
   , bool        :: Bool -> m value
   , asBool      :: value -> m Bool

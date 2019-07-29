@@ -10,11 +10,11 @@ module Data.Core.Parser
 
 import           Control.Applicative
 import qualified Data.Char as Char
-import           Data.Core
+import           Data.Core (Core, Edge(..))
+import qualified Data.Core as Core
 import           Data.Name
-import           Data.Semigroup
 import           Data.String
-import           Data.Text (pack)
+import           Data.Term
 import qualified Text.Parser.Token as Token
 import qualified Text.Parser.Token.Highlight as Highlight
 import           Text.Trifecta hiding (ident)
@@ -44,16 +44,16 @@ identifier = choice [quote, plain] <?> "identifier" where
 
 -- * Parsers (corresponding to EBNF)
 
-core :: (TokenParsing m, Monad m) => m Core
+core :: (TokenParsing m, Monad m) => m (Term Core User)
 core = expr
 
-expr :: (TokenParsing m, Monad m) => m Core
+expr :: (TokenParsing m, Monad m) => m (Term Core User)
 expr = atom `chainl1` go where
-  go = choice [ (:.) <$ dot
-              , (:$) <$ notFollowedBy dot
+  go = choice [ (Core....) <$ dot
+              , (Core.$$)  <$ notFollowedBy dot
               ]
 
-atom :: (TokenParsing m, Monad m) => m Core
+atom :: (TokenParsing m, Monad m) => m (Term Core User)
 atom = choice
   [ comp
   , ifthenelse
@@ -64,52 +64,51 @@ atom = choice
   , parens expr
   ]
 
-comp :: (TokenParsing m, Monad m) => m Core
-comp = braces (sconcat <$> sepEndByNonEmpty expr semi) <?> "compound statement"
+comp :: (TokenParsing m, Monad m) => m (Term Core User)
+comp = braces (Core.block <$> sepEndByNonEmpty expr semi) <?> "compound statement"
 
-ifthenelse :: (TokenParsing m, Monad m) => m Core
-ifthenelse = If
+ifthenelse :: (TokenParsing m, Monad m) => m (Term Core User)
+ifthenelse = Core.if'
   <$ reserved "if"   <*> core
   <* reserved "then" <*> core
   <* reserved "else" <*> core
   <?> "if-then-else statement"
 
-assign :: (TokenParsing m, Monad m) => m Core
-assign = (:=) <$> try (lvalue <* symbolic '=') <*> core <?> "assignment"
+assign :: (TokenParsing m, Monad m) => m (Term Core User)
+assign = (Core..=) <$> try (lvalue <* symbolic '=') <*> core <?> "assignment"
 
-edge :: (TokenParsing m, Monad m) => m Core
-edge = kw <*> expr where kw = choice [ Edge Lexical <$ reserved "lexical"
-                                     , Edge Import  <$ reserved "import"
-                                     , Load         <$ reserved "load"
+edge :: (TokenParsing m, Monad m) => m (Term Core User)
+edge = kw <*> expr where kw = choice [ Core.edge Lexical <$ reserved "lexical"
+                                     , Core.edge Import  <$ reserved "import"
+                                     , Core.load         <$ reserved "load"
                                      ]
 
-lvalue :: (TokenParsing m, Monad m) => m Core
+lvalue :: (TokenParsing m, Monad m) => m (Term Core User)
 lvalue = choice
-  [ Let <$ reserved "let" <*> name
+  [ Core.let' . namedValue <$ reserved "let" <*> name
   , ident
   , parens expr
   ]
 
 -- * Literals
 
-name :: (TokenParsing m, Monad m) => m Name
-name = choice [regular, strpath] <?> "name" where
-  regular = User <$> identifier
-  strpath = Path . pack <$> between (symbolic '"') (symbolic '"') (some $ noneOf "\"")
+name :: (TokenParsing m, Monad m) => m (Named User)
+name = named' <$> identifier <?> "name" where
 
-lit :: (TokenParsing m, Monad m) => m Core
+lit :: (TokenParsing m, Monad m) => m (Term Core User)
 lit = let x `given` n = x <$ reserved n in choice
-  [ Bool True  `given` "#true"
-  , Bool False `given` "#false"
-  , Unit       `given` "#unit"
-  , Frame      `given` "#frame"
+  [ Core.bool True  `given` "#true"
+  , Core.bool False `given` "#false"
+  , Core.unit       `given` "#unit"
+  , Core.frame      `given` "#frame"
+  , between (string "\"") (string "\"") (Core.string . fromString <$> many ('"' <$ string "\\\"" <|> noneOf "\""))
   , lambda
   ] <?> "literal"
 
-lambda :: (TokenParsing m, Monad m) => m Core
-lambda = Lam <$ lambduh <*> name <* arrow <*> core <?> "lambda" where
+lambda :: (TokenParsing m, Monad m) => m (Term Core User)
+lambda = Core.lam <$ lambduh <*> name <* arrow <*> core <?> "lambda" where
   lambduh = symbolic 'λ' <|> symbolic '\\'
   arrow   = symbol "→"   <|> symbol "->"
 
-ident :: (Monad m, TokenParsing m) => m Core
-ident = Var <$> name <?> "identifier"
+ident :: (Monad m, TokenParsing m) => m (Term Core User)
+ident = pure . namedValue <$> name <?> "identifier"

@@ -1,21 +1,27 @@
-{-# LANGUAGE DeriveFunctor, ExistentialQuantification, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, LambdaCase, MultiParamTypeClasses, OverloadedLists, OverloadedStrings,StandaloneDeriving, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DeriveTraversable, ExistentialQuantification, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, LambdaCase, MultiParamTypeClasses, OverloadedLists, OverloadedStrings, StandaloneDeriving, TypeApplications, TypeOperators, UndecidableInstances #-}
 module Data.Name
 ( User
 , Namespaced
 , Name(..)
+, Named(..)
+, named
+, named'
+, namedName
+, namedValue
+, Ignored(..)
 , reservedNames
 , isSimpleCharacter
 , needsQuotation
+, encloseIf
 , Gensym(..)
-, (//)
-, gensym
+, prime
+, fresh
 , namespace
 , Naming(..)
 , runNaming
 , NamingC(..)
 ) where
 
-import           Control.Applicative
 import           Control.Effect.Carrier
 import           Control.Effect.Reader
 import           Control.Effect.State
@@ -24,9 +30,9 @@ import           Control.Monad.IO.Class
 import qualified Data.Char as Char
 import           Data.HashSet (HashSet)
 import qualified Data.HashSet as HashSet
+import           Data.Stack
 import           Data.Text as Text (Text, any, unpack)
 import           Data.Text.Prettyprint.Doc (Pretty (..))
-import qualified Data.Text.Prettyprint.Doc as Pretty
 
 -- | User-specified and -relevant names.
 type User = Text
@@ -45,15 +51,36 @@ data Name
   --
   --   This should be used for names which the user provided and which other code (other functions, other modules, other packages) could call, e.g. declaration names.
   | User User
-  -- | A variable name represented as the path to a source file. Used for loading modules at a specific name.
-  | Path Text
   deriving (Eq, Ord, Show)
 
 instance Pretty Name where
   pretty = \case
     Gen p  -> pretty p
     User n -> pretty n
-    Path p -> pretty (show p)
+
+
+-- | Annotates an @a@ with a 'User'-provided name, which is ignored for '==' and 'compare'.
+data Named a = Named (Ignored User) a
+  deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
+
+named :: User -> a -> Named a
+named = Named . Ignored
+
+named' :: User -> Named User
+named' u = Named (Ignored u) u
+
+namedName :: Named a -> User
+namedName (Named (Ignored n) _) = n
+
+namedValue :: Named a -> a
+namedValue (Named _ a) = a
+
+newtype Ignored a = Ignored a
+  deriving (Foldable, Functor, Show, Traversable)
+
+instance Eq  (Ignored a) where _ == _ = True
+instance Ord (Ignored a) where compare _ _ = EQ
+
 
 reservedNames :: HashSet String
 reservedNames = [ "#true", "#false", "let", "#frame", "if", "then", "else"
@@ -63,6 +90,10 @@ reservedNames = [ "#true", "#false", "let", "#frame", "if", "then", "else"
 -- name conflicts with a Core primitive.
 needsQuotation :: User -> Bool
 needsQuotation u = HashSet.member (unpack u) reservedNames || Text.any (not . isSimpleCharacter) u
+
+encloseIf :: Monoid m => Bool -> m -> m -> m -> m
+encloseIf True  l r x = l <> x <> r
+encloseIf False _ _ x = x
 
 -- | A ‘simple’ character is, loosely defined, a character that is compatible
 -- with identifiers in most ASCII-oriented programming languages. This is defined
@@ -74,50 +105,48 @@ isSimpleCharacter = \case
   '?'  -> True -- common in Ruby
   c    -> Char.isAlphaNum c
 
-data Gensym
-  = Root Text
-  | Gensym :/ (Text, Int)
+
+data Gensym = Gensym (Stack Text) Int
   deriving (Eq, Ord, Show)
 
 instance Pretty Gensym where
-  pretty = \case
-    Root s      -> pretty s
-    p :/ (n, x) -> Pretty.hcat [pretty p, "/", pretty n, "^", pretty x]
+  pretty (Gensym _ i) = pretty (alphabet !! r : if q > 0 then show q else "")
+    where (q, r) = i `divMod` 26
+          alphabet = ['a'..'z']
 
-(//) :: Gensym -> Text -> Gensym
-root // s = root :/ (s, 0)
+prime :: Gensym -> Gensym
+prime (Gensym s i) = Gensym s (succ i)
 
-infixl 6 //
 
-gensym :: (Carrier sig m, Member Naming sig) => Text -> m Gensym
-gensym s = send (Gensym s pure)
+fresh :: (Carrier sig m, Member Naming sig) => m Gensym
+fresh = send (Fresh pure)
 
 namespace :: (Carrier sig m, Member Naming sig) => Text -> m a -> m a
 namespace s m = send (Namespace s m pure)
 
 
 data Naming m k
-  = Gensym Text (Gensym -> m k)
+  = Fresh (Gensym -> m k)
   | forall a . Namespace Text (m a) (a -> m k)
 
 deriving instance Functor m => Functor (Naming m)
 
 instance HFunctor Naming where
-  hmap f (Gensym    s   k) = Gensym    s       (f . k)
+  hmap f (Fresh         k) = Fresh             (f . k)
   hmap f (Namespace s m k) = Namespace s (f m) (f . k)
 
 instance Effect Naming where
-  handle state handler (Gensym    s   k) = Gensym    s                        (handler . (<$ state) . k)
+  handle state handler (Fresh         k) = Fresh                              (handler . (<$ state) . k)
   handle state handler (Namespace s m k) = Namespace s (handler (m <$ state)) (handler . fmap k)
 
 
-runNaming :: Functor m => Gensym -> NamingC m a -> m a
-runNaming root = runReader root . evalState 0 . runNamingC
+runNaming :: Functor m => NamingC m a -> m a
+runNaming = runReader Nil . evalState 0 . runNamingC
 
-newtype NamingC m a = NamingC { runNamingC :: StateC Int (ReaderC Gensym m) a }
-  deriving (Alternative, Applicative, Functor, Monad, MonadFail, MonadIO)
+newtype NamingC m a = NamingC { runNamingC :: StateC Int (ReaderC (Stack Text) m) a }
+  deriving (Applicative, Functor, Monad, MonadFail, MonadIO)
 
 instance (Carrier sig m, Effect sig) => Carrier (Naming :+: sig) (NamingC m) where
-  eff (L (Gensym    s   k)) = NamingC (StateC (\ i -> (:/ (s, i)) <$> ask >>= runState (succ i) . runNamingC . k))
-  eff (L (Namespace s m k)) = NamingC (StateC (\ i -> local (// s) (evalState 0 (runNamingC m)) >>= runState i . runNamingC . k))
+  eff (L (Fresh         k)) = NamingC (asks Gensym <*> get <* modify (succ @Int) >>= runNamingC . k)
+  eff (L (Namespace s m k)) = NamingC (StateC (\ i -> local (:> s) (evalState 0 (runNamingC m)) >>= runState i . runNamingC . k))
   eff (R other)             = NamingC (eff (R (R (handleCoercible other))))

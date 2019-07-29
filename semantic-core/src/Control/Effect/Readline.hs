@@ -31,7 +31,7 @@ import System.Console.Haskeline hiding (Handler, handle)
 import System.Directory
 import System.FilePath
 
-data Readline (m :: * -> *) k
+data Readline m k
   = Prompt String (Maybe String -> m k)
   | Print AnyDoc (m k)
   | AskLine (Line -> m k)

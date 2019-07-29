@@ -15,7 +15,7 @@ import           Analysis.FlowInsensitive
 import           Control.Applicative (Alternative (..))
 import           Control.Effect
 import           Control.Effect.Fail
-import           Control.Effect.Fresh
+import           Control.Effect.Fresh as Fresh
 import           Control.Effect.Reader hiding (Local)
 import           Control.Effect.State
 import           Control.Monad (unless)
@@ -29,8 +29,10 @@ import qualified Data.IntSet as IntSet
 import           Data.List.NonEmpty (nonEmpty)
 import           Data.Loc
 import qualified Data.Map as Map
-import           Data.Name
+import           Data.Name as Name
 import qualified Data.Set as Set
+import           Data.Stack
+import           Data.Term
 import           Prelude hiding (fail)
 
 data Monotype a
@@ -67,13 +69,13 @@ forAlls ns body = foldr forAll body ns
 
 generalize :: (Carrier sig m, Member Naming sig) => Monotype Meta -> m Polytype
 generalize ty = namespace "generalize" $ do
-  root <- gensym ""
-  pure (forAlls (map ((root :/) . (,) "") (IntSet.toList (mvs ty))) (fold root ty))
+  Gensym root _ <- Name.fresh
+  pure (forAlls (map (Gensym root) (IntSet.toList (mvs ty))) (fold root ty))
   where fold root = \case
           MUnit      -> PUnit
           MBool      -> PBool
           MString    -> PString
-          MMeta i    -> PFree (root :/ ("", i))
+          MMeta i    -> PFree (Gensym root i)
           MFree n    -> PFree n
           MArr a b   -> PArr (fold root a) (fold root b)
           MRecord fs -> PRecord (fold root <$> fs)
@@ -101,27 +103,28 @@ substIn free bound = go 0
         go i (PRecord fs)           = PRecord (go i <$> fs)
 
 
-typecheckingFlowInsensitive :: [File Core.Core] -> (Heap (Monotype Meta), [File (Either (Loc, String) Polytype)])
+typecheckingFlowInsensitive :: [File (Term Core.Core Name)] -> (Heap Name (Monotype Meta), [File (Either (Loc, String) Polytype)])
 typecheckingFlowInsensitive
   = run
   . runFresh
-  . runNaming (Root "typechecking-flow-insensitive")
-  . runHeap
+  . runNaming
+  . runHeap (Gen (Gensym (Nil :> "root") 0))
   . (>>= traverse (traverse (traverse generalize)))
   . traverse runFile
 
 runFile :: ( Carrier sig m
            , Effect sig
            , Member Fresh sig
-           , Member (State (Heap (Monotype Meta))) sig
+           , Member Naming sig
+           , Member (State (Heap Name (Monotype Meta))) sig
            )
-        => File Core.Core
+        => File (Term Core.Core Name)
         -> m (File (Either (Loc, String) (Monotype Meta)))
 runFile file = traverse run file
   where run
           = (\ m -> do
               (subst, t) <- m
-              modify @(Heap (Monotype Meta)) (substAll subst)
+              modify @(Heap Name (Monotype Meta)) (substAll subst)
               pure (substAll subst <$> t))
           . runState (mempty :: Substitution)
           . runReader (fileLoc file)
@@ -136,7 +139,7 @@ runFile file = traverse run file
               v <$ for_ bs (unify v))
           . convergeTerm (fix (cacheTerm . eval typecheckingAnalysis))
 
-typecheckingAnalysis :: (Alternative m, Carrier sig m, Member Fresh sig, Member (State (Set.Set Constraint)) sig, Member (State (Heap (Monotype Meta))) sig, MonadFail m) => Analysis Name (Monotype Meta) m
+typecheckingAnalysis :: (Alternative m, Carrier sig m, Member Fresh sig, Member (State (Set.Set Constraint)) sig, Member (State (Heap Name (Monotype Meta))) sig, MonadFail m) => Analysis Name (Monotype Meta) m
 typecheckingAnalysis = Analysis{..}
   where alloc = pure
         bind _ _ = pure ()
@@ -178,7 +181,7 @@ data Solution
 infix 5 :=
 
 meta :: (Carrier sig m, Member Fresh sig) => m (Monotype Meta)
-meta = MMeta <$> fresh
+meta = MMeta <$> Fresh.fresh
 
 unify :: (Carrier sig m, Member (State (Set.Set Constraint)) sig) => Monotype Meta -> Monotype Meta -> m ()
 unify t1 t2
