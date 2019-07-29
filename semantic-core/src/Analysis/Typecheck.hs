@@ -99,15 +99,16 @@ typecheckingFlowInsensitive
   . fmap (fmap (fmap (fmap generalize)))
   . traverse (runFile eval)
 
-runFile :: ( Carrier sig m
-           , Effect sig
-           , Member Fresh sig
-           , Member (State (Heap User (Term Monotype Meta))) sig
-           , Ord (term User)
-           )
-        => (forall sig m . (Carrier sig m, Member (Reader Loc) sig, MonadFail m) => Analysis term User (Term Monotype Meta) m -> (term User -> m (Term Monotype Meta)) -> (term User -> m (Term Monotype Meta)))
-        -> File (term User)
-        -> m (File (Either (Loc, String) (Term Monotype Meta)))
+runFile
+  :: ( Carrier sig m
+     , Effect sig
+     , Member Fresh sig
+     , Member (State (Heap User (Term Monotype Meta))) sig
+     , Ord (term User)
+     )
+  => (forall sig m . (Carrier sig m, Member (Reader Loc) sig, MonadFail m) => Analysis term User (Term Monotype Meta) m -> (term User -> m (Term Monotype Meta)) -> (term User -> m (Term Monotype Meta)))
+  -> File (term User)
+  -> m (File (Either (Loc, String) (Term Monotype Meta)))
 runFile eval file = traverse run file
   where run
           = (\ m -> do
