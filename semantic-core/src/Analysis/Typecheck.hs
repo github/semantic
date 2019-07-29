@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveGeneric, DeriveTraversable, DerivingVia, FlexibleContexts, FlexibleInstances, LambdaCase, OverloadedStrings, QuantifiedConstraints, RecordWildCards, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeOperators #-}
+{-# LANGUAGE DeriveGeneric, DeriveTraversable, DerivingVia, FlexibleContexts, FlexibleInstances, LambdaCase, OverloadedStrings, QuantifiedConstraints, RankNTypes, RecordWildCards, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeOperators #-}
 module Analysis.Typecheck
 ( Monotype (..)
 , Meta
@@ -93,16 +93,17 @@ typecheckingFlowInsensitive
   . runFresh
   . runHeap "__semantic_root"
   . fmap (fmap (fmap (fmap generalize)))
-  . traverse runFile
+  . traverse (runFile eval)
 
 runFile :: ( Carrier sig m
            , Effect sig
            , Member Fresh sig
            , Member (State (Heap User (Term Monotype Meta))) sig
            )
-        => File (Term (Core.Ann :+: Core.Core) User)
+        => (forall sig m . (Carrier sig m, Member (Reader Loc) sig, MonadFail m) => Analysis (Term (Core.Ann :+: Core.Core)) User (Term Monotype Meta) m -> (Term (Core.Ann :+: Core.Core) User -> m (Term Monotype Meta)) -> (Term (Core.Ann :+: Core.Core) User -> m (Term Monotype Meta)))
+        -> File (Term (Core.Ann :+: Core.Core) User)
         -> m (File (Either (Loc, String) (Term Monotype Meta)))
-runFile file = traverse run file
+runFile eval file = traverse run file
   where run
           = (\ m -> do
               (subst, t) <- m
