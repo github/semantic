@@ -174,7 +174,7 @@ heapValueGraph :: Heap term -> G.Graph (Concrete term)
 heapValueGraph h = heapGraph (const id) (const fromAddr) h
   where fromAddr addr = maybe G.empty G.vertex (IntMap.lookup addr h)
 
-heapAddressGraph :: Heap (Term (Core.Ann :+: Core.Core) User) -> G.Graph (EdgeType (Term (Core.Ann :+: Core.Core) User), Precise)
+heapAddressGraph :: Heap term -> G.Graph (EdgeType term, Precise)
 heapAddressGraph = heapGraph (\ addr v -> (Value v, addr)) (fmap G.vertex . (,) . either Edge Slot)
 
 addressStyle :: Heap (Term (Core.Ann :+: Core.Core) User) -> G.Style (EdgeType (Term (Core.Ann :+: Core.Core) User), Precise) Text
