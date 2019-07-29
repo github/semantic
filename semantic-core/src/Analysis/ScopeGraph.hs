@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, GeneralizedNewtypeDeriving, OverloadedStrings, RecordWildCards, TypeApplications, TypeOperators #-}
+{-# LANGUAGE FlexibleContexts, GeneralizedNewtypeDeriving, OverloadedStrings, RankNTypes, RecordWildCards, TypeApplications, TypeOperators #-}
 module Analysis.ScopeGraph
 ( ScopeGraph
 , Entry(..)
@@ -10,6 +10,7 @@ import           Analysis.Eval
 import           Analysis.FlowInsensitive
 import           Control.Applicative (Alternative (..))
 import           Control.Effect.Carrier
+import           Control.Effect.Fail
 import           Control.Effect.Fresh
 import           Control.Effect.Reader
 import           Control.Effect.State
@@ -45,17 +46,24 @@ scopeGraph
   = run
   . runFresh
   . runHeap
-  . traverse runFile
+  . traverse (runFile eval)
 
 runFile
   :: ( Carrier sig m
      , Effect sig
      , Member Fresh sig
      , Member (State (Heap User ScopeGraph)) sig
+     , Ord term
      )
-  => File (Term (Core.Ann :+: Core.Core) User)
+  => (forall sig m
+     .  (Carrier sig m, Member (Reader Loc) sig, MonadFail m)
+     => Analysis term User ScopeGraph m
+     -> (term -> m ScopeGraph)
+     -> (term -> m ScopeGraph)
+     )
+  -> File term
   -> m (File (Either (Loc, String) ScopeGraph))
-runFile file = traverse run file
+runFile eval file = traverse run file
   where run = runReader (fileLoc file)
             . runReader (Map.empty @User @Loc)
             . runFailWithLoc
