@@ -43,7 +43,7 @@ instance Monoid Value where
   mempty = Value Abstract mempty
 
 data Semi
-  = Closure Loc User (Term (Core.Ann :+: Core.Core) User) User
+  = Closure Loc User (Term (Core.Ann :+: Core.Core) User) (Set.Set User)
   -- FIXME: Bound String values.
   | String Text
   | Abstract
@@ -60,7 +60,6 @@ importGraph
 runFile :: ( Carrier sig m
            , Effect sig
            , Member Fresh sig
-           , Member (Reader (FrameId User)) sig
            , Member (State (Heap User Value)) sig
            )
         => File (Term (Core.Ann :+: Core.Core) User)
@@ -74,7 +73,6 @@ runFile file = traverse run file
 -- FIXME: decompose into a product domain and two atomic domains
 importGraphAnalysis :: ( Alternative m
                        , Carrier sig m
-                       , Member (Reader (FrameId User)) sig
                        , Member (Reader Loc) sig
                        , Member (State (Heap User Value)) sig
                        , MonadFail m
@@ -88,8 +86,8 @@ importGraphAnalysis = Analysis{..}
         assign addr ty = modify (Map.insertWith (<>) addr (Set.singleton ty))
         abstract _ name body = do
           loc <- ask
-          FrameId parentAddr <- ask
-          pure (Value (Closure loc name body parentAddr) mempty)
+          env <- gets @(Heap User Value) Map.keysSet
+          pure (Value (Closure loc name body env) mempty)
         apply eval (Value (Closure loc name body _) _) a = local (const loc) $ do
           addr <- alloc name
           assign addr a
