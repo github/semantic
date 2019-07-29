@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, OverloadedStrings, RankNTypes, RecordWildCards, TypeApplications, TypeOperators #-}
+{-# LANGUAGE FlexibleContexts, RankNTypes, RecordWildCards, TypeApplications #-}
 module Analysis.ImportGraph
 ( ImportGraph
 , importGraph
