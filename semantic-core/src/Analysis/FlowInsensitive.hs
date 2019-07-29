@@ -13,12 +13,10 @@ import           Control.Effect.Fresh
 import           Control.Effect.NonDet
 import           Control.Effect.Reader
 import           Control.Effect.State
-import qualified Data.Core as Core
 import qualified Data.Map as Map
 import           Data.Maybe (fromMaybe)
 import           Data.Monoid (Alt(..))
 import qualified Data.Set as Set
-import           Data.Term (Term)
 
 newtype Cache term a = Cache { unCache :: Map.Map term (Set.Set a) }
   deriving (Eq, Ord, Show)
@@ -49,16 +47,16 @@ convergeTerm _ eval body = do
     get
   pure (fromMaybe mempty (Map.lookup body (unCache cache)))
 
-cacheTerm :: forall m sig a name
+cacheTerm :: forall m sig a term
           .  ( Alternative m
              , Carrier sig m
-             , Member (Reader (Cache (Term (Core.Ann :+: Core.Core) name) a)) sig
-             , Member (State  (Cache (Term (Core.Ann :+: Core.Core) name) a)) sig
+             , Member (Reader (Cache term a)) sig
+             , Member (State  (Cache term a)) sig
              , Ord a
-             , Ord name
+             , Ord term
              )
-          => (Term (Core.Ann :+: Core.Core) name -> m a)
-          -> (Term (Core.Ann :+: Core.Core) name -> m a)
+          => (term -> m a)
+          -> (term -> m a)
 cacheTerm eval term = do
   cached <- gets (Map.lookup term . unCache)
   case cached :: Maybe (Set.Set a) of
