@@ -21,7 +21,7 @@ import qualified Data.Set as Set
 import           Data.Term (Term)
 
 type Cache name a = Map.Map (Term (Core.Ann :+: Core.Core) name) (Set.Set a)
-type Heap name a = Map.Map name (Set.Set a)
+type Heap address a = Map.Map address (Set.Set a)
 
 newtype FrameId name = FrameId { unFrameId :: name }
   deriving (Eq, Ord, Show)
@@ -65,7 +65,7 @@ cacheTerm eval term = do
       result <- eval term
       result <$ modify (Map.insertWith (<>) term (Set.singleton (result :: a)))
 
-runHeap :: name -> ReaderC (FrameId name) (StateC (Heap name a) m) b -> m (Heap name a, b)
+runHeap :: address -> ReaderC (FrameId address) (StateC (Heap address a) m) b -> m (Heap address a, b)
 runHeap addr m = runState (Map.singleton addr Set.empty) (runReader (FrameId addr) m)
 
 -- | Fold a collection by mapping each element onto an 'Alternative' action.
