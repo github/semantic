@@ -20,7 +20,7 @@ import           Data.Monoid (Alt(..))
 import qualified Data.Set as Set
 import           Data.Term (Term)
 
-newtype Cache name a = Cache { unCache :: Map.Map (Term (Core.Ann :+: Core.Core) name) (Set.Set a) }
+newtype Cache term a = Cache { unCache :: Map.Map term (Set.Set a) }
   deriving (Eq, Ord, Show)
 
 type Heap address a = Map.Map address (Set.Set a)
@@ -39,12 +39,12 @@ convergeTerm :: forall m sig a name address proxy
                 , Ord name
                 )
              => proxy address
-             -> (Term (Core.Ann :+: Core.Core) name -> NonDetC (ReaderC (Cache name a) (StateC (Cache name a) m)) a)
+             -> (Term (Core.Ann :+: Core.Core) name -> NonDetC (ReaderC (Cache (Term (Core.Ann :+: Core.Core) name) a) (StateC (Cache (Term (Core.Ann :+: Core.Core) name) a) m)) a)
              -> Term (Core.Ann :+: Core.Core) name
              -> m (Set.Set a)
 convergeTerm _ eval body = do
   heap <- get
-  (cache, _) <- converge (Cache Map.empty :: Cache name a, heap :: Heap address a) $ \ (prevCache, _) -> runState (Cache Map.empty) . runReader prevCache $ do
+  (cache, _) <- converge (Cache Map.empty :: Cache (Term (Core.Ann :+: Core.Core) name) a, heap :: Heap address a) $ \ (prevCache, _) -> runState (Cache Map.empty) . runReader prevCache $ do
     _ <- resetFresh . runNonDetM Set.singleton $ eval body
     get
   pure (fromMaybe mempty (Map.lookup body (unCache cache)))
@@ -52,8 +52,8 @@ convergeTerm _ eval body = do
 cacheTerm :: forall m sig a name
           .  ( Alternative m
              , Carrier sig m
-             , Member (Reader (Cache name a)) sig
-             , Member (State  (Cache name a)) sig
+             , Member (Reader (Cache (Term (Core.Ann :+: Core.Core) name) a)) sig
+             , Member (State  (Cache (Term (Core.Ann :+: Core.Core) name) a)) sig
              , Ord a
              , Ord name
              )
