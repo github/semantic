@@ -108,7 +108,12 @@ runFile
      , Member (State (Heap User Type)) sig
      , Ord (term User)
      )
-  => (forall sig m . (Carrier sig m, Member (Reader Loc) sig, MonadFail m) => Analysis term User Type m -> (term User -> m Type) -> (term User -> m Type))
+  => (forall sig m
+     .  (Carrier sig m, Member (Reader Loc) sig, MonadFail m)
+     => Analysis term User Type m
+     -> (term User -> m Type)
+     -> (term User -> m Type)
+     )
   -> File (term User)
   -> m (File (Either (Loc, String) Type))
 runFile eval file = traverse run file
