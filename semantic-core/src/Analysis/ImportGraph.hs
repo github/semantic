@@ -14,7 +14,6 @@ import           Control.Effect.Fresh
 import           Control.Effect.Reader
 import           Control.Effect.State
 import           Control.Monad ((>=>))
-import qualified Data.Core as Core
 import           Data.File
 import           Data.Foldable (fold)
 import           Data.Function (fix)
@@ -24,7 +23,6 @@ import qualified Data.Map as Map
 import           Data.Name
 import           Data.Proxy
 import qualified Data.Set as Set
-import           Data.Term
 import           Data.Text (Text)
 import           Prelude hiding (fail)
 
@@ -51,11 +49,18 @@ data Semi term
 
 
 importGraph
-  :: [File (Term (Core.Ann :+: Core.Core) User)]
-  -> ( Heap User (Value (Term (Core.Ann :+: Core.Core) User))
-     , [File (Either (Loc, String) (Value (Term (Core.Ann :+: Core.Core) User)))]
+  :: (Ord term, Show term)
+  => (forall sig m
+     .  (Carrier sig m, Member (Reader Loc) sig, MonadFail m)
+     => Analysis term User (Value term) m
+     -> (term -> m (Value term))
+     -> (term -> m (Value term))
      )
-importGraph
+  -> [File term]
+  -> ( Heap User (Value term)
+     , [File (Either (Loc, String) (Value term))]
+     )
+importGraph eval
   = run
   . runFresh
   . runHeap "__semantic_root"
