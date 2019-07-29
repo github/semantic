@@ -1,7 +1,7 @@
 {-# LANGUAGE FlexibleContexts, OverloadedStrings, RankNTypes, RecordWildCards, TypeApplications, TypeOperators #-}
 module Analysis.ScopeGraph
 ( ScopeGraph(..)
-, Entry(..)
+, Decl(..)
 , scopeGraph
 , scopeGraphAnalysis
 ) where
@@ -27,16 +27,16 @@ import qualified Data.Set as Set
 import           Data.Text (Text)
 import           Prelude hiding (fail)
 
-data Entry = Entry
-  { entrySymbol :: Text
-  , entryLoc    :: Loc
+data Decl = Decl
+  { declSymbol :: Text
+  , declLoc    :: Loc
   }
   deriving (Eq, Ord, Show)
 
 newtype Ref = Ref Loc
   deriving (Eq, Ord, Show)
 
-newtype ScopeGraph = ScopeGraph { unScopeGraph :: Map.Map Entry (Set.Set Ref) }
+newtype ScopeGraph = ScopeGraph { unScopeGraph :: Map.Map Decl (Set.Set Ref) }
   deriving (Eq, Ord, Show)
 
 instance Semigroup ScopeGraph where
@@ -102,7 +102,7 @@ scopeGraphAnalysis = Analysis{..}
           ref <- asks Ref
           bindLoc <- asks (Map.lookup addr)
           cell <- gets (Map.lookup addr >=> nonEmpty . Set.toList)
-          maybe (pure Nothing) (foldMapA (pure . Just . mappend (ScopeGraph (maybe Map.empty (\ bindLoc -> Map.singleton (Entry addr bindLoc) (Set.singleton ref)) bindLoc)))) cell
+          maybe (pure Nothing) (foldMapA (pure . Just . mappend (ScopeGraph (maybe Map.empty (\ bindLoc -> Map.singleton (Decl addr bindLoc) (Set.singleton ref)) bindLoc)))) cell
         assign addr v = modify (Map.insertWith (<>) addr (Set.singleton v))
         abstract eval name body = do
           addr <- alloc name
