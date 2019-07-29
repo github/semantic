@@ -63,7 +63,7 @@ importGraph
 importGraph eval
   = run
   . runFresh
-  . runHeap "__semantic_root"
+  . runHeap
   . traverse (runFile eval)
 
 runFile

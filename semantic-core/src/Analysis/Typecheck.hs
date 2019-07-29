@@ -103,7 +103,7 @@ typecheckingFlowInsensitive
 typecheckingFlowInsensitive eval
   = run
   . runFresh
-  . runHeap "__semantic_root"
+  . runHeap
   . fmap (fmap (fmap (fmap generalize)))
   . traverse (runFile eval)
 
