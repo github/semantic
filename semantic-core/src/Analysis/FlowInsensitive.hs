@@ -29,22 +29,22 @@ newtype FrameId name = FrameId { unFrameId :: name }
   deriving (Eq, Ord, Show)
 
 
-convergeTerm :: forall m sig a name address proxy
+convergeTerm :: forall m sig a term address proxy
              .  ( Carrier sig m
                 , Effect sig
                 , Eq address
                 , Member Fresh sig
                 , Member (State (Heap address a)) sig
                 , Ord a
-                , Ord name
+                , Ord term
                 )
              => proxy address
-             -> (Term (Core.Ann :+: Core.Core) name -> NonDetC (ReaderC (Cache (Term (Core.Ann :+: Core.Core) name) a) (StateC (Cache (Term (Core.Ann :+: Core.Core) name) a) m)) a)
-             -> Term (Core.Ann :+: Core.Core) name
+             -> (term -> NonDetC (ReaderC (Cache term a) (StateC (Cache term a) m)) a)
+             -> term
              -> m (Set.Set a)
 convergeTerm _ eval body = do
   heap <- get
-  (cache, _) <- converge (Cache Map.empty :: Cache (Term (Core.Ann :+: Core.Core) name) a, heap :: Heap address a) $ \ (prevCache, _) -> runState (Cache Map.empty) . runReader prevCache $ do
+  (cache, _) <- converge (Cache Map.empty :: Cache term a, heap :: Heap address a) $ \ (prevCache, _) -> runState (Cache Map.empty) . runReader prevCache $ do
     _ <- resetFresh . runNonDetM Set.singleton $ eval body
     get
   pure (fromMaybe mempty (Map.lookup body (unCache cache)))
