@@ -16,7 +16,7 @@ import           Control.Effect.Reader
 import           Control.Effect.State
 import           Control.Monad ((>=>))
 import           Data.File
-import           Data.Foldable (fold, for_)
+import           Data.Foldable (fold)
 import           Data.Function (fix)
 import           Data.List.NonEmpty
 import           Data.Loc
@@ -25,6 +25,7 @@ import           Data.Name
 import           Data.Proxy
 import qualified Data.Set as Set
 import           Data.Text (Text)
+import           Data.Traversable (for)
 import           Prelude hiding (fail)
 
 data Decl = Decl
@@ -115,8 +116,10 @@ scopeGraphAnalysis = Analysis{..}
         string _ = pure mempty
         asString _ = pure mempty
         record fields = do
-          for_ fields $ \ (k, v) -> do
+          fields' <- for fields $ \ (k, v) -> do
             addr <- alloc k
-            assign addr v
-          pure (foldMap snd fields)
+            loc <- ask @Loc
+            let v' = ScopeGraph (Map.singleton (Decl k loc) mempty) <> v
+            (k, v') <$ assign addr v'
+          pure (foldMap snd fields')
         _ ... m = pure (Just m)
