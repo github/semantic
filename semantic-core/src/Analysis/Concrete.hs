@@ -90,13 +90,15 @@ runFile file = traverse run file
             . fix (eval concreteAnalysis)
 
 concreteAnalysis :: ( Carrier sig m
+                    , Foldable term
                     , Member Fresh sig
                     , Member (Reader Env) sig
                     , Member (Reader Loc) sig
-                    , Member (State (Heap (Term (Core.Ann :+: Core.Core) User))) sig
+                    , Member (State (Heap (term User))) sig
                     , MonadFail m
+                    , Show (term User)
                     )
-                 => Analysis (Term (Core.Ann :+: Core.Core) User) Precise (Concrete (Term (Core.Ann :+: Core.Core) User)) m
+                 => Analysis (term User) Precise (Concrete (term User)) m
 concreteAnalysis = Analysis{..}
   where alloc _ = fresh
         bind name addr m = local (Map.insert name addr) m
