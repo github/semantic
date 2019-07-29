@@ -93,7 +93,7 @@ scopeGraphAnalysis = Analysis{..}
           local (Map.insert name loc) m
         lookupEnv = pure . Just
         deref addr = gets (Map.lookup addr >=> nonEmpty . Set.toList) >>= maybe (pure Nothing) (foldMapA (pure . Just))
-        assign addr ty = modify (Map.insertWith (<>) addr (Set.singleton ty))
+        assign addr v = modify (Map.insertWith (<>) addr (Set.singleton v))
         abstract eval name body = do
           addr <- alloc name
           assign name (mempty @ScopeGraph)

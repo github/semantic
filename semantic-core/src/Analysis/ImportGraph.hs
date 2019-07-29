@@ -103,7 +103,7 @@ importGraphAnalysis = Analysis{..}
         bind _ _ m = m
         lookupEnv = pure . Just
         deref addr = gets (Map.lookup addr >=> nonEmpty . Set.toList) >>= maybe (pure Nothing) (foldMapA (pure . Just))
-        assign addr ty = modify (Map.insertWith (<>) addr (Set.singleton ty))
+        assign addr v = modify (Map.insertWith (<>) addr (Set.singleton v))
         abstract _ name body = do
           loc <- ask
           pure (Value (Closure loc name body) mempty)
