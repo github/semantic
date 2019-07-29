@@ -20,7 +20,9 @@ import           Data.Monoid (Alt(..))
 import qualified Data.Set as Set
 import           Data.Term (Term)
 
-type Cache name a = Map.Map (Term (Core.Ann :+: Core.Core) name) (Set.Set a)
+newtype Cache name a = Cache { unCache :: Map.Map (Term (Core.Ann :+: Core.Core) name) (Set.Set a) }
+  deriving (Eq, Ord, Show)
+
 type Heap address a = Map.Map address (Set.Set a)
 
 newtype FrameId name = FrameId { unFrameId :: name }
@@ -40,10 +42,10 @@ convergeTerm :: forall m sig a name
              -> m (Set.Set a)
 convergeTerm eval body = do
   heap <- get
-  (cache, _) <- converge (Map.empty :: Cache name a, heap :: Heap name a) $ \ (prevCache, _) -> runState Map.empty . runReader prevCache $ do
+  (cache, _) <- converge (Cache Map.empty :: Cache name a, heap :: Heap name a) $ \ (prevCache, _) -> runState (Cache Map.empty) . runReader prevCache $ do
     _ <- resetFresh . runNonDetM Set.singleton $ eval body
     get
-  pure (fromMaybe mempty (Map.lookup body cache))
+  pure (fromMaybe mempty (Map.lookup body (unCache cache)))
 
 cacheTerm :: forall m sig a name
           .  ( Alternative m
@@ -56,14 +58,14 @@ cacheTerm :: forall m sig a name
           => (Term (Core.Ann :+: Core.Core) name -> m a)
           -> (Term (Core.Ann :+: Core.Core) name -> m a)
 cacheTerm eval term = do
-  cached <- gets (Map.lookup term)
+  cached <- gets (Map.lookup term . unCache)
   case cached :: Maybe (Set.Set a) of
     Just results -> foldMapA pure results
     Nothing -> do
-      results <- asks (fromMaybe mempty . Map.lookup term)
-      modify (Map.insert term (results :: Set.Set a))
+      results <- asks (fromMaybe mempty . Map.lookup term . unCache)
+      modify (Cache . Map.insert term (results :: Set.Set a) . unCache)
       result <- eval term
-      result <$ modify (Map.insertWith (<>) term (Set.singleton (result :: a)))
+      result <$ modify (Cache . Map.insertWith (<>) term (Set.singleton (result :: a)) . unCache)
 
 runHeap :: address -> ReaderC (FrameId address) (StateC (Heap address a) m) b -> m (Heap address a, b)
 runHeap addr m = runState (Map.singleton addr Set.empty) (runReader (FrameId addr) m)
