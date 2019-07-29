@@ -17,7 +17,6 @@ import           Control.Effect.Reader hiding (Local)
 import           Control.Effect.State
 import           Control.Monad ((>=>), unless)
 import           Control.Monad.Module
-import qualified Data.Core as Core
 import           Data.File
 import           Data.Foldable (for_)
 import           Data.Function (fix)
@@ -90,11 +89,18 @@ generalize ty = fromJust (closed (forAlls (IntSet.toList (mvs ty)) (hoistTerm R 
 
 
 typecheckingFlowInsensitive
-  :: [File (Term (Core.Ann :+: Core.Core) User)]
+  :: Ord (term User)
+  => (forall sig m
+     .  (Carrier sig m, Member (Reader Loc) sig, MonadFail m)
+     => Analysis term User Type m
+     -> (term User -> m Type)
+     -> (term User -> m Type)
+     )
+  -> [File (term User)]
   -> ( Heap User Type
      , [File (Either (Loc, String) (Term (Polytype :+: Monotype) Void))]
      )
-typecheckingFlowInsensitive
+typecheckingFlowInsensitive eval
   = run
   . runFresh
   . runHeap "__semantic_root"
