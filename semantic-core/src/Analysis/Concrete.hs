@@ -151,7 +151,7 @@ lookupConcrete heap name = run . evalState IntSet.empty . runNonDet . inConcrete
         maybeA = maybe empty pure
 
 
-runHeap :: StateC (Heap (Term (Core.Ann :+: Core.Core) User)) m a -> m (Heap (Term (Core.Ann :+: Core.Core) User), a)
+runHeap :: StateC (Heap term) m a -> m (Heap term, a)
 runHeap = runState mempty
 
 
