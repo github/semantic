@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, OverloadedStrings, RecordWildCards, TypeOperators #-}
+{-# LANGUAGE FlexibleContexts, OverloadedStrings, RecordWildCards, TypeApplications, TypeOperators #-}
 module Analysis.ImportGraph
 ( ImportGraph
 , importGraph
@@ -21,6 +21,7 @@ import           Data.List.NonEmpty (nonEmpty)
 import           Data.Loc
 import qualified Data.Map as Map
 import           Data.Name
+import           Data.Proxy
 import qualified Data.Set as Set
 import           Data.Term
 import           Data.Text (Text)
@@ -67,7 +68,7 @@ runFile file = traverse run file
   where run = runReader (fileLoc file)
             . runFailWithLoc
             . fmap fold
-            . convergeTerm (fix (cacheTerm . eval importGraphAnalysis))
+            . convergeTerm (Proxy @User) (fix (cacheTerm . eval importGraphAnalysis))
 
 -- FIXME: decompose into a product domain and two atomic domains
 importGraphAnalysis :: ( Alternative m

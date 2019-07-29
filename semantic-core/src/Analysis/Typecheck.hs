@@ -29,6 +29,7 @@ import           Data.Loc
 import qualified Data.Map as Map
 import           Data.Maybe (fromJust, fromMaybe)
 import           Data.Name as Name
+import           Data.Proxy
 import           Data.Scope
 import           Data.Semigroup (Last (..))
 import qualified Data.Set as Set
@@ -118,7 +119,7 @@ runFile file = traverse run file
               v <- meta
               bs <- m
               v <$ for_ bs (unify v))
-          . convergeTerm (fix (cacheTerm . eval typecheckingAnalysis))
+          . convergeTerm (Proxy @User) (fix (cacheTerm . eval typecheckingAnalysis))
 
 typecheckingAnalysis
   :: ( Alternative m
