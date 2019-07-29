@@ -16,7 +16,7 @@ import           Control.Effect.Reader
 import           Control.Effect.State
 import           Control.Monad ((>=>))
 import           Data.File
-import           Data.Foldable (fold)
+import           Data.Foldable (fold, for_)
 import           Data.Function (fix)
 import           Data.List.NonEmpty
 import           Data.Loc
@@ -104,5 +104,9 @@ scopeGraphAnalysis = Analysis{..}
         asBool _ = pure True <|> pure False
         string _ = pure mempty
         asString _ = pure mempty
-        record fields = pure (foldMap snd fields)
+        record fields = do
+          for_ fields $ \ (k, v) -> do
+            addr <- alloc k
+            assign addr v
+          pure (foldMap snd fields)
         _ ... m = pure (Just m)
