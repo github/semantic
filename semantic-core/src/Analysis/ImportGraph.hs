@@ -30,16 +30,16 @@ import           Prelude hiding (fail)
 
 type ImportGraph = Map.Map Text (Set.Set Text)
 
-data Value = Value
-  { valueSemi  :: Semi (Term (Core.Ann :+: Core.Core) User)
+data Value term = Value
+  { valueSemi  :: Semi term
   , valueGraph :: ImportGraph
   }
   deriving (Eq, Ord, Show)
 
-instance Semigroup Value where
+instance Semigroup (Value term) where
   Value _ g1 <> Value _ g2 = Value Abstract (Map.unionWith (<>) g1 g2)
 
-instance Monoid Value where
+instance Monoid (Value term) where
   mempty = Value Abstract mempty
 
 data Semi term
@@ -50,7 +50,7 @@ data Semi term
   deriving (Eq, Ord, Show)
 
 
-importGraph :: [File (Term (Core.Ann :+: Core.Core) User)] -> (Heap User Value, [File (Either (Loc, String) Value)])
+importGraph :: [File (Term (Core.Ann :+: Core.Core) User)] -> (Heap User (Value (Term (Core.Ann :+: Core.Core) User)), [File (Either (Loc, String) (Value (Term (Core.Ann :+: Core.Core) User)))])
 importGraph
   = run
   . runFresh
@@ -60,10 +60,10 @@ importGraph
 runFile :: ( Carrier sig m
            , Effect sig
            , Member Fresh sig
-           , Member (State (Heap User Value)) sig
+           , Member (State (Heap User (Value (Term (Core.Ann :+: Core.Core) User)))) sig
            )
         => File (Term (Core.Ann :+: Core.Core) User)
-        -> m (File (Either (Loc, String) Value))
+        -> m (File (Either (Loc, String) (Value (Term (Core.Ann :+: Core.Core) User))))
 runFile file = traverse run file
   where run = runReader (fileLoc file)
             . runFailWithLoc
@@ -74,10 +74,10 @@ runFile file = traverse run file
 importGraphAnalysis :: ( Alternative m
                        , Carrier sig m
                        , Member (Reader Loc) sig
-                       , Member (State (Heap User Value)) sig
+                       , Member (State (Heap User (Value (Term (Core.Ann :+: Core.Core) User)))) sig
                        , MonadFail m
                        )
-                    => Analysis (Term (Core.Ann :+: Core.Core)) User Value m
+                    => Analysis (Term (Core.Ann :+: Core.Core)) User (Value (Term (Core.Ann :+: Core.Core) User)) m
 importGraphAnalysis = Analysis{..}
   where alloc = pure
         bind _ _ m = m
