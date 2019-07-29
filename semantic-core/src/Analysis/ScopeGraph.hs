@@ -33,7 +33,10 @@ data Entry = Entry
   }
   deriving (Eq, Ord, Show)
 
-newtype ScopeGraph = ScopeGraph { unScopeGraph :: Map.Map Entry (Set.Set Entry) }
+newtype Ref = Ref Loc
+  deriving (Eq, Ord, Show)
+
+newtype ScopeGraph = ScopeGraph { unScopeGraph :: Map.Map Entry (Set.Set Ref) }
   deriving (Eq, Ord, Show)
 
 instance Semigroup ScopeGraph where
@@ -96,10 +99,10 @@ scopeGraphAnalysis = Analysis{..}
           local (Map.insert name loc) m
         lookupEnv = pure . Just
         deref addr = do
-          loc <- ask @Loc
+          ref <- asks Ref
           bindLoc <- asks (Map.lookup addr)
           cell <- gets (Map.lookup addr >=> nonEmpty . Set.toList)
-          maybe (pure Nothing) (foldMapA (pure . Just . mappend (ScopeGraph (maybe Map.empty (\ bindLoc -> Map.singleton (Entry addr bindLoc) (Set.singleton (Entry addr loc))) bindLoc)))) cell
+          maybe (pure Nothing) (foldMapA (pure . Just . mappend (ScopeGraph (maybe Map.empty (\ bindLoc -> Map.singleton (Entry addr bindLoc) (Set.singleton ref)) bindLoc)))) cell
         assign addr v = modify (Map.insertWith (<>) addr (Set.singleton v))
         abstract eval name body = do
           addr <- alloc name
