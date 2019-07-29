@@ -20,7 +20,6 @@ import           Control.Effect.NonDet
 import           Control.Effect.Reader hiding (Local)
 import           Control.Effect.State
 import           Control.Monad ((<=<), guard)
-import qualified Data.Core as Core
 import           Data.File
 import           Data.Function (fix)
 import qualified Data.IntMap as IntMap
@@ -30,7 +29,6 @@ import qualified Data.Map as Map
 import           Data.Name
 import           Data.Semigroup (Last (..))
 import qualified Data.Set as Set
-import           Data.Term
 import           Data.Text (Text, pack)
 import           Data.Traversable (for)
 import           Prelude hiding (fail)
@@ -69,8 +67,17 @@ data Edge = Lexical | Import
 --
 --   >>> map fileBody (snd (concrete [File (Loc "bool" emptySpan) (Core.bool True)]))
 --   [Right (Bool True)]
-concrete :: [File (Term (Core.Ann :+: Core.Core) User)] -> (Heap (Term (Core.Ann :+: Core.Core) User), [File (Either (Loc, String) (Concrete (Term (Core.Ann :+: Core.Core) User)))])
 concrete
+  :: (Foldable term, Show (term User))
+  => (forall sig m
+     .  (Carrier sig m, Member (Reader Loc) sig, MonadFail m)
+     => Analysis (term User) Precise (Concrete (term User)) m
+     -> (term User -> m (Concrete (term User)))
+     -> (term User -> m (Concrete (term User)))
+     )
+  -> [File (term User)]
+  -> (Heap (term User), [File (Either (Loc, String) (Concrete (term User)))])
+concrete eval
   = run
   . runFresh
   . runHeap
