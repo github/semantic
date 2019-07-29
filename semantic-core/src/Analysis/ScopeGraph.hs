@@ -15,7 +15,6 @@ import           Control.Effect.Fresh
 import           Control.Effect.Reader
 import           Control.Effect.State
 import           Control.Monad ((>=>))
-import qualified Data.Core as Core
 import           Data.File
 import           Data.Foldable (fold)
 import           Data.Function (fix)
@@ -26,7 +25,6 @@ import           Data.Name
 import           Data.Proxy
 import qualified Data.Set as Set
 import           Data.Text (Text)
-import           Data.Term
 import           Prelude hiding (fail)
 
 data Entry = Entry
@@ -41,8 +39,17 @@ newtype ScopeGraph = ScopeGraph { unScopeGraph :: Map.Map Entry (Set.Set Entry) 
 instance Semigroup ScopeGraph where
   ScopeGraph a <> ScopeGraph b = ScopeGraph (Map.unionWith (<>) a b)
 
-scopeGraph :: [File (Term (Core.Ann :+: Core.Core) User)] -> (Heap User ScopeGraph, [File (Either (Loc, String) ScopeGraph)])
 scopeGraph
+  :: Ord term
+  => (forall sig m
+     .  (Carrier sig m, Member (Reader Loc) sig, MonadFail m)
+     => Analysis term User ScopeGraph m
+     -> (term -> m ScopeGraph)
+     -> (term -> m ScopeGraph)
+     )
+  -> [File term]
+  -> (Heap User ScopeGraph, [File (Either (Loc, String) ScopeGraph)])
+scopeGraph eval
   = run
   . runFresh
   . runHeap
