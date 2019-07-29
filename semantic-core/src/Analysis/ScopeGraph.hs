@@ -95,7 +95,11 @@ scopeGraphAnalysis = Analysis{..}
           loc <- ask @Loc
           local (Map.insert name loc) m
         lookupEnv = pure . Just
-        deref addr = gets (Map.lookup addr >=> nonEmpty . Set.toList) >>= maybe (pure Nothing) (foldMapA (pure . Just))
+        deref addr = do
+          loc <- ask @Loc
+          bindLoc <- asks (Map.lookup addr)
+          cell <- gets (Map.lookup addr >=> nonEmpty . Set.toList)
+          maybe (pure Nothing) (foldMapA (pure . Just . mappend (ScopeGraph (maybe Map.empty (\ bindLoc -> Map.singleton (Entry addr bindLoc) (Set.singleton (Entry addr loc))) bindLoc)))) cell
         assign addr v = modify (Map.insertWith (<>) addr (Set.singleton v))
         abstract eval name body = do
           addr <- alloc name
