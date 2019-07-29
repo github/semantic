@@ -132,7 +132,7 @@ concreteAnalysis = Analysis{..}
           pure (val >>= lookupConcrete heap n)
 
 
-lookupConcrete :: Heap (Term (Core.Ann :+: Core.Core) User) -> User -> Concrete (Term (Core.Ann :+: Core.Core) User) -> Maybe Precise
+lookupConcrete :: Heap term -> User -> Concrete term -> Maybe Precise
 lookupConcrete heap name = run . evalState IntSet.empty . runNonDet . inConcrete
   where -- look up the name in a concrete value
         inConcrete = inFrame <=< maybeA . recordFrame
