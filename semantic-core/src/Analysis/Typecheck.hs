@@ -99,9 +99,10 @@ runFile :: ( Carrier sig m
            , Effect sig
            , Member Fresh sig
            , Member (State (Heap User (Term Monotype Meta))) sig
+           , Ord (term User)
            )
-        => (forall sig m . (Carrier sig m, Member (Reader Loc) sig, MonadFail m) => Analysis (Term (Core.Ann :+: Core.Core)) User (Term Monotype Meta) m -> (Term (Core.Ann :+: Core.Core) User -> m (Term Monotype Meta)) -> (Term (Core.Ann :+: Core.Core) User -> m (Term Monotype Meta)))
-        -> File (Term (Core.Ann :+: Core.Core) User)
+        => (forall sig m . (Carrier sig m, Member (Reader Loc) sig, MonadFail m) => Analysis term User (Term Monotype Meta) m -> (term User -> m (Term Monotype Meta)) -> (term User -> m (Term Monotype Meta)))
+        -> File (term User)
         -> m (File (Either (Loc, String) (Term Monotype Meta)))
 runFile eval file = traverse run file
   where run
