@@ -1,4 +1,4 @@
-{-# LANGUAGE DerivingVia, FlexibleContexts, FlexibleInstances, LambdaCase, MultiParamTypeClasses, NamedFieldPuns, OverloadedStrings, RecordWildCards, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DerivingVia, FlexibleContexts, FlexibleInstances, LambdaCase, MultiParamTypeClasses, NamedFieldPuns, OverloadedStrings, RankNTypes, RecordWildCards, TypeOperators, UndecidableInstances #-}
 module Analysis.Concrete
 ( Concrete(..)
 , concrete
@@ -74,16 +74,25 @@ concrete
   = run
   . runFresh
   . runHeap
-  . traverse runFile
+  . traverse (runFile eval)
 
-runFile :: ( Carrier sig m
-           , Effect sig
-           , Member Fresh sig
-           , Member (State (Heap (Term (Core.Ann :+: Core.Core) User))) sig
-           )
-        => File (Term (Core.Ann :+: Core.Core) User)
-        -> m (File (Either (Loc, String) (Concrete (Term (Core.Ann :+: Core.Core) User))))
-runFile file = traverse run file
+runFile
+  :: ( Carrier sig m
+     , Effect sig
+     , Foldable term
+     , Member Fresh sig
+     , Member (State (Heap (term User))) sig
+     , Show (term User)
+     )
+  => (forall sig m
+     .  (Carrier sig m, Member (Reader Loc) sig, MonadFail m)
+     => Analysis (term User) Precise (Concrete (term User)) m
+     -> (term User -> m (Concrete (term User)))
+     -> (term User -> m (Concrete (term User)))
+     )
+  -> File (term User)
+  -> m (File (Either (Loc, String) (Concrete (term User))))
+runFile eval file = traverse run file
   where run = runReader (fileLoc file)
             . runFailWithLoc
             . runReader (mempty :: Env)
