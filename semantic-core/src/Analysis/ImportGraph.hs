@@ -31,7 +31,7 @@ import           Prelude hiding (fail)
 type ImportGraph = Map.Map Text (Set.Set Text)
 
 data Value = Value
-  { valueSemi  :: Semi
+  { valueSemi  :: Semi (Term (Core.Ann :+: Core.Core) User)
   , valueGraph :: ImportGraph
   }
   deriving (Eq, Ord, Show)
@@ -42,8 +42,8 @@ instance Semigroup Value where
 instance Monoid Value where
   mempty = Value Abstract mempty
 
-data Semi
-  = Closure Loc User (Term (Core.Ann :+: Core.Core) User)
+data Semi term
+  = Closure Loc User term
   -- FIXME: Bound String values.
   | String Text
   | Abstract
