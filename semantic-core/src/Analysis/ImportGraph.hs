@@ -43,7 +43,7 @@ instance Monoid Value where
   mempty = Value Abstract mempty
 
 data Semi
-  = Closure Loc User (Term (Core.Ann :+: Core.Core) User) (Set.Set User)
+  = Closure Loc User (Term (Core.Ann :+: Core.Core) User)
   -- FIXME: Bound String values.
   | String Text
   | Abstract
@@ -86,9 +86,8 @@ importGraphAnalysis = Analysis{..}
         assign addr ty = modify (Map.insertWith (<>) addr (Set.singleton ty))
         abstract _ name body = do
           loc <- ask
-          env <- gets @(Heap User Value) Map.keysSet
-          pure (Value (Closure loc name body env) mempty)
-        apply eval (Value (Closure loc name body _) _) a = local (const loc) $ do
+          pure (Value (Closure loc name body) mempty)
+        apply eval (Value (Closure loc name body) _) a = local (const loc) $ do
           addr <- alloc name
           assign addr a
           bind name addr (eval body)
