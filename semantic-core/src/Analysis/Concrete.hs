@@ -96,7 +96,7 @@ concreteAnalysis :: ( Carrier sig m
                     , Member (State Heap) sig
                     , MonadFail m
                     )
-                 => Analysis (Term (Core.Ann :+: Core.Core)) Precise Concrete m
+                 => Analysis (Term (Core.Ann :+: Core.Core) User) Precise Concrete m
 concreteAnalysis = Analysis{..}
   where alloc _ = fresh
         bind name addr m = local (Map.insert name addr) m

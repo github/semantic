@@ -65,18 +65,18 @@ runFile
   :: ( Carrier sig m
      , Effect sig
      , Member Fresh sig
-     , Member (State (Heap User (Value (term User)))) sig
-     , Ord  (term User)
-     , Show (term User)
+     , Member (State (Heap User (Value term))) sig
+     , Ord  term
+     , Show term
      )
   => (forall sig m
      .  (Carrier sig m, Member (Reader Loc) sig, MonadFail m)
-     => Analysis term User (Value (term User)) m
-     -> (term User -> m (Value (term User)))
-     -> (term User -> m (Value (term User)))
+     => Analysis term User (Value term) m
+     -> (term -> m (Value term))
+     -> (term -> m (Value term))
      )
-  -> File (term User)
-  -> m (File (Either (Loc, String) (Value (term User))))
+  -> File term
+  -> m (File (Either (Loc, String) (Value term)))
 runFile eval file = traverse run file
   where run = runReader (fileLoc file)
             . runFailWithLoc
@@ -87,12 +87,12 @@ runFile eval file = traverse run file
 importGraphAnalysis :: ( Alternative m
                        , Carrier sig m
                        , Member (Reader Loc) sig
-                       , Member (State (Heap User (Value (term User)))) sig
+                       , Member (State (Heap User (Value term))) sig
                        , MonadFail m
-                       , Ord  (term User)
-                       , Show (term User)
+                       , Ord  term
+                       , Show term
                        )
-                    => Analysis term User (Value (term User)) m
+                    => Analysis term User (Value term) m
 importGraphAnalysis = Analysis{..}
   where alloc = pure
         bind _ _ m = m

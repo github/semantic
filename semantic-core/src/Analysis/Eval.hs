@@ -33,7 +33,7 @@ eval :: ( Carrier sig m
         , MonadFail m
         , Semigroup value
         )
-     => Analysis (Term (Ann :+: Core)) address value m
+     => Analysis (Term (Ann :+: Core) User) address value m
      -> (Term (Ann :+: Core) User -> m value)
      -> (Term (Ann :+: Core) User -> m value)
 eval Analysis{..} eval = \case
@@ -217,8 +217,8 @@ data Analysis term address value m = Analysis
   , lookupEnv :: User -> m (Maybe address)
   , deref     :: address -> m (Maybe value)
   , assign    :: address -> value -> m ()
-  , abstract  :: (term User -> m value) -> User -> term User -> m value
-  , apply     :: (term User -> m value) -> value -> value -> m value
+  , abstract  :: (term -> m value) -> User -> term -> m value
+  , apply     :: (term -> m value) -> value -> value -> m value
   , unit      :: m value
   , bool      :: Bool -> m value
   , asBool    :: value -> m Bool

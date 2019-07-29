@@ -89,14 +89,14 @@ generalize ty = fromJust (closed (forAlls (IntSet.toList (mvs ty)) (hoistTerm R 
 
 
 typecheckingFlowInsensitive
-  :: Ord (term User)
+  :: Ord term
   => (forall sig m
      .  (Carrier sig m, Member (Reader Loc) sig, MonadFail m)
      => Analysis term User Type m
-     -> (term User -> m Type)
-     -> (term User -> m Type)
+     -> (term -> m Type)
+     -> (term -> m Type)
      )
-  -> [File (term User)]
+  -> [File term]
   -> ( Heap User Type
      , [File (Either (Loc, String) (Term (Polytype :+: Monotype) Void))]
      )
@@ -112,15 +112,15 @@ runFile
      , Effect sig
      , Member Fresh sig
      , Member (State (Heap User Type)) sig
-     , Ord (term User)
+     , Ord term
      )
   => (forall sig m
      .  (Carrier sig m, Member (Reader Loc) sig, MonadFail m)
      => Analysis term User Type m
-     -> (term User -> m Type)
-     -> (term User -> m Type)
+     -> (term -> m Type)
+     -> (term -> m Type)
      )
-  -> File (term User)
+  -> File term
   -> m (File (Either (Loc, String) Type))
 runFile eval file = traverse run file
   where run
