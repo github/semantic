@@ -103,11 +103,11 @@ scopeGraphAnalysis = Analysis{..}
           ref <- asks Ref
           bindLoc <- asks (Map.lookup addr)
           cell <- gets (Map.lookup addr >=> nonEmpty . Set.toList)
-          maybe (pure Nothing) (foldMapA (pure . Just . mappend (ScopeGraph (maybe Map.empty (\ bindLoc -> Map.singleton (Decl addr bindLoc) (Set.singleton ref)) bindLoc)))) cell
+          maybe (pure Nothing) (foldMapA (pure . Just . mappend (extendBinding addr ref bindLoc))) cell
         assign addr v = do
           ref <- asks Ref
           bindLoc <- asks (Map.lookup addr)
-          modify (Map.insertWith (<>) addr (Set.singleton (ScopeGraph (maybe Map.empty (\ bindLoc -> Map.singleton (Decl addr bindLoc) (Set.singleton ref)) bindLoc) <> v)))
+          modify (Map.insertWith (<>) addr (Set.singleton (extendBinding addr ref bindLoc <> v)))
         abstract eval name body = do
           addr <- alloc name
           assign name (mempty @ScopeGraph)
@@ -126,3 +126,5 @@ scopeGraphAnalysis = Analysis{..}
             (k, v') <$ assign addr v'
           pure (foldMap snd fields')
         _ ... m = pure (Just m)
+
+        extendBinding addr ref bindLoc = ScopeGraph (maybe Map.empty (\ bindLoc -> Map.singleton (Decl addr bindLoc) (Set.singleton ref)) bindLoc)
