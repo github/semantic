@@ -84,7 +84,6 @@ runFile eval file = traverse run file
             . fmap fold
             . convergeTerm (Proxy @User) (fix (cacheTerm . eval scopeGraphAnalysis))
 
--- FIXME: decompose into a product domain and two atomic domains
 scopeGraphAnalysis
   :: ( Alternative m
      , Carrier sig m
