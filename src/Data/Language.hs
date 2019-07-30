@@ -7,12 +7,12 @@ module Data.Language
   , knownLanguage
   , languageForFilePath
   , pathIsMinified
-  , languageForType
   , supportedExts
   , codeNavLanguages
   ) where
 
 import           Data.Aeson
+import qualified Data.Languages as Lingo
 import qualified Data.Text as T
 import           Prologue
 import           System.FilePath.Posix
@@ -98,25 +98,6 @@ parseLanguage l = case T.toLower l of
 knownLanguage :: Language -> Bool
 knownLanguage = (/= Unknown)
 
--- | Returns a Language based on the file extension (including the ".").
-languageForType :: String -> Language
-languageForType mediaType = case mediaType of
-    ".java" -> Java
-    ".json" -> JSON
-    ".hs"   -> Haskell
-    ".md"   -> Markdown
-    ".rb"   -> Ruby
-    ".go"   -> Go
-    ".js"   -> JavaScript
-    ".mjs"  -> JavaScript
-    ".ts"   -> TypeScript
-    ".tsx"  -> TSX
-    ".jsx"  -> JSX
-    ".py"   -> Python
-    ".php"  -> PHP
-    ".phpt" -> PHP
-    _       -> Unknown
-
 extensionsForLanguage :: Language -> [String]
 extensionsForLanguage language = case language of
   Go         -> [".go"]
@@ -130,9 +111,22 @@ extensionsForLanguage language = case language of
   JSX        -> [".jsx"]
   _          -> []
 
--- | Return a language based on a FilePath's extension, or Nothing if extension is not found or not supported.
+-- | Return a language based on a FilePath's extension.
 languageForFilePath :: FilePath -> Language
-languageForFilePath = languageForType . takeExtension
+languageForFilePath path = case Lingo.languageName <$> Lingo.languageForPath path of
+  Just "Go" -> Go
+  Just "Haskell" -> Haskell
+  Just "Java" -> Java
+  Just "JavaScript" -> JavaScript
+  Just "JSON" -> JSON
+  Just "JSX" -> JSX
+  Just "Markdown" -> Markdown
+  Just "PHP" -> PHP
+  Just "Python" -> Python
+  Just "Ruby" -> Ruby
+  Just "TSX" -> TSX
+  Just "TypeScript" -> TypeScript
+  _ -> Unknown
 
 supportedExts :: [String]
 supportedExts = [".go", ".py", ".rb", ".js", ".mjs", ".ts", ".php", ".phpt"]

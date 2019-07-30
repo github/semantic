@@ -14,3 +14,8 @@ source-repository-package
   type: git
   location: https://github.com/joshvera/proto3-wire.git
   tag: 84664e22f01beb67870368f1f88ada5d0ad01f56
+
+source-repository-package
+  type: git
+  location: https://github.com/tclem/lingo-haskell.git
+  tag: 7a453568556d7b6ab6fb4573b158b41cef56f7cc
