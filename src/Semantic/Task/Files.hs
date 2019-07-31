@@ -45,8 +45,8 @@ data Destination = ToPath FilePath | ToHandle (Handle 'IO.WriteMode)
 data PathFilter
   = ExcludePaths [FilePath]
   | ExcludeFromHandle (Handle 'IO.ReadMode)
-  | OnlyPaths [FilePath]
-  | OnlyPathsFromHandle (Handle 'IO.ReadMode)
+  | IncludePaths [FilePath]
+  | IncludePathsFromHandle (Handle 'IO.ReadMode)
 
 -- | An effect to read/write 'Blob's from 'Handle's or 'FilePath's.
 data Files (m :: * -> *) k
@@ -84,8 +84,8 @@ instance (Member (Error SomeException) sig, Member Catch sig, MonadIO m, Carrier
     Read (FromDir dir) k                                      -> rethrowing (readBlobsFromDir dir) >>= k
     Read (FromGitRepo path sha (ExcludePaths excludePaths)) k -> rethrowing (readBlobsFromGitRepo path sha excludePaths mempty) >>= k
     Read (FromGitRepo path sha (ExcludeFromHandle handle)) k  -> rethrowing (readPathsFromHandle handle >>= (\x -> readBlobsFromGitRepo path sha x mempty)) >>= k
-    Read (FromGitRepo path sha (OnlyPaths onlyPaths)) k       -> rethrowing (readBlobsFromGitRepo path sha mempty onlyPaths) >>= k
-    Read (FromGitRepo path sha (OnlyPathsFromHandle h)) k     -> rethrowing (readPathsFromHandle h >>= readBlobsFromGitRepo path sha mempty) >>= k
+    Read (FromGitRepo path sha (IncludePaths includePaths)) k -> rethrowing (readBlobsFromGitRepo path sha mempty includePaths) >>= k
+    Read (FromGitRepo path sha (IncludePathsFromHandle h)) k  -> rethrowing (readPathsFromHandle h >>= readBlobsFromGitRepo path sha mempty) >>= k
     Read (FromPathPair paths) k                               -> rethrowing (runBothWith readFilePair paths) >>= k
     Read (FromPairHandle handle) k                            -> rethrowing (readBlobPairsFromHandle handle) >>= k
     ReadProject rootDir dir language excludeDirs k            -> rethrowing (readProjectFromPaths rootDir dir language excludeDirs) >>= k

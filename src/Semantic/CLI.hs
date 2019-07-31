@@ -115,8 +115,8 @@ parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate pa
                       <*> option shaReader (long "sha" <> help "The commit SHA1 to read from")
                       <*> ( ExcludePaths <$> many (option str (long "exclude" <> short 'x' <> help "Paths to exclude"))
                         <|> ExcludeFromHandle <$> flag' stdin (long "exclude-stdin" <> help "Exclude paths given to stdin")
-                        <|> OnlyPaths <$> many (option str (long "only" <> help "Only include the specified paths"))
-                        <|> OnlyPathsFromHandle <$> flag' stdin (long "only-stdin" <> help "Include only the paths given to stdin"))
+                        <|> IncludePaths <$> many (option str (long "only" <> help "Only include the specified paths"))
+                        <|> IncludePathsFromHandle <$> flag' stdin (long "only-stdin" <> help "Include only the paths given to stdin"))
                   <|> FilesFromPaths <$> some (argument filePathReader (metavar "FILES..."))
                   <|> pure (FilesFromHandle stdin)
       pure $ Task.readBlobs filesOrStdin >>= renderer
@@ -134,8 +134,8 @@ tsParseCommand = command "ts-parse" (info tsParseArgumentsParser (progDesc "Gene
                       <*> option shaReader (long "sha" <> help "The commit SHA1 to read from")
                       <*> ( ExcludePaths <$> many (option str (long "exclude" <> short 'x' <> help "Paths to exclude"))
                         <|> ExcludeFromHandle <$> flag' stdin (long "exclude-stdin" <> help "Exclude paths given to stdin")
-                        <|> OnlyPaths <$> many (option str (long "only" <> help "Only include the specified paths"))
-                        <|> OnlyPathsFromHandle <$> flag' stdin (long "only-stdin" <> help "Include only the paths given to stdin"))
+                        <|> IncludePaths <$> many (option str (long "only" <> help "Only include the specified paths"))
+                        <|> IncludePathsFromHandle <$> flag' stdin (long "only-stdin" <> help "Include only the paths given to stdin"))
                   <|> FilesFromPaths <$> some (argument filePathReader (metavar "FILES..."))
                   <|> pure (FilesFromHandle stdin)
       pure $ Task.readBlobs filesOrStdin >>= AST.runASTParse format
