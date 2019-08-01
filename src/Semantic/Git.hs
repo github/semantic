@@ -60,8 +60,8 @@ entryParser = TreeEntry
   <*> oidParser <* AP.char '\t'
   <*> (unpack <$> AP.takeWhile (/= '\NUL'))
     where
-      typeParser = AP.choice [BlobObject <$ "blob", TreeObject <$ "tree"]
-      modeParser = AP.choice [NormalMode <$ "100644", ExecutableMode <$ "100755", SymlinkMode <$ "120000", TreeMode <$ "040000"]
+      typeParser = AP.choice [BlobObject <$ "blob", TreeObject <$ "tree", OtherObjectType <$ AP.takeWhile isAlphaNum]
+      modeParser = AP.choice [NormalMode <$ "100644", ExecutableMode <$ "100755", SymlinkMode <$ "120000", TreeMode <$ "040000", OtherMode <$ AP.takeWhile isAlphaNum]
       oidParser = OID <$> AP.takeWhile isHexDigit
 
 newtype OID = OID Text
