@@ -99,5 +99,5 @@ insetRange Range {..} = Range (succ start) (pred end)
 
 
 instance QC.Arbitrary Source where
-  arbitrary = fromText . Text.pack <$> QC.listOf (QC.oneof [ pure '\r' , pure '\n' , QC.arbitraryUnicodeChar ])
+  arbitrary = fromText . Text.pack <$> QC.listOf (QC.oneof [ pure '\r', pure '\n', QC.arbitraryUnicodeChar ])
   shrink src = fromText . Text.pack <$> QC.shrinkList QC.shrinkNothing (Text.unpack (toText src))
