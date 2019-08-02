@@ -101,5 +101,5 @@ insetRange Range {..} = Range (succ start) (pred end)
 
 
 instance QC.Arbitrary Source where
-  arbitrary = fromText . Text.pack <$> QC.listOf (QC.oneof [ pure '\r', pure '\n', QC.arbitraryUnicodeChar ])
+  arbitrary = fromText . Text.pack <$> QC.listOf (QC.frequency [ (1, pure '\r'), (1, pure '\n'), (20, QC.arbitraryUnicodeChar) ])
   shrink src = fromText . Text.pack <$> QC.shrinkList QC.shrinkNothing (Text.unpack (toText src))
