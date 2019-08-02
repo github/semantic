@@ -11,7 +11,6 @@ module Data.Core.Pretty
 import           Control.Effect.Reader
 import           Data.Core
 import           Data.File
-import           Data.Functor.Const
 import           Data.Name
 import           Data.Scope
 import           Data.Term
@@ -56,57 +55,58 @@ inParens amount go = do
   body <- with amount go
   pure (encloseIf (amount >= prec) (symbol "(") (symbol ")") body)
 
-prettify :: (Member (Reader [AnsiDoc]) sig, Member (Reader Prec) sig, Carrier sig m)
-         => Style
-         -> Core (Const (m AnsiDoc)) a
-         -> m AnsiDoc
-prettify style = \case
-  Let a -> pure $ keyword "let" <+> name a
-  Const a :>> Const b -> do
-    prec <- ask @Prec
-    fore <- with 12 a
-    aft  <- with 12 b
+prettyCore :: Style -> Term Core User -> AnsiDoc
+prettyCore style = run . runReader @Prec 0 . go (pure . name)
+  where go :: (Member (Reader Prec) sig, Carrier sig m) => (a -> m AnsiDoc) -> Term Core a -> m AnsiDoc
+        go var = \case
+          Var v -> var v
+          Term t -> case t of
+            Let a -> pure $ keyword "let" <+> name a
+            a :>> b -> do
+              prec <- ask @Prec
+              fore <- with 12 (go var a)
+              aft  <- with 12 (go var b)
 
-    let open  = symbol ("{" <> softline)
-        close = symbol (softline <> "}")
-        separator = ";" <> Pretty.line
-        body = fore <> separator <> aft
+              let open  = symbol ("{" <> softline)
+                  close = symbol (softline <> "}")
+                  separator = ";" <> Pretty.line
+                  body = fore <> separator <> aft
 
-    pure . Pretty.align $ encloseIf (12 > prec) open close (Pretty.align body)
+              pure . Pretty.align $ encloseIf (12 > prec) open close (Pretty.align body)
 
-  Lam n f -> inParens 11 $ do
-    (x, body) <- bind n f
-    pure (lambda <> x <+> arrow <+> body)
+            Lam n f -> inParens 11 $ do
+              (x, body) <- bind n f
+              pure (lambda <> x <+> arrow <+> body)
 
-  Frame    -> pure $ primitive "frame"
-  Unit     -> pure $ primitive "unit"
-  Bool b   -> pure $ primitive (if b then "true" else "false")
-  String s -> pure . strlit $ Pretty.viaShow s
+            Frame    -> pure $ primitive "frame"
+            Unit     -> pure $ primitive "unit"
+            Bool b   -> pure $ primitive (if b then "true" else "false")
+            String s -> pure . strlit $ Pretty.viaShow s
 
-  Const f :$ Const x -> inParens 11 $ (<+>) <$> f <*> x
+            f :$ x -> inParens 11 $ (<+>) <$> go var f <*> go var x
 
-  If (Const con) (Const tru) (Const fal) -> do
-    con' <- "if"   `appending` con
-    tru' <- "then" `appending` tru
-    fal' <- "else" `appending` fal
-    pure $ Pretty.sep [con', tru', fal']
+            If con tru fal -> do
+              con' <- "if"   `appending` go var con
+              tru' <- "then" `appending` go var tru
+              fal' <- "else" `appending` go var fal
+              pure $ Pretty.sep [con', tru', fal']
 
-  Load (Const p)   -> "load" `appending` p
-  Edge Lexical (Const n) -> "lexical" `appending` n
-  Edge Import (Const n) -> "import" `appending` n
-  Const item :. Const body   -> inParens 4 $ do
-    f <- item
-    g <- body
-    pure (f <> symbol "." <> g)
+            Load p   -> "load" `appending` go var p
+            Edge Lexical n -> "lexical" `appending` go var n
+            Edge Import n -> "import" `appending` go var n
+            item :. body   -> inParens 4 $ do
+              f <- go var item
+              g <- go var body
+              pure (f <> symbol "." <> g)
 
-  Const lhs := Const rhs -> inParens 3 $ do
-    f <- lhs
-    g <- rhs
-    pure (f <+> symbol "=" <+> g)
+            lhs := rhs -> inParens 3 $ do
+              f <- go var lhs
+              g <- go var rhs
+              pure (f <+> symbol "=" <+> g)
 
-  -- Annotations are not pretty-printed, as it lowers the signal/noise ratio too profoundly.
-  Ann _ (Const c) -> c
-  where bind (Ignored x) f = let x' = name x in (,) x' <$> local (x':) (getConst (unScope f))
+            -- Annotations are not pretty-printed, as it lowers the signal/noise ratio too profoundly.
+            Ann _ c -> go var c
+          where bind (Ignored x) f = let x' = name x in (,) x' <$> go (incr (const (pure x')) var) (fromScope f)
         lambda = case style of
           Unicode -> symbol "λ"
           Ascii   -> symbol "\\"
@@ -117,8 +117,3 @@ prettify style = \case
 
 appending :: Functor f => AnsiDoc -> f AnsiDoc -> f AnsiDoc
 appending k item = (keyword k <+>) <$> item
-
-prettyCore :: Style -> Term Core User -> AnsiDoc
-prettyCore s = run . runReader @Prec 0 . runReader @[AnsiDoc] [] . cata id (prettify s) bound (pure . name)
-  where bound (Z _) = asks (head @AnsiDoc)
-        bound (S n) = local (tail @AnsiDoc) n
