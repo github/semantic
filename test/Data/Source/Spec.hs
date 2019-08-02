@@ -70,9 +70,10 @@ testTree = Tasty.testGroup "Data.Source"
     ]
 
   ]
-  where summarize src
-          | nullSource src = "empty"
-          | otherwise      = "non-empty"
+  where summarize src = case sourceLines src of
+          []  -> "empty"
+          [x] -> if nullSource x then "empty" else "single-line"
+          _   -> "multiple lines"
 
 spec :: Spec
 spec = do
