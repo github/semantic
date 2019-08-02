@@ -29,7 +29,7 @@ testTree = Tasty.testGroup "Data.Source"
   [ Tasty.testGroup "sourceLineRanges"
     [ QC.testProperty "produces 1 more range than there are newlines" $
       \ source -> QC.label (summarize source) $
-        length (sourceLineRanges source) QC.=== length (Text.splitOn "\r\n" (toText source)>>= Text.splitOn "\r" >>= Text.splitOn "\n")
+        length (sourceLineRanges source) QC.=== length (Text.splitOn "\r\n" (toText source) >>= Text.splitOn "\r" >>= Text.splitOn "\n")
 
     , QC.testProperty "produces exhaustive ranges" $
       \ source -> QC.label (summarize source) $
