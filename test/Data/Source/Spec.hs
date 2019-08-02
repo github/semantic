@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -Wno-orphans #-}
 module Data.Source.Spec (spec, testTree) where
 
 import Data.Range
@@ -14,6 +15,7 @@ import qualified Hedgehog.Range
 import           Hedgehog hiding (Range)
 import qualified Test.Tasty as Tasty
 import           Test.Tasty.Hedgehog (testProperty)
+import qualified Test.Tasty.QuickCheck as QC
 
 prop :: HasCallStack => String -> (Source -> PropertyT IO ()) -> Tasty.TestTree
 prop desc f
@@ -25,8 +27,8 @@ prop desc f
 testTree :: Tasty.TestTree
 testTree = Tasty.testGroup "Data.Source"
   [ Tasty.testGroup "sourceLineRanges"
-    [ prop "produces 1 more range than there are newlines" $
-      \ source -> length (sourceLineRanges source) === succ (Text.count "\n" (toText source))
+    [ QC.testProperty "produces 1 more range than there are newlines" $
+      \ source -> length (sourceLineRanges source) QC.=== succ (Text.count "\n" (toText source))
 
     , prop "produces exhaustive ranges" $
       \ source -> foldMap (`slice` source) (sourceLineRanges source) === source
@@ -91,3 +93,8 @@ insetSpan sourceSpan = sourceSpan { spanStart = (spanStart sourceSpan) { posColu
 
 insetRange :: Range -> Range
 insetRange Range {..} = Range (succ start) (pred end)
+
+
+instance QC.Arbitrary Source where
+  arbitrary = fromText . Text.pack <$> QC.listOf (QC.oneof [ pure '\r' , pure '\n' , QC.arbitraryUnicodeChar ])
+  shrink src = fromText . Text.pack <$> QC.shrinkList QC.shrinkNothing (Text.unpack (toText src))
