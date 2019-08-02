@@ -194,25 +194,8 @@ annWith :: (Carrier sig m, Member Core sig) => CallStack -> m a -> m a
 annWith callStack = maybe id (fmap send . Ann) (stackLoc callStack)
 
 
-stripAnnotations :: (Member Core sig, Syntax sig) => Term sig a -> Term sig a
-stripAnnotations = iter id alg Var Var
-  where alg t | Just c <- prj t, Ann _ b <- c = b
-              | otherwise                     = Term t
-
-
-instance Syntax Core where
-  foldSyntax go k h = \case
-    Let a -> Let a
-    a :>> b -> go h a :>> go h b
-    Lam u b -> Lam u (foldSyntax go k h b)
-    a :$ b -> go h a :$ go h b
-    Unit -> Unit
-    Bool b -> Bool b
-    If c t e -> If (go h c) (go h t) (go h e)
-    String s -> String s
-    Load t -> Load (go h t)
-    Edge e t -> Edge e (go h t)
-    Frame -> Frame
-    a :. b -> go h a :. go h b
-    a := b -> go h a := go h b
-    Ann loc t -> Ann loc (go h t)
+stripAnnotations :: (Member Core sig, HFunctor sig, forall g . Functor g => Functor (sig g)) => Term sig a -> Term sig a
+stripAnnotations (Var v)  = Var v
+stripAnnotations (Term t)
+  | Just c <- prj t, Ann _ b <- c = stripAnnotations b
+  | otherwise                     = Term (hmap stripAnnotations t)
