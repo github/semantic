@@ -28,7 +28,7 @@ testTree :: Tasty.TestTree
 testTree = Tasty.testGroup "Data.Source"
   [ Tasty.testGroup "sourceLineRanges"
     [ QC.testProperty "produces 1 more range than there are newlines" $
-      \ source -> length (sourceLineRanges source) QC.=== succ (Text.count "\n" (toText source))
+      \ source -> QC.label (summarize source) $ length (sourceLineRanges source) QC.=== succ (Text.count "\n" (toText source))
 
     , prop "produces exhaustive ranges" $
       \ source -> foldMap (`slice` source) (sourceLineRanges source) === source
@@ -70,6 +70,9 @@ testTree = Tasty.testGroup "Data.Source"
     ]
 
   ]
+  where summarize src
+          | nullSource src = "empty"
+          | otherwise      = "non-empty"
 
 spec :: Spec
 spec = do
