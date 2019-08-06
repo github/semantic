@@ -12,7 +12,7 @@ module Data.Core.Parser
 import           Control.Applicative
 import           Control.Effect.Carrier
 import qualified Data.Char as Char
-import           Data.Core (Core)
+import           Data.Core ((:<-) (..), Core)
 import qualified Data.Core as Core
 import           Data.Foldable (foldl')
 import           Data.Name
@@ -53,7 +53,8 @@ expr :: (TokenParsing m, Carrier sig t, Member Core sig, Monad m) => m (t User)
 expr = ifthenelse <|> lambda <|> rec <|> load <|> assign
 
 assign :: (TokenParsing m, Carrier sig t, Member Core sig, Monad m) => m (t User)
-assign = application <**> (flip (Core..=) <$ symbolic '=' <*> application <|> pure id) <?> "assignment"
+assign = application <**> (symbolic '=' *> rhs <|> pure id) <?> "assignment"
+  where rhs = flip (Core..=) <$> application
 
 application :: (TokenParsing m, Carrier sig t, Member Core sig, Monad m) => m (t User)
 application = projection `chainl1` (pure (Core.$$))
@@ -72,10 +73,10 @@ atom = choice
 comp :: (TokenParsing m, Carrier sig t, Member Core sig, Monad m) => m (t User)
 comp = braces (Core.do' <$> sepEndByNonEmpty statement semi) <?> "compound statement"
 
-statement :: (TokenParsing m, Carrier sig t, Member Core sig, Monad m) => m (Maybe (Named User) Core.:<- t User)
+statement :: (TokenParsing m, Carrier sig t, Member Core sig, Monad m) => m (Maybe (Named User) :<- t User)
 statement
-  =   try ((Core.:<-) . Just <$> name <* symbol "<-" <*> expr)
-  <|> (Nothing Core.:<-) <$> expr
+  =   try ((:<-) . Just <$> name <* symbol "<-" <*> expr)
+  <|> (Nothing :<-) <$> expr
   <?> "statement"
 
 ifthenelse :: (TokenParsing m, Carrier sig t, Member Core sig, Monad m) => m (t User)
@@ -109,14 +110,8 @@ lit = let x `given` n = x <$ reserved n in choice
   , Core.bool False `given` "#false"
   , Core.unit       `given` "#unit"
   , record
-  , token (between (string "\"") (string "\"") (Core.string . fromString <$> many (escape <|> (noneOf "\"" <?> "non-escaped character"))))
+  , Core.string <$> stringLiteral
   ] <?> "literal"
-  where escape = char '\\' *> choice
-          [ '"'  <$ string "\""
-          , '\n' <$ string "n"
-          , '\r' <$ string "r"
-          , '\t' <$ string "t"
-          ] <?> "escape sequence"
 
 record :: (TokenParsing m, Carrier sig t, Member Core sig, Monad m) => m (t User)
 record = Core.record <$ reserved "#record" <*> braces (sepEndBy ((,) <$> identifier <* symbolic ':' <*> expr) comma)

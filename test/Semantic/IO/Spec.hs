@@ -31,11 +31,45 @@ spec = do
           git ["config", "user.email", "'test@test.test'"]
           git ["commit", "-am", "'test commit'"]
 
-        readBlobsFromGitRepo (dir </> ".git") (Git.OID "HEAD") []
+        readBlobsFromGitRepo (dir </> ".git") (Git.OID "HEAD") [] []
       let files = sortOn fileLanguage (blobFile <$> blobs)
       files `shouldBe` [ File "foo.py" Python
                        , File "bar.rb" Ruby
                        ]
+
+    when hasGit . it "should read from a git directory with --only" $ do
+      -- This temporary directory will be cleaned after use.
+      blobs <- liftIO . withSystemTempDirectory "semantic-temp-git-repo" $ \dir -> do
+        shelly $ silently $ do
+          cd (fromString dir)
+          let git = run_ "git"
+          git ["init"]
+          run_ "touch" ["foo.py", "bar.rb"]
+          git ["add", "foo.py", "bar.rb"]
+          git ["config", "user.name", "'Test'"]
+          git ["config", "user.email", "'test@test.test'"]
+          git ["commit", "-am", "'test commit'"]
+
+        readBlobsFromGitRepo (dir </> ".git") (Git.OID "HEAD") [] ["foo.py"]
+      let files = sortOn fileLanguage (blobFile <$> blobs)
+      files `shouldBe` [ File "foo.py" Python ]
+
+    when hasGit . it "should read from a git directory with --exclude" $ do
+      -- This temporary directory will be cleaned after use.
+      blobs <- liftIO . withSystemTempDirectory "semantic-temp-git-repo" $ \dir -> do
+        shelly $ silently $ do
+          cd (fromString dir)
+          let git = run_ "git"
+          git ["init"]
+          run_ "touch" ["foo.py", "bar.rb"]
+          git ["add", "foo.py", "bar.rb"]
+          git ["config", "user.name", "'Test'"]
+          git ["config", "user.email", "'test@test.test'"]
+          git ["commit", "-am", "'test commit'"]
+
+        readBlobsFromGitRepo (dir </> ".git") (Git.OID "HEAD") ["foo.py"] []
+      let files = sortOn fileLanguage (blobFile <$> blobs)
+      files `shouldBe` [ File "bar.rb" Ruby ]
 
   describe "readFile" $ do
     it "returns a blob for extant files" $ do
@@ -109,4 +143,3 @@ spec = do
 
 jsonException :: Selector InvalidJSONException
 jsonException = const True
-
