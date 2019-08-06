@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, FlexibleInstances, LambdaCase, MultiParamTypeClasses, NamedFieldPuns, OverloadedStrings, RecordWildCards, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE FlexibleContexts, FlexibleInstances, LambdaCase, MultiParamTypeClasses, NamedFieldPuns, OverloadedStrings, RecordWildCards, TypeApplications, TypeOperators, UndecidableInstances #-}
 module Analysis.Concrete
 ( Concrete(..)
 , concrete
@@ -84,7 +84,7 @@ runFile :: ( Carrier sig m
 runFile file = traverse run file
   where run = runReader (fileLoc file)
             . runFailWithLoc
-            . runReader (mempty :: Env)
+            . runReader @Env mempty
             . fix (eval concreteAnalysis)
 
 concreteAnalysis :: ( Carrier sig m
