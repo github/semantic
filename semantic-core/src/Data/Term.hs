@@ -2,6 +2,7 @@
 module Data.Term
 ( Term(..)
 , hoistTerm
+, prjTerm
 ) where
 
 import Control.Effect.Carrier
@@ -48,3 +49,7 @@ hoistTerm :: (HFunctor sig, forall g . Functor g => Functor (sig g)) => (forall 
 hoistTerm f = go
   where go (Var v)  = Var v
         go (Term t) = Term (f (hmap (hoistTerm f) t))
+
+prjTerm :: Member sub sig => Term sig a -> Maybe (sub (Term sig) a)
+prjTerm (Var _)    = Nothing
+prjTerm (Term sig) = prj sig
