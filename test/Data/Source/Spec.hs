@@ -26,11 +26,11 @@ testTree :: Tasty.TestTree
 testTree = Tasty.testGroup "Data.Source"
   [ Tasty.testGroup "sourceLineRanges"
     [ prop "produces 1 more range than there are newlines" $ \ source -> do
-        label (summarize source)
+        summarize source
         length (sourceLineRanges source) === length (Text.splitOn "\r\n" (toText source) >>= Text.splitOn "\r" >>= Text.splitOn "\n")
 
     , prop "produces exhaustive ranges" $ \ source -> do
-        label (summarize source)
+        summarize source
         foldMap (`slice` source) (sourceLineRanges source) === source
     ]
 
@@ -70,7 +70,7 @@ testTree = Tasty.testGroup "Data.Source"
     ]
 
   ]
-  where summarize src = case sourceLines src of
+  where summarize src = label $ case sourceLines src of
           []  -> "empty"
           [x] -> if nullSource x then "empty" else "single-line"
           _   -> "multiple lines"
