@@ -102,7 +102,8 @@ scopeGraphAnalysis = Analysis{..}
           ref <- asks Ref
           bindLoc <- asks (Map.lookup addr)
           cell <- gets (Map.lookup addr >=> nonEmpty . Set.toList)
-          maybe (pure Nothing) (foldMapA (pure . Just . mappend (extendBinding addr ref bindLoc))) cell
+          let extending = mappend (extendBinding addr ref bindLoc)
+          maybe (pure Nothing) (foldMapA (pure . Just . extending)) cell
         assign addr v = do
           ref <- asks Ref
           bindLoc <- asks (Map.lookup addr)
