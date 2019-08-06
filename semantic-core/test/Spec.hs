@@ -41,6 +41,7 @@ parserProps = testGroup "Parsing: roundtripping"
   , testProperty "if/then/else" . prop_roundtrips . Gen.ifthenelse $ Gen.variable
   , testProperty "lambda" . prop_roundtrips $ Gen.lambda Gen.literal
   , testProperty "function application" . prop_roundtrips $ Gen.apply Gen.variable
+  , testProperty "expressions" . prop_roundtrips $ Gen.expr
   ]
 
 -- * Parser specs
@@ -68,7 +69,7 @@ assert_application_left_associative :: Assertion
 assert_application_left_associative = "f g h" `parsesInto` (f $$ g $$ h)
 
 assert_push_left_associative :: Assertion
-assert_push_left_associative = "f.g.h" `parsesInto` (f ... g ... h)
+assert_push_left_associative = "f.g.h" `parsesInto` (f ... "g" ... "h")
 
 assert_ascii_lambda_parse :: Assertion
 assert_ascii_lambda_parse = "\\a -> a" `parsesInto` lam (named' "a") a
@@ -78,12 +79,6 @@ assert_unicode_lambda_parse = "λa → a" `parsesInto` lam (named' "a") a
 
 assert_quoted_name_parse :: Assertion
 assert_quoted_name_parse = "#{(NilClass)}" `parsesInto` pure "(NilClass)"
-
-assert_let_dot_precedence :: Assertion
-assert_let_dot_precedence = "let a = f.g.h" `parsesInto` (let' "a" .= (f ... g ... h))
-
-assert_let_in_push_precedence :: Assertion
-assert_let_in_push_precedence = "f.let g = h" `parsesInto` (f ... (let' "g" .= h))
 
 parserSpecs :: TestTree
 parserSpecs = testGroup "Parsing: simple specs"
@@ -95,12 +90,12 @@ parserSpecs = testGroup "Parsing: simple specs"
   , testCase "lambda with ASCII syntax" assert_ascii_lambda_parse
   , testCase "lambda with unicode syntax" assert_unicode_lambda_parse
   , testCase "quoted names" assert_quoted_name_parse
-  , testCase "let + dot precedence" assert_let_dot_precedence
-  , testCase "let in push" assert_let_in_push_precedence
   ]
 
 assert_roundtrips :: File (Term Core User) -> Assertion
-assert_roundtrips (File _ core) = parseEither Parse.core (showCore core) @?= Right (stripAnnotations core)
+assert_roundtrips (File _ core) = case parseEither Parse.core (showCore core) of
+  Right v -> v @?= stripAnnotations core
+  Left e -> assertFailure e
 
 parserExamples :: TestTree
 parserExamples = testGroup "Parsing: Eval.hs examples"

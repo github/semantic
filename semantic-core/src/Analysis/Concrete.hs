@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, FlexibleInstances, LambdaCase, MultiParamTypeClasses, NamedFieldPuns, OverloadedStrings, RecordWildCards, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE FlexibleContexts, FlexibleInstances, LambdaCase, MultiParamTypeClasses, NamedFieldPuns, OverloadedStrings, RecordWildCards, TypeApplications, TypeOperators, UndecidableInstances #-}
 module Analysis.Concrete
 ( Concrete(..)
 , concrete
@@ -27,10 +27,11 @@ import qualified Data.IntMap as IntMap
 import qualified Data.IntSet as IntSet
 import           Data.Loc
 import qualified Data.Map as Map
-import           Data.Monoid (Alt(..))
 import           Data.Name
+import qualified Data.Set as Set
 import           Data.Term
 import           Data.Text (Text, pack)
+import           Data.Traversable (for)
 import           Prelude hiding (fail)
 
 type Precise = Int
@@ -40,24 +41,26 @@ newtype FrameId = FrameId { unFrameId :: Precise }
   deriving (Eq, Ord, Show)
 
 data Concrete
-  = Closure Loc User (Term Core.Core User) Precise
+  = Closure Loc User (Term Core.Core User) Env
   | Unit
   | Bool Bool
   | String Text
-  | Obj Frame
+  | Record Env
   deriving (Eq, Ord, Show)
 
-objectFrame :: Concrete -> Maybe Frame
-objectFrame (Obj frame) = Just frame
-objectFrame _           = Nothing
+recordFrame :: Concrete -> Maybe Env
+recordFrame (Record frame) = Just frame
+recordFrame _              = Nothing
 
-data Frame = Frame
-  { frameEdges :: [(Core.Edge, Precise)]
-  , frameSlots :: Env
+newtype Frame = Frame
+  { frameSlots :: Env
   }
   deriving (Eq, Ord, Show)
 
 type Heap = IntMap.IntMap Concrete
+
+data Edge = Lexical | Import
+  deriving (Eq, Ord, Show)
 
 
 -- | Concrete evaluation of a term to a value.
@@ -74,7 +77,6 @@ concrete
 runFile :: ( Carrier sig m
            , Effect sig
            , Member Fresh sig
-           , Member (Reader FrameId) sig
            , Member (State Heap) sig
            )
         => File (Term Core.Core User)
@@ -82,38 +84,32 @@ runFile :: ( Carrier sig m
 runFile file = traverse run file
   where run = runReader (fileLoc file)
             . runFailWithLoc
+            . runReader @Env mempty
             . fix (eval concreteAnalysis)
 
 concreteAnalysis :: ( Carrier sig m
                     , Member Fresh sig
+                    , Member (Reader Env) sig
                     , Member (Reader Loc) sig
-                    , Member (Reader FrameId) sig
                     , Member (State Heap) sig
                     , MonadFail m
                     )
                  => Analysis Precise Concrete m
 concreteAnalysis = Analysis{..}
   where alloc _ = fresh
-        bind name addr = modifyCurrentFrame (updateFrameSlots (Map.insert name addr))
-        lookupEnv n = do
-          FrameId frameAddr <- ask
-          val <- deref frameAddr
-          heap <- get
-          pure (val >>= lookupConcrete heap n)
+        bind name addr m = local (Map.insert name addr) m
+        lookupEnv n = asks (Map.lookup n)
         deref = gets . IntMap.lookup
         assign addr value = modify (IntMap.insert addr value)
         abstract _ name body = do
           loc <- ask
-          FrameId parentAddr <- ask
-          pure (Closure loc name body parentAddr)
-        apply eval (Closure loc name body parentAddr) a = do
-          frameAddr <- fresh
-          assign frameAddr (Obj (Frame [(Core.Lexical, parentAddr)] mempty))
-          local (const loc) . (frameAddr ...) $ do
+          env <- asks (flip Map.restrictKeys (Set.delete name (foldMap Set.singleton body)))
+          pure (Closure loc name body env)
+        apply eval (Closure loc name body env) a = do
+          local (const loc) $ do
             addr <- alloc name
             assign addr a
-            bind name addr
-            eval body
+            local (const (Map.insert name addr env)) (eval body)
         apply _ f _ = fail $ "Cannot coerce " <> show f <> " to function"
         unit = pure Unit
         bool b = pure (Bool b)
@@ -122,30 +118,24 @@ concreteAnalysis = Analysis{..}
         string s = pure (String s)
         asString (String s) = pure s
         asString v          = fail $ "Cannot coerce " <> show v <> " to String"
-        -- FIXME: differential inheritance (reference fields instead of copying)
-        -- FIXME: copy non-lexical parents deeply?
-        frame = do
-          lexical <- asks unFrameId
-          pure (Obj (Frame [(Core.Lexical, lexical)] mempty))
-        -- FIXME: throw an error
-        -- FIXME: support dynamic imports
-        edge e addr = modifyCurrentFrame (\ (Frame ps fs) -> Frame ((e, addr) : ps) fs)
-        addr ... m = local (const (FrameId addr)) m
-
-        updateFrameSlots f frame = frame { frameSlots = f (frameSlots frame) }
-
-        modifyCurrentFrame f = do
-          addr <- asks unFrameId
-          Just (Obj frame) <- deref addr
-          assign addr (Obj (f frame))
+        record fields = do
+          fields' <- for fields $ \ (name, value) -> do
+            addr <- alloc name
+            assign addr value
+            pure (name, addr)
+          pure (Record (Map.fromList fields'))
+        addr ... n = do
+          val <- deref addr
+          heap <- get
+          pure (val >>= lookupConcrete heap n)
 
 
 lookupConcrete :: Heap -> User -> Concrete -> Maybe Precise
 lookupConcrete heap name = run . evalState IntSet.empty . runNonDet . inConcrete
   where -- look up the name in a concrete value
-        inConcrete = inFrame <=< maybeA . objectFrame
+        inConcrete = inFrame <=< maybeA . recordFrame
         -- look up the name in a specific 'Frame', with slots taking precedence over parents
-        inFrame (Frame ps fs) = maybeA (Map.lookup name fs) <|> getAlt (foldMap (Alt . inAddress . snd) ps)
+        inFrame fs = maybeA (Map.lookup name fs) <|> (maybeA (Map.lookup "__semantic_super" fs) >>= inAddress)
         -- look up the name in the value an address points to, if we haven’t already visited it
         inAddress addr = do
           visited <- get
@@ -157,10 +147,8 @@ lookupConcrete heap name = run . evalState IntSet.empty . runNonDet . inConcrete
         maybeA = maybe empty pure
 
 
-runHeap :: (Carrier sig m, Member Fresh sig) => ReaderC FrameId (StateC Heap m) a -> m (Heap, a)
-runHeap m = do
-  addr <- fresh
-  runState (IntMap.singleton addr (Obj (Frame [] mempty))) (runReader (FrameId addr) m)
+runHeap :: StateC Heap m a -> m (Heap, a)
+runHeap = runState mempty
 
 
 -- | 'heapGraph', 'heapValueGraph', and 'heapAddressGraph' allow us to conveniently export SVGs of the heap:
@@ -168,16 +156,15 @@ runHeap m = do
 --   > λ let (heap, res) = concrete [ruby]
 --   > λ writeFile "/Users/rob/Desktop/heap.dot" (export (addressStyle heap) (heapAddressGraph heap))
 --   > λ :!dot -Tsvg < ~/Desktop/heap.dot > ~/Desktop/heap.svg
-heapGraph :: (Precise -> Concrete -> a) -> (Either Core.Edge User -> Precise -> G.Graph a) -> Heap -> G.Graph a
+heapGraph :: (Precise -> Concrete -> a) -> (Either Edge User -> Precise -> G.Graph a) -> Heap -> G.Graph a
 heapGraph vertex edge h = foldr (uncurry graph) G.empty (IntMap.toList h)
   where graph k v rest = (G.vertex (vertex k v) `G.connect` outgoing v) `G.overlay` rest
         outgoing = \case
           Unit -> G.empty
           Bool _ -> G.empty
           String _ -> G.empty
-          Closure _ _ _ parentAddr -> edge (Left Core.Lexical) parentAddr
-          Obj frame -> fromFrame frame
-        fromFrame (Frame es ss) = foldr (G.overlay . uncurry (edge . Left)) (foldr (G.overlay . uncurry (edge . Right)) G.empty (Map.toList ss)) es
+          Closure _ _ _ env -> foldr (G.overlay . edge (Left Lexical)) G.empty env
+          Record frame -> Map.foldrWithKey (\ k -> G.overlay . edge (Right k)) G.empty frame
 
 heapValueGraph :: Heap -> G.Graph Concrete
 heapValueGraph h = heapGraph (const id) (const fromAddr) h
@@ -189,20 +176,20 @@ heapAddressGraph = heapGraph (\ addr v -> (Value v, addr)) (fmap G.vertex . (,) 
 addressStyle :: Heap -> G.Style (EdgeType, Precise) Text
 addressStyle heap = (G.defaultStyle vertex) { G.edgeAttributes }
   where vertex (_, addr) = pack (show addr) <> " = " <> maybe "?" fromConcrete (IntMap.lookup addr heap)
-        edgeAttributes _ (Slot name,         _) = ["label" G.:= name]
-        edgeAttributes _ (Edge Core.Import,  _) = ["color" G.:= "blue"]
-        edgeAttributes _ (Edge Core.Lexical, _) = ["color" G.:= "green"]
-        edgeAttributes _ _                      = []
+        edgeAttributes _ (Slot name,    _) = ["label" G.:= name]
+        edgeAttributes _ (Edge Import,  _) = ["color" G.:= "blue"]
+        edgeAttributes _ (Edge Lexical, _) = ["color" G.:= "green"]
+        edgeAttributes _ _                 = []
         fromConcrete = \case
           Unit ->  "()"
           Bool b -> pack $ show b
           String s -> pack $ show s
           Closure (Loc p (Span s e)) n _ _ -> "\\\\ " <> n <> " [" <> p <> ":" <> showPos s <> "-" <> showPos e <> "]"
-          Obj _ -> "{}"
+          Record _ -> "{}"
         showPos (Pos l c) = pack (show l) <> ":" <> pack (show c)
 
 data EdgeType
-  = Edge Core.Edge
+  = Edge Edge
   | Slot User
   | Value Concrete
   deriving (Eq, Ord, Show)

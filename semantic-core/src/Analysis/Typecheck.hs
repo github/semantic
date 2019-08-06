@@ -73,7 +73,7 @@ instance RightModule Polytype where
 
 
 forAll :: (Eq a, Carrier sig m, Member Polytype sig) => a -> m a -> m a
-forAll n body = send (PForAll (Data.Scope.bind1 n body))
+forAll n body = send (PForAll (abstract1 n body))
 
 forAlls :: (Eq a, Carrier sig m, Member Polytype sig, Foldable t) => t a -> m a -> m a
 forAlls ns body = foldr forAll body ns
@@ -122,12 +122,11 @@ typecheckingAnalysis
      , Member Fresh sig
      , Member (State (Set.Set Constraint)) sig
      , Member (State (Heap User (Term Monotype Meta))) sig
-     , MonadFail m
      )
   => Analysis User (Term Monotype Meta) m
 typecheckingAnalysis = Analysis{..}
   where alloc = pure
-        bind _ _ = pure ()
+        bind _ _ m = m
         lookupEnv = pure . Just
         deref addr = gets (Map.lookup addr) >>= maybe (pure Nothing) (foldMapA (pure . Just)) . nonEmpty . maybe [] Set.toList
         assign addr ty = modify (Map.insertWith (<>) addr (Set.singleton ty))
@@ -149,9 +148,8 @@ typecheckingAnalysis = Analysis{..}
         asBool b = unify (Term Bool) b >> pure True <|> pure False
         string _ = pure (Term String)
         asString s = unify (Term String) s $> mempty
-        frame = fail "unimplemented"
-        edge _ _ = pure ()
-        _ ... m = m
+        record fields = pure (Term (Record (Map.fromList fields)))
+        _ ... m = pure (Just m)
 
 
 data Constraint = Term Monotype Meta :===: Term Monotype Meta
