@@ -1,4 +1,3 @@
-{-# OPTIONS_GHC -Wno-orphans #-}
 module Data.Source.Spec (spec, testTree) where
 
 import Data.Range
