@@ -9,7 +9,7 @@ import Test.Hspec
 
 import qualified Generators as Gen
 import qualified Hedgehog.Gen as Gen
-import           Hedgehog ((===), label)
+import           Hedgehog ((===))
 import qualified Hedgehog.Range
 import           Hedgehog hiding (Range)
 import qualified Test.Tasty as Tasty
@@ -70,10 +70,11 @@ testTree = Tasty.testGroup "Data.Source"
     ]
 
   ]
-  where summarize src = label $ case sourceLines src of
-          []  -> "empty"
-          [x] -> if nullSource x then "empty" else "single-line"
-          _   -> "multiple lines"
+  where summarize src = do
+          let lines = sourceLines src
+          classify "empty"          $ nullSource src
+          classify "single-line"    $ length lines == 1
+          classify "multiple lines" $ length lines >  1
 
 spec :: Spec
 spec = do
