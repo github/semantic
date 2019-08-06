@@ -8,10 +8,9 @@ import qualified Data.Text as Text
 import Test.Hspec
 
 import qualified Generators as Gen
-import qualified Hedgehog.Gen as Gen
-import           Hedgehog ((===))
-import qualified Hedgehog.Range
 import           Hedgehog hiding (Range)
+import qualified Hedgehog.Gen as Gen
+import qualified Hedgehog.Range
 import qualified Test.Tasty as Tasty
 import           Test.Tasty.Hedgehog (testProperty)
 
