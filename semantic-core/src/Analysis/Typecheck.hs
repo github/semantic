@@ -48,6 +48,8 @@ data Monotype f a
 type Type = Term Monotype Meta
 
 -- FIXME: Union the effects/annotations on the operands.
+
+-- | We derive the 'Semigroup' instance for types to take the second argument. This is equivalent to stating that the type of an imperative sequence of statements is the type of its final statement.
 deriving via (Last (Term Monotype a)) instance Semigroup (Term Monotype a)
 
 deriving instance (Eq   a, forall a . Eq   a => Eq   (f a), Monad f) => Eq   (Monotype f a)
