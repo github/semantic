@@ -27,6 +27,7 @@ module Data.Core
 , record
 , (...)
 , (.=)
+, Ann(..)
 , ann
 , annWith
 , instantiate
@@ -75,7 +76,6 @@ data Core f a
   | f a :. User
   -- | Assignment of a value to the reference returned by the lhs.
   | f a := f a
-  | Ann Loc (f a)
   deriving (Foldable, Functor, Generic1, Traversable)
 
 infixr 1 :>>
@@ -105,7 +105,6 @@ instance RightModule Core where
   Record fs  >>=* f = Record (map (fmap (>>= f)) fs)
   (a :. b)   >>=* f = (a >>= f) :. b
   (a := b)   >>=* f = (a >>= f) := (b >>= f)
-  Ann l b    >>=* f = Ann l (b >>= f)
 
 
 rec :: (Eq a, Carrier sig m, Member Core sig) => Named a -> m a -> m a
@@ -212,15 +211,25 @@ a .= b = send (a := b)
 
 infix 3 .=
 
-ann :: (Carrier sig m, Member Core sig) => HasCallStack => m a -> m a
+
+data Ann f a
+  = Ann Loc (f a)
+  deriving (Eq, Foldable, Functor, Generic1, Ord, Show, Traversable)
+
+instance HFunctor Ann
+
+instance RightModule Ann where
+  Ann l b >>=* f = Ann l (b >>= f)
+
+
+ann :: (Carrier sig m, Member Ann sig) => HasCallStack => m a -> m a
 ann = annWith callStack
 
-annWith :: (Carrier sig m, Member Core sig) => CallStack -> m a -> m a
+annWith :: (Carrier sig m, Member Ann sig) => CallStack -> m a -> m a
 annWith callStack = maybe id (fmap send . Ann) (stackLoc callStack)
 
 
-stripAnnotations :: (Member Core sig, HFunctor sig, forall g . Functor g => Functor (sig g)) => Term sig a -> Term sig a
-stripAnnotations (Var v)  = Var v
-stripAnnotations (Term t)
-  | Just c <- prj t, Ann _ b <- c = stripAnnotations b
-  | otherwise                     = Term (hmap stripAnnotations t)
+stripAnnotations :: (HFunctor sig, forall g . Functor g => Functor (sig g)) => Term (Ann :+: sig) a -> Term sig a
+stripAnnotations (Var v)              = Var v
+stripAnnotations (Term (L (Ann _ b))) = stripAnnotations b
+stripAnnotations (Term (R        b))  = Term (hmap stripAnnotations b)

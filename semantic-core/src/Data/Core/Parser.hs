@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE FlexibleContexts, TypeOperators #-}
 module Data.Core.Parser
   ( module Text.Trifecta
   , core
@@ -10,13 +10,13 @@ module Data.Core.Parser
 -- Consult @doc/grammar.md@ for an EBNF grammar.
 
 import           Control.Applicative
+import           Control.Effect.Carrier
 import qualified Data.Char as Char
 import           Data.Core ((:<-) (..), Core)
 import qualified Data.Core as Core
 import           Data.Foldable (foldl')
 import           Data.Name
 import           Data.String
-import           Data.Term
 import qualified Text.Parser.Token as Token
 import qualified Text.Parser.Token.Highlight as Highlight
 import           Text.Trifecta hiding (ident)
@@ -46,23 +46,23 @@ identifier = choice [quote, plain] <?> "identifier" where
 
 -- * Parsers (corresponding to EBNF)
 
-core :: (TokenParsing m, Monad m) => m (Term Core User)
+core :: (TokenParsing m, Carrier sig t, Member Core sig, Monad m) => m (t User)
 core = expr
 
-expr :: (TokenParsing m, Monad m) => m (Term Core User)
+expr :: (TokenParsing m, Carrier sig t, Member Core sig, Monad m) => m (t User)
 expr = ifthenelse <|> lambda <|> rec <|> load <|> assign
 
-assign :: (TokenParsing m, Monad m) => m (Term Core User)
+assign :: (TokenParsing m, Carrier sig t, Member Core sig, Monad m) => m (t User)
 assign = application <**> (symbolic '=' *> rhs <|> pure id) <?> "assignment"
   where rhs = flip (Core..=) <$> application
 
-application :: (TokenParsing m, Monad m) => m (Term Core User)
+application :: (TokenParsing m, Carrier sig t, Member Core sig, Monad m) => m (t User)
 application = projection `chainl1` (pure (Core.$$))
 
-projection :: (TokenParsing m, Monad m) => m (Term Core User)
+projection :: (TokenParsing m, Carrier sig t, Member Core sig, Monad m) => m (t User)
 projection = foldl' (Core....) <$> atom <*> many (namedValue <$ dot <*> name)
 
-atom :: (TokenParsing m, Monad m) => m (Term Core User)
+atom :: (TokenParsing m, Carrier sig t, Member Core sig, Monad m) => m (t User)
 atom = choice
   [ comp
   , lit
@@ -70,29 +70,29 @@ atom = choice
   , parens expr
   ]
 
-comp :: (TokenParsing m, Monad m) => m (Term Core User)
+comp :: (TokenParsing m, Carrier sig t, Member Core sig, Monad m) => m (t User)
 comp = braces (Core.do' <$> sepEndByNonEmpty statement semi) <?> "compound statement"
 
-statement :: (TokenParsing m, Monad m) => m (Maybe (Named User) :<- Term Core User)
+statement :: (TokenParsing m, Carrier sig t, Member Core sig, Monad m) => m (Maybe (Named User) :<- t User)
 statement
   =   try ((:<-) . Just <$> name <* symbol "<-" <*> expr)
   <|> (Nothing :<-) <$> expr
   <?> "statement"
 
-ifthenelse :: (TokenParsing m, Monad m) => m (Term Core User)
+ifthenelse :: (TokenParsing m, Carrier sig t, Member Core sig, Monad m) => m (t User)
 ifthenelse = Core.if'
   <$ reserved "if"   <*> expr
   <* reserved "then" <*> expr
   <* reserved "else" <*> expr
   <?> "if-then-else statement"
 
-rec :: (TokenParsing m, Monad m) => m (Term Core User)
+rec :: (TokenParsing m, Carrier sig t, Member Core sig, Monad m) => m (t User)
 rec = Core.rec <$ reserved "rec" <*> name <* symbolic '=' <*> expr <?> "recursive binding"
 
-load :: (TokenParsing m, Monad m) => m (Term Core User)
+load :: (TokenParsing m, Carrier sig t, Member Core sig, Monad m) => m (t User)
 load = Core.load <$ reserved "load" <*> expr
 
-lvalue :: (TokenParsing m, Monad m) => m (Term Core User)
+lvalue :: (TokenParsing m, Carrier sig t, Member Core sig, Monad m) => m (t User)
 lvalue = choice
   [ projection
   , ident
@@ -104,7 +104,7 @@ lvalue = choice
 name :: (TokenParsing m, Monad m) => m (Named User)
 name = named' <$> identifier <?> "name"
 
-lit :: (TokenParsing m, Monad m) => m (Term Core User)
+lit :: (TokenParsing m, Carrier sig t, Member Core sig, Monad m) => m (t User)
 lit = let x `given` n = x <$ reserved n in choice
   [ Core.bool True  `given` "#true"
   , Core.bool False `given` "#false"
@@ -113,13 +113,13 @@ lit = let x `given` n = x <$ reserved n in choice
   , Core.string <$> stringLiteral
   ] <?> "literal"
 
-record :: (TokenParsing m, Monad m) => m (Term Core User)
+record :: (TokenParsing m, Carrier sig t, Member Core sig, Monad m) => m (t User)
 record = Core.record <$ reserved "#record" <*> braces (sepEndBy ((,) <$> identifier <* symbolic ':' <*> expr) comma)
 
-lambda :: (TokenParsing m, Monad m) => m (Term Core User)
+lambda :: (TokenParsing m, Carrier sig t, Member Core sig, Monad m) => m (t User)
 lambda = Core.lam <$ lambduh <*> name <* arrow <*> expr <?> "lambda" where
   lambduh = symbolic 'λ' <|> symbolic '\\'
   arrow   = symbol "→"   <|> symbol "->"
 
-ident :: (Monad m, TokenParsing m) => m (Term Core User)
+ident :: (Applicative t, Monad m, TokenParsing m) => m (t User)
 ident = pure . namedValue <$> name <?> "identifier"

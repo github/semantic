@@ -88,7 +88,7 @@ generalize :: Term Monotype Meta -> Term (Polytype :+: Monotype) Void
 generalize ty = fromJust (closed (forAlls (IntSet.toList (mvs ty)) (hoistTerm R ty)))
 
 
-typecheckingFlowInsensitive :: [File (Term Core.Core User)] -> (Heap User (Term Monotype Meta), [File (Either (Loc, String) (Term (Polytype :+: Monotype) Void))])
+typecheckingFlowInsensitive :: [File (Term (Core.Ann :+: Core.Core) User)] -> (Heap User (Term Monotype Meta), [File (Either (Loc, String) (Term (Polytype :+: Monotype) Void))])
 typecheckingFlowInsensitive
   = run
   . runFresh
@@ -101,7 +101,7 @@ runFile :: ( Carrier sig m
            , Member Fresh sig
            , Member (State (Heap User (Term Monotype Meta))) sig
            )
-        => File (Term Core.Core User)
+        => File (Term (Core.Ann :+: Core.Core) User)
         -> m (File (Either (Loc, String) (Term Monotype Meta)))
 runFile file = traverse run file
   where run

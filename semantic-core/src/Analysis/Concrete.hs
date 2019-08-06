@@ -42,7 +42,7 @@ newtype FrameId = FrameId { unFrameId :: Precise }
   deriving (Eq, Ord, Show)
 
 data Concrete
-  = Closure Loc User (Term Core.Core User) Env
+  = Closure Loc User (Term (Core.Ann :+: Core.Core) User) Env
   | Unit
   | Bool Bool
   | String Text
@@ -70,7 +70,7 @@ data Edge = Lexical | Import
 --
 --   >>> map fileBody (snd (concrete [File (Loc "bool" emptySpan) (Core.bool True)]))
 --   [Right (Bool True)]
-concrete :: [File (Term Core.Core User)] -> (Heap, [File (Either (Loc, String) Concrete)])
+concrete :: [File (Term (Core.Ann :+: Core.Core) User)] -> (Heap, [File (Either (Loc, String) Concrete)])
 concrete
   = run
   . runFresh
@@ -82,7 +82,7 @@ runFile :: ( Carrier sig m
            , Member Fresh sig
            , Member (State Heap) sig
            )
-        => File (Term Core.Core User)
+        => File (Term (Core.Ann :+: Core.Core) User)
         -> m (File (Either (Loc, String) Concrete))
 runFile file = traverse run file
   where run = runReader (fileLoc file)

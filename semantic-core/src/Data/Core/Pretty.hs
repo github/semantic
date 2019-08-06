@@ -79,8 +79,6 @@ prettyCore style = precBody . go . fmap name
               , symbol "=" <+> align (withPrec 4 (go rhs))
               ]
 
-            -- Annotations are not pretty-printed, as it lowers the signal/noise ratio too profoundly.
-            Ann _ c -> go c
             statement ->
               let (bindings, return) = unstatements (Term statement)
                   statements = toList (bindings :> (Nothing :<- return))

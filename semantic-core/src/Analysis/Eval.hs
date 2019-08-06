@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, LambdaCase, OverloadedStrings, RankNTypes, RecordWildCards #-}
+{-# LANGUAGE FlexibleContexts, LambdaCase, OverloadedStrings, RankNTypes, RecordWildCards, TypeOperators #-}
 module Analysis.Eval
 ( eval
 , prog1
@@ -12,6 +12,7 @@ module Analysis.Eval
 ) where
 
 import Control.Applicative (Alternative (..))
+import Control.Effect.Carrier
 import Control.Effect.Fail
 import Control.Effect.Reader
 import Control.Monad ((>=>))
@@ -33,11 +34,11 @@ eval :: ( Carrier sig m
         , Semigroup value
         )
      => Analysis address value m
-     -> (Term Core User -> m value)
-     -> (Term Core User -> m value)
+     -> (Term (Ann :+: Core) User -> m value)
+     -> (Term (Ann :+: Core) User -> m value)
 eval Analysis{..} eval = \case
   Var n -> lookupEnv' n >>= deref' n
-  Term c -> case c of
+  Term (R c) -> case c of
     Rec (Named (Ignored n) b) -> do
       addr <- alloc n
       v <- bind n addr (eval (instantiate1 (pure n) b))
@@ -71,7 +72,7 @@ eval Analysis{..} eval = \case
       b' <- eval b
       addr <- ref a
       b' <$ assign addr b'
-    Ann loc c -> local (const loc) (eval c)
+  Term (L (Ann loc c)) -> local (const loc) (eval c)
   where freeVariable s = fail ("free variable: " <> s)
         uninitialized s = fail ("uninitialized variable: " <> s)
         invalidRef s = fail ("invalid ref: " <> s)
@@ -81,41 +82,41 @@ eval Analysis{..} eval = \case
 
         ref = \case
           Var n -> lookupEnv' n
-          Term c -> case c of
+          Term (R c) -> case c of
             If c t e -> do
               c' <- eval c >>= asBool
               if c' then ref t else ref e
             a :. b -> do
               a' <- ref a
               a' ... b >>= maybe (freeVariable (show b)) pure
-            Ann loc c -> local (const loc) (ref c)
             c -> invalidRef (show c)
+          Term (L (Ann loc c)) -> local (const loc) (ref c)
 
 
-prog1 :: File (Term Core User)
+prog1 :: (Carrier sig t, Member Core sig) => File (t User)
 prog1 = fromBody $ lam (named' "foo")
   (    named' "bar" :<- pure "foo"
   >>>= Core.if' (pure "bar")
     (Core.bool False)
     (Core.bool True))
 
-prog2 :: File (Term Core User)
+prog2 :: (Carrier sig t, Member Core sig) => File (t User)
 prog2 = fromBody $ fileBody prog1 $$ Core.bool True
 
-prog3 :: File (Term Core User)
+prog3 :: (Carrier sig t, Member Core sig) => File (t User)
 prog3 = fromBody $ lams [named' "foo", named' "bar", named' "quux"]
   (Core.if' (pure "quux")
     (pure "bar")
     (pure "foo"))
 
-prog4 :: File (Term Core User)
+prog4 :: (Carrier sig t, Member Core sig) => File (t User)
 prog4 = fromBody
   (    named' "foo" :<- Core.bool True
   >>>= Core.if' (pure "foo")
     (Core.bool True)
     (Core.bool False))
 
-prog5 :: File (Term Core User)
+prog5 :: (Carrier sig t, Member Ann sig, Member Core sig) => File (t User)
 prog5 = fromBody $ ann (do'
   [ Just (named' "mkPoint") :<- lams [named' "_x", named' "_y"] (ann (Core.record
     [ ("x", ann (pure "_x"))
@@ -126,7 +127,7 @@ prog5 = fromBody $ ann (do'
   , Nothing :<- ann (ann (pure "point") Core.... "y") .= ann (ann (pure "point") Core.... "x")
   ])
 
-prog6 :: [File (Term Core User)]
+prog6 :: (Carrier sig t, Member Core sig) => [File (t User)]
 prog6 =
   [ File (Loc "dep"  (locSpan (fromJust here))) $ Core.record
     [ ("dep", Core.record [ ("var", Core.bool True) ]) ]
@@ -136,7 +137,7 @@ prog6 =
     ])
   ]
 
-ruby :: File (Term Core User)
+ruby :: (Carrier sig t, Member Ann sig, Member Core sig) => File (t User)
 ruby = fromBody $ annWith callStack (rec (named' __semantic_global) (do' statements))
   where statements =
           [ Just "Class" :<- record
@@ -219,8 +220,8 @@ data Analysis address value m = Analysis
   , lookupEnv :: User -> m (Maybe address)
   , deref     :: address -> m (Maybe value)
   , assign    :: address -> value -> m ()
-  , abstract  :: (Term Core User -> m value) -> User -> Term Core User -> m value
-  , apply     :: (Term Core User -> m value) -> value -> value -> m value
+  , abstract  :: (Term (Ann :+: Core) User -> m value) -> User -> Term (Ann :+: Core) User -> m value
+  , apply     :: (Term (Ann :+: Core) User -> m value) -> value -> value -> m value
   , unit      :: m value
   , bool      :: Bool -> m value
   , asBool    :: value -> m Bool
