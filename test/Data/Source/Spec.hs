@@ -71,6 +71,7 @@ testTree = Tasty.testGroup "Data.Source"
   ]
   where summarize src = do
           let lines = sourceLines src
+          -- FIXME: this should be using cover (reverted in 1b427b995), but that leads to flaky tests: hedgehog’s 'cover' implementation fails tests instead of warning, and currently has no equivalent to 'checkCoverage'.
           classify "empty"          $ nullSource src
           classify "single-line"    $ length lines == 1
           classify "multiple lines" $ length lines >  1
