@@ -42,6 +42,9 @@ eval Analysis{..} eval = \case
       addr <- alloc n
       v <- bind n addr (eval (instantiate1 (pure n) b))
       v <$ assign addr v
+    -- NB: Combining the results of the evaluations allows us to model effects in abstract domains. This in turn means that we can define an abstract domain modelling the types-and-effects of computations by means of a 'Semigroup' instance which takes the type of its second operand and the union of both operands’ effects.
+    --
+    -- It’s also worth noting that we use a semigroup instead of a semilattice because the lattice structure of our abstract domains is instead modelled by nondeterminism effects used by some of them.
     a :>> b -> (<>) <$> eval a <*> eval b
     Named (Ignored n) a :>>= b -> do
       a' <- eval a
