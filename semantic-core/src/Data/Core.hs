@@ -71,9 +71,9 @@ data Core f a
   -- | Load the specified file (by path).
   | Load (f a)
   -- | A record mapping some keys to some values.
-  | Record [(User, f a)]
+  | Record [(Name, f a)]
   -- | Projection from a record.
-  | f a :. User
+  | f a :. Name
   -- | Assignment of a value to the reference returned by the lhs.
   | f a := f a
   deriving (Foldable, Functor, Generic1, Traversable)
@@ -198,10 +198,10 @@ string = send . String
 load :: (Carrier sig m, Member Core sig) => m a -> m a
 load = send . Load
 
-record :: (Carrier sig m, Member Core sig) => [(User, m a)] -> m a
+record :: (Carrier sig m, Member Core sig) => [(Name, m a)] -> m a
 record fs = send (Record fs)
 
-(...) :: (Carrier sig m, Member Core sig) => m a -> User -> m a
+(...) :: (Carrier sig m, Member Core sig) => m a -> Name -> m a
 a ... b = send (a :. b)
 
 infixl 9 ...

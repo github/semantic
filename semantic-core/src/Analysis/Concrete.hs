@@ -34,13 +34,13 @@ import           Data.Traversable (for)
 import           Prelude hiding (fail)
 
 type Precise = Int
-type Env = Map.Map User Precise
+type Env = Map.Map Name Precise
 
 newtype FrameId = FrameId { unFrameId :: Precise }
   deriving (Eq, Ord, Show)
 
 data Concrete term
-  = Closure Loc User term Env
+  = Closure Loc Name term Env
   | Unit
   | Bool Bool
   | String Text
@@ -69,15 +69,15 @@ data Edge = Lexical | Import
 --   >>> map fileBody (snd (concrete eval [File (Loc "bool" emptySpan) (Core.bool True)]))
 --   [Right (Bool True)]
 concrete
-  :: (Foldable term, Show (term User))
+  :: (Foldable term, Show (term Name))
   => (forall sig m
      .  (Carrier sig m, Member (Reader Loc) sig, MonadFail m)
-     => Analysis (term User) Precise (Concrete (term User)) m
-     -> (term User -> m (Concrete (term User)))
-     -> (term User -> m (Concrete (term User)))
+     => Analysis (term Name) Precise (Concrete (term Name)) m
+     -> (term Name -> m (Concrete (term Name)))
+     -> (term Name -> m (Concrete (term Name)))
      )
-  -> [File (term User)]
-  -> (Heap (term User), [File (Either (Loc, String) (Concrete (term User)))])
+  -> [File (term Name)]
+  -> (Heap (term Name), [File (Either (Loc, String) (Concrete (term Name)))])
 concrete eval
   = run
   . runFresh
@@ -89,17 +89,17 @@ runFile
      , Effect sig
      , Foldable term
      , Member Fresh sig
-     , Member (State (Heap (term User))) sig
-     , Show (term User)
+     , Member (State (Heap (term Name))) sig
+     , Show (term Name)
      )
   => (forall sig m
      .  (Carrier sig m, Member (Reader Loc) sig, MonadFail m)
-     => Analysis (term User) Precise (Concrete (term User)) m
-     -> (term User -> m (Concrete (term User)))
-     -> (term User -> m (Concrete (term User)))
+     => Analysis (term Name) Precise (Concrete (term Name)) m
+     -> (term Name -> m (Concrete (term Name)))
+     -> (term Name -> m (Concrete (term Name)))
      )
-  -> File (term User)
-  -> m (File (Either (Loc, String) (Concrete (term User))))
+  -> File (term Name)
+  -> m (File (Either (Loc, String) (Concrete (term Name))))
 runFile eval file = traverse run file
   where run = runReader (fileLoc file)
             . runFailWithLoc
@@ -111,11 +111,11 @@ concreteAnalysis :: ( Carrier sig m
                     , Member Fresh sig
                     , Member (Reader Env) sig
                     , Member (Reader Loc) sig
-                    , Member (State (Heap (term User))) sig
+                    , Member (State (Heap (term Name))) sig
                     , MonadFail m
-                    , Show (term User)
+                    , Show (term Name)
                     )
-                 => Analysis (term User) Precise (Concrete (term User)) m
+                 => Analysis (term Name) Precise (Concrete (term Name)) m
 concreteAnalysis = Analysis{..}
   where alloc _ = fresh
         bind name addr m = local (Map.insert name addr) m
@@ -151,7 +151,7 @@ concreteAnalysis = Analysis{..}
           pure (val >>= lookupConcrete heap n)
 
 
-lookupConcrete :: Heap term -> User -> Concrete term -> Maybe Precise
+lookupConcrete :: Heap term -> Name -> Concrete term -> Maybe Precise
 lookupConcrete heap name = run . evalState IntSet.empty . runNonDet . inConcrete
   where -- look up the name in a concrete value
         inConcrete = inFrame <=< maybeA . recordFrame
@@ -177,7 +177,7 @@ runHeap = runState mempty
 --   > λ let (heap, res) = concrete [ruby]
 --   > λ writeFile "/Users/rob/Desktop/heap.dot" (export (addressStyle heap) (heapAddressGraph heap))
 --   > λ :!dot -Tsvg < ~/Desktop/heap.dot > ~/Desktop/heap.svg
-heapGraph :: (Precise -> Concrete term -> a) -> (Either Edge User -> Precise -> G.Graph a) -> Heap term -> G.Graph a
+heapGraph :: (Precise -> Concrete term -> a) -> (Either Edge Name -> Precise -> G.Graph a) -> Heap term -> G.Graph a
 heapGraph vertex edge h = foldr (uncurry graph) G.empty (IntMap.toList h)
   where graph k v rest = (G.vertex (vertex k v) `G.connect` outgoing v) `G.overlay` rest
         outgoing = \case
@@ -211,7 +211,7 @@ addressStyle heap = (G.defaultStyle vertex) { G.edgeAttributes }
 
 data EdgeType term
   = Edge Edge
-  | Slot User
+  | Slot Name
   | Value (Concrete term)
   deriving (Eq, Ord, Show)
 
