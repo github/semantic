@@ -1,4 +1,4 @@
-{-# LANGUAGE DerivingVia, FlexibleContexts, FlexibleInstances, LambdaCase, MultiParamTypeClasses, NamedFieldPuns, OverloadedStrings, RecordWildCards, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DerivingVia, FlexibleContexts, FlexibleInstances, LambdaCase, MultiParamTypeClasses, NamedFieldPuns, OverloadedStrings, RecordWildCards, TypeApplications, TypeOperators, UndecidableInstances #-}
 module Analysis.Concrete
 ( Concrete(..)
 , concrete
@@ -86,7 +86,7 @@ runFile :: ( Carrier sig m
 runFile file = traverse run file
   where run = runReader (fileLoc file)
             . runFailWithLoc
-            . runReader (mempty :: Env)
+            . runReader @Env mempty
             . fix (eval concreteAnalysis)
 
 concreteAnalysis :: ( Carrier sig m
@@ -166,7 +166,7 @@ heapGraph vertex edge h = foldr (uncurry graph) G.empty (IntMap.toList h)
           Bool _ -> G.empty
           String _ -> G.empty
           Closure _ _ _ env -> foldr (G.overlay . edge (Left Lexical)) G.empty env
-          Record frame -> foldr (G.overlay . uncurry (edge . Right)) G.empty (Map.toList frame)
+          Record frame -> Map.foldrWithKey (\ k -> G.overlay . edge (Right k)) G.empty frame
 
 heapValueGraph :: Heap -> G.Graph Concrete
 heapValueGraph h = heapGraph (const id) (const fromAddr) h

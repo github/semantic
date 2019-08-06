@@ -2,16 +2,9 @@
 :set -package pretty-show -package hscolour
 
 -- See docs/💡ProTip!.md
-:undef pretty
-:def pretty \ _ -> return ":set -interactive-print Semantic.Util.Pretty.prettyShow"
-
--- See docs/💡ProTip!.md
-:undef no-pretty
-:def no-pretty \_ -> return ":set -interactive-print System.IO.print"
-
--- See docs/💡ProTip!.md
-:undef r
-:def r \_ -> return (unlines [":reload", ":pretty"])
+:def! pretty \ _ -> return ":set -interactive-print Semantic.Util.Pretty.prettyShow"
+:def! no-pretty \_ -> return ":set -interactive-print System.IO.print"
+:def! r \_ -> return (unlines [":reload", ":pretty"])
 
 -- See docs/💡ProTip!.md for documentation & examples.
 :{
@@ -29,8 +22,7 @@ assignmentExample lang = case lang of
   _ -> mk "" ""
   where mk fileExtension parser = putStrLn ("example: fmap (() <$) . runTask . parse " ++ parser ++ "Parser =<< Semantic.Util.blob \"example." ++ fileExtension ++ "\"") >> return ("import Parsing.Parser\nimport Semantic.Task\nimport Semantic.Util")
 :}
-:undef assignment
-:def assignment assignmentExample
+:def! assignment assignmentExample
 
 -- Enable breaking on errors for code written in the repl.
 :seti -fbreak-on-error
