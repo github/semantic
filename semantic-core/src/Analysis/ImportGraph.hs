@@ -15,7 +15,7 @@ import           Control.Effect.Reader
 import           Control.Effect.State
 import           Control.Monad ((>=>))
 import           Data.File
-import           Data.Foldable (fold)
+import           Data.Foldable (fold, for_)
 import           Data.Function (fix)
 import           Data.List.NonEmpty (nonEmpty)
 import           Data.Loc
@@ -103,7 +103,7 @@ importGraphAnalysis = Analysis{..}
         bind _ _ m = m
         lookupEnv = pure . Just
         deref addr = gets (Map.lookup addr >=> nonEmpty . Set.toList) >>= maybe (pure Nothing) (foldMapA (pure . Just))
-        assign addr ty = modify (Map.insertWith (<>) addr (Set.singleton ty))
+        assign addr v = modify (Map.insertWith (<>) addr (Set.singleton v))
         abstract _ name body = do
           loc <- ask
           pure (Value (Closure loc name body) mempty)
@@ -118,5 +118,9 @@ importGraphAnalysis = Analysis{..}
         string s = pure (Value (String s) mempty)
         asString (Value (String s) _) = pure s
         asString _ = pure mempty
-        record fields = pure (Value Abstract (foldMap (valueGraph . snd) fields))
+        record fields = do
+          for_ fields $ \ (k, v) -> do
+            addr <- alloc k
+            assign addr v
+          pure (Value Abstract (foldMap (valueGraph . snd) fields))
         _ ... m = pure (Just m)

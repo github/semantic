@@ -33,6 +33,7 @@ import           Data.Scope
 import           Data.Semigroup (Last (..))
 import qualified Data.Set as Set
 import           Data.Term
+import           Data.Traversable (for)
 import           Data.Void
 import           GHC.Generics (Generic1)
 import           Prelude hiding (fail)
@@ -175,7 +176,12 @@ typecheckingAnalysis = Analysis{..}
         asBool b = unify (Term Bool) b >> pure True <|> pure False
         string _ = pure (Term String)
         asString s = unify (Term String) s $> mempty
-        record fields = pure (Term (Record (Map.fromList fields)))
+        record fields = do
+          fields' <- for fields $ \ (k, v) -> do
+            addr <- alloc k
+            (k, v) <$ assign addr v
+          -- FIXME: should records reference types by address instead?
+          pure (Term (Record (Map.fromList fields')))
         _ ... m = pure (Just m)
 
 
