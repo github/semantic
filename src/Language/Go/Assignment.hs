@@ -661,6 +661,6 @@ manyTermsTill step end = manyTill (step <|> comment) end
 manyTerm :: Assignment Term -> Assignment [Term]
 manyTerm = many . term
 
--- | Match a term and contextualize any comments preceeding or proceeding the term.
+-- | Match a term and contextualize any comments preceding or proceeding the term.
 term :: Assignment Term -> Assignment Term
 term term' = contextualize comment term' <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm)

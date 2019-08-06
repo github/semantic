@@ -1,4 +1,4 @@
-{-# LANGUAGE DerivingVia, FlexibleContexts, FlexibleInstances, LambdaCase, MultiParamTypeClasses, NamedFieldPuns, OverloadedStrings, RankNTypes, RecordWildCards, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DerivingVia, FlexibleContexts, FlexibleInstances, LambdaCase, MultiParamTypeClasses, NamedFieldPuns, OverloadedStrings, RankNTypes, RecordWildCards, TypeApplications, TypeOperators, UndecidableInstances #-}
 module Analysis.Concrete
 ( Concrete(..)
 , concrete
@@ -46,6 +46,7 @@ data Concrete term
   | String Text
   | Record Env
   deriving (Eq, Ord, Show)
+  -- NB: We derive the 'Semigroup' instance for 'Concrete' to take the second argument. This is equivalent to stating that the return value of an imperative sequence of statements is the value of its final statement.
   deriving Semigroup via Last (Concrete term)
 
 recordFrame :: Concrete term -> Maybe Env
@@ -102,7 +103,7 @@ runFile
 runFile eval file = traverse run file
   where run = runReader (fileLoc file)
             . runFailWithLoc
-            . runReader (mempty :: Env)
+            . runReader @Env mempty
             . fix (eval concreteAnalysis)
 
 concreteAnalysis :: ( Carrier sig m
@@ -184,7 +185,7 @@ heapGraph vertex edge h = foldr (uncurry graph) G.empty (IntMap.toList h)
           Bool _ -> G.empty
           String _ -> G.empty
           Closure _ _ _ env -> foldr (G.overlay . edge (Left Lexical)) G.empty env
-          Record frame -> foldr (G.overlay . uncurry (edge . Right)) G.empty (Map.toList frame)
+          Record frame -> Map.foldrWithKey (\ k -> G.overlay . edge (Right k)) G.empty frame
 
 heapValueGraph :: Heap term -> G.Graph (Concrete term)
 heapValueGraph h = heapGraph (const id) (const fromAddr) h

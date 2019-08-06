@@ -44,5 +44,10 @@ spec = do
       let expected = [ TreeEntry NormalMode TreeObject (OID "abcdef") "/this/is/the/path", TreeEntry SymlinkMode BlobObject (OID "17776") "/dev/urandom"]
       parseEntries input `shouldBe` expected
 
+    it "parses submodules and other types" $ do
+      let input = "160000 commit 50865e8895c54037bf06c4c1691aa925d030a59d\tgemoji"
+      let expected = Right $ TreeEntry OtherMode OtherObjectType (OID "50865e8895c54037bf06c4c1691aa925d030a59d") "gemoji"
+      parseEntry input `shouldBe` expected
+
   where
     methodsBlob = makeBlob "def foo\nend\n" "methods.rb" Ruby mempty
