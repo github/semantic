@@ -25,13 +25,11 @@ prop desc f
 testTree :: Tasty.TestTree
 testTree = Tasty.testGroup "Data.Source"
   [ Tasty.testGroup "sourceLineRanges"
-    [ testProperty "produces 1 more range than there are newlines" $ property $ do
-        source <- forAll (Gen.source (Hedgehog.Range.linear 0 100))
+    [ prop "produces 1 more range than there are newlines" $ \ source -> do
         label (summarize source)
-        (length (sourceLineRanges source) === length (Text.splitOn "\r\n" (toText source) >>= Text.splitOn "\r" >>= Text.splitOn "\n"))
+        length (sourceLineRanges source) === length (Text.splitOn "\r\n" (toText source) >>= Text.splitOn "\r" >>= Text.splitOn "\n")
 
-    , testProperty "produces exhaustive ranges" $ property $ do
-        source <- forAll (Gen.source (Hedgehog.Range.linear 0 100))
+    , prop "produces exhaustive ranges" $ \ source -> do
         label (summarize source)
         foldMap (`slice` source) (sourceLineRanges source) === source
     ]
