@@ -72,9 +72,9 @@ testTree = Tasty.testGroup "Data.Source"
   ]
   where summarize src = do
           let lines = sourceLines src
-          classify "empty"          $ nullSource src
-          classify "single-line"    $ length lines == 1
-          classify "multiple lines" $ length lines >  1
+          cover  5 "empty"          $ nullSource src
+          cover 20 "single-line"    $ length lines == 1
+          cover 50 "multiple lines" $ length lines >  1
 
 spec :: Spec
 spec = do
