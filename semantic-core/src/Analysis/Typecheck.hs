@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveGeneric, DeriveTraversable, DerivingVia, FlexibleContexts, FlexibleInstances, LambdaCase, OverloadedStrings, QuantifiedConstraints, RecordWildCards, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeOperators #-}
+{-# LANGUAGE DeriveGeneric, DeriveTraversable, DerivingVia, FlexibleContexts, FlexibleInstances, LambdaCase, QuantifiedConstraints, RankNTypes, RecordWildCards, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeOperators #-}
 module Analysis.Typecheck
 ( Monotype (..)
 , Meta
@@ -15,9 +15,8 @@ import           Control.Effect.Fail
 import           Control.Effect.Fresh as Fresh
 import           Control.Effect.Reader hiding (Local)
 import           Control.Effect.State
-import           Control.Monad (unless)
+import           Control.Monad ((>=>), unless)
 import           Control.Monad.Module
-import qualified Data.Core as Core
 import           Data.File
 import           Data.Foldable (for_)
 import           Data.Function (fix)
@@ -29,6 +28,7 @@ import           Data.Loc
 import qualified Data.Map as Map
 import           Data.Maybe (fromJust, fromMaybe)
 import           Data.Name as Name
+import           Data.Proxy
 import           Data.Scope
 import           Data.Semigroup (Last (..))
 import qualified Data.Set as Set
@@ -44,6 +44,8 @@ data Monotype f a
   | Arr (f a) (f a)
   | Record (Map.Map User (f a))
   deriving (Foldable, Functor, Generic1, Traversable)
+
+type Type = Term Monotype Meta
 
 -- FIXME: Union the effects/annotations on the operands.
 
@@ -88,26 +90,45 @@ generalize :: Term Monotype Meta -> Term (Polytype :+: Monotype) Void
 generalize ty = fromJust (closed (forAlls (IntSet.toList (mvs ty)) (hoistTerm R ty)))
 
 
-typecheckingFlowInsensitive :: [File (Term (Core.Ann :+: Core.Core) User)] -> (Heap User (Term Monotype Meta), [File (Either (Loc, String) (Term (Polytype :+: Monotype) Void))])
 typecheckingFlowInsensitive
+  :: Ord term
+  => (forall sig m
+     .  (Carrier sig m, Member (Reader Loc) sig, MonadFail m)
+     => Analysis term User Type m
+     -> (term -> m Type)
+     -> (term -> m Type)
+     )
+  -> [File term]
+  -> ( Heap User Type
+     , [File (Either (Loc, String) (Term (Polytype :+: Monotype) Void))]
+     )
+typecheckingFlowInsensitive eval
   = run
   . runFresh
-  . runHeap "__semantic_root"
+  . runHeap
   . fmap (fmap (fmap (fmap generalize)))
-  . traverse runFile
+  . traverse (runFile eval)
 
-runFile :: ( Carrier sig m
-           , Effect sig
-           , Member Fresh sig
-           , Member (State (Heap User (Term Monotype Meta))) sig
-           )
-        => File (Term (Core.Ann :+: Core.Core) User)
-        -> m (File (Either (Loc, String) (Term Monotype Meta)))
-runFile file = traverse run file
+runFile
+  :: ( Carrier sig m
+     , Effect sig
+     , Member Fresh sig
+     , Member (State (Heap User Type)) sig
+     , Ord term
+     )
+  => (forall sig m
+     .  (Carrier sig m, Member (Reader Loc) sig, MonadFail m)
+     => Analysis term User Type m
+     -> (term -> m Type)
+     -> (term -> m Type)
+     )
+  -> File term
+  -> m (File (Either (Loc, String) Type))
+runFile eval file = traverse run file
   where run
           = (\ m -> do
               (subst, t) <- m
-              modify @(Heap User (Term Monotype Meta)) (fmap (Set.map (substAll subst)))
+              modify @(Heap User Type) (fmap (Set.map (substAll subst)))
               pure (substAll subst <$> t))
           . runState (mempty :: Substitution)
           . runReader (fileLoc file)
@@ -120,21 +141,21 @@ runFile file = traverse run file
               v <- meta
               bs <- m
               v <$ for_ bs (unify v))
-          . convergeTerm (fix (cacheTerm . eval typecheckingAnalysis))
+          . convergeTerm (Proxy @User) (fix (cacheTerm . eval typecheckingAnalysis))
 
 typecheckingAnalysis
   :: ( Alternative m
      , Carrier sig m
      , Member Fresh sig
      , Member (State (Set.Set Constraint)) sig
-     , Member (State (Heap User (Term Monotype Meta))) sig
+     , Member (State (Heap User Type)) sig
      )
-  => Analysis User (Term Monotype Meta) m
+  => Analysis term User Type m
 typecheckingAnalysis = Analysis{..}
   where alloc = pure
         bind _ _ m = m
         lookupEnv = pure . Just
-        deref addr = gets (Map.lookup addr) >>= maybe (pure Nothing) (foldMapA (pure . Just)) . nonEmpty . maybe [] Set.toList
+        deref addr = gets (Map.lookup addr >=> nonEmpty . Set.toList) >>= maybe (pure Nothing) (foldMapA (pure . Just))
         assign addr ty = modify (Map.insertWith (<>) addr (Set.singleton ty))
         abstract eval name body = do
           -- FIXME: construct the associated scope
@@ -169,7 +190,7 @@ data Solution
 
 infix 5 :=
 
-meta :: (Carrier sig m, Member Fresh sig) => m (Term Monotype Meta)
+meta :: (Carrier sig m, Member Fresh sig) => m Type
 meta = pure <$> Fresh.fresh
 
 unify :: (Carrier sig m, Member (State (Set.Set Constraint)) sig) => Term Monotype Meta -> Term Monotype Meta -> m ()
@@ -177,7 +198,7 @@ unify t1 t2
   | t1 == t2  = pure ()
   | otherwise = modify (<> Set.singleton (t1 :===: t2))
 
-type Substitution = IntMap.IntMap (Term Monotype Meta)
+type Substitution = IntMap.IntMap Type
 
 solve :: (Carrier sig m, Member (State Substitution) sig, MonadFail m) => Set.Set Constraint -> m ()
 solve cs = for_ cs solve
