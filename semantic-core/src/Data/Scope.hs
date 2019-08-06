@@ -112,7 +112,7 @@ instantiateEither f = unScope >=> incr (f . Left) (>>= f . Right)
 
 -- | Unwrap a (possibly-empty) prefix of @a@s wrapping a @t@ using a helper function.
 --
---   This allows us to peel a prefix of syntax, typically binders, off of a term, returning a stack of prefixing values (e.g. variables) and the outermost term rejected by the function.
+--   This allows us to peel a prefix of syntax, typically binders, off of a term, returning a stack of prefixing values (e.g. variables) and the outermost subterm rejected by the function.
 unprefix
   :: (Int -> t -> Maybe (a, t)) -- ^ A function taking the 0-based index into the prefix & the current term, and optionally returning a pair of the prefixing value and the inner subterm.
   -> t                          -- ^ The initial term.
