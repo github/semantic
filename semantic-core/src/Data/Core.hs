@@ -71,7 +71,7 @@ data Core f a
   deriving (Foldable, Functor, Generic1, Traversable)
 
 infixr 1 :>>
-infixl 2 :$
+infixl 9 :$
 infixl 4 :.
 infix  3 :=
 
@@ -139,7 +139,7 @@ unseqs = go
 ($$) :: (Carrier sig m, Member Core sig) => m a -> m a -> m a
 f $$ a = send (f :$ a)
 
-infixl 2 $$
+infixl 9 $$
 
 -- | Application of a function to a sequence of arguments.
 ($$*) :: (Foldable t, Carrier sig m, Member Core sig) => m a -> t (m a) -> m a

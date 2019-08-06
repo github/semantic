@@ -56,16 +56,15 @@ inParens amount go = do
   pure (encloseIf (amount >= prec) (symbol "(") (symbol ")") body)
 
 prettyCore :: Style -> Term Core User -> AnsiDoc
-prettyCore style = run . runReader @Prec 0 . go (pure . name)
-  where go :: (Member (Reader Prec) sig, Carrier sig m) => (a -> m AnsiDoc) -> Term Core a -> m AnsiDoc
-        go var = \case
-          Var v -> var v
+prettyCore style = run . runReader @Prec 0 . go
+  where go = \case
+          Var v -> pure (name v)
           Term t -> case t of
             Let a -> pure $ keyword "let" <+> name a
             a :>> b -> do
               prec <- ask @Prec
-              fore <- with 12 (go var a)
-              aft  <- with 12 (go var b)
+              fore <- with 12 (go a)
+              aft  <- with 12 (go b)
 
               let open  = symbol ("{" <> softline)
                   close = symbol (softline <> "}")
@@ -76,37 +75,37 @@ prettyCore style = run . runReader @Prec 0 . go (pure . name)
 
             Lam n f -> inParens 11 $ do
               (x, body) <- bind n f
-              pure (lambda <> x <+> arrow <+> body)
+              pure (lambda <> name x <+> arrow <+> body)
 
             Frame    -> pure $ primitive "frame"
             Unit     -> pure $ primitive "unit"
             Bool b   -> pure $ primitive (if b then "true" else "false")
             String s -> pure . strlit $ Pretty.viaShow s
 
-            f :$ x -> inParens 11 $ (<+>) <$> go var f <*> go var x
+            f :$ x -> inParens 11 $ (<+>) <$> go f <*> go x
 
             If con tru fal -> do
-              con' <- "if"   `appending` go var con
-              tru' <- "then" `appending` go var tru
-              fal' <- "else" `appending` go var fal
+              con' <- "if"   `appending` go con
+              tru' <- "then" `appending` go tru
+              fal' <- "else" `appending` go fal
               pure $ Pretty.sep [con', tru', fal']
 
-            Load p   -> "load" `appending` go var p
-            Edge Lexical n -> "lexical" `appending` go var n
-            Edge Import n -> "import" `appending` go var n
+            Load p   -> "load" `appending` go p
+            Edge Lexical n -> "lexical" `appending` go n
+            Edge Import n -> "import" `appending` go n
             item :. body   -> inParens 4 $ do
-              f <- go var item
-              g <- go var body
+              f <- go item
+              g <- go body
               pure (f <> symbol "." <> g)
 
             lhs := rhs -> inParens 3 $ do
-              f <- go var lhs
-              g <- go var rhs
+              f <- go lhs
+              g <- go rhs
               pure (f <+> symbol "=" <+> g)
 
             -- Annotations are not pretty-printed, as it lowers the signal/noise ratio too profoundly.
-            Ann _ c -> go var c
-          where bind (Ignored x) f = let x' = name x in (,) x' <$> go (incr (const (pure x')) var) (fromScope f)
+            Ann _ c -> go c
+          where bind (Ignored x) f = (,) x <$> go (instantiate1 (pure x) f)
         lambda = case style of
           Unicode -> symbol "λ"
           Ascii   -> symbol "\\"
