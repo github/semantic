@@ -30,6 +30,7 @@ import Prelude hiding (fail)
 eval :: ( Carrier sig m
         , Member (Reader Loc) sig
         , MonadFail m
+        , Semigroup value
         )
      => Analysis address value m
      -> (Term Core User -> m value)
@@ -41,12 +42,15 @@ eval Analysis{..} eval = \case
       addr <- alloc n
       v <- bind n addr (eval (instantiate1 (pure n) b))
       v <$ assign addr v
-    a :>> b -> eval a >> eval b
+    -- NB: Combining the results of the evaluations allows us to model effects in abstract domains. This in turn means that we can define an abstract domain modelling the types-and-effects of computations by means of a 'Semigroup' instance which takes the type of its second operand and the union of both operands’ effects.
+    --
+    -- It’s also worth noting that we use a semigroup instead of a semilattice because the lattice structure of our abstract domains is instead modelled by nondeterminism effects used by some of them.
+    a :>> b -> (<>) <$> eval a <*> eval b
     Named (Ignored n) a :>>= b -> do
       a' <- eval a
       addr <- alloc n
       assign addr a'
-      bind n addr (eval (instantiate1 (pure n) b))
+      bind n addr ((a' <>) <$> eval (instantiate1 (pure n) b))
     Lam (Named (Ignored n) b) -> abstract eval n (instantiate1 (pure n) b)
     f :$ a -> do
       f' <- eval f
@@ -210,18 +214,18 @@ ruby = fromBody $ annWith callStack (rec (named' __semantic_global) (do' stateme
 
 
 data Analysis address value m = Analysis
-  { alloc       :: User -> m address
-  , bind        :: forall a . User -> address -> m a -> m a
-  , lookupEnv   :: User -> m (Maybe address)
-  , deref       :: address -> m (Maybe value)
-  , assign      :: address -> value -> m ()
-  , abstract    :: (Term Core User -> m value) -> User -> Term Core User -> m value
-  , apply       :: (Term Core User -> m value) -> value -> value -> m value
-  , unit        :: m value
-  , bool        :: Bool -> m value
-  , asBool      :: value -> m Bool
-  , string      :: Text -> m value
-  , asString    :: value -> m Text
-  , record      :: [(User, value)] -> m value
-  , (...)       :: address -> User -> m (Maybe address)
+  { alloc     :: User -> m address
+  , bind      :: forall a . User -> address -> m a -> m a
+  , lookupEnv :: User -> m (Maybe address)
+  , deref     :: address -> m (Maybe value)
+  , assign    :: address -> value -> m ()
+  , abstract  :: (Term Core User -> m value) -> User -> Term Core User -> m value
+  , apply     :: (Term Core User -> m value) -> value -> value -> m value
+  , unit      :: m value
+  , bool      :: Bool -> m value
+  , asBool    :: value -> m Bool
+  , string    :: Text -> m value
+  , asString  :: value -> m Text
+  , record    :: [(User, value)] -> m value
+  , (...)     :: address -> User -> m (Maybe address)
   }
