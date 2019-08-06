@@ -43,7 +43,7 @@ data Monotype f a
   | Unit
   | String
   | Arr (f a) (f a)
-  | Record (Map.Map User (f a))
+  | Record (Map.Map Name (f a))
   deriving (Foldable, Functor, Generic1, Traversable)
 
 type Type = Term Monotype Meta
@@ -93,12 +93,12 @@ typecheckingFlowInsensitive
   :: Ord term
   => (forall sig m
      .  (Carrier sig m, Member (Reader Loc) sig, MonadFail m)
-     => Analysis term User Type m
+     => Analysis term Name Type m
      -> (term -> m Type)
      -> (term -> m Type)
      )
   -> [File term]
-  -> ( Heap User Type
+  -> ( Heap Name Type
      , [File (Either (Loc, String) (Term (Polytype :+: Monotype) Void))]
      )
 typecheckingFlowInsensitive eval
@@ -112,12 +112,12 @@ runFile
   :: ( Carrier sig m
      , Effect sig
      , Member Fresh sig
-     , Member (State (Heap User Type)) sig
+     , Member (State (Heap Name Type)) sig
      , Ord term
      )
   => (forall sig m
      .  (Carrier sig m, Member (Reader Loc) sig, MonadFail m)
-     => Analysis term User Type m
+     => Analysis term Name Type m
      -> (term -> m Type)
      -> (term -> m Type)
      )
@@ -127,7 +127,7 @@ runFile eval file = traverse run file
   where run
           = (\ m -> do
               (subst, t) <- m
-              modify @(Heap User Type) (fmap (Set.map (substAll subst)))
+              modify @(Heap Name Type) (fmap (Set.map (substAll subst)))
               pure (substAll subst <$> t))
           . runState (mempty :: Substitution)
           . runReader (fileLoc file)
@@ -140,16 +140,16 @@ runFile eval file = traverse run file
               v <- meta
               bs <- m
               v <$ for_ bs (unify v))
-          . convergeTerm (Proxy @User) (fix (cacheTerm . eval typecheckingAnalysis))
+          . convergeTerm (Proxy @Name) (fix (cacheTerm . eval typecheckingAnalysis))
 
 typecheckingAnalysis
   :: ( Alternative m
      , Carrier sig m
      , Member Fresh sig
      , Member (State (Set.Set Constraint)) sig
-     , Member (State (Heap User Type)) sig
+     , Member (State (Heap Name Type)) sig
      )
-  => Analysis term User Type m
+  => Analysis term Name Type m
 typecheckingAnalysis = Analysis{..}
   where alloc = pure
         bind _ _ m = m

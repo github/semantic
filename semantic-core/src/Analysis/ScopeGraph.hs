@@ -50,12 +50,12 @@ scopeGraph
   :: Ord term
   => (forall sig m
      .  (Carrier sig m, Member (Reader Loc) sig, MonadFail m)
-     => Analysis term User ScopeGraph m
+     => Analysis term Name ScopeGraph m
      -> (term -> m ScopeGraph)
      -> (term -> m ScopeGraph)
      )
   -> [File term]
-  -> (Heap User ScopeGraph, [File (Either (Loc, String) ScopeGraph)])
+  -> (Heap Name ScopeGraph, [File (Either (Loc, String) ScopeGraph)])
 scopeGraph eval
   = run
   . runFresh
@@ -66,12 +66,12 @@ runFile
   :: ( Carrier sig m
      , Effect sig
      , Member Fresh sig
-     , Member (State (Heap User ScopeGraph)) sig
+     , Member (State (Heap Name ScopeGraph)) sig
      , Ord term
      )
   => (forall sig m
      .  (Carrier sig m, Member (Reader Loc) sig, MonadFail m)
-     => Analysis term User ScopeGraph m
+     => Analysis term Name ScopeGraph m
      -> (term -> m ScopeGraph)
      -> (term -> m ScopeGraph)
      )
@@ -79,19 +79,19 @@ runFile
   -> m (File (Either (Loc, String) ScopeGraph))
 runFile eval file = traverse run file
   where run = runReader (fileLoc file)
-            . runReader (Map.empty @User @Loc)
+            . runReader (Map.empty @Name @Loc)
             . runFailWithLoc
             . fmap fold
-            . convergeTerm (Proxy @User) (fix (cacheTerm . eval scopeGraphAnalysis))
+            . convergeTerm (Proxy @Name) (fix (cacheTerm . eval scopeGraphAnalysis))
 
 scopeGraphAnalysis
   :: ( Alternative m
      , Carrier sig m
      , Member (Reader Loc) sig
-     , Member (Reader (Map.Map User Loc)) sig
-     , Member (State (Heap User ScopeGraph)) sig
+     , Member (Reader (Map.Map Name Loc)) sig
+     , Member (State (Heap Name ScopeGraph)) sig
      )
-  => Analysis term User ScopeGraph m
+  => Analysis term Name ScopeGraph m
 scopeGraphAnalysis = Analysis{..}
   where alloc = pure
         bind name _ m = do

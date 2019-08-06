@@ -41,7 +41,7 @@ instance Monoid (Value term) where
   mempty = Value Abstract mempty
 
 data Semi term
-  = Closure Loc User term
+  = Closure Loc Name term
   -- FIXME: Bound String values.
   | String Text
   | Abstract
@@ -52,12 +52,12 @@ importGraph
   :: (Ord term, Show term)
   => (forall sig m
      .  (Carrier sig m, Member (Reader Loc) sig, MonadFail m)
-     => Analysis term User (Value term) m
+     => Analysis term Name (Value term) m
      -> (term -> m (Value term))
      -> (term -> m (Value term))
      )
   -> [File term]
-  -> ( Heap User (Value term)
+  -> ( Heap Name (Value term)
      , [File (Either (Loc, String) (Value term))]
      )
 importGraph eval
@@ -70,13 +70,13 @@ runFile
   :: ( Carrier sig m
      , Effect sig
      , Member Fresh sig
-     , Member (State (Heap User (Value term))) sig
+     , Member (State (Heap Name (Value term))) sig
      , Ord  term
      , Show term
      )
   => (forall sig m
      .  (Carrier sig m, Member (Reader Loc) sig, MonadFail m)
-     => Analysis term User (Value term) m
+     => Analysis term Name (Value term) m
      -> (term -> m (Value term))
      -> (term -> m (Value term))
      )
@@ -86,18 +86,18 @@ runFile eval file = traverse run file
   where run = runReader (fileLoc file)
             . runFailWithLoc
             . fmap fold
-            . convergeTerm (Proxy @User) (fix (cacheTerm . eval importGraphAnalysis))
+            . convergeTerm (Proxy @Name) (fix (cacheTerm . eval importGraphAnalysis))
 
 -- FIXME: decompose into a product domain and two atomic domains
 importGraphAnalysis :: ( Alternative m
                        , Carrier sig m
                        , Member (Reader Loc) sig
-                       , Member (State (Heap User (Value term))) sig
+                       , Member (State (Heap Name (Value term))) sig
                        , MonadFail m
                        , Ord  term
                        , Show term
                        )
-                    => Analysis term User (Value term) m
+                    => Analysis term Name (Value term) m
 importGraphAnalysis = Analysis{..}
   where alloc = pure
         bind _ _ m = m
