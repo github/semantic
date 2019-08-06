@@ -33,9 +33,9 @@ eval :: ( Carrier sig m
         , MonadFail m
         , Semigroup value
         )
-     => Analysis (Term (Ann :+: Core) User) address value m
-     -> (Term (Ann :+: Core) User -> m value)
-     -> (Term (Ann :+: Core) User -> m value)
+     => Analysis (Term (Ann :+: Core) Name) address value m
+     -> (Term (Ann :+: Core) Name -> m value)
+     -> (Term (Ann :+: Core) Name -> m value)
 eval Analysis{..} eval = \case
   Var n -> lookupEnv' n >>= deref' n
   Term (R c) -> case c of
@@ -93,30 +93,30 @@ eval Analysis{..} eval = \case
           Term (L (Ann loc c)) -> local (const loc) (ref c)
 
 
-prog1 :: (Carrier sig t, Member Core sig) => File (t User)
+prog1 :: (Carrier sig t, Member Core sig) => File (t Name)
 prog1 = fromBody $ lam (named' "foo")
   (    named' "bar" :<- pure "foo"
   >>>= Core.if' (pure "bar")
     (Core.bool False)
     (Core.bool True))
 
-prog2 :: (Carrier sig t, Member Core sig) => File (t User)
+prog2 :: (Carrier sig t, Member Core sig) => File (t Name)
 prog2 = fromBody $ fileBody prog1 $$ Core.bool True
 
-prog3 :: (Carrier sig t, Member Core sig) => File (t User)
+prog3 :: (Carrier sig t, Member Core sig) => File (t Name)
 prog3 = fromBody $ lams [named' "foo", named' "bar", named' "quux"]
   (Core.if' (pure "quux")
     (pure "bar")
     (pure "foo"))
 
-prog4 :: (Carrier sig t, Member Core sig) => File (t User)
+prog4 :: (Carrier sig t, Member Core sig) => File (t Name)
 prog4 = fromBody
   (    named' "foo" :<- Core.bool True
   >>>= Core.if' (pure "foo")
     (Core.bool True)
     (Core.bool False))
 
-prog5 :: (Carrier sig t, Member Ann sig, Member Core sig) => File (t User)
+prog5 :: (Carrier sig t, Member Ann sig, Member Core sig) => File (t Name)
 prog5 = fromBody $ ann (do'
   [ Just (named' "mkPoint") :<- lams [named' "_x", named' "_y"] (ann (Core.record
     [ ("x", ann (pure "_x"))
@@ -127,7 +127,7 @@ prog5 = fromBody $ ann (do'
   , Nothing :<- ann (ann (pure "point") Core.... "y") .= ann (ann (pure "point") Core.... "x")
   ])
 
-prog6 :: (Carrier sig t, Member Core sig) => [File (t User)]
+prog6 :: (Carrier sig t, Member Core sig) => [File (t Name)]
 prog6 =
   [ File (Loc "dep"  (locSpan (fromJust here))) $ Core.record
     [ ("dep", Core.record [ ("var", Core.bool True) ]) ]
@@ -137,7 +137,7 @@ prog6 =
     ])
   ]
 
-ruby :: (Carrier sig t, Member Ann sig, Member Core sig) => File (t User)
+ruby :: (Carrier sig t, Member Ann sig, Member Core sig) => File (t Name)
 ruby = fromBody $ annWith callStack (rec (named' __semantic_global) (do' statements))
   where statements =
           [ Just "Class" :<- record
@@ -215,18 +215,18 @@ ruby = fromBody $ annWith callStack (rec (named' __semantic_global) (do' stateme
 
 
 data Analysis term address value m = Analysis
-  { alloc     :: User -> m address
-  , bind      :: forall a . User -> address -> m a -> m a
-  , lookupEnv :: User -> m (Maybe address)
+  { alloc     :: Name -> m address
+  , bind      :: forall a . Name -> address -> m a -> m a
+  , lookupEnv :: Name -> m (Maybe address)
   , deref     :: address -> m (Maybe value)
   , assign    :: address -> value -> m ()
-  , abstract  :: (term -> m value) -> User -> term -> m value
+  , abstract  :: (term -> m value) -> Name -> term -> m value
   , apply     :: (term -> m value) -> value -> value -> m value
   , unit      :: m value
   , bool      :: Bool -> m value
   , asBool    :: value -> m Bool
   , string    :: Text -> m value
   , asString  :: value -> m Text
-  , record    :: [(User, value)] -> m value
-  , (...)     :: address -> User -> m (Maybe address)
+  , record    :: [(Name, value)] -> m value
+  , (...)     :: address -> Name -> m (Maybe address)
   }

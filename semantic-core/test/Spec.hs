@@ -21,7 +21,7 @@ import           Data.Term
 
 -- * Helpers
 
-true, false :: Term (Ann :+: Core) User
+true, false :: Term (Ann :+: Core) Name
 true  = bool True
 false = bool False
 
@@ -31,7 +31,7 @@ parseEither p = Trifecta.foldResult (Left . show . Trifecta._errDoc) Right . Tri
 -- * Parser roundtripping properties. Note that parsing and prettyprinting is generally
 -- not a roundtrip, because the parser inserts 'Ann' nodes itself.
 
-prop_roundtrips :: Gen (Term (Ann :+: Core) User) -> Property
+prop_roundtrips :: Gen (Term (Ann :+: Core) Name) -> Property
 prop_roundtrips gen = property $ do
   input <- forAll gen
   tripping input (showCore . stripAnnotations) (parseEither (Parse.core <* Trifecta.eof))
@@ -47,7 +47,7 @@ parserProps = testGroup "Parsing: roundtripping"
 
 -- * Parser specs
 
-parsesInto :: String -> Term (Ann :+: Core) User -> Assertion
+parsesInto :: String -> Term (Ann :+: Core) Name -> Assertion
 parsesInto str res = case parseEither Parse.core str of
   Right x -> x @?= res
   Left m  -> assertFailure m
@@ -57,7 +57,7 @@ assert_booleans_parse = do
   parseEither Parse.core "#true"  @?= Right true
   parseEither Parse.core "#false" @?= Right false
 
-a, f, g, h :: Term (Ann :+: Core) User
+a, f, g, h :: Term (Ann :+: Core) Name
 (a, f, g, h) = (pure "a", pure "f", pure "g", pure "h")
 
 assert_ifthen_parse :: Assertion
@@ -93,7 +93,7 @@ parserSpecs = testGroup "Parsing: simple specs"
   , testCase "quoted names" assert_quoted_name_parse
   ]
 
-assert_roundtrips :: File (Term (Ann :+: Core) User) -> Assertion
+assert_roundtrips :: File (Term (Ann :+: Core) Name) -> Assertion
 assert_roundtrips (File _ core) = case parseEither Parse.core (showCore (stripAnnotations core)) of
   Right v -> stripAnnotations v @?= stripAnnotations core
   Left e -> assertFailure e

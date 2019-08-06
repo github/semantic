@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveTraversable, LambdaCase, OverloadedLists #-}
 module Data.Name
-( User
+( Name
 , Named(..)
 , named
 , named'
@@ -18,19 +18,19 @@ import qualified Data.HashSet as HashSet
 import           Data.Text as Text (Text, any, unpack)
 
 -- | User-specified and -relevant names.
-type User = Text
+type Name = Text
 
--- | Annotates an @a@ with a 'User'-provided name, which is ignored for '==' and 'compare'.
-data Named a = Named (Ignored User) a
+-- | Annotates an @a@ with a 'Name'-provided name, which is ignored for '==' and 'compare'.
+data Named a = Named (Ignored Name) a
   deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
 
-named :: User -> a -> Named a
+named :: Name -> a -> Named a
 named = Named . Ignored
 
-named' :: User -> Named User
+named' :: Name -> Named Name
 named' u = Named (Ignored u) u
 
-namedName :: Named a -> User
+namedName :: Named a -> Name
 namedName (Named (Ignored n) _) = n
 
 namedValue :: Named a -> a
@@ -49,7 +49,7 @@ reservedNames = [ "#true", "#false", "if", "then", "else"
 
 -- | Returns true if any character would require quotation or if the
 -- name conflicts with a Core primitive.
-needsQuotation :: User -> Bool
+needsQuotation :: Name -> Bool
 needsQuotation u = HashSet.member (unpack u) reservedNames || Text.any (not . isSimpleCharacter) u
 
 -- | A ‘simple’ character is, loosely defined, a character that is compatible

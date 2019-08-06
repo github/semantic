@@ -19,16 +19,16 @@ import           Data.Text.Prettyprint.Doc
 import qualified Data.Text.Prettyprint.Doc.Render.String as Pretty
 import qualified Data.Text.Prettyprint.Doc.Render.Terminal as Pretty
 
-showCore :: Term Core User -> String
+showCore :: Term Core Name -> String
 showCore = Pretty.renderString . layoutSmart defaultLayoutOptions . unAnnotate . prettyCore Ascii
 
-printCore :: Term Core User -> IO ()
+printCore :: Term Core Name -> IO ()
 printCore p = Pretty.putDoc (prettyCore Unicode p) *> putStrLn ""
 
-showFile :: File (Term Core User) -> String
+showFile :: File (Term Core Name) -> String
 showFile = showCore . fileBody
 
-printFile :: File (Term Core User) -> IO ()
+printFile :: File (Term Core Name) -> IO ()
 printFile = printCore . fileBody
 
 type AnsiDoc = Doc Pretty.AnsiStyle
@@ -41,10 +41,10 @@ primitive = keyword . mappend "#"
 
 data Style = Unicode | Ascii
 
-name :: User -> AnsiDoc
+name :: Name -> AnsiDoc
 name n = if needsQuotation n then enclose (symbol "#{") (symbol "}") (pretty n) else pretty n
 
-prettyCore :: Style -> Term Core User -> AnsiDoc
+prettyCore :: Style -> Term Core Name -> AnsiDoc
 prettyCore style = precBody . go . fmap name
   where go = \case
           Var v -> atom v
