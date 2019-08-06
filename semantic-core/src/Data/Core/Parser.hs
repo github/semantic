@@ -53,7 +53,8 @@ expr :: (TokenParsing m, Monad m) => m (Term Core User)
 expr = ifthenelse <|> lambda <|> rec <|> load <|> assign
 
 assign :: (TokenParsing m, Monad m) => m (Term Core User)
-assign = application <**> (flip (Core..=) <$ symbolic '=' <*> application <|> pure id) <?> "assignment"
+assign = application <**> (symbolic '=' *> rhs <|> pure id) <?> "assignment"
+  where rhs = flip (Core..=) <$> application
 
 application :: (TokenParsing m, Monad m) => m (Term Core User)
 application = projection `chainl1` (pure (Core.$$))
