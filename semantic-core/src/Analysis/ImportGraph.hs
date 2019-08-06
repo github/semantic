@@ -22,7 +22,6 @@ import           Data.Loc
 import qualified Data.Map as Map
 import           Data.Name
 import qualified Data.Set as Set
-import           Data.Stack
 import           Data.Term
 import           Data.Text (Text)
 import           Prelude hiding (fail)
@@ -42,29 +41,27 @@ instance Monoid Value where
   mempty = Value Abstract mempty
 
 data Semi
-  = Closure Loc Name (Term Core.Core Name) Name
+  = Closure Loc User (Term Core.Core User) User
   -- FIXME: Bound String values.
   | String Text
   | Abstract
   deriving (Eq, Ord, Show)
 
 
-importGraph :: [File (Term Core.Core Name)] -> (Heap Name Value, [File (Either (Loc, String) Value)])
+importGraph :: [File (Term Core.Core User)] -> (Heap User Value, [File (Either (Loc, String) Value)])
 importGraph
   = run
   . runFresh
-  . runNaming
-  . runHeap (Gen (Gensym (Nil :> "root") 0))
+  . runHeap "__semantic_root"
   . traverse runFile
 
 runFile :: ( Carrier sig m
            , Effect sig
            , Member Fresh sig
-           , Member Naming sig
-           , Member (Reader (FrameId Name)) sig
-           , Member (State (Heap Name Value)) sig
+           , Member (Reader (FrameId User)) sig
+           , Member (State (Heap User Value)) sig
            )
-        => File (Term Core.Core Name)
+        => File (Term Core.Core User)
         -> m (File (Either (Loc, String) Value))
 runFile file = traverse run file
   where run = runReader (fileLoc file)
@@ -75,12 +72,12 @@ runFile file = traverse run file
 -- FIXME: decompose into a product domain and two atomic domains
 importGraphAnalysis :: ( Alternative m
                        , Carrier sig m
-                       , Member (Reader (FrameId Name)) sig
+                       , Member (Reader (FrameId User)) sig
                        , Member (Reader Loc) sig
-                       , Member (State (Heap Name Value)) sig
+                       , Member (State (Heap User Value)) sig
                        , MonadFail m
                        )
-                    => Analysis Name Value m
+                    => Analysis User Value m
 importGraphAnalysis = Analysis{..}
   where alloc = pure
         bind _ _ = pure ()
@@ -104,7 +101,7 @@ importGraphAnalysis = Analysis{..}
         asString (Value (String s) _) = pure s
         asString _ = pure mempty
         frame = pure mempty
-        edge Core.Import (User to) = do -- FIXME: figure out some other way to do this
+        edge Core.Import to = do -- FIXME: figure out some other way to do this
           Loc{locPath=from} <- ask
           () <$ pure (Value Abstract (Map.singleton from (Set.singleton to)))
         edge _ _ = pure ()
