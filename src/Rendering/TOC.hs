@@ -96,7 +96,7 @@ newtype DedupeKey = DedupeKey (T.Text, T.Text) deriving (Eq, Ord)
 -- different behaviors:
 -- 1. Identical entries are in the list.
 --    Action: take the first one, drop all subsequent.
--- 2. Two similar entries (defined by a case insensitive comparision of their
+-- 2. Two similar entries (defined by a case insensitive comparison of their
 --    identifiers) are in the list.
 --    Action: Combine them into a single Replaced entry.
 dedupe :: [Entry Declaration] -> [Entry Declaration]
