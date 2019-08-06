@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveTraversable, ExistentialQuantification, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, LambdaCase, MultiParamTypeClasses, OverloadedLists, OverloadedStrings, StandaloneDeriving, TypeApplications, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DeriveTraversable, LambdaCase, OverloadedLists #-}
 module Data.Name
 ( User
 , Named(..)
@@ -10,7 +10,6 @@ module Data.Name
 , reservedNames
 , isSimpleCharacter
 , needsQuotation
-, encloseIf
 ) where
 
 import qualified Data.Char as Char
@@ -45,17 +44,13 @@ instance Ord (Ignored a) where compare _ _ = EQ
 
 
 reservedNames :: HashSet String
-reservedNames = [ "#true", "#false", "let", "#frame", "if", "then", "else"
-                , "lexical", "import", "#unit", "load"]
+reservedNames = [ "#true", "#false", "if", "then", "else"
+                , "#unit", "load", "rec", "#record"]
 
 -- | Returns true if any character would require quotation or if the
 -- name conflicts with a Core primitive.
 needsQuotation :: User -> Bool
 needsQuotation u = HashSet.member (unpack u) reservedNames || Text.any (not . isSimpleCharacter) u
-
-encloseIf :: Monoid m => Bool -> m -> m -> m -> m
-encloseIf True  l r x = l <> x <> r
-encloseIf False _ _ x = x
 
 -- | A ‘simple’ character is, loosely defined, a character that is compatible
 -- with identifiers in most ASCII-oriented programming languages. This is defined

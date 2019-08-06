@@ -80,7 +80,7 @@ importGraphAnalysis :: ( Alternative m
                     => Analysis User Value m
 importGraphAnalysis = Analysis{..}
   where alloc = pure
-        bind _ _ = pure ()
+        bind _ _ m = m
         lookupEnv = pure . Just
         deref addr = gets (Map.lookup addr) >>= maybe (pure Nothing) (foldMapA (pure . Just)) . nonEmpty . maybe [] Set.toList
         assign addr ty = modify (Map.insertWith (<>) addr (Set.singleton ty))
@@ -91,8 +91,7 @@ importGraphAnalysis = Analysis{..}
         apply eval (Value (Closure loc name body _) _) a = local (const loc) $ do
           addr <- alloc name
           assign addr a
-          bind name addr
-          eval body
+          bind name addr (eval body)
         apply _ f _ = fail $ "Cannot coerce " <> show f <> " to function"
         unit = pure mempty
         bool _ = pure mempty
@@ -100,9 +99,5 @@ importGraphAnalysis = Analysis{..}
         string s = pure (Value (String s) mempty)
         asString (Value (String s) _) = pure s
         asString _ = pure mempty
-        frame = pure mempty
-        edge Core.Import to = do -- FIXME: figure out some other way to do this
-          Loc{locPath=from} <- ask
-          () <$ pure (Value Abstract (Map.singleton from (Set.singleton to)))
-        edge _ _ = pure ()
-        _ ... m = m
+        record fields = pure (Value Abstract (foldMap (valueGraph . snd) fields))
+        _ ... m = pure (Just m)

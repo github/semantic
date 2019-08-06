@@ -8,19 +8,19 @@ module Data.Core.Pretty
   , prettyCore
   ) where
 
-import           Control.Effect.Reader
 import           Data.Core
 import           Data.File
+import           Data.Foldable (toList)
 import           Data.Name
 import           Data.Scope
+import           Data.Stack
 import           Data.Term
-import           Data.Text.Prettyprint.Doc (Pretty (..), annotate, softline, (<+>))
-import qualified Data.Text.Prettyprint.Doc as Pretty
+import           Data.Text.Prettyprint.Doc
 import qualified Data.Text.Prettyprint.Doc.Render.String as Pretty
 import qualified Data.Text.Prettyprint.Doc.Render.Terminal as Pretty
 
 showCore :: Term Core User -> String
-showCore = Pretty.renderString . Pretty.layoutSmart Pretty.defaultLayoutOptions . Pretty.unAnnotate . prettyCore Ascii
+showCore = Pretty.renderString . layoutSmart defaultLayoutOptions . unAnnotate . prettyCore Ascii
 
 printCore :: Term Core User -> IO ()
 printCore p = Pretty.putDoc (prettyCore Unicode p) *> putStrLn ""
@@ -31,88 +31,91 @@ showFile = showCore . fileBody
 printFile :: File (Term Core User) -> IO ()
 printFile = printCore . fileBody
 
-type AnsiDoc = Pretty.Doc Pretty.AnsiStyle
+type AnsiDoc = Doc Pretty.AnsiStyle
 
 keyword, symbol, strlit, primitive :: AnsiDoc -> AnsiDoc
 keyword = annotate (Pretty.colorDull Pretty.Cyan)
-symbol  = annotate (Pretty.color Pretty.Yellow)
+symbol  = annotate (Pretty.color     Pretty.Yellow)
 strlit  = annotate (Pretty.colorDull Pretty.Green)
 primitive = keyword . mappend "#"
-
-type Prec = Int
 
 data Style = Unicode | Ascii
 
 name :: User -> AnsiDoc
-name n = encloseIf (needsQuotation n) (symbol "#{") (symbol "}") (pretty n)
-
-with :: (Member (Reader Prec) sig, Carrier sig m) => Prec -> m a -> m a
-with n = local (const n)
-
-inParens :: (Member (Reader Prec) sig, Carrier sig m) => Prec -> m AnsiDoc -> m AnsiDoc
-inParens amount go = do
-  prec <- ask
-  body <- with amount go
-  pure (encloseIf (amount >= prec) (symbol "(") (symbol ")") body)
+name n = if needsQuotation n then enclose (symbol "#{") (symbol "}") (pretty n) else pretty n
 
 prettyCore :: Style -> Term Core User -> AnsiDoc
-prettyCore style = run . runReader @Prec 0 . go
+prettyCore style = precBody . go . fmap name
   where go = \case
-          Var v -> pure (name v)
+          Var v -> atom v
           Term t -> case t of
-            Let a -> pure $ keyword "let" <+> name a
-            a :>> b -> do
-              prec <- ask @Prec
-              fore <- with 12 (go a)
-              aft  <- with 12 (go b)
+            Rec (Named (Ignored x) b) -> prec 3 . group . nest 2 $ vsep
+              [ keyword "rec" <+> name x
+              , symbol "=" <+> align (withPrec 0 (go (instantiate1 (pure (name x)) b)))
+              ]
 
-              let open  = symbol ("{" <> softline)
-                  close = symbol (softline <> "}")
-                  separator = ";" <> Pretty.line
-                  body = fore <> separator <> aft
+            Lam (Named (Ignored x) b) -> prec 3 . group . nest 2 $ vsep
+              [ lambda <> name x, arrow <+> withPrec 0 (go (instantiate1 (pure (name x)) b)) ]
 
-              pure . Pretty.align $ encloseIf (12 > prec) open close (Pretty.align body)
+            Record fs -> atom . group . nest 2 $ vsep [ primitive "record", block ", " (map (uncurry keyValue) fs) ]
 
-            Lam n f -> inParens 11 $ do
-              (x, body) <- bind n f
-              pure (lambda <> name x <+> arrow <+> body)
+            Unit     -> atom $ primitive "unit"
+            Bool b   -> atom $ primitive (if b then "true" else "false")
+            String s -> atom . strlit $ viaShow s
 
-            Frame    -> pure $ primitive "frame"
-            Unit     -> pure $ primitive "unit"
-            Bool b   -> pure $ primitive (if b then "true" else "false")
-            String s -> pure . strlit $ Pretty.viaShow s
+            f :$ x -> prec 8 (withPrec 8 (go f) <+> withPrec 9 (go x))
 
-            f :$ x -> inParens 11 $ (<+>) <$> go f <*> go x
+            If con tru fal -> prec 3 . group $ vsep
+              [ keyword "if"   <+> precBody (go con)
+              , keyword "then" <+> precBody (go tru)
+              , keyword "else" <+> precBody (go fal)
+              ]
 
-            If con tru fal -> do
-              con' <- "if"   `appending` go con
-              tru' <- "then" `appending` go tru
-              fal' <- "else" `appending` go fal
-              pure $ Pretty.sep [con', tru', fal']
+            Load p -> prec 3 (keyword "load" <+> withPrec 9 (go p))
+            item :. body -> prec 9 (withPrec 9 (go item) <> symbol "." <> name body)
 
-            Load p   -> "load" `appending` go p
-            Edge Lexical n -> "lexical" `appending` go n
-            Edge Import n -> "import" `appending` go n
-            item :. body   -> inParens 4 $ do
-              f <- go item
-              g <- go body
-              pure (f <> symbol "." <> g)
-
-            lhs := rhs -> inParens 3 $ do
-              f <- go lhs
-              g <- go rhs
-              pure (f <+> symbol "=" <+> g)
+            lhs := rhs -> prec 3 . group . nest 2 $ vsep
+              [ withPrec 4 (go lhs)
+              , symbol "=" <+> align (withPrec 4 (go rhs))
+              ]
 
             -- Annotations are not pretty-printed, as it lowers the signal/noise ratio too profoundly.
             Ann _ c -> go c
-          where bind (Ignored x) f = (,) x <$> go (instantiate1 (pure x) f)
+            statement ->
+              let (bindings, return) = unstatements (Term statement)
+                  statements = toList (bindings :> (Nothing :<- return))
+                  names = zipWith (\ i (n :<- _) -> maybe (pretty @Int i) (name . namedName) n) [0..] statements
+                  statements' = map (prettyStatement names) statements
+              in atom (block "; " statements')
+        block _ [] = braces mempty
+        block s ss = encloseSep "{ " " }" s ss
+        keyValue x v = name x <+> symbol ":" <+> precBody (go v)
+        prettyStatement names (Just (Named (Ignored u) _) :<- t) = name u <+> arrowL <+> precBody (go (either (names !!) id <$> t))
+        prettyStatement names (Nothing                    :<- t) = precBody (go (either (names !!) id <$> t))
         lambda = case style of
           Unicode -> symbol "λ"
           Ascii   -> symbol "\\"
         arrow = case style of
           Unicode -> symbol "→"
           Ascii   -> symbol "->"
+        arrowL = case style of
+          Unicode -> symbol "←"
+          Ascii   -> symbol "<-"
 
 
-appending :: Functor f => AnsiDoc -> f AnsiDoc -> f AnsiDoc
-appending k item = (keyword k <+>) <$> item
+data Prec a = Prec
+  { precLevel :: Maybe Int
+  , precBody  :: a
+  }
+  deriving (Eq, Ord, Show)
+
+prec :: Int -> a -> Prec a
+prec = Prec . Just
+
+atom :: a -> Prec a
+atom = Prec Nothing
+
+withPrec :: Int -> Prec AnsiDoc -> AnsiDoc
+withPrec d (Prec d' a)
+  | maybe False (d >) d' = parens a
+  | otherwise            = a

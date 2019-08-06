@@ -1,3 +1,4 @@
+{-# LANGUAGE TypeOperators #-}
 module Data.Core.Parser
   ( module Text.Trifecta
   , core
@@ -10,8 +11,9 @@ module Data.Core.Parser
 
 import           Control.Applicative
 import qualified Data.Char as Char
-import           Data.Core (Core, Edge(..))
+import           Data.Core ((:<-) (..), Core)
 import qualified Data.Core as Core
+import           Data.Foldable (foldl')
 import           Data.Name
 import           Data.String
 import           Data.Term
@@ -48,44 +50,51 @@ core :: (TokenParsing m, Monad m) => m (Term Core User)
 core = expr
 
 expr :: (TokenParsing m, Monad m) => m (Term Core User)
-expr = atom `chainl1` go where
-  go = choice [ (Core....) <$ dot
-              , (Core.$$)  <$ notFollowedBy dot
-              ]
+expr = ifthenelse <|> lambda <|> rec <|> load <|> assign
+
+assign :: (TokenParsing m, Monad m) => m (Term Core User)
+assign = application <**> (symbolic '=' *> rhs <|> pure id) <?> "assignment"
+  where rhs = flip (Core..=) <$> application
+
+application :: (TokenParsing m, Monad m) => m (Term Core User)
+application = projection `chainl1` (pure (Core.$$))
+
+projection :: (TokenParsing m, Monad m) => m (Term Core User)
+projection = foldl' (Core....) <$> atom <*> many (namedValue <$ dot <*> name)
 
 atom :: (TokenParsing m, Monad m) => m (Term Core User)
 atom = choice
   [ comp
-  , ifthenelse
-  , edge
   , lit
   , ident
-  , assign
   , parens expr
   ]
 
 comp :: (TokenParsing m, Monad m) => m (Term Core User)
-comp = braces (Core.block <$> sepEndByNonEmpty expr semi) <?> "compound statement"
+comp = braces (Core.do' <$> sepEndByNonEmpty statement semi) <?> "compound statement"
+
+statement :: (TokenParsing m, Monad m) => m (Maybe (Named User) :<- Term Core User)
+statement
+  =   try ((:<-) . Just <$> name <* symbol "<-" <*> expr)
+  <|> (Nothing :<-) <$> expr
+  <?> "statement"
 
 ifthenelse :: (TokenParsing m, Monad m) => m (Term Core User)
 ifthenelse = Core.if'
-  <$ reserved "if"   <*> core
-  <* reserved "then" <*> core
-  <* reserved "else" <*> core
+  <$ reserved "if"   <*> expr
+  <* reserved "then" <*> expr
+  <* reserved "else" <*> expr
   <?> "if-then-else statement"
 
-assign :: (TokenParsing m, Monad m) => m (Term Core User)
-assign = (Core..=) <$> try (lvalue <* symbolic '=') <*> core <?> "assignment"
+rec :: (TokenParsing m, Monad m) => m (Term Core User)
+rec = Core.rec <$ reserved "rec" <*> name <* symbolic '=' <*> expr <?> "recursive binding"
 
-edge :: (TokenParsing m, Monad m) => m (Term Core User)
-edge = kw <*> expr where kw = choice [ Core.edge Lexical <$ reserved "lexical"
-                                     , Core.edge Import  <$ reserved "import"
-                                     , Core.load         <$ reserved "load"
-                                     ]
+load :: (TokenParsing m, Monad m) => m (Term Core User)
+load = Core.load <$ reserved "load" <*> expr
 
 lvalue :: (TokenParsing m, Monad m) => m (Term Core User)
 lvalue = choice
-  [ Core.let' . namedValue <$ reserved "let" <*> name
+  [ projection
   , ident
   , parens expr
   ]
@@ -93,20 +102,22 @@ lvalue = choice
 -- * Literals
 
 name :: (TokenParsing m, Monad m) => m (Named User)
-name = named' <$> identifier <?> "name" where
+name = named' <$> identifier <?> "name"
 
 lit :: (TokenParsing m, Monad m) => m (Term Core User)
 lit = let x `given` n = x <$ reserved n in choice
   [ Core.bool True  `given` "#true"
   , Core.bool False `given` "#false"
   , Core.unit       `given` "#unit"
-  , Core.frame      `given` "#frame"
-  , between (string "\"") (string "\"") (Core.string . fromString <$> many ('"' <$ string "\\\"" <|> noneOf "\""))
-  , lambda
+  , record
+  , Core.string <$> stringLiteral
   ] <?> "literal"
 
+record :: (TokenParsing m, Monad m) => m (Term Core User)
+record = Core.record <$ reserved "#record" <*> braces (sepEndBy ((,) <$> identifier <* symbolic ':' <*> expr) comma)
+
 lambda :: (TokenParsing m, Monad m) => m (Term Core User)
-lambda = Core.lam <$ lambduh <*> name <* arrow <*> core <?> "lambda" where
+lambda = Core.lam <$ lambduh <*> name <* arrow <*> expr <?> "lambda" where
   lambduh = symbolic 'λ' <|> symbolic '\\'
   arrow   = symbol "→"   <|> symbol "->"
 

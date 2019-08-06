@@ -6,12 +6,14 @@ module Data.Scope
 , Scope(..)
 , fromScope
 , toScope
-, bind1
-, bind
-, bindEither
+, abstract1
+, abstract
+, abstractEither
 , instantiate1
 , instantiate
 , instantiateEither
+, unprefix
+, unprefixEither
 ) where
 
 import Control.Applicative (liftA2)
@@ -20,6 +22,7 @@ import Control.Monad ((>=>), guard)
 import Control.Monad.Module
 import Control.Monad.Trans.Class
 import Data.Function (on)
+import Data.Stack
 
 data Incr a b
   = Z a
@@ -86,14 +89,14 @@ toScope = Scope . fmap (fmap pure)
 
 
 -- | Bind occurrences of a variable in a term, producing a term in which the variable is bound.
-bind1 :: (Applicative f, Eq a) => a -> f a -> Scope () f a
-bind1 n = bind (guard . (== n))
+abstract1 :: (Applicative f, Eq a) => a -> f a -> Scope () f a
+abstract1 n = abstract (guard . (== n))
 
-bind :: Applicative f => (b -> Maybe a) -> f b -> Scope a f b
-bind f = bindEither (matchMaybe f)
+abstract :: Applicative f => (b -> Maybe a) -> f b -> Scope a f b
+abstract f = abstractEither (matchMaybe f)
 
-bindEither :: Applicative f => (b -> Either a c) -> f b -> Scope a f c
-bindEither f = Scope . fmap (match f) -- FIXME: succ as little of the expression as possible, cf https://twitter.com/ollfredo/status/1145776391826358273
+abstractEither :: Applicative f => (b -> Either a c) -> f b -> Scope a f c
+abstractEither f = Scope . fmap (match f) -- FIXME: succ as little of the expression as possible, cf https://twitter.com/ollfredo/status/1145776391826358273
 
 
 -- | Substitute a term for the free variable in a given term, producing a closed term.
@@ -105,3 +108,25 @@ instantiate f = instantiateEither (either f pure)
 
 instantiateEither :: Monad f => (Either a b -> f c) -> Scope a f b -> f c
 instantiateEither f = unScope >=> incr (f . Left) (>>= f . Right)
+
+
+-- | Unwrap a (possibly-empty) prefix of @a@s wrapping a @t@ using a helper function.
+--
+--   This allows us to peel a prefix of syntax, typically binders, off of a term, returning a stack of prefixing values (e.g. variables) and the outermost subterm rejected by the function.
+unprefix
+  :: (Int -> t -> Maybe (a, t)) -- ^ A function taking the 0-based index into the prefix & the current term, and optionally returning a pair of the prefixing value and the inner subterm.
+  -> t                          -- ^ The initial term.
+  -> (Stack a, t)               -- ^ A stack of prefixing values & the final subterm.
+unprefix from = unprefixEither (matchMaybe . from)
+
+-- | Unwrap a (possibly-empty) prefix of @a@s wrapping a @b@ within a @t@ using a helper function.
+--
+--   Compared to 'unprefix', this allows the helper function to extract inner terms of a different type, for example when @t@ is a right @b@-module.
+unprefixEither
+  :: (Int -> t -> Either (a, t) b) -- ^ A function taking the 0-based index into the prefix & the current term, and returning either a pair of the prefixing value and the next inner subterm of type @t@, or the final inner subterm of type @b@.
+  -> t                             -- ^ The initial term.
+  -> (Stack a, b)                  -- ^ A stack of prefixing values & the final subterm.
+unprefixEither from = go (0 :: Int) Nil
+  where go i bs t = case from i t of
+          Left (b, t) -> go (succ i) (bs :> b) t
+          Right b     -> (bs, b)
