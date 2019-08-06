@@ -2,6 +2,7 @@
 module Data.Term
 ( Term(..)
 , hoistTerm
+, unTerm
 , prjTerm
 ) where
 
@@ -49,6 +50,10 @@ hoistTerm :: (HFunctor sig, forall g . Functor g => Functor (sig g)) => (forall 
 hoistTerm f = go
   where go (Var v)  = Var v
         go (Term t) = Term (f (hmap (hoistTerm f) t))
+
+unTerm :: Term sig a -> Maybe (sig (Term sig) a)
+unTerm (Var _)    = Nothing
+unTerm (Term sig) = Just sig
 
 prjTerm :: Member sub sig => Term sig a -> Maybe (sub (Term sig) a)
 prjTerm (Var _)    = Nothing
