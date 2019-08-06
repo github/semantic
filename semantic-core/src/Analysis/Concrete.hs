@@ -48,7 +48,7 @@ data Concrete
   | String Text
   | Record Env
   deriving (Eq, Ord, Show)
-  -- | We derive the 'Semigroup' instance for 'Concrete' to take the second argument. This is equivalent to stating that the return value of an imperative sequence of statements is the value of its final statement.
+  -- NB: We derive the 'Semigroup' instance for 'Concrete' to take the second argument. This is equivalent to stating that the return value of an imperative sequence of statements is the value of its final statement.
   deriving Semigroup via Last Concrete
 
 recordFrame :: Concrete -> Maybe Env
