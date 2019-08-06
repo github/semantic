@@ -10,12 +10,11 @@ import Test.Hspec
 
 import qualified Generators as Gen
 import qualified Hedgehog.Gen as Gen
-import           Hedgehog ((===))
+import           Hedgehog ((===), label)
 import qualified Hedgehog.Range
 import           Hedgehog hiding (Range)
 import qualified Test.Tasty as Tasty
 import           Test.Tasty.Hedgehog (testProperty)
-import qualified Test.Tasty.QuickCheck as QC
 
 prop :: HasCallStack => String -> (Source -> PropertyT IO ()) -> Tasty.TestTree
 prop desc f
@@ -27,13 +26,15 @@ prop desc f
 testTree :: Tasty.TestTree
 testTree = Tasty.testGroup "Data.Source"
   [ Tasty.testGroup "sourceLineRanges"
-    [ QC.testProperty "produces 1 more range than there are newlines" $
-      \ source -> QC.label (summarize source) $
-        length (sourceLineRanges source) QC.=== length (Text.splitOn "\r\n" (toText source) >>= Text.splitOn "\r" >>= Text.splitOn "\n")
+    [ testProperty "produces 1 more range than there are newlines" $ property $ do
+        source <- forAll (Gen.source (Hedgehog.Range.linear 0 100))
+        label (summarize source)
+        (length (sourceLineRanges source) === length (Text.splitOn "\r\n" (toText source) >>= Text.splitOn "\r" >>= Text.splitOn "\n"))
 
-    , QC.testProperty "produces exhaustive ranges" $
-      \ source -> QC.label (summarize source) $
-        foldMap (`slice` source) (sourceLineRanges source) QC.=== source
+    , testProperty "produces exhaustive ranges" $ property $ do
+        source <- forAll (Gen.source (Hedgehog.Range.linear 0 100))
+        label (summarize source)
+        foldMap (`slice` source) (sourceLineRanges source) === source
     ]
 
   , Tasty.testGroup "spanToRange"
@@ -99,8 +100,3 @@ insetSpan sourceSpan = sourceSpan { spanStart = (spanStart sourceSpan) { posColu
 
 insetRange :: Range -> Range
 insetRange Range {..} = Range (succ start) (pred end)
-
-
-instance QC.Arbitrary Source where
-  arbitrary = fromText . Text.pack <$> QC.listOf (QC.frequency [ (1, pure '\r'), (1, pure '\n'), (20, QC.arbitraryUnicodeChar) ])
-  shrink src = fromText . Text.pack <$> QC.shrinkList QC.shrinkNothing (Text.unpack (toText src))
