@@ -119,6 +119,9 @@ unprefix
   -> (Stack a, t)               -- ^ A stack of prefixing values & the final subterm.
 unprefix from = unprefixEither (matchMaybe . from)
 
+-- | Unwrap a (possibly-empty) prefix of @a@s wrapping a @b@ within a @t@ using a helper function.
+--
+--   Compared to 'unprefix', this allows the helper function to extract inner terms of a different type, for example when @t@ is a right @b@-module.
 unprefixEither :: (Int -> t -> Either (a, t) b) -> t -> (Stack a, b)
 unprefixEither from = go (0 :: Int) Nil
   where go i bs t = case from i t of
