@@ -11,7 +11,7 @@ module Data.Core.Parser
 
 import           Control.Applicative
 import qualified Data.Char as Char
-import           Data.Core (Core)
+import           Data.Core ((:<-) (..), Core)
 import qualified Data.Core as Core
 import           Data.Foldable (foldl')
 import           Data.Name
@@ -73,10 +73,10 @@ atom = choice
 comp :: (TokenParsing m, Monad m) => m (Term Core User)
 comp = braces (Core.do' <$> sepEndByNonEmpty statement semi) <?> "compound statement"
 
-statement :: (TokenParsing m, Monad m) => m (Maybe (Named User) Core.:<- Term Core User)
+statement :: (TokenParsing m, Monad m) => m (Maybe (Named User) :<- Term Core User)
 statement
-  =   try ((Core.:<-) . Just <$> name <* symbol "<-" <*> expr)
-  <|> (Nothing Core.:<-) <$> expr
+  =   try ((:<-) . Just <$> name <* symbol "<-" <*> expr)
+  <|> (Nothing :<-) <$> expr
   <?> "statement"
 
 ifthenelse :: (TokenParsing m, Monad m) => m (Term Core User)
