@@ -9,7 +9,7 @@ import Test.Hspec
 
 import qualified Generators as Gen
 import qualified Hedgehog.Gen as Gen
-import           Hedgehog ((===))
+import           Hedgehog ((===), label)
 import qualified Hedgehog.Range
 import           Hedgehog hiding (Range)
 import qualified Test.Tasty as Tasty
@@ -25,11 +25,15 @@ prop desc f
 testTree :: Tasty.TestTree
 testTree = Tasty.testGroup "Data.Source"
   [ Tasty.testGroup "sourceLineRanges"
-    [ prop "produces 1 more range than there are newlines" $
-      \ source -> length (sourceLineRanges source) === succ (Text.count "\n" (toText source))
+    [ testProperty "produces 1 more range than there are newlines" $ property $ do
+        source <- forAll (Gen.source (Hedgehog.Range.linear 0 100))
+        label (summarize source)
+        (length (sourceLineRanges source) === length (Text.splitOn "\r\n" (toText source) >>= Text.splitOn "\r" >>= Text.splitOn "\n"))
 
-    , prop "produces exhaustive ranges" $
-      \ source -> foldMap (`slice` source) (sourceLineRanges source) === source
+    , testProperty "produces exhaustive ranges" $ property $ do
+        source <- forAll (Gen.source (Hedgehog.Range.linear 0 100))
+        label (summarize source)
+        foldMap (`slice` source) (sourceLineRanges source) === source
     ]
 
   , Tasty.testGroup "spanToRange"
@@ -68,6 +72,10 @@ testTree = Tasty.testGroup "Data.Source"
     ]
 
   ]
+  where summarize src = case sourceLines src of
+          []  -> "empty"
+          [x] -> if nullSource x then "empty" else "single-line"
+          _   -> "multiple lines"
 
 spec :: Spec
 spec = do
