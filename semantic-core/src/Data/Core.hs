@@ -2,16 +2,19 @@
              ScopedTypeVariables, StandaloneDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Data.Core
 ( Core(..)
-, Edge(..)
-, let'
-, block
-, lam
-, lam'
-, lams
-, lams'
-, unlam
+, rec
+, (>>>)
 , unseq
 , unseqs
+, (>>>=)
+, unbind
+, unstatement
+, do'
+, unstatements
+, (:<-)(..)
+, lam
+, lams
+, unlam
 , ($$)
 , ($$*)
 , unapply
@@ -21,8 +24,7 @@ module Data.Core
 , if'
 , string
 , load
-, edge
-, frame
+, record
 , (...)
 , (.=)
 , ann
@@ -34,9 +36,11 @@ module Data.Core
 import Control.Applicative (Alternative (..))
 import Control.Effect.Carrier
 import Control.Monad.Module
+import Data.Bifunctor (Bifunctor (..))
 import Data.Foldable (foldl')
-import Data.List.NonEmpty
+import Data.List.NonEmpty (NonEmpty (..))
 import Data.Loc
+import Data.Maybe (fromMaybe)
 import Data.Name
 import Data.Scope
 import Data.Stack
@@ -45,14 +49,18 @@ import Data.Text (Text)
 import GHC.Generics (Generic1)
 import GHC.Stack
 
-data Edge = Lexical | Import
-  deriving (Eq, Ord, Show)
-
 data Core f a
-  = Let User
+  -- | Recursive local binding of a name in a scope; strict evaluation of the name in the body will diverge.
+  --
+  --   Simultaneous (and therefore potentially mutually-recursive) bidnings can be made by binding a 'Record' recursively within 'Rec' and projecting from it with ':.'.
+  = Rec (Named (Scope () f a))
   -- | Sequencing without binding; analogous to '>>' or '*>'.
   | f a :>> f a
-  | Lam (Ignored User) (Scope () f a)
+  -- | Sequencing with binding; analogous to '>>='.
+  --
+  --   Bindings made with :>>= are sequential, i.e. the name is not bound within the value, only within the consequence.
+  | Named (f a) :>>= Scope () f a
+  | Lam (Named (Scope () f a))
   -- | Function application; analogous to '$'.
   | f a :$ f a
   | Unit
@@ -61,18 +69,19 @@ data Core f a
   | String Text
   -- | Load the specified file (by path).
   | Load (f a)
-  | Edge Edge (f a)
-  -- | Allocation of a new frame.
-  | Frame
-  | f a :. f a
+  -- | A record mapping some keys to some values.
+  | Record [(User, f a)]
+  -- | Projection from a record.
+  | f a :. User
   -- | Assignment of a value to the reference returned by the lhs.
   | f a := f a
   | Ann Loc (f a)
   deriving (Foldable, Functor, Generic1, Traversable)
 
 infixr 1 :>>
-infixl 9 :$
-infixl 4 :.
+infixr 1 :>>=
+infixl 8 :$
+infixl 9 :.
 infix  3 :=
 
 instance HFunctor Core
@@ -83,48 +92,29 @@ deriving instance (Ord  a, forall a . Eq   a => Eq   (f a)
 deriving instance (Show a, forall a . Show a => Show (f a))          => Show (Core f a)
 
 instance RightModule Core where
-  Let u     >>=* _ = Let u
-  (a :>> b) >>=* f = (a >>= f) :>> (b >>= f)
-  Lam v b   >>=* f = Lam v (b >>=* f)
-  (a :$ b)  >>=* f = (a >>= f) :$ (b >>= f)
-  Unit      >>=* _ = Unit
-  Bool b    >>=* _ = Bool b
-  If c t e  >>=* f = If (c >>= f) (t >>= f) (e >>= f)
-  String s  >>=* _ = String s
-  Load b    >>=* f = Load (b >>= f)
-  Edge e b  >>=* f = Edge e (b >>= f)
-  Frame     >>=* _ = Frame
-  (a :. b)  >>=* f = (a >>= f) :. (b >>= f)
-  (a := b)  >>=* f = (a >>= f) := (b >>= f)
-  Ann l b   >>=* f = Ann l (b >>= f)
+  Rec b      >>=* f = Rec ((>>=* f) <$> b)
+  (a :>> b)  >>=* f = (a >>= f) :>> (b >>= f)
+  (a :>>= b) >>=* f = ((>>= f) <$> a) :>>= (b >>=* f)
+  Lam b      >>=* f = Lam ((>>=* f) <$> b)
+  (a :$ b)   >>=* f = (a >>= f) :$ (b >>= f)
+  Unit       >>=* _ = Unit
+  Bool b     >>=* _ = Bool b
+  If c t e   >>=* f = If (c >>= f) (t >>= f) (e >>= f)
+  String s   >>=* _ = String s
+  Load b     >>=* f = Load (b >>= f)
+  Record fs  >>=* f = Record (map (fmap (>>= f)) fs)
+  (a :. b)   >>=* f = (a >>= f) :. b
+  (a := b)   >>=* f = (a >>= f) := (b >>= f)
+  Ann l b    >>=* f = Ann l (b >>= f)
 
 
-let' :: (Carrier sig m, Member Core sig) => User -> m a
-let' = send . Let
+rec :: (Eq a, Carrier sig m, Member Core sig) => Named a -> m a -> m a
+rec (Named u n) b = send (Rec (Named u (abstract1 n b)))
 
-block :: (Foldable t, Carrier sig m, Member Core sig) => t (m a) -> m a
-block = maybe unit getBlock . foldMap (Just . Block)
+(>>>) :: (Carrier sig m, Member Core sig) => m a -> m a -> m a
+a >>> b = send (a :>> b)
 
-newtype Block m a = Block { getBlock :: m a }
-
-instance (Carrier sig m, Member Core sig) => Semigroup (Block m a) where
-  Block a <> Block b = Block (send (a :>> b))
-
-lam :: (Eq a, Carrier sig m, Member Core sig) => Named a -> m a -> m a
-lam (Named u n) b = send (Lam u (bind1 n b))
-
-lam' :: (Carrier sig m, Member Core sig) => User -> m User -> m User
-lam' u = lam (named' u)
-
-lams :: (Eq a, Foldable t, Carrier sig m, Member Core sig) => t (Named a) -> m a -> m a
-lams names body = foldr lam body names
-
-lams' :: (Foldable t, Carrier sig m, Member Core sig) => t User -> m User -> m User
-lams' names body = foldr lam' body names
-
-unlam :: (Alternative m, Member Core sig, RightModule sig) => a -> Term sig a -> m (Named a, Term sig a)
-unlam n (Term sig) | Just (Lam v b) <- prj sig = pure (Named v n, instantiate (const (pure n)) b)
-unlam _ _                                      = empty
+infixr 1 >>>
 
 unseq :: (Alternative m, Member Core sig) => Term sig a -> m (Term sig a, Term sig a)
 unseq (Term sig) | Just (a :>> b) <- prj sig = pure (a, b)
@@ -136,16 +126,54 @@ unseqs = go
           Just (l, r) -> go l <> go r
           Nothing     -> t :| []
 
+(>>>=) :: (Eq a, Carrier sig m, Member Core sig) => (Named a :<- m a) -> m a -> m a
+Named u n :<- a >>>= b = send (Named u a :>>= abstract1 n b)
+
+infixr 1 >>>=
+
+unbind :: (Alternative m, Member Core sig, RightModule sig) => a -> Term sig a -> m (Named a :<- Term sig a, Term sig a)
+unbind n (Term sig) | Just (Named u a :>>= b) <- prj sig = pure (Named u n :<- a, instantiate1 (pure n) b)
+unbind _ _                                               = empty
+
+unstatement :: (Alternative m, Member Core sig, RightModule sig) => a -> Term sig a -> m (Maybe (Named a) :<- Term sig a, Term sig a)
+unstatement n t = first (first Just) <$> unbind n t <|> first (Nothing :<-) <$> unseq t
+
+do' :: (Eq a, Foldable t, Carrier sig m, Member Core sig) => t (Maybe (Named a) :<- m a) -> m a
+do' bindings = fromMaybe unit (foldr bind Nothing bindings)
+  where bind (n :<- a) v = maybe (a >>>) ((>>>=) . (:<- a)) n <$> v <|> Just a
+
+unstatements :: (Member Core sig, RightModule sig) => Term sig a -> (Stack (Maybe (Named (Either Int a)) :<- Term sig (Either Int a)), Term sig (Either Int a))
+unstatements = unprefix (unstatement . Left) . fmap Right
+
+data a :<- b = a :<- b
+  deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
+
+infix 2 :<-
+
+instance Bifunctor (:<-) where
+  bimap f g (a :<- b) = f a :<- g b
+
+
+lam :: (Eq a, Carrier sig m, Member Core sig) => Named a -> m a -> m a
+lam (Named u n) b = send (Lam (Named u (abstract1 n b)))
+
+lams :: (Eq a, Foldable t, Carrier sig m, Member Core sig) => t (Named a) -> m a -> m a
+lams names body = foldr lam body names
+
+unlam :: (Alternative m, Member Core sig, RightModule sig) => a -> Term sig a -> m (Named a, Term sig a)
+unlam n (Term sig) | Just (Lam b) <- prj sig = pure (n <$ b, instantiate1 (pure n) (namedValue b))
+unlam _ _                                    = empty
+
 ($$) :: (Carrier sig m, Member Core sig) => m a -> m a -> m a
 f $$ a = send (f :$ a)
 
-infixl 9 $$
+infixl 8 $$
 
 -- | Application of a function to a sequence of arguments.
 ($$*) :: (Foldable t, Carrier sig m, Member Core sig) => m a -> t (m a) -> m a
 ($$*) = foldl' ($$)
 
-infixl 9 $$*
+infixl 8 $$*
 
 unapply :: (Alternative m, Member Core sig) => Term sig a -> m (Term sig a, Term sig a)
 unapply (Term sig) | Just (f :$ a) <- prj sig = pure (f, a)
@@ -171,16 +199,13 @@ string = send . String
 load :: (Carrier sig m, Member Core sig) => m a -> m a
 load = send . Load
 
-edge :: (Carrier sig m, Member Core sig) => Edge -> m a -> m a
-edge e b = send (Edge e b)
+record :: (Carrier sig m, Member Core sig) => [(User, m a)] -> m a
+record fs = send (Record fs)
 
-frame :: (Carrier sig m, Member Core sig) => m a
-frame = send Frame
-
-(...) :: (Carrier sig m, Member Core sig) => m a -> m a -> m a
+(...) :: (Carrier sig m, Member Core sig) => m a -> User -> m a
 a ... b = send (a :. b)
 
-infixl 4 ...
+infixl 9 ...
 
 (.=) :: (Carrier sig m, Member Core sig) => m a -> m a -> m a
 a .= b = send (a := b)
