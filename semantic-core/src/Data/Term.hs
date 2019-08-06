@@ -7,7 +7,7 @@ module Data.Term
 ) where
 
 import Control.Effect.Carrier
-import Control.Monad (ap)
+import Control.Monad ((<=<), ap)
 import Control.Monad.Module
 
 data Term sig a
@@ -56,5 +56,4 @@ unTerm (Var _)    = Nothing
 unTerm (Term sig) = Just sig
 
 prjTerm :: Member sub sig => Term sig a -> Maybe (sub (Term sig) a)
-prjTerm (Var _)    = Nothing
-prjTerm (Term sig) = prj sig
+prjTerm = prj <=< unTerm
