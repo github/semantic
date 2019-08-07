@@ -141,6 +141,11 @@ evalScopeGraph
   => (Term syntax Name -> m value)
   -> (Term syntax Name -> m value)
 evalScopeGraph eval term
+  | Var name <- term             = do
+    loc <- ask
+    declLoc <- asks (Map.lookup name)
+    maybe (pure ()) (modify . reference (Ref loc) . Decl name) declLoc
+    eval term
   | Just (Lam b) <- prjTerm term = do
     loc <- ask @Loc
     modify (declare (Decl (namedName b) loc))
@@ -151,3 +156,6 @@ evalScopeGraph eval term
 
 declare :: Decl -> ScopeGraph -> ScopeGraph
 declare decl = ScopeGraph . Map.insertWith (<>) decl mempty . unScopeGraph
+
+reference :: Ref -> Decl -> ScopeGraph -> ScopeGraph
+reference ref decl = ScopeGraph . Map.insertWith (<>) decl (Set.singleton ref) . unScopeGraph
