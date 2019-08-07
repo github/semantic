@@ -18,7 +18,7 @@ import           Control.Effect.State
 import           Control.Monad ((>=>))
 import           Data.Core as Core
 import           Data.File
-import           Data.Foldable (fold)
+import           Data.Foldable (fold, for_)
 import           Data.Function (fix)
 import           Data.List.NonEmpty (nonEmpty)
 import           Data.Loc
@@ -156,6 +156,10 @@ evalScopeGraph eval term
     modify (declare (Decl (namedName b) loc))
     local (Map.insert (namedName b) loc) $
       eval term
+  | Just (Record t) <- prjTerm term = do
+    loc <- ask @Loc
+    for_ t $ \ (k, _) -> modify (declare (Decl k loc))
+    eval term
   | otherwise                       = eval term
 
 
