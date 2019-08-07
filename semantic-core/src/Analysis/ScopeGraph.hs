@@ -4,6 +4,7 @@ module Analysis.ScopeGraph
 , Decl(..)
 , scopeGraph
 , scopeGraphAnalysis
+, evalScopeGraph
 ) where
 
 import           Analysis.Eval
@@ -15,6 +16,7 @@ import           Control.Effect.Fresh
 import           Control.Effect.Reader
 import           Control.Effect.State
 import           Control.Monad ((>=>))
+import           Data.Core as Core
 import           Data.File
 import           Data.Foldable (fold)
 import           Data.Function (fix)
@@ -24,6 +26,7 @@ import qualified Data.Map as Map
 import           Data.Name
 import           Data.Proxy
 import qualified Data.Set as Set
+import           Data.Term
 import           Data.Traversable (for)
 import           Prelude hiding (fail)
 
@@ -127,3 +130,24 @@ scopeGraphAnalysis = Analysis{..}
         _ ... m = pure (Just m)
 
         extendBinding addr ref bindLoc = ScopeGraph (maybe Map.empty (\ bindLoc -> Map.singleton (Decl addr bindLoc) (Set.singleton ref)) bindLoc)
+
+evalScopeGraph
+  :: ( Carrier sig m
+     , Member (Reader (Map.Map Name Loc)) sig
+     , Member (Reader Loc) sig
+     , Member (State ScopeGraph) sig
+     , Member Core syntax
+     )
+  => (Term syntax Name -> m value)
+  -> (Term syntax Name -> m value)
+evalScopeGraph eval term
+  | Just (Lam b) <- prjTerm term = do
+    loc <- ask @Loc
+    modify (declare (Decl (namedName b) loc))
+    local (Map.insert (namedName b) loc) $
+      eval term
+  | otherwise                    = eval term
+
+
+declare :: Decl -> ScopeGraph -> ScopeGraph
+declare decl = ScopeGraph . Map.insertWith (<>) decl mempty . unScopeGraph
