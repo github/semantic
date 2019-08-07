@@ -18,7 +18,7 @@ import           Control.Monad ((>=>))
 import           Data.File
 import           Data.Foldable (fold)
 import           Data.Function (fix)
-import           Data.List.NonEmpty
+import           Data.List.NonEmpty (nonEmpty)
 import           Data.Loc
 import qualified Data.Map as Map
 import           Data.Name
