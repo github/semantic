@@ -8,10 +8,9 @@ import qualified Data.Text as Text
 import Test.Hspec
 
 import qualified Generators as Gen
-import qualified Hedgehog.Gen as Gen
-import           Hedgehog ((===), label)
-import qualified Hedgehog.Range
 import           Hedgehog hiding (Range)
+import qualified Hedgehog.Gen as Gen
+import qualified Hedgehog.Range
 import qualified Test.Tasty as Tasty
 import           Test.Tasty.Hedgehog (testProperty)
 
@@ -25,14 +24,12 @@ prop desc f
 testTree :: Tasty.TestTree
 testTree = Tasty.testGroup "Data.Source"
   [ Tasty.testGroup "sourceLineRanges"
-    [ testProperty "produces 1 more range than there are newlines" $ property $ do
-        source <- forAll (Gen.source (Hedgehog.Range.linear 0 100))
-        label (summarize source)
-        (length (sourceLineRanges source) === length (Text.splitOn "\r\n" (toText source) >>= Text.splitOn "\r" >>= Text.splitOn "\n"))
+    [ prop "produces 1 more range than there are newlines" $ \ source -> do
+        summarize source
+        length (sourceLineRanges source) === length (Text.splitOn "\r\n" (toText source) >>= Text.splitOn "\r" >>= Text.splitOn "\n")
 
-    , testProperty "produces exhaustive ranges" $ property $ do
-        source <- forAll (Gen.source (Hedgehog.Range.linear 0 100))
-        label (summarize source)
+    , prop "produces exhaustive ranges" $ \ source -> do
+        summarize source
         foldMap (`slice` source) (sourceLineRanges source) === source
     ]
 
@@ -72,10 +69,12 @@ testTree = Tasty.testGroup "Data.Source"
     ]
 
   ]
-  where summarize src = case sourceLines src of
-          []  -> "empty"
-          [x] -> if nullSource x then "empty" else "single-line"
-          _   -> "multiple lines"
+  where summarize src = do
+          let lines = sourceLines src
+          -- FIXME: this should be using cover (reverted in 1b427b995), but that leads to flaky tests: hedgehog’s 'cover' implementation fails tests instead of warning, and currently has no equivalent to 'checkCoverage'.
+          classify "empty"          $ nullSource src
+          classify "single-line"    $ length lines == 1
+          classify "multiple lines" $ length lines >  1
 
 spec :: Spec
 spec = do
