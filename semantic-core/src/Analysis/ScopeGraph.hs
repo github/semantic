@@ -141,17 +141,22 @@ evalScopeGraph
   => (Term syntax Name -> m value)
   -> (Term syntax Name -> m value)
 evalScopeGraph eval term
-  | Var name <- term             = do
+  | Var name <- term                = do
     loc <- ask
     declLoc <- asks (Map.lookup name)
     maybe (pure ()) (modify . reference (Ref loc) . Decl name) declLoc
     eval term
-  | Just (Lam b) <- prjTerm term = do
+  | Just (a :>>= _) <- prjTerm term = do
+    loc <- ask @Loc
+    modify (declare (Decl (namedName a) loc))
+    local (Map.insert (namedName a) loc) $
+      eval term
+  | Just (Lam b)    <- prjTerm term = do
     loc <- ask @Loc
     modify (declare (Decl (namedName b) loc))
     local (Map.insert (namedName b) loc) $
       eval term
-  | otherwise                    = eval term
+  | otherwise                       = eval term
 
 
 declare :: Decl -> ScopeGraph -> ScopeGraph
