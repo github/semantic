@@ -147,17 +147,17 @@ evalScopeGraph eval term
     maybe (pure ()) (modify . reference (Ref loc) . Decl name) declLoc
     eval term
   | Just (a :>>= _) <- prjTerm term = do
-    loc <- ask @Loc
+    loc <- ask
     modify (declare (Decl (namedName a) loc))
     local (Map.insert (namedName a) loc) $
       eval term
   | Just (Lam b)    <- prjTerm term = do
-    loc <- ask @Loc
+    loc <- ask
     modify (declare (Decl (namedName b) loc))
     local (Map.insert (namedName b) loc) $
       eval term
   | Just (Record t) <- prjTerm term = do
-    loc <- ask @Loc
+    loc <- ask
     for_ t $ \ (k, _) -> modify (declare (Decl k loc))
     eval term
   | otherwise                       = eval term
