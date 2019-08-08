@@ -58,11 +58,12 @@ testTree = testGroup "Data.Scientific.Exts"
       isLeft (parseScientific ".") @? "Accepted period"
       isLeft (parseScientific "")  @? "Accepted empty string"
   , testProperty "Scientific roundtripping" $ property $ do
-      let range = Range.linear (negate 500000) 20000000
-      sci <- forAll (Gen.integerScientific range)
+      let nrange = Range.linear (negate 500000) 20000000
+          drange = Range.exponential 1 100000000
+      sci <- forAll (Gen.rationalScientific nrange drange)
       classify "negative" $ sci < 0
       classify "small" $ (sci > 0 && sci <= 1)
-      classify "medium" $ (sci > 1 && sci <= 10000000)
-      classify "large" $ sci > 10000000
+      classify "medium" $ (sci > 1 && sci <= 10000)
+      classify "large" $ sci > 10000
       tripping sci (pack . show) parseScientific
   ]
