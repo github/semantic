@@ -3,6 +3,8 @@ module Generators
   ( source
   , integerScientific
   , rationalScientific
+  , floatingScientific
+  , classifyScientific
   ) where
 
 import Hedgehog
@@ -32,3 +34,12 @@ rationalScientific nrange drange = do
     Left (sci, _)  -> pure sci
     Right (sci, _) -> pure sci
 
+floatingScientific :: MonadGen m => Hedgehog.Range Double -> m Scientific
+floatingScientific = fmap Scientific.fromFloatDigits . Gen.double
+
+classifyScientific :: MonadTest m => Scientific -> m ()
+classifyScientific sci = do
+  classify "negative" $ sci < 0
+  classify "small" $ (sci > 0 && sci <= 1)
+  classify "medium" $ (sci > 1 && sci <= 10000)
+  classify "large" $ sci > 10000
