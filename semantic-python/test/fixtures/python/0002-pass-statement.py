@@ -1,0 +1,3 @@
+pass
+
+# assertions: succeeded
