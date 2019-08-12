@@ -16,7 +16,7 @@ import           Control.Effect.Fresh
 import           Control.Effect.Reader
 import           Control.Effect.State
 import           Control.Monad ((>=>))
-import           Data.Core as Core
+import qualified Data.Core as Core
 import           Data.File
 import           Data.Foldable (fold, for_)
 import           Data.Function (fix)
@@ -136,7 +136,7 @@ evalScopeGraph
      , Member (Reader (Map.Map Name Loc)) sig
      , Member (Reader Loc) sig
      , Member (State ScopeGraph) sig
-     , Member Core syntax
+     , Member Core.Core syntax
      )
   => (Term syntax Name -> m value)
   -> (Term syntax Name -> m value)
@@ -146,17 +146,17 @@ evalScopeGraph eval term
     declLoc <- asks (Map.lookup name)
     maybe (pure ()) (modify . reference (Ref loc) . Decl name) declLoc
     eval term
-  | Just (a :>>= _) <- prjTerm term = do
+  | Just (a Core.:>>= _) <- prjTerm term = do
     loc <- ask
     modify (declare (Decl (namedName a) loc))
     local (Map.insert (namedName a) loc) $
       eval term
-  | Just (Lam b)    <- prjTerm term = do
+  | Just (Core.Lam b)    <- prjTerm term = do
     loc <- ask
     modify (declare (Decl (namedName b) loc))
     local (Map.insert (namedName b) loc) $
       eval term
-  | Just (Record t) <- prjTerm term = do
+  | Just (Core.Record t) <- prjTerm term = do
     loc <- ask
     for_ t $ \ (k, _) -> modify (declare (Decl k loc))
     eval term
