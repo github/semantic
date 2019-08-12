@@ -1,0 +1,2 @@
+()
+# assertions: succeeded
