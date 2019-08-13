@@ -1,0 +1,2 @@
+yes = True
+no = False
