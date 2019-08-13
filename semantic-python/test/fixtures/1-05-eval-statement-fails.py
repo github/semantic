@@ -1,3 +1,2 @@
 eval("'We will never support eval.'")
-
-# assertions: failed
+# CHECK-FAILS

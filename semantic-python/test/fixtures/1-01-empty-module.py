@@ -1,1 +1,1 @@
-# assertions: succeeded
+# CHECK-TOPLEVEL: empty

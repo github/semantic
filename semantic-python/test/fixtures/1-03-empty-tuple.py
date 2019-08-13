@@ -1,2 +1,2 @@
 ()
-# assertions: succeeded
+# CHECK-RESULT: has Unit

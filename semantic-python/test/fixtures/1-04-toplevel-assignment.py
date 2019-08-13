@@ -1,4 +1,3 @@
 hello = ()
 goodbye = ()
-
-# assertions: succeeded, in toplevel scope, hello = "world", goodbye = "true"
+# CHECK-TOPLEVEL: length 2; binds "hello"; binds "goodbye"

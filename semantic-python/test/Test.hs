@@ -9,7 +9,7 @@ import           Control.Monad.IO.Class
 import qualified Data.ByteString as ByteString
 import           Data.Core
 import           Data.Foldable
-import           Data.List (isInfixOf)
+import           Data.List (sort, isInfixOf)
 import           Data.Name
 import           Data.Term
 import           GHC.Stack
@@ -35,9 +35,9 @@ assertTranslationSucceeds fp = withFrozenCallStack $ do
     _                -> pure ()
 
 milestoneFixtures :: Tasty.TestTree
-milestoneFixtures = HUnit.testCaseSteps "Fixture group 1" $ \step -> do
+milestoneFixtures = HUnit.testCaseSteps "Bootstrapping" $ \step -> do
   files <- liftIO (listDirectory "semantic-python/test/fixtures")
-  let firstGroup = filter ((== '1') . head) files
+  let firstGroup = sort $ filter ((== '1') . head) files
   for_ firstGroup $ \file -> do
     step file
     assertTranslationSucceeds file

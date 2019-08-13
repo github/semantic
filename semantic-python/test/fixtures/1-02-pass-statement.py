@@ -1,3 +1,2 @@
 pass
-
-# assertions: succeeded
+# CHECK-TOPLEVEL: empty
