@@ -1,4 +1,4 @@
-packages: . semantic-core semantic-python vendor/tree-sitter-python
+packages: . semantic-core semantic-python vendor/haskell-tree-sitter/tree-sitter vendor/haskell-tree-sitter/tree-sitter-python
 
 jobs: $ncpus
 
@@ -11,6 +11,6 @@ source-repository-package
   tag: 83f3352f0c7c94ea091e6087f60692eda9991fae
 
 source-repository-package
-  type: gi
+  type: git
   location: https://github.com/joshvera/proto3-wire.git
   tag: 84664e22f01beb67870368f1f88ada5d0ad01f56
