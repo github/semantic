@@ -1,19 +1,24 @@
-{-# LANGUAGE TypeApplications, DefaultSignatures, DeriveGeneric, FlexibleContexts, FlexibleInstances, RecordWildCards, StandaloneDeriving, TypeOperators #-}
+{-# LANGUAGE DefaultSignatures, DeriveGeneric, FlexibleContexts, FlexibleInstances, RecordWildCards, StandaloneDeriving,
+             TypeApplications, TypeOperators, ScopedTypeVariables, PartialTypeSignatures #-}
 module Language.Python.Core
 ( compile
 ) where
 
+import Prelude hiding (fail)
+
+import           Control.Effect hiding ((:+:))
 import           Control.Monad.Fail
-import Control.Effect hiding ((:+:))
 import           Data.Core as Core
+import           Data.Foldable
+import           Data.List
 import           Data.Name as Name
 import           GHC.Generics
-import           Prelude hiding (fail)
 import qualified TreeSitter.Python.AST as Py
+import qualified Data.Text.Encoding as Text
 
 class Compile py where
   -- FIXME: we should really try not to fail
-  compile :: (Member Core sig, Carrier sig t, MonadFail m) => py -> m (t Name)
+  compile :: (Member Core sig, Carrier sig t, Foldable t, MonadFail m) => py -> m (t Name)
   default compile :: (MonadFail m, Show py) => py -> m (t Name)
   compile = defaultCompile
 
@@ -24,7 +29,21 @@ instance (Compile l, Compile r) => Compile (Either l r) where compile = compileS
 
 instance Compile Py.AssertStatement
 instance Compile Py.Attribute
-instance Compile Py.Assignment
+
+    -- data Assignment
+    --   = Assignment {left :: ExpressionList,
+    --                 right :: (Maybe (Either Assignment (Either AugmentedAssignment (Either ExpressionList Yield)))),
+    --                 type' :: (Maybe Type)}
+
+-- TODO what is this third field here
+instance Compile Py.Assignment where
+  compile (Py.Assignment (Py.ExpressionList [lhs]) (Just rhs) _) = do
+    target <- compile lhs
+    value  <- compile rhs
+    pure (target .= value)
+  compile (Py.Assignment (Py.ExpressionList hs) _ _) = fail ("too many lhs values: " <> show (length hs))
+  compile (Py.Assignment _ Nothing _) = fail "cannot compile assignment with no rhs"
+
 instance Compile Py.AugmentedAssignment
 instance Compile Py.Await
 instance Compile Py.BinaryOperator
@@ -54,6 +73,12 @@ instance Compile Py.ExpressionStatement where
     kids <- traverse compile children
     pure $ do' (fmap (Nothing :<-) kids)
 
+instance Compile Py.ExpressionList where
+  compile (Py.ExpressionList exprs) = do
+    kids <- traverse compile exprs
+    pure $ do' (fmap (Nothing :<-) kids)
+
+
 instance Compile Py.False
 --instance Compile Py.False where compile _ = pure (Bool False)
 
@@ -81,7 +106,8 @@ instance Compile Py.FutureImportStatement
 instance Compile Py.GeneratorExpression
 instance Compile Py.GlobalStatement
 
-instance Compile Py.Identifier
+instance Compile Py.Identifier where
+  compile (Py.Identifier bytes) = pure (pure bytes)
 -- instance Compile Py.Identifier where
 --   compile (Py.Identifier text) = pure (Var (User text))
 
@@ -92,6 +118,9 @@ instance Compile Py.IfStatement
 --     Just clauses -> foldr clause (pure Unit) clauses
 --     where clause (Left  Py.ElifClause{..}) rest = If <$> compile condition <*> compile consequence <*> rest
 --           clause (Right Py.ElseClause{..}) _    = compile body
+
+organizeBindings :: [t Name] -> [(Name, t Name)]
+organizeBindings _ = []
 
 instance Compile Py.ImportFromStatement
 instance Compile Py.ImportStatement
@@ -104,7 +133,8 @@ instance Compile Py.Module where
   compile (Py.Module [])    = pure Core.unit
   compile (Py.Module stmts) = do
     res <- traverse compile stmts
-    pure (do' (fmap (Nothing :<- ) res))
+    let paired = organizeBindings res
+    pure (record paired)
 
 instance Compile Py.NamedExpression
 instance Compile Py.None
@@ -142,11 +172,11 @@ instance Compile Py.WhileStatement
 instance Compile Py.WithStatement
 instance Compile Py.Yield
 
-compileSum :: (Generic py, GCompileSum (Rep py), Member Core sig, Carrier sig t, MonadFail m) => py -> m (t Name)
+compileSum :: (Generic py, GCompileSum (Rep py), Member Core sig, Foldable t, Carrier sig t, MonadFail m) => py -> m (t Name)
 compileSum = gcompileSum . from
 
 class GCompileSum f where
-  gcompileSum :: (Member Core sig, Carrier sig t, MonadFail m) => f a -> m (t Name)
+  gcompileSum :: (Foldable t, Member Core sig, Carrier sig t, MonadFail m) => f a -> m (t Name)
 
 instance GCompileSum f => GCompileSum (M1 D d f) where
   gcompileSum (M1 f) = gcompileSum f
