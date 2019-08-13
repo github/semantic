@@ -1,4 +1,4 @@
 def go():
     start = ()
     def stop():
-        done = stop
+        done = start
