@@ -361,6 +361,7 @@ test-suite test
                      , Data.Functor.Listable
                      , Data.Graph.Spec
                      , Data.Mergeable
+                     , Data.Language.Spec
                      , Data.Range.Spec
                      , Data.Scientific.Spec
                      , Data.Semigroup.App.Spec

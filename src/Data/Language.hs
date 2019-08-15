@@ -14,6 +14,7 @@ module Data.Language
 import           Data.Aeson
 import qualified Data.Languages as Lingo
 import qualified Data.Text as T
+import qualified Data.Map.Strict as Map
 import           Prologue
 import           System.FilePath.Posix
 
@@ -129,7 +130,12 @@ languageForFilePath path = case Lingo.languageName <$> Lingo.languageForPath pat
   _ -> Unknown
 
 supportedExts :: [String]
-supportedExts = [".go", ".py", ".rb", ".js", ".mjs", ".ts", ".php", ".phpt"]
+supportedExts = foldr append mempty supportedLanguages
+  where
+    append (Just l) b = fmap T.unpack (Lingo.languageExtensions l) <> b
+    append Nothing  b = b
+    supportedLanguages = fmap lookup ["Go", "Ruby", "Python", "JavaScript", "TypeScript", "PHP"]
+    lookup k = Map.lookup k Lingo.languages
 
 codeNavLanguages :: [Language]
 codeNavLanguages = [Go, Ruby, Python, JavaScript, TypeScript, PHP]
