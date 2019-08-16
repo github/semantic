@@ -1,5 +1,5 @@
 {-# LANGUAGE DefaultSignatures, DeriveGeneric, FlexibleContexts, FlexibleInstances, RecordWildCards, StandaloneDeriving,
-             TypeApplications, TypeOperators, ScopedTypeVariables, PartialTypeSignatures #-}
+             TypeApplications, TypeOperators, ScopedTypeVariables, PartialTypeSignatures, OverloadedStrings #-}
 module Language.Python.Core
 ( compile
 ) where
@@ -42,7 +42,6 @@ instance Compile Py.Assignment where
     value  <- compile rhs
     pure (target .= value)
   compile (Py.Assignment (Py.ExpressionList hs) _ _) = fail ("too many lhs values: " <> show (length hs))
-  compile (Py.Assignment _ Nothing _) = fail "cannot compile assignment with no rhs"
 
 instance Compile Py.AugmentedAssignment
 instance Compile Py.Await
@@ -119,9 +118,6 @@ instance Compile Py.IfStatement
 --     where clause (Left  Py.ElifClause{..}) rest = If <$> compile condition <*> compile consequence <*> rest
 --           clause (Right Py.ElseClause{..}) _    = compile body
 
-organizeBindings :: [t Name] -> [(Name, t Name)]
-organizeBindings _ = []
-
 instance Compile Py.ImportFromStatement
 instance Compile Py.ImportStatement
 instance Compile Py.Integer
@@ -132,8 +128,8 @@ instance Compile Py.ListComprehension
 instance Compile Py.Module where
   compile (Py.Module stmts) = do
     res <- traverse compile stmts
-    let paired = organizeBindings res
-    pure (record paired)
+    let names = concatMap toList res
+    pure . record $ zip names res
 
 instance Compile Py.NamedExpression
 instance Compile Py.None
