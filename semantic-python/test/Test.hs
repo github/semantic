@@ -1,6 +1,4 @@
-{-# OPTIONS_GHC -Werror #-}
-{-# LANGUAGE FlexibleContexts, FlexibleInstances, OverloadedStrings, RecordWildCards, TypeApplications,
-             TypeOperators #-}
+{-# LANGUAGE TypeOperators #-}
 
 module Main (main) where
 

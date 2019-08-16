@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Directive ( Directive (..)
                  , parseDirective
                  , toProcess

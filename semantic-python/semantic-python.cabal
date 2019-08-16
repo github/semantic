@@ -20,6 +20,20 @@ tested-with:         GHC == 8.6.4
 
 common haskell
   default-language:    Haskell2010
+  default-extensions:  DataKinds
+                     , DeriveFoldable
+                     , DeriveFunctor
+                     , DeriveGeneric
+                     , DeriveTraversable
+                     , FlexibleContexts
+                     , FlexibleInstances
+                     , MonadFailDesugaring
+                     , MultiParamTypeClasses
+                     , OverloadedStrings
+                     , RecordWildCards
+                     , StandaloneDeriving
+                     , StrictData
+                     , TypeApplications
   build-depends:       fused-effects ^>= 0.5.0.0
                      , base ^>=4.12.0.0
                      , semantic-core ^>= 0.0.0.0

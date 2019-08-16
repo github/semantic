@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings, RecordWildCards, TypeOperators #-}
+{-# LANGUAGE TypeOperators #-}
 
 module ScopeDump ( ScopeDump (..), runScopeDump ) where
 

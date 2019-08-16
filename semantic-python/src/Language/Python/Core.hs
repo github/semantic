@@ -1,5 +1,4 @@
-{-# LANGUAGE DefaultSignatures, DeriveGeneric, FlexibleContexts, FlexibleInstances, RecordWildCards, StandaloneDeriving,
-             TypeApplications, TypeOperators, ScopedTypeVariables, PartialTypeSignatures, OverloadedStrings #-}
+{-# LANGUAGE DefaultSignatures, OverloadedStrings, ScopedTypeVariables, TypeOperators #-}
 module Language.Python.Core
 ( compile
 ) where
