@@ -10,11 +10,9 @@ import           Control.Effect hiding ((:+:))
 import           Control.Monad.Fail
 import           Data.Core as Core
 import           Data.Foldable
-import           Data.List
 import           Data.Name as Name
 import           GHC.Generics
 import qualified TreeSitter.Python.AST as Py
-import qualified Data.Text.Encoding as Text
 
 class Compile py where
   -- FIXME: we should really try not to fail
