@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE DeriveAnyClass, GeneralizedNewtypeDeriving, TypeOperators, DerivingStrategies #-}
 
 module Main (main) where
 
@@ -39,26 +39,32 @@ import           System.FilePath
 import qualified TreeSitter.Python as TSP
 import qualified TreeSitter.Python.AST as TSP
 import qualified TreeSitter.Unmarshal as TS
+import qualified Data.Map as Map
 
 import qualified Test.Tasty as Tasty
 import qualified Test.Tasty.HUnit as HUnit
 
 import qualified Directive
-import           ScopeDump
+import           Analysis.ScopeGraph
 
 instance MonadFail (Either String) where fail = Left
 
+dumpScopeGraph :: ScopeGraph -> Aeson.Value
+dumpScopeGraph (ScopeGraph sg) = Aeson.toJSON (go sg) where
+  go = Map.mapKeys declSymbol . fmap (const ())
+
 assertJQExpressionSucceeds :: Directive.Directive -> Term (Ann :+: Core) Name -> HUnit.Assertion
 assertJQExpressionSucceeds directive core = do
-  dump <- case runScopeDump core of
-    Left e  -> HUnit.assertFailure ("Couldn't run scope dumping mechanism; this shouldn't happen (" <> e <> ")")
-    Right d -> pure $ Aeson.encodePretty d
+  bod <- case scopeGraph Eval.eval [File interactive core] of
+    (_heap, [File _ (Right bod)]) -> pure $ dumpScopeGraph bod
+    other -> HUnit.assertFailure "Couldn't run scope dumping mechanism; this shouldn't happen"
 
   let ignore = ByteStream.effects . hoist ByteStream.effects
-      jqPipeline = Streaming.Process.withStreamingProcess (Directive.toProcess directive) (ByteStream.fromLazy dump) ignore
+      sgJSON = ByteStream.fromLazy $ Aeson.encode bod
+      jqPipeline = Streaming.Process.withStreamingProcess (Directive.toProcess directive) sgJSON ignore
       errorMsg = "jq(1) returned non-zero exit code"
       dirMsg    = "jq expression: " <> show directive
-      jsonMsg   = "JSON value: " <> ByteString.Lazy.unpack dump
+      jsonMsg   = "JSON value: " <> ByteString.Lazy.unpack (Aeson.encodePretty bod)
       treeMsg   = "Core expr: " <> showCore (stripAnnotations core)
 
   catch @_ @Streaming.Process.ProcessExitedUnsuccessfully jqPipeline $ \err -> do
