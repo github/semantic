@@ -1,14 +1,15 @@
-{-# LANGUAGE DeriveAnyClass, DeriveGeneric, KindSignatures #-}
+{-# LANGUAGE DeriveAnyClass, DeriveGeneric, KindSignatures, LambdaCase #-}
 module Data.Language
   ( Language (..)
   , SLanguage (..)
   , extensionsForLanguage
-  , parseLanguage
   , knownLanguage
   , languageForFilePath
   , pathIsMinified
   , supportedExts
   , codeNavLanguages
+  , textToLanguage
+  , languageToText
   ) where
 
 import           Data.Aeson
@@ -78,63 +79,25 @@ instance SLanguage 'PHP where
 
 instance FromJSON Language where
   parseJSON = withText "Language" $ \l ->
-    pure $ fromMaybe Unknown (parseLanguage l)
-
-parseLanguage :: Text -> Maybe Language
-parseLanguage l = case T.toLower l of
-  "go"         -> Just Go
-  "haskell"    -> Just Haskell
-  "java"       -> Just Java
-  "javascript" -> Just JavaScript
-  "json"       -> Just JSON
-  "jsx"        -> Just JSX
-  "markdown"   -> Just Markdown
-  "python"     -> Just Python
-  "ruby"       -> Just Ruby
-  "typescript" -> Just TypeScript
-  "php"        -> Just PHP
-  _            -> Nothing
+    pure $ textToLanguage l
 
 -- | Predicate failing on 'Unknown' and passing in all other cases.
 knownLanguage :: Language -> Bool
 knownLanguage = (/= Unknown)
 
 extensionsForLanguage :: Language -> [String]
-extensionsForLanguage language = case language of
-  Go         -> [".go"]
-  Haskell    -> [".hs"]
-  JavaScript -> [".js", ".mjs"]
-  PHP        -> [".php", ".phpt"]
-  Python     -> [".py"]
-  Ruby       -> [".rb"]
-  TypeScript -> [".ts"]
-  TSX        -> [".tsx", ".d.tsx"]
-  JSX        -> [".jsx"]
-  _          -> []
+extensionsForLanguage language = T.unpack <$> maybe mempty Lingo.languageExtensions (Map.lookup (languageToText language) Lingo.languages)
 
 -- | Return a language based on a FilePath's extension.
 languageForFilePath :: FilePath -> Language
-languageForFilePath path = case Lingo.languageName <$> Lingo.languageForPath path of
-  Just "Go" -> Go
-  Just "Haskell" -> Haskell
-  Just "Java" -> Java
-  Just "JavaScript" -> JavaScript
-  Just "JSON" -> JSON
-  Just "JSX" -> JSX
-  Just "Markdown" -> Markdown
-  Just "PHP" -> PHP
-  Just "Python" -> Python
-  Just "Ruby" -> Ruby
-  Just "TSX" -> TSX
-  Just "TypeScript" -> TypeScript
-  _ -> Unknown
+languageForFilePath path = maybe Unknown (textToLanguage . Lingo.languageName) (Lingo.languageForPath path)
 
 supportedExts :: [String]
 supportedExts = foldr append mempty supportedLanguages
   where
     append (Just l) b = fmap T.unpack (Lingo.languageExtensions l) <> b
     append Nothing  b = b
-    supportedLanguages = fmap lookup ["Go", "Ruby", "Python", "JavaScript", "TypeScript", "PHP"]
+    supportedLanguages = fmap lookup (languageToText <$> codeNavLanguages)
     lookup k = Map.lookup k Lingo.languages
 
 codeNavLanguages :: [Language]
@@ -142,3 +105,35 @@ codeNavLanguages = [Go, Ruby, Python, JavaScript, TypeScript, PHP]
 
 pathIsMinified :: FilePath -> Bool
 pathIsMinified = isExtensionOf ".min.js"
+
+languageToText :: Language -> T.Text
+languageToText = \case
+  Unknown -> "Unknown"
+  Go -> "Go"
+  Haskell -> "Haskell"
+  Java -> "Java"
+  JavaScript -> "JavaScript"
+  JSON -> "JSON"
+  JSX -> "JSX"
+  Markdown -> "Markdown"
+  Python -> "Python"
+  Ruby -> "Ruby"
+  TypeScript -> "TypeScript"
+  TSX -> "TSX"
+  PHP -> "PHP"
+
+textToLanguage :: T.Text -> Language
+textToLanguage = \case
+  "Go" -> Go
+  "Haskell" -> Haskell
+  "Java" -> Java
+  "JavaScript" -> JavaScript
+  "JSON" -> JSON
+  "JSX" -> JSX
+  "Markdown" -> Markdown
+  "Python" -> Python
+  "Ruby" -> Ruby
+  "TypeScript" -> TypeScript
+  "TSX" -> TSX
+  "PHP" -> PHP
+  _ -> Unknown
