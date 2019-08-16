@@ -44,7 +44,6 @@ common haskell
 library
   import: haskell
   exposed-modules: Language.Python.Core
-  build-depends: text ^>= 1.2.3.1
   hs-source-dirs: src
   ghc-options:
     -Weverything

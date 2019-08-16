@@ -75,28 +75,26 @@ instance Compile Py.ExpressionList where
     pure $ do' (fmap (Nothing :<-) kids)
 
 
-instance Compile Py.False
---instance Compile Py.False where compile _ = pure (Bool False)
+instance Compile Py.False where compile _ = pure (bool False)
 
 instance Compile Py.Float
 instance Compile Py.ForStatement
 
-instance Compile Py.FunctionDefinition
--- instance Compile Py.FunctionDefinition where
---   compile Py.FunctionDefinition
---     { name       = Py.Identifier name
---     , parameters = Py.Parameters parameters
---     , ..
---     } = do
---       parameters' <- params
---       body' <- compile body
---       pure (Let (User name) := lams parameters' body')
---     where params = case parameters of
---             Nothing -> pure []
---             Just p  -> traverse param [p] -- FIXME: this is wrong in node-types.json, @p@ should already be a list
---           param (Right (Right (Right (Left (Py.Identifier name))))) = pure (User name)
---           param x = unimplemented x
---           unimplemented x = fail $ "unimplemented: " <> show x
+instance Compile Py.FunctionDefinition where
+  compile Py.FunctionDefinition
+    { name       = Py.Identifier name
+    , parameters = Py.Parameters parameters
+    , ..
+    } = do
+      parameters' <- params
+      body' <- compile body
+      pure (pure name .= lams parameters' body')
+    where params = case parameters of
+            Nothing -> pure []
+            Just p  -> traverse param [p] -- FIXME: this is wrong in node-types.json, @p@ should already be a list
+          param (Right (Right (Right (Left (Py.Identifier name))))) = pure (named' name)
+          param x = unimplemented x
+          unimplemented x = fail $ "unimplemented: " <> show x
 
 instance Compile Py.FutureImportStatement
 instance Compile Py.GeneratorExpression
@@ -104,16 +102,12 @@ instance Compile Py.GlobalStatement
 
 instance Compile Py.Identifier where
   compile (Py.Identifier bytes) = pure (pure bytes)
--- instance Compile Py.Identifier where
---   compile (Py.Identifier text) = pure (Var (User text))
 
-instance Compile Py.IfStatement
--- instance Compile Py.IfStatement where
---   compile Py.IfStatement{..} = If <$> compile condition <*> compile consequence <*> case alternative of
---     Nothing      -> pure Unit
---     Just clauses -> foldr clause (pure Unit) clauses
---     where clause (Left  Py.ElifClause{..}) rest = If <$> compile condition <*> compile consequence <*> rest
---           clause (Right Py.ElseClause{..}) _    = compile body
+instance Compile Py.IfStatement where
+  compile Py.IfStatement{..} = if' <$> compile condition <*> compile consequence <*> case alternative of
+    clauses -> foldr clause (pure unit) clauses
+      where clause (Left  Py.ElifClause{..}) rest = if' <$> compile condition <*> compile consequence <*> rest
+            clause (Right Py.ElseClause{..}) _    = compile body
 
 instance Compile Py.ImportFromStatement
 instance Compile Py.ImportStatement
@@ -124,6 +118,8 @@ instance Compile Py.ListComprehension
 
 instance Compile Py.Module where
   compile (Py.Module stmts) = do
+    -- Buggy and ad-hoc: the toList call promotes too many variables
+    -- to top-level scope.
     res <- traverse compile stmts
     let names = concatMap toList res
     pure . record $ zip names res
@@ -150,8 +146,7 @@ instance Compile Py.SimpleStatement where compile = compileSum
 instance Compile Py.String
 instance Compile Py.Subscript
 
-instance Compile Py.True
--- instance Compile Py.True where compile _ = pure (Bool True)
+instance Compile Py.True where compile _ = pure (bool True)
 
 instance Compile Py.TryStatement
 
