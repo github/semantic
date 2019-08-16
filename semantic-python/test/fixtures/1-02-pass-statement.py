@@ -1,2 +1,2 @@
-# CHECK: top is record
+# CHECK-JQ: . == {}
 pass

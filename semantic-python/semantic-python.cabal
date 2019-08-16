@@ -63,6 +63,7 @@ test-suite test
                , exceptions ^>= 0.10.2
                , filepath ^>= 1.4.2.1
                , process ^>= 1.6.5
+               , streaming ^>= 0.2.2
                , streaming-process ^>= 0.1
                , streaming-bytestring ^>= 0.1.6
                , tasty ^>= 1.2.3

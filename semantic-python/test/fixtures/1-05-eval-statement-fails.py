@@ -1,2 +1,2 @@
-eval("'We will never support eval.'")
 # CHECK-FAILS
+eval("'We will never support eval.'")

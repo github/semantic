@@ -130,7 +130,6 @@ instance Compile Py.List
 instance Compile Py.ListComprehension
 
 instance Compile Py.Module where
-  compile (Py.Module [])    = pure Core.unit
   compile (Py.Module stmts) = do
     res <- traverse compile stmts
     let paired = organizeBindings res

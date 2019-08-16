@@ -1,2 +1,2 @@
+# CHECK-JQ: . == {}
 ()
-# CHECK-RESULT: has Unit
