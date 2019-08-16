@@ -1,1 +1,1 @@
-# CHECK-TOPLEVEL: empty
+# CHECK-JQ: . == {}

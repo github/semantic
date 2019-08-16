@@ -26,7 +26,6 @@ data Loc = Loc
   }
   deriving (Eq, Ord, Show)
 
-
 data Span = Span
   { spanStart :: {-# UNPACK #-} !Pos
   , spanEnd   :: {-# UNPACK #-} !Pos

@@ -1,2 +1,2 @@
+# CHECK: top is record
 pass
-# CHECK-TOPLEVEL: empty
