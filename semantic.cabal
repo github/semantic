@@ -73,7 +73,7 @@ common dependencies
                      , unix ^>= 2.7.2.2
                      , proto3-suite
                      , proto3-wire
-                     , lingo
+                     , lingo >= 0.1.0.1
 
 common executable-flags
   ghc-options:         -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m"
