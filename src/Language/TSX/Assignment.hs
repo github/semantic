@@ -429,7 +429,7 @@ jsxAttribute' :: Assignment Term
 jsxAttribute' = jsxAttribute <|> jsxExpression'
 
 jsxOpeningElement' :: Assignment Term
-jsxOpeningElement' = makeTerm <$> symbol Grammar.JsxOpeningElement <*> children (TSX.Syntax.JsxOpeningElement <$> term jsxElementName <*> manyTerm jsxAttribute')
+jsxOpeningElement' = makeTerm <$> symbol Grammar.JsxOpeningElement <*> children (TSX.Syntax.JsxOpeningElement <$> term jsxElementName <*> term (typeArguments' <|> emptyTerm) <*> manyTerm jsxAttribute')
 
 jsxElementName :: Assignment Term
 jsxElementName = choice [ identifier, nestedIdentifier, jsxNamespaceName ]
