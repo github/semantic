@@ -6,6 +6,7 @@
       (JsxElement
         (JsxOpeningElement
           (Identifier)
+          (Empty)
           (JsxAttribute
             (Identifier)
             (JsxExpression
