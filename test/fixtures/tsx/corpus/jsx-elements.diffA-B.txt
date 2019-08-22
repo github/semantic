@@ -6,6 +6,7 @@
       (JsxElement
         (JsxOpeningElement
           (Identifier)
+          (Empty)
         {+(JsxAttribute
           {+(Identifier)+}
           {+(JsxExpression
@@ -31,7 +32,8 @@
       {-(JsxOpeningElement
         {-(NestedIdentifier
           {-(Identifier)-}
-          {-(Identifier)-})-})-}
+          {-(Identifier)-})-}
+        {-(Empty)-})-}
       {-(JsxClosingElement
         {-(NestedIdentifier
           {-(Identifier)-}
