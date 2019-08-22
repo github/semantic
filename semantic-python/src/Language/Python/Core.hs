@@ -27,11 +27,6 @@ instance (Compile l, Compile r) => Compile (Either l r) where compile = compileS
 instance Compile Py.AssertStatement
 instance Compile Py.Attribute
 
-    -- data Assignment
-    --   = Assignment {left :: ExpressionList,
-    --                 right :: (Maybe (Either Assignment (Either AugmentedAssignment (Either ExpressionList Yield)))),
-    --                 type' :: (Maybe Type)}
-
 -- TODO what is this third field here
 instance Compile Py.Assignment where
   compile (Py.Assignment (Py.ExpressionList [lhs]) (Just rhs) _) = do
