@@ -61,13 +61,13 @@ instance Compile Py.Expression where compile = compileSum
 
 instance Compile Py.ExpressionStatement where
   compile (Py.ExpressionStatement children) = do
-    kids <- traverse compile children
-    pure $ do' (fmap (Nothing :<-) kids)
+    actions <- traverse compile children
+    pure $ do' (fmap (Nothing :<-) actions)
 
 instance Compile Py.ExpressionList where
   compile (Py.ExpressionList exprs) = do
-    kids <- traverse compile exprs
-    pure $ do' (fmap (Nothing :<-) kids)
+    actions <- traverse compile exprs
+    pure $ do' (fmap (Nothing :<-) actions)
 
 
 instance Compile Py.False where compile _ = pure (bool False)
