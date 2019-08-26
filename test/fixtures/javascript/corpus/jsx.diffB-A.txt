@@ -1,0 +1,25 @@
+(Statements
+  (Function
+    (Empty)
+    (Empty)
+    (Identifier)
+    (StatementBlock
+      (Return
+        (JsxElement
+          (JsxOpeningElement
+            (Identifier)
+            (Empty))
+          (JsxText)
+          (JsxElement
+            (JsxOpeningElement
+              (Identifier)
+            { (TypeArguments
+              {-(TypeIdentifier)-})
+            ->(Empty) })
+          { (JsxText)
+          ->(JsxText) }
+            (JsxClosingElement
+              (Identifier)))
+          (JsxText)
+          (JsxClosingElement
+            (Identifier)))))))
