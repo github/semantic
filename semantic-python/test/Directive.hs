@@ -10,15 +10,29 @@ import           Data.Coerce
 import           System.Process
 import qualified Text.Trifecta as Trifecta
 
-{- | Directives are parsed from magic comments in test files and describe to the test suite how to query the results of a given test case. A directive that looks like this:
+{- |
+
+Directives are parsed from magic comments in test files and
+describe to the test suite how to query the results of a given test
+case. A directive that looks like this:
 
 @
   # CHECK-JQ: has("mach")
 @
 
-would, after converting the contents of the file to a Core expression, dump that expression to JSON and pipe said JSON to @jq -e 'has("mach")@, which will return an error code unless the passed JSON is a hash containing the @"mach"@ key.
+would, after converting the contents of the file to a Core expression,
+dump that expression to JSON and pipe said JSON to @jq -e
+'has("mach")@, which will return an error code unless the passed JSON
+is a hash containing the @"mach"@ key.
 
-This syntax was inspired by LLVM's [FileCheck](https://llvm.org/docs/CommandGuide/FileCheck.html). This approach is less direct than tests that pattern-match over an AST, but enable us to keep the text of test cases in close proximity to the assertions we want to make, which improves maintainability significantly and has been a successful strategy for the LLVM and Rust projects.
+This syntax was inspired by LLVM's
+[FileCheck](https://llvm.org/docs/CommandGuide/FileCheck.html). This
+approach is less direct than tests that pattern-match over an AST, but
+enable us to keep the text of test cases in close proximity to the
+assertions we want to make, which improves maintainability
+significantly and has been a successful strategy for the LLVM and Rust
+projects.
+
 -}
 data Directive = JQ ByteString -- | @# CHECK-JQ: expr@
                | Fails -- | @# CHECK-FAILS@ fails unless translation fails.
