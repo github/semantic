@@ -3,6 +3,7 @@
 module Main (main) where
 
 import qualified Analysis.Eval as Eval
+import           Analysis.FlowInsensitive
 import           Control.Effect
 import           Control.Effect.Fail
 import           Control.Effect.Fresh
@@ -46,20 +47,19 @@ import qualified Test.Tasty.HUnit as HUnit
 
 import qualified Directive
 import           Analysis.ScopeGraph
+import Instances ()
 
-instance MonadFail (Either String) where fail = Left
-
-dumpScopeGraph :: ScopeGraph -> Aeson.Value
-dumpScopeGraph (ScopeGraph sg) = Aeson.object
-  [ "scope" Aeson..= scopeJSON
-  ] where
-  scopeJSON = Aeson.toJSON . Map.mapKeys declSymbol . fmap (const ()) $ sg
+dumpScopeGraph :: Heap Name ScopeGraph -> ScopeGraph -> Aeson.Value
+dumpScopeGraph h sg = Aeson.object $
+  [ "scope" Aeson..= h
+  , "heap"  Aeson..= sg
+  ]
 
 
 assertJQExpressionSucceeds :: Directive.Directive -> Term (Ann :+: Core) Name -> HUnit.Assertion
 assertJQExpressionSucceeds directive core = do
   bod <- case scopeGraph Eval.eval [File interactive core] of
-    (_heap, [File _ (Right bod)]) -> pure $ dumpScopeGraph bod
+    (heap, [File _ (Right bod)]) -> pure $ dumpScopeGraph heap bod
     other -> HUnit.assertFailure "Couldn't run scope dumping mechanism; this shouldn't happen"
 
   let ignore = ByteStream.effects . hoist ByteStream.effects

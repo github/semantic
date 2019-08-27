@@ -66,6 +66,7 @@ test-suite test
   ghc-options: -threaded
 
   other-modules: Directive
+               , Instances
 
   build-depends: semantic-python == 0.0.0.0
                , aeson ^>= 1.4.4.0
@@ -81,5 +82,6 @@ test-suite test
                , streaming-bytestring ^>= 0.1.6
                , tasty ^>= 1.2.3
                , tasty-hunit ^>= 0.10.0.2
+               , text ^>= 1.2.3
                , trifecta >= 2 && <3
                , unordered-containers ^>= 0.2.10
