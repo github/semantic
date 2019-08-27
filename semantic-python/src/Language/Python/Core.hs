@@ -1,4 +1,4 @@
-{-# LANGUAGE DefaultSignatures, OverloadedStrings, ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE DefaultSignatures, OverloadedStrings, ScopedTypeVariables, NamedFieldPuns, NoRecordWildCards, TypeOperators #-}
 module Language.Python.Core
 ( compile
 ) where
@@ -79,7 +79,7 @@ instance Compile Py.FunctionDefinition where
   compile Py.FunctionDefinition
     { name       = Py.Identifier name
     , parameters = Py.Parameters parameters
-    , ..
+    , body
     } = do
       parameters' <- params
       body' <- compile body
@@ -99,10 +99,12 @@ instance Compile Py.Identifier where
   compile (Py.Identifier bytes) = pure (pure bytes)
 
 instance Compile Py.IfStatement where
-  compile Py.IfStatement{..} = if' <$> compile condition <*> compile consequence <*> case alternative of
-    clauses -> foldr clause (pure unit) clauses
-      where clause (Left  Py.ElifClause{..}) rest = if' <$> compile condition <*> compile consequence <*> rest
-            clause (Right Py.ElseClause{..}) _    = compile body
+  compile Py.IfStatement{ condition, consequence, alternative } =
+    if' <$> compile condition <*> compile consequence <*> foldr clause (pure unit) alternative
+    where clause (Right Py.ElseClause{ body }) _ = compile body
+          clause (Left  Py.ElifClause{ condition, consequence }) rest  =
+            if' <$> compile condition <*> compile consequence <*> rest
+
 
 instance Compile Py.ImportFromStatement
 instance Compile Py.ImportStatement
