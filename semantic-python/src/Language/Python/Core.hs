@@ -28,11 +28,10 @@ instance Compile Py.AssertStatement
 instance Compile Py.Attribute
 
 instance Compile Py.Assignment where
-  compile (Py.Assignment (Py.ExpressionList [lhs]) (Just rhs) _) = do
+  compile (Py.Assignment (Py.ExpressionList [lhs]) (Just rhs) Nothing) = do
     target <- compile lhs
     value  <- compile rhs
     pure (target .= value)
-  compile (Py.Assignment (Py.ExpressionList hs) _ _) = fail ("too many lhs values: " <> show (length hs))
   compile other = fail ("Unhandled assignment case: " <> show other)
 
 instance Compile Py.AugmentedAssignment
