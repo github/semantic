@@ -64,38 +64,7 @@ instance APIConvert Legacy.Span Data.Span where
     fromAPI Legacy.Span {..} = Data.Span <$> (start >>= preview bridging) <*> (end >>= preview bridging)
 
 instance APIBridge T.Text Data.Language where
-  bridging = iso apiLanguageToLanguage languageToApiLanguage where
-    languageToApiLanguage :: Data.Language -> T.Text
-    languageToApiLanguage = \case
-      Data.Unknown -> "Unknown"
-      Data.Go -> "Go"
-      Data.Haskell -> "Haskell"
-      Data.Java -> "Java"
-      Data.JavaScript -> "JavaScript"
-      Data.JSON -> "JSON"
-      Data.JSX -> "JSX"
-      Data.Markdown -> "Markdown"
-      Data.Python -> "Python"
-      Data.Ruby -> "Ruby"
-      Data.TypeScript -> "TypeScript"
-      Data.TSX -> "TSX"
-      Data.PHP -> "PHP"
-
-    apiLanguageToLanguage :: T.Text -> Data.Language
-    apiLanguageToLanguage = \case
-      "Go" -> Data.Go
-      "Haskell" -> Data.Haskell
-      "Java" -> Data.Java
-      "JavaScript" -> Data.JavaScript
-      "JSON" -> Data.JSON
-      "JSX" -> Data.JSX
-      "Markdown" -> Data.Markdown
-      "Python" -> Data.Python
-      "Ruby" -> Data.Ruby
-      "TypeScript" -> Data.TypeScript
-      "TSX" -> Data.TSX
-      "PHP" -> Data.PHP
-      _ -> Data.Unknown
+  bridging = iso Data.textToLanguage Data.languageToText
 
 instance APIBridge API.Blob Data.Blob where
   bridging = iso apiBlobToBlob blobToApiBlob where
