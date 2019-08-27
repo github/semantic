@@ -1,3 +1,3 @@
-# CHECK-JQ: has("hello") and has("goodbye")
+# CHECK-JQ: .scope | has("hello") and has("goodbye")
 hello = ()
 goodbye = ()

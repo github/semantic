@@ -1,1 +1,1 @@
-# CHECK-JQ: . == {}
+# CHECK-JQ: .scope == {}

@@ -50,8 +50,11 @@ import           Analysis.ScopeGraph
 instance MonadFail (Either String) where fail = Left
 
 dumpScopeGraph :: ScopeGraph -> Aeson.Value
-dumpScopeGraph (ScopeGraph sg) = Aeson.toJSON (go sg) where
-  go = Map.mapKeys declSymbol . fmap (const ())
+dumpScopeGraph (ScopeGraph sg) = Aeson.object
+  [ "scope" Aeson..= scopeJSON
+  ] where
+  scopeJSON = Aeson.toJSON . Map.mapKeys declSymbol . fmap (const ()) $ sg
+
 
 assertJQExpressionSucceeds :: Directive.Directive -> Term (Ann :+: Core) Name -> HUnit.Assertion
 assertJQExpressionSucceeds directive core = do
