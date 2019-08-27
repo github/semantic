@@ -83,7 +83,7 @@ assertTranslationSucceeds fp = withFrozenCallStack $ do
     Left err  -> HUnit.assertFailure ("Directive parsing error: " <> err)
 
   result <- TS.parseByteString TSP.tree_sitter_python fileContents
-  let coreResult = fmap (Py.compile @TSP.Module @_ @(Term (Ann :+: Core))) result
+  let coreResult = fmap (Control.Effect.run . runFail . Py.compile @TSP.Module @_ @(Term (Ann :+: Core))) result
   case coreResult of
     Right (Left _) | directive == Directive.Fails -> pure ()
     Right (Right item) -> assertJQExpressionSucceeds directive item

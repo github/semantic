@@ -14,8 +14,6 @@ import           Data.Loc
 import qualified Data.Map as Map
 import           Data.Text (Text)
 
-instance MonadFail (Either String) where fail = Left
-
 instance ToJSON Span where
   toJSON Span{spanStart, spanEnd} = object
     [ "kind"  .= ("span" :: Text)
