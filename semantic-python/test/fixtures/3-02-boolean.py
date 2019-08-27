@@ -1,2 +1,0 @@
-yes = True
-no = False
