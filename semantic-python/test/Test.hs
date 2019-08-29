@@ -73,9 +73,8 @@ assertJQExpressionSucceeds directive core = do
   catch @_ @Streaming.Process.ProcessExitedUnsuccessfully jqPipeline $ \err -> do
     HUnit.assertFailure (unlines [errorMsg, dirMsg, jsonMsg, treeMsg, show err])
 
-
-assertTranslationSucceeds :: HasCallStack => FilePath -> Tasty.TestTree
-assertTranslationSucceeds fp = HUnit.testCaseSteps fp $ \step -> withFrozenCallStack $ do
+fixtureTestTreeForFile :: HasCallStack => FilePath -> Tasty.TestTree
+fixtureTestTreeForFile fp = HUnit.testCaseSteps fp $ \step -> withFrozenCallStack $ do
   fileContents <- ByteString.readFile ("semantic-python/test/fixtures" </> fp)
   directives <- case Directive.parseDirectives fileContents of
     Right dir -> pure dir
@@ -86,17 +85,18 @@ assertTranslationSucceeds fp = HUnit.testCaseSteps fp $ \step -> withFrozenCallS
   for_ directives $ \directive -> do
     step (Directive.describe directive)
     case coreResult of
-      Right (Left _) | directive == Directive.Fails -> pure ()
+      Left err -> HUnit.assertFailure ("Parsing failed: " <> err)
+      Right (Left _)  | directive == Directive.Fails -> pure ()
+      Right (Right _) | directive == Directive.Fails -> HUnit.assertFailure ("Expected translation to fail")
       Right (Right item) -> assertJQExpressionSucceeds directive item
       Right (Left err)   -> HUnit.assertFailure ("Compilation failed: " <> err)
-      Left err           -> HUnit.assertFailure ("Parsing failed: " <> err)
 
 
 milestoneFixtures :: IO Tasty.TestTree
 milestoneFixtures = do
   files <- liftIO (listDirectory "semantic-python/test/fixtures")
   let pythons = sort (filter ("py" `isExtensionOf`) files)
-  pure $ Tasty.testGroup "Translation" (fmap assertTranslationSucceeds pythons)
+  pure $ Tasty.testGroup "Translation" (fmap fixtureTestTreeForFile pythons)
 
 main :: IO ()
 main = do
