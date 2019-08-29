@@ -74,8 +74,8 @@ assertJQExpressionSucceeds directive core = do
     HUnit.assertFailure (unlines [errorMsg, dirMsg, jsonMsg, treeMsg, show err])
 
 
-assertTranslationSucceeds :: HasCallStack => FilePath -> HUnit.Assertion
-assertTranslationSucceeds fp = withFrozenCallStack $ do
+assertTranslationSucceeds :: HasCallStack => FilePath -> Tasty.TestTree
+assertTranslationSucceeds fp = HUnit.testCaseSteps fp $ \step -> withFrozenCallStack $ do
   fileContents <- ByteString.readFile ("semantic-python/test/fixtures" </> fp)
   directives <- case Directive.parseDirectives fileContents of
     Right dir -> pure dir
@@ -83,29 +83,23 @@ assertTranslationSucceeds fp = withFrozenCallStack $ do
 
   result <- TS.parseByteString TSP.tree_sitter_python fileContents
   let coreResult = fmap (Control.Effect.run . runFail . Py.compile @TSP.Module @_ @(Term (Ann :+: Core))) result
-  for_ directives $ \directive -> case coreResult of
-    Right (Left _) | directive == Directive.Fails -> pure ()
-    Right (Right item) -> assertJQExpressionSucceeds directive item
-    Right (Left err)   -> HUnit.assertFailure ("Compilation failed: " <> err)
-    Left err           -> HUnit.assertFailure ("Parsing failed: " <> err)
+  for_ directives $ \directive -> do
+    step (Directive.describe directive)
+    case coreResult of
+      Right (Left _) | directive == Directive.Fails -> pure ()
+      Right (Right item) -> assertJQExpressionSucceeds directive item
+      Right (Left err)   -> HUnit.assertFailure ("Compilation failed: " <> err)
+      Left err           -> HUnit.assertFailure ("Parsing failed: " <> err)
 
 
-milestoneFixtures :: Tasty.TestTree
-milestoneFixtures = HUnit.testCaseSteps "Bootstrapping" $ \step -> do
+milestoneFixtures :: IO Tasty.TestTree
+milestoneFixtures = do
   files <- liftIO (listDirectory "semantic-python/test/fixtures")
-  let pyFiles = filter (isExtensionOf ".py") files
-  for_ pyFiles $ \file -> do
-    step file
-    assertTranslationSucceeds file
-
-
-tests :: Tasty.TestTree
-tests = Tasty.testGroup "Fixtures"
-  [ milestoneFixtures
-  ]
+  let pythons = sort (filter ("py" `isExtensionOf`) files)
+  pure $ Tasty.testGroup "Translation" (fmap assertTranslationSucceeds pythons)
 
 main :: IO ()
 main = do
   jq <- findExecutable "jq"
   when (isNothing jq) (die "Error: jq(1) not found in $PATH.")
-  Tasty.defaultMain tests
+  milestoneFixtures >>= Tasty.defaultMain

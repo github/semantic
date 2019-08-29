@@ -1,5 +1,6 @@
 module Directive ( Directive (..)
                  , parseDirectives
+                 , describe
                  , toProcess
                  ) where
 
@@ -38,6 +39,10 @@ projects.
 data Directive = JQ ByteString -- | @# CHECK-JQ: expr@
                | Fails -- | @# CHECK-FAILS@ fails unless translation fails.
                  deriving (Eq, Show)
+
+describe :: Directive -> String
+describe Fails = "<expect failure>"
+describe (JQ b) = ByteString.unpack b
 
 fails :: Trifecta.Parser Directive
 fails = Fails <$ Trifecta.string "# CHECK-FAILS"
