@@ -77,14 +77,13 @@ assertJQExpressionSucceeds directive core = do
 assertTranslationSucceeds :: HasCallStack => FilePath -> HUnit.Assertion
 assertTranslationSucceeds fp = withFrozenCallStack $ do
   fileContents <- ByteString.readFile ("semantic-python/test/fixtures" </> fp)
-  let first = ByteString.takeWhile (/= '\n') fileContents
-  directive <- case Directive.parseDirective first of
+  directives <- case Directive.parseDirectives fileContents of
     Right dir -> pure dir
     Left err  -> HUnit.assertFailure ("Directive parsing error: " <> err)
 
   result <- TS.parseByteString TSP.tree_sitter_python fileContents
   let coreResult = fmap (Control.Effect.run . runFail . Py.compile @TSP.Module @_ @(Term (Ann :+: Core))) result
-  case coreResult of
+  for_ directives $ \directive -> case coreResult of
     Right (Left _) | directive == Directive.Fails -> pure ()
     Right (Right item) -> assertJQExpressionSucceeds directive item
     Right (Left err)   -> HUnit.assertFailure ("Compilation failed: " <> err)
@@ -94,8 +93,8 @@ assertTranslationSucceeds fp = withFrozenCallStack $ do
 milestoneFixtures :: Tasty.TestTree
 milestoneFixtures = HUnit.testCaseSteps "Bootstrapping" $ \step -> do
   files <- liftIO (listDirectory "semantic-python/test/fixtures")
-  let firstGroup = sort $ filter ((== '1') . head) files
-  for_ firstGroup $ \file -> do
+  let pyFiles = filter (isExtensionOf ".py") files
+  for_ pyFiles $ \file -> do
     step file
     assertTranslationSucceeds file
 

@@ -1,11 +1,12 @@
 module Directive ( Directive (..)
-                 , parseDirective
+                 , parseDirectives
                  , toProcess
                  ) where
 
 import           Control.Applicative
 import           Data.ByteString.Char8 (ByteString)
 import qualified Data.ByteString.Char8 as ByteString
+import           Data.List.NonEmpty (NonEmpty)
 import           Data.Coerce
 import           System.Process
 import qualified Text.Trifecta as Trifecta
@@ -49,9 +50,12 @@ jq = do
 directive :: Trifecta.Parser Directive
 directive = fails <|> jq
 
-parseDirective :: ByteString -> Either String Directive
-parseDirective = Trifecta.foldResult (Left . show) Right
-               . Trifecta.parseByteString (directive <* Trifecta.eof) mempty
+toplevel :: Trifecta.Parser (NonEmpty Directive)
+toplevel = directive `Trifecta.sepEndByNonEmpty` Trifecta.char '\n'
+
+parseDirectives :: ByteString -> Either String (NonEmpty Directive)
+parseDirectives = Trifecta.foldResult (Left . show) Right
+                . Trifecta.parseByteString toplevel mempty
 
 toProcess :: Directive -> CreateProcess
 toProcess (JQ d) = proc "jq" ["-e", ByteString.unpack d]
