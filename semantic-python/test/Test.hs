@@ -6,11 +6,8 @@ import qualified Analysis.Eval as Eval
 import           Analysis.FlowInsensitive
 import           Control.Effect
 import           Control.Effect.Fail
-import           Control.Effect.Fresh
-import           Control.Effect.Reader
 import           Control.Monad hiding (fail)
 import           Control.Monad.Catch
-import           Control.Monad.Fail
 import           Control.Monad.IO.Class
 import qualified Data.Aeson as Aeson
 import qualified Data.Aeson.Encode.Pretty as Aeson
@@ -22,9 +19,7 @@ import           Data.Core.Pretty
 import           Data.File
 import           Data.Foldable
 import           Data.Function
-import           Data.HashMap.Strict (HashMap)
-import qualified Data.HashMap.Strict as HashMap
-import           Data.List (isInfixOf, sort)
+import           Data.List (sort)
 import           Data.Loc
 import           Data.Maybe
 import           Data.Name
@@ -40,7 +35,6 @@ import           System.FilePath
 import qualified TreeSitter.Python as TSP
 import qualified TreeSitter.Python.AST as TSP
 import qualified TreeSitter.Unmarshal as TS
-import qualified Data.Map as Map
 
 import qualified Test.Tasty as Tasty
 import qualified Test.Tasty.HUnit as HUnit
@@ -60,7 +54,7 @@ assertJQExpressionSucceeds :: Directive.Directive -> Term (Ann :+: Core) Name ->
 assertJQExpressionSucceeds directive core = do
   bod <- case scopeGraph Eval.eval [File interactive core] of
     (heap, [File _ (Right bod)]) -> pure $ dumpScopeGraph heap bod
-    other -> HUnit.assertFailure "Couldn't run scope dumping mechanism; this shouldn't happen"
+    _other -> HUnit.assertFailure "Couldn't run scope dumping mechanism; this shouldn't happen"
 
   let ignore = ByteStream.effects . hoist ByteStream.effects
       sgJSON = ByteStream.fromLazy $ Aeson.encode bod
