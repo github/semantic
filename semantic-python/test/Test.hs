@@ -39,9 +39,9 @@ import qualified TreeSitter.Unmarshal as TS
 import qualified Test.Tasty as Tasty
 import qualified Test.Tasty.HUnit as HUnit
 
-import qualified Directive
 import           Analysis.ScopeGraph
-import Instances ()
+import qualified Directive
+import           Instances ()
 
 dumpScopeGraph :: Heap Name ScopeGraph -> ScopeGraph -> Aeson.Value
 dumpScopeGraph h sg = Aeson.object $
@@ -54,7 +54,7 @@ assertJQExpressionSucceeds :: Directive.Directive -> Term (Ann :+: Core) Name ->
 assertJQExpressionSucceeds directive core = do
   bod <- case scopeGraph Eval.eval [File interactive core] of
     (heap, [File _ (Right bod)]) -> pure $ dumpScopeGraph heap bod
-    _other -> HUnit.assertFailure "Couldn't run scope dumping mechanism; this shouldn't happen"
+    _other                       -> HUnit.assertFailure "Couldn't run scope dumping mechanism; this shouldn't happen"
 
   let ignore = ByteStream.effects . hoist ByteStream.effects
       sgJSON = ByteStream.fromLazy $ Aeson.encode bod
@@ -79,9 +79,9 @@ fixtureTestTreeForFile fp = HUnit.testCaseSteps fp $ \step -> withFrozenCallStac
   for_ directives $ \directive -> do
     step (Directive.describe directive)
     case coreResult of
-      Left err -> HUnit.assertFailure ("Parsing failed: " <> err)
-      Right (Left _)  | directive == Directive.Fails -> pure ()
-      Right (Right _) | directive == Directive.Fails -> HUnit.assertFailure ("Expected translation to fail")
+      Left err           -> HUnit.assertFailure ("Parsing failed: " <> err)
+      Right (Left _)     | directive == Directive.Fails -> pure ()
+      Right (Right _)    | directive == Directive.Fails -> HUnit.assertFailure ("Expected translation to fail")
       Right (Right item) -> assertJQExpressionSucceeds directive item
       Right (Left err)   -> HUnit.assertFailure ("Compilation failed: " <> err)
 
