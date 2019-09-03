@@ -1,4 +1,4 @@
-{-# LANGUAGE DefaultSignatures, OverloadedStrings, ScopedTypeVariables, NamedFieldPuns, NoRecordWildCards, TypeOperators #-}
+{-# LANGUAGE DefaultSignatures, DisambiguateRecordFields, FlexibleContexts, FlexibleInstances, OverloadedStrings, ScopedTypeVariables, NamedFieldPuns, TypeOperators #-}
 module Language.Python.Core
 ( compile
 ) where

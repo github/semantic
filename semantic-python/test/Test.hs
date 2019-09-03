@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, GeneralizedNewtypeDeriving, TypeOperators, DerivingStrategies #-}
+{-# LANGUAGE DeriveAnyClass, DerivingStrategies, GeneralizedNewtypeDeriving, OverloadedStrings, TypeApplications, TypeOperators #-}
 
 module Main (main) where
 
