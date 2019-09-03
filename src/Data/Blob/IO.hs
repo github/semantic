@@ -38,7 +38,7 @@ readBlobsFromDir :: MonadIO m => FilePath -> m [Blob]
 readBlobsFromDir path = liftIO . fmap catMaybes $
   findFilesInDir path supportedExts mempty >>= Async.mapConcurrently (readBlobFromFile . fileForPath)
 
--- | Read all blobs from the Git repo with Language.supportedExts
+-- | Read all blobs from a git repo
 readBlobsFromGitRepo :: MonadIO m => FilePath -> Git.OID -> [FilePath] -> [FilePath] -> m [Blob]
 readBlobsFromGitRepo path oid excludePaths includePaths = liftIO . fmap catMaybes $
   Git.lsTree path oid >>= Async.mapConcurrently (blobFromTreeEntry path)
