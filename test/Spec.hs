@@ -14,6 +14,7 @@ import qualified Data.Abstract.Name.Spec
 import qualified Data.Abstract.Path.Spec
 import qualified Data.Functor.Classes.Generic.Spec
 import qualified Data.Graph.Spec
+import qualified Data.Language.Spec
 import qualified Data.Range.Spec
 import qualified Data.Scientific.Spec
 import qualified Data.Semigroup.App.Spec
@@ -46,6 +47,7 @@ tests :: (?session :: TaskSession) => [TestTree]
 tests =
   [ Integration.Spec.testTree
   , Semantic.CLI.Spec.testTree
+  , Data.Language.Spec.testTree
   , Data.Source.Spec.testTree
   , Semantic.Stat.Spec.testTree
   , Data.Scientific.Spec.testTree

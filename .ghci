@@ -1,6 +1,3 @@
--- Load the pretty-show & hscolour packages for use with :pretty.
-:set -package pretty-show -package hscolour
-
 -- See docs/💡ProTip!.md
 :def! pretty \ _ -> return ":set -interactive-print Semantic.Util.Pretty.prettyShow"
 :def! no-pretty \_ -> return ":set -interactive-print System.IO.print"
