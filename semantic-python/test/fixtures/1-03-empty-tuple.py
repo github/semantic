@@ -1,2 +1,2 @@
-# CHECK-JQ: .scope == {}
+# CHECK-JQ: .scope == {} and .tree.contents == []
 ()

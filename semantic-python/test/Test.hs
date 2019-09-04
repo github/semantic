@@ -3,7 +3,6 @@
 module Main (main) where
 
 import qualified Analysis.Eval as Eval
-import           Analysis.FlowInsensitive
 import           Control.Effect
 import           Control.Effect.Fail
 import           Control.Monad hiding (fail)
@@ -43,17 +42,14 @@ import           Analysis.ScopeGraph
 import qualified Directive
 import           Instances ()
 
-dumpScopeGraph :: Heap Name ScopeGraph -> ScopeGraph -> Aeson.Value
-dumpScopeGraph h sg = Aeson.object $
-  [ "scope" Aeson..= h
-  , "heap"  Aeson..= sg
-  ]
-
-
 assertJQExpressionSucceeds :: Directive.Directive -> Term (Ann :+: Core) Name -> HUnit.Assertion
 assertJQExpressionSucceeds directive core = do
   bod <- case scopeGraph Eval.eval [File interactive core] of
-    (heap, [File _ (Right bod)]) -> pure $ dumpScopeGraph heap bod
+    (heap, [File _ (Right result)]) -> pure $ Aeson.object
+      [ "scope" Aeson..= heap
+      , "heap"  Aeson..= result
+      , "tree"  Aeson..= Aeson.toJSON1 core
+      ]
     _other                       -> HUnit.assertFailure "Couldn't run scope dumping mechanism; this shouldn't happen"
 
   let ignore = ByteStream.effects . hoist ByteStream.effects
