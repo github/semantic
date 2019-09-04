@@ -50,6 +50,7 @@ tests =
   , Data.Language.Spec.testTree
   , Data.Source.Spec.testTree
   , Semantic.Stat.Spec.testTree
+  , Data.Scientific.Spec.testTree
   ]
 
 -- We can't bring this out of the IO monad until we divest
@@ -81,7 +82,6 @@ legacySpecs = parallel $ do
   describe "Data.Abstract.Name" Data.Abstract.Name.Spec.spec
   describe "Data.Functor.Classes.Generic" Data.Functor.Classes.Generic.Spec.spec
   describe "Data.Range" Data.Range.Spec.spec
-  describe "Data.Scientific" Data.Scientific.Spec.spec
   describe "Data.Semigroup.App" Data.Semigroup.App.Spec.spec
   describe "Data.Source" Data.Source.Spec.spec
   describe "Data.Term" Data.Term.Spec.spec
