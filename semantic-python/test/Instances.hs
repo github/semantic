@@ -68,6 +68,9 @@ instance (ToJSON1 (f k), ToJSON1 (g k)) => ToJSON1 ((:+:) f g k) where
   liftToJSON f g (L h) = liftToJSON f g h
   liftToJSON f g (R h) = liftToJSON f g h
 
+  liftToEncoding f g (L h) = liftToEncoding f g h
+  liftToEncoding f g (R h) = liftToEncoding f g h
+
 instance (ToJSON1 f) => ToJSON1 (Ann f) where
   liftToJSON f g (Ann loc term) =
     let
