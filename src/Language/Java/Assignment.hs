@@ -452,7 +452,7 @@ throw :: Assignment Term
 throw = makeTerm <$> symbol ThrowStatement <*> children (Statement.Throw <$> term expression)
 
 try :: Assignment Term
-try = (symbol TryStatement *> children tryWithResources) <|> standardTry
+try = symbol TryStatement *> children tryWithResources <|> standardTry
 
 standardTry :: Assignment Term
 standardTry = makeTerm <$> symbol TryStatement <*> children (Statement.Try <$> term expression <*> (append <$> optional catches <*> optional finally))
