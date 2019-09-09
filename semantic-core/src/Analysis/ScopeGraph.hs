@@ -1,6 +1,7 @@
 {-# LANGUAGE FlexibleContexts, OverloadedStrings, RankNTypes, RecordWildCards, TypeApplications, TypeOperators #-}
 module Analysis.ScopeGraph
 ( ScopeGraph(..)
+, Ref (..)
 , Decl(..)
 , scopeGraph
 , scopeGraphAnalysis
