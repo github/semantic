@@ -1,4 +1,4 @@
-packages: . semantic-core semantic-python vendor/haskell-tree-sitter/tree-sitter vendor/haskell-tree-sitter/tree-sitter-python
+packages: . semantic-core semantic-python
 
 jobs: $ncpus
 
