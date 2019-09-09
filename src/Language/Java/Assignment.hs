@@ -452,16 +452,19 @@ throw :: Assignment Term
 throw = makeTerm <$> symbol ThrowStatement <*> children (Statement.Throw <$> term expression)
 
 try :: Assignment Term
-try = symbol TryStatement *> children tryWithResources <|> makeTerm <$> symbol TryStatement <*> children (Statement.Try <$> term expression <*> (append <$> optional catches <*> optional finally))
+try = symbol TryStatement *> children tryWithResources <|> standardTry
+
+standardTry :: Assignment Term
+standardTry = makeTerm <$> symbol TryStatement <*> children (Statement.Try <$> term expression <*> (append <$> optional catches <*> optional finally))
 
 catches :: Assignment [Term]
 catches = symbol Catches *> children (manyTerm catch)
   where
-    catch = makeTerm <$> symbol CatchClause <*> children (Statement.Catch <$> catchFormalParameter <*> term expression)
+    catch = makeTerm <$> symbol CatchClause <*> children (Statement.Catch <$> catchFormalParameter <*> block)
     catchFormalParameter = makeTerm <$> symbol CatchFormalParameter <*> children (flip Type.Annotation <$> catchType <* symbol VariableDeclaratorId <*> children identifier)
 
 catchType :: Assignment Term
-catchType = makeTerm <$> symbol CatchType <*> (Java.Syntax.CatchType <$> many type')
+catchType = makeTerm <$> symbol CatchType <*> children (Java.Syntax.CatchType <$> many type')
 
 finally :: Assignment Term
 finally = makeTerm <$> symbol Finally <*> children (Statement.Finally <$> term expression)
