@@ -1,4 +1,4 @@
-packages: . semantic-core semantic-python
+packages: . semantic-ast semantic-core semantic-python
 
 jobs: $ncpus
 
