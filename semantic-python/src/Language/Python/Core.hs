@@ -68,7 +68,9 @@ instance Compile Py.Call
 instance Compile Py.ClassDefinition
 instance Compile Py.ComparisonOperator
 
-instance Compile Py.CompoundStatement where compile = compileSum
+instance Compile Py.CompoundStatement where
+  compile = compileSum
+  compileCC = compileCCSum
 
 instance Compile Py.ConcatenatedString
 instance Compile Py.ConditionalExpression
@@ -127,6 +129,12 @@ instance Compile Py.IfStatement where
     where clause (Right Py.ElseClause{ body }) _ = compile body
           clause (Left  Py.ElifClause{ condition, consequence }) rest  =
             if' <$> compile condition <*> compile consequence <*> rest
+
+  compileCC Py.IfStatement{ condition, consequence, alternative} cc =
+    if' <$> compile condition <*> compileCC consequence cc <*> foldr clause cc alternative
+    where clause (Right Py.ElseClause{ body }) _ = compileCC body cc
+          clause (Left  Py.ElifClause{ condition, consequence }) rest  =
+            if' <$> compile condition <*> compileCC consequence cc <*> rest
 
 
 instance Compile Py.ImportFromStatement
