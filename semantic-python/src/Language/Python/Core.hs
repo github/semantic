@@ -1,4 +1,6 @@
-{-# LANGUAGE DefaultSignatures, DisambiguateRecordFields, FlexibleContexts, FlexibleInstances, OverloadedStrings, ScopedTypeVariables, NamedFieldPuns, TypeOperators #-}
+{-# LANGUAGE DefaultSignatures, DeriveAnyClass, DerivingStrategies, DerivingVia, DisambiguateRecordFields,
+             FlexibleContexts, FlexibleInstances, NamedFieldPuns, OverloadedStrings, ScopedTypeVariables,
+             StandaloneDeriving, TypeOperators, UndecidableInstances, DeriveGeneric #-}
 module Language.Python.Core
 ( compile
 ) where
@@ -38,9 +40,13 @@ none = unit
 defaultCompile :: (MonadFail m, Show py) => py -> m (t Name)
 defaultCompile t = fail $ "compilation unimplemented for " <> show t
 
-instance (Compile l, Compile r) => Compile (Either l r) where
-  compile = compileSum
-  compileCC = compileCCSum
+newtype CompileSum py = CompileSum py
+
+instance (Generic py, GCompileSum (Rep py)) => Compile (CompileSum py) where
+  compile (CompileSum a) = compileSum a
+  compileCC (CompileSum a) cc = compileCCSum a cc
+
+deriving via CompileSum (Either l r) instance (Compile l, Compile r) => Compile (Either l r)
 
 instance Compile Py.AssertStatement
 instance Compile Py.Attribute
@@ -68,9 +74,7 @@ instance Compile Py.Call
 instance Compile Py.ClassDefinition
 instance Compile Py.ComparisonOperator
 
-instance Compile Py.CompoundStatement where
-  compile = compileSum
-  compileCC = compileCCSum
+deriving via CompileSum Py.CompoundStatement instance Compile Py.CompoundStatement
 
 instance Compile Py.ConcatenatedString
 instance Compile Py.ConditionalExpression
@@ -82,7 +86,7 @@ instance Compile Py.DictionaryComprehension
 instance Compile Py.Ellipsis
 instance Compile Py.ExecStatement
 
-instance Compile Py.Expression where compile = compileSum
+deriving via CompileSum Py.Expression instance Compile Py.Expression
 
 instance Compile Py.ExpressionStatement where
   compile (Py.ExpressionStatement children) = do
@@ -113,7 +117,7 @@ instance Compile Py.FunctionDefinition where
             Nothing -> pure []
             Just p  -> traverse param [p] -- FIXME: this is wrong in node-types.json, @p@ should already be a list
           param (Right (Right (Right (Left (Py.Identifier name))))) = pure (named' name)
-          param x = unimplemented x
+          param x                                                   = unimplemented x
           unimplemented x = fail $ "unimplemented: " <> show x
 
 instance Compile Py.FutureImportStatement
@@ -161,7 +165,7 @@ instance Compile Py.ParenthesizedExpression
 instance Compile Py.PassStatement where
   compile (Py.PassStatement _) = pure Core.unit
 
-instance Compile Py.PrimaryExpression where compile = compileSum
+deriving via CompileSum Py.PrimaryExpression instance Compile Py.PrimaryExpression
 
 instance Compile Py.PrintStatement
 
@@ -177,9 +181,7 @@ instance Compile Py.RaiseStatement
 instance Compile Py.Set
 instance Compile Py.SetComprehension
 
-instance Compile Py.SimpleStatement where
-  compile = compileSum
-  compileCC = compileCCSum
+deriving via CompileSum Py.SimpleStatement instance Compile Py.SimpleStatement
 
 instance Compile Py.String
 instance Compile Py.Subscript
