@@ -65,7 +65,8 @@ instance Compile Py.BinaryOperator
 instance Compile Py.Block where
   compile t = compileCC t (pure none)
 
-  -- BUG: working around https://github.com/tree-sitter/haskell-tree-sitter/issues/195
+  -- The call to 'reverse' works around https://github.com/tree-sitter/haskell-tree-sitter/issues/195
+  -- This will be obviated when we upgrade to tree-sitter-python 0.3
   compileCC (Py.Block body) cc = foldr compileCC cc (reverse body)
 
 instance Compile Py.BooleanOperator
