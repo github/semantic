@@ -16,13 +16,31 @@ import qualified TreeSitter.Python.AST as Py
 class Compile py where
   -- FIXME: we should really try not to fail
   compile :: (Member Core sig, Carrier sig t, Foldable t, MonadFail m) => py -> m (t Name)
+
   default compile :: (MonadFail m, Show py) => py -> m (t Name)
   compile = defaultCompile
+
+  compileCC :: (Member Core sig, Carrier sig t, Foldable t, MonadFail m) => py -> m (t Name) -> m (t Name)
+
+  default compileCC :: ( Member Core sig
+                       , Carrier sig t
+                       , Foldable t
+                       , MonadFail m
+                       )
+                    => py -> m (t Name) -> m (t Name)
+  compileCC py cc = (>>>) <$> compile py <*> cc
+
+-- | TODO: This is not right, it should be a reference to a Preluded
+-- NoneType instance, but it will do for now.
+none :: (Member Core sig, Carrier sig t) => t Name
+none = unit
 
 defaultCompile :: (MonadFail m, Show py) => py -> m (t Name)
 defaultCompile t = fail $ "compilation unimplemented for " <> show t
 
-instance (Compile l, Compile r) => Compile (Either l r) where compile = compileSum
+instance (Compile l, Compile r) => Compile (Either l r) where
+  compile = compileSum
+  compileCC = compileCCSum
 
 instance Compile Py.AssertStatement
 instance Compile Py.Attribute
@@ -37,7 +55,12 @@ instance Compile Py.Assignment where
 instance Compile Py.AugmentedAssignment
 instance Compile Py.Await
 instance Compile Py.BinaryOperator
-instance Compile Py.Block
+
+instance Compile Py.Block where
+  compile t = compileCC t (pure none)
+
+  compileCC (Py.Block body) cc = foldr compileCC cc body
+
 instance Compile Py.BooleanOperator
 instance Compile Py.BreakStatement
 instance Compile Py.Call
@@ -132,12 +155,22 @@ instance Compile Py.PassStatement where
 instance Compile Py.PrimaryExpression where compile = compileSum
 
 instance Compile Py.PrintStatement
-instance Compile Py.ReturnStatement
+
+instance Compile Py.ReturnStatement where
+  compile (Py.ReturnStatement [])    = pure none
+  compile (Py.ReturnStatement [val]) = compile val
+  compile (Py.ReturnStatement vals)  = fail ("unimplemented: return statement returning " <> show (length vals) <> " values")
+
+  compileCC r _ = compile r
+
+
 instance Compile Py.RaiseStatement
 instance Compile Py.Set
 instance Compile Py.SetComprehension
 
-instance Compile Py.SimpleStatement where compile = compileSum
+instance Compile Py.SimpleStatement where
+  compile = compileSum
+  compileCC = compileCCSum
 
 instance Compile Py.String
 instance Compile Py.Subscript
@@ -158,15 +191,25 @@ instance Compile Py.Yield
 compileSum :: (Generic py, GCompileSum (Rep py), Member Core sig, Foldable t, Carrier sig t, MonadFail m) => py -> m (t Name)
 compileSum = gcompileSum . from
 
+compileCCSum :: (Generic py, GCompileSum (Rep py), Member Core sig, Foldable t, Carrier sig t, MonadFail m) => py -> m (t Name) -> m (t Name)
+compileCCSum = gcompileCCSum . from
+
 class GCompileSum f where
   gcompileSum :: (Foldable t, Member Core sig, Carrier sig t, MonadFail m) => f a -> m (t Name)
 
+  gcompileCCSum :: (Foldable t, Member Core sig, Carrier sig t, MonadFail m) => f a -> m (t Name) -> m (t Name)
+
 instance GCompileSum f => GCompileSum (M1 D d f) where
   gcompileSum (M1 f) = gcompileSum f
+  gcompileCCSum (M1 f) = gcompileCCSum f
 
 instance (GCompileSum l, GCompileSum r) => GCompileSum (l :+: r) where
   gcompileSum (L1 l) = gcompileSum l
   gcompileSum (R1 r) = gcompileSum r
 
+  gcompileCCSum (L1 l) = gcompileCCSum l
+  gcompileCCSum (R1 r) = gcompileCCSum r
+
 instance Compile t => GCompileSum (M1 C c (M1 S s (K1 R t))) where
   gcompileSum (M1 (M1 (K1 t))) = compile t
+  gcompileCCSum (M1 (M1 (K1 t))) = compileCC t
