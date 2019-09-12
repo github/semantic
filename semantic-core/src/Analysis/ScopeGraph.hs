@@ -196,6 +196,11 @@ evalScopeGraph eval term
     loc <- ask
     for_ t $ \ (k, _) -> modify (declare (Decl k loc))
     eval term
+  -- | Just (a Core.:. b)   <- prjTerm term = do
+  --   loc <- ask
+  --   -- FIXME: evaluate @a@ to a value mapping names to decls
+  --   modify (reference (Ref loc) (Decl b _))
+  --   eval term
   | otherwise                       = eval term
 
 -- FIXME: should the scope graph be represented as an alga-style graph with vertices in Ref + Decl?
