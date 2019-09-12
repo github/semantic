@@ -198,6 +198,8 @@ evalScopeGraph eval term
     eval term
   | otherwise                       = eval term
 
+-- FIXME: should the scope graph be represented as an alga-style graph with vertices in Ref + Decl?
+
 
 declare :: Decl -> ScopeGraph -> ScopeGraph
 declare decl = ScopeGraph . Map.insertWith (<>) decl mempty . unScopeGraph
