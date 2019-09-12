@@ -1,0 +1,38 @@
+#!/bin/bash
+# Usage: script/profile FILE_A FILE_B
+# Builds and runs semantic on the given files with profiling enabled.
+
+set -e
+
+HEAD_SHA=$(git rev-parse --short HEAD)
+CURRENT_BRANCH=$(git symbolic-ref HEAD 2>/dev/null | awk -F/ {'print $NF'})
+
+PROJECT_DIR="$(dirname $0)/.."
+PROFILES_DIR="$PROJECT_DIR/profiles"
+TODAY="$(date "+%Y-%m-%d")"
+NOW=$(date "+%H_%M_%S")
+PROFILE_DIR="$PROFILES_DIR/$TODAY/$NOW-$CURRENT_BRANCH-$HEAD_SHA/"
+OUTFILE="$PROFILE_DIR/profile.out.log"
+ERRFILE="$PROFILE_DIR/profile.err.log"
+
+cabal new-build
+
+mkdir -p "$PROFILE_DIR"
+
+# NB: Do not try and use -N, it doesn't work and defaults to -N1.
+cores=$(sysctl -n machdep.cpu.core_count || echo 4)
+cabal new-run semantic -- +RTS -sstderr -N$((cores * 2)) -A8m -n2m -p -s -h -i0.1 -L1000 -xt -RTS $@ > "$OUTFILE" 2> "$ERRFILE"
+
+profiteur semantic.prof || true
+
+hp2pretty semantic.hp
+
+for f in "$PROJECT_DIR/"semantic.*; do
+	if [ "$f" != "$PROJECT_DIR/"semantic.cabal ]; then
+		mv "$f" "$PROFILE_DIR"
+	fi
+done
+
+(>&2 echo "branch: $CURRENT_BRANCH ($HEAD_SHA)")
+
+open "$PROFILE_DIR"

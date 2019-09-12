@@ -58,7 +58,7 @@ common dependencies
                      , fused-effects ^>= 0.5.0.0
                      , fused-effects-exceptions ^>= 0.2.0.0
                      , hashable ^>= 1.2.7.0
-                     , tree-sitter ^>= 0.1.0.0
+                     , tree-sitter ^>= 0.2
                      , mtl ^>= 2.2.2
                      , network ^>= 2.8.0.0
                      , process ^>= 1.6.3.0
@@ -73,6 +73,7 @@ common dependencies
                      , unix ^>= 2.7.2.2
                      , proto3-suite
                      , proto3-wire
+                     , lingo >= 0.1.0.1
 
 common executable-flags
   ghc-options:         -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m"
@@ -321,8 +322,8 @@ library
                      , tree-sitter-go ^>= 0.1.0.0
                      , tree-sitter-haskell ^>= 0.1.0.0
                      , tree-sitter-json ^>= 0.1.0.0
-                     , tree-sitter-php ^>= 0.1.0.0
-                     , tree-sitter-python ^>= 0.1.0.1
+                     , tree-sitter-php ^>= 0.1.0.1
+                     , tree-sitter-python ^>= 0.2.0.0
                      , tree-sitter-ruby ^>= 0.1.0.0
                      , tree-sitter-typescript ^>= 0.1.0.0
                      , tree-sitter-tsx ^>= 0.1.0.0
@@ -360,6 +361,7 @@ test-suite test
                      , Data.Functor.Listable
                      , Data.Graph.Spec
                      , Data.Mergeable
+                     , Data.Language.Spec
                      , Data.Range.Spec
                      , Data.Scientific.Spec
                      , Data.Semigroup.App.Spec

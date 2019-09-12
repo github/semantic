@@ -1,6 +1,7 @@
 {-# LANGUAGE FlexibleInstances, GeneralizedNewtypeDeriving, MultiParamTypeClasses, OverloadedStrings, RecordWildCards, TypeOperators, UndecidableInstances #-}
 module Data.Loc
 ( Loc(..)
+, interactive
 , Span(..)
 , emptySpan
 , Pos(..)
@@ -26,6 +27,8 @@ data Loc = Loc
   }
   deriving (Eq, Ord, Show)
 
+interactive :: Loc
+interactive = Loc "<interactive>" emptySpan
 
 data Span = Span
   { spanStart :: {-# UNPACK #-} !Pos

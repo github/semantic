@@ -5,7 +5,7 @@ import           Control.Exception as Exc (displayException)
 import           Data.Blob
 import           Data.Blob.IO
 import           Data.Handle
-import           Data.Language (languageForFilePath, parseLanguage)
+import qualified Data.Language as Language
 import           Data.List (intercalate, uncons)
 import           Data.List.Split (splitWhen)
 import           Data.Project
@@ -180,8 +180,22 @@ filePathReader = eitherReader parseFilePath
     parseFilePath arg = case splitWhen (== ':') arg of
         [a, b] | Just lang <- parseLanguage (T.pack b) -> Right (File a lang)
                | Just lang <- parseLanguage (T.pack a) -> Right (File b lang)
-        [path] -> Right (File path (languageForFilePath path))
+        [path] -> Right (File path (Language.languageForFilePath path))
         _ -> Left ("cannot parse `" <> arg <> "`\nexpecting FILE:LANGUAGE or just FILE")
+    parseLanguage :: Text -> Maybe Language.Language
+    parseLanguage l = case T.toLower l of
+      "go"         -> Just Language.Go
+      "haskell"    -> Just Language.Haskell
+      "java"       -> Just Language.Java
+      "javascript" -> Just Language.JavaScript
+      "json"       -> Just Language.JSON
+      "jsx"        -> Just Language.JSX
+      "markdown"   -> Just Language.Markdown
+      "python"     -> Just Language.Python
+      "ruby"       -> Just Language.Ruby
+      "typescript" -> Just Language.TypeScript
+      "php"        -> Just Language.PHP
+      _            -> Nothing
 
 options :: Eq a => [(String, a)] -> Mod OptionFields a -> Parser a
 options options fields = option (optionsReader options) (fields <> showDefaultWith (findOption options) <> metavar (intercalate "|" (fmap fst options)))

@@ -38,6 +38,7 @@ script:
 - cabal new-run semantic:test
 - cabal new-run semantic-core:spec
 - cabal new-run semantic-core:doctest
+- cabal new-run semantic-python:test
 # parse-examples is disabled because it slaughters our CI
 # - cabal new-run semantic:parse-examples
 

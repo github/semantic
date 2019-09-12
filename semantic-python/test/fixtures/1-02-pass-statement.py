@@ -1,0 +1,2 @@
+# CHECK-JQ: .scope == {}
+pass

@@ -28,7 +28,7 @@ newtype JsxExpression a = JsxExpression { jsxExpression :: a }
 
 instance Evaluatable JsxExpression
 
-data JsxOpeningElement a = JsxOpeningElement { jsxOpeningElementIdentifier :: !a,  jsxAttributes :: ![a] }
+data JsxOpeningElement a = JsxOpeningElement { jsxOpeningElementIdentifier :: !a, jsxOpeningElementTypeArguments :: a, jsxAttributes :: ![a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, Ord, Show, ToJSONFields1, Traversable)
   deriving (Eq1, Show1, Ord1) via Generically JsxOpeningElement
 
