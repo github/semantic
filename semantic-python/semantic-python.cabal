@@ -23,8 +23,8 @@ common haskell
   build-depends:       base ^>=4.12
                      , fused-effects ^>= 0.5
                      , semantic-core ^>= 0.0
-                     , tree-sitter ^>= 0.2.1
-                     , tree-sitter-python ^>= 0.2
+                     , tree-sitter == 0.2.1.0
+                     , tree-sitter-python == 0.3.0.0
 
   ghc-options:
     -Weverything
