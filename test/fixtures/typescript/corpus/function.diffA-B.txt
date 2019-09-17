@@ -23,5 +23,4 @@
       (Empty))
     (StatementBlock
     { (Identifier)
-    ->(Identifier) }))
-  (Empty))
+    ->(Identifier) })))

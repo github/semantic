@@ -54,11 +54,8 @@
                   (Return
                     (Empty)))
                 (Empty))))
-          (Pattern
-            (DefaultPattern
-              (Statements))
-            (Return
-              (Empty)))))
+          (DefaultPattern
+            (Statements))))
       (Select
         (Statements
           (Pattern
@@ -73,7 +70,5 @@
               (ReceiveOperator
                 (Identifier)))
             (Statements))
-          (Pattern
-            (DefaultPattern
-              (Statements))
+          (DefaultPattern
             (Statements)))))))

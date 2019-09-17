@@ -5,8 +5,8 @@
     (Identifier)
     (Match
       (Statements)
-      (Statements
-        (Pattern
+      (Pattern
+        (Statements
           (LessThan
             (Identifier)
             (Identifier))
@@ -15,18 +15,21 @@
             (Statements)
             (Empty)))
         (Pattern
-          (LessThan
-            (Identifier)
-            (Identifier))
-          (Call
-            (Identifier)
-            (Statements)
-            (Empty)))
-        (Pattern
-          (Equal
-            (Identifier)
-            (Integer))
-          (Call
-            (Identifier)
-            (Statements)
-            (Empty)))))))
+          (Statements
+            (LessThan
+              (Identifier)
+              (Identifier))
+            (Call
+              (Identifier)
+              (Statements)
+              (Empty)))
+          (Pattern
+            (Statements
+              (Equal
+                (Identifier)
+                (Integer))
+              (Call
+                (Identifier)
+                (Statements)
+                (Empty)))
+            (Statements)))))))
