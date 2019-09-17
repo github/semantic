@@ -726,7 +726,7 @@ importStatement :: Assignment Term
 importStatement =   makeImportTerm <$> symbol Grammar.ImportStatement <*> children ((,) <$> importClause <*> fromClause)
                 <|> makeTerm' <$> symbol Grammar.ImportStatement <*> children (requireImport <|> sideEffectImport)
   where
-    -- `import foo = require "./foo"`
+    -- `import foo = require("./foo")`
     requireImport = inject <$> (symbol Grammar.ImportRequireClause *> children (TSX.Syntax.QualifiedAliasedImport <$> term identifier <*> fromClause))
     -- `import "./foo"`
     sideEffectImport = inject <$> (TSX.Syntax.SideEffectImport <$> fromClause)

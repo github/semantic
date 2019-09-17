@@ -31,6 +31,7 @@ import qualified Streaming.Process
 import           System.Directory
 import           System.Exit
 import           System.FilePath
+import qualified TreeSitter.Span as TS (Span)
 import qualified TreeSitter.Python as TSP
 import qualified TreeSitter.Python.AST as TSP
 import qualified TreeSitter.Unmarshal as TS
@@ -75,7 +76,7 @@ fixtureTestTreeForFile fp = HUnit.testCaseSteps fp $ \step -> withFrozenCallStac
     Left err  -> HUnit.assertFailure ("Directive parsing error: " <> err)
 
   result <- TS.parseByteString TSP.tree_sitter_python fileContents
-  let coreResult = fmap (Control.Effect.run . runFail . Py.compile @TSP.Module @_ @(Term (Ann :+: Core))) result
+  let coreResult = fmap (Control.Effect.run . runFail . Py.compile @(TSP.Module TS.Span) @_ @(Term (Ann :+: Core))) result
   for_ directives $ \directive -> do
     step (Directive.describe directive)
     case coreResult of

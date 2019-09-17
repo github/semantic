@@ -1,6 +1,10 @@
+<<<<<<< HEAD
 {-# LANGUAGE DefaultSignatures, DeriveAnyClass, DerivingStrategies, DerivingVia, DisambiguateRecordFields,
              FlexibleContexts, FlexibleInstances, NamedFieldPuns, OverloadedStrings, ScopedTypeVariables,
              StandaloneDeriving, TypeOperators, UndecidableInstances, DeriveGeneric #-}
+=======
+{-# LANGUAGE DefaultSignatures, DisambiguateRecordFields, FlexibleContexts, FlexibleInstances, OverloadedStrings, OverloadedLists, ScopedTypeVariables, NamedFieldPuns, TypeOperators #-}
+>>>>>>> bump-to-tree-sitter-0.2.1
 module Language.Python.Core
 ( compile
 ) where
@@ -14,6 +18,7 @@ import           Data.Foldable
 import           Data.Name as Name
 import           GHC.Generics
 import qualified TreeSitter.Python.AST as Py
+import           TreeSitter.Span (Span)
 
 class Compile py where
   -- FIXME: we should really try not to fail
@@ -48,87 +53,84 @@ instance (Generic py, GCompileSum (Rep py)) => Compile (CompileSum py) where
 
 deriving via CompileSum (Either l r) instance (Compile l, Compile r) => Compile (Either l r)
 
-instance Compile Py.AssertStatement
-instance Compile Py.Attribute
+instance Compile (Py.AssertStatement Span)
+instance Compile (Py.Attribute Span)
 
-instance Compile Py.Assignment where
-  compile (Py.Assignment (Py.ExpressionList [lhs]) (Just rhs) Nothing) = do
+instance Compile (Py.Assignment Span) where
+  compile Py.Assignment { Py.left = Py.ExpressionList { Py.extraChildren = [lhs] }, Py.right = Just rhs } = do
     target <- compile lhs
     value  <- compile rhs
     pure (target .= value)
   compile other = fail ("Unhandled assignment case: " <> show other)
 
-instance Compile Py.AugmentedAssignment
-instance Compile Py.Await
-instance Compile Py.BinaryOperator
+instance Compile (Py.AugmentedAssignment Span)
+instance Compile (Py.Await Span)
+instance Compile (Py.BinaryOperator Span)
 
-instance Compile Py.Block where
+instance Compile (Py.Block Span)
+
+instance Compile (Py.Block Span) where
   compile t = compileCC t (pure none)
 
-  -- The call to 'reverse' works around https://github.com/tree-sitter/haskell-tree-sitter/issues/195
-  -- This will be obviated when we upgrade to tree-sitter-python 0.3
-  compileCC (Py.Block body) cc = foldr compileCC cc (reverse body)
+  compileCC (Py.Block body) cc = foldr compileCC cc body
 
-instance Compile Py.BooleanOperator
-instance Compile Py.BreakStatement
-instance Compile Py.Call
-instance Compile Py.ClassDefinition
-instance Compile Py.ComparisonOperator
+instance Compile (Py.BooleanOperator Span)
+instance Compile (Py.BreakStatement Span)
+instance Compile (Py.Call Span)
+instance Compile (Py.ClassDefinition Span)
+instance Compile (Py.ComparisonOperator Span)
 
-deriving via CompileSum Py.CompoundStatement instance Compile Py.CompoundStatement
+deriving via CompileSum (Py.CompoundStatement Span) instance Compile Py.CompoundStatement
 
-instance Compile Py.ConcatenatedString
-instance Compile Py.ConditionalExpression
-instance Compile Py.ContinueStatement
-instance Compile Py.DecoratedDefinition
-instance Compile Py.DeleteStatement
-instance Compile Py.Dictionary
-instance Compile Py.DictionaryComprehension
-instance Compile Py.Ellipsis
-instance Compile Py.ExecStatement
+instance Compile (Py.ConcatenatedString Span)
+instance Compile (Py.ConditionalExpression Span)
+instance Compile (Py.ContinueStatement Span)
+instance Compile (Py.DecoratedDefinition Span)
+instance Compile (Py.DeleteStatement Span)
+instance Compile (Py.Dictionary Span)
+instance Compile (Py.DictionaryComprehension Span)
+instance Compile (Py.Ellipsis Span)
+instance Compile (Py.ExecStatement Span)
 
-deriving via CompileSum Py.Expression instance Compile Py.Expression
+instance Compile (Py.Expression Span) where compile = compileSum
 
-instance Compile Py.ExpressionStatement where
-  compile (Py.ExpressionStatement children) = do
+instance Compile (Py.ExpressionStatement Span) where
+  compile Py.ExpressionStatement { Py.extraChildren = children } = do
     actions <- traverse compile children
     pure $ do' (fmap (Nothing :<-) actions)
 
-instance Compile Py.ExpressionList where
-  compile (Py.ExpressionList exprs) = do
+instance Compile (Py.ExpressionList Span) where
+  compile Py.ExpressionList { Py.extraChildren = exprs } = do
     actions <- traverse compile exprs
     pure $ do' (fmap (Nothing :<-) actions)
 
 
-instance Compile Py.False where compile _ = pure (bool False)
+instance Compile (Py.False Span) where compile _ = pure (bool False)
 
-instance Compile Py.Float
-instance Compile Py.ForStatement
+instance Compile (Py.Float Span)
+instance Compile (Py.ForStatement Span)
 
-instance Compile Py.FunctionDefinition where
+instance Compile (Py.FunctionDefinition Span) where
   compile Py.FunctionDefinition
-    { name       = Py.Identifier name
-    , parameters = Py.Parameters parameters
+    { name       = Py.Identifier _ann1 name
+    , parameters = Py.Parameters _ann2 parameters
     , body
     } = do
-      parameters' <- params
+      parameters' <- traverse param parameters
       body' <- compile body
       pure (pure name .= lams parameters' body')
-    where params = case parameters of
-            Nothing -> pure []
-            Just p  -> traverse param [p] -- FIXME: this is wrong in node-types.json, @p@ should already be a list
-          param (Right (Right (Right (Left (Py.Identifier name))))) = pure (named' name)
-          param x                                                   = unimplemented x
+    where param (Py.IdentifierParameter (Py.Identifier _pann pname)) = pure (named' pname)
+          param x = unimplemented x
           unimplemented x = fail $ "unimplemented: " <> show x
 
-instance Compile Py.FutureImportStatement
-instance Compile Py.GeneratorExpression
-instance Compile Py.GlobalStatement
+instance Compile (Py.FutureImportStatement Span)
+instance Compile (Py.GeneratorExpression Span)
+instance Compile (Py.GlobalStatement Span)
 
-instance Compile Py.Identifier where
-  compile (Py.Identifier bytes) = pure (pure bytes)
+instance Compile (Py.Identifier Span) where
+  compile Py.Identifier { bytes } = pure (pure bytes)
 
-instance Compile Py.IfStatement where
+instance Compile (Py.IfStatement Span) where
   compile Py.IfStatement{ condition, consequence, alternative } =
     if' <$> compile condition <*> compile consequence <*> foldr clause (pure unit) alternative
     where clause (Right Py.ElseClause{ body }) _ = compile body
@@ -142,63 +144,55 @@ instance Compile Py.IfStatement where
             if' <$> compile condition <*> compileCC consequence cc <*> rest
 
 
-instance Compile Py.ImportFromStatement
-instance Compile Py.ImportStatement
-instance Compile Py.Integer
-instance Compile Py.Lambda
-instance Compile Py.List
-instance Compile Py.ListComprehension
+instance Compile (Py.ImportFromStatement Span)
+instance Compile (Py.ImportStatement Span)
+instance Compile (Py.Integer Span)
+instance Compile (Py.Lambda Span)
+instance Compile (Py.List Span)
+instance Compile (Py.ListComprehension Span)
 
-instance Compile Py.Module where
-  compile (Py.Module stmts) = do
+instance Compile (Py.Module Span) where
+  compile Py.Module { Py.extraChildren = stmts } = do
     -- Buggy and ad-hoc: the toList call promotes too many variables
     -- to top-level scope.
     res <- traverse compile stmts
     let names = concatMap toList res
     pure . record $ zip names res
 
-instance Compile Py.NamedExpression
-instance Compile Py.None
-instance Compile Py.NonlocalStatement
-instance Compile Py.NotOperator
-instance Compile Py.ParenthesizedExpression
+instance Compile (Py.NamedExpression Span)
+instance Compile (Py.None Span)
+instance Compile (Py.NonlocalStatement Span)
+instance Compile (Py.NotOperator Span)
+instance Compile (Py.ParenthesizedExpression Span)
 
-instance Compile Py.PassStatement where
-  compile (Py.PassStatement _) = pure Core.unit
+instance Compile (Py.PassStatement Span) where
+  compile Py.PassStatement {} = pure Core.unit
 
-deriving via CompileSum Py.PrimaryExpression instance Compile Py.PrimaryExpression
+deriving via CompileSum (Py.PrimaryExpression Span) instance Compile (Py.PrimaryExpression Span)
 
-instance Compile Py.PrintStatement
+instance Compile (Py.PrintStatement Span)
+instance Compile (Py.ReturnStatement Span)
+instance Compile (Py.RaiseStatement Span)
+instance Compile (Py.Set Span)
+instance Compile (Py.SetComprehension Span)
 
-instance Compile Py.ReturnStatement where
-  compile (Py.ReturnStatement [])    = pure none
-  compile (Py.ReturnStatement [val]) = compile val
-  compile (Py.ReturnStatement vals)  = fail ("unimplemented: return statement returning " <> show (length vals) <> " values")
+deriving via CompileSum (Py.SimpleStatement Span) instance Compile (Py.SimpleStatement Span)
 
-  compileCC r _ = compile r
+instance Compile (Py.String Span)
+instance Compile (Py.Subscript Span)
 
+instance Compile (Py.True Span) where compile _ = pure (bool True)
 
-instance Compile Py.RaiseStatement
-instance Compile Py.Set
-instance Compile Py.SetComprehension
+instance Compile (Py.TryStatement Span)
 
-deriving via CompileSum Py.SimpleStatement instance Compile Py.SimpleStatement
+instance Compile (Py.Tuple Span) where
+  compile Py.Tuple { Py.extraChildren = [] } = pure Core.unit
+  compile t                                  = fail ("Unimplemented: non-empty tuple " <> show t)
 
-instance Compile Py.String
-instance Compile Py.Subscript
-
-instance Compile Py.True where compile _ = pure (bool True)
-
-instance Compile Py.TryStatement
-
-instance Compile Py.Tuple where
-  compile (Py.Tuple []) = pure Core.unit
-  compile (Py.Tuple t)  = fail ("Unimplemented: non-empty tuple " <> show t)
-
-instance Compile Py.UnaryOperator
-instance Compile Py.WhileStatement
-instance Compile Py.WithStatement
-instance Compile Py.Yield
+instance Compile (Py.UnaryOperator Span)
+instance Compile (Py.WhileStatement Span)
+instance Compile (Py.WithStatement Span)
+instance Compile (Py.Yield Span)
 
 compileSum :: (Generic py, GCompileSum (Rep py), Member Core sig, Foldable t, Carrier sig t, MonadFail m) => py -> m (t Name)
 compileSum = gcompileSum . from
