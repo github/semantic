@@ -61,12 +61,13 @@ data Config
 data Options
   = Options
   { optionsLogLevel         :: Maybe Level           -- ^ What level of messages to log. 'Nothing' disables logging.
+  , optionsLogPathsOnError  :: Bool                  -- ^ Should semantic log source path on parse or assignment errors (default: False).
   , optionsFailOnWarning    :: Flag FailOnWarning    -- ^ Should semantic fail fast on assignment warnings (for testing)
   , optionsFailOnParseError :: Flag FailOnParseError -- ^ Should semantic fail fast on tree-sitter parser errors (for testing)
   }
 
 defaultOptions :: Options
-defaultOptions = Options (Just Warning) (flag FailOnWarning False) (flag FailOnParseError False)
+defaultOptions = Options (Just Warning) False (flag FailOnWarning False) (flag FailOnParseError False)
 
 debugOptions :: Options
 debugOptions = defaultOptions { optionsLogLevel = Just Debug }
