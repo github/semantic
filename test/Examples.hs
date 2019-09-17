@@ -38,7 +38,8 @@ main = withOptions opts $ \ config logger statter -> hspec . parallel $ do
   runIO setupExampleRepos
 
   for_ languages $ \ lang@LanguageExample{..} -> do
-    let tsDir = languagesDir </> languageName </> ("vendor/tree-sitter-" <> languageName)
+    let tsLang = "tree-sitter-" <> languageName
+        tsDir = languagesDir </> tsLang </> "vendor" </> tsLang
     parallel . describe languageName $ parseExamples args lang tsDir
 
   where
@@ -105,4 +106,4 @@ parseFilePath :: (Member (Error SomeException) sig, Member Distribute sig, Membe
 parseFilePath path = readBlob (fileForPath path) >>= parseTermBuilder @[] TermShow . pure >>= const (pure True)
 
 languagesDir :: FilePath
-languagesDir = "tmp/haskell-tree-sitter/languages"
+languagesDir = "tmp/haskell-tree-sitter"
