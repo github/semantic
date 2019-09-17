@@ -57,7 +57,7 @@ main = do
   (options, task) <- customExecParser (prefs showHelpOnEmpty) arguments
   config <- defaultConfig options
   res <- withTelemetry config $ \ (TelemetryQueues logger statter _) ->
-    Task.runTask (Task.TaskSession config "-" False logger statter) task
+    Task.runTask (Task.TaskSession config "-" (optionsLogPathsOnError options) logger statter) task
   either (die . displayException) pure res
 
 -- | A parser for the application's command-line arguments.
@@ -76,7 +76,8 @@ optionsParser = do
                       (long "log-level" <> value (Just Log.Warning) <> help "Log messages at or above this level, or disable logging entirely.")
   failOnWarning <- switch (long "fail-on-warning" <> help "Fail on assignment warnings.")
   failOnParseError <- switch (long "fail-on-parse-error" <> help "Fail on tree-sitter parse errors.")
-  pure $ Options logLevel (Flag.flag FailOnWarning failOnWarning) (Flag.flag FailOnParseError failOnParseError)
+  logPathsOnError <- switch (long "log-paths" <> help "Log source paths on parse and assignment error.")
+  pure $ Options logLevel logPathsOnError (Flag.flag FailOnWarning failOnWarning) (Flag.flag FailOnParseError failOnParseError)
 
 argumentsParser :: Parser (Task.TaskEff ())
 argumentsParser = do
