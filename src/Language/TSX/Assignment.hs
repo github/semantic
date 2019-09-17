@@ -228,7 +228,6 @@ expression = handleError everything
       jsxElement',
       jsxFragment,
       class',
-      anonymousClass,
       function,
       arrowFunction,
       assignmentExpression,
@@ -318,7 +317,6 @@ constructableExpression = choice [
   , function
   , arrowFunction
   , class'
-  , anonymousClass
   , parenthesizedExpression
   , subscriptExpression
   , memberExpression
@@ -343,9 +341,6 @@ regex = makeTerm <$> symbol Grammar.Regex <*> (Literal.Regex <$> source)
 
 null' :: Assignment Term
 null' = makeTerm <$> symbol Null <*> (Literal.Null <$ rawSource)
-
-anonymousClass :: Assignment Term
-anonymousClass = makeTerm <$> symbol Grammar.AnonymousClass <*> children (Declaration.Class [] <$> emptyTerm <*> (classHeritage' <|> pure []) <*> classBodyStatements)
 
 abstractClass :: Assignment Term
 abstractClass = makeTerm <$> symbol Grammar.AbstractClass <*> children (TSX.Syntax.AbstractClass <$> term typeIdentifier <*> (term typeParameters <|> emptyTerm) <*> (classHeritage' <|> pure []) <*> classBodyStatements)
