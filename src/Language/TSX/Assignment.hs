@@ -545,7 +545,7 @@ constraint :: Assignment Term
 constraint = makeTerm <$> symbol Grammar.Constraint <*> children (TSX.Syntax.Constraint <$> term ty)
 
 function :: Assignment Term
-function = makeFunction <$> (symbol Grammar.Function <|> symbol Grammar.GeneratorFunction) <*> children ((,,) <$> term (identifier <|> emptyTerm) <*> callSignatureParts <*> term statementBlock)
+function = makeFunction <$> (symbol Grammar.Function <|> symbol Grammar.FunctionDeclaration <|> symbol Grammar.GeneratorFunction <|> symbol Grammar.GeneratorFunctionDeclaration) <*> children ((,,) <$> term (identifier <|> emptyTerm) <*> callSignatureParts <*> term statementBlock)
   where makeFunction loc (id, (typeParams, params, annotation), statements) = makeTerm loc (Declaration.Function [typeParams, annotation] id params statements)
 
 -- TODO: FunctionSignatures can, but don't have to be ambient functions.
@@ -568,7 +568,7 @@ primaryType =  arrayTy
            <|> objectType
            <|> parenthesizedTy
            <|> predefinedTy
-           <|> thisType
+           <|> this
            <|> tupleType
            <|> typeIdentifier
            <|> typePredicate
@@ -615,9 +615,6 @@ typeQuery = makeTerm <$> symbol Grammar.TypeQuery <*> children (TSX.Syntax.TypeQ
 
 indexTypeQuery :: Assignment Term
 indexTypeQuery = makeTerm <$> symbol Grammar.IndexTypeQuery <*> children (TSX.Syntax.IndexTypeQuery <$> term (typeIdentifier <|> nestedTypeIdentifier))
-
-thisType :: Assignment Term
-thisType = makeTerm <$> symbol Grammar.ThisType <*> (TSX.Syntax.ThisType <$> source)
 
 existentialType :: Assignment Term
 existentialType = makeTerm <$> symbol Grammar.ExistentialType <*> (TSX.Syntax.ExistentialType <$> source)
