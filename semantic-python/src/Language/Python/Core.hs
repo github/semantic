@@ -131,7 +131,7 @@ instance Compile (Py.Identifier Span) where
   compile Py.Identifier { bytes } = pure (pure bytes)
 
 instance Compile (Py.IfStatement Span) where
-  compile stmt = compileCC stmt none
+  compile stmt = compileCC stmt (pure none)
 
   compileCC Py.IfStatement{ condition, consequence, alternative} cc =
     if' <$> compile condition <*> compileCC consequence cc <*> foldr clause cc alternative
