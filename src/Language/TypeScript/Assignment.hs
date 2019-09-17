@@ -333,7 +333,7 @@ null' :: Assignment Term
 null' = makeTerm <$> symbol Null <*> (Literal.Null <$ rawSource)
 
 abstractClass :: Assignment Term
-abstractClass = makeTerm <$> symbol Grammar.AbstractClass <*> children (TypeScript.Syntax.AbstractClass <$> term typeIdentifier <*> (term typeParameters <|> emptyTerm) <*> (classHeritage' <|> pure []) <*> classBodyStatements)
+abstractClass = makeTerm <$> symbol Grammar.AbstractClassDeclaration <*> children (TypeScript.Syntax.AbstractClass <$> term typeIdentifier <*> (term typeParameters <|> emptyTerm) <*> (classHeritage' <|> pure []) <*> classBodyStatements)
 
 abstractMethodSignature :: Assignment Term
 abstractMethodSignature = makeSignature <$> symbol Grammar.AbstractMethodSignature <*> children ((,,) <$> accessibilityModifier' <*> term propertyName <*> callSignatureParts)
