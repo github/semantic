@@ -620,7 +620,6 @@ statement = handleError everything
       , switchStatement
       , forStatement
       , forInStatement
-      , forOfStatement
       , whileStatement
       , doStatement
       , tryStatement
@@ -632,9 +631,6 @@ statement = handleError everything
       , hashBang
       , emptyStatement
       , labeledStatement ]
-
-forOfStatement :: Assignment Term
-forOfStatement = makeTerm <$> symbol ForOfStatement <*> children (TypeScript.Syntax.ForOf <$> term expression <*> term expressions <*> term statement)
 
 forInStatement :: Assignment Term
 forInStatement = makeTerm <$> symbol ForInStatement <*> children (Statement.ForEach <$> term expression <*> term expression <*> term statement)
