@@ -48,8 +48,8 @@ defaultCompile t = fail $ "compilation unimplemented for " <> show t
 newtype CompileSum py = CompileSum py
 
 instance (Generic py, GCompileSum (Rep py)) => Compile (CompileSum py) where
-  compile (CompileSum a) = compileSum a
-  compileCC (CompileSum a) cc = compileCCSum a cc
+  compile (CompileSum a) = gcompileSum . from $ a
+  compileCC (CompileSum a) cc = gcompileCCSum (from a) cc
 
 deriving via CompileSum (Either l r) instance (Compile l, Compile r) => Compile (Either l r)
 
@@ -131,11 +131,7 @@ instance Compile (Py.Identifier Span) where
   compile Py.Identifier { bytes } = pure (pure bytes)
 
 instance Compile (Py.IfStatement Span) where
-  compile Py.IfStatement{ condition, consequence, alternative } =
-    if' <$> compile condition <*> compile consequence <*> foldr clause (pure unit) alternative
-    where clause (Right Py.ElseClause{ body }) _ = compile body
-          clause (Left  Py.ElifClause{ condition, consequence }) rest  =
-            if' <$> compile condition <*> compile consequence <*> rest
+  compile stmt = compileCC stmt none
 
   compileCC Py.IfStatement{ condition, consequence, alternative} cc =
     if' <$> compile condition <*> compileCC consequence cc <*> foldr clause cc alternative
@@ -193,12 +189,6 @@ instance Compile (Py.UnaryOperator Span)
 instance Compile (Py.WhileStatement Span)
 instance Compile (Py.WithStatement Span)
 instance Compile (Py.Yield Span)
-
-compileSum :: (Generic py, GCompileSum (Rep py), Member Core sig, Foldable t, Carrier sig t, MonadFail m) => py -> m (t Name)
-compileSum = gcompileSum . from
-
-compileCCSum :: (Generic py, GCompileSum (Rep py), Member Core sig, Foldable t, Carrier sig t, MonadFail m) => py -> m (t Name) -> m (t Name)
-compileCCSum = gcompileCCSum . from
 
 class GCompileSum f where
   gcompileSum :: (Foldable t, Member Core sig, Carrier sig t, MonadFail m) => f a -> m (t Name)
