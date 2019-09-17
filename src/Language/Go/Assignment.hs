@@ -233,7 +233,6 @@ types =
          , typeIdentifier
          , typeCase
          , typeCaseClause
-         , typeSwitchGuard
          , typeSwitchStatement
          ]
 
@@ -505,9 +504,6 @@ typeCaseClause = makeTerm <$> symbol TypeCaseClause <*> children (Statement.Patt
 
 typeConversion :: Assignment Term
 typeConversion = makeTerm <$> symbol TypeConversionExpression <*> children (Go.Syntax.TypeConversion <$> expression <*> expression)
-
-typeSwitchGuard :: Assignment Term
-typeSwitchGuard = makeTerm <$> symbol Grammar.TypeSwitchGuard <*> children (Go.Syntax.TypeSwitchGuard <$> expressions)
 
 typeSwitchStatement :: Assignment Term
 typeSwitchStatement = makeTerm <$> symbol TypeSwitchStatement <*> children (Go.Syntax.TypeSwitch <$> typeSwitchSubject <*> expressions)
