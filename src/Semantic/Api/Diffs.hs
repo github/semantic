@@ -129,7 +129,6 @@ doParse :: (Member (Error SomeException) sig, Member Distribute sig, Member Task
 doParse blobPair decorate = case languageForBlobPair blobPair of
   Go         -> SomeTermPair <$> distributeFor blobPair (\ blob -> parse goParser blob >>= decorate blob)
   Haskell    -> SomeTermPair <$> distributeFor blobPair (\ blob -> parse haskellParser blob >>= decorate blob)
-  Java       -> SomeTermPair <$> distributeFor blobPair (\ blob -> parse javaParser blob >>= decorate blob)
   JavaScript -> SomeTermPair <$> distributeFor blobPair (\ blob -> parse tsxParser blob >>= decorate blob)
   JSON       -> SomeTermPair <$> distributeFor blobPair (\ blob -> parse jsonParser blob >>= decorate blob)
   JSX        -> SomeTermPair <$> distributeFor blobPair (\ blob -> parse tsxParser blob >>= decorate blob)
