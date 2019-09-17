@@ -388,7 +388,11 @@ identifier :: Assignment Term
 identifier = makeTerm <$> symbol Identifier <*> (Syntax.Identifier . name <$> source)
 
 class' :: Assignment Term
-class' = makeClass <$> symbol Class <*> children ((,,,,) <$> manyTerm decorator <*> term typeIdentifier <*> (symbol TypeParameters *> children (manyTerm typeParameter') <|> pure []) <*> (classHeritage' <|> pure []) <*> classBodyStatements)
+class' = makeClass <$> (symbol Class <|> symbol ClassDeclaration) <*> children ((,,,,) <$> manyTerm decorator
+                                                                                       <*> (term typeIdentifier <|> emptyTerm)
+                                                                                       <*> (symbol TypeParameters *> children (manyTerm typeParameter') <|> pure [])
+                                                                                       <*> (classHeritage' <|> pure [])
+                                                                                       <*> classBodyStatements)
   where makeClass loc (decorators, expression, typeParams, classHeritage, statements) = makeTerm loc (Declaration.Class (decorators <> typeParams) expression classHeritage statements)
 
 object :: Assignment Term
@@ -442,7 +446,7 @@ methodDefinition = makeMethod <$>
 callSignatureParts :: Assignment (Term, [Term], Term)
 callSignatureParts = contextualize' <$> Assignment.manyThrough comment (postContextualize' <$> callSignature' <*> many comment)
   where
-    callSignature' = children ((,,) <$> (term typeParameters <|> emptyTerm) <*> formalParameters <*> (term typeAnnotation' <|> emptyTerm))
+    callSignature' = (,,) <$> (term typeParameters <|> emptyTerm) <*> formalParameters <*> (term typeAnnotation' <|> emptyTerm)
     contextualize' (cs, (typeParams, formalParams, annotation)) = case nonEmpty cs of
       Just cs -> (makeTerm1 (Syntax.Context cs typeParams), formalParams, annotation)
       Nothing -> (typeParams, formalParams, annotation)
