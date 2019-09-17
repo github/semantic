@@ -22,7 +22,6 @@ import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
-import           Debug.Trace (traceM)
 import qualified Data.Term as Term
 import           Language.Go.Syntax as Go.Syntax hiding (runeLiteral, labelName)
 import           Language.Go.Type as Go.Type
@@ -141,9 +140,7 @@ assignment :: Assignment Term
 assignment = handleError program <|> parseError
 
 program :: Assignment Term
-program = do
-  traceM "program"
-  makeTerm <$> symbol SourceFile <*> children (Statement.Statements <$> manyTerm expression)
+program = makeTerm <$> symbol SourceFile <*> children (Statement.Statements <$> manyTerm expression)
 
 expression :: Assignment Term
 expression = term (handleError (choice expressionChoices))
@@ -164,10 +161,11 @@ expressionChoices =
   , varSpecification
   , decStatement
   , defaultCase
+  , defaultExpressionCase
   , deferStatement
   , element
   , emptyStatement
-  , expressionCaseClause
+  , expressionCase
   , expressionList
   , expressionSwitchStatement
   , fallThroughStatement
@@ -405,9 +403,6 @@ callExpression = makeTerm <$> symbol CallExpression <*> children (Expression.Cal
 expressionCase :: Assignment Term
 expressionCase = makeTerm <$> symbol ExpressionCase <*> (Statement.Pattern <$> children expressions <*> expressions)
 
-expressionCaseClause :: Assignment Term
-expressionCaseClause = expressionCase <|> defaultExpressionCase
-
 expressionList :: Assignment Term
 expressionList = symbol ExpressionList *> children expressions
 
@@ -421,9 +416,7 @@ fallThroughStatement :: Assignment Term
 fallThroughStatement = makeTerm <$> symbol FallthroughStatement <*> (Statement.Pattern <$> (makeTerm <$> location <*> (Syntax.Identifier . name <$> source)) <*> emptyTerm)
 
 functionDeclaration :: Assignment Term
-functionDeclaration = do
-  traceM "function declaration"
-  makeTerm <$> (symbol FunctionDeclaration <|> symbol FuncLiteral) <*> children (mkFunctionDeclaration <$> (term identifier <|> emptyTerm) <*> params <*> returnTypes <*> (term block <|> emptyTerm))
+functionDeclaration = makeTerm <$> (symbol FunctionDeclaration <|> symbol FuncLiteral) <*> children (mkFunctionDeclaration <$> (term identifier <|> emptyTerm) <*> params <*> returnTypes <*> (term block <|> emptyTerm))
   where
     returnTypes =  pure <$> (term types <|> term identifier <|> term returnParameters)
                <|> pure []
