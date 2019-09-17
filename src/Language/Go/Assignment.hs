@@ -163,7 +163,6 @@ expressionChoices =
   , defaultCase
   , deferStatement
   , element
-  , elseClause
   , emptyStatement
   , expressionCaseClause
   , expressionList
@@ -585,8 +584,8 @@ decStatement = makeTerm <$> symbol DecStatement <*> children (Statement.PostDecr
 deferStatement :: Assignment Term
 deferStatement = makeTerm <$> symbol DeferStatement <*> children (Go.Syntax.Defer <$> expression)
 
-elseClause :: Assignment Term
-elseClause = symbol ElseClause *> children expression
+consequence :: Assignment Term
+consequence = children expression
 
 emptyStatement :: Assignment Term
 emptyStatement = makeTerm <$> token EmptyStatement <*> (Statement.NoOp <$> emptyTerm)
@@ -605,7 +604,7 @@ gotoStatement :: Assignment Term
 gotoStatement = makeTerm <$> symbol GotoStatement <*> children (Statement.Goto <$> expression)
 
 ifStatement :: Assignment Term
-ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> (makeTerm <$> location <*> manyTermsTill expression (void (symbol Block))) <*> expression <*> (expression <|> emptyTerm))
+ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> (makeTerm <$> location <*> manyTermsTill expression (void (symbol Block))) <*> expression <*> (consequence <|> emptyTerm))
 
 ifInitializer :: Assignment Term
 ifInitializer = symbol IfInitializer *> children expression
