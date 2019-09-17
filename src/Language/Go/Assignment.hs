@@ -157,7 +157,7 @@ expressionChoices =
   , block
   , breakStatement
   , callExpression
-  , communicationClause
+  , communicationCase
   , compositeLiteral
   , continueStatement
   , varDeclaration
@@ -413,7 +413,10 @@ expressionList :: Assignment Term
 expressionList = symbol ExpressionList *> children expressions
 
 expressionSwitchStatement :: Assignment Term
-expressionSwitchStatement = makeTerm <$> symbol ExpressionSwitchStatement <*> children (Statement.Match <$> (makeTerm <$> location <*> manyTermsTill expression (void (symbol ExpressionCase)) <|> emptyTerm) <*> expressions)
+expressionSwitchStatement
+  = makeTerm
+  <$> symbol ExpressionSwitchStatement
+  <*> children (Statement.Match <$> (makeTerm <$> location <*> manyTermsTill expression (void (symbol ExpressionCase)) <|> emptyTerm) <*> expressions)
 
 fallThroughStatement :: Assignment Term
 fallThroughStatement = makeTerm <$> symbol FallthroughStatement <*> (Statement.Pattern <$> (makeTerm <$> location <*> (Syntax.Identifier . name <$> source)) <*> emptyTerm)
@@ -571,10 +574,8 @@ assignment' =  makeTerm' <$> symbol AssignmentStatement <*> children (infixTerm 
 breakStatement :: Assignment Term
 breakStatement = makeTerm <$> symbol BreakStatement <*> children (Statement.Break <$> (expression <|> emptyTerm))
 
-communicationClause :: Assignment Term
-communicationClause = makeTerm <$> location <*> children (Statement.Pattern <$> (communicationCase <|> expression) <*> expressions)
-  where
-    communicationCase = symbol CommunicationCase *> children expression
+communicationCase :: Assignment Term
+communicationCase = makeTerm <$> symbol CommunicationCase <*> children (Statement.Pattern <$> expression <*> expressions)
 
 continueStatement :: Assignment Term
 continueStatement = makeTerm <$> symbol ContinueStatement <*> children (Statement.Continue <$> (expression <|> emptyTerm))
