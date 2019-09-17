@@ -497,7 +497,7 @@ constraint :: Assignment Term
 constraint = makeTerm <$> symbol Grammar.Constraint <*> children (TypeScript.Syntax.Constraint <$> term ty)
 
 function :: Assignment Term
-function = makeFunction <$> (symbol Grammar.Function <|> symbol Grammar.GeneratorFunction) <*> children ((,,) <$> term (identifier <|> emptyTerm) <*> callSignatureParts <*> term statementBlock)
+function = makeFunction <$> (symbol Grammar.Function <|> symbol Grammar.FunctionDeclaration <|> symbol Grammar.GeneratorFunction <|> symbol Grammar.GeneratorFunctionDeclaration) <*> children ((,,) <$> term (identifier <|> emptyTerm) <*> callSignatureParts <*> term statementBlock)
   where makeFunction loc (id, (typeParams, params, annotation), statements) = makeTerm loc (Declaration.Function [typeParams, annotation] id params statements)
 
 -- TODO: FunctionSignatures can, but don't have to be ambient functions.
