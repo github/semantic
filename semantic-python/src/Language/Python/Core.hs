@@ -1,10 +1,6 @@
-<<<<<<< HEAD
 {-# LANGUAGE DefaultSignatures, DeriveAnyClass, DerivingStrategies, DerivingVia, DisambiguateRecordFields,
              FlexibleContexts, FlexibleInstances, NamedFieldPuns, OverloadedStrings, ScopedTypeVariables,
              StandaloneDeriving, TypeOperators, UndecidableInstances, DeriveGeneric #-}
-=======
-{-# LANGUAGE DefaultSignatures, DisambiguateRecordFields, FlexibleContexts, FlexibleInstances, OverloadedStrings, OverloadedLists, ScopedTypeVariables, NamedFieldPuns, TypeOperators #-}
->>>>>>> bump-to-tree-sitter-0.2.1
 module Language.Python.Core
 ( compile
 ) where
