@@ -405,13 +405,13 @@ expressionCase :: Assignment Term
 expressionCase = makeTerm <$> symbol ExpressionCase <*> (Statement.Pattern <$> children expressions <*> expressions)
 
 expressionCaseClause :: Assignment Term
-expressionCaseClause = symbol ExpressionCaseClause *> children (expressionCase <|> defaultExpressionCase)
+expressionCaseClause = children (expressionCase <|> defaultExpressionCase)
 
 expressionList :: Assignment Term
 expressionList = symbol ExpressionList *> children expressions
 
 expressionSwitchStatement :: Assignment Term
-expressionSwitchStatement = makeTerm <$> symbol ExpressionSwitchStatement <*> children (Statement.Match <$> (makeTerm <$> location <*> manyTermsTill expression (void (symbol ExpressionCaseClause)) <|> emptyTerm) <*> expressions)
+expressionSwitchStatement = makeTerm <$> symbol ExpressionSwitchStatement <*> children (Statement.Match <$> (makeTerm <$> location <*> manyTermsTill expression (void (symbol ExpressionCase)) <|> emptyTerm) <*> expressions)
 
 fallThroughStatement :: Assignment Term
 fallThroughStatement = makeTerm <$> symbol FallthroughStatement <*> (Statement.Pattern <$> (makeTerm <$> location <*> (Syntax.Identifier . name <$> source)) <*> emptyTerm)
