@@ -1,5 +1,5 @@
 {-# LANGUAGE DefaultSignatures, DeriveAnyClass, DerivingStrategies, DerivingVia, DisambiguateRecordFields,
-             FlexibleContexts, FlexibleInstances, NamedFieldPuns, OverloadedStrings, ScopedTypeVariables,
+             FlexibleContexts, FlexibleInstances, NamedFieldPuns, OverloadedStrings, OverloadedLists, ScopedTypeVariables,
              StandaloneDeriving, TypeOperators, UndecidableInstances, DeriveGeneric #-}
 module Language.Python.Core
 ( compile
@@ -63,12 +63,10 @@ instance Compile (Py.AugmentedAssignment Span)
 instance Compile (Py.Await Span)
 instance Compile (Py.BinaryOperator Span)
 
-instance Compile (Py.Block Span)
-
 instance Compile (Py.Block Span) where
   compile t = compileCC t (pure none)
 
-  compileCC (Py.Block body) cc = foldr compileCC cc body
+  compileCC Py.Block{ Py.extraChildren = body} cc = foldr compileCC cc body
 
 instance Compile (Py.BooleanOperator Span)
 instance Compile (Py.BreakStatement Span)
@@ -76,7 +74,7 @@ instance Compile (Py.Call Span)
 instance Compile (Py.ClassDefinition Span)
 instance Compile (Py.ComparisonOperator Span)
 
-deriving via CompileSum (Py.CompoundStatement Span) instance Compile Py.CompoundStatement
+deriving via CompileSum (Py.CompoundStatement Span) instance Compile (Py.CompoundStatement Span)
 
 instance Compile (Py.ConcatenatedString Span)
 instance Compile (Py.ConditionalExpression Span)
@@ -88,7 +86,7 @@ instance Compile (Py.DictionaryComprehension Span)
 instance Compile (Py.Ellipsis Span)
 instance Compile (Py.ExecStatement Span)
 
-instance Compile (Py.Expression Span) where compile = compileSum
+deriving via CompileSum (Py.Expression Span) instance Compile (Py.Expression Span)
 
 instance Compile (Py.ExpressionStatement Span) where
   compile Py.ExpressionStatement { Py.extraChildren = children } = do
