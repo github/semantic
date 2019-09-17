@@ -571,7 +571,7 @@ breakStatement :: Assignment Term
 breakStatement = makeTerm <$> symbol BreakStatement <*> children (Statement.Break <$> (expression <|> emptyTerm))
 
 communicationClause :: Assignment Term
-communicationClause = makeTerm <$> symbol CommunicationClause <*> children (Statement.Pattern <$> (communicationCase <|> expression) <*> expressions)
+communicationClause = makeTerm <$> location <*> children (Statement.Pattern <$> (communicationCase <|> expression) <*> expressions)
   where
     communicationCase = symbol CommunicationCase *> children expression
 
