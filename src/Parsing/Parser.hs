@@ -42,7 +42,6 @@ import           Data.Term
 import           Foreign.Ptr
 import qualified Language.Go.Assignment as Go
 import qualified Language.Haskell.Assignment as Haskell
-import qualified Language.Java.Assignment as Java
 import qualified Language.JSON.Assignment as JSON
 import qualified Language.Markdown.Assignment as Markdown
 import qualified Language.PHP.Assignment as PHP
@@ -92,7 +91,7 @@ someAnalysisParser :: ( ApplyAll' typeclasses Go.Syntax
                    -> SomeAnalysisParser typeclasses Location -- ^ A 'SomeAnalysisParser' abstracting the syntax type to be produced.
 someAnalysisParser _ Go         = SomeAnalysisParser goParser         (Proxy :: Proxy 'Go)
 someAnalysisParser _ Haskell    = SomeAnalysisParser haskellParser    (Proxy :: Proxy 'Haskell)
-someAnalysisParser _ Java       = SomeAnalysisParser javaParser       (Proxy :: Proxy 'Java)
+someAnalysisParser _ Java       = error "Java is currently unsupported pending grammar revisions"
 someAnalysisParser _ JavaScript = SomeAnalysisParser typescriptParser (Proxy :: Proxy 'JavaScript)
 someAnalysisParser _ PHP        = SomeAnalysisParser phpParser        (Proxy :: Proxy 'PHP)
 someAnalysisParser _ Python     = SomeAnalysisParser pythonParser     (Proxy :: Proxy 'Python)
@@ -146,12 +145,6 @@ pythonParser = AssignmentParser (ASTParser tree_sitter_python) Python.assignment
 
 pythonASTParser :: Parser (AST [] Python.Grammar)
 pythonASTParser = ASTParser tree_sitter_python
-
-javaParser :: Parser Java.Term
-javaParser = AssignmentParser javaASTParser Java.assignment
-
-javaASTParser :: Parser (AST [] Java.Grammar)
-javaASTParser = ASTParser tree_sitter_java
 
 jsonParser :: Parser JSON.Term
 jsonParser = DeterministicParser jsonASTParser JSON.assignment

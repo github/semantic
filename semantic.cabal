@@ -225,7 +225,6 @@ library
                      , Language.Python.Assignment
                      , Language.Python.PrettyPrint
                      , Language.Python.Syntax
-                     , Language.Java.Assignment
                      , Language.Java.Syntax
                      , Numeric.Exts
                      -- Parser glue
