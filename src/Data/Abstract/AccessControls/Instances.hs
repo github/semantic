@@ -526,7 +526,6 @@ instance AccessControls1 TypeScript.FlowMaybeType
 instance AccessControls1 TypeScript.TypeQuery
 instance AccessControls1 TypeScript.IndexTypeQuery
 instance AccessControls1 TypeScript.TypeArguments
-instance AccessControls1 TypeScript.ThisType
 instance AccessControls1 TypeScript.ExistentialType
 instance AccessControls1 TypeScript.LiteralType
 instance AccessControls1 TypeScript.Update

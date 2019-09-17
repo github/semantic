@@ -147,7 +147,6 @@ type Syntax = '[
   , TSX.Syntax.FlowMaybeType
   , TSX.Syntax.TypeQuery
   , TSX.Syntax.IndexTypeQuery
-  , TSX.Syntax.ThisType
   , TSX.Syntax.ExistentialType
   , TSX.Syntax.AbstractMethodSignature
   , TSX.Syntax.IndexSignature
@@ -569,7 +568,7 @@ primaryType =  arrayTy
            <|> objectType
            <|> parenthesizedTy
            <|> predefinedTy
-           <|> thisType
+           <|> this
            <|> tupleType
            <|> typeIdentifier
            <|> typePredicate
@@ -616,9 +615,6 @@ typeQuery = makeTerm <$> symbol Grammar.TypeQuery <*> children (TSX.Syntax.TypeQ
 
 indexTypeQuery :: Assignment Term
 indexTypeQuery = makeTerm <$> symbol Grammar.IndexTypeQuery <*> children (TSX.Syntax.IndexTypeQuery <$> term (typeIdentifier <|> nestedTypeIdentifier))
-
-thisType :: Assignment Term
-thisType = makeTerm <$> symbol Grammar.ThisType <*> (TSX.Syntax.ThisType <$> source)
 
 existentialType :: Assignment Term
 existentialType = makeTerm <$> symbol Grammar.ExistentialType <*> (TSX.Syntax.ExistentialType <$> source)

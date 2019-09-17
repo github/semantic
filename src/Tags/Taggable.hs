@@ -675,7 +675,6 @@ instance Taggable TypeScript.FlowMaybeType
 instance Taggable TypeScript.TypeQuery
 instance Taggable TypeScript.IndexTypeQuery
 instance Taggable TypeScript.TypeArguments
-instance Taggable TypeScript.ThisType
 instance Taggable TypeScript.ExistentialType
 instance Taggable TypeScript.LiteralType
 instance Taggable TypeScript.Update

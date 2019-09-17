@@ -124,12 +124,6 @@ newtype TypeArguments a = TypeArguments { typeArguments :: [a] }
 
 instance Evaluatable TypeArguments
 
-newtype ThisType a = ThisType { contents :: T.Text }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, Ord, Show, ToJSONFields1, Traversable)
-  deriving (Eq1, Show1, Ord1) via Generically ThisType
-
-instance Evaluatable ThisType
-
 newtype ExistentialType a = ExistentialType { contents :: T.Text }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, Ord, Show, ToJSONFields1, Traversable)
   deriving (Eq1, Show1, Ord1) via Generically ExistentialType
