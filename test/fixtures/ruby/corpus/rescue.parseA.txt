@@ -7,16 +7,17 @@
         (Statements
           (Statements
             (Identifier)))
-        (Catch
+        (Statements))
+      (Catch
+        (Statements
           (Statements
-            (Statements
-              (Identifier)
-              (Identifier))
-            (Statements
-              (Send
-                (Identifier))))
-          (Send
-            (Identifier))))
+            (Identifier)
+            (Identifier))
+          (Statements
+            (Send
+              (Identifier))))
+        (Send
+          (Identifier)))
       (Else
         (Empty)
         (Send
@@ -32,15 +33,16 @@
         (Statements
           (Statements
             (Identifier)))
-        (Catch
+        (Statements))
+      (Catch
+        (Statements
           (Statements
-            (Statements
-              (Identifier)
-              (Identifier))
-            (Statements
-              (Send
-                (Identifier))))
-          (Statements)))
+            (Identifier)
+            (Identifier))
+          (Statements
+            (Send
+              (Identifier))))
+        (Statements))
       (Else
         (Empty)
         (Statements))

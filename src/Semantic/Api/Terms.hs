@@ -115,7 +115,6 @@ doParse :: (ParseEffects sig m) => Blob -> m (SomeTerm TermConstraints Location)
 doParse blob = case blobLanguage blob of
   Go         -> SomeTerm <$> parse goParser blob
   Haskell    -> SomeTerm <$> parse haskellParser blob
-  Java       -> SomeTerm <$> parse javaParser blob
   JavaScript -> SomeTerm <$> parse tsxParser blob
   JSON       -> SomeTerm <$> parse jsonParser blob
   JSX        -> SomeTerm <$> parse tsxParser blob

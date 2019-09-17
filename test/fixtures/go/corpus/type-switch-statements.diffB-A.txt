@@ -11,47 +11,39 @@
           ->(Identifier) }
           { (Identifier)
           ->(Identifier) })
-          (TypeSwitchGuard
-          { (Identifier)
-          ->(Identifier) }))
+        { (Identifier)
+        ->(Identifier) })
         (Statements
-          (Pattern
-            (Statements
-              (Identifier)
-              (Pointer
-                (MemberAccess
-                  (Identifier)
-                  (Identifier))))
-            (Statements))
+          (Statements
+            (Identifier)
+            (Pointer
+              (MemberAccess
+                (Identifier)
+                (Identifier))))
           (Context
             (Comment)
-            (Pattern
+            (Statements
               (Slice
                 (Identifier))
               (Call
                 (Identifier)
                 (Statements)
                 (Empty))))
-          (Pattern
+          (Statements
             (Pointer
               (Identifier))
             (Break
               (Empty)))
-        {-(Pattern
-          {-(DefaultPattern
-            {-(Statements)-})-}
-          {-(Break
-            {-(Empty)-})-})-}))
+        {-(DefaultPattern
+          {-(Statements)-})-}))
       (TypeSwitch
         (Statements
-          (TypeSwitchGuard
-            (Statements
-            { (Identifier)
-            ->(Identifier) }
-            { (Identifier)
-            ->(Identifier) })))
+        { (Identifier)
+        ->(Identifier) }
+        { (Identifier)
+        ->(Identifier) })
         (Statements
-          (Pattern
+          (Statements
           { (Identifier)
           ->(Identifier) }
             (Call
@@ -67,7 +59,7 @@
                 {-(Integer)-}
                 {-(Identifier)-})-})
               (Empty)))
-          (Pattern
+          (Statements
           { (Identifier)
           ->(Identifier) }
             (Call
@@ -83,53 +75,48 @@
                 {-(Identifier)-}
                 {-(Integer)-})-})
               (Empty)))
-          (Pattern
+          (Statements
             (Identifier)
-            (Statements
-              (Assignment
-              { (Identifier)
-              ->(Identifier) }
-                (DividedBy
-                  (Call
-                    (Identifier)
+            (Assignment
+            { (Identifier)
+            ->(Identifier) }
+              (DividedBy
+                (Call
+                  (Identifier)
+                { (Identifier)
+                ->(Identifier) }
+                  (Empty))
+                (Integer)))
+            (Call
+              (MemberAccess
+                (Identifier)
+                (Identifier))
+              (Statements
+                (TextElement)
+                (Plus
+                  (Slice
                   { (Identifier)
                   ->(Identifier) }
+                  { (Identifier)
+                  ->(Identifier) }
+                    (Empty)
                     (Empty))
-                  (Integer)))
-              (Call
-                (MemberAccess
-                  (Identifier)
-                  (Identifier))
-                (Statements
-                  (TextElement)
-                  (Plus
-                    (Slice
-                    { (Identifier)
-                    ->(Identifier) }
-                    { (Identifier)
-                    ->(Identifier) }
-                      (Empty)
-                      (Empty))
-                    (Slice
-                    { (Identifier)
-                    ->(Identifier) }
-                      (Empty)
-                    { (Identifier)
-                    ->(Identifier) }
-                      (Empty))))
-                (Empty))))
-          (Pattern
-            (DefaultPattern
-              (Statements))
+                  (Slice
+                  { (Identifier)
+                  ->(Identifier) }
+                    (Empty)
+                  { (Identifier)
+                  ->(Identifier) }
+                    (Empty))))
+              (Empty)))
+          (DefaultPattern
             (Statements))))
       (TypeSwitch
         (Empty)
         (Statements
-          (TypeSwitchGuard
-            (Statements
-              (Identifier)
-            { (Identifier)
-            ->(Identifier) }))
+          (Identifier)
+        { (Identifier)
+        ->(Identifier) }
           (Context
           { (Comment)
           ->(Comment) }

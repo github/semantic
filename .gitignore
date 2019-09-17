@@ -8,7 +8,7 @@ stack.yaml.lock
 profiles
 /tags
 
-cabal.project.local
+cabal.project.local*
 dist
 dist-newstyle
 .ghc.environment.*

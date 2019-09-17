@@ -10,36 +10,31 @@
     {+(Match
       {+(Statements)+}
       {+(Pattern
-        {+(Identifier)+}
-        {+(Call
+        {+(Statements
           {+(Identifier)+}
-          {+(Statements)+}
-          {+(Empty)+})+})+})+}
+          {+(Call
+            {+(Identifier)+}
+            {+(Statements)+}
+            {+(Empty)+})+})+}
+        {+(Statements)+})+})+}
     {+(Match
       {+(Statements
         {+(Identifier)+})+}
-      {+(Statements
-        {+(Pattern
+      {+(Pattern
+        {+(Statements
           {+(Statements
             {+(Integer)+}
             {+(Integer)+})+}
-          {+(Statements
-            {+(Call
-              {+(Identifier)+}
-              {+(Statements)+}
-              {+(Empty)+})+}
-            {+(Call
-              {+(Identifier)+}
-              {+(Statements)+}
-              {+(Empty)+})+}
-            {+(Pattern
-              {+(Identifier)+}
-              {+(Empty)+})+})+})+}
+          {+(Call
+            {+(Identifier)+}
+            {+(Statements)+}
+            {+(Empty)+})+}
+          {+(Call
+            {+(Identifier)+}
+            {+(Statements)+}
+            {+(Empty)+})+}
+          {+(Pattern
+            {+(Identifier)+}
+            {+(Empty)+})+})+}
         {+(DefaultPattern
-          {+(Statements
-            {+(Call
-              {+(Identifier)+}
-              {+(Statements)+}
-              {+(Empty)+})+}
-            {+(Break
-              {+(Empty)+})+})+})+})+})+}) }))
+          {+(Statements)+})+})+})+}) }))
