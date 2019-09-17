@@ -603,7 +603,7 @@ ifStatement :: Assignment Term
 ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> (makeTerm <$> location <*> manyTermsTill expression (void (symbol Block))) <*> expression <*> (consequence <|> emptyTerm))
 
 ifInitializer :: Assignment Term
-ifInitializer = symbol IfInitializer *> children expression
+ifInitializer = children expression
 
 incStatement :: Assignment Term
 incStatement = makeTerm <$> symbol IncStatement <*> children (Statement.PostIncrement <$> expression)
