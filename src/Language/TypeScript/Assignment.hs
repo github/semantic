@@ -147,6 +147,7 @@ type Syntax = '[
   , TypeScript.Syntax.FlowMaybeType
   , TypeScript.Syntax.TypeQuery
   , TypeScript.Syntax.IndexTypeQuery
+  , TypeScript.Syntax.ThisType
   , TypeScript.Syntax.ExistentialType
   , TypeScript.Syntax.AbstractMethodSignature
   , TypeScript.Syntax.IndexSignature
@@ -520,7 +521,7 @@ primaryType =  arrayTy
            <|> objectType
            <|> parenthesizedTy
            <|> predefinedTy
-           <|> this
+           <|> thisType
            <|> tupleType
            <|> typeIdentifier
            <|> typePredicate
@@ -567,6 +568,9 @@ typeQuery = makeTerm <$> symbol Grammar.TypeQuery <*> children (TypeScript.Synta
 
 indexTypeQuery :: Assignment Term
 indexTypeQuery = makeTerm <$> symbol Grammar.IndexTypeQuery <*> children (TypeScript.Syntax.IndexTypeQuery <$> term (typeIdentifier <|> nestedTypeIdentifier))
+
+thisType :: Assignment Term
+thisType = makeTerm <$> symbol Grammar.ThisType <*> (TypeScript.Syntax.ThisType <$> source)
 
 existentialType :: Assignment Term
 existentialType = makeTerm <$> symbol Grammar.ExistentialType <*> (TypeScript.Syntax.ExistentialType <$> source)
