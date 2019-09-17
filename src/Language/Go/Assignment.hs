@@ -231,7 +231,6 @@ types =
          , typeDeclaration
          , typeIdentifier
          , typeCase
-         , typeCaseClause
          , typeSwitchStatement
          ]
 
@@ -498,16 +497,13 @@ typeAssertion = makeTerm <$> symbol TypeAssertionExpression <*> children (Go.Syn
 typeCase :: Assignment Term
 typeCase = symbol TypeCase *> children expressions
 
-typeCaseClause :: Assignment Term
-typeCaseClause = makeTerm <$> symbol TypeCaseClause <*> children (Statement.Pattern <$> expression <*> expressions)
-
 typeConversion :: Assignment Term
 typeConversion = makeTerm <$> symbol TypeConversionExpression <*> children (Go.Syntax.TypeConversion <$> expression <*> expression)
 
 typeSwitchStatement :: Assignment Term
 typeSwitchStatement = makeTerm <$> symbol TypeSwitchStatement <*> children (Go.Syntax.TypeSwitch <$> typeSwitchSubject <*> expressions)
   where
-    typeSwitchSubject = makeTerm <$> location <*> manyTermsTill expression (void (symbol TypeCaseClause)) <|> emptyTerm
+    typeSwitchSubject = makeTerm <$> location <*> manyTermsTill expression (void (symbol TypeCase)) <|> emptyTerm
 
 unaryExpression :: Assignment Term
 unaryExpression = makeTerm' <$> symbol UnaryExpression <*> (  notExpression
