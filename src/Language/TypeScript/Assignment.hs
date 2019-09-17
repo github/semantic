@@ -442,7 +442,7 @@ methodDefinition = makeMethod <$>
 callSignatureParts :: Assignment (Term, [Term], Term)
 callSignatureParts = contextualize' <$> Assignment.manyThrough comment (postContextualize' <$> callSignature' <*> many comment)
   where
-    callSignature' = symbol Grammar.CallSignature *> children ((,,) <$> (term typeParameters <|> emptyTerm) <*> formalParameters <*> (term typeAnnotation' <|> emptyTerm))
+    callSignature' = children ((,,) <$> (term typeParameters <|> emptyTerm) <*> formalParameters <*> (term typeAnnotation' <|> emptyTerm))
     contextualize' (cs, (typeParams, formalParams, annotation)) = case nonEmpty cs of
       Just cs -> (makeTerm1 (Syntax.Context cs typeParams), formalParams, annotation)
       Nothing -> (typeParams, formalParams, annotation)
@@ -451,7 +451,7 @@ callSignatureParts = contextualize' <$> Assignment.manyThrough comment (postCont
       Nothing -> (typeParams, formalParams, annotation)
 
 callSignature :: Assignment Term
-callSignature =  makeTerm <$> symbol Grammar.CallSignature <*> children (TypeScript.Syntax.CallSignature <$> (fromMaybe <$> emptyTerm <*> optional (term typeParameters)) <*> formalParameters <*> (fromMaybe <$> emptyTerm <*> optional (term typeAnnotation')))
+callSignature =  children (TypeScript.Syntax.CallSignature <$> (fromMaybe <$> emptyTerm <*> optional (term typeParameters)) <*> formalParameters <*> (fromMaybe <$> emptyTerm <*> optional (term typeAnnotation')))
 
 constructSignature :: Assignment Term
 constructSignature = makeTerm <$> symbol Grammar.ConstructSignature <*> children (TypeScript.Syntax.ConstructSignature <$> (fromMaybe <$> emptyTerm <*> optional (term typeParameters)) <*> formalParameters <*> (fromMaybe <$> emptyTerm <*> optional (term typeAnnotation')))
