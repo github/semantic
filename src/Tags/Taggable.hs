@@ -41,6 +41,7 @@ import Streaming.Prelude (yield)
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
+import qualified Data.Syntax.Statement as Statement
 import qualified Language.Ruby.Syntax as Ruby
 
 
@@ -240,6 +241,36 @@ instance Taggable Literal.Pointer
 instance Taggable Literal.Reference
 instance Taggable Literal.Null
 instance Taggable Literal.KeyValue
+
+instance Taggable Statement.Assignment
+instance Taggable Statement.Break
+instance Taggable Statement.Catch
+instance Taggable Statement.Continue
+instance Taggable Statement.DoWhile
+instance Taggable Statement.Else
+instance Taggable Statement.Finally
+instance Taggable Statement.For
+instance Taggable Statement.ForEach
+instance Taggable Statement.Goto
+instance Taggable Statement.If
+instance Taggable Statement.Let
+instance Taggable Statement.Match
+instance Taggable Statement.NoOp
+instance Taggable Statement.Pattern
+instance Taggable Statement.PostDecrement
+instance Taggable Statement.PostIncrement
+instance Taggable Statement.PreDecrement
+instance Taggable Statement.PreIncrement
+instance Taggable Statement.Retry
+instance Taggable Statement.Return
+instance Taggable Statement.ScopeEntry
+instance Taggable Statement.ScopeExit
+instance Taggable Statement.StatementBlock
+instance Taggable Statement.Statements
+instance Taggable Statement.Throw
+instance Taggable Statement.Try
+instance Taggable Statement.While
+instance Taggable Statement.Yield
 
 instance Taggable Declaration.Comprehension
 instance Taggable Declaration.Constructor
