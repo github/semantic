@@ -22,6 +22,7 @@ library
   exposed-modules:
     Data.Blob
     Data.Language
+    Data.Location
     Data.Range
     Data.Source
     Data.Span
