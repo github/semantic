@@ -42,7 +42,6 @@ import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
-import qualified Language.Python.Syntax as Python
 import qualified Language.Ruby.Syntax as Ruby
 
 
@@ -286,14 +285,6 @@ instance Taggable Declaration.Type
 instance Taggable Declaration.TypeAlias
 instance Taggable Declaration.Variable
 instance Taggable Declaration.VariableDeclaration
-
-instance Taggable Python.Alias
-instance Taggable Python.Ellipsis
-instance Taggable Python.FutureImport
-instance Taggable Python.Import
-instance Taggable Python.QualifiedAliasedImport
-instance Taggable Python.QualifiedImport
-instance Taggable Python.Redirect
 
 instance Taggable Ruby.Require
 instance Taggable Ruby.Load
