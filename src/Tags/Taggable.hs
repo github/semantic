@@ -39,7 +39,6 @@ import Streaming hiding (Sum)
 import Streaming.Prelude (yield)
 
 import qualified Data.Syntax.Declaration as Declaration
-import qualified Data.Syntax.Directive as Directive
 import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
@@ -289,9 +288,6 @@ instance Taggable Declaration.Type
 instance Taggable Declaration.TypeAlias
 instance Taggable Declaration.Variable
 instance Taggable Declaration.VariableDeclaration
-
-instance Taggable Directive.File
-instance Taggable Directive.Line
 
 instance Taggable Python.Alias
 instance Taggable Python.Ellipsis
