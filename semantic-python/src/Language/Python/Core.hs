@@ -21,9 +21,9 @@ import qualified TreeSitter.Python.AST as Py
 import           TreeSitter.Span (Span)
 import qualified TreeSitter.Span as TreeSitter
 
--- We don't want to commit to a particular representation of Core syntax,
--- but there are commonalities that repeatedly crop up and that clog type
--- signatures, so here's a constraint-kind alias for its capabilities.
+-- We leave the representation of Core syntax abstract so that it's not
+-- possible for us to 'cheat' by pattern-matching on or eliminating a
+-- compiled term.
 type CoreSyntax sig t = ( Member Core sig
                         , Member Ann sig
                         , Carrier sig t
