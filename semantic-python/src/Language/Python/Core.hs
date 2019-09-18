@@ -1,6 +1,7 @@
-{-# LANGUAGE DefaultSignatures, DeriveAnyClass, DerivingStrategies, DerivingVia, DisambiguateRecordFields,
-             FlexibleContexts, FlexibleInstances, NamedFieldPuns, OverloadedStrings, OverloadedLists, ScopedTypeVariables,
-             StandaloneDeriving, TypeOperators, UndecidableInstances, DeriveGeneric #-}
+{-# LANGUAGE ConstraintKinds, DefaultSignatures, DeriveAnyClass, DeriveGeneric, DerivingStrategies, DerivingVia,
+             DisambiguateRecordFields, FlexibleContexts, FlexibleInstances, NamedFieldPuns, OverloadedLists,
+             OverloadedStrings, ScopedTypeVariables, StandaloneDeriving, TypeOperators, UndecidableInstances #-}
+
 module Language.Python.Core
 ( compile
 ) where
@@ -16,21 +17,25 @@ import           GHC.Generics
 import qualified TreeSitter.Python.AST as Py
 import           TreeSitter.Span (Span)
 
+-- We don't want to commit to a particular representation of Core syntax,
+-- but there are commonalities that repeatedly crop up and that clog type
+-- signatures, so here's a constraint-kind alias for its capabilities.
+type CoreSyntax sig t = ( Member Core sig
+                        , Member Ann sig
+                        , Carrier sig t
+                        , Foldable t
+                        )
+
 class Compile py where
   -- FIXME: we should really try not to fail
-  compile :: (Member Core sig, Carrier sig t, Foldable t, MonadFail m) => py -> m (t Name)
+  compile :: (CoreSyntax sig t, MonadFail m) => py -> m (t Name)
 
   default compile :: (MonadFail m, Show py) => py -> m (t Name)
   compile = defaultCompile
 
-  compileCC :: (Member Core sig, Carrier sig t, Foldable t, MonadFail m) => py -> m (t Name) -> m (t Name)
+  compileCC :: (CoreSyntax sig t, MonadFail m) => py -> m (t Name) -> m (t Name)
 
-  default compileCC :: ( Member Core sig
-                       , Carrier sig t
-                       , Foldable t
-                       , MonadFail m
-                       )
-                    => py -> m (t Name) -> m (t Name)
+  default compileCC :: (CoreSyntax sig t, MonadFail m) => py -> m (t Name) -> m (t Name)
   compileCC py cc = (>>>) <$> compile py <*> cc
 
 -- | TODO: This is not right, it should be a reference to a Preluded
@@ -114,7 +119,7 @@ instance Compile (Py.FunctionDefinition Span) where
       body' <- compile body
       pure (pure name .= lams parameters' body')
     where param (Py.IdentifierParameter (Py.Identifier _pann pname)) = pure (named' pname)
-          param x = unimplemented x
+          param x                                                    = unimplemented x
           unimplemented x = fail $ "unimplemented: " <> show x
 
 instance Compile (Py.FutureImportStatement Span)
@@ -194,9 +199,9 @@ instance Compile (Py.WithStatement Span)
 instance Compile (Py.Yield Span)
 
 class GCompileSum f where
-  gcompileSum :: (Foldable t, Member Core sig, Carrier sig t, MonadFail m) => f a -> m (t Name)
+  gcompileSum :: (CoreSyntax sig t, MonadFail m) => f a -> m (t Name)
 
-  gcompileCCSum :: (Foldable t, Member Core sig, Carrier sig t, MonadFail m) => f a -> m (t Name) -> m (t Name)
+  gcompileCCSum :: (CoreSyntax sig t, MonadFail m) => f a -> m (t Name) -> m (t Name)
 
 instance GCompileSum f => GCompileSum (M1 D d f) where
   gcompileSum (M1 f) = gcompileSum f
