@@ -17,7 +17,7 @@ import qualified TreeSitter.Python.AST as Python
 
 data Tag = Tag
   { name :: Text
-  , kind :: Text
+  , kind :: Kind
   , span :: Span
   , context :: [Text]
   , line :: Maybe Text
