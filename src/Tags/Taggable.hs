@@ -141,10 +141,18 @@ subtractLocation a b = subtractRange (locationByteRange a) (locationByteRange b)
 -- Instances
 
 type family TaggableInstance (t :: * -> *) :: Strategy where
-  TaggableInstance (Sum _)        = 'Custom
-  TaggableInstance (TermF _ _)    = 'Custom
-  TaggableInstance Syntax.Context = 'Custom
-  TaggableInstance _              = 'Default
+  TaggableInstance (Sum _)              = 'Custom
+  TaggableInstance (TermF _ _)          = 'Custom
+  TaggableInstance Syntax.Context       = 'Custom
+  TaggableInstance Declaration.Function = 'Custom
+  TaggableInstance Declaration.Method   = 'Custom
+  TaggableInstance Declaration.Class    = 'Custom
+  TaggableInstance Ruby.Class           = 'Custom
+  TaggableInstance Ruby.Module          = 'Custom
+  TaggableInstance TypeScript.Module    = 'Custom
+  TaggableInstance Expression.Call      = 'Custom
+  TaggableInstance Ruby.Send            = 'Custom
+  TaggableInstance _                    = 'Default
 
 instance TaggableBy 'Default t
 
@@ -170,6 +178,56 @@ instance (Taggable a) => Taggable (TermF a Location) where
 
 instance TaggableBy 'Custom Syntax.Context where
   snippet' ann (Syntax.Context _ (Term (In subj _))) = Just (subtractLocation ann subj)
+
+instance TaggableBy 'Custom Declaration.Function where
+  docsLiteral' Python (Declaration.Function _ _ _ (Term (In _ bodyF)))
+    | (Term (In exprAnn exprF):_) <- toList bodyF
+    , isTextElement exprF = Just (locationByteRange exprAnn)
+    | otherwise           = Nothing
+  docsLiteral' _ _         = Nothing
+  snippet' ann (Declaration.Function _ _ _ (Term (In body _))) = Just $ subtractLocation ann body
+  symbolName' = declaredName . Declaration.functionName
+
+instance TaggableBy 'Custom Declaration.Method where
+  docsLiteral' Python (Declaration.Method _ _ _ _ (Term (In _ bodyF)) _)
+    | (Term (In exprAnn exprF):_) <- toList bodyF
+    , isTextElement exprF = Just (locationByteRange exprAnn)
+    | otherwise           = Nothing
+  docsLiteral' _ _         = Nothing
+  snippet' ann (Declaration.Method _ _ _ _ (Term (In body _)) _) = Just $ subtractLocation ann body
+  symbolName' = declaredName . Declaration.methodName
+
+instance TaggableBy 'Custom Declaration.Class where
+  docsLiteral' Python (Declaration.Class _ _ _ (Term (In _ bodyF)))
+    | (Term (In exprAnn exprF):_) <- toList bodyF
+    , isTextElement exprF = Just (locationByteRange exprAnn)
+    | otherwise           = Nothing
+  docsLiteral' _ _         = Nothing
+  snippet' ann (Declaration.Class _ _ _ (Term (In body _))) = Just $ subtractLocation ann body
+  symbolName' = declaredName . Declaration.classIdentifier
+
+instance TaggableBy 'Custom Ruby.Class where
+  snippet' ann (Ruby.Class _ _ (Term (In body _))) = Just $ subtractLocation ann body
+  symbolName' = declaredName . Ruby.classIdentifier
+
+instance TaggableBy 'Custom Ruby.Module where
+  snippet' ann (Ruby.Module _ (Term (In body _):_)) = Just $ subtractLocation ann body
+  snippet' ann (Ruby.Module _ _)                    = Just $ locationByteRange ann
+  symbolName' = declaredName . Ruby.moduleIdentifier
+
+instance TaggableBy 'Custom TypeScript.Module where
+  snippet' ann (TypeScript.Module _ (Term (In body _):_)) = Just $ subtractLocation ann body
+  snippet' ann (TypeScript.Module _ _                   ) = Just $ locationByteRange ann
+  symbolName' = declaredName . TypeScript.moduleIdentifier
+
+instance TaggableBy 'Custom Expression.Call where
+  snippet' ann (Expression.Call _ _ _ (Term (In body _))) = Just $ subtractLocation ann body
+  symbolName' = declaredName . Expression.callFunction
+
+instance TaggableBy 'Custom Ruby.Send where
+  snippet' ann (Ruby.Send _ _ _ (Just (Term (In body _)))) = Just $ subtractLocation ann body
+  snippet' ann _                                           = Just $ locationByteRange ann
+  symbolName' Ruby.Send{..} = declaredName =<< sendSelector
 
 instance Taggable Syntax.Context where
   snippet ann (Syntax.Context _ (Term (In subj _))) = Just (subtractLocation ann subj)
