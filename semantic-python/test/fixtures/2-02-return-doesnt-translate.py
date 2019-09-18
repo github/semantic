@@ -1,4 +1,4 @@
-# CHECK-JQ: .tree.contents[0][1].contents[1].contents.value.value == []
+# CHECK-TREE: #record { foo : foo = (\a -> a) }
 
 def foo(a):
     return a

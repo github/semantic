@@ -5,6 +5,12 @@ module Directive ( Directive (..)
                  ) where
 
 import           Control.Applicative
+import           Control.Monad
+import           Data.Name (Name)
+import           Data.Term (Term)
+import           Data.Core (Core)
+import qualified Data.Core.Parser as Core.Parser
+import qualified Data.Core.Pretty as Core.Pretty
 import           Data.ByteString.Char8 (ByteString)
 import qualified Data.ByteString.Char8 as ByteString
 import           Data.List.NonEmpty (NonEmpty)
@@ -37,11 +43,13 @@ projects.
 
 -}
 data Directive = JQ ByteString -- | @# CHECK-JQ: expr@
+               | Tree (Term Core Name) -- | @# CHECK-TREE: core@
                | Fails -- | @# CHECK-FAILS@ fails unless translation fails.
                  deriving (Eq, Show)
 
 describe :: Directive -> String
 describe Fails = "<expect failure>"
+describe (Tree t) =  Core.Pretty.showCore t
 describe (JQ b) = ByteString.unpack b
 
 fails :: Trifecta.Parser Directive
@@ -52,8 +60,13 @@ jq = do
   Trifecta.string "# CHECK-JQ: "
   JQ . ByteString.pack <$> many (Trifecta.noneOf "\n")
 
+tree :: Trifecta.Parser Directive
+tree = do
+  void $ Trifecta.string "# CHECK-TREE: "
+  Tree <$> (Core.Parser.record <|> Core.Parser.comp)
+
 directive :: Trifecta.Parser Directive
-directive = fails <|> jq
+directive = Trifecta.choice [ fails, jq, tree ]
 
 toplevel :: Trifecta.Parser (NonEmpty Directive)
 toplevel = directive `Trifecta.sepEndByNonEmpty` Trifecta.char '\n'
