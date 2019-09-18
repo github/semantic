@@ -108,6 +108,7 @@ type TermConstraints =
   , Declarations1
   , ConstructorName
   , HasTextElement
+  , Show1
   , ToJSONFields1
   , Traversable
   ]
