@@ -91,7 +91,6 @@ class Taggable constr where
 type IsTaggable syntax =
   ( Functor syntax
   , Foldable syntax
-  , Traversable syntax
   , Taggable syntax
   , ConstructorName syntax
   , Declarations1 syntax
