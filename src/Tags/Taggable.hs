@@ -42,6 +42,8 @@ import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
+import qualified Language.Go.Syntax as Go
+import qualified Language.Go.Type as Go
 import qualified Language.Python.Syntax as Python
 import qualified Language.Ruby.Syntax as Ruby
 
@@ -294,6 +296,31 @@ instance Taggable Python.Import
 instance Taggable Python.QualifiedAliasedImport
 instance Taggable Python.QualifiedImport
 instance Taggable Python.Redirect
+
+instance Taggable Go.BidirectionalChannel
+instance Taggable Go.ReceiveChannel
+instance Taggable Go.SendChannel
+instance Taggable Go.Import
+instance Taggable Go.QualifiedImport
+instance Taggable Go.SideEffectImport
+instance Taggable Go.Composite
+instance Taggable Go.Label
+instance Taggable Go.Send
+instance Taggable Go.Slice
+instance Taggable Go.TypeSwitch
+instance Taggable Go.Receive
+instance Taggable Go.Field
+instance Taggable Go.Package
+instance Taggable Go.TypeAssertion
+instance Taggable Go.TypeConversion
+instance Taggable Go.Variadic
+instance Taggable Go.DefaultPattern
+instance Taggable Go.Defer
+instance Taggable Go.Go
+instance Taggable Go.Rune
+instance Taggable Go.Select
+instance Taggable Go.TypeSwitchGuard
+instance Taggable Go.ReceiveOperator
 
 instance Taggable Ruby.Require
 instance Taggable Ruby.Load
