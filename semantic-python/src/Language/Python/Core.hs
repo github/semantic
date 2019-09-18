@@ -114,7 +114,7 @@ instance Compile (Py.ExpressionList Span) where
     pure . locate it $ do' (fmap (Nothing :<-) actions)
 
 
-instance Compile (Py.False Span) where compile _ = pure (bool False)
+instance Compile (Py.False Span) where compile it = pure . locate it $ bool False
 
 instance Compile (Py.Float Span)
 instance Compile (Py.ForStatement Span)
