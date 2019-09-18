@@ -10,6 +10,7 @@ module Language.Python.Core
 import Prelude hiding (fail)
 
 import           Control.Effect hiding ((:+:))
+import           Control.Effect.Reader
 import           Control.Monad.Fail
 import           Data.Core as Core
 import           Data.Foldable
@@ -20,6 +21,8 @@ import qualified Data.Loc
 import qualified TreeSitter.Python.AST as Py
 import           TreeSitter.Span (Span)
 import qualified TreeSitter.Span as TreeSitter
+import qualified System.Path as Path
+import qualified Data.Text as Text
 
 -- We leave the representation of Core syntax abstract so that it's not
 -- possible for us to 'cheat' by pattern-matching on or eliminating a
@@ -32,21 +35,44 @@ type CoreSyntax sig t = ( Member Core sig
 
 class Compile py where
   -- FIXME: we should really try not to fail
-  compile :: (CoreSyntax sig t, MonadFail m) => py -> m (t Name)
+  compile :: ( CoreSyntax syn t
+             , Member (Reader Path.RelFile) sig
+             , Carrier sig m
+             , MonadFail m
+             )
+          => py
+          -> m (t Name)
 
   default compile :: (MonadFail m, Show py) => py -> m (t Name)
   compile = defaultCompile
 
-  compileCC :: (CoreSyntax sig t, MonadFail m) => py -> m (t Name) -> m (t Name)
+  compileCC :: ( CoreSyntax syn t
+               , Member (Reader Path.RelFile) sig
+               , Carrier sig m
+               , MonadFail m
+               )
+            => py
+            -> m (t Name)
+            -> m (t Name)
 
-  default compileCC :: (CoreSyntax sig t, MonadFail m) => py -> m (t Name) -> m (t Name)
+  default compileCC :: ( CoreSyntax syn t
+                       , Member (Reader Path.RelFile) sig
+                       , Carrier sig m
+                       , MonadFail m
+                       ) => py -> m (t Name) -> m (t Name)
   compileCC py cc = (>>>) <$> compile py <*> cc
 
-locate :: (HasField "ann" syntax Span, CoreSyntax sig t) => syntax -> t a -> t a
-locate syn = Core.annAt (locFromTSSpan (getField @"ann" syn))
-  where
-    locFromTSSpan (TreeSitter.Span (TreeSitter.Pos a b) (TreeSitter.Pos c d))
-      = Data.Loc.Loc mempty (Data.Loc.Span (Data.Loc.Pos a b) (Data.Loc.Pos c d))
+locate :: ( HasField "ann" syntax Span
+          , CoreSyntax syn t
+          , Member (Reader Path.RelFile) sig
+          , Carrier sig m
+          ) => syntax -> t a -> m (t a)
+locate syn item = do
+  fp <- asks @Path.RelFile (Text.pack . Path.toString)
+  let locFromTSSpan (TreeSitter.Span (TreeSitter.Pos a b) (TreeSitter.Pos c d))
+        = Data.Loc.Loc fp (Data.Loc.Span (Data.Loc.Pos a b) (Data.Loc.Pos c d))
+
+  pure (Core.annAt (locFromTSSpan (getField @"ann" syn)) item)
 
 -- | TODO: This is not right, it should be a reference to a Preluded
 -- NoneType instance, but it will do for now.
@@ -71,7 +97,7 @@ instance Compile (Py.Assignment Span) where
   compile it@Py.Assignment { Py.left = Py.ExpressionList { Py.extraChildren = [lhs] }, Py.right = Just rhs } = do
     target <- compile lhs
     value  <- compile rhs
-    pure . locate it $ target .= value
+    locate it $ target .= value
   compile other = fail ("Unhandled assignment case: " <> show other)
 
 instance Compile (Py.AugmentedAssignment Span)
@@ -81,7 +107,7 @@ instance Compile (Py.BinaryOperator Span)
 instance Compile (Py.Block Span) where
   compile t = compileCC t (pure none)
 
-  compileCC it@Py.Block{ Py.extraChildren = body} cc = locate it <$> foldr compileCC cc body
+  compileCC it@Py.Block{ Py.extraChildren = body} cc = locate it =<< foldr compileCC cc body
 
 instance Compile (Py.BooleanOperator Span)
 instance Compile (Py.BreakStatement Span)
@@ -106,15 +132,15 @@ deriving via CompileSum (Py.Expression Span) instance Compile (Py.Expression Spa
 instance Compile (Py.ExpressionStatement Span) where
   compile it@Py.ExpressionStatement { Py.extraChildren = children } = do
     actions <- traverse compile children
-    pure . locate it $ do' (fmap (Nothing :<-) actions)
+    locate it $ do' (fmap (Nothing :<-) actions)
 
 instance Compile (Py.ExpressionList Span) where
   compile it@Py.ExpressionList { Py.extraChildren = exprs } = do
     actions <- traverse compile exprs
-    pure . locate it $ do' (fmap (Nothing :<-) actions)
+    locate it $ do' (fmap (Nothing :<-) actions)
 
 
-instance Compile (Py.False Span) where compile it = pure . locate it $ bool False
+instance Compile (Py.False Span) where compile it = locate it $ bool False
 
 instance Compile (Py.Float Span)
 instance Compile (Py.ForStatement Span)
@@ -127,7 +153,7 @@ instance Compile (Py.FunctionDefinition Span) where
     } = do
       parameters' <- traverse param parameters
       body' <- compile body
-      pure . locate it $ (pure name .= lams parameters' body')
+      locate it $ (pure name .= lams parameters' body')
     where param (Py.IdentifierParameter (Py.Identifier _pann pname)) = pure (named' pname)
           param x                                                    = unimplemented x
           unimplemented x = fail $ "unimplemented: " <> show x
@@ -143,7 +169,7 @@ instance Compile (Py.IfStatement Span) where
   compile stmt = compileCC stmt (pure none)
 
   compileCC it@Py.IfStatement{ condition, consequence, alternative} cc =
-    locate it <$> (if' <$> compile condition <*> compileCC consequence cc <*> foldr clause cc alternative)
+    locate it =<< (if' <$> compile condition <*> compileCC consequence cc <*> foldr clause cc alternative)
     where clause (Right Py.ElseClause{ body }) _ = compileCC body cc
           clause (Left  Py.ElifClause{ condition, consequence }) rest  =
             if' <$> compile condition <*> compileCC consequence cc <*> rest
@@ -162,7 +188,7 @@ instance Compile (Py.Module Span) where
     -- to top-level scope.
     res <- traverse compile stmts
     let names = concatMap toList res
-    pure . locate it . record $ zip names res
+    locate it . record $ zip names res
 
 instance Compile (Py.NamedExpression Span)
 instance Compile (Py.None Span)
@@ -171,7 +197,7 @@ instance Compile (Py.NotOperator Span)
 instance Compile (Py.ParenthesizedExpression Span)
 
 instance Compile (Py.PassStatement Span) where
-  compile it@Py.PassStatement {} = pure . locate it $ Core.unit
+  compile it@Py.PassStatement {} = locate it $ Core.unit
 
 deriving via CompileSum (Py.PrimaryExpression Span) instance Compile (Py.PrimaryExpression Span)
 
@@ -179,8 +205,8 @@ instance Compile (Py.PrintStatement Span)
 
 instance Compile (Py.ReturnStatement Span) where
   compile it@Py.ReturnStatement { Py.extraChildren = vals } = case vals of
-    Nothing -> pure . locate it $ none
-    Just Py.ExpressionList { extraChildren = [val] } -> locate it <$> compile val
+    Nothing -> locate it $ none
+    Just Py.ExpressionList { extraChildren = [val] } -> compile val >>= locate it
     Just Py.ExpressionList { extraChildren = vals  } -> fail ("unimplemented: return statement returning " <> show (length vals) <> " values")
 
   compileCC r _ = compile r
@@ -195,12 +221,12 @@ deriving via CompileSum (Py.SimpleStatement Span) instance Compile (Py.SimpleSta
 instance Compile (Py.String Span)
 instance Compile (Py.Subscript Span)
 
-instance Compile (Py.True Span) where compile it = pure . locate it $ bool True
+instance Compile (Py.True Span) where compile it = locate it $ bool True
 
 instance Compile (Py.TryStatement Span)
 
 instance Compile (Py.Tuple Span) where
-  compile it@Py.Tuple { Py.extraChildren = [] } = pure . locate it $ Core.unit
+  compile it@Py.Tuple { Py.extraChildren = [] } = locate it $ Core.unit
   compile it                                    = fail ("Unimplemented: non-empty tuple " <> show it)
 
 instance Compile (Py.UnaryOperator Span)
@@ -209,9 +235,17 @@ instance Compile (Py.WithStatement Span)
 instance Compile (Py.Yield Span)
 
 class GCompileSum f where
-  gcompileSum :: (CoreSyntax sig t, MonadFail m) => f a -> m (t Name)
+  gcompileSum :: ( CoreSyntax syn t
+                 , Member (Reader Path.RelFile) sig
+                 , Carrier sig m
+                 , MonadFail m
+                 ) => f a -> m (t Name)
 
-  gcompileCCSum :: (CoreSyntax sig t, MonadFail m) => f a -> m (t Name) -> m (t Name)
+  gcompileCCSum :: ( CoreSyntax syn t
+                   , Member (Reader Path.RelFile) sig
+                   , Carrier sig m
+                   , MonadFail m
+                   ) => f a -> m (t Name) -> m (t Name)
 
 instance GCompileSum f => GCompileSum (M1 D d f) where
   gcompileSum (M1 f) = gcompileSum f
