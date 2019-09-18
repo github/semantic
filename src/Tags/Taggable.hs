@@ -141,9 +141,15 @@ subtractLocation a b = subtractRange (locationByteRange a) (locationByteRange b)
 -- Instances
 
 type family TaggableInstance (t :: * -> *) :: Strategy where
+  TaggableInstance (Sum _) = 'Custom
   TaggableInstance _       = 'Default
 
 instance TaggableBy 'Default t
+
+instance Apply Taggable fs => TaggableBy 'Custom (Sum fs) where
+  docsLiteral' a = apply @Taggable (docsLiteral a)
+  snippet' x = apply @Taggable (snippet x)
+  symbolName' = apply @Taggable symbolName
 
 instance Apply Taggable fs => Taggable (Sum fs) where
   docsLiteral a = apply @Taggable (docsLiteral a)
