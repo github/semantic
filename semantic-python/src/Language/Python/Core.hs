@@ -1,4 +1,6 @@
-{-# LANGUAGE DefaultSignatures, DisambiguateRecordFields, FlexibleContexts, FlexibleInstances, OverloadedStrings, OverloadedLists, ScopedTypeVariables, NamedFieldPuns, TypeOperators #-}
+{-# LANGUAGE DefaultSignatures, DeriveAnyClass, DerivingStrategies, DerivingVia, DisambiguateRecordFields,
+             FlexibleContexts, FlexibleInstances, NamedFieldPuns, OverloadedStrings, OverloadedLists, ScopedTypeVariables,
+             StandaloneDeriving, TypeOperators, UndecidableInstances, DeriveGeneric #-}
 module Language.Python.Core
 ( compile
 ) where
@@ -17,13 +19,35 @@ import           TreeSitter.Span (Span)
 class Compile py where
   -- FIXME: we should really try not to fail
   compile :: (Member Core sig, Carrier sig t, Foldable t, MonadFail m) => py -> m (t Name)
+
   default compile :: (MonadFail m, Show py) => py -> m (t Name)
   compile = defaultCompile
+
+  compileCC :: (Member Core sig, Carrier sig t, Foldable t, MonadFail m) => py -> m (t Name) -> m (t Name)
+
+  default compileCC :: ( Member Core sig
+                       , Carrier sig t
+                       , Foldable t
+                       , MonadFail m
+                       )
+                    => py -> m (t Name) -> m (t Name)
+  compileCC py cc = (>>>) <$> compile py <*> cc
+
+-- | TODO: This is not right, it should be a reference to a Preluded
+-- NoneType instance, but it will do for now.
+none :: (Member Core sig, Carrier sig t) => t Name
+none = unit
 
 defaultCompile :: (MonadFail m, Show py) => py -> m (t Name)
 defaultCompile t = fail $ "compilation unimplemented for " <> show t
 
-instance (Compile l, Compile r) => Compile (Either l r) where compile = compileSum
+newtype CompileSum py = CompileSum py
+
+instance (Generic py, GCompileSum (Rep py)) => Compile (CompileSum py) where
+  compile (CompileSum a) = gcompileSum . from $ a
+  compileCC (CompileSum a) cc = gcompileCCSum (from a) cc
+
+deriving via CompileSum (Either l r) instance (Compile l, Compile r) => Compile (Either l r)
 
 instance Compile (Py.AssertStatement Span)
 instance Compile (Py.Attribute Span)
@@ -38,14 +62,19 @@ instance Compile (Py.Assignment Span) where
 instance Compile (Py.AugmentedAssignment Span)
 instance Compile (Py.Await Span)
 instance Compile (Py.BinaryOperator Span)
-instance Compile (Py.Block Span)
+
+instance Compile (Py.Block Span) where
+  compile t = compileCC t (pure none)
+
+  compileCC Py.Block{ Py.extraChildren = body} cc = foldr compileCC cc body
+
 instance Compile (Py.BooleanOperator Span)
 instance Compile (Py.BreakStatement Span)
 instance Compile (Py.Call Span)
 instance Compile (Py.ClassDefinition Span)
 instance Compile (Py.ComparisonOperator Span)
 
-instance Compile (Py.CompoundStatement Span) where compile = compileSum
+deriving via CompileSum (Py.CompoundStatement Span) instance Compile (Py.CompoundStatement Span)
 
 instance Compile (Py.ConcatenatedString Span)
 instance Compile (Py.ConditionalExpression Span)
@@ -57,7 +86,7 @@ instance Compile (Py.DictionaryComprehension Span)
 instance Compile (Py.Ellipsis Span)
 instance Compile (Py.ExecStatement Span)
 
-instance Compile (Py.Expression Span) where compile = compileSum
+deriving via CompileSum (Py.Expression Span) instance Compile (Py.Expression Span)
 
 instance Compile (Py.ExpressionStatement Span) where
   compile Py.ExpressionStatement { Py.extraChildren = children } = do
@@ -96,11 +125,13 @@ instance Compile (Py.Identifier Span) where
   compile Py.Identifier { bytes } = pure (pure bytes)
 
 instance Compile (Py.IfStatement Span) where
-  compile Py.IfStatement{ condition, consequence, alternative } =
-    if' <$> compile condition <*> compile consequence <*> foldr clause (pure unit) alternative
-    where clause (Right Py.ElseClause{ body }) _ = compile body
+  compile stmt = compileCC stmt (pure none)
+
+  compileCC Py.IfStatement{ condition, consequence, alternative} cc =
+    if' <$> compile condition <*> compileCC consequence cc <*> foldr clause cc alternative
+    where clause (Right Py.ElseClause{ body }) _ = compileCC body cc
           clause (Left  Py.ElifClause{ condition, consequence }) rest  =
-            if' <$> compile condition <*> compile consequence <*> rest
+            if' <$> compile condition <*> compileCC consequence cc <*> rest
 
 
 instance Compile (Py.ImportFromStatement Span)
@@ -127,15 +158,24 @@ instance Compile (Py.ParenthesizedExpression Span)
 instance Compile (Py.PassStatement Span) where
   compile Py.PassStatement {} = pure Core.unit
 
-instance Compile (Py.PrimaryExpression Span) where compile = compileSum
+deriving via CompileSum (Py.PrimaryExpression Span) instance Compile (Py.PrimaryExpression Span)
 
 instance Compile (Py.PrintStatement Span)
-instance Compile (Py.ReturnStatement Span)
+
+instance Compile (Py.ReturnStatement Span) where
+  compile Py.ReturnStatement { Py.extraChildren = vals } = case vals of
+    Nothing -> pure none
+    Just Py.ExpressionList { extraChildren = [val] } -> compile val
+    Just Py.ExpressionList { extraChildren = vals  } -> fail ("unimplemented: return statement returning " <> show (length vals) <> " values")
+
+  compileCC r _ = compile r
+
+
 instance Compile (Py.RaiseStatement Span)
 instance Compile (Py.Set Span)
 instance Compile (Py.SetComprehension Span)
 
-instance Compile (Py.SimpleStatement Span) where compile = compileSum
+deriving via CompileSum (Py.SimpleStatement Span) instance Compile (Py.SimpleStatement Span)
 
 instance Compile (Py.String Span)
 instance Compile (Py.Subscript Span)
@@ -153,18 +193,22 @@ instance Compile (Py.WhileStatement Span)
 instance Compile (Py.WithStatement Span)
 instance Compile (Py.Yield Span)
 
-compileSum :: (Generic py, GCompileSum (Rep py), Member Core sig, Foldable t, Carrier sig t, MonadFail m) => py -> m (t Name)
-compileSum = gcompileSum . from
-
 class GCompileSum f where
   gcompileSum :: (Foldable t, Member Core sig, Carrier sig t, MonadFail m) => f a -> m (t Name)
 
+  gcompileCCSum :: (Foldable t, Member Core sig, Carrier sig t, MonadFail m) => f a -> m (t Name) -> m (t Name)
+
 instance GCompileSum f => GCompileSum (M1 D d f) where
   gcompileSum (M1 f) = gcompileSum f
+  gcompileCCSum (M1 f) = gcompileCCSum f
 
 instance (GCompileSum l, GCompileSum r) => GCompileSum (l :+: r) where
   gcompileSum (L1 l) = gcompileSum l
   gcompileSum (R1 r) = gcompileSum r
 
+  gcompileCCSum (L1 l) = gcompileCCSum l
+  gcompileCCSum (R1 r) = gcompileCCSum r
+
 instance Compile t => GCompileSum (M1 C c (M1 S s (K1 R t))) where
   gcompileSum (M1 (M1 (K1 t))) = compile t
+  gcompileCCSum (M1 (M1 (K1 t))) = compileCC t

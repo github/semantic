@@ -35,6 +35,7 @@ import qualified TreeSitter.Span as TS (Span)
 import qualified TreeSitter.Python as TSP
 import qualified TreeSitter.Python.AST as TSP
 import qualified TreeSitter.Unmarshal as TS
+import           Text.Show.Pretty (ppShow)
 
 import qualified Test.Tasty as Tasty
 import qualified Test.Tasty.HUnit as HUnit
@@ -43,8 +44,8 @@ import           Analysis.ScopeGraph
 import qualified Directive
 import           Instances ()
 
-assertJQExpressionSucceeds :: Directive.Directive -> Term (Ann :+: Core) Name -> HUnit.Assertion
-assertJQExpressionSucceeds directive core = do
+assertJQExpressionSucceeds :: Show a => Directive.Directive -> a -> Term (Ann :+: Core) Name -> HUnit.Assertion
+assertJQExpressionSucceeds directive tree core = do
   bod <- case scopeGraph Eval.eval [File interactive core] of
     (heap, [File _ (Right result)]) -> pure $ Aeson.object
       [ "scope" Aeson..= heap
@@ -59,10 +60,13 @@ assertJQExpressionSucceeds directive core = do
       errorMsg = "jq(1) returned non-zero exit code"
       dirMsg    = "jq expression: " <> show directive
       jsonMsg   = "JSON value: " <> ByteString.Lazy.unpack (Aeson.encodePretty bod)
-      treeMsg   = "Core expr: " <> showCore (stripAnnotations core)
+      astMsg    = "AST (pretty): " <> ppShow tree
+      treeMsg   = "Core expr (pretty): " <> showCore (stripAnnotations core)
+      treeMsg'  = "Core expr (Show): " <> ppShow (stripAnnotations core)
+
 
   catch @_ @Streaming.Process.ProcessExitedUnsuccessfully jqPipeline $ \err -> do
-    HUnit.assertFailure (unlines [errorMsg, dirMsg, jsonMsg, treeMsg, show err])
+    HUnit.assertFailure (unlines [errorMsg, dirMsg, jsonMsg, astMsg, treeMsg, treeMsg', show err])
 
 fixtureTestTreeForFile :: HasCallStack => FilePath -> Tasty.TestTree
 fixtureTestTreeForFile fp = HUnit.testCaseSteps fp $ \step -> withFrozenCallStack $ do
@@ -79,7 +83,7 @@ fixtureTestTreeForFile fp = HUnit.testCaseSteps fp $ \step -> withFrozenCallStac
       Left err           -> HUnit.assertFailure ("Parsing failed: " <> err)
       Right (Left _)     | directive == Directive.Fails -> pure ()
       Right (Right _)    | directive == Directive.Fails -> HUnit.assertFailure ("Expected translation to fail")
-      Right (Right item) -> assertJQExpressionSucceeds directive item
+      Right (Right item) -> assertJQExpressionSucceeds directive result item
       Right (Left err)   -> HUnit.assertFailure ("Compilation failed: " <> err)
 
 
