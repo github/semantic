@@ -3,7 +3,6 @@ module Data.Range
 ( Range(..)
 , emptyRange
 , rangeLength
-, offsetRange
 , intersectsRange
 , subtractRange
 ) where
@@ -23,10 +22,6 @@ emptyRange = Range 0 0
 -- | Return the length of the range.
 rangeLength :: Range -> Int
 rangeLength range = end range - start range
-
--- | Offset a range by a constant delta.
-offsetRange :: Range -> Int -> Range
-offsetRange a b = Range (start a + b) (end a + b)
 
 -- | Test two ranges for intersection.
 intersectsRange :: Range -> Range -> Bool
