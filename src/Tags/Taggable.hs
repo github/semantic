@@ -76,14 +76,13 @@ emitIden span docsLiteralRange name = yield (Iden (formatName name) span docsLit
 
 class (Show1 constr, Traversable constr) => Taggable constr where
   docsLiteral ::
-    ( Functor syntax
-    , Foldable syntax
+    ( Foldable syntax
     , HasTextElement syntax
     )
     => Language -> constr (Term syntax Location) -> Maybe Range
   docsLiteral _ _ = Nothing
 
-  snippet :: (Foldable syntax) => Location -> constr (Term syntax Location) -> Maybe Range
+  snippet :: Foldable syntax => Location -> constr (Term syntax Location) -> Maybe Range
   snippet _ _ = Nothing
 
   symbolName :: Declarations1 syntax => constr (Term syntax Location) -> Maybe Name
@@ -109,7 +108,6 @@ tagging b = foldSubterms (descend (blobLanguage b))
 descend ::
   ( Taggable (TermF syntax Location)
   , ConstructorName (TermF syntax Location)
-  , Functor syntax
   , Foldable syntax
   , HasTextElement syntax
   , Declarations1 syntax
