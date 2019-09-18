@@ -33,6 +33,7 @@ library
       aeson              ^>= 1.4.2.0
     , base                >= 4.12 && < 5
     , bytestring         ^>= 0.10.8.2
+    , containers         ^>= 0.6.0.1
     , fused-effects      ^>= 0.5
     , text               ^>= 1.2.3.1
     , tree-sitter         == 0.3.0.0
