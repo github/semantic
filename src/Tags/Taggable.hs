@@ -104,12 +104,8 @@ tagging :: (Monad m, IsTaggable syntax)
 tagging b = foldSubterms (descend (blobLanguage b))
 
 descend ::
-  ( Taggable (TermF syntax Location)
-  , ConstructorName (TermF syntax Location)
-  , Foldable syntax
-  , Functor syntax
-  , HasTextElement syntax
-  , Declarations1 syntax
+  ( ConstructorName (TermF syntax Location)
+  , IsTaggable syntax
   , Monad m
   )
   => Language -> SubtermAlgebra (TermF syntax Location) (Term syntax Location) (Tagger m ())
