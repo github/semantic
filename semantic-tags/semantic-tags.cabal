@@ -19,7 +19,8 @@ extra-source-files:  README.md
 tested-with:         GHC == 8.6.5
 
 library
-  -- exposed-modules:
+  exposed-modules:
+    Tags.Taggable.Precise
   -- other-modules:
   -- other-extensions:
   build-depends:
