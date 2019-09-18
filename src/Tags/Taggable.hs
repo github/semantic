@@ -44,7 +44,6 @@ import qualified Data.Syntax.Directive as Directive
 import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
-import qualified Data.Syntax.Type as Type
 import qualified Language.Go.Syntax as Go
 import qualified Language.Go.Type as Go
 import qualified Language.Haskell.Syntax as Haskell
@@ -283,23 +282,6 @@ instance Taggable Statement.Throw
 instance Taggable Statement.Try
 instance Taggable Statement.While
 instance Taggable Statement.Yield
-
-instance Taggable Type.Annotation
-instance Taggable Type.Array
-instance Taggable Type.Bool
-instance Taggable Type.Double
-instance Taggable Type.Float
-instance Taggable Type.Function
-instance Taggable Type.Int
-instance Taggable Type.Interface
-instance Taggable Type.Map
-instance Taggable Type.Parenthesized
-instance Taggable Type.Pointer
-instance Taggable Type.Product
-instance Taggable Type.Readonly
-instance Taggable Type.Slice
-instance Taggable Type.TypeParameters
-instance Taggable Type.Void
 
 instance Taggable Declaration.Comprehension
 instance Taggable Declaration.Constructor
