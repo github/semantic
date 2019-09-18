@@ -1,6 +1,7 @@
-{-# LANGUAGE ConstraintKinds, DefaultSignatures, DeriveAnyClass, DeriveGeneric, DerivingStrategies, DerivingVia,
-             DisambiguateRecordFields, FlexibleContexts, FlexibleInstances, NamedFieldPuns, OverloadedLists,
-             OverloadedStrings, ScopedTypeVariables, StandaloneDeriving, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE ConstraintKinds, DataKinds, DefaultSignatures, DeriveAnyClass, DeriveGeneric, DerivingStrategies,
+             DerivingVia, DisambiguateRecordFields, FlexibleContexts, FlexibleInstances, NamedFieldPuns,
+             OverloadedLists, OverloadedStrings, ScopedTypeVariables, StandaloneDeriving, TypeApplications,
+             TypeOperators, UndecidableInstances #-}
 
 module Language.Python.Core
 ( compile
@@ -14,6 +15,8 @@ import           Data.Core as Core
 import           Data.Foldable
 import           Data.Name as Name
 import           GHC.Generics
+import           GHC.Records
+import qualified Data.Loc
 import qualified TreeSitter.Python.AST as Py
 import           TreeSitter.Span (Span)
 
@@ -37,6 +40,9 @@ class Compile py where
 
   default compileCC :: (CoreSyntax sig t, MonadFail m) => py -> m (t Name) -> m (t Name)
   compileCC py cc = (>>>) <$> compile py <*> cc
+
+locate :: (HasField "ann" syntax Span, CoreSyntax sig t) => syntax -> t a -> t a
+locate syn = Core.annAt (Data.Loc.fromTSSpan (getField @"ann" syn))
 
 -- | TODO: This is not right, it should be a reference to a Preluded
 -- NoneType instance, but it will do for now.
