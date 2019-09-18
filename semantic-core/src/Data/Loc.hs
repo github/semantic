@@ -1,7 +1,9 @@
-{-# LANGUAGE FlexibleInstances, GeneralizedNewtypeDeriving, MultiParamTypeClasses, OverloadedStrings, RecordWildCards, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE FlexibleInstances, GeneralizedNewtypeDeriving, MultiParamTypeClasses, OverloadedStrings, RecordWildCards,
+             TypeOperators, UndecidableInstances #-}
 module Data.Loc
 ( Loc(..)
 , interactive
+, fromTSSpan
 , Span(..)
 , emptySpan
 , Pos(..)
@@ -11,21 +13,26 @@ module Data.Loc
 , runFailWithLoc
 ) where
 
-import Control.Applicative
-import Control.Effect.Carrier
-import Control.Effect.Error
-import Control.Effect.Fail
-import Control.Effect.Reader
-import Data.Text (Text, pack)
-import Data.Text.Prettyprint.Doc (Pretty (..))
-import GHC.Stack
-import Prelude hiding (fail)
+import           Control.Applicative
+import           Control.Effect.Carrier
+import           Control.Effect.Error
+import           Control.Effect.Fail
+import           Control.Effect.Reader
+import           Data.Text (Text, pack)
+import           Data.Text.Prettyprint.Doc (Pretty (..))
+import           GHC.Stack
+import           Prelude hiding (fail)
+import qualified TreeSitter.Span as TreeSitter
 
 data Loc = Loc
   { locPath :: !Text
   , locSpan :: {-# UNPACK #-} !Span
   }
   deriving (Eq, Ord, Show)
+
+fromTSSpan :: TreeSitter.Span -> Loc
+fromTSSpan (TreeSitter.Span (TreeSitter.Pos a b) (TreeSitter.Pos c d))
+  = Loc mempty (Span (Pos a b) (Pos c d))
 
 interactive :: Loc
 interactive = Loc "<interactive>" emptySpan
