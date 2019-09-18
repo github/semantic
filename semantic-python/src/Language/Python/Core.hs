@@ -64,10 +64,10 @@ instance Compile (Py.AssertStatement Span)
 instance Compile (Py.Attribute Span)
 
 instance Compile (Py.Assignment Span) where
-  compile Py.Assignment { Py.left = Py.ExpressionList { Py.extraChildren = [lhs] }, Py.right = Just rhs } = do
+  compile it@Py.Assignment { Py.left = Py.ExpressionList { Py.extraChildren = [lhs] }, Py.right = Just rhs } = do
     target <- compile lhs
     value  <- compile rhs
-    pure (target .= value)
+    pure . locate it $ target .= value
   compile other = fail ("Unhandled assignment case: " <> show other)
 
 instance Compile (Py.AugmentedAssignment Span)
@@ -77,7 +77,7 @@ instance Compile (Py.BinaryOperator Span)
 instance Compile (Py.Block Span) where
   compile t = compileCC t (pure none)
 
-  compileCC Py.Block{ Py.extraChildren = body} cc = foldr compileCC cc body
+  compileCC it@Py.Block{ Py.extraChildren = body} cc = locate it <$> foldr compileCC cc body
 
 instance Compile (Py.BooleanOperator Span)
 instance Compile (Py.BreakStatement Span)
@@ -100,14 +100,14 @@ instance Compile (Py.ExecStatement Span)
 deriving via CompileSum (Py.Expression Span) instance Compile (Py.Expression Span)
 
 instance Compile (Py.ExpressionStatement Span) where
-  compile Py.ExpressionStatement { Py.extraChildren = children } = do
+  compile it@Py.ExpressionStatement { Py.extraChildren = children } = do
     actions <- traverse compile children
-    pure $ do' (fmap (Nothing :<-) actions)
+    pure . locate it $ do' (fmap (Nothing :<-) actions)
 
 instance Compile (Py.ExpressionList Span) where
-  compile Py.ExpressionList { Py.extraChildren = exprs } = do
+  compile it@Py.ExpressionList { Py.extraChildren = exprs } = do
     actions <- traverse compile exprs
-    pure $ do' (fmap (Nothing :<-) actions)
+    pure . locate it $ do' (fmap (Nothing :<-) actions)
 
 
 instance Compile (Py.False Span) where compile _ = pure (bool False)
@@ -116,14 +116,14 @@ instance Compile (Py.Float Span)
 instance Compile (Py.ForStatement Span)
 
 instance Compile (Py.FunctionDefinition Span) where
-  compile Py.FunctionDefinition
+  compile it@Py.FunctionDefinition
     { name       = Py.Identifier _ann1 name
     , parameters = Py.Parameters _ann2 parameters
     , body
     } = do
       parameters' <- traverse param parameters
       body' <- compile body
-      pure (pure name .= lams parameters' body')
+      pure . locate it $ (pure name .= lams parameters' body')
     where param (Py.IdentifierParameter (Py.Identifier _pann pname)) = pure (named' pname)
           param x                                                    = unimplemented x
           unimplemented x = fail $ "unimplemented: " <> show x
@@ -138,8 +138,8 @@ instance Compile (Py.Identifier Span) where
 instance Compile (Py.IfStatement Span) where
   compile stmt = compileCC stmt (pure none)
 
-  compileCC Py.IfStatement{ condition, consequence, alternative} cc =
-    if' <$> compile condition <*> compileCC consequence cc <*> foldr clause cc alternative
+  compileCC it@Py.IfStatement{ condition, consequence, alternative} cc =
+    locate it <$> (if' <$> compile condition <*> compileCC consequence cc <*> foldr clause cc alternative)
     where clause (Right Py.ElseClause{ body }) _ = compileCC body cc
           clause (Left  Py.ElifClause{ condition, consequence }) rest  =
             if' <$> compile condition <*> compileCC consequence cc <*> rest
@@ -153,12 +153,12 @@ instance Compile (Py.List Span)
 instance Compile (Py.ListComprehension Span)
 
 instance Compile (Py.Module Span) where
-  compile Py.Module { Py.extraChildren = stmts } = do
+  compile it@Py.Module { Py.extraChildren = stmts } = do
     -- Buggy and ad-hoc: the toList call promotes too many variables
     -- to top-level scope.
     res <- traverse compile stmts
     let names = concatMap toList res
-    pure . record $ zip names res
+    pure . locate it . record $ zip names res
 
 instance Compile (Py.NamedExpression Span)
 instance Compile (Py.None Span)
@@ -167,16 +167,16 @@ instance Compile (Py.NotOperator Span)
 instance Compile (Py.ParenthesizedExpression Span)
 
 instance Compile (Py.PassStatement Span) where
-  compile Py.PassStatement {} = pure Core.unit
+  compile it@Py.PassStatement {} = pure . locate it $ Core.unit
 
 deriving via CompileSum (Py.PrimaryExpression Span) instance Compile (Py.PrimaryExpression Span)
 
 instance Compile (Py.PrintStatement Span)
 
 instance Compile (Py.ReturnStatement Span) where
-  compile Py.ReturnStatement { Py.extraChildren = vals } = case vals of
-    Nothing -> pure none
-    Just Py.ExpressionList { extraChildren = [val] } -> compile val
+  compile it@Py.ReturnStatement { Py.extraChildren = vals } = case vals of
+    Nothing -> pure . locate it $ none
+    Just Py.ExpressionList { extraChildren = [val] } -> locate it <$> compile val
     Just Py.ExpressionList { extraChildren = vals  } -> fail ("unimplemented: return statement returning " <> show (length vals) <> " values")
 
   compileCC r _ = compile r
@@ -191,13 +191,13 @@ deriving via CompileSum (Py.SimpleStatement Span) instance Compile (Py.SimpleSta
 instance Compile (Py.String Span)
 instance Compile (Py.Subscript Span)
 
-instance Compile (Py.True Span) where compile _ = pure (bool True)
+instance Compile (Py.True Span) where compile it = pure . locate it $ bool True
 
 instance Compile (Py.TryStatement Span)
 
 instance Compile (Py.Tuple Span) where
-  compile Py.Tuple { Py.extraChildren = [] } = pure Core.unit
-  compile t                                  = fail ("Unimplemented: non-empty tuple " <> show t)
+  compile it@Py.Tuple { Py.extraChildren = [] } = pure . locate it $ Core.unit
+  compile it                                    = fail ("Unimplemented: non-empty tuple " <> show it)
 
 instance Compile (Py.UnaryOperator Span)
 instance Compile (Py.WhileStatement Span)
