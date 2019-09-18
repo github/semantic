@@ -16,13 +16,12 @@ import GHC.TypeLits
 import Diffing.Algorithm
 import Prelude
 import Prologue
-import Reprinting.Tokenize hiding (Element, In)
+import Reprinting.Tokenize hiding (Element)
 import qualified Assigning.Assignment as Assignment
 import qualified Data.Error as Error
 import Control.Abstract.ScopeGraph (reference, Reference(..), Declaration(..))
 import Control.Abstract.Heap (deref, lookupSlot)
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
-import Tags.Taggable (Taggable(..), subtractLocation)
 
 -- Combinators
 
@@ -119,7 +118,7 @@ instance (Element f all, c f, Generate c all fs) => Generate c all (f ': fs) whe
 newtype Identifier a = Identifier { name :: Name }
   deriving newtype (Eq, Ord, Show)
   deriving stock (Foldable, Functor, Generic1, Traversable)
-  deriving anyclass (Diffable, Hashable1, Taggable, ToJSONFields1, NFData1)
+  deriving anyclass (Diffable, Hashable1, ToJSONFields1, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Identifier
 
 
@@ -147,7 +146,7 @@ instance Declarations1 Identifier where
 newtype AccessibilityModifier a = AccessibilityModifier { contents :: Text }
   deriving newtype (Eq, Ord, Show)
   deriving stock (Foldable, Functor, Generic1, Traversable)
-  deriving anyclass (Declarations1, Diffable, FreeVariables1, Hashable1, Taggable, ToJSONFields1, NFData1)
+  deriving anyclass (Declarations1, Diffable, FreeVariables1, Hashable1, ToJSONFields1, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically AccessibilityModifier
 
 -- TODO: Implement Eval instance for AccessibilityModifier
@@ -157,7 +156,7 @@ instance Evaluatable AccessibilityModifier
 --
 --   This can be used to represent an implicit no-op, e.g. the alternative in an 'if' statement without an 'else'.
 data Empty a = Empty
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, FreeVariables1, Declarations1, Taggable, ToJSONFields1, NFData1)
+  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Empty
 
 instance Evaluatable Empty where
@@ -168,7 +167,7 @@ instance Tokenize Empty where
 
 -- | Syntax representing a parsing or assignment error.
 data Error a = Error { errorCallStack :: ErrorStack, errorExpected :: [String], errorActual :: Maybe String, errorChildren :: [a] }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, Taggable, ToJSONFields1, Traversable, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Error
 
 instance Evaluatable Error
@@ -244,6 +243,3 @@ instance Tokenize Context where
 
 instance Declarations1 Context where
   liftDeclaredName declaredName = declaredName . contextSubject
-
-instance Taggable Context where
-  snippet ann (Context _ (Term (In subj _))) = Just (subtractLocation ann subj)
