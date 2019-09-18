@@ -61,7 +61,7 @@ class ToTag t where
        , Member (Reader Blob) sig
        , Member (Reader [ContextToken]) sig
        )
-    => t Location
+    => t
     -> m (Endo [Tag])
 
 instance (ToTagBy strategy t, strategy ~ ToTagInstance t) => ToTag t where
@@ -74,21 +74,21 @@ class ToTagBy (strategy :: Strategy) t where
        , Member (Reader Blob) sig
        , Member (Reader [ContextToken]) sig
        )
-    => t Location
+    => t
     -> m (Endo [Tag])
 
 
 data Strategy = Generic | Custom
 
 type family ToTagInstance t :: Strategy where
-  ToTagInstance Python.FunctionDefinition = 'Custom
-  ToTagInstance _                         = 'Generic
+  ToTagInstance (Python.FunctionDefinition Location) = 'Custom
+  ToTagInstance _                                    = 'Generic
 
-instance ToTagBy 'Custom Python.FunctionDefinition where
+instance ToTagBy 'Custom (Python.FunctionDefinition Location) where
   tag' Python.FunctionDefinition {} = pure mempty
 
 
-instance (Generic (t Location), GToTag (Rep (t Location))) => ToTagBy 'Generic t where
+instance (Generic t, GToTag (Rep t)) => ToTagBy 'Generic t where
   tag' = gtag . from
 
 
@@ -98,7 +98,7 @@ class GToTag t where
        , Member (Reader Blob) sig
        , Member (Reader [ContextToken]) sig
        )
-    => t Location
+    => t a
     -> m (Endo [Tag])
 
 
