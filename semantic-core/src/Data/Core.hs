@@ -230,7 +230,7 @@ annAt :: (Carrier sig m, Member Ann sig) => Loc -> m a -> m a
 annAt loc = send . Ann loc
 
 annWith :: (Carrier sig m, Member Ann sig) => CallStack -> m a -> m a
-annWith callStack = maybe id (fmap annAt) (stackLoc callStack)
+annWith callStack = maybe id annAt (stackLoc callStack)
 
 
 stripAnnotations :: (HFunctor sig, forall g . Functor g => Functor (sig g)) => Term (Ann :+: sig) a -> Term sig a

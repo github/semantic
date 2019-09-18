@@ -19,6 +19,7 @@ import           GHC.Records
 import qualified Data.Loc
 import qualified TreeSitter.Python.AST as Py
 import           TreeSitter.Span (Span)
+import qualified TreeSitter.Span as TreeSitter
 
 -- We don't want to commit to a particular representation of Core syntax,
 -- but there are commonalities that repeatedly crop up and that clog type
@@ -42,7 +43,10 @@ class Compile py where
   compileCC py cc = (>>>) <$> compile py <*> cc
 
 locate :: (HasField "ann" syntax Span, CoreSyntax sig t) => syntax -> t a -> t a
-locate syn = Core.annAt (Data.Loc.fromTSSpan (getField @"ann" syn))
+locate syn = Core.annAt (locFromTSSpan (getField @"ann" syn))
+  where
+    locFromTSSpan (TreeSitter.Span (TreeSitter.Pos a b) (TreeSitter.Pos c d))
+      = Data.Loc.Loc mempty (Data.Loc.Span (Data.Loc.Pos a b) (Data.Loc.Pos c d))
 
 -- | TODO: This is not right, it should be a reference to a Preluded
 -- NoneType instance, but it will do for now.
