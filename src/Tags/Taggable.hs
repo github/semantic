@@ -10,7 +10,7 @@ identify a new syntax as Taggable, you need to:
 constructor name of this syntax.
 
 -}
-{-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, KindSignatures, MonoLocalBinds, UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, KindSignatures, TypeFamilies, UndecidableInstances #-}
 module Tags.Taggable
 ( Tagger
 , Token(..)
@@ -136,6 +136,9 @@ subtractLocation :: Location -> Location -> Range
 subtractLocation a b = subtractRange (locationByteRange a) (locationByteRange b)
 
 -- Instances
+
+type family TaggableInstance (t :: * -> *) :: Strategy where
+  TaggableInstance _       = 'Default
 
 instance Apply Taggable fs => Taggable (Sum fs) where
   docsLiteral a = apply @Taggable (docsLiteral a)
