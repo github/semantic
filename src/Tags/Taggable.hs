@@ -47,7 +47,6 @@ import qualified Language.Go.Syntax as Go
 import qualified Language.Go.Type as Go
 import qualified Language.Haskell.Syntax as Haskell
 import qualified Language.Java.Syntax as Java
-import qualified Language.PHP.Syntax as PHP
 import qualified Language.Python.Syntax as Python
 import qualified Language.Ruby.Syntax as Ruby
 
@@ -484,63 +483,6 @@ instance Taggable Go.Rune
 instance Taggable Go.Select
 instance Taggable Go.TypeSwitchGuard
 instance Taggable Go.ReceiveOperator
-
-instance Taggable PHP.Text
-instance Taggable PHP.VariableName
-instance Taggable PHP.Require
-instance Taggable PHP.RequireOnce
-instance Taggable PHP.Include
-instance Taggable PHP.IncludeOnce
-instance Taggable PHP.ArrayElement
-instance Taggable PHP.GlobalDeclaration
-instance Taggable PHP.SimpleVariable
-instance Taggable PHP.Concat
-instance Taggable PHP.CastType
-instance Taggable PHP.ErrorControl
-instance Taggable PHP.Clone
-instance Taggable PHP.ShellCommand
-instance Taggable PHP.Update
-instance Taggable PHP.NewVariable
-instance Taggable PHP.RelativeScope
-instance Taggable PHP.NamespaceName
-instance Taggable PHP.ConstDeclaration
-instance Taggable PHP.ClassInterfaceClause
-instance Taggable PHP.ClassBaseClause
-instance Taggable PHP.UseClause
-instance Taggable PHP.ReturnType
-instance Taggable PHP.TypeDeclaration
-instance Taggable PHP.BaseTypeDeclaration
-instance Taggable PHP.ScalarType
-instance Taggable PHP.EmptyIntrinsic
-instance Taggable PHP.ExitIntrinsic
-instance Taggable PHP.IssetIntrinsic
-instance Taggable PHP.EvalIntrinsic
-instance Taggable PHP.PrintIntrinsic
-instance Taggable PHP.NamespaceAliasingClause
-instance Taggable PHP.NamespaceUseDeclaration
-instance Taggable PHP.NamespaceUseClause
-instance Taggable PHP.NamespaceUseGroupClause
-instance Taggable PHP.TraitUseSpecification
-instance Taggable PHP.Static
-instance Taggable PHP.ClassModifier
-instance Taggable PHP.InterfaceBaseClause
-instance Taggable PHP.Echo
-instance Taggable PHP.Unset
-instance Taggable PHP.DeclareDirective
-instance Taggable PHP.LabeledStatement
-instance Taggable PHP.QualifiedName
-instance Taggable PHP.ClassConstDeclaration
-instance Taggable PHP.Namespace
-instance Taggable PHP.TraitDeclaration
-instance Taggable PHP.AliasAs
-instance Taggable PHP.InsteadOf
-instance Taggable PHP.TraitUseClause
-instance Taggable PHP.DestructorDeclaration
-instance Taggable PHP.ConstructorDeclaration
-instance Taggable PHP.PropertyDeclaration
-instance Taggable PHP.PropertyModifier
-instance Taggable PHP.InterfaceDeclaration
-instance Taggable PHP.Declare
 
 instance Taggable Ruby.Require
 instance Taggable Ruby.Load
