@@ -69,13 +69,10 @@ class Taggable constr where
     , HasTextElement syntax
     )
     => Language -> constr (Term syntax Location) -> Maybe Range
-  docsLiteral _ _ = Nothing
 
   snippet :: Foldable syntax => Location -> constr (Term syntax Location) -> Maybe Range
-  snippet _ _ = Nothing
 
   symbolName :: Declarations1 syntax => constr (Term syntax Location) -> Maybe Name
-  symbolName _ = Nothing
 
 data Strategy = Default | Custom
 
