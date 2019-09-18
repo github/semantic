@@ -17,6 +17,7 @@ module Tags.Taggable
 , Taggable(..)
 , IsTaggable
 , HasTextElement
+, subtractLocation
 , tagging
 )
 where
