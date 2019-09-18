@@ -10,7 +10,6 @@ import           Data.Aeson as A
 import           Data.Blob
 import           Data.Monoid (Endo(..))
 import           Data.Location
-import qualified Data.Set as Set
 import           Data.Text (Text)
 import           GHC.Generics
 import qualified TreeSitter.Python.AST as Python
@@ -46,14 +45,13 @@ newtype Python a = Python { getPython :: Python.Module a }
 
 type ContextToken = (Text, Maybe Range)
 
-runTagging :: Blob -> Set.Set Kind -> Python Location -> [Tag]
-runTagging blob symbolsToSummarize
+runTagging :: Blob -> Python Location -> [Tag]
+runTagging blob
   = ($ [])
   . appEndo
   . run
   . runReader @[ContextToken] []
   . runReader blob
-  . runReader symbolsToSummarize
   . tag
   . getPython where
 
@@ -62,7 +60,6 @@ class ToTag t where
     :: ( Carrier sig m
        , Member (Reader Blob) sig
        , Member (Reader [ContextToken]) sig
-       , Member (Reader (Set.Set Kind)) sig
        )
     => t Location
     -> m (Endo [Tag])
@@ -76,7 +73,6 @@ class ToTagBy (strategy :: Strategy) t where
     :: ( Carrier sig m
        , Member (Reader Blob) sig
        , Member (Reader [ContextToken]) sig
-       , Member (Reader (Set.Set Kind)) sig
        )
     => t Location
     -> m (Endo [Tag])
@@ -101,7 +97,6 @@ class GToTag t where
     :: ( Carrier sig m
        , Member (Reader Blob) sig
        , Member (Reader [ContextToken]) sig
-       , Member (Reader (Set.Set Kind)) sig
        )
     => t Location
     -> m (Endo [Tag])
