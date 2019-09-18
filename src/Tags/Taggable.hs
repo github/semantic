@@ -38,7 +38,6 @@ import Data.Text hiding (empty)
 import Streaming hiding (Sum)
 import Streaming.Prelude (yield)
 
-import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Directive as Directive
@@ -138,9 +137,6 @@ instance (Taggable a) => Taggable (TermF a Location) where
   docsLiteral l t = docsLiteral l (termFOut t)
   snippet ann t = snippet ann (termFOut t)
   symbolName t = symbolName (termFOut t)
-
-instance Taggable Syntax.Context where
-  snippet ann (Syntax.Context _ (Term (In subj _))) = Just (subtractLocation ann subj)
 
 instance Taggable Declaration.Function where
   docsLiteral Python (Declaration.Function _ _ _ (Term (In _ bodyF)))
@@ -287,11 +283,6 @@ instance Taggable Statement.Throw
 instance Taggable Statement.Try
 instance Taggable Statement.While
 instance Taggable Statement.Yield
-
-instance Taggable Syntax.Empty
-instance Taggable Syntax.Error
-instance Taggable Syntax.Identifier
-instance Taggable Syntax.AccessibilityModifier
 
 instance Taggable Type.Annotation
 instance Taggable Type.Array
