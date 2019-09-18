@@ -38,6 +38,7 @@ import Data.Text hiding (empty)
 import Streaming hiding (Sum)
 import Streaming.Prelude (yield)
 
+import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Directive as Directive
 import qualified Data.Syntax.Expression as Expression
@@ -182,6 +183,8 @@ instance Taggable Ruby.Send where
   symbolName Ruby.Send{..} = declaredName =<< sendSelector
 
 instance Taggable []
+instance Taggable Comment.Comment
+instance Taggable Comment.HashBang
 
 instance Taggable Expression.And
 instance Taggable Expression.Await
