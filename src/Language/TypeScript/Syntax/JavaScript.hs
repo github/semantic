@@ -12,21 +12,22 @@ import           Data.JSON.Fields
 import qualified Data.Map.Strict as Map
 import           Diffing.Algorithm
 import           Language.TypeScript.Resolution
+import           Tags.Taggable (Taggable)
 
 newtype ImplementsClause a = ImplementsClause { implementsClauseTypes :: [a] }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, Ord, Show, Taggable, ToJSONFields1, Traversable)
   deriving (Eq1, Show1, Ord1) via Generically ImplementsClause
 
 instance Evaluatable ImplementsClause
 
 data OptionalParameter a = OptionalParameter { optionalParameterContext :: ![a], optionalParameterSubject :: !a, optionalParameterAccessControl :: AccessControl }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, Ord, Show, Taggable, ToJSONFields1, Traversable)
   deriving (Eq1, Show1, Ord1) via Generically OptionalParameter
 
 instance Evaluatable OptionalParameter
 
 data RequiredParameter a = RequiredParameter { requiredParameterContext :: [a], requiredParameterSubject :: a, requiredParameterValue :: a, requiredParameterAccessControl :: AccessControl }
-  deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, Ord, Show, Taggable, ToJSONFields1, Traversable)
   deriving (Eq1, Show1, Ord1) via Generically RequiredParameter
 
 instance Declarations1 RequiredParameter where
@@ -55,14 +56,14 @@ instance Evaluatable RequiredParameter where
     pure rhs
 
 data RestParameter a = RestParameter { restParameterContext :: ![a], restParameterSubject :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, Ord, Show, Taggable, ToJSONFields1, Traversable)
   deriving (Eq1, Show1, Ord1) via Generically RestParameter
 
 instance Evaluatable RestParameter
 
 
 data JavaScriptRequire a = JavaScriptRequire { javascriptRequireIden :: !a, javascriptRequireFrom :: ImportPath }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, Ord, Show, Taggable, ToJSONFields1, Traversable)
   deriving (Eq1, Show1, Ord1) via Generically JavaScriptRequire
 
 instance Evaluatable JavaScriptRequire where
@@ -85,32 +86,32 @@ instance Evaluatable JavaScriptRequire where
     unit
 
 data Debugger a = Debugger
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, Ord, Show, Taggable, ToJSONFields1, Traversable)
   deriving (Eq1, Show1, Ord1) via Generically Debugger
 
 instance Evaluatable Debugger
 
 data Super a = Super
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, Ord, Show, Taggable, ToJSONFields1, Traversable)
   deriving (Eq1, Show1, Ord1) via Generically Super
 
 instance Evaluatable Super
 
 data Undefined a = Undefined
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, Ord, Show, Taggable, ToJSONFields1, Traversable)
   deriving (Eq1, Show1, Ord1) via Generically Undefined
 
 instance Evaluatable Undefined
 
 data With a = With { withExpression :: !a, withBody :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, Ord, Show, Taggable, ToJSONFields1, Traversable)
   deriving (Eq1, Show1, Ord1) via Generically With
 
 instance Evaluatable With
 
 -- | A sequence expression such as Javascript or C's comma operator.
 data AnnotatedExpression a = AnnotatedExpression { expression :: !a, typeAnnotation :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, Taggable, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically AnnotatedExpression
 
 instance Evaluatable AnnotatedExpression where

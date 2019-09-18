@@ -54,8 +54,6 @@ import qualified Language.Markdown.Syntax as Markdown
 import qualified Language.PHP.Syntax as PHP
 import qualified Language.Python.Syntax as Python
 import qualified Language.Ruby.Syntax as Ruby
-import qualified Language.TSX.Syntax as TSX
-import qualified Language.TypeScript.Syntax as TypeScript
 
 
  -- TODO: Move to src/Data
@@ -179,11 +177,6 @@ instance Taggable Ruby.Module where
   snippet ann (Ruby.Module _ (Term (In body _):_)) = Just $ subtractLocation ann body
   snippet ann (Ruby.Module _ _)                    = Just $ locationByteRange ann
   symbolName = declaredName . Ruby.moduleIdentifier
-
-instance Taggable TypeScript.Module where
-  snippet ann (TypeScript.Module _ (Term (In body _):_)) = Just $ subtractLocation ann body
-  snippet ann (TypeScript.Module _ _                   ) = Just $ locationByteRange ann
-  symbolName = declaredName . TypeScript.moduleIdentifier
 
 instance Taggable Expression.Call where
   snippet ann (Expression.Call _ _ _ (Term (In body _))) = Just $ subtractLocation ann body
@@ -606,79 +599,3 @@ instance Taggable Ruby.LowPrecedenceAnd
 instance Taggable Ruby.LowPrecedenceOr
 instance Taggable Ruby.Assignment
 instance Taggable Ruby.ZSuper
-
-instance Taggable TSX.JsxElement
-instance Taggable TSX.JsxOpeningElement
-instance Taggable TSX.JsxSelfClosingElement
-instance Taggable TSX.JsxAttribute
-instance Taggable TSX.JsxText
-instance Taggable TSX.JsxExpression
-instance Taggable TSX.JsxClosingElement
-instance Taggable TSX.JsxFragment
-instance Taggable TSX.JsxNamespaceName
-
-instance Taggable TypeScript.JavaScriptRequire
-instance Taggable TypeScript.Debugger
-instance Taggable TypeScript.Super
-instance Taggable TypeScript.Undefined
-instance Taggable TypeScript.With
-instance Taggable TypeScript.OptionalParameter
-instance Taggable TypeScript.RequiredParameter
-instance Taggable TypeScript.RestParameter
-instance Taggable TypeScript.ImplementsClause
-instance Taggable TypeScript.Import
-instance Taggable TypeScript.QualifiedAliasedImport
-instance Taggable TypeScript.QualifiedExportFrom
-instance Taggable TypeScript.LookupType
-instance Taggable TypeScript.Union
-instance Taggable TypeScript.Intersection
-instance Taggable TypeScript.FunctionType
-instance Taggable TypeScript.AmbientFunction
-instance Taggable TypeScript.ImportRequireClause
-instance Taggable TypeScript.Constructor
-instance Taggable TypeScript.TypeParameter
-instance Taggable TypeScript.TypeAssertion
-instance Taggable TypeScript.NestedIdentifier
-instance Taggable TypeScript.NestedTypeIdentifier
-instance Taggable TypeScript.GenericType
-instance Taggable TypeScript.TypePredicate
-instance Taggable TypeScript.EnumDeclaration
-instance Taggable TypeScript.PropertySignature
-instance Taggable TypeScript.CallSignature
-instance Taggable TypeScript.ConstructSignature
-instance Taggable TypeScript.IndexSignature
-instance Taggable TypeScript.AbstractMethodSignature
-instance Taggable TypeScript.ForOf
-instance Taggable TypeScript.LabeledStatement
-instance Taggable TypeScript.InternalModule
-instance Taggable TypeScript.ImportAlias
-instance Taggable TypeScript.ClassHeritage
-instance Taggable TypeScript.AbstractClass
-instance Taggable TypeScript.SideEffectImport
-instance Taggable TypeScript.QualifiedExport
-instance Taggable TypeScript.DefaultExport
-instance Taggable TypeScript.ShorthandPropertyIdentifier
-instance Taggable TypeScript.ImportClause
-instance Taggable TypeScript.Tuple
-instance Taggable TypeScript.Annotation
-instance Taggable TypeScript.Decorator
-instance Taggable TypeScript.ComputedPropertyName
-instance Taggable TypeScript.Constraint
-instance Taggable TypeScript.DefaultType
-instance Taggable TypeScript.ParenthesizedType
-instance Taggable TypeScript.PredefinedType
-instance Taggable TypeScript.TypeIdentifier
-instance Taggable TypeScript.ObjectType
-instance Taggable TypeScript.AmbientDeclaration
-instance Taggable TypeScript.ExtendsClause
-instance Taggable TypeScript.ArrayType
-instance Taggable TypeScript.FlowMaybeType
-instance Taggable TypeScript.TypeQuery
-instance Taggable TypeScript.IndexTypeQuery
-instance Taggable TypeScript.TypeArguments
-instance Taggable TypeScript.ThisType
-instance Taggable TypeScript.ExistentialType
-instance Taggable TypeScript.LiteralType
-instance Taggable TypeScript.Update
-instance Taggable TypeScript.MetaProperty
-instance Taggable TypeScript.AnnotatedExpression
