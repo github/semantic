@@ -46,7 +46,7 @@ newtype Python a = Python { getPython :: Python.Module a }
 
 type ContextToken = (Text, Maybe Range)
 
-runTagging :: Blob -> Set.Set Text -> Python Location -> [Tag]
+runTagging :: Blob -> Set.Set Kind -> Python Location -> [Tag]
 runTagging blob symbolsToSummarize
   = ($ [])
   . appEndo
@@ -62,7 +62,7 @@ class ToTag t where
     :: ( Carrier sig m
        , Member (Reader Blob) sig
        , Member (Reader [ContextToken]) sig
-       , Member (Reader (Set.Set Text)) sig
+       , Member (Reader (Set.Set Kind)) sig
        )
     => t Location
     -> m (Endo [Tag])
@@ -76,7 +76,7 @@ class ToTagBy (strategy :: Strategy) t where
     :: ( Carrier sig m
        , Member (Reader Blob) sig
        , Member (Reader [ContextToken]) sig
-       , Member (Reader (Set.Set Text)) sig
+       , Member (Reader (Set.Set Kind)) sig
        )
     => t Location
     -> m (Endo [Tag])
@@ -101,7 +101,7 @@ class GToTag t where
     :: ( Carrier sig m
        , Member (Reader Blob) sig
        , Member (Reader [ContextToken]) sig
-       , Member (Reader (Set.Set Text)) sig
+       , Member (Reader (Set.Set Kind)) sig
        )
     => t Location
     -> m (Endo [Tag])
