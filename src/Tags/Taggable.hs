@@ -10,7 +10,7 @@ identify a new syntax as Taggable, you need to:
 constructor name of this syntax.
 
 -}
-{-# LANGUAGE ConstraintKinds, MonoLocalBinds, UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, KindSignatures, MonoLocalBinds, UndecidableInstances #-}
 module Tags.Taggable
 ( Tagger
 , Token(..)
@@ -87,6 +87,19 @@ class Taggable constr where
 
   symbolName :: Declarations1 syntax => constr (Term syntax Location) -> Maybe Name
   symbolName _ = Nothing
+
+data Strategy = Default | Custom
+
+class TaggableBy (strategy :: Strategy) constr where
+  docsLiteral' ::
+    ( Foldable syntax
+    , HasTextElement syntax
+    )
+    => Language -> constr (Term syntax Location) -> Maybe Range
+
+  snippet' :: (Foldable syntax) => Location -> constr (Term syntax Location) -> Maybe Range
+
+  symbolName' :: Declarations1 syntax => constr (Term syntax Location) -> Maybe Name
 
 type IsTaggable syntax =
   ( Functor syntax
