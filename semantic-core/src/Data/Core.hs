@@ -222,6 +222,7 @@ instance HFunctor Ann
 instance RightModule Ann where
   Ann l b >>=* f = Ann l (b >>= f)
 
+
 ann :: (Carrier sig m, Member Ann sig) => HasCallStack => m a -> m a
 ann = annWith callStack
 
