@@ -74,7 +74,7 @@ exit c = yield . Exit (pack c)
 emitIden :: Monad m => Span -> Maybe Range -> Name -> Tagger m ()
 emitIden span docsLiteralRange name = yield (Iden (formatName name) span docsLiteralRange)
 
-class (Show1 constr, Traversable constr) => Taggable constr where
+class Show1 constr => Taggable constr where
   docsLiteral ::
     ( Foldable syntax
     , HasTextElement syntax
@@ -109,6 +109,7 @@ descend ::
   ( Taggable (TermF syntax Location)
   , ConstructorName (TermF syntax Location)
   , Foldable syntax
+  , Functor syntax
   , HasTextElement syntax
   , Declarations1 syntax
   , Monad m
@@ -129,7 +130,7 @@ subtractLocation a b = subtractRange (locationByteRange a) (locationByteRange b)
 
 -- Instances
 
-instance ( Apply Show1 fs, Apply Functor fs, Apply Foldable fs, Apply Traversable fs, Apply Taggable fs) => Taggable (Sum fs) where
+instance ( Apply Show1 fs, Apply Taggable fs) => Taggable (Sum fs) where
   docsLiteral a = apply @Taggable (docsLiteral a)
   snippet x = apply @Taggable (snippet x)
   symbolName = apply @Taggable symbolName

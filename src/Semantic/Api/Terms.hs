@@ -109,6 +109,7 @@ type TermConstraints =
   , ConstructorName
   , HasTextElement
   , ToJSONFields1
+  , Traversable
   ]
 
 doParse :: (ParseEffects sig m) => Blob -> m (SomeTerm TermConstraints Location)
