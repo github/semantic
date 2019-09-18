@@ -161,7 +161,16 @@ instance Compile (Py.PassStatement Span) where
 deriving via CompileSum (Py.PrimaryExpression Span) instance Compile (Py.PrimaryExpression Span)
 
 instance Compile (Py.PrintStatement Span)
-instance Compile (Py.ReturnStatement Span)
+
+instance Compile (Py.ReturnStatement Span) where
+  compile Py.ReturnStatement { Py.extraChildren = vals } = case vals of
+    Nothing -> pure none
+    Just Py.ExpressionList { extraChildren = [val] } -> compile val
+    Just Py.ExpressionList { extraChildren = vals  } -> fail ("unimplemented: return statement returning " <> show (length vals) <> " values")
+
+  compileCC r _ = compile r
+
+
 instance Compile (Py.RaiseStatement Span)
 instance Compile (Py.Set Span)
 instance Compile (Py.SetComprehension Span)
