@@ -141,9 +141,10 @@ subtractLocation a b = subtractRange (locationByteRange a) (locationByteRange b)
 -- Instances
 
 type family TaggableInstance (t :: * -> *) :: Strategy where
-  TaggableInstance (Sum _)     = 'Custom
-  TaggableInstance (TermF _ _) = 'Custom
-  TaggableInstance _           = 'Default
+  TaggableInstance (Sum _)        = 'Custom
+  TaggableInstance (TermF _ _)    = 'Custom
+  TaggableInstance Syntax.Context = 'Custom
+  TaggableInstance _              = 'Default
 
 instance TaggableBy 'Default t
 
@@ -166,6 +167,9 @@ instance (Taggable a) => Taggable (TermF a Location) where
   docsLiteral l t = docsLiteral l (termFOut t)
   snippet ann t = snippet ann (termFOut t)
   symbolName t = symbolName (termFOut t)
+
+instance TaggableBy 'Custom Syntax.Context where
+  snippet' ann (Syntax.Context _ (Term (In subj _))) = Just (subtractLocation ann subj)
 
 instance Taggable Syntax.Context where
   snippet ann (Syntax.Context _ (Term (In subj _))) = Just (subtractLocation ann subj)
