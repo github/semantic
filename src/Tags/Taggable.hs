@@ -46,6 +46,7 @@ import qualified Data.Syntax.Statement as Statement
 import qualified Language.Go.Syntax as Go
 import qualified Language.Go.Type as Go
 import qualified Language.Haskell.Syntax as Haskell
+import qualified Language.Java.Syntax as Java
 import qualified Language.Python.Syntax as Python
 import qualified Language.Ruby.Syntax as Ruby
 
@@ -415,6 +416,40 @@ instance Taggable Haskell.KindListType
 instance Taggable Haskell.Instance
 instance Taggable Haskell.KindTupleType
 instance Taggable Haskell.FunctionalDependency
+
+
+instance Taggable Java.Import
+instance Taggable Java.Package
+instance Taggable Java.CatchType
+instance Taggable Java.SpreadParameter
+instance Taggable Java.StaticInitializer
+instance Taggable Java.LambdaBody
+instance Taggable Java.ClassBody
+instance Taggable Java.ClassLiteral
+instance Taggable Java.DefaultValue
+instance Taggable Java.Module
+instance Taggable Java.EnumDeclaration
+instance Taggable Java.Variable
+instance Taggable Java.Synchronized
+instance Taggable Java.New
+instance Taggable Java.Asterisk
+instance Taggable Java.Constructor
+instance Taggable Java.TypeParameter
+instance Taggable Java.Annotation
+instance Taggable Java.AnnotationField
+instance Taggable Java.GenericType
+instance Taggable Java.AnnotatedType
+instance Taggable Java.TypeWithModifiers
+instance Taggable Java.Wildcard
+instance Taggable Java.WildcardBounds
+instance Taggable Java.MethodReference
+instance Taggable Java.NewKeyword
+instance Taggable Java.Lambda
+instance Taggable Java.ArrayCreationExpression
+instance Taggable Java.DimsExpr
+instance Taggable Java.TryWithResources
+instance Taggable Java.AssertStatement
+instance Taggable Java.AnnotationTypeElement
 
 instance Taggable Python.Alias
 instance Taggable Python.Ellipsis
