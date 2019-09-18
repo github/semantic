@@ -24,7 +24,9 @@ library
   -- other-modules:
   -- other-extensions:
   build-depends:
-      base                         >= 4.12 && < 5
+      base               >= 4.12 && < 5
+    , tree-sitter        == 0.3.0.0
+    , tree-sitter-python == 0.4.0.0
   hs-source-dirs:      src
   default-language:    Haskell2010
   ghc-options:
