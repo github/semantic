@@ -36,7 +36,9 @@ data Kind
   | Call
   deriving (Bounded, Enum, Eq, Generic, Show)
 
-instance ToJSON Kind
+instance ToJSON Kind where
+  toJSON = toJSON . show
+  toEncoding = toEncoding . show
 
 
 newtype Python a = Python { getPython :: Python.Module a }
