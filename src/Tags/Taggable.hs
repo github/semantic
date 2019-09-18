@@ -47,6 +47,7 @@ import qualified Language.Go.Syntax as Go
 import qualified Language.Go.Type as Go
 import qualified Language.Haskell.Syntax as Haskell
 import qualified Language.Java.Syntax as Java
+import qualified Language.Markdown.Syntax as Markdown
 import qualified Language.PHP.Syntax as PHP
 import qualified Language.Python.Syntax as Python
 import qualified Language.Ruby.Syntax as Ruby
@@ -484,6 +485,26 @@ instance Taggable Go.Rune
 instance Taggable Go.Select
 instance Taggable Go.TypeSwitchGuard
 instance Taggable Go.ReceiveOperator
+
+instance Taggable Markdown.Document
+instance Taggable Markdown.Paragraph
+instance Taggable Markdown.UnorderedList
+instance Taggable Markdown.OrderedList
+instance Taggable Markdown.BlockQuote
+instance Taggable Markdown.HTMLBlock
+instance Taggable Markdown.Table
+instance Taggable Markdown.TableRow
+instance Taggable Markdown.TableCell
+instance Taggable Markdown.Strong
+instance Taggable Markdown.Emphasis
+instance Taggable Markdown.Text
+instance Taggable Markdown.Strikethrough
+instance Taggable Markdown.Heading
+instance Taggable Markdown.ThematicBreak
+instance Taggable Markdown.Link
+instance Taggable Markdown.Image
+instance Taggable Markdown.Code
+instance Taggable Markdown.LineBreak
 
 instance Taggable PHP.Text
 instance Taggable PHP.VariableName
