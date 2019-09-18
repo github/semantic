@@ -23,9 +23,20 @@ data Tag = Tag
   , line :: Maybe Text
   , docs :: Maybe Text
   }
-  deriving (Eq, Show, Generic)
+  deriving (Eq, Generic, Show)
 
 instance ToJSON Tag
+
+
+data Kind
+  = Function
+  | Method
+  | Class
+  | Module
+  | Call
+  deriving (Bounded, Enum, Eq, Generic, Show)
+
+instance ToJSON Kind
 
 
 newtype Python a = Python { getPython :: Python.Module a }
