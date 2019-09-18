@@ -96,10 +96,13 @@ class TaggableBy (strategy :: Strategy) constr where
     , HasTextElement syntax
     )
     => Language -> constr (Term syntax Location) -> Maybe Range
+  docsLiteral' _ _ = Nothing
 
   snippet' :: (Foldable syntax) => Location -> constr (Term syntax Location) -> Maybe Range
+  snippet' _ _ = Nothing
 
   symbolName' :: Declarations1 syntax => constr (Term syntax Location) -> Maybe Name
+  symbolName' _ = Nothing
 
 type IsTaggable syntax =
   ( Functor syntax
@@ -140,10 +143,7 @@ subtractLocation a b = subtractRange (locationByteRange a) (locationByteRange b)
 type family TaggableInstance (t :: * -> *) :: Strategy where
   TaggableInstance _       = 'Default
 
-instance TaggableBy 'Default t where
-  docsLiteral' _ _ = Nothing
-  snippet' _ _ = Nothing
-  symbolName' _ = Nothing
+instance TaggableBy 'Default t
 
 instance Apply Taggable fs => Taggable (Sum fs) where
   docsLiteral a = apply @Taggable (docsLiteral a)
