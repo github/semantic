@@ -9,44 +9,36 @@
           (Assignment
             (Identifier)
             (Identifier))
-          (TypeSwitchGuard
-            (Identifier)))
+          (Identifier))
         (Statements
-          (Pattern
-            (Statements
-              (Identifier)
-              (Pointer
-                (MemberAccess
-                  (Identifier)
-                  (Identifier))))
-            (Statements))
+          (Statements
+            (Identifier)
+            (Pointer
+              (MemberAccess
+                (Identifier)
+                (Identifier))))
           (Context
             (Comment)
-            (Pattern
+            (Statements
               (Slice
                 (Identifier))
               (Call
                 (Identifier)
                 (Statements)
                 (Empty))))
-          (Pattern
+          (Statements
             (Pointer
               (Identifier))
             (Break
               (Empty)))
-          (Pattern
-            (DefaultPattern
-              (Statements))
-            (Break
-              (Empty)))))
+          (DefaultPattern
+            (Statements))))
       (TypeSwitch
         (Statements
-          (TypeSwitchGuard
-            (Statements
-              (Identifier)
-              (Identifier))))
+          (Identifier)
+          (Identifier))
         (Statements
-          (Pattern
+          (Statements
             (Identifier)
             (Call
               (MemberAccess
@@ -58,7 +50,7 @@
                   (Integer)
                   (Identifier)))
               (Empty)))
-          (Pattern
+          (Statements
             (Identifier)
             (Call
               (MemberAccess
@@ -70,46 +62,41 @@
                   (Identifier)
                   (Integer)))
               (Empty)))
-          (Pattern
+          (Statements
             (Identifier)
-            (Statements
-              (Assignment
-                (Identifier)
-                (DividedBy
-                  (Call
-                    (Identifier)
-                    (Identifier)
-                    (Empty))
-                  (Integer)))
-              (Call
-                (MemberAccess
+            (Assignment
+              (Identifier)
+              (DividedBy
+                (Call
                   (Identifier)
-                  (Identifier))
-                (Statements
-                  (TextElement)
-                  (Plus
-                    (Slice
-                      (Identifier)
-                      (Identifier)
-                      (Empty)
-                      (Empty))
-                    (Slice
-                      (Identifier)
-                      (Empty)
-                      (Identifier)
-                      (Empty))))
-                (Empty))))
-          (Pattern
-            (DefaultPattern
-              (Statements))
+                  (Identifier)
+                  (Empty))
+                (Integer)))
+            (Call
+              (MemberAccess
+                (Identifier)
+                (Identifier))
+              (Statements
+                (TextElement)
+                (Plus
+                  (Slice
+                    (Identifier)
+                    (Identifier)
+                    (Empty)
+                    (Empty))
+                  (Slice
+                    (Identifier)
+                    (Empty)
+                    (Identifier)
+                    (Empty))))
+              (Empty)))
+          (DefaultPattern
             (Statements))))
       (TypeSwitch
         (Empty)
         (Statements
-          (TypeSwitchGuard
-            (Statements
-              (Identifier)
-              (Identifier)))
+          (Identifier)
+          (Identifier)
           (Context
             (Comment)
             (Empty)))))))

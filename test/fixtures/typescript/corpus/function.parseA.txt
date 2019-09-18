@@ -19,5 +19,4 @@
       (Identifier)
       (Empty))
     (StatementBlock
-      (Identifier)))
-  (Empty))
+      (Identifier))))

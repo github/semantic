@@ -12,8 +12,6 @@ module Parsing.Parser
 -- À la carte parsers
 , goParser
 , goASTParser
-, javaParser
-, javaASTParser
 , jsonParser
 , jsonASTParser
 , markdownParser
@@ -42,7 +40,6 @@ import           Data.Term
 import           Foreign.Ptr
 import qualified Language.Go.Assignment as Go
 import qualified Language.Haskell.Assignment as Haskell
-import qualified Language.Java.Assignment as Java
 import qualified Language.JSON.Assignment as JSON
 import qualified Language.Markdown.Assignment as Markdown
 import qualified Language.PHP.Assignment as PHP
@@ -53,7 +50,6 @@ import qualified Language.TypeScript.Assignment as TypeScript
 import           Prologue
 import           TreeSitter.Go
 import           TreeSitter.Haskell
-import           TreeSitter.Java
 import           TreeSitter.JSON
 import qualified TreeSitter.Language as TS (Language, Symbol)
 import           TreeSitter.PHP
@@ -80,7 +76,6 @@ data SomeAnalysisParser typeclasses ann where
 
 -- | A parser for some specific language, producing 'Term's whose syntax satisfies a list of typeclass constraints.
 someAnalysisParser :: ( ApplyAll' typeclasses Go.Syntax
-                      , ApplyAll' typeclasses Java.Syntax
                       , ApplyAll' typeclasses PHP.Syntax
                       , ApplyAll' typeclasses Python.Syntax
                       , ApplyAll' typeclasses Ruby.Syntax
@@ -92,7 +87,6 @@ someAnalysisParser :: ( ApplyAll' typeclasses Go.Syntax
                    -> SomeAnalysisParser typeclasses Location -- ^ A 'SomeAnalysisParser' abstracting the syntax type to be produced.
 someAnalysisParser _ Go         = SomeAnalysisParser goParser         (Proxy :: Proxy 'Go)
 someAnalysisParser _ Haskell    = SomeAnalysisParser haskellParser    (Proxy :: Proxy 'Haskell)
-someAnalysisParser _ Java       = SomeAnalysisParser javaParser       (Proxy :: Proxy 'Java)
 someAnalysisParser _ JavaScript = SomeAnalysisParser typescriptParser (Proxy :: Proxy 'JavaScript)
 someAnalysisParser _ PHP        = SomeAnalysisParser phpParser        (Proxy :: Proxy 'PHP)
 someAnalysisParser _ Python     = SomeAnalysisParser pythonParser     (Proxy :: Proxy 'Python)
@@ -147,12 +141,6 @@ pythonParser = AssignmentParser (ASTParser tree_sitter_python) Python.assignment
 pythonASTParser :: Parser (AST [] Python.Grammar)
 pythonASTParser = ASTParser tree_sitter_python
 
-javaParser :: Parser Java.Term
-javaParser = AssignmentParser javaASTParser Java.assignment
-
-javaASTParser :: Parser (AST [] Java.Grammar)
-javaASTParser = ASTParser tree_sitter_java
-
 jsonParser :: Parser JSON.Term
 jsonParser = DeterministicParser jsonASTParser JSON.assignment
 
@@ -190,7 +178,6 @@ data SomeASTParser where
 someASTParser :: Language -> Maybe SomeASTParser
 someASTParser Go         = Just (SomeASTParser (ASTParser tree_sitter_go :: Parser (AST [] Go.Grammar)))
 someASTParser Haskell    = Just (SomeASTParser (ASTParser tree_sitter_haskell :: Parser (AST [] Haskell.Grammar)))
-someASTParser Java       = Just (SomeASTParser (ASTParser tree_sitter_java :: Parser (AST [] Java.Grammar)))
 someASTParser JSON       = Just (SomeASTParser (ASTParser tree_sitter_json :: Parser (AST [] JSON.Grammar)))
 
 -- Use the TSX parser for `.js` and `.jsx` files in case they use Flow type-annotation syntax.
@@ -203,5 +190,6 @@ someASTParser Ruby       = Just (SomeASTParser (ASTParser tree_sitter_ruby :: Pa
 someASTParser TypeScript = Just (SomeASTParser (ASTParser tree_sitter_typescript :: Parser (AST [] TypeScript.Grammar)))
 someASTParser TSX        = Just (SomeASTParser (ASTParser tree_sitter_tsx :: Parser (AST [] TSX.Grammar)))
 someASTParser PHP        = Just (SomeASTParser (ASTParser tree_sitter_php :: Parser (AST [] PHP.Grammar)))
+someASTParser Java       = Nothing
 someASTParser Markdown   = Nothing
 someASTParser Unknown    = Nothing
