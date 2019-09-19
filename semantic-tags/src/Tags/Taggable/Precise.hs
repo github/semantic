@@ -83,6 +83,7 @@ data Strategy = Generic | Custom
 type family ToTagInstance t :: Strategy where
   ToTagInstance Location                             = 'Custom
   ToTagInstance [_]                                  = 'Custom
+  ToTagInstance (Either _ _)                         = 'Custom
   ToTagInstance (Python.FunctionDefinition Location) = 'Custom
   ToTagInstance _                                    = 'Generic
 
@@ -91,6 +92,9 @@ instance ToTagBy 'Custom Location where
 
 instance ToTag t => ToTagBy 'Custom [t] where
   tag' = getAp . foldMap (Ap . tag)
+
+instance (ToTag l, ToTag r) => ToTagBy 'Custom (Either l r) where
+  tag' = either tag tag
 
 instance ToTagBy 'Custom (Python.FunctionDefinition Location) where
   tag' Python.FunctionDefinition {} = pure mempty
