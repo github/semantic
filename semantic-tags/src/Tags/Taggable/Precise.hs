@@ -1,4 +1,4 @@
-{-# LANGUAGE AllowAmbiguousTypes, DataKinds, DeriveGeneric, DisambiguateRecordFields, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, NamedFieldPuns, OverloadedStrings, ScopedTypeVariables, TypeApplications, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes, DataKinds, DeriveGeneric, DisambiguateRecordFields, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, NamedFieldPuns, OverloadedStrings, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 {-# LANGUAGE StandaloneDeriving #-}
 module Tags.Taggable.Precise
 ( Python(..)
@@ -116,3 +116,6 @@ class GToTag t where
 
 instance GToTag (M1 i c f) where
   gtag _ = pure mempty
+
+instance (GToTag f, GToTag g) => GToTag (f :*: g) where
+  gtag (f :*: g) = (<>) <$> gtag f <*> gtag g
