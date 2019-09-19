@@ -11,7 +11,7 @@ import           Data.Monoid (Ap(..), Endo(..))
 import           Data.List.NonEmpty (NonEmpty(..))
 import           Data.Location
 import           Data.Source
-import           Data.Text (Text)
+import           Data.Text as T
 import           GHC.Generics
 import qualified TreeSitter.Python.AST as Python
 
@@ -103,19 +103,23 @@ instance (ToTag l, ToTag r) => ToTagBy 'Custom (Either l r) where
 
 instance ToTagBy 'Custom (Python.FunctionDefinition Location) where
   tag' Python.FunctionDefinition
-    { ann = Location _ span
+    { ann = Location Range { start } span
     , name = Python.Identifier { bytes = name }
-    , body = Python.Block { extraChildren }
+    , body = Python.Block { ann = Location Range { start = end } _, extraChildren }
     } = do
       src <- ask @Source
       let docs = case extraChildren of
             x:_ | Just (Python.String { ann }) <- docComment x -> Just (toText (slice (locationByteRange ann) src))
             _                                                  -> Nothing
-      pure (Endo (Tag name Function span [] Nothing docs :))
+          sliced = slice (Range start end) src
+      pure (Endo (Tag name Function span [] (Just (firstLine sliced)) docs :))
 
 docComment :: Either (Python.CompoundStatement a) (Python.SimpleStatement a) -> Maybe (Python.String a)
 docComment (Right (Python.ExpressionStatementSimpleStatement (Python.ExpressionStatement { extraChildren = Left (Python.PrimaryExpressionExpression (Python.StringPrimaryExpression s)) :|_ }))) = Just s
 docComment _ = Nothing
+
+firstLine :: Source -> Text
+firstLine = T.take 180 . T.takeWhile (/= '\n') . toText
 
 instance (Generic t, GToTag (Rep t)) => ToTagBy 'Generic t where
   tag' = gtag . from
