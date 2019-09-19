@@ -14,7 +14,7 @@ import           Data.Location
 import           Data.Source
 import           Data.Text as T
 import           GHC.Generics
-import qualified TreeSitter.Python.AST as Python
+import qualified TreeSitter.Python.AST as Py
 
 data Tag = Tag
   { name :: Text
@@ -44,7 +44,7 @@ instance ToJSON Kind where
 
 type ContextToken = (Text, Maybe Range)
 
-runTagging :: Source -> Python.Module Location -> [Tag]
+runTagging :: Source -> Py.Module Location -> [Tag]
 runTagging source
   = ($ [])
   . appEndo
@@ -86,7 +86,7 @@ type family ToTagInstance t :: Strategy where
   ToTagInstance Text                                 = 'Custom
   ToTagInstance [_]                                  = 'Custom
   ToTagInstance (Either _ _)                         = 'Custom
-  ToTagInstance (Python.FunctionDefinition Location) = 'Custom
+  ToTagInstance (Py.FunctionDefinition Location) = 'Custom
   ToTagInstance _                                    = 'Generic
 
 instance ToTagBy 'Custom Location where
@@ -101,17 +101,17 @@ instance ToTag t => ToTagBy 'Custom [t] where
 instance (ToTag l, ToTag r) => ToTagBy 'Custom (Either l r) where
   tag' = either tag tag
 
-instance ToTagBy 'Custom (Python.FunctionDefinition Location) where
-  tag' Python.FunctionDefinition
+instance ToTagBy 'Custom (Py.FunctionDefinition Location) where
+  tag' Py.FunctionDefinition
     { ann = Location Range { start } span
-    , name = Python.Identifier { bytes = name }
+    , name = Py.Identifier { bytes = name }
     , parameters
     , returnType
-    , body = Python.Block { ann = Location Range { start = end } _, extraChildren }
+    , body = Py.Block { ann = Location Range { start = end } _, extraChildren }
     } = do
       src <- ask @Source
       let docs = case extraChildren of
-            x:_ | Just (Python.String { ann }) <- docComment x -> Just (toText (slice (locationByteRange ann) src))
+            x:_ | Just (Py.String { ann }) <- docComment x -> Just (toText (slice (locationByteRange ann) src))
             _                                                  -> Nothing
           sliced = slice (Range start end) src
       tell (Endo (Tag name Function span [] (Just (firstLine sliced)) docs :))
@@ -119,8 +119,8 @@ instance ToTagBy 'Custom (Python.FunctionDefinition Location) where
       tag returnType
       traverse_ tag extraChildren
 
-docComment :: Either (Python.CompoundStatement a) (Python.SimpleStatement a) -> Maybe (Python.String a)
-docComment (Right (Python.ExpressionStatementSimpleStatement (Python.ExpressionStatement { extraChildren = Left (Python.PrimaryExpressionExpression (Python.StringPrimaryExpression s)) :|_ }))) = Just s
+docComment :: Either (Py.CompoundStatement a) (Py.SimpleStatement a) -> Maybe (Py.String a)
+docComment (Right (Py.ExpressionStatementSimpleStatement (Py.ExpressionStatement { extraChildren = Left (Py.PrimaryExpressionExpression (Py.StringPrimaryExpression s)) :|_ }))) = Just s
 docComment _ = Nothing
 
 firstLine :: Source -> Text
