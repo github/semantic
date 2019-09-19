@@ -5,8 +5,10 @@ module Tags.Taggable.Precise
 ) where
 
 import           Control.Effect.Reader
+import           Control.Effect.Writer
 import           Data.Aeson as A
-import           Data.Monoid (Ap(..), Endo(..))
+import           Data.Foldable (traverse_)
+import           Data.Monoid (Endo(..))
 import           Data.List.NonEmpty (NonEmpty(..))
 import           Data.Location
 import           Data.Source
@@ -47,6 +49,7 @@ runTagging source
   = ($ [])
   . appEndo
   . run
+  . execWriter
   . runReader @[ContextToken] []
   . runReader source
   . tag where
@@ -56,9 +59,10 @@ class ToTag t where
     :: ( Carrier sig m
        , Member (Reader Source) sig
        , Member (Reader [ContextToken]) sig
+       , Member (Writer (Endo [Tag])) sig
        )
     => t
-    -> m (Endo [Tag])
+    -> m ()
 
 instance (ToTagBy strategy t, strategy ~ ToTagInstance t) => ToTag t where
   tag = tag' @strategy
@@ -69,9 +73,10 @@ class ToTagBy (strategy :: Strategy) t where
     :: ( Carrier sig m
        , Member (Reader Source) sig
        , Member (Reader [ContextToken]) sig
+       , Member (Writer (Endo [Tag])) sig
        )
     => t
-    -> m (Endo [Tag])
+    -> m ()
 
 
 data Strategy = Generic | Custom
@@ -85,13 +90,13 @@ type family ToTagInstance t :: Strategy where
   ToTagInstance _                                    = 'Generic
 
 instance ToTagBy 'Custom Location where
-  tag' _ = pure mempty
+  tag' _ = pure ()
 
 instance ToTagBy 'Custom Text where
-  tag' _ = pure mempty
+  tag' _ = pure ()
 
 instance ToTag t => ToTagBy 'Custom [t] where
-  tag' = getAp . foldMap (Ap . tag)
+  tag' = traverse_ tag
 
 instance (ToTag l, ToTag r) => ToTagBy 'Custom (Either l r) where
   tag' = either tag tag
@@ -107,7 +112,7 @@ instance ToTagBy 'Custom (Python.FunctionDefinition Location) where
             x:_ | Just (Python.String { ann }) <- docComment x -> Just (toText (slice (locationByteRange ann) src))
             _                                                  -> Nothing
           sliced = slice (Range start end) src
-      pure (Endo (Tag name Function span [] (Just (firstLine sliced)) docs :))
+      tell (Endo (Tag name Function span [] (Just (firstLine sliced)) docs :))
 
 docComment :: Either (Python.CompoundStatement a) (Python.SimpleStatement a) -> Maybe (Python.String a)
 docComment (Right (Python.ExpressionStatementSimpleStatement (Python.ExpressionStatement { extraChildren = Left (Python.PrimaryExpressionExpression (Python.StringPrimaryExpression s)) :|_ }))) = Just s
@@ -125,9 +130,10 @@ class GToTag t where
     :: ( Carrier sig m
        , Member (Reader Source) sig
        , Member (Reader [ContextToken]) sig
+       , Member (Writer (Endo [Tag])) sig
        )
     => t a
-    -> m (Endo [Tag])
+    -> m ()
 
 
 instance GToTag f => GToTag (M1 i c f) where
