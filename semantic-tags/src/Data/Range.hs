@@ -10,7 +10,7 @@ import GHC.Generics (Generic)
 
 -- | A half-open interval of integers, defined by start & end indices.
 data Range = Range { start :: {-# UNPACK #-} !Int, end :: {-# UNPACK #-} !Int }
-  deriving (Eq, Generic, Ord)
+  deriving (Eq, Generic, Ord, Show)
 
 -- | Return the length of the range.
 rangeLength :: Range -> Int
@@ -30,9 +30,6 @@ subtractRange range1 range2 = Range (start range1) (end range1 - rangeLength (Ra
 -- prop> a <> (b <> c) === (a <> b) <> (c :: Range)
 instance Semigroup Range where
   Range start1 end1 <> Range start2 end2 = Range (min start1 start2) (max end1 end2)
-
-instance Show Range where
-  showsPrec _ r = showChar '[' . shows (start r) . showString " .. " . shows (end r) . showChar ']'
 
 
 -- $setup
