@@ -1,8 +1,7 @@
 {-# LANGUAGE AllowAmbiguousTypes, DataKinds, DeriveGeneric, DisambiguateRecordFields, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, NamedFieldPuns, OverloadedStrings, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 {-# LANGUAGE StandaloneDeriving #-}
 module Tags.Taggable.Precise
-( Python(..)
-, runTagging
+( runTagging
 ) where
 
 import           Control.Effect.Reader
@@ -41,20 +40,16 @@ instance ToJSON Kind where
   toEncoding = toEncoding . show
 
 
-newtype Python a = Python { getPython :: Python.Module a }
-  deriving (Eq, Generic, Ord, Show)
-
 type ContextToken = (Text, Maybe Range)
 
-runTagging :: Source -> Python Location -> [Tag]
+runTagging :: Source -> Python.Module Location -> [Tag]
 runTagging source
   = ($ [])
   . appEndo
   . run
   . runReader @[ContextToken] []
   . runReader source
-  . tag
-  . getPython where
+  . tag where
 
 class ToTag t where
   tag
