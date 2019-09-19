@@ -113,11 +113,14 @@ instance ToTagBy 'Custom (Py.FunctionDefinition Location) where
             x:_ | Just (Py.String { ann }) <- docComment x -> Just (toText (slice (locationByteRange ann) src))
             _                                                  -> Nothing
           sliced = slice (Range start end) src
-      tell (Endo (Tag name Function span ctx (Just (firstLine sliced)) docs :))
+      yield (Tag name Function span ctx (Just (firstLine sliced)) docs)
       local (Function:) $ do
         tag parameters
         tag returnType
         traverse_ tag extraChildren
+
+yield :: (Carrier sig m, Member (Writer (Endo [Tag])) sig) => Tag -> m ()
+yield = tell . Endo . (:)
 
 docComment :: Either (Py.CompoundStatement a) (Py.SimpleStatement a) -> Maybe (Py.String a)
 docComment (Right (Py.ExpressionStatementSimpleStatement (Py.ExpressionStatement { extraChildren = Left (Py.PrimaryExpressionExpression (Py.StringPrimaryExpression s)) :|_ }))) = Just s
