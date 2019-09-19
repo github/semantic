@@ -105,6 +105,8 @@ instance ToTagBy 'Custom (Python.FunctionDefinition Location) where
   tag' Python.FunctionDefinition
     { ann = Location Range { start } span
     , name = Python.Identifier { bytes = name }
+    , parameters
+    , returnType
     , body = Python.Block { ann = Location Range { start = end } _, extraChildren }
     } = do
       src <- ask @Source
@@ -113,6 +115,9 @@ instance ToTagBy 'Custom (Python.FunctionDefinition Location) where
             _                                                  -> Nothing
           sliced = slice (Range start end) src
       tell (Endo (Tag name Function span [] (Just (firstLine sliced)) docs :))
+      tag parameters
+      tag returnType
+      traverse_ tag extraChildren
 
 docComment :: Either (Python.CompoundStatement a) (Python.SimpleStatement a) -> Maybe (Python.String a)
 docComment (Right (Python.ExpressionStatementSimpleStatement (Python.ExpressionStatement { extraChildren = Left (Python.PrimaryExpressionExpression (Python.StringPrimaryExpression s)) :|_ }))) = Just s
