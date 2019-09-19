@@ -20,7 +20,7 @@ data Tag = Tag
   { name :: Text
   , kind :: Kind
   , span :: Span
-  , context :: [Text]
+  , context :: [Kind]
   , line :: Maybe Text
   , docs :: Maybe Text
   }
