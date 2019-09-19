@@ -9,6 +9,7 @@ import           Control.Effect.Reader
 import           Data.Aeson as A
 import           Data.Blob
 import           Data.Monoid (Ap(..), Endo(..))
+import           Data.List.NonEmpty (NonEmpty(..))
 import           Data.Location
 import           Data.Text (Text)
 import           GHC.Generics
@@ -101,8 +102,17 @@ instance (ToTag l, ToTag r) => ToTagBy 'Custom (Either l r) where
   tag' = either tag tag
 
 instance ToTagBy 'Custom (Python.FunctionDefinition Location) where
-  tag' Python.FunctionDefinition {} = pure mempty
+  tag' Python.FunctionDefinition
+    { ann
+    , name = Python.Identifier { bytes = name }
+    , body = Python.Block { extraChildren }
+    } = case extraChildren of
+      x:_ | isDocComment x -> pure (Endo (Tag name Function (locationSpan ann) [] Nothing Nothing :))
+      _                    -> pure (Endo (Tag name Function (locationSpan ann) [] Nothing Nothing :))
 
+isDocComment :: Either (Python.CompoundStatement a) (Python.SimpleStatement a) -> Bool
+isDocComment (Right (Python.ExpressionStatementSimpleStatement (Python.ExpressionStatement { extraChildren = Left (Python.PrimaryExpressionExpression Python.StringPrimaryExpression{}) :|_ }))) = True
+isDocComment _ = False
 
 instance (Generic t, GToTag (Rep t)) => ToTagBy 'Generic t where
   tag' = gtag . from
