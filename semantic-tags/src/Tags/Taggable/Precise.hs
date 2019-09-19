@@ -8,6 +8,7 @@ import           Control.Effect.Reader
 import           Control.Effect.Writer
 import           Data.Aeson as A
 import           Data.Foldable (traverse_)
+import           Data.Maybe (listToMaybe)
 import           Data.Monoid (Endo(..))
 import           Data.List.NonEmpty (NonEmpty(..))
 import           Data.Location
@@ -109,9 +110,9 @@ instance ToTagBy 'Custom (Py.FunctionDefinition Location) where
     } = do
       src <- ask @Source
       ctx <- ask @[Kind]
-      let docs = case extraChildren of
-            x:_ | Just (Py.String { ann }) <- docComment x -> Just (toText (slice (locationByteRange ann) src))
-            _                                              -> Nothing
+      let docs = case listToMaybe extraChildren >>= docComment of
+            Just Py.String { ann } -> Just (toText (slice (locationByteRange ann) src))
+            _                      -> Nothing
           sliced = slice (Range start end) src
       yield (Tag name Function span ctx (Just (firstLine sliced)) docs)
       local (Function:) $ do
