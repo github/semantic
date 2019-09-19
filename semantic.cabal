@@ -61,6 +61,7 @@ common dependencies
                      , tree-sitter == 0.3.0.0
                      , mtl ^>= 2.2.2
                      , network ^>= 2.8.0.0
+                     , pathtype ^>= 0.8.1
                      , process ^>= 1.6.3.0
                      , recursion-schemes ^>= 5.1
                      , scientific ^>= 0.3.6.2
