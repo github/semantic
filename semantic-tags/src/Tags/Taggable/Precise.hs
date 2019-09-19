@@ -7,10 +7,10 @@ module Tags.Taggable.Precise
 
 import           Control.Effect.Reader
 import           Data.Aeson as A
-import           Data.Blob
 import           Data.Monoid (Ap(..), Endo(..))
 import           Data.List.NonEmpty (NonEmpty(..))
 import           Data.Location
+import           Data.Source
 import           Data.Text (Text)
 import           GHC.Generics
 import qualified TreeSitter.Python.AST as Python
@@ -46,20 +46,20 @@ newtype Python a = Python { getPython :: Python.Module a }
 
 type ContextToken = (Text, Maybe Range)
 
-runTagging :: Blob -> Python Location -> [Tag]
-runTagging blob
+runTagging :: Source -> Python Location -> [Tag]
+runTagging source
   = ($ [])
   . appEndo
   . run
   . runReader @[ContextToken] []
-  . runReader blob
+  . runReader source
   . tag
   . getPython where
 
 class ToTag t where
   tag
     :: ( Carrier sig m
-       , Member (Reader Blob) sig
+       , Member (Reader Source) sig
        , Member (Reader [ContextToken]) sig
        )
     => t
@@ -72,7 +72,7 @@ instance (ToTagBy strategy t, strategy ~ ToTagInstance t) => ToTag t where
 class ToTagBy (strategy :: Strategy) t where
   tag'
     :: ( Carrier sig m
-       , Member (Reader Blob) sig
+       , Member (Reader Source) sig
        , Member (Reader [ContextToken]) sig
        )
     => t
@@ -121,7 +121,7 @@ instance (Generic t, GToTag (Rep t)) => ToTagBy 'Generic t where
 class GToTag t where
   gtag
     :: ( Carrier sig m
-       , Member (Reader Blob) sig
+       , Member (Reader Source) sig
        , Member (Reader [ContextToken]) sig
        )
     => t a
