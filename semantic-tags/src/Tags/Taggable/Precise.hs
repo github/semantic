@@ -113,9 +113,10 @@ instance ToTagBy 'Custom (Py.FunctionDefinition Location) where
             _                                                  -> Nothing
           sliced = slice (Range start end) src
       tell (Endo (Tag name Function span [] (Just (firstLine sliced)) docs :))
-      tag parameters
-      tag returnType
-      traverse_ tag extraChildren
+      local (Function:) $ do
+        tag parameters
+        tag returnType
+        traverse_ tag extraChildren
 
 docComment :: Either (Py.CompoundStatement a) (Py.SimpleStatement a) -> Maybe (Py.String a)
 docComment (Right (Py.ExpressionStatementSimpleStatement (Py.ExpressionStatement { extraChildren = Left (Py.PrimaryExpressionExpression (Py.StringPrimaryExpression s)) :|_ }))) = Just s
