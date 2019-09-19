@@ -130,3 +130,6 @@ instance (GToTag f, GToTag g) => GToTag (f :+: g) where
 
 instance ToTag t => GToTag (K1 R t) where
   gtag = tag . unK1
+
+instance GToTag U1 where
+  gtag _ = pure mempty
