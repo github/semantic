@@ -8,7 +8,7 @@ module Tags.Taggable.Precise
 import           Control.Effect.Reader
 import           Data.Aeson as A
 import           Data.Blob
-import           Data.Monoid (Endo(..))
+import           Data.Monoid (Ap(..), Endo(..))
 import           Data.Location
 import           Data.Text (Text)
 import           GHC.Generics
@@ -82,11 +82,15 @@ data Strategy = Generic | Custom
 
 type family ToTagInstance t :: Strategy where
   ToTagInstance Location                             = 'Custom
+  ToTagInstance [_]                                  = 'Custom
   ToTagInstance (Python.FunctionDefinition Location) = 'Custom
   ToTagInstance _                                    = 'Generic
 
 instance ToTagBy 'Custom Location where
   tag' _ = pure mempty
+
+instance ToTag t => ToTagBy 'Custom [t] where
+  tag' = getAp . foldMap (Ap . tag)
 
 instance ToTagBy 'Custom (Python.FunctionDefinition Location) where
   tag' Python.FunctionDefinition {} = pure mempty
