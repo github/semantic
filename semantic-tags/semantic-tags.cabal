@@ -20,7 +20,6 @@ tested-with:         GHC == 8.6.5
 
 library
   exposed-modules:
-    Data.Blob
     Data.Language
     Data.Location
     Data.Range
