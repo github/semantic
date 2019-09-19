@@ -108,11 +108,12 @@ instance ToTagBy 'Custom (Py.FunctionDefinition Location) where
     , body = Py.Block { ann = Location Range { start = end } _, extraChildren }
     } = do
       src <- ask @Source
+      ctx <- ask @[Kind]
       let docs = case extraChildren of
             x:_ | Just (Py.String { ann }) <- docComment x -> Just (toText (slice (locationByteRange ann) src))
             _                                                  -> Nothing
           sliced = slice (Range start end) src
-      tell (Endo (Tag name Function span [] (Just (firstLine sliced)) docs :))
+      tell (Endo (Tag name Function span ctx (Just (firstLine sliced)) docs :))
       local (Function:) $ do
         tag parameters
         tag returnType
