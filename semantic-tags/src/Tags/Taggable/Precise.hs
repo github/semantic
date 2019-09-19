@@ -110,9 +110,7 @@ instance ToTagBy 'Custom (Py.FunctionDefinition Location) where
     } = do
       src <- ask @Source
       ctx <- ask @[Kind]
-      let docs = case listToMaybe extraChildren >>= docComment of
-            Just Py.String { ann } -> Just (toText (slice (locationByteRange ann) src))
-            _                      -> Nothing
+      let docs = listToMaybe extraChildren >>= docComment src
           sliced = slice (Range start end) src
       yield (Tag name Function span ctx (Just (firstLine sliced)) docs)
       local (Function:) $ do
@@ -123,9 +121,9 @@ instance ToTagBy 'Custom (Py.FunctionDefinition Location) where
 yield :: (Carrier sig m, Member (Writer (Endo [Tag])) sig) => Tag -> m ()
 yield = tell . Endo . (:)
 
-docComment :: Either (Py.CompoundStatement a) (Py.SimpleStatement a) -> Maybe (Py.String a)
-docComment (Right (Py.ExpressionStatementSimpleStatement (Py.ExpressionStatement { extraChildren = Left (Py.PrimaryExpressionExpression (Py.StringPrimaryExpression s)) :|_ }))) = Just s
-docComment _ = Nothing
+docComment :: Source -> Either (Py.CompoundStatement Location) (Py.SimpleStatement Location) -> Maybe Text
+docComment src (Right (Py.ExpressionStatementSimpleStatement (Py.ExpressionStatement { extraChildren = Left (Py.PrimaryExpressionExpression (Py.StringPrimaryExpression Py.String { ann })) :|_ }))) = Just (toText (slice (locationByteRange ann) src))
+docComment _ _ = Nothing
 
 firstLine :: Source -> Text
 firstLine = T.take 180 . T.takeWhile (/= '\n') . toText
