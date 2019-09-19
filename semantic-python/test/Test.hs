@@ -83,10 +83,12 @@ fixtureTestTreeForFile fp = HUnit.testCaseSteps (Path.toString fp) $ \step -> wi
     Left err  -> HUnit.assertFailure ("Directive parsing error: " <> err)
 
   result <- TS.parseByteString TSP.tree_sitter_python fileContents
-  let coreResult = fmap (Control.Effect.run
-                          . runFail
-                          . runReader (fromString @Py.SourcePath . Path.toString $ fp)
-                          . Py.compile @(TSP.Module TS.Span) @_ @(Term (Ann :+: Core))) result
+  let coreResult = Control.Effect.run
+                   . runFail
+                   . runReader (fromString @Py.SourcePath . Path.toString $ fp)
+                   . Py.compile @(TSP.Module TS.Span) @_ @(Term (Ann :+: Core))
+                   <$> result
+
   for_ directives $ \directive -> do
     step (Directive.describe directive)
     case (coreResult, directive) of
