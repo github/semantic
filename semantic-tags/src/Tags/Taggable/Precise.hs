@@ -119,3 +119,6 @@ instance GToTag (M1 i c f) where
 
 instance (GToTag f, GToTag g) => GToTag (f :*: g) where
   gtag (f :*: g) = (<>) <$> gtag f <*> gtag g
+
+instance ToTag t => GToTag (K1 R t) where
+  gtag = tag . unK1
