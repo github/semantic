@@ -5,6 +5,7 @@ module Main (main) where
 import qualified Analysis.Eval as Eval
 import           Control.Effect
 import           Control.Effect.Fail
+import           Control.Effect.Reader
 import           Control.Monad hiding (fail)
 import           Control.Monad.Catch
 import           Control.Monad.IO.Class
@@ -23,6 +24,7 @@ import           Data.Loc
 import           Data.Maybe
 import           Data.Name
 import           Data.Term
+import           Data.String (fromString)
 import           GHC.Stack
 import qualified Language.Python.Core as Py
 import           Prelude hiding (fail)
@@ -30,12 +32,14 @@ import           Streaming
 import qualified Streaming.Process
 import           System.Directory
 import           System.Exit
-import           System.FilePath
 import qualified TreeSitter.Span as TS (Span)
 import qualified TreeSitter.Python as TSP
 import qualified TreeSitter.Python.AST as TSP
 import qualified TreeSitter.Unmarshal as TS
 import           Text.Show.Pretty (ppShow)
+import qualified System.Path as Path
+import qualified System.Path.Directory as Path
+import           System.Path ((</>))
 
 import qualified Test.Tasty as Tasty
 import qualified Test.Tasty.HUnit as HUnit
@@ -69,15 +73,22 @@ assertJQExpressionSucceeds directive tree core = do
   catch @_ @Streaming.Process.ProcessExitedUnsuccessfully jqPipeline $ \err -> do
     HUnit.assertFailure (unlines [errorMsg, dirMsg, jsonMsg, astMsg, treeMsg, treeMsg', show err])
 
-fixtureTestTreeForFile :: HasCallStack => FilePath -> Tasty.TestTree
-fixtureTestTreeForFile fp = HUnit.testCaseSteps fp $ \step -> withFrozenCallStack $ do
-  fileContents <- ByteString.readFile ("semantic-python/test/fixtures" </> fp)
+fixtureTestTreeForFile :: HasCallStack => Path.RelFile -> Tasty.TestTree
+fixtureTestTreeForFile fp = HUnit.testCaseSteps (Path.toString fp) $ \step -> withFrozenCallStack $ do
+  let fullPath = Path.relDir "semantic-python/test/fixtures" </> fp
+
+  fileContents <- ByteString.readFile (Path.toString fullPath)
   directives <- case Directive.parseDirectives fileContents of
     Right dir -> pure dir
     Left err  -> HUnit.assertFailure ("Directive parsing error: " <> err)
 
   result <- TS.parseByteString TSP.tree_sitter_python fileContents
-  let coreResult = fmap (Control.Effect.run . runFail . Py.compile @(TSP.Module TS.Span) @_ @(Term (Ann :+: Core))) result
+  let coreResult = Control.Effect.run
+                   . runFail
+                   . runReader (fromString @Py.SourcePath . Path.toString $ fp)
+                   . Py.compile @(TSP.Module TS.Span) @_ @(Term (Ann :+: Core))
+                   <$> result
+
   for_ directives $ \directive -> do
     step (Directive.describe directive)
     case (coreResult, directive) of
@@ -92,8 +103,8 @@ fixtureTestTreeForFile fp = HUnit.testCaseSteps fp $ \step -> withFrozenCallStac
 
 milestoneFixtures :: IO Tasty.TestTree
 milestoneFixtures = do
-  files <- liftIO (listDirectory "semantic-python/test/fixtures")
-  let pythons = sort (filter ("py" `isExtensionOf`) files)
+  files <- liftIO (Path.filesInDir (Path.relDir "semantic-python/test/fixtures"))
+  let pythons = sort (filter (Path.hasExtension ".py") files)
   pure $ Tasty.testGroup "Translation" (fmap fixtureTestTreeForFile pythons)
 
 main :: IO ()
