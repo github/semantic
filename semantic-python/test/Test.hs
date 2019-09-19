@@ -47,6 +47,7 @@ import           Analysis.ScopeGraph
 import qualified Directive
 import           Instances ()
 
+
 assertJQExpressionSucceeds :: Show a => Directive.Directive -> a -> Term (Ann :+: Core) Name -> HUnit.Assertion
 assertJQExpressionSucceeds directive tree core = do
   bod <- case scopeGraph Eval.eval [File interactive core] of
@@ -87,13 +88,15 @@ fixtureTestTreeForFile fp = HUnit.testCaseSteps (Path.toString fp) $ \step -> wi
                           . Py.compile @(TSP.Module TS.Span) @_ @(Term (Ann :+: Core))) result
   for_ directives $ \directive -> do
     step (Directive.describe directive)
-    case coreResult of
-      Left err           -> HUnit.assertFailure ("Parsing failed: " <> err)
-      Right (Left _)     | directive == Directive.Fails -> pure ()
-      Right (Right _)    | directive == Directive.Fails -> HUnit.assertFailure ("Expected translation to fail")
-      Right (Right item) -> assertJQExpressionSucceeds directive result item
-      Right (Left err)   -> HUnit.assertFailure ("Compilation failed: " <> err)
-
+    case (coreResult, directive) of
+      (Right (Left _), Directive.Fails)      -> pure ()
+      (Left err, _)                          -> HUnit.assertFailure ("Parsing failed: " <> err)
+      (Right (Left err), _)                  -> HUnit.assertFailure ("Compilation failed: " <> err)
+      (Right (Right _), Directive.Fails)     -> HUnit.assertFailure ("Expected translation to fail")
+      (Right (Right item), Directive.JQ _)   -> assertJQExpressionSucceeds directive result item
+      (Right (Right item), Directive.Tree t) -> let msg = "lhs = " <> showCore t <> "\n rhs " <> showCore item'
+                                                    item' = stripAnnotations item
+                                                in HUnit.assertEqual msg t item' where
 
 milestoneFixtures :: IO Tasty.TestTree
 milestoneFixtures = do
