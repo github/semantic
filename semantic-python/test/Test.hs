@@ -24,6 +24,7 @@ import           Data.Loc
 import           Data.Maybe
 import           Data.Name
 import           Data.Term
+import           Data.String (fromString)
 import           GHC.Stack
 import qualified Language.Python.Core as Py
 import           Prelude hiding (fail)
@@ -84,7 +85,7 @@ fixtureTestTreeForFile fp = HUnit.testCaseSteps (Path.toString fp) $ \step -> wi
   result <- TS.parseByteString TSP.tree_sitter_python fileContents
   let coreResult = fmap (Control.Effect.run
                           . runFail
-                          . runReader fp
+                          . runReader (fromString @Py.SourcePath . Path.toString $ fp)
                           . Py.compile @(TSP.Module TS.Span) @_ @(Term (Ann :+: Core))) result
   for_ directives $ \directive -> do
     step (Directive.describe directive)

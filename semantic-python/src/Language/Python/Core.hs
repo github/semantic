@@ -1,10 +1,11 @@
 {-# LANGUAGE ConstraintKinds, DataKinds, DefaultSignatures, DeriveAnyClass, DeriveGeneric, DerivingStrategies,
-             DerivingVia, DisambiguateRecordFields, FlexibleContexts, FlexibleInstances, NamedFieldPuns,
-             OverloadedLists, OverloadedStrings, ScopedTypeVariables, StandaloneDeriving, TypeApplications,
-             TypeOperators, UndecidableInstances #-}
+             DerivingVia, DisambiguateRecordFields, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving,
+             NamedFieldPuns, OverloadedLists, OverloadedStrings, ScopedTypeVariables, StandaloneDeriving,
+             TypeApplications, TypeOperators, UndecidableInstances #-}
 
 module Language.Python.Core
 ( compile
+, SourcePath
 ) where
 
 import Prelude hiding (fail)
@@ -14,15 +15,19 @@ import           Control.Effect.Reader
 import           Control.Monad.Fail
 import           Data.Core as Core
 import           Data.Foldable
+import qualified Data.Loc
 import           Data.Name as Name
+import           Data.String (IsString)
+import           Data.Text (Text)
 import           GHC.Generics
 import           GHC.Records
-import qualified Data.Loc
 import qualified TreeSitter.Python.AST as Py
 import           TreeSitter.Span (Span)
 import qualified TreeSitter.Span as TreeSitter
-import qualified System.Path as Path
-import qualified Data.Text as Text
+
+newtype SourcePath = SourcePath { rawPath :: Text }
+  deriving stock (Eq, Show)
+  deriving newtype IsString
 
 -- We leave the representation of Core syntax abstract so that it's not
 -- possible for us to 'cheat' by pattern-matching on or eliminating a
@@ -36,7 +41,7 @@ type CoreSyntax sig t = ( Member Core sig
 class Compile py where
   -- FIXME: we should really try not to fail
   compile :: ( CoreSyntax syn t
-             , Member (Reader Path.RelFile) sig
+             , Member (Reader SourcePath) sig
              , Carrier sig m
              , MonadFail m
              )
@@ -47,7 +52,7 @@ class Compile py where
   compile = defaultCompile
 
   compileCC :: ( CoreSyntax syn t
-               , Member (Reader Path.RelFile) sig
+               , Member (Reader SourcePath) sig
                , Carrier sig m
                , MonadFail m
                )
@@ -56,7 +61,7 @@ class Compile py where
             -> m (t Name)
 
   default compileCC :: ( CoreSyntax syn t
-                       , Member (Reader Path.RelFile) sig
+                       , Member (Reader SourcePath) sig
                        , Carrier sig m
                        , MonadFail m
                        ) => py -> m (t Name) -> m (t Name)
@@ -64,11 +69,11 @@ class Compile py where
 
 locate :: ( HasField "ann" syntax Span
           , CoreSyntax syn t
-          , Member (Reader Path.RelFile) sig
+          , Member (Reader SourcePath) sig
           , Carrier sig m
           ) => syntax -> t a -> m (t a)
 locate syn item = do
-  fp <- asks @Path.RelFile (Text.pack . Path.toString)
+  fp <- asks @SourcePath rawPath
   let locFromTSSpan (TreeSitter.Span (TreeSitter.Pos a b) (TreeSitter.Pos c d))
         = Data.Loc.Loc fp (Data.Loc.Span (Data.Loc.Pos a b) (Data.Loc.Pos c d))
 
@@ -236,13 +241,13 @@ instance Compile (Py.Yield Span)
 
 class GCompileSum f where
   gcompileSum :: ( CoreSyntax syn t
-                 , Member (Reader Path.RelFile) sig
+                 , Member (Reader SourcePath) sig
                  , Carrier sig m
                  , MonadFail m
                  ) => f a -> m (t Name)
 
   gcompileCCSum :: ( CoreSyntax syn t
-                   , Member (Reader Path.RelFile) sig
+                   , Member (Reader SourcePath) sig
                    , Carrier sig m
                    , MonadFail m
                    ) => f a -> m (t Name) -> m (t Name)
