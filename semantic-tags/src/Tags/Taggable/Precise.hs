@@ -103,16 +103,19 @@ instance (ToTag l, ToTag r) => ToTagBy 'Custom (Either l r) where
 
 instance ToTagBy 'Custom (Python.FunctionDefinition Location) where
   tag' Python.FunctionDefinition
-    { ann
+    { ann = Location _ span
     , name = Python.Identifier { bytes = name }
     , body = Python.Block { extraChildren }
-    } = case extraChildren of
-      x:_ | isDocComment x -> pure (Endo (Tag name Function (locationSpan ann) [] Nothing Nothing :))
-      _                    -> pure (Endo (Tag name Function (locationSpan ann) [] Nothing Nothing :))
+    } = do
+      src <- ask @Source
+      let docs = case extraChildren of
+            x:_ | Just (Python.String { ann }) <- docComment x -> Just (toText (slice (locationByteRange ann) src))
+            _                                                  -> Nothing
+      pure (Endo (Tag name Function span [] Nothing docs :))
 
-isDocComment :: Either (Python.CompoundStatement a) (Python.SimpleStatement a) -> Bool
-isDocComment (Right (Python.ExpressionStatementSimpleStatement (Python.ExpressionStatement { extraChildren = Left (Python.PrimaryExpressionExpression Python.StringPrimaryExpression{}) :|_ }))) = True
-isDocComment _ = False
+docComment :: Either (Python.CompoundStatement a) (Python.SimpleStatement a) -> Maybe (Python.String a)
+docComment (Right (Python.ExpressionStatementSimpleStatement (Python.ExpressionStatement { extraChildren = Left (Python.PrimaryExpressionExpression (Python.StringPrimaryExpression s)) :|_ }))) = Just s
+docComment _ = Nothing
 
 instance (Generic t, GToTag (Rep t)) => ToTagBy 'Generic t where
   tag' = gtag . from
