@@ -59,12 +59,6 @@ class Compile py where
             => py
             -> m (t Name)
             -> m (t Name)
-
-  default compileCC :: ( CoreSyntax syn t
-                       , Member (Reader SourcePath) sig
-                       , Carrier sig m
-                       , MonadFail m
-                       ) => py -> m (t Name) -> m (t Name)
   compileCC py cc = (>>>) <$> compile py <*> cc
 
 locate :: ( HasField "ann" syntax Span
