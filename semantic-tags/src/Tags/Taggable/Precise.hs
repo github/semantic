@@ -118,8 +118,8 @@ class GToTag t where
     -> m (Endo [Tag])
 
 
-instance GToTag (M1 i c f) where
-  gtag _ = pure mempty
+instance GToTag f => GToTag (M1 i c f) where
+  gtag = gtag . unM1
 
 instance (GToTag f, GToTag g) => GToTag (f :*: g) where
   gtag (f :*: g) = (<>) <$> gtag f <*> gtag g
