@@ -4,6 +4,8 @@ module Data.Core.Parser
   , core
   , lit
   , expr
+  , record
+  , comp
   , lvalue
   ) where
 
