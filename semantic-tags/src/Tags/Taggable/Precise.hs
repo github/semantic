@@ -82,12 +82,16 @@ data Strategy = Generic | Custom
 
 type family ToTagInstance t :: Strategy where
   ToTagInstance Location                             = 'Custom
+  ToTagInstance Text                                 = 'Custom
   ToTagInstance [_]                                  = 'Custom
   ToTagInstance (Either _ _)                         = 'Custom
   ToTagInstance (Python.FunctionDefinition Location) = 'Custom
   ToTagInstance _                                    = 'Generic
 
 instance ToTagBy 'Custom Location where
+  tag' _ = pure mempty
+
+instance ToTagBy 'Custom Text where
   tag' _ = pure mempty
 
 instance ToTag t => ToTagBy 'Custom [t] where
