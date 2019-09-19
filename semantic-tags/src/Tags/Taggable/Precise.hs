@@ -111,7 +111,7 @@ instance ToTagBy 'Custom (Py.FunctionDefinition Location) where
       ctx <- ask @[Kind]
       let docs = case extraChildren of
             x:_ | Just (Py.String { ann }) <- docComment x -> Just (toText (slice (locationByteRange ann) src))
-            _                                                  -> Nothing
+            _                                              -> Nothing
           sliced = slice (Range start end) src
       yield (Tag name Function span ctx (Just (firstLine sliced)) docs)
       local (Function:) $ do
