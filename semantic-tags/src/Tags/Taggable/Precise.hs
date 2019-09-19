@@ -42,15 +42,13 @@ instance ToJSON Kind where
   toEncoding = toEncoding . show
 
 
-type ContextToken = (Text, Maybe Range)
-
 runTagging :: Source -> Py.Module Location -> [Tag]
 runTagging source
   = ($ [])
   . appEndo
   . run
   . execWriter
-  . runReader @[ContextToken] []
+  . runReader @[Kind] []
   . runReader source
   . tag where
 
@@ -58,7 +56,7 @@ class ToTag t where
   tag
     :: ( Carrier sig m
        , Member (Reader Source) sig
-       , Member (Reader [ContextToken]) sig
+       , Member (Reader [Kind]) sig
        , Member (Writer (Endo [Tag])) sig
        )
     => t
@@ -72,7 +70,7 @@ class ToTagBy (strategy :: Strategy) t where
   tag'
     :: ( Carrier sig m
        , Member (Reader Source) sig
-       , Member (Reader [ContextToken]) sig
+       , Member (Reader [Kind]) sig
        , Member (Writer (Endo [Tag])) sig
        )
     => t
@@ -134,7 +132,7 @@ class GToTag t where
   gtag
     :: ( Carrier sig m
        , Member (Reader Source) sig
-       , Member (Reader [ContextToken]) sig
+       , Member (Reader [Kind]) sig
        , Member (Writer (Endo [Tag])) sig
        )
     => t a
