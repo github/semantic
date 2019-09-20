@@ -11,6 +11,7 @@ module Data.JSON.Fields
 import           Data.Aeson
 import qualified Data.Map as Map
 import           Data.Range
+import           Data.Span
 import           Data.Sum (Apply (..), Sum)
 import qualified Data.Text as Text
 import           GHC.Generics
@@ -49,6 +50,9 @@ instance (ToJSONFields a, ToJSONFields b) => ToJSONFields (a, b) where
 
 instance ToJSONFields Range where
   toJSONFields Range{..} = ["sourceRange" .= [ start, end ]]
+
+instance ToJSONFields Span where
+  toJSONFields sourceSpan = [ "sourceSpan" .= sourceSpan ]
 
 
 newtype JSONFields a = JSONFields { unJSONFields :: a }

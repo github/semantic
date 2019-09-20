@@ -21,8 +21,6 @@ import           Data.Aeson ((.:), (.=))
 import qualified Data.Aeson as A
 import           Proto3.Suite
 
-import Data.JSON.Fields
-
 -- | Source position information (1 indexed)
 data Pos = Pos
   { posLine   :: !Int
@@ -101,9 +99,6 @@ instance A.FromJSON Span where
     Span <$>
       o .: "start" <*>
       o .: "end"
-
-instance ToJSONFields Span where
-  toJSONFields sourceSpan = [ "sourceSpan" .= sourceSpan ]
 
 instance Lower Span where
   lowerBound = emptySpan
