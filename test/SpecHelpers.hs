@@ -75,6 +75,8 @@ import Semantic.Telemetry (LogQueue, StatQueue)
 import Semantic.Api hiding (File, Blob, BlobPair)
 import System.Exit (die)
 import Control.Exception (displayException)
+import qualified System.Path as Path
+import qualified System.Path.PartClass as Part
 
 runBuilder :: Builder -> ByteString
 runBuilder = toStrict . toLazyByteString
@@ -100,9 +102,9 @@ readFilePathPair :: Both FilePath -> IO BlobPair
 readFilePathPair paths = let paths' = fmap fileForPath paths in
                      runBothWith readFilePair paths'
 
-parseTestFile :: Parser term -> FilePath -> IO (Blob, term)
+parseTestFile :: Part.AbsRel ar => Parser term -> Path.File ar -> IO (Blob, term)
 parseTestFile parser path = runTaskOrDie $ do
-  blob <- readBlob (fileForPath path)
+  blob <- readBlob (fileForPath (Path.toString path))
   term <- parse parser blob
   pure (blob, term)
 
