@@ -8,7 +8,7 @@ This module is intended to be imported qualified to avoid name clashes with 'Pre
 -}
 module Source.Source
 ( Source
-, sourceBytes
+, bytes
 , fromUTF8
 -- * Measurement
 , Source.Source.length
@@ -49,7 +49,7 @@ import           Source.Span hiding (HasSpan (..))
 -- | The contents of a source file. This is represented as a UTF-8
 -- 'ByteString' under the hood. Construct these with 'fromUTF8'; obviously,
 -- passing 'fromUTF8' non-UTF8 bytes will cause crashes.
-newtype Source = Source { sourceBytes :: B.ByteString }
+newtype Source = Source { bytes :: B.ByteString }
   deriving (Eq, Semigroup, Monoid, IsString, Show, Generic)
 
 fromUTF8 :: B.ByteString -> Source
@@ -62,14 +62,14 @@ instance FromJSON Source where
 -- Measurement
 
 length :: Source -> Int
-length = B.length . sourceBytes
+length = B.length . bytes
 
 null :: Source -> Bool
-null = B.null . sourceBytes
+null = B.null . bytes
 
 -- | Return a 'Range' that covers the entire text.
 totalRange :: Source -> Range
-totalRange = Range 0 . B.length . sourceBytes
+totalRange = Range 0 . B.length . bytes
 
 -- | Return a 'Span' that covers the entire text.
 totalSpan :: Source -> Span
@@ -86,7 +86,7 @@ fromText = Source . T.encodeUtf8
 
 -- | Return the Text contained in the 'Source'.
 toText :: Source -> T.Text
-toText = T.decodeUtf8 . sourceBytes
+toText = T.decodeUtf8 . bytes
 
 
 -- Slicing
@@ -98,10 +98,10 @@ slice source range = taking $ dropping source where
   taking   = take (rangeLength range)
 
 drop :: Int -> Source -> Source
-drop i = Source . B.drop i . sourceBytes
+drop i = Source . B.drop i . bytes
 
 take :: Int -> Source -> Source
-take i = Source . B.take i . sourceBytes
+take i = Source . B.take i . bytes
 
 
 -- Splitting
@@ -121,7 +121,7 @@ lineRangesWithin source range
   . ((start range:) &&& (<> [ end range ]))
   . fmap (+ succ (start range))
   . newlineIndices
-  . sourceBytes
+  . bytes
   $ slice source range
 
 -- | Return all indices of newlines ('\n', '\r', and '\r\n') in the 'ByteString'.

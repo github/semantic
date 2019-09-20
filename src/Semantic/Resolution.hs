@@ -18,7 +18,7 @@ import           Data.Project
 import           GHC.Generics (Generic1)
 import           Prologue
 import           Semantic.Task.Files
-import           Source.Source
+import qualified Source.Source as Source
 import           System.FilePath.Posix
 
 
@@ -30,7 +30,7 @@ nodeJSResolutionMap rootDir prop excludeDirs = do
   pure $ fold (mapMaybe (lookup prop) blobs)
   where
     lookup :: Text -> Blob -> Maybe (Map FilePath FilePath)
-    lookup k b@Blob{..} = decodeStrict (sourceBytes blobSource) >>= lookupProp (blobPath b) k
+    lookup k b@Blob{..} = decodeStrict (Source.bytes blobSource) >>= lookupProp (blobPath b) k
 
     lookupProp :: FilePath -> Text -> Object -> Maybe (Map FilePath FilePath)
     lookupProp path k res = flip parseMaybe res $ \obj -> Map.singleton relPkgDotJSONPath . relEntryPath <$> obj .: k

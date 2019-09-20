@@ -20,7 +20,6 @@ import System.Console.ANSI
 
 import           Data.Blob
 import           Data.Flag as Flag
-import           Source.Source (Source)
 import qualified Source.Source as Source
 import           Source.Span
 
@@ -62,7 +61,7 @@ showExcerpt colourize Span{..} Blob{..}
   = showString context . (if "\n" `isSuffixOf` context then id else showChar '\n')
   . showString (replicate (caretPaddingWidth + lineNumberDigits) ' ') . withSGRCode colourize [SetColor Foreground Vivid Green] (showString caret) . showChar '\n'
   where context = fold contextLines
-        contextLines = [ showLineNumber i <> ": " <> unpack (Source.sourceBytes l)
+        contextLines = [ showLineNumber i <> ": " <> unpack (Source.bytes l)
                        | (i, l) <- zip [1..] (Source.lines blobSource)
                        , inRange (posLine spanStart - 2, posLine spanStart) i
                        ]

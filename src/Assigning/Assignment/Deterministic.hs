@@ -99,7 +99,7 @@ instance (Enum symbol, Ord symbol, Show symbol) => Assigning symbol (Assignment 
   leafNode s = Assignment NotNullable (IntSet.singleton (fromEnum s))
     [ (s, \ src state _ -> case stateInput state of
       []  -> Left (makeError (stateSpan state) [Right s] Nothing)
-      s:_ -> case decodeUtf8' (sourceBytes (Source.slice src (astRange s))) of
+      s:_ -> case decodeUtf8' (Source.bytes (Source.slice src (astRange s))) of
         Left err   -> Left (makeError (astSpan s) [Left "valid utf-8"] (Just (Left (show err))))
         Right text -> Right (advanceState state, text))
     ]

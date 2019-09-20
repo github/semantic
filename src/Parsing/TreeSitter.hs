@@ -14,13 +14,14 @@ import           Foreign
 import           Foreign.C.Types (CBool (..))
 import           Foreign.Marshal.Array (allocaArray)
 
-import Data.AST (AST, Node (Node))
-import Data.Blob
-import Data.Duration
-import Data.Term
-import Source.Loc
-import Source.Source
-import Source.Span
+import           Data.AST (AST, Node (Node))
+import           Data.Blob
+import           Data.Duration
+import           Data.Term
+import           Source.Loc
+import           Source.Source (Source)
+import qualified Source.Source as Source
+import           Source.Span
 
 import qualified TreeSitter.Language as TS
 import qualified TreeSitter.Node as TS
@@ -32,7 +33,7 @@ data Result grammar
   | Succeeded (AST [] grammar)
 
 runParser :: (Enum grammar, Bounded grammar) => Ptr TS.Parser -> Source -> IO (Result grammar)
-runParser parser blobSource  = unsafeUseAsCStringLen (sourceBytes blobSource) $ \ (source, len) -> do
+runParser parser blobSource  = unsafeUseAsCStringLen (Source.bytes blobSource) $ \ (source, len) -> do
     alloca (\ rootPtr -> do
       let acquire = do
             -- Change this to TS.ts_parser_loop_until_cancelled if you want to test out cancellation

@@ -100,7 +100,7 @@ import qualified Assigning.Assignment.Table as Table
 import Control.Monad.Except (MonadError (..))
 import Data.AST
 import Data.Error
-import qualified Source.Source as Source (Source, slice, sourceBytes)
+import qualified Source.Source as Source
 import Data.Term
 import Data.Text (Text)
 import Data.Text.Encoding (decodeUtf8')
@@ -265,7 +265,7 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                   GetLocals -> yield stateLocals state
                   PutLocals l -> yield () (state { stateLocals = l })
                   CurrentNode -> yield (In node (() <$ f)) state
-                  Source -> yield (Source.sourceBytes (Source.slice source (nodeByteRange node))) (advanceState state)
+                  Source -> yield (Source.bytes (Source.slice source (nodeByteRange node))) (advanceState state)
                   Children child -> do
                     (a, state') <- go child state { stateNodes = toList f, stateCallSites = maybe id (:) (tracingCallSite t) stateCallSites } >>= requireExhaustive (tracingCallSite t)
                     yield a (advanceState state' { stateNodes = stateNodes, stateCallSites = stateCallSites })
