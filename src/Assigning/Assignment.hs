@@ -265,7 +265,7 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                   GetLocals -> yield stateLocals state
                   PutLocals l -> yield () (state { stateLocals = l })
                   CurrentNode -> yield (In node (() <$ f)) state
-                  Source -> yield (Source.sourceBytes (Source.slice (nodeByteRange node) source)) (advanceState state)
+                  Source -> yield (Source.sourceBytes (Source.slice source (nodeByteRange node))) (advanceState state)
                   Children child -> do
                     (a, state') <- go child state { stateNodes = toList f, stateCallSites = maybe id (:) (tracingCallSite t) stateCallSites } >>= requireExhaustive (tracingCallSite t)
                     yield a (advanceState state' { stateNodes = stateNodes, stateCallSites = stateCallSites })

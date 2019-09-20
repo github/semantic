@@ -18,10 +18,11 @@ import Data.Ix (inRange)
 import Data.List (intersperse, isSuffixOf)
 import System.Console.ANSI
 
-import Data.Blob
-import Data.Flag as Flag
-import Data.Source
-import Source.Span
+import           Data.Blob
+import           Data.Flag as Flag
+import           Source.Source (Source)
+import qualified Source.Source as Source
+import           Source.Span
 
 data LogPrintSource = LogPrintSource
 data Colourize = Colourize
@@ -61,8 +62,8 @@ showExcerpt colourize Span{..} Blob{..}
   = showString context . (if "\n" `isSuffixOf` context then id else showChar '\n')
   . showString (replicate (caretPaddingWidth + lineNumberDigits) ' ') . withSGRCode colourize [SetColor Foreground Vivid Green] (showString caret) . showChar '\n'
   where context = fold contextLines
-        contextLines = [ showLineNumber i <> ": " <> unpack (sourceBytes l)
-                       | (i, l) <- zip [1..] (sourceLines blobSource)
+        contextLines = [ showLineNumber i <> ": " <> unpack (Source.sourceBytes l)
+                       | (i, l) <- zip [1..] (Source.lines blobSource)
                        , inRange (posLine spanStart - 2, posLine spanStart) i
                        ]
         showLineNumber n = let s = show n in replicate (lineNumberDigits - length s) ' ' <> s

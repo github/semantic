@@ -5,14 +5,15 @@ module Parsing.CMark
 , toGrammar
 ) where
 
-import CMarkGFM
-import Data.Array
+import           CMarkGFM
+import           Data.Array
 import qualified Data.AST as A
-import Data.Source
-import Data.Term
-import Source.Loc
-import Source.Span hiding (HasSpan(..))
-import TreeSitter.Language (Symbol(..), SymbolType(..))
+import           Data.Term
+import           Source.Loc
+import           Source.Source (Source)
+import qualified Source.Source as Source
+import           Source.Span hiding (HasSpan (..))
+import           TreeSitter.Language (Symbol (..), SymbolType (..))
 
 data Grammar
   = Document
@@ -50,7 +51,7 @@ exts = [
   ]
 
 cmarkParser :: Source -> A.AST (TermF [] NodeType) Grammar
-cmarkParser source = toTerm (totalRange source) (totalSpan source) $ commonmarkToNode [ optSourcePos ] exts (toText source)
+cmarkParser source = toTerm (Source.totalRange source) (Source.totalSpan source) $ commonmarkToNode [ optSourcePos ] exts (Source.toText source)
   where toTerm :: Range -> Span -> Node -> A.AST (TermF [] NodeType) Grammar
         toTerm within withinSpan (Node position t children) =
           let range = maybe within (spanToRangeInLineRanges lineRanges . toSpan) position
@@ -62,30 +63,30 @@ cmarkParser source = toTerm (totalRange source) (totalSpan source) $ commonmarkT
         lineRanges = sourceLineRangesByLineNumber source
 
 toGrammar :: NodeType -> Grammar
-toGrammar DOCUMENT{} = Document
+toGrammar DOCUMENT{}       = Document
 toGrammar THEMATIC_BREAK{} = ThematicBreak
-toGrammar PARAGRAPH{} = Paragraph
-toGrammar BLOCK_QUOTE{} = BlockQuote
-toGrammar HTML_BLOCK{} = HTMLBlock
-toGrammar CUSTOM_BLOCK{} = CustomBlock
-toGrammar CODE_BLOCK{} = CodeBlock
-toGrammar HEADING{} = Heading
-toGrammar LIST{} = List
-toGrammar ITEM{} = Item
-toGrammar TEXT{} = Text
-toGrammar SOFTBREAK{} = SoftBreak
-toGrammar LINEBREAK{} = LineBreak
-toGrammar HTML_INLINE{} = HTMLInline
-toGrammar CUSTOM_INLINE{} = CustomInline
-toGrammar CODE{} = Code
-toGrammar EMPH{} = Emphasis
-toGrammar STRONG{} = Strong
-toGrammar LINK{} = Link
-toGrammar IMAGE{} = Image
-toGrammar STRIKETHROUGH{} = Strikethrough
-toGrammar TABLE{} = Table
-toGrammar TABLE_ROW{} = TableRow
-toGrammar TABLE_CELL{} = TableCell
+toGrammar PARAGRAPH{}      = Paragraph
+toGrammar BLOCK_QUOTE{}    = BlockQuote
+toGrammar HTML_BLOCK{}     = HTMLBlock
+toGrammar CUSTOM_BLOCK{}   = CustomBlock
+toGrammar CODE_BLOCK{}     = CodeBlock
+toGrammar HEADING{}        = Heading
+toGrammar LIST{}           = List
+toGrammar ITEM{}           = Item
+toGrammar TEXT{}           = Text
+toGrammar SOFTBREAK{}      = SoftBreak
+toGrammar LINEBREAK{}      = LineBreak
+toGrammar HTML_INLINE{}    = HTMLInline
+toGrammar CUSTOM_INLINE{}  = CustomInline
+toGrammar CODE{}           = Code
+toGrammar EMPH{}           = Emphasis
+toGrammar STRONG{}         = Strong
+toGrammar LINK{}           = Link
+toGrammar IMAGE{}          = Image
+toGrammar STRIKETHROUGH{}  = Strikethrough
+toGrammar TABLE{}          = Table
+toGrammar TABLE_ROW{}      = TableRow
+toGrammar TABLE_CELL{}     = TableCell
 
 
 instance Symbol Grammar where
@@ -99,4 +100,4 @@ spanToRangeInLineRanges lineRanges Span{..} = Range
 
 sourceLineRangesByLineNumber :: Source -> Array Int Range
 sourceLineRangesByLineNumber source = listArray (1, length lineRanges) lineRanges
-  where lineRanges = sourceLineRanges source
+  where lineRanges = Source.lineRanges source

@@ -169,7 +169,7 @@ descend t = do
       let delimiter = Range crs (start r)
       unless (delimiter == Range 0 0) $ do
         log ("slicing: " <> show delimiter)
-        chunk (slice delimiter src)
+        chunk (slice src delimiter)
       move (start r)
       tokenize (fmap (withStrategy PrettyPrinting . into) t)
       move (end r)
