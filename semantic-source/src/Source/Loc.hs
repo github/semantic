@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveGeneric, DerivingVia #-}
+{-# LANGUAGE DeriveGeneric, DerivingVia, RankNTypes #-}
 module Source.Loc
 ( Loc(..)
 , Span(Span)
@@ -24,6 +24,12 @@ instance Hashable Loc
 instance NFData   Loc
 
 instance HasSpan Loc where
-  span_ = lens span (\l s -> l { span = s }) where
-    lens get put afa s = fmap (put s) (afa (get s))
+  span_ = lens span (\l s -> l { span = s })
   {-# INLINE span_ #-}
+
+
+type Lens' s a = forall f . Functor f => (a -> f a) -> (s -> f s)
+
+lens :: (s -> a) -> (s -> a -> s) -> Lens' s a
+lens get put afa s = fmap (put s) (afa (get s))
+{-# INLINE lens #-}
