@@ -325,8 +325,8 @@ library
                      , tree-sitter-php == 0.2.0.0
                      , tree-sitter-python == 0.4.0.0
                      , tree-sitter-ruby == 0.2.0.0
-                     , tree-sitter-typescript == 0.2.0.0
-                     , tree-sitter-tsx == 0.2.0.0
+                     , tree-sitter-typescript == 0.2.1.0
+                     , tree-sitter-tsx == 0.2.1.0
                      , tree-sitter-java == 0.2.0.0
   if flag(release)
     cpp-options:       -DCOMPUTE_GIT_SHA
