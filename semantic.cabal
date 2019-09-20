@@ -173,7 +173,6 @@ library
                      , Data.Semigroup.App
                      , Data.Scientific.Exts
                      , Data.Source
-                     , Data.Span
                      -- À la carte syntax types
                      , Data.Syntax
                      , Data.Syntax.Comment

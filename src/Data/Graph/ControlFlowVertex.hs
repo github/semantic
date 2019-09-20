@@ -23,13 +23,13 @@ import           Data.Aeson
 import           Data.Graph (VertexTag (..))
 import qualified Data.Graph as G
 import           Data.Location
-import           Data.Span
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Expression as Expression
 import           Data.Term
 import qualified Data.Text as T
 import           Prologue
+import           Source.Span
 
 -- | A vertex of representing some node in a control flow graph.
 data ControlFlowVertex

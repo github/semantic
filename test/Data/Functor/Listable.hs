@@ -30,7 +30,6 @@ import Data.List.NonEmpty
 import Data.Patch
 import Data.Location
 import Data.Semigroup.App
-import Data.Span
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Comment as Comment
@@ -47,6 +46,7 @@ import Data.These
 import Data.Sum
 import Diffing.Algorithm.RWS
 import Source.Range
+import Source.Span
 import Test.LeanCheck
 
 type Tier a = [a]

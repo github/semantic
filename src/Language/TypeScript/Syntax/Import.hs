@@ -11,7 +11,6 @@ import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.JSON.Fields
 import           Diffing.Algorithm
 import           Language.TypeScript.Resolution
-import Data.Span (emptySpan)
 import qualified Data.Map.Strict as Map
 import Data.Aeson (ToJSON)
 
@@ -38,7 +37,7 @@ instance Evaluatable Import where
         for_ symbols $ \Alias{..} ->
           -- TODO: Need an easier way to get the span of an Alias. It's difficult because we no longer have a term.
           -- Even if we had one we'd have to evaluate it at the moment.
-          insertImportReference (Reference aliasName) emptySpan ScopeGraph.Identifier (Declaration aliasValue) scopeAddress
+          insertImportReference (Reference aliasName) lowerBound ScopeGraph.Identifier (Declaration aliasValue) scopeAddress
 
       -- Create edges from the current scope/frame to the import scope/frame.
       insertImportEdge scopeAddress
@@ -89,7 +88,7 @@ instance Evaluatable QualifiedExport where
     withScope exportScope .
       for_ exportSymbols $ \Alias{..} -> do
         -- TODO: Replace Alias in QualifedExport with terms and use a real span
-        reference (Reference aliasName) emptySpan ScopeGraph.Identifier (Declaration aliasValue)
+        reference (Reference aliasName) lowerBound ScopeGraph.Identifier (Declaration aliasValue)
 
     -- Create an export edge from a new scope to the qualifed export's scope.
     unit
@@ -116,7 +115,7 @@ instance Evaluatable QualifiedExportFrom where
     withScopeAndFrame moduleFrame .
       for_ exportSymbols $ \Alias{..} -> do
         -- TODO: Replace Alias with terms in QualifiedExportFrom and use a real span below.
-        insertImportReference (Reference aliasName) emptySpan ScopeGraph.Identifier (Declaration aliasValue) exportScope
+        insertImportReference (Reference aliasName) lowerBound ScopeGraph.Identifier (Declaration aliasValue) exportScope
 
     insertExportEdge exportScope
     insertFrameLink ScopeGraph.Export (Map.singleton exportScope exportFrame)

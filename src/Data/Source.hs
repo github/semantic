@@ -33,11 +33,11 @@ import           Data.Array
 import qualified Data.ByteString as B
 import           Data.Char (ord)
 import           Data.List (span)
-import           Data.Span hiding (HasSpan (..))
 import           Data.String (IsString (..))
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
 import           Source.Range
+import           Source.Span hiding (HasSpan (..))
 
 
 -- | The contents of a source file. This is represented as a UTF-8

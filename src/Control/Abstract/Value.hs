@@ -80,9 +80,9 @@ import Data.Abstract.Module
 import Data.Abstract.Name
 import Data.Abstract.Number (Number, SomeNumber)
 import Data.Scientific (Scientific)
-import Data.Span
 import Prelude hiding (String)
 import Prologue hiding (TypeError, hash)
+import Source.Span
 
 -- | This datum is passed into liftComparison to handle the fact that Ruby and PHP
 --   have built-in generalized-comparison ("spaceship") operators. If you want to

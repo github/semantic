@@ -57,8 +57,8 @@ import           Data.Abstract.Module (ModuleInfo)
 import           Data.Abstract.Name
 import           Data.Abstract.ScopeGraph (Kind(..), Path (..), Relation(..), putDeclarationScopeAtPosition)
 import qualified Data.Map.Strict as Map
-import           Data.Span (Span, emptySpan)
 import           Prologue
+import           Source.Span (Span)
 
 
 -- | Evaluates an action locally the scope and frame of the given frame address.
@@ -180,7 +180,7 @@ define :: ( HasCallStack
        -> Evaluator term address value m ()
 define declaration rel accessControl def = withCurrentCallStack callStack $ do
   -- TODO: This span is still wrong.
-  declare declaration rel accessControl emptySpan Unknown Nothing
+  declare declaration rel accessControl lowerBound Unknown Nothing
   slot <- lookupSlot declaration
   value <- def
   assign slot value

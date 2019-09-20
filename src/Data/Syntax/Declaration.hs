@@ -15,9 +15,9 @@ import           Data.Abstract.Name (__self)
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.JSON.Fields
 import qualified Data.Reprinting.Scope as Scope
-import           Data.Span
 import           Diffing.Algorithm
 import           Reprinting.Tokenize hiding (Superclass)
+import           Source.Span
 
 data Function a = Function { functionContext :: ![a], functionName :: !a, functionParameters :: ![a], functionBody :: !a }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, ToJSONFields1, NFData1)
@@ -95,7 +95,7 @@ instance Evaluatable Method where
 
     params <- withScope associatedScope $ do
       -- TODO: Should we give `self` a special Relation?
-      declare (Declaration __self) ScopeGraph.Prelude ScopeGraph.Public emptySpan ScopeGraph.Unknown Nothing
+      declare (Declaration __self) ScopeGraph.Prelude ScopeGraph.Public lowerBound ScopeGraph.Unknown Nothing
       for methodParameters $ \paramNode -> declareMaybeName (declaredName paramNode) Default ScopeGraph.Public (paramNode^.span) ScopeGraph.Parameter Nothing
 
     addr <- lookupSlot (Declaration name)

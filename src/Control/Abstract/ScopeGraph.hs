@@ -50,9 +50,9 @@ import           Data.Abstract.Module
 import           Data.Abstract.Name hiding (name)
 import           Data.Abstract.ScopeGraph (Kind, Declaration(..), EdgeLabel, Reference, Relation(..), Scope (..), ScopeGraph, Slot(..), Info(..), AccessControl(..))
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
-import           Data.Span
 import           Prelude hiding (lookup)
 import           Prologue
+import           Source.Span
 
 lookup :: ( Ord address
           , Member (State (ScopeGraph address)) sig

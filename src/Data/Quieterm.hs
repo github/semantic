@@ -12,8 +12,8 @@ import Data.Abstract.Declarations (Declarations)
 import Data.Abstract.FreeVariables (FreeVariables)
 import Data.Functor.Classes
 import Data.Functor.Foldable
-import Data.Span
 import Data.Term
+import Source.Span
 import Text.Show (showListWith)
 
 newtype Quieterm syntax ann = Quieterm { unQuieterm :: TermF syntax ann (Quieterm syntax ann) }

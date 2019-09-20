@@ -20,8 +20,8 @@ import Prologue
 import           Control.Lens.Lens
 import           Data.Aeson
 import           Data.JSON.Fields
-import           Data.Span
 import qualified Data.Sum as Sum
+import           Source.Span
 import           Text.Show
 
 -- | A Term with an abstract syntax tree and an annotation.

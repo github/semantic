@@ -10,7 +10,7 @@ import Prologue
 import Data.Aeson
 import Control.Lens.Lens
 
-import Data.Span
+import Source.Span
 
 -- | These selectors aren't prefixed with @tag@ for reasons of JSON
 -- backwards compatibility.

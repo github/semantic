@@ -17,8 +17,8 @@ import           Data.Abstract.Path
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.JSON.Fields
 import qualified Data.Language as Language
-import           Data.Span
 import           Diffing.Algorithm
+import           Source.Span
 
 newtype Text a = Text { value :: T.Text }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)

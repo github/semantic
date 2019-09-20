@@ -1,9 +1,9 @@
 module Data.Source.Spec (spec, testTree) where
 
 import Data.Source
-import Data.Span
 import qualified Data.Text as Text
 import Source.Range
+import Source.Span
 
 import Test.Hspec
 

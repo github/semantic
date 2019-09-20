@@ -9,9 +9,9 @@ import CMarkGFM
 import qualified Data.AST as A
 import Data.Ix
 import Data.Location
-import Data.Span
 import Data.Source
 import Data.Term
+import Source.Span
 import TreeSitter.Language (Symbol(..), SymbolType(..))
 
 data Grammar

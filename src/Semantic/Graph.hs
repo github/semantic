@@ -56,7 +56,6 @@ import           Data.Language as Language
 import           Data.List (isPrefixOf, isSuffixOf)
 import           Data.Project
 import           Data.Location
-import           Data.Span
 import           Data.Term
 import           Data.Text (pack, unpack)
 import           Language.Haskell.HsColour
@@ -65,6 +64,7 @@ import           Parsing.Parser
 import           Prologue hiding (TypeError (..))
 import           Semantic.Analysis
 import           Semantic.Task as Task
+import           Source.Span
 import           System.FilePath.Posix (takeDirectory, (</>))
 import           Text.Show.Pretty (ppShow)
 

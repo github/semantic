@@ -19,8 +19,8 @@ import Data.Blob
 import Data.Duration
 import Data.Location
 import Data.Source
-import Data.Span
 import Data.Term
+import Source.Span
 
 import qualified TreeSitter.Language as TS
 import qualified TreeSitter.Node as TS

@@ -11,7 +11,6 @@ import Data.Functor.Classes
 import Data.Hashable.Lifted
 import Data.Patch
 import Data.Location
-import Data.Span
 import Data.Sum
 import Data.Term
 import Data.Text (Text)
@@ -23,6 +22,7 @@ import qualified Data.Syntax.Declaration as Declaration
 import Rendering.TOC
 import Semantic.Api (diffSummaryBuilder)
 import Serializing.Format as Format
+import Source.Span
 
 import SpecHelpers
 

@@ -47,11 +47,11 @@ import           Data.Aeson
 import qualified Data.Map.Strict as Map
 import qualified Data.Sequence as Seq
 import qualified Data.Set as Set
-import Data.Span
 import Control.Abstract.Hole
 import Data.Abstract.Module
 import Data.JSON.Fields
 import Data.Abstract.Name
+import Source.Span
 
 -- A slot is a location in the heap where a value is stored.
 data Slot address = Slot { frameAddress :: address, position :: Position }

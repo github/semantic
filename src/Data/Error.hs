@@ -21,7 +21,7 @@ import System.Console.ANSI
 import Data.Blob
 import Data.Flag as Flag
 import Data.Source
-import Data.Span
+import Source.Span
 
 data LogPrintSource = LogPrintSource
 data Colourize = Colourize

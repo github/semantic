@@ -46,7 +46,6 @@ import Data.Language as X
 import Data.List.NonEmpty as X (NonEmpty(..))
 import Data.Semilattice.Lower as X
 import Data.Source as X
-import Data.Span as X hiding (HasSpan(..))
 import Data.String
 import Data.Sum
 import Data.Term as X
@@ -55,6 +54,7 @@ import Semantic.Task as X
 import Semantic.Util as X
 import Semantic.Graph (runHeap, runScopeGraph)
 import Source.Range as X
+import Source.Span as X hiding (HasSpan(..))
 import System.FilePath as X
 import Debug.Trace as X (traceShowM, traceM)
 

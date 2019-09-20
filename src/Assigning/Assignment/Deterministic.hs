@@ -15,11 +15,11 @@ import qualified Data.IntMap as IntMap
 import qualified Data.IntSet as IntSet
 import Data.Location
 import Data.Source as Source
-import Data.Span hiding (HasSpan (..))
 import qualified Data.Syntax as Syntax
 import Data.Term (Term, termIn, termAnnotation, termOut)
 import Data.Text.Encoding (decodeUtf8')
 import Prologue
+import Source.Span hiding (HasSpan (..))
 
 class (Alternative f, Ord symbol, Show symbol) => Assigning symbol f | f -> symbol where
   leafNode   :: symbol -> f Text

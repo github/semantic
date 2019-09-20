@@ -22,8 +22,8 @@ import           Data.Abstract.Module
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.JSON.Fields
 import qualified Data.Language as Language
-import           Data.Span
 import           Diffing.Algorithm
+import           Source.Span
 
 data QualifiedName
   = QualifiedName { paths :: NonEmpty FilePath }
