@@ -9,7 +9,7 @@ import qualified Data.ByteString as B
 import           Data.ByteString.Builder
 import qualified Data.ByteString.Char8 as BC
 import           Data.Either
-import           Data.Blob (fileForPath)
+import           Data.Blob (fileForRelPath)
 import           Data.Flag
 import           Data.Foldable
 import           Data.List
@@ -26,7 +26,8 @@ import           Semantic.Task.Files
 import           System.Directory
 import           System.Exit (die)
 import           System.FilePath.Glob
-import           System.FilePath.Posix
+import qualified System.Path as Path
+import           System.Path ((</>))
 import           System.Process
 import           Test.Hspec
 
@@ -38,15 +39,16 @@ main = withOptions opts $ \ config logger statter -> hspec . parallel $ do
   runIO setupExampleRepos
 
   for_ languages $ \ lang@LanguageExample{..} -> do
-    let tsLang = "tree-sitter-" <> languageName
-        tsDir = languagesDir </> tsLang </> "vendor" </> tsLang
+    let tsLang = Path.relDir ("tree-sitter-" <> languageName)
+        tsDir = languagesDir </> tsLang </> Path.relDir "vendor" </> tsLang
     parallel . describe languageName $ parseExamples args lang tsDir
 
   where
     parseExamples session LanguageExample{..} tsDir = do
       knownFailures <- runIO $ knownFailuresForPath tsDir languageKnownFailuresTxt
-      files <- runIO $ globDir1 (compile ("**/*" <> languageExtension)) (tsDir </> languageExampleDir)
-      for_ files $ \file -> it file $ do
+      files <- runIO $ globDir1 (compile ("**/*" <> languageExtension)) (Path.toString (tsDir </> languageExampleDir))
+      let paths = Path.relFile <$> files
+      for_ paths $ \file -> it (Path.toString file) $ do
         res <- runTask session (parseFilePath file)
         case res of
           Left (SomeException e) -> case cast e of
@@ -62,32 +64,33 @@ main = withOptions opts $ \ config logger statter -> hspec . parallel $ do
     setupExampleRepos = readProcess "script/clone-example-repos" mempty mempty >>= print
     opts = defaultOptions { optionsFailOnWarning = flag FailOnWarning True, optionsLogLevel = Nothing }
 
-    knownFailuresForPath :: FilePath -> Maybe FilePath -> IO [FilePath]
+    knownFailuresForPath :: Path.RelDir -> Maybe Path.RelFile -> IO [Path.RelFile]
     knownFailuresForPath _     Nothing     = pure []
     knownFailuresForPath tsDir (Just path) = do
-      known <- BC.lines <$> B.readFile (tsDir </> path)
-      pure $ (tsDir </>) . BC.unpack <$> stripComments known
-      where stripComments = filter (\line -> not (BC.null line) && BC.head line == '#')
+      known <- BC.lines <$> B.readFile (Path.toString (tsDir </> path))
+      let stripComments = filter (\line -> not (BC.null line) && BC.head line == '#')
+      let failures = Path.relFile . BC.unpack <$> stripComments known
+      pure ((tsDir </>) <$> failures)
 
 data LanguageExample
   = LanguageExample
-  { languageName :: FilePath
-  , languageExtension :: FilePath
-  , languageExampleDir :: FilePath
-  , languageKnownFailuresTxt :: Maybe FilePath
+  { languageName :: String
+  , languageExtension :: String
+  , languageExampleDir :: Path.RelDir
+  , languageKnownFailuresTxt :: Maybe Path.RelFile
   } deriving (Eq, Show)
 
-le :: FilePath -> FilePath -> FilePath -> Maybe FilePath -> LanguageExample
+le :: String -> String -> Path.RelDir -> Maybe Path.RelFile -> LanguageExample
 le = LanguageExample
 
 languages :: [LanguageExample]
 languages =
-  [ le "python" ".py" "examples" (Just "script/known_failures.txt")
-  , le "ruby" ".rb" "examples" (Just "script/known_failures.txt")
-  , le "typescript" ".ts" "examples" (Just "typescript/script/known_failures.txt")
-  , le "typescript" ".tsx" "examples" (Just "typescript/script/known_failures.txt")
-  , le "typescript" ".js" "examples" Nothing -- parse JavaScript with TypeScript parser.
-  , le "go" ".go" "examples" (Just "script/known-failures.txt")
+  [ le "python" ".py" examples (Just $ Path.relFile "script/known_failures.txt")
+  , le "ruby" ".rb" examples (Just $ Path.relFile "script/known_failures.txt")
+  , le "typescript" ".ts" examples (Just $ Path.relFile "typescript/script/known_failures.txt")
+  , le "typescript" ".tsx" examples (Just $ Path.relFile "typescript/script/known_failures.txt")
+  , le "typescript" ".js" examples Nothing -- parse JavaScript with TypeScript parser.
+  , le "go" ".go" examples (Just $ Path.relFile "script/known-failures.txt")
 
   -- TODO: Java assignment errors need to be investigated
   -- , le "java" ".java" "examples/guava" (Just "script/known_failures_guava.txt")
@@ -100,10 +103,10 @@ languages =
   -- , le "haskell" ".hs" "examples/ivory" (Just "script/known-failures-ivory.txt")
 
   -- , ("php", ".php") -- TODO: No parse-examples in tree-sitter yet
-  ]
+  ] where examples = Path.relDir "examples"
 
-parseFilePath :: (Member (Error SomeException) sig, Member Distribute sig, Member Task sig, Member Files sig, Carrier sig m, MonadIO m) => FilePath -> m Bool
-parseFilePath path = readBlob (fileForPath path) >>= parseTermBuilder @[] TermShow . pure >>= const (pure True)
+parseFilePath :: (Member (Error SomeException) sig, Member Distribute sig, Member Task sig, Member Files sig, Carrier sig m, MonadIO m) => Path.RelFile -> m Bool
+parseFilePath path = readBlob (fileForRelPath path) >>= parseTermBuilder @[] TermShow . pure >>= const (pure True)
 
-languagesDir :: FilePath
-languagesDir = "tmp/haskell-tree-sitter"
+languagesDir :: Path.RelDir
+languagesDir = Path.relDir "tmp/haskell-tree-sitter"
