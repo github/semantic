@@ -171,7 +171,6 @@ library
                      , Data.Reprinting.Token
                      , Data.Semigroup.App
                      , Data.Scientific.Exts
-                     , Data.Source
                      -- À la carte syntax types
                      , Data.Syntax
                      , Data.Syntax.Comment
