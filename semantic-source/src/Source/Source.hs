@@ -1,11 +1,18 @@
 {-# LANGUAGE DeriveGeneric, GeneralizedNewtypeDeriving #-}
+{-|
+'Source' models source code, represented as a thin wrapper around a 'B.ByteString' with conveniences for splitting by line, slicing, etc.
+
+This module is intended to be imported qualified to avoid name clashes with 'Prelude':
+
+> import qualified Source.Source as Source
+-}
 module Source.Source
 ( Source
 , sourceBytes
 , fromUTF8
 -- * Measurement
-, sourceLength
-, nullSource
+, Source.Source.length
+, Source.Source.null
 , totalRange
 , totalSpan
 -- * En/decoding
@@ -16,9 +23,9 @@ module Source.Source
 , dropSource
 , takeSource
 -- * Splitting
-, sourceLines
-, sourceLineRanges
-, sourceLineRangesWithin
+, Source.Source.lines
+, lineRanges
+, lineRangesWithin
 , newlineIndices
 ) where
 
@@ -52,11 +59,11 @@ instance FromJSON Source where
 
 -- Measurement
 
-sourceLength :: Source -> Int
-sourceLength = B.length . sourceBytes
+length :: Source -> Int
+length = B.length . sourceBytes
 
-nullSource :: Source -> Bool
-nullSource = B.null . sourceBytes
+null :: Source -> Bool
+null = B.null . sourceBytes
 
 -- | Return a 'Range' that covers the entire text.
 totalRange :: Source -> Range
@@ -64,8 +71,8 @@ totalRange = Range 0 . B.length . sourceBytes
 
 -- | Return a 'Span' that covers the entire text.
 totalSpan :: Source -> Span
-totalSpan source = Span lowerBound (Pos (length ranges) (succ (end lastRange - start lastRange))) where
-  ranges = sourceLineRanges source
+totalSpan source = Span lowerBound (Pos (Prelude.length ranges) (succ (end lastRange - start lastRange))) where
+  ranges = lineRanges source
   lastRange = fromMaybe lowerBound (getLast (foldMap (Last . Just) ranges))
 
 
@@ -98,16 +105,16 @@ takeSource i = Source . B.take i . sourceBytes
 -- Splitting
 
 -- | Split the contents of the source after newlines.
-sourceLines :: Source -> [Source]
-sourceLines source = slice source <$> sourceLineRanges source
+lines :: Source -> [Source]
+lines source = slice source <$> lineRanges source
 
 -- | Compute the 'Range's of each line in a 'Source'.
-sourceLineRanges :: Source -> [Range]
-sourceLineRanges source = sourceLineRangesWithin (totalRange source) source
+lineRanges :: Source -> [Range]
+lineRanges source = lineRangesWithin (totalRange source) source
 
 -- | Compute the 'Range's of each line in a 'Range' of a 'Source'.
-sourceLineRangesWithin :: Range -> Source -> [Range]
-sourceLineRangesWithin range
+lineRangesWithin :: Range -> Source -> [Range]
+lineRangesWithin range
   = uncurry (zipWith Range)
   . ((start range:) &&& (<> [ end range ]))
   . fmap (+ succ (start range))
