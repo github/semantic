@@ -23,8 +23,10 @@ import qualified Data.Syntax.Declaration as Declaration
 import Rendering.TOC
 import Semantic.Api (diffSummaryBuilder)
 import Serializing.Format as Format
+import qualified System.Path as Path
+import           System.Path ((</>))
 
-import SpecHelpers
+import SpecHelpers hiding ((</>))
 
 
 spec :: Spec
@@ -53,7 +55,7 @@ spec = do
       diffTOC blankDiff `shouldBe` [ ]
 
     it "summarizes changed methods" $ do
-      sourceBlobs <- blobsForPaths (Both "ruby/toc/methods.A.rb" "ruby/toc/methods.B.rb")
+      sourceBlobs <- blobsForPaths (Both (Path.relFile "ruby/toc/methods.A.rb") (Path.relFile "ruby/toc/methods.B.rb"))
       diff <- runTaskOrDie $ diffWithParser rubyParser sourceBlobs
       diffTOC diff `shouldBe`
         [ TOCSummary "Method" "self.foo" (Span (Pos 1 1) (Pos 2 4)) "added"
@@ -62,7 +64,7 @@ spec = do
         ]
 
     xit "summarizes changed classes" $ do
-      sourceBlobs <- blobsForPaths (Both "ruby/toc/classes.A.rb" "ruby/toc/classes.B.rb")
+      sourceBlobs <- blobsForPaths (Both (Path.relFile "ruby/toc/classes.A.rb") (Path.relFile "ruby/toc/classes.B.rb"))
       diff <- runTaskOrDie $ diffWithParser rubyParser sourceBlobs
       diffTOC diff `shouldBe`
         [ TOCSummary "Class" "Baz" (Span (Pos 1 1) (Pos 2 4)) "removed"
@@ -71,37 +73,37 @@ spec = do
         ]
 
     it "dedupes changes in same parent method" $ do
-      sourceBlobs <- blobsForPaths (Both "javascript/toc/duplicate-parent.A.js" "javascript/toc/duplicate-parent.B.js")
+      sourceBlobs <- blobsForPaths (Both (Path.relFile "javascript/toc/duplicate-parent.A.js") (Path.relFile "javascript/toc/duplicate-parent.B.js"))
       diff <- runTaskOrDie $ diffWithParser typescriptParser sourceBlobs
       diffTOC diff `shouldBe`
         [ TOCSummary "Function" "myFunction" (Span (Pos 1 1) (Pos 6 2)) "modified" ]
 
     it "dedupes similar methods" $ do
-      sourceBlobs <- blobsForPaths (Both "javascript/toc/erroneous-duplicate-method.A.js" "javascript/toc/erroneous-duplicate-method.B.js")
+      sourceBlobs <- blobsForPaths (Both (Path.relFile "javascript/toc/erroneous-duplicate-method.A.js") (Path.relFile "javascript/toc/erroneous-duplicate-method.B.js"))
       diff <- runTaskOrDie $ diffWithParser typescriptParser sourceBlobs
       diffTOC diff `shouldBe`
         [ TOCSummary "Function" "performHealthCheck" (Span (Pos 8 1) (Pos 29 2)) "modified" ]
 
     it "summarizes Go methods with receivers with special formatting" $ do
-      sourceBlobs <- blobsForPaths (Both "go/toc/method-with-receiver.A.go" "go/toc/method-with-receiver.B.go")
+      sourceBlobs <- blobsForPaths (Both (Path.relFile "go/toc/method-with-receiver.A.go") (Path.relFile "go/toc/method-with-receiver.B.go"))
       diff <- runTaskOrDie $ diffWithParser goParser sourceBlobs
       diffTOC diff `shouldBe`
         [ TOCSummary "Method" "(*apiClient) CheckAuth" (Span (Pos 3 1) (Pos 3 101)) "added" ]
 
     it "summarizes Ruby methods that start with two identifiers" $ do
-      sourceBlobs <- blobsForPaths (Both "ruby/toc/method-starts-with-two-identifiers.A.rb" "ruby/toc/method-starts-with-two-identifiers.B.rb")
+      sourceBlobs <- blobsForPaths (Both (Path.relFile "ruby/toc/method-starts-with-two-identifiers.A.rb") (Path.relFile "ruby/toc/method-starts-with-two-identifiers.B.rb"))
       diff <- runTaskOrDie $ diffWithParser rubyParser sourceBlobs
       diffTOC diff `shouldBe`
         [ TOCSummary "Method" "foo" (Span (Pos 1 1) (Pos 4 4)) "modified" ]
 
     it "handles unicode characters in file" $ do
-      sourceBlobs <- blobsForPaths (Both "ruby/toc/unicode.A.rb" "ruby/toc/unicode.B.rb")
+      sourceBlobs <- blobsForPaths (Both (Path.relFile "ruby/toc/unicode.A.rb") (Path.relFile "ruby/toc/unicode.B.rb"))
       diff <- runTaskOrDie $ diffWithParser rubyParser sourceBlobs
       diffTOC diff `shouldBe`
         [ TOCSummary "Method" "foo" (Span (Pos 6 1) (Pos 7 4)) "added" ]
 
     it "properly slices source blob that starts with a newline and has multi-byte chars" $ do
-      sourceBlobs <- blobsForPaths (Both "javascript/toc/starts-with-newline.js" "javascript/toc/starts-with-newline.js")
+      sourceBlobs <- blobsForPaths (Both (Path.relFile "javascript/toc/starts-with-newline.js") (Path.relFile "javascript/toc/starts-with-newline.js"))
       diff <- runTaskOrDie $ diffWithParser typescriptParser sourceBlobs
       diffTOC diff `shouldBe` []
 
@@ -144,22 +146,22 @@ spec = do
 
   describe "diff with ToCDiffRenderer'" $ do
     it "produces JSON output" $ do
-      blobs <- blobsForPaths (Both "ruby/toc/methods.A.rb" "ruby/toc/methods.B.rb")
+      blobs <- blobsForPaths (Both (Path.relFile "ruby/toc/methods.A.rb") (Path.relFile "ruby/toc/methods.B.rb"))
       output <- runTaskOrDie (diffSummaryBuilder Format.JSON [blobs])
       runBuilder output `shouldBe` ("{\"files\":[{\"path\":\"test/fixtures/ruby/toc/methods.A.rb -> test/fixtures/ruby/toc/methods.B.rb\",\"language\":\"Ruby\",\"changes\":[{\"category\":\"Method\",\"term\":\"self.foo\",\"span\":{\"start\":{\"line\":1,\"column\":1},\"end\":{\"line\":2,\"column\":4}},\"changeType\":\"ADDED\"},{\"category\":\"Method\",\"term\":\"bar\",\"span\":{\"start\":{\"line\":4,\"column\":1},\"end\":{\"line\":6,\"column\":4}},\"changeType\":\"MODIFIED\"},{\"category\":\"Method\",\"term\":\"baz\",\"span\":{\"start\":{\"line\":4,\"column\":1},\"end\":{\"line\":5,\"column\":4}},\"changeType\":\"REMOVED\"}]}]}\n" :: ByteString)
 
     it "produces JSON output if there are parse errors" $ do
-      blobs <- blobsForPaths (Both "ruby/toc/methods.A.rb" "ruby/toc/methods.X.rb")
+      blobs <- blobsForPaths (Both (Path.relFile "ruby/toc/methods.A.rb") (Path.relFile "ruby/toc/methods.X.rb"))
       output <- runTaskOrDie (diffSummaryBuilder Format.JSON [blobs])
       runBuilder output `shouldBe` ("{\"files\":[{\"path\":\"test/fixtures/ruby/toc/methods.A.rb -> test/fixtures/ruby/toc/methods.X.rb\",\"language\":\"Ruby\",\"changes\":[{\"category\":\"Method\",\"term\":\"bar\",\"span\":{\"start\":{\"line\":1,\"column\":1},\"end\":{\"line\":2,\"column\":4}},\"changeType\":\"REMOVED\"},{\"category\":\"Method\",\"term\":\"baz\",\"span\":{\"start\":{\"line\":4,\"column\":1},\"end\":{\"line\":5,\"column\":4}},\"changeType\":\"REMOVED\"}],\"errors\":[{\"error\":\"expected end of input nodes, but got ParseError\",\"span\":{\"start\":{\"line\":1,\"column\":1},\"end\":{\"line\":2,\"column\":3}}}]}]}\n" :: ByteString)
 
     it "ignores anonymous functions" $ do
-      blobs <- blobsForPaths (Both "ruby/toc/lambda.A.rb" "ruby/toc/lambda.B.rb")
+      blobs <- blobsForPaths (Both (Path.relFile "ruby/toc/lambda.A.rb") (Path.relFile "ruby/toc/lambda.B.rb"))
       output <- runTaskOrDie (diffSummaryBuilder Format.JSON [blobs])
       runBuilder output `shouldBe` ("{\"files\":[{\"path\":\"test/fixtures/ruby/toc/lambda.A.rb -> test/fixtures/ruby/toc/lambda.B.rb\",\"language\":\"Ruby\"}]}\n" :: ByteString)
 
     it "summarizes Markdown headings" $ do
-      blobs <- blobsForPaths (Both "markdown/toc/headings.A.md" "markdown/toc/headings.B.md")
+      blobs <- blobsForPaths (Both (Path.relFile "markdown/toc/headings.A.md") (Path.relFile "markdown/toc/headings.B.md"))
       output <- runTaskOrDie (diffSummaryBuilder Format.JSON [blobs])
       runBuilder output `shouldBe` ("{\"files\":[{\"path\":\"test/fixtures/markdown/toc/headings.A.md -> test/fixtures/markdown/toc/headings.B.md\",\"language\":\"Markdown\",\"changes\":[{\"category\":\"Heading 1\",\"term\":\"Introduction\",\"span\":{\"start\":{\"line\":1,\"column\":1},\"end\":{\"line\":3,\"column\":16}},\"changeType\":\"REMOVED\"},{\"category\":\"Heading 2\",\"term\":\"Two\",\"span\":{\"start\":{\"line\":5,\"column\":1},\"end\":{\"line\":7,\"column\":4}},\"changeType\":\"MODIFIED\"},{\"category\":\"Heading 3\",\"term\":\"This heading is new\",\"span\":{\"start\":{\"line\":9,\"column\":1},\"end\":{\"line\":11,\"column\":10}},\"changeType\":\"ADDED\"},{\"category\":\"Heading 1\",\"term\":\"Final\",\"span\":{\"start\":{\"line\":13,\"column\":1},\"end\":{\"line\":14,\"column\":4}},\"changeType\":\"ADDED\"}]}]}\n" :: ByteString)
 
@@ -217,8 +219,8 @@ isMethodOrFunction a
   | any isJust (foldMap (:[]) a)                       = True
   | otherwise                                          = False
 
-blobsForPaths :: Both FilePath -> IO BlobPair
-blobsForPaths = readFilePathPair . fmap ("test/fixtures" </>)
+blobsForPaths :: Both Path.RelFile -> IO BlobPair
+blobsForPaths = readFilePathPair . fmap Path.toString . fmap (Path.relDir "test/fixtures" </>)
 
 blankDiff :: Diff'
 blankDiff = merge (Nothing, Nothing) (inject [ inserting (termIn Nothing (inject (Syntax.Identifier (name "\"a\"")))) ])
