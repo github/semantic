@@ -33,6 +33,7 @@ instance Lower Range where
   lowerBound = Range 0 0
 
 
+-- | Construct a 'Range' with a given value for both its start and end indices.
 point :: Int -> Range
 point i = Range i i
 
