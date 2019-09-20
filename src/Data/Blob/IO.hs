@@ -7,6 +7,7 @@ module Data.Blob.IO
   , readBlobFromFile'
   , readBlobsFromDir
   , readBlobsFromGitRepo
+  , readBlobsFromGitRepoPath
   , readFilePair
   ) where
 
@@ -19,6 +20,8 @@ import Data.Source
 import qualified Semantic.Git as Git
 import qualified Control.Concurrent.Async as Async
 import qualified Data.ByteString as B
+import qualified System.Path as Path
+import qualified System.Path.PartClass as Part
 
 -- | Read a utf8-encoded file to a 'Blob'.
 readBlobFromFile :: forall m. MonadIO m => File -> m (Maybe Blob)
@@ -33,12 +36,16 @@ readBlobFromFile' file = do
   maybeFile <- readBlobFromFile file
   maybeM (Prelude.fail ("cannot read '" <> show file <> "', file not found or language not supported.")) maybeFile
 
--- | Read all blobs in the directory with Language.supportedExts
+-- | Read all blobs in the directory with Language.supportedExts.
 readBlobsFromDir :: MonadIO m => FilePath -> m [Blob]
 readBlobsFromDir path = liftIO . fmap catMaybes $
   findFilesInDir path supportedExts mempty >>= Async.mapConcurrently (readBlobFromFile . fileForPath)
 
--- | Read all blobs from a git repo
+readBlobsFromGitRepoPath :: (Part.AbsRel ar, MonadIO m) => Path.Dir ar -> Git.OID -> [Path.RelFile] -> [Path.RelFile] -> m [Blob]
+readBlobsFromGitRepoPath path oid excludePaths includePaths
+  = readBlobsFromGitRepo (Path.toString path) oid (fmap Path.toString excludePaths) (fmap Path.toString includePaths)
+
+-- | Read all blobs from a git repo. Prefer readBlobsFromGitRepoPath, which is typed.
 readBlobsFromGitRepo :: MonadIO m => FilePath -> Git.OID -> [FilePath] -> [FilePath] -> m [Blob]
 readBlobsFromGitRepo path oid excludePaths includePaths = liftIO . fmap catMaybes $
   Git.lsTree path oid >>= Async.mapConcurrently (blobFromTreeEntry path)
