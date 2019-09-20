@@ -28,7 +28,7 @@ import qualified Data.Syntax.Expression as Expression
 import           Data.Term
 import qualified Data.Text as T
 import           Prologue
-import           Source.Loc
+import           Source.Loc as Loc
 import           Source.Span
 
 -- | A vertex of representing some node in a control flow graph.
@@ -145,17 +145,17 @@ instance Apply (VertexDeclaration' whole) fs => VertexDeclarationWithStrategy 'C
   toVertexWithStrategy _ ann info = apply @(VertexDeclaration' whole) (toVertex' ann info)
 
 instance VertexDeclarationWithStrategy 'Custom whole Syntax.Identifier where
-  toVertexWithStrategy _ ann info (Syntax.Identifier name) = Just (variableVertex (formatName name) info (locSpan ann), name)
+  toVertexWithStrategy _ ann info (Syntax.Identifier name) = Just (variableVertex (formatName name) info (Loc.span ann), name)
 
 instance VertexDeclarationWithStrategy 'Custom whole Declaration.Function where
-  toVertexWithStrategy _ ann info term@Declaration.Function{} = (\n -> (functionVertex (formatName n) info (locSpan ann), n)) <$> liftDeclaredName declaredName term
+  toVertexWithStrategy _ ann info term@Declaration.Function{} = (\n -> (functionVertex (formatName n) info (Loc.span ann), n)) <$> liftDeclaredName declaredName term
 
 instance VertexDeclarationWithStrategy 'Custom whole Declaration.Method where
-  toVertexWithStrategy _ ann info term@Declaration.Method{} = (\n -> (methodVertex (formatName n) info (locSpan ann), n)) <$> liftDeclaredName declaredName term
+  toVertexWithStrategy _ ann info term@Declaration.Method{} = (\n -> (methodVertex (formatName n) info (Loc.span ann), n)) <$> liftDeclaredName declaredName term
 
 instance VertexDeclarationWithStrategy 'Custom whole whole => VertexDeclarationWithStrategy 'Custom whole Expression.MemberAccess where
   toVertexWithStrategy proxy ann info (Expression.MemberAccess (Term (In lhsAnn lhs)) (Term (In rhsAnn rhs))) =
     case (toVertexWithStrategy proxy lhsAnn info lhs, toVertexWithStrategy proxy rhsAnn info rhs) of
-      (Just (Variable n _ _, _), Just (_, name)) -> Just (variableVertex (n <> "." <> formatName name) info (locSpan ann), name)
-      (_, Just (_, name)) -> Just (variableVertex (formatName name) info (locSpan ann), name)
+      (Just (Variable n _ _, _), Just (_, name)) -> Just (variableVertex (n <> "." <> formatName name) info (Loc.span ann), name)
+      (_, Just (_, name)) -> Just (variableVertex (formatName name) info (Loc.span ann), name)
       _ -> Nothing

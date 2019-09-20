@@ -20,7 +20,7 @@ import Data.Term
 import Prologue
 import Semantic.Api.Bridge
 import Semantic.Proto.SemanticPB
-import Source.Loc
+import Source.Loc as Loc
 
 import qualified Data.Text as T
 
@@ -75,7 +75,7 @@ instance (ConstructorName syntax, Foldable syntax) =>
     termAlgebra (In ann syntax) = do
       i <- fresh
       parent <- ask
-      let root = vertex $ TermVertex (fromIntegral i) (T.pack (constructorName syntax)) (converting #? locSpan ann)
+      let root = vertex $ TermVertex (fromIntegral i) (T.pack (constructorName syntax)) (converting #? Loc.span ann)
       subGraph <- foldl' (\acc x -> overlay <$> acc <*> local (const root) x) (pure mempty) syntax
       pure (parent `connect` root `overlay` subGraph)
 
@@ -94,7 +94,7 @@ instance (ConstructorName syntax, Foldable syntax) =>
       graph <- local (const replace) (overlay <$> diffAlgebra t1 (Deleted (Just (DeletedTerm beforeName beforeSpan))) <*> diffAlgebra t2 (Inserted (Just (InsertedTerm afterName afterSpan))))
       pure (parent `connect` replace `overlay` graph)
     where
-      ann a = converting #? locSpan a
+      ann a = converting #? Loc.span a
       diffAlgebra ::
         ( Foldable f
         , Member Fresh sig

@@ -10,7 +10,7 @@ import Data.Term
 import Data.Aeson
 import Data.Text (pack)
 import Data.JSON.Fields
-import Source.Loc
+import Source.Loc as Loc
 
 -- | An AST node labelled with symbols and source location.
 type AST syntax grammar = Term syntax (Node grammar)
@@ -25,11 +25,11 @@ data Node grammar = Node
 instance Show grammar => ToJSONFields (Node grammar) where
   toJSONFields Node{..} =
     [ "symbol" .= pack (show nodeSymbol)
-    , "span"   .= locSpan nodeLocation
+    , "span"   .= Loc.span nodeLocation
     ]
 
 nodeSpan :: Node grammar -> Span
-nodeSpan = locSpan . nodeLocation
+nodeSpan = Loc.span . nodeLocation
 
 nodeByteRange :: Node grammar -> Range
-nodeByteRange = locByteRange . nodeLocation
+nodeByteRange = byteRange . nodeLocation

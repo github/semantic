@@ -63,7 +63,7 @@ import           Parsing.Parser
 import           Prologue hiding (TypeError (..))
 import           Semantic.Analysis
 import           Semantic.Task as Task
-import           Source.Loc
+import           Source.Loc as Loc
 import           Source.Span
 import           System.FilePath.Posix (takeDirectory, (</>))
 import           Text.Show.Pretty (ppShow)
@@ -339,7 +339,7 @@ withTermSpans :: ( Member (Reader Span) sig
                  )
               => Open (term -> Evaluator term address value m a)
 withTermSpans recur term = let
-  span = locSpan (termFAnnotation (project term))
+  span = Loc.span (termFAnnotation (project term))
   updatedSpanAlg = withCurrentSpan span (recur term)
   in modifyChildSpan span updatedSpanAlg
 

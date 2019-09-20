@@ -53,8 +53,8 @@ import Parsing.Parser as X
 import Semantic.Task as X
 import Semantic.Util as X
 import Semantic.Graph (runHeap, runScopeGraph)
-import Source.Range as X
-import Source.Span as X hiding (HasSpan(..))
+import Source.Range as X hiding (start, end, point)
+import Source.Span as X hiding (HasSpan(..), start, end, point)
 import Debug.Trace as X (traceShowM, traceM)
 
 import Data.ByteString as X (ByteString)

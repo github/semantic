@@ -55,7 +55,7 @@ instance ToJSONFields Span where
   toJSONFields sourceSpan = [ "sourceSpan" .= sourceSpan ]
 
 instance ToJSONFields Loc where
-  toJSONFields Loc{..} = toJSONFields locByteRange <> toJSONFields locSpan
+  toJSONFields Loc{..} = toJSONFields byteRange <> toJSONFields span
 
 
 newtype JSONFields a = JSONFields { unJSONFields :: a }

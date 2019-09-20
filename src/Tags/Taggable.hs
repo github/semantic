@@ -33,7 +33,7 @@ import Data.Blob
 import Data.Language
 import Data.Term
 import Data.Text hiding (empty)
-import Source.Loc
+import Source.Loc as Loc
 import Source.Range
 
 import Streaming hiding (Sum)
@@ -116,12 +116,12 @@ descend lang t@(In loc _) = do
   let litRange = docsLiteral lang term
 
   enter (constructorName term) snippetRange
-  maybe (pure ()) (emitIden (locSpan loc) litRange) (symbolName term)
+  maybe (pure ()) (emitIden (Loc.span loc) litRange) (symbolName term)
   traverse_ subtermRef t
   exit (constructorName term) snippetRange
 
 subtractLoc :: Loc -> Loc -> Range
-subtractLoc a b = subtractRange (locByteRange a) (locByteRange b)
+subtractLoc a b = subtractRange (byteRange a) (byteRange b)
 
 -- Instances
 
@@ -162,7 +162,7 @@ instance TaggableBy 'Custom Syntax.Context where
 instance TaggableBy 'Custom Declaration.Function where
   docsLiteral' Python (Declaration.Function _ _ _ (Term (In _ bodyF)))
     | (Term (In exprAnn exprF):_) <- toList bodyF
-    , isTextElement exprF = Just (locByteRange exprAnn)
+    , isTextElement exprF = Just (byteRange exprAnn)
     | otherwise           = Nothing
   docsLiteral' _ _         = Nothing
   snippet' ann (Declaration.Function _ _ _ (Term (In body _))) = Just $ subtractLoc ann body
@@ -171,7 +171,7 @@ instance TaggableBy 'Custom Declaration.Function where
 instance TaggableBy 'Custom Declaration.Method where
   docsLiteral' Python (Declaration.Method _ _ _ _ (Term (In _ bodyF)) _)
     | (Term (In exprAnn exprF):_) <- toList bodyF
-    , isTextElement exprF = Just (locByteRange exprAnn)
+    , isTextElement exprF = Just (byteRange exprAnn)
     | otherwise           = Nothing
   docsLiteral' _ _         = Nothing
   snippet' ann (Declaration.Method _ _ _ _ (Term (In body _)) _) = Just $ subtractLoc ann body
@@ -180,7 +180,7 @@ instance TaggableBy 'Custom Declaration.Method where
 instance TaggableBy 'Custom Declaration.Class where
   docsLiteral' Python (Declaration.Class _ _ _ (Term (In _ bodyF)))
     | (Term (In exprAnn exprF):_) <- toList bodyF
-    , isTextElement exprF = Just (locByteRange exprAnn)
+    , isTextElement exprF = Just (byteRange exprAnn)
     | otherwise           = Nothing
   docsLiteral' _ _         = Nothing
   snippet' ann (Declaration.Class _ _ _ (Term (In body _))) = Just $ subtractLoc ann body
@@ -192,12 +192,12 @@ instance TaggableBy 'Custom Ruby.Class where
 
 instance TaggableBy 'Custom Ruby.Module where
   snippet' ann (Ruby.Module _ (Term (In body _):_)) = Just $ subtractLoc ann body
-  snippet' ann (Ruby.Module _ _)                    = Just $ locByteRange ann
+  snippet' ann (Ruby.Module _ _)                    = Just $ byteRange ann
   symbolName' = declaredName . Ruby.moduleIdentifier
 
 instance TaggableBy 'Custom TypeScript.Module where
   snippet' ann (TypeScript.Module _ (Term (In body _):_)) = Just $ subtractLoc ann body
-  snippet' ann (TypeScript.Module _ _                   ) = Just $ locByteRange ann
+  snippet' ann (TypeScript.Module _ _                   ) = Just $ byteRange ann
   symbolName' = declaredName . TypeScript.moduleIdentifier
 
 instance TaggableBy 'Custom Expression.Call where
@@ -206,5 +206,5 @@ instance TaggableBy 'Custom Expression.Call where
 
 instance TaggableBy 'Custom Ruby.Send where
   snippet' ann (Ruby.Send _ _ _ (Just (Term (In body _)))) = Just $ subtractLoc ann body
-  snippet' ann _                                           = Just $ locByteRange ann
+  snippet' ann _                                           = Just $ byteRange ann
   symbolName' Ruby.Send{..} = declaredName =<< sendSelector

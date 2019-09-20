@@ -280,7 +280,7 @@ runParser blob@Blob{..} parser = case parser of
   where languageTag = pure . (,) ("language" :: String) . show $ blobLanguage blob
         errors :: (Syntax.Error :< fs, Apply Foldable fs, Apply Functor fs) => Term (Sum fs) Assignment.Loc -> [Error.Error String]
         errors = cata $ \ (In Assignment.Loc{..} syntax) -> case syntax of
-          _ | Just err@Syntax.Error{} <- project syntax -> [Syntax.unError locSpan err]
+          _ | Just err@Syntax.Error{} <- project syntax -> [Syntax.unError span err]
           _                                             -> fold syntax
         runAssignment :: ( Apply Foldable syntaxes
                          , Apply Functor syntaxes

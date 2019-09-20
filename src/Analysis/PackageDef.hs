@@ -56,7 +56,7 @@ class CustomHasPackageDef syntax where
 instance CustomHasPackageDef Language.Go.Syntax.Package where
   customToPackageDef Blob{..} _ (Language.Go.Syntax.Package (Term (In fromAnn _), _) _)
     = Just $ PackageDef (getSource fromAnn)
-    where getSource = toText . Source.slice blobSource . locByteRange
+    where getSource = toText . Source.slice blobSource . byteRange
 
 -- | Produce a 'PackageDef' for 'Sum's using the 'HasPackageDef' instance & therefore using a 'CustomHasPackageDef' instance when one exists & the type is listed in 'PackageDefStrategy'.
 instance Apply HasPackageDef fs => CustomHasPackageDef (Sum fs) where
