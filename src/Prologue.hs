@@ -1,5 +1,4 @@
 {-# LANGUAGE UndecidableInstances #-}
-{-# OPTIONS_GHC -fplugin=DumpCore #-}
 module Prologue
   ( module X
   , eitherM
