@@ -8,7 +8,7 @@ import qualified Data.ByteString.Lazy as BL
 import System.FilePath.Glob
 import System.IO.Unsafe
 
-import SpecHelpers hiding ((</>))
+import SpecHelpers
 import qualified System.Path as Path
 import System.Path ((</>))
 

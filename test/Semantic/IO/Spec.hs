@@ -13,6 +13,8 @@ import Data.Handle
 import SpecHelpers hiding (readFile)
 import qualified Semantic.Git as Git
 import Shelly (shelly, silently, cd, run_)
+import qualified System.Path as Path
+import System.Path ((</>))
 
 spec :: Spec
 spec = do
@@ -31,7 +33,7 @@ spec = do
           git ["config", "user.email", "'test@test.test'"]
           git ["commit", "-am", "'test commit'"]
 
-        readBlobsFromGitRepo (dir </> ".git") (Git.OID "HEAD") [] []
+        readBlobsFromGitRepoPath (Path.absDir dir </> Path.relDir ".git") (Git.OID "HEAD") [] []
       let files = sortOn fileLanguage (blobFile <$> blobs)
       files `shouldBe` [ File "foo.py" Python
                        , File "bar.rb" Ruby
@@ -40,6 +42,7 @@ spec = do
     when hasGit . it "should read from a git directory with --only" $ do
       -- This temporary directory will be cleaned after use.
       blobs <- liftIO . withSystemTempDirectory "semantic-temp-git-repo" $ \dir -> do
+        let pdir = Path.absDir dir
         shelly $ silently $ do
           cd (fromString dir)
           let git = run_ "git"
@@ -50,7 +53,7 @@ spec = do
           git ["config", "user.email", "'test@test.test'"]
           git ["commit", "-am", "'test commit'"]
 
-        readBlobsFromGitRepo (dir </> ".git") (Git.OID "HEAD") [] ["foo.py"]
+        readBlobsFromGitRepoPath (pdir </> Path.relDir ".git") (Git.OID "HEAD") [] [Path.relFile "foo.py"]
       let files = sortOn fileLanguage (blobFile <$> blobs)
       files `shouldBe` [ File "foo.py" Python ]
 
@@ -67,7 +70,7 @@ spec = do
           git ["config", "user.email", "'test@test.test'"]
           git ["commit", "-am", "'test commit'"]
 
-        readBlobsFromGitRepo (dir </> ".git") (Git.OID "HEAD") ["foo.py"] []
+        readBlobsFromGitRepoPath (Path.absDir dir </> Path.relDir ".git") (Git.OID "HEAD") [Path.relFile "foo.py"] []
       let files = sortOn fileLanguage (blobFile <$> blobs)
       files `shouldBe` [ File "bar.rb" Ruby ]
 

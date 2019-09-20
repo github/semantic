@@ -26,7 +26,7 @@ import Serializing.Format as Format
 import qualified System.Path as Path
 import           System.Path ((</>))
 
-import SpecHelpers hiding ((</>))
+import SpecHelpers
 
 
 spec :: Spec

@@ -55,7 +55,6 @@ import Parsing.Parser as X
 import Semantic.Task as X
 import Semantic.Util as X
 import Semantic.Graph (runHeap, runScopeGraph)
-import System.FilePath as X
 import Debug.Trace as X (traceShowM, traceM)
 
 import Data.ByteString as X (ByteString)

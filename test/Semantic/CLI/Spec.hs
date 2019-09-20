@@ -9,7 +9,7 @@ import qualified System.Path as Path
 import           System.Path ((</>))
 import qualified System.Path.Directory as Path
 
-import SpecHelpers hiding ((</>))
+import SpecHelpers
 import Test.Tasty
 import Test.Tasty.Golden
 
