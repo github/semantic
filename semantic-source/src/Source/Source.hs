@@ -20,14 +20,16 @@ module Source.Source
 , toText
 -- * Slicing
 , slice
-, dropSource
-, takeSource
+, drop
+, take
 -- * Splitting
 , Source.Source.lines
 , lineRanges
 , lineRangesWithin
 , newlineIndices
 ) where
+
+import Prelude hiding (drop, take)
 
 import           Control.Arrow ((&&&))
 import           Data.Aeson (FromJSON (..), withText)
@@ -91,15 +93,15 @@ toText = T.decodeUtf8 . sourceBytes
 
 -- | Return a 'Source' that contains a slice of the given 'Source'.
 slice :: Source -> Range -> Source
-slice source range = take $ drop source where
-  drop = dropSource (start range)
-  take = takeSource (rangeLength range)
+slice source range = taking $ dropping source where
+  dropping = drop (start range)
+  taking   = take (rangeLength range)
 
-dropSource :: Int -> Source -> Source
-dropSource i = Source . B.drop i . sourceBytes
+drop :: Int -> Source -> Source
+drop i = Source . B.drop i . sourceBytes
 
-takeSource :: Int -> Source -> Source
-takeSource i = Source . B.take i . sourceBytes
+take :: Int -> Source -> Source
+take i = Source . B.take i . sourceBytes
 
 
 -- Splitting
