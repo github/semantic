@@ -220,7 +220,7 @@ isMethodOrFunction a
   | otherwise                                          = False
 
 blobsForPaths :: Both Path.RelFile -> IO BlobPair
-blobsForPaths = readFilePathPair . fmap Path.toString . fmap (Path.relDir "test/fixtures" </>)
+blobsForPaths = readFilePathPair . fmap (Path.relDir "test/fixtures" </>)
 
 blankDiff :: Diff'
 blankDiff = merge (Nothing, Nothing) (inject [ inserting (termIn Nothing (inject (Syntax.Identifier (name "\"a\"")))) ])

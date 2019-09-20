@@ -88,20 +88,20 @@ instance IsString Name where
 -- | Returns an s-expression formatted diff for the specified FilePath pair.
 diffFilePaths :: TaskSession -> Both Path.RelFile -> IO ByteString
 diffFilePaths session paths
-  = readFilePathPair (fmap Path.toString paths)
+  = readFilePathPair paths
     >>= runTask session . parseDiffBuilder @[] DiffSExpression . pure
     >>= either (die . displayException) (pure . runBuilder)
 
 -- | Returns an s-expression parse tree for the specified path.
 parseFilePath :: TaskSession -> Path.RelFile -> IO (Either SomeException ByteString)
 parseFilePath session path = do
-  blob <- readBlobFromFile (fileForPath (Path.toString path))
+  blob <- readBlobFromFile (fileForRelPath path)
   res <- runTask session $ parseTermBuilder TermSExpression (toList blob)
   pure (runBuilder <$> res)
 
 -- | Read two files to a BlobPair.
-readFilePathPair :: Both FilePath -> IO BlobPair
-readFilePathPair paths = let paths' = fmap fileForPath paths in
+readFilePathPair :: Both Path.RelFile -> IO BlobPair
+readFilePathPair paths = let paths' = fmap fileForRelPath paths in
                      runBothWith readFilePair paths'
 
 parseTestFile :: Parser term -> Path.RelFile -> IO (Blob, term)
