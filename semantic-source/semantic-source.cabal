@@ -67,6 +67,22 @@ test-suite doctest
     , semantic-source
   hs-source-dirs: test
 
+test-suite test
+  import: common
+  type: exitcode-stdio-1.0
+  main-is: Test.hs
+  other-modules:
+    Source.Test
+  build-depends:
+      base
+    , hedgehog        ^>= 1
+    , semantic-source
+    , tasty            >= 1.2 && <2
+    , tasty-hedgehog  ^>= 1.0.0.1
+    , tasty-hunit      >= 0.10 && <1
+    , text
+  hs-source-dirs: test
+
 source-repository head
   type:     git
   location: https://github.com/github/semantic
