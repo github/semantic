@@ -39,16 +39,18 @@ common common
 library
   import: common
   exposed-modules:
+    Source.Loc
     Source.Range
     Source.Span
   -- other-modules:
   -- other-extensions:
   build-depends:
-      aeson        ^>= 1.4.2.0
-    , base          >= 4.12 && < 5
-    , deepseq      ^>= 1.4.4.0
-    , hashable     ^>= 1.2.7.0
-    , semilattices ^>= 0.0.0.3
+      aeson          ^>= 1.4.2.0
+    , base            >= 4.12 && < 5
+    , deepseq        ^>= 1.4.4.0
+    , generic-monoid ^>= 0.1.0.0
+    , hashable       ^>= 1.2.7.0
+    , semilattices   ^>= 0.0.0.3
   hs-source-dirs: src
 
 test-suite doctest
