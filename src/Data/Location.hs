@@ -9,7 +9,6 @@ module Data.Location
 import Prologue
 
 import Control.Lens.Lens
-import Data.JSON.Fields
 import Data.Range
 import Data.Span
 
@@ -24,6 +23,3 @@ data Location
 instance HasSpan Location where
   span = lens locationSpan (\l s -> l { locationSpan = s })
   {-# INLINE span #-}
-
-instance ToJSONFields Location where
-  toJSONFields Location{..} = toJSONFields locationByteRange <> toJSONFields locationSpan
