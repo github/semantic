@@ -45,6 +45,7 @@ library
   build-depends:
       base          >= 4.12 && < 5
     , deepseq      ^>= 1.4.4.0
+    , hashable     ^>= 1.2.7.0
     , semilattices ^>= 0.0.0.3
   hs-source-dirs: src
 

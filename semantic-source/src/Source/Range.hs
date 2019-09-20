@@ -6,6 +6,7 @@ module Source.Range
 ) where
 
 import Control.DeepSeq (NFData)
+import Data.Hashable (Hashable)
 import Data.Semilattice.Lower (Lower(..))
 import GHC.Generics (Generic)
 
@@ -16,7 +17,8 @@ data Range = Range
   }
   deriving (Eq, Generic, Ord, Show)
 
-instance NFData Range
+instance Hashable Range
+instance NFData   Range
 
 -- $
 -- prop> a <> (b <> c) === (a <> b) <> (c :: Range)
