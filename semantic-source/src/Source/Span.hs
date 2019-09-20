@@ -48,6 +48,7 @@ instance Lower Span where
   lowerBound = Span lowerBound lowerBound
 
 
+-- | Construct a Span with a given value for both its start and end positions.
 point :: Pos -> Span
 point p = Span p p
 
