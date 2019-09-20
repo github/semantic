@@ -1,8 +1,11 @@
-{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveGeneric, RankNTypes #-}
 module Source.Range
 ( Range(..)
 , rangeLength
 , subtractRange
+  -- * Lenses
+, start_
+, end_
 ) where
 
 import Control.DeepSeq (NFData)
@@ -35,6 +38,18 @@ rangeLength range = end range - start range
 
 subtractRange :: Range -> Range -> Range
 subtractRange range1 range2 = Range (start range1) (end range1 - rangeLength (Range (start range2) (max (end range1) (end range2))))
+
+
+start_, end_ :: Lens' Range Int
+start_ = lens start (\r s -> r { start = s })
+end_   = lens end   (\r e -> r { end   = e })
+
+
+type Lens' s a = forall f . Functor f => (a -> f a) -> (s -> f s)
+
+lens :: (s -> a) -> (s -> a -> s) -> Lens' s a
+lens get put afa s = fmap (put s) (afa (get s))
+{-# INLINE lens #-}
 
 
 -- $setup
