@@ -39,7 +39,7 @@ testForExample = \case
       ("diffs " <> Path.toString diffOutput)
       (\ref new -> ["git", "diff", ref, new])
       (Path.toString diffOutput)
-      (BL.fromStrict <$> diffFilePaths ?session (Both (Path.toString fileA) (Path.toString fileB)))
+      (BL.fromStrict <$> diffFilePaths ?session (Both fileA fileB))
   ParseExample{file, parseOutput} ->
     goldenVsStringDiff
       ("parses " <> Path.toString parseOutput)

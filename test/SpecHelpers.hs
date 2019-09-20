@@ -86,8 +86,11 @@ instance IsString Name where
   fromString = X.name . fromString
 
 -- | Returns an s-expression formatted diff for the specified FilePath pair.
-diffFilePaths :: TaskSession -> Both FilePath -> IO ByteString
-diffFilePaths session paths = readFilePathPair paths >>= runTask session . parseDiffBuilder @[] DiffSExpression . pure >>= either (die . displayException) (pure . runBuilder)
+diffFilePaths :: TaskSession -> Both Path.RelFile -> IO ByteString
+diffFilePaths session paths
+  = readFilePathPair (fmap Path.toString paths)
+    >>= runTask session . parseDiffBuilder @[] DiffSExpression . pure
+    >>= either (die . displayException) (pure . runBuilder)
 
 -- | Returns an s-expression parse tree for the specified path.
 parseFilePath :: TaskSession -> Path.RelFile -> IO (Either SomeException ByteString)
