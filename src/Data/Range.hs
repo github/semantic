@@ -3,7 +3,6 @@ module Data.Range
 ( Range(..)
 , emptyRange
 , rangeLength
-, intersectsRange
 , subtractRange
 ) where
 
@@ -22,10 +21,6 @@ emptyRange = Range 0 0
 -- | Return the length of the range.
 rangeLength :: Range -> Int
 rangeLength range = end range - start range
-
--- | Test two ranges for intersection.
-intersectsRange :: Range -> Range -> Bool
-intersectsRange range1 range2 = start range1 < end range2 && start range2 < end range1
 
 subtractRange :: Range -> Range -> Range
 subtractRange range1 range2 = Range (start range1) (end range1 - rangeLength (Range (start range2) (max (end range1) (end range2))))
