@@ -12,7 +12,6 @@ import           Control.Exception
 import           Control.Lens
 import           Data.Blob hiding (File (..))
 import           Data.ByteString.Builder
-import           Data.Location
 import           Data.Maybe
 import           Data.Term
 import qualified Data.Text as T
@@ -26,6 +25,7 @@ import           Semantic.Api.Terms (ParseEffects, doParse)
 import           Semantic.Proto.SemanticPB hiding (Blob)
 import           Semantic.Task
 import           Serializing.Format
+import           Source.Loc
 import           Tags.Taggable
 import           Tags.Tagging
 
@@ -41,7 +41,7 @@ legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> distributeFoldMap 
         symbolsToSummarize :: [Text]
         symbolsToSummarize = ["Function", "Method", "Class", "Module"]
 
-        renderToSymbols :: (IsTaggable f, Applicative m) => Term f Location -> m [Legacy.File]
+        renderToSymbols :: (IsTaggable f, Applicative m) => Term f Loc -> m [Legacy.File]
         renderToSymbols = pure . pure . tagsToFile . runTagging blob symbolsToSummarize
 
         tagsToFile :: [Tag] -> Legacy.File
@@ -72,7 +72,7 @@ parseSymbols blobs = ParseTreeSymbolResponse . V.fromList . toList <$> distribut
         symbolsToSummarize :: [Text]
         symbolsToSummarize = ["Function", "Method", "Class", "Module", "Call", "Send"]
 
-        renderToSymbols :: (IsTaggable f, Applicative m) => Term f Location -> m File
+        renderToSymbols :: (IsTaggable f, Applicative m) => Term f Loc -> m File
         renderToSymbols term = pure $ tagsToFile (runTagging blob symbolsToSummarize term)
 
         tagsToFile :: [Tag] -> File

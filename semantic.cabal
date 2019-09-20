@@ -159,7 +159,6 @@ library
                      , Data.ImportPath
                      , Data.JSON.Fields
                      , Data.Language
-                     , Data.Location
                      , Data.Map.Monoidal
                      , Data.Patch
                      , Data.Project

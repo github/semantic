@@ -28,7 +28,6 @@ import Data.Functor.Both
 import qualified Data.Language as Language
 import Data.List.NonEmpty
 import Data.Patch
-import Data.Location
 import Data.Semigroup.App
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Literal as Literal
@@ -45,6 +44,7 @@ import Data.Text as T (Text, pack)
 import Data.These
 import Data.Sum
 import Diffing.Algorithm.RWS
+import Source.Loc
 import Source.Range
 import Source.Span
 import Test.LeanCheck
@@ -542,8 +542,8 @@ instance Listable (f a) => Listable (App f a) where
 instance Listable (f a) => Listable (AppMerge f a) where
   tiers = cons1 AppMerge
 
-instance Listable Location where
-  tiers = cons2 Location
+instance Listable Loc where
+  tiers = cons2 Loc
 
 instance Listable Range where
   tiers = cons2 Range

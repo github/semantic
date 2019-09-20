@@ -55,7 +55,6 @@ import           Data.Graph.ControlFlowVertex (VertexDeclarationStrategy, Vertex
 import           Data.Language as Language
 import           Data.List (isPrefixOf, isSuffixOf)
 import           Data.Project
-import           Data.Location
 import           Data.Term
 import           Data.Text (pack, unpack)
 import           Language.Haskell.HsColour
@@ -64,6 +63,7 @@ import           Parsing.Parser
 import           Prologue hiding (TypeError (..))
 import           Semantic.Analysis
 import           Semantic.Task as Task
+import           Source.Loc
 import           Source.Span
 import           System.FilePath.Posix (takeDirectory, (</>))
 import           Text.Show.Pretty (ppShow)
@@ -102,7 +102,7 @@ runCallGraph :: ( VertexDeclarationWithStrategy (VertexDeclarationStrategy synta
                 , Ord1 syntax
                 , Functor syntax
                 , Evaluatable syntax
-                , term ~ Term syntax Location
+                , term ~ Term syntax Loc
                 , FreeVariables1 syntax
                 , HasPrelude lang
                 , Member Trace sig
@@ -255,7 +255,7 @@ parsePythonPackage :: forall syntax sig m term.
                    , FreeVariables1 syntax
                    , AccessControls1 syntax
                    , Functor syntax
-                   , term ~ Term syntax Location
+                   , term ~ Term syntax Loc
                    , Member (Error SomeException) sig
                    , Member Distribute sig
                    , Member Resolution sig
@@ -335,11 +335,11 @@ withTermSpans :: ( Member (Reader Span) sig
                  , Member (State Span) sig -- last evaluated child's span
                  , Recursive term
                  , Carrier sig m
-                 , Base term ~ TermF syntax Location
+                 , Base term ~ TermF syntax Loc
                  )
               => Open (term -> Evaluator term address value m a)
 withTermSpans recur term = let
-  span = locationSpan (termFAnnotation (project term))
+  span = locSpan (termFAnnotation (project term))
   updatedSpanAlg = withCurrentSpan span (recur term)
   in modifyChildSpan span updatedSpanAlg
 

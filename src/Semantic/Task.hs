@@ -71,7 +71,6 @@ import           Data.ByteString.Builder
 import           Data.Diff
 import qualified Data.Error as Error
 import qualified Data.Flag as Flag
-import           Data.Location
 import           Data.Source (Source)
 import           Data.Sum
 import qualified Data.Syntax as Syntax
@@ -89,6 +88,7 @@ import           Semantic.Timeout
 import           Semantic.Resolution
 import           Semantic.Telemetry
 import           Serializing.Format hiding (Options)
+import           Source.Loc
 
 -- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
 type TaskEff
@@ -117,8 +117,8 @@ parse parser blob = send (Parse parser blob pure)
 
 -- | A task which decorates a 'Term' with values computed using the supplied 'RAlgebra' function.
 decorate :: (Functor f, Member Task sig, Carrier sig m)
-         => RAlgebra (TermF f Location) (Term f Location) field
-         -> Term f Location
+         => RAlgebra (TermF f Loc) (Term f Loc) field
+         -> Term f Loc
          -> m (Term f field)
 decorate algebra term = send (Decorate algebra term pure)
 
@@ -198,7 +198,7 @@ instance (Member Telemetry sig, Carrier sig m) => Carrier (Trace :+: sig) (Trace
 -- | An effect describing high-level tasks to be performed.
 data Task (m :: * -> *) k
   = forall term . Parse (Parser term) Blob (term -> m k)
-  | forall f field . Functor f => Decorate (RAlgebra (TermF f Location) (Term f Location) field) (Term f Location) (Term f field -> m k)
+  | forall f field . Functor f => Decorate (RAlgebra (TermF f Loc) (Term f Loc) field) (Term f Loc) (Term f field -> m k)
   | forall syntax ann . (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => Diff (These (Term syntax ann) (Term syntax ann)) (Diff syntax ann ann -> m k)
   | forall input output . Render (Renderer input output) input (output -> m k)
   | forall input . Serialize (Format input) input (Builder -> m k)
@@ -277,9 +277,9 @@ runParser blob@Blob{..} parser = case parser of
       in length term `seq` pure term
   SomeParser parser -> SomeTerm <$> runParser blob parser
   where languageTag = pure . (,) ("language" :: String) . show $ blobLanguage blob
-        errors :: (Syntax.Error :< fs, Apply Foldable fs, Apply Functor fs) => Term (Sum fs) Assignment.Location -> [Error.Error String]
-        errors = cata $ \ (In Assignment.Location{..} syntax) -> case syntax of
-          _ | Just err@Syntax.Error{} <- project syntax -> [Syntax.unError locationSpan err]
+        errors :: (Syntax.Error :< fs, Apply Foldable fs, Apply Functor fs) => Term (Sum fs) Assignment.Loc -> [Error.Error String]
+        errors = cata $ \ (In Assignment.Loc{..} syntax) -> case syntax of
+          _ | Just err@Syntax.Error{} <- project syntax -> [Syntax.unError locSpan err]
           _ -> fold syntax
         runAssignment :: ( Apply Foldable syntaxes
                          , Apply Functor syntaxes
@@ -294,10 +294,10 @@ runParser blob@Blob{..} parser = case parser of
                          , Carrier sig m
                          , MonadIO m
                          )
-                      => (Source -> assignment (Term (Sum syntaxes) Assignment.Location) -> ast -> Either (Error.Error String) (Term (Sum syntaxes) Assignment.Location))
+                      => (Source -> assignment (Term (Sum syntaxes) Assignment.Loc) -> ast -> Either (Error.Error String) (Term (Sum syntaxes) Assignment.Loc))
                       -> Parser ast
-                      -> assignment (Term (Sum syntaxes) Assignment.Location)
-                      -> m (Term (Sum syntaxes) Assignment.Location)
+                      -> assignment (Term (Sum syntaxes) Assignment.Loc)
+                      -> m (Term (Sum syntaxes) Assignment.Loc)
         runAssignment assign parser assignment = do
           taskSession <- ask
           let requestID' = ("github_request_id", requestID taskSession)

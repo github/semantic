@@ -8,9 +8,9 @@ module Parsing.CMark
 import CMarkGFM
 import qualified Data.AST as A
 import Data.Ix
-import Data.Location
 import Data.Source
 import Data.Term
+import Source.Loc
 import Source.Span
 import TreeSitter.Language (Symbol(..), SymbolType(..))
 
@@ -55,7 +55,7 @@ cmarkParser source = toTerm (totalRange source) (totalSpan source) $ commonmarkT
         toTerm within withinSpan (Node position t children) =
           let range = maybe within (spanToRangeInLineRanges lineRanges . toSpan) position
               span = maybe withinSpan toSpan position
-          in termIn (A.Node (toGrammar t) (Location range span)) (In t (toTerm range span <$> children))
+          in termIn (A.Node (toGrammar t) (Loc range span)) (In t (toTerm range span <$> children))
 
         toSpan PosInfo{..} = Span (Pos startLine startColumn) (Pos (max startLine endLine) (succ (if endLine <= startLine then max startColumn endColumn else endColumn)))
 

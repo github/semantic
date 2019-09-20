@@ -9,11 +9,11 @@ where
 import Assigning.Assignment.Deterministic hiding (Assignment)
 import qualified Assigning.Assignment.Deterministic as Deterministic
 import Data.Sum
-import Data.Location
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Term as Term
 import Prologue
+import Source.Loc
 import Text.Parser.Combinators
 import TreeSitter.JSON as Grammar
 
@@ -28,7 +28,7 @@ type Syntax =
   , Syntax.Error
   ]
 
-type Term = Term.Term (Sum Syntax) Location
+type Term = Term.Term (Sum Syntax) Loc
 type Assignment = Deterministic.Assignment Grammar
 
 assignment :: Assignment Term

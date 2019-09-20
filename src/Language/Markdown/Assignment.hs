@@ -46,7 +46,7 @@ type Syntax =
    , []
    ]
 
-type Term = Term.Term (Sum Syntax) Location
+type Term = Term.Term (Sum Syntax) Loc
 type Assignment = Assignment.Assignment (Term.TermF [] CMarkGFM.NodeType) Grammar
 
 assignment :: Assignment Term

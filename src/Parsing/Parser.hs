@@ -84,7 +84,7 @@ someAnalysisParser :: ( ApplyAll' typeclasses Go.Syntax
                       )
                    => proxy typeclasses                       -- ^ A proxy for the list of typeclasses required, e.g. @(Proxy :: Proxy '[Show1])@.
                    -> Language                                -- ^ The 'Language' to select.
-                   -> SomeAnalysisParser typeclasses Location -- ^ A 'SomeAnalysisParser' abstracting the syntax type to be produced.
+                   -> SomeAnalysisParser typeclasses Loc -- ^ A 'SomeAnalysisParser' abstracting the syntax type to be produced.
 someAnalysisParser _ Go         = SomeAnalysisParser goParser         (Proxy :: Proxy 'Go)
 someAnalysisParser _ Haskell    = SomeAnalysisParser haskellParser    (Proxy :: Proxy 'Haskell)
 someAnalysisParser _ JavaScript = SomeAnalysisParser typescriptParser (Proxy :: Proxy 'JavaScript)
@@ -102,13 +102,13 @@ data Parser term where
   ASTParser :: (Bounded grammar, Enum grammar, Show grammar) => Ptr TS.Language -> Parser (AST [] grammar)
   -- | A parser producing an à la carte term given an 'AST'-producing parser and an 'Assignment' onto 'Term's in some syntax type.
   AssignmentParser :: (Enum grammar, Ix grammar, Show grammar, TS.Symbol grammar, Syntax.Error :< fs, Eq1 ast, Apply Foldable fs, Apply Functor fs, Foldable ast, Functor ast)
-                   => Parser (Term ast (Node grammar))                -- ^ A parser producing AST.
-                   -> Assignment ast grammar (Term (Sum fs) Location) -- ^ An assignment from AST onto 'Term's.
-                   -> Parser (Term (Sum fs) Location)                 -- ^ A parser producing 'Term's.
+                   => Parser (Term ast (Node grammar))           -- ^ A parser producing AST.
+                   -> Assignment ast grammar (Term (Sum fs) Loc) -- ^ An assignment from AST onto 'Term's.
+                   -> Parser (Term (Sum fs) Loc)                 -- ^ A parser producing 'Term's.
   DeterministicParser :: (Enum grammar, Ord grammar, Show grammar, Element Syntax.Error syntaxes, Apply Foldable syntaxes, Apply Functor syntaxes)
                       => Parser (AST [] grammar)
-                      -> Deterministic.Assignment grammar (Term (Sum syntaxes) Location)
-                      -> Parser (Term (Sum syntaxes) Location)
+                      -> Deterministic.Assignment grammar (Term (Sum syntaxes) Loc)
+                      -> Parser (Term (Sum syntaxes) Loc)
   -- | A parser for 'Markdown' using cmark.
   MarkdownParser :: Parser (Term (TermF [] CMarkGFM.NodeType) (Node Markdown.Grammar))
   -- | An abstraction over parsers when we don’t know the details of the term type.

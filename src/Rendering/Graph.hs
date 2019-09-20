@@ -14,13 +14,13 @@ import Control.Effect.Reader
 import Control.Effect.State
 import Data.Diff
 import Data.Graph
-import Data.Location
 import Data.Patch
 import Data.String (IsString (..))
 import Data.Term
 import Prologue
 import Semantic.Api.Bridge
 import Semantic.Proto.SemanticPB
+import Source.Loc
 
 import qualified Data.Text as T
 
@@ -61,7 +61,7 @@ class ToTreeGraph vertex t | t -> vertex where
   toTreeGraph :: (Member Fresh sig, Member (Reader (Graph vertex)) sig, Carrier sig m) => t (m (Graph vertex)) -> m (Graph vertex)
 
 instance (ConstructorName syntax, Foldable syntax) =>
-  ToTreeGraph TermVertex (TermF syntax Location) where
+  ToTreeGraph TermVertex (TermF syntax Loc) where
   toTreeGraph = termAlgebra where
     termAlgebra ::
       ( ConstructorName syntax
@@ -70,17 +70,17 @@ instance (ConstructorName syntax, Foldable syntax) =>
       , Member (Reader (Graph TermVertex)) sig
       , Carrier sig m
       )
-      => TermF syntax Location (m (Graph TermVertex))
+      => TermF syntax Loc (m (Graph TermVertex))
       -> m (Graph TermVertex)
     termAlgebra (In ann syntax) = do
       i <- fresh
       parent <- ask
-      let root = vertex $ TermVertex (fromIntegral i) (T.pack (constructorName syntax)) (converting #? locationSpan ann)
+      let root = vertex $ TermVertex (fromIntegral i) (T.pack (constructorName syntax)) (converting #? locSpan ann)
       subGraph <- foldl' (\acc x -> overlay <$> acc <*> local (const root) x) (pure mempty) syntax
       pure (parent `connect` root `overlay` subGraph)
 
 instance (ConstructorName syntax, Foldable syntax) =>
-  ToTreeGraph DiffTreeVertex (DiffF syntax Location Location) where
+  ToTreeGraph DiffTreeVertex (DiffF syntax Loc Loc) where
   toTreeGraph d = case d of
     Merge t@(In (a1, a2) syntax)     -> diffAlgebra t  (Merged   (Just (MergedTerm (T.pack (constructorName syntax)) (ann a1) (ann a2))))
     Patch (Delete t1@(In a1 syntax)) -> diffAlgebra t1 (Deleted  (Just (DeletedTerm (T.pack (constructorName syntax)) (ann a1))))
@@ -94,7 +94,7 @@ instance (ConstructorName syntax, Foldable syntax) =>
       graph <- local (const replace) (overlay <$> diffAlgebra t1 (Deleted (Just (DeletedTerm beforeName beforeSpan))) <*> diffAlgebra t2 (Inserted (Just (InsertedTerm afterName afterSpan))))
       pure (parent `connect` replace `overlay` graph)
     where
-      ann a = converting #? locationSpan a
+      ann a = converting #? locSpan a
       diffAlgebra ::
         ( Foldable f
         , Member Fresh sig

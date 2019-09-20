@@ -14,16 +14,16 @@ import           Streaming
 import qualified Streaming.Prelude as Streaming
 
 import           Data.Blob
-import           Data.Location
 import qualified Data.Source as Source
 import           Data.Tag
 import           Data.Term
+import           Source.Loc
 import           Tags.Taggable
 
 runTagging :: (IsTaggable syntax)
            => Blob
            -> [Text]
-           -> Term syntax Location
+           -> Term syntax Loc
            -> [Tag]
 runTagging blob symbolsToSummarize
   = Eff.run

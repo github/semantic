@@ -6,7 +6,7 @@ module Data.History
   , remark
   ) where
 
-import Data.Location
+import Source.Loc
 
 -- | 'History' values, when attached to a given 'Term', describe the ways in
 -- which that term was modified during a refactoring pass, if any.
@@ -21,9 +21,9 @@ data History
 -- | Convert a 'Term' annotated with a 'Range' to one annotated with a 'History'.
 mark :: Functor f
   => (Range -> History)
-  -> f Location
+  -> f Loc
   -> f History
-mark f = fmap (f . locationByteRange)
+mark f = fmap (f . locByteRange)
 
 -- | Change the 'History' annotation on a 'Term'.
 remark :: Functor f

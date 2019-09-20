@@ -5,7 +5,6 @@ module Data.Syntax where
 import Data.Abstract.Evaluatable hiding (Empty, Error)
 import Data.Aeson as Aeson (ToJSON(..), object)
 import Data.JSON.Fields
-import Data.Location
 import qualified Data.Set as Set
 import Data.Sum
 import Data.Term
@@ -16,6 +15,7 @@ import Diffing.Algorithm
 import Prelude
 import Prologue
 import Reprinting.Tokenize hiding (Element)
+import Source.Loc
 import qualified Assigning.Assignment as Assignment
 import qualified Data.Error as Error
 import Control.Abstract.ScopeGraph (reference, Reference(..), Declaration(..))
@@ -49,16 +49,16 @@ makeTerm1' syntax = case toList syntax of
   _ -> error "makeTerm1': empty structure"
 
 -- | Construct an empty term at the current position.
-emptyTerm :: (HasCallStack, Empty :< syntaxes, Apply Foldable syntaxes) => Assignment.Assignment ast grammar (Term (Sum syntaxes) Location)
+emptyTerm :: (HasCallStack, Empty :< syntaxes, Apply Foldable syntaxes) => Assignment.Assignment ast grammar (Term (Sum syntaxes) Loc)
 emptyTerm = makeTerm . startLocation <$> Assignment.location <*> pure Empty
-  where startLocation Location{..} = Location (Range (start locationByteRange) (start locationByteRange)) (Span (spanStart locationSpan) (spanStart locationSpan))
+  where startLocation Loc{..} = Loc (Range (start locByteRange) (start locByteRange)) (Span (spanStart locSpan) (spanStart locSpan))
 
 -- | Catch assignment errors into an error term.
-handleError :: (HasCallStack, Error :< syntaxes, Enum grammar, Eq1 ast, Ix grammar, Show grammar, Apply Foldable syntaxes) => Assignment.Assignment ast grammar (Term (Sum syntaxes) Location) -> Assignment.Assignment ast grammar (Term (Sum syntaxes) Location)
+handleError :: (HasCallStack, Error :< syntaxes, Enum grammar, Eq1 ast, Ix grammar, Show grammar, Apply Foldable syntaxes) => Assignment.Assignment ast grammar (Term (Sum syntaxes) Loc) -> Assignment.Assignment ast grammar (Term (Sum syntaxes) Loc)
 handleError = flip Assignment.catchError (\ err -> makeTerm <$> Assignment.location <*> pure (errorSyntax (either id show <$> err) []) <* Assignment.source)
 
 -- | Catch parse errors into an error term.
-parseError :: (HasCallStack, Error :< syntaxes, Bounded grammar, Enum grammar, Ix grammar, Apply Foldable syntaxes) => Assignment.Assignment ast grammar (Term (Sum syntaxes) Location)
+parseError :: (HasCallStack, Error :< syntaxes, Bounded grammar, Enum grammar, Ix grammar, Apply Foldable syntaxes) => Assignment.Assignment ast grammar (Term (Sum syntaxes) Loc)
 parseError = makeTerm <$> Assignment.token maxBound <*> pure (Error (ErrorStack $ errorSite <$> getCallStack (freezeCallStack callStack)) [] (Just "ParseError") [])
 
 -- | Match context terms before a subject term, wrapping both up in a Context term if any context terms matched, or otherwise returning the subject term.

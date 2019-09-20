@@ -10,7 +10,6 @@ import Data.Diff
 import Data.Functor.Classes
 import Data.Hashable.Lifted
 import Data.Patch
-import Data.Location
 import Data.Sum
 import Data.Term
 import Data.Text (Text)
@@ -22,6 +21,7 @@ import qualified Data.Syntax.Declaration as Declaration
 import Rendering.TOC
 import Semantic.Api (diffSummaryBuilder)
 import Serializing.Format as Format
+import Source.Loc
 import Source.Span
 
 import SpecHelpers
@@ -233,7 +233,7 @@ diffWithParser :: ( Eq1 syntax
                   , Member Task sig
                   , Carrier sig m
                   )
-               => Parser (Term syntax Location)
+               => Parser (Term syntax Loc)
                -> BlobPair
                -> m (Diff syntax (Maybe Declaration) (Maybe Declaration))
 diffWithParser parser blobs = distributeFor blobs (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob)) >>= SpecHelpers.diff . runJoin
