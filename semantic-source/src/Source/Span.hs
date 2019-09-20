@@ -4,6 +4,7 @@
 --   Mostly taken from purescript's SourcePos definition.
 module Source.Span
 ( Span(..)
+, point
 , spanFromSrcLoc
 , Pos(..)
 , line_
@@ -46,6 +47,9 @@ instance A.FromJSON Span where
 instance Lower Span where
   lowerBound = Span lowerBound lowerBound
 
+
+point :: Pos -> Span
+point p = Span p p
 
 spanFromSrcLoc :: SrcLoc -> Span
 spanFromSrcLoc s = Span (Pos (srcLocStartLine s) (srcLocStartCol s)) (Pos (srcLocEndLine s) (srcLocEndCol s))
