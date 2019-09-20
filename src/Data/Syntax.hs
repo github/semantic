@@ -53,7 +53,7 @@ makeTerm1' syntax = case toList syntax of
 -- | Construct an empty term at the current position.
 emptyTerm :: (HasCallStack, Empty :< syntaxes, Apply Foldable syntaxes) => Assignment.Assignment ast grammar (Term (Sum syntaxes) Loc)
 emptyTerm = makeTerm . startLocation <$> Assignment.location <*> pure Empty
-  where startLocation Loc{..} = Loc (Range (Range.start locByteRange) (Range.start locByteRange)) (Span (Span.start locSpan) (Span.start locSpan))
+  where startLocation Loc{..} = Loc (Range.point (Range.start locByteRange)) (Span.point (Span.start locSpan))
 
 -- | Catch assignment errors into an error term.
 handleError :: (HasCallStack, Error :< syntaxes, Enum grammar, Eq1 ast, Ix grammar, Show grammar, Apply Foldable syntaxes) => Assignment.Assignment ast grammar (Term (Sum syntaxes) Loc) -> Assignment.Assignment ast grammar (Term (Sum syntaxes) Loc)
