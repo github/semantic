@@ -8,7 +8,6 @@ module Parsing.CMark
 import CMarkGFM
 import qualified Data.AST as A
 import Data.Ix
-import Data.Range
 import Data.Location
 import Data.Span
 import Data.Source

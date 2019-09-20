@@ -44,7 +44,6 @@ import Data.Foldable (toList)
 import Data.Functor.Listable as X
 import Data.Language as X
 import Data.List.NonEmpty as X (NonEmpty(..))
-import Data.Range as X
 import Data.Semilattice.Lower as X
 import Data.Source as X
 import Data.Span as X hiding (HasSpan(..))
@@ -55,6 +54,7 @@ import Parsing.Parser as X
 import Semantic.Task as X
 import Semantic.Util as X
 import Semantic.Graph (runHeap, runScopeGraph)
+import Source.Range as X
 import System.FilePath as X
 import Debug.Trace as X (traceShowM, traceM)
 

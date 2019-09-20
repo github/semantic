@@ -28,7 +28,6 @@ import Data.Functor.Both
 import qualified Data.Language as Language
 import Data.List.NonEmpty
 import Data.Patch
-import Data.Range
 import Data.Location
 import Data.Semigroup.App
 import Data.Span
@@ -47,6 +46,7 @@ import Data.Text as T (Text, pack)
 import Data.These
 import Data.Sum
 import Diffing.Algorithm.RWS
+import Source.Range
 import Test.LeanCheck
 
 type Tier a = [a]

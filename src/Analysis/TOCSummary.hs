@@ -14,12 +14,12 @@ import           Data.Error (Error (..), Colourize (..), showExpectation)
 import           Data.Flag
 import           Data.Language as Language
 import           Data.Location
-import           Data.Range
 import           Data.Source as Source
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import           Data.Term
 import qualified Data.Text as T
+import           Source.Range
 import qualified Language.Markdown.Syntax as Markdown
 
 -- | A declaration’s identifier and type.

@@ -5,7 +5,6 @@ module Data.Syntax where
 import Data.Abstract.Evaluatable hiding (Empty, Error)
 import Data.Aeson as Aeson (ToJSON(..), object)
 import Data.JSON.Fields
-import Data.Range
 import Data.Location
 import qualified Data.Set as Set
 import Data.Sum

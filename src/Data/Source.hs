@@ -33,11 +33,11 @@ import           Data.Array
 import qualified Data.ByteString as B
 import           Data.Char (ord)
 import           Data.List (span)
-import           Data.Range
 import           Data.Span hiding (HasSpan (..))
 import           Data.String (IsString (..))
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
+import           Source.Range
 
 
 -- | The contents of a source file. This is represented as a UTF-8
@@ -68,7 +68,7 @@ totalRange = Range 0 . B.length . sourceBytes
 totalSpan :: Source -> Span
 totalSpan source = Span (Pos 1 1) (Pos (length ranges) (succ (end lastRange - start lastRange)))
   where ranges = sourceLineRanges source
-        lastRange = fromMaybe emptyRange (getLast (foldMap (Last . Just) ranges))
+        lastRange = fromMaybe lowerBound (getLast (foldMap (Last . Just) ranges))
 
 
 -- En/decoding
@@ -157,5 +157,5 @@ rangeToSpan source (Range rangeStart rangeEnd) = Span startPos endPos
         firstLine = length before
         (before, rest) = span ((< rangeStart) . end) (sourceLineRanges source)
         (lineRanges, _) = span ((<= rangeEnd) . start) rest
-        firstRange = fromMaybe emptyRange (getFirst (foldMap (First . Just) lineRanges))
+        firstRange = fromMaybe lowerBound (getFirst (foldMap (First . Just) lineRanges))
         lastRange  = fromMaybe firstRange (getLast (foldMap (Last . Just) lineRanges))

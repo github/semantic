@@ -5,7 +5,6 @@ import Assigning.Assignment
 import Data.AST
 import Data.Bifunctor (first)
 import Data.Ix
-import Data.Range
 import Data.Semigroup ((<>))
 import Data.Source
 import Data.Span
@@ -13,6 +12,7 @@ import Data.Term
 import Data.Text as T (Text, length, words)
 import Data.Text.Encoding (encodeUtf8)
 import GHC.Stack (getCallStack)
+import Source.Range
 import Prelude hiding (words)
 import Test.Hspec
 import TreeSitter.Language (Symbol (..), SymbolType (..))

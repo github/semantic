@@ -9,8 +9,8 @@ module Data.Location
 import Prologue
 
 import Control.Lens.Lens
-import Data.Range
 import Data.Span
+import Source.Range
 
 data Location
   = Location

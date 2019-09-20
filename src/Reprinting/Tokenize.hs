@@ -34,13 +34,13 @@ import qualified Streaming.Prelude as Streaming
 
 import           Data.History
 import           Data.List (intersperse)
-import           Data.Range
 import           Data.Reprinting.Scope (Scope)
 import qualified Data.Reprinting.Scope as Scope
 import           Data.Reprinting.Token as Token
 import           Data.Reprinting.Operator as Operator
 import           Data.Source
 import           Data.Term
+import           Source.Range
 
 -- | The 'Tokenizer' monad represents a context in which 'Control'
 -- tokens and 'Element' tokens can be sent to some downstream

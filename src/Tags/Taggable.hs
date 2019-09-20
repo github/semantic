@@ -32,9 +32,9 @@ import Data.Abstract.Name
 import Data.Blob
 import Data.Language
 import Data.Location
-import Data.Range
 import Data.Term
 import Data.Text hiding (empty)
+import Source.Range
 
 import Streaming hiding (Sum)
 import Streaming.Prelude (yield)

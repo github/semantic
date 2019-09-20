@@ -164,7 +164,6 @@ library
                      , Data.Patch
                      , Data.Project
                      , Data.Quieterm
-                     , Data.Range
                      , Data.Reprinting.Errors
                      , Data.Reprinting.Fragment
                      , Data.Reprinting.Operator
@@ -360,7 +359,6 @@ test-suite test
                      , Data.Graph.Spec
                      , Data.Mergeable
                      , Data.Language.Spec
-                     , Data.Range.Spec
                      , Data.Scientific.Spec
                      , Data.Semigroup.App.Spec
                      , Data.Source.Spec

@@ -13,7 +13,6 @@ import Data.AST
 import Data.Error
 import qualified Data.IntMap as IntMap
 import qualified Data.IntSet as IntSet
-import Data.Range
 import Data.Location
 import Data.Source as Source
 import Data.Span hiding (HasSpan (..))
