@@ -51,7 +51,8 @@ test-suite doctest
   main-is: Doctest.hs
   build-depends:
       base
-    , doctest >=0.7 && <1.0
+    , doctest          >= 0.7 && <1.0
+    , semantic-source
   hs-source-dirs: test
 
 source-repository head
