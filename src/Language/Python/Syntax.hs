@@ -135,7 +135,7 @@ instance Evaluatable Import where
 
     -- Add declaration of the alias name to the current scope (within our current module).
     aliasName <- maybeM (throwNoNameError aliasTerm) (declaredAlias aliasTerm)
-    declare (Declaration aliasName) Default Public (aliasTerm^.span) ScopeGraph.UnqualifiedImport (Just importScope)
+    declare (Declaration aliasName) Default Public (aliasTerm^.span_) ScopeGraph.UnqualifiedImport (Just importScope)
     -- Retrieve the frame slot for the new declaration.
     aliasSlot <- lookupSlot (Declaration aliasName)
     assign aliasSlot =<< object aliasFrame
@@ -173,7 +173,7 @@ instance Evaluatable Import where
           aliasName <- maybeM (throwNoNameError aliasTerm) (declaredAlias aliasTerm)
           aliasValue <- maybeM (throwNoNameError aliasTerm) (declaredName aliasTerm)
           if aliasValue /= aliasName then do
-            insertImportReference (Reference aliasName) (aliasTerm^.span) ScopeGraph.Identifier (Declaration aliasValue) scopeAddress
+            insertImportReference (Reference aliasName) (aliasTerm^.span_) ScopeGraph.Identifier (Declaration aliasValue) scopeAddress
           else
             pure ()
 
@@ -199,7 +199,7 @@ instance Evaluatable QualifiedImport where
       go [] = pure ()
       go (((nameTerm, name), modulePath) : namesAndPaths) = do
         scopeAddress <- newScope mempty
-        declare (Declaration name) Default Public (nameTerm^.span) ScopeGraph.QualifiedImport (Just scopeAddress)
+        declare (Declaration name) Default Public (nameTerm^.span_) ScopeGraph.QualifiedImport (Just scopeAddress)
         aliasSlot <- lookupSlot (Declaration name)
         -- a.b.c
         withScope scopeAddress $

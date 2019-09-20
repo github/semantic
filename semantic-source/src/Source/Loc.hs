@@ -23,6 +23,6 @@ instance Hashable Loc
 instance NFData   Loc
 
 instance HasSpan Loc where
-  span = lens locSpan (\l s -> l { locSpan = s }) where
+  span_ = lens locSpan (\l s -> l { locSpan = s }) where
     lens get put afa s = fmap (put s) (afa (get s))
-  {-# INLINE span #-}
+  {-# INLINE span_ #-}

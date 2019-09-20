@@ -84,19 +84,19 @@ column_ = lens column (\p l -> p { column = l })
 
 -- | "Classy-fields" interface for data types that have spans.
 class HasSpan a where
-  span  :: Lens' a Span
+  span_ :: Lens' a Span
 
   start_ :: Lens' a Pos
-  start_ = span.start_
+  start_ = span_.start_
   {-# INLINE start_ #-}
 
   end_ :: Lens' a Pos
-  end_ = span.end_
+  end_ = span_.end_
   {-# INLINE end_ #-}
 
 instance HasSpan Span where
-  span  = id
-  {-# INLINE span #-}
+  span_  = id
+  {-# INLINE span_ #-}
 
   start_ = lens spanStart (\s t -> s { spanStart = t })
   {-# INLINE start_ #-}

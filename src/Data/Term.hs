@@ -49,12 +49,12 @@ annotationLens = lens termFAnnotation (\t a -> t { termFAnnotation = a })
 {-# INLINE annotationLens #-}
 
 instance HasSpan ann => HasSpan (TermF syntax ann recur) where
-  span = annotationLens.span
-  {-# INLINE span #-}
+  span_ = annotationLens.span_
+  {-# INLINE span_ #-}
 
 instance HasSpan ann => HasSpan (Term syntax ann) where
-  span = inner.span where inner = lens unTerm (\t i -> t { unTerm = i })
-  {-# INLINE span #-}
+  span_ = inner.span_ where inner = lens unTerm (\t i -> t { unTerm = i })
+  {-# INLINE span_ #-}
 
 -- | A convenience typeclass to get the annotation out of a 'Term' or 'TermF'.
 -- Useful in term-rewriting algebras.

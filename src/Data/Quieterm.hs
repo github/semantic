@@ -48,8 +48,8 @@ instance (NFData1 f, NFData a) => NFData (Quieterm f a) where
   rnf = liftRnf rnf
 
 instance HasSpan ann => HasSpan (Quieterm syntax ann) where
-  span = lens (view span . unQuieterm) (\(Quieterm i) s -> Quieterm (set span s i))
-  {-# INLINE span #-}
+  span_ = lens (view span_ . unQuieterm) (\(Quieterm i) s -> Quieterm (set span_ s i))
+  {-# INLINE span_ #-}
 
 quieterm :: (Recursive term, Base term ~ TermF syntax ann) => term -> Quieterm syntax ann
 quieterm = cata Quieterm

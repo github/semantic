@@ -103,8 +103,8 @@ data Info scopeAddress = Info
   } deriving (Eq, Show, Ord, Generic, NFData)
 
 instance HasSpan (Info scopeAddress) where
-  span = lens infoSpan (\i s -> i { infoSpan = s })
-  {-# INLINE span #-}
+  span_ = lens infoSpan (\i s -> i { infoSpan = s })
+  {-# INLINE span_ #-}
 
 instance Lower (Info scopeAddress) where
   lowerBound = Info lowerBound lowerBound lowerBound Public lowerBound lowerBound Nothing
@@ -116,8 +116,8 @@ data ReferenceInfo = ReferenceInfo
   } deriving (Eq, Show, Ord, Generic, NFData)
 
 instance HasSpan ReferenceInfo where
-  span = lens refSpan (\r s -> r { refSpan = s })
-  {-# INLINE span #-}
+  span_ = lens refSpan (\r s -> r { refSpan = s })
+  {-# INLINE span_ #-}
 
 data Kind = AbstractClass
           | Assignment
