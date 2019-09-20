@@ -38,11 +38,14 @@ common common
 
 library
   import: common
-  -- exposed-modules:
+  exposed-modules:
+    Source.Range
   -- other-modules:
   -- other-extensions:
   build-depends:
-      base >= 4.12 && < 5
+      base          >= 4.12 && < 5
+    , deepseq      ^>= 1.4.4.0
+    , semilattices ^>= 0.0.0.3
   hs-source-dirs: src
 
 test-suite doctest
