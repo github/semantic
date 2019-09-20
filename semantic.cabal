@@ -65,6 +65,7 @@ common dependencies
                      , recursion-schemes ^>= 5.1
                      , scientific ^>= 0.3.6.2
                      , safe-exceptions ^>= 0.1.7.0
+                     , semantic-source ^>= 0.0
                      , semilattices ^>= 0.0.0.3
                      , shelly >= 1.5 && <2
                      , streaming ^>= 0.2.2.0
@@ -158,12 +159,10 @@ library
                      , Data.ImportPath
                      , Data.JSON.Fields
                      , Data.Language
-                     , Data.Location
                      , Data.Map.Monoidal
                      , Data.Patch
                      , Data.Project
                      , Data.Quieterm
-                     , Data.Range
                      , Data.Reprinting.Errors
                      , Data.Reprinting.Fragment
                      , Data.Reprinting.Operator
@@ -172,8 +171,6 @@ library
                      , Data.Reprinting.Token
                      , Data.Semigroup.App
                      , Data.Scientific.Exts
-                     , Data.Source
-                     , Data.Span
                      -- À la carte syntax types
                      , Data.Syntax
                      , Data.Syntax.Comment
@@ -360,10 +357,8 @@ test-suite test
                      , Data.Graph.Spec
                      , Data.Mergeable
                      , Data.Language.Spec
-                     , Data.Range.Spec
                      , Data.Scientific.Spec
                      , Data.Semigroup.App.Spec
-                     , Data.Source.Spec
                      , Data.Term.Spec
                      , Diffing.Algorithm.RWS.Spec
                      , Diffing.Algorithm.SES.Spec

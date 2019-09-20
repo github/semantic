@@ -118,7 +118,7 @@ type Syntax =
    , []
    ]
 
-type Term = Term.Term (Sum Syntax) Location
+type Term = Term.Term (Sum Syntax) Loc
 type Assignment = Assignment.Assignment [] Grammar
 
 -- | Assignment from AST in Python's grammar onto a program in Python's syntax.

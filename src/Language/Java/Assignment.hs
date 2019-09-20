@@ -155,7 +155,7 @@ type Syntax =
    , []
    ]
 
-type Term = Term.Term (Sum Syntax) Location
+type Term = Term.Term (Sum Syntax) Loc
 type Assignment = Assignment.Assignment [] Grammar
 
 -- | Assignment from AST in Java's grammar onto a program in Java's syntax.

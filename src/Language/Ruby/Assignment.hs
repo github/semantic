@@ -129,7 +129,7 @@ type Syntax = '[
   , []
   ]
 
-type Term = Term.Term (Sum Syntax) Location
+type Term = Term.Term (Sum Syntax) Loc
 type Assignment = Assignment.Assignment [] Grammar
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
@@ -487,7 +487,7 @@ assignment' = makeTerm  <$> symbol Assignment         <*> children (Ruby.Syntax.
        <|> lhsIdent
        <|> expression
 
-identWithLocals :: Assignment (Location, Text, [Text])
+identWithLocals :: Assignment (Loc, Text, [Text])
 identWithLocals = do
   loc <- symbol Identifier
   -- source advances, so it's important we call getLocals first

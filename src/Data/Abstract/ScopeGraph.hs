@@ -47,11 +47,11 @@ import           Data.Aeson
 import qualified Data.Map.Strict as Map
 import qualified Data.Sequence as Seq
 import qualified Data.Set as Set
-import Data.Span
 import Control.Abstract.Hole
 import Data.Abstract.Module
 import Data.JSON.Fields
 import Data.Abstract.Name
+import Source.Span
 
 -- A slot is a location in the heap where a value is stored.
 data Slot address = Slot { frameAddress :: address, position :: Position }
@@ -103,8 +103,8 @@ data Info scopeAddress = Info
   } deriving (Eq, Show, Ord, Generic, NFData)
 
 instance HasSpan (Info scopeAddress) where
-  span = lens infoSpan (\i s -> i { infoSpan = s })
-  {-# INLINE span #-}
+  span_ = lens infoSpan (\i s -> i { infoSpan = s })
+  {-# INLINE span_ #-}
 
 instance Lower (Info scopeAddress) where
   lowerBound = Info lowerBound lowerBound lowerBound Public lowerBound lowerBound Nothing
@@ -116,8 +116,8 @@ data ReferenceInfo = ReferenceInfo
   } deriving (Eq, Show, Ord, Generic, NFData)
 
 instance HasSpan ReferenceInfo where
-  span = lens refSpan (\r s -> r { refSpan = s })
-  {-# INLINE span #-}
+  span_ = lens refSpan (\r s -> r { refSpan = s })
+  {-# INLINE span_ #-}
 
 data Kind = AbstractClass
           | Assignment

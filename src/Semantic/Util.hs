@@ -33,7 +33,6 @@ import           Data.Blob.IO
 import           Data.Graph (topologicalSort)
 import qualified Data.Language as Language
 import           Data.List (uncons)
-import           Data.Location
 import           Data.Project hiding (readFile)
 import           Data.Quieterm (Quieterm, quieterm)
 import           Data.Sum (weaken)
@@ -48,6 +47,7 @@ import           Semantic.Analysis
 import           Semantic.Config
 import           Semantic.Graph
 import           Semantic.Task
+import           Source.Loc
 import           System.Exit (die)
 import           System.FilePath.Posix (takeDirectory)
 
@@ -76,10 +76,10 @@ justEvaluating
 type FileEvaluator err syntax =
   [FilePath]
   -> IO
-       ( Heap Precise Precise (Value (Quieterm (Sum syntax) Location) Precise),
+       ( Heap Precise Precise (Value (Quieterm (Sum syntax) Loc) Precise),
        ( ScopeGraph Precise
        , Either (SomeError (Sum err))
-                (ModuleTable (Module (ModuleResult Precise (Value (Quieterm (Sum syntax) Location) Precise))))))
+                (ModuleTable (Module (ModuleResult Precise (Value (Quieterm (Sum syntax) Loc) Precise))))))
 
 evalGoProject :: FileEvaluator _ Language.Go.Assignment.Syntax
 evalGoProject = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Go) goParser

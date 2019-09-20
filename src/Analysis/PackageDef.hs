@@ -6,13 +6,13 @@ module Analysis.PackageDef
 ) where
 
 import Data.Blob
-import Data.Location
-import Data.Source as Source
+import Source.Source as Source
 import Data.Sum
 import Data.Term
 import qualified Data.Text as T
 import qualified Language.Go.Syntax
 import Prologue
+import Source.Loc
 
 newtype PackageDef = PackageDef { moduleDefIdentifier :: T.Text }
   deriving (Eq, Generic, Show)
@@ -27,7 +27,7 @@ newtype PackageDef = PackageDef { moduleDefIdentifier :: T.Text }
 --   If you’re getting errors about missing a 'CustomHasPackageDef' instance for your syntax type, you probably forgot step 1.
 --
 --   If you’re getting 'Nothing' for your syntax node at runtime, you probably forgot step 2.
-packageDefAlgebra :: (Foldable syntax, HasPackageDef syntax) => Blob -> RAlgebra (TermF syntax Location) (Term syntax Location) (Maybe PackageDef)
+packageDefAlgebra :: (Foldable syntax, HasPackageDef syntax) => Blob -> RAlgebra (TermF syntax Loc) (Term syntax Loc) (Maybe PackageDef)
 packageDefAlgebra blob (In ann syntax) = toPackageDef blob ann syntax
 
 
@@ -36,7 +36,7 @@ packageDefAlgebra blob (In ann syntax) = toPackageDef blob ann syntax
 --   This typeclass employs the Advanced Overlap techniques designed by Oleg Kiselyov & Simon Peyton Jones: https://wiki.haskell.org/GHC/AdvancedOverlap.
 class HasPackageDef syntax where
   -- | Compute a 'PackageDef' for a syntax type using its 'CustomHasPackageDef' instance, if any, or else falling back to the default definition (which simply returns 'Nothing').
-  toPackageDef :: (Foldable whole) => Blob -> Location -> syntax (Term whole Location, Maybe PackageDef) -> Maybe PackageDef
+  toPackageDef :: (Foldable whole) => Blob -> Loc -> syntax (Term whole Loc, Maybe PackageDef) -> Maybe PackageDef
 
 -- | Define 'toPackageDef' using the 'CustomHasPackageDef' instance for a type if there is one or else use the default definition.
 --
@@ -50,13 +50,13 @@ instance (PackageDefStrategy syntax ~ strategy, HasPackageDefWithStrategy strate
 -- | Types for which we can produce a customized 'PackageDef'. This returns in 'Maybe' so that some values can be opted out (e.g. anonymous functions).
 class CustomHasPackageDef syntax where
   -- | Produce a customized 'PackageDef' for a given syntax node.
-  customToPackageDef :: (Foldable whole) => Blob -> Location -> syntax (Term whole Location, Maybe PackageDef) -> Maybe PackageDef
+  customToPackageDef :: (Foldable whole) => Blob -> Loc -> syntax (Term whole Loc, Maybe PackageDef) -> Maybe PackageDef
 
 
 instance CustomHasPackageDef Language.Go.Syntax.Package where
   customToPackageDef Blob{..} _ (Language.Go.Syntax.Package (Term (In fromAnn _), _) _)
     = Just $ PackageDef (getSource fromAnn)
-    where getSource = toText . flip Source.slice blobSource . locationByteRange
+    where getSource = toText . Source.slice blobSource . byteRange
 
 -- | Produce a 'PackageDef' for 'Sum's using the 'HasPackageDef' instance & therefore using a 'CustomHasPackageDef' instance when one exists & the type is listed in 'PackageDefStrategy'.
 instance Apply HasPackageDef fs => CustomHasPackageDef (Sum fs) where
@@ -70,7 +70,7 @@ data Strategy = Default | Custom
 --
 --   You should probably be using 'CustomHasPackageDef' instead of this class; and you should not define new instances of this class.
 class HasPackageDefWithStrategy (strategy :: Strategy) syntax where
-  toPackageDefWithStrategy :: (Foldable whole) => proxy strategy -> Blob -> Location -> syntax (Term whole Location, Maybe PackageDef) -> Maybe PackageDef
+  toPackageDefWithStrategy :: (Foldable whole) => proxy strategy -> Blob -> Loc -> syntax (Term whole Loc, Maybe PackageDef) -> Maybe PackageDef
 
 
 -- | A predicate on syntax types selecting either the 'Custom' or 'Default' strategy.

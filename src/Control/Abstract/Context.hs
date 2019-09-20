@@ -16,9 +16,9 @@ import Control.Effect.Reader
 import Control.Effect.State
 import Data.Abstract.Module
 import Data.Abstract.Package
-import Data.Span
 import GHC.Stack
 import Prologue
+import Source.Span
 
 -- | Get the currently evaluating 'ModuleInfo'.
 currentModule :: (Member (Reader ModuleInfo) sig, Carrier sig m) => m ModuleInfo

@@ -32,8 +32,10 @@ import           Data.Aeson
 import qualified Data.ByteString.Lazy as BL
 import           Data.JSON.Fields
 import           Data.Language
-import           Data.Source as Source
+import           Source.Source (Source)
+import qualified Source.Source as Source
 import qualified System.Path as Path
+
 
 -- | A 'FilePath' paired with its corresponding 'Language'.
 -- Unpacked to have the same size overhead as (FilePath, Language).
@@ -76,7 +78,7 @@ instance FromJSON Blob where
     <*> b .: "language"
 
 nullBlob :: Blob -> Bool
-nullBlob Blob{..} = nullSource blobSource
+nullBlob Blob{..} = Source.null blobSource
 
 sourceBlob :: FilePath -> Language -> Source -> Blob
 sourceBlob filepath language source = makeBlob source filepath language mempty

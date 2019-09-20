@@ -7,10 +7,10 @@ import Prologue
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module (ModuleInfo (..))
 import           Data.JSON.Fields
-import           Data.Span
 import qualified Data.Text as T
 import           Diffing.Algorithm
 import           Reprinting.Tokenize
+import           Source.Span
 
 -- A file directive like the Ruby constant `__FILE__`.
 data File a = File
@@ -31,7 +31,7 @@ data Line a = Line
   deriving (Eq1, Show1, Ord1) via Generically Line
 
 instance Evaluatable Line where
-  eval _ _ Line = currentSpan >>= integer . fromIntegral . posLine . spanStart
+  eval _ _ Line = currentSpan >>= integer . fromIntegral . line . start
 
 -- PT TODO: proper token for this
 instance Tokenize Line where

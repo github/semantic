@@ -208,7 +208,7 @@ type Syntax = '[
   , TSX.Syntax.AnnotatedExpression
   ]
 
-type Term = Term.Term (Sum Syntax) Location
+type Term = Term.Term (Sum Syntax) Loc
 type Assignment = Assignment.Assignment [] Grammar
 
 -- | Assignment from AST in TSX’s grammar onto a program in TSX’s syntax.

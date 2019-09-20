@@ -35,10 +35,10 @@ import Data.Language
 import Data.Scientific (Scientific)
 import Data.Semigroup.App
 import Data.Semigroup.Foldable
-import Data.Span (HasSpan(..), emptySpan)
 import Data.Sum hiding (project)
 import Data.Term
 import Prologue
+import Source.Span (HasSpan(..))
 
 -- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
 class (Show1 constr, Foldable constr) => Evaluatable constr where
@@ -191,7 +191,7 @@ defineSelf :: ( Carrier sig m
            => Evaluator term address value m ()
 defineSelf = do
   let self = Declaration X.__self
-  declare self ScopeGraph.Prelude Public emptySpan ScopeGraph.Unknown Nothing
+  declare self ScopeGraph.Prelude Public lowerBound ScopeGraph.Unknown Nothing
   slot <- lookupSlot self
   assign slot =<< object =<< currentFrame
 

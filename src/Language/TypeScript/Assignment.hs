@@ -199,7 +199,7 @@ type Syntax = '[
   , TypeScript.Syntax.AnnotatedExpression
   ]
 
-type Term = Term.Term (Sum Syntax) Location
+type Term = Term.Term (Sum Syntax) Loc
 type Assignment = Assignment.Assignment [] Grammar
 
 -- | Assignment from AST in TypeScript’s grammar onto a program in TypeScript’s syntax.

@@ -26,8 +26,8 @@ import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
 import Data.Language
 import qualified Data.Set as Set
-import Data.Span
 import Prologue
+import Source.Span
 import System.FilePath.Posix (takeDirectory)
 
 -- A scope address, frame address, and value ref.
@@ -125,7 +125,7 @@ runLoadErrorWith f = raiseHandler $ runResumableWith (runEvaluator . f)
 throwLoadError :: (Member (Resumable (BaseError (LoadError address value))) sig, Carrier sig m)
                => LoadError address value resume
                -> m resume
-throwLoadError err@(ModuleNotFoundError name) = throwResumable $ BaseError (ModuleInfo name Unknown mempty) emptySpan err
+throwLoadError err@(ModuleNotFoundError name) = throwResumable $ BaseError (ModuleInfo name Unknown mempty) lowerBound err
 -- TODO: Might be able to get rest of ModuleInfo from the env ^.
 
 

@@ -9,8 +9,8 @@ where
 import Control.Abstract.Context
 import Control.Abstract.Evaluator
 import qualified Data.Abstract.Module as M
-import qualified Data.Span as S
 import Prologue
+import qualified Source.Span as S
 
 data BaseError (exc :: * -> *) resume = BaseError { baseErrorModuleInfo :: ModuleInfo, baseErrorSpan :: Span, baseErrorException :: exc resume }
 
@@ -18,10 +18,10 @@ instance (Show (exc resume)) => Show (BaseError exc resume) where
   showsPrec _ BaseError{..} = shows baseErrorException <> showString " " <> showString errorLocation
     where errorLocation | startErrorLine == endErrorLine = M.modulePath baseErrorModuleInfo <> " " <> startErrorLine <> ":" <> startErrorCol <> "-" <> endErrorCol
                         | otherwise = M.modulePath baseErrorModuleInfo <> " " <> startErrorLine <> ":" <> startErrorCol <> "-" <> endErrorLine <> ":" <> endErrorCol
-          startErrorLine = show $ S.posLine (S.spanStart baseErrorSpan)
-          endErrorLine   = show $ S.posLine (S.spanEnd baseErrorSpan)
-          startErrorCol  = show $ S.posColumn (S.spanStart baseErrorSpan)
-          endErrorCol    = show $ S.posColumn (S.spanEnd baseErrorSpan)
+          startErrorLine = show $ S.line   (S.start baseErrorSpan)
+          endErrorLine   = show $ S.line   (S.end   baseErrorSpan)
+          startErrorCol  = show $ S.column (S.start baseErrorSpan)
+          endErrorCol    = show $ S.column (S.end   baseErrorSpan)
 
 instance (Eq1 exc) => Eq1 (BaseError exc) where
   liftEq f (BaseError info1 span1 exc1) (BaseError info2 span2 exc2) = info1 == info2 && span1 == span2 && liftEq f exc1 exc2

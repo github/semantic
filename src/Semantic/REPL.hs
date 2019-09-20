@@ -27,7 +27,6 @@ import Data.Language as Language
 import Data.List (uncons)
 import Data.Project
 import Data.Quieterm
-import Data.Span
 import qualified Data.Text as T
 import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
 import qualified Data.Time.LocalTime as LocalTime
@@ -45,6 +44,7 @@ import Semantic.Telemetry
 import Semantic.Timeout
 import Semantic.Telemetry.Log (LogOptions, Message(..), writeLogMessage)
 import Semantic.Util
+import Source.Span
 import System.Console.Haskeline
 import System.Directory (createDirectoryIfMissing, getHomeDirectory)
 import System.FilePath
@@ -212,6 +212,6 @@ shouldBreak = do
       span <- ask
       pure (any @[] (matching span) breakpoints)
   where matching Span{..} (OnLine n)
-          | n >= posLine spanStart
-          , n <= posLine spanEnd   = True
-          | otherwise              = False
+          | n >= line start
+          , n <= line end   = True
+          | otherwise       = False
