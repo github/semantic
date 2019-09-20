@@ -33,31 +33,6 @@ testTree = Tasty.testGroup "Data.Source"
         foldMap (`slice` source) (sourceLineRanges source) === source
     ]
 
-  , Tasty.testGroup "spanToRange"
-    [ prop "computes single-line ranges" $ \ source -> do
-        let ranges = sourceLineRanges source
-        let spans = zipWith (\ i Range {..} -> Span (Pos i 1) (Pos i (succ (end - start)))) [1..] ranges
-        fmap (spanToRange source) spans === ranges
-
-    , prop "computes multi-line ranges" $
-        \ source ->
-          spanToRange source (totalSpan source) === totalRange source
-
-    , prop "computes sub-line ranges" $
-        \ s -> let source = "*" <> s <> "*" in
-          spanToRange source (insetSpan (totalSpan source)) === insetRange (totalRange source)
-
-    , testProperty "inverse of rangeToSpan" . property $ do
-        a <- forAll . Gen.source $ Hedgehog.Range.linear 0 100
-        b <- forAll . Gen.source $ Hedgehog.Range.linear 0 100
-        let s = a <> "\n" <> b in spanToRange s (totalSpan s) === totalRange s
-    ]
-
-  ,  testProperty "rangeToSpan inverse of spanToRange" . property $ do
-      a <- forAll . Gen.source $ Hedgehog.Range.linear 0 100
-      b <- forAll . Gen.source $ Hedgehog.Range.linear 0 100
-      let s = a <> "\n" <> b in rangeToSpan s (totalRange s) === totalSpan s
-
   , Tasty.testGroup "totalSpan"
     [ testProperty "covers single lines" . property $ do
         n <- forAll $ Gen.int (Hedgehog.Range.linear 0 100)

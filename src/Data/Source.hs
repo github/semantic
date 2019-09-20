@@ -18,21 +18,14 @@ module Data.Source
 , sourceLines
 , sourceLineRanges
 , sourceLineRangesWithin
--- Conversion
-, spanToRange
-, spanToRangeInLineRanges
-, sourceLineRangesByLineNumber
-, rangeToSpan
 , newlineIndices
 ) where
 
 import Prologue
 
 import           Data.Aeson (FromJSON (..), withText)
-import           Data.Array
 import qualified Data.ByteString as B
 import           Data.Char (ord)
-import           Data.List (span)
 import           Data.String (IsString (..))
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
@@ -132,30 +125,3 @@ newlineIndices = go 0
         searchCR = B.elemIndex (toEnum (ord '\r'))
 
 {-# INLINE newlineIndices #-}
-
-
--- Conversion
-
--- | Compute the byte 'Range' corresponding to a given 'Span' in a 'Source'.
-spanToRange :: Source -> Span -> Range
-spanToRange = spanToRangeInLineRanges . sourceLineRangesByLineNumber
-
-spanToRangeInLineRanges :: Array Int Range -> Span -> Range
-spanToRangeInLineRanges lineRanges Span{..} = Range
-  (start (lineRanges ! posLine spanStart) + pred (posColumn spanStart))
-  (start (lineRanges ! posLine spanEnd)   + pred (posColumn spanEnd))
-
-sourceLineRangesByLineNumber :: Source -> Array Int Range
-sourceLineRangesByLineNumber source = listArray (1, length lineRanges) lineRanges
-  where lineRanges = sourceLineRanges source
-
--- | Compute the 'Span' corresponding to a given byte 'Range' in a 'Source'.
-rangeToSpan :: Source -> Range -> Span
-rangeToSpan source (Range rangeStart rangeEnd) = Span startPos endPos
-  where startPos = Pos (firstLine + 1)                 (rangeStart - start firstRange + 1)
-        endPos =   Pos (firstLine + length lineRanges) (rangeEnd   - start lastRange  + 1)
-        firstLine = length before
-        (before, rest) = span ((< rangeStart) . end) (sourceLineRanges source)
-        (lineRanges, _) = span ((<= rangeEnd) . start) rest
-        firstRange = fromMaybe lowerBound (getFirst (foldMap (First . Just) lineRanges))
-        lastRange  = fromMaybe firstRange (getLast (foldMap (Last . Just) lineRanges))

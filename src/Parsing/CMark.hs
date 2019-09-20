@@ -6,12 +6,12 @@ module Parsing.CMark
 ) where
 
 import CMarkGFM
+import Data.Array
 import qualified Data.AST as A
-import Data.Ix
 import Data.Source
 import Data.Term
 import Source.Loc
-import Source.Span
+import Source.Span hiding (HasSpan(..))
 import TreeSitter.Language (Symbol(..), SymbolType(..))
 
 data Grammar
@@ -90,3 +90,13 @@ toGrammar TABLE_CELL{} = TableCell
 
 instance Symbol Grammar where
   symbolType _ = Regular
+
+
+spanToRangeInLineRanges :: Array Int Range -> Span -> Range
+spanToRangeInLineRanges lineRanges Span{..} = Range
+  (start (lineRanges ! posLine spanStart) + pred (posColumn spanStart))
+  (start (lineRanges ! posLine spanEnd)   + pred (posColumn spanEnd))
+
+sourceLineRangesByLineNumber :: Source -> Array Int Range
+sourceLineRangesByLineNumber source = listArray (1, length lineRanges) lineRanges
+  where lineRanges = sourceLineRanges source
