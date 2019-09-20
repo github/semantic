@@ -358,7 +358,6 @@ test-suite test
                      , Data.Language.Spec
                      , Data.Scientific.Spec
                      , Data.Semigroup.App.Spec
-                     , Data.Source.Spec
                      , Data.Term.Spec
                      , Diffing.Algorithm.RWS.Spec
                      , Diffing.Algorithm.SES.Spec
