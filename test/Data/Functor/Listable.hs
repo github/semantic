@@ -45,7 +45,6 @@ import Data.These
 import Data.Sum
 import Diffing.Algorithm.RWS
 import Source.Loc
-import Source.Range
 import Source.Span
 import Test.LeanCheck
 
