@@ -41,16 +41,19 @@ library
   exposed-modules:
     Source.Loc
     Source.Range
+    Source.Source
     Source.Span
   -- other-modules:
   -- other-extensions:
   build-depends:
       aeson          ^>= 1.4.2.0
     , base            >= 4.12 && < 5
+    , bytestring     ^>= 0.10.8.2
     , deepseq        ^>= 1.4.4.0
     , generic-monoid ^>= 0.1.0.0
     , hashable       ^>= 1.2.7.0
     , semilattices   ^>= 0.0.0.3
+    , text           ^>= 1.2.3.1
   hs-source-dirs: src
 
 test-suite doctest
