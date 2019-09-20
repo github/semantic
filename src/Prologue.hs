@@ -85,4 +85,3 @@ maybeM f = maybe f pure
 eitherM :: Applicative f => (a -> f b) -> Either a b -> f b
 eitherM f = either f pure
 {-# INLINE eitherM #-}
-
