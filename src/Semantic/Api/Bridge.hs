@@ -45,12 +45,12 @@ infixr 8 #?
 
 instance APIBridge Legacy.Position Source.Pos where
   bridging = iso fromAPI toAPI where
-    toAPI Source.Pos{..}        = Legacy.Position posLine posColumn
+    toAPI Source.Pos{..}        = Legacy.Position line column
     fromAPI Legacy.Position{..} = Source.Pos line column
 
 instance APIBridge API.Position Source.Pos where
   bridging = iso fromAPI toAPI where
-    toAPI Source.Pos{..}     = API.Position (fromIntegral posLine) (fromIntegral posColumn)
+    toAPI Source.Pos{..}     = API.Position (fromIntegral line) (fromIntegral column)
     fromAPI API.Position{..} = Source.Pos (fromIntegral line) (fromIntegral column)
 
 instance APIConvert API.Span Source.Span where

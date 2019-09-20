@@ -54,8 +54,8 @@ spanFromSrcLoc s = Span (Pos (srcLocStartLine s) (srcLocStartCol s)) (Pos (srcLo
 
 -- | Source position information (1-indexed)
 data Pos = Pos
-  { posLine   :: {-# UNPACK #-} !Int
-  , posColumn :: {-# UNPACK #-} !Int
+  { line   :: {-# UNPACK #-} !Int
+  , column :: {-# UNPACK #-} !Int
   }
   deriving (Eq, Ord, Generic, Show)
 
@@ -64,8 +64,8 @@ instance NFData   Pos
 
 instance A.ToJSON Pos where
   toJSON p = A.toJSON
-    [ posLine   p
-    , posColumn p
+    [ line   p
+    , column p
     ]
 
 instance A.FromJSON Pos where
@@ -78,8 +78,8 @@ instance Lower Pos where
 
 
 line_, column_ :: Lens' Pos Int
-line_   = lens posLine   (\p l -> p { posLine   = l })
-column_ = lens posColumn (\p l -> p { posColumn = l })
+line_   = lens line   (\p l -> p { line   = l })
+column_ = lens column (\p l -> p { column = l })
 
 
 -- | "Classy-fields" interface for data types that have spans.

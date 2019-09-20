@@ -63,12 +63,12 @@ showExcerpt colourize Span{..} Blob{..}
   where context = fold contextLines
         contextLines = [ showLineNumber i <> ": " <> unpack (Source.bytes l)
                        | (i, l) <- zip [1..] (Source.lines blobSource)
-                       , inRange (posLine spanStart - 2, posLine spanStart) i
+                       , inRange (line spanStart - 2, line spanStart) i
                        ]
         showLineNumber n = let s = show n in replicate (lineNumberDigits - length s) ' ' <> s
-        lineNumberDigits = succ (floor (logBase 10 (fromIntegral (posLine spanStart) :: Double)))
-        caretPaddingWidth = succ (posColumn spanStart)
-        caret | posLine spanStart == posLine spanEnd = replicate (max 1 (posColumn spanEnd - posColumn spanStart)) '^'
+        lineNumberDigits = succ (floor (logBase 10 (fromIntegral (line spanStart) :: Double)))
+        caretPaddingWidth = succ (column spanStart)
+        caret | line spanStart == line spanEnd = replicate (max 1 (column spanEnd - column spanStart)) '^'
               | otherwise                            = "^..."
 
 withSGRCode :: Flag Colourize -> [SGR] -> ShowS -> ShowS
@@ -94,7 +94,7 @@ showSymbols colourize = go
 
 showSpan :: Maybe FilePath -> Span -> ShowS
 showSpan path Span{..} = maybe (showParen True (showString "interactive")) showString path . showChar ':' . (if spanStart == spanEnd then showPos spanStart else showPos spanStart . showChar '-' . showPos spanEnd)
-  where showPos Pos{..} = shows posLine . showChar ':' . shows posColumn
+  where showPos Pos{..} = shows line . showChar ':' . shows column
 
 showCallStack :: Flag Colourize -> CallStack -> ShowS
 showCallStack colourize callStack = foldr (.) id (intersperse (showChar '\n') (uncurry (showCallSite colourize) <$> getCallStack callStack))

@@ -95,8 +95,8 @@ instance Symbol Grammar where
 
 spanToRangeInLineRanges :: Array Int Range -> Span -> Range
 spanToRangeInLineRanges lineRanges Span{..} = Range
-  (start (lineRanges ! posLine spanStart) + pred (posColumn spanStart))
-  (start (lineRanges ! posLine spanEnd)   + pred (posColumn spanEnd))
+  (start (lineRanges ! line spanStart) + pred (column spanStart))
+  (start (lineRanges ! line spanEnd)   + pred (column spanEnd))
 
 sourceLineRangesByLineNumber :: Source -> Array Int Range
 sourceLineRangesByLineNumber source = listArray (1, length lineRanges) lineRanges
