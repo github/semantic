@@ -52,6 +52,7 @@ test-suite doctest
   build-depends:
       base
     , doctest          >= 0.7 && <1.0
+    , QuickCheck
     , semantic-source
   hs-source-dirs: test
 
