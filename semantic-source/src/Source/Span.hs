@@ -86,23 +86,23 @@ column_ = lens column (\p l -> p { column = l })
 class HasSpan a where
   span  :: Lens' a Span
 
-  start :: Lens' a Pos
-  start = span.start
-  {-# INLINE start #-}
+  start_ :: Lens' a Pos
+  start_ = span.start_
+  {-# INLINE start_ #-}
 
-  end :: Lens' a Pos
-  end = span.end
-  {-# INLINE end #-}
+  end_ :: Lens' a Pos
+  end_ = span.end_
+  {-# INLINE end_ #-}
 
 instance HasSpan Span where
   span  = id
   {-# INLINE span #-}
 
-  start = lens spanStart (\s t -> s { spanStart = t })
-  {-# INLINE start #-}
+  start_ = lens spanStart (\s t -> s { spanStart = t })
+  {-# INLINE start_ #-}
 
-  end   = lens spanEnd   (\s t -> s { spanEnd   = t })
-  {-# INLINE end #-}
+  end_   = lens spanEnd   (\s t -> s { spanEnd   = t })
+  {-# INLINE end_ #-}
 
 
 type Lens' s a = forall f . Functor f => (a -> f a) -> (s -> f s)
