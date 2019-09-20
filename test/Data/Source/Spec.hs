@@ -1,6 +1,7 @@
 module Data.Source.Spec (spec, testTree) where
 
-import Data.Source
+import           Source.Source (Source)
+import qualified Source.Source as Source
 import qualified Data.Text as Text
 import Source.Range
 import Source.Span
@@ -26,28 +27,28 @@ testTree = Tasty.testGroup "Data.Source"
   [ Tasty.testGroup "sourceLineRanges"
     [ prop "produces 1 more range than there are newlines" $ \ source -> do
         summarize source
-        length (sourceLineRanges source) === length (Text.splitOn "\r\n" (toText source) >>= Text.splitOn "\r" >>= Text.splitOn "\n")
+        length (Source.lineRanges source) === length (Text.splitOn "\r\n" (Source.toText source) >>= Text.splitOn "\r" >>= Text.splitOn "\n")
 
     , prop "produces exhaustive ranges" $ \ source -> do
         summarize source
-        foldMap (`slice` source) (sourceLineRanges source) === source
+        foldMap (Source.slice source) (Source.lineRanges source) === source
     ]
 
   , Tasty.testGroup "totalSpan"
     [ testProperty "covers single lines" . property $ do
         n <- forAll $ Gen.int (Hedgehog.Range.linear 0 100)
-        totalSpan (fromText (Text.replicate n "*")) === Span (Pos 1 1) (Pos 1 (max 1 (succ n)))
+        Source.totalSpan (Source.fromText (Text.replicate n "*")) === Span (Pos 1 1) (Pos 1 (max 1 (succ n)))
 
     , testProperty "covers multiple lines" . property $ do
         n <- forAll $ Gen.int (Hedgehog.Range.linear 0 100)
-        totalSpan (fromText (Text.intersperse '\n' (Text.replicate n "*"))) === Span (Pos 1 1) (Pos (max 1 n) (if n > 0 then 2 else 1))
+        Source.totalSpan (Source.fromText (Text.intersperse '\n' (Text.replicate n "*"))) === Span (Pos 1 1) (Pos (max 1 n) (if n > 0 then 2 else 1))
     ]
 
   ]
   where summarize src = do
-          let lines = sourceLines src
+          let lines = Source.lines src
           -- FIXME: this should be using cover (reverted in 1b427b995), but that leads to flaky tests: hedgehog’s 'cover' implementation fails tests instead of warning, and currently has no equivalent to 'checkCoverage'.
-          classify "empty"          $ nullSource src
+          classify "empty"          $ Source.null src
           classify "single-line"    $ length lines == 1
           classify "multiple lines" $ length lines >  1
 
@@ -56,16 +57,16 @@ spec = do
   describe "newlineIndices" $ do
     it "finds \\n" $
       let source = "a\nb" in
-      newlineIndices source `shouldBe` [1]
+      Source.newlineIndices source `shouldBe` [1]
     it "finds \\r" $
       let source = "a\rb" in
-      newlineIndices source `shouldBe` [1]
+      Source.newlineIndices source `shouldBe` [1]
     it "finds \\r\\n" $
       let source = "a\r\nb" in
-      newlineIndices source `shouldBe` [2]
+      Source.newlineIndices source `shouldBe` [2]
     it "finds intermixed line endings" $
       let source = "hi\r}\r}\n xxx \r a" in
-      newlineIndices source `shouldBe` [2, 4, 6, 12]
+      Source.newlineIndices source `shouldBe` [2, 4, 6, 12]
 
 insetSpan :: Span -> Span
 insetSpan sourceSpan = sourceSpan { spanStart = (spanStart sourceSpan) { posColumn = succ (posColumn (spanStart sourceSpan)) }

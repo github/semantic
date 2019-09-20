@@ -51,7 +51,7 @@ contextualizing Blob{..} symbolsToSummarize = Streaming.mapMaybeM $ \case
       -> Just $ Tag iden x span (fmap fst xs) (firstLine (slice r)) (slice docsLiteralRange)
     _ -> Nothing
   where
-    slice = fmap (stripEnd . Source.toText . flip Source.slice blobSource)
+    slice = fmap (stripEnd . Source.toText . Source.slice blobSource)
     firstLine = fmap (T.take 180 . fst . breakOn "\n")
 
 enterScope, exitScope :: ( Member (State [ContextToken]) sig

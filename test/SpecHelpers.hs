@@ -45,7 +45,7 @@ import Data.Functor.Listable as X
 import Data.Language as X
 import Data.List.NonEmpty as X (NonEmpty(..))
 import Data.Semilattice.Lower as X
-import Data.Source as X
+import Source.Source as X (Source)
 import Data.String
 import Data.Sum
 import Data.Term as X

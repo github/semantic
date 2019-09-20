@@ -80,7 +80,7 @@ instance CustomHasDeclaration whole Markdown.Heading where
     = Just $ HeadingDeclaration (headingText terms) mempty (locSpan ann) (blobLanguage blob) level
     where headingText terms = getSource $ maybe (locByteRange ann) sconcat (nonEmpty (headingByteRange <$> toList terms))
           headingByteRange (Term (In ann _), _) = locByteRange ann
-          getSource = firstLine . toText . flip Source.slice blobSource
+          getSource = firstLine . toText . Source.slice blobSource
           firstLine = T.takeWhile (/= '\n')
 
 -- | Produce an 'ErrorDeclaration' for 'Syntax.Error' nodes.
@@ -126,11 +126,11 @@ getIdentifier finder Blob{..} (In a r)
   = let declRange = locByteRange a
         bodyRange = locByteRange <$> rewrite (fmap fst r) (finder >>^ annotation)
         -- Text-based gyrations to slice the identifier out of the provided blob source
-        sliceFrom = T.stripEnd . toText . flip Source.slice blobSource . subtractRange declRange
+        sliceFrom = T.stripEnd . toText . Source.slice blobSource . subtractRange declRange
     in maybe mempty sliceFrom bodyRange
 
 getSource :: Source -> Loc -> Text
-getSource blobSource = toText . flip Source.slice blobSource . locByteRange
+getSource blobSource = toText . Source.slice blobSource . locByteRange
 
 -- | Produce a 'Declaration' for 'Sum's using the 'HasDeclaration' instance & therefore using a 'CustomHasDeclaration' instance when one exists & the type is listed in 'DeclarationStrategy'.
 instance Apply (HasDeclaration' whole) fs => CustomHasDeclaration whole (Sum fs) where
