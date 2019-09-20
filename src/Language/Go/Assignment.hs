@@ -132,7 +132,7 @@ type Syntax =
    , Literal.Boolean
    ]
 
-type Term = Term.Term (Sum Syntax) Location
+type Term = Term.Term (Sum Syntax) Loc
 type Assignment = Assignment.Assignment [] Grammar
 
 -- | Assignment from AST in Go's grammar onto a program in Go's syntax.

@@ -44,10 +44,8 @@ import Data.Foldable (toList)
 import Data.Functor.Listable as X
 import Data.Language as X
 import Data.List.NonEmpty as X (NonEmpty(..))
-import Data.Range as X
 import Data.Semilattice.Lower as X
-import Data.Source as X
-import Data.Span as X hiding (HasSpan(..))
+import Source.Source as X (Source)
 import Data.String
 import Data.Sum
 import Data.Term as X
@@ -55,7 +53,8 @@ import Parsing.Parser as X
 import Semantic.Task as X
 import Semantic.Util as X
 import Semantic.Graph (runHeap, runScopeGraph)
-import System.FilePath as X
+import Source.Range as X hiding (start, end, point)
+import Source.Span as X hiding (HasSpan(..), start, end, point)
 import Debug.Trace as X (traceShowM, traceM)
 
 import Data.ByteString as X (ByteString)
@@ -75,6 +74,7 @@ import Semantic.Telemetry (LogQueue, StatQueue)
 import Semantic.Api hiding (File, Blob, BlobPair)
 import System.Exit (die)
 import Control.Exception (displayException)
+import qualified System.Path as Path
 
 runBuilder :: Builder -> ByteString
 runBuilder = toStrict . toLazyByteString
@@ -85,24 +85,27 @@ instance IsString Name where
   fromString = X.name . fromString
 
 -- | Returns an s-expression formatted diff for the specified FilePath pair.
-diffFilePaths :: TaskSession -> Both FilePath -> IO ByteString
-diffFilePaths session paths = readFilePathPair paths >>= runTask session . parseDiffBuilder @[] DiffSExpression . pure >>= either (die . displayException) (pure . runBuilder)
+diffFilePaths :: TaskSession -> Both Path.RelFile -> IO ByteString
+diffFilePaths session paths
+  = readFilePathPair paths
+    >>= runTask session . parseDiffBuilder @[] DiffSExpression . pure
+    >>= either (die . displayException) (pure . runBuilder)
 
--- | Returns an s-expression parse tree for the specified FilePath.
-parseFilePath :: TaskSession -> FilePath -> IO (Either SomeException ByteString)
+-- | Returns an s-expression parse tree for the specified path.
+parseFilePath :: TaskSession -> Path.RelFile -> IO (Either SomeException ByteString)
 parseFilePath session path = do
-  blob <- readBlobFromFile (fileForPath path)
+  blob <- readBlobFromFile (fileForRelPath path)
   res <- runTask session $ parseTermBuilder TermSExpression (toList blob)
   pure (runBuilder <$> res)
 
 -- | Read two files to a BlobPair.
-readFilePathPair :: Both FilePath -> IO BlobPair
-readFilePathPair paths = let paths' = fmap fileForPath paths in
+readFilePathPair :: Both Path.RelFile -> IO BlobPair
+readFilePathPair paths = let paths' = fmap fileForRelPath paths in
                      runBothWith readFilePair paths'
 
-parseTestFile :: Parser term -> FilePath -> IO (Blob, term)
+parseTestFile :: Parser term -> Path.RelFile -> IO (Blob, term)
 parseTestFile parser path = runTaskOrDie $ do
-  blob <- readBlob (fileForPath path)
+  blob <- readBlob (fileForPath (Path.toString path))
   term <- parse parser blob
   pure (blob, term)
 

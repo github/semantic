@@ -15,10 +15,8 @@ import qualified Data.Abstract.Path.Spec
 import qualified Data.Functor.Classes.Generic.Spec
 import qualified Data.Graph.Spec
 import qualified Data.Language.Spec
-import qualified Data.Range.Spec
 import qualified Data.Scientific.Spec
 import qualified Data.Semigroup.App.Spec
-import qualified Data.Source.Spec
 import qualified Data.Term.Spec
 import qualified Diffing.Algorithm.RWS.Spec
 import qualified Diffing.Algorithm.SES.Spec
@@ -48,7 +46,6 @@ tests =
   [ Integration.Spec.testTree
   , Semantic.CLI.Spec.testTree
   , Data.Language.Spec.testTree
-  , Data.Source.Spec.testTree
   , Semantic.Stat.Spec.testTree
   , Data.Scientific.Spec.testTree
   ]
@@ -81,9 +78,7 @@ legacySpecs = parallel $ do
   describe "Data.Abstract.Path" Data.Abstract.Path.Spec.spec
   describe "Data.Abstract.Name" Data.Abstract.Name.Spec.spec
   describe "Data.Functor.Classes.Generic" Data.Functor.Classes.Generic.Spec.spec
-  describe "Data.Range" Data.Range.Spec.spec
   describe "Data.Semigroup.App" Data.Semigroup.App.Spec.spec
-  describe "Data.Source" Data.Source.Spec.spec
   describe "Data.Term" Data.Term.Spec.spec
   describe "Diffing.Algorithm.RWS" Diffing.Algorithm.RWS.Spec.spec
   describe "Diffing.Algorithm.SES" Diffing.Algorithm.SES.Spec.spec

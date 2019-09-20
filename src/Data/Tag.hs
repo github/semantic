@@ -10,7 +10,7 @@ import Prologue
 import Data.Aeson
 import Control.Lens.Lens
 
-import Data.Span
+import Source.Span
 
 -- | These selectors aren't prefixed with @tag@ for reasons of JSON
 -- backwards compatibility.
@@ -24,5 +24,5 @@ data Tag = Tag
   } deriving (Eq, Show, Generic, ToJSON)
 
 instance HasSpan Tag where
-  span = lens Data.Tag.span (\t s -> t { Data.Tag.span = s })
-  {-# INLINE span #-}
+  span_ = lens span (\t s -> t { span = s })
+  {-# INLINE span_ #-}

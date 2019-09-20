@@ -16,7 +16,7 @@ import           Data.Reprinting.Errors
 import           Data.Reprinting.Scope
 import           Data.Reprinting.Splice
 import           Data.Reprinting.Token
-import qualified Data.Source as Source
+import qualified Source.Source as Source
 
 type TranslatorC
   = StateC [Scope]

@@ -199,7 +199,7 @@ type Syntax = '[
   , TypeScript.Syntax.AnnotatedExpression
   ]
 
-type Term = Term.Term (Sum Syntax) Location
+type Term = Term.Term (Sum Syntax) Loc
 type Assignment = Assignment.Assignment [] Grammar
 
 -- | Assignment from AST in TypeScript’s grammar onto a program in TypeScript’s syntax.
@@ -456,7 +456,7 @@ callSignatureParts = contextualize' <$> Assignment.manyThrough comment (postCont
       Nothing -> (typeParams, formalParams, annotation)
 
 callSignature :: Assignment Term
-callSignature =  makeTerm <$> location <*> (TypeScript.Syntax.CallSignature <$> (fromMaybe <$> emptyTerm <*> optional (term typeParameters)) <*> formalParameters <*> (fromMaybe <$> emptyTerm <*> optional (term typeAnnotation')))
+callSignature =  makeTerm <$> symbol Grammar.CallSignature <*> children (TypeScript.Syntax.CallSignature <$> (fromMaybe <$> emptyTerm <*> optional (term typeParameters)) <*> formalParameters <*> (fromMaybe <$> emptyTerm <*> optional (term typeAnnotation')))
 
 constructSignature :: Assignment Term
 constructSignature = makeTerm <$> symbol Grammar.ConstructSignature <*> children (TypeScript.Syntax.ConstructSignature <$> (fromMaybe <$> emptyTerm <*> optional (term typeParameters)) <*> formalParameters <*> (fromMaybe <$> emptyTerm <*> optional (term typeAnnotation')))

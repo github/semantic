@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, LambdaCase, RankNTypes, TypeOperators, ScopedTypeVariables, UndecidableInstances #-}
+{-# LANGUAGE GADTs, LambdaCase, RankNTypes, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Tags.Tagging
 ( runTagging
 , Tag(..)
@@ -14,16 +14,16 @@ import           Streaming
 import qualified Streaming.Prelude as Streaming
 
 import           Data.Blob
-import           Data.Location
-import qualified Data.Source as Source
 import           Data.Tag
 import           Data.Term
+import           Source.Loc
+import qualified Source.Source as Source
 import           Tags.Taggable
 
 runTagging :: (IsTaggable syntax)
            => Blob
            -> [Text]
-           -> Term syntax Location
+           -> Term syntax Loc
            -> [Tag]
 runTagging blob symbolsToSummarize
   = Eff.run
@@ -51,7 +51,7 @@ contextualizing Blob{..} symbolsToSummarize = Streaming.mapMaybeM $ \case
       -> Just $ Tag iden x span (fmap fst xs) (firstLine (slice r)) (slice docsLiteralRange)
     _ -> Nothing
   where
-    slice = fmap (stripEnd . Source.toText . flip Source.slice blobSource)
+    slice = fmap (stripEnd . Source.toText . Source.slice blobSource)
     firstLine = fmap (T.take 180 . fst . breakOn "\n")
 
 enterScope, exitScope :: ( Member (State [ContextToken]) sig
