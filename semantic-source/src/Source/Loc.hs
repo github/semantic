@@ -1,6 +1,7 @@
 {-# LANGUAGE DeriveGeneric, DerivingVia, RankNTypes #-}
 module Source.Loc
 ( Loc(..)
+, byteRange_
 , Span(Span)
 , Range(Range)
 ) where
@@ -26,6 +27,10 @@ instance NFData   Loc
 instance HasSpan Loc where
   span_ = lens span (\l s -> l { span = s })
   {-# INLINE span_ #-}
+
+
+byteRange_ :: Lens' Loc Range
+byteRange_ = lens byteRange (\l r -> l { byteRange = r })
 
 
 type Lens' s a = forall f . Functor f => (a -> f a) -> (s -> f s)
