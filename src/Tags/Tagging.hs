@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, LambdaCase, RankNTypes, TypeOperators, ScopedTypeVariables, UndecidableInstances #-}
+{-# LANGUAGE GADTs, LambdaCase, RankNTypes, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Tags.Tagging
 ( runTagging
 , Tag(..)
@@ -14,10 +14,10 @@ import           Streaming
 import qualified Streaming.Prelude as Streaming
 
 import           Data.Blob
-import qualified Data.Source as Source
 import           Data.Tag
 import           Data.Term
 import           Source.Loc
+import qualified Source.Source as Source
 import           Tags.Taggable
 
 runTagging :: (IsTaggable syntax)

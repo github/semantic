@@ -13,7 +13,7 @@ import           Data.Blob
 import           Data.Error (Error (..), Colourize (..), showExpectation)
 import           Data.Flag
 import           Data.Language as Language
-import           Data.Source as Source
+import           Source.Source as Source
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import           Data.Term

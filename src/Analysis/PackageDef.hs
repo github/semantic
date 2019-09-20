@@ -6,7 +6,7 @@ module Analysis.PackageDef
 ) where
 
 import Data.Blob
-import Data.Source as Source
+import Source.Source as Source
 import Data.Sum
 import Data.Term
 import qualified Data.Text as T

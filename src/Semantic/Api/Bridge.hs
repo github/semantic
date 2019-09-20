@@ -8,10 +8,10 @@ module Semantic.Api.Bridge
 import           Control.Lens
 import qualified Data.Blob as Data
 import qualified Data.Language as Data
-import           Data.Source (fromText, toText)
 import qualified Data.Text as T
 import qualified Semantic.Api.LegacyTypes as Legacy
 import qualified Semantic.Proto.SemanticPB as API
+import           Source.Source (fromText, toText)
 import qualified Source.Span as Source
 
 -- | An @APIBridge x y@ instance describes an isomorphism between @x@ and @y@.

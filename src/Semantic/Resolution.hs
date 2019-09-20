@@ -1,4 +1,5 @@
-{-# LANGUAGE ConstraintKinds, DeriveAnyClass, DerivingStrategies, GADTs, GeneralizedNewtypeDeriving, KindSignatures, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE ConstraintKinds, DeriveAnyClass, DerivingStrategies, GADTs, GeneralizedNewtypeDeriving, KindSignatures,
+             ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Semantic.Resolution
   ( Resolution (..)
   , nodeJSResolutionMap
@@ -11,13 +12,13 @@ import           Control.Effect.Carrier
 import           Data.Aeson
 import           Data.Aeson.Types (parseMaybe)
 import           Data.Blob
-import           Data.Project
-import qualified Data.Map as Map
-import           Data.Source
 import           Data.Language
-import           Prologue
+import qualified Data.Map as Map
+import           Data.Project
 import           GHC.Generics (Generic1)
+import           Prologue
 import           Semantic.Task.Files
+import           Source.Source
 import           System.FilePath.Posix
 
 

@@ -6,9 +6,9 @@ module Parsing.TreeSitter
 
 import Prologue hiding (bracket)
 
-import qualified Control.Exception as Exc (bracket)
 import           Control.Effect.Resource
 import           Control.Effect.Trace
+import qualified Control.Exception as Exc (bracket)
 import           Data.ByteString.Unsafe (unsafeUseAsCStringLen)
 import           Foreign
 import           Foreign.C.Types (CBool (..))
@@ -17,9 +17,9 @@ import           Foreign.Marshal.Array (allocaArray)
 import Data.AST (AST, Node (Node))
 import Data.Blob
 import Data.Duration
-import Data.Source
 import Data.Term
 import Source.Loc
+import Source.Source
 import Source.Span
 
 import qualified TreeSitter.Language as TS

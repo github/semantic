@@ -1,10 +1,10 @@
 module Data.Source.Spec (spec, testTree) where
 
+import qualified Data.Text as Text
+import           Source.Range
 import           Source.Source (Source)
 import qualified Source.Source as Source
-import qualified Data.Text as Text
-import Source.Range
-import Source.Span
+import           Source.Span
 
 import Test.Hspec
 

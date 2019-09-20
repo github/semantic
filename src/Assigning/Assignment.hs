@@ -100,7 +100,7 @@ import qualified Assigning.Assignment.Table as Table
 import Control.Monad.Except (MonadError (..))
 import Data.AST
 import Data.Error
-import qualified Data.Source as Source (Source, slice, sourceBytes)
+import qualified Source.Source as Source (Source, slice, sourceBytes)
 import Data.Term
 import Data.Text (Text)
 import Data.Text.Encoding (decodeUtf8')

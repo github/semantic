@@ -7,9 +7,9 @@ module Data.Reprinting.Token
   , Flow (..)
   ) where
 
-import Data.Text (Text)
-import Data.Source (Source)
 import Data.Reprinting.Scope
+import Data.Text (Text)
+import Source.Source (Source)
 
 -- | 'Token' encapsulates 'Element' and 'Control' tokens, as well as sliced
 -- portions of the original 'Source' for a given AST.
@@ -21,11 +21,11 @@ data Token
 
 isChunk :: Token -> Bool
 isChunk (Chunk _) = True
-isChunk _ = False
+isChunk _         = False
 
 isControl :: Token -> Bool
 isControl (Control _) = True
-isControl _ = False
+isControl _           = False
 
 -- | 'Element' tokens describe atomic pieces of source code to be
 -- output to a rendered document. These tokens are language-agnostic

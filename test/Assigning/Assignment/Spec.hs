@@ -6,13 +6,13 @@ import Data.AST
 import Data.Bifunctor (first)
 import Data.Ix
 import Data.Semigroup ((<>))
-import Data.Source
 import Data.Term
 import Data.Text as T (Text, length, words)
 import Data.Text.Encoding (encodeUtf8)
 import GHC.Stack (getCallStack)
 import Prelude hiding (words)
 import Source.Range
+import Source.Source
 import Source.Span
 import Test.Hspec
 import TreeSitter.Language (Symbol (..), SymbolType (..))

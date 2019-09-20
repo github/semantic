@@ -13,7 +13,7 @@ import Data.AST
 import Data.Error
 import qualified Data.IntMap as IntMap
 import qualified Data.IntSet as IntSet
-import Data.Source as Source
+import Source.Source as Source
 import qualified Data.Syntax as Syntax
 import Data.Term (Term, termIn, termAnnotation, termOut)
 import Data.Text.Encoding (decodeUtf8')

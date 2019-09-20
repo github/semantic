@@ -1,4 +1,5 @@
-{-# LANGUAGE ConstraintKinds, ExistentialQuantification, GADTs, GeneralizedNewtypeDeriving, KindSignatures, ScopedTypeVariables, StandaloneDeriving, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE ConstraintKinds, ExistentialQuantification, GADTs, GeneralizedNewtypeDeriving, KindSignatures,
+             ScopedTypeVariables, StandaloneDeriving, TypeOperators, UndecidableInstances #-}
 module Semantic.Task
 ( Task
 , TaskEff
@@ -71,7 +72,6 @@ import           Data.ByteString.Builder
 import           Data.Diff
 import qualified Data.Error as Error
 import qualified Data.Flag as Flag
-import           Data.Source (Source)
 import           Data.Sum
 import qualified Data.Syntax as Syntax
 import           Data.Term
@@ -83,12 +83,13 @@ import           Parsing.TreeSitter
 import           Prologue hiding (project)
 import           Semantic.Config
 import           Semantic.Distribute
-import qualified Semantic.Task.Files as Files
-import           Semantic.Timeout
 import           Semantic.Resolution
+import qualified Semantic.Task.Files as Files
 import           Semantic.Telemetry
+import           Semantic.Timeout
 import           Serializing.Format hiding (Options)
 import           Source.Loc
+import           Source.Source (Source)
 
 -- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
 type TaskEff
@@ -191,7 +192,7 @@ newtype TraceInTelemetryC m a = TraceInTelemetryC { runTraceInTelemetryC :: m a 
   deriving (Applicative, Functor, Monad, MonadIO)
 
 instance (Member Telemetry sig, Carrier sig m) => Carrier (Trace :+: sig) (TraceInTelemetryC m) where
-  eff (R other) = TraceInTelemetryC . eff . handleCoercible $ other
+  eff (R other)         = TraceInTelemetryC . eff . handleCoercible $ other
   eff (L (Trace str k)) = writeLog Debug str [] >> k
 
 
@@ -206,18 +207,18 @@ data Task (m :: * -> *) k
 deriving instance Functor m => Functor (Task m)
 
 instance HFunctor Task where
-  hmap f (Parse parser blob k) = Parse parser blob (f . k)
-  hmap f (Decorate decorator term k) = Decorate decorator term (f . k)
+  hmap f (Parse parser blob k)        = Parse parser blob (f . k)
+  hmap f (Decorate decorator term k)  = Decorate decorator term (f . k)
   hmap f (Semantic.Task.Diff terms k) = Semantic.Task.Diff terms (f . k)
-  hmap f (Render renderer input k) = Render renderer input (f . k)
-  hmap f (Serialize format input k) = Serialize format input (f . k)
+  hmap f (Render renderer input k)    = Render renderer input (f . k)
+  hmap f (Serialize format input k)   = Serialize format input (f . k)
 
 instance Effect Task where
-  handle state handler (Parse parser blob k) = Parse parser blob (handler . (<$ state) . k)
-  handle state handler (Decorate decorator term k) = Decorate decorator term (handler . (<$ state) . k)
+  handle state handler (Parse parser blob k)        = Parse parser blob (handler . (<$ state) . k)
+  handle state handler (Decorate decorator term k)  = Decorate decorator term (handler . (<$ state) . k)
   handle state handler (Semantic.Task.Diff terms k) = Semantic.Task.Diff terms (handler . (<$ state) . k)
-  handle state handler (Render renderer input k) = Render renderer input (handler . (<$ state) . k)
-  handle state handler (Serialize format input k) = Serialize format input (handler . (<$ state) . k)
+  handle state handler (Render renderer input k)    = Render renderer input (handler . (<$ state) . k)
+  handle state handler (Serialize format input k)   = Serialize format input (handler . (<$ state) . k)
 
 -- | Run a 'Task' effect by performing the actions in 'IO'.
 runTaskF :: TaskC m a -> m a
@@ -280,7 +281,7 @@ runParser blob@Blob{..} parser = case parser of
         errors :: (Syntax.Error :< fs, Apply Foldable fs, Apply Functor fs) => Term (Sum fs) Assignment.Loc -> [Error.Error String]
         errors = cata $ \ (In Assignment.Loc{..} syntax) -> case syntax of
           _ | Just err@Syntax.Error{} <- project syntax -> [Syntax.unError locSpan err]
-          _ -> fold syntax
+          _                                             -> fold syntax
         runAssignment :: ( Apply Foldable syntaxes
                          , Apply Functor syntaxes
                          , Element Syntax.Error syntaxes

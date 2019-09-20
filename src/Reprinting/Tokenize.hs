@@ -27,20 +27,20 @@ module Reprinting.Tokenize
   , tokenizing
   ) where
 
-import Prelude hiding (fail, log, filter)
-import Prologue hiding (Element, hash)
-import Streaming hiding (Sum)
+import           Prelude hiding (fail, filter, log)
+import           Prologue hiding (Element, hash)
+import           Streaming hiding (Sum)
 import qualified Streaming.Prelude as Streaming
 
 import           Data.History
 import           Data.List (intersperse)
+import           Data.Reprinting.Operator as Operator
 import           Data.Reprinting.Scope (Scope)
 import qualified Data.Reprinting.Scope as Scope
 import           Data.Reprinting.Token as Token
-import           Data.Reprinting.Operator as Operator
-import           Data.Source
 import           Data.Term
 import           Source.Range
+import           Source.Source
 
 -- | The 'Tokenizer' monad represents a context in which 'Control'
 -- tokens and 'Element' tokens can be sent to some downstream
