@@ -3,7 +3,6 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-} -- FIXME
 module Language.Python.Syntax where
 
-import Prelude hiding (span)
 import Prologue
 
 import           Control.Lens.Getter

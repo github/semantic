@@ -14,7 +14,6 @@ module Data.Term
 , Annotated (..)
 ) where
 
-import Prelude hiding (span)
 import Prologue
 
 import           Control.Lens.Lens

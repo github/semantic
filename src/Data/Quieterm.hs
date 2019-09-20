@@ -4,8 +4,6 @@ module Data.Quieterm
 , quieterm
 ) where
 
-import Prelude hiding (span)
-
 import Control.Lens
 import Control.DeepSeq
 import Data.Abstract.Declarations (Declarations)

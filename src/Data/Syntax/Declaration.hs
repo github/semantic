@@ -2,7 +2,6 @@
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Data.Syntax.Declaration where
 
-import Prelude hiding (span)
 import Prologue
 
 import           Control.Lens.Getter

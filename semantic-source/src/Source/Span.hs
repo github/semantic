@@ -18,7 +18,6 @@ import           Data.Hashable (Hashable)
 import           Data.Semilattice.Lower (Lower(..))
 import           GHC.Generics (Generic)
 import           GHC.Stack (SrcLoc(..))
-import           Prelude hiding (span)
 
 -- | A Span of position information
 data Span = Span

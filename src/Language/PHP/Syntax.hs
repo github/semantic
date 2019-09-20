@@ -2,7 +2,6 @@
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Language.PHP.Syntax where
 
-import Prelude hiding (span)
 import Prologue hiding (Text)
 
 import           Control.Lens.Getter
