@@ -1,6 +1,7 @@
 {-# LANGUAGE DeriveGeneric, RankNTypes #-}
 module Source.Range
 ( Range(..)
+, point
 , rangeLength
 , subtractRange
   -- * Lenses
@@ -31,6 +32,9 @@ instance Semigroup Range where
 instance Lower Range where
   lowerBound = Range 0 0
 
+
+point :: Int -> Range
+point i = Range i i
 
 -- | Return the length of the range.
 rangeLength :: Range -> Int
