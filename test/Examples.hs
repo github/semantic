@@ -9,7 +9,7 @@ import qualified Data.ByteString as B
 import           Data.ByteString.Builder
 import qualified Data.ByteString.Char8 as BC
 import           Data.Either
-import           Data.Blob (fileForPath)
+import           Data.Blob (fileForRelPath)
 import           Data.Flag
 import           Data.Foldable
 import           Data.List
@@ -49,7 +49,7 @@ main = withOptions opts $ \ config logger statter -> hspec . parallel $ do
       files <- runIO $ globDir1 (compile ("**/*" <> languageExtension)) (Path.toString (tsDir </> languageExampleDir))
       let paths = Path.relFile <$> files
       for_ paths $ \file -> it (Path.toString file) $ do
-        res <- runTask session (parseFilePath (Path.toString file))
+        res <- runTask session (parseFilePath file)
         case res of
           Left (SomeException e) -> case cast e of
             -- We have a number of known assignment timeouts, consider these pending specs instead of failing the build.
@@ -105,8 +105,8 @@ languages =
   -- , ("php", ".php") -- TODO: No parse-examples in tree-sitter yet
   ] where examples = Path.relDir "examples"
 
-parseFilePath :: (Member (Error SomeException) sig, Member Distribute sig, Member Task sig, Member Files sig, Carrier sig m, MonadIO m) => FilePath -> m Bool
-parseFilePath path = readBlob (fileForPath path) >>= parseTermBuilder @[] TermShow . pure >>= const (pure True)
+parseFilePath :: (Member (Error SomeException) sig, Member Distribute sig, Member Task sig, Member Files sig, Carrier sig m, MonadIO m) => Path.RelFile -> m Bool
+parseFilePath path = readBlob (fileForRelPath path) >>= parseTermBuilder @[] TermShow . pure >>= const (pure True)
 
 languagesDir :: Path.RelDir
 languagesDir = Path.relDir "tmp/haskell-tree-sitter"
