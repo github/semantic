@@ -6,44 +6,45 @@ import Data.Foldable (find)
 import Data.List (union, concat, transpose)
 import qualified Data.ByteString.Lazy as BL
 import System.FilePath.Glob
-import System.FilePath.Posix
 import System.IO.Unsafe
 
 import SpecHelpers
+import qualified System.Path as Path
+import System.Path ((</>))
 
 import Test.Tasty
 import Test.Tasty.Golden
 
-languages :: [FilePath]
-languages = ["go", "javascript", "json", "python", "ruby", "typescript", "tsx"]
+languages :: [Path.RelDir]
+languages = fmap Path.relDir ["go", "javascript", "json", "python", "ruby", "typescript", "tsx"]
 
 testTree :: (?session :: TaskSession) => TestTree
 testTree = testGroup "Integration (golden tests)" $ fmap testsForLanguage languages
 
-testsForLanguage :: (?session :: TaskSession) => FilePath -> TestTree
+testsForLanguage :: (?session :: TaskSession) => Path.RelDir -> TestTree
 testsForLanguage language = do
-  let dir = "test/fixtures" </> language </> "corpus"
+  let dir = Path.relDir "test/fixtures" </> language </> Path.relDir "corpus"
   let items = unsafePerformIO (examples dir)
-  localOption (mkTimeout 3000000) $ testGroup language $ fmap testForExample items
+  localOption (mkTimeout 3000000) $ testGroup (Path.toString language) $ fmap testForExample items
 {-# NOINLINE testsForLanguage #-}
 
-data Example = DiffExample { fileA :: FilePath, fileB :: FilePath, diffOutput :: FilePath }
-             | ParseExample { file :: FilePath, parseOutput :: FilePath }
+data Example = DiffExample { fileA :: Path.RelFile, fileB :: Path.RelFile, diffOutput :: Path.RelFile }
+             | ParseExample { file :: Path.RelFile, parseOutput :: Path.RelFile }
              deriving (Eq, Show)
 
 testForExample :: (?session :: TaskSession) => Example -> TestTree
 testForExample = \case
   DiffExample{fileA, fileB, diffOutput} ->
     goldenVsStringDiff
-      ("diffs " <> diffOutput)
+      ("diffs " <> Path.toString diffOutput)
       (\ref new -> ["git", "diff", ref, new])
-      diffOutput
+      (Path.toString diffOutput)
       (BL.fromStrict <$> diffFilePaths ?session (Both fileA fileB))
   ParseExample{file, parseOutput} ->
     goldenVsStringDiff
-      ("parses " <> parseOutput)
+      ("parses " <> Path.toString parseOutput)
       (\ref new -> ["git", "diff", ref, new])
-      parseOutput
+      (Path.toString parseOutput)
       (parseFilePath ?session file >>= either throw (pure . BL.fromStrict))
 
 
@@ -58,7 +59,7 @@ testForExample = \case
 -- |
 -- | example-name.parseA.txt - The expected sexpression parse tree for example-name.A.rb
 -- | example-name.parseB.txt - The expected sexpression parse tree for example-name.B.rb
-examples :: FilePath -> IO [Example]
+examples :: Path.RelDir -> IO [Example]
 examples directory = do
   as <- globFor "*.A.*"
   bs <- globFor "*.B.*"
@@ -83,17 +84,17 @@ examples directory = do
               Just out -> f out name : acc
               Nothing -> acc
 
-    lookupNormalized :: FilePath -> [FilePath] -> FilePath
+    lookupNormalized :: Path.RelFile -> [Path.RelFile] -> Path.RelFile
     lookupNormalized name xs = fromMaybe
-      (error ("cannot find " <> name <> " make sure .A, .B and exist."))
+      (error ("cannot find " <> Path.toString name <> " make sure .A, .B and exist."))
       (lookupNormalized' name xs)
 
-    lookupNormalized' :: FilePath -> [FilePath] -> Maybe FilePath
+    lookupNormalized' :: Path.RelFile -> [Path.RelFile] -> Maybe Path.RelFile
     lookupNormalized' name = find ((== name) . normalizeName)
 
-    globFor :: FilePath -> IO [FilePath]
-    globFor p = globDir1 (compile p) directory
+    globFor :: String -> IO [Path.RelFile]
+    globFor p = fmap Path.relFile <$> globDir1 (compile p) (Path.toString directory)
 
 -- | Given a test name like "foo.A.js", return "foo".
-normalizeName :: FilePath -> FilePath
-normalizeName path = dropExtension $ dropExtension path
+normalizeName :: Path.RelFile -> Path.RelFile
+normalizeName = Path.dropExtension . Path.dropExtension
