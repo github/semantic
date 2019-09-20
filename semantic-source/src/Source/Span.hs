@@ -21,8 +21,8 @@ import           GHC.Stack (SrcLoc(..))
 
 -- | A Span of position information
 data Span = Span
-  { spanStart :: {-# UNPACK #-} !Pos
-  , spanEnd   :: {-# UNPACK #-} !Pos
+  { start :: {-# UNPACK #-} !Pos
+  , end   :: {-# UNPACK #-} !Pos
   }
   deriving (Eq, Ord, Generic, Show)
 
@@ -34,8 +34,8 @@ instance Semigroup Span where
 
 instance A.ToJSON Span where
   toJSON s = A.object
-    [ "start" .= spanStart s
-    , "end"   .= spanEnd   s
+    [ "start" .= start s
+    , "end"   .= end   s
     ]
 
 instance A.FromJSON Span where
@@ -97,10 +97,10 @@ instance HasSpan Span where
   span_  = id
   {-# INLINE span_ #-}
 
-  start_ = lens spanStart (\s t -> s { spanStart = t })
+  start_ = lens start (\s t -> s { start = t })
   {-# INLINE start_ #-}
 
-  end_   = lens spanEnd   (\s t -> s { spanEnd   = t })
+  end_   = lens end   (\s t -> s { end   = t })
   {-# INLINE end_ #-}
 
 

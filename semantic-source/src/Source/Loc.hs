@@ -1,8 +1,8 @@
 {-# LANGUAGE DeriveGeneric, DerivingVia #-}
 module Source.Loc
 ( Loc(..)
-, Span(..)
-, Range(..)
+, Span(Span)
+, Range(Range)
 ) where
 
 import Control.DeepSeq (NFData)

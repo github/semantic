@@ -10,6 +10,7 @@ import           Data.Array
 import qualified Data.AST as A
 import           Data.Term
 import           Source.Loc
+import qualified Source.Range as Range
 import           Source.Source (Source)
 import qualified Source.Source as Source
 import           Source.Span hiding (HasSpan (..))
@@ -95,8 +96,8 @@ instance Symbol Grammar where
 
 spanToRangeInLineRanges :: Array Int Range -> Span -> Range
 spanToRangeInLineRanges lineRanges Span{..} = Range
-  (start (lineRanges ! line spanStart) + pred (column spanStart))
-  (start (lineRanges ! line spanEnd)   + pred (column spanEnd))
+  (Range.start (lineRanges ! line start) + pred (column start))
+  (Range.start (lineRanges ! line end)   + pred (column end))
 
 sourceLineRangesByLineNumber :: Source -> Array Int Range
 sourceLineRangesByLineNumber source = listArray (1, length lineRanges) lineRanges

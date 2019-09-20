@@ -15,6 +15,7 @@ import qualified Data.Text as Text
 import           GHC.Generics
 import           Prologue
 import           Source.Loc
+import           Source.Range
 
 class ToJSONFields a where
   toJSONFields :: KeyValue kv => a -> [kv]

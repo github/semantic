@@ -105,8 +105,8 @@ import Data.Term
 import Data.Text (Text)
 import Data.Text.Encoding (decodeUtf8')
 import qualified Source.Loc as L
-import Source.Range
-import Source.Span hiding (HasSpan(..))
+import Source.Range as Range
+import Source.Span as Span
 import Text.Parser.Combinators as Parsers hiding (choice)
 import TreeSitter.Language
 
@@ -305,7 +305,7 @@ skipTokens state = state { stateNodes = dropWhile ((/= Regular) . symbolType . n
 -- | Advances the state past the current (head) node (if any), dropping it off stateNodes, and updating stateOffset & statePos to its end; or else returns the state unchanged.
 advanceState :: State ast grammar -> State ast grammar
 advanceState state@State{..}
-  | Term (In node _) : rest <- stateNodes = State (end (nodeByteRange node)) (spanEnd (nodeSpan node)) stateCallSites rest stateLocals
+  | Term (In node _) : rest <- stateNodes = State (Range.end (nodeByteRange node)) (Span.end (nodeSpan node)) stateCallSites rest stateLocals
   | otherwise = state
 
 -- | State kept while running 'Assignment's.

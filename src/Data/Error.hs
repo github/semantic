@@ -63,12 +63,12 @@ showExcerpt colourize Span{..} Blob{..}
   where context = fold contextLines
         contextLines = [ showLineNumber i <> ": " <> unpack (Source.bytes l)
                        | (i, l) <- zip [1..] (Source.lines blobSource)
-                       , inRange (line spanStart - 2, line spanStart) i
+                       , inRange (line start - 2, line start) i
                        ]
         showLineNumber n = let s = show n in replicate (lineNumberDigits - length s) ' ' <> s
-        lineNumberDigits = succ (floor (logBase 10 (fromIntegral (line spanStart) :: Double)))
-        caretPaddingWidth = succ (column spanStart)
-        caret | line spanStart == line spanEnd = replicate (max 1 (column spanEnd - column spanStart)) '^'
+        lineNumberDigits = succ (floor (logBase 10 (fromIntegral (line start) :: Double)))
+        caretPaddingWidth = succ (column start)
+        caret | line start == line end = replicate (max 1 (column end - column start)) '^'
               | otherwise                            = "^..."
 
 withSGRCode :: Flag Colourize -> [SGR] -> ShowS -> ShowS
@@ -93,7 +93,7 @@ showSymbols colourize = go
         showSymbol = withSGRCode colourize [SetColor Foreground Vivid Red] . showString
 
 showSpan :: Maybe FilePath -> Span -> ShowS
-showSpan path Span{..} = maybe (showParen True (showString "interactive")) showString path . showChar ':' . (if spanStart == spanEnd then showPos spanStart else showPos spanStart . showChar '-' . showPos spanEnd)
+showSpan path Span{..} = maybe (showParen True (showString "interactive")) showString path . showChar ':' . (if start == end then showPos start else showPos start . showChar '-' . showPos end)
   where showPos Pos{..} = shows line . showChar ':' . shows column
 
 showCallStack :: Flag Colourize -> CallStack -> ShowS

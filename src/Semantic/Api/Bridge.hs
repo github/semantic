@@ -55,12 +55,12 @@ instance APIBridge API.Position Source.Pos where
 
 instance APIConvert API.Span Source.Span where
   converting = prism' toAPI fromAPI where
-    toAPI Source.Span{..} = API.Span (bridging #? spanStart) (bridging #? spanEnd)
+    toAPI Source.Span{..} = API.Span (bridging #? start) (bridging #? end)
     fromAPI API.Span{..} = Source.Span <$> (start >>= preview bridging) <*> (end >>= preview bridging)
 
 instance APIConvert Legacy.Span Source.Span where
   converting = prism' toAPI fromAPI where
-    toAPI Source.Span{..} = Legacy.Span (bridging #? spanStart) (bridging #? spanEnd)
+    toAPI Source.Span{..} = Legacy.Span (bridging #? start) (bridging #? end)
     fromAPI Legacy.Span {..} = Source.Span <$> (start >>= preview bridging) <*> (end >>= preview bridging)
 
 instance APIBridge T.Text Data.Language where

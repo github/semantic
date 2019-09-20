@@ -19,7 +19,8 @@ import Data.Term (Term, termIn, termAnnotation, termOut)
 import Data.Text.Encoding (decodeUtf8')
 import Prologue
 import Source.Loc
-import Source.Span hiding (HasSpan (..))
+import Source.Range as Range
+import Source.Span as Span
 
 class (Alternative f, Ord symbol, Show symbol) => Assigning symbol f | f -> symbol where
   leafNode   :: symbol -> f Text
@@ -172,7 +173,7 @@ stateLocation state = Loc (stateRange state) (stateSpan state)
 
 advanceState :: State s -> State s
 advanceState state
-  | s:ss <- stateInput state = State (end (astRange s)) (spanEnd (astSpan s)) ss
+  | s:ss <- stateInput state = State (Range.end (astRange s)) (Span.end (astSpan s)) ss
   | otherwise                = state
 
 

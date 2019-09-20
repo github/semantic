@@ -212,6 +212,6 @@ shouldBreak = do
       span <- ask
       pure (any @[] (matching span) breakpoints)
   where matching Span{..} (OnLine n)
-          | n >= line spanStart
-          , n <= line spanEnd   = True
-          | otherwise           = False
+          | n >= line start
+          , n <= line end   = True
+          | otherwise       = False

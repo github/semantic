@@ -31,7 +31,7 @@ data Line a = Line
   deriving (Eq1, Show1, Ord1) via Generically Line
 
 instance Evaluatable Line where
-  eval _ _ Line = currentSpan >>= integer . fromIntegral . line . spanStart
+  eval _ _ Line = currentSpan >>= integer . fromIntegral . line . start
 
 -- PT TODO: proper token for this
 instance Tokenize Line where

@@ -43,7 +43,7 @@ import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
 import           GHC.Generics (Generic)
 import           Source.Range
-import           Source.Span hiding (HasSpan (..))
+import           Source.Span (Span(Span), Pos(..))
 
 
 -- | The contents of a source file. This is represented as a UTF-8
