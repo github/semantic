@@ -1,4 +1,5 @@
 {-# LANGUAGE UndecidableInstances #-}
+{-# OPTIONS_GHC -fplugin=DumpCore #-}
 module Prologue
   ( module X
   , eitherM
@@ -66,8 +67,8 @@ import GHC.Stack as X
 
 -- | Fold a collection by mapping each element onto an 'Alternative' action.
 foldMapA :: (Alternative m, Foldable t) => (b -> m a) -> t b -> m a
-foldMapA f = getAlt . foldMap (Alt . f)
-
+foldMapA f = getAlt #. foldMap (Alt #. f)
+{-# INLINE foldMapA #-}
 
 maybeLast :: Foldable t => b -> (a -> b) -> t a -> b
 maybeLast b f = maybe b f . getLast . foldMap (Last . Just)
@@ -84,3 +85,7 @@ maybeM f = maybe f pure
 eitherM :: Applicative f => (a -> f b) -> Either a b -> f b
 eitherM f = either f pure
 {-# INLINE eitherM #-}
+
+(#.) :: Coercible b c => (b -> c) -> (a -> b) -> (a -> c)
+(#.) _ = coerce
+{-# INLINE (#.) #-}
