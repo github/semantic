@@ -8,9 +8,6 @@ module Data.Range
 
 import Prologue
 
-import Data.Aeson
-import Data.JSON.Fields
-
 -- | A half-open interval of integers, defined by start & end indices.
 data Range = Range { start :: {-# UNPACK #-} !Int, end :: {-# UNPACK #-} !Int }
   deriving (Eq, Generic, NFData, Ord)
@@ -34,9 +31,6 @@ instance Semigroup Range where
 
 instance Show Range where
   showsPrec _ Range{..} = showChar '[' . shows start . showString " .. " . shows end . showChar ']'
-
-instance ToJSONFields Range where
-  toJSONFields Range{..} = ["sourceRange" .= [ start, end ]]
 
 instance Lower Range where
   lowerBound = Range 0 0
