@@ -45,7 +45,7 @@ testForExample = \case
       ("parses " <> Path.toString parseOutput)
       (\ref new -> ["git", "diff", ref, new])
       (Path.toString parseOutput)
-      (parseFilePath ?session (Path.toString file) >>= either throw (pure . BL.fromStrict))
+      (parseFilePath ?session file >>= either throw (pure . BL.fromStrict))
 
 
 -- | Return all the examples from the given directory. Examples are expected to

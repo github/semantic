@@ -76,7 +76,6 @@ import Semantic.Api hiding (File, Blob, BlobPair)
 import System.Exit (die)
 import Control.Exception (displayException)
 import qualified System.Path as Path
-import qualified System.Path.PartClass as Part
 
 runBuilder :: Builder -> ByteString
 runBuilder = toStrict . toLazyByteString
@@ -90,10 +89,10 @@ instance IsString Name where
 diffFilePaths :: TaskSession -> Both FilePath -> IO ByteString
 diffFilePaths session paths = readFilePathPair paths >>= runTask session . parseDiffBuilder @[] DiffSExpression . pure >>= either (die . displayException) (pure . runBuilder)
 
--- | Returns an s-expression parse tree for the specified FilePath.
-parseFilePath :: TaskSession -> FilePath -> IO (Either SomeException ByteString)
+-- | Returns an s-expression parse tree for the specified path.
+parseFilePath :: TaskSession -> Path.RelFile -> IO (Either SomeException ByteString)
 parseFilePath session path = do
-  blob <- readBlobFromFile (fileForPath path)
+  blob <- readBlobFromFile (fileForPath (Path.toString path))
   res <- runTask session $ parseTermBuilder TermSExpression (toList blob)
   pure (runBuilder <$> res)
 
@@ -102,7 +101,7 @@ readFilePathPair :: Both FilePath -> IO BlobPair
 readFilePathPair paths = let paths' = fmap fileForPath paths in
                      runBothWith readFilePair paths'
 
-parseTestFile :: Part.AbsRel ar => Parser term -> Path.File ar -> IO (Blob, term)
+parseTestFile :: Parser term -> Path.RelFile -> IO (Blob, term)
 parseTestFile parser path = runTaskOrDie $ do
   blob <- readBlob (fileForPath (Path.toString path))
   term <- parse parser blob
