@@ -6,8 +6,8 @@ module Source.Span
 ( Span(..)
 , spanFromSrcLoc
 , Pos(..)
-, line
-, column
+, line_
+, column_
 , HasSpan(..)
 ) where
 
@@ -77,9 +77,9 @@ instance Lower Pos where
   lowerBound = Pos 1 1
 
 
-line, column :: Lens' Pos Int
-line   = lens posLine   (\p l -> p { posLine   = l })
-column = lens posColumn (\p l -> p { posColumn = l })
+line_, column_ :: Lens' Pos Int
+line_   = lens posLine   (\p l -> p { posLine   = l })
+column_ = lens posColumn (\p l -> p { posColumn = l })
 
 
 -- | "Classy-fields" interface for data types that have spans.
