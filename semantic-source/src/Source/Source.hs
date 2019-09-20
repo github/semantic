@@ -110,17 +110,17 @@ lines source = slice source <$> lineRanges source
 
 -- | Compute the 'Range's of each line in a 'Source'.
 lineRanges :: Source -> [Range]
-lineRanges source = lineRangesWithin (totalRange source) source
+lineRanges source = lineRangesWithin source (totalRange source)
 
 -- | Compute the 'Range's of each line in a 'Range' of a 'Source'.
-lineRangesWithin :: Range -> Source -> [Range]
-lineRangesWithin range
+lineRangesWithin :: Source -> Range -> [Range]
+lineRangesWithin source range
   = uncurry (zipWith Range)
   . ((start range:) &&& (<> [ end range ]))
   . fmap (+ succ (start range))
   . newlineIndices
   . sourceBytes
-  . flip slice range
+  $ slice source range
 
 -- | Return all indices of newlines ('\n', '\r', and '\r\n') in the 'ByteString'.
 newlineIndices :: B.ByteString -> [Int]
