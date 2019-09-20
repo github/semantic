@@ -20,10 +20,6 @@ tested-with:         GHC == 8.6.5
 
 library
   exposed-modules:
-    Data.Location
-    Data.Range
-    Data.Source
-    Data.Span
     Tags.Taggable.Precise
   -- other-modules:
   -- other-extensions:
@@ -32,6 +28,7 @@ library
     , base                >= 4.12 && < 5
     , bytestring         ^>= 0.10.8.2
     , fused-effects      ^>= 0.5
+    , semantic-source    ^>= 0.0
     , text               ^>= 1.2.3.1
     , tree-sitter         == 0.3.0.0
     , tree-sitter-python  == 0.4.0.0
