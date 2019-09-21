@@ -55,6 +55,7 @@ import Data.Hashable as X (Hashable, hash, hashUsing, hashWithSalt)
 import Data.Hashable.Lifted as X (Hashable1(..), hashWithSalt1)
 import Data.Monoid as X (First (..), Last (..), Monoid (..))
 import Data.Monoid.Generic as X
+import Data.Profunctor.Unsafe
 import Data.Proxy as X (Proxy (..))
 import Data.Semigroup as X (Semigroup (..))
 import Data.Traversable as X
@@ -66,8 +67,8 @@ import GHC.Stack as X
 
 -- | Fold a collection by mapping each element onto an 'Alternative' action.
 foldMapA :: (Alternative m, Foldable t) => (b -> m a) -> t b -> m a
-foldMapA f = getAlt . foldMap (Alt . f)
-
+foldMapA f = getAlt #. foldMap (Alt #. f)
+{-# INLINE foldMapA #-}
 
 maybeLast :: Foldable t => b -> (a -> b) -> t a -> b
 maybeLast b f = maybe b f . getLast . foldMap (Last . Just)
