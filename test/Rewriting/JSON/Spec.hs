@@ -9,12 +9,12 @@ import           Control.Category
 import           Control.Rewriting as Rewriting
 import qualified Data.ByteString as B
 import           Data.History as History
-import qualified Data.Source as Source
 import           Data.Sum
 import qualified Data.Syntax.Literal as Literal
 import           Data.Text (Text)
 import           Language.JSON.PrettyPrint
 import           Reprinting.Pipeline
+import qualified Source.Source as Source
 
 -- Adds a "hi": "bye" key-value pair to any empty Hash.
 onTrees :: ( Literal.TextElement :< syn

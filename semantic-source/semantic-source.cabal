@@ -1,0 +1,88 @@
+cabal-version:       2.4
+
+name:                semantic-source
+version:             0.0.0.0
+synopsis:            Types and functionality for working with source code
+description:         Types and functionality for working with source code (program text).
+homepage:            https://github.com/github/semantic/tree/master/semantic-source#readme
+bug-reports:         https://github.com/github/semantic/issues
+license:             MIT
+license-file:        LICENSE
+author:              The Semantic authors
+maintainer:          opensource+semantic@github.com
+copyright:           (c) 2019 GitHub, Inc.
+category:            Data
+build-type:          Simple
+stability:           alpha
+extra-source-files:
+  README.md
+
+
+tested-with:
+  GHC == 8.6.5
+
+common common
+  default-language: Haskell2010
+  ghc-options:
+    -Weverything
+    -Wno-missing-local-signatures
+    -Wno-missing-import-lists
+    -Wno-implicit-prelude
+    -Wno-safe
+    -Wno-unsafe
+    -Wno-name-shadowing
+    -Wno-monomorphism-restriction
+    -Wno-missed-specialisations
+    -Wno-all-missed-specialisations
+    -Wno-star-is-type
+
+library
+  import: common
+  exposed-modules:
+    Source.Loc
+    Source.Range
+    Source.Source
+    Source.Span
+  -- other-modules:
+  -- other-extensions:
+  build-depends:
+      aeson          ^>= 1.4.2.0
+    , base            >= 4.12 && < 5
+    , bytestring     ^>= 0.10.8.2
+    , deepseq        ^>= 1.4.4.0
+    , generic-monoid ^>= 0.1.0.0
+    , hashable       ^>= 1.2.7.0
+    , semilattices   ^>= 0.0.0.3
+    , text           ^>= 1.2.3.1
+  hs-source-dirs: src
+
+test-suite doctest
+  import: common
+  type: exitcode-stdio-1.0
+  main-is: Doctest.hs
+  build-depends:
+      base
+    , doctest          >= 0.7 && <1.0
+    , QuickCheck
+    , semantic-source
+  hs-source-dirs: test
+
+test-suite test
+  import: common
+  type: exitcode-stdio-1.0
+  main-is: Test.hs
+  other-modules:
+    Source.Test
+  build-depends:
+      base
+    , hedgehog        ^>= 1
+    , semantic-source
+    , tasty            >= 1.2 && <2
+    , tasty-hedgehog  ^>= 1.0.0.1
+    , tasty-hunit      >= 0.10 && <1
+    , text
+  hs-source-dirs: test
+
+source-repository head
+  type:     git
+  location: https://github.com/github/semantic

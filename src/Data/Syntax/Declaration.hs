@@ -2,7 +2,6 @@
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Data.Syntax.Declaration where
 
-import Prelude hiding (span)
 import Prologue
 
 import           Control.Lens.Getter
@@ -15,9 +14,9 @@ import           Data.Abstract.Name (__self)
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.JSON.Fields
 import qualified Data.Reprinting.Scope as Scope
-import           Data.Span
 import           Diffing.Algorithm
 import           Reprinting.Tokenize hiding (Superclass)
+import           Source.Span
 
 data Function a = Function { functionContext :: ![a], functionName :: !a, functionParameters :: ![a], functionBody :: !a }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, ToJSONFields1, NFData1)
@@ -34,7 +33,7 @@ instance Evaluatable Function where
     current <- ask @Span
     (name, associatedScope) <- declareFunction (declaredName functionName) ScopeGraph.Public current ScopeGraph.Function
 
-    params <- withScope associatedScope . for functionParameters $ \paramNode -> declareMaybeName (declaredName paramNode) Default ScopeGraph.Public (paramNode^.span) ScopeGraph.Parameter Nothing
+    params <- withScope associatedScope . for functionParameters $ \paramNode -> declareMaybeName (declaredName paramNode) Default ScopeGraph.Public (paramNode^.span_) ScopeGraph.Parameter Nothing
 
     addr <- lookupSlot (Declaration name)
     v <- function name params functionBody associatedScope
@@ -95,8 +94,8 @@ instance Evaluatable Method where
 
     params <- withScope associatedScope $ do
       -- TODO: Should we give `self` a special Relation?
-      declare (Declaration __self) ScopeGraph.Prelude ScopeGraph.Public emptySpan ScopeGraph.Unknown Nothing
-      for methodParameters $ \paramNode -> declareMaybeName (declaredName paramNode) Default ScopeGraph.Public (paramNode^.span) ScopeGraph.Parameter Nothing
+      declare (Declaration __self) ScopeGraph.Prelude ScopeGraph.Public lowerBound ScopeGraph.Unknown Nothing
+      for methodParameters $ \paramNode -> declareMaybeName (declaredName paramNode) Default ScopeGraph.Public (paramNode^.span_) ScopeGraph.Parameter Nothing
 
     addr <- lookupSlot (Declaration name)
     v <- function name params methodBody associatedScope
@@ -164,7 +163,7 @@ instance Evaluatable VariableDeclaration where
   eval _    _ (VariableDeclaration [])   = unit
   eval eval _ (VariableDeclaration decs) = do
     for_ decs $ \declaration -> do
-      _ <- declareMaybeName (declaredName declaration) Default ScopeGraph.Public (declaration^.span) ScopeGraph.VariableDeclaration Nothing
+      _ <- declareMaybeName (declaredName declaration) Default ScopeGraph.Public (declaration^.span_) ScopeGraph.VariableDeclaration Nothing
       eval declaration
     unit
 

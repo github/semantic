@@ -33,9 +33,9 @@ spec = do
       let lexicalEdges = Map.singleton Lexical [ currentScope' ]
           x =  SpecHelpers.name "x"
       associatedScope <- newScope lexicalEdges
-      declare (ScopeGraph.Declaration "identity") Default Public emptySpan ScopeGraph.Function (Just associatedScope)
+      declare (ScopeGraph.Declaration "identity") Default Public lowerBound ScopeGraph.Function (Just associatedScope)
       withScope associatedScope $ do
-        declare (Declaration x) Default Public emptySpan ScopeGraph.RequiredParameter Nothing
+        declare (Declaration x) Default Public lowerBound ScopeGraph.RequiredParameter Nothing
       identity <- function "identity" [ x ]
         (SpecEff (Heap.lookupSlot (ScopeGraph.Declaration (SpecHelpers.name "x")) >>= deref)) associatedScope
       val <- integer 123

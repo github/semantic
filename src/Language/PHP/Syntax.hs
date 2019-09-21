@@ -2,7 +2,6 @@
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Language.PHP.Syntax where
 
-import Prelude hiding (span)
 import Prologue hiding (Text)
 
 import           Control.Lens.Getter
@@ -17,8 +16,8 @@ import           Data.Abstract.Path
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.JSON.Fields
 import qualified Data.Language as Language
-import           Data.Span
 import           Diffing.Algorithm
+import           Source.Span
 
 newtype Text a = Text { value :: T.Text }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
@@ -185,7 +184,7 @@ instance Evaluatable QualifiedName where
   eval _ _ (QualifiedName obj iden) = do
     -- TODO: Consider gensym'ed names used for References.
     name <- maybeM (throwNoNameError obj) (declaredName obj)
-    reference (Reference name) (obj^.span) ScopeGraph.Identifier (Declaration name)
+    reference (Reference name) (obj^.span_) ScopeGraph.Identifier (Declaration name)
     childScope <- associatedScope (Declaration name)
 
     propName <- maybeM (throwNoNameError iden) (declaredName iden)
@@ -195,7 +194,7 @@ instance Evaluatable QualifiedName where
         currentFrameAddress <- currentFrame
         frameAddress <- newFrame childScope (Map.singleton Lexical (Map.singleton currentScopeAddress currentFrameAddress))
         withScopeAndFrame frameAddress $ do
-          reference (Reference propName) (iden^.span) ScopeGraph.Identifier (Declaration propName)
+          reference (Reference propName) (iden^.span_) ScopeGraph.Identifier (Declaration propName)
           slot <- lookupSlot (Declaration propName)
           deref slot
       Nothing ->

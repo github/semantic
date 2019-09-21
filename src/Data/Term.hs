@@ -14,14 +14,13 @@ module Data.Term
 , Annotated (..)
 ) where
 
-import Prelude hiding (span)
 import Prologue
 
 import           Control.Lens.Lens
 import           Data.Aeson
 import           Data.JSON.Fields
-import           Data.Span
 import qualified Data.Sum as Sum
+import           Source.Span
 import           Text.Show
 
 -- | A Term with an abstract syntax tree and an annotation.
@@ -49,12 +48,12 @@ annotationLens = lens termFAnnotation (\t a -> t { termFAnnotation = a })
 {-# INLINE annotationLens #-}
 
 instance HasSpan ann => HasSpan (TermF syntax ann recur) where
-  span = annotationLens.span
-  {-# INLINE span #-}
+  span_ = annotationLens.span_
+  {-# INLINE span_ #-}
 
 instance HasSpan ann => HasSpan (Term syntax ann) where
-  span = inner.span where inner = lens unTerm (\t i -> t { unTerm = i })
-  {-# INLINE span #-}
+  span_ = inner.span_ where inner = lens unTerm (\t i -> t { unTerm = i })
+  {-# INLINE span_ #-}
 
 -- | A convenience typeclass to get the annotation out of a 'Term' or 'TermF'.
 -- Useful in term-rewriting algebras.

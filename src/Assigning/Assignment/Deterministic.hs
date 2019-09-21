@@ -13,29 +13,29 @@ import Data.AST
 import Data.Error
 import qualified Data.IntMap as IntMap
 import qualified Data.IntSet as IntSet
-import Data.Range
-import Data.Location
-import Data.Source as Source
-import Data.Span hiding (HasSpan (..))
+import Source.Source as Source
 import qualified Data.Syntax as Syntax
 import Data.Term (Term, termIn, termAnnotation, termOut)
 import Data.Text.Encoding (decodeUtf8')
 import Prologue
+import Source.Loc
+import Source.Range as Range
+import Source.Span as Span
 
 class (Alternative f, Ord symbol, Show symbol) => Assigning symbol f | f -> symbol where
   leafNode   :: symbol -> f Text
   branchNode :: symbol -> f a -> f a
 
   toTerm :: (Element syntax syntaxes, Element Syntax.Error syntaxes)
-         => f (syntax (Term (Sum syntaxes) Location))
-         -> f         (Term (Sum syntaxes) Location)
+         => f (syntax (Term (Sum syntaxes) Loc))
+         -> f         (Term (Sum syntaxes) Loc)
 
 parseError :: ( Bounded symbol
               , Element Syntax.Error syntaxes
               , HasCallStack
               , Assigning symbol f
               )
-           => f (Term (Sum syntaxes) Location)
+           => f (Term (Sum syntaxes) Loc)
 parseError = toTerm (leafNode maxBound $> Syntax.Error (Syntax.ErrorStack (Syntax.errorSite <$> getCallStack (freezeCallStack callStack))) [] (Just "ParseError") [])
 
 
@@ -100,7 +100,7 @@ instance (Enum symbol, Ord symbol, Show symbol) => Assigning symbol (Assignment 
   leafNode s = Assignment NotNullable (IntSet.singleton (fromEnum s))
     [ (s, \ src state _ -> case stateInput state of
       []  -> Left (makeError (stateSpan state) [Right s] Nothing)
-      s:_ -> case decodeUtf8' (sourceBytes (Source.slice (astRange s) src)) of
+      s:_ -> case decodeUtf8' (Source.bytes (Source.slice src (astRange s))) of
         Left err   -> Left (makeError (astSpan s) [Left "valid utf-8"] (Just (Left (show err))))
         Right text -> Right (advanceState state, text))
     ]
@@ -168,12 +168,12 @@ stateSpan :: State s -> Span
 stateSpan state@(State _ _ [])    = Span (statePos state) (statePos state)
 stateSpan       (State _ _ (s:_)) = astSpan s
 
-stateLocation :: State s -> Location
-stateLocation state = Location (stateRange state) (stateSpan state)
+stateLocation :: State s -> Loc
+stateLocation state = Loc (stateRange state) (stateSpan state)
 
 advanceState :: State s -> State s
 advanceState state
-  | s:ss <- stateInput state = State (end (astRange s)) (spanEnd (astSpan s)) ss
+  | s:ss <- stateInput state = State (Range.end (astRange s)) (Span.end (astSpan s)) ss
   | otherwise                = state
 
 

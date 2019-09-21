@@ -16,7 +16,7 @@ import Prologue
 import Data.Blob
 import Data.Language
 import Semantic.IO
-import Data.Source
+import qualified Source.Source as Source
 import qualified Semantic.Git as Git
 import qualified Control.Concurrent.Async as Async
 import qualified Data.ByteString as B
@@ -28,7 +28,7 @@ readBlobFromFile :: forall m. MonadIO m => File -> m (Maybe Blob)
 readBlobFromFile (File "/dev/null" _) = pure Nothing
 readBlobFromFile (File path language) = do
   raw <- liftIO $ B.readFile path
-  pure . Just . sourceBlob path language . fromUTF8 $ raw
+  pure . Just . sourceBlob path language . Source.fromUTF8 $ raw
 
 -- | Read a utf8-encoded file to a 'Blob', raising an IOError if it can't be found.
 readBlobFromFile' :: MonadIO m => File -> m Blob
@@ -58,7 +58,7 @@ readBlobsFromGitRepo path oid excludePaths includePaths = liftIO . fmap catMaybe
       , not (pathIsMinified path)
       , path `notElem` excludePaths
       , null includePaths || path `elem` includePaths
-      = Just . sourceBlob' path lang oid . fromText <$> Git.catFile gitDir oid
+      = Just . sourceBlob' path lang oid . Source.fromText <$> Git.catFile gitDir oid
     blobFromTreeEntry _ _ = pure Nothing
 
     sourceBlob' filepath language (Git.OID oid) source = makeBlob source filepath language oid

@@ -29,7 +29,7 @@ someLanguageConstruct :: Assignment
 someLanguageConstruct = makeTerm <$> symbol NodeNameOfSymbolToMatch <*> children (SyntaxDataType <$> field1 <*> field2)
 ```
 
-The building blocks that compose this DSL come from: `Assigning.Assignment`, explained below. 
+The building blocks that compose this DSL come from: `Assigning.Assignment`, explained below.
 
 ### The underlying machinery of `Assigning.Assignment`
 
@@ -73,7 +73,7 @@ TODO: explain how traversal works in terms of matching/advancing -->
 
 #### Ways to combine assignments
 
-1. The `Functor` instance maps values from the AST (`Location`, `ByteString`, etc.) onto another structure.
+1. The `Functor` instance maps values from the AST (`Loc`, `ByteString`, etc.) onto another structure.
 
 2. The `Applicative` instance assigns sequences of (sibling) AST nodes in order, as well as providing `pure` assignments.
 

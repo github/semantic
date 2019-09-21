@@ -13,13 +13,13 @@ import           Data.Blob
 import           Data.Error (Error (..), Colourize (..), showExpectation)
 import           Data.Flag
 import           Data.Language as Language
-import           Data.Location
-import           Data.Range
-import           Data.Source as Source
+import           Source.Source as Source
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import           Data.Term
 import qualified Data.Text as T
+import           Source.Loc as Loc
+import           Source.Range
 import qualified Language.Markdown.Syntax as Markdown
 
 -- | A declaration’s identifier and type.
@@ -42,12 +42,12 @@ data Declaration
 --
 --   If you’re getting 'Nothing' for your syntax node at runtime, you probably forgot step 2.
 declarationAlgebra :: (Foldable syntax, HasDeclaration syntax)
-                   => Blob -> RAlgebra (TermF syntax Location) (Term syntax Location) (Maybe Declaration)
+                   => Blob -> RAlgebra (TermF syntax Loc) (Term syntax Loc) (Maybe Declaration)
 declarationAlgebra blob (In ann syntax) = toDeclaration blob ann syntax
 
 -- | Types for which we can produce a 'Declaration' in 'Maybe'. There is exactly one instance of this typeclass
 class HasDeclaration syntax where
-  toDeclaration :: (Foldable syntax) => Blob -> Location -> syntax (Term syntax Location, Maybe Declaration) -> Maybe Declaration
+  toDeclaration :: (Foldable syntax) => Blob -> Loc -> syntax (Term syntax Loc, Maybe Declaration) -> Maybe Declaration
 
 instance (HasDeclaration' syntax syntax) => HasDeclaration syntax where
   toDeclaration = toDeclaration'
@@ -57,7 +57,7 @@ instance (HasDeclaration' syntax syntax) => HasDeclaration syntax where
 --   This typeclass employs the Advanced Overlap techniques designed by Oleg Kiselyov & Simon Peyton Jones: https://wiki.haskell.org/GHC/AdvancedOverlap.
 class HasDeclaration' whole syntax where
   -- | Compute a 'Declaration' for a syntax type using its 'CustomHasDeclaration' instance, if any, or else falling back to the default definition (which simply returns 'Nothing').
-  toDeclaration' :: (Foldable whole) => Blob -> Location -> syntax (Term whole Location, Maybe Declaration) -> Maybe Declaration
+  toDeclaration' :: (Foldable whole) => Blob -> Loc -> syntax (Term whole Loc, Maybe Declaration) -> Maybe Declaration
 
 -- | Define 'toDeclaration' using the 'CustomHasDeclaration' instance for a type if there is one or else use the default definition.
 --
@@ -71,22 +71,22 @@ instance (DeclarationStrategy syntax ~ strategy, HasDeclarationWithStrategy stra
 -- | Types for which we can produce a customized 'Declaration'. This returns in 'Maybe' so that some values can be opted out (e.g. anonymous functions).
 class CustomHasDeclaration whole syntax where
   -- | Produce a customized 'Declaration' for a given syntax node.
-  customToDeclaration :: (Foldable whole) => Blob -> Location -> syntax (Term whole Location, Maybe Declaration) -> Maybe Declaration
+  customToDeclaration :: (Foldable whole) => Blob -> Loc -> syntax (Term whole Loc, Maybe Declaration) -> Maybe Declaration
 
 
 -- | Produce a 'HeadingDeclaration' from the first line of the heading of a 'Markdown.Heading' node.
 instance CustomHasDeclaration whole Markdown.Heading where
   customToDeclaration blob@Blob{..} ann (Markdown.Heading level terms _)
-    = Just $ HeadingDeclaration (headingText terms) mempty (locationSpan ann) (blobLanguage blob) level
-    where headingText terms = getSource $ maybe (locationByteRange ann) sconcat (nonEmpty (headingByteRange <$> toList terms))
-          headingByteRange (Term (In ann _), _) = locationByteRange ann
-          getSource = firstLine . toText . flip Source.slice blobSource
+    = Just $ HeadingDeclaration (headingText terms) mempty (Loc.span ann) (blobLanguage blob) level
+    where headingText terms = getSource $ maybe (byteRange ann) sconcat (nonEmpty (headingByteRange <$> toList terms))
+          headingByteRange (Term (In ann _), _) = byteRange ann
+          getSource = firstLine . toText . Source.slice blobSource
           firstLine = T.takeWhile (/= '\n')
 
 -- | Produce an 'ErrorDeclaration' for 'Syntax.Error' nodes.
 instance CustomHasDeclaration whole Syntax.Error where
   customToDeclaration blob@Blob{..} ann err@Syntax.Error{}
-    = Just $ ErrorDeclaration (T.pack (formatTOCError (Syntax.unError (locationSpan ann) err))) mempty (locationSpan ann) (blobLanguage blob)
+    = Just $ ErrorDeclaration (T.pack (formatTOCError (Syntax.unError (Loc.span ann) err))) mempty (Loc.span ann) (blobLanguage blob)
     where formatTOCError e = showExpectation (flag Colourize False) (errorExpected e) (errorActual e) ""
 
 -- | Produce a 'FunctionDeclaration' for 'Declaration.Function' nodes so long as their identifier is non-empty (defined as having a non-empty 'Range').
@@ -95,22 +95,22 @@ instance CustomHasDeclaration whole Declaration.Function where
     -- Do not summarize anonymous functions
     | isEmpty identifierAnn = Nothing
     -- Named functions
-    | otherwise             = Just $ FunctionDeclaration (getSource blobSource identifierAnn) functionSource (locationSpan ann) (blobLanguage blob)
-    where isEmpty = (== 0) . rangeLength . locationByteRange
+    | otherwise             = Just $ FunctionDeclaration (getSource blobSource identifierAnn) functionSource (Loc.span ann) (blobLanguage blob)
+    where isEmpty = (== 0) . rangeLength . byteRange
           functionSource = getIdentifier (arr Declaration.functionBody) blob (In ann decl)
 
 -- | Produce a 'MethodDeclaration' for 'Declaration.Method' nodes. If the method’s receiver is non-empty (defined as having a non-empty 'Range'), the 'declarationIdentifier' will be formatted as 'receiver.method_name'; otherwise it will be simply 'method_name'.
 instance CustomHasDeclaration whole Declaration.Method where
   customToDeclaration blob@Blob{..} ann decl@(Declaration.Method _ (Term (In receiverAnn receiverF), _) (Term (In identifierAnn _), _) _ _ _)
     -- Methods without a receiver
-    | isEmpty receiverAnn = Just $ MethodDeclaration (getSource blobSource identifierAnn) methodSource (locationSpan ann) (blobLanguage blob) Nothing
+    | isEmpty receiverAnn = Just $ MethodDeclaration (getSource blobSource identifierAnn) methodSource (Loc.span ann) (blobLanguage blob) Nothing
     -- Methods with a receiver type and an identifier (e.g. (a *Type) in Go).
     | blobLanguage blob == Go
-    , [ _, Term (In receiverType _) ] <- toList receiverF = Just $ MethodDeclaration (getSource blobSource identifierAnn) methodSource (locationSpan ann) (blobLanguage blob) (Just (getSource blobSource receiverType))
+    , [ _, Term (In receiverType _) ] <- toList receiverF = Just $ MethodDeclaration (getSource blobSource identifierAnn) methodSource (Loc.span ann) (blobLanguage blob) (Just (getSource blobSource receiverType))
     -- Methods with a receiver (class methods) are formatted like `receiver.method_name`
-    | otherwise           = Just $ MethodDeclaration (getSource blobSource identifierAnn) methodSource (locationSpan ann) (blobLanguage blob) (Just (getSource blobSource receiverAnn))
+    | otherwise           = Just $ MethodDeclaration (getSource blobSource identifierAnn) methodSource (Loc.span ann) (blobLanguage blob) (Just (getSource blobSource receiverAnn))
     where
-      isEmpty = (== 0) . rangeLength . locationByteRange
+      isEmpty = (== 0) . rangeLength . byteRange
       methodSource = getIdentifier (arr Declaration.methodBody) blob (In ann decl)
 
 -- When encountering a Declaration-annotated term, we need to extract a Text
@@ -118,19 +118,19 @@ instance CustomHasDeclaration whole Declaration.Method where
 -- is constructed by slicing out text from the original blob corresponding
 -- to a location, which is found via the passed-in rule.
 getIdentifier :: Functor m
-           => Rewrite (m (Term syntax Location)) (Term syntax Location)
+           => Rewrite (m (Term syntax Loc)) (Term syntax Loc)
            -> Blob
-           -> TermF m Location (Term syntax Location, a)
+           -> TermF m Loc (Term syntax Loc, a)
            -> Text
 getIdentifier finder Blob{..} (In a r)
-  = let declRange = locationByteRange a
-        bodyRange = locationByteRange <$> rewrite (fmap fst r) (finder >>^ annotation)
+  = let declRange = byteRange a
+        bodyRange = byteRange <$> rewrite (fmap fst r) (finder >>^ annotation)
         -- Text-based gyrations to slice the identifier out of the provided blob source
-        sliceFrom = T.stripEnd . toText . flip Source.slice blobSource . subtractRange declRange
+        sliceFrom = T.stripEnd . toText . Source.slice blobSource . subtractRange declRange
     in maybe mempty sliceFrom bodyRange
 
-getSource :: Source -> Location -> Text
-getSource blobSource = toText . flip Source.slice blobSource . locationByteRange
+getSource :: Source -> Loc -> Text
+getSource blobSource = toText . Source.slice blobSource . byteRange
 
 -- | Produce a 'Declaration' for 'Sum's using the 'HasDeclaration' instance & therefore using a 'CustomHasDeclaration' instance when one exists & the type is listed in 'DeclarationStrategy'.
 instance Apply (HasDeclaration' whole) fs => CustomHasDeclaration whole (Sum fs) where
@@ -144,7 +144,7 @@ data Strategy = Default | Custom
 --
 --   You should probably be using 'CustomHasDeclaration' instead of this class; and you should not define new instances of this class.
 class HasDeclarationWithStrategy (strategy :: Strategy) whole syntax where
-  toDeclarationWithStrategy :: (Foldable whole) => proxy strategy -> Blob -> Location -> syntax (Term whole Location, Maybe Declaration) -> Maybe Declaration
+  toDeclarationWithStrategy :: (Foldable whole) => proxy strategy -> Blob -> Loc -> syntax (Term whole Loc, Maybe Declaration) -> Maybe Declaration
 
 
 -- | A predicate on syntax types selecting either the 'Custom' or 'Default' strategy.

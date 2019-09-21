@@ -12,8 +12,6 @@ module Generators
   , expr
   ) where
 
-import Prelude hiding (span)
-
 import Hedgehog hiding (Var)
 import qualified Hedgehog.Gen as Gen
 import qualified Hedgehog.Range as Range

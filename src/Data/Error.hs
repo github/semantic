@@ -18,10 +18,10 @@ import Data.Ix (inRange)
 import Data.List (intersperse, isSuffixOf)
 import System.Console.ANSI
 
-import Data.Blob
-import Data.Flag as Flag
-import Data.Source
-import Data.Span
+import           Data.Blob
+import           Data.Flag as Flag
+import qualified Source.Source as Source
+import           Source.Span
 
 data LogPrintSource = LogPrintSource
 data Colourize = Colourize
@@ -61,14 +61,14 @@ showExcerpt colourize Span{..} Blob{..}
   = showString context . (if "\n" `isSuffixOf` context then id else showChar '\n')
   . showString (replicate (caretPaddingWidth + lineNumberDigits) ' ') . withSGRCode colourize [SetColor Foreground Vivid Green] (showString caret) . showChar '\n'
   where context = fold contextLines
-        contextLines = [ showLineNumber i <> ": " <> unpack (sourceBytes l)
-                       | (i, l) <- zip [1..] (sourceLines blobSource)
-                       , inRange (posLine spanStart - 2, posLine spanStart) i
+        contextLines = [ showLineNumber i <> ": " <> unpack (Source.bytes l)
+                       | (i, l) <- zip [1..] (Source.lines blobSource)
+                       , inRange (line start - 2, line start) i
                        ]
         showLineNumber n = let s = show n in replicate (lineNumberDigits - length s) ' ' <> s
-        lineNumberDigits = succ (floor (logBase 10 (fromIntegral (posLine spanStart) :: Double)))
-        caretPaddingWidth = succ (posColumn spanStart)
-        caret | posLine spanStart == posLine spanEnd = replicate (max 1 (posColumn spanEnd - posColumn spanStart)) '^'
+        lineNumberDigits = succ (floor (logBase 10 (fromIntegral (line start) :: Double)))
+        caretPaddingWidth = succ (column start)
+        caret | line start == line end = replicate (max 1 (column end - column start)) '^'
               | otherwise                            = "^..."
 
 withSGRCode :: Flag Colourize -> [SGR] -> ShowS -> ShowS
@@ -93,8 +93,8 @@ showSymbols colourize = go
         showSymbol = withSGRCode colourize [SetColor Foreground Vivid Red] . showString
 
 showSpan :: Maybe FilePath -> Span -> ShowS
-showSpan path Span{..} = maybe (showParen True (showString "interactive")) showString path . showChar ':' . (if spanStart == spanEnd then showPos spanStart else showPos spanStart . showChar '-' . showPos spanEnd)
-  where showPos Pos{..} = shows posLine . showChar ':' . shows posColumn
+showSpan path Span{..} = maybe (showParen True (showString "interactive")) showString path . showChar ':' . (if start == end then showPos start else showPos start . showChar '-' . showPos end)
+  where showPos Pos{..} = shows line . showChar ':' . shows column
 
 showCallStack :: Flag Colourize -> CallStack -> ShowS
 showCallStack colourize callStack = foldr (.) id (intersperse (showChar '\n') (uncurry (showCallSite colourize) <$> getCallStack callStack))

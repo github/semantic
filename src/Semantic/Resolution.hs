@@ -1,4 +1,5 @@
-{-# LANGUAGE ConstraintKinds, DeriveAnyClass, DerivingStrategies, GADTs, GeneralizedNewtypeDeriving, KindSignatures, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE ConstraintKinds, DeriveAnyClass, DerivingStrategies, GADTs, GeneralizedNewtypeDeriving, KindSignatures,
+             ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Semantic.Resolution
   ( Resolution (..)
   , nodeJSResolutionMap
@@ -11,13 +12,13 @@ import           Control.Effect.Carrier
 import           Data.Aeson
 import           Data.Aeson.Types (parseMaybe)
 import           Data.Blob
-import           Data.Project
-import qualified Data.Map as Map
-import           Data.Source
 import           Data.Language
-import           Prologue
+import qualified Data.Map as Map
+import           Data.Project
 import           GHC.Generics (Generic1)
+import           Prologue
 import           Semantic.Task.Files
+import qualified Source.Source as Source
 import           System.FilePath.Posix
 
 
@@ -29,7 +30,7 @@ nodeJSResolutionMap rootDir prop excludeDirs = do
   pure $ fold (mapMaybe (lookup prop) blobs)
   where
     lookup :: Text -> Blob -> Maybe (Map FilePath FilePath)
-    lookup k b@Blob{..} = decodeStrict (sourceBytes blobSource) >>= lookupProp (blobPath b) k
+    lookup k b@Blob{..} = decodeStrict (Source.bytes blobSource) >>= lookupProp (blobPath b) k
 
     lookupProp :: FilePath -> Text -> Object -> Maybe (Map FilePath FilePath)
     lookupProp path k res = flip parseMaybe res $ \obj -> Map.singleton relPkgDotJSONPath . relEntryPath <$> obj .: k

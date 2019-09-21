@@ -9,9 +9,9 @@ import           Data.Blob
 import           Data.ByteString.Builder
 import           Data.Diff
 import qualified Data.Map.Monoidal as Map
-import           Data.Span (emptySpan)
 import qualified Data.Text as T
 import qualified Data.Vector as V
+import           Data.Semilattice.Lower
 import           Rendering.TOC
 import           Semantic.Api.Diffs
 import           Semantic.Api.Bridge
@@ -28,7 +28,7 @@ legacyDiffSummary = distributeFoldMap go
     go :: (DiffEffects sig m) => BlobPair -> m Summaries
     go blobPair = doDiff blobPair (decorate . declarationAlgebra) render
       `catchError` \(SomeException e) ->
-        pure $ Summaries mempty (Map.singleton path [toJSON (ErrorSummary (T.pack (show e)) emptySpan lang)])
+        pure $ Summaries mempty (Map.singleton path [toJSON (ErrorSummary (T.pack (show e)) lowerBound lang)])
       where path = T.pack $ pathKeyForBlobPair blobPair
             lang = languageForBlobPair blobPair
 

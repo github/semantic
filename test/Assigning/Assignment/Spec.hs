@@ -5,15 +5,15 @@ import Assigning.Assignment
 import Data.AST
 import Data.Bifunctor (first)
 import Data.Ix
-import Data.Range
 import Data.Semigroup ((<>))
-import Data.Source
-import Data.Span
 import Data.Term
 import Data.Text as T (Text, length, words)
 import Data.Text.Encoding (encodeUtf8)
 import GHC.Stack (getCallStack)
 import Prelude hiding (words)
+import Source.Range
+import Source.Source
+import Source.Span
 import Test.Hspec
 import TreeSitter.Language (Symbol (..), SymbolType (..))
 
@@ -255,7 +255,7 @@ spec = do
       Left [ "symbol" ]
 
 node :: symbol -> Int -> Int -> [AST [] symbol] -> AST [] symbol
-node symbol start end children = Term (Node symbol (Location (Range start end) (Span (Pos 1 (succ start)) (Pos 1 (succ end)))) `In` children)
+node symbol start end children = Term (Node symbol (Loc (Range start end) (Span (Pos 1 (succ start)) (Pos 1 (succ end)))) `In` children)
 
 data Grammar = Palette | Red | Green | Blue | Magenta
   deriving (Bounded, Enum, Eq, Ix, Ord, Show)
