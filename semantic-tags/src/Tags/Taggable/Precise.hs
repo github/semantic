@@ -52,15 +52,11 @@ class ToTagBy (strategy :: Strategy) t where
 data Strategy = Generic | Custom
 
 type family ToTagInstance t :: Strategy where
-  ToTagInstance [_]                         = 'Custom
   ToTagInstance ((_ :+: _) _)               = 'Custom
   ToTagInstance (Py.FunctionDefinition Loc) = 'Custom
   ToTagInstance (Py.ClassDefinition Loc)    = 'Custom
   ToTagInstance (Py.Call Loc)               = 'Custom
   ToTagInstance _                           = 'Generic
-
-instance ToTag t => ToTagBy 'Custom [t] where
-  tag' = traverse_ tag
 
 instance (ToTag (l a), ToTag (r a)) => ToTagBy 'Custom ((l :+: r) a) where
   tag' (L1 l) = tag l
