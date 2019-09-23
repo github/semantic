@@ -53,6 +53,8 @@ type CoreSyntax sig t = ( Member Core sig
                         )
 
 class Compile py where
+  -- FIXME: rather than failing the compilation process entirely
+  -- with MonadFail, we should emit core that represents failure
   compileCC :: ( CoreSyntax syn t
                , Member (Reader SourcePath) sig
                , Member (Reader Bindings) sig
