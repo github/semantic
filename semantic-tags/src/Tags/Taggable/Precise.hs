@@ -178,3 +178,8 @@ instance {-# OVERLAPPABLE #-}
       => Element t (l :+: r) where
   prj (R1 r) = prj r
   prj _      = Nothing
+
+
+class GSum t where
+  type Members t :: (* -> *)
+  gmembers :: t a -> Members t a
