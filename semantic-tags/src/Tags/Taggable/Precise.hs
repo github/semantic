@@ -143,3 +143,8 @@ instance {-# OVERLAPPABLE #-}
     reassoc (L1 (L1 l)) = L1 l
     reassoc (L1 (R1 l)) = R1 (L1 l)
     reassoc (R1 r)      = R1 (R1 r)
+
+instance {-# OVERLAPPABLE #-}
+         Element t (t :+: r) where
+  prj (L1 l) = Just l
+  prj _      = Nothing
