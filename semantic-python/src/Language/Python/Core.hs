@@ -109,11 +109,18 @@ instance Compile (Py.AssertStatement Span)
 instance Compile (Py.Attribute Span)
 
 instance Compile (Py.Assignment Span) where
-  compile it@Py.Assignment { Py.left = Py.ExpressionList { Py.extraChildren = [lhs] }, Py.right = Just rhs } = do
-    target <- compile lhs
+  compileCC it@Py.Assignment
+    { Py.left = Py.ExpressionList
+      { Py.extraChildren =
+        [ Py.PrimaryExpressionExpression (Py.IdentifierPrimaryExpression (Py.Identifier { Py.bytes = name }))
+        ]
+      }
+    , Py.right = Just rhs
+    } cc = do
     value  <- compile rhs
-    locate it $ target .= value
-  compile other = fail ("Unhandled assignment case: " <> show other)
+    locate it =<< ((Name.named' name :<- value) >>>=) <$> local (def name) cc
+  compileCC other _ = fail ("Unhandled assignment case: " <> show other)
+  compile t = compileCC t (pure none)
 
 instance Compile (Py.AugmentedAssignment Span)
 instance Compile (Py.Await Span)
@@ -145,9 +152,11 @@ instance Compile (Py.ExecStatement Span)
 deriving via CompileSum (Py.Expression Span) instance Compile (Py.Expression Span)
 
 instance Compile (Py.ExpressionStatement Span) where
-  compile it@Py.ExpressionStatement { Py.extraChildren = children } = do
-    actions <- traverse compile children
-    locate it $ do' (fmap (Nothing :<-) actions)
+  compileCC it@Py.ExpressionStatement
+    { Py.extraChildren = children
+    } cc = do
+    foldr compileCC cc children >>= locate it
+  compile stmt = compileCC stmt (pure none)
 
 instance Compile (Py.ExpressionList Span) where
   compile it@Py.ExpressionList { Py.extraChildren = exprs } = do
