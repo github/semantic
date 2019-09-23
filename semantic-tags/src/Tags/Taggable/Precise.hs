@@ -56,7 +56,7 @@ type family ToTagInstance t :: Strategy where
   ToTagInstance Loc                         = 'Custom
   ToTagInstance Text                        = 'Custom
   ToTagInstance [_]                         = 'Custom
-  ToTagInstance (Either _ _)                = 'Custom
+  ToTagInstance ((_ :+: _) _)               = 'Custom
   ToTagInstance (Py.FunctionDefinition Loc) = 'Custom
   ToTagInstance _                           = 'Generic
 
@@ -69,8 +69,9 @@ instance ToTagBy 'Custom Text where
 instance ToTag t => ToTagBy 'Custom [t] where
   tag' = traverse_ tag
 
-instance (ToTag l, ToTag r) => ToTagBy 'Custom (Either l r) where
-  tag' = either tag tag
+instance (ToTag (l a), ToTag (r a)) => ToTagBy 'Custom ((l :+: r) a) where
+  tag' (L1 l) = tag l
+  tag' (R1 r) = tag r
 
 instance ToTagBy 'Custom (Py.FunctionDefinition Loc) where
   tag' Py.FunctionDefinition
@@ -91,8 +92,8 @@ instance ToTagBy 'Custom (Py.FunctionDefinition Loc) where
 yield :: (Carrier sig m, Member (Writer (Endo [Tag])) sig) => Tag -> m ()
 yield = tell . Endo . (:)
 
-docComment :: Source -> Either (Py.CompoundStatement Loc) (Py.SimpleStatement Loc) -> Maybe Text
-docComment src (Right (Py.ExpressionStatementSimpleStatement (Py.ExpressionStatement { extraChildren = Left (Py.PrimaryExpressionExpression (Py.StringPrimaryExpression Py.String { ann })) :|_ }))) = Just (toText (slice src (byteRange ann)))
+docComment :: Source -> (Py.CompoundStatement :+: Py.SimpleStatement) Loc -> Maybe Text
+docComment src (R1 (Py.ExpressionStatementSimpleStatement (Py.ExpressionStatement { extraChildren = L1 (Py.PrimaryExpressionExpression (Py.StringPrimaryExpression Py.String { ann })) :|_ }))) = Just (toText (slice src (byteRange ann)))
 docComment _ _ = Nothing
 
 firstLine :: Source -> Text
