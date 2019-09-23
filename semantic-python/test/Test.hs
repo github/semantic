@@ -86,6 +86,7 @@ fixtureTestTreeForFile fp = HUnit.testCaseSteps (Path.toString fp) $ \step -> wi
   let coreResult = Control.Effect.run
                    . runFail
                    . runReader (fromString @Py.SourcePath . Path.toString $ fp)
+                   . runReader @Py.Bindings mempty
                    . Py.compile @(TSP.Module TS.Span) @_ @(Term (Ann :+: Core))
                    <$> result
 

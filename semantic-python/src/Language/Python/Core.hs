@@ -1,10 +1,11 @@
 {-# LANGUAGE ConstraintKinds, DataKinds, DefaultSignatures, DeriveAnyClass, DeriveGeneric, DerivingStrategies,
              DerivingVia, DisambiguateRecordFields, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving,
              NamedFieldPuns, OverloadedLists, OverloadedStrings, ScopedTypeVariables, StandaloneDeriving,
-             TypeApplications, TypeOperators, UndecidableInstances #-}
+             TupleSections, TypeApplications, TypeOperators, UndecidableInstances #-}
 
 module Language.Python.Core
 ( compile
+, Bindings
 , SourcePath
 ) where
 
@@ -17,8 +18,11 @@ import           Data.Core as Core
 import           Data.Foldable
 import qualified Data.Loc
 import           Data.Name as Name
+import           Data.Stack (Stack)
+import qualified Data.Stack as Stack
 import           Data.String (IsString)
 import           Data.Text (Text)
+import           Data.Traversable
 import           GHC.Generics
 import           GHC.Records
 import qualified TreeSitter.Python.AST as Py
@@ -28,6 +32,10 @@ import qualified TreeSitter.Span as TreeSitter
 newtype SourcePath = SourcePath { rawPath :: Text }
   deriving stock (Eq, Show)
   deriving newtype IsString
+
+newtype Bindings = Bindings { unBindings :: Stack Name }
+  deriving stock (Eq, Show)
+  deriving newtype (Semigroup, Monoid)
 
 -- We leave the representation of Core syntax abstract so that it's not
 -- possible for us to 'cheat' by pattern-matching on or eliminating a
@@ -42,6 +50,7 @@ class Compile py where
   -- FIXME: we should really try not to fail
   compile :: ( CoreSyntax syn t
              , Member (Reader SourcePath) sig
+             , Member (Reader Bindings) sig
              , Carrier sig m
              , MonadFail m
              )
@@ -53,6 +62,7 @@ class Compile py where
 
   compileCC :: ( CoreSyntax syn t
                , Member (Reader SourcePath) sig
+               , Member (Reader Bindings) sig
                , Carrier sig m
                , MonadFail m
                )
@@ -236,12 +246,14 @@ instance Compile (Py.Yield Span)
 class GCompileSum f where
   gcompileSum :: ( CoreSyntax syn t
                  , Member (Reader SourcePath) sig
+                 , Member (Reader Bindings) sig
                  , Carrier sig m
                  , MonadFail m
                  ) => f a -> m (t Name)
 
   gcompileCCSum :: ( CoreSyntax syn t
                    , Member (Reader SourcePath) sig
+                   , Member (Reader Bindings) sig
                    , Carrier sig m
                    , MonadFail m
                    ) => f a -> m (t Name) -> m (t Name)
