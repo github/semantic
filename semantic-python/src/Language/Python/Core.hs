@@ -77,6 +77,7 @@ class Compile py where
             -> m (t Name)
   compileCC py cc = (>>>) <$> compile py <*> cc
 
+
 locate :: ( HasField "ann" syntax Span
           , CoreSyntax syn t
           , Member (Reader SourcePath) sig
@@ -93,6 +94,18 @@ locate syn item = do
 -- NoneType instance, but it will do for now.
 none :: (Member Core sig, Carrier sig t) => t Name
 none = unit
+
+-- | Helper for delegating to compileCC. The presence of this function indicates
+-- that we might want to move 'compile' out of the Compile class entirely.
+viaCompileCC :: ( Compile py
+                , CoreSyntax syn t
+                , Member (Reader SourcePath) sig
+                , Member (Reader Bindings) sig
+                , Carrier sig m
+                , MonadFail m
+                )
+             => py -> m (t Name)
+viaCompileCC t = compileCC t (pure none)
 
 defaultCompile :: (MonadFail m, Show py) => py -> m (t Name)
 defaultCompile t = fail $ "compilation unimplemented for " <> show t
@@ -121,16 +134,17 @@ instance Compile (Py.Assignment Span) where
     let assigning n = (Name.named' name :<- value) >>>= n
     locate it =<< assigning <$> local (def name) cc
   compileCC other _ = fail ("Unhandled assignment case: " <> show other)
-  compile t = compileCC t (pure none)
+
+  compile = viaCompileCC
 
 instance Compile (Py.AugmentedAssignment Span)
 instance Compile (Py.Await Span)
 instance Compile (Py.BinaryOperator Span)
 
 instance Compile (Py.Block Span) where
-  compile t = compileCC t (pure none)
-
   compileCC it@Py.Block{ Py.extraChildren = body} cc = locate it =<< foldr compileCC cc body
+
+  compile = viaCompileCC
 
 instance Compile (Py.BooleanOperator Span)
 instance Compile (Py.BreakStatement Span)
@@ -171,9 +185,6 @@ instance Compile (Py.Float Span)
 instance Compile (Py.ForStatement Span)
 
 instance Compile (Py.FunctionDefinition Span) where
-  -- TODO: viaCompileCC function to make this better
-  compile stmt = compileCC stmt (pure none)
-
   compileCC it@Py.FunctionDefinition
     { name       = Py.Identifier _ann1 name
     , parameters = Py.Parameters _ann2 parameters
@@ -193,6 +204,8 @@ instance Compile (Py.FunctionDefinition Span) where
           unimplemented x = fail $ "unimplemented: " <> show x
           assigning item f = (Name.named' name :<- item) >>>= f
 
+  compile = viaCompileCC
+
 instance Compile (Py.FutureImportStatement Span)
 instance Compile (Py.GeneratorExpression Span)
 instance Compile (Py.GlobalStatement Span)
@@ -201,13 +214,13 @@ instance Compile (Py.Identifier Span) where
   compile Py.Identifier { bytes } = pure (pure bytes)
 
 instance Compile (Py.IfStatement Span) where
-  compile stmt = compileCC stmt (pure none)
-
   compileCC it@Py.IfStatement{ condition, consequence, alternative} cc =
     locate it =<< (if' <$> compile condition <*> compileCC consequence cc <*> foldr clause cc alternative)
     where clause (Right Py.ElseClause{ body }) _ = compileCC body cc
           clause (Left  Py.ElifClause{ condition, consequence }) rest  =
             if' <$> compile condition <*> compileCC consequence cc <*> rest
+
+  compile = viaCompileCC
 
 
 instance Compile (Py.ImportFromStatement Span)
