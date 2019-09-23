@@ -49,7 +49,6 @@ runTagging source
   . appEndo
   . run
   . execWriter
-  . runReader @[Kind] []
   . runReader source
   . tag where
 
@@ -57,7 +56,6 @@ class ToTag t where
   tag
     :: ( Carrier sig m
        , Member (Reader Source) sig
-       , Member (Reader [Kind]) sig
        , Member (Writer (Endo [Tag])) sig
        )
     => t
@@ -71,7 +69,6 @@ class ToTagBy (strategy :: Strategy) t where
   tag'
     :: ( Carrier sig m
        , Member (Reader Source) sig
-       , Member (Reader [Kind]) sig
        , Member (Writer (Endo [Tag])) sig
        )
     => t
@@ -112,10 +109,9 @@ instance ToTagBy 'Custom (Py.FunctionDefinition Loc) where
       let docs = listToMaybe extraChildren >>= docComment src
           sliced = slice src (Range start end)
       yield (Tag name Function span (Just (firstLine sliced)) docs)
-      local (Function:) $ do
-        tag parameters
-        tag returnType
-        traverse_ tag extraChildren
+      tag parameters
+      tag returnType
+      traverse_ tag extraChildren
 
 yield :: (Carrier sig m, Member (Writer (Endo [Tag])) sig) => Tag -> m ()
 yield = tell . Endo . (:)
@@ -135,7 +131,6 @@ class GToTag t where
   gtag
     :: ( Carrier sig m
        , Member (Reader Source) sig
-       , Member (Reader [Kind]) sig
        , Member (Writer (Endo [Tag])) sig
        )
     => t a
