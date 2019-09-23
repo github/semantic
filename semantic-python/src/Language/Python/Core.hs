@@ -54,6 +54,9 @@ type CoreSyntax sig t = ( Member Core sig
 
 class Compile py where
   -- Should this go away, and should compileCC be the main function to call?
+
+  -- FIXME: rather than failing the compilation process entirely
+  -- with MonadFail, we should emit core that represents failure
   compile :: ( CoreSyntax syn t
              , Member (Reader SourcePath) sig
              , Member (Reader Bindings) sig
