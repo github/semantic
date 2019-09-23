@@ -93,6 +93,15 @@ instance ToTagBy 'Custom Py.ClassDefinition where
       traverse_ tag extraChildren
 
 instance ToTagBy 'Custom Py.Call where
+  tag' Py.Call
+    { ann = Loc range span
+    , function = Py.IdentifierPrimaryExpression Py.Identifier { bytes = name }
+    , arguments
+    } = do
+      src <- ask @Source
+      let sliced = slice src range
+      yield (Tag name Call span (Just (firstLine sliced)) Nothing)
+      tag arguments
   tag' Py.Call {} = pure ()
 
 yield :: (Carrier sig m, Member (Writer (Endo [Tag])) sig) => Tag -> m ()
