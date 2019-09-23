@@ -148,3 +148,9 @@ instance {-# OVERLAPPABLE #-}
          Element t (t :+: r) where
   prj (L1 l) = Just l
   prj _      = Nothing
+
+instance {-# OVERLAPPABLE #-}
+         Element t r
+      => Element t (l :+: r) where
+  prj (R1 r) = prj r
+  prj _      = Nothing
