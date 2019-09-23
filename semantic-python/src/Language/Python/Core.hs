@@ -1,7 +1,7 @@
 {-# LANGUAGE ConstraintKinds, DataKinds, DefaultSignatures, DeriveAnyClass, DeriveGeneric, DerivingStrategies,
              DerivingVia, DisambiguateRecordFields, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving,
              NamedFieldPuns, OverloadedLists, OverloadedStrings, ScopedTypeVariables, StandaloneDeriving,
-             TupleSections, TypeApplications, TypeOperators, UndecidableInstances #-}
+             TypeApplications, TypeOperators, UndecidableInstances #-}
 
 module Language.Python.Core
 ( compile
@@ -171,7 +171,7 @@ instance Compile (Py.ExpressionStatement Span) where
     { Py.extraChildren = children
     } cc = do
     foldr compileCC cc children >>= locate it
-  compile stmt = compileCC stmt (pure none)
+  compile = viaCompileCC
 
 instance Compile (Py.ExpressionList Span) where
   compile it@Py.ExpressionList { Py.extraChildren = exprs } = do
