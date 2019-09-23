@@ -52,7 +52,6 @@ class ToTagBy (strategy :: Strategy) t where
 data Strategy = Generic | Custom
 
 type family ToTagInstance t :: Strategy where
-  ToTagInstance Loc                         = 'Custom
   ToTagInstance Text                        = 'Custom
   ToTagInstance [_]                         = 'Custom
   ToTagInstance ((_ :+: _) _)               = 'Custom
@@ -60,9 +59,6 @@ type family ToTagInstance t :: Strategy where
   ToTagInstance (Py.ClassDefinition Loc)    = 'Custom
   ToTagInstance (Py.Call Loc)               = 'Custom
   ToTagInstance _                           = 'Generic
-
-instance ToTagBy 'Custom Loc where
-  tag' _ = pure ()
 
 instance ToTagBy 'Custom Text where
   tag' _ = pure ()
