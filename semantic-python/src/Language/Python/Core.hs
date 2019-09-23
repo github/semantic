@@ -102,7 +102,6 @@ newtype CompileSum py = CompileSum py
 
 instance (Generic py, GCompileSum (Rep py)) => Compile (CompileSum py) where
   compileCC (CompileSum a) cc = gcompileCCSum (from a) cc
-  compileCC (CompileSum a) cc = gcompileCCSum (from a) cc
 
 deriving via CompileSum (Either l r) instance (Compile l, Compile r) => Compile (Either l r)
 
@@ -259,7 +258,7 @@ instance Compile (Py.True Span) where
 instance Compile (Py.TryStatement Span)
 
 instance Compile (Py.Tuple Span) where
-  compileCC it@Py.Tuple { Py.extraChildren = [] } _ = pure unit
+  compileCC it@Py.Tuple { Py.extraChildren = [] } _ = locate it unit
 
   compileCC it _
     = fail ("Unimplemented: non-empty tuple " <> show it)
