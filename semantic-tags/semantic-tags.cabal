@@ -24,8 +24,7 @@ library
   -- other-modules:
   -- other-extensions:
   build-depends:
-      aeson              ^>= 1.4.2.0
-    , base                >= 4.12 && < 5
+      base                >= 4.12 && < 5
     , bytestring         ^>= 0.10.8.2
     , fused-effects      ^>= 0.5
     , semantic-source    ^>= 0.0

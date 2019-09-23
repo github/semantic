@@ -6,7 +6,6 @@ module Tags.Taggable.Precise
 
 import           Control.Effect.Reader
 import           Control.Effect.Writer
-import           Data.Aeson as A
 import           Data.Foldable (traverse_)
 import           Data.Maybe (listToMaybe)
 import           Data.Monoid (Endo(..))
@@ -27,8 +26,6 @@ data Tag = Tag
   }
   deriving (Eq, Generic, Show)
 
-instance ToJSON Tag
-
 
 data Kind
   = Function
@@ -37,10 +34,6 @@ data Kind
   | Module
   | Call
   deriving (Bounded, Enum, Eq, Generic, Show)
-
-instance ToJSON Kind where
-  toJSON = toJSON . show
-  toEncoding = toEncoding . show
 
 
 runTagging :: Source -> Py.Module Loc -> [Tag]
