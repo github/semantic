@@ -59,6 +59,7 @@ type family ToTagInstance t :: Strategy where
   ToTagInstance ((_ :+: _) _)               = 'Custom
   ToTagInstance (Py.FunctionDefinition Loc) = 'Custom
   ToTagInstance (Py.ClassDefinition Loc)    = 'Custom
+  ToTagInstance (Py.Call Loc)               = 'Custom
   ToTagInstance _                           = 'Generic
 
 instance ToTagBy 'Custom Loc where
@@ -92,6 +93,9 @@ instance ToTagBy 'Custom (Py.FunctionDefinition Loc) where
 
 instance ToTagBy 'Custom (Py.ClassDefinition Loc) where
   tag' Py.ClassDefinition {} = pure ()
+
+instance ToTagBy 'Custom (Py.Call Loc) where
+  tag' Py.Call {} = pure ()
 
 yield :: (Carrier sig m, Member (Writer (Endo [Tag])) sig) => Tag -> m ()
 yield = tell . Endo . (:)
