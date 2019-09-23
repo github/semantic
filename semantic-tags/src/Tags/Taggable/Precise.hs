@@ -22,7 +22,6 @@ data Tag = Tag
   { name :: Text
   , kind :: Kind
   , span :: Span
-  , context :: [Kind]
   , line :: Maybe Text
   , docs :: Maybe Text
   }
@@ -110,10 +109,9 @@ instance ToTagBy 'Custom (Py.FunctionDefinition Loc) where
     , body = Py.Block { ann = Loc Range { start = end } _, extraChildren }
     } = do
       src <- ask @Source
-      ctx <- ask @[Kind]
       let docs = listToMaybe extraChildren >>= docComment src
           sliced = slice src (Range start end)
-      yield (Tag name Function span ctx (Just (firstLine sliced)) docs)
+      yield (Tag name Function span (Just (firstLine sliced)) docs)
       local (Function:) $ do
         tag parameters
         tag returnType
