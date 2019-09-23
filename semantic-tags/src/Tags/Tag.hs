@@ -10,7 +10,7 @@ data Tag = Tag
   { name :: Text
   , kind :: Kind
   , span :: Span
-  , line :: Maybe Text
+  , line :: Text
   , docs :: Maybe Text
   }
   deriving (Eq, Show)

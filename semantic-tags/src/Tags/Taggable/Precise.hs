@@ -73,7 +73,7 @@ instance ToTagBy 'Custom Py.FunctionDefinition where
       src <- ask @Source
       let docs = listToMaybe extraChildren >>= docComment src
           sliced = slice src (Range start end)
-      yield (Tag name Function span (Just (firstLine sliced)) docs)
+      yield (Tag name Function span (firstLine sliced) docs)
       tag parameters
       traverse_ tag returnType
       traverse_ tag extraChildren
@@ -88,7 +88,7 @@ instance ToTagBy 'Custom Py.ClassDefinition where
       src <- ask @Source
       let docs = listToMaybe extraChildren >>= docComment src
           sliced = slice src (Range start end)
-      yield (Tag name Class span (Just (firstLine sliced)) docs)
+      yield (Tag name Class span (firstLine sliced) docs)
       traverse_ tag superclasses
       traverse_ tag extraChildren
 
@@ -100,7 +100,7 @@ instance ToTagBy 'Custom Py.Call where
     } = do
       src <- ask @Source
       let sliced = slice src range
-      yield (Tag name Call span (Just (firstLine sliced)) Nothing)
+      yield (Tag name Call span (firstLine sliced) Nothing)
       tag arguments
   tag' Py.Call {} = pure ()
 
