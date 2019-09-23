@@ -99,9 +99,11 @@ docComment _ _ = Nothing
 firstLine :: Source -> Text
 firstLine = T.take 180 . T.takeWhile (/= '\n') . toText
 
-instance (Generic t, GToTag (Rep t)) => ToTagBy 'Generic t where
-  tag' = gtag . from
+instance (Generic1 t, GToTag (Rep1 t)) => ToTagBy 'Generic (t Loc) where
+  tag' = gtag . from1
 
+instance (Foldable f, ToTag (g Loc)) => ToTagBy 'Generic (f (g Loc)) where
+  tag' = mapM_ tag
 
 class GToTag t where
   gtag
@@ -109,7 +111,7 @@ class GToTag t where
        , Member (Reader Source) sig
        , Member (Writer (Endo [Tag])) sig
        )
-    => t a
+    => t Loc
     -> m ()
 
 
@@ -125,6 +127,15 @@ instance (GToTag f, GToTag g) => GToTag (f :+: g) where
 
 instance ToTag t => GToTag (K1 R t) where
   gtag = tag . unK1
+
+instance GToTag Par1 where
+  gtag _ = pure ()
+
+instance ToTag (t Loc) => GToTag (Rec1 t) where
+  gtag = tag . unRec1
+
+instance (Foldable f, GToTag g) => GToTag (f :.: g) where
+  gtag = mapM_ gtag . unComp1
 
 instance GToTag U1 where
   gtag _ = pure mempty
