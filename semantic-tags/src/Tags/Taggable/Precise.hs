@@ -35,7 +35,7 @@ class ToTag t where
     => t
     -> m ()
 
-instance (ToTagBy strategy t, strategy ~ ToTagInstance t) => ToTag t where
+instance (ToTagBy strategy t, strategy ~ ToTagInstance t) => ToTag (t Loc) where
   tag = tag' @strategy
 
 
@@ -45,24 +45,24 @@ class ToTagBy (strategy :: Strategy) t where
        , Member (Reader Source) sig
        , Member (Writer (Endo [Tag])) sig
        )
-    => t
+    => t Loc
     -> m ()
 
 
 data Strategy = Generic | Custom
 
 type family ToTagInstance t :: Strategy where
-  ToTagInstance ((_ :+: _) _)               = 'Custom
-  ToTagInstance (Py.FunctionDefinition Loc) = 'Custom
-  ToTagInstance (Py.ClassDefinition Loc)    = 'Custom
-  ToTagInstance (Py.Call Loc)               = 'Custom
-  ToTagInstance _                           = 'Generic
+  ToTagInstance (_ :+: _)             = 'Custom
+  ToTagInstance Py.FunctionDefinition = 'Custom
+  ToTagInstance Py.ClassDefinition    = 'Custom
+  ToTagInstance Py.Call               = 'Custom
+  ToTagInstance _                     = 'Generic
 
-instance (ToTag (l a), ToTag (r a)) => ToTagBy 'Custom ((l :+: r) a) where
+instance (ToTag (l Loc), ToTag (r Loc)) => ToTagBy 'Custom (l :+: r) where
   tag' (L1 l) = tag l
   tag' (R1 r) = tag r
 
-instance ToTagBy 'Custom (Py.FunctionDefinition Loc) where
+instance ToTagBy 'Custom Py.FunctionDefinition where
   tag' Py.FunctionDefinition
     { ann = Loc Range { start } span
     , name = Py.Identifier { bytes = name }
@@ -75,13 +75,13 @@ instance ToTagBy 'Custom (Py.FunctionDefinition Loc) where
           sliced = slice src (Range start end)
       yield (Tag name Function span (Just (firstLine sliced)) docs)
       tag parameters
-      tag returnType
+      traverse_ tag returnType
       traverse_ tag extraChildren
 
-instance ToTagBy 'Custom (Py.ClassDefinition Loc) where
+instance ToTagBy 'Custom Py.ClassDefinition where
   tag' Py.ClassDefinition {} = pure ()
 
-instance ToTagBy 'Custom (Py.Call Loc) where
+instance ToTagBy 'Custom Py.Call where
   tag' Py.Call {} = pure ()
 
 yield :: (Carrier sig m, Member (Writer (Endo [Tag])) sig) => Tag -> m ()
@@ -94,11 +94,8 @@ docComment _ _ = Nothing
 firstLine :: Source -> Text
 firstLine = T.take 180 . T.takeWhile (/= '\n') . toText
 
-instance (Generic1 t, GToTag (Rep1 t)) => ToTagBy 'Generic (t Loc) where
+instance (Generic1 t, GToTag (Rep1 t)) => ToTagBy 'Generic t where
   tag' = gtag . from1
-
-instance (Foldable f, ToTag (g Loc)) => ToTagBy 'Generic (f (g Loc)) where
-  tag' = mapM_ tag
 
 class GToTag t where
   gtag
