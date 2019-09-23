@@ -15,26 +15,8 @@ import           GHC.Generics
 import           Source.Loc
 import           Source.Range
 import           Source.Source
+import           Tags.Tag
 import qualified TreeSitter.Python.AST as Py
-
-data Tag = Tag
-  { name :: Text
-  , kind :: Kind
-  , span :: Span
-  , line :: Maybe Text
-  , docs :: Maybe Text
-  }
-  deriving (Eq, Generic, Show)
-
-
-data Kind
-  = Function
-  | Method
-  | Class
-  | Module
-  | Call
-  deriving (Bounded, Enum, Eq, Generic, Show)
-
 
 runTagging :: Source -> Py.Module Loc -> [Tag]
 runTagging source
