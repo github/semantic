@@ -127,3 +127,7 @@ instance ToTag t => GToTag (K1 R t) where
 
 instance GToTag U1 where
   gtag _ = pure mempty
+
+
+class Element sub sup where
+  prj :: sup a -> Maybe (sub a)
