@@ -174,9 +174,8 @@ instance Compile (Py.ExpressionStatement Span) where
   compile = viaCompileCC
 
 instance Compile (Py.ExpressionList Span) where
-  compile it@Py.ExpressionList { Py.extraChildren = exprs } = do
-    actions <- traverse compile exprs
-    locate it $ do' (fmap (Nothing :<-) actions)
+  compile it@Py.ExpressionList { Py.extraChildren = [child] } = compile child >>= locate it
+  compile Py.ExpressionList { Py.extraChildren = items } = fail ("unimplemented: ExpressionList of length " <> show items)
 
 
 instance Compile (Py.False Span) where compile it = locate it $ bool False
