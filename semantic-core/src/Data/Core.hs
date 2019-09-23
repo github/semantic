@@ -126,6 +126,8 @@ unseqs = go
           Just (l, r) -> go l <> go r
           Nothing     -> t :| []
 
+-- TODO: if the left hand side is only a unit, this should return just the RHS
+-- this is a little fiddly to do
 (>>>=) :: (Eq a, Carrier sig m, Member Core sig) => (Named a :<- m a) -> m a -> m a
 Named u n :<- a >>>= b = send (Named u a :>>= abstract1 n b)
 

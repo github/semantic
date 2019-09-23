@@ -14,6 +14,7 @@ import Prelude hiding (fail)
 import           Control.Effect hiding ((:+:))
 import           Control.Effect.Reader
 import           Control.Monad.Fail
+import           Data.Coerce
 import           Data.Core as Core
 import           Data.Foldable
 import qualified Data.Loc
@@ -22,7 +23,6 @@ import           Data.Stack (Stack)
 import qualified Data.Stack as Stack
 import           Data.String (IsString)
 import           Data.Text (Text)
-import           Data.Traversable
 import           GHC.Generics
 import           GHC.Records
 import qualified TreeSitter.Python.AST as Py
@@ -33,9 +33,15 @@ newtype SourcePath = SourcePath { rawPath :: Text }
   deriving stock (Eq, Show)
   deriving newtype IsString
 
+-- Keeps track of the current scope's bindings (so that we can, when
+-- compiling a class or module, return the list of bound variables
+-- as a Core record so that all immediate definitions are exposed)
 newtype Bindings = Bindings { unBindings :: Stack Name }
   deriving stock (Eq, Show)
   deriving newtype (Semigroup, Monoid)
+
+def :: Name -> Bindings -> Bindings
+def n = coerce (Stack.:> n)
 
 -- We leave the representation of Core syntax abstract so that it's not
 -- possible for us to 'cheat' by pattern-matching on or eliminating a
@@ -47,7 +53,7 @@ type CoreSyntax sig t = ( Member Core sig
                         )
 
 class Compile py where
-  -- FIXME: we should really try not to fail
+  -- Should this go away, and should compileCC be the main function to call?
   compile :: ( CoreSyntax syn t
              , Member (Reader SourcePath) sig
              , Member (Reader Bindings) sig
@@ -155,17 +161,27 @@ instance Compile (Py.Float Span)
 instance Compile (Py.ForStatement Span)
 
 instance Compile (Py.FunctionDefinition Span) where
-  compile it@Py.FunctionDefinition
+  -- TODO: viaCompileCC function to make this better
+  compile stmt = compileCC stmt (pure none)
+
+  compileCC it@Py.FunctionDefinition
     { name       = Py.Identifier _ann1 name
     , parameters = Py.Parameters _ann2 parameters
     , body
-    } = do
+    } cc = do
+      -- Compile each of the parameters, then the body.
       parameters' <- traverse param parameters
       body' <- compile body
-      locate it $ (pure name .= lams parameters' body')
+      -- Build a lambda.
+      located <- locate it (lams parameters' body')
+      -- Give it a name (below), then augment the current continuation
+      -- with the new name (with 'def'), so that calling contexts know
+      -- that we have built an exportable definition.
+      assigning located <$> local (def name) cc
     where param (Py.IdentifierParameter (Py.Identifier _pann pname)) = pure (named' pname)
           param x                                                    = unimplemented x
           unimplemented x = fail $ "unimplemented: " <> show x
+          assigning item f = (Name.named' name :<- item) >>>= f
 
 instance Compile (Py.FutureImportStatement Span)
 instance Compile (Py.GeneratorExpression Span)
@@ -193,11 +209,16 @@ instance Compile (Py.ListComprehension Span)
 
 instance Compile (Py.Module Span) where
   compile it@Py.Module { Py.extraChildren = stmts } = do
-    -- Buggy and ad-hoc: the toList call promotes too many variables
-    -- to top-level scope.
-    res <- traverse compile stmts
-    let names = concatMap toList res
-    locate it . record $ zip names res
+    -- This action gets passed to compileCC, which means it is the
+    -- final action taken after the compiling fold finishes. It takes
+    -- care of listening for the current set of bound variables (which
+    -- is augmented by assignments and function definitions) and
+    -- creating a record corresponding to those bindings.
+    let buildRecord = do
+          bindings <- asks @Bindings (toList . unBindings)
+          let buildName n = (n, pure n)
+          pure . record . fmap buildName $ bindings
+    foldr compileCC buildRecord stmts >>= locate it
 
 instance Compile (Py.NamedExpression Span)
 instance Compile (Py.None Span)

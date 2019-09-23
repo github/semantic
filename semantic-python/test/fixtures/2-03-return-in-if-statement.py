@@ -1,5 +1,4 @@
-# CHECK-JQ: .tree.contents[0][1].contents[1] | .tag == "Lam" and .contents.value.tag == "If"
-# CHECK-JQ: .tree.contents[0][1].contents[1].contents.value | .contents[2].tag == "Unit"
+# CHECK-TREE: { foo <- \a -> if a then a else #unit; #record { foo: foo } }
 
 def foo(a):
     if a: return a

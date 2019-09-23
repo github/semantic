@@ -1,3 +1,3 @@
-# CHECK-TREE: #record { foo : foo = (\a -> a) }
+# CHECK-TREE: { foo <- (\a -> a); #record { foo: foo } }
 def foo(a):
     return a
