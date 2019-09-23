@@ -135,3 +135,11 @@ class Element sub sup where
 instance {-# OVERLAPPABLE #-}
          Element t t where
   prj = Just
+
+instance {-# OVERLAPPABLE #-}
+         Element t (l1 :+: l2 :+: r)
+      => Element t ((l1 :+: l2) :+: r) where
+  prj = prj . reassoc where
+    reassoc (L1 (L1 l)) = L1 l
+    reassoc (L1 (R1 l)) = R1 (L1 l)
+    reassoc (R1 r)      = R1 (R1 r)
