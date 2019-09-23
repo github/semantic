@@ -118,7 +118,8 @@ instance Compile (Py.Assignment Span) where
     , Py.right = Just rhs
     } cc = do
     value  <- compile rhs
-    locate it =<< ((Name.named' name :<- value) >>>=) <$> local (def name) cc
+    let assigning n = (Name.named' name :<- value) >>>= n
+    locate it =<< assigning <$> local (def name) cc
   compileCC other _ = fail ("Unhandled assignment case: " <> show other)
   compile t = compileCC t (pure none)
 
