@@ -5,6 +5,7 @@
 
 module Language.Python.Core
 ( compile
+, Bindings
 , SourcePath
 ) where
 
@@ -13,10 +14,13 @@ import Prelude hiding (fail)
 import           Control.Effect hiding ((:+:))
 import           Control.Effect.Reader
 import           Control.Monad.Fail
+import           Data.Coerce
 import           Data.Core as Core
 import           Data.Foldable
 import qualified Data.Loc
 import           Data.Name as Name
+import           Data.Stack (Stack)
+import qualified Data.Stack as Stack
 import           Data.String (IsString)
 import           Data.Text (Text)
 import           GHC.Generics
@@ -29,6 +33,16 @@ newtype SourcePath = SourcePath { rawPath :: Text }
   deriving stock (Eq, Show)
   deriving newtype IsString
 
+-- Keeps track of the current scope's bindings (so that we can, when
+-- compiling a class or module, return the list of bound variables
+-- as a Core record so that all immediate definitions are exposed)
+newtype Bindings = Bindings { unBindings :: Stack Name }
+  deriving stock (Eq, Show)
+  deriving newtype (Semigroup, Monoid)
+
+def :: Name -> Bindings -> Bindings
+def n = coerce (Stack.:> n)
+
 -- We leave the representation of Core syntax abstract so that it's not
 -- possible for us to 'cheat' by pattern-matching on or eliminating a
 -- compiled term.
@@ -39,9 +53,13 @@ type CoreSyntax sig t = ( Member Core sig
                         )
 
 class Compile py where
-  -- FIXME: we should really try not to fail
+  -- Should this go away, and should compileCC be the main function to call?
+
+  -- FIXME: rather than failing the compilation process entirely
+  -- with MonadFail, we should emit core that represents failure
   compile :: ( CoreSyntax syn t
              , Member (Reader SourcePath) sig
+             , Member (Reader Bindings) sig
              , Carrier sig m
              , MonadFail m
              )
@@ -53,6 +71,7 @@ class Compile py where
 
   compileCC :: ( CoreSyntax syn t
                , Member (Reader SourcePath) sig
+               , Member (Reader Bindings) sig
                , Carrier sig m
                , MonadFail m
                )
@@ -60,6 +79,7 @@ class Compile py where
             -> m (t Name)
             -> m (t Name)
   compileCC py cc = (>>>) <$> compile py <*> cc
+
 
 locate :: ( HasField "ann" syntax Span
           , CoreSyntax syn t
@@ -78,6 +98,18 @@ locate syn item = do
 none :: (Member Core sig, Carrier sig t) => t Name
 none = unit
 
+-- | Helper for delegating to compileCC. The presence of this function indicates
+-- that we might want to move 'compile' out of the Compile class entirely.
+viaCompileCC :: ( Compile py
+                , CoreSyntax syn t
+                , Member (Reader SourcePath) sig
+                , Member (Reader Bindings) sig
+                , Carrier sig m
+                , MonadFail m
+                )
+             => py -> m (t Name)
+viaCompileCC t = compileCC t (pure none)
+
 defaultCompile :: (MonadFail m, Show py) => py -> m (t Name)
 defaultCompile t = fail $ "compilation unimplemented for " <> show t
 
@@ -93,20 +125,29 @@ instance Compile (Py.AssertStatement Span)
 instance Compile (Py.Attribute Span)
 
 instance Compile (Py.Assignment Span) where
-  compile it@Py.Assignment { Py.left = Py.ExpressionList { Py.extraChildren = [lhs] }, Py.right = Just rhs } = do
-    target <- compile lhs
+  compileCC it@Py.Assignment
+    { Py.left = Py.ExpressionList
+      { Py.extraChildren =
+        [ Py.PrimaryExpressionExpression (Py.IdentifierPrimaryExpression (Py.Identifier { Py.bytes = name }))
+        ]
+      }
+    , Py.right = Just rhs
+    } cc = do
     value  <- compile rhs
-    locate it $ target .= value
-  compile other = fail ("Unhandled assignment case: " <> show other)
+    let assigning n = (Name.named' name :<- value) >>>= n
+    locate it =<< assigning <$> local (def name) cc
+  compileCC other _ = fail ("Unhandled assignment case: " <> show other)
+
+  compile = viaCompileCC
 
 instance Compile (Py.AugmentedAssignment Span)
 instance Compile (Py.Await Span)
 instance Compile (Py.BinaryOperator Span)
 
 instance Compile (Py.Block Span) where
-  compile t = compileCC t (pure none)
-
   compileCC it@Py.Block{ Py.extraChildren = body} cc = locate it =<< foldr compileCC cc body
+
+  compile = viaCompileCC
 
 instance Compile (Py.BooleanOperator Span)
 instance Compile (Py.BreakStatement Span)
@@ -129,14 +170,15 @@ instance Compile (Py.ExecStatement Span)
 deriving via CompileSum (Py.Expression Span) instance Compile (Py.Expression Span)
 
 instance Compile (Py.ExpressionStatement Span) where
-  compile it@Py.ExpressionStatement { Py.extraChildren = children } = do
-    actions <- traverse compile children
-    locate it $ do' (fmap (Nothing :<-) actions)
+  compileCC it@Py.ExpressionStatement
+    { Py.extraChildren = children
+    } cc = do
+    foldr compileCC cc children >>= locate it
+  compile = viaCompileCC
 
 instance Compile (Py.ExpressionList Span) where
-  compile it@Py.ExpressionList { Py.extraChildren = exprs } = do
-    actions <- traverse compile exprs
-    locate it $ do' (fmap (Nothing :<-) actions)
+  compile it@Py.ExpressionList { Py.extraChildren = [child] } = compile child >>= locate it
+  compile Py.ExpressionList { Py.extraChildren = items } = fail ("unimplemented: ExpressionList of length " <> show items)
 
 
 instance Compile (Py.False Span) where compile it = locate it $ bool False
@@ -145,17 +187,26 @@ instance Compile (Py.Float Span)
 instance Compile (Py.ForStatement Span)
 
 instance Compile (Py.FunctionDefinition Span) where
-  compile it@Py.FunctionDefinition
+  compileCC it@Py.FunctionDefinition
     { name       = Py.Identifier _ann1 name
     , parameters = Py.Parameters _ann2 parameters
     , body
-    } = do
+    } cc = do
+      -- Compile each of the parameters, then the body.
       parameters' <- traverse param parameters
       body' <- compile body
-      locate it $ (pure name .= lams parameters' body')
+      -- Build a lambda.
+      located <- locate it (lams parameters' body')
+      -- Give it a name (below), then augment the current continuation
+      -- with the new name (with 'def'), so that calling contexts know
+      -- that we have built an exportable definition.
+      assigning located <$> local (def name) cc
     where param (Py.IdentifierParameter (Py.Identifier _pann pname)) = pure (named' pname)
           param x                                                    = unimplemented x
           unimplemented x = fail $ "unimplemented: " <> show x
+          assigning item f = (Name.named' name :<- item) >>>= f
+
+  compile = viaCompileCC
 
 instance Compile (Py.FutureImportStatement Span)
 instance Compile (Py.GeneratorExpression Span)
@@ -165,13 +216,13 @@ instance Compile (Py.Identifier Span) where
   compile Py.Identifier { bytes } = pure (pure bytes)
 
 instance Compile (Py.IfStatement Span) where
-  compile stmt = compileCC stmt (pure none)
-
   compileCC it@Py.IfStatement{ condition, consequence, alternative} cc =
     locate it =<< (if' <$> compile condition <*> compileCC consequence cc <*> foldr clause cc alternative)
     where clause (Right Py.ElseClause{ body }) _ = compileCC body cc
           clause (Left  Py.ElifClause{ condition, consequence }) rest  =
             if' <$> compile condition <*> compileCC consequence cc <*> rest
+
+  compile = viaCompileCC
 
 
 instance Compile (Py.ImportFromStatement Span)
@@ -183,11 +234,16 @@ instance Compile (Py.ListComprehension Span)
 
 instance Compile (Py.Module Span) where
   compile it@Py.Module { Py.extraChildren = stmts } = do
-    -- Buggy and ad-hoc: the toList call promotes too many variables
-    -- to top-level scope.
-    res <- traverse compile stmts
-    let names = concatMap toList res
-    locate it . record $ zip names res
+    -- This action gets passed to compileCC, which means it is the
+    -- final action taken after the compiling fold finishes. It takes
+    -- care of listening for the current set of bound variables (which
+    -- is augmented by assignments and function definitions) and
+    -- creating a record corresponding to those bindings.
+    let buildRecord = do
+          bindings <- asks @Bindings (toList . unBindings)
+          let buildName n = (n, pure n)
+          pure . record . fmap buildName $ bindings
+    foldr compileCC buildRecord stmts >>= locate it
 
 instance Compile (Py.NamedExpression Span)
 instance Compile (Py.None Span)
@@ -236,12 +292,14 @@ instance Compile (Py.Yield Span)
 class GCompileSum f where
   gcompileSum :: ( CoreSyntax syn t
                  , Member (Reader SourcePath) sig
+                 , Member (Reader Bindings) sig
                  , Carrier sig m
                  , MonadFail m
                  ) => f a -> m (t Name)
 
   gcompileCCSum :: ( CoreSyntax syn t
                    , Member (Reader SourcePath) sig
+                   , Member (Reader Bindings) sig
                    , Carrier sig m
                    , MonadFail m
                    ) => f a -> m (t Name) -> m (t Name)
