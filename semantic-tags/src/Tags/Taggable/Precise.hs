@@ -32,10 +32,10 @@ class ToTag t where
        , Member (Reader Source) sig
        , Member (Writer (Endo [Tag])) sig
        )
-    => t
+    => t Loc
     -> m ()
 
-instance (ToTagBy strategy t, strategy ~ ToTagInstance t) => ToTag (t Loc) where
+instance (ToTagBy strategy t, strategy ~ ToTagInstance t) => ToTag t where
   tag = tag' @strategy
 
 
@@ -58,7 +58,7 @@ type family ToTagInstance t :: Strategy where
   ToTagInstance Py.Call               = 'Custom
   ToTagInstance _                     = 'Generic
 
-instance (ToTag (l Loc), ToTag (r Loc)) => ToTagBy 'Custom (l :+: r) where
+instance (ToTag l, ToTag r) => ToTagBy 'Custom (l :+: r) where
   tag' (L1 l) = tag l
   tag' (R1 r) = tag r
 
@@ -123,7 +123,7 @@ instance GToTag (K1 R t) where
 instance GToTag Par1 where
   gtag _ = pure ()
 
-instance ToTag (t Loc) => GToTag (Rec1 t) where
+instance ToTag t => GToTag (Rec1 t) where
   gtag = tag . unRec1
 
 instance (Foldable f, GToTag g) => GToTag (f :.: g) where
