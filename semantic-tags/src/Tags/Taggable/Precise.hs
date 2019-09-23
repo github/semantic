@@ -131,3 +131,7 @@ instance GToTag U1 where
 
 class Element sub sup where
   prj :: sup a -> Maybe (sub a)
+
+instance {-# OVERLAPPABLE #-}
+         Element t t where
+  prj = Just
