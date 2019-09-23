@@ -183,3 +183,7 @@ instance {-# OVERLAPPABLE #-}
 class GSum t where
   type Members t :: (* -> *)
   gmembers :: t a -> Members t a
+
+instance GSum f => GSum (M1 i c f) where
+  type Members (M1 i c f) = Members f
+  gmembers = gmembers . unM1
