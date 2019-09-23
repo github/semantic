@@ -132,8 +132,8 @@ instance (GToTag f, GToTag g) => GToTag (f :+: g) where
   gtag (L1 l) = gtag l
   gtag (R1 r) = gtag r
 
-instance ToTag t => GToTag (K1 R t) where
-  gtag = tag . unK1
+instance GToTag (K1 R t) where
+  gtag _ = pure ()
 
 instance GToTag Par1 where
   gtag _ = pure ()
