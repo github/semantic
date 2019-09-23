@@ -98,7 +98,7 @@ fixtureTestTreeForFile fp = HUnit.testCaseSteps (Path.toString fp) $ \step -> wi
       (Right (Left err), _)                  -> HUnit.assertFailure ("Compilation failed: " <> err)
       (Right (Right _), Directive.Fails)     -> HUnit.assertFailure ("Expected translation to fail")
       (Right (Right item), Directive.JQ _)   -> assertJQExpressionSucceeds directive result item
-      (Right (Right item), Directive.Tree t) -> let msg = "expected (pretty): " <> showCore item'
+      (Right (Right item), Directive.Tree t) -> let msg = "got (pretty): " <> showCore item'
                                                     item' = stripAnnotations item
                                                 in HUnit.assertEqual msg t item' where
 
