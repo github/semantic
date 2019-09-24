@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DerivingStrategies, GeneralizedNewtypeDeriving, OverloadedStrings, TypeApplications, TypeOperators #-}
+{-# LANGUAGE DeriveAnyClass, DerivingStrategies, GeneralizedNewtypeDeriving, OverloadedStrings, TypeApplications, TypeOperators, ScopedTypeVariables #-}
 
 module Main (main) where
 
@@ -9,6 +9,7 @@ import           Control.Effect.Reader
 import           Control.Monad hiding (fail)
 import           Control.Monad.Catch
 import           Control.Monad.IO.Class
+import           Control.Monad.Trans.Resource (ResourceT, runResourceT)
 import qualified Data.Aeson as Aeson
 import qualified Data.Aeson.Encode.Pretty as Aeson
 import qualified Data.ByteString.Char8 as ByteString
@@ -29,6 +30,7 @@ import           GHC.Stack
 import qualified Language.Python.Core as Py
 import           Prelude hiding (fail)
 import           Streaming
+import qualified Streaming.Prelude as Stream
 import qualified Streaming.Process
 import           System.Directory
 import           System.Exit
@@ -76,13 +78,23 @@ assertJQExpressionSucceeds directive tree core = do
 fixtureTestTreeForFile :: HasCallStack => Path.RelFile -> Tasty.TestTree
 fixtureTestTreeForFile fp = HUnit.testCaseSteps (Path.toString fp) $ \step -> withFrozenCallStack $ do
   let fullPath = Path.relDir "semantic-python/test/fixtures" </> fp
+      perish s = liftIO (HUnit.assertFailure ("Directive parsing error: " <> s))
 
-  fileContents <- ByteString.readFile (Path.toString fullPath)
-  directives <- case Directive.parseDirectives fileContents of
-    Right dir -> pure dir
-    Left err  -> HUnit.assertFailure ("Directive parsing error: " <> err)
+  -- Slurp the input file, taking lines from the beginning until we
+  -- encounter a line that doesn't have a '#'. For each line, parse
+  -- a directive out of it, failing if the directive can't be parsed.
+  directives <-
+    runResourceT
+    . Stream.toList_
+    . Stream.mapM (either perish pure . Directive.parseDirective)
+    . Stream.takeWhile ((== '#') . ByteString.head)
+    . Stream.mapped ByteStream.toStrict
+    . ByteStream.denull
+    . ByteStream.lines
+    . ByteStream.readFile @(ResourceT IO)
+    $ Path.toString fullPath
 
-  result <- TS.parseByteString TSP.tree_sitter_python fileContents
+  result <- ByteString.readFile (Path.toString fullPath) >>= TS.parseByteString TSP.tree_sitter_python
   let coreResult = Control.Effect.run
                    . runFail
                    . runReader (fromString @Py.SourcePath . Path.toString $ fp)
