@@ -2,6 +2,7 @@
 module Tags.Taggable.Precise
 ( runTagging
 , Tags
+, ToTag(..)
 , yield
 ) where
 
@@ -26,12 +27,12 @@ runTagging source
   . run
   . execWriter
   . runReader source
-  . tag
+  . tags
 
 type Tags = Endo [Tag]
 
 class ToTag t where
-  tag
+  tags
     :: ( Carrier sig m
        , Member (Reader Source) sig
        , Member (Writer Tags) sig
@@ -45,11 +46,11 @@ yield = tell . Endo . (:)
 
 
 instance (ToTagBy strategy t, strategy ~ ToTagInstance t) => ToTag t where
-  tag = tag' @strategy
+  tags = tags' @strategy
 
 
 class ToTagBy (strategy :: Strategy) t where
-  tag'
+  tags'
     :: ( Carrier sig m
        , Member (Reader Source) sig
        , Member (Writer Tags) sig
@@ -68,11 +69,11 @@ type family ToTagInstance t :: Strategy where
   ToTagInstance _                     = 'Generic
 
 instance (ToTag l, ToTag r) => ToTagBy 'Custom (l :+: r) where
-  tag' (L1 l) = tag l
-  tag' (R1 r) = tag r
+  tags' (L1 l) = tags l
+  tags' (R1 r) = tags r
 
 instance ToTagBy 'Custom Py.FunctionDefinition where
-  tag' Py.FunctionDefinition
+  tags' Py.FunctionDefinition
     { ann = Loc Range { start } span
     , name = Py.Identifier { bytes = name }
     , parameters
@@ -83,12 +84,12 @@ instance ToTagBy 'Custom Py.FunctionDefinition where
       let docs = listToMaybe extraChildren >>= docComment src
           sliced = slice src (Range start end)
       yield (Tag name Function span (firstLine sliced) docs)
-      tag parameters
-      traverse_ tag returnType
-      traverse_ tag extraChildren
+      tags parameters
+      traverse_ tags returnType
+      traverse_ tags extraChildren
 
 instance ToTagBy 'Custom Py.ClassDefinition where
-  tag' Py.ClassDefinition
+  tags' Py.ClassDefinition
     { ann = Loc Range { start } span
     , name = Py.Identifier { bytes = name }
     , superclasses
@@ -98,11 +99,11 @@ instance ToTagBy 'Custom Py.ClassDefinition where
       let docs = listToMaybe extraChildren >>= docComment src
           sliced = slice src (Range start end)
       yield (Tag name Class span (firstLine sliced) docs)
-      traverse_ tag superclasses
-      traverse_ tag extraChildren
+      traverse_ tags superclasses
+      traverse_ tags extraChildren
 
 instance ToTagBy 'Custom Py.Call where
-  tag' Py.Call
+  tags' Py.Call
     { ann = Loc range span
     , function = Py.IdentifierPrimaryExpression Py.Identifier { bytes = name }
     , arguments
@@ -110,8 +111,8 @@ instance ToTagBy 'Custom Py.Call where
       src <- ask @Source
       let sliced = slice src range
       yield (Tag name Call span (firstLine sliced) Nothing)
-      tag arguments
-  tag' Py.Call {} = pure ()
+      tags arguments
+  tags' Py.Call {} = pure ()
 
 docComment :: Source -> (Py.CompoundStatement :+: Py.SimpleStatement) Loc -> Maybe Text
 docComment src (R1 (Py.ExpressionStatementSimpleStatement (Py.ExpressionStatement { extraChildren = L1 (Py.PrimaryExpressionExpression (Py.StringPrimaryExpression Py.String { ann })) :|_ }))) = Just (toText (slice src (byteRange ann)))
@@ -121,10 +122,10 @@ firstLine :: Source -> Text
 firstLine = T.take 180 . T.takeWhile (/= '\n') . toText
 
 instance (Generic1 t, GToTag (Rep1 t)) => ToTagBy 'Generic t where
-  tag' = gtag . from1
+  tags' = gtags . from1
 
 class GToTag t where
-  gtag
+  gtags
     :: ( Carrier sig m
        , Member (Reader Source) sig
        , Member (Writer Tags) sig
@@ -134,26 +135,26 @@ class GToTag t where
 
 
 instance GToTag f => GToTag (M1 i c f) where
-  gtag = gtag . unM1
+  gtags = gtags . unM1
 
 instance (GToTag f, GToTag g) => GToTag (f :*: g) where
-  gtag (f :*: g) = (<>) <$> gtag f <*> gtag g
+  gtags (f :*: g) = (<>) <$> gtags f <*> gtags g
 
 instance (GToTag f, GToTag g) => GToTag (f :+: g) where
-  gtag (L1 l) = gtag l
-  gtag (R1 r) = gtag r
+  gtags (L1 l) = gtags l
+  gtags (R1 r) = gtags r
 
 instance GToTag (K1 R t) where
-  gtag _ = pure ()
+  gtags _ = pure ()
 
 instance GToTag Par1 where
-  gtag _ = pure ()
+  gtags _ = pure ()
 
 instance ToTag t => GToTag (Rec1 t) where
-  gtag = tag . unRec1
+  gtags = tags . unRec1
 
 instance (Foldable f, GToTag g) => GToTag (f :.: g) where
-  gtag = mapM_ gtag . unComp1
+  gtags = mapM_ gtags . unComp1
 
 instance GToTag U1 where
-  gtag _ = pure ()
+  gtags _ = pure ()
