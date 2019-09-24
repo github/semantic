@@ -20,6 +20,7 @@ tested-with:         GHC == 8.6.5
 
 library
   exposed-modules:
+    Language.Python.Tags
     Tags.Tag
     Tags.Taggable.Precise
   -- other-modules:
