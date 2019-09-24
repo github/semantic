@@ -187,8 +187,3 @@ class GSum t where
 instance GSum f => GSum (M1 i c f) where
   type Members (M1 i c f) = Members f
   gmembers = gmembers . unM1
-
-instance (GSum f, GSum g) => GSum (f :+: g) where
-  type Members (f :+: g) = Members f :+: Members g
-  gmembers (L1 l) = L1 (gmembers l)
-  gmembers (R1 r) = R1 (gmembers r)
