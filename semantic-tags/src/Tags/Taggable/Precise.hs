@@ -26,7 +26,7 @@ runTagging source
   . run
   . execWriter
   . runReader source
-  . tag where
+  . tag
 
 type Tags = Endo [Tag]
 
