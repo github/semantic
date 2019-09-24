@@ -63,7 +63,7 @@ jq = do
 tree :: Trifecta.Parser Directive
 tree = do
   void $ Trifecta.string "# CHECK-TREE: "
-  Tree <$> (Core.Parser.record <|> Core.Parser.comp)
+  Tree <$> (Core.Parser.record <|> Core.Parser.comp <|> Trifecta.parens Core.Parser.core)
 
 directive :: Trifecta.Parser Directive
 directive = Trifecta.choice [ fails, jq, tree ]
