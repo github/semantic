@@ -1,4 +1,4 @@
-{-# LANGUAGE AllowAmbiguousTypes, DataKinds, DisambiguateRecordFields, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, NamedFieldPuns, OverloadedStrings, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances, ViewPatterns #-}
+{-# LANGUAGE AllowAmbiguousTypes, DataKinds, DisambiguateRecordFields, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, NamedFieldPuns, OverloadedStrings, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Tags.Taggable.Precise
 ( runTagging
 ) where
@@ -95,7 +95,7 @@ instance ToTagBy 'Custom Py.ClassDefinition where
 instance ToTagBy 'Custom Py.Call where
   tag' Py.Call
     { ann = Loc range span
-    , function = prj . members -> Just Py.Identifier { bytes = name }
+    , function = Py.IdentifierPrimaryExpression Py.Identifier { bytes = name }
     , arguments
     } = do
       src <- ask @Source
@@ -179,9 +179,6 @@ instance {-# OVERLAPPABLE #-}
   prj (R1 r) = prj r
   prj _      = Nothing
 
-
-members :: (Generic1 t, GSum (Rep1 t)) => t a -> Members (Rep1 t) a
-members = gmembers . from1
 
 class GSum t where
   type Members t :: (* -> *)
