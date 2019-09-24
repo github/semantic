@@ -2,6 +2,7 @@
              DerivingVia, DisambiguateRecordFields, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving,
              NamedFieldPuns, OverloadedLists, OverloadedStrings, ScopedTypeVariables, StandaloneDeriving,
              TypeApplications, TypeOperators, UndecidableInstances #-}
+{-# OPTIONS_GHC -Werror #-}
 
 module Language.Python.Core
 ( compile
@@ -67,6 +68,11 @@ class Compile py where
 
   default compileCC :: (MonadFail m, Show py) => py -> m (t Name) -> m (t Name)
   compileCC a _ = defaultCompile a
+
+sequencing :: ( CoreSyntax syn t
+              , Carrier sig m)
+           => (py -> m (t Name)) -> py -> m (t Name) -> m (t Name)
+sequencing fn it cc = fn it >>= \lead -> fmap (lead >>>) cc
 
 -- | TODO: This is not right, it should be a reference to a Preluded
 -- NoneType instance, but it will do for now.
@@ -161,9 +167,8 @@ instance Compile (Py.ExpressionList Span) where
   compileCC Py.ExpressionList { Py.extraChildren = items } _
     = fail ("unimplemented: ExpressionList of length " <> show items)
 
-
 instance Compile (Py.False Span) where
-  compileCC it _ = locate it $ bool False
+  compileCC = sequencing $ \it -> locate it $ bool False
 
 instance Compile (Py.Float Span)
 instance Compile (Py.ForStatement Span)
@@ -253,15 +258,14 @@ instance Compile (Py.String Span)
 instance Compile (Py.Subscript Span)
 
 instance Compile (Py.True Span) where
-  compileCC it _ = locate it $ bool True
+  compileCC = sequencing $ \it -> locate it $ bool True
 
 instance Compile (Py.TryStatement Span)
 
 instance Compile (Py.Tuple Span) where
-  compileCC it@Py.Tuple { Py.extraChildren = [] } _ = locate it unit
-
-  compileCC it _
-    = fail ("Unimplemented: non-empty tuple " <> show it)
+  compileCC = sequencing $ \it -> case it of
+    Py.Tuple { Py.extraChildren = [] } -> locate it unit
+    _                                  -> fail ("Unimplemented: non-empty tuple " <> show it)
 
 instance Compile (Py.UnaryOperator Span)
 instance Compile (Py.WhileStatement Span)
