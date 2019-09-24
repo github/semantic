@@ -2,6 +2,7 @@
 module Tags.Taggable.Precise
 ( runTagging
 , Tags
+, yield
 ) where
 
 import           Control.Effect.Reader
