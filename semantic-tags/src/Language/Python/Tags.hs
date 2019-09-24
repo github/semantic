@@ -7,6 +7,7 @@ import           Control.Effect.Reader
 import           Control.Effect.Writer
 import           Data.Foldable (traverse_)
 import           Data.Maybe (listToMaybe)
+import           Data.Monoid (Ap(..))
 import           Data.List.NonEmpty (NonEmpty(..))
 import           Data.Text as T
 import           GHC.Generics
@@ -108,40 +109,5 @@ docComment _ _ = Nothing
 firstLine :: Source -> Text
 firstLine = T.take 180 . T.takeWhile (/= '\n') . toText
 
-instance (Generic1 t, GToTag (Rep1 t)) => ToTagBy 'Generic t where
-  tags' = gtags . from1
-
-class GToTag t where
-  gtags
-    :: ( Carrier sig m
-       , Member (Reader Source) sig
-       , Member (Writer Tags.Tags) sig
-       )
-    => t Loc
-    -> m ()
-
-
-instance GToTag f => GToTag (M1 i c f) where
-  gtags = gtags . unM1
-
-instance (GToTag f, GToTag g) => GToTag (f :*: g) where
-  gtags (f :*: g) = gtags f >> gtags g
-
-instance (GToTag f, GToTag g) => GToTag (f :+: g) where
-  gtags (L1 l) = gtags l
-  gtags (R1 r) = gtags r
-
-instance GToTag (K1 R t) where
-  gtags _ = pure ()
-
-instance GToTag Par1 where
-  gtags _ = pure ()
-
-instance ToTags t => GToTag (Rec1 t) where
-  gtags = tags . unRec1
-
-instance (Foldable f, GToTag g) => GToTag (f :.: g) where
-  gtags = mapM_ gtags . unComp1
-
-instance GToTag U1 where
-  gtags _ = pure ()
+instance (Generic1 t, Tags.GFold1 ToTags (Rep1 t)) => ToTagBy 'Generic t where
+  tags' = getAp . Tags.gfold1 @ToTags (Ap . tags) . from1
