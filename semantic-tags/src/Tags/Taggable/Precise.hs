@@ -11,6 +11,7 @@ import           Data.Monoid (Endo(..))
 import           Data.List.NonEmpty (NonEmpty(..))
 import           Data.Text as T
 import           GHC.Generics
+import           GHC.TypeLits (ErrorMessage(..))
 import           Source.Loc
 import           Source.Range
 import           Source.Source
@@ -195,3 +196,12 @@ instance {-# OVERLAPPABLE #-}
       => Element' 'True t (l :+: r) where
   prj' (R1 r) = prj' @'True r
   prj' _      = Nothing
+
+
+type family ShowSum t where
+  ShowSum (l :+: r) = ShowSum' ('Text "{ ") (l :+: r) ':$$: 'Text "}"
+  ShowSum t         = 'Text "{ " ':<>: 'ShowType t ':<>: 'Text " }"
+
+type family ShowSum' p t where
+  ShowSum' p (l :+: r) = ShowSum' p l ':$$: ShowSum' ('Text ", ") r
+  ShowSum' p t         = p ':<>: 'ShowType t
