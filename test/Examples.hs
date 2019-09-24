@@ -73,7 +73,7 @@ buildExamples session lang tsDir = do
   knownFailures <- knownFailuresForPath tsDir (languageKnownFailuresTxt lang)
   files <- globDir1 (compile ("**/*" <> languageExtension lang)) (Path.toString (tsDir </> languageExampleDir lang))
   let paths = Path.relFile <$> files
-  trees <- for paths $ \file -> pure $ HUnit.testCase (Path.toString file) $ do
+  trees <- forConcurrently paths $ \file -> pure $ HUnit.testCase (Path.toString file) $ do
     res <- runTask session (parseFilePath file)
     case res of
       Left (SomeException e) -> case cast e of
