@@ -11,7 +11,7 @@ import           Data.Monoid (Endo(..))
 import           Data.List.NonEmpty (NonEmpty(..))
 import           Data.Text as T
 import           GHC.Generics
-import           GHC.TypeLits (ErrorMessage(..))
+import           GHC.TypeLits (ErrorMessage(..), TypeError)
 import           Source.Loc
 import           Source.Range
 import           Source.Source
@@ -205,3 +205,9 @@ type family ShowSum t where
 type family ShowSum' p t where
   ShowSum' p (l :+: r) = ShowSum' p l ':$$: ShowSum' ('Text ", ") r
   ShowSum' p t         = p ':<>: 'ShowType t
+
+instance TypeError
+           (     'ShowType t ':<>: 'Text " is not in"
+           ':$$: ShowSum u)
+      => Element' 'False t u where
+  prj' _ = Nothing
