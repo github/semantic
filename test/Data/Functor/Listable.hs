@@ -34,9 +34,7 @@ import qualified Data.Syntax.Statement as Statement
 import qualified Data.Abstract.Name as Name
 import Data.Term
 import Data.Text as T (Text, pack)
-import Data.These
 import Data.Sum
-import Diffing.Algorithm.RWS
 import Source.Loc
 import Source.Span
 import Test.LeanCheck
@@ -142,9 +140,6 @@ instance Listable2 p => Listable1 (Join p) where
 instance Listable1 Both where
   liftTiers tiers = liftCons2 tiers tiers Both
 
-instance Listable2 These where
-  liftTiers2 this that = liftCons1 this This \/ liftCons1 that That \/ liftCons2 this that These
-
 instance (Listable1 f, Listable a) => Listable (ListableF f a) where
   tiers = ListableF `mapT` tiers1
 
@@ -235,13 +230,6 @@ type ListableSyntax = Sum
 
 instance Listable Name.Name where
   tiers = cons1 Name.name
-
-instance Listable1 Gram where
-  liftTiers tiers = liftCons2 (liftTiers (liftTiers tiers)) (liftTiers (liftTiers tiers)) Gram
-
-instance Listable a => Listable (Gram a) where
-  tiers = tiers1
-
 
 instance Listable Text where
   tiers = pack `mapT` tiers
