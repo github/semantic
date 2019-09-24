@@ -40,6 +40,7 @@ yield :: (Carrier sig m, Member (Writer Tags) sig) => Tag -> m ()
 yield = tell . Endo . (:)
 
 
+-- FIXME: move GFoldable1 into semantic-ast.
 class GFoldable1 c t where
   -- | Generically map functions over fields of kind @* -> *@, monoidally combining the results.
   gfoldMap1
