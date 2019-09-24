@@ -1,5 +1,5 @@
 {-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, RankNTypes, ScopedTypeVariables, TypeApplications, TypeOperators #-}
-module Tags.Taggable.Precise
+module Tags.Tagging.Precise
 ( Tags
 , ToTags(..)
 , yield

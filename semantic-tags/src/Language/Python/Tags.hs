@@ -15,7 +15,7 @@ import           Source.Loc
 import           Source.Range
 import           Source.Source as Source
 import           Tags.Tag
-import qualified Tags.Taggable.Precise as Tags
+import qualified Tags.Tagging.Precise as Tags
 import qualified TreeSitter.Python.AST as Py
 
 newtype Term a = Term { getTerm :: Py.Module a }

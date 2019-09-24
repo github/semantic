@@ -22,7 +22,7 @@ library
   exposed-modules:
     Language.Python.Tags
     Tags.Tag
-    Tags.Taggable.Precise
+    Tags.Tagging.Precise
   -- other-modules:
   -- other-extensions:
   build-depends:
