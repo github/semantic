@@ -82,7 +82,7 @@ instance (Member (Error SomeException) sig, Member Catch sig, MonadIO m, Carrier
   eff (L op) = case op of
     Read (FromPath path) k                                    -> rethrowing (readBlobFromFile' path) >>= k
     Read (FromHandle handle) k                                -> rethrowing (readBlobsFromHandle handle) >>= k
-    Read (FromDir dir) k                                      -> rethrowing (readBlobsFromDir (Path.toString dir)) >>= k
+    Read (FromDir dir) k                                      -> rethrowing (readBlobsFromDir dir) >>= k
     Read (FromGitRepo path sha (ExcludePaths excludePaths)) k -> rethrowing (readBlobsFromGitRepo path sha excludePaths mempty) >>= k
     Read (FromGitRepo path sha (ExcludeFromHandle handle)) k  -> rethrowing (readPathsFromHandle handle >>= (\x -> readBlobsFromGitRepo path sha x mempty)) >>= k
     Read (FromGitRepo path sha (IncludePaths includePaths)) k -> rethrowing (readBlobsFromGitRepo path sha mempty includePaths) >>= k
