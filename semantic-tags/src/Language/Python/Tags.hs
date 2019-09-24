@@ -109,5 +109,5 @@ docComment _ _ = Nothing
 firstLine :: Source -> Text
 firstLine = T.take 180 . T.takeWhile (/= '\n') . toText
 
-instance (Generic1 t, Tags.GFold1 ToTags (Rep1 t)) => ToTagsBy 'Generic t where
+instance (Generic1 t, Tags.GFoldable1 ToTags (Rep1 t)) => ToTagsBy 'Generic t where
   tags' = getAp . Tags.gfoldMap1 @ToTags (Ap . tags) . from1
