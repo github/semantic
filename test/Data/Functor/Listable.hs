@@ -16,7 +16,6 @@ module Data.Functor.Listable
 , ListableSyntax
 ) where
 
-import Analysis.CyclomaticComplexity
 import Analysis.TOCSummary
 import Data.Abstract.ScopeGraph (AccessControl(..))
 import Data.Bifunctor.Join
@@ -222,9 +221,6 @@ instance Listable Declaration where
     =  cons5 MethodDeclaration
     \/ cons4 FunctionDeclaration
     \/ cons3 (\ a b c -> ErrorDeclaration a b c Language.Unknown)
-
-instance Listable CyclomaticComplexity where
-  tiers = cons1 CyclomaticComplexity
 
 instance Listable Language.Language where
   tiers
