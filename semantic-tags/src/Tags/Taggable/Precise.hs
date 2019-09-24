@@ -156,6 +156,9 @@ instance GToTag U1 where
 class Element sub sup where
   prj :: sup a -> Maybe (sub a)
 
+instance (Element' elem sub sup, elem ~ Elem sub sup) => Element sub sup where
+  prj = prj' @elem
+
 
 type family Elem sub sup where
   Elem t t         = 'True
@@ -167,25 +170,28 @@ type family a || b where
   _     || 'True = 'True
   _     || _     = 'False
 
-instance {-# OVERLAPPABLE #-}
-         Element t t where
-  prj = Just
+class Element' (elem :: Bool) sub sup where
+  prj' :: sup a -> Maybe (sub a)
 
 instance {-# OVERLAPPABLE #-}
-         Element t (l1 :+: l2 :+: r)
-      => Element t ((l1 :+: l2) :+: r) where
-  prj = prj . reassoc where
+         Element' 'True t t where
+  prj' = Just
+
+instance {-# OVERLAPPABLE #-}
+         Element' 'True t (l1 :+: l2 :+: r)
+      => Element' 'True t ((l1 :+: l2) :+: r) where
+  prj' = prj' @'True . reassoc where
     reassoc (L1 (L1 l)) = L1 l
     reassoc (L1 (R1 l)) = R1 (L1 l)
     reassoc (R1 r)      = R1 (R1 r)
 
 instance {-# OVERLAPPABLE #-}
-         Element t (t :+: r) where
-  prj (L1 l) = Just l
-  prj _      = Nothing
+         Element' 'True t (t :+: r) where
+  prj' (L1 l) = Just l
+  prj' _      = Nothing
 
 instance {-# OVERLAPPABLE #-}
-         Element t r
-      => Element t (l :+: r) where
-  prj (R1 r) = prj r
-  prj _      = Nothing
+         Element' 'True t r
+      => Element' 'True t (l :+: r) where
+  prj' (R1 r) = prj' @'True r
+  prj' _      = Nothing
