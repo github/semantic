@@ -86,6 +86,7 @@ fixtureTestTreeForFile fp = HUnit.testCaseSteps (Path.toString fp) $ \step -> wi
   let coreResult = Control.Effect.run
                    . runFail
                    . runReader (fromString @Py.SourcePath . Path.toString $ fp)
+                   . runReader @Py.Bindings mempty
                    . Py.compile @(TSP.Module TS.Span) @_ @(Term (Ann :+: Core))
                    <$> result
 
@@ -97,7 +98,7 @@ fixtureTestTreeForFile fp = HUnit.testCaseSteps (Path.toString fp) $ \step -> wi
       (Right (Left err), _)                  -> HUnit.assertFailure ("Compilation failed: " <> err)
       (Right (Right _), Directive.Fails)     -> HUnit.assertFailure ("Expected translation to fail")
       (Right (Right item), Directive.JQ _)   -> assertJQExpressionSucceeds directive result item
-      (Right (Right item), Directive.Tree t) -> let msg = "lhs = " <> showCore t <> "\n rhs " <> showCore item'
+      (Right (Right item), Directive.Tree t) -> let msg = "got (pretty): " <> showCore item'
                                                     item' = stripAnnotations item
                                                 in HUnit.assertEqual msg t item' where
 
