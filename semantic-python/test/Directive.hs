@@ -14,7 +14,6 @@ import qualified Data.Core.Pretty as Core.Pretty
 import           Data.ByteString.Char8 (ByteString)
 import qualified Data.ByteString.Char8 as ByteString
 import           Data.List.NonEmpty (NonEmpty)
-import           Data.Coerce
 import           System.Process
 import qualified Text.Trifecta as Trifecta
 
@@ -70,7 +69,7 @@ directive = Trifecta.choice [ fails, jq, tree ]
 
 parseDirective :: ByteString -> Either String Directive
 parseDirective = Trifecta.foldResult (Left . show) Right
-                . Trifecta.parseByteString (directive <* Trifecta.eof) mempty
+               . Trifecta.parseByteString (directive <* Trifecta.eof) mempty
 
 toProcess :: Directive -> CreateProcess
 toProcess (JQ d) = proc "jq" ["-e", ByteString.unpack d]
