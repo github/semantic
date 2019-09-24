@@ -1,3 +1,3 @@
 # CHECK-JQ: .scope == {}
-# CHECK-TREE: (#unit)
+# CHECK-TREE: { #unit; #record{} }
 ()
