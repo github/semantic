@@ -21,7 +21,7 @@ import qualified TreeSitter.Python.AST as Py
 newtype Term a = Term { getTerm :: Py.Module a }
 
 instance Tags.ToTags Term where
-  tags = tags . getTerm
+  tags src = Tags.runTagging src . tags . getTerm
 
 
 class ToTags t where

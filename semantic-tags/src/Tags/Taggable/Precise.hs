@@ -1,12 +1,13 @@
 {-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, RankNTypes, ScopedTypeVariables, TypeApplications, TypeOperators #-}
 module Tags.Taggable.Precise
-( runTagging
-, Tags
+( Tags
 , ToTags(..)
 , yield
+, runTagging
 , GFoldable1(..)
 ) where
 
+import Control.Effect.Pure
 import Control.Effect.Reader
 import Control.Effect.Writer
 import Data.Monoid (Endo(..))
@@ -15,29 +16,22 @@ import Source.Loc
 import Source.Source
 import Tags.Tag
 
-runTagging :: ToTags t => Source -> t Loc -> [Tag]
+type Tags = Endo [Tag]
+
+class ToTags t where
+  tags :: Source -> t Loc -> [Tag]
+
+
+yield :: (Carrier sig m, Member (Writer Tags) sig) => Tag -> m ()
+yield = tell . Endo . (:)
+
+runTagging :: Source -> ReaderC Source (WriterC Tags PureC) () -> [Tag]
 runTagging source
   = ($ [])
   . appEndo
   . run
   . execWriter
   . runReader source
-  . tags
-
-type Tags = Endo [Tag]
-
-class ToTags t where
-  tags
-    :: ( Carrier sig m
-       , Member (Reader Source) sig
-       , Member (Writer Tags) sig
-       )
-    => t Loc
-    -> m ()
-
-
-yield :: (Carrier sig m, Member (Writer Tags) sig) => Tag -> m ()
-yield = tell . Endo . (:)
 
 
 -- FIXME: move GFoldable1 into semantic-ast.
