@@ -77,8 +77,10 @@ assertJQExpressionSucceeds directive tree core = do
 
 fixtureTestTreeForFile :: HasCallStack => Path.RelFile -> Tasty.TestTree
 fixtureTestTreeForFile fp = HUnit.testCaseSteps (Path.toString fp) $ \step -> withFrozenCallStack $ do
-  let fullPath = Path.relDir "semantic-python/test/fixtures" </> fp
-      perish s = liftIO (HUnit.assertFailure ("Directive parsing error: " <> s))
+  let fullPath  = Path.relDir "semantic-python/test/fixtures" </> fp
+      perish s  = liftIO (HUnit.assertFailure ("Directive parsing error: " <> s))
+      isComment = (== Just '#') . fmap fst . ByteString.uncons
+
 
   -- Slurp the input file, taking lines from the beginning until we
   -- encounter a line that doesn't have a '#'. For each line, parse
@@ -87,9 +89,8 @@ fixtureTestTreeForFile fp = HUnit.testCaseSteps (Path.toString fp) $ \step -> wi
     runResourceT
     . Stream.toList_
     . Stream.mapM (either perish pure . Directive.parseDirective)
-    . Stream.takeWhile ((== '#') . ByteString.head)
+    . Stream.takeWhile isComment
     . Stream.mapped ByteStream.toStrict
-    . ByteStream.denull
     . ByteStream.lines
     . ByteStream.readFile @(ResourceT IO)
     $ Path.toString fullPath
