@@ -103,13 +103,8 @@ data FilesArg
   | FilesFromGitRepo FilePath Git.OID PathFilter
 
 -- | A task which reads a list of 'Blob's from a 'Handle' or a list of 'FilePath's optionally paired with 'Language's.
-readBlobs :: (Member Files sig, Carrier sig m, MonadIO m) => FilesArg -> m [Blob]
+readBlobs :: (Member Files sig, Carrier sig m) => FilesArg -> m [Blob]
 readBlobs (FilesFromHandle handle) = send (Read (FromHandle handle) pure)
-readBlobs (FilesFromPaths [path]) = do
-  isDir <- isDirectory (filePath path)
-  if isDir
-    then send (Read (FromDir (filePath path)) pure)
-    else pure <$> send (Read (FromPath path) pure)
 readBlobs (FilesFromPaths paths) = traverse (send . flip Read pure . FromPath) paths
 readBlobs (FilesFromGitRepo path sha filter) = send (Read (FromGitRepo path sha filter) pure)
 
