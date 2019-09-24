@@ -41,6 +41,7 @@ yield = tell . Endo . (:)
 
 
 class GFoldable1 c t where
+  -- | Generically map functions over fields of kind @* -> *@, monoidally combining the results.
   gfoldMap1
     :: Monoid b
     => (forall f . c f => f a -> b)
