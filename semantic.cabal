@@ -405,9 +405,12 @@ test-suite parse-examples
   main-is:             Examples.hs
   build-depends:       semantic
                      , Glob
-                     , hspec
-                     , hspec-core
-                     , hspec-expectations
+                     , foldl ^>= 1.4.5
+                     , resourcet ^>= 1.2
+                     , streaming
+                     , streaming-bytestring ^>= 0.1.6
+                     , tasty
+                     , tasty-hunit
 
 benchmark evaluation
   import:              haskell, executable-flags
