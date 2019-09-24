@@ -156,4 +156,4 @@ instance (Foldable f, GToTag g) => GToTag (f :.: g) where
   gtag = mapM_ gtag . unComp1
 
 instance GToTag U1 where
-  gtag _ = pure mempty
+  gtag _ = pure ()
