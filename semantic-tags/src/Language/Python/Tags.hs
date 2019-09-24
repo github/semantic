@@ -125,7 +125,7 @@ instance GToTag f => GToTag (M1 i c f) where
   gtags = gtags . unM1
 
 instance (GToTag f, GToTag g) => GToTag (f :*: g) where
-  gtags (f :*: g) = (<>) <$> gtags f <*> gtags g
+  gtags (f :*: g) = gtags f >> gtags g
 
 instance (GToTag f, GToTag g) => GToTag (f :+: g) where
   gtags (L1 l) = gtags l
