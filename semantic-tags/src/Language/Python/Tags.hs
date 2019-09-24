@@ -9,7 +9,7 @@ import           Data.Foldable (traverse_)
 import           Data.Maybe (listToMaybe)
 import           Data.Monoid (Ap(..))
 import           Data.List.NonEmpty (NonEmpty(..))
-import           Data.Text as T
+import           Data.Text as Text
 import           GHC.Generics
 import           Source.Loc
 import           Source.Range
@@ -108,7 +108,7 @@ docComment src (R1 (Py.ExpressionStatementSimpleStatement (Py.ExpressionStatemen
 docComment _ _ = Nothing
 
 firstLine :: Source -> Text
-firstLine = T.takeWhile (/= '\n') . toText . Source.take 180
+firstLine = Text.takeWhile (/= '\n') . toText . Source.take 180
 
 
 instance (Generic1 t, Tags.GFoldable1 ToTags (Rep1 t)) => ToTagsBy 'Generic t where
