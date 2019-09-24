@@ -20,7 +20,6 @@ tested-with:         GHC == 8.6.5
 
 library
   exposed-modules:
-    AST.Element
     Tags.Tag
     Tags.Taggable.Precise
   -- other-modules:
