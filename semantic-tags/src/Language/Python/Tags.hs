@@ -17,7 +17,7 @@ import           Tags.Tag
 import qualified Tags.Taggable.Precise as Tags
 import qualified TreeSitter.Python.AST as Py
 
-class ToTag t where
+class ToTags t where
   tags
     :: ( Carrier sig m
        , Member (Reader Source) sig
@@ -28,11 +28,11 @@ class ToTag t where
 
 newtype Term a = Term { getTerm :: Py.Module a }
 
-instance Tags.ToTag Term where
+instance Tags.ToTags Term where
   tags = tags . getTerm
 
 
-instance (ToTagBy strategy t, strategy ~ ToTagInstance t) => ToTag t where
+instance (ToTagBy strategy t, strategy ~ ToTagInstance t) => ToTags t where
   tags = tags' @strategy
 
 
@@ -55,7 +55,7 @@ type family ToTagInstance t :: Strategy where
   ToTagInstance Py.Call               = 'Custom
   ToTagInstance _                     = 'Generic
 
-instance (ToTag l, ToTag r) => ToTagBy 'Custom (l :+: r) where
+instance (ToTags l, ToTags r) => ToTagBy 'Custom (l :+: r) where
   tags' (L1 l) = tags l
   tags' (R1 r) = tags r
 
@@ -137,7 +137,7 @@ instance GToTag (K1 R t) where
 instance GToTag Par1 where
   gtags _ = pure ()
 
-instance ToTag t => GToTag (Rec1 t) where
+instance ToTags t => GToTag (Rec1 t) where
   gtags = tags . unRec1
 
 instance (Foldable f, GToTag g) => GToTag (f :.: g) where

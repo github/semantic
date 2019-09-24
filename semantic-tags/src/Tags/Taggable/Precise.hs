@@ -2,7 +2,7 @@
 module Tags.Taggable.Precise
 ( runTagging
 , Tags
-, ToTag(..)
+, ToTags(..)
 , yield
 ) where
 
@@ -13,7 +13,7 @@ import Source.Loc
 import Source.Source
 import Tags.Tag
 
-runTagging :: ToTag t => Source -> t Loc -> [Tag]
+runTagging :: ToTags t => Source -> t Loc -> [Tag]
 runTagging source
   = ($ [])
   . appEndo
@@ -24,7 +24,7 @@ runTagging source
 
 type Tags = Endo [Tag]
 
-class ToTag t where
+class ToTags t where
   tags
     :: ( Carrier sig m
        , Member (Reader Source) sig
