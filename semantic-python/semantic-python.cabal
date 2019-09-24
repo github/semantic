@@ -67,6 +67,7 @@ test-suite test
                , pathtype ^>= 0.8.1
                , pretty-show ^>= 1.9.5
                , process ^>= 1.6.5
+               , resourcet ^>= 1.2.2
                , streaming ^>= 0.2.2
                , streaming-process ^>= 0.1
                , streaming-bytestring ^>= 0.1.6
