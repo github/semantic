@@ -56,6 +56,7 @@ type family ToTagsInstance t :: Strategy where
   ToTagsInstance Py.Call               = 'Custom
   ToTagsInstance _                     = 'Generic
 
+
 instance (ToTags l, ToTags r) => ToTagsBy 'Custom (l :+: r) where
   tags' (L1 l) = tags l
   tags' (R1 r) = tags r
@@ -108,6 +109,7 @@ docComment _ _ = Nothing
 
 firstLine :: Source -> Text
 firstLine = T.take 180 . T.takeWhile (/= '\n') . toText
+
 
 instance (Generic1 t, Tags.GFoldable1 ToTags (Rep1 t)) => ToTagsBy 'Generic t where
   tags' = getAp . Tags.gfoldMap1 @ToTags (Ap . tags) . from1
