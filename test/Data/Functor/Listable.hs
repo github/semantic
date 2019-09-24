@@ -19,8 +19,6 @@ module Data.Functor.Listable
 
 import Analysis.CyclomaticComplexity
 import Analysis.TOCSummary
-import Control.Monad.Free as Free
-import Control.Monad.Trans.Free as FreeF
 import Data.Abstract.ScopeGraph (AccessControl(..))
 import Data.Bifunctor.Join
 import Data.Diff
@@ -146,18 +144,6 @@ instance Listable1 Both where
 
 instance Listable2 These where
   liftTiers2 this that = liftCons1 this This \/ liftCons1 that That \/ liftCons2 this that These
-
-instance Listable1 f => Listable2 (FreeF f) where
-  liftTiers2 pureTiers recurTiers = liftCons1 pureTiers FreeF.Pure \/ liftCons1 (liftTiers recurTiers) FreeF.Free
-
-instance (Listable1 f, Listable a) => Listable1 (FreeF f a) where
-  liftTiers = liftTiers2 tiers
-
-instance Listable1 f => Listable1 (Free.Free f) where
-  liftTiers pureTiers = go
-    where go = liftCons1 (liftTiers2 pureTiers go) free
-          free (FreeF.Free f) = Free.Free f
-          free (FreeF.Pure a) = Free.Pure a
 
 instance (Listable1 f, Listable a) => Listable (ListableF f a) where
   tiers = ListableF `mapT` tiers1
