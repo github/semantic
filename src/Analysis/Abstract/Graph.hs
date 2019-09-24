@@ -27,10 +27,10 @@ import           Data.ByteString.Builder
 import           Data.Graph
 import           Data.Graph.ControlFlowVertex
 import           Data.Term
-import           Data.Location
 import qualified Data.Map as Map
 import qualified Data.Text.Encoding as T
 import           Prologue
+import           Source.Loc
 
 style :: Style ControlFlowVertex Builder
 style = (defaultStyle (T.encodeUtf8Builder . vertexIdentifier))
@@ -74,7 +74,7 @@ graphingTerms :: ( Member (Reader ModuleInfo) sig
                  , Declarations1 syntax
                  , Ord address
                  , Foldable syntax
-                 , term ~ Term syntax Location
+                 , term ~ Term syntax Loc
                  , Carrier sig m
                  )
               => Open (term -> Evaluator term address value m a)

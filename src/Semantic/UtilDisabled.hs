@@ -48,10 +48,9 @@ import           Semantic.Analysis
 import           Semantic.Config
 import           Semantic.Graph
 import           Semantic.Task
+import           Source.Loc
 import           System.Exit (die)
 import           System.FilePath.Posix (takeDirectory)
-
-import Data.Location
 
 type ProjectEvaluator syntax =
   Project
@@ -60,7 +59,7 @@ type ProjectEvaluator syntax =
       (Hole (Maybe Name) Precise)
       (Hole (Maybe Name) Precise)
       (Value
-      (Quieterm (Sum syntax) Location)
+      (Quieterm (Sum syntax) Loc)
       (Hole (Maybe Name) Precise)),
       (ScopeGraph (Hole (Maybe Name) Precise),
       ModuleTable
@@ -68,7 +67,7 @@ type ProjectEvaluator syntax =
               (ModuleResult
               (Hole (Maybe Name) Precise)
               (Value
-              (Quieterm (Sum syntax) Location)
+              (Quieterm (Sum syntax) Loc)
               (Hole (Maybe Name) Precise))))))
 
 type FileTypechecker (syntax :: [* -> *]) qterm value address result
@@ -132,7 +131,7 @@ type EvalEffects qterm err = ResumableC (BaseError err)
 -- We can't go with the inferred type because this needs to be
 -- polymorphic in @lang@.
 justEvaluatingCatchingErrors :: ( hole ~ Hole (Maybe Name) Precise
-                                , term ~ Quieterm (Sum lang) Location
+                                , term ~ Quieterm (Sum lang) Loc
                                 , value ~ Concrete.Value term hole
                                 , Apply Show1 lang
                                 )
@@ -149,7 +148,7 @@ justEvaluatingCatchingErrors :: ( hole ~ Hole (Maybe Name) Precise
           (ResumableWithC (BaseError (LoadError hole value))
           (FreshC
           (StateC (ScopeGraph hole)
-          (StateC (Heap hole hole (Concrete.Value (Quieterm (Sum lang) Location) (Hole (Maybe Name) Precise)))
+          (StateC (Heap hole hole (Concrete.Value (Quieterm (Sum lang) Loc) (Hole (Maybe Name) Precise)))
           (TraceByPrintingC
           (LiftC IO))))))))))))) a
      -> IO (Heap hole hole value, (ScopeGraph hole, a))
@@ -200,7 +199,7 @@ callGraphProject
         syntax
         syntax) =>
      Parser
-       (Term syntax Location)
+       (Term syntax Loc)
      -> Proxy lang
      -> [FilePath]
      -> IO
@@ -238,7 +237,7 @@ evalJavaScriptProject :: FileEvaluator Language.TypeScript.Assignment.Syntax
 evalJavaScriptProject = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.JavaScript) typescriptParser
 
 typecheckGoFile :: ( syntax ~ Language.Go.Assignment.Syntax
-                   , qterm ~ Quieterm (Sum syntax) Location
+                   , qterm ~ Quieterm (Sum syntax) Loc
                    , value ~ Type
                    , address ~ Monovariant
                    , result ~ (ModuleTable (Module (ModuleResult address value))))
@@ -246,15 +245,15 @@ typecheckGoFile :: ( syntax ~ Language.Go.Assignment.Syntax
 typecheckGoFile = checking <=< evaluateProjectWithCaching (Proxy :: Proxy 'Language.Go) goParser
 
 typecheckRubyFile :: ( syntax ~ Language.Ruby.Assignment.Syntax
-                   , qterm ~ Quieterm (Sum syntax) Location
+                   , qterm ~ Quieterm (Sum syntax) Loc
                    , value ~ Type
                    , address ~ Monovariant
                    , result ~ (ModuleTable (Module (ModuleResult address value))))
                   => FileTypechecker syntax qterm value address result
 typecheckRubyFile = checking <=< evaluateProjectWithCaching (Proxy :: Proxy 'Language.Ruby) rubyParser
 
-evaluateProjectForScopeGraph :: ( term ~ Term (Sum syntax) Location
-                              , qterm ~ Quieterm (Sum syntax) Location
+evaluateProjectForScopeGraph :: ( term ~ Term (Sum syntax) Loc
+                              , qterm ~ Quieterm (Sum syntax) Loc
                               , address ~ Hole (Maybe Name) Precise
                               , LanguageSyntax lang syntax
                               )
@@ -290,8 +289,8 @@ evaluateProjectForScopeGraph proxy parser project = runTask' $ do
        (raiseHandler (runReader (lowerBound @Span))
        (evaluate proxy (runDomainEffects (evalTerm withTermSpans)) modules)))))))
 
-evaluateProjectWithCaching :: ( term ~ Term (Sum syntax) Location
-                              , qterm ~ Quieterm (Sum syntax) Location
+evaluateProjectWithCaching :: ( term ~ Term (Sum syntax) Loc
+                              , qterm ~ Quieterm (Sum syntax) Loc
                               , LanguageSyntax lang syntax
                               )
                            => Proxy (lang :: Language.Language)
@@ -309,8 +308,8 @@ evaluateProjectWithCaching :: ( term ~ Term (Sum syntax) Location
                                   (ResumableC (BaseError (LoadError Monovariant Type))
                                   (ReaderC (Live Monovariant)
                                   (NonDetC
-                                  (ReaderC (Analysis.Abstract.Caching.FlowSensitive.Cache (Data.Quieterm.Quieterm (Sum syntax) Data.Location.Location) Monovariant Type)
-                                  (StateC (Analysis.Abstract.Caching.FlowSensitive.Cache (Data.Quieterm.Quieterm (Sum syntax) Data.Location.Location) Monovariant Type)
+                                  (ReaderC (Analysis.Abstract.Caching.FlowSensitive.Cache (Data.Quieterm.Quieterm (Sum syntax) Loc) Monovariant Type)
+                                  (StateC (Analysis.Abstract.Caching.FlowSensitive.Cache (Data.Quieterm.Quieterm (Sum syntax) Loc) Monovariant Type)
                                   (FreshC
                                   (StateC (ScopeGraph Monovariant)
                                   (StateC (Heap Monovariant Monovariant Type)
@@ -341,8 +340,8 @@ type LanguageSyntax lang syntax = ( Language.SLanguage lang
                                   , Apply AccessControls1 syntax
                                   , Apply FreeVariables1 syntax)
 
-evaluatePythonProjects :: ( term ~ Term (Sum Language.Python.Assignment.Syntax) Location
-                          , qterm ~ Quieterm (Sum Language.Python.Assignment.Syntax) Location
+evaluatePythonProjects :: ( term ~ Term (Sum Language.Python.Assignment.Syntax) Loc
+                          , qterm ~ Quieterm (Sum Language.Python.Assignment.Syntax) Loc
                           )
                        => Proxy 'Language.Python
                        -> Parser term
@@ -366,7 +365,7 @@ evaluatePythonProjects proxy parser lang path = runTask' $ do
        (evaluate proxy (runDomainEffects (evalTerm withTermSpans)) modules)))))))
 
 evaluatePythonProject :: ( syntax ~ Language.Python.Assignment.Syntax
-                   , qterm ~ Quieterm (Sum syntax) Location
+                   , qterm ~ Quieterm (Sum syntax) Loc
                    , value ~ (Concrete.Value qterm address)
                    , address ~ Precise
                    , result ~ (ModuleTable (Module (ModuleResult address value)))) => FilePath

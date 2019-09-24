@@ -1,2 +1,3 @@
-# CHECK-JQ: .scope == {} and .tree.contents == []
+# CHECK-JQ: .scope == {}
+# CHECK-TREE: { #unit; #record {} }
 ()

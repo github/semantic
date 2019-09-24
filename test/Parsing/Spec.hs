@@ -6,10 +6,10 @@ import Data.ByteString.Char8 (pack)
 import Data.Duration
 import Data.Language
 import Data.Maybe
-import Data.Source
 import Parsing.TreeSitter
+import Source.Source
 import SpecHelpers
-import TreeSitter.JSON (tree_sitter_json, Grammar)
+import TreeSitter.JSON (Grammar, tree_sitter_json)
 
 spec :: Spec
 spec = do

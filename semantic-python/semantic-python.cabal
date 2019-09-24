@@ -23,8 +23,9 @@ common haskell
   build-depends:       base ^>=4.12
                      , fused-effects ^>= 0.5
                      , semantic-core ^>= 0.0
-                     , tree-sitter ^>= 0.2
-                     , tree-sitter-python ^>= 0.2
+                     , text ^>= 1.2.3
+                     , tree-sitter == 0.3.0.0
+                     , tree-sitter-python == 0.4.0.0
 
   ghc-options:
     -Weverything
@@ -63,13 +64,13 @@ test-suite test
                , containers ^>= 0.6
                , directory ^>= 1.3.3
                , exceptions ^>= 0.10.2
-               , filepath ^>= 1.4.2.1
+               , pathtype ^>= 0.8.1
+               , pretty-show ^>= 1.9.5
                , process ^>= 1.6.5
                , streaming ^>= 0.2.2
                , streaming-process ^>= 0.1
                , streaming-bytestring ^>= 0.1.6
                , tasty ^>= 1.2.3
                , tasty-hunit ^>= 0.10.0.2
-               , text ^>= 1.2.3
                , trifecta >= 2 && <3
                , unordered-containers ^>= 0.2.10

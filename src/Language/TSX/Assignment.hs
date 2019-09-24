@@ -208,7 +208,7 @@ type Syntax = '[
   , TSX.Syntax.AnnotatedExpression
   ]
 
-type Term = Term.Term (Sum Syntax) Location
+type Term = Term.Term (Sum Syntax) Loc
 type Assignment = Assignment.Assignment [] Grammar
 
 -- | Assignment from AST in TSX’s grammar onto a program in TSX’s syntax.
@@ -229,7 +229,6 @@ expression = handleError everything
       jsxElement',
       jsxFragment,
       class',
-      anonymousClass,
       function,
       arrowFunction,
       assignmentExpression,
@@ -319,7 +318,6 @@ constructableExpression = choice [
   , function
   , arrowFunction
   , class'
-  , anonymousClass
   , parenthesizedExpression
   , subscriptExpression
   , memberExpression
@@ -345,11 +343,8 @@ regex = makeTerm <$> symbol Grammar.Regex <*> (Literal.Regex <$> source)
 null' :: Assignment Term
 null' = makeTerm <$> symbol Null <*> (Literal.Null <$ rawSource)
 
-anonymousClass :: Assignment Term
-anonymousClass = makeTerm <$> symbol Grammar.AnonymousClass <*> children (Declaration.Class [] <$> emptyTerm <*> (classHeritage' <|> pure []) <*> classBodyStatements)
-
 abstractClass :: Assignment Term
-abstractClass = makeTerm <$> symbol Grammar.AbstractClass <*> children (TSX.Syntax.AbstractClass <$> term typeIdentifier <*> (term typeParameters <|> emptyTerm) <*> (classHeritage' <|> pure []) <*> classBodyStatements)
+abstractClass = makeTerm <$> symbol Grammar.AbstractClassDeclaration <*> children (TSX.Syntax.AbstractClass <$> term typeIdentifier <*> (term typeParameters <|> emptyTerm) <*> (classHeritage' <|> pure []) <*> classBodyStatements)
 
 abstractMethodSignature :: Assignment Term
 abstractMethodSignature = makeSignature <$> symbol Grammar.AbstractMethodSignature <*> children ((,,) <$> accessibilityModifier' <*> term propertyName <*> callSignatureParts)
@@ -401,7 +396,11 @@ identifier :: Assignment Term
 identifier = makeTerm <$> symbol Identifier <*> (Syntax.Identifier . name <$> source)
 
 class' :: Assignment Term
-class' = makeClass <$> symbol Class <*> children ((,,,,) <$> manyTerm decorator <*> term typeIdentifier <*> (symbol TypeParameters *> children (manyTerm typeParameter') <|> pure []) <*> (classHeritage' <|> pure []) <*> classBodyStatements)
+class' = makeClass <$> (symbol Class <|> symbol ClassDeclaration) <*> children ((,,,,) <$> manyTerm decorator
+                                                                                       <*> (term typeIdentifier <|> emptyTerm)
+                                                                                       <*> (symbol TypeParameters *> children (manyTerm typeParameter') <|> pure [])
+                                                                                       <*> (classHeritage' <|> pure [])
+                                                                                       <*> classBodyStatements)
   where makeClass loc (decorators, expression, typeParams, classHeritage, statements) = makeTerm loc (Declaration.Class (decorators <> typeParams) expression classHeritage statements)
 
 object :: Assignment Term
@@ -495,7 +494,7 @@ methodDefinition = makeMethod <$>
 callSignatureParts :: Assignment (Term, [Term], Term)
 callSignatureParts = contextualize' <$> Assignment.manyThrough comment (postContextualize' <$> callSignature' <*> many comment)
   where
-    callSignature' = symbol Grammar.CallSignature *> children ((,,) <$> (term typeParameters <|> emptyTerm) <*> formalParameters <*> (term typeAnnotation' <|> emptyTerm))
+    callSignature' = (,,) <$> (term typeParameters <|> emptyTerm) <*> formalParameters <*> (term typeAnnotation' <|> emptyTerm)
     contextualize' (cs, (typeParams, formalParams, annotation)) = case nonEmpty cs of
       Just cs -> (makeTerm1 (Syntax.Context cs typeParams), formalParams, annotation)
       Nothing -> (typeParams, formalParams, annotation)
@@ -546,7 +545,7 @@ constraint :: Assignment Term
 constraint = makeTerm <$> symbol Grammar.Constraint <*> children (TSX.Syntax.Constraint <$> term ty)
 
 function :: Assignment Term
-function = makeFunction <$> (symbol Grammar.Function <|> symbol Grammar.GeneratorFunction) <*> children ((,,) <$> term (identifier <|> emptyTerm) <*> callSignatureParts <*> term statementBlock)
+function = makeFunction <$> (symbol Grammar.Function <|> symbol Grammar.FunctionDeclaration <|> symbol Grammar.GeneratorFunction <|> symbol Grammar.GeneratorFunctionDeclaration) <*> children ((,,) <$> term (identifier <|> emptyTerm) <*> callSignatureParts <*> term statementBlock)
   where makeFunction loc (id, (typeParams, params, annotation), statements) = makeTerm loc (Declaration.Function [typeParams, annotation] id params statements)
 
 -- TODO: FunctionSignatures can, but don't have to be ambient functions.
@@ -569,7 +568,7 @@ primaryType =  arrayTy
            <|> objectType
            <|> parenthesizedTy
            <|> predefinedTy
-           <|> thisType
+           <|> this
            <|> tupleType
            <|> typeIdentifier
            <|> typePredicate
@@ -616,9 +615,6 @@ typeQuery = makeTerm <$> symbol Grammar.TypeQuery <*> children (TSX.Syntax.TypeQ
 
 indexTypeQuery :: Assignment Term
 indexTypeQuery = makeTerm <$> symbol Grammar.IndexTypeQuery <*> children (TSX.Syntax.IndexTypeQuery <$> term (typeIdentifier <|> nestedTypeIdentifier))
-
-thisType :: Assignment Term
-thisType = makeTerm <$> symbol Grammar.ThisType <*> (TSX.Syntax.ThisType <$> source)
 
 existentialType :: Assignment Term
 existentialType = makeTerm <$> symbol Grammar.ExistentialType <*> (TSX.Syntax.ExistentialType <$> source)
@@ -676,7 +672,6 @@ statement = handleError everything
       , switchStatement
       , forStatement
       , forInStatement
-      , forOfStatement
       , whileStatement
       , doStatement
       , tryStatement
@@ -688,9 +683,6 @@ statement = handleError everything
       , hashBang
       , emptyStatement
       , labeledStatement ]
-
-forOfStatement :: Assignment Term
-forOfStatement = makeTerm <$> symbol ForOfStatement <*> children (TSX.Syntax.ForOf <$> term expression <*> term expressions <*> term statement)
 
 forInStatement :: Assignment Term
 forInStatement = makeTerm <$> symbol ForInStatement <*> children (Statement.ForEach <$> term expression <*> term expression <*> term statement)
@@ -726,7 +718,7 @@ importStatement :: Assignment Term
 importStatement =   makeImportTerm <$> symbol Grammar.ImportStatement <*> children ((,) <$> importClause <*> fromClause)
                 <|> makeTerm' <$> symbol Grammar.ImportStatement <*> children (requireImport <|> sideEffectImport)
   where
-    -- `import foo = require "./foo"`
+    -- `import foo = require("./foo")`
     requireImport = inject <$> (symbol Grammar.ImportRequireClause *> children (TSX.Syntax.QualifiedAliasedImport <$> term identifier <*> fromClause))
     -- `import "./foo"`
     sideEffectImport = inject <$> (TSX.Syntax.SideEffectImport <$> fromClause)

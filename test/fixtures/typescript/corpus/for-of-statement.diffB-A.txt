@@ -1,5 +1,5 @@
 (Statements
-  (ForOf
+  (ForEach
   { (Identifier)
   ->(Identifier) }
   { (Identifier)

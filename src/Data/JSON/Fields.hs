@@ -14,6 +14,8 @@ import           Data.Sum (Apply (..), Sum)
 import qualified Data.Text as Text
 import           GHC.Generics
 import           Prologue
+import           Source.Loc
+import           Source.Range
 
 class ToJSONFields a where
   toJSONFields :: KeyValue kv => a -> [kv]
@@ -45,6 +47,15 @@ instance Apply ToJSONFields1 fs => ToJSONFields1 (Sum fs) where
 
 instance (ToJSONFields a, ToJSONFields b) => ToJSONFields (a, b) where
   toJSONFields (a, b) = [ "before" .= JSONFields a, "after" .= JSONFields b ]
+
+instance ToJSONFields Range where
+  toJSONFields Range{..} = ["sourceRange" .= [ start, end ]]
+
+instance ToJSONFields Span where
+  toJSONFields sourceSpan = [ "sourceSpan" .= sourceSpan ]
+
+instance ToJSONFields Loc where
+  toJSONFields Loc{..} = toJSONFields byteRange <> toJSONFields span
 
 
 newtype JSONFields a = JSONFields { unJSONFields :: a }

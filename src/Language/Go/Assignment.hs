@@ -132,7 +132,7 @@ type Syntax =
    , Literal.Boolean
    ]
 
-type Term = Term.Term (Sum Syntax) Location
+type Term = Term.Term (Sum Syntax) Loc
 type Assignment = Assignment.Assignment [] Grammar
 
 -- | Assignment from AST in Go's grammar onto a program in Go's syntax.
@@ -154,18 +154,18 @@ expressionChoices =
   , block
   , breakStatement
   , callExpression
-  , communicationClause
+  , communicationCase
   , compositeLiteral
   , continueStatement
   , varDeclaration
   , varSpecification
   , decStatement
   , defaultCase
+  , defaultExpressionCase
   , deferStatement
   , element
-  , elseClause
   , emptyStatement
-  , expressionCaseClause
+  , expressionCase
   , expressionList
   , expressionSwitchStatement
   , fallThroughStatement
@@ -177,7 +177,6 @@ expressionChoices =
   , functionDeclaration
   , goStatement
   , gotoStatement
-  , ifInitializer
   , ifStatement
   , imaginaryLiteral
   , incStatement
@@ -232,8 +231,6 @@ types =
          , typeDeclaration
          , typeIdentifier
          , typeCase
-         , typeCaseClause
-         , typeSwitchGuard
          , typeSwitchStatement
          ]
 
@@ -406,20 +403,20 @@ callExpression = makeTerm <$> symbol CallExpression <*> children (Expression.Cal
 expressionCase :: Assignment Term
 expressionCase = makeTerm <$> symbol ExpressionCase <*> (Statement.Pattern <$> children expressions <*> expressions)
 
-expressionCaseClause :: Assignment Term
-expressionCaseClause = symbol ExpressionCaseClause *> children (expressionCase <|> defaultExpressionCase)
-
 expressionList :: Assignment Term
 expressionList = symbol ExpressionList *> children expressions
 
 expressionSwitchStatement :: Assignment Term
-expressionSwitchStatement = makeTerm <$> symbol ExpressionSwitchStatement <*> children (Statement.Match <$> (makeTerm <$> location <*> manyTermsTill expression (void (symbol ExpressionCaseClause)) <|> emptyTerm) <*> expressions)
+expressionSwitchStatement
+  = makeTerm
+  <$> symbol ExpressionSwitchStatement
+  <*> children (Statement.Match <$> (makeTerm <$> location <*> manyTermsTill expression (void (symbol ExpressionCase)) <|> emptyTerm) <*> expressions)
 
 fallThroughStatement :: Assignment Term
 fallThroughStatement = makeTerm <$> symbol FallthroughStatement <*> (Statement.Pattern <$> (makeTerm <$> location <*> (Syntax.Identifier . name <$> source)) <*> emptyTerm)
 
 functionDeclaration :: Assignment Term
-functionDeclaration =  makeTerm <$> (symbol FunctionDeclaration <|> symbol FuncLiteral) <*> children (mkFunctionDeclaration <$> (term identifier <|> emptyTerm) <*> params <*> returnTypes <*> (term block <|> emptyTerm))
+functionDeclaration = makeTerm <$> (symbol FunctionDeclaration <|> symbol FuncLiteral) <*> children (mkFunctionDeclaration <$> (term identifier <|> emptyTerm) <*> params <*> returnTypes <*> (term block <|> emptyTerm))
   where
     returnTypes =  pure <$> (term types <|> term identifier <|> term returnParameters)
                <|> pure []
@@ -500,19 +497,13 @@ typeAssertion = makeTerm <$> symbol TypeAssertionExpression <*> children (Go.Syn
 typeCase :: Assignment Term
 typeCase = symbol TypeCase *> children expressions
 
-typeCaseClause :: Assignment Term
-typeCaseClause = makeTerm <$> symbol TypeCaseClause <*> children (Statement.Pattern <$> expression <*> expressions)
-
 typeConversion :: Assignment Term
 typeConversion = makeTerm <$> symbol TypeConversionExpression <*> children (Go.Syntax.TypeConversion <$> expression <*> expression)
-
-typeSwitchGuard :: Assignment Term
-typeSwitchGuard = makeTerm <$> symbol Grammar.TypeSwitchGuard <*> children (Go.Syntax.TypeSwitchGuard <$> expressions)
 
 typeSwitchStatement :: Assignment Term
 typeSwitchStatement = makeTerm <$> symbol TypeSwitchStatement <*> children (Go.Syntax.TypeSwitch <$> typeSwitchSubject <*> expressions)
   where
-    typeSwitchSubject = makeTerm <$> location <*> manyTermsTill expression (void (symbol TypeCaseClause)) <|> emptyTerm
+    typeSwitchSubject = makeTerm <$> location <*> manyTermsTill expression (void (symbol TypeCase)) <|> emptyTerm
 
 unaryExpression :: Assignment Term
 unaryExpression = makeTerm' <$> symbol UnaryExpression <*> (  notExpression
@@ -575,10 +566,8 @@ assignment' =  makeTerm' <$> symbol AssignmentStatement <*> children (infixTerm 
 breakStatement :: Assignment Term
 breakStatement = makeTerm <$> symbol BreakStatement <*> children (Statement.Break <$> (expression <|> emptyTerm))
 
-communicationClause :: Assignment Term
-communicationClause = makeTerm <$> symbol CommunicationClause <*> children (Statement.Pattern <$> (communicationCase <|> expression) <*> expressions)
-  where
-    communicationCase = symbol CommunicationCase *> children expression
+communicationCase :: Assignment Term
+communicationCase = makeTerm <$> symbol CommunicationCase <*> children (Statement.Pattern <$> expression <*> expressions)
 
 continueStatement :: Assignment Term
 continueStatement = makeTerm <$> symbol ContinueStatement <*> children (Statement.Continue <$> (expression <|> emptyTerm))
@@ -588,9 +577,6 @@ decStatement = makeTerm <$> symbol DecStatement <*> children (Statement.PostDecr
 
 deferStatement :: Assignment Term
 deferStatement = makeTerm <$> symbol DeferStatement <*> children (Go.Syntax.Defer <$> expression)
-
-elseClause :: Assignment Term
-elseClause = symbol ElseClause *> children expression
 
 emptyStatement :: Assignment Term
 emptyStatement = makeTerm <$> token EmptyStatement <*> (Statement.NoOp <$> emptyTerm)
@@ -610,9 +596,6 @@ gotoStatement = makeTerm <$> symbol GotoStatement <*> children (Statement.Goto <
 
 ifStatement :: Assignment Term
 ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> (makeTerm <$> location <*> manyTermsTill expression (void (symbol Block))) <*> expression <*> (expression <|> emptyTerm))
-
-ifInitializer :: Assignment Term
-ifInitializer = symbol IfInitializer *> children expression
 
 incStatement :: Assignment Term
 incStatement = makeTerm <$> symbol IncStatement <*> children (Statement.PostIncrement <$> expression)

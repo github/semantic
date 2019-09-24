@@ -27,20 +27,21 @@ module Reprinting.Tokenize
   , tokenizing
   ) where
 
-import Prelude hiding (fail, log, filter)
-import Prologue hiding (Element, hash)
-import Streaming hiding (Sum)
+import           Prelude hiding (fail, filter, log)
+import           Prologue hiding (Element, hash)
+import           Streaming hiding (Sum)
 import qualified Streaming.Prelude as Streaming
 
 import           Data.History
 import           Data.List (intersperse)
-import           Data.Range
+import           Data.Reprinting.Operator as Operator
 import           Data.Reprinting.Scope (Scope)
 import qualified Data.Reprinting.Scope as Scope
 import           Data.Reprinting.Token as Token
-import           Data.Reprinting.Operator as Operator
-import           Data.Source
 import           Data.Term
+import           Source.Range
+import           Source.Source (Source)
+import qualified Source.Source as Source
 
 -- | The 'Tokenizer' monad represents a context in which 'Control'
 -- tokens and 'Element' tokens can be sent to some downstream
@@ -115,7 +116,7 @@ finish = do
   crs <- asks cursor
   log ("Finishing, cursor is " <> show crs)
   src <- asks source
-  chunk (dropSource crs src)
+  chunk (Source.drop crs src)
 
 -- State handling
 
@@ -169,7 +170,7 @@ descend t = do
       let delimiter = Range crs (start r)
       unless (delimiter == Range 0 0) $ do
         log ("slicing: " <> show delimiter)
-        chunk (slice delimiter src)
+        chunk (Source.slice src delimiter)
       move (start r)
       tokenize (fmap (withStrategy PrettyPrinting . into) t)
       move (end r)

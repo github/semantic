@@ -1,5 +1,9 @@
 {-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-} -- FIXME
+
+-- N.B. This module is currently disabled due to churn with the grammars
+-- and Java not being an officially supported language as of yet.
+
 module Language.Java.Assignment
 ( assignment
 , Syntax
@@ -151,7 +155,7 @@ type Syntax =
    , []
    ]
 
-type Term = Term.Term (Sum Syntax) Location
+type Term = Term.Term (Sum Syntax) Loc
 type Assignment = Assignment.Assignment [] Grammar
 
 -- | Assignment from AST in Java's grammar onto a program in Java's syntax.

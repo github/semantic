@@ -29,6 +29,7 @@ module Data.Core
 , (.=)
 , Ann(..)
 , ann
+, annAt
 , annWith
 , instantiate
 , stripAnnotations
@@ -125,6 +126,8 @@ unseqs = go
           Just (l, r) -> go l <> go r
           Nothing     -> t :| []
 
+-- TODO: if the left hand side is only a unit, this should return just the RHS
+-- this is a little fiddly to do
 (>>>=) :: (Eq a, Carrier sig m, Member Core sig) => (Named a :<- m a) -> m a -> m a
 Named u n :<- a >>>= b = send (Named u a :>>= abstract1 n b)
 
@@ -225,8 +228,11 @@ instance RightModule Ann where
 ann :: (Carrier sig m, Member Ann sig) => HasCallStack => m a -> m a
 ann = annWith callStack
 
+annAt :: (Carrier sig m, Member Ann sig) => Loc -> m a -> m a
+annAt loc = send . Ann loc
+
 annWith :: (Carrier sig m, Member Ann sig) => CallStack -> m a -> m a
-annWith callStack = maybe id (fmap send . Ann) (stackLoc callStack)
+annWith callStack = maybe id annAt (stackLoc callStack)
 
 
 stripAnnotations :: (HFunctor sig, forall g . Functor g => Functor (sig g)) => Term (Ann :+: sig) a -> Term sig a

@@ -4,8 +4,10 @@ import           Data.ByteString.Builder
 import           Semantic.Api hiding (Blob, BlobPair, File)
 import           Semantic.Task
 import           Serializing.Format
-import           System.Directory
 import           System.IO.Unsafe
+import qualified System.Path as Path
+import           System.Path ((</>))
+import qualified System.Path.Directory as Path
 
 import SpecHelpers
 import Test.Tasty
@@ -24,48 +26,48 @@ testTree = testGroup "Semantic.CLI"
 -- summary of the differences between these JSON files.
 renderDiff :: String -> String -> [String]
 renderDiff ref new = unsafePerformIO $ do
-  useJD <- (isExtensionOf ".json" ref &&) <$> fmap isJust (findExecutable "jd")
+  useJD <- (Path.hasExtension ".json" (Path.relPath ref) &&) <$> fmap isJust (Path.findExecutable "jd")
   pure $ if useJD
     then ["jd", "-set", ref, new]
     else ["git", "diff", ref, new]
 {-# NOINLINE renderDiff #-}
 
-testForDiffFixture :: (String, [BlobPair] -> TaskEff Builder, [Both File], FilePath) -> TestTree
+testForDiffFixture :: (String, [BlobPair] -> TaskEff Builder, [Both File], Path.RelFile) -> TestTree
 testForDiffFixture (diffRenderer, runDiff, files, expected) =
   goldenVsStringDiff
     ("diff fixture renders to " <> diffRenderer <> " " <> show files)
     renderDiff
-    expected
+    (Path.toString expected)
     (fmap toLazyByteString . runTaskOrDie $ readBlobPairs (Right files) >>= runDiff)
 
-testForParseFixture :: (String, [Blob] -> TaskEff Builder, [File], FilePath) -> TestTree
+testForParseFixture :: (String, [Blob] -> TaskEff Builder, [File], Path.RelFile) -> TestTree
 testForParseFixture (format, runParse, files, expected) =
   goldenVsStringDiff
     ("diff fixture renders to " <> format)
     renderDiff
-    expected
+    (Path.toString expected)
     (fmap toLazyByteString . runTaskOrDie $ readBlobs (FilesFromPaths files) >>= runParse)
 
-parseFixtures :: [(String, [Blob] -> TaskEff Builder, [File], FilePath)]
+parseFixtures :: [(String, [Blob] -> TaskEff Builder, [File], Path.RelFile)]
 parseFixtures =
-  [ ("s-expression", parseTermBuilder TermSExpression, path, "test/fixtures/ruby/corpus/and-or.parseA.txt")
-  , ("json", parseTermBuilder TermJSONTree, path, prefix </> "parse-tree.json")
-  , ("json", parseTermBuilder TermJSONTree, path', prefix </> "parse-trees.json")
-  , ("json", parseTermBuilder TermJSONTree, [], prefix </> "parse-tree-empty.json")
-  , ("symbols", parseSymbolsBuilder Serializing.Format.JSON, path'', prefix </> "parse-tree.symbols.json")
-  , ("protobuf symbols", parseSymbolsBuilder Serializing.Format.Proto, path'', prefix </> "parse-tree.symbols.protobuf.bin")
+  [ ("s-expression", parseTermBuilder TermSExpression, path, Path.relFile "test/fixtures/ruby/corpus/and-or.parseA.txt")
+  , ("json", parseTermBuilder TermJSONTree, path, prefix </> Path.file "parse-tree.json")
+  , ("json", parseTermBuilder TermJSONTree, path', prefix </> Path.file "parse-trees.json")
+  , ("json", parseTermBuilder TermJSONTree, [], prefix </> Path.file "parse-tree-empty.json")
+  , ("symbols", parseSymbolsBuilder Serializing.Format.JSON, path'', prefix </> Path.file "parse-tree.symbols.json")
+  , ("protobuf symbols", parseSymbolsBuilder Serializing.Format.Proto, path'', prefix </> Path.file "parse-tree.symbols.protobuf.bin")
   ]
   where path = [File "test/fixtures/ruby/corpus/and-or.A.rb" Ruby]
         path' = [File "test/fixtures/ruby/corpus/and-or.A.rb" Ruby, File "test/fixtures/ruby/corpus/and-or.B.rb" Ruby]
         path'' = [File "test/fixtures/ruby/corpus/method-declaration.A.rb" Ruby]
-        prefix = "test/fixtures/cli"
+        prefix = Path.relDir "test/fixtures/cli"
 
-diffFixtures :: [(String, [BlobPair] -> TaskEff Builder, [Both File], FilePath)]
+diffFixtures :: [(String, [BlobPair] -> TaskEff Builder, [Both File], Path.RelFile)]
 diffFixtures =
-  [ ("json diff", parseDiffBuilder DiffJSONTree, pathMode, prefix </> "diff-tree.json")
-  , ("s-expression diff", parseDiffBuilder DiffSExpression, pathMode, "test/fixtures/ruby/corpus/method-declaration.diffA-B.txt")
-  , ("toc summaries diff", diffSummaryBuilder Serializing.Format.JSON, pathMode, prefix </> "diff-tree.toc.json")
-  , ("protobuf diff", diffSummaryBuilder Serializing.Format.Proto, pathMode, prefix </> "diff-tree.toc.protobuf.bin")
+  [ ("json diff", parseDiffBuilder DiffJSONTree, pathMode, prefix </> Path.file "diff-tree.json")
+  , ("s-expression diff", parseDiffBuilder DiffSExpression, pathMode, Path.relFile "test/fixtures/ruby/corpus/method-declaration.diffA-B.txt")
+  , ("toc summaries diff", diffSummaryBuilder Serializing.Format.JSON, pathMode, prefix </> Path.file "diff-tree.toc.json")
+  , ("protobuf diff", diffSummaryBuilder Serializing.Format.Proto, pathMode, prefix </> Path.file "diff-tree.toc.protobuf.bin")
   ]
   where pathMode = [Both (File "test/fixtures/ruby/corpus/method-declaration.A.rb" Ruby) (File "test/fixtures/ruby/corpus/method-declaration.B.rb"  Ruby)]
-        prefix = "test/fixtures/cli"
+        prefix = Path.relDir "test/fixtures/cli"

@@ -5,6 +5,7 @@ module Main (main) where
 import qualified Analysis.Eval as Eval
 import           Control.Effect
 import           Control.Effect.Fail
+import           Control.Effect.Reader
 import           Control.Monad hiding (fail)
 import           Control.Monad.Catch
 import           Control.Monad.IO.Class
@@ -23,6 +24,7 @@ import           Data.Loc
 import           Data.Maybe
 import           Data.Name
 import           Data.Term
+import           Data.String (fromString)
 import           GHC.Stack
 import qualified Language.Python.Core as Py
 import           Prelude hiding (fail)
@@ -30,10 +32,14 @@ import           Streaming
 import qualified Streaming.Process
 import           System.Directory
 import           System.Exit
-import           System.FilePath
+import qualified TreeSitter.Span as TS (Span)
 import qualified TreeSitter.Python as TSP
 import qualified TreeSitter.Python.AST as TSP
 import qualified TreeSitter.Unmarshal as TS
+import           Text.Show.Pretty (ppShow)
+import qualified System.Path as Path
+import qualified System.Path.Directory as Path
+import           System.Path ((</>))
 
 import qualified Test.Tasty as Tasty
 import qualified Test.Tasty.HUnit as HUnit
@@ -42,8 +48,9 @@ import           Analysis.ScopeGraph
 import qualified Directive
 import           Instances ()
 
-assertJQExpressionSucceeds :: Directive.Directive -> Term (Ann :+: Core) Name -> HUnit.Assertion
-assertJQExpressionSucceeds directive core = do
+
+assertJQExpressionSucceeds :: Show a => Directive.Directive -> a -> Term (Ann :+: Core) Name -> HUnit.Assertion
+assertJQExpressionSucceeds directive tree core = do
   bod <- case scopeGraph Eval.eval [File interactive core] of
     (heap, [File _ (Right result)]) -> pure $ Aeson.object
       [ "scope" Aeson..= heap
@@ -58,34 +65,47 @@ assertJQExpressionSucceeds directive core = do
       errorMsg = "jq(1) returned non-zero exit code"
       dirMsg    = "jq expression: " <> show directive
       jsonMsg   = "JSON value: " <> ByteString.Lazy.unpack (Aeson.encodePretty bod)
-      treeMsg   = "Core expr: " <> showCore (stripAnnotations core)
+      astMsg    = "AST (pretty): " <> ppShow tree
+      treeMsg   = "Core expr (pretty): " <> showCore (stripAnnotations core)
+      treeMsg'  = "Core expr (Show): " <> ppShow (stripAnnotations core)
+
 
   catch @_ @Streaming.Process.ProcessExitedUnsuccessfully jqPipeline $ \err -> do
-    HUnit.assertFailure (unlines [errorMsg, dirMsg, jsonMsg, treeMsg, show err])
+    HUnit.assertFailure (unlines [errorMsg, dirMsg, jsonMsg, astMsg, treeMsg, treeMsg', show err])
 
-fixtureTestTreeForFile :: HasCallStack => FilePath -> Tasty.TestTree
-fixtureTestTreeForFile fp = HUnit.testCaseSteps fp $ \step -> withFrozenCallStack $ do
-  fileContents <- ByteString.readFile ("semantic-python/test/fixtures" </> fp)
+fixtureTestTreeForFile :: HasCallStack => Path.RelFile -> Tasty.TestTree
+fixtureTestTreeForFile fp = HUnit.testCaseSteps (Path.toString fp) $ \step -> withFrozenCallStack $ do
+  let fullPath = Path.relDir "semantic-python/test/fixtures" </> fp
+
+  fileContents <- ByteString.readFile (Path.toString fullPath)
   directives <- case Directive.parseDirectives fileContents of
     Right dir -> pure dir
     Left err  -> HUnit.assertFailure ("Directive parsing error: " <> err)
 
   result <- TS.parseByteString TSP.tree_sitter_python fileContents
-  let coreResult = fmap (Control.Effect.run . runFail . Py.compile @TSP.Module @_ @(Term (Ann :+: Core))) result
+  let coreResult = Control.Effect.run
+                   . runFail
+                   . runReader (fromString @Py.SourcePath . Path.toString $ fp)
+                   . runReader @Py.Bindings mempty
+                   . Py.compile @(TSP.Module TS.Span) @_ @(Term (Ann :+: Core))
+                   <$> result
+
   for_ directives $ \directive -> do
     step (Directive.describe directive)
-    case coreResult of
-      Left err           -> HUnit.assertFailure ("Parsing failed: " <> err)
-      Right (Left _)     | directive == Directive.Fails -> pure ()
-      Right (Right _)    | directive == Directive.Fails -> HUnit.assertFailure ("Expected translation to fail")
-      Right (Right item) -> assertJQExpressionSucceeds directive item
-      Right (Left err)   -> HUnit.assertFailure ("Compilation failed: " <> err)
-
+    case (coreResult, directive) of
+      (Right (Left _), Directive.Fails)      -> pure ()
+      (Left err, _)                          -> HUnit.assertFailure ("Parsing failed: " <> err)
+      (Right (Left err), _)                  -> HUnit.assertFailure ("Compilation failed: " <> err)
+      (Right (Right _), Directive.Fails)     -> HUnit.assertFailure ("Expected translation to fail")
+      (Right (Right item), Directive.JQ _)   -> assertJQExpressionSucceeds directive result item
+      (Right (Right item), Directive.Tree t) -> let msg = "got (pretty): " <> showCore item'
+                                                    item' = stripAnnotations item
+                                                in HUnit.assertEqual msg t item' where
 
 milestoneFixtures :: IO Tasty.TestTree
 milestoneFixtures = do
-  files <- liftIO (listDirectory "semantic-python/test/fixtures")
-  let pythons = sort (filter ("py" `isExtensionOf`) files)
+  files <- liftIO (Path.filesInDir (Path.relDir "semantic-python/test/fixtures"))
+  let pythons = sort (filter (Path.hasExtension ".py") files)
   pure $ Tasty.testGroup "Translation" (fmap fixtureTestTreeForFile pythons)
 
 main :: IO ()

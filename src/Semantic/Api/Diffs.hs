@@ -23,7 +23,6 @@ import           Data.Diff
 import           Data.Graph
 import           Data.JSON.Fields
 import           Data.Language
-import           Data.Location
 import           Data.Term
 import qualified Data.Text as T
 import qualified Data.Vector as V
@@ -39,6 +38,7 @@ import           Semantic.Task as Task
 import           Semantic.Telemetry as Stat
 import           Serializing.Format hiding (JSON)
 import qualified Serializing.Format as Format
+import           Source.Loc
 
 data DiffOutputFormat
   = DiffJSONTree
@@ -55,7 +55,7 @@ parseDiffBuilder DiffSExpression = distributeFoldMap sexpDiff
 parseDiffBuilder DiffShow        = distributeFoldMap showDiff
 parseDiffBuilder DiffDotGraph    = distributeFoldMap dotGraphDiff
 
-type RenderJSON m syntax = forall syntax . CanDiff syntax => BlobPair -> Diff syntax Location Location -> m (Rendering.JSON.JSON "diffs" SomeJSON)
+type RenderJSON m syntax = forall syntax . CanDiff syntax => BlobPair -> Diff syntax Loc Loc -> m (Rendering.JSON.JSON "diffs" SomeJSON)
 
 jsonDiff :: (DiffEffects sig m) => RenderJSON m syntax -> BlobPair -> m (Rendering.JSON.JSON "diffs" SomeJSON)
 jsonDiff f blobPair = doDiff blobPair (const pure) f `catchError` jsonError blobPair
@@ -63,7 +63,7 @@ jsonDiff f blobPair = doDiff blobPair (const pure) f `catchError` jsonError blob
 jsonError :: Applicative m => BlobPair -> SomeException -> m (Rendering.JSON.JSON "diffs" SomeJSON)
 jsonError blobPair (SomeException e) = pure $ renderJSONDiffError blobPair (show e)
 
-renderJSONTree :: (Applicative m, ToJSONFields1 syntax) => BlobPair -> Diff syntax Location Location -> m (Rendering.JSON.JSON "diffs" SomeJSON)
+renderJSONTree :: (Applicative m, ToJSONFields1 syntax) => BlobPair -> Diff syntax Loc Loc -> m (Rendering.JSON.JSON "diffs" SomeJSON)
 renderJSONTree blobPair = pure . renderJSONDiff blobPair
 
 diffGraph :: (Traversable t, DiffEffects sig m) => t BlobPair -> m DiffTreeGraphResponse
@@ -77,7 +77,7 @@ diffGraph blobs = DiffTreeGraphResponse . V.fromList . toList <$> distributeFor 
         path = T.pack $ pathForBlobPair blobPair
         lang = bridging # languageForBlobPair blobPair
 
-        render :: (Foldable syntax, Functor syntax, ConstructorName syntax, Applicative m) => BlobPair -> Diff syntax Location Location -> m DiffTreeFileGraph
+        render :: (Foldable syntax, Functor syntax, ConstructorName syntax, Applicative m) => BlobPair -> Diff syntax Loc Loc -> m DiffTreeFileGraph
         render _ diff =
           let graph = renderTreeGraph diff
               toEdge (Edge (a, b)) = DiffTreeEdge (diffVertexId a) (diffVertexId b)
@@ -111,7 +111,7 @@ type TermPairConstraints =
   ]
 
 doDiff :: (DiffEffects sig m)
-  => BlobPair -> Decorate m Location ann -> (forall syntax . CanDiff syntax => BlobPair -> Diff syntax ann ann -> m output) -> m output
+  => BlobPair -> Decorate m Loc ann -> (forall syntax . CanDiff syntax => BlobPair -> Diff syntax ann ann -> m output) -> m output
 doDiff blobPair decorate render = do
   SomeTermPair terms <- doParse blobPair decorate
   diff <- diffTerms blobPair terms
@@ -125,11 +125,10 @@ diffTerms blobs terms = time "diff" languageTag $ do
   where languageTag = languageTagForBlobPair blobs
 
 doParse :: (Member (Error SomeException) sig, Member Distribute sig, Member Task sig, Carrier sig m)
-  => BlobPair -> Decorate m Location ann -> m (SomeTermPair TermPairConstraints ann)
+  => BlobPair -> Decorate m Loc ann -> m (SomeTermPair TermPairConstraints ann)
 doParse blobPair decorate = case languageForBlobPair blobPair of
   Go         -> SomeTermPair <$> distributeFor blobPair (\ blob -> parse goParser blob >>= decorate blob)
   Haskell    -> SomeTermPair <$> distributeFor blobPair (\ blob -> parse haskellParser blob >>= decorate blob)
-  Java       -> SomeTermPair <$> distributeFor blobPair (\ blob -> parse javaParser blob >>= decorate blob)
   JavaScript -> SomeTermPair <$> distributeFor blobPair (\ blob -> parse tsxParser blob >>= decorate blob)
   JSON       -> SomeTermPair <$> distributeFor blobPair (\ blob -> parse jsonParser blob >>= decorate blob)
   JSX        -> SomeTermPair <$> distributeFor blobPair (\ blob -> parse tsxParser blob >>= decorate blob)

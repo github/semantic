@@ -1,4 +1,5 @@
-{-# LANGUAGE ConstraintKinds, ExistentialQuantification, GADTs, GeneralizedNewtypeDeriving, KindSignatures, ScopedTypeVariables, StandaloneDeriving, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE ConstraintKinds, ExistentialQuantification, GADTs, GeneralizedNewtypeDeriving, KindSignatures,
+             ScopedTypeVariables, StandaloneDeriving, TypeOperators, UndecidableInstances #-}
 module Semantic.Task
 ( Task
 , TaskEff
@@ -71,8 +72,6 @@ import           Data.ByteString.Builder
 import           Data.Diff
 import qualified Data.Error as Error
 import qualified Data.Flag as Flag
-import           Data.Location
-import           Data.Source (Source)
 import           Data.Sum
 import qualified Data.Syntax as Syntax
 import           Data.Term
@@ -84,11 +83,13 @@ import           Parsing.TreeSitter
 import           Prologue hiding (project)
 import           Semantic.Config
 import           Semantic.Distribute
-import qualified Semantic.Task.Files as Files
-import           Semantic.Timeout
 import           Semantic.Resolution
+import qualified Semantic.Task.Files as Files
 import           Semantic.Telemetry
+import           Semantic.Timeout
 import           Serializing.Format hiding (Options)
+import           Source.Loc
+import           Source.Source (Source)
 
 -- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
 type TaskEff
@@ -117,8 +118,8 @@ parse parser blob = send (Parse parser blob pure)
 
 -- | A task which decorates a 'Term' with values computed using the supplied 'RAlgebra' function.
 decorate :: (Functor f, Member Task sig, Carrier sig m)
-         => RAlgebra (TermF f Location) (Term f Location) field
-         -> Term f Location
+         => RAlgebra (TermF f Loc) (Term f Loc) field
+         -> Term f Loc
          -> m (Term f field)
 decorate algebra term = send (Decorate algebra term pure)
 
@@ -191,14 +192,14 @@ newtype TraceInTelemetryC m a = TraceInTelemetryC { runTraceInTelemetryC :: m a 
   deriving (Applicative, Functor, Monad, MonadIO)
 
 instance (Member Telemetry sig, Carrier sig m) => Carrier (Trace :+: sig) (TraceInTelemetryC m) where
-  eff (R other) = TraceInTelemetryC . eff . handleCoercible $ other
+  eff (R other)         = TraceInTelemetryC . eff . handleCoercible $ other
   eff (L (Trace str k)) = writeLog Debug str [] >> k
 
 
 -- | An effect describing high-level tasks to be performed.
 data Task (m :: * -> *) k
   = forall term . Parse (Parser term) Blob (term -> m k)
-  | forall f field . Functor f => Decorate (RAlgebra (TermF f Location) (Term f Location) field) (Term f Location) (Term f field -> m k)
+  | forall f field . Functor f => Decorate (RAlgebra (TermF f Loc) (Term f Loc) field) (Term f Loc) (Term f field -> m k)
   | forall syntax ann . (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => Diff (These (Term syntax ann) (Term syntax ann)) (Diff syntax ann ann -> m k)
   | forall input output . Render (Renderer input output) input (output -> m k)
   | forall input . Serialize (Format input) input (Builder -> m k)
@@ -206,18 +207,18 @@ data Task (m :: * -> *) k
 deriving instance Functor m => Functor (Task m)
 
 instance HFunctor Task where
-  hmap f (Parse parser blob k) = Parse parser blob (f . k)
-  hmap f (Decorate decorator term k) = Decorate decorator term (f . k)
+  hmap f (Parse parser blob k)        = Parse parser blob (f . k)
+  hmap f (Decorate decorator term k)  = Decorate decorator term (f . k)
   hmap f (Semantic.Task.Diff terms k) = Semantic.Task.Diff terms (f . k)
-  hmap f (Render renderer input k) = Render renderer input (f . k)
-  hmap f (Serialize format input k) = Serialize format input (f . k)
+  hmap f (Render renderer input k)    = Render renderer input (f . k)
+  hmap f (Serialize format input k)   = Serialize format input (f . k)
 
 instance Effect Task where
-  handle state handler (Parse parser blob k) = Parse parser blob (handler . (<$ state) . k)
-  handle state handler (Decorate decorator term k) = Decorate decorator term (handler . (<$ state) . k)
+  handle state handler (Parse parser blob k)        = Parse parser blob (handler . (<$ state) . k)
+  handle state handler (Decorate decorator term k)  = Decorate decorator term (handler . (<$ state) . k)
   handle state handler (Semantic.Task.Diff terms k) = Semantic.Task.Diff terms (handler . (<$ state) . k)
-  handle state handler (Render renderer input k) = Render renderer input (handler . (<$ state) . k)
-  handle state handler (Serialize format input k) = Serialize format input (handler . (<$ state) . k)
+  handle state handler (Render renderer input k)    = Render renderer input (handler . (<$ state) . k)
+  handle state handler (Serialize format input k)   = Serialize format input (handler . (<$ state) . k)
 
 -- | Run a 'Task' effect by performing the actions in 'IO'.
 runTaskF :: TaskC m a -> m a
@@ -277,10 +278,10 @@ runParser blob@Blob{..} parser = case parser of
       in length term `seq` pure term
   SomeParser parser -> SomeTerm <$> runParser blob parser
   where languageTag = pure . (,) ("language" :: String) . show $ blobLanguage blob
-        errors :: (Syntax.Error :< fs, Apply Foldable fs, Apply Functor fs) => Term (Sum fs) Assignment.Location -> [Error.Error String]
-        errors = cata $ \ (In Assignment.Location{..} syntax) -> case syntax of
-          _ | Just err@Syntax.Error{} <- project syntax -> [Syntax.unError locationSpan err]
-          _ -> fold syntax
+        errors :: (Syntax.Error :< fs, Apply Foldable fs, Apply Functor fs) => Term (Sum fs) Assignment.Loc -> [Error.Error String]
+        errors = cata $ \ (In Assignment.Loc{..} syntax) -> case syntax of
+          _ | Just err@Syntax.Error{} <- project syntax -> [Syntax.unError span err]
+          _                                             -> fold syntax
         runAssignment :: ( Apply Foldable syntaxes
                          , Apply Functor syntaxes
                          , Element Syntax.Error syntaxes
@@ -294,10 +295,10 @@ runParser blob@Blob{..} parser = case parser of
                          , Carrier sig m
                          , MonadIO m
                          )
-                      => (Source -> assignment (Term (Sum syntaxes) Assignment.Location) -> ast -> Either (Error.Error String) (Term (Sum syntaxes) Assignment.Location))
+                      => (Source -> assignment (Term (Sum syntaxes) Assignment.Loc) -> ast -> Either (Error.Error String) (Term (Sum syntaxes) Assignment.Loc))
                       -> Parser ast
-                      -> assignment (Term (Sum syntaxes) Assignment.Location)
-                      -> m (Term (Sum syntaxes) Assignment.Location)
+                      -> assignment (Term (Sum syntaxes) Assignment.Loc)
+                      -> m (Term (Sum syntaxes) Assignment.Loc)
         runAssignment assign parser assignment = do
           taskSession <- ask
           let requestID' = ("github_request_id", requestID taskSession)

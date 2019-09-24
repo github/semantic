@@ -26,9 +26,9 @@ import Data.List (sortOn)
 import qualified Data.List as List
 import qualified Data.Map.Monoidal as Map
 import Data.Patch
-import Data.Location
 import Data.Term
 import qualified Data.Text as T
+import Source.Loc
 
 data Summaries = Summaries { changes, errors :: Map.Map T.Text [Value] }
   deriving stock (Eq, Show, Generic)

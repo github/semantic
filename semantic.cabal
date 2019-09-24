@@ -1,7 +1,7 @@
 cabal-version:       2.4
 
 name:                semantic
-version:             0.7.0.0
+version:             0.7.1.0
 synopsis:            Framework and executable for analyzing and diffing untrusted code.
 description:         Semantic is a library for parsing, analyzing, and comparing source code across many languages.
 homepage:            http://github.com/github/semantic#readme
@@ -53,18 +53,19 @@ common dependencies
                      , containers ^>= 0.6.0.1
                      , directory ^>= 1.3.3.0
                      , fastsum ^>= 0.1.1.0
-                     , filepath ^>= 1.4.2.1
                      , free ^>= 5.1
                      , fused-effects ^>= 0.5.0.0
                      , fused-effects-exceptions ^>= 0.2.0.0
                      , hashable ^>= 1.2.7.0
-                     , tree-sitter ^>= 0.2
+                     , tree-sitter == 0.3.0.0
                      , mtl ^>= 2.2.2
                      , network ^>= 2.8.0.0
+                     , pathtype ^>= 0.8.1
                      , process ^>= 1.6.3.0
                      , recursion-schemes ^>= 5.1
                      , scientific ^>= 0.3.6.2
                      , safe-exceptions ^>= 0.1.7.0
+                     , semantic-source ^>= 0.0
                      , semilattices ^>= 0.0.0.3
                      , shelly >= 1.5 && <2
                      , streaming ^>= 0.2.2.0
@@ -73,7 +74,7 @@ common dependencies
                      , unix ^>= 2.7.2.2
                      , proto3-suite
                      , proto3-wire
-                     , lingo >= 0.1.0.1
+                     , lingo >= 0.2.0.0
 
 common executable-flags
   ghc-options:         -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m"
@@ -158,12 +159,10 @@ library
                      , Data.ImportPath
                      , Data.JSON.Fields
                      , Data.Language
-                     , Data.Location
                      , Data.Map.Monoidal
                      , Data.Patch
                      , Data.Project
                      , Data.Quieterm
-                     , Data.Range
                      , Data.Reprinting.Errors
                      , Data.Reprinting.Fragment
                      , Data.Reprinting.Operator
@@ -172,8 +171,6 @@ library
                      , Data.Reprinting.Token
                      , Data.Semigroup.App
                      , Data.Scientific.Exts
-                     , Data.Source
-                     , Data.Span
                      -- À la carte syntax types
                      , Data.Syntax
                      , Data.Syntax.Comment
@@ -225,7 +222,6 @@ library
                      , Language.Python.Assignment
                      , Language.Python.PrettyPrint
                      , Language.Python.Syntax
-                     , Language.Java.Assignment
                      , Language.Java.Syntax
                      , Numeric.Exts
                      -- Parser glue
@@ -290,6 +286,7 @@ library
                      , cryptohash ^>= 0.11.9
                      , deepseq ^>= 1.4.4.0
                      , directory-tree ^>= 0.12.1
+                     , filepath ^>= 1.4.2.1
                      , generic-monoid ^>= 0.1.0.0
                      , ghc-prim ^>= 0.5.3
                      , gitrev ^>= 1.3.1
@@ -319,19 +316,17 @@ library
                      , unliftio-core ^>= 0.1.2.0
                      , unordered-containers ^>= 0.2.9.0
                      , vector ^>= 0.12.0.2
-                     , tree-sitter-go ^>= 0.1.0.0
-                     , tree-sitter-haskell ^>= 0.1.0.0
-                     , tree-sitter-json ^>= 0.1.0.0
-                     , tree-sitter-php ^>= 0.1.0.1
-                     , tree-sitter-python ^>= 0.2.0.0
-                     , tree-sitter-ruby ^>= 0.1.0.0
-                     , tree-sitter-typescript ^>= 0.1.0.0
-                     , tree-sitter-tsx ^>= 0.1.0.0
-                     , tree-sitter-java ^>= 0.1.0.0
+                     , tree-sitter-go == 0.2.0.0
+                     , tree-sitter-haskell == 0.2.0.0
+                     , tree-sitter-json == 0.2.0.0
+                     , tree-sitter-php == 0.2.0.0
+                     , tree-sitter-python == 0.4.0.0
+                     , tree-sitter-ruby == 0.2.0.0
+                     , tree-sitter-typescript == 0.2.1.0
+                     , tree-sitter-tsx == 0.2.1.0
+                     , tree-sitter-java == 0.2.0.0
   if flag(release)
     cpp-options:       -DCOMPUTE_GIT_SHA
-  else
-    ghc-options:       +RTS -A128m -n2m -RTS
 
 executable semantic
   import:              haskell, dependencies, executable-flags
@@ -362,10 +357,8 @@ test-suite test
                      , Data.Graph.Spec
                      , Data.Mergeable
                      , Data.Language.Spec
-                     , Data.Range.Spec
                      , Data.Scientific.Spec
                      , Data.Semigroup.App.Spec
-                     , Data.Source.Spec
                      , Data.Term.Spec
                      , Diffing.Algorithm.RWS.Spec
                      , Diffing.Algorithm.SES.Spec

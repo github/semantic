@@ -17,7 +17,7 @@ import Data.Abstract.Evaluatable
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
 import Data.Language (Language)
-import Data.Span
+import Source.Span
 
 type ModuleC address value m
   = ErrorC (LoopControl value)

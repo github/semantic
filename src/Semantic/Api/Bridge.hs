@@ -8,11 +8,11 @@ module Semantic.Api.Bridge
 import           Control.Lens
 import qualified Data.Blob as Data
 import qualified Data.Language as Data
-import           Data.Source (fromText, toText)
-import qualified Data.Span as Data
 import qualified Data.Text as T
 import qualified Semantic.Api.LegacyTypes as Legacy
 import qualified Semantic.Proto.SemanticPB as API
+import           Source.Source (fromText, toText)
+import qualified Source.Span as Source
 
 -- | An @APIBridge x y@ instance describes an isomorphism between @x@ and @y@.
 -- This is suitable for types such as 'Pos' which are representationally equivalent
@@ -43,25 +43,25 @@ class APIConvert api native | api -> native where
 rev #? item = item ^? re rev
 infixr 8 #?
 
-instance APIBridge Legacy.Position Data.Pos where
+instance APIBridge Legacy.Position Source.Pos where
   bridging = iso fromAPI toAPI where
-    toAPI Data.Pos{..}          = Legacy.Position posLine posColumn
-    fromAPI Legacy.Position{..} = Data.Pos line column
+    toAPI Source.Pos{..}        = Legacy.Position line column
+    fromAPI Legacy.Position{..} = Source.Pos line column
 
-instance APIBridge API.Position Data.Pos where
+instance APIBridge API.Position Source.Pos where
   bridging = iso fromAPI toAPI where
-    toAPI Data.Pos{..}          = API.Position (fromIntegral posLine) (fromIntegral posColumn)
-    fromAPI API.Position{..}    = Data.Pos (fromIntegral line) (fromIntegral column)
+    toAPI Source.Pos{..}     = API.Position (fromIntegral line) (fromIntegral column)
+    fromAPI API.Position{..} = Source.Pos (fromIntegral line) (fromIntegral column)
 
-instance APIConvert API.Span Data.Span where
+instance APIConvert API.Span Source.Span where
   converting = prism' toAPI fromAPI where
-    toAPI Data.Span{..} = API.Span (bridging #? spanStart) (bridging #? spanEnd)
-    fromAPI API.Span{..} = Data.Span <$> (start >>= preview bridging) <*> (end >>= preview bridging)
+    toAPI Source.Span{..} = API.Span (bridging #? start) (bridging #? end)
+    fromAPI API.Span{..} = Source.Span <$> (start >>= preview bridging) <*> (end >>= preview bridging)
 
-instance APIConvert Legacy.Span Data.Span where
+instance APIConvert Legacy.Span Source.Span where
   converting = prism' toAPI fromAPI where
-    toAPI Data.Span{..} = Legacy.Span (bridging #? spanStart) (bridging #? spanEnd)
-    fromAPI Legacy.Span {..} = Data.Span <$> (start >>= preview bridging) <*> (end >>= preview bridging)
+    toAPI Source.Span{..} = Legacy.Span (bridging #? start) (bridging #? end)
+    fromAPI Legacy.Span {..} = Source.Span <$> (start >>= preview bridging) <*> (end >>= preview bridging)
 
 instance APIBridge T.Text Data.Language where
   bridging = iso Data.textToLanguage Data.languageToText

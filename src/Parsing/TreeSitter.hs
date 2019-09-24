@@ -6,21 +6,22 @@ module Parsing.TreeSitter
 
 import Prologue hiding (bracket)
 
-import qualified Control.Exception as Exc (bracket)
 import           Control.Effect.Resource
 import           Control.Effect.Trace
+import qualified Control.Exception as Exc (bracket)
 import           Data.ByteString.Unsafe (unsafeUseAsCStringLen)
 import           Foreign
 import           Foreign.C.Types (CBool (..))
 import           Foreign.Marshal.Array (allocaArray)
 
-import Data.AST (AST, Node (Node))
-import Data.Blob
-import Data.Duration
-import Data.Location
-import Data.Source
-import Data.Span
-import Data.Term
+import           Data.AST (AST, Node (Node))
+import           Data.Blob
+import           Data.Duration
+import           Data.Term
+import           Source.Loc
+import           Source.Source (Source)
+import qualified Source.Source as Source
+import           Source.Span
 
 import qualified TreeSitter.Language as TS
 import qualified TreeSitter.Node as TS
@@ -32,7 +33,7 @@ data Result grammar
   | Succeeded (AST [] grammar)
 
 runParser :: (Enum grammar, Bounded grammar) => Ptr TS.Parser -> Source -> IO (Result grammar)
-runParser parser blobSource  = unsafeUseAsCStringLen (sourceBytes blobSource) $ \ (source, len) -> do
+runParser parser blobSource  = unsafeUseAsCStringLen (Source.bytes blobSource) $ \ (source, len) -> do
     alloca (\ rootPtr -> do
       let acquire = do
             -- Change this to TS.ts_parser_loop_until_cancelled if you want to test out cancellation
@@ -84,7 +85,7 @@ toAST node@TS.Node{..} = do
   children <- allocaArray count $ \ childNodesPtr -> do
     _ <- with nodeTSNode (`TS.ts_node_copy_child_nodes` childNodesPtr)
     peekArray count childNodesPtr
-  pure $! In (Node (toEnum (min (fromIntegral nodeSymbol) (fromEnum (maxBound :: grammar)))) (Location (nodeRange node) (nodeSpan node))) children
+  pure $! In (Node (toEnum (min (fromIntegral nodeSymbol) (fromEnum (maxBound :: grammar)))) (Loc (nodeRange node) (nodeSpan node))) children
 
 anaM :: (Corecursive t, Monad m, Traversable (Base t)) => (a -> m (Base t a)) -> a -> m t
 anaM g = a where a = pure . embed <=< traverse a <=< g

@@ -115,11 +115,11 @@ import           Data.Reprinting.Errors
 import           Data.Reprinting.Scope
 import           Data.Reprinting.Splice
 import           Data.Reprinting.Token
-import qualified Data.Source as Source
 import           Data.Term
 import           Reprinting.Tokenize
 import           Reprinting.Translate
 import           Reprinting.Typeset
+import qualified Source.Source as Source
 
 -- | Run the reprinting pipeline given the original 'Source', a language specific
 -- translation function (as a function over 'Stream's) and the provided 'Term'.

@@ -8,7 +8,7 @@
 --
 --   1. 'symbol' rules match a node against a specific symbol in the source language’s grammar; they succeed iff a) there is a current node, and b) its symbol is equal to the argument symbol. Matching a 'symbol' rule does not advance past the current node, meaning that you can match a node against a symbol and also e.g. match against the node’s 'children'. This also means that some care must be taken, as repeating a symbol with 'many' or 'some' (see below) will never advance past the current node and could therefore loop forever.
 --
---   2. 'location' rules always succeed, and produce the current node’s Location (byte Range and Span). If there is no current node (i.e. if matching has advanced past the root node or past the last child node when operating within a 'children' rule), the location is instead the end of the most recently matched node, specified as a zero-width Range and Span. 'location' rules do not advance past the current node, meaning that you can both match a node’s 'location' and other properties.
+--   2. 'location' rules always succeed, and produce the current node’s Loc (byte Range and Span). If there is no current node (i.e. if matching has advanced past the root node or past the last child node when operating within a 'children' rule), the location is instead the end of the most recently matched node, specified as a zero-width Range and Span. 'location' rules do not advance past the current node, meaning that you can both match a node’s 'location' and other properties.
 --
 --   3. 'source' rules succeed whenever there is a current node (i.e. matching has not advanced past the root node or the last child node when operating within a 'children' rule), and produce its source as a ByteString. 'source' is intended to match leaf nodes such as e.g. comments. 'source' rules advance past the current node.
 --
@@ -20,7 +20,7 @@
 --
 --   Assignments can further be combined in a few different ways:
 --
---   1. The 'Functor' instance maps values from the AST (Location, ByteString, etc.) into another structure.
+--   1. The 'Functor' instance maps values from the AST (Loc, ByteString, etc.) into another structure.
 --
 --   2. The 'Applicative' instance assigns sequences of (sibling) AST nodes in order, as well as providing 'pure' assignments (see above). Most assignments of a single piece of syntax consist of an 'Applicative' chain of assignments.
 --
@@ -61,7 +61,7 @@
 module Assigning.Assignment
 -- Types
 ( Assignment
-, L.Location(..)
+, L.Loc(..)
 -- Combinators
 , branchNode
 , leafNode
@@ -100,13 +100,13 @@ import qualified Assigning.Assignment.Table as Table
 import Control.Monad.Except (MonadError (..))
 import Data.AST
 import Data.Error
-import Data.Range
-import qualified Data.Location as L
-import qualified Data.Source as Source (Source, slice, sourceBytes)
-import Data.Span hiding (HasSpan(..))
+import qualified Source.Source as Source
 import Data.Term
 import Data.Text (Text)
 import Data.Text.Encoding (decodeUtf8')
+import qualified Source.Loc as L
+import Source.Range as Range
+import Source.Span as Span
 import Text.Parser.Combinators as Parsers hiding (choice)
 import TreeSitter.Language
 
@@ -120,8 +120,8 @@ leafNode sym = symbol sym *> source
 
 -- | Wrap an 'Assignment' producing @syntax@ up into an 'Assignment' producing 'Term's.
 toTerm :: Element syntax syntaxes
-       => Assignment ast grammar (syntax (Term (Sum syntaxes) L.Location))
-       -> Assignment ast grammar         (Term (Sum syntaxes) L.Location)
+       => Assignment ast grammar (syntax (Term (Sum syntaxes) L.Loc))
+       -> Assignment ast grammar         (Term (Sum syntaxes) L.Loc)
 toTerm syntax = termIn <$> location <*> (inject <$> syntax)
 
 
@@ -132,7 +132,7 @@ type Assignment ast grammar = Freer (Tracing (AssignmentF ast grammar))
 
 data AssignmentF ast grammar a where
   End :: AssignmentF ast grammar ()
-  Location :: AssignmentF ast grammar L.Location
+  Loc :: AssignmentF ast grammar L.Loc
   CurrentNode :: AssignmentF ast grammar (TermF ast (Node grammar) ())
   Source :: AssignmentF ast grammar ByteString
   Children :: Assignment ast grammar a -> AssignmentF ast grammar a
@@ -159,8 +159,8 @@ tracing f = case getCallStack callStack of
 -- | Zero-width production of the current location.
 --
 --   If assigning at the end of input or at the end of a list of children, the location will be returned as an empty Range and Span at the current offset. Otherwise, it will be the Range and Span of the current node.
-location :: Assignment ast grammar L.Location
-location = tracing Location `Then` pure
+location :: Assignment ast grammar L.Loc
+location = tracing Loc `Then` pure
 
 getLocals :: HasCallStack => Assignment ast grammar [Text]
 getLocals = tracing GetLocals `Then` pure
@@ -174,7 +174,7 @@ currentNode :: HasCallStack => Assignment ast grammar (TermF ast (Node grammar) 
 currentNode = tracing CurrentNode `Then` pure
 
 -- | Zero-width match of a node with the given symbol, producing the current node’s location.
-symbol :: (Enum grammar, Ix grammar, HasCallStack) => grammar -> Assignment ast grammar L.Location
+symbol :: (Enum grammar, Ix grammar, HasCallStack) => grammar -> Assignment ast grammar L.Loc
 symbol s = tracing (Choose (Table.singleton s location) Nothing Nothing) `Then` pure
 
 -- | A rule to produce a node’s source as a ByteString.
@@ -213,7 +213,7 @@ choice alternatives
         mergeHandlers hs = Just (\ err -> asum (hs <*> [err]))
 
 -- | Match and advance past a node with the given symbol.
-token :: (Enum grammar, Ix grammar, HasCallStack) => grammar -> Assignment ast grammar L.Location
+token :: (Enum grammar, Ix grammar, HasCallStack) => grammar -> Assignment ast grammar L.Loc
 token s = symbol s <* advance
 
 
@@ -261,11 +261,11 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
             -> Either (Error (Either String grammar)) (result, State ast grammar)
         run yield t initialState = state `seq` maybe (anywhere Nothing) atNode (listToMaybe stateNodes)
           where atNode (Term (In node f)) = case runTracing t of
-                  Location -> yield (nodeLocation node) state
+                  Loc -> yield (nodeLocation node) state
                   GetLocals -> yield stateLocals state
                   PutLocals l -> yield () (state { stateLocals = l })
                   CurrentNode -> yield (In node (() <$ f)) state
-                  Source -> yield (Source.sourceBytes (Source.slice (nodeByteRange node) source)) (advanceState state)
+                  Source -> yield (Source.bytes (Source.slice source (nodeByteRange node))) (advanceState state)
                   Children child -> do
                     (a, state') <- go child state { stateNodes = toList f, stateCallSites = maybe id (:) (tracingCallSite t) stateCallSites } >>= requireExhaustive (tracingCallSite t)
                     yield a (advanceState state' { stateNodes = stateNodes, stateCallSites = stateCallSites })
@@ -274,7 +274,7 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
 
                 anywhere node = case runTracing t of
                   End -> requireExhaustive (tracingCallSite t) ((), state) >>= uncurry yield
-                  Location -> yield (L.Location (Range stateOffset stateOffset) (Span statePos statePos)) state
+                  Loc -> yield (L.Loc (Range stateOffset stateOffset) (Span statePos statePos)) state
                   Many rule -> fix (\ recur state -> (go rule state >>= \ (a, state') -> first (a:) <$> if state == state' then pure ([], state') else recur state') `catchError` const (pure ([], state))) state >>= uncurry yield
                   Alt (a:as) -> sconcat (flip yield state <$> a:|as)
                   Label child label -> go child state `catchError` (\ err -> throwError err { errorExpected = [Left label] }) >>= uncurry yield
@@ -305,7 +305,7 @@ skipTokens state = state { stateNodes = dropWhile ((/= Regular) . symbolType . n
 -- | Advances the state past the current (head) node (if any), dropping it off stateNodes, and updating stateOffset & statePos to its end; or else returns the state unchanged.
 advanceState :: State ast grammar -> State ast grammar
 advanceState state@State{..}
-  | Term (In node _) : rest <- stateNodes = State (end (nodeByteRange node)) (spanEnd (nodeSpan node)) stateCallSites rest stateLocals
+  | Term (In node _) : rest <- stateNodes = State (Range.end (nodeByteRange node)) (Span.end (nodeSpan node)) stateCallSites rest stateLocals
   | otherwise = state
 
 -- | State kept while running 'Assignment's.

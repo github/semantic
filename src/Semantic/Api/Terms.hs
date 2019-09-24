@@ -26,7 +26,6 @@ import           Data.Either
 import           Data.Graph
 import           Data.JSON.Fields
 import           Data.Language
-import           Data.Location
 import           Data.Quieterm
 import           Data.Term
 import qualified Data.Text as T
@@ -41,6 +40,7 @@ import           Semantic.Proto.SemanticPB hiding (Blob)
 import           Semantic.Task
 import           Serializing.Format hiding (JSON)
 import qualified Serializing.Format as Format
+import           Source.Loc
 import           Tags.Taggable
 
 termGraph :: (Traversable t, Member Distribute sig, ParseEffects sig m) => t Blob -> m ParseTreeGraphResponse
@@ -54,7 +54,7 @@ termGraph blobs = ParseTreeGraphResponse . V.fromList . toList <$> distributeFor
         path = T.pack $ blobPath blob
         lang = bridging # blobLanguage blob
 
-        render :: (Foldable syntax, Functor syntax, ConstructorName syntax) => Term syntax Location -> ParseTreeFileGraph
+        render :: (Foldable syntax, Functor syntax, ConstructorName syntax) => Term syntax Loc -> ParseTreeFileGraph
         render t = let graph = renderTreeGraph t
                        toEdge (Edge (a, b)) = TermEdge (vertexId a) (vertexId b)
                    in ParseTreeFileGraph path lang (V.fromList (vertexList graph)) (V.fromList (fmap toEdge (edgeList graph))) mempty
@@ -108,14 +108,15 @@ type TermConstraints =
   , Declarations1
   , ConstructorName
   , HasTextElement
+  , Show1
   , ToJSONFields1
+  , Traversable
   ]
 
-doParse :: (ParseEffects sig m) => Blob -> m (SomeTerm TermConstraints Location)
+doParse :: (ParseEffects sig m) => Blob -> m (SomeTerm TermConstraints Loc)
 doParse blob = case blobLanguage blob of
   Go         -> SomeTerm <$> parse goParser blob
   Haskell    -> SomeTerm <$> parse haskellParser blob
-  Java       -> SomeTerm <$> parse javaParser blob
   JavaScript -> SomeTerm <$> parse tsxParser blob
   JSON       -> SomeTerm <$> parse jsonParser blob
   JSX        -> SomeTerm <$> parse tsxParser blob
