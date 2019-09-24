@@ -11,7 +11,6 @@ module Data.Functor.Listable
 , cons5
 , cons6
 , (\/)
-, ListableF(..)
 , addWeight
 , ofWeight
 , ListableSyntax
@@ -101,18 +100,6 @@ liftCons6 :: [Tier a] -> [Tier b] -> [Tier c] -> [Tier d] -> [Tier e] -> [Tier f
 liftCons6 tiers1 tiers2 tiers3 tiers4 tiers5 tiers6 f = mapT (uncurry6 f) (tiers1 >< tiers2 >< tiers3 >< tiers4 >< tiers5 >< tiers6) `addWeight` 1
   where uncurry6 g (a, (b, (c, (d, (e, f))))) = g a b c d e f
 
--- | Convenient wrapper for 'Listable1' type constructors and 'Listable' types, where a 'Listable' instance would necessarily be orphaned.
-newtype ListableF f a = ListableF { unListableF :: f a }
-  deriving Show
-
--- | Convenient wrapper for 'Listable2' type constructors and 'Listable' types, where a 'Listable' instance would necessarily be orphaned.
-newtype ListableF2 f a b = ListableF2 { unListableF2 :: f a b }
-  deriving Show
-
-instance (Listable2 f, Listable a, Listable b) => Listable (ListableF2 f a b) where
-  tiers = ListableF2 `mapT` tiers2
-
-
 -- Instances
 
 instance Listable1 Maybe where
@@ -139,10 +126,6 @@ instance Listable2 p => Listable1 (Join p) where
 
 instance Listable1 Both where
   liftTiers tiers = liftCons2 tiers tiers Both
-
-instance (Listable1 f, Listable a) => Listable (ListableF f a) where
-  tiers = ListableF `mapT` tiers1
-
 
 instance Listable1 f => Listable2 (TermF f) where
   liftTiers2 annotationTiers recurTiers = liftCons2 annotationTiers (liftTiers recurTiers) In
