@@ -39,9 +39,9 @@ instance (ToTagBy strategy t, strategy ~ ToTagInstance t) => ToTags t where
 class ToTagBy (strategy :: Strategy) t where
   tags'
     :: ( Carrier sig m
-        , Member (Reader Source) sig
-        , Member (Writer Tags.Tags) sig
-        )
+       , Member (Reader Source) sig
+       , Member (Writer Tags.Tags) sig
+       )
     => t Loc
     -> m ()
 
@@ -114,9 +114,9 @@ instance (Generic1 t, GToTag (Rep1 t)) => ToTagBy 'Generic t where
 class GToTag t where
   gtags
     :: ( Carrier sig m
-        , Member (Reader Source) sig
-        , Member (Writer Tags.Tags) sig
-        )
+       , Member (Reader Source) sig
+       , Member (Writer Tags.Tags) sig
+       )
     => t Loc
     -> m ()
 
