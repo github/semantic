@@ -33,11 +33,11 @@ instance Tags.ToTags Term where
   tags = tags . getTerm
 
 
-instance (ToTagBy strategy t, strategy ~ ToTagInstance t) => ToTags t where
+instance (ToTagsBy strategy t, strategy ~ ToTagInstance t) => ToTags t where
   tags = tags' @strategy
 
 
-class ToTagBy (strategy :: Strategy) t where
+class ToTagsBy (strategy :: Strategy) t where
   tags'
     :: ( Carrier sig m
        , Member (Reader Source) sig
@@ -56,11 +56,11 @@ type family ToTagInstance t :: Strategy where
   ToTagInstance Py.Call               = 'Custom
   ToTagInstance _                     = 'Generic
 
-instance (ToTags l, ToTags r) => ToTagBy 'Custom (l :+: r) where
+instance (ToTags l, ToTags r) => ToTagsBy 'Custom (l :+: r) where
   tags' (L1 l) = tags l
   tags' (R1 r) = tags r
 
-instance ToTagBy 'Custom Py.FunctionDefinition where
+instance ToTagsBy 'Custom Py.FunctionDefinition where
   tags' Py.FunctionDefinition
     { ann = Loc Range { start } span
     , name = Py.Identifier { bytes = name }
@@ -76,7 +76,7 @@ instance ToTagBy 'Custom Py.FunctionDefinition where
       traverse_ tags returnType
       traverse_ tags extraChildren
 
-instance ToTagBy 'Custom Py.ClassDefinition where
+instance ToTagsBy 'Custom Py.ClassDefinition where
   tags' Py.ClassDefinition
     { ann = Loc Range { start } span
     , name = Py.Identifier { bytes = name }
@@ -90,7 +90,7 @@ instance ToTagBy 'Custom Py.ClassDefinition where
       traverse_ tags superclasses
       traverse_ tags extraChildren
 
-instance ToTagBy 'Custom Py.Call where
+instance ToTagsBy 'Custom Py.Call where
   tags' Py.Call
     { ann = Loc range span
     , function = Py.IdentifierPrimaryExpression Py.Identifier { bytes = name }
@@ -109,5 +109,5 @@ docComment _ _ = Nothing
 firstLine :: Source -> Text
 firstLine = T.take 180 . T.takeWhile (/= '\n') . toText
 
-instance (Generic1 t, Tags.GFold1 ToTags (Rep1 t)) => ToTagBy 'Generic t where
+instance (Generic1 t, Tags.GFold1 ToTags (Rep1 t)) => ToTagsBy 'Generic t where
   tags' = getAp . Tags.gfold1 @ToTags (Ap . tags) . from1
