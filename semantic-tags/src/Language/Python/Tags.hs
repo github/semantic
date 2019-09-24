@@ -33,7 +33,7 @@ instance Tags.ToTags Term where
   tags = tags . getTerm
 
 
-instance (ToTagsBy strategy t, strategy ~ ToTagInstance t) => ToTags t where
+instance (ToTagsBy strategy t, strategy ~ ToTagsInstance t) => ToTags t where
   tags = tags' @strategy
 
 
@@ -49,12 +49,12 @@ class ToTagsBy (strategy :: Strategy) t where
 
 data Strategy = Generic | Custom
 
-type family ToTagInstance t :: Strategy where
-  ToTagInstance (_ :+: _)             = 'Custom
-  ToTagInstance Py.FunctionDefinition = 'Custom
-  ToTagInstance Py.ClassDefinition    = 'Custom
-  ToTagInstance Py.Call               = 'Custom
-  ToTagInstance _                     = 'Generic
+type family ToTagsInstance t :: Strategy where
+  ToTagsInstance (_ :+: _)             = 'Custom
+  ToTagsInstance Py.FunctionDefinition = 'Custom
+  ToTagsInstance Py.ClassDefinition    = 'Custom
+  ToTagsInstance Py.Call               = 'Custom
+  ToTagsInstance _                     = 'Generic
 
 instance (ToTags l, ToTags r) => ToTagsBy 'Custom (l :+: r) where
   tags' (L1 l) = tags l
