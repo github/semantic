@@ -100,7 +100,7 @@ instance ToTagsBy 'Custom Py.Call where
       let sliced = slice src range
       Tags.yield (Tag name Call span (firstLine sliced) Nothing)
       tags arguments
-  tags' Py.Call {} = pure ()
+  tags' Py.Call { function, arguments } = tags function >> tags arguments
 
 docComment :: Source -> (Py.CompoundStatement :+: Py.SimpleStatement) Loc -> Maybe Text
 docComment src (R1 (Py.ExpressionStatementSimpleStatement (Py.ExpressionStatement { extraChildren = L1 (Py.PrimaryExpressionExpression (Py.StringPrimaryExpression Py.String { ann })) :|_ }))) = Just (toText (slice src (byteRange ann)))
