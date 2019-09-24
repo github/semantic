@@ -41,33 +41,33 @@ yield = tell . Endo . (:)
 
 
 class GFold1 c t where
-  gfold1
+  gfoldMap1
     :: Monoid b
     => (forall f . c f => f a -> b)
     -> t a
     -> b
 
 instance GFold1 c f => GFold1 c (M1 i c' f) where
-  gfold1 alg = gfold1 @c alg . unM1
+  gfoldMap1 alg = gfoldMap1 @c alg . unM1
 
 instance (GFold1 c f, GFold1 c g) => GFold1 c (f :*: g) where
-  gfold1 alg (f :*: g) = gfold1 @c alg f <> gfold1 @c alg g
+  gfoldMap1 alg (f :*: g) = gfoldMap1 @c alg f <> gfoldMap1 @c alg g
 
 instance (GFold1 c f, GFold1 c g) => GFold1 c (f :+: g) where
-  gfold1 alg (L1 l) = gfold1 @c alg l
-  gfold1 alg (R1 r) = gfold1 @c alg r
+  gfoldMap1 alg (L1 l) = gfoldMap1 @c alg l
+  gfoldMap1 alg (R1 r) = gfoldMap1 @c alg r
 
 instance GFold1 c (K1 R t) where
-  gfold1 _ _ = mempty
+  gfoldMap1 _ _ = mempty
 
 instance GFold1 c Par1 where
-  gfold1 _ _ = mempty
+  gfoldMap1 _ _ = mempty
 
 instance c t => GFold1 c (Rec1 t) where
-  gfold1 alg (Rec1 t) = alg t
+  gfoldMap1 alg (Rec1 t) = alg t
 
 instance (Foldable f, GFold1 c g) => GFold1 c (f :.: g) where
-  gfold1 alg = foldMap (gfold1 @c alg) . unComp1
+  gfoldMap1 alg = foldMap (gfoldMap1 @c alg) . unComp1
 
 instance GFold1 c U1 where
-  gfold1 _ _ = mempty
+  gfoldMap1 _ _ = mempty
