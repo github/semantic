@@ -1,6 +1,7 @@
 {-# LANGUAGE AllowAmbiguousTypes, DataKinds, DisambiguateRecordFields, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, NamedFieldPuns, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Tags.Taggable.Precise
 ( runTagging
+, Tags
 ) where
 
 import           Control.Effect.Reader
@@ -26,11 +27,13 @@ runTagging source
   . runReader source
   . tag where
 
+type Tags = Endo [Tag]
+
 class ToTag t where
   tag
     :: ( Carrier sig m
        , Member (Reader Source) sig
-       , Member (Writer (Endo [Tag])) sig
+       , Member (Writer Tags) sig
        )
     => t Loc
     -> m ()
@@ -43,7 +46,7 @@ class ToTagBy (strategy :: Strategy) t where
   tag'
     :: ( Carrier sig m
        , Member (Reader Source) sig
-       , Member (Writer (Endo [Tag])) sig
+       , Member (Writer Tags) sig
        )
     => t Loc
     -> m ()
@@ -104,7 +107,7 @@ instance ToTagBy 'Custom Py.Call where
       tag arguments
   tag' Py.Call {} = pure ()
 
-yield :: (Carrier sig m, Member (Writer (Endo [Tag])) sig) => Tag -> m ()
+yield :: (Carrier sig m, Member (Writer Tags) sig) => Tag -> m ()
 yield = tell . Endo . (:)
 
 docComment :: Source -> (Py.CompoundStatement :+: Py.SimpleStatement) Loc -> Maybe Text
@@ -121,7 +124,7 @@ class GToTag t where
   gtag
     :: ( Carrier sig m
        , Member (Reader Source) sig
-       , Member (Writer (Endo [Tag])) sig
+       , Member (Writer Tags) sig
        )
     => t Loc
     -> m ()
