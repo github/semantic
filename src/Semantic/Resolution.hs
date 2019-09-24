@@ -22,7 +22,7 @@ import qualified Source.Source as Source
 import           System.FilePath.Posix
 
 
-nodeJSResolutionMap :: (Member Files sig, Carrier sig m, MonadIO m) => FilePath -> Text -> [FilePath] -> m (Map FilePath FilePath)
+nodeJSResolutionMap :: (Member Files sig, Carrier sig m) => FilePath -> Text -> [FilePath] -> m (Map FilePath FilePath)
 nodeJSResolutionMap rootDir prop excludeDirs = do
   files <- findFiles rootDir [".json"] excludeDirs
   let packageFiles = fileForPath <$> filter ((==) "package.json" . takeFileName) files
