@@ -39,6 +39,11 @@ class ToTag t where
     => t Loc
     -> m ()
 
+
+yield :: (Carrier sig m, Member (Writer Tags) sig) => Tag -> m ()
+yield = tell . Endo . (:)
+
+
 instance (ToTagBy strategy t, strategy ~ ToTagInstance t) => ToTag t where
   tag = tag' @strategy
 
@@ -107,9 +112,6 @@ instance ToTagBy 'Custom Py.Call where
       yield (Tag name Call span (firstLine sliced) Nothing)
       tag arguments
   tag' Py.Call {} = pure ()
-
-yield :: (Carrier sig m, Member (Writer Tags) sig) => Tag -> m ()
-yield = tell . Endo . (:)
 
 docComment :: Source -> (Py.CompoundStatement :+: Py.SimpleStatement) Loc -> Maybe Text
 docComment src (R1 (Py.ExpressionStatementSimpleStatement (Py.ExpressionStatement { extraChildren = L1 (Py.PrimaryExpressionExpression (Py.StringPrimaryExpression Py.String { ann })) :|_ }))) = Just (toText (slice src (byteRange ann)))
