@@ -156,6 +156,12 @@ instance GToTag U1 where
 class Element sub sup where
   prj :: sup a -> Maybe (sub a)
 
+
+type family a || b where
+  'True || _     = 'True
+  _     || 'True = 'True
+  _     || _     = 'False
+
 instance {-# OVERLAPPABLE #-}
          Element t t where
   prj = Just
