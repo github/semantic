@@ -13,7 +13,7 @@ import           Data.Text as T
 import           GHC.Generics
 import           Source.Loc
 import           Source.Range
-import           Source.Source
+import           Source.Source as Source
 import           Tags.Tag
 import qualified Tags.Taggable.Precise as Tags
 import qualified TreeSitter.Python.AST as Py
@@ -108,7 +108,7 @@ docComment src (R1 (Py.ExpressionStatementSimpleStatement (Py.ExpressionStatemen
 docComment _ _ = Nothing
 
 firstLine :: Source -> Text
-firstLine = T.take 180 . T.takeWhile (/= '\n') . toText
+firstLine = T.takeWhile (/= '\n') . toText . Source.take 180
 
 
 instance (Generic1 t, Tags.GFoldable1 ToTags (Rep1 t)) => ToTagsBy 'Generic t where
