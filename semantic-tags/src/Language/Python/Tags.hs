@@ -18,6 +18,12 @@ import           Tags.Tag
 import qualified Tags.Taggable.Precise as Tags
 import qualified TreeSitter.Python.AST as Py
 
+newtype Term a = Term { getTerm :: Py.Module a }
+
+instance Tags.ToTags Term where
+  tags = tags . getTerm
+
+
 class ToTags t where
   tags
     :: ( Carrier sig m
@@ -26,12 +32,6 @@ class ToTags t where
        )
     => t Loc
     -> m ()
-
-newtype Term a = Term { getTerm :: Py.Module a }
-
-instance Tags.ToTags Term where
-  tags = tags . getTerm
-
 
 instance (ToTagsBy strategy t, strategy ~ ToTagsInstance t) => ToTags t where
   tags = tags' @strategy
