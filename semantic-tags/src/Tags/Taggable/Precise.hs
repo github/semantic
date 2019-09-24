@@ -192,7 +192,3 @@ instance (GSum f, GSum g) => GSum (f :+: g) where
   type Members (f :+: g) = Members f :+: Members g
   gmembers (L1 l) = L1 (gmembers l)
   gmembers (R1 r) = R1 (gmembers r)
-
-instance GSum (Rec1 f) where
-  type Members (Rec1 f) = f
-  gmembers = unRec1
