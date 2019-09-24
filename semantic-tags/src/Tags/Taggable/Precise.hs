@@ -157,6 +157,11 @@ class Element sub sup where
   prj :: sup a -> Maybe (sub a)
 
 
+type family Elem sub sup where
+  Elem t t         = 'True
+  Elem t (l :+: r) = Elem t l || Elem t r
+  Elem _ _         = 'False
+
 type family a || b where
   'True || _     = 'True
   _     || 'True = 'True
