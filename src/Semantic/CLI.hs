@@ -98,6 +98,11 @@ diffCommand = command "diff" (info diffArgumentsParser (progDesc "Compute change
       filesOrStdin <- Right <$> some (Both <$> argument filePathReader (metavar "FILE_A") <*> argument filePathReader (metavar "FILE_B")) <|> pure (Left stdin)
       pure $ Task.readBlobPairs filesOrStdin >>= renderer
 
+data ASTMode
+  = ALaCarte
+  | Precise
+  deriving (Eq, Ord, Show)
+
 parseCommand :: Mod CommandFields (Task.TaskEff Builder)
 parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate parse trees for path(s)"))
   where
