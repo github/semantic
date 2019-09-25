@@ -109,14 +109,14 @@ parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate pa
                         <> value Language.ALaCarte
                         <> showDefault)
       renderer
-        <-  flag  (const (parseTermBuilder TermSExpression))
-                  (const (parseTermBuilder TermSExpression))
+        <-  flag  (parseTermBuilder TermSExpression)
+                  (parseTermBuilder TermSExpression)
                   (  long "sexpression"
                   <> help "Output s-expression parse trees (default)")
-        <|> flag' (const (parseTermBuilder TermJSONTree))
+        <|> flag' (parseTermBuilder TermJSONTree)
                   (  long "json"
                   <> help "Output JSON parse trees")
-        <|> flag' (const (parseTermBuilder TermJSONGraph))
+        <|> flag' (parseTermBuilder TermJSONGraph)
                   (  long "json-graph"
                   <> help "Output JSON adjacency list")
         <|> flag' (parseSymbolsBuilder JSON)
@@ -126,13 +126,13 @@ parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate pa
         <|> flag' (parseSymbolsBuilder Proto)
                   (  long "proto-symbols"
                   <> help "Output protobufs symbol list")
-        <|> flag' (const (parseTermBuilder TermDotGraph))
+        <|> flag' (parseTermBuilder TermDotGraph)
                   (  long "dot"
                   <> help "Output DOT graph parse trees")
-        <|> flag' (const (parseTermBuilder TermShow))
+        <|> flag' (parseTermBuilder TermShow)
                   (  long "show"
                   <> help "Output using the Show instance (debug only, format subject to change without notice)")
-        <|> flag' (const (parseTermBuilder TermQuiet))
+        <|> flag' (parseTermBuilder TermQuiet)
                   (  long "quiet"
                   <> help "Don't produce output, but show timing stats")
       filesOrStdin <- FilesFromGitRepo
