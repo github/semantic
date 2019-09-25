@@ -1,6 +1,6 @@
 {-# LANGUAGE AllowAmbiguousTypes, DataKinds, DisambiguateRecordFields, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, NamedFieldPuns, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Language.Python.Tags
-( Term(..)
+( ToTags(..)
 ) where
 
 import           Control.Effect.Reader
@@ -17,12 +17,6 @@ import           Source.Source as Source
 import           Tags.Tag
 import qualified Tags.Tagging.Precise as Tags
 import qualified TreeSitter.Python.AST as Py
-
-newtype Term a = Term { getTerm :: Py.Module a }
-
-instance Tags.ToTags Term where
-  tags src = Tags.runTagging src . tags . getTerm
-
 
 class ToTags t where
   tags
