@@ -112,6 +112,8 @@ parseCommand :: Mod CommandFields (Task.TaskEff Builder)
 parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate parse trees for path(s)"))
   where
     parseArgumentsParser = do
+      language <- LanguageModes
+        <$> option auto (long "python-mode" <> help "The AST representation to use for Python sources" <> metavar "ALaCarte|Precise" <> value ALaCarte <> showDefault <> completer (listCompleter (map show (enumFrom @ASTMode minBound))))
       renderer
         <-  flag  (parseTermBuilder TermSExpression)
                   (parseTermBuilder TermSExpression)
