@@ -102,21 +102,21 @@ parseCommand :: Mod CommandFields (Task.TaskEff Builder)
 parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate parse trees for path(s)"))
   where
     parseArgumentsParser = do
-      language <- Language.PerLanguageModes
+      languageModes <- Language.PerLanguageModes
         <$> option auto (  long "python-mode"
                         <> help "The AST representation to use for Python sources"
                         <> metavar "ALaCarte|Precise"
                         <> value Language.ALaCarte
                         <> showDefault)
       renderer
-        <-  flag  (parseTermBuilder TermSExpression)
-                  (parseTermBuilder TermSExpression)
+        <-  flag  (const (parseTermBuilder TermSExpression))
+                  (const (parseTermBuilder TermSExpression))
                   (  long "sexpression"
                   <> help "Output s-expression parse trees (default)")
-        <|> flag' (parseTermBuilder TermJSONTree)
+        <|> flag' (const (parseTermBuilder TermJSONTree))
                   (  long "json"
                   <> help "Output JSON parse trees")
-        <|> flag' (parseTermBuilder TermJSONGraph)
+        <|> flag' (const (parseTermBuilder TermJSONGraph))
                   (  long "json-graph"
                   <> help "Output JSON adjacency list")
         <|> flag' (parseSymbolsBuilder JSON)
@@ -126,13 +126,13 @@ parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate pa
         <|> flag' (parseSymbolsBuilder Proto)
                   (  long "proto-symbols"
                   <> help "Output protobufs symbol list")
-        <|> flag' (parseTermBuilder TermDotGraph)
+        <|> flag' (const (parseTermBuilder TermDotGraph))
                   (  long "dot"
                   <> help "Output DOT graph parse trees")
-        <|> flag' (parseTermBuilder TermShow)
+        <|> flag' (const (parseTermBuilder TermShow))
                   (  long "show"
                   <> help "Output using the Show instance (debug only, format subject to change without notice)")
-        <|> flag' (parseTermBuilder TermQuiet)
+        <|> flag' (const (parseTermBuilder TermQuiet))
                   (  long "quiet"
                   <> help "Don't produce output, but show timing stats")
       filesOrStdin <- FilesFromGitRepo
@@ -144,7 +144,7 @@ parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate pa
                         <|> IncludePathsFromHandle <$> flag' stdin (long "only-stdin" <> help "Include only the paths given to stdin"))
                   <|> FilesFromPaths <$> some (argument filePathReader (metavar "FILES..."))
                   <|> pure (FilesFromHandle stdin)
-      pure $ Task.readBlobs filesOrStdin >>= renderer
+      pure $ Task.readBlobs filesOrStdin >>= renderer languageModes
 
 tsParseCommand :: Mod CommandFields (Task.TaskEff Builder)
 tsParseCommand = command "ts-parse" (info tsParseArgumentsParser (progDesc "Generate raw tree-sitter parse trees for path(s)"))

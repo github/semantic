@@ -10,6 +10,7 @@ import           Control.Exception
 import           Control.Lens
 import           Data.Blob hiding (File (..))
 import           Data.ByteString.Builder
+import           Data.Language
 import           Data.Maybe
 import           Data.Term
 import qualified Data.Text as T
@@ -54,8 +55,8 @@ legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> distributeFoldMap 
           , symbolSpan = converting #? span
           }
 
-parseSymbolsBuilder :: (Member Distribute sig, ParseEffects sig m, Traversable t) => Format ParseTreeSymbolResponse -> t Blob -> m Builder
-parseSymbolsBuilder format blobs = parseSymbols blobs >>= serialize format
+parseSymbolsBuilder :: (Member Distribute sig, ParseEffects sig m, Traversable t) => Format ParseTreeSymbolResponse -> PerLanguageModes -> t Blob -> m Builder
+parseSymbolsBuilder format _ blobs = parseSymbols blobs >>= serialize format
 
 parseSymbols :: (Member Distribute sig, ParseEffects sig m, Traversable t) => t Blob -> m ParseTreeSymbolResponse
 parseSymbols blobs = ParseTreeSymbolResponse . V.fromList . toList <$> distributeFor blobs go
