@@ -43,11 +43,13 @@ import Test.Tasty.Hspec as Tasty
 
 tests :: (?session :: TaskSession) => [TestTree]
 tests =
-  [ Integration.Spec.testTree
-  , Semantic.CLI.Spec.testTree
-  , Data.Language.Spec.testTree
-  , Semantic.Stat.Spec.testTree
+  [ Data.Language.Spec.testTree
   , Data.Scientific.Spec.testTree
+  , Data.Semigroup.App.Spec.testTree
+  , Integration.Spec.testTree
+  , Numeric.Spec.testTree
+  , Semantic.CLI.Spec.testTree
+  , Semantic.Stat.Spec.testTree
   ]
 
 -- We can't bring this out of the IO monad until we divest
@@ -78,13 +80,11 @@ legacySpecs = parallel $ do
   describe "Data.Abstract.Path" Data.Abstract.Path.Spec.spec
   describe "Data.Abstract.Name" Data.Abstract.Name.Spec.spec
   describe "Data.Functor.Classes.Generic" Data.Functor.Classes.Generic.Spec.spec
-  describe "Data.Semigroup.App" Data.Semigroup.App.Spec.spec
   describe "Data.Term" Data.Term.Spec.spec
   describe "Diffing.Algorithm.RWS" Diffing.Algorithm.RWS.Spec.spec
   describe "Diffing.Algorithm.SES" Diffing.Algorithm.SES.Spec.spec
   describe "Diffing.Interpreter" Diffing.Interpreter.Spec.spec
   describe "Graphing.Calls" Graphing.Calls.Spec.spec
-  describe "Numeric" Numeric.Spec.spec
   describe "Rendering.TOC" Rendering.TOC.Spec.spec
   describe "Reprinting.Spec" Reprinting.Spec.spec
   describe "Rewriting.Go" Rewriting.Go.Spec.spec
