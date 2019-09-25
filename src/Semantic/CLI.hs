@@ -1,6 +1,7 @@
 {-# LANGUAGE ApplicativeDo #-}
 module Semantic.CLI (main) where
 
+import           Control.Effect.Reader
 import           Control.Exception as Exc (displayException)
 import           Data.Blob
 import           Data.Blob.IO
@@ -144,7 +145,7 @@ parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate pa
                         <|> IncludePathsFromHandle <$> flag' stdin (long "only-stdin" <> help "Include only the paths given to stdin"))
                   <|> FilesFromPaths <$> some (argument filePathReader (metavar "FILES..."))
                   <|> pure (FilesFromHandle stdin)
-      pure $ Task.readBlobs filesOrStdin >>= renderer languageModes
+      pure $ Task.readBlobs filesOrStdin >>= runReader languageModes . renderer
 
 tsParseCommand :: Mod CommandFields (Task.TaskEff Builder)
 tsParseCommand = command "ts-parse" (info tsParseArgumentsParser (progDesc "Generate raw tree-sitter parse trees for path(s)"))

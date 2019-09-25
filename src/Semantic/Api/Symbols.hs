@@ -10,7 +10,6 @@ import           Control.Exception
 import           Control.Lens
 import           Data.Blob hiding (File (..))
 import           Data.ByteString.Builder
-import           Data.Language
 import           Data.Maybe
 import           Data.Term
 import qualified Data.Text as T
@@ -31,7 +30,7 @@ import           Tags.Tagging
 legacyParseSymbols :: (Member Distribute sig, ParseEffects sig m, Traversable t) => t Blob -> m Legacy.ParseTreeSymbolResponse
 legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> distributeFoldMap go blobs
   where
-    go :: (Member (Error SomeException) sig, Member Task sig, Carrier sig m) => Blob -> m [Legacy.File]
+    go :: ParseEffects sig m => Blob -> m [Legacy.File]
     go blob@Blob{..} = (doParse blob >>= withSomeTerm renderToSymbols) `catchError` (\(SomeException _) -> pure (pure emptyFile))
       where
         emptyFile = tagsToFile []
@@ -55,13 +54,13 @@ legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> distributeFoldMap 
           , symbolSpan = converting #? span
           }
 
-parseSymbolsBuilder :: (Member Distribute sig, ParseEffects sig m, Traversable t) => Format ParseTreeSymbolResponse -> PerLanguageModes -> t Blob -> m Builder
-parseSymbolsBuilder format modes blobs = parseSymbols modes blobs >>= serialize format
+parseSymbolsBuilder :: (Member Distribute sig, ParseEffects sig m, Traversable t) => Format ParseTreeSymbolResponse -> t Blob -> m Builder
+parseSymbolsBuilder format blobs = parseSymbols blobs >>= serialize format
 
-parseSymbols :: (Member Distribute sig, ParseEffects sig m, Traversable t) => PerLanguageModes -> t Blob -> m ParseTreeSymbolResponse
-parseSymbols _ blobs = ParseTreeSymbolResponse . V.fromList . toList <$> distributeFor blobs go
+parseSymbols :: (Member Distribute sig, ParseEffects sig m, Traversable t) => t Blob -> m ParseTreeSymbolResponse
+parseSymbols blobs = ParseTreeSymbolResponse . V.fromList . toList <$> distributeFor blobs go
   where
-    go :: (Member (Error SomeException) sig, Member Task sig, Carrier sig m) => Blob -> m File
+    go :: ParseEffects sig m => Blob -> m File
     go blob@Blob{..} = (doParse blob >>= withSomeTerm renderToSymbols) `catchError` (\(SomeException e) -> pure $ errorFile (show e))
       where
         blobLanguage' = blobLanguage blob

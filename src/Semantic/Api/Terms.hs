@@ -16,6 +16,7 @@ module Semantic.Api.Terms
 
 import           Analysis.ConstructorName (ConstructorName)
 import           Control.Effect.Error
+import           Control.Effect.Reader
 import           Control.Lens
 import           Control.Monad
 import           Control.Monad.IO.Class
@@ -69,13 +70,13 @@ data TermOutputFormat
   deriving (Eq, Show)
 
 parseTermBuilder :: (Traversable t, Member Distribute sig, ParseEffects sig m, MonadIO m)
-  => TermOutputFormat -> PerLanguageModes -> t Blob -> m Builder
-parseTermBuilder TermJSONTree    _ = distributeFoldMap jsonTerm >=> serialize Format.JSON -- NB: Serialize happens at the top level for these two JSON formats to collect results of multiple blobs.
-parseTermBuilder TermJSONGraph   _ = termGraph >=> serialize Format.JSON
-parseTermBuilder TermSExpression _ = distributeFoldMap sexpTerm
-parseTermBuilder TermDotGraph    _ = distributeFoldMap dotGraphTerm
-parseTermBuilder TermShow        _ = distributeFoldMap showTerm
-parseTermBuilder TermQuiet       _ = distributeFoldMap quietTerm
+  => TermOutputFormat -> t Blob -> m Builder
+parseTermBuilder TermJSONTree    = distributeFoldMap jsonTerm >=> serialize Format.JSON -- NB: Serialize happens at the top level for these two JSON formats to collect results of multiple blobs.
+parseTermBuilder TermJSONGraph   = termGraph >=> serialize Format.JSON
+parseTermBuilder TermSExpression = distributeFoldMap sexpTerm
+parseTermBuilder TermDotGraph    = distributeFoldMap dotGraphTerm
+parseTermBuilder TermShow        = distributeFoldMap showTerm
+parseTermBuilder TermQuiet       = distributeFoldMap quietTerm
 
 jsonTerm :: (ParseEffects sig m) => Blob -> m (Rendering.JSON.JSON "trees" SomeJSON)
 jsonTerm blob = (doParse blob >>= withSomeTerm (pure . renderJSONTerm blob)) `catchError` jsonError blob
@@ -101,7 +102,7 @@ quietTerm blob = showTiming blob <$> time' ( (doParse blob >>= withSomeTerm (fma
       in stringUtf8 (status <> "\t" <> show (blobLanguage blob) <> "\t" <> blobPath blob <> "\t" <> show duration <> " ms\n")
 
 
-type ParseEffects sig m = (Member (Error SomeException) sig, Member Task sig, Carrier sig m)
+type ParseEffects sig m = (Member (Error SomeException) sig, Member (Reader PerLanguageModes) sig, Member Task sig, Carrier sig m)
 
 type TermConstraints =
  '[ Taggable
