@@ -56,10 +56,10 @@ legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> distributeFoldMap 
           }
 
 parseSymbolsBuilder :: (Member Distribute sig, ParseEffects sig m, Traversable t) => Format ParseTreeSymbolResponse -> PerLanguageModes -> t Blob -> m Builder
-parseSymbolsBuilder format _ blobs = parseSymbols blobs >>= serialize format
+parseSymbolsBuilder format modes blobs = parseSymbols modes blobs >>= serialize format
 
-parseSymbols :: (Member Distribute sig, ParseEffects sig m, Traversable t) => t Blob -> m ParseTreeSymbolResponse
-parseSymbols blobs = ParseTreeSymbolResponse . V.fromList . toList <$> distributeFor blobs go
+parseSymbols :: (Member Distribute sig, ParseEffects sig m, Traversable t) => PerLanguageModes -> t Blob -> m ParseTreeSymbolResponse
+parseSymbols _ blobs = ParseTreeSymbolResponse . V.fromList . toList <$> distributeFor blobs go
   where
     go :: (Member (Error SomeException) sig, Member Task sig, Carrier sig m) => Blob -> m File
     go blob@Blob{..} = (doParse blob >>= withSomeTerm renderToSymbols) `catchError` (\(SomeException e) -> pure $ errorFile (show e))
