@@ -117,8 +117,7 @@ parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate pa
                         <> help "The AST representation to use for Python sources"
                         <> metavar "ALaCarte|Precise"
                         <> value ALaCarte
-                        <> showDefault
-                        <> completer (listCompleter (map show (enumFrom @ASTMode minBound))))
+                        <> showDefault)
       renderer
         <-  flag  (parseTermBuilder TermSExpression)
                   (parseTermBuilder TermSExpression)
