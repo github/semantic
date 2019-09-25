@@ -374,6 +374,7 @@ test-suite test
                      , SpecHelpers
                      , Test.Hspec.LeanCheck
                      , Generators
+                     , Properties
   build-depends:       semantic
                      , tree-sitter-json
                      , Glob ^>= 0.10.0
