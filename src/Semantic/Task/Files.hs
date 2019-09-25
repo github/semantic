@@ -31,11 +31,12 @@ import           Prologue hiding (catch)
 import qualified Semantic.Git as Git
 import           Semantic.IO
 import qualified System.IO as IO
+import qualified System.Path as Path
 
 data Source blob where
   FromPath       :: File                            -> Source Blob
   FromHandle     :: Handle 'IO.ReadMode             -> Source [Blob]
-  FromDir        :: FilePath                        -> Source [Blob]
+  FromDir        :: Path.AbsRelDir                  -> Source [Blob]
   FromGitRepo    :: FilePath -> Git.OID -> PathFilter -> Source [Blob]
   FromPathPair   :: Both File                       -> Source BlobPair
   FromPairHandle :: Handle 'IO.ReadMode             -> Source [BlobPair]
@@ -108,7 +109,7 @@ readBlobs (FilesFromHandle handle) = send (Read (FromHandle handle) pure)
 readBlobs (FilesFromPaths [path]) = do
   isDir <- isDirectory (filePath path)
   if isDir
-    then send (Read (FromDir (filePath path)) pure)
+    then send (Read (FromDir (Path.path (filePath path))) pure)
     else pure <$> send (Read (FromPath path) pure)
 readBlobs (FilesFromPaths paths) = traverse (send . flip Read pure . FromPath) paths
 readBlobs (FilesFromGitRepo path sha filter) = send (Read (FromGitRepo path sha filter) pure)

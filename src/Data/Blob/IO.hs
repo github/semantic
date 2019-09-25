@@ -37,9 +37,9 @@ readBlobFromFile' file = do
   maybeM (Prelude.fail ("cannot read '" <> show file <> "', file not found or language not supported.")) maybeFile
 
 -- | Read all blobs in the directory with Language.supportedExts.
-readBlobsFromDir :: MonadIO m => FilePath -> m [Blob]
+readBlobsFromDir :: MonadIO m => Path.AbsRelDir -> m [Blob]
 readBlobsFromDir path = liftIO . fmap catMaybes $
-  findFilesInDir path supportedExts mempty >>= Async.mapConcurrently (readBlobFromFile . fileForPath)
+  findFilesInDir (Path.toString path) supportedExts mempty >>= Async.mapConcurrently (readBlobFromFile . fileForPath)
 
 readBlobsFromGitRepoPath :: (Part.AbsRel ar, MonadIO m) => Path.Dir ar -> Git.OID -> [Path.RelFile] -> [Path.RelFile] -> m [Blob]
 readBlobsFromGitRepoPath path oid excludePaths includePaths
