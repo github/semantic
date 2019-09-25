@@ -125,7 +125,7 @@ parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate pa
                   <> help "Output JSON symbol list")
         <|> flag' (parseSymbolsBuilder Proto)
                   (  long "proto-symbols"
-                  <> help "Output JSON symbol list")
+                  <> help "Output protobufs symbol list")
         <|> flag' (parseTermBuilder TermDotGraph)
                   (  long "dot"
                   <> help "Output DOT graph parse trees")
