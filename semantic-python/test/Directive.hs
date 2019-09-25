@@ -1,5 +1,5 @@
 module Directive ( Directive (..)
-                 , parseDirectives
+                 , parseDirective
                  , describe
                  , toProcess
                  ) where
@@ -14,7 +14,6 @@ import qualified Data.Core.Pretty as Core.Pretty
 import           Data.ByteString.Char8 (ByteString)
 import qualified Data.ByteString.Char8 as ByteString
 import           Data.List.NonEmpty (NonEmpty)
-import           Data.Coerce
 import           System.Process
 import qualified Text.Trifecta as Trifecta
 
@@ -57,23 +56,20 @@ fails = Fails <$ Trifecta.string "# CHECK-FAILS"
 
 jq :: Trifecta.Parser Directive
 jq = do
-  Trifecta.string "# CHECK-JQ: "
+  void $ Trifecta.string "# CHECK-JQ: "
   JQ . ByteString.pack <$> many (Trifecta.noneOf "\n")
 
 tree :: Trifecta.Parser Directive
 tree = do
   void $ Trifecta.string "# CHECK-TREE: "
-  Tree <$> (Core.Parser.record <|> Core.Parser.comp)
+  Tree <$> Core.Parser.core
 
 directive :: Trifecta.Parser Directive
 directive = Trifecta.choice [ fails, jq, tree ]
 
-toplevel :: Trifecta.Parser (NonEmpty Directive)
-toplevel = directive `Trifecta.sepEndByNonEmpty` Trifecta.char '\n'
-
-parseDirectives :: ByteString -> Either String (NonEmpty Directive)
-parseDirectives = Trifecta.foldResult (Left . show) Right
-                . Trifecta.parseByteString toplevel mempty
+parseDirective :: ByteString -> Either String Directive
+parseDirective = Trifecta.foldResult (Left . show) Right
+               . Trifecta.parseByteString (directive <* Trifecta.eof) mempty
 
 toProcess :: Directive -> CreateProcess
 toProcess (JQ d) = proc "jq" ["-e", ByteString.unpack d]
