@@ -10,6 +10,8 @@ module Data.Language
   , codeNavLanguages
   , textToLanguage
   , languageToText
+  , LanguageModes(..)
+  , ASTMode(..)
   ) where
 
 import           Data.Aeson
@@ -137,3 +139,14 @@ textToLanguage = \case
   "TSX" -> TSX
   "PHP" -> PHP
   _ -> Unknown
+
+
+newtype LanguageModes = LanguageModes
+  { pythonMode :: ASTMode
+  }
+  deriving (Eq, Ord, Show)
+
+data ASTMode
+  = ALaCarte
+  | Precise
+  deriving (Bounded, Enum, Eq, Ord, Read, Show)

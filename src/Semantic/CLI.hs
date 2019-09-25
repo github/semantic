@@ -98,25 +98,15 @@ diffCommand = command "diff" (info diffArgumentsParser (progDesc "Compute change
       filesOrStdin <- Right <$> some (Both <$> argument filePathReader (metavar "FILE_A") <*> argument filePathReader (metavar "FILE_B")) <|> pure (Left stdin)
       pure $ Task.readBlobPairs filesOrStdin >>= renderer
 
-newtype LanguageModes = LanguageModes
-  { pythonMode :: ASTMode
-  }
-  deriving (Eq, Ord, Show)
-
-data ASTMode
-  = ALaCarte
-  | Precise
-  deriving (Bounded, Enum, Eq, Ord, Read, Show)
-
 parseCommand :: Mod CommandFields (Task.TaskEff Builder)
 parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate parse trees for path(s)"))
   where
     parseArgumentsParser = do
-      language <- LanguageModes
+      language <- Language.LanguageModes
         <$> option auto (  long "python-mode"
                         <> help "The AST representation to use for Python sources"
                         <> metavar "ALaCarte|Precise"
-                        <> value ALaCarte
+                        <> value Language.ALaCarte
                         <> showDefault)
       renderer
         <-  flag  (parseTermBuilder TermSExpression)
