@@ -98,6 +98,11 @@ diffCommand = command "diff" (info diffArgumentsParser (progDesc "Compute change
       filesOrStdin <- Right <$> some (Both <$> argument filePathReader (metavar "FILE_A") <*> argument filePathReader (metavar "FILE_B")) <|> pure (Left stdin)
       pure $ Task.readBlobPairs filesOrStdin >>= renderer
 
+newtype LanguageModes = LanguageModes
+  { pythonMode :: ASTMode
+  }
+  deriving (Eq, Ord, Show)
+
 data ASTMode
   = ALaCarte
   | Precise
