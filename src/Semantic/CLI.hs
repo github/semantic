@@ -106,7 +106,7 @@ newtype LanguageModes = LanguageModes
 data ASTMode
   = ALaCarte
   | Precise
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Ord, Read, Show)
 
 parseCommand :: Mod CommandFields (Task.TaskEff Builder)
 parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate parse trees for path(s)"))
