@@ -102,7 +102,7 @@ parseCommand :: Mod CommandFields (Task.TaskEff Builder)
 parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate parse trees for path(s)"))
   where
     parseArgumentsParser = do
-      language <- Language.LanguageModes
+      language <- Language.PerLanguageModes
         <$> option auto (  long "python-mode"
                         <> help "The AST representation to use for Python sources"
                         <> metavar "ALaCarte|Precise"

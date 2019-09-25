@@ -10,8 +10,8 @@ module Data.Language
   , codeNavLanguages
   , textToLanguage
   , languageToText
-  , LanguageModes(..)
-  , ASTMode(..)
+  , PerLanguageModes(..)
+  , LanguageMode(..)
   ) where
 
 import           Data.Aeson
@@ -141,12 +141,12 @@ textToLanguage = \case
   _ -> Unknown
 
 
-newtype LanguageModes = LanguageModes
-  { pythonMode :: ASTMode
+newtype PerLanguageModes = PerLanguageModes
+  { pythonMode :: LanguageMode
   }
   deriving (Eq, Ord, Show)
 
-data ASTMode
+data LanguageMode
   = ALaCarte
   | Precise
   deriving (Bounded, Enum, Eq, Ord, Read, Show)
