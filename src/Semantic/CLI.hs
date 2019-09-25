@@ -121,9 +121,7 @@ parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate pa
                   <> help "Output JSON adjacency list")
         <|> flag' (parseSymbolsBuilder JSON)
                   (  long "symbols"
-                  <> help "Output JSON symbol list")
-        <|> flag' (parseSymbolsBuilder JSON)
-                  (  long "json-symbols"
+                  <> long "json-symbols"
                   <> help "Output JSON symbol list")
         <|> flag' (parseSymbolsBuilder Proto)
                   (  long "proto-symbols"
