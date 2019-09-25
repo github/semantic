@@ -1,20 +1,26 @@
-module Data.Semigroup.App.Spec (spec) where
+module Data.Semigroup.App.Spec (testTree) where
 
-import SpecHelpers
-import Data.Semigroup.App
+import           Data.Semigroup.App
+import           Hedgehog
+import qualified Hedgehog.Gen as Gen
+import qualified Hedgehog.Range as Range
+import           Properties
+import qualified Test.Tasty as Tasty
+import qualified Test.Tasty.Hedgehog as Tasty
 
-spec :: Spec
-spec = do
-  describe "App" $
-    prop "should be associative" $
-      \a b c -> a <> (b <> c) == (a <> b) <> (c :: App Maybe Integer)
+app :: MonadGen m => m (App Maybe Integer)
+app = App <$> Gen.maybe (Gen.integral (Range.linear 0 10000))
 
-  describe "AppMerge" $ do
-    prop "should be associative" $
-      \ a b c -> a <> (b <> c) == (a <> b) <> (c :: AppMerge Maybe String)
+merge :: MonadGen m => m (AppMerge Maybe String)
+merge = AppMerge <$> Gen.maybe (Gen.string (Range.linear 0 10) Gen.ascii)
 
-    prop "identity/left" $
-      \ a -> mempty <> a == (a :: AppMerge Maybe String)
-
-    prop "identity/right" $
-      \ a -> a <> mempty == (a :: AppMerge Maybe String)
+testTree :: Tasty.TestTree
+testTree = Tasty.testGroup "Data.Semigroup.App"
+  [ Tasty.testGroup "App"
+    [ Tasty.testProperty "is associative" (associative (<>) app)
+    ]
+  , Tasty.testGroup "AppMerge"
+    [ Tasty.testProperty "is associative" (associative (<>) merge)
+    , Tasty.testProperty "is monoidal" (monoidal merge)
+    ]
+  ]
