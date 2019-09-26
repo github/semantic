@@ -28,11 +28,7 @@ import qualified TreeSitter.Node as TS
 import qualified TreeSitter.Parser as TS
 import qualified TreeSitter.Tree as TS
 
-data Result grammar
-  = Failed
-  | Succeeded (AST [] grammar)
-
-runParserToAST :: (Enum grammar, Bounded grammar) => Ptr TS.Parser -> Source -> IO (Result grammar)
+runParserToAST :: (Enum grammar, Bounded grammar) => Ptr TS.Parser -> Source -> IO (Maybe (AST [] grammar))
 runParserToAST parser blobSource = unsafeUseAsCStringLen (Source.bytes blobSource) $ \ (source, len) ->
   alloca (\ rootPtr ->
     let acquire =
@@ -44,11 +40,11 @@ runParserToAST parser blobSource = unsafeUseAsCStringLen (Source.bytes blobSourc
           | otherwise = TS.ts_tree_delete t
 
         go treePtr = if treePtr == nullPtr then
-          pure Failed
+          pure Nothing
         else do
           TS.ts_tree_root_node_p treePtr rootPtr
           ptr <- peek rootPtr
-          Succeeded <$> anaM toAST ptr
+          Just <$> anaM toAST ptr
     in Exc.bracket acquire release go)
 
 -- | Parse 'Source' with the given 'TS.Language' and return its AST.
@@ -73,10 +69,10 @@ parseToAST parseTimeout language b@Blob{..} = bracket (liftIO TS.ts_parser_new) 
   result <- if compatible then
     liftIO $ runParserToAST parser blobSource
   else
-    Failed <$ trace "tree-sitter: incompatible versions"
+    Nothing <$ trace "tree-sitter: incompatible versions"
   case result of
-    Failed          -> Nothing  <$ trace ("tree-sitter: parsing failed " <> blobPath b)
-    (Succeeded ast) -> Just ast <$ trace ("tree-sitter: parsing succeeded " <> blobPath b)
+    Nothing  -> Nothing  <$ trace ("tree-sitter: parsing failed " <> blobPath b)
+    Just ast -> Just ast <$ trace ("tree-sitter: parsing succeeded " <> blobPath b)
 
 toAST :: forall grammar . (Bounded grammar, Enum grammar) => TS.Node -> IO (Base (AST [] grammar) TS.Node)
 toAST node@TS.Node{..} = do
