@@ -36,7 +36,7 @@ parseToAST :: ( Bounded grammar
            -> Ptr TS.Language
            -> Blob
            -> m (Maybe (AST [] grammar))
-parseToAST parseTimeout language blob = runParse parseTimeout language blob $ \ rootPtr -> peek rootPtr >>= anaM toAST
+parseToAST parseTimeout language blob = runParse parseTimeout language blob (anaM toAST <=< peek)
 
 runParse
   :: ( Carrier sig m
