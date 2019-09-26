@@ -57,6 +57,7 @@ import           TreeSitter.Python
 import           TreeSitter.Ruby
 import           TreeSitter.TSX
 import           TreeSitter.TypeScript
+import           TreeSitter.Unmarshal
 
 
 type family ApplyAll' (typeclasses :: [(* -> *) -> Constraint]) (fs :: [* -> *]) :: Constraint where
@@ -100,6 +101,8 @@ someAnalysisParser _ l          = error $ "Analysis not supported for: " <> show
 data Parser term where
   -- | A parser producing 'AST' using a 'TS.Language'.
   ASTParser :: (Bounded grammar, Enum grammar, Show grammar) => Ptr TS.Language -> Parser (AST [] grammar)
+  -- | A parser 'Unmarshal'ing to a precise AST type using a 'TS.Language'.
+  UnmarshalParser :: Unmarshal t => Ptr TS.Language -> Parser t
   -- | A parser producing an à la carte term given an 'AST'-producing parser and an 'Assignment' onto 'Term's in some syntax type.
   AssignmentParser :: (Enum grammar, Ix grammar, Show grammar, TS.Symbol grammar, Syntax.Error :< fs, Eq1 ast, Apply Foldable fs, Apply Functor fs, Foldable ast, Functor ast)
                    => Parser (Term ast (Node grammar))           -- ^ A parser producing AST.
