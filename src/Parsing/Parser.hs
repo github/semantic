@@ -47,16 +47,20 @@ import qualified Language.Python.Assignment as Python
 import qualified Language.Ruby.Assignment as Ruby
 import qualified Language.TSX.Assignment as TSX
 import qualified Language.TypeScript.Assignment as TypeScript
+import           Prelude hiding (fail)
 import           Prologue
+import           Source.Range
+import           Source.Span
 import           TreeSitter.Go
 import           TreeSitter.Haskell
 import           TreeSitter.JSON
 import qualified TreeSitter.Language as TS (Language, Symbol)
 import           TreeSitter.PHP
 import           TreeSitter.Python
-import           TreeSitter.Ruby
+import           TreeSitter.Ruby (tree_sitter_ruby)
 import           TreeSitter.TSX
 import           TreeSitter.TypeScript
+import qualified TreeSitter.Node as TS
 import           TreeSitter.Unmarshal
 
 
@@ -196,3 +200,20 @@ someASTParser PHP        = Just (SomeASTParser (ASTParser tree_sitter_php :: Par
 someASTParser Java       = Nothing
 someASTParser Markdown   = Nothing
 someASTParser Unknown    = Nothing
+
+
+instance Unmarshal Loc where
+  unmarshalNodes nodes = Loc <$> unmarshalNodes nodes <*> unmarshalNodes nodes
+
+instance Unmarshal Range where
+  unmarshalNodes _ = peekNode >>= maybeM (fail "Range expects a current node.") >>= \ node -> do
+    let start = fromIntegral (TS.nodeStartByte node)
+        end   = fromIntegral (TS.nodeEndByte node)
+    pure (Range start end)
+
+instance Unmarshal Span where
+  unmarshalNodes _ = peekNode >>= maybeM (fail "Span expects a current node.") >>= \ node -> do
+    let start = pointToPos (TS.nodeStartPoint node)
+        end   = pointToPos (TS.nodeEndPoint node)
+    pure (Span start end)
+    where pointToPos (TS.TSPoint line column) = Pos (fromIntegral line) (fromIntegral column)
