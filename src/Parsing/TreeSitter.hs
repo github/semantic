@@ -33,7 +33,7 @@ data Result grammar
   | Succeeded (AST [] grammar)
 
 runParserToAST :: (Enum grammar, Bounded grammar) => Ptr TS.Parser -> Source -> IO (Result grammar)
-runParserToAST parser blobSource  = unsafeUseAsCStringLen (Source.bytes blobSource) $ \ (source, len) -> do
+runParserToAST parser blobSource = unsafeUseAsCStringLen (Source.bytes blobSource) $ \ (source, len) -> do
     alloca (\ rootPtr -> do
       let acquire =
             -- Change this to TS.ts_parser_loop_until_cancelled if you want to test out cancellation
