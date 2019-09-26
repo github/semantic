@@ -17,6 +17,7 @@ import qualified Data.ByteString.Char8 as BC
 import qualified Data.ByteString.Lazy.Char8 as BLC
 import qualified Data.ByteString.Streaming.Char8 as ByteStream
 import           Data.Either
+import           Data.Language (PerLanguageModes(..))
 import           Data.Set (Set)
 import           Data.Traversable
 import           Data.Typeable
@@ -121,4 +122,4 @@ knownFailuresForPath tsDir (Just path)
 
 
 parseFilePath :: (Member (Error SomeException) sig, Member Distribute sig, Member Task sig, Member Files sig, Carrier sig m, MonadIO m) => Path.RelFile -> m Bool
-parseFilePath path = readBlob (fileForRelPath path) >>= parseTermBuilder @[] TermShow . pure >>= const (pure True)
+parseFilePath path = readBlob (fileForRelPath path) >>= runReader (PerLanguageModes Nothing) . parseTermBuilder @[] TermShow . pure >>= const (pure True)
