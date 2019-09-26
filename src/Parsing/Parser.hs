@@ -24,6 +24,8 @@ module Parsing.Parser
 , phpParser
 , phpASTParser
 , haskellParser
+  -- Precise parsers
+, precisePythonParser
 ) where
 
 import           Assigning.Assignment
@@ -57,6 +59,7 @@ import           TreeSitter.JSON
 import qualified TreeSitter.Language as TS (Language, Symbol)
 import           TreeSitter.PHP
 import           TreeSitter.Python
+import qualified TreeSitter.Python.AST as Py
 import           TreeSitter.Ruby (tree_sitter_ruby)
 import           TreeSitter.TSX
 import           TreeSitter.TypeScript
@@ -168,6 +171,10 @@ haskellParser = AssignmentParser (ASTParser tree_sitter_haskell) Haskell.assignm
 
 markdownParser :: Parser Markdown.Term
 markdownParser = AssignmentParser MarkdownParser Markdown.assignment
+
+
+precisePythonParser :: Parser (Py.Module Loc)
+precisePythonParser = UnmarshalParser tree_sitter_python
 
 
 data SomeTerm typeclasses ann where
