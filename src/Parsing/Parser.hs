@@ -210,6 +210,8 @@ someASTParser Markdown   = Nothing
 someASTParser Unknown    = Nothing
 
 
+-- FIXME: delete these instances once haskell-tree-sitter depends on semantic-source.
+
 instance Unmarshal Loc where
   unmarshalNodes nodes = Loc <$> unmarshalNodes nodes <*> unmarshalNodes nodes
 
