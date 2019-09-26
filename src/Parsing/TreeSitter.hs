@@ -2,10 +2,14 @@
 module Parsing.TreeSitter
 ( Duration(..)
 , parseToAST
+, parseToPreciseAST
 ) where
 
 import Prologue
 
+import           Control.Effect.Fail
+import           Control.Effect.Lift
+import           Control.Effect.Reader
 import           Control.Effect.Trace
 import           Foreign
 import           Foreign.C.Types (CBool (..))
@@ -19,10 +23,12 @@ import           Source.Loc
 import qualified Source.Source as Source
 import           Source.Span
 
+import qualified TreeSitter.Cursor as TS
 import qualified TreeSitter.Language as TS
 import qualified TreeSitter.Node as TS
 import qualified TreeSitter.Parser as TS
 import qualified TreeSitter.Tree as TS
+import qualified TreeSitter.Unmarshal as TS
 
 -- | Parse a 'Blob' with the given 'TS.Language' and return its AST.
 -- Returns 'Nothing' if the operation timed out.
@@ -37,6 +43,20 @@ parseToAST :: ( Bounded grammar
            -> Blob
            -> m (Maybe (AST [] grammar))
 parseToAST parseTimeout language blob = runParse parseTimeout language blob (fmap Right . anaM toAST <=< peek)
+
+parseToPreciseAST
+  :: ( Carrier sig m
+     , Member Trace sig
+     , MonadIO m
+     , TS.Unmarshal t
+     )
+  => Duration
+  -> Ptr TS.Language
+  -> Blob
+  -> m (Maybe t)
+parseToPreciseAST parseTimeout language blob = runParse parseTimeout language blob $ \ rootPtr ->
+  TS.withCursor (castPtr rootPtr) $ \ cursor ->
+    runM (runFail (runReader cursor (runReader (Source.bytes (blobSource blob)) (TS.peekNode >>= TS.unmarshalNodes . maybeToList))))
 
 runParse
   :: ( Carrier sig m
