@@ -43,13 +43,12 @@ runParserToAST parser blobSource = unsafeUseAsCStringLen (Source.bytes blobSourc
           | t == nullPtr = pure ()
           | otherwise = TS.ts_tree_delete t
 
-        go treePtr =
-          if treePtr == nullPtr
-            then pure Failed
-            else do
-              TS.ts_tree_root_node_p treePtr rootPtr
-              ptr <- peek rootPtr
-              Succeeded <$> anaM toAST ptr
+        go treePtr = if treePtr == nullPtr then
+          pure Failed
+        else do
+          TS.ts_tree_root_node_p treePtr rootPtr
+          ptr <- peek rootPtr
+          Succeeded <$> anaM toAST ptr
     in Exc.bracket acquire release go)
 
 -- | Parse 'Source' with the given 'TS.Language' and return its AST.
