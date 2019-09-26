@@ -4,11 +4,9 @@ module Parsing.TreeSitter
 , parseToAST
 ) where
 
-import Prologue hiding (bracket)
+import Prologue
 
 import           Control.Effect.Trace
-import qualified Control.Exception as Exc (bracket)
-import           Data.ByteString.Unsafe (unsafeUseAsCStringLen)
 import           Foreign
 import           Foreign.C.Types (CBool (..))
 import           Foreign.Marshal.Array (allocaArray)
@@ -18,7 +16,6 @@ import           Data.Blob
 import           Data.Duration
 import           Data.Term
 import           Source.Loc
-import           Source.Source (Source)
 import qualified Source.Source as Source
 import           Source.Span
 
@@ -26,25 +23,6 @@ import qualified TreeSitter.Language as TS
 import qualified TreeSitter.Node as TS
 import qualified TreeSitter.Parser as TS
 import qualified TreeSitter.Tree as TS
-
-runParserToAST :: (Enum grammar, Bounded grammar) => Ptr TS.Parser -> Source -> IO (Either String (AST [] grammar))
-runParserToAST parser blobSource = unsafeUseAsCStringLen (Source.bytes blobSource) $ \ (source, len) ->
-  alloca (\ rootPtr ->
-    let acquire =
-          -- Change this to TS.ts_parser_loop_until_cancelled if you want to test out cancellation
-          TS.ts_parser_parse_string parser nullPtr source len
-
-        release t
-          | t == nullPtr = pure ()
-          | otherwise = TS.ts_tree_delete t
-
-        go treePtr = if treePtr == nullPtr then
-          pure (Left "tree-sitter: null root node")
-        else do
-          TS.ts_tree_root_node_p treePtr rootPtr
-          ptr <- peek rootPtr
-          Right <$> anaM toAST ptr
-    in Exc.bracket acquire release go)
 
 -- | Parse 'Source' with the given 'TS.Language' and return its AST.
 -- Returns Nothing if the operation timed out.
@@ -65,7 +43,14 @@ parseToAST parseTimeout language b@Blob{..} = do
     TS.ts_parser_halt_on_error parser (CBool 1)
     compatible <- TS.ts_parser_set_language parser language
     if compatible then
-      runParserToAST parser blobSource
+      TS.withParseTree parser (Source.bytes blobSource) $ \ treePtr ->
+        TS.withRootNode treePtr $ \ rootPtr ->
+          if treePtr == nullPtr then
+            pure (Left "tree-sitter: null root node")
+          else do
+            TS.ts_tree_root_node_p treePtr rootPtr
+            ptr <- peek rootPtr
+            Right <$> anaM toAST ptr
     else
       pure (Left "tree-sitter: incompatible versions")
   case result of
