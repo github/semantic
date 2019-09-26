@@ -115,7 +115,7 @@ type TermConstraints =
   ]
 
 doParse :: (ParseEffects sig m) => Blob -> m (SomeTerm TermConstraints Loc)
-doParse blob = case blobLanguage blob of
+doParse blob = ask @PerLanguageModes >>= \ _ -> case blobLanguage blob of
   Go         -> SomeTerm <$> parse goParser blob
   Haskell    -> SomeTerm <$> parse haskellParser blob
   JavaScript -> SomeTerm <$> parse tsxParser blob
