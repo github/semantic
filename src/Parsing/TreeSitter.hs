@@ -24,8 +24,8 @@ import qualified TreeSitter.Node as TS
 import qualified TreeSitter.Parser as TS
 import qualified TreeSitter.Tree as TS
 
--- | Parse 'Source' with the given 'TS.Language' and return its AST.
--- Returns Nothing if the operation timed out.
+-- | Parse a 'Blob' with the given 'TS.Language' and return its AST.
+-- Returns 'Nothing' if the operation timed out.
 parseToAST :: ( Bounded grammar
               , Carrier sig m
               , Enum grammar
