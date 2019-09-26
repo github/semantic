@@ -55,12 +55,11 @@ runParse parseTimeout language b@Blob{..} action = do
     TS.ts_parser_halt_on_error parser (CBool 1)
     compatible <- TS.ts_parser_set_language parser language
     if compatible then
-      TS.withParseTree parser (Source.bytes blobSource) $ \ treePtr ->
-        TS.withRootNode treePtr $ \ rootPtr ->
-          if treePtr == nullPtr then
-            pure (Left "tree-sitter: null root node")
-          else
-            Right <$> action rootPtr
+      TS.withParseTree parser (Source.bytes blobSource) $ \ treePtr -> do
+        if treePtr == nullPtr then
+          pure (Left "tree-sitter: null root node")
+        else
+          TS.withRootNode treePtr (fmap Right . action)
     else
       pure (Left "tree-sitter: incompatible versions")
   case result of
