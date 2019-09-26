@@ -36,7 +36,19 @@ parseToAST :: ( Bounded grammar
            -> Ptr TS.Language
            -> Blob
            -> m (Maybe (AST [] grammar))
-parseToAST parseTimeout language b@Blob{..} = do
+parseToAST parseTimeout language blob = runParse parseTimeout language blob $ \ rootPtr -> peek rootPtr >>= anaM toAST
+
+runParse
+  :: ( Carrier sig m
+     , Member Trace sig
+     , MonadIO m
+     )
+  => Duration
+  -> Ptr TS.Language
+  -> Blob
+  -> (Ptr TS.Node -> IO a)
+  -> m (Maybe a)
+runParse parseTimeout language b@Blob{..} action = do
   result <- liftIO . TS.withParser language $ \ parser -> do
     let timeoutMicros = fromIntegral $ toMicroseconds parseTimeout
     TS.ts_parser_set_timeout_micros parser timeoutMicros
@@ -47,9 +59,8 @@ parseToAST parseTimeout language b@Blob{..} = do
         TS.withRootNode treePtr $ \ rootPtr ->
           if treePtr == nullPtr then
             pure (Left "tree-sitter: null root node")
-          else do
-            ptr <- peek rootPtr
-            Right <$> anaM toAST ptr
+          else
+            Right <$> action rootPtr
     else
       pure (Left "tree-sitter: incompatible versions")
   case result of
