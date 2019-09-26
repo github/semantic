@@ -92,3 +92,12 @@ nodeRange TS.Node{..} = Range (fromIntegral nodeStartByte) (fromIntegral nodeEnd
 nodeSpan :: TS.Node -> Span
 nodeSpan TS.Node{..} = nodeStartPoint `seq` nodeEndPoint `seq` Span (pointPos nodeStartPoint) (pointPos nodeEndPoint)
   where pointPos TS.TSPoint{..} = pointRow `seq` pointColumn `seq` Pos (1 + fromIntegral pointRow) (1 + fromIntegral pointColumn)
+
+
+withParser :: (Carrier sig m, Member Resource sig, MonadIO m) => Ptr TS.Language -> (Ptr TS.Parser -> m a) -> m a
+withParser language action = bracket
+  (liftIO   TS.ts_parser_new)
+  (liftIO . TS.ts_parser_delete)
+  $ \ parser -> do
+    _ <- liftIO (TS.ts_parser_set_language parser language)
+    action parser
