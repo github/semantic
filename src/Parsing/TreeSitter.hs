@@ -32,8 +32,8 @@ data Result grammar
   = Failed
   | Succeeded (AST [] grammar)
 
-runParser :: (Enum grammar, Bounded grammar) => Ptr TS.Parser -> Source -> IO (Result grammar)
-runParser parser blobSource  = unsafeUseAsCStringLen (Source.bytes blobSource) $ \ (source, len) -> do
+runParserToAST :: (Enum grammar, Bounded grammar) => Ptr TS.Parser -> Source -> IO (Result grammar)
+runParserToAST parser blobSource  = unsafeUseAsCStringLen (Source.bytes blobSource) $ \ (source, len) -> do
     alloca (\ rootPtr -> do
       let acquire = do
             -- Change this to TS.ts_parser_loop_until_cancelled if you want to test out cancellation
@@ -72,7 +72,7 @@ parseToAST parseTimeout language b@Blob{..} = bracket (liftIO TS.ts_parser_new) 
     TS.ts_parser_halt_on_error parser (CBool 1)
     TS.ts_parser_set_language parser language
   result <- if compatible then
-    liftIO $ runParser parser blobSource
+    liftIO $ runParserToAST parser blobSource
   else
     Failed <$ trace "tree-sitter: incompatible versions"
   case result of
