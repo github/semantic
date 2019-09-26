@@ -6,7 +6,6 @@ module Parsing.TreeSitter
 
 import Prologue hiding (bracket)
 
-import           Control.Effect.Resource
 import           Control.Effect.Trace
 import qualified Control.Exception as Exc (bracket)
 import           Data.ByteString.Unsafe (unsafeUseAsCStringLen)
@@ -52,7 +51,6 @@ runParserToAST parser blobSource = unsafeUseAsCStringLen (Source.bytes blobSourc
 parseToAST :: ( Bounded grammar
               , Carrier sig m
               , Enum grammar
-              , Member Resource sig
               , Member Trace sig
               , MonadIO m
               )
@@ -60,16 +58,16 @@ parseToAST :: ( Bounded grammar
            -> Ptr TS.Language
            -> Blob
            -> m (Maybe (AST [] grammar))
-parseToAST parseTimeout language b@Blob{..} = withParser language $ \ parser -> do
-  compatible <- liftIO $ do
+parseToAST parseTimeout language b@Blob{..} = do
+  result <- liftIO . TS.withParser language $ \ parser -> do
     let timeoutMicros = fromIntegral $ toMicroseconds parseTimeout
     TS.ts_parser_set_timeout_micros parser timeoutMicros
     TS.ts_parser_halt_on_error parser (CBool 1)
-    TS.ts_parser_set_language parser language
-  result <- if compatible then
-    liftIO $ runParserToAST parser blobSource
-  else
-    Nothing <$ trace "tree-sitter: incompatible versions"
+    compatible <- TS.ts_parser_set_language parser language
+    if compatible then
+      runParserToAST parser blobSource
+    else
+      pure Nothing
   case result of
     Nothing  -> Nothing  <$ trace ("tree-sitter: parsing failed " <> blobPath b)
     Just ast -> Just ast <$ trace ("tree-sitter: parsing succeeded " <> blobPath b)
@@ -92,12 +90,3 @@ nodeRange TS.Node{..} = Range (fromIntegral nodeStartByte) (fromIntegral nodeEnd
 nodeSpan :: TS.Node -> Span
 nodeSpan TS.Node{..} = nodeStartPoint `seq` nodeEndPoint `seq` Span (pointPos nodeStartPoint) (pointPos nodeEndPoint)
   where pointPos TS.TSPoint{..} = pointRow `seq` pointColumn `seq` Pos (1 + fromIntegral pointRow) (1 + fromIntegral pointColumn)
-
-
-withParser :: (Carrier sig m, Member Resource sig, MonadIO m) => Ptr TS.Language -> (Ptr TS.Parser -> m a) -> m a
-withParser language action = bracket
-  (liftIO   TS.ts_parser_new)
-  (liftIO . TS.ts_parser_delete)
-  $ \ parser -> do
-    _ <- liftIO (TS.ts_parser_set_language parser language)
-    action parser
