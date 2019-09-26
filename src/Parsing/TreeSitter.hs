@@ -48,7 +48,6 @@ parseToAST parseTimeout language b@Blob{..} = do
           if treePtr == nullPtr then
             pure (Left "tree-sitter: null root node")
           else do
-            TS.ts_tree_root_node_p treePtr rootPtr
             ptr <- peek rootPtr
             Right <$> anaM toAST ptr
     else
