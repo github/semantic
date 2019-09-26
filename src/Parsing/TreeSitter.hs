@@ -33,24 +33,24 @@ data Result grammar
   | Succeeded (AST [] grammar)
 
 runParserToAST :: (Enum grammar, Bounded grammar) => Ptr TS.Parser -> Source -> IO (Result grammar)
-runParserToAST parser blobSource = unsafeUseAsCStringLen (Source.bytes blobSource) $ \ (source, len) -> do
-    alloca (\ rootPtr -> do
+runParserToAST parser blobSource = unsafeUseAsCStringLen (Source.bytes blobSource) $ \ (source, len) ->
+    alloca (\ rootPtr ->
       let acquire =
             -- Change this to TS.ts_parser_loop_until_cancelled if you want to test out cancellation
             TS.ts_parser_parse_string parser nullPtr source len
 
-      let release t
+          release t
             | t == nullPtr = pure ()
             | otherwise = TS.ts_tree_delete t
 
-      let go treePtr =
+          go treePtr =
             if treePtr == nullPtr
               then pure Failed
               else do
                 TS.ts_tree_root_node_p treePtr rootPtr
                 ptr <- peek rootPtr
                 Succeeded <$> anaM toAST ptr
-      Exc.bracket acquire release go)
+      in Exc.bracket acquire release go)
 
 -- | Parse 'Source' with the given 'TS.Language' and return its AST.
 -- Returns Nothing if the operation timed out.
