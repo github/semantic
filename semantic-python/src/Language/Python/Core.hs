@@ -25,9 +25,9 @@ import           Data.String (IsString)
 import           Data.Text (Text)
 import           GHC.Generics
 import           GHC.Records
+import           Source.Span (Span)
+import qualified Source.Span as Source
 import qualified TreeSitter.Python.AST as Py
-import           TreeSitter.Span (Span)
-import qualified TreeSitter.Span as TreeSitter
 
 newtype SourcePath = SourcePath { rawPath :: Text }
   deriving stock (Eq, Show)
@@ -90,7 +90,7 @@ locate :: ( HasField "ann" syntax Span
           ) => syntax -> t a -> m (t a)
 locate syn item = do
   fp <- asks @SourcePath rawPath
-  let locFromTSSpan (TreeSitter.Span (TreeSitter.Pos a b) (TreeSitter.Pos c d))
+  let locFromTSSpan (Source.Span (Source.Pos a b) (Source.Pos c d))
         = Data.Loc.Loc fp (Data.Loc.Span (Data.Loc.Pos a b) (Data.Loc.Pos c d))
 
   pure (Core.annAt (locFromTSSpan (getField @"ann" syn)) item)
@@ -103,7 +103,7 @@ newtype CompileSum py = CompileSum py
 instance (Generic py, GCompileSum (Rep py)) => Compile (CompileSum py) where
   compileCC (CompileSum a) cc = gcompileCCSum (from a) cc
 
-deriving via CompileSum (Either l r) instance (Compile l, Compile r) => Compile (Either l r)
+deriving via CompileSum ((l :+: r) Span) instance (Compile (l Span), Compile (r Span)) => Compile ((l :+: r) Span)
 
 instance Compile (Py.AssertStatement Span)
 instance Compile (Py.Attribute Span)
@@ -198,8 +198,8 @@ instance Compile (Py.Identifier Span) where
 instance Compile (Py.IfStatement Span) where
   compileCC it@Py.IfStatement{ condition, consequence, alternative} cc =
     locate it =<< (if' <$> compile condition <*> compileCC consequence cc <*> foldr clause cc alternative)
-    where clause (Right Py.ElseClause{ body }) _ = compileCC body cc
-          clause (Left  Py.ElifClause{ condition, consequence }) rest  =
+    where clause (R1 Py.ElseClause{ body }) _ = compileCC body cc
+          clause (L1 Py.ElifClause{ condition, consequence }) rest  =
             if' <$> compile condition <*> compileCC consequence cc <*> rest
 
 
