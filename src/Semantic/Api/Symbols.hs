@@ -10,7 +10,6 @@ import           Control.Exception
 import           Control.Lens
 import           Data.Blob hiding (File (..))
 import           Data.ByteString.Builder
-import           Data.Maybe
 import           Data.Term
 import qualified Data.Text as T
 import qualified Data.Vector as V
@@ -50,7 +49,7 @@ legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> distributeFoldMap 
           = Legacy.Symbol
           { symbolName = name
           , symbolKind = kind
-          , symbolLine = fromMaybe mempty line
+          , symbolLine = line
           , symbolSpan = converting #? span
           }
 
@@ -80,7 +79,7 @@ tagToSymbol :: Tag -> Symbol
 tagToSymbol Tag{..} = Symbol
   { symbol = name
   , kind = kind
-  , line = fromMaybe mempty line
+  , line = line
   , span = converting #? span
   , docs = fmap Docstring docs
   }

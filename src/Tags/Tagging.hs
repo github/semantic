@@ -46,9 +46,9 @@ contextualizing Blob{..} symbolsToSummarize = Streaming.mapMaybeM $ \case
   Exit  x r -> Nothing <$ exitScope (x, r)
   Iden iden span docsLiteralRange -> get @[ContextToken] >>= pure . \case
     ((x, r):("Context", cr):_) | x `elem` symbolsToSummarize
-      -> Just $ Tag iden x span (Just (firstLine (slice r))) (Just (slice cr))
+      -> Just $ Tag iden x span (firstLine (slice r)) (Just (slice cr))
     ((x, r):_) | x `elem` symbolsToSummarize
-      -> Just $ Tag iden x span (Just (firstLine (slice r))) (slice <$> docsLiteralRange)
+      -> Just $ Tag iden x span (firstLine (slice r)) (slice <$> docsLiteralRange)
     _ -> Nothing
   where
     slice = stripEnd . Source.toText . Source.slice blobSource
