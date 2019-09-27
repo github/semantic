@@ -60,14 +60,14 @@ parseSymbols :: (Member Distribute sig, ParseEffects sig m, Traversable t) => t 
 parseSymbols blobs = ParseTreeSymbolResponse . V.fromList . toList <$> distributeFor blobs go
   where
     go :: ParseEffects sig m => Blob -> m File
-    go blob@Blob{..} = (doParse blob >>= withSomeTerm renderToSymbols) `catchError` (\(SomeException e) -> pure $ errorFile (show e))
+    go blob@Blob{..} = (withSomeTerm renderToSymbols <$> doParse blob) `catchError` (\(SomeException e) -> pure $ errorFile (show e))
       where
         blobLanguage' = blobLanguage blob
         blobPath' = pack $ blobPath blob
         errorFile e = File blobPath' (bridging # blobLanguage') mempty (V.fromList [ParseError (T.pack e)]) blobOid
 
-        renderToSymbols :: (IsTaggable f, Applicative m) => Term f Loc -> m File
-        renderToSymbols term = pure $ tagsToFile (runTagging blob symbolsToSummarize term)
+        renderToSymbols :: IsTaggable f => Term f Loc -> File
+        renderToSymbols term = tagsToFile (runTagging blob symbolsToSummarize term)
 
         tagsToFile :: [Tag] -> File
         tagsToFile tags = File blobPath' (bridging # blobLanguage') (V.fromList (fmap tagToSymbol tags)) mempty blobOid
