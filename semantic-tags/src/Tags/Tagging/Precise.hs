@@ -12,7 +12,9 @@ import Control.Effect.Reader
 import Control.Effect.Writer
 import Data.Monoid (Endo(..))
 import GHC.Generics
-import Source.Loc
+import Prelude hiding (span)
+import Source.Loc (Loc)
+import Source.Span
 import Source.Source
 import Tags.Tag
 
@@ -23,7 +25,9 @@ class ToTags t where
 
 
 yield :: (Carrier sig m, Member (Writer Tags) sig) => Tag -> m ()
-yield = tell . Endo . (:)
+yield = tell . Endo . (:) . modSpan toOneIndexed where
+  modSpan f t@Tag{ span = s } = t { span = f s }
+  toOneIndexed (Span (Pos l1 c1) (Pos l2 c2)) = Span (Pos (l1 + 1) (c1 + 1)) (Pos (l2 + 1) (c2 + 1))
 
 runTagging :: Source -> ReaderC Source (WriterC Tags PureC) () -> [Tag]
 runTagging source
