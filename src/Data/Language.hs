@@ -143,14 +143,16 @@ textToLanguage = \case
   _ -> Unknown
 
 
-newtype PerLanguageModes = PerLanguageModes
-  { pythonMode :: LanguageMode
+data PerLanguageModes = PerLanguageModes
+  { javaMode   :: LanguageMode
+  , pythonMode :: LanguageMode
   }
   deriving (Eq, Ord, Show)
 
 defaultLanguageModes :: PerLanguageModes
 defaultLanguageModes = PerLanguageModes
-  { pythonMode = ALaCarte
+  { javaMode   = ALaCarte
+  , pythonMode = ALaCarte
   }
 
 data LanguageMode
@@ -160,5 +162,6 @@ data LanguageMode
 
 modeForLanguage :: PerLanguageModes -> Language -> LanguageMode
 modeForLanguage modes = \case
+  Java   -> javaMode   modes
   Python -> pythonMode modes
   _      -> ALaCarte
