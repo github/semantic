@@ -18,15 +18,13 @@ import           Data.Bifunctor
 import           Data.Coerce
 import           Data.Core as Core
 import           Data.Foldable
-import           Data.List (mapAccumL, mapAccumR)
-import           Data.List.NonEmpty (NonEmpty (..))
+import           Data.Loc (Loc)
 import qualified Data.Loc
 import           Data.Name as Name
 import           Data.Stack (Stack)
 import qualified Data.Stack as Stack
 import           Data.String (IsString)
 import           Data.Text (Text)
-import           Debug.Trace (traceShowId, traceShowM)
 import           GHC.Generics
 import           GHC.Records
 import qualified TreeSitter.Python.AST as Py
@@ -101,17 +99,18 @@ compile :: ( Compile py
         => py -> m (t Name)
 compile t = compileCC t (pure none)
 
+locFromTSSpan :: SourcePath -> TreeSitter.Span -> Loc
+locFromTSSpan fp (TreeSitter.Span (TreeSitter.Pos a b) (TreeSitter.Pos c d))
+  = Data.Loc.Loc (rawPath fp) (Data.Loc.Span (Data.Loc.Pos a b) (Data.Loc.Pos c d))
+
 locate :: ( HasField "ann" syntax Span
           , CoreSyntax syn t
           , Member (Reader SourcePath) sig
           , Carrier sig m
           ) => syntax -> t a -> m (t a)
 locate syn item = do
-  fp <- asks @SourcePath rawPath
-  let locFromTSSpan (TreeSitter.Span (TreeSitter.Pos a b) (TreeSitter.Pos c d))
-        = Data.Loc.Loc fp (Data.Loc.Span (Data.Loc.Pos a b) (Data.Loc.Pos c d))
-
-  pure (Core.annAt (locFromTSSpan (getField @"ann" syn)) item)
+  fp <- ask @SourcePath
+  pure (Core.annAt (locFromTSSpan fp (getField @"ann" syn)) item)
 
 defaultCompile :: (MonadFail m, Show py) => py -> m (t Name)
 defaultCompile t = fail $ "compilation unimplemented for " <> show t
@@ -145,14 +144,21 @@ instance Compile (Py.Attribute Span)
 type RHS a = Either (Py.Assignment a) (Either (Py.AugmentedAssignment a) (Desugared a))
 type Desugared a = Either (Py.ExpressionList a) (Py.Yield a)
 
+-- We have to pair locations and names, and tuple syntax is harder to
+-- read in this case than a happy little constructor.
+data Located a = Located Loc a
+
 -- Desugaring an RHS involves walking as deeply as possible into an
 -- assignment, storing the names we encounter as we go and eventually
--- returning a terminal expression.
-desugar :: (Show a, Member (Reader SourcePath) sig, Carrier sig m, MonadFail m)
-        => RHS a -> m ([Name], Desugared a)
+-- returning a terminal expression. We have to keep track of which
+desugar :: (Member (Reader SourcePath) sig, Carrier sig m, MonadFail m)
+        => RHS Span
+        -> m ([Located Name], Desugared Span)
 desugar = \case
-  Left it@Py.Assignment { left = OneExpression name, right = Just rhs} ->
-    let located = name in fmap (first (located:)) (desugar rhs)
+  Left Py.Assignment { left = OneExpression name, right = Just rhs, ann} -> do
+    loc <- locFromTSSpan <$> ask <*> pure ann
+    let cons = (Located loc name :)
+    fmap (first cons) (desugar rhs)
   Right (Right any) -> pure ([], any)
   other -> fail ("desugar: couldn't desugar RHS " <> show other)
 
@@ -165,20 +171,23 @@ desugar = \case
 -- exercise to the reader.
 collapseDesugared :: (CoreSyntax syn t, Member (Reader Bindings) sig, Carrier sig m)
                   => (t Name -> m (t Name)) -- A meta-continuation: it takes a name and returns a continuation
-                  -> Name                   -- The current LHS to which to assign
+                  -> Located Name           -- The current LHS to which to assign
                   -> t Name                 -- The current RHS to which to assign, yielded from an outer continuation
                   -> m (t Name)             -- The properly-sequenced resolut
-collapseDesugared cont n rem =
-  let assigning = fmap ((Name.named' n :<- rem) >>>=)
+collapseDesugared cont (Located loc n) rem =
+  let assigning = fmap (Core.annAt loc) . fmap ((Name.named' n :<- rem) >>>=)
   in assigning (local (def n) (cont (pure n))) -- gotta call local here to record this assignment
 
 instance Compile (Py.Assignment Span) where
   compileCC it@Py.Assignment
-    { Py.left = OneExpression name
-    , Py.right = Just rhs
+    { left = OneExpression name
+    , right = Just rhs
+    , ann
     } cc = do
+    p <- ask @SourcePath
     (names, val) <- desugar rhs
-    compile val >>= foldl' collapseDesugared (const cc) (name:names) >>= locate it
+    let allNames = Located (locFromTSSpan p ann) name : names
+    compile val >>= foldl' collapseDesugared (const cc) allNames >>= locate it
 
   compileCC other _ = fail ("Unhandled assignment case: " <> show other)
 
