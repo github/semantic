@@ -1,5 +1,6 @@
 packages: .
           semantic-core
+          semantic-java
           semantic-python
           semantic-source
           semantic-tags

@@ -318,7 +318,7 @@ library
                      , tree-sitter-ruby ^>= 0.2
                      , tree-sitter-typescript ^>= 0.2.1
                      , tree-sitter-tsx ^>= 0.2.1
-                     , tree-sitter-java ^>= 0.2
+                     , tree-sitter-java ^>= 0.3
   if flag(release)
     cpp-options:       -DCOMPUTE_GIT_SHA
 
