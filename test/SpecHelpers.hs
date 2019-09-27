@@ -42,7 +42,7 @@ import Data.Project as X
 import Data.Proxy as X
 import Data.Foldable (toList)
 import Data.Functor.Listable as X
-import Data.Language as X
+import Data.Language as X hiding (Precise)
 import Data.List.NonEmpty as X (NonEmpty(..))
 import Data.Semilattice.Lower as X
 import Source.Source as X (Source)
