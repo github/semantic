@@ -127,7 +127,7 @@ instance Compile (Py.Attribute Span)
 -- (since they appear to have values, i.e. `a = b = c`) and statements (because
 -- they introduce bindings. For that reason, they deserve special attention.
 --
--- The correct desugaring for the expression above looks like, given a continuation @cc@:
+-- The correct desugaring for the expression above looks like, given a continuation @cont@:
 -- @
 --  (b :<- c) >>>= (a :<- b) >>>= cont
 -- @
