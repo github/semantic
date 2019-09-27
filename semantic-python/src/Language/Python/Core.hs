@@ -143,19 +143,20 @@ instance Compile (Py.Attribute Span)
 type RHS a = Either (Py.Assignment a) (Either (Py.AugmentedAssignment a) (Desugared a))
 type Desugared a = Either (Py.ExpressionList a) (Py.Yield a)
 
-desugar :: Show a => RHS a -> Maybe ([Name], Desugared a)
+desugar :: (Member (Reader SourcePath) sig, Carrier sig m, MonadFail m)
+        => Show a => RHS a -> m ([Name], Desugared a)
 desugar = \case
-  Left it@Py.Assignment { left = OneExpression name, right} ->
-    let located = name
-    in fmap (first (located:)) (right >>= desugar)
-  Right (Right any) -> Just ([], any)
+  Left it@Py.Assignment { left = OneExpression name, right = Just rhs} ->
+    let located = name in fmap (first (located:)) (desugar rhs)
+  Right (Right any) -> pure ([], any)
+  other -> fail ("desugar: couldn't desugar RHS " <> show other)
 
 instance Compile (Py.Assignment Span) where
   compileCC it@Py.Assignment
     { Py.left = OneExpression name
     , Py.right = Just rhs
     } cc = do
-    Just (names, val) <- pure (desugar rhs)
+    (names, val) <- desugar rhs
     item <- compile val
     let builder cont n rem = fmap ((Name.named' n :<- rem) >>>=) (local (def n) (cont (pure n)))
     foldl' builder (const cc) (name:names) item >>= locate it
