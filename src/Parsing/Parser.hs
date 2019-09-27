@@ -83,8 +83,8 @@ someAnalysisParser :: ( ApplyAll typeclasses (Sum Go.Syntax)
                       , ApplyAll typeclasses (Sum TypeScript.Syntax)
                       , ApplyAll typeclasses (Sum Haskell.Syntax)
                       )
-                   => proxy typeclasses                       -- ^ A proxy for the list of typeclasses required, e.g. @(Proxy :: Proxy '[Show1])@.
-                   -> Language                                -- ^ The 'Language' to select.
+                   => proxy typeclasses                  -- ^ A proxy for the list of typeclasses required, e.g. @(Proxy :: Proxy '[Show1])@.
+                   -> Language                           -- ^ The 'Language' to select.
                    -> SomeAnalysisParser typeclasses Loc -- ^ A 'SomeAnalysisParser' abstracting the syntax type to be produced.
 someAnalysisParser _ Go         = SomeAnalysisParser goParser         (Proxy :: Proxy 'Go)
 someAnalysisParser _ Haskell    = SomeAnalysisParser haskellParser    (Proxy :: Proxy 'Haskell)
