@@ -1,5 +1,4 @@
 {-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, GADTs, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
-{-# OPTIONS_GHC -Wno-orphans #-}
 module Parsing.Parser
 ( Parser(..)
 , SomeTerm(..)
