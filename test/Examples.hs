@@ -18,7 +18,7 @@ import qualified Data.ByteString.Char8 as BC
 import qualified Data.ByteString.Lazy.Char8 as BLC
 import qualified Data.ByteString.Streaming.Char8 as ByteStream
 import           Data.Either
-import           Data.Language (PerLanguageModes(..))
+import           Data.Language (LanguageMode(..), PerLanguageModes(..))
 import           Data.Set (Set)
 import           Data.Traversable
 import           Data.Typeable
