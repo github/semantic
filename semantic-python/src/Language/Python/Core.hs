@@ -82,8 +82,6 @@ class Compile py where
   default compileCC :: (MonadFail m, Show py) => py -> m (t Name) -> m (t Name)
   compileCC a _ = defaultCompile a
 
-
-
 -- | TODO: This is not right, it should be a reference to a Preluded
 -- NoneType instance, but it will do for now.
 none :: (Member Core sig, Carrier sig t) => t Name
