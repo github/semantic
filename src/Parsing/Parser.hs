@@ -9,7 +9,6 @@ module Parsing.Parser
 , someASTParser
 , someAnalysisParser
 , ApplyAll
-, ApplyAll'
 -- À la carte parsers
 , goParser
 , goASTParser
@@ -65,13 +64,9 @@ import           TreeSitter.TypeScript
 import           TreeSitter.Unmarshal
 
 
-type family ApplyAll' (typeclasses :: [(* -> *) -> Constraint]) (fs :: [* -> *]) :: Constraint where
-  ApplyAll' (typeclass ': typeclasses) fs = (Apply typeclass fs, ApplyAll' typeclasses fs)
-  ApplyAll' '[] fs = ()
-
 -- | A parser, suitable for program analysis, for some specific language, producing 'Term's whose syntax satisfies a list of typeclass constraints.
 data SomeAnalysisParser typeclasses ann where
-  SomeAnalysisParser :: ( ApplyAll' typeclasses fs
+  SomeAnalysisParser :: ( ApplyAll typeclasses (Sum fs)
                         , Apply (VertexDeclaration' (Sum fs)) fs
                         , Element Syntax.Identifier fs
                         , HasPrelude lang
@@ -81,12 +76,12 @@ data SomeAnalysisParser typeclasses ann where
                      -> SomeAnalysisParser typeclasses ann
 
 -- | A parser for some specific language, producing 'Term's whose syntax satisfies a list of typeclass constraints.
-someAnalysisParser :: ( ApplyAll' typeclasses Go.Syntax
-                      , ApplyAll' typeclasses PHP.Syntax
-                      , ApplyAll' typeclasses Python.Syntax
-                      , ApplyAll' typeclasses Ruby.Syntax
-                      , ApplyAll' typeclasses TypeScript.Syntax
-                      , ApplyAll' typeclasses Haskell.Syntax
+someAnalysisParser :: ( ApplyAll typeclasses (Sum Go.Syntax)
+                      , ApplyAll typeclasses (Sum PHP.Syntax)
+                      , ApplyAll typeclasses (Sum Python.Syntax)
+                      , ApplyAll typeclasses (Sum Ruby.Syntax)
+                      , ApplyAll typeclasses (Sum TypeScript.Syntax)
+                      , ApplyAll typeclasses (Sum Haskell.Syntax)
                       )
                    => proxy typeclasses                       -- ^ A proxy for the list of typeclasses required, e.g. @(Proxy :: Proxy '[Show1])@.
                    -> Language                                -- ^ The 'Language' to select.
