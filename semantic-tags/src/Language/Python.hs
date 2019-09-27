@@ -1,3 +1,4 @@
+-- | Semantic functionality for Python programs.
 module Language.Python
 ( Term(..)
 ) where
