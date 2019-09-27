@@ -2,7 +2,7 @@ module Tags.Spec (spec) where
 
 import Data.Text (Text)
 import SpecHelpers
-import Tags.Tagging
+import Tags.Tagging as Tags
 import qualified System.Path as Path
 
 spec :: Spec
@@ -38,7 +38,7 @@ spec = do
     it "produces tags for modules" $ do
       (blob, tree) <- parseTestFile typescriptParser (Path.relFile "test/fixtures/typescript/tags/module.ts")
       runTagging blob symbolsToSummarize tree `shouldBe`
-        [ Tag "APromise" Module (Span (Pos 1 1) (Pos 1 20)) "module APromise { }" Nothing ]
+        [ Tag "APromise" Tags.Module (Span (Pos 1 1) (Pos 1 20)) "module APromise { }" Nothing ]
 
   describe "python" $ do
     it "produces tags for functions" $ do
@@ -88,7 +88,7 @@ spec = do
     it "produces tags for methods and classes with docs" $ do
       (blob, tree) <- parseTestFile rubyParser (Path.relFile "test/fixtures/ruby/tags/class_module.rb")
       runTagging blob symbolsToSummarize tree `shouldBe`
-        [ Tag "Foo" Module (Span (Pos 2 1 ) (Pos 12 4)) "module Foo" (Just "# Public: Foo")
+        [ Tag "Foo" Tags.Module (Span (Pos 2 1 ) (Pos 12 4)) "module Foo" (Just "# Public: Foo")
         , Tag "Bar" Class  (Span (Pos 5 3 ) (Pos 11 6)) "class Bar" (Just "# Public: Bar")
         , Tag "baz" Method (Span (Pos 8 5 ) (Pos 10 8)) "def baz(a)" (Just "# Public: baz")
         , Tag "C" Class (Span (Pos 14 1) (Pos 20 4)) "class A::B::C" Nothing
