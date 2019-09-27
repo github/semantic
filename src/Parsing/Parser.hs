@@ -44,7 +44,7 @@ import qualified Language.Haskell.Assignment as Haskell
 import qualified Language.JSON.Assignment as JSON
 import qualified Language.Markdown.Assignment as Markdown
 import qualified Language.PHP.Assignment as PHP
-import qualified Language.Python as Py
+import qualified Language.Python as PrecisePython
 import qualified Language.Python.Assignment as Python
 import qualified Language.Ruby.Assignment as Ruby
 import qualified Language.TSX.Assignment as TSX
@@ -164,7 +164,7 @@ markdownParser :: Parser Markdown.Term
 markdownParser = AssignmentParser MarkdownParser Markdown.assignment
 
 
-precisePythonParser :: Parser (Py.Term Loc)
+precisePythonParser :: Parser (PrecisePython.Term Loc)
 precisePythonParser = UnmarshalParser tree_sitter_python
 
 
