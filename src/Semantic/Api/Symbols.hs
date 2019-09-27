@@ -65,7 +65,7 @@ parseSymbols blobs = ParseTreeSymbolResponse . V.fromList . toList <$> distribut
       where
         blobLanguage' = blobLanguage blob
         blobPath' = pack $ blobPath blob
-        errorFile e = File blobPath' (bridging # blobLanguage blob) mempty (V.fromList [ParseError (T.pack e)]) blobOid
+        errorFile e = File blobPath' (bridging # blobLanguage') mempty (V.fromList [ParseError (T.pack e)]) blobOid
 
         symbolsToSummarize :: [Text]
         symbolsToSummarize = ["Function", "Method", "Class", "Module", "Call", "Send"]
