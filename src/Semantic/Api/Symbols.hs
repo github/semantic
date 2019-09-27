@@ -48,7 +48,7 @@ legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> distributeFoldMap 
         tagToSymbol Tag{..}
           = Legacy.Symbol
           { symbolName = name
-          , symbolKind = kind
+          , symbolKind = pack (show kind)
           , symbolLine = line
           , symbolSpan = converting #? span
           }
@@ -78,7 +78,7 @@ symbolsToSummarize = ["Function", "Method", "Class", "Module", "Call", "Send"]
 tagToSymbol :: Tag -> Symbol
 tagToSymbol Tag{..} = Symbol
   { symbol = name
-  , kind = kind
+  , kind = pack (show kind)
   , line = line
   , span = converting #? span
   , docs = fmap Docstring docs

@@ -2,6 +2,7 @@
 module Tags.Tagging
 ( runTagging
 , Tag(..)
+, Kind(..)
 )
 where
 
@@ -14,10 +15,10 @@ import           Streaming
 import qualified Streaming.Prelude as Streaming
 
 import           Data.Blob
-import           Data.Tag
 import           Data.Term
 import           Source.Loc
 import qualified Source.Source as Source
+import           Tags.Tag
 import           Tags.Taggable
 
 runTagging :: (IsTaggable syntax)
@@ -29,8 +30,19 @@ runTagging blob symbolsToSummarize
   = Eff.run
   . evalState @[ContextToken] []
   . Streaming.toList_
-  . contextualizing blob symbolsToSummarize
+  . contextualizing blob toKind
   . tagging blob
+  where
+    toKind x = do
+      guard (x `elem` symbolsToSummarize)
+      case x of
+        "Function" -> Just Function
+        "Method"   -> Just Method
+        "Class"    -> Just Class
+        "Module"   -> Just Module
+        "Call"     -> Just Call
+        "Send"     -> Just Call
+        _          -> Nothing
 
 type ContextToken = (Text, Range)
 
@@ -38,17 +50,17 @@ contextualizing :: ( Member (State [ContextToken]) sig
                    , Carrier sig m
                    )
                 => Blob
-                -> [Text]
+                -> (Text -> Maybe Kind)
                 -> Stream (Of Token) m a
                 -> Stream (Of Tag) m a
-contextualizing Blob{..} symbolsToSummarize = Streaming.mapMaybeM $ \case
+contextualizing Blob{..} toKind = Streaming.mapMaybeM $ \case
   Enter x r -> Nothing <$ enterScope (x, r)
   Exit  x r -> Nothing <$ exitScope (x, r)
   Iden iden span docsLiteralRange -> get @[ContextToken] >>= pure . \case
-    ((x, r):("Context", cr):_) | x `elem` symbolsToSummarize
-      -> Just $ Tag iden x span (firstLine (slice r)) (Just (slice cr))
-    ((x, r):_) | x `elem` symbolsToSummarize
-      -> Just $ Tag iden x span (firstLine (slice r)) (slice <$> docsLiteralRange)
+    ((x, r):("Context", cr):_) | Just kind <- toKind x
+      -> Just $ Tag iden kind span (firstLine (slice r)) (Just (slice cr))
+    ((x, r):_) | Just kind <- toKind x
+      -> Just $ Tag iden kind span (firstLine (slice r)) (slice <$> docsLiteralRange)
     _ -> Nothing
   where
     slice = stripEnd . Source.toText . Source.slice blobSource
