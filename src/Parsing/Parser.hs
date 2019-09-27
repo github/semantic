@@ -85,14 +85,14 @@ someAnalysisParser :: ( ApplyAll typeclasses (Sum Go.Syntax)
                    => proxy typeclasses                  -- ^ A proxy for the list of typeclasses required, e.g. @(Proxy :: Proxy '[Show1])@.
                    -> Language                           -- ^ The 'Language' to select.
                    -> SomeAnalysisParser typeclasses Loc -- ^ A 'SomeAnalysisParser' abstracting the syntax type to be produced.
-someAnalysisParser _ Go         = SomeAnalysisParser goParser         (Proxy :: Proxy 'Go)
-someAnalysisParser _ Haskell    = SomeAnalysisParser haskellParser    (Proxy :: Proxy 'Haskell)
-someAnalysisParser _ JavaScript = SomeAnalysisParser typescriptParser (Proxy :: Proxy 'JavaScript)
-someAnalysisParser _ PHP        = SomeAnalysisParser phpParser        (Proxy :: Proxy 'PHP)
-someAnalysisParser _ Python     = SomeAnalysisParser pythonParser     (Proxy :: Proxy 'Python)
-someAnalysisParser _ Ruby       = SomeAnalysisParser rubyParser       (Proxy :: Proxy 'Ruby)
-someAnalysisParser _ TypeScript = SomeAnalysisParser typescriptParser (Proxy :: Proxy 'TypeScript)
-someAnalysisParser _ TSX        = SomeAnalysisParser typescriptParser (Proxy :: Proxy 'TSX)
+someAnalysisParser _ Go         = SomeAnalysisParser goParser         (Proxy @'Go)
+someAnalysisParser _ Haskell    = SomeAnalysisParser haskellParser    (Proxy @'Haskell)
+someAnalysisParser _ JavaScript = SomeAnalysisParser typescriptParser (Proxy @'JavaScript)
+someAnalysisParser _ PHP        = SomeAnalysisParser phpParser        (Proxy @'PHP)
+someAnalysisParser _ Python     = SomeAnalysisParser pythonParser     (Proxy @'Python)
+someAnalysisParser _ Ruby       = SomeAnalysisParser rubyParser       (Proxy @'Ruby)
+someAnalysisParser _ TypeScript = SomeAnalysisParser typescriptParser (Proxy @'TypeScript)
+someAnalysisParser _ TSX        = SomeAnalysisParser typescriptParser (Proxy @'TSX)
 someAnalysisParser _ l          = error $ "Analysis not supported for: " <> show l
 
 
