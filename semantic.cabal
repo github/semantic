@@ -408,14 +408,16 @@ test-suite parse-examples
                      , tasty-hunit
 
 benchmark evaluation
-  import:              haskell, executable-flags
+  import:              haskell, dependencies, executable-flags
   hs-source-dirs:      bench/evaluation
   type:                exitcode-stdio-1.0
   main-is:             Main.hs
   ghc-options:         -static
   build-depends:       base
-                     , criterion ^>= 1.5
+                     , algebraic-graphs
+                     , gauge ^>= 0.2.5
                      , semantic
+                     , semantic-source
 
 source-repository head
   type:     git
