@@ -68,7 +68,6 @@ import           TreeSitter.Unmarshal
 data SomeAnalysisParser typeclasses ann where
   SomeAnalysisParser :: ( ApplyAll typeclasses (Sum fs)
                         , Apply (VertexDeclaration' (Sum fs)) fs
-                        , Element Syntax.Identifier fs
                         , HasPrelude lang
                         )
                      => Parser (Term (Sum fs) ann)
