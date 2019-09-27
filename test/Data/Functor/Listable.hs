@@ -24,7 +24,6 @@ import Data.Functor.Both
 import qualified Data.Language as Language
 import Data.List.NonEmpty
 import Data.Patch
-import Data.Semigroup.App
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
