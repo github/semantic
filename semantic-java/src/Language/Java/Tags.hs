@@ -75,7 +75,7 @@ instance ToTagsBy 'Custom Java.MethodDeclaration where
               Just Java.Block { ann = Loc Range { end } _ } -> end
               Nothing                                       -> end range
             }
-      Tags.yield (Tag name Function span (firstLine sliced) Nothing)
+      Tags.yield (Tag name Method span (firstLine sliced) Nothing)
       traverse_ tags typeParameters
       tags parameters
       tags type'
@@ -91,7 +91,7 @@ instance ToTagsBy 'Custom Java.ClassDeclaration where
     } = do
       src <- ask @Source
       let sliced = slice src (Range start end)
-      Tags.yield (Tag name Function span (firstLine sliced) Nothing)
+      Tags.yield (Tag name Class span (firstLine sliced) Nothing)
       gtags t
 
 firstLine :: Source -> Text
