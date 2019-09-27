@@ -11,6 +11,7 @@ module Data.Language
   , textToLanguage
   , languageToText
   , PerLanguageModes(..)
+  , defaultLanguageModes
   , LanguageMode(..)
   , modeForLanguage
   ) where
@@ -146,6 +147,11 @@ newtype PerLanguageModes = PerLanguageModes
   { pythonMode :: LanguageMode
   }
   deriving (Eq, Ord, Show)
+
+defaultLanguageModes :: PerLanguageModes
+defaultLanguageModes = PerLanguageModes
+  { pythonMode = ALaCarte
+  }
 
 data LanguageMode
   = ALaCarte

@@ -95,7 +95,7 @@ diffFilePaths session paths
 parseFilePath :: TaskSession -> Path.RelFile -> IO (Either SomeException ByteString)
 parseFilePath session path = do
   blob <- readBlobFromFile (fileForRelPath path)
-  res <- runTask session . runReader (PerLanguageModes ALaCarte) $ parseTermBuilder TermSExpression (toList blob)
+  res <- runTask session . runReader defaultLanguageModes $ parseTermBuilder TermSExpression (toList blob)
   pure (runBuilder <$> res)
 
 -- | Read two files to a BlobPair.
