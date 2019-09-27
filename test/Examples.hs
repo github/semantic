@@ -3,6 +3,7 @@
 module Main (main) where
 
 import           Control.Effect
+import           Control.Effect.Reader
 import           Control.Exception (displayException)
 import qualified Control.Foldl as Foldl
 import           Data.Function ((&))
