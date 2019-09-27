@@ -47,6 +47,7 @@ type family ToTagsInstance t :: Strategy where
   ToTagsInstance (_ :+: _)              = 'Custom
   ToTagsInstance Java.Program           = 'Custom
   ToTagsInstance Java.MethodDeclaration = 'Custom
+  ToTagsInstance Java.MethodInvocation  = 'Custom
   ToTagsInstance Java.ClassDeclaration  = 'Custom
   ToTagsInstance _                      = 'Generic
 
@@ -92,6 +93,16 @@ instance ToTagsBy 'Custom Java.ClassDeclaration where
       src <- ask @Source
       let sliced = slice src (Range start end)
       Tags.yield (Tag name Class span (firstLine sliced) Nothing)
+      gtags t
+
+instance ToTagsBy 'Custom Java.MethodInvocation where
+  tags' t@Java.MethodInvocation
+    { ann = Loc range span
+    , name = Java.Identifier { bytes = name }
+    } = do
+      src <- ask @Source
+      let sliced = slice src range
+      Tags.yield (Tag name Call span (firstLine sliced) Nothing)
       gtags t
 
 firstLine :: Source -> Text
