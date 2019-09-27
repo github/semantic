@@ -8,7 +8,7 @@ import qualified Tags.Tagging.Precise as Tags
 import qualified TreeSitter.Java.AST as Java
 import qualified TreeSitter.Unmarshal as TS
 
-newtype Term a = Term { getTerm :: Java.Module a }
+newtype Term a = Term { getTerm :: Java.Program a }
 
 instance TS.Unmarshal Term where
   unmarshalNode node = Term <$> TS.unmarshalNode node
