@@ -122,4 +122,4 @@ knownFailuresForPath tsDir (Just path)
 
 
 parseFilePath :: (Member (Error SomeException) sig, Member Distribute sig, Member Task sig, Member Files sig, Carrier sig m, MonadIO m) => Path.RelFile -> m Bool
-parseFilePath path = readBlob (fileForRelPath path) >>= runReader (PerLanguageModes Nothing) . parseTermBuilder @[] TermShow . pure >>= const (pure True)
+parseFilePath path = readBlob (fileForRelPath path) >>= runReader (PerLanguageModes ALaCarte) . parseTermBuilder @[] TermShow . pure >>= const (pure True)
