@@ -77,8 +77,7 @@ parseSymbols blobs = ParseTreeSymbolResponse . V.fromList . toList <$> distribut
         tagsToFile tags = File blobPath' (bridging # blobLanguage') (V.fromList (fmap tagToSymbol tags)) mempty blobOid
 
         tagToSymbol :: Tag -> Symbol
-        tagToSymbol Tag{..}
-          = Symbol
+        tagToSymbol Tag{..} = Symbol
           { symbol = name
           , kind = kind
           , line = fromMaybe mempty line
