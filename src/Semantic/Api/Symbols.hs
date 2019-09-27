@@ -6,14 +6,17 @@ module Semantic.Api.Symbols
   ) where
 
 import           Control.Effect.Error
+import           Control.Effect.Reader
 import           Control.Exception
 import           Control.Lens
 import           Data.Blob hiding (File (..))
 import           Data.ByteString.Builder
+import           Data.Language
 import           Data.Term
 import qualified Data.Text as T
 import qualified Data.Vector as V
 import           Data.Text (pack)
+import qualified Language.Python as Py
 import           Parsing.Parser
 import           Prologue
 import           Semantic.Api.Bridge
@@ -25,6 +28,7 @@ import           Serializing.Format
 import           Source.Loc
 import           Tags.Taggable
 import           Tags.Tagging
+import qualified Tags.Tagging.Precise as Precise
 
 legacyParseSymbols :: (Member Distribute sig, ParseEffects sig m, Traversable t) => t Blob -> m Legacy.ParseTreeSymbolResponse
 legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> distributeFoldMap go blobs
@@ -57,17 +61,27 @@ parseSymbolsBuilder :: (Member Distribute sig, ParseEffects sig m, Traversable t
 parseSymbolsBuilder format blobs = parseSymbols blobs >>= serialize format
 
 parseSymbols :: (Member Distribute sig, ParseEffects sig m, Traversable t) => t Blob -> m ParseTreeSymbolResponse
-parseSymbols blobs = ParseTreeSymbolResponse . V.fromList . toList <$> distributeFor blobs go
+parseSymbols blobs = do
+  modes <- ask
+  ParseTreeSymbolResponse . V.fromList . toList <$> distributeFor blobs (go modes)
   where
-    go :: ParseEffects sig m => Blob -> m File
-    go blob@Blob{..} = (withSomeTerm renderToSymbols <$> doParse blob) `catchError` (\(SomeException e) -> pure $ errorFile (show e))
+    go :: ParseEffects sig m => PerLanguageModes -> Blob -> m File
+    go modes blob@Blob{..}
+      | Precise <- pythonMode modes
+      , Python  <- blobLanguage'
+      =             catching $ renderPreciseToSymbols       <$> parse precisePythonParser blob
+      | otherwise = catching $ withSomeTerm renderToSymbols <$> doParse                   blob
       where
+        catching m = m `catchError` (\(SomeException e) -> pure $ errorFile (show e))
         blobLanguage' = blobLanguage blob
         blobPath' = pack $ blobPath blob
         errorFile e = File blobPath' (bridging # blobLanguage') mempty (V.fromList [ParseError (T.pack e)]) blobOid
 
         renderToSymbols :: IsTaggable f => Term f Loc -> File
         renderToSymbols term = tagsToFile (runTagging blob symbolsToSummarize term)
+
+        renderPreciseToSymbols :: Py.Term Loc -> File
+        renderPreciseToSymbols term = tagsToFile (Precise.tags blobSource term)
 
         tagsToFile :: [Tag] -> File
         tagsToFile tags = File blobPath' (bridging # blobLanguage') (V.fromList (fmap tagToSymbol tags)) mempty blobOid
