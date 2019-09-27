@@ -52,7 +52,7 @@ spec = do
     it "produces tags for functions with docs" $ do
       (blob, tree) <- parseTestFile pythonParser (Path.relFile "test/fixtures/python/tags/simple_function_with_docs.py")
       runTagging blob symbolsToSummarize tree `shouldBe`
-        [ Tag "Foo" Function (Span (Pos 1 1) (Pos 3 13)) "def Foo(x):" (Just "\"\"\"This is the foo function\"\"\"" ]
+        [ Tag "Foo" Function (Span (Pos 1 1) (Pos 3 13)) "def Foo(x):" (Just "\"\"\"This is the foo function\"\"\"") ]
 
     it "produces tags for classes" $ do
       (blob, tree) <- parseTestFile pythonParser (Path.relFile "test/fixtures/python/tags/class.py")
