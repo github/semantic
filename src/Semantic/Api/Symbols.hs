@@ -67,20 +67,20 @@ parseSymbols blobs = ParseTreeSymbolResponse . V.fromList . toList <$> distribut
         blobPath' = pack $ blobPath blob
         errorFile e = File blobPath' (bridging # blobLanguage') mempty (V.fromList [ParseError (T.pack e)]) blobOid
 
-        symbolsToSummarize :: [Text]
-        symbolsToSummarize = ["Function", "Method", "Class", "Module", "Call", "Send"]
-
         renderToSymbols :: (IsTaggable f, Applicative m) => Term f Loc -> m File
         renderToSymbols term = pure $ tagsToFile (runTagging blob symbolsToSummarize term)
 
         tagsToFile :: [Tag] -> File
         tagsToFile tags = File blobPath' (bridging # blobLanguage') (V.fromList (fmap tagToSymbol tags)) mempty blobOid
 
-        tagToSymbol :: Tag -> Symbol
-        tagToSymbol Tag{..} = Symbol
-          { symbol = name
-          , kind = kind
-          , line = fromMaybe mempty line
-          , span = converting #? span
-          , docs = fmap Docstring docs
-          }
+symbolsToSummarize :: [Text]
+symbolsToSummarize = ["Function", "Method", "Class", "Module", "Call", "Send"]
+
+tagToSymbol :: Tag -> Symbol
+tagToSymbol Tag{..} = Symbol
+  { symbol = name
+  , kind = kind
+  , line = fromMaybe mempty line
+  , span = converting #? span
+  , docs = fmap Docstring docs
+  }
