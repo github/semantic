@@ -33,7 +33,7 @@ spec = do
     it "produces tags for classes" $ do
       (blob, tree) <- parseTestFile typescriptParser (Path.relFile "test/fixtures/typescript/tags/class.ts")
       runTagging blob symbolsToSummarize tree `shouldBe`
-        [ Tag "FooBar" Class (Span (Pos 1 1) (Pos 1 16)) "class FooBar") Nothing ]
+        [ Tag "FooBar" Class (Span (Pos 1 1) (Pos 1 16)) "class FooBar" Nothing ]
 
     it "produces tags for modules" $ do
       (blob, tree) <- parseTestFile typescriptParser (Path.relFile "test/fixtures/typescript/tags/module.ts")
