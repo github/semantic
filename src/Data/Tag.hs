@@ -1,5 +1,3 @@
-{-# LANGUAGE DeriveAnyClass #-}
-
 module Data.Tag
   ( Tag (..)
   ) where
@@ -7,7 +5,6 @@ module Data.Tag
 import Prelude hiding (span)
 import Prologue
 
-import Data.Aeson
 import Control.Lens.Lens
 
 import Source.Span
@@ -21,7 +18,7 @@ data Tag = Tag
   , context :: [Text]
   , line :: Maybe Text
   , docs :: Maybe Text
-  } deriving (Eq, Show, Generic, ToJSON)
+  } deriving (Eq, Show, Generic)
 
 instance HasSpan Tag where
   span_ = lens span (\t s -> t { span = s })
