@@ -23,22 +23,24 @@ import           Data.Diff
 import           Data.Graph
 import           Data.JSON.Fields
 import           Data.Language
+import           Data.ProtoLens (defMessage)
 import           Data.Term
 import qualified Data.Text as T
-import qualified Data.Vector as V
 import           Diffing.Algorithm (Diffable)
 import           Parsing.Parser
 import           Prologue
+import           Proto.Semantic as P hiding (Blob, BlobPair)
+import           Proto.Semantic_Fields as P
 import           Rendering.Graph
 import           Rendering.JSON hiding (JSON)
 import qualified Rendering.JSON
 import           Semantic.Api.Bridge
-import           Semantic.Proto.SemanticPB hiding (Blob, BlobPair)
 import           Semantic.Task as Task
 import           Semantic.Telemetry as Stat
 import           Serializing.Format hiding (JSON)
 import qualified Serializing.Format as Format
 import           Source.Loc
+
 
 data DiffOutputFormat
   = DiffJSONTree
@@ -50,7 +52,7 @@ data DiffOutputFormat
 
 parseDiffBuilder :: (Traversable t, DiffEffects sig m) => DiffOutputFormat -> t BlobPair -> m Builder
 parseDiffBuilder DiffJSONTree    = distributeFoldMap (jsonDiff renderJSONTree) >=> serialize Format.JSON -- NB: Serialize happens at the top level for these two JSON formats to collect results of multiple blob pairs.
-parseDiffBuilder DiffJSONGraph   = diffGraph >=> serialize Format.JSON
+parseDiffBuilder DiffJSONGraph   = diffGraph >=> serialize Format.JSONPB
 parseDiffBuilder DiffSExpression = distributeFoldMap sexpDiff
 parseDiffBuilder DiffShow        = distributeFoldMap showDiff
 parseDiffBuilder DiffDotGraph    = distributeFoldMap dotGraphDiff
@@ -67,12 +69,20 @@ renderJSONTree :: (Applicative m, ToJSONFields1 syntax) => BlobPair -> Diff synt
 renderJSONTree blobPair = pure . renderJSONDiff blobPair
 
 diffGraph :: (Traversable t, DiffEffects sig m) => t BlobPair -> m DiffTreeGraphResponse
-diffGraph blobs = DiffTreeGraphResponse . V.fromList . toList <$> distributeFor blobs go
+-- diffGraph blobs = DiffTreeGraphResponse . V.fromList . toList <$> distributeFor blobs go
+diffGraph blobs = do
+  graph <- distributeFor blobs go
+  pure $ defMessage & P.files .~ toList graph
   where
     go :: (DiffEffects sig m) => BlobPair -> m DiffTreeFileGraph
     go blobPair = doDiff blobPair (const pure) render
       `catchError` \(SomeException e) ->
-        pure (DiffTreeFileGraph path lang mempty mempty (V.fromList [ParseError (T.pack (show e))]))
+        pure $ defMessage
+          & P.path .~ path
+          & P.language .~ lang
+          & P.vertices .~ mempty
+          & P.edges .~ mempty
+          & P.errors .~ [defMessage & P.error .~ T.pack (show e)]
       where
         path = T.pack $ pathForBlobPair blobPair
         lang = bridging # languageForBlobPair blobPair
@@ -80,8 +90,13 @@ diffGraph blobs = DiffTreeGraphResponse . V.fromList . toList <$> distributeFor 
         render :: (Foldable syntax, Functor syntax, ConstructorName syntax, Applicative m) => BlobPair -> Diff syntax Loc Loc -> m DiffTreeFileGraph
         render _ diff =
           let graph = renderTreeGraph diff
-              toEdge (Edge (a, b)) = DiffTreeEdge (diffVertexId a) (diffVertexId b)
-          in pure $ DiffTreeFileGraph path lang (V.fromList (vertexList graph)) (V.fromList (fmap toEdge (edgeList graph))) mempty
+              toEdge (Edge (a, b)) = defMessage & P.source .~ a^.diffVertexId & P.target .~ b^.diffVertexId
+          in pure $ defMessage
+               & P.path .~ path
+               & P.language .~ lang
+               & P.vertices .~ vertexList graph
+               & P.edges .~ fmap toEdge (edgeList graph)
+               & P.errors .~ mempty
 
 
 sexpDiff :: (DiffEffects sig m) => BlobPair -> m Builder

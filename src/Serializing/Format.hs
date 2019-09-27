@@ -14,13 +14,16 @@ import Data.ByteString.Builder
 import Language.Haskell.HsColour
 import Language.Haskell.HsColour.Colourise
 import Prologue
-import Proto3.Suite as Proto3
+import Data.ProtoLens.Encoding as Proto
+import Data.ProtoLens.JSON as Proto (messageToEncoding)
+import Data.ProtoLens.Message (Message)
 import Serializing.SExpression
 import Text.Show.Pretty
 
 data Format input where
   DOT         :: (Ord vertex, ToGraph graph, ToVertex graph ~ vertex) => Style vertex Builder -> Format graph
   JSON        :: ToJSON input                                                                 => Format input
+  JSONPB      :: Message input                                                                => Format input
   SExpression :: (Recursive input, ToSExpression (Base input))        => Options              -> Format input
   Show        :: Show input                                                                   => Format input
   Proto       :: Message input                                                                => Format input
@@ -33,4 +36,5 @@ runSerialize _         JSON               = (<> "\n") . fromEncoding . toEncodin
 runSerialize _         (SExpression opts) = serializeSExpression opts
 runSerialize Colourful Show               = (<> "\n") . stringUtf8 . hscolour TTY defaultColourPrefs False False "" False . ppShow
 runSerialize Plain     Show               = (<> "\n") . stringUtf8 . show
-runSerialize _         Proto              = lazyByteString . Proto3.toLazyByteString
+runSerialize _         JSONPB             = fromEncoding . Proto.messageToEncoding
+runSerialize _         Proto              = Proto.buildMessage -- lazyByteString . Proto3.toLazyByteString

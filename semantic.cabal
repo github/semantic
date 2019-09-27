@@ -71,8 +71,10 @@ common dependencies
                      , text ^>= 1.2.3.1
                      , these >= 0.7 && <1
                      , unix ^>= 2.7.2.2
-                     , proto3-suite
-                     , proto3-wire
+                     , microlens
+                     , proto-lens == 0.4.0.1
+                     , proto-lens-json == 0.3.0.0
+                     , proto-lens-runtime == 0.4.0.2
                      , lingo >= 0.2.0.0
 
 common executable-flags
@@ -238,6 +240,8 @@ library
                      -- High-level flow & operational functionality (logging, stats, etc.)
                      , Semantic.Analysis
                      -- API
+                     , Proto.Semantic
+                     , Proto.Semantic_Fields
                      , Semantic.Api
                      , Semantic.Api.Bridge
                      , Semantic.Api.Diffs
@@ -245,7 +249,6 @@ library
                      , Semantic.Api.Symbols
                      , Semantic.Api.Terms
                      , Semantic.Api.TOCSummaries
-                     , Semantic.Proto.SemanticPB
                      , Semantic.AST
                      , Semantic.CLI
                      , Semantic.Config

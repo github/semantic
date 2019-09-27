@@ -16,7 +16,6 @@ module Semantic.Api.Terms
 
 import           Analysis.ConstructorName (ConstructorName)
 import           Control.Effect.Error
-import           Control.Lens
 import           Control.Monad
 import           Control.Monad.IO.Class
 import           Data.Abstract.Declarations
@@ -29,35 +28,51 @@ import           Data.Language
 import           Data.Quieterm
 import           Data.Term
 import qualified Data.Text as T
-import qualified Data.Vector as V
 import           Parsing.Parser
 import           Prologue
 import           Rendering.Graph
 import           Rendering.JSON hiding (JSON)
 import qualified Rendering.JSON
 import           Semantic.Api.Bridge
-import           Semantic.Proto.SemanticPB hiding (Blob)
 import           Semantic.Task
 import           Serializing.Format hiding (JSON)
 import qualified Serializing.Format as Format
 import           Source.Loc
 import           Tags.Taggable
 
+import           Control.Lens
+import           Data.ProtoLens (defMessage)
+import           Proto.Semantic as P hiding (Blob)
+import           Proto.Semantic_Fields as P
+
 termGraph :: (Traversable t, Member Distribute sig, ParseEffects sig m) => t Blob -> m ParseTreeGraphResponse
-termGraph blobs = ParseTreeGraphResponse . V.fromList . toList <$> distributeFor blobs go
+termGraph blobs = do
+  terms <- distributeFor blobs go
+  pure $ defMessage
+    & P.files .~ toList terms
   where
     go :: ParseEffects sig m => Blob -> m ParseTreeFileGraph
     go blob = (doParse blob >>= withSomeTerm (pure . render))
       `catchError` \(SomeException e) ->
-        pure (ParseTreeFileGraph path lang mempty mempty (V.fromList [ParseError (T.pack (show e))]))
+        pure $ defMessage
+          & P.path .~ path
+          & P.language .~ lang
+          & P.vertices .~ mempty
+          & P.edges .~ mempty
+          & P.errors .~ [defMessage & P.error .~ T.pack (show e)]
       where
         path = T.pack $ blobPath blob
         lang = bridging # blobLanguage blob
 
         render :: (Foldable syntax, Functor syntax, ConstructorName syntax) => Term syntax Loc -> ParseTreeFileGraph
         render t = let graph = renderTreeGraph t
-                       toEdge (Edge (a, b)) = TermEdge (vertexId a) (vertexId b)
-                   in ParseTreeFileGraph path lang (V.fromList (vertexList graph)) (V.fromList (fmap toEdge (edgeList graph))) mempty
+                       toEdge (Edge (a, b)) = defMessage & P.source .~ a^.vertexId & P.target .~ b^.vertexId
+                   in defMessage
+                        & P.path .~ path
+                        & P.language .~ lang
+                        & P.vertices .~ vertexList graph
+                        & P.edges .~ fmap toEdge (edgeList graph)
+                        & P.errors .~ mempty
 
 data TermOutputFormat
   = TermJSONTree
@@ -71,7 +86,7 @@ data TermOutputFormat
 parseTermBuilder :: (Traversable t, Member Distribute sig, ParseEffects sig m, MonadIO m)
   => TermOutputFormat-> t Blob -> m Builder
 parseTermBuilder TermJSONTree    = distributeFoldMap jsonTerm >=> serialize Format.JSON -- NB: Serialize happens at the top level for these two JSON formats to collect results of multiple blobs.
-parseTermBuilder TermJSONGraph   = termGraph >=> serialize Format.JSON
+parseTermBuilder TermJSONGraph   = termGraph >=> serialize Format.JSONPB
 parseTermBuilder TermSExpression = distributeFoldMap sexpTerm
 parseTermBuilder TermDotGraph    = distributeFoldMap dotGraphTerm
 parseTermBuilder TermShow        = distributeFoldMap showTerm
