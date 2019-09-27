@@ -47,6 +47,7 @@ type family ToTagsInstance t :: Strategy where
   ToTagsInstance (_ :+: _)              = 'Custom
   ToTagsInstance Java.Program           = 'Custom
   ToTagsInstance Java.MethodDeclaration = 'Custom
+  ToTagsInstance Java.ClassDeclaration  = 'Custom
   ToTagsInstance _                      = 'Generic
 
 
@@ -81,6 +82,17 @@ instance ToTagsBy 'Custom Java.MethodDeclaration where
       traverse_ tags dimensions
       traverse_ tags extraChildren
       traverse_ tags body
+
+instance ToTagsBy 'Custom Java.ClassDeclaration where
+  tags' t@Java.ClassDeclaration
+    { ann = Loc Range { start } span
+    , name = Java.Identifier { bytes = name }
+    , body = Java.ClassBody { ann = Loc Range { start = end } _ }
+    } = do
+      src <- ask @Source
+      let sliced = slice src (Range start end)
+      Tags.yield (Tag name Function span (firstLine sliced) Nothing)
+      gtags t
 
 firstLine :: Source -> Text
 firstLine = Text.takeWhile (/= '\n') . toText . Source.take 180
