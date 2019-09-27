@@ -52,8 +52,6 @@ import qualified Language.TSX.Assignment as TSX
 import qualified Language.TypeScript.Assignment as TypeScript
 import           Prelude hiding (fail)
 import           Prologue
-import           Source.Range
-import           Source.Span
 import           TreeSitter.Go
 import           TreeSitter.Haskell
 import           TreeSitter.JSON
@@ -64,7 +62,6 @@ import qualified TreeSitter.Python.AST as Py
 import           TreeSitter.Ruby (tree_sitter_ruby)
 import           TreeSitter.TSX
 import           TreeSitter.TypeScript
-import qualified TreeSitter.Node as TS
 import           TreeSitter.Unmarshal
 
 
@@ -110,7 +107,7 @@ data Parser term where
   -- | A parser producing 'AST' using a 'TS.Language'.
   ASTParser :: (Bounded grammar, Enum grammar, Show grammar) => Ptr TS.Language -> Parser (AST [] grammar)
   -- | A parser 'Unmarshal'ing to a precise AST type using a 'TS.Language'.
-  UnmarshalParser :: Unmarshal t => Ptr TS.Language -> Parser t
+  UnmarshalParser :: Unmarshal t => Ptr TS.Language -> Parser (t Loc)
   -- | A parser producing an à la carte term given an 'AST'-producing parser and an 'Assignment' onto 'Term's in some syntax type.
   AssignmentParser :: (Enum grammar, Ix grammar, Show grammar, TS.Symbol grammar, Syntax.Error :< fs, Eq1 ast, Apply Foldable fs, Apply Functor fs, Foldable ast, Functor ast)
                    => Parser (Term ast (Node grammar))           -- ^ A parser producing AST.
@@ -208,22 +205,3 @@ someASTParser PHP        = Just (SomeASTParser (ASTParser tree_sitter_php :: Par
 someASTParser Java       = Nothing
 someASTParser Markdown   = Nothing
 someASTParser Unknown    = Nothing
-
-
--- FIXME: delete these instances once haskell-tree-sitter depends on semantic-source.
-
-instance Unmarshal Loc where
-  unmarshalNodes nodes = Loc <$> unmarshalNodes nodes <*> unmarshalNodes nodes
-
-instance Unmarshal Range where
-  unmarshalNodes _ = peekNode >>= maybeM (fail "Range expects a current node.") >>= \ node -> do
-    let start = fromIntegral (TS.nodeStartByte node)
-        end   = fromIntegral (TS.nodeEndByte node)
-    pure (Range start end)
-
-instance Unmarshal Span where
-  unmarshalNodes _ = peekNode >>= maybeM (fail "Span expects a current node.") >>= \ node -> do
-    let start = pointToPos (TS.nodeStartPoint node)
-        end   = pointToPos (TS.nodeEndPoint node)
-    pure (Span start end)
-    where pointToPos (TS.TSPoint line column) = Pos (fromIntegral line) (fromIntegral column)

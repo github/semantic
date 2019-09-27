@@ -53,10 +53,10 @@ parseToPreciseAST
   => Duration
   -> Ptr TS.Language
   -> Blob
-  -> m (Maybe t)
+  -> m (Maybe (t Loc))
 parseToPreciseAST parseTimeout language blob = runParse parseTimeout language blob $ \ rootPtr ->
   TS.withCursor (castPtr rootPtr) $ \ cursor ->
-    runM (runFail (runReader cursor (runReader (Source.bytes (blobSource blob)) (TS.peekNode >>= TS.unmarshalNodes . maybeToList))))
+    runM (runFail (runReader cursor (runReader (Source.bytes (blobSource blob)) (TS.peekNode >>= TS.unmarshalNode))))
 
 runParse
   :: ( Carrier sig m
