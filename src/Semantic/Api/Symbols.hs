@@ -16,7 +16,6 @@ import           Data.Term
 import qualified Data.Text as T
 import qualified Data.Vector as V
 import           Data.Text (pack)
-import qualified Language.Python as Py
 import           Parsing.Parser
 import           Prologue
 import           Semantic.Api.Bridge
@@ -83,7 +82,7 @@ parseSymbols blobs = do
         renderToSymbols :: IsTaggable f => Term f Loc -> File
         renderToSymbols term = tagsToFile (runTagging blob symbolsToSummarize term)
 
-        renderPreciseToSymbols :: Py.Term Loc -> File
+        renderPreciseToSymbols :: Precise.ToTags t => t Loc -> File
         renderPreciseToSymbols term = tagsToFile (Precise.tags blobSource term)
 
         tagsToFile :: [Tag] -> File
