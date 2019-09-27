@@ -5,8 +5,6 @@ module Data.Tag
 import Prelude hiding (span)
 import Prologue
 
-import Control.Lens.Lens
-
 import Source.Span
 
 -- | These selectors aren't prefixed with @tag@ for reasons of JSON
@@ -19,7 +17,3 @@ data Tag = Tag
   , line :: Maybe Text
   , docs :: Maybe Text
   } deriving (Eq, Show, Generic)
-
-instance HasSpan Tag where
-  span_ = lens span (\t s -> t { span = s })
-  {-# INLINE span_ #-}
