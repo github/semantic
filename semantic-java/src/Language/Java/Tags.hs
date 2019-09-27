@@ -6,9 +6,7 @@ module Language.Java.Tags
 import           Control.Effect.Reader
 import           Control.Effect.Writer
 import           Data.Foldable (traverse_)
-import           Data.Maybe (listToMaybe)
 import           Data.Monoid (Ap(..))
-import           Data.List.NonEmpty (NonEmpty(..))
 import           Data.Text as Text
 import           GHC.Generics
 import           Source.Loc
@@ -45,12 +43,38 @@ data Strategy = Generic | Custom
 
 type family ToTagsInstance t :: Strategy where
   ToTagsInstance (_ :+: _)              = 'Custom
+  ToTagsInstance Java.MethodDeclaration = 'Custom
   ToTagsInstance _                      = 'Generic
 
 
 instance (ToTags l, ToTags r) => ToTagsBy 'Custom (l :+: r) where
   tags' (L1 l) = tags l
   tags' (R1 r) = tags r
+
+instance ToTagsBy 'Custom Java.MethodDeclaration where
+  tags' Java.MethodDeclaration
+    { ann = Loc range span
+    , name = Java.Identifier { bytes = name }
+    , dimensions
+    , extraChildren
+    , typeParameters
+    , parameters
+    , type'
+    , body
+    } = do
+      src <- ask @Source
+      let sliced = slice src range
+            { end = case body of
+              Just Java.Block { ann = Loc Range { end } _ } -> end
+              Nothing                                       -> end range
+            }
+      Tags.yield (Tag name Function span (firstLine sliced) Nothing)
+      traverse_ tags typeParameters
+      tags parameters
+      tags type'
+      traverse_ tags dimensions
+      traverse_ tags extraChildren
+      traverse_ tags body
 
 firstLine :: Source -> Text
 firstLine = Text.takeWhile (/= '\n') . toText . Source.take 180
