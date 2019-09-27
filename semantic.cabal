@@ -179,7 +179,6 @@ library
                      , Data.Syntax.Literal
                      , Data.Syntax.Statement
                      , Data.Syntax.Type
-                     , Data.Tag
                      , Data.Term
                      -- Diffing algorithms & interpretation thereof
                      , Diffing.Algorithm
