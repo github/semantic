@@ -42,8 +42,8 @@ contextualizing :: ( Member (State [ContextToken]) sig
                 -> Stream (Of Token) m a
                 -> Stream (Of Tag) m a
 contextualizing Blob{..} symbolsToSummarize = Streaming.mapMaybeM $ \case
-  Enter x r -> Nothing <$ enterScope (x, r)
-  Exit  x r -> Nothing <$ exitScope (x, r)
+  Enter x r -> Nothing <$ enterScope (x, Just r)
+  Exit  x r -> Nothing <$ exitScope (x, Just r)
   Iden iden span docsLiteralRange -> get @[ContextToken] >>= pure . \case
     ((x, r):("Context", cr):_) | x `elem` symbolsToSummarize
       -> Just $ Tag iden x span (firstLine (slice r)) (slice cr)
