@@ -32,7 +32,7 @@ runTagging blob symbolsToSummarize
   . contextualizing blob symbolsToSummarize
   . tagging blob
 
-type ContextToken = (Text, Maybe Range)
+type ContextToken = (Text, Range)
 
 contextualizing :: ( Member (State [ContextToken]) sig
                    , Carrier sig m
@@ -42,13 +42,13 @@ contextualizing :: ( Member (State [ContextToken]) sig
                 -> Stream (Of Token) m a
                 -> Stream (Of Tag) m a
 contextualizing Blob{..} symbolsToSummarize = Streaming.mapMaybeM $ \case
-  Enter x r -> Nothing <$ enterScope (x, Just r)
-  Exit  x r -> Nothing <$ exitScope (x, Just r)
+  Enter x r -> Nothing <$ enterScope (x, r)
+  Exit  x r -> Nothing <$ exitScope (x, r)
   Iden iden span docsLiteralRange -> get @[ContextToken] >>= pure . \case
     ((x, r):("Context", cr):_) | x `elem` symbolsToSummarize
-      -> Just $ Tag iden x span (firstLine (slice r)) (slice cr)
+      -> Just $ Tag iden x span (firstLine (slice (Just r))) (slice (Just cr))
     ((x, r):_) | x `elem` symbolsToSummarize
-      -> Just $ Tag iden x span (firstLine (slice r)) (slice docsLiteralRange)
+      -> Just $ Tag iden x span (firstLine (slice (Just r))) (slice docsLiteralRange)
     _ -> Nothing
   where
     slice = fmap (stripEnd . Source.toText . Source.slice blobSource)
