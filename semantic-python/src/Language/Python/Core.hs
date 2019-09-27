@@ -84,6 +84,8 @@ class Compile py where
   default compileCC :: (MonadFail m, Show py) => py -> m (t Name) -> m (t Name)
   compileCC a _ = defaultCompile a
 
+
+
 -- | TODO: This is not right, it should be a reference to a Preluded
 -- NoneType instance, but it will do for now.
 none :: (Member Core sig, Carrier sig t) => t Name
@@ -143,13 +145,32 @@ instance Compile (Py.Attribute Span)
 type RHS a = Either (Py.Assignment a) (Either (Py.AugmentedAssignment a) (Desugared a))
 type Desugared a = Either (Py.ExpressionList a) (Py.Yield a)
 
-desugar :: (Member (Reader SourcePath) sig, Carrier sig m, MonadFail m)
-        => Show a => RHS a -> m ([Name], Desugared a)
+-- Desugaring an RHS involves walking as deeply as possible into an
+-- assignment, storing the names we encounter as we go and eventually
+-- returning a terminal expression.
+desugar :: (Show a, Member (Reader SourcePath) sig, Carrier sig m, MonadFail m)
+        => RHS a -> m ([Name], Desugared a)
 desugar = \case
   Left it@Py.Assignment { left = OneExpression name, right = Just rhs} ->
     let located = name in fmap (first (located:)) (desugar rhs)
   Right (Right any) -> pure ([], any)
   other -> fail ("desugar: couldn't desugar RHS " <> show other)
+
+-- This is a fold function that is invoked from a left fold but that
+-- returns a function (the 'difference' pattern) so that we can pass
+-- information about what RHS we need down the chain: unlike most fold
+-- functions, it has four parameters, not three (since our fold
+-- returns a function). There's some pun to be made on "collapsing
+-- sugar", like "icing" or "sugar water" but I'll leave that as an
+-- exercise to the reader.
+collapseDesugared :: (CoreSyntax syn t, Member (Reader Bindings) sig, Carrier sig m)
+                  => (t Name -> m (t Name)) -- A meta-continuation: it takes a name and returns a continuation
+                  -> Name                   -- The current LHS to which to assign
+                  -> t Name                 -- The current RHS to which to assign, yielded from an outer continuation
+                  -> m (t Name)             -- The properly-sequenced resolut
+collapseDesugared cont n rem =
+  let assigning = fmap ((Name.named' n :<- rem) >>>=)
+  in assigning (local (def n) (cont (pure n))) -- gotta call local here to record this assignment
 
 instance Compile (Py.Assignment Span) where
   compileCC it@Py.Assignment
@@ -157,9 +178,7 @@ instance Compile (Py.Assignment Span) where
     , Py.right = Just rhs
     } cc = do
     (names, val) <- desugar rhs
-    item <- compile val
-    let builder cont n rem = fmap ((Name.named' n :<- rem) >>>=) (local (def n) (cont (pure n)))
-    foldl' builder (const cc) (name:names) item >>= locate it
+    compile val >>= foldl' collapseDesugared (const cc) (name:names) >>= locate it
 
   compileCC other _ = fail ("Unhandled assignment case: " <> show other)
 
