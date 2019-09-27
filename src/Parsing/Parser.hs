@@ -24,6 +24,7 @@ module Parsing.Parser
 , phpASTParser
 , haskellParser
   -- Precise parsers
+, preciseJavaParser
 , precisePythonParser
 ) where
 
@@ -41,6 +42,7 @@ import           Data.Term
 import           Foreign.Ptr
 import qualified Language.Go.Assignment as Go
 import qualified Language.Haskell.Assignment as Haskell
+import qualified Language.Java as PreciseJava
 import qualified Language.JSON.Assignment as JSON
 import qualified Language.Markdown.Assignment as Markdown
 import qualified Language.PHP.Assignment as PHP
@@ -53,6 +55,7 @@ import           Prelude hiding (fail)
 import           Prologue
 import           TreeSitter.Go
 import           TreeSitter.Haskell
+import           TreeSitter.Java
 import           TreeSitter.JSON
 import qualified TreeSitter.Language as TS (Language, Symbol)
 import           TreeSitter.PHP
@@ -166,6 +169,9 @@ markdownParser = AssignmentParser MarkdownParser Markdown.assignment
 
 precisePythonParser :: Parser (PrecisePython.Term Loc)
 precisePythonParser = UnmarshalParser tree_sitter_python
+
+preciseJavaParser :: Parser (PreciseJava.Term Loc)
+preciseJavaParser = UnmarshalParser tree_sitter_java
 
 
 data SomeTerm typeclasses ann where
