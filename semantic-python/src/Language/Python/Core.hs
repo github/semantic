@@ -1,7 +1,7 @@
 {-# LANGUAGE ConstraintKinds, DataKinds, DefaultSignatures, DeriveAnyClass, DeriveGeneric, DerivingStrategies,
              DerivingVia, DisambiguateRecordFields, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving,
-             LambdaCase, NamedFieldPuns, OverloadedLists, OverloadedStrings, ScopedTypeVariables, StandaloneDeriving,
-             TypeApplications, TypeOperators, UndecidableInstances, ViewPatterns #-}
+             LambdaCase, NamedFieldPuns, OverloadedLists, OverloadedStrings, PatternSynonyms, ScopedTypeVariables,
+             StandaloneDeriving, TypeApplications, TypeOperators, UndecidableInstances, ViewPatterns #-}
 
 module Language.Python.Core
 ( compile
@@ -14,11 +14,12 @@ import Prelude hiding (fail)
 import           Control.Effect hiding ((:+:))
 import           Control.Effect.Reader
 import           Control.Monad.Fail
+import           Data.Bifunctor
 import           Data.Coerce
 import           Data.Core as Core
 import           Data.Foldable
 import           Data.List (mapAccumL, mapAccumR)
-import           Data.List.NonEmpty(NonEmpty (..))
+import           Data.List.NonEmpty (NonEmpty (..))
 import qualified Data.Loc
 import           Data.Name as Name
 import           Data.Stack (Stack)
@@ -32,6 +33,7 @@ import qualified TreeSitter.Python.AST as Py
 import           TreeSitter.Span (Span)
 import qualified TreeSitter.Span as TreeSitter
 
+-- Access to the current filename as Text to stick into location annotations.
 newtype SourcePath = SourcePath { rawPath :: Text }
   deriving stock (Eq, Show)
   deriving newtype IsString
@@ -45,6 +47,17 @@ newtype Bindings = Bindings { unBindings :: Stack Name }
 
 def :: Name -> Bindings -> Bindings
 def n = coerce (Stack.:> n)
+
+-- Useful pattern synonym for extracting a single identifier from
+-- a Python ExpressionList. Easier than pattern-matching every time.
+-- TODO: when this is finished, we won't need this pattern, as we'll
+-- handle ExpressionLists the smart way every time.
+pattern OneExpression :: Name -> Py.ExpressionList a
+pattern OneExpression name <- Py.ExpressionList
+  { Py.extraChildren =
+    [ Py.PrimaryExpressionExpression (Py.IdentifierPrimaryExpression (Py.Identifier { bytes = name }))
+    ]
+  }
 
 -- We leave the representation of Core syntax abstract so that it's not
 -- possible for us to 'cheat' by pattern-matching on or eliminating a
@@ -111,32 +124,35 @@ deriving via CompileSum (Either l r) instance (Compile l, Compile r) => Compile 
 instance Compile (Py.AssertStatement Span)
 instance Compile (Py.Attribute Span)
 
-type RHS a = Either (Py.Assignment a) (Either (Py.AugmentedAssignment a) (Either (Py.ExpressionList a) (Py.Yield a)))
-type Desugared a = Either (Py.ExpressionList a) (Py.Yield a)
+-- Assignment compilation. Assignments are an uneasy hybrid of expressions
+-- (since they appear to have values, i.e. `a = b = c`) and statements (because
+-- they introduce bindings. For that reason, they deserve special attention.
+--
+-- The correct desugaring for the expression above looks like, given a continuation @cc@:
+-- @
+--  (b :<- c) >>>= (a :<- b) >>>= cont
+-- @
+-- The tree structure that we get out of tree-sitter is not particulary conducive to expressing
+-- this naturally, so we engage in a small desugaring step so that we can turn a list [a, b, c]
+-- into a sequenced Core expression using >>>= and a left fold. (It's a left fold that has
+-- information—specifically the LHS to assign—flowing through it rightward.)
 
-expressionListToSingleName :: Py.ExpressionList a -> Maybe Text
-expressionListToSingleName Py.ExpressionList { Py.extraChildren =
-        [ Py.PrimaryExpressionExpression (Py.IdentifierPrimaryExpression (Py.Identifier { Py.bytes = name }))
-        ]
-      } = Just name
-expressionListToSingleName _ = Nothing
+-- RHS represents the right-hand-side of an assignment that we get out of tree-sitter.
+-- Desugared is the "terminal" node in a sequence of assignments, i.e. given a = b = c,
+-- c will be the terminal node. It is never an assignment.
+type RHS a = Either (Py.Assignment a) (Either (Py.AugmentedAssignment a) (Desugared a))
+type Desugared a = Either (Py.ExpressionList a) (Py.Yield a)
 
 desugar :: Show a => RHS a -> Maybe ([Name], Desugared a)
 desugar = \case
-  Left it@Py.Assignment { left = lhs
-                        , right
-                        } -> do
-    Just name <- pure $ expressionListToSingleName lhs
-    (names, item) <- right >>= desugar
-    let current = name
-    pure (current:names, item)
-  Right (Left _aug) -> error "augmented assignment case not done"
+  Left it@Py.Assignment { left = OneExpression name, right} ->
+    let located = name
+    in fmap (first (located:)) (right >>= desugar)
   Right (Right any) -> Just ([], any)
-  e -> error ("Bug: died with " <> show e <> " in desugar")
 
 instance Compile (Py.Assignment Span) where
   compileCC it@Py.Assignment
-    { Py.left = (expressionListToSingleName -> Just name)
+    { Py.left = OneExpression name
     , Py.right = Just rhs
     } cc = do
     Just (names, val) <- pure (desugar rhs)
@@ -145,6 +161,8 @@ instance Compile (Py.Assignment Span) where
     foldl' builder (const cc) (name:names) item >>= locate it
 
   compileCC other _ = fail ("Unhandled assignment case: " <> show other)
+
+-- End assignment compilation
 
 instance Compile (Py.AugmentedAssignment Span)
 instance Compile (Py.Await Span)
