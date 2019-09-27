@@ -45,7 +45,6 @@ data Strategy = Generic | Custom
 
 type family ToTagsInstance t :: Strategy where
   ToTagsInstance (_ :+: _)              = 'Custom
-  ToTagsInstance Java.Program           = 'Custom
   ToTagsInstance Java.MethodDeclaration = 'Custom
   ToTagsInstance Java.MethodInvocation  = 'Custom
   ToTagsInstance Java.ClassDeclaration  = 'Custom
@@ -55,9 +54,6 @@ type family ToTagsInstance t :: Strategy where
 instance (ToTags l, ToTags r) => ToTagsBy 'Custom (l :+: r) where
   tags' (L1 l) = tags l
   tags' (R1 r) = tags r
-
-instance ToTagsBy 'Custom Java.Program where
-  tags' Java.Program { extraChildren } = traverse_ tags extraChildren
 
 instance ToTagsBy 'Custom Java.MethodDeclaration where
   tags' Java.MethodDeclaration
