@@ -71,7 +71,7 @@ parseSymbols blobs = do
       =             catching $ renderPreciseToSymbols       <$> parse precisePythonParser blob
       | Precise <- javaMode modes
       , Java    <- blobLanguage'
-      =             catching $ renderPreciseToSymbols       <$> parse precisePythonParser blob
+      =             catching $ renderPreciseToSymbols       <$> parse preciseJavaParser   blob
       | otherwise = catching $ withSomeTerm renderToSymbols <$> doParse                   blob
       where
         catching m = m `catchError` (\(SomeException e) -> pure $ errorFile (show e))
