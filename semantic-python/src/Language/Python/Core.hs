@@ -1,7 +1,7 @@
 {-# LANGUAGE ConstraintKinds, DataKinds, DefaultSignatures, DeriveAnyClass, DeriveGeneric, DerivingStrategies,
              DerivingVia, DisambiguateRecordFields, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving,
-             NamedFieldPuns, OverloadedLists, OverloadedStrings, ScopedTypeVariables, StandaloneDeriving,
-             TypeApplications, TypeOperators, UndecidableInstances #-}
+             LambdaCase, NamedFieldPuns, OverloadedLists, OverloadedStrings, ScopedTypeVariables, StandaloneDeriving,
+             TypeApplications, TypeOperators, UndecidableInstances, ViewPatterns #-}
 
 module Language.Python.Core
 ( compile
@@ -17,12 +17,15 @@ import           Control.Monad.Fail
 import           Data.Coerce
 import           Data.Core as Core
 import           Data.Foldable
+import           Data.List (mapAccumL, mapAccumR)
+import           Data.List.NonEmpty(NonEmpty (..))
 import qualified Data.Loc
 import           Data.Name as Name
 import           Data.Stack (Stack)
 import qualified Data.Stack as Stack
 import           Data.String (IsString)
 import           Data.Text (Text)
+import           Debug.Trace (traceShowId, traceShowM)
 import           GHC.Generics
 import           GHC.Records
 import qualified TreeSitter.Python.AST as Py
@@ -108,18 +111,39 @@ deriving via CompileSum (Either l r) instance (Compile l, Compile r) => Compile 
 instance Compile (Py.AssertStatement Span)
 instance Compile (Py.Attribute Span)
 
-instance Compile (Py.Assignment Span) where
-  compileCC it@Py.Assignment
-    { Py.left = Py.ExpressionList
-      { Py.extraChildren =
+type RHS a = Either (Py.Assignment a) (Either (Py.AugmentedAssignment a) (Either (Py.ExpressionList a) (Py.Yield a)))
+type Desugared a = Either (Py.ExpressionList a) (Py.Yield a)
+
+expressionListToSingleName :: Py.ExpressionList a -> Maybe Text
+expressionListToSingleName Py.ExpressionList { Py.extraChildren =
         [ Py.PrimaryExpressionExpression (Py.IdentifierPrimaryExpression (Py.Identifier { Py.bytes = name }))
         ]
-      }
+      } = Just name
+expressionListToSingleName _ = Nothing
+
+desugar :: Show a => RHS a -> Maybe ([Name], Desugared a)
+desugar = \case
+  Left it@Py.Assignment { left = lhs
+                        , right
+                        } -> do
+    Just name <- pure $ expressionListToSingleName lhs
+    (names, item) <- right >>= desugar
+    let current = name
+    pure (current:names, item)
+  Right (Left _aug) -> error "augmented assignment case not done"
+  Right (Right any) -> Just ([], any)
+  e -> error ("Bug: died with " <> show e <> " in desugar")
+
+instance Compile (Py.Assignment Span) where
+  compileCC it@Py.Assignment
+    { Py.left = (expressionListToSingleName -> Just name)
     , Py.right = Just rhs
     } cc = do
-    value  <- compile rhs
-    let assigning n = (Name.named' name :<- value) >>>= n
-    locate it =<< assigning <$> local (def name) cc
+    Just (names, val) <- pure (desugar rhs)
+    item <- compile val
+    let builder cont n rem = fmap ((Name.named' n :<- rem) >>>=) (local (def n) (cont (pure n)))
+    foldl' builder (const cc) (name:names) item >>= locate it
+
   compileCC other _ = fail ("Unhandled assignment case: " <> show other)
 
 instance Compile (Py.AugmentedAssignment Span)
