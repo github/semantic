@@ -1,4 +1,6 @@
 {-# LANGUAGE AllowAmbiguousTypes, DataKinds, DisambiguateRecordFields, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, NamedFieldPuns, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
+-- FIXME: it would be really nice if we didn’t need to do this
+{-# OPTIONS_GHC -freduction-depth=0 #-}
 module Language.Java.Tags
 ( ToTags(..)
 ) where
