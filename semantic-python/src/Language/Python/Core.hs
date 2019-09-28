@@ -173,7 +173,7 @@ collapseDesugared :: (CoreSyntax syn t, Member (Reader Bindings) sig, Carrier si
                   -> t Name                 -- The current RHS to which to assign, yielded from an outer continuation
                   -> m (t Name)             -- The properly-sequenced resolut
 collapseDesugared cont (Located loc n) rem =
-  let assigning = fmap (Core.annAt loc) . fmap ((Name.named' n :<- rem) >>>=)
+  let assigning = fmap (Core.annAt loc . ((Name.named' n :<- rem) >>>=))
   in assigning (local (def n) (cont (pure n))) -- gotta call local here to record this assignment
 
 instance Compile (Py.Assignment Span) where
