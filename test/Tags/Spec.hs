@@ -75,9 +75,9 @@ spec = do
     it "produces tags for sends" $ do
       (blob, tree) <- parseTestFile rubyParser (Path.relFile "test/fixtures/ruby/tags/simple_method.rb")
       runTagging blob ["Send"] tree `shouldBe`
-        [ Tag "puts" Send (Span (Pos 2 3) (Pos 2 12)) "puts \"hi\"" Nothing
-        , Tag "bar" Send (Span (Pos 3 3) (Pos 3 8)) "a.bar" Nothing
-        , Tag "a" Send (Span (Pos 3 3) (Pos 3 4)) "a" Nothing
+        [ Tag "puts" Call (Span (Pos 2 3) (Pos 2 12)) "puts \"hi\"" Nothing
+        , Tag "bar" Call (Span (Pos 3 3) (Pos 3 8)) "a.bar" Nothing
+        , Tag "a" Call (Span (Pos 3 3) (Pos 3 4)) "a" Nothing
         ]
 
     it "produces tags for methods with docs" $ do
