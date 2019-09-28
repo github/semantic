@@ -11,7 +11,7 @@ spec = do
     it "produces tags for functions with docs" $ do
       (blob, tree) <- parseTestFile goParser (Path.relFile "test/fixtures/go/tags/simple_functions.go")
       runTagging blob symbolsToSummarize tree `shouldBe`
-        [ Tag "TestFromBits" Function (Span (Pos 6 1) (Pos 8 2)) ["Statements"] (Just "func TestFromBits(t *testing.T) {") (Just "// TestFromBits ...")
+        [ Tag "TestFromBits" Function (Span (Pos 6 1) (Pos 8 2)) "func TestFromBits(t *testing.T) {" (Just "// TestFromBits ...")
         , Tag "Hi" Function (Span (Pos 10 1) (Pos 11 2)) "func Hi()" Nothing ]
 
     it "produces tags for methods" $ do
