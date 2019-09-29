@@ -16,23 +16,35 @@ import Shelly (shelly, silently, cd, run_)
 import qualified System.Path as Path
 import System.Path ((</>))
 
+
+makeGitRepo :: FilePath -> IO ()
+makeGitRepo dir = shelly . silently $ do
+  cd (fromString dir)
+  let git = run_ "git"
+  git ["init"]
+  run_ "touch" ["foo.py", "bar.rb"]
+  git ["add", "foo.py", "bar.rb"]
+  git ["config", "user.name", "'Test'"]
+  git ["config", "user.email", "'test@test.test'"]
+  git ["commit", "-am", "'test commit'"]
+
 spec :: Spec
 spec = do
+  describe "lsTree" $ do
+    hasGit <- runIO $ isJust <$> findExecutable "git"
+    when hasGit . it "should read all tree entries from a repo" $ do
+      items <- liftIO . withSystemTempDirectory "semantic-temp-git-repo" $ \dir -> do
+        makeGitRepo dir
+        Git.lsTree dir (Git.OID "HEAD")
+
+      length items `shouldBe` 2
+
   describe "readBlobsFromGitRepo" $ do
     hasGit <- runIO $ isJust <$> findExecutable "git"
     when hasGit . it "should read from a git directory" $ do
       -- This temporary directory will be cleaned after use.
       blobs <- liftIO . withSystemTempDirectory "semantic-temp-git-repo" $ \dir -> do
-        shelly $ silently $ do
-          cd (fromString dir)
-          let git = run_ "git"
-          git ["init"]
-          run_ "touch" ["foo.py", "bar.rb"]
-          git ["add", "foo.py", "bar.rb"]
-          git ["config", "user.name", "'Test'"]
-          git ["config", "user.email", "'test@test.test'"]
-          git ["commit", "-am", "'test commit'"]
-
+        makeGitRepo dir
         readBlobsFromGitRepoPath (Path.absDir dir </> Path.relDir ".git") (Git.OID "HEAD") [] []
       let files = sortOn fileLanguage (blobFile <$> blobs)
       files `shouldBe` [ File "foo.py" Python
@@ -43,16 +55,7 @@ spec = do
       -- This temporary directory will be cleaned after use.
       blobs <- liftIO . withSystemTempDirectory "semantic-temp-git-repo" $ \dir -> do
         let pdir = Path.absDir dir
-        shelly $ silently $ do
-          cd (fromString dir)
-          let git = run_ "git"
-          git ["init"]
-          run_ "touch" ["foo.py", "bar.rb"]
-          git ["add", "foo.py", "bar.rb"]
-          git ["config", "user.name", "'Test'"]
-          git ["config", "user.email", "'test@test.test'"]
-          git ["commit", "-am", "'test commit'"]
-
+        makeGitRepo dir
         readBlobsFromGitRepoPath (pdir </> Path.relDir ".git") (Git.OID "HEAD") [] [Path.relFile "foo.py"]
       let files = sortOn fileLanguage (blobFile <$> blobs)
       files `shouldBe` [ File "foo.py" Python ]
@@ -60,15 +63,7 @@ spec = do
     when hasGit . it "should read from a git directory with --exclude" $ do
       -- This temporary directory will be cleaned after use.
       blobs <- liftIO . withSystemTempDirectory "semantic-temp-git-repo" $ \dir -> do
-        shelly $ silently $ do
-          cd (fromString dir)
-          let git = run_ "git"
-          git ["init"]
-          run_ "touch" ["foo.py", "bar.rb"]
-          git ["add", "foo.py", "bar.rb"]
-          git ["config", "user.name", "'Test'"]
-          git ["config", "user.email", "'test@test.test'"]
-          git ["commit", "-am", "'test commit'"]
+        makeGitRepo dir
 
         readBlobsFromGitRepoPath (Path.absDir dir </> Path.relDir ".git") (Git.OID "HEAD") [Path.relFile "foo.py"] []
       let files = sortOn fileLanguage (blobFile <$> blobs)
