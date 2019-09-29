@@ -13,13 +13,11 @@ module Semantic.Git
   , OID(..)
 
   -- Testing Purposes
-  , parseEntries
   , parseEntry
   ) where
 
 import Prologue
 
-import           Control.Monad.IO.Class
 import           Data.Attoparsec.ByteString.Char8 (Parser)
 import           Data.Attoparsec.ByteString.Char8 as AP
 import qualified Data.Attoparsec.ByteString.Streaming as AP.Stream
@@ -53,10 +51,6 @@ lsTree gitDir (OID sha) = Streaming.Process.withStreamingOutput lsproc go
 
 sh :: MonadIO m => Sh a -> m a
 sh = shelly . silently . onCommandHandles (initOutputHandles (`hSetBinaryMode` True))
-
--- | Parses an list of entries separated by \NUL, and on failure return []
-parseEntries :: BC.ByteString -> [TreeEntry]
-parseEntries = fromRight [] . AP.parseOnly everything
 
 everything :: Parser [TreeEntry]
 everything = AP.sepBy entryParser "\NUL" <* optional "\NUL" <* AP.endOfInput
