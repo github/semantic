@@ -6,6 +6,7 @@ import           Data.Blob
 import           Data.Blob.IO
 import           Data.Handle
 import qualified Data.Language as Language
+import qualified Data.ByteString.Char8 as BC
 import           Data.List (intercalate)
 import           Data.Project
 import qualified Data.Text as T
@@ -173,7 +174,7 @@ graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute a g
 shaReader :: ReadM Git.OID
 shaReader = eitherReader parseSha
   where parseSha arg = if length arg == 40 || arg == "HEAD"
-          then Right (Git.OID (T.pack arg))
+          then Right (Git.OID (BC.pack arg))
           else Left (arg <> " is not a valid sha1")
 
 filePathReader :: ReadM File
