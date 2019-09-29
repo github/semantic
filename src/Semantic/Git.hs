@@ -59,7 +59,7 @@ parseEntries :: BC.ByteString -> [TreeEntry]
 parseEntries = fromRight [] . AP.parseOnly everything
 
 everything :: Parser [TreeEntry]
-everything = AP.sepBy entryParser "\NUL" <* optional "\NUL" <* AP.endOfInput
+everything = AP.sepBy entryParser "\NUL" <* "\NUL\n" <* AP.endOfInput
 
 -- | Parse the entire input with entryParser, and on failure return a default
 -- For testing purposes only
