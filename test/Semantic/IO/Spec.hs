@@ -22,8 +22,8 @@ makeGitRepo dir = shelly . silently $ do
   cd (fromString dir)
   let git = run_ "git"
   git ["init"]
-  run_ "touch" ["foo.py", "bar.rb"]
-  git ["add", "foo.py", "bar.rb"]
+  run_ "touch" ["日本語.py", "bar.rb"]
+  git ["add", "日本語.py", "bar.rb"]
   git ["config", "user.name", "'Test'"]
   git ["config", "user.email", "'test@test.test'"]
   git ["commit", "-am", "'test commit'"]
@@ -47,7 +47,7 @@ spec = do
         makeGitRepo dir
         readBlobsFromGitRepoPath (Path.absDir dir </> Path.relDir ".git") (Git.OID "HEAD") [] []
       let files = sortOn fileLanguage (blobFile <$> blobs)
-      files `shouldBe` [ File "foo.py" Python
+      files `shouldBe` [ File "日本語.py" Python
                        , File "bar.rb" Ruby
                        ]
 
@@ -56,16 +56,16 @@ spec = do
       blobs <- liftIO . withSystemTempDirectory "semantic-temp-git-repo" $ \dir -> do
         let pdir = Path.absDir dir
         makeGitRepo dir
-        readBlobsFromGitRepoPath (pdir </> Path.relDir ".git") (Git.OID "HEAD") [] [Path.relFile "foo.py"]
+        readBlobsFromGitRepoPath (pdir </> Path.relDir ".git") (Git.OID "HEAD") [] [Path.relFile "日本語.py"]
       let files = sortOn fileLanguage (blobFile <$> blobs)
-      files `shouldBe` [ File "foo.py" Python ]
+      files `shouldBe` [ File "日本語.py" Python ]
 
     when hasGit . it "should read from a git directory with --exclude" $ do
       -- This temporary directory will be cleaned after use.
       blobs <- liftIO . withSystemTempDirectory "semantic-temp-git-repo" $ \dir -> do
         makeGitRepo dir
 
-        readBlobsFromGitRepoPath (Path.absDir dir </> Path.relDir ".git") (Git.OID "HEAD") [Path.relFile "foo.py"] []
+        readBlobsFromGitRepoPath (Path.absDir dir </> Path.relDir ".git") (Git.OID "HEAD") [Path.relFile "日本語.py"] []
       let files = sortOn fileLanguage (blobFile <$> blobs)
       files `shouldBe` [ File "bar.rb" Ruby ]
 
