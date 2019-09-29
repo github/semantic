@@ -1,5 +1,4 @@
 {-# LANGUAGE DeriveAnyClass #-}
-{-# OPTIONS_GHC -O1 #-}
 
 module Semantic.Git
   ( -- Primary (partial) API for cmd line git
@@ -16,24 +15,22 @@ module Semantic.Git
   -- Testing Purposes
   , parseEntries
   , parseEntry
-  , everything
   ) where
 
 import Prologue
 
 import           Control.Monad.IO.Class
-import qualified Data.ByteString.Char8 as BC
 import           Data.Attoparsec.ByteString.Char8 (Parser)
 import           Data.Attoparsec.ByteString.Char8 as AP
 import qualified Data.Attoparsec.ByteString.Streaming as AP.Stream
+import qualified Data.ByteString.Char8 as BC
 import qualified Data.ByteString.Streaming.Char8 as ByteStream
-import qualified Streaming.Process
 import           Data.Char
-import           Data.Either (fromLeft, fromRight)
+import           Data.Either (fromRight)
 import           Data.Text as Text
 import qualified Data.Text.Encoding as Text
 import           Shelly hiding (FilePath)
-import qualified Streaming.Prelude as Stream
+import qualified Streaming.Process
 import           System.IO (hSetBinaryMode)
 
 -- | git clone --bare
@@ -52,9 +49,7 @@ lsTree gitDir (OID sha) = Streaming.Process.withStreamingOutput lsproc go
   where
     lsproc = Streaming.Process.proc "git" ["-C", gitDir, "ls-tree", "-zr", BC.unpack sha]
     go :: ByteStream.ByteString IO () -> IO [TreeEntry]
-    go
-      = fmap (fromLeft [] . fst)
-      . AP.Stream.parse everything
+    go = fmap (fromRight [] . fst) . AP.Stream.parse everything
 
 sh :: MonadIO m => Sh a -> m a
 sh = shelly . silently . onCommandHandles (initOutputHandles (`hSetBinaryMode` True))

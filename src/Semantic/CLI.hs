@@ -9,7 +9,6 @@ import qualified Data.Language as Language
 import qualified Data.ByteString.Char8 as BC
 import           Data.List (intercalate)
 import           Data.Project
-import qualified Data.Text as T
 import qualified Data.Flag as Flag
 import           Options.Applicative hiding (style)
 import           Prologue
