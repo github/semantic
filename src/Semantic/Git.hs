@@ -47,7 +47,7 @@ catFile gitDir (OID oid) = sh $ do
 lsTree :: FilePath -> OID -> IO [TreeEntry]
 lsTree gitDir (OID sha) = Streaming.Process.withStreamingOutput lsproc go
   where
-    lsproc = Streaming.Process.proc "git" ["-C", gitDir, "ls-tree", "-zr", BC.unpack sha]
+    lsproc = Streaming.Process.proc "git" ["-C", gitDir, "ls-tree", "-rz", BC.unpack sha]
     go :: ByteStream.ByteString IO () -> IO [TreeEntry]
     go = fmap (fromRight [] . fst) . AP.Stream.parse everything
 
