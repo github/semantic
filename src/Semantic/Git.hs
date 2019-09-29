@@ -16,6 +16,7 @@ module Semantic.Git
   -- Testing Purposes
   , parseEntries
   , parseEntry
+  , everything
   ) where
 
 import Prologue
@@ -49,7 +50,7 @@ catFile gitDir (OID oid) = sh $ do
 lsTree :: FilePath -> OID -> IO [TreeEntry]
 lsTree gitDir (OID sha) = Streaming.Process.withStreamingOutput lsproc go
   where
-    lsproc = Streaming.Process.proc "git" ["-C", gitDir, "cat-file", "-p", BC.unpack sha]
+    lsproc = Streaming.Process.proc "git" ["-C", gitDir, "ls-tree", "-zr", BC.unpack sha]
     go :: ByteStream.ByteString IO () -> IO [TreeEntry]
     go
       = fmap (fromLeft [] . fst)
@@ -63,7 +64,7 @@ parseEntries :: BC.ByteString -> [TreeEntry]
 parseEntries = fromRight [] . AP.parseOnly everything
 
 everything :: Parser [TreeEntry]
-everything = AP.sepBy entryParser "\NUL" <* "\NUL\n" <* AP.endOfInput
+everything = AP.sepBy entryParser "\NUL"
 
 -- | Parse the entire input with entryParser, and on failure return a default
 -- For testing purposes only
