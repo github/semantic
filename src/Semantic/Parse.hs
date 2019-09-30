@@ -1,6 +1,7 @@
 {-# LANGUAGE ExistentialQuantification #-}
 module Semantic.Parse
 ( Parse(..)
+, parse
 ) where
 
 import Control.Effect.Carrier
@@ -17,3 +18,11 @@ instance HFunctor Parse where
 
 instance Effect Parse where
   handle state handler (Parse parser blob k) = Parse parser blob (handler . (<$ state) . k)
+
+
+-- | Parse a 'Blob' with the given 'Parser'.
+parse :: (Member Parse sig, Carrier sig m)
+      => Parser term
+      -> Blob
+      -> m term
+parse parser blob = send (Parse parser blob pure)
