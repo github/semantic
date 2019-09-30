@@ -7,7 +7,7 @@ module Semantic.REPL
 import Control.Abstract hiding (Continue, List, string)
 import Control.Abstract.ScopeGraph (runScopeError)
 import Control.Abstract.Heap (runHeapError)
-import Control.Carrier.Parse.Measured
+import Control.Carrier.Parse.Simple
 import Control.Effect.Carrier
 import Control.Effect.Catch
 import Control.Effect.Lift
@@ -35,7 +35,7 @@ import Numeric (readDec)
 import Parsing.Parser (rubyParser)
 import Prologue
 import Semantic.Analysis
-import Semantic.Config (logOptionsFromConfig)
+import Semantic.Config (configTreeSitterParseTimeout, logOptionsFromConfig)
 import Semantic.Distribute
 import Semantic.Graph
 import Semantic.Resolution
@@ -70,7 +70,7 @@ repl proxy parser paths =
     . runReader (TaskSession config "-" False logger statter)
     . Files.runFiles
     . runResolution
-    . runParse $ do
+    $ runParse (configTreeSitterParseTimeout config) $ do
       blobs <- catMaybes <$> traverse readBlobFromFile (flip File (Language.reflect proxy) <$> paths)
       package <- fmap (fmap quieterm) <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs (Language.reflect proxy) [])
       modules <- topologicalSort <$> runImportGraphToModules proxy (snd <$> package)
