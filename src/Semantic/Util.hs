@@ -120,7 +120,7 @@ parseFile, parseFileQuiet :: Parser term -> FilePath -> IO term
 parseFile parser = runTask' . (parse parser <=< readBlob . fileForPath)
 parseFileQuiet parser = runTaskQuiet . (parse parser <=< readBlob . fileForPath)
 
-runTask', runTaskQuiet :: TaskEff a -> IO a
+runTask', runTaskQuiet :: TaskC a -> IO a
 runTask' task = runTaskWithOptions debugOptions task >>= either (die . displayException) pure
 runTaskQuiet task = runTaskWithOptions defaultOptions task >>= either (die . displayException) pure
 

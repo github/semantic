@@ -110,7 +110,7 @@ parseTestFile parser path = runTaskOrDie $ do
   pure (blob, term)
 
 -- Run a Task and call `die` if it returns an Exception.
-runTaskOrDie :: TaskEff a -> IO a
+runTaskOrDie :: TaskC a -> IO a
 runTaskOrDie task = runTaskWithOptions defaultOptions { optionsLogLevel = Nothing } task >>= either (die . displayException) pure
 
 type TestEvaluatingC term

@@ -1,7 +1,7 @@
 {-# LANGUAGE ConstraintKinds, ExistentialQuantification, GADTs, GeneralizedNewtypeDeriving, KindSignatures,
              ScopedTypeVariables, StandaloneDeriving, TypeOperators, UndecidableInstances #-}
 module Semantic.Task
-( TaskEff
+( TaskC
 , Level(..)
 -- * Parse effect
 , Parse
@@ -86,7 +86,7 @@ import           Serializing.Format hiding (Options)
 import           Source.Source (Source)
 
 -- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
-type TaskEff
+type TaskC
   = ParseC
   ( ResolutionC
   ( Files.FilesC
@@ -124,11 +124,11 @@ data TaskSession
   , statter   :: StatQueue
   }
 
--- | Execute a 'TaskEff' yielding its result value in 'IO'.
-runTask :: TaskSession -> TaskEff a -> IO (Either SomeException a)
+-- | Execute a 'TaskC' yielding its result value in 'IO'.
+runTask :: TaskSession -> TaskC a -> IO (Either SomeException a)
 runTask taskSession@TaskSession{..} task = do
   (result, stat) <- withTiming "run" [] $ do
-    let run :: TaskEff a -> IO (Either SomeException a)
+    let run :: TaskC a -> IO (Either SomeException a)
         run
           = runM
           . withDistribute
@@ -146,8 +146,8 @@ runTask taskSession@TaskSession{..} task = do
   queueStat statter stat
   pure result
 
--- | Execute a 'TaskEff' yielding its result value in 'IO' using all default options and configuration.
-runTaskWithOptions :: Options -> TaskEff a -> IO (Either SomeException a)
+-- | Execute a 'TaskC' yielding its result value in 'IO' using all default options and configuration.
+runTaskWithOptions :: Options -> TaskC a -> IO (Either SomeException a)
 runTaskWithOptions options task = withOptions options $ \ config logger statter ->
   runTask (TaskSession config "-" False logger statter) task
 
