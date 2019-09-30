@@ -16,6 +16,8 @@ module Semantic.Api.Terms
 
 import           Analysis.ConstructorName (ConstructorName)
 import           Control.Effect.Error
+import           Control.Effect.Reader
+import           Control.Lens
 import           Control.Monad
 import           Control.Monad.IO.Class
 import           Data.Abstract.Declarations
@@ -25,11 +27,14 @@ import           Data.Either
 import           Data.Graph
 import           Data.JSON.Fields
 import           Data.Language
+import           Data.ProtoLens (defMessage)
 import           Data.Quieterm
 import           Data.Term
 import qualified Data.Text as T
 import           Parsing.Parser
 import           Prologue
+import           Proto.Semantic as P hiding (Blob)
+import           Proto.Semantic_Fields as P
 import           Rendering.Graph
 import           Rendering.JSON hiding (JSON)
 import qualified Rendering.JSON
@@ -40,10 +45,6 @@ import qualified Serializing.Format as Format
 import           Source.Loc
 import           Tags.Taggable
 
-import           Control.Lens
-import           Data.ProtoLens (defMessage)
-import           Proto.Semantic as P hiding (Blob)
-import           Proto.Semantic_Fields as P
 
 termGraph :: (Traversable t, Member Distribute sig, ParseEffects sig m) => t Blob -> m ParseTreeGraphResponse
 termGraph blobs = do
@@ -84,7 +85,7 @@ data TermOutputFormat
   deriving (Eq, Show)
 
 parseTermBuilder :: (Traversable t, Member Distribute sig, ParseEffects sig m, MonadIO m)
-  => TermOutputFormat-> t Blob -> m Builder
+  => TermOutputFormat -> t Blob -> m Builder
 parseTermBuilder TermJSONTree    = distributeFoldMap jsonTerm >=> serialize Format.JSON -- NB: Serialize happens at the top level for these two JSON formats to collect results of multiple blobs.
 parseTermBuilder TermJSONGraph   = termGraph >=> serialize Format.JSONPB
 parseTermBuilder TermSExpression = distributeFoldMap sexpTerm
@@ -116,7 +117,7 @@ quietTerm blob = showTiming blob <$> time' ( (doParse blob >>= withSomeTerm (fma
       in stringUtf8 (status <> "\t" <> show (blobLanguage blob) <> "\t" <> blobPath blob <> "\t" <> show duration <> " ms\n")
 
 
-type ParseEffects sig m = (Member (Error SomeException) sig, Member Task sig, Carrier sig m)
+type ParseEffects sig m = (Member (Error SomeException) sig, Member (Reader PerLanguageModes) sig, Member Task sig, Carrier sig m)
 
 type TermConstraints =
  '[ Taggable

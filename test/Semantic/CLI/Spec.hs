@@ -1,5 +1,6 @@
 module Semantic.CLI.Spec (testTree) where
 
+import           Control.Effect.Reader
 import           Data.ByteString.Builder
 import           Semantic.Api hiding (Blob, BlobPair, File)
 import           Semantic.Task
@@ -50,23 +51,24 @@ testForParseFixture (format, runParse, files, expected) =
 
 parseFixtures :: [(String, [Blob] -> TaskEff Builder, [File], Path.RelFile)]
 parseFixtures =
-  [ ("s-expression", parseTermBuilder TermSExpression, path, Path.relFile "test/fixtures/ruby/corpus/and-or.parseA.txt")
-  , ("json", parseTermBuilder TermJSONTree, path, prefix </> Path.file "parse-tree.json")
-  , ("json", parseTermBuilder TermJSONTree, path', prefix </> Path.file "parse-trees.json")
-  , ("json", parseTermBuilder TermJSONTree, [], prefix </> Path.file "parse-tree-empty.json")
-  , ("symbols", parseSymbolsBuilder Serializing.Format.JSON, path'', prefix </> Path.file "parse-tree.symbols.json")
-  , ("protobuf symbols", parseSymbolsBuilder Serializing.Format.Proto, path'', prefix </> Path.file "parse-tree.symbols.protobuf.bin")
+  [ ("s-expression", run . parseTermBuilder TermSExpression, path, Path.relFile "test/fixtures/ruby/corpus/and-or.parseA.txt")
+  , ("json", run . parseTermBuilder TermJSONTree, path, prefix </> Path.file "parse-tree.json")
+  , ("json", run . parseTermBuilder TermJSONTree, path', prefix </> Path.file "parse-trees.json")
+  , ("json", run . parseTermBuilder TermJSONTree, [], prefix </> Path.file "parse-tree-empty.json")
+  , ("symbols", run . parseSymbolsBuilder Serializing.Format.JSONPB, path'', prefix </> Path.file "parse-tree.symbols.json")
+  , ("protobuf symbols", run . parseSymbolsBuilder Serializing.Format.Proto, path'', prefix </> Path.file "parse-tree.symbols.protobuf.bin")
   ]
   where path = [File "test/fixtures/ruby/corpus/and-or.A.rb" Ruby]
         path' = [File "test/fixtures/ruby/corpus/and-or.A.rb" Ruby, File "test/fixtures/ruby/corpus/and-or.B.rb" Ruby]
         path'' = [File "test/fixtures/ruby/corpus/method-declaration.A.rb" Ruby]
         prefix = Path.relDir "test/fixtures/cli"
+        run = runReader (PerLanguageModes ALaCarte)
 
 diffFixtures :: [(String, [BlobPair] -> TaskEff Builder, [Both File], Path.RelFile)]
 diffFixtures =
   [ ("json diff", parseDiffBuilder DiffJSONTree, pathMode, prefix </> Path.file "diff-tree.json")
   , ("s-expression diff", parseDiffBuilder DiffSExpression, pathMode, Path.relFile "test/fixtures/ruby/corpus/method-declaration.diffA-B.txt")
-  , ("toc summaries diff", diffSummaryBuilder Serializing.Format.JSON, pathMode, prefix </> Path.file "diff-tree.toc.json")
+  , ("toc summaries diff", diffSummaryBuilder Serializing.Format.JSONPB, pathMode, prefix </> Path.file "diff-tree.toc.json")
   , ("protobuf diff", diffSummaryBuilder Serializing.Format.Proto, pathMode, prefix </> Path.file "diff-tree.toc.protobuf.bin")
   ]
   where pathMode = [Both (File "test/fixtures/ruby/corpus/method-declaration.A.rb" Ruby) (File "test/fixtures/ruby/corpus/method-declaration.B.rb"  Ruby)]

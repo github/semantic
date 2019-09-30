@@ -6,13 +6,15 @@ module Semantic.Api.Symbols
   ) where
 
 import           Control.Effect.Error
+import           Control.Effect.Reader
 import           Control.Exception
 import           Data.Blob hiding (File (..))
 import           Data.ByteString.Builder
-import           Data.Maybe
+import           Data.Language
 import           Data.Term
 import qualified Data.Text as T
 import           Data.Text (pack)
+import qualified Language.Python as Py
 import           Parsing.Parser
 import           Prologue
 import           Semantic.Api.Bridge
@@ -23,6 +25,7 @@ import           Serializing.Format
 import           Source.Loc
 import           Tags.Taggable
 import           Tags.Tagging
+import qualified Tags.Tagging.Precise as Precise
 
 import           Control.Lens
 import           Data.ProtoLens (defMessage)
@@ -32,7 +35,7 @@ import           Proto.Semantic_Fields as P
 legacyParseSymbols :: (Member Distribute sig, ParseEffects sig m, Traversable t) => t Blob -> m Legacy.ParseTreeSymbolResponse
 legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> distributeFoldMap go blobs
   where
-    go :: (Member (Error SomeException) sig, Member Task sig, Carrier sig m) => Blob -> m [Legacy.File]
+    go :: ParseEffects sig m => Blob -> m [Legacy.File]
     go blob@Blob{..} = (doParse blob >>= withSomeTerm renderToSymbols) `catchError` (\(SomeException _) -> pure (pure emptyFile))
       where
         emptyFile = tagsToFile []
@@ -51,8 +54,8 @@ legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> distributeFoldMap 
         tagToSymbol Tag{..}
           = Legacy.Symbol
           { symbolName = name
-          , symbolKind = kind
-          , symbolLine = fromMaybe mempty line
+          , symbolKind = pack (show kind)
+          , symbolLine = line
           , symbolSpan = converting #? span
           }
 
@@ -61,26 +64,32 @@ parseSymbolsBuilder format blobs = parseSymbols blobs >>= serialize format
 
 parseSymbols :: (Member Distribute sig, ParseEffects sig m, Traversable t) => t Blob -> m ParseTreeSymbolResponse
 parseSymbols blobs = do -- ParseTreeSymbolResponse . V.fromList . toList <$> distributeFor blobs go
-  terms <- distributeFor blobs go
+  modes <- ask
+  terms <- distributeFor blobs (go modes)
   pure $ defMessage & P.files .~ toList terms
   where
-    go :: (Member (Error SomeException) sig, Member Task sig, Carrier sig m) => Blob -> m File
-    go blob@Blob{..} = (doParse blob >>= withSomeTerm renderToSymbols) `catchError` (\(SomeException e) -> pure $ errorFile (show e))
+    go :: ParseEffects sig m => PerLanguageModes -> Blob -> m File
+    go modes blob@Blob{..}
+      | Precise <- pythonMode modes
+      , Python  <- blobLanguage'
+      =             catching $ renderPreciseToSymbols       <$> parse precisePythonParser blob
+      | otherwise = catching $ withSomeTerm renderToSymbols <$> doParse                   blob
       where
+        catching m = m `catchError` (\(SomeException e) -> pure $ errorFile (show e))
         blobLanguage' = blobLanguage blob
         blobPath' = pack $ blobPath blob
         errorFile e = defMessage
           & P.path .~ blobPath'
-          & P.language .~ (bridging # blobLanguage blob)
+          & P.language .~ (bridging # blobLanguage')
           & P.symbols .~ mempty
           & P.errors .~ [defMessage & P.error .~ T.pack e]
           & P.blobOid .~ blobOid
 
-        symbolsToSummarize :: [Text]
-        symbolsToSummarize = ["Function", "Method", "Class", "Module", "Call", "Send"]
+        renderToSymbols :: IsTaggable f => Term f Loc -> File
+        renderToSymbols term = tagsToFile (runTagging blob symbolsToSummarize term)
 
-        renderToSymbols :: (IsTaggable f, Applicative m) => Term f Loc -> m File
-        renderToSymbols term = pure $ tagsToFile (runTagging blob symbolsToSummarize term)
+        renderPreciseToSymbols :: Py.Term Loc -> File
+        renderPreciseToSymbols term = tagsToFile (Precise.tags blobSource term)
 
         tagsToFile :: [Tag] -> File
         tagsToFile tags = defMessage
@@ -93,9 +102,12 @@ parseSymbols blobs = do -- ParseTreeSymbolResponse . V.fromList . toList <$> dis
         tagToSymbol :: Tag -> Symbol
         tagToSymbol Tag{..} = defMessage
           & P.symbol .~ name
-          & P.kind .~ kind
-          & P.line .~ fromMaybe mempty line
+          & P.kind .~ pack (show kind)
+          & P.line .~ line
           & P.maybe'span .~ converting #? span
           & P.maybe'docs .~ case docs of
             Just d -> Just (defMessage & P.docstring .~ d)
             Nothing -> Nothing
+
+        symbolsToSummarize :: [Text]
+        symbolsToSummarize = ["Function", "Method", "Class", "Module", "Call", "Send"]
