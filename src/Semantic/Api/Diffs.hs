@@ -28,6 +28,7 @@ import           Data.Term
 import qualified Data.Text as T
 import qualified Data.Vector as V
 import           Diffing.Algorithm (Diffable)
+import           Diffing.Interpreter (diffTermPair)
 import           Parsing.Parser
 import           Prologue
 import           Rendering.Graph
@@ -95,7 +96,7 @@ dotGraphDiff :: (DiffEffects sig m) => BlobPair -> m Builder
 dotGraphDiff blobPair = doDiff blobPair (const id) render
   where render _ = serialize (DOT (diffStyle "diffs")) . renderTreeGraph
 
-type DiffEffects sig m = (Member (Error SomeException) sig, Member (Reader TaskSession) sig, Member Telemetry sig, Member Distribute sig, Member Parse sig, Member Task sig, Carrier sig m, MonadIO m)
+type DiffEffects sig m = (Member (Error SomeException) sig, Member (Reader TaskSession) sig, Member Telemetry sig, Member Distribute sig, Member Parse sig, Carrier sig m, MonadIO m)
 
 type CanDiff syntax = (ConstructorName syntax, Diffable syntax, Eq1 syntax, HasDeclaration syntax, Hashable1 syntax, Show1 syntax, ToJSONFields1 syntax, Traversable syntax)
 type Decorate a b = forall syntax . CanDiff syntax => Blob -> Term syntax a -> Term syntax b
@@ -118,10 +119,10 @@ doDiff blobPair decorate render = do
   diff <- diffTerms blobPair terms
   render blobPair diff
 
-diffTerms :: (CanDiff syntax, Member Task sig, Member Telemetry sig, Carrier sig m, MonadIO m)
+diffTerms :: (CanDiff syntax, Member Telemetry sig, Carrier sig m, MonadIO m)
   => BlobPair -> Join These (Term syntax ann) -> m (Diff syntax ann ann)
 diffTerms blobs terms = time "diff" languageTag $ do
-  diff <- diff (runJoin terms)
+  let diff = diffTermPair (runJoin terms)
   diff <$ writeStat (Stat.count "diff.nodes" (bilength diff) languageTag)
   where languageTag = languageTagForBlobPair blobs
 
