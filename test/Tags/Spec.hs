@@ -88,7 +88,7 @@ spec = do
     it "correctly tags files containing multibyte UTF-8 characters" $ do
       (blob, tree) <- parseTestFile rubyParser (Path.relFile "test/fixtures/ruby/tags/unicode_identifiers.rb")
       runTagging blob symbolsToSummarize tree `shouldBe`
-        [ Tag "日本語" "Method" (Span (Pos 2 1) (Pos 4 4)) ["Statements"] (Just "def 日本語") (Just "# coding: utf-8")]
+        [ Tag "日本語" Method (Span (Pos 2 1) (Pos 4 4)) "def 日本語" (Just "# coding: utf-8")]
 
     it "produces tags for methods and classes with docs" $ do
       (blob, tree) <- parseTestFile rubyParser (Path.relFile "test/fixtures/ruby/tags/class_module.rb")
