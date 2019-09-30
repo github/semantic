@@ -147,22 +147,22 @@ spec = do
   describe "diff with ToCDiffRenderer'" $ do
     it "produces JSON output" $ do
       blobs <- blobsForPaths (Both (Path.relFile "ruby/toc/methods.A.rb") (Path.relFile "ruby/toc/methods.B.rb"))
-      output <- runTaskOrDie (diffSummaryBuilder Format.JSON [blobs])
+      output <- runTaskOrDie (diffSummaryBuilder Format.JSONPB [blobs])
       runBuilder output `shouldBe` ("{\"files\":[{\"path\":\"test/fixtures/ruby/toc/methods.A.rb -> test/fixtures/ruby/toc/methods.B.rb\",\"language\":\"Ruby\",\"changes\":[{\"category\":\"Method\",\"term\":\"self.foo\",\"span\":{\"start\":{\"line\":1,\"column\":1},\"end\":{\"line\":2,\"column\":4}},\"changeType\":\"ADDED\"},{\"category\":\"Method\",\"term\":\"bar\",\"span\":{\"start\":{\"line\":4,\"column\":1},\"end\":{\"line\":6,\"column\":4}},\"changeType\":\"MODIFIED\"},{\"category\":\"Method\",\"term\":\"baz\",\"span\":{\"start\":{\"line\":4,\"column\":1},\"end\":{\"line\":5,\"column\":4}},\"changeType\":\"REMOVED\"}]}]}\n" :: ByteString)
 
     it "produces JSON output if there are parse errors" $ do
       blobs <- blobsForPaths (Both (Path.relFile "ruby/toc/methods.A.rb") (Path.relFile "ruby/toc/methods.X.rb"))
-      output <- runTaskOrDie (diffSummaryBuilder Format.JSON [blobs])
+      output <- runTaskOrDie (diffSummaryBuilder Format.JSONPB [blobs])
       runBuilder output `shouldBe` ("{\"files\":[{\"path\":\"test/fixtures/ruby/toc/methods.A.rb -> test/fixtures/ruby/toc/methods.X.rb\",\"language\":\"Ruby\",\"changes\":[{\"category\":\"Method\",\"term\":\"bar\",\"span\":{\"start\":{\"line\":1,\"column\":1},\"end\":{\"line\":2,\"column\":4}},\"changeType\":\"REMOVED\"},{\"category\":\"Method\",\"term\":\"baz\",\"span\":{\"start\":{\"line\":4,\"column\":1},\"end\":{\"line\":5,\"column\":4}},\"changeType\":\"REMOVED\"}],\"errors\":[{\"error\":\"expected end of input nodes, but got ParseError\",\"span\":{\"start\":{\"line\":1,\"column\":1},\"end\":{\"line\":2,\"column\":3}}}]}]}\n" :: ByteString)
 
     it "ignores anonymous functions" $ do
       blobs <- blobsForPaths (Both (Path.relFile "ruby/toc/lambda.A.rb") (Path.relFile "ruby/toc/lambda.B.rb"))
-      output <- runTaskOrDie (diffSummaryBuilder Format.JSON [blobs])
+      output <- runTaskOrDie (diffSummaryBuilder Format.JSONPB [blobs])
       runBuilder output `shouldBe` ("{\"files\":[{\"path\":\"test/fixtures/ruby/toc/lambda.A.rb -> test/fixtures/ruby/toc/lambda.B.rb\",\"language\":\"Ruby\"}]}\n" :: ByteString)
 
     it "summarizes Markdown headings" $ do
       blobs <- blobsForPaths (Both (Path.relFile "markdown/toc/headings.A.md") (Path.relFile "markdown/toc/headings.B.md"))
-      output <- runTaskOrDie (diffSummaryBuilder Format.JSON [blobs])
+      output <- runTaskOrDie (diffSummaryBuilder Format.JSONPB [blobs])
       runBuilder output `shouldBe` ("{\"files\":[{\"path\":\"test/fixtures/markdown/toc/headings.A.md -> test/fixtures/markdown/toc/headings.B.md\",\"language\":\"Markdown\",\"changes\":[{\"category\":\"Heading 1\",\"term\":\"Introduction\",\"span\":{\"start\":{\"line\":1,\"column\":1},\"end\":{\"line\":3,\"column\":16}},\"changeType\":\"REMOVED\"},{\"category\":\"Heading 2\",\"term\":\"Two\",\"span\":{\"start\":{\"line\":5,\"column\":1},\"end\":{\"line\":7,\"column\":4}},\"changeType\":\"MODIFIED\"},{\"category\":\"Heading 3\",\"term\":\"This heading is new\",\"span\":{\"start\":{\"line\":9,\"column\":1},\"end\":{\"line\":11,\"column\":10}},\"changeType\":\"ADDED\"},{\"category\":\"Heading 1\",\"term\":\"Final\",\"span\":{\"start\":{\"line\":13,\"column\":1},\"end\":{\"line\":14,\"column\":4}},\"changeType\":\"ADDED\"}]}]}\n" :: ByteString)
 
 
