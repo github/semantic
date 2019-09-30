@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, TypeOperators #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, TypeOperators #-}
 module Analysis.Abstract.Caching.FlowInsensitive
 ( cachingTerms
 , convergingModules

@@ -16,6 +16,7 @@ module Semantic.Api.Terms
 
 import           Analysis.ConstructorName (ConstructorName)
 import           Control.Effect.Error
+import           Control.Effect.Reader
 import           Control.Lens
 import           Control.Monad
 import           Control.Monad.IO.Class
@@ -69,7 +70,7 @@ data TermOutputFormat
   deriving (Eq, Show)
 
 parseTermBuilder :: (Traversable t, Member Distribute sig, ParseEffects sig m, MonadIO m)
-  => TermOutputFormat-> t Blob -> m Builder
+  => TermOutputFormat -> t Blob -> m Builder
 parseTermBuilder TermJSONTree    = distributeFoldMap jsonTerm >=> serialize Format.JSON -- NB: Serialize happens at the top level for these two JSON formats to collect results of multiple blobs.
 parseTermBuilder TermJSONGraph   = termGraph >=> serialize Format.JSON
 parseTermBuilder TermSExpression = distributeFoldMap sexpTerm
@@ -101,7 +102,7 @@ quietTerm blob = showTiming blob <$> time' ( (doParse blob >>= withSomeTerm (fma
       in stringUtf8 (status <> "\t" <> show (blobLanguage blob) <> "\t" <> blobPath blob <> "\t" <> show duration <> " ms\n")
 
 
-type ParseEffects sig m = (Member (Error SomeException) sig, Member Task sig, Carrier sig m)
+type ParseEffects sig m = (Member (Error SomeException) sig, Member (Reader PerLanguageModes) sig, Member Task sig, Carrier sig m)
 
 type TermConstraints =
  '[ Taggable
