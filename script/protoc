@@ -14,6 +14,5 @@ export PROJECT="github.com/github/semantic"
 
 # Generate Haskell for semantic's protobuf types
 docker run --rm --user $(id -u):$(id -g) -v $(pwd):/go/src/$PROJECT -w /go/src/$PROJECT \
-    semantic-protoc \
-    --proto_path=proto --haskell_out=src/Semantic/Proto \
+    semantic-protoc --proto_path=proto --haskell_out=./src \
     semantic.proto

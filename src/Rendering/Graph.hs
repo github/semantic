@@ -57,7 +57,7 @@ diffStyle name = (defaultStyle (fromString . show . view diffVertexId))
         vertexAttributes v = case v^.maybe'diffTerm of
           Just (DiffTreeVertex'Deleted x)  -> [ "label" := fromString (T.unpack (x^.term)),  "color" := "red" ]
           Just (DiffTreeVertex'Inserted x) -> [ "label" := fromString (T.unpack (x^.term)),  "color" := "green" ]
-          Just (DiffTreeVertex'Replaced x) -> [ "label" := "Replacement",                    "color" := "orange", "style" := "dashed" ]
+          Just (DiffTreeVertex'Replaced _) -> [ "label" := "Replacement",                    "color" := "orange", "style" := "dashed" ]
           Just (DiffTreeVertex'Merged x)   -> [ "label" := fromString (T.unpack (x^.term)) ]
           _                                -> []
 
