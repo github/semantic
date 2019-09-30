@@ -90,6 +90,7 @@ type TaskC
   = ParseC
   ( ResolutionC
   ( Files.FilesC
+  ( ReaderC Config
   ( ReaderC TaskSession
   ( TraceInTelemetryC
   ( TelemetryC
@@ -98,7 +99,7 @@ type TaskC
   ( ResourceC
   ( CatchC
   ( DistributeC
-  ( LiftC IO)))))))))))
+  ( LiftC IO))))))))))))
 
 -- | A task which parses a 'Blob' with the given 'Parser'.
 parse :: (Member Parse sig, Carrier sig m)
@@ -139,6 +140,7 @@ runTask taskSession@TaskSession{..} task = do
           . runTelemetry logger statter
           . runTraceInTelemetry
           . runReader taskSession
+          . runReader config
           . Files.runFiles
           . runResolution
           . runParse
