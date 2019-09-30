@@ -4,7 +4,6 @@ module Semantic.Task
 ( Task
 , TaskEff
 , Level(..)
-, RAlgebra
 -- * Parse effect
 , Parse
 , parse
@@ -28,7 +27,6 @@ module Semantic.Task
 , time
 , time'
 -- * High-level flow
-, decorate
 , diff
 , render
 , serialize
@@ -60,7 +58,6 @@ module Semantic.Task
 , Telemetry
 ) where
 
-import           Analysis.Decorator (decoratorWithAlgebra)
 import qualified Assigning.Assignment as Assignment
 import qualified Assigning.Assignment.Deterministic as Deterministic
 import           Control.Effect.Carrier
@@ -93,7 +90,6 @@ import qualified Semantic.Task.Files as Files
 import           Semantic.Telemetry
 import           Semantic.Timeout
 import           Serializing.Format hiding (Options)
-import           Source.Loc
 import           Source.Source (Source)
 
 -- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
@@ -121,13 +117,6 @@ parse :: (Member Parse sig, Carrier sig m)
       -> Blob
       -> m term
 parse parser blob = send (Parse parser blob pure)
-
--- | A task which decorates a 'Term' with values computed using the supplied 'RAlgebra' function.
-decorate :: (Functor f, Applicative m)
-         => RAlgebra (TermF f Loc) (Term f Loc) field
-         -> Term f Loc
-         -> m (Term f field)
-decorate algebra term = pure (decoratorWithAlgebra algebra term)
 
 -- | A task which diffs a pair of terms using the supplied 'Differ' function.
 diff :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax, Member Task sig, Carrier sig m)
