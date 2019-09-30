@@ -8,11 +8,9 @@ import Control.Abstract hiding (Continue, List, string)
 import Control.Abstract.ScopeGraph (runScopeError)
 import Control.Abstract.Heap (runHeapError)
 import Control.Carrier.Parse.Simple
-import Control.Effect.Carrier
 import Control.Effect.Catch
 import Control.Effect.Lift
 import Control.Effect.REPL
-import Control.Effect.Resource
 import Data.Abstract.Address.Precise as Precise
 import Data.Abstract.Evaluatable hiding (string)
 import Data.Abstract.Module
@@ -29,21 +27,16 @@ import Data.List (uncons)
 import Data.Project
 import Data.Quieterm
 import qualified Data.Text as T
-import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
-import qualified Data.Time.LocalTime as LocalTime
 import Numeric (readDec)
 import Parsing.Parser (rubyParser)
 import Prologue
 import Semantic.Analysis
-import Semantic.Config (configTreeSitterParseTimeout, logOptionsFromConfig)
+import Semantic.Config (configTreeSitterParseTimeout)
 import Semantic.Distribute
 import Semantic.Graph
 import Semantic.Resolution
 import Semantic.Task hiding (Error)
 import qualified Semantic.Task.Files as Files
-import Semantic.Telemetry
-import Semantic.Timeout
-import Semantic.Telemetry.Log (LogOptions, Message(..), writeLogMessage)
 import Semantic.Util
 import Source.Span
 import System.Console.Haskeline
@@ -62,11 +55,8 @@ repl proxy parser paths =
     runM
     . withDistribute
     . runCatch
-    . runResource
-    . withTimeout
     . runError @SomeException
-    . runTelemetryIgnoringStat (logOptionsFromConfig config)
-    . runTraceInTelemetry
+    . runTraceByPrinting
     . runReader (TaskSession config "-" False logger statter)
     . Files.runFiles
     . runResolution
@@ -113,24 +103,6 @@ repl proxy parser paths =
 -- TODO: REPL for typechecking/abstract semantics
 -- TODO: drive the flow from within the REPL instead of from without
 
-
-runTelemetryIgnoringStat :: LogOptions -> TelemetryIgnoringStatC m a -> m a
-runTelemetryIgnoringStat logOptions = runReader logOptions . runTelemetryIgnoringStatC
-
-newtype TelemetryIgnoringStatC m a = TelemetryIgnoringStatC { runTelemetryIgnoringStatC :: ReaderC LogOptions m a }
-  deriving (Applicative, Functor, Monad, MonadIO)
-
-instance (Carrier sig m, MonadIO m) => Carrier (Telemetry :+: sig) (TelemetryIgnoringStatC m) where
-  eff (R other) = TelemetryIgnoringStatC . eff . R . handleCoercible $ other
-  eff (L op) = do
-    logOptions <- TelemetryIgnoringStatC ask
-    case op of
-      WriteStat _                  k -> k
-      WriteLog level message pairs k -> do
-        time <- liftIO Time.getCurrentTime
-        zonedTime <- liftIO (LocalTime.utcToLocalZonedTime time)
-        writeLogMessage logOptions (Message level message pairs zonedTime)
-        k
 
 step :: ( Member (Error SomeException) sig
         , Member REPL sig
