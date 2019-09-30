@@ -1,6 +1,7 @@
 {-# LANGUAGE ApplicativeDo #-}
 module Semantic.CLI (main) where
 
+import qualified Control.Carrier.Parse.Measured as Parse
 import           Control.Effect.Reader
 import           Control.Exception as Exc (displayException)
 import           Data.Blob
@@ -17,7 +18,6 @@ import           Semantic.Api hiding (File)
 import qualified Semantic.AST as AST
 import           Semantic.Config
 import qualified Semantic.Graph as Graph
-import qualified Semantic.Parse as Parse
 import qualified Semantic.Task as Task
 import qualified Semantic.Git as Git
 import           Semantic.Task.Files

@@ -114,6 +114,8 @@ library
                      , Control.Abstract.Roots
                      , Control.Abstract.ScopeGraph
                      , Control.Abstract.Value
+                     -- Carriers
+                     , Control.Carrier.Parse.Measured
                      -- Effects
                      , Control.Effect.Interpose
                      , Control.Effect.Parse
@@ -254,7 +256,6 @@ library
                      , Semantic.Git
                      , Semantic.Graph
                      , Semantic.IO
-                     , Semantic.Parse
                      , Semantic.REPL
                      , Semantic.Resolution
                      , Semantic.Task

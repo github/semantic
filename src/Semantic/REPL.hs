@@ -7,6 +7,7 @@ module Semantic.REPL
 import Control.Abstract hiding (Continue, List, string)
 import Control.Abstract.ScopeGraph (runScopeError)
 import Control.Abstract.Heap (runHeapError)
+import Control.Carrier.Parse.Measured
 import Control.Effect.Carrier
 import Control.Effect.Catch
 import Control.Effect.Lift
@@ -37,7 +38,6 @@ import Semantic.Analysis
 import Semantic.Config (logOptionsFromConfig)
 import Semantic.Distribute
 import Semantic.Graph
-import Semantic.Parse
 import Semantic.Resolution
 import Semantic.Task hiding (Error)
 import qualified Semantic.Task.Files as Files

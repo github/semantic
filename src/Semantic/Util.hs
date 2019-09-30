@@ -20,6 +20,7 @@ import Prelude hiding (readFile)
 import           Control.Abstract
 import           Control.Abstract.Heap (runHeapError)
 import           Control.Abstract.ScopeGraph (runScopeError)
+import           Control.Carrier.Parse.Measured
 import           Control.Effect.Lift
 import           Control.Effect.Trace (runTraceByPrinting)
 import           Control.Exception (displayException)
@@ -47,7 +48,6 @@ import           Prologue
 import           Semantic.Analysis
 import           Semantic.Config
 import           Semantic.Graph
-import           Semantic.Parse
 import           Semantic.Task
 import           Source.Loc
 import           System.Exit (die)

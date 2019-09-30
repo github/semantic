@@ -1,5 +1,5 @@
 {-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, TypeOperators, UndecidableInstances #-}
-module Semantic.Parse
+module Control.Carrier.Parse.Measured
 ( -- * Parse effect
   module Control.Effect.Parse
   -- * Parse carrier
