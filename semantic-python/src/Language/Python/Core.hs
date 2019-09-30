@@ -1,7 +1,7 @@
 {-# LANGUAGE ConstraintKinds, DataKinds, DefaultSignatures, DeriveAnyClass, DeriveGeneric, DerivingStrategies,
              DerivingVia, DisambiguateRecordFields, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving,
-             NamedFieldPuns, OverloadedLists, OverloadedStrings, ScopedTypeVariables, StandaloneDeriving,
-             TypeApplications, TypeOperators, UndecidableInstances #-}
+             LambdaCase, NamedFieldPuns, OverloadedLists, OverloadedStrings, PatternSynonyms, ScopedTypeVariables,
+             StandaloneDeriving, TypeApplications, TypeOperators, UndecidableInstances, ViewPatterns #-}
 
 module Language.Python.Core
 ( compile
@@ -17,6 +17,7 @@ import           Control.Monad.Fail
 import           Data.Coerce
 import           Data.Core as Core
 import           Data.Foldable
+import           Data.Loc (Loc)
 import qualified Data.Loc
 import           Data.Name as Name
 import           Data.Stack (Stack)
@@ -29,19 +30,31 @@ import           Source.Span (Span)
 import qualified Source.Span as Source
 import qualified TreeSitter.Python.AST as Py
 
+-- | Access to the current filename as Text to stick into location annotations.
 newtype SourcePath = SourcePath { rawPath :: Text }
   deriving stock (Eq, Show)
   deriving newtype IsString
 
--- Keeps track of the current scope's bindings (so that we can, when
--- compiling a class or module, return the list of bound variables
--- as a Core record so that all immediate definitions are exposed)
+-- | Keeps track of the current scope's bindings (so that we can, when
+-- compiling a class or module, return the list of bound variables as
+-- a Core record so that all immediate definitions are exposed)
 newtype Bindings = Bindings { unBindings :: Stack Name }
   deriving stock (Eq, Show)
   deriving newtype (Semigroup, Monoid)
 
 def :: Name -> Bindings -> Bindings
 def n = coerce (Stack.:> n)
+
+-- | Useful pattern synonym for extracting a single identifier from
+-- a Python ExpressionList. Easier than pattern-matching every time.
+-- TODO: when this is finished, we won't need this pattern, as we'll
+-- handle ExpressionLists the smart way every time.
+pattern SingleIdentifier :: Name -> Py.ExpressionList a
+pattern SingleIdentifier name <- Py.ExpressionList
+  { Py.extraChildren =
+    [ Py.PrimaryExpressionExpression (Py.IdentifierPrimaryExpression (Py.Identifier { bytes = name }))
+    ]
+  }
 
 -- We leave the representation of Core syntax abstract so that it's not
 -- possible for us to 'cheat' by pattern-matching on or eliminating a
@@ -83,17 +96,18 @@ compile :: ( Compile py
         => py -> m (t Name)
 compile t = compileCC t (pure none)
 
+locFromTSSpan :: SourcePath -> Source.Span -> Loc
+locFromTSSpan fp (Source.Span (Source.Pos a b) (Source.Pos c d))
+  = Data.Loc.Loc (rawPath fp) (Data.Loc.Span (Data.Loc.Pos a b) (Data.Loc.Pos c d))
+
 locate :: ( HasField "ann" syntax Span
           , CoreSyntax syn t
           , Member (Reader SourcePath) sig
           , Carrier sig m
           ) => syntax -> t a -> m (t a)
 locate syn item = do
-  fp <- asks @SourcePath rawPath
-  let locFromTSSpan (Source.Span (Source.Pos a b) (Source.Pos c d))
-        = Data.Loc.Loc fp (Data.Loc.Span (Data.Loc.Pos a b) (Data.Loc.Pos c d))
-
-  pure (Core.annAt (locFromTSSpan (getField @"ann" syn)) item)
+  fp <- ask @SourcePath
+  pure (Core.annAt (locFromTSSpan fp (getField @"ann" syn)) item)
 
 defaultCompile :: (MonadFail m, Show py) => py -> m (t Name)
 defaultCompile t = fail $ "compilation unimplemented for " <> show t
@@ -108,19 +122,73 @@ deriving via CompileSum ((l :+: r) Span) instance (Compile (l Span), Compile (r 
 instance Compile (Py.AssertStatement Span)
 instance Compile (Py.Attribute Span)
 
+-- Assignment compilation. Assignments are an uneasy hybrid of expressions
+-- (since they appear to have values, i.e. `a = b = c`) and statements (because
+-- they introduce bindings). For that reason, they deserve special attention.
+--
+-- The correct desugaring for the expression above looks like, given a continuation @cont@:
+-- @
+--  (b :<- c) >>>= (a :<- b) >>>= cont
+-- @
+-- The tree structure that we get out of tree-sitter is not particulary conducive to expressing
+-- this naturally, so we engage in a small desugaring step so that we can turn a list [a, b, c]
+-- into a sequenced Core expression using >>>= and a left fold. (It's a left fold that has
+-- information—specifically the LHS to assign—flowing through it rightward.)
+
+-- RHS represents the right-hand-side of an assignment that we get out of tree-sitter.
+-- Desugared is the "terminal" node in a sequence of assignments, i.e. given a = b = c,
+-- c will be the terminal node. It is never an assignment.
+type RHS = Py.Assignment :+: Py.AugmentedAssignment :+: Desugared
+type Desugared = Py.ExpressionList :+: Py.Yield
+
+-- We have to pair locations and names, and tuple syntax is harder to
+-- read in this case than a happy little constructor.
+data Located a = Located Loc a
+
+-- Desugaring an RHS involves walking as deeply as possible into an
+-- assignment, storing the names we encounter as we go and eventually
+-- returning a terminal expression. We have to keep track of which
+desugar :: (Member (Reader SourcePath) sig, Carrier sig m, MonadFail m)
+        => [Located Name]
+        -> RHS Span
+        -> m ([Located Name], Desugared Span)
+desugar acc = \case
+  L1 Py.Assignment { left = SingleIdentifier name, right = Just rhs, ann} -> do
+    loc <- locFromTSSpan <$> ask <*> pure ann
+    let cons = (Located loc name :)
+    desugar (cons acc) rhs
+  R1 (R1 any) -> pure (acc, any)
+  other -> fail ("desugar: couldn't desugar RHS " <> show other)
+
+-- This is an algebra that is invoked from a left fold but that
+-- returns a function (the 'difference' pattern) so that we can pass
+-- information about what RHS we need down the chain: unlike most fold
+-- functions, it has four parameters, not three (since our fold
+-- returns a function). There's some pun to be made on "collapsing
+-- sugar", like "icing" or "sugar water" but I'll leave that as an
+-- exercise to the reader.
+collapseDesugared :: (CoreSyntax syn t, Member (Reader Bindings) sig, Carrier sig m)
+                  => Located Name           -- The current LHS to which to assign
+                  -> (t Name -> m (t Name)) -- A meta-continuation: it takes a name and returns a continuation
+                  -> t Name                 -- The current RHS to which to assign, yielded from an outer continuation
+                  -> m (t Name)             -- The properly-sequenced resolut
+collapseDesugared (Located loc n) cont rem =
+  let assigning = fmap (Core.annAt loc . ((Name.named' n :<- rem) >>>=))
+  in assigning (local (def n) (cont (pure n))) -- gotta call local here to record this assignment
+
 instance Compile (Py.Assignment Span) where
   compileCC it@Py.Assignment
-    { Py.left = Py.ExpressionList
-      { Py.extraChildren =
-        [ Py.PrimaryExpressionExpression (Py.IdentifierPrimaryExpression (Py.Identifier { Py.bytes = name }))
-        ]
-      }
-    , Py.right = Just rhs
+    { left = SingleIdentifier name
+    , right = Just rhs
+    , ann
     } cc = do
-    value  <- compile rhs
-    let assigning n = (Name.named' name :<- value) >>>= n
-    locate it =<< assigning <$> local (def name) cc
+    p <- ask @SourcePath
+    (names, val) <- desugar [Located (locFromTSSpan p ann) name] rhs
+    compile val >>= foldr collapseDesugared (const cc) names >>= locate it
+
   compileCC other _ = fail ("Unhandled assignment case: " <> show other)
+
+-- End assignment compilation
 
 instance Compile (Py.AugmentedAssignment Span)
 instance Compile (Py.Await Span)

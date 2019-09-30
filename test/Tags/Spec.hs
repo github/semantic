@@ -2,7 +2,7 @@ module Tags.Spec (spec) where
 
 import Data.Text (Text)
 import SpecHelpers
-import Tags.Tagging
+import Tags.Tagging as Tags
 import qualified System.Path as Path
 
 spec :: Spec
@@ -11,7 +11,7 @@ spec = do
     it "produces tags for functions with docs" $ do
       (blob, tree) <- parseTestFile goParser (Path.relFile "test/fixtures/go/tags/simple_functions.go")
       runTagging blob symbolsToSummarize tree `shouldBe`
-        [ Tag "TestFromBits" Function (Span (Pos 6 1) (Pos 8 2)) ["Statements"] (Just "func TestFromBits(t *testing.T) {") (Just "// TestFromBits ...")
+        [ Tag "TestFromBits" Function (Span (Pos 6 1) (Pos 8 2)) "func TestFromBits(t *testing.T) {" (Just "// TestFromBits ...")
         , Tag "Hi" Function (Span (Pos 10 1) (Pos 11 2)) "func Hi()" Nothing ]
 
     it "produces tags for methods" $ do
@@ -33,12 +33,12 @@ spec = do
     it "produces tags for classes" $ do
       (blob, tree) <- parseTestFile typescriptParser (Path.relFile "test/fixtures/typescript/tags/class.ts")
       runTagging blob symbolsToSummarize tree `shouldBe`
-        [ Tag "FooBar" Class (Span (Pos 1 1) (Pos 1 16)) "class FooBar") Nothing ]
+        [ Tag "FooBar" Class (Span (Pos 1 1) (Pos 1 16)) "class FooBar" Nothing ]
 
     it "produces tags for modules" $ do
       (blob, tree) <- parseTestFile typescriptParser (Path.relFile "test/fixtures/typescript/tags/module.ts")
       runTagging blob symbolsToSummarize tree `shouldBe`
-        [ Tag "APromise" Module (Span (Pos 1 1) (Pos 1 20)) "module APromise { }" Nothing ]
+        [ Tag "APromise" Tags.Module (Span (Pos 1 1) (Pos 1 20)) "module APromise { }" Nothing ]
 
   describe "python" $ do
     it "produces tags for functions" $ do
@@ -52,7 +52,7 @@ spec = do
     it "produces tags for functions with docs" $ do
       (blob, tree) <- parseTestFile pythonParser (Path.relFile "test/fixtures/python/tags/simple_function_with_docs.py")
       runTagging blob symbolsToSummarize tree `shouldBe`
-        [ Tag "Foo" Function (Span (Pos 1 1) (Pos 3 13)) "def Foo(x):" (Just "\"\"\"This is the foo function\"\"\"" ]
+        [ Tag "Foo" Function (Span (Pos 1 1) (Pos 3 13)) "def Foo(x):" (Just "\"\"\"This is the foo function\"\"\"") ]
 
     it "produces tags for classes" $ do
       (blob, tree) <- parseTestFile pythonParser (Path.relFile "test/fixtures/python/tags/class.py")
@@ -75,9 +75,9 @@ spec = do
     it "produces tags for sends" $ do
       (blob, tree) <- parseTestFile rubyParser (Path.relFile "test/fixtures/ruby/tags/simple_method.rb")
       runTagging blob ["Send"] tree `shouldBe`
-        [ Tag "puts" Send (Span (Pos 2 3) (Pos 2 12)) "puts \"hi\"" Nothing
-        , Tag "bar" Send (Span (Pos 3 3) (Pos 3 8)) "a.bar" Nothing
-        , Tag "a" Send (Span (Pos 3 3) (Pos 3 4)) "a" Nothing
+        [ Tag "puts" Call (Span (Pos 2 3) (Pos 2 12)) "puts \"hi\"" Nothing
+        , Tag "bar" Call (Span (Pos 3 3) (Pos 3 8)) "a.bar" Nothing
+        , Tag "a" Call (Span (Pos 3 3) (Pos 3 4)) "a" Nothing
         ]
 
     it "produces tags for methods with docs" $ do
@@ -88,7 +88,7 @@ spec = do
     it "produces tags for methods and classes with docs" $ do
       (blob, tree) <- parseTestFile rubyParser (Path.relFile "test/fixtures/ruby/tags/class_module.rb")
       runTagging blob symbolsToSummarize tree `shouldBe`
-        [ Tag "Foo" Module (Span (Pos 2 1 ) (Pos 12 4)) "module Foo" (Just "# Public: Foo")
+        [ Tag "Foo" Tags.Module (Span (Pos 2 1 ) (Pos 12 4)) "module Foo" (Just "# Public: Foo")
         , Tag "Bar" Class  (Span (Pos 5 3 ) (Pos 11 6)) "class Bar" (Just "# Public: Bar")
         , Tag "baz" Method (Span (Pos 8 5 ) (Pos 10 8)) "def baz(a)" (Just "# Public: baz")
         , Tag "C" Class (Span (Pos 14 1) (Pos 20 4)) "class A::B::C" Nothing
