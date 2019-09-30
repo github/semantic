@@ -4,6 +4,7 @@ module Semantic.Parse
   Parse(..)
 , parse
   -- * Parse carrier
+, ParseC(..)
 ) where
 
 import Control.Effect.Carrier
