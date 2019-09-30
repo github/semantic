@@ -1,10 +1,13 @@
-{-# LANGUAGE ExistentialQuantification #-}
+{-# LANGUAGE ExistentialQuantification, GeneralizedNewtypeDeriving #-}
 module Semantic.Parse
-( Parse(..)
+( -- * Parse effect
+  Parse(..)
 , parse
+  -- * Parse carrier
 ) where
 
 import Control.Effect.Carrier
+import Control.Monad.IO.Class
 import Data.Blob
 import Parsing.Parser
 
@@ -26,3 +29,7 @@ parse :: (Member Parse sig, Carrier sig m)
       -> Blob
       -> m term
 parse parser blob = send (Parse parser blob pure)
+
+
+newtype ParseC m a = ParseC { runParse :: m a }
+  deriving (Applicative, Functor, Monad, MonadIO)
