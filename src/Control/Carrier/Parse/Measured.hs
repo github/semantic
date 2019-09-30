@@ -1,4 +1,5 @@
 {-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, TypeOperators, UndecidableInstances #-}
+-- | A carrier for 'Parse' effects suitable for use in production.
 module Control.Carrier.Parse.Measured
 ( -- * Parse effect
   module Control.Effect.Parse
