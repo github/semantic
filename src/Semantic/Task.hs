@@ -108,12 +108,12 @@ parse :: (Member Parse sig, Carrier sig m)
       -> m term
 parse parser blob = send (Parse parser blob pure)
 
-serialize :: (Member (Reader TaskSession) sig, Carrier sig m)
+serialize :: (Member (Reader Config) sig, Carrier sig m)
           => Format input
           -> input
           -> m Builder
 serialize format input = do
-  formatStyle <- asks (Flag.choose IsTerminal Plain Colourful . configIsTerminal . config)
+  formatStyle <- asks (Flag.choose IsTerminal Plain Colourful . configIsTerminal)
   pure (runSerialize formatStyle format input)
 
 data TaskSession

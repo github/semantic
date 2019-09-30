@@ -18,6 +18,7 @@ import           Data.AST
 import           Data.Blob
 import           Parsing.Parser
 import           Rendering.JSON (renderJSONAST)
+import           Semantic.Config
 import           Semantic.Task
 import qualified Serializing.Format as F
 
@@ -36,7 +37,7 @@ astParseBlob blob@Blob{..}
 data ASTFormat = SExpression | JSON | Show | Quiet
   deriving (Show)
 
-runASTParse :: (Member Distribute sig, Member (Error SomeException) sig, Member Parse sig, Member (Reader TaskSession) sig, Carrier sig m, MonadIO m) => ASTFormat -> [Blob] -> m F.Builder
+runASTParse :: (Member Distribute sig, Member (Error SomeException) sig, Member Parse sig, Member (Reader Config) sig, Carrier sig m, MonadIO m) => ASTFormat -> [Blob] -> m F.Builder
 runASTParse SExpression = distributeFoldMap (astParseBlob >=> withSomeAST (serialize (F.SExpression F.ByShow)))
 runASTParse Show        = distributeFoldMap (astParseBlob >=> withSomeAST (serialize F.Show . fmap nodeSymbol))
 runASTParse JSON        = distributeFoldMap (\ blob -> withSomeAST (renderJSONAST blob) <$> astParseBlob blob) >=> serialize F.JSON

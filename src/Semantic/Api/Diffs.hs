@@ -35,6 +35,7 @@ import           Rendering.Graph
 import           Rendering.JSON hiding (JSON)
 import qualified Rendering.JSON
 import           Semantic.Api.Bridge
+import           Semantic.Config
 import           Semantic.Proto.SemanticPB hiding (Blob, BlobPair)
 import           Semantic.Task as Task
 import           Semantic.Telemetry as Stat
@@ -96,7 +97,7 @@ dotGraphDiff :: (DiffEffects sig m) => BlobPair -> m Builder
 dotGraphDiff blobPair = doDiff blobPair (const id) render
   where render _ = serialize (DOT (diffStyle "diffs")) . renderTreeGraph
 
-type DiffEffects sig m = (Member (Error SomeException) sig, Member (Reader TaskSession) sig, Member Telemetry sig, Member Distribute sig, Member Parse sig, Carrier sig m, MonadIO m)
+type DiffEffects sig m = (Member (Error SomeException) sig, Member (Reader Config) sig, Member (Reader TaskSession) sig, Member Telemetry sig, Member Distribute sig, Member Parse sig, Carrier sig m, MonadIO m)
 
 type CanDiff syntax = (ConstructorName syntax, Diffable syntax, Eq1 syntax, HasDeclaration syntax, Hashable1 syntax, Show1 syntax, ToJSONFields1 syntax, Traversable syntax)
 type Decorate a b = forall syntax . CanDiff syntax => Blob -> Term syntax a -> Term syntax b
