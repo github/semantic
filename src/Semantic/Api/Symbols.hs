@@ -22,6 +22,7 @@ import           Prologue
 import           Semantic.Api.Bridge
 import qualified Semantic.Api.LegacyTypes as Legacy
 import           Semantic.Api.Terms (ParseEffects, doParse)
+import           Semantic.Parse
 import           Semantic.Proto.SemanticPB hiding (Blob)
 import           Semantic.Task
 import           Serializing.Format

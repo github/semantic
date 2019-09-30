@@ -19,6 +19,7 @@ import           Data.Blob
 import           Parsing.Parser
 import           Rendering.JSON (renderJSONAST)
 import           Semantic.Config
+import           Semantic.Parse
 import           Semantic.Task
 import qualified Serializing.Format as F
 

@@ -38,6 +38,7 @@ import           Rendering.JSON hiding (JSON)
 import qualified Rendering.JSON
 import           Semantic.Api.Bridge
 import           Semantic.Config
+import           Semantic.Parse
 import           Semantic.Proto.SemanticPB hiding (Blob)
 import           Semantic.Task
 import           Serializing.Format hiding (JSON)

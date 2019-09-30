@@ -62,6 +62,7 @@ import           Language.Haskell.HsColour.Colourise
 import           Parsing.Parser
 import           Prologue hiding (TypeError (..))
 import           Semantic.Analysis
+import           Semantic.Parse
 import           Semantic.Task as Task
 import           Source.Loc as Loc
 import           Source.Span
