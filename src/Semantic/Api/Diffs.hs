@@ -14,6 +14,7 @@ module Semantic.Api.Diffs
 import           Analysis.ConstructorName (ConstructorName)
 import           Analysis.TOCSummary (HasDeclaration)
 import           Control.Effect.Error
+import           Control.Effect.Parse
 import           Control.Effect.Reader
 import           Control.Exception
 import           Control.Lens
@@ -36,7 +37,6 @@ import           Rendering.JSON hiding (JSON)
 import qualified Rendering.JSON
 import           Semantic.Api.Bridge
 import           Semantic.Config
-import           Semantic.Parse
 import           Semantic.Proto.SemanticPB hiding (Blob, BlobPair)
 import           Semantic.Task as Task
 import           Semantic.Telemetry as Stat

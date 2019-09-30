@@ -6,6 +6,7 @@ module Semantic.Api.Symbols
   ) where
 
 import           Control.Effect.Error
+import           Control.Effect.Parse
 import           Control.Effect.Reader
 import           Control.Exception
 import           Control.Lens
@@ -22,7 +23,6 @@ import           Prologue
 import           Semantic.Api.Bridge
 import qualified Semantic.Api.LegacyTypes as Legacy
 import           Semantic.Api.Terms (ParseEffects, doParse)
-import           Semantic.Parse
 import           Semantic.Proto.SemanticPB hiding (Blob)
 import           Semantic.Task
 import           Serializing.Format

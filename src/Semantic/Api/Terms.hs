@@ -16,6 +16,7 @@ module Semantic.Api.Terms
 
 import           Analysis.ConstructorName (ConstructorName)
 import           Control.Effect.Error
+import           Control.Effect.Parse
 import           Control.Effect.Reader
 import           Control.Lens
 import           Control.Monad
@@ -38,7 +39,6 @@ import           Rendering.JSON hiding (JSON)
 import qualified Rendering.JSON
 import           Semantic.Api.Bridge
 import           Semantic.Config
-import           Semantic.Parse
 import           Semantic.Proto.SemanticPB hiding (Blob)
 import           Semantic.Task
 import           Serializing.Format hiding (JSON)
