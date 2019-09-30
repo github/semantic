@@ -31,14 +31,14 @@ import qualified TreeSitter.Python.AST as Py
 import           TreeSitter.Span (Span)
 import qualified TreeSitter.Span as TreeSitter
 
--- Access to the current filename as Text to stick into location annotations.
+-- | Access to the current filename as Text to stick into location annotations.
 newtype SourcePath = SourcePath { rawPath :: Text }
   deriving stock (Eq, Show)
   deriving newtype IsString
 
--- Keeps track of the current scope's bindings (so that we can, when
--- compiling a class or module, return the list of bound variables
--- as a Core record so that all immediate definitions are exposed)
+-- | Keeps track of the current scope's bindings (so that we can, when
+-- compiling a class or module, return the list of bound variables as
+-- a Core record so that all immediate definitions are exposed)
 newtype Bindings = Bindings { unBindings :: Stack Name }
   deriving stock (Eq, Show)
   deriving newtype (Semigroup, Monoid)
