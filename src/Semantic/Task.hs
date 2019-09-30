@@ -120,11 +120,13 @@ diff :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax, Memb
      -> m (Diff syntax ann ann)
 diff terms = send (Semantic.Task.Diff terms pure)
 
-serialize :: (Member Task sig, Carrier sig m)
+serialize :: (Member (Reader TaskSession) sig, Carrier sig m)
           => Format input
           -> input
           -> m Builder
-serialize format input = send (Serialize format input pure)
+serialize format input = do
+  formatStyle <- asks (Flag.choose IsTerminal Plain Colourful . configIsTerminal . config)
+  pure (runSerialize formatStyle format input)
 
 data TaskSession
   = TaskSession
@@ -213,17 +215,14 @@ instance ( Carrier sig m
 -- | An effect describing high-level tasks to be performed.
 data Task (m :: * -> *) k
   = forall syntax ann . (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => Diff (These (Term syntax ann) (Term syntax ann)) (Diff syntax ann ann -> m k)
-  | forall input . Serialize (Format input) input (Builder -> m k)
 
 deriving instance Functor m => Functor (Task m)
 
 instance HFunctor Task where
   hmap f (Semantic.Task.Diff terms k) = Semantic.Task.Diff terms (f . k)
-  hmap f (Serialize format input k)   = Serialize format input (f . k)
 
 instance Effect Task where
   handle state handler (Semantic.Task.Diff terms k) = Semantic.Task.Diff terms (handler . (<$ state) . k)
-  handle state handler (Serialize format input k)   = Serialize format input (handler . (<$ state) . k)
 
 -- | Run a 'Task' effect by performing the actions in 'IO'.
 runTaskF :: TaskC m a -> m a
@@ -232,13 +231,10 @@ runTaskF = runTaskC
 newtype TaskC m a = TaskC { runTaskC :: m a }
   deriving (Applicative, Functor, Monad, MonadIO)
 
-instance (Member (Error SomeException) sig, Member (Reader TaskSession) sig, Member Resource sig, Member Telemetry sig, Member Timeout sig, Member Trace sig, Carrier sig m, MonadIO m) => Carrier (Task :+: sig) (TaskC m) where
+instance (Carrier sig m, MonadIO m) => Carrier (Task :+: sig) (TaskC m) where
   eff (R other) = TaskC . eff . handleCoercible $ other
   eff (L op) = case op of
     Semantic.Task.Diff terms k -> k (diffTermPair terms)
-    Serialize format input k -> do
-      formatStyle <- asks (Flag.choose IsTerminal Plain Colourful . configIsTerminal . config)
-      k (runSerialize formatStyle format input)
 
 
 -- | Log an 'Error.Error' at the specified 'Level'.

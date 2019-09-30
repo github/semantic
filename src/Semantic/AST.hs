@@ -13,6 +13,7 @@ import Data.ByteString.Builder
 import Data.List (intersperse)
 
 import           Control.Effect.Error
+import           Control.Effect.Reader
 import           Data.AST
 import           Data.Blob
 import           Parsing.Parser
@@ -35,7 +36,7 @@ astParseBlob blob@Blob{..}
 data ASTFormat = SExpression | JSON | Show | Quiet
   deriving (Show)
 
-runASTParse :: (Member Distribute sig, Member (Error SomeException) sig, Member Parse sig, Member Task sig, Carrier sig m, MonadIO m) => ASTFormat -> [Blob] -> m F.Builder
+runASTParse :: (Member Distribute sig, Member (Error SomeException) sig, Member Parse sig, Member (Reader TaskSession) sig, Carrier sig m, MonadIO m) => ASTFormat -> [Blob] -> m F.Builder
 runASTParse SExpression = distributeFoldMap (astParseBlob >=> withSomeAST (serialize (F.SExpression F.ByShow)))
 runASTParse Show        = distributeFoldMap (astParseBlob >=> withSomeAST (serialize F.Show . fmap nodeSymbol))
 runASTParse JSON        = distributeFoldMap (\ blob -> withSomeAST (renderJSONAST blob) <$> astParseBlob blob) >=> serialize F.JSON

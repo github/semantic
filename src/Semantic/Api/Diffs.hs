@@ -14,6 +14,7 @@ module Semantic.Api.Diffs
 import           Analysis.ConstructorName (ConstructorName)
 import           Analysis.TOCSummary (HasDeclaration)
 import           Control.Effect.Error
+import           Control.Effect.Reader
 import           Control.Exception
 import           Control.Lens
 import           Control.Monad.IO.Class
@@ -94,7 +95,7 @@ dotGraphDiff :: (DiffEffects sig m) => BlobPair -> m Builder
 dotGraphDiff blobPair = doDiff blobPair (const id) render
   where render _ = serialize (DOT (diffStyle "diffs")) . renderTreeGraph
 
-type DiffEffects sig m = (Member (Error SomeException) sig, Member Telemetry sig, Member Distribute sig, Member Parse sig, Member Task sig, Carrier sig m, MonadIO m)
+type DiffEffects sig m = (Member (Error SomeException) sig, Member (Reader TaskSession) sig, Member Telemetry sig, Member Distribute sig, Member Parse sig, Member Task sig, Carrier sig m, MonadIO m)
 
 type CanDiff syntax = (ConstructorName syntax, Diffable syntax, Eq1 syntax, HasDeclaration syntax, Hashable1 syntax, Show1 syntax, ToJSONFields1 syntax, Traversable syntax)
 type Decorate a b = forall syntax . CanDiff syntax => Blob -> Term syntax a -> Term syntax b
