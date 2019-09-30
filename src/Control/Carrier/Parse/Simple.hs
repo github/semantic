@@ -15,7 +15,6 @@ import           Control.Effect.Error
 import           Control.Effect.Carrier
 import           Control.Effect.Parse
 import           Control.Effect.Reader
-import           Control.Effect.Trace
 import           Control.Exception
 import           Control.Monad.IO.Class
 import           Data.Blob
@@ -23,7 +22,6 @@ import           Data.Typeable
 import           Parsing.CMark
 import           Parsing.Parser
 import           Parsing.TreeSitter
-import           Prologue hiding (project)
 
 runParse :: Duration -> ParseC m a -> m a
 runParse timeout = runReader timeout . runParseC
@@ -33,7 +31,6 @@ newtype ParseC m a = ParseC { runParseC :: ReaderC Duration m a }
 
 instance ( Carrier sig m
          , Member (Error SomeException) sig
-         , Member Trace sig
          , MonadIO m
          )
       => Carrier (Parse :+: sig) (ParseC m) where
@@ -44,7 +41,6 @@ instance ( Carrier sig m
 runParser
   :: ( Carrier sig m
      , Member (Error SomeException) sig
-     , Member Trace sig
      , MonadIO m
      )
   => Duration
@@ -54,11 +50,11 @@ runParser
 runParser timeout blob@Blob{..} parser = case parser of
   ASTParser language ->
     parseToAST timeout language blob
-      >>= either (trace >=> const (throwError (SomeException ParserTimedOut))) pure
+      >>= either (const (throwError (SomeException ParserTimedOut))) pure
 
   UnmarshalParser language ->
     parseToPreciseAST timeout language blob
-      >>= either (trace >=> const (throwError (SomeException ParserTimedOut))) pure
+      >>= either (const (throwError (SomeException ParserTimedOut))) pure
 
   AssignmentParser    parser assignment ->
     runParser timeout blob parser >>= either (throwError . toException) pure . Assignment.assign    blobSource assignment
