@@ -55,27 +55,23 @@ runParser :: (Member (Error SomeException) sig, Member (Reader TaskSession) sig,
           -> Parser term
           -> m term
 runParser blob@Blob{..} parser = case parser of
-  ASTParser language ->
-    time "parse.tree_sitter_ast_parse" languageTag $ do
-      config <- asks config
-      parseToAST (configTreeSitterParseTimeout config) language blob
-        >>= maybeM (throwError (SomeException ParserTimedOut))
+  ASTParser language -> do
+    config <- asks config
+    parseToAST (configTreeSitterParseTimeout config) language blob
+      >>= maybeM (throwError (SomeException ParserTimedOut))
 
-  UnmarshalParser language ->
-    time "parse.tree_sitter_ast_parse" languageTag $ do
-      config <- asks config
-      parseToPreciseAST (configTreeSitterParseTimeout config) language blob
-        >>= maybeM (throwError (SomeException ParserTimedOut))
+  UnmarshalParser language -> do
+    config <- asks config
+    parseToPreciseAST (configTreeSitterParseTimeout config) language blob
+      >>= maybeM (throwError (SomeException ParserTimedOut))
 
   AssignmentParser    parser assignment -> runAssignment Assignment.assign    parser blob assignment
   DeterministicParser parser assignment -> runAssignment Deterministic.assign parser blob assignment
 
   MarkdownParser ->
-    time "parse.cmark_parse" languageTag $
-      let term = cmarkParser blobSource
-      in length term `seq` pure term
+    let term = cmarkParser blobSource
+    in length term `seq` pure term
   SomeParser parser -> SomeTerm <$> runParser blob parser
-  where languageTag = [("language" :: String, show (blobLanguage blob))]
 
 data ParserCancelled = ParserTimedOut | AssignmentTimedOut
   deriving (Show, Typeable)
