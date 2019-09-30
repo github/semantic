@@ -161,7 +161,7 @@ desugar acc = \case
   Right (Right any) -> pure (acc, any)
   other -> fail ("desugar: couldn't desugar RHS " <> show other)
 
--- This is a fold function that is invoked from a left fold but that
+-- This is an algebra that is invoked from a left fold but that
 -- returns a function (the 'difference' pattern) so that we can pass
 -- information about what RHS we need down the chain: unlike most fold
 -- functions, it has four parameters, not three (since our fold
