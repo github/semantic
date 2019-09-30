@@ -22,7 +22,6 @@ import Data.Char
 import Data.Either            (fromRight)
 import Data.Text              as Text
 import Shelly                 hiding (FilePath)
-import System.IO              (hSetBinaryMode)
 
 -- | git clone --bare
 clone :: Text -> FilePath -> IO ()
@@ -39,7 +38,7 @@ lsTree :: FilePath -> OID -> IO [TreeEntry]
 lsTree gitDir (OID sha) = sh $ parseEntries <$> run "git" ["-C", pack gitDir, "ls-tree", "-rz", sha]
 
 sh :: MonadIO m => Sh a -> m a
-sh = shelly . silently . onCommandHandles (initOutputHandles (`hSetBinaryMode` True))
+sh = shelly . silently
 
 -- | Parses an list of entries separated by \NUL, and on failure return []
 parseEntries :: Text -> [TreeEntry]
