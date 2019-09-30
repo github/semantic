@@ -2,14 +2,15 @@
 module Parsing.TreeSitter
 ( Duration(..)
 , parseToAST
+, parseToPreciseAST
 ) where
 
-import Prologue hiding (bracket)
+import Prologue
 
-import           Control.Effect.Resource
+import           Control.Effect.Fail
+import           Control.Effect.Lift
+import           Control.Effect.Reader
 import           Control.Effect.Trace
-import qualified Control.Exception as Exc (bracket)
-import           Data.ByteString.Unsafe (unsafeUseAsCStringLen)
 import           Foreign
 import           Foreign.C.Types (CBool (..))
 import           Foreign.Marshal.Array (allocaArray)
@@ -19,45 +20,21 @@ import           Data.Blob
 import           Data.Duration
 import           Data.Term
 import           Source.Loc
-import           Source.Source (Source)
 import qualified Source.Source as Source
 import           Source.Span
 
+import qualified TreeSitter.Cursor as TS
 import qualified TreeSitter.Language as TS
 import qualified TreeSitter.Node as TS
 import qualified TreeSitter.Parser as TS
 import qualified TreeSitter.Tree as TS
+import qualified TreeSitter.Unmarshal as TS
 
-data Result grammar
-  = Failed
-  | Succeeded (AST [] grammar)
-
-runParser :: (Enum grammar, Bounded grammar) => Ptr TS.Parser -> Source -> IO (Result grammar)
-runParser parser blobSource  = unsafeUseAsCStringLen (Source.bytes blobSource) $ \ (source, len) -> do
-    alloca (\ rootPtr -> do
-      let acquire = do
-            -- Change this to TS.ts_parser_loop_until_cancelled if you want to test out cancellation
-            TS.ts_parser_parse_string parser nullPtr source len
-
-      let release t
-            | t == nullPtr = pure ()
-            | otherwise = TS.ts_tree_delete t
-
-      let go treePtr = do
-            if treePtr == nullPtr
-              then pure Failed
-              else do
-                TS.ts_tree_root_node_p treePtr rootPtr
-                ptr <- peek rootPtr
-                Succeeded <$> anaM toAST ptr
-      Exc.bracket acquire release go)
-
--- | Parse 'Source' with the given 'TS.Language' and return its AST.
--- Returns Nothing if the operation timed out.
+-- | Parse a 'Blob' with the given 'TS.Language' and return its AST.
+-- Returns 'Nothing' if the operation timed out.
 parseToAST :: ( Bounded grammar
               , Carrier sig m
               , Enum grammar
-              , Member Resource sig
               , Member Trace sig
               , MonadIO m
               )
@@ -65,19 +42,49 @@ parseToAST :: ( Bounded grammar
            -> Ptr TS.Language
            -> Blob
            -> m (Maybe (AST [] grammar))
-parseToAST parseTimeout language b@Blob{..} = bracket (liftIO TS.ts_parser_new) (liftIO . TS.ts_parser_delete) $ \ parser -> do
-  compatible <- liftIO $ do
+parseToAST parseTimeout language blob = runParse parseTimeout language blob (fmap Right . anaM toAST <=< peek)
+
+parseToPreciseAST
+  :: ( Carrier sig m
+     , Member Trace sig
+     , MonadIO m
+     , TS.Unmarshal t
+     )
+  => Duration
+  -> Ptr TS.Language
+  -> Blob
+  -> m (Maybe (t Loc))
+parseToPreciseAST parseTimeout language blob = runParse parseTimeout language blob $ \ rootPtr ->
+  TS.withCursor (castPtr rootPtr) $ \ cursor ->
+    runM (runFail (runReader cursor (runReader (Source.bytes (blobSource blob)) (TS.peekNode >>= TS.unmarshalNode))))
+
+runParse
+  :: ( Carrier sig m
+     , Member Trace sig
+     , MonadIO m
+     )
+  => Duration
+  -> Ptr TS.Language
+  -> Blob
+  -> (Ptr TS.Node -> IO (Either String a))
+  -> m (Maybe a)
+runParse parseTimeout language b@Blob{..} action = do
+  result <- liftIO . TS.withParser language $ \ parser -> do
     let timeoutMicros = fromIntegral $ toMicroseconds parseTimeout
     TS.ts_parser_set_timeout_micros parser timeoutMicros
     TS.ts_parser_halt_on_error parser (CBool 1)
-    TS.ts_parser_set_language parser language
-  result <- if compatible then
-    liftIO $ runParser parser blobSource
-  else
-    Failed <$ trace "tree-sitter: incompatible versions"
+    compatible <- TS.ts_parser_set_language parser language
+    if compatible then
+      TS.withParseTree parser (Source.bytes blobSource) $ \ treePtr -> do
+        if treePtr == nullPtr then
+          pure (Left "tree-sitter: null root node")
+        else
+          TS.withRootNode treePtr action
+    else
+      pure (Left "tree-sitter: incompatible versions")
   case result of
-    Failed          -> Nothing  <$ trace ("tree-sitter: parsing failed " <> blobPath b)
-    (Succeeded ast) -> Just ast <$ trace ("tree-sitter: parsing succeeded " <> blobPath b)
+    Left  err -> Nothing  <$ trace err <* trace ("tree-sitter: parsing failed " <> blobPath b)
+    Right ast -> Just ast <$ trace ("tree-sitter: parsing succeeded " <> blobPath b)
 
 toAST :: forall grammar . (Bounded grammar, Enum grammar) => TS.Node -> IO (Base (AST [] grammar) TS.Node)
 toAST node@TS.Node{..} = do

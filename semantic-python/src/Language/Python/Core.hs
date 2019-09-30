@@ -14,7 +14,6 @@ import Prelude hiding (fail)
 import           Control.Effect hiding ((:+:))
 import           Control.Effect.Reader
 import           Control.Monad.Fail
-import           Data.Bifunctor
 import           Data.Coerce
 import           Data.Core as Core
 import           Data.Foldable
@@ -27,9 +26,9 @@ import           Data.String (IsString)
 import           Data.Text (Text)
 import           GHC.Generics
 import           GHC.Records
+import           Source.Span (Span)
+import qualified Source.Span as Source
 import qualified TreeSitter.Python.AST as Py
-import           TreeSitter.Span (Span)
-import qualified TreeSitter.Span as TreeSitter
 
 -- | Access to the current filename as Text to stick into location annotations.
 newtype SourcePath = SourcePath { rawPath :: Text }
@@ -97,8 +96,8 @@ compile :: ( Compile py
         => py -> m (t Name)
 compile t = compileCC t (pure none)
 
-locFromTSSpan :: SourcePath -> TreeSitter.Span -> Loc
-locFromTSSpan fp (TreeSitter.Span (TreeSitter.Pos a b) (TreeSitter.Pos c d))
+locFromTSSpan :: SourcePath -> Source.Span -> Loc
+locFromTSSpan fp (Source.Span (Source.Pos a b) (Source.Pos c d))
   = Data.Loc.Loc (rawPath fp) (Data.Loc.Span (Data.Loc.Pos a b) (Data.Loc.Pos c d))
 
 locate :: ( HasField "ann" syntax Span
@@ -118,7 +117,7 @@ newtype CompileSum py = CompileSum py
 instance (Generic py, GCompileSum (Rep py)) => Compile (CompileSum py) where
   compileCC (CompileSum a) cc = gcompileCCSum (from a) cc
 
-deriving via CompileSum (Either l r) instance (Compile l, Compile r) => Compile (Either l r)
+deriving via CompileSum ((l :+: r) Span) instance (Compile (l Span), Compile (r Span)) => Compile ((l :+: r) Span)
 
 instance Compile (Py.AssertStatement Span)
 instance Compile (Py.Attribute Span)
@@ -139,8 +138,8 @@ instance Compile (Py.Attribute Span)
 -- RHS represents the right-hand-side of an assignment that we get out of tree-sitter.
 -- Desugared is the "terminal" node in a sequence of assignments, i.e. given a = b = c,
 -- c will be the terminal node. It is never an assignment.
-type RHS a = Either (Py.Assignment a) (Either (Py.AugmentedAssignment a) (Desugared a))
-type Desugared a = Either (Py.ExpressionList a) (Py.Yield a)
+type RHS = Py.Assignment :+: Py.AugmentedAssignment :+: Desugared
+type Desugared = Py.ExpressionList :+: Py.Yield
 
 -- We have to pair locations and names, and tuple syntax is harder to
 -- read in this case than a happy little constructor.
@@ -154,11 +153,11 @@ desugar :: (Member (Reader SourcePath) sig, Carrier sig m, MonadFail m)
         -> RHS Span
         -> m ([Located Name], Desugared Span)
 desugar acc = \case
-  Left Py.Assignment { left = SingleIdentifier name, right = Just rhs, ann} -> do
+  L1 Py.Assignment { left = SingleIdentifier name, right = Just rhs, ann} -> do
     loc <- locFromTSSpan <$> ask <*> pure ann
     let cons = (Located loc name :)
     desugar (cons acc) rhs
-  Right (Right any) -> pure (acc, any)
+  R1 (R1 any) -> pure (acc, any)
   other -> fail ("desugar: couldn't desugar RHS " <> show other)
 
 -- This is an algebra that is invoked from a left fold but that
@@ -267,8 +266,8 @@ instance Compile (Py.Identifier Span) where
 instance Compile (Py.IfStatement Span) where
   compileCC it@Py.IfStatement{ condition, consequence, alternative} cc =
     locate it =<< (if' <$> compile condition <*> compileCC consequence cc <*> foldr clause cc alternative)
-    where clause (Right Py.ElseClause{ body }) _ = compileCC body cc
-          clause (Left  Py.ElifClause{ condition, consequence }) rest  =
+    where clause (R1 Py.ElseClause{ body }) _ = compileCC body cc
+          clause (L1 Py.ElifClause{ condition, consequence }) rest  =
             if' <$> compile condition <*> compileCC consequence cc <*> rest
 
 
