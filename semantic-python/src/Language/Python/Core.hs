@@ -46,12 +46,12 @@ newtype Bindings = Bindings { unBindings :: Stack Name }
 def :: Name -> Bindings -> Bindings
 def n = coerce (Stack.:> n)
 
--- Useful pattern synonym for extracting a single identifier from
+-- | Useful pattern synonym for extracting a single identifier from
 -- a Python ExpressionList. Easier than pattern-matching every time.
 -- TODO: when this is finished, we won't need this pattern, as we'll
 -- handle ExpressionLists the smart way every time.
-pattern OneExpression :: Name -> Py.ExpressionList a
-pattern OneExpression name <- Py.ExpressionList
+pattern SingleIdentifier :: Name -> Py.ExpressionList a
+pattern SingleIdentifier name <- Py.ExpressionList
   { Py.extraChildren =
     [ Py.PrimaryExpressionExpression (Py.IdentifierPrimaryExpression (Py.Identifier { bytes = name }))
     ]
@@ -125,7 +125,7 @@ instance Compile (Py.Attribute Span)
 
 -- Assignment compilation. Assignments are an uneasy hybrid of expressions
 -- (since they appear to have values, i.e. `a = b = c`) and statements (because
--- they introduce bindings. For that reason, they deserve special attention.
+-- they introduce bindings). For that reason, they deserve special attention.
 --
 -- The correct desugaring for the expression above looks like, given a continuation @cont@:
 -- @
@@ -154,7 +154,7 @@ desugar :: (Member (Reader SourcePath) sig, Carrier sig m, MonadFail m)
         -> RHS Span
         -> m ([Located Name], Desugared Span)
 desugar acc = \case
-  Left Py.Assignment { left = OneExpression name, right = Just rhs, ann} -> do
+  Left Py.Assignment { left = SingleIdentifier name, right = Just rhs, ann} -> do
     loc <- locFromTSSpan <$> ask <*> pure ann
     let cons = (Located loc name :)
     desugar (cons acc) rhs
@@ -179,7 +179,7 @@ collapseDesugared (Located loc n) cont rem =
 
 instance Compile (Py.Assignment Span) where
   compileCC it@Py.Assignment
-    { left = OneExpression name
+    { left = SingleIdentifier name
     , right = Just rhs
     , ann
     } cc = do
