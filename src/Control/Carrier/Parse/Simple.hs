@@ -19,15 +19,11 @@ import           Control.Effect.Trace
 import           Control.Exception
 import           Control.Monad.IO.Class
 import           Data.Blob
-import qualified Data.Error as Error
-import           Data.Sum
-import           Data.Term
 import           Data.Typeable
 import           Parsing.CMark
 import           Parsing.Parser
 import           Parsing.TreeSitter
 import           Prologue hiding (project)
-import           Source.Source (Source)
 
 runParse :: Duration -> ParseC m a -> m a
 runParse timeout = runReader timeout . runParseC
@@ -64,8 +60,10 @@ runParser timeout blob@Blob{..} parser = case parser of
     parseToPreciseAST timeout language blob
       >>= maybeM (throwError (SomeException ParserTimedOut))
 
-  AssignmentParser    parser assignment -> runAssignment Assignment.assign    parser timeout blob assignment
-  DeterministicParser parser assignment -> runAssignment Deterministic.assign parser timeout blob assignment
+  AssignmentParser    parser assignment ->
+    runParser timeout blob parser >>= either (throwError . toException) pure . Assignment.assign    blobSource assignment
+  DeterministicParser parser assignment ->
+    runParser timeout blob parser >>= either (throwError . toException) pure . Deterministic.assign blobSource assignment
 
   MarkdownParser ->
     let term = cmarkParser blobSource
@@ -76,20 +74,3 @@ data ParserCancelled = ParserTimedOut
   deriving (Show, Typeable)
 
 instance Exception ParserCancelled
-
-
-runAssignment
-  :: ( Member (Error SomeException) sig
-     , Member Trace sig
-     , Carrier sig m
-     , MonadIO m
-     )
-  => (Source -> assignment (Term (Sum syntaxes) Assignment.Loc) -> ast -> Either (Error.Error String) (Term (Sum syntaxes) Assignment.Loc))
-  -> Parser ast
-  -> Duration
-  -> Blob
-  -> assignment (Term (Sum syntaxes) Assignment.Loc)
-  -> m (Term (Sum syntaxes) Assignment.Loc)
-runAssignment assign parser timeout blob@Blob{..} assignment = do
-  ast <- runParser timeout blob parser
-  either (throwError . toException) pure (assign blobSource assignment ast)
