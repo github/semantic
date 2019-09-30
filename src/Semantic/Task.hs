@@ -227,7 +227,7 @@ runTaskF = runTaskC
 newtype TaskC m a = TaskC { runTaskC :: m a }
   deriving (Applicative, Functor, Monad, MonadIO)
 
-instance (Member (Error SomeException) sig, Member (Lift IO) sig, Member (Reader TaskSession) sig, Member Resource sig, Member Telemetry sig, Member Timeout sig, Member Trace sig, Carrier sig m, MonadIO m) => Carrier (Task :+: sig) (TaskC m) where
+instance (Member (Error SomeException) sig, Member (Reader TaskSession) sig, Member Resource sig, Member Telemetry sig, Member Timeout sig, Member Trace sig, Carrier sig m, MonadIO m) => Carrier (Task :+: sig) (TaskC m) where
   eff (R other) = TaskC . eff . handleCoercible $ other
   eff (L op) = case op of
     Parse parser blob k -> runParser blob parser >>= k
@@ -258,7 +258,7 @@ data ParserCancelled = ParserTimedOut | AssignmentTimedOut
 instance Exception ParserCancelled
 
 -- | Parse a 'Blob' in 'IO'.
-runParser :: (Member (Error SomeException) sig, Member (Lift IO) sig, Member (Reader TaskSession) sig, Member Resource sig, Member Telemetry sig, Member Timeout sig, Member Trace sig, Carrier sig m, MonadIO m)
+runParser :: (Member (Error SomeException) sig, Member (Reader TaskSession) sig, Member Resource sig, Member Telemetry sig, Member Timeout sig, Member Trace sig, Carrier sig m, MonadIO m)
           => Blob
           -> Parser term
           -> m term
@@ -292,7 +292,6 @@ runParser blob@Blob{..} parser = case parser of
                          , Apply Functor syntaxes
                          , Element Syntax.Error syntaxes
                          , Member (Error SomeException) sig
-                         , Member (Lift IO) sig
                          , Member (Reader TaskSession) sig
                          , Member Resource sig
                          , Member Telemetry sig
