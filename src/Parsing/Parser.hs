@@ -8,7 +8,6 @@ module Parsing.Parser
 , someASTParser
 , someAnalysisParser
 , ApplyAll
-, ApplyAll'
 -- À la carte parsers
 , goParser
 , goASTParser
@@ -24,6 +23,8 @@ module Parsing.Parser
 , phpParser
 , phpASTParser
 , haskellParser
+  -- Precise parsers
+, precisePythonParser
 ) where
 
 import           Assigning.Assignment
@@ -43,10 +44,12 @@ import qualified Language.Haskell.Assignment as Haskell
 import qualified Language.JSON.Assignment as JSON
 import qualified Language.Markdown.Assignment as Markdown
 import qualified Language.PHP.Assignment as PHP
+import qualified Language.Python as Py
 import qualified Language.Python.Assignment as Python
 import qualified Language.Ruby.Assignment as Ruby
 import qualified Language.TSX.Assignment as TSX
 import qualified Language.TypeScript.Assignment as TypeScript
+import           Prelude hiding (fail)
 import           Prologue
 import           TreeSitter.Go
 import           TreeSitter.Haskell
@@ -54,20 +57,16 @@ import           TreeSitter.JSON
 import qualified TreeSitter.Language as TS (Language, Symbol)
 import           TreeSitter.PHP
 import           TreeSitter.Python
-import           TreeSitter.Ruby
+import           TreeSitter.Ruby (tree_sitter_ruby)
 import           TreeSitter.TSX
 import           TreeSitter.TypeScript
+import           TreeSitter.Unmarshal
 
-
-type family ApplyAll' (typeclasses :: [(* -> *) -> Constraint]) (fs :: [* -> *]) :: Constraint where
-  ApplyAll' (typeclass ': typeclasses) fs = (Apply typeclass fs, ApplyAll' typeclasses fs)
-  ApplyAll' '[] fs = ()
 
 -- | A parser, suitable for program analysis, for some specific language, producing 'Term's whose syntax satisfies a list of typeclass constraints.
 data SomeAnalysisParser typeclasses ann where
-  SomeAnalysisParser :: ( ApplyAll' typeclasses fs
+  SomeAnalysisParser :: ( ApplyAll typeclasses (Sum fs)
                         , Apply (VertexDeclaration' (Sum fs)) fs
-                        , Element Syntax.Identifier fs
                         , HasPrelude lang
                         )
                      => Parser (Term (Sum fs) ann)
@@ -75,24 +74,24 @@ data SomeAnalysisParser typeclasses ann where
                      -> SomeAnalysisParser typeclasses ann
 
 -- | A parser for some specific language, producing 'Term's whose syntax satisfies a list of typeclass constraints.
-someAnalysisParser :: ( ApplyAll' typeclasses Go.Syntax
-                      , ApplyAll' typeclasses PHP.Syntax
-                      , ApplyAll' typeclasses Python.Syntax
-                      , ApplyAll' typeclasses Ruby.Syntax
-                      , ApplyAll' typeclasses TypeScript.Syntax
-                      , ApplyAll' typeclasses Haskell.Syntax
+someAnalysisParser :: ( ApplyAll typeclasses (Sum Go.Syntax)
+                      , ApplyAll typeclasses (Sum PHP.Syntax)
+                      , ApplyAll typeclasses (Sum Python.Syntax)
+                      , ApplyAll typeclasses (Sum Ruby.Syntax)
+                      , ApplyAll typeclasses (Sum TypeScript.Syntax)
+                      , ApplyAll typeclasses (Sum Haskell.Syntax)
                       )
-                   => proxy typeclasses                       -- ^ A proxy for the list of typeclasses required, e.g. @(Proxy :: Proxy '[Show1])@.
-                   -> Language                                -- ^ The 'Language' to select.
+                   => proxy typeclasses                  -- ^ A proxy for the list of typeclasses required, e.g. @(Proxy :: Proxy '[Show1])@.
+                   -> Language                           -- ^ The 'Language' to select.
                    -> SomeAnalysisParser typeclasses Loc -- ^ A 'SomeAnalysisParser' abstracting the syntax type to be produced.
-someAnalysisParser _ Go         = SomeAnalysisParser goParser         (Proxy :: Proxy 'Go)
-someAnalysisParser _ Haskell    = SomeAnalysisParser haskellParser    (Proxy :: Proxy 'Haskell)
-someAnalysisParser _ JavaScript = SomeAnalysisParser typescriptParser (Proxy :: Proxy 'JavaScript)
-someAnalysisParser _ PHP        = SomeAnalysisParser phpParser        (Proxy :: Proxy 'PHP)
-someAnalysisParser _ Python     = SomeAnalysisParser pythonParser     (Proxy :: Proxy 'Python)
-someAnalysisParser _ Ruby       = SomeAnalysisParser rubyParser       (Proxy :: Proxy 'Ruby)
-someAnalysisParser _ TypeScript = SomeAnalysisParser typescriptParser (Proxy :: Proxy 'TypeScript)
-someAnalysisParser _ TSX        = SomeAnalysisParser typescriptParser (Proxy :: Proxy 'TSX)
+someAnalysisParser _ Go         = SomeAnalysisParser goParser         (Proxy @'Go)
+someAnalysisParser _ Haskell    = SomeAnalysisParser haskellParser    (Proxy @'Haskell)
+someAnalysisParser _ JavaScript = SomeAnalysisParser typescriptParser (Proxy @'JavaScript)
+someAnalysisParser _ PHP        = SomeAnalysisParser phpParser        (Proxy @'PHP)
+someAnalysisParser _ Python     = SomeAnalysisParser pythonParser     (Proxy @'Python)
+someAnalysisParser _ Ruby       = SomeAnalysisParser rubyParser       (Proxy @'Ruby)
+someAnalysisParser _ TypeScript = SomeAnalysisParser typescriptParser (Proxy @'TypeScript)
+someAnalysisParser _ TSX        = SomeAnalysisParser typescriptParser (Proxy @'TSX)
 someAnalysisParser _ l          = error $ "Analysis not supported for: " <> show l
 
 
@@ -100,6 +99,8 @@ someAnalysisParser _ l          = error $ "Analysis not supported for: " <> show
 data Parser term where
   -- | A parser producing 'AST' using a 'TS.Language'.
   ASTParser :: (Bounded grammar, Enum grammar, Show grammar) => Ptr TS.Language -> Parser (AST [] grammar)
+  -- | A parser 'Unmarshal'ing to a precise AST type using a 'TS.Language'.
+  UnmarshalParser :: Unmarshal t => Ptr TS.Language -> Parser (t Loc)
   -- | A parser producing an à la carte term given an 'AST'-producing parser and an 'Assignment' onto 'Term's in some syntax type.
   AssignmentParser :: (Enum grammar, Ix grammar, Show grammar, TS.Symbol grammar, Syntax.Error :< fs, Eq1 ast, Apply Foldable fs, Apply Functor fs, Foldable ast, Functor ast)
                    => Parser (Term ast (Node grammar))           -- ^ A parser producing AST.
@@ -161,6 +162,10 @@ haskellParser = AssignmentParser (ASTParser tree_sitter_haskell) Haskell.assignm
 
 markdownParser :: Parser Markdown.Term
 markdownParser = AssignmentParser MarkdownParser Markdown.assignment
+
+
+precisePythonParser :: Parser (Py.Term Loc)
+precisePythonParser = UnmarshalParser tree_sitter_python
 
 
 data SomeTerm typeclasses ann where

@@ -1,13 +1,13 @@
 {-# LANGUAGE ApplicativeDo #-}
 module Semantic.CLI (main) where
 
+import           Control.Effect.Reader
 import           Control.Exception as Exc (displayException)
 import           Data.Blob
 import           Data.Blob.IO
 import           Data.Handle
 import qualified Data.Language as Language
-import           Data.List (intercalate, uncons)
-import           Data.List.Split (splitWhen)
+import           Data.List (intercalate)
 import           Data.Project
 import qualified Data.Text as T
 import qualified Data.Flag as Flag
@@ -102,15 +102,39 @@ parseCommand :: Mod CommandFields (Task.TaskEff Builder)
 parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate parse trees for path(s)"))
   where
     parseArgumentsParser = do
-      renderer <- flag  (parseTermBuilder TermSExpression) (parseTermBuilder TermSExpression) (long "sexpression" <> help "Output s-expression parse trees (default)")
-              <|> flag'                                    (parseTermBuilder TermJSONTree)    (long "json"        <> help "Output JSON parse trees")
-              <|> flag'                                    (parseTermBuilder TermJSONGraph)   (long "json-graph"  <> help "Output JSON adjacency list")
-              <|> flag'                                    (parseSymbolsBuilder JSON)         (long "symbols"       <> help "Output JSON symbol list")
-              <|> flag'                                    (parseSymbolsBuilder JSON)         (long "json-symbols"  <> help "Output JSON symbol list")
-              <|> flag'                                    (parseSymbolsBuilder Proto)        (long "proto-symbols" <> help "Output JSON symbol list")
-              <|> flag'                                    (parseTermBuilder TermDotGraph)    (long "dot"         <> help "Output DOT graph parse trees")
-              <|> flag'                                    (parseTermBuilder TermShow)        (long "show"        <> help "Output using the Show instance (debug only, format subject to change without notice)")
-              <|> flag'                                    (parseTermBuilder TermQuiet)       (long "quiet"       <> help "Don't produce output, but show timing stats")
+      languageModes <- Language.PerLanguageModes
+        <$> option auto (  long "python-mode"
+                        <> help "The AST representation to use for Python sources"
+                        <> metavar "ALaCarte|Precise"
+                        <> value Language.ALaCarte
+                        <> showDefault)
+      renderer
+        <-  flag  (parseTermBuilder TermSExpression)
+                  (parseTermBuilder TermSExpression)
+                  (  long "sexpression"
+                  <> help "Output s-expression parse trees (default)")
+        <|> flag' (parseTermBuilder TermJSONTree)
+                  (  long "json"
+                  <> help "Output JSON parse trees")
+        <|> flag' (parseTermBuilder TermJSONGraph)
+                  (  long "json-graph"
+                  <> help "Output JSON adjacency list")
+        <|> flag' (parseSymbolsBuilder JSON)
+                  (  long "symbols"
+                  <> long "json-symbols"
+                  <> help "Output JSON symbol list")
+        <|> flag' (parseSymbolsBuilder Proto)
+                  (  long "proto-symbols"
+                  <> help "Output protobufs symbol list")
+        <|> flag' (parseTermBuilder TermDotGraph)
+                  (  long "dot"
+                  <> help "Output DOT graph parse trees")
+        <|> flag' (parseTermBuilder TermShow)
+                  (  long "show"
+                  <> help "Output using the Show instance (debug only, format subject to change without notice)")
+        <|> flag' (parseTermBuilder TermQuiet)
+                  (  long "quiet"
+                  <> help "Don't produce output, but show timing stats")
       filesOrStdin <- FilesFromGitRepo
                       <$> option str (long "gitDir" <> help "A .git directory to read from")
                       <*> option shaReader (long "sha" <> help "The commit SHA1 to read from")
@@ -120,7 +144,7 @@ parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate pa
                         <|> IncludePathsFromHandle <$> flag' stdin (long "only-stdin" <> help "Include only the paths given to stdin"))
                   <|> FilesFromPaths <$> some (argument filePathReader (metavar "FILES..."))
                   <|> pure (FilesFromHandle stdin)
-      pure $ Task.readBlobs filesOrStdin >>= renderer
+      pure $ Task.readBlobs filesOrStdin >>= runReader languageModes . renderer
 
 tsParseCommand :: Mod CommandFields (Task.TaskEff Builder)
 tsParseCommand = command "ts-parse" (info tsParseArgumentsParser (progDesc "Generate raw tree-sitter parse trees for path(s)"))
@@ -155,18 +179,20 @@ graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute a g
               <|> flag'                                   (Task.serialize JSON)              (long "json" <> help "Output JSON graph")
               <|> flag'                                   (Task.serialize Show)              (long "show" <> help "Output using the Show instance (debug only, format subject to change without notice)")
     readProjectFromPaths = makeReadProjectFromPathsTask
-      <$> option auto (long "language" <> help "The language for the analysis.")
-      <*> (   Just <$> some (strArgument (metavar "FILES..."))
+      <$> (   Just <$> some (strArgument (metavar "FILES..."))
           <|> flag' Nothing (long "stdin" <> help "Read a list of newline-separated paths to analyze from stdin."))
-    makeReadProjectFromPathsTask language maybePaths = do
+    makeReadProjectFromPathsTask maybePaths = do
       paths <- maybeM (liftIO (many getLine)) maybePaths
-      blobs <- traverse readBlobFromFile' (flip File language <$> paths)
-      pure $! Project (takeDirectory (maybe "/" fst (uncons paths))) blobs language []
+      blobs <- traverse readBlobFromFile' (fileForPath <$> paths)
+      case paths of
+        (x:_) -> pure $! Project (takeDirectory x) blobs (Language.languageForFilePath x) mempty
+        _     -> pure $! Project "/" mempty Language.Unknown mempty
     readProjectRecursively = makeReadProjectRecursivelyTask
-      <$> optional (strOption (long "root" <> help "Root directory of project. Optional, defaults to entry file/directory." <> metavar "DIR"))
+      <$> option auto (long "language" <> help "The language for the analysis.")
+      <*> optional (strOption (long "root" <> help "Root directory of project. Optional, defaults to entry file/directory." <> metavar "DIR"))
       <*> many (strOption (long "exclude-dir" <> help "Exclude a directory (e.g. vendor)" <> metavar "DIR"))
-      <*> argument filePathReader (metavar "DIR:LANGUAGE | FILE")
-    makeReadProjectRecursivelyTask rootDir excludeDirs File{..} = Task.readProject rootDir filePath fileLanguage excludeDirs
+      <*> argument str (metavar "DIR")
+    makeReadProjectRecursivelyTask language rootDir excludeDirs dir = Task.readProject rootDir dir language excludeDirs
     makeGraphTask graphType includePackages serializer projectTask = projectTask >>= Graph.runGraph graphType includePackages >>= serializer
 
 shaReader :: ReadM Git.OID
@@ -176,27 +202,7 @@ shaReader = eitherReader parseSha
           else Left (arg <> " is not a valid sha1")
 
 filePathReader :: ReadM File
-filePathReader = eitherReader parseFilePath
-  where
-    parseFilePath arg = case splitWhen (== ':') arg of
-        [a, b] | Just lang <- parseLanguage (T.pack b) -> Right (File a lang)
-               | Just lang <- parseLanguage (T.pack a) -> Right (File b lang)
-        [path] -> Right (File path (Language.languageForFilePath path))
-        _ -> Left ("cannot parse `" <> arg <> "`\nexpecting FILE:LANGUAGE or just FILE")
-    parseLanguage :: Text -> Maybe Language.Language
-    parseLanguage l = case T.toLower l of
-      "go"         -> Just Language.Go
-      "haskell"    -> Just Language.Haskell
-      "java"       -> Just Language.Java
-      "javascript" -> Just Language.JavaScript
-      "json"       -> Just Language.JSON
-      "jsx"        -> Just Language.JSX
-      "markdown"   -> Just Language.Markdown
-      "python"     -> Just Language.Python
-      "ruby"       -> Just Language.Ruby
-      "typescript" -> Just Language.TypeScript
-      "php"        -> Just Language.PHP
-      _            -> Nothing
+filePathReader = fileForPath <$> str
 
 options :: Eq a => [(String, a)] -> Mod OptionFields a -> Parser a
 options options fields = option (optionsReader options) (fields <> showDefaultWith (findOption options) <> metavar (intercalate "|" (fmap fst options)))

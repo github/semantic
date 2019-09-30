@@ -24,7 +24,6 @@ import Data.Functor.Both
 import qualified Data.Language as Language
 import Data.List.NonEmpty
 import Data.Patch
-import Data.Semigroup.App
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
@@ -229,12 +228,6 @@ instance Listable Language.Language where
     \/ cons0 Language.Python
     \/ cons0 Language.Ruby
     \/ cons0 Language.TypeScript
-
-instance Listable (f a) => Listable (App f a) where
-  tiers = cons1 App
-
-instance Listable (f a) => Listable (AppMerge f a) where
-  tiers = cons1 AppMerge
 
 instance Listable Loc where
   tiers = cons2 Loc
