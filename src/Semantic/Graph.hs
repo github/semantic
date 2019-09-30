@@ -74,8 +74,8 @@ type AnalysisClasses = '[ Declarations1, Eq1, Evaluatable, FreeVariables1, Acces
 
 runGraph :: ( Member Distribute sig
             , Member (Error SomeException) sig
+            , Member Parse sig
             , Member Resolution sig
-            , Member Task sig
             , Member Trace sig
             , Carrier sig m
             , Effect sig
@@ -230,7 +230,7 @@ runScopeGraph :: Ord address
 runScopeGraph = raiseHandler (runState lowerBound)
 
 -- | Parse a list of files into a 'Package'.
-parsePackage :: (Member Distribute sig, Member (Error SomeException) sig, Member Resolution sig, Member Task sig, Member Trace sig, Carrier sig m)
+parsePackage :: (Member Distribute sig, Member (Error SomeException) sig, Member Resolution sig, Member Parse sig, Member Trace sig, Carrier sig m)
              => Parser term -- ^ A parser.
              -> Project     -- ^ Project to parse into a package.
              -> m (Package (Blob, term))
@@ -244,7 +244,7 @@ parsePackage parser project = do
     n = Data.Abstract.Evaluatable.name (projectName project) -- TODO: Confirm this is the right `name`.
 
 -- | Parse all files in a project into 'Module's.
-parseModules :: (Member Distribute sig, Member (Error SomeException) sig, Member Task sig, Carrier sig m) => Parser term -> Project -> m [Module (Blob, term)]
+parseModules :: (Member Distribute sig, Member (Error SomeException) sig, Member Parse sig, Carrier sig m) => Parser term -> Project -> m [Module (Blob, term)]
 parseModules parser p@Project{..} = distributeFor (projectFiles p) (parseModule p parser)
 
 
@@ -258,9 +258,9 @@ parsePythonPackage :: forall syntax sig m term.
                    , term ~ Term syntax Loc
                    , Member (Error SomeException) sig
                    , Member Distribute sig
+                   , Member Parse sig
                    , Member Resolution sig
                    , Member Trace sig
-                   , Member Task sig
                    , Carrier sig m
                    , Effect sig
                    )
@@ -320,7 +320,7 @@ parsePythonPackage parser project = do
         resMap <- Task.resolutionMap p
         pure (Package.fromModules (Data.Abstract.Evaluatable.name $ projectName p) modules resMap) -- TODO: Confirm this is the right `name`.
 
-parseModule :: (Member (Error SomeException) sig, Member Task sig, Carrier sig m)
+parseModule :: (Member (Error SomeException) sig, Member Parse sig, Carrier sig m)
             => Project
             -> Parser term
             -> File

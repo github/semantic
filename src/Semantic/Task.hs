@@ -5,6 +5,9 @@ module Semantic.Task
 , TaskEff
 , Level(..)
 , RAlgebra
+-- * Parsing
+, Parse
+, runParse
 -- * I/O
 , Files.readBlob
 , Files.readBlobs
@@ -94,6 +97,7 @@ import           Source.Source (Source)
 -- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
 type TaskEff
   = TaskC
+  ( ParseC
   ( ResolutionC
   ( Files.FilesC
   ( ReaderC TaskSession
@@ -104,13 +108,13 @@ type TaskEff
   ( ResourceC
   ( CatchC
   ( DistributeC
-  ( LiftC IO)))))))))))
+  ( LiftC IO))))))))))))
 
 -- | A function to render terms or diffs.
 type Renderer i o = i -> o
 
 -- | A task which parses a 'Blob' with the given 'Parser'.
-parse :: (Member Task sig, Carrier sig m)
+parse :: (Member Parse sig, Carrier sig m)
       => Parser term
       -> Blob
       -> m term
@@ -168,6 +172,7 @@ runTask taskSession@TaskSession{..} task = do
           . runReader taskSession
           . Files.runFiles
           . runResolution
+          . runParse
           . runTaskF
     run task
   queueStat statter stat
@@ -196,10 +201,38 @@ instance (Member Telemetry sig, Carrier sig m) => Carrier (Trace :+: sig) (Trace
   eff (L (Trace str k)) = writeLog Debug str [] >> k
 
 
+data Parse m k
+  = forall term . Parse (Parser term) Blob (term -> m k)
+
+deriving instance Functor m => Functor (Parse m)
+
+instance HFunctor Parse where
+  hmap f (Parse parser blob k) = Parse parser blob (f . k)
+
+instance Effect Parse where
+  handle state handler (Parse parser blob k) = Parse parser blob (handler . (<$ state) . k)
+
+
+newtype ParseC m a = ParseC { runParse :: m a }
+  deriving (Applicative, Functor, Monad, MonadIO)
+
+instance ( Carrier sig m
+         , Member (Error SomeException) sig
+         , Member (Reader TaskSession) sig
+         , Member Resource sig
+         , Member Telemetry sig
+         , Member Timeout sig
+         , Member Trace sig
+         , MonadIO m
+         )
+      => Carrier (Parse :+: sig) (ParseC m) where
+  eff (L (Parse parser blob k)) = runParser blob parser >>= k
+  eff (R other) = ParseC (eff (handleCoercible other))
+
+
 -- | An effect describing high-level tasks to be performed.
 data Task (m :: * -> *) k
-  = forall term . Parse (Parser term) Blob (term -> m k)
-  | forall f field . Functor f => Decorate (RAlgebra (TermF f Loc) (Term f Loc) field) (Term f Loc) (Term f field -> m k)
+  = forall f field . Functor f => Decorate (RAlgebra (TermF f Loc) (Term f Loc) field) (Term f Loc) (Term f field -> m k)
   | forall syntax ann . (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => Diff (These (Term syntax ann) (Term syntax ann)) (Diff syntax ann ann -> m k)
   | forall input output . Render (Renderer input output) input (output -> m k)
   | forall input . Serialize (Format input) input (Builder -> m k)
@@ -207,14 +240,12 @@ data Task (m :: * -> *) k
 deriving instance Functor m => Functor (Task m)
 
 instance HFunctor Task where
-  hmap f (Parse parser blob k)        = Parse parser blob (f . k)
   hmap f (Decorate decorator term k)  = Decorate decorator term (f . k)
   hmap f (Semantic.Task.Diff terms k) = Semantic.Task.Diff terms (f . k)
   hmap f (Render renderer input k)    = Render renderer input (f . k)
   hmap f (Serialize format input k)   = Serialize format input (f . k)
 
 instance Effect Task where
-  handle state handler (Parse parser blob k)        = Parse parser blob (handler . (<$ state) . k)
   handle state handler (Decorate decorator term k)  = Decorate decorator term (handler . (<$ state) . k)
   handle state handler (Semantic.Task.Diff terms k) = Semantic.Task.Diff terms (handler . (<$ state) . k)
   handle state handler (Render renderer input k)    = Render renderer input (handler . (<$ state) . k)
@@ -230,7 +261,6 @@ newtype TaskC m a = TaskC { runTaskC :: m a }
 instance (Member (Error SomeException) sig, Member (Reader TaskSession) sig, Member Resource sig, Member Telemetry sig, Member Timeout sig, Member Trace sig, Carrier sig m, MonadIO m) => Carrier (Task :+: sig) (TaskC m) where
   eff (R other) = TaskC . eff . handleCoercible $ other
   eff (L op) = case op of
-    Parse parser blob k -> runParser blob parser >>= k
     Decorate algebra term k -> k (decoratorWithAlgebra algebra term)
     Semantic.Task.Diff terms k -> k (diffTermPair terms)
     Render renderer input k -> k (renderer input)

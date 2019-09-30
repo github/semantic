@@ -94,7 +94,7 @@ dotGraphDiff :: (DiffEffects sig m) => BlobPair -> m Builder
 dotGraphDiff blobPair = doDiff blobPair (const pure) render
   where render _ = serialize (DOT (diffStyle "diffs")) . renderTreeGraph
 
-type DiffEffects sig m = (Member (Error SomeException) sig, Member Telemetry sig, Member Distribute sig, Member Task sig, Carrier sig m, MonadIO m)
+type DiffEffects sig m = (Member (Error SomeException) sig, Member Telemetry sig, Member Distribute sig, Member Parse sig, Member Task sig, Carrier sig m, MonadIO m)
 
 type CanDiff syntax = (ConstructorName syntax, Diffable syntax, Eq1 syntax, HasDeclaration syntax, Hashable1 syntax, Show1 syntax, ToJSONFields1 syntax, Traversable syntax)
 type Decorate m a b = forall syntax . CanDiff syntax => Blob -> Term syntax a -> m (Term syntax b)
@@ -124,7 +124,7 @@ diffTerms blobs terms = time "diff" languageTag $ do
   diff <$ writeStat (Stat.count "diff.nodes" (bilength diff) languageTag)
   where languageTag = languageTagForBlobPair blobs
 
-doParse :: (Member (Error SomeException) sig, Member Distribute sig, Member Task sig, Carrier sig m)
+doParse :: (Member (Error SomeException) sig, Member Distribute sig, Member Parse sig, Carrier sig m)
   => BlobPair -> Decorate m Loc ann -> m (SomeTermPair TermPairConstraints ann)
 doParse blobPair decorate = case languageForBlobPair blobPair of
   Go         -> SomeTermPair <$> distributeFor blobPair (\ blob -> parse goParser blob >>= decorate blob)
