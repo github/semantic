@@ -41,7 +41,7 @@ runTagging blob symbolsToSummarize
         "Class"    -> Just Class
         "Module"   -> Just Module
         "Call"     -> Just Call
-        "Send"     -> Just Call
+        "Send"     -> Just Call -- Ruby’s Send is considered to be a kind of 'Call'
         _          -> Nothing
 
 type ContextToken = (Text, Range)
