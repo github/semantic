@@ -51,13 +51,12 @@ instance Exception Quit
 rubyREPL = repl (Proxy @'Language.Ruby) rubyParser
 
 repl proxy parser paths =
-  withOptions debugOptions $ \config logger statter ->
+  withOptions debugOptions $ \config _ _ ->
     runM
     . withDistribute
     . runCatch
     . runError @SomeException
     . runTraceByPrinting
-    . runReader (TaskSession config "-" False logger statter)
     . Files.runFiles
     . runResolution
     . runParse (configTreeSitterParseTimeout config) $ do
