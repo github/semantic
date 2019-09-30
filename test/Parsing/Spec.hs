@@ -1,11 +1,11 @@
+{-# LANGUAGE TypeApplications #-}
 module Parsing.Spec (spec) where
 
-import Data.AST
 import Data.Blob
 import Data.ByteString.Char8 (pack)
 import Data.Duration
+import Data.Either
 import Data.Language
-import Data.Maybe
 import Parsing.TreeSitter
 import Source.Source
 import SpecHelpers
@@ -19,15 +19,15 @@ spec = do
 
     it "returns a result when the timeout does not expire" $ do
       let timeout = fromMicroseconds 0 -- Zero microseconds indicates no timeout
-      let parseTask = parseToAST timeout tree_sitter_json largeBlob :: TaskC (Maybe (AST [] Grammar))
+      let parseTask = parseToAST @Grammar timeout tree_sitter_json largeBlob
       result <- runTaskOrDie parseTask
-      (isJust result) `shouldBe` True
+      isRight result `shouldBe` True
 
     it "returns nothing when the timeout expires" $ do
       let timeout = fromMicroseconds 1000
-      let parseTask = parseToAST timeout tree_sitter_json largeBlob :: TaskC (Maybe (AST [] Grammar))
+      let parseTask = parseToAST @Grammar timeout tree_sitter_json largeBlob
       result <- runTaskOrDie parseTask
-      (isNothing result) `shouldBe` True
+      isLeft result `shouldBe` True
 
 toJSONSource :: Show a => a -> Source
 toJSONSource = fromUTF8 . pack . show

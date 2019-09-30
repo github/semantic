@@ -4,6 +4,7 @@ module Reprinting.Spec (spec) where
 
 import SpecHelpers
 
+import           Control.Effect.Parse
 import           Data.Foldable
 import           Streaming hiding (Sum)
 import qualified Streaming.Prelude as Streaming
@@ -66,5 +67,5 @@ spec = describe "reprinting" $ do
         let eitherPrinted = runReprinter src defaultJSONPipeline tagged
         printed <- either (fail "reprinter failed") pure eitherPrinted
 
-        tree' <- runTaskOrDie (parse jsonParser (makeBlob printed path Language.JSON mempty))
+        tree' <- runTaskOrDie (runParseWithConfig (parse jsonParser (makeBlob printed path Language.JSON mempty)))
         length tree' `shouldSatisfy` (/= 0)
