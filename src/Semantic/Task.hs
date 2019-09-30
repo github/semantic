@@ -45,7 +45,7 @@ module Semantic.Task
 , withOptions
 , TaskSession(..)
 , runTraceInTelemetry
-, runTaskF
+, runTaskC
 -- * Exceptions
 , ParserCancelled(..)
 -- * Re-exports
@@ -155,7 +155,7 @@ runTask taskSession@TaskSession{..} task = do
           . Files.runFiles
           . runResolution
           . runParse
-          . runTaskF
+          . runTaskC
     run task
   queueStat statter stat
   pure result
@@ -224,9 +224,6 @@ instance HFunctor Task where
 instance Effect Task where
   handle state handler (Semantic.Task.Diff terms k) = Semantic.Task.Diff terms (handler . (<$ state) . k)
 
--- | Run a 'Task' effect by performing the actions in 'IO'.
-runTaskF :: TaskC m a -> m a
-runTaskF = runTaskC
 
 newtype TaskC m a = TaskC { runTaskC :: m a }
   deriving (Applicative, Functor, Monad, MonadIO)

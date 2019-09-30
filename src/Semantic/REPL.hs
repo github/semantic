@@ -70,7 +70,7 @@ repl proxy parser paths =
     . Files.runFiles
     . runResolution
     . runParse
-    . runTaskF $ do
+    . runTaskC $ do
       blobs <- catMaybes <$> traverse readBlobFromFile (flip File (Language.reflect proxy) <$> paths)
       package <- fmap (fmap quieterm) <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs (Language.reflect proxy) [])
       modules <- topologicalSort <$> runImportGraphToModules proxy (snd <$> package)
