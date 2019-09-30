@@ -121,11 +121,11 @@ parse :: (Member Parse sig, Carrier sig m)
 parse parser blob = send (Parse parser blob pure)
 
 -- | A task which decorates a 'Term' with values computed using the supplied 'RAlgebra' function.
-decorate :: (Functor f, Member Task sig, Carrier sig m)
+decorate :: (Functor f, Applicative m)
          => RAlgebra (TermF f Loc) (Term f Loc) field
          -> Term f Loc
          -> m (Term f field)
-decorate algebra term = send (Decorate algebra term pure)
+decorate algebra term = pure (decoratorWithAlgebra algebra term)
 
 -- | A task which diffs a pair of terms using the supplied 'Differ' function.
 diff :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax, Member Task sig, Carrier sig m)
@@ -232,21 +232,18 @@ instance ( Carrier sig m
 
 -- | An effect describing high-level tasks to be performed.
 data Task (m :: * -> *) k
-  = forall f field . Functor f => Decorate (RAlgebra (TermF f Loc) (Term f Loc) field) (Term f Loc) (Term f field -> m k)
-  | forall syntax ann . (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => Diff (These (Term syntax ann) (Term syntax ann)) (Diff syntax ann ann -> m k)
+  = forall syntax ann . (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => Diff (These (Term syntax ann) (Term syntax ann)) (Diff syntax ann ann -> m k)
   | forall input output . Render (Renderer input output) input (output -> m k)
   | forall input . Serialize (Format input) input (Builder -> m k)
 
 deriving instance Functor m => Functor (Task m)
 
 instance HFunctor Task where
-  hmap f (Decorate decorator term k)  = Decorate decorator term (f . k)
   hmap f (Semantic.Task.Diff terms k) = Semantic.Task.Diff terms (f . k)
   hmap f (Render renderer input k)    = Render renderer input (f . k)
   hmap f (Serialize format input k)   = Serialize format input (f . k)
 
 instance Effect Task where
-  handle state handler (Decorate decorator term k)  = Decorate decorator term (handler . (<$ state) . k)
   handle state handler (Semantic.Task.Diff terms k) = Semantic.Task.Diff terms (handler . (<$ state) . k)
   handle state handler (Render renderer input k)    = Render renderer input (handler . (<$ state) . k)
   handle state handler (Serialize format input k)   = Serialize format input (handler . (<$ state) . k)
@@ -261,7 +258,6 @@ newtype TaskC m a = TaskC { runTaskC :: m a }
 instance (Member (Error SomeException) sig, Member (Reader TaskSession) sig, Member Resource sig, Member Telemetry sig, Member Timeout sig, Member Trace sig, Carrier sig m, MonadIO m) => Carrier (Task :+: sig) (TaskC m) where
   eff (R other) = TaskC . eff . handleCoercible $ other
   eff (L op) = case op of
-    Decorate algebra term k -> k (decoratorWithAlgebra algebra term)
     Semantic.Task.Diff terms k -> k (diffTermPair terms)
     Render renderer input k -> k (renderer input)
     Serialize format input k -> do
