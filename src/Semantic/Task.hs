@@ -5,8 +5,11 @@ module Semantic.Task
 , TaskEff
 , Level(..)
 , RAlgebra
--- * Parsing
+-- * Parse effect
 , Parse
+, parse
+-- * Parse carrier
+, ParseC
 , runParse
 -- * I/O
 , Files.readBlob
@@ -25,7 +28,6 @@ module Semantic.Task
 , time
 , time'
 -- * High-level flow
-, parse
 , decorate
 , diff
 , render
