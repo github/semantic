@@ -151,13 +151,13 @@ data Located a = Located Loc a
 -- returning a terminal expression. We have to keep track of which
 desugar :: (Member (Reader SourcePath) sig, Carrier sig m, MonadFail m)
         => RHS Span
-        -> m ([Located Name], Desugared Span)
+        -> m ((Stack (Located Name)), Desugared Span)
 desugar = \case
   Left Py.Assignment { left = OneExpression name, right = Just rhs, ann} -> do
     loc <- locFromTSSpan <$> ask <*> pure ann
-    let cons = (Located loc name :)
+    let cons = (Stack.:> Located loc name)
     fmap (first cons) (desugar rhs)
-  Right (Right any) -> pure ([], any)
+  Right (Right any) -> pure (Stack.Nil, any)
   other -> fail ("desugar: couldn't desugar RHS " <> show other)
 
 -- This is a fold function that is invoked from a left fold but that
@@ -168,11 +168,11 @@ desugar = \case
 -- sugar", like "icing" or "sugar water" but I'll leave that as an
 -- exercise to the reader.
 collapseDesugared :: (CoreSyntax syn t, Member (Reader Bindings) sig, Carrier sig m)
-                  => (t Name -> m (t Name)) -- A meta-continuation: it takes a name and returns a continuation
-                  -> Located Name           -- The current LHS to which to assign
+                  => Located Name           -- The current LHS to which to assign
+                  -> (t Name -> m (t Name)) -- A meta-continuation: it takes a name and returns a continuation
                   -> t Name                 -- The current RHS to which to assign, yielded from an outer continuation
                   -> m (t Name)             -- The properly-sequenced resolut
-collapseDesugared cont (Located loc n) rem =
+collapseDesugared (Located loc n) cont rem =
   let assigning = fmap (Core.annAt loc . ((Name.named' n :<- rem) >>>=))
   in assigning (local (def n) (cont (pure n))) -- gotta call local here to record this assignment
 
@@ -184,8 +184,8 @@ instance Compile (Py.Assignment Span) where
     } cc = do
     p <- ask @SourcePath
     (names, val) <- desugar rhs
-    let allNames = Located (locFromTSSpan p ann) name : names
-    compile val >>= foldl' collapseDesugared (const cc) allNames >>= locate it
+    let allNames = names Stack.:> Located (locFromTSSpan p ann) name
+    compile val >>= foldr collapseDesugared (const cc) allNames >>= locate it
 
   compileCC other _ = fail ("Unhandled assignment case: " <> show other)
 
