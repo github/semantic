@@ -43,7 +43,6 @@ module Semantic.Task
 , withOptions
 , TaskSession(..)
 , runTraceInTelemetry
-, runTaskC
 -- * Exceptions
 , ParserCancelled(..)
 -- * Re-exports
@@ -88,8 +87,7 @@ import           Source.Source (Source)
 
 -- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
 type TaskEff
-  = TaskC
-  ( ParseC
+  = ParseC
   ( ResolutionC
   ( Files.FilesC
   ( ReaderC TaskSession
@@ -100,7 +98,7 @@ type TaskEff
   ( ResourceC
   ( CatchC
   ( DistributeC
-  ( LiftC IO))))))))))))
+  ( LiftC IO)))))))))))
 
 -- | A task which parses a 'Blob' with the given 'Parser'.
 parse :: (Member Parse sig, Carrier sig m)
@@ -144,7 +142,6 @@ runTask taskSession@TaskSession{..} task = do
           . Files.runFiles
           . runResolution
           . runParse
-          . runTaskC
     run task
   queueStat statter stat
   pure result
@@ -199,12 +196,6 @@ instance ( Carrier sig m
       => Carrier (Parse :+: sig) (ParseC m) where
   eff (L (Parse parser blob k)) = runParser blob parser >>= k
   eff (R other) = ParseC (eff (handleCoercible other))
-
-newtype TaskC m a = TaskC { runTaskC :: m a }
-  deriving (Applicative, Functor, Monad, MonadIO)
-
-instance (Carrier sig m, MonadIO m) => Carrier sig (TaskC m) where
-  eff = TaskC . eff . handleCoercible
 
 
 -- | Log an 'Error.Error' at the specified 'Level'.
