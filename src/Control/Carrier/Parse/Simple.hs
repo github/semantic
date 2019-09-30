@@ -6,7 +6,7 @@ module Control.Carrier.Parse.Simple
 , ParseC(..)
 , runParse
   -- * Exceptions
-, ParserCancelled(..)
+, ParseFailure(..)
 ) where
 
 import qualified Assigning.Assignment as Assignment
@@ -50,11 +50,11 @@ runParser
 runParser timeout blob@Blob{..} parser = case parser of
   ASTParser language ->
     parseToAST timeout language blob
-      >>= either (const (throwError (SomeException ParserTimedOut))) pure
+      >>= either (throwError . SomeException . ParseFailure) pure
 
   UnmarshalParser language ->
     parseToPreciseAST timeout language blob
-      >>= either (const (throwError (SomeException ParserTimedOut))) pure
+      >>= either (throwError . SomeException . ParseFailure) pure
 
   AssignmentParser    parser assignment ->
     runParser timeout blob parser >>= either (throwError . toException) pure . Assignment.assign    blobSource assignment
@@ -66,7 +66,7 @@ runParser timeout blob@Blob{..} parser = case parser of
     in length term `seq` pure term
   SomeParser parser -> SomeTerm <$> runParser timeout blob parser
 
-data ParserCancelled = ParserTimedOut
+data ParseFailure = ParseFailure String
   deriving (Show, Typeable)
 
-instance Exception ParserCancelled
+instance Exception ParseFailure
