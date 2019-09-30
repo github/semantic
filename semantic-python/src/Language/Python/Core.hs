@@ -150,14 +150,15 @@ data Located a = Located Loc a
 -- assignment, storing the names we encounter as we go and eventually
 -- returning a terminal expression. We have to keep track of which
 desugar :: (Member (Reader SourcePath) sig, Carrier sig m, MonadFail m)
-        => RHS Span
-        -> m ((Stack (Located Name)), Desugared Span)
-desugar = \case
+        => [Located Name]
+        -> RHS Span
+        -> m ([Located Name], Desugared Span)
+desugar acc = \case
   Left Py.Assignment { left = OneExpression name, right = Just rhs, ann} -> do
     loc <- locFromTSSpan <$> ask <*> pure ann
-    let cons = (Stack.:> Located loc name)
-    fmap (first cons) (desugar rhs)
-  Right (Right any) -> pure (Stack.Nil, any)
+    let cons = (Located loc name :)
+    desugar (cons acc) rhs
+  Right (Right any) -> pure (acc, any)
   other -> fail ("desugar: couldn't desugar RHS " <> show other)
 
 -- This is a fold function that is invoked from a left fold but that
@@ -183,9 +184,8 @@ instance Compile (Py.Assignment Span) where
     , ann
     } cc = do
     p <- ask @SourcePath
-    (names, val) <- desugar rhs
-    let allNames = names Stack.:> Located (locFromTSSpan p ann) name
-    compile val >>= foldr collapseDesugared (const cc) allNames >>= locate it
+    (names, val) <- desugar [Located (locFromTSSpan p ann) name] rhs
+    compile val >>= foldr collapseDesugared (const cc) names >>= locate it
 
   compileCC other _ = fail ("Unhandled assignment case: " <> show other)
 
