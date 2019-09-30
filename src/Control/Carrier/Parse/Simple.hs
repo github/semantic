@@ -72,7 +72,7 @@ runParser timeout blob@Blob{..} parser = case parser of
     in length term `seq` pure term
   SomeParser parser -> SomeTerm <$> runParser timeout blob parser
 
-data ParserCancelled = ParserTimedOut | AssignmentTimedOut
+data ParserCancelled = ParserTimedOut
   deriving (Show, Typeable)
 
 instance Exception ParserCancelled
