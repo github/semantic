@@ -1,8 +1,7 @@
 {-# LANGUAGE ConstraintKinds, ExistentialQuantification, GADTs, GeneralizedNewtypeDeriving, KindSignatures,
              ScopedTypeVariables, StandaloneDeriving, TypeOperators, UndecidableInstances #-}
 module Semantic.Task
-( Task
-, TaskEff
+( TaskEff
 , Level(..)
 -- * Parse effect
 , Parse
@@ -27,7 +26,6 @@ module Semantic.Task
 , time
 , time'
 -- * High-level flow
-, diff
 , serialize
 -- * Concurrency
 , distribute
@@ -70,14 +68,11 @@ import           Control.Monad
 import           Control.Monad.IO.Class
 import           Data.Blob
 import           Data.ByteString.Builder
-import           Data.Diff
 import qualified Data.Error as Error
 import qualified Data.Flag as Flag
 import           Data.Sum
 import qualified Data.Syntax as Syntax
 import           Data.Term
-import           Diffing.Algorithm (Diffable)
-import           Diffing.Interpreter
 import           Parsing.CMark
 import           Parsing.Parser
 import           Parsing.TreeSitter
@@ -113,12 +108,6 @@ parse :: (Member Parse sig, Carrier sig m)
       -> Blob
       -> m term
 parse parser blob = send (Parse parser blob pure)
-
--- | A task which diffs a pair of terms using the supplied 'Differ' function.
-diff :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax, Member Task sig, Carrier sig m)
-     => These (Term syntax ann) (Term syntax ann)
-     -> m (Diff syntax ann ann)
-diff terms = send (Semantic.Task.Diff terms pure)
 
 serialize :: (Member (Reader TaskSession) sig, Carrier sig m)
           => Format input
@@ -211,27 +200,11 @@ instance ( Carrier sig m
   eff (L (Parse parser blob k)) = runParser blob parser >>= k
   eff (R other) = ParseC (eff (handleCoercible other))
 
-
--- | An effect describing high-level tasks to be performed.
-data Task (m :: * -> *) k
-  = forall syntax ann . (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => Diff (These (Term syntax ann) (Term syntax ann)) (Diff syntax ann ann -> m k)
-
-deriving instance Functor m => Functor (Task m)
-
-instance HFunctor Task where
-  hmap f (Semantic.Task.Diff terms k) = Semantic.Task.Diff terms (f . k)
-
-instance Effect Task where
-  handle state handler (Semantic.Task.Diff terms k) = Semantic.Task.Diff terms (handler . (<$ state) . k)
-
-
 newtype TaskC m a = TaskC { runTaskC :: m a }
   deriving (Applicative, Functor, Monad, MonadIO)
 
-instance (Carrier sig m, MonadIO m) => Carrier (Task :+: sig) (TaskC m) where
-  eff (R other) = TaskC . eff . handleCoercible $ other
-  eff (L op) = case op of
-    Semantic.Task.Diff terms k -> k (diffTermPair terms)
+instance (Carrier sig m, MonadIO m) => Carrier sig (TaskC m) where
+  eff = TaskC . eff . handleCoercible
 
 
 -- | Log an 'Error.Error' at the specified 'Level'.
