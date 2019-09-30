@@ -14,3 +14,6 @@ deriving instance Functor m => Functor (Parse m)
 
 instance HFunctor Parse where
   hmap f (Parse parser blob k) = Parse parser blob (f . k)
+
+instance Effect Parse where
+  handle state handler (Parse parser blob k) = Parse parser blob (handler . (<$ state) . k)
