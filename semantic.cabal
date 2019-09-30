@@ -116,6 +116,7 @@ library
                      , Control.Abstract.Value
                      -- Effects
                      , Control.Effect.Interpose
+                     , Control.Effect.Parse
                      , Control.Effect.REPL
                      , Control.Rewriting
                      -- Datatypes for abstract interpretation
