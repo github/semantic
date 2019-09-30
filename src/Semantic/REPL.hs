@@ -60,7 +60,7 @@ repl proxy parser paths =
     . runReader (TaskSession config "-" False logger statter)
     . Files.runFiles
     . runResolution
-    $ runParse (configTreeSitterParseTimeout config) $ do
+    . runParse (configTreeSitterParseTimeout config) $ do
       blobs <- catMaybes <$> traverse readBlobFromFile (flip File (Language.reflect proxy) <$> paths)
       package <- fmap (fmap quieterm) <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs (Language.reflect proxy) [])
       modules <- topologicalSort <$> runImportGraphToModules proxy (snd <$> package)
