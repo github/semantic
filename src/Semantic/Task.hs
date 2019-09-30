@@ -28,7 +28,6 @@ module Semantic.Task
 , time'
 -- * High-level flow
 , diff
-, render
 , serialize
 -- * Concurrency
 , distribute
@@ -120,13 +119,6 @@ diff :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax, Memb
      => These (Term syntax ann) (Term syntax ann)
      -> m (Diff syntax ann ann)
 diff terms = send (Semantic.Task.Diff terms pure)
-
--- | A task which renders some input using the supplied 'Renderer' function.
-render :: Applicative m
-       => (input -> output)
-       -> input
-       -> m output
-render renderer = pure . renderer
 
 serialize :: (Member Task sig, Carrier sig m)
           => Format input

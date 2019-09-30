@@ -38,7 +38,7 @@ data ASTFormat = SExpression | JSON | Show | Quiet
 runASTParse :: (Member Distribute sig, Member (Error SomeException) sig, Member Parse sig, Member Task sig, Carrier sig m, MonadIO m) => ASTFormat -> [Blob] -> m F.Builder
 runASTParse SExpression = distributeFoldMap (astParseBlob >=> withSomeAST (serialize (F.SExpression F.ByShow)))
 runASTParse Show        = distributeFoldMap (astParseBlob >=> withSomeAST (serialize F.Show . fmap nodeSymbol))
-runASTParse JSON        = distributeFoldMap (\ blob -> astParseBlob blob >>= withSomeAST (render (renderJSONAST blob))) >=> serialize F.JSON
+runASTParse JSON        = distributeFoldMap (\ blob -> withSomeAST (renderJSONAST blob) <$> astParseBlob blob) >=> serialize F.JSON
 runASTParse Quiet       = distributeFoldMap $ \blob -> do
   result <- time' ((Right <$> astParseBlob blob) `catchError` (pure . Left @SomeException))
   pure . mconcat . intersperse "\t" $ [ either (const "ERR") (const "OK") (fst result)
