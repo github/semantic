@@ -1,8 +1,7 @@
-{-# LANGUAGE ExistentialQuantification, GADTs, GeneralizedNewtypeDeriving, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, TypeOperators, UndecidableInstances #-}
 module Semantic.Parse
 ( -- * Parse effect
-  Parse(..)
-, parse
+  module Control.Effect.Parse
   -- * Parse carrier
 , ParseC(..)
   -- * Exceptions
@@ -13,6 +12,7 @@ import qualified Assigning.Assignment as Assignment
 import qualified Assigning.Assignment.Deterministic as Deterministic
 import           Control.Effect.Error
 import           Control.Effect.Carrier
+import           Control.Effect.Parse
 import           Control.Effect.Reader
 import           Control.Effect.Trace
 import           Control.Exception
@@ -33,26 +33,6 @@ import           Semantic.Task (TaskSession(..))
 import           Semantic.Telemetry
 import           Semantic.Timeout
 import           Source.Source (Source)
-
-data Parse m k
-  = forall term . Parse (Parser term) Blob (term -> m k)
-
-deriving instance Functor m => Functor (Parse m)
-
-instance HFunctor Parse where
-  hmap f (Parse parser blob k) = Parse parser blob (f . k)
-
-instance Effect Parse where
-  handle state handler (Parse parser blob k) = Parse parser blob (handler . (<$ state) . k)
-
-
--- | Parse a 'Blob' with the given 'Parser'.
-parse :: (Member Parse sig, Carrier sig m)
-      => Parser term
-      -> Blob
-      -> m term
-parse parser blob = send (Parse parser blob pure)
-
 
 newtype ParseC m a = ParseC { runParse :: m a }
   deriving (Applicative, Functor, Monad, MonadIO)
