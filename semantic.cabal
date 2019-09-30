@@ -116,6 +116,7 @@ library
                      , Control.Abstract.Value
                      -- Carriers
                      , Control.Carrier.Parse.Measured
+                     , Control.Carrier.Parse.Simple
                      -- Effects
                      , Control.Effect.Interpose
                      , Control.Effect.Parse
