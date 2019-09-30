@@ -14,7 +14,6 @@ import qualified Assigning.Assignment.Deterministic as Deterministic
 import           Control.Effect.Error
 import           Control.Effect.Carrier
 import           Control.Effect.Reader
-import           Control.Effect.Resource
 import           Control.Effect.Trace
 import           Control.Exception
 import           Control.Monad.IO.Class
@@ -61,7 +60,6 @@ newtype ParseC m a = ParseC { runParse :: m a }
 instance ( Carrier sig m
          , Member (Error SomeException) sig
          , Member (Reader TaskSession) sig
-         , Member Resource sig
          , Member Telemetry sig
          , Member Timeout sig
          , Member Trace sig
@@ -72,7 +70,7 @@ instance ( Carrier sig m
   eff (R other) = ParseC (eff (handleCoercible other))
 
 -- | Parse a 'Blob' in 'IO'.
-runParser :: (Member (Error SomeException) sig, Member (Reader TaskSession) sig, Member Resource sig, Member Telemetry sig, Member Timeout sig, Member Trace sig, Carrier sig m, MonadIO m)
+runParser :: (Member (Error SomeException) sig, Member (Reader TaskSession) sig, Member Telemetry sig, Member Timeout sig, Member Trace sig, Carrier sig m, MonadIO m)
           => Blob
           -> Parser term
           -> m term
@@ -114,7 +112,6 @@ runAssignment
      , Element Syntax.Error syntaxes
      , Member (Error SomeException) sig
      , Member (Reader TaskSession) sig
-     , Member Resource sig
      , Member Telemetry sig
      , Member Timeout sig
      , Member Trace sig
