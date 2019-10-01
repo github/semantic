@@ -13,3 +13,4 @@ import System.IO (FilePath)
 
 main :: IO ()
 main = do
+  args <- head <$> getArgs
