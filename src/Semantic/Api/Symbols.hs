@@ -106,17 +106,19 @@ doParse :: (Member (Error SomeException) sig, Member (Reader PerLanguageModes) s
 doParse symbolsToSummarize blob = do
   modes <- ask @PerLanguageModes
   case blobLanguage blob of
-    Go         -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.goParser blob
-    Haskell    -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.haskellParser blob
-    JavaScript -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.tsxParser blob
-    JSON       -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.jsonParser blob
-    JSX        -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.tsxParser blob
-    Markdown   -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.markdownParser blob
+    Go         -> mkTerm <$> parse Parser.goParser blob
+    Haskell    -> mkTerm <$> parse Parser.haskellParser blob
+    JavaScript -> mkTerm <$> parse Parser.tsxParser blob
+    JSON       -> mkTerm <$> parse Parser.jsonParser blob
+    JSX        -> mkTerm <$> parse Parser.tsxParser blob
+    Markdown   -> mkTerm <$> parse Parser.markdownParser blob
     Python
       | Precise <- pythonMode modes -> SomeTerm <$> parse Parser.precisePythonParser blob
-      | otherwise                   -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.pythonParser blob
-    Ruby       -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.rubyParser blob
-    TypeScript -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.typescriptParser blob
-    TSX        -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.tsxParser blob
-    PHP        -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.phpParser blob
+      | otherwise                   -> mkTerm   <$> parse Parser.pythonParser        blob
+    Ruby       -> mkTerm <$> parse Parser.rubyParser blob
+    TypeScript -> mkTerm <$> parse Parser.typescriptParser blob
+    TSX        -> mkTerm <$> parse Parser.tsxParser blob
+    PHP        -> mkTerm <$> parse Parser.phpParser blob
     _          -> noLanguageForBlob (blobPath blob)
+    where mkTerm :: IsTaggable syntax => Term syntax Loc -> SomeTerm Precise.ToTags Loc
+          mkTerm = SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize
