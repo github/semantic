@@ -11,9 +11,6 @@ import Source.Span
 import Data.ByteString (ByteString)
 
 
-newtype SignalException = SignalException Signal
-  deriving (Show, Typeable)
-instance Exception SignalException
 
 
 main :: IO ()
