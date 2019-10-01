@@ -102,7 +102,15 @@ data SomeTerm c ann where
 withSomeTerm :: (forall t . c t => t ann -> a) -> SomeTerm c ann -> a
 withSomeTerm with (SomeTerm term) = with term
 
-doParse :: (Member (Error SomeException) sig, Member (Reader PerLanguageModes) sig, Member Parse sig, Carrier sig m) => [Text] -> Blob -> m (SomeTerm Precise.ToTags Loc)
+doParse
+  :: ( Carrier sig m
+     , Member (Error SomeException) sig
+     , Member Parse sig
+     , Member (Reader PerLanguageModes) sig
+     )
+  => [Text]
+  -> Blob
+  -> m (SomeTerm Precise.ToTags Loc)
 doParse symbolsToSummarize blob = do
   modes <- ask @PerLanguageModes
   case blobLanguage blob of
