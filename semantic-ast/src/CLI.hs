@@ -79,13 +79,6 @@ optionsParser = do
   logPathsOnError <- switch (long "log-paths" <> help "Log source paths on parse and assignment error.")
   pure $ Options logLevel logPathsOnError (Flag.flag FailOnWarning failOnWarning) (Flag.flag FailOnParseError failOnParseError)
 
-argumentsParser :: Parser (Task.TaskEff ())
-argumentsParser = do
-  subparser <- hsubparser (diffCommand <> parseCommand <>  tsParseCommand <> graphCommand)
-  output <- ToPath <$> strOption (long "output" <> short 'o' <> help "Output path, defaults to stdout") <|> pure (ToHandle stdout)
-  pure $ subparser >>= Task.write output
-
-
 parseCommand :: Mod CommandFields (Task.TaskEff Builder)
 parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate parse trees for path(s)"))
   where
