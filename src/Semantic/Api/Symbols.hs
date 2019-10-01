@@ -69,19 +69,16 @@ parseSymbols blobs = do
     go modes blob@Blob{..}
       | Precise <- pythonMode modes
       , Python  <- blobLanguage'
-      =             catching $ renderPreciseToSymbols       <$> parse precisePythonParser blob
-      | otherwise = catching $ withSomeTerm renderToSymbols <$> doParse                   blob
+      =             catching $ renderToSymbols                                                   <$> parse precisePythonParser blob
+      | otherwise = catching $ withSomeTerm (renderToSymbols . ALaCarteTerm (blobLanguage blob)) <$> doParse                   blob
       where
         catching m = m `catchError` (\(SomeException e) -> pure $ errorFile (show e))
         blobLanguage' = blobLanguage blob
         blobPath' = pack $ blobPath blob
         errorFile e = File blobPath' (bridging # blobLanguage') mempty (V.fromList [ParseError (T.pack e)]) blobOid
 
-        renderToSymbols :: IsTaggable f => Term f Loc -> File
-        renderToSymbols term = renderPreciseToSymbols (ALaCarteTerm (blobLanguage blob) term)
-
-        renderPreciseToSymbols :: Precise.ToTags t => t Loc -> File
-        renderPreciseToSymbols term = tagsToFile (Precise.tags blobSource term)
+        renderToSymbols :: Precise.ToTags t => t Loc -> File
+        renderToSymbols term = tagsToFile (Precise.tags blobSource term)
 
         tagsToFile :: [Tag] -> File
         tagsToFile tags = File blobPath' (bridging # blobLanguage') (V.fromList (fmap tagToSymbol tags)) mempty blobOid
