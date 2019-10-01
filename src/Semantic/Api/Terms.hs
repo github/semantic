@@ -40,7 +40,6 @@ import           Semantic.Proto.SemanticPB hiding (Blob)
 import           Semantic.Task
 import           Serializing.Format hiding (JSON)
 import qualified Serializing.Format as Format
-import           Serializing.SExpression (ToSExpression)
 import           Source.Loc
 
 termGraph :: (Traversable t, Member Distribute sig, ParseEffects sig m) => t Blob -> m ParseTreeGraphResponse
@@ -83,7 +82,7 @@ jsonTerm blob = doParse (pure . renderJSONTerm blob) blob `catchError` jsonError
 jsonError :: Applicative m => Blob -> SomeException -> m (Rendering.JSON.JSON "trees" SomeJSON)
 jsonError blob (SomeException e) = pure $ renderJSONError blob (show e)
 
-sexpTerm :: (Carrier sig m, Member (Reader Config) sig, Recursive t, ToSExpression (Base t)) => t -> m Builder
+sexpTerm :: (Carrier sig m, ConstructorName syntax, Foldable syntax, Functor syntax, Member (Reader Config) sig) => Term syntax Loc -> m Builder
 sexpTerm = serialize (SExpression ByConstructorName)
 
 dotGraphTerm :: ParseEffects sig m => Blob -> m Builder
