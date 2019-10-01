@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, GADTs, RankNTypes, TypeOperators #-}
+{-# LANGUAGE ConstraintKinds, GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Semantic.Api.Terms
   (
     termGraph
@@ -104,13 +104,21 @@ quietTerm blob = showTiming blob <$> time' ( (doParse blob >>= withSomeTerm (fma
 
 type ParseEffects sig m = (Member (Error SomeException) sig, Member (Reader PerLanguageModes) sig, Member Parse sig, Member (Reader Config) sig, Carrier sig m)
 
-type TermConstraints =
- '[ ConstructorName
-  , Foldable
-  , Functor
-  , Show1
-  , ToJSONFields1
-  ]
+class ( ConstructorName t
+      , Foldable t
+      , Functor t
+      , Show1 t
+      , ToJSONFields1 t
+      )
+   => TermConstraints t
+
+instance ( ConstructorName t
+         , Foldable t
+         , Functor t
+         , Show1 t
+         , ToJSONFields1 t
+         )
+      => TermConstraints t
 
 doParse :: ParseEffects sig m => Blob -> m (SomeTerm TermConstraints Loc)
 doParse blob = case blobLanguage blob of
@@ -129,7 +137,7 @@ doParse blob = case blobLanguage blob of
 
 
 data SomeTerm typeclasses ann where
-  SomeTerm :: ApplyAll typeclasses syntax => Term syntax ann -> SomeTerm typeclasses ann
+  SomeTerm :: typeclasses syntax => Term syntax ann -> SomeTerm typeclasses ann
 
-withSomeTerm :: (forall syntax . ApplyAll typeclasses syntax => Term syntax ann -> a) -> SomeTerm typeclasses ann -> a
+withSomeTerm :: (forall syntax . typeclasses syntax => Term syntax ann -> a) -> SomeTerm typeclasses ann -> a
 withSomeTerm with (SomeTerm term) = with term
