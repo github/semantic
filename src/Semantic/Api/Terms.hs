@@ -1,4 +1,4 @@
-{-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, MonoLocalBinds, RankNTypes, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, MonoLocalBinds, RankNTypes, TypeOperators #-}
 module Semantic.Api.Terms
   (
     termGraph
