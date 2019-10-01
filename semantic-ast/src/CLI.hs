@@ -1,6 +1,6 @@
 {-# LANGUAGE ApplicativeDo #-}
-module Semantic.CLI (main) where
 {-# LANGUAGE TypeApplications #-}
+module CLI (main) where
 
 import           Control.Effect.Reader
 import           Control.Exception as Exc (displayException)
