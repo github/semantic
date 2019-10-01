@@ -12,8 +12,7 @@ import Data.ByteString (ByteString)
 
 
 
-
-main :: IO ()
+main :: IO (Either Prelude.String (Module (Range, Span)))
 main = do
   args <- getArgs
   parseByteString getArgs
