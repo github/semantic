@@ -97,3 +97,9 @@ tagToSymbol Tag{..} = Symbol
   , span = converting #? span
   , docs = fmap Docstring docs
   }
+
+
+data ALaCarteTerm syntax ann = ALaCarteTerm Language (Term syntax ann)
+
+instance IsTaggable syntax => Precise.ToTags (ALaCarteTerm syntax) where
+  tags source (ALaCarteTerm lang term) = runTagging lang source symbolsToSummarize term
