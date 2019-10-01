@@ -125,6 +125,13 @@ instance (Functor syntax, Show1 syntax) => ShowTerm (Term syntax) where
   showTerm' = serialize Show . quieterm
 
 
+class SExprTerm term where
+  sexprTerm' :: (Carrier sig m, Member (Reader Config) sig) => term Loc -> m Builder
+
+instance (ConstructorName syntax, Foldable syntax, Functor syntax) => SExprTerm (Term syntax) where
+  sexprTerm' = serialize (SExpression ByConstructorName)
+
+
 doParse
   :: ( Carrier sig m
      , Member (Error SomeException) sig
