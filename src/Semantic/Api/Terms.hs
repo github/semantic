@@ -83,13 +83,13 @@ jsonError :: Applicative m => Blob -> SomeException -> m (Rendering.JSON.JSON "t
 jsonError blob (SomeException e) = pure $ renderJSONError blob (show e)
 
 sexpTerm :: (Carrier sig m, ConstructorName syntax, Foldable syntax, Functor syntax, Member (Reader Config) sig) => Term syntax Loc -> m Builder
-sexpTerm = serialize (SExpression ByConstructorName)
+sexpTerm = sexprTerm'
 
 dotGraphTerm :: (Carrier sig m, ConstructorName syntax, Foldable syntax, Functor syntax, Member (Reader Config) sig) => Term syntax Loc -> m Builder
-dotGraphTerm = serialize (DOT (termStyle "terms")) . renderTreeGraph
+dotGraphTerm = dotGraphTerm'
 
 showTerm :: (Carrier sig m, Functor syntax, Member (Reader Config) sig, Show1 syntax) => Term syntax Loc -> m Builder
-showTerm = serialize Show . quieterm
+showTerm = showTerm'
 
 quietTerm :: (ParseEffects sig m, MonadIO m) => Blob -> m Builder
 quietTerm blob = showTiming blob <$> time' ( doParse (fmap (const (Right ())) . serialize Show . quieterm) blob `catchError` timingError )
