@@ -6,6 +6,7 @@ module Semantic.Api.Symbols
   ) where
 
 import           Control.Effect.Error
+import           Control.Effect.Parse
 import           Control.Effect.Reader
 import           Control.Exception
 import           Control.Lens

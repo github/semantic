@@ -20,7 +20,7 @@ spec = do
       output `shouldBe` "{\"trees\":[{\"path\":\"methods.rb\",\"error\":\"NoLanguageForBlob \\\"methods.rb\\\"\",\"language\":\"Unknown\"}]}\n"
 
     it "throws if given an unknown language for sexpression output" $ do
-      res <- runTaskWithOptions defaultOptions (runReader (PerLanguageModes ALaCarte) (parseTermBuilder TermSExpression [setBlobLanguage Unknown methodsBlob]))
+      res <- runTaskWithOptions defaultOptions (runReader (PerLanguageModes ALaCarte) (runParseWithConfig (parseTermBuilder TermSExpression [setBlobLanguage Unknown methodsBlob])))
       case res of
         Left exc    -> fromException exc `shouldBe` Just (NoLanguageForBlob "methods.rb")
         Right _bad  -> fail "Expected parseTermBuilder to fail for an unknown language"
