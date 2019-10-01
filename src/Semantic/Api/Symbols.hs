@@ -43,7 +43,7 @@ legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> distributeFoldMap 
         symbolsToSummarize = ["Function", "Method", "Class", "Module"]
 
         renderToSymbols :: (IsTaggable f, Applicative m) => Term f Loc -> m [Legacy.File]
-        renderToSymbols = pure . pure . tagsToFile . runTagging (blobLanguage blob) blobSource symbolsToSummarize
+        renderToSymbols = pure . pure . tagsToFile . Precise.tags blobSource . ALaCarteTerm (blobLanguage blob) symbolsToSummarize
 
         tagsToFile :: [Tag] -> Legacy.File
         tagsToFile tags = Legacy.File (pack (blobPath blob)) (pack (show (blobLanguage blob))) (fmap tagToSymbol tags)
