@@ -61,16 +61,10 @@ parseSymbolsBuilder :: (Member Distribute sig, ParseEffects sig m, Traversable t
 parseSymbolsBuilder format blobs = parseSymbols blobs >>= serialize format
 
 parseSymbols :: (Member Distribute sig, ParseEffects sig m, Traversable t) => t Blob -> m ParseTreeSymbolResponse
-parseSymbols blobs = do
-  modes <- ask
-  ParseTreeSymbolResponse . V.fromList . toList <$> distributeFor blobs (go modes)
+parseSymbols blobs = ParseTreeSymbolResponse . V.fromList . toList <$> distributeFor blobs go
   where
-    go :: ParseEffects sig m => PerLanguageModes -> Blob -> m File
-    go modes blob@Blob{..}
-      | Precise <- pythonMode modes
-      , Python  <- blobLanguage'
-      =             catching $ renderToSymbols              <$> parse Parser.precisePythonParser blob
-      | otherwise = catching $ withSomeTerm renderToSymbols <$> doParse symbolsToSummarize        blob
+    go :: ParseEffects sig m => Blob -> m File
+    go blob@Blob{..} = catching $ withSomeTerm renderToSymbols <$> doParse symbolsToSummarize blob
       where
         catching m = m `catchError` (\(SomeException e) -> pure $ errorFile (show e))
         blobLanguage' = blobLanguage blob
