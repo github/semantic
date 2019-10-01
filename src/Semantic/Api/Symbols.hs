@@ -78,7 +78,7 @@ parseSymbols blobs = do
         errorFile e = File blobPath' (bridging # blobLanguage') mempty (V.fromList [ParseError (T.pack e)]) blobOid
 
         renderToSymbols :: IsTaggable f => Term f Loc -> File
-        renderToSymbols term = tagsToFile (Precise.tags blobSource (ALaCarteTerm (blobLanguage blob) term))
+        renderToSymbols term = renderPreciseToSymbols (ALaCarteTerm (blobLanguage blob) term)
 
         renderPreciseToSymbols :: Precise.ToTags t => t Loc -> File
         renderPreciseToSymbols term = tagsToFile (Precise.tags blobSource term)
