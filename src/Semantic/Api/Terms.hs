@@ -73,7 +73,7 @@ parseTermBuilder TermJSONTree    = distributeFoldMap jsonTerm >=> serialize Form
 parseTermBuilder TermJSONGraph   = termGraph >=> serialize Format.JSON
 parseTermBuilder TermSExpression = distributeFoldMap (doParse sexpTerm)
 parseTermBuilder TermDotGraph    = distributeFoldMap dotGraphTerm
-parseTermBuilder TermShow        = distributeFoldMap showTerm
+parseTermBuilder TermShow        = distributeFoldMap (doParse showTerm)
 parseTermBuilder TermQuiet       = distributeFoldMap quietTerm
 
 jsonTerm :: ParseEffects sig m => Blob -> m (Rendering.JSON.JSON "trees" SomeJSON)
@@ -88,8 +88,8 @@ sexpTerm = serialize (SExpression ByConstructorName)
 dotGraphTerm :: ParseEffects sig m => Blob -> m Builder
 dotGraphTerm = doParse (serialize (DOT (termStyle "terms")) . renderTreeGraph)
 
-showTerm :: ParseEffects sig m => Blob -> m Builder
-showTerm = doParse (serialize Show . quieterm)
+showTerm :: (Carrier sig m, Functor syntax, Member (Reader Config) sig, Show1 syntax) => Term syntax Loc -> m Builder
+showTerm = serialize Show . quieterm
 
 quietTerm :: (ParseEffects sig m, MonadIO m) => Blob -> m Builder
 quietTerm blob = showTiming blob <$> time' ( doParse (fmap (const (Right ())) . serialize Show . quieterm) blob `catchError` timingError )
