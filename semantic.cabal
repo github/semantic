@@ -240,6 +240,7 @@ library
                      -- API
                      , Proto.Semantic
                      , Proto.Semantic_Fields
+                     , Proto.Semantic_JSON
                      , Semantic.Api
                      , Semantic.Api.Bridge
                      , Semantic.Api.Diffs
