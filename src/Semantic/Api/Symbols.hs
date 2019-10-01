@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, TypeOperators, DerivingStrategies #-}
+{-# LANGUAGE ConstraintKinds, GADTs, RankNTypes, TypeOperators #-}
 module Semantic.Api.Symbols
   ( legacyParseSymbols
   , parseSymbols
@@ -17,14 +17,14 @@ import           Data.Term
 import qualified Data.Text as T
 import qualified Data.Vector as V
 import           Data.Text (pack)
-import           Parsing.Parser
+import qualified Parsing.Parser as Parser
 import           Prologue
 import           Semantic.Api.Bridge
 import qualified Semantic.Api.LegacyTypes as Legacy
-import           Semantic.Api.Terms (ParseEffects, doParse)
 import           Semantic.Proto.SemanticPB hiding (Blob)
+import           Semantic.Config
 import           Semantic.Task
-import           Serializing.Format
+import           Serializing.Format (Format)
 import           Source.Loc
 import           Tags.Taggable
 import           Tags.Tagging
@@ -34,7 +34,7 @@ legacyParseSymbols :: (Member Distribute sig, ParseEffects sig m, Traversable t)
 legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> distributeFoldMap go blobs
   where
     go :: ParseEffects sig m => Blob -> m [Legacy.File]
-    go blob@Blob{..} = (withSomeTerm (renderToSymbols . ALaCarteTerm (blobLanguage blob) symbolsToSummarize) <$> doParse blob) `catchError` (\(SomeException _) -> pure (pure emptyFile))
+    go blob@Blob{..} = (withSomeTerm renderToSymbols <$> doParse symbolsToSummarize blob) `catchError` (\(SomeException _) -> pure (pure emptyFile))
       where
         emptyFile = tagsToFile []
 
@@ -69,8 +69,8 @@ parseSymbols blobs = do
     go modes blob@Blob{..}
       | Precise <- pythonMode modes
       , Python  <- blobLanguage'
-      =             catching $ renderToSymbols                                                   <$> parse precisePythonParser blob
-      | otherwise = catching $ withSomeTerm (renderToSymbols . ALaCarteTerm (blobLanguage blob) symbolsToSummarize) <$> doParse                   blob
+      =             catching $ renderToSymbols              <$> parse Parser.precisePythonParser blob
+      | otherwise = catching $ withSomeTerm renderToSymbols <$> doParse symbolsToSummarize        blob
       where
         catching m = m `catchError` (\(SomeException e) -> pure $ errorFile (show e))
         blobLanguage' = blobLanguage blob
@@ -100,3 +100,27 @@ data ALaCarteTerm syntax ann = ALaCarteTerm Language [Text] (Term syntax ann)
 
 instance IsTaggable syntax => Precise.ToTags (ALaCarteTerm syntax) where
   tags source (ALaCarteTerm lang symbolsToSummarize term) = runTagging lang source symbolsToSummarize term
+
+
+data SomeTerm c ann where
+  SomeTerm :: c t => t ann -> SomeTerm c ann
+
+withSomeTerm :: (forall t . c t => t ann -> a) -> SomeTerm c ann -> a
+withSomeTerm with (SomeTerm term) = with term
+
+doParse :: ParseEffects sig m => [Text] -> Blob -> m (SomeTerm Precise.ToTags Loc)
+doParse symbolsToSummarize blob = case blobLanguage blob of
+  Go         -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.goParser blob
+  Haskell    -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.haskellParser blob
+  JavaScript -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.tsxParser blob
+  JSON       -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.jsonParser blob
+  JSX        -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.tsxParser blob
+  Markdown   -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.markdownParser blob
+  Python     -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.pythonParser blob
+  Ruby       -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.rubyParser blob
+  TypeScript -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.typescriptParser blob
+  TSX        -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.tsxParser blob
+  PHP        -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.phpParser blob
+  _          -> noLanguageForBlob (blobPath blob)
+
+type ParseEffects sig m = (Member (Error SomeException) sig, Member (Reader PerLanguageModes) sig, Member Parse sig, Member (Reader Config) sig, Carrier sig m)
