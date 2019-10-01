@@ -10,7 +10,6 @@ import Prologue
 import           Control.Effect.Fail
 import           Control.Effect.Lift
 import           Control.Effect.Reader
-import           Control.Effect.Trace
 import           Foreign
 import           Foreign.C.Types (CBool (..))
 import           Foreign.Marshal.Array (allocaArray)
@@ -33,43 +32,36 @@ import qualified TreeSitter.Unmarshal as TS
 -- | Parse a 'Blob' with the given 'TS.Language' and return its AST.
 -- Returns 'Nothing' if the operation timed out.
 parseToAST :: ( Bounded grammar
-              , Carrier sig m
               , Enum grammar
-              , Member Trace sig
               , MonadIO m
               )
            => Duration
            -> Ptr TS.Language
            -> Blob
-           -> m (Maybe (AST [] grammar))
+           -> m (Either String (AST [] grammar))
 parseToAST parseTimeout language blob = runParse parseTimeout language blob (fmap Right . anaM toAST <=< peek)
 
 parseToPreciseAST
-  :: ( Carrier sig m
-     , Member Trace sig
-     , MonadIO m
+  :: ( MonadIO m
      , TS.Unmarshal t
      )
   => Duration
   -> Ptr TS.Language
   -> Blob
-  -> m (Maybe (t Loc))
+  -> m (Either String (t Loc))
 parseToPreciseAST parseTimeout language blob = runParse parseTimeout language blob $ \ rootPtr ->
   TS.withCursor (castPtr rootPtr) $ \ cursor ->
     runM (runFail (runReader cursor (runReader (Source.bytes (blobSource blob)) (TS.peekNode >>= TS.unmarshalNode))))
 
 runParse
-  :: ( Carrier sig m
-     , Member Trace sig
-     , MonadIO m
-     )
+  :: MonadIO m
   => Duration
   -> Ptr TS.Language
   -> Blob
   -> (Ptr TS.Node -> IO (Either String a))
-  -> m (Maybe a)
-runParse parseTimeout language b@Blob{..} action = do
-  result <- liftIO . TS.withParser language $ \ parser -> do
+  -> m (Either String a)
+runParse parseTimeout language Blob{..} action =
+  liftIO . TS.withParser language $ \ parser -> do
     let timeoutMicros = fromIntegral $ toMicroseconds parseTimeout
     TS.ts_parser_set_timeout_micros parser timeoutMicros
     TS.ts_parser_halt_on_error parser (CBool 1)
@@ -82,9 +74,6 @@ runParse parseTimeout language b@Blob{..} action = do
           TS.withRootNode treePtr action
     else
       pure (Left "tree-sitter: incompatible versions")
-  case result of
-    Left  err -> Nothing  <$ trace err <* trace ("tree-sitter: parsing failed " <> blobPath b)
-    Right ast -> Just ast <$ trace ("tree-sitter: parsing succeeded " <> blobPath b)
 
 toAST :: forall grammar . (Bounded grammar, Enum grammar) => TS.Node -> IO (Base (AST [] grammar) TS.Node)
 toAST node@TS.Node{..} = do

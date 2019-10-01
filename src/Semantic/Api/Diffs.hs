@@ -14,6 +14,8 @@ module Semantic.Api.Diffs
 import           Analysis.ConstructorName (ConstructorName)
 import           Analysis.TOCSummary (HasDeclaration)
 import           Control.Effect.Error
+import           Control.Effect.Parse
+import           Control.Effect.Reader
 import           Control.Exception
 import           Control.Lens
 import           Control.Monad.IO.Class
@@ -27,12 +29,14 @@ import           Data.Term
 import qualified Data.Text as T
 import qualified Data.Vector as V
 import           Diffing.Algorithm (Diffable)
+import           Diffing.Interpreter (diffTermPair)
 import           Parsing.Parser
 import           Prologue
 import           Rendering.Graph
 import           Rendering.JSON hiding (JSON)
 import qualified Rendering.JSON
 import           Semantic.Api.Bridge
+import           Semantic.Config
 import           Semantic.Proto.SemanticPB hiding (Blob, BlobPair)
 import           Semantic.Task as Task
 import           Semantic.Telemetry as Stat
@@ -58,7 +62,7 @@ parseDiffBuilder DiffDotGraph    = distributeFoldMap dotGraphDiff
 type RenderJSON m syntax = forall syntax . CanDiff syntax => BlobPair -> Diff syntax Loc Loc -> m (Rendering.JSON.JSON "diffs" SomeJSON)
 
 jsonDiff :: (DiffEffects sig m) => RenderJSON m syntax -> BlobPair -> m (Rendering.JSON.JSON "diffs" SomeJSON)
-jsonDiff f blobPair = doDiff blobPair (const pure) f `catchError` jsonError blobPair
+jsonDiff f blobPair = doDiff blobPair (const id) f `catchError` jsonError blobPair
 
 jsonError :: Applicative m => BlobPair -> SomeException -> m (Rendering.JSON.JSON "diffs" SomeJSON)
 jsonError blobPair (SomeException e) = pure $ renderJSONDiffError blobPair (show e)
@@ -70,7 +74,7 @@ diffGraph :: (Traversable t, DiffEffects sig m) => t BlobPair -> m DiffTreeGraph
 diffGraph blobs = DiffTreeGraphResponse . V.fromList . toList <$> distributeFor blobs go
   where
     go :: (DiffEffects sig m) => BlobPair -> m DiffTreeFileGraph
-    go blobPair = doDiff blobPair (const pure) render
+    go blobPair = doDiff blobPair (const id) render
       `catchError` \(SomeException e) ->
         pure (DiffTreeFileGraph path lang mempty mempty (V.fromList [ParseError (T.pack (show e))]))
       where
@@ -85,19 +89,19 @@ diffGraph blobs = DiffTreeGraphResponse . V.fromList . toList <$> distributeFor 
 
 
 sexpDiff :: (DiffEffects sig m) => BlobPair -> m Builder
-sexpDiff blobPair = doDiff blobPair (const pure) (const (serialize (SExpression ByConstructorName)))
+sexpDiff blobPair = doDiff blobPair (const id) (const (serialize (SExpression ByConstructorName)))
 
 showDiff :: (DiffEffects sig m) => BlobPair -> m Builder
-showDiff blobPair = doDiff blobPair (const pure) (const (serialize Show))
+showDiff blobPair = doDiff blobPair (const id) (const (serialize Show))
 
 dotGraphDiff :: (DiffEffects sig m) => BlobPair -> m Builder
-dotGraphDiff blobPair = doDiff blobPair (const pure) render
+dotGraphDiff blobPair = doDiff blobPair (const id) render
   where render _ = serialize (DOT (diffStyle "diffs")) . renderTreeGraph
 
-type DiffEffects sig m = (Member (Error SomeException) sig, Member Telemetry sig, Member Distribute sig, Member Task sig, Carrier sig m, MonadIO m)
+type DiffEffects sig m = (Member (Error SomeException) sig, Member (Reader Config) sig, Member Telemetry sig, Member Distribute sig, Member Parse sig, Carrier sig m, MonadIO m)
 
 type CanDiff syntax = (ConstructorName syntax, Diffable syntax, Eq1 syntax, HasDeclaration syntax, Hashable1 syntax, Show1 syntax, ToJSONFields1 syntax, Traversable syntax)
-type Decorate m a b = forall syntax . CanDiff syntax => Blob -> Term syntax a -> m (Term syntax b)
+type Decorate a b = forall syntax . CanDiff syntax => Blob -> Term syntax a -> Term syntax b
 
 type TermPairConstraints =
  '[ ConstructorName
@@ -111,33 +115,33 @@ type TermPairConstraints =
   ]
 
 doDiff :: (DiffEffects sig m)
-  => BlobPair -> Decorate m Loc ann -> (forall syntax . CanDiff syntax => BlobPair -> Diff syntax ann ann -> m output) -> m output
+  => BlobPair -> Decorate Loc ann -> (forall syntax . CanDiff syntax => BlobPair -> Diff syntax ann ann -> m output) -> m output
 doDiff blobPair decorate render = do
   SomeTermPair terms <- doParse blobPair decorate
   diff <- diffTerms blobPair terms
   render blobPair diff
 
-diffTerms :: (CanDiff syntax, Member Task sig, Member Telemetry sig, Carrier sig m, MonadIO m)
+diffTerms :: (CanDiff syntax, Member Telemetry sig, Carrier sig m, MonadIO m)
   => BlobPair -> Join These (Term syntax ann) -> m (Diff syntax ann ann)
 diffTerms blobs terms = time "diff" languageTag $ do
-  diff <- diff (runJoin terms)
+  let diff = diffTermPair (runJoin terms)
   diff <$ writeStat (Stat.count "diff.nodes" (bilength diff) languageTag)
   where languageTag = languageTagForBlobPair blobs
 
-doParse :: (Member (Error SomeException) sig, Member Distribute sig, Member Task sig, Carrier sig m)
-  => BlobPair -> Decorate m Loc ann -> m (SomeTermPair TermPairConstraints ann)
+doParse :: (Member (Error SomeException) sig, Member Distribute sig, Member Parse sig, Carrier sig m)
+  => BlobPair -> Decorate Loc ann -> m (SomeTermPair TermPairConstraints ann)
 doParse blobPair decorate = case languageForBlobPair blobPair of
-  Go         -> SomeTermPair <$> distributeFor blobPair (\ blob -> parse goParser blob >>= decorate blob)
-  Haskell    -> SomeTermPair <$> distributeFor blobPair (\ blob -> parse haskellParser blob >>= decorate blob)
-  JavaScript -> SomeTermPair <$> distributeFor blobPair (\ blob -> parse tsxParser blob >>= decorate blob)
-  JSON       -> SomeTermPair <$> distributeFor blobPair (\ blob -> parse jsonParser blob >>= decorate blob)
-  JSX        -> SomeTermPair <$> distributeFor blobPair (\ blob -> parse tsxParser blob >>= decorate blob)
-  Markdown   -> SomeTermPair <$> distributeFor blobPair (\ blob -> parse markdownParser blob >>= decorate blob)
-  Python     -> SomeTermPair <$> distributeFor blobPair (\ blob -> parse pythonParser blob >>= decorate blob)
-  Ruby       -> SomeTermPair <$> distributeFor blobPair (\ blob -> parse rubyParser blob >>= decorate blob)
-  TypeScript -> SomeTermPair <$> distributeFor blobPair (\ blob -> parse typescriptParser blob >>= decorate blob)
-  TSX        -> SomeTermPair <$> distributeFor blobPair (\ blob -> parse tsxParser blob >>= decorate blob)
-  PHP        -> SomeTermPair <$> distributeFor blobPair (\ blob -> parse phpParser blob >>= decorate blob)
+  Go         -> SomeTermPair <$> distributeFor blobPair (\ blob -> decorate blob <$> parse goParser blob)
+  Haskell    -> SomeTermPair <$> distributeFor blobPair (\ blob -> decorate blob <$> parse haskellParser blob)
+  JavaScript -> SomeTermPair <$> distributeFor blobPair (\ blob -> decorate blob <$> parse tsxParser blob)
+  JSON       -> SomeTermPair <$> distributeFor blobPair (\ blob -> decorate blob <$> parse jsonParser blob)
+  JSX        -> SomeTermPair <$> distributeFor blobPair (\ blob -> decorate blob <$> parse tsxParser blob)
+  Markdown   -> SomeTermPair <$> distributeFor blobPair (\ blob -> decorate blob <$> parse markdownParser blob)
+  Python     -> SomeTermPair <$> distributeFor blobPair (\ blob -> decorate blob <$> parse pythonParser blob)
+  Ruby       -> SomeTermPair <$> distributeFor blobPair (\ blob -> decorate blob <$> parse rubyParser blob)
+  TypeScript -> SomeTermPair <$> distributeFor blobPair (\ blob -> decorate blob <$> parse typescriptParser blob)
+  TSX        -> SomeTermPair <$> distributeFor blobPair (\ blob -> decorate blob <$> parse tsxParser blob)
+  PHP        -> SomeTermPair <$> distributeFor blobPair (\ blob -> decorate blob <$> parse phpParser blob)
   _          -> noLanguageForBlob (pathForBlobPair blobPair)
 
 data SomeTermPair typeclasses ann where
