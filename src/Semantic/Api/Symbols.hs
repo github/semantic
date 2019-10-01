@@ -105,9 +105,7 @@ parseSymbols blobs = do -- ParseTreeSymbolResponse . V.fromList . toList <$> dis
           & P.kind .~ pack (show kind)
           & P.line .~ line
           & P.maybe'span .~ converting #? span
-          & P.maybe'docs .~ case docs of
-            Just d -> Just (defMessage & P.docstring .~ d)
-            Nothing -> Nothing
+          & P.maybe'docs .~ fmap (flip (set P.docstring) defMessage) docs
 
         symbolsToSummarize :: [Text]
         symbolsToSummarize = ["Function", "Method", "Class", "Module", "Call", "Send"]
