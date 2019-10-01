@@ -146,35 +146,6 @@ tsParseCommand = command "ts-parse" (info tsParseArgumentsParser (progDesc "Gene
                   <|> pure (FilesFromHandle stdin)
       pure $ Task.readBlobs filesOrStdin >>= AST.runASTParse format
 
-graphCommand :: Mod CommandFields (Task.TaskEff Builder)
-graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute a graph for a directory or from a top-level entry point module"))
-  where
-    graphArgumentsParser = makeGraphTask
-      <$> graphType
-      <*> switch (long "packages" <> help "Include a vertex for the package, with edges from it to each module")
-      <*> serializer
-      <*> (readProjectRecursively <|> readProjectFromPaths)
-    graphType =  flag  Graph.ImportGraph Graph.ImportGraph (long "imports" <> help "Compute an import graph (default)")
-             <|> flag'                   Graph.CallGraph   (long "calls"   <> help "Compute a call graph")
-    serializer =  flag (Task.serialize (DOT Graph.style)) (Task.serialize (DOT Graph.style)) (long "dot"  <> help "Output in DOT graph format (default)")
-              <|> flag'                                   (Task.serialize JSON)              (long "json" <> help "Output JSON graph")
-              <|> flag'                                   (Task.serialize Show)              (long "show" <> help "Output using the Show instance (debug only, format subject to change without notice)")
-    readProjectFromPaths = makeReadProjectFromPathsTask
-      <$> (   Just <$> some (strArgument (metavar "FILES..."))
-          <|> flag' Nothing (long "stdin" <> help "Read a list of newline-separated paths to analyze from stdin."))
-    makeReadProjectFromPathsTask maybePaths = do
-      paths <- maybeM (liftIO (many getLine)) maybePaths
-      blobs <- traverse readBlobFromFile' (fileForPath <$> paths)
-      case paths of
-        (x:_) -> pure $! Project (takeDirectory x) blobs (Language.languageForFilePath x) mempty
-        _     -> pure $! Project "/" mempty Language.Unknown mempty
-    readProjectRecursively = makeReadProjectRecursivelyTask
-      <$> option auto (long "language" <> help "The language for the analysis.")
-      <*> optional (strOption (long "root" <> help "Root directory of project. Optional, defaults to entry file/directory." <> metavar "DIR"))
-      <*> many (strOption (long "exclude-dir" <> help "Exclude a directory (e.g. vendor)" <> metavar "DIR"))
-      <*> argument str (metavar "DIR")
-    makeReadProjectRecursivelyTask language rootDir excludeDirs dir = Task.readProject rootDir dir language excludeDirs
-    makeGraphTask graphType includePackages serializer projectTask = projectTask >>= Graph.runGraph graphType includePackages >>= serializer
 
 shaReader :: ReadM Git.OID
 shaReader = eitherReader parseSha
