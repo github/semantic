@@ -2,6 +2,7 @@
 {-# LANGUAGE TypeApplications #-}
 module CLI (main) where
 
+import System.Environment
 
 
 newtype SignalException = SignalException Signal
