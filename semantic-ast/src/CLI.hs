@@ -3,6 +3,8 @@
 module CLI (main) where
 
 import System.Environment
+import Source.Range
+import Source.Span
 
 
 newtype SignalException = SignalException Signal
