@@ -109,10 +109,10 @@ instance (ConstructorName syntax, Foldable syntax, Functor syntax) => DOTGraphTe
   dotGraphTerm = serialize (DOT (termStyle "terms")) . renderTreeGraph
 
 
-class JSONTerm term where
+class JSONTreeTerm term where
   jsonTerm' :: Blob -> term Loc -> Rendering.JSON.JSON "trees" SomeJSON
 
-instance ToJSONFields1 syntax => JSONTerm (Term syntax) where
+instance ToJSONFields1 syntax => JSONTreeTerm (Term syntax) where
   jsonTerm' = renderJSONTerm
 
 
@@ -128,8 +128,8 @@ instance (Foldable syntax, Functor syntax, ConstructorName syntax) => JSONGraphT
         lang = bridging # blobLanguage blob
 
 
-class (DOTGraphTerm t, JSONGraphTerm t, JSONTerm t, SExprTerm t, ShowTerm t) => TermActions t
-instance (DOTGraphTerm t, JSONGraphTerm t, JSONTerm t, SExprTerm t, ShowTerm t) => TermActions t
+class (DOTGraphTerm t, JSONGraphTerm t, JSONTreeTerm t, SExprTerm t, ShowTerm t) => TermActions t
+instance (DOTGraphTerm t, JSONGraphTerm t, JSONTreeTerm t, SExprTerm t, ShowTerm t) => TermActions t
 
 doParse
   :: ( Carrier sig m
