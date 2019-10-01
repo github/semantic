@@ -15,3 +15,4 @@ main :: IO ()
 main = do
   args <- head <$> getArgs
   bytestring <- Data.ByteString.readFile args
+  print =<< parseByteString @TreeSitter.Python.AST.Module @(Range, Span) tree_sitter_python bytestring
