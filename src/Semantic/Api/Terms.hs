@@ -1,4 +1,4 @@
-{-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, MonoLocalBinds, RankNTypes, TypeOperators #-}
+{-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, MonoLocalBinds, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Semantic.Api.Terms
   ( termGraph
   , parseTermBuilder
@@ -35,22 +35,13 @@ import           Serializing.Format hiding (JSON)
 import qualified Serializing.Format as Format
 import           Source.Loc
 
-import qualified Language.Go.Assignment as Go
-import qualified Language.Haskell.Assignment as Haskell
-import qualified Language.JSON.Assignment as JSON
-import qualified Language.Markdown.Assignment as Markdown
-import qualified Language.PHP.Assignment as PHP
 import qualified Language.Python as Py
-import qualified Language.Python.Assignment as Python
-import qualified Language.Ruby.Assignment as Ruby
-import qualified Language.TSX.Assignment as TSX
-import qualified Language.TypeScript.Assignment as TypeScript
 
 termGraph :: (Traversable t, Member Distribute sig, ParseEffects sig m) => t Blob -> m ParseTreeGraphResponse
 termGraph blobs = ParseTreeGraphResponse . V.fromList . toList <$> distributeFor blobs go
   where
     go :: ParseEffects sig m => Blob -> m ParseTreeFileGraph
-    go blob = doParse @JSONGraphTerm (pure . jsonGraphTerm blob) blob
+    go blob = doParse (pure . jsonGraphTerm blob) blob
       `catchError` \(SomeException e) ->
         pure (ParseTreeFileGraph path lang mempty mempty (V.fromList [ParseError (T.pack (show e))]))
       where
@@ -71,19 +62,19 @@ parseTermBuilder :: (Traversable t, Member Distribute sig, ParseEffects sig m, M
   => TermOutputFormat -> t Blob -> m Builder
 parseTermBuilder TermJSONTree    = distributeFoldMap jsonTerm >=> serialize Format.JSON -- NB: Serialize happens at the top level for these two JSON formats to collect results of multiple blobs.
 parseTermBuilder TermJSONGraph   = termGraph >=> serialize Format.JSON
-parseTermBuilder TermSExpression = distributeFoldMap (doParse @SExprTerm sexprTerm)
-parseTermBuilder TermDotGraph    = distributeFoldMap (doParse @DOTGraphTerm dotGraphTerm)
-parseTermBuilder TermShow        = distributeFoldMap (doParse @ShowTerm showTerm)
+parseTermBuilder TermSExpression = distributeFoldMap (doParse sexprTerm)
+parseTermBuilder TermDotGraph    = distributeFoldMap (doParse dotGraphTerm)
+parseTermBuilder TermShow        = distributeFoldMap (doParse showTerm)
 parseTermBuilder TermQuiet       = distributeFoldMap quietTerm
 
 jsonTerm :: ParseEffects sig m => Blob -> m (Rendering.JSON.JSON "trees" SomeJSON)
-jsonTerm blob = doParse @JSONTerm (pure . jsonTerm' blob) blob `catchError` jsonError blob
+jsonTerm blob = doParse (pure . jsonTerm' blob) blob `catchError` jsonError blob
 
 jsonError :: Applicative m => Blob -> SomeException -> m (Rendering.JSON.JSON "trees" SomeJSON)
 jsonError blob (SomeException e) = pure $ renderJSONError blob (show e)
 
 quietTerm :: (ParseEffects sig m, MonadIO m) => Blob -> m Builder
-quietTerm blob = showTiming blob <$> time' ( doParse @ShowTerm (fmap (const (Right ())) . showTerm) blob `catchError` timingError )
+quietTerm blob = showTiming blob <$> time' ( doParse (fmap (const (Right ())) . showTerm) blob `catchError` timingError )
   where
     timingError (SomeException e) = pure (Left (show e))
     showTiming Blob{..} (res, duration) =
@@ -137,21 +128,15 @@ instance (Foldable syntax, Functor syntax, ConstructorName syntax) => JSONGraphT
         lang = bridging # blobLanguage blob
 
 
+class (DOTGraphTerm t, JSONGraphTerm t, JSONTerm t, SExprTerm t, ShowTerm t) => TermActions t
+instance (DOTGraphTerm t, JSONGraphTerm t, JSONTerm t, SExprTerm t, ShowTerm t) => TermActions t
+
 doParse
-  :: ( c (Term (Sum Go.Syntax))
-     , c (Term (Sum Haskell.Syntax))
-     , c (Term (Sum JSON.Syntax))
-     , c (Term (Sum Markdown.Syntax))
-     , c (Term (Sum PHP.Syntax))
-     , c (Term (Sum Python.Syntax))
-     , c (Term (Sum Ruby.Syntax))
-     , c (Term (Sum TSX.Syntax))
-     , c (Term (Sum TypeScript.Syntax))
-     , Carrier sig m
+  :: ( Carrier sig m
      , Member (Error SomeException) sig
      , Member Parse sig
      )
-  => (forall term . c term => term Loc -> m a)
+  => (forall term . TermActions term => term Loc -> m a)
   -> Blob
   -> m a
 doParse with blob = case blobLanguage blob of
