@@ -34,7 +34,7 @@ legacyParseSymbols :: (Member Distribute sig, ParseEffects sig m, Traversable t)
 legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> distributeFoldMap go blobs
   where
     go :: ParseEffects sig m => Blob -> m [Legacy.File]
-    go blob@Blob{..} = (doParse blob >>= withSomeTerm renderToSymbols) `catchError` (\(SomeException _) -> pure (pure emptyFile))
+    go blob@Blob{..} = (withSomeTerm renderToSymbols <$> doParse blob) `catchError` (\(SomeException _) -> pure (pure emptyFile))
       where
         emptyFile = tagsToFile []
 
@@ -42,8 +42,8 @@ legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> distributeFoldMap 
         symbolsToSummarize :: [Text]
         symbolsToSummarize = ["Function", "Method", "Class", "Module"]
 
-        renderToSymbols :: (IsTaggable f, Applicative m) => Term f Loc -> m [Legacy.File]
-        renderToSymbols = pure . pure . tagsToFile . Precise.tags blobSource . ALaCarteTerm (blobLanguage blob) symbolsToSummarize
+        renderToSymbols :: IsTaggable f => Term f Loc -> [Legacy.File]
+        renderToSymbols = pure . tagsToFile . Precise.tags blobSource . ALaCarteTerm (blobLanguage blob) symbolsToSummarize
 
         tagsToFile :: [Tag] -> Legacy.File
         tagsToFile tags = Legacy.File (pack (blobPath blob)) (pack (show (blobLanguage blob))) (fmap tagToSymbol tags)
