@@ -31,7 +31,7 @@ runTagging blob symbolsToSummarize
   . evalState @[ContextToken] []
   . Streaming.toList_
   . contextualizing blob toKind
-  . tagging blob
+  . tagging (blobLanguage blob)
   where
     toKind x = do
       guard (x `elem` symbolsToSummarize)
