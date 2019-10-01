@@ -44,7 +44,6 @@ import           Semantic.Task
 import           Serializing.Format hiding (JSON)
 import qualified Serializing.Format as Format
 import           Source.Loc
-import           Tags.Taggable
 
 termGraph :: (Traversable t, Member Distribute sig, ParseEffects sig m) => t Blob -> m ParseTreeGraphResponse
 termGraph blobs = ParseTreeGraphResponse . V.fromList . toList <$> distributeFor blobs go
@@ -107,10 +106,8 @@ quietTerm blob = showTiming blob <$> time' ( (doParse blob >>= withSomeTerm (fma
 type ParseEffects sig m = (Member (Error SomeException) sig, Member (Reader PerLanguageModes) sig, Member Parse sig, Member (Reader Config) sig, Carrier sig m)
 
 type TermConstraints =
- '[ Taggable
-  , Declarations1
+ '[ Declarations1
   , ConstructorName
-  , HasTextElement
   , Show1
   , ToJSONFields1
   , Traversable
