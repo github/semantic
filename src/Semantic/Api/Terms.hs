@@ -40,6 +40,7 @@ import           Semantic.Proto.SemanticPB hiding (Blob)
 import           Semantic.Task
 import           Serializing.Format hiding (JSON)
 import qualified Serializing.Format as Format
+import           Serializing.SExpression (ToSExpression)
 import           Source.Loc
 
 termGraph :: (Traversable t, Member Distribute sig, ParseEffects sig m) => t Blob -> m ParseTreeGraphResponse
@@ -71,7 +72,7 @@ parseTermBuilder :: (Traversable t, Member Distribute sig, ParseEffects sig m, M
   => TermOutputFormat -> t Blob -> m Builder
 parseTermBuilder TermJSONTree    = distributeFoldMap jsonTerm >=> serialize Format.JSON -- NB: Serialize happens at the top level for these two JSON formats to collect results of multiple blobs.
 parseTermBuilder TermJSONGraph   = termGraph >=> serialize Format.JSON
-parseTermBuilder TermSExpression = distributeFoldMap sexpTerm
+parseTermBuilder TermSExpression = distributeFoldMap (doParse sexpTerm)
 parseTermBuilder TermDotGraph    = distributeFoldMap dotGraphTerm
 parseTermBuilder TermShow        = distributeFoldMap showTerm
 parseTermBuilder TermQuiet       = distributeFoldMap quietTerm
@@ -82,8 +83,8 @@ jsonTerm blob = doParse (pure . renderJSONTerm blob) blob `catchError` jsonError
 jsonError :: Applicative m => Blob -> SomeException -> m (Rendering.JSON.JSON "trees" SomeJSON)
 jsonError blob (SomeException e) = pure $ renderJSONError blob (show e)
 
-sexpTerm :: ParseEffects sig m => Blob -> m Builder
-sexpTerm = doParse (serialize (SExpression ByConstructorName))
+sexpTerm :: (Carrier sig m, Member (Reader Config) sig, Recursive t, ToSExpression (Base t)) => t -> m Builder
+sexpTerm = serialize (SExpression ByConstructorName)
 
 dotGraphTerm :: ParseEffects sig m => Blob -> m Builder
 dotGraphTerm = doParse (serialize (DOT (termStyle "terms")) . renderTreeGraph)
