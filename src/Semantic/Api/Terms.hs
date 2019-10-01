@@ -120,7 +120,13 @@ instance ( ConstructorName t
          )
       => TermConstraints t
 
-doParse :: ParseEffects sig m => Blob -> m (SomeTerm TermConstraints Loc)
+doParse
+  :: ( Carrier sig m
+     , Member (Error SomeException) sig
+     , Member Parse sig
+     )
+  => Blob
+  -> m (SomeTerm TermConstraints Loc)
 doParse blob = case blobLanguage blob of
   Go         -> SomeTerm <$> parse goParser blob
   Haskell    -> SomeTerm <$> parse haskellParser blob
