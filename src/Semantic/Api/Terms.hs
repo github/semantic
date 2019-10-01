@@ -71,7 +71,7 @@ parseTermBuilder :: (Traversable t, Member Distribute sig, ParseEffects sig m, M
   => TermOutputFormat -> t Blob -> m Builder
 parseTermBuilder TermJSONTree    = distributeFoldMap jsonTerm >=> serialize Format.JSON -- NB: Serialize happens at the top level for these two JSON formats to collect results of multiple blobs.
 parseTermBuilder TermJSONGraph   = termGraph >=> serialize Format.JSON
-parseTermBuilder TermSExpression = distributeFoldMap (doParse sexpTerm)
+parseTermBuilder TermSExpression = distributeFoldMap (doParse sexprTerm)
 parseTermBuilder TermDotGraph    = distributeFoldMap (doParse dotGraphTerm)
 parseTermBuilder TermShow        = distributeFoldMap (doParse showTerm)
 parseTermBuilder TermQuiet       = distributeFoldMap quietTerm
@@ -81,15 +81,6 @@ jsonTerm blob = doParse (pure . renderJSONTerm blob) blob `catchError` jsonError
 
 jsonError :: Applicative m => Blob -> SomeException -> m (Rendering.JSON.JSON "trees" SomeJSON)
 jsonError blob (SomeException e) = pure $ renderJSONError blob (show e)
-
-sexpTerm :: (Carrier sig m, ConstructorName syntax, Foldable syntax, Functor syntax, Member (Reader Config) sig) => Term syntax Loc -> m Builder
-sexpTerm = sexprTerm'
-
-dotGraphTerm :: (Carrier sig m, ConstructorName syntax, Foldable syntax, Functor syntax, Member (Reader Config) sig) => Term syntax Loc -> m Builder
-dotGraphTerm = dotGraphTerm'
-
-showTerm :: (Carrier sig m, Functor syntax, Member (Reader Config) sig, Show1 syntax) => Term syntax Loc -> m Builder
-showTerm = showTerm'
 
 quietTerm :: (ParseEffects sig m, MonadIO m) => Blob -> m Builder
 quietTerm blob = showTiming blob <$> time' ( doParse (fmap (const (Right ())) . serialize Show . quieterm) blob `catchError` timingError )
@@ -119,23 +110,23 @@ instance ( ConstructorName t
       => TermConstraints t
 
 class ShowTerm term where
-  showTerm' :: (Carrier sig m, Member (Reader Config) sig) => term Loc -> m Builder
+  showTerm :: (Carrier sig m, Member (Reader Config) sig) => term Loc -> m Builder
 
 instance (Functor syntax, Show1 syntax) => ShowTerm (Term syntax) where
-  showTerm' = serialize Show . quieterm
+  showTerm = serialize Show . quieterm
 
 
 class SExprTerm term where
-  sexprTerm' :: (Carrier sig m, Member (Reader Config) sig) => term Loc -> m Builder
+  sexprTerm :: (Carrier sig m, Member (Reader Config) sig) => term Loc -> m Builder
 
 instance (ConstructorName syntax, Foldable syntax, Functor syntax) => SExprTerm (Term syntax) where
-  sexprTerm' = serialize (SExpression ByConstructorName)
+  sexprTerm = serialize (SExpression ByConstructorName)
 
 class DOTGraphTerm term where
-  dotGraphTerm' :: (Carrier sig m, Member (Reader Config) sig) => term Loc -> m Builder
+  dotGraphTerm :: (Carrier sig m, Member (Reader Config) sig) => term Loc -> m Builder
 
 instance (ConstructorName syntax, Foldable syntax, Functor syntax) => DOTGraphTerm (Term syntax) where
-  dotGraphTerm' = serialize (DOT (termStyle "terms")) . renderTreeGraph
+  dotGraphTerm = serialize (DOT (termStyle "terms")) . renderTreeGraph
 
 
 doParse
