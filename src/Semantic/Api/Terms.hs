@@ -131,6 +131,12 @@ class SExprTerm term where
 instance (ConstructorName syntax, Foldable syntax, Functor syntax) => SExprTerm (Term syntax) where
   sexprTerm' = serialize (SExpression ByConstructorName)
 
+class DOTGraphTerm term where
+  dotGraphTerm' :: (Carrier sig m, Member (Reader Config) sig) => term Loc -> m Builder
+
+instance (ConstructorName syntax, Foldable syntax, Functor syntax) => DOTGraphTerm (Term syntax) where
+  dotGraphTerm' = serialize (DOT (termStyle "terms")) . renderTreeGraph
+
 
 doParse
   :: ( Carrier sig m
