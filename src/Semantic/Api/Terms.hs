@@ -108,9 +108,10 @@ type ParseEffects sig m = (Member (Error SomeException) sig, Member (Reader PerL
 type TermConstraints =
  '[ Declarations1
   , ConstructorName
+  , Foldable
+  , Functor
   , Show1
   , ToJSONFields1
-  , Traversable
   ]
 
 doParse :: (ParseEffects sig m) => Blob -> m (SomeTerm TermConstraints Loc)
