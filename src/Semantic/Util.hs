@@ -20,6 +20,7 @@ import Prelude hiding (readFile)
 import           Control.Abstract
 import           Control.Abstract.Heap (runHeapError)
 import           Control.Abstract.ScopeGraph (runScopeError)
+import           Control.Carrier.Parse.Simple
 import           Control.Effect.Lift
 import           Control.Effect.Trace (runTraceByPrinting)
 import           Control.Exception (displayException)
@@ -102,7 +103,7 @@ evaluateProject proxy parser paths = withOptions debugOptions $ \ config logger 
 
 -- Evaluate a project consisting of the listed paths.
 evaluateProject' session proxy parser paths = do
-  res <- runTask session $ do
+  res <- runTask session $ asks configTreeSitterParseTimeout >>= \ timeout -> runParse timeout $ do
     blobs <- catMaybes <$> traverse readBlobFromFile (flip File (Language.reflect proxy) <$> paths)
     package <- fmap (quieterm . snd) <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs (Language.reflect proxy) [])
     modules <- topologicalSort <$> runImportGraphToModules proxy package
@@ -120,9 +121,9 @@ parseFile, parseFileQuiet :: Parser term -> FilePath -> IO term
 parseFile parser = runTask' . (parse parser <=< readBlob . fileForPath)
 parseFileQuiet parser = runTaskQuiet . (parse parser <=< readBlob . fileForPath)
 
-runTask', runTaskQuiet :: TaskEff a -> IO a
-runTask' task = runTaskWithOptions debugOptions task >>= either (die . displayException) pure
-runTaskQuiet task = runTaskWithOptions defaultOptions task >>= either (die . displayException) pure
+runTask', runTaskQuiet :: ParseC TaskC a -> IO a
+runTask' task = runTaskWithOptions debugOptions (asks configTreeSitterParseTimeout >>= \ timeout -> runParse timeout task) >>= either (die . displayException) pure
+runTaskQuiet task = runTaskWithOptions defaultOptions (asks configTreeSitterParseTimeout >>= \ timeout -> runParse timeout task) >>= either (die . displayException) pure
 
 mergeErrors :: Either (SomeError (Sum errs)) (Either (SomeError err) result) -> Either (SomeError (Sum (err ': errs))) result
 mergeErrors = either (\ (SomeError sum) -> Left (SomeError (weaken sum))) (either (\ (SomeError err) -> Left (SomeError (inject err))) Right)

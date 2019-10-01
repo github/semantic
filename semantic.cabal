@@ -114,8 +114,12 @@ library
                      , Control.Abstract.Roots
                      , Control.Abstract.ScopeGraph
                      , Control.Abstract.Value
+                     -- Carriers
+                     , Control.Carrier.Parse.Measured
+                     , Control.Carrier.Parse.Simple
                      -- Effects
                      , Control.Effect.Interpose
+                     , Control.Effect.Parse
                      , Control.Effect.REPL
                      , Control.Rewriting
                      -- Datatypes for abstract interpretation
