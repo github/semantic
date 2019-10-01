@@ -109,18 +109,22 @@ withSomeTerm :: (forall t . c t => t ann -> a) -> SomeTerm c ann -> a
 withSomeTerm with (SomeTerm term) = with term
 
 doParse :: ParseEffects sig m => [Text] -> Blob -> m (SomeTerm Precise.ToTags Loc)
-doParse symbolsToSummarize blob = case blobLanguage blob of
-  Go         -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.goParser blob
-  Haskell    -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.haskellParser blob
-  JavaScript -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.tsxParser blob
-  JSON       -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.jsonParser blob
-  JSX        -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.tsxParser blob
-  Markdown   -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.markdownParser blob
-  Python     -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.pythonParser blob
-  Ruby       -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.rubyParser blob
-  TypeScript -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.typescriptParser blob
-  TSX        -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.tsxParser blob
-  PHP        -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.phpParser blob
-  _          -> noLanguageForBlob (blobPath blob)
+doParse symbolsToSummarize blob = do
+  modes <- ask @PerLanguageModes
+  case blobLanguage blob of
+    Go         -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.goParser blob
+    Haskell    -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.haskellParser blob
+    JavaScript -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.tsxParser blob
+    JSON       -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.jsonParser blob
+    JSX        -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.tsxParser blob
+    Markdown   -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.markdownParser blob
+    Python
+      | Precise <- pythonMode modes -> SomeTerm <$> parse Parser.precisePythonParser blob
+      | otherwise                   -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.pythonParser blob
+    Ruby       -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.rubyParser blob
+    TypeScript -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.typescriptParser blob
+    TSX        -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.tsxParser blob
+    PHP        -> SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize <$> parse Parser.phpParser blob
+    _          -> noLanguageForBlob (blobPath blob)
 
 type ParseEffects sig m = (Member (Error SomeException) sig, Member (Reader PerLanguageModes) sig, Member Parse sig, Member (Reader Config) sig, Carrier sig m)
