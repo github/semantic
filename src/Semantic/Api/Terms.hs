@@ -118,6 +118,13 @@ instance ( ConstructorName t
          )
       => TermConstraints t
 
+class ShowTerm term where
+  showTerm' :: (Carrier sig m, Member (Reader Config) sig) => term Loc -> m Builder
+
+instance (Functor syntax, Show1 syntax) => ShowTerm (Term syntax) where
+  showTerm' = serialize Show . quieterm
+
+
 doParse
   :: ( Carrier sig m
      , Member (Error SomeException) sig
