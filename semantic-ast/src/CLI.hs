@@ -9,6 +9,7 @@ import TreeSitter.Python
 import Source.Range
 import Source.Span
 import Data.ByteString (readFile, ByteString)
+import System.IO (FilePath)
 
 main :: IO (Either Prelude.String (Module (Range, Span)))
 main = do
