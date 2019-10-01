@@ -72,7 +72,7 @@ parseTermBuilder :: (Traversable t, Member Distribute sig, ParseEffects sig m, M
 parseTermBuilder TermJSONTree    = distributeFoldMap jsonTerm >=> serialize Format.JSON -- NB: Serialize happens at the top level for these two JSON formats to collect results of multiple blobs.
 parseTermBuilder TermJSONGraph   = termGraph >=> serialize Format.JSON
 parseTermBuilder TermSExpression = distributeFoldMap (doParse sexpTerm)
-parseTermBuilder TermDotGraph    = distributeFoldMap dotGraphTerm
+parseTermBuilder TermDotGraph    = distributeFoldMap (doParse dotGraphTerm)
 parseTermBuilder TermShow        = distributeFoldMap (doParse showTerm)
 parseTermBuilder TermQuiet       = distributeFoldMap quietTerm
 
@@ -85,8 +85,8 @@ jsonError blob (SomeException e) = pure $ renderJSONError blob (show e)
 sexpTerm :: (Carrier sig m, ConstructorName syntax, Foldable syntax, Functor syntax, Member (Reader Config) sig) => Term syntax Loc -> m Builder
 sexpTerm = serialize (SExpression ByConstructorName)
 
-dotGraphTerm :: ParseEffects sig m => Blob -> m Builder
-dotGraphTerm = doParse (serialize (DOT (termStyle "terms")) . renderTreeGraph)
+dotGraphTerm :: (Carrier sig m, ConstructorName syntax, Foldable syntax, Functor syntax, Member (Reader Config) sig) => Term syntax Loc -> m Builder
+dotGraphTerm = serialize (DOT (termStyle "terms")) . renderTreeGraph
 
 showTerm :: (Carrier sig m, Functor syntax, Member (Reader Config) sig, Show1 syntax) => Term syntax Loc -> m Builder
 showTerm = serialize Show . quieterm
