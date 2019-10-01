@@ -128,17 +128,17 @@ doParse
   => Blob
   -> m (SomeTerm TermConstraints Loc)
 doParse blob = case blobLanguage blob of
-  Go         -> SomeTerm <$> parse goParser blob
-  Haskell    -> SomeTerm <$> parse haskellParser blob
-  JavaScript -> SomeTerm <$> parse tsxParser blob
-  JSON       -> SomeTerm <$> parse jsonParser blob
-  JSX        -> SomeTerm <$> parse tsxParser blob
-  Markdown   -> SomeTerm <$> parse markdownParser blob
-  Python     -> SomeTerm <$> parse pythonParser blob
-  Ruby       -> SomeTerm <$> parse rubyParser blob
+  Go         -> SomeTerm <$> parse goParser         blob
+  Haskell    -> SomeTerm <$> parse haskellParser    blob
+  JavaScript -> SomeTerm <$> parse tsxParser        blob
+  JSON       -> SomeTerm <$> parse jsonParser       blob
+  JSX        -> SomeTerm <$> parse tsxParser        blob
+  Markdown   -> SomeTerm <$> parse markdownParser   blob
+  Python     -> SomeTerm <$> parse pythonParser     blob
+  Ruby       -> SomeTerm <$> parse rubyParser       blob
   TypeScript -> SomeTerm <$> parse typescriptParser blob
-  TSX        -> SomeTerm <$> parse tsxParser blob
-  PHP        -> SomeTerm <$> parse phpParser blob
+  TSX        -> SomeTerm <$> parse tsxParser        blob
+  PHP        -> SomeTerm <$> parse phpParser        blob
   _          -> noLanguageForBlob (blobPath blob)
 
 
