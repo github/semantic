@@ -37,19 +37,6 @@ newtype SignalException = SignalException Signal
   deriving (Show, Typeable)
 instance Exception SignalException
 
-installSignalHandlers :: IO ()
-installSignalHandlers = do
-  mainThreadId <- myThreadId
-  weakTid <- mkWeakThreadId mainThreadId
-  for_ [ sigABRT, sigBUS, sigHUP, sigILL, sigQUIT, sigSEGV,
-          sigSYS, sigTERM, sigUSR1, sigUSR2, sigXCPU, sigXFSZ ] $ \sig ->
-    installHandler sig (Catch $ sendException weakTid sig) Nothing
-  where
-    sendException weakTid sig = do
-      m <- deRefWeak weakTid
-      case m of
-        Nothing  -> pure ()
-        Just tid -> throwTo tid (toException $ SignalException sig)
 
 main :: IO ()
 main = do
