@@ -70,7 +70,7 @@ parseSymbols blobs = do
       | Precise <- pythonMode modes
       , Python  <- blobLanguage'
       =             catching $ renderToSymbols                                                   <$> parse precisePythonParser blob
-      | otherwise = catching $ withSomeTerm (renderToSymbols . ALaCarteTerm (blobLanguage blob)) <$> doParse                   blob
+      | otherwise = catching $ withSomeTerm (renderToSymbols . ALaCarteTerm (blobLanguage blob) symbolsToSummarize) <$> doParse                   blob
       where
         catching m = m `catchError` (\(SomeException e) -> pure $ errorFile (show e))
         blobLanguage' = blobLanguage blob
@@ -96,7 +96,7 @@ tagToSymbol Tag{..} = Symbol
   }
 
 
-data ALaCarteTerm syntax ann = ALaCarteTerm Language (Term syntax ann)
+data ALaCarteTerm syntax ann = ALaCarteTerm Language [Text] (Term syntax ann)
 
 instance IsTaggable syntax => Precise.ToTags (ALaCarteTerm syntax) where
-  tags source (ALaCarteTerm lang term) = runTagging lang source symbolsToSummarize term
+  tags source (ALaCarteTerm lang symbolsToSummarize term) = runTagging lang source symbolsToSummarize term
