@@ -83,7 +83,7 @@ jsonError :: Applicative m => Blob -> SomeException -> m (Rendering.JSON.JSON "t
 jsonError blob (SomeException e) = pure $ renderJSONError blob (show e)
 
 quietTerm :: (ParseEffects sig m, MonadIO m) => Blob -> m Builder
-quietTerm blob = showTiming blob <$> time' ( doParse (fmap (const (Right ())) . serialize Show . quieterm) blob `catchError` timingError )
+quietTerm blob = showTiming blob <$> time' ( doParse (fmap (const (Right ())) . showTerm) blob `catchError` timingError )
   where
     timingError (SomeException e) = pure (Left (show e))
     showTiming Blob{..} (res, duration) =
