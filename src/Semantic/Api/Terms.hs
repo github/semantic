@@ -1,15 +1,9 @@
 {-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, MonoLocalBinds, RankNTypes, TypeOperators #-}
 module Semantic.Api.Terms
-  (
-    termGraph
+  ( termGraph
   , parseTermBuilder
   , TermOutputFormat(..)
-
-  , doParse
-  , ParseEffects
-
   ) where
-
 
 import           Analysis.ConstructorName (ConstructorName)
 import           Control.Effect.Error
