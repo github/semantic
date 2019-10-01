@@ -5,6 +5,7 @@ module CLI (main) where
 import System.Environment
 import Source.Range
 import Source.Span
+import Data.ByteString (ByteString)
 
 
 newtype SignalException = SignalException Signal
