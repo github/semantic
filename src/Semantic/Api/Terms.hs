@@ -46,17 +46,13 @@ termGraph :: (Traversable t, Member Distribute sig, ParseEffects sig m) => t Blo
 termGraph blobs = ParseTreeGraphResponse . V.fromList . toList <$> distributeFor blobs go
   where
     go :: ParseEffects sig m => Blob -> m ParseTreeFileGraph
-    go blob = doParse (pure . render) blob
+    go blob = doParse (pure . jsonGraphTerm blob) blob
       `catchError` \(SomeException e) ->
         pure (ParseTreeFileGraph path lang mempty mempty (V.fromList [ParseError (T.pack (show e))]))
       where
         path = T.pack $ blobPath blob
         lang = bridging # blobLanguage blob
 
-        render :: (Foldable syntax, Functor syntax, ConstructorName syntax) => Term syntax Loc -> ParseTreeFileGraph
-        render t = let graph = renderTreeGraph t
-                       toEdge (Edge (a, b)) = TermEdge (vertexId a) (vertexId b)
-                   in ParseTreeFileGraph path lang (V.fromList (vertexList graph)) (V.fromList (fmap toEdge (edgeList graph))) mempty
 
 data TermOutputFormat
   = TermJSONTree
@@ -133,6 +129,17 @@ class JSONTerm term where
 
 instance ToJSONFields1 syntax => JSONTerm (Term syntax) where
   jsonTerm' = renderJSONTerm
+
+class JSONGraphTerm term where
+  jsonGraphTerm :: Blob -> term Loc -> ParseTreeFileGraph
+
+instance (Foldable syntax, Functor syntax, ConstructorName syntax) => JSONGraphTerm (Term syntax) where
+  jsonGraphTerm blob t
+    = let graph = renderTreeGraph t
+          toEdge (Edge (a, b)) = TermEdge (vertexId a) (vertexId b)
+      in ParseTreeFileGraph path lang (V.fromList (vertexList graph)) (V.fromList (fmap toEdge (edgeList graph))) mempty where
+        path = T.pack $ blobPath blob
+        lang = bridging # blobLanguage blob
 
 
 doParse
