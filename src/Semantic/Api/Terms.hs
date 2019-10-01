@@ -127,7 +127,7 @@ instance (ConstructorName syntax, Foldable syntax, Functor syntax) => DOTGraphTe
 
 
 class JSONTerm term where
-  jsonTerm' :: Blob -> term Loc -> (Rendering.JSON.JSON "trees" SomeJSON)
+  jsonTerm' :: Blob -> term Loc -> Rendering.JSON.JSON "trees" SomeJSON
 
 instance ToJSONFields1 syntax => JSONTerm (Term syntax) where
   jsonTerm' = renderJSONTerm
