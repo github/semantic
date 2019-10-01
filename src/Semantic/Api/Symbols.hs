@@ -114,19 +114,19 @@ doParse
 doParse symbolsToSummarize blob = do
   modes <- ask @PerLanguageModes
   case blobLanguage blob of
-    Go         -> mkTerm <$> parse Parser.goParser blob
-    Haskell    -> mkTerm <$> parse Parser.haskellParser blob
-    JavaScript -> mkTerm <$> parse Parser.tsxParser blob
-    JSON       -> mkTerm <$> parse Parser.jsonParser blob
-    JSX        -> mkTerm <$> parse Parser.tsxParser blob
-    Markdown   -> mkTerm <$> parse Parser.markdownParser blob
+    Go         -> mkTerm <$> parse Parser.goParser         blob
+    Haskell    -> mkTerm <$> parse Parser.haskellParser    blob
+    JavaScript -> mkTerm <$> parse Parser.tsxParser        blob
+    JSON       -> mkTerm <$> parse Parser.jsonParser       blob
+    JSX        -> mkTerm <$> parse Parser.tsxParser        blob
+    Markdown   -> mkTerm <$> parse Parser.markdownParser   blob
     Python
       | Precise <- pythonMode modes -> SomeTerm <$> parse Parser.precisePythonParser blob
       | otherwise                   -> mkTerm   <$> parse Parser.pythonParser        blob
-    Ruby       -> mkTerm <$> parse Parser.rubyParser blob
+    Ruby       -> mkTerm <$> parse Parser.rubyParser       blob
     TypeScript -> mkTerm <$> parse Parser.typescriptParser blob
-    TSX        -> mkTerm <$> parse Parser.tsxParser blob
-    PHP        -> mkTerm <$> parse Parser.phpParser blob
+    TSX        -> mkTerm <$> parse Parser.tsxParser        blob
+    PHP        -> mkTerm <$> parse Parser.phpParser        blob
     _          -> noLanguageForBlob (blobPath blob)
     where mkTerm :: IsTaggable syntax => Term syntax Loc -> SomeTerm Precise.ToTags Loc
           mkTerm = SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize
