@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, GADTs, TypeOperators, DerivingStrategies #-}
+{-# LANGUAGE ConstraintKinds, GADTs, RankNTypes, TypeOperators #-}
 module Semantic.Api.Terms
   (
     termGraph
@@ -128,3 +128,10 @@ doParse blob = case blobLanguage blob of
   TSX        -> SomeTerm <$> parse tsxParser blob
   PHP        -> SomeTerm <$> parse phpParser blob
   _          -> noLanguageForBlob (blobPath blob)
+
+
+data SomeTerm typeclasses ann where
+  SomeTerm :: ApplyAll typeclasses syntax => Term syntax ann -> SomeTerm typeclasses ann
+
+withSomeTerm :: (forall syntax . ApplyAll typeclasses syntax => Term syntax ann -> a) -> SomeTerm typeclasses ann -> a
+withSomeTerm with (SomeTerm term) = with term

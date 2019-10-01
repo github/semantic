@@ -1,8 +1,6 @@
 {-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, GADTs, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 module Parsing.Parser
 ( Parser(..)
-, SomeTerm(..)
-, withSomeTerm
 , SomeAnalysisParser(..)
 , SomeASTParser(..)
 , someASTParser
@@ -166,12 +164,6 @@ markdownParser = AssignmentParser MarkdownParser Markdown.assignment
 precisePythonParser :: Parser (Py.Term Loc)
 precisePythonParser = UnmarshalParser tree_sitter_python
 
-
-data SomeTerm typeclasses ann where
-  SomeTerm :: ApplyAll typeclasses syntax => Term syntax ann -> SomeTerm typeclasses ann
-
-withSomeTerm :: (forall syntax . ApplyAll typeclasses syntax => Term syntax ann -> a) -> SomeTerm typeclasses ann -> a
-withSomeTerm with (SomeTerm term) = with term
 
 -- | A parser for producing specialized (tree-sitter) ASTs.
 data SomeASTParser where
