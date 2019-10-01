@@ -11,7 +11,7 @@ import Source.Span
 import Data.ByteString (readFile, ByteString)
 import System.IO (FilePath)
 
-main :: IO (Either Prelude.String (Module (Range, Span)))
+main :: IO ()
 main = do
   args <- getArgs
   parseByteString getArgs
