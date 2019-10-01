@@ -13,5 +13,4 @@ import System.IO (FilePath)
 
 main :: IO ()
 main = do
-  args <- getArgs
   parseByteString getArgs
