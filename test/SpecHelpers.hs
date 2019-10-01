@@ -42,7 +42,7 @@ import Data.Project as X
 import Data.Proxy as X
 import Data.Foldable (toList)
 import Data.Functor.Listable as X
-import Data.Language as X
+import Data.Language as X hiding (Precise)
 import Data.List.NonEmpty as X (NonEmpty(..))
 import Data.Semilattice.Lower as X
 import Source.Source as X (Source)
@@ -95,7 +95,7 @@ diffFilePaths session paths
 parseFilePath :: TaskSession -> Path.RelFile -> IO (Either SomeException ByteString)
 parseFilePath session path = do
   blob <- readBlobFromFile (fileForRelPath path)
-  res <- runTask session $ parseTermBuilder TermSExpression (toList blob)
+  res <- runTask session . runReader (PerLanguageModes ALaCarte) $ parseTermBuilder TermSExpression (toList blob)
   pure (runBuilder <$> res)
 
 -- | Read two files to a BlobPair.

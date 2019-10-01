@@ -6,7 +6,7 @@
 set -e
 cd $(dirname "$0")/..
 
-VERSION="0.7.1.0"
+VERSION="0.8.0.0"
 BUILD_SHA=$(git rev-parse HEAD 2>/dev/null)
 DOCKER_IMAGE=docker.pkg.github.com/github/semantic/semantic
 

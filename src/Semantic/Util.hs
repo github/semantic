@@ -8,6 +8,7 @@ module Semantic.Util
   , evalRubyProject
   , evalTypeScriptProject
   , evaluateProject'
+  , justEvaluating
   , mergeErrors
   , reassociate
   , parseFile
