@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE ConstraintKinds, MonoLocalBinds, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Semantic.Api.Terms
   (
     termGraph
@@ -9,8 +9,6 @@ module Semantic.Api.Terms
   , ParseEffects
   , TermConstraints
 
-  , SomeTerm(..)
-  , withSomeTerm
   ) where
 
 
@@ -48,7 +46,7 @@ termGraph :: (Traversable t, Member Distribute sig, ParseEffects sig m) => t Blo
 termGraph blobs = ParseTreeGraphResponse . V.fromList . toList <$> distributeFor blobs go
   where
     go :: ParseEffects sig m => Blob -> m ParseTreeFileGraph
-    go blob = (doParse blob >>= withSomeTerm (pure . render))
+    go blob = doParse (pure . render) blob
       `catchError` \(SomeException e) ->
         pure (ParseTreeFileGraph path lang mempty mempty (V.fromList [ParseError (T.pack (show e))]))
       where
@@ -79,22 +77,22 @@ parseTermBuilder TermShow        = distributeFoldMap showTerm
 parseTermBuilder TermQuiet       = distributeFoldMap quietTerm
 
 jsonTerm :: ParseEffects sig m => Blob -> m (Rendering.JSON.JSON "trees" SomeJSON)
-jsonTerm blob = (doParse blob >>= withSomeTerm (pure . renderJSONTerm blob)) `catchError` jsonError blob
+jsonTerm blob = doParse (pure . renderJSONTerm blob) blob `catchError` jsonError blob
 
 jsonError :: Applicative m => Blob -> SomeException -> m (Rendering.JSON.JSON "trees" SomeJSON)
 jsonError blob (SomeException e) = pure $ renderJSONError blob (show e)
 
 sexpTerm :: ParseEffects sig m => Blob -> m Builder
-sexpTerm = doParse >=> withSomeTerm (serialize (SExpression ByConstructorName))
+sexpTerm = doParse (serialize (SExpression ByConstructorName))
 
 dotGraphTerm :: ParseEffects sig m => Blob -> m Builder
-dotGraphTerm = doParse >=> withSomeTerm (serialize (DOT (termStyle "terms")) . renderTreeGraph)
+dotGraphTerm = doParse (serialize (DOT (termStyle "terms")) . renderTreeGraph)
 
 showTerm :: ParseEffects sig m => Blob -> m Builder
-showTerm = doParse >=> withSomeTerm (serialize Show . quieterm)
+showTerm = doParse (serialize Show . quieterm)
 
 quietTerm :: (ParseEffects sig m, MonadIO m) => Blob -> m Builder
-quietTerm blob = showTiming blob <$> time' ( (doParse blob >>= withSomeTerm (fmap (const (Right ())) . serialize Show . quieterm)) `catchError` timingError )
+quietTerm blob = showTiming blob <$> time' ( doParse (fmap (const (Right ())) . serialize Show . quieterm) blob `catchError` timingError )
   where
     timingError (SomeException e) = pure (Left (show e))
     showTiming Blob{..} (res, duration) =
@@ -125,25 +123,19 @@ doParse
      , Member (Error SomeException) sig
      , Member Parse sig
      )
-  => Blob
-  -> m (SomeTerm TermConstraints Loc)
-doParse blob = case blobLanguage blob of
-  Go         -> SomeTerm <$> parse goParser         blob
-  Haskell    -> SomeTerm <$> parse haskellParser    blob
-  JavaScript -> SomeTerm <$> parse tsxParser        blob
-  JSON       -> SomeTerm <$> parse jsonParser       blob
-  JSX        -> SomeTerm <$> parse tsxParser        blob
-  Markdown   -> SomeTerm <$> parse markdownParser   blob
-  Python     -> SomeTerm <$> parse pythonParser     blob
-  Ruby       -> SomeTerm <$> parse rubyParser       blob
-  TypeScript -> SomeTerm <$> parse typescriptParser blob
-  TSX        -> SomeTerm <$> parse tsxParser        blob
-  PHP        -> SomeTerm <$> parse phpParser        blob
+  => (forall syntax . TermConstraints syntax => Term syntax Loc -> m a)
+  -> Blob
+  -> m a
+doParse with blob = case blobLanguage blob of
+  Go         -> parse goParser         blob >>= with
+  Haskell    -> parse haskellParser    blob >>= with
+  JavaScript -> parse tsxParser        blob >>= with
+  JSON       -> parse jsonParser       blob >>= with
+  JSX        -> parse tsxParser        blob >>= with
+  Markdown   -> parse markdownParser   blob >>= with
+  Python     -> parse pythonParser     blob >>= with
+  Ruby       -> parse rubyParser       blob >>= with
+  TypeScript -> parse typescriptParser blob >>= with
+  TSX        -> parse tsxParser        blob >>= with
+  PHP        -> parse phpParser        blob >>= with
   _          -> noLanguageForBlob (blobPath blob)
-
-
-data SomeTerm typeclasses ann where
-  SomeTerm :: typeclasses syntax => Term syntax ann -> SomeTerm typeclasses ann
-
-withSomeTerm :: (forall syntax . typeclasses syntax => Term syntax ann -> a) -> SomeTerm typeclasses ann -> a
-withSomeTerm with (SomeTerm term) = with term
