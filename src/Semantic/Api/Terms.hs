@@ -78,19 +78,19 @@ parseTermBuilder TermDotGraph    = distributeFoldMap dotGraphTerm
 parseTermBuilder TermShow        = distributeFoldMap showTerm
 parseTermBuilder TermQuiet       = distributeFoldMap quietTerm
 
-jsonTerm :: (ParseEffects sig m) => Blob -> m (Rendering.JSON.JSON "trees" SomeJSON)
+jsonTerm :: ParseEffects sig m => Blob -> m (Rendering.JSON.JSON "trees" SomeJSON)
 jsonTerm blob = (doParse blob >>= withSomeTerm (pure . renderJSONTerm blob)) `catchError` jsonError blob
 
 jsonError :: Applicative m => Blob -> SomeException -> m (Rendering.JSON.JSON "trees" SomeJSON)
 jsonError blob (SomeException e) = pure $ renderJSONError blob (show e)
 
-sexpTerm :: (ParseEffects sig m) => Blob -> m Builder
+sexpTerm :: ParseEffects sig m => Blob -> m Builder
 sexpTerm = doParse >=> withSomeTerm (serialize (SExpression ByConstructorName))
 
-dotGraphTerm :: (ParseEffects sig m) => Blob -> m Builder
+dotGraphTerm :: ParseEffects sig m => Blob -> m Builder
 dotGraphTerm = doParse >=> withSomeTerm (serialize (DOT (termStyle "terms")) . renderTreeGraph)
 
-showTerm :: (ParseEffects sig m) => Blob -> m Builder
+showTerm :: ParseEffects sig m => Blob -> m Builder
 showTerm = doParse >=> withSomeTerm (serialize Show . quieterm)
 
 quietTerm :: (ParseEffects sig m, MonadIO m) => Blob -> m Builder
@@ -112,7 +112,7 @@ type TermConstraints =
   , ToJSONFields1
   ]
 
-doParse :: (ParseEffects sig m) => Blob -> m (SomeTerm TermConstraints Loc)
+doParse :: ParseEffects sig m => Blob -> m (SomeTerm TermConstraints Loc)
 doParse blob = case blobLanguage blob of
   Go         -> SomeTerm <$> parse goParser blob
   Haskell    -> SomeTerm <$> parse haskellParser blob
