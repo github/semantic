@@ -31,6 +31,7 @@ import           Parsing.Parser
 import           Prologue
 import           Proto.Semantic as P hiding (Blob, BlobPair)
 import           Proto.Semantic_Fields as P
+import           Proto.Semantic_JSON()
 import           Rendering.Graph
 import           Rendering.JSON hiding (JSON)
 import qualified Rendering.JSON
@@ -52,7 +53,7 @@ data DiffOutputFormat
 
 parseDiffBuilder :: (Traversable t, DiffEffects sig m) => DiffOutputFormat -> t BlobPair -> m Builder
 parseDiffBuilder DiffJSONTree    = distributeFoldMap (jsonDiff renderJSONTree) >=> serialize Format.JSON -- NB: Serialize happens at the top level for these two JSON formats to collect results of multiple blob pairs.
-parseDiffBuilder DiffJSONGraph   = diffGraph >=> serialize Format.JSONPB
+parseDiffBuilder DiffJSONGraph   = diffGraph >=> serialize Format.JSON
 parseDiffBuilder DiffSExpression = distributeFoldMap sexpDiff
 parseDiffBuilder DiffShow        = distributeFoldMap showDiff
 parseDiffBuilder DiffDotGraph    = distributeFoldMap dotGraphDiff

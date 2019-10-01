@@ -32,6 +32,7 @@ import Control.Exception (Exception(..), throwTo)
 import Data.Typeable (Typeable)
 import System.Posix.Signals
 import System.Mem.Weak (deRefWeak)
+import Proto.Semantic_JSON()
 
 newtype SignalException = SignalException Signal
   deriving (Show, Typeable)
@@ -92,7 +93,7 @@ diffCommand = command "diff" (info diffArgumentsParser (progDesc "Compute change
       renderer <- flag  (parseDiffBuilder DiffSExpression) (parseDiffBuilder DiffSExpression) (long "sexpression" <> help "Output s-expression diff tree (default)")
               <|> flag'                                    (parseDiffBuilder DiffJSONTree)    (long "json"        <> help "Output JSON diff trees")
               <|> flag'                                    (parseDiffBuilder DiffJSONGraph)   (long "json-graph"  <> help "Output JSON diff trees")
-              <|> flag'                                    (diffSummaryBuilder JSONPB)          (long "toc"         <> help "Output JSON table of contents diff summary")
+              <|> flag'                                    (diffSummaryBuilder JSON)          (long "toc"         <> help "Output JSON table of contents diff summary")
               <|> flag'                                    (parseDiffBuilder DiffDotGraph)    (long "dot"         <> help "Output the diff as a DOT graph")
               <|> flag'                                    (parseDiffBuilder DiffShow)        (long "show"        <> help "Output using the Show instance (debug only, format subject to change without notice)")
       filesOrStdin <- Right <$> some (Both <$> argument filePathReader (metavar "FILE_A") <*> argument filePathReader (metavar "FILE_B")) <|> pure (Left stdin)
@@ -119,7 +120,7 @@ parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate pa
         <|> flag' (parseTermBuilder TermJSONGraph)
                   (  long "json-graph"
                   <> help "Output JSON adjacency list")
-        <|> flag' (parseSymbolsBuilder JSONPB)
+        <|> flag' (parseSymbolsBuilder JSON)
                   (  long "symbols"
                   <> long "json-symbols"
                   <> help "Output JSON symbol list")
