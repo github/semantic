@@ -89,19 +89,19 @@ quietTerm blob = showTiming blob <$> time' ( doParse (fmap (const (Right ())) . 
 
 type ParseEffects sig m = (Member (Error SomeException) sig, Member (Reader PerLanguageModes) sig, Member Parse sig, Member (Reader Config) sig, Carrier sig m)
 
-class ( ConstructorName t
-      , Foldable t
-      , Functor t
-      , Show1 t
-      , ToJSONFields1 t
+class ( DOTGraphTerm t
+      , JSONGraphTerm t
+      , JSONTerm t
+      , SExprTerm t
+      , ShowTerm t
       )
    => TermConstraints t
 
-instance ( ConstructorName t
-         , Foldable t
-         , Functor t
-         , Show1 t
-         , ToJSONFields1 t
+instance ( DOTGraphTerm t
+         , JSONGraphTerm t
+         , JSONTerm t
+         , SExprTerm t
+         , ShowTerm t
          )
       => TermConstraints t
 
@@ -147,7 +147,7 @@ doParse
      , Member (Error SomeException) sig
      , Member Parse sig
      )
-  => (forall syntax . TermConstraints syntax => Term syntax Loc -> m a)
+  => (forall term . TermConstraints term => term Loc -> m a)
   -> Blob
   -> m a
 doParse with blob = case blobLanguage blob of
