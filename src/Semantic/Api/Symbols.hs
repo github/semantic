@@ -44,7 +44,7 @@ legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> distributeFoldMap 
         symbolsToSummarize = ["Function", "Method", "Class", "Module"]
 
         renderToSymbols :: (IsTaggable f, Applicative m) => Term f Loc -> m [Legacy.File]
-        renderToSymbols = pure . pure . tagsToFile . runTagging blob symbolsToSummarize
+        renderToSymbols = pure . pure . tagsToFile . runTagging (blobLanguage blob) blobSource symbolsToSummarize
 
         tagsToFile :: [Tag] -> Legacy.File
         tagsToFile tags = Legacy.File (pack (blobPath blob)) (pack (show (blobLanguage blob))) (fmap tagToSymbol tags)
@@ -79,7 +79,7 @@ parseSymbols blobs = do
         errorFile e = File blobPath' (bridging # blobLanguage') mempty (V.fromList [ParseError (T.pack e)]) blobOid
 
         renderToSymbols :: IsTaggable f => Term f Loc -> File
-        renderToSymbols term = tagsToFile (runTagging blob symbolsToSummarize term)
+        renderToSymbols term = tagsToFile (runTagging (blobLanguage blob) blobSource symbolsToSummarize term)
 
         renderPreciseToSymbols :: Py.Term Loc -> File
         renderPreciseToSymbols term = tagsToFile (Precise.tags blobSource term)

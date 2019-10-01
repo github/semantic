@@ -14,7 +14,7 @@ import           Data.Text as T hiding (empty)
 import           Streaming
 import qualified Streaming.Prelude as Streaming
 
-import           Data.Blob
+import           Data.Language
 import           Data.Term
 import           Source.Loc
 import qualified Source.Source as Source
@@ -22,16 +22,17 @@ import           Tags.Tag
 import           Tags.Taggable
 
 runTagging :: (IsTaggable syntax)
-           => Blob
+           => Language
+           -> Source.Source
            -> [Text]
            -> Term syntax Loc
            -> [Tag]
-runTagging blob symbolsToSummarize
+runTagging lang source symbolsToSummarize
   = Eff.run
   . evalState @[ContextToken] []
   . Streaming.toList_
-  . contextualizing (blobSource blob) toKind
-  . tagging (blobLanguage blob)
+  . contextualizing source toKind
+  . tagging lang
   where
     toKind x = do
       guard (x `elem` symbolsToSummarize)
