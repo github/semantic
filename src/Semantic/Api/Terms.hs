@@ -46,6 +46,7 @@ import qualified Language.Haskell.Assignment as Haskell
 import qualified Language.JSON.Assignment as JSON
 import qualified Language.Markdown.Assignment as Markdown
 import qualified Language.PHP.Assignment as PHP
+import qualified Language.Python as Py
 import qualified Language.Python.Assignment as Python
 import qualified Language.Ruby.Assignment as Ruby
 import qualified Language.TSX.Assignment as TSX
@@ -104,6 +105,9 @@ class ShowTerm term where
 
 instance (Functor syntax, Show1 syntax) => ShowTerm (Term syntax) where
   showTerm = serialize Show . quieterm
+
+instance ShowTerm Py.Term where
+  showTerm = serialize Show . Py.getTerm
 
 
 class SExprTerm term where
