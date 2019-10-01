@@ -21,7 +21,6 @@ import           Control.Effect.Reader
 import           Control.Lens
 import           Control.Monad
 import           Control.Monad.IO.Class
-import           Data.Abstract.Declarations
 import           Data.Blob
 import           Data.ByteString.Builder
 import           Data.Either
@@ -106,8 +105,7 @@ quietTerm blob = showTiming blob <$> time' ( (doParse blob >>= withSomeTerm (fma
 type ParseEffects sig m = (Member (Error SomeException) sig, Member (Reader PerLanguageModes) sig, Member Parse sig, Member (Reader Config) sig, Carrier sig m)
 
 type TermConstraints =
- '[ Declarations1
-  , ConstructorName
+ '[ ConstructorName
   , Foldable
   , Functor
   , Show1
