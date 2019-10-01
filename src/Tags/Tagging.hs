@@ -30,7 +30,7 @@ runTagging blob symbolsToSummarize
   = Eff.run
   . evalState @[ContextToken] []
   . Streaming.toList_
-  . contextualizing blob toKind
+  . contextualizing (blobSource blob) toKind
   . tagging (blobLanguage blob)
   where
     toKind x = do
@@ -49,11 +49,11 @@ type ContextToken = (Text, Range)
 contextualizing :: ( Member (State [ContextToken]) sig
                    , Carrier sig m
                    )
-                => Blob
+                => Source.Source
                 -> (Text -> Maybe Kind)
                 -> Stream (Of Token) m a
                 -> Stream (Of Tag) m a
-contextualizing Blob{..} toKind = Streaming.mapMaybeM $ \case
+contextualizing source toKind = Streaming.mapMaybeM $ \case
   Enter x r -> Nothing <$ enterScope (x, r)
   Exit  x r -> Nothing <$ exitScope (x, r)
   Iden iden span docsLiteralRange -> get @[ContextToken] >>= pure . \case
@@ -63,7 +63,7 @@ contextualizing Blob{..} toKind = Streaming.mapMaybeM $ \case
       -> Just $ Tag iden kind span (firstLine (slice r)) (slice <$> docsLiteralRange)
     _ -> Nothing
   where
-    slice = stripEnd . Source.toText . Source.slice blobSource
+    slice = stripEnd . Source.toText . Source.slice source
     firstLine = T.take 180 . fst . breakOn "\n"
 
 enterScope, exitScope :: ( Member (State [ContextToken]) sig
