@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, GADTs, RankNTypes, TypeOperators #-}
+{-# LANGUAGE ConstraintKinds, MonoLocalBinds, RankNTypes, TypeOperators #-}
 module Semantic.Api.Symbols
   ( legacyParseSymbols
   , parseSymbols
@@ -34,7 +34,7 @@ legacyParseSymbols :: (Member Distribute sig, Member (Error SomeException) sig, 
 legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> distributeFoldMap go blobs
   where
     go :: (Member (Error SomeException) sig, Member (Reader PerLanguageModes) sig, Member Parse sig, Carrier sig m) => Blob -> m [Legacy.File]
-    go blob@Blob{..} = (withSomeTerm renderToSymbols <$> doParse symbolsToSummarize blob) `catchError` (\(SomeException _) -> pure (pure emptyFile))
+    go blob@Blob{..} = doParse (pure . renderToSymbols) symbolsToSummarize blob `catchError` (\(SomeException _) -> pure (pure emptyFile))
       where
         emptyFile = tagsToFile []
 
@@ -64,7 +64,7 @@ parseSymbols :: (Member Distribute sig, Member (Error SomeException) sig, Member
 parseSymbols blobs = ParseTreeSymbolResponse . V.fromList . toList <$> distributeFor blobs go
   where
     go :: (Member (Error SomeException) sig, Member (Reader PerLanguageModes) sig, Member Parse sig, Carrier sig m) => Blob -> m File
-    go blob@Blob{..} = catching $ withSomeTerm renderToSymbols <$> doParse symbolsToSummarize blob
+    go blob@Blob{..} = catching $ doParse (pure . renderToSymbols) symbolsToSummarize blob
       where
         catching m = m `catchError` (\(SomeException e) -> pure $ errorFile (show e))
         blobLanguage' = blobLanguage blob
@@ -96,37 +96,32 @@ instance IsTaggable syntax => Precise.ToTags (ALaCarteTerm syntax) where
   tags source (ALaCarteTerm lang symbolsToSummarize term) = runTagging lang source symbolsToSummarize term
 
 
-data SomeTerm c ann where
-  SomeTerm :: c t => t ann -> SomeTerm c ann
-
-withSomeTerm :: (forall t . c t => t ann -> a) -> SomeTerm c ann -> a
-withSomeTerm with (SomeTerm term) = with term
-
 doParse
   :: ( Carrier sig m
      , Member (Error SomeException) sig
      , Member Parse sig
      , Member (Reader PerLanguageModes) sig
      )
-  => [Text]
+  => (forall t . Precise.ToTags t => t Loc -> m a)
+  -> [Text]
   -> Blob
-  -> m (SomeTerm Precise.ToTags Loc)
-doParse symbolsToSummarize blob = do
+  -> m a
+doParse with symbolsToSummarize blob = do
   modes <- ask @PerLanguageModes
   case blobLanguage blob of
-    Go         -> mkTerm <$> parse Parser.goParser         blob
-    Haskell    -> mkTerm <$> parse Parser.haskellParser    blob
-    JavaScript -> mkTerm <$> parse Parser.tsxParser        blob
-    JSON       -> mkTerm <$> parse Parser.jsonParser       blob
-    JSX        -> mkTerm <$> parse Parser.tsxParser        blob
-    Markdown   -> mkTerm <$> parse Parser.markdownParser   blob
+    Go         -> parse Parser.goParser         blob >>= with . mkTerm
+    Haskell    -> parse Parser.haskellParser    blob >>= with . mkTerm
+    JavaScript -> parse Parser.tsxParser        blob >>= with . mkTerm
+    JSON       -> parse Parser.jsonParser       blob >>= with . mkTerm
+    JSX        -> parse Parser.tsxParser        blob >>= with . mkTerm
+    Markdown   -> parse Parser.markdownParser   blob >>= with . mkTerm
     Python
-      | Precise <- pythonMode modes -> SomeTerm <$> parse Parser.precisePythonParser blob
-      | otherwise                   -> mkTerm   <$> parse Parser.pythonParser        blob
-    Ruby       -> mkTerm <$> parse Parser.rubyParser       blob
-    TypeScript -> mkTerm <$> parse Parser.typescriptParser blob
-    TSX        -> mkTerm <$> parse Parser.tsxParser        blob
-    PHP        -> mkTerm <$> parse Parser.phpParser        blob
+      | Precise <- pythonMode modes -> parse Parser.precisePythonParser blob >>= with
+      | otherwise                   -> parse Parser.pythonParser        blob >>= with . mkTerm
+    Ruby       -> parse Parser.rubyParser       blob >>= with . mkTerm
+    TypeScript -> parse Parser.typescriptParser blob >>= with . mkTerm
+    TSX        -> parse Parser.tsxParser        blob >>= with . mkTerm
+    PHP        -> parse Parser.phpParser        blob >>= with . mkTerm
     _          -> noLanguageForBlob (blobPath blob)
-    where mkTerm :: IsTaggable syntax => Term syntax Loc -> SomeTerm Precise.ToTags Loc
-          mkTerm = SomeTerm . ALaCarteTerm (blobLanguage blob) symbolsToSummarize
+    where mkTerm :: Term syntax Loc -> ALaCarteTerm syntax Loc
+          mkTerm = ALaCarteTerm (blobLanguage blob) symbolsToSummarize
