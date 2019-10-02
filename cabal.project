@@ -4,5 +4,5 @@ jobs: $ncpus
 
 source-repository-package
   type: git
-  location: https://github.com/tclem/proto-lens-json
-  tag: 6b56fa64c2a2edad6dd460a97650327cb4c6361c
+  location: https://github.com/tclem/proto-lens-jsonpb
+  tag: 2b4cd579144ea10c3bd36bd05122c233dc5334d7
