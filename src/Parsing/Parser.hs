@@ -21,6 +21,8 @@ module Parsing.Parser
 , phpASTParser
 , haskellParser
   -- * Abstract parsers
+
+  -- $abstract
 , SomeParser(..)
 , goParser'
 , haskellParser'
@@ -199,6 +201,31 @@ someASTParser PHP        = Just (SomeASTParser (ASTParser tree_sitter_php :: Par
 someASTParser Java       = Nothing
 someASTParser Markdown   = Nothing
 someASTParser Unknown    = Nothing
+
+
+-- $abstract
+-- Most of our features are intended to operate over multiple languages, each represented by disjoint term types. Thus, we typically implement them using typeclasses, allowing us to share a single interface to invoke the feature, while specializing the implementation(s) as appropriate for each distinct term type.
+--
+-- In order to accomplish this, we employ 'SomeParser', which abstracts over parsers of various term types, while ensuring that some desired constraint holds. Constructing a @'SomeParser' c@ requires satisfiyng the constraint @c@ against the underlying 'Parser'’s term type, and so it can be used to parse with any of a map of parsers whose terms support @c@.
+--
+-- In practice, this means using 'Control.Effect.Parse.parseWith', and passing in a map of parsers to select from for your feature. It is recommended to define the map as a concrete top-level binding using the abstract parsers or ideally the canonical maps of parsers, below; using the abstracted parsers or canonical maps directly with 'Control.Effect.Parse.parseWith' will lead to significantly slower compiles.
+--
+-- Bad:
+--
+-- @
+-- isFancy :: (Carrier sig m, Member Parse sig) => Blob -> m Bool
+-- isFancy = parseWith (preciseParsers @Fancy) (pure . isTermFancy) -- slow compiles!
+-- @
+--
+-- Good:
+--
+-- @
+-- fancyParsers :: 'Map' 'Language' ('SomeParser' Fancy 'Loc')
+-- fancyParsers = preciseParsers
+--
+-- isFancy :: (Carrier sig m, Member Parse sig) => Blob -> m Bool
+-- isFancy = parseWith fancyParsers (pure . isTermFancy) -- much faster compiles
+-- @
 
 
 -- | A parser producing terms of existentially-quantified type under some constraint @c@.
