@@ -59,7 +59,7 @@ parseDiffBuilder DiffSExpression = distributeFoldMap sexpDiff
 parseDiffBuilder DiffShow        = distributeFoldMap (doDiff (const id) showDiff)
 parseDiffBuilder DiffDotGraph    = distributeFoldMap dotGraphDiff
 
-type RenderJSON m syntax = forall syntax . CanDiff syntax => BlobPair -> Diff syntax Loc Loc -> m (Rendering.JSON.JSON "diffs" SomeJSON)
+type RenderJSON m syntax = forall syntax . DiffActions syntax => BlobPair -> Diff syntax Loc Loc -> m (Rendering.JSON.JSON "diffs" SomeJSON)
 
 jsonDiff :: DiffEffects sig m => RenderJSON m syntax -> BlobPair -> m (Rendering.JSON.JSON "diffs" SomeJSON)
 jsonDiff f blobPair = doDiff (const id) (f blobPair) blobPair `catchError` jsonError blobPair
@@ -98,8 +98,7 @@ dotGraphDiff = doDiff (const id) render
 
 type DiffEffects sig m = (Member (Error SomeException) sig, Member (Reader Config) sig, Member Telemetry sig, Member Distribute sig, Member Parse sig, Carrier sig m, MonadIO m)
 
-type CanDiff syntax = (ConstructorName syntax, Diffable syntax, Eq1 syntax, HasDeclaration syntax, Hashable1 syntax, Show1 syntax, ToJSONFields1 syntax, Traversable syntax)
-type Decorate a b = forall syntax . CanDiff syntax => Blob -> Term syntax a -> Term syntax b
+type Decorate a b = forall syntax . DiffActions syntax => Blob -> Term syntax a -> Term syntax b
 
 class ShowDiff diff where
   showDiff :: (Carrier sig m, Member (Reader Config) sig) => diff Loc Loc -> m Builder
@@ -131,7 +130,7 @@ instance ( ConstructorName t
 doDiff
   :: DiffEffects sig m
   => Decorate Loc ann
-  -> (forall syntax . CanDiff syntax => Diff syntax ann ann -> m output)
+  -> (forall syntax . DiffActions syntax => Diff syntax ann ann -> m output)
   -> BlobPair
   -> m output
 doDiff decorate render blobPair = do
@@ -139,7 +138,7 @@ doDiff decorate render blobPair = do
   diff <- diffTerms blobPair terms
   render diff
 
-diffTerms :: (CanDiff syntax, Member Telemetry sig, Carrier sig m, MonadIO m)
+diffTerms :: (DiffActions syntax, Member Telemetry sig, Carrier sig m, MonadIO m)
   => BlobPair -> Join These (Term syntax ann) -> m (Diff syntax ann ann)
 diffTerms blobs terms = time "diff" languageTag $ do
   let diff = diffTermPair (runJoin terms)
