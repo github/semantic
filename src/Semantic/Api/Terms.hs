@@ -141,14 +141,3 @@ instance (Foldable syntax, Functor syntax, ConstructorName syntax) => JSONGraphT
       in ParseTreeFileGraph path lang (V.fromList (vertexList graph)) (V.fromList (fmap toEdge (edgeList graph))) mempty where
         path = T.pack $ blobPath blob
         lang = bridging # blobLanguage blob
-
-
-parseWith
-  :: (Carrier sig m, Member (Error SomeException) sig, Member Parse sig)
-  => [(Language, SomeParser c ann)]
-  -> (forall term . c term => term ann -> m a)
-  -> Blob
-  -> m a
-parseWith parsers with blob = case lookup (blobLanguage blob) parsers of
-  Just (SomeParser parser) -> parse parser blob >>= with
-  _                        -> noLanguageForBlob (blobPath blob)

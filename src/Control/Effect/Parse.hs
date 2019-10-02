@@ -1,12 +1,16 @@
-{-# LANGUAGE ExistentialQuantification #-}
+{-# LANGUAGE ConstraintKinds, ExistentialQuantification, GADTs, RankNTypes #-}
 module Control.Effect.Parse
 ( -- * Parse effect
   Parse(..)
 , parse
+, parseWith
 ) where
 
 import Control.Effect.Carrier
+import Control.Effect.Error
+import Control.Exception (SomeException)
 import Data.Blob
+import Data.Language
 import Parsing.Parser
 
 data Parse m k
@@ -27,3 +31,14 @@ parse :: (Member Parse sig, Carrier sig m)
       -> Blob
       -> m term
 parse parser blob = send (Parse parser blob pure)
+
+
+parseWith
+  :: (Carrier sig m, Member (Error SomeException) sig, Member Parse sig)
+  => [(Language, SomeParser c ann)]
+  -> (forall term . c term => term ann -> m a)
+  -> Blob
+  -> m a
+parseWith parsers with blob = case lookup (blobLanguage blob) parsers of
+  Just (SomeParser parser) -> parse parser blob >>= with
+  _                        -> noLanguageForBlob (blobPath blob)
