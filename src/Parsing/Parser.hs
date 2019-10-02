@@ -23,6 +23,8 @@ module Parsing.Parser
 , haskellParser
   -- * Precise parsers
 , precisePythonParser
+  -- * Abstract parsers
+, SomeParser(..)
 ) where
 
 import           Assigning.Assignment

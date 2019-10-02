@@ -153,9 +153,6 @@ doParse with blob = case blobLanguage blob of
   _          -> noLanguageForBlob (blobPath blob)
 
 
-data SomeParser c a where
-  SomeParser :: c t => Parser (t a) -> SomeParser c a
-
 showTermParsers
   :: (Carrier sig m, Member (Reader PerLanguageModes) sig)
   => m [(Language, SomeParser ShowTerm Loc)]
