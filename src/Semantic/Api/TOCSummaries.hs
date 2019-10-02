@@ -40,26 +40,29 @@ diffSummary :: DiffEffects sig m => [BlobPair] -> m DiffTreeTOCResponse
 diffSummary blobs = DiffTreeTOCResponse . V.fromList <$> distributeFor blobs go
   where
     go :: DiffEffects sig m => BlobPair -> m TOCSummaryFile
-    go blobPair = doDiff (\ blob -> decoratorWithAlgebra (declarationAlgebra blob)) (render blobPair) blobPair
+    go blobPair = doDiff (\ blob -> decoratorWithAlgebra (declarationAlgebra blob)) (pure . summarizeDiff blobPair) blobPair
       `catchError` \(SomeException e) ->
         pure $ TOCSummaryFile path lang mempty (V.fromList [TOCSummaryError (T.pack (show e)) Nothing])
       where path = T.pack $ pathKeyForBlobPair blobPair
             lang = bridging # languageForBlobPair blobPair
 
-    render :: (Foldable syntax, Functor syntax, Applicative m) => BlobPair -> Diff syntax (Maybe Declaration) (Maybe Declaration) -> m TOCSummaryFile
-    render blobPair diff = pure $ foldr go (TOCSummaryFile path lang mempty mempty) (diffTOC diff)
-      where
-        path = T.pack $ pathKeyForBlobPair blobPair
-        lang = bridging # languageForBlobPair blobPair
+class SummarizeDiff diff where
+  summarizeDiff :: BlobPair -> diff (Maybe Declaration) (Maybe Declaration) -> TOCSummaryFile
 
-        toChangeType = \case
-          "added" -> Added
-          "modified" -> Modified
-          "removed" -> Removed
-          _ -> None
+instance (Foldable syntax, Functor syntax) => SummarizeDiff (Diff syntax) where
+  summarizeDiff blobPair diff = foldr go (TOCSummaryFile path lang mempty mempty) (diffTOC diff)
+    where
+      path = T.pack $ pathKeyForBlobPair blobPair
+      lang = bridging # languageForBlobPair blobPair
 
-        go :: TOCSummary -> TOCSummaryFile -> TOCSummaryFile
-        go TOCSummary{..} TOCSummaryFile{..}
-          = TOCSummaryFile path language (V.cons (TOCSummaryChange summaryCategoryName summaryTermName (converting #? summarySpan) (toChangeType summaryChangeType)) changes) errors
-        go ErrorSummary{..} TOCSummaryFile{..}
-          = TOCSummaryFile path language changes (V.cons (TOCSummaryError errorText (converting #? errorSpan)) errors)
+      toChangeType = \case
+        "added" -> Added
+        "modified" -> Modified
+        "removed" -> Removed
+        _ -> None
+
+      go :: TOCSummary -> TOCSummaryFile -> TOCSummaryFile
+      go TOCSummary{..} TOCSummaryFile{..}
+        = TOCSummaryFile path language (V.cons (TOCSummaryChange summaryCategoryName summaryTermName (converting #? summarySpan) (toChangeType summaryChangeType)) changes) errors
+      go ErrorSummary{..} TOCSummaryFile{..}
+        = TOCSummaryFile path language changes (V.cons (TOCSummaryError errorText (converting #? errorSpan)) errors)
