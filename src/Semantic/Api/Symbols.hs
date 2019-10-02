@@ -36,7 +36,7 @@ legacyParseSymbols :: (Member Distribute sig, Member (Error SomeException) sig, 
 legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> distributeFoldMap go blobs
   where
     go :: (Member (Error SomeException) sig, Member (Reader PerLanguageModes) sig, Member Parse sig, Carrier sig m) => Blob -> m [Legacy.File]
-    go blob@Blob{..} = doParse (pure . renderToSymbols) blob `catchError` (\(SomeException _) -> pure (pure emptyFile))
+    go blob@Blob{..} = asks toTagsParsers >>= \ p -> parseWith p (pure . renderToSymbols) blob `catchError` (\(SomeException _) -> pure (pure emptyFile))
       where
         emptyFile = tagsToFile []
 
@@ -66,7 +66,7 @@ parseSymbols :: (Member Distribute sig, Member (Error SomeException) sig, Member
 parseSymbols blobs = ParseTreeSymbolResponse . V.fromList . toList <$> distributeFor blobs go
   where
     go :: (Member (Error SomeException) sig, Member (Reader PerLanguageModes) sig, Member Parse sig, Carrier sig m) => Blob -> m File
-    go blob@Blob{..} = catching $ doParse (pure . renderToSymbols) blob
+    go blob@Blob{..} = catching $ asks toTagsParsers >>= \ p -> parseWith p (pure . renderToSymbols) blob
       where
         catching m = m `catchError` (\(SomeException e) -> pure $ errorFile (show e))
         blobLanguage' = blobLanguage blob
@@ -102,29 +102,5 @@ instance ToTags Python.Term where
   tags _ _ = Precise.tags
 
 
-doParse
-  :: ( Carrier sig m
-     , Member (Error SomeException) sig
-     , Member Parse sig
-     , Member (Reader PerLanguageModes) sig
-     )
-  => (forall t . ToTags t => t Loc -> m a)
-  -> Blob
-  -> m a
-doParse with blob = do
-  modes <- ask @PerLanguageModes
-  case blobLanguage blob of
-    Go         -> parse Parser.goParser         blob >>= with
-    Haskell    -> parse Parser.haskellParser    blob >>= with
-    JavaScript -> parse Parser.tsxParser        blob >>= with
-    JSON       -> parse Parser.jsonParser       blob >>= with
-    JSX        -> parse Parser.tsxParser        blob >>= with
-    Markdown   -> parse Parser.markdownParser   blob >>= with
-    Python
-      | Precise <- pythonMode modes -> parse Parser.precisePythonParser blob >>= with
-      | otherwise                   -> parse Parser.pythonParser        blob >>= with
-    Ruby       -> parse Parser.rubyParser       blob >>= with
-    TypeScript -> parse Parser.typescriptParser blob >>= with
-    TSX        -> parse Parser.tsxParser        blob >>= with
-    PHP        -> parse Parser.phpParser        blob >>= with
-    _          -> noLanguageForBlob (blobPath blob)
+toTagsParsers :: PerLanguageModes -> [(Language, Parser.SomeParser ToTags Loc)]
+toTagsParsers = Parser.allParsers
