@@ -13,6 +13,10 @@ import System.IO (FilePath)
 import Options.Applicative hiding (style)
 import Data.Semigroup ((<>))
 
+data SemanticAST = SemanticAST
+  { sourceFilePath :: Prelude.String
+  , format         :: Prelude.String
+  }
 main :: IO ()
 main = do
   args <- head <$> getArgs
