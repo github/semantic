@@ -75,7 +75,7 @@ diffGraph :: (Traversable t, DiffEffects sig m) => t BlobPair -> m DiffTreeGraph
 diffGraph blobs = DiffTreeGraphResponse . V.fromList . toList <$> distributeFor blobs go
   where
     go :: DiffEffects sig m => BlobPair -> m DiffTreeFileGraph
-    go blobPair = doDiff (const id) (pure . jsonGraphDiff blobPair) blobPair
+    go blobPair = diffWith jsonGraphDiffParsers (const id) (pure . jsonGraphDiff blobPair) blobPair
       `catchError` \(SomeException e) ->
         pure (DiffTreeFileGraph path lang mempty mempty (V.fromList [ParseError (T.pack (show e))]))
       where
