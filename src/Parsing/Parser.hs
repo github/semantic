@@ -1,8 +1,6 @@
 {-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, GADTs, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 module Parsing.Parser
 ( Parser(..)
-, SomeTerm(..)
-, withSomeTerm
 , SomeAnalysisParser(..)
 , SomeASTParser(..)
 , someASTParser
@@ -115,8 +113,7 @@ data Parser term where
                       -> Parser (Term (Sum syntaxes) Loc)
   -- | A parser for 'Markdown' using cmark.
   MarkdownParser :: Parser (Term (TermF [] CMarkGFM.NodeType) (Node Markdown.Grammar))
-  -- | An abstraction over parsers when we don’t know the details of the term type.
-  SomeParser :: ApplyAll typeclasses syntax => Parser (Term syntax ann) -> Parser (SomeTerm typeclasses ann)
+
 
 -- | Apply all of a list of typeclasses to all of a list of functors using 'Apply'. Used by 'someParser' to constrain all of the language-specific syntax types to the typeclasses in question.
 type family ApplyAll (typeclasses :: [(* -> *) -> Constraint]) (syntax :: * -> *) :: Constraint where
@@ -173,12 +170,6 @@ precisePythonParser = UnmarshalParser tree_sitter_python
 preciseJavaParser :: Parser (PreciseJava.Term Loc)
 preciseJavaParser = UnmarshalParser tree_sitter_java
 
-
-data SomeTerm typeclasses ann where
-  SomeTerm :: ApplyAll typeclasses syntax => Term syntax ann -> SomeTerm typeclasses ann
-
-withSomeTerm :: (forall syntax . ApplyAll typeclasses syntax => Term syntax ann -> a) -> SomeTerm typeclasses ann -> a
-withSomeTerm with (SomeTerm term) = with term
 
 -- | A parser for producing specialized (tree-sitter) ASTs.
 data SomeASTParser where

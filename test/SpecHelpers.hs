@@ -8,6 +8,7 @@ module SpecHelpers
 , parseTestFile
 , readFilePathPair
 , runTaskOrDie
+, runParseWithConfig
 , TaskSession(..)
 , testEvaluating
 , toList
@@ -20,6 +21,7 @@ module SpecHelpers
 ) where
 
 import Control.Abstract
+import Control.Carrier.Parse.Simple
 import Data.Abstract.ScopeGraph (EdgeLabel(..))
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import qualified Data.Abstract.Heap as Heap
@@ -88,15 +90,18 @@ instance IsString Name where
 diffFilePaths :: TaskSession -> Both Path.RelFile -> IO ByteString
 diffFilePaths session paths
   = readFilePathPair paths
-    >>= runTask session . parseDiffBuilder @[] DiffSExpression . pure
+    >>= runTask session . runParse (configTreeSitterParseTimeout (config session)) . parseDiffBuilder @[] DiffSExpression . pure
     >>= either (die . displayException) (pure . runBuilder)
 
 -- | Returns an s-expression parse tree for the specified path.
 parseFilePath :: TaskSession -> Path.RelFile -> IO (Either SomeException ByteString)
 parseFilePath session path = do
   blob <- readBlobFromFile (fileForRelPath path)
-  res <- runTask session . runReader defaultLanguageModes $ parseTermBuilder TermSExpression (toList blob)
+  res <- runTask session . runParse (configTreeSitterParseTimeout (config session)) . runReader defaultLanguageModes $ parseTermBuilder TermSExpression (toList blob)
   pure (runBuilder <$> res)
+
+runParseWithConfig :: (Carrier sig m, Member (Reader Config) sig) => ParseC m a -> m a
+runParseWithConfig task = asks configTreeSitterParseTimeout >>= \ timeout -> runParse timeout task
 
 -- | Read two files to a BlobPair.
 readFilePathPair :: Both Path.RelFile -> IO BlobPair
@@ -110,8 +115,8 @@ parseTestFile parser path = runTaskOrDie $ do
   pure (blob, term)
 
 -- Run a Task and call `die` if it returns an Exception.
-runTaskOrDie :: TaskEff a -> IO a
-runTaskOrDie task = runTaskWithOptions defaultOptions { optionsLogLevel = Nothing } task >>= either (die . displayException) pure
+runTaskOrDie :: ParseC TaskC a -> IO a
+runTaskOrDie task = runTaskWithOptions defaultOptions { optionsLogLevel = Nothing } (runParseWithConfig task) >>= either (die . displayException) pure
 
 type TestEvaluatingC term
   = ResumableC (BaseError (AddressError Precise (Val term)))

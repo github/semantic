@@ -1,8 +1,10 @@
 {-# LANGUAGE DataKinds, MonoLocalBinds, TypeOperators #-}
 module Rendering.TOC.Spec (spec) where
 
+import Analysis.Decorator
 import Analysis.TOCSummary
 import Control.Effect
+import Control.Effect.Parse
 import Data.Aeson hiding (defaultOptions)
 import Data.Bifunctor
 import Data.Bifunctor.Join
@@ -232,10 +234,10 @@ diffWithParser :: ( Eq1 syntax
                   , HasDeclaration syntax
                   , Hashable1 syntax
                   , Member Distribute sig
-                  , Member Task sig
+                  , Member Parse sig
                   , Carrier sig m
                   )
                => Parser (Term syntax Loc)
                -> BlobPair
                -> m (Diff syntax (Maybe Declaration) (Maybe Declaration))
-diffWithParser parser blobs = distributeFor blobs (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob)) >>= SpecHelpers.diff . runJoin
+diffWithParser parser blobs = diffTermPair . runJoin <$> distributeFor blobs (\ blob -> decoratorWithAlgebra (declarationAlgebra blob) <$> parse parser blob)
