@@ -82,7 +82,7 @@ diffGraph blobs = DiffTreeGraphResponse . V.fromList . toList <$> distributeFor 
 type DiffEffects sig m = (Member (Error SomeException) sig, Member (Reader Config) sig, Member Telemetry sig, Member Distribute sig, Member Parse sig, Carrier sig m, MonadIO m)
 
 
-dotGraphDiffParsers :: [(Language, SomeParser DOTGraphDiff Loc)]
+dotGraphDiffParsers :: Map Language (SomeParser DOTGraphDiff Loc)
 dotGraphDiffParsers = aLaCarteParsers
 
 class DiffTerms term => DOTGraphDiff term where
@@ -92,7 +92,7 @@ instance (ConstructorName syntax, Diffable syntax, Eq1 syntax, Hashable1 syntax,
   dotGraphDiff = serialize (DOT (diffStyle "diffs")) . renderTreeGraph
 
 
-jsonGraphDiffParsers :: [(Language, SomeParser JSONGraphDiff Loc)]
+jsonGraphDiffParsers :: Map Language (SomeParser JSONGraphDiff Loc)
 jsonGraphDiffParsers = aLaCarteParsers
 
 class DiffTerms term => JSONGraphDiff term where
@@ -107,7 +107,7 @@ instance (ConstructorName syntax, Diffable syntax, Eq1 syntax, Hashable1 syntax,
         lang = bridging # languageForBlobPair blobPair
 
 
-jsonTreeDiffParsers :: [(Language, SomeParser JSONTreeDiff Loc)]
+jsonTreeDiffParsers :: Map Language (SomeParser JSONTreeDiff Loc)
 jsonTreeDiffParsers = aLaCarteParsers
 
 class DiffTerms term => JSONTreeDiff term where
@@ -117,7 +117,7 @@ instance (Diffable syntax, Eq1 syntax, Hashable1 syntax, ToJSONFields1 syntax, T
   jsonTreeDiff = renderJSONDiff
 
 
-sexprDiffParsers :: [(Language, SomeParser SExprDiff Loc)]
+sexprDiffParsers :: Map Language (SomeParser SExprDiff Loc)
 sexprDiffParsers = aLaCarteParsers
 
 class DiffTerms term => SExprDiff term where
@@ -127,7 +127,7 @@ instance (ConstructorName syntax, Diffable syntax, Eq1 syntax, Hashable1 syntax,
   sexprDiff = serialize (SExpression ByConstructorName)
 
 
-showDiffParsers :: [(Language, SomeParser ShowDiff Loc)]
+showDiffParsers :: Map Language (SomeParser ShowDiff Loc)
 showDiffParsers = aLaCarteParsers
 
 class DiffTerms term => ShowDiff term where
@@ -137,7 +137,7 @@ instance (Diffable syntax, Eq1 syntax, Hashable1 syntax, Show1 syntax, Traversab
   showDiff = serialize Show
 
 
-legacySummarizeDiffParsers :: [(Language, SomeParser LegacySummarizeDiff Loc)]
+legacySummarizeDiffParsers :: Map Language (SomeParser LegacySummarizeDiff Loc)
 legacySummarizeDiffParsers = aLaCarteParsers
 
 class DiffTerms term => LegacySummarizeDiff term where
@@ -149,7 +149,7 @@ instance (Diffable syntax, Eq1 syntax, HasDeclaration syntax, Hashable1 syntax, 
   legacySummarizeDiff = renderToCDiff
 
 
-summarizeDiffParsers :: [(Language, SomeParser SummarizeDiff Loc)]
+summarizeDiffParsers :: Map Language (SomeParser SummarizeDiff Loc)
 summarizeDiffParsers = aLaCarteParsers
 
 class DiffTerms term => SummarizeDiff term where
@@ -178,7 +178,7 @@ instance (Diffable syntax, Eq1 syntax, HasDeclaration syntax, Hashable1 syntax, 
 
 diffWith
   :: (forall term . c term => DiffTerms term, DiffEffects sig m)
-  => [(Language, SomeParser c Loc)]
+  => Map Language (SomeParser c Loc)
   -> (forall term . c term => DiffFor term Loc Loc -> m output)
   -> BlobPair
   -> m output
@@ -187,7 +187,7 @@ diffWith parsers render blobPair = parsePairWith parsers (render <=< diffTerms b
 decoratingDiffWith
   :: forall ann c output m sig
   .  (forall term . c term => DiffTerms term, DiffEffects sig m)
-  => [(Language, SomeParser c Loc)]
+  => Map Language (SomeParser c Loc)
   -> (forall term . c term => Blob -> term Loc -> term ann)
   -> (forall term . c term => DiffFor term ann ann -> m output)
   -> BlobPair

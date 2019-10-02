@@ -48,6 +48,7 @@ import           Data.Abstract.Evaluatable (HasPrelude)
 import           Data.AST
 import           Data.Graph.ControlFlowVertex (VertexDeclaration')
 import           Data.Language
+import qualified Data.Map as Map
 import           Data.Sum
 import qualified Data.Syntax as Syntax
 import           Data.Term
@@ -256,8 +257,8 @@ aLaCarteParsers
      , c (Term (Sum TSX.Syntax))
      , c (Term (Sum TypeScript.Syntax))
      )
-  => [(Language, SomeParser c Loc)]
-aLaCarteParsers =
+  => Map Language (SomeParser c Loc)
+aLaCarteParsers = Map.fromList
   [ goParser'
   , haskellParser'
   , javascriptParser'
@@ -271,8 +272,8 @@ aLaCarteParsers =
   , tsxParser'
   ]
 
-preciseParsers :: c Py.Term => [(Language, SomeParser c Loc)]
-preciseParsers =
+preciseParsers :: c Py.Term => Map Language (SomeParser c Loc)
+preciseParsers = Map.fromList
   [ pythonParserPrecise'
   ]
 
@@ -289,8 +290,8 @@ allParsers
      , c (Term (Sum TypeScript.Syntax))
      )
   => PerLanguageModes
-  -> [(Language, SomeParser c Loc)]
-allParsers modes =
+  -> Map Language (SomeParser c Loc)
+allParsers modes = Map.fromList
   [ goParser'
   , haskellParser'
   , javascriptParser'

@@ -13,6 +13,7 @@ import Control.Exception (SomeException)
 import Data.Bifunctor.Join
 import Data.Blob
 import Data.Language
+import qualified Data.Map as Map
 import Data.These
 import Parsing.Parser
 
@@ -38,20 +39,20 @@ parse parser blob = send (Parse parser blob pure)
 
 parseWith
   :: (Carrier sig m, Member (Error SomeException) sig, Member Parse sig)
-  => [(Language, SomeParser c ann)]
+  => Map.Map Language (SomeParser c ann)
   -> (forall term . c term => term ann -> m a)
   -> Blob
   -> m a
-parseWith parsers with blob = case lookup (blobLanguage blob) parsers of
+parseWith parsers with blob = case Map.lookup (blobLanguage blob) parsers of
   Just (SomeParser parser) -> parse parser blob >>= with
   _                        -> noLanguageForBlob (blobPath blob)
 
 parsePairWith
   :: (Carrier sig m, Member (Error SomeException) sig, Member Parse sig)
-  => [(Language, SomeParser c ann)]
+  => Map.Map Language (SomeParser c ann)
   -> (forall term . c term => These (term ann) (term ann) -> m a)
   -> BlobPair
   -> m a
-parsePairWith parsers with blobPair = case lookup (languageForBlobPair blobPair) parsers of
+parsePairWith parsers with blobPair = case Map.lookup (languageForBlobPair blobPair) parsers of
   Just (SomeParser parser) -> traverse (parse parser) blobPair >>= with . runJoin
   _                        -> noLanguageForBlob (pathForBlobPair blobPair)

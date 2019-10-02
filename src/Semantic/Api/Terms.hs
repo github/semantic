@@ -85,7 +85,7 @@ quietTerm blob = showTiming blob <$> time' ( asks showTermParsers >>= \ parsers 
 type ParseEffects sig m = (Member (Error SomeException) sig, Member (Reader PerLanguageModes) sig, Member Parse sig, Member (Reader Config) sig, Carrier sig m)
 
 
-showTermParsers :: PerLanguageModes -> [(Language, SomeParser ShowTerm Loc)]
+showTermParsers :: PerLanguageModes -> Map Language (SomeParser ShowTerm Loc)
 showTermParsers = allParsers
 
 class ShowTerm term where
@@ -98,7 +98,7 @@ instance ShowTerm Py.Term where
   showTerm = serialize Show . (() <$) . Py.getTerm
 
 
-sexprTermParsers :: [(Language, SomeParser SExprTerm Loc)]
+sexprTermParsers :: Map Language (SomeParser SExprTerm Loc)
 sexprTermParsers = aLaCarteParsers
 
 class SExprTerm term where
@@ -108,7 +108,7 @@ instance (ConstructorName syntax, Foldable syntax, Functor syntax) => SExprTerm 
   sexprTerm = serialize (SExpression ByConstructorName)
 
 
-dotGraphTermParsers :: [(Language, SomeParser DOTGraphTerm Loc)]
+dotGraphTermParsers :: Map Language (SomeParser DOTGraphTerm Loc)
 dotGraphTermParsers = aLaCarteParsers
 
 class DOTGraphTerm term where
@@ -118,7 +118,7 @@ instance (ConstructorName syntax, Foldable syntax, Functor syntax) => DOTGraphTe
   dotGraphTerm = serialize (DOT (termStyle "terms")) . renderTreeGraph
 
 
-jsonTreeTermParsers :: [(Language, SomeParser JSONTreeTerm Loc)]
+jsonTreeTermParsers :: Map Language (SomeParser JSONTreeTerm Loc)
 jsonTreeTermParsers = aLaCarteParsers
 
 class JSONTreeTerm term where
@@ -128,7 +128,7 @@ instance ToJSONFields1 syntax => JSONTreeTerm (Term syntax) where
   jsonTreeTerm = renderJSONTerm
 
 
-jsonGraphTermParsers :: [(Language, SomeParser JSONGraphTerm Loc)]
+jsonGraphTermParsers :: Map Language (SomeParser JSONGraphTerm Loc)
 jsonGraphTermParsers = aLaCarteParsers
 
 class JSONGraphTerm term where

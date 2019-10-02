@@ -102,5 +102,5 @@ instance ToTags Python.Term where
   tags _ _ = Precise.tags
 
 
-toTagsParsers :: PerLanguageModes -> [(Language, Parser.SomeParser ToTags Loc)]
+toTagsParsers :: PerLanguageModes -> Map Language (Parser.SomeParser ToTags Loc)
 toTagsParsers = Parser.allParsers
