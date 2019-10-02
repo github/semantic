@@ -80,11 +80,13 @@ type DiffEffects sig m = (Member (Error SomeException) sig, Member (Reader Confi
 
 type Decorate a b = forall syntax . DiffActions syntax => Blob -> Term syntax a -> Term syntax b
 
+
 class DOTGraphDiff diff where
   dotGraphDiff :: (Carrier sig m, Member (Reader Config) sig) => diff Loc Loc -> m Builder
 
 instance (ConstructorName syntax, Foldable syntax, Functor syntax) => DOTGraphDiff (Diff syntax) where
   dotGraphDiff = serialize (DOT (diffStyle "diffs")) . renderTreeGraph
+
 
 class JSONGraphDiff diff where
   jsonGraphDiff :: BlobPair -> diff Loc Loc -> DiffTreeFileGraph
@@ -97,11 +99,13 @@ instance (Foldable syntax, Functor syntax, ConstructorName syntax) => JSONGraphD
         path = T.pack $ pathForBlobPair blobPair
         lang = bridging # languageForBlobPair blobPair
 
+
 class JSONTreeDiff diff where
   jsonTreeDiff :: BlobPair -> diff Loc Loc -> Rendering.JSON.JSON "diffs" SomeJSON
 
 instance ToJSONFields1 syntax => JSONTreeDiff (Diff syntax) where
   jsonTreeDiff = renderJSONDiff
+
 
 class SExprDiff diff where
   sexprDiff :: (Carrier sig m, Member (Reader Config) sig) => diff Loc Loc -> m Builder
@@ -109,11 +113,13 @@ class SExprDiff diff where
 instance (ConstructorName syntax, Foldable syntax, Functor syntax) => SExprDiff (Diff syntax) where
   sexprDiff = serialize (SExpression ByConstructorName)
 
+
 class ShowDiff diff where
   showDiff :: (Carrier sig m, Member (Reader Config) sig) => diff Loc Loc -> m Builder
 
 instance Show1 syntax => ShowDiff (Diff syntax) where
   showDiff = serialize Show
+
 
 class ( ConstructorName t
       , Diffable t
