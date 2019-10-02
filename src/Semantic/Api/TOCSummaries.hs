@@ -27,14 +27,17 @@ legacyDiffSummary :: DiffEffects sig m => [BlobPair] -> m Summaries
 legacyDiffSummary = distributeFoldMap go
   where
     go :: DiffEffects sig m => BlobPair -> m Summaries
-    go blobPair = doDiff (\ blob -> decoratorWithAlgebra (declarationAlgebra blob)) (render blobPair) blobPair
+    go blobPair = doDiff (\ blob -> decoratorWithAlgebra (declarationAlgebra blob)) (pure . legacySummarizeDiff blobPair) blobPair
       `catchError` \(SomeException e) ->
         pure $ Summaries mempty (Map.singleton path [toJSON (ErrorSummary (T.pack (show e)) lowerBound lang)])
       where path = T.pack $ pathKeyForBlobPair blobPair
             lang = languageForBlobPair blobPair
 
-    render :: (Foldable syntax, Functor syntax, Applicative m) => BlobPair -> Diff syntax (Maybe Declaration) (Maybe Declaration) -> m Summaries
-    render blobPair = pure . renderToCDiff blobPair
+class LegacySummarizeDiff diff where
+  legacySummarizeDiff :: BlobPair -> diff (Maybe Declaration) (Maybe Declaration) -> Summaries
+
+instance (Foldable syntax, Functor syntax) => LegacySummarizeDiff (Diff syntax) where
+  legacySummarizeDiff = renderToCDiff
 
 diffSummary :: DiffEffects sig m => [BlobPair] -> m DiffTreeTOCResponse
 diffSummary blobs = DiffTreeTOCResponse . V.fromList <$> distributeFor blobs go
