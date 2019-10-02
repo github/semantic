@@ -176,28 +176,6 @@ instance (Foldable syntax, Functor syntax, HasDeclaration syntax) => SummarizeDi
         = TOCSummaryFile path language changes (V.cons (TOCSummaryError errorText (converting #? errorSpan)) errors)
 
 
-class
-  ( DiffTerms term
-  , DOTGraphDiff term
-  , JSONGraphDiff term
-  , JSONTreeDiff term
-  , SExprDiff term
-  , ShowDiff term
-  , LegacySummarizeDiff term
-  , SummarizeDiff term
-  ) => DiffActions term
-instance
-  ( DiffTerms term
-  , DOTGraphDiff term
-  , JSONGraphDiff term
-  , JSONTreeDiff term
-  , SExprDiff term
-  , ShowDiff term
-  , LegacySummarizeDiff term
-  , SummarizeDiff term
-  ) => DiffActions term
-
-
 class (c1 term, c2 term) => ((c1 :: (* -> *) -> Constraint) & (c2 :: (* -> *) -> Constraint)) (term :: * -> *)
 
 infixl 9 &
