@@ -35,7 +35,7 @@ instance ToJSON1 Named where
   -- The correct thing to do here is to manually munge the bytestring
   -- together as a builder, but we don't even hit this code path,
   -- so it will do for now.
-  liftToEncoding f _ (Named name a) = f a
+  liftToEncoding f _ (Named _ a) = f a
 
 instance ToJSON2 Incr where
   liftToJSON2 f _ g _ = \case
