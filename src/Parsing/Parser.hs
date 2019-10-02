@@ -246,6 +246,7 @@ typescriptParser' :: c (Term (Sum TypeScript.Syntax)) => (Language, SomeParser c
 typescriptParser' = (TypeScript, SomeParser typescriptParser)
 
 
+-- | The canonical set of parsers producing à la carte terms.
 aLaCarteParsers
   :: ( c (Term (Sum Go.Syntax))
      , c (Term (Sum Haskell.Syntax))
@@ -272,11 +273,13 @@ aLaCarteParsers = Map.fromList
   , tsxParser'
   ]
 
+-- | The canonical set of parsers producing precise terms.
 preciseParsers :: c Py.Term => Map Language (SomeParser c Loc)
 preciseParsers = Map.fromList
   [ pythonParserPrecise'
   ]
 
+-- | The canonical set of all parsers for the passed per-language modes.
 allParsers
   :: ( c (Term (Sum Go.Syntax))
      , c (Term (Sum Haskell.Syntax))
