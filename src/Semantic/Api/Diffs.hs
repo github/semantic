@@ -66,7 +66,7 @@ parseDiffBuilder DiffShow        = distributeFoldMap (diffWith @Loc showDiffPars
 parseDiffBuilder DiffDotGraph    = distributeFoldMap (diffWith @Loc dotGraphDiffParsers (const id) dotGraphDiff)
 
 jsonDiff :: DiffEffects sig m => BlobPair -> m (Rendering.JSON.JSON "diffs" SomeJSON)
-jsonDiff blobPair = doDiff (const id) (pure . jsonTreeDiff blobPair) blobPair `catchError` jsonError blobPair
+jsonDiff blobPair = diffWith jsonTreeDiffParsers (const id) (pure . jsonTreeDiff blobPair) blobPair `catchError` jsonError blobPair
 
 jsonError :: Applicative m => BlobPair -> SomeException -> m (Rendering.JSON.JSON "diffs" SomeJSON)
 jsonError blobPair (SomeException e) = pure $ renderJSONDiffError blobPair (show e)
