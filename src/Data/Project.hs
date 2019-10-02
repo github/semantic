@@ -1,8 +1,5 @@
-{-# LANGUAGE DeriveAnyClass, MultiWayIf #-}
-
 module Data.Project
   ( Project (..)
-  , ProjectException (..)
   , projectExtensions
   , projectName
   , projectFiles
@@ -36,10 +33,6 @@ projectExtensions = extensionsForLanguage . projectLanguage
 
 projectFiles :: Project -> [File]
 projectFiles = fmap blobFile . projectBlobs
-
-newtype ProjectException
-  = FileNotFound FilePath
-    deriving (Show, Eq, Typeable, Exception)
 
 readProjectFromPaths :: MonadIO m => Maybe FilePath -> FilePath -> Language -> [FilePath] -> m Project
 readProjectFromPaths maybeRoot path lang excludeDirs = do
