@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, MonoLocalBinds, RankNTypes, TypeOperators #-}
+{-# LANGUAGE MonoLocalBinds, RankNTypes #-}
 module Semantic.Api.Symbols
   ( legacyParseSymbols
   , parseSymbols
