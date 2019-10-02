@@ -11,7 +11,7 @@ import Prologue
 import           Control.Effect.Fail
 import           Control.Effect.Lift
 import           Control.Effect.Reader
-import qualified Control.Exception
+import qualified Control.Exception as Exc
 import           Foreign
 import           Foreign.C.Types (CBool (..))
 import           Foreign.Marshal.Array (allocaArray)
@@ -46,7 +46,7 @@ parseToAST :: ( Bounded grammar
            => Duration
            -> Ptr TS.Language
            -> Blob
-           -> m (Either SomeException (AST [] grammar))
+           -> m (Either TSParseException  (AST [] grammar))
 parseToAST parseTimeout language blob = runParse parseTimeout language blob (anaM toAST <=< peek)
 
 parseToPreciseAST
@@ -56,11 +56,11 @@ parseToPreciseAST
   => Duration
   -> Ptr TS.Language
   -> Blob
-  -> m (Either SomeException (t Loc))
+  -> m (Either TSParseException (t Loc))
 parseToPreciseAST parseTimeout language blob = runParse parseTimeout language blob $ \ rootPtr ->
   TS.withCursor (castPtr rootPtr) $ \ cursor ->
     runM (runFail (runReader cursor (runReader (Source.bytes (blobSource blob)) (TS.peekNode >>= TS.unmarshalNode))))
-      >>= either (Control.Exception.throw . UnmarshalFailure) pure
+      >>= either (Exc.throw . UnmarshalFailure) pure
 
 instance Exception TSParseException where
   displayException = \case
@@ -74,9 +74,9 @@ runParse
   -> Ptr TS.Language
   -> Blob
   -> (Ptr TS.Node -> IO a)
-  -> m (Either SomeException a)
+  -> m (Either TSParseException a)
 runParse parseTimeout language Blob{..} action =
-  liftIO . Control.Exception.try . TS.withParser language $ \ parser -> do
+  liftIO . Exc.tryJust fromException . TS.withParser language $ \ parser -> do
     let timeoutMicros = fromIntegral $ toMicroseconds parseTimeout
     TS.ts_parser_set_timeout_micros parser timeoutMicros
     TS.ts_parser_halt_on_error parser (CBool 1)
@@ -84,11 +84,11 @@ runParse parseTimeout language Blob{..} action =
     if compatible then
       TS.withParseTree parser (Source.bytes blobSource) $ \ treePtr -> do
         if treePtr == nullPtr then
-          Control.Exception.throw ParserTimedOut
+          Exc.throw ParserTimedOut
         else
           TS.withRootNode treePtr action
     else
-      Control.Exception.throw IncompatibleVersions
+      Exc.throw IncompatibleVersions
 
 toAST :: forall grammar . (Bounded grammar, Enum grammar) => TS.Node -> IO (Base (AST [] grammar) TS.Node)
 toAST node@TS.Node{..} = do
