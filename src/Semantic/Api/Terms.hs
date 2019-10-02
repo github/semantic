@@ -157,19 +157,17 @@ showTermParsers
   :: (Carrier sig m, Member (Reader PerLanguageModes) sig)
   => m [(Language, SomeParser ShowTerm Loc)]
 showTermParsers = ask >>= \ modes -> pure
-  [ (Go,         SomeParser goParser)
-  , (Haskell,    SomeParser haskellParser)
-  , (JavaScript, SomeParser tsxParser)
-  , (JSON,       SomeParser jsonParser)
-  , (JSX,        SomeParser tsxParser)
-  , (Markdown,   SomeParser markdownParser)
-  , (Python,     case pythonMode modes of
-    ALaCarte -> SomeParser pythonParser
-    Precise  -> SomeParser precisePythonParser)
-  , (Ruby,       SomeParser rubyParser)
-  , (TypeScript, SomeParser typescriptParser)
-  , (TSX,        SomeParser tsxParser)
-  , (PHP,        SomeParser phpParser)
+  [ goParser'
+  , haskellParser'
+  , javascriptParser'
+  , jsonParser'
+  , jsxParser'
+  , markdownParser'
+  , phpParser'
+  , pythonParser' modes
+  , rubyParser'
+  , typescriptParser'
+  , tsxParser'
   ]
 
 doParse'
