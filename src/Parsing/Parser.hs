@@ -1,11 +1,10 @@
-{-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, GADTs, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, GADTs, RankNTypes, ScopedTypeVariables, TypeOperators #-}
 module Parsing.Parser
 ( Parser(..)
 , SomeAnalysisParser(..)
 , SomeASTParser(..)
 , someASTParser
 , someAnalysisParser
-, ApplyAll
 -- * À la carte parsers
 , goParser
 , goASTParser
@@ -50,7 +49,6 @@ import qualified CMarkGFM
 import           Data.Abstract.Evaluatable (HasPrelude)
 import           Data.AST
 import           Data.Graph.ControlFlowVertex (VertexDeclaration')
-import           Data.Kind
 import           Data.Language
 import           Data.Sum
 import qualified Data.Syntax as Syntax
@@ -129,12 +127,6 @@ data Parser term where
                       -> Parser (Term (Sum syntaxes) Loc)
   -- | A parser for 'Markdown' using cmark.
   MarkdownParser :: Parser (Term (TermF [] CMarkGFM.NodeType) (Node Markdown.Grammar))
-
-
--- | Apply all of a list of typeclasses to all of a list of functors using 'Apply'. Used by 'someParser' to constrain all of the language-specific syntax types to the typeclasses in question.
-type family ApplyAll (typeclasses :: [(* -> *) -> Constraint]) (syntax :: * -> *) :: Constraint where
-  ApplyAll (typeclass ': typeclasses) syntax = (typeclass syntax, ApplyAll typeclasses syntax)
-  ApplyAll '[] syntax = ()
 
 
 goParser :: Parser Go.Term
