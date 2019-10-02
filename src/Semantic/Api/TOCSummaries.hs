@@ -1,4 +1,3 @@
-{-# LANGUAGE TypeOperators #-}
 module Semantic.Api.TOCSummaries (diffSummary, legacyDiffSummary, diffSummaryBuilder) where
 
 import           Control.Effect.Error
