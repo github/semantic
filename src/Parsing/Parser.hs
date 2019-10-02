@@ -38,6 +38,8 @@ module Parsing.Parser
 , rubyParser'
 , tsxParser'
 , typescriptParser'
+  -- * Canonical sets of parsers
+, aLaCarteParsers
 ) where
 
 import           Assigning.Assignment
@@ -249,3 +251,30 @@ tsxParser' = (TSX, SomeParser tsxParser)
 
 typescriptParser' :: c (Term (Sum TypeScript.Syntax)) => (Language, SomeParser c Loc)
 typescriptParser' = (TypeScript, SomeParser typescriptParser)
+
+
+aLaCarteParsers
+  :: ( c (Term (Sum Go.Syntax))
+     , c (Term (Sum Haskell.Syntax))
+     , c (Term (Sum JSON.Syntax))
+     , c (Term (Sum Markdown.Syntax))
+     , c (Term (Sum PHP.Syntax))
+     , c (Term (Sum Python.Syntax))
+     , c (Term (Sum Ruby.Syntax))
+     , c (Term (Sum TSX.Syntax))
+     , c (Term (Sum TypeScript.Syntax))
+     )
+  => [(Language, SomeParser c Loc)]
+aLaCarteParsers =
+  [ goParser'
+  , haskellParser'
+  , javascriptParser'
+  , jsonParser'
+  , jsxParser'
+  , markdownParser'
+  , phpParser'
+  , pythonParserALaCarte'
+  , rubyParser'
+  , typescriptParser'
+  , tsxParser'
+  ]
