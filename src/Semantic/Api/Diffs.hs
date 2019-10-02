@@ -7,8 +7,6 @@ module Semantic.Api.Diffs
   , diffWith
   , DiffEffects
 
-  , SomeTermPair(..)
-
   , legacySummarizeDiffParsers
   , LegacySummarizeDiff(..)
   , summarizeDiffParsers
@@ -224,7 +222,3 @@ diffTerms blobs terms = time "diff" languageTag $ do
   let diff = diffTermPair (runJoin terms)
   diff <$ writeStat (Stat.count "diff.nodes" (bilength diff) languageTag)
   where languageTag = languageTagForBlobPair blobs
-
-
-data SomeTermPair ann where
-  SomeTermPair :: DiffActions term  => Join These (term ann) -> SomeTermPair ann
