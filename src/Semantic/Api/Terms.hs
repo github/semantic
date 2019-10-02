@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, MonoLocalBinds, RankNTypes #-}
+{-# LANGUAGE ConstraintKinds, GADTs, RankNTypes #-}
 module Semantic.Api.Terms
   ( termGraph
   , parseTermBuilder
@@ -151,3 +151,7 @@ doParse with blob = case blobLanguage blob of
   TSX        -> parse tsxParser        blob >>= with
   PHP        -> parse phpParser        blob >>= with
   _          -> noLanguageForBlob (blobPath blob)
+
+
+data SomeParser c a where
+  SomeParser :: c t => Parser (t a) -> SomeParser c a
