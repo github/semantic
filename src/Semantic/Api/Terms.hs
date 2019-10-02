@@ -112,6 +112,21 @@ instance ShowTerm Py.Term where
   showTerm = serialize Show . (() <$) . Py.getTerm
 
 
+sexprTermParsers :: [(Language, SomeParser SExprTerm Loc)]
+sexprTermParsers =
+  [ goParser'
+  , haskellParser'
+  , javascriptParser'
+  , jsonParser'
+  , jsxParser'
+  , markdownParser'
+  , phpParser'
+  , pythonParserALaCarte'
+  , rubyParser'
+  , typescriptParser'
+  , tsxParser'
+  ]
+
 class SExprTerm term where
   sexprTerm :: (Carrier sig m, Member (Reader Config) sig) => term Loc -> m Builder
 
