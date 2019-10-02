@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, ConstraintKinds, TypeOperators, RankNTypes #-}
+{-# LANGUAGE GADTs, ConstraintKinds, TypeOperators, RankNTypes, UndecidableInstances #-}
 module Semantic.Api.Diffs
   ( parseDiffBuilder
   , DiffOutputFormat(..)
@@ -103,16 +103,26 @@ type DiffEffects sig m = (Member (Error SomeException) sig, Member (Reader Confi
 type CanDiff syntax = (ConstructorName syntax, Diffable syntax, Eq1 syntax, HasDeclaration syntax, Hashable1 syntax, Show1 syntax, ToJSONFields1 syntax, Traversable syntax)
 type Decorate a b = forall syntax . CanDiff syntax => Blob -> Term syntax a -> Term syntax b
 
-type TermPairConstraints =
- '[ ConstructorName
-  , Diffable
-  , Eq1
-  , HasDeclaration
-  , Hashable1
-  , Show1
-  , Traversable
-  , ToJSONFields1
-  ]
+class ( ConstructorName t
+      , Diffable t
+      , Eq1 t
+      , HasDeclaration t
+      , Hashable1 t
+      , Show1 t
+      , Traversable t
+      , ToJSONFields1 t
+      )
+   => DiffActions t
+instance ( ConstructorName t
+         , Diffable t
+         , Eq1 t
+         , HasDeclaration t
+         , Hashable1 t
+         , Show1 t
+         , Traversable t
+         , ToJSONFields1 t
+         )
+      => DiffActions t
 
 doDiff :: (DiffEffects sig m)
   => BlobPair -> Decorate Loc ann -> (forall syntax . CanDiff syntax => BlobPair -> Diff syntax ann ann -> m output) -> m output
@@ -129,7 +139,7 @@ diffTerms blobs terms = time "diff" languageTag $ do
   where languageTag = languageTagForBlobPair blobs
 
 doParse :: (Member (Error SomeException) sig, Member Distribute sig, Member Parse sig, Carrier sig m)
-  => BlobPair -> Decorate Loc ann -> m (SomeTermPair TermPairConstraints ann)
+  => BlobPair -> Decorate Loc ann -> m (SomeTermPair DiffActions ann)
 doParse blobPair decorate = case languageForBlobPair blobPair of
   Go         -> SomeTermPair <$> distributeFor blobPair (\ blob -> decorate blob <$> parse goParser blob)
   Haskell    -> SomeTermPair <$> distributeFor blobPair (\ blob -> decorate blob <$> parse haskellParser blob)
@@ -145,7 +155,7 @@ doParse blobPair decorate = case languageForBlobPair blobPair of
   _          -> noLanguageForBlob (pathForBlobPair blobPair)
 
 data SomeTermPair typeclasses ann where
-  SomeTermPair :: ApplyAll typeclasses syntax => Join These (Term syntax ann) -> SomeTermPair typeclasses ann
+  SomeTermPair :: typeclasses syntax => Join These (Term syntax ann) -> SomeTermPair typeclasses ann
 
-withSomeTermPair :: (forall syntax . ApplyAll typeclasses syntax => Join These (Term syntax ann) -> a) -> SomeTermPair typeclasses ann -> a
+withSomeTermPair :: (forall syntax . typeclasses syntax => Join These (Term syntax ann) -> a) -> SomeTermPair typeclasses ann -> a
 withSomeTermPair with (SomeTermPair terms) = with terms
