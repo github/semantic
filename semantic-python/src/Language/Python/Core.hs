@@ -105,7 +105,10 @@ locate :: ( HasField "ann" syntax Span
           , CoreSyntax syn t
           , Member (Reader SourcePath) sig
           , Carrier sig m
-          ) => syntax -> t a -> m (t a)
+          )
+       => syntax
+       -> t a
+       -> m (t a)
 locate syn item = do
   fp <- ask @SourcePath
   pure (Core.annAt (locFromTSSpan fp (getField @"ann" syn)) item)
@@ -116,7 +119,7 @@ defaultCompile t = fail $ "compilation unimplemented for " <> show t
 newtype CompileSum py a = CompileSum (py a)
 
 instance (Generic1 py, GCompileSum (Rep1 py)) => Compile (CompileSum py) where
-  compileCC (CompileSum a) cc = gcompileCCSum (from a) cc
+  compileCC (CompileSum a) cc = gcompileCCSum (from1 a) cc
 
 deriving via CompileSum (l :+: r) instance (Compile l, Compile r) => Compile (l :+: r)
 
@@ -133,8 +136,8 @@ instance Compile Py.Attribute
 -- @
 -- The tree structure that we get out of tree-sitter is not particulary conducive to expressing
 -- this naturally, so we engage in a small desugaring step so that we can turn a list [a, b, c]
--- into a sequenced Core expression using >>>= and a left fold. (It's a left fold that has
--- information—specifically the LHS to assign—flowing through it rightward.)
+-- into a sequenced Core expression using >>>= and a fold through which information—specifically
+-- the LHS to assign—flows.
 
 -- RHS represents the right-hand-side of an assignment that we get out of tree-sitter.
 -- Desugared is the "terminal" node in a sequence of assignments, i.e. given a = b = c,
@@ -337,20 +340,23 @@ instance Compile Py.WhileStatement
 instance Compile Py.WithStatement
 instance Compile Py.Yield
 
-class GCompileSum f where
+class GCompileSum (f :: * -> *) where
   gcompileCCSum :: ( CoreSyntax syn t
                    , Member (Reader SourcePath) sig
                    , Member (Reader Bindings) sig
                    , Carrier sig m
                    , MonadFail m
-                   ) => f a -> m (t Name) -> m (t Name)
+                   )
+                => f Span
+                -> m (t Name)
+                -> m (t Name)
 
-instance GCompileSum f => GCompileSum (M1 D d f) where
+instance GCompileSum f => GCompileSum (M1 t d f) where
   gcompileCCSum (M1 f) = gcompileCCSum f
 
 instance (GCompileSum l, GCompileSum r) => GCompileSum (l :+: r) where
   gcompileCCSum (L1 l) = gcompileCCSum l
   gcompileCCSum (R1 r) = gcompileCCSum r
 
-instance Compile t => GCompileSum (M1 C c (M1 S s (K1 R (t Span)))) where
-  gcompileCCSum (M1 (M1 (K1 t))) = compileCC t
+instance Compile t => GCompileSum (Rec1 t) where
+  gcompileCCSum (Rec1 t) = compileCC t
