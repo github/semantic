@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, ConstraintKinds, LambdaCase, KindSignatures, RankNTypes, TypeOperators, UndecidableInstances, UndecidableSuperClasses #-}
+{-# LANGUAGE AllowAmbiguousTypes, GADTs, ConstraintKinds, LambdaCase, KindSignatures, RankNTypes, TypeOperators, UndecidableInstances, UndecidableSuperClasses #-}
 module Semantic.Api.Diffs
   ( parseDiffBuilder
   , DiffOutputFormat(..)
@@ -194,6 +194,17 @@ class (c1 term, c2 term) => ((c1 :: (* -> *) -> Constraint) & (c2 :: (* -> *) ->
 infixl 9 &
 
 instance (c1 term, c2 term) => (c1 & c2) term
+
+diffWith
+  :: DiffEffects sig m
+  => [(Language, SomeParser (DiffTerms & c) Loc)]
+  -> (forall term . c term => Blob -> term Loc -> term ann)
+  -> (forall term . c term => DiffFor term ann ann -> m output)
+  -> BlobPair
+  -> m output
+diffWith parsers decorate render blobPair = parsePairWith parsers (render <=< diffTerms blobPair . Join . bimap (decorate blobL) (decorate blobR) . runJoin) blobPair where
+  (blobL, blobR) = fromThese errorBlob errorBlob (runJoin blobPair)
+  errorBlob = Prelude.error "evaluating blob on absent side"
 
 diffTerms :: (DiffTerms term, Member Telemetry sig, Carrier sig m, MonadIO m)
   => BlobPair -> Join These (term ann) -> m (DiffFor term ann ann)
