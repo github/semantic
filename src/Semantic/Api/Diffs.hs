@@ -57,7 +57,7 @@ parseDiffBuilder DiffJSONTree    = distributeFoldMap (jsonDiff renderJSONTree) >
 parseDiffBuilder DiffJSONGraph   = diffGraph >=> serialize Format.JSON
 parseDiffBuilder DiffSExpression = distributeFoldMap (doDiff (const id) sexprDiff)
 parseDiffBuilder DiffShow        = distributeFoldMap (doDiff (const id) showDiff)
-parseDiffBuilder DiffDotGraph    = distributeFoldMap dotGraphDiff
+parseDiffBuilder DiffDotGraph    = distributeFoldMap (doDiff (const id) dotGraphDiff)
 
 type RenderJSON m syntax = forall syntax . DiffActions syntax => BlobPair -> Diff syntax Loc Loc -> m (Rendering.JSON.JSON "diffs" SomeJSON)
 
@@ -87,14 +87,15 @@ diffGraph blobs = DiffTreeGraphResponse . V.fromList . toList <$> distributeFor 
               toEdge (Edge (a, b)) = DiffTreeEdge (diffVertexId a) (diffVertexId b)
           in pure $ DiffTreeFileGraph path lang (V.fromList (vertexList graph)) (V.fromList (fmap toEdge (edgeList graph))) mempty
 
-dotGraphDiff :: DiffEffects sig m => BlobPair -> m Builder
-dotGraphDiff = doDiff (const id) render
-  where render :: (Carrier sig m, ConstructorName syntax, Foldable syntax, Functor syntax, Member (Reader Config) sig) => Diff syntax Loc Loc -> m Builder
-        render = serialize (DOT (diffStyle "diffs")) . renderTreeGraph
-
 type DiffEffects sig m = (Member (Error SomeException) sig, Member (Reader Config) sig, Member Telemetry sig, Member Distribute sig, Member Parse sig, Carrier sig m, MonadIO m)
 
 type Decorate a b = forall syntax . DiffActions syntax => Blob -> Term syntax a -> Term syntax b
+
+class DOTGraphDiff diff where
+  dotGraphDiff :: (Carrier sig m, Member (Reader Config) sig) => diff Loc Loc -> m Builder
+
+instance (ConstructorName syntax, Foldable syntax, Functor syntax) => DOTGraphDiff (Diff syntax) where
+  dotGraphDiff = serialize (DOT (diffStyle "diffs")) . renderTreeGraph
 
 class SExprDiff diff where
   sexprDiff :: (Carrier sig m, Member (Reader Config) sig) => diff Loc Loc -> m Builder
