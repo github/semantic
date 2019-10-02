@@ -71,8 +71,28 @@ import           Text.Show.Pretty (ppShow)
 
 data GraphType = ImportGraph | CallGraph
 
-class (Declarations1 syntax, Eq1 syntax, Evaluatable syntax, FreeVariables1 syntax, AccessControls1 syntax, Foldable syntax, Functor syntax, Ord1 syntax, Show1 syntax) => AnalysisClasses syntax
-instance (Declarations1 syntax, Eq1 syntax, Evaluatable syntax, FreeVariables1 syntax, AccessControls1 syntax, Foldable syntax, Functor syntax, Ord1 syntax, Show1 syntax) => AnalysisClasses syntax
+class
+  ( Declarations1 syntax
+  , Eq1 syntax
+  , Evaluatable syntax
+  , FreeVariables1 syntax
+  , AccessControls1 syntax
+  , Foldable syntax
+  , Functor syntax
+  , Ord1 syntax
+  , Show1 syntax
+  ) => AnalysisClasses syntax
+instance
+  ( Declarations1 syntax
+  , Eq1 syntax
+  , Evaluatable syntax
+  , FreeVariables1 syntax
+  , AccessControls1 syntax
+  , Foldable syntax
+  , Functor syntax
+  , Ord1 syntax
+  , Show1 syntax
+  ) => AnalysisClasses syntax
 
 runGraph :: ( Member Distribute sig
             , Member Parse sig
