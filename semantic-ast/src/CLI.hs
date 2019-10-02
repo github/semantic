@@ -17,6 +17,17 @@ data SemanticAST = SemanticAST
   { sourceFilePath :: Prelude.String
   , format         :: Prelude.String
   }
+
+parseAST :: Parser SemanticAST
+parseAST = SemanticAST
+    <$> strOption
+        ( long "semantic-ast"
+       <> metavar "FILEPATH"
+       <> help "Specify filepath containing source code to parse" )
+    <*> strOption
+        ( long "format"
+       <> help "Specify format --json --sexpression --show" )
+
 main :: IO ()
 main = do
   args <- head <$> getArgs
