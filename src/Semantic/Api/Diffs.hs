@@ -1,4 +1,4 @@
-{-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, KindSignatures, LambdaCase, MonoLocalBinds, QuantifiedConstraints, RankNTypes, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, LambdaCase, MonoLocalBinds, QuantifiedConstraints, RankNTypes #-}
 module Semantic.Api.Diffs
   ( parseDiffBuilder
   , DiffOutputFormat(..)
