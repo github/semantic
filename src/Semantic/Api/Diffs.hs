@@ -69,18 +69,12 @@ diffGraph :: (Traversable t, DiffEffects sig m) => t BlobPair -> m DiffTreeGraph
 diffGraph blobs = DiffTreeGraphResponse . V.fromList . toList <$> distributeFor blobs go
   where
     go :: DiffEffects sig m => BlobPair -> m DiffTreeFileGraph
-    go blobPair = doDiff (const id) render blobPair
+    go blobPair = doDiff (const id) (pure . jsonGraphDiff blobPair) blobPair
       `catchError` \(SomeException e) ->
         pure (DiffTreeFileGraph path lang mempty mempty (V.fromList [ParseError (T.pack (show e))]))
       where
         path = T.pack $ pathForBlobPair blobPair
         lang = bridging # languageForBlobPair blobPair
-
-        render :: (Foldable syntax, Functor syntax, ConstructorName syntax, Applicative m) => Diff syntax Loc Loc -> m DiffTreeFileGraph
-        render diff =
-          let graph = renderTreeGraph diff
-              toEdge (Edge (a, b)) = DiffTreeEdge (diffVertexId a) (diffVertexId b)
-          in pure $ DiffTreeFileGraph path lang (V.fromList (vertexList graph)) (V.fromList (fmap toEdge (edgeList graph))) mempty
 
 type DiffEffects sig m = (Member (Error SomeException) sig, Member (Reader Config) sig, Member Telemetry sig, Member Distribute sig, Member Parse sig, Carrier sig m, MonadIO m)
 
@@ -91,6 +85,17 @@ class DOTGraphDiff diff where
 
 instance (ConstructorName syntax, Foldable syntax, Functor syntax) => DOTGraphDiff (Diff syntax) where
   dotGraphDiff = serialize (DOT (diffStyle "diffs")) . renderTreeGraph
+
+class JSONGraphDiff diff where
+  jsonGraphDiff :: BlobPair -> diff Loc Loc -> DiffTreeFileGraph
+
+instance (Foldable syntax, Functor syntax, ConstructorName syntax) => JSONGraphDiff (Diff syntax) where
+  jsonGraphDiff blobPair diff
+    = let graph = renderTreeGraph diff
+          toEdge (Edge (a, b)) = DiffTreeEdge (diffVertexId a) (diffVertexId b)
+      in DiffTreeFileGraph path lang (V.fromList (vertexList graph)) (V.fromList (fmap toEdge (edgeList graph))) mempty where
+        path = T.pack $ pathForBlobPair blobPair
+        lang = bridging # languageForBlobPair blobPair
 
 class JSONTreeDiff diff where
   jsonTreeDiff :: BlobPair -> diff Loc Loc -> Rendering.JSON.JSON "diffs" SomeJSON
