@@ -174,3 +174,13 @@ showTermParsers = ask >>= \ modes -> pure
   , (TSX,        SomeParser tsxParser)
   , (PHP,        SomeParser phpParser)
   ]
+
+doParse'
+  :: (Carrier sig m, Member (Error SomeException) sig, Member Parse sig)
+  => [(Language, SomeParser c ann)]
+  -> (forall term . c term => term ann -> m a)
+  -> Blob
+  -> m a
+doParse' parsers with blob = case lookup (blobLanguage blob) parsers of
+  Just (SomeParser parser) -> parse parser blob >>= with
+  _                        -> noLanguageForBlob (blobPath blob)
