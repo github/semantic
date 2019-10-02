@@ -63,7 +63,7 @@ parseDiffBuilder DiffJSONTree    = distributeFoldMap jsonDiff >=> serialize Form
 parseDiffBuilder DiffJSONGraph   = diffGraph >=> serialize Format.JSON
 parseDiffBuilder DiffSExpression = distributeFoldMap (diffWith @Loc sexprDiffParsers (const id) sexprDiff)
 parseDiffBuilder DiffShow        = distributeFoldMap (diffWith @Loc showDiffParsers (const id) showDiff)
-parseDiffBuilder DiffDotGraph    = distributeFoldMap (doDiff (const id) dotGraphDiff)
+parseDiffBuilder DiffDotGraph    = distributeFoldMap (diffWith @Loc dotGraphDiffParsers (const id) dotGraphDiff)
 
 jsonDiff :: DiffEffects sig m => BlobPair -> m (Rendering.JSON.JSON "diffs" SomeJSON)
 jsonDiff blobPair = doDiff (const id) (pure . jsonTreeDiff blobPair) blobPair `catchError` jsonError blobPair
