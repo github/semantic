@@ -31,7 +31,7 @@ import           Data.Term
 import qualified Data.Text as T
 import qualified Data.Vector as V
 import           Diffing.Algorithm (Diffable)
-import           Diffing.Interpreter (HasDiffFor(..), DiffTerms(..))
+import           Diffing.Interpreter (DiffTerms(..))
 import           Parsing.Parser
 import           Prologue
 import           Rendering.Graph

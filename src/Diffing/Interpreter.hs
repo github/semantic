@@ -1,7 +1,6 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilyDependencies, TypeOperators, UndecidableInstances #-}
 module Diffing.Interpreter
 ( diffTerms
-, HasDiffFor(..)
 , DiffTerms(..)
 , stripDiff
 ) where
@@ -30,17 +29,14 @@ stripDiff :: Functor syntax
           -> Diff.Diff syntax ann1 ann2
 stripDiff = bimap snd snd
 
-class HasDiffFor (term :: * -> *) where
+class (Bifoldable (DiffFor term)) => DiffTerms term where
   type DiffFor term = (res :: * -> * -> *) | res -> term
 
-class (Bifoldable (DiffFor term), HasDiffFor term) => DiffTerms term where
   -- | Diff a 'These' of terms.
   diffTermPair :: These (term ann1) (term ann2) -> DiffFor term ann1 ann2
 
-instance HasDiffFor (Term syntax) where
-  type DiffFor (Term syntax) = Diff.Diff syntax
-
 instance (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => DiffTerms (Term syntax) where
+  type DiffFor (Term syntax) = Diff.Diff syntax
   diffTermPair = these Diff.deleting Diff.inserting diffTerms
 
 
