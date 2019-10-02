@@ -10,7 +10,9 @@ module Semantic.Api.Diffs
 
   , SomeTermPair(..)
 
+  , legacySummarizeDiffParsers
   , LegacySummarizeDiff(..)
+  , summarizeDiffParsers
   , SummarizeDiff(..)
   ) where
 
@@ -85,12 +87,18 @@ type DiffEffects sig m = (Member (Error SomeException) sig, Member (Reader Confi
 type Decorate a b = forall term . DiffActions term => Blob -> term a -> term b
 
 
+dotGraphDiffParsers :: [(Language, SomeParser DOTGraphDiff Loc)]
+dotGraphDiffParsers = aLaCarteParsers
+
 class HasDiffFor term => DOTGraphDiff term where
   dotGraphDiff :: (Carrier sig m, Member (Reader Config) sig) => DiffFor term Loc Loc -> m Builder
 
 instance (ConstructorName syntax, Foldable syntax, Functor syntax) => DOTGraphDiff (Term syntax) where
   dotGraphDiff = serialize (DOT (diffStyle "diffs")) . renderTreeGraph
 
+
+jsonGraphDiffParsers :: [(Language, SomeParser JSONGraphDiff Loc)]
+jsonGraphDiffParsers = aLaCarteParsers
 
 class HasDiffFor term => JSONGraphDiff term where
   jsonGraphDiff :: BlobPair -> DiffFor term Loc Loc -> DiffTreeFileGraph
@@ -104,12 +112,18 @@ instance (Foldable syntax, Functor syntax, ConstructorName syntax) => JSONGraphD
         lang = bridging # languageForBlobPair blobPair
 
 
+jsonTreeDiffParsers :: [(Language, SomeParser JSONTreeDiff Loc)]
+jsonTreeDiffParsers = aLaCarteParsers
+
 class HasDiffFor term => JSONTreeDiff term where
   jsonTreeDiff :: BlobPair -> DiffFor term Loc Loc -> Rendering.JSON.JSON "diffs" SomeJSON
 
 instance ToJSONFields1 syntax => JSONTreeDiff (Term syntax) where
   jsonTreeDiff = renderJSONDiff
 
+
+sexprDiffParsers :: [(Language, SomeParser SExprDiff Loc)]
+sexprDiffParsers = aLaCarteParsers
 
 class HasDiffFor term => SExprDiff term where
   sexprDiff :: (Carrier sig m, Member (Reader Config) sig) => DiffFor term Loc Loc -> m Builder
@@ -118,12 +132,18 @@ instance (ConstructorName syntax, Foldable syntax, Functor syntax) => SExprDiff 
   sexprDiff = serialize (SExpression ByConstructorName)
 
 
+showDiffParsers :: [(Language, SomeParser ShowDiff Loc)]
+showDiffParsers = aLaCarteParsers
+
 class HasDiffFor term => ShowDiff term where
   showDiff :: (Carrier sig m, Member (Reader Config) sig) => DiffFor term Loc Loc -> m Builder
 
 instance Show1 syntax => ShowDiff (Term syntax) where
   showDiff = serialize Show
 
+
+legacySummarizeDiffParsers :: [(Language, SomeParser LegacySummarizeDiff Loc)]
+legacySummarizeDiffParsers = aLaCarteParsers
 
 class HasDiffFor term => LegacySummarizeDiff term where
   legacyDecorateTerm :: Blob -> term Loc -> term (Maybe Declaration)
@@ -133,6 +153,9 @@ instance (Foldable syntax, Functor syntax, HasDeclaration syntax) => LegacySumma
   legacyDecorateTerm = decoratorWithAlgebra . declarationAlgebra
   legacySummarizeDiff = renderToCDiff
 
+
+summarizeDiffParsers :: [(Language, SomeParser SummarizeDiff Loc)]
+summarizeDiffParsers = aLaCarteParsers
 
 class HasDiffFor term => SummarizeDiff term where
   decorateTerm :: Blob -> term Loc -> term (Maybe Declaration)
