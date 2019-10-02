@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, ConstraintKinds, FunctionalDependencies, LambdaCase, RankNTypes, UndecidableInstances #-}
+{-# LANGUAGE GADTs, ConstraintKinds, FunctionalDependencies, LambdaCase, RankNTypes #-}
 module Semantic.Api.Diffs
   ( parseDiffBuilder
   , DiffOutputFormat(..)
@@ -157,28 +157,17 @@ instance (Foldable syntax, Functor syntax, HasDeclaration syntax) => SummarizeDi
         = TOCSummaryFile path language changes (V.cons (TOCSummaryError errorText (converting #? errorSpan)) errors)
 
 
-class ( Bifoldable diff
-      , DiffTerms term diff
-      , DOTGraphDiff diff
-      , JSONGraphDiff diff
-      , JSONTreeDiff diff
-      , SExprDiff diff
-      , ShowDiff diff
-      , LegacySummarizeDiff term diff
-      , SummarizeDiff term diff
-      )
-   => DiffActions term diff
-instance ( Bifoldable diff
-         , DiffTerms term diff
-         , DOTGraphDiff diff
-         , JSONGraphDiff diff
-         , JSONTreeDiff diff
-         , SExprDiff diff
-         , ShowDiff diff
-         , LegacySummarizeDiff term diff
-         , SummarizeDiff term diff
-         )
-      => DiffActions term diff
+type DiffActions term diff =
+  ( Bifoldable diff
+  , DiffTerms term diff
+  , DOTGraphDiff diff
+  , JSONGraphDiff diff
+  , JSONTreeDiff diff
+  , SExprDiff diff
+  , ShowDiff diff
+  , LegacySummarizeDiff term diff
+  , SummarizeDiff term diff
+  )
 
 doDiff
   :: DiffEffects sig m
