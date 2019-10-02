@@ -4,7 +4,6 @@ module Semantic.Api.Diffs
   , DiffOutputFormat(..)
   , diffGraph
 
-  , doDiff
   , diffWith
   , DiffEffects
 
@@ -202,16 +201,6 @@ instance
   , SummarizeDiff term
   ) => DiffActions term
 
-doDiff
-  :: DiffEffects sig m
-  => Decorate Loc ann
-  -> (forall term . DiffActions term => DiffFor term ann ann -> m output)
-  -> BlobPair
-  -> m output
-doDiff decorate render blobPair = do
-  SomeTermPair terms <- doParse blobPair decorate
-  diff <- diffTerms blobPair terms
-  render diff
 
 class (c1 term, c2 term) => ((c1 :: (* -> *) -> Constraint) & (c2 :: (* -> *) -> Constraint)) (term :: * -> *)
 
