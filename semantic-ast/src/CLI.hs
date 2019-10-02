@@ -13,6 +13,6 @@ import System.IO (FilePath)
 
 main :: IO ()
 main = do
-  args <- getArgs
-  bytestring <- Data.ByteString.readFile (args !! 0)
+  args <- head <$> getArgs
+  bytestring <- Data.ByteString.readFile args
   print =<< parseByteString @TreeSitter.Python.AST.Module @(Range, Span) tree_sitter_python bytestring
