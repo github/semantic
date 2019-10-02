@@ -13,7 +13,6 @@ import qualified Data.Core.Parser as Core.Parser
 import qualified Data.Core.Pretty as Core.Pretty
 import           Data.ByteString.Char8 (ByteString)
 import qualified Data.ByteString.Char8 as ByteString
-import           Data.List.NonEmpty (NonEmpty)
 import           System.Process
 import qualified Text.Trifecta as Trifecta
 
