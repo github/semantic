@@ -256,7 +256,3 @@ doParse blobPair decorate = case languageForBlobPair blobPair of
 
 data SomeTermPair ann where
   SomeTermPair :: DiffActions term  => Join These (term ann) -> SomeTermPair ann
-
-
-diffParsers :: [(Language, SomeParser DiffActions Loc)]
-diffParsers = aLaCarteParsers
