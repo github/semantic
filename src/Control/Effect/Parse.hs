@@ -37,6 +37,7 @@ parse :: (Member Parse sig, Carrier sig m)
 parse parser blob = send (Parse parser blob pure)
 
 
+-- | Parse a 'Blob' with one of the provided parsers, and run an action on the abstracted term.
 parseWith
   :: (Carrier sig m, Member (Error SomeException) sig, Member Parse sig)
   => Map.Map Language (SomeParser c ann)
@@ -47,6 +48,7 @@ parseWith parsers with blob = case Map.lookup (blobLanguage blob) parsers of
   Just (SomeParser parser) -> parse parser blob >>= with
   _                        -> noLanguageForBlob (blobPath blob)
 
+-- | Parse a 'BlobPair' with one of the provided parsers, and run an action on the abstracted term pair.
 parsePairWith
   :: (Carrier sig m, Member (Error SomeException) sig, Member Parse sig)
   => Map.Map Language (SomeParser c ann)
