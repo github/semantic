@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE GADTs, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Semantic.Graph
 ( runGraph
 , runCallGraph
@@ -71,7 +71,29 @@ import           Text.Show.Pretty (ppShow)
 
 data GraphType = ImportGraph | CallGraph
 
-type AnalysisClasses = '[ Declarations1, Eq1, Evaluatable, FreeVariables1, AccessControls1, Foldable, Functor, Ord1, Show1 ]
+-- | Constraints we require for a term’s syntax in order to analyze it.
+class
+  ( Declarations1 syntax
+  , Eq1 syntax
+  , Evaluatable syntax
+  , FreeVariables1 syntax
+  , AccessControls1 syntax
+  , Foldable syntax
+  , Functor syntax
+  , Ord1 syntax
+  , Show1 syntax
+  ) => AnalysisClasses syntax
+instance
+  ( Declarations1 syntax
+  , Eq1 syntax
+  , Evaluatable syntax
+  , FreeVariables1 syntax
+  , AccessControls1 syntax
+  , Foldable syntax
+  , Functor syntax
+  , Ord1 syntax
+  , Show1 syntax
+  ) => AnalysisClasses syntax
 
 runGraph :: ( Member Distribute sig
             , Member Parse sig
