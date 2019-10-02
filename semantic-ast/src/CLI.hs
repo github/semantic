@@ -10,6 +10,8 @@ import Source.Range
 import Source.Span
 import Data.ByteString (readFile, ByteString)
 import System.IO (FilePath)
+import Options.Applicative hiding (style)
+import Data.Semigroup ((<>))
 
 main :: IO ()
 main = do
