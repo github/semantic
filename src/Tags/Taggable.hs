@@ -29,7 +29,6 @@ import Analysis.ConstructorName
 import Analysis.HasTextElement
 import Data.Abstract.Declarations
 import Data.Abstract.Name
-import Data.Blob
 import Data.Language
 import Data.Term
 import Data.Text hiding (empty)
@@ -99,10 +98,10 @@ type IsTaggable syntax =
   )
 
 tagging :: (Monad m, IsTaggable syntax)
-        => Blob
+        => Language
         -> Term syntax Loc
         -> Stream (Of Token) m ()
-tagging b = foldSubterms (descend (blobLanguage b))
+tagging = foldSubterms . descend
 
 descend ::
   ( ConstructorName (TermF syntax Loc)

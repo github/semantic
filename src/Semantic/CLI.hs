@@ -1,6 +1,7 @@
 {-# LANGUAGE ApplicativeDo #-}
 module Semantic.CLI (main) where
 
+import qualified Control.Carrier.Parse.Measured as Parse
 import           Control.Effect.Reader
 import           Control.Exception as Exc (displayException)
 import           Data.Blob
@@ -58,13 +59,13 @@ main = do
   (options, task) <- customExecParser (prefs showHelpOnEmpty) arguments
   config <- defaultConfig options
   res <- withTelemetry config $ \ (TelemetryQueues logger statter _) ->
-    Task.runTask (Task.TaskSession config "-" (optionsLogPathsOnError options) logger statter) task
+    Task.runTask (Task.TaskSession config "-" (optionsLogPathsOnError options) logger statter) (Parse.runParse task)
   either (die . displayException) pure res
 
 -- | A parser for the application's command-line arguments.
 --
 --   Returns a 'Task' to read the input, run the requested operation, and write the output to the specified output path or stdout.
-arguments :: ParserInfo (Options, Task.TaskEff ())
+arguments :: ParserInfo (Options, Parse.ParseC Task.TaskC ())
 arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsParser)) description
   where
     version = infoOption versionString (long "version" <> short 'v' <> help "Output the version of the program")
@@ -80,13 +81,13 @@ optionsParser = do
   logPathsOnError <- switch (long "log-paths" <> help "Log source paths on parse and assignment error.")
   pure $ Options logLevel logPathsOnError (Flag.flag FailOnWarning failOnWarning) (Flag.flag FailOnParseError failOnParseError)
 
-argumentsParser :: Parser (Task.TaskEff ())
+argumentsParser :: Parser (Parse.ParseC Task.TaskC ())
 argumentsParser = do
   subparser <- hsubparser (diffCommand <> parseCommand <>  tsParseCommand <> graphCommand)
   output <- ToPath <$> strOption (long "output" <> short 'o' <> help "Output path, defaults to stdout") <|> pure (ToHandle stdout)
   pure $ subparser >>= Task.write output
 
-diffCommand :: Mod CommandFields (Task.TaskEff Builder)
+diffCommand :: Mod CommandFields (Parse.ParseC Task.TaskC Builder)
 diffCommand = command "diff" (info diffArgumentsParser (progDesc "Compute changes between paths"))
   where
     diffArgumentsParser = do
@@ -99,7 +100,7 @@ diffCommand = command "diff" (info diffArgumentsParser (progDesc "Compute change
       filesOrStdin <- Right <$> some (Both <$> argument filePathReader (metavar "FILE_A") <*> argument filePathReader (metavar "FILE_B")) <|> pure (Left stdin)
       pure $ Task.readBlobPairs filesOrStdin >>= renderer
 
-parseCommand :: Mod CommandFields (Task.TaskEff Builder)
+parseCommand :: Mod CommandFields (Parse.ParseC Task.TaskC Builder)
 parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate parse trees for path(s)"))
   where
     parseArgumentsParser = do
@@ -147,7 +148,7 @@ parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate pa
                   <|> pure (FilesFromHandle stdin)
       pure $ Task.readBlobs filesOrStdin >>= runReader languageModes . renderer
 
-tsParseCommand :: Mod CommandFields (Task.TaskEff Builder)
+tsParseCommand :: Mod CommandFields (Parse.ParseC Task.TaskC Builder)
 tsParseCommand = command "ts-parse" (info tsParseArgumentsParser (progDesc "Generate raw tree-sitter parse trees for path(s)"))
   where
     tsParseArgumentsParser = do
@@ -166,7 +167,7 @@ tsParseCommand = command "ts-parse" (info tsParseArgumentsParser (progDesc "Gene
                   <|> pure (FilesFromHandle stdin)
       pure $ Task.readBlobs filesOrStdin >>= AST.runASTParse format
 
-graphCommand :: Mod CommandFields (Task.TaskEff Builder)
+graphCommand :: Mod CommandFields (Parse.ParseC Task.TaskC Builder)
 graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute a graph for a directory or from a top-level entry point module"))
   where
     graphArgumentsParser = makeGraphTask
