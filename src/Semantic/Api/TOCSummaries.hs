@@ -34,7 +34,7 @@ diffSummary :: DiffEffects sig m => [BlobPair] -> m DiffTreeTOCResponse
 diffSummary blobs = DiffTreeTOCResponse . V.fromList <$> distributeFor blobs go
   where
     go :: DiffEffects sig m => BlobPair -> m TOCSummaryFile
-    go blobPair = doDiff decorateTerm (pure . summarizeDiff blobPair) blobPair
+    go blobPair = diffWith summarizeDiffParsers decorateTerm (pure . summarizeDiff blobPair) blobPair
       `catchError` \(SomeException e) ->
         pure $ TOCSummaryFile path lang mempty (V.fromList [TOCSummaryError (T.pack (show e)) Nothing])
       where path = T.pack $ pathKeyForBlobPair blobPair
