@@ -25,7 +25,7 @@ import           Data.Blob.IO
 import qualified Data.ByteString.Builder as B
 import           Data.Handle
 import           Data.Language
-import           Data.Project hiding (readFile)
+import           Data.Project
 import           Prelude hiding (readFile)
 import           Prologue hiding (catch)
 import qualified Semantic.Git as Git
