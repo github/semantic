@@ -85,6 +85,23 @@ quietTerm blob = showTiming blob <$> time' ( showTermParsers >>= \ parsers -> do
 type ParseEffects sig m = (Member (Error SomeException) sig, Member (Reader PerLanguageModes) sig, Member Parse sig, Member (Reader Config) sig, Carrier sig m)
 
 
+showTermParsers
+  :: (Carrier sig m, Member (Reader PerLanguageModes) sig)
+  => m [(Language, SomeParser ShowTerm Loc)]
+showTermParsers = ask >>= \ modes -> pure
+  [ goParser'
+  , haskellParser'
+  , javascriptParser'
+  , jsonParser'
+  , jsxParser'
+  , markdownParser'
+  , phpParser'
+  , pythonParser' modes
+  , rubyParser'
+  , typescriptParser'
+  , tsxParser'
+  ]
+
 class ShowTerm term where
   showTerm :: (Carrier sig m, Member (Reader Config) sig) => term Loc -> m Builder
 
@@ -152,23 +169,6 @@ doParse with blob = case blobLanguage blob of
   PHP        -> parse phpParser        blob >>= with
   _          -> noLanguageForBlob (blobPath blob)
 
-
-showTermParsers
-  :: (Carrier sig m, Member (Reader PerLanguageModes) sig)
-  => m [(Language, SomeParser ShowTerm Loc)]
-showTermParsers = ask >>= \ modes -> pure
-  [ goParser'
-  , haskellParser'
-  , javascriptParser'
-  , jsonParser'
-  , jsxParser'
-  , markdownParser'
-  , phpParser'
-  , pythonParser' modes
-  , rubyParser'
-  , typescriptParser'
-  , tsxParser'
-  ]
 
 doParse'
   :: (Carrier sig m, Member (Error SomeException) sig, Member Parse sig)
