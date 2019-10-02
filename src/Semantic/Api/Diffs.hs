@@ -220,7 +220,8 @@ infixl 9 &
 instance (c1 term, c2 term) => (c1 & c2) term
 
 diffWith
-  :: DiffEffects sig m
+  :: forall ann c output m sig
+  .  DiffEffects sig m
   => [(Language, SomeParser (DiffTerms & c) Loc)]
   -> (forall term . c term => Blob -> term Loc -> term ann)
   -> (forall term . c term => DiffFor term ann ann -> m output)
