@@ -58,12 +58,12 @@ data DiffOutputFormat
 parseDiffBuilder :: (Traversable t, DiffEffects sig m) => DiffOutputFormat -> t BlobPair -> m Builder
 parseDiffBuilder DiffJSONTree    = distributeFoldMap jsonDiff >=> serialize Format.JSON -- NB: Serialize happens at the top level for these two JSON formats to collect results of multiple blob pairs.
 parseDiffBuilder DiffJSONGraph   = diffGraph >=> serialize Format.JSON
-parseDiffBuilder DiffSExpression = distributeFoldMap (decoratingDiffWith @Loc sexprDiffParsers (const id) sexprDiff)
-parseDiffBuilder DiffShow        = distributeFoldMap (decoratingDiffWith @Loc showDiffParsers (const id) showDiff)
-parseDiffBuilder DiffDotGraph    = distributeFoldMap (decoratingDiffWith @Loc dotGraphDiffParsers (const id) dotGraphDiff)
+parseDiffBuilder DiffSExpression = distributeFoldMap (diffWith sexprDiffParsers sexprDiff)
+parseDiffBuilder DiffShow        = distributeFoldMap (diffWith showDiffParsers showDiff)
+parseDiffBuilder DiffDotGraph    = distributeFoldMap (diffWith dotGraphDiffParsers dotGraphDiff)
 
 jsonDiff :: DiffEffects sig m => BlobPair -> m (Rendering.JSON.JSON "diffs" SomeJSON)
-jsonDiff blobPair = decoratingDiffWith jsonTreeDiffParsers (const id) (pure . jsonTreeDiff blobPair) blobPair `catchError` jsonError blobPair
+jsonDiff blobPair = diffWith jsonTreeDiffParsers (pure . jsonTreeDiff blobPair) blobPair `catchError` jsonError blobPair
 
 jsonError :: Applicative m => BlobPair -> SomeException -> m (Rendering.JSON.JSON "diffs" SomeJSON)
 jsonError blobPair (SomeException e) = pure $ renderJSONDiffError blobPair (show e)
@@ -72,7 +72,7 @@ diffGraph :: (Traversable t, DiffEffects sig m) => t BlobPair -> m DiffTreeGraph
 diffGraph blobs = DiffTreeGraphResponse . V.fromList . toList <$> distributeFor blobs go
   where
     go :: DiffEffects sig m => BlobPair -> m DiffTreeFileGraph
-    go blobPair = decoratingDiffWith jsonGraphDiffParsers (const id) (pure . jsonGraphDiff blobPair) blobPair
+    go blobPair = diffWith jsonGraphDiffParsers (pure . jsonGraphDiff blobPair) blobPair
       `catchError` \(SomeException e) ->
         pure (DiffTreeFileGraph path lang mempty mempty (V.fromList [ParseError (T.pack (show e))]))
       where
@@ -181,6 +181,14 @@ class (c1 term, c2 term) => ((c1 :: (* -> *) -> Constraint) & (c2 :: (* -> *) ->
 infixl 9 &
 
 instance (c1 term, c2 term) => (c1 & c2) term
+
+diffWith
+  :: DiffEffects sig m
+  => [(Language, SomeParser (DiffTerms & c) Loc)]
+  -> (forall term . c term => DiffFor term Loc Loc -> m output)
+  -> BlobPair
+  -> m output
+diffWith parsers render blobPair = parsePairWith parsers (render <=< diffTerms blobPair) blobPair
 
 decoratingDiffWith
   :: forall ann c output m sig
