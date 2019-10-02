@@ -62,7 +62,7 @@ parseDiffBuilder DiffDotGraph    = distributeFoldMap dotGraphDiff
 type RenderJSON m syntax = forall syntax . CanDiff syntax => BlobPair -> Diff syntax Loc Loc -> m (Rendering.JSON.JSON "diffs" SomeJSON)
 
 jsonDiff :: DiffEffects sig m => RenderJSON m syntax -> BlobPair -> m (Rendering.JSON.JSON "diffs" SomeJSON)
-jsonDiff f blobPair = doDiff blobPair (const id) f `catchError` jsonError blobPair
+jsonDiff f blobPair = doDiff (const id) f blobPair `catchError` jsonError blobPair
 
 jsonError :: Applicative m => BlobPair -> SomeException -> m (Rendering.JSON.JSON "diffs" SomeJSON)
 jsonError blobPair (SomeException e) = pure $ renderJSONDiffError blobPair (show e)
@@ -74,7 +74,7 @@ diffGraph :: (Traversable t, DiffEffects sig m) => t BlobPair -> m DiffTreeGraph
 diffGraph blobs = DiffTreeGraphResponse . V.fromList . toList <$> distributeFor blobs go
   where
     go :: DiffEffects sig m => BlobPair -> m DiffTreeFileGraph
-    go blobPair = doDiff blobPair (const id) render
+    go blobPair = doDiff (const id) render blobPair
       `catchError` \(SomeException e) ->
         pure (DiffTreeFileGraph path lang mempty mempty (V.fromList [ParseError (T.pack (show e))]))
       where
@@ -89,13 +89,13 @@ diffGraph blobs = DiffTreeGraphResponse . V.fromList . toList <$> distributeFor 
 
 
 sexpDiff :: DiffEffects sig m => BlobPair -> m Builder
-sexpDiff blobPair = doDiff blobPair (const id) (const (serialize (SExpression ByConstructorName)))
+sexpDiff = doDiff (const id) (const (serialize (SExpression ByConstructorName)))
 
 showDiff :: DiffEffects sig m => BlobPair -> m Builder
-showDiff blobPair = doDiff blobPair (const id) (const (serialize Show))
+showDiff = doDiff (const id) (const (serialize Show))
 
 dotGraphDiff :: DiffEffects sig m => BlobPair -> m Builder
-dotGraphDiff blobPair = doDiff blobPair (const id) render
+dotGraphDiff = doDiff (const id) render
   where render _ = serialize (DOT (diffStyle "diffs")) . renderTreeGraph
 
 type DiffEffects sig m = (Member (Error SomeException) sig, Member (Reader Config) sig, Member Telemetry sig, Member Distribute sig, Member Parse sig, Carrier sig m, MonadIO m)
@@ -126,11 +126,11 @@ instance ( ConstructorName t
 
 doDiff
   :: DiffEffects sig m
-  => BlobPair
-  -> Decorate Loc ann
+  => Decorate Loc ann
   -> (forall syntax . CanDiff syntax => BlobPair -> Diff syntax ann ann -> m output)
+  -> BlobPair
   -> m output
-doDiff blobPair decorate render = do
+doDiff decorate render blobPair = do
   SomeTermPair terms <- doParse blobPair decorate
   diff <- diffTerms blobPair terms
   render blobPair diff
