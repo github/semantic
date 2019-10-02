@@ -1,7 +1,7 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, MultiParamTypeClasses, TypeOperators, UndecidableInstances #-}
 module Diffing.Interpreter
 ( diffTerms
-, diffTermPair
+, DiffTerms(..)
 , stripDiff
 ) where
 
@@ -29,9 +29,12 @@ stripDiff :: Functor syntax
           -> Diff.Diff syntax ann1 ann2
 stripDiff = bimap snd snd
 
--- | Diff a 'These' of terms.
-diffTermPair :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => These (Term syntax ann1) (Term syntax ann2) -> Diff.Diff syntax ann1 ann2
-diffTermPair = these Diff.deleting Diff.inserting diffTerms
+class DiffTerms term diff where
+  -- | Diff a 'These' of terms.
+  diffTermPair :: These (term ann1) (term ann2) -> diff ann1 ann2
+
+instance (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => DiffTerms (Term syntax) (Diff.Diff syntax) where
+  diffTermPair = these Diff.deleting Diff.inserting diffTerms
 
 
 -- | Run an 'Algorithm' to completion in an 'Alternative' context using the supplied comparability & equivalence relations.
