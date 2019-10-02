@@ -71,6 +71,7 @@ import           Text.Show.Pretty (ppShow)
 
 data GraphType = ImportGraph | CallGraph
 
+-- | Constraints we require for a term’s syntax in order to analyze it.
 class
   ( Declarations1 syntax
   , Eq1 syntax
