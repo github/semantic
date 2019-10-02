@@ -1,1 +1,1 @@
-{"files":[{"path":"test/fixtures/ruby/corpus/method-declaration.A.rb -> test/fixtures/ruby/corpus/method-declaration.B.rb","language":"Ruby","changes":[{"category":"Method","term":"bar","span":{"start":{"line":1,"column":1},"end":{"line":3,"column":4}},"changeType":"MODIFIED"}]}]}
+{"files":[{"path":"test/fixtures/ruby/corpus/method-declaration.A.rb -> test/fixtures/ruby/corpus/method-declaration.B.rb","language":"Ruby","changes":[{"category":"Method","term":"bar","span":{"start":{"line":1,"column":1},"end":{"line":3,"column":4}},"changeType":"MODIFIED"}],"errors":[]}]}

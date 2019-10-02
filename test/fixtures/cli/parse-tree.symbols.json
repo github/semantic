@@ -1,1 +1,1 @@
-{"files":[{"path":"test/fixtures/ruby/corpus/method-declaration.A.rb","language":"Ruby","symbols":[{"symbol":"foo","kind":"Method","line":"def foo","span":{"start":{"line":1,"column":1},"end":{"line":2,"column":4}}}]}]}
+{"files":[{"path":"test/fixtures/ruby/corpus/method-declaration.A.rb","language":"Ruby","symbols":[{"symbol":"foo","kind":"Method","line":"def foo","span":{"start":{"line":1,"column":1},"end":{"line":2,"column":4}},"docs":null}],"errors":[],"blobOid":""}]}
