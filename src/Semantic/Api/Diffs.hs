@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, ConstraintKinds, TypeOperators, RankNTypes, UndecidableInstances #-}
+{-# LANGUAGE GADTs, ConstraintKinds, FunctionalDependencies, LambdaCase, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Semantic.Api.Diffs
   ( parseDiffBuilder
   , DiffOutputFormat(..)
@@ -8,10 +8,14 @@ module Semantic.Api.Diffs
   , DiffEffects
 
   , SomeTermPair(..)
+
+  , LegacySummarizeDiff(..)
+  , SummarizeDiff(..)
   ) where
 
 import           Analysis.ConstructorName (ConstructorName)
-import           Analysis.TOCSummary (HasDeclaration)
+import           Analysis.Decorator (decoratorWithAlgebra)
+import           Analysis.TOCSummary (Declaration, HasDeclaration, declarationAlgebra)
 import           Control.Effect.Error
 import           Control.Effect.Parse
 import           Control.Effect.Reader
@@ -27,13 +31,13 @@ import           Data.Language
 import           Data.Term
 import qualified Data.Text as T
 import qualified Data.Vector as V
-import           Diffing.Algorithm (Diffable)
-import           Diffing.Interpreter (diffTermPair)
+import           Diffing.Interpreter (DiffTerms(..))
 import           Parsing.Parser
 import           Prologue
 import           Rendering.Graph
 import           Rendering.JSON hiding (JSON)
 import qualified Rendering.JSON
+import           Rendering.TOC
 import           Semantic.Api.Bridge
 import           Semantic.Config
 import           Semantic.Proto.SemanticPB hiding (Blob, BlobPair)
@@ -77,7 +81,7 @@ diffGraph blobs = DiffTreeGraphResponse . V.fromList . toList <$> distributeFor 
 
 type DiffEffects sig m = (Member (Error SomeException) sig, Member (Reader Config) sig, Member Telemetry sig, Member Distribute sig, Member Parse sig, Carrier sig m, MonadIO m)
 
-type Decorate a b = forall syntax . DiffActions syntax => Blob -> Term syntax a -> Term syntax b
+type Decorate a b = forall term diff . DiffActions term diff => Blob -> term a -> term b
 
 
 class DOTGraphDiff diff where
@@ -120,31 +124,66 @@ instance Show1 syntax => ShowDiff (Diff syntax) where
   showDiff = serialize Show
 
 
-class ( ConstructorName t
-      , Diffable t
-      , Eq1 t
-      , HasDeclaration t
-      , Hashable1 t
-      , Show1 t
-      , Traversable t
-      , ToJSONFields1 t
+class LegacySummarizeDiff term diff | diff -> term, term -> diff where
+  legacyDecorateTerm :: Blob -> term Loc -> term (Maybe Declaration)
+  legacySummarizeDiff :: BlobPair -> diff (Maybe Declaration) (Maybe Declaration) -> Summaries
+
+instance (Foldable syntax, Functor syntax, HasDeclaration syntax) => LegacySummarizeDiff (Term syntax) (Diff syntax) where
+  legacyDecorateTerm = decoratorWithAlgebra . declarationAlgebra
+  legacySummarizeDiff = renderToCDiff
+
+
+class SummarizeDiff term diff | diff -> term, term -> diff where
+  decorateTerm :: Blob -> term Loc -> term (Maybe Declaration)
+  summarizeDiff :: BlobPair -> diff (Maybe Declaration) (Maybe Declaration) -> TOCSummaryFile
+
+instance (Foldable syntax, Functor syntax, HasDeclaration syntax) => SummarizeDiff (Term syntax) (Diff syntax) where
+  decorateTerm = decoratorWithAlgebra . declarationAlgebra
+  summarizeDiff blobPair diff = foldr go (TOCSummaryFile path lang mempty mempty) (diffTOC diff)
+    where
+      path = T.pack $ pathKeyForBlobPair blobPair
+      lang = bridging # languageForBlobPair blobPair
+
+      toChangeType = \case
+        "added" -> Added
+        "modified" -> Modified
+        "removed" -> Removed
+        _ -> None
+
+      go :: TOCSummary -> TOCSummaryFile -> TOCSummaryFile
+      go TOCSummary{..} TOCSummaryFile{..}
+        = TOCSummaryFile path language (V.cons (TOCSummaryChange summaryCategoryName summaryTermName (converting #? summarySpan) (toChangeType summaryChangeType)) changes) errors
+      go ErrorSummary{..} TOCSummaryFile{..}
+        = TOCSummaryFile path language changes (V.cons (TOCSummaryError errorText (converting #? errorSpan)) errors)
+
+
+class ( Bifoldable diff
+      , DiffTerms term diff
+      , DOTGraphDiff diff
+      , JSONGraphDiff diff
+      , JSONTreeDiff diff
+      , SExprDiff diff
+      , ShowDiff diff
+      , LegacySummarizeDiff term diff
+      , SummarizeDiff term diff
       )
-   => DiffActions t
-instance ( ConstructorName t
-         , Diffable t
-         , Eq1 t
-         , HasDeclaration t
-         , Hashable1 t
-         , Show1 t
-         , Traversable t
-         , ToJSONFields1 t
+   => DiffActions term diff
+instance ( Bifoldable diff
+         , DiffTerms term diff
+         , DOTGraphDiff diff
+         , JSONGraphDiff diff
+         , JSONTreeDiff diff
+         , SExprDiff diff
+         , ShowDiff diff
+         , LegacySummarizeDiff term diff
+         , SummarizeDiff term diff
          )
-      => DiffActions t
+      => DiffActions term diff
 
 doDiff
   :: DiffEffects sig m
   => Decorate Loc ann
-  -> (forall syntax . DiffActions syntax => Diff syntax ann ann -> m output)
+  -> (forall term diff . DiffActions term diff => diff ann ann -> m output)
   -> BlobPair
   -> m output
 doDiff decorate render blobPair = do
@@ -152,15 +191,15 @@ doDiff decorate render blobPair = do
   diff <- diffTerms blobPair terms
   render diff
 
-diffTerms :: (DiffActions syntax, Member Telemetry sig, Carrier sig m, MonadIO m)
-  => BlobPair -> Join These (Term syntax ann) -> m (Diff syntax ann ann)
+diffTerms :: (DiffActions term diff, Member Telemetry sig, Carrier sig m, MonadIO m)
+  => BlobPair -> Join These (term ann) -> m (diff ann ann)
 diffTerms blobs terms = time "diff" languageTag $ do
   let diff = diffTermPair (runJoin terms)
   diff <$ writeStat (Stat.count "diff.nodes" (bilength diff) languageTag)
   where languageTag = languageTagForBlobPair blobs
 
 doParse :: (Member (Error SomeException) sig, Member Distribute sig, Member Parse sig, Carrier sig m)
-  => BlobPair -> Decorate Loc ann -> m (SomeTermPair DiffActions ann)
+  => BlobPair -> Decorate Loc ann -> m (SomeTermPair ann)
 doParse blobPair decorate = case languageForBlobPair blobPair of
   Go         -> SomeTermPair <$> distributeFor blobPair (\ blob -> decorate blob <$> parse goParser blob)
   Haskell    -> SomeTermPair <$> distributeFor blobPair (\ blob -> decorate blob <$> parse haskellParser blob)
@@ -175,5 +214,5 @@ doParse blobPair decorate = case languageForBlobPair blobPair of
   PHP        -> SomeTermPair <$> distributeFor blobPair (\ blob -> decorate blob <$> parse phpParser blob)
   _          -> noLanguageForBlob (pathForBlobPair blobPair)
 
-data SomeTermPair typeclasses ann where
-  SomeTermPair :: typeclasses syntax => Join These (Term syntax ann) -> SomeTermPair typeclasses ann
+data SomeTermPair ann where
+  SomeTermPair :: DiffActions term diff => Join These (term ann) -> SomeTermPair ann
