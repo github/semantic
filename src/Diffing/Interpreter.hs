@@ -30,7 +30,7 @@ stripDiff :: Functor syntax
 stripDiff = bimap snd snd
 
 class (Bifoldable (DiffFor term)) => DiffTerms term where
-  type DiffFor term = (res :: * -> * -> *) | res -> term
+  type DiffFor term = (diff :: * -> * -> *) | diff -> term
 
   -- | Diff a 'These' of terms.
   diffTermPair :: These (term ann1) (term ann2) -> DiffFor term ann1 ann2
