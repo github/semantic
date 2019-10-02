@@ -181,9 +181,9 @@ instance (Diffable syntax, Eq1 syntax, HasDeclaration syntax, Hashable1 syntax, 
 -- This allows us to define features using an abstract interface, and use them with diffs for any parser whose terms support that interface.
 diffWith
   :: (forall term . c term => DiffTerms term, DiffEffects sig m)
-  => Map Language (SomeParser c Loc)
-  -> (forall term . c term => DiffFor term Loc Loc -> m output)
-  -> BlobPair
+  => Map Language (SomeParser c Loc)                            -- ^ The set of parsers to select from.
+  -> (forall term . c term => DiffFor term Loc Loc -> m output) -- ^ A function to run on the computed diff. Note that the diff is abstract (it’s the diff type corresponding to an abstract term type), but the term type is constrained by @c@, allowing you to do anything @c@ allows, and requiring that all the input parsers produce terms supporting @c@.
+  -> BlobPair                                                   -- ^ The blob pair to parse.
   -> m output
 diffWith parsers render blobPair = parsePairWith parsers (render <=< diffTerms blobPair) blobPair
 
@@ -193,10 +193,10 @@ diffWith parsers render blobPair = parsePairWith parsers (render <=< diffTerms b
 decoratingDiffWith
   :: forall ann c output m sig
   .  (forall term . c term => DiffTerms term, DiffEffects sig m)
-  => Map Language (SomeParser c Loc)
-  -> (forall term . c term => Blob -> term Loc -> term ann)
-  -> (forall term . c term => DiffFor term ann ann -> m output)
-  -> BlobPair
+  => Map Language (SomeParser c Loc)                            -- ^ The set of parsers to select from.
+  -> (forall term . c term => Blob -> term Loc -> term ann)     -- ^ A function to decorate the terms, replacing their annotations and thus the annotations in the resulting diff.
+  -> (forall term . c term => DiffFor term ann ann -> m output) -- ^ A function to run on the computed diff. Note that the diff is abstract (it’s the diff type corresponding to an abstract term type), but the term type is constrained by @c@, allowing you to do anything @c@ allows, and requiring that all the input parsers produce terms supporting @c@.
+  -> BlobPair                                                   -- ^ The blob pair to parse.
   -> m output
 decoratingDiffWith parsers decorate render blobPair = parsePairWith parsers (render <=< diffTerms blobPair . bimap (decorate blobL) (decorate blobR)) blobPair where
   (blobL, blobR) = fromThese errorBlob errorBlob (runJoin blobPair)
