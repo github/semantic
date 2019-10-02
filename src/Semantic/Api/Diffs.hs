@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, ConstraintKinds, LambdaCase, RankNTypes, UndecidableInstances #-}
+{-# LANGUAGE GADTs, ConstraintKinds, LambdaCase, KindSignatures, RankNTypes, TypeOperators, UndecidableInstances, UndecidableSuperClasses #-}
 module Semantic.Api.Diffs
   ( parseDiffBuilder
   , DiffOutputFormat(..)
@@ -26,6 +26,7 @@ import           Data.Blob
 import           Data.ByteString.Builder
 import           Data.Graph
 import           Data.JSON.Fields
+import           Data.Kind (Constraint)
 import           Data.Language
 import           Data.Term
 import qualified Data.Text as T
@@ -187,6 +188,12 @@ doDiff decorate render blobPair = do
   SomeTermPair terms <- doParse blobPair decorate
   diff <- diffTerms blobPair terms
   render diff
+
+class (c1 term, c2 term) => ((c1 :: (* -> *) -> Constraint) & (c2 :: (* -> *) -> Constraint)) (term :: * -> *)
+
+infixl 9 &
+
+instance (c1 term, c2 term) => (c1 & c2) term
 
 diffTerms :: (DiffTerms term, Member Telemetry sig, Carrier sig m, MonadIO m)
   => BlobPair -> Join These (term ann) -> m (DiffFor term ann ann)
