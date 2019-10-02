@@ -31,6 +31,9 @@ stripDiff = bimap snd snd
 
 -- | The class of term types for which we can compute a diff.
 class (Bifoldable (DiffFor term)) => DiffTerms term where
+  -- | The type of diffs for the given term type.
+  --
+  -- Note that the dependency means that the diff type is in 1:1 correspondence with the term type. This allows subclasses of 'DiffTerms' to receive e.g. @'DiffFor' term a b@ without incurring ambiguity, since every diff type is unique to its term type.
   type DiffFor term = (diff :: * -> * -> *) | diff -> term
 
   -- | Diff a 'These' of terms.
