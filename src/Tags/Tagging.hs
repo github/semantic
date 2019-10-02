@@ -23,11 +23,11 @@ import           Tags.Taggable
 
 runTagging :: (IsTaggable syntax)
            => Language
-           -> Source.Source
            -> [Text]
+           -> Source.Source
            -> Term syntax Loc
            -> [Tag]
-runTagging lang source symbolsToSummarize
+runTagging lang symbolsToSummarize source
   = Eff.run
   . evalState @[ContextToken] []
   . Streaming.toList_

@@ -93,7 +93,7 @@ tagToSymbol Tag{..} = Symbol
 data ALaCarteTerm syntax ann = ALaCarteTerm Language [Text] (Term syntax ann)
 
 instance IsTaggable syntax => Precise.ToTags (ALaCarteTerm syntax) where
-  tags source (ALaCarteTerm lang symbolsToSummarize term) = runTagging lang source symbolsToSummarize term
+  tags source (ALaCarteTerm lang symbolsToSummarize term) = runTagging lang symbolsToSummarize source term
 
 
 doParse
