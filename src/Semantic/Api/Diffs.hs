@@ -157,8 +157,7 @@ instance (Foldable syntax, Functor syntax, HasDeclaration syntax) => SummarizeDi
 
 
 class
-  ( Bifoldable (DiffFor term)
-  , DiffTerms term
+  ( DiffTerms term
   , DOTGraphDiff term
   , JSONGraphDiff term
   , JSONTreeDiff term
@@ -168,8 +167,7 @@ class
   , SummarizeDiff term
   ) => DiffActions term
 instance
-  ( Bifoldable (DiffFor term)
-  , DiffTerms term
+  ( DiffTerms term
   , DOTGraphDiff term
   , JSONGraphDiff term
   , JSONTreeDiff term
@@ -190,7 +188,7 @@ doDiff decorate render blobPair = do
   diff <- diffTerms blobPair terms
   render diff
 
-diffTerms :: (DiffActions term, Member Telemetry sig, Carrier sig m, MonadIO m)
+diffTerms :: (DiffTerms term, Member Telemetry sig, Carrier sig m, MonadIO m)
   => BlobPair -> Join These (term ann) -> m (DiffFor term ann ann)
 diffTerms blobs terms = time "diff" languageTag $ do
   let diff = diffTermPair (runJoin terms)
