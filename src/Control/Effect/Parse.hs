@@ -4,13 +4,16 @@ module Control.Effect.Parse
   Parse(..)
 , parse
 , parseWith
+, parsePairWith
 ) where
 
 import Control.Effect.Carrier
 import Control.Effect.Error
 import Control.Exception (SomeException)
+import Data.Bifunctor.Join
 import Data.Blob
 import Data.Language
+import Data.These
 import Parsing.Parser
 
 data Parse m k
@@ -42,3 +45,13 @@ parseWith
 parseWith parsers with blob = case lookup (blobLanguage blob) parsers of
   Just (SomeParser parser) -> parse parser blob >>= with
   _                        -> noLanguageForBlob (blobPath blob)
+
+parsePairWith
+  :: (Carrier sig m, Member (Error SomeException) sig, Member Parse sig)
+  => [(Language, SomeParser c ann)]
+  -> (forall term . c term => Join These (term ann) -> m a)
+  -> BlobPair
+  -> m a
+parsePairWith parsers with blobPair = case lookup (languageForBlobPair blobPair) parsers of
+  Just (SomeParser parser) -> traverse (parse parser) blobPair >>= with
+  _                        -> noLanguageForBlob (pathForBlobPair blobPair)
