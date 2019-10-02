@@ -85,22 +85,8 @@ quietTerm blob = showTiming blob <$> time' ( asks showTermParsers >>= \ parsers 
 type ParseEffects sig m = (Member (Error SomeException) sig, Member (Reader PerLanguageModes) sig, Member Parse sig, Member (Reader Config) sig, Carrier sig m)
 
 
-showTermParsers
-  :: PerLanguageModes
-  -> [(Language, SomeParser ShowTerm Loc)]
-showTermParsers modes =
-  [ goParser'
-  , haskellParser'
-  , javascriptParser'
-  , jsonParser'
-  , jsxParser'
-  , markdownParser'
-  , phpParser'
-  , pythonParser' modes
-  , rubyParser'
-  , typescriptParser'
-  , tsxParser'
-  ]
+showTermParsers :: PerLanguageModes -> [(Language, SomeParser ShowTerm Loc)]
+showTermParsers = allParsers
 
 class ShowTerm term where
   showTerm :: (Carrier sig m, Member (Reader Config) sig) => term Loc -> m Builder
