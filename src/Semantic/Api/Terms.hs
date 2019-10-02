@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, MonoLocalBinds, RankNTypes, UndecidableInstances #-}
+{-# LANGUAGE ConstraintKinds, MonoLocalBinds, RankNTypes #-}
 module Semantic.Api.Terms
   ( termGraph
   , parseTermBuilder
@@ -128,8 +128,7 @@ instance (Foldable syntax, Functor syntax, ConstructorName syntax) => JSONGraphT
         lang = bridging # blobLanguage blob
 
 
-class (DOTGraphTerm t, JSONGraphTerm t, JSONTreeTerm t, SExprTerm t, ShowTerm t) => TermActions t
-instance (DOTGraphTerm t, JSONGraphTerm t, JSONTreeTerm t, SExprTerm t, ShowTerm t) => TermActions t
+type TermActions t = (DOTGraphTerm t, JSONGraphTerm t, JSONTreeTerm t, SExprTerm t, ShowTerm t)
 
 doParse
   :: ( Carrier sig m
