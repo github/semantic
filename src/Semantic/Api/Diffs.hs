@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, ConstraintKinds, FunctionalDependencies, LambdaCase, RankNTypes #-}
+{-# LANGUAGE GADTs, ConstraintKinds, LambdaCase, RankNTypes #-}
 module Semantic.Api.Diffs
   ( parseDiffBuilder
   , DiffOutputFormat(..)
@@ -24,14 +24,13 @@ import           Control.Lens
 import           Control.Monad.IO.Class
 import           Data.Blob
 import           Data.ByteString.Builder
-import           Data.Diff
 import           Data.Graph
 import           Data.JSON.Fields
 import           Data.Language
 import           Data.Term
 import qualified Data.Text as T
 import qualified Data.Vector as V
-import           Diffing.Interpreter (DiffTerms(..))
+import           Diffing.Interpreter (HasDiffFor(..), DiffTerms(..))
 import           Parsing.Parser
 import           Prologue
 import           Rendering.Graph
@@ -81,20 +80,20 @@ diffGraph blobs = DiffTreeGraphResponse . V.fromList . toList <$> distributeFor 
 
 type DiffEffects sig m = (Member (Error SomeException) sig, Member (Reader Config) sig, Member Telemetry sig, Member Distribute sig, Member Parse sig, Carrier sig m, MonadIO m)
 
-type Decorate a b = forall term diff . DiffActions term diff => Blob -> term a -> term b
+type Decorate a b = forall term . DiffActions term => Blob -> term a -> term b
 
 
-class DOTGraphDiff diff where
-  dotGraphDiff :: (Carrier sig m, Member (Reader Config) sig) => diff Loc Loc -> m Builder
+class HasDiffFor term => DOTGraphDiff term where
+  dotGraphDiff :: (Carrier sig m, Member (Reader Config) sig) => DiffFor term Loc Loc -> m Builder
 
-instance (ConstructorName syntax, Foldable syntax, Functor syntax) => DOTGraphDiff (Diff syntax) where
+instance (ConstructorName syntax, Foldable syntax, Functor syntax) => DOTGraphDiff (Term syntax) where
   dotGraphDiff = serialize (DOT (diffStyle "diffs")) . renderTreeGraph
 
 
-class JSONGraphDiff diff where
-  jsonGraphDiff :: BlobPair -> diff Loc Loc -> DiffTreeFileGraph
+class HasDiffFor term => JSONGraphDiff term where
+  jsonGraphDiff :: BlobPair -> DiffFor term Loc Loc -> DiffTreeFileGraph
 
-instance (Foldable syntax, Functor syntax, ConstructorName syntax) => JSONGraphDiff (Diff syntax) where
+instance (Foldable syntax, Functor syntax, ConstructorName syntax) => JSONGraphDiff (Term syntax) where
   jsonGraphDiff blobPair diff
     = let graph = renderTreeGraph diff
           toEdge (Edge (a, b)) = DiffTreeEdge (diffVertexId a) (diffVertexId b)
@@ -103,41 +102,41 @@ instance (Foldable syntax, Functor syntax, ConstructorName syntax) => JSONGraphD
         lang = bridging # languageForBlobPair blobPair
 
 
-class JSONTreeDiff diff where
-  jsonTreeDiff :: BlobPair -> diff Loc Loc -> Rendering.JSON.JSON "diffs" SomeJSON
+class HasDiffFor term => JSONTreeDiff term where
+  jsonTreeDiff :: BlobPair -> DiffFor term Loc Loc -> Rendering.JSON.JSON "diffs" SomeJSON
 
-instance ToJSONFields1 syntax => JSONTreeDiff (Diff syntax) where
+instance ToJSONFields1 syntax => JSONTreeDiff (Term syntax) where
   jsonTreeDiff = renderJSONDiff
 
 
-class SExprDiff diff where
-  sexprDiff :: (Carrier sig m, Member (Reader Config) sig) => diff Loc Loc -> m Builder
+class HasDiffFor term => SExprDiff term where
+  sexprDiff :: (Carrier sig m, Member (Reader Config) sig) => DiffFor term Loc Loc -> m Builder
 
-instance (ConstructorName syntax, Foldable syntax, Functor syntax) => SExprDiff (Diff syntax) where
+instance (ConstructorName syntax, Foldable syntax, Functor syntax) => SExprDiff (Term syntax) where
   sexprDiff = serialize (SExpression ByConstructorName)
 
 
-class ShowDiff diff where
-  showDiff :: (Carrier sig m, Member (Reader Config) sig) => diff Loc Loc -> m Builder
+class HasDiffFor term => ShowDiff term where
+  showDiff :: (Carrier sig m, Member (Reader Config) sig) => DiffFor term Loc Loc -> m Builder
 
-instance Show1 syntax => ShowDiff (Diff syntax) where
+instance Show1 syntax => ShowDiff (Term syntax) where
   showDiff = serialize Show
 
 
-class LegacySummarizeDiff term diff | diff -> term, term -> diff where
+class HasDiffFor term => LegacySummarizeDiff term where
   legacyDecorateTerm :: Blob -> term Loc -> term (Maybe Declaration)
-  legacySummarizeDiff :: BlobPair -> diff (Maybe Declaration) (Maybe Declaration) -> Summaries
+  legacySummarizeDiff :: BlobPair -> DiffFor term (Maybe Declaration) (Maybe Declaration) -> Summaries
 
-instance (Foldable syntax, Functor syntax, HasDeclaration syntax) => LegacySummarizeDiff (Term syntax) (Diff syntax) where
+instance (Foldable syntax, Functor syntax, HasDeclaration syntax) => LegacySummarizeDiff (Term syntax) where
   legacyDecorateTerm = decoratorWithAlgebra . declarationAlgebra
   legacySummarizeDiff = renderToCDiff
 
 
-class SummarizeDiff term diff | diff -> term, term -> diff where
+class HasDiffFor term => SummarizeDiff term where
   decorateTerm :: Blob -> term Loc -> term (Maybe Declaration)
-  summarizeDiff :: BlobPair -> diff (Maybe Declaration) (Maybe Declaration) -> TOCSummaryFile
+  summarizeDiff :: BlobPair -> DiffFor term (Maybe Declaration) (Maybe Declaration) -> TOCSummaryFile
 
-instance (Foldable syntax, Functor syntax, HasDeclaration syntax) => SummarizeDiff (Term syntax) (Diff syntax) where
+instance (Foldable syntax, Functor syntax, HasDeclaration syntax) => SummarizeDiff (Term syntax) where
   decorateTerm = decoratorWithAlgebra . declarationAlgebra
   summarizeDiff blobPair diff = foldr go (TOCSummaryFile path lang mempty mempty) (diffTOC diff)
     where
@@ -157,22 +156,22 @@ instance (Foldable syntax, Functor syntax, HasDeclaration syntax) => SummarizeDi
         = TOCSummaryFile path language changes (V.cons (TOCSummaryError errorText (converting #? errorSpan)) errors)
 
 
-type DiffActions term diff =
-  ( Bifoldable diff
-  , DiffTerms term diff
-  , DOTGraphDiff diff
-  , JSONGraphDiff diff
-  , JSONTreeDiff diff
-  , SExprDiff diff
-  , ShowDiff diff
-  , LegacySummarizeDiff term diff
-  , SummarizeDiff term diff
+type DiffActions term =
+  ( Bifoldable (DiffFor term)
+  , DiffTerms term
+  , DOTGraphDiff term
+  , JSONGraphDiff term
+  , JSONTreeDiff term
+  , SExprDiff term
+  , ShowDiff term
+  , LegacySummarizeDiff term
+  , SummarizeDiff term
   )
 
 doDiff
   :: DiffEffects sig m
   => Decorate Loc ann
-  -> (forall term diff . DiffActions term diff => diff ann ann -> m output)
+  -> (forall term . DiffActions term => DiffFor term ann ann -> m output)
   -> BlobPair
   -> m output
 doDiff decorate render blobPair = do
@@ -180,8 +179,8 @@ doDiff decorate render blobPair = do
   diff <- diffTerms blobPair terms
   render diff
 
-diffTerms :: (DiffActions term diff, Member Telemetry sig, Carrier sig m, MonadIO m)
-  => BlobPair -> Join These (term ann) -> m (diff ann ann)
+diffTerms :: (DiffActions term, Member Telemetry sig, Carrier sig m, MonadIO m)
+  => BlobPair -> Join These (term ann) -> m (DiffFor term ann ann)
 diffTerms blobs terms = time "diff" languageTag $ do
   let diff = diffTermPair (runJoin terms)
   diff <$ writeStat (Stat.count "diff.nodes" (bilength diff) languageTag)
@@ -204,4 +203,4 @@ doParse blobPair decorate = case languageForBlobPair blobPair of
   _          -> noLanguageForBlob (pathForBlobPair blobPair)
 
 data SomeTermPair ann where
-  SomeTermPair :: DiffActions term diff => Join These (term ann) -> SomeTermPair ann
+  SomeTermPair :: DiffActions term  => Join These (term ann) -> SomeTermPair ann
