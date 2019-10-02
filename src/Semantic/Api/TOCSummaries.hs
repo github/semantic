@@ -27,7 +27,7 @@ legacyDiffSummary :: (DiffEffects sig m) => [BlobPair] -> m Summaries
 legacyDiffSummary = distributeFoldMap go
   where
     go :: (DiffEffects sig m) => BlobPair -> m Summaries
-    go blobPair = doDiff (\ blob -> decoratorWithAlgebra (declarationAlgebra blob)) render blobPair
+    go blobPair = doDiff (\ blob -> decoratorWithAlgebra (declarationAlgebra blob)) (render blobPair) blobPair
       `catchError` \(SomeException e) ->
         pure $ Summaries mempty (Map.singleton path [toJSON (ErrorSummary (T.pack (show e)) lowerBound lang)])
       where path = T.pack $ pathKeyForBlobPair blobPair
@@ -40,7 +40,7 @@ diffSummary :: (DiffEffects sig m) => [BlobPair] -> m DiffTreeTOCResponse
 diffSummary blobs = DiffTreeTOCResponse . V.fromList <$> distributeFor blobs go
   where
     go :: (DiffEffects sig m) => BlobPair -> m TOCSummaryFile
-    go blobPair = doDiff (\ blob -> decoratorWithAlgebra (declarationAlgebra blob)) render blobPair
+    go blobPair = doDiff (\ blob -> decoratorWithAlgebra (declarationAlgebra blob)) (render blobPair) blobPair
       `catchError` \(SomeException e) ->
         pure $ TOCSummaryFile path lang mempty (V.fromList [TOCSummaryError (T.pack (show e)) Nothing])
       where path = T.pack $ pathKeyForBlobPair blobPair
