@@ -298,20 +298,20 @@ parsePythonPackage parser project = do
       modules <- fmap (fmap snd) <$> parseModules parser project
       resMap <- Task.resolutionMap project
       pure (Package.fromModules (Data.Abstract.Evaluatable.name (projectName project)) modules resMap) -- TODO: Confirm this is the right `name`.
-    PythonPackage.Packages dirs -> do
-      let filteredBlobs = do
-            dir <- dirs
-            let packageDir = projectRootDir project </> unpack dir
-            filter ((packageDir `isPrefixOf`) . blobPath) (projectBlobs project)
-      packageFromProject project filteredBlobs
+    PythonPackage.Packages dirs ->
+      packageFromProject project [ blob | dir <- dirs
+                                        , blob <- projectBlobs project
+                                        , packageDir <- [projectRootDir project </> unpack dir]
+                                        , packageDir `isPrefixOf` blobPath blob
+                                        ]
     PythonPackage.FindPackages excludeDirs -> do
       trace "In Graph.FindPackages"
       let initFiles = filter (("__init__.py" `isSuffixOf`) . filePath) (projectFiles project)
       let packageDirs = filter (`notElem` ((projectRootDir project </>) . unpack <$> excludeDirs)) (takeDirectory . filePath <$> initFiles)
-      let filteredBlobs = do
-            dir <- packageDirs
-            filter ((dir `isPrefixOf`) . blobPath) (projectBlobs project)
-      packageFromProject project filteredBlobs
+      packageFromProject project [ blob | dir <- packageDirs
+                                        , blob <- projectBlobs project
+                                        , dir `isPrefixOf` blobPath blob
+                                        ]
     where
       packageFromProject project filteredBlobs = do
         let p = project { projectBlobs = filteredBlobs }
