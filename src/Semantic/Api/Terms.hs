@@ -68,7 +68,7 @@ parseTermBuilder TermShow        = distributeFoldMap (doParse showTerm)
 parseTermBuilder TermQuiet       = distributeFoldMap quietTerm
 
 jsonTerm :: ParseEffects sig m => Blob -> m (Rendering.JSON.JSON "trees" SomeJSON)
-jsonTerm blob = doParse (pure . jsonTerm' blob) blob `catchError` jsonError blob
+jsonTerm blob = doParse (pure . jsonTreeTerm blob) blob `catchError` jsonError blob
 
 jsonError :: Applicative m => Blob -> SomeException -> m (Rendering.JSON.JSON "trees" SomeJSON)
 jsonError blob (SomeException e) = pure $ renderJSONError blob (show e)
@@ -110,10 +110,10 @@ instance (ConstructorName syntax, Foldable syntax, Functor syntax) => DOTGraphTe
 
 
 class JSONTreeTerm term where
-  jsonTerm' :: Blob -> term Loc -> Rendering.JSON.JSON "trees" SomeJSON
+  jsonTreeTerm :: Blob -> term Loc -> Rendering.JSON.JSON "trees" SomeJSON
 
 instance ToJSONFields1 syntax => JSONTreeTerm (Term syntax) where
-  jsonTerm' = renderJSONTerm
+  jsonTreeTerm = renderJSONTerm
 
 
 class JSONGraphTerm term where
