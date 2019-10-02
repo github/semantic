@@ -64,7 +64,7 @@ parseTermBuilder TermJSONTree    = distributeFoldMap jsonTerm >=> serialize Form
 parseTermBuilder TermJSONGraph   = termGraph >=> serialize Format.JSON
 parseTermBuilder TermSExpression = distributeFoldMap (doParse sexprTerm)
 parseTermBuilder TermDotGraph    = distributeFoldMap (doParse dotGraphTerm)
-parseTermBuilder TermShow        = distributeFoldMap (\ blob -> showTermParsers >>= \ parsers -> doParse' parsers showTerm blob)
+parseTermBuilder TermShow        = distributeFoldMap (\ blob -> showTermParsers >>= \ parsers -> parseWith parsers showTerm blob)
 parseTermBuilder TermQuiet       = distributeFoldMap quietTerm
 
 jsonTerm :: ParseEffects sig m => Blob -> m (Rendering.JSON.JSON "trees" SomeJSON)
@@ -74,7 +74,7 @@ jsonError :: Applicative m => Blob -> SomeException -> m (Rendering.JSON.JSON "t
 jsonError blob (SomeException e) = pure $ renderJSONError blob (show e)
 
 quietTerm :: (ParseEffects sig m, MonadIO m) => Blob -> m Builder
-quietTerm blob = showTiming blob <$> time' ( showTermParsers >>= \ parsers -> doParse' parsers (fmap (const (Right ())) . showTerm) blob `catchError` timingError )
+quietTerm blob = showTiming blob <$> time' ( showTermParsers >>= \ parsers -> parseWith parsers (fmap (const (Right ())) . showTerm) blob `catchError` timingError )
   where
     timingError (SomeException e) = pure (Left (show e))
     showTiming Blob{..} (res, duration) =
@@ -170,12 +170,12 @@ doParse with blob = case blobLanguage blob of
   _          -> noLanguageForBlob (blobPath blob)
 
 
-doParse'
+parseWith
   :: (Carrier sig m, Member (Error SomeException) sig, Member Parse sig)
   => [(Language, SomeParser c ann)]
   -> (forall term . c term => term ann -> m a)
   -> Blob
   -> m a
-doParse' parsers with blob = case lookup (blobLanguage blob) parsers of
+parseWith parsers with blob = case lookup (blobLanguage blob) parsers of
   Just (SomeParser parser) -> parse parser blob >>= with
   _                        -> noLanguageForBlob (blobPath blob)
