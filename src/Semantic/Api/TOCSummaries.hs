@@ -23,7 +23,7 @@ legacyDiffSummary :: DiffEffects sig m => [BlobPair] -> m Summaries
 legacyDiffSummary = distributeFoldMap go
   where
     go :: DiffEffects sig m => BlobPair -> m Summaries
-    go blobPair = doDiff legacyDecorateTerm (pure . legacySummarizeDiff blobPair) blobPair
+    go blobPair = diffWith legacySummarizeDiffParsers legacyDecorateTerm (pure . legacySummarizeDiff blobPair) blobPair
       `catchError` \(SomeException e) ->
         pure $ Summaries mempty (Map.singleton path [toJSON (ErrorSummary (T.pack (show e)) lowerBound lang)])
       where path = T.pack $ pathKeyForBlobPair blobPair
