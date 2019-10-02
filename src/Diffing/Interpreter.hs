@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, MultiParamTypeClasses, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE FunctionalDependencies, GeneralizedNewtypeDeriving, TypeOperators, UndecidableInstances #-}
 module Diffing.Interpreter
 ( diffTerms
 , DiffTerms(..)
@@ -29,7 +29,7 @@ stripDiff :: Functor syntax
           -> Diff.Diff syntax ann1 ann2
 stripDiff = bimap snd snd
 
-class DiffTerms term diff where
+class DiffTerms term diff | diff -> term, term -> diff where
   -- | Diff a 'These' of terms.
   diffTermPair :: These (term ann1) (term ann2) -> diff ann1 ann2
 
