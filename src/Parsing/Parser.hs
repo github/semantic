@@ -81,26 +81,26 @@ import           TreeSitter.Unmarshal
 
 
 -- | A parser, suitable for program analysis, for some specific language, producing 'Term's whose syntax satisfies a list of typeclass constraints.
-data SomeAnalysisParser typeclasses ann where
-  SomeAnalysisParser :: ( ApplyAll typeclasses (Sum fs)
+data SomeAnalysisParser constraint ann where
+  SomeAnalysisParser :: ( constraint (Sum fs)
                         , Apply (VertexDeclaration' (Sum fs)) fs
                         , HasPrelude lang
                         )
                      => Parser (Term (Sum fs) ann)
                      -> Proxy lang
-                     -> SomeAnalysisParser typeclasses ann
+                     -> SomeAnalysisParser constraint ann
 
 -- | A parser for some specific language, producing 'Term's whose syntax satisfies a list of typeclass constraints.
-someAnalysisParser :: ( ApplyAll typeclasses (Sum Go.Syntax)
-                      , ApplyAll typeclasses (Sum PHP.Syntax)
-                      , ApplyAll typeclasses (Sum Python.Syntax)
-                      , ApplyAll typeclasses (Sum Ruby.Syntax)
-                      , ApplyAll typeclasses (Sum TypeScript.Syntax)
-                      , ApplyAll typeclasses (Sum Haskell.Syntax)
+someAnalysisParser :: ( constraint (Sum Go.Syntax)
+                      , constraint (Sum PHP.Syntax)
+                      , constraint (Sum Python.Syntax)
+                      , constraint (Sum Ruby.Syntax)
+                      , constraint (Sum TypeScript.Syntax)
+                      , constraint (Sum Haskell.Syntax)
                       )
-                   => proxy typeclasses                  -- ^ A proxy for the list of typeclasses required, e.g. @(Proxy :: Proxy '[Show1])@.
-                   -> Language                           -- ^ The 'Language' to select.
-                   -> SomeAnalysisParser typeclasses Loc -- ^ A 'SomeAnalysisParser' abstracting the syntax type to be produced.
+                   => proxy constraint                  -- ^ A proxy for the list of typeclasses required, e.g. @(Proxy :: Proxy '[Show1])@.
+                   -> Language                          -- ^ The 'Language' to select.
+                   -> SomeAnalysisParser constraint Loc -- ^ A 'SomeAnalysisParser' abstracting the syntax type to be produced.
 someAnalysisParser _ Go         = SomeAnalysisParser goParser         (Proxy @'Go)
 someAnalysisParser _ Haskell    = SomeAnalysisParser haskellParser    (Proxy @'Haskell)
 someAnalysisParser _ JavaScript = SomeAnalysisParser typescriptParser (Proxy @'JavaScript)
