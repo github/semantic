@@ -83,8 +83,6 @@ diffGraph blobs = DiffTreeGraphResponse . V.fromList . toList <$> distributeFor 
 
 type DiffEffects sig m = (Member (Error SomeException) sig, Member (Reader Config) sig, Member Telemetry sig, Member Distribute sig, Member Parse sig, Carrier sig m, MonadIO m)
 
-type Decorate a b = forall term . DiffActions term => Blob -> term a -> term b
-
 
 dotGraphDiffParsers :: [(Language, SomeParser (DiffTerms & DOTGraphDiff) Loc)]
 dotGraphDiffParsers = aLaCarteParsers
