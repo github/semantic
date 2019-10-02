@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GADTs, ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE DataKinds, GADTs, LambdaCase, ScopedTypeVariables, TypeOperators #-}
 module Parsing.TreeSitter
 ( Duration(..)
 , parseToAST
@@ -10,6 +10,7 @@ import Prologue
 import           Control.Effect.Fail
 import           Control.Effect.Lift
 import           Control.Effect.Reader
+import qualified Control.Exception
 import           Foreign
 import           Foreign.C.Types (CBool (..))
 import           Foreign.Marshal.Array (allocaArray)
@@ -38,8 +39,8 @@ parseToAST :: ( Bounded grammar
            => Duration
            -> Ptr TS.Language
            -> Blob
-           -> m (Either String (AST [] grammar))
-parseToAST parseTimeout language blob = runParse parseTimeout language blob (fmap Right . anaM toAST <=< peek)
+           -> m (Either SomeException (AST [] grammar))
+parseToAST parseTimeout language blob = runParse parseTimeout language blob (anaM toAST <=< peek)
 
 parseToPreciseAST
   :: ( MonadIO m
@@ -48,20 +49,34 @@ parseToPreciseAST
   => Duration
   -> Ptr TS.Language
   -> Blob
-  -> m (Either String (t Loc))
+  -> m (Either SomeException (t Loc))
 parseToPreciseAST parseTimeout language blob = runParse parseTimeout language blob $ \ rootPtr ->
   TS.withCursor (castPtr rootPtr) $ \ cursor ->
     runM (runFail (runReader cursor (runReader (Source.bytes (blobSource blob)) (TS.peekNode >>= TS.unmarshalNode))))
+      >>= either (Control.Exception.throw . UnmarshalFailure) pure
+
+
+data TSParseException
+  = ParserTimedOut
+  | IncompatibleVersions
+  | UnmarshalFailure String
+    deriving (Eq, Show, Generic)
+
+instance Exception TSParseException where
+  displayException = \case
+    ParserTimedOut -> "tree-sitter: parser timed out"
+    IncompatibleVersions -> "tree-sitter: incompatible versions"
+    UnmarshalFailure s -> "tree-sitter: unmarshal failure - " <> show s
 
 runParse
   :: MonadIO m
   => Duration
   -> Ptr TS.Language
   -> Blob
-  -> (Ptr TS.Node -> IO (Either String a))
-  -> m (Either String a)
+  -> (Ptr TS.Node -> IO a)
+  -> m (Either SomeException a)
 runParse parseTimeout language Blob{..} action =
-  liftIO . TS.withParser language $ \ parser -> do
+  liftIO . Control.Exception.try . TS.withParser language $ \ parser -> do
     let timeoutMicros = fromIntegral $ toMicroseconds parseTimeout
     TS.ts_parser_set_timeout_micros parser timeoutMicros
     TS.ts_parser_halt_on_error parser (CBool 1)
@@ -69,11 +84,11 @@ runParse parseTimeout language Blob{..} action =
     if compatible then
       TS.withParseTree parser (Source.bytes blobSource) $ \ treePtr -> do
         if treePtr == nullPtr then
-          pure (Left "tree-sitter: null root node")
+          Control.Exception.throw ParserTimedOut
         else
           TS.withRootNode treePtr action
     else
-      pure (Left "tree-sitter: incompatible versions")
+      Control.Exception.throw IncompatibleVersions
 
 toAST :: forall grammar . (Bounded grammar, Enum grammar) => TS.Node -> IO (Base (AST [] grammar) TS.Node)
 toAST node@TS.Node{..} = do
