@@ -1,6 +1,7 @@
 {-# LANGUAGE DataKinds, GADTs, LambdaCase, ScopedTypeVariables, TypeOperators #-}
 module Parsing.TreeSitter
-( Duration(..)
+( TSParseException (..)
+, Duration(..)
 , parseToAST
 , parseToPreciseAST
 ) where
@@ -30,6 +31,12 @@ import qualified TreeSitter.Parser as TS
 import qualified TreeSitter.Tree as TS
 import qualified TreeSitter.Unmarshal as TS
 
+data TSParseException
+  = ParserTimedOut
+  | IncompatibleVersions
+  | UnmarshalFailure String
+    deriving (Eq, Show, Generic)
+
 -- | Parse a 'Blob' with the given 'TS.Language' and return its AST.
 -- Returns 'Nothing' if the operation timed out.
 parseToAST :: ( Bounded grammar
@@ -54,13 +61,6 @@ parseToPreciseAST parseTimeout language blob = runParse parseTimeout language bl
   TS.withCursor (castPtr rootPtr) $ \ cursor ->
     runM (runFail (runReader cursor (runReader (Source.bytes (blobSource blob)) (TS.peekNode >>= TS.unmarshalNode))))
       >>= either (Control.Exception.throw . UnmarshalFailure) pure
-
-
-data TSParseException
-  = ParserTimedOut
-  | IncompatibleVersions
-  | UnmarshalFailure String
-    deriving (Eq, Show, Generic)
 
 instance Exception TSParseException where
   displayException = \case
