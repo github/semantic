@@ -29,7 +29,6 @@ import           Data.String (fromString)
 import           GHC.Stack
 import qualified Language.Python.Core as Py
 import           Prelude hiding (fail)
-import qualified Source.Span as Source (Span)
 import           Streaming
 import qualified Streaming.Prelude as Stream
 import qualified Streaming.Process
@@ -100,7 +99,7 @@ fixtureTestTreeForFile fp = HUnit.testCaseSteps (Path.toString fp) $ \step -> wi
                    . runFail
                    . runReader (fromString @Py.SourcePath . Path.toString $ fp)
                    . runReader @Py.Bindings mempty
-                   . Py.compile @(TSP.Module Source.Span) @_ @(Term (Ann :+: Core))
+                   . Py.compile @TSP.Module @_ @(Term (Ann :+: Core))
                    <$> result
 
   for_ directives $ \directive -> do
