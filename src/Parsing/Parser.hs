@@ -1,4 +1,4 @@
-{-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, GADTs, RankNTypes, ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, KindSignatures, GADTs, RankNTypes, ScopedTypeVariables, TypeOperators #-}
 module Parsing.Parser
 ( Parser(..)
 , SomeAnalysisParser(..)
@@ -50,6 +50,7 @@ import           Data.Abstract.Evaluatable (HasPrelude)
 import           Data.AST
 import           Data.Graph.ControlFlowVertex (VertexDeclaration')
 import           Data.Language
+import           Data.Kind (Constraint)
 import qualified Data.Map as Map
 import           Data.Sum
 import qualified Data.Syntax as Syntax
@@ -80,7 +81,7 @@ import           TreeSitter.Unmarshal
 
 
 -- | A parser, suitable for program analysis, for some specific language, producing 'Term's whose syntax satisfies a list of typeclass constraints.
-data SomeAnalysisParser constraint ann where
+data SomeAnalysisParser (constraint :: (* -> *) -> Constraint) ann where
   SomeAnalysisParser :: ( constraint (Sum fs)
                         , Apply (VertexDeclaration' (Sum fs)) fs
                         , HasPrelude lang
