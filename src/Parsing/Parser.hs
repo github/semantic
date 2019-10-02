@@ -98,7 +98,7 @@ someAnalysisParser :: ( constraint (Sum Go.Syntax)
                       , constraint (Sum TypeScript.Syntax)
                       , constraint (Sum Haskell.Syntax)
                       )
-                   => proxy constraint                  -- ^ A proxy for the list of typeclasses required, e.g. @(Proxy :: Proxy '[Show1])@.
+                   => proxy constraint                  -- ^ A proxy for the constraint required, e.g. @(Proxy \@Show1)@.
                    -> Language                          -- ^ The 'Language' to select.
                    -> SomeAnalysisParser constraint Loc -- ^ A 'SomeAnalysisParser' abstracting the syntax type to be produced.
 someAnalysisParser _ Go         = SomeAnalysisParser goParser         (Proxy @'Go)
