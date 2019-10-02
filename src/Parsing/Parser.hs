@@ -25,6 +25,19 @@ module Parsing.Parser
 , precisePythonParser
   -- * Abstract parsers
 , SomeParser(..)
+, goParser'
+, haskellParser'
+, javascriptParser'
+, jsonParser'
+, jsxParser'
+, markdownParser'
+, phpParser'
+, pythonParserALaCarte'
+, pythonParserPrecise'
+, pythonParser'
+, rubyParser'
+, typescriptParser'
+, tsxParser'
 ) where
 
 import           Assigning.Assignment
@@ -191,3 +204,48 @@ someASTParser PHP        = Just (SomeASTParser (ASTParser tree_sitter_php :: Par
 someASTParser Java       = Nothing
 someASTParser Markdown   = Nothing
 someASTParser Unknown    = Nothing
+
+
+data SomeParser c a where
+  SomeParser :: c t => Parser (t a) -> SomeParser c a
+
+goParser' :: c (Term (Sum Go.Syntax)) => (Language, SomeParser c Loc)
+goParser' = (Go, SomeParser goParser)
+
+haskellParser' :: c (Term (Sum Haskell.Syntax)) => (Language, SomeParser c Loc)
+haskellParser' = (Haskell, SomeParser haskellParser)
+
+javascriptParser' :: c (Term (Sum TSX.Syntax)) => (Language, SomeParser c Loc)
+javascriptParser' = (JavaScript, SomeParser tsxParser)
+
+jsonParser' :: c (Term (Sum JSON.Syntax)) => (Language, SomeParser c Loc)
+jsonParser' = (JSON, SomeParser jsonParser)
+
+jsxParser' :: c (Term (Sum TSX.Syntax)) => (Language, SomeParser c Loc)
+jsxParser' = (JSX, SomeParser tsxParser)
+
+markdownParser' :: c (Term (Sum Markdown.Syntax)) => (Language, SomeParser c Loc)
+markdownParser' = (Markdown, SomeParser markdownParser)
+
+phpParser' :: c (Term (Sum PHP.Syntax)) => (Language, SomeParser c Loc)
+phpParser' = (PHP, SomeParser phpParser)
+
+pythonParserALaCarte' :: c (Term (Sum Python.Syntax)) => (Language, SomeParser c Loc)
+pythonParserALaCarte' = (Python, SomeParser pythonParser)
+
+pythonParserPrecise' :: c Py.Term => (Language, SomeParser c Loc)
+pythonParserPrecise' = (Python, SomeParser precisePythonParser)
+
+pythonParser' :: (c (Term (Sum Python.Syntax)), c Py.Term) => PerLanguageModes -> (Language, SomeParser c Loc)
+pythonParser' modes = case pythonMode modes of
+  ALaCarte -> (Python, SomeParser pythonParser)
+  Precise  -> (Python, SomeParser precisePythonParser)
+
+rubyParser' :: c (Term (Sum Ruby.Syntax)) => (Language, SomeParser c Loc)
+rubyParser' = (Ruby, SomeParser rubyParser)
+
+typescriptParser' :: c (Term (Sum TypeScript.Syntax)) => (Language, SomeParser c Loc)
+typescriptParser' = (TypeScript, SomeParser typescriptParser)
+
+tsxParser' :: c (Term (Sum TSX.Syntax)) => (Language, SomeParser c Loc)
+tsxParser' = (TSX, SomeParser tsxParser)
