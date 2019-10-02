@@ -6,7 +6,7 @@ module Parsing.Parser
 , someASTParser
 , someAnalysisParser
 , ApplyAll
--- À la carte parsers
+-- * À la carte parsers
 , goParser
 , goASTParser
 , jsonParser
@@ -21,7 +21,7 @@ module Parsing.Parser
 , phpParser
 , phpASTParser
 , haskellParser
-  -- Precise parsers
+  -- * Precise parsers
 , precisePythonParser
 ) where
 
