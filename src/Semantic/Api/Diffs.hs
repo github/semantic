@@ -56,7 +56,7 @@ parseDiffBuilder :: (Traversable t, DiffEffects sig m) => DiffOutputFormat -> t 
 parseDiffBuilder DiffJSONTree    = distributeFoldMap (jsonDiff renderJSONTree) >=> serialize Format.JSON -- NB: Serialize happens at the top level for these two JSON formats to collect results of multiple blob pairs.
 parseDiffBuilder DiffJSONGraph   = diffGraph >=> serialize Format.JSON
 parseDiffBuilder DiffSExpression = distributeFoldMap sexpDiff
-parseDiffBuilder DiffShow        = distributeFoldMap showDiff
+parseDiffBuilder DiffShow        = distributeFoldMap (doDiff (const id) showDiff)
 parseDiffBuilder DiffDotGraph    = distributeFoldMap dotGraphDiff
 
 type RenderJSON m syntax = forall syntax . CanDiff syntax => BlobPair -> Diff syntax Loc Loc -> m (Rendering.JSON.JSON "diffs" SomeJSON)
@@ -91,9 +91,6 @@ diffGraph blobs = DiffTreeGraphResponse . V.fromList . toList <$> distributeFor 
 sexpDiff :: DiffEffects sig m => BlobPair -> m Builder
 sexpDiff = doDiff (const id) (serialize (SExpression ByConstructorName))
 
-showDiff :: DiffEffects sig m => BlobPair -> m Builder
-showDiff = doDiff (const id) (serialize Show)
-
 dotGraphDiff :: DiffEffects sig m => BlobPair -> m Builder
 dotGraphDiff = doDiff (const id) render
   where render :: (Carrier sig m, ConstructorName syntax, Foldable syntax, Functor syntax, Member (Reader Config) sig) => Diff syntax Loc Loc -> m Builder
@@ -103,6 +100,12 @@ type DiffEffects sig m = (Member (Error SomeException) sig, Member (Reader Confi
 
 type CanDiff syntax = (ConstructorName syntax, Diffable syntax, Eq1 syntax, HasDeclaration syntax, Hashable1 syntax, Show1 syntax, ToJSONFields1 syntax, Traversable syntax)
 type Decorate a b = forall syntax . CanDiff syntax => Blob -> Term syntax a -> Term syntax b
+
+class ShowDiff diff where
+  showDiff :: (Carrier sig m, Member (Reader Config) sig) => diff Loc Loc -> m Builder
+
+instance Show1 syntax => ShowDiff (Diff syntax) where
+  showDiff = serialize Show
 
 class ( ConstructorName t
       , Diffable t
