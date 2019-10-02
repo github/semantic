@@ -14,7 +14,7 @@ import           Data.Text as T hiding (empty)
 import           Streaming
 import qualified Streaming.Prelude as Streaming
 
-import           Data.Blob
+import           Data.Language
 import           Data.Term
 import           Source.Loc
 import qualified Source.Source as Source
@@ -22,16 +22,17 @@ import           Tags.Tag
 import           Tags.Taggable
 
 runTagging :: (IsTaggable syntax)
-           => Blob
+           => Language
+           -> Source.Source
            -> [Text]
            -> Term syntax Loc
            -> [Tag]
-runTagging blob symbolsToSummarize
+runTagging lang source symbolsToSummarize
   = Eff.run
   . evalState @[ContextToken] []
   . Streaming.toList_
-  . contextualizing blob toKind
-  . tagging blob
+  . contextualizing source toKind
+  . tagging lang
   where
     toKind x = do
       guard (x `elem` symbolsToSummarize)
@@ -49,11 +50,11 @@ type ContextToken = (Text, Range)
 contextualizing :: ( Member (State [ContextToken]) sig
                    , Carrier sig m
                    )
-                => Blob
+                => Source.Source
                 -> (Text -> Maybe Kind)
                 -> Stream (Of Token) m a
                 -> Stream (Of Tag) m a
-contextualizing Blob{..} toKind = Streaming.mapMaybeM $ \case
+contextualizing source toKind = Streaming.mapMaybeM $ \case
   Enter x r -> Nothing <$ enterScope (x, r)
   Exit  x r -> Nothing <$ exitScope (x, r)
   Iden iden span docsLiteralRange -> get @[ContextToken] >>= pure . \case
@@ -63,7 +64,7 @@ contextualizing Blob{..} toKind = Streaming.mapMaybeM $ \case
       -> Just $ Tag iden kind span (firstLine (slice r)) (slice <$> docsLiteralRange)
     _ -> Nothing
   where
-    slice = stripEnd . Source.toText . Source.slice blobSource
+    slice = stripEnd . Source.toText . Source.slice source
     firstLine = T.take 180 . fst . breakOn "\n"
 
 enterScope, exitScope :: ( Member (State [ContextToken]) sig

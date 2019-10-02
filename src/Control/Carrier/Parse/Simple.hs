@@ -65,7 +65,6 @@ runParser timeout blob@Blob{..} parser = case parser of
   MarkdownParser ->
     let term = cmarkParser blobSource
     in length term `seq` pure term
-  SomeParser parser -> SomeTerm <$> runParser timeout blob parser
 
 data ParseFailure = ParseFailure String
   deriving (Show, Typeable)
