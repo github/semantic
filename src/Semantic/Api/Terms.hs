@@ -63,7 +63,7 @@ parseTermBuilder :: (Traversable t, Member Distribute sig, ParseEffects sig m, M
 parseTermBuilder TermJSONTree    = distributeFoldMap jsonTerm >=> serialize Format.JSON -- NB: Serialize happens at the top level for these two JSON formats to collect results of multiple blobs.
 parseTermBuilder TermJSONGraph   = termGraph >=> serialize Format.JSON
 parseTermBuilder TermSExpression = distributeFoldMap (parseWith sexprTermParsers sexprTerm)
-parseTermBuilder TermDotGraph    = distributeFoldMap (doParse dotGraphTerm)
+parseTermBuilder TermDotGraph    = distributeFoldMap (parseWith dotGraphTermParsers dotGraphTerm)
 parseTermBuilder TermShow        = distributeFoldMap (\ blob -> asks showTermParsers >>= \ parsers -> parseWith parsers showTerm blob)
 parseTermBuilder TermQuiet       = distributeFoldMap quietTerm
 
@@ -108,6 +108,9 @@ instance (ConstructorName syntax, Foldable syntax, Functor syntax) => SExprTerm 
   sexprTerm = serialize (SExpression ByConstructorName)
 
 
+dotGraphTermParsers :: [(Language, SomeParser DOTGraphTerm Loc)]
+dotGraphTermParsers = aLaCarteParsers
+
 class DOTGraphTerm term where
   dotGraphTerm :: (Carrier sig m, Member (Reader Config) sig) => term Loc -> m Builder
 
@@ -134,7 +137,7 @@ instance (Foldable syntax, Functor syntax, ConstructorName syntax) => JSONGraphT
         lang = bridging # blobLanguage blob
 
 
-type TermActions t = (DOTGraphTerm t, JSONGraphTerm t, JSONTreeTerm t)
+type TermActions t = (JSONGraphTerm t, JSONTreeTerm t)
 
 doParse
   :: ( Carrier sig m
