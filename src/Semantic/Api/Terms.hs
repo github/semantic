@@ -68,7 +68,7 @@ parseTermBuilder TermShow        = distributeFoldMap (\ blob -> asks showTermPar
 parseTermBuilder TermQuiet       = distributeFoldMap quietTerm
 
 jsonTerm :: ParseEffects sig m => Blob -> m (Rendering.JSON.JSON "trees" SomeJSON)
-jsonTerm blob = doParse (pure . jsonTreeTerm blob) blob `catchError` jsonError blob
+jsonTerm blob = parseWith jsonTreeTermParsers (pure . jsonTreeTerm blob) blob `catchError` jsonError blob
 
 jsonError :: Applicative m => Blob -> SomeException -> m (Rendering.JSON.JSON "trees" SomeJSON)
 jsonError blob (SomeException e) = pure $ renderJSONError blob (show e)
@@ -118,6 +118,9 @@ instance (ConstructorName syntax, Foldable syntax, Functor syntax) => DOTGraphTe
   dotGraphTerm = serialize (DOT (termStyle "terms")) . renderTreeGraph
 
 
+jsonTreeTermParsers :: [(Language, SomeParser JSONTreeTerm Loc)]
+jsonTreeTermParsers = aLaCarteParsers
+
 class JSONTreeTerm term where
   jsonTreeTerm :: Blob -> term Loc -> Rendering.JSON.JSON "trees" SomeJSON
 
@@ -137,7 +140,7 @@ instance (Foldable syntax, Functor syntax, ConstructorName syntax) => JSONGraphT
         lang = bridging # blobLanguage blob
 
 
-type TermActions t = (JSONGraphTerm t, JSONTreeTerm t)
+type TermActions t = JSONGraphTerm t
 
 doParse
   :: ( Carrier sig m
