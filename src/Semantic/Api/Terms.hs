@@ -155,3 +155,22 @@ doParse with blob = case blobLanguage blob of
 
 data SomeParser c a where
   SomeParser :: c t => Parser (t a) -> SomeParser c a
+
+showTermParsers
+  :: (Carrier sig m, Member (Reader PerLanguageModes) sig)
+  => m [(Language, SomeParser ShowTerm Loc)]
+showTermParsers = ask >>= \ modes -> pure
+  [ (Go,         SomeParser goParser)
+  , (Haskell,    SomeParser haskellParser)
+  , (JavaScript, SomeParser tsxParser)
+  , (JSON,       SomeParser jsonParser)
+  , (JSX,        SomeParser tsxParser)
+  , (Markdown,   SomeParser markdownParser)
+  , (Python,     case pythonMode modes of
+    ALaCarte -> SomeParser pythonParser
+    Precise  -> SomeParser precisePythonParser)
+  , (Ruby,       SomeParser rubyParser)
+  , (TypeScript, SomeParser typescriptParser)
+  , (TSX,        SomeParser tsxParser)
+  , (PHP,        SomeParser phpParser)
+  ]
