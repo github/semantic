@@ -62,7 +62,7 @@ parseDiffBuilder :: (Traversable t, DiffEffects sig m) => DiffOutputFormat -> t 
 parseDiffBuilder DiffJSONTree    = distributeFoldMap jsonDiff >=> serialize Format.JSON -- NB: Serialize happens at the top level for these two JSON formats to collect results of multiple blob pairs.
 parseDiffBuilder DiffJSONGraph   = diffGraph >=> serialize Format.JSON
 parseDiffBuilder DiffSExpression = distributeFoldMap (diffWith @Loc sexprDiffParsers (const id) sexprDiff)
-parseDiffBuilder DiffShow        = distributeFoldMap (doDiff (const id) showDiff)
+parseDiffBuilder DiffShow        = distributeFoldMap (diffWith @Loc showDiffParsers (const id) showDiff)
 parseDiffBuilder DiffDotGraph    = distributeFoldMap (doDiff (const id) dotGraphDiff)
 
 jsonDiff :: DiffEffects sig m => BlobPair -> m (Rendering.JSON.JSON "diffs" SomeJSON)
