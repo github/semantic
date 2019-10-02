@@ -227,21 +227,6 @@ diffTerms blobs terms = time "diff" languageTag $ do
   diff <$ writeStat (Stat.count "diff.nodes" (bilength diff) languageTag)
   where languageTag = languageTagForBlobPair blobs
 
-doParse :: (Member (Error SomeException) sig, Member Distribute sig, Member Parse sig, Carrier sig m)
-  => BlobPair -> Decorate Loc ann -> m (SomeTermPair ann)
-doParse blobPair decorate = case languageForBlobPair blobPair of
-  Go         -> SomeTermPair <$> distributeFor blobPair (\ blob -> decorate blob <$> parse goParser blob)
-  Haskell    -> SomeTermPair <$> distributeFor blobPair (\ blob -> decorate blob <$> parse haskellParser blob)
-  JavaScript -> SomeTermPair <$> distributeFor blobPair (\ blob -> decorate blob <$> parse tsxParser blob)
-  JSON       -> SomeTermPair <$> distributeFor blobPair (\ blob -> decorate blob <$> parse jsonParser blob)
-  JSX        -> SomeTermPair <$> distributeFor blobPair (\ blob -> decorate blob <$> parse tsxParser blob)
-  Markdown   -> SomeTermPair <$> distributeFor blobPair (\ blob -> decorate blob <$> parse markdownParser blob)
-  Python     -> SomeTermPair <$> distributeFor blobPair (\ blob -> decorate blob <$> parse pythonParser blob)
-  Ruby       -> SomeTermPair <$> distributeFor blobPair (\ blob -> decorate blob <$> parse rubyParser blob)
-  TypeScript -> SomeTermPair <$> distributeFor blobPair (\ blob -> decorate blob <$> parse typescriptParser blob)
-  TSX        -> SomeTermPair <$> distributeFor blobPair (\ blob -> decorate blob <$> parse tsxParser blob)
-  PHP        -> SomeTermPair <$> distributeFor blobPair (\ blob -> decorate blob <$> parse phpParser blob)
-  _          -> noLanguageForBlob (pathForBlobPair blobPair)
 
 data SomeTermPair ann where
   SomeTermPair :: DiffActions term  => Join These (term ann) -> SomeTermPair ann
