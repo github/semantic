@@ -1,6 +1,7 @@
 {-# LANGUAGE DataKinds, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, OverloadedStrings, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Serializing.SExpression.Precise
 ( serializeSExpression
+, ToSExpression(..)
 ) where
 
 import Data.ByteString.Builder
