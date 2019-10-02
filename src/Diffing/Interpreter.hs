@@ -29,6 +29,7 @@ stripDiff :: Functor syntax
           -> Diff.Diff syntax ann1 ann2
 stripDiff = bimap snd snd
 
+-- | The class of term types for which we can compute a diff.
 class (Bifoldable (DiffFor term)) => DiffTerms term where
   type DiffFor term = (diff :: * -> * -> *) | diff -> term
 
