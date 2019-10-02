@@ -113,19 +113,7 @@ instance ShowTerm Py.Term where
 
 
 sexprTermParsers :: [(Language, SomeParser SExprTerm Loc)]
-sexprTermParsers =
-  [ goParser'
-  , haskellParser'
-  , javascriptParser'
-  , jsonParser'
-  , jsxParser'
-  , markdownParser'
-  , phpParser'
-  , pythonParserALaCarte'
-  , rubyParser'
-  , typescriptParser'
-  , tsxParser'
-  ]
+sexprTermParsers = aLaCarteParsers
 
 class SExprTerm term where
   sexprTerm :: (Carrier sig m, Member (Reader Config) sig) => term Loc -> m Builder
