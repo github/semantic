@@ -21,10 +21,6 @@ import           Data.Scope (Scope, Incr)
 import qualified Data.Scope as Scope
 import           Data.Name
 
--- We default to deriving the default toEncoding definition (that piggybacks
--- off of toJSON) so that we never hit the problematic code paths associated
--- with toEncoding above.
-
 instance ToJSON a => ToJSON (File a) where
   toJSON File{fileLoc, fileBody} = object
     [ "location" .= fileLoc

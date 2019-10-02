@@ -75,7 +75,6 @@ runParser blob@Blob{..} parser = case parser of
     time "parse.cmark_parse" languageTag $
       let term = cmarkParser blobSource
       in length term `seq` pure term
-  SomeParser parser -> SomeTerm <$> runParser blob parser
   where languageTag = [("language" :: String, show (blobLanguage blob))]
 
 data ParserCancelled = ParserTimedOut | AssignmentTimedOut
