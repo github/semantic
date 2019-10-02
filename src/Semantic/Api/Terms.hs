@@ -109,7 +109,7 @@ instance (Functor syntax, Show1 syntax) => ShowTerm (Term syntax) where
   showTerm = serialize Show . quieterm
 
 instance ShowTerm Py.Term where
-  showTerm = serialize Show . Py.getTerm
+  showTerm = serialize Show . (() <$) . Py.getTerm
 
 
 class SExprTerm term where
