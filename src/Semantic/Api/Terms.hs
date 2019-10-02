@@ -64,7 +64,7 @@ parseTermBuilder TermJSONTree    = distributeFoldMap jsonTerm >=> serialize Form
 parseTermBuilder TermJSONGraph   = termGraph >=> serialize Format.JSON
 parseTermBuilder TermSExpression = distributeFoldMap (doParse sexprTerm)
 parseTermBuilder TermDotGraph    = distributeFoldMap (doParse dotGraphTerm)
-parseTermBuilder TermShow        = distributeFoldMap (doParse showTerm)
+parseTermBuilder TermShow        = distributeFoldMap (\ blob -> showTermParsers >>= \ parsers -> doParse' parsers showTerm blob)
 parseTermBuilder TermQuiet       = distributeFoldMap quietTerm
 
 jsonTerm :: ParseEffects sig m => Blob -> m (Rendering.JSON.JSON "trees" SomeJSON)
@@ -74,7 +74,7 @@ jsonError :: Applicative m => Blob -> SomeException -> m (Rendering.JSON.JSON "t
 jsonError blob (SomeException e) = pure $ renderJSONError blob (show e)
 
 quietTerm :: (ParseEffects sig m, MonadIO m) => Blob -> m Builder
-quietTerm blob = showTiming blob <$> time' ( doParse (fmap (const (Right ())) . showTerm) blob `catchError` timingError )
+quietTerm blob = showTiming blob <$> time' ( showTermParsers >>= \ parsers -> doParse' parsers (fmap (const (Right ())) . showTerm) blob `catchError` timingError )
   where
     timingError (SomeException e) = pure (Left (show e))
     showTiming Blob{..} (res, duration) =
@@ -128,7 +128,7 @@ instance (Foldable syntax, Functor syntax, ConstructorName syntax) => JSONGraphT
         lang = bridging # blobLanguage blob
 
 
-type TermActions t = (DOTGraphTerm t, JSONGraphTerm t, JSONTreeTerm t, SExprTerm t, ShowTerm t)
+type TermActions t = (DOTGraphTerm t, JSONGraphTerm t, JSONTreeTerm t, SExprTerm t)
 
 doParse
   :: ( Carrier sig m
