@@ -33,7 +33,7 @@ stripDiff = bimap snd snd
 class HasDiffFor (term :: * -> *) where
   type DiffFor term = (res :: * -> * -> *) | res -> term
 
-class HasDiffFor term => DiffTerms term where
+class (Bifoldable (DiffFor term), HasDiffFor term) => DiffTerms term where
   -- | Diff a 'These' of terms.
   diffTermPair :: These (term ann1) (term ann2) -> DiffFor term ann1 ann2
 
