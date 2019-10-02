@@ -8,7 +8,6 @@ module Semantic.Api.Diffs
   , DiffEffects
 
   , SomeTermPair(..)
-  , withSomeTermPair
   ) where
 
 import           Analysis.ConstructorName (ConstructorName)
@@ -178,6 +177,3 @@ doParse blobPair decorate = case languageForBlobPair blobPair of
 
 data SomeTermPair typeclasses ann where
   SomeTermPair :: typeclasses syntax => Join These (Term syntax ann) -> SomeTermPair typeclasses ann
-
-withSomeTermPair :: (forall syntax . typeclasses syntax => Join These (Term syntax ann) -> a) -> SomeTermPair typeclasses ann -> a
-withSomeTermPair with (SomeTermPair terms) = with terms
