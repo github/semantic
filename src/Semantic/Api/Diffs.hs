@@ -61,7 +61,7 @@ parseDiffBuilder DiffDotGraph    = distributeFoldMap dotGraphDiff
 
 type RenderJSON m syntax = forall syntax . CanDiff syntax => BlobPair -> Diff syntax Loc Loc -> m (Rendering.JSON.JSON "diffs" SomeJSON)
 
-jsonDiff :: (DiffEffects sig m) => RenderJSON m syntax -> BlobPair -> m (Rendering.JSON.JSON "diffs" SomeJSON)
+jsonDiff :: DiffEffects sig m => RenderJSON m syntax -> BlobPair -> m (Rendering.JSON.JSON "diffs" SomeJSON)
 jsonDiff f blobPair = doDiff blobPair (const id) f `catchError` jsonError blobPair
 
 jsonError :: Applicative m => BlobPair -> SomeException -> m (Rendering.JSON.JSON "diffs" SomeJSON)
@@ -73,7 +73,7 @@ renderJSONTree blobPair = pure . renderJSONDiff blobPair
 diffGraph :: (Traversable t, DiffEffects sig m) => t BlobPair -> m DiffTreeGraphResponse
 diffGraph blobs = DiffTreeGraphResponse . V.fromList . toList <$> distributeFor blobs go
   where
-    go :: (DiffEffects sig m) => BlobPair -> m DiffTreeFileGraph
+    go :: DiffEffects sig m => BlobPair -> m DiffTreeFileGraph
     go blobPair = doDiff blobPair (const id) render
       `catchError` \(SomeException e) ->
         pure (DiffTreeFileGraph path lang mempty mempty (V.fromList [ParseError (T.pack (show e))]))
@@ -88,13 +88,13 @@ diffGraph blobs = DiffTreeGraphResponse . V.fromList . toList <$> distributeFor 
           in pure $ DiffTreeFileGraph path lang (V.fromList (vertexList graph)) (V.fromList (fmap toEdge (edgeList graph))) mempty
 
 
-sexpDiff :: (DiffEffects sig m) => BlobPair -> m Builder
+sexpDiff :: DiffEffects sig m => BlobPair -> m Builder
 sexpDiff blobPair = doDiff blobPair (const id) (const (serialize (SExpression ByConstructorName)))
 
-showDiff :: (DiffEffects sig m) => BlobPair -> m Builder
+showDiff :: DiffEffects sig m => BlobPair -> m Builder
 showDiff blobPair = doDiff blobPair (const id) (const (serialize Show))
 
-dotGraphDiff :: (DiffEffects sig m) => BlobPair -> m Builder
+dotGraphDiff :: DiffEffects sig m => BlobPair -> m Builder
 dotGraphDiff blobPair = doDiff blobPair (const id) render
   where render _ = serialize (DOT (diffStyle "diffs")) . renderTreeGraph
 
@@ -124,7 +124,7 @@ instance ( ConstructorName t
          )
       => DiffActions t
 
-doDiff :: (DiffEffects sig m)
+doDiff :: DiffEffects sig m
   => BlobPair -> Decorate Loc ann -> (forall syntax . CanDiff syntax => BlobPair -> Diff syntax ann ann -> m output) -> m output
 doDiff blobPair decorate render = do
   SomeTermPair terms <- doParse blobPair decorate
