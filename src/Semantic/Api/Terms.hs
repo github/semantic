@@ -41,7 +41,7 @@ termGraph :: (Traversable t, Member Distribute sig, ParseEffects sig m) => t Blo
 termGraph blobs = ParseTreeGraphResponse . V.fromList . toList <$> distributeFor blobs go
   where
     go :: ParseEffects sig m => Blob -> m ParseTreeFileGraph
-    go blob = doParse (pure . jsonGraphTerm blob) blob
+    go blob = parseWith jsonGraphTermParsers (pure . jsonGraphTerm blob) blob
       `catchError` \(SomeException e) ->
         pure (ParseTreeFileGraph path lang mempty mempty (V.fromList [ParseError (T.pack (show e))]))
       where
@@ -128,6 +128,9 @@ instance ToJSONFields1 syntax => JSONTreeTerm (Term syntax) where
   jsonTreeTerm = renderJSONTerm
 
 
+jsonGraphTermParsers :: [(Language, SomeParser JSONGraphTerm Loc)]
+jsonGraphTermParsers = aLaCarteParsers
+
 class JSONGraphTerm term where
   jsonGraphTerm :: Blob -> term Loc -> ParseTreeFileGraph
 
@@ -140,14 +143,12 @@ instance (Foldable syntax, Functor syntax, ConstructorName syntax) => JSONGraphT
         lang = bridging # blobLanguage blob
 
 
-type TermActions t = JSONGraphTerm t
-
 doParse
   :: ( Carrier sig m
      , Member (Error SomeException) sig
      , Member Parse sig
      )
-  => (forall term . TermActions term => term Loc -> m a)
+  => (forall term . term Loc -> m a)
   -> Blob
   -> m a
 doParse with blob = case blobLanguage blob of
