@@ -40,6 +40,7 @@ module Parsing.Parser
 , typescriptParser'
   -- * Canonical sets of parsers
 , aLaCarteParsers
+, preciseParsers
 , allParsers
 ) where
 
@@ -278,6 +279,11 @@ aLaCarteParsers =
   , rubyParser'
   , typescriptParser'
   , tsxParser'
+  ]
+
+preciseParsers :: c Py.Term => [(Language, SomeParser c Loc)]
+preciseParsers =
+  [ pythonParserPrecise'
   ]
 
 allParsers
