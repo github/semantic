@@ -170,8 +170,8 @@ markdownParser :: Parser Markdown.Term
 markdownParser = AssignmentParser MarkdownParser Markdown.assignment
 
 
-precisePythonParser :: Parser (Py.Term Loc)
-precisePythonParser = UnmarshalParser tree_sitter_python
+pythonParserPrecise :: Parser (Py.Term Loc)
+pythonParserPrecise = UnmarshalParser tree_sitter_python
 
 
 -- | A parser for producing specialized (tree-sitter) ASTs.
@@ -228,12 +228,12 @@ pythonParserALaCarte' :: c (Term (Sum Python.Syntax)) => (Language, SomeParser c
 pythonParserALaCarte' = (Python, SomeParser pythonParser)
 
 pythonParserPrecise' :: c Py.Term => (Language, SomeParser c Loc)
-pythonParserPrecise' = (Python, SomeParser precisePythonParser)
+pythonParserPrecise' = (Python, SomeParser pythonParserPrecise)
 
 pythonParser' :: (c (Term (Sum Python.Syntax)), c Py.Term) => PerLanguageModes -> (Language, SomeParser c Loc)
 pythonParser' modes = case pythonMode modes of
   ALaCarte -> (Python, SomeParser pythonParser)
-  Precise  -> (Python, SomeParser precisePythonParser)
+  Precise  -> (Python, SomeParser pythonParserPrecise)
 
 rubyParser' :: c (Term (Sum Ruby.Syntax)) => (Language, SomeParser c Loc)
 rubyParser' = (Ruby, SomeParser rubyParser)
