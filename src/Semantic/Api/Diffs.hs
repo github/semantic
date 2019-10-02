@@ -1,4 +1,4 @@
-{-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, KindSignatures, LambdaCase, MonoLocalBinds, RankNTypes, TypeOperators, UndecidableInstances, UndecidableSuperClasses #-}
+{-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, KindSignatures, LambdaCase, MonoLocalBinds, QuantifiedConstraints, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Semantic.Api.Diffs
   ( parseDiffBuilder
   , DiffOutputFormat(..)
@@ -26,11 +26,11 @@ import           Data.Blob
 import           Data.ByteString.Builder
 import           Data.Graph
 import           Data.JSON.Fields
-import           Data.Kind (Constraint)
 import           Data.Language
 import           Data.Term
 import qualified Data.Text as T
 import qualified Data.Vector as V
+import           Diffing.Algorithm (Diffable)
 import           Diffing.Interpreter (HasDiffFor(..), DiffTerms(..))
 import           Parsing.Parser
 import           Prologue
@@ -82,23 +82,23 @@ diffGraph blobs = DiffTreeGraphResponse . V.fromList . toList <$> distributeFor 
 type DiffEffects sig m = (Member (Error SomeException) sig, Member (Reader Config) sig, Member Telemetry sig, Member Distribute sig, Member Parse sig, Carrier sig m, MonadIO m)
 
 
-dotGraphDiffParsers :: [(Language, SomeParser (DiffTerms & DOTGraphDiff) Loc)]
+dotGraphDiffParsers :: [(Language, SomeParser DOTGraphDiff Loc)]
 dotGraphDiffParsers = aLaCarteParsers
 
-class HasDiffFor term => DOTGraphDiff term where
+class DiffTerms term => DOTGraphDiff term where
   dotGraphDiff :: (Carrier sig m, Member (Reader Config) sig) => DiffFor term Loc Loc -> m Builder
 
-instance (ConstructorName syntax, Foldable syntax, Functor syntax) => DOTGraphDiff (Term syntax) where
+instance (ConstructorName syntax, Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => DOTGraphDiff (Term syntax) where
   dotGraphDiff = serialize (DOT (diffStyle "diffs")) . renderTreeGraph
 
 
-jsonGraphDiffParsers :: [(Language, SomeParser (DiffTerms & JSONGraphDiff) Loc)]
+jsonGraphDiffParsers :: [(Language, SomeParser JSONGraphDiff Loc)]
 jsonGraphDiffParsers = aLaCarteParsers
 
-class HasDiffFor term => JSONGraphDiff term where
+class DiffTerms term => JSONGraphDiff term where
   jsonGraphDiff :: BlobPair -> DiffFor term Loc Loc -> DiffTreeFileGraph
 
-instance (Foldable syntax, Functor syntax, ConstructorName syntax) => JSONGraphDiff (Term syntax) where
+instance (ConstructorName syntax, Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => JSONGraphDiff (Term syntax) where
   jsonGraphDiff blobPair diff
     = let graph = renderTreeGraph diff
           toEdge (Edge (a, b)) = DiffTreeEdge (diffVertexId a) (diffVertexId b)
@@ -107,56 +107,56 @@ instance (Foldable syntax, Functor syntax, ConstructorName syntax) => JSONGraphD
         lang = bridging # languageForBlobPair blobPair
 
 
-jsonTreeDiffParsers :: [(Language, SomeParser (DiffTerms & JSONTreeDiff) Loc)]
+jsonTreeDiffParsers :: [(Language, SomeParser JSONTreeDiff Loc)]
 jsonTreeDiffParsers = aLaCarteParsers
 
-class HasDiffFor term => JSONTreeDiff term where
+class DiffTerms term => JSONTreeDiff term where
   jsonTreeDiff :: BlobPair -> DiffFor term Loc Loc -> Rendering.JSON.JSON "diffs" SomeJSON
 
-instance ToJSONFields1 syntax => JSONTreeDiff (Term syntax) where
+instance (Diffable syntax, Eq1 syntax, Hashable1 syntax, ToJSONFields1 syntax, Traversable syntax) => JSONTreeDiff (Term syntax) where
   jsonTreeDiff = renderJSONDiff
 
 
-sexprDiffParsers :: [(Language, SomeParser (DiffTerms & SExprDiff) Loc)]
+sexprDiffParsers :: [(Language, SomeParser SExprDiff Loc)]
 sexprDiffParsers = aLaCarteParsers
 
-class HasDiffFor term => SExprDiff term where
+class DiffTerms term => SExprDiff term where
   sexprDiff :: (Carrier sig m, Member (Reader Config) sig) => DiffFor term Loc Loc -> m Builder
 
-instance (ConstructorName syntax, Foldable syntax, Functor syntax) => SExprDiff (Term syntax) where
+instance (ConstructorName syntax, Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => SExprDiff (Term syntax) where
   sexprDiff = serialize (SExpression ByConstructorName)
 
 
-showDiffParsers :: [(Language, SomeParser (DiffTerms & ShowDiff) Loc)]
+showDiffParsers :: [(Language, SomeParser ShowDiff Loc)]
 showDiffParsers = aLaCarteParsers
 
-class HasDiffFor term => ShowDiff term where
+class DiffTerms term => ShowDiff term where
   showDiff :: (Carrier sig m, Member (Reader Config) sig) => DiffFor term Loc Loc -> m Builder
 
-instance Show1 syntax => ShowDiff (Term syntax) where
+instance (Diffable syntax, Eq1 syntax, Hashable1 syntax, Show1 syntax, Traversable syntax) => ShowDiff (Term syntax) where
   showDiff = serialize Show
 
 
-legacySummarizeDiffParsers :: [(Language, SomeParser (DiffTerms & LegacySummarizeDiff) Loc)]
+legacySummarizeDiffParsers :: [(Language, SomeParser LegacySummarizeDiff Loc)]
 legacySummarizeDiffParsers = aLaCarteParsers
 
-class HasDiffFor term => LegacySummarizeDiff term where
+class DiffTerms term => LegacySummarizeDiff term where
   legacyDecorateTerm :: Blob -> term Loc -> term (Maybe Declaration)
   legacySummarizeDiff :: BlobPair -> DiffFor term (Maybe Declaration) (Maybe Declaration) -> Summaries
 
-instance (Foldable syntax, Functor syntax, HasDeclaration syntax) => LegacySummarizeDiff (Term syntax) where
+instance (Diffable syntax, Eq1 syntax, HasDeclaration syntax, Hashable1 syntax, Traversable syntax) => LegacySummarizeDiff (Term syntax) where
   legacyDecorateTerm = decoratorWithAlgebra . declarationAlgebra
   legacySummarizeDiff = renderToCDiff
 
 
-summarizeDiffParsers :: [(Language, SomeParser (DiffTerms & SummarizeDiff) Loc)]
+summarizeDiffParsers :: [(Language, SomeParser SummarizeDiff Loc)]
 summarizeDiffParsers = aLaCarteParsers
 
-class HasDiffFor term => SummarizeDiff term where
+class DiffTerms term => SummarizeDiff term where
   decorateTerm :: Blob -> term Loc -> term (Maybe Declaration)
   summarizeDiff :: BlobPair -> DiffFor term (Maybe Declaration) (Maybe Declaration) -> TOCSummaryFile
 
-instance (Foldable syntax, Functor syntax, HasDeclaration syntax) => SummarizeDiff (Term syntax) where
+instance (Diffable syntax, Eq1 syntax, HasDeclaration syntax, Hashable1 syntax, Traversable syntax) => SummarizeDiff (Term syntax) where
   decorateTerm = decoratorWithAlgebra . declarationAlgebra
   summarizeDiff blobPair diff = foldr go (TOCSummaryFile path lang mempty mempty) (diffTOC diff)
     where
@@ -176,15 +176,9 @@ instance (Foldable syntax, Functor syntax, HasDeclaration syntax) => SummarizeDi
         = TOCSummaryFile path language changes (V.cons (TOCSummaryError errorText (converting #? errorSpan)) errors)
 
 
-class (c1 term, c2 term) => ((c1 :: (* -> *) -> Constraint) & (c2 :: (* -> *) -> Constraint)) (term :: * -> *)
-
-infixl 9 &
-
-instance (c1 term, c2 term) => (c1 & c2) term
-
 diffWith
-  :: DiffEffects sig m
-  => [(Language, SomeParser (DiffTerms & c) Loc)]
+  :: (forall term . c term => DiffTerms term, DiffEffects sig m)
+  => [(Language, SomeParser c Loc)]
   -> (forall term . c term => DiffFor term Loc Loc -> m output)
   -> BlobPair
   -> m output
@@ -192,8 +186,8 @@ diffWith parsers render blobPair = parsePairWith parsers (render <=< diffTerms b
 
 decoratingDiffWith
   :: forall ann c output m sig
-  .  DiffEffects sig m
-  => [(Language, SomeParser (DiffTerms & c) Loc)]
+  .  (forall term . c term => DiffTerms term, DiffEffects sig m)
+  => [(Language, SomeParser c Loc)]
   -> (forall term . c term => Blob -> term Loc -> term ann)
   -> (forall term . c term => DiffFor term ann ann -> m output)
   -> BlobPair
