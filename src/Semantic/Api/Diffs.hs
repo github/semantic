@@ -53,16 +53,14 @@ data DiffOutputFormat
   deriving (Eq, Show)
 
 parseDiffBuilder :: (Traversable t, DiffEffects sig m) => DiffOutputFormat -> t BlobPair -> m Builder
-parseDiffBuilder DiffJSONTree    = distributeFoldMap (jsonDiff renderJSONTree) >=> serialize Format.JSON -- NB: Serialize happens at the top level for these two JSON formats to collect results of multiple blob pairs.
+parseDiffBuilder DiffJSONTree    = distributeFoldMap jsonDiff >=> serialize Format.JSON -- NB: Serialize happens at the top level for these two JSON formats to collect results of multiple blob pairs.
 parseDiffBuilder DiffJSONGraph   = diffGraph >=> serialize Format.JSON
 parseDiffBuilder DiffSExpression = distributeFoldMap (doDiff (const id) sexprDiff)
 parseDiffBuilder DiffShow        = distributeFoldMap (doDiff (const id) showDiff)
 parseDiffBuilder DiffDotGraph    = distributeFoldMap (doDiff (const id) dotGraphDiff)
 
-type RenderJSON m syntax = forall syntax . DiffActions syntax => BlobPair -> Diff syntax Loc Loc -> m (Rendering.JSON.JSON "diffs" SomeJSON)
-
-jsonDiff :: DiffEffects sig m => RenderJSON m syntax -> BlobPair -> m (Rendering.JSON.JSON "diffs" SomeJSON)
-jsonDiff f blobPair = doDiff (const id) (f blobPair) blobPair `catchError` jsonError blobPair
+jsonDiff :: DiffEffects sig m => BlobPair -> m (Rendering.JSON.JSON "diffs" SomeJSON)
+jsonDiff blobPair = doDiff (const id) (renderJSONTree blobPair) blobPair `catchError` jsonError blobPair
 
 jsonError :: Applicative m => BlobPair -> SomeException -> m (Rendering.JSON.JSON "diffs" SomeJSON)
 jsonError blobPair (SomeException e) = pure $ renderJSONDiffError blobPair (show e)
