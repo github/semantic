@@ -192,13 +192,13 @@ decoratingDiffWith
   -> (forall term . c term => DiffFor term ann ann -> m output)
   -> BlobPair
   -> m output
-decoratingDiffWith parsers decorate render blobPair = parsePairWith parsers (render <=< diffTerms blobPair . Join . bimap (decorate blobL) (decorate blobR) . runJoin) blobPair where
+decoratingDiffWith parsers decorate render blobPair = parsePairWith parsers (render <=< diffTerms blobPair . bimap (decorate blobL) (decorate blobR)) blobPair where
   (blobL, blobR) = fromThese errorBlob errorBlob (runJoin blobPair)
   errorBlob = Prelude.error "evaluating blob on absent side"
 
 diffTerms :: (DiffTerms term, Member Telemetry sig, Carrier sig m, MonadIO m)
-  => BlobPair -> Join These (term ann) -> m (DiffFor term ann ann)
+  => BlobPair -> These (term ann) (term ann) -> m (DiffFor term ann ann)
 diffTerms blobs terms = time "diff" languageTag $ do
-  let diff = diffTermPair (runJoin terms)
+  let diff = diffTermPair terms
   diff <$ writeStat (Stat.count "diff.nodes" (bilength diff) languageTag)
   where languageTag = languageTagForBlobPair blobs

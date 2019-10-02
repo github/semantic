@@ -49,9 +49,9 @@ parseWith parsers with blob = case lookup (blobLanguage blob) parsers of
 parsePairWith
   :: (Carrier sig m, Member (Error SomeException) sig, Member Parse sig)
   => [(Language, SomeParser c ann)]
-  -> (forall term . c term => Join These (term ann) -> m a)
+  -> (forall term . c term => These (term ann) (term ann) -> m a)
   -> BlobPair
   -> m a
 parsePairWith parsers with blobPair = case lookup (languageForBlobPair blobPair) parsers of
-  Just (SomeParser parser) -> traverse (parse parser) blobPair >>= with
+  Just (SomeParser parser) -> traverse (parse parser) blobPair >>= with . runJoin
   _                        -> noLanguageForBlob (pathForBlobPair blobPair)
