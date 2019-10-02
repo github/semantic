@@ -176,6 +176,9 @@ instance (Diffable syntax, Eq1 syntax, HasDeclaration syntax, Hashable1 syntax, 
         = TOCSummaryFile path language changes (V.cons (TOCSummaryError errorText (converting #? errorSpan)) errors)
 
 
+-- | Parse a 'BlobPair' using one of the provided parsers, diff the resulting terms, and run an action on the abstracted diff.
+--
+-- This allows us to define features using an abstract interface, and use them with diffs for any parser whose terms support that interface.
 diffWith
   :: (forall term . c term => DiffTerms term, DiffEffects sig m)
   => Map Language (SomeParser c Loc)
@@ -184,6 +187,9 @@ diffWith
   -> m output
 diffWith parsers render blobPair = parsePairWith parsers (render <=< diffTerms blobPair) blobPair
 
+-- | Parse a 'BlobPair' using one of the provided parsers, decorate the resulting terms, diff them, and run an action on the abstracted diff.
+--
+-- This allows us to define features using an abstract interface, and use them with diffs for any parser whose terms support that interface.
 decoratingDiffWith
   :: forall ann c output m sig
   .  (forall term . c term => DiffTerms term, DiffEffects sig m)
