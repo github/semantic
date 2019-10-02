@@ -104,12 +104,7 @@ parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate pa
   where
     parseArgumentsParser = do
       languageModes <- Language.PerLanguageModes
-        <$> option auto (  long "java-mode"
-                        <> help "The AST representation to use for Java sources"
-                        <> metavar "ALaCarte|Precise"
-                        <> value Language.ALaCarte
-                        <> showDefault)
-        <*> option auto (  long "python-mode"
+        <$> option auto (  long "python-mode"
                         <> help "The AST representation to use for Python sources"
                         <> metavar "ALaCarte|Precise"
                         <> value Language.ALaCarte
