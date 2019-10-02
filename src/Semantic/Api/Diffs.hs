@@ -124,8 +124,12 @@ instance ( ConstructorName t
          )
       => DiffActions t
 
-doDiff :: DiffEffects sig m
-  => BlobPair -> Decorate Loc ann -> (forall syntax . CanDiff syntax => BlobPair -> Diff syntax ann ann -> m output) -> m output
+doDiff
+  :: DiffEffects sig m
+  => BlobPair
+  -> Decorate Loc ann
+  -> (forall syntax . CanDiff syntax => BlobPair -> Diff syntax ann ann -> m output)
+  -> m output
 doDiff blobPair decorate render = do
   SomeTermPair terms <- doParse blobPair decorate
   diff <- diffTerms blobPair terms
