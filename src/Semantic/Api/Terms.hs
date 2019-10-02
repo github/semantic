@@ -143,29 +143,6 @@ instance (Foldable syntax, Functor syntax, ConstructorName syntax) => JSONGraphT
         lang = bridging # blobLanguage blob
 
 
-doParse
-  :: ( Carrier sig m
-     , Member (Error SomeException) sig
-     , Member Parse sig
-     )
-  => (forall term . term Loc -> m a)
-  -> Blob
-  -> m a
-doParse with blob = case blobLanguage blob of
-  Go         -> parse goParser         blob >>= with
-  Haskell    -> parse haskellParser    blob >>= with
-  JavaScript -> parse tsxParser        blob >>= with
-  JSON       -> parse jsonParser       blob >>= with
-  JSX        -> parse tsxParser        blob >>= with
-  Markdown   -> parse markdownParser   blob >>= with
-  Python     -> parse pythonParser     blob >>= with
-  Ruby       -> parse rubyParser       blob >>= with
-  TypeScript -> parse typescriptParser blob >>= with
-  TSX        -> parse tsxParser        blob >>= with
-  PHP        -> parse phpParser        blob >>= with
-  _          -> noLanguageForBlob (blobPath blob)
-
-
 parseWith
   :: (Carrier sig m, Member (Error SomeException) sig, Member Parse sig)
   => [(Language, SomeParser c ann)]
