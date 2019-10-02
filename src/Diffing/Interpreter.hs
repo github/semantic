@@ -16,30 +16,30 @@ import Prologue
 
 -- | Diff two à la carte terms recursively.
 diffTerms :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax)
-          => Term syntax ann
-          -> Term syntax ann
-          -> Diff.Diff syntax ann ann
+          => Term syntax ann1
+          -> Term syntax ann2
+          -> Diff.Diff syntax ann1 ann2
 diffTerms t1 t2 = stripDiff (fromMaybe (Diff.replacing t1' t2') (run (runNonDetOnce (runDiff (algorithmForTerms t1' t2')))))
   where (t1', t2') = ( defaultFeatureVectorDecorator t1
                      , defaultFeatureVectorDecorator t2)
 
 -- | Strips the head annotation off a diff annotated with non-empty records.
 stripDiff :: Functor syntax
-          => Diff.Diff syntax (FeatureVector, ann) (FeatureVector, ann)
-          -> Diff.Diff syntax ann ann
+          => Diff.Diff syntax (FeatureVector, ann1) (FeatureVector, ann2)
+          -> Diff.Diff syntax ann1 ann2
 stripDiff = bimap snd snd
 
 -- | Diff a 'These' of terms.
-diffTermPair :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => These (Term syntax ann) (Term syntax ann) -> Diff.Diff syntax ann ann
+diffTermPair :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => These (Term syntax ann1) (Term syntax ann2) -> Diff.Diff syntax ann1 ann2
 diffTermPair = these Diff.deleting Diff.inserting diffTerms
 
 
 -- | Run an 'Algorithm' to completion in an 'Alternative' context using the supplied comparability & equivalence relations.
 runDiff :: Algorithm
-             (Term syntax (FeatureVector, ann))
-             (Term syntax (FeatureVector, ann))
-             (Diff.Diff syntax (FeatureVector, ann) (FeatureVector, ann))
-             (DiffC (Term syntax (FeatureVector, ann)) (Term syntax (FeatureVector, ann)) (Diff.Diff syntax (FeatureVector, ann) (FeatureVector, ann)) m)
+             (Term syntax (FeatureVector, ann1))
+             (Term syntax (FeatureVector, ann2))
+             (Diff.Diff syntax (FeatureVector, ann1) (FeatureVector, ann2))
+             (DiffC (Term syntax (FeatureVector, ann1)) (Term syntax (FeatureVector, ann2)) (Diff.Diff syntax (FeatureVector, ann1) (FeatureVector, ann2)) m)
              result
         -> m result
 runDiff = runDiffC . runAlgorithm
@@ -57,8 +57,8 @@ instance ( Alternative m
          , Traversable syntax
          )
       => Carrier
-        (Diff (Term syntax (FeatureVector, ann)) (Term syntax (FeatureVector, ann)) (Diff.Diff syntax (FeatureVector, ann) (FeatureVector, ann)) :+: sig)
-        (DiffC (Term syntax (FeatureVector, ann)) (Term syntax (FeatureVector, ann)) (Diff.Diff syntax (FeatureVector, ann) (FeatureVector, ann)) m) where
+        (Diff (Term syntax (FeatureVector, ann1)) (Term syntax (FeatureVector, ann2)) (Diff.Diff syntax (FeatureVector, ann1) (FeatureVector, ann2)) :+: sig)
+        (DiffC (Term syntax (FeatureVector, ann1)) (Term syntax (FeatureVector, ann2)) (Diff.Diff syntax (FeatureVector, ann1) (FeatureVector, ann2)) m) where
   eff (L op) = case op of
     Diff t1 t2 k -> runDiff (algorithmForTerms t1 t2) <|> pure (Diff.replacing t1 t2) >>= k
     Linear (Term (In ann1 f1)) (Term (In ann2 f2)) k -> Diff.merge (ann1, ann2) <$> tryAlignWith (runDiff . diffThese) f1 f2 >>= k
