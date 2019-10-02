@@ -55,7 +55,7 @@ data DiffOutputFormat
 parseDiffBuilder :: (Traversable t, DiffEffects sig m) => DiffOutputFormat -> t BlobPair -> m Builder
 parseDiffBuilder DiffJSONTree    = distributeFoldMap (jsonDiff renderJSONTree) >=> serialize Format.JSON -- NB: Serialize happens at the top level for these two JSON formats to collect results of multiple blob pairs.
 parseDiffBuilder DiffJSONGraph   = diffGraph >=> serialize Format.JSON
-parseDiffBuilder DiffSExpression = distributeFoldMap sexpDiff
+parseDiffBuilder DiffSExpression = distributeFoldMap (doDiff (const id) sexprDiff)
 parseDiffBuilder DiffShow        = distributeFoldMap (doDiff (const id) showDiff)
 parseDiffBuilder DiffDotGraph    = distributeFoldMap dotGraphDiff
 
@@ -87,10 +87,6 @@ diffGraph blobs = DiffTreeGraphResponse . V.fromList . toList <$> distributeFor 
               toEdge (Edge (a, b)) = DiffTreeEdge (diffVertexId a) (diffVertexId b)
           in pure $ DiffTreeFileGraph path lang (V.fromList (vertexList graph)) (V.fromList (fmap toEdge (edgeList graph))) mempty
 
-
-sexpDiff :: DiffEffects sig m => BlobPair -> m Builder
-sexpDiff = doDiff (const id) (serialize (SExpression ByConstructorName))
-
 dotGraphDiff :: DiffEffects sig m => BlobPair -> m Builder
 dotGraphDiff = doDiff (const id) render
   where render :: (Carrier sig m, ConstructorName syntax, Foldable syntax, Functor syntax, Member (Reader Config) sig) => Diff syntax Loc Loc -> m Builder
@@ -99,6 +95,12 @@ dotGraphDiff = doDiff (const id) render
 type DiffEffects sig m = (Member (Error SomeException) sig, Member (Reader Config) sig, Member Telemetry sig, Member Distribute sig, Member Parse sig, Carrier sig m, MonadIO m)
 
 type Decorate a b = forall syntax . DiffActions syntax => Blob -> Term syntax a -> Term syntax b
+
+class SExprDiff diff where
+  sexprDiff :: (Carrier sig m, Member (Reader Config) sig) => diff Loc Loc -> m Builder
+
+instance (ConstructorName syntax, Foldable syntax, Functor syntax) => SExprDiff (Diff syntax) where
+  sexprDiff = serialize (SExpression ByConstructorName)
 
 class ShowDiff diff where
   showDiff :: (Carrier sig m, Member (Reader Config) sig) => diff Loc Loc -> m Builder
