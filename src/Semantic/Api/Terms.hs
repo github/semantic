@@ -1,4 +1,4 @@
-{-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, MonoLocalBinds, RankNTypes, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE ConstraintKinds, MonoLocalBinds, RankNTypes, UndecidableInstances #-}
 module Semantic.Api.Terms
   ( termGraph
   , parseTermBuilder
