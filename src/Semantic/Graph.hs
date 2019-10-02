@@ -75,7 +75,6 @@ class (Declarations1 syntax, Eq1 syntax, Evaluatable syntax, FreeVariables1 synt
 instance (Declarations1 syntax, Eq1 syntax, Evaluatable syntax, FreeVariables1 syntax, AccessControls1 syntax, Foldable syntax, Functor syntax, Ord1 syntax, Show1 syntax) => AnalysisClasses syntax
 
 runGraph :: ( Member Distribute sig
-            , Member (Error SomeException) sig
             , Member Parse sig
             , Member Resolution sig
             , Member Trace sig
@@ -232,7 +231,7 @@ runScopeGraph :: Ord address
 runScopeGraph = raiseHandler (runState lowerBound)
 
 -- | Parse a list of files into a 'Package'.
-parsePackage :: (Member Distribute sig, Member (Error SomeException) sig, Member Resolution sig, Member Parse sig, Member Trace sig, Carrier sig m)
+parsePackage :: (Member Distribute sig, Member Resolution sig, Member Parse sig, Member Trace sig, Carrier sig m)
              => Parser term -- ^ A parser.
              -> Project     -- ^ Project to parse into a package.
              -> m (Package (Blob, term))
@@ -246,8 +245,8 @@ parsePackage parser project = do
     n = Data.Abstract.Evaluatable.name (projectName project) -- TODO: Confirm this is the right `name`.
 
 -- | Parse all files in a project into 'Module's.
-parseModules :: (Member Distribute sig, Member (Error SomeException) sig, Member Parse sig, Carrier sig m) => Parser term -> Project -> m [Module (Blob, term)]
-parseModules parser p@Project{..} = distributeFor (projectFiles p) (parseModule p parser)
+parseModules :: (Member Distribute sig, Member Parse sig, Carrier sig m) => Parser term -> Project -> m [Module (Blob, term)]
+parseModules parser p = distributeFor (projectBlobs p) (parseModule p parser)
 
 
 -- | Parse a list of packages from a python project.
@@ -258,7 +257,6 @@ parsePythonPackage :: forall syntax sig m term.
                    , AccessControls1 syntax
                    , Functor syntax
                    , term ~ Term syntax Loc
-                   , Member (Error SomeException) sig
                    , Member Distribute sig
                    , Member Parse sig
                    , Member Resolution sig
@@ -291,7 +289,7 @@ parsePythonPackage parser project = do
         . raiseHandler (runState (lowerBound @(ScopeGraph (Hole (Maybe Name) Precise))))
         . runAllocator
 
-  strat <- case find ((== (projectRootDir project </> "setup.py")) . filePath) (projectFiles project) of
+  strat <- case find (\b -> blobPath b == (projectRootDir project </> "setup.py")) (projectBlobs project) of
     Just setupFile -> do
       setupModule <- fmap snd <$> parseModule project parser setupFile
       fst <$> runAnalysis (evaluate (Proxy @'Language.Python) (runDomainEffects (runPythonPackaging . evalTerm id)) [ setupModule ])
@@ -301,37 +299,33 @@ parsePythonPackage parser project = do
       modules <- fmap (fmap snd) <$> parseModules parser project
       resMap <- Task.resolutionMap project
       pure (Package.fromModules (Data.Abstract.Evaluatable.name (projectName project)) modules resMap) -- TODO: Confirm this is the right `name`.
-    PythonPackage.Packages dirs -> do
-      filteredBlobs <- for dirs $ \dir -> do
-        let packageDir = projectRootDir project </> unpack dir
-        let paths = filter ((packageDir `isPrefixOf`) . filePath) (projectFiles project)
-        traverse (readFile project) paths
-      packageFromProject project filteredBlobs
+    PythonPackage.Packages dirs ->
+      packageFromProject project [ blob | dir <- dirs
+                                        , blob <- projectBlobs project
+                                        , packageDir <- [projectRootDir project </> unpack dir]
+                                        , packageDir `isPrefixOf` blobPath blob
+                                        ]
     PythonPackage.FindPackages excludeDirs -> do
       trace "In Graph.FindPackages"
       let initFiles = filter (("__init__.py" `isSuffixOf`) . filePath) (projectFiles project)
       let packageDirs = filter (`notElem` ((projectRootDir project </>) . unpack <$> excludeDirs)) (takeDirectory . filePath <$> initFiles)
-      filteredBlobs <- for packageDirs $ \dir -> do
-        let paths = filter ((dir `isPrefixOf`) . filePath) (projectFiles project)
-        traverse (readFile project) paths
-      packageFromProject project filteredBlobs
+      packageFromProject project [ blob | dir <- packageDirs
+                                        , blob <- projectBlobs project
+                                        , dir `isPrefixOf` blobPath blob
+                                        ]
     where
       packageFromProject project filteredBlobs = do
-        let p = project { projectBlobs = catMaybes $ join filteredBlobs }
+        let p = project { projectBlobs = filteredBlobs }
         modules <- fmap (fmap snd) <$> parseModules parser p
         resMap <- Task.resolutionMap p
         pure (Package.fromModules (Data.Abstract.Evaluatable.name $ projectName p) modules resMap) -- TODO: Confirm this is the right `name`.
 
-parseModule :: (Member (Error SomeException) sig, Member Parse sig, Carrier sig m)
+parseModule :: (Member Parse sig, Carrier sig m)
             => Project
             -> Parser term
-            -> File
+            -> Blob
             -> m (Module (Blob, term))
-parseModule proj parser file = do
-  mBlob <- readFile proj file
-  case mBlob of
-    Just blob -> moduleForBlob (Just (projectRootDir proj)) blob . (,) blob <$> parse parser blob
-    Nothing   -> throwError (SomeException (FileNotFound (filePath file)))
+parseModule proj parser blob = moduleForBlob (Just (projectRootDir proj)) blob . (,) blob <$> parse parser blob
 
 withTermSpans :: ( Member (Reader Span) sig
                  , Member (State Span) sig -- last evaluated child's span
