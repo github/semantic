@@ -5,6 +5,7 @@ module Semantic.Api.Diffs
   , diffGraph
 
   , doDiff
+  , diffWith
   , DiffEffects
 
   , SomeTermPair(..)
