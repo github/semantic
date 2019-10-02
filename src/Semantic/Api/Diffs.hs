@@ -49,7 +49,6 @@ import           Serializing.Format hiding (JSON)
 import qualified Serializing.Format as Format
 import           Source.Loc
 
-
 data DiffOutputFormat
   = DiffJSONTree
   | DiffJSONGraph

@@ -111,7 +111,6 @@ instance (ConstructorName syntax, Foldable syntax) =>
                                      & P.maybe'beforeSpan .~ beforeSpan
                                      & P.afterTerm .~ afterName
                                      & P.maybe'afterSpan .~ afterSpan)
-      -- graph <- local (const replace) (overlay <$> diffAlgebra t1 (Deleted (Just (DeletedTerm beforeName beforeSpan))) <*> diffAlgebra t2 (Inserted (Just (InsertedTerm afterName afterSpan))))
       graph <- local (const replace) (overlay <$> diffAlgebra t1 (DiffTreeVertex'Deleted (defMessage & P.term .~ beforeName & P.maybe'span .~ beforeSpan)) <*> diffAlgebra t2 (DiffTreeVertex'Inserted (defMessage & P.term .~ afterName & P.maybe'span .~ afterSpan)))
       pure (parent `connect` replace `overlay` graph)
     where
