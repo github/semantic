@@ -201,6 +201,9 @@ someASTParser Markdown   = Nothing
 someASTParser Unknown    = Nothing
 
 
+-- | A parser producing terms of existentially-quantified type under some constraint @c@.
+--
+--   This can be used to perform actions on terms supporting some feature abstracted using a typeclass, without knowing (or caring) what the specific term types are.
 data SomeParser c a where
   SomeParser :: c t => Parser (t a) -> SomeParser c a
 
