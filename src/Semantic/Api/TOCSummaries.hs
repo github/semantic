@@ -20,13 +20,13 @@ import           Semantic.Proto.SemanticPB hiding (Blob, BlobPair)
 import           Semantic.Task as Task
 import           Serializing.Format
 
-diffSummaryBuilder :: (DiffEffects sig m) => Format DiffTreeTOCResponse -> [BlobPair] -> m Builder
+diffSummaryBuilder :: DiffEffects sig m => Format DiffTreeTOCResponse -> [BlobPair] -> m Builder
 diffSummaryBuilder format blobs = diffSummary blobs >>= serialize format
 
-legacyDiffSummary :: (DiffEffects sig m) => [BlobPair] -> m Summaries
+legacyDiffSummary :: DiffEffects sig m => [BlobPair] -> m Summaries
 legacyDiffSummary = distributeFoldMap go
   where
-    go :: (DiffEffects sig m) => BlobPair -> m Summaries
+    go :: DiffEffects sig m => BlobPair -> m Summaries
     go blobPair = doDiff (\ blob -> decoratorWithAlgebra (declarationAlgebra blob)) (render blobPair) blobPair
       `catchError` \(SomeException e) ->
         pure $ Summaries mempty (Map.singleton path [toJSON (ErrorSummary (T.pack (show e)) lowerBound lang)])
@@ -36,10 +36,10 @@ legacyDiffSummary = distributeFoldMap go
     render :: (Foldable syntax, Functor syntax, Applicative m) => BlobPair -> Diff syntax (Maybe Declaration) (Maybe Declaration) -> m Summaries
     render blobPair = pure . renderToCDiff blobPair
 
-diffSummary :: (DiffEffects sig m) => [BlobPair] -> m DiffTreeTOCResponse
+diffSummary :: DiffEffects sig m => [BlobPair] -> m DiffTreeTOCResponse
 diffSummary blobs = DiffTreeTOCResponse . V.fromList <$> distributeFor blobs go
   where
-    go :: (DiffEffects sig m) => BlobPair -> m TOCSummaryFile
+    go :: DiffEffects sig m => BlobPair -> m TOCSummaryFile
     go blobPair = doDiff (\ blob -> decoratorWithAlgebra (declarationAlgebra blob)) (render blobPair) blobPair
       `catchError` \(SomeException e) ->
         pure $ TOCSummaryFile path lang mempty (V.fromList [TOCSummaryError (T.pack (show e)) Nothing])
