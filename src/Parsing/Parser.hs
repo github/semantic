@@ -36,8 +36,8 @@ module Parsing.Parser
 , pythonParserPrecise'
 , pythonParser'
 , rubyParser'
-, typescriptParser'
 , tsxParser'
+, typescriptParser'
 ) where
 
 import           Assigning.Assignment
@@ -244,8 +244,8 @@ pythonParser' modes = case pythonMode modes of
 rubyParser' :: c (Term (Sum Ruby.Syntax)) => (Language, SomeParser c Loc)
 rubyParser' = (Ruby, SomeParser rubyParser)
 
-typescriptParser' :: c (Term (Sum TypeScript.Syntax)) => (Language, SomeParser c Loc)
-typescriptParser' = (TypeScript, SomeParser typescriptParser)
-
 tsxParser' :: c (Term (Sum TSX.Syntax)) => (Language, SomeParser c Loc)
 tsxParser' = (TSX, SomeParser tsxParser)
+
+typescriptParser' :: c (Term (Sum TypeScript.Syntax)) => (Language, SomeParser c Loc)
+typescriptParser' = (TypeScript, SomeParser typescriptParser)
