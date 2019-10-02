@@ -203,7 +203,18 @@ instance Compile Py.Block where
 
 instance Compile Py.BooleanOperator
 instance Compile Py.BreakStatement
-instance Compile Py.Call
+
+instance Compile Py.Call where
+  compileCC it@Py.Call
+    { function
+    , arguments = L1 Py.ArgumentList { extraChildren = args }
+    } cc = do
+    func <- compileCC function cc
+    -- Python function arguments are defined to evaluate left to right.
+    args <- traverse (flip compileCC cc) args
+    locate it (func $$* args)
+  compileCC it _cc = fail ("can't compile Call node with generator expression: " <> show it)
+
 instance Compile Py.ClassDefinition
 instance Compile Py.ComparisonOperator
 
@@ -216,6 +227,7 @@ instance Compile Py.DecoratedDefinition
 instance Compile Py.DeleteStatement
 instance Compile Py.Dictionary
 instance Compile Py.DictionaryComprehension
+instance Compile Py.DictionarySplat
 instance Compile Py.Ellipsis
 instance Compile Py.ExecStatement
 
@@ -278,9 +290,17 @@ instance Compile Py.IfStatement where
 instance Compile Py.ImportFromStatement
 instance Compile Py.ImportStatement
 instance Compile Py.Integer
+
+-- Buggy: ignores the semantics of the provided name. This requires
+-- coordination between Call nodes and KeywordArgument nodes, which is
+-- a sign that we need something smarter here, but it'll do for now.
+instance Compile Py.KeywordArgument where
+  compileCC Py.KeywordArgument { value } cc = compileCC value cc
+
 instance Compile Py.Lambda
 instance Compile Py.List
 instance Compile Py.ListComprehension
+instance Compile Py.ListSplat
 
 instance Compile Py.Module where
   compileCC it@Py.Module { Py.extraChildren = stmts } _cc = do
@@ -299,7 +319,10 @@ instance Compile Py.NamedExpression
 instance Compile Py.None
 instance Compile Py.NonlocalStatement
 instance Compile Py.NotOperator
-instance Compile Py.ParenthesizedExpression
+
+instance Compile Py.ParenthesizedExpression where
+  compileCC it@Py.ParenthesizedExpression { extraChildren } cc
+    = compileCC extraChildren cc >>= locate it
 
 instance Compile Py.PassStatement where
   compileCC it@Py.PassStatement {} _ = locate it $ Core.unit
