@@ -56,7 +56,6 @@ assertJQExpressionSucceeds directive tree core = do
     (heap, [File _ (Right result)]) -> pure $ Aeson.object
       [ "scope" Aeson..= heap
       , "heap"  Aeson..= result
-      , "tree"  Aeson..= Aeson.toJSON1 core
       ]
     _other                       -> HUnit.assertFailure "Couldn't run scope dumping mechanism; this shouldn't happen"
 
