@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, GADTs, RankNTypes #-}
+{-# LANGUAGE ConstraintKinds, MonoLocalBinds, RankNTypes #-}
 module Semantic.Api.Terms
   ( termGraph
   , parseTermBuilder
