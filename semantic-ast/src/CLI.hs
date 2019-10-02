@@ -29,9 +29,13 @@ parseAST = SemanticAST
        <> help "Specify format --json --sexpression --show" )
 
 main :: IO ()
-main = do
-  args <- head <$> getArgs
-  bytestring <- Data.ByteString.readFile args
+main = generateAST =<< execParser opts
+ where
+   opts = info (parseAST <**> helper)
+     ( fullDesc
+    <> progDesc "Read a file, output an AST"
+    <> header "semantic-ast - generates ASTs" )
+
 generateAST :: SemanticAST -> IO ()
 generateAST (SemanticAST file _) = do
   bytestring <- Data.ByteString.readFile file
