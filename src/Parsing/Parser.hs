@@ -20,8 +20,6 @@ module Parsing.Parser
 , phpParser
 , phpASTParser
 , haskellParser
-  -- * Precise parsers
-, precisePythonParser
   -- * Abstract parsers
 , SomeParser(..)
 , goParser'
