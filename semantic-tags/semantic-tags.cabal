@@ -20,8 +20,6 @@ tested-with:         GHC == 8.6.5
 
 library
   exposed-modules:
-    Language.Python
-    Language.Python.Tags
     Tags.Tag
     Tags.Tagging.Precise
   build-depends:
@@ -29,8 +27,6 @@ library
     , fused-effects      ^>= 0.5
     , semantic-source    ^>= 0.0
     , text               ^>= 1.2.3.1
-    , tree-sitter        ^>= 0.4
-    , tree-sitter-python ^>= 0.5
   hs-source-dirs:      src
   default-language:    Haskell2010
   ghc-options:
