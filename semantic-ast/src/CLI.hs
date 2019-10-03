@@ -40,6 +40,14 @@ generateAST :: SemanticAST -> IO ()
 generateAST (SemanticAST file _) = do
   bytestring <- Data.ByteString.readFile file
   print =<< parseByteString @TreeSitter.Python.AST.Module @(Range, Span) tree_sitter_python bytestring
+-- pass in a file as an argument and parse its contents
+fileInput :: Parser Input
+fileInput = FileInput <$> strOption
+  (  long "file"
+  <> short 'f'
+  <> metavar "FILENAME"
+  <> help "Input file" )
+
 -- cat something in
 stdInput :: Parser Input
 stdInput = flag' StdInput
