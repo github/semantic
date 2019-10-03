@@ -28,13 +28,18 @@ instance (ToSExpressionBy strategy t, strategy ~ ToSExpressionStrategy t) => ToS
   toSExpression = toSExpression' @strategy
 
 
-data Strategy = Generic
+data Strategy = Generic | Custom
 
 type family ToSExpressionStrategy (t :: * -> *) :: Strategy where
-  ToSExpressionStrategy _    = 'Generic
+  ToSExpressionStrategy (_ :+: _) = 'Custom
+  ToSExpressionStrategy _         = 'Generic
 
 class ToSExpressionBy (strategy :: Strategy) t where
   toSExpression' :: t ann -> Int -> Builder
+
+instance (ToSExpression l, ToSExpression r) => ToSExpressionBy 'Custom (l :+: r) where
+  toSExpression' (L1 l) = toSExpression l
+  toSExpression' (R1 r) = toSExpression r
 
 instance (Generic1 t, GToSExpression (Rep1 t)) => ToSExpressionBy 'Generic t where
   toSExpression' t n = nl n <> pad n <> "(" <> fold (intersperse " " (gtoSExpression (from1 t) n)) <> ")"
