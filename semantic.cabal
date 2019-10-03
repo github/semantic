@@ -304,9 +304,9 @@ library
                      , prettyprinter ^>= 1.2.1
                      , pretty-show ^>= 1.9.5
                      , profunctors ^>= 5.3
-                     , proto-lens == 0.5.1.0
+                     , proto-lens ^>= 0.5.1.0
                      , proto-lens-jsonpb
-                     , proto-lens-runtime == 0.5.0.0
+                     , proto-lens-runtime ^>= 0.5.0.0
                      , reducers ^>= 3.12.3
                      , semantic-tags ^>= 0
                      , semigroupoids ^>= 5.3.2
