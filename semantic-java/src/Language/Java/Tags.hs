@@ -5,7 +5,6 @@ module Language.Java.Tags
 
 import           Control.Effect.Reader
 import           Control.Effect.Writer
-import           Data.Foldable (traverse_)
 import           Data.Monoid (Ap(..))
 import           Data.Text as Text
 import           GHC.Generics
@@ -54,14 +53,9 @@ instance (ToTags l, ToTags r) => ToTagsBy 'Custom (l :+: r) where
   tags' (R1 r) = tags r
 
 instance ToTagsBy 'Custom Java.MethodDeclaration where
-  tags' Java.MethodDeclaration
+  tags' t@Java.MethodDeclaration
     { ann = Loc range span
     , name = Java.Identifier { bytes = name }
-    , dimensions
-    , extraChildren
-    , typeParameters
-    , parameters
-    , type'
     , body
     } = do
       src <- ask @Source
@@ -71,12 +65,7 @@ instance ToTagsBy 'Custom Java.MethodDeclaration where
               Nothing                                       -> end range
             }
       Tags.yield (Tag name Method span (firstLine sliced) Nothing)
-      traverse_ tags typeParameters
-      tags parameters
-      tags type'
-      traverse_ tags dimensions
-      traverse_ tags extraChildren
-      traverse_ tags body
+      gtags t
 
 instance ToTagsBy 'Custom Java.ClassDeclaration where
   tags' t@Java.ClassDeclaration
