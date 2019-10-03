@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, OverloadedStrings, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes, DataKinds, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, OverloadedStrings, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Serializing.SExpression.Precise
 ( serializeSExpression
 , ToSExpression(..)
@@ -26,7 +26,7 @@ class ToSExpression t where
   toSExpression :: t -> Int -> Builder
 
 instance (ToSExpressionBy strategy t, strategy ~ ToSExpressionStrategy t) => ToSExpression t where
-  toSExpression = toSExpression' @strategy undefined
+  toSExpression = toSExpression' @strategy
 
 
 data Strategy = Generic | Show
@@ -36,13 +36,13 @@ type family ToSExpressionStrategy t :: Strategy where
   ToSExpressionStrategy _    = 'Generic
 
 class ToSExpressionBy (strategy :: Strategy) t where
-  toSExpression' :: proxy strategy -> t -> Int -> Builder
+  toSExpression' :: t -> Int -> Builder
 
 instance Show t => ToSExpressionBy 'Show t where
-  toSExpression' _ t _ = stringUtf8 (show t)
+  toSExpression' t _ = stringUtf8 (show t)
 
 instance (Generic t, GToSExpression (Rep t)) => ToSExpressionBy 'Generic t where
-  toSExpression' _ t n = nl n <> pad n <> "(" <> fold (intersperse " " (gtoSExpression (from t) n)) <> ")"
+  toSExpression' t n = nl n <> pad n <> "(" <> fold (intersperse " " (gtoSExpression (from t) n)) <> ")"
 
 
 class GToSExpression f where
