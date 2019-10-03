@@ -31,7 +31,7 @@ data Format = Show deriving (Read)
 
 data SemanticAST = SemanticAST
   { sourceFilePath :: Prelude.String
-  , format         :: Prelude.String
+  , format         :: Format
   }
 
 parseAST :: Parser SemanticAST
