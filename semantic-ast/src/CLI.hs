@@ -40,3 +40,8 @@ generateAST :: SemanticAST -> IO ()
 generateAST (SemanticAST file _) = do
   bytestring <- Data.ByteString.readFile file
   print =<< parseByteString @TreeSitter.Python.AST.Module @(Range, Span) tree_sitter_python bytestring
+-- cat something in
+stdInput :: Parser Input
+stdInput = flag' StdInput
+  (  long "stdin"
+  <> help "Read from stdin" )
