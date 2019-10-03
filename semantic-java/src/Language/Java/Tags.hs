@@ -6,7 +6,6 @@ module Language.Java.Tags
 import           Control.Effect.Reader
 import           Control.Effect.Writer
 import           Data.Monoid (Ap(..))
-import           Data.Text as Text
 import           GHC.Generics
 import           Source.Loc
 import           Source.Range
@@ -64,7 +63,7 @@ instance ToTagsBy 'Custom Java.MethodDeclaration where
               Just Java.Block { ann = Loc Range { end } _ } -> end
               Nothing                                       -> end range
             }
-      Tags.yield (Tag name Method span (firstLine sliced) Nothing)
+      Tags.yield (Tag name Method span (Tags.firstLine sliced) Nothing)
       gtags t
 
 instance ToTagsBy 'Custom Java.ClassDeclaration where
@@ -75,7 +74,7 @@ instance ToTagsBy 'Custom Java.ClassDeclaration where
     } = do
       src <- ask @Source
       let sliced = slice src (Range start end)
-      Tags.yield (Tag name Class span (firstLine sliced) Nothing)
+      Tags.yield (Tag name Class span (Tags.firstLine sliced) Nothing)
       gtags t
 
 instance ToTagsBy 'Custom Java.MethodInvocation where
@@ -85,11 +84,8 @@ instance ToTagsBy 'Custom Java.MethodInvocation where
     } = do
       src <- ask @Source
       let sliced = slice src range
-      Tags.yield (Tag name Call span (firstLine sliced) Nothing)
+      Tags.yield (Tag name Call span (Tags.firstLine sliced) Nothing)
       gtags t
-
-firstLine :: Source -> Text
-firstLine = Text.takeWhile (/= '\n') . toText . Source.take 180
 
 
 gtags

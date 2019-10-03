@@ -4,6 +4,7 @@ module Tags.Tagging.Precise
 , ToTags(..)
 , yield
 , runTagging
+, firstLine
 , GFoldable1(..)
 ) where
 
@@ -11,11 +12,12 @@ import Control.Effect.Pure
 import Control.Effect.Reader
 import Control.Effect.Writer
 import Data.Monoid (Endo(..))
+import Data.Text as Text (Text, takeWhile)
 import GHC.Generics
 import Prelude hiding (span)
 import Source.Loc (Loc)
 import Source.Span
-import Source.Source
+import Source.Source as Source
 import Tags.Tag
 
 type Tags = Endo [Tag]
@@ -36,6 +38,9 @@ runTagging source
   . run
   . execWriter
   . runReader source
+
+firstLine :: Source -> Text
+firstLine = Text.takeWhile (/= '\n') . toText . Source.take 180
 
 
 -- FIXME: move GFoldable1 into semantic-ast.

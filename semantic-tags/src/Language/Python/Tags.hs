@@ -66,7 +66,7 @@ instance ToTagsBy 'Custom Py.FunctionDefinition where
       src <- ask @Source
       let docs = listToMaybe extraChildren >>= docComment src
           sliced = slice src (Range start end)
-      Tags.yield (Tag name Function span (firstLine sliced) docs)
+      Tags.yield (Tag name Function span (Tags.firstLine sliced) docs)
       tags parameters
       traverse_ tags returnType
       traverse_ tags extraChildren
@@ -81,7 +81,7 @@ instance ToTagsBy 'Custom Py.ClassDefinition where
       src <- ask @Source
       let docs = listToMaybe extraChildren >>= docComment src
           sliced = slice src (Range start end)
-      Tags.yield (Tag name Class span (firstLine sliced) docs)
+      Tags.yield (Tag name Class span (Tags.firstLine sliced) docs)
       traverse_ tags superclasses
       traverse_ tags extraChildren
 
@@ -93,16 +93,13 @@ instance ToTagsBy 'Custom Py.Call where
     } = do
       src <- ask @Source
       let sliced = slice src range
-      Tags.yield (Tag name Call span (firstLine sliced) Nothing)
+      Tags.yield (Tag name Call span (Tags.firstLine sliced) Nothing)
       tags arguments
   tags' Py.Call { function, arguments } = tags function >> tags arguments
 
 docComment :: Source -> (Py.CompoundStatement :+: Py.SimpleStatement) Loc -> Maybe Text
 docComment src (R1 (Py.ExpressionStatementSimpleStatement (Py.ExpressionStatement { extraChildren = L1 (Py.PrimaryExpressionExpression (Py.StringPrimaryExpression Py.String { ann })) :|_ }))) = Just (toText (slice src (byteRange ann)))
 docComment _ _ = Nothing
-
-firstLine :: Source -> Text
-firstLine = Text.takeWhile (/= '\n') . toText . Source.take 180
 
 
 instance (Generic1 t, Tags.GFoldable1 ToTags (Rep1 t)) => ToTagsBy 'Generic t where
