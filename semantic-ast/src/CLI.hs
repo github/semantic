@@ -40,10 +40,9 @@ parseAST = SemanticAST
         ( long "semantic-ast"
        <> metavar "FILEPATH"
        <> help "Specify filepath containing source code to parse" )
-    <*> strOption
-        ( long "format"
-       <> help "Specify one these formats: -json -sexpression -show" )
-
+    <*> option auto
+          ( long "format"
+         <> help "The format you want to display")
 data Input
   = FileInput FilePath
   | StdInput
