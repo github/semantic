@@ -42,12 +42,7 @@ parseAST = SemanticAST
        <> help "Specify filepath containing source code to parse" )
     <*> strOption
         ( long "format"
-       <> help "Specify format --json --sexpression --show" )
-
-generateAST :: SemanticAST -> IO ()
-generateAST (SemanticAST file _) = do
-  bytestring <- Data.ByteString.readFile file
-  print =<< parseByteString @TreeSitter.Python.AST.Module @(Range, Span) tree_sitter_python bytestring
+       <> help "Specify one these formats: -json -sexpression -show" )
 
 input :: Parser Input
 input = fileInput <|> stdInput
