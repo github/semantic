@@ -72,18 +72,16 @@ instance ToTagsBy 'Custom Py.FunctionDefinition where
       traverse_ tags extraChildren
 
 instance ToTagsBy 'Custom Py.ClassDefinition where
-  tags' Py.ClassDefinition
+  tags' t@Py.ClassDefinition
     { ann = Loc Range { start } span
     , name = Py.Identifier { bytes = name }
-    , superclasses
     , body = Py.Block { ann = Loc Range { start = end } _, extraChildren }
     } = do
       src <- ask @Source
       let docs = listToMaybe extraChildren >>= docComment src
           sliced = slice src (Range start end)
       Tags.yield (Tag name Class span (Tags.firstLine sliced) docs)
-      traverse_ tags superclasses
-      traverse_ tags extraChildren
+      gtags t
 
 instance ToTagsBy 'Custom Py.Call where
   tags' t@Py.Call
