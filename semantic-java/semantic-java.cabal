@@ -24,7 +24,6 @@ library
     Language.Java.Tags
   build-depends:
       base                >= 4.12 && < 5
-    , bytestring         ^>= 0.10.8.2
     , fused-effects      ^>= 0.5
     , semantic-source    ^>= 0.0
     , semantic-tags      ^>= 0.0
