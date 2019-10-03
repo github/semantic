@@ -78,5 +78,5 @@ instance ToSExpression t => GToSExpression (Rec1 t) where
 
 instance (Foldable f, GToSExpression g) => GToSExpression (f :.: g) where
   gtoSExpression (Comp1 fs) n
-    | null fs   = [nl n <> pad n <> "()"]
-    | otherwise = nl n <> pad n <> "(" : foldMap gtoSExpression fs (n + 1) <> [")"]
+    | null fs   = [nl n <> pad n <> "[]"]
+    | otherwise = nl n <> pad n <> "[" : foldMap gtoSExpression fs (n + 1) <> ["]"]
