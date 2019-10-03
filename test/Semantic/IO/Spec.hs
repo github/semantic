@@ -15,7 +15,7 @@ import           Data.Blob
 import           Data.Handle
 import qualified Semantic.Git as Git
 import           Shelly (cd, run_, shelly, silently, touchfile, writefile)
-import           SpecHelpers hiding (readFile)
+import           SpecHelpers
 import           System.Path ((</>))
 import qualified System.Path as Path
 

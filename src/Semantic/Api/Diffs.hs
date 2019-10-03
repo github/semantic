@@ -27,20 +27,22 @@ import           Data.ByteString.Builder
 import           Data.Graph
 import           Data.JSON.Fields
 import           Data.Language
+import           Data.ProtoLens (defMessage)
 import           Data.Term
 import qualified Data.Text as T
-import qualified Data.Vector as V
 import           Diffing.Algorithm (Diffable)
 import           Diffing.Interpreter (DiffTerms(..))
 import           Parsing.Parser
 import           Prologue
+import           Proto.Semantic as P hiding (Blob, BlobPair)
+import           Proto.Semantic_Fields as P
+import           Proto.Semantic_JSON()
 import           Rendering.Graph
 import           Rendering.JSON hiding (JSON)
 import qualified Rendering.JSON
 import           Rendering.TOC
 import           Semantic.Api.Bridge
 import           Semantic.Config
-import           Semantic.Proto.SemanticPB hiding (Blob, BlobPair)
 import           Semantic.Task as Task
 import           Semantic.Telemetry as Stat
 import           Serializing.Format hiding (JSON)
@@ -69,12 +71,19 @@ jsonError :: Applicative m => BlobPair -> SomeException -> m (Rendering.JSON.JSO
 jsonError blobPair (SomeException e) = pure $ renderJSONDiffError blobPair (show e)
 
 diffGraph :: (Traversable t, DiffEffects sig m) => t BlobPair -> m DiffTreeGraphResponse
-diffGraph blobs = DiffTreeGraphResponse . V.fromList . toList <$> distributeFor blobs go
+diffGraph blobs = do
+  graph <- distributeFor blobs go
+  pure $ defMessage & P.files .~ toList graph
   where
     go :: DiffEffects sig m => BlobPair -> m DiffTreeFileGraph
     go blobPair = diffWith jsonGraphDiffParsers (pure . jsonGraphDiff blobPair) blobPair
       `catchError` \(SomeException e) ->
-        pure (DiffTreeFileGraph path lang mempty mempty (V.fromList [ParseError (T.pack (show e))]))
+        pure $ defMessage
+          & P.path .~ path
+          & P.language .~ lang
+          & P.vertices .~ mempty
+          & P.edges .~ mempty
+          & P.errors .~ [defMessage & P.error .~ T.pack (show e)]
       where
         path = T.pack $ pathForBlobPair blobPair
         lang = bridging # languageForBlobPair blobPair
@@ -101,10 +110,15 @@ class DiffTerms term => JSONGraphDiff term where
 instance (ConstructorName syntax, Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => JSONGraphDiff (Term syntax) where
   jsonGraphDiff blobPair diff
     = let graph = renderTreeGraph diff
-          toEdge (Edge (a, b)) = DiffTreeEdge (diffVertexId a) (diffVertexId b)
-      in DiffTreeFileGraph path lang (V.fromList (vertexList graph)) (V.fromList (fmap toEdge (edgeList graph))) mempty where
-        path = T.pack $ pathForBlobPair blobPair
-        lang = bridging # languageForBlobPair blobPair
+          toEdge (Edge (a, b)) = defMessage & P.source .~ a^.diffVertexId & P.target .~ b^.diffVertexId
+          path = T.pack $ pathForBlobPair blobPair
+          lang = bridging # languageForBlobPair blobPair
+      in defMessage
+           & P.path .~ path
+           & P.language .~ lang
+           & P.vertices .~ vertexList graph
+           & P.edges .~ fmap toEdge (edgeList graph)
+           & P.errors .~ mempty
 
 
 jsonTreeDiffParsers :: Map Language (SomeParser JSONTreeDiff Loc)
@@ -158,22 +172,29 @@ class DiffTerms term => SummarizeDiff term where
 
 instance (Diffable syntax, Eq1 syntax, HasDeclaration syntax, Hashable1 syntax, Traversable syntax) => SummarizeDiff (Term syntax) where
   decorateTerm = decoratorWithAlgebra . declarationAlgebra
-  summarizeDiff blobPair diff = foldr go (TOCSummaryFile path lang mempty mempty) (diffTOC diff)
+  summarizeDiff blobPair diff = foldr go (defMessage & P.path .~ path & P.language .~ lang) (diffTOC diff)
     where
       path = T.pack $ pathKeyForBlobPair blobPair
       lang = bridging # languageForBlobPair blobPair
 
       toChangeType = \case
-        "added" -> Added
-        "modified" -> Modified
-        "removed" -> Removed
-        _ -> None
+        "added" -> ADDED
+        "modified" -> MODIFIED
+        "removed" -> REMOVED
+        _ -> NONE
 
       go :: TOCSummary -> TOCSummaryFile -> TOCSummaryFile
-      go TOCSummary{..} TOCSummaryFile{..}
-        = TOCSummaryFile path language (V.cons (TOCSummaryChange summaryCategoryName summaryTermName (converting #? summarySpan) (toChangeType summaryChangeType)) changes) errors
-      go ErrorSummary{..} TOCSummaryFile{..}
-        = TOCSummaryFile path language changes (V.cons (TOCSummaryError errorText (converting #? errorSpan)) errors)
+      go TOCSummary{..} file = defMessage
+        & P.path .~ file^.P.path
+        & P.language .~ file^.P.language
+        & P.changes .~ (defMessage & P.category .~ summaryCategoryName & P.term .~ summaryTermName & P.maybe'span .~ (converting #? summarySpan) & P.changeType .~ toChangeType summaryChangeType) : file^.P.changes
+        & P.errors .~ file^.P.errors
+
+      go ErrorSummary{..} file = defMessage
+        & P.path .~ file^.P.path
+        & P.language .~ file^.P.language
+        & P.changes .~ file^.P.changes
+        & P.errors .~ (defMessage & P.error .~ errorText & P.maybe'span .~ converting #? errorSpan) : file^.P.errors
 
 
 -- | Parse a 'BlobPair' using one of the provided parsers, diff the resulting terms, and run an action on the abstracted diff.

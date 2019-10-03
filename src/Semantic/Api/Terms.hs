@@ -18,18 +18,20 @@ import           Data.Either
 import           Data.Graph
 import           Data.JSON.Fields
 import           Data.Language
+import           Data.ProtoLens (defMessage)
 import           Data.Quieterm
 import           Data.Term
 import qualified Data.Text as T
-import qualified Data.Vector as V
 import           Parsing.Parser
 import           Prologue
+import           Proto.Semantic as P hiding (Blob)
+import           Proto.Semantic_Fields as P
+import           Proto.Semantic_JSON()
 import           Rendering.Graph
 import           Rendering.JSON hiding (JSON)
 import qualified Rendering.JSON
 import           Semantic.Api.Bridge
 import           Semantic.Config
-import           Semantic.Proto.SemanticPB hiding (Blob)
 import           Semantic.Task
 import           Serializing.Format hiding (JSON)
 import qualified Serializing.Format as Format
@@ -37,17 +39,25 @@ import           Source.Loc
 
 import qualified Language.Python as Py
 
+
 termGraph :: (Traversable t, Member Distribute sig, ParseEffects sig m) => t Blob -> m ParseTreeGraphResponse
-termGraph blobs = ParseTreeGraphResponse . V.fromList . toList <$> distributeFor blobs go
+termGraph blobs = do
+  terms <- distributeFor blobs go
+  pure $ defMessage
+    & P.files .~ toList terms
   where
     go :: ParseEffects sig m => Blob -> m ParseTreeFileGraph
     go blob = parseWith jsonGraphTermParsers (pure . jsonGraphTerm blob) blob
       `catchError` \(SomeException e) ->
-        pure (ParseTreeFileGraph path lang mempty mempty (V.fromList [ParseError (T.pack (show e))]))
+        pure $ defMessage
+          & P.path .~ path
+          & P.language .~ lang
+          & P.vertices .~ mempty
+          & P.edges .~ mempty
+          & P.errors .~ [defMessage & P.error .~ T.pack (show e)]
       where
         path = T.pack $ blobPath blob
         lang = bridging # blobLanguage blob
-
 
 data TermOutputFormat
   = TermJSONTree
@@ -137,7 +147,12 @@ class JSONGraphTerm term where
 instance (Foldable syntax, Functor syntax, ConstructorName syntax) => JSONGraphTerm (Term syntax) where
   jsonGraphTerm blob t
     = let graph = renderTreeGraph t
-          toEdge (Edge (a, b)) = TermEdge (vertexId a) (vertexId b)
-      in ParseTreeFileGraph path lang (V.fromList (vertexList graph)) (V.fromList (fmap toEdge (edgeList graph))) mempty where
-        path = T.pack $ blobPath blob
-        lang = bridging # blobLanguage blob
+          toEdge (Edge (a, b)) = defMessage & P.source .~ a^.vertexId & P.target .~ b^.vertexId
+          path = T.pack $ blobPath blob
+          lang = bridging # blobLanguage blob
+      in defMessage
+          & P.path .~ path
+          & P.language .~ lang
+          & P.vertices .~ vertexList graph
+          & P.edges .~ fmap toEdge (edgeList graph)
+          & P.errors .~ mempty

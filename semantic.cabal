@@ -71,8 +71,6 @@ common dependencies
                      , text ^>= 1.2.3.1
                      , these >= 0.7 && <1
                      , unix ^>= 2.7.2.2
-                     , proto3-suite
-                     , proto3-wire
                      , lingo >= 0.2.0.0
 
 common executable-flags
@@ -241,6 +239,9 @@ library
                      -- High-level flow & operational functionality (logging, stats, etc.)
                      , Semantic.Analysis
                      -- API
+                     , Proto.Semantic
+                     , Proto.Semantic_Fields
+                     , Proto.Semantic_JSON
                      , Semantic.Api
                      , Semantic.Api.Bridge
                      , Semantic.Api.Diffs
@@ -248,7 +249,6 @@ library
                      , Semantic.Api.Symbols
                      , Semantic.Api.Terms
                      , Semantic.Api.TOCSummaries
-                     , Semantic.Proto.SemanticPB
                      , Semantic.AST
                      , Semantic.CLI
                      , Semantic.Config
@@ -304,6 +304,9 @@ library
                      , prettyprinter ^>= 1.2.1
                      , pretty-show ^>= 1.9.5
                      , profunctors ^>= 5.3
+                     , proto-lens ^>= 0.5.1.0
+                     , proto-lens-jsonpb
+                     , proto-lens-runtime ^>= 0.5.0.0
                      , reducers ^>= 3.12.3
                      , semantic-tags ^>= 0
                      , semigroupoids ^>= 5.3.2
