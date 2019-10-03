@@ -47,7 +47,7 @@ termGraph blobs = do
     & P.files .~ toList terms
   where
     go :: ParseEffects sig m => Blob -> m ParseTreeFileGraph
-    go blob = doParse (pure . jsonGraphTerm blob) blob
+    go blob = parseWith jsonGraphTermParsers (pure . jsonGraphTerm blob) blob
       `catchError` \(SomeException e) ->
         pure $ defMessage
           & P.path .~ path
@@ -72,19 +72,19 @@ parseTermBuilder :: (Traversable t, Member Distribute sig, ParseEffects sig m, M
   => TermOutputFormat -> t Blob -> m Builder
 parseTermBuilder TermJSONTree    = distributeFoldMap jsonTerm >=> serialize Format.JSON -- NB: Serialize happens at the top level for these two JSON formats to collect results of multiple blobs.
 parseTermBuilder TermJSONGraph   = termGraph >=> serialize Format.JSON
-parseTermBuilder TermSExpression = distributeFoldMap (doParse sexprTerm)
-parseTermBuilder TermDotGraph    = distributeFoldMap (doParse dotGraphTerm)
-parseTermBuilder TermShow        = distributeFoldMap (doParse showTerm)
+parseTermBuilder TermSExpression = distributeFoldMap (parseWith sexprTermParsers sexprTerm)
+parseTermBuilder TermDotGraph    = distributeFoldMap (parseWith dotGraphTermParsers dotGraphTerm)
+parseTermBuilder TermShow        = distributeFoldMap (\ blob -> asks showTermParsers >>= \ parsers -> parseWith parsers showTerm blob)
 parseTermBuilder TermQuiet       = distributeFoldMap quietTerm
 
 jsonTerm :: ParseEffects sig m => Blob -> m (Rendering.JSON.JSON "trees" SomeJSON)
-jsonTerm blob = doParse (pure . jsonTreeTerm blob) blob `catchError` jsonError blob
+jsonTerm blob = parseWith jsonTreeTermParsers (pure . jsonTreeTerm blob) blob `catchError` jsonError blob
 
 jsonError :: Applicative m => Blob -> SomeException -> m (Rendering.JSON.JSON "trees" SomeJSON)
 jsonError blob (SomeException e) = pure $ renderJSONError blob (show e)
 
 quietTerm :: (ParseEffects sig m, MonadIO m) => Blob -> m Builder
-quietTerm blob = showTiming blob <$> time' ( doParse (fmap (const (Right ())) . showTerm) blob `catchError` timingError )
+quietTerm blob = showTiming blob <$> time' ( asks showTermParsers >>= \ parsers -> parseWith parsers (fmap (const (Right ())) . showTerm) blob `catchError` timingError )
   where
     timingError (SomeException e) = pure (Left (show e))
     showTiming Blob{..} (res, duration) =
@@ -95,6 +95,9 @@ quietTerm blob = showTiming blob <$> time' ( doParse (fmap (const (Right ())) . 
 type ParseEffects sig m = (Member (Error SomeException) sig, Member (Reader PerLanguageModes) sig, Member Parse sig, Member (Reader Config) sig, Carrier sig m)
 
 
+showTermParsers :: PerLanguageModes -> Map Language (SomeParser ShowTerm Loc)
+showTermParsers = allParsers
+
 class ShowTerm term where
   showTerm :: (Carrier sig m, Member (Reader Config) sig) => term Loc -> m Builder
 
@@ -102,8 +105,11 @@ instance (Functor syntax, Show1 syntax) => ShowTerm (Term syntax) where
   showTerm = serialize Show . quieterm
 
 instance ShowTerm Py.Term where
-  showTerm = serialize Show . Py.getTerm
+  showTerm = serialize Show . void . Py.getTerm
 
+
+sexprTermParsers :: Map Language (SomeParser SExprTerm Loc)
+sexprTermParsers = aLaCarteParsers
 
 class SExprTerm term where
   sexprTerm :: (Carrier sig m, Member (Reader Config) sig) => term Loc -> m Builder
@@ -112,6 +118,9 @@ instance (ConstructorName syntax, Foldable syntax, Functor syntax) => SExprTerm 
   sexprTerm = serialize (SExpression ByConstructorName)
 
 
+dotGraphTermParsers :: Map Language (SomeParser DOTGraphTerm Loc)
+dotGraphTermParsers = aLaCarteParsers
+
 class DOTGraphTerm term where
   dotGraphTerm :: (Carrier sig m, Member (Reader Config) sig) => term Loc -> m Builder
 
@@ -119,12 +128,18 @@ instance (ConstructorName syntax, Foldable syntax, Functor syntax) => DOTGraphTe
   dotGraphTerm = serialize (DOT (termStyle "terms")) . renderTreeGraph
 
 
+jsonTreeTermParsers :: Map Language (SomeParser JSONTreeTerm Loc)
+jsonTreeTermParsers = aLaCarteParsers
+
 class JSONTreeTerm term where
   jsonTreeTerm :: Blob -> term Loc -> Rendering.JSON.JSON "trees" SomeJSON
 
 instance ToJSONFields1 syntax => JSONTreeTerm (Term syntax) where
   jsonTreeTerm = renderJSONTerm
 
+
+jsonGraphTermParsers :: Map Language (SomeParser JSONGraphTerm Loc)
+jsonGraphTermParsers = aLaCarteParsers
 
 class JSONGraphTerm term where
   jsonGraphTerm :: Blob -> term Loc -> ParseTreeFileGraph
@@ -141,27 +156,3 @@ instance (Foldable syntax, Functor syntax, ConstructorName syntax) => JSONGraphT
           & P.vertices .~ vertexList graph
           & P.edges .~ fmap toEdge (edgeList graph)
           & P.errors .~ mempty
-
-type TermActions t = (DOTGraphTerm t, JSONGraphTerm t, JSONTreeTerm t, SExprTerm t, ShowTerm t)
-
-doParse
-  :: ( Carrier sig m
-     , Member (Error SomeException) sig
-     , Member Parse sig
-     )
-  => (forall term . TermActions term => term Loc -> m a)
-  -> Blob
-  -> m a
-doParse with blob = case blobLanguage blob of
-  Go         -> parse goParser         blob >>= with
-  Haskell    -> parse haskellParser    blob >>= with
-  JavaScript -> parse tsxParser        blob >>= with
-  JSON       -> parse jsonParser       blob >>= with
-  JSX        -> parse tsxParser        blob >>= with
-  Markdown   -> parse markdownParser   blob >>= with
-  Python     -> parse pythonParser     blob >>= with
-  Ruby       -> parse rubyParser       blob >>= with
-  TypeScript -> parse typescriptParser blob >>= with
-  TSX        -> parse tsxParser        blob >>= with
-  PHP        -> parse phpParser        blob >>= with
-  _          -> noLanguageForBlob (blobPath blob)
