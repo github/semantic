@@ -77,4 +77,4 @@ instance ToSExpression t => GToSExpression (Rec1 t) where
   gtoSExpression (Rec1 t) = pure . toSExpression t
 
 instance (Foldable f, GToSExpression g) => GToSExpression (f :.: g) where
-  gtoSExpression (Comp1 fs) n = "(" : foldMap gtoSExpression fs n <> [")"]
+  gtoSExpression (Comp1 fs) n = "(" : foldMap gtoSExpression fs (n + 1) <> [")"]
