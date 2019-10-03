@@ -15,6 +15,7 @@ category:            Data
 build-type:          Simple
 stability:           alpha
 extra-source-files:
+  CHANGELOG.md
   README.md
 
 
