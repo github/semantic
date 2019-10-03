@@ -67,3 +67,6 @@ instance Show k => GToSExpression (K1 R k) where
 
 instance GToSExpression Par1 where
   gtoSExpression _ _ = []
+
+instance ToSExpression t => GToSExpression (Rec1 t) where
+  gtoSExpression (Rec1 t) = pure . toSExpression t
