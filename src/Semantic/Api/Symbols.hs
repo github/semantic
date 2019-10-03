@@ -99,8 +99,8 @@ parseSymbols blobs = do
           & P.maybe'span .~ converting #? span
           & P.maybe'docs .~ fmap (flip (set P.docstring) defMessage) docs
 
-        symbolsToSummarize :: [Text]
-        symbolsToSummarize = ["Function", "Method", "Class", "Module", "Call", "Send"]
+symbolsToSummarize :: [Text]
+symbolsToSummarize = ["Function", "Method", "Class", "Module", "Call", "Send"]
 
 data ALaCarteTerm syntax ann = ALaCarteTerm Language [Text] (Term syntax ann)
 

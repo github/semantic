@@ -2,7 +2,7 @@
 {-# OPTIONS_GHC -Wno-orphans -Wno-unused-imports -Wno-missing-export-lists #-}
 module Proto.Semantic_JSON where
 
-import           Prelude(($), (.), (<$>), pure, show)
+import           Prelude(($), (.), (<$>), pure, show, Maybe(..))
 
 import           Data.ProtoLens.Runtime.Lens.Family2 ((^.), (.~), (&))
 import           Data.Monoid (mconcat)
@@ -471,14 +471,14 @@ instance FromJSONPB DiffTreeVertex'DiffTerm where
     ]
 
 instance ToJSONPB DiffTreeVertex'DiffTerm where
-  toJSONPB (DiffTreeVertex'Deleted x) = object [ "deleted" .= x ]
-  toJSONPB (DiffTreeVertex'Inserted x) = object [ "inserted" .= x ]
-  toJSONPB (DiffTreeVertex'Replaced x) = object [ "replaced" .= x ]
-  toJSONPB (DiffTreeVertex'Merged x) = object [ "merged" .= x ]
-  toEncodingPB (DiffTreeVertex'Deleted x) = pairs [ "deleted" .= x ]
-  toEncodingPB (DiffTreeVertex'Inserted x) = pairs [ "inserted" .= x ]
-  toEncodingPB (DiffTreeVertex'Replaced x) = pairs [ "replaced" .= x ]
-  toEncodingPB (DiffTreeVertex'Merged x) = pairs [ "merged" .= x ]
+  toJSONPB (DiffTreeVertex'Deleted x) = object [ "deleted" .= Just x ]
+  toJSONPB (DiffTreeVertex'Inserted x) = object [ "inserted" .= Just x ]
+  toJSONPB (DiffTreeVertex'Replaced x) = object [ "replaced" .= Just x ]
+  toJSONPB (DiffTreeVertex'Merged x) = object [ "merged" .= Just x ]
+  toEncodingPB (DiffTreeVertex'Deleted x) = pairs [ "deleted" .= Just x ]
+  toEncodingPB (DiffTreeVertex'Inserted x) = pairs [ "inserted" .= Just x ]
+  toEncodingPB (DiffTreeVertex'Replaced x) = pairs [ "replaced" .= Just x ]
+  toEncodingPB (DiffTreeVertex'Merged x) = pairs [ "merged" .= Just x ]
 
 instance FromJSON DiffTreeVertex'DiffTerm where
   parseJSON = parseJSONPB

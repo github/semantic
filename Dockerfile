@@ -12,7 +12,7 @@ RUN wget "https://github.com/protocolbuffers/protobuf/releases/download/v3.7.1/p
 
 RUN go get github.com/golang/protobuf/proto && \
     go get github.com/twitchtv/protogen/typemap && \
-    GO111MODULE=on go get github.com/tclem/proto-lens-jsonpb/protoc-gen-jsonpb_haskell@master
+    GO111MODULE=on go get github.com/tclem/proto-lens-jsonpb/protoc-gen-jsonpb_haskell@e4d10b77f57ee25beb759a33e63e2061420d3dc2
 
 COPY --from=haskell /root/.cabal/bin/proto-lens-protoc /usr/local/bin/proto-lens-protoc
 
