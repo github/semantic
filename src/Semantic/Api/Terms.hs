@@ -34,6 +34,7 @@ import           Semantic.Task
 import           Serializing.Format hiding (JSON)
 import qualified Serializing.Format as Format
 import qualified Serializing.SExpression as SExpr
+import qualified Serializing.SExpression.Precise as SExpr.Precise
 import           Source.Loc
 
 import qualified Language.Java as Java
@@ -111,6 +112,9 @@ class SExprTerm term where
 
 instance (ConstructorName syntax, Foldable syntax, Functor syntax) => SExprTerm (Term syntax) where
   sexprTerm = SExpr.serializeSExpression ByConstructorName
+
+instance SExprTerm Java.Term where
+  sexprTerm = SExpr.Precise.serializeSExpression . Java.getTerm
 
 
 dotGraphTermParsers :: Map Language (SomeParser DOTGraphTerm Loc)
