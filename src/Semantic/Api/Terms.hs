@@ -33,6 +33,7 @@ import           Semantic.Proto.SemanticPB hiding (Blob)
 import           Semantic.Task
 import           Serializing.Format hiding (JSON)
 import qualified Serializing.Format as Format
+import qualified Serializing.SExpression as SExpr
 import           Source.Loc
 
 import qualified Language.Java as Java
@@ -109,7 +110,7 @@ class SExprTerm term where
   sexprTerm :: (Carrier sig m, Member (Reader Config) sig) => term Loc -> m Builder
 
 instance (ConstructorName syntax, Foldable syntax, Functor syntax) => SExprTerm (Term syntax) where
-  sexprTerm = serialize (SExpression ByConstructorName)
+  sexprTerm = pure . SExpr.serializeSExpression ByConstructorName
 
 
 dotGraphTermParsers :: Map Language (SomeParser DOTGraphTerm Loc)
