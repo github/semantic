@@ -1,10 +1,7 @@
 syntax = "proto3";
 
-import "pkg/gen/haskell/haskell.proto";
-
 package github.semantic;
 
-option (haskell.haskell_package) = "Semantic.Proto";
 option ruby_package = "Semantic::Proto";
 
 message PingRequest {
