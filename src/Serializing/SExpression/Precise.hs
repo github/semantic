@@ -64,3 +64,6 @@ instance GToSExpression f => GToSExpression (M1 S s f) where
 
 instance Show k => GToSExpression (K1 R k) where
   gtoSExpression k _ = pure (stringUtf8 (show (unK1 k)))
+
+instance GToSExpression Par1 where
+  gtoSExpression _ _ = []
