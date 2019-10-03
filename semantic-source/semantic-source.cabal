@@ -51,7 +51,7 @@ library
     , bytestring     ^>= 0.10.8.2
     , deepseq        ^>= 1.4.4.0
     , generic-monoid ^>= 0.1.0.0
-    , hashable       ^>= 1.2.7.0
+    , hashable        >= 1.2.7 && < 1.4
     , semilattices   ^>= 0.0.0.3
     , text           ^>= 1.2.3.1
   hs-source-dirs: src
