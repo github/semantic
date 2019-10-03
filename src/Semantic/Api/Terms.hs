@@ -64,7 +64,7 @@ parseTermBuilder :: (Traversable t, Member Distribute sig, ParseEffects sig m, M
   => TermOutputFormat -> t Blob -> m Builder
 parseTermBuilder TermJSONTree    = distributeFoldMap jsonTerm >=> serialize Format.JSON -- NB: Serialize happens at the top level for these two JSON formats to collect results of multiple blobs.
 parseTermBuilder TermJSONGraph   = termGraph >=> serialize Format.JSON
-parseTermBuilder TermSExpression = distributeFoldMap (parseWith sexprTermParsers sexprTerm)
+parseTermBuilder TermSExpression = distributeFoldMap (parseWith sexprTermParsers (pure . sexprTerm))
 parseTermBuilder TermDotGraph    = distributeFoldMap (parseWith dotGraphTermParsers dotGraphTerm)
 parseTermBuilder TermShow        = distributeFoldMap (\ blob -> asks showTermParsers >>= \ parsers -> parseWith parsers showTerm blob)
 parseTermBuilder TermQuiet       = distributeFoldMap quietTerm
@@ -107,10 +107,10 @@ sexprTermParsers :: Map Language (SomeParser SExprTerm Loc)
 sexprTermParsers = aLaCarteParsers
 
 class SExprTerm term where
-  sexprTerm :: (Carrier sig m, Member (Reader Config) sig) => term Loc -> m Builder
+  sexprTerm :: term Loc -> Builder
 
 instance (ConstructorName syntax, Foldable syntax, Functor syntax) => SExprTerm (Term syntax) where
-  sexprTerm = pure . SExpr.serializeSExpression ByConstructorName
+  sexprTerm = SExpr.serializeSExpression ByConstructorName
 
 
 dotGraphTermParsers :: Map Language (SomeParser DOTGraphTerm Loc)
