@@ -1,5 +1,4 @@
 -- | Semantic functionality for Java programs.
-{-# OPTIONS_GHC -freduction-depth=0 #-}
 module Language.Java
 ( Term(..)
 ) where
