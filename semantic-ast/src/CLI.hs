@@ -44,6 +44,10 @@ parseAST = SemanticAST
         ( long "format"
        <> help "Specify one these formats: -json -sexpression -show" )
 
+data Input
+  = FileInput FilePath
+  | StdInput
+
 input :: Parser Input
 input = fileInput <|> stdInput
 
