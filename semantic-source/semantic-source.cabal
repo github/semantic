@@ -46,8 +46,6 @@ library
     Source.Range
     Source.Source
     Source.Span
-  -- other-modules:
-  -- other-extensions:
   build-depends:
       aeson          ^>= 1.4.2.0
     , base            >= 4.12 && < 5
