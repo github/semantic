@@ -33,8 +33,8 @@ import           Semantic.Proto.SemanticPB hiding (Blob)
 import           Semantic.Task
 import           Serializing.Format hiding (JSON)
 import qualified Serializing.Format as Format
-import qualified Serializing.SExpression as SExpr
-import qualified Serializing.SExpression.Precise as SExpr.Precise
+import qualified Serializing.SExpression as SExpr (serializeSExpression)
+import qualified Serializing.SExpression.Precise as SExpr.Precise (serializeSExpression)
 import           Source.Loc
 
 import qualified Language.Java as Java
