@@ -7,7 +7,6 @@ module Serializing.SExpression.Precise
 import Data.ByteString.Builder
 import Data.Foldable (fold)
 import Data.List (intersperse)
-import Data.List.NonEmpty (NonEmpty(..))
 import GHC.Generics
 
 serializeSExpression :: ToSExpression t => t ann -> Builder
@@ -77,13 +76,5 @@ instance GToSExpression Par1 where
 instance ToSExpression t => GToSExpression (Rec1 t) where
   gtoSExpression (Rec1 t) = pure . toSExpression t
 
-instance GToSExpression f => GToSExpression (Maybe :.: f) where
-  gtoSExpression (Comp1 Nothing)  n = [nl n <> pad n <> "()"]
-  gtoSExpression (Comp1 (Just t)) n = gtoSExpression t n
-
-instance GToSExpression f => GToSExpression ([] :.: f) where
-  gtoSExpression (Comp1 []) n = [nl n <> pad n <> "[]"]
-  gtoSExpression (Comp1 fs) n = [nl n <> pad n <> "[" <> fold (intersperse " " (foldMap gtoSExpression fs (n + 1))) <> "]"]
-
-instance GToSExpression f => GToSExpression (NonEmpty :.: f) where
-  gtoSExpression (Comp1 (f:|fs)) = gtoSExpression (Comp1 (f:fs))
+instance (Foldable f, GToSExpression g) => GToSExpression (f :.: g) where
+  gtoSExpression (Comp1 fs) n = "(" : foldMap gtoSExpression fs n <> [")"]
