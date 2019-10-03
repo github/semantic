@@ -25,7 +25,7 @@ pad n = stringUtf8 (replicate (2 * n) ' ')
 class ToSExpression t where
   toSExpression :: t -> Int -> Builder
 
-instance (ToSExpressionWithStrategy strategy t, strategy ~ ToSExpressionStrategy t) => ToSExpression t where
+instance (ToSExpressionBy strategy t, strategy ~ ToSExpressionStrategy t) => ToSExpression t where
   toSExpression = toSExpressionWithStrategy @strategy undefined
 
 
@@ -35,13 +35,13 @@ type family ToSExpressionStrategy t :: Strategy where
   ToSExpressionStrategy Text = 'Show
   ToSExpressionStrategy _    = 'Generic
 
-class ToSExpressionWithStrategy (strategy :: Strategy) t where
+class ToSExpressionBy (strategy :: Strategy) t where
   toSExpressionWithStrategy :: proxy strategy -> t -> Int -> Builder
 
-instance Show t => ToSExpressionWithStrategy 'Show t where
+instance Show t => ToSExpressionBy 'Show t where
   toSExpressionWithStrategy _ t _ = stringUtf8 (show t)
 
-instance (Generic t, GToSExpression (Rep t)) => ToSExpressionWithStrategy 'Generic t where
+instance (Generic t, GToSExpression (Rep t)) => ToSExpressionBy 'Generic t where
   toSExpressionWithStrategy _ t n = nl n <> pad n <> "(" <> fold (intersperse " " (gtoSExpression (from t) n)) <> ")"
 
 
