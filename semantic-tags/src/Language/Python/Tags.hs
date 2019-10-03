@@ -5,7 +5,6 @@ module Language.Python.Tags
 
 import           Control.Effect.Reader
 import           Control.Effect.Writer
-import           Data.Foldable (traverse_)
 import           Data.Maybe (listToMaybe)
 import           Data.Monoid (Ap(..))
 import           Data.List.NonEmpty (NonEmpty(..))
@@ -56,20 +55,16 @@ instance (ToTags l, ToTags r) => ToTagsBy 'Custom (l :+: r) where
   tags' (R1 r) = tags r
 
 instance ToTagsBy 'Custom Py.FunctionDefinition where
-  tags' Py.FunctionDefinition
+  tags' t@Py.FunctionDefinition
     { ann = Loc Range { start } span
     , name = Py.Identifier { bytes = name }
-    , parameters
-    , returnType
     , body = Py.Block { ann = Loc Range { start = end } _, extraChildren }
     } = do
       src <- ask @Source
       let docs = listToMaybe extraChildren >>= docComment src
           sliced = slice src (Range start end)
       Tags.yield (Tag name Function span (Tags.firstLine sliced) docs)
-      tags parameters
-      traverse_ tags returnType
-      traverse_ tags extraChildren
+      gtags t
 
 instance ToTagsBy 'Custom Py.ClassDefinition where
   tags' t@Py.ClassDefinition
