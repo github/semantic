@@ -14,7 +14,8 @@ import Data.ByteString.Builder
 import Language.Haskell.HsColour
 import Language.Haskell.HsColour.Colourise
 import Prologue
-import Proto3.Suite as Proto3
+import Data.ProtoLens.Encoding as Proto
+import Data.ProtoLens.Message (Message)
 import Serializing.SExpression
 import Text.Show.Pretty
 
@@ -33,4 +34,4 @@ runSerialize _         JSON               = (<> "\n") . fromEncoding . toEncodin
 runSerialize _         (SExpression opts) = serializeSExpression opts
 runSerialize Colourful Show               = (<> "\n") . stringUtf8 . hscolour TTY defaultColourPrefs False False "" False . ppShow
 runSerialize Plain     Show               = (<> "\n") . stringUtf8 . show
-runSerialize _         Proto              = lazyByteString . Proto3.toLazyByteString
+runSerialize _         Proto              = Proto.buildMessage

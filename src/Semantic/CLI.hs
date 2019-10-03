@@ -33,6 +33,7 @@ import Control.Exception (Exception(..), throwTo)
 import Data.Typeable (Typeable)
 import System.Posix.Signals
 import System.Mem.Weak (deRefWeak)
+import Proto.Semantic_JSON()
 
 newtype SignalException = SignalException Signal
   deriving (Show, Typeable)
