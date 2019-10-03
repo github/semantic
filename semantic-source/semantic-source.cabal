@@ -1,7 +1,7 @@
 cabal-version:       2.4
 
 name:                semantic-source
-version:             0.0.0.0
+version:             0.0.0.1
 synopsis:            Types and functionality for working with source code
 description:         Types and functionality for working with source code (program text).
 homepage:            https://github.com/github/semantic/tree/master/semantic-source#readme
