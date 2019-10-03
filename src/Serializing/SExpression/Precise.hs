@@ -7,10 +7,9 @@ module Serializing.SExpression.Precise
 import Data.ByteString.Builder
 import Data.Foldable (fold)
 import Data.List (intersperse)
-import Data.Text (Text)
 import GHC.Generics
 
-serializeSExpression :: ToSExpression t => t -> Builder
+serializeSExpression :: ToSExpression t => t ann -> Builder
 serializeSExpression t = toSExpression t 0 <> "\n"
 
 
@@ -23,30 +22,26 @@ pad n = stringUtf8 (replicate (2 * n) ' ')
 
 
 class ToSExpression t where
-  toSExpression :: t -> Int -> Builder
+  toSExpression :: t ann -> Int -> Builder
 
 instance (ToSExpressionBy strategy t, strategy ~ ToSExpressionStrategy t) => ToSExpression t where
   toSExpression = toSExpression' @strategy
 
 
-data Strategy = Generic | Show
+data Strategy = Generic
 
-type family ToSExpressionStrategy t :: Strategy where
-  ToSExpressionStrategy Text = 'Show
+type family ToSExpressionStrategy (t :: * -> *) :: Strategy where
   ToSExpressionStrategy _    = 'Generic
 
 class ToSExpressionBy (strategy :: Strategy) t where
-  toSExpression' :: t -> Int -> Builder
+  toSExpression' :: t ann -> Int -> Builder
 
-instance Show t => ToSExpressionBy 'Show t where
-  toSExpression' t _ = stringUtf8 (show t)
-
-instance (Generic t, GToSExpression (Rep t)) => ToSExpressionBy 'Generic t where
-  toSExpression' t n = nl n <> pad n <> "(" <> fold (intersperse " " (gtoSExpression (from t) n)) <> ")"
+instance (Generic1 t, GToSExpression (Rep1 t)) => ToSExpressionBy 'Generic t where
+  toSExpression' t n = nl n <> pad n <> "(" <> fold (intersperse " " (gtoSExpression (from1 t) n)) <> ")"
 
 
 class GToSExpression f where
-  gtoSExpression :: f (Int -> Builder) -> (Int -> [Builder])
+  gtoSExpression :: f ann -> Int -> [Builder]
 
 instance GToSExpression f => GToSExpression (M1 D d f) where
   gtoSExpression = gtoSExpression . unM1
@@ -67,5 +62,5 @@ instance GToSExpression U1 where
 instance GToSExpression f => GToSExpression (M1 S s f) where
   gtoSExpression = gtoSExpression . unM1 -- FIXME: show the selector name, if any
 
-instance ToSExpression k => GToSExpression (K1 R k) where
-  gtoSExpression k = pure . toSExpression (unK1 k)
+instance Show k => GToSExpression (K1 R k) where
+  gtoSExpression k _ = pure (stringUtf8 (show (unK1 k)))
