@@ -18,7 +18,6 @@ extra-source-files:
   CHANGELOG.md
   README.md
 
-
 tested-with:
   GHC == 8.6.5
   GHC == 8.8.1
