@@ -27,7 +27,7 @@ generateAST (SemanticAST file _) = do
  bytestring <- Data.ByteString.readFile file
  print =<< parseByteString @TreeSitter.Python.AST.Module @(Range, Span) tree_sitter_python bytestring
 -- TODO: Define formats for json, sexpression, etc.
-data Format = Show
+data Format = Show deriving (Read)
 
 data SemanticAST = SemanticAST
   { sourceFilePath :: Prelude.String
