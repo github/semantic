@@ -70,3 +70,6 @@ instance GToSExpression Par1 where
 
 instance ToSExpression t => GToSExpression (Rec1 t) where
   gtoSExpression (Rec1 t) = pure . toSExpression t
+
+instance (Foldable f, GToSExpression g) => GToSExpression (f :.: g) where
+  gtoSExpression = foldMap gtoSExpression . unComp1
