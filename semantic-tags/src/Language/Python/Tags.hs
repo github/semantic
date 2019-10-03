@@ -102,5 +102,16 @@ docComment src (R1 (Py.ExpressionStatementSimpleStatement (Py.ExpressionStatemen
 docComment _ _ = Nothing
 
 
+gtags
+  :: ( Carrier sig m
+     , Member (Reader Source) sig
+     , Member (Writer Tags.Tags) sig
+     , Generic1 t
+     , Tags.GFoldable1 ToTags (Rep1 t)
+     )
+  => t Loc
+  -> m ()
+gtags = getAp . Tags.gfoldMap1 @ToTags (Ap . tags) . from1
+
 instance (Generic1 t, Tags.GFoldable1 ToTags (Rep1 t)) => ToTagsBy 'Generic t where
-  tags' = getAp . Tags.gfoldMap1 @ToTags (Ap . tags) . from1
+  tags' = gtags
