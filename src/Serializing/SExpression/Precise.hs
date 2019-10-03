@@ -26,7 +26,7 @@ class ToSExpression t where
   toSExpression :: t -> Int -> Builder
 
 instance (ToSExpressionBy strategy t, strategy ~ ToSExpressionStrategy t) => ToSExpression t where
-  toSExpression = toSExpressionWithStrategy @strategy undefined
+  toSExpression = toSExpression' @strategy undefined
 
 
 data Strategy = Generic | Show
@@ -36,13 +36,13 @@ type family ToSExpressionStrategy t :: Strategy where
   ToSExpressionStrategy _    = 'Generic
 
 class ToSExpressionBy (strategy :: Strategy) t where
-  toSExpressionWithStrategy :: proxy strategy -> t -> Int -> Builder
+  toSExpression' :: proxy strategy -> t -> Int -> Builder
 
 instance Show t => ToSExpressionBy 'Show t where
-  toSExpressionWithStrategy _ t _ = stringUtf8 (show t)
+  toSExpression' _ t _ = stringUtf8 (show t)
 
 instance (Generic t, GToSExpression (Rep t)) => ToSExpressionBy 'Generic t where
-  toSExpressionWithStrategy _ t n = nl n <> pad n <> "(" <> fold (intersperse " " (gtoSExpression (from t) n)) <> ")"
+  toSExpression' _ t n = nl n <> pad n <> "(" <> fold (intersperse " " (gtoSExpression (from t) n)) <> ")"
 
 
 class GToSExpression f where
