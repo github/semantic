@@ -13,6 +13,14 @@ import System.IO (FilePath)
 import Options.Applicative hiding (style)
 import Data.Semigroup ((<>))
 
+main :: IO ()
+main = generateAST =<< execParser opts
+
+opts :: ParserInfo SemanticAST
+opts = info (parseAST <**> helper)
+  ( fullDesc
+ <> progDesc "Read a file, output an AST"
+ <> header "semantic-ast - generates ASTs" )
 data SemanticAST = SemanticAST
   { sourceFilePath :: Prelude.String
   , format         :: Prelude.String
@@ -27,14 +35,6 @@ parseAST = SemanticAST
     <*> strOption
         ( long "format"
        <> help "Specify format --json --sexpression --show" )
-
-main :: IO ()
-main = generateAST =<< execParser opts
- where
-   opts = info (parseAST <**> helper)
-     ( fullDesc
-    <> progDesc "Read a file, output an AST"
-    <> header "semantic-ast - generates ASTs" )
 
 generateAST :: SemanticAST -> IO ()
 generateAST (SemanticAST file _) = do
