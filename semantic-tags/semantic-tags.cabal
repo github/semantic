@@ -24,8 +24,6 @@ library
     Language.Python.Tags
     Tags.Tag
     Tags.Tagging.Precise
-  -- other-modules:
-  -- other-extensions:
   build-depends:
       base                >= 4.12 && < 5
     , bytestring         ^>= 0.10.8.2
