@@ -70,13 +70,6 @@ cacheTerm eval term = do
 runHeap :: StateC (Heap address a) m b -> m (Heap address a, b)
 runHeap m = runState Map.empty m
 
--- | Fold a collection by mapping each element onto an 'Alternative' action.
-foldMapA :: (Alternative m, Foldable t) => (b -> m a) -> t b -> m a
-foldMapA f = getAlt . foldMap (Alt . f)
-
-runNonDetM :: (Monoid b, Applicative m) => (a -> b) -> NonDetC m a -> m b
-runNonDetM f (NonDetC m) = m (fmap . (<>) . f) (pure mempty)
-
 -- | Iterate a monadic action starting from some initial seed until the results converge.
 --
 --   This applies the Kleene fixed-point theorem to finitize a monotone action. cf https://en.wikipedia.org/wiki/Kleene_fixed-point_theorem
