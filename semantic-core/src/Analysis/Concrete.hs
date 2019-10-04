@@ -13,12 +13,12 @@ import qualified Algebra.Graph as G
 import qualified Algebra.Graph.Export.Dot as G
 import           Analysis.Eval
 import           Control.Applicative (Alternative (..))
-import           Control.Effect
-import           Control.Effect.Fail
-import           Control.Effect.Fresh
-import           Control.Effect.NonDet
-import           Control.Effect.Reader hiding (Local)
-import           Control.Effect.State
+import           Control.Carrier
+import           Control.Carrier.Fail.Either
+import           Control.Carrier.Fresh.Strict
+import           Control.Carrier.NonDet.Church
+import           Control.Carrier.Reader hiding (Local)
+import           Control.Carrier.State.Strict
 import           Control.Monad ((<=<), guard)
 import           Data.File
 import           Data.Function (fix)
@@ -71,7 +71,7 @@ data Edge = Lexical | Import
 concrete
   :: (Foldable term, Show (term Name))
   => (forall sig m
-     .  (Carrier sig m, Member (Reader Loc) sig, MonadFail m)
+     .  (Has (Reader Loc) sig m, MonadFail m)
      => Analysis (term Name) Precise (Concrete (term Name)) m
      -> (term Name -> m (Concrete (term Name)))
      -> (term Name -> m (Concrete (term Name)))
@@ -85,15 +85,14 @@ concrete eval
   . traverse (runFile eval)
 
 runFile
-  :: ( Carrier sig m
-     , Effect sig
+  :: ( Effect sig
      , Foldable term
-     , Member Fresh sig
-     , Member (State (Heap (term Name))) sig
+     , Has Fresh sig m
+     , Has (State (Heap (term Name))) sig m
      , Show (term Name)
      )
   => (forall sig m
-     .  (Carrier sig m, Member (Reader Loc) sig, MonadFail m)
+     .  (Has (Reader Loc) sig m, MonadFail m)
      => Analysis (term Name) Precise (Concrete (term Name)) m
      -> (term Name -> m (Concrete (term Name)))
      -> (term Name -> m (Concrete (term Name)))
@@ -106,12 +105,11 @@ runFile eval file = traverse run file
             . runReader @Env mempty
             . fix (eval concreteAnalysis)
 
-concreteAnalysis :: ( Carrier sig m
-                    , Foldable term
-                    , Member Fresh sig
-                    , Member (Reader Env) sig
-                    , Member (Reader Loc) sig
-                    , Member (State (Heap (term Name))) sig
+concreteAnalysis :: ( Foldable term
+                    , Has Fresh sig m
+                    , Has (Reader Env) sig m
+                    , Has (Reader Loc) sig m
+                    , Has (State (Heap (term Name))) sig m
                     , MonadFail m
                     , Show (term Name)
                     )
@@ -152,7 +150,7 @@ concreteAnalysis = Analysis{..}
 
 
 lookupConcrete :: Heap term -> Name -> Concrete term -> Maybe Precise
-lookupConcrete heap name = run . evalState IntSet.empty . runNonDet . inConcrete
+lookupConcrete heap name = run . evalState IntSet.empty . runNonDetA . inConcrete
   where -- look up the name in a concrete value
         inConcrete = inFrame <=< maybeA . recordFrame
         -- look up the name in a specific 'Frame', with slots taking precedence over parents
