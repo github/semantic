@@ -12,8 +12,8 @@ module Data.Loc
 ) where
 
 import Control.Applicative
-import Control.Effect.Carrier
-import Control.Effect.Error
+import Control.Carrier
+import Control.Carrier.Error.Either
 import Control.Effect.Fail
 import Control.Effect.Reader
 import Data.Text (Text, pack)
@@ -70,11 +70,11 @@ runFailWithLoc = runError . runFailWithLocC
 newtype FailWithLocC m a = FailWithLocC { runFailWithLocC :: ErrorC (Loc, String) m a }
   deriving (Alternative, Applicative, Functor, Monad)
 
-instance (Carrier sig m, Effect sig, Member (Reader Loc) sig) => MonadFail (FailWithLocC m) where
+instance (Effect sig, Has (Reader Loc) sig m) => MonadFail (FailWithLocC m) where
   fail s = do
     loc <- ask
     FailWithLocC (throwError (loc :: Loc, s))
 
-instance (Carrier sig m, Effect sig, Member (Reader Loc) sig) => Carrier (Fail :+: sig) (FailWithLocC m) where
+instance (Effect sig, Has (Reader Loc) sig m) => Carrier (Fail :+: sig) (FailWithLocC m) where
   eff (L (Fail s)) = fail s
   eff (R other)    = FailWithLocC (eff (R (handleCoercible other)))
