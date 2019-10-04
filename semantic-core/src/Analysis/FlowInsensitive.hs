@@ -8,14 +8,13 @@ module Analysis.FlowInsensitive
 , foldMapA
 ) where
 
-import           Control.Effect
+import           Control.Carrier
+import           Control.Carrier.NonDet.Church
+import           Control.Carrier.Reader
+import           Control.Carrier.State.Strict
 import           Control.Effect.Fresh
-import           Control.Effect.NonDet
-import           Control.Effect.Reader
-import           Control.Effect.State
 import qualified Data.Map as Map
 import           Data.Maybe (fromMaybe)
-import           Data.Monoid (Alt(..))
 import qualified Data.Set as Set
 
 newtype Cache term a = Cache { unCache :: Map.Map term (Set.Set a) }
@@ -28,11 +27,10 @@ newtype FrameId name = FrameId { unFrameId :: name }
 
 
 convergeTerm :: forall m sig a term address proxy
-             .  ( Carrier sig m
-                , Effect sig
+             .  ( Effect sig
                 , Eq address
-                , Member Fresh sig
-                , Member (State (Heap address a)) sig
+                , Has Fresh sig m
+                , Has (State (Heap address a)) sig m
                 , Ord a
                 , Ord term
                 )
@@ -49,9 +47,8 @@ convergeTerm _ eval body = do
 
 cacheTerm :: forall m sig a term
           .  ( Alternative m
-             , Carrier sig m
-             , Member (Reader (Cache term a)) sig
-             , Member (State  (Cache term a)) sig
+             , Has (Reader (Cache term a)) sig m
+             , Has (State  (Cache term a)) sig m
              , Ord a
              , Ord term
              )
