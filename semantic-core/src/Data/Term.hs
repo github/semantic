@@ -4,7 +4,7 @@ module Data.Term
 , hoistTerm
 ) where
 
-import Control.Effect.Carrier
+import Control.Carrier
 import Control.Monad (ap)
 import Control.Monad.Module
 

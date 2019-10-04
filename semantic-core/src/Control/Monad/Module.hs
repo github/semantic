@@ -6,7 +6,7 @@ module Control.Monad.Module
 , joinr
 ) where
 
-import Control.Effect.Carrier
+import Control.Carrier
 
 -- | Modules over monads allow lifting of a monad’s product (i.e. 'Control.Monad.join') into another structure composed with the monad. A right-module @f m@ over a monad @m@ therefore allows one to extend @m@’s '>>=' operation to values of @f m@ using the '>>=*' operator.
 --
