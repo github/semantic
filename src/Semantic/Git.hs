@@ -15,23 +15,32 @@ module Semantic.Git
   , parseEntry
   ) where
 
-import Control.Monad.IO.Class
-import Data.Attoparsec.Text   (Parser)
-import Data.Attoparsec.Text   as AP
-import Data.Char
-import Data.Either            (fromRight)
-import Data.Text              as Text
-import Shelly                 hiding (FilePath)
+import Prologue
+
+import           Data.Attoparsec.Text (Parser)
+import           Data.Attoparsec.Text as AP
+import qualified Data.ByteString.Streaming as ByteStream
+import           Data.Char
+import           Data.Either (fromRight)
+import           Data.Text as Text
+import           Shelly hiding (FilePath)
+import qualified Streaming.Process
+import qualified System.Process as Process (proc)
+import qualified Source.Source as Source
 
 -- | git clone --bare
 clone :: Text -> FilePath -> IO ()
 clone url path = sh $ do
   run_ "git" ["clone", "--bare", url, pack path]
 
--- | git cat-file -p
-catFile :: FilePath -> OID -> IO Text
-catFile gitDir (OID oid) = sh $ do
-  run "git" ["-C", pack gitDir, "cat-file", "-p", oid]
+-- | Runs @git cat-file -p@. Throws 'ProcessExitedUnsuccessfully' if the
+-- underlying git command returns a nonzero exit code. Loads the contents
+-- of the file into memory all at once and strictly.
+catFile :: FilePath -> OID -> IO Source.Source
+catFile gitDir (OID oid) =
+  let process = Process.proc "git" ["-C", gitDir, "cat-file", "-p", Text.unpack oid]
+      consumeStdout stream = Streaming.Process.withProcessOutput stream ByteStream.toStrict_
+  in Source.fromUTF8 <$> Streaming.Process.withStreamProcess process consumeStdout
 
 -- | git ls-tree -rz
 lsTree :: FilePath -> OID -> IO [TreeEntry]
