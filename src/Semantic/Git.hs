@@ -24,9 +24,7 @@ import           Data.Char
 import           Data.Either (fromRight)
 import           Data.Text as Text
 import           Shelly hiding (FilePath)
-import           Streaming hiding (run)
 import qualified Streaming.Process
-import           System.Exit
 import qualified System.Process as Process (proc)
 import qualified Source.Source as Source
 
