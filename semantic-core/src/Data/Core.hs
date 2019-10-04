@@ -36,7 +36,7 @@ module Data.Core
 ) where
 
 import Control.Applicative (Alternative (..))
-import Control.Effect.Carrier
+import Control.Carrier
 import Control.Monad.Module
 import Data.Bifunctor (Bifunctor (..))
 import Data.Foldable (foldl')
@@ -108,19 +108,19 @@ instance RightModule Core where
   (a := b)   >>=* f = (a >>= f) := (b >>= f)
 
 
-rec :: (Eq a, Carrier sig m, Member Core sig) => Named a -> m a -> m a
+rec :: (Eq a, Has Core sig m) => Named a -> m a -> m a
 rec (Named u n) b = send (Rec (Named u (abstract1 n b)))
 
-(>>>) :: (Carrier sig m, Member Core sig) => m a -> m a -> m a
+(>>>) :: Has Core sig m => m a -> m a -> m a
 a >>> b = send (a :>> b)
 
 infixr 1 >>>
 
-unseq :: (Alternative m, Member Core sig) => Term sig a -> m (Term sig a, Term sig a)
+unseq :: (Alternative m, Project Core sig) => Term sig a -> m (Term sig a, Term sig a)
 unseq (Term sig) | Just (a :>> b) <- prj sig = pure (a, b)
 unseq _                                      = empty
 
-unseqs :: Member Core sig => Term sig a -> NonEmpty (Term sig a)
+unseqs :: Project Core sig => Term sig a -> NonEmpty (Term sig a)
 unseqs = go
   where go t = case unseq t of
           Just (l, r) -> go l <> go r
@@ -128,23 +128,23 @@ unseqs = go
 
 -- TODO: if the left hand side is only a unit, this should return just the RHS
 -- this is a little fiddly to do
-(>>>=) :: (Eq a, Carrier sig m, Member Core sig) => (Named a :<- m a) -> m a -> m a
+(>>>=) :: (Eq a, Has Core sig m) => (Named a :<- m a) -> m a -> m a
 Named u n :<- a >>>= b = send (Named u a :>>= abstract1 n b)
 
 infixr 1 >>>=
 
-unbind :: (Alternative m, Member Core sig, RightModule sig) => a -> Term sig a -> m (Named a :<- Term sig a, Term sig a)
+unbind :: (Alternative m, Project Core sig, RightModule sig) => a -> Term sig a -> m (Named a :<- Term sig a, Term sig a)
 unbind n (Term sig) | Just (Named u a :>>= b) <- prj sig = pure (Named u n :<- a, instantiate1 (pure n) b)
 unbind _ _                                               = empty
 
-unstatement :: (Alternative m, Member Core sig, RightModule sig) => a -> Term sig a -> m (Maybe (Named a) :<- Term sig a, Term sig a)
+unstatement :: (Alternative m, Project Core sig, RightModule sig) => a -> Term sig a -> m (Maybe (Named a) :<- Term sig a, Term sig a)
 unstatement n t = first (first Just) <$> unbind n t <|> first (Nothing :<-) <$> unseq t
 
-do' :: (Eq a, Foldable t, Carrier sig m, Member Core sig) => t (Maybe (Named a) :<- m a) -> m a
+do' :: (Eq a, Foldable t, Has Core sig m) => t (Maybe (Named a) :<- m a) -> m a
 do' bindings = fromMaybe unit (foldr bind Nothing bindings)
   where bind (n :<- a) v = maybe (a >>>) ((>>>=) . (:<- a)) n <$> v <|> Just a
 
-unstatements :: (Member Core sig, RightModule sig) => Term sig a -> (Stack (Maybe (Named (Either Int a)) :<- Term sig (Either Int a)), Term sig (Either Int a))
+unstatements :: (Project Core sig, RightModule sig) => Term sig a -> (Stack (Maybe (Named (Either Int a)) :<- Term sig (Either Int a)), Term sig (Either Int a))
 unstatements = unprefix (unstatement . Left) . fmap Right
 
 data a :<- b = a :<- b
@@ -156,60 +156,60 @@ instance Bifunctor (:<-) where
   bimap f g (a :<- b) = f a :<- g b
 
 
-lam :: (Eq a, Carrier sig m, Member Core sig) => Named a -> m a -> m a
+lam :: (Eq a, Has Core sig m) => Named a -> m a -> m a
 lam (Named u n) b = send (Lam (Named u (abstract1 n b)))
 
-lams :: (Eq a, Foldable t, Carrier sig m, Member Core sig) => t (Named a) -> m a -> m a
+lams :: (Eq a, Foldable t, Has Core sig m) => t (Named a) -> m a -> m a
 lams names body = foldr lam body names
 
-unlam :: (Alternative m, Member Core sig, RightModule sig) => a -> Term sig a -> m (Named a, Term sig a)
+unlam :: (Alternative m, Project Core sig, RightModule sig) => a -> Term sig a -> m (Named a, Term sig a)
 unlam n (Term sig) | Just (Lam b) <- prj sig = pure (n <$ b, instantiate1 (pure n) (namedValue b))
 unlam _ _                                    = empty
 
-($$) :: (Carrier sig m, Member Core sig) => m a -> m a -> m a
+($$) :: Has Core sig m => m a -> m a -> m a
 f $$ a = send (f :$ a)
 
 infixl 8 $$
 
 -- | Application of a function to a sequence of arguments.
-($$*) :: (Foldable t, Carrier sig m, Member Core sig) => m a -> t (m a) -> m a
+($$*) :: (Foldable t, Has Core sig m) => m a -> t (m a) -> m a
 ($$*) = foldl' ($$)
 
 infixl 8 $$*
 
-unapply :: (Alternative m, Member Core sig) => Term sig a -> m (Term sig a, Term sig a)
+unapply :: (Alternative m, Project Core sig) => Term sig a -> m (Term sig a, Term sig a)
 unapply (Term sig) | Just (f :$ a) <- prj sig = pure (f, a)
 unapply _                                     = empty
 
-unapplies :: Member Core sig => Term sig a -> (Term sig a, Stack (Term sig a))
+unapplies :: Project Core sig => Term sig a -> (Term sig a, Stack (Term sig a))
 unapplies core = case unapply core of
   Just (f, a) -> (:> a) <$> unapplies f
   Nothing     -> (core, Nil)
 
-unit :: (Carrier sig m, Member Core sig) => m a
+unit :: Has Core sig m => m a
 unit = send Unit
 
-bool :: (Carrier sig m, Member Core sig) => Bool -> m a
+bool :: Has Core sig m => Bool -> m a
 bool = send . Bool
 
-if' :: (Carrier sig m, Member Core sig) => m a -> m a -> m a -> m a
+if' :: Has Core sig m => m a -> m a -> m a -> m a
 if' c t e = send (If c t e)
 
-string :: (Carrier sig m, Member Core sig) => Text -> m a
+string :: Has Core sig m => Text -> m a
 string = send . String
 
-load :: (Carrier sig m, Member Core sig) => m a -> m a
+load :: Has Core sig m => m a -> m a
 load = send . Load
 
-record :: (Carrier sig m, Member Core sig) => [(Name, m a)] -> m a
+record :: Has Core sig m => [(Name, m a)] -> m a
 record fs = send (Record fs)
 
-(...) :: (Carrier sig m, Member Core sig) => m a -> Name -> m a
+(...) :: Has Core sig m => m a -> Name -> m a
 a ... b = send (a :. b)
 
 infixl 9 ...
 
-(.=) :: (Carrier sig m, Member Core sig) => m a -> m a -> m a
+(.=) :: Has Core sig m => m a -> m a -> m a
 a .= b = send (a := b)
 
 infix 3 .=
@@ -225,13 +225,13 @@ instance RightModule Ann where
   Ann l b >>=* f = Ann l (b >>= f)
 
 
-ann :: (Carrier sig m, Member Ann sig) => HasCallStack => m a -> m a
+ann :: Has Ann sig m => HasCallStack => m a -> m a
 ann = annWith callStack
 
-annAt :: (Carrier sig m, Member Ann sig) => Loc -> m a -> m a
+annAt :: Has Ann sig m => Loc -> m a -> m a
 annAt loc = send . Ann loc
 
-annWith :: (Carrier sig m, Member Ann sig) => CallStack -> m a -> m a
+annWith :: Has Ann sig m => CallStack -> m a -> m a
 annWith callStack = maybe id annAt (stackLoc callStack)
 
 
