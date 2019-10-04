@@ -195,14 +195,6 @@ library
                      , Language.Go.Assignment
                      , Language.Go.Syntax
                      , Language.Go.Type
-                     , Language.Haskell.Assignment
-                     , Language.Haskell.Syntax
-                     , Language.Haskell.Syntax.Constructor
-                     , Language.Haskell.Syntax.Haskell
-                     , Language.Haskell.Syntax.Identifier
-                     , Language.Haskell.Syntax.Pattern
-                     , Language.Haskell.Syntax.QuasiQuote
-                     , Language.Haskell.Syntax.Type
                      , Language.JSON.Assignment
                      , Language.JSON.PrettyPrint
                      , Language.Ruby.Assignment
@@ -320,7 +312,6 @@ library
                      , unordered-containers ^>= 0.2.9.0
                      , vector ^>= 0.12.0.2
                      , tree-sitter-go ^>= 0.2
-                     , tree-sitter-haskell ^>= 0.2
                      , tree-sitter-json ^>= 0.2
                      , tree-sitter-php ^>= 0.2
                      , tree-sitter-python ^>= 0.5
