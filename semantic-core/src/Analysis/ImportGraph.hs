@@ -8,11 +8,11 @@ module Analysis.ImportGraph
 import           Analysis.Eval
 import           Analysis.FlowInsensitive
 import           Control.Applicative (Alternative(..))
-import           Control.Effect
-import           Control.Effect.Fail
-import           Control.Effect.Fresh
-import           Control.Effect.Reader
-import           Control.Effect.State
+import           Control.Carrier
+import           Control.Carrier.Fail.Either
+import           Control.Carrier.Fresh.Strict
+import           Control.Carrier.Reader
+import           Control.Carrier.State.Strict
 import           Control.Monad ((>=>))
 import           Data.File
 import           Data.Foldable (fold, for_)
@@ -51,7 +51,7 @@ data Semi term
 importGraph
   :: (Ord term, Show term)
   => (forall sig m
-     .  (Carrier sig m, Member (Reader Loc) sig, MonadFail m)
+     .  (Has (Reader Loc) sig m, MonadFail m)
      => Analysis term Name (Value term) m
      -> (term -> m (Value term))
      -> (term -> m (Value term))
@@ -67,15 +67,14 @@ importGraph eval
   . traverse (runFile eval)
 
 runFile
-  :: ( Carrier sig m
-     , Effect sig
-     , Member Fresh sig
-     , Member (State (Heap Name (Value term))) sig
+  :: ( Effect sig
+     , Has Fresh sig m
+     , Has (State (Heap Name (Value term))) sig m
      , Ord  term
      , Show term
      )
   => (forall sig m
-     .  (Carrier sig m, Member (Reader Loc) sig, MonadFail m)
+     .  (Has (Reader Loc) sig m, MonadFail m)
      => Analysis term Name (Value term) m
      -> (term -> m (Value term))
      -> (term -> m (Value term))
@@ -90,9 +89,8 @@ runFile eval file = traverse run file
 
 -- FIXME: decompose into a product domain and two atomic domains
 importGraphAnalysis :: ( Alternative m
-                       , Carrier sig m
-                       , Member (Reader Loc) sig
-                       , Member (State (Heap Name (Value term))) sig
+                       , Has (Reader Loc) sig m
+                       , Has (State (Heap Name (Value term))) sig m
                        , MonadFail m
                        , Ord  term
                        , Show term
