@@ -10,11 +10,11 @@ module Analysis.Typecheck
 import           Analysis.Eval
 import           Analysis.FlowInsensitive
 import           Control.Applicative (Alternative (..))
-import           Control.Effect.Carrier
-import           Control.Effect.Fail
-import           Control.Effect.Fresh as Fresh
-import           Control.Effect.Reader hiding (Local)
-import           Control.Effect.State
+import           Control.Carrier
+import           Control.Carrier.Fail.Either
+import           Control.Carrier.Fresh.Strict as Fresh
+import           Control.Carrier.Reader hiding (Local)
+import           Control.Carrier.State.Strict
 import           Control.Monad ((>=>), unless)
 import           Control.Monad.Module
 import           Data.File
@@ -81,10 +81,10 @@ instance RightModule Polytype where
   PForAll b >>=* f = PForAll (b >>=* f)
 
 
-forAll :: (Eq a, Carrier sig m, Member Polytype sig) => a -> m a -> m a
+forAll :: (Eq a, Has Polytype sig m) => a -> m a -> m a
 forAll n body = send (PForAll (abstract1 n body))
 
-forAlls :: (Eq a, Carrier sig m, Member Polytype sig, Foldable t) => t a -> m a -> m a
+forAlls :: (Eq a, Has Polytype sig m, Foldable t) => t a -> m a -> m a
 forAlls ns body = foldr forAll body ns
 
 generalize :: Term Monotype Meta -> Term (Polytype :+: Monotype) Void
@@ -94,7 +94,7 @@ generalize ty = fromJust (closed (forAlls (IntSet.toList (mvs ty)) (hoistTerm R 
 typecheckingFlowInsensitive
   :: Ord term
   => (forall sig m
-     .  (Carrier sig m, Member (Reader Loc) sig, MonadFail m)
+     .  (Has (Reader Loc) sig m, MonadFail m)
      => Analysis term Name Type m
      -> (term -> m Type)
      -> (term -> m Type)
@@ -111,14 +111,13 @@ typecheckingFlowInsensitive eval
   . traverse (runFile eval)
 
 runFile
-  :: ( Carrier sig m
-     , Effect sig
-     , Member Fresh sig
-     , Member (State (Heap Name Type)) sig
+  :: ( Effect sig
+     , Has Fresh sig m
+     , Has (State (Heap Name Type)) sig m
      , Ord term
      )
   => (forall sig m
-     .  (Carrier sig m, Member (Reader Loc) sig, MonadFail m)
+     .  (Has (Reader Loc) sig m, MonadFail m)
      => Analysis term Name Type m
      -> (term -> m Type)
      -> (term -> m Type)
@@ -146,10 +145,9 @@ runFile eval file = traverse run file
 
 typecheckingAnalysis
   :: ( Alternative m
-     , Carrier sig m
-     , Member Fresh sig
-     , Member (State (Set.Set Constraint)) sig
-     , Member (State (Heap Name Type)) sig
+     , Has Fresh sig m
+     , Has (State (Set.Set Constraint)) sig m
+     , Has (State (Heap Name Type)) sig m
      )
   => Analysis term Name Type m
 typecheckingAnalysis = Analysis{..}
@@ -196,17 +194,17 @@ data Solution
 
 infix 5 :=
 
-meta :: (Carrier sig m, Member Fresh sig) => m Type
+meta :: Has Fresh sig m => m Type
 meta = pure <$> Fresh.fresh
 
-unify :: (Carrier sig m, Member (State (Set.Set Constraint)) sig) => Term Monotype Meta -> Term Monotype Meta -> m ()
+unify :: Has (State (Set.Set Constraint)) sig m => Term Monotype Meta -> Term Monotype Meta -> m ()
 unify t1 t2
   | t1 == t2  = pure ()
   | otherwise = modify (<> Set.singleton (t1 :===: t2))
 
 type Substitution = IntMap.IntMap Type
 
-solve :: (Carrier sig m, Member (State Substitution) sig, MonadFail m) => Set.Set Constraint -> m ()
+solve :: (Has (State Substitution) sig m, MonadFail m) => Set.Set Constraint -> m ()
 solve cs = for_ cs solve
   where solve = \case
           -- FIXME: how do we enforce proper subtyping? row polymorphism or something?
