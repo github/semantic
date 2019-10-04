@@ -19,13 +19,11 @@ module Parsing.Parser
 , typescriptASTParser
 , phpParser
 , phpASTParser
-, haskellParser
   -- * Abstract parsers
 
   -- $abstract
 , SomeParser(..)
 , goParser'
-, haskellParser'
 , javascriptParser'
 , jsonParser'
 , jsxParser'
@@ -57,7 +55,6 @@ import qualified Data.Syntax as Syntax
 import           Data.Term
 import           Foreign.Ptr
 import qualified Language.Go.Assignment as Go
-import qualified Language.Haskell.Assignment as Haskell
 import qualified Language.JSON.Assignment as JSON
 import qualified Language.Markdown.Assignment as Markdown
 import qualified Language.PHP.Assignment as PHP
@@ -69,7 +66,6 @@ import qualified Language.TypeScript.Assignment as TypeScript
 import           Prelude hiding (fail)
 import           Prologue
 import           TreeSitter.Go
-import           TreeSitter.Haskell
 import           TreeSitter.JSON
 import qualified TreeSitter.Language as TS (Language, Symbol)
 import           TreeSitter.PHP
@@ -96,13 +92,11 @@ someAnalysisParser :: ( constraint (Sum Go.Syntax)
                       , constraint (Sum Python.Syntax)
                       , constraint (Sum Ruby.Syntax)
                       , constraint (Sum TypeScript.Syntax)
-                      , constraint (Sum Haskell.Syntax)
                       )
                    => proxy constraint                  -- ^ A proxy for the constraint required, e.g. @(Proxy \@Show1)@.
                    -> Language                          -- ^ The 'Language' to select.
                    -> SomeAnalysisParser constraint Loc -- ^ A 'SomeAnalysisParser' abstracting the syntax type to be produced.
 someAnalysisParser _ Go         = SomeAnalysisParser goParser         (Proxy @'Go)
-someAnalysisParser _ Haskell    = SomeAnalysisParser haskellParser    (Proxy @'Haskell)
 someAnalysisParser _ JavaScript = SomeAnalysisParser typescriptParser (Proxy @'JavaScript)
 someAnalysisParser _ PHP        = SomeAnalysisParser phpParser        (Proxy @'PHP)
 someAnalysisParser _ Python     = SomeAnalysisParser pythonParser     (Proxy @'Python)
@@ -167,9 +161,6 @@ tsxParser = AssignmentParser (ASTParser tree_sitter_tsx) TSX.assignment
 typescriptASTParser :: Parser (AST [] TypeScript.Grammar)
 typescriptASTParser = ASTParser tree_sitter_typescript
 
-haskellParser :: Parser Haskell.Term
-haskellParser = AssignmentParser (ASTParser tree_sitter_haskell) Haskell.assignment
-
 markdownParser :: Parser Markdown.Term
 markdownParser = AssignmentParser MarkdownParser Markdown.assignment
 
@@ -186,7 +177,6 @@ data SomeASTParser where
 
 someASTParser :: Language -> Maybe SomeASTParser
 someASTParser Go         = Just (SomeASTParser (ASTParser tree_sitter_go :: Parser (AST [] Go.Grammar)))
-someASTParser Haskell    = Just (SomeASTParser (ASTParser tree_sitter_haskell :: Parser (AST [] Haskell.Grammar)))
 someASTParser JSON       = Just (SomeASTParser (ASTParser tree_sitter_json :: Parser (AST [] JSON.Grammar)))
 
 -- Use the TSX parser for `.js` and `.jsx` files in case they use Flow type-annotation syntax.
@@ -238,9 +228,6 @@ data SomeParser c a where
 goParser' :: c (Term (Sum Go.Syntax)) => (Language, SomeParser c Loc)
 goParser' = (Go, SomeParser goParser)
 
-haskellParser' :: c (Term (Sum Haskell.Syntax)) => (Language, SomeParser c Loc)
-haskellParser' = (Haskell, SomeParser haskellParser)
-
 javascriptParser' :: c (Term (Sum TSX.Syntax)) => (Language, SomeParser c Loc)
 javascriptParser' = (JavaScript, SomeParser tsxParser)
 
@@ -280,7 +267,6 @@ typescriptParser' = (TypeScript, SomeParser typescriptParser)
 -- | The canonical set of parsers producing à la carte terms.
 aLaCarteParsers
   :: ( c (Term (Sum Go.Syntax))
-     , c (Term (Sum Haskell.Syntax))
      , c (Term (Sum JSON.Syntax))
      , c (Term (Sum Markdown.Syntax))
      , c (Term (Sum PHP.Syntax))
@@ -292,7 +278,6 @@ aLaCarteParsers
   => Map Language (SomeParser c Loc)
 aLaCarteParsers = Map.fromList
   [ goParser'
-  , haskellParser'
   , javascriptParser'
   , jsonParser'
   , jsxParser'
@@ -313,7 +298,6 @@ preciseParsers = Map.fromList
 -- | The canonical set of all parsers for the passed per-language modes.
 allParsers
   :: ( c (Term (Sum Go.Syntax))
-     , c (Term (Sum Haskell.Syntax))
      , c (Term (Sum JSON.Syntax))
      , c (Term (Sum Markdown.Syntax))
      , c (Term (Sum PHP.Syntax))
@@ -327,7 +311,6 @@ allParsers
   -> Map Language (SomeParser c Loc)
 allParsers modes = Map.fromList
   [ goParser'
-  , haskellParser'
   , javascriptParser'
   , jsonParser'
   , jsxParser'
