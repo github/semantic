@@ -10,11 +10,11 @@ module Analysis.ScopeGraph
 import           Analysis.Eval
 import           Analysis.FlowInsensitive
 import           Control.Applicative (Alternative (..))
-import           Control.Effect.Carrier
-import           Control.Effect.Fail
-import           Control.Effect.Fresh
-import           Control.Effect.Reader
-import           Control.Effect.State
+import           Control.Carrier
+import           Control.Carrier.Fail.Either
+import           Control.Carrier.Fresh.Strict
+import           Control.Carrier.Reader
+import           Control.Carrier.State.Strict
 import           Control.Monad ((>=>))
 import           Data.File
 import           Data.Foldable (fold)
@@ -50,7 +50,7 @@ instance Monoid ScopeGraph where
 scopeGraph
   :: Ord term
   => (forall sig m
-     .  (Carrier sig m, Member (Reader Loc) sig, MonadFail m)
+     .  (Has (Reader Loc) sig m, MonadFail m)
      => Analysis term Name ScopeGraph m
      -> (term -> m ScopeGraph)
      -> (term -> m ScopeGraph)
@@ -64,14 +64,13 @@ scopeGraph eval
   . traverse (runFile eval)
 
 runFile
-  :: ( Carrier sig m
-     , Effect sig
-     , Member Fresh sig
-     , Member (State (Heap Name ScopeGraph)) sig
+  :: ( Effect sig
+     , Has Fresh sig m
+     , Has (State (Heap Name ScopeGraph)) sig m
      , Ord term
      )
   => (forall sig m
-     .  (Carrier sig m, Member (Reader Loc) sig, MonadFail m)
+     .  (Has (Reader Loc) sig m, MonadFail m)
      => Analysis term Name ScopeGraph m
      -> (term -> m ScopeGraph)
      -> (term -> m ScopeGraph)
@@ -87,10 +86,9 @@ runFile eval file = traverse run file
 
 scopeGraphAnalysis
   :: ( Alternative m
-     , Carrier sig m
-     , Member (Reader Loc) sig
-     , Member (Reader (Map.Map Name Loc)) sig
-     , Member (State (Heap Name ScopeGraph)) sig
+     , Has (Reader Loc) sig m
+     , Has (Reader (Map.Map Name Loc)) sig m
+     , Has (State (Heap Name ScopeGraph)) sig m
      )
   => Analysis term Name ScopeGraph m
 scopeGraphAnalysis = Analysis{..}
