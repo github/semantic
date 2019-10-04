@@ -11,3 +11,8 @@ source-repository-package
   type: git
   location: https://github.com/tclem/proto-lens-jsonpb
   tag: e4d10b77f57ee25beb759a33e63e2061420d3dc2
+
+source-repository-package
+  type: git
+  location: https://github.com/fused-effects/fused-effects
+  tag: b0983cefd366a4df010ae3ac45318c50328d042e
