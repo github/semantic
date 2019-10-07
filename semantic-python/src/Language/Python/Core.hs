@@ -1,7 +1,7 @@
 {-# LANGUAGE ConstraintKinds, DataKinds, DefaultSignatures, DeriveAnyClass, DeriveGeneric, DerivingStrategies,
              DerivingVia, DisambiguateRecordFields, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving,
              KindSignatures, LambdaCase, NamedFieldPuns, OverloadedLists, OverloadedStrings, PatternSynonyms,
-             ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeOperators, UndecidableInstances #-}
+             ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeOperators, UndecidableInstances, ViewPatterns #-}
 
 module Language.Python.Core
 ( compile
@@ -51,7 +51,7 @@ def n = coerce (Stack.:> n)
 pattern SingleIdentifier :: Name -> Py.ExpressionList a
 pattern SingleIdentifier name <- Py.ExpressionList
   { Py.extraChildren =
-    [ Py.PrimaryExpressionExpression (Py.IdentifierPrimaryExpression (Py.Identifier { bytes = name }))
+    [ Py.PrimaryExpressionExpression (Py.IdentifierPrimaryExpression (Py.Identifier { bytes = Name -> name }))
     ]
   }
 
@@ -240,7 +240,7 @@ instance Compile Py.ForStatement
 
 instance Compile Py.FunctionDefinition where
   compileCC it@Py.FunctionDefinition
-    { name       = Py.Identifier _ann1 name
+    { name       = Py.Identifier _ann1 (Name -> name)
     , parameters = Py.Parameters _ann2 parameters
     , body
     } cc = do
@@ -253,7 +253,7 @@ instance Compile Py.FunctionDefinition where
       -- with the new name (with 'def'), so that calling contexts know
       -- that we have built an exportable definition.
       assigning located <$> local (def name) cc
-    where param (Py.IdentifierParameter (Py.Identifier _pann pname)) = pure (named' pname)
+    where param (Py.IdentifierParameter (Py.Identifier _pann pname)) = pure (named' (Name pname))
           param x                                                    = unimplemented x
           unimplemented x = fail $ "unimplemented: " <> show x
           assigning item f = (Name.named' name :<- item) >>>= f
@@ -263,7 +263,7 @@ instance Compile Py.GeneratorExpression
 instance Compile Py.GlobalStatement
 
 instance Compile Py.Identifier where
-  compileCC Py.Identifier { bytes } _ = pure (pure bytes)
+  compileCC Py.Identifier { bytes } _ = pure (pure (Name bytes))
 
 instance Compile Py.IfStatement where
   compileCC it@Py.IfStatement{ condition, consequence, alternative} cc =
