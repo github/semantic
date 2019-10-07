@@ -27,7 +27,6 @@ import           Data.Text (Text)
 import           GHC.Generics
 import           GHC.Records
 import           Source.Span (Span)
-import qualified Source.Span as Source
 import qualified TreeSitter.Python.AST as Py
 
 -- | Access to the current filename as Text to stick into location annotations.
@@ -97,9 +96,8 @@ compile :: ( Compile py
         -> m (t Name)
 compile t = compileCC t (pure none)
 
-locFromTSSpan :: SourcePath -> Source.Span -> Loc
-locFromTSSpan fp (Source.Span (Source.Pos a b) (Source.Pos c d))
-  = Data.Loc.Loc (rawPath fp) (Data.Loc.Span (Data.Loc.Pos a b) (Data.Loc.Pos c d))
+locFromTSSpan :: SourcePath -> Span -> Loc
+locFromTSSpan fp = Data.Loc.Loc (rawPath fp)
 
 locate :: ( HasField "ann" syntax Span
           , CoreSyntax syn t
