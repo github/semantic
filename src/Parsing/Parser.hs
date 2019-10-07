@@ -66,7 +66,6 @@ import           Prelude hiding (fail)
 import           Prologue
 import           TreeSitter.Go
 import           TreeSitter.Java
-import           TreeSitter.JSON
 import qualified TreeSitter.Language as TS (Language, Symbol)
 import           TreeSitter.PHP
 import           TreeSitter.Python
@@ -159,7 +158,7 @@ javaParserPrecise :: Parser (PreciseJava.Term Loc)
 javaParserPrecise = UnmarshalParser tree_sitter_java
 
 jsonParserPrecise :: Parser (PreciseJSON.Term Loc)
-jsonParserPrecise = UnmarshalParser tree_sitter_json
+jsonParserPrecise = UnmarshalParser PreciseJSON.tree_sitter_json
 
 pythonParserPrecise :: Parser (PrecisePython.Term Loc)
 pythonParserPrecise = UnmarshalParser tree_sitter_python
