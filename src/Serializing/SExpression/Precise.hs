@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, OverloadedStrings, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes, DataKinds, FlexibleContexts, FlexibleInstances, KindSignatures, MultiParamTypeClasses, OverloadedStrings, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Serializing.SExpression.Precise
 ( serializeSExpression
 , ToSExpression(..)
@@ -7,10 +7,9 @@ module Serializing.SExpression.Precise
 import Data.ByteString.Builder
 import Data.Foldable (fold)
 import Data.List (intersperse)
-import Data.Text (Text)
 import GHC.Generics
 
-serializeSExpression :: ToSExpression t => t -> Builder
+serializeSExpression :: ToSExpression t => t ann -> Builder
 serializeSExpression t = toSExpression t 0 <> "\n"
 
 
@@ -22,31 +21,32 @@ pad :: Int -> Builder
 pad n = stringUtf8 (replicate (2 * n) ' ')
 
 
-class ToSExpression t where
-  toSExpression :: t -> Int -> Builder
+class ToSExpression (t :: * -> *) where
+  toSExpression :: t ann -> Int -> Builder
 
-instance (ToSExpressionWithStrategy strategy t, strategy ~ ToSExpressionStrategy t) => ToSExpression t where
-  toSExpression = toSExpressionWithStrategy @strategy undefined
+instance (ToSExpressionBy strategy t, strategy ~ ToSExpressionStrategy t) => ToSExpression t where
+  toSExpression = toSExpression' @strategy
 
 
-data Strategy = Generic | Show
+data Strategy = Generic | Custom
 
-type family ToSExpressionStrategy t :: Strategy where
-  ToSExpressionStrategy Text = 'Show
-  ToSExpressionStrategy _    = 'Generic
+type family ToSExpressionStrategy (t :: * -> *) :: Strategy where
+  ToSExpressionStrategy (_ :+: _) = 'Custom
+  ToSExpressionStrategy _         = 'Generic
 
-class ToSExpressionWithStrategy (strategy :: Strategy) t where
-  toSExpressionWithStrategy :: proxy strategy -> t -> Int -> Builder
+class ToSExpressionBy (strategy :: Strategy) t where
+  toSExpression' :: t ann -> Int -> Builder
 
-instance Show t => ToSExpressionWithStrategy 'Show t where
-  toSExpressionWithStrategy _ t _ = stringUtf8 (show t)
+instance (ToSExpression l, ToSExpression r) => ToSExpressionBy 'Custom (l :+: r) where
+  toSExpression' (L1 l) = toSExpression l
+  toSExpression' (R1 r) = toSExpression r
 
-instance (Generic t, GToSExpression (Rep t)) => ToSExpressionWithStrategy 'Generic t where
-  toSExpressionWithStrategy _ t n = nl n <> pad n <> "(" <> fold (intersperse " " (gtoSExpression (from t) n)) <> ")"
+instance (Generic1 t, GToSExpression (Rep1 t)) => ToSExpressionBy 'Generic t where
+  toSExpression' t n = nl n <> pad n <> "(" <> fold (intersperse " " (gtoSExpression (from1 t) n)) <> ")"
 
 
 class GToSExpression f where
-  gtoSExpression :: f (Int -> Builder) -> (Int -> [Builder])
+  gtoSExpression :: f ann -> Int -> [Builder]
 
 instance GToSExpression f => GToSExpression (M1 D d f) where
   gtoSExpression = gtoSExpression . unM1
@@ -67,5 +67,16 @@ instance GToSExpression U1 where
 instance GToSExpression f => GToSExpression (M1 S s f) where
   gtoSExpression = gtoSExpression . unM1 -- FIXME: show the selector name, if any
 
-instance ToSExpression k => GToSExpression (K1 R k) where
-  gtoSExpression k = pure . toSExpression (unK1 k)
+instance Show k => GToSExpression (K1 R k) where
+  gtoSExpression k _ = [stringUtf8 (show (unK1 k))]
+
+instance GToSExpression Par1 where
+  gtoSExpression _ _ = []
+
+instance ToSExpression t => GToSExpression (Rec1 t) where
+  gtoSExpression (Rec1 t) = pure . toSExpression t
+
+instance (Foldable f, GToSExpression g) => GToSExpression (f :.: g) where
+  gtoSExpression (Comp1 fs) n
+    | null fs   = [nl n <> pad n <> "[]"]
+    | otherwise = nl n <> pad n <> "[" : foldMap gtoSExpression fs (n + 1) <> ["]"]

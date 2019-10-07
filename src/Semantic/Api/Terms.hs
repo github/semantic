@@ -35,6 +35,8 @@ import           Semantic.Config
 import           Semantic.Task
 import           Serializing.Format hiding (JSON)
 import qualified Serializing.Format as Format
+import qualified Serializing.SExpression as SExpr (serializeSExpression)
+import qualified Serializing.SExpression.Precise as SExpr.Precise (serializeSExpression)
 import           Source.Loc
 
 import qualified Language.Java as Java
@@ -73,7 +75,7 @@ parseTermBuilder :: (Traversable t, Member Distribute sig, ParseEffects sig m, M
   => TermOutputFormat -> t Blob -> m Builder
 parseTermBuilder TermJSONTree    = distributeFoldMap jsonTerm >=> serialize Format.JSON -- NB: Serialize happens at the top level for these two JSON formats to collect results of multiple blobs.
 parseTermBuilder TermJSONGraph   = termGraph >=> serialize Format.JSON
-parseTermBuilder TermSExpression = distributeFoldMap (parseWith sexprTermParsers sexprTerm)
+parseTermBuilder TermSExpression = distributeFoldMap (\ blob -> asks sexprTermParsers >>= \ parsers -> parseWith parsers (pure . sexprTerm) blob)
 parseTermBuilder TermDotGraph    = distributeFoldMap (parseWith dotGraphTermParsers dotGraphTerm)
 parseTermBuilder TermShow        = distributeFoldMap (\ blob -> asks showTermParsers >>= \ parsers -> parseWith parsers showTerm blob)
 parseTermBuilder TermQuiet       = distributeFoldMap quietTerm
@@ -112,14 +114,20 @@ instance ShowTerm Python.Term where
   showTerm = serialize Show . void . Python.getTerm
 
 
-sexprTermParsers :: Map Language (SomeParser SExprTerm Loc)
-sexprTermParsers = aLaCarteParsers
+sexprTermParsers :: PerLanguageModes -> Map Language (SomeParser SExprTerm Loc)
+sexprTermParsers = allParsers
 
 class SExprTerm term where
-  sexprTerm :: (Carrier sig m, Member (Reader Config) sig) => term Loc -> m Builder
+  sexprTerm :: term Loc -> Builder
 
 instance (ConstructorName syntax, Foldable syntax, Functor syntax) => SExprTerm (Term syntax) where
-  sexprTerm = serialize (SExpression ByConstructorName)
+  sexprTerm = SExpr.serializeSExpression ByConstructorName
+
+instance SExprTerm Java.Term where
+  sexprTerm = SExpr.Precise.serializeSExpression . Java.getTerm
+
+instance SExprTerm Python.Term where
+  sexprTerm = SExpr.Precise.serializeSExpression . Python.getTerm
 
 
 dotGraphTermParsers :: Map Language (SomeParser DOTGraphTerm Loc)

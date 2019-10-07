@@ -21,10 +21,10 @@ import Text.Show.Pretty
 
 data Format input where
   DOT         :: (Ord vertex, ToGraph graph, ToVertex graph ~ vertex) => Style vertex Builder -> Format graph
-  JSON        :: ToJSON input                                                                 => Format input
+  JSON        :: ToJSON input                                         =>                         Format input
   SExpression :: (Recursive input, ToSExpression (Base input))        => Options              -> Format input
-  Show        :: Show input                                                                   => Format input
-  Proto       :: Message input                                                                => Format input
+  Show        :: Show input                                           =>                         Format input
+  Proto       :: Message input                                        =>                         Format input
 
 data FormatStyle = Colourful | Plain
 
