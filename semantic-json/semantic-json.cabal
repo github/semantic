@@ -23,6 +23,7 @@ library
     Language.JSON
   build-depends:
       base              >= 4.12 && < 5
+    , semantic-tags    ^>= 0.0
     , tree-sitter      ^>= 0.4
     , tree-sitter-json ^>= 0.3
   hs-source-dirs:      src
