@@ -40,6 +40,7 @@ import qualified Serializing.SExpression.Precise as SExpr.Precise (serializeSExp
 import           Source.Loc
 
 import qualified Language.Java as Java
+import qualified Language.JSON as JSON
 import qualified Language.Python as Python
 
 
@@ -109,6 +110,9 @@ instance (Functor syntax, Show1 syntax) => ShowTerm (Term syntax) where
 
 instance ShowTerm Java.Term where
   showTerm = serialize Show . void . Java.getTerm
+
+instance ShowTerm JSON.Term where
+  showTerm = serialize Show . void . JSON.getTerm
 
 instance ShowTerm Python.Term where
   showTerm = serialize Show . void . Python.getTerm
