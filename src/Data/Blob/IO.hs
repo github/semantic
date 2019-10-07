@@ -22,6 +22,7 @@ import qualified Control.Concurrent.Async as Async
 import qualified Data.ByteString as B
 import qualified System.Path as Path
 import qualified System.Path.PartClass as Part
+import Data.Text.Encoding (decodeUtf8)
 
 -- | Read a utf8-encoded file to a 'Blob'.
 readBlobFromFile :: forall m. MonadIO m => File -> m (Maybe Blob)
@@ -61,7 +62,7 @@ readBlobsFromGitRepo path oid excludePaths includePaths = liftIO . fmap catMaybe
       = Just . sourceBlob' path lang oid <$> Git.catFile gitDir oid
     blobFromTreeEntry _ _ = pure Nothing
 
-    sourceBlob' filepath language (Git.OID oid) source = makeBlob source filepath language oid
+    sourceBlob' filepath language (Git.OID oid) source = makeBlob source filepath language (decodeUtf8 oid)
 
 readFilePair :: MonadIO m => File -> File -> m BlobPair
 readFilePair a b = do

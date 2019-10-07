@@ -6,6 +6,7 @@ import           Control.Effect.Reader
 import           Control.Exception as Exc (displayException)
 import           Data.Blob
 import           Data.Blob.IO
+import qualified Data.ByteString.Char8 as B
 import           Data.Handle
 import qualified Data.Language as Language
 import           Data.List (intercalate)
@@ -200,7 +201,7 @@ graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute a g
 shaReader :: ReadM Git.OID
 shaReader = eitherReader parseSha
   where parseSha arg = if length arg == 40 || arg == "HEAD"
-          then Right (Git.OID (T.pack arg))
+          then Right (Git.OID (B.pack arg))
           else Left (arg <> " is not a valid sha1")
 
 filePathReader :: ReadM File
