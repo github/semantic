@@ -26,7 +26,6 @@ module Parsing.Parser
 , goParser'
 , javaParser'
 , javascriptParser'
-, jsonParserALaCarte'
 , jsonParserPrecise'
 , jsxParser'
 , markdownParser'
@@ -245,9 +244,6 @@ javaParser' = (Python, SomeParser javaParserPrecise)
 
 javascriptParser' :: c (Term (Sum TSX.Syntax)) => (Language, SomeParser c Loc)
 javascriptParser' = (JavaScript, SomeParser tsxParser)
-
-jsonParserALaCarte' :: c (Term (Sum JSON.Syntax)) => (Language, SomeParser c Loc)
-jsonParserALaCarte' = (JSON, SomeParser jsonParser)
 
 jsonParserPrecise' :: c PreciseJSON.Term => (Language, SomeParser c Loc)
 jsonParserPrecise' = (JSON, SomeParser jsonParserPrecise)
