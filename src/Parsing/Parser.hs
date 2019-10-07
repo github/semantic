@@ -196,6 +196,7 @@ someASTParser TypeScript = Just (SomeASTParser (ASTParser tree_sitter_typescript
 someASTParser TSX        = Just (SomeASTParser (ASTParser tree_sitter_tsx :: Parser (AST [] TSX.Grammar)))
 someASTParser PHP        = Just (SomeASTParser (ASTParser tree_sitter_php :: Parser (AST [] PHP.Grammar)))
 someASTParser Java       = Nothing
+someASTParser Haskell    = Nothing
 someASTParser Markdown   = Nothing
 someASTParser Unknown    = Nothing
 
