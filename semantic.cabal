@@ -301,6 +301,7 @@ library
                      , proto-lens-runtime ^>= 0.5.0.0
                      , reducers ^>= 3.12.3
                      , semantic-java ^>= 0
+                     , semantic-json ^>= 0
                      , semantic-python ^>= 0
                      , semantic-tags ^>= 0
                      , semigroupoids ^>= 5.3.2
