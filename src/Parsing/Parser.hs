@@ -2,8 +2,6 @@
 module Parsing.Parser
 ( Parser(..)
 , SomeAnalysisParser(..)
-, SomeASTParser(..)
-, someASTParser
 , someAnalysisParser
 -- * À la carte parsers
 , goParser
@@ -161,32 +159,6 @@ jsonParserPrecise = UnmarshalParser PreciseJSON.tree_sitter_json
 
 pythonParserPrecise :: Parser (PrecisePython.Term Loc)
 pythonParserPrecise = UnmarshalParser PrecisePython.tree_sitter_python
-
-
--- | A parser for producing specialized (tree-sitter) ASTs.
-data SomeASTParser where
-  SomeASTParser :: (Bounded grammar, Enum grammar, Show grammar)
-                => Parser (AST [] grammar)
-                -> SomeASTParser
-
-someASTParser :: Language -> Maybe SomeASTParser
-someASTParser Go         = Just (SomeASTParser (ASTParser tree_sitter_go :: Parser (AST [] Go.Grammar)))
-someASTParser JSON       = Nothing
-
--- Use the TSX parser for `.js` and `.jsx` files in case they use Flow type-annotation syntax.
--- The TSX and Flow syntaxes are the same, whereas the normal TypeScript syntax is different.
-someASTParser JavaScript = Just (SomeASTParser (ASTParser tree_sitter_tsx :: Parser (AST [] TSX.Grammar)))
-someASTParser JSX        = Just (SomeASTParser (ASTParser tree_sitter_tsx :: Parser (AST [] TSX.Grammar)))
-
-someASTParser Python     = Just (SomeASTParser (ASTParser tree_sitter_python :: Parser (AST [] Python.Grammar)))
-someASTParser Ruby       = Just (SomeASTParser (ASTParser tree_sitter_ruby :: Parser (AST [] Ruby.Grammar)))
-someASTParser TypeScript = Just (SomeASTParser (ASTParser tree_sitter_typescript :: Parser (AST [] TypeScript.Grammar)))
-someASTParser TSX        = Just (SomeASTParser (ASTParser tree_sitter_tsx :: Parser (AST [] TSX.Grammar)))
-someASTParser PHP        = Just (SomeASTParser (ASTParser tree_sitter_php :: Parser (AST [] PHP.Grammar)))
-someASTParser Java       = Nothing
-someASTParser Haskell    = Nothing
-someASTParser Markdown   = Nothing
-someASTParser Unknown    = Nothing
 
 
 -- $abstract
