@@ -1,6 +1,6 @@
-{-# LANGUAGE DeriveTraversable, GeneralizedNewtypeDeriving, LambdaCase, OverloadedLists #-}
+{-# LANGUAGE DeriveGeneric, DeriveTraversable, GeneralizedNewtypeDeriving, LambdaCase, OverloadedLists #-}
 module Data.Name
-( Name(..)
+( Name (..)
 , Named(..)
 , named
 , named'
@@ -15,14 +15,14 @@ module Data.Name
 import qualified Data.Char as Char
 import           Data.HashSet (HashSet)
 import qualified Data.HashSet as HashSet
-import           Data.String
+import           Data.String (IsString)
 import           Data.Text as Text (Text, any, unpack)
-import           Data.Text.Prettyprint.Doc
+import           Data.Text.Prettyprint.Doc (Pretty)
+import           GHC.Generics (Generic)
 
 -- | User-specified and -relevant names.
 newtype Name = Name { unName :: Text }
-  deriving (Eq, IsString, Ord, Pretty, Show)
-
+  deriving (Eq, Generic, IsString, Ord, Pretty, Show)
 
 -- | Annotates an @a@ with a 'Name'-provided name, which is ignored for '==' and 'compare'.
 data Named a = Named (Ignored Name) a
