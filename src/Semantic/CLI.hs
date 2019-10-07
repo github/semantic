@@ -15,7 +15,6 @@ import qualified Data.Flag as Flag
 import           Options.Applicative hiding (style)
 import           Prologue
 import           Semantic.Api hiding (File)
-import qualified Semantic.AST as AST
 import           Semantic.Config
 import qualified Semantic.Graph as Graph
 import qualified Semantic.Task as Task
@@ -83,7 +82,7 @@ optionsParser = do
 
 argumentsParser :: Parser (Parse.ParseC Task.TaskC ())
 argumentsParser = do
-  subparser <- hsubparser (diffCommand <> parseCommand <>  tsParseCommand <> graphCommand)
+  subparser <- hsubparser (diffCommand <> parseCommand <> graphCommand)
   output <- ToPath <$> strOption (long "output" <> short 'o' <> help "Output path, defaults to stdout") <|> pure (ToHandle stdout)
   pure $ subparser >>= Task.write output
 
@@ -147,25 +146,6 @@ parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate pa
                   <|> FilesFromPaths <$> some (argument filePathReader (metavar "FILES..."))
                   <|> pure (FilesFromHandle stdin)
       pure $ Task.readBlobs filesOrStdin >>= runReader languageModes . renderer
-
-tsParseCommand :: Mod CommandFields (Parse.ParseC Task.TaskC Builder)
-tsParseCommand = command "ts-parse" (info tsParseArgumentsParser (progDesc "Generate raw tree-sitter parse trees for path(s)"))
-  where
-    tsParseArgumentsParser = do
-      format <- flag  AST.SExpression AST.SExpression (long "sexpression" <> help "Output s-expression ASTs (default)")
-            <|> flag'                 AST.JSON        (long "json"        <> help "Output JSON ASTs")
-            <|> flag'                 AST.Quiet       (long "quiet"       <> help "Don't produce output, but show timing stats")
-            <|> flag'                 AST.Show        (long "show"        <> help "Output using the Show instance (debug only, format subject to change without notice)")
-      filesOrStdin <- FilesFromGitRepo
-                      <$> option str (long "gitDir" <> help "A .git directory to read from")
-                      <*> option shaReader (long "sha" <> help "The commit SHA1 to read from")
-                      <*> ( ExcludePaths <$> many (option str (long "exclude" <> short 'x' <> help "Paths to exclude"))
-                        <|> ExcludeFromHandle <$> flag' stdin (long "exclude-stdin" <> help "Exclude paths given to stdin")
-                        <|> IncludePaths <$> many (option str (long "only" <> help "Only include the specified paths"))
-                        <|> IncludePathsFromHandle <$> flag' stdin (long "only-stdin" <> help "Include only the paths given to stdin"))
-                  <|> FilesFromPaths <$> some (argument filePathReader (metavar "FILES..."))
-                  <|> pure (FilesFromHandle stdin)
-      pure $ Task.readBlobs filesOrStdin >>= AST.runASTParse format
 
 graphCommand :: Mod CommandFields (Parse.ParseC Task.TaskC Builder)
 graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute a graph for a directory or from a top-level entry point module"))
