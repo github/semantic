@@ -67,7 +67,7 @@ data Edge = Lexical | Import
 
 -- | Concrete evaluation of a term to a value.
 --
---   >>> map fileBody (snd (concrete eval [File (Loc "bool" emptySpan) (Core.bool True)]))
+--   >>> map fileBody (snd (concrete eval [File (Loc "bool" (Span (Pos 1 1) (Pos 1 5))) (Core.bool True)]))
 --   [Right (Bool True)]
 concrete
   :: (Foldable term, Show (term Name))
