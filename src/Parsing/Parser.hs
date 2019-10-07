@@ -65,7 +65,6 @@ import qualified Language.TypeScript.Assignment as TypeScript
 import           Prelude hiding (fail)
 import           Prologue
 import           TreeSitter.Go
-import           TreeSitter.Java
 import qualified TreeSitter.Language as TS (Language, Symbol)
 import           TreeSitter.PHP
 import           TreeSitter.Python
@@ -155,7 +154,7 @@ markdownParser = AssignmentParser MarkdownParser Markdown.assignment
 
 
 javaParserPrecise :: Parser (PreciseJava.Term Loc)
-javaParserPrecise = UnmarshalParser tree_sitter_java
+javaParserPrecise = UnmarshalParser PreciseJava.tree_sitter_java
 
 jsonParserPrecise :: Parser (PreciseJSON.Term Loc)
 jsonParserPrecise = UnmarshalParser PreciseJSON.tree_sitter_json
