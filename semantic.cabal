@@ -195,7 +195,6 @@ library
                      , Language.Go.Assignment
                      , Language.Go.Syntax
                      , Language.Go.Type
-                     , Language.JSON.Assignment
                      , Language.JSON.PrettyPrint
                      , Language.Ruby.Assignment
                      , Language.Ruby.PrettyPrint
