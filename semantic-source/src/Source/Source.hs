@@ -32,6 +32,7 @@ module Source.Source
 import Prelude hiding (drop, take)
 
 import           Control.Arrow ((&&&))
+import           Control.DeepSeq (NFData)
 import           Data.Aeson (FromJSON (..), withText)
 import qualified Data.ByteString as B
 import           Data.Char (ord)
@@ -50,7 +51,7 @@ import           Source.Span (Span(Span), Pos(..))
 -- 'ByteString' under the hood. Construct these with 'fromUTF8'; obviously,
 -- passing 'fromUTF8' non-UTF8 bytes will cause crashes.
 newtype Source = Source { bytes :: B.ByteString }
-  deriving (Eq, Semigroup, Monoid, IsString, Show, Generic)
+  deriving (Eq, Semigroup, Monoid, IsString, Show, Generic, NFData)
 
 fromUTF8 :: B.ByteString -> Source
 fromUTF8 = Source
