@@ -5,9 +5,11 @@ module Control.Effect.Parse
 , parse
 , parseWith
 , parsePairWith
+  -- * Re-exports
+, Has
 ) where
 
-import Control.Effect.Carrier
+import Control.Carrier
 import Control.Effect.Error
 import Control.Exception (SomeException)
 import Data.Bifunctor.Join
@@ -30,7 +32,7 @@ instance Effect Parse where
 
 
 -- | Parse a 'Blob' with the given 'Parser'.
-parse :: (Member Parse sig, Carrier sig m)
+parse :: Has Parse sig m
       => Parser term
       -> Blob
       -> m term
@@ -39,7 +41,7 @@ parse parser blob = send (Parse parser blob pure)
 
 -- | Parse a 'Blob' with one of the provided parsers, and run an action on the abstracted term.
 parseWith
-  :: (Carrier sig m, Member (Error SomeException) sig, Member Parse sig)
+  :: (Has (Error SomeException) sig m, Has Parse sig m)
   => Map.Map Language (SomeParser c ann)       -- ^ The set of parsers to select from.
   -> (forall term . c term => term ann -> m a) -- ^ A function to run on the parsed term. Note that the term is abstract, but constrained by @c@, allowing you to do anything @c@ allows, and requiring that all the input parsers produce terms supporting @c@.
   -> Blob                                      -- ^ The blob to parse.
@@ -50,7 +52,7 @@ parseWith parsers with blob = case Map.lookup (blobLanguage blob) parsers of
 
 -- | Parse a 'BlobPair' with one of the provided parsers, and run an action on the abstracted term pair.
 parsePairWith
-  :: (Carrier sig m, Member (Error SomeException) sig, Member Parse sig)
+  :: (Has (Error SomeException) sig m, Has Parse sig m)
   => Map.Map Language (SomeParser c ann)                          -- ^ The set of parsers to select from.
   -> (forall term . c term => These (term ann) (term ann) -> m a) -- ^ A function to run on the parsed terms. Note that the terms are abstract, but constrained by @c@, allowing you to do anything @c@ allows, and requiring that all the input parsers produce terms supporting @c@.
   -> BlobPair                                                     -- ^ The blob pair to parse.
