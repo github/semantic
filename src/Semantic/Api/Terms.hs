@@ -130,6 +130,9 @@ instance (ConstructorName syntax, Foldable syntax, Functor syntax) => SExprTerm 
 instance SExprTerm Java.Term where
   sexprTerm = SExpr.Precise.serializeSExpression . Java.getTerm
 
+instance SExprTerm JSON.Term where
+  sexprTerm = SExpr.Precise.serializeSExpression . JSON.getTerm
+
 instance SExprTerm Python.Term where
   sexprTerm = SExpr.Precise.serializeSExpression . Python.getTerm
 
