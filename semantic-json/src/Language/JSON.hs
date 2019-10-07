@@ -1,9 +1,11 @@
 -- | Semantic functionality for JSON programs.
 module Language.JSON
 ( Term(..)
+, TreeSitter.JSON.tree_sitter_json
 ) where
 
 import qualified Tags.Tagging.Precise as Tags
+import qualified TreeSitter.JSON (tree_sitter_json)
 import qualified TreeSitter.JSON.AST as JSON
 import qualified TreeSitter.Unmarshal as TS
 
