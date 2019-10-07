@@ -48,6 +48,7 @@ library
                      , parsers                     ^>= 0.12.10
                      , prettyprinter               ^>= 1.2.1
                      , prettyprinter-ansi-terminal ^>= 1.1.1
+                     , semantic-source             ^>= 0
                      , semigroupoids               ^>= 5.3
                      , text                        ^>= 1.2.3.1
                      , transformers                ^>= 0.5.6
