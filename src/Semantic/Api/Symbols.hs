@@ -110,10 +110,10 @@ class ToTags t where
 instance IsTaggable syntax => ToTags (Term syntax) where
   tags = runTagging
 
-instance ToTags Python.Term where
+instance ToTags Java.Term where
   tags _ _ = Precise.tags
 
-instance ToTags Java.Term where
+instance ToTags Python.Term where
   tags _ _ = Precise.tags
 
 
