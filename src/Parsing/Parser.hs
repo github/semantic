@@ -5,16 +5,12 @@ module Parsing.Parser
 , someAnalysisParser
 -- * À la carte parsers
 , goParser
-, goASTParser
 , markdownParser
 , pythonParser
-, pythonASTParser
 , rubyParser
 , tsxParser
 , typescriptParser
-, typescriptASTParser
 , phpParser
-, phpASTParser
   -- * Abstract parsers
 
   -- $abstract
@@ -120,32 +116,20 @@ data Parser term where
 goParser :: Parser Go.Term
 goParser = AssignmentParser (ASTParser tree_sitter_go) Go.assignment
 
-goASTParser :: Parser (AST [] Go.Grammar)
-goASTParser = ASTParser tree_sitter_go
-
 rubyParser :: Parser Ruby.Term
 rubyParser = AssignmentParser (ASTParser tree_sitter_ruby) Ruby.assignment
 
 phpParser :: Parser PHP.Term
 phpParser = AssignmentParser (ASTParser tree_sitter_php) PHP.assignment
 
-phpASTParser :: Parser (AST [] PHP.Grammar)
-phpASTParser = ASTParser tree_sitter_php
-
 pythonParser :: Parser Python.Term
 pythonParser = AssignmentParser (ASTParser tree_sitter_python) Python.assignment
-
-pythonASTParser :: Parser (AST [] Python.Grammar)
-pythonASTParser = ASTParser tree_sitter_python
 
 typescriptParser :: Parser TypeScript.Term
 typescriptParser = AssignmentParser (ASTParser tree_sitter_typescript) TypeScript.assignment
 
 tsxParser :: Parser TSX.Term
 tsxParser = AssignmentParser (ASTParser tree_sitter_tsx) TSX.assignment
-
-typescriptASTParser :: Parser (AST [] TypeScript.Grammar)
-typescriptASTParser = ASTParser tree_sitter_typescript
 
 markdownParser :: Parser Markdown.Term
 markdownParser = AssignmentParser MarkdownParser Markdown.assignment
