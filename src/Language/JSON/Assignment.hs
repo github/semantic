@@ -35,7 +35,7 @@ assignment :: Assignment Term
 assignment = value <|> parseError
 
 value :: Assignment Term
-value = branchNode Value (object <|> array <|> parseError)
+value = branchNode Document (object <|> array <|> parseError)
 
 jsonValue :: Assignment Term
 jsonValue = object <|> array <|> number <|> string <|> boolean <|> none <|> parseError
