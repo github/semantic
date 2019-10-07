@@ -1,10 +1,10 @@
 cabal-version:       2.4
 
-name:                semantic-tags
+name:                semantic-java
 version:             0.0.0.0
-synopsis:            Tags computation
-description:         Tags computation for ASTs derived from tree-sitter grammars.
-homepage:            https://github.com/github/semantic/tree/master/semantic-core#readme
+synopsis:            Semantic support for Java
+description:         Semantic support for Java.
+homepage:            https://github.com/github/semantic/tree/master/semantic-java#readme
 bug-reports:         https://github.com/github/semantic/issues
 license:             MIT
 license-file:        LICENSE
@@ -20,13 +20,15 @@ tested-with:         GHC == 8.6.5
 
 library
   exposed-modules:
-    Tags.Tag
-    Tags.Tagging.Precise
+    Language.Java
+    Language.Java.Tags
   build-depends:
-      base                >= 4.12 && < 5
-    , fused-effects      ^>= 0.5
-    , semantic-source    ^>= 0.0
-    , text               ^>= 1.2.3.1
+      base              >= 4.12 && < 5
+    , fused-effects    ^>= 0.5
+    , semantic-source  ^>= 0.0
+    , semantic-tags    ^>= 0.0
+    , tree-sitter      ^>= 0.4
+    , tree-sitter-java ^>= 0.3
   hs-source-dirs:      src
   default-language:    Haskell2010
   ghc-options:

@@ -215,7 +215,6 @@ library
                      , Language.Python.Assignment
                      , Language.Python.PrettyPrint
                      , Language.Python.Syntax
-                     , Language.Java.Syntax
                      , Numeric.Exts
                      -- Parser glue
                      , Parsing.CMark
@@ -301,6 +300,8 @@ library
                      , proto-lens-jsonpb
                      , proto-lens-runtime ^>= 0.5.0.0
                      , reducers ^>= 3.12.3
+                     , semantic-java ^>= 0
+                     , semantic-python ^>= 0
                      , semantic-tags ^>= 0
                      , semigroupoids ^>= 5.3.2
                      , split ^>= 0.2.3.3
@@ -318,7 +319,7 @@ library
                      , tree-sitter-ruby ^>= 0.2
                      , tree-sitter-typescript ^>= 0.2.1
                      , tree-sitter-tsx ^>= 0.2.1
-                     , tree-sitter-java ^>= 0.2
+                     , tree-sitter-java ^>= 0.3
   if flag(release)
     cpp-options:       -DCOMPUTE_GIT_SHA
 

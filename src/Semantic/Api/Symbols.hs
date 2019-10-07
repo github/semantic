@@ -16,7 +16,7 @@ import           Data.Language
 import           Data.ProtoLens (defMessage)
 import           Data.Term
 import           Data.Text (pack)
-import qualified Data.Text as T
+import qualified Language.Java as Java
 import qualified Language.Python as Python
 import qualified Parsing.Parser as Parser
 import           Prologue
@@ -79,7 +79,7 @@ parseSymbols blobs = do
           & P.path .~ blobPath'
           & P.language .~ (bridging # blobLanguage')
           & P.symbols .~ mempty
-          & P.errors .~ [defMessage & P.error .~ T.pack e]
+          & P.errors .~ [defMessage & P.error .~ pack e]
           & P.blobOid .~ blobOid
 
         renderToSymbols :: ToTags t => t Loc -> File
@@ -111,6 +111,9 @@ instance IsTaggable syntax => ToTags (Term syntax) where
   tags = runTagging
 
 instance ToTags Python.Term where
+  tags _ _ = Precise.tags
+
+instance ToTags Java.Term where
   tags _ _ = Precise.tags
 
 

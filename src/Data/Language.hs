@@ -11,6 +11,7 @@ module Data.Language
   , textToLanguage
   , languageToText
   , PerLanguageModes(..)
+  , defaultLanguageModes
   , LanguageMode(..)
   , modeForLanguage
   ) where
@@ -147,6 +148,11 @@ newtype PerLanguageModes = PerLanguageModes
   }
   deriving (Eq, Ord, Show)
 
+defaultLanguageModes :: PerLanguageModes
+defaultLanguageModes = PerLanguageModes
+  { pythonMode = ALaCarte
+  }
+
 data LanguageMode
   = ALaCarte
   | Precise
@@ -154,5 +160,6 @@ data LanguageMode
 
 modeForLanguage :: PerLanguageModes -> Language -> LanguageMode
 modeForLanguage modes = \case
+  Java   -> Precise
   Python -> pythonMode modes
   _      -> ALaCarte

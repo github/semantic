@@ -37,7 +37,8 @@ import           Serializing.Format hiding (JSON)
 import qualified Serializing.Format as Format
 import           Source.Loc
 
-import qualified Language.Python as Py
+import qualified Language.Java as Java
+import qualified Language.Python as Python
 
 
 termGraph :: (Traversable t, Member Distribute sig, ParseEffects sig m) => t Blob -> m ParseTreeGraphResponse
@@ -104,8 +105,11 @@ class ShowTerm term where
 instance (Functor syntax, Show1 syntax) => ShowTerm (Term syntax) where
   showTerm = serialize Show . quieterm
 
-instance ShowTerm Py.Term where
-  showTerm = serialize Show . void . Py.getTerm
+instance ShowTerm Java.Term where
+  showTerm = serialize Show . void . Java.getTerm
+
+instance ShowTerm Python.Term where
+  showTerm = serialize Show . void . Python.getTerm
 
 
 sexprTermParsers :: Map Language (SomeParser SExprTerm Loc)

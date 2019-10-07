@@ -16,7 +16,6 @@ import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Language.Go.Syntax as Go
 import qualified Language.Go.Type as Go
-import qualified Language.Java.Syntax as Java
 import qualified Language.Markdown.Syntax as Markdown
 import qualified Language.PHP.Syntax as PHP
 import qualified Language.Python.Syntax as Python
@@ -178,39 +177,6 @@ instance AccessControls1 Declaration.VariableDeclaration
 
 instance AccessControls1 Directive.File
 instance AccessControls1 Directive.Line
-
-instance AccessControls1 Java.Import
-instance AccessControls1 Java.Package
-instance AccessControls1 Java.CatchType
-instance AccessControls1 Java.SpreadParameter
-instance AccessControls1 Java.StaticInitializer
-instance AccessControls1 Java.LambdaBody
-instance AccessControls1 Java.ClassBody
-instance AccessControls1 Java.ClassLiteral
-instance AccessControls1 Java.DefaultValue
-instance AccessControls1 Java.Module
-instance AccessControls1 Java.EnumDeclaration
-instance AccessControls1 Java.Variable
-instance AccessControls1 Java.Synchronized
-instance AccessControls1 Java.New
-instance AccessControls1 Java.Asterisk
-instance AccessControls1 Java.Constructor
-instance AccessControls1 Java.TypeParameter
-instance AccessControls1 Java.Annotation
-instance AccessControls1 Java.AnnotationField
-instance AccessControls1 Java.GenericType
-instance AccessControls1 Java.AnnotatedType
-instance AccessControls1 Java.TypeWithModifiers
-instance AccessControls1 Java.Wildcard
-instance AccessControls1 Java.WildcardBounds
-instance AccessControls1 Java.MethodReference
-instance AccessControls1 Java.NewKeyword
-instance AccessControls1 Java.Lambda
-instance AccessControls1 Java.ArrayCreationExpression
-instance AccessControls1 Java.DimsExpr
-instance AccessControls1 Java.TryWithResources
-instance AccessControls1 Java.AssertStatement
-instance AccessControls1 Java.AnnotationTypeElement
 
 instance AccessControls1 Python.Alias
 instance AccessControls1 Python.Ellipsis

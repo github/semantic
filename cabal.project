@@ -1,4 +1,9 @@
-packages: . semantic-core semantic-python semantic-source semantic-tags
+packages: .
+          semantic-core
+          semantic-java
+          semantic-python
+          semantic-source
+          semantic-tags
 
 jobs: $ncpus
 
