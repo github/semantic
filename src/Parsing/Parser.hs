@@ -27,6 +27,7 @@ module Parsing.Parser
 , javaParser'
 , javascriptParser'
 , jsonParser'
+, jsonParserPrecise'
 , jsxParser'
 , markdownParser'
 , phpParser'
