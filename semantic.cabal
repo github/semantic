@@ -314,7 +314,7 @@ library
                      , unordered-containers ^>= 0.2.9.0
                      , vector ^>= 0.12.0.2
                      , tree-sitter-go ^>= 0.2
-                     , tree-sitter-json ^>= 0.2
+                     , tree-sitter-json ^>= 0.3
                      , tree-sitter-php ^>= 0.2
                      , tree-sitter-python ^>= 0.5
                      , tree-sitter-ruby ^>= 0.2
