@@ -99,7 +99,6 @@ library
                      , Analysis.PackageDef
                      -- Semantic assignment
                      , Assigning.Assignment
-                     , Assigning.Assignment.Deterministic
                      , Assigning.Assignment.Table
                      -- Control structures & interfaces for abstract interpretation
                      , Control.Abstract
