@@ -2,7 +2,6 @@
 module Data.Loc
 ( Loc(..)
 , interactive
-, emptySpan
 , here
 , stackLoc
 , FailWithLocC(..)
@@ -26,10 +25,7 @@ data Loc = Loc
   deriving (Eq, Ord, Show)
 
 interactive :: Loc
-interactive = Loc "<interactive>" emptySpan
-
-emptySpan :: Span
-emptySpan = Span (Pos 1 1) (Pos 1 1)
+interactive = Loc "<interactive>" (Span (Pos 1 1) (Pos 1 1))
 
 
 here :: HasCallStack => Maybe Loc
