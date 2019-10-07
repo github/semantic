@@ -210,8 +210,12 @@ instance Compile Py.Call where
     , arguments = L1 Py.ArgumentList { extraChildren = args }
     } cc = do
     func <- compileCC function cc
+    let compileArg = \case
+          L1 expr -> compileCC expr cc
+          other   -> fail ("Can't compile non-expression function argument: " <> show other)
+
     -- Python function arguments are defined to evaluate left to right.
-    args <- traverse (flip compileCC cc) args
+    args <- traverse compileArg args
     locate it (func $$* args)
   compileCC it _cc = fail ("can't compile Call node with generator expression: " <> show it)
 
@@ -227,7 +231,6 @@ instance Compile Py.DecoratedDefinition
 instance Compile Py.DeleteStatement
 instance Compile Py.Dictionary
 instance Compile Py.DictionaryComprehension
-instance Compile Py.DictionarySplat
 instance Compile Py.Ellipsis
 instance Compile Py.ExecStatement
 
@@ -291,16 +294,9 @@ instance Compile Py.ImportFromStatement
 instance Compile Py.ImportStatement
 instance Compile Py.Integer
 
--- Buggy: ignores the semantics of the provided name. This requires
--- coordination between Call nodes and KeywordArgument nodes, which is
--- a sign that we need something smarter here, but it'll do for now.
-instance Compile Py.KeywordArgument where
-  compileCC Py.KeywordArgument { value } cc = compileCC value cc
-
 instance Compile Py.Lambda
 instance Compile Py.List
 instance Compile Py.ListComprehension
-instance Compile Py.ListSplat
 
 instance Compile Py.Module where
   compileCC it@Py.Module { Py.extraChildren = stmts } _cc = do
