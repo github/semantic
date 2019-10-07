@@ -285,7 +285,6 @@ typescriptParser' = (TypeScript, SomeParser typescriptParser)
 -- | The canonical set of parsers producing à la carte terms.
 aLaCarteParsers
   :: ( c (Term (Sum Go.Syntax))
-     , c (Term (Sum JSON.Syntax))
      , c (Term (Sum Markdown.Syntax))
      , c (Term (Sum PHP.Syntax))
      , c (Term (Sum Python.Syntax))
@@ -297,7 +296,6 @@ aLaCarteParsers
 aLaCarteParsers = Map.fromList
   [ goParser'
   , javascriptParser'
-  , jsonParserALaCarte'
   , jsxParser'
   , markdownParser'
   , phpParser'
