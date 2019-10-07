@@ -17,6 +17,7 @@ import           Data.ProtoLens (defMessage)
 import           Data.Term
 import           Data.Text (pack)
 import qualified Language.Java as Java
+import qualified Language.JSON as JSON
 import qualified Language.Python as Python
 import qualified Parsing.Parser as Parser
 import           Prologue
@@ -111,6 +112,9 @@ instance IsTaggable syntax => ToTags (Term syntax) where
   tags = runTagging
 
 instance ToTags Java.Term where
+  tags _ _ = Precise.tags
+
+instance ToTags JSON.Term where
   tags _ _ = Precise.tags
 
 instance ToTags Python.Term where
