@@ -26,7 +26,7 @@ module Parsing.Parser
 , goParser'
 , javaParser'
 , javascriptParser'
-, jsonParser'
+, jsonParserALaCarte'
 , jsonParserPrecise'
 , jsxParser'
 , markdownParser'
@@ -246,8 +246,8 @@ javaParser' = (Python, SomeParser javaParserPrecise)
 javascriptParser' :: c (Term (Sum TSX.Syntax)) => (Language, SomeParser c Loc)
 javascriptParser' = (JavaScript, SomeParser tsxParser)
 
-jsonParser' :: c (Term (Sum JSON.Syntax)) => (Language, SomeParser c Loc)
-jsonParser' = (JSON, SomeParser jsonParser)
+jsonParserALaCarte' :: c (Term (Sum JSON.Syntax)) => (Language, SomeParser c Loc)
+jsonParserALaCarte' = (JSON, SomeParser jsonParser)
 
 jsonParserPrecise' :: c PreciseJSON.Term => (Language, SomeParser c Loc)
 jsonParserPrecise' = (JSON, SomeParser jsonParserPrecise)
@@ -297,7 +297,7 @@ aLaCarteParsers
 aLaCarteParsers = Map.fromList
   [ goParser'
   , javascriptParser'
-  , jsonParser'
+  , jsonParserALaCarte'
   , jsxParser'
   , markdownParser'
   , phpParser'
@@ -339,7 +339,7 @@ allParsers modes = Map.fromList
   [ goParser'
   , javaParser'
   , javascriptParser'
-  , jsonParser'
+  , jsonParserALaCarte'
   , jsxParser'
   , markdownParser'
   , phpParser'
