@@ -110,7 +110,7 @@ data Parser term where
                    -> Assignment ast grammar (Term (Sum fs) Loc) -- ^ An assignment from AST onto 'Term's.
                    -> Parser (Term (Sum fs) Loc)                 -- ^ A parser producing 'Term's.
   -- | A parser for 'Markdown' using cmark.
-  MarkdownParser :: Parser (Term (TermF [] CMarkGFM.NodeType) (Node Markdown.Grammar))
+  MarkdownParser :: Parser (AST (TermF [] CMarkGFM.NodeType) Markdown.Grammar)
 
 
 goParser :: Parser Go.Term
