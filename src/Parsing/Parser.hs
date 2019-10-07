@@ -325,6 +325,7 @@ allParsers
   :: ( c (Term (Sum Go.Syntax))
      , c PreciseJava.Term
      , c (Term (Sum JSON.Syntax))
+     , c PreciseJSON.Term
      , c (Term (Sum Markdown.Syntax))
      , c (Term (Sum PHP.Syntax))
      , c (Term (Sum Python.Syntax))
@@ -340,6 +341,7 @@ allParsers modes = Map.fromList
   , javaParser'
   , javascriptParser'
   , jsonParserALaCarte'
+  , jsonParserPrecise'
   , jsxParser'
   , markdownParser'
   , phpParser'
