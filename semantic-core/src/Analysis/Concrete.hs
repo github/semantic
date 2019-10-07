@@ -103,7 +103,7 @@ runFile
   -> m (File (Either (Loc, String) (Concrete (term Name))))
 runFile eval file = traverse run file
   where run = runReader (fileLoc file)
-            . runFailWithLoc
+            . runFail
             . runReader @Env mempty
             . fix (eval concreteAnalysis)
 

@@ -84,7 +84,7 @@ runFile
   -> m (File (Either (Loc, String) (Value term)))
 runFile eval file = traverse run file
   where run = runReader (fileLoc file)
-            . runFailWithLoc
+            . runFail
             . fmap fold
             . convergeTerm (Proxy @Name) (fix (cacheTerm . eval importGraphAnalysis))
 

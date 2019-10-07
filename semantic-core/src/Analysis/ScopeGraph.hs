@@ -80,7 +80,7 @@ runFile
 runFile eval file = traverse run file
   where run = runReader (fileLoc file)
             . runReader (Map.empty @Name @Loc)
-            . runFailWithLoc
+            . runFail
             . fmap fold
             . convergeTerm (Proxy @Name) (fix (cacheTerm . eval scopeGraphAnalysis))
 

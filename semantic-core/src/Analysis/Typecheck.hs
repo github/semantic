@@ -133,7 +133,7 @@ runFile eval file = traverse run file
               pure (substAll subst <$> t))
           . runState (mempty :: Substitution)
           . runReader (fileLoc file)
-          . runFailWithLoc
+          . runFail
           . (\ m -> do
             (cs, t) <- m
             t <$ solve cs)
