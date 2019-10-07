@@ -17,9 +17,9 @@ import Control.Effect.Error
 import Control.Effect.Fail
 import Control.Effect.Reader
 import Data.Text (Text, pack)
-import Data.Text.Prettyprint.Doc (Pretty (..))
 import GHC.Stack
 import Prelude hiding (fail)
+import Source.Span
 
 data Loc = Loc
   { locPath :: !Text
@@ -30,26 +30,8 @@ data Loc = Loc
 interactive :: Loc
 interactive = Loc "<interactive>" emptySpan
 
-data Span = Span
-  { spanStart :: {-# UNPACK #-} !Pos
-  , spanEnd   :: {-# UNPACK #-} !Pos
-  }
-  deriving (Eq, Ord, Show)
-
-instance Pretty Span where
-  pretty (Span s e) = pretty s <> "-" <> pretty e
-
 emptySpan :: Span
 emptySpan = Span (Pos 1 1) (Pos 1 1)
-
-data Pos = Pos
-  { posLine :: {-# UNPACK #-} !Int
-  , posCol  :: {-# UNPACK #-} !Int
-  }
-  deriving (Eq, Ord, Show)
-
-instance Pretty Pos where
-  pretty (Pos l c) = pretty l <> ":" <> pretty c
 
 
 here :: HasCallStack => Maybe Loc
