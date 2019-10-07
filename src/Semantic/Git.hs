@@ -24,7 +24,7 @@ import           Data.ByteString.Internal (w2c)
 import qualified Data.ByteString.UTF8 as UTF8
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Streaming as ByteStream
-import qualified Data.Attoparsec.ByteString.Streaming as Streaming.Parse
+import qualified Data.Attoparsec.ByteString.Streaming as AP.Streaming
 import           Data.Char
 import           Data.Either (fromRight)
 import           Data.Text as Text
@@ -50,11 +50,11 @@ catFile gitDir (OID oid) =
 -- | git ls-tree -rz
 lsTree :: FilePath -> OID -> IO [TreeEntry]
 lsTree gitDir (OID sha) =
-  let process = Process.proc "git" ["-C", gitDir, "ls-tree", "-rz", UTF8.toString sha]
-      parse   = Streaming.Parse.parse ((entryParser `sepEndBy` AP.word8 0) <* AP.endOfInput)
+  let process        = Process.proc "git" ["-C", gitDir, "ls-tree", "-rz", UTF8.toString sha]
+      allEntries     = (entryParser `sepEndBy` AP.word8 0) <* AP.endOfInput
       ignoreFailures = fmap (fromRight [] . fst)
   in Streaming.Process.withStreamProcess process $
-     \stream -> Streaming.Process.withProcessOutput stream (ignoreFailures . parse)
+     \stream -> Streaming.Process.withProcessOutput stream (ignoreFailures . AP.Streaming.parse allEntries)
 
 
 -- | Parses an list of entries separated by \NUL, and on failure return []
