@@ -36,8 +36,6 @@ library
                      , Data.Scope
                      , Data.Stack
                      , Data.Term
-  -- other-modules:
-  -- other-extensions:
   build-depends:       algebraic-graphs            ^>= 0.3
                      , base                         >= 4.12 && < 5
                      , containers                  ^>= 0.6
