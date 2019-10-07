@@ -32,6 +32,7 @@ import qualified Data.Set as Set
 import           Data.Text (Text, pack)
 import           Data.Traversable (for)
 import           Prelude hiding (fail)
+import           Source.Span
 
 type Precise = Int
 type Env = Map.Map Name Precise

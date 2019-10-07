@@ -2,9 +2,7 @@
 module Data.Loc
 ( Loc(..)
 , interactive
-, Span(..)
 , emptySpan
-, Pos(..)
 , here
 , stackLoc
 , FailWithLocC(..)
