@@ -161,5 +161,6 @@ data LanguageMode
 modeForLanguage :: PerLanguageModes -> Language -> LanguageMode
 modeForLanguage modes = \case
   Java   -> Precise
+  JSON   -> Precise
   Python -> pythonMode modes
   _      -> ALaCarte
