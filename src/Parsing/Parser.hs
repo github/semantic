@@ -9,7 +9,6 @@ module Parsing.Parser
 , goParser
 , goASTParser
 , jsonParser
-, jsonASTParser
 , markdownParser
 , pythonParser
 , pythonASTParser
@@ -152,9 +151,6 @@ pythonASTParser = ASTParser tree_sitter_python
 
 jsonParser :: Parser JSON.Term
 jsonParser = DeterministicParser jsonASTParser JSON.assignment
-
-jsonASTParser :: Parser (AST [] JSON.Grammar)
-jsonASTParser = ASTParser tree_sitter_json
 
 typescriptParser :: Parser TypeScript.Term
 typescriptParser = AssignmentParser (ASTParser tree_sitter_typescript) TypeScript.assignment
