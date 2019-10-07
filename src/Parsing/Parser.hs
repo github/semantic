@@ -8,7 +8,6 @@ module Parsing.Parser
 -- * À la carte parsers
 , goParser
 , goASTParser
-, jsonParser
 , markdownParser
 , pythonParser
 , pythonASTParser
@@ -57,7 +56,6 @@ import           Foreign.Ptr
 import qualified Language.Go.Assignment as Go
 import qualified Language.Java as PreciseJava
 import qualified Language.JSON as PreciseJSON
-import qualified Language.JSON.Assignment as JSON
 import qualified Language.Markdown.Assignment as Markdown
 import qualified Language.PHP.Assignment as PHP
 import qualified Language.Python as PrecisePython
@@ -148,9 +146,6 @@ pythonParser = AssignmentParser (ASTParser tree_sitter_python) Python.assignment
 
 pythonASTParser :: Parser (AST [] Python.Grammar)
 pythonASTParser = ASTParser tree_sitter_python
-
-jsonParser :: Parser JSON.Term
-jsonParser = DeterministicParser jsonASTParser JSON.assignment
 
 typescriptParser :: Parser TypeScript.Term
 typescriptParser = AssignmentParser (ASTParser tree_sitter_typescript) TypeScript.assignment
