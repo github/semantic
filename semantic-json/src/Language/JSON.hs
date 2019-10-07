@@ -12,5 +12,6 @@ newtype Term a = Term { getTerm :: JSON.Document a }
 instance TS.Unmarshal Term where
   unmarshalNode node = Term <$> TS.unmarshalNode node
 
+-- | Tags aren’t really meaningful for JSON, but by implementing this we can avoid having to customize the set of parsers used for computing tags.
 instance Tags.ToTags Term where
   tags _ _ = []
