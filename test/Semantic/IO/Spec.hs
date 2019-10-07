@@ -15,6 +15,7 @@ import           Data.Blob
 import           Data.Handle
 import qualified Semantic.Git as Git
 import           Shelly (cd, run_, shelly, silently, touchfile, writefile)
+import qualified Source.Source as Source
 import           SpecHelpers
 import           System.Path ((</>))
 import qualified System.Path as Path
@@ -42,7 +43,7 @@ spec = do
         trees <- Git.lsTree (dir <> "/.git") (Git.OID "HEAD")
         Just it <- pure $ find (\p -> "日本語" `isInfixOf` Git.treeEntryPath p) trees
         Git.catFile (dir <> "/.git") (Git.treeEntryOid it)
-      ("日本語" `Text.isInfixOf` result) `shouldBe` True
+      Source.toText result `shouldSatisfy` ("日本語" `Text.isInfixOf`)
 
   describe "lsTree" $ do
     hasGit <- runIO $ isJust <$> findExecutable "git"

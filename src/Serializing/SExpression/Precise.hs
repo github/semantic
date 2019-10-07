@@ -1,4 +1,4 @@
-{-# LANGUAGE AllowAmbiguousTypes, DataKinds, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, OverloadedStrings, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes, DataKinds, FlexibleContexts, FlexibleInstances, KindSignatures, MultiParamTypeClasses, OverloadedStrings, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Serializing.SExpression.Precise
 ( serializeSExpression
 , ToSExpression(..)
@@ -21,7 +21,7 @@ pad :: Int -> Builder
 pad n = stringUtf8 (replicate (2 * n) ' ')
 
 
-class ToSExpression t where
+class ToSExpression (t :: * -> *) where
   toSExpression :: t ann -> Int -> Builder
 
 instance (ToSExpressionBy strategy t, strategy ~ ToSExpressionStrategy t) => ToSExpression t where

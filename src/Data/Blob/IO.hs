@@ -58,7 +58,7 @@ readBlobsFromGitRepo path oid excludePaths includePaths = liftIO . fmap catMaybe
       , not (pathIsMinified path)
       , path `notElem` excludePaths
       , null includePaths || path `elem` includePaths
-      = Just . sourceBlob' path lang oid . Source.fromText <$> Git.catFile gitDir oid
+      = Just . sourceBlob' path lang oid <$> Git.catFile gitDir oid
     blobFromTreeEntry _ _ = pure Nothing
 
     sourceBlob' filepath language (Git.OID oid) source = makeBlob source filepath language oid

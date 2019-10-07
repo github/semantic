@@ -1,9 +1,11 @@
 {-# LANGUAGE DataKinds, FlexibleContexts, PackageImports, PartialTypeSignatures, TypeApplications, TypeFamilies #-}
 
-module Main where
+module Evaluation (benchmarks) where
 
 import           Algebra.Graph
 import           Control.Monad
+import           Control.Carrier.Parse.Simple
+import qualified Data.Duration as Duration
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.FreeVariables
 import           Data.Blob
@@ -45,7 +47,7 @@ callGraphProject' :: ( Language.SLanguage lang
                   -> IO (Either String (Data.Graph.Graph ControlFlowVertex))
 callGraphProject' session proxy parser path = fmap (first show) . runTask session $ do
   blob <- readBlobFromFile' (fileForRelPath path)
-  package <- fmap snd <$> parsePackage parser (Project (Path.toString (Path.takeDirectory path)) [blob] (Language.reflect proxy) [])
+  package <- fmap snd <$> runParse (Duration.fromSeconds 10) (parsePackage parser (Project (Path.toString (Path.takeDirectory path)) [blob] (Language.reflect proxy) []))
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   runCallGraph proxy False modules package
 
@@ -70,8 +72,8 @@ pyCall p = nfIO $ callGraphProject (Proxy @'Language.Python) pythonParser (Path.
 rbCall :: Path.RelFile -> Benchmarkable
 rbCall p = nfIO $ callGraphProject (Proxy @'Language.Ruby) rubyParser $ (Path.relDir "bench/bench-fixtures/ruby" </> p)
 
-main :: IO ()
-main = defaultMain
+benchmarks :: Benchmark
+benchmarks = bgroup "evaluation"
   [ bgroup "python" [ bench "assignment" . pyEval $ Path.relFile "simple-assignment.py"
                     , bench "function def" . pyEval $ Path.relFile "function-definition.py"
                     , bench "if + function calls" . pyCall . Path.relFile $ "if-statement-functions.py"
