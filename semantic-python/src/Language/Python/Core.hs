@@ -52,7 +52,7 @@ def n = coerce (Stack.:> n)
 pattern SingleIdentifier :: Name -> Py.ExpressionList a
 pattern SingleIdentifier name <- Py.ExpressionList
   { Py.extraChildren =
-    [ Py.PrimaryExpressionExpression (Py.IdentifierPrimaryExpression (Py.Identifier { bytes = (Name -> name) }))
+    [ Py.PrimaryExpressionExpression (Py.IdentifierPrimaryExpression (Py.Identifier { bytes = Name -> name }))
     ]
   }
 
