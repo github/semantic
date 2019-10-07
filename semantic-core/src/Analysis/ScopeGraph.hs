@@ -25,12 +25,11 @@ import qualified Data.Map as Map
 import           Data.Name
 import           Data.Proxy
 import qualified Data.Set as Set
-import           Data.Text (Text)
 import           Data.Traversable (for)
 import           Prelude hiding (fail)
 
 data Decl = Decl
-  { declSymbol :: Text
+  { declSymbol :: Name
   , declLoc    :: Loc
   }
   deriving (Eq, Ord, Show)

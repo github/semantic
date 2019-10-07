@@ -1,6 +1,6 @@
-{-# LANGUAGE DeriveTraversable, LambdaCase, OverloadedLists #-}
+{-# LANGUAGE DeriveGeneric, DeriveTraversable, GeneralizedNewtypeDeriving, LambdaCase, OverloadedLists #-}
 module Data.Name
-( Name
+( Name (..)
 , Named(..)
 , named
 , named'
@@ -15,10 +15,14 @@ module Data.Name
 import qualified Data.Char as Char
 import           Data.HashSet (HashSet)
 import qualified Data.HashSet as HashSet
+import           Data.String (IsString)
 import           Data.Text as Text (Text, any, unpack)
+import           Data.Text.Prettyprint.Doc (Pretty)
+import           GHC.Generics (Generic)
 
 -- | User-specified and -relevant names.
-type Name = Text
+newtype Name = Name { unName :: Text }
+  deriving (Eq, Show, Ord, Generic, Pretty, IsString)
 
 -- | Annotates an @a@ with a 'Name'-provided name, which is ignored for '==' and 'compare'.
 data Named a = Named (Ignored Name) a
@@ -50,7 +54,7 @@ reservedNames = [ "#true", "#false", "if", "then", "else"
 -- | Returns true if any character would require quotation or if the
 -- name conflicts with a Core primitive.
 needsQuotation :: Name -> Bool
-needsQuotation u = HashSet.member (unpack u) reservedNames || Text.any (not . isSimpleCharacter) u
+needsQuotation (Name u) = HashSet.member (unpack u) reservedNames || Text.any (not . isSimpleCharacter) u
 
 -- | A ‘simple’ character is, loosely defined, a character that is compatible
 -- with identifiers in most ASCII-oriented programming languages. This is defined
