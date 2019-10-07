@@ -1,3 +1,4 @@
-# CHECK-TREE: { ident <- \x -> x; y <- ident #unit; #record { ident: ident, y : y }}
-def ident(x): return x
-y = ident(())
+# CHECK-TREE: { const <- \x -> \y -> x; y <- const #true #true; z <- const #false #false; #record { const: const, y : y, z: z, }}
+def const(x, y): return x
+y = const(True, True)
+z = const(False, False)
