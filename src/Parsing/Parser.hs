@@ -187,7 +187,7 @@ data SomeASTParser where
 
 someASTParser :: Language -> Maybe SomeASTParser
 someASTParser Go         = Just (SomeASTParser (ASTParser tree_sitter_go :: Parser (AST [] Go.Grammar)))
-someASTParser JSON       = Just (SomeASTParser (ASTParser tree_sitter_json :: Parser (AST [] JSON.Grammar)))
+someASTParser JSON       = Nothing
 
 -- Use the TSX parser for `.js` and `.jsx` files in case they use Flow type-annotation syntax.
 -- The TSX and Flow syntaxes are the same, whereas the normal TypeScript syntax is different.
