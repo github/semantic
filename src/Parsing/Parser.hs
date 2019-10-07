@@ -160,7 +160,7 @@ jsonParserPrecise :: Parser (PreciseJSON.Term Loc)
 jsonParserPrecise = UnmarshalParser PreciseJSON.tree_sitter_json
 
 pythonParserPrecise :: Parser (PrecisePython.Term Loc)
-pythonParserPrecise = UnmarshalParser tree_sitter_python
+pythonParserPrecise = UnmarshalParser PrecisePython.tree_sitter_python
 
 
 -- | A parser for producing specialized (tree-sitter) ASTs.
