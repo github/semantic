@@ -57,6 +57,7 @@ import           Data.Term
 import           Foreign.Ptr
 import qualified Language.Go.Assignment as Go
 import qualified Language.Java as PreciseJava
+import qualified Language.JSON as PreciseJSON
 import qualified Language.JSON.Assignment as JSON
 import qualified Language.Markdown.Assignment as Markdown
 import qualified Language.PHP.Assignment as PHP
@@ -171,6 +172,9 @@ markdownParser = AssignmentParser MarkdownParser Markdown.assignment
 javaParserPrecise :: Parser (PreciseJava.Term Loc)
 javaParserPrecise = UnmarshalParser tree_sitter_java
 
+jsonParserPrecise :: Parser (PreciseJSON.Term Loc)
+jsonParserPrecise = UnmarshalParser tree_sitter_json
+
 pythonParserPrecise :: Parser (PrecisePython.Term Loc)
 pythonParserPrecise = UnmarshalParser tree_sitter_python
 
@@ -244,6 +248,9 @@ javascriptParser' = (JavaScript, SomeParser tsxParser)
 jsonParser' :: c (Term (Sum JSON.Syntax)) => (Language, SomeParser c Loc)
 jsonParser' = (JSON, SomeParser jsonParser)
 
+jsonParserPrecise' :: c PreciseJSON.Term => (Language, SomeParser c Loc)
+jsonParserPrecise' = (JSON, SomeParser jsonParserPrecise)
+
 jsxParser' :: c (Term (Sum TSX.Syntax)) => (Language, SomeParser c Loc)
 jsxParser' = (JSX, SomeParser tsxParser)
 
@@ -302,11 +309,13 @@ aLaCarteParsers = Map.fromList
 -- | The canonical set of parsers producing precise terms.
 preciseParsers
   :: ( c PreciseJava.Term
+     , c PreciseJSON.Term
      , c PrecisePython.Term
      )
   => Map Language (SomeParser c Loc)
 preciseParsers = Map.fromList
   [ javaParser'
+  , jsonParserPrecise'
   , pythonParserPrecise'
   ]
 
