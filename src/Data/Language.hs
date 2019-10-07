@@ -13,7 +13,6 @@ module Data.Language
   , PerLanguageModes(..)
   , defaultLanguageModes
   , LanguageMode(..)
-  , modeForLanguage
   ) where
 
 import           Data.Aeson
@@ -157,10 +156,3 @@ data LanguageMode
   = ALaCarte
   | Precise
   deriving (Bounded, Enum, Eq, Ord, Read, Show)
-
-modeForLanguage :: PerLanguageModes -> Language -> LanguageMode
-modeForLanguage modes = \case
-  Java   -> Precise
-  JSON   -> Precise
-  Python -> pythonMode modes
-  _      -> ALaCarte
