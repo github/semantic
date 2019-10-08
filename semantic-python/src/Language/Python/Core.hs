@@ -25,7 +25,6 @@ import           Data.Stack (Stack)
 import qualified Data.Stack as Stack
 import           Data.String (IsString)
 import           Data.Text (Text)
-import           GHC.Generics
 import           GHC.Records
 import           Source.Span (Span)
 import qualified TreeSitter.Python.AST as Py
