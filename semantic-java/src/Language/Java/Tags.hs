@@ -54,7 +54,7 @@ instance (ToTags l, ToTags r) => ToTagsBy 'Custom (l :+: r) where
 instance ToTagsBy 'Custom Java.MethodDeclaration where
   tags' t@Java.MethodDeclaration
     { ann = Loc range span
-    , name = Java.Identifier { bytes = name }
+    , name = Java.Identifier { text = name }
     , body
     } = do
       src <- ask @Source
@@ -69,7 +69,7 @@ instance ToTagsBy 'Custom Java.MethodDeclaration where
 instance ToTagsBy 'Custom Java.ClassDeclaration where
   tags' t@Java.ClassDeclaration
     { ann = Loc Range { start } span
-    , name = Java.Identifier { bytes = name }
+    , name = Java.Identifier { text = name }
     , body = Java.ClassBody { ann = Loc Range { start = end } _ }
     } = do
       src <- ask @Source
@@ -80,7 +80,7 @@ instance ToTagsBy 'Custom Java.ClassDeclaration where
 instance ToTagsBy 'Custom Java.MethodInvocation where
   tags' t@Java.MethodInvocation
     { ann = Loc range span
-    , name = Java.Identifier { bytes = name }
+    , name = Java.Identifier { text = name }
     } = do
       src <- ask @Source
       let sliced = slice src range

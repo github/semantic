@@ -25,6 +25,7 @@ library
                      , Analysis.ImportGraph
                      , Analysis.ScopeGraph
                      , Analysis.Typecheck
+                     , Control.Carrier.Fail.WithLoc
                      , Control.Effect.Readline
                      , Control.Monad.Module
                      , Data.Core
@@ -36,8 +37,6 @@ library
                      , Data.Scope
                      , Data.Stack
                      , Data.Term
-  -- other-modules:
-  -- other-extensions:
   build-depends:       algebraic-graphs            ^>= 0.3
                      , base                         >= 4.12 && < 5
                      , containers                  ^>= 0.6
@@ -48,6 +47,7 @@ library
                      , parsers                     ^>= 0.12.10
                      , prettyprinter               ^>= 1.2.1
                      , prettyprinter-ansi-terminal ^>= 1.1.1
+                     , semantic-source             ^>= 0
                      , semigroupoids               ^>= 5.3
                      , text                        ^>= 1.2.3.1
                      , transformers                ^>= 0.5.6

@@ -7,7 +7,6 @@ import Data.JSON.Fields
 import Diffing.Algorithm
 import Prelude hiding (Bool, Float, Int, Double)
 import Prologue hiding (Map)
-import Reprinting.Tokenize
 
 data Array a = Array { arraySize :: Maybe a, arrayElementType :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
@@ -25,11 +24,6 @@ data Annotation a = Annotation { annotationSubject :: a, annotationType :: a }
 -- TODO: Specialize Evaluatable for Type to unify the inferred type of the subject with the specified type
 instance Evaluatable Annotation where
   eval eval _ Annotation{..} = eval annotationSubject
-
-instance Tokenize Annotation where
-  -- FIXME: This ignores annotationType.
-  -- TODO: Not sure what this should look like yet
-  tokenize Annotation{..} = annotationSubject
 
 
 data Function a = Function { functionParameters :: [a], functionReturn :: a }

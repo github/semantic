@@ -1,7 +1,6 @@
-{-# LANGUAGE ConstraintKinds, DataKinds, DefaultSignatures, DeriveAnyClass, DeriveGeneric, DerivingStrategies,
-             DerivingVia, DisambiguateRecordFields, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving,
-             KindSignatures, LambdaCase, NamedFieldPuns, OverloadedLists, OverloadedStrings, PatternSynonyms,
-             ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE ConstraintKinds, DataKinds, DefaultSignatures, DisambiguateRecordFields, FlexibleContexts,
+             GeneralizedNewtypeDeriving, KindSignatures, LambdaCase, NamedFieldPuns, OverloadedLists,
+             PatternSynonyms, StandaloneDeriving, TypeApplications, TypeOperators, ViewPatterns #-}
 
 module Language.Python.Core
 ( compile
@@ -11,6 +10,7 @@ module Language.Python.Core
 
 import Prelude hiding (fail)
 
+import           AST.Element
 import           Control.Effect hiding ((:+:))
 import           Control.Effect.Reader
 import           Control.Monad.Fail
@@ -24,23 +24,19 @@ import           Data.Stack (Stack)
 import qualified Data.Stack as Stack
 import           Data.String (IsString)
 import           Data.Text (Text)
-import           GHC.Generics
 import           GHC.Records
 import           Source.Span (Span)
-import qualified Source.Span as Source
 import qualified TreeSitter.Python.AST as Py
 
 -- | Access to the current filename as Text to stick into location annotations.
 newtype SourcePath = SourcePath { rawPath :: Text }
-  deriving stock (Eq, Show)
-  deriving newtype IsString
+  deriving (Eq, IsString, Show)
 
 -- | Keeps track of the current scope's bindings (so that we can, when
 -- compiling a class or module, return the list of bound variables as
 -- a Core record so that all immediate definitions are exposed)
 newtype Bindings = Bindings { unBindings :: Stack Name }
-  deriving stock (Eq, Show)
-  deriving newtype (Semigroup, Monoid)
+  deriving (Eq, Monoid, Semigroup, Show)
 
 def :: Name -> Bindings -> Bindings
 def n = coerce (Stack.:> n)
@@ -52,7 +48,7 @@ def n = coerce (Stack.:> n)
 pattern SingleIdentifier :: Name -> Py.ExpressionList a
 pattern SingleIdentifier name <- Py.ExpressionList
   { Py.extraChildren =
-    [ Py.PrimaryExpressionExpression (Py.IdentifierPrimaryExpression (Py.Identifier { bytes = name }))
+    [ Py.Expression (Prj (Py.PrimaryExpression (Prj Py.Identifier { text = Name -> name })))
     ]
   }
 
@@ -97,9 +93,8 @@ compile :: ( Compile py
         -> m (t Name)
 compile t = compileCC t (pure none)
 
-locFromTSSpan :: SourcePath -> Source.Span -> Loc
-locFromTSSpan fp (Source.Span (Source.Pos a b) (Source.Pos c d))
-  = Data.Loc.Loc (rawPath fp) (Data.Loc.Span (Data.Loc.Pos a b) (Data.Loc.Pos c d))
+locFromTSSpan :: SourcePath -> Span -> Loc
+locFromTSSpan fp = Data.Loc.Loc (rawPath fp)
 
 locate :: ( HasField "ann" syntax Span
           , CoreSyntax syn t
@@ -116,12 +111,10 @@ locate syn item = do
 defaultCompile :: (MonadFail m, Show py) => py -> m (t Name)
 defaultCompile t = fail $ "compilation unimplemented for " <> show t
 
-newtype CompileSum py a = CompileSum (py a)
 
-instance (Generic1 py, GCompileSum (Rep1 py)) => Compile (CompileSum py) where
-  compileCC (CompileSum a) cc = gcompileCCSum (from1 a) cc
-
-deriving via CompileSum (l :+: r) instance (Compile l, Compile r) => Compile (l :+: r)
+instance (Compile l, Compile r) => Compile (l :+: r) where
+  compileCC (L1 l) cc = compileCC l cc
+  compileCC (R1 r) cc = compileCC r cc
 
 instance Compile Py.AssertStatement
 instance Compile Py.Attribute
@@ -142,7 +135,7 @@ instance Compile Py.Attribute
 -- RHS represents the right-hand-side of an assignment that we get out of tree-sitter.
 -- Desugared is the "terminal" node in a sequence of assignments, i.e. given a = b = c,
 -- c will be the terminal node. It is never an assignment.
-type RHS = Py.Assignment :+: Py.AugmentedAssignment :+: Desugared
+type RHS = (Py.Assignment :+: Py.AugmentedAssignment) :+: Desugared
 type Desugared = Py.ExpressionList :+: Py.Yield
 
 -- We have to pair locations and names, and tuple syntax is harder to
@@ -157,11 +150,11 @@ desugar :: (Member (Reader SourcePath) sig, Carrier sig m, MonadFail m)
         -> RHS Span
         -> m ([Located Name], Desugared Span)
 desugar acc = \case
-  L1 Py.Assignment { left = SingleIdentifier name, right = Just rhs, ann} -> do
+  Prj Py.Assignment { left = SingleIdentifier name, right = Just rhs, ann} -> do
     loc <- locFromTSSpan <$> ask <*> pure ann
     let cons = (Located loc name :)
     desugar (cons acc) rhs
-  R1 (R1 any) -> pure (acc, any)
+  R1 any -> pure (acc, any)
   other -> fail ("desugar: couldn't desugar RHS " <> show other)
 
 -- This is an algebra that is invoked from a left fold but that
@@ -207,7 +200,7 @@ instance Compile Py.Call
 instance Compile Py.ClassDefinition
 instance Compile Py.ComparisonOperator
 
-deriving via CompileSum Py.CompoundStatement instance Compile Py.CompoundStatement
+deriving instance Compile Py.CompoundStatement
 
 instance Compile Py.ConcatenatedString
 instance Compile Py.ConditionalExpression
@@ -219,7 +212,7 @@ instance Compile Py.DictionaryComprehension
 instance Compile Py.Ellipsis
 instance Compile Py.ExecStatement
 
-deriving via CompileSum Py.Expression instance Compile Py.Expression
+deriving instance Compile Py.Expression
 
 instance Compile Py.ExpressionStatement where
   compileCC it@Py.ExpressionStatement
@@ -254,18 +247,18 @@ instance Compile Py.FunctionDefinition where
       -- Give it a name (below), then augment the current continuation
       -- with the new name (with 'def'), so that calling contexts know
       -- that we have built an exportable definition.
-      assigning located <$> local (def name) cc
-    where param (Py.IdentifierParameter (Py.Identifier _pann pname)) = pure (named' pname)
-          param x                                                    = unimplemented x
+      assigning located <$> local (def (Name name)) cc
+    where param (Py.Parameter (Prj (Py.Identifier _pann pname))) = pure . named' . Name $ pname
+          param x                                                = unimplemented x
           unimplemented x = fail $ "unimplemented: " <> show x
-          assigning item f = (Name.named' name :<- item) >>>= f
+          assigning item f = (Name.named' (Name name) :<- item) >>>= f
 
 instance Compile Py.FutureImportStatement
 instance Compile Py.GeneratorExpression
 instance Compile Py.GlobalStatement
 
 instance Compile Py.Identifier where
-  compileCC Py.Identifier { bytes } _ = pure (pure bytes)
+  compileCC Py.Identifier { text } _ = pure . pure . Name $ text
 
 instance Compile Py.IfStatement where
   compileCC it@Py.IfStatement{ condition, consequence, alternative} cc =
@@ -304,7 +297,7 @@ instance Compile Py.ParenthesizedExpression
 instance Compile Py.PassStatement where
   compileCC it@Py.PassStatement {} _ = locate it $ Core.unit
 
-deriving via CompileSum Py.PrimaryExpression instance Compile Py.PrimaryExpression
+deriving instance Compile Py.PrimaryExpression
 
 instance Compile Py.PrintStatement
 
@@ -319,7 +312,7 @@ instance Compile Py.RaiseStatement
 instance Compile Py.Set
 instance Compile Py.SetComprehension
 
-deriving via CompileSum Py.SimpleStatement instance Compile Py.SimpleStatement
+deriving instance Compile Py.SimpleStatement
 
 instance Compile Py.String
 instance Compile Py.Subscript
@@ -339,24 +332,3 @@ instance Compile Py.UnaryOperator
 instance Compile Py.WhileStatement
 instance Compile Py.WithStatement
 instance Compile Py.Yield
-
-class GCompileSum (f :: * -> *) where
-  gcompileCCSum :: ( CoreSyntax syn t
-                   , Member (Reader SourcePath) sig
-                   , Member (Reader Bindings) sig
-                   , Carrier sig m
-                   , MonadFail m
-                   )
-                => f Span
-                -> m (t Name)
-                -> m (t Name)
-
-instance GCompileSum f => GCompileSum (M1 t d f) where
-  gcompileCCSum (M1 f) = gcompileCCSum f
-
-instance (GCompileSum l, GCompileSum r) => GCompileSum (l :+: r) where
-  gcompileCCSum (L1 l) = gcompileCCSum l
-  gcompileCCSum (R1 r) = gcompileCCSum r
-
-instance Compile t => GCompileSum (Rec1 t) where
-  gcompileCCSum (Rec1 t) = compileCC t
