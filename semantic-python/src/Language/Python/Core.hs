@@ -249,7 +249,7 @@ instance Compile Py.FunctionDefinition where
       -- that we have built an exportable definition.
       assigning located <$> local (def (Name name)) cc
     where param (Py.Parameter (Prj (Py.Identifier _pann pname))) = pure . named' . Name $ pname
-          param x                                                        = unimplemented x
+          param x                                                = unimplemented x
           unimplemented x = fail $ "unimplemented: " <> show x
           assigning item f = (Name.named' (Name name) :<- item) >>>= f
 
