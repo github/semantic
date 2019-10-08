@@ -19,6 +19,7 @@ instance (Element' side sub sup, side ~ Find sub sup) => Element sub sup where
 pattern Prj :: Element sub sup => sub a -> sup a
 pattern Prj sub <- (prj -> Just sub)
 
+
 data Side = None | Here | L | R
 
 type family Find sub sup :: Side where
