@@ -7,7 +7,7 @@ module AST.Element
 import GHC.Generics ((:+:)(..))
 import GHC.TypeLits (ErrorMessage(..), TypeError)
 
--- | Projection of an element out of a tree of sums, particularly suitable for use with highly branching (e.g. balanced) trees.
+-- | Projection of an element out of a tree of sums, particularly suitable for use with highly branching (e.g. balanced) trees. This provides custom type errors when the tree is known statically, rather than provided via a constraint passed on to callers.
 class Element sub sup where
   -- | Project one element out of a sum type.
   prj :: sup a -> Maybe (sub a)
