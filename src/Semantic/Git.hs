@@ -22,7 +22,6 @@ import           Data.Attoparsec.ByteString as AP
 import           Data.ByteString (ByteString)
 import           Data.ByteString.Internal (w2c)
 import qualified Data.ByteString.UTF8 as UTF8
-import qualified Data.ByteString as B
 import qualified Data.ByteString.Streaming as ByteStream
 import qualified Data.Attoparsec.ByteString.Streaming as AP.Streaming
 import           Data.Char
