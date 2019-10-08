@@ -49,6 +49,7 @@ class Element' (side :: Side) sub sup where
 instance Element' 'Here t t where
   prj' = Just
 
+-- | Membershp on the left.
 instance Element     t l
       => Element' 'L t (l :+: r) where
   prj' (L1 l) = prj l
