@@ -2,6 +2,7 @@
 module AST.Element
 ( Element(..)
 , pattern Prj
+, (:+:)(..)
 ) where
 
 import GHC.Generics ((:+:)(..))
