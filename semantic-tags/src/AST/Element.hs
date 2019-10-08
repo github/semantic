@@ -19,41 +19,39 @@ instance (Element' elem sub sup, elem ~ Elem sub sup) => Element sub sup where
 pattern Prj :: Element sub sup => sub a -> sup a
 pattern Prj sub <- (prj -> Just sub)
 
+data Side = None | Here | L | R
 
-type family Elem sub sup where
-  Elem t t         = 'True
-  Elem t (l :+: r) = Elem t l || Elem t r
-  Elem _ _         = 'False
+type family Elem sub sup :: Side where
+  Elem t t         = 'Here
+  Elem t (l :+: r) = Elem' 'L t l <> Elem' 'R t r
+  Elem _ _         = 'None
 
-type family a || b where
-  'True || _     = 'True
-  _     || 'True = 'True
-  _     || _     = 'False
+type family Elem' (side :: Side) sub sup :: Side where
+  Elem' s t t         = s
+  Elem' s t (l :+: r) = Elem' s t l <> Elem' s t r
+  Elem' _ _ _         = 'None
 
-class Element' (elem :: Bool) sub sup where
+type family (a :: Side) <> (b :: Side) :: Side where
+  'None <> b = b
+  a     <> _ = a
+
+class Element' (elem :: Side) sub sup where
   prj' :: sup a -> Maybe (sub a)
 
 instance {-# OVERLAPPABLE #-}
-         Element' 'True t t where
+         Element' 'Here t t where
   prj' = Just
 
 instance {-# OVERLAPPABLE #-}
-         Element' 'True t (l1 :+: l2 :+: r)
-      => Element' 'True t ((l1 :+: l2) :+: r) where
-  prj' = prj' @'True . reassoc where
-    reassoc (L1 (L1 l)) = L1 l
-    reassoc (L1 (R1 l)) = R1 (L1 l)
-    reassoc (R1 r)      = R1 (R1 r)
-
-instance {-# OVERLAPPABLE #-}
-         Element' 'True t (t :+: r) where
-  prj' (L1 l) = Just l
+         Element     t l
+      => Element' 'L t (l :+: r) where
+  prj' (L1 l) = prj l
   prj' _      = Nothing
 
 instance {-# OVERLAPPABLE #-}
-         Element' 'True t r
-      => Element' 'True t (l :+: r) where
-  prj' (R1 r) = prj' @'True r
+         Element     t r
+      => Element' 'R t (l :+: r) where
+  prj' (R1 r) = prj r
   prj' _      = Nothing
 
 
@@ -68,5 +66,5 @@ type family ShowSum' p t where
 instance TypeError
            (     'ShowType t ':<>: 'Text " is not in"
            ':$$: ShowSum u)
-      => Element' 'False t u where
+      => Element' 'None t u where
   prj' _ = Nothing
