@@ -116,10 +116,6 @@ locate syn item = do
 defaultCompile :: (MonadFail m, Show py) => py -> m (t Name)
 defaultCompile t = fail $ "compilation unimplemented for " <> show t
 
-newtype CompileSum py a = CompileSum (py a)
-
-instance (Generic1 py, GCompileSum (Rep1 py)) => Compile (CompileSum py) where
-  compileCC (CompileSum a) cc = gcompileCCSum (from1 a) cc
 
 instance (Compile l, Compile r) => Compile (l :+: r) where
   compileCC (L1 l) cc = compileCC l cc
