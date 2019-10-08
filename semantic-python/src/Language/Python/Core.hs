@@ -121,7 +121,9 @@ newtype CompileSum py a = CompileSum (py a)
 instance (Generic1 py, GCompileSum (Rep1 py)) => Compile (CompileSum py) where
   compileCC (CompileSum a) cc = gcompileCCSum (from1 a) cc
 
-deriving via CompileSum (l :+: r) instance (Compile l, Compile r) => Compile (l :+: r)
+instance (Compile l, Compile r) => Compile (l :+: r) where
+  compileCC (L1 l) cc = compileCC l cc
+  compileCC (R1 r) cc = compileCC r cc
 
 instance Compile Py.AssertStatement
 instance Compile Py.Attribute
