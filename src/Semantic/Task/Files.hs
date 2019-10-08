@@ -30,7 +30,8 @@ import           Prelude hiding (readFile)
 import           Prologue hiding (catch)
 import qualified Semantic.Git as Git
 import           Semantic.IO
-import qualified System.IO as IO
+import qualified System.IO as IO hiding (withBinaryFile)
+import qualified System.Path.IO as IO (withBinaryFile)
 import qualified System.Path as Path
 
 data Source blob where
@@ -41,7 +42,7 @@ data Source blob where
   FromPathPair   :: Both File                       -> Source BlobPair
   FromPairHandle :: Handle 'IO.ReadMode             -> Source [BlobPair]
 
-data Destination = ToPath FilePath | ToHandle (Handle 'IO.WriteMode)
+data Destination = ToPath Path.AbsRelFile | ToHandle (Handle 'IO.WriteMode)
 
 data PathFilter
   = ExcludePaths [FilePath]
