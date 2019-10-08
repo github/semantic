@@ -30,7 +30,8 @@ import           Prelude hiding (readFile)
 import           Prologue hiding (catch)
 import qualified Semantic.Git as Git
 import           Semantic.IO
-import qualified System.IO as IO
+import qualified System.IO as IO hiding (withBinaryFile)
+import qualified System.Path.IO as IO (withBinaryFile)
 import qualified System.Path as Path
 
 data Source blob where
@@ -91,7 +92,7 @@ instance (Member (Error SomeException) sig, Member Catch sig, MonadIO m, Carrier
     Read (FromPairHandle handle) k                            -> rethrowing (readBlobPairsFromHandle handle) >>= k
     ReadProject rootDir dir language excludeDirs k            -> rethrowing (readProjectFromPaths rootDir dir language excludeDirs) >>= k
     FindFiles dir exts excludeDirs k                          -> rethrowing (findFilesInDir dir exts excludeDirs) >>= k
-    Write (ToPath path) builder k                             -> rethrowing (liftIO (IO.withBinaryFile (Path.toString path) IO.WriteMode (`B.hPutBuilder` builder))) >> k
+    Write (ToPath path) builder k                             -> rethrowing (liftIO (IO.withBinaryFile path IO.WriteMode (`B.hPutBuilder` builder))) >> k
     Write (ToHandle (WriteHandle handle)) builder k           -> rethrowing (liftIO (B.hPutBuilder handle builder)) >> k
 
 readBlob :: (Member Files sig, Carrier sig m) => File -> m Blob
