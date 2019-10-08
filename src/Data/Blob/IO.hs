@@ -13,13 +13,14 @@ module Data.Blob.IO
 
 import Prologue
 
-import Data.Blob
-import Data.Language
-import Semantic.IO
-import qualified Source.Source as Source
-import qualified Semantic.Git as Git
 import qualified Control.Concurrent.Async as Async
+import           Data.Blob
 import qualified Data.ByteString as B
+import           Data.Language
+import           Data.Text.Encoding (decodeUtf8)
+import qualified Semantic.Git as Git
+import           Semantic.IO
+import qualified Source.Source as Source
 import qualified System.Path as Path
 import qualified System.Path.PartClass as Part
 
@@ -61,7 +62,7 @@ readBlobsFromGitRepo path oid excludePaths includePaths = liftIO . fmap catMaybe
       = Just . sourceBlob' path lang oid <$> Git.catFile gitDir oid
     blobFromTreeEntry _ _ = pure Nothing
 
-    sourceBlob' filepath language (Git.OID oid) source = makeBlob source filepath language oid
+    sourceBlob' filepath language (Git.OID oid) source = makeBlob source filepath language (decodeUtf8 oid)
 
 readFilePair :: MonadIO m => File -> File -> m BlobPair
 readFilePair a b = do
