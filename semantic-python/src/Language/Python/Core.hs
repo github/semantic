@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, DataKinds, DefaultSignatures, DeriveAnyClass, DeriveGeneric, DerivingStrategies,
+{-# LANGUAGE ConstraintKinds, DataKinds, DefaultSignatures, DeriveGeneric, DerivingStrategies,
              DisambiguateRecordFields, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving,
              KindSignatures, LambdaCase, NamedFieldPuns, OverloadedLists, OverloadedStrings, PatternSynonyms,
              ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeOperators, UndecidableInstances,
