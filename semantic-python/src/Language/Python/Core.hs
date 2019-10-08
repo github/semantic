@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, DataKinds, DefaultSignatures, DeriveGeneric, DerivingStrategies,
+{-# LANGUAGE ConstraintKinds, DataKinds, DefaultSignatures, DeriveGeneric,
              DisambiguateRecordFields, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving,
              KindSignatures, LambdaCase, NamedFieldPuns, OverloadedLists, OverloadedStrings, PatternSynonyms,
              ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeOperators, UndecidableInstances,
@@ -33,15 +33,13 @@ import qualified TreeSitter.Python.AST as Py
 
 -- | Access to the current filename as Text to stick into location annotations.
 newtype SourcePath = SourcePath { rawPath :: Text }
-  deriving stock (Eq, Show)
-  deriving newtype IsString
+  deriving (Eq, IsString, Show)
 
 -- | Keeps track of the current scope's bindings (so that we can, when
 -- compiling a class or module, return the list of bound variables as
 -- a Core record so that all immediate definitions are exposed)
 newtype Bindings = Bindings { unBindings :: Stack Name }
-  deriving stock (Eq, Show)
-  deriving newtype (Semigroup, Monoid)
+  deriving (Eq, Monoid, Semigroup, Show)
 
 def :: Name -> Bindings -> Bindings
 def n = coerce (Stack.:> n)
@@ -205,7 +203,7 @@ instance Compile Py.Call
 instance Compile Py.ClassDefinition
 instance Compile Py.ComparisonOperator
 
-deriving newtype instance Compile Py.CompoundStatement
+deriving instance Compile Py.CompoundStatement
 
 instance Compile Py.ConcatenatedString
 instance Compile Py.ConditionalExpression
@@ -217,7 +215,7 @@ instance Compile Py.DictionaryComprehension
 instance Compile Py.Ellipsis
 instance Compile Py.ExecStatement
 
-deriving newtype instance Compile Py.Expression
+deriving instance Compile Py.Expression
 
 instance Compile Py.ExpressionStatement where
   compileCC it@Py.ExpressionStatement
@@ -302,7 +300,7 @@ instance Compile Py.ParenthesizedExpression
 instance Compile Py.PassStatement where
   compileCC it@Py.PassStatement {} _ = locate it $ Core.unit
 
-deriving newtype instance Compile Py.PrimaryExpression
+deriving instance Compile Py.PrimaryExpression
 
 instance Compile Py.PrintStatement
 
@@ -317,7 +315,7 @@ instance Compile Py.RaiseStatement
 instance Compile Py.Set
 instance Compile Py.SetComprehension
 
-deriving newtype instance Compile Py.SimpleStatement
+deriving instance Compile Py.SimpleStatement
 
 instance Compile Py.String
 instance Compile Py.Subscript
