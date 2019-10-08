@@ -13,8 +13,8 @@ import qualified Algebra.Graph as G
 import qualified Algebra.Graph.Export.Dot as G
 import           Analysis.Eval
 import           Control.Applicative (Alternative (..))
+import           Control.Carrier.Fail.WithLoc
 import           Control.Effect
-import           Control.Effect.Fail
 import           Control.Effect.Fresh
 import           Control.Effect.NonDet
 import           Control.Effect.Reader hiding (Local)
@@ -32,6 +32,7 @@ import qualified Data.Set as Set
 import           Data.Text (Text, pack)
 import           Data.Traversable (for)
 import           Prelude hiding (fail)
+import           Source.Span
 
 type Precise = Int
 type Env = Map.Map Name Precise
@@ -66,7 +67,7 @@ data Edge = Lexical | Import
 
 -- | Concrete evaluation of a term to a value.
 --
---   >>> map fileBody (snd (concrete eval [File (Loc "bool" emptySpan) (Core.bool True)]))
+--   >>> map fileBody (snd (concrete eval [File (Loc "bool" (Span (Pos 1 1) (Pos 1 5))) (Core.bool True)]))
 --   [Right (Bool True)]
 concrete
   :: (Foldable term, Show (term Name))
@@ -102,7 +103,7 @@ runFile
   -> m (File (Either (Loc, String) (Concrete (term Name))))
 runFile eval file = traverse run file
   where run = runReader (fileLoc file)
-            . runFailWithLoc
+            . runFail
             . runReader @Env mempty
             . fix (eval concreteAnalysis)
 
@@ -197,7 +198,7 @@ heapAddressGraph = heapGraph (\ addr v -> (Value v, addr)) (fmap G.vertex . (,) 
 addressStyle :: Heap term -> G.Style (EdgeType term, Precise) Text
 addressStyle heap = (G.defaultStyle vertex) { G.edgeAttributes }
   where vertex (_, addr) = pack (show addr) <> " = " <> maybe "?" fromConcrete (IntMap.lookup addr heap)
-        edgeAttributes _ (Slot name,    _) = ["label" G.:= name]
+        edgeAttributes _ (Slot name,    _) = ["label" G.:= unName name]
         edgeAttributes _ (Edge Import,  _) = ["color" G.:= "blue"]
         edgeAttributes _ (Edge Lexical, _) = ["color" G.:= "green"]
         edgeAttributes _ _                 = []
@@ -205,7 +206,7 @@ addressStyle heap = (G.defaultStyle vertex) { G.edgeAttributes }
           Unit ->  "()"
           Bool b -> pack $ show b
           String s -> pack $ show s
-          Closure (Loc p (Span s e)) n _ _ -> "\\\\ " <> n <> " [" <> p <> ":" <> showPos s <> "-" <> showPos e <> "]"
+          Closure (Loc p (Span s e)) n _ _ -> "\\\\ " <> unName n <> " [" <> p <> ":" <> showPos s <> "-" <> showPos e <> "]"
           Record _ -> "{}"
         showPos (Pos l c) = pack (show l) <> ":" <> pack (show c)
 

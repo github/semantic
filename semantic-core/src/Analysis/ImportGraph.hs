@@ -8,8 +8,8 @@ module Analysis.ImportGraph
 import           Analysis.Eval
 import           Analysis.FlowInsensitive
 import           Control.Applicative (Alternative(..))
+import           Control.Carrier.Fail.WithLoc
 import           Control.Effect
-import           Control.Effect.Fail
 import           Control.Effect.Fresh
 import           Control.Effect.Reader
 import           Control.Effect.State
@@ -84,7 +84,7 @@ runFile
   -> m (File (Either (Loc, String) (Value term)))
 runFile eval file = traverse run file
   where run = runReader (fileLoc file)
-            . runFailWithLoc
+            . runFail
             . fmap fold
             . convergeTerm (Proxy @Name) (fix (cacheTerm . eval importGraphAnalysis))
 
