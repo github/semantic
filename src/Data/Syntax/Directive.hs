@@ -9,7 +9,6 @@ import           Data.Abstract.Module (ModuleInfo (..))
 import           Data.JSON.Fields
 import qualified Data.Text as T
 import           Diffing.Algorithm
-import           Reprinting.Tokenize
 import           Source.Span
 
 -- A file directive like the Ruby constant `__FILE__`.
@@ -20,10 +19,6 @@ data File a = File
 instance Evaluatable File where
   eval _ _ File = currentModule >>= string . T.pack . modulePath
 
--- We may need a separate token class for these given additional languages
-instance Tokenize File where
-  tokenize _ = yield . Run $ "__FILE__"
-
 
 -- A line directive like the Ruby constant `__LINE__`.
 data Line a = Line
@@ -32,7 +27,3 @@ data Line a = Line
 
 instance Evaluatable Line where
   eval _ _ Line = currentSpan >>= integer . fromIntegral . line . start
-
--- PT TODO: proper token for this
-instance Tokenize Line where
-  tokenize _ = yield . Run $ "__FILE__"

@@ -165,12 +165,6 @@ library
                      , Data.Patch
                      , Data.Project
                      , Data.Quieterm
-                     , Data.Reprinting.Errors
-                     , Data.Reprinting.Fragment
-                     , Data.Reprinting.Operator
-                     , Data.Reprinting.Scope
-                     , Data.Reprinting.Splice
-                     , Data.Reprinting.Token
                      , Data.Semigroup.App
                      , Data.Scientific.Exts
                      -- À la carte syntax types
@@ -196,9 +190,7 @@ library
                      , Language.Go.Syntax
                      , Language.Go.Type
                      , Language.JSON.Assignment
-                     , Language.JSON.PrettyPrint
                      , Language.Ruby.Assignment
-                     , Language.Ruby.PrettyPrint
                      , Language.Ruby.Syntax
                      , Language.TSX.Assignment
                      , Language.TSX.Syntax
@@ -213,7 +205,6 @@ library
                      , Language.PHP.Assignment
                      , Language.PHP.Syntax
                      , Language.Python.Assignment
-                     , Language.Python.PrettyPrint
                      , Language.Python.Syntax
                      , Numeric.Exts
                      -- Parser glue
@@ -224,10 +215,6 @@ library
                      , Rendering.Graph
                      , Rendering.JSON
                      , Rendering.TOC
-                     , Reprinting.Tokenize
-                     , Reprinting.Translate
-                     , Reprinting.Typeset
-                     , Reprinting.Pipeline
                      -- High-level flow & operational functionality (logging, stats, etc.)
                      , Semantic.Analysis
                      -- API
@@ -362,10 +349,6 @@ test-suite test
                      , Integration.Spec
                      , Numeric.Spec
                      , Parsing.Spec
-                     , Reprinting.Spec
-                     , Rewriting.Go.Spec
-                     , Rewriting.JSON.Spec
-                     , Rewriting.Python.Spec
                      , Rendering.TOC.Spec
                      , Semantic.Spec
                      , Semantic.CLI.Spec

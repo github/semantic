@@ -18,13 +18,10 @@ import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.JSON.Fields
 import qualified Data.Language as Language
 import qualified Data.Map.Strict as Map
-import qualified Data.Reprinting.Scope as Scope
-import qualified Data.Reprinting.Token as Token
 import           Data.Semigroup.App
 import           Data.Semigroup.Foldable
 import qualified Data.Text as T
 import           Diffing.Algorithm
-import           Reprinting.Tokenize hiding (Superclass)
 import           System.FilePath.Posix
 
 -- TODO: Fully sort out ruby require/load mechanics
@@ -85,13 +82,6 @@ instance Evaluatable Send where
           call boundFunc args -- TODO pass through sendBlock
     maybe callFunction (`withScopeAndFrame` callFunction) lhsFrame
 
-instance Tokenize Send where
-  tokenize Send{..} = within Scope.Call $ do
-    maybe (pure ()) (\r -> r *> yield Sep) sendReceiver
-    fromMaybe (pure ()) sendSelector
-    within' Scope.Params $ sequenceA_ (sep sendArgs)
-    fromMaybe (pure ()) sendBlock
-
 data Require a = Require { requireRelative :: Bool, requirePath :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Require
@@ -105,13 +95,6 @@ instance Evaluatable Require where
     insertImportEdge moduleScope
     insertFrameLink ScopeGraph.Import (Map.singleton moduleScope moduleFrame)
     pure v -- Returns True if the file was loaded, False if it was already loaded. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-require
-
-instance Tokenize Require where
-  tokenize Require{..} = do
-    yield . Run $ if requireRelative
-                     then "require_relative"
-                     else "require"
-    within' Scope.Params requirePath
 
 doRequire :: ( Member (Boolean value) sig
              , Member (Modules address value) sig
@@ -129,11 +112,6 @@ doRequire path = do
 data Load a = Load { loadPath :: a, loadWrap :: Maybe a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Load
-
-instance Tokenize Load where
-  tokenize Load{..} = do
-    yield (Run "load")
-    within' Scope.Params $ loadPath *> fromMaybe (pure ()) loadWrap
 
 instance Evaluatable Load where
   eval eval _ (Load x Nothing) = do
@@ -228,14 +206,6 @@ instance Evaluatable Class where
 instance Declarations1 Class where
   liftDeclaredName declaredName = declaredName . classIdentifier
 
-instance Tokenize Class where
-  tokenize Class{..} = within' Scope.Class $ do
-    classIdentifier
-    case classSuperClass of
-      Just a  -> yield Token.Extends *> a
-      Nothing -> pure ()
-    classBody
-
 
 data Module a = Module { moduleIdentifier :: !a, moduleStatements :: ![a] }
   deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
@@ -280,12 +250,6 @@ instance Evaluatable Module where
 instance Declarations1 Module where
   liftDeclaredName declaredName = declaredName . moduleIdentifier
 
-instance Tokenize Module where
-  tokenize Module{..} = do
-    yield (Run "module")
-    moduleIdentifier
-    within' Scope.Namespace $ sequenceA_ moduleStatements
-
 
 data LowPrecedenceAnd a = LowPrecedenceAnd { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
@@ -298,11 +262,6 @@ instance Evaluatable LowPrecedenceAnd where
       cond <- a
       ifthenelse cond b (pure cond)
 
--- TODO: These should probably be expressed with a new context/token,
--- rather than a literal run, and need to take surrounding precedence
--- into account.
-instance Tokenize LowPrecedenceAnd where
-  tokenize LowPrecedenceAnd{..} = lhs *> yield (Token.Run "and") <* rhs
 
 data LowPrecedenceOr a = LowPrecedenceOr { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
@@ -314,9 +273,6 @@ instance Evaluatable LowPrecedenceOr where
     go (LowPrecedenceOr a b) = do
       cond <- a
       ifthenelse cond (pure cond) b
-
-instance Tokenize LowPrecedenceOr where
-  tokenize LowPrecedenceOr{..} = lhs *> yield (Token.Run "or") <* rhs
 
 data Assignment a = Assignment { assignmentContext :: ![a], assignmentTarget :: !a, assignmentValue :: !a }
   deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
@@ -351,9 +307,6 @@ instance Evaluatable Assignment where
     assign lhs rhs
     pure rhs
 
-instance Tokenize Assignment where
-  -- Should we be using 'assignmentContext' in here?
-  tokenize Assignment{..} = assignmentTarget *> yield Token.Assign <* assignmentValue
 
 -- | A call to @super@ without parentheses in Ruby is known as "zsuper", which has
 -- the semantics of invoking @super()@ but implicitly passing the current function's
@@ -363,6 +316,3 @@ data ZSuper a = ZSuper
   deriving (Eq1, Show1, Ord1) via Generically ZSuper
 
 instance Evaluatable ZSuper
-
-instance Tokenize ZSuper where
-  tokenize _ = yield $ Run "super"

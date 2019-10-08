@@ -7,7 +7,6 @@ import Prologue
 import Data.Abstract.Evaluatable
 import Data.JSON.Fields
 import Diffing.Algorithm
-import Reprinting.Tokenize as Token
 
 -- | An unnested comment (line or block).
 newtype Comment a = Comment { commentContent :: Text }
@@ -16,9 +15,6 @@ newtype Comment a = Comment { commentContent :: Text }
 
 instance Evaluatable Comment where
   eval _ _ _ = unit
-
-instance Tokenize Comment where
-  tokenize = yield . Run . commentContent
 
 -- TODO: nested comment types
 -- TODO: documentation comment types
