@@ -8,6 +8,7 @@ import GHC.TypeLits (ErrorMessage(..), TypeError)
 
 -- | Projection of an element out of a tree of sums, particularly suitable for use with highly branching (e.g. balanced) trees.
 class Element sub sup where
+  -- | Project one element out of a sum type.
   prj :: sup a -> Maybe (sub a)
 
 instance (Element' elem sub sup, elem ~ Elem sub sup) => Element sub sup where
