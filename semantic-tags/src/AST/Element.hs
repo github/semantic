@@ -62,6 +62,7 @@ instance Element     t r
   prj' _      = Nothing
 
 
+-- | Error cases, with custom type errors.
 instance TypeError
            (     'ShowType t ':<>: 'Text " is not in"
            ':$$: ShowSum u)
