@@ -1,7 +1,6 @@
-{-# LANGUAGE ConstraintKinds, DataKinds, DefaultSignatures, DeriveGeneric, DisambiguateRecordFields,
-             FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, KindSignatures, LambdaCase,
-             NamedFieldPuns, OverloadedLists, OverloadedStrings, PatternSynonyms, ScopedTypeVariables,
-             StandaloneDeriving, TypeApplications, TypeOperators, UndecidableInstances, ViewPatterns #-}
+{-# LANGUAGE ConstraintKinds, DataKinds, DefaultSignatures, DisambiguateRecordFields, FlexibleContexts,
+             GeneralizedNewtypeDeriving, KindSignatures, LambdaCase, NamedFieldPuns, OverloadedLists,
+             PatternSynonyms, StandaloneDeriving, TypeApplications, TypeOperators, ViewPatterns #-}
 
 module Language.Python.Core
 ( compile
