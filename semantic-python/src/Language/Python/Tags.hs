@@ -1,8 +1,9 @@
-{-# LANGUAGE AllowAmbiguousTypes, DataKinds, DisambiguateRecordFields, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, NamedFieldPuns, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes, DataKinds, DisambiguateRecordFields, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, NamedFieldPuns, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances, ViewPatterns #-}
 module Language.Python.Tags
 ( ToTags(..)
 ) where
 
+import           AST.Element
 import           Control.Effect.Reader
 import           Control.Effect.Writer
 import           Data.Maybe (listToMaybe)
@@ -57,7 +58,7 @@ instance (ToTags l, ToTags r) => ToTagsBy 'Custom (l :+: r) where
 instance ToTagsBy 'Custom Py.FunctionDefinition where
   tags' t@Py.FunctionDefinition
     { ann = Loc Range { start } span
-    , name = Py.Identifier { bytes = name }
+    , name = Py.Identifier { text = name }
     , body = Py.Block { ann = Loc Range { start = end } _, extraChildren }
     } = do
       src <- ask @Source
@@ -69,7 +70,7 @@ instance ToTagsBy 'Custom Py.FunctionDefinition where
 instance ToTagsBy 'Custom Py.ClassDefinition where
   tags' t@Py.ClassDefinition
     { ann = Loc Range { start } span
-    , name = Py.Identifier { bytes = name }
+    , name = Py.Identifier { text = name }
     , body = Py.Block { ann = Loc Range { start = end } _, extraChildren }
     } = do
       src <- ask @Source
@@ -81,7 +82,7 @@ instance ToTagsBy 'Custom Py.ClassDefinition where
 instance ToTagsBy 'Custom Py.Call where
   tags' t@Py.Call
     { ann = Loc range span
-    , function = Py.IdentifierPrimaryExpression Py.Identifier { bytes = name }
+    , function = Py.PrimaryExpression (prj -> Just Py.Identifier { text = name })
     } = do
       src <- ask @Source
       let sliced = slice src range
@@ -90,7 +91,7 @@ instance ToTagsBy 'Custom Py.Call where
   tags' t@Py.Call{} = gtags t
 
 docComment :: Source -> (Py.CompoundStatement :+: Py.SimpleStatement) Loc -> Maybe Text
-docComment src (R1 (Py.ExpressionStatementSimpleStatement (Py.ExpressionStatement { extraChildren = L1 (Py.PrimaryExpressionExpression (Py.StringPrimaryExpression Py.String { ann })) :|_ }))) = Just (toText (slice src (byteRange ann)))
+docComment src (R1 (Py.SimpleStatement (prj -> Just Py.ExpressionStatement { extraChildren = L1 (prj -> Just (Py.Expression (prj -> Just (Py.PrimaryExpression (prj -> Just Py.String { ann }))))) :|_ }))) = Just (toText (slice src (byteRange ann)))
 docComment _ _ = Nothing
 
 
