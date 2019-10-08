@@ -75,6 +75,7 @@ type family ShowSum t where
   ShowSum (l :+: r) = ShowSum' ('Text "{ ") (l :+: r) ':$$: 'Text "}"
   ShowSum t         = 'Text "{ " ':<>: 'ShowType t ':<>: 'Text " }"
 
+-- | Helper for formatting & aligning sums nicely with a prefix.
 type family ShowSum' p t where
   ShowSum' p (l :+: r) = ShowSum' p l ':$$: ShowSum' ('Text ", ") r
   ShowSum' p t         = p ':<>: 'ShowType t
