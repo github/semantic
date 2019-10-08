@@ -150,7 +150,7 @@ desugar :: (Member (Reader SourcePath) sig, Carrier sig m, MonadFail m)
         -> RHS Span
         -> m ([Located Name], Desugared Span)
 desugar acc = \case
-  (Prj Py.Assignment { left = SingleIdentifier name, right = Just rhs, ann}) -> do
+  Prj Py.Assignment { left = SingleIdentifier name, right = Just rhs, ann} -> do
     loc <- locFromTSSpan <$> ask <*> pure ann
     let cons = (Located loc name :)
     desugar (cons acc) rhs
