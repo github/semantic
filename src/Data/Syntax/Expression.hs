@@ -127,13 +127,25 @@ data Modulo a = Modulo { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Modulo
 
+instance Evaluatable Modulo where
+  eval eval _ t = traverse eval t >>= go where
+    go (Modulo a b) = liftNumeric2 (liftIntegralFrac mod mod') a b
+
 data Power a = Power { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Power
 
+instance Evaluatable Power where
+  eval eval _ t = traverse eval t >>= go where
+    go (Power a b) = liftNumeric2 liftedExponent a b
+
 newtype Negate a = Negate { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Negate
+
+instance Evaluatable Negate where
+  eval eval _ t = traverse eval t >>= go where
+    go (Negate a) = liftNumeric negate a
 
 data FloorDivision a = FloorDivision { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
