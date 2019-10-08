@@ -30,6 +30,7 @@ type family Find sub sup :: Side where
   Find t (l :+: r) = Find' 'L t l <> Find' 'R t r
   Find _ _         = 'None
 
+-- | Helper to compute the side an element occurs on.
 type family Find' (side :: Side) sub sup :: Side where
   Find' s t t         = s
   Find' s t (l :+: r) = Find' s t l <> Find' s t r
