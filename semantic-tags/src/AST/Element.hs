@@ -36,6 +36,7 @@ type family Find' (side :: Side) sub sup :: Side where
   Find' s t (l :+: r) = Find' s t l <> Find' s t r
   Find' _ _ _         = 'None
 
+-- | Return the leftmost non-'None' side, or 'None'.
 type family (a :: Side) <> (b :: Side) :: Side where
   'None <> b = b
   a     <> _ = a
