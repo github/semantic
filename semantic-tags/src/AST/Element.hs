@@ -41,6 +41,7 @@ type family (a :: Side) <> (b :: Side) :: Side where
   'None <> b = b
   a     <> _ = a
 
+-- | Helper to project elements out of the matching portion of a tree.
 class Element' (side :: Side) sub sup where
   prj' :: sup a -> Maybe (sub a)
 
