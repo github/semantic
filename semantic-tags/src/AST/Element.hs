@@ -21,6 +21,7 @@ pattern Prj :: Element sub sup => sub a -> sup a
 pattern Prj sub <- (prj -> Just sub)
 
 
+-- | Where does the element occur in the tree?
 data Side = None | Here | L | R
 
 type family Find sub sup :: Side where
