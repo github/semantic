@@ -1,7 +1,8 @@
 {-# LANGUAGE ConstraintKinds, DataKinds, DefaultSignatures, DeriveAnyClass, DeriveGeneric, DerivingStrategies,
              DerivingVia, DisambiguateRecordFields, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving,
              KindSignatures, LambdaCase, NamedFieldPuns, OverloadedLists, OverloadedStrings, PatternSynonyms,
-             ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeOperators, UndecidableInstances #-}
+             ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeOperators, UndecidableInstances,
+             ViewPatterns #-}
 
 module Language.Python.Core
 ( compile
@@ -27,7 +28,6 @@ import           Data.Text (Text)
 import           GHC.Generics
 import           GHC.Records
 import           Source.Span (Span)
-import qualified Source.Span as Source
 import qualified TreeSitter.Python.AST as Py
 
 -- | Access to the current filename as Text to stick into location annotations.
@@ -52,7 +52,7 @@ def n = coerce (Stack.:> n)
 pattern SingleIdentifier :: Name -> Py.ExpressionList a
 pattern SingleIdentifier name <- Py.ExpressionList
   { Py.extraChildren =
-    [ Py.PrimaryExpressionExpression (Py.IdentifierPrimaryExpression (Py.Identifier { bytes = name }))
+    [ Py.PrimaryExpressionExpression (Py.IdentifierPrimaryExpression (Py.Identifier { bytes = Name -> name }))
     ]
   }
 
@@ -97,9 +97,8 @@ compile :: ( Compile py
         -> m (t Name)
 compile t = compileCC t (pure none)
 
-locFromTSSpan :: SourcePath -> Source.Span -> Loc
-locFromTSSpan fp (Source.Span (Source.Pos a b) (Source.Pos c d))
-  = Data.Loc.Loc (rawPath fp) (Data.Loc.Span (Data.Loc.Pos a b) (Data.Loc.Pos c d))
+locFromTSSpan :: SourcePath -> Span -> Loc
+locFromTSSpan fp = Data.Loc.Loc (rawPath fp)
 
 locate :: ( HasField "ann" syntax Span
           , CoreSyntax syn t
@@ -254,18 +253,18 @@ instance Compile Py.FunctionDefinition where
       -- Give it a name (below), then augment the current continuation
       -- with the new name (with 'def'), so that calling contexts know
       -- that we have built an exportable definition.
-      assigning located <$> local (def name) cc
-    where param (Py.IdentifierParameter (Py.Identifier _pann pname)) = pure (named' pname)
+      assigning located <$> local (def (Name name)) cc
+    where param (Py.IdentifierParameter (Py.Identifier _pann pname)) = pure . named' . Name $ pname
           param x                                                    = unimplemented x
           unimplemented x = fail $ "unimplemented: " <> show x
-          assigning item f = (Name.named' name :<- item) >>>= f
+          assigning item f = (Name.named' (Name name) :<- item) >>>= f
 
 instance Compile Py.FutureImportStatement
 instance Compile Py.GeneratorExpression
 instance Compile Py.GlobalStatement
 
 instance Compile Py.Identifier where
-  compileCC Py.Identifier { bytes } _ = pure (pure bytes)
+  compileCC Py.Identifier { bytes } _ = pure . pure . Name $ bytes
 
 instance Compile Py.IfStatement where
   compileCC it@Py.IfStatement{ condition, consequence, alternative} cc =
