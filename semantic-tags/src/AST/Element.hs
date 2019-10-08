@@ -55,6 +55,7 @@ instance Element     t l
   prj' (L1 l) = prj l
   prj' _      = Nothing
 
+-- | Membership on the right.
 instance Element     t r
       => Element' 'R t (l :+: r) where
   prj' (R1 r) = prj r
