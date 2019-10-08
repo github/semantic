@@ -40,18 +40,15 @@ type family (a :: Side) <> (b :: Side) :: Side where
 class Element' (side :: Side) sub sup where
   prj' :: sup a -> Maybe (sub a)
 
-instance {-# OVERLAPPABLE #-}
-         Element' 'Here t t where
+instance Element' 'Here t t where
   prj' = Just
 
-instance {-# OVERLAPPABLE #-}
-         Element     t l
+instance Element     t l
       => Element' 'L t (l :+: r) where
   prj' (L1 l) = prj l
   prj' _      = Nothing
 
-instance {-# OVERLAPPABLE #-}
-         Element     t r
+instance Element     t r
       => Element' 'R t (l :+: r) where
   prj' (R1 r) = prj r
   prj' _      = Nothing
