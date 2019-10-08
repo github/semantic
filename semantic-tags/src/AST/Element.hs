@@ -45,6 +45,7 @@ type family (a :: Side) <> (b :: Side) :: Side where
 class Element' (side :: Side) sub sup where
   prj' :: sup a -> Maybe (sub a)
 
+-- | Membership is reflexive.
 instance Element' 'Here t t where
   prj' = Just
 
