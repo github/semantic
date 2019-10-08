@@ -1,2 +1,6 @@
-(Array
-  (Null))
+(Document 
+  (Value 
+    (Array 
+      [ 
+        (Value 
+          (Null "null")) ])))

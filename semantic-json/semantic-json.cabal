@@ -1,10 +1,10 @@
 cabal-version:       2.4
 
-name:                semantic-java
+name:                semantic-json
 version:             0.0.0.0
-synopsis:            Semantic support for Java
-description:         Semantic support for Java.
-homepage:            https://github.com/github/semantic/tree/master/semantic-java#readme
+synopsis:            Semantic support for JSON
+description:         Semantic support for JSON.
+homepage:            https://github.com/github/semantic/tree/master/semantic-json#readme
 bug-reports:         https://github.com/github/semantic/issues
 license:             MIT
 license-file:        LICENSE
@@ -20,15 +20,12 @@ tested-with:         GHC == 8.6.5
 
 library
   exposed-modules:
-    Language.Java
-    Language.Java.Tags
+    Language.JSON
   build-depends:
       base              >= 4.12 && < 5
-    , fused-effects    ^>= 0.5
-    , semantic-source  ^>= 0.0
     , semantic-tags    ^>= 0.0
     , tree-sitter      ^>= 0.5
-    , tree-sitter-java ^>= 0.4
+    , tree-sitter-json ^>= 0.3
   hs-source-dirs:      src
   default-language:    Haskell2010
   ghc-options:

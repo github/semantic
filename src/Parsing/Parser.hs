@@ -8,8 +8,6 @@ module Parsing.Parser
 -- * À la carte parsers
 , goParser
 , goASTParser
-, jsonParser
-, jsonASTParser
 , markdownParser
 , pythonParser
 , pythonASTParser
@@ -26,7 +24,7 @@ module Parsing.Parser
 , goParser'
 , javaParser'
 , javascriptParser'
-, jsonParser'
+, jsonParserPrecise'
 , jsxParser'
 , markdownParser'
 , phpParser'
@@ -43,7 +41,6 @@ module Parsing.Parser
 ) where
 
 import           Assigning.Assignment
-import qualified Assigning.Assignment.Deterministic as Deterministic
 import qualified CMarkGFM
 import           Data.Abstract.Evaluatable (HasPrelude)
 import           Data.AST
@@ -57,7 +54,7 @@ import           Data.Term
 import           Foreign.Ptr
 import qualified Language.Go.Assignment as Go
 import qualified Language.Java as PreciseJava
-import qualified Language.JSON.Assignment as JSON
+import qualified Language.JSON as PreciseJSON
 import qualified Language.Markdown.Assignment as Markdown
 import qualified Language.PHP.Assignment as PHP
 import qualified Language.Python as PrecisePython
@@ -68,8 +65,6 @@ import qualified Language.TypeScript.Assignment as TypeScript
 import           Prelude hiding (fail)
 import           Prologue
 import           TreeSitter.Go
-import           TreeSitter.Java
-import           TreeSitter.JSON
 import qualified TreeSitter.Language as TS (Language, Symbol)
 import           TreeSitter.PHP
 import           TreeSitter.Python
@@ -120,10 +115,6 @@ data Parser term where
                    => Parser (Term ast (Node grammar))           -- ^ A parser producing AST.
                    -> Assignment ast grammar (Term (Sum fs) Loc) -- ^ An assignment from AST onto 'Term's.
                    -> Parser (Term (Sum fs) Loc)                 -- ^ A parser producing 'Term's.
-  DeterministicParser :: (Enum grammar, Ord grammar, Show grammar, Element Syntax.Error syntaxes, Apply Foldable syntaxes, Apply Functor syntaxes)
-                      => Parser (AST [] grammar)
-                      -> Deterministic.Assignment grammar (Term (Sum syntaxes) Loc)
-                      -> Parser (Term (Sum syntaxes) Loc)
   -- | A parser for 'Markdown' using cmark.
   MarkdownParser :: Parser (Term (TermF [] CMarkGFM.NodeType) (Node Markdown.Grammar))
 
@@ -149,12 +140,6 @@ pythonParser = AssignmentParser (ASTParser tree_sitter_python) Python.assignment
 pythonASTParser :: Parser (AST [] Python.Grammar)
 pythonASTParser = ASTParser tree_sitter_python
 
-jsonParser :: Parser JSON.Term
-jsonParser = DeterministicParser jsonASTParser JSON.assignment
-
-jsonASTParser :: Parser (AST [] JSON.Grammar)
-jsonASTParser = ASTParser tree_sitter_json
-
 typescriptParser :: Parser TypeScript.Term
 typescriptParser = AssignmentParser (ASTParser tree_sitter_typescript) TypeScript.assignment
 
@@ -169,10 +154,13 @@ markdownParser = AssignmentParser MarkdownParser Markdown.assignment
 
 
 javaParserPrecise :: Parser (PreciseJava.Term Loc)
-javaParserPrecise = UnmarshalParser tree_sitter_java
+javaParserPrecise = UnmarshalParser PreciseJava.tree_sitter_java
+
+jsonParserPrecise :: Parser (PreciseJSON.Term Loc)
+jsonParserPrecise = UnmarshalParser PreciseJSON.tree_sitter_json
 
 pythonParserPrecise :: Parser (PrecisePython.Term Loc)
-pythonParserPrecise = UnmarshalParser tree_sitter_python
+pythonParserPrecise = UnmarshalParser PrecisePython.tree_sitter_python
 
 
 -- | A parser for producing specialized (tree-sitter) ASTs.
@@ -183,7 +171,7 @@ data SomeASTParser where
 
 someASTParser :: Language -> Maybe SomeASTParser
 someASTParser Go         = Just (SomeASTParser (ASTParser tree_sitter_go :: Parser (AST [] Go.Grammar)))
-someASTParser JSON       = Just (SomeASTParser (ASTParser tree_sitter_json :: Parser (AST [] JSON.Grammar)))
+someASTParser JSON       = Nothing
 
 -- Use the TSX parser for `.js` and `.jsx` files in case they use Flow type-annotation syntax.
 -- The TSX and Flow syntaxes are the same, whereas the normal TypeScript syntax is different.
@@ -196,6 +184,7 @@ someASTParser TypeScript = Just (SomeASTParser (ASTParser tree_sitter_typescript
 someASTParser TSX        = Just (SomeASTParser (ASTParser tree_sitter_tsx :: Parser (AST [] TSX.Grammar)))
 someASTParser PHP        = Just (SomeASTParser (ASTParser tree_sitter_php :: Parser (AST [] PHP.Grammar)))
 someASTParser Java       = Nothing
+someASTParser Haskell    = Nothing
 someASTParser Markdown   = Nothing
 someASTParser Unknown    = Nothing
 
@@ -240,8 +229,8 @@ javaParser' = (Python, SomeParser javaParserPrecise)
 javascriptParser' :: c (Term (Sum TSX.Syntax)) => (Language, SomeParser c Loc)
 javascriptParser' = (JavaScript, SomeParser tsxParser)
 
-jsonParser' :: c (Term (Sum JSON.Syntax)) => (Language, SomeParser c Loc)
-jsonParser' = (JSON, SomeParser jsonParser)
+jsonParserPrecise' :: c PreciseJSON.Term => (Language, SomeParser c Loc)
+jsonParserPrecise' = (JSON, SomeParser jsonParserPrecise)
 
 jsxParser' :: c (Term (Sum TSX.Syntax)) => (Language, SomeParser c Loc)
 jsxParser' = (JSX, SomeParser tsxParser)
@@ -276,7 +265,6 @@ typescriptParser' = (TypeScript, SomeParser typescriptParser)
 -- | The canonical set of parsers producing à la carte terms.
 aLaCarteParsers
   :: ( c (Term (Sum Go.Syntax))
-     , c (Term (Sum JSON.Syntax))
      , c (Term (Sum Markdown.Syntax))
      , c (Term (Sum PHP.Syntax))
      , c (Term (Sum Python.Syntax))
@@ -288,7 +276,6 @@ aLaCarteParsers
 aLaCarteParsers = Map.fromList
   [ goParser'
   , javascriptParser'
-  , jsonParser'
   , jsxParser'
   , markdownParser'
   , phpParser'
@@ -301,11 +288,13 @@ aLaCarteParsers = Map.fromList
 -- | The canonical set of parsers producing precise terms.
 preciseParsers
   :: ( c PreciseJava.Term
+     , c PreciseJSON.Term
      , c PrecisePython.Term
      )
   => Map Language (SomeParser c Loc)
 preciseParsers = Map.fromList
   [ javaParser'
+  , jsonParserPrecise'
   , pythonParserPrecise'
   ]
 
@@ -313,7 +302,7 @@ preciseParsers = Map.fromList
 allParsers
   :: ( c (Term (Sum Go.Syntax))
      , c PreciseJava.Term
-     , c (Term (Sum JSON.Syntax))
+     , c PreciseJSON.Term
      , c (Term (Sum Markdown.Syntax))
      , c (Term (Sum PHP.Syntax))
      , c (Term (Sum Python.Syntax))
@@ -328,7 +317,7 @@ allParsers modes = Map.fromList
   [ goParser'
   , javaParser'
   , javascriptParser'
-  , jsonParser'
+  , jsonParserPrecise'
   , jsxParser'
   , markdownParser'
   , phpParser'

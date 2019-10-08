@@ -26,8 +26,8 @@ common haskell
                      , semantic-source ^>= 0.0
                      , semantic-tags ^>= 0.0
                      , text ^>= 1.2.3
-                     , tree-sitter ^>= 0.4
-                     , tree-sitter-python ^>= 0.5
+                     , tree-sitter ^>= 0.5
+                     , tree-sitter-python ^>= 0.6
 
   ghc-options:
     -Weverything

@@ -10,7 +10,6 @@ module Control.Carrier.Parse.Measured
 ) where
 
 import qualified Assigning.Assignment as Assignment
-import qualified Assigning.Assignment.Deterministic as Deterministic
 import           Control.Effect.Error
 import           Control.Effect.Carrier
 import           Control.Effect.Parse
@@ -69,7 +68,6 @@ runParser blob@Blob{..} parser = case parser of
         >>= either (\e -> trace (displayException e) *> throwError (SomeException e)) pure
 
   AssignmentParser    parser assignment -> runAssignment Assignment.assign    parser blob assignment
-  DeterministicParser parser assignment -> runAssignment Deterministic.assign parser blob assignment
 
   MarkdownParser ->
     time "parse.cmark_parse" languageTag $

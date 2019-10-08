@@ -1,2 +1,6 @@
-(Array
-  (Float))
+(Document 
+  (Value 
+    (Array 
+      [ 
+        (Value 
+          (Number "1")) ])))

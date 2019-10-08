@@ -1,13 +1,28 @@
-(Hash
-  (KeyValue
-    (TextElement)
-    (Float))
-  (KeyValue
-    (TextElement)
-    (Float))
-  (KeyValue
-    (TextElement)
-    (Float))
-  (KeyValue
-    (TextElement)
-    (Float)))
+(Document 
+  (Value 
+    (Object 
+      [ 
+        (Pair 
+          (Value 
+            (Number "2")) 
+          (String 
+            [ 
+              (StringContent "b") ])) 
+        (Pair 
+          (Value 
+            (Number "3")) 
+          (String 
+            [ 
+              (StringContent "c'") ])) 
+        (Pair 
+          (Value 
+            (Number "5")) 
+          (String 
+            [ 
+              (StringContent "d") ])) 
+        (Pair 
+          (Value 
+            (Number "5")) 
+          (String 
+            [ 
+              (StringContent "e") ])) ])))
