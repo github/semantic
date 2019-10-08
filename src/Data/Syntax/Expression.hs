@@ -11,7 +11,6 @@ import           Data.Abstract.Name as Name
 import           Data.Abstract.Number (liftIntegralFrac, liftReal, liftedExponent, liftedFloorDiv)
 import           Data.Fixed
 import           Data.JSON.Fields
-import           Data.List (intersperse)
 import qualified Data.List.NonEmpty as NonEmpty
 import qualified Data.Map.Strict as Map
 import           Diffing.Algorithm hiding (Delete)
