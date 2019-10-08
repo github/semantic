@@ -26,10 +26,6 @@ import qualified Integration.Spec
 import qualified Numeric.Spec
 import qualified Parsing.Spec
 import qualified Rendering.TOC.Spec
-import qualified Reprinting.Spec
-import qualified Rewriting.Go.Spec
-import qualified Rewriting.JSON.Spec
-import qualified Rewriting.Python.Spec
 import qualified Tags.Spec
 import qualified Semantic.Spec
 import qualified Semantic.CLI.Spec
@@ -86,11 +82,7 @@ legacySpecs = parallel $ do
   describe "Diffing.Interpreter" Diffing.Interpreter.Spec.spec
   describe "Graphing.Calls" Graphing.Calls.Spec.spec
   describe "Rendering.TOC" Rendering.TOC.Spec.spec
-  describe "Reprinting.Spec" Reprinting.Spec.spec
-  describe "Rewriting.Go" Rewriting.Go.Spec.spec
-  describe "Rewriting.JSON" Rewriting.JSON.Spec.spec
-  describe "Rewriting.Python" Rewriting.Python.Spec.spec
-  describe "Tags.Spec" Tags.Spec.spec
+   describe "Tags.Spec" Tags.Spec.spec
   describe "Semantic" Semantic.Spec.spec
   describe "Semantic.IO" Semantic.IO.Spec.spec
   describe "Parsing" Parsing.Spec.spec
