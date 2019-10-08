@@ -26,7 +26,7 @@ import Data.Term
 -- interesting property as they parse regardless.
 name :: MonadGen m => m (Named Name)
 name = Gen.prune (named' <$> names) where
-  names = Gen.text (Range.linear 1 10) Gen.lower
+  names = Name <$> Gen.text (Range.linear 1 10) Gen.lower
 
 boolean :: (Carrier sig t, Member Core.Core sig, MonadGen m) => m (t Name)
 boolean = Core.bool <$> Gen.bool

@@ -8,37 +8,20 @@ module Instances () where
 -- we should keep track of them in a dedicated file.
 
 import           Analysis.ScopeGraph
-import           Control.Effect.Sum
 import           Data.Aeson
-import qualified Data.HashMap.Strict as HashMap
-import           Data.Loc
-import           Data.Core (Core, Ann (..))
-import qualified Data.Map as Map
 import           Data.File
-import           Data.Term
+import           Data.Loc
+import qualified Data.Map as Map
+import           Data.Name (Name (..))
 import           Data.Text (Text)
-import           Data.Scope (Scope, Incr)
-import qualified Data.Scope as Scope
-import           Data.Name
+
+deriving newtype instance ToJSON Name
+deriving newtype instance ToJSONKey Name
 
 instance ToJSON a => ToJSON (File a) where
   toJSON File{fileLoc, fileBody} = object
     [ "location" .= fileLoc
     , "body" .= fileBody
-    ]
-
-instance ToJSON Span where
-  toJSON Span{spanStart, spanEnd} = object
-    [ "kind"  .= ("span" :: Text)
-    , "start" .= spanStart
-    , "end"   .= spanEnd
-    ]
-
-instance ToJSON Pos where
-  toJSON Pos{posLine, posCol} = object
-    [ "kind" .= ("pos" :: Text)
-    , "line" .= posLine
-    , "column"  .= posCol
     ]
 
 instance ToJSON Loc where

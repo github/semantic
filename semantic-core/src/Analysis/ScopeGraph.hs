@@ -10,8 +10,8 @@ module Analysis.ScopeGraph
 import           Analysis.Eval
 import           Analysis.FlowInsensitive
 import           Control.Applicative (Alternative (..))
+import           Control.Carrier.Fail.WithLoc
 import           Control.Effect.Carrier
-import           Control.Effect.Fail
 import           Control.Effect.Fresh
 import           Control.Effect.Reader
 import           Control.Effect.State
@@ -25,12 +25,11 @@ import qualified Data.Map as Map
 import           Data.Name
 import           Data.Proxy
 import qualified Data.Set as Set
-import           Data.Text (Text)
 import           Data.Traversable (for)
 import           Prelude hiding (fail)
 
 data Decl = Decl
-  { declSymbol :: Text
+  { declSymbol :: Name
   , declLoc    :: Loc
   }
   deriving (Eq, Ord, Show)
@@ -81,7 +80,7 @@ runFile
 runFile eval file = traverse run file
   where run = runReader (fileLoc file)
             . runReader (Map.empty @Name @Loc)
-            . runFailWithLoc
+            . runFail
             . fmap fold
             . convergeTerm (Proxy @Name) (fix (cacheTerm . eval scopeGraphAnalysis))
 
