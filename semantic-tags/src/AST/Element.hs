@@ -54,6 +54,13 @@ instance Element     t r
   prj' _      = Nothing
 
 
+instance TypeError
+           (     'ShowType t ':<>: 'Text " is not in"
+           ':$$: ShowSum u)
+      => Element' 'None t u where
+  prj' _ = Nothing
+
+
 type family ShowSum t where
   ShowSum (l :+: r) = ShowSum' ('Text "{ ") (l :+: r) ':$$: 'Text "}"
   ShowSum t         = 'Text "{ " ':<>: 'ShowType t ':<>: 'Text " }"
@@ -61,9 +68,3 @@ type family ShowSum t where
 type family ShowSum' p t where
   ShowSum' p (l :+: r) = ShowSum' p l ':$$: ShowSum' ('Text ", ") r
   ShowSum' p t         = p ':<>: 'ShowType t
-
-instance TypeError
-           (     'ShowType t ':<>: 'Text " is not in"
-           ':$$: ShowSum u)
-      => Element' 'None t u where
-  prj' _ = Nothing
