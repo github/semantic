@@ -1,6 +1,7 @@
-{-# LANGUAGE AllowAmbiguousTypes, DataKinds, FlexibleInstances, MultiParamTypeClasses, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes, DataKinds, FlexibleInstances, MultiParamTypeClasses, PatternSynonyms, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances, ViewPatterns #-}
 module AST.Element
 ( Element(..)
+, pattern Prj
 ) where
 
 import GHC.Generics
@@ -13,6 +14,10 @@ class Element sub sup where
 
 instance (Element' elem sub sup, elem ~ Elem sub sup) => Element sub sup where
   prj = prj' @elem
+
+
+pattern Prj :: Element sub sup => sub a -> sup a
+pattern Prj sub <- (prj -> Just sub)
 
 
 type family Elem sub sup where
