@@ -41,7 +41,7 @@ data Source blob where
   FromPathPair   :: Both File                       -> Source BlobPair
   FromPairHandle :: Handle 'IO.ReadMode             -> Source [BlobPair]
 
-data Destination = ToPath FilePath | ToHandle (Handle 'IO.WriteMode)
+data Destination = ToPath Path.AbsRelFile | ToHandle (Handle 'IO.WriteMode)
 
 data PathFilter
   = ExcludePaths [FilePath]
@@ -91,7 +91,7 @@ instance (Member (Error SomeException) sig, Member Catch sig, MonadIO m, Carrier
     Read (FromPairHandle handle) k                            -> rethrowing (readBlobPairsFromHandle handle) >>= k
     ReadProject rootDir dir language excludeDirs k            -> rethrowing (readProjectFromPaths rootDir dir language excludeDirs) >>= k
     FindFiles dir exts excludeDirs k                          -> rethrowing (findFilesInDir dir exts excludeDirs) >>= k
-    Write (ToPath path) builder k                             -> rethrowing (liftIO (IO.withBinaryFile path IO.WriteMode (`B.hPutBuilder` builder))) >> k
+    Write (ToPath path) builder k                             -> rethrowing (liftIO (IO.withBinaryFile (Path.toString path) IO.WriteMode (`B.hPutBuilder` builder))) >> k
     Write (ToHandle (WriteHandle handle)) builder k           -> rethrowing (liftIO (B.hPutBuilder handle builder)) >> k
 
 readBlob :: (Member Files sig, Carrier sig m) => File -> m Blob

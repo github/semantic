@@ -11,7 +11,6 @@ import           Data.Handle
 import qualified Data.Language as Language
 import           Data.List (intercalate)
 import           Data.Project
-import qualified Data.Text as T
 import qualified Data.Flag as Flag
 import           Options.Applicative hiding (style)
 import           Prologue
@@ -27,6 +26,8 @@ import           Semantic.Version
 import           Serializing.Format hiding (Options)
 import           System.Exit (die)
 import           System.FilePath
+import qualified System.Path as Path
+import qualified System.Path.PartClass as Path.PartClass
 
 import Control.Concurrent (mkWeakThreadId, myThreadId)
 import Control.Exception (Exception(..), throwTo)
@@ -84,7 +85,7 @@ optionsParser = do
 argumentsParser :: Parser (Parse.ParseC Task.TaskC ())
 argumentsParser = do
   subparser <- hsubparser (diffCommand <> parseCommand <> graphCommand)
-  output <- ToPath <$> strOption (long "output" <> short 'o' <> help "Output path, defaults to stdout") <|> pure (ToHandle stdout)
+  output <- ToPath <$> pathOption (long "output" <> short 'o' <> help "Output path, defaults to stdout") <|> pure (ToHandle stdout)
   pure $ subparser >>= Task.write output
 
 diffCommand :: Mod CommandFields (Parse.ParseC Task.TaskC Builder)
@@ -186,6 +187,12 @@ shaReader = eitherReader parseSha
 
 filePathReader :: ReadM File
 filePathReader = fileForPath <$> str
+
+path :: (Path.PartClass.FileDir fd) => ReadM (Path.AbsRel fd)
+path = eitherReader Path.parse
+
+pathOption :: Path.PartClass.FileDir fd => Mod OptionFields (Path.AbsRel fd) -> Parser (Path.AbsRel fd)
+pathOption = option path
 
 options :: Eq a => [(String, a)] -> Mod OptionFields a -> Parser a
 options options fields = option (optionsReader options) (fields <> showDefaultWith (findOption options) <> metavar (intercalate "|" (fmap fst options)))
