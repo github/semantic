@@ -337,24 +337,3 @@ instance Compile Py.UnaryOperator
 instance Compile Py.WhileStatement
 instance Compile Py.WithStatement
 instance Compile Py.Yield
-
-class GCompileSum (f :: * -> *) where
-  gcompileCCSum :: ( CoreSyntax syn t
-                   , Member (Reader SourcePath) sig
-                   , Member (Reader Bindings) sig
-                   , Carrier sig m
-                   , MonadFail m
-                   )
-                => f Span
-                -> m (t Name)
-                -> m (t Name)
-
-instance GCompileSum f => GCompileSum (M1 t d f) where
-  gcompileCCSum (M1 f) = gcompileCCSum f
-
-instance (GCompileSum l, GCompileSum r) => GCompileSum (l :+: r) where
-  gcompileCCSum (L1 l) = gcompileCCSum l
-  gcompileCCSum (R1 r) = gcompileCCSum r
-
-instance Compile t => GCompileSum (Rec1 t) where
-  gcompileCCSum (Rec1 t) = compileCC t
