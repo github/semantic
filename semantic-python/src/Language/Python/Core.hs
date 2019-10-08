@@ -304,7 +304,7 @@ instance Compile Py.ParenthesizedExpression
 instance Compile Py.PassStatement where
   compileCC it@Py.PassStatement {} _ = locate it $ Core.unit
 
-deriving via CompileSum Py.PrimaryExpression instance Compile Py.PrimaryExpression
+deriving newtype instance Compile Py.PrimaryExpression
 
 instance Compile Py.PrintStatement
 
