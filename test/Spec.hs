@@ -82,7 +82,7 @@ legacySpecs = parallel $ do
   describe "Diffing.Interpreter" Diffing.Interpreter.Spec.spec
   describe "Graphing.Calls" Graphing.Calls.Spec.spec
   describe "Rendering.TOC" Rendering.TOC.Spec.spec
-   describe "Tags.Spec" Tags.Spec.spec
+  describe "Tags.Spec" Tags.Spec.spec
   describe "Semantic" Semantic.Spec.spec
   describe "Semantic.IO" Semantic.IO.Spec.spec
   describe "Parsing" Parsing.Spec.spec
