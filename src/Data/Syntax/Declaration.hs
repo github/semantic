@@ -13,9 +13,7 @@ import           Data.Abstract.Evaluatable
 import           Data.Abstract.Name (__self)
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.JSON.Fields
-import qualified Data.Reprinting.Scope as Scope
 import           Diffing.Algorithm
-import           Reprinting.Tokenize hiding (Superclass)
 import           Source.Span
 
 data Function a = Function { functionContext :: ![a], functionName :: !a, functionParameters :: ![a], functionBody :: !a }
@@ -59,11 +57,6 @@ declareFunction name accessControl span kind = do
   name' <- declareMaybeName name Default accessControl span kind (Just associatedScope)
   pure (name', associatedScope)
 
-instance Tokenize Function where
-  tokenize Function{..} = within' Scope.Function $ do
-    functionName
-    within' Scope.Params $ sequenceA_ (sep functionParameters)
-    functionBody
 
 instance Declarations1 Function where
   liftDeclaredName declaredName = declaredName . functionName
@@ -100,12 +93,6 @@ instance Evaluatable Method where
     addr <- lookupSlot (Declaration name)
     v <- function name params methodBody associatedScope
     v <$ assign addr v
-
-instance Tokenize Data.Syntax.Declaration.Method where
-  tokenize Method{..} = within' Scope.Method $ do
-    methodName
-    within' Scope.Params $ sequenceA_ (sep methodParameters)
-    methodBody
 
 instance Declarations1 Method where
   liftDeclaredName declaredName = declaredName . methodName
