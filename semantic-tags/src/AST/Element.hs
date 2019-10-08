@@ -24,6 +24,7 @@ pattern Prj sub <- (prj -> Just sub)
 -- | Where does the element occur in the tree?
 data Side = None | Here | L | R
 
+-- | Find where in a tree an element occurs.
 type family Find sub sup :: Side where
   Find t t         = 'Here
   Find t (l :+: r) = Find' 'L t l <> Find' 'R t r
