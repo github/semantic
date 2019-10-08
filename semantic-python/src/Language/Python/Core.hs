@@ -53,7 +53,7 @@ def n = coerce (Stack.:> n)
 pattern SingleIdentifier :: Name -> Py.ExpressionList a
 pattern SingleIdentifier name <- Py.ExpressionList
   { Py.extraChildren =
-    [ Py.Expression (prj -> Just (Py.PrimaryExpression (prj -> Just Py.Identifier { text = Name -> name })))
+    [ Py.Expression (Prj (Py.PrimaryExpression (Prj Py.Identifier { text = Name -> name })))
     ]
   }
 
@@ -155,7 +155,7 @@ desugar :: (Member (Reader SourcePath) sig, Carrier sig m, MonadFail m)
         -> RHS Span
         -> m ([Located Name], Desugared Span)
 desugar acc = \case
-  (prj -> Just Py.Assignment { left = SingleIdentifier name, right = Just rhs, ann}) -> do
+  (Prj Py.Assignment { left = SingleIdentifier name, right = Just rhs, ann}) -> do
     loc <- locFromTSSpan <$> ask <*> pure ann
     let cons = (Located loc name :)
     desugar (cons acc) rhs
@@ -253,7 +253,7 @@ instance Compile Py.FunctionDefinition where
       -- with the new name (with 'def'), so that calling contexts know
       -- that we have built an exportable definition.
       assigning located <$> local (def (Name name)) cc
-    where param (Py.Parameter (prj -> Just (Py.Identifier _pann pname))) = pure . named' . Name $ pname
+    where param (Py.Parameter (Prj (Py.Identifier _pann pname))) = pure . named' . Name $ pname
           param x                                                        = unimplemented x
           unimplemented x = fail $ "unimplemented: " <> show x
           assigning item f = (Name.named' (Name name) :<- item) >>>= f

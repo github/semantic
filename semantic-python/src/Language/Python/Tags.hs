@@ -82,7 +82,7 @@ instance ToTagsBy 'Custom Py.ClassDefinition where
 instance ToTagsBy 'Custom Py.Call where
   tags' t@Py.Call
     { ann = Loc range span
-    , function = Py.PrimaryExpression (prj -> Just Py.Identifier { text = name })
+    , function = Py.PrimaryExpression (Prj Py.Identifier { text = name })
     } = do
       src <- ask @Source
       let sliced = slice src range
@@ -91,7 +91,7 @@ instance ToTagsBy 'Custom Py.Call where
   tags' t@Py.Call{} = gtags t
 
 docComment :: Source -> (Py.CompoundStatement :+: Py.SimpleStatement) Loc -> Maybe Text
-docComment src (R1 (Py.SimpleStatement (prj -> Just Py.ExpressionStatement { extraChildren = L1 (prj -> Just (Py.Expression (prj -> Just (Py.PrimaryExpression (prj -> Just Py.String { ann }))))) :|_ }))) = Just (toText (slice src (byteRange ann)))
+docComment src (R1 (Py.SimpleStatement (Prj Py.ExpressionStatement { extraChildren = L1 (Prj (Py.Expression (Prj (Py.PrimaryExpression (Prj Py.String { ann }))))) :|_ }))) = Just (toText (slice src (byteRange ann)))
 docComment _ _ = Nothing
 
 
