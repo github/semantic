@@ -70,6 +70,7 @@ instance TypeError
   prj' _ = Nothing
 
 
+-- | Show a sum tree as a set (for use in type errors).
 type family ShowSum t where
   ShowSum (l :+: r) = ShowSum' ('Text "{ ") (l :+: r) ':$$: 'Text "}"
   ShowSum t         = 'Text "{ " ':<>: 'ShowType t ':<>: 'Text " }"
