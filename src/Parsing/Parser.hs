@@ -5,7 +5,6 @@ module Parsing.Parser
 , someAnalysisParser
 -- * À la carte parsers
 , goParser
-, markdownParser
 , pythonParser
 , rubyParser
 , tsxParser
@@ -20,7 +19,6 @@ module Parsing.Parser
 , javascriptParser'
 , jsonParserPrecise'
 , jsxParser'
-, markdownParser'
 , phpParser'
 , pythonParserALaCarte'
 , pythonParserPrecise'
@@ -131,10 +129,6 @@ typescriptParser = AssignmentParser (ASTParser tree_sitter_typescript) TypeScrip
 tsxParser :: Parser TSX.Term
 tsxParser = AssignmentParser (ASTParser tree_sitter_tsx) TSX.assignment
 
-markdownParser :: Parser Markdown.Term
-markdownParser = AssignmentParser MarkdownParser Markdown.assignment
-
-
 javaParserPrecise :: Parser (PreciseJava.Term Loc)
 javaParserPrecise = UnmarshalParser PreciseJava.tree_sitter_java
 
@@ -191,9 +185,6 @@ jsonParserPrecise' = (JSON, SomeParser jsonParserPrecise)
 jsxParser' :: c (Term (Sum TSX.Syntax)) => (Language, SomeParser c Loc)
 jsxParser' = (JSX, SomeParser tsxParser)
 
-markdownParser' :: c (Term (Sum Markdown.Syntax)) => (Language, SomeParser c Loc)
-markdownParser' = (Markdown, SomeParser markdownParser)
-
 phpParser' :: c (Term (Sum PHP.Syntax)) => (Language, SomeParser c Loc)
 phpParser' = (PHP, SomeParser phpParser)
 
@@ -221,7 +212,6 @@ typescriptParser' = (TypeScript, SomeParser typescriptParser)
 -- | The canonical set of parsers producing à la carte terms.
 aLaCarteParsers
   :: ( c (Term (Sum Go.Syntax))
-     , c (Term (Sum Markdown.Syntax))
      , c (Term (Sum PHP.Syntax))
      , c (Term (Sum Python.Syntax))
      , c (Term (Sum Ruby.Syntax))
@@ -233,7 +223,6 @@ aLaCarteParsers = Map.fromList
   [ goParser'
   , javascriptParser'
   , jsxParser'
-  , markdownParser'
   , phpParser'
   , pythonParserALaCarte'
   , rubyParser'
@@ -259,7 +248,6 @@ allParsers
   :: ( c (Term (Sum Go.Syntax))
      , c PreciseJava.Term
      , c PreciseJSON.Term
-     , c (Term (Sum Markdown.Syntax))
      , c (Term (Sum PHP.Syntax))
      , c (Term (Sum Python.Syntax))
      , c PrecisePython.Term
@@ -275,7 +263,6 @@ allParsers modes = Map.fromList
   , javascriptParser'
   , jsonParserPrecise'
   , jsxParser'
-  , markdownParser'
   , phpParser'
   , pythonParser' modes
   , rubyParser'
