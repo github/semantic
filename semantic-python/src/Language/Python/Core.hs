@@ -192,7 +192,7 @@ instance Compile Py.Await
 instance Compile Py.BinaryOperator
 
 instance Compile Py.Block where
-  compile it@Py.Block{ Py.extraChildren = body} cc next = foldr compile cc body next >>= locate it
+  compile it@Py.Block{ Py.extraChildren = body} cc = foldr compile cc body >=> locate it
 
 instance Compile Py.BooleanOperator
 instance Compile Py.BreakStatement
@@ -228,7 +228,7 @@ instance Compile Py.ExpressionList where
 
 
 instance Compile Py.False where
-  compile it cc _ = locate it (bool True) >>= cc
+  compile it cc _ = locate it (bool False) >>= cc
 
 instance Compile Py.Float
 instance Compile Py.ForStatement
@@ -259,7 +259,7 @@ instance Compile Py.GeneratorExpression
 instance Compile Py.GlobalStatement
 
 instance Compile Py.Identifier where
-  compile Py.Identifier { text } cc _next = cc . pure . Name $ text
+  compile Py.Identifier { text } cc = cc . pure . Name $ text
 
 instance Compile Py.IfStatement where
   compile it@Py.IfStatement{ condition, consequence, alternative} cc next =
