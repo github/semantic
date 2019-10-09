@@ -2,21 +2,15 @@
 module Parsing.Parser
 ( Parser(..)
 , SomeAnalysisParser(..)
-, SomeASTParser(..)
-, someASTParser
 , someAnalysisParser
 -- * À la carte parsers
 , goParser
-, goASTParser
 , markdownParser
 , pythonParser
-, pythonASTParser
 , rubyParser
 , tsxParser
 , typescriptParser
-, typescriptASTParser
 , phpParser
-, phpASTParser
   -- * Abstract parsers
 
   -- $abstract
@@ -112,18 +106,15 @@ data Parser term where
   UnmarshalParser :: Unmarshal t => Ptr TS.Language -> Parser (t Loc)
   -- | A parser producing an à la carte term given an 'AST'-producing parser and an 'Assignment' onto 'Term's in some syntax type.
   AssignmentParser :: (Enum grammar, Ix grammar, Show grammar, TS.Symbol grammar, Syntax.Error :< fs, Eq1 ast, Apply Foldable fs, Apply Functor fs, Foldable ast, Functor ast)
-                   => Parser (Term ast (Node grammar))           -- ^ A parser producing AST.
+                   => Parser (AST ast grammar)                   -- ^ A parser producing AST.
                    -> Assignment ast grammar (Term (Sum fs) Loc) -- ^ An assignment from AST onto 'Term's.
                    -> Parser (Term (Sum fs) Loc)                 -- ^ A parser producing 'Term's.
   -- | A parser for 'Markdown' using cmark.
-  MarkdownParser :: Parser (Term (TermF [] CMarkGFM.NodeType) (Node Markdown.Grammar))
+  MarkdownParser :: Parser (AST (TermF [] CMarkGFM.NodeType) Markdown.Grammar)
 
 
 goParser :: Parser Go.Term
 goParser = AssignmentParser (ASTParser tree_sitter_go) Go.assignment
-
-goASTParser :: Parser (AST [] Go.Grammar)
-goASTParser = ASTParser tree_sitter_go
 
 rubyParser :: Parser Ruby.Term
 rubyParser = AssignmentParser (ASTParser tree_sitter_ruby) Ruby.assignment
@@ -131,23 +122,14 @@ rubyParser = AssignmentParser (ASTParser tree_sitter_ruby) Ruby.assignment
 phpParser :: Parser PHP.Term
 phpParser = AssignmentParser (ASTParser tree_sitter_php) PHP.assignment
 
-phpASTParser :: Parser (AST [] PHP.Grammar)
-phpASTParser = ASTParser tree_sitter_php
-
 pythonParser :: Parser Python.Term
 pythonParser = AssignmentParser (ASTParser tree_sitter_python) Python.assignment
-
-pythonASTParser :: Parser (AST [] Python.Grammar)
-pythonASTParser = ASTParser tree_sitter_python
 
 typescriptParser :: Parser TypeScript.Term
 typescriptParser = AssignmentParser (ASTParser tree_sitter_typescript) TypeScript.assignment
 
 tsxParser :: Parser TSX.Term
 tsxParser = AssignmentParser (ASTParser tree_sitter_tsx) TSX.assignment
-
-typescriptASTParser :: Parser (AST [] TypeScript.Grammar)
-typescriptASTParser = ASTParser tree_sitter_typescript
 
 markdownParser :: Parser Markdown.Term
 markdownParser = AssignmentParser MarkdownParser Markdown.assignment
@@ -161,32 +143,6 @@ jsonParserPrecise = UnmarshalParser PreciseJSON.tree_sitter_json
 
 pythonParserPrecise :: Parser (PrecisePython.Term Loc)
 pythonParserPrecise = UnmarshalParser PrecisePython.tree_sitter_python
-
-
--- | A parser for producing specialized (tree-sitter) ASTs.
-data SomeASTParser where
-  SomeASTParser :: (Bounded grammar, Enum grammar, Show grammar)
-                => Parser (AST [] grammar)
-                -> SomeASTParser
-
-someASTParser :: Language -> Maybe SomeASTParser
-someASTParser Go         = Just (SomeASTParser (ASTParser tree_sitter_go :: Parser (AST [] Go.Grammar)))
-someASTParser JSON       = Nothing
-
--- Use the TSX parser for `.js` and `.jsx` files in case they use Flow type-annotation syntax.
--- The TSX and Flow syntaxes are the same, whereas the normal TypeScript syntax is different.
-someASTParser JavaScript = Just (SomeASTParser (ASTParser tree_sitter_tsx :: Parser (AST [] TSX.Grammar)))
-someASTParser JSX        = Just (SomeASTParser (ASTParser tree_sitter_tsx :: Parser (AST [] TSX.Grammar)))
-
-someASTParser Python     = Just (SomeASTParser (ASTParser tree_sitter_python :: Parser (AST [] Python.Grammar)))
-someASTParser Ruby       = Just (SomeASTParser (ASTParser tree_sitter_ruby :: Parser (AST [] Ruby.Grammar)))
-someASTParser TypeScript = Just (SomeASTParser (ASTParser tree_sitter_typescript :: Parser (AST [] TypeScript.Grammar)))
-someASTParser TSX        = Just (SomeASTParser (ASTParser tree_sitter_tsx :: Parser (AST [] TSX.Grammar)))
-someASTParser PHP        = Just (SomeASTParser (ASTParser tree_sitter_php :: Parser (AST [] PHP.Grammar)))
-someASTParser Java       = Nothing
-someASTParser Haskell    = Nothing
-someASTParser Markdown   = Nothing
-someASTParser Unknown    = Nothing
 
 
 -- $abstract

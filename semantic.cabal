@@ -225,7 +225,6 @@ library
                      , Semantic.Api.Symbols
                      , Semantic.Api.Terms
                      , Semantic.Api.TOCSummaries
-                     , Semantic.AST
                      , Semantic.CLI
                      , Semantic.Config
                      , Semantic.Distribute
