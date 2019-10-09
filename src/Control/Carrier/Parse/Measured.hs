@@ -24,7 +24,6 @@ import qualified Data.Syntax as Syntax
 import           Data.Sum
 import           Data.Term
 import           Data.Typeable
-import           Parsing.CMark
 import           Parsing.Parser
 import           Parsing.TreeSitter
 import           Prologue hiding (project)
@@ -68,11 +67,6 @@ runParser blob@Blob{..} parser = case parser of
         >>= either (\e -> trace (displayException e) *> throwError (SomeException e)) pure
 
   AssignmentParser    parser assignment -> runAssignment Assignment.assign    parser blob assignment
-
-  MarkdownParser ->
-    time "parse.cmark_parse" languageTag $
-      let term = cmarkParser blobSource
-      in length term `seq` pure term
   where languageTag = [("language" :: String, show (blobLanguage blob))]
 
 data ParserCancelled = ParserTimedOut | AssignmentTimedOut

@@ -19,7 +19,6 @@ import           Control.Exception
 import           Control.Monad.IO.Class
 import           Data.Blob
 import           Data.Typeable
-import           Parsing.CMark
 import           Parsing.Parser
 import           Parsing.TreeSitter
 
@@ -59,9 +58,6 @@ runParser timeout blob@Blob{..} parser = case parser of
   AssignmentParser    parser assignment ->
     runParser timeout blob parser >>= either (throwError . toException) pure . Assignment.assign    blobSource assignment
 
-  MarkdownParser ->
-    let term = cmarkParser blobSource
-    in length term `seq` pure term
 
 data ParseFailure = ParseFailure String
   deriving (Show, Typeable)

@@ -33,7 +33,6 @@ module Parsing.Parser
 ) where
 
 import           Assigning.Assignment
-import qualified CMarkGFM
 import           Data.Abstract.Evaluatable (HasPrelude)
 import           Data.AST
 import           Data.Graph.ControlFlowVertex (VertexDeclaration')
@@ -47,7 +46,6 @@ import           Foreign.Ptr
 import qualified Language.Go.Assignment as Go
 import qualified Language.Java as PreciseJava
 import qualified Language.JSON as PreciseJSON
-import qualified Language.Markdown.Assignment as Markdown
 import qualified Language.PHP.Assignment as PHP
 import qualified Language.Python as PrecisePython
 import qualified Language.Python.Assignment as Python
@@ -107,8 +105,6 @@ data Parser term where
                    => Parser (AST ast grammar)                   -- ^ A parser producing AST.
                    -> Assignment ast grammar (Term (Sum fs) Loc) -- ^ An assignment from AST onto 'Term's.
                    -> Parser (Term (Sum fs) Loc)                 -- ^ A parser producing 'Term's.
-  -- | A parser for 'Markdown' using cmark.
-  MarkdownParser :: Parser (AST (TermF [] CMarkGFM.NodeType) Markdown.Grammar)
 
 
 goParser :: Parser Go.Term
