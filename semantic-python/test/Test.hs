@@ -35,7 +35,6 @@ import qualified Streaming.Process
 import           System.Directory
 import           System.Exit
 import qualified TreeSitter.Python as TSP
-import qualified TreeSitter.Python.AST as TSP
 import qualified TreeSitter.Unmarshal as TS
 import           Text.Show.Pretty (ppShow)
 import qualified System.Path as Path
@@ -98,7 +97,7 @@ fixtureTestTreeForFile fp = HUnit.testCaseSteps (Path.toString fp) $ \step -> wi
                    . runFail
                    . runReader (fromString @Py.SourcePath . Path.toString $ fp)
                    . runReader @Py.Bindings mempty
-                   . Py.compile @TSP.Module @_ @(Term (Ann :+: Core))
+                   . Py.toplevelCompile
                    <$> result
 
   for_ directives $ \directive -> do

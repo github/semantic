@@ -3,7 +3,7 @@
              PatternSynonyms, StandaloneDeriving, TypeApplications, TypeOperators, ViewPatterns #-}
 
 module Language.Python.Core
-( compile
+( toplevelCompile
 , Bindings
 , SourcePath
 ) where
@@ -77,21 +77,21 @@ class Compile (py :: * -> *) where
   default compileCC :: (MonadFail m, Show (py Span)) => py Span -> m (t Name) -> m (t Name)
   compileCC a _ = defaultCompile a
 
+toplevelCompile ::
+  ( CoreSyntax syn t
+  , Member (Reader SourcePath) sig
+  , Member (Reader Bindings) sig
+  , Carrier sig m
+  , MonadFail m
+  )
+  => Py.Module Span
+  -> m (t Name)
+toplevelCompile = flip compileCC (pure none)
+
 -- | TODO: This is not right, it should be a reference to a Preluded
 -- NoneType instance, but it will do for now.
 none :: (Member Core sig, Carrier sig t) => t Name
 none = unit
-
-compile :: ( Compile py
-           , CoreSyntax syn t
-           , Member (Reader SourcePath) sig
-           , Member (Reader Bindings) sig
-           , Carrier sig m
-           , MonadFail m
-           )
-        => py Span
-        -> m (t Name)
-compile t = compileCC t (pure none)
 
 locFromTSSpan :: SourcePath -> Span -> Loc
 locFromTSSpan fp = Data.Loc.Loc (rawPath fp)
@@ -181,7 +181,8 @@ instance Compile Py.Assignment where
     } cc = do
     p <- ask @SourcePath
     (names, val) <- desugar [Located (locFromTSSpan p ann) name] rhs
-    compile val >>= foldr collapseDesugared (const cc) names >>= locate it
+    -- BUG: ignoring the continuation here
+    compileCC val (pure none) >>= foldr collapseDesugared (const cc) names >>= locate it
 
   compileCC other _ = fail ("Unhandled assignment case: " <> show other)
 
@@ -241,7 +242,8 @@ instance Compile Py.FunctionDefinition where
     } cc = do
       -- Compile each of the parameters, then the body.
       parameters' <- traverse param parameters
-      body' <- compile body
+      -- BUG: ignoring the continuation here
+      body' <- compileCC body (pure none)
       -- Build a lambda.
       located <- locate it (lams parameters' body')
       -- Give it a name (below), then augment the current continuation
@@ -262,10 +264,14 @@ instance Compile Py.Identifier where
 
 instance Compile Py.IfStatement where
   compileCC it@Py.IfStatement{ condition, consequence, alternative} cc =
-    locate it =<< (if' <$> compile condition <*> compileCC consequence cc <*> foldr clause cc alternative)
+    locate it =<< (if'
+                    <$> compileCC condition (pure none)
+                    <*> compileCC consequence cc
+                    <*> foldr clause cc alternative
+                  )
     where clause (R1 Py.ElseClause{ body }) _ = compileCC body cc
           clause (L1 Py.ElifClause{ condition, consequence }) rest  =
-            if' <$> compile condition <*> compileCC consequence cc <*> rest
+            if' <$> compileCC condition (pure none) <*> compileCC consequence cc <*> rest
 
 
 instance Compile Py.ImportFromStatement
@@ -304,7 +310,8 @@ instance Compile Py.PrintStatement
 instance Compile Py.ReturnStatement where
   compileCC it@Py.ReturnStatement { Py.extraChildren = vals } _ = case vals of
     Nothing -> locate it $ none
-    Just Py.ExpressionList { extraChildren = [val] } -> compile val >>= locate it
+    -- BUG: ignoring the continuation here
+    Just Py.ExpressionList { extraChildren = [val] } -> compileCC val (pure none) >>= locate it
     Just Py.ExpressionList { extraChildren = vals  } -> fail ("unimplemented: return statement returning " <> show (length vals) <> " values")
 
 
