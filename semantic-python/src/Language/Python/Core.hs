@@ -201,16 +201,16 @@ instance Compile Py.Call where
   compile it@Py.Call
     { function
     , arguments = L1 Py.ArgumentList { extraChildren = args }
-    } cc = do
-    func <- compile function cc
+    } cc next = do
+    func <- compile function pure next
     let compileArg = \case
-          Prj expr -> compile (expr :: Py.Expression Span) cc
+          Prj expr -> compile (expr :: Py.Expression Span) pure next
           other   -> fail ("Can't compile non-expression function argument: " <> show other)
 
     -- Python function arguments are defined to evaluate left to right.
     args <- traverse compileArg args
-    locate it (func $$* args)
-  compile it _cc = fail ("can't compile Call node with generator expression: " <> show it)
+    locate it (func $$* args) >>= cc
+  compile it _ _ = fail ("can't compile Call node with generator expression: " <> show it)
 
 instance Compile Py.ClassDefinition
 instance Compile Py.ComparisonOperator
@@ -243,7 +243,7 @@ instance Compile Py.ExpressionList where
 
 
 instance Compile Py.False where
-  compile it cc _ = locate it (bool True) >>= cc
+  compile it cc _ = locate it (bool False) >>= cc
 
 instance Compile Py.Float
 instance Compile Py.ForStatement
@@ -316,7 +316,7 @@ instance Compile Py.NotOperator
 
 instance Compile Py.ParenthesizedExpression where
   compile it@Py.ParenthesizedExpression { extraChildren } cc
-    = compile extraChildren cc >>= locate it
+    = compile extraChildren cc >=> locate it
 
 instance Compile Py.PassStatement where
   compile it@Py.PassStatement {} cc _ = locate it Core.unit >>= cc
