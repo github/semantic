@@ -13,7 +13,7 @@ import Data.JSON.Fields
 import Source.Loc as Loc
 
 -- | An AST node labelled with symbols and source location.
-type AST syntax grammar = Term syntax (Node grammar)
+type AST grammar = Term [] (Node grammar)
 
 data Node grammar = Node
   { nodeSymbol    :: !grammar

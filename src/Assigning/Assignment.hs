@@ -238,7 +238,7 @@ firstSet = iterFreer (\ _ (Tracing _ assignment) -> case assignment of
 assign :: (Enum grammar, Ix grammar, Symbol grammar, Show grammar)
        => Source.Source           -- ^ The source for the parse tree.
        -> Assignment grammar a    -- ^ The 'Assignment to run.
-       -> AST [] grammar          -- ^ The root of the ast.
+       -> AST grammar             -- ^ The root of the ast.
        -> Either (Error String) a -- ^ 'Either' an 'Error' or an assigned value.
 assign source assignment ast = bimap (fmap (either id show)) fst (runAssignment source assignment (makeState [ast]))
 {-# INLINE assign #-}
@@ -313,12 +313,12 @@ data State grammar = State
   { stateOffset :: {-# UNPACK #-} !Int    -- ^ The offset into the Source thus far reached, measured in bytes.
   , statePos :: {-# UNPACK #-} !Pos  -- ^ The (1-indexed) line/column position in the Source thus far reached.
   , stateCallSites :: ![(String, SrcLoc)] -- ^ The symbols & source locations of the calls thus far.
-  , stateNodes :: ![AST [] grammar]      -- ^ The remaining nodes to assign. Note that 'children' rules recur into subterms, and thus this does not necessarily reflect all of the terms remaining to be assigned in the overall algorithm, only those “in scope.”
+  , stateNodes :: ![AST grammar]      -- ^ The remaining nodes to assign. Note that 'children' rules recur into subterms, and thus this does not necessarily reflect all of the terms remaining to be assigned in the overall algorithm, only those “in scope.”
   , stateLocals :: ![Text]      -- Special state necessary for the Ruby assignment. When we refactor Assignment to use effects we should pull this out into Language.Ruby.Assignment.
   }
   deriving (Eq, Show)
 
-makeState :: [AST [] grammar] -> State grammar
+makeState :: [AST grammar] -> State grammar
 makeState ns = State 0 (Pos 1 1) [] ns []
 
 

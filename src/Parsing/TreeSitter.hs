@@ -46,7 +46,7 @@ parseToAST :: ( Bounded grammar
            => Duration
            -> Ptr TS.Language
            -> Blob
-           -> m (Either TSParseException  (AST [] grammar))
+           -> m (Either TSParseException (AST grammar))
 parseToAST parseTimeout language blob = runParse parseTimeout language blob (anaM toAST <=< peek)
 
 parseToPreciseAST
@@ -90,7 +90,7 @@ runParse parseTimeout language Blob{..} action =
     else
       Exc.throw IncompatibleVersions
 
-toAST :: forall grammar . (Bounded grammar, Enum grammar) => TS.Node -> IO (Base (AST [] grammar) TS.Node)
+toAST :: forall grammar . (Bounded grammar, Enum grammar) => TS.Node -> IO (Base (AST grammar) TS.Node)
 toAST node@TS.Node{..} = do
   let count = fromIntegral nodeChildCount
   children <- allocaArray count $ \ childNodesPtr -> do
