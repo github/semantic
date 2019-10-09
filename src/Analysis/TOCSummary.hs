@@ -20,7 +20,6 @@ import           Data.Term
 import qualified Data.Text as T
 import           Source.Loc as Loc
 import           Source.Range
-import qualified Language.Markdown.Syntax as Markdown
 
 -- | A declaration’s identifier and type.
 data Declaration
@@ -73,15 +72,6 @@ class CustomHasDeclaration whole syntax where
   -- | Produce a customized 'Declaration' for a given syntax node.
   customToDeclaration :: (Foldable whole) => Blob -> Loc -> syntax (Term whole Loc, Maybe Declaration) -> Maybe Declaration
 
-
--- | Produce a 'HeadingDeclaration' from the first line of the heading of a 'Markdown.Heading' node.
-instance CustomHasDeclaration whole Markdown.Heading where
-  customToDeclaration blob@Blob{..} ann (Markdown.Heading level terms _)
-    = Just $ HeadingDeclaration (headingText terms) mempty (Loc.span ann) (blobLanguage blob) level
-    where headingText terms = getSource $ maybe (byteRange ann) sconcat (nonEmpty (headingByteRange <$> toList terms))
-          headingByteRange (Term (In ann _), _) = byteRange ann
-          getSource = firstLine . toText . Source.slice blobSource
-          firstLine = T.takeWhile (/= '\n')
 
 -- | Produce an 'ErrorDeclaration' for 'Syntax.Error' nodes.
 instance CustomHasDeclaration whole Syntax.Error where
@@ -155,7 +145,6 @@ class HasDeclarationWithStrategy (strategy :: Strategy) whole syntax where
 type family DeclarationStrategy syntax where
   DeclarationStrategy Declaration.Function = 'Custom
   DeclarationStrategy Declaration.Method = 'Custom
-  DeclarationStrategy Markdown.Heading = 'Custom
   DeclarationStrategy Syntax.Error = 'Custom
   DeclarationStrategy (Sum fs) = 'Custom
   DeclarationStrategy a = 'Default
