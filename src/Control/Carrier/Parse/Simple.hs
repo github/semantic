@@ -47,10 +47,6 @@ runParser
   -> Parser term
   -> m term
 runParser timeout blob@Blob{..} parser = case parser of
-  ASTParser language ->
-    parseToAST timeout language blob
-      >>= either (throwError . SomeException) pure
-
   UnmarshalParser language ->
     parseToPreciseAST timeout language blob
       >>= either (throwError . SomeException) pure

@@ -57,12 +57,6 @@ runParser :: (Member (Error SomeException) sig, Member (Reader TaskSession) sig,
           -> Parser term
           -> m term
 runParser blob@Blob{..} parser = case parser of
-  ASTParser language ->
-    time "parse.tree_sitter_ast_parse" languageTag $ do
-      config <- asks config
-      parseToAST (configTreeSitterParseTimeout config) language blob
-        >>= either (\e -> trace (displayException e) *> throwError (SomeException e)) pure
-
   UnmarshalParser language ->
     time "parse.tree_sitter_ast_parse" languageTag $ do
       config <- asks config

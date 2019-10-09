@@ -34,7 +34,6 @@ module Parsing.Parser
 
 import           Assigning.Assignment
 import           Data.Abstract.Evaluatable (HasPrelude)
-import           Data.AST
 import           Data.Graph.ControlFlowVertex (VertexDeclaration')
 import           Data.Language
 import           Data.Kind (Constraint)
@@ -96,8 +95,6 @@ someAnalysisParser _ l          = error $ "Analysis not supported for: " <> show
 
 -- | A parser from 'Source' onto some term type.
 data Parser term where
-  -- | A parser producing 'AST' using a 'TS.Language'.
-  ASTParser :: (Bounded grammar, Enum grammar, Show grammar) => Ptr TS.Language -> Parser (AST grammar)
   -- | A parser 'Unmarshal'ing to a precise AST type using a 'TS.Language'.
   UnmarshalParser :: Unmarshal t => Ptr TS.Language -> Parser (t Loc)
   -- | A parser producing an à la carte term given an 'AST'-producing parser and an 'Assignment' onto 'Term's in some syntax type.
