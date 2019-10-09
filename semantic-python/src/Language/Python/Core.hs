@@ -259,7 +259,7 @@ instance Compile Py.GeneratorExpression
 instance Compile Py.GlobalStatement
 
 instance Compile Py.Identifier where
-  compile Py.Identifier { text } cc = cc . pure . Name $ text
+  compile Py.Identifier { text } cc _ = cc . pure . Name $ text
 
 instance Compile Py.IfStatement where
   compile it@Py.IfStatement{ condition, consequence, alternative} cc next =
