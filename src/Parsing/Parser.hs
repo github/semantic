@@ -102,28 +102,28 @@ data Parser term where
   UnmarshalParser :: Unmarshal t => Ptr TS.Language -> Parser (t Loc)
   -- | A parser producing an à la carte term given an 'AST'-producing parser and an 'Assignment' onto 'Term's in some syntax type.
   AssignmentParser :: (Enum grammar, Ix grammar, Show grammar, TS.Symbol grammar, Syntax.Error :< fs, Apply Foldable fs, Apply Functor fs)
-                   => Parser (AST grammar)                   -- ^ A parser producing AST.
+                   => Ptr TS.Language                        -- ^ A parser producing AST.
                    -> Assignment grammar (Term (Sum fs) Loc) -- ^ An assignment from AST onto 'Term's.
                    -> Parser (Term (Sum fs) Loc)             -- ^ A parser producing 'Term's.
 
 
 goParser :: Parser Go.Term
-goParser = AssignmentParser (ASTParser tree_sitter_go) Go.assignment
+goParser = AssignmentParser tree_sitter_go Go.assignment
 
 rubyParser :: Parser Ruby.Term
-rubyParser = AssignmentParser (ASTParser tree_sitter_ruby) Ruby.assignment
+rubyParser = AssignmentParser tree_sitter_ruby Ruby.assignment
 
 phpParser :: Parser PHP.Term
-phpParser = AssignmentParser (ASTParser tree_sitter_php) PHP.assignment
+phpParser = AssignmentParser tree_sitter_php PHP.assignment
 
 pythonParser :: Parser Python.Term
-pythonParser = AssignmentParser (ASTParser tree_sitter_python) Python.assignment
+pythonParser = AssignmentParser tree_sitter_python Python.assignment
 
 typescriptParser :: Parser TypeScript.Term
-typescriptParser = AssignmentParser (ASTParser tree_sitter_typescript) TypeScript.assignment
+typescriptParser = AssignmentParser tree_sitter_typescript TypeScript.assignment
 
 tsxParser :: Parser TSX.Term
-tsxParser = AssignmentParser (ASTParser tree_sitter_tsx) TSX.assignment
+tsxParser = AssignmentParser tree_sitter_tsx TSX.assignment
 
 javaParserPrecise :: Parser (PreciseJava.Term Loc)
 javaParserPrecise = UnmarshalParser PreciseJava.tree_sitter_java

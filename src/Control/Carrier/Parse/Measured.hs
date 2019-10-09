@@ -17,6 +17,7 @@ import           Control.Effect.Reader
 import           Control.Effect.Trace
 import           Control.Exception
 import           Control.Monad.IO.Class
+import           Data.AST
 import           Data.Blob
 import qualified Data.Error as Error
 import qualified Data.Flag as Flag
@@ -24,6 +25,7 @@ import qualified Data.Syntax as Syntax
 import           Data.Sum
 import           Data.Term
 import           Data.Typeable
+import           Foreign
 import           Parsing.Parser
 import           Parsing.TreeSitter
 import           Prologue hiding (project)
@@ -32,6 +34,7 @@ import           Semantic.Task (TaskSession(..))
 import           Semantic.Telemetry
 import           Semantic.Timeout
 import           Source.Source (Source)
+import qualified TreeSitter.Language as TS
 
 newtype ParseC m a = ParseC { runParse :: m a }
   deriving (Applicative, Functor, Monad, MonadIO)
@@ -66,7 +69,7 @@ runParser blob@Blob{..} parser = case parser of
       parseToPreciseAST (configTreeSitterParseTimeout config) language blob
         >>= either (\e -> trace (displayException e) *> throwError (SomeException e)) pure
 
-  AssignmentParser    parser assignment -> runAssignment Assignment.assign    parser blob assignment
+  AssignmentParser language assignment -> runAssignment Assignment.assign language blob assignment
   where languageTag = [("language" :: String, show (blobLanguage blob))]
 
 data ParserCancelled = ParserTimedOut | AssignmentTimedOut
@@ -81,7 +84,9 @@ errors = cata $ \ (In Assignment.Loc{..} syntax) ->
 runAssignment
   :: ( Apply Foldable syntaxes
      , Apply Functor syntaxes
+     , Bounded grammar
      , Element Syntax.Error syntaxes
+     , Enum grammar
      , Member (Error SomeException) sig
      , Member (Reader TaskSession) sig
      , Member Telemetry sig
@@ -90,12 +95,12 @@ runAssignment
      , Carrier sig m
      , MonadIO m
      )
-  => (Source -> assignment (Term (Sum syntaxes) Assignment.Loc) -> ast -> Either (Error.Error String) (Term (Sum syntaxes) Assignment.Loc))
-  -> Parser ast
+  => (Source -> Assignment.Assignment grammar (Term (Sum syntaxes) Assignment.Loc) -> AST grammar -> Either (Error.Error String) (Term (Sum syntaxes) Assignment.Loc))
+  -> Ptr TS.Language
   -> Blob
-  -> assignment (Term (Sum syntaxes) Assignment.Loc)
+  -> Assignment.Assignment grammar (Term (Sum syntaxes) Assignment.Loc)
   -> m (Term (Sum syntaxes) Assignment.Loc)
-runAssignment assign parser blob@Blob{..} assignment = do
+runAssignment assign language blob@Blob{..} assignment = do
   taskSession <- ask
   let requestID' = ("github_request_id", requestID taskSession)
   let isPublic'  = ("github_is_public", show (isPublic taskSession))
@@ -106,10 +111,14 @@ runAssignment assign parser blob@Blob{..} assignment = do
   let shouldFailOnParsing = optionsFailOnParseError . configOptions $ config taskSession
   let shouldFailOnWarning = optionsFailOnWarning . configOptions $ config taskSession
 
-  ast <- runParser blob parser `catchError` \ (SomeException err) -> do
-    writeStat (increment "parse.parse_failures" languageTag)
-    writeLog Error "failed parsing" (("task", "parse") : logFields)
-    throwError (toException err)
+  ast <- time "parse.tree_sitter_ast_parse" languageTag $ do
+    config <- asks config
+    parseToAST (configTreeSitterParseTimeout config) language blob
+      >>= either (\e -> trace (displayException e) *> throwError (SomeException e)) pure
+    `catchError` \ (SomeException err) -> do
+      writeStat (increment "parse.parse_failures" languageTag)
+      writeLog Error "failed parsing" (("task", "parse") : logFields)
+      throwError (toException err)
 
   res <- timeout (configAssignmentTimeout (config taskSession)) . time "parse.assign" languageTag $
     case assign blobSource assignment ast of
