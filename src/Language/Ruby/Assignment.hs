@@ -1,5 +1,4 @@
 {-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-} -- FIXME
 module Language.Ruby.Assignment
 ( assignment
 , Syntax
@@ -130,7 +129,7 @@ type Syntax = '[
   ]
 
 type Term = Term.Term (Sum Syntax) Loc
-type Assignment = Assignment.Assignment [] Grammar
+type Assignment = Assignment.Assignment Grammar
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
 assignment :: Assignment Term

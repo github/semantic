@@ -1,5 +1,4 @@
 {-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-} -- FIXME
 module Language.TypeScript.Assignment
 ( assignment
 , Syntax
@@ -200,7 +199,7 @@ type Syntax = '[
   ]
 
 type Term = Term.Term (Sum Syntax) Loc
-type Assignment = Assignment.Assignment [] Grammar
+type Assignment = Assignment.Assignment Grammar
 
 -- | Assignment from AST in TypeScript’s grammar onto a program in TypeScript’s syntax.
 assignment :: Assignment Term

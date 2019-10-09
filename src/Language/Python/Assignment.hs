@@ -1,5 +1,4 @@
 {-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-} -- FIXME
 module Language.Python.Assignment
 ( assignment
 , Syntax
@@ -119,7 +118,7 @@ type Syntax =
    ]
 
 type Term = Term.Term (Sum Syntax) Loc
-type Assignment = Assignment.Assignment [] Grammar
+type Assignment = Assignment.Assignment Grammar
 
 -- | Assignment from AST in Python's grammar onto a program in Python's syntax.
 assignment :: Assignment Term

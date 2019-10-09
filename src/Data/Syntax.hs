@@ -49,16 +49,16 @@ makeTerm1' syntax = case toList syntax of
   _ -> error "makeTerm1': empty structure"
 
 -- | Construct an empty term at the current position.
-emptyTerm :: (HasCallStack, Empty :< syntaxes, Apply Foldable syntaxes) => Assignment.Assignment ast grammar (Term (Sum syntaxes) Loc)
+emptyTerm :: (HasCallStack, Empty :< syntaxes, Apply Foldable syntaxes) => Assignment.Assignment grammar (Term (Sum syntaxes) Loc)
 emptyTerm = makeTerm . startLocation <$> Assignment.location <*> pure Empty
   where startLocation Loc{..} = Loc (Range.point (Range.start byteRange)) (Span.point (Span.start span))
 
 -- | Catch assignment errors into an error term.
-handleError :: (HasCallStack, Error :< syntaxes, Enum grammar, Eq1 ast, Ix grammar, Show grammar, Apply Foldable syntaxes) => Assignment.Assignment ast grammar (Term (Sum syntaxes) Loc) -> Assignment.Assignment ast grammar (Term (Sum syntaxes) Loc)
+handleError :: (HasCallStack, Error :< syntaxes, Enum grammar, Ix grammar, Show grammar, Apply Foldable syntaxes) => Assignment.Assignment grammar (Term (Sum syntaxes) Loc) -> Assignment.Assignment grammar (Term (Sum syntaxes) Loc)
 handleError = flip Assignment.catchError (\ err -> makeTerm <$> Assignment.location <*> pure (errorSyntax (either id show <$> err) []) <* Assignment.source)
 
 -- | Catch parse errors into an error term.
-parseError :: (HasCallStack, Error :< syntaxes, Bounded grammar, Enum grammar, Ix grammar, Apply Foldable syntaxes) => Assignment.Assignment ast grammar (Term (Sum syntaxes) Loc)
+parseError :: (HasCallStack, Error :< syntaxes, Bounded grammar, Enum grammar, Ix grammar, Apply Foldable syntaxes) => Assignment.Assignment grammar (Term (Sum syntaxes) Loc)
 parseError = makeTerm <$> Assignment.token maxBound <*> pure (Error (ErrorStack $ errorSite <$> getCallStack (freezeCallStack callStack)) [] (Just "ParseError") [])
 
 -- | Match context terms before a subject term, wrapping both up in a Context term if any context terms matched, or otherwise returning the subject term.

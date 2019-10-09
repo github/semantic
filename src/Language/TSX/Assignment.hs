@@ -1,5 +1,4 @@
 {-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-} -- FIXME
 module Language.TSX.Assignment
 ( assignment
 , Syntax
@@ -209,7 +208,7 @@ type Syntax = '[
   ]
 
 type Term = Term.Term (Sum Syntax) Loc
-type Assignment = Assignment.Assignment [] Grammar
+type Assignment = Assignment.Assignment Grammar
 
 -- | Assignment from AST in TSX’s grammar onto a program in TSX’s syntax.
 assignment :: Assignment Term
