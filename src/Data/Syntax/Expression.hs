@@ -11,13 +11,9 @@ import           Data.Abstract.Name as Name
 import           Data.Abstract.Number (liftIntegralFrac, liftReal, liftedExponent, liftedFloorDiv)
 import           Data.Fixed
 import           Data.JSON.Fields
-import           Data.List (intersperse)
 import qualified Data.List.NonEmpty as NonEmpty
 import qualified Data.Map.Strict as Map
-import qualified Data.Reprinting.Scope as Scope
-import qualified Data.Reprinting.Token as Token
 import           Diffing.Algorithm hiding (Delete)
-import           Reprinting.Tokenize hiding (Superclass)
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 
 -- | Typical prefix function application, like `f(x)` in many languages, or `f x` in Haskell.
@@ -34,13 +30,6 @@ instance Evaluatable Call where
     args <- traverse eval callParams
     call op args
 
-instance Tokenize Call where
-  tokenize Call{..} = within Scope.Call $ do
-    -- TODO: callContext
-    callFunction
-    within' Scope.Params $ sequenceA_ (sep callParams)
-    callBlock
-
 data LessThan a = LessThan { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically LessThan
@@ -48,9 +37,6 @@ data LessThan a = LessThan { lhs :: a, rhs :: a }
 instance Evaluatable LessThan where
   eval eval _ t = traverse eval t >>= go where
     go (LessThan a b) = liftComparison (Concrete (<)) a b
-
-instance Tokenize LessThan where
-  tokenize LessThan{..} = within' (Scope.InfixL (Compare Less) 4) $ lhs *> yield Token.Sym <* rhs
 
 data LessThanEqual a = LessThanEqual { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
@@ -60,9 +46,6 @@ instance Evaluatable LessThanEqual where
   eval eval _ t = traverse eval t >>= go where
     go (LessThanEqual a b) = liftComparison (Concrete (<=)) a b
 
-instance Tokenize LessThanEqual where
-  tokenize LessThanEqual{..} = within' (Scope.InfixL (CompareEql Less) 4) $ lhs *> yield Token.Sym <* rhs
-
 data GreaterThan a = GreaterThan { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically GreaterThan
@@ -71,9 +54,6 @@ instance Evaluatable GreaterThan where
   eval eval _ t = traverse eval t >>= go where
     go (GreaterThan a b) = liftComparison (Concrete (>)) a b
 
-instance Tokenize GreaterThan where
-  tokenize GreaterThan{..} = within' (Scope.InfixL (Compare Greater) 4) $ lhs *> yield Token.Sym <* rhs
-
 data GreaterThanEqual a = GreaterThanEqual { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically GreaterThanEqual
@@ -81,9 +61,6 @@ data GreaterThanEqual a = GreaterThanEqual { lhs :: a, rhs :: a }
 instance Evaluatable GreaterThanEqual where
   eval eval _ t = traverse eval t >>= go where
     go (GreaterThanEqual a b) = liftComparison (Concrete (>=)) a b
-
-instance Tokenize GreaterThanEqual where
-  tokenize GreaterThanEqual{..} = within' (Scope.InfixL (CompareEql Greater) 4) $ lhs *> yield Token.Sym <* rhs
 
 data Equal a = Equal { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
@@ -95,9 +72,6 @@ instance Evaluatable Equal where
     -- We need some mechanism to customize this behavior per-language.
     go (Equal a b) = liftComparison (Concrete (==)) a b
 
-instance Tokenize Equal where
-  tokenize Equal{..} = within' (Scope.InfixL Eql 4) $ lhs *> yield Token.Sym <* rhs
-
 data StrictEqual a = StrictEqual { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically StrictEqual
@@ -108,9 +82,6 @@ instance Evaluatable StrictEqual where
     -- We need some mechanism to customize this behavior per-language.
     go (StrictEqual a b) = liftComparison (Concrete (==)) a b
 
-instance Tokenize StrictEqual where
-  tokenize StrictEqual{..} = within' (Scope.InfixL StrictEql 4) $ lhs *> yield Token.Sym <* rhs
-
 data Comparison a = Comparison { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Comparison
@@ -118,9 +89,6 @@ data Comparison a = Comparison { lhs :: a, rhs :: a }
 instance Evaluatable Comparison where
   eval eval _ t = traverse eval t >>= go where
     go (Comparison a b) = liftComparison (Concrete (==)) a b
-
-instance Tokenize Comparison where
-  tokenize Comparison{..} = within' (Scope.InfixL Spaceship 4) $ lhs *> yield Token.Sym <* rhs
 
 data Plus a = Plus { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
@@ -130,9 +98,6 @@ instance Evaluatable Plus where
   eval eval _ t = traverse eval t >>= go where
     go (Plus a b) = liftNumeric2 add a b  where add    = liftReal (+)
 
-instance Tokenize Plus where
-  tokenize Plus{..} = within' (Scope.InfixL Add 6) $ lhs *> yield Token.Sym <* rhs
-
 data Minus a = Minus { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Minus
@@ -140,9 +105,6 @@ data Minus a = Minus { lhs :: a, rhs :: a }
 instance Evaluatable Minus where
   eval eval _ t = traverse eval t >>= go where
     go (Minus a b) = liftNumeric2 (liftReal (-)) a b
-
-instance Tokenize Minus where
-  tokenize Minus{..} = within' (Scope.InfixL Subtract 6) $ lhs *> yield Token.Sym <* rhs
 
 data Times a = Times { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
@@ -152,9 +114,6 @@ instance Evaluatable Times where
   eval eval _ t = traverse eval t >>= go where
     go (Times a b) = liftNumeric2 (liftReal (*)) a b
 
-instance Tokenize Times where
-  tokenize Times{..} = within' (Scope.InfixL Multiply 7) $ lhs *> yield Token.Sym <* rhs
-
 data DividedBy a = DividedBy { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically DividedBy
@@ -162,9 +121,6 @@ data DividedBy a = DividedBy { lhs :: a, rhs :: a }
 instance Evaluatable DividedBy where
   eval eval _ t = traverse eval t >>= go where
     go (DividedBy a b) = liftNumeric2 (liftIntegralFrac div (/)) a b
-
-instance Tokenize DividedBy where
-  tokenize DividedBy{..} = within' (Scope.InfixL Divide 7) $ lhs *> yield Token.Sym <* rhs
 
 data Modulo a = Modulo { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
@@ -174,9 +130,6 @@ instance Evaluatable Modulo where
   eval eval _ t = traverse eval t >>= go where
     go (Modulo a b) = liftNumeric2 (liftIntegralFrac mod mod') a b
 
-instance Tokenize Modulo where
-  tokenize Modulo{..} = within' (Scope.InfixL Modulus 7) $ lhs *> yield Token.Sym <* rhs
-
 data Power a = Power { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Power
@@ -184,9 +137,6 @@ data Power a = Power { lhs :: a, rhs :: a }
 instance Evaluatable Power where
   eval eval _ t = traverse eval t >>= go where
     go (Power a b) = liftNumeric2 liftedExponent a b
-
-instance Tokenize Power where
-  tokenize Power{..} = within' (Scope.InfixL Raise 9) $ lhs *> yield Token.Sym <* rhs
 
 newtype Negate a = Negate { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
@@ -196,9 +146,6 @@ instance Evaluatable Negate where
   eval eval _ t = traverse eval t >>= go where
     go (Negate a) = liftNumeric negate a
 
-instance Tokenize Negate where
-  tokenize Negate{..} = within' (Scope.Prefix NumericNegate) $ yield Token.Sym <* value
-
 data FloorDivision a = FloorDivision { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically FloorDivision
@@ -207,9 +154,6 @@ instance Evaluatable FloorDivision where
   eval eval _ t = traverse eval t >>= go where
     go (FloorDivision a b) = liftNumeric2 liftedFloorDiv a b
 
-instance Tokenize FloorDivision where
-  tokenize FloorDivision{..} = within' (Scope.InfixL FloorDivide 7) $ lhs *> yield Token.Sym <* rhs
-
 -- | Regex matching operators (Ruby's =~ and ~!)
 data Matches a = Matches { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
@@ -217,17 +161,11 @@ data Matches a = Matches { lhs :: a, rhs :: a }
 
 instance Evaluatable Matches
 
-instance Tokenize Matches where
-  tokenize Matches{..} = within' (Scope.InfixL RegexMatch 1) $ lhs *> yield Token.Sym <* rhs
-
 data NotMatches a = NotMatches { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically NotMatches
 
 instance Evaluatable NotMatches
-
-instance Tokenize NotMatches where
-  tokenize NotMatches{..} = within' (Scope.InfixL RegexNotMatch 1) $ lhs *> yield Token.Sym <* rhs
 
 data Or a = Or { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
@@ -238,9 +176,6 @@ instance Evaluatable Or where
     a' <- eval a
     ifthenelse a' (pure a') (eval b)
 
-instance Tokenize Or where
-  tokenize Or{..} = within' (Scope.InfixL LogicalOr 2) $ lhs *> yield Token.Sym <* rhs
-
 data And a = And { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically And
@@ -250,18 +185,12 @@ instance Evaluatable And where
     a' <- eval a
     ifthenelse a' (eval b) (pure a')
 
-instance Tokenize And where
-  tokenize And{..} = within' (Scope.InfixL LogicalAnd 2) $ lhs *> yield Token.Sym <* rhs
-
 newtype Not a = Not { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Not
 
 instance Evaluatable Not where
   eval eval _ (Not a) = eval a >>= asBool >>= boolean . not
-
-instance Tokenize Not where
-  tokenize Not{..} = within' (Scope.Prefix LogicalNot) $ yield Token.Sym <* value
 
 data XOr a = XOr { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
@@ -270,9 +199,6 @@ data XOr a = XOr { lhs :: a, rhs :: a }
 instance Evaluatable XOr where
   -- N.B. we have to use Monad rather than Applicative/Traversable on 'And' and 'Or' so that we don't evaluate both operands
   eval eval _ (XOr a b) = liftA2 (/=) (eval a >>= asBool) (eval b >>= asBool) >>= boolean
-
-instance Tokenize XOr where
-  tokenize XOr{..} = within' (Scope.InfixL LogicalXor 2) $ lhs *> yield Token.Sym <* rhs
 
 -- | Javascript delete operator
 newtype Delete a = Delete { value :: a }
@@ -319,9 +245,6 @@ instance Evaluatable BOr where
     b' <- eval b >>= castToInteger
     liftBitwise2 (.|.) a' b'
 
-instance Tokenize BOr where
-  tokenize BOr{..} = within' (Scope.InfixL BinaryOr 4) $ lhs *> yield Token.Sym <* rhs
-
 data BAnd a = BAnd { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically BAnd
@@ -332,9 +255,6 @@ instance Evaluatable BAnd where
     b' <- eval b >>= castToInteger
     liftBitwise2 (.&.) a' b'
 
-instance Tokenize BAnd where
-  tokenize BAnd{..} = within' (Scope.InfixL BinaryAnd 5) $ lhs *> yield Token.Sym <* rhs
-
 data BXOr a = BXOr { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically BXOr
@@ -344,9 +264,6 @@ instance Evaluatable BXOr where
     a' <- eval a >>= castToInteger
     b' <- eval b >>= castToInteger
     liftBitwise2 xor a' b'
-
-instance Tokenize BXOr where
-  tokenize BXOr{..} = within' (Scope.InfixL BinaryXor 5) $ lhs *> yield Token.Sym <* rhs
 
 data LShift a = LShift { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
@@ -360,9 +277,6 @@ instance Evaluatable LShift where
     where
       shiftL' a b = shiftL a (fromIntegral (toInteger b))
 
-instance Tokenize LShift where
-  tokenize LShift{..} = within' (Scope.InfixL LeftShift 4) $ lhs *> yield Token.Sym <* rhs
-
 data RShift a = RShift { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically RShift
@@ -374,9 +288,6 @@ instance Evaluatable RShift where
     liftBitwise2 shiftR' a' b'
     where
       shiftR' a b = shiftR a (fromIntegral (toInteger b))
-
-instance Tokenize RShift where
-  tokenize RShift{..} = within' (Scope.InfixL RightShift 4) $ lhs *> yield Token.Sym <* rhs
 
 data UnsignedRShift a = UnsignedRShift { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
@@ -396,9 +307,6 @@ instance Evaluatable Complement where
   eval eval _ (Complement a) = do
     a' <- eval a >>= castToInteger
     liftBitwise complement a'
-
-instance Tokenize Complement where
-  tokenize Complement{..} = within' (Scope.Prefix BinaryComplement) $ yield Token.Sym <* value
 
 -- | Member Access (e.g. a.b)
 data MemberAccess a = MemberAccess { lhs :: a, rhs :: a }
@@ -448,9 +356,6 @@ instance Evaluatable MemberAccess where
       Nothing -> throwEvalError (ReferenceError lhsValue rhs)
 
 
-instance Tokenize MemberAccess where
-  tokenize MemberAccess{..} = lhs *> yield Access <* rhs
-
 -- | Subscript (e.g a[1])
 data Subscript a = Subscript { lhs :: a, rhs :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
@@ -462,17 +367,11 @@ instance Evaluatable Subscript where
   eval eval _ (Subscript l [r]) = join (index <$> eval l <*> eval r)
   eval _    _ (Subscript _ _)   = throwUnspecializedError (UnspecializedError "Eval unspecialized for subscript with slices")
 
-instance Tokenize Subscript where
-  tokenize Subscript{..} = lhs *> within' Scope.Indexing (sequenceA_ (intersperse (yield Token.Sep) rhs))
-
 data Member a = Member { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Member
 
 instance Evaluatable Member where
-
-instance Tokenize Member where
-  tokenize Member{..} = lhs *> yield Token.Access <* rhs
 
 -- | Enumeration (e.g. a[1:10:1] in Python (start at index 1, stop at index 10, step 1 element from start to stop))
 data Enumeration a = Enumeration { enumerationStart :: !a, enumerationEnd :: !a, enumerationStep :: !a }
@@ -481,9 +380,6 @@ data Enumeration a = Enumeration { enumerationStart :: !a, enumerationEnd :: !a,
 
 -- TODO: Implement Eval instance for Enumeration
 instance Evaluatable Enumeration
-
-instance Tokenize Enumeration where
-  tokenize Enumeration{..} = within Scope.Slice $ enumerationStart *> enumerationEnd *> enumerationStep
 
 -- | InstanceOf (e.g. a instanceof b in JavaScript
 data InstanceOf a = InstanceOf { instanceOfSubject :: !a, instanceOfObject :: !a }
@@ -502,10 +398,6 @@ newtype ScopeResolution a = ScopeResolution { scopes :: NonEmpty a }
 instance Hashable1 ScopeResolution where liftHashWithSalt = foldl
 
 instance Evaluatable ScopeResolution
-
-instance Tokenize ScopeResolution where
-  tokenize (ScopeResolution (a :| rest)) =
-    a *> for_ rest (yield Token.Resolve *>)
 
 instance Declarations1 ScopeResolution where
   liftDeclaredName declaredName = declaredName . NonEmpty.last . scopes
@@ -584,15 +476,9 @@ data Super a = Super
 
 instance Evaluatable Super
 
-instance Tokenize Super where
-  tokenize _ = yield Token.Superclass
-
 data This a = This
   deriving (Diffable, Eq, Foldable, Functor,  Generic1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically This
-
-instance Tokenize This where
-  tokenize _ = yield Self
 
 instance Evaluatable This where
   eval _ _ This = do

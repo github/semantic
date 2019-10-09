@@ -3,7 +3,7 @@
 module Graphing.Calls.Spec ( spec ) where
 
 import Prelude hiding (readFile)
-import SpecHelpers hiding (readFile)
+import SpecHelpers
 
 import Algebra.Graph
 

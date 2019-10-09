@@ -11,4 +11,4 @@ import Semantic.Api.Diffs as DiffsAPI
 import Semantic.Api.Symbols as SymbolsAPI
 import Semantic.Api.Terms as TermsAPI
 import Semantic.Api.TOCSummaries as TOCSummariesAPI
-import Semantic.Proto.SemanticPB as Types
+import Proto.Semantic as Types

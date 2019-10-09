@@ -97,7 +97,7 @@ diffFilePaths session paths
 parseFilePath :: TaskSession -> Path.RelFile -> IO (Either SomeException ByteString)
 parseFilePath session path = do
   blob <- readBlobFromFile (fileForRelPath path)
-  res <- runTask session . runParse (configTreeSitterParseTimeout (config session)) . runReader (PerLanguageModes ALaCarte) $ parseTermBuilder TermSExpression (toList blob)
+  res <- runTask session . runParse (configTreeSitterParseTimeout (config session)) . runReader defaultLanguageModes $ parseTermBuilder TermSExpression (toList blob)
   pure (runBuilder <$> res)
 
 runParseWithConfig :: (Carrier sig m, Member (Reader Config) sig) => ParseC m a -> m a

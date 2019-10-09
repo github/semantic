@@ -8,9 +8,11 @@ module Semantic.Api.Bridge
 import           Control.Lens
 import qualified Data.Blob as Data
 import qualified Data.Language as Data
+import           Data.ProtoLens (defMessage)
 import qualified Data.Text as T
 import qualified Semantic.Api.LegacyTypes as Legacy
-import qualified Semantic.Proto.SemanticPB as API
+import qualified Proto.Semantic as API
+import           Proto.Semantic_Fields as P
 import           Source.Source (fromText, toText)
 import qualified Source.Span as Source
 
@@ -50,13 +52,13 @@ instance APIBridge Legacy.Position Source.Pos where
 
 instance APIBridge API.Position Source.Pos where
   bridging = iso fromAPI toAPI where
-    toAPI Source.Pos{..}     = API.Position (fromIntegral line) (fromIntegral column)
-    fromAPI API.Position{..} = Source.Pos (fromIntegral line) (fromIntegral column)
+    toAPI Source.Pos{..}     = defMessage & P.line .~ fromIntegral line & P.column .~ fromIntegral column
+    fromAPI position = Source.Pos (fromIntegral (position^.line)) (fromIntegral (position^.column))
 
 instance APIConvert API.Span Source.Span where
   converting = prism' toAPI fromAPI where
-    toAPI Source.Span{..} = API.Span (bridging #? start) (bridging #? end)
-    fromAPI API.Span{..} = Source.Span <$> (start >>= preview bridging) <*> (end >>= preview bridging)
+    toAPI Source.Span{..} = defMessage & P.maybe'start .~ (bridging #? start) & P.maybe'end .~ (bridging #? end)
+    fromAPI span = Source.Span <$> (span^.maybe'start >>= preview bridging) <*> (span^.maybe'end >>= preview bridging)
 
 instance APIConvert Legacy.Span Source.Span where
   converting = prism' toAPI fromAPI where
@@ -68,18 +70,19 @@ instance APIBridge T.Text Data.Language where
 
 instance APIBridge API.Blob Data.Blob where
   bridging = iso apiBlobToBlob blobToApiBlob where
-    blobToApiBlob b = API.Blob (toText (Data.blobSource b)) (T.pack (Data.blobPath b)) (bridging # Data.blobLanguage b)
-    apiBlobToBlob API.Blob{..} = Data.makeBlob (fromText content) (T.unpack path) (language ^. bridging) mempty
+    blobToApiBlob b = defMessage & P.content .~ toText (Data.blobSource b) & P.path .~ T.pack (Data.blobPath b) & P.language .~ (bridging # Data.blobLanguage b)
+    apiBlobToBlob blob = Data.makeBlob (fromText (blob^.content)) (T.unpack (blob^.path)) (blob^.(language . bridging)) mempty
 
 
 instance APIConvert API.BlobPair Data.BlobPair where
   converting = prism' blobPairToApiBlobPair apiBlobPairToBlobPair where
 
-    apiBlobPairToBlobPair (API.BlobPair (Just before) (Just after)) = Just $ Data.Diffing (before^.bridging) (after^.bridging)
-    apiBlobPairToBlobPair (API.BlobPair (Just before) Nothing) = Just $ Data.Deleting (before^.bridging)
-    apiBlobPairToBlobPair (API.BlobPair Nothing (Just after)) = Just $ Data.Inserting (after^.bridging)
-    apiBlobPairToBlobPair _ = Nothing
+    apiBlobPairToBlobPair blobPair = case (blobPair^.maybe'before, blobPair^.maybe'after) of
+      (Just before, Just after) -> Just $ Data.Diffing (before^.bridging) (after^.bridging)
+      (Just before, Nothing)    -> Just $ Data.Deleting (before^.bridging)
+      (Nothing, Just after)     -> Just $ Data.Inserting (after^.bridging)
+      _                         -> Nothing
 
-    blobPairToApiBlobPair (Data.Diffing before after) = API.BlobPair (bridging #? before) (bridging #? after)
-    blobPairToApiBlobPair (Data.Inserting after)      = API.BlobPair Nothing (bridging #? after)
-    blobPairToApiBlobPair (Data.Deleting before)      = API.BlobPair (bridging #? before) Nothing
+    blobPairToApiBlobPair (Data.Diffing before after) = defMessage & P.maybe'before .~ (bridging #? before) & P.maybe'after .~ (bridging #? after)
+    blobPairToApiBlobPair (Data.Inserting after)      = defMessage & P.maybe'before .~ Nothing & P.maybe'after .~ (bridging #? after)
+    blobPairToApiBlobPair (Data.Deleting before)      = defMessage & P.maybe'before .~ (bridging #? before) & P.maybe'after .~ Nothing

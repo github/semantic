@@ -11,8 +11,8 @@ module Data.Language
   , textToLanguage
   , languageToText
   , PerLanguageModes(..)
+  , defaultLanguageModes
   , LanguageMode(..)
-  , modeForLanguage
   ) where
 
 import           Data.Aeson
@@ -147,12 +147,12 @@ newtype PerLanguageModes = PerLanguageModes
   }
   deriving (Eq, Ord, Show)
 
+defaultLanguageModes :: PerLanguageModes
+defaultLanguageModes = PerLanguageModes
+  { pythonMode = ALaCarte
+  }
+
 data LanguageMode
   = ALaCarte
   | Precise
   deriving (Bounded, Enum, Eq, Ord, Read, Show)
-
-modeForLanguage :: PerLanguageModes -> Language -> LanguageMode
-modeForLanguage modes = \case
-  Python -> pythonMode modes
-  _      -> ALaCarte
