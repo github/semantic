@@ -11,6 +11,7 @@ module Control.Carrier.Readline.Haskeline
   -- * Re-exports
 , Carrier
 , run
+, runM
 ) where
 
 import Prelude hiding (print)
