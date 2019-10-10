@@ -13,18 +13,20 @@ import Control.Effect.Error
 import Control.Effect.Fail (Fail(..), MonadFail(..))
 import Control.Effect.Reader
 import Data.Loc
-import Data.File
 import Prelude hiding (fail)
 import Source.Span
 
-runFail :: FailC m a -> m (Either (File String) a)
+runFail :: FailC m a -> m (Either (Path, Span, String) a)
 runFail = runError . runFailC
 
-newtype FailC m a = FailC { runFailC :: ErrorC (File String) m a }
+newtype FailC m a = FailC { runFailC :: ErrorC (Path, Span, String) m a }
   deriving (Alternative, Applicative, Functor, Monad)
 
 instance (Carrier sig m, Effect sig, Member (Reader Path) sig, Member (Reader Span) sig) => MonadFail (FailC m) where
-  fail s = File <$> ask <*> ask <*> pure s >>= FailC . throwError
+  fail s = do
+    path <- ask
+    span <- ask
+    FailC (throwError (path :: Path, span :: Span, s))
 
 instance (Carrier sig m, Effect sig, Member (Reader Path) sig, Member (Reader Span) sig) => Carrier (Fail :+: sig) (FailC m) where
   eff (L (Fail s)) = fail s

@@ -102,7 +102,7 @@ typecheckingFlowInsensitive
      )
   -> [File term]
   -> ( Heap Name Type
-     , [File (Either (File String) (Term (Polytype :+: Monotype) Void))]
+     , [File (Either (Path, Span, String) (Term (Polytype :+: Monotype) Void))]
      )
 typecheckingFlowInsensitive eval
   = run
@@ -125,7 +125,7 @@ runFile
      -> (term -> m Type)
      )
   -> File term
-  -> m (File (Either (File String) Type))
+  -> m (File (Either (Path, Span, String) Type))
 runFile eval file = traverse run file
   where run
           = (\ m -> do

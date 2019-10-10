@@ -56,7 +56,7 @@ scopeGraph
      -> (term -> m ScopeGraph)
      )
   -> [File term]
-  -> (Heap Name ScopeGraph, [File (Either (File String) ScopeGraph)])
+  -> (Heap Name ScopeGraph, [File (Either (Path, Span, String) ScopeGraph)])
 scopeGraph eval
   = run
   . runFresh
@@ -77,7 +77,7 @@ runFile
      -> (term -> m ScopeGraph)
      )
   -> File term
-  -> m (File (Either (File String) ScopeGraph))
+  -> m (File (Either (Path, Span, String) ScopeGraph))
 runFile eval file = traverse run file
   where run = runReader (filePath file)
             . runReader (fileSpan file)
