@@ -14,9 +14,9 @@ import           Core.Core.Pretty
 import           Core.Core.Parser as Parse
 import           Core.File
 import           Core.Name
-import           Core.Term
 import qualified Generators as Gen
 import           Source.Span
+import           Syntax.Term
 
 -- * Helpers
 

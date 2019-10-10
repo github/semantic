@@ -16,7 +16,6 @@ import           Core.Core.Pretty
 import           Core.File
 import           Core.Loc
 import           Core.Name
-import           Core.Term
 import qualified Data.Aeson as Aeson
 import qualified Data.Aeson.Encode.Pretty as Aeson
 import qualified Data.ByteString.Char8 as ByteString
@@ -34,14 +33,15 @@ import           Source.Span
 import           Streaming
 import qualified Streaming.Prelude as Stream
 import qualified Streaming.Process
+import           Syntax.Term
 import           System.Directory
 import           System.Exit
-import qualified TreeSitter.Python as TSP
-import qualified TreeSitter.Unmarshal as TS
-import           Text.Show.Pretty (ppShow)
 import qualified System.Path as Path
 import qualified System.Path.Directory as Path
 import           System.Path ((</>))
+import           Text.Show.Pretty (ppShow)
+import qualified TreeSitter.Python as TSP
+import qualified TreeSitter.Unmarshal as TS
 
 import qualified Test.Tasty as Tasty
 import qualified Test.Tasty.HUnit as HUnit

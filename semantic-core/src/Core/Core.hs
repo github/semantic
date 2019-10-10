@@ -41,7 +41,6 @@ import Core.Loc
 import Core.Name
 import Core.Scope
 import Core.Stack
-import Core.Term
 import Data.Bifunctor (Bifunctor (..))
 import Data.Foldable (foldl')
 import Data.List.NonEmpty (NonEmpty (..))
@@ -51,6 +50,7 @@ import GHC.Generics (Generic1)
 import GHC.Stack
 import Source.Span
 import Syntax.Module
+import Syntax.Term
 
 data Core f a
   -- | Recursive local binding of a name in a scope; strict evaluation of the name in the body will diverge.

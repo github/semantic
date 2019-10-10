@@ -21,13 +21,13 @@ import Core.File
 import Core.Loc
 import Core.Name
 import Core.Scope
-import Core.Term
 import Data.Functor
 import Data.Maybe (fromJust, fromMaybe)
 import Data.Text (Text)
 import GHC.Stack
 import Prelude hiding (fail)
 import Source.Span
+import Syntax.Term
 
 eval :: ( Carrier sig m
         , Member (Reader Span) sig

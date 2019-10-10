@@ -19,7 +19,7 @@ import qualified Hedgehog.Range as Range
 import Control.Effect.Carrier
 import qualified Core.Core as Core
 import Core.Name
-import Core.Term
+import Syntax.Term
 
 -- The 'prune' call here ensures that we don't spend all our time just generating
 -- fresh names for variables, since the length of variable names is not an
