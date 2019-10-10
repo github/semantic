@@ -12,11 +12,11 @@ import           Core.Core
 import           Core.File
 import           Core.Name
 import           Core.Scope
-import           Core.Stack
 import           Data.Foldable (toList)
 import           Data.Text.Prettyprint.Doc
 import qualified Data.Text.Prettyprint.Doc.Render.String as Pretty
 import qualified Data.Text.Prettyprint.Doc.Render.Terminal as Pretty
+import           Syntax.Stack
 import           Syntax.Term
 
 showCore :: Term Core Name -> String

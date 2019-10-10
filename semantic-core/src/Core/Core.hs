@@ -40,7 +40,6 @@ import Control.Effect.Carrier
 import Core.Loc
 import Core.Name
 import Core.Scope
-import Core.Stack
 import Data.Bifunctor (Bifunctor (..))
 import Data.Foldable (foldl')
 import Data.List.NonEmpty (NonEmpty (..))
@@ -49,6 +48,7 @@ import Data.Text (Text)
 import GHC.Generics (Generic1)
 import GHC.Stack
 import Source.Span
+import Syntax.Stack
 import Syntax.Module
 import Syntax.Term
 

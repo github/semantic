@@ -55,7 +55,6 @@ library
     Core.Loc
     Core.Name
     Core.Scope
-    Core.Stack
   build-depends:
       algebraic-graphs            ^>= 0.3
     , base                         >= 4.12 && < 5
