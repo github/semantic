@@ -90,7 +90,7 @@ test-suite test
   import: common
   type:           exitcode-stdio-1.0
   hs-source-dirs: test
-  main-is:        Spec.hs
+  main-is:        Test.hs
   other-modules:  Generators
   build-depends:
       base
