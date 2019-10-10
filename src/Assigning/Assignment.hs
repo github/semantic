@@ -63,7 +63,6 @@ module Assigning.Assignment
 , L.Loc(..)
 -- Combinators
 , branchNode
-, leafNode
 , Alternative(..)
 , MonadError(..)
 , MonadFail(..)
@@ -110,10 +109,6 @@ import TreeSitter.Language
 -- | Match a branch node, matching its children with the supplied 'Assignment' & returning the result.
 branchNode :: Enum grammar => grammar -> Assignment grammar a -> Assignment grammar a
 branchNode sym child = symbol sym *> children child
-
--- | Match a leaf node, returning the corresponding 'Text'.
-leafNode :: Enum grammar => grammar -> Assignment grammar Text
-leafNode sym = symbol sym *> source
 
 
 -- | Assignment from an AST with some set of 'symbol's onto some other value.
