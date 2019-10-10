@@ -28,7 +28,7 @@ import System.FilePath
 import System.IO (stdout)
 
 runReadline :: MonadUnliftIO m => Prefs -> Settings m -> ReadlineC m a -> m a
-runReadline prefs settings = runControlIO . runInputTWithPrefs prefs (coerce settings) . runM . runReader (Line 0) . runReadlineC
+runReadline prefs settings = runUnliftIOToMonadException . runInputTWithPrefs prefs (coerce settings) . runM . runReader (Line 0) . runReadlineC
 
 runReadlineWithHistory :: MonadUnliftIO m => ReadlineC m a -> m a
 runReadlineWithHistory block = do
@@ -44,12 +44,12 @@ runReadlineWithHistory block = do
 
   runReadline prefs settings block
 
-newtype ReadlineC m a = ReadlineC { runReadlineC :: ReaderC Line (LiftC (InputT (ControlIOC m))) a }
+newtype ReadlineC m a = ReadlineC { runReadlineC :: ReaderC Line (LiftC (InputT (UnliftIOToMonadException m))) a }
   deriving (Applicative, Functor, Monad, MonadFix, MonadIO)
 
-instance MonadUnliftIO m => Carrier (Readline :+: Lift (InputT (ControlIOC m))) (ReadlineC m) where
+instance MonadUnliftIO m => Carrier (Readline :+: Lift (InputT (UnliftIOToMonadException m))) (ReadlineC m) where
   eff (L (Prompt prompt k)) = ReadlineC $ do
-    str <- sendM (getInputLine @(ControlIOC m) (cyan <> prompt <> plain))
+    str <- sendM (getInputLine @(UnliftIOToMonadException m) (cyan <> prompt <> plain))
     Line line <- ask
     local increment (runReadlineC (k line str))
     where cyan = "\ESC[1;36m\STX"
@@ -62,13 +62,13 @@ instance MonadUnliftIO m => Carrier (Readline :+: Lift (InputT (ControlIOC m))) 
 
 
 -- | This exists to work around the 'MonadException' constraint that haskeline entails.
-newtype ControlIOC m a = ControlIOC { runControlIO :: m a }
+newtype UnliftIOToMonadException m a = UnliftIOToMonadException { runUnliftIOToMonadException :: m a }
   deriving (Applicative, Functor, Monad, MonadFix, MonadIO)
 
-instance MonadUnliftIO m => MonadUnliftIO (ControlIOC m) where
-  withRunInIO inner = ControlIOC $ withRunInIO $ \ go -> inner (go . runControlIO)
+instance MonadUnliftIO m => MonadUnliftIO (UnliftIOToMonadException m) where
+  withRunInIO inner = UnliftIOToMonadException $ withRunInIO $ \ go -> inner (go . runUnliftIOToMonadException)
 
-instance MonadUnliftIO m => MonadException (ControlIOC m) where
+instance MonadUnliftIO m => MonadException (UnliftIOToMonadException m) where
   controlIO f = withRunInIO (\ runInIO -> f (RunIO (fmap pure . runInIO)) >>= runInIO)
 
 
