@@ -64,7 +64,6 @@ module Assigning.Assignment
 -- Combinators
 , branchNode
 , leafNode
-, toTerm
 , Alternative(..)
 , MonadError(..)
 , MonadFail(..)
@@ -115,12 +114,6 @@ branchNode sym child = symbol sym *> children child
 -- | Match a leaf node, returning the corresponding 'Text'.
 leafNode :: Enum grammar => grammar -> Assignment grammar Text
 leafNode sym = symbol sym *> source
-
--- | Wrap an 'Assignment' producing @syntax@ up into an 'Assignment' producing 'Term's.
-toTerm :: Element syntax syntaxes
-       => Assignment grammar (syntax (Term (Sum syntaxes) L.Loc))
-       -> Assignment grammar         (Term (Sum syntaxes) L.Loc)
-toTerm syntax = termIn <$> location <*> (inject <$> syntax)
 
 
 -- | Assignment from an AST with some set of 'symbol's onto some other value.
