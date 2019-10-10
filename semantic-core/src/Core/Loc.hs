@@ -13,8 +13,8 @@ here = stackLoc callStack
 
 stackLoc :: CallStack -> Maybe (Path.AbsRelFile, Span)
 stackLoc cs = case getCallStack cs of
-  (_, srcLoc):_ -> Just (fromGHCSrcLoc srcLoc)
+  (_, srcLoc):_ -> Just (fromSrcLoc srcLoc)
   _             -> Nothing
 
-fromGHCSrcLoc :: SrcLoc -> (Path.AbsRelFile, Span)
-fromGHCSrcLoc SrcLoc{..} = (Path.absRel srcLocFile, Span (Pos srcLocStartLine srcLocStartCol) (Pos srcLocEndLine srcLocEndCol))
+fromSrcLoc :: SrcLoc -> (Path.AbsRelFile, Span)
+fromSrcLoc SrcLoc{..} = (Path.absRel srcLocFile, Span (Pos srcLocStartLine srcLocStartCol) (Pos srcLocEndLine srcLocEndCol))
