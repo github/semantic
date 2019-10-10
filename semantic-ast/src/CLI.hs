@@ -28,12 +28,13 @@ generateAST (SemanticAST file _) = do
  print =<< parseByteString @TreeSitter.Python.AST.Module @(Range, Span) tree_sitter_python bytestring
 
 -- TODO: Define formats for json, sexpression, etc.
-data Format = Show deriving (Read)
 
 data SemanticAST = SemanticAST
   { sourceFilePath :: Prelude.String
   , format         :: Format
   }
+data Format = Show
+  deriving (Read)
 
 data Input
   = FileInput FilePath
