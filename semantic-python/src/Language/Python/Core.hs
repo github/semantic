@@ -16,12 +16,12 @@ import           Control.Monad ((>=>))
 import           Control.Monad.Fail
 import           Core.Core as Core
 import           Core.Name as Name
-import           Core.Stack (Stack)
-import qualified Core.Stack as Stack
 import           Data.Coerce
 import           Data.Foldable
 import           GHC.Records
 import           Source.Span (Span)
+import           Syntax.Stack (Stack)
+import qualified Syntax.Stack as Stack
 import qualified TreeSitter.Python.AST as Py
 
 -- | Keeps track of the current scope's bindings (so that we can, when
