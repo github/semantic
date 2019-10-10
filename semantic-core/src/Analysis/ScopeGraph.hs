@@ -85,7 +85,7 @@ runFile
 runFile eval file = traverse run file
   where run = runReader (filePath file)
             . runReader (fileSpan file)
-            . runReader (Map.empty @Name @Loc)
+            . runReader (Map.empty @Name @Ref)
             . runFail
             . fmap fold
             . convergeTerm (Proxy @Name) (fix (cacheTerm . eval scopeGraphAnalysis))
@@ -95,26 +95,26 @@ scopeGraphAnalysis
      , Carrier sig m
      , Member (Reader Path) sig
      , Member (Reader Span) sig
-     , Member (Reader (Map.Map Name Loc)) sig
+     , Member (Reader (Map.Map Name Ref)) sig
      , Member (State (Heap Name ScopeGraph)) sig
      )
   => Analysis term Name ScopeGraph m
 scopeGraphAnalysis = Analysis{..}
   where alloc = pure
         bind name _ m = do
-          loc <- Loc <$> ask <*> ask
-          local (Map.insert name loc) m
+          ref <- askRef
+          local (Map.insert name ref) m
         lookupEnv = pure . Just
         deref addr = do
           ref <- askRef
-          bindLoc <- asks (Map.lookup addr)
+          bindRef <- asks (Map.lookup addr)
           cell <- gets (Map.lookup addr >=> nonEmpty . Set.toList)
-          let extending = mappend (extendBinding addr ref bindLoc)
+          let extending = mappend (extendBinding addr ref bindRef)
           maybe (pure Nothing) (foldMapA (pure . Just . extending)) cell
         assign addr v = do
           ref <- askRef
-          bindLoc <- asks (Map.lookup addr)
-          modify (Map.insertWith (<>) addr (Set.singleton (extendBinding addr ref bindLoc <> v)))
+          bindRef <- asks (Map.lookup addr)
+          modify (Map.insertWith (<>) addr (Set.singleton (extendBinding addr ref bindRef <> v)))
         abstract eval name body = do
           addr <- alloc name
           assign name (mempty @ScopeGraph)
@@ -137,4 +137,4 @@ scopeGraphAnalysis = Analysis{..}
 
         askRef = Ref <$> ask <*> ask
 
-        extendBinding addr ref bindLoc = ScopeGraph (maybe Map.empty (\ (Loc path span) -> Map.singleton (Decl addr path span) (Set.singleton ref)) bindLoc)
+        extendBinding addr ref bindRef = ScopeGraph (maybe Map.empty (\ (Ref path span) -> Map.singleton (Decl addr path span) (Set.singleton ref)) bindRef)
