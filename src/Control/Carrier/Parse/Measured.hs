@@ -6,7 +6,7 @@ module Control.Carrier.Parse.Measured
   -- * Parse carrier
 , ParseC(..)
   -- * Exceptions
-, ParserCancelled(..)
+, AssignmentTimedOut(..)
 ) where
 
 import qualified Assigning.Assignment as Assignment
@@ -98,10 +98,10 @@ instance ( Carrier sig m
   eff (R other) = ParseC (eff (handleCoercible other))
 
 
-data ParserCancelled = ParserTimedOut | AssignmentTimedOut
+data AssignmentTimedOut = AssignmentTimedOut
   deriving (Show, Typeable)
 
-instance Exception ParserCancelled
+instance Exception AssignmentTimedOut
 
 
 errors :: (Syntax.Error :< fs, Apply Foldable fs, Apply Functor fs) => Term (Sum fs) Assignment.Loc -> [Error.Error String]
