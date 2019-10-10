@@ -16,7 +16,6 @@ import Data.Semigroup ((<>))
 data SemanticAST = SemanticAST
   { sourceFilePath      :: Input
   , format              :: Format
-  }
   } deriving (Read)
 
 parseAST :: Parser SemanticAST
