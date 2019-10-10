@@ -2,7 +2,6 @@
 module Data.Loc
 ( Loc(..)
 , Path(..)
-, interactive
 , here
 , stackLoc
 ) where
@@ -19,9 +18,6 @@ data Loc = Loc
   , locSpan :: {-# UNPACK #-} !Span
   }
   deriving (Eq, Ord, Show)
-
-interactive :: Loc
-interactive = Loc (Path "<interactive>") (Span (Pos 1 1) (Pos 1 1))
 
 
 here :: HasCallStack => Maybe (Path, Span)
