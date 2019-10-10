@@ -73,3 +73,10 @@ stdInput :: Parser Input
 stdInput = flag' StdInput
   (  long "stdin"
   <> help "Read from stdin" )
+
+-- flag Normal Verbose
+--   ( long "verbose"
+--  <> short 'v'
+--  <> help "Enable verbose mode" )
+-- need semantic-ast as invocation
+-- format should be a flag
