@@ -44,66 +44,58 @@ instance ( Carrier sig m
          , MonadIO m
          )
       => Carrier (Parse :+: sig) (ParseC m) where
-  eff (L (Parse parser blob k)) = runParser blob parser >>= k
+  eff (L (Parse parser blob k)) = case parser of
+    UnmarshalParser language ->
+      time "parse.tree_sitter_ast_parse" languageTag $ do
+        config <- asks config
+        parseToPreciseAST (configTreeSitterParseTimeout config) language blob
+          >>= either (\e -> trace (displayException e) *> throwError (SomeException e)) k
+    AssignmentParser language assignment -> do
+      taskSession <- ask
+      let requestID' = ("github_request_id", requestID taskSession)
+      let isPublic'  = ("github_is_public", show (isPublic taskSession))
+      let logPrintFlag = configLogPrintSource . config $ taskSession
+      let blobFields = ("path", if isPublic taskSession || Flag.toBool LogPrintSource logPrintFlag then blobPath blob else "<filtered>")
+      let logFields = requestID' : isPublic' : blobFields : languageTag
+      let shouldFailForTesting = configFailParsingForTesting $ config taskSession
+      let shouldFailOnParsing = optionsFailOnParseError . configOptions $ config taskSession
+      let shouldFailOnWarning = optionsFailOnWarning . configOptions $ config taskSession
+
+      ast <- time "parse.tree_sitter_ast_parse" languageTag $ do
+        config <- asks config
+        parseToAST (configTreeSitterParseTimeout config) language blob >>= either
+          (\ err -> do
+            trace (displayException err)
+            writeStat (increment "parse.parse_failures" languageTag)
+            writeLog Error "failed parsing" (("task", "parse") : logFields)
+            throwError (toException err))
+          pure
+
+      res <- timeout (configAssignmentTimeout (config taskSession)) . time "parse.assign" languageTag $
+        case Assignment.assign (blobSource blob) assignment ast of
+          Left err -> do
+            writeStat (increment "parse.assign_errors" languageTag)
+            logError taskSession Error blob err (("task", "assign") : logFields)
+            throwError (toException err)
+          Right term -> do
+            for_ (zip (errors term) [(0::Integer)..]) $ \ (err, i) -> case Error.errorActual err of
+              Just "ParseError" -> do
+                when (i == 0) $ writeStat (increment "parse.parse_errors" languageTag)
+                logError taskSession Warning blob err (("task", "parse") : logFields)
+                when (Flag.toBool FailOnParseError shouldFailOnParsing) (throwError (toException err))
+              _ -> do
+                when (i == 0) $ writeStat (increment "parse.assign_warnings" languageTag)
+                logError taskSession Warning blob err (("task", "assign") : logFields)
+                when (Flag.toBool FailOnWarning shouldFailOnWarning) (throwError (toException err))
+            term <$ writeStat (count "parse.nodes" (length term) languageTag)
+      case res of
+        Just r | not (Flag.toBool FailTestParsing shouldFailForTesting) -> k r
+        _ -> do
+          writeStat (increment "assign.assign_timeouts" languageTag)
+          writeLog Error "assignment timeout" (("task", "assign") : logFields)
+          throwError (SomeException AssignmentTimedOut)
+    where languageTag = [("language" :: String, show (blobLanguage blob))]
   eff (R other) = ParseC (eff (handleCoercible other))
-
--- | Parse a 'Blob' in 'IO'.
-runParser :: (Member (Error SomeException) sig, Member (Reader TaskSession) sig, Member Telemetry sig, Member Timeout sig, Member Trace sig, Carrier sig m, MonadIO m)
-          => Blob
-          -> Parser term
-          -> m term
-runParser blob@Blob{..} parser = case parser of
-  UnmarshalParser language ->
-    time "parse.tree_sitter_ast_parse" languageTag $ do
-      config <- asks config
-      parseToPreciseAST (configTreeSitterParseTimeout config) language blob
-        >>= either (\e -> trace (displayException e) *> throwError (SomeException e)) pure
-
-  AssignmentParser language assignment -> do
-    taskSession <- ask
-    let requestID' = ("github_request_id", requestID taskSession)
-    let isPublic'  = ("github_is_public", show (isPublic taskSession))
-    let logPrintFlag = configLogPrintSource . config $ taskSession
-    let blobFields = ("path", if isPublic taskSession || Flag.toBool LogPrintSource logPrintFlag then blobPath blob else "<filtered>")
-    let logFields = requestID' : isPublic' : blobFields : languageTag
-    let shouldFailForTesting = configFailParsingForTesting $ config taskSession
-    let shouldFailOnParsing = optionsFailOnParseError . configOptions $ config taskSession
-    let shouldFailOnWarning = optionsFailOnWarning . configOptions $ config taskSession
-
-    ast <- time "parse.tree_sitter_ast_parse" languageTag $ do
-      config <- asks config
-      parseToAST (configTreeSitterParseTimeout config) language blob >>= either
-        (\ err -> do
-          trace (displayException err)
-          writeStat (increment "parse.parse_failures" languageTag)
-          writeLog Error "failed parsing" (("task", "parse") : logFields)
-          throwError (toException err))
-        pure
-
-    res <- timeout (configAssignmentTimeout (config taskSession)) . time "parse.assign" languageTag $
-      case Assignment.assign blobSource assignment ast of
-        Left err -> do
-          writeStat (increment "parse.assign_errors" languageTag)
-          logError taskSession Error blob err (("task", "assign") : logFields)
-          throwError (toException err)
-        Right term -> do
-          for_ (zip (errors term) [(0::Integer)..]) $ \ (err, i) -> case Error.errorActual err of
-            Just "ParseError" -> do
-              when (i == 0) $ writeStat (increment "parse.parse_errors" languageTag)
-              logError taskSession Warning blob err (("task", "parse") : logFields)
-              when (Flag.toBool FailOnParseError shouldFailOnParsing) (throwError (toException err))
-            _ -> do
-              when (i == 0) $ writeStat (increment "parse.assign_warnings" languageTag)
-              logError taskSession Warning blob err (("task", "assign") : logFields)
-              when (Flag.toBool FailOnWarning shouldFailOnWarning) (throwError (toException err))
-          term <$ writeStat (count "parse.nodes" (length term) languageTag)
-    case res of
-      Just r | not (Flag.toBool FailTestParsing shouldFailForTesting) -> pure r
-      _ -> do
-        writeStat (increment "assign.assign_timeouts" languageTag)
-        writeLog Error "assignment timeout" (("task", "assign") : logFields)
-        throwError (SomeException AssignmentTimedOut)
-  where languageTag = [("language" :: String, show (blobLanguage blob))]
 
 
 data ParserCancelled = ParserTimedOut | AssignmentTimedOut
