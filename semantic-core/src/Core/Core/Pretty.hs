@@ -16,6 +16,7 @@ import           Data.Foldable (toList)
 import           Data.Text.Prettyprint.Doc
 import qualified Data.Text.Prettyprint.Doc.Render.String as Pretty
 import qualified Data.Text.Prettyprint.Doc.Render.Terminal as Pretty
+import           Syntax.Pretty
 import           Syntax.Stack
 import           Syntax.Term
 
@@ -45,7 +46,7 @@ name :: Name -> AnsiDoc
 name n = if needsQuotation n then enclose (symbol "#{") (symbol "}") (pretty n) else pretty n
 
 prettyCore :: Style -> Term Core Name -> AnsiDoc
-prettyCore style = precBody . go . fmap name
+prettyCore style = unPrec . go . fmap name
   where go = \case
           Var v -> atom v
           Alg t -> case t of
@@ -66,9 +67,9 @@ prettyCore style = precBody . go . fmap name
             f :$ x -> prec 8 (withPrec 8 (go f) <+> withPrec 9 (go x))
 
             If con tru fal -> prec 3 . group $ vsep
-              [ keyword "if"   <+> precBody (go con)
-              , keyword "then" <+> precBody (go tru)
-              , keyword "else" <+> precBody (go fal)
+              [ keyword "if"   <+> unPrec (go con)
+              , keyword "then" <+> unPrec (go tru)
+              , keyword "else" <+> unPrec (go fal)
               ]
 
             Load p -> prec 3 (keyword "load" <+> withPrec 9 (go p))
@@ -87,9 +88,9 @@ prettyCore style = precBody . go . fmap name
               in atom (block "; " statements')
         block _ [] = braces mempty
         block s ss = encloseSep "{ " " }" s ss
-        keyValue x v = name x <+> symbol ":" <+> precBody (go v)
-        prettyStatement names (Just (Named (Ignored u) _) :<- t) = name u <+> arrowL <+> precBody (go (either (names !!) id <$> t))
-        prettyStatement names (Nothing                    :<- t) = precBody (go (either (names !!) id <$> t))
+        keyValue x v = name x <+> symbol ":" <+> unPrec (go v)
+        prettyStatement names (Just (Named (Ignored u) _) :<- t) = name u <+> arrowL <+> unPrec (go (either (names !!) id <$> t))
+        prettyStatement names (Nothing                    :<- t) = unPrec (go (either (names !!) id <$> t))
         lambda = case style of
           Unicode -> symbol "λ"
           Ascii   -> symbol "\\"
@@ -99,21 +100,3 @@ prettyCore style = precBody . go . fmap name
         arrowL = case style of
           Unicode -> symbol "←"
           Ascii   -> symbol "<-"
-
-
-data Prec a = Prec
-  { precLevel :: Maybe Int
-  , precBody  :: a
-  }
-  deriving (Eq, Ord, Show)
-
-prec :: Int -> a -> Prec a
-prec = Prec . Just
-
-atom :: a -> Prec a
-atom = Prec Nothing
-
-withPrec :: Int -> Prec AnsiDoc -> AnsiDoc
-withPrec d (Prec d' a)
-  | maybe False (d >) d' = parens a
-  | otherwise            = a
