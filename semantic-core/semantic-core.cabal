@@ -47,6 +47,7 @@ library
     Analysis.ScopeGraph
     Analysis.Typecheck
     Control.Carrier.Fail.WithLoc
+    Control.Carrier.Readline.Haskeline
     Control.Effect.Readline
     Core.Core
     Core.Core.Parser
