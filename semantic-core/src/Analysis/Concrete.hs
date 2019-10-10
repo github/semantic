@@ -78,7 +78,7 @@ concrete
      -> (term Name -> m (Concrete (term Name)))
      )
   -> [File (term Name)]
-  -> (Heap (term Name), [File (Either (Path, Span, String) (Concrete (term Name)))])
+  -> (Heap (term Name), [File (Either (File String) (Concrete (term Name)))])
 concrete eval
   = run
   . runFresh
@@ -100,7 +100,7 @@ runFile
      -> (term Name -> m (Concrete (term Name)))
      )
   -> File (term Name)
-  -> m (File (Either (Path, Span, String) (Concrete (term Name))))
+  -> m (File (Either (File String) (Concrete (term Name))))
 runFile eval file = traverse run file
   where run = runReader (filePath file)
             . runReader (fileSpan file)

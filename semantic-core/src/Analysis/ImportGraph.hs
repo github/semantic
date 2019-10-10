@@ -59,7 +59,7 @@ importGraph
      )
   -> [File term]
   -> ( Heap Name (Value term)
-     , [File (Either (Path, Span, String) (Value term))]
+     , [File (Either (File String) (Value term))]
      )
 importGraph eval
   = run
@@ -82,7 +82,7 @@ runFile
      -> (term -> m (Value term))
      )
   -> File term
-  -> m (File (Either (Path, Span, String) (Value term)))
+  -> m (File (Either (File String) (Value term)))
 runFile eval file = traverse run file
   where run = runReader (filePath file)
             . runReader (fileSpan file)
