@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedStrings, RecordWildCards #-}
 module Data.Loc
 ( Loc(..)
+, Path(..)
 , interactive
 , here
 , stackLoc
@@ -10,14 +11,17 @@ import Data.Text (Text, pack)
 import GHC.Stack
 import Source.Span
 
+newtype Path = Path { getPath :: Text }
+  deriving (Eq, Ord, Show)
+
 data Loc = Loc
-  { locPath :: !Text
+  { locPath :: !Path
   , locSpan :: {-# UNPACK #-} !Span
   }
   deriving (Eq, Ord, Show)
 
 interactive :: Loc
-interactive = Loc "<interactive>" (Span (Pos 1 1) (Pos 1 1))
+interactive = Loc (Path "<interactive>") (Span (Pos 1 1) (Pos 1 1))
 
 
 here :: HasCallStack => Maybe Loc
@@ -29,4 +33,4 @@ stackLoc cs = case getCallStack cs of
   _             -> Nothing
 
 fromGHCSrcLoc :: SrcLoc -> Loc
-fromGHCSrcLoc SrcLoc{..} = Loc (pack srcLocFile) (Span (Pos srcLocStartLine srcLocStartCol) (Pos srcLocEndLine srcLocEndCol))
+fromGHCSrcLoc SrcLoc{..} = Loc (Path (pack srcLocFile)) (Span (Pos srcLocStartLine srcLocStartCol) (Pos srcLocEndLine srcLocEndCol))

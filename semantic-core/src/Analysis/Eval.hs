@@ -129,9 +129,9 @@ prog5 = fromBody $ ann (do'
 
 prog6 :: (Carrier sig t, Member Core sig) => [File (t Name)]
 prog6 =
-  [ File (Loc "dep"  (locSpan (fromJust here))) $ Core.record
+  [ File (Loc (Path "dep")  (locSpan (fromJust here))) $ Core.record
     [ ("dep", Core.record [ ("var", Core.bool True) ]) ]
-  , File (Loc "main" (locSpan (fromJust here))) $ do' (map (Nothing :<-)
+  , File (Loc (Path "main") (locSpan (fromJust here))) $ do' (map (Nothing :<-)
     [ load (Core.string "dep")
     , Core.record [ ("thing", pure "dep" Core.... "var") ]
     ])
