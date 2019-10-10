@@ -29,6 +29,7 @@ import           Data.String (fromString)
 import           GHC.Stack
 import qualified Language.Python.Core as Py
 import           Prelude hiding (fail)
+import           Source.Span
 import           Streaming
 import qualified Streaming.Prelude as Stream
 import qualified Streaming.Process
@@ -49,10 +50,10 @@ import qualified Directive
 import           Instances ()
 
 
-assertJQExpressionSucceeds :: Show a => Directive.Directive -> a -> Term (Ann :+: Core) Name -> HUnit.Assertion
+assertJQExpressionSucceeds :: Show a => Directive.Directive -> a -> Term (Ann Span :+: Core) Name -> HUnit.Assertion
 assertJQExpressionSucceeds directive tree core = do
-  bod <- case scopeGraph Eval.eval [File interactive core] of
-    (heap, [File _ (Right result)]) -> pure $ Aeson.object
+  bod <- case scopeGraph Eval.eval [File (Path "<interactive>") (Span (Pos 1 1) (Pos 1 1)) core] of
+    (heap, [File _ _ (Right result)]) -> pure $ Aeson.object
       [ "scope" Aeson..= heap
       , "heap"  Aeson..= result
       ]
