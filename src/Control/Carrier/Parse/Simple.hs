@@ -6,8 +6,6 @@ module Control.Carrier.Parse.Simple
   -- * Parse carrier
 , ParseC(..)
 , runParse
-  -- * Exceptions
-, ParseFailure(..)
 ) where
 
 import qualified Assigning.Assignment as Assignment
@@ -18,7 +16,6 @@ import           Control.Effect.Reader
 import           Control.Exception
 import           Control.Monad.IO.Class
 import           Data.Blob
-import           Data.Typeable
 import           Parsing.Parser
 import           Parsing.TreeSitter
 
@@ -54,9 +51,3 @@ runParser timeout blob@Blob{..} parser = case parser of
   AssignmentParser language assignment
     ->  either (throwError . toException) pure . Assignment.assign blobSource assignment
     =<< either (throwError . toException) pure =<< parseToAST timeout language blob
-
-
-data ParseFailure = ParseFailure String
-  deriving (Show, Typeable)
-
-instance Exception ParseFailure
