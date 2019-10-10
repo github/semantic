@@ -1,6 +1,6 @@
 {-# LANGUAGE ApplicativeDo #-}
 {-# LANGUAGE TypeApplications #-}
-module CLI (main) where
+module Main (main) where
 
 import System.Environment
 import TreeSitter.Unmarshal
