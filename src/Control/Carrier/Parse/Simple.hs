@@ -53,7 +53,7 @@ runParser timeout blob@Blob{..} parser = case parser of
 
   AssignmentParser language assignment
     ->  either (throwError . toException) pure . Assignment.assign blobSource assignment
-    =<< either (throwError . SomeException) pure =<< parseToAST timeout language blob
+    =<< either (throwError . toException) pure =<< parseToAST timeout language blob
 
 
 data ParseFailure = ParseFailure String
