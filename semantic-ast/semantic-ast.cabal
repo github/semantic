@@ -17,7 +17,7 @@ category:            Language
 extra-source-files:  CHANGELOG.md
 
 library
-  -- exposed-modules:
+  exposed-modules:
   -- other-modules:
   -- other-extensions:
   build-depends:       base ^>=4.12.0.0
@@ -33,6 +33,12 @@ executable semantic-ast
   main-is:             Main.hs
   -- other-modules:
   -- other-extensions:
-  build-depends:       base ^>=4.12.0.0, semantic-ast
+  build-depends:       base ^>=4.12.0.0
+                     , semantic-ast
+                     , tree-sitter ^>= 0.4
+                     , semantic-source ^>= 0.0
+                     , tree-sitter-python
+                     , bytestring
+                     , optparse-applicative ^>= 0.14.3.0
   hs-source-dirs:      src
   default-language:    Haskell2010
