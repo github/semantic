@@ -31,7 +31,8 @@ import           Source.Span
 
 data Decl = Decl
   { declSymbol :: Name
-  , declLoc    :: Loc
+  , declPath   :: Path
+  , declSpan   :: Span
   }
   deriving (Eq, Ord, Show)
 
@@ -124,8 +125,9 @@ scopeGraphAnalysis = Analysis{..}
         record fields = do
           fields' <- for fields $ \ (k, v) -> do
             addr <- alloc k
-            loc <- askLoc
-            let v' = ScopeGraph (Map.singleton (Decl k loc) mempty) <> v
+            path <- ask
+            span <- ask
+            let v' = ScopeGraph (Map.singleton (Decl k path span) mempty) <> v
             (k, v') <$ assign addr v'
           pure (foldMap snd fields')
         _ ... m = pure (Just m)
@@ -133,4 +135,4 @@ scopeGraphAnalysis = Analysis{..}
         askRef = Ref <$> askLoc
         askLoc = Loc <$> ask <*> ask
 
-        extendBinding addr ref bindLoc = ScopeGraph (maybe Map.empty (\ bindLoc -> Map.singleton (Decl addr bindLoc) (Set.singleton ref)) bindLoc)
+        extendBinding addr ref bindLoc = ScopeGraph (maybe Map.empty (\ (Loc path span) -> Map.singleton (Decl addr path span) (Set.singleton ref)) bindLoc)
