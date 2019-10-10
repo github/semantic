@@ -68,7 +68,7 @@ instance MonadUnliftIO m => MonadUnliftIO (ControlIOC m) where
 instance Carrier sig m => Carrier sig (ControlIOC m) where
   eff op = ControlIOC (eff (handleCoercible op))
 
-instance (Carrier sig m, MonadUnliftIO m) => MonadException (ControlIOC m) where
+instance MonadUnliftIO m => MonadException (ControlIOC m) where
   controlIO f = withRunInIO (\ runInIO -> f (RunIO (fmap pure . runInIO)) >>= runInIO)
 
 
