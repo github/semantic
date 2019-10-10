@@ -17,7 +17,7 @@ import Control.Effect.Lift
 import Control.Effect.Reader
 import Control.Effect.Readline hiding (Carrier)
 import Control.Monad.Fix
-import Control.Monad.IO.Unlift
+import Control.Monad.IO.Class
 import Data.Coerce
 import Data.Text.Prettyprint.Doc
 import Data.Text.Prettyprint.Doc.Render.Terminal (renderIO)
@@ -27,10 +27,10 @@ import System.Directory
 import System.FilePath
 import System.IO (stdout)
 
-runReadline :: MonadUnliftIO m => Prefs -> Settings m -> ReadlineC m a -> m a
-runReadline prefs settings = runUnliftIOToMonadException . runInputTWithPrefs prefs (coerce settings) . runM . runReader (Line 0) . runReadlineC
+runReadline :: MonadException m => Prefs -> Settings m -> ReadlineC m a -> m a
+runReadline prefs settings = runInputTWithPrefs prefs (coerce settings) . runM . runReader (Line 0) . runReadlineC
 
-runReadlineWithHistory :: MonadUnliftIO m => ReadlineC m a -> m a
+runReadlineWithHistory :: MonadException m => ReadlineC m a -> m a
 runReadlineWithHistory block = do
   homeDir <- liftIO getHomeDirectory
   prefs <- liftIO $ readPrefs (homeDir </> ".haskeline")
@@ -44,12 +44,12 @@ runReadlineWithHistory block = do
 
   runReadline prefs settings block
 
-newtype ReadlineC m a = ReadlineC { runReadlineC :: ReaderC Line (LiftC (InputT (UnliftIOToMonadException m))) a }
+newtype ReadlineC m a = ReadlineC { runReadlineC :: ReaderC Line (LiftC (InputT m)) a }
   deriving (Applicative, Functor, Monad, MonadFix, MonadIO)
 
-instance MonadUnliftIO m => Carrier Readline (ReadlineC m) where
+instance MonadException m => Carrier Readline (ReadlineC m) where
   eff (Prompt prompt k) = ReadlineC $ do
-    str <- sendM (getInputLine @(UnliftIOToMonadException m) (cyan <> prompt <> plain))
+    str <- sendM (getInputLine @m (cyan <> prompt <> plain))
     Line line <- ask
     local increment (runReadlineC (k line str))
     where cyan = "\ESC[1;36m\STX"
@@ -58,17 +58,6 @@ instance MonadUnliftIO m => Carrier Readline (ReadlineC m) where
     s <- maybe 80 Size.width <$> liftIO size
     liftIO (renderIO stdout (layoutSmart defaultLayoutOptions { layoutPageWidth = AvailablePerLine s 0.8 } (doc <> line)))
     k
-
-
--- | This exists to work around the 'MonadException' constraint that haskeline entails.
-newtype UnliftIOToMonadException m a = UnliftIOToMonadException { runUnliftIOToMonadException :: m a }
-  deriving (Applicative, Functor, Monad, MonadFix, MonadIO)
-
-instance MonadUnliftIO m => MonadUnliftIO (UnliftIOToMonadException m) where
-  withRunInIO inner = UnliftIOToMonadException $ withRunInIO $ \ go -> inner (go . runUnliftIOToMonadException)
-
-instance MonadUnliftIO m => MonadException (UnliftIOToMonadException m) where
-  controlIO f = withRunInIO (\ runInIO -> f (RunIO (fmap pure . runInIO)) >>= runInIO)
 
 
 newtype Line = Line Int
