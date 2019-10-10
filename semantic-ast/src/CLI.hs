@@ -13,26 +13,41 @@ import System.IO (FilePath)
 import Options.Applicative hiding (style)
 import Data.Semigroup ((<>))
 
+data SemanticAST = SemanticAST
+  { sourceFilePath      :: Input
+  , format              :: Format
+  }
+
+parseAST :: Parser SemanticAST
+parseAST = SemanticAST
+      <$> option auto
+          ( long "sourcefile"
+         <> metavar "FILEPATH"
+         <> help "Specify filepath containing source code to parse" )
+      <*> option auto
+          ( long "format"
+         <> help "Specify desired output: show, json, sexpression" )
+
 main :: IO ()
 main = generateAST =<< execParser opts
+
+generateAST :: SemanticAST -> IO ()
+generateAST (SemanticAST sourceInput _) = do
+  case sourceInput of
+    FileInput filePath -> do
+      bytestring <- Data.ByteString.readFile filePath
+      print =<< parseByteString @TreeSitter.Python.AST.Module @(Range, Span) tree_sitter_python bytestring
+    StdInput -> do
+      bytestring <- pack getArgs
+      print =<< parseByteString @TreeSitter.Python.AST.Module @(Range, Span) tree_sitter_python bytestring
 
 opts :: ParserInfo SemanticAST
 opts = info (parseAST <**> helper)
   ( fullDesc
- <> progDesc "Read a file, output an AST"
- <> header "semantic-ast - generates ASTs" )
-
-generateAST :: SemanticAST -> IO ()
-generateAST (SemanticAST file _) = do
- bytestring <- Data.ByteString.readFile file
- print =<< parseByteString @TreeSitter.Python.AST.Module @(Range, Span) tree_sitter_python bytestring
+ <> progDesc "Parse source code and produce an AST"
+ <> header "semantic-ast is a package used to parse source code" )
 
 -- TODO: Define formats for json, sexpression, etc.
-
-data SemanticAST = SemanticAST
-  { sourceFilePath :: Prelude.String
-  , format         :: Format
-  }
 data Format = Show
   deriving (Read)
 
