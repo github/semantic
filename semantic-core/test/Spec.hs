@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings, TypeOperators #-}
+{-# LANGUAGE OverloadedStrings, TypeApplications, TypeOperators #-}
 module Main (main) where
 
 import           Data.String
@@ -11,6 +11,7 @@ import           Test.Tasty.HUnit
 
 import           Control.Effect.Sum
 import           Data.File
+import           Data.Loc (Path)
 import qualified Generators as Gen
 import qualified Analysis.Eval as Eval
 import           Data.Core
@@ -18,10 +19,11 @@ import           Data.Core.Pretty
 import           Data.Core.Parser as Parse
 import           Data.Name
 import           Data.Term
+import           Source.Span
 
 -- * Helpers
 
-true, false :: Term (Ann :+: Core) Name
+true, false :: Term Core Name
 true  = bool True
 false = bool False
 
@@ -31,10 +33,10 @@ parseEither p = Trifecta.foldResult (Left . show . Trifecta._errDoc) Right . Tri
 -- * Parser roundtripping properties. Note that parsing and prettyprinting is generally
 -- not a roundtrip, because the parser inserts 'Ann' nodes itself.
 
-prop_roundtrips :: Gen (Term (Ann :+: Core) Name) -> Property
+prop_roundtrips :: Gen (Term Core Name) -> Property
 prop_roundtrips gen = property $ do
   input <- forAll gen
-  tripping input (showCore . stripAnnotations) (parseEither (Parse.core <* Trifecta.eof))
+  tripping input showCore (parseEither (Parse.core <* Trifecta.eof))
 
 parserProps :: TestTree
 parserProps = testGroup "Parsing: roundtripping"
@@ -47,7 +49,7 @@ parserProps = testGroup "Parsing: roundtripping"
 
 -- * Parser specs
 
-parsesInto :: String -> Term (Ann :+: Core) Name -> Assertion
+parsesInto :: String -> Term Core Name -> Assertion
 parsesInto str res = case parseEither Parse.core str of
   Right x -> x @?= res
   Left m  -> assertFailure m
@@ -57,7 +59,7 @@ assert_booleans_parse = do
   parseEither Parse.core "#true"  @?= Right true
   parseEither Parse.core "#false" @?= Right false
 
-a, f, g, h :: Term (Ann :+: Core) Name
+a, f, g, h :: Term Core Name
 (a, f, g, h) = (pure "a", pure "f", pure "g", pure "h")
 
 assert_ifthen_parse :: Assertion
@@ -93,10 +95,10 @@ parserSpecs = testGroup "Parsing: simple specs"
   , testCase "quoted names" assert_quoted_name_parse
   ]
 
-assert_roundtrips :: File (Term (Ann :+: Core) Name) -> Assertion
-assert_roundtrips (File _ core) = case parseEither Parse.core (showCore (stripAnnotations core)) of
-  Right v -> stripAnnotations v @?= stripAnnotations core
-  Left e -> assertFailure e
+assert_roundtrips :: File (Term Core Name) -> Assertion
+assert_roundtrips (File _ _ core) = case parseEither Parse.core (showCore core) of
+  Right v -> v @?= core
+  Left  e -> assertFailure e
 
 parserExamples :: TestTree
 parserExamples = testGroup "Parsing: Eval.hs examples"
@@ -106,7 +108,7 @@ parserExamples = testGroup "Parsing: Eval.hs examples"
   , testCase "prog4" (assert_roundtrips Eval.prog4)
   , testCase "prog6.1" (assert_roundtrips (head Eval.prog6))
   , testCase "prog6.2" (assert_roundtrips (last Eval.prog6))
-  , testCase "ruby" (assert_roundtrips Eval.ruby)
+  , testCase "ruby" (assert_roundtrips (stripAnnotations @Span . stripAnnotations @Path <$> Eval.ruby))
   ]
 
 tests :: TestTree
