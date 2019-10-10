@@ -19,10 +19,13 @@ import Control.Effect.Readline hiding (Carrier)
 import Control.Monad.Fix
 import Control.Monad.IO.Unlift
 import Data.Coerce
-import Data.Text.Prettyprint.Doc.Render.Terminal
+import Data.Text.Prettyprint.Doc
+import Data.Text.Prettyprint.Doc.Render.Terminal (renderIO)
 import System.Console.Haskeline hiding (Handler, handle)
+import System.Console.Terminal.Size as Size
 import System.Directory
 import System.FilePath
+import System.IO (stdout)
 
 runReadline :: MonadUnliftIO m => Prefs -> Settings m -> ReadlineC m a -> m a
 runReadline prefs settings = runControlIO . runInputTWithPrefs prefs (coerce settings) . runM . runReader (Line 0) . runReadlineC
@@ -51,7 +54,10 @@ instance MonadUnliftIO m => Carrier (Readline :+: Lift (InputT (ControlIOC m))) 
     local increment (runReadlineC (k line str))
     where cyan = "\ESC[1;36m\STX"
           plain = "\ESC[0m\STX"
-  eff (L (Print doc k)) = liftIO (putDoc doc) *> k
+  eff (L (Print doc k)) = do
+    s <- maybe 80 Size.width <$> liftIO size
+    liftIO (renderIO stdout (layoutSmart defaultLayoutOptions { layoutPageWidth = AvailablePerLine s 0.8 } (doc <> line)))
+    k
   eff (R other) = ReadlineC (eff (R (handleCoercible other)))
 
 
