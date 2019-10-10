@@ -41,7 +41,7 @@ newtype FrameId = FrameId { unFrameId :: Precise }
   deriving (Eq, Ord, Show)
 
 data Concrete term
-  = Closure Loc Name term Env
+  = Closure Path Span Name term Env
   | Unit
   | Bool Bool
   | String Text
@@ -126,10 +126,11 @@ concreteAnalysis = Analysis{..}
         deref = gets . IntMap.lookup
         assign addr value = modify (IntMap.insert addr value)
         abstract _ name body = do
-          loc <- askLoc
+          path <- ask
+          span <- ask
           env <- asks (flip Map.restrictKeys (Set.delete name (foldMap Set.singleton body)))
-          pure (Closure loc name body env)
-        apply eval (Closure (Loc path span) name body env) a = do
+          pure (Closure path span name body env)
+        apply eval (Closure path span name body env) a = do
           local (const path) . local (const span) $ do
             addr <- alloc name
             assign addr a
@@ -152,7 +153,6 @@ concreteAnalysis = Analysis{..}
           val <- deref addr
           heap <- get
           pure (val >>= lookupConcrete heap n)
-        askLoc = Loc <$> ask <*> ask
 
 
 lookupConcrete :: Heap term -> Name -> Concrete term -> Maybe Precise
@@ -188,7 +188,7 @@ heapGraph vertex edge h = foldr (uncurry graph) G.empty (IntMap.toList h)
           Unit -> G.empty
           Bool _ -> G.empty
           String _ -> G.empty
-          Closure _ _ _ env -> foldr (G.overlay . edge (Left Lexical)) G.empty env
+          Closure _ _ _ _ env -> foldr (G.overlay . edge (Left Lexical)) G.empty env
           Record frame -> Map.foldrWithKey (\ k -> G.overlay . edge (Right k)) G.empty frame
 
 heapValueGraph :: Heap term -> G.Graph (Concrete term)
@@ -209,7 +209,7 @@ addressStyle heap = (G.defaultStyle vertex) { G.edgeAttributes }
           Unit ->  "()"
           Bool b -> pack $ show b
           String s -> pack $ show s
-          Closure (Loc p (Span s e)) n _ _ -> "\\\\ " <> unName n <> " [" <> getPath p <> ":" <> showPos s <> "-" <> showPos e <> "]"
+          Closure p (Span s e) n _ _ -> "\\\\ " <> unName n <> " [" <> getPath p <> ":" <> showPos s <> "-" <> showPos e <> "]"
           Record _ -> "{}"
         showPos (Pos l c) = pack (show l) <> ":" <> pack (show c)
 
