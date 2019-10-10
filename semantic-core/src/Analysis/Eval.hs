@@ -18,10 +18,9 @@ import Control.Effect.Reader
 import Control.Monad ((>=>))
 import Core.Core as Core
 import Core.File
-import Core.Loc
 import Core.Name
 import Data.Functor
-import Data.Maybe (fromJust, fromMaybe)
+import Data.Maybe (fromMaybe)
 import Data.Text (Text)
 import GHC.Stack
 import Prelude hiding (fail)
@@ -131,12 +130,14 @@ prog5 = fromBody $ ann (do'
 
 prog6 :: (Carrier sig t, Member Core sig) => [File (t Name)]
 prog6 =
-  [ File (Path.absRel "dep")  (snd (fromJust here)) $ Core.record
-    [ ("dep", Core.record [ ("var", Core.bool True) ]) ]
-  , File (Path.absRel "main") (snd (fromJust here)) $ do' (map (Nothing :<-)
+  [ (fromBody (Core.record
+    [ ("dep", Core.record [ ("var", Core.bool True) ]) ]))
+    { filePath = Path.absRel "dep"}
+  , (fromBody (do' (map (Nothing :<-)
     [ load (Core.string "dep")
     , Core.record [ ("thing", pure "dep" Core.... "var") ]
-    ])
+    ])))
+    { filePath = Path.absRel "main" }
   ]
 
 ruby :: (Carrier sig t, Member (Ann Span) sig, Member Core sig) => File (t Name)
