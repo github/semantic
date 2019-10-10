@@ -42,6 +42,7 @@ common common
 library
   import: common
   exposed-modules:
+    Source.Debug
     Source.Loc
     Source.Range
     Source.Source
