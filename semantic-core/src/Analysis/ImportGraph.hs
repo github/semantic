@@ -42,7 +42,7 @@ instance Monoid (Value term) where
   mempty = Value Abstract mempty
 
 data Semi term
-  = Closure Loc Name term
+  = Closure Path Span Name term
   -- FIXME: Bound String values.
   | String Text
   | Abstract
@@ -108,9 +108,10 @@ importGraphAnalysis = Analysis{..}
         deref addr = gets (Map.lookup addr >=> nonEmpty . Set.toList) >>= maybe (pure Nothing) (foldMapA (pure . Just))
         assign addr v = modify (Map.insertWith (<>) addr (Set.singleton v))
         abstract _ name body = do
-          loc <- askLoc
-          pure (Value (Closure loc name body) mempty)
-        apply eval (Value (Closure (Loc path span) name body) _) a = local (const path) . local (const span) $ do
+          path <- ask
+          span <- ask
+          pure (Value (Closure path span name body) mempty)
+        apply eval (Value (Closure path span name body) _) a = local (const path) . local (const span) $ do
           addr <- alloc name
           assign addr a
           bind name addr (eval body)
@@ -127,5 +128,3 @@ importGraphAnalysis = Analysis{..}
             assign addr v
           pure (Value Abstract (foldMap (valueGraph . snd) fields))
         _ ... m = pure (Just m)
-
-        askLoc = Loc <$> ask <*> ask
