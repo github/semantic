@@ -4,7 +4,6 @@ module Control.Effect.Readline
   Readline (..)
 , prompt
 , print
-, println
   -- * Re-exports
 , Carrier
 ) where
@@ -29,6 +28,3 @@ prompt p = send (Prompt p (curry pure))
 
 print :: (Carrier sig m, Member Readline sig) => Doc AnsiStyle -> m ()
 print s = send (Print s (pure ()))
-
-println :: (Carrier sig m, Member Readline sig) => Doc AnsiStyle -> m ()
-println s = print s >> print "\n"
