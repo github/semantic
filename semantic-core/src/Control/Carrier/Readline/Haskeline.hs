@@ -6,7 +6,6 @@ module Control.Carrier.Readline.Haskeline
 , runReadline
 , runReadlineWithHistory
 , ReadlineC (..)
-, runControlIO
 , ControlIOC (..)
   -- * Re-exports
 , Carrier
@@ -20,7 +19,7 @@ import Control.Effect.Carrier
 import Control.Effect.Lift
 import Control.Effect.Reader
 import Control.Effect.Readline hiding (Carrier)
-import Control.Monad.IO.Class
+import Control.Monad.IO.Unlift
 import Control.Monad.Trans.Class
 import Data.Text.Prettyprint.Doc.Render.Text
 import System.Console.Haskeline hiding (Handler, handle)
@@ -58,26 +57,18 @@ instance (MonadException m, MonadIO m) => Carrier (Readline :+: Lift (InputT m))
   eff (R other) = ReadlineC (eff (R (handleCoercible other)))
 
 
-runHandler :: Handler m -> ControlIOC m a -> IO a
-runHandler h@(Handler handler) = handler . runReader h . runControlIOC
-
-newtype Handler m = Handler (forall x . m x -> IO x)
-
-
-runControlIO :: (forall x . m x -> IO x) -> ControlIOC m a -> m a
-runControlIO handler = runReader (Handler handler) . runControlIOC
-
 -- | This exists to work around the 'MonadException' constraint that haskeline entails.
-newtype ControlIOC m a = ControlIOC { runControlIOC :: ReaderC (Handler m) m a }
+newtype ControlIOC m a = ControlIOC { runControlIO :: m a }
   deriving (Applicative, Functor, Monad, MonadIO)
 
-instance Carrier sig m => Carrier sig (ControlIOC m) where
-  eff op = ControlIOC (eff (R (handleCoercible op)))
+instance MonadUnliftIO m => MonadUnliftIO (ControlIOC m) where
+  withRunInIO inner = ControlIOC $ withRunInIO $ \ go -> inner (go . runControlIO)
 
-instance (Carrier sig m, MonadIO m) => MonadException (ControlIOC m) where
-  controlIO f = ControlIOC $ do
-    handler <- ask
-    liftIO (f (RunIO (fmap pure . runHandler handler)) >>= runHandler handler)
+instance Carrier sig m => Carrier sig (ControlIOC m) where
+  eff op = ControlIOC (eff (handleCoercible op))
+
+instance (Carrier sig m, MonadUnliftIO m) => MonadException (ControlIOC m) where
+  controlIO f = withRunInIO (\ runInIO -> f (RunIO (fmap pure . runInIO)) >>= runInIO)
 
 
 newtype Line = Line Int
