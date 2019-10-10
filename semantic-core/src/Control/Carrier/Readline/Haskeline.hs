@@ -49,7 +49,7 @@ newtype ReadlineC m a = ReadlineC { runReadlineC :: ReaderC Line (LiftC (InputT 
 instance (MonadException m, MonadIO m) => Carrier (Readline :+: Lift (InputT m)) (ReadlineC m) where
   eff (L (Prompt prompt k)) = ReadlineC $ do
     str <- lift (lift (getInputLine (cyan <> prompt <> plain)))
-    line <- ask
+    Line line <- ask
     local increment (runReadlineC (k line str))
     where cyan = "\ESC[1;36m\STX"
           plain = "\ESC[0m\STX"
@@ -77,3 +77,9 @@ instance (Carrier sig m, MonadIO m) => MonadException (ControlIOC m) where
   controlIO f = ControlIOC $ do
     handler <- ask
     liftIO (f (RunIO (fmap pure . runHandler handler)) >>= runHandler handler)
+
+
+newtype Line = Line Int
+
+increment :: Line -> Line
+increment (Line n) = Line (n + 1)
