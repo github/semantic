@@ -108,7 +108,7 @@ parserExamples = testGroup "Parsing: Eval.hs examples"
   , testCase "prog4" (assert_roundtrips Eval.prog4)
   , testCase "prog6.1" (assert_roundtrips (head Eval.prog6))
   , testCase "prog6.2" (assert_roundtrips (last Eval.prog6))
-  , testCase "ruby" (assert_roundtrips (stripAnnotations @Span . stripAnnotations @Path <$> Eval.ruby))
+  , testCase "ruby" (assert_roundtrips (stripAnnotations @Span <$> Eval.ruby))
   ]
 
 tests :: TestTree
