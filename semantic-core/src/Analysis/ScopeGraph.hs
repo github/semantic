@@ -36,7 +36,10 @@ data Decl = Decl
   }
   deriving (Eq, Ord, Show)
 
-newtype Ref = Ref Loc
+data Ref = Ref
+  { refPath :: Path
+  , refSpan :: Span
+  }
   deriving (Eq, Ord, Show)
 
 newtype ScopeGraph = ScopeGraph { unScopeGraph :: Map.Map Decl (Set.Set Ref) }
@@ -132,7 +135,7 @@ scopeGraphAnalysis = Analysis{..}
           pure (foldMap snd fields')
         _ ... m = pure (Just m)
 
-        askRef = Ref <$> askLoc
+        askRef = Ref <$> ask <*> ask
         askLoc = Loc <$> ask <*> ask
 
         extendBinding addr ref bindLoc = ScopeGraph (maybe Map.empty (\ (Loc path span) -> Map.singleton (Decl addr path span) (Set.singleton ref)) bindLoc)
