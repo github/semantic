@@ -9,6 +9,7 @@ import TreeSitter.Python
 import Source.Range
 import Source.Span
 import Data.ByteString (readFile, ByteString)
+import System.Posix.Env.ByteString (getArgs)
 import System.IO (FilePath)
 import Options.Applicative hiding (style)
 import Data.Semigroup ((<>))
