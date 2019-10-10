@@ -236,7 +236,7 @@ annWith :: (Carrier sig m, Member (Ann Path) sig, Member (Ann Span) sig) => Call
 annWith callStack = maybe id (\ (path, span) -> annAt path . annAt span) (stackLoc callStack)
 
 
-stripAnnotations :: (HFunctor sig, forall g . Functor g => Functor (sig g)) => Term (Ann ann :+: sig) a -> Term sig a
+stripAnnotations :: forall ann a sig . (HFunctor sig, forall g . Functor g => Functor (sig g)) => Term (Ann ann :+: sig) a -> Term sig a
 stripAnnotations (Var v)              = Var v
 stripAnnotations (Term (L (Ann _ b))) = stripAnnotations b
 stripAnnotations (Term (R        b))  = Term (hmap stripAnnotations b)
