@@ -22,4 +22,4 @@ fileLoc (File p s _) = Loc p s
 
 fromBody :: HasCallStack => a -> File a
 fromBody body = File path span body where
-  Loc path span = fromJust (stackLoc callStack)
+  (path, span) = fromJust (stackLoc callStack)

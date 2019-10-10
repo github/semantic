@@ -50,6 +50,7 @@ import Data.Term
 import Data.Text (Text)
 import GHC.Generics (Generic1)
 import GHC.Stack
+import Source.Span
 
 data Core f a
   -- | Recursive local binding of a name in a scope; strict evaluation of the name in the body will diverge.
@@ -225,14 +226,14 @@ instance RightModule (Ann ann) where
   Ann l b >>=* f = Ann l (b >>= f)
 
 
-ann :: (Carrier sig m, Member (Ann Loc) sig) => HasCallStack => m a -> m a
+ann :: (Carrier sig m, Member (Ann Path) sig, Member (Ann Span) sig) => HasCallStack => m a -> m a
 ann = annWith callStack
 
-annAt :: (Carrier sig m, Member (Ann Loc) sig) => Loc -> m a -> m a
-annAt loc = send . Ann loc
+annAt :: (Carrier sig m, Member (Ann ann) sig) => ann -> m a -> m a
+annAt ann = send . Ann ann
 
-annWith :: (Carrier sig m, Member (Ann Loc) sig) => CallStack -> m a -> m a
-annWith callStack = maybe id annAt (stackLoc callStack)
+annWith :: (Carrier sig m, Member (Ann Path) sig, Member (Ann Span) sig) => CallStack -> m a -> m a
+annWith callStack = maybe id (\ (path, span) -> annAt path . annAt span) (stackLoc callStack)
 
 
 stripAnnotations :: (HFunctor sig, forall g . Functor g => Functor (sig g)) => Term (Ann ann :+: sig) a -> Term sig a

@@ -24,13 +24,13 @@ interactive :: Loc
 interactive = Loc (Path "<interactive>") (Span (Pos 1 1) (Pos 1 1))
 
 
-here :: HasCallStack => Maybe Loc
+here :: HasCallStack => Maybe (Path, Span)
 here = stackLoc callStack
 
-stackLoc :: CallStack -> Maybe Loc
+stackLoc :: CallStack -> Maybe (Path, Span)
 stackLoc cs = case getCallStack cs of
   (_, srcLoc):_ -> Just (fromGHCSrcLoc srcLoc)
   _             -> Nothing
 
-fromGHCSrcLoc :: SrcLoc -> Loc
-fromGHCSrcLoc SrcLoc{..} = Loc (Path (pack srcLocFile)) (Span (Pos srcLocStartLine srcLocStartCol) (Pos srcLocEndLine srcLocEndCol))
+fromGHCSrcLoc :: SrcLoc -> (Path, Span)
+fromGHCSrcLoc SrcLoc{..} = (Path (pack srcLocFile), Span (Pos srcLocStartLine srcLocStartCol) (Pos srcLocEndLine srcLocEndCol))

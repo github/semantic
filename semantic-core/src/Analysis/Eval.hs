@@ -120,7 +120,7 @@ prog4 = fromBody
     (Core.bool True)
     (Core.bool False))
 
-prog5 :: (Carrier sig t, Member (Ann Loc) sig, Member Core sig) => File (t Name)
+prog5 :: (Carrier sig t, Member (Ann Path) sig, Member (Ann Span) sig, Member Core sig) => File (t Name)
 prog5 = fromBody $ ann (do'
   [ Just (named' "mkPoint") :<- lams [named' "_x", named' "_y"] (ann (Core.record
     [ ("x", ann (pure "_x"))
@@ -133,15 +133,15 @@ prog5 = fromBody $ ann (do'
 
 prog6 :: (Carrier sig t, Member Core sig) => [File (t Name)]
 prog6 =
-  [ File (Path "dep")  (locSpan (fromJust here)) $ Core.record
+  [ File (Path "dep")  (snd (fromJust here)) $ Core.record
     [ ("dep", Core.record [ ("var", Core.bool True) ]) ]
-  , File (Path "main") (locSpan (fromJust here)) $ do' (map (Nothing :<-)
+  , File (Path "main") (snd (fromJust here)) $ do' (map (Nothing :<-)
     [ load (Core.string "dep")
     , Core.record [ ("thing", pure "dep" Core.... "var") ]
     ])
   ]
 
-ruby :: (Carrier sig t, Member (Ann Loc) sig, Member Core sig) => File (t Name)
+ruby :: (Carrier sig t, Member (Ann Path) sig, Member (Ann Span) sig, Member Core sig) => File (t Name)
 ruby = fromBody $ annWith callStack (rec (named' __semantic_global) (do' statements))
   where statements =
           [ Just "Class" :<- record
