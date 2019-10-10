@@ -1,7 +1,6 @@
 {-# LANGUAGE FlexibleContexts, TypeOperators #-}
 module Data.Core.Parser
-  ( module Text.Trifecta
-  , core
+  ( core
   , lit
   , expr
   , record
