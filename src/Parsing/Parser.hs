@@ -180,7 +180,7 @@ goParser' :: c (Term (Sum Go.Syntax)) => (Language, SomeParser c Loc)
 goParser' = (Go, SomeParser goParser)
 
 javaParser' :: c PreciseJava.Term => (Language, SomeParser c Loc)
-javaParser' = (Python, SomeParser javaParserPrecise)
+javaParser' = (Java, SomeParser javaParserPrecise)
 
 javascriptParser' :: c (Term (Sum TSX.Syntax)) => (Language, SomeParser c Loc)
 javascriptParser' = (JavaScript, SomeParser tsxParser)
