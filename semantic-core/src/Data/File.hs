@@ -1,7 +1,6 @@
 {-# LANGUAGE DeriveTraversable #-}
 module Data.File
 ( File(..)
-, fileLoc
 , fromBody
 ) where
 
@@ -16,9 +15,6 @@ data File a = File
   , fileBody :: !a
   }
   deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
-
-fileLoc :: File a -> Loc
-fileLoc (File p s _) = Loc p s
 
 fromBody :: HasCallStack => a -> File a
 fromBody body = File path span body where
