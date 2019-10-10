@@ -25,8 +25,8 @@ import Data.Maybe (fromJust, fromMaybe)
 import Data.Text (Text)
 import GHC.Stack
 import Prelude hiding (fail)
-import Syntax.Scope
 import Source.Span
+import Syntax.Scope
 import Syntax.Term
 
 eval :: ( Carrier sig m
