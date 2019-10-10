@@ -13,8 +13,6 @@ module Control.Carrier.Readline.Haskeline
 , runM
 ) where
 
-import Prelude hiding (print)
-
 import Control.Effect.Carrier
 import Control.Effect.Lift
 import Control.Effect.Reader
