@@ -150,7 +150,7 @@ assignmentCallSite _ = Nothing
 
 tracing :: HasCallStack => f a -> Tracing f a
 tracing f = case getCallStack callStack of
-  (_ : site : _) -> Tracing (Just site) f
+  _ : site : _ -> Tracing (Just site) f
   _ -> Tracing Nothing f
 
 -- | Zero-width production of the current location.
