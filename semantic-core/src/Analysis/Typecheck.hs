@@ -19,7 +19,6 @@ import           Control.Monad ((>=>), unless)
 import           Core.File
 import           Core.Loc
 import           Core.Name as Name
-import           Core.Scope
 import           Data.Foldable (for_)
 import           Data.Function (fix)
 import           Data.Functor (($>))
@@ -37,7 +36,9 @@ import           GHC.Generics (Generic1)
 import           Prelude hiding (fail)
 import           Source.Span
 import           Syntax.Module
+import           Syntax.Scope
 import           Syntax.Term
+import           Syntax.Var (closed)
 
 data Monotype f a
   = Bool

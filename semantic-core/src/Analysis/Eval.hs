@@ -20,12 +20,12 @@ import Core.Core as Core
 import Core.File
 import Core.Loc
 import Core.Name
-import Core.Scope
 import Data.Functor
 import Data.Maybe (fromJust, fromMaybe)
 import Data.Text (Text)
 import GHC.Stack
 import Prelude hiding (fail)
+import Syntax.Scope
 import Source.Span
 import Syntax.Term
 
