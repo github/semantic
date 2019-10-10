@@ -25,6 +25,7 @@ import           Data.Proxy
 import qualified Data.Set as Set
 import           Data.Text (Text)
 import           Prelude hiding (fail)
+import           Source.Span
 
 type ImportGraph = Map.Map Text (Set.Set Text)
 
@@ -51,14 +52,14 @@ data Semi term
 importGraph
   :: (Ord term, Show term)
   => (forall sig m
-     .  (Carrier sig m, Member (Reader Loc) sig, MonadFail m)
+     .  (Carrier sig m, Member (Reader Path) sig, Member (Reader Span) sig, MonadFail m)
      => Analysis term Name (Value term) m
      -> (term -> m (Value term))
      -> (term -> m (Value term))
      )
   -> [File term]
   -> ( Heap Name (Value term)
-     , [File (Either (Loc, String) (Value term))]
+     , [File (Either (Path, Span, String) (Value term))]
      )
 importGraph eval
   = run
@@ -75,15 +76,16 @@ runFile
      , Show term
      )
   => (forall sig m
-     .  (Carrier sig m, Member (Reader Loc) sig, MonadFail m)
+     .  (Carrier sig m, Member (Reader Path) sig, Member (Reader Span) sig, MonadFail m)
      => Analysis term Name (Value term) m
      -> (term -> m (Value term))
      -> (term -> m (Value term))
      )
   -> File term
-  -> m (File (Either (Loc, String) (Value term)))
+  -> m (File (Either (Path, Span, String) (Value term)))
 runFile eval file = traverse run file
-  where run = runReader (fileLoc file)
+  where run = runReader (filePath file)
+            . runReader (fileSpan file)
             . runFail
             . fmap fold
             . convergeTerm (Proxy @Name) (fix (cacheTerm . eval importGraphAnalysis))
@@ -91,7 +93,8 @@ runFile eval file = traverse run file
 -- FIXME: decompose into a product domain and two atomic domains
 importGraphAnalysis :: ( Alternative m
                        , Carrier sig m
-                       , Member (Reader Loc) sig
+                       , Member (Reader Path) sig
+                       , Member (Reader Span) sig
                        , Member (State (Heap Name (Value term))) sig
                        , MonadFail m
                        , Ord  term
@@ -105,9 +108,9 @@ importGraphAnalysis = Analysis{..}
         deref addr = gets (Map.lookup addr >=> nonEmpty . Set.toList) >>= maybe (pure Nothing) (foldMapA (pure . Just))
         assign addr v = modify (Map.insertWith (<>) addr (Set.singleton v))
         abstract _ name body = do
-          loc <- ask
+          loc <- askLoc
           pure (Value (Closure loc name body) mempty)
-        apply eval (Value (Closure loc name body) _) a = local (const loc) $ do
+        apply eval (Value (Closure (Loc path span) name body) _) a = local (const path) . local (const span) $ do
           addr <- alloc name
           assign addr a
           bind name addr (eval body)
@@ -124,3 +127,5 @@ importGraphAnalysis = Analysis{..}
             assign addr v
           pure (Value Abstract (foldMap (valueGraph . snd) fields))
         _ ... m = pure (Just m)
+
+        askLoc = Loc <$> ask <*> ask

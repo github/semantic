@@ -27,6 +27,7 @@ import           Data.Proxy
 import qualified Data.Set as Set
 import           Data.Traversable (for)
 import           Prelude hiding (fail)
+import           Source.Span
 
 data Decl = Decl
   { declSymbol :: Name
@@ -49,13 +50,13 @@ instance Monoid ScopeGraph where
 scopeGraph
   :: Ord term
   => (forall sig m
-     .  (Carrier sig m, Member (Reader Loc) sig, MonadFail m)
+     .  (Carrier sig m, Member (Reader Path) sig, Member (Reader Span) sig, MonadFail m)
      => Analysis term Name ScopeGraph m
      -> (term -> m ScopeGraph)
      -> (term -> m ScopeGraph)
      )
   -> [File term]
-  -> (Heap Name ScopeGraph, [File (Either (Loc, String) ScopeGraph)])
+  -> (Heap Name ScopeGraph, [File (Either (Path, Span, String) ScopeGraph)])
 scopeGraph eval
   = run
   . runFresh
@@ -70,15 +71,16 @@ runFile
      , Ord term
      )
   => (forall sig m
-     .  (Carrier sig m, Member (Reader Loc) sig, MonadFail m)
+     .  (Carrier sig m, Member (Reader Path) sig, Member (Reader Span) sig, MonadFail m)
      => Analysis term Name ScopeGraph m
      -> (term -> m ScopeGraph)
      -> (term -> m ScopeGraph)
      )
   -> File term
-  -> m (File (Either (Loc, String) ScopeGraph))
+  -> m (File (Either (Path, Span, String) ScopeGraph))
 runFile eval file = traverse run file
-  where run = runReader (fileLoc file)
+  where run = runReader (filePath file)
+            . runReader (fileSpan file)
             . runReader (Map.empty @Name @Loc)
             . runFail
             . fmap fold
@@ -87,7 +89,8 @@ runFile eval file = traverse run file
 scopeGraphAnalysis
   :: ( Alternative m
      , Carrier sig m
-     , Member (Reader Loc) sig
+     , Member (Reader Path) sig
+     , Member (Reader Span) sig
      , Member (Reader (Map.Map Name Loc)) sig
      , Member (State (Heap Name ScopeGraph)) sig
      )
@@ -95,17 +98,17 @@ scopeGraphAnalysis
 scopeGraphAnalysis = Analysis{..}
   where alloc = pure
         bind name _ m = do
-          loc <- ask @Loc
+          loc <- askLoc
           local (Map.insert name loc) m
         lookupEnv = pure . Just
         deref addr = do
-          ref <- asks Ref
+          ref <- askRef
           bindLoc <- asks (Map.lookup addr)
           cell <- gets (Map.lookup addr >=> nonEmpty . Set.toList)
           let extending = mappend (extendBinding addr ref bindLoc)
           maybe (pure Nothing) (foldMapA (pure . Just . extending)) cell
         assign addr v = do
-          ref <- asks Ref
+          ref <- askRef
           bindLoc <- asks (Map.lookup addr)
           modify (Map.insertWith (<>) addr (Set.singleton (extendBinding addr ref bindLoc <> v)))
         abstract eval name body = do
@@ -121,10 +124,13 @@ scopeGraphAnalysis = Analysis{..}
         record fields = do
           fields' <- for fields $ \ (k, v) -> do
             addr <- alloc k
-            loc <- ask @Loc
+            loc <- askLoc
             let v' = ScopeGraph (Map.singleton (Decl k loc) mempty) <> v
             (k, v') <$ assign addr v'
           pure (foldMap snd fields')
         _ ... m = pure (Just m)
+
+        askRef = Ref <$> askLoc
+        askLoc = Loc <$> ask <*> ask
 
         extendBinding addr ref bindLoc = ScopeGraph (maybe Map.empty (\ bindLoc -> Map.singleton (Decl addr bindLoc) (Set.singleton ref)) bindLoc)

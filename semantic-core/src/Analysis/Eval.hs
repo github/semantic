@@ -27,9 +27,11 @@ import Data.Term
 import Data.Text (Text)
 import GHC.Stack
 import Prelude hiding (fail)
+import Source.Span
 
 eval :: ( Carrier sig m
-        , Member (Reader Loc) sig
+        , Member (Reader Path) sig
+        , Member (Reader Span) sig
         , MonadFail m
         , Semigroup value
         )
@@ -72,7 +74,7 @@ eval Analysis{..} eval = \case
       b' <- eval b
       addr <- ref a
       b' <$ assign addr b'
-  Term (L (Ann loc c)) -> local (const loc) (eval c)
+  Term (L (Ann (Loc p s) c)) -> local (const p) (local (const s) (eval c))
   where freeVariable s = fail ("free variable: " <> s)
         uninitialized s = fail ("uninitialized variable: " <> s)
         invalidRef s = fail ("invalid ref: " <> s)
@@ -90,7 +92,7 @@ eval Analysis{..} eval = \case
               a' <- ref a
               a' ... b >>= maybe (freeVariable (show b)) pure
             c -> invalidRef (show c)
-          Term (L (Ann loc c)) -> local (const loc) (ref c)
+          Term (L (Ann (Loc p s) c)) -> local (const p) (local (const s) (ref c))
 
 
 prog1 :: (Carrier sig t, Member Core sig) => File (t Name)

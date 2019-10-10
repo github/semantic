@@ -72,13 +72,13 @@ data Edge = Lexical | Import
 concrete
   :: (Foldable term, Show (term Name))
   => (forall sig m
-     .  (Carrier sig m, Member (Reader Loc) sig, MonadFail m)
+     .  (Carrier sig m, Member (Reader Path) sig, Member (Reader Span) sig, MonadFail m)
      => Analysis (term Name) Precise (Concrete (term Name)) m
      -> (term Name -> m (Concrete (term Name)))
      -> (term Name -> m (Concrete (term Name)))
      )
   -> [File (term Name)]
-  -> (Heap (term Name), [File (Either (Loc, String) (Concrete (term Name)))])
+  -> (Heap (term Name), [File (Either (Path, Span, String) (Concrete (term Name)))])
 concrete eval
   = run
   . runFresh
@@ -94,15 +94,16 @@ runFile
      , Show (term Name)
      )
   => (forall sig m
-     .  (Carrier sig m, Member (Reader Loc) sig, MonadFail m)
+     .  (Carrier sig m, Member (Reader Path) sig, Member (Reader Span) sig, MonadFail m)
      => Analysis (term Name) Precise (Concrete (term Name)) m
      -> (term Name -> m (Concrete (term Name)))
      -> (term Name -> m (Concrete (term Name)))
      )
   -> File (term Name)
-  -> m (File (Either (Loc, String) (Concrete (term Name))))
+  -> m (File (Either (Path, Span, String) (Concrete (term Name))))
 runFile eval file = traverse run file
-  where run = runReader (fileLoc file)
+  where run = runReader (filePath file)
+            . runReader (fileSpan file)
             . runFail
             . runReader @Env mempty
             . fix (eval concreteAnalysis)
@@ -111,7 +112,8 @@ concreteAnalysis :: ( Carrier sig m
                     , Foldable term
                     , Member Fresh sig
                     , Member (Reader Env) sig
-                    , Member (Reader Loc) sig
+                    , Member (Reader Path) sig
+                    , Member (Reader Span) sig
                     , Member (State (Heap (term Name))) sig
                     , MonadFail m
                     , Show (term Name)
@@ -124,11 +126,11 @@ concreteAnalysis = Analysis{..}
         deref = gets . IntMap.lookup
         assign addr value = modify (IntMap.insert addr value)
         abstract _ name body = do
-          loc <- ask
+          loc <- askLoc
           env <- asks (flip Map.restrictKeys (Set.delete name (foldMap Set.singleton body)))
           pure (Closure loc name body env)
-        apply eval (Closure loc name body env) a = do
-          local (const loc) $ do
+        apply eval (Closure (Loc path span) name body env) a = do
+          local (const path) . local (const span) $ do
             addr <- alloc name
             assign addr a
             local (const (Map.insert name addr env)) (eval body)
@@ -150,6 +152,7 @@ concreteAnalysis = Analysis{..}
           val <- deref addr
           heap <- get
           pure (val >>= lookupConcrete heap n)
+        askLoc = Loc <$> ask <*> ask
 
 
 lookupConcrete :: Heap term -> Name -> Concrete term -> Maybe Precise
