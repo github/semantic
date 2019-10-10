@@ -39,7 +39,7 @@ generateAST (SemanticAST sourceInput _) = do
       bytestring <- Data.ByteString.readFile filePath
       print =<< parseByteString @TreeSitter.Python.AST.Module @(Range, Span) tree_sitter_python bytestring
     StdInput -> do
-      bytestring <- pack getArgs
+      bytestring <- Data.ByteString.Char8.pack . Prelude.head <$> getArgs
       print =<< parseByteString @TreeSitter.Python.AST.Module @(Range, Span) tree_sitter_python bytestring
 
 opts :: ParserInfo SemanticAST
