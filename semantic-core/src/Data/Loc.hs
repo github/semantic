@@ -1,7 +1,6 @@
 {-# LANGUAGE RecordWildCards #-}
 module Data.Loc
-( Loc(..)
-, Path(..)
+( Path(..)
 , here
 , stackLoc
 ) where
@@ -11,12 +10,6 @@ import GHC.Stack
 import Source.Span
 
 newtype Path = Path { getPath :: Text }
-  deriving (Eq, Ord, Show)
-
-data Loc = Loc
-  { locPath :: !Path
-  , locSpan :: {-# UNPACK #-} !Span
-  }
   deriving (Eq, Ord, Show)
 
 
