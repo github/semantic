@@ -226,14 +226,14 @@ instance RightModule (Ann ann) where
   Ann l b >>=* f = Ann l (b >>= f)
 
 
-ann :: (Carrier sig m, Member (Ann Path) sig, Member (Ann Span) sig) => HasCallStack => m a -> m a
+ann :: (Carrier sig m, Member (Ann Span) sig) => HasCallStack => m a -> m a
 ann = annWith callStack
 
 annAt :: (Carrier sig m, Member (Ann ann) sig) => ann -> m a -> m a
 annAt ann = send . Ann ann
 
-annWith :: (Carrier sig m, Member (Ann Path) sig, Member (Ann Span) sig) => CallStack -> m a -> m a
-annWith callStack = maybe id (\ (path, span) -> annAt path . annAt span) (stackLoc callStack)
+annWith :: (Carrier sig m, Member (Ann Span) sig) => CallStack -> m a -> m a
+annWith callStack = maybe id (annAt . snd) (stackLoc callStack)
 
 
 stripAnnotations :: forall ann a sig . (HFunctor sig, forall g . Functor g => Functor (sig g)) => Term (Ann ann :+: sig) a -> Term sig a
