@@ -35,15 +35,6 @@ data SemanticAST = SemanticAST
   , format         :: Format
   }
 
-parseAST :: Parser SemanticAST
-parseAST = SemanticAST
-    <$> strOption
-        ( long "semantic-ast"
-       <> metavar "FILEPATH"
-       <> help "Specify filepath containing source code to parse" )
-    <*> option auto
-          ( long "format"
-         <> help "The format you want to display")
 data Input
   = FileInput FilePath
   | StdInput
