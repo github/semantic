@@ -1,5 +1,5 @@
 {-# LANGUAGE DeriveTraversable, LambdaCase, RankNTypes, QuantifiedConstraints, StandaloneDeriving #-}
-module Data.Scope
+module Core.Scope
 ( Incr(..)
 , incr
 , closed
@@ -21,8 +21,8 @@ import Control.Effect.Carrier
 import Control.Monad ((>=>), guard)
 import Control.Monad.Module
 import Control.Monad.Trans.Class
+import Core.Stack
 import Data.Function (on)
-import Data.Stack
 
 data Incr a b
   = Z a

@@ -14,12 +14,12 @@ import           AST.Element
 import           Control.Effect hiding ((:+:))
 import           Control.Effect.Reader
 import           Control.Monad.Fail
+import           Core.Core as Core
+import           Core.Name as Name
+import           Core.Stack (Stack)
+import qualified Core.Stack as Stack
 import           Data.Coerce
-import           Data.Core as Core
 import           Data.Foldable
-import           Data.Name as Name
-import           Data.Stack (Stack)
-import qualified Data.Stack as Stack
 import           Data.String (IsString)
 import           Data.Text (Text)
 import           GHC.Records

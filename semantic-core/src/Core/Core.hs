@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveGeneric, DeriveTraversable, FlexibleContexts, LambdaCase, MultiParamTypeClasses, OverloadedStrings, QuantifiedConstraints, RankNTypes,
              ScopedTypeVariables, StandaloneDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
-module Data.Core
+module Core.Core
 ( Core(..)
 , rec
 , (>>>)
@@ -38,15 +38,15 @@ module Data.Core
 import Control.Applicative (Alternative (..))
 import Control.Effect.Carrier
 import Control.Monad.Module
+import Core.Loc
+import Core.Name
+import Core.Scope
+import Core.Stack
+import Core.Term
 import Data.Bifunctor (Bifunctor (..))
 import Data.Foldable (foldl')
 import Data.List.NonEmpty (NonEmpty (..))
-import Data.Loc
 import Data.Maybe (fromMaybe)
-import Data.Name
-import Data.Scope
-import Data.Stack
-import Data.Term
 import Data.Text (Text)
 import GHC.Generics (Generic1)
 import GHC.Stack

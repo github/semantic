@@ -8,11 +8,11 @@ module Instances () where
 -- we should keep track of them in a dedicated file.
 
 import           Analysis.ScopeGraph
+import           Core.File
+import           Core.Loc
+import           Core.Name (Name (..))
 import           Data.Aeson
-import           Data.File
-import           Data.Loc
 import qualified Data.Map as Map
-import           Data.Name (Name (..))
 import           Data.Text (Text)
 
 deriving newtype instance ToJSON Name

@@ -16,14 +16,14 @@ import Control.Effect.Carrier
 import Control.Effect.Fail
 import Control.Effect.Reader
 import Control.Monad ((>=>))
-import Data.Core as Core
-import Data.File
+import Core.Core as Core
+import Core.File
+import Core.Loc
+import Core.Name
+import Core.Scope
+import Core.Term
 import Data.Functor
-import Data.Loc
 import Data.Maybe (fromJust, fromMaybe)
-import Data.Name
-import Data.Scope
-import Data.Term
 import Data.Text (Text)
 import GHC.Stack
 import Prelude hiding (fail)

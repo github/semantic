@@ -1,6 +1,6 @@
 {-# LANGUAGE FlexibleContexts, LambdaCase, OverloadedStrings, TypeApplications #-}
 
-module Data.Core.Pretty
+module Core.Core.Pretty
   ( showCore
   , printCore
   , showFile
@@ -8,13 +8,13 @@ module Data.Core.Pretty
   , prettyCore
   ) where
 
-import           Data.Core
-import           Data.File
+import           Core.Core
+import           Core.File
+import           Core.Name
+import           Core.Scope
+import           Core.Stack
+import           Core.Term
 import           Data.Foldable (toList)
-import           Data.Name
-import           Data.Scope
-import           Data.Stack
-import           Data.Term
 import           Data.Text.Prettyprint.Doc
 import qualified Data.Text.Prettyprint.Doc.Render.String as Pretty
 import qualified Data.Text.Prettyprint.Doc.Render.Terminal as Pretty

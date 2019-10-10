@@ -1,5 +1,5 @@
 {-# LANGUAGE DeriveTraversable, FlexibleInstances, MultiParamTypeClasses, QuantifiedConstraints, RankNTypes, StandaloneDeriving, UndecidableInstances #-}
-module Data.Term
+module Core.Term
 ( Term(..)
 , hoistTerm
 ) where

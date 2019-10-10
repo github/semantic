@@ -20,13 +20,13 @@ import           Control.Effect.NonDet
 import           Control.Effect.Reader hiding (Local)
 import           Control.Effect.State
 import           Control.Monad ((<=<), guard)
-import           Data.File
+import           Core.File
+import           Core.Loc
+import           Core.Name
 import           Data.Function (fix)
 import qualified Data.IntMap as IntMap
 import qualified Data.IntSet as IntSet
-import           Data.Loc
 import qualified Data.Map as Map
-import           Data.Name
 import           Data.Semigroup (Last (..))
 import qualified Data.Set as Set
 import           Data.Text (Text, pack)

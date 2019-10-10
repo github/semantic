@@ -8,14 +8,14 @@ import           Test.Tasty
 import           Test.Tasty.Hedgehog
 import           Test.Tasty.HUnit
 
-import           Data.File
-import qualified Generators as Gen
 import qualified Analysis.Eval as Eval
-import           Data.Core
-import           Data.Core.Pretty
-import           Data.Core.Parser as Parse
-import           Data.Name
-import           Data.Term
+import           Core.Core
+import           Core.Core.Pretty
+import           Core.Core.Parser as Parse
+import           Core.File
+import           Core.Name
+import           Core.Term
+import qualified Generators as Gen
 import           Source.Span
 
 -- * Helpers

@@ -1,5 +1,5 @@
 {-# LANGUAGE DeriveTraversable #-}
-module Data.Stack
+module Core.Stack
 ( Stack(..)
 ) where
 

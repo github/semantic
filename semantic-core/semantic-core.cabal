@@ -49,15 +49,15 @@ library
     Control.Carrier.Fail.WithLoc
     Control.Effect.Readline
     Control.Monad.Module
-    Data.Core
-    Data.Core.Parser
-    Data.Core.Pretty
-    Data.File
-    Data.Loc
-    Data.Name
-    Data.Scope
-    Data.Stack
-    Data.Term
+    Core.Core
+    Core.Core.Parser
+    Core.Core.Pretty
+    Core.File
+    Core.Loc
+    Core.Name
+    Core.Scope
+    Core.Stack
+    Core.Term
   build-depends:
       algebraic-graphs            ^>= 0.3
     , base                         >= 4.12 && < 5

@@ -14,13 +14,13 @@ import           Control.Effect.Fresh
 import           Control.Effect.Reader
 import           Control.Effect.State
 import           Control.Monad ((>=>))
-import           Data.File
+import           Core.File
+import           Core.Loc
+import           Core.Name
 import           Data.Foldable (fold, for_)
 import           Data.Function (fix)
 import           Data.List.NonEmpty (nonEmpty)
-import           Data.Loc
 import qualified Data.Map as Map
-import           Data.Name
 import           Data.Proxy
 import qualified Data.Set as Set
 import           Data.Text (Text)

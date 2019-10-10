@@ -17,22 +17,22 @@ import           Control.Effect.Reader hiding (Local)
 import           Control.Effect.State
 import           Control.Monad ((>=>), unless)
 import           Control.Monad.Module
-import           Data.File
+import           Core.File
+import           Core.Loc
+import           Core.Name as Name
+import           Core.Scope
+import           Core.Term
 import           Data.Foldable (for_)
 import           Data.Function (fix)
 import           Data.Functor (($>))
 import qualified Data.IntMap as IntMap
 import qualified Data.IntSet as IntSet
 import           Data.List.NonEmpty (nonEmpty)
-import           Data.Loc
 import qualified Data.Map as Map
 import           Data.Maybe (fromJust, fromMaybe)
-import           Data.Name as Name
 import           Data.Proxy
-import           Data.Scope
 import           Data.Semigroup (Last (..))
 import qualified Data.Set as Set
-import           Data.Term
 import           Data.Traversable (for)
 import           Data.Void
 import           GHC.Generics (Generic1)
