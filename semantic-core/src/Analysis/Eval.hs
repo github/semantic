@@ -30,17 +30,16 @@ import Prelude hiding (fail)
 import Source.Span
 
 eval :: ( Carrier sig m
-        , Member (Reader Path) sig
         , Member (Reader Span) sig
         , MonadFail m
         , Semigroup value
         )
-     => Analysis (Term (Ann Path :+: Ann Span :+: Core) Name) address value m
-     -> (Term (Ann Path :+: Ann Span :+: Core) Name -> m value)
-     -> (Term (Ann Path :+: Ann Span :+: Core) Name -> m value)
+     => Analysis (Term (Ann Span :+: Core) Name) address value m
+     -> (Term (Ann Span :+: Core) Name -> m value)
+     -> (Term (Ann Span :+: Core) Name -> m value)
 eval Analysis{..} eval = \case
   Var n -> lookupEnv' n >>= deref' n
-  Term (R (R c)) -> case c of
+  Term (R c) -> case c of
     Rec (Named (Ignored n) b) -> do
       addr <- alloc n
       v <- bind n addr (eval (instantiate1 (pure n) b))
@@ -74,8 +73,7 @@ eval Analysis{..} eval = \case
       b' <- eval b
       addr <- ref a
       b' <$ assign addr b'
-  Term (R (L (Ann span c))) -> local (const span) (eval c)
-  Term (L (Ann path c)) -> local (const path) (eval c)
+  Term (L (Ann span c)) -> local (const span) (eval c)
   where freeVariable s = fail ("free variable: " <> s)
         uninitialized s = fail ("uninitialized variable: " <> s)
         invalidRef s = fail ("invalid ref: " <> s)
@@ -85,7 +83,7 @@ eval Analysis{..} eval = \case
 
         ref = \case
           Var n -> lookupEnv' n
-          Term (R (R c)) -> case c of
+          Term (R c) -> case c of
             If c t e -> do
               c' <- eval c >>= asBool
               if c' then ref t else ref e
@@ -93,8 +91,7 @@ eval Analysis{..} eval = \case
               a' <- ref a
               a' ... b >>= maybe (freeVariable (show b)) pure
             c -> invalidRef (show c)
-          Term (R (L (Ann span c))) -> local (const span) (ref c)
-          Term (L (Ann path c)) -> local (const path) (ref c)
+          Term (L (Ann span c)) -> local (const span) (ref c)
 
 
 prog1 :: (Carrier sig t, Member Core sig) => File (t Name)
