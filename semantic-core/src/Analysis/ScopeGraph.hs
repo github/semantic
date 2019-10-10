@@ -102,7 +102,7 @@ scopeGraphAnalysis
 scopeGraphAnalysis = Analysis{..}
   where alloc = pure
         bind name _ m = do
-          loc <- askLoc
+          loc <- Loc <$> ask <*> ask
           local (Map.insert name loc) m
         lookupEnv = pure . Just
         deref addr = do
@@ -136,6 +136,5 @@ scopeGraphAnalysis = Analysis{..}
         _ ... m = pure (Just m)
 
         askRef = Ref <$> ask <*> ask
-        askLoc = Loc <$> ask <*> ask
 
         extendBinding addr ref bindLoc = ScopeGraph (maybe Map.empty (\ (Loc path span) -> Map.singleton (Decl addr path span) (Set.singleton ref)) bindLoc)
