@@ -70,7 +70,6 @@ module Assigning.Assignment
 , MonadError(..)
 , MonadFail(..)
 , location
-, currentNode
 , symbol
 , rawSource
 , source
@@ -133,7 +132,6 @@ type Assignment grammar = Freer (Tracing (AssignmentF grammar))
 data AssignmentF grammar a where
   End :: AssignmentF grammar ()
   Loc :: AssignmentF grammar L.Loc
-  CurrentNode :: AssignmentF grammar (TermF [] (Node grammar) ())
   Source :: AssignmentF grammar ByteString
   Children :: Assignment grammar a -> AssignmentF grammar a
   Choose :: Table.Table grammar (Assignment grammar a) -> Maybe (Assignment grammar a) -> Maybe (Error (Either String grammar) -> Assignment grammar a) -> AssignmentF grammar a
@@ -168,10 +166,6 @@ getLocals = tracing GetLocals `Then` pure
 putLocals :: (HasCallStack, Enum grammar, Ix grammar) => [Text] -> Assignment grammar ()
 putLocals l = (tracing (PutLocals l) `Then` pure)
           <|> (tracing End `Then` pure)
-
--- | Zero-width production of the current node.
-currentNode :: HasCallStack => Assignment grammar (TermF [] (Node grammar) ())
-currentNode = tracing CurrentNode `Then` pure
 
 -- | Zero-width match of a node with the given symbol, producing the current node’s location.
 symbol :: (Enum grammar, Ix grammar, HasCallStack) => grammar -> Assignment grammar L.Loc
@@ -264,7 +258,6 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                   Loc -> yield (nodeLocation node) state
                   GetLocals -> yield stateLocals state
                   PutLocals l -> yield () (state { stateLocals = l })
-                  CurrentNode -> yield (In node (() <$ f)) state
                   Source -> yield (Source.bytes (Source.slice source (nodeByteRange node))) (advanceState state)
                   Children child -> do
                     (a, state') <- go child state { stateNodes = toList f, stateCallSites = maybe id (:) (tracingCallSite t) stateCallSites } >>= requireExhaustive (tracingCallSite t)
