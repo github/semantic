@@ -98,7 +98,7 @@ data Parser term where
   -- | A parser 'Unmarshal'ing to a precise AST type using a 'TS.Language'.
   UnmarshalParser :: Unmarshal t => Ptr TS.Language -> Parser (t Loc)
   -- | A parser producing an à la carte term given an 'AST'-producing parser and an 'Assignment' onto 'Term's in some syntax type.
-  AssignmentParser :: (Enum grammar, Ix grammar, Show grammar, TS.Symbol grammar, Syntax.Error :< fs, Apply Foldable fs, Apply Functor fs)
+  AssignmentParser :: (TS.Symbol grammar, Syntax.Error :< fs, Apply Foldable fs, Apply Functor fs)
                    => Ptr TS.Language                        -- ^ A parser producing AST.
                    -> Assignment grammar (Term (Sum fs) Loc) -- ^ An assignment from AST onto 'Term's.
                    -> Parser (Term (Sum fs) Loc)             -- ^ A parser producing 'Term's.

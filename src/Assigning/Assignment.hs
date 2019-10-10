@@ -229,7 +229,7 @@ firstSet = iterFreer (\ _ (Tracing _ assignment) -> case assignment of
 
 
 -- | Run an assignment over an AST exhaustively.
-assign :: (Enum grammar, Ix grammar, Symbol grammar, Show grammar)
+assign :: Symbol grammar
        => Source.Source           -- ^ The source for the parse tree.
        -> Assignment grammar a    -- ^ The 'Assignment to run.
        -> AST grammar             -- ^ The root of the ast.
@@ -238,7 +238,7 @@ assign source assignment ast = bimap (fmap (either id show)) fst (runAssignment 
 {-# INLINE assign #-}
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax over an AST exhaustively.
-runAssignment :: forall grammar a . (Enum grammar, Ix grammar, Symbol grammar)
+runAssignment :: forall grammar a . Symbol grammar
               => Source.Source                                             -- ^ The source for the parse tree.
               -> Assignment grammar a                                      -- ^ The 'Assignment' to run.
               -> State grammar                                             -- ^ The current state.
