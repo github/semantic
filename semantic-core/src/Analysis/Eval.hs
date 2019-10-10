@@ -35,12 +35,12 @@ eval :: ( Carrier sig m
         , MonadFail m
         , Semigroup value
         )
-     => Analysis (Term (Ann Loc :+: Core) Name) address value m
-     -> (Term (Ann Loc :+: Core) Name -> m value)
-     -> (Term (Ann Loc :+: Core) Name -> m value)
+     => Analysis (Term (Ann Path :+: Ann Span :+: Core) Name) address value m
+     -> (Term (Ann Path :+: Ann Span :+: Core) Name -> m value)
+     -> (Term (Ann Path :+: Ann Span :+: Core) Name -> m value)
 eval Analysis{..} eval = \case
   Var n -> lookupEnv' n >>= deref' n
-  Term (R c) -> case c of
+  Term (R (R c)) -> case c of
     Rec (Named (Ignored n) b) -> do
       addr <- alloc n
       v <- bind n addr (eval (instantiate1 (pure n) b))
@@ -74,7 +74,8 @@ eval Analysis{..} eval = \case
       b' <- eval b
       addr <- ref a
       b' <$ assign addr b'
-  Term (L (Ann (Loc p s) c)) -> local (const p) (local (const s) (eval c))
+  Term (R (L (Ann span c))) -> local (const span) (eval c)
+  Term (L (Ann path c)) -> local (const path) (eval c)
   where freeVariable s = fail ("free variable: " <> s)
         uninitialized s = fail ("uninitialized variable: " <> s)
         invalidRef s = fail ("invalid ref: " <> s)
@@ -84,7 +85,7 @@ eval Analysis{..} eval = \case
 
         ref = \case
           Var n -> lookupEnv' n
-          Term (R c) -> case c of
+          Term (R (R c)) -> case c of
             If c t e -> do
               c' <- eval c >>= asBool
               if c' then ref t else ref e
@@ -92,7 +93,8 @@ eval Analysis{..} eval = \case
               a' <- ref a
               a' ... b >>= maybe (freeVariable (show b)) pure
             c -> invalidRef (show c)
-          Term (L (Ann (Loc p s) c)) -> local (const p) (local (const s) (ref c))
+          Term (R (L (Ann span c))) -> local (const span) (ref c)
+          Term (L (Ann path c)) -> local (const path) (ref c)
 
 
 prog1 :: (Carrier sig t, Member Core sig) => File (t Name)
