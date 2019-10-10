@@ -53,13 +53,13 @@ instance ( Carrier sig m
     AssignmentParser language assignment -> do
       taskSession <- ask
       let requestID' = ("github_request_id", requestID taskSession)
-      let isPublic'  = ("github_is_public", show (isPublic taskSession))
-      let logPrintFlag = configLogPrintSource . config $ taskSession
-      let blobFields = ("path", if isPublic taskSession || Flag.toBool LogPrintSource logPrintFlag then blobPath blob else "<filtered>")
-      let logFields = requestID' : isPublic' : blobFields : languageTag
-      let shouldFailForTesting = configFailParsingForTesting $ config taskSession
-      let shouldFailOnParsing = optionsFailOnParseError . configOptions $ config taskSession
-      let shouldFailOnWarning = optionsFailOnWarning . configOptions $ config taskSession
+          isPublic'  = ("github_is_public", show (isPublic taskSession))
+          logPrintFlag = configLogPrintSource . config $ taskSession
+          blobFields = ("path", if isPublic taskSession || Flag.toBool LogPrintSource logPrintFlag then blobPath blob else "<filtered>")
+          logFields = requestID' : isPublic' : blobFields : languageTag
+          shouldFailForTesting = configFailParsingForTesting $ config taskSession
+          shouldFailOnParsing = optionsFailOnParseError . configOptions $ config taskSession
+          shouldFailOnWarning = optionsFailOnWarning . configOptions $ config taskSession
 
       ast <- time "parse.tree_sitter_ast_parse" languageTag $ do
         config <- asks config
