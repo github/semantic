@@ -17,6 +17,7 @@ data SemanticAST = SemanticAST
   { sourceFilePath      :: Input
   , format              :: Format
   }
+  } deriving (Read)
 
 parseAST :: Parser SemanticAST
 parseAST = SemanticAST
@@ -54,6 +55,7 @@ data Format = Show
 data Input
   = FileInput FilePath
   | StdInput
+  deriving (Read)
 
 input :: Parser Input
 input = fileInput <|> stdInput
