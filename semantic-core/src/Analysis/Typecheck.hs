@@ -10,7 +10,7 @@ module Analysis.Typecheck
 import           Analysis.Eval
 import           Analysis.FlowInsensitive
 import           Control.Applicative (Alternative (..))
-import           Control.Carrier.Fail.WithFile
+import           Control.Carrier.Fail.WithLoc
 import           Control.Effect.Carrier
 import           Control.Effect.Fresh as Fresh
 import           Control.Effect.Reader hiding (Local)

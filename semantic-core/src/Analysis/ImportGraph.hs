@@ -8,7 +8,7 @@ module Analysis.ImportGraph
 import           Analysis.Eval
 import           Analysis.FlowInsensitive
 import           Control.Applicative (Alternative(..))
-import           Control.Carrier.Fail.WithFile
+import           Control.Carrier.Fail.WithLoc
 import           Control.Effect
 import           Control.Effect.Fresh
 import           Control.Effect.Reader

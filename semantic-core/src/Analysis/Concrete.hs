@@ -13,7 +13,7 @@ import qualified Algebra.Graph as G
 import qualified Algebra.Graph.Export.Dot as G
 import           Analysis.Eval
 import           Control.Applicative (Alternative (..))
-import           Control.Carrier.Fail.WithFile
+import           Control.Carrier.Fail.WithLoc
 import           Control.Effect
 import           Control.Effect.Fresh
 import           Control.Effect.NonDet
