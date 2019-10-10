@@ -105,10 +105,12 @@ runParser blob@Blob{..} parser = case parser of
         throwError (SomeException AssignmentTimedOut)
   where languageTag = [("language" :: String, show (blobLanguage blob))]
 
+
 data ParserCancelled = ParserTimedOut | AssignmentTimedOut
   deriving (Show, Typeable)
 
 instance Exception ParserCancelled
+
 
 errors :: (Syntax.Error :< fs, Apply Foldable fs, Apply Functor fs) => Term (Sum fs) Assignment.Loc -> [Error.Error String]
 errors = cata $ \ (In Assignment.Loc{..} syntax) ->
