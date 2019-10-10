@@ -6,7 +6,7 @@ module Core.Term
 
 import Control.Effect.Carrier
 import Control.Monad (ap)
-import Control.Monad.Module
+import Syntax.Module
 
 data Term sig a
   = Var a

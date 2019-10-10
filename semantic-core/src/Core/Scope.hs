@@ -19,10 +19,10 @@ module Core.Scope
 import Control.Applicative (liftA2)
 import Control.Effect.Carrier
 import Control.Monad ((>=>), guard)
-import Control.Monad.Module
 import Control.Monad.Trans.Class
 import Core.Stack
 import Data.Function (on)
+import Syntax.Module
 
 data Incr a b
   = Z a

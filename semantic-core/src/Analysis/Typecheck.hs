@@ -16,7 +16,6 @@ import           Control.Effect.Fresh as Fresh
 import           Control.Effect.Reader hiding (Local)
 import           Control.Effect.State
 import           Control.Monad ((>=>), unless)
-import           Control.Monad.Module
 import           Core.File
 import           Core.Loc
 import           Core.Name as Name
@@ -38,6 +37,7 @@ import           Data.Void
 import           GHC.Generics (Generic1)
 import           Prelude hiding (fail)
 import           Source.Span
+import           Syntax.Module
 
 data Monotype f a
   = Bool

@@ -37,7 +37,6 @@ module Core.Core
 
 import Control.Applicative (Alternative (..))
 import Control.Effect.Carrier
-import Control.Monad.Module
 import Core.Loc
 import Core.Name
 import Core.Scope
@@ -51,6 +50,7 @@ import Data.Text (Text)
 import GHC.Generics (Generic1)
 import GHC.Stack
 import Source.Span
+import Syntax.Module
 
 data Core f a
   -- | Recursive local binding of a name in a scope; strict evaluation of the name in the body will diverge.
