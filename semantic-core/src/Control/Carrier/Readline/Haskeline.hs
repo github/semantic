@@ -19,6 +19,7 @@ import Control.Effect.Carrier
 import Control.Effect.Lift
 import Control.Effect.Reader
 import Control.Effect.Readline hiding (Carrier)
+import Control.Monad.Fix
 import Control.Monad.IO.Unlift
 import Control.Monad.Trans.Class
 import Data.Text.Prettyprint.Doc.Render.Text
@@ -44,7 +45,7 @@ runReadlineWithHistory block = do
   runReadline prefs settings block
 
 newtype ReadlineC m a = ReadlineC { runReadlineC :: ReaderC Line (LiftC (InputT m)) a }
-  deriving (Applicative, Functor, Monad, MonadIO)
+  deriving (Applicative, Functor, Monad, MonadFix, MonadIO)
 
 instance (MonadException m, MonadIO m) => Carrier (Readline :+: Lift (InputT m)) (ReadlineC m) where
   eff (L (Prompt prompt k)) = ReadlineC $ do
@@ -59,7 +60,7 @@ instance (MonadException m, MonadIO m) => Carrier (Readline :+: Lift (InputT m))
 
 -- | This exists to work around the 'MonadException' constraint that haskeline entails.
 newtype ControlIOC m a = ControlIOC { runControlIO :: m a }
-  deriving (Applicative, Functor, Monad, MonadIO)
+  deriving (Applicative, Functor, Monad, MonadFix, MonadIO)
 
 instance MonadUnliftIO m => MonadUnliftIO (ControlIOC m) where
   withRunInIO inner = ControlIOC $ withRunInIO $ \ go -> inner (go . runControlIO)
