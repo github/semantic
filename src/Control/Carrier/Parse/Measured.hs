@@ -95,6 +95,12 @@ instance ( Carrier sig m
           writeLog Error "assignment timeout" (("task", "assign") : logFields)
           throwError (SomeException AssignmentTimedOut)
     where languageTag = [("language" :: String, show (blobLanguage blob))]
+
+          logError TaskSession{..} level blob err =
+            let shouldLogSource = configLogPrintSource config
+                shouldColorize = Flag.switch IsTerminal Error.Colourize $ configIsTerminal config
+            in writeLog level (Error.formatError shouldLogSource shouldColorize blob err)
+
   eff (R other) = ParseC (eff (handleCoercible other))
 
 
@@ -107,17 +113,3 @@ instance Exception AssignmentTimedOut
 errors :: (Syntax.Error :< fs, Apply Foldable fs, Apply Functor fs) => Term (Sum fs) Assignment.Loc -> [Error.Error String]
 errors = cata $ \ (In Assignment.Loc{..} syntax) ->
   maybe (fold syntax) (pure . Syntax.unError span) (project syntax)
-
-
--- | Log an 'Error.Error' at the specified 'Level'.
-logError :: (Member Telemetry sig, Carrier sig m)
-         => TaskSession
-         -> Level
-         -> Blob
-         -> Error.Error String
-         -> [(String, String)]
-         -> m ()
-logError TaskSession{..} level blob err =
-  let shouldLogSource = configLogPrintSource config
-      shouldColorize = Flag.switch IsTerminal Error.Colourize $ configIsTerminal config
-  in writeLog level (Error.formatError shouldLogSource shouldColorize blob err)
