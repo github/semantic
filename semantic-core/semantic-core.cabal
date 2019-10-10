@@ -87,7 +87,7 @@ test-suite doctest
     , QuickCheck
     , semantic-core
 
-test-suite spec
+test-suite test
   import: common
   type:           exitcode-stdio-1.0
   hs-source-dirs: test
