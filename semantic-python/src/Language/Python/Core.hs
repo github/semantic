@@ -5,7 +5,6 @@
 module Language.Python.Core
 ( toplevelCompile
 , Bindings
-, SourcePath
 ) where
 
 import Prelude hiding (fail)
@@ -21,15 +20,9 @@ import           Data.Foldable
 import           Data.Name as Name
 import           Data.Stack (Stack)
 import qualified Data.Stack as Stack
-import           Data.String (IsString)
-import           Data.Text (Text)
 import           GHC.Records
 import           Source.Span (Span)
 import qualified TreeSitter.Python.AST as Py
-
--- | Access to the current filename as Text to stick into location annotations.
-newtype SourcePath = SourcePath { rawPath :: Text }
-  deriving (Eq, IsString, Show)
 
 -- | Keeps track of the current scope's bindings (so that we can, when
 -- compiling a class or module, return the list of bound variables as
@@ -64,7 +57,6 @@ class Compile (py :: * -> *) where
   -- FIXME: rather than failing the compilation process entirely
   -- with MonadFail, we should emit core that represents failure
   compile :: ( CoreSyntax syn t
-             , Member (Reader SourcePath) sig
              , Member (Reader Bindings) sig
              , Carrier sig m
              , MonadFail m
@@ -77,7 +69,6 @@ class Compile (py :: * -> *) where
   compile a _ _ = defaultCompile a
 
 toplevelCompile :: ( CoreSyntax syn t
-                   , Member (Reader SourcePath) sig
                    , Member (Reader Bindings) sig
                    , Carrier sig m
                    , MonadFail m
@@ -137,7 +128,7 @@ data Located a = Located Span a
 -- Desugaring an RHS involves walking as deeply as possible into an
 -- assignment, storing the names we encounter as we go and eventually
 -- returning a terminal expression. We have to keep track of which
-desugar :: (Member (Reader SourcePath) sig, Carrier sig m, MonadFail m)
+desugar :: MonadFail m
         => [Located Name]
         -> RHS Span
         -> m ([Located Name], Desugared Span)
@@ -170,7 +161,7 @@ instance Compile Py.Assignment where
     , ann
     } cc next = do
     (names, val) <- desugar [Located ann name] rhs
-    compile val pure next >>= foldr collapseDesugared (const cc) names >>= locate it
+    compile val pure next >>= foldr collapseDesugared cc names >>= locate it
 
   compile other _ _ = fail ("Unhandled assignment case: " <> show other)
 

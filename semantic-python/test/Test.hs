@@ -25,7 +25,6 @@ import           Data.Loc
 import           Data.Maybe
 import           Data.Name
 import           Data.Term
-import           Data.String (fromString)
 import           GHC.Stack
 import qualified Language.Python.Core as Py
 import           Prelude hiding (fail)
@@ -96,7 +95,6 @@ fixtureTestTreeForFile fp = HUnit.testCaseSteps (Path.toString fp) $ \step -> wi
   result <- ByteString.readFile (Path.toString fullPath) >>= TS.parseByteString TSP.tree_sitter_python
   let coreResult = Control.Effect.run
                    . runFail
-                   . runReader (fromString @Py.SourcePath . Path.toString $ fp)
                    . runReader @Py.Bindings mempty
                    . Py.toplevelCompile
                    <$> result
