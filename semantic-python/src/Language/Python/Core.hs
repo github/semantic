@@ -3,7 +3,7 @@
              PatternSynonyms, StandaloneDeriving, TypeApplications, TypeOperators, ViewPatterns #-}
 
 module Language.Python.Core
-( compile
+( toplevelCompile
 , Bindings
 , SourcePath
 ) where
@@ -64,34 +64,33 @@ type CoreSyntax sig t = ( Member Core sig
 class Compile (py :: * -> *) where
   -- FIXME: rather than failing the compilation process entirely
   -- with MonadFail, we should emit core that represents failure
-  compileCC :: ( CoreSyntax syn t
-               , Member (Reader SourcePath) sig
-               , Member (Reader Bindings) sig
-               , Carrier sig m
-               , MonadFail m
-               )
-            => py Span
-            -> m (t Name)
-            -> m (t Name)
+  compile :: ( CoreSyntax syn t
+             , Member (Reader SourcePath) sig
+             , Member (Reader Bindings) sig
+             , Carrier sig m
+             , MonadFail m
+             )
+          => py Span
+          -> m (t Name)
+          -> m (t Name)
 
-  default compileCC :: (MonadFail m, Show (py Span)) => py Span -> m (t Name) -> m (t Name)
-  compileCC a _ = defaultCompile a
+  default compile :: (MonadFail m, Show (py Span)) => py Span -> m (t Name) -> m (t Name)
+  compile a _ = defaultCompile a
+
+toplevelCompile :: ( CoreSyntax syn t
+                   , Member (Reader SourcePath) sig
+                   , Member (Reader Bindings) sig
+                   , Carrier sig m
+                   , MonadFail m
+                   )
+                => Py.Module Span
+                -> m (t Name)
+toplevelCompile = flip compile (pure none)
 
 -- | TODO: This is not right, it should be a reference to a Preluded
 -- NoneType instance, but it will do for now.
 none :: (Member Core sig, Carrier sig t) => t Name
 none = unit
-
-compile :: ( Compile py
-           , CoreSyntax syn t
-           , Member (Reader SourcePath) sig
-           , Member (Reader Bindings) sig
-           , Carrier sig m
-           , MonadFail m
-           )
-        => py Span
-        -> m (t Name)
-compile t = compileCC t (pure none)
 
 locFromTSSpan :: SourcePath -> Span -> Loc
 locFromTSSpan fp = Data.Loc.Loc (rawPath fp)
@@ -113,8 +112,8 @@ defaultCompile t = fail $ "compilation unimplemented for " <> show t
 
 
 instance (Compile l, Compile r) => Compile (l :+: r) where
-  compileCC (L1 l) cc = compileCC l cc
-  compileCC (R1 r) cc = compileCC r cc
+  compile (L1 l) cc = compile l cc
+  compile (R1 r) cc = compile r cc
 
 instance Compile Py.AssertStatement
 instance Compile Py.Attribute
@@ -174,16 +173,17 @@ collapseDesugared (Located loc n) cont rem =
   in assigning (local (def n) (cont (pure n))) -- gotta call local here to record this assignment
 
 instance Compile Py.Assignment where
-  compileCC it@Py.Assignment
+  compile it@Py.Assignment
     { left = SingleIdentifier name
     , right = Just rhs
     , ann
     } cc = do
     p <- ask @SourcePath
     (names, val) <- desugar [Located (locFromTSSpan p ann) name] rhs
-    compile val >>= foldr collapseDesugared (const cc) names >>= locate it
+    -- BUG: ignoring the continuation here
+    compile val (pure none) >>= foldr collapseDesugared (const cc) names >>= locate it
 
-  compileCC other _ = fail ("Unhandled assignment case: " <> show other)
+  compile other _ = fail ("Unhandled assignment case: " <> show other)
 
 -- End assignment compilation
 
@@ -192,7 +192,7 @@ instance Compile Py.Await
 instance Compile Py.BinaryOperator
 
 instance Compile Py.Block where
-  compileCC it@Py.Block{ Py.extraChildren = body} cc = locate it =<< foldr compileCC cc body
+  compile it@Py.Block{ Py.extraChildren = body} cc = locate it =<< foldr compile cc body
 
 instance Compile Py.BooleanOperator
 instance Compile Py.BreakStatement
@@ -215,33 +215,33 @@ instance Compile Py.ExecStatement
 deriving instance Compile Py.Expression
 
 instance Compile Py.ExpressionStatement where
-  compileCC it@Py.ExpressionStatement
+  compile it@Py.ExpressionStatement
     { Py.extraChildren = children
     } cc = do
-    foldr compileCC cc children >>= locate it
+    foldr compile cc children >>= locate it
 
 instance Compile Py.ExpressionList where
-  compileCC it@Py.ExpressionList { Py.extraChildren = [child] } cc
-    = compileCC child cc >>= locate it
-  compileCC Py.ExpressionList { Py.extraChildren = items } _
+  compile it@Py.ExpressionList { Py.extraChildren = [child] } cc
+    = compile child cc >>= locate it
+  compile Py.ExpressionList { Py.extraChildren = items } _
     = fail ("unimplemented: ExpressionList of length " <> show items)
 
 
 instance Compile Py.False where
-  compileCC it _ = locate it $ bool False
+  compile it _ = locate it $ bool False
 
 instance Compile Py.Float
 instance Compile Py.ForStatement
 
 instance Compile Py.FunctionDefinition where
-  compileCC it@Py.FunctionDefinition
+  compile it@Py.FunctionDefinition
     { name       = Py.Identifier _ann1 name
     , parameters = Py.Parameters _ann2 parameters
     , body
     } cc = do
       -- Compile each of the parameters, then the body.
       parameters' <- traverse param parameters
-      body' <- compile body
+      body' <- compile body (pure none)
       -- Build a lambda.
       located <- locate it (lams parameters' body')
       -- Give it a name (below), then augment the current continuation
@@ -258,14 +258,17 @@ instance Compile Py.GeneratorExpression
 instance Compile Py.GlobalStatement
 
 instance Compile Py.Identifier where
-  compileCC Py.Identifier { text } _ = pure . pure . Name $ text
+  compile Py.Identifier { text } _ = pure . pure . Name $ text
 
 instance Compile Py.IfStatement where
-  compileCC it@Py.IfStatement{ condition, consequence, alternative} cc =
-    locate it =<< (if' <$> compile condition <*> compileCC consequence cc <*> foldr clause cc alternative)
-    where clause (R1 Py.ElseClause{ body }) _ = compileCC body cc
+  compile it@Py.IfStatement{ condition, consequence, alternative} cc =
+    locate it =<< if'
+    <$> compile condition (pure none)
+    <*> compile consequence cc
+    <*> foldr clause cc alternative
+    where clause (R1 Py.ElseClause{ body }) _ = compile body cc
           clause (L1 Py.ElifClause{ condition, consequence }) rest  =
-            if' <$> compile condition <*> compileCC consequence cc <*> rest
+            if' <$> compile condition (pure none) <*> compile consequence cc <*> rest
 
 
 instance Compile Py.ImportFromStatement
@@ -276,8 +279,8 @@ instance Compile Py.List
 instance Compile Py.ListComprehension
 
 instance Compile Py.Module where
-  compileCC it@Py.Module { Py.extraChildren = stmts } _cc = do
-    -- This action gets passed to compileCC, which means it is the
+  compile it@Py.Module { Py.extraChildren = stmts } _cc = do
+    -- This action gets passed to compile, which means it is the
     -- final action taken after the compiling fold finishes. It takes
     -- care of listening for the current set of bound variables (which
     -- is augmented by assignments and function definitions) and
@@ -286,7 +289,7 @@ instance Compile Py.Module where
           bindings <- asks @Bindings (toList . unBindings)
           let buildName n = (n, pure n)
           pure . record . fmap buildName $ bindings
-    foldr compileCC buildRecord stmts >>= locate it
+    foldr compile buildRecord stmts >>= locate it
 
 instance Compile Py.NamedExpression
 instance Compile Py.None
@@ -295,16 +298,17 @@ instance Compile Py.NotOperator
 instance Compile Py.ParenthesizedExpression
 
 instance Compile Py.PassStatement where
-  compileCC it@Py.PassStatement {} _ = locate it $ Core.unit
+  compile it@Py.PassStatement {} _ = locate it $ Core.unit
 
 deriving instance Compile Py.PrimaryExpression
 
 instance Compile Py.PrintStatement
 
 instance Compile Py.ReturnStatement where
-  compileCC it@Py.ReturnStatement { Py.extraChildren = vals } _ = case vals of
+  compile it@Py.ReturnStatement { Py.extraChildren = vals } _ = case vals of
     Nothing -> locate it $ none
-    Just Py.ExpressionList { extraChildren = [val] } -> compile val >>= locate it
+    -- BUG: ignoring the continuation here
+    Just Py.ExpressionList { extraChildren = [val] } -> compile val (pure none) >>= locate it
     Just Py.ExpressionList { extraChildren = vals  } -> fail ("unimplemented: return statement returning " <> show (length vals) <> " values")
 
 
@@ -318,14 +322,14 @@ instance Compile Py.String
 instance Compile Py.Subscript
 
 instance Compile Py.True where
-  compileCC it _ = locate it $ bool True
+  compile it _ = locate it $ bool True
 
 instance Compile Py.TryStatement
 
 instance Compile Py.Tuple where
-  compileCC it@Py.Tuple { Py.extraChildren = [] } _ = locate it unit
+  compile it@Py.Tuple { Py.extraChildren = [] } _ = locate it unit
 
-  compileCC it _
+  compile it _
     = fail ("Unimplemented: non-empty tuple " <> show it)
 
 instance Compile Py.UnaryOperator
