@@ -241,7 +241,6 @@ instance Compile Py.FunctionDefinition where
     } cc = do
       -- Compile each of the parameters, then the body.
       parameters' <- traverse param parameters
-      -- BUG: ignoring the continuation here
       body' <- compile body (pure none)
       -- Build a lambda.
       located <- locate it (lams parameters' body')
@@ -263,11 +262,10 @@ instance Compile Py.Identifier where
 
 instance Compile Py.IfStatement where
   compile it@Py.IfStatement{ condition, consequence, alternative} cc =
-    locate it =<< (if'
-                    <$> compile condition (pure none)
-                    <*> compile consequence cc
-                    <*> foldr clause cc alternative
-                  )
+    locate it =<< if'
+    <$> compile condition (pure none)
+    <*> compile consequence cc
+    <*> foldr clause cc alternative
     where clause (R1 Py.ElseClause{ body }) _ = compile body cc
           clause (L1 Py.ElifClause{ condition, consequence }) rest  =
             if' <$> compile condition (pure none) <*> compile consequence cc <*> rest
