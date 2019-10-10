@@ -4,8 +4,7 @@ module Core.File
 , fromBody
 ) where
 
-import Core.Loc
-import Data.Maybe (fromJust)
+import Data.Maybe (fromJust, listToMaybe)
 import GHC.Stack
 import Source.Span
 import qualified System.Path as Path
@@ -18,5 +17,5 @@ data File a = File
   deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
 
 fromBody :: HasCallStack => a -> File a
-fromBody body = File path span body where
-  (path, span) = fromJust (stackLoc callStack)
+fromBody body = File (Path.absRel (srcLocFile srcLoc)) (spanFromSrcLoc srcLoc) body where
+  srcLoc = snd (fromJust (listToMaybe (getCallStack callStack)))
