@@ -1,5 +1,4 @@
 {-# LANGUAGE DataKinds, GADTs, InstanceSigs, MultiParamTypeClasses, RankNTypes, ScopedTypeVariables, StandaloneDeriving, TypeFamilies, TypeOperators #-}
-{-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For HasCallStack
 -- | Assignment of AST onto some other structure (typically terms).
 --
 --   Parsing yields an AST represented as a Rose tree labelled with symbols in the language’s grammar and source locations (byte Range and Span). An Assignment represents a (partial) map from AST nodes onto some other structure; in essence, it’s a parser that operates over trees. (For our purposes, this structure is typically Terms annotated with source locations.) Assignments are able to match based on symbol, sequence, and hierarchy; thus, in @x = y@, both @x@ and @y@ might have the same symbol, @Identifier@, the left can be assigned to a variable declaration, while the right can be assigned to a variable reference.
@@ -110,11 +109,11 @@ import Text.Parser.Combinators as Parsers hiding (choice)
 import TreeSitter.Language
 
 -- | Match a branch node, matching its children with the supplied 'Assignment' & returning the result.
-branchNode :: (Enum grammar, Ix grammar) => grammar -> Assignment grammar a -> Assignment grammar a
+branchNode :: Enum grammar => grammar -> Assignment grammar a -> Assignment grammar a
 branchNode sym child = symbol sym *> children child
 
 -- | Match a leaf node, returning the corresponding 'Text'.
-leafNode :: (Enum grammar, Ix grammar) => grammar -> Assignment grammar Text
+leafNode :: Enum grammar => grammar -> Assignment grammar Text
 leafNode sym = symbol sym *> source
 
 -- | Wrap an 'Assignment' producing @syntax@ up into an 'Assignment' producing 'Term's.
@@ -168,7 +167,7 @@ putLocals l = (tracing (PutLocals l) `Then` pure)
           <|> (tracing End `Then` pure)
 
 -- | Zero-width match of a node with the given symbol, producing the current node’s location.
-symbol :: (Enum grammar, Ix grammar, HasCallStack) => grammar -> Assignment grammar L.Loc
+symbol :: (Enum grammar, HasCallStack) => grammar -> Assignment grammar L.Loc
 symbol s = tracing (Choose (Table.singleton s location) Nothing Nothing) `Then` pure
 
 -- | A rule to produce a node’s source as a ByteString.
@@ -207,12 +206,12 @@ choice alternatives
         mergeHandlers hs = Just (\ err -> asum (hs <*> [err]))
 
 -- | Match and advance past a node with the given symbol.
-token :: (Enum grammar, Ix grammar, HasCallStack) => grammar -> Assignment grammar L.Loc
+token :: (Enum grammar, HasCallStack) => grammar -> Assignment grammar L.Loc
 token s = symbol s <* advance
 
 
 -- | Match the first operand until the second operand matches, returning both results. Like 'manyTill', but returning the terminal value.
-manyThrough :: (Alternative m, HasCallStack) => m a -> m b -> m ([a], b)
+manyThrough :: Alternative m => m a -> m b -> m ([a], b)
 manyThrough step stop = go
   where go = (,) [] <$> stop <|> first . (:) <$> step <*> go
 
@@ -321,7 +320,7 @@ instance (Enum grammar, Ix grammar) => Alternative (Assignment grammar) where
   empty :: HasCallStack => Assignment grammar a
   empty = tracing (Alt []) `Then` pure
 
-  (<|>) :: forall a. HasCallStack => Assignment grammar a -> Assignment grammar a -> Assignment grammar a
+  (<|>) :: forall a. Assignment grammar a -> Assignment grammar a -> Assignment grammar a
   Return a <|> _ = Return a
   l@(Tracing cs _ `Then` _) <|> r@Return{} = Tracing cs (Alt [l, r]) `Then` id
   l@(Tracing callSiteL la `Then` continueL) <|> r@(Tracing callSiteR ra `Then` continueR) = go callSiteL la continueL callSiteR ra continueR
@@ -352,20 +351,16 @@ instance (Enum grammar, Ix grammar, Show grammar) => Parsing (Assignment grammar
   (<?>) :: HasCallStack => Assignment grammar a -> String -> Assignment grammar a
   a <?> s = tracing (Label a s) `Then` pure
 
-  unexpected :: HasCallStack => String -> Assignment grammar a
   unexpected = fail
 
   eof :: HasCallStack => Assignment grammar ()
   eof = tracing End `Then` pure
 
-  notFollowedBy :: (HasCallStack, Show a) => Assignment grammar a -> Assignment grammar ()
   notFollowedBy a = (a >>= unexpected . show) <|> pure ()
 
 instance (Enum grammar, Ix grammar, Show grammar) => MonadError (Error (Either String grammar)) (Assignment grammar) where
-  throwError :: HasCallStack => Error (Either String grammar) -> Assignment grammar a
   throwError err = fail (show err)
 
-  catchError :: HasCallStack => Assignment grammar a -> (Error (Either String grammar) -> Assignment grammar a) -> Assignment grammar a
   catchError rule handler = iterFreer (\ continue (Tracing cs assignment) -> case assignment of
     Choose choices atEnd Nothing -> Tracing cs (Choose (fmap (>>= continue) choices) (fmap (>>= continue) atEnd) (Just handler)) `Then` pure
     Choose choices atEnd (Just onError) -> Tracing cs (Choose (fmap (>>= continue) choices) (fmap (>>= continue) atEnd) (Just (\ err -> (onError err >>= continue) <|> handler err))) `Then` pure
