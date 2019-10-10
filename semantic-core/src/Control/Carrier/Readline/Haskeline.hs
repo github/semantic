@@ -19,7 +19,7 @@ import Control.Effect.Readline hiding (Carrier)
 import Control.Monad.Fix
 import Control.Monad.IO.Unlift
 import Data.Coerce
-import Data.Text.Prettyprint.Doc.Render.Text
+import Data.Text.Prettyprint.Doc.Render.Terminal
 import System.Console.Haskeline hiding (Handler, handle)
 import System.Directory
 import System.FilePath
