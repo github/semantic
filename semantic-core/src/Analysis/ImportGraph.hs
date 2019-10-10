@@ -15,7 +15,6 @@ import           Control.Effect.Reader
 import           Control.Effect.State
 import           Control.Monad ((>=>))
 import           Core.File
-import           Core.Loc
 import           Core.Name
 import           Data.Foldable (fold, for_)
 import           Data.Function (fix)
@@ -26,6 +25,7 @@ import qualified Data.Set as Set
 import           Data.Text (Text)
 import           Prelude hiding (fail)
 import           Source.Span
+import qualified System.Path as Path
 
 type ImportGraph = Map.Map Text (Set.Set Text)
 
@@ -42,7 +42,7 @@ instance Monoid (Value term) where
   mempty = Value Abstract mempty
 
 data Semi term
-  = Closure Path Span Name term
+  = Closure Path.AbsRelFile Span Name term
   -- FIXME: Bound String values.
   | String Text
   | Abstract
@@ -52,14 +52,14 @@ data Semi term
 importGraph
   :: (Ord term, Show term)
   => (forall sig m
-     .  (Carrier sig m, Member (Reader Path) sig, Member (Reader Span) sig, MonadFail m)
+     .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
      => Analysis term Name (Value term) m
      -> (term -> m (Value term))
      -> (term -> m (Value term))
      )
   -> [File term]
   -> ( Heap Name (Value term)
-     , [File (Either (Path, Span, String) (Value term))]
+     , [File (Either (Path.AbsRelFile, Span, String) (Value term))]
      )
 importGraph eval
   = run
@@ -76,13 +76,13 @@ runFile
      , Show term
      )
   => (forall sig m
-     .  (Carrier sig m, Member (Reader Path) sig, Member (Reader Span) sig, MonadFail m)
+     .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
      => Analysis term Name (Value term) m
      -> (term -> m (Value term))
      -> (term -> m (Value term))
      )
   -> File term
-  -> m (File (Either (Path, Span, String) (Value term)))
+  -> m (File (Either (Path.AbsRelFile, Span, String) (Value term)))
 runFile eval file = traverse run file
   where run = runReader (filePath file)
             . runReader (fileSpan file)
@@ -93,7 +93,7 @@ runFile eval file = traverse run file
 -- FIXME: decompose into a product domain and two atomic domains
 importGraphAnalysis :: ( Alternative m
                        , Carrier sig m
-                       , Member (Reader Path) sig
+                       , Member (Reader Path.AbsRelFile) sig
                        , Member (Reader Span) sig
                        , Member (State (Heap Name (Value term))) sig
                        , MonadFail m

@@ -28,6 +28,7 @@ import Prelude hiding (fail)
 import Source.Span
 import Syntax.Scope
 import Syntax.Term
+import qualified System.Path as Path
 
 eval :: ( Carrier sig m
         , Member (Reader Span) sig
@@ -130,9 +131,9 @@ prog5 = fromBody $ ann (do'
 
 prog6 :: (Carrier sig t, Member Core sig) => [File (t Name)]
 prog6 =
-  [ File (Path "dep")  (snd (fromJust here)) $ Core.record
+  [ File (Path.absRel "dep")  (snd (fromJust here)) $ Core.record
     [ ("dep", Core.record [ ("var", Core.bool True) ]) ]
-  , File (Path "main") (snd (fromJust here)) $ do' (map (Nothing :<-)
+  , File (Path.absRel "main") (snd (fromJust here)) $ do' (map (Nothing :<-)
     [ load (Core.string "dep")
     , Core.record [ ("thing", pure "dep" Core.... "var") ]
     ])

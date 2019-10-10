@@ -8,9 +8,10 @@ import Core.Loc
 import Data.Maybe (fromJust)
 import GHC.Stack
 import Source.Span
+import qualified System.Path as Path
 
 data File a = File
-  { filePath :: !Path
+  { filePath :: !Path.AbsRelFile
   , fileSpan :: {-# UNPACK #-} !Span
   , fileBody :: !a
   }

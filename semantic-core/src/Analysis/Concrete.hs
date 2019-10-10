@@ -21,7 +21,6 @@ import           Control.Effect.Reader hiding (Local)
 import           Control.Effect.State
 import           Control.Monad ((<=<), guard)
 import           Core.File
-import           Core.Loc
 import           Core.Name
 import           Data.Function (fix)
 import qualified Data.IntMap as IntMap
@@ -33,6 +32,7 @@ import           Data.Text (Text, pack)
 import           Data.Traversable (for)
 import           Prelude hiding (fail)
 import           Source.Span
+import qualified System.Path as Path
 
 type Precise = Int
 type Env = Map.Map Name Precise
@@ -41,7 +41,7 @@ newtype FrameId = FrameId { unFrameId :: Precise }
   deriving (Eq, Ord, Show)
 
 data Concrete term
-  = Closure Path Span Name term Env
+  = Closure Path.AbsRelFile Span Name term Env
   | Unit
   | Bool Bool
   | String Text
@@ -67,18 +67,18 @@ data Edge = Lexical | Import
 
 -- | Concrete evaluation of a term to a value.
 --
---   >>> map fileBody (snd (concrete eval [File (Path "bool") (Span (Pos 1 1) (Pos 1 5)) (Core.bool True)]))
+--   >>> map fileBody (snd (concrete eval [File (Path.AbsRelFile "bool") (Span (Pos 1 1) (Pos 1 5)) (Core.bool True)]))
 --   [Right (Bool True)]
 concrete
   :: (Foldable term, Show (term Name))
   => (forall sig m
-     .  (Carrier sig m, Member (Reader Path) sig, Member (Reader Span) sig, MonadFail m)
+     .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
      => Analysis (term Name) Precise (Concrete (term Name)) m
      -> (term Name -> m (Concrete (term Name)))
      -> (term Name -> m (Concrete (term Name)))
      )
   -> [File (term Name)]
-  -> (Heap (term Name), [File (Either (Path, Span, String) (Concrete (term Name)))])
+  -> (Heap (term Name), [File (Either (Path.AbsRelFile, Span, String) (Concrete (term Name)))])
 concrete eval
   = run
   . runFresh
@@ -94,13 +94,13 @@ runFile
      , Show (term Name)
      )
   => (forall sig m
-     .  (Carrier sig m, Member (Reader Path) sig, Member (Reader Span) sig, MonadFail m)
+     .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
      => Analysis (term Name) Precise (Concrete (term Name)) m
      -> (term Name -> m (Concrete (term Name)))
      -> (term Name -> m (Concrete (term Name)))
      )
   -> File (term Name)
-  -> m (File (Either (Path, Span, String) (Concrete (term Name))))
+  -> m (File (Either (Path.AbsRelFile, Span, String) (Concrete (term Name))))
 runFile eval file = traverse run file
   where run = runReader (filePath file)
             . runReader (fileSpan file)
@@ -112,7 +112,7 @@ concreteAnalysis :: ( Carrier sig m
                     , Foldable term
                     , Member Fresh sig
                     , Member (Reader Env) sig
-                    , Member (Reader Path) sig
+                    , Member (Reader Path.AbsRelFile) sig
                     , Member (Reader Span) sig
                     , Member (State (Heap (term Name))) sig
                     , MonadFail m
@@ -209,7 +209,7 @@ addressStyle heap = (G.defaultStyle vertex) { G.edgeAttributes }
           Unit ->  "()"
           Bool b -> pack $ show b
           String s -> pack $ show s
-          Closure p (Span s e) n _ _ -> "\\\\ " <> unName n <> " [" <> getPath p <> ":" <> showPos s <> "-" <> showPos e <> "]"
+          Closure p (Span s e) n _ _ -> "\\\\ " <> unName n <> " [" <> pack (show p) <> ":" <> showPos s <> "-" <> showPos e <> "]"
           Record _ -> "{}"
         showPos (Pos l c) = pack (show l) <> ":" <> pack (show c)
 

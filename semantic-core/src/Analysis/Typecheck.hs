@@ -17,7 +17,6 @@ import           Control.Effect.Reader hiding (Local)
 import           Control.Effect.State
 import           Control.Monad ((>=>), unless)
 import           Core.File
-import           Core.Loc
 import           Core.Name as Name
 import           Data.Foldable (for_)
 import           Data.Function (fix)
@@ -39,6 +38,7 @@ import           Syntax.Module
 import           Syntax.Scope
 import           Syntax.Term
 import           Syntax.Var (closed)
+import qualified System.Path as Path
 
 data Monotype f a
   = Bool
@@ -96,14 +96,14 @@ generalize ty = fromJust (closed (forAlls (IntSet.toList (mvs ty)) (hoistTerm R 
 typecheckingFlowInsensitive
   :: Ord term
   => (forall sig m
-     .  (Carrier sig m, Member (Reader Path) sig, Member (Reader Span) sig, MonadFail m)
+     .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
      => Analysis term Name Type m
      -> (term -> m Type)
      -> (term -> m Type)
      )
   -> [File term]
   -> ( Heap Name Type
-     , [File (Either (Path, Span, String) (Term (Polytype :+: Monotype) Void))]
+     , [File (Either (Path.AbsRelFile, Span, String) (Term (Polytype :+: Monotype) Void))]
      )
 typecheckingFlowInsensitive eval
   = run
@@ -120,13 +120,13 @@ runFile
      , Ord term
      )
   => (forall sig m
-     .  (Carrier sig m, Member (Reader Path) sig, Member (Reader Span) sig, MonadFail m)
+     .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
      => Analysis term Name Type m
      -> (term -> m Type)
      -> (term -> m Type)
      )
   -> File term
-  -> m (File (Either (Path, Span, String) Type))
+  -> m (File (Either (Path.AbsRelFile, Span, String) Type))
 runFile eval file = traverse run file
   where run
           = (\ m -> do
