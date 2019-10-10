@@ -118,8 +118,8 @@ a >>> b = send (a :>> b)
 infixr 1 >>>
 
 unseq :: (Alternative m, Member Core sig) => Term sig a -> m (Term sig a, Term sig a)
-unseq (Term sig) | Just (a :>> b) <- prj sig = pure (a, b)
-unseq _                                      = empty
+unseq (Alg sig) | Just (a :>> b) <- prj sig = pure (a, b)
+unseq _                                     = empty
 
 unseqs :: Member Core sig => Term sig a -> NonEmpty (Term sig a)
 unseqs = go
@@ -135,8 +135,8 @@ Named u n :<- a >>>= b = send (Named u a :>>= abstract1 n b)
 infixr 1 >>>=
 
 unbind :: (Alternative m, Member Core sig, RightModule sig) => a -> Term sig a -> m (Named a :<- Term sig a, Term sig a)
-unbind n (Term sig) | Just (Named u a :>>= b) <- prj sig = pure (Named u n :<- a, instantiate1 (pure n) b)
-unbind _ _                                               = empty
+unbind n (Alg sig) | Just (Named u a :>>= b) <- prj sig = pure (Named u n :<- a, instantiate1 (pure n) b)
+unbind _ _                                              = empty
 
 unstatement :: (Alternative m, Member Core sig, RightModule sig) => a -> Term sig a -> m (Maybe (Named a) :<- Term sig a, Term sig a)
 unstatement n t = first (first Just) <$> unbind n t <|> first (Nothing :<-) <$> unseq t
@@ -164,8 +164,8 @@ lams :: (Eq a, Foldable t, Carrier sig m, Member Core sig) => t (Named a) -> m a
 lams names body = foldr lam body names
 
 unlam :: (Alternative m, Member Core sig, RightModule sig) => a -> Term sig a -> m (Named a, Term sig a)
-unlam n (Term sig) | Just (Lam b) <- prj sig = pure (n <$ b, instantiate1 (pure n) (namedValue b))
-unlam _ _                                    = empty
+unlam n (Alg sig) | Just (Lam b) <- prj sig = pure (n <$ b, instantiate1 (pure n) (namedValue b))
+unlam _ _                                   = empty
 
 ($$) :: (Carrier sig m, Member Core sig) => m a -> m a -> m a
 f $$ a = send (f :$ a)
@@ -179,8 +179,8 @@ infixl 8 $$
 infixl 8 $$*
 
 unapply :: (Alternative m, Member Core sig) => Term sig a -> m (Term sig a, Term sig a)
-unapply (Term sig) | Just (f :$ a) <- prj sig = pure (f, a)
-unapply _                                     = empty
+unapply (Alg sig) | Just (f :$ a) <- prj sig = pure (f, a)
+unapply _                                    = empty
 
 unapplies :: Member Core sig => Term sig a -> (Term sig a, Stack (Term sig a))
 unapplies core = case unapply core of
@@ -237,6 +237,6 @@ annWith callStack = maybe id (annAt . snd) (stackLoc callStack)
 
 
 stripAnnotations :: forall ann a sig . (HFunctor sig, forall g . Functor g => Functor (sig g)) => Term (Ann ann :+: sig) a -> Term sig a
-stripAnnotations (Var v)              = Var v
-stripAnnotations (Term (L (Ann _ b))) = stripAnnotations b
-stripAnnotations (Term (R        b))  = Term (hmap stripAnnotations b)
+stripAnnotations (Var v)             = Var v
+stripAnnotations (Alg (L (Ann _ b))) = stripAnnotations b
+stripAnnotations (Alg (R        b))  = Alg (hmap stripAnnotations b)

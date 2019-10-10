@@ -10,7 +10,7 @@ import Control.Monad.Module
 
 data Term sig a
   = Var a
-  | Term (sig (Term sig) a)
+  | Alg (sig (Term sig) a)
 
 deriving instance ( Eq a
                   , RightModule sig
@@ -37,14 +37,14 @@ instance RightModule sig => Applicative (Term sig) where
   (<*>) = ap
 
 instance RightModule sig => Monad (Term sig) where
-  Var  a >>= f = f a
-  Term t >>= f = Term (t >>=* f)
+  Var a >>= f = f a
+  Alg t >>= f = Alg (t >>=* f)
 
 instance RightModule sig => Carrier sig (Term sig) where
-  eff = Term
+  eff = Alg
 
 
 hoistTerm :: (HFunctor sig, forall g . Functor g => Functor (sig g)) => (forall m x . sig m x -> sig' m x) -> Term sig a -> Term sig' a
 hoistTerm f = go
   where go (Var v)  = Var v
-        go (Term t) = Term (f (hmap (hoistTerm f) t))
+        go (Alg t) = Alg (f (hmap (hoistTerm f) t))

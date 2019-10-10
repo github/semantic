@@ -166,24 +166,24 @@ typecheckingAnalysis = Analysis{..}
           arg <- meta
           assign addr arg
           ty <- eval body
-          pure (Term (Arr arg ty))
+          pure (Alg (Arr arg ty))
         apply _ f a = do
           _A <- meta
           _B <- meta
-          unify (Term (Arr _A _B)) f
+          unify (Alg (Arr _A _B)) f
           unify _A a
           pure _B
-        unit = pure (Term Unit)
-        bool _ = pure (Term Bool)
-        asBool b = unify (Term Bool) b >> pure True <|> pure False
-        string _ = pure (Term String)
-        asString s = unify (Term String) s $> mempty
+        unit = pure (Alg Unit)
+        bool _ = pure (Alg Bool)
+        asBool b = unify (Alg Bool) b >> pure True <|> pure False
+        string _ = pure (Alg String)
+        asString s = unify (Alg String) s $> mempty
         record fields = do
           fields' <- for fields $ \ (k, v) -> do
             addr <- alloc k
             (k, v) <$ assign addr v
           -- FIXME: should records reference types by address instead?
-          pure (Term (Record (Map.fromList fields')))
+          pure (Alg (Record (Map.fromList fields')))
         _ ... m = pure (Just m)
 
 
@@ -212,8 +212,8 @@ solve :: (Carrier sig m, Member (State Substitution) sig, MonadFail m) => Set.Se
 solve cs = for_ cs solve
   where solve = \case
           -- FIXME: how do we enforce proper subtyping? row polymorphism or something?
-          Term (Record f1) :===: Term (Record f2) -> traverse solve (Map.intersectionWith (:===:) f1 f2) $> ()
-          Term (Arr a1 b1) :===: Term (Arr a2 b2) -> solve (a1 :===: a2) *> solve (b1 :===: b2)
+          Alg (Record f1) :===: Alg (Record f2) -> traverse solve (Map.intersectionWith (:===:) f1 f2) $> ()
+          Alg (Arr a1 b1) :===: Alg (Arr a2 b2) -> solve (a1 :===: a2) *> solve (b1 :===: b2)
           Var m1   :===: Var m2   | m1 == m2 -> pure ()
           Var m1   :===: t2         -> do
             sol <- solution m1

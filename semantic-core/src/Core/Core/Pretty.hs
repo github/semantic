@@ -48,7 +48,7 @@ prettyCore :: Style -> Term Core Name -> AnsiDoc
 prettyCore style = precBody . go . fmap name
   where go = \case
           Var v -> atom v
-          Term t -> case t of
+          Alg t -> case t of
             Rec (Named (Ignored x) b) -> prec 3 . group . nest 2 $ vsep
               [ keyword "rec" <+> name x
               , symbol "=" <+> align (withPrec 0 (go (instantiate1 (pure (name x)) b)))
@@ -80,7 +80,7 @@ prettyCore style = precBody . go . fmap name
               ]
 
             statement ->
-              let (bindings, return) = unstatements (Term statement)
+              let (bindings, return) = unstatements (Alg statement)
                   statements = toList (bindings :> (Nothing :<- return))
                   names = zipWith (\ i (n :<- _) -> maybe (pretty @Int i) (name . namedName) n) [0..] statements
                   statements' = map (prettyStatement names) statements
