@@ -5,7 +5,6 @@
 module Language.Python.Core
 ( toplevelCompile
 , Bindings
-, SourcePath
 ) where
 
 import Prelude hiding (fail)
@@ -18,20 +17,12 @@ import           Control.Monad ((>=>))
 import           Data.Coerce
 import           Data.Core as Core
 import           Data.Foldable
-import           Data.Loc (Loc)
-import qualified Data.Loc
 import           Data.Name as Name
 import           Data.Stack (Stack)
 import qualified Data.Stack as Stack
-import           Data.String (IsString)
-import           Data.Text (Text)
 import           GHC.Records
 import           Source.Span (Span)
 import qualified TreeSitter.Python.AST as Py
-
--- | Access to the current filename as Text to stick into location annotations.
-newtype SourcePath = SourcePath { rawPath :: Text }
-  deriving (Eq, IsString, Show)
 
 -- | Keeps track of the current scope's bindings (so that we can, when
 -- compiling a class or module, return the list of bound variables as
@@ -57,7 +48,7 @@ pattern SingleIdentifier name <- Py.ExpressionList
 -- possible for us to 'cheat' by pattern-matching on or eliminating a
 -- compiled term.
 type CoreSyntax sig t = ( Member Core sig
-                        , Member Ann sig
+                        , Member (Ann Span) sig
                         , Carrier sig t
                         , Foldable t
                         )
@@ -66,7 +57,6 @@ class Compile (py :: * -> *) where
   -- FIXME: rather than failing the compilation process entirely
   -- with MonadFail, we should emit core that represents failure
   compile :: ( CoreSyntax syn t
-             , Member (Reader SourcePath) sig
              , Member (Reader Bindings) sig
              , Carrier sig m
              , MonadFail m
@@ -79,7 +69,6 @@ class Compile (py :: * -> *) where
   compile a _ _ = defaultCompile a
 
 toplevelCompile :: ( CoreSyntax syn t
-                   , Member (Reader SourcePath) sig
                    , Member (Reader Bindings) sig
                    , Carrier sig m
                    , MonadFail m
@@ -93,20 +82,14 @@ toplevelCompile py = compile py pure none
 none :: (Member Core sig, Carrier sig t) => t Name
 none = unit
 
-locFromTSSpan :: SourcePath -> Span -> Loc
-locFromTSSpan fp = Data.Loc.Loc (rawPath fp)
-
 locate :: ( HasField "ann" syntax Span
           , CoreSyntax syn t
-          , Member (Reader SourcePath) sig
-          , Carrier sig m
+          , Applicative m
           )
        => syntax
        -> t a
        -> m (t a)
-locate syn item = do
-  fp <- ask @SourcePath
-  pure (Core.annAt (locFromTSSpan fp (getField @"ann" syn)) item)
+locate syn item = pure (Core.annAt (getField @"ann" syn) item)
 
 defaultCompile :: (MonadFail m, Show py) => py -> m (t Name)
 defaultCompile t = fail $ "compilation unimplemented for " <> show t
@@ -140,20 +123,18 @@ type Desugared = Py.ExpressionList :+: Py.Yield
 
 -- We have to pair locations and names, and tuple syntax is harder to
 -- read in this case than a happy little constructor.
-data Located a = Located Loc a
+data Located a = Located Span a
 
 -- Desugaring an RHS involves walking as deeply as possible into an
 -- assignment, storing the names we encounter as we go and eventually
 -- returning a terminal expression. We have to keep track of which
-desugar :: (Member (Reader SourcePath) sig, Carrier sig m, MonadFail m)
+desugar :: MonadFail m
         => [Located Name]
         -> RHS Span
         -> m ([Located Name], Desugared Span)
 desugar acc = \case
-  Prj Py.Assignment { left = SingleIdentifier name, right = Just rhs, ann} -> do
-    loc <- locFromTSSpan <$> ask <*> pure ann
-    let cons = (Located loc name :)
-    desugar (cons acc) rhs
+  Prj Py.Assignment { left = SingleIdentifier name, right = Just rhs, ann} ->
+    desugar (Located ann name : acc) rhs
   R1 any -> pure (acc, any)
   other -> fail ("desugar: couldn't desugar RHS " <> show other)
 
@@ -179,8 +160,7 @@ instance Compile Py.Assignment where
     , right = Just rhs
     , ann
     } cc next = do
-    p <- ask @SourcePath
-    (names, val) <- desugar [Located (locFromTSSpan p ann) name] rhs
+    (names, val) <- desugar [Located ann name] rhs
     compile val pure next >>= foldr collapseDesugared cc names >>= locate it
 
   compile other _ _ = fail ("Unhandled assignment case: " <> show other)
