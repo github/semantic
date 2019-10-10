@@ -37,6 +37,7 @@ import           Data.Traversable (for)
 import           Data.Void
 import           GHC.Generics (Generic1)
 import           Prelude hiding (fail)
+import           Source.Span
 
 data Monotype f a
   = Bool
@@ -94,14 +95,14 @@ generalize ty = fromJust (closed (forAlls (IntSet.toList (mvs ty)) (hoistTerm R 
 typecheckingFlowInsensitive
   :: Ord term
   => (forall sig m
-     .  (Carrier sig m, Member (Reader Loc) sig, MonadFail m)
+     .  (Carrier sig m, Member (Reader Path) sig, Member (Reader Span) sig, MonadFail m)
      => Analysis term Name Type m
      -> (term -> m Type)
      -> (term -> m Type)
      )
   -> [File term]
   -> ( Heap Name Type
-     , [File (Either (Loc, String) (Term (Polytype :+: Monotype) Void))]
+     , [File (Either (Path, Span, String) (Term (Polytype :+: Monotype) Void))]
      )
 typecheckingFlowInsensitive eval
   = run
@@ -118,13 +119,13 @@ runFile
      , Ord term
      )
   => (forall sig m
-     .  (Carrier sig m, Member (Reader Loc) sig, MonadFail m)
+     .  (Carrier sig m, Member (Reader Path) sig, Member (Reader Span) sig, MonadFail m)
      => Analysis term Name Type m
      -> (term -> m Type)
      -> (term -> m Type)
      )
   -> File term
-  -> m (File (Either (Loc, String) Type))
+  -> m (File (Either (Path, Span, String) Type))
 runFile eval file = traverse run file
   where run
           = (\ m -> do
@@ -132,7 +133,8 @@ runFile eval file = traverse run file
               modify @(Heap Name Type) (fmap (Set.map (substAll subst)))
               pure (substAll subst <$> t))
           . runState (mempty :: Substitution)
-          . runReader (fileLoc file)
+          . runReader (filePath file)
+          . runReader (fileSpan file)
           . runFail
           . (\ m -> do
             (cs, t) <- m
