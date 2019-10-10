@@ -46,7 +46,7 @@ runParser
 runParser timeout blob@Blob{..} parser = case parser of
   UnmarshalParser language ->
     parseToPreciseAST timeout language blob
-      >>= either (throwError . SomeException) pure
+      >>= either (throwError . toException) pure
 
   AssignmentParser language assignment
     ->  either (throwError . toException) pure . Assignment.assign blobSource assignment
