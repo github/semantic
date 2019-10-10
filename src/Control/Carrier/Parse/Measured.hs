@@ -107,12 +107,13 @@ runAssignment assign language blob@Blob{..} assignment = do
 
   ast <- time "parse.tree_sitter_ast_parse" languageTag $ do
     config <- asks config
-    parseToAST (configTreeSitterParseTimeout config) language blob
-      >>= either (\e -> trace (displayException e) *> throwError (SomeException e)) pure
-    `catchError` \ (SomeException err) -> do
-      writeStat (increment "parse.parse_failures" languageTag)
-      writeLog Error "failed parsing" (("task", "parse") : logFields)
-      throwError (toException err)
+    parseToAST (configTreeSitterParseTimeout config) language blob >>= either
+      (\ err -> do
+        trace (displayException err)
+        writeStat (increment "parse.parse_failures" languageTag)
+        writeLog Error "failed parsing" (("task", "parse") : logFields)
+        throwError (toException err))
+      pure
 
   res <- timeout (configAssignmentTimeout (config taskSession)) . time "parse.assign" languageTag $
     case assign blobSource assignment ast of
