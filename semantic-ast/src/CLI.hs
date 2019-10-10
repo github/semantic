@@ -8,7 +8,8 @@ import TreeSitter.Python.AST
 import TreeSitter.Python
 import Source.Range
 import Source.Span
-import Data.ByteString (readFile, ByteString)
+import Data.ByteString.Char8
+import Data.ByteString (pack, readFile, ByteString)
 import System.IO (FilePath)
 import Options.Applicative hiding (style)
 import Data.Semigroup ((<>))
