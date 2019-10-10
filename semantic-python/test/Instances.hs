@@ -9,11 +9,11 @@ module Instances () where
 
 import           Analysis.ScopeGraph
 import           Core.File
-import           Core.Loc
 import           Core.Name (Name (..))
 import           Data.Aeson
 import qualified Data.Map as Map
-import           Data.Text (Text)
+import           Data.Text (Text, pack)
+import qualified System.Path as Path
 
 deriving newtype instance ToJSON Name
 deriving newtype instance ToJSONKey Name
@@ -25,7 +25,8 @@ instance ToJSON a => ToJSON (File a) where
     , "body" .= fileBody
     ]
 
-deriving newtype instance ToJSON Path
+instance ToJSON Path.AbsRelFile where
+  toJSON p = toJSON (pack (show p))
 
 instance ToJSON Ref where
   toJSON (Ref path span) = object
