@@ -62,9 +62,6 @@ newtype ControlIOC m a = ControlIOC { runControlIO :: m a }
 instance MonadUnliftIO m => MonadUnliftIO (ControlIOC m) where
   withRunInIO inner = ControlIOC $ withRunInIO $ \ go -> inner (go . runControlIO)
 
-instance Carrier sig m => Carrier sig (ControlIOC m) where
-  eff op = ControlIOC (eff (handleCoercible op))
-
 instance MonadUnliftIO m => MonadException (ControlIOC m) where
   controlIO f = withRunInIO (\ runInIO -> f (RunIO (fmap pure . runInIO)) >>= runInIO)
 
