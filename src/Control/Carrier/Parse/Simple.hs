@@ -31,9 +31,9 @@ instance ( Carrier sig m
          )
       => Carrier (Parse :+: sig) (ParseC m) where
   eff (L (Parse parser blob k)) = ParseC (ask @Duration) >>= \ timeout -> case parser of
-    UnmarshalParser language ->
-      parseToPreciseAST timeout language blob
-        >>= either (throwError . toException) k
+    UnmarshalParser language
+      ->  either (throwError . toException) k
+      =<< parseToPreciseAST timeout language blob
 
     AssignmentParser language assignment
       ->  either (throwError . toException) k . Assignment.assign (blobSource blob) assignment
