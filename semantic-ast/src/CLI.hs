@@ -59,7 +59,7 @@ fileInput = FileInput <$> strOption
   <> metavar "FILENAME"
   <> help "Input file" )
 
--- cat something in
+-- Read from stdin
 stdInput :: Parser Input
 stdInput = flag' StdInput
   (  long "stdin"
