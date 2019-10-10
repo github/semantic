@@ -53,7 +53,6 @@ library
     Core.Core.Parser
     Core.Core.Pretty
     Core.File
-    Core.Loc
     Core.Name
   build-depends:
       algebraic-graphs            ^>= 0.3
