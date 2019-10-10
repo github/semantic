@@ -47,18 +47,17 @@ runReadlineWithHistory block = do
 newtype ReadlineC m a = ReadlineC { runReadlineC :: ReaderC Line (LiftC (InputT (UnliftIOToMonadException m))) a }
   deriving (Applicative, Functor, Monad, MonadFix, MonadIO)
 
-instance MonadUnliftIO m => Carrier (Readline :+: Lift (InputT (UnliftIOToMonadException m))) (ReadlineC m) where
-  eff (L (Prompt prompt k)) = ReadlineC $ do
+instance MonadUnliftIO m => Carrier Readline (ReadlineC m) where
+  eff (Prompt prompt k) = ReadlineC $ do
     str <- sendM (getInputLine @(UnliftIOToMonadException m) (cyan <> prompt <> plain))
     Line line <- ask
     local increment (runReadlineC (k line str))
     where cyan = "\ESC[1;36m\STX"
           plain = "\ESC[0m\STX"
-  eff (L (Print doc k)) = do
+  eff (Print doc k) = do
     s <- maybe 80 Size.width <$> liftIO size
     liftIO (renderIO stdout (layoutSmart defaultLayoutOptions { layoutPageWidth = AvailablePerLine s 0.8 } (doc <> line)))
     k
-  eff (R other) = ReadlineC (eff (R (handleCoercible other)))
 
 
 -- | This exists to work around the 'MonadException' constraint that haskeline entails.
