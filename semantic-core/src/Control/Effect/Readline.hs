@@ -13,7 +13,6 @@ module Control.Effect.Readline
 ) where
 
 import Control.Effect.Carrier
-import Data.Int
 import Data.String
 import Data.Text.Prettyprint.Doc
 import Data.Text.Prettyprint.Doc.Render.Terminal
@@ -39,7 +38,7 @@ println :: (Carrier sig m, Member Readline sig) => Doc AnsiStyle -> m ()
 println s = print s >> print "\n"
 
 
-newtype Line = Line Int64
+newtype Line = Line Int
 
 increment :: Line -> Line
 increment (Line n) = Line (n + 1)
