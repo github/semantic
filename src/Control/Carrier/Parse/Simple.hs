@@ -30,24 +30,13 @@ instance ( Carrier sig m
          , MonadIO m
          )
       => Carrier (Parse :+: sig) (ParseC m) where
-  eff (L (Parse parser blob k)) = ParseC ask >>= \ timeout -> runParser timeout blob parser >>= k
+  eff (L (Parse parser blob k)) = ParseC (ask @Duration) >>= \ timeout -> case parser of
+    UnmarshalParser language ->
+      parseToPreciseAST timeout language blob
+        >>= either (throwError . toException) k
+
+    AssignmentParser language assignment
+      ->  either (throwError . toException) k . Assignment.assign (blobSource blob) assignment
+      =<< either (throwError . toException) pure =<< parseToAST timeout language blob
+
   eff (R other) = ParseC (send (handleCoercible other))
-
--- | Parse a 'Blob' in 'IO'.
-runParser
-  :: ( Carrier sig m
-     , Member (Error SomeException) sig
-     , MonadIO m
-     )
-  => Duration
-  -> Blob
-  -> Parser term
-  -> m term
-runParser timeout blob@Blob{..} parser = case parser of
-  UnmarshalParser language ->
-    parseToPreciseAST timeout language blob
-      >>= either (throwError . toException) pure
-
-  AssignmentParser language assignment
-    ->  either (throwError . toException) pure . Assignment.assign blobSource assignment
-    =<< either (throwError . toException) pure =<< parseToAST timeout language blob
