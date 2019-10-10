@@ -33,9 +33,9 @@ eval :: ( Carrier sig m
         , MonadFail m
         , Semigroup value
         )
-     => Analysis (Term (Ann :+: Core) Name) address value m
-     -> (Term (Ann :+: Core) Name -> m value)
-     -> (Term (Ann :+: Core) Name -> m value)
+     => Analysis (Term (Ann Loc :+: Core) Name) address value m
+     -> (Term (Ann Loc :+: Core) Name -> m value)
+     -> (Term (Ann Loc :+: Core) Name -> m value)
 eval Analysis{..} eval = \case
   Var n -> lookupEnv' n >>= deref' n
   Term (R c) -> case c of
@@ -116,7 +116,7 @@ prog4 = fromBody
     (Core.bool True)
     (Core.bool False))
 
-prog5 :: (Carrier sig t, Member Ann sig, Member Core sig) => File (t Name)
+prog5 :: (Carrier sig t, Member (Ann Loc) sig, Member Core sig) => File (t Name)
 prog5 = fromBody $ ann (do'
   [ Just (named' "mkPoint") :<- lams [named' "_x", named' "_y"] (ann (Core.record
     [ ("x", ann (pure "_x"))
@@ -137,7 +137,7 @@ prog6 =
     ])
   ]
 
-ruby :: (Carrier sig t, Member Ann sig, Member Core sig) => File (t Name)
+ruby :: (Carrier sig t, Member (Ann Loc) sig, Member Core sig) => File (t Name)
 ruby = fromBody $ annWith callStack (rec (named' __semantic_global) (do' statements))
   where statements =
           [ Just "Class" :<- record

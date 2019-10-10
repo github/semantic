@@ -215,27 +215,27 @@ a .= b = send (a := b)
 infix 3 .=
 
 
-data Ann f a
-  = Ann Loc (f a)
+data Ann ann f a
+  = Ann ann (f a)
   deriving (Eq, Foldable, Functor, Generic1, Ord, Show, Traversable)
 
-instance HFunctor Ann
+instance HFunctor (Ann ann)
 
-instance RightModule Ann where
+instance RightModule (Ann ann) where
   Ann l b >>=* f = Ann l (b >>= f)
 
 
-ann :: (Carrier sig m, Member Ann sig) => HasCallStack => m a -> m a
+ann :: (Carrier sig m, Member (Ann Loc) sig) => HasCallStack => m a -> m a
 ann = annWith callStack
 
-annAt :: (Carrier sig m, Member Ann sig) => Loc -> m a -> m a
+annAt :: (Carrier sig m, Member (Ann Loc) sig) => Loc -> m a -> m a
 annAt loc = send . Ann loc
 
-annWith :: (Carrier sig m, Member Ann sig) => CallStack -> m a -> m a
+annWith :: (Carrier sig m, Member (Ann Loc) sig) => CallStack -> m a -> m a
 annWith callStack = maybe id annAt (stackLoc callStack)
 
 
-stripAnnotations :: (HFunctor sig, forall g . Functor g => Functor (sig g)) => Term (Ann :+: sig) a -> Term sig a
+stripAnnotations :: (HFunctor sig, forall g . Functor g => Functor (sig g)) => Term (Ann ann :+: sig) a -> Term sig a
 stripAnnotations (Var v)              = Var v
 stripAnnotations (Term (L (Ann _ b))) = stripAnnotations b
 stripAnnotations (Term (R        b))  = Term (hmap stripAnnotations b)
