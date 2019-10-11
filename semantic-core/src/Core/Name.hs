@@ -1,5 +1,5 @@
 {-# LANGUAGE DeriveGeneric, DeriveTraversable, GeneralizedNewtypeDeriving, LambdaCase, OverloadedLists #-}
-module Data.Name
+module Core.Name
 ( Name (..)
 , Named(..)
 , named

@@ -1,5 +1,5 @@
 {-# LANGUAGE FlexibleContexts, TypeOperators #-}
-module Data.Core.Parser
+module Core.Core.Parser
   ( core
   , lit
   , expr
@@ -12,11 +12,11 @@ module Data.Core.Parser
 
 import           Control.Applicative
 import           Control.Effect.Carrier
+import           Core.Core ((:<-) (..), Core)
+import qualified Core.Core as Core
+import           Core.Name
 import qualified Data.Char as Char
-import           Data.Core ((:<-) (..), Core)
-import qualified Data.Core as Core
 import           Data.Foldable (foldl')
-import           Data.Name
 import           Data.String
 import qualified Text.Parser.Token as Token
 import qualified Text.Parser.Token.Highlight as Highlight

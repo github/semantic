@@ -3,6 +3,7 @@
 module Main (main) where
 
 import qualified Analysis.Eval as Eval
+import           Analysis.ScopeGraph
 import           Control.Effect
 import           Control.Effect.Fail
 import           Control.Effect.Reader
@@ -10,21 +11,20 @@ import           Control.Monad hiding (fail)
 import           Control.Monad.Catch
 import           Control.Monad.IO.Class
 import           Control.Monad.Trans.Resource (ResourceT, runResourceT)
+import           Core.Core
+import           Core.Core.Pretty
+import           Core.File
+import           Core.Loc
+import           Core.Name
 import qualified Data.Aeson as Aeson
 import qualified Data.Aeson.Encode.Pretty as Aeson
 import qualified Data.ByteString.Char8 as ByteString
 import qualified Data.ByteString.Lazy.Char8 as ByteString.Lazy
 import qualified Data.ByteString.Streaming.Char8 as ByteStream
-import           Data.Core
-import           Data.Core.Pretty
-import           Data.File
 import           Data.Foldable
 import           Data.Function
 import           Data.List (sort)
-import           Data.Loc
 import           Data.Maybe
-import           Data.Name
-import           Data.Term
 import           GHC.Stack
 import qualified Language.Python.Core as Py
 import           Prelude hiding (fail)
@@ -32,19 +32,19 @@ import           Source.Span
 import           Streaming
 import qualified Streaming.Prelude as Stream
 import qualified Streaming.Process
+import           Syntax.Term
 import           System.Directory
 import           System.Exit
-import qualified TreeSitter.Python as TSP
-import qualified TreeSitter.Unmarshal as TS
-import           Text.Show.Pretty (ppShow)
 import qualified System.Path as Path
 import qualified System.Path.Directory as Path
 import           System.Path ((</>))
+import           Text.Show.Pretty (ppShow)
+import qualified TreeSitter.Python as TSP
+import qualified TreeSitter.Unmarshal as TS
 
 import qualified Test.Tasty as Tasty
 import qualified Test.Tasty.HUnit as HUnit
 
-import           Analysis.ScopeGraph
 import qualified Directive
 import           Instances ()
 
