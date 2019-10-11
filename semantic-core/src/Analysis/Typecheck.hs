@@ -133,7 +133,7 @@ runFile eval file = traverse run file
               (subst, t) <- m
               modify @(Heap Name (Type Name)) (fmap (Set.map (substAll subst)))
               pure (substAll subst <$> t))
-          . runState (mempty :: Substitution)
+          . runState (mempty :: (Substitution Name))
           . runReader (filePath file)
           . runReader (fileSpan file)
           . runFail
@@ -207,9 +207,9 @@ unify t1 t2
   | t1 == t2  = pure ()
   | otherwise = modify (<> Set.singleton (t1 :===: t2))
 
-type Substitution = IntMap.IntMap (Type Name)
+type Substitution name = IntMap.IntMap (Type name)
 
-solve :: (Carrier sig m, Member (State Substitution) sig, MonadFail m) => Set.Set Constraint -> m ()
+solve :: (Carrier sig m, Member (State (Substitution Name)) sig, MonadFail m) => Set.Set Constraint -> m ()
 solve cs = for_ cs solve
   where solve = \case
           -- FIXME: how do we enforce proper subtyping? row polymorphism or something?
