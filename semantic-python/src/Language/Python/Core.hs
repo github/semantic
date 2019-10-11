@@ -213,7 +213,7 @@ instance Compile Py.DecoratedDefinition where
           tocall <- compile extraChildren pure next
           let callit go = (pure lastbound .= (tocall $$ pure lastbound)) >>> go
           fmap callit (cc item)
-    compile definition thenReassign next >>= locate it
+    locate it <$> compile definition thenReassign next
   compile it _ _ = fail ("Can't figure out decorated definition " <> show it)
 instance Compile Py.DeleteStatement
 instance Compile Py.Dictionary
@@ -225,7 +225,7 @@ instance Compile Py.DottedName where
     } cc _next = do
     let aggregate Py.Identifier { text = inner } x = x ... Name inner
         composite = foldr aggregate (pure (Name text)) rest
-    locate it composite >>= cc
+    locate it composite & cc
 
 
 instance Compile Py.Ellipsis
