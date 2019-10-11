@@ -221,5 +221,6 @@ data EdgeType term
 
 
 -- $setup
+-- >>> :seti -XFlexibleContexts
 -- >>> :seti -XOverloadedStrings
 -- >>> import qualified Core.Core as Core
