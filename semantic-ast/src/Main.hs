@@ -44,9 +44,12 @@ generateAST (SemanticAST filePath sourceString _) = do
     Just filePath -> do
       bytestring <- Data.ByteString.readFile filePath
       print =<< parseByteString @TreeSitter.Python.AST.Module @(Range, Span) tree_sitter_python bytestring
-    StdInput -> do
-      bytestring <- Data.ByteString.Char8.pack . Prelude.head <$> getArgs
-      print =<< parseByteString @TreeSitter.Python.AST.Module @(Range, Span) tree_sitter_python bytestring
+    Nothing -> do
+      case sourceString of
+        Just sourceString -> do
+          bytestring <- Data.ByteString.Char8.pack . Prelude.head <$> getArgs
+          print =<< parseByteString @TreeSitter.Python.AST.Module @(Range, Span) tree_sitter_python bytestring
+        Nothing -> print "please provide a file path or source string to parse"
 
 opts :: ParserInfo SemanticAST
 opts = info (parseAST <**> helper)
