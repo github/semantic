@@ -46,7 +46,7 @@ callGraphProject' :: ( Language.SLanguage lang
                   -> Path.RelFile
                   -> IO (Either String (Data.Graph.Graph ControlFlowVertex))
 callGraphProject' session proxy parser path = fmap (first show) . runTask session $ do
-  blob <- readBlobFromFile' (fileForRelPath path)
+  blob <- readBlobFromFile' (fileForTypedPath path)
   package <- fmap snd <$> runParse (Duration.fromSeconds 10) (parsePackage parser (Project (Path.toString (Path.takeDirectory path)) [blob] (Language.reflect proxy) []))
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   runCallGraph proxy False modules package
