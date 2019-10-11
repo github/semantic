@@ -27,6 +27,11 @@ parseAST = SemanticAST
          <> metavar "FILEPATH"
          <> help "Specify filepath containing source code to parse" )
       <*> option auto
+          ( long "sourceString"
+         <> metavar "STRING"
+         <> help "Specify source input to parse"
+          )
+      <*> option auto
           ( long "format"
          <> help "Specify desired output: show, json, sexpression" )
 
