@@ -42,6 +42,7 @@ library
   exposed-modules:
     Analysis.Analysis
     Analysis.Concrete
+    Analysis.File
     Analysis.FlowInsensitive
     Analysis.ImportGraph
     Analysis.ScopeGraph
@@ -53,7 +54,6 @@ library
     Core.Core.Parser
     Core.Core.Pretty
     Core.Eval
-    Core.File
     Core.Name
   build-depends:
       algebraic-graphs            ^>= 0.3

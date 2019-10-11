@@ -2,6 +2,7 @@
 
 module Main (main) where
 
+import           Analysis.File
 import           Analysis.ScopeGraph
 import           Control.Effect
 import           Control.Effect.Fail
@@ -13,7 +14,6 @@ import           Control.Monad.Trans.Resource (ResourceT, runResourceT)
 import           Core.Core
 import           Core.Core.Pretty
 import qualified Core.Eval as Eval
-import           Core.File
 import           Core.Name
 import qualified Data.Aeson as Aeson
 import qualified Data.Aeson.Encode.Pretty as Aeson

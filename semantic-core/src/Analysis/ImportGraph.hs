@@ -6,6 +6,7 @@ module Analysis.ImportGraph
 ) where
 
 import           Analysis.Analysis
+import           Analysis.File
 import           Analysis.FlowInsensitive
 import           Control.Applicative (Alternative(..))
 import           Control.Carrier.Fail.WithLoc
@@ -14,7 +15,6 @@ import           Control.Effect.Fresh
 import           Control.Effect.Reader
 import           Control.Effect.State
 import           Control.Monad ((>=>))
-import           Core.File
 import           Data.Foldable (fold, for_)
 import           Data.Function (fix)
 import           Data.List.NonEmpty (nonEmpty)

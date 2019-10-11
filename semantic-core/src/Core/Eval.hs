@@ -11,13 +11,13 @@ module Core.Eval
 ) where
 
 import Analysis.Analysis
+import Analysis.File
 import Control.Applicative (Alternative (..))
 import Control.Effect.Carrier
 import Control.Effect.Fail
 import Control.Effect.Reader
 import Control.Monad ((>=>))
 import Core.Core as Core
-import Core.File
 import Core.Name
 import Data.Functor
 import Data.Maybe (fromMaybe)
