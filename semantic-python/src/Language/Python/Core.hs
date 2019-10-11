@@ -18,6 +18,7 @@ import           Core.Name as Name
 import           Data.Coerce
 import           Data.Foldable
 import           Data.Function
+import           Data.List.NonEmpty  (NonEmpty (..))
 import           GHC.Records
 import           Source.Span (Span)
 import           Syntax.Stack (Stack)
@@ -201,10 +202,32 @@ deriving instance Compile Py.CompoundStatement
 instance Compile Py.ConcatenatedString
 instance Compile Py.ConditionalExpression
 instance Compile Py.ContinueStatement
-instance Compile Py.DecoratedDefinition
+
+instance Compile Py.DecoratedDefinition where
+  compile it@Py.DecoratedDefinition
+    { definition
+    , extraChildren = [ Py.Decorator { extraChildren } ]
+    } cc next = do
+    let thenReassign item = do
+          _ :> lastbound <- asks unBindings
+          tocall <- compile extraChildren pure next
+          let callit go = (pure lastbound .= (tocall $$ pure lastbound)) >>> go
+          fmap callit (cc item)
+    locate it <$> compile definition thenReassign next
+  compile it _ _ = fail ("Can't figure out decorated definition " <> show it)
 instance Compile Py.DeleteStatement
 instance Compile Py.Dictionary
 instance Compile Py.DictionaryComprehension
+
+instance Compile Py.DottedName where
+  compile it@Py.DottedName
+    { extraChildren = Py.Identifier { text } :| rest
+    } cc _next = do
+    let aggregate Py.Identifier { text = inner } x = x ... Name inner
+        composite = foldr aggregate (pure (Name text)) rest
+    locate it composite & cc
+
+
 instance Compile Py.Ellipsis
 instance Compile Py.ExecStatement
 
