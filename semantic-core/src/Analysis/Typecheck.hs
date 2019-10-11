@@ -97,7 +97,7 @@ typecheckingFlowInsensitive
   :: Ord term
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term Name Type m
+     => Analysis term Name Name Type m
      -> (term -> m Type)
      -> (term -> m Type)
      )
@@ -121,7 +121,7 @@ runFile
      )
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term Name Type m
+     => Analysis term Name Name Type m
      -> (term -> m Type)
      -> (term -> m Type)
      )
@@ -154,7 +154,7 @@ typecheckingAnalysis
      , Member (State (Set.Set Constraint)) sig
      , Member (State (Heap Name Type)) sig
      )
-  => Analysis term Name Type m
+  => Analysis term Name Name Type m
 typecheckingAnalysis = Analysis{..}
   where alloc = pure
         bind _ _ m = m

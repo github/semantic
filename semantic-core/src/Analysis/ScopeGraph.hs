@@ -55,7 +55,7 @@ scopeGraph
   :: Ord term
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term Name ScopeGraph m
+     => Analysis term Name Name ScopeGraph m
      -> (term -> m ScopeGraph)
      -> (term -> m ScopeGraph)
      )
@@ -76,7 +76,7 @@ runFile
      )
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term Name ScopeGraph m
+     => Analysis term Name Name ScopeGraph m
      -> (term -> m ScopeGraph)
      -> (term -> m ScopeGraph)
      )
@@ -98,7 +98,7 @@ scopeGraphAnalysis
      , Member (Reader (Map.Map Name Ref)) sig
      , Member (State (Heap Name ScopeGraph)) sig
      )
-  => Analysis term Name ScopeGraph m
+  => Analysis term Name Name ScopeGraph m
 scopeGraphAnalysis = Analysis{..}
   where alloc = pure
         bind name _ m = do

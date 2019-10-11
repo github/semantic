@@ -53,7 +53,7 @@ importGraph
   :: (Ord term, Show term)
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term Name (Value term) m
+     => Analysis term Name Name (Value term) m
      -> (term -> m (Value term))
      -> (term -> m (Value term))
      )
@@ -77,7 +77,7 @@ runFile
      )
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term Name (Value term) m
+     => Analysis term Name Name (Value term) m
      -> (term -> m (Value term))
      -> (term -> m (Value term))
      )
@@ -100,7 +100,7 @@ importGraphAnalysis :: ( Alternative m
                        , Ord  term
                        , Show term
                        )
-                    => Analysis term Name (Value term) m
+                    => Analysis term Name Name (Value term) m
 importGraphAnalysis = Analysis{..}
   where alloc = pure
         bind _ _ m = m
