@@ -140,7 +140,7 @@ runFile eval file = traverse run file
           . (\ m -> do
             (cs, t) <- m
             t <$ solve cs)
-          . runState (Set.empty :: Set.Set Constraint)
+          . runState (Set.empty :: Set.Set (Constraint name))
           . (\ m -> do
               v <- meta
               bs <- m
@@ -151,7 +151,7 @@ typecheckingAnalysis
   :: ( Alternative m
      , Carrier sig m
      , Member Fresh sig
-     , Member (State (Set.Set Constraint)) sig
+     , Member (State (Set.Set (Constraint Name))) sig
      , Member (State (Heap Name (Type Name))) sig
      )
   => Analysis term Name Name (Type Name) m
@@ -188,7 +188,7 @@ typecheckingAnalysis = Analysis{..}
         _ ... m = pure (Just m)
 
 
-data Constraint = Type Name :===: Type Name
+data Constraint name = Type name :===: Type name
   deriving (Eq, Ord, Show)
 
 infix 4 :===:
@@ -202,14 +202,14 @@ infix 5 :=
 meta :: (Carrier sig m, Member Fresh sig) => m (Type Name)
 meta = pure <$> Fresh.fresh
 
-unify :: (Carrier sig m, Member (State (Set.Set Constraint)) sig) => Type Name -> Type Name -> m ()
+unify :: (Carrier sig m, Member (State (Set.Set (Constraint Name))) sig) => Type Name -> Type Name -> m ()
 unify t1 t2
   | t1 == t2  = pure ()
   | otherwise = modify (<> Set.singleton (t1 :===: t2))
 
 type Substitution name = IntMap.IntMap (Type name)
 
-solve :: (Carrier sig m, Member (State (Substitution Name)) sig, MonadFail m) => Set.Set Constraint -> m ()
+solve :: (Carrier sig m, Member (State (Substitution Name)) sig, MonadFail m) => Set.Set (Constraint Name) -> m ()
 solve cs = for_ cs solve
   where solve = \case
           -- FIXME: how do we enforce proper subtyping? row polymorphism or something?
