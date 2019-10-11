@@ -1,5 +1,5 @@
 {-# LANGUAGE ConstraintKinds, DataKinds, DefaultSignatures, DisambiguateRecordFields, FlexibleContexts,
-             GeneralizedNewtypeDeriving, KindSignatures, LambdaCase, NamedFieldPuns, OverloadedLists,
+             GeneralizedNewtypeDeriving, KindSignatures, LambdaCase, NamedFieldPuns, OverloadedLists, OverloadedStrings,
              PatternSynonyms, StandaloneDeriving, TypeApplications, TypeOperators, ViewPatterns #-}
 
 module Language.Python.Core
@@ -24,6 +24,7 @@ import           Source.Span (Span)
 import           Syntax.Stack (Stack (..))
 import qualified Syntax.Stack as Stack
 import qualified TreeSitter.Python.AST as Py
+import           Debug.Trace (traceM)
 
 -- | Keeps track of the current scope's bindings (so that we can, when
 -- compiling a class or module, return the list of bound variables as
@@ -194,7 +195,20 @@ instance Compile Py.Call where
     locate it (func $$* args) & cc
   compile it _ _ = fail ("can't compile Call node with generator expression: " <> show it)
 
-instance Compile Py.ClassDefinition
+instance Compile Py.ClassDefinition where
+  compile _it@Py.ClassDefinition { body = pybody, name = Py.Identifier _ann pyname } cc next = do
+    traceM "in class def"
+    let n = Name pyname
+    let buildTypeCall _next' = do
+          bindings <- asks @Bindings (toList . unBindings)
+          let buildName n = (n, pure n)
+          let contents = record . fmap buildName $ bindings
+          pure (pure (Name "type") $$ Core.string pyname $$ pure "object" $$ contents)
+
+    body <- compile pybody buildTypeCall next
+    let called = Name.named' n :<- body
+    fmap (called >>>=) (local (def n) (cc next))
+
 instance Compile Py.ComparisonOperator
 
 deriving instance Compile Py.CompoundStatement
