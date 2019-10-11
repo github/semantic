@@ -28,6 +28,7 @@ import qualified Data.IntSet as IntSet
 import qualified Data.Map as Map
 import           Data.Semigroup (Last (..))
 import qualified Data.Set as Set
+import           Data.String (IsString)
 import           Data.Text (Text, pack)
 import           Data.Traversable (for)
 import           Prelude hiding (fail)
@@ -155,7 +156,7 @@ concreteAnalysis = Analysis{..}
           pure (val >>= lookupConcrete heap n)
 
 
-lookupConcrete :: Heap term Name -> Name -> Concrete term Name -> Maybe Precise
+lookupConcrete :: (IsString name, Ord name) => Heap term name -> name -> Concrete term name -> Maybe Precise
 lookupConcrete heap name = run . evalState IntSet.empty . runNonDet . inConcrete
   where -- look up the name in a concrete value
         inConcrete = inFrame <=< maybeA . recordFrame
