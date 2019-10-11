@@ -139,7 +139,7 @@ runFile eval file = traverse run file
           . runFail
           . (\ m -> do
             (cs, t) <- m
-            t <$ solve cs)
+            t <$ solve @Name cs)
           . runState (Set.empty :: Set.Set (Constraint name))
           . (\ m -> do
               v <- meta
@@ -209,7 +209,7 @@ unify t1 t2
 
 type Substitution name = IntMap.IntMap (Type name)
 
-solve :: (Carrier sig m, Member (State (Substitution Name)) sig, MonadFail m) => Set.Set (Constraint Name) -> m ()
+solve :: (Member (State (Substitution name)) sig, MonadFail m, Ord name, Show name, Carrier sig m) => Set.Set (Constraint name) -> m ()
 solve cs = for_ cs solve
   where solve = \case
           -- FIXME: how do we enforce proper subtyping? row polymorphism or something?
