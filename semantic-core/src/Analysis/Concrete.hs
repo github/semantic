@@ -235,5 +235,5 @@ data EdgeType term name
 -- $setup
 -- >>> :seti -XFlexibleContexts
 -- >>> :seti -XOverloadedStrings
--- >>> import Analysis.Eval (eval)
+-- >>> import Core.Eval (eval)
 -- >>> import qualified Core.Core as Core
