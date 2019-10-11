@@ -111,15 +111,18 @@ runFile eval file = traverse run file
 
 concreteAnalysis :: ( Carrier sig m
                     , Foldable term
+                    , IsString name
                     , Member Fresh sig
-                    , Member (Reader (Env Name)) sig
+                    , Member (Reader (Env name)) sig
                     , Member (Reader Path.AbsRelFile) sig
                     , Member (Reader Span) sig
-                    , Member (State (Heap (term Name) Name)) sig
+                    , Member (State (Heap (term name) name)) sig
                     , MonadFail m
-                    , Show (term Name)
+                    , Ord name
+                    , Show name
+                    , Show (term name)
                     )
-                 => Analysis (term Name) Name Precise (Concrete (term Name) Name) m
+                 => Analysis (term name) name Precise (Concrete (term name) name) m
 concreteAnalysis = Analysis{..}
   where alloc _ = fresh
         bind name addr m = local (Map.insert name addr) m
