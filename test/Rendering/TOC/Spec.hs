@@ -146,7 +146,7 @@ spec = do
       let summary = TOCSummary "Method" "self.foo" (Span (Pos 1 1) (Pos 2 4)) "added"
       encode summary `shouldBe` "{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"self.foo\",\"changeType\":\"added\"}"
 
-  describe "diff with ToCDiffRenderer'" $ do
+  describe "diff with diffSummaryBuilder" $ do
     it "produces JSON output" $ do
       blobs <- blobsForPaths (Both (Path.relFile "ruby/toc/methods.A.rb") (Path.relFile "ruby/toc/methods.B.rb"))
       output <- runTaskOrDie (diffSummaryBuilder Format.JSON [blobs])
