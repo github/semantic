@@ -15,7 +15,8 @@ import Options.Applicative hiding (style)
 import Data.Semigroup ((<>))
 
 data SemanticAST = SemanticAST
-  { sourceFilePath      :: Input
+  { sourceFilePath      :: Maybe FilePath
+  , sourceString        :: Maybe Prelude.String
   , format              :: Format
   } deriving (Read)
 
