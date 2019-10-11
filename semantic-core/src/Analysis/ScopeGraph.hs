@@ -17,7 +17,6 @@ import           Control.Effect.Reader
 import           Control.Effect.State
 import           Control.Monad ((>=>))
 import           Core.File
-import           Core.Loc
 import           Core.Name
 import           Data.Foldable (fold)
 import           Data.Function (fix)
@@ -28,16 +27,17 @@ import qualified Data.Set as Set
 import           Data.Traversable (for)
 import           Prelude hiding (fail)
 import           Source.Span
+import qualified System.Path as Path
 
 data Decl = Decl
   { declSymbol :: Name
-  , declPath   :: Path
+  , declPath   :: Path.AbsRelFile
   , declSpan   :: Span
   }
   deriving (Eq, Ord, Show)
 
 data Ref = Ref
-  { refPath :: Path
+  { refPath :: Path.AbsRelFile
   , refSpan :: Span
   }
   deriving (Eq, Ord, Show)
@@ -54,13 +54,13 @@ instance Monoid ScopeGraph where
 scopeGraph
   :: Ord term
   => (forall sig m
-     .  (Carrier sig m, Member (Reader Path) sig, Member (Reader Span) sig, MonadFail m)
+     .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
      => Analysis term Name ScopeGraph m
      -> (term -> m ScopeGraph)
      -> (term -> m ScopeGraph)
      )
   -> [File term]
-  -> (Heap Name ScopeGraph, [File (Either (Path, Span, String) ScopeGraph)])
+  -> (Heap Name ScopeGraph, [File (Either (Path.AbsRelFile, Span, String) ScopeGraph)])
 scopeGraph eval
   = run
   . runFresh
@@ -75,13 +75,13 @@ runFile
      , Ord term
      )
   => (forall sig m
-     .  (Carrier sig m, Member (Reader Path) sig, Member (Reader Span) sig, MonadFail m)
+     .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
      => Analysis term Name ScopeGraph m
      -> (term -> m ScopeGraph)
      -> (term -> m ScopeGraph)
      )
   -> File term
-  -> m (File (Either (Path, Span, String) ScopeGraph))
+  -> m (File (Either (Path.AbsRelFile, Span, String) ScopeGraph))
 runFile eval file = traverse run file
   where run = runReader (filePath file)
             . runReader (fileSpan file)
@@ -93,7 +93,7 @@ runFile eval file = traverse run file
 scopeGraphAnalysis
   :: ( Alternative m
      , Carrier sig m
-     , Member (Reader Path) sig
+     , Member (Reader Path.AbsRelFile) sig
      , Member (Reader Span) sig
      , Member (Reader (Map.Map Name Ref)) sig
      , Member (State (Heap Name ScopeGraph)) sig

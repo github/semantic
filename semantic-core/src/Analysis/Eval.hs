@@ -18,15 +18,15 @@ import Control.Effect.Reader
 import Control.Monad ((>=>))
 import Core.Core as Core
 import Core.File
-import Core.Loc
 import Core.Name
 import Data.Functor
-import Data.Maybe (fromJust, fromMaybe)
+import Data.Maybe (fromMaybe)
 import GHC.Stack
 import Prelude hiding (fail)
 import Source.Span
 import Syntax.Scope
 import Syntax.Term
+import qualified System.Path as Path
 
 eval :: ( Carrier sig m
         , Member (Reader Span) sig
@@ -129,12 +129,14 @@ prog5 = fromBody $ ann (do'
 
 prog6 :: (Carrier sig t, Member Core sig) => [File (t Name)]
 prog6 =
-  [ File (Path "dep")  (snd (fromJust here)) $ Core.record
-    [ ("dep", Core.record [ ("var", Core.bool True) ]) ]
-  , File (Path "main") (snd (fromJust here)) $ do' (map (Nothing :<-)
+  [ (fromBody (Core.record
+    [ ("dep", Core.record [ ("var", Core.bool True) ]) ]))
+    { filePath = Path.absRel "dep"}
+  , (fromBody (do' (map (Nothing :<-)
     [ load (Core.string "dep")
     , Core.record [ ("thing", pure "dep" Core.... "var") ]
-    ])
+    ])))
+    { filePath = Path.absRel "main" }
   ]
 
 ruby :: (Carrier sig t, Member (Ann Span) sig, Member Core sig) => File (t Name)
