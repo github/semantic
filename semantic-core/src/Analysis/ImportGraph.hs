@@ -30,7 +30,7 @@ import qualified System.Path as Path
 type ImportGraph = Map.Map Text (Set.Set Text)
 
 data Value term = Value
-  { valueSemi  :: Semi term
+  { valueSemi  :: Semi term Name
   , valueGraph :: ImportGraph
   }
   deriving (Eq, Ord, Show)
@@ -41,8 +41,8 @@ instance Semigroup (Value term) where
 instance Monoid (Value term) where
   mempty = Value Abstract mempty
 
-data Semi term
-  = Closure Path.AbsRelFile Span Name term
+data Semi term name
+  = Closure Path.AbsRelFile Span name term
   -- FIXME: Bound String values.
   | String Text
   | Abstract
