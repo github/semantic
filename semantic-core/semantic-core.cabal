@@ -16,45 +16,11 @@ build-type:          Simple
 stability:           alpha
 extra-source-files:  README.md
 
-tested-with:         GHC == 8.6.4
+tested-with:
+  GHC == 8.6.5
 
-library
-  exposed-modules:     Analysis.Concrete
-                     , Analysis.Eval
-                     , Analysis.FlowInsensitive
-                     , Analysis.ImportGraph
-                     , Analysis.ScopeGraph
-                     , Analysis.Typecheck
-                     , Control.Carrier.Fail.WithLoc
-                     , Control.Effect.Readline
-                     , Control.Monad.Module
-                     , Data.Core
-                     , Data.Core.Parser
-                     , Data.Core.Pretty
-                     , Data.File
-                     , Data.Loc
-                     , Data.Name
-                     , Data.Scope
-                     , Data.Stack
-                     , Data.Term
-  build-depends:       algebraic-graphs            ^>= 0.3
-                     , base                         >= 4.12 && < 5
-                     , containers                  ^>= 0.6
-                     , directory                   ^>= 1.3
-                     , filepath                    ^>= 1.4
-                     , fused-effects               ^>= 0.5
-                     , haskeline                   ^>= 0.7.5
-                     , parsers                     ^>= 0.12.10
-                     , prettyprinter               ^>= 1.2.1
-                     , prettyprinter-ansi-terminal ^>= 1.1.1
-                     , semantic-source             ^>= 0
-                     , semigroupoids               ^>= 5.3
-                     , text                        ^>= 1.2.3.1
-                     , transformers                ^>= 0.5.6
-                     , trifecta                    ^>= 2
-                     , unordered-containers        ^>= 0.2.10
-  hs-source-dirs:      src
-  default-language:    Haskell2010
+common common
+  default-language: Haskell2010
   ghc-options:
     -Weverything
     -Wno-missing-local-signatures
@@ -67,29 +33,74 @@ library
     -Wno-missed-specialisations
     -Wno-all-missed-specialisations
     -Wno-star-is-type
+  if (impl(ghc >= 8.8))
+    ghc-options: -Wno-missing-deriving-strategies
+
+library
+  import: common
+  hs-source-dirs: src
+  exposed-modules:
+    Analysis.Analysis
+    Analysis.Concrete
+    Analysis.Eval
+    Analysis.FlowInsensitive
+    Analysis.ImportGraph
+    Analysis.ScopeGraph
+    Analysis.Typecheck
+    Control.Carrier.Fail.WithLoc
+    Control.Carrier.Readline.Haskeline
+    Control.Effect.Readline
+    Core.Core
+    Core.Core.Parser
+    Core.Core.Pretty
+    Core.File
+    Core.Loc
+    Core.Name
+  build-depends:
+      algebraic-graphs            ^>= 0.3
+    , base                         >= 4.12 && < 5
+    , containers                  ^>= 0.6
+    , directory                   ^>= 1.3
+    , filepath                    ^>= 1.4
+    , fused-effects               ^>= 0.5
+    , fused-syntax
+    , haskeline                   ^>= 0.7.5
+    , parsers                     ^>= 0.12.10
+    , prettyprinter               ^>= 1.2.1
+    , prettyprinter-ansi-terminal ^>= 1.1.1
+    , semantic-source             ^>= 0
+    , semigroupoids               ^>= 5.3
+    , terminal-size               ^>= 0.3
+    , text                        ^>= 1.2.3.1
+    , transformers                ^>= 0.5.6
+    , trifecta                    ^>= 2
+    , unordered-containers        ^>= 0.2.10
 
 test-suite doctest
-  type:                exitcode-stdio-1.0
-  main-is:             Doctest.hs
-  build-depends:       base >=4.9 && <4.13
-                     , doctest >=0.7 && <1.0
-                     , QuickCheck
-                     , semantic-core
-  hs-source-dirs:      test
-  default-language:    Haskell2010
+  import: common
+  type:           exitcode-stdio-1.0
+  hs-source-dirs: test
+  main-is:        Doctest.hs
+  build-depends:
+      base >=4.9 && <4.13
+    , doctest >=0.7 && <1.0
+    , QuickCheck
+    , semantic-core
 
-test-suite spec
-  type:                exitcode-stdio-1.0
-  main-is:             Spec.hs
-  other-modules:       Generators
-  build-depends:       base
-                     , semantic-core
-                     , semantic-source ^>= 0
-                     , fused-effects
-                     , hedgehog ^>= 1
-                     , tasty >= 1.2 && <2
-                     , tasty-hedgehog ^>= 1.0.0.1
-                     , tasty-hunit >= 0.10 && <1
-                     , trifecta
-  hs-source-dirs:      test
-  default-language:    Haskell2010
+test-suite test
+  import: common
+  type:           exitcode-stdio-1.0
+  hs-source-dirs: test
+  main-is:        Test.hs
+  other-modules:  Generators
+  build-depends:
+      base
+    , semantic-core
+    , semantic-source ^>= 0
+    , fused-effects
+    , fused-syntax
+    , hedgehog ^>= 1
+    , tasty >= 1.2 && <2
+    , tasty-hedgehog ^>= 1.0.0.1
+    , tasty-hunit >= 0.10 && <1
+    , trifecta

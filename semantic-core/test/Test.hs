@@ -1,7 +1,6 @@
 {-# LANGUAGE OverloadedStrings, TypeApplications, TypeOperators #-}
 module Main (main) where
 
-import           Data.String
 import qualified Text.Trifecta as Trifecta
 
 import           Hedgehog hiding (Var)
@@ -9,17 +8,15 @@ import           Test.Tasty
 import           Test.Tasty.Hedgehog
 import           Test.Tasty.HUnit
 
-import           Control.Effect.Sum
-import           Data.File
-import           Data.Loc (Path)
-import qualified Generators as Gen
 import qualified Analysis.Eval as Eval
-import           Data.Core
-import           Data.Core.Pretty
-import           Data.Core.Parser as Parse
-import           Data.Name
-import           Data.Term
+import           Core.Core
+import           Core.Core.Pretty
+import           Core.Core.Parser as Parse
+import           Core.File
+import           Core.Name
+import qualified Generators as Gen
 import           Source.Span
+import           Syntax.Term
 
 -- * Helpers
 
