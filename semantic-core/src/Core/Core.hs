@@ -37,12 +37,11 @@ module Core.Core
 
 import Control.Applicative (Alternative (..))
 import Control.Effect.Carrier
-import Core.Loc
 import Core.Name
 import Data.Bifunctor (Bifunctor (..))
 import Data.Foldable (foldl')
 import Data.List.NonEmpty (NonEmpty (..))
-import Data.Maybe (fromMaybe)
+import Data.Maybe (fromMaybe, listToMaybe)
 import Data.Text (Text)
 import GHC.Generics (Generic1)
 import GHC.Stack
@@ -233,7 +232,7 @@ annAt :: (Carrier sig m, Member (Ann ann) sig) => ann -> m a -> m a
 annAt ann = send . Ann ann
 
 annWith :: (Carrier sig m, Member (Ann Span) sig) => CallStack -> m a -> m a
-annWith callStack = maybe id (annAt . snd) (stackLoc callStack)
+annWith callStack = maybe id (annAt . spanFromSrcLoc . snd) (listToMaybe (getCallStack callStack))
 
 
 stripAnnotations :: forall ann a sig . (HFunctor sig, forall g . Functor g => Functor (sig g)) => Term (Ann ann :+: sig) a -> Term sig a

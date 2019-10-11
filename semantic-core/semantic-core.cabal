@@ -54,7 +54,6 @@ library
     Core.Core.Parser
     Core.Core.Pretty
     Core.File
-    Core.Loc
     Core.Name
   build-depends:
       algebraic-graphs            ^>= 0.3
@@ -66,6 +65,7 @@ library
     , fused-syntax
     , haskeline                   ^>= 0.7.5
     , parsers                     ^>= 0.12.10
+    , pathtype                    ^>= 0.8.1
     , prettyprinter               ^>= 1.2.1
     , prettyprinter-ansi-terminal ^>= 1.1.1
     , semantic-source             ^>= 0

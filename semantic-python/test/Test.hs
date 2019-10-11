@@ -14,7 +14,6 @@ import           Control.Monad.Trans.Resource (ResourceT, runResourceT)
 import           Core.Core
 import           Core.Core.Pretty
 import           Core.File
-import           Core.Loc
 import           Core.Name
 import qualified Data.Aeson as Aeson
 import qualified Data.Aeson.Encode.Pretty as Aeson
@@ -51,7 +50,7 @@ import           Instances ()
 
 assertJQExpressionSucceeds :: Show a => Directive.Directive -> a -> Term (Ann Span :+: Core) Name -> HUnit.Assertion
 assertJQExpressionSucceeds directive tree core = do
-  bod <- case scopeGraph Eval.eval [File (Path "<interactive>") (Span (Pos 1 1) (Pos 1 1)) core] of
+  bod <- case scopeGraph Eval.eval [File (Path.absRel "<interactive>") (Span (Pos 1 1) (Pos 1 1)) core] of
     (heap, [File _ _ (Right result)]) -> pure $ Aeson.object
       [ "scope" Aeson..= heap
       , "heap"  Aeson..= result
