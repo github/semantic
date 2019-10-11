@@ -65,15 +65,3 @@ library
     , semantic-source             ^>= 0
     , terminal-size               ^>= 0.3
     , text                        ^>= 1.2.3.1
-
-
-test-suite doctest
-  import: common
-  type:           exitcode-stdio-1.0
-  hs-source-dirs: test
-  main-is:        Doctest.hs
-  build-depends:
-      base >=4.9 && <4.13
-    , doctest >=0.7 && <1.0
-    , QuickCheck
-    , semantic-analysis
