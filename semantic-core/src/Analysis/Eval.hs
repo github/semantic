@@ -11,6 +11,7 @@ module Analysis.Eval
 , Analysis(..)
 ) where
 
+import Analysis.Analysis
 import Control.Applicative (Alternative (..))
 import Control.Effect.Carrier
 import Control.Effect.Fail
@@ -22,7 +23,6 @@ import Core.Loc
 import Core.Name
 import Data.Functor
 import Data.Maybe (fromJust, fromMaybe)
-import Data.Text (Text)
 import GHC.Stack
 import Prelude hiding (fail)
 import Source.Span
@@ -213,21 +213,3 @@ ruby = fromBody $ annWith callStack (rec (named' __semantic_global) (do' stateme
         __semantic_global = "__semantic_global"
         __semantic_super  = "__semantic_super"
         __semantic_truthy = "__semantic_truthy"
-
-
-data Analysis term address value m = Analysis
-  { alloc     :: Name -> m address
-  , bind      :: forall a . Name -> address -> m a -> m a
-  , lookupEnv :: Name -> m (Maybe address)
-  , deref     :: address -> m (Maybe value)
-  , assign    :: address -> value -> m ()
-  , abstract  :: (term -> m value) -> Name -> term -> m value
-  , apply     :: (term -> m value) -> value -> value -> m value
-  , unit      :: m value
-  , bool      :: Bool -> m value
-  , asBool    :: value -> m Bool
-  , string    :: Text -> m value
-  , asString  :: value -> m Text
-  , record    :: [(Name, value)] -> m value
-  , (...)     :: address -> Name -> m (Maybe address)
-  }

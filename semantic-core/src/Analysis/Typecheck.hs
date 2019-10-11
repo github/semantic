@@ -7,7 +7,7 @@ module Analysis.Typecheck
 , typecheckingAnalysis
 ) where
 
-import           Analysis.Eval
+import           Analysis.Analysis
 import           Analysis.FlowInsensitive
 import           Control.Applicative (Alternative (..))
 import           Control.Carrier.Fail.WithLoc
