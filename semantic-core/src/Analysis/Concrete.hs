@@ -181,7 +181,7 @@ runHeap = runState mempty
 --   > λ let (heap, res) = concrete [ruby]
 --   > λ writeFile "/Users/rob/Desktop/heap.dot" (export (addressStyle heap) (heapAddressGraph heap))
 --   > λ :!dot -Tsvg < ~/Desktop/heap.dot > ~/Desktop/heap.svg
-heapGraph :: (Precise -> Concrete term Name -> a) -> (Either Edge Name -> Precise -> G.Graph a) -> Heap term Name -> G.Graph a
+heapGraph :: (Precise -> Concrete term name -> a) -> (Either Edge name -> Precise -> G.Graph a) -> Heap term name -> G.Graph a
 heapGraph vertex edge h = foldr (uncurry graph) G.empty (IntMap.toList h)
   where graph k v rest = (G.vertex (vertex k v) `G.connect` outgoing v) `G.overlay` rest
         outgoing = \case
