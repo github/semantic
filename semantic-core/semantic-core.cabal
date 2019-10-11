@@ -67,6 +67,7 @@ test-suite test
   other-modules:  Generators
   build-depends:
       base
+    , semantic-analysis
     , semantic-core
     , semantic-source ^>= 0
     , fused-effects
