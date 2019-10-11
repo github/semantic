@@ -1,5 +1,5 @@
 {-# LANGUAGE DeriveTraversable #-}
-module Core.File
+module Analysis.File
 ( File(..)
 , fromBody
 ) where

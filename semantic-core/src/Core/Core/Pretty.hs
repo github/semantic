@@ -8,8 +8,8 @@ module Core.Core.Pretty
   , prettyCore
   ) where
 
+import           Analysis.File
 import           Core.Core
-import           Core.File
 import           Core.Name
 import           Data.Foldable (toList)
 import           Data.Text.Prettyprint.Doc

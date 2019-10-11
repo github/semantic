@@ -7,8 +7,8 @@ module Instances () where
 -- expose in semantic-core proper, yet are important enough that
 -- we should keep track of them in a dedicated file.
 
+import           Analysis.File
 import           Analysis.ScopeGraph
-import           Core.File
 import           Core.Name (Name (..))
 import           Data.Aeson
 import qualified Data.Map as Map

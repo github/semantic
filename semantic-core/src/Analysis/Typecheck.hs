@@ -8,6 +8,7 @@ module Analysis.Typecheck
 ) where
 
 import           Analysis.Analysis
+import           Analysis.File
 import           Analysis.FlowInsensitive
 import           Control.Applicative (Alternative (..))
 import           Control.Carrier.Fail.WithLoc
@@ -16,7 +17,6 @@ import           Control.Effect.Fresh as Fresh
 import           Control.Effect.Reader hiding (Local)
 import           Control.Effect.State
 import           Control.Monad ((>=>), unless)
-import           Core.File
 import           Data.Foldable (for_)
 import           Data.Function (fix)
 import           Data.Functor (($>))

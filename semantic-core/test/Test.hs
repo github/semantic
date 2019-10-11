@@ -8,11 +8,11 @@ import           Test.Tasty
 import           Test.Tasty.Hedgehog
 import           Test.Tasty.HUnit
 
+import           Analysis.File
 import           Core.Core
 import           Core.Core.Pretty
 import           Core.Core.Parser as Parse
 import qualified Core.Eval as Eval
-import           Core.File
 import           Core.Name
 import qualified Generators as Gen
 import           Source.Span
