@@ -59,17 +59,6 @@ library
     , trifecta                    ^>= 2
     , unordered-containers        ^>= 0.2.10
 
-test-suite doctest
-  import: common
-  type:           exitcode-stdio-1.0
-  hs-source-dirs: test
-  main-is:        Doctest.hs
-  build-depends:
-      base >=4.9 && <4.13
-    , doctest >=0.7 && <1.0
-    , QuickCheck
-    , semantic-core
-
 test-suite test
   import: common
   type:           exitcode-stdio-1.0
