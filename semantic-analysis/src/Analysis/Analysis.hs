@@ -40,7 +40,7 @@ data Heap addr value m k
 data Domain term name value m k
   = Abstract name (term name)                 (value term name -> m k)
   | Apply (value term name) (value term name) (value term name -> m k)
-  | Unit
+  | Unit (value term name -> m k)
   | Bool   Bool              (value term name -> m k)
   | AsBool (value term name) (Bool            -> m k)
   | String   Text              (value term name -> m k)
