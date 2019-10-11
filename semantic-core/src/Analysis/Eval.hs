@@ -8,7 +8,6 @@ module Analysis.Eval
 , prog5
 , prog6
 , ruby
-, Analysis(..)
 ) where
 
 import Analysis.Analysis
