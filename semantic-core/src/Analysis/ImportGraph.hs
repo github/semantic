@@ -15,7 +15,6 @@ import           Control.Effect.Reader
 import           Control.Effect.State
 import           Control.Monad ((>=>))
 import           Core.File
-import           Core.Name
 import           Data.Foldable (fold, for_)
 import           Data.Function (fix)
 import           Data.List.NonEmpty (nonEmpty)
@@ -50,16 +49,16 @@ data Semi term name
 
 
 importGraph
-  :: (Ord term, Show term)
+  :: (Ord name, Ord term, Show name, Show term)
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term Name Name (Value term Name) m
-     -> (term -> m (Value term Name))
-     -> (term -> m (Value term Name))
+     => Analysis term name name (Value term name) m
+     -> (term -> m (Value term name))
+     -> (term -> m (Value term name))
      )
   -> [File term]
-  -> ( Heap Name (Value term Name)
-     , [File (Either (Path.AbsRelFile, Span, String) (Value term Name))]
+  -> ( Heap name (Value term name)
+     , [File (Either (Path.AbsRelFile, Span, String) (Value term name))]
      )
 importGraph eval
   = run
