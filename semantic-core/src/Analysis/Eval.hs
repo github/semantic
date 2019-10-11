@@ -27,15 +27,16 @@ import Data.Term
 import Data.Text (Text)
 import GHC.Stack
 import Prelude hiding (fail)
+import Source.Span
 
 eval :: ( Carrier sig m
-        , Member (Reader Loc) sig
+        , Member (Reader Span) sig
         , MonadFail m
         , Semigroup value
         )
-     => Analysis (Term (Ann :+: Core) Name) address value m
-     -> (Term (Ann :+: Core) Name -> m value)
-     -> (Term (Ann :+: Core) Name -> m value)
+     => Analysis (Term (Ann Span :+: Core) Name) address value m
+     -> (Term (Ann Span :+: Core) Name -> m value)
+     -> (Term (Ann Span :+: Core) Name -> m value)
 eval Analysis{..} eval = \case
   Var n -> lookupEnv' n >>= deref' n
   Term (R c) -> case c of
@@ -72,7 +73,7 @@ eval Analysis{..} eval = \case
       b' <- eval b
       addr <- ref a
       b' <$ assign addr b'
-  Term (L (Ann loc c)) -> local (const loc) (eval c)
+  Term (L (Ann span c)) -> local (const span) (eval c)
   where freeVariable s = fail ("free variable: " <> s)
         uninitialized s = fail ("uninitialized variable: " <> s)
         invalidRef s = fail ("invalid ref: " <> s)
@@ -90,7 +91,7 @@ eval Analysis{..} eval = \case
               a' <- ref a
               a' ... b >>= maybe (freeVariable (show b)) pure
             c -> invalidRef (show c)
-          Term (L (Ann loc c)) -> local (const loc) (ref c)
+          Term (L (Ann span c)) -> local (const span) (ref c)
 
 
 prog1 :: (Carrier sig t, Member Core sig) => File (t Name)
@@ -116,7 +117,7 @@ prog4 = fromBody
     (Core.bool True)
     (Core.bool False))
 
-prog5 :: (Carrier sig t, Member Ann sig, Member Core sig) => File (t Name)
+prog5 :: (Carrier sig t, Member (Ann Span) sig, Member Core sig) => File (t Name)
 prog5 = fromBody $ ann (do'
   [ Just (named' "mkPoint") :<- lams [named' "_x", named' "_y"] (ann (Core.record
     [ ("x", ann (pure "_x"))
@@ -129,15 +130,15 @@ prog5 = fromBody $ ann (do'
 
 prog6 :: (Carrier sig t, Member Core sig) => [File (t Name)]
 prog6 =
-  [ File (Loc "dep"  (locSpan (fromJust here))) $ Core.record
+  [ File (Path "dep")  (snd (fromJust here)) $ Core.record
     [ ("dep", Core.record [ ("var", Core.bool True) ]) ]
-  , File (Loc "main" (locSpan (fromJust here))) $ do' (map (Nothing :<-)
+  , File (Path "main") (snd (fromJust here)) $ do' (map (Nothing :<-)
     [ load (Core.string "dep")
     , Core.record [ ("thing", pure "dep" Core.... "var") ]
     ])
   ]
 
-ruby :: (Carrier sig t, Member Ann sig, Member Core sig) => File (t Name)
+ruby :: (Carrier sig t, Member (Ann Span) sig, Member Core sig) => File (t Name)
 ruby = fromBody $ annWith callStack (rec (named' __semantic_global) (do' statements))
   where statements =
           [ Just "Class" :<- record

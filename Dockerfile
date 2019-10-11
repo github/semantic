@@ -1,7 +1,7 @@
 # Put protoc and twirp tooling in its own image
 FROM haskell:8.6 as haskell
-RUN cabal new-update hackage.haskell.org,HEAD
-RUN cabal new-install proto-lens-protoc
+RUN cabal v2-update && \
+    cabal v2-install proto-lens-protoc
 RUN which proto-lens-protoc
 
 FROM golang:1.13-stretch AS protoc
@@ -22,18 +22,23 @@ ENTRYPOINT ["/protobuf/bin/protoc", "-I/protobuf", "--plugin=protoc-gen-haskell=
 FROM haskell:8.6 as build
 WORKDIR /build
 
-# Build and cache the dependencies first so we can cache these layers.
+# Build just the dependencies so that this layer can be cached
 COPY semantic.cabal .
-COPY semantic-core semantic-core
-RUN cabal new-update hackage.haskell.org,HEAD
-RUN cabal new-configure semantic semantic-core
-RUN cabal new-build --only-dependencies
+COPY semantic-core semantic-core/
+COPY semantic-java semantic-java/
+COPY semantic-json semantic-json/
+COPY semantic-python semantic-python/
+COPY semantic-source semantic-source/
+COPY semantic-tags semantic-tags/
+COPY cabal.project .
+RUN cabal v2-update && \
+    cabal v2-build --flags="release" --only-dependencies
 
-# Copy in and build the entire project
+# Build all of semantic
 COPY . .
-RUN cabal new-build --flags="release" semantic:exe:semantic
+RUN cabal v2-build --flags="release" semantic:exe:semantic
 
-# A fake `install` target until we can get `cabal new-install` to work
+# A fake `install` target until we can get `cabal v2-install` to work
 RUN cp $(find dist-newstyle/build/x86_64-linux -name semantic -type f -perm -u=x) /usr/local/bin/semantic
 
 # Create a fresh image containing only the compiled CLI program, so that the

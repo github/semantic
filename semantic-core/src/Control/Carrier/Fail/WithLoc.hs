@@ -14,18 +14,20 @@ import Control.Effect.Fail (Fail(..), MonadFail(..))
 import Control.Effect.Reader
 import Data.Loc
 import Prelude hiding (fail)
+import Source.Span
 
-runFail :: FailC m a -> m (Either (Loc, String) a)
+runFail :: FailC m a -> m (Either (Path, Span, String) a)
 runFail = runError . runFailC
 
-newtype FailC m a = FailC { runFailC :: ErrorC (Loc, String) m a }
+newtype FailC m a = FailC { runFailC :: ErrorC (Path, Span, String) m a }
   deriving (Alternative, Applicative, Functor, Monad)
 
-instance (Carrier sig m, Effect sig, Member (Reader Loc) sig) => MonadFail (FailC m) where
+instance (Carrier sig m, Effect sig, Member (Reader Path) sig, Member (Reader Span) sig) => MonadFail (FailC m) where
   fail s = do
-    loc <- ask
-    FailC (throwError (loc :: Loc, s))
+    path <- ask
+    span <- ask
+    FailC (throwError (path :: Path, span :: Span, s))
 
-instance (Carrier sig m, Effect sig, Member (Reader Loc) sig) => Carrier (Fail :+: sig) (FailC m) where
+instance (Carrier sig m, Effect sig, Member (Reader Path) sig, Member (Reader Span) sig) => Carrier (Fail :+: sig) (FailC m) where
   eff (L (Fail s)) = fail s
   eff (R other)    = FailC (eff (R (handleCoercible other)))
