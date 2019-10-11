@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, OverloadedStrings, RankNTypes, RecordWildCards, TypeApplications, TypeOperators #-}
+{-# LANGUAGE FlexibleContexts, OverloadedStrings, RankNTypes, RecordWildCards, ScopedTypeVariables, TypeApplications, TypeOperators #-}
 module Analysis.ScopeGraph
 ( ScopeGraph(..)
 , Ref (..)
@@ -17,7 +17,6 @@ import           Control.Effect.Reader
 import           Control.Effect.State
 import           Control.Monad ((>=>))
 import           Core.File
-import           Core.Name
 import           Data.Foldable (fold)
 import           Data.Function (fix)
 import           Data.List.NonEmpty
@@ -29,8 +28,8 @@ import           Prelude hiding (fail)
 import           Source.Span
 import qualified System.Path as Path
 
-data Decl = Decl
-  { declSymbol :: Name
+data Decl name = Decl
+  { declSymbol :: name
   , declPath   :: Path.AbsRelFile
   , declSpan   :: Span
   }
@@ -42,25 +41,25 @@ data Ref = Ref
   }
   deriving (Eq, Ord, Show)
 
-newtype ScopeGraph = ScopeGraph { unScopeGraph :: Map.Map Decl (Set.Set Ref) }
+newtype ScopeGraph name = ScopeGraph { unScopeGraph :: Map.Map (Decl name) (Set.Set Ref) }
   deriving (Eq, Ord, Show)
 
-instance Semigroup ScopeGraph where
+instance Ord name => Semigroup (ScopeGraph name) where
   ScopeGraph a <> ScopeGraph b = ScopeGraph (Map.unionWith (<>) a b)
 
-instance Monoid ScopeGraph where
+instance Ord name => Monoid (ScopeGraph name) where
   mempty = ScopeGraph Map.empty
 
 scopeGraph
-  :: Ord term
+  :: (Ord name, Ord (term name))
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term Name ScopeGraph m
-     -> (term -> m ScopeGraph)
-     -> (term -> m ScopeGraph)
+     => Analysis term name name (ScopeGraph name) m
+     -> (term name -> m (ScopeGraph name))
+     -> (term name -> m (ScopeGraph name))
      )
-  -> [File term]
-  -> (Heap Name ScopeGraph, [File (Either (Path.AbsRelFile, Span, String) ScopeGraph)])
+  -> [File (term name)]
+  -> (Heap name (ScopeGraph name), [File (Either (Path.AbsRelFile, Span, String) (ScopeGraph name))])
 scopeGraph eval
   = run
   . runFresh
@@ -68,37 +67,40 @@ scopeGraph eval
   . traverse (runFile eval)
 
 runFile
-  :: ( Carrier sig m
+  :: forall term name m sig
+  .  ( Carrier sig m
      , Effect sig
      , Member Fresh sig
-     , Member (State (Heap Name ScopeGraph)) sig
-     , Ord term
+     , Member (State (Heap name (ScopeGraph name))) sig
+     , Ord name
+     , Ord (term name)
      )
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term Name ScopeGraph m
-     -> (term -> m ScopeGraph)
-     -> (term -> m ScopeGraph)
+     => Analysis term name name (ScopeGraph name) m
+     -> (term name -> m (ScopeGraph name))
+     -> (term name -> m (ScopeGraph name))
      )
-  -> File term
-  -> m (File (Either (Path.AbsRelFile, Span, String) ScopeGraph))
+  -> File (term name)
+  -> m (File (Either (Path.AbsRelFile, Span, String) (ScopeGraph name)))
 runFile eval file = traverse run file
   where run = runReader (filePath file)
             . runReader (fileSpan file)
-            . runReader (Map.empty @Name @Ref)
+            . runReader (Map.empty @name @Ref)
             . runFail
             . fmap fold
-            . convergeTerm (Proxy @Name) (fix (cacheTerm . eval scopeGraphAnalysis))
+            . convergeTerm (Proxy @name) (fix (cacheTerm . eval scopeGraphAnalysis))
 
 scopeGraphAnalysis
   :: ( Alternative m
      , Carrier sig m
      , Member (Reader Path.AbsRelFile) sig
      , Member (Reader Span) sig
-     , Member (Reader (Map.Map Name Ref)) sig
-     , Member (State (Heap Name ScopeGraph)) sig
+     , Member (Reader (Map.Map name Ref)) sig
+     , Member (State (Heap name (ScopeGraph name))) sig
+     , Ord name
      )
-  => Analysis term Name ScopeGraph m
+  => Analysis term name name (ScopeGraph name) m
 scopeGraphAnalysis = Analysis{..}
   where alloc = pure
         bind name _ m = do
@@ -117,7 +119,7 @@ scopeGraphAnalysis = Analysis{..}
           modify (Map.insertWith (<>) addr (Set.singleton (extendBinding addr ref bindRef <> v)))
         abstract eval name body = do
           addr <- alloc name
-          assign name (mempty @ScopeGraph)
+          assign name mempty
           bind name addr (eval body)
         apply _ f a = pure (f <> a)
         unit = pure mempty

@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, RankNTypes, RecordWildCards, TypeApplications #-}
+{-# LANGUAGE FlexibleContexts, RankNTypes, RecordWildCards, ScopedTypeVariables, TypeApplications #-}
 module Analysis.ImportGraph
 ( ImportGraph
 , importGraph
@@ -15,7 +15,6 @@ import           Control.Effect.Reader
 import           Control.Effect.State
 import           Control.Monad ((>=>))
 import           Core.File
-import           Core.Name
 import           Data.Foldable (fold, for_)
 import           Data.Function (fix)
 import           Data.List.NonEmpty (nonEmpty)
@@ -29,20 +28,20 @@ import qualified System.Path as Path
 
 type ImportGraph = Map.Map Text (Set.Set Text)
 
-data Value term = Value
-  { valueSemi  :: Semi term
+data Value term name = Value
+  { valueSemi  :: Semi term name
   , valueGraph :: ImportGraph
   }
   deriving (Eq, Ord, Show)
 
-instance Semigroup (Value term) where
+instance Semigroup (Value term name) where
   Value _ g1 <> Value _ g2 = Value Abstract (Map.unionWith (<>) g1 g2)
 
-instance Monoid (Value term) where
+instance Monoid (Value term name) where
   mempty = Value Abstract mempty
 
-data Semi term
-  = Closure Path.AbsRelFile Span Name term
+data Semi term name
+  = Closure Path.AbsRelFile Span name (term name)
   -- FIXME: Bound String values.
   | String Text
   | Abstract
@@ -50,16 +49,16 @@ data Semi term
 
 
 importGraph
-  :: (Ord term, Show term)
+  :: (Ord name, Ord (term name), Show name, Show (term name))
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term Name (Value term) m
-     -> (term -> m (Value term))
-     -> (term -> m (Value term))
+     => Analysis term name name (Value term name) m
+     -> (term name -> m (Value term name))
+     -> (term name -> m (Value term name))
      )
-  -> [File term]
-  -> ( Heap Name (Value term)
-     , [File (Either (Path.AbsRelFile, Span, String) (Value term))]
+  -> [File (term name)]
+  -> ( Heap name (Value term name)
+     , [File (Either (Path.AbsRelFile, Span, String) (Value term name))]
      )
 importGraph eval
   = run
@@ -68,39 +67,44 @@ importGraph eval
   . traverse (runFile eval)
 
 runFile
-  :: ( Carrier sig m
+  :: forall term name m sig
+  .  ( Carrier sig m
      , Effect sig
      , Member Fresh sig
-     , Member (State (Heap Name (Value term))) sig
-     , Ord  term
-     , Show term
+     , Member (State (Heap name (Value term name))) sig
+     , Ord  name
+     , Ord  (term name)
+     , Show name
+     , Show (term name)
      )
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term Name (Value term) m
-     -> (term -> m (Value term))
-     -> (term -> m (Value term))
+     => Analysis term name name (Value term name) m
+     -> (term name -> m (Value term name))
+     -> (term name -> m (Value term name))
      )
-  -> File term
-  -> m (File (Either (Path.AbsRelFile, Span, String) (Value term)))
+  -> File (term name)
+  -> m (File (Either (Path.AbsRelFile, Span, String) (Value term name)))
 runFile eval file = traverse run file
   where run = runReader (filePath file)
             . runReader (fileSpan file)
             . runFail
             . fmap fold
-            . convergeTerm (Proxy @Name) (fix (cacheTerm . eval importGraphAnalysis))
+            . convergeTerm (Proxy @name) (fix (cacheTerm . eval importGraphAnalysis))
 
 -- FIXME: decompose into a product domain and two atomic domains
 importGraphAnalysis :: ( Alternative m
                        , Carrier sig m
                        , Member (Reader Path.AbsRelFile) sig
                        , Member (Reader Span) sig
-                       , Member (State (Heap Name (Value term))) sig
+                       , Member (State (Heap name (Value term name))) sig
                        , MonadFail m
-                       , Ord  term
-                       , Show term
+                       , Ord  name
+                       , Ord  (term name)
+                       , Show name
+                       , Show (term name)
                        )
-                    => Analysis term Name (Value term) m
+                    => Analysis term name name (Value term name) m
 importGraphAnalysis = Analysis{..}
   where alloc = pure
         bind _ _ m = m

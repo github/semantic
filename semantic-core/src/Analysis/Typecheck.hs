@@ -17,7 +17,6 @@ import           Control.Effect.Reader hiding (Local)
 import           Control.Effect.State
 import           Control.Monad ((>=>), unless)
 import           Core.File
-import           Core.Name as Name
 import           Data.Foldable (for_)
 import           Data.Function (fix)
 import           Data.Functor (($>))
@@ -40,28 +39,28 @@ import           Syntax.Term
 import           Syntax.Var (closed)
 import qualified System.Path as Path
 
-data Monotype f a
+data Monotype name f a
   = Bool
   | Unit
   | String
   | Arr (f a) (f a)
-  | Record (Map.Map Name (f a))
+  | Record (Map.Map name (f a))
   deriving (Foldable, Functor, Generic1, Traversable)
 
-type Type = Term Monotype Meta
+type Type name = Term (Monotype name) Meta
 
 -- FIXME: Union the effects/annotations on the operands.
 
 -- | We derive the 'Semigroup' instance for types to take the second argument. This is equivalent to stating that the type of an imperative sequence of statements is the type of its final statement.
-deriving via (Last (Term Monotype a)) instance Semigroup (Term Monotype a)
+deriving via (Last (Term (Monotype name) a)) instance Semigroup (Term (Monotype name) a)
 
-deriving instance (Eq   a, forall a . Eq   a => Eq   (f a), Monad f) => Eq   (Monotype f a)
-deriving instance (Ord  a, forall a . Eq   a => Eq   (f a)
-                         , forall a . Ord  a => Ord  (f a), Monad f) => Ord  (Monotype f a)
-deriving instance (Show a, forall a . Show a => Show (f a))          => Show (Monotype f a)
+deriving instance (Eq   name, Eq   a, forall a . Eq   a => Eq   (f a), Monad f) => Eq   (Monotype name f a)
+deriving instance (Ord  name, Ord  a, forall a . Eq   a => Eq   (f a)
+                                    , forall a . Ord  a => Ord  (f a), Monad f) => Ord  (Monotype name f a)
+deriving instance (Show name, Show a, forall a . Show a => Show (f a))          => Show (Monotype name f a)
 
-instance HFunctor Monotype
-instance RightModule Monotype where
+instance HFunctor (Monotype name)
+instance RightModule (Monotype name) where
   Unit     >>=* _ = Unit
   Bool     >>=* _ = Bool
   String   >>=* _ = String
@@ -89,21 +88,21 @@ forAll n body = send (PForAll (abstract1 n body))
 forAlls :: (Eq a, Carrier sig m, Member Polytype sig, Foldable t) => t a -> m a -> m a
 forAlls ns body = foldr forAll body ns
 
-generalize :: Term Monotype Meta -> Term (Polytype :+: Monotype) Void
+generalize :: Term (Monotype name) Meta -> Term (Polytype :+: Monotype name) Void
 generalize ty = fromJust (closed (forAlls (IntSet.toList (mvs ty)) (hoistTerm R ty)))
 
 
 typecheckingFlowInsensitive
-  :: Ord term
+  :: (Ord name, Ord (term name), Show name)
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term Name Type m
-     -> (term -> m Type)
-     -> (term -> m Type)
+     => Analysis term name name (Type name) m
+     -> (term name -> m (Type name))
+     -> (term name -> m (Type name))
      )
-  -> [File term]
-  -> ( Heap Name Type
-     , [File (Either (Path.AbsRelFile, Span, String) (Term (Polytype :+: Monotype) Void))]
+  -> [File (term name)]
+  -> ( Heap name (Type name)
+     , [File (Either (Path.AbsRelFile, Span, String) (Term (Polytype :+: Monotype name) Void))]
      )
 typecheckingFlowInsensitive eval
   = run
@@ -113,48 +112,52 @@ typecheckingFlowInsensitive eval
   . traverse (runFile eval)
 
 runFile
-  :: ( Carrier sig m
+  :: forall term name m sig
+  .  ( Carrier sig m
      , Effect sig
      , Member Fresh sig
-     , Member (State (Heap Name Type)) sig
-     , Ord term
+     , Member (State (Heap name (Type name))) sig
+     , Ord name
+     , Ord (term name)
+     , Show name
      )
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term Name Type m
-     -> (term -> m Type)
-     -> (term -> m Type)
+     => Analysis term name name (Type name) m
+     -> (term name -> m (Type name))
+     -> (term name -> m (Type name))
      )
-  -> File term
-  -> m (File (Either (Path.AbsRelFile, Span, String) Type))
+  -> File (term name)
+  -> m (File (Either (Path.AbsRelFile, Span, String) (Type name)))
 runFile eval file = traverse run file
   where run
           = (\ m -> do
               (subst, t) <- m
-              modify @(Heap Name Type) (fmap (Set.map (substAll subst)))
+              modify @(Heap name (Type name)) (fmap (Set.map (substAll subst)))
               pure (substAll subst <$> t))
-          . runState (mempty :: Substitution)
+          . runState (mempty :: (Substitution name))
           . runReader (filePath file)
           . runReader (fileSpan file)
           . runFail
           . (\ m -> do
             (cs, t) <- m
-            t <$ solve cs)
-          . runState (Set.empty :: Set.Set Constraint)
+            t <$ solve @name cs)
+          . runState (Set.empty :: Set.Set (Constraint name))
           . (\ m -> do
               v <- meta
               bs <- m
               v <$ for_ bs (unify v))
-          . convergeTerm (Proxy @Name) (fix (cacheTerm . eval typecheckingAnalysis))
+          . convergeTerm (Proxy @name) (fix (cacheTerm . eval typecheckingAnalysis))
 
 typecheckingAnalysis
   :: ( Alternative m
      , Carrier sig m
      , Member Fresh sig
-     , Member (State (Set.Set Constraint)) sig
-     , Member (State (Heap Name Type)) sig
+     , Member (State (Set.Set (Constraint name))) sig
+     , Member (State (Heap name (Type name))) sig
+     , Ord name
      )
-  => Analysis term Name Type m
+  => Analysis term name name (Type name) m
 typecheckingAnalysis = Analysis{..}
   where alloc = pure
         bind _ _ m = m
@@ -188,28 +191,28 @@ typecheckingAnalysis = Analysis{..}
         _ ... m = pure (Just m)
 
 
-data Constraint = Term Monotype Meta :===: Term Monotype Meta
+data Constraint name = Type name :===: Type name
   deriving (Eq, Ord, Show)
 
 infix 4 :===:
 
-data Solution
-  = Int := Term Monotype Meta
+data Solution name
+  = Int := Type name
   deriving (Eq, Ord, Show)
 
 infix 5 :=
 
-meta :: (Carrier sig m, Member Fresh sig) => m Type
+meta :: (Carrier sig m, Member Fresh sig) => m (Type name)
 meta = pure <$> Fresh.fresh
 
-unify :: (Carrier sig m, Member (State (Set.Set Constraint)) sig) => Term Monotype Meta -> Term Monotype Meta -> m ()
+unify :: (Carrier sig m, Member (State (Set.Set (Constraint name))) sig, Ord name) => Type name -> Type name -> m ()
 unify t1 t2
   | t1 == t2  = pure ()
   | otherwise = modify (<> Set.singleton (t1 :===: t2))
 
-type Substitution = IntMap.IntMap Type
+type Substitution name = IntMap.IntMap (Type name)
 
-solve :: (Carrier sig m, Member (State Substitution) sig, MonadFail m) => Set.Set Constraint -> m ()
+solve :: (Member (State (Substitution name)) sig, MonadFail m, Ord name, Show name, Carrier sig m) => Set.Set (Constraint name) -> m ()
 solve cs = for_ cs solve
   where solve = \case
           -- FIXME: how do we enforce proper subtyping? row polymorphism or something?
