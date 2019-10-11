@@ -19,27 +19,27 @@ deriving newtype instance ToJSON Name
 deriving newtype instance ToJSONKey Name
 
 instance ToJSON a => ToJSON (File a) where
-  toJSON File{fileLoc, fileBody} = object
-    [ "location" .= fileLoc
+  toJSON File{filePath, fileSpan, fileBody} = object
+    [ "path" .= filePath
+    , "span" .= fileSpan
     , "body" .= fileBody
     ]
 
-instance ToJSON Loc where
-  toJSON Loc{locPath, locSpan} = object
-    [ "kind" .= ("loc" :: Text)
-    , "path" .= locPath
-    , "span" .= locSpan
-    ]
+deriving newtype instance ToJSON Path
 
 instance ToJSON Ref where
-  toJSON (Ref loc) = object [ "kind" .= ("ref" :: Text)
-                            , "location" .= loc]
+  toJSON (Ref path span) = object
+    [ "kind" .= ("ref" :: Text)
+    , "path" .= path
+    , "span" .= span
+    ]
 
 instance ToJSON Decl where
-  toJSON Decl{declSymbol, declLoc} = object
+  toJSON Decl{declSymbol, declPath, declSpan} = object
     [ "kind"   .= ("decl" :: Text)
     , "symbol" .= declSymbol
-    , "location" .= declLoc
+    , "path" .= declPath
+    , "span" .= declSpan
     ]
 
 instance ToJSON ScopeGraph where

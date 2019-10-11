@@ -104,7 +104,7 @@ supportedExts = foldr append mempty supportedLanguages
     lookup k = Map.lookup k Lingo.languages
 
 codeNavLanguages :: [Language]
-codeNavLanguages = [Go, Ruby, Python, JavaScript, TypeScript, PHP]
+codeNavLanguages = [Go, Java, Ruby, Python, JavaScript, TypeScript, PHP]
 
 pathIsMinified :: FilePath -> Bool
 pathIsMinified = isExtensionOf ".min.js"
