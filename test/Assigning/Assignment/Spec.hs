@@ -254,7 +254,7 @@ spec = do
       `shouldBe`
       Left [ "symbol" ]
 
-node :: symbol -> Int -> Int -> [AST [] symbol] -> AST [] symbol
+node :: symbol -> Int -> Int -> [AST symbol] -> AST symbol
 node symbol start end children = Term (Node symbol (Loc (Range start end) (Span (Pos 1 (succ start)) (Pos 1 (succ end)))) `In` children)
 
 data Grammar = Palette | Red | Green | Blue | Magenta
