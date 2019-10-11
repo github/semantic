@@ -199,7 +199,7 @@ data Solution
 
 infix 5 :=
 
-meta :: (Carrier sig m, Member Fresh sig) => m (Type Name)
+meta :: (Carrier sig m, Member Fresh sig) => m (Type name)
 meta = pure <$> Fresh.fresh
 
 unify :: (Carrier sig m, Member (State (Set.Set (Constraint Name))) sig) => Type Name -> Type Name -> m ()
