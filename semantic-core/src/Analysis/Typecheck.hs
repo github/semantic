@@ -113,39 +113,42 @@ typecheckingFlowInsensitive eval
   . traverse (runFile eval)
 
 runFile
-  :: ( Carrier sig m
+  :: forall term name m sig
+  .  ( Carrier sig m
      , Effect sig
      , Member Fresh sig
-     , Member (State (Heap Name (Type Name))) sig
-     , Ord (term Name)
+     , Member (State (Heap name (Type name))) sig
+     , Ord name
+     , Ord (term name)
+     , Show name
      )
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term Name Name (Type Name) m
-     -> (term Name -> m (Type Name))
-     -> (term Name -> m (Type Name))
+     => Analysis term name name (Type name) m
+     -> (term name -> m (Type name))
+     -> (term name -> m (Type name))
      )
-  -> File (term Name)
-  -> m (File (Either (Path.AbsRelFile, Span, String) (Type Name)))
+  -> File (term name)
+  -> m (File (Either (Path.AbsRelFile, Span, String) (Type name)))
 runFile eval file = traverse run file
   where run
           = (\ m -> do
               (subst, t) <- m
-              modify @(Heap Name (Type Name)) (fmap (Set.map (substAll subst)))
+              modify @(Heap name (Type name)) (fmap (Set.map (substAll subst)))
               pure (substAll subst <$> t))
-          . runState (mempty :: (Substitution Name))
+          . runState (mempty :: (Substitution name))
           . runReader (filePath file)
           . runReader (fileSpan file)
           . runFail
           . (\ m -> do
             (cs, t) <- m
-            t <$ solve @Name cs)
+            t <$ solve @name cs)
           . runState (Set.empty :: Set.Set (Constraint name))
           . (\ m -> do
               v <- meta
               bs <- m
               v <$ for_ bs (unify v))
-          . convergeTerm (Proxy @Name) (fix (cacheTerm . eval typecheckingAnalysis))
+          . convergeTerm (Proxy @name) (fix (cacheTerm . eval typecheckingAnalysis))
 
 typecheckingAnalysis
   :: ( Alternative m
