@@ -31,3 +31,8 @@ data Env name addr m k
   | Lookup name (Maybe addr -> m k)
 
 deriving instance Functor m => Functor (Env name addr m)
+
+data Heap addr value m k
+  = Deref addr (Maybe value -> m k)
+  | Assign addr value (m k)
+  deriving (Functor)
