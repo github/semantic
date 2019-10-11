@@ -23,8 +23,9 @@ import Data.Text.Prettyprint.Doc
 import Data.Text.Prettyprint.Doc.Render.Terminal (renderIO)
 import System.Console.Haskeline hiding (Handler, handle)
 import System.Console.Terminal.Size as Size
-import System.Directory
-import System.FilePath
+import System.Path ((</>))
+import qualified System.Path as Path
+import System.Path.Directory
 import System.IO (stdout)
 
 runReadline :: MonadException m => Prefs -> Settings m -> ReadlineC m a -> m a
@@ -33,11 +34,11 @@ runReadline prefs settings = runInputTWithPrefs prefs (coerce settings) . runM .
 runReadlineWithHistory :: MonadException m => ReadlineC m a -> m a
 runReadlineWithHistory block = do
   homeDir <- liftIO getHomeDirectory
-  prefs <- liftIO $ readPrefs (homeDir </> ".haskeline")
-  let settingsDir = homeDir </> ".local/semantic-core"
+  prefs <- liftIO $ readPrefs (Path.toString (homeDir </> Path.relFile ".haskeline"))
+  let settingsDir = homeDir </> Path.relDir ".local" </> Path.relDir "semantic-core"
       settings = Settings
         { complete = noCompletion
-        , historyFile = Just (settingsDir <> "/repl_history")
+        , historyFile = Just (Path.toString (settingsDir </> Path.relFile "repl_history"))
         , autoAddHistory = True
         }
   liftIO $ createDirectoryIfMissing True settingsDir
