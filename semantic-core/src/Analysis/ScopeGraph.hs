@@ -29,8 +29,8 @@ import           Prelude hiding (fail)
 import           Source.Span
 import qualified System.Path as Path
 
-data Decl = Decl
-  { declSymbol :: Name
+data Decl name = Decl
+  { declSymbol :: name
   , declPath   :: Path.AbsRelFile
   , declSpan   :: Span
   }
@@ -42,7 +42,7 @@ data Ref = Ref
   }
   deriving (Eq, Ord, Show)
 
-newtype ScopeGraph = ScopeGraph { unScopeGraph :: Map.Map Decl (Set.Set Ref) }
+newtype ScopeGraph = ScopeGraph { unScopeGraph :: Map.Map (Decl Name) (Set.Set Ref) }
   deriving (Eq, Ord, Show)
 
 instance Semigroup ScopeGraph where
