@@ -1,5 +1,5 @@
 {-# LANGUAGE FlexibleContexts, TypeOperators #-}
-module Core.Core.Parser
+module Core.Parser
   ( core
   , lit
   , expr

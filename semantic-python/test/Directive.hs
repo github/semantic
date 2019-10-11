@@ -7,8 +7,8 @@ module Directive ( Directive (..)
 import           Control.Applicative
 import           Control.Monad
 import           Core.Core (Core)
-import qualified Core.Core.Parser as Core.Parser
-import qualified Core.Core.Pretty as Core.Pretty
+import qualified Core.Parser as Core.Parser
+import qualified Core.Pretty as Core.Pretty
 import           Core.Name (Name)
 import           Data.ByteString.Char8 (ByteString)
 import qualified Data.ByteString.Char8 as ByteString

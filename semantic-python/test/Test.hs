@@ -12,7 +12,7 @@ import           Control.Monad.Catch
 import           Control.Monad.IO.Class
 import           Control.Monad.Trans.Resource (ResourceT, runResourceT)
 import           Core.Core
-import           Core.Core.Pretty
+import           Core.Pretty
 import qualified Core.Eval as Eval
 import           Core.Name
 import qualified Data.Aeson as Aeson

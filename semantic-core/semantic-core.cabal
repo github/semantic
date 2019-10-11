@@ -41,8 +41,8 @@ library
   hs-source-dirs: src
   exposed-modules:
     Core.Core
-    Core.Core.Parser
-    Core.Core.Pretty
+    Core.Parser
+    Core.Pretty
     Core.Eval
     Core.Name
   build-depends:
