@@ -17,7 +17,6 @@ import           Control.Effect.Reader
 import           Control.Effect.State
 import           Control.Monad ((>=>))
 import           Core.File
-import           Core.Name
 import           Data.Foldable (fold)
 import           Data.Function (fix)
 import           Data.List.NonEmpty
@@ -52,15 +51,15 @@ instance Ord name => Monoid (ScopeGraph name) where
   mempty = ScopeGraph Map.empty
 
 scopeGraph
-  :: Ord (term Name)
+  :: (Ord name, Ord (term name))
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term Name Name (ScopeGraph Name) m
-     -> (term Name -> m (ScopeGraph Name))
-     -> (term Name -> m (ScopeGraph Name))
+     => Analysis term name name (ScopeGraph name) m
+     -> (term name -> m (ScopeGraph name))
+     -> (term name -> m (ScopeGraph name))
      )
-  -> [File (term Name)]
-  -> (Heap Name (ScopeGraph Name), [File (Either (Path.AbsRelFile, Span, String) (ScopeGraph Name))])
+  -> [File (term name)]
+  -> (Heap name (ScopeGraph name), [File (Either (Path.AbsRelFile, Span, String) (ScopeGraph name))])
 scopeGraph eval
   = run
   . runFresh
