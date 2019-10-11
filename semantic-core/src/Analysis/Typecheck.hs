@@ -188,13 +188,13 @@ typecheckingAnalysis = Analysis{..}
         _ ... m = pure (Just m)
 
 
-data Constraint = Term Monotype Meta :===: Term Monotype Meta
+data Constraint = Type :===: Type
   deriving (Eq, Ord, Show)
 
 infix 4 :===:
 
 data Solution
-  = Int := Term Monotype Meta
+  = Int := Type
   deriving (Eq, Ord, Show)
 
 infix 5 :=
@@ -202,7 +202,7 @@ infix 5 :=
 meta :: (Carrier sig m, Member Fresh sig) => m Type
 meta = pure <$> Fresh.fresh
 
-unify :: (Carrier sig m, Member (State (Set.Set Constraint)) sig) => Term Monotype Meta -> Term Monotype Meta -> m ()
+unify :: (Carrier sig m, Member (State (Set.Set Constraint)) sig) => Type -> Type -> m ()
 unify t1 t2
   | t1 == t2  = pure ()
   | otherwise = modify (<> Set.singleton (t1 :===: t2))
