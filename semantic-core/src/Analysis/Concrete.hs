@@ -222,4 +222,4 @@ data EdgeType term
 
 -- $setup
 -- >>> :seti -XOverloadedStrings
--- >>> import qualified Data.Core as Core
+-- >>> import qualified Core.Core as Core
