@@ -33,7 +33,7 @@ eval :: ( Carrier sig m
         , MonadFail m
         , Semigroup value
         )
-     => Analysis (Term (Ann Span :+: Core) Name) Name address value m
+     => Analysis (Term (Ann Span :+: Core)) Name address value m
      -> (Term (Ann Span :+: Core) Name -> m value)
      -> (Term (Ann Span :+: Core) Name -> m value)
 eval Analysis{..} eval = \case

@@ -52,14 +52,14 @@ instance Monoid ScopeGraph where
   mempty = ScopeGraph Map.empty
 
 scopeGraph
-  :: Ord term
+  :: Ord (term Name)
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
      => Analysis term Name Name ScopeGraph m
-     -> (term -> m ScopeGraph)
-     -> (term -> m ScopeGraph)
+     -> (term Name -> m ScopeGraph)
+     -> (term Name -> m ScopeGraph)
      )
-  -> [File term]
+  -> [File (term Name)]
   -> (Heap Name ScopeGraph, [File (Either (Path.AbsRelFile, Span, String) ScopeGraph)])
 scopeGraph eval
   = run
@@ -72,15 +72,15 @@ runFile
      , Effect sig
      , Member Fresh sig
      , Member (State (Heap Name ScopeGraph)) sig
-     , Ord term
+     , Ord (term Name)
      )
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
      => Analysis term Name Name ScopeGraph m
-     -> (term -> m ScopeGraph)
-     -> (term -> m ScopeGraph)
+     -> (term Name -> m ScopeGraph)
+     -> (term Name -> m ScopeGraph)
      )
-  -> File term
+  -> File (term Name)
   -> m (File (Either (Path.AbsRelFile, Span, String) ScopeGraph))
 runFile eval file = traverse run file
   where run = runReader (filePath file)

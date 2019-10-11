@@ -94,14 +94,14 @@ generalize ty = fromJust (closed (forAlls (IntSet.toList (mvs ty)) (hoistTerm R 
 
 
 typecheckingFlowInsensitive
-  :: Ord term
+  :: Ord (term Name)
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
      => Analysis term Name Name Type m
-     -> (term -> m Type)
-     -> (term -> m Type)
+     -> (term Name -> m Type)
+     -> (term Name -> m Type)
      )
-  -> [File term]
+  -> [File (term Name)]
   -> ( Heap Name Type
      , [File (Either (Path.AbsRelFile, Span, String) (Term (Polytype :+: Monotype) Void))]
      )
@@ -117,15 +117,15 @@ runFile
      , Effect sig
      , Member Fresh sig
      , Member (State (Heap Name Type)) sig
-     , Ord term
+     , Ord (term Name)
      )
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
      => Analysis term Name Name Type m
-     -> (term -> m Type)
-     -> (term -> m Type)
+     -> (term Name -> m Type)
+     -> (term Name -> m Type)
      )
-  -> File term
+  -> File (term Name)
   -> m (File (Either (Path.AbsRelFile, Span, String) Type))
 runFile eval file = traverse run file
   where run

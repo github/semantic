@@ -78,7 +78,7 @@ concrete
      )
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis (term name) name Precise (Concrete term name) m
+     => Analysis term name Precise (Concrete term name) m
      -> (term name -> m (Concrete term name))
      -> (term name -> m (Concrete term name))
      )
@@ -104,7 +104,7 @@ runFile
      )
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis (term name) name Precise (Concrete term name) m
+     => Analysis term name Precise (Concrete term name) m
      -> (term name -> m (Concrete term name))
      -> (term name -> m (Concrete term name))
      )
@@ -130,7 +130,7 @@ concreteAnalysis :: ( Carrier sig m
                     , Show name
                     , Show (term name)
                     )
-                 => Analysis (term name) name Precise (Concrete term name) m
+                 => Analysis term name Precise (Concrete term name) m
 concreteAnalysis = Analysis{..}
   where alloc _ = fresh
         bind name addr m = local (Map.insert name addr) m

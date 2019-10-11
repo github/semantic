@@ -14,8 +14,8 @@ data Analysis term name address value m = Analysis
   , lookupEnv :: name -> m (Maybe address)
   , deref     :: address -> m (Maybe value)
   , assign    :: address -> value -> m ()
-  , abstract  :: (term -> m value) -> name -> term -> m value
-  , apply     :: (term -> m value) -> value -> value -> m value
+  , abstract  :: (term name -> m value) -> name -> term name -> m value
+  , apply     :: (term name -> m value) -> value -> value -> m value
   , unit      :: m value
   , bool      :: Bool -> m value
   , asBool    :: value -> m Bool
