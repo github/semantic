@@ -18,7 +18,6 @@ data SemanticAST = SemanticAST
   { format              :: Format
   , sourceFilePath      :: Maybe FilePath
   , sourceString        :: Maybe Prelude.String
-  , format              :: Format
   } deriving (Read)
 
 parseAST :: Parser SemanticAST
