@@ -12,7 +12,7 @@ import Control.Effect.Carrier
 import Control.Effect.Error
 import Control.Effect.Fail (Fail(..), MonadFail(..))
 import Control.Effect.Reader
-import Data.Loc
+import Core.Loc
 import Prelude hiding (fail)
 import Source.Span
 

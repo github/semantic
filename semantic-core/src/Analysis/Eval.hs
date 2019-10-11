@@ -8,26 +8,25 @@ module Analysis.Eval
 , prog5
 , prog6
 , ruby
-, Analysis(..)
 ) where
 
+import Analysis.Analysis
 import Control.Applicative (Alternative (..))
 import Control.Effect.Carrier
 import Control.Effect.Fail
 import Control.Effect.Reader
 import Control.Monad ((>=>))
-import Data.Core as Core
-import Data.File
+import Core.Core as Core
+import Core.File
+import Core.Loc
+import Core.Name
 import Data.Functor
-import Data.Loc
 import Data.Maybe (fromJust, fromMaybe)
-import Data.Name
-import Data.Scope
-import Data.Term
-import Data.Text (Text)
 import GHC.Stack
 import Prelude hiding (fail)
 import Source.Span
+import Syntax.Scope
+import Syntax.Term
 
 eval :: ( Carrier sig m
         , Member (Reader Span) sig
@@ -39,7 +38,7 @@ eval :: ( Carrier sig m
      -> (Term (Ann Span :+: Core) Name -> m value)
 eval Analysis{..} eval = \case
   Var n -> lookupEnv' n >>= deref' n
-  Term (R c) -> case c of
+  Alg (R c) -> case c of
     Rec (Named (Ignored n) b) -> do
       addr <- alloc n
       v <- bind n addr (eval (instantiate1 (pure n) b))
@@ -73,7 +72,7 @@ eval Analysis{..} eval = \case
       b' <- eval b
       addr <- ref a
       b' <$ assign addr b'
-  Term (L (Ann span c)) -> local (const span) (eval c)
+  Alg (L (Ann span c)) -> local (const span) (eval c)
   where freeVariable s = fail ("free variable: " <> s)
         uninitialized s = fail ("uninitialized variable: " <> s)
         invalidRef s = fail ("invalid ref: " <> s)
@@ -83,7 +82,7 @@ eval Analysis{..} eval = \case
 
         ref = \case
           Var n -> lookupEnv' n
-          Term (R c) -> case c of
+          Alg (R c) -> case c of
             If c t e -> do
               c' <- eval c >>= asBool
               if c' then ref t else ref e
@@ -91,7 +90,7 @@ eval Analysis{..} eval = \case
               a' <- ref a
               a' ... b >>= maybe (freeVariable (show b)) pure
             c -> invalidRef (show c)
-          Term (L (Ann span c)) -> local (const span) (ref c)
+          Alg (L (Ann span c)) -> local (const span) (ref c)
 
 
 prog1 :: (Carrier sig t, Member Core sig) => File (t Name)
@@ -213,21 +212,3 @@ ruby = fromBody $ annWith callStack (rec (named' __semantic_global) (do' stateme
         __semantic_global = "__semantic_global"
         __semantic_super  = "__semantic_super"
         __semantic_truthy = "__semantic_truthy"
-
-
-data Analysis term address value m = Analysis
-  { alloc     :: Name -> m address
-  , bind      :: forall a . Name -> address -> m a -> m a
-  , lookupEnv :: Name -> m (Maybe address)
-  , deref     :: address -> m (Maybe value)
-  , assign    :: address -> value -> m ()
-  , abstract  :: (term -> m value) -> Name -> term -> m value
-  , apply     :: (term -> m value) -> value -> value -> m value
-  , unit      :: m value
-  , bool      :: Bool -> m value
-  , asBool    :: value -> m Bool
-  , string    :: Text -> m value
-  , asString  :: value -> m Text
-  , record    :: [(Name, value)] -> m value
-  , (...)     :: address -> Name -> m (Maybe address)
-  }

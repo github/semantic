@@ -1,10 +1,10 @@
 {-# LANGUAGE DeriveTraversable #-}
-module Data.File
+module Core.File
 ( File(..)
 , fromBody
 ) where
 
-import Data.Loc
+import Core.Loc
 import Data.Maybe (fromJust)
 import GHC.Stack
 import Source.Span

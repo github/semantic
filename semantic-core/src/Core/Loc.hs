@@ -1,5 +1,5 @@
 {-# LANGUAGE RecordWildCards #-}
-module Data.Loc
+module Core.Loc
 ( Path(..)
 , here
 , stackLoc

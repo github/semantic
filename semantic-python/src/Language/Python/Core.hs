@@ -13,14 +13,14 @@ import           AST.Element
 import           Control.Effect hiding ((:+:))
 import           Control.Effect.Reader
 import           Control.Monad.Fail
+import           Core.Core as Core
+import           Core.Name as Name
 import           Data.Coerce
-import           Data.Core as Core
 import           Data.Foldable
-import           Data.Name as Name
-import           Data.Stack (Stack)
-import qualified Data.Stack as Stack
 import           GHC.Records
 import           Source.Span (Span)
+import           Syntax.Stack (Stack)
+import qualified Syntax.Stack as Stack
 import qualified TreeSitter.Python.AST as Py
 
 -- | Keeps track of the current scope's bindings (so that we can, when
