@@ -39,9 +39,9 @@ main :: IO ()
 main = generateAST =<< execParser opts
 
 generateAST :: SemanticAST -> IO ()
-generateAST (SemanticAST sourceInput _) = do
-  case sourceInput of
-    FileInput filePath -> do
+generateAST (SemanticAST filePath sourceString _) = do
+  case filePath of
+    Just filePath -> do
       bytestring <- Data.ByteString.readFile filePath
       print =<< parseByteString @TreeSitter.Python.AST.Module @(Range, Span) tree_sitter_python bytestring
     StdInput -> do
