@@ -267,14 +267,14 @@ instance Symbol Grammar where
 data Out = Out T.Text | OutError T.Text
   deriving (Eq, Show)
 
-red :: HasCallStack => Assignment [] Grammar Out
+red :: HasCallStack => Assignment Grammar Out
 red = Out <$ symbol Red <*> source
 
-green :: HasCallStack => Assignment [] Grammar Out
+green :: HasCallStack => Assignment Grammar Out
 green = Out <$ symbol Green <*> source
 
-blue :: HasCallStack => Assignment [] Grammar Out
+blue :: HasCallStack => Assignment Grammar Out
 blue = Out <$ symbol Blue <*> source
 
-magenta :: HasCallStack => Assignment [] Grammar Out
+magenta :: HasCallStack => Assignment Grammar Out
 magenta = Out <$ symbol Magenta <*> source
