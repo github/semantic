@@ -151,10 +151,11 @@ typecheckingAnalysis
   :: ( Alternative m
      , Carrier sig m
      , Member Fresh sig
-     , Member (State (Set.Set (Constraint Name))) sig
-     , Member (State (Heap Name (Type Name))) sig
+     , Member (State (Set.Set (Constraint name))) sig
+     , Member (State (Heap name (Type name))) sig
+     , Ord name
      )
-  => Analysis term Name Name (Type Name) m
+  => Analysis term name name (Type name) m
 typecheckingAnalysis = Analysis{..}
   where alloc = pure
         bind _ _ m = m
