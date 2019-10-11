@@ -38,11 +38,11 @@ data Heap addr value m k
   deriving (Functor)
 
 data Domain term name value m k
-  = Abstract name (term name) (value -> m k)
-  | Apply value value         (value -> m k)
+  = Abstract name (term name)                 (value term name -> m k)
+  | Apply (value term name) (value term name) (value term name -> m k)
   | Unit
-  | Bool   Bool  (value -> m k)
-  | AsBool value (Bool  -> m k)
-  | String   Text  (value -> m k)
-  | AsString value (Text  -> m k)
+  | Bool   Bool              (value term name -> m k)
+  | AsBool (value term name) (Bool            -> m k)
+  | String   Text              (value term name -> m k)
+  | AsString (value term name) (Text            -> m k)
   deriving (Functor)
