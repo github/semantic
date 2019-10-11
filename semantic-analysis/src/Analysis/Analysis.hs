@@ -36,3 +36,13 @@ data Heap addr value m k
   = Deref addr (Maybe value -> m k)
   | Assign addr value (m k)
   deriving (Functor)
+
+data Domain term name value m k
+  = Abstract name (term name) (value -> m k)
+  | Apply value value         (value -> m k)
+  | Unit
+  | Bool   Bool  (value -> m k)
+  | AsBool value (Bool  -> m k)
+  | String   Text  (value -> m k)
+  | AsString value (Text  -> m k)
+  deriving (Functor)
