@@ -82,7 +82,6 @@ buildExamples session lang tsDir = do
       Left (SomeException e) -> case cast e of
         -- We have a number of known assignment timeouts, consider these pending specs instead of failing the build.
         Just AssignmentTimedOut -> pure ()
-        Just ParserTimedOut     ->     pure ()
         -- Other exceptions are true failures
         _                       -> HUnit.assertFailure (show (displayException e))
       _ -> if file `elem` knownFailures
