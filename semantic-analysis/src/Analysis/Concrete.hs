@@ -65,10 +65,6 @@ data Edge = Lexical | Import
   deriving (Eq, Ord, Show)
 
 
--- | Concrete evaluation of a term to a value.
---
---   >>> map fileBody (snd (concrete eval [File (Path.absRel "bool") (Span (Pos 1 1) (Pos 1 5)) (Core.bool True)]))
---   [Right (Bool True)]
 concrete
   :: ( Foldable term
      , IsString name
@@ -230,10 +226,3 @@ data EdgeType term name
   | Slot name
   | Value (Concrete term name)
   deriving (Eq, Ord, Show)
-
-
--- $setup
--- >>> :seti -XFlexibleContexts
--- >>> :seti -XOverloadedStrings
--- >>> import Core.Eval (eval)
--- >>> import qualified Core.Core as Core
