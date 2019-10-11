@@ -59,7 +59,7 @@ newtype Frame = Frame
   }
   deriving (Eq, Ord, Show)
 
-type Heap term = IntMap.IntMap (Concrete term Name)
+type Heap term name = IntMap.IntMap (Concrete term name)
 
 data Edge = Lexical | Import
   deriving (Eq, Ord, Show)
@@ -78,7 +78,7 @@ concrete
      -> (term Name -> m (Concrete (term Name) Name))
      )
   -> [File (term Name)]
-  -> (Heap (term Name), [File (Either (Path.AbsRelFile, Span, String) (Concrete (term Name) Name))])
+  -> (Heap (term Name) Name, [File (Either (Path.AbsRelFile, Span, String) (Concrete (term Name) Name))])
 concrete eval
   = run
   . runFresh
@@ -90,7 +90,7 @@ runFile
      , Effect sig
      , Foldable term
      , Member Fresh sig
-     , Member (State (Heap (term Name))) sig
+     , Member (State (Heap (term Name) Name)) sig
      , Show (term Name)
      )
   => (forall sig m
@@ -114,7 +114,7 @@ concreteAnalysis :: ( Carrier sig m
                     , Member (Reader Env) sig
                     , Member (Reader Path.AbsRelFile) sig
                     , Member (Reader Span) sig
-                    , Member (State (Heap (term Name))) sig
+                    , Member (State (Heap (term Name) Name)) sig
                     , MonadFail m
                     , Show (term Name)
                     )
@@ -155,7 +155,7 @@ concreteAnalysis = Analysis{..}
           pure (val >>= lookupConcrete heap n)
 
 
-lookupConcrete :: Heap term -> Name -> Concrete term Name -> Maybe Precise
+lookupConcrete :: Heap term Name -> Name -> Concrete term Name -> Maybe Precise
 lookupConcrete heap name = run . evalState IntSet.empty . runNonDet . inConcrete
   where -- look up the name in a concrete value
         inConcrete = inFrame <=< maybeA . recordFrame
@@ -172,7 +172,7 @@ lookupConcrete heap name = run . evalState IntSet.empty . runNonDet . inConcrete
         maybeA = maybe empty pure
 
 
-runHeap :: StateC (Heap term) m a -> m (Heap term, a)
+runHeap :: StateC (Heap term name) m a -> m (Heap term name, a)
 runHeap = runState mempty
 
 
@@ -181,7 +181,7 @@ runHeap = runState mempty
 --   > λ let (heap, res) = concrete [ruby]
 --   > λ writeFile "/Users/rob/Desktop/heap.dot" (export (addressStyle heap) (heapAddressGraph heap))
 --   > λ :!dot -Tsvg < ~/Desktop/heap.dot > ~/Desktop/heap.svg
-heapGraph :: (Precise -> Concrete term Name -> a) -> (Either Edge Name -> Precise -> G.Graph a) -> Heap term -> G.Graph a
+heapGraph :: (Precise -> Concrete term Name -> a) -> (Either Edge Name -> Precise -> G.Graph a) -> Heap term Name -> G.Graph a
 heapGraph vertex edge h = foldr (uncurry graph) G.empty (IntMap.toList h)
   where graph k v rest = (G.vertex (vertex k v) `G.connect` outgoing v) `G.overlay` rest
         outgoing = \case
@@ -191,14 +191,14 @@ heapGraph vertex edge h = foldr (uncurry graph) G.empty (IntMap.toList h)
           Closure _ _ _ _ env -> foldr (G.overlay . edge (Left Lexical)) G.empty env
           Record frame -> Map.foldrWithKey (\ k -> G.overlay . edge (Right k)) G.empty frame
 
-heapValueGraph :: Heap term -> G.Graph (Concrete term Name)
+heapValueGraph :: Heap term Name -> G.Graph (Concrete term Name)
 heapValueGraph h = heapGraph (const id) (const fromAddr) h
   where fromAddr addr = maybe G.empty G.vertex (IntMap.lookup addr h)
 
-heapAddressGraph :: Heap term -> G.Graph (EdgeType term, Precise)
+heapAddressGraph :: Heap term Name -> G.Graph (EdgeType term, Precise)
 heapAddressGraph = heapGraph (\ addr v -> (Value v, addr)) (fmap G.vertex . (,) . either Edge Slot)
 
-addressStyle :: Heap term -> G.Style (EdgeType term, Precise) Text
+addressStyle :: Heap term Name -> G.Style (EdgeType term, Precise) Text
 addressStyle heap = (G.defaultStyle vertex) { G.edgeAttributes }
   where vertex (_, addr) = pack (show addr) <> " = " <> maybe "?" fromConcrete (IntMap.lookup addr heap)
         edgeAttributes _ (Slot name,    _) = ["label" G.:= unName name]
