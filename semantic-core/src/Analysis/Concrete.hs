@@ -1,4 +1,4 @@
-{-# LANGUAGE DerivingVia, FlexibleContexts, FlexibleInstances, LambdaCase, MultiParamTypeClasses, NamedFieldPuns, OverloadedStrings, RankNTypes, RecordWildCards, TypeApplications, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DerivingVia, FlexibleContexts, FlexibleInstances, LambdaCase, MultiParamTypeClasses, NamedFieldPuns, OverloadedStrings, RankNTypes, RecordWildCards, ScopedTypeVariables, TypeApplications, TypeOperators, UndecidableInstances #-}
 module Analysis.Concrete
 ( Concrete(..)
 , concrete
@@ -87,26 +87,30 @@ concrete eval
   . traverse (runFile eval)
 
 runFile
-  :: ( Carrier sig m
+  :: forall term name m sig
+  .  ( Carrier sig m
      , Effect sig
      , Foldable term
+     , IsString name
      , Member Fresh sig
-     , Member (State (Heap (term Name) Name)) sig
-     , Show (term Name)
+     , Member (State (Heap (term name) name)) sig
+     , Ord name
+     , Show name
+     , Show (term name)
      )
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis (term Name) Name Precise (Concrete (term Name) Name) m
-     -> (term Name -> m (Concrete (term Name) Name))
-     -> (term Name -> m (Concrete (term Name) Name))
+     => Analysis (term name) name Precise (Concrete (term name) name) m
+     -> (term name -> m (Concrete (term name) name))
+     -> (term name -> m (Concrete (term name) name))
      )
-  -> File (term Name)
-  -> m (File (Either (Path.AbsRelFile, Span, String) (Concrete (term Name) Name)))
+  -> File (term name)
+  -> m (File (Either (Path.AbsRelFile, Span, String) (Concrete (term name) name)))
 runFile eval file = traverse run file
   where run = runReader (filePath file)
             . runReader (fileSpan file)
             . runFail
-            . runReader @(Env Name) mempty
+            . runReader @(Env name) mempty
             . fix (eval concreteAnalysis)
 
 concreteAnalysis :: ( Carrier sig m
