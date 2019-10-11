@@ -35,7 +35,7 @@ instance ToJSON Ref where
     , "span" .= span
     ]
 
-instance ToJSON Decl where
+instance ToJSON (Decl Name) where
   toJSON Decl{declSymbol, declPath, declSpan} = object
     [ "kind"   .= ("decl" :: Text)
     , "symbol" .= declSymbol
@@ -43,5 +43,5 @@ instance ToJSON Decl where
     , "span" .= declSpan
     ]
 
-instance ToJSON ScopeGraph where
+instance ToJSON (ScopeGraph Name) where
   toJSON (ScopeGraph sc) = toJSON . Map.mapKeys declSymbol $ sc
