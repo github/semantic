@@ -50,6 +50,6 @@ data Domain term name value m k
   | String   Text              (value term name -> m k)
   | AsString (value term name) (Text            -> m k)
   -- Record construction & elimination
-  | Record [(name, value term name)] (value term name -> m k)
+  | Record [(name, value term name)] (value term name         -> m k)
   | Project (value term name) name   (Maybe (value term name) -> m k)
   deriving (Functor)
