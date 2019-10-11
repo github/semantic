@@ -95,12 +95,14 @@ importGraphAnalysis :: ( Alternative m
                        , Carrier sig m
                        , Member (Reader Path.AbsRelFile) sig
                        , Member (Reader Span) sig
-                       , Member (State (Heap Name (Value term Name))) sig
+                       , Member (State (Heap name (Value term name))) sig
                        , MonadFail m
+                       , Ord  name
                        , Ord  term
+                       , Show name
                        , Show term
                        )
-                    => Analysis term Name Name (Value term Name) m
+                    => Analysis term name name (Value term name) m
 importGraphAnalysis = Analysis{..}
   where alloc = pure
         bind _ _ m = m
