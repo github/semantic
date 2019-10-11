@@ -129,6 +129,7 @@ textToLanguage :: T.Text -> Language
 textToLanguage = \case
   "Go" -> Go
   "Haskell" -> Haskell
+  "Hack" -> PHP -- working around https://github.com/github/semantic/issues/330
   "Java" -> Java
   "JavaScript" -> JavaScript
   "JSON" -> JSON
