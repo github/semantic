@@ -95,10 +95,11 @@ scopeGraphAnalysis
      , Carrier sig m
      , Member (Reader Path.AbsRelFile) sig
      , Member (Reader Span) sig
-     , Member (Reader (Map.Map Name Ref)) sig
-     , Member (State (Heap Name (ScopeGraph Name))) sig
+     , Member (Reader (Map.Map name Ref)) sig
+     , Member (State (Heap name (ScopeGraph name))) sig
+     , Ord name
      )
-  => Analysis term Name Name (ScopeGraph Name) m
+  => Analysis term name name (ScopeGraph name) m
 scopeGraphAnalysis = Analysis{..}
   where alloc = pure
         bind name _ m = do
