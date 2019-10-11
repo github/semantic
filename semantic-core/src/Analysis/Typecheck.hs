@@ -202,7 +202,7 @@ infix 5 :=
 meta :: (Carrier sig m, Member Fresh sig) => m (Type name)
 meta = pure <$> Fresh.fresh
 
-unify :: (Carrier sig m, Member (State (Set.Set (Constraint Name))) sig) => Type Name -> Type Name -> m ()
+unify :: (Carrier sig m, Member (State (Set.Set (Constraint name))) sig, Ord name) => Type name -> Type name -> m ()
 unify t1 t2
   | t1 == t2  = pure ()
   | otherwise = modify (<> Set.singleton (t1 :===: t2))
