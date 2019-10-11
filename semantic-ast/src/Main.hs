@@ -61,10 +61,6 @@ opts = info (parseAST <**> helper)
 data Format = Show
   deriving (Read)
 
-data Input
-  = FileInput FilePath
-  | StdInput
-  deriving (Read)
 
 input :: Parser Input
 input = fileInput <|> stdInput
