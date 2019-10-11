@@ -1,5 +1,5 @@
 {-# LANGUAGE FlexibleContexts, LambdaCase, OverloadedStrings, RankNTypes, RecordWildCards, TypeOperators #-}
-module Analysis.Eval
+module Core.Eval
 ( eval
 , prog1
 , prog2

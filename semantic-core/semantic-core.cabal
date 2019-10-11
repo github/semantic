@@ -42,7 +42,6 @@ library
   exposed-modules:
     Analysis.Analysis
     Analysis.Concrete
-    Analysis.Eval
     Analysis.FlowInsensitive
     Analysis.ImportGraph
     Analysis.ScopeGraph
@@ -53,6 +52,7 @@ library
     Core.Core
     Core.Core.Parser
     Core.Core.Pretty
+    Core.Eval
     Core.File
     Core.Name
   build-depends:
