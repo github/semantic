@@ -15,7 +15,8 @@ import Options.Applicative hiding (style)
 import Data.Semigroup ((<>))
 
 data SemanticAST = SemanticAST
-  { sourceFilePath      :: Maybe FilePath
+  { format              :: Format
+  , sourceFilePath      :: Maybe FilePath
   , sourceString        :: Maybe Prelude.String
   , format              :: Format
   } deriving (Read)
@@ -61,9 +62,6 @@ opts = info (parseAST <**> helper)
 data Format = Show
   deriving (Read)
 
-
-input :: Parser Input
-input = fileInput <|> stdInput
 
 -- pass in a file as an argument and parse its contents
 fileInput :: Parser Input
