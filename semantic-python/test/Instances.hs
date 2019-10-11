@@ -26,7 +26,7 @@ instance ToJSON a => ToJSON (File a) where
     ]
 
 instance ToJSON Path.AbsRelFile where
-  toJSON p = toJSON (pack (show p))
+  toJSON p = toJSON (pack (Path.toString p))
 
 instance ToJSON Ref where
   toJSON (Ref path span) = object
