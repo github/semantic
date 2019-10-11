@@ -193,8 +193,8 @@ data Constraint name = Type name :===: Type name
 
 infix 4 :===:
 
-data Solution
-  = Int := Type Name
+data Solution name
+  = Int := Type name
   deriving (Eq, Ord, Show)
 
 infix 5 :=
