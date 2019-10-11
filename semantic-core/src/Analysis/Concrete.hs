@@ -209,7 +209,7 @@ addressStyle heap = (G.defaultStyle vertex) { G.edgeAttributes }
           Unit ->  "()"
           Bool b -> pack $ show b
           String s -> pack $ show s
-          Closure p (Span s e) n _ _ -> "\\\\ " <> unName n <> " [" <> pack (show p) <> ":" <> showPos s <> "-" <> showPos e <> "]"
+          Closure p (Span s e) n _ _ -> "\\\\ " <> unName n <> " [" <> pack (Path.toString p) <> ":" <> showPos s <> "-" <> showPos e <> "]"
           Record _ -> "{}"
         showPos (Pos l c) = pack (show l) <> ":" <> pack (show c)
 
