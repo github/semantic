@@ -31,7 +31,7 @@ name = Gen.prune (named' <$> names) where
 boolean :: (Carrier sig t, Member Core.Core sig, MonadGen m) => m (t Name)
 boolean = Core.bool <$> Gen.bool
 
-variable :: (Carrier sig t, Member Core.Core sig, MonadGen m) => m (t Name)
+variable :: (Carrier sig t, MonadGen m) => m (t Name)
 variable = pure . namedValue <$> name
 
 ifthenelse :: (Carrier sig t, Member Core.Core sig, MonadGen m) => m (t Name) -> m (t Name)
