@@ -20,6 +20,9 @@ data SemanticAST = SemanticAST
   , sourceString        :: Maybe Prelude.String
   } deriving (Read)
 
+-- TODO:
+-- make format optional with default --Show (this will be convenient)
+-- need Either sourceFilePath or sourceString
 parseAST :: Parser SemanticAST
 parseAST = SemanticAST
       <$> option auto
