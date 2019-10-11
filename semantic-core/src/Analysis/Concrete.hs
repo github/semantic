@@ -41,7 +41,7 @@ newtype FrameId = FrameId { unFrameId :: Precise }
   deriving (Eq, Ord, Show)
 
 data Concrete term
-  = Closure Loc Name term Env
+  = Closure Path Span Name term Env
   | Unit
   | Bool Bool
   | String Text
@@ -67,18 +67,18 @@ data Edge = Lexical | Import
 
 -- | Concrete evaluation of a term to a value.
 --
---   >>> map fileBody (snd (concrete eval [File (Loc "bool" (Span (Pos 1 1) (Pos 1 5))) (Core.bool True)]))
+--   >>> map fileBody (snd (concrete eval [File (Path "bool") (Span (Pos 1 1) (Pos 1 5)) (Core.bool True)]))
 --   [Right (Bool True)]
 concrete
   :: (Foldable term, Show (term Name))
   => (forall sig m
-     .  (Carrier sig m, Member (Reader Loc) sig, MonadFail m)
+     .  (Carrier sig m, Member (Reader Path) sig, Member (Reader Span) sig, MonadFail m)
      => Analysis (term Name) Precise (Concrete (term Name)) m
      -> (term Name -> m (Concrete (term Name)))
      -> (term Name -> m (Concrete (term Name)))
      )
   -> [File (term Name)]
-  -> (Heap (term Name), [File (Either (Loc, String) (Concrete (term Name)))])
+  -> (Heap (term Name), [File (Either (Path, Span, String) (Concrete (term Name)))])
 concrete eval
   = run
   . runFresh
@@ -94,15 +94,16 @@ runFile
      , Show (term Name)
      )
   => (forall sig m
-     .  (Carrier sig m, Member (Reader Loc) sig, MonadFail m)
+     .  (Carrier sig m, Member (Reader Path) sig, Member (Reader Span) sig, MonadFail m)
      => Analysis (term Name) Precise (Concrete (term Name)) m
      -> (term Name -> m (Concrete (term Name)))
      -> (term Name -> m (Concrete (term Name)))
      )
   -> File (term Name)
-  -> m (File (Either (Loc, String) (Concrete (term Name))))
+  -> m (File (Either (Path, Span, String) (Concrete (term Name))))
 runFile eval file = traverse run file
-  where run = runReader (fileLoc file)
+  where run = runReader (filePath file)
+            . runReader (fileSpan file)
             . runFail
             . runReader @Env mempty
             . fix (eval concreteAnalysis)
@@ -111,7 +112,8 @@ concreteAnalysis :: ( Carrier sig m
                     , Foldable term
                     , Member Fresh sig
                     , Member (Reader Env) sig
-                    , Member (Reader Loc) sig
+                    , Member (Reader Path) sig
+                    , Member (Reader Span) sig
                     , Member (State (Heap (term Name))) sig
                     , MonadFail m
                     , Show (term Name)
@@ -124,11 +126,12 @@ concreteAnalysis = Analysis{..}
         deref = gets . IntMap.lookup
         assign addr value = modify (IntMap.insert addr value)
         abstract _ name body = do
-          loc <- ask
+          path <- ask
+          span <- ask
           env <- asks (flip Map.restrictKeys (Set.delete name (foldMap Set.singleton body)))
-          pure (Closure loc name body env)
-        apply eval (Closure loc name body env) a = do
-          local (const loc) $ do
+          pure (Closure path span name body env)
+        apply eval (Closure path span name body env) a = do
+          local (const path) . local (const span) $ do
             addr <- alloc name
             assign addr a
             local (const (Map.insert name addr env)) (eval body)
@@ -185,7 +188,7 @@ heapGraph vertex edge h = foldr (uncurry graph) G.empty (IntMap.toList h)
           Unit -> G.empty
           Bool _ -> G.empty
           String _ -> G.empty
-          Closure _ _ _ env -> foldr (G.overlay . edge (Left Lexical)) G.empty env
+          Closure _ _ _ _ env -> foldr (G.overlay . edge (Left Lexical)) G.empty env
           Record frame -> Map.foldrWithKey (\ k -> G.overlay . edge (Right k)) G.empty frame
 
 heapValueGraph :: Heap term -> G.Graph (Concrete term)
@@ -206,7 +209,7 @@ addressStyle heap = (G.defaultStyle vertex) { G.edgeAttributes }
           Unit ->  "()"
           Bool b -> pack $ show b
           String s -> pack $ show s
-          Closure (Loc p (Span s e)) n _ _ -> "\\\\ " <> unName n <> " [" <> p <> ":" <> showPos s <> "-" <> showPos e <> "]"
+          Closure p (Span s e) n _ _ -> "\\\\ " <> unName n <> " [" <> getPath p <> ":" <> showPos s <> "-" <> showPos e <> "]"
           Record _ -> "{}"
         showPos (Pos l c) = pack (show l) <> ":" <> pack (show c)
 

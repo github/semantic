@@ -7,12 +7,15 @@ module Data.File
 import Data.Loc
 import Data.Maybe (fromJust)
 import GHC.Stack
+import Source.Span
 
 data File a = File
-  { fileLoc  :: !Loc
+  { filePath :: !Path
+  , fileSpan :: {-# UNPACK #-} !Span
   , fileBody :: !a
   }
   deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
 
 fromBody :: HasCallStack => a -> File a
-fromBody body = File (fromJust (stackLoc callStack)) body
+fromBody body = File path span body where
+  (path, span) = fromJust (stackLoc callStack)
