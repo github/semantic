@@ -23,6 +23,9 @@ data SemanticAST = SemanticAST
 parseAST :: Parser SemanticAST
 parseAST = SemanticAST
       <$> option auto
+          ( long "format"
+         <> help "Specify desired output: show, json, sexpression" )
+      <*> option auto
           ( long "sourcefile"
          <> metavar "FILEPATH"
          <> help "Specify filepath containing source code to parse" )
@@ -31,15 +34,12 @@ parseAST = SemanticAST
          <> metavar "STRING"
          <> help "Specify source input to parse"
           )
-      <*> option auto
-          ( long "format"
-         <> help "Specify desired output: show, json, sexpression" )
 
 main :: IO ()
 main = generateAST =<< execParser opts
 
 generateAST :: SemanticAST -> IO ()
-generateAST (SemanticAST filePath sourceString _) = do
+generateAST (SemanticAST _ filePath sourceString) = do
   case filePath of
     Just filePath -> do
       bytestring <- Data.ByteString.readFile filePath
