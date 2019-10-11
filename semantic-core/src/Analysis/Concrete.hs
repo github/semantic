@@ -195,7 +195,7 @@ heapValueGraph :: Heap term name -> G.Graph (Concrete term name)
 heapValueGraph h = heapGraph (const id) (const fromAddr) h
   where fromAddr addr = maybe G.empty G.vertex (IntMap.lookup addr h)
 
-heapAddressGraph :: Heap term Name -> G.Graph (EdgeType term Name, Precise)
+heapAddressGraph :: Heap term name -> G.Graph (EdgeType term name, Precise)
 heapAddressGraph = heapGraph (\ addr v -> (Value v, addr)) (fmap G.vertex . (,) . either Edge Slot)
 
 addressStyle :: Heap term Name -> G.Style (EdgeType term Name, Precise) Text
