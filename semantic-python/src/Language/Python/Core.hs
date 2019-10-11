@@ -16,6 +16,7 @@ import           Control.Monad.Fail
 import           Data.Coerce
 import           Data.Core as Core
 import           Data.Foldable
+import           Data.Function
 import           Data.Name as Name
 import           Data.Stack (Stack)
 import qualified Data.Stack as Stack
@@ -189,7 +190,7 @@ instance Compile Py.Call where
 
     -- Python function arguments are defined to evaluate left to right.
     args <- traverse compileArg args
-    locate it (func $$* args) >>= cc
+    locate it (func $$* args) & cc
   compile it _ _ = fail ("can't compile Call node with generator expression: " <> show it)
 
 instance Compile Py.ClassDefinition
@@ -293,7 +294,8 @@ instance Compile Py.NotOperator
 
 instance Compile Py.ParenthesizedExpression where
   compile it@Py.ParenthesizedExpression { extraChildren } cc
-    = compile extraChildren cc >=> locate it
+    = fmap (locate it)
+    . compile extraChildren cc
 
 instance Compile Py.PassStatement where
   compile it@Py.PassStatement {} cc _ = cc $ locate it Core.unit
