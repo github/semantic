@@ -198,8 +198,8 @@ heapValueGraph h = heapGraph (const id) (const fromAddr) h
 heapAddressGraph :: Heap term name -> G.Graph (EdgeType term name, Precise)
 heapAddressGraph = heapGraph (\ addr v -> (Value v, addr)) (fmap G.vertex . (,) . either Edge Slot)
 
-addressStyle :: Heap term Name -> G.Style (EdgeType term Name, Precise) Text
-addressStyle heap = (G.defaultStyle vertex) { G.edgeAttributes }
+addressStyle :: (name -> Text) -> Heap term name -> G.Style (EdgeType term name, Precise) Text
+addressStyle unName heap = (G.defaultStyle vertex) { G.edgeAttributes }
   where vertex (_, addr) = pack (show addr) <> " = " <> maybe "?" fromConcrete (IntMap.lookup addr heap)
         edgeAttributes _ (Slot name,    _) = ["label" G.:= unName name]
         edgeAttributes _ (Edge Import,  _) = ["color" G.:= "blue"]
