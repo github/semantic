@@ -48,7 +48,7 @@ data Monotype name f a
   | Record (Map.Map name (f a))
   deriving (Foldable, Functor, Generic1, Traversable)
 
-type Type = Term (Monotype Name) Meta
+type Type name = Term (Monotype name) Meta
 
 -- FIXME: Union the effects/annotations on the operands.
 
@@ -97,12 +97,12 @@ typecheckingFlowInsensitive
   :: Ord (term Name)
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term Name Name Type m
-     -> (term Name -> m Type)
-     -> (term Name -> m Type)
+     => Analysis term Name Name (Type Name) m
+     -> (term Name -> m (Type Name))
+     -> (term Name -> m (Type Name))
      )
   -> [File (term Name)]
-  -> ( Heap Name Type
+  -> ( Heap Name (Type Name)
      , [File (Either (Path.AbsRelFile, Span, String) (Term (Polytype :+: Monotype Name) Void))]
      )
 typecheckingFlowInsensitive eval
@@ -116,22 +116,22 @@ runFile
   :: ( Carrier sig m
      , Effect sig
      , Member Fresh sig
-     , Member (State (Heap Name Type)) sig
+     , Member (State (Heap Name (Type Name))) sig
      , Ord (term Name)
      )
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term Name Name Type m
-     -> (term Name -> m Type)
-     -> (term Name -> m Type)
+     => Analysis term Name Name (Type Name) m
+     -> (term Name -> m (Type Name))
+     -> (term Name -> m (Type Name))
      )
   -> File (term Name)
-  -> m (File (Either (Path.AbsRelFile, Span, String) Type))
+  -> m (File (Either (Path.AbsRelFile, Span, String) (Type Name)))
 runFile eval file = traverse run file
   where run
           = (\ m -> do
               (subst, t) <- m
-              modify @(Heap Name Type) (fmap (Set.map (substAll subst)))
+              modify @(Heap Name (Type Name)) (fmap (Set.map (substAll subst)))
               pure (substAll subst <$> t))
           . runState (mempty :: Substitution)
           . runReader (filePath file)
@@ -152,9 +152,9 @@ typecheckingAnalysis
      , Carrier sig m
      , Member Fresh sig
      , Member (State (Set.Set Constraint)) sig
-     , Member (State (Heap Name Type)) sig
+     , Member (State (Heap Name (Type Name))) sig
      )
-  => Analysis term Name Name Type m
+  => Analysis term Name Name (Type Name) m
 typecheckingAnalysis = Analysis{..}
   where alloc = pure
         bind _ _ m = m
@@ -188,26 +188,26 @@ typecheckingAnalysis = Analysis{..}
         _ ... m = pure (Just m)
 
 
-data Constraint = Type :===: Type
+data Constraint = Type Name :===: Type Name
   deriving (Eq, Ord, Show)
 
 infix 4 :===:
 
 data Solution
-  = Int := Type
+  = Int := Type Name
   deriving (Eq, Ord, Show)
 
 infix 5 :=
 
-meta :: (Carrier sig m, Member Fresh sig) => m Type
+meta :: (Carrier sig m, Member Fresh sig) => m (Type Name)
 meta = pure <$> Fresh.fresh
 
-unify :: (Carrier sig m, Member (State (Set.Set Constraint)) sig) => Type -> Type -> m ()
+unify :: (Carrier sig m, Member (State (Set.Set Constraint)) sig) => Type Name -> Type Name -> m ()
 unify t1 t2
   | t1 == t2  = pure ()
   | otherwise = modify (<> Set.singleton (t1 :===: t2))
 
-type Substitution = IntMap.IntMap Type
+type Substitution = IntMap.IntMap (Type Name)
 
 solve :: (Carrier sig m, Member (State Substitution) sig, MonadFail m) => Set.Set Constraint -> m ()
 solve cs = for_ cs solve
