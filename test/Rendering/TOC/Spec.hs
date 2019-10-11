@@ -162,11 +162,6 @@ spec = do
       output <- runTaskOrDie (diffSummaryBuilder Format.JSON [blobs])
       runBuilder output `shouldBe` ("{\"files\":[{\"path\":\"test/fixtures/ruby/toc/lambda.A.rb -> test/fixtures/ruby/toc/lambda.B.rb\",\"language\":\"Ruby\"}]}\n" :: ByteString)
 
-    it "summarizes Markdown headings" $ do
-      blobs <- blobsForPaths (Both (Path.relFile "markdown/toc/headings.A.md") (Path.relFile "markdown/toc/headings.B.md"))
-      output <- runTaskOrDie (diffSummaryBuilder Format.JSON [blobs])
-      runBuilder output `shouldBe` ("{\"files\":[{\"path\":\"test/fixtures/markdown/toc/headings.A.md -> test/fixtures/markdown/toc/headings.B.md\",\"language\":\"Markdown\",\"changes\":[{\"category\":\"Heading 1\",\"term\":\"Introduction\",\"span\":{\"start\":{\"line\":1,\"column\":1},\"end\":{\"line\":3,\"column\":16}},\"changeType\":\"REMOVED\"},{\"category\":\"Heading 2\",\"term\":\"Two\",\"span\":{\"start\":{\"line\":5,\"column\":1},\"end\":{\"line\":7,\"column\":4}},\"changeType\":\"MODIFIED\"},{\"category\":\"Heading 3\",\"term\":\"This heading is new\",\"span\":{\"start\":{\"line\":9,\"column\":1},\"end\":{\"line\":11,\"column\":10}},\"changeType\":\"ADDED\"},{\"category\":\"Heading 1\",\"term\":\"Final\",\"span\":{\"start\":{\"line\":13,\"column\":1},\"end\":{\"line\":14,\"column\":4}},\"changeType\":\"ADDED\"}]}]}\n" :: ByteString)
-
 
 type Diff' = Diff ListableSyntax (Maybe Declaration) (Maybe Declaration)
 type Term' = Term ListableSyntax (Maybe Declaration)
