@@ -61,10 +61,3 @@ opts = info (parseAST <**> helper)
 -- TODO: Define formats for json, sexpression, etc.
 data Format = Show
   deriving (Read)
-
-
--- Read from stdin
-stdInput :: Parser Input
-stdInput = flag' StdInput
-  (  long "stdin"
-  <> help "Read from stdin" )
