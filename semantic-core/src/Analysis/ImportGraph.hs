@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, RankNTypes, RecordWildCards, TypeApplications #-}
+{-# LANGUAGE FlexibleContexts, RankNTypes, RecordWildCards, ScopedTypeVariables, TypeApplications #-}
 module Analysis.ImportGraph
 ( ImportGraph
 , importGraph
@@ -68,27 +68,30 @@ importGraph eval
   . traverse (runFile eval)
 
 runFile
-  :: ( Carrier sig m
+  :: forall term name m sig
+  .  ( Carrier sig m
      , Effect sig
      , Member Fresh sig
-     , Member (State (Heap Name (Value term Name))) sig
+     , Member (State (Heap name (Value term name))) sig
+     , Ord  name
      , Ord  term
+     , Show name
      , Show term
      )
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term Name Name (Value term Name) m
-     -> (term -> m (Value term Name))
-     -> (term -> m (Value term Name))
+     => Analysis term name name (Value term name) m
+     -> (term -> m (Value term name))
+     -> (term -> m (Value term name))
      )
   -> File term
-  -> m (File (Either (Path.AbsRelFile, Span, String) (Value term Name)))
+  -> m (File (Either (Path.AbsRelFile, Span, String) (Value term name)))
 runFile eval file = traverse run file
   where run = runReader (filePath file)
             . runReader (fileSpan file)
             . runFail
             . fmap fold
-            . convergeTerm (Proxy @Name) (fix (cacheTerm . eval importGraphAnalysis))
+            . convergeTerm (Proxy @name) (fix (cacheTerm . eval importGraphAnalysis))
 
 -- FIXME: decompose into a product domain and two atomic domains
 importGraphAnalysis :: ( Alternative m
