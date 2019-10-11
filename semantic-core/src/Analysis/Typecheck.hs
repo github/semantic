@@ -17,7 +17,6 @@ import           Control.Effect.Reader hiding (Local)
 import           Control.Effect.State
 import           Control.Monad ((>=>), unless)
 import           Core.File
-import           Core.Name as Name
 import           Data.Foldable (for_)
 import           Data.Function (fix)
 import           Data.Functor (($>))
@@ -94,16 +93,16 @@ generalize ty = fromJust (closed (forAlls (IntSet.toList (mvs ty)) (hoistTerm R 
 
 
 typecheckingFlowInsensitive
-  :: Ord (term Name)
+  :: (Ord name, Ord (term name), Show name)
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term Name Name (Type Name) m
-     -> (term Name -> m (Type Name))
-     -> (term Name -> m (Type Name))
+     => Analysis term name name (Type name) m
+     -> (term name -> m (Type name))
+     -> (term name -> m (Type name))
      )
-  -> [File (term Name)]
-  -> ( Heap Name (Type Name)
-     , [File (Either (Path.AbsRelFile, Span, String) (Term (Polytype :+: Monotype Name) Void))]
+  -> [File (term name)]
+  -> ( Heap name (Type name)
+     , [File (Either (Path.AbsRelFile, Span, String) (Term (Polytype :+: Monotype name) Void))]
      )
 typecheckingFlowInsensitive eval
   = run
