@@ -42,25 +42,25 @@ data Ref = Ref
   }
   deriving (Eq, Ord, Show)
 
-newtype ScopeGraph = ScopeGraph { unScopeGraph :: Map.Map (Decl Name) (Set.Set Ref) }
+newtype ScopeGraph name = ScopeGraph { unScopeGraph :: Map.Map (Decl name) (Set.Set Ref) }
   deriving (Eq, Ord, Show)
 
-instance Semigroup ScopeGraph where
+instance Ord name => Semigroup (ScopeGraph name) where
   ScopeGraph a <> ScopeGraph b = ScopeGraph (Map.unionWith (<>) a b)
 
-instance Monoid ScopeGraph where
+instance Ord name => Monoid (ScopeGraph name) where
   mempty = ScopeGraph Map.empty
 
 scopeGraph
   :: Ord (term Name)
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term Name Name ScopeGraph m
-     -> (term Name -> m ScopeGraph)
-     -> (term Name -> m ScopeGraph)
+     => Analysis term Name Name (ScopeGraph Name) m
+     -> (term Name -> m (ScopeGraph Name))
+     -> (term Name -> m (ScopeGraph Name))
      )
   -> [File (term Name)]
-  -> (Heap Name ScopeGraph, [File (Either (Path.AbsRelFile, Span, String) ScopeGraph)])
+  -> (Heap Name (ScopeGraph Name), [File (Either (Path.AbsRelFile, Span, String) (ScopeGraph Name))])
 scopeGraph eval
   = run
   . runFresh
@@ -71,17 +71,17 @@ runFile
   :: ( Carrier sig m
      , Effect sig
      , Member Fresh sig
-     , Member (State (Heap Name ScopeGraph)) sig
+     , Member (State (Heap Name (ScopeGraph Name))) sig
      , Ord (term Name)
      )
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term Name Name ScopeGraph m
-     -> (term Name -> m ScopeGraph)
-     -> (term Name -> m ScopeGraph)
+     => Analysis term Name Name (ScopeGraph Name) m
+     -> (term Name -> m (ScopeGraph Name))
+     -> (term Name -> m (ScopeGraph Name))
      )
   -> File (term Name)
-  -> m (File (Either (Path.AbsRelFile, Span, String) ScopeGraph))
+  -> m (File (Either (Path.AbsRelFile, Span, String) (ScopeGraph Name)))
 runFile eval file = traverse run file
   where run = runReader (filePath file)
             . runReader (fileSpan file)
@@ -96,9 +96,9 @@ scopeGraphAnalysis
      , Member (Reader Path.AbsRelFile) sig
      , Member (Reader Span) sig
      , Member (Reader (Map.Map Name Ref)) sig
-     , Member (State (Heap Name ScopeGraph)) sig
+     , Member (State (Heap Name (ScopeGraph Name))) sig
      )
-  => Analysis term Name Name ScopeGraph m
+  => Analysis term Name Name (ScopeGraph Name) m
 scopeGraphAnalysis = Analysis{..}
   where alloc = pure
         bind name _ m = do
