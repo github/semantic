@@ -191,7 +191,7 @@ heapGraph vertex edge h = foldr (uncurry graph) G.empty (IntMap.toList h)
           Closure _ _ _ _ env -> foldr (G.overlay . edge (Left Lexical)) G.empty env
           Record frame -> Map.foldrWithKey (\ k -> G.overlay . edge (Right k)) G.empty frame
 
-heapValueGraph :: Heap term Name -> G.Graph (Concrete term Name)
+heapValueGraph :: Heap term name -> G.Graph (Concrete term name)
 heapValueGraph h = heapGraph (const id) (const fromAddr) h
   where fromAddr addr = maybe G.empty G.vertex (IntMap.lookup addr h)
 
