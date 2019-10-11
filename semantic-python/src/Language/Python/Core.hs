@@ -21,7 +21,7 @@ import           Data.Function
 import           Data.List.NonEmpty  (NonEmpty (..))
 import           GHC.Records
 import           Source.Span (Span)
-import           Syntax.Stack (Stack)
+import           Syntax.Stack (Stack (..))
 import qualified Syntax.Stack as Stack
 import qualified TreeSitter.Python.AST as Py
 
