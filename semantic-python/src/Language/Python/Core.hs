@@ -17,9 +17,11 @@ import           Core.Core as Core
 import           Core.Name as Name
 import           Data.Coerce
 import           Data.Foldable
+import           Data.Function
+import           Data.List.NonEmpty  (NonEmpty (..))
 import           GHC.Records
 import           Source.Span (Span)
-import           Syntax.Stack (Stack)
+import           Syntax.Stack (Stack (..))
 import qualified Syntax.Stack as Stack
 import qualified TreeSitter.Python.AST as Py
 
@@ -176,7 +178,22 @@ instance Compile Py.Block where
 
 instance Compile Py.BooleanOperator
 instance Compile Py.BreakStatement
-instance Compile Py.Call
+
+instance Compile Py.Call where
+  compile it@Py.Call
+    { function
+    , arguments = L1 Py.ArgumentList { extraChildren = args }
+    } cc next = do
+    func <- compile function pure next
+    let compileArg = \case
+          Prj expr -> compile (expr :: Py.Expression Span) pure next
+          other   -> fail ("Can't compile non-expression function argument: " <> show other)
+
+    -- Python function arguments are defined to evaluate left to right.
+    args <- traverse compileArg args
+    locate it (func $$* args) & cc
+  compile it _ _ = fail ("can't compile Call node with generator expression: " <> show it)
+
 instance Compile Py.ClassDefinition
 instance Compile Py.ComparisonOperator
 
@@ -185,10 +202,32 @@ deriving instance Compile Py.CompoundStatement
 instance Compile Py.ConcatenatedString
 instance Compile Py.ConditionalExpression
 instance Compile Py.ContinueStatement
-instance Compile Py.DecoratedDefinition
+
+instance Compile Py.DecoratedDefinition where
+  compile it@Py.DecoratedDefinition
+    { definition
+    , extraChildren = [ Py.Decorator { extraChildren } ]
+    } cc next = do
+    let thenReassign item = do
+          _ :> lastbound <- asks unBindings
+          tocall <- compile extraChildren pure next
+          let callit go = (pure lastbound .= (tocall $$ pure lastbound)) >>> go
+          fmap callit (cc item)
+    locate it <$> compile definition thenReassign next
+  compile it _ _ = fail ("Can't figure out decorated definition " <> show it)
 instance Compile Py.DeleteStatement
 instance Compile Py.Dictionary
 instance Compile Py.DictionaryComprehension
+
+instance Compile Py.DottedName where
+  compile it@Py.DottedName
+    { extraChildren = Py.Identifier { text } :| rest
+    } cc _next = do
+    let aggregate Py.Identifier { text = inner } x = x ... Name inner
+        composite = foldr aggregate (pure (Name text)) rest
+    locate it composite & cc
+
+
 instance Compile Py.Ellipsis
 instance Compile Py.ExecStatement
 
@@ -253,6 +292,7 @@ instance Compile Py.IfStatement where
 instance Compile Py.ImportFromStatement
 instance Compile Py.ImportStatement
 instance Compile Py.Integer
+
 instance Compile Py.Lambda
 instance Compile Py.List
 instance Compile Py.ListComprehension
@@ -274,7 +314,11 @@ instance Compile Py.NamedExpression
 instance Compile Py.None
 instance Compile Py.NonlocalStatement
 instance Compile Py.NotOperator
-instance Compile Py.ParenthesizedExpression
+
+instance Compile Py.ParenthesizedExpression where
+  compile it@Py.ParenthesizedExpression { extraChildren } cc
+    = fmap (locate it)
+    . compile extraChildren cc
 
 instance Compile Py.PassStatement where
   compile it@Py.PassStatement {} cc _ = cc $ locate it Core.unit
