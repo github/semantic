@@ -21,7 +21,6 @@ import           Control.Effect.Reader hiding (Local)
 import           Control.Effect.State
 import           Control.Monad ((<=<), guard)
 import           Core.File
-import           Core.Name
 import           Data.Function (fix)
 import qualified Data.IntMap as IntMap
 import qualified Data.IntSet as IntSet
@@ -71,15 +70,20 @@ data Edge = Lexical | Import
 --   >>> map fileBody (snd (concrete eval [File (Path.AbsRelFile "bool") (Span (Pos 1 1) (Pos 1 5)) (Core.bool True)]))
 --   [Right (Bool True)]
 concrete
-  :: (Foldable term, Show (term Name))
+  :: ( Foldable term
+     , IsString name
+     , Ord name
+     , Show name
+     , Show (term name)
+     )
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis (term Name) Name Precise (Concrete (term Name) Name) m
-     -> (term Name -> m (Concrete (term Name) Name))
-     -> (term Name -> m (Concrete (term Name) Name))
+     => Analysis (term name) name Precise (Concrete (term name) name) m
+     -> (term name -> m (Concrete (term name) name))
+     -> (term name -> m (Concrete (term name) name))
      )
-  -> [File (term Name)]
-  -> (Heap (term Name) Name, [File (Either (Path.AbsRelFile, Span, String) (Concrete (term Name) Name))])
+  -> [File (term name)]
+  -> (Heap (term name) name, [File (Either (Path.AbsRelFile, Span, String) (Concrete (term name) name))])
 concrete eval
   = run
   . runFresh
