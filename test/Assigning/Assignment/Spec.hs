@@ -135,10 +135,10 @@ spec = do
 
   describe "eof" $ do
     it "matches at the end of branches" $
-      fst <$> runAssignment "" eof (makeState [] :: State [] Grammar) `shouldBe` Right ()
+      fst <$> runAssignment "" eof (makeState [] :: State Grammar) `shouldBe` Right ()
 
     it "matches before anonymous nodes at the end of branches" $
-      fst <$> runAssignment "magenta" eof (makeState [ node Magenta 0 7 [] ] :: State [] Grammar) `shouldBe` Right ()
+      fst <$> runAssignment "magenta" eof (makeState [ node Magenta 0 7 [] ] :: State Grammar) `shouldBe` Right ()
 
   describe "catchError" $ do
     it "catches failed committed choices" $
