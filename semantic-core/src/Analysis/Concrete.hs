@@ -11,7 +11,7 @@ module Analysis.Concrete
 
 import qualified Algebra.Graph as G
 import qualified Algebra.Graph.Export.Dot as G
-import           Analysis.Eval
+import           Analysis.Analysis
 import           Control.Applicative (Alternative (..))
 import           Control.Carrier.Fail.WithLoc
 import           Control.Effect
@@ -20,13 +20,13 @@ import           Control.Effect.NonDet
 import           Control.Effect.Reader hiding (Local)
 import           Control.Effect.State
 import           Control.Monad ((<=<), guard)
-import           Data.File
+import           Core.File
+import           Core.Loc
+import           Core.Name
 import           Data.Function (fix)
 import qualified Data.IntMap as IntMap
 import qualified Data.IntSet as IntSet
-import           Data.Loc
 import qualified Data.Map as Map
-import           Data.Name
 import           Data.Semigroup (Last (..))
 import qualified Data.Set as Set
 import           Data.Text (Text, pack)
@@ -221,5 +221,7 @@ data EdgeType term
 
 
 -- $setup
+-- >>> :seti -XFlexibleContexts
 -- >>> :seti -XOverloadedStrings
--- >>> import qualified Data.Core as Core
+-- >>> import Analysis.Eval (eval)
+-- >>> import qualified Core.Core as Core

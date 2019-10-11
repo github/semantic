@@ -36,7 +36,7 @@ install:
 script:
 - cabal new-build
 - cabal new-run semantic:test
-- cabal new-run semantic-core:spec
+- cabal new-run semantic-core:test
 - cabal new-run semantic-core:doctest
 - cabal new-run semantic-python:test
 - cabal new-run semantic-source:test
