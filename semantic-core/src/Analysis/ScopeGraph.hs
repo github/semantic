@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, OverloadedStrings, RankNTypes, RecordWildCards, TypeApplications, TypeOperators #-}
+{-# LANGUAGE FlexibleContexts, OverloadedStrings, RankNTypes, RecordWildCards, ScopedTypeVariables, TypeApplications, TypeOperators #-}
 module Analysis.ScopeGraph
 ( ScopeGraph(..)
 , Ref (..)
@@ -68,27 +68,29 @@ scopeGraph eval
   . traverse (runFile eval)
 
 runFile
-  :: ( Carrier sig m
+  :: forall term name m sig
+  .  ( Carrier sig m
      , Effect sig
      , Member Fresh sig
-     , Member (State (Heap Name (ScopeGraph Name))) sig
-     , Ord (term Name)
+     , Member (State (Heap name (ScopeGraph name))) sig
+     , Ord name
+     , Ord (term name)
      )
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term Name Name (ScopeGraph Name) m
-     -> (term Name -> m (ScopeGraph Name))
-     -> (term Name -> m (ScopeGraph Name))
+     => Analysis term name name (ScopeGraph name) m
+     -> (term name -> m (ScopeGraph name))
+     -> (term name -> m (ScopeGraph name))
      )
-  -> File (term Name)
-  -> m (File (Either (Path.AbsRelFile, Span, String) (ScopeGraph Name)))
+  -> File (term name)
+  -> m (File (Either (Path.AbsRelFile, Span, String) (ScopeGraph name)))
 runFile eval file = traverse run file
   where run = runReader (filePath file)
             . runReader (fileSpan file)
-            . runReader (Map.empty @Name @Ref)
+            . runReader (Map.empty @name @Ref)
             . runFail
             . fmap fold
-            . convergeTerm (Proxy @Name) (fix (cacheTerm . eval scopeGraphAnalysis))
+            . convergeTerm (Proxy @name) (fix (cacheTerm . eval scopeGraphAnalysis))
 
 scopeGraphAnalysis
   :: ( Alternative m
