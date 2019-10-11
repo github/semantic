@@ -233,5 +233,6 @@ data EdgeType term name
 
 
 -- $setup
+-- >>> :seti -XFlexibleContexts
 -- >>> :seti -XOverloadedStrings
 -- >>> import qualified Core.Core as Core
