@@ -29,16 +29,16 @@ import qualified System.Path as Path
 
 type ImportGraph = Map.Map Text (Set.Set Text)
 
-data Value term = Value
-  { valueSemi  :: Semi term Name
+data Value term name = Value
+  { valueSemi  :: Semi term name
   , valueGraph :: ImportGraph
   }
   deriving (Eq, Ord, Show)
 
-instance Semigroup (Value term) where
+instance Semigroup (Value term name) where
   Value _ g1 <> Value _ g2 = Value Abstract (Map.unionWith (<>) g1 g2)
 
-instance Monoid (Value term) where
+instance Monoid (Value term name) where
   mempty = Value Abstract mempty
 
 data Semi term name
@@ -53,13 +53,13 @@ importGraph
   :: (Ord term, Show term)
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term Name Name (Value term) m
-     -> (term -> m (Value term))
-     -> (term -> m (Value term))
+     => Analysis term Name Name (Value term Name) m
+     -> (term -> m (Value term Name))
+     -> (term -> m (Value term Name))
      )
   -> [File term]
-  -> ( Heap Name (Value term)
-     , [File (Either (Path.AbsRelFile, Span, String) (Value term))]
+  -> ( Heap Name (Value term Name)
+     , [File (Either (Path.AbsRelFile, Span, String) (Value term Name))]
      )
 importGraph eval
   = run
@@ -71,18 +71,18 @@ runFile
   :: ( Carrier sig m
      , Effect sig
      , Member Fresh sig
-     , Member (State (Heap Name (Value term))) sig
+     , Member (State (Heap Name (Value term Name))) sig
      , Ord  term
      , Show term
      )
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term Name Name (Value term) m
-     -> (term -> m (Value term))
-     -> (term -> m (Value term))
+     => Analysis term Name Name (Value term Name) m
+     -> (term -> m (Value term Name))
+     -> (term -> m (Value term Name))
      )
   -> File term
-  -> m (File (Either (Path.AbsRelFile, Span, String) (Value term)))
+  -> m (File (Either (Path.AbsRelFile, Span, String) (Value term Name)))
 runFile eval file = traverse run file
   where run = runReader (filePath file)
             . runReader (fileSpan file)
@@ -95,12 +95,12 @@ importGraphAnalysis :: ( Alternative m
                        , Carrier sig m
                        , Member (Reader Path.AbsRelFile) sig
                        , Member (Reader Span) sig
-                       , Member (State (Heap Name (Value term))) sig
+                       , Member (State (Heap Name (Value term Name))) sig
                        , MonadFail m
                        , Ord  term
                        , Show term
                        )
-                    => Analysis term Name Name (Value term) m
+                    => Analysis term Name Name (Value term Name) m
 importGraphAnalysis = Analysis{..}
   where alloc = pure
         bind _ _ m = m
