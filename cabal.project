@@ -1,4 +1,5 @@
 packages: .
+          semantic-analysis
           semantic-core
           semantic-java
           semantic-json
@@ -9,6 +10,9 @@ packages: .
 jobs: $ncpus
 
 package semantic
+  ghc-options: -Werror
+
+package semantic-analysis
   ghc-options: -Werror
 
 package semantic-core

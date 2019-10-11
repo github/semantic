@@ -10,8 +10,8 @@ import           Test.Tasty.HUnit
 
 import           Analysis.File
 import           Core.Core
-import           Core.Core.Pretty
-import           Core.Core.Parser as Parse
+import           Core.Pretty
+import           Core.Parser as Parse
 import qualified Core.Eval as Eval
 import           Core.Name
 import qualified Generators as Gen

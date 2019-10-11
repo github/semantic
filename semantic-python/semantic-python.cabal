@@ -74,6 +74,7 @@ test-suite test
                , pretty-show ^>= 1.9.5
                , process ^>= 1.6.5
                , resourcet ^>= 1.2.2
+               , semantic-analysis ^>= 0
                , streaming ^>= 0.2.2
                , streaming-process ^>= 0.1
                , streaming-bytestring ^>= 0.1.6

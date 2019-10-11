@@ -1,10 +1,10 @@
 cabal-version:       2.4
 
-name:                semantic-core
+name:                semantic-analysis
 version:             0.0.0.0
-synopsis:            Semantic core intermediate language
-description:         Core intermediate language for program analysis using abstract definitional interpretation.
-homepage:            https://github.com/github/semantic/tree/master/semantic-core#readme
+synopsis:            Program analysis by abstract definitional interpretation.
+description:         Program analysis abstractions and implementations by abstract definitional interpretation.
+homepage:            https://github.com/github/semantic/tree/master/semantic-analysis#readme
 bug-reports:         https://github.com/github/semantic/issues
 license:             MIT
 license-file:        LICENSE
@@ -40,40 +40,28 @@ library
   import: common
   hs-source-dirs: src
   exposed-modules:
-    Core.Core
-    Core.Parser
-    Core.Pretty
-    Core.Eval
-    Core.Name
+    Analysis.Analysis
+    Analysis.Concrete
+    Analysis.File
+    Analysis.FlowInsensitive
+    Analysis.ImportGraph
+    Analysis.ScopeGraph
+    Analysis.Typecheck
+    Control.Carrier.Fail.WithLoc
+    Control.Carrier.Readline.Haskeline
+    Control.Effect.Readline
   build-depends:
-      base                         >= 4.12 && < 5
+      algebraic-graphs            ^>= 0.3
+    , base                         >= 4.12 && < 5
+    , containers                  ^>= 0.6
+    , directory                   ^>= 1.3
+    , filepath                    ^>= 1.4
     , fused-effects               ^>= 0.5
     , fused-syntax
-    , parsers                     ^>= 0.12.10
+    , haskeline                   ^>= 0.7.5
     , pathtype                    ^>= 0.8.1
     , prettyprinter               ^>= 1.2.1
     , prettyprinter-ansi-terminal ^>= 1.1.1
-    , semantic-analysis           ^>= 0
     , semantic-source             ^>= 0
+    , terminal-size               ^>= 0.3
     , text                        ^>= 1.2.3.1
-    , trifecta                    ^>= 2
-    , unordered-containers        ^>= 0.2.10
-
-test-suite test
-  import: common
-  type:           exitcode-stdio-1.0
-  hs-source-dirs: test
-  main-is:        Test.hs
-  other-modules:  Generators
-  build-depends:
-      base
-    , semantic-analysis
-    , semantic-core
-    , semantic-source ^>= 0
-    , fused-effects
-    , fused-syntax
-    , hedgehog ^>= 1
-    , tasty >= 1.2 && <2
-    , tasty-hedgehog ^>= 1.0.0.1
-    , tasty-hunit >= 0.10 && <1
-    , trifecta

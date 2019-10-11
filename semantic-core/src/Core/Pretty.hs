@@ -1,6 +1,6 @@
 {-# LANGUAGE FlexibleContexts, LambdaCase, OverloadedStrings, TypeApplications #-}
 
-module Core.Core.Pretty
+module Core.Pretty
   ( showCore
   , printCore
   , showFile
