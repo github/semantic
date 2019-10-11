@@ -63,14 +63,6 @@ data Format = Show
   deriving (Read)
 
 
--- pass in a file as an argument and parse its contents
-fileInput :: Parser Input
-fileInput = FileInput <$> strOption
-  (  long "file"
-  <> short 'f'
-  <> metavar "FILENAME"
-  <> help "Input file" )
-
 -- Read from stdin
 stdInput :: Parser Input
 stdInput = flag' StdInput
