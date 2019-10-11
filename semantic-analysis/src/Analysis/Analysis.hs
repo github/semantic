@@ -38,11 +38,15 @@ data Heap addr value m k
   deriving (Functor)
 
 data Domain term name value m k
+  -- Functions construction & elimination
   = Abstract name (term name)                 (value term name -> m k)
   | Apply (value term name) (value term name) (value term name -> m k)
+  -- Unit construction (no elimination)
   | Unit (value term name -> m k)
+  -- Boolean construction & elimination
   | Bool   Bool              (value term name -> m k)
   | AsBool (value term name) (Bool            -> m k)
+  -- String construction & elimination
   | String   Text              (value term name -> m k)
   | AsString (value term name) (Text            -> m k)
   deriving (Functor)
