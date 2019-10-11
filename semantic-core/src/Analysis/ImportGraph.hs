@@ -41,7 +41,7 @@ instance Monoid (Value term name) where
   mempty = Value Abstract mempty
 
 data Semi term name
-  = Closure Path.AbsRelFile Span name term
+  = Closure Path.AbsRelFile Span name (term name)
   -- FIXME: Bound String values.
   | String Text
   | Abstract
@@ -49,14 +49,14 @@ data Semi term name
 
 
 importGraph
-  :: (Ord name, Ord term, Show name, Show term)
+  :: (Ord name, Ord (term name), Show name, Show (term name))
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term name name (Value term name) m
-     -> (term -> m (Value term name))
-     -> (term -> m (Value term name))
+     => Analysis (term name) name name (Value term name) m
+     -> (term name -> m (Value term name))
+     -> (term name -> m (Value term name))
      )
-  -> [File term]
+  -> [File (term name)]
   -> ( Heap name (Value term name)
      , [File (Either (Path.AbsRelFile, Span, String) (Value term name))]
      )
@@ -73,17 +73,17 @@ runFile
      , Member Fresh sig
      , Member (State (Heap name (Value term name))) sig
      , Ord  name
-     , Ord  term
+     , Ord  (term name)
      , Show name
-     , Show term
+     , Show (term name)
      )
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term name name (Value term name) m
-     -> (term -> m (Value term name))
-     -> (term -> m (Value term name))
+     => Analysis (term name) name name (Value term name) m
+     -> (term name -> m (Value term name))
+     -> (term name -> m (Value term name))
      )
-  -> File term
+  -> File (term name)
   -> m (File (Either (Path.AbsRelFile, Span, String) (Value term name)))
 runFile eval file = traverse run file
   where run = runReader (filePath file)
@@ -100,11 +100,11 @@ importGraphAnalysis :: ( Alternative m
                        , Member (State (Heap name (Value term name))) sig
                        , MonadFail m
                        , Ord  name
-                       , Ord  term
+                       , Ord  (term name)
                        , Show name
-                       , Show term
+                       , Show (term name)
                        )
-                    => Analysis term name name (Value term name) m
+                    => Analysis (term name) name name (Value term name) m
 importGraphAnalysis = Analysis{..}
   where alloc = pure
         bind _ _ m = m
