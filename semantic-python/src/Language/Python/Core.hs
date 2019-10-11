@@ -82,11 +82,11 @@ none :: (Member Core sig, Carrier sig t) => t Name
 none = unit
 
 locate :: ( HasField "ann" syntax Span
-           , CoreSyntax syn t
-           )
-        => syntax
-        -> t a
-        -> t a
+          , CoreSyntax syn t
+          )
+       => syntax
+       -> t a
+       -> t a
 locate syn  = Core.annAt (getField @"ann" syn)
 
 defaultCompile :: (MonadFail m, Show py) => py -> m (t Name)
@@ -159,7 +159,7 @@ instance Compile Py.Assignment where
     , ann
     } cc next = do
     (names, val) <- desugar [Located ann name] rhs
-    locate it <$> compile val pure next >>= foldr collapseDesugared cc names
+    compile val pure next >>= foldr collapseDesugared cc names >>= pure . locate it
 
   compile other _ _ = fail ("Unhandled assignment case: " <> show other)
 
