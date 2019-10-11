@@ -13,7 +13,6 @@ import           AST.Element
 import           Control.Effect hiding ((:+:))
 import           Control.Effect.Reader
 import           Control.Monad.Fail
-import           Control.Monad ((>=>))
 import           Data.Coerce
 import           Data.Core as Core
 import           Data.Foldable
@@ -84,12 +83,11 @@ none = unit
 
 locate :: ( HasField "ann" syntax Span
           , CoreSyntax syn t
-          , Applicative m
           )
        => syntax
        -> t a
-       -> m (t a)
-locate syn item = pure (Core.annAt (getField @"ann" syn) item)
+       -> t a
+locate syn  = Core.annAt (getField @"ann" syn)
 
 defaultCompile :: (MonadFail m, Show py) => py -> m (t Name)
 defaultCompile t = fail $ "compilation unimplemented for " <> show t
@@ -161,7 +159,7 @@ instance Compile Py.Assignment where
     , ann
     } cc next = do
     (names, val) <- desugar [Located ann name] rhs
-    compile val pure next >>= foldr collapseDesugared cc names >>= locate it
+    compile val pure next >>= foldr collapseDesugared cc names >>= pure . locate it
 
   compile other _ _ = fail ("Unhandled assignment case: " <> show other)
 
@@ -172,7 +170,9 @@ instance Compile Py.Await
 instance Compile Py.BinaryOperator
 
 instance Compile Py.Block where
-  compile it@Py.Block{ Py.extraChildren = body} cc = foldr compile cc body >=> locate it
+  compile it@Py.Block{ Py.extraChildren = body} cc
+    = fmap (locate it)
+    . foldr compile cc body
 
 instance Compile Py.BooleanOperator
 instance Compile Py.BreakStatement
@@ -195,20 +195,20 @@ instance Compile Py.ExecStatement
 deriving instance Compile Py.Expression
 
 instance Compile Py.ExpressionStatement where
-  compile it@Py.ExpressionStatement
-    { Py.extraChildren = children
-    } cc = do
-    foldr compile cc children >=> locate it
+  compile it@Py.ExpressionStatement { Py.extraChildren = children } cc
+    = fmap (locate it)
+    . foldr compile cc children
 
 instance Compile Py.ExpressionList where
   compile it@Py.ExpressionList { Py.extraChildren = [child] } cc
-    = compile child cc >=> locate it
+    = fmap (locate it)
+    . compile child cc
   compile Py.ExpressionList { Py.extraChildren = items } _
     = const (fail ("unimplemented: ExpressionList of length " <> show items))
 
 
 instance Compile Py.False where
-  compile it cc _ = locate it (bool False) >>= cc
+  compile it cc _ = cc $ locate it (bool False)
 
 instance Compile Py.Float
 instance Compile Py.ForStatement
@@ -223,7 +223,7 @@ instance Compile Py.FunctionDefinition where
       parameters' <- traverse param parameters
       body' <- compile body pure next
       -- Build a lambda.
-      located <- locate it (lams parameters' body')
+      let located = locate it (lams parameters' body')
       -- Give it a name (below), then augment the current continuation
       -- with the new name (with 'def'), so that calling contexts know
       -- that we have built an exportable definition.
@@ -242,9 +242,9 @@ instance Compile Py.Identifier where
 
 instance Compile Py.IfStatement where
   compile it@Py.IfStatement{ condition, consequence, alternative} cc next =
-    locate it =<< if' <$> compile condition pure next
-                      <*> compile consequence cc next
-                      <*> foldr clause (cc next) alternative
+    locate it <$> (if' <$> compile condition pure next
+                       <*> compile consequence cc next
+                       <*> foldr clause (cc next) alternative)
     where clause (R1 Py.ElseClause{ body }) _ = compile body cc next
           clause (L1 Py.ElifClause{ condition, consequence }) rest  =
             if' <$> compile condition pure next <*> compile consequence cc next <*> rest
@@ -268,7 +268,7 @@ instance Compile Py.Module where
           bindings <- asks @Bindings (toList . unBindings)
           let buildName n = (n, pure n)
           pure . record . fmap buildName $ bindings
-    in foldr compile buildRecord stmts >=> locate it
+    in fmap (locate it) . foldr compile buildRecord stmts
 
 instance Compile Py.NamedExpression
 instance Compile Py.None
@@ -277,16 +277,16 @@ instance Compile Py.NotOperator
 instance Compile Py.ParenthesizedExpression
 
 instance Compile Py.PassStatement where
-  compile it@Py.PassStatement {} cc _ = locate it Core.unit >>= cc
+  compile it@Py.PassStatement {} cc _ = cc $ locate it Core.unit
 
 deriving instance Compile Py.PrimaryExpression
 
 instance Compile Py.PrintStatement
 
 instance Compile Py.ReturnStatement where
-  compile it@Py.ReturnStatement { Py.extraChildren = vals } _ next = case vals of
-    Nothing -> locate it $ none
-    Just Py.ExpressionList { extraChildren = [val] } -> compile val pure next >>= locate it
+  compile it@Py.ReturnStatement { Py.extraChildren = vals } _ next = locate it <$> case vals of
+    Nothing -> pure none
+    Just Py.ExpressionList { extraChildren = [val] } -> compile val pure next
     Just Py.ExpressionList { extraChildren = vals  } -> fail ("unimplemented: return statement returning " <> show (length vals) <> " values")
 
 
@@ -300,12 +300,12 @@ instance Compile Py.String
 instance Compile Py.Subscript
 
 instance Compile Py.True where
-  compile it cc _next = locate it (bool True) >>= cc
+  compile it cc _next = cc $ locate it (bool True)
 
 instance Compile Py.TryStatement
 
 instance Compile Py.Tuple where
-  compile it@Py.Tuple { Py.extraChildren = [] } cc _ = locate it unit >>= cc
+  compile it@Py.Tuple { Py.extraChildren = [] } cc _ = cc $ locate it unit
 
   compile it _ _
     = fail ("Unimplemented: non-empty tuple " <> show it)
