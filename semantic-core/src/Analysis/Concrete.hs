@@ -41,7 +41,7 @@ newtype FrameId = FrameId { unFrameId :: Precise }
   deriving (Eq, Ord, Show)
 
 data Concrete term name
-  = Closure Path.AbsRelFile Span name term (Env name)
+  = Closure Path.AbsRelFile Span name (term name) (Env name)
   | Unit
   | Bool Bool
   | String Text
@@ -78,12 +78,12 @@ concrete
      )
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis (term name) name Precise (Concrete (term name) name) m
-     -> (term name -> m (Concrete (term name) name))
-     -> (term name -> m (Concrete (term name) name))
+     => Analysis (term name) name Precise (Concrete term name) m
+     -> (term name -> m (Concrete term name))
+     -> (term name -> m (Concrete term name))
      )
   -> [File (term name)]
-  -> (Heap (term name) name, [File (Either (Path.AbsRelFile, Span, String) (Concrete (term name) name))])
+  -> (Heap term name, [File (Either (Path.AbsRelFile, Span, String) (Concrete term name))])
 concrete eval
   = run
   . runFresh
@@ -97,19 +97,19 @@ runFile
      , Foldable term
      , IsString name
      , Member Fresh sig
-     , Member (State (Heap (term name) name)) sig
+     , Member (State (Heap term name)) sig
      , Ord name
      , Show name
      , Show (term name)
      )
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis (term name) name Precise (Concrete (term name) name) m
-     -> (term name -> m (Concrete (term name) name))
-     -> (term name -> m (Concrete (term name) name))
+     => Analysis (term name) name Precise (Concrete term name) m
+     -> (term name -> m (Concrete term name))
+     -> (term name -> m (Concrete term name))
      )
   -> File (term name)
-  -> m (File (Either (Path.AbsRelFile, Span, String) (Concrete (term name) name)))
+  -> m (File (Either (Path.AbsRelFile, Span, String) (Concrete term name)))
 runFile eval file = traverse run file
   where run = runReader (filePath file)
             . runReader (fileSpan file)
@@ -124,13 +124,13 @@ concreteAnalysis :: ( Carrier sig m
                     , Member (Reader (Env name)) sig
                     , Member (Reader Path.AbsRelFile) sig
                     , Member (Reader Span) sig
-                    , Member (State (Heap (term name) name)) sig
+                    , Member (State (Heap term name)) sig
                     , MonadFail m
                     , Ord name
                     , Show name
                     , Show (term name)
                     )
-                 => Analysis (term name) name Precise (Concrete (term name) name) m
+                 => Analysis (term name) name Precise (Concrete term name) m
 concreteAnalysis = Analysis{..}
   where alloc _ = fresh
         bind name addr m = local (Map.insert name addr) m
