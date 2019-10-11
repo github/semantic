@@ -1,4 +1,4 @@
-{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE DeriveFunctor, ExistentialQuantification, RankNTypes, StandaloneDeriving #-}
 module Analysis.Analysis
 ( Analysis(..)
 ) where
@@ -24,3 +24,10 @@ data Analysis term name address value m = Analysis
   , record    :: [(name, value)] -> m value
   , (...)     :: address -> name -> m (Maybe address)
   }
+
+data Env name addr m k
+  = Alloc name (addr -> m k)
+  | forall a . Bind name addr (m a) (a -> m k)
+  | Lookup name (Maybe addr -> m k)
+
+deriving instance Functor m => Functor (Env name addr m)
