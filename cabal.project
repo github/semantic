@@ -35,6 +35,11 @@ package semantic-tags
 
 source-repository-package
   type: git
+  location: https://github.com/tclem/lingo-haskell
+  tag: 59b19fd7251bd247245dbb67859507391764270f
+
+source-repository-package
+  type: git
   location: https://github.com/tclem/proto-lens-jsonpb
   tag: e4d10b77f57ee25beb759a33e63e2061420d3dc2
 

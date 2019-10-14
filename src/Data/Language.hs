@@ -93,7 +93,15 @@ extensionsForLanguage language = T.unpack <$> maybe mempty Lingo.languageExtensi
 
 -- | Return a language based on a FilePath's extension.
 languageForFilePath :: FilePath -> Language
-languageForFilePath path = maybe Unknown (textToLanguage . Lingo.languageName) (Lingo.languageForPath path)
+languageForFilePath path =
+  let spurious lang = lang `elem` [ "Hack" -- .php files
+                                  , "GCC Machine Description" -- .md files
+                                  , "XML" -- .tsx files
+                                  ]
+      allResults = Lingo.languageName <$> Lingo.languagesForPath path
+  in case filter (not . spurious) allResults of
+    [result] -> textToLanguage result
+    _        -> Unknown
 
 supportedExts :: [String]
 supportedExts = foldr append mempty supportedLanguages
@@ -129,7 +137,6 @@ textToLanguage :: T.Text -> Language
 textToLanguage = \case
   "Go" -> Go
   "Haskell" -> Haskell
-  "Hack" -> PHP -- working around https://github.com/github/semantic/issues/330
   "Java" -> Java
   "JavaScript" -> JavaScript
   "JSON" -> JSON
