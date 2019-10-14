@@ -24,7 +24,6 @@ import           Source.Span (Span)
 import           Syntax.Stack (Stack (..))
 import qualified Syntax.Stack as Stack
 import qualified TreeSitter.Python.AST as Py
-import           Debug.Trace (traceM)
 
 -- | Keeps track of the current scope's bindings (so that we can, when
 -- compiling a class or module, return the list of bound variables as
@@ -197,7 +196,6 @@ instance Compile Py.Call where
 
 instance Compile Py.ClassDefinition where
   compile _it@Py.ClassDefinition { body = pybody, name = Py.Identifier _ann pyname } cc next = do
-    traceM "in class def"
     let n = Name pyname
     let buildTypeCall _next' = do
           bindings <- asks @Bindings (toList . unBindings)
