@@ -195,17 +195,17 @@ instance Compile Py.Call where
   compile it _ _ = fail ("can't compile Call node with generator expression: " <> show it)
 
 instance Compile Py.ClassDefinition where
-  compile _it@Py.ClassDefinition { body = pybody, name = Py.Identifier _ann pyname } cc next = do
-    let n = Name pyname
-    let buildTypeCall _next' = do
+  compile it@Py.ClassDefinition { body = pybody, name = Py.Identifier _ann (Name -> n) } cc next = do
+    let buildTypeCall _ = do
           bindings <- asks @Bindings (toList . unBindings)
           let buildName n = (n, pure n)
           let contents = record . fmap buildName $ bindings
-          pure (pure (Name "type") $$ Core.string pyname $$ pure "object" $$ contents)
+          pure (pure (Name "type") $$ Core.string (coerce n) $$ pure "object" $$ contents)
 
     body <- compile pybody buildTypeCall next
-    let called = Name.named' n :<- body
-    fmap (called >>>=) (local (def n) (cc next))
+    let assignClass = Name.named' n :<- body
+    let continuing = fmap (locate it . (assignClass >>>=))
+    continuing (local (def n) (cc next))
 
 instance Compile Py.ComparisonOperator
 
