@@ -201,8 +201,9 @@ instance Compile Py.ClassDefinition where
           let buildName n = (n, pure n)
               contents = record . fmap buildName $ bindings
               typefn = pure "__semantic_prelude" ... "type"
+              object = pure "__semantic_prelude" ... "object"
 
-          pure (typefn $$ Core.string (coerce n) $$ pure "object" $$ contents)
+          pure (typefn $$ Core.string (coerce n) $$ object $$ contents)
 
     body <- compile pybody buildTypeCall next
     let assignClass = Name.named' n :<- body
