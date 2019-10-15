@@ -1,4 +1,4 @@
-# CHECK-TREE: { Foo <- { identity <- \self -> \x -> x; type "Foo" object #record { identity: identity } }; #record { Foo: Foo } }
+# CHECK-TREE: { Foo <- { identity <- \self -> \x -> x; __semantic_prelude.type "Foo" object #record { identity: identity } }; #record { Foo: Foo } }
 
 class Foo():
     def identity(self, x):
