@@ -30,11 +30,11 @@ import Prologue
 type ComparabilityRelation syntax ann1 ann2 = forall a b. TermF syntax ann1 a -> TermF syntax ann2 b -> Bool
 
 rws :: (Foldable syntax, Functor syntax, Diffable syntax)
-    => ComparabilityRelation syntax (FeatureVector, ann) (FeatureVector, ann)
-    -> (Term syntax (FeatureVector, ann) -> Term syntax (FeatureVector, ann) -> Bool)
-    -> [Term syntax (FeatureVector, ann)]
-    -> [Term syntax (FeatureVector, ann)]
-    -> EditScript (Term syntax (FeatureVector, ann)) (Term syntax (FeatureVector, ann))
+    => ComparabilityRelation syntax (FeatureVector, ann1) (FeatureVector, ann2)
+    -> (Term syntax (FeatureVector, ann1) -> Term syntax (FeatureVector, ann2) -> Bool)
+    -> [Term syntax (FeatureVector, ann1)]
+    -> [Term syntax (FeatureVector, ann2)]
+    -> EditScript (Term syntax (FeatureVector, ann1)) (Term syntax (FeatureVector, ann2))
 rws _          _          as [] = This <$> as
 rws _          _          [] bs = That <$> bs
 rws canCompare _          [a] [b] = if canCompareTerms canCompare a b then [These a b] else [That b, This a]

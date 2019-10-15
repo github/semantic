@@ -11,8 +11,8 @@ module Data.Language
   , textToLanguage
   , languageToText
   , PerLanguageModes(..)
+  , defaultLanguageModes
   , LanguageMode(..)
-  , modeForLanguage
   ) where
 
 import           Data.Aeson
@@ -104,7 +104,7 @@ supportedExts = foldr append mempty supportedLanguages
     lookup k = Map.lookup k Lingo.languages
 
 codeNavLanguages :: [Language]
-codeNavLanguages = [Go, Ruby, Python, JavaScript, TypeScript, PHP]
+codeNavLanguages = [Go, Java, Ruby, Python, JavaScript, TypeScript, PHP]
 
 pathIsMinified :: FilePath -> Bool
 pathIsMinified = isExtensionOf ".min.js"
@@ -129,6 +129,7 @@ textToLanguage :: T.Text -> Language
 textToLanguage = \case
   "Go" -> Go
   "Haskell" -> Haskell
+  "Hack" -> PHP -- working around https://github.com/github/semantic/issues/330
   "Java" -> Java
   "JavaScript" -> JavaScript
   "JSON" -> JSON
@@ -147,12 +148,12 @@ newtype PerLanguageModes = PerLanguageModes
   }
   deriving (Eq, Ord, Show)
 
+defaultLanguageModes :: PerLanguageModes
+defaultLanguageModes = PerLanguageModes
+  { pythonMode = ALaCarte
+  }
+
 data LanguageMode
   = ALaCarte
   | Precise
   deriving (Bounded, Enum, Eq, Ord, Read, Show)
-
-modeForLanguage :: PerLanguageModes -> Language -> LanguageMode
-modeForLanguage modes = \case
-  Python -> pythonMode modes
-  _      -> ALaCarte

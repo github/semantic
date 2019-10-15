@@ -2,7 +2,8 @@
 
 module Main (main) where
 
-import qualified Analysis.Eval as Eval
+import           Analysis.File
+import           Analysis.ScopeGraph
 import           Control.Effect
 import           Control.Effect.Fail
 import           Control.Effect.Reader
@@ -10,54 +11,49 @@ import           Control.Monad hiding (fail)
 import           Control.Monad.Catch
 import           Control.Monad.IO.Class
 import           Control.Monad.Trans.Resource (ResourceT, runResourceT)
+import           Core.Core
+import           Core.Pretty
+import qualified Core.Eval as Eval
+import           Core.Name
 import qualified Data.Aeson as Aeson
 import qualified Data.Aeson.Encode.Pretty as Aeson
 import qualified Data.ByteString.Char8 as ByteString
 import qualified Data.ByteString.Lazy.Char8 as ByteString.Lazy
 import qualified Data.ByteString.Streaming.Char8 as ByteStream
-import           Data.Core
-import           Data.Core.Pretty
-import           Data.File
 import           Data.Foldable
 import           Data.Function
 import           Data.List (sort)
-import           Data.Loc
 import           Data.Maybe
-import           Data.Name
-import           Data.Term
-import           Data.String (fromString)
 import           GHC.Stack
 import qualified Language.Python.Core as Py
 import           Prelude hiding (fail)
-import qualified Source.Span as Source (Span)
+import           Source.Span
 import           Streaming
 import qualified Streaming.Prelude as Stream
 import qualified Streaming.Process
+import           Syntax.Term
 import           System.Directory
 import           System.Exit
-import qualified TreeSitter.Python as TSP
-import qualified TreeSitter.Python.AST as TSP
-import qualified TreeSitter.Unmarshal as TS
-import           Text.Show.Pretty (ppShow)
 import qualified System.Path as Path
 import qualified System.Path.Directory as Path
 import           System.Path ((</>))
+import           Text.Show.Pretty (ppShow)
+import qualified TreeSitter.Python as TSP
+import qualified TreeSitter.Unmarshal as TS
 
 import qualified Test.Tasty as Tasty
 import qualified Test.Tasty.HUnit as HUnit
 
-import           Analysis.ScopeGraph
 import qualified Directive
 import           Instances ()
 
 
-assertJQExpressionSucceeds :: Show a => Directive.Directive -> a -> Term (Ann :+: Core) Name -> HUnit.Assertion
+assertJQExpressionSucceeds :: Show a => Directive.Directive -> a -> Term (Ann Span :+: Core) Name -> HUnit.Assertion
 assertJQExpressionSucceeds directive tree core = do
-  bod <- case scopeGraph Eval.eval [File interactive core] of
-    (heap, [File _ (Right result)]) -> pure $ Aeson.object
+  bod <- case scopeGraph Eval.eval [File (Path.absRel "<interactive>") (Span (Pos 1 1) (Pos 1 1)) core] of
+    (heap, [File _ _ (Right result)]) -> pure $ Aeson.object
       [ "scope" Aeson..= heap
       , "heap"  Aeson..= result
-      , "tree"  Aeson..= Aeson.toJSON1 core
       ]
     _other                       -> HUnit.assertFailure "Couldn't run scope dumping mechanism; this shouldn't happen"
 
@@ -98,9 +94,8 @@ fixtureTestTreeForFile fp = HUnit.testCaseSteps (Path.toString fp) $ \step -> wi
   result <- ByteString.readFile (Path.toString fullPath) >>= TS.parseByteString TSP.tree_sitter_python
   let coreResult = Control.Effect.run
                    . runFail
-                   . runReader (fromString @Py.SourcePath . Path.toString $ fp)
                    . runReader @Py.Bindings mempty
-                   . Py.compile @(TSP.Module Source.Span) @_ @(Term (Ann :+: Core))
+                   . Py.toplevelCompile
                    <$> result
 
   for_ directives $ \directive -> do

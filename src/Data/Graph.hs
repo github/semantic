@@ -21,9 +21,11 @@ import           Algebra.Graph.Class (connect, overlay, vertex)
 import qualified Algebra.Graph.Class as Class
 import qualified Algebra.Graph.ToGraph as Class
 import           Control.Effect.State
+import           Control.Lens (view)
 import           Data.Aeson
 import qualified Data.Set as Set
-import           Semantic.Proto.SemanticPB
+import           Proto.Semantic as P
+import           Proto.Semantic_Fields as P
 
 -- | An algebraic graph with 'Ord', 'Semigroup', and 'Monoid' instances.
 newtype Graph vertex = Graph { unGraph :: G.Graph vertex }
@@ -100,8 +102,8 @@ instance Ord vertex => Ord (Graph vertex) where
 class VertexTag vertex where
   uniqueTag :: vertex -> Int
 
-instance VertexTag DiffTreeVertex where uniqueTag = fromIntegral . diffVertexId
-instance VertexTag TermVertex where uniqueTag = fromIntegral . vertexId
+instance VertexTag DiffTreeVertex where uniqueTag = fromIntegral . view diffVertexId
+instance VertexTag TermVertex where uniqueTag = fromIntegral . view vertexId
 
 instance (Ord vertex, ToJSON vertex, VertexTag vertex) => ToJSON (Graph vertex) where
   toJSON     (Graph graph) = object ["vertices" .= G.vertexList graph,   "edges" .= (Edge <$> G.edgeList graph)]

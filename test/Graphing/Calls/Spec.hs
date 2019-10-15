@@ -3,7 +3,7 @@
 module Graphing.Calls.Spec ( spec ) where
 
 import Prelude hiding (readFile)
-import SpecHelpers hiding (readFile)
+import SpecHelpers
 
 import Algebra.Graph
 
@@ -17,7 +17,7 @@ callGraphPythonProject :: Path.RelFile -> IO (Semantic.Graph.Graph ControlFlowVe
 callGraphPythonProject path = runTaskOrDie $ do
   let proxy = Proxy @'Language.Python
   let lang = Language.Python
-  blob <- readBlobFromFile' (fileForRelPath path)
+  blob <- readBlobFromFile' (fileForTypedPath path)
   package <- fmap snd <$> parsePackage pythonParser (Project (Path.toString (Path.takeDirectory path)) [blob] lang [])
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   runCallGraph proxy False modules package

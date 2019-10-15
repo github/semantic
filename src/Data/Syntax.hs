@@ -8,13 +8,11 @@ import Data.JSON.Fields
 import qualified Data.Set as Set
 import Data.Sum
 import Data.Term
-import qualified Data.Reprinting.Token as Token
 import GHC.Types (Constraint)
 import GHC.TypeLits
 import Diffing.Algorithm
 import Prelude
 import Prologue
-import Reprinting.Tokenize hiding (Element)
 import Source.Loc
 import Source.Range as Range
 import Source.Span as Span
@@ -133,9 +131,6 @@ instance Evaluatable Identifier where
   ref _ _ (Identifier name) = lookupSlot (Declaration name)
 
 
-instance Tokenize Identifier where
-  tokenize = yield . Token.Run . formatName . Data.Syntax.name
-
 instance FreeVariables1 Identifier where
   liftFreeVariables _ (Identifier x) = Set.singleton x
 
@@ -163,19 +158,12 @@ data Empty a = Empty
 instance Evaluatable Empty where
   eval _ _ _ = unit
 
-instance Tokenize Empty where
-  tokenize = ignore
-
 -- | Syntax representing a parsing or assignment error.
 data Error a = Error { errorCallStack :: ErrorStack, errorExpected :: [String], errorActual :: Maybe String, errorChildren :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Error
 
 instance Evaluatable Error
-
-instance Tokenize Error where
-  -- TODO: Considering producing comments like "ERROR: due to.." instead of ignoring.
-  tokenize = ignore
 
 errorSyntax :: Error.Error String -> [a] -> Error a
 errorSyntax Error.Error{..} = Error (ErrorStack $ errorSite <$> getCallStack callStack) errorExpected errorActual
@@ -238,9 +226,6 @@ instance Hashable1 Context where liftHashWithSalt = foldl
 
 instance Evaluatable Context where
   eval eval _ Context{..} = eval contextSubject
-
-instance Tokenize Context where
-  tokenize Context{..} = sequenceA_ (sepTrailing contextTerms) *> contextSubject
 
 instance Declarations1 Context where
   liftDeclaredName declaredName = declaredName . contextSubject

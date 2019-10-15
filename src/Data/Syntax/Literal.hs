@@ -7,12 +7,10 @@ import Prologue hiding (Set, hash, null)
 
 import           Data.Abstract.Evaluatable as Eval
 import           Data.JSON.Fields
-import qualified Data.Reprinting.Scope as Scope
 import           Data.Scientific.Exts
 import qualified Data.Text as T
 import           Diffing.Algorithm
 import           Numeric.Exts
-import           Reprinting.Tokenize as Tok
 import           Text.Read (readMaybe)
 
 -- Boolean
@@ -31,9 +29,6 @@ false = Boolean False
 instance Evaluatable Boolean where
   eval _ _ (Boolean x) = boolean x
 
-instance Tokenize Boolean where
-  tokenize = yield . Truth . booleanContent
-
 -- | A literal integer of unspecified width. No particular base is implied.
 newtype Integer a = Integer { integerContent :: Text }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
@@ -43,9 +38,6 @@ instance Evaluatable Data.Syntax.Literal.Integer where
   -- TODO: We should use something more robust than shelling out to readMaybe.
   eval _ _ (Data.Syntax.Literal.Integer x) =
     either (const (throwEvalError (IntegerFormatError x))) pure (parseInteger x) >>= integer
-
-instance Tokenize Data.Syntax.Literal.Integer where
-  tokenize = yield . Run . integerContent
 
 -- | A literal float of unspecified width.
 
@@ -57,9 +49,6 @@ newtype Float a = Float { floatContent :: Text }
 instance Evaluatable Data.Syntax.Literal.Float where
   eval _ _ (Float s) =
     either (const (throwEvalError (FloatFormatError s))) pure (parseScientific s) >>= float
-
-instance Tokenize Data.Syntax.Literal.Float where
-  tokenize = yield . Run . floatContent
 
 -- Rational literals e.g. `2/3r`
 newtype Rational a = Rational { value :: Text }
@@ -73,9 +62,6 @@ instance Evaluatable Data.Syntax.Literal.Rational where
       parsed = readMaybe @Prelude.Integer (T.unpack trimmed)
     in maybe (throwEvalError (RationalFormatError r)) (pure . toRational) parsed >>= rational
 
-instance Tokenize Data.Syntax.Literal.Rational where
-  tokenize (Rational t) = yield . Run $ t
-
 -- Complex literals e.g. `3 + 2i`
 newtype Complex a = Complex { value :: Text }
   deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, NFData1)
@@ -83,9 +69,6 @@ newtype Complex a = Complex { value :: Text }
 
 -- TODO: Implement Eval instance for Complex
 instance Evaluatable Complex
-
-instance Tokenize Complex where
-  tokenize (Complex v) = yield . Run $ v
 
 -- Strings, symbols
 
@@ -98,17 +81,11 @@ newtype String a = String { stringElements :: [a] }
 -- TODO: Implement Eval instance for String
 instance Evaluatable Data.Syntax.Literal.String
 
-instance Tokenize Data.Syntax.Literal.String where
-  tokenize = sequenceA_
-
 newtype Character a = Character { characterContent :: Text }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Ord1, Show1) via Generically Character
 
 instance Evaluatable Data.Syntax.Literal.Character
-
-instance Tokenize Character where
-  tokenize = yield . Glyph . characterContent
 
 -- | An interpolation element within a string literal.
 newtype InterpolationElement a = InterpolationElement { interpolationBody :: a }
@@ -118,9 +95,6 @@ newtype InterpolationElement a = InterpolationElement { interpolationBody :: a }
 -- TODO: Implement Eval instance for InterpolationElement
 instance Evaluatable InterpolationElement
 
-instance Tokenize InterpolationElement where
-  tokenize = sequenceA_
-
 -- | A sequence of textual contents within a string literal.
 newtype TextElement a = TextElement { textElementContent :: Text }
   deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, NFData1)
@@ -128,9 +102,6 @@ newtype TextElement a = TextElement { textElementContent :: Text }
 
 instance Evaluatable TextElement where
   eval _ _ (TextElement x) = string x
-
-instance Tokenize TextElement where
-  tokenize = yield . Run . textElementContent
 
 isTripleQuoted :: TextElement a -> Bool
 isTripleQuoted (TextElement t) =
@@ -148,17 +119,11 @@ newtype EscapeSequence a = EscapeSequence { value :: Text }
 -- TODO: Implement Eval instance for EscapeSequence
 instance Evaluatable EscapeSequence
 
-instance Tokenize EscapeSequence where
-  tokenize (EscapeSequence e) = yield . Run $ e
-
 data Null a = Null
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, NFData1)
   deriving (Eq1, Ord1, Show1) via Generically Null
 
 instance Evaluatable Null where eval _ _ _ = pure null
-
-instance Tokenize Null where
-  tokenize _ = yield Nullity
 
 newtype Symbol a = Symbol { symbolElements :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
@@ -167,18 +132,12 @@ newtype Symbol a = Symbol { symbolElements :: [a] }
 -- TODO: Implement Eval instance for Symbol
 instance Evaluatable Symbol
 
-instance Tokenize Symbol where
-  tokenize s = within Scope.Atom (yield Sym *> sequenceA_ s)
-
 newtype SymbolElement a = SymbolElement { symbolContent :: Text }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Ord1, Show1) via Generically SymbolElement
 
 instance Evaluatable SymbolElement where
   eval _ _ (SymbolElement s) = string s
-
-instance Tokenize SymbolElement where
-  tokenize = yield . Run . symbolContent
 
 newtype Regex a = Regex { regexContent :: Text }
   deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, NFData1)
@@ -190,9 +149,6 @@ newtype Regex a = Regex { regexContent :: Text }
 instance Evaluatable Regex where
   eval _ _ (Regex x) = string x
 
-instance Tokenize Regex where
-  tokenize = yield . Run . regexContent
-
 -- Collections
 
 newtype Array a = Array { arrayElements :: [a] }
@@ -201,9 +157,6 @@ newtype Array a = Array { arrayElements :: [a] }
 
 instance Evaluatable Array where
   eval eval _ Array{..} = array =<< traverse eval arrayElements
-
-instance Tokenize Array where
-  tokenize = list . arrayElements
 
 newtype Hash a = Hash { hashElements :: [a] }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, NFData1)
@@ -214,9 +167,6 @@ instance Evaluatable Hash where
     elements <- traverse (eval >=> asPair) (hashElements t)
     Eval.hash elements
 
-instance Tokenize Hash where
-  tokenize = Tok.hash . hashElements
-
 data KeyValue a = KeyValue { key :: !a, value :: !a }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, NFData1)
   deriving (Eq1, Ord1, Show1) via Generically KeyValue
@@ -226,9 +176,6 @@ instance Evaluatable KeyValue where
     k <- eval key
     v <- eval value
     kvPair k v
-
-instance Tokenize KeyValue where
-  tokenize (KeyValue k v) = pair k v
 
 newtype Tuple a = Tuple { tupleContents :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)

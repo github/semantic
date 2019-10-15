@@ -10,7 +10,6 @@ module Control.Carrier.Parse.Measured
 ) where
 
 import qualified Assigning.Assignment as Assignment
-import qualified Assigning.Assignment.Deterministic as Deterministic
 import           Control.Effect.Error
 import           Control.Effect.Carrier
 import           Control.Effect.Parse
@@ -60,22 +59,20 @@ runParser blob@Blob{..} parser = case parser of
     time "parse.tree_sitter_ast_parse" languageTag $ do
       config <- asks config
       parseToAST (configTreeSitterParseTimeout config) language blob
-        >>= either (trace >=> const (throwError (SomeException ParserTimedOut))) pure
+        >>= either (\e -> trace (displayException e) *> throwError (SomeException e)) pure
 
   UnmarshalParser language ->
     time "parse.tree_sitter_ast_parse" languageTag $ do
       config <- asks config
       parseToPreciseAST (configTreeSitterParseTimeout config) language blob
-        >>= either (trace >=> const (throwError (SomeException ParserTimedOut))) pure
+        >>= either (\e -> trace (displayException e) *> throwError (SomeException e)) pure
 
   AssignmentParser    parser assignment -> runAssignment Assignment.assign    parser blob assignment
-  DeterministicParser parser assignment -> runAssignment Deterministic.assign parser blob assignment
 
   MarkdownParser ->
     time "parse.cmark_parse" languageTag $
       let term = cmarkParser blobSource
       in length term `seq` pure term
-  SomeParser parser -> SomeTerm <$> runParser blob parser
   where languageTag = [("language" :: String, show (blobLanguage blob))]
 
 data ParserCancelled = ParserTimedOut | AssignmentTimedOut

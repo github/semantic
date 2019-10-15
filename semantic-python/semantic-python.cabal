@@ -22,11 +22,13 @@ common haskell
   default-language:    Haskell2010
   build-depends:       base ^>=4.12
                      , fused-effects ^>= 0.5
+                     , fused-syntax
                      , semantic-core ^>= 0.0
                      , semantic-source ^>= 0.0
+                     , semantic-tags ^>= 0.0
                      , text ^>= 1.2.3
-                     , tree-sitter ^>= 0.4
-                     , tree-sitter-python ^>= 0.5
+                     , tree-sitter ^>= 0.5
+                     , tree-sitter-python ^>= 0.6
 
   ghc-options:
     -Weverything
@@ -45,7 +47,10 @@ common haskell
 
 library
   import: haskell
-  exposed-modules: Language.Python.Core
+  exposed-modules:
+    Language.Python
+    Language.Python.Core
+    Language.Python.Tags
   hs-source-dirs: src
 
 test-suite test
@@ -69,6 +74,7 @@ test-suite test
                , pretty-show ^>= 1.9.5
                , process ^>= 1.6.5
                , resourcet ^>= 1.2.2
+               , semantic-analysis ^>= 0
                , streaming ^>= 0.2.2
                , streaming-process ^>= 0.1
                , streaming-bytestring ^>= 0.1.6

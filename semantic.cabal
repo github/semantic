@@ -56,7 +56,7 @@ common dependencies
                      , fused-effects ^>= 0.5.0.0
                      , fused-effects-exceptions ^>= 0.2.0.0
                      , hashable ^>= 1.2.7.0
-                     , tree-sitter ^>= 0.4
+                     , tree-sitter ^>= 0.5
                      , mtl ^>= 2.2.2
                      , network ^>= 2.8.0.0
                      , pathtype ^>= 0.8.1
@@ -66,13 +66,11 @@ common dependencies
                      , safe-exceptions ^>= 0.1.7.0
                      , semantic-source ^>= 0.0
                      , semilattices ^>= 0.0.0.3
-                     , shelly >= 1.5 && <2
                      , streaming ^>= 0.2.2.0
+                     , streaming-bytestring ^>= 0.1.6
                      , text ^>= 1.2.3.1
                      , these >= 0.7 && <1
                      , unix ^>= 2.7.2.2
-                     , proto3-suite
-                     , proto3-wire
                      , lingo >= 0.2.0.0
 
 common executable-flags
@@ -100,7 +98,6 @@ library
                      , Analysis.PackageDef
                      -- Semantic assignment
                      , Assigning.Assignment
-                     , Assigning.Assignment.Deterministic
                      , Assigning.Assignment.Table
                      -- Control structures & interfaces for abstract interpretation
                      , Control.Abstract
@@ -166,12 +163,6 @@ library
                      , Data.Patch
                      , Data.Project
                      , Data.Quieterm
-                     , Data.Reprinting.Errors
-                     , Data.Reprinting.Fragment
-                     , Data.Reprinting.Operator
-                     , Data.Reprinting.Scope
-                     , Data.Reprinting.Splice
-                     , Data.Reprinting.Token
                      , Data.Semigroup.App
                      , Data.Scientific.Exts
                      -- À la carte syntax types
@@ -196,18 +187,7 @@ library
                      , Language.Go.Assignment
                      , Language.Go.Syntax
                      , Language.Go.Type
-                     , Language.Haskell.Assignment
-                     , Language.Haskell.Syntax
-                     , Language.Haskell.Syntax.Constructor
-                     , Language.Haskell.Syntax.Haskell
-                     , Language.Haskell.Syntax.Identifier
-                     , Language.Haskell.Syntax.Pattern
-                     , Language.Haskell.Syntax.QuasiQuote
-                     , Language.Haskell.Syntax.Type
-                     , Language.JSON.Assignment
-                     , Language.JSON.PrettyPrint
                      , Language.Ruby.Assignment
-                     , Language.Ruby.PrettyPrint
                      , Language.Ruby.Syntax
                      , Language.TSX.Assignment
                      , Language.TSX.Syntax
@@ -222,9 +202,7 @@ library
                      , Language.PHP.Assignment
                      , Language.PHP.Syntax
                      , Language.Python.Assignment
-                     , Language.Python.PrettyPrint
                      , Language.Python.Syntax
-                     , Language.Java.Syntax
                      , Numeric.Exts
                      -- Parser glue
                      , Parsing.CMark
@@ -234,13 +212,12 @@ library
                      , Rendering.Graph
                      , Rendering.JSON
                      , Rendering.TOC
-                     , Reprinting.Tokenize
-                     , Reprinting.Translate
-                     , Reprinting.Typeset
-                     , Reprinting.Pipeline
                      -- High-level flow & operational functionality (logging, stats, etc.)
                      , Semantic.Analysis
                      -- API
+                     , Proto.Semantic
+                     , Proto.Semantic_Fields
+                     , Proto.Semantic_JSON
                      , Semantic.Api
                      , Semantic.Api.Bridge
                      , Semantic.Api.Diffs
@@ -248,8 +225,6 @@ library
                      , Semantic.Api.Symbols
                      , Semantic.Api.Terms
                      , Semantic.Api.TOCSummaries
-                     , Semantic.Proto.SemanticPB
-                     , Semantic.AST
                      , Semantic.CLI
                      , Semantic.Config
                      , Semantic.Distribute
@@ -304,25 +279,31 @@ library
                      , prettyprinter ^>= 1.2.1
                      , pretty-show ^>= 1.9.5
                      , profunctors ^>= 5.3
+                     , proto-lens ^>= 0.5.1.0
+                     , proto-lens-jsonpb
+                     , proto-lens-runtime ^>= 0.5.0.0
                      , reducers ^>= 3.12.3
+                     , semantic-java ^>= 0
+                     , semantic-json ^>= 0
+                     , semantic-python ^>= 0
                      , semantic-tags ^>= 0
                      , semigroupoids ^>= 5.3.2
                      , split ^>= 0.2.3.3
+                     , streaming-attoparsec ^>= 1.0.0.1
+                     , streaming-process ^>= 0.1
                      , stm-chans ^>= 3.0.0.4
                      , template-haskell ^>= 2.14
                      , time ^>= 1.8.0.2
+                     , utf8-string ^>= 1.0.1.1
                      , unliftio-core ^>= 0.1.2.0
                      , unordered-containers ^>= 0.2.9.0
                      , vector ^>= 0.12.0.2
                      , tree-sitter-go ^>= 0.2
-                     , tree-sitter-haskell ^>= 0.2
-                     , tree-sitter-json ^>= 0.2
                      , tree-sitter-php ^>= 0.2
-                     , tree-sitter-python ^>= 0.5
+                     , tree-sitter-python ^>= 0.6
                      , tree-sitter-ruby ^>= 0.2
                      , tree-sitter-typescript ^>= 0.2.1
                      , tree-sitter-tsx ^>= 0.2.1
-                     , tree-sitter-java ^>= 0.2
   if flag(release)
     cpp-options:       -DCOMPUTE_GIT_SHA
 
@@ -365,10 +346,6 @@ test-suite test
                      , Integration.Spec
                      , Numeric.Spec
                      , Parsing.Spec
-                     , Reprinting.Spec
-                     , Rewriting.Go.Spec
-                     , Rewriting.JSON.Spec
-                     , Rewriting.Python.Spec
                      , Rendering.TOC.Spec
                      , Semantic.Spec
                      , Semantic.CLI.Spec
@@ -380,12 +357,13 @@ test-suite test
                      , Generators
                      , Properties
   build-depends:       semantic
-                     , tree-sitter-json
+                     , tree-sitter-json ^>= 0.3
                      , Glob ^>= 0.10.0
                      , hedgehog ^>= 1
                      , hspec >= 2.6 && <3
                      , hspec-core >= 2.6 && <3
                      , hspec-expectations ^>= 0.8.2
+                     , shelly >= 1.5 && <2
                      , tasty ^>= 1.2.3
                      , tasty-golden ^>= 2.3.2
                      , tasty-hedgehog ^>= 1.0.0.1
@@ -407,15 +385,16 @@ test-suite parse-examples
                      , foldl ^>= 1.4.5
                      , resourcet ^>= 1.2
                      , streaming
-                     , streaming-bytestring ^>= 0.1.6
+                     , streaming-bytestring
                      , tasty
                      , tasty-hunit
 
 benchmark evaluation
   import:              haskell, dependencies, executable-flags
-  hs-source-dirs:      bench/evaluation
+  hs-source-dirs:      bench
   type:                exitcode-stdio-1.0
   main-is:             Main.hs
+  other-modules:       Evaluation
   ghc-options:         -static
   build-depends:       base
                      , algebraic-graphs

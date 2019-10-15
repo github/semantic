@@ -1,50 +1,57 @@
-{-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, GADTs, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, KindSignatures, GADTs, RankNTypes, ScopedTypeVariables, TypeOperators #-}
 module Parsing.Parser
 ( Parser(..)
-, SomeTerm(..)
-, withSomeTerm
 , SomeAnalysisParser(..)
-, SomeASTParser(..)
-, someASTParser
 , someAnalysisParser
-, ApplyAll
--- À la carte parsers
+-- * À la carte parsers
 , goParser
-, goASTParser
-, jsonParser
-, jsonASTParser
 , markdownParser
 , pythonParser
-, pythonASTParser
 , rubyParser
 , tsxParser
 , typescriptParser
-, typescriptASTParser
 , phpParser
-, phpASTParser
-, haskellParser
-  -- Precise parsers
-, precisePythonParser
+  -- * Abstract parsers
+
+  -- $abstract
+, SomeParser(..)
+, goParser'
+, javaParser'
+, javascriptParser'
+, jsonParserPrecise'
+, jsxParser'
+, markdownParser'
+, phpParser'
+, pythonParserALaCarte'
+, pythonParserPrecise'
+, pythonParser'
+, rubyParser'
+, tsxParser'
+, typescriptParser'
+  -- * Canonical sets of parsers
+, aLaCarteParsers
+, preciseParsers
+, allParsers
 ) where
 
 import           Assigning.Assignment
-import qualified Assigning.Assignment.Deterministic as Deterministic
 import qualified CMarkGFM
 import           Data.Abstract.Evaluatable (HasPrelude)
 import           Data.AST
 import           Data.Graph.ControlFlowVertex (VertexDeclaration')
-import           Data.Kind
 import           Data.Language
+import           Data.Kind (Constraint)
+import qualified Data.Map as Map
 import           Data.Sum
 import qualified Data.Syntax as Syntax
 import           Data.Term
 import           Foreign.Ptr
 import qualified Language.Go.Assignment as Go
-import qualified Language.Haskell.Assignment as Haskell
-import qualified Language.JSON.Assignment as JSON
+import qualified Language.Java as PreciseJava
+import qualified Language.JSON as PreciseJSON
 import qualified Language.Markdown.Assignment as Markdown
 import qualified Language.PHP.Assignment as PHP
-import qualified Language.Python as Py
+import qualified Language.Python as PrecisePython
 import qualified Language.Python.Assignment as Python
 import qualified Language.Ruby.Assignment as Ruby
 import qualified Language.TSX.Assignment as TSX
@@ -52,8 +59,6 @@ import qualified Language.TypeScript.Assignment as TypeScript
 import           Prelude hiding (fail)
 import           Prologue
 import           TreeSitter.Go
-import           TreeSitter.Haskell
-import           TreeSitter.JSON
 import qualified TreeSitter.Language as TS (Language, Symbol)
 import           TreeSitter.PHP
 import           TreeSitter.Python
@@ -64,28 +69,26 @@ import           TreeSitter.Unmarshal
 
 
 -- | A parser, suitable for program analysis, for some specific language, producing 'Term's whose syntax satisfies a list of typeclass constraints.
-data SomeAnalysisParser typeclasses ann where
-  SomeAnalysisParser :: ( ApplyAll typeclasses (Sum fs)
+data SomeAnalysisParser (constraint :: (* -> *) -> Constraint) ann where
+  SomeAnalysisParser :: ( constraint (Sum fs)
                         , Apply (VertexDeclaration' (Sum fs)) fs
                         , HasPrelude lang
                         )
                      => Parser (Term (Sum fs) ann)
                      -> Proxy lang
-                     -> SomeAnalysisParser typeclasses ann
+                     -> SomeAnalysisParser constraint ann
 
 -- | A parser for some specific language, producing 'Term's whose syntax satisfies a list of typeclass constraints.
-someAnalysisParser :: ( ApplyAll typeclasses (Sum Go.Syntax)
-                      , ApplyAll typeclasses (Sum PHP.Syntax)
-                      , ApplyAll typeclasses (Sum Python.Syntax)
-                      , ApplyAll typeclasses (Sum Ruby.Syntax)
-                      , ApplyAll typeclasses (Sum TypeScript.Syntax)
-                      , ApplyAll typeclasses (Sum Haskell.Syntax)
+someAnalysisParser :: ( constraint (Sum Go.Syntax)
+                      , constraint (Sum PHP.Syntax)
+                      , constraint (Sum Python.Syntax)
+                      , constraint (Sum Ruby.Syntax)
+                      , constraint (Sum TypeScript.Syntax)
                       )
-                   => proxy typeclasses                  -- ^ A proxy for the list of typeclasses required, e.g. @(Proxy :: Proxy '[Show1])@.
-                   -> Language                           -- ^ The 'Language' to select.
-                   -> SomeAnalysisParser typeclasses Loc -- ^ A 'SomeAnalysisParser' abstracting the syntax type to be produced.
+                   => proxy constraint                  -- ^ A proxy for the constraint required, e.g. @(Proxy \@Show1)@.
+                   -> Language                          -- ^ The 'Language' to select.
+                   -> SomeAnalysisParser constraint Loc -- ^ A 'SomeAnalysisParser' abstracting the syntax type to be produced.
 someAnalysisParser _ Go         = SomeAnalysisParser goParser         (Proxy @'Go)
-someAnalysisParser _ Haskell    = SomeAnalysisParser haskellParser    (Proxy @'Haskell)
 someAnalysisParser _ JavaScript = SomeAnalysisParser typescriptParser (Proxy @'JavaScript)
 someAnalysisParser _ PHP        = SomeAnalysisParser phpParser        (Proxy @'PHP)
 someAnalysisParser _ Python     = SomeAnalysisParser pythonParser     (Proxy @'Python)
@@ -103,29 +106,15 @@ data Parser term where
   UnmarshalParser :: Unmarshal t => Ptr TS.Language -> Parser (t Loc)
   -- | A parser producing an à la carte term given an 'AST'-producing parser and an 'Assignment' onto 'Term's in some syntax type.
   AssignmentParser :: (Enum grammar, Ix grammar, Show grammar, TS.Symbol grammar, Syntax.Error :< fs, Eq1 ast, Apply Foldable fs, Apply Functor fs, Foldable ast, Functor ast)
-                   => Parser (Term ast (Node grammar))           -- ^ A parser producing AST.
+                   => Parser (AST ast grammar)                   -- ^ A parser producing AST.
                    -> Assignment ast grammar (Term (Sum fs) Loc) -- ^ An assignment from AST onto 'Term's.
                    -> Parser (Term (Sum fs) Loc)                 -- ^ A parser producing 'Term's.
-  DeterministicParser :: (Enum grammar, Ord grammar, Show grammar, Element Syntax.Error syntaxes, Apply Foldable syntaxes, Apply Functor syntaxes)
-                      => Parser (AST [] grammar)
-                      -> Deterministic.Assignment grammar (Term (Sum syntaxes) Loc)
-                      -> Parser (Term (Sum syntaxes) Loc)
   -- | A parser for 'Markdown' using cmark.
-  MarkdownParser :: Parser (Term (TermF [] CMarkGFM.NodeType) (Node Markdown.Grammar))
-  -- | An abstraction over parsers when we don’t know the details of the term type.
-  SomeParser :: ApplyAll typeclasses syntax => Parser (Term syntax ann) -> Parser (SomeTerm typeclasses ann)
-
--- | Apply all of a list of typeclasses to all of a list of functors using 'Apply'. Used by 'someParser' to constrain all of the language-specific syntax types to the typeclasses in question.
-type family ApplyAll (typeclasses :: [(* -> *) -> Constraint]) (syntax :: * -> *) :: Constraint where
-  ApplyAll (typeclass ': typeclasses) syntax = (typeclass syntax, ApplyAll typeclasses syntax)
-  ApplyAll '[] syntax = ()
+  MarkdownParser :: Parser (AST (TermF [] CMarkGFM.NodeType) Markdown.Grammar)
 
 
 goParser :: Parser Go.Term
 goParser = AssignmentParser (ASTParser tree_sitter_go) Go.assignment
-
-goASTParser :: Parser (AST [] Go.Grammar)
-goASTParser = ASTParser tree_sitter_go
 
 rubyParser :: Parser Ruby.Term
 rubyParser = AssignmentParser (ASTParser tree_sitter_ruby) Ruby.assignment
@@ -133,20 +122,8 @@ rubyParser = AssignmentParser (ASTParser tree_sitter_ruby) Ruby.assignment
 phpParser :: Parser PHP.Term
 phpParser = AssignmentParser (ASTParser tree_sitter_php) PHP.assignment
 
-phpASTParser :: Parser (AST [] PHP.Grammar)
-phpASTParser = ASTParser tree_sitter_php
-
 pythonParser :: Parser Python.Term
 pythonParser = AssignmentParser (ASTParser tree_sitter_python) Python.assignment
-
-pythonASTParser :: Parser (AST [] Python.Grammar)
-pythonASTParser = ASTParser tree_sitter_python
-
-jsonParser :: Parser JSON.Term
-jsonParser = DeterministicParser jsonASTParser JSON.assignment
-
-jsonASTParser :: Parser (AST [] JSON.Grammar)
-jsonASTParser = ASTParser tree_sitter_json
 
 typescriptParser :: Parser TypeScript.Term
 typescriptParser = AssignmentParser (ASTParser tree_sitter_typescript) TypeScript.assignment
@@ -154,47 +131,154 @@ typescriptParser = AssignmentParser (ASTParser tree_sitter_typescript) TypeScrip
 tsxParser :: Parser TSX.Term
 tsxParser = AssignmentParser (ASTParser tree_sitter_tsx) TSX.assignment
 
-typescriptASTParser :: Parser (AST [] TypeScript.Grammar)
-typescriptASTParser = ASTParser tree_sitter_typescript
-
-haskellParser :: Parser Haskell.Term
-haskellParser = AssignmentParser (ASTParser tree_sitter_haskell) Haskell.assignment
-
 markdownParser :: Parser Markdown.Term
 markdownParser = AssignmentParser MarkdownParser Markdown.assignment
 
 
-precisePythonParser :: Parser (Py.Term Loc)
-precisePythonParser = UnmarshalParser tree_sitter_python
+javaParserPrecise :: Parser (PreciseJava.Term Loc)
+javaParserPrecise = UnmarshalParser PreciseJava.tree_sitter_java
+
+jsonParserPrecise :: Parser (PreciseJSON.Term Loc)
+jsonParserPrecise = UnmarshalParser PreciseJSON.tree_sitter_json
+
+pythonParserPrecise :: Parser (PrecisePython.Term Loc)
+pythonParserPrecise = UnmarshalParser PrecisePython.tree_sitter_python
 
 
-data SomeTerm typeclasses ann where
-  SomeTerm :: ApplyAll typeclasses syntax => Term syntax ann -> SomeTerm typeclasses ann
+-- $abstract
+-- Most of our features are intended to operate over multiple languages, each represented by disjoint term types. Thus, we typically implement them using typeclasses, allowing us to share a single interface to invoke the feature, while specializing the implementation(s) as appropriate for each distinct term type.
+--
+-- In order to accomplish this, we employ 'SomeParser', which abstracts over parsers of various term types, while ensuring that some desired constraint holds. Constructing a @'SomeParser' c@ requires satisfiyng the constraint @c@ against the underlying 'Parser'’s term type, and so it can be used to parse with any of a map of parsers whose terms support @c@.
+--
+-- In practice, this means using 'Control.Effect.Parse.parseWith', and passing in a map of parsers to select from for your feature. It is recommended to define the map as a concrete top-level binding using the abstract parsers or ideally the canonical maps of parsers, below; using the abstracted parsers or canonical maps directly with 'Control.Effect.Parse.parseWith' will lead to significantly slower compiles.
+--
+-- Bad:
+--
+-- @
+-- isFancy :: (Carrier sig m, Member Parse sig) => Blob -> m Bool
+-- isFancy = parseWith (preciseParsers @Fancy) (pure . isTermFancy) -- slow compiles!
+-- @
+--
+-- Good:
+--
+-- @
+-- fancyParsers :: 'Map' 'Language' ('SomeParser' Fancy 'Loc')
+-- fancyParsers = preciseParsers
+--
+-- isFancy :: (Carrier sig m, Member Parse sig) => Blob -> m Bool
+-- isFancy = parseWith fancyParsers (pure . isTermFancy) -- much faster compiles
+-- @
 
-withSomeTerm :: (forall syntax . ApplyAll typeclasses syntax => Term syntax ann -> a) -> SomeTerm typeclasses ann -> a
-withSomeTerm with (SomeTerm term) = with term
 
--- | A parser for producing specialized (tree-sitter) ASTs.
-data SomeASTParser where
-  SomeASTParser :: (Bounded grammar, Enum grammar, Show grammar)
-                => Parser (AST [] grammar)
-                -> SomeASTParser
+-- | A parser producing terms of existentially-quantified type under some constraint @c@.
+--
+--   This can be used to perform actions on terms supporting some feature abstracted using a typeclass, without knowing (or caring) what the specific term types are.
+data SomeParser c a where
+  SomeParser :: c t => Parser (t a) -> SomeParser c a
 
-someASTParser :: Language -> Maybe SomeASTParser
-someASTParser Go         = Just (SomeASTParser (ASTParser tree_sitter_go :: Parser (AST [] Go.Grammar)))
-someASTParser Haskell    = Just (SomeASTParser (ASTParser tree_sitter_haskell :: Parser (AST [] Haskell.Grammar)))
-someASTParser JSON       = Just (SomeASTParser (ASTParser tree_sitter_json :: Parser (AST [] JSON.Grammar)))
+goParser' :: c (Term (Sum Go.Syntax)) => (Language, SomeParser c Loc)
+goParser' = (Go, SomeParser goParser)
 
--- Use the TSX parser for `.js` and `.jsx` files in case they use Flow type-annotation syntax.
--- The TSX and Flow syntaxes are the same, whereas the normal TypeScript syntax is different.
-someASTParser JavaScript = Just (SomeASTParser (ASTParser tree_sitter_tsx :: Parser (AST [] TSX.Grammar)))
-someASTParser JSX        = Just (SomeASTParser (ASTParser tree_sitter_tsx :: Parser (AST [] TSX.Grammar)))
+javaParser' :: c PreciseJava.Term => (Language, SomeParser c Loc)
+javaParser' = (Java, SomeParser javaParserPrecise)
 
-someASTParser Python     = Just (SomeASTParser (ASTParser tree_sitter_python :: Parser (AST [] Python.Grammar)))
-someASTParser Ruby       = Just (SomeASTParser (ASTParser tree_sitter_ruby :: Parser (AST [] Ruby.Grammar)))
-someASTParser TypeScript = Just (SomeASTParser (ASTParser tree_sitter_typescript :: Parser (AST [] TypeScript.Grammar)))
-someASTParser TSX        = Just (SomeASTParser (ASTParser tree_sitter_tsx :: Parser (AST [] TSX.Grammar)))
-someASTParser PHP        = Just (SomeASTParser (ASTParser tree_sitter_php :: Parser (AST [] PHP.Grammar)))
-someASTParser Java       = Nothing
-someASTParser Markdown   = Nothing
-someASTParser Unknown    = Nothing
+javascriptParser' :: c (Term (Sum TSX.Syntax)) => (Language, SomeParser c Loc)
+javascriptParser' = (JavaScript, SomeParser tsxParser)
+
+jsonParserPrecise' :: c PreciseJSON.Term => (Language, SomeParser c Loc)
+jsonParserPrecise' = (JSON, SomeParser jsonParserPrecise)
+
+jsxParser' :: c (Term (Sum TSX.Syntax)) => (Language, SomeParser c Loc)
+jsxParser' = (JSX, SomeParser tsxParser)
+
+markdownParser' :: c (Term (Sum Markdown.Syntax)) => (Language, SomeParser c Loc)
+markdownParser' = (Markdown, SomeParser markdownParser)
+
+phpParser' :: c (Term (Sum PHP.Syntax)) => (Language, SomeParser c Loc)
+phpParser' = (PHP, SomeParser phpParser)
+
+pythonParserALaCarte' :: c (Term (Sum Python.Syntax)) => (Language, SomeParser c Loc)
+pythonParserALaCarte' = (Python, SomeParser pythonParser)
+
+pythonParserPrecise' :: c PrecisePython.Term => (Language, SomeParser c Loc)
+pythonParserPrecise' = (Python, SomeParser pythonParserPrecise)
+
+pythonParser' :: (c (Term (Sum Python.Syntax)), c PrecisePython.Term) => PerLanguageModes -> (Language, SomeParser c Loc)
+pythonParser' modes = case pythonMode modes of
+  ALaCarte -> (Python, SomeParser pythonParser)
+  Precise  -> (Python, SomeParser pythonParserPrecise)
+
+rubyParser' :: c (Term (Sum Ruby.Syntax)) => (Language, SomeParser c Loc)
+rubyParser' = (Ruby, SomeParser rubyParser)
+
+tsxParser' :: c (Term (Sum TSX.Syntax)) => (Language, SomeParser c Loc)
+tsxParser' = (TSX, SomeParser tsxParser)
+
+typescriptParser' :: c (Term (Sum TypeScript.Syntax)) => (Language, SomeParser c Loc)
+typescriptParser' = (TypeScript, SomeParser typescriptParser)
+
+
+-- | The canonical set of parsers producing à la carte terms.
+aLaCarteParsers
+  :: ( c (Term (Sum Go.Syntax))
+     , c (Term (Sum Markdown.Syntax))
+     , c (Term (Sum PHP.Syntax))
+     , c (Term (Sum Python.Syntax))
+     , c (Term (Sum Ruby.Syntax))
+     , c (Term (Sum TSX.Syntax))
+     , c (Term (Sum TypeScript.Syntax))
+     )
+  => Map Language (SomeParser c Loc)
+aLaCarteParsers = Map.fromList
+  [ goParser'
+  , javascriptParser'
+  , jsxParser'
+  , markdownParser'
+  , phpParser'
+  , pythonParserALaCarte'
+  , rubyParser'
+  , typescriptParser'
+  , tsxParser'
+  ]
+
+-- | The canonical set of parsers producing precise terms.
+preciseParsers
+  :: ( c PreciseJava.Term
+     , c PreciseJSON.Term
+     , c PrecisePython.Term
+     )
+  => Map Language (SomeParser c Loc)
+preciseParsers = Map.fromList
+  [ javaParser'
+  , jsonParserPrecise'
+  , pythonParserPrecise'
+  ]
+
+-- | The canonical set of all parsers for the passed per-language modes.
+allParsers
+  :: ( c (Term (Sum Go.Syntax))
+     , c PreciseJava.Term
+     , c PreciseJSON.Term
+     , c (Term (Sum Markdown.Syntax))
+     , c (Term (Sum PHP.Syntax))
+     , c (Term (Sum Python.Syntax))
+     , c PrecisePython.Term
+     , c (Term (Sum Ruby.Syntax))
+     , c (Term (Sum TSX.Syntax))
+     , c (Term (Sum TypeScript.Syntax))
+     )
+  => PerLanguageModes
+  -> Map Language (SomeParser c Loc)
+allParsers modes = Map.fromList
+  [ goParser'
+  , javaParser'
+  , javascriptParser'
+  , jsonParserPrecise'
+  , jsxParser'
+  , markdownParser'
+  , phpParser'
+  , pythonParser' modes
+  , rubyParser'
+  , typescriptParser'
+  , tsxParser'
+  ]

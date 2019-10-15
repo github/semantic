@@ -17,21 +17,20 @@ import qualified Hedgehog.Gen as Gen
 import qualified Hedgehog.Range as Range
 
 import Control.Effect.Carrier
-import qualified Data.Core as Core
-import Data.Name
-import Data.Term
+import qualified Core.Core as Core
+import Core.Name
 
 -- The 'prune' call here ensures that we don't spend all our time just generating
 -- fresh names for variables, since the length of variable names is not an
 -- interesting property as they parse regardless.
 name :: MonadGen m => m (Named Name)
 name = Gen.prune (named' <$> names) where
-  names = Gen.text (Range.linear 1 10) Gen.lower
+  names = Name <$> Gen.text (Range.linear 1 10) Gen.lower
 
 boolean :: (Carrier sig t, Member Core.Core sig, MonadGen m) => m (t Name)
 boolean = Core.bool <$> Gen.bool
 
-variable :: (Carrier sig t, Member Core.Core sig, MonadGen m) => m (t Name)
+variable :: (Applicative t, MonadGen m) => m (t Name)
 variable = pure . namedValue <$> name
 
 ifthenelse :: (Carrier sig t, Member Core.Core sig, MonadGen m) => m (t Name) -> m (t Name)
