@@ -24,13 +24,13 @@ WORKDIR /build
 
 # Build just the dependencies so that this layer can be cached
 COPY semantic.cabal .
+COPY semantic-analysis semantic-analysis/
 COPY semantic-core semantic-core/
 COPY semantic-java semantic-java/
 COPY semantic-json semantic-json/
 COPY semantic-python semantic-python/
 COPY semantic-source semantic-source/
 COPY semantic-tags semantic-tags/
-COPY semantic-analysis semantic-analysis/
 COPY cabal.project .
 RUN cabal v2-update && \
     cabal v2-build --flags="release" --only-dependencies
