@@ -2,7 +2,7 @@
 module Data.Blob
 ( File(..)
 , fileForPath
-, fileForRelPath
+, fileForTypedPath
 , Blob(..)
 , Blobs(..)
 , blobLanguage
@@ -35,6 +35,7 @@ import           Data.Language
 import           Source.Source (Source)
 import qualified Source.Source as Source
 import qualified System.Path as Path
+import qualified System.Path.PartClass as Path.PartClass
 
 
 -- | A 'FilePath' paired with its corresponding 'Language'.
@@ -44,12 +45,12 @@ data File = File
   , fileLanguage :: Language
   } deriving (Show, Eq, Generic)
 
--- | Prefer 'fileForRelPath' if at all possible.
+-- | Prefer 'fileForTypedPath' if at all possible.
 fileForPath :: FilePath  -> File
 fileForPath p = File p (languageForFilePath p)
 
-fileForRelPath :: Path.RelFile -> File
-fileForRelPath = fileForPath . Path.toString
+fileForTypedPath :: Path.PartClass.AbsRel ar => Path.File ar -> File
+fileForTypedPath = fileForPath . Path.toString
 
 -- | The source, path information, and language of a file read from disk.
 data Blob = Blob

@@ -40,7 +40,7 @@ readBlobFromFile' file = do
 -- | Read all blobs in the directory with Language.supportedExts.
 readBlobsFromDir :: MonadIO m => Path.AbsRelDir -> m [Blob]
 readBlobsFromDir path = liftIO . fmap catMaybes $
-  findFilesInDir (Path.toString path) supportedExts mempty >>= Async.mapConcurrently (readBlobFromFile . fileForPath)
+  findFilesInDir path supportedExts mempty >>= Async.mapConcurrently (readBlobFromFile . fileForTypedPath)
 
 readBlobsFromGitRepoPath :: (Part.AbsRel ar, MonadIO m) => Path.Dir ar -> Git.OID -> [Path.RelFile] -> [Path.RelFile] -> m [Blob]
 readBlobsFromGitRepoPath path oid excludePaths includePaths

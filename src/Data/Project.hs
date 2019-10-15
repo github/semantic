@@ -15,6 +15,7 @@ import           Data.Language
 import qualified Data.Text as T
 import           System.FilePath.Posix
 import           Semantic.IO
+import qualified System.Path as Path
 
 -- | A 'Project' contains all the information that semantic needs
 -- to execute an analysis, diffing, or graphing pass.
@@ -41,9 +42,9 @@ readProjectFromPaths maybeRoot path lang excludeDirs = do
       then fromMaybe path maybeRoot
       else fromMaybe (takeDirectory path) maybeRoot
 
-  paths <- liftIO $ findFilesInDir rootDir exts excludeDirs
+  paths <- liftIO $ findFilesInDir (Path.absRel rootDir) exts (fmap Path.absRel excludeDirs)
   blobs <- liftIO $ traverse (readBlobFromFile' . toFile) paths
   pure $ Project rootDir blobs lang excludeDirs
   where
-    toFile path = File path lang
+    toFile path = File (Path.toString path) lang
     exts = extensionsForLanguage lang
