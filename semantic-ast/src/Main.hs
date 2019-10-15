@@ -16,8 +16,7 @@ import Data.Semigroup ((<>))
 
 data SemanticAST = SemanticAST
   { format              :: Format
-  , sourceFilePath      :: Maybe FilePath
-  , sourceString        :: Maybe Prelude.String
+  , source              :: Either FilePath Prelude.String
   } deriving (Read)
 
 -- TODO:
