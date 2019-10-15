@@ -21,7 +21,7 @@ library
   -- other-modules:
   -- other-extensions:
   build-depends:       base ^>=4.12.0.0
-                     , tree-sitter ^>= 0.4
+                     , tree-sitter
                      , semantic-source ^>= 0.0
                      , tree-sitter-python
                      , bytestring
@@ -35,7 +35,7 @@ executable semantic-ast
   -- other-extensions:
   build-depends:       base ^>=4.12.0.0
                      , semantic-ast
-                     , tree-sitter ^>= 0.4
+                     , tree-sitter
                      , semantic-source ^>= 0.0
                      , tree-sitter-python
                      , bytestring
