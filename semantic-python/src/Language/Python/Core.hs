@@ -1,6 +1,6 @@
 {-# LANGUAGE ConstraintKinds, DataKinds, DefaultSignatures, DisambiguateRecordFields, FlexibleContexts,
-             GeneralizedNewtypeDeriving, KindSignatures, LambdaCase, NamedFieldPuns, OverloadedLists, OverloadedStrings,
-             PatternSynonyms, StandaloneDeriving, TypeApplications, TypeOperators, ViewPatterns #-}
+             GeneralizedNewtypeDeriving, KindSignatures, LambdaCase, NamedFieldPuns, OverloadedLists,
+             OverloadedStrings, PatternSynonyms, StandaloneDeriving, TypeApplications, TypeOperators, ViewPatterns #-}
 
 module Language.Python.Core
 ( toplevelCompile
@@ -18,7 +18,7 @@ import           Core.Name as Name
 import           Data.Coerce
 import           Data.Foldable
 import           Data.Function
-import           Data.List.NonEmpty  (NonEmpty (..))
+import           Data.List.NonEmpty (NonEmpty (..))
 import           GHC.Records
 import           Source.Span (Span)
 import           Syntax.Stack (Stack (..))
