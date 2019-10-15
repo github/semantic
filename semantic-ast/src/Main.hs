@@ -27,15 +27,15 @@ parseAST = SemanticAST
       <$> option auto
           ( long "format"
          <> help "Specify desired output: show, json, sexpression" )
-      <*> option auto
+      <*> (Left <$> strOption
           ( long "sourcefile"
          <> metavar "FILEPATH"
          <> help "Specify filepath containing source code to parse" )
-      <*> option auto
-          ( long "sourceString"
+      <|> Right <$> strOption
+          (long "sourceString"
          <> metavar "STRING"
          <> help "Specify source input to parse"
-          )
+          ))
 
 main :: IO ()
 main = generateAST =<< execParser opts
