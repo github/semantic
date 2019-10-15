@@ -30,6 +30,7 @@ COPY semantic-json semantic-json/
 COPY semantic-python semantic-python/
 COPY semantic-source semantic-source/
 COPY semantic-tags semantic-tags/
+COPY semantic-analysis semantic-analysis/
 COPY cabal.project .
 RUN cabal v2-update && \
     cabal v2-build --flags="release" --only-dependencies
