@@ -10,7 +10,6 @@ module Rendering.TOC
 , tableOfContentsBy
 , termTableOfContentsBy
 , dedupe
-, entrySummary
 , toCategoryName
 ) where
 
