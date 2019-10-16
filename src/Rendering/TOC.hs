@@ -116,10 +116,10 @@ entryChange entry = case entry of
   Replaced -> "modified"
 
 -- | Construct a 'TOCSummary' from a node annotation and a change type label.
-recordSummary :: T.Text -> Declaration -> TOCSummary
-recordSummary changeText decl@(Declaration kind text _ srcSpan language)
+recordSummary :: Entry -> Declaration -> TOCSummary
+recordSummary entry decl@(Declaration kind text _ srcSpan language)
   | ErrorDeclaration <- kind = ErrorSummary text srcSpan language
-  | otherwise                = TOCSummary (toCategoryName kind) (formatIdentifier decl) srcSpan changeText
+  | otherwise                = TOCSummary (toCategoryName kind) (formatIdentifier decl) srcSpan (entryChange entry)
 
 formatIdentifier :: Declaration -> Text
 formatIdentifier (Declaration kind identifier _ _ lang) = case kind of
@@ -135,7 +135,7 @@ renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isV
         summaryKey = T.pack $ pathKeyForBlobPair blobs
 
 diffTOC :: (Foldable f, Functor f) => Diff f (Maybe Declaration) (Maybe Declaration) -> [TOCSummary]
-diffTOC = map (uncurry (recordSummary . entryChange)) . dedupe . tableOfContentsBy declaration
+diffTOC = map (uncurry recordSummary) . dedupe . tableOfContentsBy declaration
 
 -- The user-facing category name
 toCategoryName :: DeclarationKind -> T.Text
