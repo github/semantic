@@ -12,7 +12,7 @@ license:             MIT
 license-file:        LICENSE
 author:              The Semantic Authors
 maintainer:          opensource+semantic@github.com
--- copyright:
+copyright:           (c) 2019 GitHub, Inc.
 category:            Language
 extra-source-files:  CHANGELOG.md
 
