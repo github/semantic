@@ -1,4 +1,4 @@
-# CHECK-TREE: { const <- \a -> \b -> { identity <- \x -> x; identity a }; #record{ const: const }}
+# CHECK-TREE: { const <- rec const = \a -> \b -> { identity <- rec identity = \x -> x; identity a }; #record{ const: const }}
 
 def const(a, b):
     def identity(x):

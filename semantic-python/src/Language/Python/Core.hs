@@ -206,7 +206,8 @@ instance Compile Py.ClassDefinition where
           pure (typefn $$ Core.string (coerce n) $$ object $$ contents)
 
     body <- compile pybody buildTypeCall next
-    let assignClass = Name.named' n :<- body
+    let coreName = Name.named' n
+    let assignClass = coreName :<- (rec coreName body)
     let continuing = fmap (locate it . (assignClass >>>=))
     continuing (local (def n) (cc next))
 
@@ -277,7 +278,7 @@ instance Compile Py.FunctionDefinition where
       parameters' <- traverse param parameters
       body' <- compile body pure next
       -- Build a lambda.
-      let located = locate it (lams parameters' body')
+      let located = locate it (rec (Name.named' (Name name)) (lams parameters' body'))
       -- Give it a name (below), then augment the current continuation
       -- with the new name (with 'def'), so that calling contexts know
       -- that we have built an exportable definition.
