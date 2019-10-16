@@ -1,6 +1,7 @@
 {-# LANGUAGE RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.TOCSummary
 ( Declaration(..)
+, DeclarationKind(..)
 , HasDeclaration
 , declarationAlgebra
 ) where
@@ -23,11 +24,19 @@ import           Source.Range
 import qualified Language.Markdown.Syntax as Markdown
 
 -- | A declaration’s identifier and type.
-data Declaration
-  = MethodDeclaration   { declarationIdentifier :: Text, declarationText :: Text, declarationSpan :: Span, declarationLanguage :: Language, declarationReceiver :: Maybe Text }
-  | FunctionDeclaration { declarationIdentifier :: Text, declarationText :: Text, declarationSpan :: Span, declarationLanguage :: Language }
-  | HeadingDeclaration  { declarationIdentifier :: Text, declarationText :: Text, declarationSpan :: Span, declarationLanguage :: Language, declarationLevel :: Int }
-  | ErrorDeclaration    { declarationIdentifier :: Text, declarationText :: Text, declarationSpan :: Span, declarationLanguage :: Language }
+data Declaration = Declaration
+  { declarationKind       :: DeclarationKind
+  , declarationIdentifier :: Text
+  , declarationText       :: Text
+  , declarationSpan       :: Span
+  , declarationLanguage   :: Language }
+  deriving (Eq, Show)
+
+data DeclarationKind
+  = MethodDeclaration (Maybe Text)
+  | FunctionDeclaration
+  | HeadingDeclaration Int
+  | ErrorDeclaration
   deriving (Eq, Show)
 
 
@@ -77,7 +86,7 @@ class CustomHasDeclaration whole syntax where
 -- | Produce a 'HeadingDeclaration' from the first line of the heading of a 'Markdown.Heading' node.
 instance CustomHasDeclaration whole Markdown.Heading where
   customToDeclaration blob@Blob{..} ann (Markdown.Heading level terms _)
-    = Just $ HeadingDeclaration (headingText terms) mempty (Loc.span ann) (blobLanguage blob) level
+    = Just $ Declaration (HeadingDeclaration level) (headingText terms) mempty (Loc.span ann) (blobLanguage blob)
     where headingText terms = getSource $ maybe (byteRange ann) sconcat (nonEmpty (headingByteRange <$> toList terms))
           headingByteRange (Term (In ann _), _) = byteRange ann
           getSource = firstLine . toText . Source.slice blobSource
@@ -86,7 +95,7 @@ instance CustomHasDeclaration whole Markdown.Heading where
 -- | Produce an 'ErrorDeclaration' for 'Syntax.Error' nodes.
 instance CustomHasDeclaration whole Syntax.Error where
   customToDeclaration blob@Blob{..} ann err@Syntax.Error{}
-    = Just $ ErrorDeclaration (T.pack (formatTOCError (Syntax.unError (Loc.span ann) err))) mempty (Loc.span ann) (blobLanguage blob)
+    = Just $ Declaration ErrorDeclaration (T.pack (formatTOCError (Syntax.unError (Loc.span ann) err))) mempty (Loc.span ann) (blobLanguage blob)
     where formatTOCError e = showExpectation (flag Colourize False) (errorExpected e) (errorActual e) ""
 
 -- | Produce a 'FunctionDeclaration' for 'Declaration.Function' nodes so long as their identifier is non-empty (defined as having a non-empty 'Range').
@@ -95,7 +104,7 @@ instance CustomHasDeclaration whole Declaration.Function where
     -- Do not summarize anonymous functions
     | isEmpty identifierAnn = Nothing
     -- Named functions
-    | otherwise             = Just $ FunctionDeclaration (getSource blobSource identifierAnn) functionSource (Loc.span ann) (blobLanguage blob)
+    | otherwise             = Just $ Declaration FunctionDeclaration (getSource blobSource identifierAnn) functionSource (Loc.span ann) (blobLanguage blob)
     where isEmpty = (== 0) . rangeLength . byteRange
           functionSource = getIdentifier (arr Declaration.functionBody) blob (In ann decl)
 
@@ -103,12 +112,12 @@ instance CustomHasDeclaration whole Declaration.Function where
 instance CustomHasDeclaration whole Declaration.Method where
   customToDeclaration blob@Blob{..} ann decl@(Declaration.Method _ (Term (In receiverAnn receiverF), _) (Term (In identifierAnn _), _) _ _ _)
     -- Methods without a receiver
-    | isEmpty receiverAnn = Just $ MethodDeclaration (getSource blobSource identifierAnn) methodSource (Loc.span ann) (blobLanguage blob) Nothing
+    | isEmpty receiverAnn = Just $ Declaration (MethodDeclaration Nothing) (getSource blobSource identifierAnn) methodSource (Loc.span ann) (blobLanguage blob)
     -- Methods with a receiver type and an identifier (e.g. (a *Type) in Go).
     | blobLanguage blob == Go
-    , [ _, Term (In receiverType _) ] <- toList receiverF = Just $ MethodDeclaration (getSource blobSource identifierAnn) methodSource (Loc.span ann) (blobLanguage blob) (Just (getSource blobSource receiverType))
+    , [ _, Term (In receiverType _) ] <- toList receiverF = Just $ Declaration (MethodDeclaration (Just (getSource blobSource receiverType))) (getSource blobSource identifierAnn) methodSource (Loc.span ann) (blobLanguage blob)
     -- Methods with a receiver (class methods) are formatted like `receiver.method_name`
-    | otherwise           = Just $ MethodDeclaration (getSource blobSource identifierAnn) methodSource (Loc.span ann) (blobLanguage blob) (Just (getSource blobSource receiverAnn))
+    | otherwise           = Just $ Declaration (MethodDeclaration (Just (getSource blobSource receiverAnn))) (getSource blobSource identifierAnn) methodSource (Loc.span ann) (blobLanguage blob)
     where
       isEmpty = (== 0) . rangeLength . byteRange
       methodSource = getIdentifier (arr Declaration.methodBody) blob (In ann decl)

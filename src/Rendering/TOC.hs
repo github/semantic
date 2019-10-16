@@ -112,7 +112,7 @@ dedupe = map snd . sortOn fst . Map.elems . snd . foldl' (uncurry . go) (0, Map.
           Map.insert (dedupeKey similarDecl) (index, (Replaced, similarDecl)) m
       | otherwise = (succ index, Map.insert (dedupeKey decl) (index, (entry, decl)) m)
 
-    dedupeKey decl = DedupeKey (toCategoryName decl, T.toLower (declarationIdentifier decl))
+    dedupeKey decl = DedupeKey (toCategoryName (declarationKind decl), T.toLower (declarationIdentifier decl))
 
 -- | Construct a description of an 'Entry'.
 entryChange :: Entry -> Text
@@ -125,11 +125,11 @@ entryChange entry = case entry of
 -- | Construct a 'TOCSummary' from a node annotation and a change type label.
 recordSummary :: T.Text -> Declaration -> TOCSummary
 recordSummary changeText record = case record of
-  ErrorDeclaration text _ srcSpan language -> ErrorSummary text srcSpan language
-  decl -> TOCSummary (toCategoryName decl) (formatIdentifier decl) (declarationSpan decl) changeText
+  Declaration ErrorDeclaration text _ srcSpan language -> ErrorSummary text srcSpan language
+  decl -> TOCSummary (toCategoryName (declarationKind decl)) (formatIdentifier decl) (declarationSpan decl) changeText
   where
-    formatIdentifier (MethodDeclaration identifier _ _ Language.Go (Just receiver)) = "(" <> receiver <> ") " <> identifier
-    formatIdentifier (MethodDeclaration identifier _ _ _           (Just receiver)) = receiver <> "." <> identifier
+    formatIdentifier (Declaration (MethodDeclaration (Just receiver)) identifier _ _ Language.Go) = "(" <> receiver <> ") " <> identifier
+    formatIdentifier (Declaration (MethodDeclaration (Just receiver)) identifier _ _ _          ) = receiver <> "." <> identifier
     formatIdentifier decl = declarationIdentifier decl
 
 renderToCDiff :: (Foldable f, Functor f) => BlobPair -> Diff f (Maybe Declaration) (Maybe Declaration) -> Summaries
@@ -142,9 +142,9 @@ diffTOC :: (Foldable f, Functor f) => Diff f (Maybe Declaration) (Maybe Declarat
 diffTOC = map (uncurry (recordSummary . entryChange)) . dedupe . tableOfContentsBy declaration
 
 -- The user-facing category name
-toCategoryName :: Declaration -> T.Text
-toCategoryName declaration = case declaration of
-  FunctionDeclaration{}        -> "Function"
-  MethodDeclaration{}          -> "Method"
-  HeadingDeclaration _ _ _ _ l -> "Heading " <> T.pack (show l)
-  ErrorDeclaration{}           -> "ParseError"
+toCategoryName :: DeclarationKind -> T.Text
+toCategoryName kind = case kind of
+  FunctionDeclaration  -> "Function"
+  MethodDeclaration _  -> "Method"
+  HeadingDeclaration l -> "Heading " <> T.pack (show l)
+  ErrorDeclaration     -> "ParseError"
