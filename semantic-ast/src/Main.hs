@@ -25,7 +25,7 @@ parseAST = SemanticAST
           ( long "format"
          <> help "Specify desired output: show, json, sexpression" )
       <*> (Left <$> strOption
-          ( long "sourcefile"
+          ( long "sourceFile"
          <> metavar "FILEPATH"
          <> help "Specify filepath containing source code to parse" )
       <|> Right <$> strOption
