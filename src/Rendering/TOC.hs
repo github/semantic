@@ -103,7 +103,7 @@ dedupe = map (entry &&& decl) . sortOn index . Map.elems . foldl' go Map.empty .
       | otherwise       -> Map.insert key d { entry = Replaced, decl = similar } m
     _                   -> Map.insert key d m
 
-  dedupeKey (Declaration kind ident _ _ _) = DedupeKey (toCategoryName kind) (T.toLower ident)
+  dedupeKey (Declaration kind ident _ _ _) = DedupeKey (formatKind kind) (T.toLower ident)
 
 -- | Construct a description of an 'Entry'.
 entryChange :: Entry -> Text
@@ -117,7 +117,7 @@ entryChange entry = case entry of
 recordSummary :: Entry -> Declaration -> TOCSummary
 recordSummary entry decl@(Declaration kind text _ srcSpan language)
   | ErrorDeclaration <- kind = ErrorSummary text srcSpan language
-  | otherwise                = TOCSummary (toCategoryName kind) (formatIdentifier decl) srcSpan (entryChange entry)
+  | otherwise                = TOCSummary (formatKind kind) (formatIdentifier decl) srcSpan (entryChange entry)
 
 formatIdentifier :: Declaration -> Text
 formatIdentifier (Declaration kind identifier _ _ lang) = case kind of
@@ -135,9 +135,9 @@ renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isV
 diffTOC :: (Foldable f, Functor f) => Diff f (Maybe Declaration) (Maybe Declaration) -> [TOCSummary]
 diffTOC = map (uncurry recordSummary) . dedupe . tableOfContentsBy declaration
 
--- The user-facing category name
-toCategoryName :: DeclarationKind -> T.Text
-toCategoryName kind = case kind of
+-- The user-facing kind
+formatKind :: DeclarationKind -> T.Text
+formatKind kind = case kind of
   FunctionDeclaration  -> "Function"
   MethodDeclaration _  -> "Method"
   HeadingDeclaration l -> "Heading " <> T.pack (show l)
