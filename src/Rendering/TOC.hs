@@ -86,7 +86,7 @@ termTableOfContentsBy :: (Foldable f, Functor f)
                       -> [a]
 termTableOfContentsBy selector = cata termAlgebra
   where termAlgebra r | Just a <- selector r = a : fold r
-                      | otherwise = fold r
+                      | otherwise            =     fold r
 
 newtype DedupeKey = DedupeKey (T.Text, T.Text) deriving (Eq, Ord)
 
