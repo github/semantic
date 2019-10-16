@@ -1,4 +1,4 @@
-{-# LANGUAGE DerivingVia, RankNTypes, ScopedTypeVariables #-}
+{-# LANGUAGE DerivingVia, RankNTypes, ScopedTypeVariables, TupleSections #-}
 module Rendering.TOC
 ( renderToCDiff
 , diffTOC
@@ -61,11 +61,11 @@ declaration (In annotation _) = annotation
 
 
 -- | An entry in a table of contents.
-data Entry a
-  = Changed   { entryPayload :: a } -- ^ An entry for a node containing changes.
-  | Inserted  { entryPayload :: a } -- ^ An entry for a change occurring inside an 'Insert' 'Patch'.
-  | Deleted   { entryPayload :: a } -- ^ An entry for a change occurring inside a 'Delete' 'Patch'.
-  | Replaced  { entryPayload :: a } -- ^ An entry for a change occurring on the insertion side of a 'Replace' 'Patch'.
+data Entry
+  = Changed  -- ^ An entry for a node containing changes.
+  | Inserted -- ^ An entry for a change occurring inside an 'Insert' 'Patch'.
+  | Deleted  -- ^ An entry for a change occurring inside a 'Delete' 'Patch'.
+  | Replaced -- ^ An entry for a change occurring on the insertion side of a 'Replace' 'Patch'.
   deriving (Eq, Show)
 
 
@@ -73,13 +73,13 @@ data Entry a
 tableOfContentsBy :: (Foldable f, Functor f)
                   => (forall b. TermF f ann b -> Maybe a) -- ^ A function mapping relevant nodes onto values in Maybe.
                   -> Diff f ann ann                       -- ^ The diff to compute the table of contents for.
-                  -> [Entry a]                            -- ^ A list of entries for relevant changed nodes in the diff.
+                  -> [(Entry, a)]                         -- ^ A list of entries for relevant changed nodes in the diff.
 tableOfContentsBy selector = fromMaybe [] . cata (\ r -> case r of
   Patch patch -> (pure . patchEntry <$> bicrosswalk selector selector patch) <> bifoldMap fold fold patch <> Just []
   Merge (In (_, ann2) r) -> case (selector (In ann2 r), fold r) of
-    (Just a, Just entries) -> Just (Changed a : entries)
+    (Just a, Just entries) -> Just ((Changed, a) : entries)
     (_     , entries)      -> entries)
-   where patchEntry = patch Deleted Inserted (const Replaced)
+   where patchEntry = patch (Deleted,) (Inserted,) (const (Replaced,))
 
 termTableOfContentsBy :: (Foldable f, Functor f)
                       => (forall b. TermF f annotation b -> Maybe a)
@@ -98,30 +98,30 @@ newtype DedupeKey = DedupeKey (T.Text, T.Text) deriving (Eq, Ord)
 -- 2. Two similar entries (defined by a case insensitive comparison of their
 --    identifiers) are in the list.
 --    Action: Combine them into a single Replaced entry.
-dedupe :: [Entry Declaration] -> [Entry Declaration]
+dedupe :: [(Entry, Declaration)] -> [(Entry, Declaration)]
 dedupe = let tuples = sortOn fst . Map.elems . snd . foldl' go (0, Map.empty) in (fmap . fmap) snd tuples
   where
-    go :: (Int, Map.Map DedupeKey (Int, Entry Declaration))
-       -> Entry Declaration
-       -> (Int, Map.Map DedupeKey (Int, Entry Declaration))
+    go :: (Int, Map.Map DedupeKey (Int, (Entry, Declaration)))
+       -> (Entry, Declaration)
+       -> (Int, Map.Map DedupeKey (Int, (Entry, Declaration)))
     go (index, m) x | Just (_, similar) <- Map.lookup (dedupeKey x) m
                     = if exactMatch similar x
                       then (succ index, m)
                       else
-                        let replacement = Replaced (entryPayload similar)
+                        let replacement = (Replaced, snd similar)
                         in (succ index, Map.insert (dedupeKey replacement) (index, replacement) m)
                     | otherwise = (succ index, Map.insert (dedupeKey x) (index, x) m)
 
-    dedupeKey entry = DedupeKey (toCategoryName (entryPayload entry), T.toLower (declarationIdentifier (entryPayload entry)))
-    exactMatch = (==) `on` entryPayload
+    dedupeKey entry = DedupeKey (toCategoryName (snd entry), T.toLower (declarationIdentifier (snd entry)))
+    exactMatch = (==) `on` snd
 
 -- | Construct a 'TOCSummary' from an 'Entry'.
-entrySummary :: Entry Declaration -> TOCSummary
+entrySummary :: (Entry, Declaration) -> TOCSummary
 entrySummary entry = case entry of
-  Changed  a -> recordSummary "modified" a
-  Deleted  a -> recordSummary "removed" a
-  Inserted a -> recordSummary "added" a
-  Replaced a -> recordSummary "modified" a
+  (Changed,  a) -> recordSummary "modified" a
+  (Deleted,  a) -> recordSummary "removed" a
+  (Inserted, a) -> recordSummary "added" a
+  (Replaced, a) -> recordSummary "modified" a
 
 -- | Construct a 'TOCSummary' from a node annotation and a change type label.
 recordSummary :: T.Text -> Declaration -> TOCSummary
