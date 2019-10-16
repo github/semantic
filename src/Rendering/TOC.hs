@@ -125,7 +125,7 @@ entryChange entry = case entry of
 -- | Construct a 'TOCSummary' from a node annotation and a change type label.
 recordSummary :: T.Text -> Declaration -> TOCSummary
 recordSummary changeText record = case record of
-  (ErrorDeclaration text _ srcSpan language) -> ErrorSummary text srcSpan language
+  ErrorDeclaration text _ srcSpan language -> ErrorSummary text srcSpan language
   decl-> TOCSummary (toCategoryName decl) (formatIdentifier decl) (declarationSpan decl) changeText
   where
     formatIdentifier (MethodDeclaration identifier _ _ Language.Go (Just receiver)) = "(" <> receiver <> ") " <> identifier
