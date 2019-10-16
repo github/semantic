@@ -114,13 +114,13 @@ dedupe = let tuples = sortOn fst . Map.elems . snd . foldl' go (0, Map.empty) in
     dedupeKey entry = DedupeKey (toCategoryName (snd entry), T.toLower (declarationIdentifier (snd entry)))
     exactMatch = (==) `on` snd
 
--- | Construct a 'TOCSummary' from an 'Entry'.
-entrySummary :: (Entry, Declaration) -> TOCSummary
-entrySummary entry = case entry of
-  (Changed,  a) -> recordSummary "modified" a
-  (Deleted,  a) -> recordSummary "removed" a
-  (Inserted, a) -> recordSummary "added" a
-  (Replaced, a) -> recordSummary "modified" a
+-- | Construct a description of an 'Entry'.
+entryChange :: Entry -> Text
+entryChange entry = case entry of
+  Changed  -> "modified"
+  Deleted  -> "removed"
+  Inserted -> "added"
+  Replaced -> "modified"
 
 -- | Construct a 'TOCSummary' from a node annotation and a change type label.
 recordSummary :: T.Text -> Declaration -> TOCSummary
@@ -139,7 +139,7 @@ renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isV
         summaryKey = T.pack $ pathKeyForBlobPair blobs
 
 diffTOC :: (Foldable f, Functor f) => Diff f (Maybe Declaration) (Maybe Declaration) -> [TOCSummary]
-diffTOC = map entrySummary . dedupe . tableOfContentsBy declaration
+diffTOC = map (uncurry (recordSummary . entryChange)) . dedupe . tableOfContentsBy declaration
 
 -- The user-facing category name
 toCategoryName :: Declaration -> T.Text
