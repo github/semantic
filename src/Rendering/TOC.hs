@@ -80,7 +80,8 @@ tableOfContentsBy selector = fromMaybe [] . cata (\ r -> case r of
    where patchEntry = patch (Deleted,) (Inserted,) (const (Replaced,))
 
 
-newtype DedupeKey = DedupeKey (T.Text, T.Text) deriving (Eq, Ord)
+data DedupeKey = DedupeKey {-# UNPACK #-} !T.Text {-# UNPACK #-} !T.Text
+  deriving (Eq, Ord)
 
 data Dedupe = Dedupe
   { index :: {-# UNPACK #-} !Int
@@ -103,7 +104,7 @@ dedupe = map (entry &&& decl) . sortOn index . Map.elems . foldl' go Map.empty .
       | otherwise       -> Map.insert key d { entry = Replaced, decl = similar } m
     _                   -> Map.insert key d m
 
-  dedupeKey (Declaration kind ident _ _ _) = DedupeKey (toCategoryName kind, T.toLower ident)
+  dedupeKey (Declaration kind ident _ _ _) = DedupeKey (toCategoryName kind) (T.toLower ident)
 
 -- | Construct a description of an 'Entry'.
 entryChange :: Entry -> Text
