@@ -1,7 +1,6 @@
 {-# LANGUAGE DerivingVia, RankNTypes, ScopedTypeVariables, TupleSections #-}
 module Rendering.TOC
-( renderToCDiff
-, diffTOC
+( diffTOC
 , Summaries(..)
 , TOCSummary(..)
 , isValidSummary
@@ -15,11 +14,9 @@ import Prologue hiding (index)
 import Analysis.TOCSummary
 import Data.Align (bicrosswalk)
 import Data.Aeson
-import Data.Blob
 import Data.Diff
 import Data.Language as Language
 import Data.List (sortOn)
-import qualified Data.List as List
 import qualified Data.Map.Monoidal as Map
 import Data.Patch
 import Data.Term
@@ -125,12 +122,6 @@ formatIdentifier (Declaration kind identifier _ _ lang) = case kind of
     | Language.Go <- lang -> "(" <> receiver <> ") " <> identifier
     | otherwise           -> receiver <> "." <> identifier
   _                       -> identifier
-
-renderToCDiff :: (Foldable f, Functor f) => BlobPair -> Diff f (Maybe Declaration) (Maybe Declaration) -> Summaries
-renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . diffTOC
-  where toMap [] = mempty
-        toMap as = Map.singleton summaryKey (toJSON <$> as)
-        summaryKey = T.pack $ pathKeyForBlobPair blobs
 
 diffTOC :: (Foldable f, Functor f) => Diff f (Maybe Declaration) (Maybe Declaration) -> [TOCSummary]
 diffTOC = map (uncurry recordSummary) . dedupe . tableOfContentsBy declaration
