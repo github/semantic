@@ -90,13 +90,12 @@ newtype DedupeKey = DedupeKey (T.Text, T.Text) deriving (Eq, Ord)
 --    identifiers) are in the list.
 --    Action: Combine them into a single Replaced entry.
 dedupe :: [(Entry, Declaration)] -> [(Entry, Declaration)]
-dedupe = map snd . sortOn fst . Map.elems . snd . foldl' (uncurry . go) (0, Map.empty)
+dedupe = map snd . sortOn fst . Map.elems . snd . foldl' go (0, Map.empty)
   where
     go :: (Int, Map.Map DedupeKey (Int, (Entry, Declaration)))
-       -> Entry
-       -> Declaration
+       -> (Entry, Declaration)
        -> (Int, Map.Map DedupeKey (Int, (Entry, Declaration)))
-    go (index, m) entry decl
+    go (index, m) (entry, decl)
       | Just (_, (_, similar)) <- Map.lookup (dedupeKey decl) m
       = (succ index,) $ if similar == decl then
           m
