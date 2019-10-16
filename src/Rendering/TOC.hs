@@ -105,10 +105,10 @@ dedupe = map snd . sortOn fst . Map.elems . snd . foldl' go (0, Map.empty)
        -> (Int, Map.Map DedupeKey (Int, (Entry, Declaration)))
     go (index, m) x
       | Just (_, (_, similarDecl)) <- Map.lookup (dedupeKey (snd x)) m
-      = if similarDecl == snd x then
-          (succ index, m)
+      = (succ index,) $ if similarDecl == snd x then
+          m
         else
-          (succ index, Map.insert (dedupeKey similarDecl) (index, (Replaced, similarDecl)) m)
+          Map.insert (dedupeKey similarDecl) (index, (Replaced, similarDecl)) m
       | otherwise = (succ index, Map.insert (dedupeKey (snd x)) (index, x) m)
 
     dedupeKey decl = DedupeKey (toCategoryName decl, T.toLower (declarationIdentifier decl))
