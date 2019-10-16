@@ -107,8 +107,7 @@ dedupe = let tuples = sortOn fst . Map.elems . snd . foldl' go (0, Map.empty) in
                     = if exactMatch similar x
                       then (succ index, m)
                       else
-                        let replacement = (Replaced, snd similar)
-                        in (succ index, Map.insert (dedupeKey (snd similar)) (index, replacement) m)
+                        (succ index, Map.insert (dedupeKey (snd similar)) (index, (Replaced, snd similar)) m)
                     | otherwise = (succ index, Map.insert (dedupeKey (snd x)) (index, x) m)
 
     dedupeKey decl = DedupeKey (toCategoryName decl, T.toLower (declarationIdentifier decl))
