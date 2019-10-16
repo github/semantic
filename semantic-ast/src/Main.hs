@@ -1,4 +1,3 @@
-{-# LANGUAGE ApplicativeDo #-}
 {-# LANGUAGE TypeApplications #-}
 module Main (main) where
 
@@ -15,8 +14,8 @@ import Options.Applicative hiding (style)
 import Data.Semigroup ((<>))
 
 data SemanticAST = SemanticAST
-  { format              :: Format
-  , source              :: Either FilePath Prelude.String
+  { format :: Format
+  , source :: Either FilePath Prelude.String
   }
 
 parseAST :: Parser SemanticAST
