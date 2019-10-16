@@ -103,15 +103,15 @@ dedupe = let tuples = sortOn fst . Map.elems . snd . foldl' go (0, Map.empty) in
     go :: (Int, Map.Map DedupeKey (Int, (Entry, Declaration)))
        -> (Entry, Declaration)
        -> (Int, Map.Map DedupeKey (Int, (Entry, Declaration)))
-    go (index, m) x | Just (_, similar) <- Map.lookup (dedupeKey x) m
+    go (index, m) x | Just (_, similar) <- Map.lookup (dedupeKey (snd x)) m
                     = if exactMatch similar x
                       then (succ index, m)
                       else
                         let replacement = (Replaced, snd similar)
-                        in (succ index, Map.insert (dedupeKey replacement) (index, replacement) m)
-                    | otherwise = (succ index, Map.insert (dedupeKey x) (index, x) m)
+                        in (succ index, Map.insert (dedupeKey (snd similar)) (index, replacement) m)
+                    | otherwise = (succ index, Map.insert (dedupeKey (snd x)) (index, x) m)
 
-    dedupeKey entry = DedupeKey (toCategoryName (snd entry), T.toLower (declarationIdentifier (snd entry)))
+    dedupeKey decl = DedupeKey (toCategoryName decl, T.toLower (declarationIdentifier decl))
     exactMatch = (==) `on` snd
 
 -- | Construct a description of an 'Entry'.
