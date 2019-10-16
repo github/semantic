@@ -98,9 +98,6 @@ data Dedupe = Dedupe
 dedupe :: [(Entry, Declaration)] -> [(Entry, Declaration)]
 dedupe = map (dedupeEntry &&& dedupeDecl) . sortOn dedupeIndex . Map.elems . foldl' go Map.empty . zipWith (uncurry . Dedupe) [0..]
   where
-    go :: Map.Map DedupeKey Dedupe
-       -> Dedupe
-       -> Map.Map DedupeKey Dedupe
     go m (Dedupe index entry decl) = case findSimilar decl m of
       Just (Dedupe _ _ similar)
         | similar == decl -> m
