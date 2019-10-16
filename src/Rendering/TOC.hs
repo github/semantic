@@ -98,7 +98,7 @@ newtype DedupeKey = DedupeKey (T.Text, T.Text) deriving (Eq, Ord)
 --    identifiers) are in the list.
 --    Action: Combine them into a single Replaced entry.
 dedupe :: [(Entry, Declaration)] -> [(Entry, Declaration)]
-dedupe = fmap (map snd) tuples
+dedupe = map snd . tuples
   where
     tuples = sortOn fst . Map.elems . snd . foldl' go (0, Map.empty)
     go :: (Int, Map.Map DedupeKey (Int, (Entry, Declaration)))
