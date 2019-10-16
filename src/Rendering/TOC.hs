@@ -9,7 +9,6 @@ module Rendering.TOC
 , Entry(..)
 , tableOfContentsBy
 , dedupe
-, toCategoryName
 ) where
 
 import Prologue hiding (index)
