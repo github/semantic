@@ -25,11 +25,11 @@ import qualified Language.Markdown.Syntax as Markdown
 
 -- | A declaration’s identifier and type.
 data Declaration = Declaration
-  { declarationKind       :: DeclarationKind
-  , declarationIdentifier :: Text
-  , declarationText       :: Text
-  , declarationSpan       :: Span
-  , declarationLanguage   :: Language }
+  { kind       :: DeclarationKind
+  , identifier :: Text
+  , text       :: Text
+  , span       :: Span
+  , language   :: Language }
   deriving (Eq, Show)
 
 data DeclarationKind
@@ -108,7 +108,7 @@ instance CustomHasDeclaration whole Declaration.Function where
     where isEmpty = (== 0) . rangeLength . byteRange
           functionSource = getIdentifier (arr Declaration.functionBody) blob (In ann decl)
 
--- | Produce a 'MethodDeclaration' for 'Declaration.Method' nodes. If the method’s receiver is non-empty (defined as having a non-empty 'Range'), the 'declarationIdentifier' will be formatted as 'receiver.method_name'; otherwise it will be simply 'method_name'.
+-- | Produce a 'MethodDeclaration' for 'Declaration.Method' nodes. If the method’s receiver is non-empty (defined as having a non-empty 'Range'), the 'identifier' will be formatted as 'receiver.method_name'; otherwise it will be simply 'method_name'.
 instance CustomHasDeclaration whole Declaration.Method where
   customToDeclaration blob@Blob{..} ann decl@(Declaration.Method _ (Term (In receiverAnn receiverF), _) (Term (In identifierAnn _), _) _ _ _)
     -- Methods without a receiver
@@ -123,7 +123,7 @@ instance CustomHasDeclaration whole Declaration.Method where
       methodSource = getIdentifier (arr Declaration.methodBody) blob (In ann decl)
 
 -- When encountering a Declaration-annotated term, we need to extract a Text
--- for the resulting Declaration's 'declarationIdentifier' field. This text
+-- for the resulting Declaration's 'identifier' field. This text
 -- is constructed by slicing out text from the original blob corresponding
 -- to a location, which is found via the passed-in rule.
 getIdentifier :: Functor m
