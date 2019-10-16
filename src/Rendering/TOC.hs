@@ -101,7 +101,7 @@ dedupe = map (entry &&& decl) . sortOn index . Map.elems . foldl' go Map.empty .
     go m d@(Dedupe _ _ decl) = case findSimilar decl m of
       Just similar
         | similar == decl -> m
-        | otherwise       -> Map.insert (dedupeKey similar) (d { entry = Replaced, decl = similar }) m
+        | otherwise       -> Map.insert (dedupeKey similar) d { entry = Replaced, decl = similar } m
       _ -> Map.insert (dedupeKey decl) d m
 
     findSimilar d = fmap decl . Map.lookup (dedupeKey d)
