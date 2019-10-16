@@ -112,7 +112,7 @@ dedupe = map snd . sortOn fst . Map.elems . snd . foldl' (uncurry . go) (0, Map.
           Map.insert (dedupeKey similarDecl) (index, (Replaced, similarDecl)) m
       | otherwise = (succ index, Map.insert (dedupeKey decl) (index, (entry, decl)) m)
 
-    dedupeKey decl = DedupeKey (toCategoryName (declarationKind decl), T.toLower (declarationIdentifier decl))
+    dedupeKey (Declaration kind ident _ _ _) = DedupeKey (toCategoryName kind, T.toLower ident)
 
 -- | Construct a description of an 'Entry'.
 entryChange :: Entry -> Text
