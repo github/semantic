@@ -127,12 +127,13 @@ recordSummary :: T.Text -> Declaration -> TOCSummary
 recordSummary changeText record = case record of
   Declaration ErrorDeclaration text _ srcSpan language -> ErrorSummary text srcSpan language
   decl -> TOCSummary (toCategoryName (declarationKind decl)) (formatIdentifier decl) (declarationSpan decl) changeText
-  where
-    formatIdentifier (Declaration kind identifier _ _ lang) = case kind of
-      MethodDeclaration (Just receiver)
-        | Language.Go <- lang -> "(" <> receiver <> ") " <> identifier
-        | otherwise           -> receiver <> "." <> identifier
-      _                       -> identifier
+
+formatIdentifier :: Declaration -> Text
+formatIdentifier (Declaration kind identifier _ _ lang) = case kind of
+  MethodDeclaration (Just receiver)
+    | Language.Go <- lang -> "(" <> receiver <> ") " <> identifier
+    | otherwise           -> receiver <> "." <> identifier
+  _                       -> identifier
 
 renderToCDiff :: (Foldable f, Functor f) => BlobPair -> Diff f (Maybe Declaration) (Maybe Declaration) -> Summaries
 renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . diffTOC
