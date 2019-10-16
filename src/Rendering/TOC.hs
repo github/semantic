@@ -106,8 +106,8 @@ dedupe = map (entry &&& decl) . sortOn index . Map.elems . foldl' go Map.empty .
   dedupeKey (Declaration kind ident _ _ _) = DedupeKey (formatKind kind) (T.toLower ident)
 
 -- | Construct a description of an 'Entry'.
-entryChange :: Entry -> Text
-entryChange entry = case entry of
+formatEntry :: Entry -> Text
+formatEntry entry = case entry of
   Changed  -> "modified"
   Deleted  -> "removed"
   Inserted -> "added"
@@ -117,7 +117,7 @@ entryChange entry = case entry of
 recordSummary :: Entry -> Declaration -> TOCSummary
 recordSummary entry decl@(Declaration kind text _ srcSpan language)
   | ErrorDeclaration <- kind = ErrorSummary text srcSpan language
-  | otherwise                = TOCSummary (formatKind kind) (formatIdentifier decl) srcSpan (entryChange entry)
+  | otherwise                = TOCSummary (formatKind kind) (formatIdentifier decl) srcSpan (formatEntry entry)
 
 formatIdentifier :: Declaration -> Text
 formatIdentifier (Declaration kind identifier _ _ lang) = case kind of
