@@ -140,7 +140,7 @@ renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isV
         summaryKey = T.pack $ pathKeyForBlobPair blobs
 
 diffTOC :: (Foldable f, Functor f) => Diff f (Maybe Declaration) (Maybe Declaration) -> [TOCSummary]
-diffTOC = fmap entrySummary . dedupe . tableOfContentsBy declaration
+diffTOC = map entrySummary . dedupe . tableOfContentsBy declaration
 
 -- The user-facing category name
 toCategoryName :: Declaration -> T.Text
