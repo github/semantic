@@ -8,7 +8,6 @@ module Rendering.TOC
 , declaration
 , Entry(..)
 , tableOfContentsBy
-, termTableOfContentsBy
 , dedupe
 , toCategoryName
 ) where
@@ -80,13 +79,6 @@ tableOfContentsBy selector = fromMaybe [] . cata (\ r -> case r of
     (_     , entries)      -> entries)
    where patchEntry = patch (Deleted,) (Inserted,) (const (Replaced,))
 
-termTableOfContentsBy :: (Foldable f, Functor f)
-                      => (forall b. TermF f annotation b -> Maybe a)
-                      -> Term f annotation
-                      -> [a]
-termTableOfContentsBy selector = cata termAlgebra
-  where termAlgebra r | Just a <- selector r = a : fold r
-                      | otherwise            =     fold r
 
 newtype DedupeKey = DedupeKey (T.Text, T.Text) deriving (Eq, Ord)
 
