@@ -23,7 +23,7 @@ library
   build-depends:       base ^>=4.12.0.0
                      , tree-sitter ^>= 0.5
                      , semantic-source ^>= 0.0
-                     , tree-sitter-python
+                     , tree-sitter-python ^>= 0.6
                      , bytestring
                      , optparse-applicative ^>= 0.14.3.0
   hs-source-dirs:      src
@@ -37,7 +37,7 @@ executable semantic-ast
                      , semantic-ast
                      , tree-sitter ^>= 0.5
                      , semantic-source ^>= 0.0
-                     , tree-sitter-python
+                     , tree-sitter-python ^>= 0.6
                      , bytestring
                      , optparse-applicative ^>= 0.14.3.0
   hs-source-dirs:      src
