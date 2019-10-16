@@ -28,7 +28,7 @@ data Declaration
   | FunctionDeclaration { declarationIdentifier :: Text, declarationText :: Text, declarationSpan :: Span, declarationLanguage :: Language }
   | HeadingDeclaration  { declarationIdentifier :: Text, declarationText :: Text, declarationSpan :: Span, declarationLanguage :: Language, declarationLevel :: Int }
   | ErrorDeclaration    { declarationIdentifier :: Text, declarationText :: Text, declarationSpan :: Span, declarationLanguage :: Language }
-  deriving (Eq, Generic, Show)
+  deriving (Eq, Show)
 
 
 -- | An r-algebra producing 'Just' a 'Declaration' for syntax nodes corresponding to high-level declarations, or 'Nothing' otherwise.
