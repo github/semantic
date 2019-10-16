@@ -42,11 +42,11 @@ generateAST (SemanticAST _ source) = do
   case source of
     Left filePath -> do
       bytestring <- Data.ByteString.readFile filePath
-      print =<< parseByteString @TreeSitter.Python.AST.Module @(Range, Span) tree_sitter_python bytestring
+      printByteString bytestring
     Right source -> do
       let bytestring = Data.ByteString.Char8.pack source
-      print =<< parseByteString @TreeSitter.Python.AST.Module @(Range, Span) tree_sitter_python bytestring
-
+      printByteString bytestring
+  where printByteString bytestring = print =<< parseByteString @TreeSitter.Python.AST.Module @(Range, Span) tree_sitter_python bytestring
 
 opts :: ParserInfo SemanticAST
 opts = info (parseAST <**> helper)
