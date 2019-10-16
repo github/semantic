@@ -12,7 +12,7 @@ module Rendering.TOC
 , toCategoryName
 ) where
 
-import Prologue
+import Prologue hiding (index)
 import Analysis.TOCSummary
 import Data.Align (bicrosswalk)
 import Data.Aeson
@@ -83,9 +83,9 @@ tableOfContentsBy selector = fromMaybe [] . cata (\ r -> case r of
 newtype DedupeKey = DedupeKey (T.Text, T.Text) deriving (Eq, Ord)
 
 data Dedupe = Dedupe
-  { dedupeIndex :: {-# UNPACK #-} !Int
-  , dedupeEntry :: {-# UNPACK #-} !Entry
-  , dedupeDecl  :: {-# UNPACK #-} !Declaration
+  { index :: {-# UNPACK #-} !Int
+  , entry :: {-# UNPACK #-} !Entry
+  , decl  :: {-# UNPACK #-} !Declaration
   }
 
 -- Dedupe entries in a final pass. This catches two specific scenarios with
@@ -96,12 +96,12 @@ data Dedupe = Dedupe
 --    identifiers) are in the list.
 --    Action: Combine them into a single Replaced entry.
 dedupe :: [(Entry, Declaration)] -> [(Entry, Declaration)]
-dedupe = map (dedupeEntry &&& dedupeDecl) . sortOn dedupeIndex . Map.elems . foldl' go Map.empty . zipWith (uncurry . Dedupe) [0..]
+dedupe = map (entry &&& decl) . sortOn index . Map.elems . foldl' go Map.empty . zipWith (uncurry . Dedupe) [0..]
   where
     go m d@(Dedupe _ _ decl) = case findSimilar decl m of
       Just (Dedupe _ _ similar)
         | similar == decl -> m
-        | otherwise       -> Map.insert (dedupeKey similar) (d { dedupeEntry = Replaced, dedupeDecl = similar }) m
+        | otherwise       -> Map.insert (dedupeKey similar) (d { entry = Replaced, decl = similar }) m
       _ -> Map.insert (dedupeKey decl) d m
 
     findSimilar decl = Map.lookup (dedupeKey decl)
