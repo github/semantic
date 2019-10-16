@@ -22,11 +22,14 @@ import           Control.Effect.Reader
 import           Control.Exception
 import           Control.Lens
 import           Control.Monad.IO.Class
+import           Data.Aeson (toJSON)
 import           Data.Blob
 import           Data.ByteString.Builder
 import           Data.Graph
 import           Data.JSON.Fields
 import           Data.Language
+import qualified Data.List as List
+import qualified Data.Map.Monoidal as Map
 import           Data.ProtoLens (defMessage)
 import           Data.Term
 import qualified Data.Text as T
@@ -160,7 +163,10 @@ class DiffTerms term => LegacySummarizeDiff term where
 
 instance (Diffable syntax, Eq1 syntax, HasDeclaration syntax, Hashable1 syntax, Traversable syntax) => LegacySummarizeDiff (Term syntax) where
   legacyDecorateTerm = decoratorWithAlgebra . declarationAlgebra
-  legacySummarizeDiff = renderToCDiff
+  legacySummarizeDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . diffTOC where
+    toMap [] = mempty
+    toMap as = Map.singleton summaryKey (toJSON <$> as)
+    summaryKey = T.pack $ pathKeyForBlobPair blobs
 
 
 summarizeDiffParsers :: Map Language (SomeParser SummarizeDiff Loc)
