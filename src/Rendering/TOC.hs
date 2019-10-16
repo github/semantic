@@ -95,11 +95,11 @@ dedupe = map snd . sortOn fst . Map.elems . foldl' go Map.empty . zip [0..]
     go :: Map.Map DedupeKey (Int, (Entry, Declaration))
        -> (Int, (Entry, Declaration))
        -> Map.Map DedupeKey (Int, (Entry, Declaration))
-    go m (index, (entry, decl)) = case findSimilar decl m of
+    go m x@(_, (_, decl)) = case findSimilar decl m of
       Just (_, (_, similar))
         | similar == decl -> m
-        | otherwise       -> Map.insert (dedupeKey similar) (index, (Replaced, similar)) m
-      _ -> Map.insert (dedupeKey decl) (index, (entry, decl)) m
+        | otherwise       -> Map.insert (dedupeKey similar) ((Replaced, similar) <$ x) m
+      _ -> Map.insert (dedupeKey decl) x m
 
     findSimilar decl = Map.lookup (dedupeKey decl)
     dedupeKey (Declaration kind ident _ _ _) = DedupeKey (toCategoryName kind, T.toLower ident)
