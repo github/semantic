@@ -97,13 +97,12 @@ data Dedupe = Dedupe
 --    Action: Combine them into a single Replaced entry.
 dedupe :: [(Entry, Declaration)] -> [(Entry, Declaration)]
 dedupe = map (entry &&& decl) . sortOn index . Map.elems . foldl' go Map.empty . zipWith (uncurry . Dedupe) [0..] where
-  go m d@(Dedupe _ _ decl) = let key = dedupeKey decl in case findSimilarBy key m of
-    Just similar
+  go m d@(Dedupe _ _ decl) = let key = dedupeKey decl in case Map.lookup key m of
+    Just (Dedupe _ _ similar)
       | similar == decl -> m
       | otherwise       -> Map.insert key d { entry = Replaced, decl = similar } m
     _                   -> Map.insert key d m
 
-  findSimilarBy key = fmap decl . Map.lookup key
   dedupeKey (Declaration kind ident _ _ _) = DedupeKey (toCategoryName kind, T.toLower ident)
 
 -- | Construct a description of an 'Entry'.
