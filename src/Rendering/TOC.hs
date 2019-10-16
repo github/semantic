@@ -124,9 +124,9 @@ entryChange entry = case entry of
 
 -- | Construct a 'TOCSummary' from a node annotation and a change type label.
 recordSummary :: T.Text -> Declaration -> TOCSummary
-recordSummary changeText record = case record of
-  Declaration ErrorDeclaration text _ srcSpan language -> ErrorSummary text srcSpan language
-  decl -> TOCSummary (toCategoryName (declarationKind decl)) (formatIdentifier decl) (declarationSpan decl) changeText
+recordSummary changeText decl@(Declaration kind text _ srcSpan language)
+  | ErrorDeclaration <- kind = ErrorSummary text srcSpan language
+  | otherwise                = TOCSummary (toCategoryName kind) (formatIdentifier decl) srcSpan changeText
 
 formatIdentifier :: Declaration -> Text
 formatIdentifier (Declaration kind identifier _ _ lang) = case kind of
