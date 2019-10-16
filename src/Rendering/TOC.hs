@@ -145,7 +145,7 @@ diffTOC = map entrySummary . dedupe . tableOfContentsBy declaration
 -- The user-facing category name
 toCategoryName :: Declaration -> T.Text
 toCategoryName declaration = case declaration of
-  FunctionDeclaration{} -> "Function"
-  MethodDeclaration{} -> "Method"
+  FunctionDeclaration{}        -> "Function"
+  MethodDeclaration{}          -> "Method"
   HeadingDeclaration _ _ _ _ l -> "Heading " <> T.pack (show l)
-  ErrorDeclaration{} -> "ParseError"
+  ErrorDeclaration{}           -> "ParseError"
