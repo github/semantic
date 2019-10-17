@@ -5,7 +5,7 @@ module Rendering.TOC
 , TOCSummary(..)
 , isValidSummary
 , declaration
-, ChangeType(..)
+, Change(..)
 , tableOfContentsBy
 , dedupe
 ) where
@@ -50,7 +50,7 @@ instance ToJSON TOCSummary where
   toJSON ErrorSummary{..} = object [ "error" .= message, "span" .= span, "language" .= language ]
 
 -- | An entry in a table of contents.
-data ChangeType
+data Change
   = Changed  -- ^ An entry for a node containing changes.
   | Inserted -- ^ An entry for a change occurring inside an 'Insert' 'Patch'.
   | Deleted  -- ^ An entry for a change occurring inside a 'Delete' 'Patch'.
@@ -70,7 +70,7 @@ declaration (In annotation _) = annotation
 tableOfContentsBy :: (Foldable f, Functor f)
                   => (forall b. TermF f ann b -> Maybe a) -- ^ A function mapping relevant nodes onto values in Maybe.
                   -> Diff f ann ann                       -- ^ The diff to compute the table of contents for.
-                  -> [(ChangeType, a)]                         -- ^ A list of entries for relevant changed nodes in the diff.
+                  -> [(Change, a)]                         -- ^ A list of entries for relevant changed nodes in the diff.
 tableOfContentsBy selector = fromMaybe [] . cata (\ r -> case r of
   Patch patch -> (pure . patchEntry <$> bicrosswalk selector selector patch) <> bifoldMap fold fold patch <> Just []
   Merge (In (_, ann2) r) -> case (selector (In ann2 r), fold r) of
@@ -84,7 +84,7 @@ data DedupeKey = DedupeKey {-# UNPACK #-} !T.Text {-# UNPACK #-} !T.Text
 
 data Dedupe = Dedupe
   { index :: {-# UNPACK #-} !Int
-  , entry :: {-# UNPACK #-} !ChangeType
+  , entry :: {-# UNPACK #-} !Change
   , decl  :: {-# UNPACK #-} !Declaration
   }
 
@@ -95,7 +95,7 @@ data Dedupe = Dedupe
 -- 2. Two similar entries (defined by a case insensitive comparison of their
 --    identifiers) are in the list.
 --    Action: Combine them into a single Replaced entry.
-dedupe :: [(ChangeType, Declaration)] -> [(ChangeType, Declaration)]
+dedupe :: [(Change, Declaration)] -> [(Change, Declaration)]
 dedupe = map (entry &&& decl) . sortOn index . Map.elems . foldl' go Map.empty . zipWith (uncurry . Dedupe) [0..] where
   go m d@(Dedupe _ _ decl) = let key = dedupeKey decl in case Map.lookup key m of
     Just (Dedupe _ _ similar)
@@ -105,8 +105,8 @@ dedupe = map (entry &&& decl) . sortOn index . Map.elems . foldl' go Map.empty .
 
   dedupeKey (Declaration kind ident _ _ _) = DedupeKey (formatKind kind) (T.toLower ident)
 
--- | Construct a description of an 'ChangeType'.
-formatEntry :: ChangeType -> Text
+-- | Construct a description of an 'Change'.
+formatEntry :: Change -> Text
 formatEntry entry = case entry of
   Changed  -> "modified"
   Deleted  -> "removed"
@@ -114,7 +114,7 @@ formatEntry entry = case entry of
   Replaced -> "modified"
 
 -- | Construct a 'TOCSummary' from a node annotation and a change type label.
-recordSummary :: ChangeType -> Declaration -> TOCSummary
+recordSummary :: Change -> Declaration -> TOCSummary
 recordSummary entry decl@(Declaration kind text _ srcSpan language)
   | ErrorDeclaration <- kind = ErrorSummary text srcSpan language
   | otherwise                = TOCSummary (formatKind kind) (formatIdentifier decl) srcSpan (formatEntry entry)
