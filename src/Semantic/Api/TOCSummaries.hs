@@ -50,14 +50,15 @@ diffSummary blobs = do
               & P.changes  .~ changes
               & P.errors   .~ errors
 
-            toChangeType = \case
-              Changed  -> MODIFIED
-              Deleted  -> REMOVED
-              Inserted -> ADDED
-              Replaced -> MODIFIED
+toChangeType :: Change -> ChangeType
+toChangeType = \case
+  Changed  -> MODIFIED
+  Deleted  -> REMOVED
+  Inserted -> ADDED
+  Replaced -> MODIFIED
 
-            toChange :: TOCSummary -> TOCSummaryChange
-            toChange TOCSummary{..} = defMessage & P.category .~ formatKind kind & P.term .~ ident & P.maybe'span .~ (converting #? span) & P.changeType .~ toChangeType change
+toChange :: TOCSummary -> TOCSummaryChange
+toChange TOCSummary{..} = defMessage & P.category .~ formatKind kind & P.term .~ ident & P.maybe'span .~ (converting #? span) & P.changeType .~ toChangeType change
 
-            toError :: ErrorSummary -> TOCSummaryError
-            toError ErrorSummary{..} = defMessage & P.error .~ message & P.maybe'span .~ converting #? span
+toError :: ErrorSummary -> TOCSummaryError
+toError ErrorSummary{..} = defMessage & P.error .~ message & P.maybe'span .~ converting #? span
