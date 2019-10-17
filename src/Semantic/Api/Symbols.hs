@@ -1,4 +1,4 @@
-{-# LANGUAGE MonoLocalBinds, RankNTypes #-}
+{-# LANGUAGE DerivingVia, MonoLocalBinds, RankNTypes, StandaloneDeriving #-}
 module Semantic.Api.Symbols
   ( legacyParseSymbols
   , parseSymbols
@@ -111,14 +111,10 @@ class ToTags t where
 instance IsTaggable syntax => ToTags (Term syntax) where
   tags = runTagging
 
-instance ToTags Java.Term where
-  tags _ _ = Precise.tags
 
-instance ToTags JSON.Term where
-  tags _ _ = Precise.tags
-
-instance ToTags Python.Term where
-  tags _ _ = Precise.tags
+deriving via (ViaPrecise Java.Term)   instance ToTags Java.Term
+deriving via (ViaPrecise JSON.Term)   instance ToTags JSON.Term
+deriving via (ViaPrecise Python.Term) instance ToTags Python.Term
 
 
 newtype ViaPrecise t a = ViaPrecise (t a)
