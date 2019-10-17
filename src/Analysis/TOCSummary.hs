@@ -52,41 +52,44 @@ formatKind kind = case kind of
 --
 --   Customizing this for a given syntax type involves two steps:
 --
---   1. Defining a 'CustomHasDeclaration' instance for the type.
+--   1. Defining a @'HasDeclarationBy' ''Custom'@ instance for the type.
 --   2. Adding the type to the 'DeclarationStrategy' type family.
 --
---   If you’re getting errors about missing a 'CustomHasDeclaration' instance for your syntax type, you probably forgot step 1.
+--   If you’re getting errors about missing a @'HasDeclarationBy' ''Custom'@ instance for your syntax type, you probably forgot step 1.
 --
 --   If you’re getting 'Nothing' for your syntax node at runtime, you probably forgot step 2.
 declarationAlgebra :: (Foldable syntax, HasDeclaration syntax)
                    => Blob -> RAlgebra (TermF syntax Loc) (Term syntax Loc) (Maybe Declaration)
 declarationAlgebra blob (In ann syntax) = toDeclaration blob ann syntax
 
--- | Types for which we can produce a 'Declaration' in 'Maybe'. There is exactly one instance of this typeclass; adding customized 'Declaration's for a new type is done by defining an instance of 'CustomHasDeclaration' instead.
+-- | Types for which we can produce a 'Declaration' in 'Maybe'. There is exactly one instance of this typeclass; adding customized 'Declaration's for a new type is done by defining an instance of @'HasDeclarationBy' ''Custom'@ instead.
 --
 --   This typeclass employs the Advanced Overlap techniques designed by Oleg Kiselyov & Simon Peyton Jones: https://wiki.haskell.org/GHC/AdvancedOverlap.
 class HasDeclaration syntax where
-  -- | Compute a 'Declaration' for a syntax type using its 'CustomHasDeclaration' instance, if any, or else falling back to the default definition (which simply returns 'Nothing').
+  -- | Compute a 'Declaration' for a syntax type using its @'HasDeclarationBy' ''Custom'@ instance, if any, or else falling back to the default definition (which simply returns 'Nothing').
   toDeclaration :: Foldable whole => Blob -> Loc -> syntax (Term whole Loc, Maybe Declaration) -> Maybe Declaration
 
--- | Define 'toDeclaration' using the 'CustomHasDeclaration' instance for a type if there is one or else use the default definition.
+-- | Define 'toDeclaration' using the @'HasDeclarationBy' ''Custom'@ instance for a type if there is one or else use the default definition.
 --
---   This instance determines whether or not there is an instance for @syntax@ by looking it up in the 'DeclarationStrategy' type family. Thus producing a 'Declaration' for a node requires both defining a 'CustomHasDeclaration' instance _and_ adding a definition for the type to the 'DeclarationStrategy' type family to return 'Custom'.
+--   This instance determines whether or not there is an instance for @syntax@ by looking it up in the 'DeclarationStrategy' type family. Thus producing a 'Declaration' for a node requires both defining a @'HasDeclarationBy' ''Custom'@ instance _and_ adding a definition for the type to the 'DeclarationStrategy' type family to return 'Custom'.
 --
 --   Note that since 'DeclarationStrategy' has a fallback case for its final entry, this instance will hold for all types of kind @* -> *@. Thus, this must be the only instance of 'HasDeclaration', as any other instance would be indistinguishable.
 instance (DeclarationStrategy syntax ~ strategy, HasDeclarationBy strategy syntax) => HasDeclaration syntax where
   toDeclaration = toDeclarationBy (Proxy :: Proxy strategy)
 
 
--- | Types for which we can produce a customized 'Declaration'. This returns in 'Maybe' so that some values can be opted out (e.g. anonymous functions).
-class CustomHasDeclaration syntax where
-  -- | Produce a customized 'Declaration' for a given syntax node.
-  customToDeclaration :: Foldable whole => Blob -> Loc -> syntax (Term whole Loc, Maybe Declaration) -> Maybe Declaration
+-- | Produce a 'Declaration' for a syntax node using either the 'Default' or 'Custom' strategy.
+class HasDeclarationBy (strategy :: Strategy) syntax where
+  toDeclarationBy :: Foldable whole => proxy strategy -> Blob -> Loc -> syntax (Term whole Loc, Maybe Declaration) -> Maybe Declaration
+
+-- | The 'Default' strategy produces 'Nothing'.
+instance HasDeclarationBy 'Default syntax where
+  toDeclarationBy _ _ _ _ = Nothing
 
 
 -- | Produce a 'Heading' from the first line of the heading of a 'Markdown.Heading' node.
-instance CustomHasDeclaration Markdown.Heading where
-  customToDeclaration blob@Blob{..} ann (Markdown.Heading level terms _)
+instance HasDeclarationBy 'Custom Markdown.Heading where
+  toDeclarationBy _ blob@Blob{..} ann (Markdown.Heading level terms _)
     = Just $ Declaration (Heading level) (headingText terms) mempty (Loc.span ann) (blobLanguage blob)
     where headingText terms = getSource $ maybe (byteRange ann) sconcat (nonEmpty (headingByteRange <$> toList terms))
           headingByteRange (Term (In ann _), _) = byteRange ann
@@ -94,14 +97,14 @@ instance CustomHasDeclaration Markdown.Heading where
           firstLine = T.takeWhile (/= '\n')
 
 -- | Produce an 'Error' for 'Syntax.Error' nodes.
-instance CustomHasDeclaration Syntax.Error where
-  customToDeclaration blob@Blob{..} ann err@Syntax.Error{}
+instance HasDeclarationBy 'Custom Syntax.Error where
+  toDeclarationBy _ blob@Blob{..} ann err@Syntax.Error{}
     = Just $ Declaration Error (T.pack (formatTOCError (Syntax.unError (Loc.span ann) err))) mempty (Loc.span ann) (blobLanguage blob)
     where formatTOCError e = Error.showExpectation (flag Error.Colourize False) (Error.errorExpected e) (Error.errorActual e) ""
 
 -- | Produce a 'Function' for 'Declaration.Function' nodes so long as their identifier is non-empty (defined as having a non-empty 'Range').
-instance CustomHasDeclaration Declaration.Function where
-  customToDeclaration blob@Blob{..} ann decl@(Declaration.Function _ (Term (In identifierAnn _), _) _ _)
+instance HasDeclarationBy 'Custom Declaration.Function where
+  toDeclarationBy _ blob@Blob{..} ann decl@(Declaration.Function _ (Term (In identifierAnn _), _) _ _)
     -- Do not summarize anonymous functions
     | isEmpty identifierAnn = Nothing
     -- Named functions
@@ -110,8 +113,8 @@ instance CustomHasDeclaration Declaration.Function where
           functionSource = getIdentifier (arr Declaration.functionBody) blob (In ann decl)
 
 -- | Produce a 'Method' for 'Declaration.Method' nodes. If the method’s receiver is non-empty (defined as having a non-empty 'Range'), the 'identifier' will be formatted as 'receiver.method_name'; otherwise it will be simply 'method_name'.
-instance CustomHasDeclaration Declaration.Method where
-  customToDeclaration blob@Blob{..} ann decl@(Declaration.Method _ (Term (In receiverAnn receiverF), _) (Term (In identifierAnn _), _) _ _ _)
+instance HasDeclarationBy 'Custom Declaration.Method where
+  toDeclarationBy _ blob@Blob{..} ann decl@(Declaration.Method _ (Term (In receiverAnn receiverF), _) (Term (In identifierAnn _), _) _ _ _)
     -- Methods without a receiver
     | isEmpty receiverAnn = Just $ Declaration (Method Nothing) (getSource blobSource identifierAnn) methodSource (Loc.span ann) (blobLanguage blob)
     -- Methods with a receiver type and an identifier (e.g. (a *Type) in Go).
@@ -142,26 +145,19 @@ getIdentifier finder Blob{..} (In a r)
 getSource :: Source -> Loc -> Text
 getSource blobSource = toText . Source.slice blobSource . byteRange
 
--- | Produce a 'Declaration' for 'Sum's using the 'HasDeclaration' instance & therefore using a 'CustomHasDeclaration' instance when one exists & the type is listed in 'DeclarationStrategy'.
-instance Apply HasDeclaration fs => CustomHasDeclaration (Sum fs) where
-  customToDeclaration blob ann = apply @HasDeclaration (toDeclaration blob ann)
+-- | Produce a 'Declaration' for 'Sum's using the 'HasDeclaration' instance & therefore using a @'HasDeclarationBy' ''Custom'@ instance when one exists & the type is listed in 'DeclarationStrategy'.
+instance Apply HasDeclaration fs => HasDeclarationBy 'Custom (Sum fs) where
+  toDeclarationBy _ blob ann = apply @HasDeclaration (toDeclaration blob ann)
 
 
 -- | A strategy for defining a 'HasDeclaration' instance. Intended to be promoted to the kind level using @-XDataKinds@.
 data Strategy = Default | Custom
 
--- | Produce a 'Declaration' for a syntax node using either the 'Default' or 'Custom' strategy.
---
---   You should probably be using 'CustomHasDeclaration' instead of this class; and you should not define new instances of this class.
-class HasDeclarationBy (strategy :: Strategy) syntax where
-  toDeclarationBy :: Foldable whole => proxy strategy -> Blob -> Loc -> syntax (Term whole Loc, Maybe Declaration) -> Maybe Declaration
-
-
 -- | A predicate on syntax types selecting either the 'Custom' or 'Default' strategy.
 --
 --   Only entries for which we want to use the 'Custom' strategy should be listed, with the exception of the final entry which maps all other types onto the 'Default' strategy.
 --
---   If you’re seeing errors about missing a 'CustomHasDeclaration' instance for a given type, you’ve probably listed it in here but not defined a 'CustomHasDeclaration' instance for it, or else you’ve listed the wrong type in here. Conversely, if your 'customHasDeclaration' method is never being called, you may have forgotten to list the type in here.
+--   If you’re seeing errors about missing a @'HasDeclarationBy' ''Custom'@ instance for a given type, you’ve probably listed it in here but not defined a @'HasDeclarationBy' ''Custom'@ instance for it, or else you’ve listed the wrong type in here. Conversely, if your @'HasDeclarationBy' ''Custom'@ method is never being called, you may have forgotten to list the type in here.
 type family DeclarationStrategy syntax where
   DeclarationStrategy Declaration.Function = 'Custom
   DeclarationStrategy Declaration.Method = 'Custom
@@ -169,12 +165,3 @@ type family DeclarationStrategy syntax where
   DeclarationStrategy Syntax.Error = 'Custom
   DeclarationStrategy (Sum fs) = 'Custom
   DeclarationStrategy a = 'Default
-
-
--- | The 'Default' strategy produces 'Nothing'.
-instance HasDeclarationBy 'Default syntax where
-  toDeclarationBy _ _ _ _ = Nothing
-
--- | The 'Custom' strategy delegates the selection of the strategy to the 'CustomHasDeclaration' instance for the type.
-instance CustomHasDeclaration syntax => HasDeclarationBy 'Custom syntax where
-  toDeclarationBy _ = customToDeclaration
