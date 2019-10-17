@@ -89,7 +89,7 @@ data DedupeKey = DedupeKey !Kind {-# UNPACK #-} !T.Text
 
 data Dedupe = Dedupe
   { index  :: {-# UNPACK #-} !Int
-  , change :: {-# UNPACK #-} !Change
+  , change :: !Change
   , decl   :: {-# UNPACK #-} !Declaration
   }
 
