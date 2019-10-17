@@ -82,7 +82,7 @@ tableOfContentsBy selector = fromMaybe [] . cata (\ r -> case r of
   Merge (In (_, ann2) r) -> case (selector (In ann2 r), fold r) of
     (Just a, Just entries) -> Just ((Changed, a) : entries)
     (_     , entries)      -> entries)
-   where patchEntry = patch (Deleted,) (Inserted,) (const (Replaced,))
+  where patchEntry = patch (Deleted,) (Inserted,) (const (Replaced,))
 
 
 data DedupeKey = DedupeKey !DeclarationKind {-# UNPACK #-} !T.Text
