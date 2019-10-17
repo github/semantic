@@ -23,7 +23,7 @@ import qualified Data.Text as T
 import Source.Loc
 
 data Summaries = Summaries { changes, errors :: Map.Map T.Text [Value] }
-  deriving stock (Eq, Show, Generic)
+  deriving (Eq, Show, Generic)
   deriving Semigroup via GenericSemigroup Summaries
   deriving Monoid via GenericMonoid Summaries
 
@@ -36,14 +36,14 @@ data TOCSummary = TOCSummary
   , span   :: Span
   , change :: Change
   }
-  deriving stock (Eq, Show)
+  deriving (Eq, Show)
 
 data ErrorSummary = ErrorSummary
   { message  :: T.Text
   , span     :: Span
   , language :: Language
   }
-  deriving stock (Eq, Show)
+  deriving (Eq, Show)
 
 instance ToJSON TOCSummary where
   toJSON TOCSummary{..} = object [ "changeType" .= change, "category" .= formatKind kind, "term" .= ident, "span" .= span ]
