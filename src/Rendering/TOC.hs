@@ -32,7 +32,7 @@ instance ToJSON Summaries where
   toJSON Summaries{..} = object [ "changes" .= changes, "errors" .= errors ]
 
 data TOCSummary = TOCSummary
-  { kind   :: T.Text
+  { kind   :: DeclarationKind
   , ident  :: T.Text
   , span   :: Span
   , change :: Change
@@ -47,7 +47,7 @@ data ErrorSummary = ErrorSummary
   deriving stock (Eq, Show)
 
 instance ToJSON TOCSummary where
-  toJSON TOCSummary{..} = object [ "changeType" .= change, "category" .= kind, "term" .= ident, "span" .= span ]
+  toJSON TOCSummary{..} = object [ "changeType" .= change, "category" .= formatKind kind, "term" .= ident, "span" .= span ]
 
 instance ToJSON ErrorSummary where
   toJSON ErrorSummary{..} = object [ "error" .= message, "span" .= span, "language" .= language ]
@@ -115,7 +115,7 @@ dedupe = map ((change :: Dedupe -> Change) &&& decl) . sortOn index . Map.elems 
 recordSummary :: Change -> Declaration -> Either ErrorSummary TOCSummary
 recordSummary change decl@(Declaration kind text _ srcSpan language)
   | ErrorDeclaration <- kind = Left  $ ErrorSummary text srcSpan language
-  | otherwise                = Right $ TOCSummary (formatKind kind) (formatIdentifier decl) srcSpan change
+  | otherwise                = Right $ TOCSummary kind (formatIdentifier decl) srcSpan change
 
 formatIdentifier :: Declaration -> Text
 formatIdentifier (Declaration kind identifier _ _ lang) = case kind of
