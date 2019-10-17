@@ -41,7 +41,7 @@ diffSummary blobs = do
   diff <- distributeFor blobs go
   pure $ defMessage & P.files .~ diff
   where
-    go blobPair = decoratingDiffWith summarizeDiffParsers decorateTerm (pure . foldr combine (defMessage & P.path .~ path & P.language .~ lang) . summarizeDiff) blobPair
+    go blobPair = decoratingDiffWith summarizeDiffParsers decorateTerm (pure . uncurry toFile . foldr combine ([], []) . summarizeDiff) blobPair
       `catchError` \(SomeException e) ->
         pure $ defMessage
           & P.path .~ path
@@ -51,15 +51,19 @@ diffSummary blobs = do
       where path = T.pack $ pathKeyForBlobPair blobPair
             lang = bridging # languageForBlobPair blobPair
 
+            toFile changes errors = defMessage
+              & P.path .~ path
+              & P.language .~ lang
+              & P.changes .~ changes
+              & P.errors .~ errors
+
             toChangeType = \case
               Changed  -> MODIFIED
               Deleted  -> REMOVED
               Inserted -> ADDED
               Replaced -> MODIFIED
 
-            combine :: TOCSummary -> TOCSummaryFile -> TOCSummaryFile
-            combine TOCSummary{..} file = file
-              & P.changes .~ (defMessage & P.category .~ kind & P.term .~ ident & P.maybe'span .~ (converting #? span) & P.changeType .~ toChangeType change) : file^.P.changes
+            combine :: TOCSummary -> ([TOCSummaryChange], [TOCSummaryError]) -> ([TOCSummaryChange], [TOCSummaryError])
+            combine TOCSummary{..} (changes, errors) = ((defMessage & P.category .~ kind & P.term .~ ident & P.maybe'span .~ (converting #? span) & P.changeType .~ toChangeType change) : changes, errors)
 
-            combine ErrorSummary{..} file = file
-              & P.errors .~ (defMessage & P.error .~ message & P.maybe'span .~ converting #? span) : file^.P.errors
+            combine ErrorSummary{..} (changes, errors) = (changes, (defMessage & P.error .~ message & P.maybe'span .~ converting #? span) : errors)
