@@ -66,13 +66,13 @@ declarationAlgebra blob (In ann syntax) = toDeclaration blob ann syntax
 class HasDeclaration syntax where
   toDeclaration :: Foldable syntax => Blob -> Loc -> syntax (Term syntax Loc, Maybe Declaration) -> Maybe Declaration
 
-instance HasDeclaration' syntax syntax => HasDeclaration syntax where
+instance HasDeclaration' syntax => HasDeclaration syntax where
   toDeclaration = toDeclaration'
 
 -- | Types for which we can produce a 'Declaration' in 'Maybe'. There is exactly one instance of this typeclass; adding customized 'Declaration's for a new type is done by defining an instance of 'CustomHasDeclaration' instead.
 --
 --   This typeclass employs the Advanced Overlap techniques designed by Oleg Kiselyov & Simon Peyton Jones: https://wiki.haskell.org/GHC/AdvancedOverlap.
-class HasDeclaration' whole syntax where
+class HasDeclaration' syntax where
   -- | Compute a 'Declaration' for a syntax type using its 'CustomHasDeclaration' instance, if any, or else falling back to the default definition (which simply returns 'Nothing').
   toDeclaration' :: Foldable whole => Blob -> Loc -> syntax (Term whole Loc, Maybe Declaration) -> Maybe Declaration
 
@@ -81,18 +81,18 @@ class HasDeclaration' whole syntax where
 --   This instance determines whether or not there is an instance for @syntax@ by looking it up in the 'DeclarationStrategy' type family. Thus producing a 'Declaration' for a node requires both defining a 'CustomHasDeclaration' instance _and_ adding a definition for the type to the 'DeclarationStrategy' type family to return 'Custom'.
 --
 --   Note that since 'DeclarationStrategy' has a fallback case for its final entry, this instance will hold for all types of kind @* -> *@. Thus, this must be the only instance of 'HasDeclaration', as any other instance would be indistinguishable.
-instance (DeclarationStrategy syntax ~ strategy, HasDeclarationWithStrategy strategy whole syntax) => HasDeclaration' whole syntax where
+instance (DeclarationStrategy syntax ~ strategy, HasDeclarationWithStrategy strategy syntax) => HasDeclaration' syntax where
   toDeclaration' = toDeclarationWithStrategy (Proxy :: Proxy strategy)
 
 
 -- | Types for which we can produce a customized 'Declaration'. This returns in 'Maybe' so that some values can be opted out (e.g. anonymous functions).
-class CustomHasDeclaration whole syntax where
+class CustomHasDeclaration syntax where
   -- | Produce a customized 'Declaration' for a given syntax node.
   customToDeclaration :: Foldable whole => Blob -> Loc -> syntax (Term whole Loc, Maybe Declaration) -> Maybe Declaration
 
 
 -- | Produce a 'Heading' from the first line of the heading of a 'Markdown.Heading' node.
-instance CustomHasDeclaration whole Markdown.Heading where
+instance CustomHasDeclaration Markdown.Heading where
   customToDeclaration blob@Blob{..} ann (Markdown.Heading level terms _)
     = Just $ Declaration (Heading level) (headingText terms) mempty (Loc.span ann) (blobLanguage blob)
     where headingText terms = getSource $ maybe (byteRange ann) sconcat (nonEmpty (headingByteRange <$> toList terms))
@@ -101,13 +101,13 @@ instance CustomHasDeclaration whole Markdown.Heading where
           firstLine = T.takeWhile (/= '\n')
 
 -- | Produce an 'Error' for 'Syntax.Error' nodes.
-instance CustomHasDeclaration whole Syntax.Error where
+instance CustomHasDeclaration Syntax.Error where
   customToDeclaration blob@Blob{..} ann err@Syntax.Error{}
     = Just $ Declaration Error (T.pack (formatTOCError (Syntax.unError (Loc.span ann) err))) mempty (Loc.span ann) (blobLanguage blob)
     where formatTOCError e = Error.showExpectation (flag Error.Colourize False) (Error.errorExpected e) (Error.errorActual e) ""
 
 -- | Produce a 'Function' for 'Declaration.Function' nodes so long as their identifier is non-empty (defined as having a non-empty 'Range').
-instance CustomHasDeclaration whole Declaration.Function where
+instance CustomHasDeclaration Declaration.Function where
   customToDeclaration blob@Blob{..} ann decl@(Declaration.Function _ (Term (In identifierAnn _), _) _ _)
     -- Do not summarize anonymous functions
     | isEmpty identifierAnn = Nothing
@@ -117,7 +117,7 @@ instance CustomHasDeclaration whole Declaration.Function where
           functionSource = getIdentifier (arr Declaration.functionBody) blob (In ann decl)
 
 -- | Produce a 'Method' for 'Declaration.Method' nodes. If the method’s receiver is non-empty (defined as having a non-empty 'Range'), the 'identifier' will be formatted as 'receiver.method_name'; otherwise it will be simply 'method_name'.
-instance CustomHasDeclaration whole Declaration.Method where
+instance CustomHasDeclaration Declaration.Method where
   customToDeclaration blob@Blob{..} ann decl@(Declaration.Method _ (Term (In receiverAnn receiverF), _) (Term (In identifierAnn _), _) _ _ _)
     -- Methods without a receiver
     | isEmpty receiverAnn = Just $ Declaration (Method Nothing) (getSource blobSource identifierAnn) methodSource (Loc.span ann) (blobLanguage blob)
@@ -150,8 +150,8 @@ getSource :: Source -> Loc -> Text
 getSource blobSource = toText . Source.slice blobSource . byteRange
 
 -- | Produce a 'Declaration' for 'Sum's using the 'HasDeclaration' instance & therefore using a 'CustomHasDeclaration' instance when one exists & the type is listed in 'DeclarationStrategy'.
-instance Apply (HasDeclaration' whole) fs => CustomHasDeclaration whole (Sum fs) where
-  customToDeclaration blob ann = apply @(HasDeclaration' whole) (toDeclaration' blob ann)
+instance Apply HasDeclaration' fs => CustomHasDeclaration (Sum fs) where
+  customToDeclaration blob ann = apply @HasDeclaration' (toDeclaration' blob ann)
 
 
 -- | A strategy for defining a 'HasDeclaration' instance. Intended to be promoted to the kind level using @-XDataKinds@.
@@ -160,7 +160,7 @@ data Strategy = Default | Custom
 -- | Produce a 'Declaration' for a syntax node using either the 'Default' or 'Custom' strategy.
 --
 --   You should probably be using 'CustomHasDeclaration' instead of this class; and you should not define new instances of this class.
-class HasDeclarationWithStrategy (strategy :: Strategy) whole syntax where
+class HasDeclarationWithStrategy (strategy :: Strategy) syntax where
   toDeclarationWithStrategy :: Foldable whole => proxy strategy -> Blob -> Loc -> syntax (Term whole Loc, Maybe Declaration) -> Maybe Declaration
 
 
@@ -179,9 +179,9 @@ type family DeclarationStrategy syntax where
 
 
 -- | The 'Default' strategy produces 'Nothing'.
-instance HasDeclarationWithStrategy 'Default whole syntax where
+instance HasDeclarationWithStrategy 'Default syntax where
   toDeclarationWithStrategy _ _ _ _ = Nothing
 
 -- | The 'Custom' strategy delegates the selection of the strategy to the 'CustomHasDeclaration' instance for the type.
-instance CustomHasDeclaration whole syntax => HasDeclarationWithStrategy 'Custom whole syntax where
+instance CustomHasDeclaration syntax => HasDeclarationWithStrategy 'Custom syntax where
   toDeclarationWithStrategy _ = customToDeclaration
