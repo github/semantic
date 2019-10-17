@@ -3,12 +3,12 @@
     #record { __name: name, __bases: bases, __dict: dict };
 
   instance <- \class -> \prim -> \slots ->
-    #record { __class: class, __prim: prim, __slots: slots }
+    #record { __class: class, __prim: prim, __slots: slots };
 
   object <- type "object" #unit #record{};
 
-  str <- type "str" object #record { }
-  str.__class.__new__ = \contents -> instance str contents #record{}
+  str <- type "str" object #record { };
+  str.__class.__new__ = \contents -> instance str contents #record{};
 
   #record { type: type, object: object, string: string }
 }
