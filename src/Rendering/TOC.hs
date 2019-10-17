@@ -4,7 +4,6 @@ module Rendering.TOC
 , Summaries(..)
 , TOCSummary(..)
 , ErrorSummary(..)
-, declaration
 , Change(..)
 , tableOfContentsBy
 , dedupe
