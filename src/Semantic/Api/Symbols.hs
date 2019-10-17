@@ -121,5 +121,11 @@ instance ToTags Python.Term where
   tags _ _ = Precise.tags
 
 
+newtype ViaPrecise t a = ViaPrecise (t a)
+
+instance Precise.ToTags t => ToTags (ViaPrecise t) where
+  tags _ _ src (ViaPrecise t) = Precise.tags src t
+
+
 toTagsParsers :: PerLanguageModes -> Map Language (Parser.SomeParser ToTags Loc)
 toTagsParsers = Parser.allParsers
