@@ -218,4 +218,4 @@ summarize
   :: DiffEffects sig m
   => BlobPair
   -> m [Either ErrorSummary TOCSummary]
-summarize blobPair = parsePairWith summarizeDiffParsers (summarizeTerms blobPair . decorateTermsWith decorateTerm blobPair) blobPair
+summarize blobPair = parsePairWith summarizeDiffParsers (summarizeTerms blobPair . decorateTermsWith decorateTerm) blobPair

@@ -170,7 +170,7 @@ diffWith
   -> (forall term . c term => DiffFor term Loc Loc -> m output) -- ^ A function to run on the computed diff. Note that the diff is abstract (it’s the diff type corresponding to an abstract term type), but the term type is constrained by @c@, allowing you to do anything @c@ allows, and requiring that all the input parsers produce terms supporting @c@.
   -> BlobPair                                                   -- ^ The blob pair to parse.
   -> m output
-diffWith parsers render blobPair = parsePairWith parsers (render <=< diffTerms blobPair) blobPair
+diffWith parsers render blobPair = parsePairWith parsers (render <=< diffTerms blobPair . bimap snd snd) blobPair
 
 -- | Parse a 'BlobPair' using one of the provided parsers, decorate the resulting terms, diff them, and run an action on the abstracted diff.
 --
@@ -183,9 +183,7 @@ decoratingDiffWith
   -> (forall term . c term => DiffFor term ann ann -> m output) -- ^ A function to run on the computed diff. Note that the diff is abstract (it’s the diff type corresponding to an abstract term type), but the term type is constrained by @c@, allowing you to do anything @c@ allows, and requiring that all the input parsers produce terms supporting @c@.
   -> BlobPair                                                   -- ^ The blob pair to parse.
   -> m output
-decoratingDiffWith parsers decorate render blobPair = parsePairWith parsers (render <=< diffTerms blobPair . bimap (decorate blobL) (decorate blobR)) blobPair where
-  (blobL, blobR) = fromThese errorBlob errorBlob (getBlobPair blobPair)
-  errorBlob = Prelude.error "evaluating blob on absent side"
+decoratingDiffWith parsers decorate render blobPair = parsePairWith parsers (render <=< diffTerms blobPair . bimap (uncurry decorate) (uncurry decorate)) blobPair
 
 diffTerms :: (DiffTerms term, Member Telemetry sig, Carrier sig m, MonadIO m)
   => BlobPair -> These (term ann) (term ann) -> m (DiffFor term ann ann)

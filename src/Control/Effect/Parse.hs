@@ -51,10 +51,11 @@ parseWith parsers with blob = case Map.lookup (blobLanguage blob) parsers of
 -- | Parse a 'BlobPair' with one of the provided parsers, and run an action on the abstracted term pair.
 parsePairWith
   :: (Carrier sig m, Member (Error SomeException) sig, Member Parse sig)
-  => Map.Map Language (SomeParser c ann)                          -- ^ The set of parsers to select from.
-  -> (forall term . c term => These (term ann) (term ann) -> m a) -- ^ A function to run on the parsed terms. Note that the terms are abstract, but constrained by @c@, allowing you to do anything @c@ allows, and requiring that all the input parsers produce terms supporting @c@.
-  -> BlobPair                                                     -- ^ The blob pair to parse.
+  => Map.Map Language (SomeParser c ann)                                      -- ^ The set of parsers to select from.
+  -> (forall term . c term => These (Blob, term ann) (Blob, term ann) -> m a) -- ^ A function to run on the parsed terms. Note that the terms are abstract, but constrained by @c@, allowing you to do anything @c@ allows, and requiring that all the input parsers produce terms supporting @c@.
+  -> BlobPair                                                                 -- ^ The blob pair to parse.
   -> m a
 parsePairWith parsers with blobPair = case Map.lookup (languageForBlobPair blobPair) parsers of
-  Just (SomeParser parser) -> bitraverse (parse parser) (parse parser) (getBlobPair blobPair) >>= with
+  Just (SomeParser parser) -> bitraverse (p parser) (p parser) (getBlobPair blobPair) >>= with
   _                        -> noLanguageForBlob (pathForBlobPair blobPair)
+  where p parser blob = (,) blob <$> parse parser blob

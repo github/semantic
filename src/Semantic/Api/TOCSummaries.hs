@@ -19,7 +19,7 @@ import qualified Data.Map.Monoidal as Map
 import           Data.ProtoLens (defMessage)
 import           Data.Semilattice.Lower
 import qualified Data.Text as T
-import           Data.These (These, fromThese)
+import           Data.These (These)
 import           Proto.Semantic as P hiding (Blob, BlobPair)
 import           Proto.Semantic_Fields as P
 import           Rendering.TOC
@@ -35,7 +35,7 @@ legacyDiffSummary :: DiffEffects sig m => [BlobPair] -> m Summaries
 legacyDiffSummary = distributeFoldMap go
   where
     go :: (Carrier sig m, Member (Error SomeException) sig, Member Parse sig, Member Telemetry sig, MonadIO m) => BlobPair -> m Summaries
-    go blobPair = parsePairWith summarizeDiffParsers (fmap (uncurry (flip Summaries) . bimap toMap toMap . partitionEithers) . summarizeTerms blobPair . decorateTermsWith decorateTerm blobPair) blobPair
+    go blobPair = parsePairWith summarizeDiffParsers (fmap (uncurry (flip Summaries) . bimap toMap toMap . partitionEithers) . summarizeTerms blobPair . decorateTermsWith decorateTerm) blobPair
       `catchError` \(SomeException e) ->
         pure $ Summaries mempty (toMap [ErrorSummary (T.pack (show e)) lowerBound lang])
       where path = T.pack $ pathKeyForBlobPair blobPair
@@ -51,7 +51,7 @@ diffSummary blobs = do
   pure $ defMessage & P.files .~ diff
   where
     go :: (Carrier sig m, Member (Error SomeException) sig, Member Parse sig, Member Telemetry sig, MonadIO m) => BlobPair -> m TOCSummaryFile
-    go blobPair = parsePairWith summarizeDiffParsers (fmap (uncurry toFile . partitionEithers . map (bimap toError toChange)) . summarizeTerms blobPair . decorateTermsWith decorateTerm blobPair) blobPair
+    go blobPair = parsePairWith summarizeDiffParsers (fmap (uncurry toFile . partitionEithers . map (bimap toError toChange)) . summarizeTerms blobPair . decorateTermsWith decorateTerm) blobPair
       `catchError` \(SomeException e) ->
         pure $ toFile [defMessage & P.error .~ T.pack (show e) & P.maybe'span .~ Nothing] []
       where toFile errors changes = defMessage
@@ -60,10 +60,8 @@ diffSummary blobs = do
               & P.changes  .~ changes
               & P.errors   .~ errors
 
-decorateTermsWith :: (Blob -> term a -> term b) -> BlobPair -> These (term a) (term a) -> These (term b) (term b)
-decorateTermsWith decorate blobPair = bimap (decorate blobL) (decorate blobR) where
-  (blobL, blobR) = fromThese errorBlob errorBlob (getBlobPair blobPair)
-  errorBlob = Prelude.error "evaluating blob on absent side"
+decorateTermsWith :: (Blob -> term a -> term b) -> These (Blob, term a) (Blob, term a) -> These (term b) (term b)
+decorateTermsWith decorate = bimap (uncurry decorate) (uncurry decorate)
 
 toChangeType :: Change -> ChangeType
 toChangeType = \case
