@@ -86,7 +86,7 @@ tableOfContentsBy selector = fromMaybe [] . cata (\ r -> case r of
    where patchEntry = patch (Deleted,) (Inserted,) (const (Replaced,))
 
 
-data DedupeKey = DedupeKey {-# UNPACK #-} !T.Text {-# UNPACK #-} !T.Text
+data DedupeKey = DedupeKey !DeclarationKind {-# UNPACK #-} !T.Text
   deriving (Eq, Ord)
 
 data Dedupe = Dedupe
@@ -110,7 +110,7 @@ dedupe = map ((change :: Dedupe -> Change) &&& decl) . sortOn index . Map.elems 
       | otherwise       -> Map.insert key d { change = Replaced, decl = similar } m
     _                   -> Map.insert key d m
 
-  dedupeKey (Declaration kind ident _ _ _) = DedupeKey (formatKind kind) (T.toLower ident)
+  dedupeKey (Declaration kind ident _ _ _) = DedupeKey kind (T.toLower ident)
 
 -- | Construct a 'TOCSummary' from a node annotation and a change type label.
 recordSummary :: Change -> Declaration -> TOCSummary
