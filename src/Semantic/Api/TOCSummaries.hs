@@ -25,7 +25,7 @@ diffSummaryBuilder format blobs = diffSummary blobs >>= serialize format
 legacyDiffSummary :: DiffEffects sig m => [BlobPair] -> m Summaries
 legacyDiffSummary = distributeFoldMap go
   where
-    go blobPair = decoratingDiffWith summarizeDiffParsers decorateTerm (pure . uncurry Summaries . bimap toMap toMap . partitionEithers . summarizeDiff) blobPair
+    go blobPair = decoratingDiffWith summarizeDiffParsers decorateTerm (pure . uncurry (flip Summaries) . bimap toMap toMap . partitionEithers . summarizeDiff) blobPair
       `catchError` \(SomeException e) ->
         pure $ Summaries mempty (Map.singleton path [toJSON (ErrorSummary (T.pack (show e)) lowerBound lang)])
       where path = T.pack $ pathKeyForBlobPair blobPair
