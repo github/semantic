@@ -1,4 +1,4 @@
-{-# LANGUAGE RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.TOCSummary
 ( Declaration(..)
 , Kind(..)
@@ -75,21 +75,21 @@ class HasDeclaration syntax where
 --
 --   Note that since 'DeclarationStrategy' has a fallback case for its final entry, this instance will hold for all types of kind @* -> *@. Thus, this must be the only instance of 'HasDeclaration', as any other instance would be indistinguishable.
 instance (DeclarationStrategy syntax ~ strategy, HasDeclarationBy strategy syntax) => HasDeclaration syntax where
-  toDeclaration = toDeclarationBy (Proxy :: Proxy strategy)
+  toDeclaration = toDeclarationBy @strategy
 
 
 -- | Produce a 'Declaration' for a syntax node using either the 'Default' or 'Custom' strategy.
 class HasDeclarationBy (strategy :: Strategy) syntax where
-  toDeclarationBy :: Foldable whole => proxy strategy -> Blob -> Loc -> syntax (Term whole Loc, Maybe Declaration) -> Maybe Declaration
+  toDeclarationBy :: Foldable whole => Blob -> Loc -> syntax (Term whole Loc, Maybe Declaration) -> Maybe Declaration
 
 -- | The 'Default' strategy produces 'Nothing'.
 instance HasDeclarationBy 'Default syntax where
-  toDeclarationBy _ _ _ _ = Nothing
+  toDeclarationBy _ _ _ = Nothing
 
 
 -- | Produce a 'Heading' from the first line of the heading of a 'Markdown.Heading' node.
 instance HasDeclarationBy 'Custom Markdown.Heading where
-  toDeclarationBy _ blob@Blob{..} ann (Markdown.Heading level terms _)
+  toDeclarationBy blob@Blob{..} ann (Markdown.Heading level terms _)
     = Just $ Declaration (Heading level) (headingText terms) mempty (Loc.span ann) (blobLanguage blob)
     where headingText terms = getSource $ maybe (byteRange ann) sconcat (nonEmpty (headingByteRange <$> toList terms))
           headingByteRange (Term (In ann _), _) = byteRange ann
@@ -98,13 +98,13 @@ instance HasDeclarationBy 'Custom Markdown.Heading where
 
 -- | Produce an 'Error' for 'Syntax.Error' nodes.
 instance HasDeclarationBy 'Custom Syntax.Error where
-  toDeclarationBy _ blob@Blob{..} ann err@Syntax.Error{}
+  toDeclarationBy blob@Blob{..} ann err@Syntax.Error{}
     = Just $ Declaration Error (T.pack (formatTOCError (Syntax.unError (Loc.span ann) err))) mempty (Loc.span ann) (blobLanguage blob)
     where formatTOCError e = Error.showExpectation (flag Error.Colourize False) (Error.errorExpected e) (Error.errorActual e) ""
 
 -- | Produce a 'Function' for 'Declaration.Function' nodes so long as their identifier is non-empty (defined as having a non-empty 'Range').
 instance HasDeclarationBy 'Custom Declaration.Function where
-  toDeclarationBy _ blob@Blob{..} ann decl@(Declaration.Function _ (Term (In identifierAnn _), _) _ _)
+  toDeclarationBy blob@Blob{..} ann decl@(Declaration.Function _ (Term (In identifierAnn _), _) _ _)
     -- Do not summarize anonymous functions
     | isEmpty identifierAnn = Nothing
     -- Named functions
@@ -114,7 +114,7 @@ instance HasDeclarationBy 'Custom Declaration.Function where
 
 -- | Produce a 'Method' for 'Declaration.Method' nodes. If the method’s receiver is non-empty (defined as having a non-empty 'Range'), the 'identifier' will be formatted as 'receiver.method_name'; otherwise it will be simply 'method_name'.
 instance HasDeclarationBy 'Custom Declaration.Method where
-  toDeclarationBy _ blob@Blob{..} ann decl@(Declaration.Method _ (Term (In receiverAnn receiverF), _) (Term (In identifierAnn _), _) _ _ _)
+  toDeclarationBy blob@Blob{..} ann decl@(Declaration.Method _ (Term (In receiverAnn receiverF), _) (Term (In identifierAnn _), _) _ _ _)
     -- Methods without a receiver
     | isEmpty receiverAnn = Just $ Declaration (Method Nothing) (getSource blobSource identifierAnn) methodSource (Loc.span ann) (blobLanguage blob)
     -- Methods with a receiver type and an identifier (e.g. (a *Type) in Go).
@@ -147,7 +147,7 @@ getSource blobSource = toText . Source.slice blobSource . byteRange
 
 -- | Produce a 'Declaration' for 'Sum's using the 'HasDeclaration' instance & therefore using a @'HasDeclarationBy' ''Custom'@ instance when one exists & the type is listed in 'DeclarationStrategy'.
 instance Apply HasDeclaration fs => HasDeclarationBy 'Custom (Sum fs) where
-  toDeclarationBy _ blob ann = apply @HasDeclaration (toDeclaration blob ann)
+  toDeclarationBy blob ann = apply @HasDeclaration (toDeclaration blob ann)
 
 
 -- | A strategy for defining a 'HasDeclaration' instance. Intended to be promoted to the kind level using @-XDataKinds@.
