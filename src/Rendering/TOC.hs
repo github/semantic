@@ -33,16 +33,16 @@ instance ToJSON Summaries where
 
 data TOCSummary
   = TOCSummary
-    { summaryCategoryName :: T.Text
-    , summaryTermName     :: T.Text
-    , summarySpan         :: Span
-    , summaryChangeType   :: T.Text
+    { kind       :: T.Text
+    , ident      :: T.Text
+    , span       :: Span
+    , changeType :: T.Text
     }
   | ErrorSummary { errorText :: T.Text, errorSpan :: Span, errorLanguage :: Language }
   deriving stock (Eq, Show)
 
 instance ToJSON TOCSummary where
-  toJSON TOCSummary{..} = object [ "changeType" .= summaryChangeType, "category" .= summaryCategoryName, "term" .= summaryTermName, "span" .= summarySpan ]
+  toJSON TOCSummary{..} = object [ "changeType" .= changeType, "category" .= kind, "term" .= ident, "span" .= span ]
   toJSON ErrorSummary{..} = object [ "error" .= errorText, "span" .= errorSpan, "language" .= errorLanguage ]
 
 isValidSummary :: TOCSummary -> Bool
