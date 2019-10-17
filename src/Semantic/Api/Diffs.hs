@@ -174,33 +174,11 @@ summarizeDiffParsers = aLaCarteParsers
 
 class DiffTerms term => SummarizeDiff term where
   decorateTerm :: Blob -> term Loc -> term (Maybe Declaration)
-  summarizeDiff :: BlobPair -> DiffFor term (Maybe Declaration) (Maybe Declaration) -> TOCSummaryFile
+  summarizeDiff :: DiffFor term (Maybe Declaration) (Maybe Declaration) -> [TOCSummary]
 
 instance (Diffable syntax, Eq1 syntax, HasDeclaration syntax, Hashable1 syntax, Traversable syntax) => SummarizeDiff (Term syntax) where
   decorateTerm = decoratorWithAlgebra . declarationAlgebra
-  summarizeDiff blobPair diff = foldr go (defMessage & P.path .~ path & P.language .~ lang) (diffTOC diff)
-    where
-      path = T.pack $ pathKeyForBlobPair blobPair
-      lang = bridging # languageForBlobPair blobPair
-
-      toChangeType = \case
-        "added" -> ADDED
-        "modified" -> MODIFIED
-        "removed" -> REMOVED
-        _ -> NONE
-
-      go :: TOCSummary -> TOCSummaryFile -> TOCSummaryFile
-      go TOCSummary{..} file = defMessage
-        & P.path .~ file^.P.path
-        & P.language .~ file^.P.language
-        & P.changes .~ (defMessage & P.category .~ summaryCategoryName & P.term .~ summaryTermName & P.maybe'span .~ (converting #? summarySpan) & P.changeType .~ toChangeType summaryChangeType) : file^.P.changes
-        & P.errors .~ file^.P.errors
-
-      go ErrorSummary{..} file = defMessage
-        & P.path .~ file^.P.path
-        & P.language .~ file^.P.language
-        & P.changes .~ file^.P.changes
-        & P.errors .~ (defMessage & P.error .~ errorText & P.maybe'span .~ converting #? errorSpan) : file^.P.errors
+  summarizeDiff = diffTOC
 
 
 -- | Parse a 'BlobPair' using one of the provided parsers, diff the resulting terms, and run an action on the abstracted diff.

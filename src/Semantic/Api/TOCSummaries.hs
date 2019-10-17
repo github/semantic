@@ -1,3 +1,4 @@
+{-# LANGUAGE LambdaCase #-}
 module Semantic.Api.TOCSummaries (diffSummary, legacyDiffSummary, diffSummaryBuilder) where
 
 import           Control.Effect.Error
@@ -37,7 +38,7 @@ diffSummary blobs = do
   pure $ defMessage & P.files .~ diff
   where
     go :: DiffEffects sig m => BlobPair -> m TOCSummaryFile
-    go blobPair = decoratingDiffWith summarizeDiffParsers decorateTerm (pure . summarizeDiff blobPair) blobPair
+    go blobPair = decoratingDiffWith summarizeDiffParsers decorateTerm (pure . foldr combine (defMessage & P.path .~ path & P.language .~ lang) . summarizeDiff) blobPair
       `catchError` \(SomeException e) ->
         pure $ defMessage
           & P.path .~ path
@@ -46,3 +47,22 @@ diffSummary blobs = do
           & P.errors .~ [defMessage & P.error .~ T.pack (show e) & P.maybe'span .~ Nothing]
       where path = T.pack $ pathKeyForBlobPair blobPair
             lang = bridging # languageForBlobPair blobPair
+
+            toChangeType = \case
+              "added" -> ADDED
+              "modified" -> MODIFIED
+              "removed" -> REMOVED
+              _ -> NONE
+
+            combine :: TOCSummary -> TOCSummaryFile -> TOCSummaryFile
+            combine TOCSummary{..} file = defMessage
+              & P.path .~ file^.P.path
+              & P.language .~ file^.P.language
+              & P.changes .~ (defMessage & P.category .~ summaryCategoryName & P.term .~ summaryTermName & P.maybe'span .~ (converting #? summarySpan) & P.changeType .~ toChangeType summaryChangeType) : file^.P.changes
+              & P.errors .~ file^.P.errors
+
+            combine ErrorSummary{..} file = defMessage
+              & P.path .~ file^.P.path
+              & P.language .~ file^.P.language
+              & P.changes .~ file^.P.changes
+              & P.errors .~ (defMessage & P.error .~ errorText & P.maybe'span .~ converting #? errorSpan) : file^.P.errors
