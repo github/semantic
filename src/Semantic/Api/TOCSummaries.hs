@@ -1,5 +1,9 @@
 {-# LANGUAGE LambdaCase #-}
-module Semantic.Api.TOCSummaries (diffSummary, legacyDiffSummary, diffSummaryBuilder) where
+module Semantic.Api.TOCSummaries
+( diffSummary
+, legacyDiffSummary
+, diffSummaryBuilder
+) where
 
 import           Analysis.TOCSummary (formatKind)
 import           Control.Effect.Error
