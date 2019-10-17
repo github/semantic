@@ -68,4 +68,4 @@ diffSummary blobs = do
               & P.path .~ file^.P.path
               & P.language .~ file^.P.language
               & P.changes .~ file^.P.changes
-              & P.errors .~ (defMessage & P.error .~ errorText & P.maybe'span .~ converting #? errorSpan) : file^.P.errors
+              & P.errors .~ (defMessage & P.error .~ message & P.maybe'span .~ converting #? span) : file^.P.errors
