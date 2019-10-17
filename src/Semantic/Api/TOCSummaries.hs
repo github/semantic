@@ -67,4 +67,4 @@ toChange TOCSummary{..} = defMessage
 toError :: ErrorSummary -> TOCSummaryError
 toError ErrorSummary{..} = defMessage
   & P.error      .~ message
-  & P.maybe'span .~ converting #? span
+  & P.maybe'span ?~ converting # span
