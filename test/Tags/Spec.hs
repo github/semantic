@@ -1,6 +1,7 @@
 module Tags.Spec (spec) where
 
 import Data.Text (Text)
+import Source.Loc
 import SpecHelpers
 import Tags.Tagging as Tags
 import qualified System.Path as Path
