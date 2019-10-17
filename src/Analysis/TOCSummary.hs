@@ -37,7 +37,7 @@ data DeclarationKind
   | FunctionDeclaration
   | HeadingDeclaration Int
   | ErrorDeclaration
-  deriving (Eq, Show)
+  deriving (Eq, Ord, Show)
 
 
 -- | An r-algebra producing 'Just' a 'Declaration' for syntax nodes corresponding to high-level declarations, or 'Nothing' otherwise.
