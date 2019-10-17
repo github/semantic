@@ -4,7 +4,6 @@ module Semantic.Api.Diffs
   , DiffOutputFormat(..)
   , diffGraph
 
-  , decoratingDiffWith
   , DiffEffects
 
   , summarizeDiffParsers
@@ -171,19 +170,6 @@ diffWith
   -> BlobPair                                                   -- ^ The blob pair to parse.
   -> m output
 diffWith parsers render blobPair = parsePairWith parsers (render <=< diffTerms blobPair . bimap snd snd) blobPair
-
--- | Parse a 'BlobPair' using one of the provided parsers, decorate the resulting terms, diff them, and run an action on the abstracted diff.
---
--- This allows us to define features using an abstract interface, and use them with diffs for any parser whose terms support that interface.
-decoratingDiffWith
-  :: forall ann c output m sig
-  .  (forall term . c term => DiffTerms term, DiffEffects sig m)
-  => Map Language (SomeParser c Loc)                            -- ^ The set of parsers to select from.
-  -> (forall term . c term => Blob -> term Loc -> term ann)     -- ^ A function to decorate the terms, replacing their annotations and thus the annotations in the resulting diff.
-  -> (forall term . c term => DiffFor term ann ann -> m output) -- ^ A function to run on the computed diff. Note that the diff is abstract (it’s the diff type corresponding to an abstract term type), but the term type is constrained by @c@, allowing you to do anything @c@ allows, and requiring that all the input parsers produce terms supporting @c@.
-  -> BlobPair                                                   -- ^ The blob pair to parse.
-  -> m output
-decoratingDiffWith parsers decorate render blobPair = parsePairWith parsers (render <=< diffTerms blobPair . bimap (uncurry decorate) (uncurry decorate)) blobPair
 
 diffTerms :: (DiffTerms term, Member Telemetry sig, Carrier sig m, MonadIO m)
   => BlobPair -> These (term ann) (term ann) -> m (DiffFor term ann ann)
