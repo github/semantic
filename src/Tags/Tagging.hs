@@ -16,7 +16,7 @@ import qualified Streaming.Prelude as Streaming
 
 import           Data.Language
 import           Data.Term
-import           Source.Loc
+import           Source.Loc as Loc
 import qualified Source.Source as Source
 import           Tags.Tag
 import           Tags.Taggable
@@ -57,11 +57,11 @@ contextualizing :: ( Member (State [ContextToken]) sig
 contextualizing source toKind = Streaming.mapMaybeM $ \case
   Enter x r -> Nothing <$ enterScope (x, r)
   Exit  x r -> Nothing <$ exitScope (x, r)
-  Iden iden span docsLiteralRange -> get @[ContextToken] >>= pure . \case
+  Iden iden loc docsLiteralRange -> get @[ContextToken] >>= pure . \case
     ((x, r):("Context", cr):_) | Just kind <- toKind x
-      -> Just $ Tag iden kind span (firstLine (slice r)) (Just (slice cr))
+      -> Just $ Tag iden kind (Loc.span loc) (firstLine (slice r)) (Just (slice cr))
     ((x, r):_) | Just kind <- toKind x
-      -> Just $ Tag iden kind span (firstLine (slice r)) (slice <$> docsLiteralRange)
+      -> Just $ Tag iden kind (Loc.span loc) (firstLine (slice r)) (slice <$> docsLiteralRange)
     _ -> Nothing
   where
     slice = stripEnd . Source.toText . Source.slice source
