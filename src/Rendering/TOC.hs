@@ -3,7 +3,7 @@ module Rendering.TOC
 ( diffTOC
 , Summaries(..)
 , TOCSummary(..)
-, isValidSummary
+, ErrorSummary(..)
 , declaration
 , Change(..)
 , tableOfContentsBy
@@ -31,22 +31,25 @@ data Summaries = Summaries { changes, errors :: Map.Map T.Text [Value] }
 instance ToJSON Summaries where
   toJSON Summaries{..} = object [ "changes" .= changes, "errors" .= errors ]
 
-data TOCSummary
-  = TOCSummary
-    { kind   :: T.Text
-    , ident  :: T.Text
-    , span   :: Span
-    , change :: Change
-    }
-  | ErrorSummary
-    { message  :: T.Text
-    , span     :: Span
-    , language :: Language
-    }
+data TOCSummary = TOCSummary
+  { kind   :: T.Text
+  , ident  :: T.Text
+  , span   :: Span
+  , change :: Change
+  }
+  deriving stock (Eq, Show)
+
+data ErrorSummary = ErrorSummary
+  { message  :: T.Text
+  , span     :: Span
+  , language :: Language
+  }
   deriving stock (Eq, Show)
 
 instance ToJSON TOCSummary where
   toJSON TOCSummary{..} = object [ "changeType" .= change, "category" .= kind, "term" .= ident, "span" .= span ]
+
+instance ToJSON ErrorSummary where
   toJSON ErrorSummary{..} = object [ "error" .= message, "span" .= span, "language" .= language ]
 
 -- | The kind of a ToC change.
@@ -64,10 +67,6 @@ instance ToJSON Change where
     Inserted -> "added"
     Replaced -> "modified"
 
-
-isValidSummary :: TOCSummary -> Bool
-isValidSummary ErrorSummary{} = False
-isValidSummary _ = True
 
 -- | Produce the annotations of nodes representing declarations.
 declaration :: TermF f (Maybe Declaration) a -> Maybe Declaration
@@ -113,10 +112,10 @@ dedupe = map ((change :: Dedupe -> Change) &&& decl) . sortOn index . Map.elems 
   dedupeKey (Declaration kind ident _ _ _) = DedupeKey kind (T.toLower ident)
 
 -- | Construct a 'TOCSummary' from a node annotation and a change type label.
-recordSummary :: Change -> Declaration -> TOCSummary
+recordSummary :: Change -> Declaration -> Either ErrorSummary TOCSummary
 recordSummary change decl@(Declaration kind text _ srcSpan language)
-  | ErrorDeclaration <- kind = ErrorSummary text srcSpan language
-  | otherwise                = TOCSummary (formatKind kind) (formatIdentifier decl) srcSpan change
+  | ErrorDeclaration <- kind = Left  $ ErrorSummary text srcSpan language
+  | otherwise                = Right $ TOCSummary (formatKind kind) (formatIdentifier decl) srcSpan change
 
 formatIdentifier :: Declaration -> Text
 formatIdentifier (Declaration kind identifier _ _ lang) = case kind of
@@ -125,7 +124,7 @@ formatIdentifier (Declaration kind identifier _ _ lang) = case kind of
     | otherwise           -> receiver <> "." <> identifier
   _                       -> identifier
 
-diffTOC :: (Foldable f, Functor f) => Diff f (Maybe Declaration) (Maybe Declaration) -> [TOCSummary]
+diffTOC :: (Foldable f, Functor f) => Diff f (Maybe Declaration) (Maybe Declaration) -> [Either ErrorSummary TOCSummary]
 diffTOC = map (uncurry recordSummary) . dedupe . tableOfContentsBy declaration
 
 -- The user-facing kind

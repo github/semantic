@@ -154,7 +154,7 @@ summarizeDiffParsers = aLaCarteParsers
 
 class DiffTerms term => SummarizeDiff term where
   decorateTerm :: Blob -> term Loc -> term (Maybe Declaration)
-  summarizeDiff :: DiffFor term (Maybe Declaration) (Maybe Declaration) -> [TOCSummary]
+  summarizeDiff :: DiffFor term (Maybe Declaration) (Maybe Declaration) -> [Either ErrorSummary TOCSummary]
 
 instance (Diffable syntax, Eq1 syntax, HasDeclaration syntax, Hashable1 syntax, Traversable syntax) => SummarizeDiff (Term syntax) where
   decorateTerm = decoratorWithAlgebra . declarationAlgebra
