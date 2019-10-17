@@ -58,7 +58,13 @@ toChangeType = \case
   Replaced -> MODIFIED
 
 toChange :: TOCSummary -> TOCSummaryChange
-toChange TOCSummary{..} = defMessage & P.category .~ formatKind kind & P.term .~ ident & P.maybe'span .~ (converting #? span) & P.changeType .~ toChangeType change
+toChange TOCSummary{..} = defMessage
+  & P.category   .~ formatKind kind
+  & P.term       .~ ident
+  & P.maybe'span .~ (converting #? span)
+  & P.changeType .~ toChangeType change
 
 toError :: ErrorSummary -> TOCSummaryError
-toError ErrorSummary{..} = defMessage & P.error .~ message & P.maybe'span .~ converting #? span
+toError ErrorSummary{..} = defMessage
+  & P.error      .~ message
+  & P.maybe'span .~ converting #? span
