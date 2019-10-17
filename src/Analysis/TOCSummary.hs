@@ -2,6 +2,7 @@
 module Analysis.TOCSummary
 ( Declaration(..)
 , DeclarationKind(..)
+, formatKind
 , HasDeclaration
 , declarationAlgebra
 ) where
@@ -38,6 +39,13 @@ data DeclarationKind
   | HeadingDeclaration Int
   | ErrorDeclaration
   deriving (Eq, Ord, Show)
+
+formatKind :: DeclarationKind -> T.Text
+formatKind kind = case kind of
+  FunctionDeclaration  -> "Function"
+  MethodDeclaration _  -> "Method"
+  HeadingDeclaration l -> "Heading " <> T.pack (show l)
+  ErrorDeclaration     -> "ParseError"
 
 
 -- | An r-algebra producing 'Just' a 'Declaration' for syntax nodes corresponding to high-level declarations, or 'Nothing' otherwise.

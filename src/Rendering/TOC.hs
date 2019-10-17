@@ -126,11 +126,3 @@ formatIdentifier (Declaration kind identifier _ _ lang) = case kind of
 
 diffTOC :: (Foldable f, Functor f) => Diff f (Maybe Declaration) (Maybe Declaration) -> [Either ErrorSummary TOCSummary]
 diffTOC = map (uncurry recordSummary) . dedupe . tableOfContentsBy declaration
-
--- The user-facing kind
-formatKind :: DeclarationKind -> T.Text
-formatKind kind = case kind of
-  FunctionDeclaration  -> "Function"
-  MethodDeclaration _  -> "Method"
-  HeadingDeclaration l -> "Heading " <> T.pack (show l)
-  ErrorDeclaration     -> "ParseError"
