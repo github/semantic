@@ -52,10 +52,10 @@ diffSummary blobs = do
             lang = bridging # languageForBlobPair blobPair
 
             toChangeType = \case
-              "added" -> ADDED
-              "modified" -> MODIFIED
-              "removed" -> REMOVED
-              _ -> NONE
+              Changed  -> MODIFIED
+              Deleted  -> REMOVED
+              Inserted -> ADDED
+              Replaced -> MODIFIED
 
             combine :: TOCSummary -> TOCSummaryFile -> TOCSummaryFile
             combine TOCSummary{..} file = defMessage

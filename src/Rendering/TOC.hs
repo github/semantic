@@ -36,7 +36,7 @@ data TOCSummary
     { kind   :: T.Text
     , ident  :: T.Text
     , span   :: Span
-    , change :: T.Text
+    , change :: Change
     }
   | ErrorSummary
     { message  :: T.Text
@@ -56,6 +56,13 @@ data Change
   | Deleted  -- ^ An entry for a change occurring inside a 'Delete' 'Patch'.
   | Replaced -- ^ An entry for a change occurring on the insertion side of a 'Replace' 'Patch'.
   deriving (Eq, Show)
+
+instance ToJSON Change where
+  toJSON change = case change of
+    Changed  -> "modified"
+    Deleted  -> "removed"
+    Inserted -> "added"
+    Replaced -> "modified"
 
 
 isValidSummary :: TOCSummary -> Bool
@@ -105,19 +112,11 @@ dedupe = map ((change :: Dedupe -> Change) &&& decl) . sortOn index . Map.elems 
 
   dedupeKey (Declaration kind ident _ _ _) = DedupeKey (formatKind kind) (T.toLower ident)
 
--- | Construct a description of an 'Change'.
-formatChange :: Change -> Text
-formatChange change = case change of
-  Changed  -> "modified"
-  Deleted  -> "removed"
-  Inserted -> "added"
-  Replaced -> "modified"
-
 -- | Construct a 'TOCSummary' from a node annotation and a change type label.
 recordSummary :: Change -> Declaration -> TOCSummary
 recordSummary change decl@(Declaration kind text _ srcSpan language)
   | ErrorDeclaration <- kind = ErrorSummary text srcSpan language
-  | otherwise                = TOCSummary (formatKind kind) (formatIdentifier decl) srcSpan (formatChange change)
+  | otherwise                = TOCSummary (formatKind kind) (formatIdentifier decl) srcSpan change
 
 formatIdentifier :: Declaration -> Text
 formatIdentifier (Declaration kind identifier _ _ lang) = case kind of
