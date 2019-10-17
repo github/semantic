@@ -25,7 +25,6 @@ diffSummaryBuilder format blobs = diffSummary blobs >>= serialize format
 legacyDiffSummary :: DiffEffects sig m => [BlobPair] -> m Summaries
 legacyDiffSummary = distributeFoldMap go
   where
-    go :: DiffEffects sig m => BlobPair -> m Summaries
     go blobPair = decoratingDiffWith summarizeDiffParsers decorateTerm (pure . uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . summarizeDiff) blobPair
       `catchError` \(SomeException e) ->
         pure $ Summaries mempty (Map.singleton path [toJSON (ErrorSummary (T.pack (show e)) lowerBound lang)])
@@ -42,7 +41,6 @@ diffSummary blobs = do
   diff <- distributeFor blobs go
   pure $ defMessage & P.files .~ diff
   where
-    go :: DiffEffects sig m => BlobPair -> m TOCSummaryFile
     go blobPair = decoratingDiffWith summarizeDiffParsers decorateTerm (pure . foldr combine (defMessage & P.path .~ path & P.language .~ lang) . summarizeDiff) blobPair
       `catchError` \(SomeException e) ->
         pure $ defMessage
