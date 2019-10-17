@@ -27,7 +27,7 @@ legacyDiffSummary = distributeFoldMap go
   where
     go blobPair = decoratingDiffWith summarizeDiffParsers decorateTerm (pure . uncurry (flip Summaries) . bimap toMap toMap . partitionEithers . summarizeDiff) blobPair
       `catchError` \(SomeException e) ->
-        pure $ Summaries mempty (Map.singleton path [toJSON (ErrorSummary (T.pack (show e)) lowerBound lang)])
+        pure $ Summaries mempty (toMap [ErrorSummary (T.pack (show e)) lowerBound lang])
       where path = T.pack $ pathKeyForBlobPair blobPair
             lang = languageForBlobPair blobPair
 
