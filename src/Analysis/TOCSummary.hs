@@ -74,8 +74,8 @@ class HasDeclaration syntax where
 --   This instance determines whether or not there is an instance for @syntax@ by looking it up in the 'DeclarationStrategy' type family. Thus producing a 'Declaration' for a node requires both defining a 'CustomHasDeclaration' instance _and_ adding a definition for the type to the 'DeclarationStrategy' type family to return 'Custom'.
 --
 --   Note that since 'DeclarationStrategy' has a fallback case for its final entry, this instance will hold for all types of kind @* -> *@. Thus, this must be the only instance of 'HasDeclaration', as any other instance would be indistinguishable.
-instance (DeclarationStrategy syntax ~ strategy, HasDeclarationWithStrategy strategy syntax) => HasDeclaration syntax where
-  toDeclaration = toDeclarationWithStrategy (Proxy :: Proxy strategy)
+instance (DeclarationStrategy syntax ~ strategy, HasDeclarationBy strategy syntax) => HasDeclaration syntax where
+  toDeclaration = toDeclarationBy (Proxy :: Proxy strategy)
 
 
 -- | Types for which we can produce a customized 'Declaration'. This returns in 'Maybe' so that some values can be opted out (e.g. anonymous functions).
@@ -153,8 +153,8 @@ data Strategy = Default | Custom
 -- | Produce a 'Declaration' for a syntax node using either the 'Default' or 'Custom' strategy.
 --
 --   You should probably be using 'CustomHasDeclaration' instead of this class; and you should not define new instances of this class.
-class HasDeclarationWithStrategy (strategy :: Strategy) syntax where
-  toDeclarationWithStrategy :: Foldable whole => proxy strategy -> Blob -> Loc -> syntax (Term whole Loc, Maybe Declaration) -> Maybe Declaration
+class HasDeclarationBy (strategy :: Strategy) syntax where
+  toDeclarationBy :: Foldable whole => proxy strategy -> Blob -> Loc -> syntax (Term whole Loc, Maybe Declaration) -> Maybe Declaration
 
 
 -- | A predicate on syntax types selecting either the 'Custom' or 'Default' strategy.
@@ -172,9 +172,9 @@ type family DeclarationStrategy syntax where
 
 
 -- | The 'Default' strategy produces 'Nothing'.
-instance HasDeclarationWithStrategy 'Default syntax where
-  toDeclarationWithStrategy _ _ _ _ = Nothing
+instance HasDeclarationBy 'Default syntax where
+  toDeclarationBy _ _ _ _ = Nothing
 
 -- | The 'Custom' strategy delegates the selection of the strategy to the 'CustomHasDeclaration' instance for the type.
-instance CustomHasDeclaration syntax => HasDeclarationWithStrategy 'Custom syntax where
-  toDeclarationWithStrategy _ = customToDeclaration
+instance CustomHasDeclaration syntax => HasDeclarationBy 'Custom syntax where
+  toDeclarationBy _ = customToDeclaration
