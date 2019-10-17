@@ -107,7 +107,7 @@ dedupe = map (entry &&& decl) . sortOn index . Map.elems . foldl' go Map.empty .
 
 -- | Construct a description of an 'Change'.
 formatChange :: Change -> Text
-formatChange entry = case entry of
+formatChange change = case change of
   Changed  -> "modified"
   Deleted  -> "removed"
   Inserted -> "added"
@@ -115,9 +115,9 @@ formatChange entry = case entry of
 
 -- | Construct a 'TOCSummary' from a node annotation and a change type label.
 recordSummary :: Change -> Declaration -> TOCSummary
-recordSummary entry decl@(Declaration kind text _ srcSpan language)
+recordSummary change decl@(Declaration kind text _ srcSpan language)
   | ErrorDeclaration <- kind = ErrorSummary text srcSpan language
-  | otherwise                = TOCSummary (formatKind kind) (formatIdentifier decl) srcSpan (formatChange entry)
+  | otherwise                = TOCSummary (formatKind kind) (formatIdentifier decl) srcSpan (formatChange change)
 
 formatIdentifier :: Declaration -> Text
 formatIdentifier (Declaration kind identifier _ _ lang) = case kind of
