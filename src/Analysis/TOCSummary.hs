@@ -62,27 +62,20 @@ declarationAlgebra :: (Foldable syntax, HasDeclaration syntax)
                    => Blob -> RAlgebra (TermF syntax Loc) (Term syntax Loc) (Maybe Declaration)
 declarationAlgebra blob (In ann syntax) = toDeclaration blob ann syntax
 
--- | Types for which we can produce a 'Declaration' in 'Maybe'. There is exactly one instance of this typeclass
-class HasDeclaration syntax where
-  toDeclaration :: Foldable syntax => Blob -> Loc -> syntax (Term syntax Loc, Maybe Declaration) -> Maybe Declaration
-
-instance HasDeclaration' syntax => HasDeclaration syntax where
-  toDeclaration = toDeclaration'
-
 -- | Types for which we can produce a 'Declaration' in 'Maybe'. There is exactly one instance of this typeclass; adding customized 'Declaration's for a new type is done by defining an instance of 'CustomHasDeclaration' instead.
 --
 --   This typeclass employs the Advanced Overlap techniques designed by Oleg Kiselyov & Simon Peyton Jones: https://wiki.haskell.org/GHC/AdvancedOverlap.
-class HasDeclaration' syntax where
+class HasDeclaration syntax where
   -- | Compute a 'Declaration' for a syntax type using its 'CustomHasDeclaration' instance, if any, or else falling back to the default definition (which simply returns 'Nothing').
-  toDeclaration' :: Foldable whole => Blob -> Loc -> syntax (Term whole Loc, Maybe Declaration) -> Maybe Declaration
+  toDeclaration :: Foldable whole => Blob -> Loc -> syntax (Term whole Loc, Maybe Declaration) -> Maybe Declaration
 
 -- | Define 'toDeclaration' using the 'CustomHasDeclaration' instance for a type if there is one or else use the default definition.
 --
 --   This instance determines whether or not there is an instance for @syntax@ by looking it up in the 'DeclarationStrategy' type family. Thus producing a 'Declaration' for a node requires both defining a 'CustomHasDeclaration' instance _and_ adding a definition for the type to the 'DeclarationStrategy' type family to return 'Custom'.
 --
 --   Note that since 'DeclarationStrategy' has a fallback case for its final entry, this instance will hold for all types of kind @* -> *@. Thus, this must be the only instance of 'HasDeclaration', as any other instance would be indistinguishable.
-instance (DeclarationStrategy syntax ~ strategy, HasDeclarationWithStrategy strategy syntax) => HasDeclaration' syntax where
-  toDeclaration' = toDeclarationWithStrategy (Proxy :: Proxy strategy)
+instance (DeclarationStrategy syntax ~ strategy, HasDeclarationWithStrategy strategy syntax) => HasDeclaration syntax where
+  toDeclaration = toDeclarationWithStrategy (Proxy :: Proxy strategy)
 
 
 -- | Types for which we can produce a customized 'Declaration'. This returns in 'Maybe' so that some values can be opted out (e.g. anonymous functions).
@@ -150,8 +143,8 @@ getSource :: Source -> Loc -> Text
 getSource blobSource = toText . Source.slice blobSource . byteRange
 
 -- | Produce a 'Declaration' for 'Sum's using the 'HasDeclaration' instance & therefore using a 'CustomHasDeclaration' instance when one exists & the type is listed in 'DeclarationStrategy'.
-instance Apply HasDeclaration' fs => CustomHasDeclaration (Sum fs) where
-  customToDeclaration blob ann = apply @HasDeclaration' (toDeclaration' blob ann)
+instance Apply HasDeclaration fs => CustomHasDeclaration (Sum fs) where
+  customToDeclaration blob ann = apply @HasDeclaration (toDeclaration blob ann)
 
 
 -- | A strategy for defining a 'HasDeclaration' instance. Intended to be promoted to the kind level using @-XDataKinds@.
