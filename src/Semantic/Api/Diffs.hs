@@ -6,13 +6,10 @@ module Semantic.Api.Diffs
 
   , DiffEffects
 
-  , summarizeDiffParsers
-  , SummarizeDiff(..)
+  , diffTerms
   ) where
 
 import           Analysis.ConstructorName (ConstructorName)
-import           Analysis.Decorator (decoratorWithAlgebra)
-import           Analysis.TOCSummary (Declaration, HasDeclaration, declarationAlgebra)
 import           Control.Effect.Error
 import           Control.Effect.Parse
 import           Control.Effect.Reader
@@ -37,7 +34,6 @@ import           Proto.Semantic_JSON()
 import           Rendering.Graph
 import           Rendering.JSON hiding (JSON)
 import qualified Rendering.JSON
-import           Rendering.TOC
 import           Semantic.Api.Bridge
 import           Semantic.Config
 import           Semantic.Task as Task
@@ -146,18 +142,6 @@ class DiffTerms term => ShowDiff term where
 
 instance (Diffable syntax, Eq1 syntax, Hashable1 syntax, Show1 syntax, Traversable syntax) => ShowDiff (Term syntax) where
   showDiff = serialize Show
-
-
-summarizeDiffParsers :: Map Language (SomeParser SummarizeDiff Loc)
-summarizeDiffParsers = aLaCarteParsers
-
-class SummarizeDiff term where
-  summarizeTerms :: (Member Telemetry sig, Carrier sig m, MonadIO m) => These (Blob, term Loc) (Blob, term Loc) -> m [Either ErrorSummary TOCSummary]
-
-instance (Diffable syntax, Eq1 syntax, HasDeclaration syntax, Hashable1 syntax, Traversable syntax) => SummarizeDiff (Term syntax) where
-  summarizeTerms = fmap diffTOC . diffTerms . bimap decorateTerm decorateTerm where
-    decorateTerm :: (Foldable syntax, Functor syntax, HasDeclaration syntax) => (Blob, Term syntax Loc) -> (Blob, Term syntax (Maybe Declaration))
-    decorateTerm (blob, term) = (blob, decoratorWithAlgebra (declarationAlgebra blob) term)
 
 
 -- | Parse a 'BlobPair' using one of the provided parsers, diff the resulting terms, and run an action on the abstracted diff.
