@@ -164,7 +164,7 @@ numTocSummaries diff = length $ filter isRight (diffTOC diff)
 programWithChange :: Term' -> Diff'
 programWithChange body = merge (Nothing, Nothing) (inject [ function' ])
   where
-    function' = merge (Just (Declaration Function "foo" mempty lowerBound Ruby), Just (Declaration Function "foo" mempty lowerBound Ruby)) (inject (Declaration.Function [] name' [] (merge (Nothing, Nothing) (inject [ inserting body ]))))
+    function' = merge (Just (Declaration Function "foo" lowerBound Ruby), Just (Declaration Function "foo" lowerBound Ruby)) (inject (Declaration.Function [] name' [] (merge (Nothing, Nothing) (inject [ inserting body ]))))
     name' = merge (Nothing, Nothing) (inject (Syntax.Identifier (name "foo")))
 
 -- Return a diff where term is inserted in the program, below a function found on Both sides of the diff.
@@ -188,7 +188,7 @@ programOf :: Diff' -> Diff'
 programOf diff = merge (Nothing, Nothing) (inject [ diff ])
 
 functionOf :: Text -> Term' -> Term'
-functionOf n body = termIn (Just (Declaration Function n mempty lowerBound Unknown)) (inject (Declaration.Function [] name' [] (termIn Nothing (inject [body]))))
+functionOf n body = termIn (Just (Declaration Function n lowerBound Unknown)) (inject (Declaration.Function [] name' [] (termIn Nothing (inject [body]))))
   where
     name' = termIn Nothing (inject (Syntax.Identifier (name n)))
 

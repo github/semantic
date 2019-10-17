@@ -109,11 +109,11 @@ dedupe = map ((change :: Dedupe -> Change) &&& decl) . sortOn index . Map.elems 
       | otherwise       -> Map.insert key d { change = Replaced, decl = similar } m
     _                   -> Map.insert key d m
 
-  dedupeKey (Declaration kind ident _ _ _) = DedupeKey kind (T.toLower ident)
+  dedupeKey (Declaration kind ident _ _) = DedupeKey kind (T.toLower ident)
 
 -- | Construct a 'TOCSummary' or 'ErrorSummary' from a 'Change' and 'Declaration'.
 summarizeChange :: Change -> Declaration -> Either ErrorSummary TOCSummary
-summarizeChange change decl@(Declaration kind text _ srcSpan language)
+summarizeChange change decl@(Declaration kind text srcSpan language)
   | Error <- kind = Left  $ ErrorSummary text srcSpan language
   | otherwise     = Right $ TOCSummary kind (formatIdentifier decl) srcSpan change
 

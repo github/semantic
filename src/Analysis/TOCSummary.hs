@@ -10,8 +10,6 @@ module Analysis.TOCSummary
 
 import Prologue hiding (project)
 
-import           Control.Arrow
-import           Control.Rewriting
 import           Data.Blob
 import qualified Data.Error as Error
 import           Data.Flag
@@ -29,14 +27,13 @@ import           Source.Source as Source
 data Declaration = Declaration
   { kind       :: Kind
   , identifier :: Text
-  , text       :: Text
   , span       :: Span
   , language   :: Language
   }
   deriving (Eq, Show)
 
 formatIdentifier :: Declaration -> Text
-formatIdentifier (Declaration kind identifier _ _ lang) = case kind of
+formatIdentifier (Declaration kind identifier _ lang) = case kind of
   Method (Just receiver)
     | Language.Go <- lang -> "(" <> receiver <> ") " <> identifier
     | otherwise           -> receiver <> "." <> identifier
@@ -99,7 +96,7 @@ instance HasDeclarationBy 'Default syntax where
 -- | Produce a 'Heading' from the first line of the heading of a 'Markdown.Heading' node.
 instance HasDeclarationBy 'Custom Markdown.Heading where
   toDeclarationBy blob@Blob{..} ann (Markdown.Heading level terms _)
-    = Just $ Declaration (Heading level) (headingText terms) mempty (Loc.span ann) (blobLanguage blob)
+    = Just $ Declaration (Heading level) (headingText terms) (Loc.span ann) (blobLanguage blob)
     where headingText terms = getSource $ maybe (byteRange ann) sconcat (nonEmpty (headingByteRange <$> toList terms))
           headingByteRange (Term (In ann _), _) = byteRange ann
           getSource = firstLine . toText . Source.slice blobSource
@@ -108,48 +105,30 @@ instance HasDeclarationBy 'Custom Markdown.Heading where
 -- | Produce an 'Error' for 'Syntax.Error' nodes.
 instance HasDeclarationBy 'Custom Syntax.Error where
   toDeclarationBy blob@Blob{..} ann err@Syntax.Error{}
-    = Just $ Declaration Error (T.pack (formatTOCError (Syntax.unError (Loc.span ann) err))) mempty (Loc.span ann) (blobLanguage blob)
+    = Just $ Declaration Error (T.pack (formatTOCError (Syntax.unError (Loc.span ann) err))) (Loc.span ann) (blobLanguage blob)
     where formatTOCError e = Error.showExpectation (flag Error.Colourize False) (Error.errorExpected e) (Error.errorActual e) ""
 
 -- | Produce a 'Function' for 'Declaration.Function' nodes so long as their identifier is non-empty (defined as having a non-empty 'Range').
 instance HasDeclarationBy 'Custom Declaration.Function where
-  toDeclarationBy blob@Blob{..} ann decl@(Declaration.Function _ (Term (In identifierAnn _), _) _ _)
+  toDeclarationBy blob@Blob{..} ann (Declaration.Function _ (Term (In identifierAnn _), _) _ _)
     -- Do not summarize anonymous functions
     | isEmpty identifierAnn = Nothing
     -- Named functions
-    | otherwise             = Just $ Declaration Function (getSource blobSource identifierAnn) functionSource (Loc.span ann) (blobLanguage blob)
+    | otherwise             = Just $ Declaration Function (getSource blobSource identifierAnn) (Loc.span ann) (blobLanguage blob)
     where isEmpty = (== 0) . rangeLength . byteRange
-          functionSource = getIdentifier (arr Declaration.functionBody) blob (In ann decl)
 
 -- | Produce a 'Method' for 'Declaration.Method' nodes. If the method’s receiver is non-empty (defined as having a non-empty 'Range'), the 'identifier' will be formatted as 'receiver.method_name'; otherwise it will be simply 'method_name'.
 instance HasDeclarationBy 'Custom Declaration.Method where
-  toDeclarationBy blob@Blob{..} ann decl@(Declaration.Method _ (Term (In receiverAnn receiverF), _) (Term (In identifierAnn _), _) _ _ _)
+  toDeclarationBy blob@Blob{..} ann (Declaration.Method _ (Term (In receiverAnn receiverF), _) (Term (In identifierAnn _), _) _ _ _)
     -- Methods without a receiver
-    | isEmpty receiverAnn = Just $ Declaration (Method Nothing) (getSource blobSource identifierAnn) methodSource (Loc.span ann) (blobLanguage blob)
+    | isEmpty receiverAnn = Just $ Declaration (Method Nothing) (getSource blobSource identifierAnn) (Loc.span ann) (blobLanguage blob)
     -- Methods with a receiver type and an identifier (e.g. (a *Type) in Go).
     | blobLanguage blob == Go
-    , [ _, Term (In receiverType _) ] <- toList receiverF = Just $ Declaration (Method (Just (getSource blobSource receiverType))) (getSource blobSource identifierAnn) methodSource (Loc.span ann) (blobLanguage blob)
+    , [ _, Term (In receiverType _) ] <- toList receiverF = Just $ Declaration (Method (Just (getSource blobSource receiverType))) (getSource blobSource identifierAnn) (Loc.span ann) (blobLanguage blob)
     -- Methods with a receiver (class methods) are formatted like `receiver.method_name`
-    | otherwise           = Just $ Declaration (Method (Just (getSource blobSource receiverAnn))) (getSource blobSource identifierAnn) methodSource (Loc.span ann) (blobLanguage blob)
+    | otherwise           = Just $ Declaration (Method (Just (getSource blobSource receiverAnn))) (getSource blobSource identifierAnn) (Loc.span ann) (blobLanguage blob)
     where
       isEmpty = (== 0) . rangeLength . byteRange
-      methodSource = getIdentifier (arr Declaration.methodBody) blob (In ann decl)
-
--- When encountering a Declaration-annotated term, we need to extract a Text
--- for the resulting Declaration's 'identifier' field. This text
--- is constructed by slicing out text from the original blob corresponding
--- to a location, which is found via the passed-in rule.
-getIdentifier :: Functor m
-           => Rewrite (m (Term syntax Loc)) (Term syntax Loc)
-           -> Blob
-           -> TermF m Loc (Term syntax Loc, a)
-           -> Text
-getIdentifier finder Blob{..} (In a r)
-  = let declRange = byteRange a
-        bodyRange = byteRange <$> rewrite (fmap fst r) (finder >>^ annotation)
-        -- Text-based gyrations to slice the identifier out of the provided blob source
-        sliceFrom = T.stripEnd . toText . Source.slice blobSource . subtractRange declRange
-    in maybe mempty sliceFrom bodyRange
 
 getSource :: Source -> Loc -> Text
 getSource blobSource = toText . Source.slice blobSource . byteRange
