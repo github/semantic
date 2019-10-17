@@ -61,7 +61,7 @@ toChange :: TOCSummary -> TOCSummaryChange
 toChange TOCSummary{..} = defMessage
   & P.category   .~ formatKind kind
   & P.term       .~ ident
-  & P.maybe'span .~ (converting #? span)
+  & P.maybe'span ?~ converting # span
   & P.changeType .~ toChangeType change
 
 toError :: ErrorSummary -> TOCSummaryError
