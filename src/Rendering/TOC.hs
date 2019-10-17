@@ -38,7 +38,11 @@ data TOCSummary
     , span       :: Span
     , changeType :: T.Text
     }
-  | ErrorSummary { errorText :: T.Text, errorSpan :: Span, errorLanguage :: Language }
+  | ErrorSummary
+    { errorText :: T.Text
+    , errorSpan :: Span
+    , errorLanguage :: Language
+    }
   deriving stock (Eq, Show)
 
 instance ToJSON TOCSummary where
