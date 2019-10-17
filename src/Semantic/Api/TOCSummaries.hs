@@ -3,6 +3,8 @@ module Semantic.Api.TOCSummaries
 ( diffSummary
 , legacyDiffSummary
 , diffSummaryBuilder
+, SummarizeDiff(..)
+, summarizeDiffParsers
 ) where
 
 import           Analysis.Decorator (decoratorWithAlgebra)
