@@ -110,7 +110,7 @@ dedupe = map ((change :: Dedupe -> Change) &&& decl) . sortOn index . Map.elems 
 
   dedupeKey (Declaration kind ident _ _ _) = DedupeKey kind (T.toLower ident)
 
--- | Construct a 'TOCSummary' from a node annotation and a change type label.
+-- | Construct a 'TOCSummary' or 'ErrorSummary' from a 'Change' and 'Declaration'.
 recordSummary :: Change -> Declaration -> Either ErrorSummary TOCSummary
 recordSummary change decl@(Declaration kind text _ srcSpan language)
   | Error <- kind = Left  $ ErrorSummary text srcSpan language
