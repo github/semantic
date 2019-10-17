@@ -7,6 +7,7 @@ module Diffing.Algorithm.SES
 
 import Data.Array ((!))
 import qualified Data.Array as Array
+import Data.Bifunctor
 import Data.Foldable (find, toList)
 import Data.Ix
 import Data.These
@@ -17,6 +18,12 @@ data Edit a b
   | Insert b
   | Copy a b
   deriving (Eq, Functor, Ord, Show)
+
+instance Bifunctor Edit where
+  bimap f g = \case
+    Delete a -> Delete (f a)
+    Insert b -> Insert (g b)
+    Copy a b -> Copy (f a) (g b)
 
 toThese :: Edit a b -> These a b
 toThese = \case
