@@ -64,9 +64,9 @@ declarationAlgebra blob (In ann syntax) = toDeclaration blob ann syntax
 
 -- | Types for which we can produce a 'Declaration' in 'Maybe'. There is exactly one instance of this typeclass
 class HasDeclaration syntax where
-  toDeclaration :: (Foldable syntax) => Blob -> Loc -> syntax (Term syntax Loc, Maybe Declaration) -> Maybe Declaration
+  toDeclaration :: Foldable syntax => Blob -> Loc -> syntax (Term syntax Loc, Maybe Declaration) -> Maybe Declaration
 
-instance (HasDeclaration' syntax syntax) => HasDeclaration syntax where
+instance HasDeclaration' syntax syntax => HasDeclaration syntax where
   toDeclaration = toDeclaration'
 
 -- | Types for which we can produce a 'Declaration' in 'Maybe'. There is exactly one instance of this typeclass; adding customized 'Declaration's for a new type is done by defining an instance of 'CustomHasDeclaration' instead.
@@ -74,7 +74,7 @@ instance (HasDeclaration' syntax syntax) => HasDeclaration syntax where
 --   This typeclass employs the Advanced Overlap techniques designed by Oleg Kiselyov & Simon Peyton Jones: https://wiki.haskell.org/GHC/AdvancedOverlap.
 class HasDeclaration' whole syntax where
   -- | Compute a 'Declaration' for a syntax type using its 'CustomHasDeclaration' instance, if any, or else falling back to the default definition (which simply returns 'Nothing').
-  toDeclaration' :: (Foldable whole) => Blob -> Loc -> syntax (Term whole Loc, Maybe Declaration) -> Maybe Declaration
+  toDeclaration' :: Foldable whole => Blob -> Loc -> syntax (Term whole Loc, Maybe Declaration) -> Maybe Declaration
 
 -- | Define 'toDeclaration' using the 'CustomHasDeclaration' instance for a type if there is one or else use the default definition.
 --
@@ -88,7 +88,7 @@ instance (DeclarationStrategy syntax ~ strategy, HasDeclarationWithStrategy stra
 -- | Types for which we can produce a customized 'Declaration'. This returns in 'Maybe' so that some values can be opted out (e.g. anonymous functions).
 class CustomHasDeclaration whole syntax where
   -- | Produce a customized 'Declaration' for a given syntax node.
-  customToDeclaration :: (Foldable whole) => Blob -> Loc -> syntax (Term whole Loc, Maybe Declaration) -> Maybe Declaration
+  customToDeclaration :: Foldable whole => Blob -> Loc -> syntax (Term whole Loc, Maybe Declaration) -> Maybe Declaration
 
 
 -- | Produce a 'Heading' from the first line of the heading of a 'Markdown.Heading' node.
@@ -161,7 +161,7 @@ data Strategy = Default | Custom
 --
 --   You should probably be using 'CustomHasDeclaration' instead of this class; and you should not define new instances of this class.
 class HasDeclarationWithStrategy (strategy :: Strategy) whole syntax where
-  toDeclarationWithStrategy :: (Foldable whole) => proxy strategy -> Blob -> Loc -> syntax (Term whole Loc, Maybe Declaration) -> Maybe Declaration
+  toDeclarationWithStrategy :: Foldable whole => proxy strategy -> Blob -> Loc -> syntax (Term whole Loc, Maybe Declaration) -> Maybe Declaration
 
 
 -- | A predicate on syntax types selecting either the 'Custom' or 'Default' strategy.
