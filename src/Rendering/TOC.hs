@@ -49,12 +49,12 @@ instance ToJSON TOCSummary where
   toJSON TOCSummary{..} = object [ "changeType" .= change, "category" .= kind, "term" .= ident, "span" .= span ]
   toJSON ErrorSummary{..} = object [ "error" .= message, "span" .= span, "language" .= language ]
 
--- | An entry in a table of contents.
+-- | The kind of a ToC change.
 data Change
-  = Changed  -- ^ An entry for a node containing changes.
-  | Inserted -- ^ An entry for a change occurring inside an 'Insert' 'Patch'.
-  | Deleted  -- ^ An entry for a change occurring inside a 'Delete' 'Patch'.
-  | Replaced -- ^ An entry for a change occurring on the insertion side of a 'Replace' 'Patch'.
+  = Changed
+  | Inserted
+  | Deleted
+  | Replaced
   deriving (Eq, Show)
 
 instance ToJSON Change where
