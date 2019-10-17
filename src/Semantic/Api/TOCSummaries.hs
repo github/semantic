@@ -1,4 +1,4 @@
-{-# LANGUAGE LambdaCase, MonoLocalBinds #-}
+{-# LANGUAGE LambdaCase, MonoLocalBinds, TupleSections #-}
 module Semantic.Api.TOCSummaries
 ( diffSummary
 , legacyDiffSummary
@@ -6,7 +6,8 @@ module Semantic.Api.TOCSummaries
 ) where
 
 import           Analysis.Decorator (decoratorWithAlgebra)
-import           Analysis.TOCSummary (Declaration, HasDeclaration, declarationAlgebra, formatKind)
+import           Analysis.TOCSummary (Declaration(..), HasDeclaration, Kind(..), declarationAlgebra, formatKind)
+import           Control.Applicative (liftA2)
 import           Control.Effect.Error
 import           Control.Effect.Parse
 import           Control.Lens
@@ -15,17 +16,20 @@ import           Data.Aeson
 import           Data.Blob
 import           Data.ByteString.Builder
 import           Data.Either (partitionEithers)
+import           Data.Function (on)
 import           Data.Functor.Classes
 import           Data.Hashable.Lifted
 import           Data.Language (Language)
 import           Data.Map (Map)
 import qualified Data.Map.Monoidal as Map
+import           Data.Maybe (mapMaybe)
 import           Data.ProtoLens (defMessage)
 import           Data.Semilattice.Lower
 import           Data.Term (Term)
 import qualified Data.Text as T
-import           Data.These (These)
+import           Data.These (These, fromThese)
 import           Diffing.Algorithm (Diffable)
+import qualified Diffing.Algorithm.SES as SES
 import           Parsing.Parser (SomeParser, aLaCarteParsers)
 import           Proto.Semantic as P hiding (Blob, BlobPair)
 import           Proto.Semantic_Fields as P
@@ -34,7 +38,10 @@ import           Semantic.Api.Bridge
 import           Semantic.Api.Diffs
 import           Semantic.Task as Task
 import           Serializing.Format
-import           Source.Loc
+import           Source.Loc as Loc
+import           Source.Source as Source
+import qualified Tags.Tag as Tag
+import qualified Tags.Tagging.Precise as Tagging
 
 diffSummaryBuilder :: DiffEffects sig m => Format DiffTreeTOCResponse -> [BlobPair] -> m Builder
 diffSummaryBuilder format blobs = diffSummary blobs >>= serialize format
@@ -99,3 +106,30 @@ instance (Diffable syntax, Eq1 syntax, HasDeclaration syntax, Hashable1 syntax, 
   summarizeTerms = fmap diffTOC . diffTerms . bimap decorateTerm decorateTerm where
     decorateTerm :: (Foldable syntax, Functor syntax, HasDeclaration syntax) => (Blob, Term syntax Loc) -> (Blob, Term syntax (Maybe Declaration))
     decorateTerm (blob, term) = (blob, decoratorWithAlgebra (declarationAlgebra blob) term)
+
+
+newtype ViaTags t a = ViaTags (t a)
+
+instance Tagging.ToTags t => SummarizeDiff (ViaTags t) where
+  summarizeTerms terms = pure . map (uncurry summarizeChange) . dedupe . mapMaybe toChange . uncurry (SES.ses compare) . fromThese [] [] . bimap (uncurry go) (uncurry go) $ terms where
+    go blob (ViaTags t) = Tagging.tags (blobSource blob) t
+    lang = languageForBlobPair (BlobPair (bimap fst fst terms))
+    (s1, s2) = fromThese mempty mempty (bimap (blobSource . fst) (blobSource . fst) terms)
+    compare = liftA2 (&&) <$> ((==) `on` Tag.kind) <*> ((==) `on` Tag.name)
+
+    toChange = \case
+      SES.Delete tag -> (Deleted,)  <$> toDecl tag
+      SES.Insert tag -> (Inserted,) <$> toDecl tag
+      SES.Copy t1 t2
+        | Source.slice s1 (byteRange (Tag.loc t1)) /= Source.slice s2 (byteRange (Tag.loc t2))
+                     -> (Changed,) <$> toDecl t2
+        | otherwise  -> Nothing
+
+    toDecl (Tag.Tag name kind loc _ _) = do
+      kind <- toKind kind
+      pure (Declaration kind name (Loc.span loc) lang)
+
+    toKind = \case
+      Tag.Function -> Just Function
+      Tag.Method   -> Just (Method Nothing)
+      _            -> Nothing
