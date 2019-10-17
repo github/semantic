@@ -10,7 +10,7 @@ module Control.Effect.Parse
 import Control.Effect.Carrier
 import Control.Effect.Error
 import Control.Exception (SomeException)
-import Data.Bifunctor.Join
+import Data.Bitraversable
 import Data.Blob
 import Data.Language
 import qualified Data.Map as Map
@@ -56,5 +56,5 @@ parsePairWith
   -> BlobPair                                                     -- ^ The blob pair to parse.
   -> m a
 parsePairWith parsers with blobPair = case Map.lookup (languageForBlobPair blobPair) parsers of
-  Just (SomeParser parser) -> traverse (parse parser) blobPair >>= with . runJoin
+  Just (SomeParser parser) -> bitraverse (parse parser) (parse parser) (getBlobPair blobPair) >>= with
   _                        -> noLanguageForBlob (pathForBlobPair blobPair)

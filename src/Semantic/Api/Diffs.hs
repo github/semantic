@@ -184,7 +184,7 @@ decoratingDiffWith
   -> BlobPair                                                   -- ^ The blob pair to parse.
   -> m output
 decoratingDiffWith parsers decorate render blobPair = parsePairWith parsers (render <=< diffTerms blobPair . bimap (decorate blobL) (decorate blobR)) blobPair where
-  (blobL, blobR) = fromThese errorBlob errorBlob (runJoin blobPair)
+  (blobL, blobR) = fromThese errorBlob errorBlob (getBlobPair blobPair)
   errorBlob = Prelude.error "evaluating blob on absent side"
 
 diffTerms :: (DiffTerms term, Member Telemetry sig, Carrier sig m, MonadIO m)
