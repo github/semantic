@@ -105,12 +105,7 @@ parseCommand :: Mod CommandFields (Parse.ParseC Task.TaskC Builder)
 parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate parse trees for path(s)"))
   where
     parseArgumentsParser = do
-      languageModes <- Language.PerLanguageModes
-        <$> option auto (  long "python-mode"
-                        <> help "The AST representation to use for Python sources"
-                        <> metavar "ALaCarte|Precise"
-                        <> value Language.ALaCarte
-                        <> showDefault)
+      languageModes <- languageModes
       renderer
         <-  flag  (parseTermBuilder TermSExpression)
                   (parseTermBuilder TermSExpression)
@@ -178,6 +173,14 @@ graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute a g
       <*> argument str (metavar "DIR")
     makeReadProjectRecursivelyTask language rootDir excludeDirs dir = Task.readProject rootDir dir language excludeDirs
     makeGraphTask graphType includePackages serializer projectTask = projectTask >>= Graph.runGraph graphType includePackages >>= serializer
+
+languageModes :: Parser Language.PerLanguageModes
+languageModes = Language.PerLanguageModes
+  <$> option auto (  long "python-mode"
+                  <> help "The AST representation to use for Python sources"
+                  <> metavar "ALaCarte|Precise"
+                  <> value Language.ALaCarte
+                  <> showDefault)
 
 shaReader :: ReadM Git.OID
 shaReader = eitherReader parseSha
