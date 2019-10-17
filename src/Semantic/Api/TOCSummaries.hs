@@ -10,6 +10,7 @@ import           Analysis.TOCSummary (Declaration(..), HasDeclaration, Kind(..),
 import           Control.Applicative (liftA2)
 import           Control.Effect.Error
 import           Control.Effect.Parse
+import           Control.Effect.Reader
 import           Control.Lens
 import           Control.Monad.IO.Class
 import           Data.Aeson
@@ -19,7 +20,7 @@ import           Data.Either (partitionEithers)
 import           Data.Function (on)
 import           Data.Functor.Classes
 import           Data.Hashable.Lifted
-import           Data.Language (Language)
+import           Data.Language (Language, PerLanguageModes)
 import           Data.Map (Map)
 import qualified Data.Map.Monoidal as Map
 import           Data.Maybe (mapMaybe)
@@ -33,12 +34,13 @@ import qualified Diffing.Algorithm.SES as SES
 import qualified Language.Java as Java
 import qualified Language.JSON as JSON
 import qualified Language.Python as Python
-import           Parsing.Parser (SomeParser, aLaCarteParsers)
+import           Parsing.Parser (SomeParser, allParsers)
 import           Proto.Semantic as P hiding (Blob, BlobPair)
 import           Proto.Semantic_Fields as P
 import           Rendering.TOC
 import           Semantic.Api.Bridge
 import           Semantic.Api.Diffs
+import           Semantic.Config (Config)
 import           Semantic.Task as Task
 import           Serializing.Format
 import           Source.Loc as Loc
@@ -46,14 +48,14 @@ import           Source.Source as Source
 import qualified Tags.Tag as Tag
 import qualified Tags.Tagging.Precise as Tagging
 
-diffSummaryBuilder :: DiffEffects sig m => Format DiffTreeTOCResponse -> [BlobPair] -> m Builder
+diffSummaryBuilder :: (Carrier sig m, Member Distribute sig, Member (Error SomeException) sig, Member Parse sig, Member (Reader Config) sig, Member (Reader PerLanguageModes) sig, Member Telemetry sig, MonadIO m) => Format DiffTreeTOCResponse -> [BlobPair] -> m Builder
 diffSummaryBuilder format blobs = diffSummary blobs >>= serialize format
 
-legacyDiffSummary :: DiffEffects sig m => [BlobPair] -> m Summaries
+legacyDiffSummary :: (Carrier sig m, Member Distribute sig, Member (Error SomeException) sig, Member Parse sig, Member (Reader PerLanguageModes) sig, Member Telemetry sig, MonadIO m) => [BlobPair] -> m Summaries
 legacyDiffSummary = distributeFoldMap go
   where
-    go :: (Carrier sig m, Member (Error SomeException) sig, Member Parse sig, Member Telemetry sig, MonadIO m) => BlobPair -> m Summaries
-    go blobPair = parsePairWith summarizeDiffParsers (fmap (uncurry (flip Summaries) . bimap toMap toMap . partitionEithers) . summarizeTerms) blobPair
+    go :: (Carrier sig m, Member (Error SomeException) sig, Member Parse sig, Member (Reader PerLanguageModes) sig, Member Telemetry sig, MonadIO m) => BlobPair -> m Summaries
+    go blobPair = asks summarizeDiffParsers >>= \ p -> parsePairWith p (fmap (uncurry (flip Summaries) . bimap toMap toMap . partitionEithers) . summarizeTerms) blobPair
       `catchError` \(SomeException e) ->
         pure $ Summaries mempty (toMap [ErrorSummary (T.pack (show e)) lowerBound lang])
       where path = T.pack $ pathKeyForBlobPair blobPair
@@ -64,13 +66,13 @@ legacyDiffSummary = distributeFoldMap go
             toMap as = Map.singleton path (toJSON <$> as)
 
 
-diffSummary :: DiffEffects sig m => [BlobPair] -> m DiffTreeTOCResponse
+diffSummary :: (Carrier sig m, Member Distribute sig, Member (Error SomeException) sig, Member Parse sig, Member (Reader PerLanguageModes) sig, Member Telemetry sig, MonadIO m) => [BlobPair] -> m DiffTreeTOCResponse
 diffSummary blobs = do
   diff <- distributeFor blobs go
   pure $ defMessage & P.files .~ diff
   where
-    go :: (Carrier sig m, Member (Error SomeException) sig, Member Parse sig, Member Telemetry sig, MonadIO m) => BlobPair -> m TOCSummaryFile
-    go blobPair = parsePairWith summarizeDiffParsers (fmap (uncurry toFile . partitionEithers . map (bimap toError toChange)) . summarizeTerms) blobPair
+    go :: (Carrier sig m, Member (Error SomeException) sig, Member Parse sig, Member (Reader PerLanguageModes) sig, Member Telemetry sig, MonadIO m) => BlobPair -> m TOCSummaryFile
+    go blobPair = asks summarizeDiffParsers >>= \ p -> parsePairWith p (fmap (uncurry toFile . partitionEithers . map (bimap toError toChange)) . summarizeTerms) blobPair
       `catchError` \(SomeException e) ->
         pure $ toFile [defMessage & P.error .~ T.pack (show e) & P.maybe'span .~ Nothing] []
       where toFile errors changes = defMessage
@@ -99,8 +101,8 @@ toError ErrorSummary{..} = defMessage
   & P.maybe'span .~ converting #? span
 
 
-summarizeDiffParsers :: Map Language (SomeParser SummarizeDiff Loc)
-summarizeDiffParsers = aLaCarteParsers
+summarizeDiffParsers :: PerLanguageModes -> Map Language (SomeParser SummarizeDiff Loc)
+summarizeDiffParsers = allParsers
 
 class SummarizeDiff term where
   summarizeTerms :: (Member Telemetry sig, Carrier sig m, MonadIO m) => These (Blob, term Loc) (Blob, term Loc) -> m [Either ErrorSummary TOCSummary]
