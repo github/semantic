@@ -114,12 +114,12 @@ dedupe = map ((change :: Dedupe -> Change) &&& decl) . sortOn index . Map.elems 
 -- | Construct a 'TOCSummary' from a node annotation and a change type label.
 recordSummary :: Change -> Declaration -> Either ErrorSummary TOCSummary
 recordSummary change decl@(Declaration kind text _ srcSpan language)
-  | ErrorDeclaration <- kind = Left  $ ErrorSummary text srcSpan language
-  | otherwise                = Right $ TOCSummary kind (formatIdentifier decl) srcSpan change
+  | Error <- kind = Left  $ ErrorSummary text srcSpan language
+  | otherwise     = Right $ TOCSummary kind (formatIdentifier decl) srcSpan change
 
 formatIdentifier :: Declaration -> Text
 formatIdentifier (Declaration kind identifier _ _ lang) = case kind of
-  MethodDeclaration (Just receiver)
+  Method (Just receiver)
     | Language.Go <- lang -> "(" <> receiver <> ") " <> identifier
     | otherwise           -> receiver <> "." <> identifier
   _                       -> identifier

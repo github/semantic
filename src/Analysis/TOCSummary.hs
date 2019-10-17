@@ -34,18 +34,18 @@ data Declaration = Declaration
   deriving (Eq, Show)
 
 data DeclarationKind
-  = MethodDeclaration (Maybe Text)
-  | FunctionDeclaration
-  | HeadingDeclaration Int
-  | ErrorDeclaration
+  = Method (Maybe Text)
+  | Function
+  | Heading Int
+  | Error
   deriving (Eq, Ord, Show)
 
 formatKind :: DeclarationKind -> T.Text
 formatKind kind = case kind of
-  FunctionDeclaration  -> "Function"
-  MethodDeclaration _  -> "Method"
-  HeadingDeclaration l -> "Heading " <> T.pack (show l)
-  ErrorDeclaration     -> "ParseError"
+  Function  -> "Function"
+  Method _  -> "Method"
+  Heading l -> "Heading " <> T.pack (show l)
+  Error     -> "ParseError"
 
 
 -- | An r-algebra producing 'Just' a 'Declaration' for syntax nodes corresponding to high-level declarations, or 'Nothing' otherwise.
@@ -91,41 +91,41 @@ class CustomHasDeclaration whole syntax where
   customToDeclaration :: (Foldable whole) => Blob -> Loc -> syntax (Term whole Loc, Maybe Declaration) -> Maybe Declaration
 
 
--- | Produce a 'HeadingDeclaration' from the first line of the heading of a 'Markdown.Heading' node.
+-- | Produce a 'Heading' from the first line of the heading of a 'Markdown.Heading' node.
 instance CustomHasDeclaration whole Markdown.Heading where
   customToDeclaration blob@Blob{..} ann (Markdown.Heading level terms _)
-    = Just $ Declaration (HeadingDeclaration level) (headingText terms) mempty (Loc.span ann) (blobLanguage blob)
+    = Just $ Declaration (Heading level) (headingText terms) mempty (Loc.span ann) (blobLanguage blob)
     where headingText terms = getSource $ maybe (byteRange ann) sconcat (nonEmpty (headingByteRange <$> toList terms))
           headingByteRange (Term (In ann _), _) = byteRange ann
           getSource = firstLine . toText . Source.slice blobSource
           firstLine = T.takeWhile (/= '\n')
 
--- | Produce an 'ErrorDeclaration' for 'Syntax.Error' nodes.
+-- | Produce an 'Error' for 'Syntax.Error' nodes.
 instance CustomHasDeclaration whole Syntax.Error where
   customToDeclaration blob@Blob{..} ann err@Syntax.Error{}
-    = Just $ Declaration ErrorDeclaration (T.pack (formatTOCError (Syntax.unError (Loc.span ann) err))) mempty (Loc.span ann) (blobLanguage blob)
+    = Just $ Declaration Error (T.pack (formatTOCError (Syntax.unError (Loc.span ann) err))) mempty (Loc.span ann) (blobLanguage blob)
     where formatTOCError e = Error.showExpectation (flag Error.Colourize False) (Error.errorExpected e) (Error.errorActual e) ""
 
--- | Produce a 'FunctionDeclaration' for 'Declaration.Function' nodes so long as their identifier is non-empty (defined as having a non-empty 'Range').
+-- | Produce a 'Function' for 'Declaration.Function' nodes so long as their identifier is non-empty (defined as having a non-empty 'Range').
 instance CustomHasDeclaration whole Declaration.Function where
   customToDeclaration blob@Blob{..} ann decl@(Declaration.Function _ (Term (In identifierAnn _), _) _ _)
     -- Do not summarize anonymous functions
     | isEmpty identifierAnn = Nothing
     -- Named functions
-    | otherwise             = Just $ Declaration FunctionDeclaration (getSource blobSource identifierAnn) functionSource (Loc.span ann) (blobLanguage blob)
+    | otherwise             = Just $ Declaration Function (getSource blobSource identifierAnn) functionSource (Loc.span ann) (blobLanguage blob)
     where isEmpty = (== 0) . rangeLength . byteRange
           functionSource = getIdentifier (arr Declaration.functionBody) blob (In ann decl)
 
--- | Produce a 'MethodDeclaration' for 'Declaration.Method' nodes. If the method’s receiver is non-empty (defined as having a non-empty 'Range'), the 'identifier' will be formatted as 'receiver.method_name'; otherwise it will be simply 'method_name'.
+-- | Produce a 'Method' for 'Declaration.Method' nodes. If the method’s receiver is non-empty (defined as having a non-empty 'Range'), the 'identifier' will be formatted as 'receiver.method_name'; otherwise it will be simply 'method_name'.
 instance CustomHasDeclaration whole Declaration.Method where
   customToDeclaration blob@Blob{..} ann decl@(Declaration.Method _ (Term (In receiverAnn receiverF), _) (Term (In identifierAnn _), _) _ _ _)
     -- Methods without a receiver
-    | isEmpty receiverAnn = Just $ Declaration (MethodDeclaration Nothing) (getSource blobSource identifierAnn) methodSource (Loc.span ann) (blobLanguage blob)
+    | isEmpty receiverAnn = Just $ Declaration (Method Nothing) (getSource blobSource identifierAnn) methodSource (Loc.span ann) (blobLanguage blob)
     -- Methods with a receiver type and an identifier (e.g. (a *Type) in Go).
     | blobLanguage blob == Go
-    , [ _, Term (In receiverType _) ] <- toList receiverF = Just $ Declaration (MethodDeclaration (Just (getSource blobSource receiverType))) (getSource blobSource identifierAnn) methodSource (Loc.span ann) (blobLanguage blob)
+    , [ _, Term (In receiverType _) ] <- toList receiverF = Just $ Declaration (Method (Just (getSource blobSource receiverType))) (getSource blobSource identifierAnn) methodSource (Loc.span ann) (blobLanguage blob)
     -- Methods with a receiver (class methods) are formatted like `receiver.method_name`
-    | otherwise           = Just $ Declaration (MethodDeclaration (Just (getSource blobSource receiverAnn))) (getSource blobSource identifierAnn) methodSource (Loc.span ann) (blobLanguage blob)
+    | otherwise           = Just $ Declaration (Method (Just (getSource blobSource receiverAnn))) (getSource blobSource identifierAnn) methodSource (Loc.span ann) (blobLanguage blob)
     where
       isEmpty = (== 0) . rangeLength . byteRange
       methodSource = getIdentifier (arr Declaration.methodBody) blob (In ann decl)
