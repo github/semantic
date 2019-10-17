@@ -39,8 +39,8 @@ data TOCSummary
     , changeType :: T.Text
     }
   | ErrorSummary
-    { errorText :: T.Text
-    , errorSpan :: Span
+    { errorText     :: T.Text
+    , errorSpan     :: Span
     , errorLanguage :: Language
     }
   deriving stock (Eq, Show)
