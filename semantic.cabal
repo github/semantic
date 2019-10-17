@@ -375,6 +375,7 @@ test-suite parse-examples
   build-depends:       semantic
                      , Glob
                      , foldl ^>= 1.4.5
+                     , lens ^>= 4.17
                      , resourcet ^>= 1.2
                      , streaming
                      , streaming-bytestring ^>= 0.1.6
