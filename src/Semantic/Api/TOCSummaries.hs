@@ -6,6 +6,7 @@ import           Control.Lens
 import           Data.Aeson
 import           Data.Blob
 import           Data.ByteString.Builder
+import qualified Data.List as List
 import qualified Data.Map.Monoidal as Map
 import           Data.ProtoLens (defMessage)
 import           Data.Semilattice.Lower
@@ -25,11 +26,15 @@ legacyDiffSummary :: DiffEffects sig m => [BlobPair] -> m Summaries
 legacyDiffSummary = distributeFoldMap go
   where
     go :: DiffEffects sig m => BlobPair -> m Summaries
-    go blobPair = decoratingDiffWith legacySummarizeDiffParsers legacyDecorateTerm (pure . legacySummarizeDiff blobPair) blobPair
+    go blobPair = decoratingDiffWith summarizeDiffParsers decorateTerm (pure . uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . summarizeDiff) blobPair
       `catchError` \(SomeException e) ->
         pure $ Summaries mempty (Map.singleton path [toJSON (ErrorSummary (T.pack (show e)) lowerBound lang)])
       where path = T.pack $ pathKeyForBlobPair blobPair
             lang = languageForBlobPair blobPair
+
+            toMap [] = mempty
+            toMap as = Map.singleton summaryKey (toJSON <$> as)
+            summaryKey = T.pack $ pathKeyForBlobPair blobPair
 
 
 diffSummary :: DiffEffects sig m => [BlobPair] -> m DiffTreeTOCResponse
