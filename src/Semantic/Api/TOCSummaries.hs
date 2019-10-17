@@ -3,6 +3,7 @@ module Semantic.Api.TOCSummaries
 ( diffSummary
 , legacyDiffSummary
 , diffSummaryBuilder
+, decorateTermsWith
 ) where
 
 import           Analysis.TOCSummary (formatKind)
@@ -53,6 +54,11 @@ diffSummary blobs = do
               & P.language .~ bridging # languageForBlobPair blobPair
               & P.changes  .~ changes
               & P.errors   .~ errors
+
+decorateTermsWith :: (Blob -> term a -> term b) -> BlobPair -> These (term a) (term a) -> These (term b) (term b)
+decorateTermsWith decorate blobPair = bimap (decorate blobL) (decorate blobR) where
+  (blobL, blobR) = fromThese errorBlob errorBlob (getBlobPair blobPair)
+  errorBlob = Prelude.error "evaluating blob on absent side"
 
 toChangeType :: Change -> ChangeType
 toChangeType = \case
