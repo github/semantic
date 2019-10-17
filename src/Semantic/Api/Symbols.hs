@@ -29,7 +29,7 @@ import qualified Semantic.Api.LegacyTypes as Legacy
 import           Semantic.Config
 import           Semantic.Task
 import           Serializing.Format (Format)
-import           Source.Loc
+import           Source.Loc as Loc
 import           Source.Source
 import           Tags.Taggable
 import           Tags.Tagging
@@ -59,7 +59,7 @@ legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> distributeFoldMap 
           { symbolName = name
           , symbolKind = pack (show kind)
           , symbolLine = line
-          , symbolSpan = converting #? span
+          , symbolSpan = converting #? Loc.span loc
           }
 
 parseSymbolsBuilder :: (Member Distribute sig, Member (Error SomeException) sig, Member Parse sig, Member (Reader Config) sig, Member (Reader PerLanguageModes) sig, Carrier sig m, Traversable t) => Format ParseTreeSymbolResponse -> t Blob -> m Builder
@@ -99,7 +99,7 @@ parseSymbols blobs = do
           & P.symbol .~ name
           & P.kind .~ pack (show kind)
           & P.line .~ line
-          & P.maybe'span .~ converting #? span
+          & P.maybe'span .~ converting #? Loc.span loc
           & P.maybe'docs .~ fmap (flip (set P.docstring) defMessage) docs
 
 symbolsToSummarize :: [Text]
