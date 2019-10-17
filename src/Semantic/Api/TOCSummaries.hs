@@ -61,7 +61,7 @@ diffSummary blobs = do
             combine TOCSummary{..} file = defMessage
               & P.path .~ file^.P.path
               & P.language .~ file^.P.language
-              & P.changes .~ (defMessage & P.category .~ kind & P.term .~ ident & P.maybe'span .~ (converting #? span) & P.changeType .~ toChangeType changeType) : file^.P.changes
+              & P.changes .~ (defMessage & P.category .~ kind & P.term .~ ident & P.maybe'span .~ (converting #? span) & P.changeType .~ toChangeType change) : file^.P.changes
               & P.errors .~ file^.P.errors
 
             combine ErrorSummary{..} file = defMessage

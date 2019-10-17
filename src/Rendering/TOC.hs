@@ -33,10 +33,10 @@ instance ToJSON Summaries where
 
 data TOCSummary
   = TOCSummary
-    { kind       :: T.Text
-    , ident      :: T.Text
-    , span       :: Span
-    , changeType :: T.Text
+    { kind   :: T.Text
+    , ident  :: T.Text
+    , span   :: Span
+    , change :: T.Text
     }
   | ErrorSummary
     { message  :: T.Text
@@ -46,7 +46,7 @@ data TOCSummary
   deriving stock (Eq, Show)
 
 instance ToJSON TOCSummary where
-  toJSON TOCSummary{..} = object [ "changeType" .= changeType, "category" .= kind, "term" .= ident, "span" .= span ]
+  toJSON TOCSummary{..} = object [ "changeType" .= change, "category" .= kind, "term" .= ident, "span" .= span ]
   toJSON ErrorSummary{..} = object [ "error" .= message, "span" .= span, "language" .= language ]
 
 -- | An entry in a table of contents.
