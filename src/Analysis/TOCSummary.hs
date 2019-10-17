@@ -15,14 +15,14 @@ import           Data.Blob
 import qualified Data.Error as Error
 import           Data.Flag
 import           Data.Language as Language
-import           Source.Source as Source
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import           Data.Term
 import qualified Data.Text as T
+import qualified Language.Markdown.Syntax as Markdown
 import           Source.Loc as Loc
 import           Source.Range
-import qualified Language.Markdown.Syntax as Markdown
+import           Source.Source as Source
 
 -- | A declaration’s identifier and type.
 data Declaration = Declaration
