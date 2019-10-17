@@ -25,7 +25,7 @@ import Source.Loc
 data Summaries = Summaries { changes, errors :: Map.Map T.Text [Value] }
   deriving (Eq, Show, Generic)
   deriving Semigroup via GenericSemigroup Summaries
-  deriving Monoid via GenericMonoid Summaries
+  deriving Monoid    via GenericMonoid    Summaries
 
 instance ToJSON Summaries where
   toJSON Summaries{..} = object [ "changes" .= changes, "errors" .= errors ]
