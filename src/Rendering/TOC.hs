@@ -13,7 +13,7 @@ module Rendering.TOC
 import Prologue hiding (index)
 import Analysis.TOCSummary
 import Data.Align (bicrosswalk)
-import Data.Aeson
+import Data.Aeson (ToJSON(..), Value, (.=), object)
 import Data.Diff
 import Data.Language as Language
 import Data.List (sortOn)
