@@ -43,11 +43,7 @@ diffSummary blobs = do
   where
     go blobPair = decoratingDiffWith summarizeDiffParsers decorateTerm (pure . uncurry toFile . partitionEithers . map (bimap toError toChange) . summarizeDiff) blobPair
       `catchError` \(SomeException e) ->
-        pure $ defMessage
-          & P.path .~ path
-          & P.language .~ lang
-          & P.changes .~ mempty
-          & P.errors .~ [defMessage & P.error .~ T.pack (show e) & P.maybe'span .~ Nothing]
+        pure $ toFile [defMessage & P.error .~ T.pack (show e) & P.maybe'span .~ Nothing] []
       where path = T.pack $ pathKeyForBlobPair blobPair
             lang = bridging # languageForBlobPair blobPair
 
