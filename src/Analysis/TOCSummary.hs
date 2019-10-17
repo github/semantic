@@ -1,6 +1,7 @@
 {-# LANGUAGE AllowAmbiguousTypes, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.TOCSummary
 ( Declaration(..)
+, formatIdentifier
 , Kind(..)
 , formatKind
 , HasDeclaration
@@ -32,6 +33,13 @@ data Declaration = Declaration
   , span       :: Span
   , language   :: Language }
   deriving (Eq, Show)
+
+formatIdentifier :: Declaration -> Text
+formatIdentifier (Declaration kind identifier _ _ lang) = case kind of
+  Method (Just receiver)
+    | Language.Go <- lang -> "(" <> receiver <> ") " <> identifier
+    | otherwise           -> receiver <> "." <> identifier
+  _                       -> identifier
 
 data Kind
   = Method (Maybe Text)

@@ -116,12 +116,5 @@ recordSummary change decl@(Declaration kind text _ srcSpan language)
   | Error <- kind = Left  $ ErrorSummary text srcSpan language
   | otherwise     = Right $ TOCSummary kind (formatIdentifier decl) srcSpan change
 
-formatIdentifier :: Declaration -> Text
-formatIdentifier (Declaration kind identifier _ _ lang) = case kind of
-  Method (Just receiver)
-    | Language.Go <- lang -> "(" <> receiver <> ") " <> identifier
-    | otherwise           -> receiver <> "." <> identifier
-  _                       -> identifier
-
 diffTOC :: (Foldable f, Functor f) => Diff f (Maybe Declaration) (Maybe Declaration) -> [Either ErrorSummary TOCSummary]
 diffTOC = map (uncurry recordSummary) . dedupe . tableOfContentsBy declaration
