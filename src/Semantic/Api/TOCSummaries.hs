@@ -48,10 +48,10 @@ diffSummary blobs = do
             lang = bridging # languageForBlobPair blobPair
 
             toFile errors changes = defMessage
-              & P.path .~ path
+              & P.path     .~ path
               & P.language .~ lang
-              & P.changes .~ changes
-              & P.errors .~ errors
+              & P.changes  .~ changes
+              & P.errors   .~ errors
 
             toChangeType = \case
               Changed  -> MODIFIED
