@@ -8,7 +8,9 @@ module Semantic.Api.TOCSummaries
 
 import           Analysis.TOCSummary (formatKind)
 import           Control.Effect.Error
+import           Control.Effect.Parse
 import           Control.Lens
+import           Control.Monad.IO.Class
 import           Data.Aeson
 import           Data.Blob
 import           Data.ByteString.Builder
@@ -17,6 +19,7 @@ import qualified Data.Map.Monoidal as Map
 import           Data.ProtoLens (defMessage)
 import           Data.Semilattice.Lower
 import qualified Data.Text as T
+import           Data.These (These, fromThese)
 import           Proto.Semantic as P hiding (Blob, BlobPair)
 import           Proto.Semantic_Fields as P
 import           Rendering.TOC
@@ -31,7 +34,8 @@ diffSummaryBuilder format blobs = diffSummary blobs >>= serialize format
 legacyDiffSummary :: DiffEffects sig m => [BlobPair] -> m Summaries
 legacyDiffSummary = distributeFoldMap go
   where
-    go blobPair = decoratingDiffWith summarizeDiffParsers decorateTerm (pure . uncurry (flip Summaries) . bimap toMap toMap . partitionEithers . summarizeDiff) blobPair
+    go :: (Carrier sig m, Member (Error SomeException) sig, Member Parse sig, Member Telemetry sig, MonadIO m) => BlobPair -> m Summaries
+    go blobPair = parsePairWith summarizeDiffParsers (fmap (uncurry (flip Summaries) . bimap toMap toMap . partitionEithers) . summarizeTerms blobPair . decorateTermsWith decorateTerm blobPair) blobPair
       `catchError` \(SomeException e) ->
         pure $ Summaries mempty (toMap [ErrorSummary (T.pack (show e)) lowerBound lang])
       where path = T.pack $ pathKeyForBlobPair blobPair
@@ -46,7 +50,8 @@ diffSummary blobs = do
   diff <- distributeFor blobs go
   pure $ defMessage & P.files .~ diff
   where
-    go blobPair = decoratingDiffWith summarizeDiffParsers decorateTerm (pure . uncurry toFile . partitionEithers . map (bimap toError toChange) . summarizeDiff) blobPair
+    go :: (Carrier sig m, Member (Error SomeException) sig, Member Parse sig, Member Telemetry sig, MonadIO m) => BlobPair -> m TOCSummaryFile
+    go blobPair = parsePairWith summarizeDiffParsers (fmap (uncurry toFile . partitionEithers . map (bimap toError toChange)) . summarizeTerms blobPair . decorateTermsWith decorateTerm blobPair) blobPair
       `catchError` \(SomeException e) ->
         pure $ toFile [defMessage & P.error .~ T.pack (show e) & P.maybe'span .~ Nothing] []
       where toFile errors changes = defMessage

@@ -152,13 +152,13 @@ instance (Diffable syntax, Eq1 syntax, Hashable1 syntax, Show1 syntax, Traversab
 summarizeDiffParsers :: Map Language (SomeParser SummarizeDiff Loc)
 summarizeDiffParsers = aLaCarteParsers
 
-class DiffTerms term => SummarizeDiff term where
+class SummarizeDiff term where
   decorateTerm :: Blob -> term Loc -> term (Maybe Declaration)
-  summarizeDiff :: DiffFor term (Maybe Declaration) (Maybe Declaration) -> [Either ErrorSummary TOCSummary]
+  summarizeTerms :: (Member Telemetry sig, Carrier sig m, MonadIO m) => BlobPair -> These (term (Maybe Declaration)) (term (Maybe Declaration)) -> m [Either ErrorSummary TOCSummary]
 
 instance (Diffable syntax, Eq1 syntax, HasDeclaration syntax, Hashable1 syntax, Traversable syntax) => SummarizeDiff (Term syntax) where
   decorateTerm = decoratorWithAlgebra . declarationAlgebra
-  summarizeDiff = diffTOC
+  summarizeTerms blobs = fmap diffTOC . diffTerms blobs
 
 
 -- | Parse a 'BlobPair' using one of the provided parsers, diff the resulting terms, and run an action on the abstracted diff.

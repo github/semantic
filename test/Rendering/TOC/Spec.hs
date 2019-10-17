@@ -2,6 +2,7 @@
 module Rendering.TOC.Spec (spec) where
 
 import Analysis.TOCSummary
+import Control.Effect.Parse
 import Data.Aeson hiding (defaultOptions)
 import Data.Bifunctor
 import Data.Diff
@@ -15,7 +16,7 @@ import Prelude
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import Rendering.TOC
-import Semantic.Api (DiffEffects, decorateTerm, decoratingDiffWith, diffSummaryBuilder, summarizeDiff, summarizeDiffParsers)
+import Semantic.Api (DiffEffects, decorateTerm, decorateTermsWith, diffSummaryBuilder, summarizeDiff, summarizeDiffParsers)
 import Serializing.Format as Format
 import Source.Loc
 import Source.Span
@@ -217,4 +218,4 @@ summarize
   :: DiffEffects sig m
   => BlobPair
   -> m [Either ErrorSummary TOCSummary]
-summarize = decoratingDiffWith summarizeDiffParsers decorateTerm (pure . summarizeDiff)
+summarize blobPair = parsePairWith summarizeDiffParsers (summarizeTerms blobPair . decorateTermsWith decorateTerm blobPair) blobPair
