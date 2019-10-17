@@ -39,7 +39,7 @@ data TOCSummary
     , summaryChangeType   :: T.Text
     }
   | ErrorSummary { errorText :: T.Text, errorSpan :: Span, errorLanguage :: Language }
-  deriving stock (Generic, Eq, Show)
+  deriving stock (Eq, Show)
 
 instance ToJSON TOCSummary where
   toJSON TOCSummary{..} = object [ "changeType" .= summaryChangeType, "category" .= summaryCategoryName, "term" .= summaryTermName, "span" .= summarySpan ]
