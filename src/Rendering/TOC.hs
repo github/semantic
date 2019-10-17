@@ -32,7 +32,7 @@ instance ToJSON Summaries where
   toJSON Summaries{..} = object [ "changes" .= changes, "errors" .= errors ]
 
 data TOCSummary = TOCSummary
-  { kind   :: DeclarationKind
+  { kind   :: Kind
   , ident  :: T.Text
   , span   :: Span
   , change :: Change
@@ -85,7 +85,7 @@ tableOfContentsBy selector = fromMaybe [] . cata (\ r -> case r of
   where patchEntry = patch (Deleted,) (Inserted,) (const (Replaced,))
 
 
-data DedupeKey = DedupeKey !DeclarationKind {-# UNPACK #-} !T.Text
+data DedupeKey = DedupeKey !Kind {-# UNPACK #-} !T.Text
   deriving (Eq, Ord)
 
 data Dedupe = Dedupe

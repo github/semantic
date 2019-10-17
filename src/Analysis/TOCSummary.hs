@@ -1,7 +1,7 @@
 {-# LANGUAGE RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.TOCSummary
 ( Declaration(..)
-, DeclarationKind(..)
+, Kind(..)
 , formatKind
 , HasDeclaration
 , declarationAlgebra
@@ -26,21 +26,21 @@ import qualified Language.Markdown.Syntax as Markdown
 
 -- | A declaration’s identifier and type.
 data Declaration = Declaration
-  { kind       :: DeclarationKind
+  { kind       :: Kind
   , identifier :: Text
   , text       :: Text
   , span       :: Span
   , language   :: Language }
   deriving (Eq, Show)
 
-data DeclarationKind
+data Kind
   = Method (Maybe Text)
   | Function
   | Heading Int
   | Error
   deriving (Eq, Ord, Show)
 
-formatKind :: DeclarationKind -> T.Text
+formatKind :: Kind -> T.Text
 formatKind kind = case kind of
   Function  -> "Function"
   Method _  -> "Method"
