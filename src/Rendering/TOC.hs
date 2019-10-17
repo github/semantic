@@ -49,15 +49,6 @@ instance ToJSON TOCSummary where
   toJSON TOCSummary{..} = object [ "changeType" .= changeType, "category" .= kind, "term" .= ident, "span" .= span ]
   toJSON ErrorSummary{..} = object [ "error" .= message, "span" .= span, "language" .= language ]
 
-isValidSummary :: TOCSummary -> Bool
-isValidSummary ErrorSummary{} = False
-isValidSummary _ = True
-
--- | Produce the annotations of nodes representing declarations.
-declaration :: TermF f (Maybe Declaration) a -> Maybe Declaration
-declaration (In annotation _) = annotation
-
-
 -- | An entry in a table of contents.
 data Entry
   = Changed  -- ^ An entry for a node containing changes.
@@ -66,6 +57,14 @@ data Entry
   | Replaced -- ^ An entry for a change occurring on the insertion side of a 'Replace' 'Patch'.
   deriving (Eq, Show)
 
+
+isValidSummary :: TOCSummary -> Bool
+isValidSummary ErrorSummary{} = False
+isValidSummary _ = True
+
+-- | Produce the annotations of nodes representing declarations.
+declaration :: TermF f (Maybe Declaration) a -> Maybe Declaration
+declaration (In annotation _) = annotation
 
 -- | Compute a table of contents for a diff characterized by a function mapping relevant nodes onto values in Maybe.
 tableOfContentsBy :: (Foldable f, Functor f)
