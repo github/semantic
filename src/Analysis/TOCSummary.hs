@@ -160,8 +160,8 @@ data Strategy = Default | Custom
 --   If you’re seeing errors about missing a @'HasDeclarationBy' ''Custom'@ instance for a given type, you’ve probably listed it in here but not defined a @'HasDeclarationBy' ''Custom'@ instance for it, or else you’ve listed the wrong type in here. Conversely, if your @'HasDeclarationBy' ''Custom'@ method is never being called, you may have forgotten to list the type in here.
 type family DeclarationStrategy syntax where
   DeclarationStrategy Declaration.Function = 'Custom
-  DeclarationStrategy Declaration.Method = 'Custom
-  DeclarationStrategy Markdown.Heading = 'Custom
-  DeclarationStrategy Syntax.Error = 'Custom
-  DeclarationStrategy (Sum fs) = 'Custom
-  DeclarationStrategy a = 'Default
+  DeclarationStrategy Declaration.Method   = 'Custom
+  DeclarationStrategy Markdown.Heading     = 'Custom
+  DeclarationStrategy Syntax.Error         = 'Custom
+  DeclarationStrategy (Sum fs)             = 'Custom
+  DeclarationStrategy a                    = 'Default
