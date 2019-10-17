@@ -16,7 +16,7 @@ import Prelude
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import Rendering.TOC
-import Semantic.Api (DiffEffects, decorateTerm, diffSummaryBuilder, summarizeDiff, summarizeDiffParsers)
+import Semantic.Api (DiffEffects, diffSummaryBuilder, summarizeTerms, summarizeDiffParsers)
 import Serializing.Format as Format
 import Source.Loc
 import Source.Span
