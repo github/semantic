@@ -61,7 +61,7 @@ spec = do
       sourceBlobs <- blobsForPaths (Both (Path.relFile "ruby/toc/methods.A.rb") (Path.relFile "ruby/toc/methods.B.rb"))
       diff <- runTaskOrDie $ diffWithParser rubyParser sourceBlobs
       diffTOC diff `shouldBe`
-        [ Right $ TOCSummary (Method Nothing) "self.foo" (Span (Pos 1 1) (Pos 2 4)) Inserted
+        [ Right $ TOCSummary (Method (Just "self")) "self.foo" (Span (Pos 1 1) (Pos 2 4)) Inserted
         , Right $ TOCSummary (Method Nothing) "bar" (Span (Pos 4 1) (Pos 6 4)) Changed
         , Right $ TOCSummary (Method Nothing) "baz" (Span (Pos 4 1) (Pos 5 4)) Deleted
         ]
@@ -76,13 +76,13 @@ spec = do
       sourceBlobs <- blobsForPaths (Both (Path.relFile "javascript/toc/erroneous-duplicate-method.A.js") (Path.relFile "javascript/toc/erroneous-duplicate-method.B.js"))
       diff <- runTaskOrDie $ diffWithParser typescriptParser sourceBlobs
       diffTOC diff `shouldBe`
-        [ Right $ TOCSummary Function "performHealthCheck" (Span (Pos 8 1) (Pos 29 2)) Changed ]
+        [ Right $ TOCSummary Function "performHealthCheck" (Span (Pos 8 1) (Pos 29 2)) Replaced ]
 
     it "summarizes Go methods with receivers with special formatting" $ do
       sourceBlobs <- blobsForPaths (Both (Path.relFile "go/toc/method-with-receiver.A.go") (Path.relFile "go/toc/method-with-receiver.B.go"))
       diff <- runTaskOrDie $ diffWithParser goParser sourceBlobs
       diffTOC diff `shouldBe`
-        [ Right $ TOCSummary (Method Nothing) "(*apiClient) CheckAuth" (Span (Pos 3 1) (Pos 3 101)) Inserted ]
+        [ Right $ TOCSummary (Method (Just "*apiClient")) "(*apiClient) CheckAuth" (Span (Pos 3 1) (Pos 3 101)) Inserted ]
 
     it "summarizes Ruby methods that start with two identifiers" $ do
       sourceBlobs <- blobsForPaths (Both (Path.relFile "ruby/toc/method-starts-with-two-identifiers.A.rb") (Path.relFile "ruby/toc/method-starts-with-two-identifiers.B.rb"))
