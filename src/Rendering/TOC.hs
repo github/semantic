@@ -7,6 +7,7 @@ module Rendering.TOC
 , Change(..)
 , tableOfContentsBy
 , dedupe
+, summarizeChange
 ) where
 
 import Prologue hiding (index)
