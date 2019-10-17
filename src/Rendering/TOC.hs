@@ -1,4 +1,4 @@
-{-# LANGUAGE DerivingVia, RankNTypes, ScopedTypeVariables, TupleSections #-}
+{-# LANGUAGE DerivingVia, DuplicateRecordFields, RankNTypes, ScopedTypeVariables, TupleSections #-}
 module Rendering.TOC
 ( diffTOC
 , Summaries(..)
@@ -83,9 +83,9 @@ data DedupeKey = DedupeKey {-# UNPACK #-} !T.Text {-# UNPACK #-} !T.Text
   deriving (Eq, Ord)
 
 data Dedupe = Dedupe
-  { index :: {-# UNPACK #-} !Int
-  , entry :: {-# UNPACK #-} !Change
-  , decl  :: {-# UNPACK #-} !Declaration
+  { index  :: {-# UNPACK #-} !Int
+  , change :: {-# UNPACK #-} !Change
+  , decl   :: {-# UNPACK #-} !Declaration
   }
 
 -- Dedupe entries in a final pass. This catches two specific scenarios with
@@ -96,11 +96,11 @@ data Dedupe = Dedupe
 --    identifiers) are in the list.
 --    Action: Combine them into a single Replaced entry.
 dedupe :: [(Change, Declaration)] -> [(Change, Declaration)]
-dedupe = map (entry &&& decl) . sortOn index . Map.elems . foldl' go Map.empty . zipWith (uncurry . Dedupe) [0..] where
+dedupe = map ((change :: Dedupe -> Change) &&& decl) . sortOn index . Map.elems . foldl' go Map.empty . zipWith (uncurry . Dedupe) [0..] where
   go m d@(Dedupe _ _ decl) = let key = dedupeKey decl in case Map.lookup key m of
     Just (Dedupe _ _ similar)
       | similar == decl -> m
-      | otherwise       -> Map.insert key d { entry = Replaced, decl = similar } m
+      | otherwise       -> Map.insert key d { change = Replaced, decl = similar } m
     _                   -> Map.insert key d m
 
   dedupeKey (Declaration kind ident _ _ _) = DedupeKey (formatKind kind) (T.toLower ident)
