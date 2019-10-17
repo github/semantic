@@ -58,14 +58,8 @@ diffSummary blobs = do
               Replaced -> MODIFIED
 
             combine :: TOCSummary -> TOCSummaryFile -> TOCSummaryFile
-            combine TOCSummary{..} file = defMessage
-              & P.path .~ file^.P.path
-              & P.language .~ file^.P.language
+            combine TOCSummary{..} file = file
               & P.changes .~ (defMessage & P.category .~ kind & P.term .~ ident & P.maybe'span .~ (converting #? span) & P.changeType .~ toChangeType change) : file^.P.changes
-              & P.errors .~ file^.P.errors
 
-            combine ErrorSummary{..} file = defMessage
-              & P.path .~ file^.P.path
-              & P.language .~ file^.P.language
-              & P.changes .~ file^.P.changes
+            combine ErrorSummary{..} file = file
               & P.errors .~ (defMessage & P.error .~ message & P.maybe'span .~ converting #? span) : file^.P.errors
