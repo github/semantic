@@ -99,7 +99,7 @@ diffCommand = command "diff" (info diffArgumentsParser (progDesc "Compute change
               <|> flag'                                    (parseDiffBuilder DiffDotGraph)    (long "dot"         <> help "Output the diff as a DOT graph")
               <|> flag'                                    (parseDiffBuilder DiffShow)        (long "show"        <> help "Output using the Show instance (debug only, format subject to change without notice)")
       filesOrStdin <- Right <$> some (Both <$> argument filePathReader (metavar "FILE_A") <*> argument filePathReader (metavar "FILE_B")) <|> pure (Left stdin)
-      pure $ Task.readBlobPairs filesOrStdin >>= renderer
+      pure $ Task.readBlobPairs filesOrStdin >>= runReader Language.defaultLanguageModes . renderer
 
 parseCommand :: Mod CommandFields (Parse.ParseC Task.TaskC Builder)
 parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate parse trees for path(s)"))
