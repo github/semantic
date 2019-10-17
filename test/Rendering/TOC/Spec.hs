@@ -65,15 +65,6 @@ spec = do
         , TOCSummary "Method" "baz" (Span (Pos 4 1) (Pos 5 4)) "removed"
         ]
 
-    xit "summarizes changed classes" $ do
-      sourceBlobs <- blobsForPaths (Both (Path.relFile "ruby/toc/classes.A.rb") (Path.relFile "ruby/toc/classes.B.rb"))
-      diff <- runTaskOrDie $ diffWithParser rubyParser sourceBlobs
-      diffTOC diff `shouldBe`
-        [ TOCSummary "Class" "Baz" (Span (Pos 1 1) (Pos 2 4)) "removed"
-        , TOCSummary "Class" "Foo" (Span (Pos 1 1) (Pos 3 4)) "modified"
-        , TOCSummary "Class" "Bar" (Span (Pos 5 1) (Pos 6 4)) "added"
-        ]
-
     it "dedupes changes in same parent method" $ do
       sourceBlobs <- blobsForPaths (Both (Path.relFile "javascript/toc/duplicate-parent.A.js") (Path.relFile "javascript/toc/duplicate-parent.B.js"))
       diff <- runTaskOrDie $ diffWithParser typescriptParser sourceBlobs
