@@ -60,7 +60,7 @@ spec = do
     it "summarizes changed methods" $ do
       sourceBlobs <- blobsForPaths (Both (Path.relFile "ruby/toc/methods.A.rb") (Path.relFile "ruby/toc/methods.B.rb"))
       diff <- runTaskOrDie $ runDiff rubyParser sourceBlobs
-      diffTOC diff `shouldBe`
+      diff `shouldBe`
         [ Right $ TOCSummary (Method (Just "self")) "self.foo" (Span (Pos 1 1) (Pos 2 4)) Inserted
         , Right $ TOCSummary (Method Nothing) "bar" (Span (Pos 4 1) (Pos 6 4)) Changed
         , Right $ TOCSummary (Method Nothing) "baz" (Span (Pos 4 1) (Pos 5 4)) Deleted
@@ -69,37 +69,37 @@ spec = do
     it "dedupes changes in same parent method" $ do
       sourceBlobs <- blobsForPaths (Both (Path.relFile "javascript/toc/duplicate-parent.A.js") (Path.relFile "javascript/toc/duplicate-parent.B.js"))
       diff <- runTaskOrDie $ runDiff typescriptParser sourceBlobs
-      diffTOC diff `shouldBe`
+      diff `shouldBe`
         [ Right $ TOCSummary Function "myFunction" (Span (Pos 1 1) (Pos 6 2)) Changed ]
 
     it "dedupes similar methods" $ do
       sourceBlobs <- blobsForPaths (Both (Path.relFile "javascript/toc/erroneous-duplicate-method.A.js") (Path.relFile "javascript/toc/erroneous-duplicate-method.B.js"))
       diff <- runTaskOrDie $ runDiff typescriptParser sourceBlobs
-      diffTOC diff `shouldBe`
+      diff `shouldBe`
         [ Right $ TOCSummary Function "performHealthCheck" (Span (Pos 8 1) (Pos 29 2)) Replaced ]
 
     it "summarizes Go methods with receivers with special formatting" $ do
       sourceBlobs <- blobsForPaths (Both (Path.relFile "go/toc/method-with-receiver.A.go") (Path.relFile "go/toc/method-with-receiver.B.go"))
       diff <- runTaskOrDie $ runDiff goParser sourceBlobs
-      diffTOC diff `shouldBe`
+      diff `shouldBe`
         [ Right $ TOCSummary (Method (Just "*apiClient")) "(*apiClient) CheckAuth" (Span (Pos 3 1) (Pos 3 101)) Inserted ]
 
     it "summarizes Ruby methods that start with two identifiers" $ do
       sourceBlobs <- blobsForPaths (Both (Path.relFile "ruby/toc/method-starts-with-two-identifiers.A.rb") (Path.relFile "ruby/toc/method-starts-with-two-identifiers.B.rb"))
       diff <- runTaskOrDie $ runDiff rubyParser sourceBlobs
-      diffTOC diff `shouldBe`
+      diff `shouldBe`
         [ Right $ TOCSummary (Method Nothing) "foo" (Span (Pos 1 1) (Pos 4 4)) Changed ]
 
     it "handles unicode characters in file" $ do
       sourceBlobs <- blobsForPaths (Both (Path.relFile "ruby/toc/unicode.A.rb") (Path.relFile "ruby/toc/unicode.B.rb"))
       diff <- runTaskOrDie $ runDiff rubyParser sourceBlobs
-      diffTOC diff `shouldBe`
+      diff `shouldBe`
         [ Right $ TOCSummary (Method Nothing) "foo" (Span (Pos 6 1) (Pos 7 4)) Inserted ]
 
     it "properly slices source blob that starts with a newline and has multi-byte chars" $ do
       sourceBlobs <- blobsForPaths (Both (Path.relFile "javascript/toc/starts-with-newline.js") (Path.relFile "javascript/toc/starts-with-newline.js"))
       diff <- runTaskOrDie $ runDiff typescriptParser sourceBlobs
-      diffTOC diff `shouldBe` []
+      diff `shouldBe` []
 
     prop "inserts of methods and functions are summarized" . forAll ((not . isMethodOrFunction . Prelude.snd) `filterT` tiers) $
       \(name, body) ->
@@ -232,5 +232,5 @@ runDiff
      )
   => Parser (Term syntax Loc)
   -> BlobPair
-  -> m (Diff syntax (Maybe Declaration) (Maybe Declaration))
-runDiff parser blobs = diffTermPair . runJoin <$> distributeFor blobs (\ blob -> decoratorWithAlgebra (declarationAlgebra blob) <$> parse parser blob)
+  -> m [Either ErrorSummary TOCSummary]
+runDiff parser blobs = diffTOC . diffTermPair . runJoin <$> distributeFor blobs (\ blob -> decoratorWithAlgebra (declarationAlgebra blob) <$> parse parser blob)
