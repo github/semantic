@@ -35,7 +35,7 @@ legacyDiffSummary :: DiffEffects sig m => [BlobPair] -> m Summaries
 legacyDiffSummary = distributeFoldMap go
   where
     go :: (Carrier sig m, Member (Error SomeException) sig, Member Parse sig, Member Telemetry sig, MonadIO m) => BlobPair -> m Summaries
-    go blobPair = parsePairWith summarizeDiffParsers (fmap (uncurry (flip Summaries) . bimap toMap toMap . partitionEithers) . summarizeTerms blobPair . decorateTermsWith decorateTerm) blobPair
+    go blobPair = parsePairWith summarizeDiffParsers (fmap (uncurry (flip Summaries) . bimap toMap toMap . partitionEithers) . summarizeTerms . decorateTermsWith decorateTerm) blobPair
       `catchError` \(SomeException e) ->
         pure $ Summaries mempty (toMap [ErrorSummary (T.pack (show e)) lowerBound lang])
       where path = T.pack $ pathKeyForBlobPair blobPair
@@ -51,7 +51,7 @@ diffSummary blobs = do
   pure $ defMessage & P.files .~ diff
   where
     go :: (Carrier sig m, Member (Error SomeException) sig, Member Parse sig, Member Telemetry sig, MonadIO m) => BlobPair -> m TOCSummaryFile
-    go blobPair = parsePairWith summarizeDiffParsers (fmap (uncurry toFile . partitionEithers . map (bimap toError toChange)) . summarizeTerms blobPair . decorateTermsWith decorateTerm) blobPair
+    go blobPair = parsePairWith summarizeDiffParsers (fmap (uncurry toFile . partitionEithers . map (bimap toError toChange)) . summarizeTerms . decorateTermsWith decorateTerm) blobPair
       `catchError` \(SomeException e) ->
         pure $ toFile [defMessage & P.error .~ T.pack (show e) & P.maybe'span .~ Nothing] []
       where toFile errors changes = defMessage
@@ -60,8 +60,9 @@ diffSummary blobs = do
               & P.changes  .~ changes
               & P.errors   .~ errors
 
-decorateTermsWith :: (Blob -> term a -> term b) -> These (Blob, term a) (Blob, term a) -> These (term b) (term b)
-decorateTermsWith decorate = bimap (uncurry decorate) (uncurry decorate)
+decorateTermsWith :: (Blob -> term a -> term b) -> These (Blob, term a) (Blob, term a) -> These (Blob, term b) (Blob, term b)
+decorateTermsWith decorate = bimap dec dec where
+  dec (blob, term) = (blob, decorate blob term)
 
 toChangeType :: Change -> ChangeType
 toChangeType = \case

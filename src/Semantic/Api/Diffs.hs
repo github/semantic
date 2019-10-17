@@ -153,11 +153,11 @@ summarizeDiffParsers = aLaCarteParsers
 
 class SummarizeDiff term where
   decorateTerm :: Blob -> term Loc -> term (Maybe Declaration)
-  summarizeTerms :: (Member Telemetry sig, Carrier sig m, MonadIO m) => BlobPair -> These (term (Maybe Declaration)) (term (Maybe Declaration)) -> m [Either ErrorSummary TOCSummary]
+  summarizeTerms :: (Member Telemetry sig, Carrier sig m, MonadIO m) => These (Blob, term (Maybe Declaration)) (Blob, term (Maybe Declaration)) -> m [Either ErrorSummary TOCSummary]
 
 instance (Diffable syntax, Eq1 syntax, HasDeclaration syntax, Hashable1 syntax, Traversable syntax) => SummarizeDiff (Term syntax) where
   decorateTerm = decoratorWithAlgebra . declarationAlgebra
-  summarizeTerms blobs = fmap diffTOC . diffTerms blobs
+  summarizeTerms = fmap diffTOC . diffTerms
 
 
 -- | Parse a 'BlobPair' using one of the provided parsers, diff the resulting terms, and run an action on the abstracted diff.
@@ -169,11 +169,12 @@ diffWith
   -> (forall term . c term => DiffFor term Loc Loc -> m output) -- ^ A function to run on the computed diff. Note that the diff is abstract (it’s the diff type corresponding to an abstract term type), but the term type is constrained by @c@, allowing you to do anything @c@ allows, and requiring that all the input parsers produce terms supporting @c@.
   -> BlobPair                                                   -- ^ The blob pair to parse.
   -> m output
-diffWith parsers render blobPair = parsePairWith parsers (render <=< diffTerms blobPair . bimap snd snd) blobPair
+diffWith parsers render = parsePairWith parsers (render <=< diffTerms)
 
 diffTerms :: (DiffTerms term, Member Telemetry sig, Carrier sig m, MonadIO m)
-  => BlobPair -> These (term ann) (term ann) -> m (DiffFor term ann ann)
-diffTerms blobs terms = time "diff" languageTag $ do
-  let diff = diffTermPair terms
+  => These (Blob, term ann) (Blob, term ann) -> m (DiffFor term ann ann)
+diffTerms terms = time "diff" languageTag $ do
+  let diff = diffTermPair (bimap snd snd terms)
   diff <$ writeStat (Stat.count "diff.nodes" (bilength diff) languageTag)
   where languageTag = languageTagForBlobPair blobs
+        blobs = BlobPair (bimap fst fst terms)
