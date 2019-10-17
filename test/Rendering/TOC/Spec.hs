@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, MonoLocalBinds, TypeOperators #-}
+{-# LANGUAGE DataKinds, MonoLocalBinds, TupleSections, TypeOperators #-}
 module Rendering.TOC.Spec (spec) where
 
 import Analysis.Decorator
@@ -9,6 +9,7 @@ import Data.Aeson hiding (defaultOptions)
 import Data.Bifunctor
 import Data.Bifunctor.Join
 import Data.Diff
+import Data.Either (isRight)
 import Data.Functor.Classes
 import Data.Hashable.Lifted
 import Data.Patch
@@ -43,14 +44,14 @@ spec = do
     prop "produces inserted/deleted/replaced entries for relevant nodes within patches" $
       \ p -> tableOfContentsBy (Just . termFAnnotation) (patch deleting inserting replacing p)
       `shouldBe`
-      patch (fmap Deleted) (fmap Inserted) (\ as bs -> Replaced (head bs) : fmap Deleted (tail as) <> fmap Inserted (tail bs)) (bimap (foldMap pure) (foldMap pure) (p :: Patch (Term ListableSyntax Int) (Term ListableSyntax Int)))
+      patch (fmap (Deleted,)) (fmap (Inserted,)) (\ as bs -> (Replaced, head bs) : fmap (Deleted,) (tail as) <> fmap (Inserted,) (tail bs)) (bimap (foldMap pure) (foldMap pure) (p :: Patch (Term ListableSyntax Int) (Term ListableSyntax Int)))
 
     prop "produces changed entries for relevant nodes containing irrelevant patches" $
       \ diff -> do
         let diff' = merge (True, True) (inject [bimap (const False) (const False) (diff :: Diff ListableSyntax Bool Bool)])
         let toc = tableOfContentsBy (\ (n `In` _) -> if n then Just n else Nothing) diff'
         toc `shouldBe` if null (diffPatches diff') then []
-                                                   else [Changed True]
+                                                   else [(Changed, True)]
 
   describe "diffTOC" $ do
     it "blank if there are no methods" $
@@ -60,40 +61,40 @@ spec = do
       sourceBlobs <- blobsForPaths (Both (Path.relFile "ruby/toc/methods.A.rb") (Path.relFile "ruby/toc/methods.B.rb"))
       diff <- runTaskOrDie $ diffWithParser rubyParser sourceBlobs
       diffTOC diff `shouldBe`
-        [ TOCSummary "Method" "self.foo" (Span (Pos 1 1) (Pos 2 4)) "added"
-        , TOCSummary "Method" "bar" (Span (Pos 4 1) (Pos 6 4)) "modified"
-        , TOCSummary "Method" "baz" (Span (Pos 4 1) (Pos 5 4)) "removed"
+        [ Right $ TOCSummary (Method Nothing) "self.foo" (Span (Pos 1 1) (Pos 2 4)) Inserted
+        , Right $ TOCSummary (Method Nothing) "bar" (Span (Pos 4 1) (Pos 6 4)) Changed
+        , Right $ TOCSummary (Method Nothing) "baz" (Span (Pos 4 1) (Pos 5 4)) Deleted
         ]
 
     it "dedupes changes in same parent method" $ do
       sourceBlobs <- blobsForPaths (Both (Path.relFile "javascript/toc/duplicate-parent.A.js") (Path.relFile "javascript/toc/duplicate-parent.B.js"))
       diff <- runTaskOrDie $ diffWithParser typescriptParser sourceBlobs
       diffTOC diff `shouldBe`
-        [ TOCSummary "Function" "myFunction" (Span (Pos 1 1) (Pos 6 2)) "modified" ]
+        [ Right $ TOCSummary Function "myFunction" (Span (Pos 1 1) (Pos 6 2)) Changed ]
 
     it "dedupes similar methods" $ do
       sourceBlobs <- blobsForPaths (Both (Path.relFile "javascript/toc/erroneous-duplicate-method.A.js") (Path.relFile "javascript/toc/erroneous-duplicate-method.B.js"))
       diff <- runTaskOrDie $ diffWithParser typescriptParser sourceBlobs
       diffTOC diff `shouldBe`
-        [ TOCSummary "Function" "performHealthCheck" (Span (Pos 8 1) (Pos 29 2)) "modified" ]
+        [ Right $ TOCSummary Function "performHealthCheck" (Span (Pos 8 1) (Pos 29 2)) Changed ]
 
     it "summarizes Go methods with receivers with special formatting" $ do
       sourceBlobs <- blobsForPaths (Both (Path.relFile "go/toc/method-with-receiver.A.go") (Path.relFile "go/toc/method-with-receiver.B.go"))
       diff <- runTaskOrDie $ diffWithParser goParser sourceBlobs
       diffTOC diff `shouldBe`
-        [ TOCSummary "Method" "(*apiClient) CheckAuth" (Span (Pos 3 1) (Pos 3 101)) "added" ]
+        [ Right $ TOCSummary (Method Nothing) "(*apiClient) CheckAuth" (Span (Pos 3 1) (Pos 3 101)) Inserted ]
 
     it "summarizes Ruby methods that start with two identifiers" $ do
       sourceBlobs <- blobsForPaths (Both (Path.relFile "ruby/toc/method-starts-with-two-identifiers.A.rb") (Path.relFile "ruby/toc/method-starts-with-two-identifiers.B.rb"))
       diff <- runTaskOrDie $ diffWithParser rubyParser sourceBlobs
       diffTOC diff `shouldBe`
-        [ TOCSummary "Method" "foo" (Span (Pos 1 1) (Pos 4 4)) "modified" ]
+        [ Right $ TOCSummary (Method Nothing) "foo" (Span (Pos 1 1) (Pos 4 4)) Changed ]
 
     it "handles unicode characters in file" $ do
       sourceBlobs <- blobsForPaths (Both (Path.relFile "ruby/toc/unicode.A.rb") (Path.relFile "ruby/toc/unicode.B.rb"))
       diff <- runTaskOrDie $ diffWithParser rubyParser sourceBlobs
       diffTOC diff `shouldBe`
-        [ TOCSummary "Method" "foo" (Span (Pos 6 1) (Pos 7 4)) "added" ]
+        [ Right $ TOCSummary (Method Nothing) "foo" (Span (Pos 6 1) (Pos 7 4)) Inserted ]
 
     it "properly slices source blob that starts with a newline and has multi-byte chars" $ do
       sourceBlobs <- blobsForPaths (Both (Path.relFile "javascript/toc/starts-with-newline.js") (Path.relFile "javascript/toc/starts-with-newline.js"))
@@ -130,11 +131,11 @@ spec = do
 
   describe "TOCSummary" $ do
     it "encodes modified summaries to JSON" $ do
-      let summary = TOCSummary "Method" "foo" (Span (Pos 1 1) (Pos 4 4)) "modified"
+      let summary = TOCSummary (Method Nothing) "foo" (Span (Pos 1 1) (Pos 4 4)) Changed
       encode summary `shouldBe` "{\"span\":{\"start\":[1,1],\"end\":[4,4]},\"category\":\"Method\",\"term\":\"foo\",\"changeType\":\"modified\"}"
 
     it "encodes added summaries to JSON" $ do
-      let summary = TOCSummary "Method" "self.foo" (Span (Pos 1 1) (Pos 2 4)) "added"
+      let summary = TOCSummary (Method Nothing) "self.foo" (Span (Pos 1 1) (Pos 2 4)) Inserted
       encode summary `shouldBe` "{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"self.foo\",\"changeType\":\"added\"}"
 
   describe "diff with ToCDiffRenderer'" $ do
@@ -163,13 +164,13 @@ type Diff' = Diff ListableSyntax (Maybe Declaration) (Maybe Declaration)
 type Term' = Term ListableSyntax (Maybe Declaration)
 
 numTocSummaries :: Diff' -> Int
-numTocSummaries diff = length $ filter isValidSummary (diffTOC diff)
+numTocSummaries diff = length $ filter isRight (diffTOC diff)
 
 -- Return a diff where body is inserted in the expressions of a function. The function is present in Both sides of the diff.
 programWithChange :: Term' -> Diff'
 programWithChange body = merge (Nothing, Nothing) (inject [ function' ])
   where
-    function' = merge (Just (FunctionDeclaration "foo" mempty lowerBound Ruby), Just (FunctionDeclaration "foo" mempty lowerBound Ruby)) (inject (Declaration.Function [] name' [] (merge (Nothing, Nothing) (inject [ inserting body ]))))
+    function' = merge (Just (Declaration Function "foo" mempty lowerBound Ruby), Just (Declaration Function "foo" mempty lowerBound Ruby)) (inject (Declaration.Function [] name' [] (merge (Nothing, Nothing) (inject [ inserting body ]))))
     name' = merge (Nothing, Nothing) (inject (Syntax.Identifier (name "foo")))
 
 -- Return a diff where term is inserted in the program, below a function found on Both sides of the diff.
@@ -193,7 +194,7 @@ programOf :: Diff' -> Diff'
 programOf diff = merge (Nothing, Nothing) (inject [ diff ])
 
 functionOf :: Text -> Term' -> Term'
-functionOf n body = termIn (Just (FunctionDeclaration n mempty lowerBound Unknown)) (inject (Declaration.Function [] name' [] (termIn Nothing (inject [body]))))
+functionOf n body = termIn (Just (Declaration Function n mempty lowerBound Unknown)) (inject (Declaration.Function [] name' [] (termIn Nothing (inject [body]))))
   where
     name' = termIn Nothing (inject (Syntax.Identifier (name n)))
 
