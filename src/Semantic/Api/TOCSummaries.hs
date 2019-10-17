@@ -32,8 +32,7 @@ legacyDiffSummary = distributeFoldMap go
             lang = languageForBlobPair blobPair
 
             toMap [] = mempty
-            toMap as = Map.singleton summaryKey (toJSON <$> as)
-            summaryKey = T.pack $ pathKeyForBlobPair blobPair
+            toMap as = Map.singleton path (toJSON <$> as)
 
 
 diffSummary :: DiffEffects sig m => [BlobPair] -> m DiffTreeTOCResponse
