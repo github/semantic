@@ -12,6 +12,7 @@ import           Control.Monad.Catch
 import           Control.Monad.IO.Class
 import           Control.Monad.Trans.Resource (ResourceT, runResourceT)
 import           Core.Core
+import qualified Core.Parser
 import           Core.Pretty
 import qualified Core.Eval as Eval
 import           Core.Name
@@ -38,6 +39,7 @@ import qualified System.Path as Path
 import qualified System.Path.Directory as Path
 import           System.Path ((</>))
 import           Text.Show.Pretty (ppShow)
+import qualified Text.Trifecta as Trifecta
 import qualified TreeSitter.Python as TSP
 import qualified TreeSitter.Unmarshal as TS
 
@@ -50,12 +52,20 @@ import           Instances ()
 
 assertJQExpressionSucceeds :: Show a => Directive.Directive -> a -> Term (Ann Span :+: Core) Name -> HUnit.Assertion
 assertJQExpressionSucceeds directive tree core = do
-  bod <- case scopeGraph Eval.eval [File (Path.absRel "<interactive>") (Span (Pos 1 1) (Pos 1 1)) core] of
+  preludesrc <- ByteString.readFile "semantic-python/src/Prelude.score"
+  let ePrelude = Trifecta.parseByteString (Core.Parser.core <* Trifecta.eof) mempty preludesrc
+  prelude <- case Trifecta.foldResult (Left . show) Right ePrelude of
+    Right r -> pure r
+    Left s -> HUnit.assertFailure ("Couldn't parse prelude: " <> s)
+
+  let allTogether = (named' "__semantic_prelude" :<- prelude) >>>= core
+
+  bod <- case scopeGraph Eval.eval [File (Path.absRel "<interactive>") (Span (Pos 1 1) (Pos 1 1)) allTogether] of
     (heap, [File _ _ (Right result)]) -> pure $ Aeson.object
       [ "scope" Aeson..= heap
       , "heap"  Aeson..= result
       ]
-    _other                       -> HUnit.assertFailure "Couldn't run scope dumping mechanism; this shouldn't happen"
+    other -> HUnit.assertFailure ("Couldn't run scope dumping mechanism: " <> showCore (stripAnnotations allTogether) <> "\n" <> show other)
 
   let ignore = ByteStream.effects . hoist ByteStream.effects
       sgJSON = ByteStream.fromLazy $ Aeson.encode bod

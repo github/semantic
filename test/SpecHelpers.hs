@@ -96,7 +96,7 @@ diffFilePaths session paths
 -- | Returns an s-expression parse tree for the specified path.
 parseFilePath :: TaskSession -> Path.RelFile -> IO (Either SomeException ByteString)
 parseFilePath session path = do
-  blob <- readBlobFromFile (fileForRelPath path)
+  blob <- readBlobFromFile (fileForTypedPath path)
   res <- runTask session . runParse (configTreeSitterParseTimeout (config session)) . runReader defaultLanguageModes $ parseTermBuilder TermSExpression (toList blob)
   pure (runBuilder <$> res)
 
@@ -105,7 +105,7 @@ runParseWithConfig task = asks configTreeSitterParseTimeout >>= \ timeout -> run
 
 -- | Read two files to a BlobPair.
 readFilePathPair :: Both Path.RelFile -> IO BlobPair
-readFilePathPair paths = let paths' = fmap fileForRelPath paths in
+readFilePathPair paths = let paths' = fmap fileForTypedPath paths in
                      runBothWith readFilePair paths'
 
 parseTestFile :: Parser term -> Path.RelFile -> IO (Blob, term)

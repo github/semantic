@@ -54,7 +54,7 @@ data PathFilter
 data Files (m :: * -> *) k
   = forall a . Read (Source a)                                     (a -> m k)
   | ReadProject (Maybe FilePath) FilePath Language [FilePath] (Project -> m k)
-  | FindFiles FilePath [String] [FilePath]                    ([FilePath] -> m k)
+  | FindFiles Path.AbsRelDir [String] [Path.AbsRelDir] ([Path.AbsRelFile] -> m k)
   | Write Destination B.Builder                               (m k)
 
 deriving instance Functor m => Functor (Files m)
@@ -123,7 +123,7 @@ readBlobPairs (Right paths) = traverse (send . flip Read pure . FromPathPair) pa
 readProject :: (Member Files sig, Carrier sig m) => Maybe FilePath -> FilePath -> Language -> [FilePath] -> m Project
 readProject rootDir dir lang excludeDirs = send (ReadProject rootDir dir lang excludeDirs pure)
 
-findFiles :: (Member Files sig, Carrier sig m) => FilePath -> [String] -> [FilePath] -> m [FilePath]
+findFiles :: (Member Files sig, Carrier sig m) => Path.AbsRelDir -> [String] -> [Path.AbsRelDir] -> m [Path.AbsRelFile]
 findFiles dir exts paths = send (FindFiles dir exts paths pure)
 
 -- | A task which writes a 'B.Builder' to a 'Handle' or a 'FilePath'.

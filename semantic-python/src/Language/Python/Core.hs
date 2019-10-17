@@ -1,6 +1,6 @@
 {-# LANGUAGE ConstraintKinds, DataKinds, DefaultSignatures, DisambiguateRecordFields, FlexibleContexts,
              GeneralizedNewtypeDeriving, KindSignatures, LambdaCase, NamedFieldPuns, OverloadedLists,
-             PatternSynonyms, StandaloneDeriving, TypeApplications, TypeOperators, ViewPatterns #-}
+             OverloadedStrings, PatternSynonyms, StandaloneDeriving, TypeApplications, TypeOperators, ViewPatterns #-}
 
 module Language.Python.Core
 ( toplevelCompile
@@ -18,7 +18,7 @@ import           Core.Name as Name
 import           Data.Coerce
 import           Data.Foldable
 import           Data.Function
-import           Data.List.NonEmpty  (NonEmpty (..))
+import           Data.List.NonEmpty (NonEmpty (..))
 import           GHC.Records
 import           Source.Span (Span)
 import           Syntax.Stack (Stack (..))
@@ -194,7 +194,22 @@ instance Compile Py.Call where
     locate it (func $$* args) & cc
   compile it _ _ = fail ("can't compile Call node with generator expression: " <> show it)
 
-instance Compile Py.ClassDefinition
+instance Compile Py.ClassDefinition where
+  compile it@Py.ClassDefinition { body = pybody, name = Py.Identifier _ann (Name -> n) } cc next = do
+    let buildTypeCall _ = do
+          bindings <- asks @Bindings (toList . unBindings)
+          let buildName n = (n, pure n)
+              contents = record . fmap buildName $ bindings
+              typefn = pure "__semantic_prelude" ... "type"
+              object = pure "__semantic_prelude" ... "object"
+
+          pure (typefn $$ Core.string (coerce n) $$ object $$ contents)
+
+    body <- compile pybody buildTypeCall next
+    let assignClass = Name.named' n :<- body
+    let continuing = fmap (locate it . (assignClass >>>=))
+    continuing (local (def n) (cc next))
+
 instance Compile Py.ComparisonOperator
 
 deriving instance Compile Py.CompoundStatement
