@@ -1,6 +1,7 @@
-{-# LANGUAGE BangPatterns, GADTs, MultiParamTypeClasses, ScopedTypeVariables #-}
+{-# LANGUAGE BangPatterns, GADTs, LambdaCase, MultiParamTypeClasses, ScopedTypeVariables #-}
 module Diffing.Algorithm.SES
-( Edit
+( Edit(..)
+, toThese
 , ses
 ) where
 
@@ -11,7 +12,17 @@ import Data.Ix
 import Data.These
 
 -- | An edit script, i.e. a sequence of changes/copies of elements.
-type Edit = These
+data Edit a b
+  = Delete a
+  | Insert b
+  | Copy a b
+  deriving (Eq, Functor, Ord, Show)
+
+toThese :: Edit a b -> These a b
+toThese = \case
+  Delete a -> This a
+  Insert b -> That b
+  Copy a b -> These a b
 
 data Endpoint a b = Endpoint { x :: {-# UNPACK #-} !Int, _y :: {-# UNPACK #-} !Int, _script :: [Edit a b] }
   deriving (Eq, Show)
@@ -20,8 +31,8 @@ data Endpoint a b = Endpoint { x :: {-# UNPACK #-} !Int, _y :: {-# UNPACK #-} !I
 -- | Compute the shortest edit script using Myers’ algorithm.
 ses :: (Foldable t, Foldable u) => (a -> b -> Bool) -> t a -> u b -> [Edit a b]
 ses eq as' bs'
-  | null bs = This <$> toList as
-  | null as = That <$> toList bs
+  | null bs = Delete <$> toList as
+  | null as = Insert <$> toList bs
   | otherwise = reverse (searchUpToD 0 (Array.array (1, 1) [(1, Endpoint 0 (-1) [])]))
   where (as, bs) = (Array.listArray (0, pred n) (toList as'), Array.listArray (0, pred m) (toList bs'))
         (!n, !m) = (length as', length bs')
@@ -49,19 +60,19 @@ ses eq as' bs'
                       moveRightFrom left
 
         -- | Move downward from a given vertex, inserting the element for the corresponding row.
-        moveDownFrom  (Endpoint x y script) = Endpoint       x (succ y) $ maybe script ((: script) . That) (bs !? y)
+        moveDownFrom  (Endpoint x y script) = Endpoint       x (succ y) $ maybe script ((: script) . Insert) (bs !? y)
         {-# INLINE moveDownFrom #-}
 
         -- | Move rightward from a given vertex, deleting the element for the corresponding column.
-        moveRightFrom (Endpoint x y script) = Endpoint (succ x)      y  $ maybe script ((: script) . This) (as !? x)
+        moveRightFrom (Endpoint x y script) = Endpoint (succ x)      y  $ maybe script ((: script) . Delete) (as !? x)
         {-# INLINE moveRightFrom #-}
 
         -- | Slide down any diagonal edges from a given vertex.
         slideFrom (Endpoint x y script)
           | Just a <- as !? x
           , Just b <- bs !? y
-          , a `eq` b  = slideFrom (Endpoint (succ x) (succ y) (These a b : script))
-          | otherwise =            Endpoint       x        y               script
+          , a `eq` b  = slideFrom (Endpoint (succ x) (succ y) (Copy a b : script))
+          | otherwise =            Endpoint       x        y              script
 
 
 (!?) :: Ix i => Array.Array i a -> i -> Maybe a
