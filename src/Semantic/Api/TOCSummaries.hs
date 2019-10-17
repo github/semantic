@@ -1,4 +1,4 @@
-{-# LANGUAGE LambdaCase, MonoLocalBinds, TupleSections #-}
+{-# LANGUAGE DerivingVia, LambdaCase, MonoLocalBinds, StandaloneDeriving, TupleSections #-}
 module Semantic.Api.TOCSummaries
 ( diffSummary
 , legacyDiffSummary
@@ -30,6 +30,9 @@ import qualified Data.Text as T
 import           Data.These (These, fromThese)
 import           Diffing.Algorithm (Diffable)
 import qualified Diffing.Algorithm.SES as SES
+import qualified Language.Java as Java
+import qualified Language.JSON as JSON
+import qualified Language.Python as Python
 import           Parsing.Parser (SomeParser, aLaCarteParsers)
 import           Proto.Semantic as P hiding (Blob, BlobPair)
 import           Proto.Semantic_Fields as P
@@ -106,6 +109,11 @@ instance (Diffable syntax, Eq1 syntax, HasDeclaration syntax, Hashable1 syntax, 
   summarizeTerms = fmap diffTOC . diffTerms . bimap decorateTerm decorateTerm where
     decorateTerm :: (Foldable syntax, Functor syntax, HasDeclaration syntax) => (Blob, Term syntax Loc) -> (Blob, Term syntax (Maybe Declaration))
     decorateTerm (blob, term) = (blob, decoratorWithAlgebra (declarationAlgebra blob) term)
+
+
+deriving via (ViaTags Java.Term)   instance SummarizeDiff Java.Term
+deriving via (ViaTags JSON.Term)   instance SummarizeDiff JSON.Term
+deriving via (ViaTags Python.Term) instance SummarizeDiff Python.Term
 
 
 newtype ViaTags t a = ViaTags (t a)
