@@ -11,7 +11,6 @@ import Data.ByteString.Char8
 import Data.ByteString (pack, readFile, ByteString)
 import System.IO (FilePath)
 import Options.Applicative hiding (style)
-import Codec.Binary.UTF8.Generic (fromString)
 import Data.Semigroup ((<>))
 
 data SemanticAST = SemanticAST
@@ -43,7 +42,7 @@ generateAST (SemanticAST _ source) = do
     Left filePath -> do
       Data.ByteString.readFile filePath
     Right source -> do
-      pure $ Codec.Binary.UTF8.Generic.fromString source
+      pure $ Data.ByteString.Char8.pack source
   print =<< parseByteString @TreeSitter.Python.AST.Module @(Range, Span) tree_sitter_python bytestring
 
 opts :: ParserInfo SemanticAST
