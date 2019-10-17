@@ -34,9 +34,9 @@ instance ToJSON Summaries where
 data TOCSummary
   = TOCSummary
     { summaryCategoryName :: T.Text
-    , summaryTermName :: T.Text
-    , summarySpan :: Span
-    , summaryChangeType :: T.Text
+    , summaryTermName     :: T.Text
+    , summarySpan         :: Span
+    , summaryChangeType   :: T.Text
     }
   | ErrorSummary { errorText :: T.Text, errorSpan :: Span, errorLanguage :: Language }
   deriving stock (Generic, Eq, Show)
