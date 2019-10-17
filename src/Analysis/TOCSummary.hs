@@ -31,7 +31,8 @@ data Declaration = Declaration
   , identifier :: Text
   , text       :: Text
   , span       :: Span
-  , language   :: Language }
+  , language   :: Language
+  }
   deriving (Eq, Show)
 
 formatIdentifier :: Declaration -> Text
