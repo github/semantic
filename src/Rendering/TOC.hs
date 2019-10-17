@@ -111,10 +111,10 @@ dedupe = map ((change :: Dedupe -> Change) &&& decl) . sortOn index . Map.elems 
   dedupeKey (Declaration kind ident _ _ _) = DedupeKey kind (T.toLower ident)
 
 -- | Construct a 'TOCSummary' or 'ErrorSummary' from a 'Change' and 'Declaration'.
-recordSummary :: Change -> Declaration -> Either ErrorSummary TOCSummary
-recordSummary change decl@(Declaration kind text _ srcSpan language)
+summarizeChange :: Change -> Declaration -> Either ErrorSummary TOCSummary
+summarizeChange change decl@(Declaration kind text _ srcSpan language)
   | Error <- kind = Left  $ ErrorSummary text srcSpan language
   | otherwise     = Right $ TOCSummary kind (formatIdentifier decl) srcSpan change
 
 diffTOC :: (Foldable f, Functor f) => Diff f (Maybe Declaration) (Maybe Declaration) -> [Either ErrorSummary TOCSummary]
-diffTOC = map (uncurry recordSummary) . dedupe . tableOfContentsBy declaration
+diffTOC = map (uncurry summarizeChange) . dedupe . tableOfContentsBy declaration
