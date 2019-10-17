@@ -26,6 +26,7 @@ library
                      , tree-sitter-python ^>= 0.6
                      , bytestring ^>= 0.10.8.2
                      , optparse-applicative ^>= 0.14.3.0
+                     , utf8-string ^>= 1.0.1.1
   hs-source-dirs:      src
   default-language:    Haskell2010
 
@@ -40,5 +41,6 @@ executable semantic-ast
                      , tree-sitter-python ^>= 0.6
                      , bytestring ^>= 0.10.8.2
                      , optparse-applicative ^>= 0.14.3.0
+                     , utf8-string ^>= 1.0.1.1
   hs-source-dirs:      src
   default-language:    Haskell2010
