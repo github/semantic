@@ -1,6 +1,6 @@
 {-# LANGUAGE BangPatterns, GADTs, MultiParamTypeClasses, ScopedTypeVariables #-}
 module Diffing.Algorithm.SES
-( EditScript
+( Edit
 , ses
 ) where
 
@@ -11,14 +11,14 @@ import Data.Ix
 import Data.These
 
 -- | An edit script, i.e. a sequence of changes/copies of elements.
-type EditScript a b = [These a b]
+type Edit = These
 
-data Endpoint a b = Endpoint { x :: {-# UNPACK #-} !Int, _y :: {-# UNPACK #-} !Int, _script :: EditScript a b }
+data Endpoint a b = Endpoint { x :: {-# UNPACK #-} !Int, _y :: {-# UNPACK #-} !Int, _script :: [Edit a b] }
   deriving (Eq, Show)
 
 
 -- | Compute the shortest edit script using Myers’ algorithm.
-ses :: (Foldable t, Foldable u) => (a -> b -> Bool) -> t a -> u b -> EditScript a b
+ses :: (Foldable t, Foldable u) => (a -> b -> Bool) -> t a -> u b -> [Edit a b]
 ses eq as' bs'
   | null bs = This <$> toList as
   | null as = That <$> toList bs

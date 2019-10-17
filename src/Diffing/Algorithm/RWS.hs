@@ -34,7 +34,7 @@ rws :: (Foldable syntax, Functor syntax, Diffable syntax)
     -> (Term syntax (FeatureVector, ann1) -> Term syntax (FeatureVector, ann2) -> Bool)
     -> [Term syntax (FeatureVector, ann1)]
     -> [Term syntax (FeatureVector, ann2)]
-    -> EditScript (Term syntax (FeatureVector, ann1)) (Term syntax (FeatureVector, ann2))
+    -> [Edit (Term syntax (FeatureVector, ann1)) (Term syntax (FeatureVector, ann2))]
 rws _          _          as [] = This <$> as
 rws _          _          [] bs = That <$> bs
 rws canCompare _          [a] [b] = if canCompareTerms canCompare a b then [These a b] else [That b, This a]
