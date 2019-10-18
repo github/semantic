@@ -102,21 +102,21 @@ instance ToJSON ControlFlowVertex where
 class VertexDeclaration term where
   toVertex
     :: ModuleInfo
-    -> term
+    -> term Loc
     -> Maybe (ControlFlowVertex, Name)
 
-instance (VertexDeclaration1 f, Declarations1 f) => VertexDeclaration (Term f Loc) where
+instance (VertexDeclaration1 f, Declarations1 f) => VertexDeclaration (Term f) where
   toVertex info (Term (In a f)) = liftToVertex toVertex a info f
 
-toVertex1 :: (VertexDeclaration1 f, VertexDeclaration a, Declarations a) => Loc -> ModuleInfo -> f a -> Maybe (ControlFlowVertex, Name)
+toVertex1 :: (VertexDeclaration1 f, VertexDeclaration t, Declarations (t Loc)) => Loc -> ModuleInfo -> f (t Loc) -> Maybe (ControlFlowVertex, Name)
 toVertex1 = liftToVertex toVertex
 
 class VertexDeclaration1 syntax where
-  liftToVertex :: Declarations term
-               => (ModuleInfo -> term -> Maybe (ControlFlowVertex, Name))
+  liftToVertex :: Declarations (term Loc)
+               => (ModuleInfo -> term Loc -> Maybe (ControlFlowVertex, Name))
                -> Loc
                -> ModuleInfo
-               -> syntax term
+               -> syntax (term Loc)
                -> Maybe (ControlFlowVertex, Name)
 
 instance (VertexDeclarationStrategy1 syntax ~ strategy, VertexDeclarationWithStrategy1 strategy syntax) => VertexDeclaration1 syntax where
@@ -137,12 +137,12 @@ type family VertexDeclarationStrategy1 syntax where
   VertexDeclarationStrategy1 syntax                  = 'Default
 
 class VertexDeclarationWithStrategy1 (strategy :: Strategy) syntax where
-  liftToVertexWithStrategy :: Declarations term
+  liftToVertexWithStrategy :: Declarations (term Loc)
                            => proxy strategy
-                           -> (ModuleInfo -> term -> Maybe (ControlFlowVertex, Name))
+                           -> (ModuleInfo -> term Loc -> Maybe (ControlFlowVertex, Name))
                            -> Loc
                            -> ModuleInfo
-                           -> syntax term
+                           -> syntax (term Loc)
                            -> Maybe (ControlFlowVertex, Name)
 
 -- | The 'Default' strategy produces 'Nothing'.

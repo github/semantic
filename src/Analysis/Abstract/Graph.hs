@@ -28,6 +28,7 @@ import           Data.Graph.ControlFlowVertex
 import qualified Data.Map as Map
 import qualified Data.Text.Encoding as T
 import           Prologue
+import           Source.Loc
 
 style :: Style ControlFlowVertex Builder
 style = (defaultStyle (T.encodeUtf8Builder . vertexIdentifier))
@@ -71,7 +72,7 @@ graphingTerms :: ( Member (Reader ModuleInfo) sig
                  , Ord address
                  , Carrier sig m
                  )
-              => Open (term -> Evaluator term address value m a)
+              => Open (term Loc -> Evaluator (term Loc) address value m a)
 graphingTerms recur term = do
   definedInModule <- currentModule
   case toVertex definedInModule term of
