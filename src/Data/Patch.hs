@@ -29,9 +29,10 @@ before = patch Just (const Nothing) (\ a _ -> Just a)
 
 -- | Return both sides of a patch.
 patch :: (before -> result) -> (after -> result) -> (before -> after -> result) -> Patch before after -> result
-patch ifDelete _ _ (Delete a) = ifDelete a
-patch _ ifInsert _ (Insert b) = ifInsert b
-patch _ _ ifReplace (Compare a b) = ifReplace a b
+patch delete insert compare = \case
+  Delete  a   -> delete a
+  Insert    b -> insert b
+  Compare a b -> compare a b
 
 
 instance Bifunctor Patch where
