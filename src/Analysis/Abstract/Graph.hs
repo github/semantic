@@ -74,10 +74,9 @@ graphingTerms :: ( Member (Reader ModuleInfo) sig
                  , Declarations1 syntax
                  , Ord address
                  , Foldable syntax
-                 , term ~ Term syntax Loc
                  , Carrier sig m
                  )
-              => Open (term -> Evaluator term address value m a)
+              => Open (Term syntax Loc -> Evaluator (Term syntax Loc) address value m a)
 graphingTerms recur term@(Term (In a syntax)) = do
   definedInModule <- currentModule
   case toVertex a definedInModule syntax of

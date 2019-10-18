@@ -10,9 +10,6 @@ module Data.Graph.ControlFlowVertex
 , vertexIdentifier
 , showSpan
 , VertexDeclaration (..)
-, VertexDeclaration' (..)
-, VertexDeclarationStrategy
-, VertexDeclarationWithStrategy
 ) where
 
 import           Data.Abstract.Declarations
@@ -100,24 +97,18 @@ instance ToJSON ControlFlowVertex where
 -- 'Name's for terms with symbolic names like Identifiers and Declarations.
 
 class VertexDeclaration syntax where
-  toVertex :: (Declarations1 syntax, Foldable syntax)
+  toVertex :: (Declarations1 whole, Foldable whole, VertexDeclaration whole)
            => Loc
            -> ModuleInfo
-           -> syntax (Term syntax Loc)
+           -> syntax (Term whole Loc)
            -> Maybe (ControlFlowVertex, Name)
 
-instance (VertexDeclaration' syntax syntax) => VertexDeclaration syntax where
-  toVertex = toVertex'
+instance (VertexDeclarationStrategy syntax ~ strategy, VertexDeclarationWithStrategy strategy syntax) => VertexDeclaration syntax where
+  toVertex = toVertexWithStrategy (Proxy :: Proxy strategy)
 
-class VertexDeclaration' whole syntax where
-  toVertex' :: (Declarations1 whole, Foldable whole)
-            => Loc
-            -> ModuleInfo
-            -> syntax (Term whole Loc)
-            -> Maybe (ControlFlowVertex, Name)
-
-instance (VertexDeclarationStrategy syntax ~ strategy, VertexDeclarationWithStrategy strategy whole syntax) => VertexDeclaration' whole syntax where
-  toVertex' = toVertexWithStrategy (Proxy :: Proxy strategy)
+-- | This appears to be required to convince 'Semantic.Graph.runCallGraph' not to try to specialize the instance too eagerly.
+instance {-# OVERLAPPING #-} VertexDeclaration Maybe where
+  toVertex _ _ _ = Nothing
 
 data Strategy = Default | Custom
 
@@ -129,8 +120,8 @@ type family VertexDeclarationStrategy syntax where
   VertexDeclarationStrategy (Sum _)                 = 'Custom
   VertexDeclarationStrategy syntax                  = 'Default
 
-class VertexDeclarationWithStrategy (strategy :: Strategy) whole syntax where
-  toVertexWithStrategy :: (Declarations1 whole, Foldable whole)
+class VertexDeclarationWithStrategy (strategy :: Strategy) syntax where
+  toVertexWithStrategy :: (Declarations1 whole, Foldable whole, VertexDeclaration whole)
                        => proxy strategy
                        -> Loc
                        -> ModuleInfo
@@ -138,24 +129,24 @@ class VertexDeclarationWithStrategy (strategy :: Strategy) whole syntax where
                        -> Maybe (ControlFlowVertex, Name)
 
 -- | The 'Default' strategy produces 'Nothing'.
-instance VertexDeclarationWithStrategy 'Default whole syntax where
+instance VertexDeclarationWithStrategy 'Default syntax where
   toVertexWithStrategy _ _ _ _ = Nothing
 
-instance Apply (VertexDeclaration' whole) fs => VertexDeclarationWithStrategy 'Custom whole (Sum fs) where
-  toVertexWithStrategy _ ann info = apply @(VertexDeclaration' whole) (toVertex' ann info)
+instance Apply VertexDeclaration fs => VertexDeclarationWithStrategy 'Custom (Sum fs) where
+  toVertexWithStrategy _ ann info = apply @VertexDeclaration (toVertex ann info)
 
-instance VertexDeclarationWithStrategy 'Custom whole Syntax.Identifier where
+instance VertexDeclarationWithStrategy 'Custom Syntax.Identifier where
   toVertexWithStrategy _ ann info (Syntax.Identifier name) = Just (variableVertex (formatName name) info (Loc.span ann), name)
 
-instance VertexDeclarationWithStrategy 'Custom whole Declaration.Function where
+instance VertexDeclarationWithStrategy 'Custom Declaration.Function where
   toVertexWithStrategy _ ann info term@Declaration.Function{} = (\n -> (functionVertex (formatName n) info (Loc.span ann), n)) <$> liftDeclaredName declaredName term
 
-instance VertexDeclarationWithStrategy 'Custom whole Declaration.Method where
+instance VertexDeclarationWithStrategy 'Custom Declaration.Method where
   toVertexWithStrategy _ ann info term@Declaration.Method{} = (\n -> (methodVertex (formatName n) info (Loc.span ann), n)) <$> liftDeclaredName declaredName term
 
-instance VertexDeclarationWithStrategy 'Custom whole whole => VertexDeclarationWithStrategy 'Custom whole Expression.MemberAccess where
-  toVertexWithStrategy proxy ann info (Expression.MemberAccess (Term (In lhsAnn lhs)) (Term (In rhsAnn rhs))) =
-    case (toVertexWithStrategy proxy lhsAnn info lhs, toVertexWithStrategy proxy rhsAnn info rhs) of
+instance VertexDeclarationWithStrategy 'Custom Expression.MemberAccess where
+  toVertexWithStrategy _ ann info (Expression.MemberAccess (Term (In lhsAnn lhs)) (Term (In rhsAnn rhs))) =
+    case (toVertex lhsAnn info lhs, toVertex rhsAnn info rhs) of
       (Just (Variable n _ _, _), Just (_, name)) -> Just (variableVertex (n <> "." <> formatName name) info (Loc.span ann), name)
       (_, Just (_, name)) -> Just (variableVertex (formatName name) info (Loc.span ann), name)
       _ -> Nothing
