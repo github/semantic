@@ -36,6 +36,7 @@ import           Control.Abstract hiding (String)
 import           Control.Abstract.PythonPackage as PythonPackage
 import           Control.Effect.Carrier
 import           Control.Effect.Parse
+import           Control.Lens.Getter
 import           Data.Abstract.Address.Hole as Hole
 import           Data.Abstract.Address.Monovariant as Monovariant
 import           Data.Abstract.Address.Precise as Precise
@@ -52,7 +53,7 @@ import           Data.Abstract.Value.Type as Type
 import           Data.Abstract.AccessControls.Instances ()
 import           Data.Blob
 import           Data.Graph
-import           Data.Graph.ControlFlowVertex (VertexDeclaration1)
+import           Data.Graph.ControlFlowVertex (VertexDeclaration)
 import           Data.Language as Language
 import           Data.List (isPrefixOf, isSuffixOf)
 import           Data.Project
@@ -118,22 +119,24 @@ runGraph CallGraph includePackages project
     modules <- topologicalSort <$> runImportGraphToModules lang package
     runCallGraph lang includePackages modules package
 
-runCallGraph :: ( VertexDeclaration1 syntax
-                , Declarations1 syntax
-                , AccessControls1 syntax
-                , Ord1 syntax
-                , Functor syntax
-                , Evaluatable syntax
-                , FreeVariables1 syntax
+runCallGraph :: ( VertexDeclaration term
+                , Declarations (term Loc)
+                , AccessControls (term Loc)
+                , Ord (term Loc)
+                , Evaluatable (Base (term Loc))
+                , FreeVariables (term Loc)
+                , Recursive (term Loc)
+                , Show (term Loc)
                 , HasPrelude lang
+                , HasSpan (term Loc)
                 , Member Trace sig
                 , Carrier sig m
                 , Effect sig
                 )
              => Proxy lang
              -> Bool
-             -> [Module (Term syntax Loc)]
-             -> Package (Term syntax Loc)
+             -> [Module (term Loc)]
+             -> Package (term Loc)
              -> m (Graph ControlFlowVertex)
 runCallGraph lang includePackages modules package
   = fmap (simplify . fst)
@@ -158,7 +161,7 @@ runCallGraph lang includePackages modules package
   . runModuleTable
   . runModules (ModuleTable.modulePaths (packageModules package))
   $ evaluate lang perModule modules
-  where perTerm = evalTerm (withTermSpans (Loc.span . termFAnnotation . project) . graphingTerms . cachingTerms)
+  where perTerm = evalTerm (withTermSpans (^. span_) . graphingTerms . cachingTerms)
         perModule = (if includePackages then graphingPackages else id) . convergingModules . graphingModules $ runDomainEffects perTerm
 
 
