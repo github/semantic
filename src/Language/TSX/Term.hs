@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving #-}
 module Language.TSX.Term
 ( Syntax
 , Term(..)
@@ -187,3 +187,4 @@ type Syntax =
 
 
 newtype Term ann = Term { getTerm :: Term.Term (Sum Syntax) ann }
+  deriving (Foldable, Functor, Traversable)
