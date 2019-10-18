@@ -49,7 +49,7 @@ import qualified Language.TypeScript.Syntax as TypeScript
 data Token
   = Enter { tokenName :: Text, tokenSnippetRange :: Range }
   | Exit  { tokenName :: Text, tokenSnippetRange :: Range}
-  | Iden  { identifierName :: Text, tokenSpan :: Span, docsLiteralRange :: Maybe Range }
+  | Iden  { identifierName :: Text, tokenLoc :: Loc, docsLiteralRange :: Maybe Range }
   deriving (Eq, Show)
 
 type Tagger = Stream (Of Token)
@@ -58,8 +58,8 @@ enter, exit :: Monad m => String -> Range -> Tagger m ()
 enter c = yield . Enter (pack c)
 exit c = yield . Exit (pack c)
 
-emitIden :: Monad m => Span -> Maybe Range -> Name -> Tagger m ()
-emitIden span docsLiteralRange name = yield (Iden (formatName name) span docsLiteralRange)
+emitIden :: Monad m => Loc -> Maybe Range -> Name -> Tagger m ()
+emitIden loc docsLiteralRange name = yield (Iden (formatName name) loc docsLiteralRange)
 
 class Taggable constr where
   docsLiteral ::
@@ -115,7 +115,7 @@ descend lang t@(In loc _) = do
   let litRange = docsLiteral lang term
 
   enter (constructorName term) snippetRange
-  maybe (pure ()) (emitIden (Loc.span loc) litRange) (symbolName term)
+  maybe (pure ()) (emitIden loc litRange) (symbolName term)
   traverse_ subtermRef t
   exit (constructorName term) snippetRange
 

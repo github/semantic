@@ -216,7 +216,7 @@ instance Listable Text where
   tiers = pack `mapT` tiers
 
 instance Listable ToC.Declaration where
-  tiers = cons5 ToC.Declaration
+  tiers = cons4 ToC.Declaration
 
 instance Listable ToC.Kind where
   tiers

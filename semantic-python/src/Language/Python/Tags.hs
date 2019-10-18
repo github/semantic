@@ -57,36 +57,36 @@ instance (ToTags l, ToTags r) => ToTagsBy 'Custom (l :+: r) where
 
 instance ToTagsBy 'Custom Py.FunctionDefinition where
   tags' t@Py.FunctionDefinition
-    { ann = Loc Range { start } span
+    { ann = loc@Loc { byteRange = Range { start } }
     , name = Py.Identifier { text = name }
     , body = Py.Block { ann = Loc Range { start = end } _, extraChildren }
     } = do
       src <- ask @Source
       let docs = listToMaybe extraChildren >>= docComment src
           sliced = slice src (Range start end)
-      Tags.yield (Tag name Function span (Tags.firstLine sliced) docs)
+      Tags.yield (Tag name Function loc (Tags.firstLine sliced) docs)
       gtags t
 
 instance ToTagsBy 'Custom Py.ClassDefinition where
   tags' t@Py.ClassDefinition
-    { ann = Loc Range { start } span
+    { ann = loc@Loc { byteRange = Range { start } }
     , name = Py.Identifier { text = name }
     , body = Py.Block { ann = Loc Range { start = end } _, extraChildren }
     } = do
       src <- ask @Source
       let docs = listToMaybe extraChildren >>= docComment src
           sliced = slice src (Range start end)
-      Tags.yield (Tag name Class span (Tags.firstLine sliced) docs)
+      Tags.yield (Tag name Class loc (Tags.firstLine sliced) docs)
       gtags t
 
 instance ToTagsBy 'Custom Py.Call where
   tags' t@Py.Call
-    { ann = Loc range span
+    { ann = loc@Loc { byteRange = range }
     , function = Py.PrimaryExpression (Prj Py.Identifier { text = name })
     } = do
       src <- ask @Source
       let sliced = slice src range
-      Tags.yield (Tag name Call span (Tags.firstLine sliced) Nothing)
+      Tags.yield (Tag name Call loc (Tags.firstLine sliced) Nothing)
       gtags t
   tags' t@Py.Call{} = gtags t
 
