@@ -107,11 +107,7 @@ instance FromJSON BlobPair where
     >>= maybeM (Prelude.fail "Expected object with 'before' and/or 'after' keys only")
 
 maybeBlobPair :: MonadFail m => Maybe Blob -> Maybe Blob -> m BlobPair
-maybeBlobPair a b = case (a, b) of
-  (Just a, Nothing) -> pure (Delete a)
-  (Nothing, Just b) -> pure (Insert b)
-  (Just a, Just b)  -> pure (Compare a b)
-  _                 -> Prologue.fail "expected file pair with content on at least one side"
+maybeBlobPair a b = maybeM (Prologue.fail "expected file pair with content on at least one side") (fromMaybes a b)
 
 languageForBlobPair :: BlobPair -> Language
 languageForBlobPair = mergeEdit combine . bimap blobLanguage blobLanguage where
