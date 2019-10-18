@@ -1,5 +1,4 @@
 {-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-} -- FIXME
 module Language.TSX.Assignment
 ( assignment
 , TSX.Syntax

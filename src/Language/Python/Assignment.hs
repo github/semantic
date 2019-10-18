@@ -1,5 +1,4 @@
 {-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-} -- FIXME
 module Language.Python.Assignment
 ( assignment
 , Python.Syntax
