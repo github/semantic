@@ -213,6 +213,14 @@ instance Ord ErrorStack where
             ]
 
 
+class HasErrors term where
+  getErrors :: term -> [Error.Error String]
+
+instance (Error :< fs, Apply Foldable fs, Apply Functor fs) => HasErrors (Term (Sum fs) Loc) where
+  getErrors = cata $ \ (In Loc{..} syntax) ->
+    maybe (fold syntax) (pure . unError span) (Data.Sum.project syntax)
+
+
 data Context a = Context { contextTerms :: NonEmpty a, contextSubject :: a }
   deriving (Eq, Foldable, FreeVariables1, Functor, Generic1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Context
