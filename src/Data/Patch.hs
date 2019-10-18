@@ -35,16 +35,10 @@ patch _ _ ifReplace (Compare a b) = ifReplace a b
 
 
 instance Bifunctor Patch where
-  bimap f g = \case
-    Delete  a   -> Delete (f a)
-    Insert    b -> Insert (g b)
-    Compare a b -> Compare (f a) (g b)
+  bimap = bimapDefault
 
 instance Bifoldable Patch where
-  bifoldMap f g = \case
-    Delete  a   -> f a
-    Insert    b -> g b
-    Compare a b -> f a <> g b
+  bifoldMap = bifoldMapDefault
 
 instance Bitraversable Patch where
   bitraverse f g = \case
