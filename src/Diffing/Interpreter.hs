@@ -9,6 +9,7 @@ import Control.Effect.Carrier
 import Control.Effect.Cull
 import Control.Effect.NonDet
 import qualified Data.Diff as Diff
+import Data.Edit (Edit, edit)
 import Data.Term
 import Diffing.Algorithm
 import Diffing.Algorithm.RWS
@@ -36,12 +37,12 @@ class Bifoldable (DiffFor term) => DiffTerms term where
   -- Note that the dependency means that the diff type is in 1:1 correspondence with the term type. This allows subclasses of 'DiffTerms' to receive e.g. @'DiffFor' term a b@ without incurring ambiguity, since every diff type is unique to its term type.
   type DiffFor term = (diff :: * -> * -> *) | diff -> term
 
-  -- | Diff a 'These' of terms.
-  diffTermPair :: These (term ann1) (term ann2) -> DiffFor term ann1 ann2
+  -- | Diff an 'Edit' of terms.
+  diffTermPair :: Edit (term ann1) (term ann2) -> DiffFor term ann1 ann2
 
 instance (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => DiffTerms (Term syntax) where
   type DiffFor (Term syntax) = Diff.Diff syntax
-  diffTermPair = these Diff.deleting Diff.inserting diffTerms
+  diffTermPair = edit Diff.deleting Diff.inserting diffTerms
 
 
 -- | Run an 'Algorithm' to completion in an 'Alternative' context using the supplied comparability & equivalence relations.

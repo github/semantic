@@ -31,7 +31,6 @@ import           Data.ProtoLens (defMessage)
 import           Data.Semilattice.Lower
 import           Data.Term (Term)
 import qualified Data.Text as T
-import           Data.These (These, fromThese, these)
 import           Diffing.Algorithm (Diffable)
 import qualified Diffing.Algorithm.SES as SES
 import qualified Language.Java as Java
@@ -108,7 +107,7 @@ summarizeDiffParsers :: PerLanguageModes -> Map Language (SomeParser SummarizeDi
 summarizeDiffParsers = allParsers
 
 class SummarizeDiff term where
-  summarizeTerms :: (Member Telemetry sig, Carrier sig m, MonadIO m) => These (Blob, term Loc) (Blob, term Loc) -> m [Either ErrorSummary TOCSummary]
+  summarizeTerms :: (Member Telemetry sig, Carrier sig m, MonadIO m) => Edit (Blob, term Loc) (Blob, term Loc) -> m [Either ErrorSummary TOCSummary]
 
 instance (Diffable syntax, Eq1 syntax, HasDeclaration syntax, Hashable1 syntax, Traversable syntax) => SummarizeDiff (Term syntax) where
   summarizeTerms = fmap diffTOC . diffTerms . bimap decorateTerm decorateTerm where
@@ -124,10 +123,10 @@ deriving via (ViaTags Python.Term) instance SummarizeDiff Python.Term
 newtype ViaTags t a = ViaTags (t a)
 
 instance Tagging.ToTags t => SummarizeDiff (ViaTags t) where
-  summarizeTerms terms = pure . map (uncurry summarizeChange) . dedupe . mapMaybe toChange . uncurry (SES.ses compare) . fromThese [] [] . bimap (uncurry go) (uncurry go) $ terms where
+  summarizeTerms terms = pure . map (uncurry summarizeChange) . dedupe . mapMaybe toChange . edit (map Delete) (map Insert) (SES.ses compare) . bimap (uncurry go) (uncurry go) $ terms where
     go blob (ViaTags t) = Tagging.tags (blobSource blob) t
-    lang = languageForBlobPair (BlobPair (these Delete Insert Compare (bimap fst fst terms)))
-    (s1, s2) = fromThese mempty mempty (bimap (blobSource . fst) (blobSource . fst) terms)
+    lang = languageForBlobPair (BlobPair (bimap fst fst terms))
+    (s1, s2) = edit (,mempty) (mempty,) (,) (bimap (blobSource . fst) (blobSource . fst) terms)
     compare = liftA2 (&&) <$> ((==) `on` Tag.kind) <*> ((==) `on` Tag.name)
 
     toChange = \case
