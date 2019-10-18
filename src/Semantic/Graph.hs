@@ -145,16 +145,8 @@ runGraph CallGraph includePackages project
     modules <- topologicalSort <$> runImportGraphToModules lang package
     runCallGraph lang includePackages modules package
 
-runCallGraph :: ( VertexDeclaration term
-                , Declarations (term Loc)
-                , AccessControls (term Loc)
-                , Ord (term Loc)
-                , Evaluatable (Base (term Loc))
-                , FreeVariables (term Loc)
-                , Recursive (term Loc)
-                , Show (term Loc)
+runCallGraph :: ( AnalyzeTerm term
                 , HasPrelude lang
-                , HasSpan (term Loc)
                 , Member Trace sig
                 , Carrier sig m
                 , Effect sig
@@ -195,59 +187,41 @@ runModuleTable :: Evaluator term address value (ReaderC (ModuleTable (Module (Mo
                -> Evaluator term address value m a
 runModuleTable = raiseHandler $ runReader lowerBound
 
-runImportGraphToModuleInfos :: ( Declarations term
-                               , Evaluatable (Base term)
-                               , FreeVariables term
-                               , AccessControls term
-                               , HasSpan term
+runImportGraphToModuleInfos :: ( AnalyzeTerm term
                                , HasPrelude lang
                                , Member Trace sig
-                               , Recursive term
                                , Carrier sig m
-                               , Show term
                                , Effect sig
                                )
                             => Proxy lang
-                            -> Package term
+                            -> Package (term Loc)
                             -> m (Graph ControlFlowVertex)
-runImportGraphToModuleInfos lang (package :: Package term) = runImportGraph lang package allModuleInfos
+runImportGraphToModuleInfos lang (package :: Package (term Loc)) = runImportGraph lang package allModuleInfos
   where allModuleInfos info = vertex (maybe (unknownModuleVertex info) (moduleVertex . moduleInfo) (ModuleTable.lookup (modulePath info) (packageModules package)))
 
-runImportGraphToModules :: ( Declarations term
-                           , Evaluatable (Base term)
-                           , FreeVariables term
-                           , AccessControls term
-                           , HasSpan term
+runImportGraphToModules :: ( AnalyzeTerm term
                            , HasPrelude lang
                            , Member Trace sig
-                           , Recursive term
                            , Carrier sig m
-                           , Show term
                            , Effect sig
                            )
                         => Proxy lang
-                        -> Package term
-                        -> m (Graph (Module term))
-runImportGraphToModules lang (package :: Package term) = runImportGraph lang package resolveOrLowerBound
+                        -> Package (term Loc)
+                        -> m (Graph (Module (term Loc)))
+runImportGraphToModules lang (package :: Package (term Loc)) = runImportGraph lang package resolveOrLowerBound
   where resolveOrLowerBound info = maybe lowerBound vertex (ModuleTable.lookup (modulePath info) (packageModules package))
 
-runImportGraph :: ( AccessControls term
-                  , Evaluatable (Base term)
-                  , FreeVariables term
-                  , HasSpan term
-                  , Declarations term
+runImportGraph :: ( AnalyzeTerm term
                   , HasPrelude lang
                   , Member Trace sig
-                  , Recursive term
                   , Carrier sig m
-                  , Show term
                   , Effect sig
                   )
                => Proxy lang
-               -> Package term
+               -> Package (term Loc)
                -> (ModuleInfo -> Graph vertex)
                -> m (Graph vertex)
-runImportGraph lang (package :: Package term) f
+runImportGraph lang (package :: Package (term Loc)) f
   = fmap (fst >=> f)
   . runEvaluator @_ @_ @(Value _ (Hole (Maybe Name) Precise))
   . raiseHandler (runState lowerBound)
@@ -300,27 +274,21 @@ parseModules parser p = distributeFor (projectBlobs p) (parseModule p parser)
 
 -- | Parse a list of packages from a python project.
 parsePythonPackage :: forall term sig m .
-                   ( Declarations term
-                   , Evaluatable (Base term)
-                   , FreeVariables term
-                   , AccessControls term
-                   , Recursive term
+                   ( AnalyzeTerm term
                    , Member Distribute sig
                    , Member Parse sig
                    , Member Resolution sig
                    , Member Trace sig
-                   , HasSpan term
-                   , Show term
                    , Carrier sig m
                    , Effect sig
                    )
-                   => Parser term -- ^ A parser.
-                   -> Project     -- ^ Project to parse into a package.
-                   -> m (Package term)
+                   => Parser (term Loc) -- ^ A parser.
+                   -> Project           -- ^ Project to parse into a package.
+                   -> m (Package (term Loc))
 parsePythonPackage parser project = do
-  let runAnalysis = runEvaluator @_ @_ @(Value term (Hole (Maybe Name) Precise))
+  let runAnalysis = runEvaluator @_ @_ @(Value (term Loc) (Hole (Maybe Name) Precise))
         . raiseHandler (runState PythonPackage.Unknown)
-        . raiseHandler (runState (lowerBound @(Heap (Hole (Maybe Name) Precise) (Hole (Maybe Name) Precise) (Value term (Hole (Maybe Name) Precise)))))
+        . raiseHandler (runState (lowerBound @(Heap (Hole (Maybe Name) Precise) (Hole (Maybe Name) Precise) (Value (term Loc) (Hole (Maybe Name) Precise)))))
         . raiseHandler runFresh
         . resumingLoadError
         . resumingUnspecialized
