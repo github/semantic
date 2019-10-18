@@ -57,7 +57,6 @@ import           Data.Graph.ControlFlowVertex (VertexDeclaration)
 import           Data.Language as Language
 import           Data.List (isPrefixOf, isSuffixOf)
 import           Data.Project
-import           Data.Term
 import           Data.Text (pack, unpack)
 import           Language.Haskell.HsColour
 import           Language.Haskell.HsColour.Colourise
@@ -273,26 +272,28 @@ parseModules parser p = distributeFor (projectBlobs p) (parseModule p parser)
 
 
 -- | Parse a list of packages from a python project.
-parsePythonPackage :: forall syntax sig m .
-                   ( Declarations1 syntax
-                   , Evaluatable syntax
-                   , FreeVariables1 syntax
-                   , AccessControls1 syntax
-                   , Functor syntax
+parsePythonPackage :: forall term sig m .
+                   ( Declarations term
+                   , Evaluatable (Base term)
+                   , FreeVariables term
+                   , AccessControls term
+                   , Recursive term
                    , Member Distribute sig
                    , Member Parse sig
                    , Member Resolution sig
                    , Member Trace sig
+                   , HasSpan term
+                   , Show term
                    , Carrier sig m
                    , Effect sig
                    )
-                   => Parser (Term syntax Loc) -- ^ A parser.
-                   -> Project                  -- ^ Project to parse into a package.
-                   -> m (Package (Term syntax Loc))
+                   => Parser term -- ^ A parser.
+                   -> Project     -- ^ Project to parse into a package.
+                   -> m (Package term)
 parsePythonPackage parser project = do
-  let runAnalysis = runEvaluator @_ @_ @(Value (Term syntax Loc) (Hole (Maybe Name) Precise))
+  let runAnalysis = runEvaluator @_ @_ @(Value term (Hole (Maybe Name) Precise))
         . raiseHandler (runState PythonPackage.Unknown)
-        . raiseHandler (runState (lowerBound @(Heap (Hole (Maybe Name) Precise) (Hole (Maybe Name) Precise) (Value (Term syntax Loc) (Hole (Maybe Name) Precise)))))
+        . raiseHandler (runState (lowerBound @(Heap (Hole (Maybe Name) Precise) (Hole (Maybe Name) Precise) (Value term (Hole (Maybe Name) Precise)))))
         . raiseHandler runFresh
         . resumingLoadError
         . resumingUnspecialized
