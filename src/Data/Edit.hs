@@ -48,10 +48,10 @@ instance Bitraversable Edit where
 
 instance Eq2 Edit where
   liftEq2 eql eqr = curry $ \case
-    (Delete a1, Delete a2) -> eql a1 a2
-    (Insert b1, Insert b2) -> eqr b1 b2
+    (Delete  a1   , Delete  a2   ) -> eql a1 a2
+    (Insert     b1, Insert     b2) -> eqr b1 b2
     (Compare a1 b1, Compare a2 b2) -> eql a1 a2 && eqr b1 b2
-    _ -> False
+    _                              -> False
 
 instance Ord2 Edit where
   liftCompare2 cmpl cmpr = curry $ \case
