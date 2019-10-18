@@ -1,9 +1,6 @@
 {-# LANGUAGE FunctionalDependencies, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 module Data.Term
 ( Term(..)
-, termIn
-, termAnnotation
-, termOut
 , injectTerm
 , projectTerm
 , guardTerm
@@ -12,6 +9,8 @@ module Data.Term
 , hoistTerm
 , hoistTermF
 , Annotated (..)
+-- * Abstract term interfaces
+, IsTerm(..)
 ) where
 
 import Prologue
@@ -25,12 +24,6 @@ import           Text.Show
 
 -- | A Term with an abstract syntax tree and an annotation.
 newtype Term syntax ann = Term { unTerm :: TermF syntax ann (Term syntax ann) }
-
-termAnnotation :: Term syntax ann -> ann
-termAnnotation = termFAnnotation . unTerm
-
-termOut :: Term syntax ann -> syntax (Term syntax ann)
-termOut = termFOut . unTerm
 
 projectTerm :: forall f syntax ann . (f :< syntax) => Term (Sum syntax) ann -> Maybe (f (Term (Sum syntax) ann))
 projectTerm = Sum.project . termOut
@@ -71,10 +64,6 @@ instance Annotated (Term syntax ann) ann where
 termSize :: (Foldable f, Functor f) => Term f annotation -> Int
 termSize = cata size where
   size (In _ syntax) = 1 + sum syntax
-
--- | Build a Term from its annotation and syntax.
-termIn :: ann -> syntax (Term syntax ann) -> Term syntax ann
-termIn = (Term .) . In
 
 injectTerm :: (f :< syntax) => ann -> f (Term (Sum syntax) ann) -> Term (Sum syntax) ann
 injectTerm a = termIn a . Sum.inject
@@ -171,3 +160,22 @@ instance (ToJSON b, ToJSONFields a, ToJSONFields1 f) => ToJSONFields (TermF f a 
 instance (ToJSON b, ToJSONFields a, ToJSONFields1 f) => ToJSON (TermF f a b) where
   toJSON = object . toJSONFields
   toEncoding = pairs . mconcat . toJSONFields
+
+
+class IsTerm term where
+  type Syntax term :: * -> *
+
+  termAnnotation :: term ann -> ann
+  termOut :: term ann -> Syntax term (term ann)
+
+  -- | Build a Term from its annotation and syntax.
+  termIn :: ann -> Syntax term (term ann) -> term ann
+
+
+instance IsTerm (Term syntax) where
+  type Syntax (Term syntax) = syntax
+
+  termAnnotation = termFAnnotation . unTerm
+  termOut = termFOut . unTerm
+
+  termIn = fmap Term . In
