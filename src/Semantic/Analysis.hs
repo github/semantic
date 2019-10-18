@@ -150,19 +150,19 @@ runDomainEffects runTerm
 --
 --   This calls out to the 'Evaluatable' instances, and can have other functions composed after it to e.g. intercept effects arising in the evaluation of the term.
 evalTerm :: ( Carrier sig m
-            , AbstractValue (term Loc) address value m
-            , AccessControls (term Loc)
-            , Declarations (term Loc)
-            , Evaluatable (Base (term Loc))
-            , FreeVariables (term Loc)
-            , HasSpan (term Loc)
+            , AbstractValue term address value m
+            , AccessControls term
+            , Declarations term
+            , Evaluatable (Base term)
+            , FreeVariables term
+            , HasSpan term
             , Member (Allocator address) sig
             , Member (Bitwise value) sig
             , Member (Boolean value) sig
             , Member (Deref value) sig
             , Member (Error (LoopControl value)) sig
             , Member (Error (Return value)) sig
-            , Member (Function (term Loc) address value) sig
+            , Member (Function term address value) sig
             , Member (Modules address value) sig
             , Member (Numeric value) sig
             , Member (Object address value) sig
@@ -175,7 +175,7 @@ evalTerm :: ( Carrier sig m
             , Member (Resumable (BaseError (HeapError address))) sig
             , Member (Resumable (BaseError (ScopeError address))) sig
             , Member (Resumable (BaseError (UnspecializedError address value))) sig
-            , Member (Resumable (BaseError (EvalError (term Loc) address value))) sig
+            , Member (Resumable (BaseError (EvalError term address value))) sig
             , Member (Resumable (BaseError ResolutionError)) sig
             , Member (State (Heap address address value)) sig
             , Member (State (ScopeGraph address)) sig
@@ -188,10 +188,10 @@ evalTerm :: ( Carrier sig m
             , Member Fresh sig
             , Member Trace sig
             , Ord address
-            , Recursive (term Loc)
+            , Recursive term
             , Show address
             )
-        => Open (term Loc -> Evaluator (term Loc) address value m value)
-        -> term Loc -> Evaluator (term Loc) address value m value
+         => Open (term -> Evaluator term address value m value)
+         -> term -> Evaluator term address value m value
 -- NB: We use a lazy pattern match for the lambda’s argument to postpone evaluating the pair until eval/ref is called.
 evalTerm perTerm = fst (fix (\ ~(ev, re) -> (perTerm (eval ev re . project), ref ev re . project)))
