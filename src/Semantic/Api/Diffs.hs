@@ -162,4 +162,4 @@ diffTerms terms = time "diff" languageTag $ do
   let diff = diffTermPair (bimap snd snd terms)
   diff <$ writeStat (Stat.count "diff.nodes" (bilength diff) languageTag)
   where languageTag = languageTagForBlobPair blobs
-        blobs = BlobPair (bimap fst fst terms)
+        blobs = bimap fst fst terms

@@ -125,7 +125,7 @@ newtype ViaTags t a = ViaTags (t a)
 instance Tagging.ToTags t => SummarizeDiff (ViaTags t) where
   summarizeTerms terms = pure . map (uncurry summarizeChange) . dedupe . mapMaybe toChange . edit (map Delete) (map Insert) (SES.ses compare) . bimap (uncurry go) (uncurry go) $ terms where
     go blob (ViaTags t) = Tagging.tags (blobSource blob) t
-    lang = languageForBlobPair (BlobPair (bimap fst fst terms))
+    lang = languageForBlobPair (bimap fst fst terms)
     (s1, s2) = edit (,mempty) (mempty,) (,) (bimap (blobSource . fst) (blobSource . fst) terms)
     compare = liftA2 (&&) <$> ((==) `on` Tag.kind) <*> ((==) `on` Tag.name)
 

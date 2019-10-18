@@ -56,6 +56,6 @@ parsePairWith
   -> BlobPair                                                                -- ^ The blob pair to parse.
   -> m a
 parsePairWith parsers with blobPair = case Map.lookup (languageForBlobPair blobPair) parsers of
-  Just (SomeParser parser) -> bitraverse (p parser) (p parser) (getBlobPair blobPair) >>= with
+  Just (SomeParser parser) -> bitraverse (p parser) (p parser) blobPair >>= with
   _                        -> noLanguageForBlob (pathForBlobPair blobPair)
   where p parser blob = (,) blob <$> parse parser blob
