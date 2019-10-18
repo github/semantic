@@ -54,7 +54,7 @@ instance Eq2 Edit where
     _ -> False
 
 instance Ord2 Edit where
-  liftCompare2 cmpl cmpr p1 p2 = case (p1, p2) of
+  liftCompare2 cmpl cmpr = curry $ \case
     (Delete  a1   , Delete  a2   ) -> cmpl a1 a2
     (Delete  _    , _            ) -> LT
     (Insert     b1, Insert     b2) -> cmpr b1 b2
