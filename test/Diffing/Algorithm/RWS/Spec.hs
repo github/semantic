@@ -7,7 +7,6 @@ import Data.Functor.Listable (ListableSyntax)
 import Data.Sum
 import qualified Data.Syntax as Syntax
 import Data.Term
-import Data.These
 import Diffing.Algorithm (comparableTerms)
 import Diffing.Interpreter (stripDiff)
 import Diffing.Algorithm.RWS
