@@ -14,9 +14,6 @@ module Data.Blob
 , sourceBlob
 , noLanguageForBlob
 , BlobPair
-, pattern Diffing
-, pattern Inserting
-, pattern Deleting
 , maybeBlobPair
 , decodeBlobPairs
 , languageForBlobPair
@@ -109,33 +106,22 @@ instance FromJSON BlobPair where
     before <- o .:? "before"
     after <- o .:? "after"
     case (before, after) of
-      (Just b, Just a)  -> pure $ Diffing b a
-      (Just b, Nothing) -> pure $ Deleting b
-      (Nothing, Just a) -> pure $ Inserting a
+      (Just b, Just a)  -> pure $ Compare b a
+      (Just b, Nothing) -> pure $ Delete b
+      (Nothing, Just a) -> pure $ Insert a
       _                 -> Prelude.fail "Expected object with 'before' and/or 'after' keys only"
-
-pattern Diffing :: Blob -> Blob -> BlobPair
-pattern Diffing a b = Compare a b
-
-pattern Inserting :: Blob -> BlobPair
-pattern Inserting a = Insert a
-
-pattern Deleting :: Blob -> BlobPair
-pattern Deleting b = Delete b
-
-{-# COMPLETE Diffing, Inserting, Deleting #-}
 
 maybeBlobPair :: MonadFail m => Maybe Blob -> Maybe Blob -> m BlobPair
 maybeBlobPair a b = case (a, b) of
-  (Just a, Nothing) -> pure (Deleting a)
-  (Nothing, Just b) -> pure (Inserting b)
-  (Just a, Just b)  -> pure (Diffing a b)
+  (Just a, Nothing) -> pure (Delete a)
+  (Nothing, Just b) -> pure (Insert b)
+  (Just a, Just b)  -> pure (Compare a b)
   _                 -> Prologue.fail "expected file pair with content on at least one side"
 
 languageForBlobPair :: BlobPair -> Language
-languageForBlobPair (Deleting b)  = blobLanguage b
-languageForBlobPair (Inserting b) = blobLanguage b
-languageForBlobPair (Diffing a b)
+languageForBlobPair (Delete b)  = blobLanguage b
+languageForBlobPair (Insert b) = blobLanguage b
+languageForBlobPair (Compare a b)
   | blobLanguage a == Unknown || blobLanguage b == Unknown
     = Unknown
   | otherwise
@@ -143,9 +129,9 @@ languageForBlobPair (Diffing a b)
 
 pathForBlobPair :: BlobPair -> FilePath
 pathForBlobPair x = blobPath $ case x of
-  (Inserting b) -> b
-  (Deleting b)  -> b
-  (Diffing _ b) -> b
+  (Insert b) -> b
+  (Delete b)  -> b
+  (Compare _ b) -> b
 
 languageTagForBlobPair :: BlobPair -> [(String, String)]
 languageTagForBlobPair pair = showLanguage (languageForBlobPair pair)

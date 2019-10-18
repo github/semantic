@@ -7,6 +7,7 @@ module Semantic.Api.Bridge
 
 import           Control.Lens
 import qualified Data.Blob as Data
+import qualified Data.Edit as Data
 import qualified Data.Language as Data
 import           Data.ProtoLens (defMessage)
 import qualified Data.Text as T
@@ -78,11 +79,11 @@ instance APIConvert API.BlobPair Data.BlobPair where
   converting = prism' blobPairToApiBlobPair apiBlobPairToBlobPair where
 
     apiBlobPairToBlobPair blobPair = case (blobPair^.maybe'before, blobPair^.maybe'after) of
-      (Just before, Just after) -> Just $ Data.Diffing (before^.bridging) (after^.bridging)
-      (Just before, Nothing)    -> Just $ Data.Deleting (before^.bridging)
-      (Nothing, Just after)     -> Just $ Data.Inserting (after^.bridging)
+      (Just before, Just after) -> Just $ Data.Compare (before^.bridging) (after^.bridging)
+      (Just before, Nothing)    -> Just $ Data.Delete (before^.bridging)
+      (Nothing, Just after)     -> Just $ Data.Insert (after^.bridging)
       _                         -> Nothing
 
-    blobPairToApiBlobPair (Data.Diffing before after) = defMessage & P.maybe'before .~ (bridging #? before) & P.maybe'after .~ (bridging #? after)
-    blobPairToApiBlobPair (Data.Inserting after)      = defMessage & P.maybe'before .~ Nothing & P.maybe'after .~ (bridging #? after)
-    blobPairToApiBlobPair (Data.Deleting before)      = defMessage & P.maybe'before .~ (bridging #? before) & P.maybe'after .~ Nothing
+    blobPairToApiBlobPair (Data.Compare before after) = defMessage & P.maybe'before .~ (bridging #? before) & P.maybe'after .~ (bridging #? after)
+    blobPairToApiBlobPair (Data.Insert after)      = defMessage & P.maybe'before .~ Nothing & P.maybe'after .~ (bridging #? after)
+    blobPairToApiBlobPair (Data.Delete before)      = defMessage & P.maybe'before .~ (bridging #? before) & P.maybe'after .~ Nothing
