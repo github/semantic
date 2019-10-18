@@ -12,7 +12,6 @@ module Rendering.TOC
 
 import Prologue hiding (index)
 import Analysis.TOCSummary
-import Data.Align (bicrosswalk)
 import Data.Aeson (ToJSON(..), Value, (.=), object)
 import Data.Diff
 import Data.Edit
@@ -78,11 +77,16 @@ tableOfContentsBy :: (Foldable f, Functor f)
                   -> Diff f ann ann                       -- ^ The diff to compute the table of contents for.
                   -> [(Change, a)]                        -- ^ A list of entries for relevant changed nodes in the diff.
 tableOfContentsBy selector = fromMaybe [] . cata (\ r -> case r of
-  Patch patch -> (pure . patchEntry <$> bicrosswalk selector selector patch) <> bifoldMap fold fold patch <> Just []
+  Patch patch -> (pure . patchEntry <$> select (bimap selector selector patch)) <> bifoldMap fold fold patch <> Just []
   Merge (In (_, ann2) r) -> case (selector (In ann2 r), fold r) of
     (Just a, Just entries) -> Just ((Changed, a) : entries)
     (_     , entries)      -> entries)
   where patchEntry = edit (Deleted,) (Inserted,) (const (Replaced,))
+
+        select = \case
+          Delete  a   -> Delete <$> a
+          Insert    b -> Insert <$> b
+          Compare a b -> liftA2 Compare a b <|> Delete <$> a <|> Insert <$> b
 
 
 data DedupeKey = DedupeKey !Kind {-# UNPACK #-} !T.Text
