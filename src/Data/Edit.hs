@@ -28,6 +28,7 @@ edit delete insert compare = \case
   Insert    b -> insert b
   Compare a b -> compare a b
 
+-- | Extract the values from an 'Edit', combining 'Compare's with the passed function.
 mergeEdit :: (a -> a -> a) -> Edit a a -> a
 mergeEdit = edit id id
 
