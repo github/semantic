@@ -38,7 +38,7 @@ import           Assigning.Assignment
 import qualified CMarkGFM
 import           Data.Abstract.Evaluatable (HasPrelude)
 import           Data.AST
-import           Data.Graph.ControlFlowVertex (VertexDeclaration1)
+import           Data.Graph.ControlFlowVertex (VertexDeclaration)
 import           Data.Language
 import           Data.Kind (Constraint)
 import qualified Data.Map as Map
@@ -70,20 +70,20 @@ import           TreeSitter.Unmarshal
 
 -- | A parser, suitable for program analysis, for some specific language, producing 'Term's whose syntax satisfies a list of typeclass constraints.
 data SomeAnalysisParser (constraint :: (* -> *) -> Constraint) ann where
-  SomeAnalysisParser :: ( constraint syntax
-                        , VertexDeclaration1 syntax
+  SomeAnalysisParser :: ( constraint term
+                        , VertexDeclaration term
                         , HasPrelude lang
                         )
-                     => Parser (Term syntax ann)
+                     => Parser (term ann)
                      -> Proxy lang
                      -> SomeAnalysisParser constraint ann
 
 -- | A parser for some specific language, producing 'Term's whose syntax satisfies a list of typeclass constraints.
-someAnalysisParser :: ( constraint (Sum Go.Syntax)
-                      , constraint (Sum PHP.Syntax)
-                      , constraint (Sum Python.Syntax)
-                      , constraint (Sum Ruby.Syntax)
-                      , constraint (Sum TypeScript.Syntax)
+someAnalysisParser :: ( constraint (Term (Sum Go.Syntax))
+                      , constraint (Term (Sum PHP.Syntax))
+                      , constraint (Term (Sum Python.Syntax))
+                      , constraint (Term (Sum Ruby.Syntax))
+                      , constraint (Term (Sum TypeScript.Syntax))
                       )
                    => proxy constraint                  -- ^ A proxy for the constraint required, e.g. @(Proxy \@Show1)@.
                    -> Language                          -- ^ The 'Language' to select.
