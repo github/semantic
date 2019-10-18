@@ -1,6 +1,8 @@
-{-# LANGUAGE GADTs, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, KindSignatures, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Semantic.Graph
-( runGraph
+( analysisParsers
+, AnalyzeTerm(..)
+, runGraph
 , runCallGraph
 , runImportGraph
 , runImportGraphToModules
@@ -56,6 +58,7 @@ import           Data.Graph
 import           Data.Graph.ControlFlowVertex (VertexDeclaration)
 import           Data.Language as Language
 import           Data.List (isPrefixOf, isSuffixOf)
+import qualified Data.Map as Map
 import           Data.Project
 import           Data.Text (pack, unpack)
 import           Language.Haskell.HsColour
@@ -94,6 +97,32 @@ instance
   , Ord1 syntax
   , Show1 syntax
   ) => AnalysisClasses syntax
+
+class
+  ( VertexDeclaration term
+  , Declarations (term Loc)
+  , AccessControls (term Loc)
+  , Ord (term Loc)
+  , Evaluatable (Base (term Loc))
+  , FreeVariables (term Loc)
+  , Recursive (term Loc)
+  , Show (term Loc)
+  , HasSpan (term Loc)
+  ) => AnalyzeTerm (term :: * -> *) where
+  evaluateTerm
+    :: (term Loc -> Evaluator (term Loc) address value m value)
+    -> (term Loc -> Evaluator (term Loc) address value m value)
+
+analysisParsers :: Map Language (SomeParser AnalyzeTerm Loc)
+analysisParsers = Map.fromList
+  [ goParser'
+  , javascriptParser'
+  , phpParser'
+  , pythonParserALaCarte'
+  , rubyParser'
+  , typescriptParser'
+  , tsxParser'
+  ]
 
 runGraph :: ( Member Distribute sig
             , Member Parse sig
