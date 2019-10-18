@@ -19,7 +19,7 @@ import           Data.Text (pack)
 import qualified Language.Java as Java
 import qualified Language.JSON as JSON
 import qualified Language.PHP.Term as PHP
-import qualified Language.Python as Python
+import qualified Language.Python as PythonPrecise
 import qualified Language.TSX.Term as TSX
 import qualified Language.TypeScript.Term as TypeScript
 import qualified Parsing.Parser as Parser
@@ -124,7 +124,7 @@ instance ToTags Java.Term where
 instance ToTags JSON.Term where
   tags _ _ = Precise.tags
 
-instance ToTags Python.Term where
+instance ToTags PythonPrecise.Term where
   tags _ _ = Precise.tags
 
 

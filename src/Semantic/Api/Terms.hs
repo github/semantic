@@ -42,7 +42,7 @@ import           Source.Loc
 import qualified Language.Java as Java
 import qualified Language.JSON as JSON
 import qualified Language.PHP.Term as PHP
-import qualified Language.Python as Python
+import qualified Language.Python as PythonPrecise
 import qualified Language.TSX.Term as TSX
 import qualified Language.TypeScript.Term as TypeScript
 
@@ -117,8 +117,8 @@ instance ShowTerm Java.Term where
 instance ShowTerm JSON.Term where
   showTerm = serialize Show . void . JSON.getTerm
 
-instance ShowTerm Python.Term where
-  showTerm = serialize Show . void . Python.getTerm
+instance ShowTerm PythonPrecise.Term where
+  showTerm = serialize Show . void . PythonPrecise.getTerm
 
 deriving instance ShowTerm PHP.Term
 deriving instance ShowTerm TSX.Term
@@ -140,8 +140,8 @@ instance SExprTerm Java.Term where
 instance SExprTerm JSON.Term where
   sexprTerm = SExpr.Precise.serializeSExpression . JSON.getTerm
 
-instance SExprTerm Python.Term where
-  sexprTerm = SExpr.Precise.serializeSExpression . Python.getTerm
+instance SExprTerm PythonPrecise.Term where
+  sexprTerm = SExpr.Precise.serializeSExpression . PythonPrecise.getTerm
 
 deriving instance SExprTerm PHP.Term
 deriving instance SExprTerm TSX.Term
