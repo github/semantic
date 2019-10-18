@@ -2,9 +2,9 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-} -- FIXME
 module Language.Markdown.Assignment
 ( assignment
-, Syntax
+, Markdown.Syntax
 , Grammar
-, Language.Markdown.Assignment.Term
+, Markdown.Term
 ) where
 
 import Prologue
@@ -17,40 +17,14 @@ import qualified Data.Syntax as Syntax
 import qualified Data.Term as Term
 import qualified Data.Text as Text
 import qualified Language.Markdown.Syntax as Markup
+import qualified Language.Markdown.Term as Markdown
 import           Parsing.CMark as Grammar (Grammar (..))
 
-type Syntax =
-  '[ Markup.Document
-   -- Block elements
-   , Markup.BlockQuote
-   , Markup.Heading
-   , Markup.HTMLBlock
-   , Markup.OrderedList
-   , Markup.Paragraph
-   , Markup.ThematicBreak
-   , Markup.UnorderedList
-   , Markup.Table
-   , Markup.TableRow
-   , Markup.TableCell
-   -- Inline elements
-   , Markup.Code
-   , Markup.Emphasis
-   , Markup.Image
-   , Markup.LineBreak
-   , Markup.Link
-   , Markup.Strong
-   , Markup.Text
-   , Markup.Strikethrough
-   -- Assignment errors; cmark does not provide parse errors.
-   , Syntax.Error
-   , []
-   ]
-
-type Term = Term.Term (Sum Syntax)
+type Term = Term.Term (Sum Markdown.Syntax)
 type Assignment = Assignment.Assignment (Term.TermF [] CMarkGFM.NodeType) Grammar
 
-assignment :: Assignment (Term Loc)
-assignment = Syntax.handleError $ makeTerm <$> symbol Document <*> children (Markup.Document <$> many blockElement)
+assignment :: Assignment (Markdown.Term Loc)
+assignment = fmap Markdown.Term . Syntax.handleError $ makeTerm <$> symbol Document <*> children (Markup.Document <$> many blockElement)
 
 
 -- Block elements

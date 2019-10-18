@@ -184,6 +184,7 @@ library
                      -- Language-specific grammar/syntax types, & assignments
                      , Language.Markdown.Assignment
                      , Language.Markdown.Syntax
+                     , Language.Markdown.Term
                      , Language.Go.Assignment
                      , Language.Go.Syntax
                      , Language.Go.Term

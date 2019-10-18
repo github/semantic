@@ -42,6 +42,7 @@ import           Source.Loc
 import qualified Language.Java as Java
 import qualified Language.JSON as JSON
 import qualified Language.Go.Term as Go
+import qualified Language.Markdown.Term as Markdown
 import qualified Language.PHP.Term as PHP
 import qualified Language.Python as PythonPrecise
 import qualified Language.Python.Term as PythonALaCarte
@@ -123,6 +124,7 @@ instance ShowTerm PythonPrecise.Term where
   showTerm = serialize Show . void . PythonPrecise.getTerm
 
 deriving instance ShowTerm Go.Term
+deriving instance ShowTerm Markdown.Term
 deriving instance ShowTerm PHP.Term
 deriving instance ShowTerm PythonALaCarte.Term
 deriving instance ShowTerm TSX.Term
@@ -148,6 +150,7 @@ instance SExprTerm PythonPrecise.Term where
   sexprTerm = SExpr.Precise.serializeSExpression . PythonPrecise.getTerm
 
 deriving instance SExprTerm Go.Term
+deriving instance SExprTerm Markdown.Term
 deriving instance SExprTerm PHP.Term
 deriving instance SExprTerm PythonALaCarte.Term
 deriving instance SExprTerm TSX.Term
@@ -164,6 +167,7 @@ instance (ConstructorName syntax, Foldable syntax, Functor syntax) => DOTGraphTe
   dotGraphTerm = serialize (DOT (termStyle "terms")) . renderTreeGraph
 
 deriving instance DOTGraphTerm Go.Term
+deriving instance DOTGraphTerm Markdown.Term
 deriving instance DOTGraphTerm PHP.Term
 deriving instance DOTGraphTerm PythonALaCarte.Term
 deriving instance DOTGraphTerm TSX.Term
@@ -180,6 +184,7 @@ instance ToJSONFields1 syntax => JSONTreeTerm (Term syntax) where
   jsonTreeTerm = renderJSONTerm
 
 deriving instance JSONTreeTerm Go.Term
+deriving instance JSONTreeTerm Markdown.Term
 deriving instance JSONTreeTerm PHP.Term
 deriving instance JSONTreeTerm PythonALaCarte.Term
 deriving instance JSONTreeTerm TSX.Term
@@ -206,6 +211,7 @@ instance (Foldable syntax, Functor syntax, ConstructorName syntax) => JSONGraphT
           & P.errors .~ mempty
 
 deriving instance JSONGraphTerm Go.Term
+deriving instance JSONGraphTerm Markdown.Term
 deriving instance JSONGraphTerm PHP.Term
 deriving instance JSONGraphTerm PythonALaCarte.Term
 deriving instance JSONGraphTerm TSX.Term
