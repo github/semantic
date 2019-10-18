@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DeriveAnyClass, EmptyCase, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Data.Graph.ControlFlowVertex
 ( ControlFlowVertex (..)
 , packageVertex
@@ -24,6 +24,7 @@ import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Expression as Expression
 import           Data.Term
 import qualified Data.Text as T
+import           GHC.Generics (V1)
 import           Prologue
 import           Source.Loc as Loc
 import           Source.Span
@@ -107,8 +108,8 @@ instance (VertexDeclarationStrategy syntax ~ strategy, VertexDeclarationWithStra
   toVertex = toVertexWithStrategy (Proxy :: Proxy strategy)
 
 -- | This appears to be required to convince 'Semantic.Graph.runCallGraph' not to try to specialize the instance too eagerly.
-instance {-# OVERLAPPING #-} VertexDeclaration Maybe where
-  toVertex _ _ _ = Nothing
+instance {-# OVERLAPPING #-} VertexDeclaration V1 where
+  toVertex _ _ v = case v of {}
 
 data Strategy = Default | Custom
 
