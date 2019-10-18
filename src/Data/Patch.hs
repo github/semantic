@@ -6,13 +6,11 @@ module Data.Patch
 , edit
 ) where
 
-import Data.Aeson
 import Data.Align
 import Data.Bifoldable
 import Data.Bifunctor
 import Data.Bitraversable
 import Data.Functor.Classes
-import Data.JSON.Fields
 import Data.These
 import GHC.Generics (Generic, Generic1)
 
@@ -70,9 +68,3 @@ instance Show2 Patch where
     Delete a -> showsUnaryWith spl "Delete" d a
     Insert b -> showsUnaryWith spr "Insert" d b
     Compare a b -> showsBinaryWith spl spr "Compare" d a b
-
-
-instance (ToJSONFields a, ToJSONFields b) => ToJSONFields (Patch a b) where
-  toJSONFields (Insert a)    = [ "insert" .= object (toJSONFields a) ]
-  toJSONFields (Delete a)    = [ "delete" .= object (toJSONFields a) ]
-  toJSONFields (Compare a b) = [ "replace" .= [object (toJSONFields a), object (toJSONFields b)] ]

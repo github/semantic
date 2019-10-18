@@ -10,6 +10,7 @@ module Data.JSON.Fields
 
 import           Data.Aeson
 import qualified Data.Map as Map
+import           Data.Patch
 import           Data.Sum (Apply (..), Sum)
 import qualified Data.Text as Text
 import           GHC.Generics
@@ -56,6 +57,11 @@ instance ToJSONFields Span where
 
 instance ToJSONFields Loc where
   toJSONFields Loc{..} = toJSONFields byteRange <> toJSONFields span
+
+instance (ToJSONFields a, ToJSONFields b) => ToJSONFields (Patch a b) where
+  toJSONFields (Insert a)    = [ "insert" .= object (toJSONFields a) ]
+  toJSONFields (Delete a)    = [ "delete" .= object (toJSONFields a) ]
+  toJSONFields (Compare a b) = [ "replace" .= [object (toJSONFields a), object (toJSONFields b)] ]
 
 
 newtype JSONFields a = JSONFields { unJSONFields :: a }
