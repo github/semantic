@@ -7,7 +7,6 @@ import           Control.Exception as Exc (displayException)
 import           Data.Blob
 import           Data.Blob.IO
 import qualified Data.ByteString.Char8 as B
-import           Data.Functor.Both
 import           Data.Handle
 import qualified Data.Language as Language
 import           Data.List (intercalate)
@@ -100,7 +99,7 @@ diffCommand = command "diff" (info diffArgumentsParser (progDesc "Compute change
               <|> flag'                                    (diffSummaryBuilder JSON)          (long "toc"         <> help "Output JSON table of contents diff summary")
               <|> flag'                                    (parseDiffBuilder DiffDotGraph)    (long "dot"         <> help "Output the diff as a DOT graph")
               <|> flag'                                    (parseDiffBuilder DiffShow)        (long "show"        <> help "Output using the Show instance (debug only, format subject to change without notice)")
-      filesOrStdin <- Right <$> some (Both <$> argument filePathReader (metavar "FILE_A") <*> argument filePathReader (metavar "FILE_B")) <|> pure (Left stdin)
+      filesOrStdin <- Right <$> some ((,) <$> argument filePathReader (metavar "FILE_A") <*> argument filePathReader (metavar "FILE_B")) <|> pure (Left stdin)
       pure $ Task.readBlobPairs filesOrStdin >>= runReader languageModes . renderer
 
 parseCommand :: Mod CommandFields (Parse.ParseC Task.TaskC Builder)

@@ -60,7 +60,6 @@ import Source.Span as X hiding (HasSpan(..), start, end, point)
 import Debug.Trace as X (traceShowM, traceM)
 
 import Data.ByteString as X (ByteString)
-import Data.Functor.Both as X (Both (Both), runBothWith)
 import Data.Edit as X
 import Data.Maybe as X
 import Data.Monoid as X (Monoid(..), First(..), Last(..))
@@ -88,9 +87,9 @@ instance IsString Name where
   fromString = X.name . fromString
 
 -- | Returns an s-expression formatted diff for the specified FilePath pair.
-diffFilePaths :: TaskSession -> Both Path.RelFile -> IO ByteString
-diffFilePaths session paths = do
-  blobs <- readFilePathPair paths
+diffFilePaths :: TaskSession -> Path.RelFile -> Path.RelFile -> IO ByteString
+diffFilePaths session p1 p2 = do
+  blobs <- readFilePathPair p1 p2
   builder <- runTask session (runParse (configTreeSitterParseTimeout (config session)) (parseDiffBuilder DiffSExpression [ blobs ]))
   either (die . displayException) (pure . runBuilder) builder
 
@@ -105,8 +104,8 @@ runParseWithConfig :: (Carrier sig m, Member (Reader Config) sig) => ParseC m a 
 runParseWithConfig task = asks configTreeSitterParseTimeout >>= \ timeout -> runParse timeout task
 
 -- | Read two files to a BlobPair.
-readFilePathPair :: Both Path.RelFile -> IO BlobPair
-readFilePathPair = runBothWith readFilePair . fmap fileForTypedPath
+readFilePathPair :: Path.RelFile -> Path.RelFile -> IO BlobPair
+readFilePathPair p1 p2 = readFilePair (fileForTypedPath p1) (fileForTypedPath p2)
 
 parseTestFile :: Parser term -> Path.RelFile -> IO (Blob, term)
 parseTestFile parser path = runTaskOrDie $ do
