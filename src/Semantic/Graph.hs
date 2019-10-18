@@ -158,7 +158,7 @@ runCallGraph lang includePackages modules package
   . runModuleTable
   . runModules (ModuleTable.modulePaths (packageModules package))
   $ evaluate lang perModule modules
-  where perTerm = evalTerm (withTermSpans . graphingTerms . cachingTerms)
+  where perTerm = evalTerm (withTermSpans (Loc.span . termFAnnotation . project) . graphingTerms . cachingTerms)
         perModule = (if includePackages then graphingPackages else id) . convergingModules . graphingModules $ runDomainEffects perTerm
 
 
@@ -348,13 +348,12 @@ parseModule proj parser blob = moduleForBlob (Just (projectRootDir proj)) blob .
 
 withTermSpans :: ( Member (Reader Span) sig
                  , Member (State Span) sig -- last evaluated child's span
-                 , Recursive term
                  , Carrier sig m
-                 , Base term ~ TermF syntax Loc
                  )
-              => Open (term -> Evaluator term address value m a)
-withTermSpans recur term = let
-  span = Loc.span (termFAnnotation (project term))
+              => (term -> Span)
+              -> Open (term -> Evaluator term address value m a)
+withTermSpans getSpan recur term = let
+  span = getSpan term
   updatedSpanAlg = withCurrentSpan span (recur term)
   in modifyChildSpan span updatedSpanAlg
 
