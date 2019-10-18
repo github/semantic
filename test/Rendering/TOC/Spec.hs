@@ -2,6 +2,8 @@
 module Rendering.TOC.Spec (spec) where
 
 import Analysis.TOCSummary
+import Control.Effect.Parse
+import Control.Effect.Reader
 import Data.Aeson hiding (defaultOptions)
 import Data.Bifunctor
 import Data.Diff
@@ -15,7 +17,7 @@ import Prelude
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import Rendering.TOC
-import Semantic.Api (DiffEffects, decorateTerm, decoratingDiffWith, diffSummaryBuilder, summarizeDiff, summarizeDiffParsers)
+import Semantic.Api (DiffEffects, diffSummaryBuilder, summarizeTerms, summarizeDiffParsers)
 import Serializing.Format as Format
 import Source.Loc
 import Source.Span
@@ -134,22 +136,22 @@ spec = do
   describe "diff with ToCDiffRenderer'" $ do
     it "produces JSON output" $ do
       blobs <- blobsForPaths (Both (Path.relFile "ruby/toc/methods.A.rb") (Path.relFile "ruby/toc/methods.B.rb"))
-      output <- runTaskOrDie (diffSummaryBuilder Format.JSON [blobs])
+      output <- runTaskOrDie (runReader defaultLanguageModes (diffSummaryBuilder Format.JSON [blobs]))
       runBuilder output `shouldBe` ("{\"files\":[{\"path\":\"test/fixtures/ruby/toc/methods.A.rb -> test/fixtures/ruby/toc/methods.B.rb\",\"language\":\"Ruby\",\"changes\":[{\"category\":\"Method\",\"term\":\"self.foo\",\"span\":{\"start\":{\"line\":1,\"column\":1},\"end\":{\"line\":2,\"column\":4}},\"changeType\":\"ADDED\"},{\"category\":\"Method\",\"term\":\"bar\",\"span\":{\"start\":{\"line\":4,\"column\":1},\"end\":{\"line\":6,\"column\":4}},\"changeType\":\"MODIFIED\"},{\"category\":\"Method\",\"term\":\"baz\",\"span\":{\"start\":{\"line\":4,\"column\":1},\"end\":{\"line\":5,\"column\":4}},\"changeType\":\"REMOVED\"}]}]}\n" :: ByteString)
 
     it "produces JSON output if there are parse errors" $ do
       blobs <- blobsForPaths (Both (Path.relFile "ruby/toc/methods.A.rb") (Path.relFile "ruby/toc/methods.X.rb"))
-      output <- runTaskOrDie (diffSummaryBuilder Format.JSON [blobs])
+      output <- runTaskOrDie (runReader defaultLanguageModes (diffSummaryBuilder Format.JSON [blobs]))
       runBuilder output `shouldBe` ("{\"files\":[{\"path\":\"test/fixtures/ruby/toc/methods.A.rb -> test/fixtures/ruby/toc/methods.X.rb\",\"language\":\"Ruby\",\"changes\":[{\"category\":\"Method\",\"term\":\"bar\",\"span\":{\"start\":{\"line\":1,\"column\":1},\"end\":{\"line\":2,\"column\":4}},\"changeType\":\"REMOVED\"},{\"category\":\"Method\",\"term\":\"baz\",\"span\":{\"start\":{\"line\":4,\"column\":1},\"end\":{\"line\":5,\"column\":4}},\"changeType\":\"REMOVED\"}],\"errors\":[{\"error\":\"expected end of input nodes, but got ParseError\",\"span\":{\"start\":{\"line\":1,\"column\":1},\"end\":{\"line\":2,\"column\":3}}}]}]}\n" :: ByteString)
 
     it "ignores anonymous functions" $ do
       blobs <- blobsForPaths (Both (Path.relFile "ruby/toc/lambda.A.rb") (Path.relFile "ruby/toc/lambda.B.rb"))
-      output <- runTaskOrDie (diffSummaryBuilder Format.JSON [blobs])
+      output <- runTaskOrDie (runReader defaultLanguageModes (diffSummaryBuilder Format.JSON [blobs]))
       runBuilder output `shouldBe` ("{\"files\":[{\"path\":\"test/fixtures/ruby/toc/lambda.A.rb -> test/fixtures/ruby/toc/lambda.B.rb\",\"language\":\"Ruby\"}]}\n" :: ByteString)
 
     it "summarizes Markdown headings" $ do
       blobs <- blobsForPaths (Both (Path.relFile "markdown/toc/headings.A.md") (Path.relFile "markdown/toc/headings.B.md"))
-      output <- runTaskOrDie (diffSummaryBuilder Format.JSON [blobs])
+      output <- runTaskOrDie (runReader defaultLanguageModes (diffSummaryBuilder Format.JSON [blobs]))
       runBuilder output `shouldBe` ("{\"files\":[{\"path\":\"test/fixtures/markdown/toc/headings.A.md -> test/fixtures/markdown/toc/headings.B.md\",\"language\":\"Markdown\",\"changes\":[{\"category\":\"Heading 1\",\"term\":\"Introduction\",\"span\":{\"start\":{\"line\":1,\"column\":1},\"end\":{\"line\":3,\"column\":16}},\"changeType\":\"REMOVED\"},{\"category\":\"Heading 2\",\"term\":\"Two\",\"span\":{\"start\":{\"line\":5,\"column\":1},\"end\":{\"line\":7,\"column\":4}},\"changeType\":\"MODIFIED\"},{\"category\":\"Heading 3\",\"term\":\"This heading is new\",\"span\":{\"start\":{\"line\":9,\"column\":1},\"end\":{\"line\":11,\"column\":10}},\"changeType\":\"ADDED\"},{\"category\":\"Heading 1\",\"term\":\"Final\",\"span\":{\"start\":{\"line\":13,\"column\":1},\"end\":{\"line\":14,\"column\":4}},\"changeType\":\"ADDED\"}]}]}\n" :: ByteString)
 
 
@@ -163,7 +165,7 @@ numTocSummaries diff = length $ filter isRight (diffTOC diff)
 programWithChange :: Term' -> Diff'
 programWithChange body = merge (Nothing, Nothing) (inject [ function' ])
   where
-    function' = merge (Just (Declaration Function "foo" mempty lowerBound Ruby), Just (Declaration Function "foo" mempty lowerBound Ruby)) (inject (Declaration.Function [] name' [] (merge (Nothing, Nothing) (inject [ inserting body ]))))
+    function' = merge (Just (Declaration Function "foo" lowerBound Ruby), Just (Declaration Function "foo" lowerBound Ruby)) (inject (Declaration.Function [] name' [] (merge (Nothing, Nothing) (inject [ inserting body ]))))
     name' = merge (Nothing, Nothing) (inject (Syntax.Identifier (name "foo")))
 
 -- Return a diff where term is inserted in the program, below a function found on Both sides of the diff.
@@ -187,7 +189,7 @@ programOf :: Diff' -> Diff'
 programOf diff = merge (Nothing, Nothing) (inject [ diff ])
 
 functionOf :: Text -> Term' -> Term'
-functionOf n body = termIn (Just (Declaration Function n mempty lowerBound Unknown)) (inject (Declaration.Function [] name' [] (termIn Nothing (inject [body]))))
+functionOf n body = termIn (Just (Declaration Function n lowerBound Unknown)) (inject (Declaration.Function [] name' [] (termIn Nothing (inject [body]))))
   where
     name' = termIn Nothing (inject (Syntax.Identifier (name n)))
 
@@ -217,4 +219,4 @@ summarize
   :: DiffEffects sig m
   => BlobPair
   -> m [Either ErrorSummary TOCSummary]
-summarize = decoratingDiffWith summarizeDiffParsers decorateTerm (pure . summarizeDiff)
+summarize = parsePairWith (summarizeDiffParsers defaultLanguageModes) summarizeTerms

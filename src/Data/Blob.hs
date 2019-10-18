@@ -13,7 +13,7 @@ module Data.Blob
 , nullBlob
 , sourceBlob
 , noLanguageForBlob
-, type BlobPair
+, BlobPair(..)
 , pattern Diffing
 , pattern Inserting
 , pattern Deleting
@@ -101,7 +101,8 @@ noLanguageForBlob blobPath = throwError (SomeException (NoLanguageForBlob blobPa
 
 -- | Represents a blobs suitable for diffing which can be either a blob to
 -- delete, a blob to insert, or a pair of blobs to diff.
-type BlobPair = Join These Blob
+newtype BlobPair = BlobPair { getBlobPair :: These Blob Blob }
+  deriving (Eq, Show)
 
 instance FromJSON BlobPair where
   parseJSON = withObject "BlobPair" $ \o -> do
@@ -114,13 +115,13 @@ instance FromJSON BlobPair where
       _                 -> Prelude.fail "Expected object with 'before' and/or 'after' keys only"
 
 pattern Diffing :: Blob -> Blob -> BlobPair
-pattern Diffing a b = Join (These a b)
+pattern Diffing a b = BlobPair (These a b)
 
 pattern Inserting :: Blob -> BlobPair
-pattern Inserting a = Join (That a)
+pattern Inserting a = BlobPair (That a)
 
 pattern Deleting :: Blob -> BlobPair
-pattern Deleting b = Join (This b)
+pattern Deleting b = BlobPair (This b)
 
 {-# COMPLETE Diffing, Inserting, Deleting #-}
 
@@ -151,7 +152,7 @@ languageTagForBlobPair pair = showLanguage (languageForBlobPair pair)
   where showLanguage = pure . (,) "language" . show
 
 pathKeyForBlobPair :: BlobPair -> FilePath
-pathKeyForBlobPair blobs = case bimap blobPath blobPath (runJoin blobs) of
+pathKeyForBlobPair blobs = case bimap blobPath blobPath (getBlobPair blobs) of
    This before -> before
    That after -> after
    These before after | before == after -> after
