@@ -14,8 +14,8 @@ import GHC.Generics (Generic, Generic1)
 
 -- | The deletion, insertion, or comparison of values.
 data Edit a b
-  = Delete a
-  | Insert b
+  = Delete  a
+  | Insert    b
   | Compare a b
   deriving (Eq, Foldable, Functor, Generic, Generic1, Ord, Show, Traversable)
 
