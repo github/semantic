@@ -11,7 +11,7 @@ import Data.Aeson
 import Data.Align
 import Data.JSON.Fields
 
--- | An operation to replace, insert, or delete an item.
+-- | An operation to compare, insert, or delete an item.
 data Patch a b
   = Delete a
   | Insert b
