@@ -1,7 +1,7 @@
 {-# LANGUAGE GADTs, KindSignatures, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Semantic.Graph
 ( analysisParsers
-, AnalyzeTerm(..)
+, AnalyzeTerm
 , runGraph
 , runCallGraph
 , runImportGraph
@@ -108,10 +108,7 @@ class
   , Recursive (term Loc)
   , Show (term Loc)
   , HasSpan (term Loc)
-  ) => AnalyzeTerm (term :: * -> *) where
-  evaluateTerm
-    :: (term Loc -> Evaluator (term Loc) address value m value)
-    -> (term Loc -> Evaluator (term Loc) address value m value)
+  ) => AnalyzeTerm (term :: * -> *)
 
 analysisParsers :: Map Language (SomeParser AnalyzeTerm Loc)
 analysisParsers = Map.fromList
