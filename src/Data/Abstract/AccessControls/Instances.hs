@@ -17,7 +17,6 @@ import qualified Data.Syntax.Type as Type
 import qualified Language.Go.Syntax as Go
 import qualified Language.Go.Term as Go
 import qualified Language.Go.Type as Go
-import qualified Language.Markdown.Syntax as Markdown
 import qualified Language.PHP.Syntax as PHP
 import qualified Language.PHP.Term as PHP
 import qualified Language.Python.Syntax as Python
@@ -222,26 +221,6 @@ instance AccessControls1 Go.Rune
 instance AccessControls1 Go.Select
 instance AccessControls1 Go.TypeSwitchGuard
 instance AccessControls1 Go.ReceiveOperator
-
-instance AccessControls1 Markdown.Document
-instance AccessControls1 Markdown.Paragraph
-instance AccessControls1 Markdown.UnorderedList
-instance AccessControls1 Markdown.OrderedList
-instance AccessControls1 Markdown.BlockQuote
-instance AccessControls1 Markdown.HTMLBlock
-instance AccessControls1 Markdown.Table
-instance AccessControls1 Markdown.TableRow
-instance AccessControls1 Markdown.TableCell
-instance AccessControls1 Markdown.Strong
-instance AccessControls1 Markdown.Emphasis
-instance AccessControls1 Markdown.Text
-instance AccessControls1 Markdown.Strikethrough
-instance AccessControls1 Markdown.Heading
-instance AccessControls1 Markdown.ThematicBreak
-instance AccessControls1 Markdown.Link
-instance AccessControls1 Markdown.Image
-instance AccessControls1 Markdown.Code
-instance AccessControls1 Markdown.LineBreak
 
 instance AccessControls1 PHP.Text
 instance AccessControls1 PHP.VariableName
