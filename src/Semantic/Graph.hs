@@ -100,15 +100,15 @@ instance
   ) => AnalysisClasses syntax
 
 class
-  ( VertexDeclaration term
+  ( AccessControls (term Loc)
   , Declarations (term Loc)
-  , AccessControls (term Loc)
-  , Ord (term Loc)
   , Evaluatable (Base (term Loc))
   , FreeVariables (term Loc)
+  , HasSpan (term Loc)
+  , Ord (term Loc)
   , Recursive (term Loc)
   , Show (term Loc)
-  , HasSpan (term Loc)
+  , VertexDeclaration term
   ) => AnalyzeTerm (term :: * -> *)
 
 instance
