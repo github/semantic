@@ -47,7 +47,7 @@ instance Bitraversable Edit where
     Compare a b -> Compare <$> f a <*> g b
 
 instance Eq2 Edit where
-  liftEq2 eqBefore eqAfter p1 p2 = case (p1, p2) of
+  liftEq2 eqBefore eqAfter = curry $ \case
     (Delete a1, Delete a2) -> eqBefore a1 a2
     (Insert b1, Insert b2) -> eqAfter b1 b2
     (Compare a1 b1, Compare a2 b2) -> eqBefore a1 a2 && eqAfter b1 b2
