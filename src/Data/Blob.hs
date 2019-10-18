@@ -104,7 +104,7 @@ type BlobPair = Edit Blob Blob
 instance FromJSON BlobPair where
   parseJSON = withObject "BlobPair" $ \o -> do
     before <- o .:? "before"
-    after <- o .:? "after"
+    after  <- o .:? "after"
     case (before, after) of
       (Just b, Just a)  -> pure $ Compare b a
       (Just b, Nothing) -> pure $ Delete b
