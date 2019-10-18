@@ -1,8 +1,8 @@
-{-# LANGUAGE TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE TypeFamilies, TypeOperators #-}
 module Semantic.Analysis
 ( evaluate
 , runDomainEffects
-, EvalTerm(..)
+, evalTerm
 ) where
 
 import Prologue
@@ -146,63 +146,52 @@ runDomainEffects runTerm
   . either ((unit <*) . definePrelude) runTerm
   . moduleBody
 
-class
-  ( AccessControls (term Loc)
-  , Declarations (term Loc)
-  , Evaluatable (Base (term Loc))
-  , FreeVariables (term Loc)
-  , HasSpan (term Loc)
-  , Recursive (term Loc)
-  ) => EvalTerm term where
-  -- | Evaluate a term recursively, applying the passed function at every recursive position.
-  --
-  --   This calls out to the 'Evaluatable' instances, and can have other functions composed after it to e.g. intercept effects arising in the evaluation of the term.
-  evalTerm :: ( Carrier sig m
-              , AbstractValue (term Loc) address value m
-              , Member (Allocator address) sig
-              , Member (Bitwise value) sig
-              , Member (Boolean value) sig
-              , Member (Deref value) sig
-              , Member (Error (LoopControl value)) sig
-              , Member (Error (Return value)) sig
-              , Member (Function (term Loc) address value) sig
-              , Member (Modules address value) sig
-              , Member (Numeric value) sig
-              , Member (Object address value) sig
-              , Member (Array value) sig
-              , Member (Hash value) sig
-              , Member (Reader ModuleInfo) sig
-              , Member (Reader PackageInfo) sig
-              , Member (Reader Span) sig
-              , Member (Resumable (BaseError (AddressError address value))) sig
-              , Member (Resumable (BaseError (HeapError address))) sig
-              , Member (Resumable (BaseError (ScopeError address))) sig
-              , Member (Resumable (BaseError (UnspecializedError address value))) sig
-              , Member (Resumable (BaseError (EvalError (term Loc) address value))) sig
-              , Member (Resumable (BaseError ResolutionError)) sig
-              , Member (State (Heap address address value)) sig
-              , Member (State (ScopeGraph address)) sig
-              , Member (Abstract.String value) sig
-              , Member (Reader (CurrentFrame address)) sig
-              , Member (Reader (CurrentScope address)) sig
-              , Member (State Span) sig
-              , Member (Unit value) sig
-              , Member (While value) sig
-              , Member Fresh sig
-              , Member Trace sig
-              , Ord address
-              , Show address
-              )
-          => Open (term Loc -> Evaluator (term Loc) address value m value)
-          -> term Loc -> Evaluator (term Loc) address value m value
-
-instance ( AccessControls (term Loc)
-         , Declarations (term Loc)
-         , Evaluatable (Base (term Loc))
-         , FreeVariables (term Loc)
-         , HasSpan (term Loc)
-         , Recursive (term Loc)
-         )
-      => EvalTerm term where
-  -- NB: We use a lazy pattern match for the lambda’s argument to postpone evaluating the pair until eval/ref is called.
-  evalTerm perTerm = fst (fix (\ ~(ev, re) -> (perTerm (eval ev re . project), ref ev re . project)))
+-- | Evaluate a term recursively, applying the passed function at every recursive position.
+--
+--   This calls out to the 'Evaluatable' instances, and can have other functions composed after it to e.g. intercept effects arising in the evaluation of the term.
+evalTerm :: ( Carrier sig m
+            , AbstractValue (term Loc) address value m
+            , AccessControls (term Loc)
+            , Declarations (term Loc)
+            , Evaluatable (Base (term Loc))
+            , FreeVariables (term Loc)
+            , HasSpan (term Loc)
+            , Member (Allocator address) sig
+            , Member (Bitwise value) sig
+            , Member (Boolean value) sig
+            , Member (Deref value) sig
+            , Member (Error (LoopControl value)) sig
+            , Member (Error (Return value)) sig
+            , Member (Function (term Loc) address value) sig
+            , Member (Modules address value) sig
+            , Member (Numeric value) sig
+            , Member (Object address value) sig
+            , Member (Array value) sig
+            , Member (Hash value) sig
+            , Member (Reader ModuleInfo) sig
+            , Member (Reader PackageInfo) sig
+            , Member (Reader Span) sig
+            , Member (Resumable (BaseError (AddressError address value))) sig
+            , Member (Resumable (BaseError (HeapError address))) sig
+            , Member (Resumable (BaseError (ScopeError address))) sig
+            , Member (Resumable (BaseError (UnspecializedError address value))) sig
+            , Member (Resumable (BaseError (EvalError (term Loc) address value))) sig
+            , Member (Resumable (BaseError ResolutionError)) sig
+            , Member (State (Heap address address value)) sig
+            , Member (State (ScopeGraph address)) sig
+            , Member (Abstract.String value) sig
+            , Member (Reader (CurrentFrame address)) sig
+            , Member (Reader (CurrentScope address)) sig
+            , Member (State Span) sig
+            , Member (Unit value) sig
+            , Member (While value) sig
+            , Member Fresh sig
+            , Member Trace sig
+            , Ord address
+            , Recursive (term Loc)
+            , Show address
+            )
+        => Open (term Loc -> Evaluator (term Loc) address value m value)
+        -> term Loc -> Evaluator (term Loc) address value m value
+-- NB: We use a lazy pattern match for the lambda’s argument to postpone evaluating the pair until eval/ref is called.
+evalTerm perTerm = fst (fix (\ ~(ev, re) -> (perTerm (eval ev re . project), ref ev re . project)))

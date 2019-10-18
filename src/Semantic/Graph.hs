@@ -76,15 +76,25 @@ data GraphType = ImportGraph | CallGraph
 
 -- | Constraints required to analyze a term.
 class
-  ( EvalTerm term
+  ( AccessControls (term Loc)
+  , Declarations (term Loc)
+  , Evaluatable (Base (term Loc))
+  , FreeVariables (term Loc)
+  , HasSpan (term Loc)
   , Ord (term Loc)
+  , Recursive (term Loc)
   , Show (term Loc)
   , VertexDeclaration term
   ) => AnalyzeTerm (term :: * -> *)
 
 instance
-  ( EvalTerm term
+  ( AccessControls (term Loc)
+  , Declarations (term Loc)
+  , Evaluatable (Base (term Loc))
+  , FreeVariables (term Loc)
+  , HasSpan (term Loc)
   , Ord (term Loc)
+  , Recursive (term Loc)
   , Show (term Loc)
   , VertexDeclaration term
   ) => AnalyzeTerm term
