@@ -85,5 +85,5 @@ instance APIConvert API.BlobPair Data.BlobPair where
       _                         -> Nothing
 
     blobPairToApiBlobPair (Data.Compare before after) = defMessage & P.maybe'before .~ (bridging #? before) & P.maybe'after .~ (bridging #? after)
-    blobPairToApiBlobPair (Data.Insert after)      = defMessage & P.maybe'before .~ Nothing & P.maybe'after .~ (bridging #? after)
-    blobPairToApiBlobPair (Data.Delete before)      = defMessage & P.maybe'before .~ (bridging #? before) & P.maybe'after .~ Nothing
+    blobPairToApiBlobPair (Data.Insert after)         = defMessage & P.maybe'before .~ Nothing & P.maybe'after .~ (bridging #? after)
+    blobPairToApiBlobPair (Data.Delete before)        = defMessage & P.maybe'before .~ (bridging #? before) & P.maybe'after .~ Nothing
