@@ -2,7 +2,7 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-} -- FIXME
 module Language.TSX.Assignment
 ( assignment
-, Syntax
+, TSX.Syntax
 , Grammar
 , Term
 ) where
@@ -34,181 +34,11 @@ import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
 import qualified Language.TSX.Syntax as TSX.Syntax
 import qualified Language.TypeScript.Resolution as TypeScript.Resolution
+import qualified Language.TSX.Term as TSX
 import Prologue
 import TreeSitter.TSX as Grammar
 
--- | The type of TSX syntax.
-type Syntax = '[
-    Comment.Comment
-  , Comment.HashBang
-  , Declaration.Class
-  , Declaration.Function
-  , Declaration.Method
-  , Declaration.MethodSignature
-  , Declaration.InterfaceDeclaration
-  , Declaration.PublicFieldDefinition
-  , Declaration.VariableDeclaration
-  , Declaration.TypeAlias
-  , Expression.Plus
-  , Expression.Minus
-  , Expression.Times
-  , Expression.DividedBy
-  , Expression.Modulo
-  , Expression.Power
-  , Expression.Negate
-  , Expression.FloorDivision
-  , Expression.BAnd
-  , Expression.BOr
-  , Expression.BXOr
-  , Expression.LShift
-  , Expression.RShift
-  , Expression.UnsignedRShift
-  , Expression.Complement
-  , Expression.And
-  , Expression.Not
-  , Expression.Or
-  , Expression.XOr
-  , Expression.Call
-  , Expression.Cast
-  , Expression.LessThan
-  , Expression.LessThanEqual
-  , Expression.GreaterThan
-  , Expression.GreaterThanEqual
-  , Expression.Equal
-  , Expression.StrictEqual
-  , Expression.Comparison
-  , Expression.Enumeration
-  , Expression.MemberAccess
-  , Expression.NonNullExpression
-  , Expression.ScopeResolution
-  , Expression.SequenceExpression
-  , Expression.Subscript
-  , Expression.Member
-  , Expression.Delete
-  , Expression.Void
-  , Expression.Typeof
-  , Expression.InstanceOf
-  , Expression.New
-  , Expression.Await
-  , Expression.This
-  , Literal.Array
-  , Literal.Boolean
-  , Literal.Float
-  , Literal.Hash
-  , Literal.Integer
-  , Literal.KeyValue
-  , Literal.Null
-  , Literal.String
-  , Literal.TextElement
-  , Literal.Regex
-  , Statement.Assignment
-  , Statement.Break
-  , Statement.Catch
-  , Statement.Continue
-  , Statement.DoWhile
-  , Statement.Else
-  , Statement.Finally
-  , Statement.For
-  , Statement.ForEach
-  , Statement.If
-  , Statement.Match
-  , Statement.Pattern
-  , Statement.Retry
-  , Statement.Return
-  , Statement.ScopeEntry
-  , Statement.ScopeExit
-  , Statement.Statements
-  , Statement.Throw
-  , Statement.Try
-  , Statement.While
-  , Statement.Yield
-  , Syntax.AccessibilityModifier
-  , Syntax.Empty
-  , Syntax.Error
-  , Syntax.Identifier
-  , Syntax.Context
-  , Type.Readonly
-  , Type.TypeParameters
-  , TSX.Syntax.TypeParameter
-  , TSX.Syntax.Constraint
-  , TSX.Syntax.ParenthesizedType
-  , TSX.Syntax.DefaultType
-  , TSX.Syntax.PredefinedType
-  , TSX.Syntax.TypeIdentifier
-  , TSX.Syntax.NestedIdentifier
-  , TSX.Syntax.NestedTypeIdentifier
-  , TSX.Syntax.GenericType
-  , TSX.Syntax.TypeArguments
-  , TSX.Syntax.TypePredicate
-  , TSX.Syntax.CallSignature
-  , TSX.Syntax.ConstructSignature
-  , TSX.Syntax.ArrayType
-  , TSX.Syntax.LookupType
-  , TSX.Syntax.FlowMaybeType
-  , TSX.Syntax.TypeQuery
-  , TSX.Syntax.IndexTypeQuery
-  , TSX.Syntax.ThisType
-  , TSX.Syntax.ExistentialType
-  , TSX.Syntax.AbstractMethodSignature
-  , TSX.Syntax.IndexSignature
-  , TSX.Syntax.ObjectType
-  , TSX.Syntax.LiteralType
-  , TSX.Syntax.Union
-  , TSX.Syntax.Intersection
-  , TSX.Syntax.Module
-  , TSX.Syntax.InternalModule
-  , TSX.Syntax.FunctionType
-  , TSX.Syntax.Tuple
-  , TSX.Syntax.Constructor
-  , TSX.Syntax.TypeAssertion
-  , TSX.Syntax.ImportAlias
-  , TSX.Syntax.Debugger
-  , TSX.Syntax.ShorthandPropertyIdentifier
-  , TSX.Syntax.Super
-  , TSX.Syntax.Undefined
-  , TSX.Syntax.ClassHeritage
-  , TSX.Syntax.AbstractClass
-  , TSX.Syntax.ImplementsClause
-  , TSX.Syntax.JsxElement
-  , TSX.Syntax.JsxSelfClosingElement
-  , TSX.Syntax.JsxOpeningElement
-  , TSX.Syntax.JsxText
-  , TSX.Syntax.JsxClosingElement
-  , TSX.Syntax.JsxExpression
-  , TSX.Syntax.JsxAttribute
-  , TSX.Syntax.JsxFragment
-  , TSX.Syntax.JsxNamespaceName
-  , TSX.Syntax.OptionalParameter
-  , TSX.Syntax.RequiredParameter
-  , TSX.Syntax.RestParameter
-  , TSX.Syntax.PropertySignature
-  , TSX.Syntax.AmbientDeclaration
-  , TSX.Syntax.EnumDeclaration
-  , TSX.Syntax.ExtendsClause
-  , TSX.Syntax.AmbientFunction
-  , TSX.Syntax.ImportRequireClause
-  , TSX.Syntax.ImportClause
-  , TSX.Syntax.LabeledStatement
-  , TSX.Syntax.Annotation
-  , TSX.Syntax.With
-  , TSX.Syntax.ForOf
-  , TSX.Syntax.Update
-  , TSX.Syntax.ComputedPropertyName
-  , TSX.Syntax.Decorator
-  , TSX.Syntax.Import
-  , TSX.Syntax.QualifiedAliasedImport
-  , TSX.Syntax.SideEffectImport
-  , TSX.Syntax.DefaultExport
-  , TSX.Syntax.QualifiedExport
-  , TSX.Syntax.QualifiedExportFrom
-  , TSX.Syntax.JavaScriptRequire
-  , []
-  , Statement.StatementBlock
-  , TSX.Syntax.MetaProperty
-  , TSX.Syntax.AnnotatedExpression
-  ]
-
-type Term = Term.Term (Sum Syntax)
+type Term = Term.Term (Sum TSX.Syntax)
 type Assignment = Assignment.Assignment [] Grammar
 
 -- | Assignment from AST in TSX’s grammar onto a program in TSX’s syntax.
@@ -276,7 +106,7 @@ augmentedAssignmentExpression = makeTerm' <$> symbol AugmentedAssignmentExpressi
   , assign Expression.UnsignedRShift <$ symbol AnonRAngleRAngleRAngleEqual
   , assign Expression.LShift <$ symbol AnonLAngleLAngleEqual
   , assign Expression.BOr <$ symbol AnonPipeEqual ])
-  where assign :: (f :< Syntax) => (Term Loc -> Term Loc -> f (Term Loc)) -> Term Loc -> Term Loc -> Sum Syntax (Term Loc)
+  where assign :: (f :< TSX.Syntax) => (Term Loc -> Term Loc -> f (Term Loc)) -> Term Loc -> Term Loc -> Sum TSX.Syntax (Term Loc)
         assign c l r = inject (Statement.Assignment [] l (makeTerm1 (c l r)))
 
 
@@ -958,6 +788,6 @@ emptyStatement = makeTerm <$> symbol EmptyStatement <*> (Syntax.Empty <$ rawSour
 -- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
 infixTerm :: Assignment (Term Loc)
           -> Assignment (Term Loc)
-          -> [Assignment (Term Loc -> Term Loc -> Sum Syntax (Term Loc))]
-          -> Assignment (Sum Syntax (Term Loc))
+          -> [Assignment (Term Loc -> Term Loc -> Sum TSX.Syntax (Term Loc))]
+          -> Assignment (Sum TSX.Syntax (Term Loc))
 infixTerm = infixContext comment

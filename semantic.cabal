@@ -192,6 +192,7 @@ library
                      , Language.TSX.Assignment
                      , Language.TSX.Syntax
                      , Language.TSX.Syntax.JSX
+                     , Language.TSX.Term
                      , Language.TypeScript.Assignment
                      , Language.TypeScript.Resolution
                      , Language.TypeScript.Syntax
