@@ -2,7 +2,7 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-} -- FIXME
 module Language.TypeScript.Assignment
 ( assignment
-, Syntax
+, TypeScript.Syntax
 , Grammar
 , Term
 ) where
@@ -34,172 +34,11 @@ import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
 import qualified Language.TypeScript.Syntax as TypeScript.Syntax
 import qualified Language.TypeScript.Resolution as TypeScript.Resolution
+import qualified Language.TypeScript.Term as TypeScript
 import Prologue
 import TreeSitter.TypeScript as Grammar
 
--- | The type of TypeScript syntax.
-type Syntax = '[
-    Comment.Comment
-  , Comment.HashBang
-  , Declaration.Class
-  , Declaration.Function
-  , Declaration.Method
-  , Declaration.MethodSignature
-  , Declaration.InterfaceDeclaration
-  , Declaration.PublicFieldDefinition
-  , Declaration.VariableDeclaration
-  , Declaration.TypeAlias
-  , Expression.Plus
-  , Expression.Minus
-  , Expression.Times
-  , Expression.DividedBy
-  , Expression.Modulo
-  , Expression.Power
-  , Expression.Negate
-  , Expression.FloorDivision
-  , Expression.BAnd
-  , Expression.BOr
-  , Expression.BXOr
-  , Expression.LShift
-  , Expression.RShift
-  , Expression.UnsignedRShift
-  , Expression.Complement
-  , Expression.And
-  , Expression.Not
-  , Expression.Or
-  , Expression.XOr
-  , Expression.Call
-  , Expression.Cast
-  , Expression.LessThan
-  , Expression.LessThanEqual
-  , Expression.GreaterThan
-  , Expression.GreaterThanEqual
-  , Expression.Equal
-  , Expression.StrictEqual
-  , Expression.Comparison
-  , Expression.Enumeration
-  , Expression.MemberAccess
-  , Expression.NonNullExpression
-  , Expression.ScopeResolution
-  , Expression.SequenceExpression
-  , Expression.Subscript
-  , Expression.Member
-  , Expression.Delete
-  , Expression.Void
-  , Expression.Typeof
-  , Expression.InstanceOf
-  , Expression.New
-  , Expression.Await
-  , Expression.This
-  , Literal.Array
-  , Literal.Boolean
-  , Literal.Float
-  , Literal.Hash
-  , Literal.Integer
-  , Literal.KeyValue
-  , Literal.Null
-  , Literal.String
-  , Literal.TextElement
-  , Literal.Regex
-  , Statement.Assignment
-  , Statement.Break
-  , Statement.Catch
-  , Statement.Continue
-  , Statement.DoWhile
-  , Statement.Else
-  , Statement.Finally
-  , Statement.For
-  , Statement.ForEach
-  , Statement.If
-  , Statement.Match
-  , Statement.Pattern
-  , Statement.Retry
-  , Statement.Return
-  , Statement.ScopeEntry
-  , Statement.ScopeExit
-  , Statement.Statements
-  , Statement.Throw
-  , Statement.Try
-  , Statement.While
-  , Statement.Yield
-  , Syntax.AccessibilityModifier
-  , Syntax.Empty
-  , Syntax.Error
-  , Syntax.Identifier
-  , Syntax.Context
-  , Type.Readonly
-  , Type.TypeParameters
-  , TypeScript.Syntax.TypeParameter
-  , TypeScript.Syntax.Constraint
-  , TypeScript.Syntax.ParenthesizedType
-  , TypeScript.Syntax.DefaultType
-  , TypeScript.Syntax.PredefinedType
-  , TypeScript.Syntax.TypeIdentifier
-  , TypeScript.Syntax.NestedIdentifier
-  , TypeScript.Syntax.NestedTypeIdentifier
-  , TypeScript.Syntax.GenericType
-  , TypeScript.Syntax.TypeArguments
-  , TypeScript.Syntax.TypePredicate
-  , TypeScript.Syntax.CallSignature
-  , TypeScript.Syntax.ConstructSignature
-  , TypeScript.Syntax.ArrayType
-  , TypeScript.Syntax.LookupType
-  , TypeScript.Syntax.FlowMaybeType
-  , TypeScript.Syntax.TypeQuery
-  , TypeScript.Syntax.IndexTypeQuery
-  , TypeScript.Syntax.ThisType
-  , TypeScript.Syntax.ExistentialType
-  , TypeScript.Syntax.AbstractMethodSignature
-  , TypeScript.Syntax.IndexSignature
-  , TypeScript.Syntax.ObjectType
-  , TypeScript.Syntax.LiteralType
-  , TypeScript.Syntax.Union
-  , TypeScript.Syntax.Intersection
-  , TypeScript.Syntax.Module
-  , TypeScript.Syntax.InternalModule
-  , TypeScript.Syntax.FunctionType
-  , TypeScript.Syntax.Tuple
-  , TypeScript.Syntax.Constructor
-  , TypeScript.Syntax.TypeAssertion
-  , TypeScript.Syntax.ImportAlias
-  , TypeScript.Syntax.Debugger
-  , TypeScript.Syntax.ShorthandPropertyIdentifier
-  , TypeScript.Syntax.Super
-  , TypeScript.Syntax.Undefined
-  , TypeScript.Syntax.ClassHeritage
-  , TypeScript.Syntax.AbstractClass
-  , TypeScript.Syntax.ImplementsClause
-  , TypeScript.Syntax.OptionalParameter
-  , TypeScript.Syntax.RequiredParameter
-  , TypeScript.Syntax.RestParameter
-  , TypeScript.Syntax.PropertySignature
-  , TypeScript.Syntax.AmbientDeclaration
-  , TypeScript.Syntax.EnumDeclaration
-  , TypeScript.Syntax.ExtendsClause
-  , TypeScript.Syntax.AmbientFunction
-  , TypeScript.Syntax.ImportRequireClause
-  , TypeScript.Syntax.ImportClause
-  , TypeScript.Syntax.LabeledStatement
-  , TypeScript.Syntax.Annotation
-  , TypeScript.Syntax.With
-  , TypeScript.Syntax.ForOf
-  , TypeScript.Syntax.Update
-  , TypeScript.Syntax.ComputedPropertyName
-  , TypeScript.Syntax.Decorator
-  , TypeScript.Syntax.Import
-  , TypeScript.Syntax.QualifiedAliasedImport
-  , TypeScript.Syntax.SideEffectImport
-  , TypeScript.Syntax.DefaultExport
-  , TypeScript.Syntax.QualifiedExport
-  , TypeScript.Syntax.QualifiedExportFrom
-  , TypeScript.Syntax.JavaScriptRequire
-  , []
-  , Statement.StatementBlock
-  , TypeScript.Syntax.MetaProperty
-  , TypeScript.Syntax.AnnotatedExpression
-  ]
-
-type Term = Term.Term (Sum Syntax)
+type Term = Term.Term (Sum TypeScript.Syntax)
 type Assignment = Assignment.Assignment [] Grammar
 
 -- | Assignment from AST in TypeScript’s grammar onto a program in TypeScript’s syntax.
@@ -266,7 +105,7 @@ augmentedAssignmentExpression = makeTerm' <$> symbol AugmentedAssignmentExpressi
   , assign Expression.UnsignedRShift <$ symbol AnonRAngleRAngleRAngleEqual
   , assign Expression.LShift <$ symbol AnonLAngleLAngleEqual
   , assign Expression.BOr <$ symbol AnonPipeEqual ])
-  where assign :: (f :< Syntax) => (Term Loc -> Term Loc -> f (Term Loc)) -> Term Loc -> Term Loc -> Sum Syntax (Term Loc)
+  where assign :: (f :< TypeScript.Syntax) => (Term Loc -> Term Loc -> f (Term Loc)) -> Term Loc -> Term Loc -> Sum TypeScript.Syntax (Term Loc)
         assign c l r = inject (Statement.Assignment [] l (makeTerm1 (c l r)))
 
 
@@ -911,6 +750,6 @@ emptyStatement = makeTerm <$> symbol EmptyStatement <*> (Syntax.Empty <$ rawSour
 -- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
 infixTerm :: Assignment (Term Loc)
           -> Assignment (Term Loc)
-          -> [Assignment (Term Loc -> Term Loc -> Sum Syntax (Term Loc))]
-          -> Assignment (Sum Syntax (Term Loc))
+          -> [Assignment (Term Loc -> Term Loc -> Sum TypeScript.Syntax (Term Loc))]
+          -> Assignment (Sum TypeScript.Syntax (Term Loc))
 infixTerm = infixContext comment
