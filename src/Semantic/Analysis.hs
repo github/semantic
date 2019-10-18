@@ -17,6 +17,7 @@ import Data.Abstract.Evaluatable
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
 import Data.Language (Language)
+import Source.Loc
 import Source.Span
 
 type ModuleC address value m
@@ -150,14 +151,14 @@ class EvalTerm term where
   --
   --   This calls out to the 'Evaluatable' instances, and can have other functions composed after it to e.g. intercept effects arising in the evaluation of the term.
   evalTerm :: ( Carrier sig m
-              , AbstractValue term address value m
+              , AbstractValue (term Loc) address value m
               , Member (Allocator address) sig
               , Member (Bitwise value) sig
               , Member (Boolean value) sig
               , Member (Deref value) sig
               , Member (Error (LoopControl value)) sig
               , Member (Error (Return value)) sig
-              , Member (Function term address value) sig
+              , Member (Function (term Loc) address value) sig
               , Member (Modules address value) sig
               , Member (Numeric value) sig
               , Member (Object address value) sig
@@ -170,7 +171,7 @@ class EvalTerm term where
               , Member (Resumable (BaseError (HeapError address))) sig
               , Member (Resumable (BaseError (ScopeError address))) sig
               , Member (Resumable (BaseError (UnspecializedError address value))) sig
-              , Member (Resumable (BaseError (EvalError term address value))) sig
+              , Member (Resumable (BaseError (EvalError (term Loc) address value))) sig
               , Member (Resumable (BaseError ResolutionError)) sig
               , Member (State (Heap address address value)) sig
               , Member (State (ScopeGraph address)) sig
@@ -185,15 +186,15 @@ class EvalTerm term where
               , Ord address
               , Show address
               )
-          => Open (term -> Evaluator term address value m value)
-          -> term -> Evaluator term address value m value
+          => Open (term Loc -> Evaluator (term Loc) address value m value)
+          -> term Loc -> Evaluator (term Loc) address value m value
 
-instance ( AccessControls term
-         , Declarations term
-         , Evaluatable (Base term)
-         , FreeVariables term
-         , HasSpan term
-         , Recursive term
+instance ( AccessControls (term Loc)
+         , Declarations (term Loc)
+         , Evaluatable (Base (term Loc))
+         , FreeVariables (term Loc)
+         , HasSpan (term Loc)
+         , Recursive (term Loc)
          )
       => EvalTerm term where
   -- NB: We use a lazy pattern match for the lambda’s argument to postpone evaluating the pair until eval/ref is called.
