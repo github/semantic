@@ -12,7 +12,7 @@ import Data.ByteString (pack, readFile, ByteString)
 import System.IO (FilePath)
 import Options.Applicative hiding (style)
 import Data.Semigroup ((<>))
-import Text.Pretty.Simple (pPrint)
+import Text.Pretty.Simple (pPrint, pPrintNoColor)
 
 data SemanticAST = SemanticAST
   { format :: Format
