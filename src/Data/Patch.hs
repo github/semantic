@@ -1,8 +1,6 @@
 {-# LANGUAGE LambdaCase #-}
 module Data.Patch
 ( Patch(..)
-, after
-, before
 , edit
 ) where
 
@@ -21,14 +19,6 @@ data Patch a b
   | Compare a b
   deriving (Eq, Foldable, Functor, Generic, Generic1, Ord, Show, Traversable)
 
-
--- | Return the item from the after side of the patch.
-after :: Patch l r -> Maybe r
-after = edit (const Nothing) Just (\ _ b -> Just b)
-
--- | Return the item from the before side of the patch.
-before :: Patch l r -> Maybe l
-before = edit Just (const Nothing) (\ a _ -> Just a)
 
 -- | Return both sides of a patch.
 edit :: (l -> a) -> (r -> a) -> (l -> r -> a) -> Patch l r -> a
