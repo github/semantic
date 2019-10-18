@@ -37,7 +37,6 @@ import qualified CMarkGFM
 import           Data.AST
 import           Data.Language
 import qualified Data.Map as Map
-import           Data.Sum
 import qualified Data.Syntax as Syntax
 import           Data.Term
 import           Foreign.Ptr
@@ -69,10 +68,10 @@ data Parser term where
   -- | A parser 'Unmarshal'ing to a precise AST type using a 'TS.Language'.
   UnmarshalParser :: Unmarshal t => Ptr TS.Language -> Parser (t Loc)
   -- | A parser producing an à la carte term given an 'AST'-producing parser and an 'Assignment' onto 'Term's in some syntax type.
-  AssignmentParser :: (TS.Symbol grammar, Syntax.Error :< fs, Eq1 ast, Apply Foldable fs, Apply Functor fs, Foldable ast, Functor ast)
-                   => Parser (AST ast grammar)                   -- ^ A parser producing AST.
-                   -> Assignment ast grammar (Term (Sum fs) Loc) -- ^ An assignment from AST onto 'Term's.
-                   -> Parser (Term (Sum fs) Loc)                 -- ^ A parser producing 'Term's.
+  AssignmentParser :: (TS.Symbol grammar, Syntax.HasErrors term, Eq1 ast, Foldable term, Foldable ast, Functor ast)
+                   => Parser (AST ast grammar)          -- ^ A parser producing AST.
+                   -> Assignment ast grammar (term Loc) -- ^ An assignment from AST onto 'Term's.
+                   -> Parser (term Loc)                 -- ^ A parser producing 'Term's.
   -- | A parser for 'Markdown' using cmark.
   MarkdownParser :: Parser (AST (TermF [] CMarkGFM.NodeType) Markdown.Grammar)
 
