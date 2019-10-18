@@ -77,7 +77,7 @@ tableOfContentsBy :: (Foldable f, Functor f)
                   -> Diff f ann ann                       -- ^ The diff to compute the table of contents for.
                   -> [(Change, a)]                        -- ^ A list of entries for relevant changed nodes in the diff.
 tableOfContentsBy selector = fromMaybe [] . cata (\ r -> case r of
-  Patch patch -> (pure . patchEntry <$> select (bimap selector selector patch)) <> bifoldMap fold fold patch <> Just []
+  Patch edit -> (pure . patchEntry <$> select (bimap selector selector edit)) <> bifoldMap fold fold edit <> Just []
   Merge (In (_, ann2) r) -> case (selector (In ann2 r), fold r) of
     (Just a, Just entries) -> Just ((Changed, a) : entries)
     (_     , entries)      -> entries)
