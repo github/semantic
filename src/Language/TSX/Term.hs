@@ -11,6 +11,7 @@ import Data.Abstract.FreeVariables
 import Data.Bifoldable
 import Data.Bifunctor
 import Data.Functor.Foldable
+import Data.Graph.ControlFlowVertex (VertexDeclaration)
 import Data.Sum (Sum)
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
@@ -197,7 +198,7 @@ type Syntax =
 
 
 newtype Term ann = Term { getTerm :: Term.Term (Sum Syntax) ann }
-  deriving (Eq, Declarations, Foldable, FreeVariables, Functor, Syntax.HasErrors, Ord, Show, Traversable)
+  deriving (Eq, Declarations, Foldable, FreeVariables, Functor, Syntax.HasErrors, Ord, Show, Traversable, VertexDeclaration)
 
 newtype Diff ann1 ann2 = Diff { getDiff :: Diff.Diff (Sum Syntax) ann1 ann2 }
   deriving (Bifoldable, Bifunctor)
