@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, KindSignatures, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Semantic.Graph
 ( analysisParsers
 , AnalyzeTerm
@@ -85,7 +85,7 @@ class
   , Recursive (term Loc)
   , Show (term Loc)
   , VertexDeclaration term
-  ) => AnalyzeTerm (term :: * -> *)
+  ) => AnalyzeTerm term
 
 instance
   ( AccessControls (term Loc)
