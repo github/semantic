@@ -129,9 +129,9 @@ languageForBlobPair (Compare a b)
 
 pathForBlobPair :: BlobPair -> FilePath
 pathForBlobPair x = blobPath $ case x of
-  (Insert b) -> b
-  (Delete b)  -> b
-  (Compare _ b) -> b
+  Insert b -> b
+  Delete b  -> b
+  Compare _ b -> b
 
 languageTagForBlobPair :: BlobPair -> [(String, String)]
 languageTagForBlobPair pair = showLanguage (languageForBlobPair pair)
