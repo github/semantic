@@ -146,7 +146,14 @@ runDomainEffects runTerm
   . either ((unit <*) . definePrelude) runTerm
   . moduleBody
 
-class EvalTerm term where
+class
+  ( AccessControls (term Loc)
+  , Declarations (term Loc)
+  , Evaluatable (Base (term Loc))
+  , FreeVariables (term Loc)
+  , HasSpan (term Loc)
+  , Recursive (term Loc)
+  ) => EvalTerm term where
   -- | Evaluate a term recursively, applying the passed function at every recursive position.
   --
   --   This calls out to the 'Evaluatable' instances, and can have other functions composed after it to e.g. intercept effects arising in the evaluation of the term.
