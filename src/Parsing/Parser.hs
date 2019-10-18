@@ -92,7 +92,7 @@ pythonParser = AssignmentParser (ASTParser tree_sitter_python) Python.assignment
 typescriptParser :: Parser (TypeScript.Term Loc)
 typescriptParser = AssignmentParser (ASTParser tree_sitter_typescript) TypeScript.assignment
 
-tsxParser :: Parser TSX.Term
+tsxParser :: Parser (TSX.Term Loc)
 tsxParser = AssignmentParser (ASTParser tree_sitter_tsx) TSX.assignment
 
 markdownParser :: Parser (Markdown.Term Loc)
