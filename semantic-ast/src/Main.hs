@@ -51,8 +51,11 @@ generateAST (SemanticAST format color source) = do
       pure $ Data.ByteString.Char8.pack source
   ast <- parseByteString @TreeSitter.Python.AST.Module @(Range, Span) tree_sitter_python bytestring
   case format of
-    Show -> print ast
+    Show   -> print ast
     Pretty -> pPrint ast
+  case color of
+    Prelude.True   -> pPrintNoColor ast
+    Prelude.False  -> pPrint ast
 
 opts :: ParserInfo SemanticAST
 opts = info (parseAST <**> helper)
