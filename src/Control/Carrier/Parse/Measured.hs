@@ -80,9 +80,6 @@ data ParserCancelled = ParserTimedOut | AssignmentTimedOut
 
 instance Exception ParserCancelled
 
-errors :: (Syntax.Error :< fs, Apply Foldable fs, Apply Functor fs) => Term (Sum fs) Assignment.Loc -> [Error.Error String]
-errors = cata $ \ (In Assignment.Loc{..} syntax) ->
-  maybe (fold syntax) (pure . Syntax.unError span) (project syntax)
 
 runAssignment
   :: ( Apply Foldable syntaxes
@@ -124,7 +121,7 @@ runAssignment assign parser blob@Blob{..} assignment = do
         logError taskSession Error blob err (("task", "assign") : logFields)
         throwError (toException err)
       Right term -> do
-        for_ (zip (errors term) [(0::Integer)..]) $ \ (err, i) -> case Error.errorActual err of
+        for_ (zip (Syntax.getErrors term) [(0::Integer)..]) $ \ (err, i) -> case Error.errorActual err of
           Just "ParseError" -> do
             when (i == 0) $ writeStat (increment "parse.parse_errors" languageTag)
             logError taskSession Warning blob err (("task", "parse") : logFields)
