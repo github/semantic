@@ -1,4 +1,4 @@
-{-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, LambdaCase, MonoLocalBinds, QuantifiedConstraints, RankNTypes #-}
+{-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, GeneralizedNewtypeDeriving, LambdaCase, MonoLocalBinds, QuantifiedConstraints, RankNTypes, StandaloneDeriving #-}
 module Semantic.Api.Diffs
   ( parseDiffBuilder
   , DiffOutputFormat(..)
@@ -30,6 +30,7 @@ import           Data.Term
 import qualified Data.Text as T
 import           Diffing.Algorithm (Diffable)
 import           Diffing.Interpreter (DiffTerms(..))
+import qualified Language.TSX.Term as TSX
 import           Parsing.Parser
 import           Prologue
 import           Proto.Semantic as P hiding (Blob, BlobPair)
@@ -98,6 +99,8 @@ class DiffTerms term => DOTGraphDiff term where
 instance (ConstructorName syntax, Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => DOTGraphDiff (Term syntax) where
   dotGraphDiff = serialize (DOT (diffStyle "diffs")) . renderTreeGraph
 
+deriving instance DOTGraphDiff TSX.Term
+
 
 jsonGraphDiffParsers :: Map Language (SomeParser JSONGraphDiff Loc)
 jsonGraphDiffParsers = aLaCarteParsers
@@ -118,6 +121,8 @@ instance (ConstructorName syntax, Diffable syntax, Eq1 syntax, Hashable1 syntax,
            & P.edges .~ fmap toEdge (edgeList graph)
            & P.errors .~ mempty
 
+deriving instance JSONGraphDiff TSX.Term
+
 
 jsonTreeDiffParsers :: Map Language (SomeParser JSONTreeDiff Loc)
 jsonTreeDiffParsers = aLaCarteParsers
@@ -127,6 +132,8 @@ class DiffTerms term => JSONTreeDiff term where
 
 instance (Diffable syntax, Eq1 syntax, Hashable1 syntax, ToJSONFields1 syntax, Traversable syntax) => JSONTreeDiff (Term syntax) where
   jsonTreeDiff = renderJSONDiff
+
+deriving instance JSONTreeDiff TSX.Term
 
 
 sexprDiffParsers :: Map Language (SomeParser SExprDiff Loc)
@@ -138,6 +145,8 @@ class DiffTerms term => SExprDiff term where
 instance (ConstructorName syntax, Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => SExprDiff (Term syntax) where
   sexprDiff = serialize (SExpression ByConstructorName)
 
+deriving instance SExprDiff TSX.Term
+
 
 showDiffParsers :: Map Language (SomeParser ShowDiff Loc)
 showDiffParsers = aLaCarteParsers
@@ -147,6 +156,8 @@ class DiffTerms term => ShowDiff term where
 
 instance (Diffable syntax, Eq1 syntax, Hashable1 syntax, Show1 syntax, Traversable syntax) => ShowDiff (Term syntax) where
   showDiff = serialize Show
+
+deriving instance ShowDiff TSX.Term
 
 
 summarizeDiffParsers :: Map Language (SomeParser SummarizeDiff Loc)
@@ -159,6 +170,8 @@ class DiffTerms term => SummarizeDiff term where
 instance (Diffable syntax, Eq1 syntax, HasDeclaration syntax, Hashable1 syntax, Traversable syntax) => SummarizeDiff (Term syntax) where
   decorateTerm = decoratorWithAlgebra . declarationAlgebra
   summarizeDiff = diffTOC
+
+deriving instance SummarizeDiff TSX.Term
 
 
 -- | Parse a 'BlobPair' using one of the provided parsers, diff the resulting terms, and run an action on the abstracted diff.
