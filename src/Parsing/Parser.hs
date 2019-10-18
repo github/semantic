@@ -36,7 +36,6 @@ module Parsing.Parser
 
 import           Assigning.Assignment
 import qualified CMarkGFM
-import           Data.Abstract.Evaluatable (HasPrelude)
 import           Data.AST
 import           Data.Graph.ControlFlowVertex (VertexDeclaration)
 import           Data.Language
@@ -72,10 +71,8 @@ import           TreeSitter.Unmarshal
 data SomeAnalysisParser (constraint :: (* -> *) -> Constraint) ann where
   SomeAnalysisParser :: ( constraint term
                         , VertexDeclaration term
-                        , HasPrelude lang
                         )
                      => Parser (term ann)
-                     -> Proxy lang
                      -> SomeAnalysisParser constraint ann
 
 -- | A parser for some specific language, producing 'Term's whose syntax satisfies a list of typeclass constraints.
@@ -88,13 +85,13 @@ someAnalysisParser :: ( constraint (Term (Sum Go.Syntax))
                    => proxy constraint                  -- ^ A proxy for the constraint required, e.g. @(Proxy \@Show1)@.
                    -> Language                          -- ^ The 'Language' to select.
                    -> SomeAnalysisParser constraint Loc -- ^ A 'SomeAnalysisParser' abstracting the syntax type to be produced.
-someAnalysisParser _ Go         = SomeAnalysisParser goParser         (Proxy @'Go)
-someAnalysisParser _ JavaScript = SomeAnalysisParser typescriptParser (Proxy @'JavaScript)
-someAnalysisParser _ PHP        = SomeAnalysisParser phpParser        (Proxy @'PHP)
-someAnalysisParser _ Python     = SomeAnalysisParser pythonParser     (Proxy @'Python)
-someAnalysisParser _ Ruby       = SomeAnalysisParser rubyParser       (Proxy @'Ruby)
-someAnalysisParser _ TypeScript = SomeAnalysisParser typescriptParser (Proxy @'TypeScript)
-someAnalysisParser _ TSX        = SomeAnalysisParser typescriptParser (Proxy @'TSX)
+someAnalysisParser _ Go         = SomeAnalysisParser goParser
+someAnalysisParser _ JavaScript = SomeAnalysisParser typescriptParser
+someAnalysisParser _ PHP        = SomeAnalysisParser phpParser
+someAnalysisParser _ Python     = SomeAnalysisParser pythonParser
+someAnalysisParser _ Ruby       = SomeAnalysisParser rubyParser
+someAnalysisParser _ TypeScript = SomeAnalysisParser typescriptParser
+someAnalysisParser _ TSX        = SomeAnalysisParser typescriptParser
 someAnalysisParser _ l          = error $ "Analysis not supported for: " <> show l
 
 

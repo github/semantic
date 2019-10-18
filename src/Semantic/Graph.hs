@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, LambdaCase, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Semantic.Graph
 ( analysisParsers
 , AnalyzeTerm
@@ -122,7 +122,8 @@ runGraph :: ( Member Distribute sig
          -> Project
          -> m (Graph ControlFlowVertex)
 runGraph type' includePackages project
-  | SomeAnalysisParser parser (lang :: Proxy lang) <- someAnalysisParser (Proxy @AnalyzeTerm) (projectLanguage project) = do
+  | SomeAnalysisParser parser <- someAnalysisParser (Proxy @AnalyzeTerm) (projectLanguage project)
+  , SomeLanguage (lang :: Proxy lang) <- reifyLanguage (projectLanguage project) = do
     package <- if projectLanguage project == Language.Python then
         parsePythonPackage parser project
       else
@@ -132,6 +133,20 @@ runGraph type' includePackages project
       CallGraph -> do
         modules <- topologicalSort <$> runImportGraphToModules lang package
         runCallGraph lang includePackages modules package
+
+data SomeLanguage where
+  SomeLanguage :: HasPrelude lang => Proxy lang -> SomeLanguage
+
+reifyLanguage :: Language -> SomeLanguage
+reifyLanguage = \case
+  Go         -> SomeLanguage (Proxy @'Go)
+  JavaScript -> SomeLanguage (Proxy @'JavaScript)
+  PHP        -> SomeLanguage (Proxy @'PHP)
+  Python     -> SomeLanguage (Proxy @'Python)
+  Ruby       -> SomeLanguage (Proxy @'Ruby)
+  TypeScript -> SomeLanguage (Proxy @'TypeScript)
+  TSX        -> SomeLanguage (Proxy @'TSX)
+  l          -> error $ "HasPrelude not supported for: " <> show l
 
 runCallGraph :: ( AnalyzeTerm term
                 , HasPrelude lang
