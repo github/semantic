@@ -186,6 +186,7 @@ library
                      , Language.Markdown.Syntax
                      , Language.Go.Assignment
                      , Language.Go.Syntax
+                     , Language.Go.Term
                      , Language.Go.Type
                      , Language.Ruby.Assignment
                      , Language.Ruby.Syntax

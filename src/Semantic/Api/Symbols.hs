@@ -18,6 +18,7 @@ import           Data.Term
 import           Data.Text (pack)
 import qualified Language.Java as Java
 import qualified Language.JSON as JSON
+import qualified Language.Go.Term as Go
 import qualified Language.PHP.Term as PHP
 import qualified Language.Python as PythonPrecise
 import qualified Language.Python.Term as PythonALaCarte
@@ -115,6 +116,7 @@ class ToTags t where
 instance IsTaggable syntax => ToTags (Term syntax) where
   tags = runTagging
 
+deriving instance ToTags Go.Term
 deriving instance ToTags PHP.Term
 deriving instance ToTags PythonALaCarte.Term
 deriving instance ToTags TSX.Term

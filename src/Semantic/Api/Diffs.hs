@@ -30,6 +30,7 @@ import           Data.Term
 import qualified Data.Text as T
 import           Diffing.Algorithm (Diffable)
 import           Diffing.Interpreter (DiffTerms(..))
+import qualified Language.Go.Term as Go
 import qualified Language.PHP.Term as PHP
 import qualified Language.Python.Term as Python
 import qualified Language.TSX.Term as TSX
@@ -102,6 +103,7 @@ class DiffTerms term => DOTGraphDiff term where
 instance (ConstructorName syntax, Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => DOTGraphDiff (Term syntax) where
   dotGraphDiff = serialize (DOT (diffStyle "diffs")) . renderTreeGraph
 
+deriving instance DOTGraphDiff Go.Term
 deriving instance DOTGraphDiff PHP.Term
 deriving instance DOTGraphDiff Python.Term
 deriving instance DOTGraphDiff TSX.Term
@@ -127,6 +129,7 @@ instance (ConstructorName syntax, Diffable syntax, Eq1 syntax, Hashable1 syntax,
            & P.edges .~ fmap toEdge (edgeList graph)
            & P.errors .~ mempty
 
+deriving instance JSONGraphDiff Go.Term
 deriving instance JSONGraphDiff PHP.Term
 deriving instance JSONGraphDiff Python.Term
 deriving instance JSONGraphDiff TSX.Term
@@ -142,6 +145,7 @@ class DiffTerms term => JSONTreeDiff term where
 instance (Diffable syntax, Eq1 syntax, Hashable1 syntax, ToJSONFields1 syntax, Traversable syntax) => JSONTreeDiff (Term syntax) where
   jsonTreeDiff = renderJSONDiff
 
+deriving instance JSONTreeDiff Go.Term
 deriving instance JSONTreeDiff PHP.Term
 deriving instance JSONTreeDiff Python.Term
 deriving instance JSONTreeDiff TSX.Term
@@ -157,6 +161,7 @@ class DiffTerms term => SExprDiff term where
 instance (ConstructorName syntax, Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => SExprDiff (Term syntax) where
   sexprDiff = serialize (SExpression ByConstructorName)
 
+deriving instance SExprDiff Go.Term
 deriving instance SExprDiff PHP.Term
 deriving instance SExprDiff Python.Term
 deriving instance SExprDiff TSX.Term
@@ -172,6 +177,7 @@ class DiffTerms term => ShowDiff term where
 instance (Diffable syntax, Eq1 syntax, Hashable1 syntax, Show1 syntax, Traversable syntax) => ShowDiff (Term syntax) where
   showDiff = serialize Show
 
+deriving instance ShowDiff Go.Term
 deriving instance ShowDiff PHP.Term
 deriving instance ShowDiff Python.Term
 deriving instance ShowDiff TSX.Term
@@ -189,6 +195,7 @@ instance (Diffable syntax, Eq1 syntax, HasDeclaration syntax, Hashable1 syntax, 
   decorateTerm = decoratorWithAlgebra . declarationAlgebra
   summarizeDiff = diffTOC
 
+deriving instance SummarizeDiff Go.Term
 deriving instance SummarizeDiff PHP.Term
 deriving instance SummarizeDiff Python.Term
 deriving instance SummarizeDiff TSX.Term

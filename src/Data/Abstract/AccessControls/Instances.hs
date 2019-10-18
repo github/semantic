@@ -15,6 +15,7 @@ import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Language.Go.Syntax as Go
+import qualified Language.Go.Term as Go
 import qualified Language.Go.Type as Go
 import qualified Language.Markdown.Syntax as Markdown
 import qualified Language.PHP.Syntax as PHP
@@ -29,6 +30,7 @@ import qualified Language.TypeScript.Term as TypeScript
 import Data.Quieterm
 
 deriving instance AccessControls1 syntax => AccessControls (Term syntax ann)
+deriving instance AccessControls (Go.Term ann)
 deriving instance AccessControls (PHP.Term ann)
 deriving instance AccessControls (Python.Term ann)
 deriving instance AccessControls (TSX.Term ann)

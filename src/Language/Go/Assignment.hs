@@ -1,10 +1,9 @@
 {-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-} -- FIXME
 module Language.Go.Assignment
 ( assignment
-, Syntax
+, Go.Syntax
 , Grammar
-, Term
+, Go.Term
 ) where
 
 import Prologue
@@ -24,120 +23,17 @@ import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
 import           Language.Go.Syntax as Go.Syntax hiding (runeLiteral, labelName)
+import qualified Language.Go.Term as Go
 import           Language.Go.Type as Go.Type
 import Data.ImportPath (importPath, defaultAlias)
 import           TreeSitter.Go as Grammar
 
-type Syntax =
-  '[ Comment.Comment
-   , Declaration.Constructor
-   , Declaration.Function
-   , Declaration.Method
-   , Declaration.MethodSignature
-   , Declaration.Type
-   , Declaration.TypeAlias
-   , Expression.Plus
-   , Expression.Minus
-   , Expression.Times
-   , Expression.DividedBy
-   , Expression.Modulo
-   , Expression.Power
-   , Expression.Negate
-   , Expression.FloorDivision
-   , Expression.BOr
-   , Expression.BAnd
-   , Expression.BXOr
-   , Expression.LShift
-   , Expression.RShift
-   , Expression.UnsignedRShift
-   , Expression.Complement
-   , Expression.Call
-   , Expression.LessThan
-   , Expression.LessThanEqual
-   , Expression.GreaterThan
-   , Expression.GreaterThanEqual
-   , Expression.Equal
-   , Expression.StrictEqual
-   , Expression.Comparison
-   , Expression.Subscript
-   , Expression.Member
-   , Statement.PostDecrement
-   , Statement.PostIncrement
-   , Expression.MemberAccess
-   , Expression.And
-   , Expression.Not
-   , Expression.Or
-   , Expression.XOr
-   , Go.Syntax.Composite
-   , Go.Syntax.DefaultPattern
-   , Go.Syntax.Defer
-   , Go.Syntax.Field
-   , Go.Syntax.Go
-   , Go.Syntax.Label
-   , Go.Syntax.Package
-   , Go.Syntax.Receive
-   , Go.Syntax.ReceiveOperator
-   , Go.Syntax.Rune
-   , Go.Syntax.Select
-   , Go.Syntax.Send
-   , Go.Syntax.Slice
-   , Go.Syntax.TypeAssertion
-   , Go.Syntax.TypeConversion
-   , Go.Syntax.TypeSwitch
-   , Go.Syntax.TypeSwitchGuard
-   , Go.Syntax.Variadic
-   , Go.Type.BidirectionalChannel
-   , Go.Type.ReceiveChannel
-   , Go.Type.SendChannel
-   , Go.Syntax.Import
-   , Go.Syntax.QualifiedImport
-   , Go.Syntax.SideEffectImport
-   , Literal.Array
-   , Literal.Complex
-   , Literal.Float
-   , Literal.Hash
-   , Literal.Integer
-   , Literal.KeyValue
-   , Literal.Pointer
-   , Literal.Reference
-   , Literal.TextElement
-   , Statement.Assignment
-   , Statement.Break
-   , Statement.Continue
-   , Statement.For
-   , Statement.ForEach
-   , Statement.Goto
-   , Statement.If
-   , Statement.Match
-   , Statement.NoOp
-   , Statement.Pattern
-   , Statement.Return
-   , Statement.Statements
-   , Syntax.Context
-   , Syntax.Error
-   , Syntax.Empty
-   , Syntax.Identifier
-   , Type.Annotation
-   , Type.Array
-   , Type.Function
-   , Type.Interface
-   , Type.Map
-   , Type.Parenthesized
-   , Type.Pointer
-   , Type.Slice
-   , []
-   , Literal.String
-   , Literal.EscapeSequence
-   , Literal.Null
-   , Literal.Boolean
-   ]
-
-type Term = Term.Term (Sum Syntax)
+type Term = Term.Term (Sum Go.Syntax)
 type Assignment = Assignment.Assignment [] Grammar
 
 -- | Assignment from AST in Go's grammar onto a program in Go's syntax.
-assignment :: Assignment (Term Loc)
-assignment = handleError program <|> parseError
+assignment :: Assignment (Go.Term Loc)
+assignment = fmap Go.Term $ handleError program <|> parseError
 
 program :: Assignment (Term Loc)
 program = makeTerm <$> symbol SourceFile <*> children (Statement.Statements <$> manyTerm expression)
@@ -308,7 +204,7 @@ arrayType = makeTerm <$> symbol ArrayType <*> children (Type.Array . Just <$> ex
 channelType :: Assignment (Term Loc)
 channelType =  makeTerm' <$> symbol ChannelType <*> children (mkChannelType <$> optional (token AnonLAngleMinus) <* token AnonChan <*> optional (token AnonLAngleMinus) <*> expression)
   where
-    mkChannelType :: Maybe a -> Maybe a -> b -> Sum Syntax b
+    mkChannelType :: Maybe a -> Maybe a -> b -> Sum Go.Syntax b
     mkChannelType receive send | Just _ <- receive = inject . Go.Type.ReceiveChannel
                                | Just _ <- send    = inject . Go.Type.SendChannel
                                | otherwise         = inject . Go.Type.BidirectionalChannel
@@ -555,10 +451,10 @@ assignment' =  makeTerm' <$> symbol AssignmentStatement <*> children (infixTerm 
                   , augmentedAssign (invert Expression.BAnd) <$ symbol AnonAmpersandCaretEqual
                   ])
   where
-    assign :: Term Loc -> Term Loc -> Sum Syntax (Term Loc)
+    assign :: Term Loc -> Term Loc -> Sum Go.Syntax (Term Loc)
     assign l r = inject (Statement.Assignment [] l r)
 
-    augmentedAssign :: (f :< Syntax) => (Term Loc -> Term Loc -> f (Term Loc)) -> Term Loc -> Term Loc -> Sum Syntax (Term Loc)
+    augmentedAssign :: (f :< Go.Syntax) => (Term Loc -> Term Loc -> f (Term Loc)) -> Term Loc -> Term Loc -> Sum Go.Syntax (Term Loc)
     augmentedAssign c l r = assign l (makeTerm1 (c l r))
 
     invert cons a b = Expression.Not (makeTerm1 (cons a b))
@@ -630,8 +526,8 @@ sendStatement = makeTerm <$> symbol SendStatement <*> children (Go.Syntax.Send <
 -- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
 infixTerm :: Assignment (Term Loc)
           -> Assignment (Term Loc)
-          -> [Assignment (Term Loc -> Term Loc -> Sum Syntax (Term Loc))]
-          -> Assignment (Sum Syntax (Term Loc))
+          -> [Assignment (Term Loc -> Term Loc -> Sum Go.Syntax (Term Loc))]
+          -> Assignment (Sum Go.Syntax (Term Loc))
 infixTerm = infixContext comment
 
 -- | Match a series of terms or comments until a delimiter is matched
