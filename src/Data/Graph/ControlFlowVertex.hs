@@ -122,12 +122,12 @@ instance (VertexDeclarationStrategy syntax ~ strategy, VertexDeclarationWithStra
 data Strategy = Default | Custom
 
 type family VertexDeclarationStrategy syntax where
-  VertexDeclarationStrategy Syntax.Identifier = 'Custom
-  VertexDeclarationStrategy Declaration.Function = 'Custom
-  VertexDeclarationStrategy Declaration.Method = 'Custom
+  VertexDeclarationStrategy Syntax.Identifier       = 'Custom
+  VertexDeclarationStrategy Declaration.Function    = 'Custom
+  VertexDeclarationStrategy Declaration.Method      = 'Custom
   VertexDeclarationStrategy Expression.MemberAccess = 'Custom
-  VertexDeclarationStrategy (Sum _) = 'Custom
-  VertexDeclarationStrategy syntax  = 'Default
+  VertexDeclarationStrategy (Sum _)                 = 'Custom
+  VertexDeclarationStrategy syntax                  = 'Default
 
 class VertexDeclarationWithStrategy (strategy :: Strategy) whole syntax where
   toVertexWithStrategy :: (Declarations1 whole, Foldable whole)
