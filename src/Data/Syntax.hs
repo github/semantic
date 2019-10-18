@@ -54,7 +54,7 @@ emptyTerm = makeTerm . startLocation <$> Assignment.location <*> pure Empty
   where startLocation Loc{..} = Loc (Range.point (Range.start byteRange)) (Span.point (Span.start span))
 
 -- | Catch assignment errors into an error term.
-handleError :: (HasCallStack, Error :< syntaxes, Enum grammar, Eq1 ast, Ix grammar, Show grammar, Apply Foldable syntaxes) => Assignment.Assignment ast grammar (Term (Sum syntaxes) Loc) -> Assignment.Assignment ast grammar (Term (Sum syntaxes) Loc)
+handleError :: (HasCallStack, Error :< syntaxes, Sum syntaxes ~ Syntax term, Enum grammar, Eq1 ast, Ix grammar, Show grammar, Apply Foldable syntaxes, IsTerm term) => Assignment.Assignment ast grammar (term Loc) -> Assignment.Assignment ast grammar (term Loc)
 handleError = flip Assignment.catchError (\ err -> makeTerm <$> Assignment.location <*> pure (errorSyntax (either id show <$> err) []) <* Assignment.source)
 
 -- | Catch parse errors into an error term.
