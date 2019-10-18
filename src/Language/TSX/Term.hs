@@ -5,6 +5,7 @@ module Language.TSX.Term
 , Diff(..)
 ) where
 
+import Data.Abstract.Declarations
 import Data.Bifoldable
 import Data.Bifunctor
 import Data.Sum (Sum)
@@ -192,7 +193,7 @@ type Syntax =
 
 
 newtype Term ann = Term { getTerm :: Term.Term (Sum Syntax) ann }
-  deriving (Foldable, Functor, Syntax.HasErrors, Traversable)
+  deriving (Declarations, Foldable, Functor, Syntax.HasErrors, Traversable)
 
 newtype Diff ann1 ann2 = Diff { getDiff :: Diff.Diff (Sum Syntax) ann1 ann2 }
   deriving (Bifoldable, Bifunctor)
