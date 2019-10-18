@@ -162,20 +162,20 @@ type Syntax = '[
   , []
   ]
 
-type Term = Term.Term (Sum Syntax) Loc
+type Term = Term.Term (Sum Syntax)
 type Assignment = Assignment.Assignment [] Grammar
 
 -- | Assignment from AST in PHP's grammar onto a program in PHP's syntax.
-assignment :: Assignment Term
+assignment :: Assignment (Term Loc)
 assignment = handleError $ makeTerm <$> symbol Program <*> children (Statement.Statements <$> (bookend <$> (text <|> emptyTerm) <*> manyTerm statement <*> (text <|> emptyTerm))) <|> parseError
 
-text :: Assignment Term
+text :: Assignment (Term Loc)
 text = makeTerm <$> symbol Text <*> (Syntax.Text <$> source)
 
-textInterpolation :: Assignment Term
+textInterpolation :: Assignment (Term Loc)
 textInterpolation = makeTerm <$> symbol TextInterpolation <*> (Syntax.Text <$> source)
 
-statement :: Assignment Term
+statement :: Assignment (Term Loc)
 statement = handleError everything
   where
     everything = choice [
@@ -200,7 +200,7 @@ statement = handleError everything
       , functionStaticDeclaration
       ]
 
-expression :: Assignment Term
+expression :: Assignment (Term Loc)
 expression = choice [
   assignmentExpression,
   augmentedAssignmentExpression,
@@ -214,7 +214,7 @@ expression = choice [
   unaryExpression
   ]
 
-unaryExpression :: Assignment Term
+unaryExpression :: Assignment (Term Loc)
 unaryExpression = choice [
   cloneExpression,
   exponentiationExpression,
@@ -223,10 +223,10 @@ unaryExpression = choice [
   primaryExpression
   ]
 
-assignmentExpression :: Assignment Term
+assignmentExpression :: Assignment (Term Loc)
 assignmentExpression = makeTerm <$> symbol AssignmentExpression <*> children (Statement.Assignment [] <$> term (variable <|> list <|> arrayCreationExpression) <*> term (expression <|> variable))
 
-augmentedAssignmentExpression :: Assignment Term
+augmentedAssignmentExpression :: Assignment (Term Loc)
 augmentedAssignmentExpression = makeTerm' <$> symbol AugmentedAssignmentExpression <*> children (infixTerm variable (term expression) [
   assign Expression.Power <$ symbol AnonStarStarEqual
   , assign Expression.Times <$ symbol AnonStarEqual
@@ -243,7 +243,7 @@ augmentedAssignmentExpression = makeTerm' <$> symbol AugmentedAssignmentExpressi
   where
     assign c l r = inject (Statement.Assignment [] l (makeTerm1 (c l r)))
 
-binaryExpression  :: Assignment Term
+binaryExpression  :: Assignment (Term Loc)
 binaryExpression = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm expression (term (expression <|> classTypeDesignator))
   [ (inject .) . Expression.And                <$ symbol AnonAnd
   , (inject .) . Expression.Or                 <$ symbol AnonOr
@@ -274,19 +274,19 @@ binaryExpression = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm
   , (inject .) . Expression.InstanceOf         <$ symbol AnonInstanceof
   ]) where invert cons a b = Expression.Not (makeTerm1 (cons a b))
 
-conditionalExpression :: Assignment Term
+conditionalExpression :: Assignment (Term Loc)
 conditionalExpression = makeTerm <$> symbol ConditionalExpression <*> children (Statement.If <$> term (binaryExpression <|> unaryExpression) <*> (term expression <|> emptyTerm) <*> term expression)
 
-list :: Assignment Term
+list :: Assignment (Term Loc)
 list = makeTerm <$> symbol ListLiteral <*> children (Literal.Array <$> manyTerm (list <|> variable))
 
-exponentiationExpression :: Assignment Term
+exponentiationExpression :: Assignment (Term Loc)
 exponentiationExpression = makeTerm <$> symbol ExponentiationExpression <*> children (Expression.Power <$> term (cloneExpression <|> primaryExpression) <*> term (primaryExpression <|> cloneExpression <|> exponentiationExpression))
 
-cloneExpression :: Assignment Term
+cloneExpression :: Assignment (Term Loc)
 cloneExpression = makeTerm <$> symbol CloneExpression <*> children (Syntax.Clone <$> term primaryExpression)
 
-primaryExpression :: Assignment Term
+primaryExpression :: Assignment (Term Loc)
 primaryExpression = choice [
   variable,
   classConstantAccessExpression,
@@ -301,16 +301,16 @@ primaryExpression = choice [
   parenthesizedExpression
   ]
 
-parenthesizedExpression :: Assignment Term
+parenthesizedExpression :: Assignment (Term Loc)
 parenthesizedExpression = symbol ParenthesizedExpression *> children (term expression)
 
-classConstantAccessExpression :: Assignment Term
+classConstantAccessExpression :: Assignment (Term Loc)
 classConstantAccessExpression = makeTerm <$> symbol ClassConstantAccessExpression <*> children (Expression.MemberAccess <$> term scopeResolutionQualifier <*> name)
 
-variable :: Assignment Term
+variable :: Assignment (Term Loc)
 variable = callableVariable <|> scopedPropertyAccessExpression <|> memberAccessExpression <|> castExpression
 
-callableVariable :: Assignment Term
+callableVariable :: Assignment (Term Loc)
 callableVariable = choice [
   simpleVariable',
   subscriptExpression,
@@ -319,18 +319,18 @@ callableVariable = choice [
   functionCallExpression
   ]
 
-memberCallExpression :: Assignment Term
+memberCallExpression :: Assignment (Term Loc)
 memberCallExpression = makeTerm <$> symbol MemberCallExpression <*> children (Expression.Call [] <$> (makeMemberAccess <$> location <*> term dereferencableExpression <*> memberName) <*> arguments <*> emptyTerm)
   where makeMemberAccess loc expr memberName = makeTerm loc (Expression.MemberAccess expr memberName)
 
-scopedCallExpression :: Assignment Term
+scopedCallExpression :: Assignment (Term Loc)
 scopedCallExpression = makeTerm <$> symbol ScopedCallExpression <*> children (Expression.Call [] <$> (makeMemberAccess <$> location <*> term scopeResolutionQualifier <*> memberName) <*> arguments <*> emptyTerm)
   where makeMemberAccess loc expr memberName = makeTerm loc (Expression.MemberAccess expr memberName)
 
-functionCallExpression :: Assignment Term
+functionCallExpression :: Assignment (Term Loc)
 functionCallExpression = makeTerm <$> symbol FunctionCallExpression <*> children (Expression.Call [] <$> term (qualifiedName <|> callableExpression) <*> arguments <*> emptyTerm)
 
-callableExpression :: Assignment Term
+callableExpression :: Assignment (Term Loc)
 callableExpression = choice [
   callableVariable,
   expression,
@@ -338,29 +338,29 @@ callableExpression = choice [
   string
   ]
 
-subscriptExpression :: Assignment Term
+subscriptExpression :: Assignment (Term Loc)
 subscriptExpression = makeTerm <$> symbol SubscriptExpression <*> children (Expression.Subscript <$> term dereferencableExpression <*> (pure <$> (term expression <|> emptyTerm)))
 
-memberAccessExpression :: Assignment Term
+memberAccessExpression :: Assignment (Term Loc)
 memberAccessExpression = makeTerm <$> symbol MemberAccessExpression <*> children (Expression.MemberAccess <$> term dereferencableExpression <*> memberName)
 
-dereferencableExpression :: Assignment Term
+dereferencableExpression :: Assignment (Term Loc)
 dereferencableExpression = symbol DereferencableExpression *> children (term (variable <|> expression <|> arrayCreationExpression <|> string))
 
-scopedPropertyAccessExpression :: Assignment Term
+scopedPropertyAccessExpression :: Assignment (Term Loc)
 scopedPropertyAccessExpression = makeTerm <$> symbol ScopedPropertyAccessExpression <*> children (Expression.MemberAccess <$> term scopeResolutionQualifier <*> simpleVariable')
 
-scopeResolutionQualifier :: Assignment Term
+scopeResolutionQualifier :: Assignment (Term Loc)
 scopeResolutionQualifier = choice [
   relativeScope,
   qualifiedName,
   dereferencableExpression
   ]
 
-arrayCreationExpression :: Assignment Term
+arrayCreationExpression :: Assignment (Term Loc)
 arrayCreationExpression = makeTerm <$> symbol ArrayCreationExpression <*> children (Literal.Array <$> manyTerm arrayElementInitializer)
 
-intrinsic :: Assignment Term
+intrinsic :: Assignment (Term Loc)
 intrinsic = choice [
   emptyIntrinsic,
   evalIntrinsic,
@@ -369,68 +369,68 @@ intrinsic = choice [
   printIntrinsic
   ]
 
-emptyIntrinsic :: Assignment Term
+emptyIntrinsic :: Assignment (Term Loc)
 emptyIntrinsic = makeTerm <$> symbol EmptyIntrinsic <*> children (Syntax.EmptyIntrinsic <$> term expression)
 
-evalIntrinsic :: Assignment Term
+evalIntrinsic :: Assignment (Term Loc)
 evalIntrinsic = makeTerm <$> symbol EvalIntrinsic <*> children (Syntax.EvalIntrinsic <$> term expression)
 
-exitIntrinsic :: Assignment Term
+exitIntrinsic :: Assignment (Term Loc)
 exitIntrinsic = makeTerm <$> symbol ExitIntrinsic <*> children (Syntax.ExitIntrinsic <$> (term expression <|> emptyTerm))
 
-issetIntrinsic :: Assignment Term
+issetIntrinsic :: Assignment (Term Loc)
 issetIntrinsic = makeTerm <$> symbol IssetIntrinsic <*> children (Syntax.IssetIntrinsic <$> (makeTerm <$> location <*> someTerm variable))
 
-printIntrinsic :: Assignment Term
+printIntrinsic :: Assignment (Term Loc)
 printIntrinsic = makeTerm <$> symbol PrintIntrinsic <*> children (Syntax.PrintIntrinsic <$> term expression)
 
-anonymousFunctionCreationExpression :: Assignment Term
+anonymousFunctionCreationExpression :: Assignment (Term Loc)
 anonymousFunctionCreationExpression = makeTerm <$> symbol AnonymousFunctionCreationExpression <*> children (makeFunction <$> emptyTerm <*> parameters <*> (term functionUseClause <|> emptyTerm) <*> (term returnType <|> emptyTerm) <*> term compoundStatement)
   where
     makeFunction identifier parameters functionUseClause returnType statement = Declaration.Function [functionUseClause, returnType] identifier parameters statement
 
-parameters :: Assignment [Term]
+parameters :: Assignment [Term Loc]
 parameters = symbol FormalParameters *> children (manyTerm (simpleParameter <|> variadicParameter))
 
-simpleParameter :: Assignment Term
+simpleParameter :: Assignment (Term Loc)
 simpleParameter = makeTerm <$> symbol SimpleParameter <*> children (makeAnnotation <$> (term typeDeclaration <|> emptyTerm) <*> (makeAssignment <$> location <*> term variableName <*> (term defaultArgumentSpecifier <|> emptyTerm)))
   where
     makeAnnotation typeDecl assignment = Type.Annotation assignment typeDecl
     makeAssignment loc name argument = makeTerm loc (Statement.Assignment [] name argument)
 
-defaultArgumentSpecifier :: Assignment Term
+defaultArgumentSpecifier :: Assignment (Term Loc)
 defaultArgumentSpecifier = symbol DefaultArgumentSpecifier *> children (term expression)
 
 
-variadicParameter :: Assignment Term
+variadicParameter :: Assignment (Term Loc)
 variadicParameter = makeTerm <$> symbol VariadicParameter <*> children (makeTypeAnnotation <$> (term typeDeclaration <|> emptyTerm) <*> term variableName)
   where makeTypeAnnotation ty variableName = Type.Annotation variableName ty
 
-functionUseClause :: Assignment Term
+functionUseClause :: Assignment (Term Loc)
 functionUseClause = makeTerm <$> symbol AnonymousFunctionUseClause <*> children (Syntax.UseClause <$> someTerm variableName)
 
-returnType :: Assignment Term
+returnType :: Assignment (Term Loc)
 returnType = makeTerm <$> symbol ReturnType <*> children (Syntax.ReturnType <$> (term typeDeclaration <|> emptyTerm))
 
-typeDeclaration :: Assignment Term
+typeDeclaration :: Assignment (Term Loc)
 typeDeclaration = makeTerm <$> symbol TypeDeclaration <*> children (Syntax.TypeDeclaration <$> term baseTypeDeclaration)
 
-baseTypeDeclaration :: Assignment Term
+baseTypeDeclaration :: Assignment (Term Loc)
 baseTypeDeclaration = makeTerm <$> symbol BaseTypeDeclaration <*> children (Syntax.BaseTypeDeclaration <$> term (scalarType <|> qualifiedName <|> emptyTerm))
 
-scalarType :: Assignment Term
+scalarType :: Assignment (Term Loc)
 scalarType = makeTerm <$> symbol ScalarType <*> (Syntax.ScalarType <$> source)
 
-compoundStatement :: Assignment Term
+compoundStatement :: Assignment (Term Loc)
 compoundStatement = makeTerm <$> symbol CompoundStatement <*> children (manyTerm statement)
 
-objectCreationExpression :: Assignment Term
+objectCreationExpression :: Assignment (Term Loc)
 objectCreationExpression = makeTerm <$> symbol ObjectCreationExpression <*> children (Expression.New <$> term classTypeDesignator <*> emptyTerm <*> (arguments <|> pure []))
 
   <|> (makeTerm <$> symbol ObjectCreationExpression <*> children (makeAnonClass <$ token AnonNew <* token AnonClass <*> emptyTerm <*> (arguments <|> pure []) <*> (term classBaseClause <|> emptyTerm) <*> (term classInterfaceClause <|> emptyTerm) <*> (makeTerm <$> location <*> manyTerm classMemberDeclaration)))
   where makeAnonClass identifier args baseClause interfaceClause declarations = Declaration.Class [] identifier (args <> [baseClause, interfaceClause]) declarations
 
-classMemberDeclaration :: Assignment Term
+classMemberDeclaration :: Assignment (Term Loc)
 classMemberDeclaration = choice [
   classConstDeclaration,
   propertyDeclaration,
@@ -444,7 +444,7 @@ publicAccessControl :: ScopeGraph.AccessControl
 publicAccessControl = ScopeGraph.Public
 
 -- TODO: Update to check for AccessControl.
-methodDeclaration :: Assignment Term
+methodDeclaration :: Assignment (Term Loc)
 methodDeclaration =  (makeTerm <$> symbol MethodDeclaration <*> children (makeMethod1 publicAccessControl <$> manyTerm methodModifier <*> emptyTerm <*> functionDefinitionParts))
                  <|> makeTerm <$> symbol MethodDeclaration <*> children (makeMethod2 publicAccessControl <$> someTerm methodModifier <*> emptyTerm <*> term name <*> parameters <*> term (returnType <|> emptyTerm) <*> emptyTerm)
   where
@@ -452,107 +452,107 @@ methodDeclaration =  (makeTerm <$> symbol MethodDeclaration <*> children (makeMe
     makeMethod1 accessControl modifiers receiver (name, params, returnType, compoundStatement) = Declaration.Method (modifiers <> [returnType]) receiver name params compoundStatement accessControl
     makeMethod2 accessControl modifiers receiver name params returnType compoundStatement      = Declaration.Method (modifiers <> [returnType]) receiver name params compoundStatement accessControl
 
-classBaseClause :: Assignment Term
+classBaseClause :: Assignment (Term Loc)
 classBaseClause = makeTerm <$> symbol ClassBaseClause <*> children (Syntax.ClassBaseClause <$> term qualifiedName)
 
-classInterfaceClause :: Assignment Term
+classInterfaceClause :: Assignment (Term Loc)
 classInterfaceClause = makeTerm <$> symbol ClassInterfaceClause <*> children (Syntax.ClassInterfaceClause <$> someTerm qualifiedName)
 
-classConstDeclaration :: Assignment Term
+classConstDeclaration :: Assignment (Term Loc)
 classConstDeclaration = makeTerm <$> symbol ClassConstDeclaration <*> children (Syntax.ClassConstDeclaration <$> (term accessControlModifier <|> emptyTerm) <*> manyTerm constElement)
 
 -- TODO: Update to ScopeGraph.AccessControl
-accessControlModifier :: Assignment Term
+accessControlModifier :: Assignment (Term Loc)
 accessControlModifier = makeTerm <$> symbol VisibilityModifier <*> (Syntax.Identifier . Name.name <$> source)
 
-constElement :: Assignment Term
+constElement :: Assignment (Term Loc)
 constElement = makeTerm <$> symbol ConstElement <*> children (Statement.Assignment [] <$> term name <*> term expression)
 
-arguments :: Assignment [Term]
+arguments :: Assignment [Term Loc]
 arguments = symbol Arguments *> children (manyTerm (variadicUnpacking <|> expression))
 
-variadicUnpacking :: Assignment Term
+variadicUnpacking :: Assignment (Term Loc)
 variadicUnpacking = symbol VariadicUnpacking *> children (term expression)
 
-classTypeDesignator :: Assignment Term
+classTypeDesignator :: Assignment (Term Loc)
 classTypeDesignator = qualifiedName <|> newVariable
 
-newVariable :: Assignment Term
+newVariable :: Assignment (Term Loc)
 newVariable = makeTerm <$> symbol NewVariable <*> children (Syntax.NewVariable <$> ((pure <$> term simpleVariable') <|> ((\a b -> [a, b]) <$> term (newVariable <|> qualifiedName <|> relativeScope) <*> term (expression <|> memberName <|> emptyTerm))))
 
-memberName :: Assignment Term
+memberName :: Assignment (Term Loc)
 memberName = name <|> simpleVariable' <|> expression
 
-relativeScope :: Assignment Term
+relativeScope :: Assignment (Term Loc)
 relativeScope = makeTerm <$> symbol RelativeScope <*> (Syntax.RelativeScope <$> source)
 
-qualifiedName :: Assignment Term
+qualifiedName :: Assignment (Term Loc)
 qualifiedName = makeTerm <$> symbol QualifiedName <*> children (Syntax.QualifiedName <$> (term namespaceNameAsPrefix <|> emptyTerm) <*> term name)
 
-namespaceNameAsPrefix :: Assignment Term
+namespaceNameAsPrefix :: Assignment (Term Loc)
 namespaceNameAsPrefix = symbol NamespaceNameAsPrefix *> children (term namespaceName <|> emptyTerm)
 
-namespaceName :: Assignment Term
+namespaceName :: Assignment (Term Loc)
 namespaceName = makeTerm <$> symbol NamespaceName <*> children (Syntax.NamespaceName <$> someTerm' name)
 
-namespaceName' :: Assignment (NonEmpty Term)
+namespaceName' :: Assignment (NonEmpty (Term Loc))
 namespaceName' = symbol NamespaceName *> children (someTerm' name)
 
-updateExpression :: Assignment Term
+updateExpression :: Assignment (Term Loc)
 updateExpression = makeTerm <$> symbol UpdateExpression <*> children (Syntax.Update <$> term expression)
 
-shellCommandExpression :: Assignment Term
+shellCommandExpression :: Assignment (Term Loc)
 shellCommandExpression = makeTerm <$> symbol ShellCommandExpression <*> (Syntax.ShellCommand <$> source)
 
-literal :: Assignment Term
+literal :: Assignment (Term Loc)
 literal = integer <|> float <|> string
 
-float :: Assignment Term
+float :: Assignment (Term Loc)
 float = makeTerm <$> symbol Float <*> (Literal.Float <$> source)
 
-integer :: Assignment Term
+integer :: Assignment (Term Loc)
 integer = makeTerm <$> symbol Integer <*> (Literal.Integer <$> source)
 
-unaryOpExpression :: Assignment Term
+unaryOpExpression :: Assignment (Term Loc)
 unaryOpExpression = symbol UnaryOpExpression >>= \ loc ->
   makeTerm loc . Expression.Not <$> children ((symbol AnonTilde <|> symbol AnonBang) *> term expression)
   <|> makeTerm loc . Expression.Negate <$> children ((symbol AnonMinus <|> symbol AnonPlus) *> term expression)
   <|> makeTerm loc . Syntax.ErrorControl <$> children (symbol AnonAt *> term expression)
 
-castExpression :: Assignment Term
+castExpression :: Assignment (Term Loc)
 castExpression = makeTerm <$> (symbol CastExpression <|> symbol CastExpression') <*> children (flip Expression.Cast <$> term castType <*> term unaryExpression)
 
-castType :: Assignment Term
+castType :: Assignment (Term Loc)
 castType = makeTerm <$> symbol CastType <*> (Syntax.CastType <$> source)
 
-expressionStatement :: Assignment Term
+expressionStatement :: Assignment (Term Loc)
 expressionStatement = symbol ExpressionStatement *> children (term expression)
 
-namedLabelStatement :: Assignment Term
+namedLabelStatement :: Assignment (Term Loc)
 namedLabelStatement = makeTerm <$> symbol NamedLabelStatement <*> children (Syntax.LabeledStatement <$> term name)
 
-selectionStatement :: Assignment Term
+selectionStatement :: Assignment (Term Loc)
 selectionStatement = ifStatement <|> switchStatement
 
-ifStatement :: Assignment Term
+ifStatement :: Assignment (Term Loc)
 ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> term expression <*> (makeTerm <$> location <*> manyTerm statement) <*> (makeTerm <$> location <*> ((\as b -> as <> [b]) <$> manyTerm elseIfClause <*> (term elseClause <|> emptyTerm))))
 
-switchStatement :: Assignment Term
+switchStatement :: Assignment (Term Loc)
 switchStatement = makeTerm <$> symbol SwitchStatement <*> children (Statement.Match <$> term expression <*> (makeTerm <$> location <*> manyTerm (caseStatement <|> defaultStatement)))
 
-caseStatement :: Assignment Term
+caseStatement :: Assignment (Term Loc)
 caseStatement = makeTerm <$> symbol CaseStatement <*> children (Statement.Pattern <$> term expression <*> (makeTerm <$> location <*> manyTerm statement))
 
-defaultStatement :: Assignment Term
+defaultStatement :: Assignment (Term Loc)
 defaultStatement = makeTerm <$> symbol DefaultStatement <*> children (Statement.Pattern <$> emptyTerm <*> (makeTerm <$> location <*> manyTerm statement))
 
-elseIfClause :: Assignment Term
+elseIfClause :: Assignment (Term Loc)
 elseIfClause = makeTerm <$> symbol ElseIfClause <*> children (Statement.Else <$> term expression <*> (makeTerm <$> location <*> manyTerm statement))
 
-elseClause :: Assignment Term
+elseClause :: Assignment (Term Loc)
 elseClause = makeTerm <$> symbol ElseClause <*> children (Statement.Else <$> emptyTerm <*> (makeTerm <$> location <*> manyTerm statement))
 
-iterationStatement :: Assignment Term
+iterationStatement :: Assignment (Term Loc)
 iterationStatement = choice [
   whileStatement,
   doStatement,
@@ -560,23 +560,23 @@ iterationStatement = choice [
   foreachStatement
   ]
 
-whileStatement :: Assignment Term
+whileStatement :: Assignment (Term Loc)
 whileStatement = makeTerm <$> symbol WhileStatement <*> children (Statement.While <$> expression <*> (term (statement <|> (makeTerm <$> location <*> manyTerm statement)) <|> emptyTerm))
 
-doStatement :: Assignment Term
+doStatement :: Assignment (Term Loc)
 doStatement = makeTerm <$> symbol DoStatement <*> children (Statement.DoWhile <$> term statement <*> term expression)
 
-forStatement :: Assignment Term
+forStatement :: Assignment (Term Loc)
 forStatement = makeTerm <$> symbol ForStatement <*> children (Statement.For <$> (term expressions <|> emptyTerm) <*> (term expressions <|> emptyTerm) <*> (term expressions <|> emptyTerm) <*> (makeTerm <$> location <*> manyTerm statement))
 
-foreachStatement :: Assignment Term
+foreachStatement :: Assignment (Term Loc)
 foreachStatement = makeTerm <$> symbol ForeachStatement <*> children (forEachStatement' <$> term expression <*> term (pair <|> expression <|> list) <*> (makeTerm <$> location <*> manyTerm statement))
   where forEachStatement' array value body = Statement.ForEach value array body
 
-pair :: Assignment Term
+pair :: Assignment (Term Loc)
 pair = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> term expression <*> term (expression <|> list))
 
-jumpStatement :: Assignment Term
+jumpStatement :: Assignment (Term Loc)
 jumpStatement = choice [
   gotoStatement,
   continueStatement,
@@ -585,81 +585,81 @@ jumpStatement = choice [
   throwStatement
   ]
 
-gotoStatement :: Assignment Term
+gotoStatement :: Assignment (Term Loc)
 gotoStatement = makeTerm <$> symbol GotoStatement <*> children (Statement.Goto <$> term name)
 
-continueStatement :: Assignment Term
+continueStatement :: Assignment (Term Loc)
 continueStatement = makeTerm <$> symbol ContinueStatement <*> children (Statement.Continue <$> (term breakoutLevel <|> emptyTerm))
 
-breakoutLevel :: Assignment Term
+breakoutLevel :: Assignment (Term Loc)
 breakoutLevel = integer
 
-breakStatement :: Assignment Term
+breakStatement :: Assignment (Term Loc)
 breakStatement = makeTerm <$> symbol BreakStatement <*> children (Statement.Break <$> (term breakoutLevel <|> emptyTerm))
 
-returnStatement :: Assignment Term
+returnStatement :: Assignment (Term Loc)
 returnStatement = makeTerm <$> symbol ReturnStatement <*> children (Statement.Return <$> (term expression <|> emptyTerm))
 
-throwStatement :: Assignment Term
+throwStatement :: Assignment (Term Loc)
 throwStatement = makeTerm <$> symbol ThrowStatement <*> children (Statement.Throw <$> term expression)
 
 
-tryStatement :: Assignment Term
+tryStatement :: Assignment (Term Loc)
 tryStatement = makeTerm <$> symbol TryStatement <*> children (Statement.Try <$> term compoundStatement <*> (((\as b -> as <> [b]) <$> someTerm catchClause <*> term finallyClause) <|>  someTerm catchClause <|> someTerm finallyClause))
 
-catchClause :: Assignment Term
+catchClause :: Assignment (Term Loc)
 catchClause = makeTerm <$> symbol CatchClause <*> children (Statement.Catch <$> (makeTerm <$> location <*> ((\a b -> [a, b]) <$> term qualifiedName <*> term variableName)) <*> term compoundStatement)
 
-finallyClause :: Assignment Term
+finallyClause :: Assignment (Term Loc)
 finallyClause = makeTerm <$> symbol FinallyClause <*> children (Statement.Finally <$> term compoundStatement)
 
-declareStatement :: Assignment Term
+declareStatement :: Assignment (Term Loc)
 declareStatement = makeTerm <$> symbol DeclareStatement <*> children (Syntax.Declare <$> term declareDirective <*> (makeTerm <$> location <*> manyTerm statement))
 
 
 -- | TODO: Figure out how to parse assignment token
-declareDirective :: Assignment Term
+declareDirective :: Assignment (Term Loc)
 declareDirective = makeTerm <$> symbol DeclareDirective <*> children (Syntax.DeclareDirective <$> literal)
 
 
-echoStatement :: Assignment Term
+echoStatement :: Assignment (Term Loc)
 echoStatement = makeTerm <$> symbol EchoStatement <*> children (Syntax.Echo <$> term expressions)
 
-unsetStatement :: Assignment Term
+unsetStatement :: Assignment (Term Loc)
 unsetStatement = makeTerm <$> symbol UnsetStatement <*> children (Syntax.Unset <$> (makeTerm <$> location <*> someTerm variable))
 
-expressions :: Assignment Term
+expressions :: Assignment (Term Loc)
 expressions = expression <|> sequenceExpression
 
-sequenceExpression :: Assignment Term
+sequenceExpression :: Assignment (Term Loc)
 sequenceExpression = makeTerm <$> symbol SequenceExpression <*> children (Expression.SequenceExpression <$> term expression <*> term expressions)
 
-constDeclaration :: Assignment Term
+constDeclaration :: Assignment (Term Loc)
 constDeclaration = makeTerm <$> symbol ConstDeclaration <*> children (Syntax.ConstDeclaration <$> someTerm constElement)
 
-functionDefinition :: Assignment Term
+functionDefinition :: Assignment (Term Loc)
 functionDefinition = makeTerm <$> symbol FunctionDefinition <*> children (makeFunction <$> term name <*> parameters <*> (term returnType <|> emptyTerm) <*> term compoundStatement)
   where
     makeFunction identifier parameters returnType statement = Declaration.Function [returnType] identifier parameters statement
 
-classDeclaration :: Assignment Term
+classDeclaration :: Assignment (Term Loc)
 classDeclaration = makeTerm <$> symbol ClassDeclaration <*> children (makeClass <$> (term classModifier <|> emptyTerm) <*> term name <*> (term classBaseClause <|> emptyTerm) <*> (term classInterfaceClause <|> emptyTerm) <*> (makeTerm <$> location <*> manyTerm classMemberDeclaration))
   where
     makeClass modifier name baseClause interfaceClause declarations = Declaration.Class [modifier] name [baseClause, interfaceClause] declarations
 
-interfaceDeclaration :: Assignment Term
+interfaceDeclaration :: Assignment (Term Loc)
 interfaceDeclaration = makeTerm <$> symbol InterfaceDeclaration <*> children (Syntax.InterfaceDeclaration <$> term name <*> (term interfaceBaseClause <|> emptyTerm) <*> manyTerm interfaceMemberDeclaration)
 
-interfaceBaseClause :: Assignment Term
+interfaceBaseClause :: Assignment (Term Loc)
 interfaceBaseClause = makeTerm <$> symbol InterfaceBaseClause <*> children (Syntax.InterfaceBaseClause <$> someTerm qualifiedName)
 
-interfaceMemberDeclaration :: Assignment Term
+interfaceMemberDeclaration :: Assignment (Term Loc)
 interfaceMemberDeclaration = methodDeclaration <|> classConstDeclaration
 
-traitDeclaration :: Assignment Term
+traitDeclaration :: Assignment (Term Loc)
 traitDeclaration = makeTerm <$> symbol TraitDeclaration <*> children (Syntax.TraitDeclaration <$> term name <*> manyTerm traitMemberDeclaration)
 
-traitMemberDeclaration :: Assignment Term
+traitMemberDeclaration :: Assignment (Term Loc)
 traitMemberDeclaration = choice [
   propertyDeclaration,
   methodDeclaration,
@@ -668,119 +668,119 @@ traitMemberDeclaration = choice [
   traitUseClause
   ]
 
-propertyDeclaration :: Assignment Term
+propertyDeclaration :: Assignment (Term Loc)
 propertyDeclaration = makeTerm <$> symbol PropertyDeclaration <*> children (Syntax.PropertyDeclaration <$> term propertyModifier <*> someTerm propertyElement)
 
-propertyModifier :: Assignment Term
+propertyModifier :: Assignment (Term Loc)
 propertyModifier = (makeTerm <$> symbol PropertyModifier <*> children (Syntax.PropertyModifier <$> (term accessControlModifier <|> emptyTerm) <*> (term staticModifier <|> emptyTerm))) <|> term (makeTerm <$> symbol PropertyModifier <*> (Syntax.Identifier . Name.name <$> source))
 
-propertyElement :: Assignment Term
+propertyElement :: Assignment (Term Loc)
 propertyElement = makeTerm <$> symbol PropertyElement <*> children (Statement.Assignment [] <$> term variableName <*> term propertyInitializer) <|> (symbol PropertyElement *> children (term variableName))
   where propertyInitializer = symbol PropertyInitializer *> children (term expression)
 
-constructorDeclaration :: Assignment Term
+constructorDeclaration :: Assignment (Term Loc)
 constructorDeclaration = makeTerm <$> symbol ConstructorDeclaration <*> children (Syntax.ConstructorDeclaration <$> someTerm methodModifier <*> parameters <*> term compoundStatement)
 
-destructorDeclaration :: Assignment Term
+destructorDeclaration :: Assignment (Term Loc)
 destructorDeclaration = makeTerm <$> symbol DestructorDeclaration <*> children (Syntax.DestructorDeclaration <$> someTerm methodModifier <*> term compoundStatement)
 
-methodModifier :: Assignment Term
+methodModifier :: Assignment (Term Loc)
 methodModifier = choice [
   accessControlModifier,
   classModifier,
   staticModifier
   ]
 
-staticModifier :: Assignment Term
+staticModifier :: Assignment (Term Loc)
 staticModifier = makeTerm <$> symbol StaticModifier <*> (Syntax.Static <$> source)
 
-classModifier :: Assignment Term
+classModifier :: Assignment (Term Loc)
 classModifier = makeTerm <$> symbol ClassModifier <*> (Syntax.ClassModifier <$> source)
 
-traitUseClause :: Assignment Term
+traitUseClause :: Assignment (Term Loc)
 traitUseClause = makeTerm <$> symbol TraitUseClause <*> children (Syntax.TraitUseClause <$> someTerm qualifiedName <*> (term traitUseSpecification <|> emptyTerm))
 
-traitUseSpecification :: Assignment Term
+traitUseSpecification :: Assignment (Term Loc)
 traitUseSpecification = makeTerm <$> symbol TraitUseSpecification <*> children (Syntax.TraitUseSpecification <$> manyTerm traitSelectAndAliasClause)
 
-traitSelectAndAliasClause :: Assignment Term
+traitSelectAndAliasClause :: Assignment (Term Loc)
 traitSelectAndAliasClause = traitSelectInsteadOfClause <|> traitAliasAsClause
 
-traitSelectInsteadOfClause :: Assignment Term
+traitSelectInsteadOfClause :: Assignment (Term Loc)
 traitSelectInsteadOfClause = makeTerm <$> symbol TraitSelectInsteadOfClause <*> children (Syntax.InsteadOf <$> term (classConstantAccessExpression <|> name) <*> term name)
 
-traitAliasAsClause :: Assignment Term
+traitAliasAsClause :: Assignment (Term Loc)
 traitAliasAsClause = makeTerm <$> symbol TraitAliasAsClause <*> children (Syntax.AliasAs <$> term (classConstantAccessExpression <|> name) <*> (term accessControlModifier <|> emptyTerm) <*> (term name <|> emptyTerm))
 
-namespaceDefinition :: Assignment Term
+namespaceDefinition :: Assignment (Term Loc)
 namespaceDefinition = makeTerm <$> symbol NamespaceDefinition <*> children (Syntax.Namespace <$> (toList <$> namespaceName' <|> pure []) <*> (term compoundStatement <|> emptyTerm))
 
-namespaceUseDeclaration :: Assignment Term
+namespaceUseDeclaration :: Assignment (Term Loc)
 namespaceUseDeclaration = makeTerm <$> symbol NamespaceUseDeclaration <*> children (Syntax.NamespaceUseDeclaration <$>
   ((mappend <$> (pure <$> (term namespaceFunctionOrConst <|> emptyTerm)) <*> someTerm namespaceUseClause) <|> ((\a b cs -> a : b : cs) <$> term namespaceFunctionOrConst <*> term namespaceName <*> someTerm namespaceUseGroupClause1) <|> ((:) <$> term namespaceName <*> someTerm namespaceUseGroupClause2)))
 
-namespaceUseClause :: Assignment Term
+namespaceUseClause :: Assignment (Term Loc)
 namespaceUseClause = makeTerm <$> symbol NamespaceUseClause <*> children (fmap Syntax.NamespaceUseClause $ (\a b -> [a, b]) <$> term qualifiedName <*> (term namespaceAliasingClause <|> emptyTerm))
 
-namespaceUseGroupClause1 :: Assignment Term
+namespaceUseGroupClause1 :: Assignment (Term Loc)
 namespaceUseGroupClause1 = makeTerm <$> symbol NamespaceUseGroupClause_1 <*> children (fmap Syntax.NamespaceUseGroupClause $ (\a b -> [a, b]) <$> term namespaceName <*> (term namespaceAliasingClause <|> emptyTerm))
 
-namespaceUseGroupClause2 :: Assignment Term
+namespaceUseGroupClause2 :: Assignment (Term Loc)
 namespaceUseGroupClause2 = makeTerm <$> symbol NamespaceUseGroupClause_2 <*> children (fmap Syntax.NamespaceUseGroupClause $ (\a b c -> [a, b, c]) <$> (term namespaceFunctionOrConst <|> emptyTerm) <*> term namespaceName <*> (term namespaceAliasingClause <|> emptyTerm))
 
-namespaceAliasingClause :: Assignment Term
+namespaceAliasingClause :: Assignment (Term Loc)
 namespaceAliasingClause = makeTerm <$> symbol NamespaceAliasingClause <*> children (Syntax.NamespaceAliasingClause <$> term name)
 
 -- | TODO Do something better than Identifier
-namespaceFunctionOrConst :: Assignment Term
+namespaceFunctionOrConst :: Assignment (Term Loc)
 namespaceFunctionOrConst = makeTerm <$> symbol NamespaceFunctionOrConst <*> (Syntax.Identifier . Name.name <$> source)
 
-globalDeclaration :: Assignment Term
+globalDeclaration :: Assignment (Term Loc)
 globalDeclaration = makeTerm <$> symbol GlobalDeclaration <*> children (Syntax.GlobalDeclaration <$> manyTerm simpleVariable')
 
-simpleVariable :: Assignment Term
+simpleVariable :: Assignment (Term Loc)
 simpleVariable = makeTerm <$> symbol SimpleVariable <*> children (Syntax.SimpleVariable <$> term (simpleVariable' <|> expression))
 
-simpleVariable' :: Assignment Term
+simpleVariable' :: Assignment (Term Loc)
 simpleVariable' = choice [simpleVariable, variableName]
 
 
-yieldExpression :: Assignment Term
+yieldExpression :: Assignment (Term Loc)
 yieldExpression = makeTerm <$> symbol YieldExpression <*> children (Statement.Yield <$> term (arrayElementInitializer <|> expression))
 
-arrayElementInitializer :: Assignment Term
+arrayElementInitializer :: Assignment (Term Loc)
 arrayElementInitializer = makeTerm <$> symbol ArrayElementInitializer <*> children (Literal.KeyValue <$> term expression <*> term expression) <|> (symbol ArrayElementInitializer *> children (term expression))
 
-includeExpression :: Assignment Term
+includeExpression :: Assignment (Term Loc)
 includeExpression = makeTerm <$> symbol IncludeExpression <*> children (Syntax.Include <$> term expression)
 
 
-includeOnceExpression :: Assignment Term
+includeOnceExpression :: Assignment (Term Loc)
 includeOnceExpression = makeTerm <$> symbol IncludeOnceExpression <*> children (Syntax.IncludeOnce <$> term expression)
 
-requireExpression :: Assignment Term
+requireExpression :: Assignment (Term Loc)
 requireExpression = makeTerm <$> symbol RequireExpression <*> children (Syntax.Require <$> term expression)
 
 
-requireOnceExpression :: Assignment Term
+requireOnceExpression :: Assignment (Term Loc)
 requireOnceExpression = makeTerm <$> symbol RequireOnceExpression <*> children (Syntax.RequireOnce <$> term expression)
 
-variableName :: Assignment Term
+variableName :: Assignment (Term Loc)
 variableName = makeTerm <$> symbol VariableName <*> children (Syntax.VariableName <$> term name)
 
-name :: Assignment Term
+name :: Assignment (Term Loc)
 name = makeTerm <$> (symbol Name <|> symbol Name') <*> (Syntax.Identifier . Name.name <$> source)
 
-functionStaticDeclaration :: Assignment Term
+functionStaticDeclaration :: Assignment (Term Loc)
 functionStaticDeclaration = makeTerm <$> symbol FunctionStaticDeclaration <*> children (Declaration.VariableDeclaration <$> manyTerm staticVariableDeclaration)
 
-staticVariableDeclaration :: Assignment Term
+staticVariableDeclaration :: Assignment (Term Loc)
 staticVariableDeclaration = makeTerm <$> symbol StaticVariableDeclaration <*> children (Statement.Assignment [] <$> term variableName <*> (term expression <|> emptyTerm))
 
-comment :: Assignment Term
+comment :: Assignment (Term Loc)
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
-string :: Assignment Term
+string :: Assignment (Term Loc)
 string = makeTerm <$> (symbol Grammar.String <|> symbol Heredoc) <*> (Literal.TextElement <$> source)
 
 
@@ -792,25 +792,25 @@ append x xs = xs <> [x]
 bookend :: a -> [a] -> a -> [a]
 bookend head_ list last_ = head_ : append last_ list
 
-term :: Assignment Term -> Assignment Term
+term :: Assignment (Term Loc) -> Assignment (Term Loc)
 term term = contextualize (comment <|> textInterpolation) (postContextualize (comment <|> textInterpolation) term)
 
-commentedTerm :: Assignment Term -> Assignment Term
+commentedTerm :: Assignment (Term Loc) -> Assignment (Term Loc)
 commentedTerm term = contextualize (comment <|> textInterpolation) term <|> makeTerm1 <$> (Syntax.Context <$> some1 (comment <|> textInterpolation) <*> emptyTerm)
 
 -- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
-manyTerm :: Assignment Term -> Assignment [Term]
+manyTerm :: Assignment (Term Loc) -> Assignment [Term Loc]
 manyTerm = many . commentedTerm
 
-someTerm :: Assignment Term -> Assignment [Term]
+someTerm :: Assignment (Term Loc) -> Assignment [Term Loc]
 someTerm = fmap NonEmpty.toList . someTerm'
 
-someTerm' :: Assignment Term -> Assignment (NonEmpty Term)
+someTerm' :: Assignment (Term Loc) -> Assignment (NonEmpty (Term Loc))
 someTerm' = NonEmpty.some1 . commentedTerm
 
 -- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
-infixTerm :: Assignment Term
-          -> Assignment Term
-          -> [Assignment (Term -> Term -> Sum Syntax Term)]
-          -> Assignment (Sum Syntax Term)
+infixTerm :: Assignment (Term Loc)
+          -> Assignment (Term Loc)
+          -> [Assignment (Term Loc -> Term Loc -> Sum Syntax (Term Loc))]
+          -> Assignment (Sum Syntax (Term Loc))
 infixTerm = infixContext (comment <|> textInterpolation)

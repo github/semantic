@@ -83,7 +83,7 @@ goParser = AssignmentParser (ASTParser tree_sitter_go) Go.assignment
 rubyParser :: Parser (Ruby.Term Loc)
 rubyParser = AssignmentParser (ASTParser tree_sitter_ruby) Ruby.assignment
 
-phpParser :: Parser PHP.Term
+phpParser :: Parser (PHP.Term Loc)
 phpParser = AssignmentParser (ASTParser tree_sitter_php) PHP.assignment
 
 pythonParser :: Parser (Python.Term Loc)
