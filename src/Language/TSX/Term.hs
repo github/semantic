@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, TypeFamilies #-}
 module Language.TSX.Term
 ( Syntax
 , Term(..)
@@ -17,6 +17,7 @@ import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Data.Diff as Diff
 import qualified Data.Term as Term
+import Diffing.Interpreter
 import qualified Language.TSX.Syntax as TSX.Syntax
 
 type Syntax =
@@ -195,3 +196,7 @@ newtype Term ann = Term { getTerm :: Term.Term (Sum Syntax) ann }
 
 newtype Diff ann1 ann2 = Diff { getDiff :: Diff.Diff (Sum Syntax) ann1 ann2 }
   deriving (Bifoldable, Bifunctor)
+
+instance DiffTerms Term where
+  type DiffFor Term = Diff
+  diffTermPair = Diff . diffTermPair . bimap getTerm getTerm
