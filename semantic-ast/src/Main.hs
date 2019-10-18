@@ -43,7 +43,7 @@ main :: IO ()
 main = generateAST =<< execParser opts
 
 generateAST :: SemanticAST -> IO ()
-generateAST (SemanticAST format _ source) = do
+generateAST (SemanticAST format color source) = do
   bytestring <- case source of
     Left filePath -> do
       Data.ByteString.readFile filePath
