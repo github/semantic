@@ -30,7 +30,7 @@ newtype Diff syntax ann1 ann2 = Diff { unDiff :: DiffF syntax ann1 ann2 (Diff sy
 
 -- | A single entry within a recursive 'Diff'.
 data DiffF syntax ann1 ann2 recur
-  -- | A changed node, represented as 'Insert'ed, 'Delete'd, or 'Replace'd 'TermF's, consisting of syntax labelled with an annotation.
+  -- | A changed node, represented as 'Insert'ed, 'Delete'd, or 'Compare'd 'TermF's, consisting of syntax labelled with an annotation.
   = Patch (Patch (TermF syntax  ann1        recur)
                  (TermF syntax        ann2  recur))
   -- | An unchanged node, consisting of syntax labelled with both the original annotations.
@@ -42,7 +42,7 @@ replacing (Term (In a1 r1)) (Term (In a2 r2)) = replaceF (In a1 (deleting <$> r1
 
 -- | Constructs a 'Diff' replacing one 'TermF' populated by further 'Diff's with another.
 replaceF :: TermF syntax ann1 (Diff syntax ann1 ann2) -> TermF syntax ann2 (Diff syntax ann1 ann2) -> Diff syntax ann1 ann2
-replaceF t1 t2 = Diff (Patch (Replace t1 t2))
+replaceF t1 t2 = Diff (Patch (Compare t1 t2))
 
 -- | Constructs a 'Diff' inserting a 'Term' recursively.
 inserting :: Functor syntax => Term syntax ann2 -> Diff syntax ann1 ann2

@@ -56,8 +56,8 @@ newtype JSONStat = JSONStat { jsonStatBlobs :: BlobPair }
   deriving (Eq, Show)
 
 instance ToJSON JSONStat where
-  toJSON JSONStat{..} = object ("path" .= pathKeyForBlobPair jsonStatBlobs : toJSONFields (these Delete Insert Replace (getBlobPair jsonStatBlobs)))
-  toEncoding JSONStat{..} = pairs (fold ("path" .= pathKeyForBlobPair jsonStatBlobs : toJSONFields (these Delete Insert Replace (getBlobPair jsonStatBlobs))))
+  toJSON JSONStat{..} = object ("path" .= pathKeyForBlobPair jsonStatBlobs : toJSONFields (these Delete Insert Compare (getBlobPair jsonStatBlobs)))
+  toEncoding JSONStat{..} = pairs (fold ("path" .= pathKeyForBlobPair jsonStatBlobs : toJSONFields (these Delete Insert Compare (getBlobPair jsonStatBlobs))))
 
 -- | Render a term to a value representing its JSON.
 renderJSONTerm :: ToJSON a => Blob -> a -> JSON "trees" SomeJSON

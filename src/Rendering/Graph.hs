@@ -99,7 +99,7 @@ instance (ConstructorName syntax, Foldable syntax) =>
     Patch (Insert t2@(In a2 syntax)) -> diffAlgebra t2 . DiffTreeVertex'Inserted $ defMessage
                                           & P.term .~ T.pack (constructorName syntax)
                                           & P.maybe'span .~ ann a2
-    Patch (Replace t1@(In a1 syntax1) t2@(In a2 syntax2)) -> do
+    Patch (Compare t1@(In a1 syntax1) t2@(In a2 syntax2)) -> do
       i <- fresh
       parent <- ask
       let (beforeName, beforeSpan) = (T.pack (constructorName syntax1), ann a1)
