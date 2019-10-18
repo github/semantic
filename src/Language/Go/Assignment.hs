@@ -3,7 +3,7 @@ module Language.Go.Assignment
 ( assignment
 , Go.Syntax
 , Grammar
-, Go.Term
+, Go.Term(..)
 ) where
 
 import Prologue

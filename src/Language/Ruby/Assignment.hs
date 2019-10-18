@@ -3,7 +3,7 @@ module Language.Ruby.Assignment
 ( assignment
 , Ruby.Syntax
 , Grammar
-, Ruby.Term
+, Ruby.Term(..)
 ) where
 
 import Prologue hiding (for, unless)

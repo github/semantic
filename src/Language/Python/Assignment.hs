@@ -4,7 +4,7 @@ module Language.Python.Assignment
 ( assignment
 , Python.Syntax
 , Grammar
-, Python.Term
+, Python.Term(..)
 ) where
 
 import           Assigning.Assignment hiding (Assignment, Error)

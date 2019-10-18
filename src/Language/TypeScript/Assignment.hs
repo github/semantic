@@ -4,7 +4,7 @@ module Language.TypeScript.Assignment
 ( assignment
 , TypeScript.Syntax
 , Grammar
-, TypeScript.Term
+, TypeScript.Term(..)
 ) where
 
 import Assigning.Assignment hiding (Assignment, Error)

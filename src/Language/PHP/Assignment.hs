@@ -4,7 +4,7 @@ module Language.PHP.Assignment
 ( assignment
 , PHP.Syntax
 , Grammar
-, PHP.Term
+, PHP.Term(..)
 ) where
 
 import Prologue

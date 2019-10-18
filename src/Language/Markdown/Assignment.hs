@@ -4,7 +4,7 @@ module Language.Markdown.Assignment
 ( assignment
 , Markdown.Syntax
 , Grammar
-, Markdown.Term
+, Markdown.Term(..)
 ) where
 
 import Prologue
