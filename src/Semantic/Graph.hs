@@ -124,7 +124,6 @@ runCallGraph :: ( VertexDeclaration syntax
                 , Ord1 syntax
                 , Functor syntax
                 , Evaluatable syntax
-                , term ~ Term syntax Loc
                 , FreeVariables1 syntax
                 , HasPrelude lang
                 , Member Trace sig
@@ -133,8 +132,8 @@ runCallGraph :: ( VertexDeclaration syntax
                 )
              => Proxy lang
              -> Bool
-             -> [Module term]
-             -> Package term
+             -> [Module (Term syntax Loc)]
+             -> Package (Term syntax Loc)
              -> m (Graph ControlFlowVertex)
 runCallGraph lang includePackages modules package
   = fmap (simplify . fst)
@@ -271,13 +270,12 @@ parseModules parser p = distributeFor (projectBlobs p) (parseModule p parser)
 
 
 -- | Parse a list of packages from a python project.
-parsePythonPackage :: forall syntax sig m term.
+parsePythonPackage :: forall syntax sig m .
                    ( Declarations1 syntax
                    , Evaluatable syntax
                    , FreeVariables1 syntax
                    , AccessControls1 syntax
                    , Functor syntax
-                   , term ~ Term syntax Loc
                    , Member Distribute sig
                    , Member Parse sig
                    , Member Resolution sig
@@ -285,13 +283,13 @@ parsePythonPackage :: forall syntax sig m term.
                    , Carrier sig m
                    , Effect sig
                    )
-                   => Parser term      -- ^ A parser.
-                   -> Project          -- ^ Project to parse into a package.
-                   -> m (Package term)
+                   => Parser (Term syntax Loc) -- ^ A parser.
+                   -> Project                  -- ^ Project to parse into a package.
+                   -> m (Package (Term syntax Loc))
 parsePythonPackage parser project = do
-  let runAnalysis = runEvaluator @_ @_ @(Value term (Hole (Maybe Name) Precise))
+  let runAnalysis = runEvaluator @_ @_ @(Value (Term syntax Loc) (Hole (Maybe Name) Precise))
         . raiseHandler (runState PythonPackage.Unknown)
-        . raiseHandler (runState (lowerBound @(Heap (Hole (Maybe Name) Precise) (Hole (Maybe Name) Precise) (Value term (Hole (Maybe Name) Precise)))))
+        . raiseHandler (runState (lowerBound @(Heap (Hole (Maybe Name) Precise) (Hole (Maybe Name) Precise) (Value (Term syntax Loc) (Hole (Maybe Name) Precise)))))
         . raiseHandler runFresh
         . resumingLoadError
         . resumingUnspecialized
