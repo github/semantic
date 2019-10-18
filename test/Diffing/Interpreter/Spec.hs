@@ -82,11 +82,11 @@ afterTerm = cata $ \ diff -> case diff of
   Merge                             (In (_, b) r) -> termIn b <$> sequenceAlt r
 
 -- | Return the item from the after side of the patch.
-after :: Patch l r -> Maybe r
+after :: Edit l r -> Maybe r
 after = edit (const Nothing) Just (\ _ b -> Just b)
 
 -- | Return the item from the before side of the patch.
-before :: Patch l r -> Maybe l
+before :: Edit l r -> Maybe l
 before = edit Just (const Nothing) (\ a _ -> Just a)
 
 emptyAnnotation :: ()

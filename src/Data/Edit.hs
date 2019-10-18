@@ -1,6 +1,6 @@
 {-# LANGUAGE LambdaCase #-}
 module Data.Edit
-( Patch(..)
+( Edit(..)
 , edit
 ) where
 
@@ -13,7 +13,7 @@ import Data.These
 import GHC.Generics (Generic, Generic1)
 
 -- | An operation to compare, insert, or delete an item.
-data Patch a b
+data Edit a b
   = Delete a
   | Insert b
   | Compare a b
@@ -21,39 +21,39 @@ data Patch a b
 
 
 -- | Return both sides of a patch.
-edit :: (l -> a) -> (r -> a) -> (l -> r -> a) -> Patch l r -> a
+edit :: (l -> a) -> (r -> a) -> (l -> r -> a) -> Edit l r -> a
 edit delete insert compare = \case
   Delete  a   -> delete a
   Insert    b -> insert b
   Compare a b -> compare a b
 
 
-instance Bifunctor Patch where
+instance Bifunctor Edit where
   bimap = bimapDefault
 
-instance Bifoldable Patch where
+instance Bifoldable Edit where
   bifoldMap = bifoldMapDefault
 
-instance Bitraversable Patch where
+instance Bitraversable Edit where
   bitraverse f g = \case
     Delete  a   -> Delete  <$> f a
     Insert    b -> Insert  <$>         g b
     Compare a b -> Compare <$> f a <*> g b
 
-instance Bicrosswalk Patch where
+instance Bicrosswalk Edit where
   bicrosswalk f g = \case
     Delete  a   -> Delete <$> f a
     Insert    b -> Insert <$> g b
     Compare a b -> alignWith (these Delete Insert Compare) (f a) (g b)
 
-instance Eq2 Patch where
+instance Eq2 Edit where
   liftEq2 eqBefore eqAfter p1 p2 = case (p1, p2) of
     (Delete a1, Delete a2) -> eqBefore a1 a2
     (Insert b1, Insert b2) -> eqAfter b1 b2
     (Compare a1 b1, Compare a2 b2) -> eqBefore a1 a2 && eqAfter b1 b2
     _ -> False
 
-instance Show2 Patch where
+instance Show2 Edit where
   liftShowsPrec2 spl _ spr _ d = \case
     Delete a -> showsUnaryWith spl "Delete" d a
     Insert b -> showsUnaryWith spr "Insert" d b

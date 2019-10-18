@@ -31,10 +31,10 @@ newtype Diff syntax ann1 ann2 = Diff { unDiff :: DiffF syntax ann1 ann2 (Diff sy
 -- | A single entry within a recursive 'Diff'.
 data DiffF syntax ann1 ann2 recur
   -- | A changed node, represented as 'Insert'ed, 'Delete'd, or 'Compare'd 'TermF's, consisting of syntax labelled with an annotation.
-  = Patch (Patch (TermF syntax  ann1        recur)
-                 (TermF syntax        ann2  recur))
+  = Patch (Edit (TermF syntax  ann1        recur)
+                (TermF syntax        ann2  recur))
   -- | An unchanged node, consisting of syntax labelled with both the original annotations.
-  | Merge        (TermF syntax (ann1, ann2) recur)
+  | Merge       (TermF syntax (ann1, ann2) recur)
 
 -- | Constructs a 'Diff' comparing one 'Term' with another recursively.
 comparing :: Functor syntax => Term syntax ann1 -> Term syntax ann2 -> Diff syntax ann1 ann2
@@ -75,7 +75,7 @@ merging :: Functor syntax => Term syntax ann -> Diff syntax ann ann
 merging = cata (\ (In ann syntax) -> mergeF (In (ann, ann) syntax))
 
 
-diffPatches :: (Foldable syntax, Functor syntax) => Diff syntax ann1 ann2 -> [Patch (TermF syntax ann1 (Diff syntax ann1 ann2)) (TermF syntax ann2 (Diff syntax ann1 ann2))]
+diffPatches :: (Foldable syntax, Functor syntax) => Diff syntax ann1 ann2 -> [Edit (TermF syntax ann1 (Diff syntax ann1 ann2)) (TermF syntax ann2 (Diff syntax ann1 ann2))]
 diffPatches = para $ \ diff -> case diff of
   Patch patch -> bimap (fmap fst) (fmap fst) patch : bifoldMap (foldMap snd) (foldMap snd) patch
   Merge merge -> foldMap snd merge

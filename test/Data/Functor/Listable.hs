@@ -160,10 +160,10 @@ instance (Listable1 syntax, Listable ann1, Listable ann2) => Listable (Diff synt
   tiers = tiers2
 
 
-instance Listable2 Patch where
+instance Listable2 Edit where
   liftTiers2 t1 t2 = liftCons1 t2 Insert \/ liftCons1 t1 Delete \/ liftCons2 t1 t2 Replace
 
-instance (Listable a, Listable b) => Listable (Patch a b) where
+instance (Listable a, Listable b) => Listable (Edit a b) where
   tiers = tiers2
 
 
