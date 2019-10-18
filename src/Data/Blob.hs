@@ -135,11 +135,9 @@ languageTagForBlobPair pair = showLanguage (languageForBlobPair pair)
   where showLanguage = pure . (,) "language" . show
 
 pathKeyForBlobPair :: BlobPair -> FilePath
-pathKeyForBlobPair blobs = case bimap blobPath blobPath blobs of
-   Delete before -> before
-   Insert after -> after
-   Compare before after | before == after -> after
-                        | otherwise -> before <> " -> " <> after
+pathKeyForBlobPair = mergeEditWith blobPath blobPath combine where
+   combine before after | before == after = after
+                        | otherwise       = before <> " -> " <> after
 
 instance ToJSONFields Blob where
   toJSONFields p = [ "path" .= blobPath p, "language" .= blobLanguage p]
