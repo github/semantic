@@ -3,6 +3,7 @@ module Data.Edit
 ( Edit(..)
 , edit
 , mergeEdit
+, mergeEditWith
 ) where
 
 import Data.Bifoldable
@@ -28,6 +29,9 @@ edit delete insert compare = \case
 
 mergeEdit :: (a -> a -> a) -> Edit a a -> a
 mergeEdit = edit id id
+
+mergeEditWith :: (l -> a) -> (r -> a) -> (a -> a -> a) -> Edit l r -> a
+mergeEditWith f g h = mergeEdit h . bimap f g
 
 
 instance Bifunctor Edit where
