@@ -3,7 +3,7 @@ module Data.Patch
 ( Patch(..)
 , after
 , before
-, patch
+, edit
 ) where
 
 import Prologue
@@ -21,15 +21,15 @@ data Patch a b
 
 -- | Return the item from the after side of the patch.
 after :: Patch l r -> Maybe r
-after = patch (const Nothing) Just (\ _ b -> Just b)
+after = edit (const Nothing) Just (\ _ b -> Just b)
 
 -- | Return the item from the before side of the patch.
 before :: Patch l r -> Maybe l
-before = patch Just (const Nothing) (\ a _ -> Just a)
+before = edit Just (const Nothing) (\ a _ -> Just a)
 
 -- | Return both sides of a patch.
-patch :: (l -> a) -> (r -> a) -> (l -> r -> a) -> Patch l r -> a
-patch delete insert compare = \case
+edit :: (l -> a) -> (r -> a) -> (l -> r -> a) -> Patch l r -> a
+edit delete insert compare = \case
   Delete  a   -> delete a
   Insert    b -> insert b
   Compare a b -> compare a b
