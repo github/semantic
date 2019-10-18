@@ -20,10 +20,10 @@ import qualified Analysis.TOCSummary as ToC
 import Data.Abstract.ScopeGraph (AccessControl(..))
 import Data.Bifunctor.Join
 import Data.Diff
+import Data.Edit
 import Data.Functor.Both
 import qualified Data.Language as Language
 import Data.List.NonEmpty
-import Data.Patch
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration

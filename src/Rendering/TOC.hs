@@ -15,10 +15,10 @@ import Analysis.TOCSummary
 import Data.Align (bicrosswalk)
 import Data.Aeson (ToJSON(..), Value, (.=), object)
 import Data.Diff
+import Data.Edit
 import Data.Language as Language
 import Data.List (sortOn)
 import qualified Data.Map.Monoidal as Map
-import Data.Patch
 import Data.Term
 import qualified Data.Text as T
 import Source.Loc

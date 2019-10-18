@@ -3,12 +3,12 @@ module Diffing.Interpreter.Spec (spec, afterTerm, beforeTerm) where
 
 import Control.Applicative ((<|>))
 import Data.Diff
+import Data.Edit (edit)
 import Data.Foldable (asum)
 import Data.Functor.Foldable (cata)
 import Data.Functor.Listable
 import Data.Maybe
 import Data.Mergeable
-import Data.Patch (after, before)
 import Data.Sum
 import Data.Term
 import Data.These
@@ -80,6 +80,14 @@ afterTerm :: (Foldable syntax, Mergeable syntax) => Diff syntax ann1 ann2 -> May
 afterTerm = cata $ \ diff -> case diff of
   Patch patch -> (after patch >>= \ (In     b  r) -> termIn b <$> sequenceAlt r) <|> (before patch >>= asum)
   Merge                             (In (_, b) r) -> termIn b <$> sequenceAlt r
+
+-- | Return the item from the after side of the patch.
+after :: Patch l r -> Maybe r
+after = edit (const Nothing) Just (\ _ b -> Just b)
+
+-- | Return the item from the before side of the patch.
+before :: Patch l r -> Maybe l
+before = edit Just (const Nothing) (\ a _ -> Just a)
 
 emptyAnnotation :: ()
 emptyAnnotation = ()

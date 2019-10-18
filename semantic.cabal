@@ -148,6 +148,7 @@ library
                      , Data.Blob.IO
                      , Data.Diff
                      , Data.Duration
+                     , Data.Edit
                      , Data.Error
                      , Data.Flag
                      , Data.Functor.Both
@@ -160,7 +161,6 @@ library
                      , Data.JSON.Fields
                      , Data.Language
                      , Data.Map.Monoidal
-                     , Data.Patch
                      , Data.Project
                      , Data.Quieterm
                      , Data.Semigroup.App

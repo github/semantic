@@ -8,7 +8,7 @@ module Serializing.SExpression
 import Analysis.ConstructorName
 import Data.ByteString.Builder
 import Data.Diff
-import Data.Patch
+import Data.Edit
 import Data.Term
 import Prelude
 import Prologue

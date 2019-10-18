@@ -15,9 +15,9 @@ module Rendering.JSON
 
 import Data.Aeson (ToJSON, toJSON, object, (.=))
 import Data.Aeson as A
-import Data.JSON.Fields
 import Data.Blob
-import Data.Patch
+import Data.Edit
+import Data.JSON.Fields
 import Data.Text (pack)
 import GHC.TypeLits
 import Prologue

@@ -9,8 +9,8 @@ module Data.JSON.Fields
   ) where
 
 import           Data.Aeson
+import           Data.Edit
 import qualified Data.Map as Map
-import           Data.Patch
 import           Data.Sum (Apply (..), Sum)
 import qualified Data.Text as Text
 import           GHC.Generics

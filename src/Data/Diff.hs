@@ -18,10 +18,10 @@ import Data.Aeson
 import Data.Bifoldable
 import Data.Bifunctor
 import Data.Bitraversable
+import Data.Edit
 import Data.Functor.Classes
 import Data.Functor.Foldable
 import Data.JSON.Fields
-import Data.Patch
 import Data.Term
 import Text.Show
 

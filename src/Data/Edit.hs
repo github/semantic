@@ -1,5 +1,5 @@
 {-# LANGUAGE LambdaCase #-}
-module Data.Patch
+module Data.Edit
 ( Patch(..)
 , edit
 ) where

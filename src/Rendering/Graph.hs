@@ -14,8 +14,8 @@ import Control.Effect.Reader
 import Control.Effect.State
 import Control.Lens
 import Data.Diff
+import Data.Edit
 import Data.Graph
-import Data.Patch
 import Data.ProtoLens (defMessage)
 import Data.String (IsString (..))
 import Data.Term
