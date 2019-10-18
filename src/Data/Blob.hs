@@ -105,11 +105,7 @@ instance FromJSON BlobPair where
   parseJSON = withObject "BlobPair" $ \o -> do
     before <- o .:? "before"
     after  <- o .:? "after"
-    case (before, after) of
-      (Just b, Just a)  -> pure $ Compare b a
-      (Just b, Nothing) -> pure $ Delete b
-      (Nothing, Just a) -> pure $ Insert a
-      _                 -> Prelude.fail "Expected object with 'before' and/or 'after' keys only"
+    maybeM (Prelude.fail "Expected object with 'before' and/or 'after' keys only") (fromMaybes before after)
 
 maybeBlobPair :: MonadFail m => Maybe Blob -> Maybe Blob -> m BlobPair
 maybeBlobPair a b = case (a, b) of
