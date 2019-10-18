@@ -99,7 +99,7 @@ parseSymbols blobs = do
           & P.symbol .~ name
           & P.kind .~ pack (show kind)
           & P.line .~ line
-          & P.maybe'span .~ converting #? Loc.span loc
+          & P.maybe'span ?~ converting # Loc.span loc
           & P.maybe'docs .~ fmap (flip (set P.docstring) defMessage) docs
 
 symbolsToSummarize :: [Text]
