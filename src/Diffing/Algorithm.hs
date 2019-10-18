@@ -5,7 +5,6 @@ module Diffing.Algorithm
   , Diffable (..)
   , Equivalence (..)
   , diff
-  , diffThese
   , diffEdit
   , diffMaybe
   , linearly
@@ -54,10 +53,6 @@ instance Carrier sig m => Carrier sig (Algorithm term1 term2 diff m) where
 -- | Diff two terms without specifying the algorithm to be used.
 diff :: (Carrier sig m, Member (Diff term1 term2 diff) sig) => term1 -> term2 -> m diff
 diff a1 a2 = send (Diff a1 a2 pure)
-
--- | Diff a These of terms without specifying the algorithm to be used.
-diffThese :: (Carrier sig m, Member (Diff term1 term2 diff) sig) => These term1 term2 -> Algorithm term1 term2 diff m diff
-diffThese = these byDeleting byInserting diff
 
 -- | Diff an 'Edit' of terms without specifying the algorithm to be used.
 diffEdit :: (Carrier sig m, Member (Diff term1 term2 diff) sig) => Edit.Edit term1 term2 -> Algorithm term1 term2 diff m diff
