@@ -1,7 +1,6 @@
 {-# LANGUAGE BangPatterns, GADTs, LambdaCase, MultiParamTypeClasses, ScopedTypeVariables #-}
 module Diffing.Algorithm.SES
-( toThese
-, ses
+( ses
 ) where
 
 import Data.Array ((!))
@@ -9,13 +8,6 @@ import qualified Data.Array as Array
 import Data.Edit
 import Data.Foldable (find, toList)
 import Data.Ix
-import Data.These
-
-toThese :: Edit a b -> These a b
-toThese = \case
-  Delete a -> This a
-  Insert b -> That b
-  Compare a b -> These a b
 
 data Endpoint a b = Endpoint { x :: {-# UNPACK #-} !Int, _y :: {-# UNPACK #-} !Int, _script :: [Edit a b] }
   deriving (Eq, Show)
