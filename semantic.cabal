@@ -191,6 +191,7 @@ library
                      , Language.Go.Type
                      , Language.Ruby.Assignment
                      , Language.Ruby.Syntax
+                     , Language.Ruby.Term
                      , Language.TSX.Assignment
                      , Language.TSX.Syntax
                      , Language.TSX.Syntax.JSX

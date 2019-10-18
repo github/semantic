@@ -23,6 +23,7 @@ import qualified Language.Markdown.Term as Markdown
 import qualified Language.PHP.Term as PHP
 import qualified Language.Python as PythonPrecise
 import qualified Language.Python.Term as PythonALaCarte
+import qualified Language.Ruby.Term as Ruby
 import qualified Language.TSX.Term as TSX
 import qualified Language.TypeScript.Term as TypeScript
 import qualified Parsing.Parser as Parser
@@ -121,6 +122,7 @@ deriving instance ToTags Go.Term
 deriving instance ToTags Markdown.Term
 deriving instance ToTags PHP.Term
 deriving instance ToTags PythonALaCarte.Term
+deriving instance ToTags Ruby.Term
 deriving instance ToTags TSX.Term
 deriving instance ToTags TypeScript.Term
 

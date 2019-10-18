@@ -1,10 +1,9 @@
 {-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-} -- FIXME
 module Language.Ruby.Assignment
 ( assignment
-, Syntax
+, Ruby.Syntax
 , Grammar
-, Term
+, Ruby.Term
 ) where
 
 import Prologue hiding (for, unless)
@@ -36,105 +35,15 @@ import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Term as Term
 import qualified Language.Ruby.Syntax as Ruby.Syntax
+import qualified Language.Ruby.Term as Ruby
 import           TreeSitter.Ruby as Grammar
 
--- | The type of Ruby syntax.
-type Syntax = '[
-    Comment.Comment
-  , Declaration.Function
-  , Declaration.Method
-  , Directive.File
-  , Directive.Line
-  , Expression.Plus
-  , Expression.Minus
-  , Expression.Times
-  , Expression.DividedBy
-  , Expression.Modulo
-  , Expression.Power
-  , Expression.Negate
-  , Expression.FloorDivision
-  , Expression.BAnd
-  , Expression.BOr
-  , Expression.BXOr
-  , Expression.LShift
-  , Expression.RShift
-  , Expression.Complement
-  , Expression.And
-  , Expression.Not
-  , Expression.Or
-  , Expression.XOr
-  , Expression.Call
-  , Expression.LessThan
-  , Expression.LessThanEqual
-  , Expression.GreaterThan
-  , Expression.GreaterThanEqual
-  , Expression.Equal
-  , Expression.StrictEqual
-  , Expression.Comparison
-  , Expression.Enumeration
-  , Expression.Matches
-  , Expression.NotMatches
-  , Expression.MemberAccess
-  , Expression.ScopeResolution
-  , Expression.Subscript
-  , Expression.Member
-  , Expression.This
-  , Literal.Array
-  , Literal.Boolean
-  , Literal.Character
-  , Literal.Complex
-  , Literal.EscapeSequence
-  , Literal.Float
-  , Literal.Hash
-  , Literal.Integer
-  , Literal.InterpolationElement
-  , Literal.KeyValue
-  , Literal.Null
-  , Literal.Rational
-  , Literal.Regex
-  , Literal.String
-  , Literal.Symbol
-  , Literal.SymbolElement
-  , Literal.TextElement
-  , Ruby.Syntax.Assignment
-  , Statement.Break
-  , Statement.Catch
-  , Statement.Continue
-  , Statement.Else
-  , Statement.Finally
-  , Statement.ForEach
-  , Statement.If
-  , Statement.Match
-  , Statement.Pattern
-  , Statement.Retry
-  , Statement.Return
-  , Statement.ScopeEntry
-  , Statement.ScopeExit
-  , Statement.Statements
-  , Statement.Try
-  , Statement.While
-  , Statement.Yield
-  , Syntax.Context
-  , Syntax.Empty
-  , Syntax.Error
-  , Syntax.Identifier
-  , Ruby.Syntax.Class
-  , Ruby.Syntax.Load
-  , Ruby.Syntax.LowPrecedenceAnd
-  , Ruby.Syntax.LowPrecedenceOr
-  , Ruby.Syntax.Module
-  , Ruby.Syntax.Require
-  , Ruby.Syntax.Send
-  , Ruby.Syntax.ZSuper
-  , []
-  ]
-
-type Term = Term.Term (Sum Syntax)
+type Term = Term.Term (Sum Ruby.Syntax)
 type Assignment = Assignment.Assignment [] Grammar
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
-assignment :: Assignment (Term Loc)
-assignment = handleError $ makeTerm <$> symbol Program <*> children (Statement.Statements <$> many expression) <|> parseError
+assignment :: Assignment (Ruby.Term Loc)
+assignment = fmap Ruby.Term . handleError $ makeTerm <$> symbol Program <*> children (Statement.Statements <$> many expression) <|> parseError
 
 expression :: Assignment (Term Loc)
 expression = term (handleError (choice expressionChoices))
@@ -477,7 +386,7 @@ assignment' = makeTerm  <$> symbol Assignment         <*> children (Ruby.Syntax.
                 , assign Expression.BXOr      <$ symbol AnonCaretEqual
                 ])
   where
-    assign :: (f :< Syntax) => (Term Loc -> Term Loc -> f (Term Loc)) -> Term Loc -> Term Loc -> Sum Syntax (Term Loc)
+    assign :: (f :< Ruby.Syntax) => (Term Loc -> Term Loc -> f (Term Loc)) -> Term Loc -> Term Loc -> Sum Ruby.Syntax (Term Loc)
     assign c l r = inject (Ruby.Syntax.Assignment [] l (makeTerm1 (c l r)))
 
     lhs  = makeTerm <$> symbol LeftAssignmentList  <*> children (many expr) <|> expr
@@ -568,6 +477,6 @@ manyTermsTill step end = manyTill (step <|> comment) end
 -- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
 infixTerm :: Assignment (Term Loc)
           -> Assignment (Term Loc)
-          -> [Assignment (Term Loc -> Term Loc -> Sum Syntax (Term Loc))]
-          -> Assignment (Sum Syntax (Term Loc))
+          -> [Assignment (Term Loc -> Term Loc -> Sum Ruby.Syntax (Term Loc))]
+          -> Assignment (Sum Ruby.Syntax (Term Loc))
 infixTerm = infixContext comment

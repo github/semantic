@@ -34,6 +34,7 @@ import qualified Language.Go.Term as Go
 import qualified Language.Markdown.Term as Markdown
 import qualified Language.PHP.Term as PHP
 import qualified Language.Python.Term as Python
+import qualified Language.Ruby.Term as Ruby
 import qualified Language.TSX.Term as TSX
 import qualified Language.TypeScript.Term as TypeScript
 import           Parsing.Parser
@@ -108,6 +109,7 @@ deriving instance DOTGraphDiff Go.Term
 deriving instance DOTGraphDiff Markdown.Term
 deriving instance DOTGraphDiff PHP.Term
 deriving instance DOTGraphDiff Python.Term
+deriving instance DOTGraphDiff Ruby.Term
 deriving instance DOTGraphDiff TSX.Term
 deriving instance DOTGraphDiff TypeScript.Term
 
@@ -135,6 +137,7 @@ deriving instance JSONGraphDiff Go.Term
 deriving instance JSONGraphDiff Markdown.Term
 deriving instance JSONGraphDiff PHP.Term
 deriving instance JSONGraphDiff Python.Term
+deriving instance JSONGraphDiff Ruby.Term
 deriving instance JSONGraphDiff TSX.Term
 deriving instance JSONGraphDiff TypeScript.Term
 
@@ -152,6 +155,7 @@ deriving instance JSONTreeDiff Go.Term
 deriving instance JSONTreeDiff Markdown.Term
 deriving instance JSONTreeDiff PHP.Term
 deriving instance JSONTreeDiff Python.Term
+deriving instance JSONTreeDiff Ruby.Term
 deriving instance JSONTreeDiff TSX.Term
 deriving instance JSONTreeDiff TypeScript.Term
 
@@ -169,6 +173,7 @@ deriving instance SExprDiff Go.Term
 deriving instance SExprDiff Markdown.Term
 deriving instance SExprDiff PHP.Term
 deriving instance SExprDiff Python.Term
+deriving instance SExprDiff Ruby.Term
 deriving instance SExprDiff TSX.Term
 deriving instance SExprDiff TypeScript.Term
 
@@ -186,6 +191,7 @@ deriving instance ShowDiff Go.Term
 deriving instance ShowDiff Markdown.Term
 deriving instance ShowDiff PHP.Term
 deriving instance ShowDiff Python.Term
+deriving instance ShowDiff Ruby.Term
 deriving instance ShowDiff TSX.Term
 deriving instance ShowDiff TypeScript.Term
 
@@ -205,6 +211,7 @@ deriving instance SummarizeDiff Go.Term
 deriving instance SummarizeDiff Markdown.Term
 deriving instance SummarizeDiff PHP.Term
 deriving instance SummarizeDiff Python.Term
+deriving instance SummarizeDiff Ruby.Term
 deriving instance SummarizeDiff TSX.Term
 deriving instance SummarizeDiff TypeScript.Term
 

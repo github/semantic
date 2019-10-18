@@ -46,6 +46,7 @@ import qualified Language.Markdown.Term as Markdown
 import qualified Language.PHP.Term as PHP
 import qualified Language.Python as PythonPrecise
 import qualified Language.Python.Term as PythonALaCarte
+import qualified Language.Ruby.Term as Ruby
 import qualified Language.TSX.Term as TSX
 import qualified Language.TypeScript.Term as TypeScript
 
@@ -127,6 +128,7 @@ deriving instance ShowTerm Go.Term
 deriving instance ShowTerm Markdown.Term
 deriving instance ShowTerm PHP.Term
 deriving instance ShowTerm PythonALaCarte.Term
+deriving instance ShowTerm Ruby.Term
 deriving instance ShowTerm TSX.Term
 deriving instance ShowTerm TypeScript.Term
 
@@ -153,6 +155,7 @@ deriving instance SExprTerm Go.Term
 deriving instance SExprTerm Markdown.Term
 deriving instance SExprTerm PHP.Term
 deriving instance SExprTerm PythonALaCarte.Term
+deriving instance SExprTerm Ruby.Term
 deriving instance SExprTerm TSX.Term
 deriving instance SExprTerm TypeScript.Term
 
@@ -170,6 +173,7 @@ deriving instance DOTGraphTerm Go.Term
 deriving instance DOTGraphTerm Markdown.Term
 deriving instance DOTGraphTerm PHP.Term
 deriving instance DOTGraphTerm PythonALaCarte.Term
+deriving instance DOTGraphTerm Ruby.Term
 deriving instance DOTGraphTerm TSX.Term
 deriving instance DOTGraphTerm TypeScript.Term
 
@@ -187,6 +191,7 @@ deriving instance JSONTreeTerm Go.Term
 deriving instance JSONTreeTerm Markdown.Term
 deriving instance JSONTreeTerm PHP.Term
 deriving instance JSONTreeTerm PythonALaCarte.Term
+deriving instance JSONTreeTerm Ruby.Term
 deriving instance JSONTreeTerm TSX.Term
 deriving instance JSONTreeTerm TypeScript.Term
 
@@ -214,5 +219,6 @@ deriving instance JSONGraphTerm Go.Term
 deriving instance JSONGraphTerm Markdown.Term
 deriving instance JSONGraphTerm PHP.Term
 deriving instance JSONGraphTerm PythonALaCarte.Term
+deriving instance JSONGraphTerm Ruby.Term
 deriving instance JSONGraphTerm TSX.Term
 deriving instance JSONGraphTerm TypeScript.Term
