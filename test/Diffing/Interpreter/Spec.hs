@@ -10,14 +10,13 @@ import Data.Maybe
 import Data.Mergeable
 import Data.Sum
 import Data.Term
-import Data.These
 import Diffing.Interpreter
 import qualified Data.Syntax as Syntax
 import Test.Hspec (Spec, describe, it)
 import Test.Hspec.Expectations
 import Test.Hspec.LeanCheck
 import Test.LeanCheck.Core
-import SpecHelpers (edit)
+import SpecHelpers (Edit(..), edit)
 
 spec :: Spec
 spec = do
@@ -60,11 +59,11 @@ spec = do
 
   describe "diffTermPair" $ do
     prop "produces an Insert when the first term is missing" $ do
-      \ after -> let diff = diffTermPair (That after) :: Diff ListableSyntax () () in
+      \ after -> let diff = diffTermPair (Insert after) :: Diff ListableSyntax () () in
         diff `shouldBe` inserting after
 
     prop "produces a Delete when the second term is missing" $ do
-      \ before -> let diff = diffTermPair (This before) :: Diff ListableSyntax () () in
+      \ before -> let diff = diffTermPair (Delete before) :: Diff ListableSyntax () () in
         diff `shouldBe` deleting before
 
 
