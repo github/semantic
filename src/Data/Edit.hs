@@ -3,9 +3,10 @@ module Data.Edit
 ( Edit(..)
 , edit
 , mergeEdit
+, fromMaybes
 ) where
 
-import Control.Applicative (liftA2)
+import Control.Applicative ((<|>), liftA2)
 import Data.Bifoldable
 import Data.Bifunctor
 import Data.Bitraversable
@@ -30,6 +31,9 @@ edit delete insert compare = \case
 -- | Extract the values from an 'Edit', combining 'Compare's with the passed function.
 mergeEdit :: (a -> a -> a) -> Edit a a -> a
 mergeEdit = edit id id
+
+fromMaybes :: Maybe a -> Maybe b -> Maybe (Edit a b)
+fromMaybes a b = liftA2 Compare a b <|> Delete <$> a <|> Insert <$> b
 
 
 instance Bifunctor Edit where
