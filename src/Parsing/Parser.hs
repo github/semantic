@@ -80,7 +80,7 @@ data Parser term where
 goParser :: Parser Go.Term
 goParser = AssignmentParser (ASTParser tree_sitter_go) Go.assignment
 
-rubyParser :: Parser Ruby.Term
+rubyParser :: Parser (Ruby.Term Loc)
 rubyParser = AssignmentParser (ASTParser tree_sitter_ruby) Ruby.assignment
 
 phpParser :: Parser PHP.Term
