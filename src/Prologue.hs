@@ -29,7 +29,6 @@ import Data.Semilattice.Lower as X (Lower(..))
 import Data.Set as X (Set)
 import Data.Sum as X (Sum, Element, Elements, (:<), (:<:), Apply (..), inject)
 import Data.Text as X (Text)
-import Data.These as X
 import Data.Word as X (Word8, Word16, Word32, Word64)
 
 import Control.Exception as X hiding (Handler (..), assert, evaluate, throw, throwIO, throwTo)
