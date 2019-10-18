@@ -122,7 +122,7 @@ runGraph :: ( Member Distribute sig
          -> Project
          -> m (Graph ControlFlowVertex)
 runGraph type' includePackages project
-  | SomeAnalysisParser parser <- someAnalysisParser (Proxy @AnalyzeTerm) (projectLanguage project)
+  | Just (SomeParser parser) <- Map.lookup (projectLanguage project) analysisParsers
   , SomeLanguage (lang :: Proxy lang) <- reifyLanguage (projectLanguage project) = do
     package <- if projectLanguage project == Language.Python then
         parsePythonPackage parser project
@@ -133,6 +133,7 @@ runGraph type' includePackages project
       CallGraph -> do
         modules <- topologicalSort <$> runImportGraphToModules lang package
         runCallGraph lang includePackages modules package
+  | otherwise = error $ "Analysis not supported for: " <> show (projectLanguage project)
 
 data SomeLanguage where
   SomeLanguage :: HasPrelude lang => Proxy lang -> SomeLanguage
