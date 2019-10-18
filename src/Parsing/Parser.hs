@@ -86,7 +86,7 @@ rubyParser = AssignmentParser (ASTParser tree_sitter_ruby) Ruby.assignment
 phpParser :: Parser PHP.Term
 phpParser = AssignmentParser (ASTParser tree_sitter_php) PHP.assignment
 
-pythonParser :: Parser Python.Term
+pythonParser :: Parser (Python.Term Loc)
 pythonParser = AssignmentParser (ASTParser tree_sitter_python) Python.assignment
 
 typescriptParser :: Parser TypeScript.Term
