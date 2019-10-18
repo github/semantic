@@ -88,10 +88,10 @@ instance IsString Name where
 
 -- | Returns an s-expression formatted diff for the specified FilePath pair.
 diffFilePaths :: TaskSession -> Both Path.RelFile -> IO ByteString
-diffFilePaths session paths
-  = readFilePathPair paths
-    >>= runTask session . runParse (configTreeSitterParseTimeout (config session)) . parseDiffBuilder @[] DiffSExpression . pure
-    >>= either (die . displayException) (pure . runBuilder)
+diffFilePaths session paths = do
+  blobs <- readFilePathPair paths
+  builder <- runTask session (runParse (configTreeSitterParseTimeout (config session)) (parseDiffBuilder DiffSExpression [ blobs ]))
+  either (die . displayException) (pure . runBuilder) builder
 
 -- | Returns an s-expression parse tree for the specified path.
 parseFilePath :: TaskSession -> Path.RelFile -> IO (Either SomeException ByteString)
