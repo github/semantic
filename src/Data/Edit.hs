@@ -4,12 +4,10 @@ module Data.Edit
 , edit
 ) where
 
-import Data.Align
 import Data.Bifoldable
 import Data.Bifunctor
 import Data.Bitraversable
 import Data.Functor.Classes
-import Data.These
 import GHC.Generics (Generic, Generic1)
 
 -- | An operation to compare, insert, or delete an item.
@@ -39,12 +37,6 @@ instance Bitraversable Edit where
     Delete  a   -> Delete  <$> f a
     Insert    b -> Insert  <$>         g b
     Compare a b -> Compare <$> f a <*> g b
-
-instance Bicrosswalk Edit where
-  bicrosswalk f g = \case
-    Delete  a   -> Delete <$> f a
-    Insert    b -> Insert <$> g b
-    Compare a b -> alignWith (these Delete Insert Compare) (f a) (g b)
 
 instance Eq2 Edit where
   liftEq2 eqBefore eqAfter p1 p2 = case (p1, p2) of
