@@ -1,8 +1,6 @@
 {-# LANGUAGE FunctionalDependencies, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 module Data.Term
 ( Term(..)
-, injectTerm
-, projectTerm
 , guardTerm
 , TermF(..)
 , termSize
@@ -13,7 +11,9 @@ module Data.Term
 , IsTerm(..)
 , termAnnotation
 , termOut
+, projectTerm
 , termIn
+, injectTerm
 ) where
 
 import Prologue
@@ -27,9 +27,6 @@ import           Text.Show
 
 -- | A Term with an abstract syntax tree and an annotation.
 newtype Term syntax ann = Term { unTerm :: TermF syntax ann (Term syntax ann) }
-
-projectTerm :: (f :< syntax) => Term (Sum syntax) ann -> Maybe (f (Term (Sum syntax) ann))
-projectTerm = Sum.project . termOut
 
 guardTerm :: (f :< syntax, Alternative m)
           => Term (Sum syntax) ann
@@ -67,9 +64,6 @@ instance Annotated (Term syntax ann) ann where
 termSize :: (Foldable f, Functor f) => Term f annotation -> Int
 termSize = cata size where
   size (In _ syntax) = 1 + sum syntax
-
-injectTerm :: (f :< syntax) => ann -> f (Term (Sum syntax) ann) -> Term (Sum syntax) ann
-injectTerm a = termIn a . Sum.inject
 
 
 hoistTerm :: Functor f => (forall a. f a -> g a) -> Term f a -> Term g a
@@ -178,9 +172,16 @@ termAnnotation = termFAnnotation . toTermF
 termOut :: IsTerm term => term ann -> Syntax term (term ann)
 termOut = termFOut . toTermF
 
+projectTerm :: (f :< syntax, Sum syntax ~ Syntax term, IsTerm term) => term ann -> Maybe (f (term ann))
+projectTerm = Sum.project . termOut
+
+
 -- | Build a term from its annotation and syntax.
 termIn :: IsTerm term => ann -> Syntax term (term ann) -> term ann
 termIn = fmap fromTermF . In
+
+injectTerm :: (f :< syntax, Sum syntax ~ Syntax term, IsTerm term) => ann -> f (term ann) -> term ann
+injectTerm a = termIn a . Sum.inject
 
 
 instance IsTerm (Term syntax) where
