@@ -23,10 +23,12 @@ import qualified Language.Ruby.Syntax as Ruby
 import qualified Language.TSX.Syntax as TSX
 import qualified Language.TSX.Term as TSX
 import qualified Language.TypeScript.Syntax as TypeScript
+import qualified Language.TypeScript.Term as TypeScript
 import Data.Quieterm
 
 deriving instance AccessControls1 syntax => AccessControls (Term syntax ann)
 deriving instance AccessControls (TSX.Term ann)
+deriving instance AccessControls (TypeScript.Term ann)
 
 instance (AccessControls recur, AccessControls1 syntax) => AccessControls (TermF syntax ann recur) where
   termToAccessControl = liftTermToAccessControl termToAccessControl . termFOut
