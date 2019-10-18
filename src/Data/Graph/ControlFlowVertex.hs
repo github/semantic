@@ -21,6 +21,7 @@ import           Data.Abstract.Package (PackageInfo (..))
 import           Data.Aeson
 import           Data.Graph (VertexTag (..))
 import qualified Data.Graph as G
+import           Data.Quieterm (Quieterm(..))
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Expression as Expression
@@ -107,6 +108,9 @@ class VertexDeclaration term where
 
 instance (VertexDeclaration1 f, Declarations1 f) => VertexDeclaration (Term f) where
   toVertex info (Term (In a f)) = liftToVertex toVertex a info f
+
+instance (VertexDeclaration1 f, Declarations1 f) => VertexDeclaration (Quieterm f) where
+  toVertex info (Quieterm (In a f)) = liftToVertex toVertex a info f
 
 toVertex1 :: (VertexDeclaration1 f, VertexDeclaration t, Declarations (t Loc)) => Loc -> ModuleInfo -> f (t Loc) -> Maybe (ControlFlowVertex, Name)
 toVertex1 = liftToVertex toVertex
