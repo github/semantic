@@ -33,8 +33,6 @@ patch _ ifInsert _ (Insert b) = ifInsert b
 patch _ _ ifReplace (Compare a b) = ifReplace a b
 
 
--- Instances
-
 instance Bifunctor Patch where
   bimap f _ (Delete a) = Delete (f a)
   bimap _ g (Insert b) = Insert (g b)
