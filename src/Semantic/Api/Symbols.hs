@@ -20,6 +20,7 @@ import qualified Language.Java as Java
 import qualified Language.JSON as JSON
 import qualified Language.Python as Python
 import qualified Language.TSX.Term as TSX
+import qualified Language.TypeScript.Term as TypeScript
 import qualified Parsing.Parser as Parser
 import           Prologue
 import           Proto.Semantic as P hiding (Blob, BlobPair)
@@ -113,6 +114,7 @@ instance IsTaggable syntax => ToTags (Term syntax) where
   tags = runTagging
 
 deriving instance ToTags TSX.Term
+deriving instance ToTags TypeScript.Term
 
 instance ToTags Java.Term where
   tags _ _ = Precise.tags

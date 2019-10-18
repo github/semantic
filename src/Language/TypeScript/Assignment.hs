@@ -4,7 +4,7 @@ module Language.TypeScript.Assignment
 ( assignment
 , TypeScript.Syntax
 , Grammar
-, Term
+, TypeScript.Term
 ) where
 
 import Assigning.Assignment hiding (Assignment, Error)
@@ -42,8 +42,8 @@ type Term = Term.Term (Sum TypeScript.Syntax)
 type Assignment = Assignment.Assignment [] Grammar
 
 -- | Assignment from AST in TypeScript’s grammar onto a program in TypeScript’s syntax.
-assignment :: Assignment (Term Loc)
-assignment = handleError $ makeTerm <$> symbol Program <*> children (Statement.Statements <$> manyTerm statement) <|> parseError
+assignment :: Assignment (TypeScript.Term Loc)
+assignment = fmap TypeScript.Term $ handleError $ makeTerm <$> symbol Program <*> children (Statement.Statements <$> manyTerm statement) <|> parseError
 
 expression :: Assignment (Term Loc)
 expression = handleError everything

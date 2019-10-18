@@ -43,6 +43,7 @@ import qualified Language.Java as Java
 import qualified Language.JSON as JSON
 import qualified Language.Python as Python
 import qualified Language.TSX.Term as TSX
+import qualified Language.TypeScript.Term as TypeScript
 
 
 termGraph :: (Traversable t, Member Distribute sig, ParseEffects sig m) => t Blob -> m ParseTreeGraphResponse
@@ -119,6 +120,7 @@ instance ShowTerm Python.Term where
   showTerm = serialize Show . void . Python.getTerm
 
 deriving instance ShowTerm TSX.Term
+deriving instance ShowTerm TypeScript.Term
 
 
 sexprTermParsers :: PerLanguageModes -> Map Language (SomeParser SExprTerm Loc)
@@ -140,6 +142,7 @@ instance SExprTerm Python.Term where
   sexprTerm = SExpr.Precise.serializeSExpression . Python.getTerm
 
 deriving instance SExprTerm TSX.Term
+deriving instance SExprTerm TypeScript.Term
 
 
 dotGraphTermParsers :: Map Language (SomeParser DOTGraphTerm Loc)
@@ -152,6 +155,7 @@ instance (ConstructorName syntax, Foldable syntax, Functor syntax) => DOTGraphTe
   dotGraphTerm = serialize (DOT (termStyle "terms")) . renderTreeGraph
 
 deriving instance DOTGraphTerm TSX.Term
+deriving instance DOTGraphTerm TypeScript.Term
 
 
 jsonTreeTermParsers :: Map Language (SomeParser JSONTreeTerm Loc)
@@ -164,6 +168,7 @@ instance ToJSONFields1 syntax => JSONTreeTerm (Term syntax) where
   jsonTreeTerm = renderJSONTerm
 
 deriving instance JSONTreeTerm TSX.Term
+deriving instance JSONTreeTerm TypeScript.Term
 
 
 jsonGraphTermParsers :: Map Language (SomeParser JSONGraphTerm Loc)
@@ -186,3 +191,4 @@ instance (Foldable syntax, Functor syntax, ConstructorName syntax) => JSONGraphT
           & P.errors .~ mempty
 
 deriving instance JSONGraphTerm TSX.Term
+deriving instance JSONGraphTerm TypeScript.Term

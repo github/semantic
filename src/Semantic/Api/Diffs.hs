@@ -31,6 +31,7 @@ import qualified Data.Text as T
 import           Diffing.Algorithm (Diffable)
 import           Diffing.Interpreter (DiffTerms(..))
 import qualified Language.TSX.Term as TSX
+import qualified Language.TypeScript.Term as TypeScript
 import           Parsing.Parser
 import           Prologue
 import           Proto.Semantic as P hiding (Blob, BlobPair)
@@ -100,6 +101,7 @@ instance (ConstructorName syntax, Diffable syntax, Eq1 syntax, Hashable1 syntax,
   dotGraphDiff = serialize (DOT (diffStyle "diffs")) . renderTreeGraph
 
 deriving instance DOTGraphDiff TSX.Term
+deriving instance DOTGraphDiff TypeScript.Term
 
 
 jsonGraphDiffParsers :: Map Language (SomeParser JSONGraphDiff Loc)
@@ -122,6 +124,7 @@ instance (ConstructorName syntax, Diffable syntax, Eq1 syntax, Hashable1 syntax,
            & P.errors .~ mempty
 
 deriving instance JSONGraphDiff TSX.Term
+deriving instance JSONGraphDiff TypeScript.Term
 
 
 jsonTreeDiffParsers :: Map Language (SomeParser JSONTreeDiff Loc)
@@ -134,6 +137,7 @@ instance (Diffable syntax, Eq1 syntax, Hashable1 syntax, ToJSONFields1 syntax, T
   jsonTreeDiff = renderJSONDiff
 
 deriving instance JSONTreeDiff TSX.Term
+deriving instance JSONTreeDiff TypeScript.Term
 
 
 sexprDiffParsers :: Map Language (SomeParser SExprDiff Loc)
@@ -146,6 +150,7 @@ instance (ConstructorName syntax, Diffable syntax, Eq1 syntax, Hashable1 syntax,
   sexprDiff = serialize (SExpression ByConstructorName)
 
 deriving instance SExprDiff TSX.Term
+deriving instance SExprDiff TypeScript.Term
 
 
 showDiffParsers :: Map Language (SomeParser ShowDiff Loc)
@@ -158,6 +163,7 @@ instance (Diffable syntax, Eq1 syntax, Hashable1 syntax, Show1 syntax, Traversab
   showDiff = serialize Show
 
 deriving instance ShowDiff TSX.Term
+deriving instance ShowDiff TypeScript.Term
 
 
 summarizeDiffParsers :: Map Language (SomeParser SummarizeDiff Loc)
@@ -172,6 +178,7 @@ instance (Diffable syntax, Eq1 syntax, HasDeclaration syntax, Hashable1 syntax, 
   summarizeDiff = diffTOC
 
 deriving instance SummarizeDiff TSX.Term
+deriving instance SummarizeDiff TypeScript.Term
 
 
 -- | Parse a 'BlobPair' using one of the provided parsers, diff the resulting terms, and run an action on the abstracted diff.
