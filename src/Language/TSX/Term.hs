@@ -1,8 +1,10 @@
 {-# LANGUAGE DataKinds #-}
 module Language.TSX.Term
 ( Syntax
+, Term(..)
 ) where
 
+import Data.Sum (Sum)
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
@@ -10,6 +12,7 @@ import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
+import qualified Data.Term as Term
 import qualified Language.TSX.Syntax as TSX.Syntax
 
 type Syntax =
@@ -181,3 +184,6 @@ type Syntax =
   , TSX.Syntax.MetaProperty
   , TSX.Syntax.AnnotatedExpression
   ]
+
+
+newtype Term ann = Term { getTerm :: Term.Term (Sum Syntax) ann }
