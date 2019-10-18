@@ -214,9 +214,9 @@ instance Ord ErrorStack where
 
 
 class HasErrors term where
-  getErrors :: term -> [Error.Error String]
+  getErrors :: term Loc -> [Error.Error String]
 
-instance (Error :< fs, Apply Foldable fs, Apply Functor fs) => HasErrors (Term (Sum fs) Loc) where
+instance (Error :< fs, Apply Foldable fs, Apply Functor fs) => HasErrors (Term (Sum fs)) where
   getErrors = cata $ \ (In Loc{..} syntax) ->
     maybe (fold syntax) (pure . unError span) (Data.Sum.project syntax)
 
