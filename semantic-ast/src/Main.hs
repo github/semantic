@@ -16,6 +16,7 @@ import Text.Pretty.Simple (pPrint)
 
 data SemanticAST = SemanticAST
   { format :: Format
+  , color  :: Bool
   , source :: Either FilePath Prelude.String
   }
 
@@ -24,6 +25,10 @@ parseAST = SemanticAST
   <$> option auto
     ( long "format"
     <> help "Specify desired output: show, json, sexpression" )
+  <*> switch
+    ( long "color"
+    <> help "Print with color: --color"
+    )
   <*> (Left <$> strOption
       ( long "sourceFile"
       <> metavar "FILEPATH"
@@ -38,7 +43,7 @@ main :: IO ()
 main = generateAST =<< execParser opts
 
 generateAST :: SemanticAST -> IO ()
-generateAST (SemanticAST format source) = do
+generateAST (SemanticAST format _ source) = do
   bytestring <- case source of
     Left filePath -> do
       Data.ByteString.readFile filePath
@@ -58,3 +63,12 @@ opts = info (parseAST <**> helper)
 -- TODO: Define formats for json, sexpression, etc.
 data Format = Show | Pretty
   deriving (Read)
+
+-- CLI feature request -> implementation
+-- add a boolean flag that represents "print with color" or not
+-- `semantic-ast --format=Pretty --no-color` won't show those pretty colors
+-- adding a boolean field to represent whether color is on or not
+-- and use an appropriate construct in optparse-applicative to indicate that `--color` means True
+-- and -- no-color means false, and not provided means True
+
+-- The difference between auto and string option
