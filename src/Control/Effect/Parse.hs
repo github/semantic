@@ -12,6 +12,7 @@ import Control.Effect.Error
 import Control.Exception (SomeException)
 import Data.Bitraversable
 import Data.Blob
+import Data.Edit
 import Data.Language
 import qualified Data.Map as Map
 import Data.These
@@ -56,6 +57,6 @@ parsePairWith
   -> BlobPair                                                                 -- ^ The blob pair to parse.
   -> m a
 parsePairWith parsers with blobPair = case Map.lookup (languageForBlobPair blobPair) parsers of
-  Just (SomeParser parser) -> bitraverse (p parser) (p parser) (getBlobPair blobPair) >>= with
+  Just (SomeParser parser) -> bitraverse (p parser) (p parser) (getBlobPair blobPair) >>= with . edit This That These
   _                        -> noLanguageForBlob (pathForBlobPair blobPair)
   where p parser blob = (,) blob <$> parse parser blob

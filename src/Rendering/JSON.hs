@@ -16,7 +16,6 @@ module Rendering.JSON
 import Data.Aeson (ToJSON, toJSON, object, (.=))
 import Data.Aeson as A
 import Data.Blob
-import Data.Edit
 import Data.JSON.Fields
 import Data.Text (pack)
 import GHC.TypeLits
@@ -56,8 +55,8 @@ newtype JSONStat = JSONStat { jsonStatBlobs :: BlobPair }
   deriving (Eq, Show)
 
 instance ToJSON JSONStat where
-  toJSON JSONStat{..} = object ("path" .= pathKeyForBlobPair jsonStatBlobs : toJSONFields (these Delete Insert Compare (getBlobPair jsonStatBlobs)))
-  toEncoding JSONStat{..} = pairs (fold ("path" .= pathKeyForBlobPair jsonStatBlobs : toJSONFields (these Delete Insert Compare (getBlobPair jsonStatBlobs))))
+  toJSON JSONStat{..} = object ("path" .= pathKeyForBlobPair jsonStatBlobs : toJSONFields (getBlobPair jsonStatBlobs))
+  toEncoding JSONStat{..} = pairs (fold ("path" .= pathKeyForBlobPair jsonStatBlobs : toJSONFields (getBlobPair jsonStatBlobs)))
 
 -- | Render a term to a value representing its JSON.
 renderJSONTerm :: ToJSON a => Blob -> a -> JSON "trees" SomeJSON
