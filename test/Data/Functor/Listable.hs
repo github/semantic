@@ -21,7 +21,6 @@ import Data.Abstract.ScopeGraph (AccessControl(..))
 import Data.Bifunctor.Join
 import Data.Diff
 import Data.Edit
-import Data.Functor.Both
 import qualified Data.Language as Language
 import Data.List.NonEmpty
 import qualified Data.Syntax as Syntax
@@ -121,9 +120,6 @@ instance Listable1 NonEmpty where
 
 instance Listable2 p => Listable1 (Join p) where
   liftTiers tiers = liftCons1 (liftTiers2 tiers tiers) Join
-
-instance Listable1 Both where
-  liftTiers tiers = liftCons2 tiers tiers Both
 
 instance Listable1 f => Listable2 (TermF f) where
   liftTiers2 annotationTiers recurTiers = liftCons2 annotationTiers (liftTiers recurTiers) In
