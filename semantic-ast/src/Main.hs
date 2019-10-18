@@ -37,13 +37,16 @@ main :: IO ()
 main = generateAST =<< execParser opts
 
 generateAST :: SemanticAST -> IO ()
-generateAST (SemanticAST _ source) = do
+generateAST (SemanticAST format source) = do
   bytestring <- case source of
     Left filePath -> do
       Data.ByteString.readFile filePath
     Right source -> do
       pure $ Data.ByteString.Char8.pack source
-  print =<< parseByteString @TreeSitter.Python.AST.Module @(Range, Span) tree_sitter_python bytestring
+  ast <- parseByteString @TreeSitter.Python.AST.Module @(Range, Span) tree_sitter_python bytestring
+  case format of
+    Show -> print ast
+
 
 opts :: ParserInfo SemanticAST
 opts = info (parseAST <**> helper)
