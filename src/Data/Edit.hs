@@ -53,6 +53,15 @@ instance Eq2 Edit where
     (Compare a1 b1, Compare a2 b2) -> eqBefore a1 a2 && eqAfter b1 b2
     _ -> False
 
+instance Ord2 Edit where
+  liftCompare2 cmpl cmpr p1 p2 = case (p1, p2) of
+    (Delete  a1   , Delete  a2   ) -> cmpl a1 a2
+    (Delete  _    , _            ) -> LT
+    (Insert     b1, Insert     b2) -> cmpr b1 b2
+    (Insert     _ , _            ) -> LT
+    (Compare a1 b1, Compare a2 b2) -> cmpl a1 a2 <> cmpr b1 b2
+    _                              -> GT
+
 instance Show2 Edit where
   liftShowsPrec2 spl _ spr _ d = \case
     Delete a -> showsUnaryWith spl "Delete" d a
