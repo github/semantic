@@ -16,20 +16,20 @@ import Data.These
 data Edit a b
   = Delete a
   | Insert b
-  | Copy a b
+  | Compare a b
   deriving (Eq, Functor, Ord, Show)
 
 instance Bifunctor Edit where
   bimap f g = \case
     Delete a -> Delete (f a)
     Insert b -> Insert (g b)
-    Copy a b -> Copy (f a) (g b)
+    Compare a b -> Compare (f a) (g b)
 
 toThese :: Edit a b -> These a b
 toThese = \case
   Delete a -> This a
   Insert b -> That b
-  Copy a b -> These a b
+  Compare a b -> These a b
 
 data Endpoint a b = Endpoint { x :: {-# UNPACK #-} !Int, _y :: {-# UNPACK #-} !Int, _script :: [Edit a b] }
   deriving (Eq, Show)
@@ -78,7 +78,7 @@ ses eq as' bs'
         slideFrom (Endpoint x y script)
           | Just a <- as !? x
           , Just b <- bs !? y
-          , a `eq` b  = slideFrom (Endpoint (succ x) (succ y) (Copy a b : script))
+          , a `eq` b  = slideFrom (Endpoint (succ x) (succ y) (Compare a b : script))
           | otherwise =            Endpoint       x        y              script
 
 

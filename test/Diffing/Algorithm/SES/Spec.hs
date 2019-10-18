@@ -9,7 +9,7 @@ spec :: Spec
 spec = do
   describe "ses" $ do
     prop "returns equal lists in These" $
-      \ as -> (ses (==) as as :: [Edit Char Char]) `shouldBe` zipWith Copy as as
+      \ as -> (ses (==) as as :: [Edit Char Char]) `shouldBe` zipWith Compare as as
 
     prop "returns deletions in This" $
       \ as -> (ses (==) as [] :: [Edit Char Char]) `shouldBe` fmap Delete as

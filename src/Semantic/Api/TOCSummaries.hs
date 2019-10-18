@@ -132,7 +132,7 @@ instance Tagging.ToTags t => SummarizeDiff (ViaTags t) where
     toChange = \case
       SES.Delete tag -> (Deleted,)  <$> toDecl tag
       SES.Insert tag -> (Inserted,) <$> toDecl tag
-      SES.Copy t1 t2
+      SES.Compare t1 t2
         | Source.slice s1 (byteRange (Tag.loc t1)) /= Source.slice s2 (byteRange (Tag.loc t2))
                      -> (Changed,) <$> toDecl t2
         | otherwise  -> Nothing

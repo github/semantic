@@ -36,7 +36,7 @@ spec = do
 
     it "produces unbiased insertions within branches" $
       let (a, b) = (decorate (termIn emptyAnnotation (inject [ termIn emptyAnnotation (inject (Syntax.Identifier "a")) ])), decorate (termIn emptyAnnotation (inject [ termIn emptyAnnotation (inject (Syntax.Identifier "b")) ]))) in
-      fmap (bimap stripTerm stripTerm) (rws comparableTerms (equalTerms comparableTerms) [ b ] [ a, b ]) `shouldBe` fmap (bimap stripTerm stripTerm) [ Insert a, Copy b b ]
+      fmap (bimap stripTerm stripTerm) (rws comparableTerms (equalTerms comparableTerms) [ b ] [ a, b ]) `shouldBe` fmap (bimap stripTerm stripTerm) [ Insert a, Compare b b ]
 
   where decorate = defaultFeatureVectorDecorator
 
