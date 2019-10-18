@@ -6,6 +6,7 @@ module Data.Edit
 , mergeEditWith
 ) where
 
+import Control.Applicative (liftA2)
 import Data.Bifoldable
 import Data.Bifunctor
 import Data.Bitraversable
@@ -41,10 +42,7 @@ instance Bifoldable Edit where
   bifoldMap = bifoldMapDefault
 
 instance Bitraversable Edit where
-  bitraverse f g = \case
-    Delete  a   -> Delete  <$> f a
-    Insert    b -> Insert  <$>         g b
-    Compare a b -> Compare <$> f a <*> g b
+  bitraverse f g = edit (fmap Delete) (fmap Insert) (liftA2 Compare) . bimap f g
 
 instance Eq2 Edit where
   liftEq2 eql eqr = curry $ \case
