@@ -30,6 +30,7 @@ import           Data.Term
 import qualified Data.Text as T
 import           Diffing.Algorithm (Diffable)
 import           Diffing.Interpreter (DiffTerms(..))
+import qualified Language.PHP.Term as PHP
 import qualified Language.TSX.Term as TSX
 import qualified Language.TypeScript.Term as TypeScript
 import           Parsing.Parser
@@ -100,6 +101,7 @@ class DiffTerms term => DOTGraphDiff term where
 instance (ConstructorName syntax, Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => DOTGraphDiff (Term syntax) where
   dotGraphDiff = serialize (DOT (diffStyle "diffs")) . renderTreeGraph
 
+deriving instance DOTGraphDiff PHP.Term
 deriving instance DOTGraphDiff TSX.Term
 deriving instance DOTGraphDiff TypeScript.Term
 
@@ -123,6 +125,7 @@ instance (ConstructorName syntax, Diffable syntax, Eq1 syntax, Hashable1 syntax,
            & P.edges .~ fmap toEdge (edgeList graph)
            & P.errors .~ mempty
 
+deriving instance JSONGraphDiff PHP.Term
 deriving instance JSONGraphDiff TSX.Term
 deriving instance JSONGraphDiff TypeScript.Term
 
@@ -136,6 +139,7 @@ class DiffTerms term => JSONTreeDiff term where
 instance (Diffable syntax, Eq1 syntax, Hashable1 syntax, ToJSONFields1 syntax, Traversable syntax) => JSONTreeDiff (Term syntax) where
   jsonTreeDiff = renderJSONDiff
 
+deriving instance JSONTreeDiff PHP.Term
 deriving instance JSONTreeDiff TSX.Term
 deriving instance JSONTreeDiff TypeScript.Term
 
@@ -149,6 +153,7 @@ class DiffTerms term => SExprDiff term where
 instance (ConstructorName syntax, Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => SExprDiff (Term syntax) where
   sexprDiff = serialize (SExpression ByConstructorName)
 
+deriving instance SExprDiff PHP.Term
 deriving instance SExprDiff TSX.Term
 deriving instance SExprDiff TypeScript.Term
 
@@ -162,6 +167,7 @@ class DiffTerms term => ShowDiff term where
 instance (Diffable syntax, Eq1 syntax, Hashable1 syntax, Show1 syntax, Traversable syntax) => ShowDiff (Term syntax) where
   showDiff = serialize Show
 
+deriving instance ShowDiff PHP.Term
 deriving instance ShowDiff TSX.Term
 deriving instance ShowDiff TypeScript.Term
 
@@ -177,6 +183,7 @@ instance (Diffable syntax, Eq1 syntax, HasDeclaration syntax, Hashable1 syntax, 
   decorateTerm = decoratorWithAlgebra . declarationAlgebra
   summarizeDiff = diffTOC
 
+deriving instance SummarizeDiff PHP.Term
 deriving instance SummarizeDiff TSX.Term
 deriving instance SummarizeDiff TypeScript.Term
 

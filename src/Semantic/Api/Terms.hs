@@ -41,6 +41,7 @@ import           Source.Loc
 
 import qualified Language.Java as Java
 import qualified Language.JSON as JSON
+import qualified Language.PHP.Term as PHP
 import qualified Language.Python as Python
 import qualified Language.TSX.Term as TSX
 import qualified Language.TypeScript.Term as TypeScript
@@ -119,6 +120,7 @@ instance ShowTerm JSON.Term where
 instance ShowTerm Python.Term where
   showTerm = serialize Show . void . Python.getTerm
 
+deriving instance ShowTerm PHP.Term
 deriving instance ShowTerm TSX.Term
 deriving instance ShowTerm TypeScript.Term
 
@@ -141,6 +143,7 @@ instance SExprTerm JSON.Term where
 instance SExprTerm Python.Term where
   sexprTerm = SExpr.Precise.serializeSExpression . Python.getTerm
 
+deriving instance SExprTerm PHP.Term
 deriving instance SExprTerm TSX.Term
 deriving instance SExprTerm TypeScript.Term
 
@@ -154,6 +157,7 @@ class DOTGraphTerm term where
 instance (ConstructorName syntax, Foldable syntax, Functor syntax) => DOTGraphTerm (Term syntax) where
   dotGraphTerm = serialize (DOT (termStyle "terms")) . renderTreeGraph
 
+deriving instance DOTGraphTerm PHP.Term
 deriving instance DOTGraphTerm TSX.Term
 deriving instance DOTGraphTerm TypeScript.Term
 
@@ -167,6 +171,7 @@ class JSONTreeTerm term where
 instance ToJSONFields1 syntax => JSONTreeTerm (Term syntax) where
   jsonTreeTerm = renderJSONTerm
 
+deriving instance JSONTreeTerm PHP.Term
 deriving instance JSONTreeTerm TSX.Term
 deriving instance JSONTreeTerm TypeScript.Term
 
@@ -190,5 +195,6 @@ instance (Foldable syntax, Functor syntax, ConstructorName syntax) => JSONGraphT
           & P.edges .~ fmap toEdge (edgeList graph)
           & P.errors .~ mempty
 
+deriving instance JSONGraphTerm PHP.Term
 deriving instance JSONGraphTerm TSX.Term
 deriving instance JSONGraphTerm TypeScript.Term

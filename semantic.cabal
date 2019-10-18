@@ -203,6 +203,7 @@ library
                      , Language.TypeScript.Term
                      , Language.PHP.Assignment
                      , Language.PHP.Syntax
+                     , Language.PHP.Term
                      , Language.Python.Assignment
                      , Language.Python.Syntax
                      , Numeric.Exts

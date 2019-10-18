@@ -2,9 +2,9 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-} -- FIXME
 module Language.PHP.Assignment
 ( assignment
-, Syntax
+, PHP.Syntax
 , Grammar
-, Term
+, PHP.Term
 ) where
 
 import Prologue
@@ -34,140 +34,15 @@ import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
 import qualified Language.PHP.Syntax as Syntax
+import qualified Language.PHP.Term as PHP
 import           TreeSitter.PHP as Grammar
 
-type Syntax = '[
-    Comment.Comment
-  , Declaration.Class
-  , Declaration.Function
-  , Declaration.Method
-  , Declaration.VariableDeclaration
-  , Expression.Plus
-  , Expression.Minus
-  , Expression.Times
-  , Expression.DividedBy
-  , Expression.Modulo
-  , Expression.Power
-  , Expression.Negate
-  , Expression.FloorDivision
-  , Expression.BAnd
-  , Expression.BOr
-  , Expression.BXOr
-  , Expression.LShift
-  , Expression.RShift
-  , Expression.And
-  , Expression.Not
-  , Expression.Or
-  , Expression.XOr
-  , Expression.Call
-  , Expression.Cast
-  , Expression.LessThan
-  , Expression.LessThanEqual
-  , Expression.GreaterThan
-  , Expression.GreaterThanEqual
-  , Expression.Equal
-  , Expression.StrictEqual
-  , Expression.Comparison
-  , Expression.InstanceOf
-  , Expression.MemberAccess
-  , Expression.New
-  , Expression.SequenceExpression
-  , Expression.Subscript
-  , Expression.Member
-  , Literal.Array
-  , Literal.Float
-  , Literal.Integer
-  , Literal.KeyValue
-  , Literal.TextElement
-  , Statement.Assignment
-  , Statement.Break
-  , Statement.Catch
-  , Statement.Continue
-  , Statement.DoWhile
-  , Statement.Else
-  , Statement.Finally
-  , Statement.For
-  , Statement.ForEach
-  , Statement.Goto
-  , Statement.If
-  , Statement.Match
-  , Statement.Pattern
-  , Statement.Return
-  , Statement.Statements
-  , Statement.Throw
-  , Statement.Try
-  , Statement.While
-  , Statement.Yield
-  , Syntax.AliasAs
-  , Syntax.ArrayElement
-  , Syntax.BaseTypeDeclaration
-  , Syntax.CastType
-  , Syntax.ClassBaseClause
-  , Syntax.ClassConstDeclaration
-  , Syntax.ClassInterfaceClause
-  , Syntax.ClassModifier
-  , Syntax.Clone
-  , Syntax.ConstDeclaration
-  , Syntax.ConstructorDeclaration
-  , Syntax.Context
-  , Syntax.Declare
-  , Syntax.DeclareDirective
-  , Syntax.DestructorDeclaration
-  , Syntax.Echo
-  , Syntax.Empty
-  , Syntax.EmptyIntrinsic
-  , Syntax.Error
-  , Syntax.ErrorControl
-  , Syntax.EvalIntrinsic
-  , Syntax.ExitIntrinsic
-  , Syntax.GlobalDeclaration
-  , Syntax.Identifier
-  , Syntax.Include
-  , Syntax.IncludeOnce
-  , Syntax.InsteadOf
-  , Syntax.InterfaceBaseClause
-  , Syntax.InterfaceDeclaration
-  , Syntax.IssetIntrinsic
-  , Syntax.LabeledStatement
-  , Syntax.Namespace
-  , Syntax.NamespaceAliasingClause
-  , Syntax.NamespaceName
-  , Syntax.NamespaceUseClause
-  , Syntax.NamespaceUseDeclaration
-  , Syntax.NamespaceUseGroupClause
-  , Syntax.NewVariable
-  , Syntax.PrintIntrinsic
-  , Syntax.PropertyDeclaration
-  , Syntax.PropertyModifier
-  , Syntax.QualifiedName
-  , Syntax.RelativeScope
-  , Syntax.Require
-  , Syntax.RequireOnce
-  , Syntax.ReturnType
-  , Syntax.ScalarType
-  , Syntax.ShellCommand
-  , Syntax.Concat
-  , Syntax.SimpleVariable
-  , Syntax.Static
-  , Syntax.Text
-  , Syntax.TraitDeclaration
-  , Syntax.TraitUseClause
-  , Syntax.TraitUseSpecification
-  , Syntax.TypeDeclaration
-  , Syntax.Unset
-  , Syntax.Update
-  , Syntax.UseClause
-  , Syntax.VariableName
-  , Type.Annotation
-  , []
-  ]
-
-type Term = Term.Term (Sum Syntax)
+type Term = Term.Term (Sum PHP.Syntax)
 type Assignment = Assignment.Assignment [] Grammar
 
 -- | Assignment from AST in PHP's grammar onto a program in PHP's syntax.
-assignment :: Assignment (Term Loc)
-assignment = handleError $ makeTerm <$> symbol Program <*> children (Statement.Statements <$> (bookend <$> (text <|> emptyTerm) <*> manyTerm statement <*> (text <|> emptyTerm))) <|> parseError
+assignment :: Assignment (PHP.Term Loc)
+assignment = fmap PHP.Term . handleError $ makeTerm <$> symbol Program <*> children (Statement.Statements <$> (bookend <$> (text <|> emptyTerm) <*> manyTerm statement <*> (text <|> emptyTerm))) <|> parseError
 
 text :: Assignment (Term Loc)
 text = makeTerm <$> symbol Text <*> (Syntax.Text <$> source)
@@ -811,6 +686,6 @@ someTerm' = NonEmpty.some1 . commentedTerm
 -- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
 infixTerm :: Assignment (Term Loc)
           -> Assignment (Term Loc)
-          -> [Assignment (Term Loc -> Term Loc -> Sum Syntax (Term Loc))]
-          -> Assignment (Sum Syntax (Term Loc))
+          -> [Assignment (Term Loc -> Term Loc -> Sum PHP.Syntax (Term Loc))]
+          -> Assignment (Sum PHP.Syntax (Term Loc))
 infixTerm = infixContext (comment <|> textInterpolation)
