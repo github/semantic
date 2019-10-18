@@ -39,6 +39,8 @@ spec = do
 
   where decorate = defaultFeatureVectorDecorator
 
+        diffEdit = edit deleting inserting comparing
+
 stripTerm :: Functor f => Term f (FeatureVector, ()) -> Term f ()
 stripTerm = fmap snd
 
