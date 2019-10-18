@@ -1,4 +1,4 @@
-{-# LANGUAGE DerivingVia, DuplicateRecordFields, RankNTypes, ScopedTypeVariables, TupleSections #-}
+{-# LANGUAGE DerivingVia, DuplicateRecordFields, LambdaCase, RankNTypes, ScopedTypeVariables, TupleSections #-}
 module Rendering.TOC
 ( diffTOC
 , Summaries(..)
@@ -61,7 +61,7 @@ data Change
   deriving (Eq, Show)
 
 instance ToJSON Change where
-  toJSON change = case change of
+  toJSON = \case
     Changed  -> "modified"
     Deleted  -> "removed"
     Inserted -> "added"
@@ -102,7 +102,12 @@ data Dedupe = Dedupe
 --    identifiers) are in the list.
 --    Action: Combine them into a single Replaced entry.
 dedupe :: [(Change, Declaration)] -> [(Change, Declaration)]
-dedupe = map ((change :: Dedupe -> Change) &&& decl) . sortOn index . Map.elems . foldl' go Map.empty . zipWith (uncurry . Dedupe) [0..] where
+dedupe
+  = map ((change :: Dedupe -> Change) &&& decl) -- extract the changes and decls
+  . sortOn index                                -- after sorting
+  . Map.elems                                   -- the elements of the map
+  . foldl' go Map.empty                         -- produced by deduping
+  . zipWith (uncurry . Dedupe) [0..] where      -- the indexed inputs
   go m d@(Dedupe _ _ decl) = let key = dedupeKey decl in case Map.lookup key m of
     Just (Dedupe _ _ similar)
       | similar == decl -> m
