@@ -2,6 +2,7 @@
 module Data.Edit
 ( Edit(..)
 , edit
+, mergeEdit
 ) where
 
 import Data.Bifoldable
@@ -24,6 +25,9 @@ edit delete insert compare = \case
   Delete  a   -> delete a
   Insert    b -> insert b
   Compare a b -> compare a b
+
+mergeEdit :: (a -> a -> a) -> Edit a a -> a
+mergeEdit = edit id id
 
 
 instance Bifunctor Edit where
