@@ -61,10 +61,10 @@ instance Eq2 Patch where
     _ -> False
 
 instance Show2 Patch where
-  liftShowsPrec2 spBefore _ spAfter _ d = \case
-    Delete a -> showsUnaryWith spBefore "Delete" d a
-    Insert b -> showsUnaryWith spAfter "Insert" d b
-    Compare a b -> showsBinaryWith spBefore spAfter "Compare" d a b
+  liftShowsPrec2 spl _ spr _ d = \case
+    Delete a -> showsUnaryWith spl "Delete" d a
+    Insert b -> showsUnaryWith spr "Insert" d b
+    Compare a b -> showsBinaryWith spl spr "Compare" d a b
 
 
 instance (ToJSONFields a, ToJSONFields b) => ToJSONFields (Patch a b) where
