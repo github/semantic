@@ -8,13 +8,13 @@ import Test.Hspec.LeanCheck
 spec :: Spec
 spec = do
   describe "ses" $ do
-    prop "returns equal lists in These" $
+    prop "returns equal lists in Compare" $
       \ as -> (ses (==) as as :: [Edit Char Char]) `shouldBe` zipWith Compare as as
 
-    prop "returns deletions in This" $
+    prop "returns deletions in Delete" $
       \ as -> (ses (==) as [] :: [Edit Char Char]) `shouldBe` fmap Delete as
 
-    prop "returns insertions in That" $
+    prop "returns insertions in Insert" $
       \ bs -> (ses (==) [] bs :: [Edit Char Char]) `shouldBe` fmap Insert bs
 
     prop "returns all elements individually for disjoint inputs" $
