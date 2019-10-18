@@ -122,16 +122,14 @@ runGraph :: ( Member Distribute sig
          -> Project
          -> m (Graph ControlFlowVertex)
 runGraph type' includePackages project
-  | SomeAnalysisParser parser (lang :: Proxy lang) <- someAnalysisParser (Proxy @AnalyzeTerm) (projectLanguage project) = case type' of
-  ImportGraph -> do
+  | SomeAnalysisParser parser (lang :: Proxy lang) <- someAnalysisParser (Proxy @AnalyzeTerm) (projectLanguage project) = do
     let parse = if projectLanguage project == Language.Python then parsePythonPackage parser else fmap (fmap snd) . parsePackage parser
     package <- parse project
-    runImportGraphToModuleInfos lang package
-  CallGraph -> do
-    let parse = if projectLanguage project == Language.Python then parsePythonPackage parser else fmap (fmap snd) . parsePackage parser
-    package <- parse project
-    modules <- topologicalSort <$> runImportGraphToModules lang package
-    runCallGraph lang includePackages modules package
+    case type' of
+      ImportGraph -> runImportGraphToModuleInfos lang package
+      CallGraph -> do
+        modules <- topologicalSort <$> runImportGraphToModules lang package
+        runCallGraph lang includePackages modules package
 
 runCallGraph :: ( AnalyzeTerm term
                 , HasPrelude lang
