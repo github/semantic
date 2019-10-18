@@ -123,8 +123,10 @@ runGraph :: ( Member Distribute sig
          -> m (Graph ControlFlowVertex)
 runGraph type' includePackages project
   | SomeAnalysisParser parser (lang :: Proxy lang) <- someAnalysisParser (Proxy @AnalyzeTerm) (projectLanguage project) = do
-    let parse = if projectLanguage project == Language.Python then parsePythonPackage parser else fmap (fmap snd) . parsePackage parser
-    package <- parse project
+    package <- if projectLanguage project == Language.Python then
+        parsePythonPackage parser project
+      else
+        fmap snd <$> parsePackage parser project
     case type' of
       ImportGraph -> runImportGraphToModuleInfos lang package
       CallGraph -> do
