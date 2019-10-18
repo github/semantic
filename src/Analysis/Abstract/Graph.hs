@@ -70,7 +70,7 @@ graphingTerms :: ( Member (Reader ModuleInfo) sig
                  , Member (Reader (CurrentFrame address)) sig
                  , Member (Reader (CurrentScope address)) sig
                  , Member (Reader ControlFlowVertex) sig
-                 , VertexDeclaration syntax
+                 , VertexDeclaration1 syntax
                  , Declarations1 syntax
                  , Ord address
                  , Foldable syntax

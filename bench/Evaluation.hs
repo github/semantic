@@ -38,7 +38,7 @@ callGraphProject' :: ( Language.SLanguage lang
                      , AccessControls1 syntax
                      , HasPrelude lang
                      , Functor syntax
-                     , VertexDeclaration syntax
+                     , VertexDeclaration1 syntax
                      )
                   => TaskSession
                   -> Proxy lang

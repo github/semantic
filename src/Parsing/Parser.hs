@@ -38,7 +38,7 @@ import           Assigning.Assignment
 import qualified CMarkGFM
 import           Data.Abstract.Evaluatable (HasPrelude)
 import           Data.AST
-import           Data.Graph.ControlFlowVertex (VertexDeclaration)
+import           Data.Graph.ControlFlowVertex (VertexDeclaration1)
 import           Data.Language
 import           Data.Kind (Constraint)
 import qualified Data.Map as Map
@@ -71,7 +71,7 @@ import           TreeSitter.Unmarshal
 -- | A parser, suitable for program analysis, for some specific language, producing 'Term's whose syntax satisfies a list of typeclass constraints.
 data SomeAnalysisParser (constraint :: (* -> *) -> Constraint) ann where
   SomeAnalysisParser :: ( constraint syntax
-                        , VertexDeclaration syntax
+                        , VertexDeclaration1 syntax
                         , HasPrelude lang
                         )
                      => Parser (Term syntax ann)

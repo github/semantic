@@ -52,7 +52,7 @@ import           Data.Abstract.Value.Type as Type
 import           Data.Abstract.AccessControls.Instances ()
 import           Data.Blob
 import           Data.Graph
-import           Data.Graph.ControlFlowVertex (VertexDeclaration)
+import           Data.Graph.ControlFlowVertex (VertexDeclaration1)
 import           Data.Language as Language
 import           Data.List (isPrefixOf, isSuffixOf)
 import           Data.Project
@@ -118,7 +118,7 @@ runGraph CallGraph includePackages project
     modules <- topologicalSort <$> runImportGraphToModules lang package
     runCallGraph lang includePackages modules package
 
-runCallGraph :: ( VertexDeclaration syntax
+runCallGraph :: ( VertexDeclaration1 syntax
                 , Declarations1 syntax
                 , AccessControls1 syntax
                 , Ord1 syntax
