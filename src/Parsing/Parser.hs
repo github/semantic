@@ -77,7 +77,7 @@ data Parser term where
   MarkdownParser :: Parser (AST (TermF [] CMarkGFM.NodeType) Markdown.Grammar)
 
 
-goParser :: Parser Go.Term
+goParser :: Parser (Go.Term Loc)
 goParser = AssignmentParser (ASTParser tree_sitter_go) Go.assignment
 
 rubyParser :: Parser (Ruby.Term Loc)
