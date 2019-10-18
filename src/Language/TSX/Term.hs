@@ -8,6 +8,7 @@ module Language.TSX.Term
 import Data.Abstract.Declarations
 import Data.Bifoldable
 import Data.Bifunctor
+import Data.Functor.Foldable
 import Data.Sum (Sum)
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
@@ -201,3 +202,8 @@ newtype Diff ann1 ann2 = Diff { getDiff :: Diff.Diff (Sum Syntax) ann1 ann2 }
 instance DiffTerms Term where
   type DiffFor Term = Diff
   diffTermPair = Diff . diffTermPair . bimap getTerm getTerm
+
+type instance Base (Term ann) = Term.TermF (Sum Syntax) ann
+
+instance Recursive (Term ann) where
+  project = fmap Term . project . getTerm
