@@ -20,17 +20,14 @@ import           Algebra.Graph.Export.Dot hiding (vertexName)
 import           Control.Abstract hiding (Function(..))
 import           Control.Effect.Carrier
 import           Data.Abstract.BaseError
-import           Data.Abstract.Declarations
 import           Data.Abstract.Module (Module (moduleInfo), ModuleInfo (..))
 import           Data.Abstract.Package (PackageInfo (..))
 import           Data.ByteString.Builder
 import           Data.Graph
 import           Data.Graph.ControlFlowVertex
-import           Data.Term
 import qualified Data.Map as Map
 import qualified Data.Text.Encoding as T
 import           Prologue
-import           Source.Loc
 
 style :: Style ControlFlowVertex Builder
 style = (defaultStyle (T.encodeUtf8Builder . vertexIdentifier))
@@ -70,12 +67,11 @@ graphingTerms :: ( Member (Reader ModuleInfo) sig
                  , Member (Reader (CurrentFrame address)) sig
                  , Member (Reader (CurrentScope address)) sig
                  , Member (Reader ControlFlowVertex) sig
-                 , VertexDeclaration1 syntax
-                 , Declarations1 syntax
+                 , VertexDeclaration term
                  , Ord address
                  , Carrier sig m
                  )
-              => Open (Term syntax Loc -> Evaluator (Term syntax Loc) address value m a)
+              => Open (term -> Evaluator term address value m a)
 graphingTerms recur term = do
   definedInModule <- currentModule
   case toVertex definedInModule term of
