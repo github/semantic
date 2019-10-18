@@ -6,10 +6,15 @@ module Data.Patch
 , edit
 ) where
 
-import Prologue
 import Data.Aeson
 import Data.Align
+import Data.Bifoldable
+import Data.Bifunctor
+import Data.Bitraversable
+import Data.Functor.Classes
 import Data.JSON.Fields
+import Data.These
+import GHC.Generics (Generic, Generic1)
 
 -- | An operation to compare, insert, or delete an item.
 data Patch a b
