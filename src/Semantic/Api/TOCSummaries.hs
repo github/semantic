@@ -18,6 +18,7 @@ import           Control.Monad.IO.Class
 import           Data.Aeson
 import           Data.Blob
 import           Data.ByteString.Builder
+import           Data.Edit as Edit
 import           Data.Either (partitionEithers)
 import           Data.Function (on)
 import           Data.Functor.Classes
@@ -130,9 +131,9 @@ instance Tagging.ToTags t => SummarizeDiff (ViaTags t) where
     compare = liftA2 (&&) <$> ((==) `on` Tag.kind) <*> ((==) `on` Tag.name)
 
     toChange = \case
-      SES.Delete tag -> (Deleted,)  <$> toDecl tag
-      SES.Insert tag -> (Inserted,) <$> toDecl tag
-      SES.Compare t1 t2
+      Edit.Delete tag -> (Deleted,)  <$> toDecl tag
+      Edit.Insert tag -> (Inserted,) <$> toDecl tag
+      Edit.Compare t1 t2
         | Source.slice s1 (byteRange (Tag.loc t1)) /= Source.slice s2 (byteRange (Tag.loc t2))
                      -> (Changed,) <$> toDecl t2
         | otherwise  -> Nothing

@@ -16,6 +16,7 @@ module Diffing.Algorithm.RWS
 
 import Control.Monad.State.Strict
 import Data.Diff (DiffF(..), comparing, deleting, inserting, merge)
+import Data.Edit
 import qualified Data.KdMap.Static as KdMap
 import Data.List (sortOn)
 import Data.Term as Term

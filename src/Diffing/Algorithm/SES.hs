@@ -1,29 +1,15 @@
 {-# LANGUAGE BangPatterns, GADTs, LambdaCase, MultiParamTypeClasses, ScopedTypeVariables #-}
 module Diffing.Algorithm.SES
-( Edit(..)
-, toThese
+( toThese
 , ses
 ) where
 
 import Data.Array ((!))
 import qualified Data.Array as Array
-import Data.Bifunctor
+import Data.Edit
 import Data.Foldable (find, toList)
 import Data.Ix
 import Data.These
-
--- | An edit script, i.e. a sequence of changes/copies of elements.
-data Edit a b
-  = Delete a
-  | Insert b
-  | Compare a b
-  deriving (Eq, Functor, Ord, Show)
-
-instance Bifunctor Edit where
-  bimap f g = \case
-    Delete a -> Delete (f a)
-    Insert b -> Insert (g b)
-    Compare a b -> Compare (f a) (g b)
 
 toThese :: Edit a b -> These a b
 toThese = \case
