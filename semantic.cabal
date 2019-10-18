@@ -206,6 +206,7 @@ library
                      , Language.PHP.Term
                      , Language.Python.Assignment
                      , Language.Python.Syntax
+                     , Language.Python.Term
                      , Numeric.Exts
                      -- Parser glue
                      , Parsing.CMark

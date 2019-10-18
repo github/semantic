@@ -43,6 +43,7 @@ import qualified Language.Java as Java
 import qualified Language.JSON as JSON
 import qualified Language.PHP.Term as PHP
 import qualified Language.Python as PythonPrecise
+import qualified Language.Python.Term as PythonALaCarte
 import qualified Language.TSX.Term as TSX
 import qualified Language.TypeScript.Term as TypeScript
 
@@ -121,6 +122,7 @@ instance ShowTerm PythonPrecise.Term where
   showTerm = serialize Show . void . PythonPrecise.getTerm
 
 deriving instance ShowTerm PHP.Term
+deriving instance ShowTerm PythonALaCarte.Term
 deriving instance ShowTerm TSX.Term
 deriving instance ShowTerm TypeScript.Term
 
@@ -144,6 +146,7 @@ instance SExprTerm PythonPrecise.Term where
   sexprTerm = SExpr.Precise.serializeSExpression . PythonPrecise.getTerm
 
 deriving instance SExprTerm PHP.Term
+deriving instance SExprTerm PythonALaCarte.Term
 deriving instance SExprTerm TSX.Term
 deriving instance SExprTerm TypeScript.Term
 
@@ -158,6 +161,7 @@ instance (ConstructorName syntax, Foldable syntax, Functor syntax) => DOTGraphTe
   dotGraphTerm = serialize (DOT (termStyle "terms")) . renderTreeGraph
 
 deriving instance DOTGraphTerm PHP.Term
+deriving instance DOTGraphTerm PythonALaCarte.Term
 deriving instance DOTGraphTerm TSX.Term
 deriving instance DOTGraphTerm TypeScript.Term
 
@@ -172,6 +176,7 @@ instance ToJSONFields1 syntax => JSONTreeTerm (Term syntax) where
   jsonTreeTerm = renderJSONTerm
 
 deriving instance JSONTreeTerm PHP.Term
+deriving instance JSONTreeTerm PythonALaCarte.Term
 deriving instance JSONTreeTerm TSX.Term
 deriving instance JSONTreeTerm TypeScript.Term
 
@@ -196,5 +201,6 @@ instance (Foldable syntax, Functor syntax, ConstructorName syntax) => JSONGraphT
           & P.errors .~ mempty
 
 deriving instance JSONGraphTerm PHP.Term
+deriving instance JSONGraphTerm PythonALaCarte.Term
 deriving instance JSONGraphTerm TSX.Term
 deriving instance JSONGraphTerm TypeScript.Term

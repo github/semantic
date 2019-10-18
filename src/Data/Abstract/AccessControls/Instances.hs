@@ -20,6 +20,7 @@ import qualified Language.Markdown.Syntax as Markdown
 import qualified Language.PHP.Syntax as PHP
 import qualified Language.PHP.Term as PHP
 import qualified Language.Python.Syntax as Python
+import qualified Language.Python.Term as Python
 import qualified Language.Ruby.Syntax as Ruby
 import qualified Language.TSX.Syntax as TSX
 import qualified Language.TSX.Term as TSX
@@ -29,6 +30,7 @@ import Data.Quieterm
 
 deriving instance AccessControls1 syntax => AccessControls (Term syntax ann)
 deriving instance AccessControls (PHP.Term ann)
+deriving instance AccessControls (Python.Term ann)
 deriving instance AccessControls (TSX.Term ann)
 deriving instance AccessControls (TypeScript.Term ann)
 

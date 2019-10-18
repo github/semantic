@@ -20,6 +20,7 @@ import qualified Language.Java as Java
 import qualified Language.JSON as JSON
 import qualified Language.PHP.Term as PHP
 import qualified Language.Python as PythonPrecise
+import qualified Language.Python.Term as PythonALaCarte
 import qualified Language.TSX.Term as TSX
 import qualified Language.TypeScript.Term as TypeScript
 import qualified Parsing.Parser as Parser
@@ -115,6 +116,7 @@ instance IsTaggable syntax => ToTags (Term syntax) where
   tags = runTagging
 
 deriving instance ToTags PHP.Term
+deriving instance ToTags PythonALaCarte.Term
 deriving instance ToTags TSX.Term
 deriving instance ToTags TypeScript.Term
 

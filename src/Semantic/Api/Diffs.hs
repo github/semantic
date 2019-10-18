@@ -31,6 +31,7 @@ import qualified Data.Text as T
 import           Diffing.Algorithm (Diffable)
 import           Diffing.Interpreter (DiffTerms(..))
 import qualified Language.PHP.Term as PHP
+import qualified Language.Python.Term as Python
 import qualified Language.TSX.Term as TSX
 import qualified Language.TypeScript.Term as TypeScript
 import           Parsing.Parser
@@ -102,6 +103,7 @@ instance (ConstructorName syntax, Diffable syntax, Eq1 syntax, Hashable1 syntax,
   dotGraphDiff = serialize (DOT (diffStyle "diffs")) . renderTreeGraph
 
 deriving instance DOTGraphDiff PHP.Term
+deriving instance DOTGraphDiff Python.Term
 deriving instance DOTGraphDiff TSX.Term
 deriving instance DOTGraphDiff TypeScript.Term
 
@@ -126,6 +128,7 @@ instance (ConstructorName syntax, Diffable syntax, Eq1 syntax, Hashable1 syntax,
            & P.errors .~ mempty
 
 deriving instance JSONGraphDiff PHP.Term
+deriving instance JSONGraphDiff Python.Term
 deriving instance JSONGraphDiff TSX.Term
 deriving instance JSONGraphDiff TypeScript.Term
 
@@ -140,6 +143,7 @@ instance (Diffable syntax, Eq1 syntax, Hashable1 syntax, ToJSONFields1 syntax, T
   jsonTreeDiff = renderJSONDiff
 
 deriving instance JSONTreeDiff PHP.Term
+deriving instance JSONTreeDiff Python.Term
 deriving instance JSONTreeDiff TSX.Term
 deriving instance JSONTreeDiff TypeScript.Term
 
@@ -154,6 +158,7 @@ instance (ConstructorName syntax, Diffable syntax, Eq1 syntax, Hashable1 syntax,
   sexprDiff = serialize (SExpression ByConstructorName)
 
 deriving instance SExprDiff PHP.Term
+deriving instance SExprDiff Python.Term
 deriving instance SExprDiff TSX.Term
 deriving instance SExprDiff TypeScript.Term
 
@@ -168,6 +173,7 @@ instance (Diffable syntax, Eq1 syntax, Hashable1 syntax, Show1 syntax, Traversab
   showDiff = serialize Show
 
 deriving instance ShowDiff PHP.Term
+deriving instance ShowDiff Python.Term
 deriving instance ShowDiff TSX.Term
 deriving instance ShowDiff TypeScript.Term
 
@@ -184,6 +190,7 @@ instance (Diffable syntax, Eq1 syntax, HasDeclaration syntax, Hashable1 syntax, 
   summarizeDiff = diffTOC
 
 deriving instance SummarizeDiff PHP.Term
+deriving instance SummarizeDiff Python.Term
 deriving instance SummarizeDiff TSX.Term
 deriving instance SummarizeDiff TypeScript.Term
 

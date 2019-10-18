@@ -2,9 +2,9 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-} -- FIXME
 module Language.Python.Assignment
 ( assignment
-, Syntax
+, Python.Syntax
 , Grammar
-, Term
+, Python.Term
 ) where
 
 import           Assigning.Assignment hiding (Assignment, Error)
@@ -33,97 +33,16 @@ import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
 import           Language.Python.Syntax as Python.Syntax
+import qualified Language.Python.Term as Python
 import           Prologue
 import           TreeSitter.Python as Grammar
 
-
--- | The type of Python syntax.
-type Syntax =
-  '[ Comment.Comment
-   , Declaration.Class
-   , Declaration.Comprehension
-   , Declaration.Decorator
-   , Declaration.Function
-   , Declaration.RequiredParameter
-   , Expression.Plus
-   , Expression.Minus
-   , Expression.Times
-   , Expression.DividedBy
-   , Expression.Modulo
-   , Expression.Power
-   , Expression.Negate
-   , Expression.FloorDivision
-   , Expression.And
-   , Expression.Not
-   , Expression.Or
-   , Expression.XOr
-   , Expression.BAnd
-   , Expression.BOr
-   , Expression.BXOr
-   , Expression.LShift
-   , Expression.RShift
-   , Expression.Complement
-   , Expression.Call
-   , Expression.LessThan
-   , Expression.LessThanEqual
-   , Expression.GreaterThan
-   , Expression.GreaterThanEqual
-   , Expression.Equal
-   , Expression.StrictEqual
-   , Expression.Comparison
-   , Expression.Enumeration
-   , Expression.ScopeResolution
-   , Expression.MemberAccess
-   , Expression.Subscript
-   , Expression.Member
-   , Literal.Array
-   , Literal.Boolean
-   , Literal.Float
-   , Literal.Hash
-   , Literal.Integer
-   , Literal.KeyValue
-   , Literal.Null
-   , Literal.Set
-   , Literal.String
-   , Literal.TextElement
-   , Literal.Tuple
-   , Python.Syntax.Alias
-   , Python.Syntax.Ellipsis
-   , Python.Syntax.FutureImport
-   , Python.Syntax.Import
-   , Python.Syntax.QualifiedImport
-   , Python.Syntax.QualifiedAliasedImport
-   , Python.Syntax.Redirect
-   , Statement.Assignment
-   , Statement.Break
-   , Statement.Catch
-   , Statement.Continue
-   , Statement.Else
-   , Statement.Finally
-   , Statement.ForEach
-   , Statement.If
-   , Statement.Let
-   , Statement.NoOp
-   , Statement.Return
-   , Statement.Statements
-   , Statement.Throw
-   , Statement.Try
-   , Statement.While
-   , Statement.Yield
-   , Syntax.Context
-   , Syntax.Empty
-   , Syntax.Error
-   , Syntax.Identifier
-   , Type.Annotation
-   , []
-   ]
-
-type Term = Term.Term (Sum Syntax)
+type Term = Term.Term (Sum Python.Syntax)
 type Assignment = Assignment.Assignment [] Grammar
 
 -- | Assignment from AST in Python's grammar onto a program in Python's syntax.
-assignment :: Assignment (Term Loc)
-assignment = handleError $ makeTerm <$> symbol Module <*> children (Statement.Statements <$> manyTerm expression) <|> parseError
+assignment :: Assignment (Python.Term Loc)
+assignment = fmap Python.Term . handleError $ makeTerm <$> symbol Module <*> children (Statement.Statements <$> manyTerm expression) <|> parseError
 
 expression :: Assignment (Term Loc)
 expression = handleError (choice expressionChoices)
@@ -371,7 +290,7 @@ assignment' =  makeAssignment <$> symbol Assignment <*> children ((,,) <$> term 
                   ])
   where rvalue = expressionList <|> assignment' <|> yield <|> emptyTerm
         makeAssignment loc (lhs, maybeType, rhs) = makeTerm loc (Statement.Assignment (maybeToList maybeType) lhs rhs)
-        assign :: (f :< Syntax) => (Term Loc -> Term Loc -> f (Term Loc)) -> Term Loc -> Term Loc -> Sum Syntax (Term Loc)
+        assign :: (f :< Python.Syntax) => (Term Loc -> Term Loc -> f (Term Loc)) -> Term Loc -> Term Loc -> Sum Python.Syntax (Term Loc)
         assign c l r = inject (Statement.Assignment [] l (makeTerm1 (c l r)))
 
 yield :: Assignment (Term Loc)
@@ -554,6 +473,6 @@ manyTermsTill step end = manyTill (step <|> comment) end
 -- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
 infixTerm :: Assignment (Term Loc)
           -> Assignment (Term Loc)
-          -> [Assignment (Term Loc -> Term Loc -> Sum Syntax (Term Loc))]
-          -> Assignment (Sum Syntax (Term Loc))
+          -> [Assignment (Term Loc -> Term Loc -> Sum Python.Syntax (Term Loc))]
+          -> Assignment (Sum Python.Syntax (Term Loc))
 infixTerm = infixContext comment
