@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, MonoLocalBinds, RankNTypes #-}
+{-# LANGUAGE ConstraintKinds, GeneralizedNewtypeDeriving, MonoLocalBinds, RankNTypes, StandaloneDeriving #-}
 module Semantic.Api.Terms
   ( termGraph
   , parseTermBuilder
@@ -42,6 +42,7 @@ import           Source.Loc
 import qualified Language.Java as Java
 import qualified Language.JSON as JSON
 import qualified Language.Python as Python
+import qualified Language.TSX.Term as TSX
 
 
 termGraph :: (Traversable t, Member Distribute sig, ParseEffects sig m) => t Blob -> m ParseTreeGraphResponse
@@ -117,6 +118,8 @@ instance ShowTerm JSON.Term where
 instance ShowTerm Python.Term where
   showTerm = serialize Show . void . Python.getTerm
 
+deriving instance ShowTerm TSX.Term
+
 
 sexprTermParsers :: PerLanguageModes -> Map Language (SomeParser SExprTerm Loc)
 sexprTermParsers = allParsers
@@ -136,6 +139,8 @@ instance SExprTerm JSON.Term where
 instance SExprTerm Python.Term where
   sexprTerm = SExpr.Precise.serializeSExpression . Python.getTerm
 
+deriving instance SExprTerm TSX.Term
+
 
 dotGraphTermParsers :: Map Language (SomeParser DOTGraphTerm Loc)
 dotGraphTermParsers = aLaCarteParsers
@@ -146,6 +151,8 @@ class DOTGraphTerm term where
 instance (ConstructorName syntax, Foldable syntax, Functor syntax) => DOTGraphTerm (Term syntax) where
   dotGraphTerm = serialize (DOT (termStyle "terms")) . renderTreeGraph
 
+deriving instance DOTGraphTerm TSX.Term
+
 
 jsonTreeTermParsers :: Map Language (SomeParser JSONTreeTerm Loc)
 jsonTreeTermParsers = aLaCarteParsers
@@ -155,6 +162,8 @@ class JSONTreeTerm term where
 
 instance ToJSONFields1 syntax => JSONTreeTerm (Term syntax) where
   jsonTreeTerm = renderJSONTerm
+
+deriving instance JSONTreeTerm TSX.Term
 
 
 jsonGraphTermParsers :: Map Language (SomeParser JSONGraphTerm Loc)
@@ -175,3 +184,5 @@ instance (Foldable syntax, Functor syntax, ConstructorName syntax) => JSONGraphT
           & P.vertices .~ vertexList graph
           & P.edges .~ fmap toEdge (edgeList graph)
           & P.errors .~ mempty
+
+deriving instance JSONGraphTerm TSX.Term
