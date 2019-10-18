@@ -21,7 +21,7 @@ data Edit a b
   deriving (Eq, Foldable, Functor, Generic, Generic1, Ord, Show, Traversable)
 
 
--- | Return both sides of an edit.
+-- | Eliminate an 'Edit' by case analysis.
 edit :: (l -> a) -> (r -> a) -> (l -> r -> a) -> Edit l r -> a
 edit delete insert compare = \case
   Delete  a   -> delete a
