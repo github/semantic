@@ -1,3 +1,4 @@
+{-# LANGUAGE LambdaCase #-}
 module Data.Patch
 ( Patch(..)
 , after
@@ -34,24 +35,28 @@ patch _ _ ifReplace (Compare a b) = ifReplace a b
 
 
 instance Bifunctor Patch where
-  bimap f _ (Delete a) = Delete (f a)
-  bimap _ g (Insert b) = Insert (g b)
-  bimap f g (Compare a b) = Compare (f a) (g b)
+  bimap f g = \case
+    Delete  a   -> Delete (f a)
+    Insert    b -> Insert (g b)
+    Compare a b -> Compare (f a) (g b)
 
 instance Bifoldable Patch where
-  bifoldMap f _ (Delete a) = f a
-  bifoldMap _ g (Insert b) = g b
-  bifoldMap f g (Compare a b) = f a `mappend` g b
+  bifoldMap f g = \case
+    Delete  a   -> f a
+    Insert    b -> g b
+    Compare a b -> f a <> g b
 
 instance Bitraversable Patch where
-  bitraverse f _ (Delete a) = Delete <$> f a
-  bitraverse _ g (Insert b) = Insert <$> g b
-  bitraverse f g (Compare a b) = Compare <$> f a <*> g b
+  bitraverse f g = \case
+    Delete  a   -> Delete <$> f a
+    Insert    b -> Insert <$> g b
+    Compare a b -> Compare <$> f a <*> g b
 
 instance Bicrosswalk Patch where
-  bicrosswalk f _ (Delete a) = Delete <$> f a
-  bicrosswalk _ g (Insert b) = Insert <$> g b
-  bicrosswalk f g (Compare a b) = alignWith (these Delete Insert Compare) (f a) (g b)
+  bicrosswalk f g = \case
+    Delete  a   -> Delete <$> f a
+    Insert    b -> Insert <$> g b
+    Compare a b -> alignWith (these Delete Insert Compare) (f a) (g b)
 
 instance Eq2 Patch where
   liftEq2 eqBefore eqAfter p1 p2 = case (p1, p2) of
@@ -61,7 +66,7 @@ instance Eq2 Patch where
     _ -> False
 
 instance Show2 Patch where
-  liftShowsPrec2 spBefore _ spAfter _ d p = case p of
+  liftShowsPrec2 spBefore _ spAfter _ d = \case
     Delete a -> showsUnaryWith spBefore "Delete" d a
     Insert b -> showsUnaryWith spAfter "Insert" d b
     Compare a b -> showsBinaryWith spBefore spAfter "Compare" d a b
