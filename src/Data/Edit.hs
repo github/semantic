@@ -13,7 +13,7 @@ import Data.Bitraversable
 import Data.Functor.Classes
 import GHC.Generics (Generic, Generic1)
 
--- | An operation to compare, insert, or delete an item.
+-- | The deletion, insertion, or comparison of values.
 data Edit a b
   = Delete a
   | Insert b
@@ -21,7 +21,7 @@ data Edit a b
   deriving (Eq, Foldable, Functor, Generic, Generic1, Ord, Show, Traversable)
 
 
--- | Return both sides of a patch.
+-- | Return both sides of an edit.
 edit :: (l -> a) -> (r -> a) -> (l -> r -> a) -> Edit l r -> a
 edit delete insert compare = \case
   Delete  a   -> delete a
