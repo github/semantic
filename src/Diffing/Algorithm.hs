@@ -6,6 +6,7 @@ module Diffing.Algorithm
   , Equivalence (..)
   , diff
   , diffThese
+  , diffEdit
   , diffMaybe
   , linearly
   , byReplacing
@@ -17,6 +18,7 @@ module Diffing.Algorithm
 import Control.Effect.Carrier hiding ((:+:))
 import Control.Effect.NonDet
 import qualified Data.Diff as Diff
+import qualified Data.Edit as Edit
 import Data.Sum
 import Data.Term
 import GHC.Generics
@@ -56,6 +58,10 @@ diff a1 a2 = send (Diff a1 a2 pure)
 -- | Diff a These of terms without specifying the algorithm to be used.
 diffThese :: (Carrier sig m, Member (Diff term1 term2 diff) sig) => These term1 term2 -> Algorithm term1 term2 diff m diff
 diffThese = these byDeleting byInserting diff
+
+-- | Diff an 'Edit' of terms without specifying the algorithm to be used.
+diffEdit :: (Carrier sig m, Member (Diff term1 term2 diff) sig) => Edit.Edit term1 term2 -> Algorithm term1 term2 diff m diff
+diffEdit = Edit.edit byDeleting byInserting diff
 
 -- | Diff a pair of optional terms without specifying the algorithm to be used.
 diffMaybe :: (Carrier sig m, Member (Diff term1 term2 diff) sig) => Maybe term1 -> Maybe term2 -> Algorithm term1 term2 diff m (Maybe diff)
