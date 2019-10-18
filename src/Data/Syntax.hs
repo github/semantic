@@ -72,11 +72,11 @@ contextualize context rule = make <$> Assignment.manyThrough context rule
           _ -> node
 
 -- | Match context terms after a subject term and before a delimiter, returning the delimiter paired with a Context term if any context terms matched, or the subject term otherwise.
-postContextualizeThrough :: (HasCallStack, Context :< syntaxes, Alternative m, Semigroup ann, Apply Foldable syntaxes)
-                         => m (Term (Sum syntaxes) ann)
-                         -> m (Term (Sum syntaxes) ann)
+postContextualizeThrough :: (HasCallStack, Context :< syntaxes, Sum syntaxes ~ Syntax term, Alternative m, Semigroup ann, Apply Foldable syntaxes, IsTerm term)
+                         => m (term ann)
+                         -> m (term ann)
                          -> m delimiter
-                         -> m (Term (Sum syntaxes) ann, delimiter)
+                         -> m (term ann, delimiter)
 postContextualizeThrough context rule end = make <$> rule <*> Assignment.manyThrough context end
   where make node (cs, end) = case nonEmpty cs of
           Just cs -> (makeTerm1 (Context cs node), end)
