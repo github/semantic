@@ -26,7 +26,7 @@ parseAST = SemanticAST
     ( long "format"
     <> help "Specify desired output: show, json, sexpression" )
   <*> switch
-    ( long "color"
+    ( long "no-color"
     <> help "Print with color: --color"
     )
   <*> (Left <$> strOption
