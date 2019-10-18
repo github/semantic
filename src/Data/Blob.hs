@@ -119,7 +119,7 @@ maybeBlobPair a b = case (a, b) of
   _                 -> Prologue.fail "expected file pair with content on at least one side"
 
 languageForBlobPair :: BlobPair -> Language
-languageForBlobPair = mergeEditWith blobLanguage blobLanguage combine where
+languageForBlobPair = mergeEdit combine . bimap blobLanguage blobLanguage where
   combine a b
     | a == Unknown || b == Unknown = Unknown
     | otherwise                    = b
@@ -132,7 +132,7 @@ languageTagForBlobPair pair = showLanguage (languageForBlobPair pair)
   where showLanguage = pure . (,) "language" . show
 
 pathKeyForBlobPair :: BlobPair -> FilePath
-pathKeyForBlobPair = mergeEditWith blobPath blobPath combine where
+pathKeyForBlobPair = mergeEdit combine . bimap blobPath blobPath where
    combine before after | before == after = after
                         | otherwise       = before <> " -> " <> after
 

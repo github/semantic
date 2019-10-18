@@ -3,7 +3,6 @@ module Data.Edit
 ( Edit(..)
 , edit
 , mergeEdit
-, mergeEditWith
 ) where
 
 import Control.Applicative (liftA2)
@@ -31,9 +30,6 @@ edit delete insert compare = \case
 -- | Extract the values from an 'Edit', combining 'Compare's with the passed function.
 mergeEdit :: (a -> a -> a) -> Edit a a -> a
 mergeEdit = edit id id
-
-mergeEditWith :: (l -> a) -> (r -> a) -> (a -> a -> a) -> Edit l r -> a
-mergeEditWith f g h = mergeEdit h . bimap f g
 
 
 instance Bifunctor Edit where
