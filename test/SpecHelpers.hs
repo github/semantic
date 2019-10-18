@@ -105,8 +105,7 @@ runParseWithConfig task = asks configTreeSitterParseTimeout >>= \ timeout -> run
 
 -- | Read two files to a BlobPair.
 readFilePathPair :: Both Path.RelFile -> IO BlobPair
-readFilePathPair paths = let paths' = fmap fileForTypedPath paths in
-                     runBothWith readFilePair paths'
+readFilePathPair = runBothWith readFilePair . fmap fileForTypedPath
 
 parseTestFile :: Parser term -> Path.RelFile -> IO (Blob, term)
 parseTestFile parser path = runTaskOrDie $ do
