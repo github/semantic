@@ -197,7 +197,7 @@ type Syntax =
 
 
 newtype Term ann = Term { getTerm :: Term.Term (Sum Syntax) ann }
-  deriving (Declarations, Foldable, FreeVariables, Functor, Syntax.HasErrors, Traversable)
+  deriving (Eq, Declarations, Foldable, FreeVariables, Functor, Syntax.HasErrors, Ord, Show, Traversable)
 
 newtype Diff ann1 ann2 = Diff { getDiff :: Diff.Diff (Sum Syntax) ann1 ann2 }
   deriving (Bifoldable, Bifunctor)
