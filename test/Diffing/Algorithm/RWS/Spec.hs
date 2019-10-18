@@ -31,7 +31,7 @@ spec = do
       \ (as, bs) -> let tas = decorate <$> (as :: [Term ListableSyntax ()])
                         tbs = decorate <$> (bs :: [Term ListableSyntax ()])
                         wrap = termIn emptyAnnotation . inject
-                        diff = merge (emptyAnnotation, emptyAnnotation) (inject (stripDiff . diffThese . toThese <$> rws comparableTerms (equalTerms comparableTerms) tas tbs)) in
+                        diff = merge (emptyAnnotation, emptyAnnotation) (inject (stripDiff . diffEdit <$> rws comparableTerms (equalTerms comparableTerms) tas tbs)) in
         (beforeTerm diff, afterTerm diff) `shouldBe` (Just (wrap (stripTerm <$> tas)), Just (wrap (stripTerm <$> tbs)))
 
     it "produces unbiased insertions within branches" $
