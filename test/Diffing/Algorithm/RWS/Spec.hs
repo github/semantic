@@ -40,8 +40,6 @@ spec = do
 
   where decorate = defaultFeatureVectorDecorator
 
-        diffThese = these deleting inserting comparing
-
 stripTerm :: Functor f => Term f (FeatureVector, ()) -> Term f ()
 stripTerm = fmap snd
 
