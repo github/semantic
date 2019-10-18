@@ -20,15 +20,15 @@ data Patch a b
 
 
 -- | Return the item from the after side of the patch.
-after :: Patch before after -> Maybe after
+after :: Patch l r -> Maybe r
 after = patch (const Nothing) Just (\ _ b -> Just b)
 
 -- | Return the item from the before side of the patch.
-before :: Patch before after -> Maybe before
+before :: Patch l r -> Maybe l
 before = patch Just (const Nothing) (\ a _ -> Just a)
 
 -- | Return both sides of a patch.
-patch :: (before -> result) -> (after -> result) -> (before -> after -> result) -> Patch before after -> result
+patch :: (l -> a) -> (r -> a) -> (l -> r -> a) -> Patch l r -> a
 patch delete insert compare = \case
   Delete  a   -> delete a
   Insert    b -> insert b
