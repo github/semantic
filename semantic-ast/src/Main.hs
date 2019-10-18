@@ -12,6 +12,7 @@ import Data.ByteString (pack, readFile, ByteString)
 import System.IO (FilePath)
 import Options.Applicative hiding (style)
 import Data.Semigroup ((<>))
+import Text.Pretty.Simple (pPrint)
 
 data SemanticAST = SemanticAST
   { format :: Format
@@ -46,7 +47,7 @@ generateAST (SemanticAST format source) = do
   ast <- parseByteString @TreeSitter.Python.AST.Module @(Range, Span) tree_sitter_python bytestring
   case format of
     Show -> print ast
-
+    Pretty -> pPrint ast
 
 opts :: ParserInfo SemanticAST
 opts = info (parseAST <**> helper)
