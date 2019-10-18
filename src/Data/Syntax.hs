@@ -49,7 +49,7 @@ makeTerm1' syntax = case toList syntax of
   _ -> error "makeTerm1': empty structure"
 
 -- | Construct an empty term at the current position.
-emptyTerm :: (HasCallStack, Empty :< syntaxes, Apply Foldable syntaxes) => Assignment.Assignment ast grammar (Term (Sum syntaxes) Loc)
+emptyTerm :: (HasCallStack, Empty :< syntaxes, Sum syntaxes ~ Syntax term, Apply Foldable syntaxes, IsTerm term) => Assignment.Assignment ast grammar (term Loc)
 emptyTerm = makeTerm . startLocation <$> Assignment.location <*> pure Empty
   where startLocation Loc{..} = Loc (Range.point (Range.start byteRange)) (Span.point (Span.start span))
 
