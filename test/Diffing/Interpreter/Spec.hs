@@ -3,7 +3,6 @@ module Diffing.Interpreter.Spec (spec, afterTerm, beforeTerm) where
 
 import Control.Applicative ((<|>))
 import Data.Diff
-import Data.Edit (edit)
 import Data.Foldable (asum)
 import Data.Functor.Foldable (cata)
 import Data.Functor.Listable
@@ -18,7 +17,7 @@ import Test.Hspec (Spec, describe, it)
 import Test.Hspec.Expectations
 import Test.Hspec.LeanCheck
 import Test.LeanCheck.Core
-import SpecHelpers ()
+import SpecHelpers (edit)
 
 spec :: Spec
 spec = do

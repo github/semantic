@@ -61,6 +61,7 @@ import Debug.Trace as X (traceShowM, traceM)
 
 import Data.ByteString as X (ByteString)
 import Data.Functor.Both as X (Both (Both), runBothWith)
+import Data.Edit as X
 import Data.Maybe as X
 import Data.Monoid as X (Monoid(..), First(..), Last(..))
 import Data.Semigroup as X (Semigroup(..))

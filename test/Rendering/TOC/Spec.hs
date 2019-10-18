@@ -7,7 +7,6 @@ import Control.Effect.Reader
 import Data.Aeson hiding (defaultOptions)
 import Data.Bifunctor
 import Data.Diff
-import Data.Edit
 import Data.Either (isRight)
 import Data.Sum
 import Data.Term
