@@ -140,57 +140,57 @@ pythonParserPrecise = UnmarshalParser PrecisePython.tree_sitter_python
 data SomeParser c a where
   SomeParser :: c t => Parser (t a) -> SomeParser c a
 
-goParser' :: c (Term (Sum Go.Syntax)) => (Language, SomeParser c Loc)
+goParser' :: c Go.Term => (Language, SomeParser c Loc)
 goParser' = (Go, SomeParser goParser)
 
 javaParser' :: c PreciseJava.Term => (Language, SomeParser c Loc)
 javaParser' = (Java, SomeParser javaParserPrecise)
 
-javascriptParser' :: c (Term (Sum TSX.Syntax)) => (Language, SomeParser c Loc)
+javascriptParser' :: c TSX.Term => (Language, SomeParser c Loc)
 javascriptParser' = (JavaScript, SomeParser tsxParser)
 
 jsonParserPrecise' :: c PreciseJSON.Term => (Language, SomeParser c Loc)
 jsonParserPrecise' = (JSON, SomeParser jsonParserPrecise)
 
-jsxParser' :: c (Term (Sum TSX.Syntax)) => (Language, SomeParser c Loc)
+jsxParser' :: c TSX.Term => (Language, SomeParser c Loc)
 jsxParser' = (JSX, SomeParser tsxParser)
 
-markdownParser' :: c (Term (Sum Markdown.Syntax)) => (Language, SomeParser c Loc)
+markdownParser' :: c Markdown.Term => (Language, SomeParser c Loc)
 markdownParser' = (Markdown, SomeParser markdownParser)
 
-phpParser' :: c (Term (Sum PHP.Syntax)) => (Language, SomeParser c Loc)
+phpParser' :: c PHP.Term => (Language, SomeParser c Loc)
 phpParser' = (PHP, SomeParser phpParser)
 
-pythonParserALaCarte' :: c (Term (Sum Python.Syntax)) => (Language, SomeParser c Loc)
+pythonParserALaCarte' :: c Python.Term => (Language, SomeParser c Loc)
 pythonParserALaCarte' = (Python, SomeParser pythonParser)
 
 pythonParserPrecise' :: c PrecisePython.Term => (Language, SomeParser c Loc)
 pythonParserPrecise' = (Python, SomeParser pythonParserPrecise)
 
-pythonParser' :: (c (Term (Sum Python.Syntax)), c PrecisePython.Term) => PerLanguageModes -> (Language, SomeParser c Loc)
+pythonParser' :: (c Python.Term, c PrecisePython.Term) => PerLanguageModes -> (Language, SomeParser c Loc)
 pythonParser' modes = case pythonMode modes of
   ALaCarte -> (Python, SomeParser pythonParser)
   Precise  -> (Python, SomeParser pythonParserPrecise)
 
-rubyParser' :: c (Term (Sum Ruby.Syntax)) => (Language, SomeParser c Loc)
+rubyParser' :: c Ruby.Term => (Language, SomeParser c Loc)
 rubyParser' = (Ruby, SomeParser rubyParser)
 
-tsxParser' :: c (Term (Sum TSX.Syntax)) => (Language, SomeParser c Loc)
+tsxParser' :: c TSX.Term => (Language, SomeParser c Loc)
 tsxParser' = (TSX, SomeParser tsxParser)
 
-typescriptParser' :: c (Term (Sum TypeScript.Syntax)) => (Language, SomeParser c Loc)
+typescriptParser' :: c TypeScript.Term => (Language, SomeParser c Loc)
 typescriptParser' = (TypeScript, SomeParser typescriptParser)
 
 
 -- | The canonical set of parsers producing à la carte terms.
 aLaCarteParsers
-  :: ( c (Term (Sum Go.Syntax))
-     , c (Term (Sum Markdown.Syntax))
-     , c (Term (Sum PHP.Syntax))
-     , c (Term (Sum Python.Syntax))
-     , c (Term (Sum Ruby.Syntax))
-     , c (Term (Sum TSX.Syntax))
-     , c (Term (Sum TypeScript.Syntax))
+  :: ( c Go.Term
+     , c Markdown.Term
+     , c PHP.Term
+     , c Python.Term
+     , c Ruby.Term
+     , c TSX.Term
+     , c TypeScript.Term
      )
   => Map Language (SomeParser c Loc)
 aLaCarteParsers = Map.fromList
@@ -220,16 +220,16 @@ preciseParsers = Map.fromList
 
 -- | The canonical set of all parsers for the passed per-language modes.
 allParsers
-  :: ( c (Term (Sum Go.Syntax))
+  :: ( c Go.Term
      , c PreciseJava.Term
      , c PreciseJSON.Term
-     , c (Term (Sum Markdown.Syntax))
-     , c (Term (Sum PHP.Syntax))
-     , c (Term (Sum Python.Syntax))
+     , c Markdown.Term
+     , c PHP.Term
+     , c Python.Term
      , c PrecisePython.Term
-     , c (Term (Sum Ruby.Syntax))
-     , c (Term (Sum TSX.Syntax))
-     , c (Term (Sum TypeScript.Syntax))
+     , c Ruby.Term
+     , c TSX.Term
+     , c TypeScript.Term
      )
   => PerLanguageModes
   -> Map Language (SomeParser c Loc)
