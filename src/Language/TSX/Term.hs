@@ -5,6 +5,7 @@ module Language.TSX.Term
 , Diff(..)
 ) where
 
+import Control.Lens.Lens
 import Data.Abstract.Declarations
 import Data.Abstract.FreeVariables
 import Data.Bifoldable
@@ -22,6 +23,7 @@ import qualified Data.Diff as Diff
 import qualified Data.Term as Term
 import Diffing.Interpreter
 import qualified Language.TSX.Syntax as TSX.Syntax
+import Source.Span
 
 type Syntax =
   [ Comment.Comment
@@ -208,3 +210,7 @@ type instance Base (Term ann) = Term.TermF (Sum Syntax) ann
 
 instance Recursive (Term ann) where
   project = fmap Term . project . getTerm
+
+instance HasSpan ann => HasSpan (Term ann) where
+  span_ = inner.span_ where inner = lens getTerm (\t i -> t { getTerm = i })
+  {-# INLINE span_ #-}
