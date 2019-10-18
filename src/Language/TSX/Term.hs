@@ -187,4 +187,4 @@ type Syntax =
 
 
 newtype Term ann = Term { getTerm :: Term.Term (Sum Syntax) ann }
-  deriving (Foldable, Functor, Traversable)
+  deriving (Foldable, Functor, Syntax.HasErrors, Traversable)
