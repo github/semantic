@@ -151,7 +151,6 @@ library
                      , Data.Edit
                      , Data.Error
                      , Data.Flag
-                     , Data.Functor.Both
                      , Data.Functor.Classes.Generic
                      , Data.Graph
                      , Data.Graph.ControlFlowVertex
