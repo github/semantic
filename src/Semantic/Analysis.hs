@@ -17,7 +17,6 @@ import Data.Abstract.Evaluatable
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
 import Data.Language (Language)
-import Source.Loc
 import Source.Span
 
 type ModuleC address value m
