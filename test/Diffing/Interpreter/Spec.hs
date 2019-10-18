@@ -26,7 +26,7 @@ spec = do
     it "returns a replacement when comparing two unicode equivalent terms" $
       let termA = termIn emptyAnnotation (inject (Syntax.Identifier "t\776"))
           termB = termIn emptyAnnotation (inject (Syntax.Identifier "\7831")) in
-          diffTerms termA termB `shouldBe` replacing termA (termB :: Term ListableSyntax ())
+          diffTerms termA termB `shouldBe` comparing termA (termB :: Term ListableSyntax ())
 
     prop "produces correct diffs" $
       \ a b -> let diff = diffTerms a b :: Diff ListableSyntax () () in

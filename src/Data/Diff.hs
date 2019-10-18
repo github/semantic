@@ -2,7 +2,7 @@
 module Data.Diff
 ( Diff(..)
 , DiffF(..)
-, replacing
+, comparing
 , compareF
 , inserting
 , insertF
@@ -36,11 +36,11 @@ data DiffF syntax ann1 ann2 recur
   -- | An unchanged node, consisting of syntax labelled with both the original annotations.
   | Merge        (TermF syntax (ann1, ann2) recur)
 
--- | Constructs a 'Diff' replacing one 'Term' with another recursively.
-replacing :: Functor syntax => Term syntax ann1 -> Term syntax ann2 -> Diff syntax ann1 ann2
-replacing (Term (In a1 r1)) (Term (In a2 r2)) = compareF (In a1 (deleting <$> r1)) (In a2 (inserting <$> r2))
+-- | Constructs a 'Diff' comparing one 'Term' with another recursively.
+comparing :: Functor syntax => Term syntax ann1 -> Term syntax ann2 -> Diff syntax ann1 ann2
+comparing (Term (In a1 r1)) (Term (In a2 r2)) = compareF (In a1 (deleting <$> r1)) (In a2 (inserting <$> r2))
 
--- | Constructs a 'Diff' replacing one 'TermF' populated by further 'Diff's with another.
+-- | Constructs a 'Diff' comparing one 'TermF' populated by further 'Diff's with another.
 compareF :: TermF syntax ann1 (Diff syntax ann1 ann2) -> TermF syntax ann2 (Diff syntax ann1 ann2) -> Diff syntax ann1 ann2
 compareF t1 t2 = Diff (Patch (Compare t1 t2))
 

@@ -15,7 +15,7 @@ module Diffing.Algorithm.RWS
 ) where
 
 import Control.Monad.State.Strict
-import Data.Diff (DiffF(..), deleting, inserting, merge, replacing)
+import Data.Diff (DiffF(..), comparing, deleting, inserting, merge)
 import qualified Data.KdMap.Static as KdMap
 import Data.List (sortOn)
 import Data.Term as Term
@@ -158,7 +158,7 @@ editDistanceUpTo m a b = diffCost m (approximateDiff a b)
           _ | m <= 0 -> 0
           Merge body -> sum (fmap ($ pred m) body)
           body -> succ (sum (fmap ($ pred m) body))
-        approximateDiff a b = maybe (replacing a b) (merge (termAnnotation a, termAnnotation b)) (tryAlignWith (Just . these deleting inserting approximateDiff) (termOut a) (termOut b))
+        approximateDiff a b = maybe (comparing a b) (merge (termAnnotation a, termAnnotation b)) (tryAlignWith (Just . these deleting inserting approximateDiff) (termOut a) (termOut b))
 
 
 data Label syntax where
