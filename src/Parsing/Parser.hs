@@ -95,7 +95,7 @@ typescriptParser = AssignmentParser (ASTParser tree_sitter_typescript) TypeScrip
 tsxParser :: Parser TSX.Term
 tsxParser = AssignmentParser (ASTParser tree_sitter_tsx) TSX.assignment
 
-markdownParser :: Parser Markdown.Term
+markdownParser :: Parser (Markdown.Term Loc)
 markdownParser = AssignmentParser MarkdownParser Markdown.assignment
 
 
