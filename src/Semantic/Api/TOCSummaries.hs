@@ -1,10 +1,13 @@
+{-# LANGUAGE LambdaCase #-}
 module Semantic.Api.TOCSummaries (diffSummary, legacyDiffSummary, diffSummaryBuilder) where
 
+import           Analysis.TOCSummary (formatKind)
 import           Control.Effect.Error
 import           Control.Lens
 import           Data.Aeson
 import           Data.Blob
 import           Data.ByteString.Builder
+import           Data.Either (partitionEithers)
 import qualified Data.Map.Monoidal as Map
 import           Data.ProtoLens (defMessage)
 import           Data.Semilattice.Lower
@@ -23,12 +26,14 @@ diffSummaryBuilder format blobs = diffSummary blobs >>= serialize format
 legacyDiffSummary :: DiffEffects sig m => [BlobPair] -> m Summaries
 legacyDiffSummary = distributeFoldMap go
   where
-    go :: DiffEffects sig m => BlobPair -> m Summaries
-    go blobPair = decoratingDiffWith legacySummarizeDiffParsers legacyDecorateTerm (pure . legacySummarizeDiff blobPair) blobPair
+    go blobPair = decoratingDiffWith summarizeDiffParsers decorateTerm (pure . uncurry (flip Summaries) . bimap toMap toMap . partitionEithers . summarizeDiff) blobPair
       `catchError` \(SomeException e) ->
-        pure $ Summaries mempty (Map.singleton path [toJSON (ErrorSummary (T.pack (show e)) lowerBound lang)])
+        pure $ Summaries mempty (toMap [ErrorSummary (T.pack (show e)) lowerBound lang])
       where path = T.pack $ pathKeyForBlobPair blobPair
             lang = languageForBlobPair blobPair
+
+            toMap [] = mempty
+            toMap as = Map.singleton path (toJSON <$> as)
 
 
 diffSummary :: DiffEffects sig m => [BlobPair] -> m DiffTreeTOCResponse
@@ -36,13 +41,30 @@ diffSummary blobs = do
   diff <- distributeFor blobs go
   pure $ defMessage & P.files .~ diff
   where
-    go :: DiffEffects sig m => BlobPair -> m TOCSummaryFile
-    go blobPair = decoratingDiffWith summarizeDiffParsers decorateTerm (pure . summarizeDiff blobPair) blobPair
+    go blobPair = decoratingDiffWith summarizeDiffParsers decorateTerm (pure . uncurry toFile . partitionEithers . map (bimap toError toChange) . summarizeDiff) blobPair
       `catchError` \(SomeException e) ->
-        pure $ defMessage
-          & P.path .~ path
-          & P.language .~ lang
-          & P.changes .~ mempty
-          & P.errors .~ [defMessage & P.error .~ T.pack (show e) & P.maybe'span .~ Nothing]
-      where path = T.pack $ pathKeyForBlobPair blobPair
-            lang = bridging # languageForBlobPair blobPair
+        pure $ toFile [defMessage & P.error .~ T.pack (show e) & P.maybe'span .~ Nothing] []
+      where toFile errors changes = defMessage
+              & P.path     .~ T.pack (pathKeyForBlobPair blobPair)
+              & P.language .~ bridging # languageForBlobPair blobPair
+              & P.changes  .~ changes
+              & P.errors   .~ errors
+
+toChangeType :: Change -> ChangeType
+toChangeType = \case
+  Changed  -> MODIFIED
+  Deleted  -> REMOVED
+  Inserted -> ADDED
+  Replaced -> MODIFIED
+
+toChange :: TOCSummary -> TOCSummaryChange
+toChange TOCSummary{..} = defMessage
+  & P.category   .~ formatKind kind
+  & P.term       .~ ident
+  & P.maybe'span ?~ converting # span
+  & P.changeType .~ toChangeType change
+
+toError :: ErrorSummary -> TOCSummaryError
+toError ErrorSummary{..} = defMessage
+  & P.error      .~ message
+  & P.maybe'span ?~ converting # span
