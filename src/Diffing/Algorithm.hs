@@ -54,7 +54,7 @@ instance Carrier sig m => Carrier sig (Algorithm term1 term2 diff m) where
 diff :: (Carrier sig m, Member (Diff term1 term2 diff) sig) => term1 -> term2 -> m diff
 diff a1 a2 = send (Diff a1 a2 pure)
 
--- | Diff an 'Edit' of terms without specifying the algorithm to be used.
+-- | Diff an 'Edit.Edit' of terms without specifying the algorithm to be used.
 diffEdit :: (Carrier sig m, Member (Diff term1 term2 diff) sig) => Edit.Edit term1 term2 -> Algorithm term1 term2 diff m diff
 diffEdit = Edit.edit byDeleting byInserting diff
 
@@ -144,8 +144,8 @@ class Diffable f where
                  -> Algorithm term1 term2 diff m (f diff)
   algorithmFor = genericAlgorithmFor
 
-  tryAlignWith :: Alternative g => (These a1 a2 -> g b) -> f a1 -> f a2 -> g (f b)
-  default tryAlignWith :: (Alternative g, Generic1 f, GDiffable (Rep1 f)) => (These a1 a2 -> g b) -> f a1 -> f a2 -> g (f b)
+  tryAlignWith :: Alternative g => (Edit.Edit a1 a2 -> g b) -> f a1 -> f a2 -> g (f b)
+  default tryAlignWith :: (Alternative g, Generic1 f, GDiffable (Rep1 f)) => (Edit.Edit a1 a2 -> g b) -> f a1 -> f a2 -> g (f b)
   tryAlignWith f a b = to1 <$> gtryAlignWith f (from1 a) (from1 b)
 
   -- | Construct an algorithm to diff against positions inside an @f@.
@@ -208,30 +208,30 @@ instance Apply Diffable fs => Diffable (Sum fs) where
 instance Diffable Maybe where
   algorithmFor = diffMaybe
 
-  tryAlignWith f (Just a1) (Just a2) = Just <$> f (These a1 a2)
-  tryAlignWith f (Just a1) Nothing   = Just <$> f (This a1)
-  tryAlignWith f Nothing   (Just a2) = Just <$> f (That a2)
+  tryAlignWith f (Just a1) (Just a2) = Just <$> f (Edit.Compare a1 a2)
+  tryAlignWith f (Just a1) Nothing   = Just <$> f (Edit.Delete a1)
+  tryAlignWith f Nothing   (Just a2) = Just <$> f (Edit.Insert a2)
   tryAlignWith _ Nothing   Nothing   = pure Nothing
 
 -- | Diff two lists using RWS.
 instance Diffable [] where
   algorithmFor = byRWS
 
-  tryAlignWith f (a1:as1) (a2:as2) = (:) <$> f (These a1 a2) <*> tryAlignWith f as1 as2
-  tryAlignWith f []       as2      = traverse (f . That) as2
-  tryAlignWith f as1      []       = traverse (f . This) as1
+  tryAlignWith f (a1:as1) (a2:as2) = (:) <$> f (Edit.Compare a1 a2) <*> tryAlignWith f as1 as2
+  tryAlignWith f []       as2      = traverse (f . Edit.Insert) as2
+  tryAlignWith f as1      []       = traverse (f . Edit.Delete) as1
 
 -- | Diff two non-empty lists using RWS.
 instance Diffable NonEmpty where
   algorithmFor (a1:|as1) (a2:|as2) = nonEmpty <$> byRWS (a1:as1) (a2:as2) >>= maybeM empty
 
-  tryAlignWith f (a1:|as1) (a2:|as2) = (:|) <$> f (These a1 a2) <*> tryAlignWith f as1 as2
+  tryAlignWith f (a1:|as1) (a2:|as2) = (:|) <$> f (Edit.Compare a1 a2) <*> tryAlignWith f as1 as2
 
 -- | A generic type class for diffing two terms defined by the Generic1 interface.
 class GDiffable f where
   galgorithmFor :: (Alternative m, Carrier sig m, Member (Diff term1 term2 diff) sig, Member NonDet sig) => f term1 -> f term2 -> Algorithm term1 term2 diff m (f diff)
 
-  gtryAlignWith :: Alternative g => (These a1 a2 -> g b) -> f a1 -> f a2 -> g (f b)
+  gtryAlignWith :: Alternative g => (Edit.Edit a1 a2 -> g b) -> f a1 -> f a2 -> g (f b)
 
   gcomparableTo :: f term1 -> f term2 -> Bool
   gcomparableTo _ _ = True
@@ -272,7 +272,7 @@ instance (GDiffable f, GDiffable g) => GDiffable (f :+: g) where
 instance GDiffable Par1 where
   galgorithmFor (Par1 a1) (Par1 a2) = Par1 <$> diff a1 a2
 
-  gtryAlignWith f (Par1 a) (Par1 b) = Par1 <$> f (These a b)
+  gtryAlignWith f (Par1 a) (Par1 b) = Par1 <$> f (Edit.Compare a b)
 
 -- | Diff two constant parameters (K1 is the Generic1 newtype representing type parameter constants).
 -- i.e. data Foo = Foo Int (the 'Int' is a constant parameter).

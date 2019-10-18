@@ -159,7 +159,7 @@ editDistanceUpTo m a b = diffCost m (approximateDiff a b)
           _ | m <= 0 -> 0
           Merge body -> sum (fmap ($ pred m) body)
           body -> succ (sum (fmap ($ pred m) body))
-        approximateDiff a b = maybe (comparing a b) (merge (termAnnotation a, termAnnotation b)) (tryAlignWith (Just . these deleting inserting approximateDiff) (termOut a) (termOut b))
+        approximateDiff a b = maybe (comparing a b) (merge (termAnnotation a, termAnnotation b)) (tryAlignWith (Just . edit deleting inserting approximateDiff) (termOut a) (termOut b))
 
 
 data Label syntax where
