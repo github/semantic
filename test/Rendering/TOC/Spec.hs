@@ -160,14 +160,14 @@ type Term' = Term ListableSyntax (Maybe Declaration)
 numTocSummaries :: Diff' -> Int
 numTocSummaries diff = length $ filter isRight (diffTOC diff)
 
--- Return a diff where body is inserted in the expressions of a function. The function is present in Both sides of the diff.
+-- Return a diff where body is inserted in the expressions of a function. The function is present in both sides of the diff.
 programWithChange :: Term' -> Diff'
 programWithChange body = merge (Nothing, Nothing) (inject [ function' ])
   where
     function' = merge (Just (Declaration Function "foo" lowerBound Ruby), Just (Declaration Function "foo" lowerBound Ruby)) (inject (Declaration.Function [] name' [] (merge (Nothing, Nothing) (inject [ inserting body ]))))
     name' = merge (Nothing, Nothing) (inject (Syntax.Identifier (name "foo")))
 
--- Return a diff where term is inserted in the program, below a function found on Both sides of the diff.
+-- Return a diff where term is inserted in the program, below a function found on both sides of the diff.
 programWithChangeOutsideFunction :: Term' -> Diff'
 programWithChangeOutsideFunction term = merge (Nothing, Nothing) (inject [ function', term' ])
   where
