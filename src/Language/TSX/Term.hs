@@ -10,6 +10,7 @@ import Data.Abstract.Declarations
 import Data.Abstract.FreeVariables
 import Data.Bifoldable
 import Data.Bifunctor
+import qualified Data.Diff as Diff
 import Data.Functor.Foldable
 import Data.Graph.ControlFlowVertex (VertexDeclaration)
 import Data.Sum (Sum)
@@ -20,7 +21,6 @@ import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
-import qualified Data.Diff as Diff
 import qualified Data.Term as Term
 import Diffing.Interpreter
 import qualified Language.TSX.Syntax as TSX.Syntax
