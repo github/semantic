@@ -102,10 +102,9 @@ noLanguageForBlob blobPath = throwError (SomeException (NoLanguageForBlob blobPa
 type BlobPair = Edit Blob Blob
 
 instance FromJSON BlobPair where
-  parseJSON = withObject "BlobPair" $ \o -> do
-    before <- o .:? "before"
-    after  <- o .:? "after"
-    maybeM (Prelude.fail "Expected object with 'before' and/or 'after' keys only") (fromMaybes before after)
+  parseJSON = withObject "BlobPair" $ \o ->
+    fromMaybes <$> (o .:? "before") <*> (o .:? "after")
+    >>= maybeM (Prelude.fail "Expected object with 'before' and/or 'after' keys only")
 
 maybeBlobPair :: MonadFail m => Maybe Blob -> Maybe Blob -> m BlobPair
 maybeBlobPair a b = case (a, b) of
