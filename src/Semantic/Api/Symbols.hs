@@ -1,4 +1,4 @@
-{-# LANGUAGE MonoLocalBinds, RankNTypes #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, MonoLocalBinds, RankNTypes, StandaloneDeriving #-}
 module Semantic.Api.Symbols
   ( legacyParseSymbols
   , parseSymbols
@@ -19,6 +19,7 @@ import           Data.Text (pack)
 import qualified Language.Java as Java
 import qualified Language.JSON as JSON
 import qualified Language.Python as Python
+import qualified Language.TSX.Term as TSX
 import qualified Parsing.Parser as Parser
 import           Prologue
 import           Proto.Semantic as P hiding (Blob, BlobPair)
@@ -110,6 +111,8 @@ class ToTags t where
 
 instance IsTaggable syntax => ToTags (Term syntax) where
   tags = runTagging
+
+deriving instance ToTags TSX.Term
 
 instance ToTags Java.Term where
   tags _ _ = Precise.tags
