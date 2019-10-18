@@ -64,6 +64,6 @@ instance Ord2 Edit where
 
 instance Show2 Edit where
   liftShowsPrec2 spl _ spr _ d = \case
-    Delete a -> showsUnaryWith spl "Delete" d a
-    Insert b -> showsUnaryWith spr "Insert" d b
+    Delete  a   -> showsUnaryWith  spl     "Delete"  d a
+    Insert    b -> showsUnaryWith      spr "Insert"  d   b
     Compare a b -> showsBinaryWith spl spr "Compare" d a b
