@@ -7,6 +7,7 @@ import           Control.Exception as Exc (displayException)
 import           Data.Blob
 import           Data.Blob.IO
 import qualified Data.ByteString.Char8 as B
+import           Data.Functor.Both
 import           Data.Handle
 import qualified Data.Language as Language
 import           Data.List (intercalate)

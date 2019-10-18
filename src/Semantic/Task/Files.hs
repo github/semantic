@@ -23,6 +23,7 @@ import           Control.Effect.Error
 import           Data.Blob
 import           Data.Blob.IO
 import qualified Data.ByteString.Builder as B
+import           Data.Functor.Both
 import           Data.Handle
 import           Data.Language
 import           Data.Project
