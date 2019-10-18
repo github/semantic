@@ -55,11 +55,12 @@ import           Data.Abstract.Value.Type as Type
 import           Data.Abstract.AccessControls.Instances ()
 import           Data.Blob
 import           Data.Graph
-import           Data.Graph.ControlFlowVertex (VertexDeclaration)
+import           Data.Graph.ControlFlowVertex (VertexDeclaration, VertexDeclaration1)
 import           Data.Language as Language
 import           Data.List (isPrefixOf, isSuffixOf)
 import qualified Data.Map as Map
 import           Data.Project
+import           Data.Term
 import           Data.Text (pack, unpack)
 import           Language.Haskell.HsColour
 import           Language.Haskell.HsColour.Colourise
@@ -109,6 +110,17 @@ class
   , Show (term Loc)
   , HasSpan (term Loc)
   ) => AnalyzeTerm (term :: * -> *)
+
+instance
+  ( VertexDeclaration1 syntax
+  , Declarations1 syntax
+  , Evaluatable syntax
+  , FreeVariables1 syntax
+  , AccessControls1 syntax
+  , Functor syntax
+  , Ord1 syntax
+  , Show1 syntax
+  ) => AnalyzeTerm (Term syntax)
 
 analysisParsers :: Map Language (SomeParser AnalyzeTerm Loc)
 analysisParsers = Map.fromList
