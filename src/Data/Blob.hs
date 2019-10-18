@@ -119,13 +119,10 @@ maybeBlobPair a b = case (a, b) of
   _                 -> Prologue.fail "expected file pair with content on at least one side"
 
 languageForBlobPair :: BlobPair -> Language
-languageForBlobPair (Delete b)  = blobLanguage b
-languageForBlobPair (Insert b) = blobLanguage b
-languageForBlobPair (Compare a b)
-  | blobLanguage a == Unknown || blobLanguage b == Unknown
-    = Unknown
-  | otherwise
-    = blobLanguage b
+languageForBlobPair = mergeEditWith blobLanguage blobLanguage combine where
+  combine a b
+    | a == Unknown || b == Unknown = Unknown
+    | otherwise                    = b
 
 pathForBlobPair :: BlobPair -> FilePath
 pathForBlobPair = blobPath . mergeEdit (const id)
