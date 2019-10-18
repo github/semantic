@@ -1,4 +1,4 @@
-{-# LANGUAGE AllowAmbiguousTypes, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes, LambdaCase, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.TOCSummary
 ( Declaration(..)
 , formatIdentifier
@@ -49,7 +49,7 @@ data Kind
   deriving (Eq, Ord, Show)
 
 formatKind :: Kind -> T.Text
-formatKind kind = case kind of
+formatKind = \case
   Function  -> "Function"
   Method _  -> "Method"
   Heading l -> "Heading " <> T.pack (show l)

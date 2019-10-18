@@ -1,4 +1,4 @@
-{-# LANGUAGE DerivingVia, DuplicateRecordFields, RankNTypes, ScopedTypeVariables, TupleSections #-}
+{-# LANGUAGE DerivingVia, DuplicateRecordFields, LambdaCase, RankNTypes, ScopedTypeVariables, TupleSections #-}
 module Rendering.TOC
 ( diffTOC
 , Summaries(..)
@@ -60,7 +60,7 @@ data Change
   deriving (Eq, Show)
 
 instance ToJSON Change where
-  toJSON change = case change of
+  toJSON = \case
     Changed  -> "modified"
     Deleted  -> "removed"
     Inserted -> "added"
