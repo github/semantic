@@ -4,7 +4,7 @@ module Language.TSX.Assignment
 ( assignment
 , TSX.Syntax
 , Grammar
-, Term
+, TSX.Term(..)
 ) where
 
 import Assigning.Assignment hiding (Assignment, Error)
@@ -38,12 +38,11 @@ import qualified Language.TSX.Term as TSX
 import Prologue
 import TreeSitter.TSX as Grammar
 
-type Term = Term.Term (Sum TSX.Syntax)
 type Assignment = Assignment.Assignment [] Grammar
 
 -- | Assignment from AST in TSX’s grammar onto a program in TSX’s syntax.
-assignment :: Assignment (Term.Term (Sum TSX.Syntax) Loc)
-assignment = handleError $ makeTerm <$> symbol Program <*> children (Statement.Statements <$> manyTerm statement) <|> parseError
+assignment :: Assignment (TSX.Term Loc)
+assignment = fmap TSX.Term . handleError $ makeTerm <$> symbol Program <*> children (Statement.Statements <$> manyTerm statement) <|> parseError
 
 expression :: Assignment (Term.Term (Sum TSX.Syntax) Loc)
 expression = handleError everything
