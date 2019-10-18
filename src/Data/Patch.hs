@@ -43,8 +43,8 @@ instance Bifoldable Patch where
 
 instance Bitraversable Patch where
   bitraverse f g = \case
-    Delete  a   -> Delete <$> f a
-    Insert    b -> Insert <$> g b
+    Delete  a   -> Delete  <$> f a
+    Insert    b -> Insert  <$>         g b
     Compare a b -> Compare <$> f a <*> g b
 
 instance Bicrosswalk Patch where
