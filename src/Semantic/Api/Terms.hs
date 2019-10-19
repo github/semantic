@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, GeneralizedNewtypeDeriving, MonoLocalBinds, RankNTypes, StandaloneDeriving #-}
+{-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, GeneralizedNewtypeDeriving, MonoLocalBinds, RankNTypes, ScopedTypeVariables, StandaloneDeriving, TypeFamilies, UndecidableInstances #-}
 module Semantic.Api.Terms
   ( termGraph
   , parseTermBuilder
@@ -35,7 +35,7 @@ import           Semantic.Config
 import           Semantic.Task
 import           Serializing.Format hiding (JSON)
 import qualified Serializing.Format as Format
-import qualified Serializing.SExpression as SExpr (serializeSExpression)
+import qualified Serializing.SExpression as SExpr
 import qualified Serializing.SExpression.Precise as SExpr.Precise (serializeSExpression)
 import           Source.Loc
 
@@ -105,6 +105,12 @@ quietTerm blob = showTiming blob <$> time' ( asks showTermParsers >>= \ parsers 
 
 type ParseEffects sig m = (Member (Error SomeException) sig, Member (Reader PerLanguageModes) sig, Member Parse sig, Member (Reader Config) sig, Carrier sig m)
 
+type family TermMode term where
+  TermMode Java.Term          = 'Precise
+  TermMode JSON.Term          = 'Precise
+  TermMode PythonPrecise.Term = 'Precise
+  TermMode _                  = 'ALaCarte
+
 
 showTermParsers :: PerLanguageModes -> Map Language (SomeParser ShowTerm Loc)
 showTermParsers = allParsers
@@ -112,33 +118,23 @@ showTermParsers = allParsers
 class ShowTerm term where
   showTerm :: (Carrier sig m, Member (Reader Config) sig) => term Loc -> m Builder
 
-instance (Functor syntax, Show1 syntax) => ShowTerm (Term syntax) where
-  showTerm = serialize Show . quieterm
+instance (TermMode term ~ strategy, ShowTermBy strategy term) => ShowTerm term where
+  showTerm = showTermBy @strategy
 
-instance ShowTerm Java.Term where
-  showTerm = serialize Show . void . Java.getTerm
+class ShowTermBy (strategy :: LanguageMode) term where
+  showTermBy :: (Carrier sig m, Member (Reader Config) sig) => term Loc -> m Builder
 
-instance ShowTerm JSON.Term where
-  showTerm = serialize Show . void . JSON.getTerm
+instance ShowTermBy 'Precise Java.Term where
+  showTermBy = serialize Show . void . Java.getTerm
 
-instance ShowTerm PythonPrecise.Term where
-  showTerm = serialize Show . void . PythonPrecise.getTerm
+instance ShowTermBy 'Precise JSON.Term where
+  showTermBy = serialize Show . void . JSON.getTerm
 
+instance ShowTermBy 'Precise PythonPrecise.Term where
+  showTermBy = serialize Show . void . PythonPrecise.getTerm
 
-instance ShowTerm Go.Term where
-  showTerm = serialize Show . quieterm
-instance ShowTerm Markdown.Term where
-  showTerm = serialize Show . quieterm
-instance ShowTerm PHP.Term where
-  showTerm = serialize Show . quieterm
-instance ShowTerm PythonALaCarte.Term where
-  showTerm = serialize Show . quieterm
-instance ShowTerm Ruby.Term where
-  showTerm = serialize Show . quieterm
-instance ShowTerm TSX.Term where
-  showTerm = serialize Show . quieterm
-instance ShowTerm TypeScript.Term where
-  showTerm = serialize Show . quieterm
+instance (Recursive (term Loc), Show1 syntax, Base (term Loc) ~ TermF syntax Loc) => ShowTermBy 'ALaCarte term where
+  showTermBy = serialize Show . quieterm
 
 
 sexprTermParsers :: PerLanguageModes -> Map Language (SomeParser SExprTerm Loc)
@@ -147,30 +143,23 @@ sexprTermParsers = allParsers
 class SExprTerm term where
   sexprTerm :: term Loc -> Builder
 
-instance SExprTerm Java.Term where
-  sexprTerm = SExpr.Precise.serializeSExpression . Java.getTerm
+instance (TermMode term ~ strategy, SExprTermBy strategy term) => SExprTerm term where
+  sexprTerm = sexprTermBy @strategy
 
-instance SExprTerm JSON.Term where
-  sexprTerm = SExpr.Precise.serializeSExpression . JSON.getTerm
+class SExprTermBy (strategy :: LanguageMode) term where
+  sexprTermBy :: term Loc -> Builder
 
-instance SExprTerm PythonPrecise.Term where
-  sexprTerm = SExpr.Precise.serializeSExpression . PythonPrecise.getTerm
+instance SExprTermBy 'Precise Java.Term where
+  sexprTermBy = SExpr.Precise.serializeSExpression . Java.getTerm
 
+instance SExprTermBy 'Precise JSON.Term where
+  sexprTermBy = SExpr.Precise.serializeSExpression . JSON.getTerm
 
-instance SExprTerm Go.Term where
-  sexprTerm = SExpr.serializeSExpression ByConstructorName
-instance SExprTerm Markdown.Term where
-  sexprTerm = SExpr.serializeSExpression ByConstructorName
-instance SExprTerm PHP.Term where
-  sexprTerm = SExpr.serializeSExpression ByConstructorName
-instance SExprTerm PythonALaCarte.Term where
-  sexprTerm = SExpr.serializeSExpression ByConstructorName
-instance SExprTerm Ruby.Term where
-  sexprTerm = SExpr.serializeSExpression ByConstructorName
-instance SExprTerm TSX.Term where
-  sexprTerm = SExpr.serializeSExpression ByConstructorName
-instance SExprTerm TypeScript.Term where
-  sexprTerm = SExpr.serializeSExpression ByConstructorName
+instance SExprTermBy 'Precise PythonPrecise.Term where
+  sexprTermBy = SExpr.Precise.serializeSExpression . PythonPrecise.getTerm
+
+instance (Recursive (term Loc), SExpr.ToSExpression (Base (term Loc))) => SExprTermBy 'ALaCarte term where
+  sexprTermBy = SExpr.serializeSExpression ByConstructorName
 
 
 dotGraphTermParsers :: Map Language (SomeParser DOTGraphTerm Loc)
