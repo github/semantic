@@ -6,7 +6,6 @@ module Semantic.Api.Diffs
   , diffTerms
   ) where
 
-import           Analysis.ConstructorName (ConstructorName)
 import           Control.Effect.Error
 import           Control.Effect.Parse
 import           Control.Effect.Reader
@@ -17,12 +16,9 @@ import           Data.Blob
 import           Data.ByteString.Builder
 import           Data.Edit
 import           Data.Graph
-import           Data.JSON.Fields
 import           Data.Language
 import           Data.ProtoLens (defMessage)
-import           Data.Term
 import qualified Data.Text as T
-import           Diffing.Algorithm (Diffable)
 import           Diffing.Interpreter (DiffTerms(..))
 import qualified Language.Go.Term as Go
 import qualified Language.Markdown.Term as Markdown
@@ -93,9 +89,6 @@ dotGraphDiffParsers = aLaCarteParsers
 class DOTGraphDiff term where
   dotGraphDiff :: (Carrier sig m, Member (Reader Config) sig, Member Telemetry sig, MonadIO m) => Edit (Blob, term Loc) (Blob, term Loc) -> m Builder
 
-instance (ConstructorName syntax, Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => DOTGraphDiff (Term syntax) where
-  dotGraphDiff = serialize (DOT (diffStyle "diffs")) . renderTreeGraph <=< diffTerms
-
 instance DOTGraphDiff Go.Term where
   dotGraphDiff = serialize (DOT (diffStyle "diffs")) . renderTreeGraph <=< diffTerms
 instance DOTGraphDiff Markdown.Term where
@@ -117,9 +110,6 @@ jsonGraphDiffParsers = aLaCarteParsers
 
 class JSONGraphDiff term where
   jsonGraphDiff :: (Carrier sig m, Member Telemetry sig, MonadIO m) => Edit (Blob, term Loc) (Blob, term Loc) -> m DiffTreeFileGraph
-
-instance (ConstructorName syntax, Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => JSONGraphDiff (Term syntax) where
-  jsonGraphDiff terms = toGraph (bimap fst fst terms) <$> diffTerms terms
 
 toGraph
   :: (Recursive diff, ToTreeGraph DiffTreeVertex (Base diff))
@@ -160,9 +150,6 @@ jsonTreeDiffParsers = aLaCarteParsers
 class JSONTreeDiff term where
   jsonTreeDiff :: (Carrier sig m, Member Telemetry sig, MonadIO m) => Edit (Blob, term Loc) (Blob, term Loc) -> m (Rendering.JSON.JSON "diffs" SomeJSON)
 
-instance (Diffable syntax, Eq1 syntax, Hashable1 syntax, ToJSONFields1 syntax, Traversable syntax) => JSONTreeDiff (Term syntax) where
-  jsonTreeDiff terms = renderJSONDiff (bimap fst fst terms) <$> diffTerms terms
-
 instance JSONTreeDiff Go.Term where
   jsonTreeDiff terms = renderJSONDiff (bimap fst fst terms) <$> diffTerms terms
 instance JSONTreeDiff Markdown.Term where
@@ -185,9 +172,6 @@ sexprDiffParsers = aLaCarteParsers
 class SExprDiff term where
   sexprDiff :: (Carrier sig m, Member (Reader Config) sig, Member Telemetry sig, MonadIO m) => Edit (Blob, term Loc) (Blob, term Loc) -> m Builder
 
-instance (ConstructorName syntax, Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => SExprDiff (Term syntax) where
-  sexprDiff = serialize (SExpression ByConstructorName) <=< diffTerms
-
 instance SExprDiff Go.Term where
   sexprDiff = serialize (SExpression ByConstructorName) <=< diffTerms
 instance SExprDiff Markdown.Term where
@@ -209,9 +193,6 @@ showDiffParsers = aLaCarteParsers
 
 class ShowDiff term where
   showDiff :: (Carrier sig m, Member (Reader Config) sig, Member Telemetry sig, MonadIO m) => Edit (Blob, term Loc) (Blob, term Loc) -> m Builder
-
-instance (Diffable syntax, Eq1 syntax, Hashable1 syntax, Show1 syntax, Traversable syntax) => ShowDiff (Term syntax) where
-  showDiff = serialize Show <=< diffTerms
 
 instance ShowDiff Go.Term where
   showDiff = serialize Show <=< diffTerms
