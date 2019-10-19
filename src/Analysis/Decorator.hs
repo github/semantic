@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE DataKinds, TypeFamilies, TypeOperators #-}
 module Analysis.Decorator
 ( decoratorWithAlgebra
 ) where
