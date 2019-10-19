@@ -123,7 +123,8 @@ deriving instance ToTags Go.Term
 deriving instance ToTags Markdown.Term
 deriving instance ToTags PHP.Term
 deriving instance ToTags PythonALaCarte.Term
-deriving instance ToTags Ruby.Term
+instance ToTags Ruby.Term where
+  tags = runTagging
 instance ToTags TSX.Term where
   tags = runTagging
 instance ToTags TypeScript.Term where

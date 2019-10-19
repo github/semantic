@@ -100,7 +100,8 @@ deriving instance DOTGraphDiff Go.Term
 deriving instance DOTGraphDiff Markdown.Term
 deriving instance DOTGraphDiff PHP.Term
 deriving instance DOTGraphDiff Python.Term
-deriving instance DOTGraphDiff Ruby.Term
+instance DOTGraphDiff Ruby.Term where
+  dotGraphDiff = serialize (DOT (diffStyle "diffs")) . renderTreeGraph <=< diffTerms
 instance DOTGraphDiff TSX.Term where
   dotGraphDiff = serialize (DOT (diffStyle "diffs")) . renderTreeGraph <=< diffTerms
 instance DOTGraphDiff TypeScript.Term where
@@ -137,9 +138,10 @@ deriving instance JSONGraphDiff Go.Term
 deriving instance JSONGraphDiff Markdown.Term
 deriving instance JSONGraphDiff PHP.Term
 deriving instance JSONGraphDiff Python.Term
-deriving instance JSONGraphDiff Ruby.Term
+instance JSONGraphDiff Ruby.Term where
+  jsonGraphDiff terms = toGraph (bimap fst fst terms) <$> diffTerms terms
 instance JSONGraphDiff TSX.Term where
-  jsonGraphDiff terms = toGraph (bimap fst fst terms)        <$> diffTerms terms
+  jsonGraphDiff terms = toGraph (bimap fst fst terms) <$> diffTerms terms
 instance JSONGraphDiff TypeScript.Term where
   jsonGraphDiff terms = toGraph (bimap fst fst terms) <$> diffTerms terms
 
@@ -157,7 +159,8 @@ deriving instance JSONTreeDiff Go.Term
 deriving instance JSONTreeDiff Markdown.Term
 deriving instance JSONTreeDiff PHP.Term
 deriving instance JSONTreeDiff Python.Term
-deriving instance JSONTreeDiff Ruby.Term
+instance JSONTreeDiff Ruby.Term where
+  jsonTreeDiff terms = renderJSONDiff (bimap fst fst terms) <$> diffTerms terms
 instance JSONTreeDiff TSX.Term where
   jsonTreeDiff terms = renderJSONDiff (bimap fst fst terms) <$> diffTerms terms
 instance JSONTreeDiff TypeScript.Term where
@@ -177,7 +180,8 @@ deriving instance SExprDiff Go.Term
 deriving instance SExprDiff Markdown.Term
 deriving instance SExprDiff PHP.Term
 deriving instance SExprDiff Python.Term
-deriving instance SExprDiff Ruby.Term
+instance SExprDiff Ruby.Term where
+  sexprDiff = serialize (SExpression ByConstructorName) <=< diffTerms
 instance SExprDiff TSX.Term where
   sexprDiff = serialize (SExpression ByConstructorName) <=< diffTerms
 instance SExprDiff TypeScript.Term where
@@ -197,7 +201,8 @@ deriving instance ShowDiff Go.Term
 deriving instance ShowDiff Markdown.Term
 deriving instance ShowDiff PHP.Term
 deriving instance ShowDiff Python.Term
-deriving instance ShowDiff Ruby.Term
+instance ShowDiff Ruby.Term where
+  showDiff = serialize Show <=< diffTerms
 instance ShowDiff TSX.Term where
   showDiff = serialize Show <=< diffTerms
 instance ShowDiff TypeScript.Term where

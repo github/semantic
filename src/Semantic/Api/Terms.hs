@@ -128,7 +128,8 @@ deriving instance ShowTerm Go.Term
 deriving instance ShowTerm Markdown.Term
 deriving instance ShowTerm PHP.Term
 deriving instance ShowTerm PythonALaCarte.Term
-deriving instance ShowTerm Ruby.Term
+instance ShowTerm Ruby.Term where
+  showTerm = showTerm . cata Term
 instance ShowTerm TSX.Term where
   showTerm = showTerm . cata Term
 instance ShowTerm TypeScript.Term where
@@ -157,7 +158,8 @@ deriving instance SExprTerm Go.Term
 deriving instance SExprTerm Markdown.Term
 deriving instance SExprTerm PHP.Term
 deriving instance SExprTerm PythonALaCarte.Term
-deriving instance SExprTerm Ruby.Term
+instance SExprTerm Ruby.Term where
+  sexprTerm = SExpr.serializeSExpression ByConstructorName
 instance SExprTerm TSX.Term where
   sexprTerm = SExpr.serializeSExpression ByConstructorName
 instance SExprTerm TypeScript.Term where
@@ -177,7 +179,8 @@ deriving instance DOTGraphTerm Go.Term
 deriving instance DOTGraphTerm Markdown.Term
 deriving instance DOTGraphTerm PHP.Term
 deriving instance DOTGraphTerm PythonALaCarte.Term
-deriving instance DOTGraphTerm Ruby.Term
+instance DOTGraphTerm Ruby.Term where
+  dotGraphTerm = serialize (DOT (termStyle "terms")) . renderTreeGraph
 instance DOTGraphTerm TSX.Term where
   dotGraphTerm = serialize (DOT (termStyle "terms")) . renderTreeGraph
 instance DOTGraphTerm TypeScript.Term where
@@ -197,7 +200,8 @@ deriving instance JSONTreeTerm Go.Term
 deriving instance JSONTreeTerm Markdown.Term
 deriving instance JSONTreeTerm PHP.Term
 deriving instance JSONTreeTerm PythonALaCarte.Term
-deriving instance JSONTreeTerm Ruby.Term
+instance JSONTreeTerm Ruby.Term where
+  jsonTreeTerm blob = jsonTreeTerm blob . cata Term
 instance JSONTreeTerm TSX.Term where
   jsonTreeTerm blob = jsonTreeTerm blob . cata Term
 instance JSONTreeTerm TypeScript.Term where
@@ -227,7 +231,8 @@ deriving instance JSONGraphTerm Go.Term
 deriving instance JSONGraphTerm Markdown.Term
 deriving instance JSONGraphTerm PHP.Term
 deriving instance JSONGraphTerm PythonALaCarte.Term
-deriving instance JSONGraphTerm Ruby.Term
+instance JSONGraphTerm Ruby.Term where
+  jsonGraphTerm blob = jsonGraphTerm blob . cata Term
 instance JSONGraphTerm TSX.Term where
   jsonGraphTerm blob = jsonGraphTerm blob . cata Term
 instance JSONGraphTerm TypeScript.Term where

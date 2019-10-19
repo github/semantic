@@ -33,17 +33,15 @@ import qualified Data.Syntax.Directive as Directive
 import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
-import qualified Data.Term as Term
 import qualified Language.Ruby.Syntax as Ruby.Syntax
-import qualified Language.Ruby.Term as Ruby
+import           Language.Ruby.Term as Ruby
 import           TreeSitter.Ruby as Grammar
 
-type Term = Term.Term (Sum Ruby.Syntax)
 type Assignment = Assignment.Assignment [] Grammar
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
-assignment :: Assignment (Ruby.Term Loc)
-assignment = fmap Ruby.Term . handleError $ makeTerm <$> symbol Program <*> children (Statement.Statements <$> many expression) <|> parseError
+assignment :: Assignment (Term Loc)
+assignment = handleError $ makeTerm <$> symbol Program <*> children (Statement.Statements <$> many expression) <|> parseError
 
 expression :: Assignment (Term Loc)
 expression = term (handleError (choice expressionChoices))

@@ -126,7 +126,8 @@ deriving instance SummarizeTerms Go.Term
 deriving instance SummarizeTerms Markdown.Term
 deriving instance SummarizeTerms PHP.Term
 deriving instance SummarizeTerms PythonALaCarte.Term
-deriving instance SummarizeTerms Ruby.Term
+instance SummarizeTerms Ruby.Term where
+  summarizeTerms = summarizeTerms . bimap (fmap (cata Term)) (fmap (cata Term))
 instance SummarizeTerms TSX.Term where
   summarizeTerms = summarizeTerms . bimap (fmap (cata Term)) (fmap (cata Term))
 instance SummarizeTerms TypeScript.Term where
