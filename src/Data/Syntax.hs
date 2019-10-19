@@ -93,12 +93,12 @@ postContextualize context rule = make <$> rule <*> many context
           _ -> node
 
 -- | Match infix terms separated by any of a list of operators, with optional context terms following each operand.
-infixContext :: (Context :< syntaxes, Sum syntaxes ~ Syntax term, Assignment.Parsing m, Semigroup ann, HasCallStack, Apply Foldable syntaxes, IsTerm term)
-             => m (term ann)
-             -> m (term ann)
-             -> m (term ann)
-             -> [m (term ann -> term ann -> Sum syntaxes (term ann))]
-             -> m (Sum syntaxes (term ann))
+infixContext :: (Context :< syntaxes, Assignment.Parsing m, Semigroup ann, HasCallStack, Apply Foldable syntaxes)
+             => m (Term (Sum syntaxes) ann)
+             -> m (Term (Sum syntaxes) ann)
+             -> m (Term (Sum syntaxes) ann)
+             -> [m (Term (Sum syntaxes) ann -> Term (Sum syntaxes) ann -> Sum syntaxes (Term (Sum syntaxes) ann))]
+             -> m (Sum syntaxes (Term (Sum syntaxes) ann))
 infixContext context left right operators = uncurry (&) <$> postContextualizeThrough context left (asum operators) <*> postContextualize context right
 
 class Generate (c :: (* -> *) -> Constraint) (all :: [* -> *]) (fs :: [* -> *]) where
