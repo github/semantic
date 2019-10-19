@@ -11,9 +11,6 @@ module Data.Term
 , Annotated (..)
 -- * Abstract term interfaces
 , IsTerm(..)
-, termAnnotation
-, termOut
-, termIn
 ) where
 
 import Prologue
@@ -168,23 +165,17 @@ instance (ToJSON b, ToJSONFields a, ToJSONFields1 f) => ToJSON (TermF f a b) whe
 class IsTerm term where
   type Syntax term :: * -> *
 
-  toTermF :: term ann -> TermF (Syntax term) ann (term ann)
-  fromTermF :: TermF (Syntax term) ann (term ann) -> term ann
+  termAnnotation :: term ann -> ann
+  termOut :: term ann -> Syntax term (term ann)
 
-
-termAnnotation :: IsTerm term => term ann -> ann
-termAnnotation = termFAnnotation . toTermF
-
-termOut :: IsTerm term => term ann -> Syntax term (term ann)
-termOut = termFOut . toTermF
-
--- | Build a term from its annotation and syntax.
-termIn :: IsTerm term => ann -> Syntax term (term ann) -> term ann
-termIn = fmap fromTermF . In
+  -- | Build a Term from its annotation and syntax.
+  termIn :: ann -> Syntax term (term ann) -> term ann
 
 
 instance IsTerm (Term syntax) where
   type Syntax (Term syntax) = syntax
 
-  toTermF = unTerm
-  fromTermF = Term
+  termAnnotation = termFAnnotation . unTerm
+  termOut = termFOut . unTerm
+
+  termIn = fmap Term . In
