@@ -25,7 +25,7 @@ import qualified Data.Abstract.ScopeGraph as ScopeGraph
 -- Combinators
 
 -- | Lift syntax and an annotation into a term, injecting the syntax into a union & ensuring the annotation encompasses all children.
-makeTerm :: (HasCallStack, Element syntax syntaxes, Semigroup ann, Apply Foldable syntaxes) => ann -> syntax (Term (Sum syntaxes) ann) -> Term (Sum syntaxes) ann
+makeTerm :: (HasCallStack, Element syntax syntaxes, Sum syntaxes ~ Syntax term, Semigroup ann, Apply Foldable syntaxes, IsTerm term) => ann -> syntax (term ann) -> term ann
 makeTerm ann = makeTerm' ann . inject
 
 -- | Lift a union and an annotation into a term, ensuring the annotation encompasses all children.

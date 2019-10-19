@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
+{-# LANGUAGE DataKinds, RankNTypes, TypeFamilies, TypeOperators #-}
 module Language.TypeScript.Assignment
 ( assignment
 , TypeScript.Syntax
