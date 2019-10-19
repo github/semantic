@@ -126,19 +126,19 @@ instance ShowTerm PythonPrecise.Term where
 
 
 instance ShowTerm Go.Term where
-  showTerm = showTerm . cata Term
+  showTerm = serialize Show . quieterm
 instance ShowTerm Markdown.Term where
-  showTerm = showTerm . cata Term
+  showTerm = serialize Show . quieterm
 instance ShowTerm PHP.Term where
-  showTerm = showTerm . cata Term
+  showTerm = serialize Show . quieterm
 instance ShowTerm PythonALaCarte.Term where
-  showTerm = showTerm . cata Term
+  showTerm = serialize Show . quieterm
 instance ShowTerm Ruby.Term where
-  showTerm = showTerm . cata Term
+  showTerm = serialize Show . quieterm
 instance ShowTerm TSX.Term where
-  showTerm = showTerm . cata Term
+  showTerm = serialize Show . quieterm
 instance ShowTerm TypeScript.Term where
-  showTerm = showTerm . cata Term
+  showTerm = serialize Show . quieterm
 
 
 sexprTermParsers :: PerLanguageModes -> Map Language (SomeParser SExprTerm Loc)
