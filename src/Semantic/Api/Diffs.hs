@@ -24,13 +24,6 @@ import           Data.ProtoLens (defMessage)
 import           Data.Term (IsTerm(..))
 import qualified Data.Text as T
 import           Diffing.Interpreter (DiffTerms(..))
-import qualified Language.Go.Term as Go
-import qualified Language.Markdown.Term as Markdown
-import qualified Language.PHP.Term as PHP
-import qualified Language.Python.Term as Python
-import qualified Language.Ruby.Term as Ruby
-import qualified Language.TSX.Term as TSX
-import qualified Language.TypeScript.Term as TypeScript
 import           Parsing.Parser
 import           Prologue
 import           Proto.Semantic as P hiding (Blob, BlobPair)
@@ -93,19 +86,7 @@ dotGraphDiffParsers = aLaCarteParsers
 class DOTGraphDiff term where
   dotGraphDiff :: (Carrier sig m, Member (Reader Config) sig, Member Telemetry sig, MonadIO m) => Edit (Blob, term Loc) (Blob, term Loc) -> m Builder
 
-instance DOTGraphDiff Go.Term where
-  dotGraphDiff = serialize (DOT (diffStyle "diffs")) . renderTreeGraph <=< diffTerms
-instance DOTGraphDiff Markdown.Term where
-  dotGraphDiff = serialize (DOT (diffStyle "diffs")) . renderTreeGraph <=< diffTerms
-instance DOTGraphDiff PHP.Term where
-  dotGraphDiff = serialize (DOT (diffStyle "diffs")) . renderTreeGraph <=< diffTerms
-instance DOTGraphDiff Python.Term where
-  dotGraphDiff = serialize (DOT (diffStyle "diffs")) . renderTreeGraph <=< diffTerms
-instance DOTGraphDiff Ruby.Term where
-  dotGraphDiff = serialize (DOT (diffStyle "diffs")) . renderTreeGraph <=< diffTerms
-instance DOTGraphDiff TSX.Term where
-  dotGraphDiff = serialize (DOT (diffStyle "diffs")) . renderTreeGraph <=< diffTerms
-instance DOTGraphDiff TypeScript.Term where
+instance (DiffTerms term, ConstructorName (Syntax term), Foldable (Syntax term), Functor (Syntax term)) => DOTGraphDiff term where
   dotGraphDiff = serialize (DOT (diffStyle "diffs")) . renderTreeGraph <=< diffTerms
 
 
