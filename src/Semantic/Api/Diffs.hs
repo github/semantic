@@ -1,4 +1,4 @@
-{-# LANGUAGE AllowAmbiguousTypes, GeneralizedNewtypeDeriving, LambdaCase, MonoLocalBinds, RankNTypes, StandaloneDeriving #-}
+{-# LANGUAGE AllowAmbiguousTypes, GeneralizedNewtypeDeriving, LambdaCase, MonoLocalBinds, RankNTypes, StandaloneDeriving, UndecidableInstances #-}
 module Semantic.Api.Diffs
   ( parseDiffBuilder
   , DiffOutputFormat(..)
@@ -6,6 +6,7 @@ module Semantic.Api.Diffs
   , diffTerms
   ) where
 
+import           Analysis.ConstructorName (ConstructorName)
 import           Control.Effect.Error
 import           Control.Effect.Parse
 import           Control.Effect.Reader
@@ -174,19 +175,7 @@ sexprDiffParsers = aLaCarteParsers
 class SExprDiff term where
   sexprDiff :: (Carrier sig m, Member (Reader Config) sig, Member Telemetry sig, MonadIO m) => Edit (Blob, term Loc) (Blob, term Loc) -> m Builder
 
-instance SExprDiff Go.Term where
-  sexprDiff = serialize (SExpression ByConstructorName) <=< diffTerms
-instance SExprDiff Markdown.Term where
-  sexprDiff = serialize (SExpression ByConstructorName) <=< diffTerms
-instance SExprDiff PHP.Term where
-  sexprDiff = serialize (SExpression ByConstructorName) <=< diffTerms
-instance SExprDiff Python.Term where
-  sexprDiff = serialize (SExpression ByConstructorName) <=< diffTerms
-instance SExprDiff Ruby.Term where
-  sexprDiff = serialize (SExpression ByConstructorName) <=< diffTerms
-instance SExprDiff TSX.Term where
-  sexprDiff = serialize (SExpression ByConstructorName) <=< diffTerms
-instance SExprDiff TypeScript.Term where
+instance (DiffTerms term, ConstructorName (Syntax term), Foldable (Syntax term), Functor (Syntax term)) => SExprDiff term where
   sexprDiff = serialize (SExpression ByConstructorName) <=< diffTerms
 
 
