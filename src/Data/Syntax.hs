@@ -33,7 +33,7 @@ makeTerm' :: (HasCallStack, Semigroup ann, Foldable (Syntax term), IsTerm term) 
 makeTerm' ann syntax = termIn (sconcat (ann :| (termAnnotation <$> toList syntax))) syntax
 
 -- | Lift syntax and an annotation into a term, injecting the syntax into a union & ensuring the annotation encompasses all children. Removes extra structure if term is a list of a single item.
-makeTerm'' :: (HasCallStack, Element syntax syntaxes, Semigroup ann, Apply Foldable syntaxes, Foldable syntax) => ann -> syntax (Term (Sum syntaxes) ann) -> Term (Sum syntaxes) ann
+makeTerm'' :: (HasCallStack, Element syntax syntaxes, Sum syntaxes ~ Syntax term, Semigroup ann, Apply Foldable syntaxes, Foldable syntax, IsTerm term) => ann -> syntax (term ann) -> term ann
 makeTerm'' ann children = case toList children of
   [x] -> x
   _ -> makeTerm' ann (inject children)
