@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilyDependencies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Diffing.Interpreter
 ( diffTerms
 , DiffTerms(..)
@@ -35,7 +35,7 @@ class Bifoldable (DiffFor term) => DiffTerms term where
   -- | The type of diffs for the given term type.
   --
   -- Note that the dependency means that the diff type is in 1:1 correspondence with the term type. This allows subclasses of 'DiffTerms' to receive e.g. @'DiffFor' term a b@ without incurring ambiguity, since every diff type is unique to its term type.
-  type DiffFor term = (diff :: * -> * -> *) | diff -> term
+  type DiffFor term :: * -> * -> *
 
   -- | Diff an 'Edit' of terms.
   diffTermPair :: Edit (term ann1) (term ann2) -> DiffFor term ann1 ann2
