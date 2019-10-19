@@ -83,10 +83,10 @@ postContextualizeThrough context rule end = make <$> rule <*> Assignment.manyThr
           _ -> (node, end)
 
 -- | Match context terms after a subject term, wrapping both up in a Context term if any context terms matched, or otherwise returning the subject term.
-postContextualize :: (HasCallStack, Context :< syntaxes, Alternative m, Semigroup ann, Apply Foldable syntaxes)
-                  => m (Term (Sum syntaxes) ann)
-                  -> m (Term (Sum syntaxes) ann)
-                  -> m (Term (Sum syntaxes) ann)
+postContextualize :: (HasCallStack, Context :< syntaxes, Sum syntaxes ~ Syntax term, Alternative m, Semigroup ann, Apply Foldable syntaxes, IsTerm term)
+                  => m (term ann)
+                  -> m (term ann)
+                  -> m (term ann)
 postContextualize context rule = make <$> rule <*> many context
   where make node cs = case nonEmpty cs of
           Just cs -> makeTerm1 (Context cs node)
