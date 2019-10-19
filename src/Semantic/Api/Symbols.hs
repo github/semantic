@@ -126,7 +126,8 @@ deriving instance ToTags PythonALaCarte.Term
 deriving instance ToTags Ruby.Term
 instance ToTags TSX.Term where
   tags = runTagging
-deriving instance ToTags TypeScript.Term
+instance ToTags TypeScript.Term where
+  tags = runTagging
 
 deriving via (ViaPrecise Java.Term)          instance ToTags Java.Term
 deriving via (ViaPrecise JSON.Term)          instance ToTags JSON.Term

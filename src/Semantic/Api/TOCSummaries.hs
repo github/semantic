@@ -129,7 +129,8 @@ deriving instance SummarizeTerms PythonALaCarte.Term
 deriving instance SummarizeTerms Ruby.Term
 instance SummarizeTerms TSX.Term where
   summarizeTerms = summarizeTerms . bimap (fmap (cata Term)) (fmap (cata Term))
-deriving instance SummarizeTerms TypeScript.Term
+instance SummarizeTerms TypeScript.Term where
+  summarizeTerms = summarizeTerms . bimap (fmap (cata Term)) (fmap (cata Term))
 
 
 deriving via (ViaTags Java.Term)          instance SummarizeTerms Java.Term

@@ -131,7 +131,8 @@ deriving instance ShowTerm PythonALaCarte.Term
 deriving instance ShowTerm Ruby.Term
 instance ShowTerm TSX.Term where
   showTerm = showTerm . cata Term
-deriving instance ShowTerm TypeScript.Term
+instance ShowTerm TypeScript.Term where
+  showTerm = showTerm . cata Term
 
 
 sexprTermParsers :: PerLanguageModes -> Map Language (SomeParser SExprTerm Loc)
@@ -159,7 +160,8 @@ deriving instance SExprTerm PythonALaCarte.Term
 deriving instance SExprTerm Ruby.Term
 instance SExprTerm TSX.Term where
   sexprTerm = SExpr.serializeSExpression ByConstructorName
-deriving instance SExprTerm TypeScript.Term
+instance SExprTerm TypeScript.Term where
+  sexprTerm = SExpr.serializeSExpression ByConstructorName
 
 
 dotGraphTermParsers :: Map Language (SomeParser DOTGraphTerm Loc)
@@ -178,7 +180,8 @@ deriving instance DOTGraphTerm PythonALaCarte.Term
 deriving instance DOTGraphTerm Ruby.Term
 instance DOTGraphTerm TSX.Term where
   dotGraphTerm = serialize (DOT (termStyle "terms")) . renderTreeGraph
-deriving instance DOTGraphTerm TypeScript.Term
+instance DOTGraphTerm TypeScript.Term where
+  dotGraphTerm = serialize (DOT (termStyle "terms")) . renderTreeGraph
 
 
 jsonTreeTermParsers :: Map Language (SomeParser JSONTreeTerm Loc)
@@ -197,7 +200,8 @@ deriving instance JSONTreeTerm PythonALaCarte.Term
 deriving instance JSONTreeTerm Ruby.Term
 instance JSONTreeTerm TSX.Term where
   jsonTreeTerm blob = jsonTreeTerm blob . cata Term
-deriving instance JSONTreeTerm TypeScript.Term
+instance JSONTreeTerm TypeScript.Term where
+  jsonTreeTerm blob = jsonTreeTerm blob . cata Term
 
 
 jsonGraphTermParsers :: Map Language (SomeParser JSONGraphTerm Loc)
@@ -226,4 +230,5 @@ deriving instance JSONGraphTerm PythonALaCarte.Term
 deriving instance JSONGraphTerm Ruby.Term
 instance JSONGraphTerm TSX.Term where
   jsonGraphTerm blob = jsonGraphTerm blob . cata Term
-deriving instance JSONGraphTerm TypeScript.Term
+instance JSONGraphTerm TypeScript.Term where
+  jsonGraphTerm blob = jsonGraphTerm blob . cata Term

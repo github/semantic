@@ -103,7 +103,8 @@ deriving instance DOTGraphDiff Python.Term
 deriving instance DOTGraphDiff Ruby.Term
 instance DOTGraphDiff TSX.Term where
   dotGraphDiff = serialize (DOT (diffStyle "diffs")) . renderTreeGraph . TSX.getDiff <=< diffTerms
-deriving instance DOTGraphDiff TypeScript.Term
+instance DOTGraphDiff TypeScript.Term where
+  dotGraphDiff = serialize (DOT (diffStyle "diffs")) . renderTreeGraph . TypeScript.getDiff <=< diffTerms
 
 
 jsonGraphDiffParsers :: Map Language (SomeParser JSONGraphDiff Loc)
@@ -146,7 +147,20 @@ instance JSONGraphDiff TSX.Term where
       & P.vertices .~ vertexList graph
       & P.edges    .~ fmap toEdge (edgeList graph)
       & P.errors   .~ mempty
-deriving instance JSONGraphDiff TypeScript.Term
+instance JSONGraphDiff TypeScript.Term where
+  jsonGraphDiff terms = do
+    TypeScript.Diff diff <- diffTerms terms
+    let graph = renderTreeGraph diff
+        blobPair = (bimap fst fst terms)
+        toEdge (Edge (a, b)) = defMessage & P.source .~ a^.diffVertexId & P.target .~ b^.diffVertexId
+        path = T.pack $ pathForBlobPair blobPair
+        lang = bridging # languageForBlobPair blobPair
+    pure $! defMessage
+      & P.path     .~ path
+      & P.language .~ lang
+      & P.vertices .~ vertexList graph
+      & P.edges    .~ fmap toEdge (edgeList graph)
+      & P.errors   .~ mempty
 
 
 jsonTreeDiffParsers :: Map Language (SomeParser JSONTreeDiff Loc)
@@ -165,7 +179,8 @@ deriving instance JSONTreeDiff Python.Term
 deriving instance JSONTreeDiff Ruby.Term
 instance JSONTreeDiff TSX.Term where
   jsonTreeDiff terms = renderJSONDiff (bimap fst fst terms) . TSX.getDiff <$> diffTerms terms
-deriving instance JSONTreeDiff TypeScript.Term
+instance JSONTreeDiff TypeScript.Term where
+  jsonTreeDiff terms = renderJSONDiff (bimap fst fst terms) . TypeScript.getDiff <$> diffTerms terms
 
 
 sexprDiffParsers :: Map Language (SomeParser SExprDiff Loc)
@@ -184,7 +199,8 @@ deriving instance SExprDiff Python.Term
 deriving instance SExprDiff Ruby.Term
 instance SExprDiff TSX.Term where
   sexprDiff = serialize (SExpression ByConstructorName) . TSX.getDiff <=< diffTerms
-deriving instance SExprDiff TypeScript.Term
+instance SExprDiff TypeScript.Term where
+  sexprDiff = serialize (SExpression ByConstructorName) . TypeScript.getDiff <=< diffTerms
 
 
 showDiffParsers :: Map Language (SomeParser ShowDiff Loc)
@@ -203,7 +219,8 @@ deriving instance ShowDiff Python.Term
 deriving instance ShowDiff Ruby.Term
 instance ShowDiff TSX.Term where
   showDiff = serialize Show . TSX.getDiff <=< diffTerms
-deriving instance ShowDiff TypeScript.Term
+instance ShowDiff TypeScript.Term where
+  showDiff = serialize Show . TypeScript.getDiff <=< diffTerms
 
 
 diffTerms :: (DiffTerms term, Member Telemetry sig, Carrier sig m, MonadIO m)
