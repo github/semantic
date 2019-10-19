@@ -77,7 +77,7 @@ diffGraph blobs = do
   pure $ defMessage & P.files .~ toList graph
   where
     go :: DiffEffects sig m => BlobPair -> m DiffTreeFileGraph
-    go blobPair = diffWith jsonGraphDiffParsers (pure . jsonGraphDiff blobPair) blobPair
+    go blobPair = parsePairWith jsonGraphDiffParsers jsonGraphDiff blobPair
       `catchError` \(SomeException e) ->
         pure $ defMessage
           & P.path .~ path
@@ -113,21 +113,23 @@ deriving instance DOTGraphDiff TypeScript.Term
 jsonGraphDiffParsers :: Map Language (SomeParser JSONGraphDiff Loc)
 jsonGraphDiffParsers = aLaCarteParsers
 
-class DiffTerms term => JSONGraphDiff term where
-  jsonGraphDiff :: BlobPair -> DiffFor term Loc Loc -> DiffTreeFileGraph
+class JSONGraphDiff term where
+  jsonGraphDiff :: (Carrier sig m, Member Telemetry sig, MonadIO m) => Edit (Blob, term Loc) (Blob, term Loc) -> m DiffTreeFileGraph
 
 instance (ConstructorName syntax, Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => JSONGraphDiff (Term syntax) where
-  jsonGraphDiff blobPair diff
-    = let graph = renderTreeGraph diff
-          toEdge (Edge (a, b)) = defMessage & P.source .~ a^.diffVertexId & P.target .~ b^.diffVertexId
-          path = T.pack $ pathForBlobPair blobPair
-          lang = bridging # languageForBlobPair blobPair
-      in defMessage
-           & P.path .~ path
-           & P.language .~ lang
-           & P.vertices .~ vertexList graph
-           & P.edges .~ fmap toEdge (edgeList graph)
-           & P.errors .~ mempty
+  jsonGraphDiff terms = do
+    diff <- diffTerms terms
+    let graph = renderTreeGraph diff
+        blobPair = (bimap fst fst terms)
+        toEdge (Edge (a, b)) = defMessage & P.source .~ a^.diffVertexId & P.target .~ b^.diffVertexId
+        path = T.pack $ pathForBlobPair blobPair
+        lang = bridging # languageForBlobPair blobPair
+    pure $! defMessage
+      & P.path     .~ path
+      & P.language .~ lang
+      & P.vertices .~ vertexList graph
+      & P.edges    .~ fmap toEdge (edgeList graph)
+      & P.errors   .~ mempty
 
 deriving instance JSONGraphDiff Go.Term
 deriving instance JSONGraphDiff Markdown.Term
