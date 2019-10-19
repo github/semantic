@@ -10,7 +10,6 @@ import Data.Abstract.FreeVariables
 import Data.Bifunctor
 import Data.Bitraversable
 import Data.Coerce
-import Data.Diff
 import Data.Foldable (fold)
 import Data.Functor.Foldable (Base, Recursive(..))
 import Data.Graph.ControlFlowVertex (VertexDeclaration(..), toVertex1)
@@ -226,7 +225,6 @@ instance Syntax.HasErrors Term where
 
 
 instance DiffTerms Term where
-  type DiffFor Term = Diff (Sum.Sum Syntax)
   diffTermPair = diffTermPair . bimap (cata Term.Term) (cata Term.Term)
 
 type instance Base (Term ann) = Term.TermF (Sum.Sum Syntax) ann

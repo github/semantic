@@ -14,10 +14,12 @@ import           Control.Lens
 import           Control.Monad.IO.Class
 import           Data.Blob
 import           Data.ByteString.Builder
+import           Data.Diff
 import           Data.Edit
 import           Data.Graph
 import           Data.Language
 import           Data.ProtoLens (defMessage)
+import           Data.Term (IsTerm(..))
 import qualified Data.Text as T
 import           Diffing.Interpreter (DiffTerms(..))
 import qualified Language.Go.Term as Go
@@ -210,8 +212,8 @@ instance ShowDiff TypeScript.Term where
   showDiff = serialize Show <=< diffTerms
 
 
-diffTerms :: (DiffTerms term, Member Telemetry sig, Carrier sig m, MonadIO m)
-  => Edit (Blob, term ann) (Blob, term ann) -> m (DiffFor term ann ann)
+diffTerms :: (DiffTerms term, Foldable (Syntax term), Member Telemetry sig, Carrier sig m, MonadIO m)
+  => Edit (Blob, term ann) (Blob, term ann) -> m (Diff (Syntax term) ann ann)
 diffTerms terms = time "diff" languageTag $ do
   let diff = diffTermPair (bimap snd snd terms)
   diff <$ writeStat (Stat.count "diff.nodes" (bilength diff) languageTag)
