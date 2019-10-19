@@ -69,7 +69,6 @@ common dependencies
                      , streaming ^>= 0.2.2.0
                      , streaming-bytestring ^>= 0.1.6
                      , text ^>= 1.2.3.1
-                     , these >= 0.7 && <1
                      , unix ^>= 2.7.2.2
                      , lingo ^>= 0.3.0.0
 
@@ -148,9 +147,9 @@ library
                      , Data.Blob.IO
                      , Data.Diff
                      , Data.Duration
+                     , Data.Edit
                      , Data.Error
                      , Data.Flag
-                     , Data.Functor.Both
                      , Data.Functor.Classes.Generic
                      , Data.Graph
                      , Data.Graph.ControlFlowVertex
@@ -160,7 +159,6 @@ library
                      , Data.JSON.Fields
                      , Data.Language
                      , Data.Map.Monoidal
-                     , Data.Patch
                      , Data.Project
                      , Data.Quieterm
                      , Data.Semigroup.App

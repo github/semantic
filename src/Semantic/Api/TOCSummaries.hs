@@ -18,6 +18,7 @@ import           Control.Monad.IO.Class
 import           Data.Aeson
 import           Data.Blob
 import           Data.ByteString.Builder
+import           Data.Edit
 import           Data.Either (partitionEithers)
 import           Data.Function (on)
 import           Data.Functor.Classes
@@ -30,7 +31,6 @@ import           Data.ProtoLens (defMessage)
 import           Data.Semilattice.Lower
 import           Data.Term (Term)
 import qualified Data.Text as T
-import           Data.These (These, fromThese)
 import           Diffing.Algorithm (Diffable)
 import qualified Diffing.Algorithm.SES as SES
 import qualified Language.Go.Term as Go
@@ -114,7 +114,7 @@ summarizeTermParsers :: PerLanguageModes -> Map Language (SomeParser SummarizeTe
 summarizeTermParsers = allParsers
 
 class SummarizeTerms term where
-  summarizeTerms :: (Member Telemetry sig, Carrier sig m, MonadIO m) => These (Blob, term Loc) (Blob, term Loc) -> m [Either ErrorSummary TOCSummary]
+  summarizeTerms :: (Member Telemetry sig, Carrier sig m, MonadIO m) => Edit (Blob, term Loc) (Blob, term Loc) -> m [Either ErrorSummary TOCSummary]
 
 instance (Diffable syntax, Eq1 syntax, HasDeclaration syntax, Hashable1 syntax, Traversable syntax) => SummarizeTerms (Term syntax) where
   summarizeTerms = fmap diffTOC . diffTerms . bimap decorateTerm decorateTerm where
@@ -138,16 +138,16 @@ deriving via (ViaTags PythonPrecise.Term) instance SummarizeTerms PythonPrecise.
 newtype ViaTags t a = ViaTags (t a)
 
 instance Tagging.ToTags t => SummarizeTerms (ViaTags t) where
-  summarizeTerms terms = pure . map (uncurry summarizeChange) . dedupe . mapMaybe toChange . uncurry (SES.ses compare) . fromThese [] [] . bimap (uncurry go) (uncurry go) $ terms where
+  summarizeTerms terms = pure . map (uncurry summarizeChange) . dedupe . mapMaybe toChange . edit (map Delete) (map Insert) (SES.ses compare) . bimap (uncurry go) (uncurry go) $ terms where
     go blob (ViaTags t) = Tagging.tags (blobSource blob) t
-    lang = languageForBlobPair (BlobPair (bimap fst fst terms))
-    (s1, s2) = fromThese mempty mempty (bimap (blobSource . fst) (blobSource . fst) terms)
+    lang = languageForBlobPair (bimap fst fst terms)
+    (s1, s2) = edit (,mempty) (mempty,) (,) (bimap (blobSource . fst) (blobSource . fst) terms)
     compare = liftA2 (&&) <$> ((==) `on` Tag.kind) <*> ((==) `on` Tag.name)
 
     toChange = \case
-      SES.Delete tag -> (Deleted,)  <$> toDecl tag
-      SES.Insert tag -> (Inserted,) <$> toDecl tag
-      SES.Copy t1 t2
+      Delete tag -> (Deleted,)  <$> toDecl tag
+      Insert tag -> (Inserted,) <$> toDecl tag
+      Compare t1 t2
         | Source.slice s1 (byteRange (Tag.loc t1)) /= Source.slice s2 (byteRange (Tag.loc t2))
                      -> (Changed,) <$> toDecl t2
         | otherwise  -> Nothing

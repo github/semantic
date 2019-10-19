@@ -8,7 +8,6 @@ import Data.Aeson hiding (defaultOptions)
 import Data.Bifunctor
 import Data.Diff
 import Data.Either (isRight)
-import Data.Patch
 import Data.Sum
 import Data.Term
 import Data.Text (Text)
@@ -37,9 +36,9 @@ spec = do
       \ term -> tableOfContentsBy (Just . termFAnnotation) (diffTerms term (term :: Term ListableSyntax ())) `shouldBe` []
 
     prop "produces inserted/deleted/replaced entries for relevant nodes within patches" $
-      \ p -> tableOfContentsBy (Just . termFAnnotation) (patch deleting inserting replacing p)
+      \ p -> tableOfContentsBy (Just . termFAnnotation) (patch deleting inserting comparing p)
       `shouldBe`
-      patch (fmap (Deleted,)) (fmap (Inserted,)) (\ as bs -> (Replaced, head bs) : fmap (Deleted,) (tail as) <> fmap (Inserted,) (tail bs)) (bimap (foldMap pure) (foldMap pure) (p :: Patch (Term ListableSyntax Int) (Term ListableSyntax Int)))
+      patch (fmap (Deleted,)) (fmap (Inserted,)) (\ as bs -> (Replaced, head bs) : fmap (Deleted,) (tail as) <> fmap (Inserted,) (tail bs)) (bimap (foldMap pure) (foldMap pure) (p :: Edit (Term ListableSyntax Int) (Term ListableSyntax Int)))
 
     prop "produces changed entries for relevant nodes containing irrelevant patches" $
       \ diff -> do
@@ -53,7 +52,7 @@ spec = do
       diffTOC blankDiff `shouldBe` [ ]
 
     it "summarizes changed methods" $ do
-      sourceBlobs <- blobsForPaths (Both (Path.relFile "ruby/toc/methods.A.rb") (Path.relFile "ruby/toc/methods.B.rb"))
+      sourceBlobs <- blobsForPaths (Path.relFile "ruby/toc/methods.A.rb") (Path.relFile "ruby/toc/methods.B.rb")
       diff <- runTaskOrDie $ summarize sourceBlobs
       diff `shouldBe`
         [ Right $ TOCSummary (Method (Just "self")) "self.foo" (Span (Pos 1 1) (Pos 2 4)) Inserted
@@ -62,37 +61,37 @@ spec = do
         ]
 
     it "dedupes changes in same parent method" $ do
-      sourceBlobs <- blobsForPaths (Both (Path.relFile "javascript/toc/duplicate-parent.A.js") (Path.relFile "javascript/toc/duplicate-parent.B.js"))
+      sourceBlobs <- blobsForPaths (Path.relFile "javascript/toc/duplicate-parent.A.js") (Path.relFile "javascript/toc/duplicate-parent.B.js")
       diff <- runTaskOrDie $ summarize sourceBlobs
       diff `shouldBe`
         [ Right $ TOCSummary Function "myFunction" (Span (Pos 1 1) (Pos 6 2)) Changed ]
 
     it "dedupes similar methods" $ do
-      sourceBlobs <- blobsForPaths (Both (Path.relFile "javascript/toc/erroneous-duplicate-method.A.js") (Path.relFile "javascript/toc/erroneous-duplicate-method.B.js"))
+      sourceBlobs <- blobsForPaths (Path.relFile "javascript/toc/erroneous-duplicate-method.A.js") (Path.relFile "javascript/toc/erroneous-duplicate-method.B.js")
       diff <- runTaskOrDie $ summarize sourceBlobs
       diff `shouldBe`
         [ Right $ TOCSummary Function "performHealthCheck" (Span (Pos 8 1) (Pos 29 2)) Replaced ]
 
     it "summarizes Go methods with receivers with special formatting" $ do
-      sourceBlobs <- blobsForPaths (Both (Path.relFile "go/toc/method-with-receiver.A.go") (Path.relFile "go/toc/method-with-receiver.B.go"))
+      sourceBlobs <- blobsForPaths (Path.relFile "go/toc/method-with-receiver.A.go") (Path.relFile "go/toc/method-with-receiver.B.go")
       diff <- runTaskOrDie $ summarize sourceBlobs
       diff `shouldBe`
         [ Right $ TOCSummary (Method (Just "*apiClient")) "(*apiClient) CheckAuth" (Span (Pos 3 1) (Pos 3 101)) Inserted ]
 
     it "summarizes Ruby methods that start with two identifiers" $ do
-      sourceBlobs <- blobsForPaths (Both (Path.relFile "ruby/toc/method-starts-with-two-identifiers.A.rb") (Path.relFile "ruby/toc/method-starts-with-two-identifiers.B.rb"))
+      sourceBlobs <- blobsForPaths (Path.relFile "ruby/toc/method-starts-with-two-identifiers.A.rb") (Path.relFile "ruby/toc/method-starts-with-two-identifiers.B.rb")
       diff <- runTaskOrDie $ summarize sourceBlobs
       diff `shouldBe`
         [ Right $ TOCSummary (Method Nothing) "foo" (Span (Pos 1 1) (Pos 4 4)) Changed ]
 
     it "handles unicode characters in file" $ do
-      sourceBlobs <- blobsForPaths (Both (Path.relFile "ruby/toc/unicode.A.rb") (Path.relFile "ruby/toc/unicode.B.rb"))
+      sourceBlobs <- blobsForPaths (Path.relFile "ruby/toc/unicode.A.rb") (Path.relFile "ruby/toc/unicode.B.rb")
       diff <- runTaskOrDie $ summarize sourceBlobs
       diff `shouldBe`
         [ Right $ TOCSummary (Method Nothing) "foo" (Span (Pos 6 1) (Pos 7 4)) Inserted ]
 
     it "properly slices source blob that starts with a newline and has multi-byte chars" $ do
-      sourceBlobs <- blobsForPaths (Both (Path.relFile "javascript/toc/starts-with-newline.js") (Path.relFile "javascript/toc/starts-with-newline.js"))
+      sourceBlobs <- blobsForPaths (Path.relFile "javascript/toc/starts-with-newline.js") (Path.relFile "javascript/toc/starts-with-newline.js")
       diff <- runTaskOrDie $ summarize sourceBlobs
       diff `shouldBe` []
 
@@ -135,22 +134,22 @@ spec = do
 
   describe "diff with ToCDiffRenderer'" $ do
     it "produces JSON output" $ do
-      blobs <- blobsForPaths (Both (Path.relFile "ruby/toc/methods.A.rb") (Path.relFile "ruby/toc/methods.B.rb"))
+      blobs <- blobsForPaths (Path.relFile "ruby/toc/methods.A.rb") (Path.relFile "ruby/toc/methods.B.rb")
       output <- runTaskOrDie (runReader defaultLanguageModes (diffSummaryBuilder Format.JSON [blobs]))
       runBuilder output `shouldBe` ("{\"files\":[{\"path\":\"test/fixtures/ruby/toc/methods.A.rb -> test/fixtures/ruby/toc/methods.B.rb\",\"language\":\"Ruby\",\"changes\":[{\"category\":\"Method\",\"term\":\"self.foo\",\"span\":{\"start\":{\"line\":1,\"column\":1},\"end\":{\"line\":2,\"column\":4}},\"changeType\":\"ADDED\"},{\"category\":\"Method\",\"term\":\"bar\",\"span\":{\"start\":{\"line\":4,\"column\":1},\"end\":{\"line\":6,\"column\":4}},\"changeType\":\"MODIFIED\"},{\"category\":\"Method\",\"term\":\"baz\",\"span\":{\"start\":{\"line\":4,\"column\":1},\"end\":{\"line\":5,\"column\":4}},\"changeType\":\"REMOVED\"}]}]}\n" :: ByteString)
 
     it "produces JSON output if there are parse errors" $ do
-      blobs <- blobsForPaths (Both (Path.relFile "ruby/toc/methods.A.rb") (Path.relFile "ruby/toc/methods.X.rb"))
+      blobs <- blobsForPaths (Path.relFile "ruby/toc/methods.A.rb") (Path.relFile "ruby/toc/methods.X.rb")
       output <- runTaskOrDie (runReader defaultLanguageModes (diffSummaryBuilder Format.JSON [blobs]))
       runBuilder output `shouldBe` ("{\"files\":[{\"path\":\"test/fixtures/ruby/toc/methods.A.rb -> test/fixtures/ruby/toc/methods.X.rb\",\"language\":\"Ruby\",\"changes\":[{\"category\":\"Method\",\"term\":\"bar\",\"span\":{\"start\":{\"line\":1,\"column\":1},\"end\":{\"line\":2,\"column\":4}},\"changeType\":\"REMOVED\"},{\"category\":\"Method\",\"term\":\"baz\",\"span\":{\"start\":{\"line\":4,\"column\":1},\"end\":{\"line\":5,\"column\":4}},\"changeType\":\"REMOVED\"}],\"errors\":[{\"error\":\"expected end of input nodes, but got ParseError\",\"span\":{\"start\":{\"line\":1,\"column\":1},\"end\":{\"line\":2,\"column\":3}}}]}]}\n" :: ByteString)
 
     it "ignores anonymous functions" $ do
-      blobs <- blobsForPaths (Both (Path.relFile "ruby/toc/lambda.A.rb") (Path.relFile "ruby/toc/lambda.B.rb"))
+      blobs <- blobsForPaths (Path.relFile "ruby/toc/lambda.A.rb") (Path.relFile "ruby/toc/lambda.B.rb")
       output <- runTaskOrDie (runReader defaultLanguageModes (diffSummaryBuilder Format.JSON [blobs]))
       runBuilder output `shouldBe` ("{\"files\":[{\"path\":\"test/fixtures/ruby/toc/lambda.A.rb -> test/fixtures/ruby/toc/lambda.B.rb\",\"language\":\"Ruby\"}]}\n" :: ByteString)
 
     it "summarizes Markdown headings" $ do
-      blobs <- blobsForPaths (Both (Path.relFile "markdown/toc/headings.A.md") (Path.relFile "markdown/toc/headings.B.md"))
+      blobs <- blobsForPaths (Path.relFile "markdown/toc/headings.A.md") (Path.relFile "markdown/toc/headings.B.md")
       output <- runTaskOrDie (runReader defaultLanguageModes (diffSummaryBuilder Format.JSON [blobs]))
       runBuilder output `shouldBe` ("{\"files\":[{\"path\":\"test/fixtures/markdown/toc/headings.A.md -> test/fixtures/markdown/toc/headings.B.md\",\"language\":\"Markdown\",\"changes\":[{\"category\":\"Heading 1\",\"term\":\"Introduction\",\"span\":{\"start\":{\"line\":1,\"column\":1},\"end\":{\"line\":3,\"column\":16}},\"changeType\":\"REMOVED\"},{\"category\":\"Heading 2\",\"term\":\"Two\",\"span\":{\"start\":{\"line\":5,\"column\":1},\"end\":{\"line\":7,\"column\":4}},\"changeType\":\"MODIFIED\"},{\"category\":\"Heading 3\",\"term\":\"This heading is new\",\"span\":{\"start\":{\"line\":9,\"column\":1},\"end\":{\"line\":11,\"column\":10}},\"changeType\":\"ADDED\"},{\"category\":\"Heading 1\",\"term\":\"Final\",\"span\":{\"start\":{\"line\":13,\"column\":1},\"end\":{\"line\":14,\"column\":4}},\"changeType\":\"ADDED\"}]}]}\n" :: ByteString)
 
@@ -161,14 +160,14 @@ type Term' = Term ListableSyntax (Maybe Declaration)
 numTocSummaries :: Diff' -> Int
 numTocSummaries diff = length $ filter isRight (diffTOC diff)
 
--- Return a diff where body is inserted in the expressions of a function. The function is present in Both sides of the diff.
+-- Return a diff where body is inserted in the expressions of a function. The function is present in both sides of the diff.
 programWithChange :: Term' -> Diff'
 programWithChange body = merge (Nothing, Nothing) (inject [ function' ])
   where
     function' = merge (Just (Declaration Function "foo" lowerBound Ruby), Just (Declaration Function "foo" lowerBound Ruby)) (inject (Declaration.Function [] name' [] (merge (Nothing, Nothing) (inject [ inserting body ]))))
     name' = merge (Nothing, Nothing) (inject (Syntax.Identifier (name "foo")))
 
--- Return a diff where term is inserted in the program, below a function found on Both sides of the diff.
+-- Return a diff where term is inserted in the program, below a function found on both sides of the diff.
 programWithChangeOutsideFunction :: Term' -> Diff'
 programWithChangeOutsideFunction term = merge (Nothing, Nothing) (inject [ function', term' ])
   where
@@ -183,7 +182,7 @@ programWithDelete :: Text -> Term' -> Diff'
 programWithDelete name body = programOf $ deleting (functionOf name body)
 
 programWithReplace :: Text -> Term' -> Diff'
-programWithReplace name body = programOf $ replacing (functionOf name body) (functionOf (name <> "2") body)
+programWithReplace name body = programOf $ comparing (functionOf name body) (functionOf (name <> "2") body)
 
 programOf :: Diff' -> Diff'
 programOf diff = merge (Nothing, Nothing) (inject [ diff ])
@@ -208,8 +207,9 @@ isMethodOrFunction a
   | any isJust (foldMap (:[]) a)                       = True
   | otherwise                                          = False
 
-blobsForPaths :: Both Path.RelFile -> IO BlobPair
-blobsForPaths = readFilePathPair . fmap (Path.relDir "test/fixtures" </>)
+blobsForPaths :: Path.RelFile -> Path.RelFile -> IO BlobPair
+blobsForPaths p1 p2 = readFilePathPair (prefix p1) (prefix p2) where
+  prefix = (Path.relDir "test/fixtures" </>)
 
 blankDiff :: Diff'
 blankDiff = merge (Nothing, Nothing) (inject [ inserting (termIn Nothing (inject (Syntax.Identifier (name "\"a\"")))) ])
