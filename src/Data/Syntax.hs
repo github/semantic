@@ -58,7 +58,7 @@ handleError :: (HasCallStack, Error :< syntaxes, Sum syntaxes ~ Syntax term, Enu
 handleError = flip Assignment.catchError (\ err -> makeTerm <$> Assignment.location <*> pure (errorSyntax (either id show <$> err) []) <* Assignment.source)
 
 -- | Catch parse errors into an error term.
-parseError :: (HasCallStack, Error :< syntaxes, Bounded grammar, Enum grammar, Ix grammar, Apply Foldable syntaxes) => Assignment.Assignment ast grammar (Term (Sum syntaxes) Loc)
+parseError :: (HasCallStack, Error :< syntaxes, Sum syntaxes ~ Syntax term, Bounded grammar, Enum grammar, Ix grammar, Apply Foldable syntaxes, IsTerm term) => Assignment.Assignment ast grammar (term Loc)
 parseError = makeTerm <$> Assignment.token maxBound <*> pure (Error (ErrorStack $ errorSite <$> getCallStack (freezeCallStack callStack)) [] (Just "ParseError") [])
 
 -- | Match context terms before a subject term, wrapping both up in a Context term if any context terms matched, or otherwise returning the subject term.
