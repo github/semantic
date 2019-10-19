@@ -43,7 +43,7 @@ makeTerm1 :: (HasCallStack, Element syntax syntaxes, Semigroup ann, Apply Foldab
 makeTerm1 = makeTerm1' . inject
 
 -- | Lift a non-empty union into a term, appending all subterms’ annotations to make the new term’s annotation.
-makeTerm1' :: (HasCallStack, Semigroup ann, Foldable (Syntax term), IsTerm term) => Syntax term (term ann) -> term ann
+makeTerm1' :: (HasCallStack, Semigroup ann, Foldable syntax) => syntax (Term syntax ann) -> Term syntax ann
 makeTerm1' syntax = case toList syntax of
   a : _ -> makeTerm' (termAnnotation a) syntax
   _ -> error "makeTerm1': empty structure"
