@@ -3,8 +3,6 @@ module Semantic.Api.Diffs
   ( parseDiffBuilder
   , DiffOutputFormat(..)
 
-  , DiffEffects
-
   , diffTerms
   ) where
 
