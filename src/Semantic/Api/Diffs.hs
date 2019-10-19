@@ -114,19 +114,24 @@ class JSONGraphDiff term where
   jsonGraphDiff :: (Carrier sig m, Member Telemetry sig, MonadIO m) => Edit (Blob, term Loc) (Blob, term Loc) -> m DiffTreeFileGraph
 
 instance (ConstructorName syntax, Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => JSONGraphDiff (Term syntax) where
-  jsonGraphDiff terms = do
-    diff <- diffTerms terms
-    let graph = renderTreeGraph diff
-        blobPair = (bimap fst fst terms)
-        toEdge (Edge (a, b)) = defMessage & P.source .~ a^.diffVertexId & P.target .~ b^.diffVertexId
-        path = T.pack $ pathForBlobPair blobPair
-        lang = bridging # languageForBlobPair blobPair
-    pure $! defMessage
-      & P.path     .~ path
-      & P.language .~ lang
-      & P.vertices .~ vertexList graph
-      & P.edges    .~ fmap toEdge (edgeList graph)
-      & P.errors   .~ mempty
+  jsonGraphDiff terms = toGraph (bimap fst fst terms) <$> diffTerms terms
+
+toGraph
+  :: (Recursive diff, ToTreeGraph DiffTreeVertex (Base diff))
+  => BlobPair
+  -> diff
+  -> DiffTreeFileGraph
+toGraph blobPair diff =
+  let graph = renderTreeGraph diff
+      toEdge (Edge (a, b)) = defMessage & P.source .~ a^.diffVertexId & P.target .~ b^.diffVertexId
+      path = T.pack $ pathForBlobPair blobPair
+      lang = bridging # languageForBlobPair blobPair
+  in defMessage
+    & P.path     .~ path
+    & P.language .~ lang
+    & P.vertices .~ vertexList graph
+    & P.edges    .~ fmap toEdge (edgeList graph)
+    & P.errors   .~ mempty
 
 deriving instance JSONGraphDiff Go.Term
 deriving instance JSONGraphDiff Markdown.Term
@@ -134,33 +139,9 @@ deriving instance JSONGraphDiff PHP.Term
 deriving instance JSONGraphDiff Python.Term
 deriving instance JSONGraphDiff Ruby.Term
 instance JSONGraphDiff TSX.Term where
-  jsonGraphDiff terms = do
-    TSX.Diff diff <- diffTerms terms
-    let graph = renderTreeGraph diff
-        blobPair = (bimap fst fst terms)
-        toEdge (Edge (a, b)) = defMessage & P.source .~ a^.diffVertexId & P.target .~ b^.diffVertexId
-        path = T.pack $ pathForBlobPair blobPair
-        lang = bridging # languageForBlobPair blobPair
-    pure $! defMessage
-      & P.path     .~ path
-      & P.language .~ lang
-      & P.vertices .~ vertexList graph
-      & P.edges    .~ fmap toEdge (edgeList graph)
-      & P.errors   .~ mempty
+  jsonGraphDiff terms = toGraph (bimap fst fst terms) . TSX.getDiff        <$> diffTerms terms
 instance JSONGraphDiff TypeScript.Term where
-  jsonGraphDiff terms = do
-    TypeScript.Diff diff <- diffTerms terms
-    let graph = renderTreeGraph diff
-        blobPair = (bimap fst fst terms)
-        toEdge (Edge (a, b)) = defMessage & P.source .~ a^.diffVertexId & P.target .~ b^.diffVertexId
-        path = T.pack $ pathForBlobPair blobPair
-        lang = bridging # languageForBlobPair blobPair
-    pure $! defMessage
-      & P.path     .~ path
-      & P.language .~ lang
-      & P.vertices .~ vertexList graph
-      & P.edges    .~ fmap toEdge (edgeList graph)
-      & P.errors   .~ mempty
+  jsonGraphDiff terms = toGraph (bimap fst fst terms) . TypeScript.getDiff <$> diffTerms terms
 
 
 jsonTreeDiffParsers :: Map Language (SomeParser JSONTreeDiff Loc)
