@@ -91,24 +91,19 @@ class JSONGraphDiff term where
   jsonGraphDiff :: (Carrier sig m, Member Telemetry sig, MonadIO m) => Edit (Blob, term Loc) (Blob, term Loc) -> m DiffTreeFileGraph
 
 instance (DiffTerms term, ConstructorName (Syntax term), Foldable (Syntax term), Functor (Syntax term)) => JSONGraphDiff term where
-  jsonGraphDiff terms = toGraph (bimap fst fst terms) <$> diffTerms terms
-
-toGraph
-  :: (Recursive diff, ToTreeGraph DiffTreeVertex (Base diff))
-  => BlobPair
-  -> diff
-  -> DiffTreeFileGraph
-toGraph blobPair diff =
-  let graph = renderTreeGraph diff
-      toEdge (Edge (a, b)) = defMessage & P.source .~ a^.diffVertexId & P.target .~ b^.diffVertexId
-      path = T.pack $ pathForBlobPair blobPair
-      lang = bridging # languageForBlobPair blobPair
-  in defMessage
-    & P.path     .~ path
-    & P.language .~ lang
-    & P.vertices .~ vertexList graph
-    & P.edges    .~ fmap toEdge (edgeList graph)
-    & P.errors   .~ mempty
+  jsonGraphDiff terms = do
+    diff <- diffTerms terms
+    let blobPair = bimap fst fst terms
+        graph = renderTreeGraph diff
+        toEdge (Edge (a, b)) = defMessage & P.source .~ a^.diffVertexId & P.target .~ b^.diffVertexId
+        path = T.pack $ pathForBlobPair blobPair
+        lang = bridging # languageForBlobPair blobPair
+    pure $! defMessage
+      & P.path     .~ path
+      & P.language .~ lang
+      & P.vertices .~ vertexList graph
+      & P.edges    .~ fmap toEdge (edgeList graph)
+      & P.errors   .~ mempty
 
 
 class JSONTreeDiff term where
