@@ -102,7 +102,7 @@ deriving instance DOTGraphDiff PHP.Term
 deriving instance DOTGraphDiff Python.Term
 deriving instance DOTGraphDiff Ruby.Term
 instance DOTGraphDiff TSX.Term where
-  dotGraphDiff = serialize (DOT (diffStyle "diffs")) . renderTreeGraph . TSX.getDiff
+  dotGraphDiff = serialize (DOT (diffStyle "diffs")) . renderTreeGraph . TSX.getDiff <=< diffTerms
 deriving instance DOTGraphDiff TypeScript.Term
 
 
@@ -133,17 +133,19 @@ deriving instance JSONGraphDiff PHP.Term
 deriving instance JSONGraphDiff Python.Term
 deriving instance JSONGraphDiff Ruby.Term
 instance JSONGraphDiff TSX.Term where
-  jsonGraphDiff blobPair (TSX.Diff diff)
-    = let graph = renderTreeGraph diff
-          toEdge (Edge (a, b)) = defMessage & P.source .~ a^.diffVertexId & P.target .~ b^.diffVertexId
-          path = T.pack $ pathForBlobPair blobPair
-          lang = bridging # languageForBlobPair blobPair
-      in defMessage
-           & P.path .~ path
-           & P.language .~ lang
-           & P.vertices .~ vertexList graph
-           & P.edges .~ fmap toEdge (edgeList graph)
-           & P.errors .~ mempty
+  jsonGraphDiff terms = do
+    TSX.Diff diff <- diffTerms terms
+    let graph = renderTreeGraph diff
+        blobPair = (bimap fst fst terms)
+        toEdge (Edge (a, b)) = defMessage & P.source .~ a^.diffVertexId & P.target .~ b^.diffVertexId
+        path = T.pack $ pathForBlobPair blobPair
+        lang = bridging # languageForBlobPair blobPair
+    pure $! defMessage
+      & P.path     .~ path
+      & P.language .~ lang
+      & P.vertices .~ vertexList graph
+      & P.edges    .~ fmap toEdge (edgeList graph)
+      & P.errors   .~ mempty
 deriving instance JSONGraphDiff TypeScript.Term
 
 
@@ -162,7 +164,7 @@ deriving instance JSONTreeDiff PHP.Term
 deriving instance JSONTreeDiff Python.Term
 deriving instance JSONTreeDiff Ruby.Term
 instance JSONTreeDiff TSX.Term where
-  jsonTreeDiff blobs = renderJSONDiff blobs . TSX.getDiff
+  jsonTreeDiff terms = renderJSONDiff (bimap fst fst terms) . TSX.getDiff <$> diffTerms terms
 deriving instance JSONTreeDiff TypeScript.Term
 
 
@@ -181,7 +183,7 @@ deriving instance SExprDiff PHP.Term
 deriving instance SExprDiff Python.Term
 deriving instance SExprDiff Ruby.Term
 instance SExprDiff TSX.Term where
-  sexprDiff = serialize (SExpression ByConstructorName) . TSX.getDiff
+  sexprDiff = serialize (SExpression ByConstructorName) . TSX.getDiff <=< diffTerms
 deriving instance SExprDiff TypeScript.Term
 
 
@@ -200,7 +202,7 @@ deriving instance ShowDiff PHP.Term
 deriving instance ShowDiff Python.Term
 deriving instance ShowDiff Ruby.Term
 instance ShowDiff TSX.Term where
-  showDiff = serialize Show . TSX.getDiff
+  showDiff = serialize Show . TSX.getDiff <=< diffTerms
 deriving instance ShowDiff TypeScript.Term
 
 
