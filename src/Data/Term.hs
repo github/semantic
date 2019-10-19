@@ -25,10 +25,10 @@ import           Text.Show
 -- | A Term with an abstract syntax tree and an annotation.
 newtype Term syntax ann = Term { unTerm :: TermF syntax ann (Term syntax ann) }
 
-projectTerm :: (f :< syntax) => Term (Sum syntax) ann -> Maybe (f (Term (Sum syntax) ann))
+projectTerm :: forall f syntax ann . (f :< syntax) => Term (Sum syntax) ann -> Maybe (f (Term (Sum syntax) ann))
 projectTerm = Sum.project . termOut
 
-guardTerm :: (f :< syntax, Alternative m)
+guardTerm :: forall m f syntax ann . (f :< syntax, Alternative m)
           => Term (Sum syntax) ann
           -> m (f (Term (Sum syntax) ann))
 guardTerm = Sum.projectGuard . termOut
