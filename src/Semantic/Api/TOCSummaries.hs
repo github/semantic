@@ -21,6 +21,7 @@ import           Data.ByteString.Builder
 import           Data.Either (partitionEithers)
 import           Data.Function (on)
 import           Data.Functor.Classes
+import           Data.Functor.Foldable (cata)
 import           Data.Hashable.Lifted
 import           Data.Language (Language, PerLanguageModes)
 import           Data.Map (Map)
@@ -28,7 +29,7 @@ import qualified Data.Map.Monoidal as Map
 import           Data.Maybe (mapMaybe)
 import           Data.ProtoLens (defMessage)
 import           Data.Semilattice.Lower
-import           Data.Term (Term)
+import           Data.Term (Term(Term))
 import qualified Data.Text as T
 import           Data.These (These, fromThese)
 import           Diffing.Algorithm (Diffable)
@@ -126,7 +127,8 @@ deriving instance SummarizeDiff Markdown.Term
 deriving instance SummarizeDiff PHP.Term
 deriving instance SummarizeDiff PythonALaCarte.Term
 deriving instance SummarizeDiff Ruby.Term
-deriving instance SummarizeDiff TSX.Term
+instance SummarizeDiff TSX.Term where
+  summarizeTerms = summarizeTerms . bimap (fmap (cata Term)) (fmap (cata Term))
 deriving instance SummarizeDiff TypeScript.Term
 
 

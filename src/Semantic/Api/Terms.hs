@@ -129,7 +129,8 @@ deriving instance ShowTerm Markdown.Term
 deriving instance ShowTerm PHP.Term
 deriving instance ShowTerm PythonALaCarte.Term
 deriving instance ShowTerm Ruby.Term
-deriving instance ShowTerm TSX.Term
+instance ShowTerm TSX.Term where
+  showTerm = showTerm . cata Term
 deriving instance ShowTerm TypeScript.Term
 
 
@@ -156,7 +157,8 @@ deriving instance SExprTerm Markdown.Term
 deriving instance SExprTerm PHP.Term
 deriving instance SExprTerm PythonALaCarte.Term
 deriving instance SExprTerm Ruby.Term
-deriving instance SExprTerm TSX.Term
+instance SExprTerm TSX.Term where
+  sexprTerm = SExpr.serializeSExpression ByConstructorName
 deriving instance SExprTerm TypeScript.Term
 
 
@@ -174,7 +176,8 @@ deriving instance DOTGraphTerm Markdown.Term
 deriving instance DOTGraphTerm PHP.Term
 deriving instance DOTGraphTerm PythonALaCarte.Term
 deriving instance DOTGraphTerm Ruby.Term
-deriving instance DOTGraphTerm TSX.Term
+instance DOTGraphTerm TSX.Term where
+  dotGraphTerm = serialize (DOT (termStyle "terms")) . renderTreeGraph
 deriving instance DOTGraphTerm TypeScript.Term
 
 
@@ -192,7 +195,8 @@ deriving instance JSONTreeTerm Markdown.Term
 deriving instance JSONTreeTerm PHP.Term
 deriving instance JSONTreeTerm PythonALaCarte.Term
 deriving instance JSONTreeTerm Ruby.Term
-deriving instance JSONTreeTerm TSX.Term
+instance JSONTreeTerm TSX.Term where
+  jsonTreeTerm blob = jsonTreeTerm blob . cata Term
 deriving instance JSONTreeTerm TypeScript.Term
 
 
@@ -220,5 +224,6 @@ deriving instance JSONGraphTerm Markdown.Term
 deriving instance JSONGraphTerm PHP.Term
 deriving instance JSONGraphTerm PythonALaCarte.Term
 deriving instance JSONGraphTerm Ruby.Term
-deriving instance JSONGraphTerm TSX.Term
+instance JSONGraphTerm TSX.Term where
+  jsonGraphTerm blob = jsonGraphTerm blob . cata Term
 deriving instance JSONGraphTerm TypeScript.Term
