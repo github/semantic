@@ -114,6 +114,9 @@ jsonGraphDiffParsers = aLaCarteParsers
 class JSONGraphDiff term where
   jsonGraphDiff :: (Carrier sig m, Member Telemetry sig, MonadIO m) => Edit (Blob, term Loc) (Blob, term Loc) -> m DiffTreeFileGraph
 
+instance (DiffTerms term, ConstructorName (Syntax term), Foldable (Syntax term), Functor (Syntax term)) => JSONGraphDiff term where
+  jsonGraphDiff terms = toGraph (bimap fst fst terms) <$> diffTerms terms
+
 toGraph
   :: (Recursive diff, ToTreeGraph DiffTreeVertex (Base diff))
   => BlobPair
@@ -130,21 +133,6 @@ toGraph blobPair diff =
     & P.vertices .~ vertexList graph
     & P.edges    .~ fmap toEdge (edgeList graph)
     & P.errors   .~ mempty
-
-instance JSONGraphDiff Go.Term where
-  jsonGraphDiff terms = toGraph (bimap fst fst terms) <$> diffTerms terms
-instance JSONGraphDiff Markdown.Term where
-  jsonGraphDiff terms = toGraph (bimap fst fst terms) <$> diffTerms terms
-instance JSONGraphDiff PHP.Term where
-  jsonGraphDiff terms = toGraph (bimap fst fst terms) <$> diffTerms terms
-instance JSONGraphDiff Python.Term where
-  jsonGraphDiff terms = toGraph (bimap fst fst terms) <$> diffTerms terms
-instance JSONGraphDiff Ruby.Term where
-  jsonGraphDiff terms = toGraph (bimap fst fst terms) <$> diffTerms terms
-instance JSONGraphDiff TSX.Term where
-  jsonGraphDiff terms = toGraph (bimap fst fst terms) <$> diffTerms terms
-instance JSONGraphDiff TypeScript.Term where
-  jsonGraphDiff terms = toGraph (bimap fst fst terms) <$> diffTerms terms
 
 
 jsonTreeDiffParsers :: Map Language (SomeParser JSONTreeDiff Loc)
