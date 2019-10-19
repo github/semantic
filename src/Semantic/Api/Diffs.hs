@@ -62,7 +62,7 @@ parseDiffBuilder :: (Traversable t, DiffEffects sig m) => DiffOutputFormat -> t 
 parseDiffBuilder DiffJSONTree    = distributeFoldMap jsonDiff >=> serialize Format.JSON -- NB: Serialize happens at the top level for these two JSON formats to collect results of multiple blob pairs.
 parseDiffBuilder DiffJSONGraph   = diffGraph >=> serialize Format.JSON
 parseDiffBuilder DiffSExpression = distributeFoldMap (diffWith sexprDiffParsers sexprDiff)
-parseDiffBuilder DiffShow        = distributeFoldMap (diffWith showDiffParsers showDiff)
+parseDiffBuilder DiffShow        = distributeFoldMap (parsePairWith showDiffParsers showDiff)
 parseDiffBuilder DiffDotGraph    = distributeFoldMap (diffWith dotGraphDiffParsers dotGraphDiff)
 
 jsonDiff :: DiffEffects sig m => BlobPair -> m (Rendering.JSON.JSON "diffs" SomeJSON)
@@ -177,11 +177,11 @@ deriving instance SExprDiff TypeScript.Term
 showDiffParsers :: Map Language (SomeParser ShowDiff Loc)
 showDiffParsers = aLaCarteParsers
 
-class DiffTerms term => ShowDiff term where
-  showDiff :: (Carrier sig m, Member (Reader Config) sig) => DiffFor term Loc Loc -> m Builder
+class ShowDiff term where
+  showDiff :: (Carrier sig m, Member (Reader Config) sig, Member Telemetry sig, MonadIO m) => Edit (Blob, term Loc) (Blob, term Loc) -> m Builder
 
 instance (Diffable syntax, Eq1 syntax, Hashable1 syntax, Show1 syntax, Traversable syntax) => ShowDiff (Term syntax) where
-  showDiff = serialize Show
+  showDiff = serialize Show <=< diffTerms
 
 deriving instance ShowDiff Go.Term
 deriving instance ShowDiff Markdown.Term
