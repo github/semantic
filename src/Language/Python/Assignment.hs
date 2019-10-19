@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, RankNTypes, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
 module Language.Python.Assignment
 ( assignment
 , Python.Syntax
