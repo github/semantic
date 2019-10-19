@@ -10,7 +10,6 @@ import Prelude hiding (fail, filter, log)
 import Prologue hiding (Element, hash)
 
 import           Control.Effect.State as Eff
-import           Data.Abstract.Declarations (Declarations)
 import           Data.Text as T hiding (empty)
 import           Streaming
 import qualified Streaming.Prelude as Streaming
@@ -22,11 +21,11 @@ import qualified Source.Source as Source
 import           Tags.Tag
 import           Tags.Taggable
 
-runTagging :: (IsTerm term, IsTaggable (Syntax term), Base (term Loc) ~ TermF (Syntax term) Loc, Recursive (term Loc), Declarations (term Loc))
+runTagging :: (IsTaggable syntax)
            => Language
            -> [Text]
            -> Source.Source
-           -> term Loc
+           -> Term syntax Loc
            -> [Tag]
 runTagging lang symbolsToSummarize source
   = Eff.run
