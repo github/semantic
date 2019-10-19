@@ -66,7 +66,7 @@ parseDiffBuilder DiffShow        = distributeFoldMap (parsePairWith showDiffPars
 parseDiffBuilder DiffDotGraph    = distributeFoldMap (diffWith dotGraphDiffParsers dotGraphDiff)
 
 jsonDiff :: DiffEffects sig m => BlobPair -> m (Rendering.JSON.JSON "diffs" SomeJSON)
-jsonDiff blobPair = diffWith jsonTreeDiffParsers (pure . jsonTreeDiff blobPair) blobPair `catchError` jsonError blobPair
+jsonDiff blobPair = parsePairWith jsonTreeDiffParsers jsonTreeDiff blobPair `catchError` jsonError blobPair
 
 jsonError :: Applicative m => BlobPair -> SomeException -> m (Rendering.JSON.JSON "diffs" SomeJSON)
 jsonError blobPair (SomeException e) = pure $ renderJSONDiffError blobPair (show e)
@@ -141,11 +141,11 @@ deriving instance JSONGraphDiff TypeScript.Term
 jsonTreeDiffParsers :: Map Language (SomeParser JSONTreeDiff Loc)
 jsonTreeDiffParsers = aLaCarteParsers
 
-class DiffTerms term => JSONTreeDiff term where
-  jsonTreeDiff :: BlobPair -> DiffFor term Loc Loc -> Rendering.JSON.JSON "diffs" SomeJSON
+class JSONTreeDiff term where
+  jsonTreeDiff :: (Carrier sig m, Member Telemetry sig, MonadIO m) => Edit (Blob, term Loc) (Blob, term Loc) -> m (Rendering.JSON.JSON "diffs" SomeJSON)
 
 instance (Diffable syntax, Eq1 syntax, Hashable1 syntax, ToJSONFields1 syntax, Traversable syntax) => JSONTreeDiff (Term syntax) where
-  jsonTreeDiff = renderJSONDiff
+  jsonTreeDiff terms = renderJSONDiff (bimap fst fst terms) <$> diffTerms terms
 
 deriving instance JSONTreeDiff Go.Term
 deriving instance JSONTreeDiff Markdown.Term
