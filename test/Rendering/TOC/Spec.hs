@@ -17,7 +17,7 @@ import Prelude
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import Rendering.TOC
-import Semantic.Api (DiffEffects, diffSummaryBuilder, summarizeTerms, summarizeDiffParsers)
+import Semantic.Api (DiffEffects, diffSummaryBuilder, summarizeTerms, summarizeTermsParsers)
 import Serializing.Format as Format
 import Source.Loc
 import Source.Span
@@ -219,4 +219,4 @@ summarize
   :: DiffEffects sig m
   => BlobPair
   -> m [Either ErrorSummary TOCSummary]
-summarize = parsePairWith (summarizeDiffParsers defaultLanguageModes) summarizeTerms
+summarize = parsePairWith (summarizeTermsParsers defaultLanguageModes) summarizeTerms

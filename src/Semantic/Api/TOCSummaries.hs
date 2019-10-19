@@ -3,8 +3,8 @@ module Semantic.Api.TOCSummaries
 ( diffSummary
 , legacyDiffSummary
 , diffSummaryBuilder
-, SummarizeDiff(..)
-, summarizeDiffParsers
+, SummarizeTerms(..)
+, summarizeTermParsers
 ) where
 
 import           Analysis.Decorator (decoratorWithAlgebra)
@@ -64,7 +64,7 @@ legacyDiffSummary :: (Carrier sig m, Member Distribute sig, Member (Error SomeEx
 legacyDiffSummary = distributeFoldMap go
   where
     go :: (Carrier sig m, Member (Error SomeException) sig, Member Parse sig, Member (Reader PerLanguageModes) sig, Member Telemetry sig, MonadIO m) => BlobPair -> m Summaries
-    go blobPair = asks summarizeDiffParsers >>= \ p -> parsePairWith p (fmap (uncurry (flip Summaries) . bimap toMap toMap . partitionEithers) . summarizeTerms) blobPair
+    go blobPair = asks summarizeTermParsers >>= \ p -> parsePairWith p (fmap (uncurry (flip Summaries) . bimap toMap toMap . partitionEithers) . summarizeTerms) blobPair
       `catchError` \(SomeException e) ->
         pure $ Summaries mempty (toMap [ErrorSummary (T.pack (show e)) lowerBound lang])
       where path = T.pack $ pathKeyForBlobPair blobPair
@@ -81,7 +81,7 @@ diffSummary blobs = do
   pure $ defMessage & P.files .~ diff
   where
     go :: (Carrier sig m, Member (Error SomeException) sig, Member Parse sig, Member (Reader PerLanguageModes) sig, Member Telemetry sig, MonadIO m) => BlobPair -> m TOCSummaryFile
-    go blobPair = asks summarizeDiffParsers >>= \ p -> parsePairWith p (fmap (uncurry toFile . partitionEithers . map (bimap toError toChange)) . summarizeTerms) blobPair
+    go blobPair = asks summarizeTermParsers >>= \ p -> parsePairWith p (fmap (uncurry toFile . partitionEithers . map (bimap toError toChange)) . summarizeTerms) blobPair
       `catchError` \(SomeException e) ->
         pure $ toFile [defMessage & P.error .~ T.pack (show e) & P.maybe'span .~ Nothing] []
       where toFile errors changes = defMessage
@@ -110,34 +110,34 @@ toError ErrorSummary{..} = defMessage
   & P.maybe'span ?~ converting # span
 
 
-summarizeDiffParsers :: PerLanguageModes -> Map Language (SomeParser SummarizeDiff Loc)
-summarizeDiffParsers = allParsers
+summarizeTermParsers :: PerLanguageModes -> Map Language (SomeParser SummarizeTerms Loc)
+summarizeTermParsers = allParsers
 
-class SummarizeDiff term where
+class SummarizeTerms term where
   summarizeTerms :: (Member Telemetry sig, Carrier sig m, MonadIO m) => These (Blob, term Loc) (Blob, term Loc) -> m [Either ErrorSummary TOCSummary]
 
-instance (Diffable syntax, Eq1 syntax, HasDeclaration syntax, Hashable1 syntax, Traversable syntax) => SummarizeDiff (Term syntax) where
+instance (Diffable syntax, Eq1 syntax, HasDeclaration syntax, Hashable1 syntax, Traversable syntax) => SummarizeTerms (Term syntax) where
   summarizeTerms = fmap diffTOC . diffTerms . bimap decorateTerm decorateTerm where
     decorateTerm :: (Foldable syntax, Functor syntax, HasDeclaration syntax) => (Blob, Term syntax Loc) -> (Blob, Term syntax (Maybe Declaration))
     decorateTerm (blob, term) = (blob, decoratorWithAlgebra (declarationAlgebra blob) term)
 
-deriving instance SummarizeDiff Go.Term
-deriving instance SummarizeDiff Markdown.Term
-deriving instance SummarizeDiff PHP.Term
-deriving instance SummarizeDiff PythonALaCarte.Term
-deriving instance SummarizeDiff Ruby.Term
-deriving instance SummarizeDiff TSX.Term
-deriving instance SummarizeDiff TypeScript.Term
+deriving instance SummarizeTerms Go.Term
+deriving instance SummarizeTerms Markdown.Term
+deriving instance SummarizeTerms PHP.Term
+deriving instance SummarizeTerms PythonALaCarte.Term
+deriving instance SummarizeTerms Ruby.Term
+deriving instance SummarizeTerms TSX.Term
+deriving instance SummarizeTerms TypeScript.Term
 
 
-deriving via (ViaTags Java.Term)          instance SummarizeDiff Java.Term
-deriving via (ViaTags JSON.Term)          instance SummarizeDiff JSON.Term
-deriving via (ViaTags PythonPrecise.Term) instance SummarizeDiff PythonPrecise.Term
+deriving via (ViaTags Java.Term)          instance SummarizeTerms Java.Term
+deriving via (ViaTags JSON.Term)          instance SummarizeTerms JSON.Term
+deriving via (ViaTags PythonPrecise.Term) instance SummarizeTerms PythonPrecise.Term
 
 
 newtype ViaTags t a = ViaTags (t a)
 
-instance Tagging.ToTags t => SummarizeDiff (ViaTags t) where
+instance Tagging.ToTags t => SummarizeTerms (ViaTags t) where
   summarizeTerms terms = pure . map (uncurry summarizeChange) . dedupe . mapMaybe toChange . uncurry (SES.ses compare) . fromThese [] [] . bimap (uncurry go) (uncurry go) $ terms where
     go blob (ViaTags t) = Tagging.tags (blobSource blob) t
     lang = languageForBlobPair (BlobPair (bimap fst fst terms))
