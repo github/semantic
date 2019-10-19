@@ -56,25 +56,25 @@ data DiffOutputFormat
   | DiffDotGraph
   deriving (Eq, Show)
 
-parseDiffBuilder :: (Traversable t, DiffEffects sig m) => DiffOutputFormat -> t BlobPair -> m Builder
+parseDiffBuilder :: (Traversable t, Member (Error SomeException) sig, Member (Reader Config) sig, Member Telemetry sig, Member Distribute sig, Member Parse sig, Carrier sig m, MonadIO m) => DiffOutputFormat -> t BlobPair -> m Builder
 parseDiffBuilder DiffJSONTree    = distributeFoldMap jsonDiff >=> serialize Format.JSON -- NB: Serialize happens at the top level for these two JSON formats to collect results of multiple blob pairs.
 parseDiffBuilder DiffJSONGraph   = diffGraph >=> serialize Format.JSON
 parseDiffBuilder DiffSExpression = distributeFoldMap (parsePairWith sexprDiffParsers sexprDiff)
 parseDiffBuilder DiffShow        = distributeFoldMap (parsePairWith showDiffParsers showDiff)
 parseDiffBuilder DiffDotGraph    = distributeFoldMap (parsePairWith dotGraphDiffParsers dotGraphDiff)
 
-jsonDiff :: DiffEffects sig m => BlobPair -> m (Rendering.JSON.JSON "diffs" SomeJSON)
+jsonDiff :: (Member (Error SomeException) sig, Member Telemetry sig, Member Parse sig, Carrier sig m, MonadIO m) => BlobPair -> m (Rendering.JSON.JSON "diffs" SomeJSON)
 jsonDiff blobPair = parsePairWith jsonTreeDiffParsers jsonTreeDiff blobPair `catchError` jsonError blobPair
 
 jsonError :: Applicative m => BlobPair -> SomeException -> m (Rendering.JSON.JSON "diffs" SomeJSON)
 jsonError blobPair (SomeException e) = pure $ renderJSONDiffError blobPair (show e)
 
-diffGraph :: (Traversable t, DiffEffects sig m) => t BlobPair -> m DiffTreeGraphResponse
+diffGraph :: (Traversable t, Member (Error SomeException) sig, Member Telemetry sig, Member Distribute sig, Member Parse sig, Carrier sig m, MonadIO m) => t BlobPair -> m DiffTreeGraphResponse
 diffGraph blobs = do
   graph <- distributeFor blobs go
   pure $ defMessage & P.files .~ toList graph
   where
-    go :: DiffEffects sig m => BlobPair -> m DiffTreeFileGraph
+    go :: (Member (Error SomeException) sig, Member Telemetry sig, Member Parse sig, Carrier sig m, MonadIO m) => BlobPair -> m DiffTreeFileGraph
     go blobPair = parsePairWith jsonGraphDiffParsers jsonGraphDiff blobPair
       `catchError` \(SomeException e) ->
         pure $ defMessage
@@ -86,8 +86,6 @@ diffGraph blobs = do
       where
         path = T.pack $ pathForBlobPair blobPair
         lang = bridging # languageForBlobPair blobPair
-
-type DiffEffects sig m = (Member (Error SomeException) sig, Member (Reader Config) sig, Member Telemetry sig, Member Distribute sig, Member Parse sig, Carrier sig m, MonadIO m)
 
 
 dotGraphDiffParsers :: Map Language (SomeParser DOTGraphDiff Loc)
