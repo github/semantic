@@ -2,7 +2,6 @@
 module Semantic.Api.Diffs
   ( parseDiffBuilder
   , DiffOutputFormat(..)
-  , diffGraph
 
   , DiffEffects
 
