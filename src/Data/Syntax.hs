@@ -39,7 +39,7 @@ makeTerm'' ann children = case toList children of
   _ -> makeTerm' ann (inject children)
 
 -- | Lift non-empty syntax into a term, injecting the syntax into a union & appending all subterms’.annotations to make the new term’s annotation.
-makeTerm1 :: (HasCallStack, Element syntax syntaxes, Sum syntaxes ~ Syntax term, Semigroup ann, Apply Foldable syntaxes, IsTerm term) => syntax (term ann) -> term ann
+makeTerm1 :: (HasCallStack, Element syntax syntaxes, Semigroup ann, Apply Foldable syntaxes) => syntax (Term (Sum syntaxes) ann) -> Term (Sum syntaxes) ann
 makeTerm1 = makeTerm1' . inject
 
 -- | Lift a non-empty union into a term, appending all subterms’ annotations to make the new term’s annotation.
