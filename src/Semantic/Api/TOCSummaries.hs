@@ -22,6 +22,7 @@ import           Data.Edit
 import           Data.Either (partitionEithers)
 import           Data.Function (on)
 import           Data.Functor.Classes
+import           Data.Functor.Foldable (cata)
 import           Data.Hashable.Lifted
 import           Data.Language (Language, PerLanguageModes)
 import           Data.Map (Map)
@@ -29,7 +30,7 @@ import qualified Data.Map.Monoidal as Map
 import           Data.Maybe (mapMaybe)
 import           Data.ProtoLens (defMessage)
 import           Data.Semilattice.Lower
-import           Data.Term (Term)
+import           Data.Term (Term(Term))
 import qualified Data.Text as T
 import           Diffing.Algorithm (Diffable)
 import qualified Diffing.Algorithm.SES as SES
@@ -126,7 +127,8 @@ deriving instance SummarizeTerms Markdown.Term
 deriving instance SummarizeTerms PHP.Term
 deriving instance SummarizeTerms PythonALaCarte.Term
 deriving instance SummarizeTerms Ruby.Term
-deriving instance SummarizeTerms TSX.Term
+instance SummarizeTerms TSX.Term where
+  summarizeTerms = summarizeTerms . bimap (fmap (cata Term)) (fmap (cata Term))
 deriving instance SummarizeTerms TypeScript.Term
 
 

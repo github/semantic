@@ -10,10 +10,13 @@ import Data.Abstract.Declarations
 import Data.Abstract.FreeVariables
 import Data.Bifoldable
 import Data.Bifunctor
+import Data.Bitraversable
+import Data.Coerce
 import qualified Data.Diff as Diff
-import Data.Functor.Foldable
-import Data.Graph.ControlFlowVertex (VertexDeclaration)
-import Data.Sum (Sum)
+import Data.Foldable (fold)
+import Data.Functor.Foldable (Base, Recursive(..))
+import Data.Graph.ControlFlowVertex (VertexDeclaration(..), toVertex1)
+import qualified Data.Sum as Sum
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
@@ -22,8 +25,10 @@ import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
+import Data.Traversable
 import Diffing.Interpreter
 import qualified Language.TSX.Syntax as TSX.Syntax
+import Source.Loc
 import Source.Span
 
 type Syntax =
@@ -197,20 +202,42 @@ type Syntax =
   ]
 
 
-newtype Term ann = Term { getTerm :: Term.Term (Sum Syntax) ann }
-  deriving (Eq, Declarations, Foldable, FreeVariables, Functor, Syntax.HasErrors, Ord, Show, Traversable, VertexDeclaration)
+newtype Term ann = Term { getTerm :: Term.TermF (Sum.Sum Syntax) ann (Term ann) }
+  deriving (Eq, Declarations, FreeVariables, Ord, Show)
 
-newtype Diff ann1 ann2 = Diff { getDiff :: Diff.Diff (Sum Syntax) ann1 ann2 }
+instance Term.IsTerm Term where
+  type Syntax Term = Sum.Sum Syntax
+  toTermF = coerce
+  fromTermF = coerce
+
+instance Foldable Term where
+  foldMap = foldMapDefault
+
+instance Functor Term where
+  fmap = fmapDefault
+
+instance Traversable Term where
+  traverse f = go where go = fmap Term . bitraverse f go . getTerm
+
+instance VertexDeclaration Term where
+  toVertex info (Term (Term.In ann syntax)) = toVertex1 ann info syntax
+
+instance Syntax.HasErrors Term where
+  getErrors = cata $ \ (Term.In Loc{..} syntax) ->
+    maybe (fold syntax) (pure . Syntax.unError span) (Sum.project syntax)
+
+
+newtype Diff ann1 ann2 = Diff { getDiff :: Diff.Diff (Sum.Sum Syntax) ann1 ann2 }
   deriving (Bifoldable, Bifunctor)
 
 instance DiffTerms Term where
   type DiffFor Term = Diff
-  diffTermPair = Diff . diffTermPair . bimap getTerm getTerm
+  diffTermPair = Diff . diffTermPair . bimap (cata Term.Term) (cata Term.Term)
 
-type instance Base (Term ann) = Term.TermF (Sum Syntax) ann
+type instance Base (Term ann) = Term.TermF (Sum.Sum Syntax) ann
 
 instance Recursive (Term ann) where
-  project = fmap Term . project . getTerm
+  project = getTerm
 
 instance HasSpan ann => HasSpan (Term ann) where
   span_ = inner.span_ where inner = lens getTerm (\t i -> t { getTerm = i })

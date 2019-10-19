@@ -102,7 +102,8 @@ deriving instance DOTGraphDiff Markdown.Term
 deriving instance DOTGraphDiff PHP.Term
 deriving instance DOTGraphDiff Python.Term
 deriving instance DOTGraphDiff Ruby.Term
-deriving instance DOTGraphDiff TSX.Term
+instance DOTGraphDiff TSX.Term where
+  dotGraphDiff = serialize (DOT (diffStyle "diffs")) . renderTreeGraph . TSX.getDiff
 deriving instance DOTGraphDiff TypeScript.Term
 
 
@@ -132,7 +133,18 @@ deriving instance JSONGraphDiff Markdown.Term
 deriving instance JSONGraphDiff PHP.Term
 deriving instance JSONGraphDiff Python.Term
 deriving instance JSONGraphDiff Ruby.Term
-deriving instance JSONGraphDiff TSX.Term
+instance JSONGraphDiff TSX.Term where
+  jsonGraphDiff blobPair (TSX.Diff diff)
+    = let graph = renderTreeGraph diff
+          toEdge (Edge (a, b)) = defMessage & P.source .~ a^.diffVertexId & P.target .~ b^.diffVertexId
+          path = T.pack $ pathForBlobPair blobPair
+          lang = bridging # languageForBlobPair blobPair
+      in defMessage
+           & P.path .~ path
+           & P.language .~ lang
+           & P.vertices .~ vertexList graph
+           & P.edges .~ fmap toEdge (edgeList graph)
+           & P.errors .~ mempty
 deriving instance JSONGraphDiff TypeScript.Term
 
 
@@ -150,7 +162,8 @@ deriving instance JSONTreeDiff Markdown.Term
 deriving instance JSONTreeDiff PHP.Term
 deriving instance JSONTreeDiff Python.Term
 deriving instance JSONTreeDiff Ruby.Term
-deriving instance JSONTreeDiff TSX.Term
+instance JSONTreeDiff TSX.Term where
+  jsonTreeDiff blobs = renderJSONDiff blobs . TSX.getDiff
 deriving instance JSONTreeDiff TypeScript.Term
 
 
@@ -168,7 +181,8 @@ deriving instance SExprDiff Markdown.Term
 deriving instance SExprDiff PHP.Term
 deriving instance SExprDiff Python.Term
 deriving instance SExprDiff Ruby.Term
-deriving instance SExprDiff TSX.Term
+instance SExprDiff TSX.Term where
+  sexprDiff = serialize (SExpression ByConstructorName) . TSX.getDiff
 deriving instance SExprDiff TypeScript.Term
 
 
@@ -186,7 +200,8 @@ deriving instance ShowDiff Markdown.Term
 deriving instance ShowDiff PHP.Term
 deriving instance ShowDiff Python.Term
 deriving instance ShowDiff Ruby.Term
-deriving instance ShowDiff TSX.Term
+instance ShowDiff TSX.Term where
+  showDiff = serialize Show . TSX.getDiff
 deriving instance ShowDiff TypeScript.Term
 
 
