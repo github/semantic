@@ -1,4 +1,4 @@
-{-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, GeneralizedNewtypeDeriving, LambdaCase, MonoLocalBinds, QuantifiedConstraints, RankNTypes, StandaloneDeriving #-}
+{-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, GeneralizedNewtypeDeriving, LambdaCase, MonoLocalBinds, RankNTypes, StandaloneDeriving #-}
 module Semantic.Api.Diffs
   ( parseDiffBuilder
   , DiffOutputFormat(..)
@@ -193,17 +193,6 @@ deriving instance ShowDiff Ruby.Term
 deriving instance ShowDiff TSX.Term
 deriving instance ShowDiff TypeScript.Term
 
-
--- | Parse a 'BlobPair' using one of the provided parsers, diff the resulting terms, and run an action on the abstracted diff.
---
--- This allows us to define features using an abstract interface, and use them with diffs for any parser whose terms support that interface.
-diffWith
-  :: (forall term . c term => DiffTerms term, DiffEffects sig m)
-  => Map Language (SomeParser c Loc)                            -- ^ The set of parsers to select from.
-  -> (forall term . c term => DiffFor term Loc Loc -> m output) -- ^ A function to run on the computed diff. Note that the diff is abstract (it’s the diff type corresponding to an abstract term type), but the term type is constrained by @c@, allowing you to do anything @c@ allows, and requiring that all the input parsers produce terms supporting @c@.
-  -> BlobPair                                                   -- ^ The blob pair to parse.
-  -> m output
-diffWith parsers render = parsePairWith parsers (render <=< diffTerms)
 
 diffTerms :: (DiffTerms term, Member Telemetry sig, Carrier sig m, MonadIO m)
   => Edit (Blob, term ann) (Blob, term ann) -> m (DiffFor term ann ann)
