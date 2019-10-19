@@ -185,19 +185,7 @@ showDiffParsers = aLaCarteParsers
 class ShowDiff term where
   showDiff :: (Carrier sig m, Member (Reader Config) sig, Member Telemetry sig, MonadIO m) => Edit (Blob, term Loc) (Blob, term Loc) -> m Builder
 
-instance ShowDiff Go.Term where
-  showDiff = serialize Show <=< diffTerms
-instance ShowDiff Markdown.Term where
-  showDiff = serialize Show <=< diffTerms
-instance ShowDiff PHP.Term where
-  showDiff = serialize Show <=< diffTerms
-instance ShowDiff Python.Term where
-  showDiff = serialize Show <=< diffTerms
-instance ShowDiff Ruby.Term where
-  showDiff = serialize Show <=< diffTerms
-instance ShowDiff TSX.Term where
-  showDiff = serialize Show <=< diffTerms
-instance ShowDiff TypeScript.Term where
+instance (DiffTerms term, Foldable (Syntax term), Show1 (Syntax term)) => ShowDiff term where
   showDiff = serialize Show <=< diffTerms
 
 
