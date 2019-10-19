@@ -18,6 +18,7 @@ import           Data.ByteString.Builder
 import           Data.Diff
 import           Data.Edit
 import           Data.Graph
+import           Data.JSON.Fields (ToJSONFields1)
 import           Data.Language
 import           Data.ProtoLens (defMessage)
 import           Data.Term (IsTerm(..))
@@ -141,19 +142,7 @@ jsonTreeDiffParsers = aLaCarteParsers
 class JSONTreeDiff term where
   jsonTreeDiff :: (Carrier sig m, Member Telemetry sig, MonadIO m) => Edit (Blob, term Loc) (Blob, term Loc) -> m (Rendering.JSON.JSON "diffs" SomeJSON)
 
-instance JSONTreeDiff Go.Term where
-  jsonTreeDiff terms = renderJSONDiff (bimap fst fst terms) <$> diffTerms terms
-instance JSONTreeDiff Markdown.Term where
-  jsonTreeDiff terms = renderJSONDiff (bimap fst fst terms) <$> diffTerms terms
-instance JSONTreeDiff PHP.Term where
-  jsonTreeDiff terms = renderJSONDiff (bimap fst fst terms) <$> diffTerms terms
-instance JSONTreeDiff Python.Term where
-  jsonTreeDiff terms = renderJSONDiff (bimap fst fst terms) <$> diffTerms terms
-instance JSONTreeDiff Ruby.Term where
-  jsonTreeDiff terms = renderJSONDiff (bimap fst fst terms) <$> diffTerms terms
-instance JSONTreeDiff TSX.Term where
-  jsonTreeDiff terms = renderJSONDiff (bimap fst fst terms) <$> diffTerms terms
-instance JSONTreeDiff TypeScript.Term where
+instance (DiffTerms term, Foldable (Syntax term), ToJSONFields1 (Syntax term)) => JSONTreeDiff term where
   jsonTreeDiff terms = renderJSONDiff (bimap fst fst terms) <$> diffTerms terms
 
 
