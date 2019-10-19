@@ -10,12 +10,10 @@ import           Control.Effect.Parse
 import           Control.Effect.Reader
 import           Control.Exception
 import           Control.Lens
-import           Data.Abstract.Declarations (Declarations1)
 import           Data.Blob hiding (File (..))
 import           Data.ByteString.Builder
 import           Data.Language
 import           Data.ProtoLens (defMessage)
-import           Data.Term
 import           Data.Text (pack)
 import qualified Language.Java as Java
 import qualified Language.JSON as JSON
@@ -39,7 +37,6 @@ import           Semantic.Task
 import           Serializing.Format (Format)
 import           Source.Loc as Loc
 import           Source.Source
-import           Tags.Taggable
 import           Tags.Tagging
 import qualified Tags.Tagging.Precise as Precise
 
@@ -115,9 +112,6 @@ symbolsToSummarize = ["Function", "Method", "Class", "Module", "Call", "Send"]
 
 class ToTags t where
   tags :: Language -> [Text] -> Source -> t Loc -> [Tag]
-
-instance (IsTaggable syntax, Declarations1 syntax) => ToTags (Term syntax) where
-  tags = runTagging
 
 instance ToTags Go.Term where
   tags = runTagging
