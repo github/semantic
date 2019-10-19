@@ -10,7 +10,6 @@ import           Control.Effect.Parse
 import           Control.Effect.Reader
 import           Control.Exception
 import           Control.Lens
-import           Data.Abstract.Declarations (Declarations1)
 import           Data.Blob hiding (File (..))
 import           Data.ByteString.Builder
 import           Data.Language
@@ -116,7 +115,7 @@ symbolsToSummarize = ["Function", "Method", "Class", "Module", "Call", "Send"]
 class ToTags t where
   tags :: Language -> [Text] -> Source -> t Loc -> [Tag]
 
-instance (IsTaggable syntax, Declarations1 syntax) => ToTags (Term syntax) where
+instance IsTaggable syntax => ToTags (Term syntax) where
   tags = runTagging
 
 deriving instance ToTags Go.Term
@@ -124,8 +123,7 @@ deriving instance ToTags Markdown.Term
 deriving instance ToTags PHP.Term
 deriving instance ToTags PythonALaCarte.Term
 deriving instance ToTags Ruby.Term
-instance ToTags TSX.Term where
-  tags = runTagging
+deriving instance ToTags TSX.Term
 deriving instance ToTags TypeScript.Term
 
 deriving via (ViaPrecise Java.Term)          instance ToTags Java.Term

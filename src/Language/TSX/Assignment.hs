@@ -30,17 +30,19 @@ import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
+import qualified Data.Term as Term
 import qualified Language.TSX.Syntax as TSX.Syntax
 import qualified Language.TypeScript.Resolution as TypeScript.Resolution
-import Language.TSX.Term as TSX
+import qualified Language.TSX.Term as TSX
 import Prologue
 import TreeSitter.TSX as Grammar
 
+type Term = Term.Term (Sum TSX.Syntax)
 type Assignment = Assignment.Assignment [] Grammar
 
 -- | Assignment from AST in TSX’s grammar onto a program in TSX’s syntax.
-assignment :: Assignment (Term Loc)
-assignment = handleError $ makeTerm <$> symbol Program <*> children (Statement.Statements <$> manyTerm statement) <|> parseError
+assignment :: Assignment (TSX.Term Loc)
+assignment = fmap TSX.Term . handleError $ makeTerm <$> symbol Program <*> children (Statement.Statements <$> manyTerm statement) <|> parseError
 
 expression :: Assignment (Term Loc)
 expression = handleError everything
