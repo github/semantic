@@ -18,6 +18,7 @@ import           Control.Lens
 import           Control.Monad.IO.Class
 import           Data.Blob
 import           Data.ByteString.Builder
+import           Data.Diff as Diff
 import           Data.Edit
 import           Data.Graph
 import           Data.JSON.Fields
@@ -26,7 +27,7 @@ import           Data.ProtoLens (defMessage)
 import           Data.Term
 import qualified Data.Text as T
 import           Diffing.Algorithm (Diffable)
-import           Diffing.Interpreter (DiffTerms(..))
+import qualified Diffing.Interpreter as Interpreter (diffTerms)
 import qualified Language.Go.Term as Go
 import qualified Language.Markdown.Term as Markdown
 import qualified Language.PHP.Term as PHP
@@ -194,10 +195,10 @@ deriving instance ShowDiff TSX.Term
 deriving instance ShowDiff TypeScript.Term
 
 
-diffTerms :: (DiffTerms term, Member Telemetry sig, Carrier sig m, MonadIO m)
-  => Edit (Blob, term ann) (Blob, term ann) -> m (DiffFor term ann ann)
+diffTerms :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax, Member Telemetry sig, Carrier sig m, MonadIO m)
+  => Edit (Blob, Term syntax ann) (Blob, Term syntax ann) -> m (Diff syntax ann ann)
 diffTerms terms = time "diff" languageTag $ do
-  let diff = diffTermPair (bimap snd snd terms)
+  let diff = edit Diff.deleting Diff.inserting Interpreter.diffTerms (bimap snd snd terms)
   diff <$ writeStat (Stat.count "diff.nodes" (bilength diff) languageTag)
   where languageTag = languageTagForBlobPair blobs
         blobs = bimap fst fst terms
