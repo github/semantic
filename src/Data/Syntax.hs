@@ -62,10 +62,10 @@ parseError :: (HasCallStack, Error :< syntaxes, Sum syntaxes ~ Syntax term, Boun
 parseError = makeTerm <$> Assignment.token maxBound <*> pure (Error (ErrorStack $ errorSite <$> getCallStack (freezeCallStack callStack)) [] (Just "ParseError") [])
 
 -- | Match context terms before a subject term, wrapping both up in a Context term if any context terms matched, or otherwise returning the subject term.
-contextualize :: (HasCallStack, Context :< syntaxes, Sum syntaxes ~ Syntax term, Alternative m, Semigroup ann, Apply Foldable syntaxes, IsTerm term)
-              => m (term ann)
-              -> m (term ann)
-              -> m (term ann)
+contextualize :: (HasCallStack, Context :< syntaxes, Alternative m, Semigroup ann, Apply Foldable syntaxes)
+              => m (Term (Sum syntaxes) ann)
+              -> m (Term (Sum syntaxes) ann)
+              -> m (Term (Sum syntaxes) ann)
 contextualize context rule = make <$> Assignment.manyThrough context rule
   where make (cs, node) = case nonEmpty cs of
           Just cs -> makeTerm1 (Context cs node)
