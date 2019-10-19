@@ -1,6 +1,7 @@
 {-# LANGUAGE FunctionalDependencies, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 module Data.Term
 ( Term(..)
+, guardTerm
 , TermF(..)
 , termSize
 , hoistTerm
@@ -26,6 +27,11 @@ import           Text.Show
 
 -- | A Term with an abstract syntax tree and an annotation.
 newtype Term syntax ann = Term { unTerm :: TermF syntax ann (Term syntax ann) }
+
+guardTerm :: (f :< syntax, Alternative m)
+          => Term (Sum syntax) ann
+          -> m (f (Term (Sum syntax) ann))
+guardTerm = Sum.projectGuard . termOut
 
 data TermF syntax ann recur = In { termFAnnotation :: ann, termFOut :: syntax recur }
   deriving (Eq, Ord, Foldable, Functor, Show, Traversable, Generic1)
