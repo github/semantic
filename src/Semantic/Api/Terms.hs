@@ -147,9 +147,6 @@ sexprTermParsers = allParsers
 class SExprTerm term where
   sexprTerm :: term Loc -> Builder
 
-instance (ConstructorName syntax, Foldable syntax, Functor syntax) => SExprTerm (Term syntax) where
-  sexprTerm = SExpr.serializeSExpression ByConstructorName
-
 instance SExprTerm Java.Term where
   sexprTerm = SExpr.Precise.serializeSExpression . Java.getTerm
 
@@ -181,9 +178,6 @@ dotGraphTermParsers = aLaCarteParsers
 
 class DOTGraphTerm term where
   dotGraphTerm :: (Carrier sig m, Member (Reader Config) sig) => term Loc -> m Builder
-
-instance (ConstructorName syntax, Foldable syntax, Functor syntax) => DOTGraphTerm (Term syntax) where
-  dotGraphTerm = serialize (DOT (termStyle "terms")) . renderTreeGraph
 
 instance DOTGraphTerm Go.Term where
   dotGraphTerm = serialize (DOT (termStyle "terms")) . renderTreeGraph
