@@ -63,7 +63,7 @@ parseDiffBuilder DiffJSONTree    = distributeFoldMap jsonDiff >=> serialize Form
 parseDiffBuilder DiffJSONGraph   = diffGraph >=> serialize Format.JSON
 parseDiffBuilder DiffSExpression = distributeFoldMap (parsePairWith sexprDiffParsers sexprDiff)
 parseDiffBuilder DiffShow        = distributeFoldMap (parsePairWith showDiffParsers showDiff)
-parseDiffBuilder DiffDotGraph    = distributeFoldMap (diffWith dotGraphDiffParsers dotGraphDiff)
+parseDiffBuilder DiffDotGraph    = distributeFoldMap (parsePairWith dotGraphDiffParsers dotGraphDiff)
 
 jsonDiff :: DiffEffects sig m => BlobPair -> m (Rendering.JSON.JSON "diffs" SomeJSON)
 jsonDiff blobPair = parsePairWith jsonTreeDiffParsers jsonTreeDiff blobPair `catchError` jsonError blobPair
@@ -95,11 +95,11 @@ type DiffEffects sig m = (Member (Error SomeException) sig, Member (Reader Confi
 dotGraphDiffParsers :: Map Language (SomeParser DOTGraphDiff Loc)
 dotGraphDiffParsers = aLaCarteParsers
 
-class DiffTerms term => DOTGraphDiff term where
-  dotGraphDiff :: (Carrier sig m, Member (Reader Config) sig) => DiffFor term Loc Loc -> m Builder
+class DOTGraphDiff term where
+  dotGraphDiff :: (Carrier sig m, Member (Reader Config) sig, Member Telemetry sig, MonadIO m) => Edit (Blob, term Loc) (Blob, term Loc) -> m Builder
 
 instance (ConstructorName syntax, Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => DOTGraphDiff (Term syntax) where
-  dotGraphDiff = serialize (DOT (diffStyle "diffs")) . renderTreeGraph
+  dotGraphDiff = serialize (DOT (diffStyle "diffs")) . renderTreeGraph <=< diffTerms
 
 deriving instance DOTGraphDiff Go.Term
 deriving instance DOTGraphDiff Markdown.Term
