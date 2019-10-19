@@ -119,10 +119,14 @@ class ToTags t where
 instance (IsTaggable syntax, Declarations1 syntax) => ToTags (Term syntax) where
   tags = runTagging
 
-deriving instance ToTags Go.Term
-deriving instance ToTags Markdown.Term
-deriving instance ToTags PHP.Term
-deriving instance ToTags PythonALaCarte.Term
+instance ToTags Go.Term where
+  tags = runTagging
+instance ToTags Markdown.Term where
+  tags = runTagging
+instance ToTags PHP.Term where
+  tags = runTagging
+instance ToTags PythonALaCarte.Term where
+  tags = runTagging
 instance ToTags Ruby.Term where
   tags = runTagging
 instance ToTags TSX.Term where

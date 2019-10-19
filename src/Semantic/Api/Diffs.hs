@@ -96,10 +96,14 @@ class DOTGraphDiff term where
 instance (ConstructorName syntax, Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => DOTGraphDiff (Term syntax) where
   dotGraphDiff = serialize (DOT (diffStyle "diffs")) . renderTreeGraph <=< diffTerms
 
-deriving instance DOTGraphDiff Go.Term
-deriving instance DOTGraphDiff Markdown.Term
-deriving instance DOTGraphDiff PHP.Term
-deriving instance DOTGraphDiff Python.Term
+instance DOTGraphDiff Go.Term where
+  dotGraphDiff = serialize (DOT (diffStyle "diffs")) . renderTreeGraph <=< diffTerms
+instance DOTGraphDiff Markdown.Term where
+  dotGraphDiff = serialize (DOT (diffStyle "diffs")) . renderTreeGraph <=< diffTerms
+instance DOTGraphDiff PHP.Term where
+  dotGraphDiff = serialize (DOT (diffStyle "diffs")) . renderTreeGraph <=< diffTerms
+instance DOTGraphDiff Python.Term where
+  dotGraphDiff = serialize (DOT (diffStyle "diffs")) . renderTreeGraph <=< diffTerms
 instance DOTGraphDiff Ruby.Term where
   dotGraphDiff = serialize (DOT (diffStyle "diffs")) . renderTreeGraph <=< diffTerms
 instance DOTGraphDiff TSX.Term where
@@ -134,10 +138,14 @@ toGraph blobPair diff =
     & P.edges    .~ fmap toEdge (edgeList graph)
     & P.errors   .~ mempty
 
-deriving instance JSONGraphDiff Go.Term
-deriving instance JSONGraphDiff Markdown.Term
-deriving instance JSONGraphDiff PHP.Term
-deriving instance JSONGraphDiff Python.Term
+instance JSONGraphDiff Go.Term where
+  jsonGraphDiff terms = toGraph (bimap fst fst terms) <$> diffTerms terms
+instance JSONGraphDiff Markdown.Term where
+  jsonGraphDiff terms = toGraph (bimap fst fst terms) <$> diffTerms terms
+instance JSONGraphDiff PHP.Term where
+  jsonGraphDiff terms = toGraph (bimap fst fst terms) <$> diffTerms terms
+instance JSONGraphDiff Python.Term where
+  jsonGraphDiff terms = toGraph (bimap fst fst terms) <$> diffTerms terms
 instance JSONGraphDiff Ruby.Term where
   jsonGraphDiff terms = toGraph (bimap fst fst terms) <$> diffTerms terms
 instance JSONGraphDiff TSX.Term where
@@ -155,10 +163,14 @@ class JSONTreeDiff term where
 instance (Diffable syntax, Eq1 syntax, Hashable1 syntax, ToJSONFields1 syntax, Traversable syntax) => JSONTreeDiff (Term syntax) where
   jsonTreeDiff terms = renderJSONDiff (bimap fst fst terms) <$> diffTerms terms
 
-deriving instance JSONTreeDiff Go.Term
-deriving instance JSONTreeDiff Markdown.Term
-deriving instance JSONTreeDiff PHP.Term
-deriving instance JSONTreeDiff Python.Term
+instance JSONTreeDiff Go.Term where
+  jsonTreeDiff terms = renderJSONDiff (bimap fst fst terms) <$> diffTerms terms
+instance JSONTreeDiff Markdown.Term where
+  jsonTreeDiff terms = renderJSONDiff (bimap fst fst terms) <$> diffTerms terms
+instance JSONTreeDiff PHP.Term where
+  jsonTreeDiff terms = renderJSONDiff (bimap fst fst terms) <$> diffTerms terms
+instance JSONTreeDiff Python.Term where
+  jsonTreeDiff terms = renderJSONDiff (bimap fst fst terms) <$> diffTerms terms
 instance JSONTreeDiff Ruby.Term where
   jsonTreeDiff terms = renderJSONDiff (bimap fst fst terms) <$> diffTerms terms
 instance JSONTreeDiff TSX.Term where
@@ -176,10 +188,14 @@ class SExprDiff term where
 instance (ConstructorName syntax, Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => SExprDiff (Term syntax) where
   sexprDiff = serialize (SExpression ByConstructorName) <=< diffTerms
 
-deriving instance SExprDiff Go.Term
-deriving instance SExprDiff Markdown.Term
-deriving instance SExprDiff PHP.Term
-deriving instance SExprDiff Python.Term
+instance SExprDiff Go.Term where
+  sexprDiff = serialize (SExpression ByConstructorName) <=< diffTerms
+instance SExprDiff Markdown.Term where
+  sexprDiff = serialize (SExpression ByConstructorName) <=< diffTerms
+instance SExprDiff PHP.Term where
+  sexprDiff = serialize (SExpression ByConstructorName) <=< diffTerms
+instance SExprDiff Python.Term where
+  sexprDiff = serialize (SExpression ByConstructorName) <=< diffTerms
 instance SExprDiff Ruby.Term where
   sexprDiff = serialize (SExpression ByConstructorName) <=< diffTerms
 instance SExprDiff TSX.Term where
@@ -197,10 +213,14 @@ class ShowDiff term where
 instance (Diffable syntax, Eq1 syntax, Hashable1 syntax, Show1 syntax, Traversable syntax) => ShowDiff (Term syntax) where
   showDiff = serialize Show <=< diffTerms
 
-deriving instance ShowDiff Go.Term
-deriving instance ShowDiff Markdown.Term
-deriving instance ShowDiff PHP.Term
-deriving instance ShowDiff Python.Term
+instance ShowDiff Go.Term where
+  showDiff = serialize Show <=< diffTerms
+instance ShowDiff Markdown.Term where
+  showDiff = serialize Show <=< diffTerms
+instance ShowDiff PHP.Term where
+  showDiff = serialize Show <=< diffTerms
+instance ShowDiff Python.Term where
+  showDiff = serialize Show <=< diffTerms
 instance ShowDiff Ruby.Term where
   showDiff = serialize Show <=< diffTerms
 instance ShowDiff TSX.Term where

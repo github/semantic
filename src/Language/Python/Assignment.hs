@@ -30,18 +30,16 @@ import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
-import qualified Data.Term as Term
 import           Language.Python.Syntax as Python.Syntax
-import qualified Language.Python.Term as Python
+import           Language.Python.Term as Python
 import           Prologue
 import           TreeSitter.Python as Grammar
 
-type Term = Term.Term (Sum Python.Syntax)
 type Assignment = Assignment.Assignment [] Grammar
 
 -- | Assignment from AST in Python's grammar onto a program in Python's syntax.
-assignment :: Assignment (Python.Term Loc)
-assignment = fmap Python.Term . handleError $ makeTerm <$> symbol Module <*> children (Statement.Statements <$> manyTerm expression) <|> parseError
+assignment :: Assignment (Term Loc)
+assignment = handleError $ makeTerm <$> symbol Module <*> children (Statement.Statements <$> manyTerm expression) <|> parseError
 
 expression :: Assignment (Term Loc)
 expression = handleError (choice expressionChoices)

@@ -16,14 +16,13 @@ import qualified Data.Syntax as Syntax
 import qualified Data.Term as Term
 import qualified Data.Text as Text
 import qualified Language.Markdown.Syntax as Markup
-import qualified Language.Markdown.Term as Markdown
+import           Language.Markdown.Term as Markdown
 import           Parsing.CMark as Grammar (Grammar (..))
 
-type Term = Term.Term (Sum Markdown.Syntax)
 type Assignment = Assignment.Assignment (Term.TermF [] CMarkGFM.NodeType) Grammar
 
-assignment :: Assignment (Markdown.Term Loc)
-assignment = fmap Markdown.Term . Syntax.handleError $ makeTerm <$> symbol Document <*> children (Markup.Document <$> many blockElement)
+assignment :: Assignment (Term Loc)
+assignment = Syntax.handleError $ makeTerm <$> symbol Document <*> children (Markup.Document <$> many blockElement)
 
 
 -- Block elements

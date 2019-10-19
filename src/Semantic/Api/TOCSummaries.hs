@@ -122,10 +122,14 @@ instance (Diffable syntax, Eq1 syntax, HasDeclaration syntax, Hashable1 syntax, 
     decorateTerm :: (Foldable syntax, Functor syntax, HasDeclaration syntax) => (Blob, Term syntax Loc) -> (Blob, Term syntax (Maybe Declaration))
     decorateTerm (blob, term) = (blob, decoratorWithAlgebra (declarationAlgebra blob) term)
 
-deriving instance SummarizeTerms Go.Term
-deriving instance SummarizeTerms Markdown.Term
-deriving instance SummarizeTerms PHP.Term
-deriving instance SummarizeTerms PythonALaCarte.Term
+instance SummarizeTerms Go.Term where
+  summarizeTerms = summarizeTerms . bimap (fmap (cata Term)) (fmap (cata Term))
+instance SummarizeTerms Markdown.Term where
+  summarizeTerms = summarizeTerms . bimap (fmap (cata Term)) (fmap (cata Term))
+instance SummarizeTerms PHP.Term where
+  summarizeTerms = summarizeTerms . bimap (fmap (cata Term)) (fmap (cata Term))
+instance SummarizeTerms PythonALaCarte.Term where
+  summarizeTerms = summarizeTerms . bimap (fmap (cata Term)) (fmap (cata Term))
 instance SummarizeTerms Ruby.Term where
   summarizeTerms = summarizeTerms . bimap (fmap (cata Term)) (fmap (cata Term))
 instance SummarizeTerms TSX.Term where

@@ -124,10 +124,15 @@ instance ShowTerm JSON.Term where
 instance ShowTerm PythonPrecise.Term where
   showTerm = serialize Show . void . PythonPrecise.getTerm
 
-deriving instance ShowTerm Go.Term
-deriving instance ShowTerm Markdown.Term
-deriving instance ShowTerm PHP.Term
-deriving instance ShowTerm PythonALaCarte.Term
+
+instance ShowTerm Go.Term where
+  showTerm = showTerm . cata Term
+instance ShowTerm Markdown.Term where
+  showTerm = showTerm . cata Term
+instance ShowTerm PHP.Term where
+  showTerm = showTerm . cata Term
+instance ShowTerm PythonALaCarte.Term where
+  showTerm = showTerm . cata Term
 instance ShowTerm Ruby.Term where
   showTerm = showTerm . cata Term
 instance ShowTerm TSX.Term where
@@ -154,10 +159,15 @@ instance SExprTerm JSON.Term where
 instance SExprTerm PythonPrecise.Term where
   sexprTerm = SExpr.Precise.serializeSExpression . PythonPrecise.getTerm
 
-deriving instance SExprTerm Go.Term
-deriving instance SExprTerm Markdown.Term
-deriving instance SExprTerm PHP.Term
-deriving instance SExprTerm PythonALaCarte.Term
+
+instance SExprTerm Go.Term where
+  sexprTerm = SExpr.serializeSExpression ByConstructorName
+instance SExprTerm Markdown.Term where
+  sexprTerm = SExpr.serializeSExpression ByConstructorName
+instance SExprTerm PHP.Term where
+  sexprTerm = SExpr.serializeSExpression ByConstructorName
+instance SExprTerm PythonALaCarte.Term where
+  sexprTerm = SExpr.serializeSExpression ByConstructorName
 instance SExprTerm Ruby.Term where
   sexprTerm = SExpr.serializeSExpression ByConstructorName
 instance SExprTerm TSX.Term where
@@ -175,10 +185,14 @@ class DOTGraphTerm term where
 instance (ConstructorName syntax, Foldable syntax, Functor syntax) => DOTGraphTerm (Term syntax) where
   dotGraphTerm = serialize (DOT (termStyle "terms")) . renderTreeGraph
 
-deriving instance DOTGraphTerm Go.Term
-deriving instance DOTGraphTerm Markdown.Term
-deriving instance DOTGraphTerm PHP.Term
-deriving instance DOTGraphTerm PythonALaCarte.Term
+instance DOTGraphTerm Go.Term where
+  dotGraphTerm = serialize (DOT (termStyle "terms")) . renderTreeGraph
+instance DOTGraphTerm Markdown.Term where
+  dotGraphTerm = serialize (DOT (termStyle "terms")) . renderTreeGraph
+instance DOTGraphTerm PHP.Term where
+  dotGraphTerm = serialize (DOT (termStyle "terms")) . renderTreeGraph
+instance DOTGraphTerm PythonALaCarte.Term where
+  dotGraphTerm = serialize (DOT (termStyle "terms")) . renderTreeGraph
 instance DOTGraphTerm Ruby.Term where
   dotGraphTerm = serialize (DOT (termStyle "terms")) . renderTreeGraph
 instance DOTGraphTerm TSX.Term where
@@ -196,10 +210,14 @@ class JSONTreeTerm term where
 instance ToJSONFields1 syntax => JSONTreeTerm (Term syntax) where
   jsonTreeTerm = renderJSONTerm
 
-deriving instance JSONTreeTerm Go.Term
-deriving instance JSONTreeTerm Markdown.Term
-deriving instance JSONTreeTerm PHP.Term
-deriving instance JSONTreeTerm PythonALaCarte.Term
+instance JSONTreeTerm Go.Term where
+  jsonTreeTerm blob = jsonTreeTerm blob . cata Term
+instance JSONTreeTerm Markdown.Term where
+  jsonTreeTerm blob = jsonTreeTerm blob . cata Term
+instance JSONTreeTerm PHP.Term where
+  jsonTreeTerm blob = jsonTreeTerm blob . cata Term
+instance JSONTreeTerm PythonALaCarte.Term where
+  jsonTreeTerm blob = jsonTreeTerm blob . cata Term
 instance JSONTreeTerm Ruby.Term where
   jsonTreeTerm blob = jsonTreeTerm blob . cata Term
 instance JSONTreeTerm TSX.Term where
@@ -227,10 +245,14 @@ instance (Foldable syntax, Functor syntax, ConstructorName syntax) => JSONGraphT
           & P.edges .~ fmap toEdge (edgeList graph)
           & P.errors .~ mempty
 
-deriving instance JSONGraphTerm Go.Term
-deriving instance JSONGraphTerm Markdown.Term
-deriving instance JSONGraphTerm PHP.Term
-deriving instance JSONGraphTerm PythonALaCarte.Term
+instance JSONGraphTerm Go.Term where
+  jsonGraphTerm blob = jsonGraphTerm blob . cata Term
+instance JSONGraphTerm Markdown.Term where
+  jsonGraphTerm blob = jsonGraphTerm blob . cata Term
+instance JSONGraphTerm PHP.Term where
+  jsonGraphTerm blob = jsonGraphTerm blob . cata Term
+instance JSONGraphTerm PythonALaCarte.Term where
+  jsonGraphTerm blob = jsonGraphTerm blob . cata Term
 instance JSONGraphTerm Ruby.Term where
   jsonGraphTerm blob = jsonGraphTerm blob . cata Term
 instance JSONGraphTerm TSX.Term where

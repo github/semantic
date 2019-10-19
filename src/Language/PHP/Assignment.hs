@@ -31,17 +31,15 @@ import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
-import qualified Data.Term as Term
 import qualified Language.PHP.Syntax as Syntax
-import qualified Language.PHP.Term as PHP
+import           Language.PHP.Term as PHP
 import           TreeSitter.PHP as Grammar
 
-type Term = Term.Term (Sum PHP.Syntax)
 type Assignment = Assignment.Assignment [] Grammar
 
 -- | Assignment from AST in PHP's grammar onto a program in PHP's syntax.
-assignment :: Assignment (PHP.Term Loc)
-assignment = fmap PHP.Term . handleError $ makeTerm <$> symbol Program <*> children (Statement.Statements <$> (bookend <$> (text <|> emptyTerm) <*> manyTerm statement <*> (text <|> emptyTerm))) <|> parseError
+assignment :: Assignment (Term Loc)
+assignment = handleError $ makeTerm <$> symbol Program <*> children (Statement.Statements <$> (bookend <$> (text <|> emptyTerm) <*> manyTerm statement <*> (text <|> emptyTerm))) <|> parseError
 
 text :: Assignment (Term Loc)
 text = makeTerm <$> symbol Text <*> (Syntax.Text <$> source)
