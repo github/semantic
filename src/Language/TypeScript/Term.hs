@@ -2,17 +2,15 @@
 module Language.TypeScript.Term
 ( Syntax
 , Term(..)
-, Diff(..)
 ) where
 
 import Control.Lens.Lens
 import Data.Abstract.Declarations
 import Data.Abstract.FreeVariables
-import Data.Bifoldable
 import Data.Bifunctor
 import Data.Bitraversable
 import Data.Coerce
-import qualified Data.Diff as Diff
+import Data.Diff
 import Data.Foldable (fold)
 import Data.Functor.Foldable (Base, Recursive(..))
 import Data.Graph.ControlFlowVertex (VertexDeclaration(..), toVertex1)
@@ -218,12 +216,9 @@ instance Syntax.HasErrors Term where
     maybe (fold syntax) (pure . Syntax.unError span) (Sum.project syntax)
 
 
-newtype Diff ann1 ann2 = Diff { getDiff :: Diff.Diff (Sum.Sum Syntax) ann1 ann2 }
-  deriving (Bifoldable, Bifunctor)
-
 instance DiffTerms Term where
-  type DiffFor Term = Diff
-  diffTermPair = Diff . diffTermPair . bimap (cata Term.Term) (cata Term.Term)
+  type DiffFor Term = Diff (Sum.Sum Syntax)
+  diffTermPair = diffTermPair . bimap (cata Term.Term) (cata Term.Term)
 
 type instance Base (Term ann) = Term.TermF (Sum.Sum Syntax) ann
 

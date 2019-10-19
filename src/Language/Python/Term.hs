@@ -2,15 +2,13 @@
 module Language.Python.Term
 ( Syntax
 , Term(..)
-, Diff(..)
 ) where
 
 import Control.Lens.Lens
 import Data.Abstract.Declarations
 import Data.Abstract.FreeVariables
-import Data.Bifoldable
 import Data.Bifunctor
-import qualified Data.Diff as Diff
+import Data.Diff
 import Data.Functor.Foldable
 import Data.Graph.ControlFlowVertex (VertexDeclaration)
 import Data.Sum (Sum)
@@ -110,12 +108,9 @@ type Syntax =
 newtype Term ann = Term { getTerm :: Term.Term (Sum Syntax) ann }
   deriving (Eq, Declarations, Foldable, FreeVariables, Functor, Syntax.HasErrors, Ord, Show, Traversable, VertexDeclaration)
 
-newtype Diff ann1 ann2 = Diff { getDiff :: Diff.Diff (Sum Syntax) ann1 ann2 }
-  deriving (Bifoldable, Bifunctor)
-
 instance DiffTerms Term where
-  type DiffFor Term = Diff
-  diffTermPair = Diff . diffTermPair . bimap getTerm getTerm
+  type DiffFor Term = Diff (Sum Syntax)
+  diffTermPair = diffTermPair . bimap getTerm getTerm
 
 type instance Base (Term ann) = Term.TermF (Sum Syntax) ann
 

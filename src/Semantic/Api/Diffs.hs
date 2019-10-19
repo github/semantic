@@ -102,9 +102,9 @@ deriving instance DOTGraphDiff PHP.Term
 deriving instance DOTGraphDiff Python.Term
 deriving instance DOTGraphDiff Ruby.Term
 instance DOTGraphDiff TSX.Term where
-  dotGraphDiff = serialize (DOT (diffStyle "diffs")) . renderTreeGraph . TSX.getDiff <=< diffTerms
+  dotGraphDiff = serialize (DOT (diffStyle "diffs")) . renderTreeGraph <=< diffTerms
 instance DOTGraphDiff TypeScript.Term where
-  dotGraphDiff = serialize (DOT (diffStyle "diffs")) . renderTreeGraph . TypeScript.getDiff <=< diffTerms
+  dotGraphDiff = serialize (DOT (diffStyle "diffs")) . renderTreeGraph <=< diffTerms
 
 
 jsonGraphDiffParsers :: Map Language (SomeParser JSONGraphDiff Loc)
@@ -139,9 +139,9 @@ deriving instance JSONGraphDiff PHP.Term
 deriving instance JSONGraphDiff Python.Term
 deriving instance JSONGraphDiff Ruby.Term
 instance JSONGraphDiff TSX.Term where
-  jsonGraphDiff terms = toGraph (bimap fst fst terms) . TSX.getDiff        <$> diffTerms terms
+  jsonGraphDiff terms = toGraph (bimap fst fst terms)        <$> diffTerms terms
 instance JSONGraphDiff TypeScript.Term where
-  jsonGraphDiff terms = toGraph (bimap fst fst terms) . TypeScript.getDiff <$> diffTerms terms
+  jsonGraphDiff terms = toGraph (bimap fst fst terms) <$> diffTerms terms
 
 
 jsonTreeDiffParsers :: Map Language (SomeParser JSONTreeDiff Loc)
@@ -159,9 +159,9 @@ deriving instance JSONTreeDiff PHP.Term
 deriving instance JSONTreeDiff Python.Term
 deriving instance JSONTreeDiff Ruby.Term
 instance JSONTreeDiff TSX.Term where
-  jsonTreeDiff terms = renderJSONDiff (bimap fst fst terms) . TSX.getDiff <$> diffTerms terms
+  jsonTreeDiff terms = renderJSONDiff (bimap fst fst terms) <$> diffTerms terms
 instance JSONTreeDiff TypeScript.Term where
-  jsonTreeDiff terms = renderJSONDiff (bimap fst fst terms) . TypeScript.getDiff <$> diffTerms terms
+  jsonTreeDiff terms = renderJSONDiff (bimap fst fst terms) <$> diffTerms terms
 
 
 sexprDiffParsers :: Map Language (SomeParser SExprDiff Loc)
@@ -179,9 +179,9 @@ deriving instance SExprDiff PHP.Term
 deriving instance SExprDiff Python.Term
 deriving instance SExprDiff Ruby.Term
 instance SExprDiff TSX.Term where
-  sexprDiff = serialize (SExpression ByConstructorName) . TSX.getDiff <=< diffTerms
+  sexprDiff = serialize (SExpression ByConstructorName) <=< diffTerms
 instance SExprDiff TypeScript.Term where
-  sexprDiff = serialize (SExpression ByConstructorName) . TypeScript.getDiff <=< diffTerms
+  sexprDiff = serialize (SExpression ByConstructorName) <=< diffTerms
 
 
 showDiffParsers :: Map Language (SomeParser ShowDiff Loc)
@@ -199,9 +199,9 @@ deriving instance ShowDiff PHP.Term
 deriving instance ShowDiff Python.Term
 deriving instance ShowDiff Ruby.Term
 instance ShowDiff TSX.Term where
-  showDiff = serialize Show . TSX.getDiff <=< diffTerms
+  showDiff = serialize Show <=< diffTerms
 instance ShowDiff TypeScript.Term where
-  showDiff = serialize Show . TypeScript.getDiff <=< diffTerms
+  showDiff = serialize Show <=< diffTerms
 
 
 diffTerms :: (DiffTerms term, Member Telemetry sig, Carrier sig m, MonadIO m)
