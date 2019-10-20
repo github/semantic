@@ -17,7 +17,7 @@ import Text.Pretty.Simple (pPrint, pPrintNoColor)
 data SemanticAST = SemanticAST
   { format :: Format
   , color  :: Bool
-  , source :: Either FilePath Prelude.String
+  , source :: Either [FilePath] Prelude.String
   }
 
 parseAST :: Parser SemanticAST
