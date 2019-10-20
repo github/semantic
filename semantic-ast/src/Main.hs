@@ -13,6 +13,7 @@ import System.IO (FilePath)
 import Options.Applicative hiding (style)
 import Data.Semigroup ((<>))
 import Text.Pretty.Simple (pPrint, pPrintNoColor)
+import Data.Foldable (for_)
 
 data SemanticAST = SemanticAST
   { format :: Format
