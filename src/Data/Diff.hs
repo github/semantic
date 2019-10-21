@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, RankNTypes, TypeFamilies, TypeOperators, ScopedTypeVariables, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, LambdaCase, RankNTypes, TypeFamilies, TypeOperators, ScopedTypeVariables, UndecidableInstances #-}
 module Data.Diff
 ( Diff(..)
 , DiffF(..)
@@ -76,7 +76,7 @@ merging = cata (\ (In ann syntax) -> mergeF (In (ann, ann) syntax))
 
 
 diffPatches :: (Foldable syntax, Functor syntax) => Diff syntax ann1 ann2 -> [Patch (TermF syntax ann1 (Diff syntax ann1 ann2)) (TermF syntax ann2 (Diff syntax ann1 ann2))]
-diffPatches = para $ \ diff -> case diff of
+diffPatches = para $ \case
   Patch patch -> bimap (fmap fst) (fmap fst) patch : bifoldMap (foldMap snd) (foldMap snd) patch
   Merge merge -> foldMap snd merge
 
