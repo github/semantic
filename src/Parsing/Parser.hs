@@ -46,7 +46,7 @@ import qualified Language.JSON as JSON
 import qualified Language.Markdown.Assignment as Markdown
 import qualified Language.PHP.Assignment as PHP
 import qualified Language.Python as PythonPrecise
-import qualified Language.Python.Assignment as Python
+import qualified Language.Python.Assignment as PythonALaCarte
 import qualified Language.Ruby.Assignment as Ruby
 import qualified Language.TSX.Assignment as TSX
 import qualified Language.TypeScript.Assignment as TypeScript
@@ -85,8 +85,8 @@ rubyParser = AssignmentParser (ASTParser tree_sitter_ruby) Ruby.assignment
 phpParser :: Parser (PHP.Term Loc)
 phpParser = AssignmentParser (ASTParser tree_sitter_php) PHP.assignment
 
-pythonParser :: Parser (Python.Term Loc)
-pythonParser = AssignmentParser (ASTParser tree_sitter_python) Python.assignment
+pythonParser :: Parser (PythonALaCarte.Term Loc)
+pythonParser = AssignmentParser (ASTParser tree_sitter_python) PythonALaCarte.assignment
 
 typescriptParser :: Parser (TypeScript.Term Loc)
 typescriptParser = AssignmentParser (ASTParser tree_sitter_typescript) TypeScript.assignment
@@ -160,13 +160,13 @@ markdownParser' = (Markdown, SomeParser markdownParser)
 phpParser' :: c PHP.Term => (Language, SomeParser c Loc)
 phpParser' = (PHP, SomeParser phpParser)
 
-pythonParserALaCarte' :: c Python.Term => (Language, SomeParser c Loc)
+pythonParserALaCarte' :: c PythonALaCarte.Term => (Language, SomeParser c Loc)
 pythonParserALaCarte' = (Python, SomeParser pythonParser)
 
 pythonParserPrecise' :: c PythonPrecise.Term => (Language, SomeParser c Loc)
 pythonParserPrecise' = (Python, SomeParser pythonParserPrecise)
 
-pythonParser' :: (c Python.Term, c PythonPrecise.Term) => PerLanguageModes -> (Language, SomeParser c Loc)
+pythonParser' :: (c PythonALaCarte.Term, c PythonPrecise.Term) => PerLanguageModes -> (Language, SomeParser c Loc)
 pythonParser' modes = case pythonMode modes of
   ALaCarte -> (Python, SomeParser pythonParser)
   Precise  -> (Python, SomeParser pythonParserPrecise)
@@ -186,7 +186,7 @@ aLaCarteParsers
   :: ( c Go.Term
      , c Markdown.Term
      , c PHP.Term
-     , c Python.Term
+     , c PythonALaCarte.Term
      , c Ruby.Term
      , c TSX.Term
      , c TypeScript.Term
@@ -224,7 +224,7 @@ allParsers
      , c JSON.Term
      , c Markdown.Term
      , c PHP.Term
-     , c Python.Term
+     , c PythonALaCarte.Term
      , c PythonPrecise.Term
      , c Ruby.Term
      , c TSX.Term
