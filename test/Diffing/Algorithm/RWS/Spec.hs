@@ -10,7 +10,6 @@ import Data.Term
 import Diffing.Algorithm (comparableTerms)
 import Diffing.Interpreter (stripDiff)
 import Diffing.Algorithm.RWS
-import Diffing.Algorithm.SES
 import Diffing.Interpreter.Spec (afterTerm, beforeTerm)
 import Test.Hspec.LeanCheck
 import SpecHelpers
