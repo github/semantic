@@ -31,18 +31,19 @@ import           System.Path ((</>))
 -- Duplicating this stuff from Util to shut off the logging
 
 callGraphProject' :: ( Language.SLanguage lang
-                     , Ord1 syntax
-                     , Declarations1 syntax
-                     , Evaluatable syntax
-                     , FreeVariables1 syntax
-                     , AccessControls1 syntax
+                     , Ord1 (Syntax term)
+                     , Declarations1 (Syntax term)
+                     , Evaluatable (Syntax term)
+                     , FreeVariables1 (Syntax term)
+                     , AccessControls1 (Syntax term)
                      , HasPrelude lang
-                     , Functor syntax
-                     , VertexDeclaration1 syntax
+                     , IsTerm term
+                     , Functor (Syntax term)
+                     , VertexDeclaration1 (Syntax term)
                      )
                   => TaskSession
                   -> Proxy lang
-                  -> Parser (Term syntax Loc)
+                  -> Parser (term Loc)
                   -> Path.RelFile
                   -> IO (Either String (Data.Graph.Graph ControlFlowVertex))
 callGraphProject' session proxy parser path = fmap (first show) . runTask session $ do
