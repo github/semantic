@@ -15,12 +15,9 @@ import qualified Control.Concurrent.Async as Async
 import           Data.Blob
 import qualified Data.ByteString as B
 import           Data.Language
-import           Data.Text.Encoding (decodeUtf8)
-import qualified Semantic.Git as Git
 import           Semantic.IO
 import qualified Source.Source as Source
 import qualified System.Path as Path
-import qualified System.Path.PartClass as Part
 
 -- | Read a utf8-encoded file to a 'Blob'.
 readBlobFromFile :: forall m. MonadIO m => File -> m (Maybe Blob)
