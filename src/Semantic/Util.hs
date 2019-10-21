@@ -39,11 +39,11 @@ import           Data.Project
 import           Data.Quieterm (Quieterm, quieterm)
 import           Data.Sum (weaken)
 import           Data.Term (termFAnnotation)
-import qualified Language.Go.Assignment
-import qualified Language.PHP.Assignment
-import qualified Language.Python.Assignment
-import qualified Language.Ruby.Assignment
-import qualified Language.TypeScript.Assignment
+import qualified Language.Go.Term as Go
+import qualified Language.PHP.Term as PHP
+import qualified Language.Python.Term as Python
+import qualified Language.Ruby.Term as Ruby
+import qualified Language.TypeScript.Term as TypeScript
 import           Parsing.Parser
 import           Prologue
 import           Semantic.Analysis
@@ -84,19 +84,19 @@ type FileEvaluator err term =
        , Either (SomeError err)
                 (ModuleTable (Module (ModuleResult Precise (Value (term Loc) Precise))))))
 
-evalGoProject :: FileEvaluator _ (Quieterm (Sum Language.Go.Assignment.Syntax))
+evalGoProject :: FileEvaluator _ (Quieterm (Sum Go.Syntax))
 evalGoProject = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Go) goParser
 
-evalRubyProject :: FileEvaluator _ (Quieterm (Sum Language.Ruby.Assignment.Syntax))
+evalRubyProject :: FileEvaluator _ (Quieterm (Sum Ruby.Syntax))
 evalRubyProject = justEvaluating <=< evaluateProject (Proxy @'Language.Ruby)               rubyParser
 
-evalPHPProject :: FileEvaluator _ (Quieterm (Sum Language.PHP.Assignment.Syntax))
+evalPHPProject :: FileEvaluator _ (Quieterm (Sum PHP.Syntax))
 evalPHPProject  = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.PHP)        phpParser
 
-evalPythonProject :: FileEvaluator _ (Quieterm (Sum Language.Python.Assignment.Syntax))
+evalPythonProject :: FileEvaluator _ (Quieterm (Sum Python.Syntax))
 evalPythonProject = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Python)     pythonParser
 
-evalTypeScriptProject :: FileEvaluator _ (Quieterm (Sum Language.TypeScript.Assignment.Syntax))
+evalTypeScriptProject :: FileEvaluator _ (Quieterm (Sum TypeScript.Syntax))
 evalTypeScriptProject = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.TypeScript) typescriptParser
 
 evaluateProject proxy parser paths = withOptions debugOptions $ \ config logger statter ->
