@@ -6,6 +6,7 @@ module Language.Markdown.Term
 
 import Control.Lens.Lens
 import Data.Abstract.Declarations
+import Data.Aeson (ToJSON)
 import Data.Bifunctor
 import Data.Bitraversable
 import Data.Coerce
@@ -49,7 +50,7 @@ type Syntax =
 
 
 newtype Term ann = Term { getTerm :: Term.TermF (Sum.Sum Syntax) ann (Term ann) }
-  deriving (Declarations, Eq, Ord, Show)
+  deriving (Declarations, Eq, Ord, Show, ToJSON)
 
 instance Term.IsTerm Term where
   type Syntax Term = Sum.Sum Syntax

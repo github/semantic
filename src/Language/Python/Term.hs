@@ -7,6 +7,7 @@ module Language.Python.Term
 import Control.Lens.Lens
 import Data.Abstract.Declarations
 import Data.Abstract.FreeVariables
+import Data.Aeson (ToJSON)
 import Data.Bifunctor
 import Data.Bitraversable
 import Data.Coerce
@@ -110,7 +111,7 @@ type Syntax =
 
 
 newtype Term ann = Term { getTerm :: Term.TermF (Sum.Sum Syntax) ann (Term ann) }
-  deriving (Eq, Declarations, FreeVariables, Ord, Show)
+  deriving (Eq, Declarations, FreeVariables, Ord, Show, ToJSON)
 
 instance Term.IsTerm Term where
   type Syntax Term = Sum.Sum Syntax
