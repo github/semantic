@@ -35,16 +35,21 @@ projectExtensions = extensionsForLanguage . projectLanguage
 projectFiles :: Project -> [File]
 projectFiles = fmap blobFile . projectBlobs
 
-readProjectFromPaths :: MonadIO m => Maybe FilePath -> FilePath -> Language -> [FilePath] -> m Project
+readProjectFromPaths :: MonadIO m
+                     => Maybe Path.AbsRelDir
+                     -> FilePath
+                     -> Language
+                     -> [Path.AbsRelDir]
+                     -> m Project
 readProjectFromPaths maybeRoot path lang excludeDirs = do
   isDir <- isDirectory path
   let rootDir = if isDir
-      then fromMaybe path maybeRoot
-      else fromMaybe (takeDirectory path) maybeRoot
+      then fromMaybe path (fmap Path.toString maybeRoot)
+      else fromMaybe (takeDirectory path) (fmap Path.toString maybeRoot)
 
-  paths <- liftIO $ findFilesInDir (Path.absRel rootDir) exts (fmap Path.absRel excludeDirs)
+  paths <- liftIO $ findFilesInDir (Path.absRel rootDir) exts excludeDirs
   blobs <- liftIO $ traverse (readBlobFromFile' . toFile) paths
-  pure $ Project rootDir blobs lang excludeDirs
+  pure $ Project rootDir blobs lang (fmap Path.toString excludeDirs)
   where
     toFile path = File (Path.toString path) lang
     exts = extensionsForLanguage lang
