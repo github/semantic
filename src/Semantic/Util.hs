@@ -79,24 +79,24 @@ justEvaluating
 type FileEvaluator err syntax =
   [FilePath]
   -> IO
-       ( Heap Precise Precise (Value (Quieterm (Sum syntax) Loc) Precise),
+       ( Heap Precise Precise (Value (Quieterm syntax Loc) Precise),
        ( ScopeGraph Precise
        , Either (SomeError (Sum err))
-                (ModuleTable (Module (ModuleResult Precise (Value (Quieterm (Sum syntax) Loc) Precise))))))
+                (ModuleTable (Module (ModuleResult Precise (Value (Quieterm syntax Loc) Precise))))))
 
-evalGoProject :: FileEvaluator _ Language.Go.Assignment.Syntax
+evalGoProject :: FileEvaluator _ (Sum Language.Go.Assignment.Syntax)
 evalGoProject = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Go) goParser
 
-evalRubyProject :: FileEvaluator _ Language.Ruby.Assignment.Syntax
+evalRubyProject :: FileEvaluator _ (Sum Language.Ruby.Assignment.Syntax)
 evalRubyProject = justEvaluating <=< evaluateProject (Proxy @'Language.Ruby)               rubyParser
 
-evalPHPProject :: FileEvaluator _ Language.PHP.Assignment.Syntax
+evalPHPProject :: FileEvaluator _ (Sum Language.PHP.Assignment.Syntax)
 evalPHPProject  = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.PHP)        phpParser
 
-evalPythonProject :: FileEvaluator _ Language.Python.Assignment.Syntax
+evalPythonProject :: FileEvaluator _ (Sum Language.Python.Assignment.Syntax)
 evalPythonProject = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Python)     pythonParser
 
-evalTypeScriptProject :: FileEvaluator _ Language.TypeScript.Assignment.Syntax
+evalTypeScriptProject :: FileEvaluator _ (Sum Language.TypeScript.Assignment.Syntax)
 evalTypeScriptProject = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.TypeScript) typescriptParser
 
 evaluateProject proxy parser paths = withOptions debugOptions $ \ config logger statter ->
