@@ -16,6 +16,8 @@ copyright:           (c) 2019 GitHub, Inc.
 category:            Language
 extra-source-files:  CHANGELOG.md
 
+tested-with:         GHC == 8.6.5
+
 library
   exposed-modules:
   -- other-modules:
