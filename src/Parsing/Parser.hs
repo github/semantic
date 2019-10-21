@@ -45,7 +45,7 @@ import qualified Language.Java as Java
 import qualified Language.JSON as JSON
 import qualified Language.Markdown.Assignment as Markdown
 import qualified Language.PHP.Assignment as PHP
-import qualified Language.Python as PrecisePython
+import qualified Language.Python as PythonPrecise
 import qualified Language.Python.Assignment as Python
 import qualified Language.Ruby.Assignment as Ruby
 import qualified Language.TSX.Assignment as TSX
@@ -104,8 +104,8 @@ javaParserPrecise = UnmarshalParser Java.tree_sitter_java
 jsonParserPrecise :: Parser (JSON.Term Loc)
 jsonParserPrecise = UnmarshalParser JSON.tree_sitter_json
 
-pythonParserPrecise :: Parser (PrecisePython.Term Loc)
-pythonParserPrecise = UnmarshalParser PrecisePython.tree_sitter_python
+pythonParserPrecise :: Parser (PythonPrecise.Term Loc)
+pythonParserPrecise = UnmarshalParser PythonPrecise.tree_sitter_python
 
 
 -- $abstract
@@ -163,10 +163,10 @@ phpParser' = (PHP, SomeParser phpParser)
 pythonParserALaCarte' :: c Python.Term => (Language, SomeParser c Loc)
 pythonParserALaCarte' = (Python, SomeParser pythonParser)
 
-pythonParserPrecise' :: c PrecisePython.Term => (Language, SomeParser c Loc)
+pythonParserPrecise' :: c PythonPrecise.Term => (Language, SomeParser c Loc)
 pythonParserPrecise' = (Python, SomeParser pythonParserPrecise)
 
-pythonParser' :: (c Python.Term, c PrecisePython.Term) => PerLanguageModes -> (Language, SomeParser c Loc)
+pythonParser' :: (c Python.Term, c PythonPrecise.Term) => PerLanguageModes -> (Language, SomeParser c Loc)
 pythonParser' modes = case pythonMode modes of
   ALaCarte -> (Python, SomeParser pythonParser)
   Precise  -> (Python, SomeParser pythonParserPrecise)
@@ -208,7 +208,7 @@ aLaCarteParsers = Map.fromList
 preciseParsers
   :: ( c Java.Term
      , c JSON.Term
-     , c PrecisePython.Term
+     , c PythonPrecise.Term
      )
   => Map Language (SomeParser c Loc)
 preciseParsers = Map.fromList
@@ -225,7 +225,7 @@ allParsers
      , c Markdown.Term
      , c PHP.Term
      , c Python.Term
-     , c PrecisePython.Term
+     , c PythonPrecise.Term
      , c Ruby.Term
      , c TSX.Term
      , c TypeScript.Term
