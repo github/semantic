@@ -85,19 +85,19 @@ type FileEvaluator err term =
                 (ModuleTable (Module (ModuleResult Precise (Value (term Loc) Precise))))))
 
 evalGoProject :: FileEvaluator _ (Quieterm (Sum Go.Syntax))
-evalGoProject = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Go) goParser
+evalGoProject = justEvaluating <=< evaluateProject (Proxy @'Language.Go) goParser
 
 evalRubyProject :: FileEvaluator _ (Quieterm (Sum Ruby.Syntax))
 evalRubyProject = justEvaluating <=< evaluateProject (Proxy @'Language.Ruby)               rubyParser
 
 evalPHPProject :: FileEvaluator _ (Quieterm (Sum PHP.Syntax))
-evalPHPProject  = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.PHP)        phpParser
+evalPHPProject  = justEvaluating <=< evaluateProject (Proxy @'Language.PHP)        phpParser
 
 evalPythonProject :: FileEvaluator _ (Quieterm (Sum Python.Syntax))
-evalPythonProject = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Python)     pythonParser
+evalPythonProject = justEvaluating <=< evaluateProject (Proxy @'Language.Python)     pythonParser
 
 evalTypeScriptProject :: FileEvaluator _ (Quieterm (Sum TypeScript.Syntax))
-evalTypeScriptProject = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.TypeScript) typescriptParser
+evalTypeScriptProject = justEvaluating <=< evaluateProject (Proxy @'Language.TypeScript) typescriptParser
 
 evaluateProject proxy parser paths = withOptions debugOptions $ \ config logger statter ->
   evaluateProject' (TaskSession config "-" False logger statter) proxy parser paths
