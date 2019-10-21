@@ -17,10 +17,6 @@ before_cache:
 
   - rm -rfv $HOME/.cabal/packages/head.hackage
 
-  # remove files from old compilers
-  - rm -rfv $HOME/.cabal/store/{!(ghc-8.6.5)}
-  - rm -rfv $TRAVIS_BUILD_DIR/dist-newstyle/build/*/{!(ghc-8.6.5)}
-
   # download and install hlint
   - mkdir -p $HOME/.local/bin
   - curl "https://github.com/ndmitchell/hlint/releases/download/v2.2.3/hlint-2.2.3-x86_64-linux.tar.gz"

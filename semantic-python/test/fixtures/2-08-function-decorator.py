@@ -1,4 +1,4 @@
-# CHECK-TREE: { passthru <- \x -> x; decorated <- \x -> x; decorated = passthru(decorated); #record { passthru: passthru, decorated: decorated }}
+# CHECK-TREE: { passthru <- rec passthru = \x -> x; decorated <- rec decorated = \x -> x; decorated = passthru(decorated); #record { passthru: passthru, decorated: decorated }}
 def passthru(x):
     return x
 
