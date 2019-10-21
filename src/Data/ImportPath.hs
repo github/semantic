@@ -19,8 +19,9 @@ data ImportPath = ImportPath { unPath :: FilePath, pathIsRelative :: IsRelative 
 importPath :: Text -> ImportPath
 importPath str = let path = stripQuotes str in ImportPath (T.unpack path) (pathType path)
   where
-    pathType xs | not (T.null xs), fmap fst (T.uncons xs) == Just '.' = Relative -- head call here is safe
-                | otherwise = NonRelative
+    pathType xs | startsWithDot xs = Relative -- head call here is safe
+                | otherwise        = NonRelative
+    startsWithDot t = fmap fst (T.uncons t) == Just '.'
 
 defaultAlias :: ImportPath -> Name
 defaultAlias = name . T.pack . takeFileName . unPath
