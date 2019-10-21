@@ -8,7 +8,7 @@
   object <- type "object" #unit #record{};
 
   str <- type "str" object #record { };
-  str.__class.__new__ = \contents -> instance str contents #record{};
+  str.__class.__new__ = (\contents -> instance str contents #record{});
 
-  #record { type: type, object: object, string: string }
+  #record { type: type, object: object, str: str }
 }
