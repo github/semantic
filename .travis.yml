@@ -21,13 +21,17 @@ before_cache:
   - rm -rfv $HOME/.cabal/store/{!(ghc-8.6.5)}
   - rm -rfv $TRAVIS_BUILD_DIR/dist-newstyle/build/*/{!(ghc-8.6.5)}
 
+  # download and install hlint
+  - mkdir -p $HOME/.local/bin
+  - curl "https://github.com/ndmitchell/hlint/releases/download/v2.2.3/hlint-2.2.3-x86_64-linux.tar.gz"
+  - tar -xf hlint-2.2.3-x86_64-linux.tar.gz -C $HOME/.local/bin
+
 matrix:
   include:
     - compiler: "ghc-8.6.5"
       addons: {apt: {packages: [cabal-install-2.4,ghc-8.6.5], sources: [hvr-ghc]}}
 
 before_install:
-- mkdir -p $HOME/.local/bin
 - "PATH=/opt/ghc/bin:$HOME/local/bin:$PATH"
 - ghc --version
 - cabal --version
@@ -46,8 +50,7 @@ script:
 - cabal v2-run semantic-source:doctest
 # parse-examples is disabled because it slaughters our CI
 # - cabal v2-run semantic:parse-examples
-# Downloads an hlint binary rather than going through cabal-install
-- curl -sSL https://raw.github.com/ndmitchell/hlint/master/misc/run.sh | sh -s src semantic-python
+- hlint src semantic-python
 
 # Any branch linked with a pull request will be built, as well as the non-PR
 # branches listed below:
