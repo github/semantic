@@ -230,7 +230,6 @@ library
                      , Semantic.Git
                      , Semantic.Graph
                      , Semantic.IO
-                     , Semantic.REPL
                      , Semantic.Resolution
                      , Semantic.Task
                      , Semantic.Task.Files
