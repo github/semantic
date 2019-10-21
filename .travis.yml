@@ -42,6 +42,8 @@ script:
 - cabal new-run semantic-source:doctest
 # parse-examples is disabled because it slaughters our CI
 # - cabal new-run semantic:parse-examples
+# Downloads an hlint binary rather than going through cabal-install
+- curl -sSL https://raw.github.com/ndmitchell/hlint/master/misc/run.sh | sh -s src
 
 # Any branch linked with a pull request will be built, as well as the non-PR
 # branches listed below:
