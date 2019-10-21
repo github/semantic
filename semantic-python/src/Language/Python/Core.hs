@@ -207,8 +207,8 @@ instance Compile Py.ClassDefinition where
 
     body <- compile pybody buildTypeCall next
     let coreName = Name.named' n
-    let assignClass = coreName :<- (rec coreName body)
-    let continuing = fmap (locate it . (assignClass >>>=))
+        assignClass = coreName :<- (rec coreName body)
+        continuing = fmap (locate it . (assignClass >>>=))
     continuing (local (def n) (cc next))
 
 instance Compile Py.ComparisonOperator
