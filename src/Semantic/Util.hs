@@ -104,9 +104,10 @@ evaluateProject proxy parser paths = withOptions debugOptions $ \ config logger 
 
 -- Evaluate a project consisting of the listed paths.
 evaluateProject' session proxy parser paths = do
+  let lang = Language.reflect proxy
   res <- runTask session $ asks configTreeSitterParseTimeout >>= \ timeout -> runParse timeout $ do
-    blobs <- catMaybes <$> traverse readBlobFromFile (flip File (Language.reflect proxy) <$> paths)
-    package <- fmap (quieterm . snd) <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs (Language.reflect proxy) [])
+    blobs <- catMaybes <$> traverse readBlobFromFile (flip File lang <$> paths)
+    package <- fmap (quieterm . snd) <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs lang [])
     modules <- topologicalSort <$> runImportGraphToModules proxy package
     trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
     pure (id @(Evaluator _ Precise (Value _ Precise) _ _)
