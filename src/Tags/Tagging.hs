@@ -3,6 +3,7 @@ module Tags.Tagging
 ( runTagging
 , Tag(..)
 , Kind(..)
+, IsTaggable
 )
 where
 
