@@ -21,6 +21,7 @@ data SemanticAST = SemanticAST
   , source :: Either [FilePath] Prelude.String
   }
 
+-- Usage: semantic-ast --format ARG [--no-color] [--sourceString STRING] [FILEPATHS…]
 parseAST :: Parser SemanticAST
 parseAST = SemanticAST
   <$> option auto
