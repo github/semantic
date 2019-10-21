@@ -20,10 +20,9 @@ import qualified Analysis.TOCSummary as ToC
 import Data.Abstract.ScopeGraph (AccessControl(..))
 import Data.Bifunctor.Join
 import Data.Diff
-import Data.Functor.Both
+import Data.Edit
 import qualified Data.Language as Language
 import Data.List.NonEmpty
-import Data.Patch
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
@@ -122,9 +121,6 @@ instance Listable1 NonEmpty where
 instance Listable2 p => Listable1 (Join p) where
   liftTiers tiers = liftCons1 (liftTiers2 tiers tiers) Join
 
-instance Listable1 Both where
-  liftTiers tiers = liftCons2 tiers tiers Both
-
 instance Listable1 f => Listable2 (TermF f) where
   liftTiers2 annotationTiers recurTiers = liftCons2 annotationTiers (liftTiers recurTiers) In
 
@@ -160,10 +156,10 @@ instance (Listable1 syntax, Listable ann1, Listable ann2) => Listable (Diff synt
   tiers = tiers2
 
 
-instance Listable2 Patch where
-  liftTiers2 t1 t2 = liftCons1 t2 Insert \/ liftCons1 t1 Delete \/ liftCons2 t1 t2 Replace
+instance Listable2 Edit where
+  liftTiers2 t1 t2 = liftCons1 t2 Insert \/ liftCons1 t1 Delete \/ liftCons2 t1 t2 Compare
 
-instance (Listable a, Listable b) => Listable (Patch a b) where
+instance (Listable a, Listable b) => Listable (Edit a b) where
   tiers = tiers2
 
 

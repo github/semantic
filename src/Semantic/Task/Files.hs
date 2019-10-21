@@ -39,7 +39,7 @@ data Source blob where
   FromHandle     :: Handle 'IO.ReadMode             -> Source [Blob]
   FromDir        :: Path.AbsRelDir                  -> Source [Blob]
   FromGitRepo    :: FilePath -> Git.OID -> PathFilter -> Source [Blob]
-  FromPathPair   :: Both File                       -> Source BlobPair
+  FromPathPair   :: File -> File                    -> Source BlobPair
   FromPairHandle :: Handle 'IO.ReadMode             -> Source [BlobPair]
 
 data Destination = ToPath Path.AbsRelFile | ToHandle (Handle 'IO.WriteMode)
@@ -88,7 +88,7 @@ instance (Member (Error SomeException) sig, Member Catch sig, MonadIO m, Carrier
     Read (FromGitRepo path sha (ExcludeFromHandle handle)) k  -> rethrowing (readPathsFromHandle handle >>= (\x -> readBlobsFromGitRepo path sha x mempty)) >>= k
     Read (FromGitRepo path sha (IncludePaths includePaths)) k -> rethrowing (readBlobsFromGitRepo path sha mempty includePaths) >>= k
     Read (FromGitRepo path sha (IncludePathsFromHandle h)) k  -> rethrowing (readPathsFromHandle h >>= readBlobsFromGitRepo path sha mempty) >>= k
-    Read (FromPathPair paths) k                               -> rethrowing (runBothWith readFilePair paths) >>= k
+    Read (FromPathPair p1 p2) k                               -> rethrowing (readFilePair p1 p2) >>= k
     Read (FromPairHandle handle) k                            -> rethrowing (readBlobPairsFromHandle handle) >>= k
     ReadProject rootDir dir language excludeDirs k            -> rethrowing (readProjectFromPaths rootDir dir language excludeDirs) >>= k
     FindFiles dir exts excludeDirs k                          -> rethrowing (findFilesInDir dir exts excludeDirs) >>= k
@@ -116,9 +116,9 @@ readBlobs (FilesFromPaths paths) = traverse (send . flip Read pure . FromPath) p
 readBlobs (FilesFromGitRepo path sha filter) = send (Read (FromGitRepo path sha filter) pure)
 
 -- | A task which reads a list of pairs of 'Blob's from a 'Handle' or a list of pairs of 'FilePath's optionally paired with 'Language's.
-readBlobPairs :: (Member Files sig, Carrier sig m) => Either (Handle 'IO.ReadMode) [Both File] -> m [BlobPair]
+readBlobPairs :: (Member Files sig, Carrier sig m) => Either (Handle 'IO.ReadMode) [(File, File)] -> m [BlobPair]
 readBlobPairs (Left handle) = send (Read (FromPairHandle handle) pure)
-readBlobPairs (Right paths) = traverse (send . flip Read pure . FromPathPair) paths
+readBlobPairs (Right paths) = traverse (send . flip Read pure . uncurry FromPathPair) paths
 
 readProject :: (Member Files sig, Carrier sig m) => Maybe FilePath -> FilePath -> Language -> [FilePath] -> m Project
 readProject rootDir dir lang excludeDirs = send (ReadProject rootDir dir lang excludeDirs pure)
