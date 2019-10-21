@@ -19,8 +19,8 @@ before_cache:
 
 matrix:
   include:
-    - compiler: "ghc-8.6.4"
-      addons: {apt: {packages: [cabal-install-2.4,ghc-8.6.4], sources: [hvr-ghc]}}
+    - compiler: "ghc-8.6.5"
+      addons: {apt: {packages: [cabal-install-2.4,ghc-8.6.5], sources: [hvr-ghc]}}
 
 before_install:
 - mkdir -p $HOME/.local/bin
