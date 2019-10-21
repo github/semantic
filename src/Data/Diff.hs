@@ -2,8 +2,8 @@
 module Data.Diff
 ( Diff(..)
 , DiffF(..)
-, replacing
-, replaceF
+, comparing
+, compareF
 , inserting
 , insertF
 , deleting
@@ -18,10 +18,10 @@ import Data.Aeson
 import Data.Bifoldable
 import Data.Bifunctor
 import Data.Bitraversable
+import Data.Edit
 import Data.Functor.Classes
 import Data.Functor.Foldable
 import Data.JSON.Fields
-import Data.Patch
 import Data.Term
 import Text.Show
 
@@ -30,19 +30,19 @@ newtype Diff syntax ann1 ann2 = Diff { unDiff :: DiffF syntax ann1 ann2 (Diff sy
 
 -- | A single entry within a recursive 'Diff'.
 data DiffF syntax ann1 ann2 recur
-  -- | A changed node, represented as 'Insert'ed, 'Delete'd, or 'Replace'd 'TermF's, consisting of syntax labelled with an annotation.
-  = Patch (Patch (TermF syntax  ann1        recur)
-                 (TermF syntax        ann2  recur))
+  -- | A changed node, represented as 'Insert'ed, 'Delete'd, or 'Compare'd 'TermF's, consisting of syntax labelled with an annotation.
+  = Patch (Edit (TermF syntax  ann1        recur)
+                (TermF syntax        ann2  recur))
   -- | An unchanged node, consisting of syntax labelled with both the original annotations.
-  | Merge        (TermF syntax (ann1, ann2) recur)
+  | Merge       (TermF syntax (ann1, ann2) recur)
 
--- | Constructs a 'Diff' replacing one 'Term' with another recursively.
-replacing :: Functor syntax => Term syntax ann1 -> Term syntax ann2 -> Diff syntax ann1 ann2
-replacing (Term (In a1 r1)) (Term (In a2 r2)) = replaceF (In a1 (deleting <$> r1)) (In a2 (inserting <$> r2))
+-- | Constructs a 'Diff' comparing one 'Term' with another recursively.
+comparing :: Functor syntax => Term syntax ann1 -> Term syntax ann2 -> Diff syntax ann1 ann2
+comparing (Term (In a1 r1)) (Term (In a2 r2)) = compareF (In a1 (deleting <$> r1)) (In a2 (inserting <$> r2))
 
--- | Constructs a 'Diff' replacing one 'TermF' populated by further 'Diff's with another.
-replaceF :: TermF syntax ann1 (Diff syntax ann1 ann2) -> TermF syntax ann2 (Diff syntax ann1 ann2) -> Diff syntax ann1 ann2
-replaceF t1 t2 = Diff (Patch (Replace t1 t2))
+-- | Constructs a 'Diff' comparing one 'TermF' populated by further 'Diff's with another.
+compareF :: TermF syntax ann1 (Diff syntax ann1 ann2) -> TermF syntax ann2 (Diff syntax ann1 ann2) -> Diff syntax ann1 ann2
+compareF t1 t2 = Diff (Patch (Compare t1 t2))
 
 -- | Constructs a 'Diff' inserting a 'Term' recursively.
 inserting :: Functor syntax => Term syntax ann2 -> Diff syntax ann1 ann2
@@ -75,7 +75,7 @@ merging :: Functor syntax => Term syntax ann -> Diff syntax ann ann
 merging = cata (\ (In ann syntax) -> mergeF (In (ann, ann) syntax))
 
 
-diffPatches :: (Foldable syntax, Functor syntax) => Diff syntax ann1 ann2 -> [Patch (TermF syntax ann1 (Diff syntax ann1 ann2)) (TermF syntax ann2 (Diff syntax ann1 ann2))]
+diffPatches :: (Foldable syntax, Functor syntax) => Diff syntax ann1 ann2 -> [Edit (TermF syntax ann1 (Diff syntax ann1 ann2)) (TermF syntax ann2 (Diff syntax ann1 ann2))]
 diffPatches = para $ \case
   Patch patch -> bimap (fmap fst) (fmap fst) patch : bifoldMap (foldMap snd) (foldMap snd) patch
   Merge merge -> foldMap snd merge

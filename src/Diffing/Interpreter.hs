@@ -9,10 +9,10 @@ import Control.Effect.Carrier
 import Control.Effect.Cull
 import Control.Effect.NonDet
 import qualified Data.Diff as Diff
+import Data.Edit (Edit, edit)
 import Data.Term
 import Diffing.Algorithm
 import Diffing.Algorithm.RWS
-import Diffing.Algorithm.SES (toThese)
 import Prologue
 
 -- | Diff two à la carte terms recursively.
@@ -20,7 +20,7 @@ diffTerms :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax)
           => Term syntax ann1
           -> Term syntax ann2
           -> Diff.Diff syntax ann1 ann2
-diffTerms t1 t2 = stripDiff (fromMaybe (Diff.replacing t1' t2') (run (runNonDetOnce (runDiff (algorithmForTerms t1' t2')))))
+diffTerms t1 t2 = stripDiff (fromMaybe (Diff.comparing t1' t2') (run (runNonDetOnce (runDiff (algorithmForTerms t1' t2')))))
   where (t1', t2') = ( defaultFeatureVectorDecorator t1
                      , defaultFeatureVectorDecorator t2)
 
@@ -37,12 +37,12 @@ class Bifoldable (DiffFor term) => DiffTerms term where
   -- Note that the dependency means that the diff type is in 1:1 correspondence with the term type. This allows subclasses of 'DiffTerms' to receive e.g. @'DiffFor' term a b@ without incurring ambiguity, since every diff type is unique to its term type.
   type DiffFor term = (diff :: * -> * -> *) | diff -> term
 
-  -- | Diff a 'These' of terms.
-  diffTermPair :: These (term ann1) (term ann2) -> DiffFor term ann1 ann2
+  -- | Diff an 'Edit' of terms.
+  diffTermPair :: Edit (term ann1) (term ann2) -> DiffFor term ann1 ann2
 
 instance (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => DiffTerms (Term syntax) where
   type DiffFor (Term syntax) = Diff.Diff syntax
-  diffTermPair = these Diff.deleting Diff.inserting diffTerms
+  diffTermPair = edit Diff.deleting Diff.inserting diffTerms
 
 
 -- | Run an 'Algorithm' to completion in an 'Alternative' context using the supplied comparability & equivalence relations.
@@ -71,10 +71,10 @@ instance ( Alternative m
         (Diff (Term syntax (FeatureVector, ann1)) (Term syntax (FeatureVector, ann2)) (Diff.Diff syntax (FeatureVector, ann1) (FeatureVector, ann2)) :+: sig)
         (DiffC (Term syntax (FeatureVector, ann1)) (Term syntax (FeatureVector, ann2)) (Diff.Diff syntax (FeatureVector, ann1) (FeatureVector, ann2)) m) where
   eff (L op) = case op of
-    Diff t1 t2 k -> runDiff (algorithmForTerms t1 t2) <|> pure (Diff.replacing t1 t2) >>= k
-    Linear (Term (In ann1 f1)) (Term (In ann2 f2)) k -> Diff.merge (ann1, ann2) <$> tryAlignWith (runDiff . diffThese) f1 f2 >>= k
-    RWS as bs k -> traverse (runDiff . diffThese . toThese) (rws comparableTerms equivalentTerms as bs) >>= k
+    Diff t1 t2 k -> runDiff (algorithmForTerms t1 t2) <|> pure (Diff.comparing t1 t2) >>= k
+    Linear (Term (In ann1 f1)) (Term (In ann2 f2)) k -> Diff.merge (ann1, ann2) <$> tryAlignWith (runDiff . diffEdit) f1 f2 >>= k
+    RWS as bs k -> traverse (runDiff . diffEdit) (rws comparableTerms equivalentTerms as bs) >>= k
     Delete a k -> k (Diff.deleting a)
     Insert b k -> k (Diff.inserting b)
-    Replace a b k -> k (Diff.replacing a b)
+    Replace a b k -> k (Diff.comparing a b)
   eff (R other) = DiffC . eff . handleCoercible $ other

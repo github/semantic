@@ -3,7 +3,7 @@
 module Data.Syntax.Expression where
 
 import Prelude hiding (null)
-import Prologue hiding (This, index, null)
+import Prologue hiding (index, null)
 
 import           Control.Abstract hiding (Bitwise (..), Call, Member)
 import           Data.Abstract.Evaluatable as Abstract hiding (Member)
