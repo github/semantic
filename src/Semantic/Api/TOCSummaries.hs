@@ -21,26 +21,17 @@ import           Data.ByteString.Builder
 import           Data.Edit
 import           Data.Either (partitionEithers)
 import           Data.Function (on)
-import           Data.Functor.Classes
-import           Data.Functor.Foldable (cata)
-import           Data.Hashable.Lifted
+import           Data.Functor.Foldable (Base, Recursive)
 import           Data.Language (Language, LanguageMode(..), PerLanguageModes)
 import           Data.Map (Map)
 import qualified Data.Map.Monoidal as Map
 import           Data.Maybe (mapMaybe)
 import           Data.ProtoLens (defMessage)
 import           Data.Semilattice.Lower
-import           Data.Term (Term(Term))
+import           Data.Term (IsTerm(..), TermF)
 import qualified Data.Text as T
-import           Diffing.Algorithm (Diffable)
 import qualified Diffing.Algorithm.SES as SES
-import qualified Language.Go.Term as Go
-import qualified Language.Markdown.Term as Markdown
-import qualified Language.PHP.Term as PHP
-import qualified Language.Python.Term as PythonALaCarte
-import qualified Language.Ruby.Term as Ruby
-import qualified Language.TSX.Term as TSX
-import qualified Language.TypeScript.Term as TypeScript
+import           Diffing.Interpreter (DiffTerms)
 import           Parsing.Parser (SomeParser, TermMode, allParsers)
 import           Proto.Semantic as P hiding (Blob, BlobPair)
 import           Proto.Semantic_Fields as P
@@ -120,25 +111,10 @@ instance (TermMode term ~ strategy, SummarizeTermsBy strategy term) => Summarize
 class SummarizeTermsBy (strategy :: LanguageMode) term where
   summarizeTermsBy :: (Member Telemetry sig, Carrier sig m, MonadIO m) => Edit (Blob, term Loc) (Blob, term Loc) -> m [Either ErrorSummary TOCSummary]
 
-instance (Diffable syntax, Eq1 syntax, HasDeclaration syntax, Hashable1 syntax, Traversable syntax) => SummarizeTermsBy 'ALaCarte (Term syntax) where
+instance (DiffTerms term, HasDeclaration (Syntax term), Traversable (Syntax term), Recursive (term Loc), Base (term Loc) ~ TermF (Syntax term) Loc) => SummarizeTermsBy 'ALaCarte term where
   summarizeTermsBy = fmap diffTOC . diffTerms . bimap decorateTerm decorateTerm where
-    decorateTerm :: (Blob, Term syntax Loc) -> (Blob, Term syntax (Maybe Declaration))
+    decorateTerm :: (Blob, term Loc) -> (Blob, term (Maybe Declaration))
     decorateTerm (blob, term) = (blob, decoratorWithAlgebra (declarationAlgebra blob) term)
-
-instance SummarizeTermsBy 'ALaCarte Go.Term where
-  summarizeTermsBy = summarizeTermsBy @'ALaCarte . bimap (fmap (cata Term)) (fmap (cata Term))
-instance SummarizeTermsBy 'ALaCarte Markdown.Term where
-  summarizeTermsBy = summarizeTermsBy @'ALaCarte . bimap (fmap (cata Term)) (fmap (cata Term))
-instance SummarizeTermsBy 'ALaCarte PHP.Term where
-  summarizeTermsBy = summarizeTermsBy @'ALaCarte . bimap (fmap (cata Term)) (fmap (cata Term))
-instance SummarizeTermsBy 'ALaCarte PythonALaCarte.Term where
-  summarizeTermsBy = summarizeTermsBy @'ALaCarte . bimap (fmap (cata Term)) (fmap (cata Term))
-instance SummarizeTermsBy 'ALaCarte Ruby.Term where
-  summarizeTermsBy = summarizeTermsBy @'ALaCarte . bimap (fmap (cata Term)) (fmap (cata Term))
-instance SummarizeTermsBy 'ALaCarte TSX.Term where
-  summarizeTermsBy = summarizeTermsBy @'ALaCarte . bimap (fmap (cata Term)) (fmap (cata Term))
-instance SummarizeTermsBy 'ALaCarte TypeScript.Term where
-  summarizeTermsBy = summarizeTermsBy @'ALaCarte . bimap (fmap (cata Term)) (fmap (cata Term))
 
 
 instance Tagging.ToTags term => SummarizeTermsBy 'Precise term where
