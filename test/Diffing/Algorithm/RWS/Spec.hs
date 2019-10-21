@@ -8,9 +8,10 @@ import Data.Sum
 import qualified Data.Syntax as Syntax
 import Data.Term
 import Data.These
-import Diffing.Algorithm
+import Diffing.Algorithm (comparableTerms)
 import Diffing.Interpreter (stripDiff)
 import Diffing.Algorithm.RWS
+import Diffing.Algorithm.SES
 import Diffing.Interpreter.Spec (afterTerm, beforeTerm)
 import Test.Hspec.LeanCheck
 import SpecHelpers
@@ -30,12 +31,12 @@ spec = do
       \ (as, bs) -> let tas = decorate <$> (as :: [Term ListableSyntax ()])
                         tbs = decorate <$> (bs :: [Term ListableSyntax ()])
                         wrap = termIn emptyAnnotation . inject
-                        diff = merge (emptyAnnotation, emptyAnnotation) (inject (stripDiff . diffThese <$> rws comparableTerms (equalTerms comparableTerms) tas tbs)) in
+                        diff = merge (emptyAnnotation, emptyAnnotation) (inject (stripDiff . diffThese . toThese <$> rws comparableTerms (equalTerms comparableTerms) tas tbs)) in
         (beforeTerm diff, afterTerm diff) `shouldBe` (Just (wrap (stripTerm <$> tas)), Just (wrap (stripTerm <$> tbs)))
 
     it "produces unbiased insertions within branches" $
       let (a, b) = (decorate (termIn emptyAnnotation (inject [ termIn emptyAnnotation (inject (Syntax.Identifier "a")) ])), decorate (termIn emptyAnnotation (inject [ termIn emptyAnnotation (inject (Syntax.Identifier "b")) ]))) in
-      fmap (bimap stripTerm stripTerm) (rws comparableTerms (equalTerms comparableTerms) [ b ] [ a, b ]) `shouldBe` fmap (bimap stripTerm stripTerm) [ That a, These b b ]
+      fmap (bimap stripTerm stripTerm) (rws comparableTerms (equalTerms comparableTerms) [ b ] [ a, b ]) `shouldBe` fmap (bimap stripTerm stripTerm) [ Insert a, Copy b b ]
 
   where decorate = defaultFeatureVectorDecorator
 

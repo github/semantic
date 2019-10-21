@@ -1,8 +1,6 @@
-{-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, KindSignatures, GADTs, RankNTypes, ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE ConstraintKinds, GADTs, TypeOperators #-}
 module Parsing.Parser
 ( Parser(..)
-, SomeAnalysisParser(..)
-, someAnalysisParser
 -- * À la carte parsers
 , goParser
 , markdownParser
@@ -36,11 +34,8 @@ module Parsing.Parser
 
 import           Assigning.Assignment
 import qualified CMarkGFM
-import           Data.Abstract.Evaluatable (HasPrelude)
 import           Data.AST
-import           Data.Graph.ControlFlowVertex (VertexDeclaration')
 import           Data.Language
-import           Data.Kind (Constraint)
 import qualified Data.Map as Map
 import           Data.Sum
 import qualified Data.Syntax as Syntax
@@ -66,37 +61,6 @@ import           TreeSitter.Ruby (tree_sitter_ruby)
 import           TreeSitter.TSX
 import           TreeSitter.TypeScript
 import           TreeSitter.Unmarshal
-
-
--- | A parser, suitable for program analysis, for some specific language, producing 'Term's whose syntax satisfies a list of typeclass constraints.
-data SomeAnalysisParser (constraint :: (* -> *) -> Constraint) ann where
-  SomeAnalysisParser :: ( constraint (Sum fs)
-                        , Apply (VertexDeclaration' (Sum fs)) fs
-                        , HasPrelude lang
-                        )
-                     => Parser (Term (Sum fs) ann)
-                     -> Proxy lang
-                     -> SomeAnalysisParser constraint ann
-
--- | A parser for some specific language, producing 'Term's whose syntax satisfies a list of typeclass constraints.
-someAnalysisParser :: ( constraint (Sum Go.Syntax)
-                      , constraint (Sum PHP.Syntax)
-                      , constraint (Sum Python.Syntax)
-                      , constraint (Sum Ruby.Syntax)
-                      , constraint (Sum TypeScript.Syntax)
-                      )
-                   => proxy constraint                  -- ^ A proxy for the constraint required, e.g. @(Proxy \@Show1)@.
-                   -> Language                          -- ^ The 'Language' to select.
-                   -> SomeAnalysisParser constraint Loc -- ^ A 'SomeAnalysisParser' abstracting the syntax type to be produced.
-someAnalysisParser _ Go         = SomeAnalysisParser goParser         (Proxy @'Go)
-someAnalysisParser _ JavaScript = SomeAnalysisParser typescriptParser (Proxy @'JavaScript)
-someAnalysisParser _ PHP        = SomeAnalysisParser phpParser        (Proxy @'PHP)
-someAnalysisParser _ Python     = SomeAnalysisParser pythonParser     (Proxy @'Python)
-someAnalysisParser _ Ruby       = SomeAnalysisParser rubyParser       (Proxy @'Ruby)
-someAnalysisParser _ TypeScript = SomeAnalysisParser typescriptParser (Proxy @'TypeScript)
-someAnalysisParser _ TSX        = SomeAnalysisParser typescriptParser (Proxy @'TSX)
-someAnalysisParser _ l          = error $ "Analysis not supported for: " <> show l
-
 
 -- | A parser from 'Source' onto some term type.
 data Parser term where

@@ -20,12 +20,13 @@ import           Prologue
 import           Semantic.Task.Files
 import qualified Source.Source as Source
 import           System.FilePath.Posix
+import qualified System.Path as Path
 
 
 nodeJSResolutionMap :: (Member Files sig, Carrier sig m, MonadIO m) => FilePath -> Text -> [FilePath] -> m (Map FilePath FilePath)
 nodeJSResolutionMap rootDir prop excludeDirs = do
-  files <- findFiles rootDir [".json"] excludeDirs
-  let packageFiles = fileForPath <$> filter ((==) "package.json" . takeFileName) files
+  files <- findFiles (Path.absRel rootDir) [".json"] (fmap Path.absRel excludeDirs)
+  let packageFiles = fileForTypedPath <$> filter ((==) (Path.relFile "package.json") . Path.takeFileName) files
   blobs <- readBlobs (FilesFromPaths packageFiles)
   pure $ fold (mapMaybe (lookup prop) blobs)
   where

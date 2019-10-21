@@ -4,18 +4,12 @@ module Semantic.Api.Diffs
   , DiffOutputFormat(..)
   , diffGraph
 
-  , decoratingDiffWith
   , DiffEffects
 
-  , legacySummarizeDiffParsers
-  , LegacySummarizeDiff(..)
-  , summarizeDiffParsers
-  , SummarizeDiff(..)
+  , diffTerms
   ) where
 
 import           Analysis.ConstructorName (ConstructorName)
-import           Analysis.Decorator (decoratorWithAlgebra)
-import           Analysis.TOCSummary (Declaration, HasDeclaration, declarationAlgebra)
 import           Control.Effect.Error
 import           Control.Effect.Parse
 import           Control.Effect.Reader
@@ -40,7 +34,6 @@ import           Proto.Semantic_JSON()
 import           Rendering.Graph
 import           Rendering.JSON hiding (JSON)
 import qualified Rendering.JSON
-import           Rendering.TOC
 import           Semantic.Api.Bridge
 import           Semantic.Config
 import           Semantic.Task as Task
@@ -151,52 +144,6 @@ instance (Diffable syntax, Eq1 syntax, Hashable1 syntax, Show1 syntax, Traversab
   showDiff = serialize Show
 
 
-legacySummarizeDiffParsers :: Map Language (SomeParser LegacySummarizeDiff Loc)
-legacySummarizeDiffParsers = aLaCarteParsers
-
-class DiffTerms term => LegacySummarizeDiff term where
-  legacyDecorateTerm :: Blob -> term Loc -> term (Maybe Declaration)
-  legacySummarizeDiff :: BlobPair -> DiffFor term (Maybe Declaration) (Maybe Declaration) -> Summaries
-
-instance (Diffable syntax, Eq1 syntax, HasDeclaration syntax, Hashable1 syntax, Traversable syntax) => LegacySummarizeDiff (Term syntax) where
-  legacyDecorateTerm = decoratorWithAlgebra . declarationAlgebra
-  legacySummarizeDiff = renderToCDiff
-
-
-summarizeDiffParsers :: Map Language (SomeParser SummarizeDiff Loc)
-summarizeDiffParsers = aLaCarteParsers
-
-class DiffTerms term => SummarizeDiff term where
-  decorateTerm :: Blob -> term Loc -> term (Maybe Declaration)
-  summarizeDiff :: BlobPair -> DiffFor term (Maybe Declaration) (Maybe Declaration) -> TOCSummaryFile
-
-instance (Diffable syntax, Eq1 syntax, HasDeclaration syntax, Hashable1 syntax, Traversable syntax) => SummarizeDiff (Term syntax) where
-  decorateTerm = decoratorWithAlgebra . declarationAlgebra
-  summarizeDiff blobPair diff = foldr go (defMessage & P.path .~ path & P.language .~ lang) (diffTOC diff)
-    where
-      path = T.pack $ pathKeyForBlobPair blobPair
-      lang = bridging # languageForBlobPair blobPair
-
-      toChangeType = \case
-        "added" -> ADDED
-        "modified" -> MODIFIED
-        "removed" -> REMOVED
-        _ -> NONE
-
-      go :: TOCSummary -> TOCSummaryFile -> TOCSummaryFile
-      go TOCSummary{..} file = defMessage
-        & P.path .~ file^.P.path
-        & P.language .~ file^.P.language
-        & P.changes .~ (defMessage & P.category .~ summaryCategoryName & P.term .~ summaryTermName & P.maybe'span .~ (converting #? summarySpan) & P.changeType .~ toChangeType summaryChangeType) : file^.P.changes
-        & P.errors .~ file^.P.errors
-
-      go ErrorSummary{..} file = defMessage
-        & P.path .~ file^.P.path
-        & P.language .~ file^.P.language
-        & P.changes .~ file^.P.changes
-        & P.errors .~ (defMessage & P.error .~ errorText & P.maybe'span .~ converting #? errorSpan) : file^.P.errors
-
-
 -- | Parse a 'BlobPair' using one of the provided parsers, diff the resulting terms, and run an action on the abstracted diff.
 --
 -- This allows us to define features using an abstract interface, and use them with diffs for any parser whose terms support that interface.
@@ -206,26 +153,12 @@ diffWith
   -> (forall term . c term => DiffFor term Loc Loc -> m output) -- ^ A function to run on the computed diff. Note that the diff is abstract (it’s the diff type corresponding to an abstract term type), but the term type is constrained by @c@, allowing you to do anything @c@ allows, and requiring that all the input parsers produce terms supporting @c@.
   -> BlobPair                                                   -- ^ The blob pair to parse.
   -> m output
-diffWith parsers render blobPair = parsePairWith parsers (render <=< diffTerms blobPair) blobPair
-
--- | Parse a 'BlobPair' using one of the provided parsers, decorate the resulting terms, diff them, and run an action on the abstracted diff.
---
--- This allows us to define features using an abstract interface, and use them with diffs for any parser whose terms support that interface.
-decoratingDiffWith
-  :: forall ann c output m sig
-  .  (forall term . c term => DiffTerms term, DiffEffects sig m)
-  => Map Language (SomeParser c Loc)                            -- ^ The set of parsers to select from.
-  -> (forall term . c term => Blob -> term Loc -> term ann)     -- ^ A function to decorate the terms, replacing their annotations and thus the annotations in the resulting diff.
-  -> (forall term . c term => DiffFor term ann ann -> m output) -- ^ A function to run on the computed diff. Note that the diff is abstract (it’s the diff type corresponding to an abstract term type), but the term type is constrained by @c@, allowing you to do anything @c@ allows, and requiring that all the input parsers produce terms supporting @c@.
-  -> BlobPair                                                   -- ^ The blob pair to parse.
-  -> m output
-decoratingDiffWith parsers decorate render blobPair = parsePairWith parsers (render <=< diffTerms blobPair . bimap (decorate blobL) (decorate blobR)) blobPair where
-  (blobL, blobR) = fromThese errorBlob errorBlob (runJoin blobPair)
-  errorBlob = Prelude.error "evaluating blob on absent side"
+diffWith parsers render = parsePairWith parsers (render <=< diffTerms)
 
 diffTerms :: (DiffTerms term, Member Telemetry sig, Carrier sig m, MonadIO m)
-  => BlobPair -> These (term ann) (term ann) -> m (DiffFor term ann ann)
-diffTerms blobs terms = time "diff" languageTag $ do
-  let diff = diffTermPair terms
+  => These (Blob, term ann) (Blob, term ann) -> m (DiffFor term ann ann)
+diffTerms terms = time "diff" languageTag $ do
+  let diff = diffTermPair (bimap snd snd terms)
   diff <$ writeStat (Stat.count "diff.nodes" (bilength diff) languageTag)
   where languageTag = languageTagForBlobPair blobs
+        blobs = BlobPair (bimap fst fst terms)

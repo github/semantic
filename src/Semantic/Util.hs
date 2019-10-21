@@ -38,6 +38,7 @@ import           Data.List (uncons)
 import           Data.Project
 import           Data.Quieterm (Quieterm, quieterm)
 import           Data.Sum (weaken)
+import           Data.Term (termFAnnotation)
 import qualified Language.Go.Assignment
 import qualified Language.PHP.Assignment
 import qualified Language.Python.Assignment
@@ -49,7 +50,7 @@ import           Semantic.Analysis
 import           Semantic.Config
 import           Semantic.Graph
 import           Semantic.Task
-import           Source.Loc
+import           Source.Loc as Loc
 import           System.Exit (die)
 import           System.FilePath.Posix (takeDirectory)
 
@@ -114,7 +115,7 @@ evaluateProject' session proxy parser paths = do
          (raiseHandler (runReader (packageInfo package))
          (raiseHandler (evalState (lowerBound @Span))
          (raiseHandler (runReader (lowerBound @Span))
-         (evaluate proxy (runDomainEffects (evalTerm withTermSpans)) modules)))))))
+         (evaluate proxy (runDomainEffects (evalTerm (withTermSpans (Loc.span . termFAnnotation . project)))) modules)))))))
   either (die . displayException) pure res
 
 parseFile, parseFileQuiet :: Parser term -> FilePath -> IO term
