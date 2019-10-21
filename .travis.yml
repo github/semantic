@@ -24,8 +24,8 @@ matrix:
 
 before_install:
 - mkdir -p $HOME/.local/bin
-- curl "https://github.com/ndmitchell/hlint/releases/download/v2.2.3/hlint-2.2.3-x86_64-linux.tar.gz"
-- tar -xf hlint-2.2.3-x86_64-linux.tar.gz -C $HOME/.local/bin
+- curl -L -o /tmp/hlint.tar.gz "https://github.com/ndmitchell/hlint/releases/download/v2.2.3/hlint-2.2.3-x86_64-linux.tar.gz"
+- tar -xf /tmp/hlint.tar.gz -C $HOME/.local/bin
 - "PATH=/opt/ghc/bin:$HOME/local/bin:$PATH"
 - ghc --version
 - cabal --version
