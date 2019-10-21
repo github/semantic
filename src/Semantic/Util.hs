@@ -81,7 +81,7 @@ type FileEvaluator err term =
   -> IO
        ( Heap Precise Precise (Value (term Loc) Precise),
        ( ScopeGraph Precise
-       , Either (SomeError (Sum err))
+       , Either (SomeError err)
                 (ModuleTable (Module (ModuleResult Precise (Value (term Loc) Precise))))))
 
 evalGoProject :: FileEvaluator _ (Quieterm (Sum Language.Go.Assignment.Syntax))
