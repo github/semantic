@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP, ConstraintKinds, PartialTypeSignatures, Rank2Types, ScopedTypeVariables, TypeFamilies,
+{-# LANGUAGE ConstraintKinds, PartialTypeSignatures, Rank2Types, ScopedTypeVariables, TypeFamilies,
              TypeOperators #-}
 {-# OPTIONS_GHC -Wno-missing-signatures -Wno-partial-type-signatures -O0 #-}
 module Semantic.Util
