@@ -17,7 +17,6 @@ before_cache:
 
   - rm -rfv $HOME/.cabal/packages/head.hackage
 
-  # remove files from old compilers
   - rm -rfv $HOME/.cabal/store/{!(ghc-8.6.5)}
   - rm -rfv $TRAVIS_BUILD_DIR/dist-newstyle/build/*/{!(ghc-8.6.5)}
 
