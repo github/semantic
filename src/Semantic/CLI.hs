@@ -162,7 +162,7 @@ graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute a g
       <$> option auto (long "language" <> help "The language for the analysis.")
       <*> optional (pathOption (long "root" <> help "Root directory of project. Optional, defaults to entry file/directory." <> metavar "DIR"))
       <*> many (pathOption (long "exclude-dir" <> help "Exclude a directory (e.g. vendor)" <> metavar "DIR"))
-      <*> argument str (metavar "DIR")
+      <*> argument path (metavar "PATH")
     makeReadProjectRecursivelyTask language rootDir excludeDirs dir = Task.readProject rootDir dir language excludeDirs
     makeGraphTask graphType includePackages serializer projectTask = projectTask >>= Graph.runGraph graphType includePackages >>= serializer
 

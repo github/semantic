@@ -1,3 +1,4 @@
+{-# LANGUAGE ScopedTypeVariables #-}
 module Data.Project
   ( Project (..)
   , projectExtensions
@@ -36,20 +37,21 @@ projectFiles :: Project -> [File]
 projectFiles = fmap blobFile . projectBlobs
 
 readProjectFromPaths :: MonadIO m
-                     => Maybe Path.AbsRelDir
-                     -> FilePath
+                     => Maybe Path.AbsRelDir -- ^ An optional root directory for the project
+                     -> Path.AbsRelFileDir   -- ^ A file or directory to parse. Passing a directory will load
                      -> Language
                      -> [Path.AbsRelDir]
                      -> m Project
 readProjectFromPaths maybeRoot path lang excludeDirs = do
-  isDir <- isDirectory path
-  let rootDir = if isDir
-      then fromMaybe path (fmap Path.toString maybeRoot)
-      else fromMaybe (takeDirectory path) (fmap Path.toString maybeRoot)
+  let (rootDir :: Path.AbsRelDir) = case maybeRoot of
+        Just root -> fromMaybe (Path.dirFromFileDir path) (Path.fromAbsRel root)
+        Nothing   -> case Path.fileFromFileDir path of
+          Just fp -> Path.takeDirectory fp
+          Nothing -> Path.dirFromFileDir path
 
-  paths <- liftIO $ findFilesInDir (Path.absRel rootDir) exts excludeDirs
+  paths <- liftIO $ findFilesInDir rootDir exts excludeDirs
   blobs <- liftIO $ traverse (readBlobFromFile' . toFile) paths
-  pure $ Project rootDir blobs lang (fmap Path.toString excludeDirs)
+  pure $ Project (Path.toString rootDir) blobs lang (fmap Path.toString excludeDirs)
   where
     toFile path = File (Path.toString path) lang
     exts = extensionsForLanguage lang
