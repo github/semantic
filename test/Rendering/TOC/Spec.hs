@@ -16,7 +16,7 @@ import Prelude
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import Rendering.TOC
-import Semantic.Api (diffSummaryBuilder, summarizeTerms, summarizeTermsParsers)
+import Semantic.Api (diffSummaryBuilder, summarizeTerms, summarizeTermParsers)
 import Serializing.Format as Format
 import Source.Loc
 import Source.Span
@@ -219,4 +219,4 @@ summarize
   :: (Member Telemetry sig, Carrier sig m, MonadIO m)
   => BlobPair
   -> m [Either ErrorSummary TOCSummary]
-summarize = parsePairWith (summarizeTermsParsers defaultLanguageModes) summarizeTerms
+summarize = parsePairWith (summarizeTermParsers defaultLanguageModes) summarizeTerms
