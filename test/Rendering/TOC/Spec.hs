@@ -36,9 +36,9 @@ spec = do
       \ term -> tableOfContentsBy (Just . termFAnnotation) (diffTerms term (term :: Term ListableSyntax ())) `shouldBe` []
 
     prop "produces inserted/deleted/replaced entries for relevant nodes within patches" $
-      \ p -> tableOfContentsBy (Just . termFAnnotation) (patch deleting inserting comparing p)
+      \ p -> tableOfContentsBy (Just . termFAnnotation) (edit deleting inserting comparing p)
       `shouldBe`
-      patch (fmap (Deleted,)) (fmap (Inserted,)) (\ as bs -> (Replaced, head bs) : fmap (Deleted,) (tail as) <> fmap (Inserted,) (tail bs)) (bimap (foldMap pure) (foldMap pure) (p :: Edit (Term ListableSyntax Int) (Term ListableSyntax Int)))
+      edit (fmap (Deleted,)) (fmap (Inserted,)) (\ as bs -> (Replaced, head bs) : fmap (Deleted,) (tail as) <> fmap (Inserted,) (tail bs)) (bimap (foldMap pure) (foldMap pure) (p :: Edit (Term ListableSyntax Int) (Term ListableSyntax Int)))
 
     prop "produces changed entries for relevant nodes containing irrelevant patches" $
       \ diff -> do
