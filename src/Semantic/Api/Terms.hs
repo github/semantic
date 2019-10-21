@@ -195,11 +195,11 @@ instance (Foldable syntax, Functor syntax, ConstructorName syntax) => JSONGraphT
           path = T.pack $ blobPath blob
           lang = bridging # blobLanguage blob
       in defMessage
-          & P.path .~ path
+          & P.path     .~ path
           & P.language .~ lang
           & P.vertices .~ vertexList graph
-          & P.edges .~ fmap toEdge (edgeList graph)
-          & P.errors .~ mempty
+          & P.edges    .~ fmap toEdge (edgeList graph)
+          & P.errors   .~ mempty
 
 instance JSONGraphTerm Go.Term where
   jsonGraphTerm blob = jsonGraphTerm blob . cata Term
