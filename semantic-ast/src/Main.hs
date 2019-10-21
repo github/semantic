@@ -31,10 +31,8 @@ parseAST = SemanticAST
     ( long "no-color"
     <> help "Print with color: --color"
     )
-  <*> (Left <$> strOption
-      ( long "sourceFile"
-      <> metavar "FILEPATH"
-      <> help "Specify filepath containing source code to parse" )
+  <*> (Left <$> some
+    (Options.Applicative.argument str (metavar "FILEPATH(S)"))
     <|> Right <$> strOption
       ( long "sourceString"
       <> metavar "STRING"
