@@ -5,7 +5,6 @@ module Semantic.Api.Terms
   , TermOutputFormat(..)
   ) where
 
-import           Analysis.ConstructorName (ConstructorName)
 import           Control.Effect.Error
 import           Control.Effect.Parse
 import           Control.Effect.Reader
@@ -41,14 +40,7 @@ import           Source.Loc
 
 import qualified Language.Java as Java
 import qualified Language.JSON as JSON
-import qualified Language.Go.Term as Go
-import qualified Language.Markdown.Term as Markdown
-import qualified Language.PHP.Term as PHP
 import qualified Language.Python as PythonPrecise
-import qualified Language.Python.Term as PythonALaCarte
-import qualified Language.Ruby.Term as Ruby
-import qualified Language.TSX.Term as TSX
-import qualified Language.TypeScript.Term as TypeScript
 
 
 termGraph :: (Traversable t, Member Distribute sig, ParseEffects sig m) => t Blob -> m ParseTreeGraphResponse
@@ -188,7 +180,7 @@ jsonGraphTermParsers = aLaCarteParsers
 class JSONGraphTerm term where
   jsonGraphTerm :: Blob -> term Loc -> ParseTreeFileGraph
 
-instance (Foldable syntax, Functor syntax, ConstructorName syntax) => JSONGraphTerm (Term syntax) where
+instance (Recursive (term Loc), ToTreeGraph TermVertex (Base (term Loc))) => JSONGraphTerm term where
   jsonGraphTerm blob t
     = let graph = renderTreeGraph t
           toEdge (Edge (a, b)) = defMessage & P.source .~ a^.vertexId & P.target .~ b^.vertexId
@@ -200,18 +192,3 @@ instance (Foldable syntax, Functor syntax, ConstructorName syntax) => JSONGraphT
           & P.vertices .~ vertexList graph
           & P.edges    .~ fmap toEdge (edgeList graph)
           & P.errors   .~ mempty
-
-instance JSONGraphTerm Go.Term where
-  jsonGraphTerm blob = jsonGraphTerm blob . cata Term
-instance JSONGraphTerm Markdown.Term where
-  jsonGraphTerm blob = jsonGraphTerm blob . cata Term
-instance JSONGraphTerm PHP.Term where
-  jsonGraphTerm blob = jsonGraphTerm blob . cata Term
-instance JSONGraphTerm PythonALaCarte.Term where
-  jsonGraphTerm blob = jsonGraphTerm blob . cata Term
-instance JSONGraphTerm Ruby.Term where
-  jsonGraphTerm blob = jsonGraphTerm blob . cata Term
-instance JSONGraphTerm TSX.Term where
-  jsonGraphTerm blob = jsonGraphTerm blob . cata Term
-instance JSONGraphTerm TypeScript.Term where
-  jsonGraphTerm blob = jsonGraphTerm blob . cata Term
