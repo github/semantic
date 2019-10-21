@@ -1,2 +1,2 @@
 # CHECK-FAILS
-eval("'We will never support eval.'")
+exec "'We will never support exec statements.'"
