@@ -157,7 +157,7 @@ instance (Listable1 syntax, Listable ann1, Listable ann2) => Listable (Diff synt
 
 
 instance Listable2 Edit where
-  liftTiers2 t1 t2 = liftCons1 t2 Insert \/ liftCons1 t1 Delete \/ liftCons2 t1 t2 Replace
+  liftTiers2 t1 t2 = liftCons1 t2 Insert \/ liftCons1 t1 Delete \/ liftCons2 t1 t2 Compare
 
 instance (Listable a, Listable b) => Listable (Edit a b) where
   tiers = tiers2
