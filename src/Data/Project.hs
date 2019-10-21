@@ -23,7 +23,7 @@ data Project = Project
   { projectRootDir     :: FilePath
   , projectBlobs       :: [Blob]
   , projectLanguage    :: Language
-  , projectExcludeDirs :: [FilePath]
+  , projectExcludeDirs :: [Path.AbsRelDir]
   } deriving (Eq, Show, Generic)
 
 projectName :: Project -> Text
@@ -54,7 +54,7 @@ readProjectFromPaths maybeRoot path lang excludeDirs = do
 
   paths <- liftIO $ findFilesInDir rootDir exts excludeDirs
   blobs <- liftIO $ traverse (readBlobFromFile' . toFile) paths
-  pure $ Project (Path.toString rootDir) blobs lang (fmap Path.toString excludeDirs)
+  pure $ Project (Path.toString rootDir) blobs lang excludeDirs
   where
     toFile path = File (Path.toString path) lang
     exts = extensionsForLanguage lang
