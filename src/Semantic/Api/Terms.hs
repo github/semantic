@@ -168,19 +168,7 @@ dotGraphTermParsers = aLaCarteParsers
 class DOTGraphTerm term where
   dotGraphTerm :: (Carrier sig m, Member (Reader Config) sig) => term Loc -> m Builder
 
-instance DOTGraphTerm Go.Term where
-  dotGraphTerm = serialize (DOT (termStyle "terms")) . renderTreeGraph
-instance DOTGraphTerm Markdown.Term where
-  dotGraphTerm = serialize (DOT (termStyle "terms")) . renderTreeGraph
-instance DOTGraphTerm PHP.Term where
-  dotGraphTerm = serialize (DOT (termStyle "terms")) . renderTreeGraph
-instance DOTGraphTerm PythonALaCarte.Term where
-  dotGraphTerm = serialize (DOT (termStyle "terms")) . renderTreeGraph
-instance DOTGraphTerm Ruby.Term where
-  dotGraphTerm = serialize (DOT (termStyle "terms")) . renderTreeGraph
-instance DOTGraphTerm TSX.Term where
-  dotGraphTerm = serialize (DOT (termStyle "terms")) . renderTreeGraph
-instance DOTGraphTerm TypeScript.Term where
+instance (Recursive (term Loc), ToTreeGraph TermVertex (Base (term Loc))) => DOTGraphTerm term where
   dotGraphTerm = serialize (DOT (termStyle "terms")) . renderTreeGraph
 
 
