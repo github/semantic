@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, GADTs, TypeOperators #-}
+{-# LANGUAGE ConstraintKinds, DataKinds, GADTs, TypeFamilies, TypeOperators #-}
 module Parsing.Parser
 ( Parser(..)
 -- * À la carte parsers
@@ -26,6 +26,8 @@ module Parsing.Parser
 , rubyParser'
 , tsxParser'
 , typescriptParser'
+  -- * Modes by term type
+, TermMode
   -- * Canonical sets of parsers
 , aLaCarteParsers
 , preciseParsers
@@ -179,6 +181,14 @@ tsxParser' = (TSX, SomeParser tsxParser)
 
 typescriptParser' :: c TypeScript.Term => (Language, SomeParser c Loc)
 typescriptParser' = (TypeScript, SomeParser typescriptParser)
+
+
+-- | A type family selecting the language mode for a given term type.
+type family TermMode term where
+  TermMode Java.Term          = 'Precise
+  TermMode JSON.Term          = 'Precise
+  TermMode PythonPrecise.Term = 'Precise
+  TermMode _                  = 'ALaCarte
 
 
 -- | The canonical set of parsers producing à la carte terms.

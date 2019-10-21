@@ -97,12 +97,6 @@ quietTerm blob = showTiming blob <$> time' ( asks showTermParsers >>= \ parsers 
 
 type ParseEffects sig m = (Member (Error SomeException) sig, Member (Reader PerLanguageModes) sig, Member Parse sig, Member (Reader Config) sig, Carrier sig m)
 
-type family TermMode term where
-  TermMode Java.Term          = 'Precise
-  TermMode JSON.Term          = 'Precise
-  TermMode PythonPrecise.Term = 'Precise
-  TermMode _                  = 'ALaCarte
-
 
 showTermParsers :: PerLanguageModes -> Map Language (SomeParser ShowTerm Loc)
 showTermParsers = allParsers
