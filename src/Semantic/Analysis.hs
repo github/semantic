@@ -187,8 +187,8 @@ evalTerm :: ( Carrier sig m
             , Member Fresh sig
             , Member Trace sig
             , Ord address
-            , Show address
             , Recursive term
+            , Show address
             )
          => Open (term -> Evaluator term address value m value)
          -> term -> Evaluator term address value m value

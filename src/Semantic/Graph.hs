@@ -1,6 +1,8 @@
-{-# LANGUAGE GADTs, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, LambdaCase, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Semantic.Graph
-( runGraph
+( analysisParsers
+, AnalyzeTerm
+, runGraph
 , runCallGraph
 , runImportGraph
 , runImportGraphToModules
@@ -36,6 +38,7 @@ import           Control.Abstract hiding (String)
 import           Control.Abstract.PythonPackage as PythonPackage
 import           Control.Effect.Carrier
 import           Control.Effect.Parse
+import           Control.Lens.Getter
 import           Data.Abstract.Address.Hole as Hole
 import           Data.Abstract.Address.Monovariant as Monovariant
 import           Data.Abstract.Address.Precise as Precise
@@ -52,11 +55,11 @@ import           Data.Abstract.Value.Type as Type
 import           Data.Abstract.AccessControls.Instances ()
 import           Data.Blob
 import           Data.Graph
-import           Data.Graph.ControlFlowVertex (VertexDeclarationStrategy, VertexDeclarationWithStrategy)
+import           Data.Graph.ControlFlowVertex (VertexDeclaration)
 import           Data.Language as Language
 import           Data.List (isPrefixOf, isSuffixOf)
+import qualified Data.Map as Map
 import           Data.Project
-import           Data.Term
 import           Data.Text (pack, unpack)
 import           Language.Haskell.HsColour
 import           Language.Haskell.HsColour.Colourise
@@ -71,29 +74,41 @@ import           Text.Show.Pretty (ppShow)
 
 data GraphType = ImportGraph | CallGraph
 
--- | Constraints we require for a term’s syntax in order to analyze it.
+-- | Constraints required to analyze a term.
 class
-  ( Declarations1 syntax
-  , Eq1 syntax
-  , Evaluatable syntax
-  , FreeVariables1 syntax
-  , AccessControls1 syntax
-  , Foldable syntax
-  , Functor syntax
-  , Ord1 syntax
-  , Show1 syntax
-  ) => AnalysisClasses syntax
+  ( AccessControls (term Loc)
+  , Declarations (term Loc)
+  , Evaluatable (Base (term Loc))
+  , FreeVariables (term Loc)
+  , HasSpan (term Loc)
+  , Ord (term Loc)
+  , Recursive (term Loc)
+  , Show (term Loc)
+  , VertexDeclaration term
+  ) => AnalyzeTerm term
+
 instance
-  ( Declarations1 syntax
-  , Eq1 syntax
-  , Evaluatable syntax
-  , FreeVariables1 syntax
-  , AccessControls1 syntax
-  , Foldable syntax
-  , Functor syntax
-  , Ord1 syntax
-  , Show1 syntax
-  ) => AnalysisClasses syntax
+  ( AccessControls (term Loc)
+  , Declarations (term Loc)
+  , Evaluatable (Base (term Loc))
+  , FreeVariables (term Loc)
+  , HasSpan (term Loc)
+  , Ord (term Loc)
+  , Recursive (term Loc)
+  , Show (term Loc)
+  , VertexDeclaration term
+  ) => AnalyzeTerm term
+
+analysisParsers :: Map Language (SomeParser AnalyzeTerm Loc)
+analysisParsers = Map.fromList
+  [ goParser'
+  , javascriptParser'
+  , phpParser'
+  , pythonParserALaCarte'
+  , rubyParser'
+  , typescriptParser'
+  , tsxParser'
+  ]
 
 runGraph :: ( Member Distribute sig
             , Member Parse sig
@@ -106,26 +121,35 @@ runGraph :: ( Member Distribute sig
          -> Bool
          -> Project
          -> m (Graph ControlFlowVertex)
-runGraph ImportGraph _ project
-  | SomeAnalysisParser parser (lang' :: Proxy lang) <- someAnalysisParser (Proxy :: Proxy AnalysisClasses) (projectLanguage project) = do
-    let parse = if projectLanguage project == Language.Python then parsePythonPackage parser else fmap (fmap snd) . parsePackage parser
-    package <- parse project
-    runImportGraphToModuleInfos lang' package
-runGraph CallGraph includePackages project
-  | SomeAnalysisParser parser lang <- someAnalysisParser (Proxy :: Proxy AnalysisClasses) (projectLanguage project) = do
-    let parse = if projectLanguage project == Language.Python then parsePythonPackage parser else fmap (fmap snd) . parsePackage parser
-    package <- parse project
-    modules <- topologicalSort <$> runImportGraphToModules lang package
-    runCallGraph lang includePackages modules package
+runGraph type' includePackages project
+  | Just (SomeParser parser) <- Map.lookup (projectLanguage project) analysisParsers
+  , SomeLanguage (lang :: Proxy lang) <- reifyLanguage (projectLanguage project) = do
+    package <- if projectLanguage project == Language.Python then
+        parsePythonPackage parser project
+      else
+        fmap snd <$> parsePackage parser project
+    case type' of
+      ImportGraph -> runImportGraphToModuleInfos lang package
+      CallGraph -> do
+        modules <- topologicalSort <$> runImportGraphToModules lang package
+        runCallGraph lang includePackages modules package
+  | otherwise = error $ "Analysis not supported for: " <> show (projectLanguage project)
 
-runCallGraph :: ( VertexDeclarationWithStrategy (VertexDeclarationStrategy syntax) syntax syntax
-                , Declarations1 syntax
-                , AccessControls1 syntax
-                , Ord1 syntax
-                , Functor syntax
-                , Evaluatable syntax
-                , term ~ Term syntax Loc
-                , FreeVariables1 syntax
+data SomeLanguage where
+  SomeLanguage :: HasPrelude lang => Proxy lang -> SomeLanguage
+
+reifyLanguage :: Language -> SomeLanguage
+reifyLanguage = \case
+  Go         -> SomeLanguage (Proxy @'Go)
+  JavaScript -> SomeLanguage (Proxy @'JavaScript)
+  PHP        -> SomeLanguage (Proxy @'PHP)
+  Python     -> SomeLanguage (Proxy @'Python)
+  Ruby       -> SomeLanguage (Proxy @'Ruby)
+  TypeScript -> SomeLanguage (Proxy @'TypeScript)
+  TSX        -> SomeLanguage (Proxy @'TSX)
+  l          -> error $ "HasPrelude not supported for: " <> show l
+
+runCallGraph :: ( AnalyzeTerm term
                 , HasPrelude lang
                 , Member Trace sig
                 , Carrier sig m
@@ -133,8 +157,8 @@ runCallGraph :: ( VertexDeclarationWithStrategy (VertexDeclarationStrategy synta
                 )
              => Proxy lang
              -> Bool
-             -> [Module term]
-             -> Package term
+             -> [Module (term Loc)]
+             -> Package (term Loc)
              -> m (Graph ControlFlowVertex)
 runCallGraph lang includePackages modules package
   = fmap (simplify . fst)
@@ -159,7 +183,7 @@ runCallGraph lang includePackages modules package
   . runModuleTable
   . runModules (ModuleTable.modulePaths (packageModules package))
   $ evaluate lang perModule modules
-  where perTerm = evalTerm (withTermSpans . graphingTerms . cachingTerms)
+  where perTerm = evalTerm (withTermSpans (^. span_) . graphingTerms . cachingTerms)
         perModule = (if includePackages then graphingPackages else id) . convergingModules . graphingModules $ runDomainEffects perTerm
 
 
@@ -167,59 +191,41 @@ runModuleTable :: Evaluator term address value (ReaderC (ModuleTable (Module (Mo
                -> Evaluator term address value m a
 runModuleTable = raiseHandler $ runReader lowerBound
 
-runImportGraphToModuleInfos :: ( Declarations term
-                               , Evaluatable (Base term)
-                               , FreeVariables term
-                               , AccessControls term
-                               , HasSpan term
+runImportGraphToModuleInfos :: ( AnalyzeTerm term
                                , HasPrelude lang
                                , Member Trace sig
-                               , Recursive term
                                , Carrier sig m
-                               , Show term
                                , Effect sig
                                )
                             => Proxy lang
-                            -> Package term
+                            -> Package (term Loc)
                             -> m (Graph ControlFlowVertex)
-runImportGraphToModuleInfos lang (package :: Package term) = runImportGraph lang package allModuleInfos
+runImportGraphToModuleInfos lang (package :: Package (term Loc)) = runImportGraph lang package allModuleInfos
   where allModuleInfos info = vertex (maybe (unknownModuleVertex info) (moduleVertex . moduleInfo) (ModuleTable.lookup (modulePath info) (packageModules package)))
 
-runImportGraphToModules :: ( Declarations term
-                           , Evaluatable (Base term)
-                           , FreeVariables term
-                           , AccessControls term
-                           , HasSpan term
+runImportGraphToModules :: ( AnalyzeTerm term
                            , HasPrelude lang
                            , Member Trace sig
-                           , Recursive term
                            , Carrier sig m
-                           , Show term
                            , Effect sig
                            )
                         => Proxy lang
-                        -> Package term
-                        -> m (Graph (Module term))
-runImportGraphToModules lang (package :: Package term) = runImportGraph lang package resolveOrLowerBound
+                        -> Package (term Loc)
+                        -> m (Graph (Module (term Loc)))
+runImportGraphToModules lang (package :: Package (term Loc)) = runImportGraph lang package resolveOrLowerBound
   where resolveOrLowerBound info = maybe lowerBound vertex (ModuleTable.lookup (modulePath info) (packageModules package))
 
-runImportGraph :: ( AccessControls term
-                  , Evaluatable (Base term)
-                  , FreeVariables term
-                  , HasSpan term
-                  , Declarations term
+runImportGraph :: ( AnalyzeTerm term
                   , HasPrelude lang
                   , Member Trace sig
-                  , Recursive term
                   , Carrier sig m
-                  , Show term
                   , Effect sig
                   )
                => Proxy lang
-               -> Package term
+               -> Package (term Loc)
                -> (ModuleInfo -> Graph vertex)
                -> m (Graph vertex)
-runImportGraph lang (package :: Package term) f
+runImportGraph lang (package :: Package (term Loc)) f
   = fmap (fst >=> f)
   . runEvaluator @_ @_ @(Value _ (Hole (Maybe Name) Precise))
   . raiseHandler (runState lowerBound)
@@ -271,13 +277,8 @@ parseModules parser p = distributeFor (projectBlobs p) (parseModule p parser)
 
 
 -- | Parse a list of packages from a python project.
-parsePythonPackage :: forall syntax sig m term.
-                   ( Declarations1 syntax
-                   , Evaluatable syntax
-                   , FreeVariables1 syntax
-                   , AccessControls1 syntax
-                   , Functor syntax
-                   , term ~ Term syntax Loc
+parsePythonPackage :: forall term sig m .
+                   ( AnalyzeTerm term
                    , Member Distribute sig
                    , Member Parse sig
                    , Member Resolution sig
@@ -285,13 +286,13 @@ parsePythonPackage :: forall syntax sig m term.
                    , Carrier sig m
                    , Effect sig
                    )
-                   => Parser term      -- ^ A parser.
-                   -> Project          -- ^ Project to parse into a package.
-                   -> m (Package term)
+                   => Parser (term Loc) -- ^ A parser.
+                   -> Project           -- ^ Project to parse into a package.
+                   -> m (Package (term Loc))
 parsePythonPackage parser project = do
-  let runAnalysis = runEvaluator @_ @_ @(Value term (Hole (Maybe Name) Precise))
+  let runAnalysis = runEvaluator @_ @_ @(Value (term Loc) (Hole (Maybe Name) Precise))
         . raiseHandler (runState PythonPackage.Unknown)
-        . raiseHandler (runState (lowerBound @(Heap (Hole (Maybe Name) Precise) (Hole (Maybe Name) Precise) (Value term (Hole (Maybe Name) Precise)))))
+        . raiseHandler (runState (lowerBound @(Heap (Hole (Maybe Name) Precise) (Hole (Maybe Name) Precise) (Value (term Loc) (Hole (Maybe Name) Precise)))))
         . raiseHandler runFresh
         . resumingLoadError
         . resumingUnspecialized
@@ -350,13 +351,12 @@ parseModule proj parser blob = moduleForBlob (Just (projectRootDir proj)) blob .
 
 withTermSpans :: ( Member (Reader Span) sig
                  , Member (State Span) sig -- last evaluated child's span
-                 , Recursive term
                  , Carrier sig m
-                 , Base term ~ TermF syntax Loc
                  )
-              => Open (term -> Evaluator term address value m a)
-withTermSpans recur term = let
-  span = Loc.span (termFAnnotation (project term))
+              => (term -> Span)
+              -> Open (term -> Evaluator term address value m a)
+withTermSpans getSpan recur term = let
+  span = getSpan term
   updatedSpanAlg = withCurrentSpan span (recur term)
   in modifyChildSpan span updatedSpanAlg
 

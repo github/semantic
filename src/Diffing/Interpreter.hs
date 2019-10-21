@@ -12,6 +12,7 @@ import qualified Data.Diff as Diff
 import Data.Term
 import Diffing.Algorithm
 import Diffing.Algorithm.RWS
+import Diffing.Algorithm.SES (toThese)
 import Prologue
 
 -- | Diff two à la carte terms recursively.
@@ -30,7 +31,7 @@ stripDiff :: Functor syntax
 stripDiff = bimap snd snd
 
 -- | The class of term types for which we can compute a diff.
-class (Bifoldable (DiffFor term)) => DiffTerms term where
+class Bifoldable (DiffFor term) => DiffTerms term where
   -- | The type of diffs for the given term type.
   --
   -- Note that the dependency means that the diff type is in 1:1 correspondence with the term type. This allows subclasses of 'DiffTerms' to receive e.g. @'DiffFor' term a b@ without incurring ambiguity, since every diff type is unique to its term type.
@@ -72,7 +73,7 @@ instance ( Alternative m
   eff (L op) = case op of
     Diff t1 t2 k -> runDiff (algorithmForTerms t1 t2) <|> pure (Diff.replacing t1 t2) >>= k
     Linear (Term (In ann1 f1)) (Term (In ann2 f2)) k -> Diff.merge (ann1, ann2) <$> tryAlignWith (runDiff . diffThese) f1 f2 >>= k
-    RWS as bs k -> traverse (runDiff . diffThese) (rws comparableTerms equivalentTerms as bs) >>= k
+    RWS as bs k -> traverse (runDiff . diffThese . toThese) (rws comparableTerms equivalentTerms as bs) >>= k
     Delete a k -> k (Diff.deleting a)
     Insert b k -> k (Diff.inserting b)
     Replace a b k -> k (Diff.replacing a b)

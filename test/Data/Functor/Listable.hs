@@ -16,7 +16,7 @@ module Data.Functor.Listable
 , ListableSyntax
 ) where
 
-import Analysis.TOCSummary
+import qualified Analysis.TOCSummary as ToC
 import Data.Abstract.ScopeGraph (AccessControl(..))
 import Data.Bifunctor.Join
 import Data.Diff
@@ -215,11 +215,14 @@ instance Listable Name.Name where
 instance Listable Text where
   tiers = pack `mapT` tiers
 
-instance Listable Declaration where
+instance Listable ToC.Declaration where
+  tiers = cons4 ToC.Declaration
+
+instance Listable ToC.Kind where
   tiers
-    =  cons5 MethodDeclaration
-    \/ cons4 FunctionDeclaration
-    \/ cons3 (\ a b c -> ErrorDeclaration a b c Language.Unknown)
+    =  cons1 ToC.Method
+    \/ cons0 ToC.Function
+    \/ cons0 ToC.Error
 
 instance Listable Language.Language where
   tiers

@@ -4,12 +4,12 @@ module Tags.Tag
 ) where
 
 import Data.Text (Text)
-import Source.Span
+import Source.Loc
 
 data Tag = Tag
   { name :: Text
   , kind :: Kind
-  , span :: Span
+  , loc  :: Loc
   , line :: Text
   , docs :: Maybe Text
   }

@@ -92,6 +92,7 @@ diffCommand :: Mod CommandFields (Parse.ParseC Task.TaskC Builder)
 diffCommand = command "diff" (info diffArgumentsParser (progDesc "Compute changes between paths"))
   where
     diffArgumentsParser = do
+      languageModes <- languageModes
       renderer <- flag  (parseDiffBuilder DiffSExpression) (parseDiffBuilder DiffSExpression) (long "sexpression" <> help "Output s-expression diff tree (default)")
               <|> flag'                                    (parseDiffBuilder DiffJSONTree)    (long "json"        <> help "Output JSON diff trees")
               <|> flag'                                    (parseDiffBuilder DiffJSONGraph)   (long "json-graph"  <> help "Output JSON diff trees")
@@ -99,18 +100,13 @@ diffCommand = command "diff" (info diffArgumentsParser (progDesc "Compute change
               <|> flag'                                    (parseDiffBuilder DiffDotGraph)    (long "dot"         <> help "Output the diff as a DOT graph")
               <|> flag'                                    (parseDiffBuilder DiffShow)        (long "show"        <> help "Output using the Show instance (debug only, format subject to change without notice)")
       filesOrStdin <- Right <$> some (Both <$> argument filePathReader (metavar "FILE_A") <*> argument filePathReader (metavar "FILE_B")) <|> pure (Left stdin)
-      pure $ Task.readBlobPairs filesOrStdin >>= renderer
+      pure $ Task.readBlobPairs filesOrStdin >>= runReader languageModes . renderer
 
 parseCommand :: Mod CommandFields (Parse.ParseC Task.TaskC Builder)
 parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate parse trees for path(s)"))
   where
     parseArgumentsParser = do
-      languageModes <- Language.PerLanguageModes
-        <$> option auto (  long "python-mode"
-                        <> help "The AST representation to use for Python sources"
-                        <> metavar "ALaCarte|Precise"
-                        <> value Language.ALaCarte
-                        <> showDefault)
+      languageModes <- languageModes
       renderer
         <-  flag  (parseTermBuilder TermSExpression)
                   (parseTermBuilder TermSExpression)
@@ -178,6 +174,14 @@ graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute a g
       <*> argument str (metavar "DIR")
     makeReadProjectRecursivelyTask language rootDir excludeDirs dir = Task.readProject rootDir dir language excludeDirs
     makeGraphTask graphType includePackages serializer projectTask = projectTask >>= Graph.runGraph graphType includePackages >>= serializer
+
+languageModes :: Parser Language.PerLanguageModes
+languageModes = Language.PerLanguageModes
+  <$> option auto (  long "python-mode"
+                  <> help "The AST representation to use for Python sources"
+                  <> metavar "ALaCarte|Precise"
+                  <> value Language.ALaCarte
+                  <> showDefault)
 
 shaReader :: ReadM Git.OID
 shaReader = eitherReader parseSha

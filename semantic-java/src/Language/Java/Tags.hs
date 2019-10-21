@@ -53,7 +53,7 @@ instance (ToTags l, ToTags r) => ToTagsBy 'Custom (l :+: r) where
 
 instance ToTagsBy 'Custom Java.MethodDeclaration where
   tags' t@Java.MethodDeclaration
-    { ann = Loc range span
+    { ann = loc@Loc { byteRange = range }
     , name = Java.Identifier { text = name }
     , body
     } = do
@@ -63,28 +63,28 @@ instance ToTagsBy 'Custom Java.MethodDeclaration where
               Just Java.Block { ann = Loc Range { end } _ } -> end
               Nothing                                       -> end range
             }
-      Tags.yield (Tag name Method span (Tags.firstLine sliced) Nothing)
+      Tags.yield (Tag name Method loc (Tags.firstLine sliced) Nothing)
       gtags t
 
 instance ToTagsBy 'Custom Java.ClassDeclaration where
   tags' t@Java.ClassDeclaration
-    { ann = Loc Range { start } span
+    { ann = loc@Loc { byteRange = Range { start } }
     , name = Java.Identifier { text = name }
     , body = Java.ClassBody { ann = Loc Range { start = end } _ }
     } = do
       src <- ask @Source
       let sliced = slice src (Range start end)
-      Tags.yield (Tag name Class span (Tags.firstLine sliced) Nothing)
+      Tags.yield (Tag name Class loc (Tags.firstLine sliced) Nothing)
       gtags t
 
 instance ToTagsBy 'Custom Java.MethodInvocation where
   tags' t@Java.MethodInvocation
-    { ann = Loc range span
+    { ann = loc@Loc { byteRange = range }
     , name = Java.Identifier { text = name }
     } = do
       src <- ask @Source
       let sliced = slice src range
-      Tags.yield (Tag name Call span (Tags.firstLine sliced) Nothing)
+      Tags.yield (Tag name Call loc (Tags.firstLine sliced) Nothing)
       gtags t
 
 
