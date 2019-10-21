@@ -27,7 +27,7 @@ before_install:
 - curl -L -o /tmp/hlint.tar.gz "https://github.com/ndmitchell/hlint/releases/download/v2.2.3/hlint-2.2.3-x86_64-linux.tar.gz"
 - tar -xf /tmp/hlint.tar.gz -C /tmp
 - cp /tmp/hlint-2.2.3/hlint $HOME/.local/bin
-- cp -r /tmp/hlint-2.2.3/hlint/data $HOME/.local/bin
+- cp -r /tmp/hlint-2.2.3/data $HOME/.local/bin
 - "PATH=/opt/ghc/bin:$HOME/local/bin:$PATH"
 - ghc --version
 - cabal --version
