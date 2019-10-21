@@ -1,4 +1,3 @@
-{-# LANGUAGE ScopedTypeVariables #-}
 module Data.Project
   ( Project (..)
   , projectExtensions
@@ -43,7 +42,8 @@ readProjectFromPaths :: MonadIO m
                      -> [Path.AbsRelDir]     -- ^ Directories to exclude.
                      -> m Project
 readProjectFromPaths maybeRoot path lang excludeDirs = do
-  let (rootDir :: Path.AbsRelDir) = case maybeRoot >>= Path.fromAbsRel of
+  let rootDir :: Path.AbsRelDir
+      rootDir = case maybeRoot >>= Path.fromAbsRel of
         -- If we were provided a root directory, use that.
         Just root -> root
         Nothing   -> case Path.fileFromFileDir path of
