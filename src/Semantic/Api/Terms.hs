@@ -12,11 +12,11 @@ import           Control.Effect.Reader
 import           Control.Lens
 import           Control.Monad
 import           Control.Monad.IO.Class
+import           Data.Aeson (ToJSON)
 import           Data.Blob
 import           Data.ByteString.Builder
 import           Data.Either
 import           Data.Graph
-import           Data.JSON.Fields
 import           Data.Language
 import           Data.ProtoLens (defMessage)
 import           Data.Quieterm
@@ -178,23 +178,8 @@ jsonTreeTermParsers = aLaCarteParsers
 class JSONTreeTerm term where
   jsonTreeTerm :: Blob -> term Loc -> Rendering.JSON.JSON "trees" SomeJSON
 
-instance ToJSONFields1 syntax => JSONTreeTerm (Term syntax) where
+instance ToJSON (term Loc) => JSONTreeTerm term where
   jsonTreeTerm = renderJSONTerm
-
-instance JSONTreeTerm Go.Term where
-  jsonTreeTerm blob = jsonTreeTerm blob . cata Term
-instance JSONTreeTerm Markdown.Term where
-  jsonTreeTerm blob = jsonTreeTerm blob . cata Term
-instance JSONTreeTerm PHP.Term where
-  jsonTreeTerm blob = jsonTreeTerm blob . cata Term
-instance JSONTreeTerm PythonALaCarte.Term where
-  jsonTreeTerm blob = jsonTreeTerm blob . cata Term
-instance JSONTreeTerm Ruby.Term where
-  jsonTreeTerm blob = jsonTreeTerm blob . cata Term
-instance JSONTreeTerm TSX.Term where
-  jsonTreeTerm blob = jsonTreeTerm blob . cata Term
-instance JSONTreeTerm TypeScript.Term where
-  jsonTreeTerm blob = jsonTreeTerm blob . cata Term
 
 
 jsonGraphTermParsers :: Map Language (SomeParser JSONGraphTerm Loc)
