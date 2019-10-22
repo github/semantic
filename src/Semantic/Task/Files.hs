@@ -44,7 +44,7 @@ data Destination = ToPath Path.AbsRelFile | ToHandle (Handle 'IO.WriteMode)
 -- | An effect to read/write 'Blob's from 'Handle's or 'FilePath's.
 data Files (m :: * -> *) k
   = forall a . Read (Source a)                                     (a -> m k)
-  | ReadProject (Maybe FilePath) FilePath Language [FilePath] (Project -> m k)
+  | ReadProject (Maybe Path.AbsRelDir) Path.AbsRelFileDir Language [Path.AbsRelDir] (Project -> m k)
   | FindFiles Path.AbsRelDir [String] [Path.AbsRelDir] ([Path.AbsRelFile] -> m k)
   | Write Destination B.Builder                               (m k)
 
@@ -105,7 +105,7 @@ readBlobPairs :: (Member Files sig, Carrier sig m) => Either (Handle 'IO.ReadMod
 readBlobPairs (Left handle) = send (Read (FromPairHandle handle) pure)
 readBlobPairs (Right paths) = traverse (send . flip Read pure . uncurry FromPathPair) paths
 
-readProject :: (Member Files sig, Carrier sig m) => Maybe FilePath -> FilePath -> Language -> [FilePath] -> m Project
+readProject :: (Member Files sig, Carrier sig m) => Maybe Path.AbsRelDir -> Path.AbsRelFileDir -> Language -> [Path.AbsRelDir] -> m Project
 readProject rootDir dir lang excludeDirs = send (ReadProject rootDir dir lang excludeDirs pure)
 
 findFiles :: (Member Files sig, Carrier sig m) => Path.AbsRelDir -> [String] -> [Path.AbsRelDir] -> m [Path.AbsRelFile]
