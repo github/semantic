@@ -12,6 +12,7 @@ import           Data.Blob
 import           Data.Blob.IO (readBlobFromFile')
 import           Data.Bifunctor
 import           Data.Functor.Classes
+import           Data.Functor.Foldable (Base, Recursive)
 import           "semantic" Data.Graph (Graph (..), topologicalSort)
 import           Data.Graph.ControlFlowVertex
 import qualified Data.Language as Language
@@ -25,6 +26,7 @@ import           Semantic.Graph
 import           Semantic.Task (SomeException, TaskSession (..), runTask, withOptions)
 import           Semantic.Util hiding (evalPythonProject, evalRubyProject, evaluateProject)
 import           Source.Loc
+import           Source.Span (HasSpan)
 import qualified System.Path as Path
 import           System.Path ((</>))
 
