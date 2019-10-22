@@ -38,6 +38,7 @@ import Data.Abstract.Name as X
 import Data.Abstract.ScopeGraph (EdgeLabel(..))
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import Data.Abstract.Value.Concrete (Value(..), ValueError, runValueError)
+import Data.Bifunctor (bimap, first)
 import Data.Blob as X
 import Data.Blob.IO as X
 import Data.ByteString as X (ByteString)
@@ -55,6 +56,7 @@ import Data.Project as X
 import Data.Proxy as X
 import Data.Semigroup as X (Semigroup(..))
 import Data.Semilattice.Lower as X
+import qualified Data.Set as Set
 import Data.String
 import Data.Sum
 import Data.Term as X
@@ -166,11 +168,14 @@ testEvaluating
 
 type Val term = Value term Precise
 
-evaluateProject :: (HasPrelude lang, SLanguage lang) => TaskSession -> Proxy lang -> [FilePath] -> IO (ScopeGraph Precise, (Heap Precise Precise (Value Any Precise), Either (SomeError (Data.Sum.Sum (TestEvaluatingErrors Any))) (ModuleTable (Module (ModuleResult Precise (Value Any Precise))))))
+evaluateProject :: (HasPrelude lang, SLanguage lang) => TaskSession -> Proxy lang -> [FilePath] -> IO (ScopeGraph Precise, (Heap Precise Precise (Value () Precise), Either (SomeError (Data.Sum.Sum (TestEvaluatingErrors Any))) (ModuleTable (Module (ModuleResult Precise (Value () Precise))))))
 evaluateProject session proxy = case Map.lookup lang analysisParsers of
-  Just (SomeParser parser) -> unsafeCoerce . testEvaluating <=< evaluateProject' session proxy parser
+  Just (SomeParser parser) -> fmap (fmap (bimap eraseHeap (bimap unsafeCoerce (fmap (fmap (fmap erase)))))) . testEvaluating <=< evaluateProject' session proxy parser
   _                        -> error $ "analysis not supported for " <> show lang
   where lang = reflect proxy
+        erase = first (const ())
+        eraseHeap (Heap.Heap m) = Heap.Heap (eraseFrame <$> m)
+        eraseFrame f = f { Heap.slots = Set.map erase <$> Heap.slots f }
 
 
 members :: EdgeLabel
