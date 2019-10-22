@@ -18,6 +18,7 @@ module SpecHelpers
 , lookupDeclaration
 , lookupMembers
 , EdgeLabel(..)
+, evaluateProject
 ) where
 
 import Control.Abstract
@@ -47,6 +48,7 @@ import Data.Foldable (toList)
 import Data.Functor.Listable as X
 import Data.Language as X hiding (Precise)
 import Data.List.NonEmpty as X (NonEmpty(..))
+import qualified Data.Map as Map
 import Data.Maybe as X
 import Data.Monoid as X (Monoid(..), First(..), Last(..))
 import Data.Project as X
@@ -58,10 +60,11 @@ import Data.Sum
 import Data.Term as X
 import Data.Traversable as X (for)
 import Debug.Trace as X (traceShowM, traceM)
+import GHC.Exts (Any)
 import Parsing.Parser as X
 import Semantic.Api hiding (File, Blob, BlobPair)
 import Semantic.Config (Config(..), optionsLogLevel)
-import Semantic.Graph (runHeap, runScopeGraph)
+import Semantic.Graph (analysisParsers, runHeap, runScopeGraph)
 import Semantic.Task as X
 import Semantic.Telemetry (LogQueue, StatQueue)
 import Semantic.Util as X
@@ -74,6 +77,7 @@ import Test.Hspec as X (Spec, SpecWith, context, describe, it, xit, parallel, pe
 import Test.Hspec.Expectations as X
 import Test.Hspec.LeanCheck as X
 import Test.LeanCheck as X
+import Unsafe.Coerce (unsafeCoerce)
 
 runBuilder :: Builder -> ByteString
 runBuilder = toStrict . toLazyByteString
@@ -161,6 +165,12 @@ testEvaluating
   . runAddressError
 
 type Val term = Value term Precise
+
+evaluateProject :: (HasPrelude lang, SLanguage lang) => TaskSession -> Proxy lang -> [FilePath] -> IO (ScopeGraph Precise, (Heap Precise Precise (Value Any Precise), Either (SomeError (Data.Sum.Sum (TestEvaluatingErrors Any))) (ModuleTable (Module (ModuleResult Precise (Value Any Precise))))))
+evaluateProject session proxy = case Map.lookup lang analysisParsers of
+  Just (SomeParser parser) -> unsafeCoerce . testEvaluating <=< evaluateProject' session proxy parser
+  _                        -> error $ "analysis not supported for " <> show lang
+  where lang = reflect proxy
 
 
 members :: EdgeLabel
