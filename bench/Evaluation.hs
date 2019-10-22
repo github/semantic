@@ -40,6 +40,8 @@ callGraphProject' :: ( Language.SLanguage lang
                      , IsTerm term
                      , Functor (Syntax term)
                      , VertexDeclaration1 (Syntax term)
+                     , Ord (term Loc)
+                     , AccessControls (term Loc)
                      )
                   => TaskSession
                   -> Proxy lang

@@ -292,15 +292,9 @@ liftNumeric2 :: (Member (Numeric value) sig, Carrier sig m)
              -> m value
 liftNumeric2 t v1 v2 = send (LiftNumeric2 (Numeric2Function t) v1 v2 pure)
 
-data NumericFunction = NumericFunction (forall a . Num a => a -> a)
+newtype NumericFunction = NumericFunction { runNumericFunction :: forall a . Num a => a -> a }
 
-runNumericFunction :: Num a => NumericFunction -> a -> a
-runNumericFunction (NumericFunction f) a = f a
-
-data Numeric2Function = Numeric2Function (forall a b. Number a -> Number b -> SomeNumber)
-
-runNumeric2Function :: Numeric2Function -> Number a -> Number b -> SomeNumber
-runNumeric2Function (Numeric2Function f) a b = f a b
+newtype Numeric2Function = Numeric2Function { runNumeric2Function :: forall a b. Number a -> Number b -> SomeNumber }
 
 data Numeric value (m :: * -> *) k
   = Integer Integer (value -> m k)
@@ -347,15 +341,9 @@ unsignedRShift :: (Member (Bitwise value) sig, Carrier sig m)
                -> m value
 unsignedRShift v1 v2 = send (UnsignedRShift v1 v2 pure)
 
-data BitwiseFunction = BitwiseFunction (forall a . Bits a => a -> a)
+newtype BitwiseFunction = BitwiseFunction { runBitwiseFunction :: forall a . Bits a => a -> a }
 
-runBitwiseFunction :: Bits a => BitwiseFunction -> a -> a
-runBitwiseFunction (BitwiseFunction f) a = f a
-
-data Bitwise2Function = Bitwise2Function (forall a . (Integral a, Bits a) => a -> a -> a)
-
-runBitwise2Function :: (Integral a, Bits a) => Bitwise2Function -> a -> a -> a
-runBitwise2Function (Bitwise2Function f) a b = f a b
+newtype Bitwise2Function = Bitwise2Function { runBitwise2Function :: forall a . (Integral a, Bits a) => a -> a -> a }
 
 data Bitwise value (m :: * -> *) k
   = CastToInteger value (value -> m k)

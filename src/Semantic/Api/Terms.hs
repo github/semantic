@@ -1,4 +1,4 @@
-{-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, GeneralizedNewtypeDeriving, MonoLocalBinds, RankNTypes, ScopedTypeVariables, StandaloneDeriving, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, RankNTypes, ScopedTypeVariables, TypeFamilies, UndecidableInstances #-}
 module Semantic.Api.Terms
   ( termGraph
   , parseTermBuilder

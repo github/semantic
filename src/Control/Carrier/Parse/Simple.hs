@@ -63,7 +63,7 @@ runParser timeout blob@Blob{..} parser = case parser of
     let term = cmarkParser blobSource
     in length term `seq` pure term
 
-data ParseFailure = ParseFailure String
+newtype ParseFailure = ParseFailure String
   deriving (Show, Typeable)
 
 instance Exception ParseFailure
