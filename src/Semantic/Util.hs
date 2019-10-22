@@ -72,13 +72,14 @@ evaluateProject' session proxy parser paths = do
     package <- fmap snd <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs lang [])
     modules <- topologicalSort <$> runImportGraphToModules proxy package
     trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
-    pure (runModuleTable
-         (runModules (ModuleTable.modulePaths (packageModules package))
-         (raiseHandler (runReader (packageInfo package))
-         (raiseHandler (evalState (lowerBound @Span))
-         (raiseHandler (runReader (lowerBound @Span))
-         (evaluate proxy (runDomainEffects (evalTerm (withTermSpans (^. span_)))) modules))))))
-  either (die . displayException) pure res
+    pure (package, modules)
+  (package, modules) <- either (die . displayException) pure res
+  pure (runModuleTable
+       (runModules (ModuleTable.modulePaths (packageModules package))
+       (raiseHandler (runReader (packageInfo package))
+       (raiseHandler (evalState (lowerBound @Span))
+       (raiseHandler (runReader (lowerBound @Span))
+       (evaluate proxy (runDomainEffects (evalTerm (withTermSpans (^. span_)))) modules))))))
 
 parseFile, parseFileQuiet :: Parser term -> FilePath -> IO term
 parseFile      parser = runTask'     . (parse parser <=< readBlob . fileForPath)
