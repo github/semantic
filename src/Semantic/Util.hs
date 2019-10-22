@@ -81,7 +81,7 @@ evaluateProject' session proxy parser paths = do
   either (die . displayException) pure res
 
 parseFile, parseFileQuiet :: Parser term -> FilePath -> IO term
-parseFile parser = runTask' . (parse parser <=< readBlob . fileForPath)
+parseFile      parser = runTask'     . (parse parser <=< readBlob . fileForPath)
 parseFileQuiet parser = runTaskQuiet . (parse parser <=< readBlob . fileForPath)
 
 runTask', runTaskQuiet :: ParseC TaskC a -> IO a
