@@ -47,13 +47,15 @@ generateAST (SemanticAST format color source) = do
   bytestrings <- case source of
     Left filePaths -> traverse Data.ByteString.readFile filePaths
     Right source   -> pure [Data.ByteString.Char8.pack source]
-  for_ bytestrings $ \bytestring -> do
-    ast <- parseByteString @AST.Module @(Range, Span) Python.tree_sitter_python bytestring
-    case format of
-      Show   -> print ast
-      Pretty -> case color of
-        True   -> pPrintNoColor ast
-        False  -> pPrint ast
+  for_ bytestrings go
+  where go bytestring = do
+          ast <- parseByteString @AST.Module @(Range, Span) Python.tree_sitter_python bytestring
+          case format of
+            Show   -> print ast
+            Pretty -> case color of
+              True   -> pPrintNoColor ast
+              False  -> pPrint ast
+
 
 opts :: ParserInfo SemanticAST
 opts = info (parseAST <**> helper)
