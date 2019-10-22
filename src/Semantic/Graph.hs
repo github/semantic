@@ -200,7 +200,7 @@ runImportGraphToModuleInfos :: ( AnalyzeTerm term
                             => Proxy lang
                             -> Package (term Loc)
                             -> m (Graph ControlFlowVertex)
-runImportGraphToModuleInfos lang (package :: Package (term Loc)) = runImportGraph lang package allModuleInfos
+runImportGraphToModuleInfos lang package = runImportGraph lang package allModuleInfos
   where allModuleInfos info = vertex (maybe (unknownModuleVertex info) (moduleVertex . moduleInfo) (ModuleTable.lookup (modulePath info) (packageModules package)))
 
 runImportGraphToModules :: ( AnalyzeTerm term
@@ -212,7 +212,7 @@ runImportGraphToModules :: ( AnalyzeTerm term
                         => Proxy lang
                         -> Package (term Loc)
                         -> m (Graph (Module (term Loc)))
-runImportGraphToModules lang (package :: Package (term Loc)) = runImportGraph lang package resolveOrLowerBound
+runImportGraphToModules lang package = runImportGraph lang package resolveOrLowerBound
   where resolveOrLowerBound info = maybe lowerBound vertex (ModuleTable.lookup (modulePath info) (packageModules package))
 
 runImportGraph :: ( AnalyzeTerm term
@@ -225,7 +225,7 @@ runImportGraph :: ( AnalyzeTerm term
                -> Package (term Loc)
                -> (ModuleInfo -> Graph vertex)
                -> m (Graph vertex)
-runImportGraph lang (package :: Package (term Loc)) f
+runImportGraph lang package f
   = fmap (fst >=> f)
   . runEvaluator @_ @_ @(Value _ (Hole (Maybe Name) Precise))
   . raiseHandler (runState lowerBound)
