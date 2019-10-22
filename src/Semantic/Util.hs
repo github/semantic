@@ -1,4 +1,4 @@
-{-# LANGUAGE PartialTypeSignatures, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE PartialTypeSignatures, TypeOperators #-}
 {-# OPTIONS_GHC -Wno-missing-signatures -Wno-partial-type-signatures -O0 #-}
 module Semantic.Util
   ( evaluateProject'
