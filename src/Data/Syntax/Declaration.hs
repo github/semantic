@@ -216,9 +216,7 @@ instance Evaluatable Class where
     currentScope' <- currentScope
 
     superScopes <- for classSuperclasses $ \superclass -> do
-      name <- case declaredName superclass of
-                Just name -> pure name
-                Nothing   -> gensym
+      name <- maybeM gensym (declaredName superclass)
       scope <- associatedScope (Declaration name)
       slot <- lookupSlot (Declaration name)
       superclassFrame <- scopedEnvironment =<< deref slot

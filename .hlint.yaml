@@ -34,6 +34,10 @@
 # Change the severity of hints we don’t want to fail CI for
 - suggest: {name: Eta reduce}
 
+# While I think DerivingStrategies is good, it's too noisy to suggest by default
+- ignore:
+    name: Use DerivingStrategies
+
 # Ignore eta reduce in the assignment modules
 - ignore:
     name: Eta reduce
@@ -45,8 +49,29 @@
 
 - ignore: {name: Use ., within: [Analysis.Abstract.Graph.graphingModules, Semantic.Distribute]}
 
-- ignore: {name: Reduce duplication, within: [Semantic.Util, Semantic.UtilDisabled]}
-- ignore: {name: Use newtype instead of data, within: [Semantic.Api.V1.CodeAnalysisPB]}
+- ignore:
+    within:
+      - Proto.Semantic
+      - Proto.Semantic_Fields
+      - Proto.Semantic_JSON
+
+- ignore:
+    name: Reduce duplication
+    within:
+      - Semantic.Util
+
+# hlint has issues with QuantifiedConstraints (see https://github.com/ndmitchell/hlint/issues/759)
+# Once the above is fixed, we can drop this error.
+
+- ignore: { name: Parse error }
+
+# hlint is too paranoid about NonEmpty functions (https://github.com/ndmitchell/hlint/issues/787)
+
+- ignore:
+    name: Avoid restricted function
+    within:
+      - Language.Python.Syntax
+      - Data.Syntax.Expression
 
 # Our customized warnings
 
