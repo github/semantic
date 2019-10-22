@@ -31,17 +31,16 @@ import           System.Path ((</>))
 -- Duplicating this stuff from Util to shut off the logging
 
 callGraphProject' :: ( Language.SLanguage lang
-                     , Ord1 (Syntax term)
-                     , Declarations1 (Syntax term)
-                     , Evaluatable (Syntax term)
-                     , FreeVariables1 (Syntax term)
-                     , AccessControls1 (Syntax term)
                      , HasPrelude lang
-                     , IsTerm term
-                     , Functor (Syntax term)
-                     , VertexDeclaration1 (Syntax term)
-                     , Ord (term Loc)
                      , AccessControls (term Loc)
+                     , Declarations (term Loc)
+                     , Evaluatable (Base (term Loc))
+                     , FreeVariables (term Loc)
+                     , HasSpan (term Loc)
+                     , Ord (term Loc)
+                     , Recursive (term Loc)
+                     , Show (term Loc)
+                     , VertexDeclaration term
                      )
                   => TaskSession
                   -> Proxy lang
