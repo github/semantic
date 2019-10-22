@@ -22,61 +22,58 @@ module SpecHelpers
 
 import Control.Abstract
 import Control.Carrier.Parse.Simple
-import Data.Abstract.ScopeGraph (EdgeLabel(..))
-import qualified Data.Abstract.ScopeGraph as ScopeGraph
-import qualified Data.Abstract.Heap as Heap
 import Control.Effect.Lift
 import Control.Effect.Trace as X (runTraceByIgnoring, runTraceByReturning)
+import Control.Exception (displayException)
 import Control.Monad ((>=>))
-import Data.Traversable as X (for)
+import Control.Monad as X
 import Data.Abstract.Address.Precise as X
 import Data.Abstract.Evaluatable
 import Data.Abstract.FreeVariables as X
+import qualified Data.Abstract.Heap as Heap
 import Data.Abstract.Module as X
 import Data.Abstract.ModuleTable as X hiding (lookup)
 import Data.Abstract.Name as X
+import Data.Abstract.ScopeGraph (EdgeLabel(..))
+import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import Data.Abstract.Value.Concrete (Value(..), ValueError, runValueError)
 import Data.Blob as X
 import Data.Blob.IO as X
+import Data.ByteString as X (ByteString)
 import Data.ByteString.Builder (Builder, toLazyByteString)
 import Data.ByteString.Lazy (toStrict)
-import Data.Project as X
-import Data.Proxy as X
+import Data.Edit as X
 import Data.Foldable (toList)
 import Data.Functor.Listable as X
 import Data.Language as X hiding (Precise)
 import Data.List.NonEmpty as X (NonEmpty(..))
+import Data.Maybe as X
+import Data.Monoid as X (Monoid(..), First(..), Last(..))
+import Data.Project as X
+import Data.Proxy as X
+import Data.Semigroup as X (Semigroup(..))
 import Data.Semilattice.Lower as X
-import Source.Source as X (Source)
 import Data.String
 import Data.Sum
 import Data.Term as X
-import Parsing.Parser as X
-import Semantic.Task as X
-import Semantic.Util as X
-import Semantic.Graph (runHeap, runScopeGraph)
-import Source.Range as X hiding (start, end, point)
-import Source.Span as X hiding (HasSpan(..), start, end, point)
+import Data.Traversable as X (for)
 import Debug.Trace as X (traceShowM, traceM)
-
-import Data.ByteString as X (ByteString)
-import Data.Edit as X
-import Data.Maybe as X
-import Data.Monoid as X (Monoid(..), First(..), Last(..))
-import Data.Semigroup as X (Semigroup(..))
-import Control.Monad as X
-
+import Parsing.Parser as X
+import Semantic.Api hiding (File, Blob, BlobPair)
+import Semantic.Config (Config(..), optionsLogLevel)
+import Semantic.Graph (runHeap, runScopeGraph)
+import Semantic.Task as X
+import Semantic.Telemetry (LogQueue, StatQueue)
+import Semantic.Util as X
+import Source.Range as X hiding (start, end, point)
+import Source.Source as X (Source)
+import Source.Span as X hiding (HasSpan(..), start, end, point)
+import System.Exit (die)
+import qualified System.Path as Path
 import Test.Hspec as X (Spec, SpecWith, context, describe, it, xit, parallel, pendingWith, around, runIO)
 import Test.Hspec.Expectations as X
 import Test.Hspec.LeanCheck as X
 import Test.LeanCheck as X
-
-import Semantic.Config (Config(..), optionsLogLevel)
-import Semantic.Telemetry (LogQueue, StatQueue)
-import Semantic.Api hiding (File, Blob, BlobPair)
-import System.Exit (die)
-import Control.Exception (displayException)
-import qualified System.Path as Path
 
 runBuilder :: Builder -> ByteString
 runBuilder = toStrict . toLazyByteString
