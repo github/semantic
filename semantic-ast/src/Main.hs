@@ -45,10 +45,8 @@ main = generateAST =<< execParser opts
 generateAST :: SemanticAST -> IO ()
 generateAST (SemanticAST format color source) = do
   bytestrings <- case source of
-    Left filePaths -> do
-      traverse Data.ByteString.readFile filePaths
-    Right source -> do
-      pure [Data.ByteString.Char8.pack source]
+    Left filePaths -> traverse Data.ByteString.readFile filePaths
+    Right source   -> pure [Data.ByteString.Char8.pack source]
   for_ bytestrings $ \bytestring -> do
     ast <- parseByteString @AST.Module @(Range, Span) Python.tree_sitter_python bytestring
     case format of
