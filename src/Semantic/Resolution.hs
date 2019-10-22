@@ -23,9 +23,9 @@ import           System.FilePath.Posix
 import qualified System.Path as Path
 
 
-nodeJSResolutionMap :: (Member Files sig, Carrier sig m, MonadIO m) => FilePath -> Text -> [Path.AbsRelDir] -> m (Map FilePath FilePath)
+nodeJSResolutionMap :: (Member Files sig, Carrier sig m, MonadIO m) => FilePath -> Text -> [FilePath] -> m (Map FilePath FilePath)
 nodeJSResolutionMap rootDir prop excludeDirs = do
-  files <- findFiles (Path.absRel rootDir) [".json"] excludeDirs
+  files <- findFiles (Path.absRel rootDir) [".json"] (fmap Path.absRel excludeDirs)
   let packageFiles = fileForTypedPath <$> filter ((==) (Path.relFile "package.json") . Path.takeFileName) files
   blobs <- readBlobs (FilesFromPaths packageFiles)
   pure $ fold (mapMaybe (lookup prop) blobs)
@@ -45,8 +45,8 @@ resolutionMap Project{..} = case projectLanguage of
   _          -> send (NoResolution pure)
 
 data Resolution (m :: * -> *) k
-  = NodeJSResolution FilePath Text [Path.AbsRelDir] (Map FilePath FilePath -> m k)
-  | NoResolution                                    (Map FilePath FilePath -> m k)
+  = NodeJSResolution FilePath Text [FilePath] (Map FilePath FilePath -> m k)
+  | NoResolution                              (Map FilePath FilePath -> m k)
   deriving stock (Functor, Generic1)
   deriving anyclass (HFunctor, Effect)
 
