@@ -24,9 +24,14 @@ matrix:
 
 before_install:
 - mkdir -p $HOME/.local/bin
+- curl -L -o /tmp/hlint.tar.gz "https://github.com/ndmitchell/hlint/releases/download/v2.2.3/hlint-2.2.3-x86_64-linux.tar.gz"
+- tar -xf /tmp/hlint.tar.gz -C /tmp
+- cp /tmp/hlint-2.2.3/hlint $HOME/.local/bin
+- cp -r /tmp/hlint-2.2.3/data $HOME/.local/bin
 - "PATH=/opt/ghc/bin:$HOME/local/bin:$PATH"
 - ghc --version
 - cabal --version
+- hlint --version
 
 install:
 - cabal v2-update -v
@@ -34,6 +39,7 @@ install:
 - cabal v2-build --only-dependencies
 
 script:
+- hlint src semantic-python
 - cabal v2-build
 - cabal v2-run semantic:test
 - cabal v2-run semantic-core:test

@@ -1,4 +1,4 @@
-{-# LANGUAGE FunctionalDependencies, LambdaCase #-}
+{-# LANGUAGE FunctionalDependencies #-}
 module Semantic.Api.Bridge
   ( APIBridge (..)
   , APIConvert (..)
