@@ -15,12 +15,15 @@ import Analysis.File
 import Control.Applicative (Alternative (..))
 import Control.Effect.Carrier
 import Control.Effect.Fail
+import Control.Effect.Fresh
 import Control.Effect.Reader
 import Control.Monad ((>=>))
 import Core.Core as Core
 import Core.Name
 import Data.Functor
 import Data.Maybe (fromMaybe)
+import Data.Text (Text)
+import qualified Data.Text as Text
 import GHC.Stack
 import Prelude hiding (fail)
 import Source.Span
@@ -28,8 +31,11 @@ import Syntax.Scope
 import Syntax.Term
 import qualified System.Path as Path
 
+type Gensym = Fresh
+
 eval :: ( Carrier sig m
         , Member (Reader Span) sig
+        , Member Fresh sig
         , MonadFail m
         , Semigroup value
         )
@@ -68,6 +74,19 @@ eval Analysis{..} eval = \case
     a :. b -> do
       a' <- ref a
       a' ... b >>= maybe (freeVariable (show b)) (deref' b)
+    a :? b -> do
+      a' <- ref a
+      mFound <- a' ... b
+      case mFound of
+        Nothing ->
+          eval . Core.lam (named' "nothing")
+               . Core.lam (named' "just")
+               $ pure "nothing"
+        Just item -> do
+          value <- deref' b item
+          abstract eval "nothing" (instantiate1 (pure "nothing") (Syntax.Scope.abstract _ _))
+
+
     a := b -> do
       b' <- eval b
       addr <- ref a

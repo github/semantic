@@ -26,6 +26,7 @@ module Core.Core
 , load
 , record
 , (...)
+, (.?)
 , (.=)
 , Ann(..)
 , ann
@@ -75,6 +76,8 @@ data Core f a
   | Record [(Name, f a)]
   -- | Projection from a record.
   | f a :. Name
+  -- | Projection of a record, with failure.
+  | f a :? Name
   -- | Assignment of a value to the reference returned by the lhs.
   | f a := f a
   deriving (Foldable, Functor, Generic1, Traversable)
@@ -105,6 +108,7 @@ instance RightModule Core where
   Load b     >>=* f = Load (b >>= f)
   Record fs  >>=* f = Record (map (fmap (>>= f)) fs)
   (a :. b)   >>=* f = (a >>= f) :. b
+  (a :? b)   >>=* f = (a >>= f) : b
   (a := b)   >>=* f = (a >>= f) := (b >>= f)
 
 
@@ -208,6 +212,11 @@ record fs = send (Record fs)
 a ... b = send (a :. b)
 
 infixl 9 ...
+
+(.?) :: (Carrier sig m, Member Core sig) => m a -> Name -> m a
+a .? b = send (a :? b)
+
+infixl 9 .?
 
 (.=) :: (Carrier sig m, Member Core sig) => m a -> m a -> m a
 a .= b = send (a := b)
