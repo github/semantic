@@ -83,19 +83,16 @@ type FileEvaluator err term =
        , Either (SomeError err)
                 (ModuleTable (Module (ModuleResult Precise (Value (term Loc) Precise))))))
 
-evalGoProject :: FileEvaluator _ Go.Term
-evalGoProject = justEvaluating <=< evaluateProject (Proxy @'Language.Go) goParser
-
-evalRubyProject :: FileEvaluator _ Ruby.Term
-evalRubyProject = justEvaluating <=< evaluateProject (Proxy @'Language.Ruby)               rubyParser
-
-evalPHPProject :: FileEvaluator _ PHP.Term
-evalPHPProject  = justEvaluating <=< evaluateProject (Proxy @'Language.PHP)        phpParser
-
-evalPythonProject :: FileEvaluator _ Python.Term
-evalPythonProject = justEvaluating <=< evaluateProject (Proxy @'Language.Python)     pythonParser
-
+evalGoProject         :: FileEvaluator _ Go.Term
+evalRubyProject       :: FileEvaluator _ Ruby.Term
+evalPHPProject        :: FileEvaluator _ PHP.Term
+evalPythonProject     :: FileEvaluator _ Python.Term
 evalTypeScriptProject :: FileEvaluator _ TypeScript.Term
+
+evalGoProject         = justEvaluating <=< evaluateProject (Proxy @'Language.Go)         goParser
+evalRubyProject       = justEvaluating <=< evaluateProject (Proxy @'Language.Ruby)       rubyParser
+evalPHPProject        = justEvaluating <=< evaluateProject (Proxy @'Language.PHP)        phpParser
+evalPythonProject     = justEvaluating <=< evaluateProject (Proxy @'Language.Python)     pythonParser
 evalTypeScriptProject = justEvaluating <=< evaluateProject (Proxy @'Language.TypeScript) typescriptParser
 
 evaluateProject proxy parser paths = withOptions debugOptions $ \ config logger statter ->
