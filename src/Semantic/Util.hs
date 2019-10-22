@@ -1,12 +1,7 @@
 {-# LANGUAGE PartialTypeSignatures, TypeFamilies, TypeOperators #-}
 {-# OPTIONS_GHC -Wno-missing-signatures -Wno-partial-type-signatures -O0 #-}
 module Semantic.Util
-  ( evalGoProject
-  , evalPHPProject
-  , evalPythonProject
-  , evalRubyProject
-  , evalTypeScriptProject
-  , evaluateProject'
+  ( evaluateProject'
   , justEvaluating
   , mergeErrors
   , reassociate
@@ -37,18 +32,12 @@ import qualified Data.Language as Language
 import           Data.List (uncons)
 import           Data.Project
 import           Data.Sum (weaken)
-import qualified Language.Go.Term as Go
-import qualified Language.PHP.Term as PHP
-import qualified Language.Python.Term as Python
-import qualified Language.Ruby.Term as Ruby
-import qualified Language.TypeScript.Term as TypeScript
 import           Parsing.Parser
 import           Prologue
 import           Semantic.Analysis
 import           Semantic.Config
 import           Semantic.Graph
 import           Semantic.Task
-import           Source.Loc as Loc
 import           Source.Span (HasSpan(..))
 import           System.Exit (die)
 import           System.FilePath.Posix (takeDirectory)
@@ -74,29 +63,6 @@ justEvaluating
   . runResolutionError
   . runAddressError
   . runValueError
-
-type FileEvaluator err term =
-  [FilePath]
-  -> IO
-       ( Heap Precise Precise (Value (term Loc) Precise),
-       ( ScopeGraph Precise
-       , Either (SomeError err)
-                (ModuleTable (Module (ModuleResult Precise (Value (term Loc) Precise))))))
-
-evalGoProject         :: FileEvaluator _ Go.Term
-evalRubyProject       :: FileEvaluator _ Ruby.Term
-evalPHPProject        :: FileEvaluator _ PHP.Term
-evalPythonProject     :: FileEvaluator _ Python.Term
-evalTypeScriptProject :: FileEvaluator _ TypeScript.Term
-
-evalGoProject         = justEvaluating <=< evaluateProject (Proxy @'Language.Go)         goParser
-evalRubyProject       = justEvaluating <=< evaluateProject (Proxy @'Language.Ruby)       rubyParser
-evalPHPProject        = justEvaluating <=< evaluateProject (Proxy @'Language.PHP)        phpParser
-evalPythonProject     = justEvaluating <=< evaluateProject (Proxy @'Language.Python)     pythonParser
-evalTypeScriptProject = justEvaluating <=< evaluateProject (Proxy @'Language.TypeScript) typescriptParser
-
-evaluateProject proxy parser paths = withOptions debugOptions $ \ config logger statter ->
-  evaluateProject' (TaskSession config "-" False logger statter) proxy parser paths
 
 -- Evaluate a project consisting of the listed paths.
 evaluateProject' session proxy parser paths = do
