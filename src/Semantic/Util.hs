@@ -36,7 +36,6 @@ import           Data.Graph (topologicalSort)
 import qualified Data.Language as Language
 import           Data.List (uncons)
 import           Data.Project
-import           Data.Quieterm (Quieterm, quieterm)
 import           Data.Sum (weaken)
 import qualified Language.Go.Term as Go
 import qualified Language.PHP.Term as PHP
@@ -84,19 +83,19 @@ type FileEvaluator err term =
        , Either (SomeError err)
                 (ModuleTable (Module (ModuleResult Precise (Value (term Loc) Precise))))))
 
-evalGoProject :: FileEvaluator _ (Quieterm (Sum Go.Syntax))
+evalGoProject :: FileEvaluator _ Go.Term
 evalGoProject = justEvaluating <=< evaluateProject (Proxy @'Language.Go) goParser
 
-evalRubyProject :: FileEvaluator _ (Quieterm (Sum Ruby.Syntax))
+evalRubyProject :: FileEvaluator _ Ruby.Term
 evalRubyProject = justEvaluating <=< evaluateProject (Proxy @'Language.Ruby)               rubyParser
 
-evalPHPProject :: FileEvaluator _ (Quieterm (Sum PHP.Syntax))
+evalPHPProject :: FileEvaluator _ PHP.Term
 evalPHPProject  = justEvaluating <=< evaluateProject (Proxy @'Language.PHP)        phpParser
 
-evalPythonProject :: FileEvaluator _ (Quieterm (Sum Python.Syntax))
+evalPythonProject :: FileEvaluator _ Python.Term
 evalPythonProject = justEvaluating <=< evaluateProject (Proxy @'Language.Python)     pythonParser
 
-evalTypeScriptProject :: FileEvaluator _ (Quieterm (Sum TypeScript.Syntax))
+evalTypeScriptProject :: FileEvaluator _ TypeScript.Term
 evalTypeScriptProject = justEvaluating <=< evaluateProject (Proxy @'Language.TypeScript) typescriptParser
 
 evaluateProject proxy parser paths = withOptions debugOptions $ \ config logger statter ->
@@ -107,7 +106,7 @@ evaluateProject' session proxy parser paths = do
   let lang = Language.reflect proxy
   res <- runTask session $ asks configTreeSitterParseTimeout >>= \ timeout -> runParse timeout $ do
     blobs <- catMaybes <$> traverse readBlobFromFile (flip File lang <$> paths)
-    package <- fmap (quieterm . snd) <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs lang [])
+    package <- fmap snd <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs lang [])
     modules <- topologicalSort <$> runImportGraphToModules proxy package
     trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
     pure (id @(Evaluator _ Precise (Value _ Precise) _ _)
