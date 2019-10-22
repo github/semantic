@@ -4,7 +4,7 @@ module Main (main) where
 import System.Environment
 import TreeSitter.Unmarshal
 import qualified TreeSitter.Python.AST as AST
-import TreeSitter.Python
+import qualified TreeSitter.Python as Python
 import Source.Range
 import Source.Span
 import Data.ByteString.Char8
@@ -50,7 +50,7 @@ generateAST (SemanticAST format color source) = do
     Right source -> do
       pure [Data.ByteString.Char8.pack source]
   for_ bytestrings $ \bytestring -> do
-    ast <- parseByteString @AST.Module @(Range, Span) tree_sitter_python bytestring
+    ast <- parseByteString @AST.Module @(Range, Span) Python.tree_sitter_python bytestring
     case format of
       Show   -> print ast
       Pretty -> pPrint ast
