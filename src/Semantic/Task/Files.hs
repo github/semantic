@@ -14,7 +14,6 @@ module Semantic.Task.Files
   , Handle (..)
   , FilesC(..)
   , FilesArg(..)
-  , PathFilter(..)
   ) where
 
 import           Control.Effect.Carrier
@@ -41,12 +40,6 @@ data Source blob where
   FromPairHandle :: Handle 'IO.ReadMode             -> Source [BlobPair]
 
 data Destination = ToPath Path.AbsRelFile | ToHandle (Handle 'IO.WriteMode)
-
-data PathFilter
-  = ExcludePaths [FilePath]
-  | ExcludeFromHandle (Handle 'IO.ReadMode)
-  | IncludePaths [FilePath]
-  | IncludePathsFromHandle (Handle 'IO.ReadMode)
 
 -- | An effect to read/write 'Blob's from 'Handle's or 'FilePath's.
 data Files (m :: * -> *) k
