@@ -120,7 +120,7 @@ parseFile parser = runTask' . (parse parser <=< readBlob . fileForPath)
 parseFileQuiet parser = runTaskQuiet . (parse parser <=< readBlob . fileForPath)
 
 runTask', runTaskQuiet :: ParseC TaskC a -> IO a
-runTask' task = runTaskWithOptions debugOptions (asks configTreeSitterParseTimeout >>= \ timeout -> runParse timeout task) >>= either (die . displayException) pure
+runTask'     task = runTaskWithOptions debugOptions   (asks configTreeSitterParseTimeout >>= \ timeout -> runParse timeout task) >>= either (die . displayException) pure
 runTaskQuiet task = runTaskWithOptions defaultOptions (asks configTreeSitterParseTimeout >>= \ timeout -> runParse timeout task) >>= either (die . displayException) pure
 
 mergeErrors :: Either (SomeError (Sum errs)) (Either (SomeError err) result) -> Either (SomeError (Sum (err ': errs))) result
