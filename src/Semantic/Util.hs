@@ -23,6 +23,7 @@ import           Control.Carrier.Parse.Simple
 import           Control.Effect.Lift
 import           Control.Effect.Trace (runTraceByPrinting)
 import           Control.Exception (displayException)
+import           Control.Lens.Getter
 import           Data.Abstract.Address.Precise as Precise
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
@@ -37,7 +38,6 @@ import           Data.List (uncons)
 import           Data.Project
 import           Data.Quieterm (Quieterm, quieterm)
 import           Data.Sum (weaken)
-import           Data.Term (termFAnnotation)
 import qualified Language.Go.Term as Go
 import qualified Language.PHP.Term as PHP
 import qualified Language.Python.Term as Python
@@ -50,6 +50,7 @@ import           Semantic.Config
 import           Semantic.Graph
 import           Semantic.Task
 import           Source.Loc as Loc
+import           Source.Span (HasSpan(..))
 import           System.Exit (die)
 import           System.FilePath.Posix (takeDirectory)
 
@@ -115,7 +116,7 @@ evaluateProject' session proxy parser paths = do
          (raiseHandler (runReader (packageInfo package))
          (raiseHandler (evalState (lowerBound @Span))
          (raiseHandler (runReader (lowerBound @Span))
-         (evaluate proxy (runDomainEffects (evalTerm (withTermSpans (Loc.span . termFAnnotation . project)))) modules)))))))
+         (evaluate proxy (runDomainEffects (evalTerm (withTermSpans (^. span_)))) modules)))))))
   either (die . displayException) pure res
 
 parseFile, parseFileQuiet :: Parser term -> FilePath -> IO term
