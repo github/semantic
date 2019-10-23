@@ -71,7 +71,7 @@ pyCall :: Path.RelFile -> Benchmarkable
 pyCall p = nfIO $ callGraphProject (Proxy @'Language.Python) pythonParser (Path.relDir "bench/bench-fixtures/python/" </> p)
 
 rbCall :: Path.RelFile -> Benchmarkable
-rbCall p = nfIO $ callGraphProject (Proxy @'Language.Ruby) rubyParser $ (Path.relDir "bench/bench-fixtures/ruby" </> p)
+rbCall p = nfIO $ callGraphProject (Proxy @'Language.Ruby)   rubyParser   (Path.relDir "bench/bench-fixtures/ruby" </> p)
 
 benchmarks :: Benchmark
 benchmarks = bgroup "evaluation"
