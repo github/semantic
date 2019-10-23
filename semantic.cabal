@@ -397,6 +397,7 @@ benchmark evaluation
   ghc-options:         -static
   build-depends:       base
                      , algebraic-graphs
+                     , containers
                      , gauge ^>= 0.2.5
                      , semantic
                      , semantic-source

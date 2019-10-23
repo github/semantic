@@ -16,6 +16,7 @@ import           Data.Functor.Foldable (Base, Recursive)
 import           "semantic" Data.Graph (Graph (..), topologicalSort)
 import           Data.Graph.ControlFlowVertex
 import qualified Data.Language as Language
+import qualified Data.Map as Map
 import           Data.Project
 import           Data.Proxy
 import           Data.Term
@@ -34,29 +35,21 @@ import           System.Path ((</>))
 
 callGraphProject' :: ( Language.SLanguage lang
                      , HasPrelude lang
-                     , AccessControls (term Loc)
-                     , Declarations (term Loc)
-                     , Evaluatable (Base (term Loc))
-                     , FreeVariables (term Loc)
-                     , HasSpan (term Loc)
-                     , Ord (term Loc)
-                     , Recursive (term Loc)
-                     , Show (term Loc)
-                     , VertexDeclaration term
                      )
                   => TaskSession
                   -> Proxy lang
-                  -> Parser (term Loc)
                   -> Path.RelFile
                   -> IO (Either String (Data.Graph.Graph ControlFlowVertex))
-callGraphProject' session proxy parser path = fmap (first show) . runTask session $ do
+callGraphProject' session proxy path
+  | let lang = Language.reflect proxy
+  , Just (SomeParser parser) <- Map.lookup lang analysisParsers = fmap (first show) . runTask session $ do
   blob <- readBlobFromFile' (fileForTypedPath path)
-  package <- fmap snd <$> runParse (Duration.fromSeconds 10) (parsePackage parser (Project (Path.toString (Path.takeDirectory path)) [blob] (Language.reflect proxy) []))
+  package <- fmap snd <$> runParse (Duration.fromSeconds 10) (parsePackage parser (Project (Path.toString (Path.takeDirectory path)) [blob] lang []))
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   runCallGraph proxy False modules package
 
-callGraphProject proxy parser paths = withOptions defaultOptions $ \ config logger statter ->
-  callGraphProject' (TaskSession config "" False logger statter) proxy parser paths
+callGraphProject proxy paths = withOptions defaultOptions $ \ config logger statter ->
+  callGraphProject' (TaskSession config "" False logger statter) proxy paths
 
 evaluateProject proxy parser path = withOptions defaultOptions $ \ config logger statter ->
   justEvaluating =<< evaluateProject' (TaskSession config "" False logger statter) proxy parser [Path.toString path]
@@ -68,10 +61,10 @@ rbEval :: Path.RelFile -> Benchmarkable
 rbEval p = nfIO $ () <$ evaluateProject (Proxy @'Language.Ruby)   rubyParser   (Path.relDir "bench/bench-fixtures/ruby" </> p)
 
 pyCall :: Path.RelFile -> Benchmarkable
-pyCall p = nfIO $ callGraphProject (Proxy @'Language.Python) pythonParser (Path.relDir "bench/bench-fixtures/python/" </> p)
+pyCall p = nfIO $ callGraphProject (Proxy @'Language.Python) (Path.relDir "bench/bench-fixtures/python/" </> p)
 
 rbCall :: Path.RelFile -> Benchmarkable
-rbCall p = nfIO $ callGraphProject (Proxy @'Language.Ruby)   rubyParser   (Path.relDir "bench/bench-fixtures/ruby" </> p)
+rbCall p = nfIO $ callGraphProject (Proxy @'Language.Ruby)   (Path.relDir "bench/bench-fixtures/ruby" </> p)
 
 benchmarks :: Benchmark
 benchmarks = bgroup "evaluation"
