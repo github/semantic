@@ -1,11 +1,12 @@
 {
-  type <- \name -> \bases -> \dict ->
-    #record { __name: name, __bases: bases, __dict: dict };
+  type <- \name -> \super -> \slots ->
+    #record { __name: name, __super: super, __slots: slots };
 
   object <- type "object" #unit #record{};
 
-  #record { type: type, object: object }
+  getitem <- rec getitem = \item -> \attr ->
+    if item.slots.?attr then item.slots.attr else #unit;
 
+  #record { type: type, object: object, getitem: getitem }
 
-  lookup <- \item -> \name -> if item.?name then item.name else item.class.name
 }
