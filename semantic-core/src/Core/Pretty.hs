@@ -74,6 +74,7 @@ prettyCore style = unPrec . go . fmap name
 
             Load p -> prec 3 (keyword "load" <+> withPrec 9 (go p))
             item :. body -> prec 9 (withPrec 9 (go item) <> symbol "." <> name body)
+            item :? body -> prec 9 (withPrec 9 (go item) <> symbol ".?" <> name body)
 
             lhs := rhs -> prec 3 . group . nest 2 $ vsep
               [ withPrec 4 (go lhs)
