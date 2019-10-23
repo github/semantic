@@ -10,8 +10,9 @@ import           Data.Abstract.Number as Number
 import           Data.Abstract.Value.Concrete as Value
 import qualified Data.Language as Language
 import           Data.Sum
-
-import SpecHelpers
+import qualified Language.Ruby.Term as Ruby
+import           Source.Loc
+import           SpecHelpers
 
 
 spec :: (?session :: TaskSession) =>  Spec
@@ -100,5 +101,4 @@ spec = do
 
   where
     fixtures = "test/fixtures/ruby/analysis/"
-    evaluate = evalRubyProject . map (fixtures <>)
-    evalRubyProject = testEvaluating <=< evaluateProject' ?session (Proxy :: Proxy 'Language.Ruby) rubyParser
+    evaluate = evaluateProject @'Language.Ruby @(Ruby.Term Loc) ?session Proxy . map (fixtures <>)

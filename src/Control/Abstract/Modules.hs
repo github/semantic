@@ -30,8 +30,10 @@ import Prologue
 import Source.Span
 import System.FilePath.Posix (takeDirectory)
 
--- A scope address, frame address, and value ref.
-type ModuleResult address value = ((address, address), value)
+-- | A scope address, frame address, and value ref.
+--
+-- Partially applied, omitting the value type for type applications at * -> *.
+type ModuleResult address = (,) (address, address)
 
 -- | Retrieve an evaluated module, if any. @Nothing@ means we’ve never tried to load it, and @Just (env, value)@ indicates the result of a completed load.
 lookupModule :: (Member (Modules address value) sig, Carrier sig m) => ModulePath -> Evaluator term address value m (Maybe (ModuleResult address value))

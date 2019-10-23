@@ -3,6 +3,7 @@ module Semantic.Api.Symbols
   ( legacyParseSymbols
   , parseSymbols
   , parseSymbolsBuilder
+  , tagsForBlob
   ) where
 
 import           Control.Effect.Error
@@ -28,7 +29,6 @@ import           Semantic.Config
 import           Semantic.Task
 import           Serializing.Format (Format)
 import           Source.Loc as Loc
-import           Source.Source
 import           Tags.Tagging
 import qualified Tags.Tagging.Precise as Precise
 
@@ -45,7 +45,7 @@ legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> distributeFoldMap 
         symbolsToSummarize = ["Function", "Method", "Class", "Module"]
 
         renderToSymbols :: ToTags t => t Loc -> [Legacy.File]
-        renderToSymbols = pure . tagsToFile . tags (blobLanguage blob) symbolsToSummarize blobSource
+        renderToSymbols = pure . tagsToFile . tags symbolsToSummarize blob
 
         tagsToFile :: [Tag] -> Legacy.File
         tagsToFile tags = Legacy.File (pack (blobPath blob)) (pack (show (blobLanguage blob))) (fmap tagToSymbol tags)
@@ -68,7 +68,7 @@ parseSymbols blobs = do
   pure $ defMessage & P.files .~ toList terms
   where
     go :: (Member (Error SomeException) sig, Member (Reader PerLanguageModes) sig, Member Parse sig, Carrier sig m) => Blob -> m File
-    go blob@Blob{..} = catching $ asks toTagsParsers >>= \ p -> parseWith p (pure . renderToSymbols) blob
+    go blob@Blob{..} = catching $ tagsToFile <$> tagsForBlob blob
       where
         catching m = m `catchError` (\(SomeException e) -> pure $ errorFile (show e))
         blobLanguage' = blobLanguage blob
@@ -79,9 +79,6 @@ parseSymbols blobs = do
           & P.symbols .~ mempty
           & P.errors .~ [defMessage & P.error .~ pack e]
           & P.blobOid .~ blobOid
-
-        renderToSymbols :: ToTags t => t Loc -> File
-        renderToSymbols term = tagsToFile (tags (blobLanguage blob) symbolsToSummarize blobSource term)
 
         tagsToFile :: [Tag] -> File
         tagsToFile tags = defMessage
@@ -99,23 +96,26 @@ parseSymbols blobs = do
           & P.maybe'span ?~ converting # Loc.span loc
           & P.maybe'docs .~ fmap (flip (set P.docstring) defMessage) docs
 
+tagsForBlob :: (Carrier sig m, Member (Error SomeException) sig, Member Parse sig, Member (Reader PerLanguageModes) sig) => Blob -> m [Tag]
+tagsForBlob blob = asks toTagsParsers >>= \p -> parseWith p (pure . tags symbolsToSummarize blob) blob
+
 symbolsToSummarize :: [Text]
 symbolsToSummarize = ["Function", "Method", "Class", "Module", "Call", "Send"]
 
 class ToTags t where
-  tags :: Language -> [Text] -> Source -> t Loc -> [Tag]
+  tags :: [Text] -> Blob -> t Loc -> [Tag]
 
 instance (Parser.TermMode term ~ strategy, ToTagsBy strategy term) => ToTags term where
   tags = tagsBy @strategy
 
 class ToTagsBy (strategy :: LanguageMode) term where
-  tagsBy :: Language -> [Text] -> Source -> term Loc -> [Tag]
+  tagsBy :: [Text] -> Blob -> term Loc -> [Tag]
 
 instance (IsTerm term, IsTaggable (Syntax term), Base (term Loc) ~ TermF (Syntax term) Loc, Recursive (term Loc), Declarations (term Loc)) => ToTagsBy 'ALaCarte term where
-  tagsBy = runTagging
+  tagsBy symbols blob = runTagging (blobLanguage blob) symbols (blobSource blob)
 
 instance Precise.ToTags term => ToTagsBy 'Precise term where
-  tagsBy _ _ = Precise.tags
+  tagsBy _ = Precise.tags . blobSource
 
 
 toTagsParsers :: PerLanguageModes -> Map Language (Parser.SomeParser ToTags Loc)
