@@ -7,7 +7,7 @@ module Parsing.Parser
 , goParser'
 , javaParser'
 , javascriptParser'
-, jsonParserPrecise'
+, jsonParser'
 , jsxParser'
 , markdownParser'
 , phpParser'
@@ -109,8 +109,8 @@ javaParser' = (Java, SomeParser (UnmarshalParser @Java.Term Java.tree_sitter_jav
 javascriptParser' :: c TSX.Term => (Language, SomeParser c Loc)
 javascriptParser' = (JavaScript, SomeParser (AssignmentParser (ASTParser tree_sitter_tsx) TSX.assignment))
 
-jsonParserPrecise' :: c JSON.Term => (Language, SomeParser c Loc)
-jsonParserPrecise' = (JSON, SomeParser (UnmarshalParser @JSON.Term JSON.tree_sitter_json))
+jsonParser' :: c JSON.Term => (Language, SomeParser c Loc)
+jsonParser' = (JSON, SomeParser (UnmarshalParser @JSON.Term JSON.tree_sitter_json))
 
 jsxParser' :: c TSX.Term => (Language, SomeParser c Loc)
 jsxParser' = (JSX, SomeParser (AssignmentParser (ASTParser tree_sitter_tsx) TSX.assignment))
@@ -182,7 +182,7 @@ preciseParsers
   => Map Language (SomeParser c Loc)
 preciseParsers = Map.fromList
   [ javaParser'
-  , jsonParserPrecise'
+  , jsonParser'
   , pythonParserPrecise'
   ]
 
@@ -205,7 +205,7 @@ allParsers modes = Map.fromList
   [ goParser'
   , javaParser'
   , javascriptParser'
-  , jsonParserPrecise'
+  , jsonParser'
   , jsxParser'
   , markdownParser'
   , phpParser'
