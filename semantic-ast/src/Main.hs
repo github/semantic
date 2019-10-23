@@ -39,8 +39,10 @@ parseAST = SemanticAST
       <> help "Specify source input to parse"
       ))
 
+
 main :: IO ()
 main = generateAST =<< execParser opts
+
 
 generateAST :: SemanticAST -> IO ()
 generateAST (SemanticAST format color source) =
