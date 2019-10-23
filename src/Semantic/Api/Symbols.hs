@@ -28,7 +28,6 @@ import           Semantic.Config
 import           Semantic.Task
 import           Serializing.Format (Format)
 import           Source.Loc as Loc
-import           Source.Source
 import           Tags.Tagging
 import qualified Tags.Tagging.Precise as Precise
 
@@ -45,7 +44,7 @@ legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> distributeFoldMap 
         symbolsToSummarize = ["Function", "Method", "Class", "Module"]
 
         renderToSymbols :: ToTags t => t Loc -> [Legacy.File]
-        renderToSymbols = pure . tagsToFile . tags (blobLanguage blob) symbolsToSummarize blobSource
+        renderToSymbols = pure . tagsToFile . tags symbolsToSummarize blob
 
         tagsToFile :: [Tag] -> Legacy.File
         tagsToFile tags = Legacy.File (pack (blobPath blob)) (pack (show (blobLanguage blob))) (fmap tagToSymbol tags)
@@ -81,7 +80,7 @@ parseSymbols blobs = do
           & P.blobOid .~ blobOid
 
         tagsForTerm :: ToTags t => t Loc -> [Tag]
-        tagsForTerm term = tags (blobLanguage blob) symbolsToSummarize blobSource term
+        tagsForTerm = tags symbolsToSummarize blob
 
         tagsToFile :: [Tag] -> File
         tagsToFile tags = defMessage
@@ -103,19 +102,19 @@ symbolsToSummarize :: [Text]
 symbolsToSummarize = ["Function", "Method", "Class", "Module", "Call", "Send"]
 
 class ToTags t where
-  tags :: Language -> [Text] -> Source -> t Loc -> [Tag]
+  tags :: [Text] -> Blob -> t Loc -> [Tag]
 
 instance (Parser.TermMode term ~ strategy, ToTagsBy strategy term) => ToTags term where
   tags = tagsBy @strategy
 
 class ToTagsBy (strategy :: LanguageMode) term where
-  tagsBy :: Language -> [Text] -> Source -> term Loc -> [Tag]
+  tagsBy :: [Text] -> Blob -> term Loc -> [Tag]
 
 instance (IsTerm term, IsTaggable (Syntax term), Base (term Loc) ~ TermF (Syntax term) Loc, Recursive (term Loc), Declarations (term Loc)) => ToTagsBy 'ALaCarte term where
-  tagsBy = runTagging
+  tagsBy symbols blob = runTagging (blobLanguage blob) symbols (blobSource blob)
 
 instance Precise.ToTags term => ToTagsBy 'Precise term where
-  tagsBy _ _ = Precise.tags
+  tagsBy _ = Precise.tags . blobSource
 
 
 toTagsParsers :: PerLanguageModes -> Map Language (Parser.SomeParser ToTags Loc)
