@@ -3,6 +3,7 @@ module Semantic.Api.Symbols
   ( legacyParseSymbols
   , parseSymbols
   , parseSymbolsBuilder
+  , tagsForBlob
   ) where
 
 import           Control.Effect.Error
@@ -67,7 +68,7 @@ parseSymbols blobs = do
   pure $ defMessage & P.files .~ toList terms
   where
     go :: (Member (Error SomeException) sig, Member (Reader PerLanguageModes) sig, Member Parse sig, Carrier sig m) => Blob -> m File
-    go blob@Blob{..} = catching $ asks toTagsParsers >>= \ p -> parseWith p (pure . tagsToFile . tagsForTerm) blob
+    go blob@Blob{..} = catching $ tagsToFile <$> tagsForBlob blob
       where
         catching m = m `catchError` (\(SomeException e) -> pure $ errorFile (show e))
         blobLanguage' = blobLanguage blob
@@ -78,9 +79,6 @@ parseSymbols blobs = do
           & P.symbols .~ mempty
           & P.errors .~ [defMessage & P.error .~ pack e]
           & P.blobOid .~ blobOid
-
-        tagsForTerm :: ToTags t => t Loc -> [Tag]
-        tagsForTerm = tags symbolsToSummarize blob
 
         tagsToFile :: [Tag] -> File
         tagsToFile tags = defMessage
@@ -97,6 +95,9 @@ parseSymbols blobs = do
           & P.line .~ line
           & P.maybe'span ?~ converting # Loc.span loc
           & P.maybe'docs .~ fmap (flip (set P.docstring) defMessage) docs
+
+tagsForBlob :: (Carrier sig m, Member (Error SomeException) sig, Member Parse sig, Member (Reader PerLanguageModes) sig) => Blob -> m [Tag]
+tagsForBlob blob = asks toTagsParsers >>= \p -> parseWith p (pure . tags symbolsToSummarize blob) blob
 
 symbolsToSummarize :: [Text]
 symbolsToSummarize = ["Function", "Method", "Class", "Module", "Call", "Send"]
