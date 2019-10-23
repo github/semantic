@@ -46,26 +46,6 @@ data Value term address
   | Hole
   deriving (Eq, Ord, Show, Generic, NFData)
 
-instance Bifunctor Value where
-  bimap term addr = go where
-    go = \case
-      Closure p m n v as b s f -> Closure p m n (fmap go v) as (fmap term b) (addr s) (addr f)
-      Unit -> Unit
-      Boolean b -> Boolean b
-      Integer i -> Integer i
-      Rational r -> Rational r
-      Float f -> Float f
-      String s -> String s
-      Tuple vs -> Tuple (map go vs)
-      Array vs -> Array (map go vs)
-      Class d vs a -> Class d (map go vs) (addr a)
-      Object a -> Object (addr a)
-      Namespace n a -> Namespace n (addr a)
-      KVPair k v -> KVPair (go k) (go v)
-      Hash vs -> Hash (map go vs)
-      Null -> Null
-      Hole -> Hole
-
 
 instance ValueRoots address (Value term address) where
   valueRoots _ = lowerBound
