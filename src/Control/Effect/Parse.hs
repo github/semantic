@@ -38,7 +38,7 @@ parse :: (Member Parse sig, Carrier sig m)
 parse parser blob = send (Parse parser blob pure)
 
 
--- | Select a parser for the given language.
+-- | Select a parser for the given 'Language'.
 parserForLanguage :: Map.Map Language (SomeParser c ann) -> Language -> Maybe (SomeParser c ann)
 parserForLanguage = flip Map.lookup
 
