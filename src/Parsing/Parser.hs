@@ -1,16 +1,7 @@
 {-# LANGUAGE ConstraintKinds, DataKinds, GADTs, TypeFamilies #-}
 module Parsing.Parser
 ( Parser(..)
--- * À la carte parsers
-, goParser
-, markdownParser
-, pythonParser
-, rubyParser
-, tsxParser
-, typescriptParser
-, phpParser
-  -- * Abstract parsers
-
+  -- * Parsers
   -- $abstract
 , SomeParser(..)
 , goParser'
