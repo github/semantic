@@ -49,7 +49,6 @@ import Data.Foldable (toList)
 import Data.Functor.Listable as X
 import Data.Language as X hiding (Precise)
 import Data.List.NonEmpty as X (NonEmpty(..))
-import qualified Data.Map as Map
 import Data.Maybe as X
 import Data.Monoid as X (Monoid(..), First(..), Last(..))
 import Data.Project as X
@@ -165,7 +164,7 @@ testEvaluating
 type Val term = Value term Precise
 
 evaluateProject :: (HasPrelude lang, SLanguage lang) => TaskSession -> Proxy lang -> [FilePath] -> IO (TestEvaluatingState term (TestEvaluatingResult term))
-evaluateProject session proxy = case Map.lookup lang analysisParsers of
+evaluateProject session proxy = case parserForLanguage analysisParsers lang of
   Just (SomeParser parser) -> unsafeCoerce . testEvaluating <=< evaluateProject' session proxy parser
   _                        -> error $ "analysis not supported for " <> show lang
   where lang = reflect proxy

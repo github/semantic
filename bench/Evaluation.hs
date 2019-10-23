@@ -16,7 +16,6 @@ import           Data.Functor.Foldable (Base, Recursive)
 import           "semantic" Data.Graph (Graph (..), topologicalSort)
 import           Data.Graph.ControlFlowVertex
 import qualified Data.Language as Language
-import qualified Data.Map as Map
 import           Data.Project
 import           Data.Proxy
 import           Data.Term
@@ -42,7 +41,7 @@ callGraphProject' :: ( Language.SLanguage lang
                   -> IO (Either String (Data.Graph.Graph ControlFlowVertex))
 callGraphProject' session proxy path
   | let lang = Language.reflect proxy
-  , Just (SomeParser parser) <- Map.lookup lang analysisParsers = fmap (first show) . runTask session $ do
+  , Just (SomeParser parser) <- parserForLanguage analysisParsers lang = fmap (first show) . runTask session $ do
   blob <- readBlobFromFile' (fileForTypedPath path)
   package <- fmap snd <$> runParse (Duration.fromSeconds 10) (parsePackage parser (Project (Path.toString (Path.takeDirectory path)) [blob] lang []))
   modules <- topologicalSort <$> runImportGraphToModules proxy package
@@ -53,7 +52,7 @@ callGraphProject proxy paths = withOptions defaultOptions $ \ config logger stat
 
 evaluateProject proxy path
   | let lang = Language.reflect proxy
-  , Just (SomeParser parser) <- Map.lookup lang analysisParsers = withOptions defaultOptions $ \ config logger statter ->
+  , Just (SomeParser parser) <- parserForLanguage analysisParsers lang = withOptions defaultOptions $ \ config logger statter ->
   fmap (const ()) . justEvaluating =<< evaluateProject' (TaskSession config "" False logger statter) proxy parser [Path.toString path]
 
 pyEval :: Path.RelFile -> Benchmarkable

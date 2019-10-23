@@ -19,7 +19,7 @@ callGraphPythonProject :: Path.RelFile -> IO (Semantic.Graph.Graph ControlFlowVe
 callGraphPythonProject path = runTaskOrDie $ do
   let proxy = Proxy @'Language.Python
       lang = Language.Python
-  SomeParser parser <- pure . fromJust $! Map.lookup Language.Python analysisParsers
+  SomeParser parser <- pure . fromJust $! parserForLanguage analysisParsers Language.Python
   blob <- readBlobFromFile' (fileForTypedPath path)
   package <- fmap snd <$> parsePackage parser (Project (Path.toString (Path.takeDirectory path)) [blob] lang [])
   modules <- topologicalSort <$> runImportGraphToModules proxy package

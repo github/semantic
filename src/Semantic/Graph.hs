@@ -122,7 +122,7 @@ runGraph :: ( Member Distribute sig
          -> Project
          -> m (Graph ControlFlowVertex)
 runGraph type' includePackages project
-  | Just (SomeParser parser) <- Map.lookup (projectLanguage project) analysisParsers
+  | Just (SomeParser parser) <- parserForLanguage analysisParsers (projectLanguage project)
   , SomeLanguage (lang :: Proxy lang) <- reifyLanguage (projectLanguage project) = do
     package <- if projectLanguage project == Language.Python then
         parsePythonPackage parser project
