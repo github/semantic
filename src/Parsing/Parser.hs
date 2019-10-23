@@ -161,8 +161,8 @@ pythonParserPrecise' = (Python, SomeParser pythonParserPrecise)
 
 pythonParser' :: (c PythonALaCarte.Term, c PythonPrecise.Term) => PerLanguageModes -> (Language, SomeParser c Loc)
 pythonParser' modes = case pythonMode modes of
-  ALaCarte -> (Python, SomeParser pythonParser)
-  Precise  -> (Python, SomeParser pythonParserPrecise)
+  ALaCarte -> pythonParserALaCarte'
+  Precise  -> pythonParserPrecise'
 
 rubyParser' :: c Ruby.Term => (Language, SomeParser c Loc)
 rubyParser' = (Ruby, SomeParser rubyParser)
