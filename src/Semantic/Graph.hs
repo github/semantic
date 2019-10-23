@@ -101,13 +101,13 @@ instance
 
 analysisParsers :: Map Language (SomeParser AnalyzeTerm Loc)
 analysisParsers = Map.fromList
-  [ goParser'
-  , javascriptParser'
-  , phpParser'
-  , pythonParserALaCarte'
-  , rubyParser'
-  , typescriptParser'
-  , tsxParser'
+  [ goParser
+  , javascriptParser
+  , phpParser
+  , pythonParserALaCarte
+  , rubyParser
+  , typescriptParser
+  , tsxParser
   ]
 
 runGraph :: ( Member Distribute sig
