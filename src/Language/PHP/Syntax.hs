@@ -202,7 +202,7 @@ instance Evaluatable QualifiedName where
         unit
 
 newtype NamespaceName a = NamespaceName { names :: NonEmpty a }
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, NFData1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Ord, Show, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically NamespaceName
 
 instance Hashable1 NamespaceName where liftHashWithSalt = foldl
