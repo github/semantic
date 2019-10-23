@@ -5,7 +5,6 @@ module Core.Parser
   , expr
   , record
   , comp
-  , lvalue
   ) where
 
 -- Consult @doc/grammar.md@ for an EBNF grammar.
@@ -102,13 +101,6 @@ rec = Core.rec <$ reserved "rec" <*> name <* symbolic '=' <*> expr <?> "recursiv
 
 load :: (TokenParsing m, Carrier sig t, Member Core sig, Monad m) => m (t Name)
 load = Core.load <$ reserved "load" <*> expr
-
-lvalue :: (TokenParsing m, Carrier sig t, Member Core sig, Monad m) => m (t Name)
-lvalue = choice
-  [ projection
-  , ident
-  , parens expr
-  ]
 
 -- * Literals
 
