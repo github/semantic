@@ -59,7 +59,7 @@ cleanNameOrPath :: Text -> String
 cleanNameOrPath = T.unpack . dropRelativePrefix . stripQuotes
 
 data Send a = Send { sendReceiver :: Maybe a, sendSelector :: Maybe a, sendArgs :: [a], sendBlock :: Maybe a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Send
 
 instance Evaluatable Send where
@@ -83,7 +83,7 @@ instance Evaluatable Send where
     maybe callFunction (`withScopeAndFrame` callFunction) lhsFrame
 
 data Require a = Require { requireRelative :: Bool, requirePath :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Require
 
 instance Evaluatable Require where
@@ -110,7 +110,7 @@ doRequire path = do
 
 
 data Load a = Load { loadPath :: a, loadWrap :: Maybe a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Load
 
 instance Evaluatable Load where
@@ -151,7 +151,7 @@ doLoad path shouldWrap = do
 -- TODO: autoload
 
 data Class a = Class { classIdentifier :: !a, classSuperClass :: !(Maybe a), classBody :: !a }
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, FreeVariables1, ToJSONFields1, NFData1)
+  deriving (Foldable, Traversable, Functor, Generic1, Hashable1, FreeVariables1, ToJSONFields1, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Class
 
 instance Diffable Class where
@@ -208,7 +208,7 @@ instance Declarations1 Class where
 
 
 data Module a = Module { moduleIdentifier :: !a, moduleStatements :: ![a] }
-  deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
+  deriving (Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Module
 
 instance Evaluatable Module where
@@ -252,7 +252,7 @@ instance Declarations1 Module where
 
 
 data LowPrecedenceAnd a = LowPrecedenceAnd { lhs :: a, rhs :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically LowPrecedenceAnd
 
 instance Evaluatable LowPrecedenceAnd where
@@ -264,7 +264,7 @@ instance Evaluatable LowPrecedenceAnd where
 
 
 data LowPrecedenceOr a = LowPrecedenceOr { lhs :: a, rhs :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically LowPrecedenceOr
 
 instance Evaluatable LowPrecedenceOr where
@@ -275,7 +275,7 @@ instance Evaluatable LowPrecedenceOr where
       ifthenelse cond (pure cond) b
 
 data Assignment a = Assignment { assignmentContext :: ![a], assignmentTarget :: !a, assignmentValue :: !a }
-  deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
+  deriving (Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Assignment
 
 instance Declarations1 Assignment where
@@ -312,7 +312,7 @@ instance Evaluatable Assignment where
 -- the semantics of invoking @super()@ but implicitly passing the current function's
 -- arguments to the @super()@ invocation.
 data ZSuper a = ZSuper
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically ZSuper
 
 instance Evaluatable ZSuper

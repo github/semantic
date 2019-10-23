@@ -17,7 +17,7 @@ import           Diffing.Algorithm
 import           Source.Span
 
 data Function a = Function { functionContext :: ![a], functionName :: !a, functionParameters :: ![a], functionBody :: !a }
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, ToJSONFields1, NFData1)
+  deriving (Foldable, Traversable, Functor, Generic1, Hashable1, ToJSONFields1, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Function
 
 instance Diffable Function where
@@ -72,7 +72,7 @@ data Method a = Method
   , methodBody :: a
   , methodAccessControl :: ScopeGraph.AccessControl
   }
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, ToJSONFields1, NFData1)
+  deriving (Foldable, Traversable, Functor, Generic1, Hashable1, ToJSONFields1, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Method
 
 instance Diffable Method where
@@ -108,7 +108,7 @@ data MethodSignature a = MethodSignature
   , methodSignatureParameters :: [a]
   , methodSignatureAccessControl :: ScopeGraph.AccessControl
   }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically MethodSignature
 
 -- TODO: Implement Eval instance for MethodSignature
@@ -116,7 +116,7 @@ instance Evaluatable MethodSignature
 
 
 newtype RequiredParameter a = RequiredParameter { requiredParameter :: a }
-  deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
+  deriving (Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically RequiredParameter
 
 instance Declarations1 RequiredParameter where
@@ -131,7 +131,7 @@ instance Evaluatable RequiredParameter where
 
 
 newtype OptionalParameter a = OptionalParameter { optionalParameter :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically OptionalParameter
 
 -- TODO: Implement Eval instance for OptionalParameter
@@ -143,7 +143,7 @@ instance Evaluatable OptionalParameter
 -- TODO: It would be really nice to have a more meaningful type contained in here than [a]
 -- | A declaration of possibly many variables such as var foo = 5, bar = 6 in JavaScript.
 newtype VariableDeclaration a = VariableDeclaration { variableDeclarations :: [a] }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically VariableDeclaration
 
 instance Evaluatable VariableDeclaration where
@@ -163,7 +163,7 @@ instance Declarations a => Declarations (VariableDeclaration a) where
 -- | A TypeScript/Java style interface declaration to implement.
 
 data InterfaceDeclaration a = InterfaceDeclaration { interfaceDeclarationContext :: ![a], interfaceDeclarationIdentifier :: !a, interfaceDeclarationSuperInterfaces :: ![a], interfaceDeclarationBody :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically InterfaceDeclaration
 
 -- TODO: Implement Eval instance for InterfaceDeclaration
@@ -180,7 +180,7 @@ data PublicFieldDefinition a = PublicFieldDefinition
   , publicFieldValue :: a
   , publicFieldAccessControl :: ScopeGraph.AccessControl
   }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically PublicFieldDefinition
 
 -- TODO: Implement Eval instance for PublicFieldDefinition
@@ -194,14 +194,14 @@ instance Evaluatable PublicFieldDefinition where
     unit
 
 data Variable a = Variable { variableName :: !a, variableType :: !a, variableValue :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Variable
 
 -- TODO: Implement Eval instance for Variable
 instance Evaluatable Variable
 
 data Class a = Class { classContext :: ![a], classIdentifier :: !a, classSuperclasses :: ![a], classBody :: !a }
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, FreeVariables1, ToJSONFields1, NFData1)
+  deriving (Foldable, Traversable, Functor, Generic1, Hashable1, FreeVariables1, ToJSONFields1, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Class
 
 instance Declarations a => Declarations (Class a) where
@@ -246,7 +246,7 @@ instance Declarations1 Class where
 
 -- | A decorator in Python
 data Decorator a = Decorator { decoratorIdentifier :: !a, decoratorParamaters :: ![a], decoratorBody :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Decorator
 
 -- TODO: Implement Eval instance for Decorator
@@ -257,7 +257,7 @@ instance Evaluatable Decorator
 
 -- | An ADT, i.e. a disjoint sum of products, like 'data' in Haskell, or 'enum' in Rust or Swift.
 data Datatype a = Datatype { datatypeContext :: a, datatypeName :: a, datatypeConstructors :: [a], datatypeDeriving :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Datatype
 
 -- TODO: Implement Eval instance for Datatype
@@ -266,7 +266,7 @@ instance Evaluatable Data.Syntax.Declaration.Datatype
 
 -- | A single constructor in a datatype, or equally a 'struct' in C, Rust, or Swift.
 data Constructor a = Constructor { constructorContext :: [a], constructorName :: a, constructorFields :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Constructor
 
 -- TODO: Implement Eval instance for Constructor
@@ -275,7 +275,7 @@ instance Evaluatable Data.Syntax.Declaration.Constructor
 
 -- | Comprehension (e.g. ((a for b in c if a()) in Python)
 data Comprehension a = Comprehension { comprehensionValue :: !a, comprehensionBody :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Comprehension
 
 -- TODO: Implement Eval instance for Comprehension
@@ -284,7 +284,7 @@ instance Evaluatable Comprehension
 
 -- | A declared type (e.g. `a []int` in Go).
 data Type a = Type { typeName :: !a, typeKind :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically Type
 
 -- TODO: Implement Eval instance for Type
@@ -293,7 +293,7 @@ instance Evaluatable Type
 
 -- | Type alias declarations in Javascript/Haskell, etc.
 data TypeAlias a = TypeAlias { typeAliasContext :: ![a], typeAliasIdentifier :: !a, typeAliasKind :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable, NFData1)
   deriving (Eq1, Show1, Ord1) via Generically TypeAlias
 
 instance Evaluatable TypeAlias where
