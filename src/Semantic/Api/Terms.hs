@@ -1,22 +1,21 @@
-{-# LANGUAGE ConstraintKinds, MonoLocalBinds, RankNTypes #-}
+{-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, RankNTypes, ScopedTypeVariables, TypeFamilies, UndecidableInstances #-}
 module Semantic.Api.Terms
   ( termGraph
   , parseTermBuilder
   , TermOutputFormat(..)
   ) where
 
-import           Analysis.ConstructorName (ConstructorName)
 import           Control.Effect.Error
 import           Control.Effect.Parse
 import           Control.Effect.Reader
 import           Control.Lens
 import           Control.Monad
 import           Control.Monad.IO.Class
+import           Data.Aeson (ToJSON)
 import           Data.Blob
 import           Data.ByteString.Builder
 import           Data.Either
 import           Data.Graph
-import           Data.JSON.Fields
 import           Data.Language
 import           Data.ProtoLens (defMessage)
 import           Data.Quieterm
@@ -35,22 +34,22 @@ import           Semantic.Config
 import           Semantic.Task
 import           Serializing.Format hiding (JSON)
 import qualified Serializing.Format as Format
-import qualified Serializing.SExpression as SExpr (serializeSExpression)
+import qualified Serializing.SExpression as SExpr
 import qualified Serializing.SExpression.Precise as SExpr.Precise (serializeSExpression)
 import           Source.Loc
 
 import qualified Language.Java as Java
 import qualified Language.JSON as JSON
-import qualified Language.Python as Python
+import qualified Language.Python as PythonPrecise
 
 
-termGraph :: (Traversable t, Member Distribute sig, ParseEffects sig m) => t Blob -> m ParseTreeGraphResponse
+termGraph :: (Traversable t, Member Distribute sig, Member (Error SomeException) sig, Member Parse sig, Carrier sig m) => t Blob -> m ParseTreeGraphResponse
 termGraph blobs = do
   terms <- distributeFor blobs go
   pure $ defMessage
     & P.files .~ toList terms
   where
-    go :: ParseEffects sig m => Blob -> m ParseTreeFileGraph
+    go :: (Member (Error SomeException) sig, Member Parse sig, Carrier sig m) => Blob -> m ParseTreeFileGraph
     go blob = parseWith jsonGraphTermParsers (pure . jsonGraphTerm blob) blob
       `catchError` \(SomeException e) ->
         pure $ defMessage
@@ -72,7 +71,7 @@ data TermOutputFormat
   | TermQuiet
   deriving (Eq, Show)
 
-parseTermBuilder :: (Traversable t, Member Distribute sig, ParseEffects sig m, MonadIO m)
+parseTermBuilder :: (Traversable t, Member Distribute sig, Member (Error SomeException) sig, Member (Reader PerLanguageModes) sig, Member Parse sig, Member (Reader Config) sig, Carrier sig m, MonadIO m)
   => TermOutputFormat -> t Blob -> m Builder
 parseTermBuilder TermJSONTree    = distributeFoldMap jsonTerm >=> serialize Format.JSON -- NB: Serialize happens at the top level for these two JSON formats to collect results of multiple blobs.
 parseTermBuilder TermJSONGraph   = termGraph >=> serialize Format.JSON
@@ -81,13 +80,13 @@ parseTermBuilder TermDotGraph    = distributeFoldMap (parseWith dotGraphTermPars
 parseTermBuilder TermShow        = distributeFoldMap (\ blob -> asks showTermParsers >>= \ parsers -> parseWith parsers showTerm blob)
 parseTermBuilder TermQuiet       = distributeFoldMap quietTerm
 
-jsonTerm :: ParseEffects sig m => Blob -> m (Rendering.JSON.JSON "trees" SomeJSON)
+jsonTerm :: (Member (Error SomeException) sig, Member Parse sig, Carrier sig m) => Blob -> m (Rendering.JSON.JSON "trees" SomeJSON)
 jsonTerm blob = parseWith jsonTreeTermParsers (pure . jsonTreeTerm blob) blob `catchError` jsonError blob
 
 jsonError :: Applicative m => Blob -> SomeException -> m (Rendering.JSON.JSON "trees" SomeJSON)
 jsonError blob (SomeException e) = pure $ renderJSONError blob (show e)
 
-quietTerm :: (ParseEffects sig m, MonadIO m) => Blob -> m Builder
+quietTerm :: (Member (Error SomeException) sig, Member (Reader PerLanguageModes) sig, Member Parse sig, Member (Reader Config) sig, Carrier sig m, MonadIO m) => Blob -> m Builder
 quietTerm blob = showTiming blob <$> time' ( asks showTermParsers >>= \ parsers -> parseWith parsers (fmap (const (Right ())) . showTerm) blob `catchError` timingError )
   where
     timingError (SomeException e) = pure (Left (show e))
@@ -96,26 +95,29 @@ quietTerm blob = showTiming blob <$> time' ( asks showTermParsers >>= \ parsers 
       in stringUtf8 (status <> "\t" <> show (blobLanguage blob) <> "\t" <> blobPath blob <> "\t" <> show duration <> " ms\n")
 
 
-type ParseEffects sig m = (Member (Error SomeException) sig, Member (Reader PerLanguageModes) sig, Member Parse sig, Member (Reader Config) sig, Carrier sig m)
-
-
 showTermParsers :: PerLanguageModes -> Map Language (SomeParser ShowTerm Loc)
 showTermParsers = allParsers
 
 class ShowTerm term where
   showTerm :: (Carrier sig m, Member (Reader Config) sig) => term Loc -> m Builder
 
-instance (Functor syntax, Show1 syntax) => ShowTerm (Term syntax) where
-  showTerm = serialize Show . quieterm
+instance (TermMode term ~ strategy, ShowTermBy strategy term) => ShowTerm term where
+  showTerm = showTermBy @strategy
 
-instance ShowTerm Java.Term where
-  showTerm = serialize Show . void . Java.getTerm
+class ShowTermBy (strategy :: LanguageMode) term where
+  showTermBy :: (Carrier sig m, Member (Reader Config) sig) => term Loc -> m Builder
 
-instance ShowTerm JSON.Term where
-  showTerm = serialize Show . void . JSON.getTerm
+instance ShowTermBy 'Precise Java.Term where
+  showTermBy = serialize Show . void . Java.getTerm
 
-instance ShowTerm Python.Term where
-  showTerm = serialize Show . void . Python.getTerm
+instance ShowTermBy 'Precise JSON.Term where
+  showTermBy = serialize Show . void . JSON.getTerm
+
+instance ShowTermBy 'Precise PythonPrecise.Term where
+  showTermBy = serialize Show . void . PythonPrecise.getTerm
+
+instance (Recursive (term Loc), Show1 syntax, Base (term Loc) ~ TermF syntax Loc) => ShowTermBy 'ALaCarte term where
+  showTermBy = serialize Show . quieterm
 
 
 sexprTermParsers :: PerLanguageModes -> Map Language (SomeParser SExprTerm Loc)
@@ -124,17 +126,23 @@ sexprTermParsers = allParsers
 class SExprTerm term where
   sexprTerm :: term Loc -> Builder
 
-instance (ConstructorName syntax, Foldable syntax, Functor syntax) => SExprTerm (Term syntax) where
-  sexprTerm = SExpr.serializeSExpression ByConstructorName
+instance (TermMode term ~ strategy, SExprTermBy strategy term) => SExprTerm term where
+  sexprTerm = sexprTermBy @strategy
 
-instance SExprTerm Java.Term where
-  sexprTerm = SExpr.Precise.serializeSExpression . Java.getTerm
+class SExprTermBy (strategy :: LanguageMode) term where
+  sexprTermBy :: term Loc -> Builder
 
-instance SExprTerm JSON.Term where
-  sexprTerm = SExpr.Precise.serializeSExpression . JSON.getTerm
+instance SExprTermBy 'Precise Java.Term where
+  sexprTermBy = SExpr.Precise.serializeSExpression . Java.getTerm
 
-instance SExprTerm Python.Term where
-  sexprTerm = SExpr.Precise.serializeSExpression . Python.getTerm
+instance SExprTermBy 'Precise JSON.Term where
+  sexprTermBy = SExpr.Precise.serializeSExpression . JSON.getTerm
+
+instance SExprTermBy 'Precise PythonPrecise.Term where
+  sexprTermBy = SExpr.Precise.serializeSExpression . PythonPrecise.getTerm
+
+instance (Recursive (term Loc), SExpr.ToSExpression (Base (term Loc))) => SExprTermBy 'ALaCarte term where
+  sexprTermBy = SExpr.serializeSExpression ByConstructorName
 
 
 dotGraphTermParsers :: Map Language (SomeParser DOTGraphTerm Loc)
@@ -143,7 +151,7 @@ dotGraphTermParsers = aLaCarteParsers
 class DOTGraphTerm term where
   dotGraphTerm :: (Carrier sig m, Member (Reader Config) sig) => term Loc -> m Builder
 
-instance (ConstructorName syntax, Foldable syntax, Functor syntax) => DOTGraphTerm (Term syntax) where
+instance (Recursive (term Loc), ToTreeGraph TermVertex (Base (term Loc))) => DOTGraphTerm term where
   dotGraphTerm = serialize (DOT (termStyle "terms")) . renderTreeGraph
 
 
@@ -153,7 +161,7 @@ jsonTreeTermParsers = aLaCarteParsers
 class JSONTreeTerm term where
   jsonTreeTerm :: Blob -> term Loc -> Rendering.JSON.JSON "trees" SomeJSON
 
-instance ToJSONFields1 syntax => JSONTreeTerm (Term syntax) where
+instance ToJSON (term Loc) => JSONTreeTerm term where
   jsonTreeTerm = renderJSONTerm
 
 
@@ -163,15 +171,15 @@ jsonGraphTermParsers = aLaCarteParsers
 class JSONGraphTerm term where
   jsonGraphTerm :: Blob -> term Loc -> ParseTreeFileGraph
 
-instance (Foldable syntax, Functor syntax, ConstructorName syntax) => JSONGraphTerm (Term syntax) where
+instance (Recursive (term Loc), ToTreeGraph TermVertex (Base (term Loc))) => JSONGraphTerm term where
   jsonGraphTerm blob t
     = let graph = renderTreeGraph t
           toEdge (Edge (a, b)) = defMessage & P.source .~ a^.vertexId & P.target .~ b^.vertexId
           path = T.pack $ blobPath blob
           lang = bridging # blobLanguage blob
       in defMessage
-          & P.path .~ path
+          & P.path     .~ path
           & P.language .~ lang
           & P.vertices .~ vertexList graph
-          & P.edges .~ fmap toEdge (edgeList graph)
-          & P.errors .~ mempty
+          & P.edges    .~ fmap toEdge (edgeList graph)
+          & P.errors   .~ mempty

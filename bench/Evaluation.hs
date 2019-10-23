@@ -12,6 +12,7 @@ import           Data.Blob
 import           Data.Blob.IO (readBlobFromFile')
 import           Data.Bifunctor
 import           Data.Functor.Classes
+import           Data.Functor.Foldable (Base, Recursive)
 import           "semantic" Data.Graph (Graph (..), topologicalSort)
 import           Data.Graph.ControlFlowVertex
 import qualified Data.Language as Language
@@ -25,24 +26,27 @@ import           Semantic.Graph
 import           Semantic.Task (SomeException, TaskSession (..), runTask, withOptions)
 import           Semantic.Util hiding (evalPythonProject, evalRubyProject, evaluateProject)
 import           Source.Loc
+import           Source.Span (HasSpan)
 import qualified System.Path as Path
 import           System.Path ((</>))
 
 -- Duplicating this stuff from Util to shut off the logging
 
 callGraphProject' :: ( Language.SLanguage lang
-                     , Ord1 syntax
-                     , Declarations1 syntax
-                     , Evaluatable syntax
-                     , FreeVariables1 syntax
-                     , AccessControls1 syntax
                      , HasPrelude lang
-                     , Functor syntax
-                     , VertexDeclaration1 syntax
+                     , AccessControls (term Loc)
+                     , Declarations (term Loc)
+                     , Evaluatable (Base (term Loc))
+                     , FreeVariables (term Loc)
+                     , HasSpan (term Loc)
+                     , Ord (term Loc)
+                     , Recursive (term Loc)
+                     , Show (term Loc)
+                     , VertexDeclaration term
                      )
                   => TaskSession
                   -> Proxy lang
-                  -> Parser (Term syntax Loc)
+                  -> Parser (term Loc)
                   -> Path.RelFile
                   -> IO (Either String (Data.Graph.Graph ControlFlowVertex))
 callGraphProject' session proxy parser path = fmap (first show) . runTask session $ do

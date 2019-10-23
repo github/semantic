@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, TypeOperators #-}
+{-# LANGUAGE DeriveFunctor, DerivingStrategies, FlexibleContexts, GeneralizedNewtypeDeriving, TypeOperators #-}
 module Core.Parser
   ( core
   , lit
@@ -13,16 +13,26 @@ module Core.Parser
 import           Control.Applicative
 import           Control.Category ((>>>))
 import           Control.Effect.Carrier
+import           Control.Monad
 import           Core.Core ((:<-) (..), Core)
 import qualified Core.Core as Core
 import           Core.Name
 import qualified Data.Char as Char
 import           Data.String
+import           Text.Parser.LookAhead (LookAheadParsing)
 import qualified Text.Parser.Token as Token
 import qualified Text.Parser.Token.Highlight as Highlight
+import qualified Text.Parser.Token.Style as Style
 import           Text.Trifecta hiding (ident)
 
 -- * Identifier styles and derived parsers
+
+newtype CoreParser m a = CoreParser { runCoreParser :: m a }
+  deriving stock Functor
+  deriving newtype (Alternative, Applicative, CharParsing, DeltaParsing, Errable, LookAheadParsing, Monad, MonadPlus, Parsing)
+
+instance TokenParsing m => TokenParsing (CoreParser m) where
+  someSpace = Style.buildSomeSpaceParser (void (satisfy Char.isSpace)) Style.haskellCommentStyle
 
 validIdentifierStart :: Char -> Bool
 validIdentifierStart c = not (Char.isDigit c) && isSimpleCharacter c
@@ -48,7 +58,7 @@ identifier = choice [quote, plain] <?> "identifier" where
 -- * Parsers (corresponding to EBNF)
 
 core :: (TokenParsing m, Carrier sig t, Member Core sig, Monad m) => m (t Name)
-core = expr
+core = runCoreParser expr
 
 expr :: (TokenParsing m, Carrier sig t, Member Core sig, Monad m) => m (t Name)
 expr = ifthenelse <|> lambda <|> rec <|> load <|> assign

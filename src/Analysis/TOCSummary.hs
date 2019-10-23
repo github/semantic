@@ -1,4 +1,4 @@
-{-# LANGUAGE AllowAmbiguousTypes, LambdaCase, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes, LambdaCase, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances, ViewPatterns #-}
 module Analysis.TOCSummary
 ( Declaration(..)
 , formatIdentifier
@@ -64,8 +64,8 @@ formatKind = \case
 --   If you’re getting errors about missing a @'HasDeclarationBy' ''Custom'@ instance for your syntax type, you probably forgot step 1.
 --
 --   If you’re getting 'Nothing' for your syntax node at runtime, you probably forgot step 2.
-declarationAlgebra :: (Foldable syntax, HasDeclaration syntax)
-                   => Blob -> RAlgebra (TermF syntax Loc) (Term syntax Loc) (Maybe Declaration)
+declarationAlgebra :: (Foldable (Syntax term), HasDeclaration (Syntax term), IsTerm term)
+                   => Blob -> RAlgebra (TermF (Syntax term) Loc) (term Loc) (Maybe Declaration)
 declarationAlgebra blob (In ann syntax) = toDeclaration blob ann syntax
 
 -- | Types for which we can produce a 'Declaration' in 'Maybe'. There is exactly one instance of this typeclass; adding customized 'Declaration's for a new type is done by defining an instance of @'HasDeclarationBy' ''Custom'@ instead.
@@ -73,7 +73,7 @@ declarationAlgebra blob (In ann syntax) = toDeclaration blob ann syntax
 --   This typeclass employs the Advanced Overlap techniques designed by Oleg Kiselyov & Simon Peyton Jones: https://wiki.haskell.org/GHC/AdvancedOverlap.
 class HasDeclaration syntax where
   -- | Compute a 'Declaration' for a syntax type using its @'HasDeclarationBy' ''Custom'@ instance, if any, or else falling back to the default definition (which simply returns 'Nothing').
-  toDeclaration :: Foldable whole => Blob -> Loc -> syntax (Term whole Loc, Maybe Declaration) -> Maybe Declaration
+  toDeclaration :: (Foldable (Syntax term), IsTerm term) => Blob -> Loc -> syntax (term Loc, Maybe Declaration) -> Maybe Declaration
 
 -- | Define 'toDeclaration' using the @'HasDeclarationBy' ''Custom'@ instance for a type if there is one or else use the default definition.
 --
@@ -86,7 +86,7 @@ instance (DeclarationStrategy syntax ~ strategy, HasDeclarationBy strategy synta
 
 -- | Produce a 'Declaration' for a syntax node using either the 'Default' or 'Custom' strategy.
 class HasDeclarationBy (strategy :: Strategy) syntax where
-  toDeclarationBy :: Foldable whole => Blob -> Loc -> syntax (Term whole Loc, Maybe Declaration) -> Maybe Declaration
+  toDeclarationBy :: (Foldable (Syntax term), IsTerm term) => Blob -> Loc -> syntax (term Loc, Maybe Declaration) -> Maybe Declaration
 
 -- | The 'Default' strategy produces 'Nothing'.
 instance HasDeclarationBy 'Default syntax where
@@ -98,7 +98,7 @@ instance HasDeclarationBy 'Custom Markdown.Heading where
   toDeclarationBy blob@Blob{..} ann (Markdown.Heading level terms _)
     = Just $ Declaration (Heading level) (headingText terms) (Loc.span ann) (blobLanguage blob)
     where headingText terms = getSource $ maybe (byteRange ann) sconcat (nonEmpty (headingByteRange <$> toList terms))
-          headingByteRange (Term (In ann _), _) = byteRange ann
+          headingByteRange (t, _) = byteRange (termAnnotation t)
           getSource = firstLine . toText . Source.slice blobSource
           firstLine = T.takeWhile (/= '\n')
 
@@ -110,7 +110,7 @@ instance HasDeclarationBy 'Custom Syntax.Error where
 
 -- | Produce a 'Function' for 'Declaration.Function' nodes so long as their identifier is non-empty (defined as having a non-empty 'Range').
 instance HasDeclarationBy 'Custom Declaration.Function where
-  toDeclarationBy blob@Blob{..} ann (Declaration.Function _ (Term (In identifierAnn _), _) _ _)
+  toDeclarationBy blob@Blob{..} ann (Declaration.Function _ (termAnnotation -> identifierAnn, _) _ _)
     -- Do not summarize anonymous functions
     | isEmpty identifierAnn = Nothing
     -- Named functions
@@ -119,12 +119,12 @@ instance HasDeclarationBy 'Custom Declaration.Function where
 
 -- | Produce a 'Method' for 'Declaration.Method' nodes. If the method’s receiver is non-empty (defined as having a non-empty 'Range'), the 'identifier' will be formatted as 'receiver.method_name'; otherwise it will be simply 'method_name'.
 instance HasDeclarationBy 'Custom Declaration.Method where
-  toDeclarationBy blob@Blob{..} ann (Declaration.Method _ (Term (In receiverAnn receiverF), _) (Term (In identifierAnn _), _) _ _ _)
+  toDeclarationBy blob@Blob{..} ann (Declaration.Method _ (toTermF -> In receiverAnn receiverF, _) (termAnnotation -> identifierAnn, _) _ _ _)
     -- Methods without a receiver
     | isEmpty receiverAnn = Just $ Declaration (Method Nothing) (getSource blobSource identifierAnn) (Loc.span ann) (blobLanguage blob)
     -- Methods with a receiver type and an identifier (e.g. (a *Type) in Go).
     | blobLanguage blob == Go
-    , [ _, Term (In receiverType _) ] <- toList receiverF = Just $ Declaration (Method (Just (getSource blobSource receiverType))) (getSource blobSource identifierAnn) (Loc.span ann) (blobLanguage blob)
+    , [ _, termAnnotation -> receiverType ] <- toList receiverF = Just $ Declaration (Method (Just (getSource blobSource receiverType))) (getSource blobSource identifierAnn) (Loc.span ann) (blobLanguage blob)
     -- Methods with a receiver (class methods) are formatted like `receiver.method_name`
     | otherwise           = Just $ Declaration (Method (Just (getSource blobSource receiverAnn))) (getSource blobSource identifierAnn) (Loc.span ann) (blobLanguage blob)
     where

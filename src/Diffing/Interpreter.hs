@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilyDependencies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, TypeOperators, UndecidableInstances #-}
 module Diffing.Interpreter
 ( diffTerms
 , DiffTerms(..)
@@ -31,17 +31,11 @@ stripDiff :: Functor syntax
 stripDiff = bimap snd snd
 
 -- | The class of term types for which we can compute a diff.
-class Bifoldable (DiffFor term) => DiffTerms term where
-  -- | The type of diffs for the given term type.
-  --
-  -- Note that the dependency means that the diff type is in 1:1 correspondence with the term type. This allows subclasses of 'DiffTerms' to receive e.g. @'DiffFor' term a b@ without incurring ambiguity, since every diff type is unique to its term type.
-  type DiffFor term = (diff :: * -> * -> *) | diff -> term
-
+class IsTerm term => DiffTerms term where
   -- | Diff an 'Edit' of terms.
-  diffTermPair :: Edit (term ann1) (term ann2) -> DiffFor term ann1 ann2
+  diffTermPair :: Edit (term ann1) (term ann2) -> Diff.Diff (Syntax term) ann1 ann2
 
 instance (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => DiffTerms (Term syntax) where
-  type DiffFor (Term syntax) = Diff.Diff syntax
   diffTermPair = edit Diff.deleting Diff.inserting diffTerms
 
 

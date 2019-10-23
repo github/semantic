@@ -181,14 +181,18 @@ library
                      -- Language-specific grammar/syntax types, & assignments
                      , Language.Markdown.Assignment
                      , Language.Markdown.Syntax
+                     , Language.Markdown.Term
                      , Language.Go.Assignment
                      , Language.Go.Syntax
+                     , Language.Go.Term
                      , Language.Go.Type
                      , Language.Ruby.Assignment
                      , Language.Ruby.Syntax
+                     , Language.Ruby.Term
                      , Language.TSX.Assignment
                      , Language.TSX.Syntax
                      , Language.TSX.Syntax.JSX
+                     , Language.TSX.Term
                      , Language.TypeScript.Assignment
                      , Language.TypeScript.Resolution
                      , Language.TypeScript.Syntax
@@ -196,10 +200,13 @@ library
                      , Language.TypeScript.Syntax.JavaScript
                      , Language.TypeScript.Syntax.TypeScript
                      , Language.TypeScript.Syntax.Types
+                     , Language.TypeScript.Term
                      , Language.PHP.Assignment
                      , Language.PHP.Syntax
+                     , Language.PHP.Term
                      , Language.Python.Assignment
                      , Language.Python.Syntax
+                     , Language.Python.Term
                      , Numeric.Exts
                      -- Parser glue
                      , Parsing.CMark

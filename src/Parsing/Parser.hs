@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, GADTs, TypeOperators #-}
+{-# LANGUAGE ConstraintKinds, DataKinds, GADTs, TypeFamilies #-}
 module Parsing.Parser
 ( Parser(..)
 -- * À la carte parsers
@@ -26,6 +26,8 @@ module Parsing.Parser
 , rubyParser'
 , tsxParser'
 , typescriptParser'
+  -- * Modes by term type
+, TermMode
   -- * Canonical sets of parsers
 , aLaCarteParsers
 , preciseParsers
@@ -37,17 +39,16 @@ import qualified CMarkGFM
 import           Data.AST
 import           Data.Language
 import qualified Data.Map as Map
-import           Data.Sum
 import qualified Data.Syntax as Syntax
 import           Data.Term
 import           Foreign.Ptr
 import qualified Language.Go.Assignment as Go
-import qualified Language.Java as PreciseJava
-import qualified Language.JSON as PreciseJSON
+import qualified Language.Java as Java
+import qualified Language.JSON as JSON
 import qualified Language.Markdown.Assignment as Markdown
 import qualified Language.PHP.Assignment as PHP
-import qualified Language.Python as PrecisePython
-import qualified Language.Python.Assignment as Python
+import qualified Language.Python as PythonPrecise
+import qualified Language.Python.Assignment as PythonALaCarte
 import qualified Language.Ruby.Assignment as Ruby
 import qualified Language.TSX.Assignment as TSX
 import qualified Language.TypeScript.Assignment as TypeScript
@@ -69,44 +70,44 @@ data Parser term where
   -- | A parser 'Unmarshal'ing to a precise AST type using a 'TS.Language'.
   UnmarshalParser :: Unmarshal t => Ptr TS.Language -> Parser (t Loc)
   -- | A parser producing an à la carte term given an 'AST'-producing parser and an 'Assignment' onto 'Term's in some syntax type.
-  AssignmentParser :: (Enum grammar, Ix grammar, Show grammar, TS.Symbol grammar, Syntax.Error :< fs, Eq1 ast, Apply Foldable fs, Apply Functor fs, Foldable ast, Functor ast)
-                   => Parser (AST ast grammar)                   -- ^ A parser producing AST.
-                   -> Assignment ast grammar (Term (Sum fs) Loc) -- ^ An assignment from AST onto 'Term's.
-                   -> Parser (Term (Sum fs) Loc)                 -- ^ A parser producing 'Term's.
+  AssignmentParser :: (TS.Symbol grammar, Syntax.HasErrors term, Eq1 ast, Foldable term, Foldable ast, Functor ast)
+                   => Parser (AST ast grammar)          -- ^ A parser producing AST.
+                   -> Assignment ast grammar (term Loc) -- ^ An assignment from AST onto 'Term's.
+                   -> Parser (term Loc)                 -- ^ A parser producing 'Term's.
   -- | A parser for 'Markdown' using cmark.
   MarkdownParser :: Parser (AST (TermF [] CMarkGFM.NodeType) Markdown.Grammar)
 
 
-goParser :: Parser Go.Term
+goParser :: Parser (Go.Term Loc)
 goParser = AssignmentParser (ASTParser tree_sitter_go) Go.assignment
 
-rubyParser :: Parser Ruby.Term
+rubyParser :: Parser (Ruby.Term Loc)
 rubyParser = AssignmentParser (ASTParser tree_sitter_ruby) Ruby.assignment
 
-phpParser :: Parser PHP.Term
+phpParser :: Parser (PHP.Term Loc)
 phpParser = AssignmentParser (ASTParser tree_sitter_php) PHP.assignment
 
-pythonParser :: Parser Python.Term
-pythonParser = AssignmentParser (ASTParser tree_sitter_python) Python.assignment
+pythonParser :: Parser (PythonALaCarte.Term Loc)
+pythonParser = AssignmentParser (ASTParser tree_sitter_python) PythonALaCarte.assignment
 
-typescriptParser :: Parser TypeScript.Term
+typescriptParser :: Parser (TypeScript.Term Loc)
 typescriptParser = AssignmentParser (ASTParser tree_sitter_typescript) TypeScript.assignment
 
-tsxParser :: Parser TSX.Term
+tsxParser :: Parser (TSX.Term Loc)
 tsxParser = AssignmentParser (ASTParser tree_sitter_tsx) TSX.assignment
 
-markdownParser :: Parser Markdown.Term
+markdownParser :: Parser (Markdown.Term Loc)
 markdownParser = AssignmentParser MarkdownParser Markdown.assignment
 
 
-javaParserPrecise :: Parser (PreciseJava.Term Loc)
-javaParserPrecise = UnmarshalParser PreciseJava.tree_sitter_java
+javaParserPrecise :: Parser (Java.Term Loc)
+javaParserPrecise = UnmarshalParser Java.tree_sitter_java
 
-jsonParserPrecise :: Parser (PreciseJSON.Term Loc)
-jsonParserPrecise = UnmarshalParser PreciseJSON.tree_sitter_json
+jsonParserPrecise :: Parser (JSON.Term Loc)
+jsonParserPrecise = UnmarshalParser JSON.tree_sitter_json
 
-pythonParserPrecise :: Parser (PrecisePython.Term Loc)
-pythonParserPrecise = UnmarshalParser PrecisePython.tree_sitter_python
+pythonParserPrecise :: Parser (PythonPrecise.Term Loc)
+pythonParserPrecise = UnmarshalParser PythonPrecise.tree_sitter_python
 
 
 -- $abstract
@@ -140,57 +141,65 @@ pythonParserPrecise = UnmarshalParser PrecisePython.tree_sitter_python
 data SomeParser c a where
   SomeParser :: c t => Parser (t a) -> SomeParser c a
 
-goParser' :: c (Term (Sum Go.Syntax)) => (Language, SomeParser c Loc)
+goParser' :: c Go.Term => (Language, SomeParser c Loc)
 goParser' = (Go, SomeParser goParser)
 
-javaParser' :: c PreciseJava.Term => (Language, SomeParser c Loc)
+javaParser' :: c Java.Term => (Language, SomeParser c Loc)
 javaParser' = (Java, SomeParser javaParserPrecise)
 
-javascriptParser' :: c (Term (Sum TSX.Syntax)) => (Language, SomeParser c Loc)
+javascriptParser' :: c TSX.Term => (Language, SomeParser c Loc)
 javascriptParser' = (JavaScript, SomeParser tsxParser)
 
-jsonParserPrecise' :: c PreciseJSON.Term => (Language, SomeParser c Loc)
+jsonParserPrecise' :: c JSON.Term => (Language, SomeParser c Loc)
 jsonParserPrecise' = (JSON, SomeParser jsonParserPrecise)
 
-jsxParser' :: c (Term (Sum TSX.Syntax)) => (Language, SomeParser c Loc)
+jsxParser' :: c TSX.Term => (Language, SomeParser c Loc)
 jsxParser' = (JSX, SomeParser tsxParser)
 
-markdownParser' :: c (Term (Sum Markdown.Syntax)) => (Language, SomeParser c Loc)
+markdownParser' :: c Markdown.Term => (Language, SomeParser c Loc)
 markdownParser' = (Markdown, SomeParser markdownParser)
 
-phpParser' :: c (Term (Sum PHP.Syntax)) => (Language, SomeParser c Loc)
+phpParser' :: c PHP.Term => (Language, SomeParser c Loc)
 phpParser' = (PHP, SomeParser phpParser)
 
-pythonParserALaCarte' :: c (Term (Sum Python.Syntax)) => (Language, SomeParser c Loc)
+pythonParserALaCarte' :: c PythonALaCarte.Term => (Language, SomeParser c Loc)
 pythonParserALaCarte' = (Python, SomeParser pythonParser)
 
-pythonParserPrecise' :: c PrecisePython.Term => (Language, SomeParser c Loc)
+pythonParserPrecise' :: c PythonPrecise.Term => (Language, SomeParser c Loc)
 pythonParserPrecise' = (Python, SomeParser pythonParserPrecise)
 
-pythonParser' :: (c (Term (Sum Python.Syntax)), c PrecisePython.Term) => PerLanguageModes -> (Language, SomeParser c Loc)
+pythonParser' :: (c PythonALaCarte.Term, c PythonPrecise.Term) => PerLanguageModes -> (Language, SomeParser c Loc)
 pythonParser' modes = case pythonMode modes of
   ALaCarte -> (Python, SomeParser pythonParser)
   Precise  -> (Python, SomeParser pythonParserPrecise)
 
-rubyParser' :: c (Term (Sum Ruby.Syntax)) => (Language, SomeParser c Loc)
+rubyParser' :: c Ruby.Term => (Language, SomeParser c Loc)
 rubyParser' = (Ruby, SomeParser rubyParser)
 
-tsxParser' :: c (Term (Sum TSX.Syntax)) => (Language, SomeParser c Loc)
+tsxParser' :: c TSX.Term => (Language, SomeParser c Loc)
 tsxParser' = (TSX, SomeParser tsxParser)
 
-typescriptParser' :: c (Term (Sum TypeScript.Syntax)) => (Language, SomeParser c Loc)
+typescriptParser' :: c TypeScript.Term => (Language, SomeParser c Loc)
 typescriptParser' = (TypeScript, SomeParser typescriptParser)
+
+
+-- | A type family selecting the language mode for a given term type.
+type family TermMode term where
+  TermMode Java.Term          = 'Precise
+  TermMode JSON.Term          = 'Precise
+  TermMode PythonPrecise.Term = 'Precise
+  TermMode _                  = 'ALaCarte
 
 
 -- | The canonical set of parsers producing à la carte terms.
 aLaCarteParsers
-  :: ( c (Term (Sum Go.Syntax))
-     , c (Term (Sum Markdown.Syntax))
-     , c (Term (Sum PHP.Syntax))
-     , c (Term (Sum Python.Syntax))
-     , c (Term (Sum Ruby.Syntax))
-     , c (Term (Sum TSX.Syntax))
-     , c (Term (Sum TypeScript.Syntax))
+  :: ( c Go.Term
+     , c Markdown.Term
+     , c PHP.Term
+     , c PythonALaCarte.Term
+     , c Ruby.Term
+     , c TSX.Term
+     , c TypeScript.Term
      )
   => Map Language (SomeParser c Loc)
 aLaCarteParsers = Map.fromList
@@ -207,9 +216,9 @@ aLaCarteParsers = Map.fromList
 
 -- | The canonical set of parsers producing precise terms.
 preciseParsers
-  :: ( c PreciseJava.Term
-     , c PreciseJSON.Term
-     , c PrecisePython.Term
+  :: ( c Java.Term
+     , c JSON.Term
+     , c PythonPrecise.Term
      )
   => Map Language (SomeParser c Loc)
 preciseParsers = Map.fromList
@@ -220,16 +229,16 @@ preciseParsers = Map.fromList
 
 -- | The canonical set of all parsers for the passed per-language modes.
 allParsers
-  :: ( c (Term (Sum Go.Syntax))
-     , c PreciseJava.Term
-     , c PreciseJSON.Term
-     , c (Term (Sum Markdown.Syntax))
-     , c (Term (Sum PHP.Syntax))
-     , c (Term (Sum Python.Syntax))
-     , c PrecisePython.Term
-     , c (Term (Sum Ruby.Syntax))
-     , c (Term (Sum TSX.Syntax))
-     , c (Term (Sum TypeScript.Syntax))
+  :: ( c Go.Term
+     , c Java.Term
+     , c JSON.Term
+     , c Markdown.Term
+     , c PHP.Term
+     , c PythonALaCarte.Term
+     , c PythonPrecise.Term
+     , c Ruby.Term
+     , c TSX.Term
+     , c TypeScript.Term
      )
   => PerLanguageModes
   -> Map Language (SomeParser c Loc)
