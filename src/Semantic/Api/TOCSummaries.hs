@@ -1,10 +1,10 @@
-{-# LANGUAGE DerivingVia, LambdaCase, MonoLocalBinds, StandaloneDeriving, TupleSections #-}
+{-# LANGUAGE AllowAmbiguousTypes, DataKinds, LambdaCase, ScopedTypeVariables, TupleSections, TypeFamilies, UndecidableInstances #-}
 module Semantic.Api.TOCSummaries
 ( diffSummary
 , legacyDiffSummary
 , diffSummaryBuilder
-, SummarizeDiff(..)
-, summarizeDiffParsers
+, SummarizeTerms(..)
+, summarizeTermParsers
 ) where
 
 import           Analysis.Decorator (decoratorWithAlgebra)
@@ -21,22 +21,18 @@ import           Data.ByteString.Builder
 import           Data.Edit
 import           Data.Either (partitionEithers)
 import           Data.Function (on)
-import           Data.Functor.Classes
-import           Data.Hashable.Lifted
-import           Data.Language (Language, PerLanguageModes)
+import           Data.Functor.Foldable (Base, Recursive)
+import           Data.Language (Language, LanguageMode(..), PerLanguageModes)
 import           Data.Map (Map)
 import qualified Data.Map.Monoidal as Map
 import           Data.Maybe (mapMaybe)
 import           Data.ProtoLens (defMessage)
 import           Data.Semilattice.Lower
-import           Data.Term (Term)
+import           Data.Term (IsTerm(..), TermF)
 import qualified Data.Text as T
-import           Diffing.Algorithm (Diffable)
 import qualified Diffing.Algorithm.SES as SES
-import qualified Language.Java as Java
-import qualified Language.JSON as JSON
-import qualified Language.Python as Python
-import           Parsing.Parser (SomeParser, allParsers)
+import           Diffing.Interpreter (DiffTerms)
+import           Parsing.Parser (SomeParser, TermMode, allParsers)
 import           Proto.Semantic as P hiding (Blob, BlobPair)
 import           Proto.Semantic_Fields as P
 import           Rendering.TOC
@@ -57,7 +53,7 @@ legacyDiffSummary :: (Carrier sig m, Member Distribute sig, Member (Error SomeEx
 legacyDiffSummary = distributeFoldMap go
   where
     go :: (Carrier sig m, Member (Error SomeException) sig, Member Parse sig, Member (Reader PerLanguageModes) sig, Member Telemetry sig, MonadIO m) => BlobPair -> m Summaries
-    go blobPair = asks summarizeDiffParsers >>= \ p -> parsePairWith p (fmap (uncurry (flip Summaries) . bimap toMap toMap . partitionEithers) . summarizeTerms) blobPair
+    go blobPair = asks summarizeTermParsers >>= \ p -> parsePairWith p (fmap (uncurry (flip Summaries) . bimap toMap toMap . partitionEithers) . summarizeTerms) blobPair
       `catchError` \(SomeException e) ->
         pure $ Summaries mempty (toMap [ErrorSummary (T.pack (show e)) lowerBound lang])
       where path = T.pack $ pathKeyForBlobPair blobPair
@@ -74,7 +70,7 @@ diffSummary blobs = do
   pure $ defMessage & P.files .~ diff
   where
     go :: (Carrier sig m, Member (Error SomeException) sig, Member Parse sig, Member (Reader PerLanguageModes) sig, Member Telemetry sig, MonadIO m) => BlobPair -> m TOCSummaryFile
-    go blobPair = asks summarizeDiffParsers >>= \ p -> parsePairWith p (fmap (uncurry toFile . partitionEithers . map (bimap toError toChange)) . summarizeTerms) blobPair
+    go blobPair = asks summarizeTermParsers >>= \ p -> parsePairWith p (fmap (uncurry toFile . partitionEithers . map (bimap toError toChange)) . summarizeTerms) blobPair
       `catchError` \(SomeException e) ->
         pure $ toFile [defMessage & P.error .~ T.pack (show e) & P.maybe'span .~ Nothing] []
       where toFile errors changes = defMessage
@@ -103,28 +99,27 @@ toError ErrorSummary{..} = defMessage
   & P.maybe'span ?~ converting # span
 
 
-summarizeDiffParsers :: PerLanguageModes -> Map Language (SomeParser SummarizeDiff Loc)
-summarizeDiffParsers = allParsers
+summarizeTermParsers :: PerLanguageModes -> Map Language (SomeParser SummarizeTerms Loc)
+summarizeTermParsers = allParsers
 
-class SummarizeDiff term where
+class SummarizeTerms term where
   summarizeTerms :: (Member Telemetry sig, Carrier sig m, MonadIO m) => Edit (Blob, term Loc) (Blob, term Loc) -> m [Either ErrorSummary TOCSummary]
 
-instance (Diffable syntax, Eq1 syntax, HasDeclaration syntax, Hashable1 syntax, Traversable syntax) => SummarizeDiff (Term syntax) where
-  summarizeTerms = fmap diffTOC . diffTerms . bimap decorateTerm decorateTerm where
-    decorateTerm :: (Foldable syntax, Functor syntax, HasDeclaration syntax) => (Blob, Term syntax Loc) -> (Blob, Term syntax (Maybe Declaration))
+instance (TermMode term ~ strategy, SummarizeTermsBy strategy term) => SummarizeTerms term where
+  summarizeTerms = summarizeTermsBy @strategy
+
+class SummarizeTermsBy (strategy :: LanguageMode) term where
+  summarizeTermsBy :: (Member Telemetry sig, Carrier sig m, MonadIO m) => Edit (Blob, term Loc) (Blob, term Loc) -> m [Either ErrorSummary TOCSummary]
+
+instance (DiffTerms term, HasDeclaration (Syntax term), Traversable (Syntax term), Recursive (term Loc), Base (term Loc) ~ TermF (Syntax term) Loc) => SummarizeTermsBy 'ALaCarte term where
+  summarizeTermsBy = fmap diffTOC . diffTerms . bimap decorateTerm decorateTerm where
+    decorateTerm :: (Blob, term Loc) -> (Blob, term (Maybe Declaration))
     decorateTerm (blob, term) = (blob, decoratorWithAlgebra (declarationAlgebra blob) term)
 
 
-deriving via (ViaTags Java.Term)   instance SummarizeDiff Java.Term
-deriving via (ViaTags JSON.Term)   instance SummarizeDiff JSON.Term
-deriving via (ViaTags Python.Term) instance SummarizeDiff Python.Term
-
-
-newtype ViaTags t a = ViaTags (t a)
-
-instance Tagging.ToTags t => SummarizeDiff (ViaTags t) where
-  summarizeTerms terms = pure . map (uncurry summarizeChange) . dedupe . mapMaybe toChange . edit (map Delete) (map Insert) (SES.ses compare) . bimap (uncurry go) (uncurry go) $ terms where
-    go blob (ViaTags t) = Tagging.tags (blobSource blob) t
+instance Tagging.ToTags term => SummarizeTermsBy 'Precise term where
+  summarizeTermsBy terms = pure . map (uncurry summarizeChange) . dedupe . mapMaybe toChange . edit (map Delete) (map Insert) (SES.ses compare) . bimap (uncurry go) (uncurry go) $ terms where
+    go = Tagging.tags . blobSource
     lang = languageForBlobPair (bimap fst fst terms)
     (s1, s2) = edit (,mempty) (mempty,) (,) (bimap (blobSource . fst) (blobSource . fst) terms)
     compare = liftA2 (&&) <$> ((==) `on` Tag.kind) <*> ((==) `on` Tag.name)

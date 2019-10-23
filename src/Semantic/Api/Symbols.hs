@@ -1,4 +1,4 @@
-{-# LANGUAGE DerivingVia, MonoLocalBinds, RankNTypes, StandaloneDeriving #-}
+{-# LANGUAGE AllowAmbiguousTypes, ScopedTypeVariables, TypeFamilies, UndecidableInstances #-}
 module Semantic.Api.Symbols
   ( legacyParseSymbols
   , parseSymbols
@@ -10,15 +10,13 @@ import           Control.Effect.Parse
 import           Control.Effect.Reader
 import           Control.Exception
 import           Control.Lens
+import           Data.Abstract.Declarations
 import           Data.Blob hiding (File (..))
 import           Data.ByteString.Builder
 import           Data.Language
 import           Data.ProtoLens (defMessage)
-import           Data.Term
+import           Data.Term (IsTerm(..), TermF)
 import           Data.Text (pack)
-import qualified Language.Java as Java
-import qualified Language.JSON as JSON
-import qualified Language.Python as Python
 import qualified Parsing.Parser as Parser
 import           Prologue
 import           Proto.Semantic as P hiding (Blob, BlobPair)
@@ -31,7 +29,6 @@ import           Semantic.Task
 import           Serializing.Format (Format)
 import           Source.Loc as Loc
 import           Source.Source
-import           Tags.Taggable
 import           Tags.Tagging
 import qualified Tags.Tagging.Precise as Precise
 
@@ -108,19 +105,17 @@ symbolsToSummarize = ["Function", "Method", "Class", "Module", "Call", "Send"]
 class ToTags t where
   tags :: Language -> [Text] -> Source -> t Loc -> [Tag]
 
-instance IsTaggable syntax => ToTags (Term syntax) where
-  tags = runTagging
+instance (Parser.TermMode term ~ strategy, ToTagsBy strategy term) => ToTags term where
+  tags = tagsBy @strategy
 
+class ToTagsBy (strategy :: LanguageMode) term where
+  tagsBy :: Language -> [Text] -> Source -> term Loc -> [Tag]
 
-deriving via (ViaPrecise Java.Term)   instance ToTags Java.Term
-deriving via (ViaPrecise JSON.Term)   instance ToTags JSON.Term
-deriving via (ViaPrecise Python.Term) instance ToTags Python.Term
+instance (IsTerm term, IsTaggable (Syntax term), Base (term Loc) ~ TermF (Syntax term) Loc, Recursive (term Loc), Declarations (term Loc)) => ToTagsBy 'ALaCarte term where
+  tagsBy = runTagging
 
-
-newtype ViaPrecise t a = ViaPrecise (t a)
-
-instance Precise.ToTags t => ToTags (ViaPrecise t) where
-  tags _ _ src (ViaPrecise t) = Precise.tags src t
+instance Precise.ToTags term => ToTagsBy 'Precise term where
+  tagsBy _ _ = Precise.tags
 
 
 toTagsParsers :: PerLanguageModes -> Map Language (Parser.SomeParser ToTags Loc)

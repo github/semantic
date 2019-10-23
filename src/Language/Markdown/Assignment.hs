@@ -1,10 +1,9 @@
-{-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-} -- FIXME
+{-# LANGUAGE DataKinds, RankNTypes, TypeFamilies, TypeOperators #-}
 module Language.Markdown.Assignment
 ( assignment
-, Syntax
+, Markdown.Syntax
 , Grammar
-, Language.Markdown.Assignment.Term
+, Markdown.Term(..)
 ) where
 
 import Prologue
@@ -17,45 +16,18 @@ import qualified Data.Syntax as Syntax
 import qualified Data.Term as Term
 import qualified Data.Text as Text
 import qualified Language.Markdown.Syntax as Markup
+import           Language.Markdown.Term as Markdown
 import           Parsing.CMark as Grammar (Grammar (..))
 
-type Syntax =
-  '[ Markup.Document
-   -- Block elements
-   , Markup.BlockQuote
-   , Markup.Heading
-   , Markup.HTMLBlock
-   , Markup.OrderedList
-   , Markup.Paragraph
-   , Markup.ThematicBreak
-   , Markup.UnorderedList
-   , Markup.Table
-   , Markup.TableRow
-   , Markup.TableCell
-   -- Inline elements
-   , Markup.Code
-   , Markup.Emphasis
-   , Markup.Image
-   , Markup.LineBreak
-   , Markup.Link
-   , Markup.Strong
-   , Markup.Text
-   , Markup.Strikethrough
-   -- Assignment errors; cmark does not provide parse errors.
-   , Syntax.Error
-   , []
-   ]
-
-type Term = Term.Term (Sum Syntax) Loc
 type Assignment = Assignment.Assignment (Term.TermF [] CMarkGFM.NodeType) Grammar
 
-assignment :: Assignment Term
+assignment :: Assignment (Term Loc)
 assignment = Syntax.handleError $ makeTerm <$> symbol Document <*> children (Markup.Document <$> many blockElement)
 
 
 -- Block elements
 
-blockElement :: Assignment Term
+blockElement :: Assignment (Term Loc)
 blockElement = choice
   [ paragraph
   , list
@@ -67,10 +39,10 @@ blockElement = choice
   , table
   ]
 
-paragraph :: Assignment Term
+paragraph :: Assignment (Term Loc)
 paragraph = makeTerm <$> symbol Paragraph <*> children (Markup.Paragraph <$> many inlineElement)
 
-list :: Assignment Term
+list :: Assignment (Term Loc)
 list = Term.termIn <$> symbol List <*> (makeList . Term.termFAnnotation . Term.termFOut <$> currentNode <*> children (many item))
   where
     makeList (CMarkGFM.LIST CMarkGFM.ListAttributes{..}) = case listType of
@@ -78,42 +50,42 @@ list = Term.termIn <$> symbol List <*> (makeList . Term.termFAnnotation . Term.t
       CMarkGFM.ORDERED_LIST -> inject . Markup.OrderedList
     makeList _ = inject . Markup.UnorderedList
 
-item :: Assignment Term
+item :: Assignment (Term Loc)
 item = makeTerm <$> symbol Item <*> children (many blockElement)
 
-heading :: Assignment Term
+heading :: Assignment (Term Loc)
 heading = makeTerm <$> symbol Heading <*> (makeHeading . Term.termFAnnotation . Term.termFOut <$> currentNode <*> children (many inlineElement) <*> manyTill blockElement (void (symbol Heading) <|> eof))
   where
     makeHeading (CMarkGFM.HEADING level) = Markup.Heading level
     makeHeading _ = Markup.Heading 0
 
-blockQuote :: Assignment Term
+blockQuote :: Assignment (Term Loc)
 blockQuote = makeTerm <$> symbol BlockQuote <*> children (Markup.BlockQuote <$> many blockElement)
 
-codeBlock :: Assignment Term
+codeBlock :: Assignment (Term Loc)
 codeBlock = makeTerm <$> symbol CodeBlock <*> (makeCode . Term.termFAnnotation . Term.termFOut <$> currentNode <*> source)
   where
     makeCode (CMarkGFM.CODE_BLOCK language _) = Markup.Code (nullText language)
     makeCode _ = Markup.Code Nothing
 
-thematicBreak :: Assignment Term
+thematicBreak :: Assignment (Term Loc)
 thematicBreak = makeTerm <$> token ThematicBreak <*> pure Markup.ThematicBreak
 
-htmlBlock :: Assignment Term
+htmlBlock :: Assignment (Term Loc)
 htmlBlock = makeTerm <$> symbol HTMLBlock <*> (Markup.HTMLBlock <$> source)
 
-table :: Assignment Term
+table :: Assignment (Term Loc)
 table = makeTerm <$> symbol Table <*> children (Markup.Table <$> many tableRow)
 
-tableRow :: Assignment Term
+tableRow :: Assignment (Term Loc)
 tableRow = makeTerm <$> symbol TableRow <*> children (Markup.TableRow <$> many tableCell)
 
-tableCell :: Assignment Term
+tableCell :: Assignment (Term Loc)
 tableCell = makeTerm <$> symbol TableCell <*> children (Markup.TableCell <$> many inlineElement)
 
 -- Inline elements
 
-inlineElement :: Assignment Term
+inlineElement :: Assignment (Term Loc)
 inlineElement = choice
   [ strong
   , emphasis
@@ -127,40 +99,40 @@ inlineElement = choice
   , softBreak
   ]
 
-strong :: Assignment Term
+strong :: Assignment (Term Loc)
 strong = makeTerm <$> symbol Strong <*> children (Markup.Strong <$> many inlineElement)
 
-emphasis :: Assignment Term
+emphasis :: Assignment (Term Loc)
 emphasis = makeTerm <$> symbol Emphasis <*> children (Markup.Emphasis <$> many inlineElement)
 
-strikethrough :: Assignment Term
+strikethrough :: Assignment (Term Loc)
 strikethrough = makeTerm <$> symbol Strikethrough <*> children (Markup.Strikethrough <$> many inlineElement)
 
-text :: Assignment Term
+text :: Assignment (Term Loc)
 text = makeTerm <$> symbol Text <*> (Markup.Text <$> source)
 
-htmlInline :: Assignment Term
+htmlInline :: Assignment (Term Loc)
 htmlInline = makeTerm <$> symbol HTMLInline <*> (Markup.HTMLBlock <$> source)
 
-link :: Assignment Term
+link :: Assignment (Term Loc)
 link = makeTerm <$> symbol Link <*> (makeLink . Term.termFAnnotation . Term.termFOut <$> currentNode) <* advance
   where
     makeLink (CMarkGFM.LINK url title) = Markup.Link url (nullText title)
     makeLink _ = Markup.Link mempty Nothing
 
-image :: Assignment Term
+image :: Assignment (Term Loc)
 image = makeTerm <$> symbol Image <*> (makeImage . Term.termFAnnotation . Term.termFOut <$> currentNode) <* advance
   where
     makeImage (CMarkGFM.IMAGE url title) = Markup.Image url (nullText title)
     makeImage _ = Markup.Image mempty Nothing
 
-code :: Assignment Term
+code :: Assignment (Term Loc)
 code = makeTerm <$> symbol Code <*> (Markup.Code Nothing <$> source)
 
-lineBreak :: Assignment Term
+lineBreak :: Assignment (Term Loc)
 lineBreak = makeTerm <$> token LineBreak <*> pure Markup.LineBreak
 
-softBreak :: Assignment Term
+softBreak :: Assignment (Term Loc)
 softBreak = makeTerm <$> token SoftBreak <*> pure Markup.LineBreak
 
 

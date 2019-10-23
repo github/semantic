@@ -25,80 +25,80 @@ import qualified Data.Abstract.ScopeGraph as ScopeGraph
 -- Combinators
 
 -- | Lift syntax and an annotation into a term, injecting the syntax into a union & ensuring the annotation encompasses all children.
-makeTerm :: (HasCallStack, Element syntax syntaxes, Semigroup ann, Apply Foldable syntaxes) => ann -> syntax (Term (Sum syntaxes) ann) -> Term (Sum syntaxes) ann
+makeTerm :: (HasCallStack, Element syntax syntaxes, Sum syntaxes ~ Syntax term, Semigroup ann, Apply Foldable syntaxes, IsTerm term) => ann -> syntax (term ann) -> term ann
 makeTerm ann = makeTerm' ann . inject
 
 -- | Lift a union and an annotation into a term, ensuring the annotation encompasses all children.
-makeTerm' :: (HasCallStack, Semigroup ann, Foldable syntax) => ann -> syntax (Term syntax ann) -> Term syntax ann
+makeTerm' :: (HasCallStack, Semigroup ann, Foldable (Syntax term), IsTerm term) => ann -> Syntax term (term ann) -> term ann
 makeTerm' ann syntax = termIn (sconcat (ann :| (termAnnotation <$> toList syntax))) syntax
 
 -- | Lift syntax and an annotation into a term, injecting the syntax into a union & ensuring the annotation encompasses all children. Removes extra structure if term is a list of a single item.
-makeTerm'' :: (HasCallStack, Element syntax syntaxes, Semigroup ann, Apply Foldable syntaxes, Foldable syntax) => ann -> syntax (Term (Sum syntaxes) ann) -> Term (Sum syntaxes) ann
+makeTerm'' :: (HasCallStack, Element syntax syntaxes, Sum syntaxes ~ Syntax term, Semigroup ann, Apply Foldable syntaxes, Foldable syntax, IsTerm term) => ann -> syntax (term ann) -> term ann
 makeTerm'' ann children = case toList children of
   [x] -> x
   _ -> makeTerm' ann (inject children)
 
 -- | Lift non-empty syntax into a term, injecting the syntax into a union & appending all subterms’.annotations to make the new term’s annotation.
-makeTerm1 :: (HasCallStack, Element syntax syntaxes, Semigroup ann, Apply Foldable syntaxes) => syntax (Term (Sum syntaxes) ann) -> Term (Sum syntaxes) ann
+makeTerm1 :: (HasCallStack, Element syntax syntaxes, Sum syntaxes ~ Syntax term, Semigroup ann, Apply Foldable syntaxes, IsTerm term) => syntax (term ann) -> term ann
 makeTerm1 = makeTerm1' . inject
 
 -- | Lift a non-empty union into a term, appending all subterms’ annotations to make the new term’s annotation.
-makeTerm1' :: (HasCallStack, Semigroup ann, Foldable syntax) => syntax (Term syntax ann) -> Term syntax ann
+makeTerm1' :: (HasCallStack, Semigroup ann, Foldable (Syntax term), IsTerm term) => Syntax term (term ann) -> term ann
 makeTerm1' syntax = case toList syntax of
   a : _ -> makeTerm' (termAnnotation a) syntax
   _ -> error "makeTerm1': empty structure"
 
 -- | Construct an empty term at the current position.
-emptyTerm :: (HasCallStack, Empty :< syntaxes, Apply Foldable syntaxes) => Assignment.Assignment ast grammar (Term (Sum syntaxes) Loc)
+emptyTerm :: (HasCallStack, Empty :< syntaxes, Sum syntaxes ~ Syntax term, Apply Foldable syntaxes, IsTerm term) => Assignment.Assignment ast grammar (term Loc)
 emptyTerm = makeTerm . startLocation <$> Assignment.location <*> pure Empty
   where startLocation Loc{..} = Loc (Range.point (Range.start byteRange)) (Span.point (Span.start span))
 
 -- | Catch assignment errors into an error term.
-handleError :: (HasCallStack, Error :< syntaxes, Enum grammar, Eq1 ast, Ix grammar, Show grammar, Apply Foldable syntaxes) => Assignment.Assignment ast grammar (Term (Sum syntaxes) Loc) -> Assignment.Assignment ast grammar (Term (Sum syntaxes) Loc)
+handleError :: (HasCallStack, Error :< syntaxes, Sum syntaxes ~ Syntax term, Enum grammar, Eq1 ast, Ix grammar, Show grammar, Apply Foldable syntaxes, IsTerm term) => Assignment.Assignment ast grammar (term Loc) -> Assignment.Assignment ast grammar (term Loc)
 handleError = flip Assignment.catchError (\ err -> makeTerm <$> Assignment.location <*> pure (errorSyntax (either id show <$> err) []) <* Assignment.source)
 
 -- | Catch parse errors into an error term.
-parseError :: (HasCallStack, Error :< syntaxes, Bounded grammar, Enum grammar, Ix grammar, Apply Foldable syntaxes) => Assignment.Assignment ast grammar (Term (Sum syntaxes) Loc)
+parseError :: (HasCallStack, Error :< syntaxes, Sum syntaxes ~ Syntax term, Bounded grammar, Enum grammar, Ix grammar, Apply Foldable syntaxes, IsTerm term) => Assignment.Assignment ast grammar (term Loc)
 parseError = makeTerm <$> Assignment.token maxBound <*> pure (Error (ErrorStack $ errorSite <$> getCallStack (freezeCallStack callStack)) [] (Just "ParseError") [])
 
 -- | Match context terms before a subject term, wrapping both up in a Context term if any context terms matched, or otherwise returning the subject term.
-contextualize :: (HasCallStack, Context :< syntaxes, Alternative m, Semigroup ann, Apply Foldable syntaxes)
-              => m (Term (Sum syntaxes) ann)
-              -> m (Term (Sum syntaxes) ann)
-              -> m (Term (Sum syntaxes) ann)
+contextualize :: (HasCallStack, Context :< syntaxes, Sum syntaxes ~ Syntax term, Alternative m, Semigroup ann, Apply Foldable syntaxes, IsTerm term)
+              => m (term ann)
+              -> m (term ann)
+              -> m (term ann)
 contextualize context rule = make <$> Assignment.manyThrough context rule
   where make (cs, node) = case nonEmpty cs of
           Just cs -> makeTerm1 (Context cs node)
           _ -> node
 
 -- | Match context terms after a subject term and before a delimiter, returning the delimiter paired with a Context term if any context terms matched, or the subject term otherwise.
-postContextualizeThrough :: (HasCallStack, Context :< syntaxes, Alternative m, Semigroup ann, Apply Foldable syntaxes)
-                         => m (Term (Sum syntaxes) ann)
-                         -> m (Term (Sum syntaxes) ann)
+postContextualizeThrough :: (HasCallStack, Context :< syntaxes, Sum syntaxes ~ Syntax term, Alternative m, Semigroup ann, Apply Foldable syntaxes, IsTerm term)
+                         => m (term ann)
+                         -> m (term ann)
                          -> m delimiter
-                         -> m (Term (Sum syntaxes) ann, delimiter)
+                         -> m (term ann, delimiter)
 postContextualizeThrough context rule end = make <$> rule <*> Assignment.manyThrough context end
   where make node (cs, end) = case nonEmpty cs of
           Just cs -> (makeTerm1 (Context cs node), end)
           _ -> (node, end)
 
 -- | Match context terms after a subject term, wrapping both up in a Context term if any context terms matched, or otherwise returning the subject term.
-postContextualize :: (HasCallStack, Context :< syntaxes, Alternative m, Semigroup ann, Apply Foldable syntaxes)
-                  => m (Term (Sum syntaxes) ann)
-                  -> m (Term (Sum syntaxes) ann)
-                  -> m (Term (Sum syntaxes) ann)
+postContextualize :: (HasCallStack, Context :< syntaxes, Sum syntaxes ~ Syntax term, Alternative m, Semigroup ann, Apply Foldable syntaxes, IsTerm term)
+                  => m (term ann)
+                  -> m (term ann)
+                  -> m (term ann)
 postContextualize context rule = make <$> rule <*> many context
   where make node cs = case nonEmpty cs of
           Just cs -> makeTerm1 (Context cs node)
           _ -> node
 
 -- | Match infix terms separated by any of a list of operators, with optional context terms following each operand.
-infixContext :: (Context :< syntaxes, Assignment.Parsing m, Semigroup ann, HasCallStack, Apply Foldable syntaxes)
-             => m (Term (Sum syntaxes) ann)
-             -> m (Term (Sum syntaxes) ann)
-             -> m (Term (Sum syntaxes) ann)
-             -> [m (Term (Sum syntaxes) ann -> Term (Sum syntaxes) ann -> Sum syntaxes (Term (Sum syntaxes) ann))]
-             -> m (Sum syntaxes (Term (Sum syntaxes) ann))
+infixContext :: (Context :< syntaxes, Sum syntaxes ~ Syntax term, Assignment.Parsing m, Semigroup ann, HasCallStack, Apply Foldable syntaxes, IsTerm term)
+             => m (term ann)
+             -> m (term ann)
+             -> m (term ann)
+             -> [m (term ann -> term ann -> Sum syntaxes (term ann))]
+             -> m (Sum syntaxes (term ann))
 infixContext context left right operators = uncurry (&) <$> postContextualizeThrough context left (asum operators) <*> postContextualize context right
 
 class Generate (c :: (* -> *) -> Constraint) (all :: [* -> *]) (fs :: [* -> *]) where
@@ -211,6 +211,14 @@ instance Ord ErrorStack where
             , (compare `on` srcLocEndLine) s1 s2
             , (compare `on` srcLocEndCol) s1 s2
             ]
+
+
+class HasErrors term where
+  getErrors :: term Loc -> [Error.Error String]
+
+instance (Error :< fs, Apply Foldable fs, Apply Functor fs) => HasErrors (Term (Sum fs)) where
+  getErrors = cata $ \ (In Loc{..} syntax) ->
+    maybe (fold syntax) (pure . unError span) (Data.Sum.project syntax)
 
 
 data Context a = Context { contextTerms :: NonEmpty a, contextSubject :: a }

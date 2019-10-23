@@ -4,6 +4,7 @@ module Rendering.TOC.Spec (spec) where
 import Analysis.TOCSummary
 import Control.Effect.Parse
 import Control.Effect.Reader
+import Control.Monad.IO.Class
 import Data.Aeson hiding (defaultOptions)
 import Data.Bifunctor
 import Data.Diff
@@ -16,7 +17,7 @@ import Prelude
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import Rendering.TOC
-import Semantic.Api (DiffEffects, diffSummaryBuilder, summarizeTerms, summarizeDiffParsers)
+import Semantic.Api (diffSummaryBuilder, summarizeTerms, summarizeTermParsers)
 import Serializing.Format as Format
 import Source.Loc
 import Source.Span
@@ -216,7 +217,7 @@ blankDiff = merge (Nothing, Nothing) (inject [ inserting (termIn Nothing (inject
 
 -- Diff helpers
 summarize
-  :: DiffEffects sig m
+  :: (Member (Error SomeException) sig, Member Parse sig, Member Telemetry sig, Carrier sig m, MonadIO m)
   => BlobPair
   -> m [Either ErrorSummary TOCSummary]
-summarize = parsePairWith (summarizeDiffParsers defaultLanguageModes) summarizeTerms
+summarize = parsePairWith (summarizeTermParsers defaultLanguageModes) summarizeTerms
