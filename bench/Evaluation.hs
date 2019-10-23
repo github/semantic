@@ -68,7 +68,7 @@ pyEval :: Path.RelFile -> Benchmarkable
 pyEval p = nfIO $ () <$ evalPythonProject (Path.relDir "bench/bench-fixtures/python" </> p)
 
 rbEval :: Path.RelFile -> Benchmarkable
-rbEval p = nfIO $ () <$ evalRubyProject (Path.relDir "bench/bench-fixtures/python" </> p)
+rbEval p = nfIO $ () <$ evalRubyProject (Path.relDir "bench/bench-fixtures/ruby" </> p)
 
 pyCall :: Path.RelFile -> Benchmarkable
 pyCall p = nfIO $ callGraphProject (Proxy @'Language.Python) pythonParser (Path.relDir "bench/bench-fixtures/python/" </> p)
