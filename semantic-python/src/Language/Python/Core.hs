@@ -100,9 +100,7 @@ instance (Compile l, Compile r) => Compile (l :+: r) where
   compile (R1 r) cc = compile r cc
 
 instance Compile Py.AssertStatement
-
-instance Compile Py.Attribute where
-  compile it@Py.Attribute { extraChildren = [L1 lhs, R1 rhs]} = _
+instance Compile Py.Attribute
 
 -- Assignment compilation. Assignments are an uneasy hybrid of expressions
 -- (since they appear to have values, i.e. `a = b = c`) and statements (because
