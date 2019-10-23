@@ -108,7 +108,7 @@ instance RightModule Core where
   Load b     >>=* f = Load (b >>= f)
   Record fs  >>=* f = Record (map (fmap (>>= f)) fs)
   (a :. b)   >>=* f = (a >>= f) :. b
-  (a :? b)   >>=* f = (a >>= f) : b
+  (a :? b)   >>=* f = (a >>= f) :. b
   (a := b)   >>=* f = (a >>= f) := (b >>= f)
 
 

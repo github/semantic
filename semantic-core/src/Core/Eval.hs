@@ -15,7 +15,6 @@ import Analysis.File
 import Control.Applicative (Alternative (..))
 import Control.Effect.Carrier
 import Control.Effect.Fail
-import Control.Effect.Fresh
 import Control.Effect.Reader
 import Control.Monad ((>=>))
 import Core.Core as Core
@@ -31,11 +30,8 @@ import Syntax.Scope
 import Syntax.Term
 import qualified System.Path as Path
 
-type Gensym = Fresh
-
 eval :: ( Carrier sig m
         , Member (Reader Span) sig
-        , Member Fresh sig
         , MonadFail m
         , Semigroup value
         )
@@ -82,9 +78,7 @@ eval Analysis{..} eval = \case
           eval . Core.lam (named' "nothing")
                . Core.lam (named' "just")
                $ pure "nothing"
-        Just item -> do
-          value <- deref' b item
-          abstract eval "nothing" (instantiate1 (pure "nothing") (Syntax.Scope.abstract _ _))
+        Just item -> undefined
 
 
     a := b -> do
