@@ -5,4 +5,7 @@
   object <- type "object" #unit #record{};
 
   #record { type: type, object: object }
+
+
+  lookup <- \item -> \name -> if item.?name then item.name else item.class.name
 }

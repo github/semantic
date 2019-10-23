@@ -20,7 +20,7 @@ import Control.Monad ((>=>))
 import Core.Core as Core
 import Core.Name
 import Data.Functor
-import Data.Maybe (fromMaybe)
+import Data.Maybe (fromMaybe, isJust)
 import Data.Text (Text)
 import qualified Data.Text as Text
 import GHC.Stack
@@ -73,13 +73,7 @@ eval Analysis{..} eval = \case
     a :? b -> do
       a' <- ref a
       mFound <- a' ... b
-      case mFound of
-        Nothing ->
-          eval . Core.lam (named' "nothing")
-               . Core.lam (named' "just")
-               $ pure "nothing"
-        Just item -> undefined
-
+      bool (isJust mFound)
 
     a := b -> do
       b' <- eval b
