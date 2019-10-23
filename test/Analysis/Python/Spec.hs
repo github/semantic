@@ -3,10 +3,11 @@
 module Analysis.Python.Spec (spec) where
 
 import qualified Data.Abstract.ModuleTable as ModuleTable
-import Data.Abstract.Value.Concrete
+import           Data.Abstract.Value.Concrete
 import qualified Data.Language as Language
-
-import SpecHelpers
+import qualified Language.Python.Term as Python
+import           Source.Loc
+import           SpecHelpers
 
 
 spec :: (?session :: TaskSession) => Spec
@@ -71,5 +72,4 @@ spec = do
 
   where
     fixtures = "test/fixtures/python/analysis/"
-    evaluate = evalPythonProject . map (fixtures <>)
-    evalPythonProject = testEvaluating <=< evaluateProject' ?session (Proxy :: Proxy 'Language.Python) pythonParser
+    evaluate = evaluateProject @'Language.Python @(Python.Term Loc) ?session Proxy . map (fixtures <>)

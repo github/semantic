@@ -180,7 +180,6 @@ spec = do
 
   where
     fixtures = "test/fixtures/typescript/analysis/"
-    evaluate = evalTypeScriptProject . map (fixtures <>)
-    evalTypeScriptProject = testEvaluating <=< (evaluateProject' ?session (Proxy :: Proxy 'Language.TypeScript) typescriptParser)
+    evaluate = evaluateProject @'Language.TypeScript @(TypeScript.Term Loc) ?session Proxy . map (fixtures <>)
 
 type TypeScriptEvalError = BaseError (EvalError (TypeScript.Term Loc) Precise (Concrete.Value (TypeScript.Term Loc) Precise))
