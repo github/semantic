@@ -51,14 +51,16 @@ callGraphProject' session proxy path
 callGraphProject proxy paths = withOptions defaultOptions $ \ config logger statter ->
   callGraphProject' (TaskSession config "" False logger statter) proxy paths
 
-evaluateProject proxy parser path = withOptions defaultOptions $ \ config logger statter ->
+evaluateProject proxy path
+  | let lang = Language.reflect proxy
+  , Just (SomeParser parser) <- Map.lookup lang analysisParsers = withOptions defaultOptions $ \ config logger statter ->
   fmap (const ()) . justEvaluating =<< evaluateProject' (TaskSession config "" False logger statter) proxy parser [Path.toString path]
 
 pyEval :: Path.RelFile -> Benchmarkable
-pyEval p = nfIO $ evaluateProject (Proxy @'Language.Python) pythonParser (Path.relDir "bench/bench-fixtures/python" </> p)
+pyEval p = nfIO $ evaluateProject  (Proxy @'Language.Python) (Path.relDir "bench/bench-fixtures/python" </> p)
 
 rbEval :: Path.RelFile -> Benchmarkable
-rbEval p = nfIO $ evaluateProject (Proxy @'Language.Ruby)   rubyParser   (Path.relDir "bench/bench-fixtures/ruby" </> p)
+rbEval p = nfIO $ evaluateProject  (Proxy @'Language.Ruby)   (Path.relDir "bench/bench-fixtures/ruby" </> p)
 
 pyCall :: Path.RelFile -> Benchmarkable
 pyCall p = nfIO $ callGraphProject (Proxy @'Language.Python) (Path.relDir "bench/bench-fixtures/python/" </> p)
