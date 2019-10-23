@@ -55,7 +55,7 @@ parseWith
   -> (forall term . c term => term ann -> m a) -- ^ A function to run on the parsed term. Note that the term is abstract, but constrained by @c@, allowing you to do anything @c@ allows, and requiring that all the input parsers produce terms supporting @c@.
   -> Blob                                      -- ^ The blob to parse.
   -> m a
-parseWith parsers with blob = case Map.lookup (blobLanguage blob) parsers of
+parseWith parsers with blob = case parserForBlob parsers blob of
   Just (SomeParser parser) -> parse parser blob >>= with
   _                        -> noLanguageForBlob (blobPath blob)
 
@@ -66,7 +66,7 @@ parsePairWith
   -> (forall term . c term => Edit (Blob, term ann) (Blob, term ann) -> m a) -- ^ A function to run on the parsed terms. Note that the terms are abstract, but constrained by @c@, allowing you to do anything @c@ allows, and requiring that all the input parsers produce terms supporting @c@.
   -> BlobPair                                                                -- ^ The blob pair to parse.
   -> m a
-parsePairWith parsers with blobPair = case Map.lookup (languageForBlobPair blobPair) parsers of
+parsePairWith parsers with blobPair = case parserForLanguage parsers (languageForBlobPair blobPair) of
   Just (SomeParser parser) -> bitraverse (p parser) (p parser) blobPair >>= with
   _                        -> noLanguageForBlob (pathForBlobPair blobPair)
   where p parser blob = (,) blob <$> parse parser blob
