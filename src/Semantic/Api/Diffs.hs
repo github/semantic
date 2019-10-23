@@ -18,6 +18,7 @@ import           Control.Lens
 import           Control.Monad.IO.Class
 import           Data.Blob
 import           Data.ByteString.Builder
+import           Data.Edit
 import           Data.Graph
 import           Data.JSON.Fields
 import           Data.Language
@@ -156,9 +157,9 @@ diffWith
 diffWith parsers render = parsePairWith parsers (render <=< diffTerms)
 
 diffTerms :: (DiffTerms term, Member Telemetry sig, Carrier sig m, MonadIO m)
-  => These (Blob, term ann) (Blob, term ann) -> m (DiffFor term ann ann)
+  => Edit (Blob, term ann) (Blob, term ann) -> m (DiffFor term ann ann)
 diffTerms terms = time "diff" languageTag $ do
   let diff = diffTermPair (bimap snd snd terms)
   diff <$ writeStat (Stat.count "diff.nodes" (bilength diff) languageTag)
   where languageTag = languageTagForBlobPair blobs
-        blobs = BlobPair (bimap fst fst terms)
+        blobs = bimap fst fst terms

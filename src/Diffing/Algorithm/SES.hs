@@ -1,35 +1,13 @@
-{-# LANGUAGE BangPatterns, GADTs, LambdaCase, MultiParamTypeClasses, ScopedTypeVariables #-}
+{-# LANGUAGE BangPatterns, GADTs, MultiParamTypeClasses, ScopedTypeVariables #-}
 module Diffing.Algorithm.SES
-( Edit(..)
-, toThese
-, ses
+( ses
 ) where
 
 import Data.Array ((!))
 import qualified Data.Array as Array
-import Data.Bifunctor
+import Data.Edit
 import Data.Foldable (find, toList)
 import Data.Ix
-import Data.These
-
--- | An edit script, i.e. a sequence of changes/copies of elements.
-data Edit a b
-  = Delete a
-  | Insert b
-  | Copy a b
-  deriving (Eq, Functor, Ord, Show)
-
-instance Bifunctor Edit where
-  bimap f g = \case
-    Delete a -> Delete (f a)
-    Insert b -> Insert (g b)
-    Copy a b -> Copy (f a) (g b)
-
-toThese :: Edit a b -> These a b
-toThese = \case
-  Delete a -> This a
-  Insert b -> That b
-  Copy a b -> These a b
 
 data Endpoint a b = Endpoint { x :: {-# UNPACK #-} !Int, _y :: {-# UNPACK #-} !Int, _script :: [Edit a b] }
   deriving (Eq, Show)
@@ -78,11 +56,11 @@ ses eq as' bs'
         slideFrom (Endpoint x y script)
           | Just a <- as !? x
           , Just b <- bs !? y
-          , a `eq` b  = slideFrom (Endpoint (succ x) (succ y) (Copy a b : script))
+          , a `eq` b  = slideFrom (Endpoint (succ x) (succ y) (Compare a b : script))
           | otherwise =            Endpoint       x        y              script
 
 
 (!?) :: Ix i => Array.Array i a -> i -> Maybe a
-(!?) v i | inRange (Array.bounds v) i, !a <- v ! i = Just a
-         | otherwise = Nothing
+v !? i | inRange (Array.bounds v) i, !a <- v ! i = Just a
+       | otherwise                               = Nothing
 {-# INLINE (!?) #-}

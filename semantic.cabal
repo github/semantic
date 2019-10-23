@@ -67,9 +67,7 @@ common dependencies
                      , semantic-source ^>= 0.0
                      , semilattices ^>= 0.0.0.3
                      , streaming ^>= 0.2.2.0
-                     , streaming-bytestring ^>= 0.1.6
                      , text ^>= 1.2.3.1
-                     , these >= 0.7 && <1
                      , unix ^>= 2.7.2.2
                      , lingo ^>= 0.3.0.0
 
@@ -148,9 +146,9 @@ library
                      , Data.Blob.IO
                      , Data.Diff
                      , Data.Duration
+                     , Data.Edit
                      , Data.Error
                      , Data.Flag
-                     , Data.Functor.Both
                      , Data.Functor.Classes.Generic
                      , Data.Graph
                      , Data.Graph.ControlFlowVertex
@@ -160,7 +158,6 @@ library
                      , Data.JSON.Fields
                      , Data.Language
                      , Data.Map.Monoidal
-                     , Data.Patch
                      , Data.Project
                      , Data.Quieterm
                      , Data.Semigroup.App
@@ -229,7 +226,6 @@ library
                      , Semantic.Config
                      , Semantic.Distribute
                      , Semantic.Env
-                     , Semantic.Git
                      , Semantic.Graph
                      , Semantic.IO
                      , Semantic.Resolution
@@ -288,8 +284,6 @@ library
                      , semantic-tags ^>= 0
                      , semigroupoids ^>= 5.3.2
                      , split ^>= 0.2.3.3
-                     , streaming-attoparsec ^>= 1.0.0.1
-                     , streaming-process ^>= 0.1
                      , stm-chans ^>= 3.0.0.4
                      , template-haskell ^>= 2.14
                      , time ^>= 1.8.0.2
@@ -362,7 +356,6 @@ test-suite test
                      , hspec >= 2.6 && <3
                      , hspec-core >= 2.6 && <3
                      , hspec-expectations ^>= 0.8.2
-                     , shelly >= 1.5 && <2
                      , tasty ^>= 1.2.3
                      , tasty-golden ^>= 2.3.2
                      , tasty-hedgehog ^>= 1.0.0.1
@@ -384,7 +377,7 @@ test-suite parse-examples
                      , foldl ^>= 1.4.5
                      , resourcet ^>= 1.2
                      , streaming
-                     , streaming-bytestring
+                     , streaming-bytestring ^>= 0.1.6
                      , tasty
                      , tasty-hunit
 

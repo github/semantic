@@ -1,14 +1,20 @@
 {
-  type <- \name -> \bases -> \dict ->
-    #record { __name: name, __bases: bases, __dict: dict };
+  type <- \name -> \super -> \slots ->
+    #record { __name: name, __super: super, __slots: slots };
 
   instance <- \class -> \prim -> \slots ->
     #record { __class: class, __prim: prim, __slots: slots };
 
-  object <- type "object" #unit #record{};
+  object <- type "object" type #record{};
 
   str <- type "str" object #record { };
-  str.__class.__new__ = (\contents -> instance str contents #record{});
+  str.__new__ = (\contents -> instance str contents #record{});
 
   #record { type: type, object: object, str: str }
+
+  getitem <- rec getitem = \item -> \attr ->
+    if item.slots.?attr then item.slots.attr else #unit;
+
+  #record { type: type, object: object, getitem: getitem }
+
 }
