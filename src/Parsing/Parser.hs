@@ -69,38 +69,6 @@ data Parser term where
   MarkdownParser :: Parser (AST (TermF [] CMarkGFM.NodeType) Markdown.Grammar)
 
 
-goParser :: Parser (Go.Term Loc)
-goParser = AssignmentParser (ASTParser tree_sitter_go) Go.assignment
-
-rubyParser :: Parser (Ruby.Term Loc)
-rubyParser = AssignmentParser (ASTParser tree_sitter_ruby) Ruby.assignment
-
-phpParser :: Parser (PHP.Term Loc)
-phpParser = AssignmentParser (ASTParser tree_sitter_php) PHP.assignment
-
-pythonParser :: Parser (PythonALaCarte.Term Loc)
-pythonParser = AssignmentParser (ASTParser tree_sitter_python) PythonALaCarte.assignment
-
-typescriptParser :: Parser (TypeScript.Term Loc)
-typescriptParser = AssignmentParser (ASTParser tree_sitter_typescript) TypeScript.assignment
-
-tsxParser :: Parser (TSX.Term Loc)
-tsxParser = AssignmentParser (ASTParser tree_sitter_tsx) TSX.assignment
-
-markdownParser :: Parser (Markdown.Term Loc)
-markdownParser = AssignmentParser MarkdownParser Markdown.assignment
-
-
-javaParserPrecise :: Parser (Java.Term Loc)
-javaParserPrecise = UnmarshalParser Java.tree_sitter_java
-
-jsonParserPrecise :: Parser (JSON.Term Loc)
-jsonParserPrecise = UnmarshalParser JSON.tree_sitter_json
-
-pythonParserPrecise :: Parser (PythonPrecise.Term Loc)
-pythonParserPrecise = UnmarshalParser PythonPrecise.tree_sitter_python
-
-
 -- $abstract
 -- Most of our features are intended to operate over multiple languages, each represented by disjoint term types. Thus, we typically implement them using typeclasses, allowing us to share a single interface to invoke the feature, while specializing the implementation(s) as appropriate for each distinct term type.
 --
@@ -133,31 +101,31 @@ data SomeParser c a where
   SomeParser :: c t => Parser (t a) -> SomeParser c a
 
 goParser' :: c Go.Term => (Language, SomeParser c Loc)
-goParser' = (Go, SomeParser goParser)
+goParser' = (Go, SomeParser (AssignmentParser (ASTParser tree_sitter_go) Go.assignment))
 
 javaParser' :: c Java.Term => (Language, SomeParser c Loc)
-javaParser' = (Java, SomeParser javaParserPrecise)
+javaParser' = (Java, SomeParser (UnmarshalParser @Java.Term Java.tree_sitter_java))
 
 javascriptParser' :: c TSX.Term => (Language, SomeParser c Loc)
-javascriptParser' = (JavaScript, SomeParser tsxParser)
+javascriptParser' = (JavaScript, SomeParser (AssignmentParser (ASTParser tree_sitter_tsx) TSX.assignment))
 
 jsonParserPrecise' :: c JSON.Term => (Language, SomeParser c Loc)
-jsonParserPrecise' = (JSON, SomeParser jsonParserPrecise)
+jsonParserPrecise' = (JSON, SomeParser (UnmarshalParser @JSON.Term JSON.tree_sitter_json))
 
 jsxParser' :: c TSX.Term => (Language, SomeParser c Loc)
-jsxParser' = (JSX, SomeParser tsxParser)
+jsxParser' = (JSX, SomeParser (AssignmentParser (ASTParser tree_sitter_tsx) TSX.assignment))
 
 markdownParser' :: c Markdown.Term => (Language, SomeParser c Loc)
-markdownParser' = (Markdown, SomeParser markdownParser)
+markdownParser' = (Markdown, SomeParser (AssignmentParser MarkdownParser Markdown.assignment))
 
 phpParser' :: c PHP.Term => (Language, SomeParser c Loc)
-phpParser' = (PHP, SomeParser phpParser)
+phpParser' = (PHP, SomeParser (AssignmentParser (ASTParser tree_sitter_php) PHP.assignment))
 
 pythonParserALaCarte' :: c PythonALaCarte.Term => (Language, SomeParser c Loc)
-pythonParserALaCarte' = (Python, SomeParser pythonParser)
+pythonParserALaCarte' = (Python, SomeParser (AssignmentParser (ASTParser tree_sitter_python) PythonALaCarte.assignment))
 
 pythonParserPrecise' :: c PythonPrecise.Term => (Language, SomeParser c Loc)
-pythonParserPrecise' = (Python, SomeParser pythonParserPrecise)
+pythonParserPrecise' = (Python, SomeParser (UnmarshalParser @PythonPrecise.Term PythonPrecise.tree_sitter_python))
 
 pythonParser' :: (c PythonALaCarte.Term, c PythonPrecise.Term) => PerLanguageModes -> (Language, SomeParser c Loc)
 pythonParser' modes = case pythonMode modes of
@@ -165,13 +133,13 @@ pythonParser' modes = case pythonMode modes of
   Precise  -> pythonParserPrecise'
 
 rubyParser' :: c Ruby.Term => (Language, SomeParser c Loc)
-rubyParser' = (Ruby, SomeParser rubyParser)
+rubyParser' = (Ruby, SomeParser (AssignmentParser (ASTParser tree_sitter_ruby) Ruby.assignment))
 
 tsxParser' :: c TSX.Term => (Language, SomeParser c Loc)
-tsxParser' = (TSX, SomeParser tsxParser)
+tsxParser' = (TSX, SomeParser (AssignmentParser (ASTParser tree_sitter_tsx) TSX.assignment))
 
 typescriptParser' :: c TypeScript.Term => (Language, SomeParser c Loc)
-typescriptParser' = (TypeScript, SomeParser typescriptParser)
+typescriptParser' = (TypeScript, SomeParser (AssignmentParser (ASTParser tree_sitter_typescript) TypeScript.assignment))
 
 
 -- | A type family selecting the language mode for a given term type.
