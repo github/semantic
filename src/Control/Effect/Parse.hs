@@ -3,6 +3,7 @@ module Control.Effect.Parse
 ( -- * Parse effect
   Parse(..)
 , parse
+, parserForLanguage
 , parseWith
 , parsePairWith
 ) where
@@ -35,6 +36,11 @@ parse :: (Member Parse sig, Carrier sig m)
       -> Blob
       -> m term
 parse parser blob = send (Parse parser blob pure)
+
+
+-- | Select a parser for the given language.
+parserForLanguage :: Map.Map Language (SomeParser c ann) -> Language -> Maybe (SomeParser c ann)
+parserForLanguage = flip Map.lookup
 
 
 -- | Parse a 'Blob' with one of the provided parsers, and run an action on the abstracted term.
