@@ -386,21 +386,21 @@ instance ( Member (Abstract.Boolean (Value term address)) sig
 
 -- | The type of exceptions that can be thrown when constructing values in 'Value'’s 'MonadValue' instance.
 data ValueError value resume where
-  StringError            :: value          -> ValueError value Text
-  BoolError              :: value          -> ValueError value Bool
-  IndexError             :: value -> value -> ValueError value value
-  CallError              :: value          -> ValueError value value
-  NumericError           :: value          -> ValueError value value
-  Numeric2Error          :: value -> value -> ValueError value value
-  ComparisonError        :: value -> value -> ValueError value value
-  BitwiseError           :: value          -> ValueError value value
-  Bitwise2Error          :: value -> value -> ValueError value value
-  KeyValueError          :: value          -> ValueError value (value, value)
-  ArrayError             :: value          -> ValueError value [value]
+  StringError     :: value                      -> ValueError value Text
+  BoolError       :: value                      -> ValueError value Bool
+  IndexError      :: value -> value             -> ValueError value value
+  CallError       :: value                      -> ValueError value value
+  NumericError    :: value                      -> ValueError value value
+  Numeric2Error   :: value -> value             -> ValueError value value
+  ComparisonError :: value -> value             -> ValueError value value
+  BitwiseError    :: value                      -> ValueError value value
+  Bitwise2Error   :: value -> value             -> ValueError value value
+  KeyValueError   :: value                      -> ValueError value (value, value)
+  ArrayError      :: value                      -> ValueError value [value]
   -- Indicates that we encountered an arithmetic exception inside Haskell-native number crunching.
-  ArithmeticError        :: ArithException -> ValueError value value
+  ArithmeticError :: ArithException             -> ValueError value value
   -- Out-of-bounds error
-  BoundsError            :: [value] -> Prelude.Integer -> ValueError value value
+  BoundsError     :: [value] -> Prelude.Integer -> ValueError value value
 
 instance NFData value => NFData1 (ValueError value) where
   liftRnf _ x = case x of
