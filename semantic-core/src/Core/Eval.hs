@@ -21,8 +21,6 @@ import Core.Core as Core
 import Core.Name
 import Data.Functor
 import Data.Maybe (fromMaybe, isJust)
-import Data.Text (Text)
-import qualified Data.Text as Text
 import GHC.Stack
 import Prelude hiding (fail)
 import Source.Span
