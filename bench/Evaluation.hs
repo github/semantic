@@ -58,8 +58,8 @@ callGraphProject' session proxy parser path = fmap (first show) . runTask sessio
 callGraphProject proxy parser paths = withOptions defaultOptions $ \ config logger statter ->
   callGraphProject' (TaskSession config "" False logger statter) proxy parser paths
 
-evalRubyProject       = evaluateProject (Proxy @'Language.Ruby)       rubyParser
-evalPythonProject     = evaluateProject (Proxy @'Language.Python)     pythonParser
+evalRubyProject   = evaluateProject (Proxy @'Language.Ruby)   rubyParser
+evalPythonProject = evaluateProject (Proxy @'Language.Python) pythonParser
 
 evaluateProject proxy parser path = withOptions defaultOptions $ \ config logger statter ->
   justEvaluating =<< evaluateProject' (TaskSession config "" False logger statter) proxy parser [Path.toString path]
