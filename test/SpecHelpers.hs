@@ -122,7 +122,7 @@ runTaskOrDie task = runTaskWithOptions defaultOptions { optionsLogLevel = Nothin
 
 type TestEvaluatingC term
   = ResumableC (BaseError (AddressError Precise (Val term)))
-  ( ResumableC (BaseError (ValueError (Val term)))
+  ( ResumableC (BaseError (ValueError term Precise))
   ( ResumableC (BaseError ResolutionError)
   ( ResumableC (BaseError (EvalError term Precise (Val term)))
   ( ResumableC (BaseError (HeapError Precise))
@@ -136,7 +136,7 @@ type TestEvaluatingC term
   ( LiftC IO))))))))))))
 type TestEvaluatingErrors term
   = '[ BaseError (AddressError Precise (Val term))
-     , BaseError (ValueError (Val term))
+     , BaseError (ValueError term Precise)
      , BaseError ResolutionError
      , BaseError (EvalError term Precise (Val term))
      , BaseError (HeapError Precise)

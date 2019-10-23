@@ -84,7 +84,7 @@ instance ( FreeVariables term
          , Member (State (ScopeGraph address)) sig
          , Member (Resumable (BaseError (AddressError address (Value term address)))) sig
          , Member (Resumable (BaseError (EvalError term address (Value term address)))) sig
-         , Member (Resumable (BaseError (ValueError (Value term address)))) sig
+         , Member (Resumable (BaseError (ValueError term address))) sig
          , Member (Resumable (BaseError (HeapError address))) sig
          , Member (Resumable (BaseError (ScopeError address))) sig
          , Member (State (Heap address address (Value term address))) sig
@@ -141,7 +141,7 @@ instance ( FreeVariables term
 
 instance ( Member (Reader ModuleInfo) sig
          , Member (Reader Span) sig
-         , Member (Resumable (BaseError (ValueError (Value term address)))) sig
+         , Member (Resumable (BaseError (ValueError term address))) sig
          , Carrier sig m
          , Monad m
          )
@@ -221,7 +221,7 @@ instance Carrier sig m
 
 instance ( Member (Reader ModuleInfo) sig
          , Member (Reader Span) sig
-         , Member (Resumable (BaseError (ValueError (Value term address)))) sig
+         , Member (Resumable (BaseError (ValueError term address))) sig
          , Carrier sig m
          , Monad m
          )
@@ -234,7 +234,7 @@ instance ( Member (Reader ModuleInfo) sig
 
 instance ( Member (Reader ModuleInfo) sig
          , Member (Reader Span) sig
-         , Member (Resumable (BaseError (ValueError (Value term address)))) sig
+         , Member (Resumable (BaseError (ValueError term address))) sig
          , Carrier sig m
          , Monad m
          )
@@ -264,7 +264,7 @@ instance ( Member (Reader ModuleInfo) sig
 -- Dispatch whatever's contained inside a 'Number.SomeNumber' to its appropriate 'MonadValue' ctor
 specialize :: ( Member (Reader ModuleInfo) sig
               , Member (Reader Span) sig
-              , Member (Resumable (BaseError (ValueError (Value term address)))) sig
+              , Member (Resumable (BaseError (ValueError term address))) sig
               , Carrier sig m
               )
            => Either ArithException Number.SomeNumber
@@ -277,7 +277,7 @@ specialize (Right (Number.SomeNumber (Number.Ratio t)))   = pure (Rational (Numb
 
 instance ( Member (Reader ModuleInfo) sig
          , Member (Reader Span) sig
-         , Member (Resumable (BaseError (ValueError (Value term address)))) sig
+         , Member (Resumable (BaseError (ValueError term address))) sig
          , Carrier sig m
          , Monad m
          )
@@ -310,7 +310,7 @@ instance Carrier sig m => Carrier (Abstract.Object address (Value term address) 
 
 instance ( Member (Reader ModuleInfo) sig
          , Member (Reader Span) sig
-         , Member (Resumable (BaseError (ValueError (Value term address)))) sig
+         , Member (Resumable (BaseError (ValueError term address))) sig
          , Carrier sig m
          , Monad m
          )
@@ -338,7 +338,7 @@ instance (Show address, Show term) => AbstractIntro (Value term address) where
 instance ( Member (Abstract.Boolean (Value term address)) sig
          , Member (Reader ModuleInfo) sig
          , Member (Reader Span) sig
-         , Member (Resumable (BaseError (ValueError (Value term address)))) sig
+         , Member (Resumable (BaseError (ValueError term address))) sig
          , Show address
          , Show term
          , Carrier sig m
@@ -385,24 +385,24 @@ instance ( Member (Abstract.Boolean (Value term address)) sig
         pair = (left, right)
 
 -- | The type of exceptions that can be thrown when constructing values in 'Value'’s 'MonadValue' instance.
-data ValueError value resume where
-  StringError            :: value          -> ValueError value Text
-  BoolError              :: value          -> ValueError value Bool
-  IndexError             :: value -> value -> ValueError value value
-  CallError              :: value          -> ValueError value value
-  NumericError           :: value          -> ValueError value value
-  Numeric2Error          :: value -> value -> ValueError value value
-  ComparisonError        :: value -> value -> ValueError value value
-  BitwiseError           :: value          -> ValueError value value
-  Bitwise2Error          :: value -> value -> ValueError value value
-  KeyValueError          :: value          -> ValueError value (value, value)
-  ArrayError             :: value          -> ValueError value [value]
+data ValueError term address resume where
+  StringError            :: Value term address                       -> ValueError term address Text
+  BoolError              :: Value term address                       -> ValueError term address Bool
+  IndexError             :: Value term address -> Value term address -> ValueError term address (Value term address)
+  CallError              :: Value term address                       -> ValueError term address (Value term address)
+  NumericError           :: Value term address                       -> ValueError term address (Value term address)
+  Numeric2Error          :: Value term address -> Value term address -> ValueError term address (Value term address)
+  ComparisonError        :: Value term address -> Value term address -> ValueError term address (Value term address)
+  BitwiseError           :: Value term address                       -> ValueError term address (Value term address)
+  Bitwise2Error          :: Value term address -> Value term address -> ValueError term address (Value term address)
+  KeyValueError          :: Value term address                       -> ValueError term address (Value term address, Value term address)
+  ArrayError             :: Value term address                       -> ValueError term address [Value term address]
   -- Indicates that we encountered an arithmetic exception inside Haskell-native number crunching.
-  ArithmeticError        :: ArithException -> ValueError value value
+  ArithmeticError        :: ArithException                           -> ValueError term address (Value term address)
   -- Out-of-bounds error
-  BoundsError            :: [value] -> Prelude.Integer -> ValueError value value
+  BoundsError            :: [Value term address] -> Prelude.Integer  -> ValueError term address (Value term address)
 
-instance NFData value => NFData1 (ValueError value) where
+instance (NFData term, NFData address) => NFData1 (ValueError term address) where
   liftRnf _ x = case x of
     StringError i       -> rnf i
     BoolError   i       -> rnf i
@@ -418,10 +418,10 @@ instance NFData value => NFData1 (ValueError value) where
     ArithmeticError i   -> i `seq` ()
     BoundsError i j     -> rnf i `seq` rnf j
 
-instance (NFData value, NFData resume) => NFData (ValueError value resume) where
+instance (NFData term, NFData address, NFData resume) => NFData (ValueError term address resume) where
   rnf = liftRnf rnf
 
-instance Eq value => Eq1 (ValueError value) where
+instance (Eq address, Eq term) => Eq1 (ValueError term address) where
   liftEq _ (StringError a) (StringError b)                       = a == b
   liftEq _ (CallError a) (CallError b)                           = a == b
   liftEq _ (BoolError a) (BoolError c)                           = a == c
@@ -434,24 +434,24 @@ instance Eq value => Eq1 (ValueError value) where
   liftEq _ (BoundsError a b) (BoundsError c d)                   = (a == c) && (b == d)
   liftEq _ _             _                                       = False
 
-deriving instance Show value => Show (ValueError value resume)
-instance Show value => Show1 (ValueError value) where
+deriving instance (Show address, Show term) => Show (ValueError term address resume)
+instance (Show address, Show term) => Show1 (ValueError term address) where
   liftShowsPrec _ _ = showsPrec
 
-runValueError :: Evaluator term address (Value term address) (ResumableC (BaseError (ValueError value)) m) a
-              -> Evaluator term address (Value term address) m (Either (SomeError (BaseError (ValueError value))) a)
+runValueError :: Evaluator term address (Value term address) (ResumableC (BaseError (ValueError term address)) m) a
+              -> Evaluator term address (Value term address) m (Either (SomeError (BaseError (ValueError term address))) a)
 runValueError = Evaluator . runResumable . runEvaluator
 
-runValueErrorWith :: (forall resume . BaseError (ValueError value) resume -> Evaluator term address (Value term address) m resume)
-                  -> Evaluator term address (Value term address) (ResumableWithC (BaseError (ValueError value)) m) a
+runValueErrorWith :: (forall resume . BaseError (ValueError term address) resume -> Evaluator term address (Value term address) m resume)
+                  -> Evaluator term address (Value term address) (ResumableWithC (BaseError (ValueError term address)) m) a
                   -> Evaluator term address (Value term address) m a
 runValueErrorWith f = Evaluator . runResumableWith (runEvaluator . f) . runEvaluator
 
-throwValueError :: ( Member (Resumable (BaseError (ValueError (Value term address)))) sig
+throwValueError :: ( Member (Resumable (BaseError (ValueError term address))) sig
                    , Member (Reader ModuleInfo) sig
                    , Member (Reader Span) sig
                    , Carrier sig m
                    )
-                => ValueError (Value term address) resume
+                => ValueError term address resume
                 -> Evaluator term address (Value term address) m resume
 throwValueError = throwBaseError

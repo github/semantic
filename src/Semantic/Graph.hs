@@ -433,7 +433,7 @@ resumingValueError :: ( Carrier sig m
                       , Show address
                       , Show term
                       )
-                   => Evaluator term address (Value term address) (ResumableWithC (BaseError (ValueError (Value term address))) m) a
+                   => Evaluator term address (Value term address) (ResumableWithC (BaseError (ValueError term address)) m) a
                    -> Evaluator term address (Value term address) m a
 resumingValueError = runValueErrorWith (\ baseError -> traceError "ValueError" baseError *> case baseErrorException baseError of
   CallError{}       -> pure hole
