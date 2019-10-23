@@ -62,7 +62,6 @@ import Data.Sum as Sum
 import Data.Term as X
 import Data.Traversable as X (for)
 import Debug.Trace as X (traceShowM, traceM)
-import GHC.Exts (Any)
 import Parsing.Parser as X
 import Semantic.Api hiding (File, Blob, BlobPair)
 import Semantic.Config (Config(..), optionsLogLevel)
@@ -172,7 +171,7 @@ testEvaluating
 
 type Val term = Value term Precise
 
-evaluateProject :: (HasPrelude lang, SLanguage lang) => TaskSession -> Proxy lang -> [FilePath] -> IO (TestEvaluatingState Any (TestEvaluatingResult Any))
+evaluateProject :: (HasPrelude lang, SLanguage lang) => TaskSession -> Proxy lang -> [FilePath] -> IO (TestEvaluatingState term (TestEvaluatingResult term))
 evaluateProject session proxy = case Map.lookup lang analysisParsers of
   Just (SomeParser parser) -> unsafeCoerce . testEvaluating <=< evaluateProject' session proxy parser
   _                        -> error $ "analysis not supported for " <> show lang
