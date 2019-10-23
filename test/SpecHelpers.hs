@@ -58,7 +58,7 @@ import Data.Semigroup as X (Semigroup(..))
 import Data.Semilattice.Lower as X
 import qualified Data.Set as Set
 import Data.String
-import Data.Sum
+import Data.Sum as Sum
 import Data.Term as X
 import Data.Traversable as X (for)
 import Debug.Trace as X (traceShowM, traceM)
@@ -148,7 +148,7 @@ testEvaluating :: Evaluator term Precise (Val term) (TestEvaluatingC term) a
                -> IO
                   (ScopeGraph Precise,
                     (Heap Precise Precise (Value term Precise),
-                     Either (SomeError (Data.Sum.Sum (TestEvaluatingErrors term))) a))
+                     Either (SomeError (Sum.Sum (TestEvaluatingErrors term))) a))
 testEvaluating
   = runM
   . runTraceByIgnoring
@@ -168,7 +168,7 @@ testEvaluating
 
 type Val term = Value term Precise
 
-evaluateProject :: (HasPrelude lang, SLanguage lang) => TaskSession -> Proxy lang -> [FilePath] -> IO (ScopeGraph Precise, (Heap Precise Precise (Value () Precise), Either (SomeError (Data.Sum.Sum (TestEvaluatingErrors Any))) (ModuleTable (Module (ModuleResult Precise (Value () Precise))))))
+evaluateProject :: (HasPrelude lang, SLanguage lang) => TaskSession -> Proxy lang -> [FilePath] -> IO (ScopeGraph Precise, (Heap Precise Precise (Value () Precise), Either (SomeError (Sum.Sum (TestEvaluatingErrors Any))) (ModuleTable (Module (ModuleResult Precise (Value () Precise))))))
 evaluateProject session proxy = case Map.lookup lang analysisParsers of
   Just (SomeParser parser) -> fmap (fmap (bimap eraseHeap (bimap unsafeCoerce (fmap (fmap (fmap erase)))))) . testEvaluating <=< evaluateProject' session proxy parser
   _                        -> error $ "analysis not supported for " <> show lang
