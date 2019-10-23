@@ -309,11 +309,11 @@ instance Carrier sig m => Carrier (Abstract.Object address (Value term address) 
     Abstract.Klass n frame k -> k (Class n mempty frame)
 
 instance ( Member (Reader ModuleInfo) sig
-       , Member (Reader Span) sig
-       , Member (Resumable (BaseError (ValueError term address))) sig
-       , Carrier sig m
-       , Monad m
-       )
+         , Member (Reader Span) sig
+         , Member (Resumable (BaseError (ValueError term address))) sig
+         , Carrier sig m
+         , Monad m
+         )
       => Carrier (Abstract.Array (Value term address) :+: sig) (ArrayC (Value term address) m) where
   eff (R other) = ArrayC . eff . handleCoercible $ other
   eff (L op) = case op of
