@@ -5,7 +5,6 @@ module SpecHelpers
 , runBuilder
 , diffFilePaths
 , parseFilePath
-, parseTestFile
 , readFilePathPair
 , runTaskOrDie
 , runParseWithConfig
@@ -108,12 +107,6 @@ runParseWithConfig task = asks configTreeSitterParseTimeout >>= \ timeout -> run
 -- | Read two files to a BlobPair.
 readFilePathPair :: Path.RelFile -> Path.RelFile -> IO BlobPair
 readFilePathPair p1 p2 = readFilePair (fileForTypedPath p1) (fileForTypedPath p2)
-
-parseTestFile :: Parser term -> Path.RelFile -> IO (Blob, term)
-parseTestFile parser path = runTaskOrDie $ do
-  blob <- readBlob (fileForPath (Path.toString path))
-  term <- parse parser blob
-  pure (blob, term)
 
 -- Run a Task and call `die` if it returns an Exception.
 runTaskOrDie :: ParseC TaskC a -> IO a

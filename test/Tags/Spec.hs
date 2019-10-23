@@ -1,5 +1,6 @@
 module Tags.Spec (spec) where
 
+import Control.Carrier.Parse.Simple
 import Data.Text (Text)
 import Source.Loc
 import SpecHelpers
@@ -104,3 +105,9 @@ spec = do
 
 symbolsToSummarize :: [Text]
 symbolsToSummarize = ["Function", "Method", "Class", "Module"]
+
+parseTestFile :: Parser term -> Path.RelFile -> IO (Blob, term)
+parseTestFile parser path = runTaskOrDie $ do
+  blob <- readBlob (fileForPath (Path.toString path))
+  term <- parse parser blob
+  pure (blob, term)
