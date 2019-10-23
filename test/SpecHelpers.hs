@@ -19,6 +19,7 @@ module SpecHelpers
 , lookupMembers
 , EdgeLabel(..)
 , TestEvaluatingResult
+, TestEvaluatingState
 , evaluateProject
 ) where
 
@@ -143,14 +144,15 @@ type TestEvaluatingErrors term
      , BaseError (UnspecializedError Precise (Val term))
      , BaseError (LoadError Precise (Val term))
      ]
-type TestEvaluatingResult term a
+type TestEvaluatingState term a
   = ( ScopeGraph Precise
-    , ( Heap Precise Precise (Value term Precise)
+    , ( Heap Precise Precise (Val term)
       , Either (SomeError (Sum.Sum (TestEvaluatingErrors term))) a
       )
     )
+type TestEvaluatingResult term = ModuleTable (Module (ModuleResult Precise (Val term)))
 testEvaluating :: Evaluator term Precise (Val term) (TestEvaluatingC term) a
-               -> IO (TestEvaluatingResult term a)
+               -> IO (TestEvaluatingState term a)
 testEvaluating
   = runM
   . runTraceByIgnoring
@@ -170,7 +172,7 @@ testEvaluating
 
 type Val term = Value term Precise
 
-evaluateProject :: (HasPrelude lang, SLanguage lang) => TaskSession -> Proxy lang -> [FilePath] -> IO (TestEvaluatingResult Any a)
+evaluateProject :: (HasPrelude lang, SLanguage lang) => TaskSession -> Proxy lang -> [FilePath] -> IO (TestEvaluatingState Any (TestEvaluatingResult Any))
 evaluateProject session proxy = case Map.lookup lang analysisParsers of
   Just (SomeParser parser) -> unsafeCoerce . testEvaluating <=< evaluateProject' session proxy parser
   _                        -> error $ "analysis not supported for " <> show lang
