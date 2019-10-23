@@ -68,7 +68,7 @@ parseSymbols blobs = do
   pure $ defMessage & P.files .~ toList terms
   where
     go :: (Member (Error SomeException) sig, Member (Reader PerLanguageModes) sig, Member Parse sig, Carrier sig m) => Blob -> m File
-    go blob@Blob{..} = catching $ asks toTagsParsers >>= \ p -> parseWith p (pure . renderToSymbols) blob
+    go blob@Blob{..} = catching $ asks toTagsParsers >>= \ p -> parseWith p (pure . tagsToFile . tagsForTerm) blob
       where
         catching m = m `catchError` (\(SomeException e) -> pure $ errorFile (show e))
         blobLanguage' = blobLanguage blob
@@ -80,8 +80,8 @@ parseSymbols blobs = do
           & P.errors .~ [defMessage & P.error .~ pack e]
           & P.blobOid .~ blobOid
 
-        renderToSymbols :: ToTags t => t Loc -> File
-        renderToSymbols term = tagsToFile (tags (blobLanguage blob) symbolsToSummarize blobSource term)
+        tagsForTerm :: ToTags t => t Loc -> [Tag]
+        tagsForTerm term = tags (blobLanguage blob) symbolsToSummarize blobSource term
 
         tagsToFile :: [Tag] -> File
         tagsToFile tags = defMessage
