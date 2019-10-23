@@ -24,7 +24,7 @@ import           Parsing.Parser
 import           Semantic.Config (defaultOptions)
 import           Semantic.Graph
 import           Semantic.Task (SomeException, TaskSession (..), runTask, withOptions)
-import           Semantic.Util hiding (evalPythonProject, evalRubyProject, evaluateProject)
+import           Semantic.Util
 import           Source.Loc
 import           Source.Span (HasSpan)
 import qualified System.Path as Path
@@ -65,10 +65,10 @@ evaluateProject proxy parser path = withOptions defaultOptions $ \ config logger
   evaluateProject' (TaskSession config "" False logger statter) proxy parser [Path.toString path]
 
 pyEval :: Path.RelFile -> Benchmarkable
-pyEval p = nfIO $ evalPythonProject (Path.relDir "bench/bench-fixtures/python" </> p)
+pyEval p = nfIO $ () <$ evalPythonProject (Path.relDir "bench/bench-fixtures/python" </> p)
 
 rbEval :: Path.RelFile -> Benchmarkable
-rbEval p = nfIO $ evalRubyProject (Path.relDir "bench/bench-fixtures/python" </> p)
+rbEval p = nfIO $ () <$ evalRubyProject (Path.relDir "bench/bench-fixtures/python" </> p)
 
 pyCall :: Path.RelFile -> Benchmarkable
 pyCall p = nfIO $ callGraphProject (Proxy @'Language.Python) pythonParser (Path.relDir "bench/bench-fixtures/python/" </> p)
