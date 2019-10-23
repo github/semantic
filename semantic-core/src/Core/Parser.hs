@@ -93,9 +93,13 @@ rec = Core.rec <$ reserved "rec" <*> name <* symbolic '=' <*> expr <?> "recursiv
 load :: (TokenParsing m, Carrier sig t, Member Core sig, Monad m) => m (t Name)
 load = Core.load <$ reserved "load" <*> expr
 
+query :: (TokenParsing m, Carrier sig t, Member Core sig, Monad m) => m (t Name)
+query = (Core..?) <$> atom <*> (namedValue <$ symbol ".?" <*> name)
+
 lvalue :: (TokenParsing m, Carrier sig t, Member Core sig, Monad m) => m (t Name)
 lvalue = choice
-  [ projection
+  [ query
+  , projection
   , ident
   , parens expr
   ]
