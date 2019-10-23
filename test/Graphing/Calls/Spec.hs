@@ -11,7 +11,6 @@ import           Control.Effect.Parse
 import           "semantic" Data.Graph (Graph (..), topologicalSort)
 import           Data.Graph.ControlFlowVertex
 import qualified Data.Language as Language
-import qualified Data.Map as Map
 import           Data.Maybe (fromJust)
 import           Semantic.Graph
 import qualified System.Path as Path
