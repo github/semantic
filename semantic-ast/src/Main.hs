@@ -66,5 +66,7 @@ opts = info (parseAST <**> helper)
  <> header "semantic-ast is a package used to parse source code" )
 
 -- TODO: Define formats for json, sexpression, etc.
-data Format = Show | Pretty | JSON
+data Format = Show
+            | Pretty
+            | JSON
   deriving (Read)
