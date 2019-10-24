@@ -51,7 +51,7 @@ generateAST (SemanticAST format noColor source) =
           Left filePaths -> traverse Data.ByteString.readFile filePaths
           Right source   -> pure [Data.ByteString.Char8.pack source]
         go bytestring = ast bytestring >>= display
-        ast bytestring = parseByteString @AST.Module @(Range, Span) Python.tree_sitter_python bytestring
+        ast = parseByteString @AST.Module @(Range, Span) Python.tree_sitter_python
         display = case format of
           Show -> print
           Pretty | noColor -> pPrintNoColor
@@ -70,3 +70,5 @@ data Format = Show
             | Pretty
             | JSON
   deriving (Read)
+
+-- bool field would break Read
