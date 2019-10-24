@@ -18,7 +18,7 @@ import Control.Monad ((>=>))
 
 data SemanticAST = SemanticAST
   { format :: Format
-  , color  :: Bool
+  , noColor  :: Bool
   , source :: Either [FilePath] String
   }
 
