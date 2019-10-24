@@ -14,6 +14,7 @@ import Options.Applicative hiding (style)
 import Data.Semigroup ((<>))
 import Text.Pretty.Simple (pPrint, pPrintNoColor)
 import Data.Foldable (traverse_)
+import Control.Monad ((>=>))
 
 data SemanticAST = SemanticAST
   { format :: Format
@@ -50,7 +51,7 @@ generateAST (SemanticAST format noColor source) =
   where getByteStrings = case source of
           Left filePaths -> traverse Data.ByteString.readFile filePaths
           Right source   -> pure [Data.ByteString.Char8.pack source]
-        go bytestring = ast bytestring >>= display
+        go = ast >=> display
         ast = parseByteString @AST.Module @(Range, Span) Python.tree_sitter_python
         display = case format of
           Show -> print
