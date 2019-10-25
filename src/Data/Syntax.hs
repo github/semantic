@@ -154,7 +154,7 @@ instance Evaluatable AccessibilityModifier
 --
 --   This can be used to represent an implicit no-op, e.g. the alternative in an 'if' statement without an 'else'.
 data Empty a = Empty
-  deriving (Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, NFData1)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, ToJSONFields1, Traversable)
 
 instance Eq1 Empty where liftEq = genericLiftEq
 instance Ord1 Empty where liftCompare = genericLiftCompare
@@ -165,7 +165,7 @@ instance Evaluatable Empty where
 
 -- | Syntax representing a parsing or assignment error.
 data Error a = Error { errorCallStack :: ErrorStack, errorExpected :: [String], errorActual :: Maybe String, errorChildren :: [a] }
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable, NFData1)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, ToJSONFields1, Traversable)
 
 instance Eq1 Error where liftEq = genericLiftEq
 instance Ord1 Error where liftCompare = genericLiftCompare
@@ -229,7 +229,7 @@ instance (Error :< fs, Apply Foldable fs, Apply Functor fs) => HasErrors (Term (
 
 
 data Context a = Context { contextTerms :: NonEmpty a, contextSubject :: a }
-  deriving (Foldable, FreeVariables1, Functor, Generic1, ToJSONFields1, Traversable, NFData1)
+  deriving (Foldable, FreeVariables1, Functor, Generic1, NFData1, ToJSONFields1, Traversable)
 
 instance Eq1 Context where liftEq = genericLiftEq
 instance Ord1 Context where liftCompare = genericLiftCompare
