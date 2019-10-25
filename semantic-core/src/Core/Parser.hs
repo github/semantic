@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveFunctor, DerivingStrategies, FlexibleContexts, GeneralizedNewtypeDeriving, TypeOperators #-}
+{-# LANGUAGE FlexibleContexts, GeneralizedNewtypeDeriving, TypeOperators #-}
 module Core.Parser
   ( core
   , lit
@@ -27,8 +27,7 @@ import           Text.Trifecta hiding (ident)
 -- * Identifier styles and derived parsers
 
 newtype CoreParser m a = CoreParser { runCoreParser :: m a }
-  deriving stock Functor
-  deriving newtype (Alternative, Applicative, CharParsing, DeltaParsing, Errable, LookAheadParsing, Monad, MonadPlus, Parsing)
+  deriving (Alternative, Applicative, CharParsing, DeltaParsing, Errable, Functor, LookAheadParsing, Monad, MonadPlus, Parsing)
 
 instance TokenParsing m => TokenParsing (CoreParser m) where
   someSpace = Style.buildSomeSpaceParser (void (satisfy Char.isSpace)) Style.haskellCommentStyle
