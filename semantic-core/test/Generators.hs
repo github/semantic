@@ -70,5 +70,6 @@ expr = Gen.recursive Gen.choice atoms
   , Gen.subterm expr Core.load
   , record expr
   , Gen.subtermM expr (\ x -> (x Core....) . namedValue <$> name)
+  , Gen.subtermM expr (\ x -> (x Core..?)  . namedValue <$> name)
   , Gen.subterm2 expr expr (Core..=)
   ]
