@@ -11,12 +11,13 @@ module Core.Parser
 -- Consult @doc/grammar.md@ for an EBNF grammar.
 
 import           Control.Applicative
-import           Control.Category ((>>>))
 import           Control.Effect.Carrier
 import           Core.Core ((:<-) (..), Core)
 import qualified Core.Core as Core
 import           Core.Name
 import qualified Data.Char as Char
+import           Data.Foldable (foldl')
+import           Data.Function
 import           Data.String
 import qualified Text.Parser.Token as Token
 import qualified Text.Parser.Token.Highlight as Highlight
@@ -61,12 +62,9 @@ application :: (TokenParsing m, Carrier sig t, Member Core sig, Monad m) => m (t
 application = projection `chainl1` (pure (Core.$$))
 
 projection :: (TokenParsing m, Carrier sig t, Member Core sig, Monad m) => m (t Name)
-projection = let a <$$> b = flip a <$> b in do
-  head <- atom
-  res <- many (choice [ (Core..?)  <$$> (symbol ".?" *> identifier)
-                      , (Core....) <$$> (dot *> identifier)
-                      ])
-  pure (foldr (>>>) id res head)
+projection = foldl' (&) <$> atom <*> many (choice [ flip (Core..?)  <$ symbol ".?" <*> identifier
+                                                  , flip (Core....) <$ dot         <*> identifier
+                                                  ])
 
 atom :: (TokenParsing m, Carrier sig t, Member Core sig, Monad m) => m (t Name)
 atom = choice
