@@ -20,7 +20,7 @@ import Control.Monad ((>=>))
 import Core.Core as Core
 import Core.Name
 import Data.Functor
-import Data.Maybe (fromMaybe)
+import Data.Maybe (fromMaybe, isJust)
 import GHC.Stack
 import Prelude hiding (fail)
 import Source.Span
@@ -68,6 +68,11 @@ eval Analysis{..} eval = \case
     a :. b -> do
       a' <- ref a
       a' ... b >>= maybe (freeVariable (show b)) (deref' b)
+    a :? b -> do
+      a' <- ref a
+      mFound <- a' ... b
+      bool (isJust mFound)
+
     a := b -> do
       b' <- eval b
       addr <- ref a
