@@ -38,14 +38,14 @@ callGraphProject' :: ( Language.SLanguage lang
                   => TaskSession
                   -> Proxy lang
                   -> Path.RelFile
-                  -> IO (Either String (Data.Graph.Graph ControlFlowVertex))
+                  -> IO (Either String ())
 callGraphProject' session proxy path
   | let lang = Language.reflect proxy
   , Just (SomeParser parser) <- parserForLanguage analysisParsers lang = fmap (first show) . runTask session $ do
   blob <- readBlobFromFile' (fileForTypedPath path)
   package <- fmap snd <$> runParse (Duration.fromSeconds 10) (parsePackage parser (Project (Path.toString (Path.takeDirectory path)) [blob] lang []))
   modules <- topologicalSort <$> runImportGraphToModules proxy package
-  runCallGraph proxy False modules package
+  (() <$) <$> runCallGraph proxy False modules package
 
 callGraphProject proxy paths = withOptions defaultOptions $ \ config logger statter ->
   callGraphProject' (TaskSession config "" False logger statter) proxy paths
