@@ -2,6 +2,7 @@
 module Analysis.FlowInsensitive
 ( Heap
 , FrameId(..)
+, Cache
 , convergeTerm
 , cacheTerm
 , runHeap
