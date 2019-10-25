@@ -13,8 +13,8 @@ import qualified Algebra.Graph as G
 import qualified Algebra.Graph.Export.Dot as G
 import           Analysis.Analysis
 import           Analysis.File
+import           Control.Algebra
 import           Control.Applicative (Alternative (..))
-import           Control.Carrier
 import           Control.Carrier.Fail.WithLoc
 import           Control.Carrier.Fresh.Strict
 import           Control.Carrier.NonDet.Church
