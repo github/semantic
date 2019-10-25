@@ -1,5 +1,4 @@
 {-# LANGUAGE DefaultSignatures, MultiParamTypeClasses, TypeOperators, UndecidableInstances, GADTs #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-} -- FIXME
 module Data.JSON.Fields
   ( JSONFields (..)
   , JSONFields1 (..)
