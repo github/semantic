@@ -32,12 +32,6 @@ data Number a where
 
 deriving instance Eq a => Eq (Number a)
 
-instance NFData (Number a) where
-  rnf a = case a of
-    Integer i -> rnf i
-    Ratio   r -> rnf r
-    Decimal d -> rnf d
-
 instance Show (Number a) where
   show (Integer i) = show i
   show (Ratio r) = show r

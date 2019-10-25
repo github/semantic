@@ -99,12 +99,6 @@ instance Ord1 f => Ord1 (Term f) where
 instance (Ord1 f, Ord a) => Ord (Term f a) where
   compare = compare1
 
-instance NFData1 f => NFData1 (Term f) where
-  liftRnf rnf = go where go x = liftRnf2 rnf go (unTerm x)
-
-instance (NFData1 f, NFData a) => NFData (Term f a) where
-  rnf = liftRnf rnf
-
 
 instance Functor f => Bifunctor (TermF f) where
   bimap f g (In a r) = In (f a) (fmap g r)
@@ -134,9 +128,6 @@ instance Ord1 f => Ord2 (TermF f) where
 
 instance (Ord1 f, Ord a) => Ord1 (TermF f a) where
   liftCompare = liftCompare2 compare
-
-instance NFData1 f => NFData2 (TermF f) where
-  liftRnf2 rnf1 rnf2 (In a1 f1) = rnf1 a1 `seq` liftRnf rnf2 f1
 
 instance (ToJSONFields a, ToJSONFields1 f) => ToJSON (Term f a) where
   toJSON = object . toJSONFields

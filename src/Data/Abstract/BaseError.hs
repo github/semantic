@@ -29,12 +29,6 @@ instance (Eq1 exc) => Eq1 (BaseError exc) where
 instance Show1 exc => Show1 (BaseError exc) where
   liftShowsPrec sl sp d (BaseError info span exc) = showParen (d > 10) $ showString "BaseError" . showChar ' ' . showsPrec 11 info . showChar ' ' . showsPrec 11 span . showChar ' ' . liftShowsPrec sl sp 11 exc
 
-instance (NFData1 exc, NFData resume) => NFData (BaseError exc resume) where
-  rnf = liftRnf rnf
-
-instance (NFData1 exc) => NFData1 (BaseError exc) where
-  liftRnf rnf' (BaseError i s e) = rnf i `seq` rnf s `seq` liftRnf rnf' e
-
 throwBaseError :: ( Member (Resumable (BaseError exc)) sig
                   , Member (Reader M.ModuleInfo) sig
                   , Member (Reader S.Span) sig

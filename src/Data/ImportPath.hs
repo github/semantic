@@ -10,10 +10,10 @@ import qualified Data.Text as T
 import           System.FilePath.Posix
 
 data IsRelative = Unknown | Relative | NonRelative
-  deriving (Bounded, Enum, Eq, Generic, Hashable, Ord, Show, ToJSON, NFData)
+  deriving (Bounded, Enum, Eq, Generic, Hashable, Ord, Show, ToJSON)
 
 data ImportPath = ImportPath { unPath :: FilePath, pathIsRelative :: IsRelative }
-  deriving (Eq, Generic, Hashable, Ord, Show, ToJSON, NFData)
+  deriving (Eq, Generic, Hashable, Ord, Show, ToJSON)
 
 -- TODO: fix the duplication present in this and Python
 importPath :: Text -> ImportPath

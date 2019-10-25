@@ -112,9 +112,6 @@ instance Show1 (LoadError address value) where
 instance Eq1 (LoadError address value) where
   liftEq _ (ModuleNotFoundError a) (ModuleNotFoundError b) = a == b
 
-instance NFData1 (LoadError address value) where
-  liftRnf _ (ModuleNotFoundError p) = rnf p
-
 runLoadError :: Evaluator term address value (ResumableC (BaseError (LoadError address value)) m) a
              -> Evaluator term address value m (Either (SomeError (BaseError (LoadError address value))) a)
 runLoadError = raiseHandler runResumable
@@ -147,10 +144,6 @@ instance Eq1 ResolutionError where
   liftEq _ (NotFoundError a _ l1) (NotFoundError b _ l2) = a == b && l1 == l2
   liftEq _ (GoImportError a) (GoImportError b) = a == b
   liftEq _ _ _ = False
-instance NFData1 ResolutionError where
-  liftRnf _ x = case x of
-    NotFoundError p ps l -> rnf p `seq` rnf ps `seq` rnf l
-    GoImportError p      -> rnf p
 
 runResolutionError :: Evaluator term address value (ResumableC (BaseError ResolutionError) m) a
                    -> Evaluator term address value m (Either (SomeError (BaseError ResolutionError)) a)

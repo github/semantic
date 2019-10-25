@@ -1,4 +1,4 @@
-{-# LANGUAGE AllowAmbiguousTypes, DeriveAnyClass, DerivingVia, GADTs, TypeOperators, MultiParamTypeClasses, UndecidableInstances, ScopedTypeVariables, KindSignatures, RankNTypes, ConstraintKinds, GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, DeriveAnyClass, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-missing-export-lists -Wno-redundant-constraints #-} -- For HasCallStack
 module Data.Syntax where
 
@@ -115,10 +115,11 @@ instance (Element f all, c f, Generate c all fs) => Generate c all (f ': fs) whe
 
 -- | An identifier of some other construct, whether a containing declaration (e.g. a class name) or a reference (e.g. a variable).
 newtype Identifier a = Identifier { name :: Name }
-  deriving newtype (Eq, Ord, Show)
-  deriving stock (Foldable, Functor, Generic1, Traversable)
-  deriving anyclass (Diffable, Hashable1, ToJSONFields1, NFData1)
-  deriving (Eq1, Show1, Ord1) via Generically Identifier
+  deriving (Diffable, Foldable, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
+
+instance Eq1 Identifier where liftEq = genericLiftEq
+instance Ord1 Identifier where liftCompare = genericLiftCompare
+instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 
 
 instance Evaluatable Identifier where
@@ -140,10 +141,11 @@ instance Declarations1 Identifier where
 
 -- | An accessibility modifier, e.g. private, public, protected, etc.
 newtype AccessibilityModifier a = AccessibilityModifier { contents :: Text }
-  deriving newtype (Eq, Ord, Show)
-  deriving stock (Foldable, Functor, Generic1, Traversable)
-  deriving anyclass (Declarations1, Diffable, FreeVariables1, Hashable1, ToJSONFields1, NFData1)
-  deriving (Eq1, Show1, Ord1) via Generically AccessibilityModifier
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
+
+instance Eq1 AccessibilityModifier where liftEq = genericLiftEq
+instance Ord1 AccessibilityModifier where liftCompare = genericLiftCompare
+instance Show1 AccessibilityModifier where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for AccessibilityModifier
 instance Evaluatable AccessibilityModifier
@@ -152,16 +154,22 @@ instance Evaluatable AccessibilityModifier
 --
 --   This can be used to represent an implicit no-op, e.g. the alternative in an 'if' statement without an 'else'.
 data Empty a = Empty
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, NFData1)
-  deriving (Eq1, Show1, Ord1) via Generically Empty
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
+
+instance Eq1 Empty where liftEq = genericLiftEq
+instance Ord1 Empty where liftCompare = genericLiftCompare
+instance Show1 Empty where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Empty where
   eval _ _ _ = unit
 
 -- | Syntax representing a parsing or assignment error.
 data Error a = Error { errorCallStack :: ErrorStack, errorExpected :: [String], errorActual :: Maybe String, errorChildren :: [a] }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
-  deriving (Eq1, Show1, Ord1) via Generically Error
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
+
+instance Eq1 Error where liftEq = genericLiftEq
+instance Ord1 Error where liftCompare = genericLiftCompare
+instance Show1 Error where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Error
 
@@ -173,7 +181,7 @@ unError span Error{..} = Error.Error span errorExpected errorActual stack
   where stack = fromCallSiteList $ unErrorSite <$> unErrorStack errorCallStack
 
 data ErrorSite = ErrorSite { errorMessage :: String, errorLocation :: SrcLoc }
-  deriving (Eq, Show, Generic, NFData)
+  deriving (Eq, Show, Generic)
 
 errorSite :: (String, SrcLoc) -> ErrorSite
 errorSite = uncurry ErrorSite
@@ -182,8 +190,7 @@ unErrorSite :: ErrorSite -> (String, SrcLoc)
 unErrorSite ErrorSite{..} = (errorMessage, errorLocation)
 
 newtype ErrorStack = ErrorStack { unErrorStack :: [ErrorSite] }
-  deriving stock (Eq, Show, Generic)
-  deriving anyclass (NFData)
+  deriving (Eq, Show, Generic)
 
 instance ToJSON ErrorStack where
   toJSON (ErrorStack es) = toJSON (jSite <$> es) where
@@ -222,8 +229,11 @@ instance (Error :< fs, Apply Foldable fs, Apply Functor fs) => HasErrors (Term (
 
 
 data Context a = Context { contextTerms :: NonEmpty a, contextSubject :: a }
-  deriving (Eq, Foldable, FreeVariables1, Functor, Generic1, Ord, Show, ToJSONFields1, Traversable, NFData1)
-  deriving (Eq1, Show1, Ord1) via Generically Context
+  deriving (Foldable, FreeVariables1, Functor, Generic1, ToJSONFields1, Traversable)
+
+instance Eq1 Context where liftEq = genericLiftEq
+instance Ord1 Context where liftCompare = genericLiftCompare
+instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
 
 instance Diffable Context where
   subalgorithmFor blur focus (Context n s) = Context <$> traverse blur n <*> focus s
