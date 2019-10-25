@@ -19,6 +19,7 @@ import           Data.Coerce
 import           Data.Foldable
 import           Data.Function
 import           Data.List.NonEmpty (NonEmpty (..))
+import           Data.Traversable
 import           GHC.Records
 import           Source.Span (Span)
 import           Syntax.Stack (Stack (..))
@@ -356,7 +357,15 @@ instance Compile Py.SetComprehension
 
 deriving instance Compile Py.SimpleStatement
 
-instance Compile Py.String
+instance Compile Py.String where
+  compile it@Py.String { extraChildren } cc _ = do
+    contents <- for extraChildren $ \case
+      Prj Py.EscapeSequence { text } -> pure text
+      other                          -> fail ("Couldn't string-desugar " <> show other)
+
+    let new = pure "__semantic_prelude" ... "str" ... "__class" ... "__new__"
+    cc $ locate it (new $$ Core.string (mconcat contents))
+
 instance Compile Py.Subscript
 
 instance Compile Py.True where
