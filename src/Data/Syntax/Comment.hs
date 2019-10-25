@@ -10,7 +10,7 @@ import Diffing.Algorithm
 
 -- | An unnested comment (line or block).
 newtype Comment a = Comment { commentContent :: Text }
-  deriving (Diffable, Foldable, Functor, Generic1, Hashable1, Traversable, FreeVariables1, Declarations1, ToJSONFields1, NFData1)
+  deriving (Diffable, Foldable, Functor, Generic1, Hashable1, Traversable, FreeVariables1, Declarations1, ToJSONFields1)
 
 instance Eq1 Comment where liftEq = genericLiftEq
 instance Ord1 Comment where liftCompare = genericLiftCompare
@@ -26,7 +26,7 @@ instance Evaluatable Comment where
 
 -- | HashBang line (e.g. `#!/usr/bin/env node`)
 newtype HashBang a = HashBang { value :: Text }
-  deriving (Diffable, Foldable, Functor, Generic1, Hashable1, Traversable, FreeVariables1, Declarations1, ToJSONFields1, NFData1)
+  deriving (Diffable, Foldable, Functor, Generic1, Hashable1, Traversable, FreeVariables1, Declarations1, ToJSONFields1)
 
 instance Eq1 HashBang where liftEq = genericLiftEq
 instance Ord1 HashBang where liftCompare = genericLiftCompare

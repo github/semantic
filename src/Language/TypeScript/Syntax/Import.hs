@@ -15,7 +15,7 @@ import qualified Data.Map.Strict as Map
 import Data.Aeson (ToJSON)
 
 data Import a = Import { importSymbols :: ![Alias], importFrom :: ImportPath }
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
 
 instance Eq1 Import where liftEq = genericLiftEq
 instance Ord1 Import where liftCompare = genericLiftCompare
@@ -48,7 +48,7 @@ instance Evaluatable Import where
     unit
 
 data QualifiedAliasedImport a = QualifiedAliasedImport { qualifiedAliasedImportAlias :: !a, qualifiedAliasedImportFrom :: ImportPath }
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
 
 instance Eq1 QualifiedAliasedImport where liftEq = genericLiftEq
 instance Ord1 QualifiedAliasedImport where liftCompare = genericLiftCompare
@@ -70,7 +70,7 @@ instance Evaluatable QualifiedAliasedImport where
     unit
 
 newtype SideEffectImport a = SideEffectImport { sideEffectImportFrom :: ImportPath }
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
 
 instance Eq1 SideEffectImport where liftEq = genericLiftEq
 instance Ord1 SideEffectImport where liftCompare = genericLiftCompare
@@ -84,7 +84,7 @@ instance Evaluatable SideEffectImport where
 
 -- | Qualified Export declarations
 newtype QualifiedExport a = QualifiedExport { qualifiedExportSymbols :: [Alias] }
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
 
 instance Eq1 QualifiedExport where liftEq = genericLiftEq
 instance Ord1 QualifiedExport where liftCompare = genericLiftCompare
@@ -106,14 +106,14 @@ instance Evaluatable QualifiedExport where
     unit
 
 data Alias = Alias { aliasValue :: Name, aliasName :: Name }
-  deriving (Eq, Generic, Hashable, Ord, Show, ToJSON, NFData)
+  deriving (Eq, Generic, Hashable, Ord, Show, ToJSON)
 
 toTuple :: Alias -> (Name, Name)
 toTuple Alias{..} = (aliasValue, aliasName)
 
 -- | Qualified Export declarations that export from another module.
 data QualifiedExportFrom a = QualifiedExportFrom { qualifiedExportFrom :: ImportPath, qualifiedExportFromSymbols :: ![Alias]}
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
 
 instance Eq1 QualifiedExportFrom where liftEq = genericLiftEq
 instance Ord1 QualifiedExportFrom where liftCompare = genericLiftCompare
@@ -138,7 +138,7 @@ instance Evaluatable QualifiedExportFrom where
     unit
 
 newtype DefaultExport a = DefaultExport { defaultExport :: a }
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
 
 instance Eq1 DefaultExport where liftEq = genericLiftEq
 instance Ord1 DefaultExport where liftCompare = genericLiftCompare
@@ -164,7 +164,7 @@ instance Evaluatable DefaultExport where
     unit
 
 data ImportRequireClause a = ImportRequireClause { importRequireIdentifier :: !a, importRequireSubject :: !a }
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
 
 instance Eq1 ImportRequireClause where liftEq = genericLiftEq
 instance Ord1 ImportRequireClause where liftCompare = genericLiftCompare
@@ -173,7 +173,7 @@ instance Show1 ImportRequireClause where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable ImportRequireClause
 
 newtype ImportClause a = ImportClause { importClauseElements :: [a] }
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
 
 instance Eq1 ImportClause where liftEq = genericLiftEq
 instance Ord1 ImportClause where liftCompare = genericLiftCompare
@@ -182,7 +182,7 @@ instance Show1 ImportClause where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable ImportClause
 
 data ImportAlias a = ImportAlias { importAliasSubject :: !a, importAlias :: !a }
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
 
 instance Eq1 ImportAlias where liftEq = genericLiftEq
 instance Ord1 ImportAlias where liftCompare = genericLiftCompare

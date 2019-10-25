@@ -40,7 +40,7 @@ data ControlFlowVertex
   | Variable      { vertexName :: Text, vertexModuleName :: Text, vertexSpan :: Span }
   | Method        { vertexName :: Text, vertexModuleName :: Text, vertexSpan :: Span }
   | Function      { vertexName :: Text, vertexModuleName :: Text, vertexSpan :: Span }
-  deriving (Eq, Ord, Show, Generic, Hashable, NFData)
+  deriving (Eq, Ord, Show, Generic, Hashable)
 
 packageVertex :: PackageInfo -> ControlFlowVertex
 packageVertex (PackageInfo name _) = Package (formatName name)

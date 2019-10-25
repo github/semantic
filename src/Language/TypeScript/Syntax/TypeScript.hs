@@ -17,7 +17,7 @@ import qualified Data.Abstract.ScopeGraph as ScopeGraph
 
 -- | ShorthandPropertyIdentifier used in object patterns such as var baz = { foo } to mean var baz = { foo: foo }
 newtype ShorthandPropertyIdentifier a = ShorthandPropertyIdentifier { contents :: T.Text }
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
 
 instance Eq1 ShorthandPropertyIdentifier where liftEq = genericLiftEq
 instance Ord1 ShorthandPropertyIdentifier where liftCompare = genericLiftCompare
@@ -26,7 +26,7 @@ instance Show1 ShorthandPropertyIdentifier where liftShowsPrec = genericLiftShow
 instance Evaluatable ShorthandPropertyIdentifier
 
 data Union a = Union { unionLeft :: !a, unionRight :: !a }
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
 
 instance Eq1 Union where liftEq = genericLiftEq
 instance Ord1 Union where liftCompare = genericLiftCompare
@@ -35,7 +35,7 @@ instance Show1 Union where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Language.TypeScript.Syntax.TypeScript.Union
 
 data Intersection a = Intersection { intersectionLeft :: !a, intersectionRight :: !a }
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
 
 instance Eq1 Intersection where liftEq = genericLiftEq
 instance Ord1 Intersection where liftCompare = genericLiftCompare
@@ -44,7 +44,7 @@ instance Show1 Intersection where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Intersection
 
 data AmbientFunction a = AmbientFunction { ambientFunctionContext :: ![a], ambientFunctionIdentifier :: !a, ambientFunctionParameters :: ![a] }
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
 
 instance Eq1 AmbientFunction where liftEq = genericLiftEq
 instance Ord1 AmbientFunction where liftCompare = genericLiftCompare
@@ -53,7 +53,7 @@ instance Show1 AmbientFunction where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable AmbientFunction
 
 newtype Tuple a = Tuple { tupleElements :: [a] }
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
 
 instance Eq1 Tuple where liftEq = genericLiftEq
 instance Ord1 Tuple where liftCompare = genericLiftCompare
@@ -63,7 +63,7 @@ instance Show1 Tuple where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Tuple
 
 data Constructor a = Constructor { constructorTypeParameters :: !a, constructorFormalParameters :: ![a], constructorType :: !a }
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
 
 instance Eq1 Constructor where liftEq = genericLiftEq
 instance Ord1 Constructor where liftCompare = genericLiftCompare
@@ -73,7 +73,7 @@ instance Evaluatable Language.TypeScript.Syntax.TypeScript.Constructor
 
 
 newtype Annotation a = Annotation { annotationType :: a }
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
 
 instance Eq1 Annotation where liftEq = genericLiftEq
 instance Ord1 Annotation where liftCompare = genericLiftCompare
@@ -82,7 +82,7 @@ instance Show1 Annotation where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Annotation
 
 newtype Decorator a = Decorator { decoratorTerm :: a }
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
 
 instance Eq1 Decorator where liftEq = genericLiftEq
 instance Ord1 Decorator where liftCompare = genericLiftCompare
@@ -91,7 +91,7 @@ instance Show1 Decorator where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Decorator
 
 newtype ComputedPropertyName a = ComputedPropertyName { propertyName :: a }
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
 
 instance Eq1 ComputedPropertyName where liftEq = genericLiftEq
 instance Ord1 ComputedPropertyName where liftCompare = genericLiftCompare
@@ -100,7 +100,7 @@ instance Show1 ComputedPropertyName where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable ComputedPropertyName
 
 newtype Constraint a = Constraint { constraintType :: a }
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
 
 instance Eq1 Constraint where liftEq = genericLiftEq
 instance Ord1 Constraint where liftCompare = genericLiftCompare
@@ -109,7 +109,7 @@ instance Show1 Constraint where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Constraint
 
 data NestedIdentifier a = NestedIdentifier { left :: !a, right :: !a }
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
 
 instance Eq1 NestedIdentifier where liftEq = genericLiftEq
 instance Ord1 NestedIdentifier where liftCompare = genericLiftCompare
@@ -118,7 +118,7 @@ instance Show1 NestedIdentifier where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable NestedIdentifier
 
 newtype AmbientDeclaration a = AmbientDeclaration { ambientDeclarationBody :: a }
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
 
 instance Eq1 AmbientDeclaration where liftEq = genericLiftEq
 instance Ord1 AmbientDeclaration where liftCompare = genericLiftCompare
@@ -128,7 +128,7 @@ instance Evaluatable AmbientDeclaration where
   eval eval _ (AmbientDeclaration body) = eval body
 
 data EnumDeclaration a = EnumDeclaration { enumDeclarationIdentifier :: !a, enumDeclarationBody :: ![a] }
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
 
 instance Eq1 EnumDeclaration where liftEq = genericLiftEq
 instance Ord1 EnumDeclaration where liftCompare = genericLiftCompare
@@ -140,7 +140,7 @@ instance Declarations a => Declarations (EnumDeclaration a) where
   declaredName EnumDeclaration{..} = declaredName enumDeclarationIdentifier
 
 newtype ExtendsClause a = ExtendsClause { extendsClauses :: [a] }
-  deriving (Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, ToJSONFields1, Traversable)
+  deriving (Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
 
 instance Eq1 ExtendsClause where liftEq = genericLiftEq
 instance Ord1 ExtendsClause where liftCompare = genericLiftCompare
@@ -158,7 +158,7 @@ instance Evaluatable ExtendsClause where
     unit
 
 data PropertySignature a = PropertySignature { modifiers :: [a], propertySignaturePropertyName :: a, propertySignatureAccessControl :: AccessControl }
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
 
 instance Eq1 PropertySignature where liftEq = genericLiftEq
 instance Ord1 PropertySignature where liftCompare = genericLiftCompare
@@ -167,7 +167,7 @@ instance Show1 PropertySignature where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable PropertySignature
 
 data CallSignature a = CallSignature { callSignatureTypeParameters :: !a, callSignatureParameters :: ![a], callSignatureType :: !a }
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
 
 instance Eq1 CallSignature where liftEq = genericLiftEq
 instance Ord1 CallSignature where liftCompare = genericLiftCompare
@@ -177,7 +177,7 @@ instance Evaluatable CallSignature
 
 -- | Todo: Move type params and type to context
 data ConstructSignature a = ConstructSignature { constructSignatureTypeParameters :: !a, constructSignatureParameters :: ![a], constructSignatureType :: !a }
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
 
 instance Eq1 ConstructSignature where liftEq = genericLiftEq
 instance Ord1 ConstructSignature where liftCompare = genericLiftCompare
@@ -186,7 +186,7 @@ instance Show1 ConstructSignature where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable ConstructSignature
 
 data IndexSignature a = IndexSignature { subject :: a, subjectType :: a, typeAnnotation :: a }
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
 
 instance Eq1 IndexSignature where liftEq = genericLiftEq
 instance Ord1 IndexSignature where liftCompare = genericLiftCompare
@@ -195,7 +195,7 @@ instance Show1 IndexSignature where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable IndexSignature
 
 data AbstractMethodSignature a = AbstractMethodSignature { abstractMethodSignatureContext :: ![a], abstractMethodSignatureName :: a, abstractMethodSignatureParameters :: [a], abstractMethodAccessControl :: AccessControl }
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
 
 instance Eq1 AbstractMethodSignature where liftEq = genericLiftEq
 instance Ord1 AbstractMethodSignature where liftCompare = genericLiftCompare
@@ -204,7 +204,7 @@ instance Show1 AbstractMethodSignature where liftShowsPrec = genericLiftShowsPre
 instance Evaluatable AbstractMethodSignature
 
 data ForOf a = ForOf { forOfBinding :: !a, forOfSubject :: !a, forOfBody :: !a }
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
 
 instance Eq1 ForOf where liftEq = genericLiftEq
 instance Ord1 ForOf where liftCompare = genericLiftCompare
@@ -213,7 +213,7 @@ instance Show1 ForOf where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable ForOf
 
 data LabeledStatement a = LabeledStatement { labeledStatementIdentifier :: !a, labeledStatementSubject :: !a }
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
 
 instance Eq1 LabeledStatement where liftEq = genericLiftEq
 instance Ord1 LabeledStatement where liftCompare = genericLiftCompare
@@ -222,7 +222,7 @@ instance Show1 LabeledStatement where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable LabeledStatement
 
 newtype Update a = Update { updateSubject :: a }
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
 
 instance Eq1 Update where liftEq = genericLiftEq
 instance Ord1 Update where liftCompare = genericLiftCompare
@@ -231,7 +231,7 @@ instance Show1 Update where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Update
 
 data Module a = Module { moduleIdentifier :: !a, moduleStatements :: ![a] }
-  deriving (Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, ToJSONFields1, Traversable)
+  deriving (Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
 
 instance Eq1 Module where liftEq = genericLiftEq
 instance Ord1 Module where liftCompare = genericLiftCompare
@@ -303,7 +303,7 @@ instance Declarations1 Module where
   liftDeclaredName declaredName = declaredName . moduleIdentifier
 
 data InternalModule a = InternalModule { internalModuleIdentifier :: !a, internalModuleStatements :: ![a] }
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
 
 instance Eq1 InternalModule where liftEq = genericLiftEq
 instance Ord1 InternalModule where liftCompare = genericLiftCompare
@@ -317,7 +317,7 @@ instance Declarations a => Declarations (InternalModule a) where
   declaredName InternalModule{..} = declaredName internalModuleIdentifier
 
 data ClassHeritage a = ClassHeritage { classHeritageExtendsClause :: !a, implementsClause :: !a }
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
 
 instance Eq1 ClassHeritage where liftEq = genericLiftEq
 instance Ord1 ClassHeritage where liftCompare = genericLiftCompare
@@ -326,7 +326,7 @@ instance Show1 ClassHeritage where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable ClassHeritage
 
 data AbstractClass a = AbstractClass { abstractClassIdentifier :: !a,  abstractClassTypeParameters :: !a, classHeritage :: ![a], classBody :: !a }
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
 
 instance Eq1 AbstractClass where liftEq = genericLiftEq
 instance Ord1 AbstractClass where liftCompare = genericLiftCompare
@@ -367,7 +367,7 @@ instance Evaluatable AbstractClass where
     unit
 
 data MetaProperty a = MetaProperty
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
 
 instance Eq1 MetaProperty where liftEq = genericLiftEq
 instance Ord1 MetaProperty where liftCompare = genericLiftCompare

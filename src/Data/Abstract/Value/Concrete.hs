@@ -44,7 +44,7 @@ data Value term address
   | Hash [Value term address]
   | Null
   | Hole
-  deriving (Eq, Ord, Show, Generic, NFData)
+  deriving (Eq, Ord, Show, Generic)
 
 
 instance ValueRoots address (Value term address) where
@@ -381,25 +381,6 @@ data ValueError term address resume where
   ArithmeticError        :: ArithException                           -> ValueError term address (Value term address)
   -- Out-of-bounds error
   BoundsError            :: [Value term address] -> Prelude.Integer  -> ValueError term address (Value term address)
-
-instance (NFData term, NFData address) => NFData1 (ValueError term address) where
-  liftRnf _ x = case x of
-    StringError i       -> rnf i
-    BoolError   i       -> rnf i
-    IndexError  i j     -> rnf i `seq` rnf j
-    CallError i         -> rnf i
-    NumericError i      -> rnf i
-    Numeric2Error i j   -> rnf i `seq` rnf j
-    ComparisonError i j -> rnf i `seq` rnf j
-    BitwiseError i      -> rnf i
-    Bitwise2Error i j   -> rnf i `seq` rnf j
-    KeyValueError i     -> rnf i
-    ArrayError i        -> rnf i
-    ArithmeticError i   -> i `seq` ()
-    BoundsError i j     -> rnf i `seq` rnf j
-
-instance (NFData term, NFData address, NFData resume) => NFData (ValueError term address resume) where
-  rnf = liftRnf rnf
 
 instance (Eq address, Eq term) => Eq1 (ValueError term address) where
   liftEq _ (StringError a) (StringError b)                       = a == b

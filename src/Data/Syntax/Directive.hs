@@ -13,7 +13,7 @@ import           Source.Span
 
 -- A file directive like the Ruby constant `__FILE__`.
 data File a = File
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable, NFData1)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
 
 instance Eq1 File where liftEq = genericLiftEq
 instance Ord1 File where liftCompare = genericLiftCompare
@@ -25,7 +25,7 @@ instance Evaluatable File where
 
 -- A line directive like the Ruby constant `__LINE__`.
 data Line a = Line
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable, NFData1)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
 
 instance Eq1 Line where liftEq = genericLiftEq
 instance Ord1 Line where liftCompare = genericLiftCompare

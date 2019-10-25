@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DerivingStrategies, GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Data.Abstract.ModuleTable
 ( ModulePath
 , ModuleTable (..)
@@ -21,9 +21,7 @@ import Prologue
 import System.FilePath.Posix
 
 newtype ModuleTable a = ModuleTable { unModuleTable :: Map.Map ModulePath a }
-  deriving stock (Eq, Foldable, Functor, Generic1, Generic, Ord, Traversable)
-  deriving newtype (Lower, Monoid, Semigroup)
-  deriving anyclass (NFData)
+  deriving (Eq, Foldable, Functor, Generic1, Generic, Lower, Monoid, Ord, Semigroup, Traversable)
 
 singleton :: ModulePath -> a -> ModuleTable a
 singleton name = ModuleTable . Map.singleton name

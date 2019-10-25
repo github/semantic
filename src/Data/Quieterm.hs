@@ -5,7 +5,6 @@ module Data.Quieterm
 ) where
 
 import Control.Lens
-import Control.DeepSeq
 import Data.Abstract.Declarations (Declarations)
 import Data.Abstract.FreeVariables (FreeVariables)
 import Data.Functor.Classes
@@ -38,12 +37,6 @@ instance Show1 syntax => Show1 (Quieterm syntax) where
 
 instance Show1 syntax => Show (Quieterm syntax ann) where
   showsPrec = liftShowsPrec (const (const id)) (const id)
-
-instance NFData1 f => NFData1 (Quieterm f) where
-  liftRnf rnf = go where go x = liftRnf2 rnf go (unQuieterm x)
-
-instance (NFData1 f, NFData a) => NFData (Quieterm f a) where
-  rnf = liftRnf rnf
 
 instance HasSpan ann => HasSpan (Quieterm syntax ann) where
   span_ = lens (view span_ . unQuieterm) (\(Quieterm i) s -> Quieterm (set span_ s i))

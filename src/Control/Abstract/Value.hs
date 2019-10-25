@@ -114,7 +114,7 @@ function name params body scope = sendFunction (Function name params body scope 
 data BuiltIn
   = Print
   | Show
-  deriving (Eq, Ord, Show, Generic, NFData)
+  deriving (Eq, Ord, Show, Generic)
 
 builtIn :: (Member (Function term address value) sig, Carrier sig m) => address -> BuiltIn -> Evaluator term address value m value
 builtIn address = sendFunction . flip (BuiltIn address) pure
