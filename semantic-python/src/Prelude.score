@@ -2,11 +2,21 @@
   type <- \name -> \super -> \slots ->
     #record { __name: name, __super: super, __slots: slots };
 
-  object <- type "object" #unit #record{};
+  instance <- \class -> \prim -> \slots ->
+    #record { __super: class, __prim: prim, __slots: slots };
 
-  getitem <- rec getitem = \item -> \attr ->
+  // object's superclass is type itself
+  object <- type "object" type #record{};
+
+  str <- type "str" object #record { };
+  str.__new__ = (\contents -> instance str contents #record{});
+
+  getitem <- \super -> \item -> \attr ->
     if item.slots.?attr then item.slots.attr else #unit;
 
-  #record { type: type, object: object, getitem: getitem }
+  new <- \class -> class.__new__;
 
+  example <- new str "hello";
+
+  #record { type: type, object: object, str: str, getitem: getitem, new: new, example: example }
 }
