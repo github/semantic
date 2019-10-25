@@ -5,7 +5,7 @@
   instance <- \class -> \prim -> \slots ->
     #record { __super: class, __prim: prim, __slots: slots };
 
-  -- object's superclass is type itself
+  // object's superclass is type itself
   object <- type "object" type #record{};
 
   str <- type "str" object #record { };
