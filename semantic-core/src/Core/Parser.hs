@@ -30,7 +30,8 @@ newtype CoreParser m a = CoreParser { runCoreParser :: m a }
   deriving (Alternative, Applicative, CharParsing, DeltaParsing, Errable, Functor, LookAheadParsing, Monad, MonadPlus, Parsing)
 
 instance TokenParsing m => TokenParsing (CoreParser m) where
-  someSpace = Style.buildSomeSpaceParser (void (satisfy Char.isSpace)) Style.haskellCommentStyle
+  someSpace = Style.buildSomeSpaceParser (void (satisfy Char.isSpace)) comments
+    where comments = Style.CommentStyle "" "" "//" False
 
 validIdentifierStart :: Char -> Bool
 validIdentifierStart c = not (Char.isDigit c) && isSimpleCharacter c
