@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveGeneric, DeriveTraversable, DerivingVia, FlexibleContexts, FlexibleInstances, LambdaCase, QuantifiedConstraints, RankNTypes, RecordWildCards, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeOperators #-}
+{-# LANGUAGE DeriveGeneric, DeriveTraversable, DerivingVia, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, LambdaCase, QuantifiedConstraints, RankNTypes, RecordWildCards, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Typecheck
 ( Monotype (..)
 , Meta
@@ -10,10 +10,11 @@ module Analysis.Typecheck
 import           Analysis.Analysis
 import           Analysis.File
 import           Analysis.FlowInsensitive
+import           Control.Algebra
 import           Control.Applicative (Alternative (..))
-import           Control.Carrier
 import           Control.Carrier.Fail.WithLoc
 import           Control.Carrier.Fresh.Strict as Fresh
+import           Control.Carrier.NonDet.Church
 import           Control.Carrier.Reader hiding (Local)
 import           Control.Carrier.State.Strict
 import           Control.Monad ((>=>), unless)
@@ -33,6 +34,7 @@ import           Data.Void
 import           GHC.Generics (Generic1)
 import           Prelude hiding (fail)
 import           Source.Span
+import           Syntax.Functor
 import           Syntax.Module
 import           Syntax.Scope
 import           Syntax.Term
@@ -60,6 +62,14 @@ deriving instance (Ord  name, Ord  a, forall a . Eq   a => Eq   (f a)
 deriving instance (Show name, Show a, forall a . Show a => Show (f a))          => Show (Monotype name f a)
 
 instance HFunctor (Monotype name)
+instance Effect   (Monotype name) where
+  handle ctx dst = \case
+    Bool -> Bool
+    Unit -> Unit
+    String -> String
+    Arr f a -> Arr (dst (f <$ ctx)) (dst (a <$ ctx))
+    Record fs -> Record (dst . (<$ ctx) <$> fs)
+
 instance RightModule (Monotype name) where
   Unit     >>=* _ = Unit
   Bool     >>=* _ = Bool
@@ -70,7 +80,7 @@ instance RightModule (Monotype name) where
 type Meta = Int
 
 newtype Polytype f a = PForAll (Scope () f a)
-  deriving (Foldable, Functor, Generic1, Traversable)
+  deriving (Effect, Foldable, Functor, Generic1, Traversable)
 
 deriving instance (Eq   a, forall a . Eq   a => Eq   (f a), Monad f) => Eq   (Polytype f a)
 deriving instance (Ord  a, forall a . Eq   a => Eq   (f a)
@@ -106,14 +116,19 @@ typecheckingFlowInsensitive
      )
 typecheckingFlowInsensitive eval
   = run
-  . runFresh
+  . evalFresh 0
   . runHeap
   . fmap (fmap (fmap (fmap generalize)))
   . traverse (runFile eval)
 
 runFile
   :: forall term name m sig
-  .  ( Effect sig
+  .  ( CanHandle sig (Either (Path.AbsRelFile, Span, String))
+     , CanHandle sig ((,) (IntMap.IntMap (Type name)))
+     , CanHandle sig ((,) (Set.Set (Constraint name)))
+     , CanHandle sig ((,) (Cache (term name) (Type name)))
+     , CanHandle sig ((,) Int)
+     , CanHandle sig (NonDetC (FreshC (ReaderC (Cache (term name) (Type name)) (StateC (Cache (term name) (Type name)) (StateC (Set.Set (Constraint name)) (FailC (ReaderC Span (ReaderC Path.AbsRelFile (StateC (Substitution name) m)))))))))
      , Has Fresh sig m
      , Has (State (Heap name (Type name))) sig m
      , Ord name
@@ -146,7 +161,7 @@ runFile eval file = traverse run file
               v <- meta
               bs <- m
               v <$ for_ bs (unify v))
-          . convergeTerm (Proxy @name) (fix (cacheTerm . eval typecheckingAnalysis))
+          . convergeTerm (Proxy @name) 1 (fix (cacheTerm . eval typecheckingAnalysis))
 
 typecheckingAnalysis
   :: ( Alternative m
