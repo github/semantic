@@ -8,17 +8,15 @@ import Data.Functor.Foldable (cata)
 import Data.Functor.Listable
 import Data.Maybe
 import Data.Mergeable
-import Data.Patch (after, before)
 import Data.Sum
 import Data.Term
-import Data.These
 import Diffing.Interpreter
 import qualified Data.Syntax as Syntax
 import Test.Hspec (Spec, describe, it)
 import Test.Hspec.Expectations
 import Test.Hspec.LeanCheck
 import Test.LeanCheck.Core
-import SpecHelpers ()
+import SpecHelpers (Edit(..), edit)
 
 spec :: Spec
 spec = do
@@ -26,7 +24,7 @@ spec = do
     it "returns a replacement when comparing two unicode equivalent terms" $
       let termA = termIn emptyAnnotation (inject (Syntax.Identifier "t\776"))
           termB = termIn emptyAnnotation (inject (Syntax.Identifier "\7831")) in
-          diffTerms termA termB `shouldBe` replacing termA (termB :: Term ListableSyntax ())
+          diffTerms termA termB `shouldBe` comparing termA (termB :: Term ListableSyntax ())
 
     prop "produces correct diffs" $
       \ a b -> let diff = diffTerms a b :: Diff ListableSyntax () () in
@@ -61,11 +59,11 @@ spec = do
 
   describe "diffTermPair" $ do
     prop "produces an Insert when the first term is missing" $ do
-      \ after -> let diff = diffTermPair (That after) :: Diff ListableSyntax () () in
+      \ after -> let diff = diffTermPair (Insert after) :: Diff ListableSyntax () () in
         diff `shouldBe` inserting after
 
     prop "produces a Delete when the second term is missing" $ do
-      \ before -> let diff = diffTermPair (This before) :: Diff ListableSyntax () () in
+      \ before -> let diff = diffTermPair (Delete before) :: Diff ListableSyntax () () in
         diff `shouldBe` deleting before
 
 
@@ -80,6 +78,14 @@ afterTerm :: (Foldable syntax, Mergeable syntax) => Diff syntax ann1 ann2 -> May
 afterTerm = cata $ \ diff -> case diff of
   Patch patch -> (after patch >>= \ (In     b  r) -> termIn b <$> sequenceAlt r) <|> (before patch >>= asum)
   Merge                             (In (_, b) r) -> termIn b <$> sequenceAlt r
+
+-- | Return the item from the after side of the patch.
+after :: Edit l r -> Maybe r
+after = edit (const Nothing) Just (\ _ b -> Just b)
+
+-- | Return the item from the before side of the patch.
+before :: Edit l r -> Maybe l
+before = edit Just (const Nothing) (\ a _ -> Just a)
 
 emptyAnnotation :: ()
 emptyAnnotation = ()

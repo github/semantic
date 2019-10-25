@@ -10,7 +10,6 @@ module Control.Carrier.Parse.Measured
 ) where
 
 import qualified Assigning.Assignment as Assignment
-import qualified Assigning.Assignment.Deterministic as Deterministic
 import           Control.Effect.Error
 import           Control.Effect.Carrier
 import           Control.Effect.Parse
@@ -22,8 +21,6 @@ import           Data.Blob
 import qualified Data.Error as Error
 import qualified Data.Flag as Flag
 import qualified Data.Syntax as Syntax
-import           Data.Sum
-import           Data.Term
 import           Data.Typeable
 import           Parsing.CMark
 import           Parsing.Parser
@@ -69,7 +66,6 @@ runParser blob@Blob{..} parser = case parser of
         >>= either (\e -> trace (displayException e) *> throwError (SomeException e)) pure
 
   AssignmentParser    parser assignment -> runAssignment Assignment.assign    parser blob assignment
-  DeterministicParser parser assignment -> runAssignment Deterministic.assign parser blob assignment
 
   MarkdownParser ->
     time "parse.cmark_parse" languageTag $
@@ -82,14 +78,10 @@ data ParserCancelled = ParserTimedOut | AssignmentTimedOut
 
 instance Exception ParserCancelled
 
-errors :: (Syntax.Error :< fs, Apply Foldable fs, Apply Functor fs) => Term (Sum fs) Assignment.Loc -> [Error.Error String]
-errors = cata $ \ (In Assignment.Loc{..} syntax) ->
-  maybe (fold syntax) (pure . Syntax.unError span) (project syntax)
 
 runAssignment
-  :: ( Apply Foldable syntaxes
-     , Apply Functor syntaxes
-     , Element Syntax.Error syntaxes
+  :: ( Foldable term
+     , Syntax.HasErrors term
      , Member (Error SomeException) sig
      , Member (Reader TaskSession) sig
      , Member Telemetry sig
@@ -98,11 +90,11 @@ runAssignment
      , Carrier sig m
      , MonadIO m
      )
-  => (Source -> assignment (Term (Sum syntaxes) Assignment.Loc) -> ast -> Either (Error.Error String) (Term (Sum syntaxes) Assignment.Loc))
+  => (Source -> assignment (term Assignment.Loc) -> ast -> Either (Error.Error String) (term Assignment.Loc))
   -> Parser ast
   -> Blob
-  -> assignment (Term (Sum syntaxes) Assignment.Loc)
-  -> m (Term (Sum syntaxes) Assignment.Loc)
+  -> assignment (term Assignment.Loc)
+  -> m (term Assignment.Loc)
 runAssignment assign parser blob@Blob{..} assignment = do
   taskSession <- ask
   let requestID' = ("github_request_id", requestID taskSession)
@@ -126,7 +118,7 @@ runAssignment assign parser blob@Blob{..} assignment = do
         logError taskSession Error blob err (("task", "assign") : logFields)
         throwError (toException err)
       Right term -> do
-        for_ (zip (errors term) [(0::Integer)..]) $ \ (err, i) -> case Error.errorActual err of
+        for_ (zip (Syntax.getErrors term) [(0::Integer)..]) $ \ (err, i) -> case Error.errorActual err of
           Just "ParseError" -> do
             when (i == 0) $ writeStat (increment "parse.parse_errors" languageTag)
             logError taskSession Warning blob err (("task", "parse") : logFields)

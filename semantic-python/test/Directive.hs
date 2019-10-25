@@ -6,13 +6,13 @@ module Directive ( Directive (..)
 
 import           Control.Applicative
 import           Control.Monad
-import           Data.Name (Name)
-import           Data.Term (Term)
-import           Data.Core (Core)
-import qualified Data.Core.Parser as Core.Parser
-import qualified Data.Core.Pretty as Core.Pretty
+import           Core.Core (Core)
+import qualified Core.Parser
+import qualified Core.Pretty
+import           Core.Name (Name)
 import           Data.ByteString.Char8 (ByteString)
 import qualified Data.ByteString.Char8 as ByteString
+import           Syntax.Term (Term)
 import           System.Process
 import qualified Text.Trifecta as Trifecta
 

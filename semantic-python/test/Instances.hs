@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DerivingStrategies, GeneralizedNewtypeDeriving, LambdaCase, StandaloneDeriving, FlexibleInstances, NamedFieldPuns, OverloadedStrings, QuantifiedConstraints, TypeOperators, UndecidableInstances, TypeApplications #-}
+{-# LANGUAGE DerivingStrategies, GeneralizedNewtypeDeriving, StandaloneDeriving, FlexibleInstances, NamedFieldPuns, OverloadedStrings, QuantifiedConstraints, TypeOperators, UndecidableInstances #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module Instances () where
@@ -7,57 +7,41 @@ module Instances () where
 -- expose in semantic-core proper, yet are important enough that
 -- we should keep track of them in a dedicated file.
 
+import           Analysis.File
 import           Analysis.ScopeGraph
-import           Control.Effect.Sum
+import           Core.Name (Name (..))
 import           Data.Aeson
-import qualified Data.HashMap.Strict as HashMap
-import           Data.Loc
-import           Data.Core (Core, Ann (..))
 import qualified Data.Map as Map
-import           Data.File
-import           Data.Term
-import           Data.Text (Text)
-import           Data.Scope (Scope, Incr)
-import qualified Data.Scope as Scope
-import           Data.Name
+import           Data.Text (Text, pack)
+import qualified System.Path as Path
+
+deriving newtype instance ToJSON Name
+deriving newtype instance ToJSONKey Name
 
 instance ToJSON a => ToJSON (File a) where
-  toJSON File{fileLoc, fileBody} = object
-    [ "location" .= fileLoc
+  toJSON File{filePath, fileSpan, fileBody} = object
+    [ "path" .= filePath
+    , "span" .= fileSpan
     , "body" .= fileBody
     ]
 
-instance ToJSON Span where
-  toJSON Span{spanStart, spanEnd} = object
-    [ "kind"  .= ("span" :: Text)
-    , "start" .= spanStart
-    , "end"   .= spanEnd
-    ]
-
-instance ToJSON Pos where
-  toJSON Pos{posLine, posCol} = object
-    [ "kind" .= ("pos" :: Text)
-    , "line" .= posLine
-    , "column"  .= posCol
-    ]
-
-instance ToJSON Loc where
-  toJSON Loc{locPath, locSpan} = object
-    [ "kind" .= ("loc" :: Text)
-    , "path" .= locPath
-    , "span" .= locSpan
-    ]
+instance ToJSON Path.AbsRelFile where
+  toJSON p = toJSON (pack (Path.toString p))
 
 instance ToJSON Ref where
-  toJSON (Ref loc) = object [ "kind" .= ("ref" :: Text)
-                            , "location" .= loc]
-
-instance ToJSON Decl where
-  toJSON Decl{declSymbol, declLoc} = object
-    [ "kind"   .= ("decl" :: Text)
-    , "symbol" .= declSymbol
-    , "location" .= declLoc
+  toJSON (Ref path span) = object
+    [ "kind" .= ("ref" :: Text)
+    , "path" .= path
+    , "span" .= span
     ]
 
-instance ToJSON ScopeGraph where
+instance ToJSON (Decl Name) where
+  toJSON Decl{declSymbol, declPath, declSpan} = object
+    [ "kind"   .= ("decl" :: Text)
+    , "symbol" .= declSymbol
+    , "path" .= declPath
+    , "span" .= declSpan
+    ]
+
+instance ToJSON (ScopeGraph Name) where
   toJSON (ScopeGraph sc) = toJSON . Map.mapKeys declSymbol $ sc

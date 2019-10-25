@@ -27,8 +27,8 @@ library
     , fused-effects    ^>= 0.5
     , semantic-source  ^>= 0.0
     , semantic-tags    ^>= 0.0
-    , tree-sitter      ^>= 0.4
-    , tree-sitter-java ^>= 0.3
+    , tree-sitter      ^>= 0.5
+    , tree-sitter-java ^>= 0.4
   hs-source-dirs:      src
   default-language:    Haskell2010
   ghc-options:

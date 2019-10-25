@@ -10,16 +10,13 @@ import           Data.Handle
 import qualified Data.Language as Language
 import           Data.List (intercalate)
 import           Data.Project
-import qualified Data.Text as T
 import qualified Data.Flag as Flag
 import           Options.Applicative hiding (style)
 import           Prologue
 import           Semantic.Api hiding (File)
-import qualified Semantic.AST as AST
 import           Semantic.Config
 import qualified Semantic.Graph as Graph
 import qualified Semantic.Task as Task
-import qualified Semantic.Git as Git
 import           Semantic.Task.Files
 import           Semantic.Telemetry
 import qualified Semantic.Telemetry.Log as Log
@@ -27,6 +24,8 @@ import           Semantic.Version
 import           Serializing.Format hiding (Options)
 import           System.Exit (die)
 import           System.FilePath
+import qualified System.Path as Path
+import qualified System.Path.PartClass as Path.PartClass
 
 import Control.Concurrent (mkWeakThreadId, myThreadId)
 import Control.Exception (Exception(..), throwTo)
@@ -83,33 +82,29 @@ optionsParser = do
 
 argumentsParser :: Parser (Parse.ParseC Task.TaskC ())
 argumentsParser = do
-  subparser <- hsubparser (diffCommand <> parseCommand <>  tsParseCommand <> graphCommand)
-  output <- ToPath <$> strOption (long "output" <> short 'o' <> help "Output path, defaults to stdout") <|> pure (ToHandle stdout)
+  subparser <- hsubparser (diffCommand <> parseCommand <> graphCommand)
+  output <- ToPath <$> pathOption (long "output" <> short 'o' <> help "Output path, defaults to stdout") <|> pure (ToHandle stdout)
   pure $ subparser >>= Task.write output
 
 diffCommand :: Mod CommandFields (Parse.ParseC Task.TaskC Builder)
 diffCommand = command "diff" (info diffArgumentsParser (progDesc "Compute changes between paths"))
   where
     diffArgumentsParser = do
+      languageModes <- languageModes
       renderer <- flag  (parseDiffBuilder DiffSExpression) (parseDiffBuilder DiffSExpression) (long "sexpression" <> help "Output s-expression diff tree (default)")
               <|> flag'                                    (parseDiffBuilder DiffJSONTree)    (long "json"        <> help "Output JSON diff trees")
               <|> flag'                                    (parseDiffBuilder DiffJSONGraph)   (long "json-graph"  <> help "Output JSON diff trees")
               <|> flag'                                    (diffSummaryBuilder JSON)          (long "toc"         <> help "Output JSON table of contents diff summary")
               <|> flag'                                    (parseDiffBuilder DiffDotGraph)    (long "dot"         <> help "Output the diff as a DOT graph")
               <|> flag'                                    (parseDiffBuilder DiffShow)        (long "show"        <> help "Output using the Show instance (debug only, format subject to change without notice)")
-      filesOrStdin <- Right <$> some (Both <$> argument filePathReader (metavar "FILE_A") <*> argument filePathReader (metavar "FILE_B")) <|> pure (Left stdin)
-      pure $ Task.readBlobPairs filesOrStdin >>= renderer
+      filesOrStdin <- Right <$> some ((,) <$> argument filePathReader (metavar "FILE_A") <*> argument filePathReader (metavar "FILE_B")) <|> pure (Left stdin)
+      pure $ Task.readBlobPairs filesOrStdin >>= runReader languageModes . renderer
 
 parseCommand :: Mod CommandFields (Parse.ParseC Task.TaskC Builder)
 parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate parse trees for path(s)"))
   where
     parseArgumentsParser = do
-      languageModes <- Language.PerLanguageModes
-        <$> option auto (  long "python-mode"
-                        <> help "The AST representation to use for Python sources"
-                        <> metavar "ALaCarte|Precise"
-                        <> value Language.ALaCarte
-                        <> showDefault)
+      languageModes <- languageModes
       renderer
         <-  flag  (parseTermBuilder TermSExpression)
                   (parseTermBuilder TermSExpression)
@@ -137,35 +132,9 @@ parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate pa
         <|> flag' (parseTermBuilder TermQuiet)
                   (  long "quiet"
                   <> help "Don't produce output, but show timing stats")
-      filesOrStdin <- FilesFromGitRepo
-                      <$> option str (long "gitDir" <> help "A .git directory to read from")
-                      <*> option shaReader (long "sha" <> help "The commit SHA1 to read from")
-                      <*> ( ExcludePaths <$> many (option str (long "exclude" <> short 'x' <> help "Paths to exclude"))
-                        <|> ExcludeFromHandle <$> flag' stdin (long "exclude-stdin" <> help "Exclude paths given to stdin")
-                        <|> IncludePaths <$> many (option str (long "only" <> help "Only include the specified paths"))
-                        <|> IncludePathsFromHandle <$> flag' stdin (long "only-stdin" <> help "Include only the paths given to stdin"))
-                  <|> FilesFromPaths <$> some (argument filePathReader (metavar "FILES..."))
+      filesOrStdin <- FilesFromPaths <$> some (argument filePathReader (metavar "FILES..."))
                   <|> pure (FilesFromHandle stdin)
       pure $ Task.readBlobs filesOrStdin >>= runReader languageModes . renderer
-
-tsParseCommand :: Mod CommandFields (Parse.ParseC Task.TaskC Builder)
-tsParseCommand = command "ts-parse" (info tsParseArgumentsParser (progDesc "Generate raw tree-sitter parse trees for path(s)"))
-  where
-    tsParseArgumentsParser = do
-      format <- flag  AST.SExpression AST.SExpression (long "sexpression" <> help "Output s-expression ASTs (default)")
-            <|> flag'                 AST.JSON        (long "json"        <> help "Output JSON ASTs")
-            <|> flag'                 AST.Quiet       (long "quiet"       <> help "Don't produce output, but show timing stats")
-            <|> flag'                 AST.Show        (long "show"        <> help "Output using the Show instance (debug only, format subject to change without notice)")
-      filesOrStdin <- FilesFromGitRepo
-                      <$> option str (long "gitDir" <> help "A .git directory to read from")
-                      <*> option shaReader (long "sha" <> help "The commit SHA1 to read from")
-                      <*> ( ExcludePaths <$> many (option str (long "exclude" <> short 'x' <> help "Paths to exclude"))
-                        <|> ExcludeFromHandle <$> flag' stdin (long "exclude-stdin" <> help "Exclude paths given to stdin")
-                        <|> IncludePaths <$> many (option str (long "only" <> help "Only include the specified paths"))
-                        <|> IncludePathsFromHandle <$> flag' stdin (long "only-stdin" <> help "Include only the paths given to stdin"))
-                  <|> FilesFromPaths <$> some (argument filePathReader (metavar "FILES..."))
-                  <|> pure (FilesFromHandle stdin)
-      pure $ Task.readBlobs filesOrStdin >>= AST.runASTParse format
 
 graphCommand :: Mod CommandFields (Parse.ParseC Task.TaskC Builder)
 graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute a graph for a directory or from a top-level entry point module"))
@@ -191,20 +160,28 @@ graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute a g
         _     -> pure $! Project "/" mempty Language.Unknown mempty
     readProjectRecursively = makeReadProjectRecursivelyTask
       <$> option auto (long "language" <> help "The language for the analysis.")
-      <*> optional (strOption (long "root" <> help "Root directory of project. Optional, defaults to entry file/directory." <> metavar "DIR"))
-      <*> many (strOption (long "exclude-dir" <> help "Exclude a directory (e.g. vendor)" <> metavar "DIR"))
-      <*> argument str (metavar "DIR")
+      <*> optional (pathOption (long "root" <> help "Root directory of project. Optional, defaults to entry file/directory." <> metavar "DIR"))
+      <*> many (pathOption (long "exclude-dir" <> help "Exclude a directory (e.g. vendor)" <> metavar "DIR"))
+      <*> argument path (metavar "PATH")
     makeReadProjectRecursivelyTask language rootDir excludeDirs dir = Task.readProject rootDir dir language excludeDirs
     makeGraphTask graphType includePackages serializer projectTask = projectTask >>= Graph.runGraph graphType includePackages >>= serializer
 
-shaReader :: ReadM Git.OID
-shaReader = eitherReader parseSha
-  where parseSha arg = if length arg == 40 || arg == "HEAD"
-          then Right (Git.OID (T.pack arg))
-          else Left (arg <> " is not a valid sha1")
+languageModes :: Parser Language.PerLanguageModes
+languageModes = Language.PerLanguageModes
+  <$> option auto (  long "python-mode"
+                  <> help "The AST representation to use for Python sources"
+                  <> metavar "ALaCarte|Precise"
+                  <> value Language.ALaCarte
+                  <> showDefault)
 
 filePathReader :: ReadM File
 filePathReader = fileForPath <$> str
+
+path :: (Path.PartClass.FileDir fd) => ReadM (Path.AbsRel fd)
+path = eitherReader Path.parse
+
+pathOption :: Path.PartClass.FileDir fd => Mod OptionFields (Path.AbsRel fd) -> Parser (Path.AbsRel fd)
+pathOption = option path
 
 options :: Eq a => [(String, a)] -> Mod OptionFields a -> Parser a
 options options fields = option (optionsReader options) (fields <> showDefaultWith (findOption options) <> metavar (intercalate "|" (fmap fst options)))

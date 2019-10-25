@@ -1,17 +1,18 @@
 {-# LANGUAGE FunctionalDependencies, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 module Data.Term
 ( Term(..)
-, termIn
-, termAnnotation
-, termOut
-, injectTerm
-, projectTerm
-, guardTerm
 , TermF(..)
 , termSize
 , hoistTerm
 , hoistTermF
 , Annotated (..)
+-- * Abstract term interfaces
+, IsTerm(..)
+, termAnnotation
+, termOut
+, projectTerm
+, termIn
+, injectTerm
 ) where
 
 import Prologue
@@ -25,20 +26,6 @@ import           Text.Show
 
 -- | A Term with an abstract syntax tree and an annotation.
 newtype Term syntax ann = Term { unTerm :: TermF syntax ann (Term syntax ann) }
-
-termAnnotation :: Term syntax ann -> ann
-termAnnotation = termFAnnotation . unTerm
-
-termOut :: Term syntax ann -> syntax (Term syntax ann)
-termOut = termFOut . unTerm
-
-projectTerm :: forall f syntax ann . (f :< syntax) => Term (Sum syntax) ann -> Maybe (f (Term (Sum syntax) ann))
-projectTerm = Sum.project . termOut
-
-guardTerm :: forall m f syntax ann . (f :< syntax, Alternative m)
-          => Term (Sum syntax) ann
-          -> m (f (Term (Sum syntax) ann))
-guardTerm = Sum.projectGuard . termOut
 
 data TermF syntax ann recur = In { termFAnnotation :: ann, termFOut :: syntax recur }
   deriving (Eq, Ord, Foldable, Functor, Show, Traversable, Generic1)
@@ -71,13 +58,6 @@ instance Annotated (Term syntax ann) ann where
 termSize :: (Foldable f, Functor f) => Term f annotation -> Int
 termSize = cata size where
   size (In _ syntax) = 1 + sum syntax
-
--- | Build a Term from its annotation and syntax.
-termIn :: ann -> syntax (Term syntax ann) -> Term syntax ann
-termIn = (Term .) . In
-
-injectTerm :: (f :< syntax) => ann -> f (Term (Sum syntax) ann) -> Term (Sum syntax) ann
-injectTerm a = termIn a . Sum.inject
 
 
 hoistTerm :: Functor f => (forall a. f a -> g a) -> Term f a -> Term g a
@@ -119,12 +99,6 @@ instance Ord1 f => Ord1 (Term f) where
 instance (Ord1 f, Ord a) => Ord (Term f a) where
   compare = compare1
 
-instance NFData1 f => NFData1 (Term f) where
-  liftRnf rnf = go where go x = liftRnf2 rnf go (unTerm x)
-
-instance (NFData1 f, NFData a) => NFData (Term f a) where
-  rnf = liftRnf rnf
-
 
 instance Functor f => Bifunctor (TermF f) where
   bimap f g (In a r) = In (f a) (fmap g r)
@@ -155,9 +129,6 @@ instance Ord1 f => Ord2 (TermF f) where
 instance (Ord1 f, Ord a) => Ord1 (TermF f a) where
   liftCompare = liftCompare2 compare
 
-instance NFData1 f => NFData2 (TermF f) where
-  liftRnf2 rnf1 rnf2 (In a1 f1) = rnf1 a1 `seq` liftRnf rnf2 f1
-
 instance (ToJSONFields a, ToJSONFields1 f) => ToJSON (Term f a) where
   toJSON = object . toJSONFields
   toEncoding = pairs . mconcat . toJSONFields
@@ -171,3 +142,35 @@ instance (ToJSON b, ToJSONFields a, ToJSONFields1 f) => ToJSONFields (TermF f a 
 instance (ToJSON b, ToJSONFields a, ToJSONFields1 f) => ToJSON (TermF f a b) where
   toJSON = object . toJSONFields
   toEncoding = pairs . mconcat . toJSONFields
+
+
+class IsTerm term where
+  type Syntax term :: * -> *
+
+  toTermF :: term ann -> TermF (Syntax term) ann (term ann)
+  fromTermF :: TermF (Syntax term) ann (term ann) -> term ann
+
+
+termAnnotation :: IsTerm term => term ann -> ann
+termAnnotation = termFAnnotation . toTermF
+
+termOut :: IsTerm term => term ann -> Syntax term (term ann)
+termOut = termFOut . toTermF
+
+projectTerm :: (f :< syntax, Sum syntax ~ Syntax term, IsTerm term) => term ann -> Maybe (f (term ann))
+projectTerm = Sum.project . termOut
+
+
+-- | Build a term from its annotation and syntax.
+termIn :: IsTerm term => ann -> Syntax term (term ann) -> term ann
+termIn = fmap fromTermF . In
+
+injectTerm :: (f :< syntax, Sum syntax ~ Syntax term, IsTerm term) => ann -> f (term ann) -> term ann
+injectTerm a = termIn a . Sum.inject
+
+
+instance IsTerm (Term syntax) where
+  type Syntax (Term syntax) = syntax
+
+  toTermF = unTerm
+  fromTermF = Term

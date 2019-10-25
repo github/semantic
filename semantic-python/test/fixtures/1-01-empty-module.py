@@ -1,2 +1,1 @@
-# CHECK-JQ: .scope == {}
-# CHECK-JQ: .heap  == {}
+# CHECK-JQ: .scope | has("__semantic_prelude") # prelude should be present

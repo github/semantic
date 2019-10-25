@@ -10,17 +10,18 @@ import qualified Data.Text as T
 import           System.FilePath.Posix
 
 data IsRelative = Unknown | Relative | NonRelative
-  deriving (Bounded, Enum, Eq, Generic, Hashable, Ord, Show, ToJSON, NFData)
+  deriving (Bounded, Enum, Eq, Generic, Hashable, Ord, Show, ToJSON)
 
 data ImportPath = ImportPath { unPath :: FilePath, pathIsRelative :: IsRelative }
-  deriving (Eq, Generic, Hashable, Ord, Show, ToJSON, NFData)
+  deriving (Eq, Generic, Hashable, Ord, Show, ToJSON)
 
 -- TODO: fix the duplication present in this and Python
 importPath :: Text -> ImportPath
 importPath str = let path = stripQuotes str in ImportPath (T.unpack path) (pathType path)
   where
-    pathType xs | not (T.null xs), T.head xs == '.' = Relative -- head call here is safe
-                | otherwise = NonRelative
+    pathType xs | startsWithDot xs = Relative -- head call here is safe
+                | otherwise        = NonRelative
+    startsWithDot t = fmap fst (T.uncons t) == Just '.'
 
 defaultAlias :: ImportPath -> Name
 defaultAlias = name . T.pack . takeFileName . unPath

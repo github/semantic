@@ -16,18 +16,19 @@ build-type:          Simple
 stability:           alpha
 extra-source-files:  README.md
 
-tested-with:         GHC == 8.6.4
+tested-with:         GHC == 8.6.5
 
 common haskell
   default-language:    Haskell2010
   build-depends:       base ^>=4.12
                      , fused-effects ^>= 0.5
+                     , fused-syntax
                      , semantic-core ^>= 0.0
                      , semantic-source ^>= 0.0
                      , semantic-tags ^>= 0.0
                      , text ^>= 1.2.3
-                     , tree-sitter ^>= 0.4
-                     , tree-sitter-python ^>= 0.5
+                     , tree-sitter ^>= 0.5
+                     , tree-sitter-python ^>= 0.6
 
   ghc-options:
     -Weverything
@@ -73,6 +74,7 @@ test-suite test
                , pretty-show ^>= 1.9.5
                , process ^>= 1.6.5
                , resourcet ^>= 1.2.2
+               , semantic-analysis ^>= 0
                , streaming ^>= 0.2.2
                , streaming-process ^>= 0.1
                , streaming-bytestring ^>= 0.1.6

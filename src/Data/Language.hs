@@ -13,7 +13,6 @@ module Data.Language
   , PerLanguageModes(..)
   , defaultLanguageModes
   , LanguageMode(..)
-  , modeForLanguage
   ) where
 
 import           Data.Aeson
@@ -40,7 +39,7 @@ data Language
     | TypeScript
     | PHP
     | TSX
-    deriving (Eq, Generic, Ord, Read, Show, Bounded, Hashable, ToJSON, Enum, NFData)
+    deriving (Eq, Generic, Ord, Read, Show, Bounded, Hashable, ToJSON, Enum)
 
 class SLanguage (lang :: Language) where
   reflect :: proxy lang -> Language
@@ -94,7 +93,15 @@ extensionsForLanguage language = T.unpack <$> maybe mempty Lingo.languageExtensi
 
 -- | Return a language based on a FilePath's extension.
 languageForFilePath :: FilePath -> Language
-languageForFilePath path = maybe Unknown (textToLanguage . Lingo.languageName) (Lingo.languageForPath path)
+languageForFilePath path =
+  let spurious lang = lang `elem` [ "Hack" -- .php files
+                                  , "GCC Machine Description" -- .md files
+                                  , "XML" -- .tsx files
+                                  ]
+      allResults = Lingo.languageName <$> Lingo.languagesForPath path
+  in case filter (not . spurious) allResults of
+    [result] -> textToLanguage result
+    _        -> Unknown
 
 supportedExts :: [String]
 supportedExts = foldr append mempty supportedLanguages
@@ -105,7 +112,7 @@ supportedExts = foldr append mempty supportedLanguages
     lookup k = Map.lookup k Lingo.languages
 
 codeNavLanguages :: [Language]
-codeNavLanguages = [Go, Ruby, Python, JavaScript, TypeScript, PHP]
+codeNavLanguages = [Go, Java, Ruby, Python, JavaScript, TypeScript, PHP]
 
 pathIsMinified :: FilePath -> Bool
 pathIsMinified = isExtensionOf ".min.js"
@@ -157,9 +164,3 @@ data LanguageMode
   = ALaCarte
   | Precise
   deriving (Bounded, Enum, Eq, Ord, Read, Show)
-
-modeForLanguage :: PerLanguageModes -> Language -> LanguageMode
-modeForLanguage modes = \case
-  Java   -> Precise
-  Python -> pythonMode modes
-  _      -> ALaCarte

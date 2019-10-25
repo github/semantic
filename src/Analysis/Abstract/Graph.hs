@@ -20,13 +20,11 @@ import           Algebra.Graph.Export.Dot hiding (vertexName)
 import           Control.Abstract hiding (Function(..))
 import           Control.Effect.Carrier
 import           Data.Abstract.BaseError
-import           Data.Abstract.Declarations
 import           Data.Abstract.Module (Module (moduleInfo), ModuleInfo (..))
 import           Data.Abstract.Package (PackageInfo (..))
 import           Data.ByteString.Builder
 import           Data.Graph
 import           Data.Graph.ControlFlowVertex
-import           Data.Term
 import qualified Data.Map as Map
 import qualified Data.Text.Encoding as T
 import           Prologue
@@ -70,17 +68,14 @@ graphingTerms :: ( Member (Reader ModuleInfo) sig
                  , Member (Reader (CurrentFrame address)) sig
                  , Member (Reader (CurrentScope address)) sig
                  , Member (Reader ControlFlowVertex) sig
-                 , VertexDeclaration syntax
-                 , Declarations1 syntax
+                 , VertexDeclaration term
                  , Ord address
-                 , Foldable syntax
-                 , term ~ Term syntax Loc
                  , Carrier sig m
                  )
-              => Open (term -> Evaluator term address value m a)
-graphingTerms recur term@(Term (In a syntax)) = do
+              => Open (term Loc -> Evaluator (term Loc) address value m a)
+graphingTerms recur term = do
   definedInModule <- currentModule
-  case toVertex a definedInModule syntax of
+  case toVertex definedInModule term of
     Just (v@Function{}, name) -> recurWithContext v name
     Just (v@Method{}, name) -> recurWithContext v name
     Just (v@Variable{..}, name) -> do

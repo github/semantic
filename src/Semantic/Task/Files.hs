@@ -14,7 +14,6 @@ module Semantic.Task.Files
   , Handle (..)
   , FilesC(..)
   , FilesArg(..)
-  , PathFilter(..)
   ) where
 
 import           Control.Effect.Carrier
@@ -28,32 +27,25 @@ import           Data.Language
 import           Data.Project
 import           Prelude hiding (readFile)
 import           Prologue hiding (catch)
-import qualified Semantic.Git as Git
 import           Semantic.IO
-import qualified System.IO as IO
+import qualified System.IO as IO hiding (withBinaryFile)
+import qualified System.Path.IO as IO (withBinaryFile)
 import qualified System.Path as Path
 
 data Source blob where
   FromPath       :: File                            -> Source Blob
   FromHandle     :: Handle 'IO.ReadMode             -> Source [Blob]
   FromDir        :: Path.AbsRelDir                  -> Source [Blob]
-  FromGitRepo    :: FilePath -> Git.OID -> PathFilter -> Source [Blob]
-  FromPathPair   :: Both File                       -> Source BlobPair
+  FromPathPair   :: File -> File                    -> Source BlobPair
   FromPairHandle :: Handle 'IO.ReadMode             -> Source [BlobPair]
 
-data Destination = ToPath FilePath | ToHandle (Handle 'IO.WriteMode)
-
-data PathFilter
-  = ExcludePaths [FilePath]
-  | ExcludeFromHandle (Handle 'IO.ReadMode)
-  | IncludePaths [FilePath]
-  | IncludePathsFromHandle (Handle 'IO.ReadMode)
+data Destination = ToPath Path.AbsRelFile | ToHandle (Handle 'IO.WriteMode)
 
 -- | An effect to read/write 'Blob's from 'Handle's or 'FilePath's.
 data Files (m :: * -> *) k
   = forall a . Read (Source a)                                     (a -> m k)
-  | ReadProject (Maybe FilePath) FilePath Language [FilePath] (Project -> m k)
-  | FindFiles FilePath [String] [FilePath]                    ([FilePath] -> m k)
+  | ReadProject (Maybe Path.AbsRelDir) Path.AbsRelFileDir Language [Path.AbsRelDir] (Project -> m k)
+  | FindFiles Path.AbsRelDir [String] [Path.AbsRelDir] ([Path.AbsRelFile] -> m k)
   | Write Destination B.Builder                               (m k)
 
 deriving instance Functor m => Functor (Files m)
@@ -83,11 +75,7 @@ instance (Member (Error SomeException) sig, Member Catch sig, MonadIO m, Carrier
     Read (FromPath path) k                                    -> rethrowing (readBlobFromFile' path) >>= k
     Read (FromHandle handle) k                                -> rethrowing (readBlobsFromHandle handle) >>= k
     Read (FromDir dir) k                                      -> rethrowing (readBlobsFromDir dir) >>= k
-    Read (FromGitRepo path sha (ExcludePaths excludePaths)) k -> rethrowing (readBlobsFromGitRepo path sha excludePaths mempty) >>= k
-    Read (FromGitRepo path sha (ExcludeFromHandle handle)) k  -> rethrowing (readPathsFromHandle handle >>= (\x -> readBlobsFromGitRepo path sha x mempty)) >>= k
-    Read (FromGitRepo path sha (IncludePaths includePaths)) k -> rethrowing (readBlobsFromGitRepo path sha mempty includePaths) >>= k
-    Read (FromGitRepo path sha (IncludePathsFromHandle h)) k  -> rethrowing (readPathsFromHandle h >>= readBlobsFromGitRepo path sha mempty) >>= k
-    Read (FromPathPair paths) k                               -> rethrowing (runBothWith readFilePair paths) >>= k
+    Read (FromPathPair p1 p2) k                               -> rethrowing (readFilePair p1 p2) >>= k
     Read (FromPairHandle handle) k                            -> rethrowing (readBlobPairsFromHandle handle) >>= k
     ReadProject rootDir dir language excludeDirs k            -> rethrowing (readProjectFromPaths rootDir dir language excludeDirs) >>= k
     FindFiles dir exts excludeDirs k                          -> rethrowing (findFilesInDir dir exts excludeDirs) >>= k
@@ -101,7 +89,6 @@ readBlob file = send (Read (FromPath file) pure)
 data FilesArg
   = FilesFromHandle (Handle 'IO.ReadMode)
   | FilesFromPaths [File]
-  | FilesFromGitRepo FilePath Git.OID PathFilter
 
 -- | A task which reads a list of 'Blob's from a 'Handle' or a list of 'FilePath's optionally paired with 'Language's.
 readBlobs :: (Member Files sig, Carrier sig m, MonadIO m) => FilesArg -> m [Blob]
@@ -112,17 +99,16 @@ readBlobs (FilesFromPaths [path]) = do
     then send (Read (FromDir (Path.path (filePath path))) pure)
     else pure <$> send (Read (FromPath path) pure)
 readBlobs (FilesFromPaths paths) = traverse (send . flip Read pure . FromPath) paths
-readBlobs (FilesFromGitRepo path sha filter) = send (Read (FromGitRepo path sha filter) pure)
 
 -- | A task which reads a list of pairs of 'Blob's from a 'Handle' or a list of pairs of 'FilePath's optionally paired with 'Language's.
-readBlobPairs :: (Member Files sig, Carrier sig m) => Either (Handle 'IO.ReadMode) [Both File] -> m [BlobPair]
+readBlobPairs :: (Member Files sig, Carrier sig m) => Either (Handle 'IO.ReadMode) [(File, File)] -> m [BlobPair]
 readBlobPairs (Left handle) = send (Read (FromPairHandle handle) pure)
-readBlobPairs (Right paths) = traverse (send . flip Read pure . FromPathPair) paths
+readBlobPairs (Right paths) = traverse (send . flip Read pure . uncurry FromPathPair) paths
 
-readProject :: (Member Files sig, Carrier sig m) => Maybe FilePath -> FilePath -> Language -> [FilePath] -> m Project
+readProject :: (Member Files sig, Carrier sig m) => Maybe Path.AbsRelDir -> Path.AbsRelFileDir -> Language -> [Path.AbsRelDir] -> m Project
 readProject rootDir dir lang excludeDirs = send (ReadProject rootDir dir lang excludeDirs pure)
 
-findFiles :: (Member Files sig, Carrier sig m) => FilePath -> [String] -> [FilePath] -> m [FilePath]
+findFiles :: (Member Files sig, Carrier sig m) => Path.AbsRelDir -> [String] -> [Path.AbsRelDir] -> m [Path.AbsRelFile]
 findFiles dir exts paths = send (FindFiles dir exts paths pure)
 
 -- | A task which writes a 'B.Builder' to a 'Handle' or a 'FilePath'.

@@ -34,7 +34,7 @@ renderDiff ref new = unsafePerformIO $ do
     else ["git", "diff", ref, new]
 {-# NOINLINE renderDiff #-}
 
-testForDiffFixture :: (String, [BlobPair] -> ParseC TaskC Builder, [Both File], Path.RelFile) -> TestTree
+testForDiffFixture :: (String, [BlobPair] -> ParseC TaskC Builder, [(File, File)], Path.RelFile) -> TestTree
 testForDiffFixture (diffRenderer, runDiff, files, expected) =
   goldenVsStringDiff
     ("diff fixture renders to " <> diffRenderer <> " " <> show files)
@@ -65,12 +65,12 @@ parseFixtures =
         prefix = Path.relDir "test/fixtures/cli"
         run = runReader (PerLanguageModes ALaCarte)
 
-diffFixtures :: [(String, [BlobPair] -> ParseC TaskC Builder, [Both File], Path.RelFile)]
+diffFixtures :: [(String, [BlobPair] -> ParseC TaskC Builder, [(File, File)], Path.RelFile)]
 diffFixtures =
   [ ("json diff", parseDiffBuilder DiffJSONTree, pathMode, prefix </> Path.file "diff-tree.json")
   , ("s-expression diff", parseDiffBuilder DiffSExpression, pathMode, Path.relFile "test/fixtures/ruby/corpus/method-declaration.diffA-B.txt")
-  , ("toc summaries diff", diffSummaryBuilder Serializing.Format.JSON, pathMode, prefix </> Path.file "diff-tree.toc.json")
-  , ("protobuf diff", diffSummaryBuilder Serializing.Format.Proto, pathMode, prefix </> Path.file "diff-tree.toc.protobuf.bin")
+  , ("toc summaries diff", runReader defaultLanguageModes . diffSummaryBuilder Serializing.Format.JSON, pathMode, prefix </> Path.file "diff-tree.toc.json")
+  , ("protobuf diff", runReader defaultLanguageModes . diffSummaryBuilder Serializing.Format.Proto, pathMode, prefix </> Path.file "diff-tree.toc.protobuf.bin")
   ]
-  where pathMode = [Both (File "test/fixtures/ruby/corpus/method-declaration.A.rb" Ruby) (File "test/fixtures/ruby/corpus/method-declaration.B.rb"  Ruby)]
+  where pathMode = [(File "test/fixtures/ruby/corpus/method-declaration.A.rb" Ruby, File "test/fixtures/ruby/corpus/method-declaration.B.rb"  Ruby)]
         prefix = Path.relDir "test/fixtures/cli"
