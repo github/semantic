@@ -1,6 +1,5 @@
 {-# LANGUAGE DeriveAnyClass, DerivingVia #-}
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-} -- FIXME
 module Language.Python.Syntax where
 
 import Prologue
@@ -187,14 +186,13 @@ instance Evaluatable Import where
 
     unit
 
-deriving instance Hashable1 NonEmpty
-
 newtype QualifiedImport a = QualifiedImport { qualifiedImportFrom :: NonEmpty a }
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, ToJSONFields1, Traversable)
 
 instance Eq1 QualifiedImport where liftEq = genericLiftEq
 instance Ord1 QualifiedImport where liftCompare = genericLiftCompare
 instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
+instance Hashable1 QualifiedImport where liftHashWithSalt = foldl
 
 -- import a.b.c
 instance Evaluatable QualifiedImport where
