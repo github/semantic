@@ -1,4 +1,4 @@
-{-# LANGUAGE AllowAmbiguousTypes, DeriveAnyClass, DerivingVia, GADTs, TypeOperators, MultiParamTypeClasses, UndecidableInstances, ScopedTypeVariables, KindSignatures, RankNTypes, ConstraintKinds, GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE AllowAmbiguousTypes, DeriveAnyClass, GADTs, TypeOperators, MultiParamTypeClasses, UndecidableInstances, ScopedTypeVariables, KindSignatures, RankNTypes, ConstraintKinds #-}
 {-# OPTIONS_GHC -Wno-missing-export-lists -Wno-redundant-constraints #-} -- For HasCallStack
 module Data.Syntax where
 
@@ -115,8 +115,7 @@ instance (Element f all, c f, Generate c all fs) => Generate c all (f ': fs) whe
 
 -- | An identifier of some other construct, whether a containing declaration (e.g. a class name) or a reference (e.g. a variable).
 newtype Identifier a = Identifier { name :: Name }
-  deriving stock (Foldable, Functor, Generic1, Traversable)
-  deriving anyclass (Diffable, Hashable1, ToJSONFields1, NFData1)
+  deriving (Diffable, Foldable, Functor, Generic1, Hashable1, NFData1, ToJSONFields1, Traversable)
 
 instance Eq1 Identifier where liftEq = genericLiftEq
 instance Ord1 Identifier where liftCompare = genericLiftCompare
@@ -142,8 +141,7 @@ instance Declarations1 Identifier where
 
 -- | An accessibility modifier, e.g. private, public, protected, etc.
 newtype AccessibilityModifier a = AccessibilityModifier { contents :: Text }
-  deriving stock (Foldable, Functor, Generic1, Traversable)
-  deriving anyclass (Declarations1, Diffable, FreeVariables1, Hashable1, ToJSONFields1, NFData1)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, NFData1, ToJSONFields1, Traversable)
 
 instance Eq1 AccessibilityModifier where liftEq = genericLiftEq
 instance Ord1 AccessibilityModifier where liftCompare = genericLiftCompare
@@ -192,8 +190,7 @@ unErrorSite :: ErrorSite -> (String, SrcLoc)
 unErrorSite ErrorSite{..} = (errorMessage, errorLocation)
 
 newtype ErrorStack = ErrorStack { unErrorStack :: [ErrorSite] }
-  deriving stock (Eq, Show, Generic)
-  deriving anyclass (NFData)
+  deriving (Eq, Show, Generic, NFData)
 
 instance ToJSON ErrorStack where
   toJSON (ErrorStack es) = toJSON (jSite <$> es) where
