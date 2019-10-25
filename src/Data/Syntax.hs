@@ -118,7 +118,10 @@ newtype Identifier a = Identifier { name :: Name }
   deriving newtype (Eq, Ord, Show)
   deriving stock (Foldable, Functor, Generic1, Traversable)
   deriving anyclass (Diffable, Hashable1, ToJSONFields1, NFData1)
-  deriving (Eq1, Show1, Ord1) via Generically Identifier
+
+instance Eq1 Identifier where liftEq = genericLiftEq
+instance Ord1 Identifier where liftCompare = genericLiftCompare
+instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 
 
 instance Evaluatable Identifier where
@@ -143,7 +146,10 @@ newtype AccessibilityModifier a = AccessibilityModifier { contents :: Text }
   deriving newtype (Eq, Ord, Show)
   deriving stock (Foldable, Functor, Generic1, Traversable)
   deriving anyclass (Declarations1, Diffable, FreeVariables1, Hashable1, ToJSONFields1, NFData1)
-  deriving (Eq1, Show1, Ord1) via Generically AccessibilityModifier
+
+instance Eq1 AccessibilityModifier where liftEq = genericLiftEq
+instance Ord1 AccessibilityModifier where liftCompare = genericLiftCompare
+instance Show1 AccessibilityModifier where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for AccessibilityModifier
 instance Evaluatable AccessibilityModifier
@@ -153,7 +159,10 @@ instance Evaluatable AccessibilityModifier
 --   This can be used to represent an implicit no-op, e.g. the alternative in an 'if' statement without an 'else'.
 data Empty a = Empty
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, NFData1)
-  deriving (Eq1, Show1, Ord1) via Generically Empty
+
+instance Eq1 Empty where liftEq = genericLiftEq
+instance Ord1 Empty where liftCompare = genericLiftCompare
+instance Show1 Empty where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Empty where
   eval _ _ _ = unit
@@ -161,7 +170,10 @@ instance Evaluatable Empty where
 -- | Syntax representing a parsing or assignment error.
 data Error a = Error { errorCallStack :: ErrorStack, errorExpected :: [String], errorActual :: Maybe String, errorChildren :: [a] }
   deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable, NFData1)
-  deriving (Eq1, Show1, Ord1) via Generically Error
+
+instance Eq1 Error where liftEq = genericLiftEq
+instance Ord1 Error where liftCompare = genericLiftCompare
+instance Show1 Error where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Error
 
@@ -223,7 +235,10 @@ instance (Error :< fs, Apply Foldable fs, Apply Functor fs) => HasErrors (Term (
 
 data Context a = Context { contextTerms :: NonEmpty a, contextSubject :: a }
   deriving (Eq, Foldable, FreeVariables1, Functor, Generic1, Ord, Show, ToJSONFields1, Traversable, NFData1)
-  deriving (Eq1, Show1, Ord1) via Generically Context
+
+instance Eq1 Context where liftEq = genericLiftEq
+instance Ord1 Context where liftCompare = genericLiftCompare
+instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
 
 instance Diffable Context where
   subalgorithmFor blur focus (Context n s) = Context <$> traverse blur n <*> focus s

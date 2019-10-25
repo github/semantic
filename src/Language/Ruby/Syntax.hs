@@ -60,7 +60,10 @@ cleanNameOrPath = T.unpack . dropRelativePrefix . stripQuotes
 
 data Send a = Send { sendReceiver :: Maybe a, sendSelector :: Maybe a, sendArgs :: [a], sendBlock :: Maybe a }
   deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable, NFData1)
-  deriving (Eq1, Show1, Ord1) via Generically Send
+
+instance Eq1 Send where liftEq = genericLiftEq
+instance Ord1 Send where liftCompare = genericLiftCompare
+instance Show1 Send where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Send where
   eval eval _ Send{..} = do
@@ -84,7 +87,10 @@ instance Evaluatable Send where
 
 data Require a = Require { requireRelative :: Bool, requirePath :: !a }
   deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable, NFData1)
-  deriving (Eq1, Show1, Ord1) via Generically Require
+
+instance Eq1 Require where liftEq = genericLiftEq
+instance Ord1 Require where liftCompare = genericLiftCompare
+instance Show1 Require where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Require where
   eval eval _ (Require _ x) = do
@@ -111,7 +117,10 @@ doRequire path = do
 
 data Load a = Load { loadPath :: a, loadWrap :: Maybe a }
   deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable, NFData1)
-  deriving (Eq1, Show1, Ord1) via Generically Load
+
+instance Eq1 Load where liftEq = genericLiftEq
+instance Ord1 Load where liftCompare = genericLiftCompare
+instance Show1 Load where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Load where
   eval eval _ (Load x Nothing) = do
@@ -152,7 +161,10 @@ doLoad path shouldWrap = do
 
 data Class a = Class { classIdentifier :: !a, classSuperClass :: !(Maybe a), classBody :: !a }
   deriving (Foldable, Traversable, Functor, Generic1, Hashable1, FreeVariables1, ToJSONFields1, NFData1)
-  deriving (Eq1, Show1, Ord1) via Generically Class
+
+instance Eq1 Class where liftEq = genericLiftEq
+instance Ord1 Class where liftCompare = genericLiftCompare
+instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 
 instance Diffable Class where
   equivalentBySubterm = Just . classIdentifier
@@ -209,7 +221,10 @@ instance Declarations1 Class where
 
 data Module a = Module { moduleIdentifier :: !a, moduleStatements :: ![a] }
   deriving (Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable, NFData1)
-  deriving (Eq1, Show1, Ord1) via Generically Module
+
+instance Eq1 Module where liftEq = genericLiftEq
+instance Ord1 Module where liftCompare = genericLiftCompare
+instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Module where
   eval eval _ Module{..} =  do
@@ -253,7 +268,10 @@ instance Declarations1 Module where
 
 data LowPrecedenceAnd a = LowPrecedenceAnd { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable, NFData1)
-  deriving (Eq1, Show1, Ord1) via Generically LowPrecedenceAnd
+
+instance Eq1 LowPrecedenceAnd where liftEq = genericLiftEq
+instance Ord1 LowPrecedenceAnd where liftCompare = genericLiftCompare
+instance Show1 LowPrecedenceAnd where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable LowPrecedenceAnd where
   -- N.B. we have to use Monad rather than Applicative/Traversable on 'And' and 'Or' so that we don't evaluate both operands
@@ -265,7 +283,10 @@ instance Evaluatable LowPrecedenceAnd where
 
 data LowPrecedenceOr a = LowPrecedenceOr { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable, NFData1)
-  deriving (Eq1, Show1, Ord1) via Generically LowPrecedenceOr
+
+instance Eq1 LowPrecedenceOr where liftEq = genericLiftEq
+instance Ord1 LowPrecedenceOr where liftCompare = genericLiftCompare
+instance Show1 LowPrecedenceOr where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable LowPrecedenceOr where
   -- N.B. we have to use Monad rather than Applicative/Traversable on 'And' and 'Or' so that we don't evaluate both operands
@@ -276,7 +297,10 @@ instance Evaluatable LowPrecedenceOr where
 
 data Assignment a = Assignment { assignmentContext :: ![a], assignmentTarget :: !a, assignmentValue :: !a }
   deriving (Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable, NFData1)
-  deriving (Eq1, Show1, Ord1) via Generically Assignment
+
+instance Eq1 Assignment where liftEq = genericLiftEq
+instance Ord1 Assignment where liftCompare = genericLiftCompare
+instance Show1 Assignment where liftShowsPrec = genericLiftShowsPrec
 
 instance Declarations1 Assignment where
   liftDeclaredName declaredName Assignment{..} = declaredName assignmentTarget
@@ -313,6 +337,9 @@ instance Evaluatable Assignment where
 -- arguments to the @super()@ invocation.
 data ZSuper a = ZSuper
   deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable, NFData1)
-  deriving (Eq1, Show1, Ord1) via Generically ZSuper
+
+instance Eq1 ZSuper where liftEq = genericLiftEq
+instance Ord1 ZSuper where liftCompare = genericLiftCompare
+instance Show1 ZSuper where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable ZSuper
