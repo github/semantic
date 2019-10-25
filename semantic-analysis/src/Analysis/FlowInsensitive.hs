@@ -9,11 +9,11 @@ module Analysis.FlowInsensitive
 , foldMapA
 ) where
 
-import           Control.Carrier
+import           Control.Algebra
+import           Control.Carrier.Fresh.Strict
 import           Control.Carrier.NonDet.Church
 import           Control.Carrier.Reader
 import           Control.Carrier.State.Strict
-import           Control.Effect.Fresh
 import qualified Data.Map as Map
 import           Data.Maybe (fromMaybe)
 import qualified Data.Set as Set
@@ -28,7 +28,7 @@ newtype FrameId name = FrameId { unFrameId :: name }
 
 
 convergeTerm :: forall m sig a term address proxy
-             .  ( Effect sig
+             .  ( CanHandle sig ((,) (Cache term a))
                 , Eq address
                 , Has Fresh sig m
                 , Has (State (Heap address a)) sig m
@@ -36,13 +36,14 @@ convergeTerm :: forall m sig a term address proxy
                 , Ord term
                 )
              => proxy address
-             -> (term -> NonDetC (ReaderC (Cache term a) (StateC (Cache term a) m)) a)
+             -> Int
+             -> (term -> NonDetC (FreshC (ReaderC (Cache term a) (StateC (Cache term a) m))) a)
              -> term
              -> m (Set.Set a)
-convergeTerm _ eval body = do
+convergeTerm _ n eval body = do
   heap <- get
   (cache, _) <- converge (Cache Map.empty :: Cache term a, heap :: Heap address a) $ \ (prevCache, _) -> runState (Cache Map.empty) . runReader prevCache $ do
-    _ <- resetFresh . runNonDetM Set.singleton $ eval body
+    _ <- runFresh n . runNonDetM Set.singleton $ eval body
     get
   pure (fromMaybe mempty (Map.lookup body (unCache cache)))
 
