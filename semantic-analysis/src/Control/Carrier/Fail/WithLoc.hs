@@ -8,9 +8,9 @@ module Control.Carrier.Fail.WithLoc
 ) where
 
 import Control.Applicative
-import Control.Effect.Carrier
-import Control.Effect.Error
-import Control.Effect.Fail (Fail(..), MonadFail(..))
+import Control.Algebra
+import Control.Carrier.Error.Either
+import Control.Effect.Fail
 import Control.Effect.Reader
 import Prelude hiding (fail)
 import Source.Span
@@ -22,12 +22,12 @@ runFail = runError . runFailC
 newtype FailC m a = FailC { runFailC :: ErrorC (Path.AbsRelFile, Span, String) m a }
   deriving (Alternative, Applicative, Functor, Monad)
 
-instance (Carrier sig m, Effect sig, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig) => MonadFail (FailC m) where
+instance (CanHandle sig (Either (Path.AbsRelFile, Span, String)), Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m) => MonadFail (FailC m) where
   fail s = do
     path <- ask
     span <- ask
     FailC (throwError (path :: Path.AbsRelFile, span :: Span, s))
 
-instance (Carrier sig m, Effect sig, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig) => Carrier (Fail :+: sig) (FailC m) where
-  eff (L (Fail s)) = fail s
-  eff (R other)    = FailC (eff (R (handleCoercible other)))
+instance (CanHandle sig (Either (Path.AbsRelFile, Span, String)), Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m) => Algebra (Fail :+: sig) (FailC m) where
+  alg (L (Fail s)) = fail s
+  alg (R other)    = FailC (handleCoercible other)
