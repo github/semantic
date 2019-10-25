@@ -115,7 +115,6 @@ instance (Element f all, c f, Generate c all fs) => Generate c all (f ': fs) whe
 
 -- | An identifier of some other construct, whether a containing declaration (e.g. a class name) or a reference (e.g. a variable).
 newtype Identifier a = Identifier { name :: Name }
-  deriving newtype (Eq, Ord, Show)
   deriving stock (Foldable, Functor, Generic1, Traversable)
   deriving anyclass (Diffable, Hashable1, ToJSONFields1, NFData1)
 
@@ -143,7 +142,6 @@ instance Declarations1 Identifier where
 
 -- | An accessibility modifier, e.g. private, public, protected, etc.
 newtype AccessibilityModifier a = AccessibilityModifier { contents :: Text }
-  deriving newtype (Eq, Ord, Show)
   deriving stock (Foldable, Functor, Generic1, Traversable)
   deriving anyclass (Declarations1, Diffable, FreeVariables1, Hashable1, ToJSONFields1, NFData1)
 
@@ -158,7 +156,7 @@ instance Evaluatable AccessibilityModifier
 --
 --   This can be used to represent an implicit no-op, e.g. the alternative in an 'if' statement without an 'else'.
 data Empty a = Empty
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, NFData1)
+  deriving (Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, NFData1)
 
 instance Eq1 Empty where liftEq = genericLiftEq
 instance Ord1 Empty where liftCompare = genericLiftCompare
@@ -234,7 +232,7 @@ instance (Error :< fs, Apply Foldable fs, Apply Functor fs) => HasErrors (Term (
 
 
 data Context a = Context { contextTerms :: NonEmpty a, contextSubject :: a }
-  deriving (Eq, Foldable, FreeVariables1, Functor, Generic1, Ord, Show, ToJSONFields1, Traversable, NFData1)
+  deriving (Foldable, FreeVariables1, Functor, Generic1, ToJSONFields1, Traversable, NFData1)
 
 instance Eq1 Context where liftEq = genericLiftEq
 instance Ord1 Context where liftCompare = genericLiftCompare
