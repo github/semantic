@@ -69,16 +69,12 @@ instance RightModule (Monotype name)
 type Meta = Int
 
 newtype Polytype f a = PForAll (Scope () f a)
-  deriving (Effect Traversable, Foldable, Functor, Generic1, Traversable)
+  deriving (Effect Traversable, Foldable, Functor, Generic1, HFunctor, RightModule, Traversable)
 
 deriving instance (Eq   a, forall a . Eq   a => Eq   (f a), Monad f) => Eq   (Polytype f a)
 deriving instance (Ord  a, forall a . Eq   a => Eq   (f a)
                          , forall a . Ord  a => Ord  (f a), Monad f) => Ord  (Polytype f a)
 deriving instance (Show a, forall a . Show a => Show (f a))          => Show (Polytype f a)
-
-instance HFunctor Polytype
-instance RightModule Polytype where
-  PForAll b >>=* f = PForAll (b >>=* f)
 
 
 forAll :: (Eq a, Has Polytype sig m) => a -> m a -> m a
