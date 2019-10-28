@@ -63,13 +63,7 @@ deriving instance (Ord  name, Ord  a, forall a . Eq   a => Eq   (f a)
 deriving instance (Show name, Show a, forall a . Show a => Show (f a))          => Show (Monotype name f a)
 
 instance HFunctor (Monotype name)
-instance Effect Functor (Monotype name) where
-  handle ctx dst = \case
-    Bool -> Bool
-    Unit -> Unit
-    String -> String
-    Arr f a -> Arr (dst (f <$ ctx)) (dst (a <$ ctx))
-    Record fs -> Record (dst . (<$ ctx) <$> fs)
+instance Effect Functor (Monotype name)
 
 instance RightModule (Monotype name) where
   Unit     >>=* _ = Unit
