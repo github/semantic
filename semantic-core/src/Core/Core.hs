@@ -91,23 +91,7 @@ infixl 9 :.
 infix  3 :=
 
 instance HFunctor Core
-instance Effect Traversable Core where
-  handle ctx dst = \case
-    Rec b -> Rec (handle ctx dst <$> b)
-    a :>> b -> dst (a <$ ctx) :>> dst (b <$ ctx)
-    a :>>= f -> (dst . (<$ ctx) <$> a) :>>= handle ctx dst f
-    Lam b -> Lam (handle ctx dst <$> b)
-    f :$ a -> dst (f <$ ctx) :$ dst (a <$ ctx)
-    Unit -> Unit
-    Bool b -> Bool b
-    If c t e -> If (dst (c <$ ctx)) (dst (t <$ ctx)) (dst (e <$ ctx))
-    String s -> String s
-    Load t -> Load (dst (t <$ ctx))
-    Record fs -> Record (map (fmap (dst . (<$ ctx))) fs)
-    f :. n -> dst (f <$ ctx) :. n
-    f :? n -> dst (f <$ ctx) :? n
-    f := a -> dst (f <$ ctx) := dst (a <$ ctx)
-
+instance Effect Traversable Core
 
 deriving instance (Eq   a, forall a . Eq   a => Eq   (f a), Monad f) => Eq   (Core f a)
 deriving instance (Ord  a, forall a . Eq   a => Eq   (f a)
