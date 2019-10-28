@@ -112,19 +112,21 @@ runFile eval file = traverse run file
             . runReader @(Env name) mempty
             . fix (eval concreteAnalysis)
 
-concreteAnalysis :: ( Foldable term
-                    , IsString name
-                    , Has Fresh sig m
-                    , Has (Reader (Env name)) sig m
-                    , Has (Reader Path.AbsRelFile) sig m
-                    , Has (Reader Span) sig m
-                    , Has (State (Heap term name)) sig m
-                    , MonadFail m
-                    , Ord name
-                    , Show name
-                    , Show (term name)
-                    )
-                 => Analysis term name Precise (Concrete term name) m
+concreteAnalysis
+  :: forall term name m sig
+  .  ( Foldable term
+     , IsString name
+     , Has Fresh sig m
+     , Has (Reader (Env name)) sig m
+     , Has (Reader Path.AbsRelFile) sig m
+     , Has (Reader Span) sig m
+     , Has (State (Heap term name)) sig m
+     , MonadFail m
+     , Ord name
+     , Show name
+     , Show (term name)
+     )
+  => Analysis term name Precise (Concrete term name) m
 concreteAnalysis = Analysis{..}
   where alloc _ = fresh
         bind name addr m = local (Map.insert name addr) m
