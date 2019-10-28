@@ -248,8 +248,7 @@ data Ann ann f a
   deriving (Eq, Foldable, Functor, Generic1, Ord, Show, Traversable)
 
 instance HFunctor (Ann ann)
-instance Effect Functor (Ann ann) where
-  handle ctx dst (Ann a b) = Ann a (dst (b <$ ctx))
+instance Effect Functor (Ann ann)
 
 instance RightModule (Ann ann) where
   Ann l b >>=* f = Ann l (b >>= f)
