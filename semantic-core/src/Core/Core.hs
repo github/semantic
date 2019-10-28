@@ -92,27 +92,12 @@ infix  3 :=
 
 instance HFunctor Core
 instance Effect Traversable Core
+instance RightModule Core
 
 deriving instance (Eq   a, forall a . Eq   a => Eq   (f a), Monad f) => Eq   (Core f a)
 deriving instance (Ord  a, forall a . Eq   a => Eq   (f a)
                          , forall a . Ord  a => Ord  (f a), Monad f) => Ord  (Core f a)
 deriving instance (Show a, forall a . Show a => Show (f a))          => Show (Core f a)
-
-instance RightModule Core where
-  Rec b      >>=* f = Rec ((>>=* f) <$> b)
-  (a :>> b)  >>=* f = (a >>= f) :>> (b >>= f)
-  (a :>>= b) >>=* f = ((>>= f) <$> a) :>>= (b >>=* f)
-  Lam b      >>=* f = Lam ((>>=* f) <$> b)
-  (a :$ b)   >>=* f = (a >>= f) :$ (b >>= f)
-  Unit       >>=* _ = Unit
-  Bool b     >>=* _ = Bool b
-  If c t e   >>=* f = If (c >>= f) (t >>= f) (e >>= f)
-  String s   >>=* _ = String s
-  Load b     >>=* f = Load (b >>= f)
-  Record fs  >>=* f = Record (map (fmap (>>= f)) fs)
-  (a :. b)   >>=* f = (a >>= f) :. b
-  (a :? b)   >>=* f = (a >>= f) :. b
-  (a := b)   >>=* f = (a >>= f) := (b >>= f)
 
 
 rec :: (Eq a, Has Core sig m) => Named a -> m a -> m a
