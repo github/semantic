@@ -36,8 +36,8 @@ module Core.Core
 , stripAnnotations
 ) where
 
+import Control.Algebra
 import Control.Applicative (Alternative (..))
-import Control.Carrier
 import Core.Name
 import Data.Bifunctor (Bifunctor (..))
 import Data.Foldable (foldl')
@@ -47,8 +47,10 @@ import Data.Text (Text)
 import GHC.Generics (Generic1)
 import GHC.Stack
 import Source.Span
+import Syntax.Functor
 import Syntax.Scope
 import Syntax.Stack
+import Syntax.Sum
 import Syntax.Module
 import Syntax.Term
 
@@ -89,6 +91,24 @@ infixl 9 :.
 infix  3 :=
 
 instance HFunctor Core
+instance Effect Core where
+  type CanHandle Core ctx = Traversable ctx
+  handle ctx dst = \case
+    Rec b -> Rec (handle ctx dst <$> b)
+    a :>> b -> dst (a <$ ctx) :>> dst (b <$ ctx)
+    a :>>= f -> (dst . (<$ ctx) <$> a) :>>= handle ctx dst f
+    Lam b -> Lam (handle ctx dst <$> b)
+    f :$ a -> dst (f <$ ctx) :$ dst (a <$ ctx)
+    Unit -> Unit
+    Bool b -> Bool b
+    If c t e -> If (dst (c <$ ctx)) (dst (t <$ ctx)) (dst (e <$ ctx))
+    String s -> String s
+    Load t -> Load (dst (t <$ ctx))
+    Record fs -> Record (map (fmap (dst . (<$ ctx))) fs)
+    f :. n -> dst (f <$ ctx) :. n
+    f :? n -> dst (f <$ ctx) :? n
+    f := a -> dst (f <$ ctx) := dst (a <$ ctx)
+
 
 deriving instance (Eq   a, forall a . Eq   a => Eq   (f a), Monad f) => Eq   (Core f a)
 deriving instance (Ord  a, forall a . Eq   a => Eq   (f a)
@@ -120,7 +140,7 @@ a >>> b = send (a :>> b)
 
 infixr 1 >>>
 
-unseq :: (Alternative m, Member Core sig) => Term sig a -> m (Term sig a, Term sig a)
+unseq :: (Alternative m, Project Core sig) => Term sig a -> m (Term sig a, Term sig a)
 unseq (Alg sig) | Just (a :>> b) <- prj sig = pure (a, b)
 unseq _                                     = empty
 
@@ -137,7 +157,7 @@ Named u n :<- a >>>= b = send (Named u a :>>= abstract1 n b)
 
 infixr 1 >>>=
 
-unbind :: (Alternative m, Member Core sig, RightModule sig) => a -> Term sig a -> m (Named a :<- Term sig a, Term sig a)
+unbind :: (Alternative m, Project Core sig, RightModule sig) => a -> Term sig a -> m (Named a :<- Term sig a, Term sig a)
 unbind n (Alg sig) | Just (Named u a :>>= b) <- prj sig = pure (Named u n :<- a, instantiate1 (pure n) b)
 unbind _ _                                              = empty
 
@@ -166,7 +186,7 @@ lam (Named u n) b = send (Lam (Named u (abstract1 n b)))
 lams :: (Eq a, Foldable t, Has Core sig m) => t (Named a) -> m a -> m a
 lams names body = foldr lam body names
 
-unlam :: (Alternative m, Member Core sig, RightModule sig) => a -> Term sig a -> m (Named a, Term sig a)
+unlam :: (Alternative m, Project Core sig, RightModule sig) => a -> Term sig a -> m (Named a, Term sig a)
 unlam n (Alg sig) | Just (Lam b) <- prj sig = pure (n <$ b, instantiate1 (pure n) (namedValue b))
 unlam _ _                                   = empty
 
@@ -181,7 +201,7 @@ infixl 8 $$
 
 infixl 8 $$*
 
-unapply :: (Alternative m, Member Core sig) => Term sig a -> m (Term sig a, Term sig a)
+unapply :: (Alternative m, Project Core sig) => Term sig a -> m (Term sig a, Term sig a)
 unapply (Alg sig) | Just (f :$ a) <- prj sig = pure (f, a)
 unapply _                                    = empty
 
@@ -229,6 +249,8 @@ data Ann ann f a
   deriving (Eq, Foldable, Functor, Generic1, Ord, Show, Traversable)
 
 instance HFunctor (Ann ann)
+instance Effect   (Ann ann) where
+  handle ctx dst (Ann a b) = Ann a (dst (b <$ ctx))
 
 instance RightModule (Ann ann) where
   Ann l b >>=* f = Ann l (b >>= f)
@@ -244,7 +266,7 @@ annWith :: Has (Ann Span) sig m => CallStack -> m a -> m a
 annWith callStack = maybe id (annAt . spanFromSrcLoc . snd) (listToMaybe (getCallStack callStack))
 
 
-stripAnnotations :: forall ann a sig . (HFunctor sig, forall g . Functor g => Functor (sig g)) => Term (Ann ann :+: sig) a -> Term sig a
+stripAnnotations :: forall ann a sig . RightModule sig => Term (Ann ann :+: sig) a -> Term sig a
 stripAnnotations (Var v)             = Var v
 stripAnnotations (Alg (L (Ann _ b))) = stripAnnotations b
 stripAnnotations (Alg (R        b))  = Alg (hmap stripAnnotations b)
