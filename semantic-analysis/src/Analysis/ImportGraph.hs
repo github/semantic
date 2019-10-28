@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, RankNTypes, RecordWildCards, ScopedTypeVariables, TypeApplications #-}
+{-# LANGUAGE ConstraintKinds, FlexibleContexts, RankNTypes, RecordWildCards, ScopedTypeVariables, TypeApplications #-}
 module Analysis.ImportGraph
 ( ImportGraph
 , importGraph
@@ -69,11 +69,12 @@ importGraph eval
   . traverse (runFile eval)
 
 runFile
-  :: forall term name m sig
-  .  ( CanHandle sig (Either (Path.AbsRelFile, Span, String))
-     , CanHandle sig ((,) Int)
-     , CanHandle sig (NonDetC Identity)
-     , CanHandle sig ((,) (Cache (term name) (Value term name)))
+  :: forall term name m c sig
+  .  ( c (Either (Path.AbsRelFile, Span, String))
+     , c (NonDetC Identity)
+     , c ((,) (Cache (term name) (Value term name)))
+     , c ((,) Int)
+     , Effect c sig
      , Has Fresh sig m
      , Has (State (Heap name (Value term name))) sig m
      , Ord  name

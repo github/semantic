@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, OverloadedStrings, RankNTypes, RecordWildCards, ScopedTypeVariables, TypeApplications, TypeOperators #-}
+{-# LANGUAGE ConstraintKinds, FlexibleContexts, OverloadedStrings, RankNTypes, RecordWildCards, ScopedTypeVariables, TypeApplications, TypeOperators #-}
 module Analysis.ScopeGraph
 ( ScopeGraph(..)
 , Ref (..)
@@ -69,11 +69,12 @@ scopeGraph eval
   . traverse (runFile eval)
 
 runFile
-  :: forall term name m sig
-  .  ( CanHandle sig ((,) Int)
-     , CanHandle sig ((,) (Cache (term name) (ScopeGraph name)))
-     , CanHandle sig (Either (Path.AbsRelFile, Span, String))
-     , CanHandle sig (NonDetC Identity)
+  :: forall term name m c sig
+  .  ( c ((,) Int)
+     , c ((,) (Cache (term name) (ScopeGraph name)))
+     , c (Either (Path.AbsRelFile, Span, String))
+     , c (NonDetC Identity)
+     , Effect c sig
      , Has Fresh sig m
      , Has (State (Heap name (ScopeGraph name))) sig m
      , Ord name

@@ -1,4 +1,4 @@
-{-# LANGUAGE DerivingVia, FlexibleContexts, FlexibleInstances, LambdaCase, MultiParamTypeClasses, NamedFieldPuns, OverloadedStrings, RankNTypes, RecordWildCards, ScopedTypeVariables, TypeApplications, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE ConstraintKinds, DerivingVia, FlexibleContexts, FlexibleInstances, LambdaCase, MultiParamTypeClasses, NamedFieldPuns, OverloadedStrings, RankNTypes, RecordWildCards, ScopedTypeVariables, TypeApplications, TypeOperators, UndecidableInstances #-}
 module Analysis.Concrete
 ( Concrete(..)
 , concrete
@@ -87,8 +87,9 @@ concrete eval
   . traverse (runFile eval)
 
 runFile
-  :: forall term name m sig
-  .  ( CanHandle sig (Either (Path.AbsRelFile, Span, String))
+  :: forall term name m c sig
+  .  ( c (Either (Path.AbsRelFile, Span, String))
+     , Effect c sig
      , Foldable term
      , IsString name
      , Has Fresh sig m

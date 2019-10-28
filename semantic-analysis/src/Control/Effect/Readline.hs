@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveFunctor, DeriveGeneric, FlexibleContexts, OverloadedStrings #-}
+{-# LANGUAGE DeriveFunctor, DeriveGeneric, FlexibleContexts, MultiParamTypeClasses #-}
 module Control.Effect.Readline
 ( -- * Readline effect
   Readline (..)
@@ -21,7 +21,7 @@ data Readline m k
   | Print (Doc AnsiStyle) (m k)
   deriving (Functor, Generic1)
 
-instance Effect Readline
+instance Effect Functor Readline
 
 
 prompt :: Has Readline sig m => String -> m (Int, Maybe String)

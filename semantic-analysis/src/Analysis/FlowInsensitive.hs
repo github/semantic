@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, OverloadedStrings, ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE ConstraintKinds, FlexibleContexts, OverloadedStrings, ScopedTypeVariables, TypeOperators #-}
 module Analysis.FlowInsensitive
 ( Heap
 , FrameId(..)
@@ -27,8 +27,9 @@ newtype FrameId name = FrameId { unFrameId :: name }
   deriving (Eq, Ord, Show)
 
 
-convergeTerm :: forall m sig a term address proxy
-             .  ( CanHandle sig ((,) (Cache term a))
+convergeTerm :: forall m c sig a term address proxy
+             .  ( Effect c sig
+                , c ((,) (Cache term a))
                 , Eq address
                 , Has Fresh sig m
                 , Has (State (Heap address a)) sig m

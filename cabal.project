@@ -42,7 +42,7 @@ source-repository-package
 source-repository-package
   type: git
   location: https://github.com/fused-effects/fused-effects
-  tag: b18f7d1af076d531b5e382ae5c12801c8b356b1f
+  tag: 1c5a2fd197a5bd4af43019e9be6ec59b44c00d7c
 
 source-repository-package
   type: git
@@ -52,4 +52,4 @@ source-repository-package
 source-repository-package
   type: git
   location: https://github.com/antitypical/fused-syntax.git
-  tag: 73a101e97759d51272b2fd9b0203565f99f9eaf6
+  tag: d4ca0910d2b73f7686f57229557018973c2adc4a
