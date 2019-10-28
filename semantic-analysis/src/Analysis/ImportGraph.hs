@@ -62,7 +62,7 @@ importGraph
      )
 importGraph eval
   = run
-  . runFresh
+  . evalFresh 0
   . runHeap
   . traverse (runFile eval)
 
@@ -89,7 +89,7 @@ runFile eval file = traverse run file
             . runReader (fileSpan file)
             . runFail
             . fmap fold
-            . convergeTerm (Proxy @name) (fix (cacheTerm . eval importGraphAnalysis))
+            . convergeTerm (Proxy @name) 0 (fix (cacheTerm . eval importGraphAnalysis))
 
 -- FIXME: decompose into a product domain and two atomic domains
 importGraphAnalysis :: ( Alternative m

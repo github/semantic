@@ -82,7 +82,7 @@ concrete
   -> (Heap term name, [File (Either (Path.AbsRelFile, Span, String) (Concrete term name))])
 concrete eval
   = run
-  . runFresh
+  . evalFresh 0
   . runHeap
   . traverse (runFile eval)
 

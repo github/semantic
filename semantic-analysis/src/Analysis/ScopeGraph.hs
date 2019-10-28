@@ -62,7 +62,7 @@ scopeGraph
   -> (Heap name (ScopeGraph name), [File (Either (Path.AbsRelFile, Span, String) (ScopeGraph name))])
 scopeGraph eval
   = run
-  . runFresh
+  . evalFresh 0
   . runHeap
   . traverse (runFile eval)
 
@@ -89,7 +89,7 @@ runFile eval file = traverse run file
             . runReader (Map.empty @name @Ref)
             . runFail
             . fmap fold
-            . convergeTerm (Proxy @name) (fix (cacheTerm . eval scopeGraphAnalysis))
+            . convergeTerm (Proxy @name) 0 (fix (cacheTerm . eval scopeGraphAnalysis))
 
 scopeGraphAnalysis
   :: ( Alternative m
