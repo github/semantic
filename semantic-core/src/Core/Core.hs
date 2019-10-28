@@ -91,8 +91,7 @@ infixl 9 :.
 infix  3 :=
 
 instance HFunctor Core
-instance Effect Core where
-  type CanHandle Core ctx = Traversable ctx
+instance Effect Traversable Core where
   handle ctx dst = \case
     Rec b -> Rec (handle ctx dst <$> b)
     a :>> b -> dst (a <$ ctx) :>> dst (b <$ ctx)
@@ -249,7 +248,7 @@ data Ann ann f a
   deriving (Eq, Foldable, Functor, Generic1, Ord, Show, Traversable)
 
 instance HFunctor (Ann ann)
-instance Effect   (Ann ann) where
+instance Effect Functor (Ann ann) where
   handle ctx dst (Ann a b) = Ann a (dst (b <$ ctx))
 
 instance RightModule (Ann ann) where
