@@ -160,7 +160,7 @@ concreteAnalysis = Analysis{..}
         addr ... n = do
           val <- deref addr
           heap <- get
-          pure (val >>= lookupConcrete heap n)
+          pure (val >>= lookupConcrete (heap :: Heap term name) n)
 
 
 lookupConcrete :: (IsString name, Ord name) => Heap term name -> name -> Concrete term name -> Maybe Precise
