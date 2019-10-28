@@ -14,14 +14,12 @@ import           Control.Algebra
 import           Control.Applicative (Alternative (..))
 import           Control.Carrier.Fail.WithLoc
 import           Control.Carrier.Fresh.Strict as Fresh
-import           Control.Carrier.NonDet.Church
 import           Control.Carrier.Reader hiding (Local)
 import           Control.Carrier.State.Strict
 import           Control.Monad ((>=>), unless)
 import           Data.Foldable (for_)
 import           Data.Function (fix)
 import           Data.Functor (($>))
-import           Data.Functor.Identity
 import qualified Data.IntMap as IntMap
 import qualified Data.IntSet as IntSet
 import           Data.List.NonEmpty (nonEmpty)
@@ -108,12 +106,7 @@ typecheckingFlowInsensitive eval
 
 runFile
   :: forall term name m c sig
-  .  ( c (Either (Path.AbsRelFile, Span, String))
-     , c ((,) (IntMap.IntMap (Type name)))
-     , c ((,) (Set.Set (Constraint name)))
-     , c ((,) (Cache (term name) (Type name)))
-     , c ((,) Int)
-     , c (NonDetC Identity)
+  .  ( forall ctx . Functor ctx => c ctx
      , Effect c sig
      , Has Fresh sig m
      , Has (State (Heap name (Type name))) sig m
