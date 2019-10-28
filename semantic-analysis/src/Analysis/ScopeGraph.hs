@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, FlexibleContexts, OverloadedStrings, RankNTypes, RecordWildCards, ScopedTypeVariables, TypeApplications, TypeOperators #-}
+{-# LANGUAGE ConstraintKinds, FlexibleContexts, OverloadedStrings, QuantifiedConstraints, RankNTypes, RecordWildCards, ScopedTypeVariables, TypeApplications, TypeOperators #-}
 module Analysis.ScopeGraph
 ( ScopeGraph(..)
 , Ref (..)
@@ -12,7 +12,6 @@ import           Analysis.File
 import           Analysis.FlowInsensitive
 import           Control.Algebra
 import           Control.Applicative (Alternative (..))
-import           Control.Carrier.NonDet.Church
 import           Control.Carrier.Reader
 import           Control.Carrier.Fail.WithLoc
 import           Control.Carrier.Fresh.Strict
@@ -20,7 +19,6 @@ import           Control.Effect.State
 import           Control.Monad ((>=>))
 import           Data.Foldable (fold)
 import           Data.Function (fix)
-import           Data.Functor.Identity
 import           Data.List.NonEmpty
 import qualified Data.Map as Map
 import           Data.Proxy
@@ -70,10 +68,7 @@ scopeGraph eval
 
 runFile
   :: forall term name m c sig
-  .  ( c ((,) Int)
-     , c ((,) (Cache (term name) (ScopeGraph name)))
-     , c (Either (Path.AbsRelFile, Span, String))
-     , c (NonDetC Identity)
+  .  ( forall ctx . Functor ctx => c ctx
      , Effect c sig
      , Has Fresh sig m
      , Has (State (Heap name (ScopeGraph name))) sig m
