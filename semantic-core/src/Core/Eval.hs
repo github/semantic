@@ -12,8 +12,8 @@ module Core.Eval
 
 import Analysis.Analysis
 import Analysis.File
+import Control.Algebra
 import Control.Applicative (Alternative (..))
-import Control.Carrier
 import Control.Effect.Fail
 import Control.Effect.Reader
 import Control.Monad ((>=>))

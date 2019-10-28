@@ -9,8 +9,8 @@ module Core.Parser
 
 -- Consult @doc/grammar.md@ for an EBNF grammar.
 
+import           Control.Algebra
 import           Control.Applicative
-import           Control.Carrier
 import           Control.Monad
 import           Core.Core ((:<-) (..), Core)
 import qualified Core.Core as Core
