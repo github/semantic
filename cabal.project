@@ -42,7 +42,7 @@ source-repository-package
 source-repository-package
   type: git
   location: https://github.com/fused-effects/fused-effects
-  tag: 7a8c0e8ab98bbbebe8bdf4af2b3531041ec8caef
+  tag: b18f7d1af076d531b5e382ae5c12801c8b356b1f
 
 source-repository-package
   type: git
