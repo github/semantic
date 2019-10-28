@@ -233,9 +233,7 @@ data Ann ann f a
 
 instance HFunctor (Ann ann)
 instance Effect Functor (Ann ann)
-
-instance RightModule (Ann ann) where
-  Ann l b >>=* f = Ann l (b >>= f)
+instance RightModule (Ann ann)
 
 
 ann :: Has (Ann Span) sig m => HasCallStack => m a -> m a
