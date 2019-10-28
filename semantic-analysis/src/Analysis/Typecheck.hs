@@ -21,6 +21,7 @@ import           Control.Monad ((>=>), unless)
 import           Data.Foldable (for_)
 import           Data.Function (fix)
 import           Data.Functor (($>))
+import           Data.Functor.Identity
 import qualified Data.IntMap as IntMap
 import qualified Data.IntSet as IntSet
 import           Data.List.NonEmpty (nonEmpty)
@@ -128,7 +129,7 @@ runFile
      , CanHandle sig ((,) (Set.Set (Constraint name)))
      , CanHandle sig ((,) (Cache (term name) (Type name)))
      , CanHandle sig ((,) Int)
-     , CanHandle sig (NonDetC (FreshC (ReaderC (Cache (term name) (Type name)) (StateC (Cache (term name) (Type name)) (StateC (Set.Set (Constraint name)) (FailC (ReaderC Span (ReaderC Path.AbsRelFile (StateC (Substitution name) m)))))))))
+     , CanHandle sig (NonDetC Identity)
      , Has Fresh sig m
      , Has (State (Heap name (Type name))) sig m
      , Ord name
