@@ -64,13 +64,7 @@ deriving instance (Show name, Show a, forall a . Show a => Show (f a))          
 
 instance HFunctor (Monotype name)
 instance Effect Functor (Monotype name)
-
-instance RightModule (Monotype name) where
-  Unit     >>=* _ = Unit
-  Bool     >>=* _ = Bool
-  String   >>=* _ = String
-  Arr a b  >>=* f = Arr (a >>= f) (b >>= f)
-  Record m >>=* f = Record ((>>= f) <$> m)
+instance RightModule (Monotype name)
 
 type Meta = Int
 
