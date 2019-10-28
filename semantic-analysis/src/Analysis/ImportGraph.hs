@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, FlexibleContexts, RankNTypes, RecordWildCards, ScopedTypeVariables, TypeApplications #-}
+{-# LANGUAGE ConstraintKinds, FlexibleContexts, QuantifiedConstraints, RankNTypes, RecordWildCards, ScopedTypeVariables, TypeApplications #-}
 module Analysis.ImportGraph
 ( ImportGraph
 , importGraph
@@ -12,13 +12,11 @@ import           Control.Applicative (Alternative(..))
 import           Control.Algebra
 import           Control.Carrier.Fail.WithLoc
 import           Control.Carrier.Fresh.Strict
-import           Control.Carrier.NonDet.Church
 import           Control.Carrier.Reader
 import           Control.Carrier.State.Strict
 import           Control.Monad ((>=>))
 import           Data.Foldable (fold, for_)
 import           Data.Function (fix)
-import           Data.Functor.Identity
 import           Data.List.NonEmpty (nonEmpty)
 import qualified Data.Map as Map
 import           Data.Proxy
@@ -70,10 +68,7 @@ importGraph eval
 
 runFile
   :: forall term name m c sig
-  .  ( c (Either (Path.AbsRelFile, Span, String))
-     , c (NonDetC Identity)
-     , c ((,) (Cache (term name) (Value term name)))
-     , c ((,) Int)
+  .  ( forall ctx . Functor ctx => c ctx
      , Effect c sig
      , Has Fresh sig m
      , Has (State (Heap name (Value term name))) sig m
