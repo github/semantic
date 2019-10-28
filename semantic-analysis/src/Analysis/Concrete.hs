@@ -88,7 +88,7 @@ concrete eval
 
 runFile
   :: forall term name m sig
-  .  ( Effect sig
+  .  ( CanHandle sig (Either (Path.AbsRelFile, Span, String))
      , Foldable term
      , IsString name
      , Has Fresh sig m

@@ -9,14 +9,16 @@ import           Analysis.Analysis
 import           Analysis.File
 import           Analysis.FlowInsensitive
 import           Control.Applicative (Alternative(..))
-import           Control.Carrier
+import           Control.Algebra
 import           Control.Carrier.Fail.WithLoc
 import           Control.Carrier.Fresh.Strict
+import           Control.Carrier.NonDet.Church
 import           Control.Carrier.Reader
 import           Control.Carrier.State.Strict
 import           Control.Monad ((>=>))
 import           Data.Foldable (fold, for_)
 import           Data.Function (fix)
+import           Data.Functor.Identity
 import           Data.List.NonEmpty (nonEmpty)
 import qualified Data.Map as Map
 import           Data.Proxy
@@ -68,7 +70,10 @@ importGraph eval
 
 runFile
   :: forall term name m sig
-  .  ( Effect sig
+  .  ( CanHandle sig (Either (Path.AbsRelFile, Span, String))
+     , CanHandle sig ((,) Int)
+     , CanHandle sig (NonDetC Identity)
+     , CanHandle sig ((,) (Cache (term name) (Value term name)))
      , Has Fresh sig m
      , Has (State (Heap name (Value term name))) sig m
      , Ord  name
