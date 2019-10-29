@@ -44,8 +44,8 @@ script:
 - cabal v2-run semantic:test
 - cabal v2-run semantic-core:test
 - cabal v2-run semantic-python:test
-- cd semantic-source; cabal v2-run semantic-source:test
-- cd semantic-source; cabal v2-run semantic-source:doctest
+- cd semantic-source; cabal v2-run semantic-source:test; cd ..
+- cd semantic-source; cabal v2-run semantic-source:doctest; cd ..
 # parse-examples is disabled because it slaughters our CI
 # - cabal v2-run semantic:parse-examples
 
