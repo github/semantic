@@ -22,7 +22,7 @@ tested-with:
   GHC == 8.6.5
   GHC == 8.8.1
 
-common common
+common haskell
   default-language: Haskell2010
   ghc-options:
     -Weverything
@@ -40,7 +40,7 @@ common common
     ghc-options: -Wno-missing-deriving-strategies
 
 library
-  import: common
+  import: haskell
   exposed-modules:
     Source.Loc
     Source.Range
@@ -58,7 +58,7 @@ library
   hs-source-dirs: src
 
 test-suite doctest
-  import: common
+  import: haskell
   type: exitcode-stdio-1.0
   main-is: Doctest.hs
   build-depends:
@@ -69,8 +69,9 @@ test-suite doctest
   hs-source-dirs: test
 
 test-suite test
-  import: common
+  import: haskell
   type: exitcode-stdio-1.0
+  hs-source-dirs: test
   main-is: Test.hs
   other-modules:
     Source.Test
@@ -82,7 +83,6 @@ test-suite test
     , tasty-hedgehog  ^>= 1.0.0.1
     , tasty-hunit      >= 0.10 && <1
     , text
-  hs-source-dirs: test
 
 source-repository head
   type:     git
