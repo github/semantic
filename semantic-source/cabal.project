@@ -1,0 +1,4 @@
+packages: .
+
+package semantic-source
+  ghc-options: -Werror
