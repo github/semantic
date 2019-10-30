@@ -1,6 +1,5 @@
 {-# LANGUAGE DeriveAnyClass, DeriveGeneric, DeriveTraversable, DuplicateRecordFields #-}
-{-# OPTIONS_GHC -Wno-missing-export-lists #-}
-module Language.Markdown.Syntax where
+module Language.Markdown.Syntax (module Language.Markdown.Syntax) where
 
 import           Data.Abstract.Declarations
 import           Data.JSON.Fields

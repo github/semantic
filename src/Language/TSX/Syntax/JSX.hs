@@ -1,6 +1,5 @@
 {-# LANGUAGE DeriveAnyClass, DeriveGeneric, DeriveTraversable, DuplicateRecordFields #-}
-{-# OPTIONS_GHC -Wno-missing-export-lists #-}
-module Language.TSX.Syntax.JSX where
+module Language.TSX.Syntax.JSX (module Language.TSX.Syntax.JSX) where
 
 import Prologue
 

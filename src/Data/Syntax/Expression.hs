@@ -1,6 +1,5 @@
 {-# LANGUAGE DeriveAnyClass, DeriveGeneric, DeriveTraversable, DuplicateRecordFields, FlexibleContexts, MultiParamTypeClasses, OverloadedStrings, RecordWildCards, ScopedTypeVariables, TypeApplications, UndecidableInstances #-}
-{-# OPTIONS_GHC -Wno-missing-export-lists #-}
-module Data.Syntax.Expression where
+module Data.Syntax.Expression (module Data.Syntax.Expression) where
 
 import Prelude hiding (null)
 import Prologue hiding (index, null)

@@ -1,6 +1,5 @@
 {-# LANGUAGE DeriveAnyClass, DeriveGeneric, DeriveTraversable, DuplicateRecordFields, OverloadedStrings, RecordWildCards, ScopedTypeVariables, TypeApplications #-}
-{-# OPTIONS_GHC -Wno-missing-export-lists #-}
-module Data.Syntax.Literal where
+module Data.Syntax.Literal (module Data.Syntax.Literal) where
 
 import Prelude hiding (Float, null)
 import Prologue hiding (Set, hash, null)

@@ -1,6 +1,5 @@
 {-# LANGUAGE DeriveAnyClass, DeriveGeneric, DeriveTraversable, FlexibleContexts, MultiParamTypeClasses, RecordWildCards, ScopedTypeVariables, TypeApplications, TupleSections, UndecidableInstances #-}
-{-# OPTIONS_GHC -Wno-missing-export-lists #-}
-module Data.Syntax.Declaration where
+module Data.Syntax.Declaration (module Data.Syntax.Declaration) where
 
 import Prologue
 

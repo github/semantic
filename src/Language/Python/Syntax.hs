@@ -1,6 +1,5 @@
 {-# LANGUAGE DeriveAnyClass, DeriveGeneric, DeriveTraversable, FlexibleContexts, RecordWildCards, TypeApplications #-}
-{-# OPTIONS_GHC -Wno-missing-export-lists #-}
-module Language.Python.Syntax where
+module Language.Python.Syntax (module Language.Python.Syntax) where
 
 import Prologue
 

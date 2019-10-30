@@ -1,6 +1,5 @@
 {-# LANGUAGE DeriveAnyClass, DeriveGeneric, DeriveTraversable, DuplicateRecordFields #-}
-{-# OPTIONS_GHC -Wno-missing-export-lists #-}
-module Language.Go.Type where
+module Language.Go.Type (module Language.Go.Type) where
 
 import Prologue
 

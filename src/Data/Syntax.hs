@@ -1,6 +1,6 @@
 {-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, DataKinds, DeriveAnyClass, DeriveGeneric, DeriveTraversable, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, OverloadedStrings, RankNTypes, RecordWildCards, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
-{-# OPTIONS_GHC -Wno-missing-export-lists -Wno-redundant-constraints #-} -- For HasCallStack
-module Data.Syntax where
+{-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For HasCallStack
+module Data.Syntax (module Data.Syntax) where
 
 import Data.Abstract.Evaluatable hiding (Empty, Error)
 import Data.Aeson as Aeson (ToJSON(..), object)
