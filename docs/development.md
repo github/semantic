@@ -12,11 +12,11 @@
 
 ### Nix-style local builds
 
-`semantic` is a complicated app with a very large dependency tree. Because managing large dependency trees in a system-wide `ghc` installation is difficult, especially when developing on multiple Haskell projects, `cabal` enables "local" builds: each dependency is linked in per-project, not globally. In practice, this means that you should prefix your commands with the `new-` prefix: `cabal new-build` builds the project, `new-clean` purges its build artifacts, etc. (With versions of the `cabal` command line tool newer than 2.6, local builds become the default, with the `v1-` prefix required to yield old behavior.)
+`semantic` is a complicated app with a very large dependency tree. Because managing large dependency trees in a system-wide `ghc` installation is difficult, especially when developing on multiple Haskell projects, `cabal` enables "local" builds: each dependency is linked in per-project, not globally. In practice, this means that you should prefix your commands with the `v2-` prefix: `cabal v2-build` builds the project, `v2-clean` purges its build artifacts, etc. (With versions of the `cabal` command line tool newer than 2.6, local builds become the default, with the `v1-` prefix required to yield old behavior.)
 
 ### Running a REPL
 
-Running `cabal new-repl semantic:lib` will boot a GHCi with the right environment for Semantic set up.
+Running `cabal v2-repl semantic:lib` will boot a GHCi with the right environment for Semantic set up.
 
 See the [💡ProTips](💡ProTip!.md#ghci) for more info.
 
