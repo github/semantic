@@ -8,7 +8,7 @@
   // object's superclass is type itself
   object <- type "object" type #record{};
 
-  str <- type "str" object #record { };
+  str <- type "str" object #record { __new__: \prim -> instance #unit prim #record{} };
 
   getitem <- \super -> \item -> \attr ->
     if item.slots.?attr then item.slots.attr else #unit;

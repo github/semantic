@@ -1,7 +1,10 @@
-{-# LANGUAGE DeriveAnyClass, DerivingStrategies, GeneralizedNewtypeDeriving, OverloadedStrings, TypeApplications, TypeOperators, ScopedTypeVariables #-}
+{-# LANGUAGE DeriveAnyClass, DerivingStrategies, GeneralizedNewtypeDeriving, OverloadedStrings, ScopedTypeVariables,
+             TypeApplications, TypeOperators #-}
 
 module Main (main) where
 
+import           Analysis.Concrete (Concrete)
+import qualified Analysis.Concrete as Concrete
 import           Analysis.File
 import           Analysis.ScopeGraph
 import           Control.Effect
@@ -12,39 +15,37 @@ import           Control.Monad.Catch
 import           Control.Monad.IO.Class
 import           Control.Monad.Trans.Resource (ResourceT, runResourceT)
 import           Core.Core
-import qualified Core.Parser
-import           Core.Pretty
 import qualified Core.Eval as Eval
 import           Core.Name
+import qualified Core.Parser
+import           Core.Pretty
 import qualified Data.Aeson as Aeson
-import           Analysis.Concrete (Concrete)
-import qualified Analysis.Concrete as Concrete
 import qualified Data.Aeson.Encode.Pretty as Aeson
 import qualified Data.ByteString.Char8 as ByteString
 import qualified Data.ByteString.Lazy.Char8 as ByteString.Lazy
 import qualified Data.ByteString.Streaming.Char8 as ByteStream
 import           Data.Foldable
 import           Data.Function
+import qualified Data.IntMap as IntMap
 import           Data.List (sort)
+import qualified Data.Map as Map
 import           Data.Maybe
+import           Data.Text (Text)
 import           GHC.Stack
 import qualified Language.Python.Core as Py
 import           Prelude hiding (fail)
-import qualified Data.Map as Map
-import qualified Data.IntMap as IntMap
 import           Source.Span
+import           Streaming
 import qualified Streaming.Process
 import           Syntax.Term
 import           System.Directory
 import           System.Exit
-import           Streaming
+import           System.Path ((</>))
 import qualified System.Path as Path
 import qualified System.Path.Directory as Path
-import           System.Path ((</>))
 import           Text.Show.Pretty (ppShow)
 import qualified Text.Trifecta as Trifecta
 import qualified TreeSitter.Python as TSP
-import Data.Text (Text)
 import qualified TreeSitter.Unmarshal as TS
 
 import qualified Test.Tasty as Tasty
@@ -59,7 +60,7 @@ parsePrelude = do
   let ePrelude = Trifecta.parseByteString (Core.Parser.core <* Trifecta.eof) mempty preludesrc
   case Trifecta.foldResult (Left . show) Right ePrelude of
     Right r -> pure r
-    Left s -> HUnit.assertFailure ("Couldn't parse prelude: " <> s)
+    Left s  -> HUnit.assertFailure ("Couldn't parse prelude: " <> s)
 
 assertJQExpressionSucceeds :: Show a => Directive.Directive -> a -> Term (Ann Span :+: Core) Name -> HUnit.Assertion
 assertJQExpressionSucceeds directive tree core = do
