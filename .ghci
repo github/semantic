@@ -48,6 +48,9 @@
 -- Bonus: silence “add these modules to your .cabal file” warnings for files we :load
 :set -Wno-missing-home-modules
 
+-- Don’t fail on warnings when in the repl
+:set -Wwarn
+
 -- Warnings for code written in the repl
 :seti -Weverything
 :seti -Wno-all-missed-specialisations
