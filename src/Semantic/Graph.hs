@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, LambdaCase, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, FlexibleContexts, FlexibleInstances, GADTs, LambdaCase, OverloadedStrings, ScopedTypeVariables, TypeApplications, TypeOperators, UndecidableInstances #-}
 module Semantic.Graph
 ( analysisParsers
 , AnalyzeTerm

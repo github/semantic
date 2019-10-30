@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DerivingVia, MultiParamTypeClasses #-}
+{-# LANGUAGE DeriveAnyClass, DeriveGeneric, DeriveTraversable, DerivingVia, MultiParamTypeClasses #-}
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Data.Syntax.Comment where
 

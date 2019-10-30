@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, UndecidableInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, StandaloneDeriving, TypeApplications, UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-orphans -Wno-missing-export-lists #-}
 module Data.Abstract.AccessControls.Instances where
 

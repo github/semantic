@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DerivingVia, DuplicateRecordFields #-}
+{-# LANGUAGE DeriveAnyClass, DeriveGeneric, DeriveTraversable, DuplicateRecordFields, FlexibleContexts #-}
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Language.PHP.Syntax where
 

@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DerivingStrategies, GeneralizedNewtypeDeriving, KindSignatures, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DeriveFunctor, DeriveGeneric, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, KindSignatures, MultiParamTypeClasses, TypeOperators, UndecidableInstances #-}
 
 module Control.Effect.REPL
   ( REPL (..)
@@ -18,8 +18,10 @@ import qualified Data.Text as T
 data REPL (m :: * -> *) k
   = Prompt Text (Maybe Text -> m k)
   | Output Text (m k)
-  deriving stock (Functor, Generic1)
-  deriving anyclass (HFunctor, Effect)
+  deriving (Functor, Generic1)
+
+instance HFunctor REPL
+instance Effect   REPL
 
 prompt :: (Member REPL sig, Carrier sig m) => Text -> m (Maybe Text)
 prompt p = send (Prompt p pure)
@@ -31,7 +33,7 @@ runREPL :: Prefs -> Settings IO -> REPLC m a -> m a
 runREPL prefs settings = runReader (prefs, settings) . runREPLC
 
 newtype REPLC m a = REPLC { runREPLC :: ReaderC (Prefs, Settings IO) m a }
-  deriving newtype (Functor, Applicative, Monad, MonadIO)
+  deriving (Functor, Applicative, Monad, MonadIO)
 
 instance (Carrier sig m, MonadIO m) => Carrier (REPL :+: sig) (REPLC m) where
   eff (L op) = do

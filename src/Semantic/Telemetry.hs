@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DerivingStrategies, GADTs, GeneralizedNewtypeDeriving, KindSignatures, RankNTypes, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DeriveFunctor, DeriveGeneric, FlexibleContexts, FlexibleInstances, GADTs, GeneralizedNewtypeDeriving, KindSignatures, MultiParamTypeClasses, RankNTypes, RecordWildCards, TypeOperators, UndecidableInstances #-}
 module Semantic.Telemetry
 (
   -- Async telemetry interface
@@ -138,15 +138,17 @@ time' = withTiming'
 data Telemetry (m :: * -> *) k
   = WriteStat Stat (m k)
   | WriteLog Level String [(String, String)] (m k)
-  deriving stock (Functor, Generic1)
-  deriving anyclass (HFunctor, Effect)
+  deriving (Functor, Generic1)
+
+instance HFunctor Telemetry
+instance Effect   Telemetry
 
 -- | Run a 'Telemetry' effect by expecting a 'Reader' of 'Queue's to write stats and logs to.
 runTelemetry :: LogQueue -> StatQueue -> TelemetryC m a -> m a
 runTelemetry logger statter = runReader (logger, statter) . runTelemetryC
 
 newtype TelemetryC m a = TelemetryC { runTelemetryC :: ReaderC (LogQueue, StatQueue) m a }
-  deriving newtype (Applicative, Functor, Monad, MonadIO)
+  deriving (Applicative, Functor, Monad, MonadIO)
 
 instance (Carrier sig m, MonadIO m) => Carrier (Telemetry :+: sig) (TelemetryC m) where
   eff (L op) = do
@@ -161,7 +163,7 @@ ignoreTelemetry :: IgnoreTelemetryC m a -> m a
 ignoreTelemetry = runIgnoreTelemetryC
 
 newtype IgnoreTelemetryC m a = IgnoreTelemetryC { runIgnoreTelemetryC :: m a }
-  deriving newtype (Applicative, Functor, Monad)
+  deriving (Applicative, Functor, Monad)
 
 instance Carrier sig m => Carrier (Telemetry :+: sig) (IgnoreTelemetryC m) where
   eff (R other) = IgnoreTelemetryC . eff . handleCoercible $ other

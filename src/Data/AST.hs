@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE OverloadedStrings, RecordWildCards #-}
 module Data.AST
   ( Node (..)
   , nodeSpan

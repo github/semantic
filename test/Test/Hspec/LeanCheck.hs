@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, TypeFamilies #-}
+{-# LANGUAGE FlexibleInstances, GADTs, TypeFamilies #-}
 module Test.Hspec.LeanCheck
 ( prop
 , forAll
@@ -8,7 +8,6 @@ import Control.Exception
 import Data.Bifunctor (first)
 import Data.List (intercalate)
 import Data.Maybe (listToMaybe)
-import Data.Typeable
 import GHC.Show as Show (showsPrec)
 import Test.Hspec
 import Test.Hspec.Core.Spec as Hspec
@@ -90,6 +89,6 @@ iocounterExample n = fmap listToMaybe . iocounterExamples n
 
 
 data LeanCheckException = LeanCheckException [String] HUnit.HUnitFailure
-  deriving (Show, Typeable)
+  deriving (Show)
 
 instance Exception LeanCheckException

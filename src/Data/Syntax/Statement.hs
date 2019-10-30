@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DerivingVia, ScopedTypeVariables, UndecidableInstances, ViewPatterns, DuplicateRecordFields #-}
+{-# LANGUAGE DeriveAnyClass, DeriveGeneric, DeriveTraversable, DuplicateRecordFields, RecordWildCards, ScopedTypeVariables, TypeApplications, UndecidableInstances, ViewPatterns #-}
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Data.Syntax.Statement where
 

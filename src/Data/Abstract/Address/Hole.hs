@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DeriveTraversable, FlexibleInstances, MultiParamTypeClasses, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Address.Hole
 ( Hole(..)
 , toMaybe

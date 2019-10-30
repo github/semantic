@@ -1,4 +1,4 @@
-{-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE FlexibleContexts, FlexibleInstances, FunctionalDependencies, RecordWildCards #-}
 module Semantic.Api.Bridge
   ( APIBridge (..)
   , APIConvert (..)

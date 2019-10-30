@@ -1,4 +1,4 @@
-{-# LANGUAGE DefaultSignatures, MultiParamTypeClasses, TypeOperators, UndecidableInstances, GADTs #-}
+{-# LANGUAGE DefaultSignatures, FlexibleContexts, FlexibleInstances, GADTs, MultiParamTypeClasses, OverloadedStrings, RecordWildCards, TypeApplications, TypeOperators, UndecidableInstances #-}
 module Data.JSON.Fields
   ( JSONFields (..)
   , JSONFields1 (..)

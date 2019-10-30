@@ -1,4 +1,4 @@
-{-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, DeriveAnyClass, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, DataKinds, DeriveAnyClass, DeriveGeneric, DeriveTraversable, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, OverloadedStrings, RankNTypes, RecordWildCards, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-missing-export-lists -Wno-redundant-constraints #-} -- For HasCallStack
 module Data.Syntax where
 

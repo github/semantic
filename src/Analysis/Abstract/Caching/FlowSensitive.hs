@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, GADTs, GeneralizedNewtypeDeriving, TypeOperators #-}
+{-# LANGUAGE ConstraintKinds, FlexibleContexts, GADTs, GeneralizedNewtypeDeriving, TypeApplications, TypeOperators #-}
 module Analysis.Abstract.Caching.FlowSensitive
 ( Cache
 , cachingTerms

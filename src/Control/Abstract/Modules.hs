@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DerivingStrategies, GADTs, GeneralizedNewtypeDeriving, KindSignatures, RankNTypes, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DeriveFunctor, DeriveGeneric, FlexibleContexts, FlexibleInstances, GADTs, GeneralizedNewtypeDeriving, KindSignatures, MultiParamTypeClasses, RankNTypes, ScopedTypeVariables, StandaloneDeriving, TypeOperators, UndecidableInstances #-}
 module Control.Abstract.Modules
 ( ModuleResult
 , lookupModule
@@ -65,8 +65,10 @@ data Modules address value (m :: * -> *) k
   | Lookup  ModulePath (Maybe (ModuleResult address value) -> m k)
   | Resolve [FilePath] (Maybe ModulePath -> m k)
   | List    FilePath   ([ModulePath] -> m k)
-  deriving stock (Functor, Generic1)
-  deriving anyclass (HFunctor, Effect)
+  deriving (Functor, Generic1)
+
+instance HFunctor (Modules address value)
+instance Effect   (Modules address value)
 
 
 sendModules :: ( Member (Modules address value) sig
@@ -81,7 +83,7 @@ runModules :: Set ModulePath
 runModules paths = raiseHandler (runReader paths . runModulesC)
 
 newtype ModulesC address value m a = ModulesC { runModulesC :: ReaderC (Set ModulePath) m a }
-  deriving newtype (Alternative, Applicative, Functor, Monad, MonadIO)
+  deriving (Alternative, Applicative, Functor, Monad, MonadIO)
 
 instance ( Member (Reader (ModuleTable (Module (ModuleResult address value)))) sig
          , Member (Resumable (BaseError (LoadError address value))) sig

@@ -1,4 +1,4 @@
-{-# LANGUAGE TupleSections #-}
+{-# LANGUAGE FlexibleContexts, RecordWildCards, TupleSections #-}
 module Control.Abstract.Primitive
   ( defineClass
   , defineNamespace

@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GADTs, LambdaCase, ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE DataKinds, DeriveGeneric, FlexibleContexts, GADTs, LambdaCase, RecordWildCards, ScopedTypeVariables, StandaloneDeriving, TypeOperators #-}
 module Parsing.TreeSitter
 ( TSParseException (..)
 , Duration(..)

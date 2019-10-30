@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, TypeOperators #-}
+{-# LANGUAGE DataKinds, RecordWildCards, TypeOperators #-}
 module Parsing.CMark
 ( Grammar(..)
 , cmarkParser

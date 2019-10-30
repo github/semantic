@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, RankNTypes #-}
+{-# LANGUAGE DeriveFunctor, FlexibleInstances, GADTs, RankNTypes, RecordWildCards #-}
 module Data.Error
   ( Error (..)
   , formatError
@@ -34,7 +34,7 @@ data Error grammar = Error
   , errorExpected  :: [grammar]
   , errorActual    :: Maybe grammar
   , errorCallStack :: CallStack
-  } deriving (Show, Functor, Typeable)
+  } deriving (Show, Functor)
 
 -- | This instance does not take into account the call stack.
 instance Eq grammar => Eq (Error grammar) where

@@ -1,4 +1,4 @@
-{-# LANGUAGE DerivingVia, LambdaCase, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DerivingVia, FlexibleContexts, FlexibleInstances, LambdaCase, MultiParamTypeClasses, OverloadedStrings, RankNTypes, RecordWildCards, ScopedTypeVariables, TypeFamilies, UndecidableInstances #-}
 module Analysis.Abstract.Graph
 ( Graph(..)
 , ControlFlowVertex(..)

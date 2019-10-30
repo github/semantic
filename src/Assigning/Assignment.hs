@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GADTs, InstanceSigs, MultiParamTypeClasses, RankNTypes, ScopedTypeVariables, StandaloneDeriving, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE DataKinds, FlexibleContexts, FlexibleInstances, GADTs, InstanceSigs, MultiParamTypeClasses, RankNTypes, RecordWildCards, ScopedTypeVariables, StandaloneDeriving, TypeFamilies, TypeOperators #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For HasCallStack
 -- | Assignment of AST onto some other structure (typically terms).
 --

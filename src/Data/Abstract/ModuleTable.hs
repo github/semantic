@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE DeriveTraversable, GeneralizedNewtypeDeriving #-}
 module Data.Abstract.ModuleTable
 ( ModulePath
 , ModuleTable (..)
@@ -15,13 +15,12 @@ module Data.Abstract.ModuleTable
 
 import Data.Abstract.Module
 import qualified Data.Map as Map
-import GHC.Generics (Generic1)
 import Prelude hiding (lookup)
 import Prologue
 import System.FilePath.Posix
 
 newtype ModuleTable a = ModuleTable { unModuleTable :: Map.Map ModulePath a }
-  deriving (Eq, Foldable, Functor, Generic1, Generic, Lower, Monoid, Ord, Semigroup, Traversable)
+  deriving (Eq, Foldable, Functor, Lower, Monoid, Ord, Semigroup, Traversable)
 
 singleton :: ModulePath -> a -> ModuleTable a
 singleton name = ModuleTable . Map.singleton name

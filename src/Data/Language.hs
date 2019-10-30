@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DeriveGeneric, KindSignatures, LambdaCase #-}
+{-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric, KindSignatures, LambdaCase, OverloadedStrings #-}
 module Data.Language
   ( Language (..)
   , SLanguage (..)

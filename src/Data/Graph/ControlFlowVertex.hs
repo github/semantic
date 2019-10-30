@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, EmptyCase, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric, EmptyCase, FlexibleInstances, MultiParamTypeClasses, OverloadedStrings, RecordWildCards, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Data.Graph.ControlFlowVertex
 ( ControlFlowVertex (..)
 , packageVertex

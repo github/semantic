@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE FlexibleContexts, TypeFamilies #-}
 module Analysis.Decorator
 ( decoratorWithAlgebra
 ) where

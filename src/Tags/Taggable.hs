@@ -12,7 +12,7 @@ identify a new syntax as Taggable, you need to:
 constructor name of this syntax.
 
 -}
-{-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, ScopedTypeVariables, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, DataKinds, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, RecordWildCards, ScopedTypeVariables, TypeApplications, TypeFamilies, UndecidableInstances #-}
 module Tags.Taggable
 ( Tagger
 , Token(..)

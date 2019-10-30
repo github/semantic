@@ -1,4 +1,4 @@
-{-# LANGUAGE DerivingVia, DuplicateRecordFields, LambdaCase, RankNTypes, ScopedTypeVariables, TupleSections #-}
+{-# LANGUAGE DeriveGeneric, DerivingVia, DuplicateRecordFields, LambdaCase, OverloadedStrings, RankNTypes, RecordWildCards, ScopedTypeVariables, TupleSections #-}
 module Rendering.TOC
 ( diffTOC
 , Summaries(..)

@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DerivingVia #-}
+{-# LANGUAGE DeriveAnyClass, DeriveGeneric, DeriveTraversable, FlexibleContexts, RecordWildCards, TypeApplications #-}
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Language.Go.Syntax where
 

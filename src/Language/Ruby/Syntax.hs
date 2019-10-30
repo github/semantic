@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DerivingVia, DuplicateRecordFields, TupleSections #-}
+{-# LANGUAGE DeriveAnyClass, DeriveGeneric, DeriveTraversable, DuplicateRecordFields, FlexibleContexts, OverloadedStrings, RecordWildCards, TupleSections, TypeApplications #-}
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Language.Ruby.Syntax where
 

@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, PackageImports #-}
+{-# LANGUAGE GADTs, PackageImports, TypeApplications #-}
 
 module Graphing.Calls.Spec ( spec ) where
 

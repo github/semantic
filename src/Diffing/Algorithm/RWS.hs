@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, DataKinds, DeriveAnyClass, RankNTypes, TypeOperators #-}
+{-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric, GADTs, RankNTypes, RecordWildCards, TypeOperators #-}
 {-# OPTIONS_GHC -Wno-incomplete-uni-patterns #-} -- FIXME
 module Diffing.Algorithm.RWS
 ( rws

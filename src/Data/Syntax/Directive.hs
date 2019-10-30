@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DerivingVia, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances #-}
+{-# LANGUAGE DeriveAnyClass, DeriveGeneric, DeriveTraversable, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Data.Syntax.Directive where
 
