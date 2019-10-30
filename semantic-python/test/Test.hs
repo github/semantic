@@ -17,6 +17,8 @@ import           Core.Pretty
 import qualified Core.Eval as Eval
 import           Core.Name
 import qualified Data.Aeson as Aeson
+import           Analysis.Concrete (Concrete)
+import qualified Analysis.Concrete as Concrete
 import qualified Data.Aeson.Encode.Pretty as Aeson
 import qualified Data.ByteString.Char8 as ByteString
 import qualified Data.ByteString.Lazy.Char8 as ByteString.Lazy
@@ -28,6 +30,8 @@ import           Data.Maybe
 import           GHC.Stack
 import qualified Language.Python.Core as Py
 import           Prelude hiding (fail)
+import qualified Data.Map as Map
+import qualified Data.IntMap as IntMap
 import           Source.Span
 import           Streaming
 import qualified Streaming.Prelude as Stream
@@ -41,6 +45,7 @@ import           System.Path ((</>))
 import           Text.Show.Pretty (ppShow)
 import qualified Text.Trifecta as Trifecta
 import qualified TreeSitter.Python as TSP
+import Data.Text (Text)
 import qualified TreeSitter.Unmarshal as TS
 
 import qualified Test.Tasty as Tasty
@@ -49,15 +54,17 @@ import qualified Test.Tasty.HUnit as HUnit
 import qualified Directive
 import           Instances ()
 
-
-assertJQExpressionSucceeds :: Show a => Directive.Directive -> a -> Term (Ann Span :+: Core) Name -> HUnit.Assertion
-assertJQExpressionSucceeds directive tree core = do
+parsePrelude :: IO (Term (Ann Span :+: Core) Name)
+parsePrelude = do
   preludesrc <- ByteString.readFile "semantic-python/src/Prelude.score"
   let ePrelude = Trifecta.parseByteString (Core.Parser.core <* Trifecta.eof) mempty preludesrc
-  prelude <- case Trifecta.foldResult (Left . show) Right ePrelude of
+  case Trifecta.foldResult (Left . show) Right ePrelude of
     Right r -> pure r
     Left s -> HUnit.assertFailure ("Couldn't parse prelude: " <> s)
 
+assertJQExpressionSucceeds :: Show a => Directive.Directive -> a -> Term (Ann Span :+: Core) Name -> HUnit.Assertion
+assertJQExpressionSucceeds directive tree core = do
+  prelude <- parsePrelude
   let allTogether = (named' "__semantic_prelude" :<- prelude) >>>= core
 
   bod <- case scopeGraph Eval.eval [File (Path.absRel "<interactive>") (Span (Pos 1 1) (Pos 1 1)) allTogether] of
@@ -80,6 +87,24 @@ assertJQExpressionSucceeds directive tree core = do
 
   catch @_ @Streaming.Process.ProcessExitedUnsuccessfully jqPipeline $ \err -> do
     HUnit.assertFailure (unlines [errorMsg, dirMsg, jsonMsg, astMsg, treeMsg, treeMsg', show err])
+
+assertEvaluatesTo :: Term (Ann Span :+: Core) Name -> Text -> Directive.Expected -> HUnit.Assertion
+assertEvaluatesTo core k val = do
+  prelude <- parsePrelude
+  let allTogether = (named' "__semantic_prelude" :<- prelude) >>>= core
+  let filius = [File (Path.absRel "<interactive>") (Span (Pos 1 1) (Pos 1 1)) allTogether]
+
+  (heap, env) <- case Concrete.concrete Eval.eval filius of
+    (heap, [File _ _ (Right (Concrete.Record env))]) -> pure (heap, env)
+    other -> error ("SHIT! " <> show other)
+  print env
+  let found = Map.lookup (Name k) env >>= flip IntMap.lookup heap
+  case (found, val) of
+    (Just (Concrete.String t), Directive.AString t') -> t HUnit.@?= t'
+    (Just Concrete.Unit, Directive.AUnit) -> return ()
+    other -> error ("FUCK! " <> show other)
+
+
 
 fixtureTestTreeForFile :: HasCallStack => Path.RelFile -> Tasty.TestTree
 fixtureTestTreeForFile fp = HUnit.testCaseSteps (Path.toString fp) $ \step -> withFrozenCallStack $ do
@@ -115,6 +140,7 @@ fixtureTestTreeForFile fp = HUnit.testCaseSteps (Path.toString fp) $ \step -> wi
       (Left err, _)                          -> HUnit.assertFailure ("Parsing failed: " <> err)
       (Right (Left err), _)                  -> HUnit.assertFailure ("Compilation failed: " <> err)
       (Right (Right _), Directive.Fails)     -> HUnit.assertFailure ("Expected translation to fail")
+      (Right (Right item), Directive.Result k v) -> assertEvaluatesTo item k v
       (Right (Right item), Directive.JQ _)   -> assertJQExpressionSucceeds directive result item
       (Right (Right item), Directive.Tree t) -> let msg = "got (pretty): " <> showCore item'
                                                     item' = stripAnnotations item

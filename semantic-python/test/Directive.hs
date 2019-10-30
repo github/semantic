@@ -1,4 +1,5 @@
 module Directive ( Directive (..)
+                 , Expected (..)
                  , parseDirective
                  , describe
                  , toProcess
@@ -14,7 +15,11 @@ import           Data.ByteString.Char8 (ByteString)
 import qualified Data.ByteString.Char8 as ByteString
 import           Syntax.Term (Term)
 import           System.Process
+import           Data.Text (Text)
+import qualified Data.Text as T
+import           Text.Trifecta (CharParsing, TokenParsing (..))
 import qualified Text.Trifecta as Trifecta
+import qualified Text.Parser.Token.Style as Style
 
 {- |
 
@@ -42,29 +47,52 @@ projects.
 -}
 data Directive = JQ ByteString -- | @# CHECK-JQ: expr@
                | Tree (Term Core Name) -- | @# CHECK-TREE: core@
+               | Result Text Expected
                | Fails -- | @# CHECK-FAILS@ fails unless translation fails.
                  deriving (Eq, Show)
+
+data Expected
+  = AString Text
+  | ABool Bool
+  | AUnit
+    deriving (Eq, Show)
 
 describe :: Directive -> String
 describe Fails = "<expect failure>"
 describe (Tree t) =  Core.Pretty.showCore t
 describe (JQ b) = ByteString.unpack b
+describe (Result t e) = T.unpack t <> ": " <> show e
 
-fails :: Trifecta.Parser Directive
+fails :: CharParsing m => m Directive
 fails = Fails <$ Trifecta.string "# CHECK-FAILS"
 
-jq :: Trifecta.Parser Directive
+jq :: (Monad m, CharParsing m) => m Directive
 jq = do
   void $ Trifecta.string "# CHECK-JQ: "
   JQ . ByteString.pack <$> many (Trifecta.noneOf "\n")
 
-tree :: Trifecta.Parser Directive
+tree :: (Monad m, TokenParsing m) => m Directive
 tree = do
   void $ Trifecta.string "# CHECK-TREE: "
   Tree <$> Core.Parser.core
 
-directive :: Trifecta.Parser Directive
-directive = Trifecta.choice [ fails, jq, tree ]
+result :: (Monad m, TokenParsing m) => m Directive
+result = do
+  void $ Trifecta.string "# CHECK-RESULT "
+  key <- Trifecta.ident Style.haskellIdents
+  void $ Trifecta.symbolic ':'
+  Result key <$> expected
+
+expected :: TokenParsing m => m Expected
+expected = Trifecta.choice
+  [ AString <$> Trifecta.stringLiteral
+  , ABool True <$ Trifecta.symbol "#true"
+  , ABool False <$ Trifecta.symbol "#false"
+  , AUnit <$ Trifecta.symbol "#unit"
+  ]
+
+directive :: (Monad m, TokenParsing m) => m Directive
+directive = Trifecta.choice [ fails, result, jq, tree ]
 
 parseDirective :: ByteString -> Either String Directive
 parseDirective = Trifecta.foldResult (Left . show) Right
