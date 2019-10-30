@@ -24,8 +24,8 @@ import           Diffing.Algorithm
 import           Source.Span
 
 data QualifiedName
-  = QualifiedName { paths :: NonEmpty FilePath }
-  | RelativeQualifiedName { path :: FilePath, maybeQualifiedName ::  Maybe QualifiedName }
+  = QualifiedName (NonEmpty FilePath)
+  | RelativeQualifiedName FilePath (Maybe QualifiedName)
   deriving (Eq, Generic, Hashable, Ord, Show, ToJSON)
 
 qualifiedName :: NonEmpty Text -> QualifiedName
