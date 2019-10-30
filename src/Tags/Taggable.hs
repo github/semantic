@@ -47,9 +47,9 @@ import qualified Language.TypeScript.Syntax as TypeScript
 
  -- TODO: Move to src/Data
 data Token
-  = Enter { tokenName :: Text, tokenSnippetRange :: Range }
-  | Exit  { tokenName :: Text, tokenSnippetRange :: Range}
-  | Iden  { identifierName :: Text, tokenLoc :: Loc, docsLiteralRange :: Maybe Range }
+  = Enter Text Range
+  | Exit  Text Range
+  | Iden  Text Loc (Maybe Range)
   deriving (Eq, Show)
 
 type Tagger = Stream (Of Token)
