@@ -1,4 +1,4 @@
-{-# LANGUAGE ImplicitParams, LambdaCase, NamedFieldPuns #-}
+{-# LANGUAGE ImplicitParams, LambdaCase #-}
 module Integration.Spec (testTree) where
 
 import Control.Exception (throw)
