@@ -65,6 +65,7 @@
 :seti -Wno-star-is-type
 
 -- Consider adding these to your ~/.ghc/ghci.conf file:
+
 -- -- Pretty-printing
 -- :set -package pretty-simple
 -- :def! pretty \ _ -> pure ":set -interactive-print Text.Pretty.Simple.pPrint"
