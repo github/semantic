@@ -4,4 +4,10 @@ set -e
 
 cd $(dirname "$0")/..
 
-cabal exec --builddir=dist-repl ghci -- $@
+repl_builddir=dist-repl
+
+if [[ ! -d $repl_builddir ]]; then
+  echo "$repl_builddir does not exist, first run 'cabal repl --builddir=$replbuilddir', exit, and then run script/repl"
+else
+  cabal exec --builddir=$repl_builddir ghci -- $@
+fi
