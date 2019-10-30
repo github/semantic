@@ -1,0 +1,44 @@
+:set -j -v1 -fwrite-interface -fobject-code
+:set -O0
+
+:set -idist-newstyle/build/x86_64-osx/ghc-8.6.5/semantic-0.8.0.0/build/autogen
+
+:set -Idist-newstyle/build/x86_64-osx/ghc-8.6.5/semantic-0.8.0.0/build/autogen
+
+:set -isemantic-analysis/src
+:set -isemantic-ast/src
+:set -isemantic-core/src
+:set -isemantic-java/src
+:set -isemantic-json/src
+:set -isemantic-python/src
+:set -isemantic-tags/src
+:set -isrc
+:set -ibench
+:set -itest
+
+:set -XHaskell2010
+
+:set -Weverything
+:set -Wno-all-missed-specialisations
+:set -Wno-implicit-prelude
+:set -Wno-missed-specialisations
+:set -Wno-missing-import-lists
+:set -Wno-missing-local-signatures
+:set -Wno-monomorphism-restriction
+:set -Wno-name-shadowing
+:set -Wno-safe
+:set -Wno-unsafe
+:set -Wno-star-is-type
+:set -Wno-missing-home-modules
+
+:seti -Weverything
+:seti -Wno-all-missed-specialisations
+:seti -Wno-implicit-prelude
+:seti -Wno-missed-specialisations
+:seti -Wno-missing-import-lists
+:seti -Wno-missing-local-signatures
+:seti -Wno-monomorphism-restriction
+:seti -Wno-name-shadowing
+:seti -Wno-safe
+:seti -Wno-unsafe
+:seti -Wno-star-is-type
