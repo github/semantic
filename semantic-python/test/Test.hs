@@ -33,12 +33,11 @@ import           Prelude hiding (fail)
 import qualified Data.Map as Map
 import qualified Data.IntMap as IntMap
 import           Source.Span
-import           Streaming
-import qualified Streaming.Prelude as Stream
 import qualified Streaming.Process
 import           Syntax.Term
 import           System.Directory
 import           System.Exit
+import           Streaming
 import qualified System.Path as Path
 import qualified System.Path.Directory as Path
 import           System.Path ((</>))
@@ -109,22 +108,8 @@ assertEvaluatesTo core k val = do
 checkPythonFile :: HasCallStack => Path.RelFile -> Tasty.TestTree
 checkPythonFile fp = HUnit.testCaseSteps (Path.toString fp) $ \step -> withFrozenCallStack $ do
   let fullPath  = Path.relDir "semantic-python/test/fixtures" </> fp
-      perish s  = liftIO (HUnit.assertFailure ("Directive parsing error: " <> s))
-      isComment = (== Just '#') . fmap fst . ByteString.uncons
 
-
-  -- Slurp the input file, taking lines from the beginning until we
-  -- encounter a line that doesn't have a '#'. For each line, parse
-  -- a directive out of it, failing if the directive can't be parsed.
-  directives <-
-    runResourceT
-    . Stream.toList_
-    . Stream.mapM (either perish pure . Directive.parseDirective)
-    . Stream.takeWhile isComment
-    . Stream.mapped ByteStream.toStrict
-    . ByteStream.lines
-    . ByteStream.readFile @(ResourceT IO)
-    $ Path.toString fullPath
+  directives <- Directive.readDirectivesFromFile fullPath
 
   result <- ByteString.readFile (Path.toString fullPath) >>= TS.parseByteString TSP.tree_sitter_python
   let coreResult = Control.Effect.run
