@@ -63,3 +63,19 @@
 :seti -Wno-safe
 :seti -Wno-unsafe
 :seti -Wno-star-is-type
+
+-- Consider adding these to your ~/.ghc/ghci.conf file:
+-- -- Pretty-printing
+-- :set -package pretty-simple
+-- :def! pretty \ _ -> pure ":set -interactive-print Text.Pretty.Simple.pPrint"
+-- :def! no-pretty \ _ -> pure ":set -interactive-print System.IO.print"
+-- :def! r \_ -> pure ":reload\n:pretty"
+
+-- -- Break on errors
+-- :seti -fbreak-on-error
+
+-- -- Automatically show the code around breakpoints
+-- :set stop :list
+
+-- -- Use a cyan lambda as the prompt
+-- :set prompt "\ESC[1;36m\STXλ \ESC[m\STX"
