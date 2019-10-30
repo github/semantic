@@ -106,8 +106,8 @@ assertEvaluatesTo core k val = do
 
 
 
-fixtureTestTreeForFile :: HasCallStack => Path.RelFile -> Tasty.TestTree
-fixtureTestTreeForFile fp = HUnit.testCaseSteps (Path.toString fp) $ \step -> withFrozenCallStack $ do
+checkPythonFile :: HasCallStack => Path.RelFile -> Tasty.TestTree
+checkPythonFile fp = HUnit.testCaseSteps (Path.toString fp) $ \step -> withFrozenCallStack $ do
   let fullPath  = Path.relDir "semantic-python/test/fixtures" </> fp
       perish s  = liftIO (HUnit.assertFailure ("Directive parsing error: " <> s))
       isComment = (== Just '#') . fmap fst . ByteString.uncons
@@ -147,10 +147,10 @@ fixtureTestTreeForFile fp = HUnit.testCaseSteps (Path.toString fp) $ \step -> wi
                                                 in HUnit.assertEqual msg t item' where
 
 milestoneFixtures :: IO Tasty.TestTree
-milestoneFixtures = do
-  files <- liftIO (Path.filesInDir (Path.relDir "semantic-python/test/fixtures"))
-  let pythons = sort (filter (Path.hasExtension ".py") files)
-  pure $ Tasty.testGroup "Translation" (fmap fixtureTestTreeForFile pythons)
+milestoneFixtures = buildTests <$> readFiles
+  where
+    readFiles  = liftIO . Path.filesInDir . Path.relDir $ "semantic-python/test/fixtures"
+    buildTests = Tasty.testGroup "Python" . fmap checkPythonFile . sort . filter (Path.hasExtension ".py")
 
 main :: IO ()
 main = do
