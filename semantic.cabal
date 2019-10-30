@@ -25,20 +25,7 @@ flag release
 -- GHC extensions shared between targets
 common haskell
   default-language:    Haskell2010
-  default-extensions:  DataKinds
-                     , DeriveFoldable
-                     , DeriveFunctor
-                     , DeriveGeneric
-                     , DeriveTraversable
-                     , FlexibleContexts
-                     , FlexibleInstances
-                     , MonadFailDesugaring
-                     , MultiParamTypeClasses
-                     , OverloadedStrings
-                     , RecordWildCards
-                     , StandaloneDeriving
-                     , StrictData
-                     , TypeApplications
+  default-extensions:  StrictData
 
 -- Except in case of vendored dependencies, these deps should be expressed
 -- as caret-operator bounds relative to a version in Stackage.
