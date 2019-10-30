@@ -1,7 +1,11 @@
 Dockerfile
 /.licenses
 /.git
+.ghci
+.ghci_history
 .ghc.environment.x86_64-darwin-8.6.5
+*.yaml
+*.md
 
 /bin
 /dist
