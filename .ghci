@@ -1,3 +1,5 @@
+-- GHCI settings for semantic, collected by running cabal repl -v and checking out the flags cabal passes to ghc.
+
 -- Basic verbosity & compiler parallelization
 :set -j -v1
 
