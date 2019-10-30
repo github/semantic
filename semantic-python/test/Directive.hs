@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeOperators, TypeApplications #-}
+{-# LANGUAGE TypeApplications, TypeOperators #-}
 
 -- | FileCheck-style directives for testing Core compilers.
 module Directive ( Directive (..)
@@ -7,12 +7,14 @@ module Directive ( Directive (..)
                  , toProcess
                  ) where
 
+import           Analysis.Concrete (Concrete (..))
 import           Control.Applicative
+import           Control.Effect
 import           Control.Monad
+import           Control.Monad.Trans.Resource (ResourceT, runResourceT)
 import           Core.Core (Core)
 import qualified Core.Core as Core
 import           Core.Name (Name)
-import           Analysis.Concrete (Concrete(..))
 import qualified Core.Parser
 import qualified Core.Pretty
 import           Data.ByteString.Char8 (ByteString)
@@ -20,18 +22,15 @@ import qualified Data.ByteString.Char8 as ByteString
 import qualified Data.ByteString.Streaming.Char8 as ByteStream
 import           Data.Text (Text)
 import qualified Data.Text as T
-import           Streaming
-import qualified Streaming.Prelude as Stream
 import qualified Source.Span as Source
-import Control.Effect
+import qualified Streaming.Prelude as Stream
 import           Syntax.Term (Term)
+import qualified System.Path as Path
+import qualified System.Path.PartClass as Path.Class
 import           System.Process
 import qualified Text.Parser.Token.Style as Style
 import           Text.Trifecta (CharParsing, TokenParsing (..))
 import qualified Text.Trifecta as Trifecta
-import qualified System.Path as Path
-import qualified System.Path.PartClass as Path.Class
-import           Control.Monad.Trans.Resource (ResourceT, runResourceT)
 
 {- |
 
