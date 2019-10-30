@@ -23,7 +23,7 @@
 - warn: {group: {name: default}}
 
 # Ignore the highly noisy module export list hint
-- ignore: {name: Use module export list}
+- ignore: {name: Use explicit module export list}
 
 # Ignore some builtin hints
 - ignore: {name: Use mappend}
