@@ -6,4 +6,10 @@ set -e
 
 cd $(dirname "$0")/..
 
-cabal exec ghci -- -ghci-script=.ghci.semantic $@
+repl_builddir=dist-repl
+
+if [[ ! -d $repl_builddir ]]; then
+  echo "$repl_builddir does not exist, first run 'cabal repl --builddir=$replbuilddir', exit, and then re-run $0"
+else
+  cabal exec --builddir=$repl_builddir ghci -- -ghci-script=.ghci.semantic $@
+fi

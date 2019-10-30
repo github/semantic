@@ -10,20 +10,15 @@
 
 -- Compile to object code
 :set -fwrite-interface -fobject-code
--- Build both static & dynamic objects so we don’t confuse cabal build
-:set -static
-:set -dynamic-too
-:set -dynosuf dyn_o
-:set -dynhisuf dyn_hi
 
--- Write build products to dist-newstyle (instead of alongside the .hs files)
-:set -outputdir dist-newstyle/build/x86_64-osx/ghc-8.6.5/semantic-0.8.0.0/build
-:set -odir dist-newstyle/build/x86_64-osx/ghc-8.6.5/semantic-0.8.0.0/build
-:set -hidir dist-newstyle/build/x86_64-osx/ghc-8.6.5/semantic-0.8.0.0/build
-:set -stubdir dist-newstyle/build/x86_64-osx/ghc-8.6.5/semantic-0.8.0.0/build
+-- Write build products to dist-repl (so that we don’t clobber 'cabal build' outputs)
+:set -outputdir dist-repl/build/x86_64-osx/ghc-8.6.5/semantic-0.8.0.0/build
+:set -odir dist-repl/build/x86_64-osx/ghc-8.6.5/semantic-0.8.0.0/build
+:set -hidir dist-repl/build/x86_64-osx/ghc-8.6.5/semantic-0.8.0.0/build
+:set -stubdir dist-repl/build/x86_64-osx/ghc-8.6.5/semantic-0.8.0.0/build
 
--- Look for autogen’d files in dist-newstyle
-:set -idist-newstyle/build/x86_64-osx/ghc-8.6.5/semantic-0.8.0.0/build/autogen
+-- Look for autogen’d files in dist-repl
+:set -idist-repl/build/x86_64-osx/ghc-8.6.5/semantic-0.8.0.0/build/autogen
 
 -- Load all our sources… remember to keep this up to date when we add new packages!
 -- But don’t add semantic-source, it’s important that we get that from hackage.
