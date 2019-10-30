@@ -87,6 +87,7 @@ assertJQExpressionSucceeds directive tree core = do
   catch @_ @Streaming.Process.ProcessExitedUnsuccessfully jqPipeline $ \err -> do
     HUnit.assertFailure (unlines [errorMsg, dirMsg, jsonMsg, astMsg, treeMsg, treeMsg', show err])
 
+-- handles CHECK-RESULT directives
 assertEvaluatesTo :: Term (Ann Span :+: Core) Name -> Text -> Directive.Expected -> HUnit.Assertion
 assertEvaluatesTo core k val = do
   prelude <- parsePrelude
@@ -94,15 +95,21 @@ assertEvaluatesTo core k val = do
   let filius = [File (Path.absRel "<interactive>") (Span (Pos 1 1) (Pos 1 1)) allTogether]
 
   (heap, env) <- case Concrete.concrete Eval.eval filius of
-    (heap, [File _ _ (Right (Concrete.Record env))]) -> pure (heap, env)
-    other -> error ("SHIT! " <> show other)
-  print env
+    (heap, [File _ _ (Right (Concrete.Record env))]) ->
+      pure (heap, env)
+    (_, [File _ _ (Left (_, span, err))]) ->
+      HUnit.assertFailure ("Failed evaluation (" <> show span <> "): " <> err)
+    (_, files) ->
+      HUnit.assertFailure ("Unexpected number of files: " <> show (length files))
+
   let found = Map.lookup (Name k) env >>= flip IntMap.lookup heap
   case (found, val) of
     (Just (Concrete.String t), Directive.AString t') -> t HUnit.@?= t'
-    (Just Concrete.Unit, Directive.AUnit) -> return ()
-    other -> error ("FUCK! " <> show other)
+    (Just (Concrete.Bool b), Directive.ABool b') -> b HUnit.@?= b'
+    (Just Concrete.Unit, Directive.AUnit) -> pure ()
+    (a, b) -> HUnit.assertFailure ("expected " <> show a <> ", got " <> show b)
 
+-- handles CHECK-TREE directives
 assertTreeEqual :: Term Core Name -> Term Core Name -> HUnit.Assertion
 assertTreeEqual t item = HUnit.assertEqual ("got (pretty)" <> showCore item) t item
 
@@ -120,7 +127,7 @@ checkPythonFile fp = HUnit.testCaseSteps (Path.toString fp) $ \step -> withFroze
                    . Py.toplevelCompile
                    <$> result
 
-  -- Dispatch
+  -- Dispatch based on the result-directive pair
   for_ directives $ \directive -> do
     step (Directive.describe directive)
     case (coreResult, directive) of
