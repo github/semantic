@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric, DeriveTraversable, DuplicateRecordFields, DeriveGeneric, MultiParamTypeClasses, RecordWildCards, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric, DeriveTraversable, DuplicateRecordFields, MultiParamTypeClasses, RecordWildCards, UndecidableInstances #-}
 module Data.Syntax.Type (module Data.Syntax.Type) where
 
 import Data.Abstract.Evaluatable
