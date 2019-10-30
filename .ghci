@@ -20,6 +20,7 @@
 :set -itest
 
 :set -XHaskell2010
+:set -XStrictData
 
 :set -Weverything
 :set -Wno-all-missed-specialisations
