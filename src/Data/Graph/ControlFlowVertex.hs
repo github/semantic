@@ -138,7 +138,7 @@ type family VertexDeclarationStrategy1 syntax where
   VertexDeclarationStrategy1 Declaration.Method      = 'Custom
   VertexDeclarationStrategy1 Expression.MemberAccess = 'Custom
   VertexDeclarationStrategy1 (Sum _)                 = 'Custom
-  VertexDeclarationStrategy1 syntax                  = 'Default
+  VertexDeclarationStrategy1 _                       = 'Default
 
 class VertexDeclarationWithStrategy1 (strategy :: Strategy) syntax where
   liftToVertexWithStrategy :: Declarations (term Loc)
