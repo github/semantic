@@ -73,15 +73,15 @@ assertJQExpressionSucceeds directive tree core = do
       ]
     other -> HUnit.assertFailure ("Couldn't run scope dumping mechanism: " <> showCore (stripAnnotations allTogether) <> "\n" <> show other)
 
-  let ignore = ByteStream.effects . hoist ByteStream.effects
-      sgJSON = ByteStream.fromLazy $ Aeson.encode bod
+  let ignore     = ByteStream.effects . hoist ByteStream.effects
+      sgJSON     = ByteStream.fromLazy $ Aeson.encode bod
       jqPipeline = Streaming.Process.withStreamingProcess (Directive.toProcess directive) sgJSON ignore
-      errorMsg = "jq(1) returned non-zero exit code"
-      dirMsg    = "jq expression: " <> show directive
-      jsonMsg   = "JSON value: " <> ByteString.Lazy.unpack (Aeson.encodePretty bod)
-      astMsg    = "AST (pretty): " <> ppShow tree
-      treeMsg   = "Core expr (pretty): " <> showCore (stripAnnotations core)
-      treeMsg'  = "Core expr (Show): " <> ppShow (stripAnnotations core)
+      errorMsg   = "jq(1) returned non-zero exit code"
+      dirMsg     = "jq expression: " <> show directive
+      jsonMsg    = "JSON value: " <> ByteString.Lazy.unpack (Aeson.encodePretty bod)
+      astMsg     = "AST (pretty): " <> ppShow tree
+      treeMsg    = "Core expr (pretty): " <> showCore (stripAnnotations core)
+      treeMsg'   = "Core expr (Show): " <> ppShow (stripAnnotations core)
 
 
   catch @_ @Streaming.Process.ProcessExitedUnsuccessfully jqPipeline $ \err -> do
