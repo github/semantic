@@ -32,7 +32,7 @@ type family ConstructorNameStrategy syntax where
   ConstructorNameStrategy (Sum _)     = 'Custom
   ConstructorNameStrategy []          = 'Custom
   ConstructorNameStrategy (TermF _ _) = 'Custom
-  ConstructorNameStrategy syntax      = 'Default
+  ConstructorNameStrategy _           = 'Default
 
 class ConstructorNameWithStrategy (strategy :: Strategy) syntax where
   constructorNameWithStrategy :: proxy strategy -> syntax a -> String
