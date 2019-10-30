@@ -80,3 +80,12 @@
 
 -- -- Use a cyan lambda as the prompt
 -- :set prompt "\ESC[1;36m\STXλ \ESC[m\STX"
+
+-- -- Better errors
+-- :set -ferror-spans -freverse-errors -fprint-expanded-synonyms
+
+-- -- Path-local ghci history
+-- :set -flocal-ghci-history
+
+-- -- Better typed holes
+-- :set -funclutter-valid-hole-fits -fabstract-refinement-hole-fits -frefinement-level-hole-fits=2
