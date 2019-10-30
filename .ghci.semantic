@@ -10,7 +10,7 @@
 -- Compile to object code
 :set -fwrite-interface -fobject-code
 
--- Write build products to dist-repl
+-- Write build products to dist-repl (so that we don’t clobber 'cabal build' outputs)
 :set -outputdir dist-repl/build/x86_64-osx/ghc-8.6.5/semantic-0.8.0.0/build
 :set -odir dist-repl/build/x86_64-osx/ghc-8.6.5/semantic-0.8.0.0/build
 :set -hidir dist-repl/build/x86_64-osx/ghc-8.6.5/semantic-0.8.0.0/build
