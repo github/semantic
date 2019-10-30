@@ -103,33 +103,34 @@ assertEvaluatesTo core k val = do
     (Just Concrete.Unit, Directive.AUnit) -> return ()
     other -> error ("FUCK! " <> show other)
 
-
+assertTreeEqual :: Term Core Name -> Term Core Name -> HUnit.Assertion
+assertTreeEqual t item = HUnit.assertEqual ("got (pretty)" <> showCore item) t item
 
 checkPythonFile :: HasCallStack => Path.RelFile -> Tasty.TestTree
 checkPythonFile fp = HUnit.testCaseSteps (Path.toString fp) $ \step -> withFrozenCallStack $ do
+  -- Extract the directives and the core associated with the provided file
   let fullPath  = Path.relDir "semantic-python/test/fixtures" </> fp
-
   directives <- Directive.readDirectivesFromFile fullPath
-
   result <- ByteString.readFile (Path.toString fullPath) >>= TS.parseByteString TSP.tree_sitter_python
+
+  -- Run the compiler
   let coreResult = Control.Effect.run
                    . runFail
                    . runReader @Py.Bindings mempty
                    . Py.toplevelCompile
                    <$> result
 
+  -- Dispatch
   for_ directives $ \directive -> do
     step (Directive.describe directive)
     case (coreResult, directive) of
-      (Right (Left _), Directive.Fails)      -> pure ()
-      (Left err, _)                          -> HUnit.assertFailure ("Parsing failed: " <> err)
-      (Right (Left err), _)                  -> HUnit.assertFailure ("Compilation failed: " <> err)
-      (Right (Right _), Directive.Fails)     -> HUnit.assertFailure ("Expected translation to fail")
+      (Right (Left _), Directive.Fails)          -> pure ()
+      (Left err, _)                              -> HUnit.assertFailure ("Parsing failed: " <> err)
+      (Right (Left err), _)                      -> HUnit.assertFailure ("Compilation failed: " <> err)
+      (Right (Right _), Directive.Fails)         -> HUnit.assertFailure ("Expected translation to fail")
       (Right (Right item), Directive.Result k v) -> assertEvaluatesTo item k v
-      (Right (Right item), Directive.JQ _)   -> assertJQExpressionSucceeds directive result item
-      (Right (Right item), Directive.Tree t) -> let msg = "got (pretty): " <> showCore item'
-                                                    item' = stripAnnotations item
-                                                in HUnit.assertEqual msg t item' where
+      (Right (Right item), Directive.JQ _)       -> assertJQExpressionSucceeds directive result item
+      (Right (Right item), Directive.Tree t)     -> assertTreeEqual (stripAnnotations item) t
 
 milestoneFixtures :: IO Tasty.TestTree
 milestoneFixtures = buildTests <$> readFiles
