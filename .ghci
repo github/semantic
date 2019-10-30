@@ -72,6 +72,9 @@
 -- :def! no-pretty \ _ -> pure ":set -interactive-print System.IO.print"
 -- :def! r \_ -> pure ":reload\n:pretty"
 
+-- -- Turn on some language extensions you use a lot
+-- :seti -XFlexibleContexts -XOverloadedStrings -XTypeApplications
+
 -- -- Break on errors
 -- :seti -fbreak-on-error
 
