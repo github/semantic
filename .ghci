@@ -1,5 +1,5 @@
 -- GHCI settings for semantic, collected by running cabal repl -v and checking out the flags cabal passes to ghc.
--- These have been added here instead of to script/repl so that they can be overridden on the CLI.
+-- These have been added here instead of to script/repl so that we can comment them.
 
 -- Basic verbosity
 :set -v1
