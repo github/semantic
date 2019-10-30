@@ -1,4 +1,4 @@
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE OverloadedStrings, RecordWildCards #-}
 
 module Semantic.Stat.Spec (testTree) where
 

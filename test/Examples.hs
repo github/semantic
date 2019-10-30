@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE FlexibleContexts, RecordWildCards, TypeApplications #-}
 {-# OPTIONS_GHC -O1 #-}
 module Main (main) where
 

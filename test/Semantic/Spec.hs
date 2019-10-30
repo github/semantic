@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Semantic.Spec (spec) where
 
 import Control.Effect.Reader

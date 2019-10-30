@@ -1,4 +1,4 @@
-{-# LANGUAGE ImplicitParams #-}
+{-# LANGUAGE DataKinds, ImplicitParams, OverloadedStrings, TypeApplications #-}
 {-# OPTIONS_GHC -O0 #-}
 
 module Analysis.TypeScript.Spec (spec) where

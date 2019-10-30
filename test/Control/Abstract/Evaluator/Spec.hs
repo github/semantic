@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE DataKinds, OverloadedStrings, TypeApplications, TypeOperators #-}
 {-# OPTIONS_GHC -fno-warn-missing-signatures #-}
 module Control.Abstract.Evaluator.Spec
 ( spec
