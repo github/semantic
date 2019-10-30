@@ -11,6 +11,7 @@ profiles
 cabal.project.local*
 dist
 dist-newstyle
+dist-repl
 .ghc.environment.*
 .ghci_history
 
