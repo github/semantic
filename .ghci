@@ -1,6 +1,10 @@
 :set -j -v1 -fwrite-interface -fobject-code
 :set -O0
 
+:set -outputdir dist-repl/build/x86_64-osx/ghc-8.6.5/semantic-0.8.0.0/build
+:set -odir dist-repl/build/x86_64-osx/ghc-8.6.5/semantic-0.8.0.0/build
+:set -hidir dist-repl/build/x86_64-osx/ghc-8.6.5/semantic-0.8.0.0/build
+:set -stubdir dist-repl/build/x86_64-osx/ghc-8.6.5/semantic-0.8.0.0/build
 
 :set -idist-repl/build/x86_64-osx/ghc-8.6.5/semantic-0.8.0.0/build/autogen
 
