@@ -1,13 +1,21 @@
-:set -j -v1 -fwrite-interface -fobject-code
+-- Basic verbosity & compiler parallelization
+:set -j -v1
+
+-- Compile to object code
+:set -fwrite-interface -fobject-code
 :set -O0
 
+-- Write build products to dist-repl
 :set -outputdir dist-repl/build/x86_64-osx/ghc-8.6.5/semantic-0.8.0.0/build
 :set -odir dist-repl/build/x86_64-osx/ghc-8.6.5/semantic-0.8.0.0/build
 :set -hidir dist-repl/build/x86_64-osx/ghc-8.6.5/semantic-0.8.0.0/build
 :set -stubdir dist-repl/build/x86_64-osx/ghc-8.6.5/semantic-0.8.0.0/build
 
+-- Look for autogen’d files in dist-repl
 :set -idist-repl/build/x86_64-osx/ghc-8.6.5/semantic-0.8.0.0/build/autogen
 
+-- Load all our sources… remember to keep this up to date when we add new packages!
+-- But don’t add semantic-source, it’s important that we get that from hackage.
 :set -isemantic-analysis/src
 :set -isemantic-ast/src
 :set -isemantic-core/src
@@ -19,9 +27,11 @@
 :set -ibench
 :set -itest
 
+-- Default language mode & extensions
 :set -XHaskell2010
 :set -XStrictData
 
+-- Warnings for compiling .hs files
 :set -Weverything
 :set -Wno-all-missed-specialisations
 :set -Wno-implicit-prelude
@@ -33,8 +43,10 @@
 :set -Wno-safe
 :set -Wno-unsafe
 :set -Wno-star-is-type
+-- Bonus: silence “add these modules to your .cabal file” warnings for files we :load
 :set -Wno-missing-home-modules
 
+-- Warnings for code written in the repl
 :seti -Weverything
 :seti -Wno-all-missed-specialisations
 :seti -Wno-implicit-prelude
