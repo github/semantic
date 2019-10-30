@@ -9,5 +9,5 @@ repl_builddir=dist-repl
 if [[ ! -d $repl_builddir ]]; then
   echo "$repl_builddir does not exist, first run 'cabal repl --builddir=$replbuilddir', exit, and then run script/repl"
 else
-  cabal exec --builddir=$repl_builddir ghci -- $@
+  cabal exec --builddir=$repl_builddir ghci -- -ghci-script=.ghci.semantic $@
 fi
