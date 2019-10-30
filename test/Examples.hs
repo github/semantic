@@ -13,15 +13,11 @@ import           Control.Monad
 import           Control.Monad.IO.Class
 import           Control.Monad.Trans.Resource (ResIO, runResourceT)
 import           Data.Blob
-import qualified Data.ByteString as B
-import           Data.ByteString.Builder
-import qualified Data.ByteString.Char8 as BC
 import qualified Data.ByteString.Lazy.Char8 as BLC
 import qualified Data.ByteString.Streaming.Char8 as ByteStream
 import           Data.Either
 import           Data.Language (defaultLanguageModes)
 import           Data.Set (Set)
-import           Data.Traversable
 import           Data.Typeable
 import qualified Streaming.Prelude as Stream
 import           System.FilePath.Glob
