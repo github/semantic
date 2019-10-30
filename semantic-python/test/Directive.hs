@@ -1,9 +1,8 @@
-{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeOperators, TypeApplications #-}
 
 -- | FileCheck-style directives for testing Core compilers.
 module Directive ( Directive (..)
                  , readDirectivesFromFile
-                 , Expected (..)
                  , describe
                  , toProcess
                  ) where
@@ -11,7 +10,9 @@ module Directive ( Directive (..)
 import           Control.Applicative
 import           Control.Monad
 import           Core.Core (Core)
+import qualified Core.Core as Core
 import           Core.Name (Name)
+import           Analysis.Concrete (Concrete(..))
 import qualified Core.Parser
 import qualified Core.Pretty
 import           Data.ByteString.Char8 (ByteString)
@@ -21,6 +22,8 @@ import           Data.Text (Text)
 import qualified Data.Text as T
 import           Streaming
 import qualified Streaming.Prelude as Stream
+import qualified Source.Span as Source
+import Control.Effect
 import           Syntax.Term (Term)
 import           System.Process
 import qualified Text.Parser.Token.Style as Style
@@ -56,7 +59,7 @@ projects.
 -}
 data Directive = JQ ByteString -- | @# CHECK-JQ: expr@
                | Tree (Term Core Name) -- | @# CHECK-TREE: core@
-               | Result Text Expected -- | @# CHECK-RESULT key: expected
+               | Result Text (Concrete (Term (Core.Ann Source.Span :+: Core)) Name) -- | @# CHECK-RESULT key: expected
                | Fails -- | @# CHECK-FAILS@ fails unless translation fails.
                  deriving (Eq, Show)
 
@@ -75,11 +78,6 @@ readDirectivesFromFile
       perish s  = fail ("Directive parsing error: " <> s)
       isComment = (== Just '#') . fmap fst . ByteString.uncons
 
-data Expected
-  = AString Text
-  | ABool Bool
-  | AUnit
-    deriving (Eq, Show)
 
 describe :: Directive -> String
 describe Fails        = "<expect failure>"
@@ -105,14 +103,14 @@ result = do
   void $ Trifecta.string "# CHECK-RESULT "
   key <- Trifecta.ident Style.haskellIdents
   void $ Trifecta.symbolic ':'
-  Result key <$> expected
+  Result key <$> concrete
 
-expected :: TokenParsing m => m Expected
-expected = Trifecta.choice
-  [ AString <$> Trifecta.stringLiteral
-  , ABool True <$ Trifecta.symbol "#true"
-  , ABool False <$ Trifecta.symbol "#false"
-  , AUnit <$ Trifecta.symbol "#unit"
+concrete :: TokenParsing m => m (Concrete term Name)
+concrete = Trifecta.choice
+  [ String <$> Trifecta.stringLiteral
+  , Bool True <$ Trifecta.symbol "#true"
+  , Bool False <$ Trifecta.symbol "#false"
+  , Unit <$ Trifecta.symbol "#unit"
   ]
 
 directive :: (Monad m, TokenParsing m) => m Directive

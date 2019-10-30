@@ -88,7 +88,7 @@ assertJQExpressionSucceeds directive tree core = do
     HUnit.assertFailure (unlines [errorMsg, dirMsg, jsonMsg, astMsg, treeMsg, treeMsg', show err])
 
 -- handles CHECK-RESULT directives
-assertEvaluatesTo :: Term (Ann Span :+: Core) Name -> Text -> Directive.Expected -> HUnit.Assertion
+assertEvaluatesTo :: Term (Ann Span :+: Core) Name -> Text -> Concrete (Term (Ann Span :+: Core)) Name -> HUnit.Assertion
 assertEvaluatesTo core k val = do
   prelude <- parsePrelude
   let allTogether = (named' "__semantic_prelude" :<- prelude) >>>= core
@@ -103,11 +103,7 @@ assertEvaluatesTo core k val = do
       HUnit.assertFailure ("Unexpected number of files: " <> show (length files))
 
   let found = Map.lookup (Name k) env >>= flip IntMap.lookup heap
-  case (found, val) of
-    (Just (Concrete.String t), Directive.AString t') -> t HUnit.@?= t'
-    (Just (Concrete.Bool b), Directive.ABool b') -> b HUnit.@?= b'
-    (Just Concrete.Unit, Directive.AUnit) -> pure ()
-    (a, b) -> HUnit.assertFailure ("expected " <> show a <> ", got " <> show b)
+  found HUnit.@?= Just val
 
 -- handles CHECK-TREE directives
 assertTreeEqual :: Term Core Name -> Term Core Name -> HUnit.Assertion
