@@ -104,9 +104,9 @@ We use `cabal's` [Nix-style local builds][nix] for development. To get started q
 git clone git@github.com:github/semantic.git
 cd semantic
 script/bootstrap
-cabal new-build
-cabal new-test
-cabal new-run semantic -- --help
+cabal v2-build
+cabal v2-test
+cabal v2-run semantic -- --help
 ```
 
  `stack` as a build tool is not officially supported; there is an unofficial [`stack.yaml`](https://gist.github.com/jkachmar/f200caee83280f1f25e9cfa2dd2b16bb) available, though we cannot make guarantees as to its stability.
