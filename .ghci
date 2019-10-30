@@ -1,9 +1,8 @@
 :set -j -v1 -fwrite-interface -fobject-code
 :set -O0
 
-:set -idist-newstyle/build/x86_64-osx/ghc-8.6.5/semantic-0.8.0.0/build/autogen
 
-:set -Idist-newstyle/build/x86_64-osx/ghc-8.6.5/semantic-0.8.0.0/build/autogen
+:set -idist-repl/build/x86_64-osx/ghc-8.6.5/semantic-0.8.0.0/build/autogen
 
 :set -isemantic-analysis/src
 :set -isemantic-ast/src
