@@ -62,9 +62,6 @@ module Assigning.Assignment
 ( Assignment
 , L.Loc(..)
 -- Combinators
-, branchNode
-, leafNode
-, toTerm
 , Alternative(..)
 , MonadError(..)
 , MonadFail(..)
@@ -108,21 +105,6 @@ import Source.Range as Range
 import Source.Span as Span
 import Text.Parser.Combinators as Parsers hiding (choice)
 import TreeSitter.Language
-
--- | Match a branch node, matching its children with the supplied 'Assignment' & returning the result.
-branchNode :: Enum grammar => grammar -> Assignment ast grammar a -> Assignment ast grammar a
-branchNode sym child = symbol sym *> children child
-
--- | Match a leaf node, returning the corresponding 'Text'.
-leafNode :: Enum grammar => grammar -> Assignment ast grammar Text
-leafNode sym = symbol sym *> source
-
--- | Wrap an 'Assignment' producing @syntax@ up into an 'Assignment' producing 'Term's.
-toTerm :: Element syntax syntaxes
-       => Assignment ast grammar (syntax (Term (Sum syntaxes) L.Loc))
-       -> Assignment ast grammar         (Term (Sum syntaxes) L.Loc)
-toTerm syntax = termIn <$> location <*> (inject <$> syntax)
-
 
 -- | Assignment from an AST with some set of 'symbol's onto some other value.
 --
