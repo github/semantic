@@ -35,18 +35,12 @@ import           Source.Span
 
 -- | A vertex of representing some node in a control flow graph.
 data ControlFlowVertex
-  = Package       { vertexName :: Text }
-  | Module        { vertexName :: Text }
-  | UnknownModule { vertexName :: Text }
-  | Variable      { vertexName :: Text, info :: SyntaxInfo }
-  | Method        { vertexName :: Text, info :: SyntaxInfo }
-  | Function      { vertexName :: Text, info :: SyntaxInfo }
-  deriving (Eq, Ord, Show, Generic, Hashable)
-
-data SyntaxInfo = SyntaxInfo
-  { moduleName :: Text
-  , span :: Span
-  }
+  = Package       Text
+  | Module        Text
+  | UnknownModule Text
+  | Variable      Text Text Span
+  | Method        Text Text Span
+  | Function      Text Text Span
   deriving (Eq, Ord, Show, Generic, Hashable)
 
 packageVertex :: PackageInfo -> ControlFlowVertex
@@ -59,19 +53,22 @@ unknownModuleVertex :: ModuleInfo -> ControlFlowVertex
 unknownModuleVertex = UnknownModule . T.pack . modulePath
 
 variableVertex :: Text -> ModuleInfo -> Span -> ControlFlowVertex
-variableVertex name ModuleInfo{..} = Variable name . SyntaxInfo (T.pack modulePath)
+variableVertex name ModuleInfo{..} = Variable name (T.pack modulePath)
 
 methodVertex :: Text -> ModuleInfo -> Span -> ControlFlowVertex
-methodVertex name ModuleInfo{..} = Method name . SyntaxInfo (T.pack modulePath)
+methodVertex name ModuleInfo{..} = Method name (T.pack modulePath)
 
 functionVertex :: Text -> ModuleInfo -> Span -> ControlFlowVertex
-functionVertex name ModuleInfo{..} = Function name . SyntaxInfo (T.pack modulePath)
+functionVertex name ModuleInfo{..} = Function name (T.pack modulePath)
 
 vertexIdentifier :: ControlFlowVertex -> Text
-vertexIdentifier v@Package{..}  = vertexName <> " (" <> vertexToType v <> ")"
-vertexIdentifier v@Module{..}   = vertexName <> " (" <> vertexToType v <> ")"
-vertexIdentifier v@UnknownModule{..}   = vertexName <> " (" <> vertexToType v <> ")"
-vertexIdentifier v = moduleName (info v) <> "::" <> vertexName v <> " (" <> vertexToType v <> " " <> showSpan (span (info v)) <>  ")"
+vertexIdentifier v = case v of
+  Package       n     -> n <> " (" <> vertexToType v <> ")"
+  Module        n     -> n <> " (" <> vertexToType v <> ")"
+  UnknownModule n     -> n <> " (" <> vertexToType v <> ")"
+  Variable      n m s -> m <> "::" <> n <> " (" <> vertexToType v <> " " <> showSpan s <>  ")"
+  Method        n m s -> m <> "::" <> n <> " (" <> vertexToType v <> " " <> showSpan s <>  ")"
+  Function      n m s -> m <> "::" <> n <> " (" <> vertexToType v <> " " <> showSpan s <>  ")"
 
 showSpan :: Span -> Text
 showSpan (Span (Pos a b) (Pos c d)) = T.pack $
@@ -175,6 +172,6 @@ instance VertexDeclarationWithStrategy1 'Custom Declaration.Method where
 instance VertexDeclarationWithStrategy1 'Custom Expression.MemberAccess where
   liftToVertexWithStrategy _ toVertex ann info (Expression.MemberAccess lhs rhs) =
     case (toVertex info lhs, toVertex info rhs) of
-      (Just (Variable n _, _), Just (_, name)) -> Just (variableVertex (n <> "." <> formatName name) info (Loc.span ann), name)
+      (Just (Variable n _ _, _), Just (_, name)) -> Just (variableVertex (n <> "." <> formatName name) info (Loc.span ann), name)
       (_, Just (_, name)) -> Just (variableVertex (formatName name) info (Loc.span ann), name)
       _ -> Nothing
