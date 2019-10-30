@@ -28,6 +28,7 @@
 :set -isemantic-json/src
 :set -isemantic-python/src
 :set -isemantic-tags/src
+:set -iapp
 :set -isrc
 :set -ibench
 :set -itest
