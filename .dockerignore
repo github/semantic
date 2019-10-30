@@ -9,3 +9,6 @@ Dockerfile
 /docs
 /tmp
 /semantic-source
+/bench
+/script
+/test
