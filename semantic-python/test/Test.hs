@@ -13,7 +13,6 @@ import           Control.Effect.Reader
 import           Control.Monad hiding (fail)
 import           Control.Monad.Catch
 import           Control.Monad.IO.Class
-import           Control.Monad.Trans.Resource (ResourceT, runResourceT)
 import           Core.Core
 import qualified Core.Eval as Eval
 import           Core.Name
