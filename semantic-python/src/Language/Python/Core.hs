@@ -363,7 +363,7 @@ instance Compile Py.String where
       Prj Py.EscapeSequence { text } -> pure text
       other                          -> fail ("Couldn't string-desugar " <> show other)
 
-    let new = pure "__semantic_prelude" ... "str" ... "__class" ... "__new__"
+    let new = pure "__semantic_prelude" ... "str" ... "__slots" ... "__new__"
     cc $ locate it (new $$ Core.string (mconcat contents))
 
 instance Compile Py.Subscript
