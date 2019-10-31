@@ -1,6 +1,5 @@
-{-# LANGUAGE DataKinds, DeriveAnyClass, DerivingVia, DuplicateRecordFields, DeriveGeneric, MultiParamTypeClasses, UndecidableInstances #-}
-{-# OPTIONS_GHC -Wno-missing-export-lists #-}
-module Data.Syntax.Type where
+{-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric, DeriveTraversable, DuplicateRecordFields, MultiParamTypeClasses, RecordWildCards, UndecidableInstances #-}
+module Data.Syntax.Type (module Data.Syntax.Type) where
 
 import Data.Abstract.Evaluatable
 import Data.JSON.Fields

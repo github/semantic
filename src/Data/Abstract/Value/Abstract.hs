@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE FlexibleInstances, MultiParamTypeClasses, OverloadedStrings, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Value.Abstract
 ( Abstract (..)
 , runFunction

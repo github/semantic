@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleContexts #-}
 module Control.Abstract.Context
 ( ModuleInfo
 , currentModule

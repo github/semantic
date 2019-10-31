@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Data.Scientific.Exts
     ( module Data.Scientific
     , attemptUnsafeArithmetic

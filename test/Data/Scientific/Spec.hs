@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Data.Scientific.Spec (testTree) where
 
 import           Data.Either

@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, RankNTypes, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE DataKinds, FlexibleContexts, RankNTypes, TypeFamilies, TypeOperators #-}
 module Language.Go.Assignment
 ( assignment
 , Go.Syntax

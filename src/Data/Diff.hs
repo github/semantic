@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, LambdaCase, RankNTypes, TypeFamilies, TypeOperators, ScopedTypeVariables, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, LambdaCase, OverloadedStrings, RankNTypes, TypeFamilies, TypeOperators, ScopedTypeVariables, UndecidableInstances #-}
 module Data.Diff
 ( Diff(..)
 , DiffF(..)

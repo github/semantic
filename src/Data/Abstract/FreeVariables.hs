@@ -1,4 +1,4 @@
-{-# LANGUAGE DefaultSignatures, GeneralizedNewtypeDeriving, UndecidableInstances #-}
+{-# LANGUAGE DefaultSignatures, GeneralizedNewtypeDeriving, StandaloneDeriving, TypeApplications, UndecidableInstances #-}
 module Data.Abstract.FreeVariables
   ( FreeVariables (..)
   , FreeVariables1 (..)

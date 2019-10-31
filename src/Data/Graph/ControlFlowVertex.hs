@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, EmptyCase, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, EmptyCase, FlexibleInstances, MultiParamTypeClasses, OverloadedStrings, RecordWildCards, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Data.Graph.ControlFlowVertex
 ( ControlFlowVertex (..)
 , packageVertex
@@ -28,19 +28,20 @@ import qualified Data.Syntax.Expression as Expression
 import           Data.Term
 import qualified Data.Text as T
 import           GHC.Generics (V1)
+import           Prelude hiding (span)
 import           Prologue
-import           Source.Loc as Loc
+import qualified Source.Loc as Loc
 import           Source.Span
 
 -- | A vertex of representing some node in a control flow graph.
 data ControlFlowVertex
-  = Package       { vertexName :: Text }
-  | Module        { vertexName :: Text }
-  | UnknownModule { vertexName :: Text }
-  | Variable      { vertexName :: Text, vertexModuleName :: Text, vertexSpan :: Span }
-  | Method        { vertexName :: Text, vertexModuleName :: Text, vertexSpan :: Span }
-  | Function      { vertexName :: Text, vertexModuleName :: Text, vertexSpan :: Span }
-  deriving (Eq, Ord, Show, Generic, Hashable)
+  = Package       Text
+  | Module        Text
+  | UnknownModule Text
+  | Variable      Text Text Span
+  | Method        Text Text Span
+  | Function      Text Text Span
+  deriving (Eq, Ord, Show)
 
 packageVertex :: PackageInfo -> ControlFlowVertex
 packageVertex (PackageInfo name _) = Package (formatName name)
@@ -61,10 +62,13 @@ functionVertex :: Text -> ModuleInfo -> Span -> ControlFlowVertex
 functionVertex name ModuleInfo{..} = Function name (T.pack modulePath)
 
 vertexIdentifier :: ControlFlowVertex -> Text
-vertexIdentifier v@Package{..}  = vertexName <> " (" <> vertexToType v <> ")"
-vertexIdentifier v@Module{..}   = vertexName <> " (" <> vertexToType v <> ")"
-vertexIdentifier v@UnknownModule{..}   = vertexName <> " (" <> vertexToType v <> ")"
-vertexIdentifier v = vertexModuleName v <> "::" <> vertexName v <> " (" <> vertexToType v <> " " <> showSpan (vertexSpan v) <>  ")"
+vertexIdentifier v = case v of
+  Package       n     -> n <> " (" <> vertexToType v <> ")"
+  Module        n     -> n <> " (" <> vertexToType v <> ")"
+  UnknownModule n     -> n <> " (" <> vertexToType v <> ")"
+  Variable      n m s -> m <> "::" <> n <> " (" <> vertexToType v <> " " <> showSpan s <>  ")"
+  Method        n m s -> m <> "::" <> n <> " (" <> vertexToType v <> " " <> showSpan s <>  ")"
+  Function      n m s -> m <> "::" <> n <> " (" <> vertexToType v <> " " <> showSpan s <>  ")"
 
 showSpan :: Span -> Text
 showSpan (Span (Pos a b) (Pos c d)) = T.pack $
@@ -103,7 +107,7 @@ instance ToJSON ControlFlowVertex where
 class VertexDeclaration term where
   toVertex
     :: ModuleInfo
-    -> term Loc
+    -> term Loc.Loc
     -> Maybe (ControlFlowVertex, Name)
 
 instance (VertexDeclaration1 f, Declarations1 f) => VertexDeclaration (Term f) where
@@ -112,15 +116,15 @@ instance (VertexDeclaration1 f, Declarations1 f) => VertexDeclaration (Term f) w
 instance (VertexDeclaration1 f, Declarations1 f) => VertexDeclaration (Quieterm f) where
   toVertex info (Quieterm (In a f)) = liftToVertex toVertex a info f
 
-toVertex1 :: (VertexDeclaration1 f, VertexDeclaration t, Declarations (t Loc)) => Loc -> ModuleInfo -> f (t Loc) -> Maybe (ControlFlowVertex, Name)
+toVertex1 :: (VertexDeclaration1 f, VertexDeclaration t, Declarations (t Loc.Loc)) => Loc.Loc -> ModuleInfo -> f (t Loc.Loc) -> Maybe (ControlFlowVertex, Name)
 toVertex1 = liftToVertex toVertex
 
 class VertexDeclaration1 syntax where
-  liftToVertex :: Declarations (term Loc)
-               => (ModuleInfo -> term Loc -> Maybe (ControlFlowVertex, Name))
-               -> Loc
+  liftToVertex :: Declarations (term Loc.Loc)
+               => (ModuleInfo -> term Loc.Loc -> Maybe (ControlFlowVertex, Name))
+               -> Loc.Loc
                -> ModuleInfo
-               -> syntax (term Loc)
+               -> syntax (term Loc.Loc)
                -> Maybe (ControlFlowVertex, Name)
 
 instance (VertexDeclarationStrategy1 syntax ~ strategy, VertexDeclarationWithStrategy1 strategy syntax) => VertexDeclaration1 syntax where
@@ -138,15 +142,15 @@ type family VertexDeclarationStrategy1 syntax where
   VertexDeclarationStrategy1 Declaration.Method      = 'Custom
   VertexDeclarationStrategy1 Expression.MemberAccess = 'Custom
   VertexDeclarationStrategy1 (Sum _)                 = 'Custom
-  VertexDeclarationStrategy1 syntax                  = 'Default
+  VertexDeclarationStrategy1 _                       = 'Default
 
 class VertexDeclarationWithStrategy1 (strategy :: Strategy) syntax where
-  liftToVertexWithStrategy :: Declarations (term Loc)
+  liftToVertexWithStrategy :: Declarations (term Loc.Loc)
                            => proxy strategy
-                           -> (ModuleInfo -> term Loc -> Maybe (ControlFlowVertex, Name))
-                           -> Loc
+                           -> (ModuleInfo -> term Loc.Loc -> Maybe (ControlFlowVertex, Name))
+                           -> Loc.Loc
                            -> ModuleInfo
-                           -> syntax (term Loc)
+                           -> syntax (term Loc.Loc)
                            -> Maybe (ControlFlowVertex, Name)
 
 -- | The 'Default' strategy produces 'Nothing'.

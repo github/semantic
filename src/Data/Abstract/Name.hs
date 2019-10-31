@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleContexts, OverloadedStrings #-}
 module Data.Abstract.Name
 ( Name
 -- * Constructors
@@ -19,7 +20,7 @@ import           Prologue
 data Name
   = Name Text
   | I Int
-  deriving (Eq, Ord, Generic)
+  deriving (Eq, Ord)
 
 -- | Generate a fresh (unused) name for use in synthesized variables/closures/etc.
 gensym :: (Member Fresh sig, Carrier sig m) => m Name

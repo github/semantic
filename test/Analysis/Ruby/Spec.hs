@@ -1,5 +1,5 @@
+{-# LANGUAGE DataKinds, ImplicitParams, OverloadedStrings, TypeApplications #-}
 {-# OPTIONS_GHC -O0 #-}
-{-# LANGUAGE ImplicitParams #-}
 module Analysis.Ruby.Spec (spec) where
 
 import           Control.Abstract (Declaration (..), ScopeError (..))

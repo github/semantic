@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE FlexibleContexts #-}
 module Analysis.Abstract.Tracing
 ( tracingTerms
 , tracing

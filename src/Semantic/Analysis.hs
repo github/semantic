@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeFamilies, TypeOperators #-}
+{-# LANGUAGE DataKinds, FlexibleContexts, TypeFamilies, TypeOperators #-}
 module Semantic.Analysis
 ( evaluate
 , runDomainEffects

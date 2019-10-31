@@ -1,5 +1,3 @@
-{-# LANGUAGE RankNTypes #-}
-
 -- | These are primitive file IO methods for use in ghci and as internal functions.
 -- Instead of using these, consider if you can use the Files DSL instead.
 module Data.Blob.IO
@@ -20,7 +18,7 @@ import qualified Source.Source as Source
 import qualified System.Path as Path
 
 -- | Read a utf8-encoded file to a 'Blob'.
-readBlobFromFile :: forall m. MonadIO m => File -> m (Maybe Blob)
+readBlobFromFile :: MonadIO m => File -> m (Maybe Blob)
 readBlobFromFile (File "/dev/null" _) = pure Nothing
 readBlobFromFile (File path language) = do
   raw <- liftIO $ B.readFile path

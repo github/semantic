@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE FlexibleContexts, FlexibleInstances, GADTs, GeneralizedNewtypeDeriving, MultiParamTypeClasses, RecordWildCards, TypeOperators, UndecidableInstances #-}
 -- | A carrier for 'Parse' effects suitable for use in production.
 module Control.Carrier.Parse.Measured
 ( -- * Parse effect
@@ -21,7 +21,6 @@ import           Data.Blob
 import qualified Data.Error as Error
 import qualified Data.Flag as Flag
 import qualified Data.Syntax as Syntax
-import           Data.Typeable
 import           Parsing.CMark
 import           Parsing.Parser
 import           Parsing.TreeSitter
@@ -74,7 +73,7 @@ runParser blob@Blob{..} parser = case parser of
   where languageTag = [("language" :: String, show (blobLanguage blob))]
 
 data ParserCancelled = ParserTimedOut | AssignmentTimedOut
-  deriving (Show, Typeable)
+  deriving (Show)
 
 instance Exception ParserCancelled
 

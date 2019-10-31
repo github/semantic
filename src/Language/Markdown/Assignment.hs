@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, RankNTypes, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE DataKinds, FlexibleContexts, RankNTypes, RecordWildCards, TypeFamilies, TypeOperators #-}
 module Language.Markdown.Assignment
 ( assignment
 , Markdown.Syntax

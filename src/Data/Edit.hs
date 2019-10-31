@@ -1,4 +1,4 @@
-{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE DeriveGeneric, DeriveTraversable, LambdaCase #-}
 module Data.Edit
 ( Edit(..)
 , edit

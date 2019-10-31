@@ -24,7 +24,7 @@ data Project = Project
   , projectBlobs       :: [Blob]
   , projectLanguage    :: Language
   , projectExcludeDirs :: [FilePath]
-  } deriving (Eq, Show, Generic)
+  } deriving (Eq, Show)
 
 projectName :: Project -> Text
 projectName = T.pack . dropExtensions . takeFileName . projectRootDir

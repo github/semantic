@@ -1,4 +1,4 @@
-{-# LANGUAGE AllowAmbiguousTypes, MonoLocalBinds, RankNTypes, UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes, DataKinds, FlexibleContexts, FlexibleInstances, MonoLocalBinds, RankNTypes, UndecidableInstances #-}
 module Semantic.Api.Diffs
   ( parseDiffBuilder
   , DiffOutputFormat(..)

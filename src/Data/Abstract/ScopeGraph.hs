@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DuplicateRecordFields, LambdaCase, TupleSections #-}
+{-# LANGUAGE DeriveAnyClass, DeriveFunctor, DeriveGeneric, DuplicateRecordFields, LambdaCase, OverloadedStrings, RecordWildCards, TupleSections #-}
 module Data.Abstract.ScopeGraph
   ( Slot(..)
   , Info(..)

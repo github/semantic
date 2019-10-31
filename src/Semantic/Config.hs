@@ -1,3 +1,4 @@
+{-# LANGUAGE RecordWildCards #-}
 module Semantic.Config
   ( Config (..)
   , defaultConfig

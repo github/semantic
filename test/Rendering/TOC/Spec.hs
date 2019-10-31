@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, MonoLocalBinds, TupleSections, TypeOperators #-}
+{-# LANGUAGE DataKinds, FlexibleContexts, MonoLocalBinds, OverloadedStrings, TupleSections, TypeOperators #-}
 module Rendering.TOC.Spec (spec) where
 
 import Analysis.TOCSummary

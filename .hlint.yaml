@@ -1,7 +1,7 @@
 # HLint configuration file
 # https://github.com/ndmitchell/hlint
 
-- arguments: [--color=auto, -XDataKinds, -XDeriveFoldable, -XDeriveFunctor, -XDeriveGeneric, -XDeriveTraversable, -XFlexibleContexts, -XFlexibleInstances, -XMultiParamTypeClasses, -XOverloadedStrings, -XRecordWildCards, -XStandaloneDeriving, -XStrictData, -XTypeApplications, -XDerivingVia]
+- arguments: [--color=auto, -XStrictData]
 
 # Blacklist some functions by default.
 - functions:
@@ -23,7 +23,7 @@
 - warn: {group: {name: default}}
 
 # Ignore the highly noisy module export list hint
-- ignore: {name: Use module export list}
+- ignore: {name: Use explicit module export list}
 
 # Ignore some builtin hints
 - ignore: {name: Use mappend}

@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GADTs, GeneralizedNewtypeDeriving, KindSignatures, ScopedTypeVariables #-}
+{-# LANGUAGE DataKinds, GADTs, GeneralizedNewtypeDeriving, KindSignatures, OverloadedStrings, RecordWildCards, ScopedTypeVariables, TypeApplications #-}
 module Rendering.JSON
 ( JSON(..)
 , renderJSONDiff

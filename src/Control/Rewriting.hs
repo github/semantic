@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, TypeOperators #-}
+{-# LANGUAGE FlexibleContexts, GADTs, TypeOperators #-}
 
 -- | This module provides 'Rewrite', a monadic DSL that abstracts the
 -- details of rewriting a given datum into another type, supporting

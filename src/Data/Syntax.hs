@@ -1,6 +1,5 @@
-{-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, DeriveAnyClass, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
-{-# OPTIONS_GHC -Wno-missing-export-lists -Wno-redundant-constraints #-} -- For HasCallStack
-module Data.Syntax where
+{-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, DataKinds, DeriveAnyClass, DeriveGeneric, DeriveTraversable, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, OverloadedStrings, RankNTypes, RecordWildCards, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
+module Data.Syntax (module Data.Syntax) where
 
 import Data.Abstract.Evaluatable hiding (Empty, Error)
 import Data.Aeson as Aeson (ToJSON(..), object)
@@ -25,15 +24,15 @@ import qualified Data.Abstract.ScopeGraph as ScopeGraph
 -- Combinators
 
 -- | Lift syntax and an annotation into a term, injecting the syntax into a union & ensuring the annotation encompasses all children.
-makeTerm :: (HasCallStack, Element syntax syntaxes, Sum syntaxes ~ Syntax term, Semigroup ann, Apply Foldable syntaxes, IsTerm term) => ann -> syntax (term ann) -> term ann
+makeTerm :: (Element syntax syntaxes, Sum syntaxes ~ Syntax term, Semigroup ann, Apply Foldable syntaxes, IsTerm term) => ann -> syntax (term ann) -> term ann
 makeTerm ann = makeTerm' ann . inject
 
 -- | Lift a union and an annotation into a term, ensuring the annotation encompasses all children.
-makeTerm' :: (HasCallStack, Semigroup ann, Foldable (Syntax term), IsTerm term) => ann -> Syntax term (term ann) -> term ann
+makeTerm' :: (Semigroup ann, Foldable (Syntax term), IsTerm term) => ann -> Syntax term (term ann) -> term ann
 makeTerm' ann syntax = termIn (sconcat (ann :| (termAnnotation <$> toList syntax))) syntax
 
 -- | Lift syntax and an annotation into a term, injecting the syntax into a union & ensuring the annotation encompasses all children. Removes extra structure if term is a list of a single item.
-makeTerm'' :: (HasCallStack, Element syntax syntaxes, Sum syntaxes ~ Syntax term, Semigroup ann, Apply Foldable syntaxes, Foldable syntax, IsTerm term) => ann -> syntax (term ann) -> term ann
+makeTerm'' :: (Element syntax syntaxes, Sum syntaxes ~ Syntax term, Semigroup ann, Apply Foldable syntaxes, Foldable syntax, IsTerm term) => ann -> syntax (term ann) -> term ann
 makeTerm'' ann children = case toList children of
   [x] -> x
   _ -> makeTerm' ann (inject children)
@@ -49,7 +48,7 @@ makeTerm1' syntax = case toList syntax of
   _ -> error "makeTerm1': empty structure"
 
 -- | Construct an empty term at the current position.
-emptyTerm :: (HasCallStack, Empty :< syntaxes, Sum syntaxes ~ Syntax term, Apply Foldable syntaxes, IsTerm term) => Assignment.Assignment ast grammar (term Loc)
+emptyTerm :: (Empty :< syntaxes, Sum syntaxes ~ Syntax term, Apply Foldable syntaxes, IsTerm term) => Assignment.Assignment ast grammar (term Loc)
 emptyTerm = makeTerm . startLocation <$> Assignment.location <*> pure Empty
   where startLocation Loc{..} = Loc (Range.point (Range.start byteRange)) (Span.point (Span.start span))
 
@@ -58,7 +57,7 @@ handleError :: (HasCallStack, Error :< syntaxes, Sum syntaxes ~ Syntax term, Enu
 handleError = flip Assignment.catchError (\ err -> makeTerm <$> Assignment.location <*> pure (errorSyntax (either id show <$> err) []) <* Assignment.source)
 
 -- | Catch parse errors into an error term.
-parseError :: (HasCallStack, Error :< syntaxes, Sum syntaxes ~ Syntax term, Bounded grammar, Enum grammar, Ix grammar, Apply Foldable syntaxes, IsTerm term) => Assignment.Assignment ast grammar (term Loc)
+parseError :: (Error :< syntaxes, Sum syntaxes ~ Syntax term, Bounded grammar, Enum grammar, Apply Foldable syntaxes, IsTerm term) => Assignment.Assignment ast grammar (term Loc)
 parseError = makeTerm <$> Assignment.token maxBound <*> pure (Error (ErrorStack $ errorSite <$> getCallStack (freezeCallStack callStack)) [] (Just "ParseError") [])
 
 -- | Match context terms before a subject term, wrapping both up in a Context term if any context terms matched, or otherwise returning the subject term.

@@ -1,3 +1,4 @@
+{-# LANGUAGE RecordWildCards #-}
 module Semantic.Telemetry.AsyncQueue
 (
   AsyncQueue(..)
