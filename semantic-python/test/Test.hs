@@ -1,5 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DerivingStrategies, GeneralizedNewtypeDeriving, OverloadedStrings, ScopedTypeVariables,
-             TypeApplications, TypeOperators #-}
+{-# LANGUAGE OverloadedStrings, ScopedTypeVariables, TypeApplications, TypeOperators #-}
 
 module Main (main) where
 
@@ -130,7 +129,7 @@ checkPythonFile fp = HUnit.testCaseSteps (Path.toString fp) $ \step -> withFroze
       (Right (Left _), Directive.Fails)          -> pure ()
       (Left err, _)                              -> HUnit.assertFailure ("Parsing failed: " <> err)
       (Right (Left err), _)                      -> HUnit.assertFailure ("Compilation failed: " <> err)
-      (Right (Right _), Directive.Fails)         -> HUnit.assertFailure ("Expected translation to fail")
+      (Right (Right _), Directive.Fails)         -> HUnit.assertFailure "Expected translation to fail"
       (Right (Right item), Directive.Result k v) -> assertEvaluatesTo item k v
       (Right (Right item), Directive.JQ _)       -> assertJQExpressionSucceeds directive result item
       (Right (Right item), Directive.Tree t)     -> assertTreeEqual (stripAnnotations item) t
