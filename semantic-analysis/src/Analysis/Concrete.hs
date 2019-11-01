@@ -11,7 +11,7 @@ module Analysis.Concrete
 
 import qualified Algebra.Graph as G
 import qualified Algebra.Graph.Export.Dot as G
-import qualified Analysis.Analysis as A
+import           Analysis.Analysis
 import qualified Analysis.Carrier.Env.Precise as A
 import           Analysis.File
 import           Control.Applicative (Alternative (..))
@@ -75,7 +75,7 @@ concrete
      )
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => A.Analysis term name Precise (Concrete term name) m
+     => Analysis term name Precise (Concrete term name) m
      -> (term name -> m (Concrete term name))
      -> (term name -> m (Concrete term name))
      )
@@ -101,7 +101,7 @@ runFile
      )
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => A.Analysis term name Precise (Concrete term name) m
+     => Analysis term name Precise (Concrete term name) m
      -> (term name -> m (Concrete term name))
      -> (term name -> m (Concrete term name))
      )
@@ -118,7 +118,7 @@ runFile eval file = traverse run file
 concreteAnalysis :: ( Carrier sig m
                     , Foldable term
                     , IsString name
-                    , Member Fresh sig
+                    , Member (A.Env name Precise) sig
                     , Member (Reader (Env name)) sig
                     , Member (Reader Path.AbsRelFile) sig
                     , Member (Reader Span) sig
@@ -128,11 +128,11 @@ concreteAnalysis :: ( Carrier sig m
                     , Show name
                     , Show (term name)
                     )
-                 => A.Analysis term name Precise (Concrete term name) m
-concreteAnalysis = A.Analysis{..}
-  where alloc _ = fresh
-        bind name addr m = local (Map.insert name addr) m
-        lookupEnv n = asks (Map.lookup n)
+                 => Analysis term name Precise (Concrete term name) m
+concreteAnalysis = Analysis{..}
+  where alloc = A.alloc
+        bind = A.bind
+        lookupEnv = A.lookupEnv
         deref = gets . IntMap.lookup
         assign addr value = modify (IntMap.insert addr value)
         abstract _ name body = do
