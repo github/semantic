@@ -12,12 +12,11 @@ module Analysis.Concrete
 import qualified Algebra.Graph as G
 import qualified Algebra.Graph.Export.Dot as G
 import qualified Analysis.Analysis as A
-import qualified Analysis.Effect.Env as A
+import qualified Analysis.Carrier.Env.Precise as A
 import           Analysis.File
 import           Control.Applicative (Alternative (..))
 import           Control.Carrier.Fail.WithLoc
 import           Control.Effect
-import           Control.Effect.Carrier
 import           Control.Effect.Fresh
 import           Control.Effect.NonDet
 import           Control.Effect.Reader hiding (Local)
@@ -113,7 +112,7 @@ runFile eval file = traverse run file
             . runReader (fileSpan file)
             . runFail
             . runReader @(Env name) mempty
-            . runEnv @name
+            . A.runEnv @name
             . fix (eval concreteAnalysis)
 
 concreteAnalysis :: ( Carrier sig m
@@ -229,18 +228,3 @@ data EdgeType term name
   | Slot name
   | Value (Concrete term name)
   deriving (Eq, Ord, Show)
-
-
-newtype EnvC name m a = EnvC { runEnv :: m a }
-  deriving (Applicative, Functor, Monad, MonadFail)
-
-instance ( Carrier sig m
-         , Member Fresh sig
-         , Member (Reader (Map.Map name Precise)) sig
-         , Ord name
-         )
-      => Carrier (A.Env name Precise :+: sig) (EnvC name m) where
-  eff (L (A.Alloc _ k))          = fresh >>= k
-  eff (L (A.Bind name addr m k)) = local (Map.insert name addr) m >>= k
-  eff (L (A.Lookup name k))      = asks (Map.lookup name) >>= k
-  eff (R other)                  = EnvC (eff (handleCoercible other))
