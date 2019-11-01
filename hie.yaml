@@ -1,0 +1,3 @@
+cradle:
+  bios:
+    program: script/ghci-flags
