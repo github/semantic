@@ -201,53 +201,6 @@ You can use `:pretty` & `:no-pretty` like so:
 ```
 
 
-### Working in Assignment
-
-When working in assignment, some setup is required. This macro automates that by automatically importing the necessary modules and outputs an example command. If you provide the language you are working with as an optional parameter, the example command is formatted for that language's specific needs (parser, example file extension, etc.).
-
-The macro is defined as:
-
-```
-:{
-assignmentExample lang = case lang of
-  "Python" -> mk "py" "python"
-  "Go" -> mk "go" "go"
-  "Ruby" -> mk "rb" "ruby"
-  "JavaScript" -> mk "js" "typescript"
-  "TypeScript" -> mk "ts" "typescript"
-  "Haskell" -> mk "hs" "haskell"
-  "Markdown" -> mk "md" "markdown"
-  "JSON" -> mk "json" "json"
-  _ -> mk "" ""
-  where mk fileExtension parser = putStrLn ("example: fmap (() <$) . runTask . parse " ++ parser ++ "Parser =<< Semantic.Util.blob \"example." ++ fileExtension ++ "\"") >> return ("import Parsing.Parser\nimport Semantic.Task\nimport Semantic.Util")
-:}
-
-:def assignment assignmentExample
-```
-
-And is invoked in GHCi like:
-
-```
-λ :assignment Python
-```
-
-The output produces a one line expression assuming the syntax to assign is in a file named `example` with the relevant programming language extension:
-
-```haskell
-quieterm <$> parseFile pythonParser "example.py"
-```
-
-
-### Inspecting TreeSitter ASTs
-
-Inspecting the parse tree from TreeSitter can be helpful for debugging. In GHCi, the command below allows viewing the TreeSitter production name of each node in the TreeSitter AST:
-
-```haskell
-import TreeSitter.Java
-fmap nodeSymbol <$> parseFile javaASTParser "example.java"
-```
-
-
 ### Using Threadscope
 
 Threadscope is a tool for profiling the multi-threaded performance of Haskell programs. It allows us to see how work is shared across processors and identify performance issues related to garbage collection or bottlenecks in our processes.
