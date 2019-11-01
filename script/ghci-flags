@@ -32,7 +32,7 @@ echo "-optP-include"
 echo "-optP$root/dist-newstyle/build/x86_64-osx/ghc-$ghc_version/semantic-0.8.0.0/build/autogen/cabal_macros.h"
 
 # Emit package flags from the environment file, removing comments & prefixing with -
-cabal exec -v0 bash -- -c 'cat $GHC_ENVIRONMENT | grep -v "^--" | sed -e "s/^/-/"'
+cabal exec -v0 bash -- -c 'cat $GHC_ENVIRONMENT' | grep -v '^--' | sed -e 's/^/-/'
 
 echo "-XHaskell2010"
 
