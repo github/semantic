@@ -1,8 +1,9 @@
-{-# LANGUAGE DeriveFunctor, ExistentialQuantification, RankNTypes, StandaloneDeriving #-}
+{-# LANGUAGE DeriveFunctor, ExistentialQuantification, LambdaCase, RankNTypes, StandaloneDeriving #-}
 module Analysis.Analysis
 ( Analysis(..)
 ) where
 
+import Control.Effect.Carrier
 import Data.Text (Text)
 
 -- | A record of functions necessary to perform analysis.
@@ -31,6 +32,13 @@ data Env name addr m k
   | Lookup name (Maybe addr -> m k)
 
 deriving instance Functor m => Functor (Env name addr m)
+
+instance HFunctor (Env name addr) where
+  hmap f = \case
+    Alloc name k -> Alloc name (f . k)
+    Bind name addr m k -> Bind name addr (f m) (f . k)
+    Lookup name k -> Lookup name (f . k)
+
 
 data Heap addr value m k
   = Deref addr (Maybe value -> m k)
