@@ -207,7 +207,6 @@ Threadscope is a tool for profiling the multi-threaded performance of Haskell pr
 
 To install threadscope:
 
-1. Download a prebuilt binary from https://github.com/haskell/ThreadScope/releases .
-2. `chmod a+x` the result of extracting the release.
-3. `brew install gtk+ gtk-mac-integration`.
-4. profit.
+1. Download a prebuilt binary from https://github.com/haskell/ThreadScope/releases
+2. `chmod a+x` the result of extracting the release
+3. `brew install gtk+ gtk-mac-integration`
