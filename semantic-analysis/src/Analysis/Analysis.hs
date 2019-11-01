@@ -40,6 +40,12 @@ instance HFunctor (Env name addr) where
     Bind name addr m k -> Bind name addr (f m) (f . k)
     Lookup name k -> Lookup name (f . k)
 
+instance Effect (Env name addr) where
+  handle ctx hdl = \case
+    Alloc name k -> Alloc name (hdl . (<$ ctx) . k)
+    Bind name addr m k -> Bind name addr (hdl (m <$ ctx)) (hdl . fmap k)
+    Lookup name k -> Lookup name (hdl . (<$ ctx) . k)
+
 
 data Heap addr value m k
   = Deref addr (Maybe value -> m k)
