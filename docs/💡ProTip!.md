@@ -148,17 +148,27 @@ _Voilà!_ You’re now looking at the source code for the datatype generated fro
 
 ## GHCi
 
-The Haskell interactive repl (GHCi) allows you to quickly typecheck your work and test out ideas interactively. It’s always worth having a repl open, but we’ve particularly tuned some workflows, e.g. semantic assignment development, for the repl.
-
-
-### Configuration
-
-We configure `ghci` with defaults & macros for use with `semantic` via the [`.ghci` file][] at the project root, and you can further customize its behaviour via the `~/.ghci` file.
+The Haskell interactive repl (GHCi) allows you to quickly typecheck your work and test out ideas interactively. It’s always worth having a repl open, and we’ve particularly tuned some workflows for the repl.
 
 Full docs for ghci can be found in the [user’s guide][ghci user’s guide].
 
 [ghci user’s guide]: https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/ghci.html
-[`.ghci` file]: https://github.com/github/semantic/blob/master/.ghci
+
+
+### Multiple components
+
+`semantic` consists of multiple packages and components, which makes it somewhat challenging to load into `ghci` using e.g. `cabal repl`. To help that, we provide [`script/repl`][] to automate working with multiple components & packages. Unlike when using `cabal repl`, after loading you will need to explicitly `:load` (at least some of) the sources you need to work with. For example, when working in the main `semantic` package, almost everything can be loaded with `:load Semantic.CLI`, since the `Semantic.CLI` module ultimately depends on just about everything else in the repo.
+
+This script is also set up to store intermediate build products in a separate `dist-repl` dir to avoid colliding with normal builds.
+
+[`script/repl`]: https://github.com/github/semantic/blob/master/script/repl
+
+
+### Configuration
+
+`ghci` can be configured with scripts containing Haskell statements and repl commands. By default, the `~/.ghc/ghci.conf` file will be loaded, as well as a `.ghci` file in the working directory, if any. We don’t currently provide such for use with `semantic`, but we do provide a [`.ghci.sample`][] file which we suggest copying to `~/.ghc/ghci.conf` for better typed holes, pretty-printing via `pretty-simple`, and a simple prompt.
+
+[`.ghci.sample`]: https://github.com/github/semantic/blob/master/.ghci.sample
 
 
 ### Managing history
@@ -176,9 +186,9 @@ maxHistorySize: Nothing
 
 ### Pretty-printing
 
-By default, GHCi prints the results of expressions using their `Show` instances, which can be particularly difficult to read for large recursive structures like `Term`s and `Diff`s. The project’s [`.ghci` file][] provides `:pretty` & `:no-pretty` macros which respectively enable & disable colourized, pretty-printed formatting of result values instead. These macros depend on the the `pretty-show` & `hscolour` packages.
+By default, GHCi prints the results of expressions using their `Show` instances, which can be particularly difficult to read for large recursive structures like `Term`s and `Diff`s. The project’s [`.ghci.sample`][] file provides `:pretty` & `:no-pretty` macros which respectively enable & disable colourized, pretty-printed formatting of result values instead. These macros depend on the the `pretty-simple` package.
 
-Since `:reload`ing resets local bindings, the [`.ghci` file][] also provides a convenient `:r` macro which reloads and then immediately re-enables `:pretty`.
+Since `:reload`ing resets local bindings, the file also provides a convenient `:r` macro which reloads and then immediately re-enables `:pretty`.
 
 You can use `:pretty` & `:no-pretty` like so:
 
