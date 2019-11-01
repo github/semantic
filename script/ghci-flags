@@ -33,6 +33,7 @@ echo "-optP$root/dist-newstyle/build/x86_64-osx/ghc-$ghc_version/semantic-0.8.0.
 cabal exec -v0 bash -- -c 'cat $GHC_ENVIRONMENT' | grep -v '^--' | sed -e 's/^/-/'
 
 echo "-XHaskell2010"
+echo "-XStrictData"
 
 echo "-Weverything"
 echo "-Wno-all-missed-specialisations"
