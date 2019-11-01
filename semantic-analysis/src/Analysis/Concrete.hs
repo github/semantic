@@ -12,6 +12,7 @@ module Analysis.Concrete
 import qualified Algebra.Graph as G
 import qualified Algebra.Graph.Export.Dot as G
 import qualified Analysis.Analysis as A
+import qualified Analysis.Effect.Env as A
 import           Analysis.File
 import           Control.Applicative (Alternative (..))
 import           Control.Carrier.Fail.WithLoc

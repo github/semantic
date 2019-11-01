@@ -8,6 +8,7 @@ module Analysis.Typecheck
 ) where
 
 import           Analysis.Analysis
+import           Analysis.Effect.Env
 import           Analysis.File
 import           Analysis.FlowInsensitive
 import           Control.Applicative (Alternative (..))
