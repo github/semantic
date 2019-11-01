@@ -230,7 +230,7 @@ data EdgeType term name
 
 
 newtype EnvC name m a = EnvC { runEnv :: m a }
-  deriving (Applicative, Functor, Monad)
+  deriving (Applicative, Functor, Monad, MonadFail)
 
 instance ( Carrier sig m
          , Member Fresh sig
