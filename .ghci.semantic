@@ -9,12 +9,6 @@
 -- Compile to object code
 :set -fwrite-interface -fobject-code
 
--- Write build products to dist-repl (so that we don’t clobber 'cabal build' outputs)
-:set -outputdir dist-repl/build/x86_64-osx/ghc-8.6.5/semantic-0.8.0.0/build
-:set -odir dist-repl/build/x86_64-osx/ghc-8.6.5/semantic-0.8.0.0/build
-:set -hidir dist-repl/build/x86_64-osx/ghc-8.6.5/semantic-0.8.0.0/build
-:set -stubdir dist-repl/build/x86_64-osx/ghc-8.6.5/semantic-0.8.0.0/build
-
 -- Bonus: silence “add these modules to your .cabal file” warnings for files we :load
 :set -Wno-missing-home-modules
 
