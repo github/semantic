@@ -53,6 +53,7 @@ data Heap addr value m k
   deriving (Functor, Generic1)
 
 instance HFunctor (Heap addr value)
+instance Effect   (Heap addr value)
 
 
 data Domain term name value m k
