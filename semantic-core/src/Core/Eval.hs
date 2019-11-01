@@ -11,6 +11,7 @@ module Core.Eval
 ) where
 
 import Analysis.Analysis
+import Analysis.Effect.Env as A
 import Analysis.File
 import Control.Applicative (Alternative (..))
 import Control.Effect.Carrier
@@ -29,6 +30,7 @@ import Syntax.Term
 import qualified System.Path as Path
 
 eval :: ( Carrier sig m
+        , Member (Env Name address) sig
         , Member (Reader Span) sig
         , MonadFail m
         , Semigroup value
@@ -40,8 +42,8 @@ eval Analysis{..} eval = \case
   Var n -> lookupEnv' n >>= deref' n
   Alg (R c) -> case c of
     Rec (Named (Ignored n) b) -> do
-      addr <- alloc n
-      v <- bind n addr (eval (instantiate1 (pure n) b))
+      addr <- A.alloc n
+      v <- A.bind n addr (eval (instantiate1 (pure n) b))
       v <$ assign addr v
     -- NB: Combining the results of the evaluations allows us to model effects in abstract domains. This in turn means that we can define an abstract domain modelling the types-and-effects of computations by means of a 'Semigroup' instance which takes the type of its second operand and the union of both operands’ effects.
     --
@@ -49,9 +51,9 @@ eval Analysis{..} eval = \case
     a :>> b -> (<>) <$> eval a <*> eval b
     Named (Ignored n) a :>>= b -> do
       a' <- eval a
-      addr <- alloc n
+      addr <- A.alloc n
       assign addr a'
-      bind n addr ((a' <>) <$> eval (instantiate1 (pure n) b))
+      A.bind n addr ((a' <>) <$> eval (instantiate1 (pure n) b))
     Lam (Named (Ignored n) b) -> abstract eval n (instantiate1 (pure n) b)
     f :$ a -> do
       f' <- eval f
@@ -82,7 +84,7 @@ eval Analysis{..} eval = \case
         uninitialized s = fail ("uninitialized variable: " <> s)
         invalidRef s = fail ("invalid ref: " <> s)
 
-        lookupEnv' n = lookupEnv n >>= maybe (freeVariable (show n)) pure
+        lookupEnv' n = A.lookupEnv n >>= maybe (freeVariable (show n)) pure
         deref' n = deref >=> maybe (uninitialized (show n)) pure
 
         ref = \case
