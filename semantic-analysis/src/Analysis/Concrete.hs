@@ -11,7 +11,7 @@ module Analysis.Concrete
 
 import qualified Algebra.Graph as G
 import qualified Algebra.Graph.Export.Dot as G
-import           Analysis.Analysis
+import qualified Analysis.Analysis as A
 import           Analysis.File
 import           Control.Applicative (Alternative (..))
 import           Control.Carrier.Fail.WithLoc
@@ -74,7 +74,7 @@ concrete
      )
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term name Precise (Concrete term name) m
+     => A.Analysis term name Precise (Concrete term name) m
      -> (term name -> m (Concrete term name))
      -> (term name -> m (Concrete term name))
      )
@@ -100,7 +100,7 @@ runFile
      )
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term name Precise (Concrete term name) m
+     => A.Analysis term name Precise (Concrete term name) m
      -> (term name -> m (Concrete term name))
      -> (term name -> m (Concrete term name))
      )
@@ -126,8 +126,8 @@ concreteAnalysis :: ( Carrier sig m
                     , Show name
                     , Show (term name)
                     )
-                 => Analysis term name Precise (Concrete term name) m
-concreteAnalysis = Analysis{..}
+                 => A.Analysis term name Precise (Concrete term name) m
+concreteAnalysis = A.Analysis{..}
   where alloc _ = fresh
         bind name addr m = local (Map.insert name addr) m
         lookupEnv n = asks (Map.lookup n)
