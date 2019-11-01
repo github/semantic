@@ -8,8 +8,6 @@ cd $(dirname "$0")/..
 root="$(pwd)"
 ghc_version="$(ghc --numeric-version)"
 
-echo "--interactive"
-
 echo "-O0"
 echo "-ignore-dot-ghci"
 
