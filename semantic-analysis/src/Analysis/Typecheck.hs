@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveGeneric, DeriveTraversable, DerivingVia, FlexibleContexts, FlexibleInstances, LambdaCase, QuantifiedConstraints, RankNTypes, RecordWildCards, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeOperators #-}
+{-# LANGUAGE DeriveGeneric, DeriveTraversable, DerivingVia, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, LambdaCase, MultiParamTypeClasses, QuantifiedConstraints, RankNTypes, RecordWildCards, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeOperators, UndecidableInstances #-}
 module Analysis.Typecheck
 ( Monotype (..)
 , Meta
@@ -236,3 +236,14 @@ mvs = foldMap IntSet.singleton
 
 substAll :: Monad t => IntMap.IntMap (t Meta) -> t Meta -> t Meta
 substAll s a = a >>= \ i -> fromMaybe (pure i) (IntMap.lookup i s)
+
+
+newtype EnvC name m a = EnvC { runEnv :: m a }
+  deriving (Applicative, Functor, Monad, MonadFail)
+
+instance Carrier sig m
+      => Carrier (Env name name :+: sig) (EnvC name m) where
+  eff (L (Alloc name k))  = k name
+  eff (L (Bind _ _ m k))  = m >>= k
+  eff (L (Lookup name k)) = k (Just name)
+  eff (R other)           = EnvC (eff (handleCoercible other))
