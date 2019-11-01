@@ -35,6 +35,8 @@ cabal exec -v0 bash -- -c 'cat $GHC_ENVIRONMENT' | grep -v '^--' | sed -e 's/^/-
 echo "-XHaskell2010"
 echo "-XStrictData"
 
+echo "-Wwarn"
+
 echo "-Weverything"
 echo "-Wno-all-missed-specialisations"
 echo "-Wno-implicit-prelude"
