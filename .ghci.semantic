@@ -1,6 +1,7 @@
 -- GHCI settings for semantic, collected by running cabal repl -v and checking out the flags cabal passes to ghc.
 -- These live here instead of script/repl for ease of commenting.
 -- These live here instead of .ghci so cabal repl remains unaffected.
+-- These live here instead of script/ghci-flags so ghcide remains unaffected.
 
 -- Basic verbosity
 :set -v1
