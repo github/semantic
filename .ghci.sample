@@ -26,3 +26,6 @@
 
 -- Better typed holes
 :set -funclutter-valid-hole-fits -fabstract-refinement-hole-fits -frefinement-level-hole-fits=2
+
+-- Enable pretty-printing immediately
+:pretty
