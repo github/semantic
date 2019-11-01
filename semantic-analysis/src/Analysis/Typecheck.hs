@@ -8,7 +8,7 @@ module Analysis.Typecheck
 ) where
 
 import           Analysis.Analysis
-import           Analysis.Carrier.Env.Monovariant
+import           Analysis.Carrier.Env.Monovariant as A
 import           Analysis.File
 import           Analysis.FlowInsensitive
 import           Control.Applicative (Alternative (..))
@@ -109,7 +109,6 @@ typecheckingFlowInsensitive eval
   = run
   . runFresh
   . runHeap
-  . runEnv
   . fmap (fmap (fmap (fmap generalize)))
   . traverse (runFile eval)
 
@@ -140,6 +139,7 @@ runFile eval file = traverse run file
           . runState (mempty :: (Substitution name))
           . runReader (filePath file)
           . runReader (fileSpan file)
+          . runEnv @name
           . runFail
           . (\ m -> do
             (cs, t) <- m
@@ -154,6 +154,7 @@ runFile eval file = traverse run file
 typecheckingAnalysis
   :: ( Alternative m
      , Carrier sig m
+     , Member (Env name name) sig
      , Member Fresh sig
      , Member (State (Set.Set (Constraint name))) sig
      , Member (State (Heap name (Type name))) sig
@@ -161,9 +162,9 @@ typecheckingAnalysis
      )
   => Analysis term name name (Type name) m
 typecheckingAnalysis = Analysis{..}
-  where alloc = pure
-        bind _ _ m = m
-        lookupEnv = pure . Just
+  where alloc = A.alloc
+        bind = A.bind
+        lookupEnv = A.lookupEnv
         deref addr = gets (Map.lookup addr >=> nonEmpty . Set.toList) >>= maybe (pure Nothing) (foldMapA (pure . Just))
         assign addr ty = modify (Map.insertWith (<>) addr (Set.singleton ty))
         abstract eval name body = do
