@@ -41,6 +41,7 @@ library
   hs-source-dirs: src
   exposed-modules:
     Analysis.Analysis
+    Analysis.Carrier.Env.Precise
     Analysis.Concrete
     Analysis.Effect.Env
     Analysis.File
