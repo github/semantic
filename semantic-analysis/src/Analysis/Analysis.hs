@@ -1,6 +1,7 @@
-{-# LANGUAGE DeriveFunctor, DeriveGeneric, ExistentialQuantification, LambdaCase, RankNTypes, StandaloneDeriving #-}
+{-# LANGUAGE DeriveFunctor, DeriveGeneric, ExistentialQuantification, FlexibleContexts, LambdaCase, RankNTypes, StandaloneDeriving #-}
 module Analysis.Analysis
 ( Analysis(..)
+, alloc'
 , Env(..)
 ) where
 
@@ -27,6 +28,10 @@ data Analysis term name address value m = Analysis
   , record    :: [(name, value)] -> m value
   , (...)     :: address -> name -> m (Maybe address)
   }
+
+alloc' :: (Carrier sig m, Member (Env name addr) sig) => name -> m addr
+alloc' name = send (Alloc name pure)
+
 
 data Env name addr m k
   = Alloc name (addr -> m k)
