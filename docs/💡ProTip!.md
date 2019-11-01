@@ -201,7 +201,7 @@ You can use `:pretty` & `:no-pretty` like so:
 ```
 
 
-### Using Threadscope
+## Using Threadscope
 
 Threadscope is a tool for profiling the multi-threaded performance of Haskell programs. It allows us to see how work is shared across processors and identify performance issues related to garbage collection or bottlenecks in our processes.
 
