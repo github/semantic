@@ -56,7 +56,3 @@ echo "-Wno-name-shadowing"
 echo "-Wno-safe"
 echo "-Wno-unsafe"
 echo "-Wno-star-is-type"
-
-for arg in "$@"; do
-  echo "$arg"
-done
