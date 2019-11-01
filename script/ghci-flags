@@ -18,10 +18,10 @@ fi
 echo "-O0"
 echo "-ignore-dot-ghci"
 
-echo "-outputdir dist-repl/build/x86_64-osx/ghc-8.6.5/semantic-0.8.0.0/build"
-echo "-odir dist-repl/build/x86_64-osx/ghc-8.6.5/semantic-0.8.0.0/build"
-echo "-hidir dist-repl/build/x86_64-osx/ghc-8.6.5/semantic-0.8.0.0/build"
-echo "-stubdir dist-repl/build/x86_64-osx/ghc-8.6.5/semantic-0.8.0.0/build"
+echo "-outputdir $repl_builddir/build/x86_64-osx/ghc-8.6.5/semantic-0.8.0.0/build"
+echo "-odir $repl_builddir/build/x86_64-osx/ghc-8.6.5/semantic-0.8.0.0/build"
+echo "-hidir $repl_builddir/build/x86_64-osx/ghc-8.6.5/semantic-0.8.0.0/build"
+echo "-stubdir $repl_builddir/build/x86_64-osx/ghc-8.6.5/semantic-0.8.0.0/build"
 
 echo "-i$root/$repl_builddir/build/x86_64-osx/ghc-$ghc_version/semantic-0.8.0.0/build/autogen"
 
