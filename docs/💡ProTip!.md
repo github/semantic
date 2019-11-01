@@ -150,8 +150,6 @@ _Voilà!_ You’re now looking at the source code for the datatype generated fro
 
 The Haskell interactive repl (GHCi) allows you to quickly typecheck your work and test out ideas interactively. It’s always worth having a repl open, but we’ve particularly tuned some workflows, e.g. semantic assignment development, for the repl.
 
-[pretty-printing]: pretty-printing
-
 
 ### Configuration
 
