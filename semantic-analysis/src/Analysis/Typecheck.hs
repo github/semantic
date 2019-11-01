@@ -109,6 +109,7 @@ typecheckingFlowInsensitive eval
   = run
   . runFresh
   . runHeap
+  . runEnv
   . fmap (fmap (fmap (fmap generalize)))
   . traverse (runFile eval)
 
