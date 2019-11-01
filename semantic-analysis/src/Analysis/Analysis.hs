@@ -1,6 +1,7 @@
 {-# LANGUAGE DeriveFunctor, DeriveGeneric, ExistentialQuantification, LambdaCase, RankNTypes, StandaloneDeriving #-}
 module Analysis.Analysis
 ( Analysis(..)
+, Env(..)
 ) where
 
 import Control.Effect.Carrier
