@@ -1,10 +1,11 @@
-{-# LANGUAGE DeriveFunctor, ExistentialQuantification, LambdaCase, RankNTypes, StandaloneDeriving #-}
+{-# LANGUAGE DeriveFunctor, DeriveGeneric, ExistentialQuantification, LambdaCase, RankNTypes, StandaloneDeriving #-}
 module Analysis.Analysis
 ( Analysis(..)
 ) where
 
 import Control.Effect.Carrier
 import Data.Text (Text)
+import GHC.Generics (Generic1)
 
 -- | A record of functions necessary to perform analysis.
 --
@@ -43,7 +44,10 @@ instance HFunctor (Env name addr) where
 data Heap addr value m k
   = Deref addr (Maybe value -> m k)
   | Assign addr value (m k)
-  deriving (Functor)
+  deriving (Functor, Generic1)
+
+instance HFunctor (Heap addr value)
+
 
 data Domain term name value m k
   -- Functions construction & elimination
