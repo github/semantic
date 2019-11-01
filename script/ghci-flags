@@ -8,12 +8,19 @@ cd $(dirname "$0")/..
 root="$(pwd)"
 ghc_version="$(ghc --numeric-version)"
 
+if [ "$1" == "--builddir" ]; then
+  repl_builddir="$2"
+  shift 2
+else
+  repl_builddir=dist-newstyle
+fi
+
 echo "-O0"
 echo "-ignore-dot-ghci"
 
-echo "-i$root/dist-newstyle/build/x86_64-osx/ghc-$ghc_version/semantic-0.8.0.0/build/autogen"
+echo "-i$root/$repl_builddir/build/x86_64-osx/ghc-$ghc_version/semantic-0.8.0.0/build/autogen"
 
-echo "-I$root/dist-newstyle/build/x86_64-osx/ghc-$ghc_version/semantic-0.8.0.0/build/autogen"
+echo "-I$root/$repl_builddir/build/x86_64-osx/ghc-$ghc_version/semantic-0.8.0.0/build/autogen"
 
 echo "-i$root/semantic-analysis/src"
 echo "-i$root/semantic-ast/src"
@@ -28,10 +35,10 @@ echo "-i$root/bench"
 echo "-i$root/test"
 
 echo "-optP-include"
-echo "-optP$root/dist-newstyle/build/x86_64-osx/ghc-$ghc_version/semantic-0.8.0.0/build/autogen/cabal_macros.h"
+echo "-optP$root/$repl_builddir/build/x86_64-osx/ghc-$ghc_version/semantic-0.8.0.0/build/autogen/cabal_macros.h"
 
 # Emit package flags from the environment file, removing comments & prefixing with -
-cabal exec -v0 bash -- -c 'cat $GHC_ENVIRONMENT' | grep -v '^--' | sed -e 's/^/-/'
+cabal exec --builddir=$repl_builddir -v0 bash -- -c 'cat $GHC_ENVIRONMENT' | grep -v '^--' | sed -e 's/^/-/'
 
 echo "-XHaskell2010"
 echo "-XStrictData"
