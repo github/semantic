@@ -42,6 +42,7 @@ library
   exposed-modules:
     Analysis.Analysis
     Analysis.Concrete
+    Analysis.Effect.Env
     Analysis.File
     Analysis.FlowInsensitive
     Analysis.ImportGraph
