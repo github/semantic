@@ -1,0 +1,2 @@
+#!/bin/bash
+# Computes the flags for ghcide to pass to ghci. You probably won’t be running this yourself, but rather ghcide will via configuration in hie.yaml.
