@@ -3,6 +3,7 @@ module Analysis.Analysis
 ( Analysis(..)
 , alloc'
 , bind'
+, lookupEnv'
 , Env(..)
 ) where
 
@@ -35,6 +36,9 @@ alloc' name = send (Alloc name pure)
 
 bind' :: (Carrier sig m, Member (Env name addr) sig) => name -> addr -> m a -> m a
 bind' name addr m = send (Bind name addr m pure)
+
+lookupEnv' :: (Carrier sig m, Member (Env name addr) sig) => name -> m (Maybe addr)
+lookupEnv' name = send (Lookup name pure)
 
 
 data Env name addr m k
