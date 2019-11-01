@@ -1,4 +1,4 @@
-{-# LANGUAGE DerivingVia, FlexibleContexts, FlexibleInstances, LambdaCase, MultiParamTypeClasses, NamedFieldPuns, OverloadedStrings, RankNTypes, RecordWildCards, ScopedTypeVariables, TypeApplications, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DerivingVia, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, LambdaCase, MultiParamTypeClasses, NamedFieldPuns, OverloadedStrings, RankNTypes, RecordWildCards, ScopedTypeVariables, TypeApplications, TypeOperators, UndecidableInstances #-}
 module Analysis.Concrete
 ( Concrete(..)
 , concrete
@@ -16,6 +16,7 @@ import           Analysis.File
 import           Control.Applicative (Alternative (..))
 import           Control.Carrier.Fail.WithLoc
 import           Control.Effect
+import           Control.Effect.Carrier
 import           Control.Effect.Fresh
 import           Control.Effect.NonDet
 import           Control.Effect.Reader hiding (Local)
@@ -226,3 +227,18 @@ data EdgeType term name
   | Slot name
   | Value (Concrete term name)
   deriving (Eq, Ord, Show)
+
+
+newtype EnvC name m a = EnvC { runEnv :: m a }
+  deriving (Applicative, Functor, Monad)
+
+instance ( Carrier sig m
+         , Member Fresh sig
+         , Member (Reader (Map.Map name Precise)) sig
+         , Ord name
+         )
+      => Carrier (A.Env name Precise :+: sig) (EnvC name m) where
+  eff (L (A.Alloc _ k))          = fresh >>= k
+  eff (L (A.Bind name addr m k)) = local (Map.insert name addr) m >>= k
+  eff (L (A.Lookup name k))      = asks (Map.lookup name) >>= k
+  eff (R other)                  = EnvC (eff (handleCoercible other))
