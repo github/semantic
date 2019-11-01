@@ -1,7 +1,7 @@
 -- Consider copying this to your ~/.ghc/ghci.conf file:
 
 -- Pretty-printing
-:set -package pretty-simple
+:set -ignore-package pretty-simple -package pretty-simple
 :def! pretty \ _ -> pure ":set -interactive-print Text.Pretty.Simple.pPrint"
 :def! no-pretty \ _ -> pure ":set -interactive-print System.IO.print"
 :def! r \_ -> pure ":reload\n:pretty"
