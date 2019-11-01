@@ -1,0 +1,26 @@
+-- GHCI settings for semantic, collected by running cabal repl -v and checking out the flags cabal passes to ghc.
+-- These live here instead of script/repl for ease of commenting.
+-- These live here instead of .ghci so cabal repl remains unaffected.
+-- These live here instead of script/ghci-flags so ghcide remains unaffected.
+
+-- Basic verbosity
+:set -v1
+
+-- Compile to object code
+:set -fwrite-interface -fobject-code
+
+-- Bonus: silence “add these modules to your .cabal file” warnings for files we :load
+:set -Wno-missing-home-modules
+
+-- Warnings for code written in the repl
+:seti -Weverything
+:seti -Wno-all-missed-specialisations
+:seti -Wno-implicit-prelude
+:seti -Wno-missed-specialisations
+:seti -Wno-missing-import-lists
+:seti -Wno-missing-local-signatures
+:seti -Wno-monomorphism-restriction
+:seti -Wno-name-shadowing
+:seti -Wno-safe
+:seti -Wno-unsafe
+:seti -Wno-star-is-type

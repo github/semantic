@@ -1,0 +1,15 @@
+#!/bin/bash
+# Usage: script/repl [ARGS...]
+# Run a repl session capable of loading all of the packages and their individual components. Any passed arguments, e.g. module names or flags, will be passed to ghci.
+
+set -e
+
+cd $(dirname "$0")/..
+
+repl_builddir=dist-repl
+
+if [[ ! -d $repl_builddir ]]; then
+  echo "$repl_builddir does not exist, first run 'cabal repl --builddir=$repl_builddir', exit, and then re-run $0"
+else
+  cabal exec --builddir=$repl_builddir ghci -- -ghci-script=.ghci.semantic $(script/ghci-flags --builddir "$repl_builddir") -no-ignore-dot-ghci $@
+fi

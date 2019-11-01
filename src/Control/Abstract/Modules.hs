@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DerivingStrategies, GADTs, GeneralizedNewtypeDeriving, KindSignatures, RankNTypes, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DeriveFunctor, DeriveGeneric, FlexibleContexts, FlexibleInstances, GADTs, GeneralizedNewtypeDeriving, KindSignatures, MultiParamTypeClasses, RankNTypes, ScopedTypeVariables, StandaloneDeriving, TypeOperators, UndecidableInstances #-}
 module Control.Abstract.Modules
 ( ModuleResult
 , lookupModule
@@ -30,8 +30,10 @@ import Prologue
 import Source.Span
 import System.FilePath.Posix (takeDirectory)
 
--- A scope address, frame address, and value ref.
-type ModuleResult address value = ((address, address), value)
+-- | A scope address, frame address, and value ref.
+--
+-- Partially applied, omitting the value type for type applications at * -> *.
+type ModuleResult address = (,) (address, address)
 
 -- | Retrieve an evaluated module, if any. @Nothing@ means we’ve never tried to load it, and @Just (env, value)@ indicates the result of a completed load.
 lookupModule :: (Member (Modules address value) sig, Carrier sig m) => ModulePath -> Evaluator term address value m (Maybe (ModuleResult address value))
@@ -63,8 +65,10 @@ data Modules address value (m :: * -> *) k
   | Lookup  ModulePath (Maybe (ModuleResult address value) -> m k)
   | Resolve [FilePath] (Maybe ModulePath -> m k)
   | List    FilePath   ([ModulePath] -> m k)
-  deriving stock (Functor, Generic1)
-  deriving anyclass (HFunctor, Effect)
+  deriving (Functor, Generic1)
+
+instance HFunctor (Modules address value)
+instance Effect   (Modules address value)
 
 
 sendModules :: ( Member (Modules address value) sig
@@ -79,7 +83,7 @@ runModules :: Set ModulePath
 runModules paths = raiseHandler (runReader paths . runModulesC)
 
 newtype ModulesC address value m a = ModulesC { runModulesC :: ReaderC (Set ModulePath) m a }
-  deriving newtype (Alternative, Applicative, Functor, Monad, MonadIO)
+  deriving (Alternative, Applicative, Functor, Monad, MonadIO)
 
 instance ( Member (Reader (ModuleTable (Module (ModuleResult address value)))) sig
          , Member (Resumable (BaseError (LoadError address value))) sig
@@ -109,9 +113,6 @@ instance Show1 (LoadError address value) where
   liftShowsPrec _ _ = showsPrec
 instance Eq1 (LoadError address value) where
   liftEq _ (ModuleNotFoundError a) (ModuleNotFoundError b) = a == b
-
-instance NFData1 (LoadError address value) where
-  liftRnf _ (ModuleNotFoundError p) = rnf p
 
 runLoadError :: Evaluator term address value (ResumableC (BaseError (LoadError address value)) m) a
              -> Evaluator term address value m (Either (SomeError (BaseError (LoadError address value))) a)
@@ -145,10 +146,6 @@ instance Eq1 ResolutionError where
   liftEq _ (NotFoundError a _ l1) (NotFoundError b _ l2) = a == b && l1 == l2
   liftEq _ (GoImportError a) (GoImportError b) = a == b
   liftEq _ _ _ = False
-instance NFData1 ResolutionError where
-  liftRnf _ x = case x of
-    NotFoundError p ps l -> rnf p `seq` rnf ps `seq` rnf l
-    GoImportError p      -> rnf p
 
 runResolutionError :: Evaluator term address value (ResumableC (BaseError ResolutionError) m) a
                    -> Evaluator term address value m (Either (SomeError (BaseError ResolutionError)) a)

@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DerivingStrategies, GADTs, GeneralizedNewtypeDeriving, KindSignatures, RankNTypes, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DeriveFunctor, DeriveGeneric, FlexibleContexts, GADTs, GeneralizedNewtypeDeriving, KindSignatures, RankNTypes, RecordWildCards, ScopedTypeVariables, StandaloneDeriving, TypeOperators, UndecidableInstances #-}
 module Control.Abstract.Heap
 ( Heap
 , HeapError(..)
@@ -420,15 +420,17 @@ reachable roots heap = go mempty roots
 data Deref value (m :: * -> *) k
   = DerefCell        (Set value) (Maybe value -> m k)
   | AssignCell value (Set value) (Set value   -> m k)
-  deriving stock (Functor, Generic1)
-  deriving anyclass (HFunctor, Effect)
+  deriving (Functor, Generic1)
+
+instance HFunctor (Deref value)
+instance Effect   (Deref value)
 
 runDeref :: Evaluator term address value (DerefC address value m) a
          -> Evaluator term address value m a
 runDeref = raiseHandler runDerefC
 
 newtype DerefC address value m a = DerefC { runDerefC :: m a }
-  deriving newtype (Alternative, Applicative, Functor, Monad)
+  deriving (Alternative, Applicative, Functor, Monad)
 
 
 
@@ -452,17 +454,6 @@ instance Eq address => Eq1 (HeapError address) where
   liftEq _ (LookupFrameError a) (LookupFrameError b)     = a == b
   liftEq _ _ _                                           = False
 
-instance NFData address => NFData1 (HeapError address) where
-  liftRnf _ x = case x of
-    CurrentFrameError    -> ()
-    LookupAddressError a -> rnf a
-    LookupFrameError a   -> a `seq` ()
-    LookupLinksError a   -> rnf a
-    LookupLinkError p    -> rnf p
-
-instance (NFData address, NFData resume) => NFData (HeapError address resume) where
-  rnf = liftRnf rnf
-
 throwHeapError  :: ( Member (Resumable (BaseError (HeapError address))) sig
                    , Member (Reader ModuleInfo) sig
                    , Member (Reader Span) sig
@@ -484,14 +475,6 @@ runHeapErrorWith f = raiseHandler $ runResumableWith (runEvaluator . f)
 data AddressError address value resume where
   UnallocatedSlot   :: Slot address -> AddressError address value (Set value)
   UninitializedSlot :: Slot address -> AddressError address value value
-
-instance (NFData address) => NFData1 (AddressError address value) where
-  liftRnf _ x = case x of
-    UnallocatedSlot a   -> rnf a
-    UninitializedSlot a -> rnf a
-
-instance (NFData address, NFData resume) => NFData (AddressError address value resume) where
-  rnf = liftRnf rnf
 
 deriving instance Eq address => Eq (AddressError address value resume)
 deriving instance Show address => Show (AddressError address value resume)

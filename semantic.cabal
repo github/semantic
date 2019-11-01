@@ -16,7 +16,7 @@ build-type:          Simple
 stability:           alpha
 extra-source-files:  README.md
 
-tested-with:         GHC == 8.6.4
+tested-with:         GHC == 8.6.5
 
 flag release
   description: Build with optimizations on (for CI or deployment builds)
@@ -25,20 +25,22 @@ flag release
 -- GHC extensions shared between targets
 common haskell
   default-language:    Haskell2010
-  default-extensions:  DataKinds
-                     , DeriveFoldable
-                     , DeriveFunctor
-                     , DeriveGeneric
-                     , DeriveTraversable
-                     , FlexibleContexts
-                     , FlexibleInstances
-                     , MonadFailDesugaring
-                     , MultiParamTypeClasses
-                     , OverloadedStrings
-                     , RecordWildCards
-                     , StandaloneDeriving
-                     , StrictData
-                     , TypeApplications
+  default-extensions:  StrictData
+  ghc-options:
+    -Weverything
+    -Wno-missing-local-signatures
+    -Wno-missing-import-lists
+    -Wno-implicit-prelude
+    -Wno-safe
+    -Wno-unsafe
+    -Wno-name-shadowing
+    -Wno-monomorphism-restriction
+    -Wno-missed-specialisations
+    -Wno-all-missed-specialisations
+    -Wno-star-is-type
+  if (impl(ghc >= 8.8))
+    ghc-options: -Wno-missing-deriving-strategies
+
 
 -- Except in case of vendored dependencies, these deps should be expressed
 -- as caret-operator bounds relative to a version in Stackage.
@@ -67,20 +69,15 @@ common dependencies
                      , semantic-source ^>= 0.0
                      , semilattices ^>= 0.0.0.3
                      , streaming ^>= 0.2.2.0
-                     , streaming-bytestring ^>= 0.1.6
                      , text ^>= 1.2.3.1
-                     , these >= 0.7 && <1
                      , unix ^>= 2.7.2.2
-                     , lingo >= 0.2.0.0
+                     , lingo ^>= 0.3.0.0
 
 common executable-flags
   ghc-options:         -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m"
 
-common ghc-warnings
-  ghc-options:         -Wall -Wmissing-export-lists -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -Wno-name-shadowing
-
 library
-  import:              haskell, dependencies, ghc-warnings
+  import:              haskell, dependencies
   hs-source-dirs:      src
   exposed-modules:
                      -- Analyses & term annotations
@@ -148,9 +145,9 @@ library
                      , Data.Blob.IO
                      , Data.Diff
                      , Data.Duration
+                     , Data.Edit
                      , Data.Error
                      , Data.Flag
-                     , Data.Functor.Both
                      , Data.Functor.Classes.Generic
                      , Data.Graph
                      , Data.Graph.ControlFlowVertex
@@ -160,7 +157,6 @@ library
                      , Data.JSON.Fields
                      , Data.Language
                      , Data.Map.Monoidal
-                     , Data.Patch
                      , Data.Project
                      , Data.Quieterm
                      , Data.Semigroup.App
@@ -184,14 +180,18 @@ library
                      -- Language-specific grammar/syntax types, & assignments
                      , Language.Markdown.Assignment
                      , Language.Markdown.Syntax
+                     , Language.Markdown.Term
                      , Language.Go.Assignment
                      , Language.Go.Syntax
+                     , Language.Go.Term
                      , Language.Go.Type
                      , Language.Ruby.Assignment
                      , Language.Ruby.Syntax
+                     , Language.Ruby.Term
                      , Language.TSX.Assignment
                      , Language.TSX.Syntax
                      , Language.TSX.Syntax.JSX
+                     , Language.TSX.Term
                      , Language.TypeScript.Assignment
                      , Language.TypeScript.Resolution
                      , Language.TypeScript.Syntax
@@ -199,10 +199,13 @@ library
                      , Language.TypeScript.Syntax.JavaScript
                      , Language.TypeScript.Syntax.TypeScript
                      , Language.TypeScript.Syntax.Types
+                     , Language.TypeScript.Term
                      , Language.PHP.Assignment
                      , Language.PHP.Syntax
+                     , Language.PHP.Term
                      , Language.Python.Assignment
                      , Language.Python.Syntax
+                     , Language.Python.Term
                      , Numeric.Exts
                      -- Parser glue
                      , Parsing.CMark
@@ -229,10 +232,8 @@ library
                      , Semantic.Config
                      , Semantic.Distribute
                      , Semantic.Env
-                     , Semantic.Git
                      , Semantic.Graph
                      , Semantic.IO
-                     , Semantic.REPL
                      , Semantic.Resolution
                      , Semantic.Task
                      , Semantic.Task.Files
@@ -289,8 +290,6 @@ library
                      , semantic-tags ^>= 0
                      , semigroupoids ^>= 5.3.2
                      , split ^>= 0.2.3.3
-                     , streaming-attoparsec ^>= 1.0.0.1
-                     , streaming-process ^>= 0.1
                      , stm-chans ^>= 3.0.0.4
                      , template-haskell ^>= 2.14
                      , time ^>= 1.8.0.2
@@ -317,7 +316,7 @@ executable semantic
                      , semantic
 
 test-suite test
-  import:              haskell, dependencies, executable-flags, ghc-warnings
+  import:              haskell, dependencies, executable-flags
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
@@ -363,7 +362,6 @@ test-suite test
                      , hspec >= 2.6 && <3
                      , hspec-core >= 2.6 && <3
                      , hspec-expectations ^>= 0.8.2
-                     , shelly >= 1.5 && <2
                      , tasty ^>= 1.2.3
                      , tasty-golden ^>= 2.3.2
                      , tasty-hedgehog ^>= 1.0.0.1
@@ -372,8 +370,6 @@ test-suite test
                      , HUnit ^>= 1.6.0.0
                      , leancheck >= 0.8 && <1
                      , temporary ^>= 1.3
-  if flag(release)
-    ghc-options:       -dynamic
 
 test-suite parse-examples
   import:              haskell, dependencies, executable-flags
@@ -385,7 +381,7 @@ test-suite parse-examples
                      , foldl ^>= 1.4.5
                      , resourcet ^>= 1.2
                      , streaming
-                     , streaming-bytestring
+                     , streaming-bytestring ^>= 0.1.6
                      , tasty
                      , tasty-hunit
 

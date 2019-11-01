@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, DataKinds, DeriveAnyClass, RankNTypes, TypeOperators #-}
+{-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric, GADTs, RankNTypes, RecordWildCards, TypeOperators #-}
 {-# OPTIONS_GHC -Wno-incomplete-uni-patterns #-} -- FIXME
 module Diffing.Algorithm.RWS
 ( rws
@@ -15,11 +15,12 @@ module Diffing.Algorithm.RWS
 ) where
 
 import Control.Monad.State.Strict
-import Data.Diff (DiffF(..), deleting, inserting, merge, replacing)
+import Data.Diff (DiffF(..), comparing, deleting, inserting, merge)
+import Data.Edit
 import qualified Data.KdMap.Static as KdMap
 import Data.List (sortOn)
 import Data.Term as Term
-import Diffing.Algorithm
+import Diffing.Algorithm (Diffable(..))
 import Diffing.Algorithm.RWS.FeatureVector
 import Diffing.Algorithm.SES
 import Prologue
@@ -34,10 +35,10 @@ rws :: (Foldable syntax, Functor syntax, Diffable syntax)
     -> (Term syntax (FeatureVector, ann1) -> Term syntax (FeatureVector, ann2) -> Bool)
     -> [Term syntax (FeatureVector, ann1)]
     -> [Term syntax (FeatureVector, ann2)]
-    -> EditScript (Term syntax (FeatureVector, ann1)) (Term syntax (FeatureVector, ann2))
-rws _          _          as [] = This <$> as
-rws _          _          [] bs = That <$> bs
-rws canCompare _          [a] [b] = if canCompareTerms canCompare a b then [These a b] else [That b, This a]
+    -> [Edit (Term syntax (FeatureVector, ann1)) (Term syntax (FeatureVector, ann2))]
+rws _          _          as [] = Delete <$> as
+rws _          _          [] bs = Insert <$> bs
+rws canCompare _          [a] [b] = if canCompareTerms canCompare a b then [Compare a b] else [Insert b, Delete a]
 rws canCompare equivalent as bs
   = ses equivalent as bs
   & mapContiguous [] []
@@ -46,18 +47,18 @@ rws canCompare equivalent as bs
         -- Map contiguous sequences of unmapped terms separated by SES-mapped equivalencies.
         mapContiguous as bs [] = mapSimilar (reverse as) (reverse bs)
         mapContiguous as bs (first : rest) = case first of
-          This  a   -> mapContiguous (a : as)      bs  rest
-          That    b -> mapContiguous      as  (b : bs) rest
-          These _ _ -> mapSimilar (reverse as) (reverse bs) <> (first : mapContiguous [] [] rest)
+          Delete  a   -> mapContiguous (a : as)      bs  rest
+          Insert    b -> mapContiguous      as  (b : bs) rest
+          Compare _ _ -> mapSimilar (reverse as) (reverse bs) <> (first : mapContiguous [] [] rest)
 
         -- Map comparable, mutually similar terms, inserting & deleting surrounding terms.
         mapSimilar as' bs' = go as bs
-          where go as [] = This . snd <$> as
-                go [] bs = That . snd <$> bs
-                go [a] [b] | canCompareTerms canCompare (snd a) (snd b) = [These (snd a) (snd b)]
-                           | otherwise = [That (snd b), This (snd a)]
+          where go as [] = Delete . snd <$> as
+                go [] bs = Insert . snd <$> bs
+                go [a] [b] | canCompareTerms canCompare (snd a) (snd b) = [Compare (snd a) (snd b)]
+                           | otherwise = [Insert (snd b), Delete (snd a)]
                 go as@((i, _) : _) ((j, b) : restB) =
-                  fromMaybe (That b : go as restB) $ do
+                  fromMaybe (Insert b : go as restB) $ do
                     -- Look up the most similar term to b near i.
                     (i', a) <- mostSimilarMatching (\ i' a -> inRange (i, i + optionsLookaheadPlaces) i' && canCompareTerms canCompare a b) kdMapA b
                     -- Look up the most similar term to a near j.
@@ -66,7 +67,7 @@ rws canCompare equivalent as bs
                     guard (j == j')
                     -- Delete any elements of as before the selected element.
                     let (deleted, _ : restA) = span ((< i') . fst) as
-                    pure $! (This . snd <$> deleted) <> (These a b : go restA restB)
+                    pure $! (Delete . snd <$> deleted) <> (Compare a b : go restA restB)
                 (as, bs) = (zip [0..] as', zip [0..] bs')
                 (kdMapA, kdMapB) = (toKdMap as, toKdMap bs)
 
@@ -158,7 +159,7 @@ editDistanceUpTo m a b = diffCost m (approximateDiff a b)
           _ | m <= 0 -> 0
           Merge body -> sum (fmap ($ pred m) body)
           body -> succ (sum (fmap ($ pred m) body))
-        approximateDiff a b = maybe (replacing a b) (merge (termAnnotation a, termAnnotation b)) (tryAlignWith (Just . these deleting inserting approximateDiff) (termOut a) (termOut b))
+        approximateDiff a b = maybe (comparing a b) (merge (termAnnotation a, termAnnotation b)) (tryAlignWith (Just . edit deleting inserting approximateDiff) (termOut a) (termOut b))
 
 
 data Label syntax where

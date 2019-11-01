@@ -1,6 +1,6 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, UndecidableInstances #-}
-{-# OPTIONS_GHC -Wno-orphans -Wno-missing-export-lists #-}
-module Data.Abstract.AccessControls.Instances where
+{-# LANGUAGE GeneralizedNewtypeDeriving, StandaloneDeriving, TypeApplications, UndecidableInstances #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
+module Data.Abstract.AccessControls.Instances () where
 
 import Data.Sum
 import Data.Term
@@ -15,16 +15,27 @@ import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Language.Go.Syntax as Go
+import qualified Language.Go.Term as Go
 import qualified Language.Go.Type as Go
-import qualified Language.Markdown.Syntax as Markdown
 import qualified Language.PHP.Syntax as PHP
+import qualified Language.PHP.Term as PHP
 import qualified Language.Python.Syntax as Python
+import qualified Language.Python.Term as Python
 import qualified Language.Ruby.Syntax as Ruby
+import qualified Language.Ruby.Term as Ruby
 import qualified Language.TSX.Syntax as TSX
+import qualified Language.TSX.Term as TSX
 import qualified Language.TypeScript.Syntax as TypeScript
+import qualified Language.TypeScript.Term as TypeScript
 import Data.Quieterm
 
 deriving instance AccessControls1 syntax => AccessControls (Term syntax ann)
+deriving instance AccessControls (Go.Term ann)
+deriving instance AccessControls (PHP.Term ann)
+deriving instance AccessControls (Python.Term ann)
+deriving instance AccessControls (Ruby.Term ann)
+deriving instance AccessControls (TSX.Term ann)
+deriving instance AccessControls (TypeScript.Term ann)
 
 instance (AccessControls recur, AccessControls1 syntax) => AccessControls (TermF syntax ann recur) where
   termToAccessControl = liftTermToAccessControl termToAccessControl . termFOut
@@ -210,26 +221,6 @@ instance AccessControls1 Go.Rune
 instance AccessControls1 Go.Select
 instance AccessControls1 Go.TypeSwitchGuard
 instance AccessControls1 Go.ReceiveOperator
-
-instance AccessControls1 Markdown.Document
-instance AccessControls1 Markdown.Paragraph
-instance AccessControls1 Markdown.UnorderedList
-instance AccessControls1 Markdown.OrderedList
-instance AccessControls1 Markdown.BlockQuote
-instance AccessControls1 Markdown.HTMLBlock
-instance AccessControls1 Markdown.Table
-instance AccessControls1 Markdown.TableRow
-instance AccessControls1 Markdown.TableCell
-instance AccessControls1 Markdown.Strong
-instance AccessControls1 Markdown.Emphasis
-instance AccessControls1 Markdown.Text
-instance AccessControls1 Markdown.Strikethrough
-instance AccessControls1 Markdown.Heading
-instance AccessControls1 Markdown.ThematicBreak
-instance AccessControls1 Markdown.Link
-instance AccessControls1 Markdown.Image
-instance AccessControls1 Markdown.Code
-instance AccessControls1 Markdown.LineBreak
 
 instance AccessControls1 PHP.Text
 instance AccessControls1 PHP.VariableName

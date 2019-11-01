@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, EmptyCase, FlexibleInstances, MultiParamTypeClasses, OverloadedStrings, RecordWildCards, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Data.Graph.ControlFlowVertex
 ( ControlFlowVertex (..)
 , packageVertex
@@ -10,9 +10,8 @@ module Data.Graph.ControlFlowVertex
 , vertexIdentifier
 , showSpan
 , VertexDeclaration (..)
-, VertexDeclaration' (..)
-, VertexDeclarationStrategy
-, VertexDeclarationWithStrategy
+, toVertex1
+, VertexDeclaration1 (..)
 ) where
 
 import           Data.Abstract.Declarations
@@ -22,24 +21,27 @@ import           Data.Abstract.Package (PackageInfo (..))
 import           Data.Aeson
 import           Data.Graph (VertexTag (..))
 import qualified Data.Graph as G
+import           Data.Quieterm (Quieterm(..))
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Expression as Expression
 import           Data.Term
 import qualified Data.Text as T
+import           GHC.Generics (V1)
+import           Prelude hiding (span)
 import           Prologue
-import           Source.Loc as Loc
+import qualified Source.Loc as Loc
 import           Source.Span
 
 -- | A vertex of representing some node in a control flow graph.
 data ControlFlowVertex
-  = Package       { vertexName :: Text }
-  | Module        { vertexName :: Text }
-  | UnknownModule { vertexName :: Text }
-  | Variable      { vertexName :: Text, vertexModuleName :: Text, vertexSpan :: Span }
-  | Method        { vertexName :: Text, vertexModuleName :: Text, vertexSpan :: Span }
-  | Function      { vertexName :: Text, vertexModuleName :: Text, vertexSpan :: Span }
-  deriving (Eq, Ord, Show, Generic, Hashable, NFData)
+  = Package       Text
+  | Module        Text
+  | UnknownModule Text
+  | Variable      Text Text Span
+  | Method        Text Text Span
+  | Function      Text Text Span
+  deriving (Eq, Ord, Show)
 
 packageVertex :: PackageInfo -> ControlFlowVertex
 packageVertex (PackageInfo name _) = Package (formatName name)
@@ -60,10 +62,13 @@ functionVertex :: Text -> ModuleInfo -> Span -> ControlFlowVertex
 functionVertex name ModuleInfo{..} = Function name (T.pack modulePath)
 
 vertexIdentifier :: ControlFlowVertex -> Text
-vertexIdentifier v@Package{..}  = vertexName <> " (" <> vertexToType v <> ")"
-vertexIdentifier v@Module{..}   = vertexName <> " (" <> vertexToType v <> ")"
-vertexIdentifier v@UnknownModule{..}   = vertexName <> " (" <> vertexToType v <> ")"
-vertexIdentifier v = vertexModuleName v <> "::" <> vertexName v <> " (" <> vertexToType v <> " " <> showSpan (vertexSpan v) <>  ")"
+vertexIdentifier v = case v of
+  Package       n     -> n <> " (" <> vertexToType v <> ")"
+  Module        n     -> n <> " (" <> vertexToType v <> ")"
+  UnknownModule n     -> n <> " (" <> vertexToType v <> ")"
+  Variable      n m s -> m <> "::" <> n <> " (" <> vertexToType v <> " " <> showSpan s <>  ")"
+  Method        n m s -> m <> "::" <> n <> " (" <> vertexToType v <> " " <> showSpan s <>  ")"
+  Function      n m s -> m <> "::" <> n <> " (" <> vertexToType v <> " " <> showSpan s <>  ")"
 
 showSpan :: Span -> Text
 showSpan (Span (Pos a b) (Pos c d)) = T.pack $
@@ -99,63 +104,74 @@ instance ToJSON ControlFlowVertex where
 -- Typeclasses to create 'ControlFlowVertex's from 'Term's. Also extracts
 -- 'Name's for terms with symbolic names like Identifiers and Declarations.
 
-class VertexDeclaration syntax where
-  toVertex :: (Declarations1 syntax, Foldable syntax)
-           => Loc
-           -> ModuleInfo
-           -> syntax (Term syntax Loc)
-           -> Maybe (ControlFlowVertex, Name)
+class VertexDeclaration term where
+  toVertex
+    :: ModuleInfo
+    -> term Loc.Loc
+    -> Maybe (ControlFlowVertex, Name)
 
-instance (VertexDeclaration' syntax syntax) => VertexDeclaration syntax where
-  toVertex = toVertex'
+instance (VertexDeclaration1 f, Declarations1 f) => VertexDeclaration (Term f) where
+  toVertex info (Term (In a f)) = liftToVertex toVertex a info f
 
-class VertexDeclaration' whole syntax where
-  toVertex' :: (Declarations1 whole, Foldable whole)
-            => Loc
-            -> ModuleInfo
-            -> syntax (Term whole Loc)
-            -> Maybe (ControlFlowVertex, Name)
+instance (VertexDeclaration1 f, Declarations1 f) => VertexDeclaration (Quieterm f) where
+  toVertex info (Quieterm (In a f)) = liftToVertex toVertex a info f
 
-instance (VertexDeclarationStrategy syntax ~ strategy, VertexDeclarationWithStrategy strategy whole syntax) => VertexDeclaration' whole syntax where
-  toVertex' = toVertexWithStrategy (Proxy :: Proxy strategy)
+toVertex1 :: (VertexDeclaration1 f, VertexDeclaration t, Declarations (t Loc.Loc)) => Loc.Loc -> ModuleInfo -> f (t Loc.Loc) -> Maybe (ControlFlowVertex, Name)
+toVertex1 = liftToVertex toVertex
+
+class VertexDeclaration1 syntax where
+  liftToVertex :: Declarations (term Loc.Loc)
+               => (ModuleInfo -> term Loc.Loc -> Maybe (ControlFlowVertex, Name))
+               -> Loc.Loc
+               -> ModuleInfo
+               -> syntax (term Loc.Loc)
+               -> Maybe (ControlFlowVertex, Name)
+
+instance (VertexDeclarationStrategy1 syntax ~ strategy, VertexDeclarationWithStrategy1 strategy syntax) => VertexDeclaration1 syntax where
+  liftToVertex = liftToVertexWithStrategy (Proxy :: Proxy strategy)
+
+-- | This appears to be required to convince 'Semantic.Graph.runCallGraph' not to try to specialize the instance too eagerly.
+instance {-# OVERLAPPING #-} VertexDeclaration1 V1 where
+  liftToVertex _ _ _ v = case v of {}
 
 data Strategy = Default | Custom
 
-type family VertexDeclarationStrategy syntax where
-  VertexDeclarationStrategy Syntax.Identifier = 'Custom
-  VertexDeclarationStrategy Declaration.Function = 'Custom
-  VertexDeclarationStrategy Declaration.Method = 'Custom
-  VertexDeclarationStrategy Expression.MemberAccess = 'Custom
-  VertexDeclarationStrategy (Sum _) = 'Custom
-  VertexDeclarationStrategy syntax  = 'Default
+type family VertexDeclarationStrategy1 syntax where
+  VertexDeclarationStrategy1 Syntax.Identifier       = 'Custom
+  VertexDeclarationStrategy1 Declaration.Function    = 'Custom
+  VertexDeclarationStrategy1 Declaration.Method      = 'Custom
+  VertexDeclarationStrategy1 Expression.MemberAccess = 'Custom
+  VertexDeclarationStrategy1 (Sum _)                 = 'Custom
+  VertexDeclarationStrategy1 _                       = 'Default
 
-class VertexDeclarationWithStrategy (strategy :: Strategy) whole syntax where
-  toVertexWithStrategy :: (Declarations1 whole, Foldable whole)
-                       => proxy strategy
-                       -> Loc
-                       -> ModuleInfo
-                       -> syntax (Term whole Loc)
-                       -> Maybe (ControlFlowVertex, Name)
+class VertexDeclarationWithStrategy1 (strategy :: Strategy) syntax where
+  liftToVertexWithStrategy :: Declarations (term Loc.Loc)
+                           => proxy strategy
+                           -> (ModuleInfo -> term Loc.Loc -> Maybe (ControlFlowVertex, Name))
+                           -> Loc.Loc
+                           -> ModuleInfo
+                           -> syntax (term Loc.Loc)
+                           -> Maybe (ControlFlowVertex, Name)
 
 -- | The 'Default' strategy produces 'Nothing'.
-instance VertexDeclarationWithStrategy 'Default whole syntax where
-  toVertexWithStrategy _ _ _ _ = Nothing
+instance VertexDeclarationWithStrategy1 'Default syntax where
+  liftToVertexWithStrategy _ _ _ _ _ = Nothing
 
-instance Apply (VertexDeclaration' whole) fs => VertexDeclarationWithStrategy 'Custom whole (Sum fs) where
-  toVertexWithStrategy _ ann info = apply @(VertexDeclaration' whole) (toVertex' ann info)
+instance Apply VertexDeclaration1 fs => VertexDeclarationWithStrategy1 'Custom (Sum fs) where
+  liftToVertexWithStrategy _ toVertex ann info = apply @VertexDeclaration1 (liftToVertex toVertex ann info)
 
-instance VertexDeclarationWithStrategy 'Custom whole Syntax.Identifier where
-  toVertexWithStrategy _ ann info (Syntax.Identifier name) = Just (variableVertex (formatName name) info (Loc.span ann), name)
+instance VertexDeclarationWithStrategy1 'Custom Syntax.Identifier where
+  liftToVertexWithStrategy _ _ ann info (Syntax.Identifier name) = Just (variableVertex (formatName name) info (Loc.span ann), name)
 
-instance VertexDeclarationWithStrategy 'Custom whole Declaration.Function where
-  toVertexWithStrategy _ ann info term@Declaration.Function{} = (\n -> (functionVertex (formatName n) info (Loc.span ann), n)) <$> liftDeclaredName declaredName term
+instance VertexDeclarationWithStrategy1 'Custom Declaration.Function where
+  liftToVertexWithStrategy _ _ ann info term@Declaration.Function{} = (\n -> (functionVertex (formatName n) info (Loc.span ann), n)) <$> liftDeclaredName declaredName term
 
-instance VertexDeclarationWithStrategy 'Custom whole Declaration.Method where
-  toVertexWithStrategy _ ann info term@Declaration.Method{} = (\n -> (methodVertex (formatName n) info (Loc.span ann), n)) <$> liftDeclaredName declaredName term
+instance VertexDeclarationWithStrategy1 'Custom Declaration.Method where
+  liftToVertexWithStrategy _ _ ann info term@Declaration.Method{} = (\n -> (methodVertex (formatName n) info (Loc.span ann), n)) <$> liftDeclaredName declaredName term
 
-instance VertexDeclarationWithStrategy 'Custom whole whole => VertexDeclarationWithStrategy 'Custom whole Expression.MemberAccess where
-  toVertexWithStrategy proxy ann info (Expression.MemberAccess (Term (In lhsAnn lhs)) (Term (In rhsAnn rhs))) =
-    case (toVertexWithStrategy proxy lhsAnn info lhs, toVertexWithStrategy proxy rhsAnn info rhs) of
+instance VertexDeclarationWithStrategy1 'Custom Expression.MemberAccess where
+  liftToVertexWithStrategy _ toVertex ann info (Expression.MemberAccess lhs rhs) =
+    case (toVertex info lhs, toVertex info rhs) of
       (Just (Variable n _ _, _), Just (_, name)) -> Just (variableVertex (n <> "." <> formatName name) info (Loc.span ann), name)
       (_, Just (_, name)) -> Just (variableVertex (formatName name) info (Loc.span ann), name)
       _ -> Nothing

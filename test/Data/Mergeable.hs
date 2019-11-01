@@ -1,4 +1,4 @@
-{-# LANGUAGE DefaultSignatures, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DefaultSignatures, FlexibleContexts, TypeApplications, TypeOperators, UndecidableInstances #-}
 module Data.Mergeable ( Mergeable (..) ) where
 
 import Control.Applicative

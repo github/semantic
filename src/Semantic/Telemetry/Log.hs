@@ -1,3 +1,4 @@
+{-# LANGUAGE RecordWildCards #-}
 module Semantic.Telemetry.Log
   ( Level (..)
   , LogOptions (..)

@@ -1,5 +1,4 @@
-{-# LANGUAGE ConstraintKinds, DeriveAnyClass, DerivingStrategies, GADTs, GeneralizedNewtypeDeriving, KindSignatures,
-             ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DeriveFunctor, DeriveGeneric, FlexibleContexts, FlexibleInstances, GADTs, GeneralizedNewtypeDeriving, KindSignatures, MultiParamTypeClasses, OverloadedStrings, RecordWildCards, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Semantic.Resolution
   ( Resolution (..)
   , nodeJSResolutionMap
@@ -20,12 +19,13 @@ import           Prologue
 import           Semantic.Task.Files
 import qualified Source.Source as Source
 import           System.FilePath.Posix
+import qualified System.Path as Path
 
 
 nodeJSResolutionMap :: (Member Files sig, Carrier sig m, MonadIO m) => FilePath -> Text -> [FilePath] -> m (Map FilePath FilePath)
 nodeJSResolutionMap rootDir prop excludeDirs = do
-  files <- findFiles rootDir [".json"] excludeDirs
-  let packageFiles = fileForPath <$> filter ((==) "package.json" . takeFileName) files
+  files <- findFiles (Path.absRel rootDir) [".json"] (fmap Path.absRel excludeDirs)
+  let packageFiles = fileForTypedPath <$> filter ((==) (Path.relFile "package.json") . Path.takeFileName) files
   blobs <- readBlobs (FilesFromPaths packageFiles)
   pure $ fold (mapMaybe (lookup prop) blobs)
   where
@@ -46,14 +46,16 @@ resolutionMap Project{..} = case projectLanguage of
 data Resolution (m :: * -> *) k
   = NodeJSResolution FilePath Text [FilePath] (Map FilePath FilePath -> m k)
   | NoResolution                              (Map FilePath FilePath -> m k)
-  deriving stock (Functor, Generic1)
-  deriving anyclass (HFunctor, Effect)
+  deriving (Functor, Generic1)
+
+instance HFunctor Resolution
+instance Effect   Resolution
 
 runResolution :: ResolutionC m a -> m a
 runResolution = runResolutionC
 
 newtype ResolutionC m a = ResolutionC { runResolutionC :: m a }
-  deriving newtype (Applicative, Functor, Monad, MonadIO)
+  deriving (Applicative, Functor, Monad, MonadIO)
 
 instance (Member Files sig, Carrier sig m, MonadIO m) => Carrier (Resolution :+: sig) (ResolutionC m) where
   eff (R other) = ResolutionC . eff . handleCoercible $ other

@@ -1,5 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DerivingStrategies #-}
-
+{-# LANGUAGE DeriveTraversable, RecordWildCards #-}
 module Data.Abstract.Module
 ( Module(..)
 , moduleForBlob
@@ -16,8 +15,7 @@ import Prologue
 import System.FilePath.Posix
 
 data Module body = Module { moduleInfo :: ModuleInfo, moduleBody :: body }
-  deriving stock (Eq, Foldable, Functor, Ord, Traversable, Generic)
-  deriving anyclass (NFData)
+  deriving (Eq, Foldable, Functor, Ord, Traversable)
 
 instance Show body => Show (Module body) where
   showsPrec d Module{..} = showsBinaryWith showsPrec showsPrec "Module" d (modulePath moduleInfo) moduleBody
@@ -36,8 +34,7 @@ moduleForBlob rootDir b = Module info
 type ModulePath = FilePath
 
 data ModuleInfo = ModuleInfo { modulePath :: ModulePath, moduleLanguage :: Language, moduleOid :: Text }
-  deriving stock (Eq, Ord, Generic)
-  deriving anyclass (NFData)
+  deriving (Eq, Ord)
 
 instance Lower ModuleInfo where
   lowerBound = ModuleInfo mempty Unknown mempty

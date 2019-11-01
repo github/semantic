@@ -1,4 +1,4 @@
-{-# LANGUAGE ImplicitParams #-}
+{-# LANGUAGE DataKinds, ImplicitParams, OverloadedStrings, TypeApplications #-}
 {-# OPTIONS_GHC -O0 #-}
 
 module Analysis.TypeScript.Spec (spec) where
@@ -14,11 +14,10 @@ import           Data.Abstract.Number as Number
 import           Data.Abstract.Package (PackageInfo (..))
 import           Data.Abstract.Value.Concrete as Concrete
 import qualified Data.Language as Language
-import           Data.Quieterm
 import           Data.Scientific (scientific)
 import           Data.Sum
 import           Data.Text (pack)
-import qualified Language.TypeScript.Assignment as TypeScript
+import qualified Language.TypeScript.Term as TypeScript
 import           Source.Loc
 import           SpecHelpers
 
@@ -176,13 +175,11 @@ spec = do
 
     it "member access of private methods throws AccessControlError" $ do
       (_, (_, res)) <- evaluate ["access_control/adder.ts", "access_control/private_method.ts"]
-      let expected = Left (SomeError (inject @TypeScriptEvalError (BaseError (ModuleInfo "private_method.ts" Language.TypeScript mempty) (Span (Pos 4 1) (Pos 4 16)) (AccessControlError ("foo", ScopeGraph.Public) ("private_add", ScopeGraph.Private) (Closure (PackageInfo "access_control" mempty) (ModuleInfo "adder.ts" Language.TypeScript mempty) (Just "private_add") Nothing [] (Right (Quieterm (In (Loc (Range 146 148) (Span (Pos 7 27) (Pos 7 29))) (inject (StatementBlock []))))) (Precise 20) (Precise 18))))))
+      let expected = Left (SomeError (inject @TypeScriptEvalError (BaseError (ModuleInfo "private_method.ts" Language.TypeScript mempty) (Span (Pos 4 1) (Pos 4 16)) (AccessControlError ("foo", ScopeGraph.Public) ("private_add", ScopeGraph.Private) (Closure (PackageInfo "access_control" mempty) (ModuleInfo "adder.ts" Language.TypeScript mempty) (Just "private_add") Nothing [] (Right (TypeScript.Term (In (Loc (Range 146 148) (Span (Pos 7 27) (Pos 7 29))) (inject (StatementBlock []))))) (Precise 20) (Precise 18))))))
       res `shouldBe` expected
 
   where
     fixtures = "test/fixtures/typescript/analysis/"
-    evaluate = evalTypeScriptProject . map (fixtures <>)
-    evalTypeScriptProject = testEvaluating <=< (evaluateProject' ?session (Proxy :: Proxy 'Language.TypeScript) typescriptParser)
+    evaluate = evaluateProject @'Language.TypeScript @(TypeScript.Term Loc) ?session Proxy . map (fixtures <>)
 
-type TypeScriptTerm = Quieterm (Sum TypeScript.Syntax) Loc
-type TypeScriptEvalError = BaseError (EvalError TypeScriptTerm Precise (Concrete.Value TypeScriptTerm Precise))
+type TypeScriptEvalError = BaseError (EvalError (TypeScript.Term Loc) Precise (Concrete.Value (TypeScript.Term Loc) Precise))

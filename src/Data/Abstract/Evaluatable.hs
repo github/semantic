@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, KindSignatures, RankNTypes, TypeOperators, UndecidableInstances, InstanceSigs #-}
+{-# LANGUAGE DataKinds, FlexibleContexts, GADTs, KindSignatures, OverloadedStrings, RankNTypes, StandaloneDeriving, TypeApplications, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Evaluatable
 ( module X
 , Evaluatable(..)
@@ -225,23 +225,6 @@ throwNoNameError = throwEvalError . NoNameError
 deriving instance (Eq term, Eq value) => Eq (EvalError term address value return)
 deriving instance (Show term, Show value) => Show (EvalError term address value return)
 
-instance (NFData term, NFData value) => NFData1 (EvalError term address value) where
-  liftRnf _ x = case x of
-    AccessControlError requester requested v -> rnf requester `seq` rnf requested `seq` rnf v
-    ConstructorError n -> rnf n
-    DefaultExportError -> ()
-    DerefError v -> rnf v
-    ExportError p n -> rnf p `seq` rnf n
-    FloatFormatError i -> rnf i
-    IntegerFormatError i -> rnf i
-    NoNameError term -> rnf term
-    RationalFormatError i -> rnf i
-    ReferenceError v n -> rnf v `seq` rnf n
-    ScopedEnvError v -> rnf v
-
-instance (NFData term, NFData value, NFData return) => NFData (EvalError term address value return) where
-  rnf = liftRnf rnf
-
 instance (Eq term, Eq value) => Eq1 (EvalError term address value) where
   liftEq _ (AccessControlError a b c) (AccessControlError a' b' c') = a == a' && b == b' && c == c'
   liftEq _ (DerefError v) (DerefError v2)                           = v == v2
@@ -279,13 +262,6 @@ throwEvalError = throwBaseError
 data UnspecializedError address value resume where
   UnspecializedError    :: String -> UnspecializedError address value value
   RefUnspecializedError :: String -> UnspecializedError address value (Slot address)
-
-instance NFData1 (UnspecializedError address value) where
-  liftRnf _ (UnspecializedError s)    = rnf s
-  liftRnf _ (RefUnspecializedError s) = rnf s
-
-instance NFData (UnspecializedError address value resume) where
-  rnf = liftRnf (const ())
 
 deriving instance Eq   (UnspecializedError address value resume)
 deriving instance Show (UnspecializedError address value resume)

@@ -16,7 +16,7 @@ build-type:          Simple
 stability:           alpha
 extra-source-files:  README.md
 
-tested-with:         GHC == 8.6.4
+tested-with:         GHC == 8.6.5
 
 common haskell
   default-language:    Haskell2010

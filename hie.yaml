@@ -1,0 +1,4 @@
+cradle:
+  bios:
+    program: script/ghci-flags
+    dependency-program: script/ghci-flags-dependencies

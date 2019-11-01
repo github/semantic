@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE FlexibleContexts, FlexibleInstances, GADTs, GeneralizedNewtypeDeriving, MultiParamTypeClasses, RecordWildCards, TypeOperators, UndecidableInstances #-}
 -- | A carrier for 'Parse' effects suitable for use in the repl, tests, etc.
 module Control.Carrier.Parse.Simple
 ( -- * Parse effect
@@ -18,7 +18,6 @@ import           Control.Effect.Reader
 import           Control.Exception
 import           Control.Monad.IO.Class
 import           Data.Blob
-import           Data.Typeable
 import           Parsing.CMark
 import           Parsing.Parser
 import           Parsing.TreeSitter
@@ -63,7 +62,7 @@ runParser timeout blob@Blob{..} parser = case parser of
     let term = cmarkParser blobSource
     in length term `seq` pure term
 
-data ParseFailure = ParseFailure String
-  deriving (Show, Typeable)
+newtype ParseFailure = ParseFailure String
+  deriving (Show)
 
 instance Exception ParseFailure

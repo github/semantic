@@ -1,5 +1,4 @@
-{-# LANGUAGE DefaultSignatures, MultiParamTypeClasses, TypeOperators, UndecidableInstances, GADTs #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-} -- FIXME
+{-# LANGUAGE DefaultSignatures, FlexibleContexts, FlexibleInstances, GADTs, MultiParamTypeClasses, OverloadedStrings, RecordWildCards, TypeApplications, TypeOperators, UndecidableInstances #-}
 module Data.JSON.Fields
   ( JSONFields (..)
   , JSONFields1 (..)
@@ -9,6 +8,7 @@ module Data.JSON.Fields
   ) where
 
 import           Data.Aeson
+import           Data.Edit
 import qualified Data.Map as Map
 import           Data.Sum (Apply (..), Sum)
 import qualified Data.Text as Text
@@ -56,6 +56,11 @@ instance ToJSONFields Span where
 
 instance ToJSONFields Loc where
   toJSONFields Loc{..} = toJSONFields byteRange <> toJSONFields span
+
+instance (ToJSONFields a, ToJSONFields b) => ToJSONFields (Edit a b) where
+  toJSONFields (Insert a)    = [ "insert" .= object (toJSONFields a) ]
+  toJSONFields (Delete a)    = [ "delete" .= object (toJSONFields a) ]
+  toJSONFields (Compare a b) = [ "replace" .= [object (toJSONFields a), object (toJSONFields b)] ]
 
 
 newtype JSONFields a = JSONFields { unJSONFields :: a }

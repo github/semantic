@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, GADTs #-}
+{-# LANGUAGE DataKinds, DeriveAnyClass, GADTs, StandaloneDeriving #-}
 
 module Data.Handle
   ( Handle (..)

@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DuplicateRecordFields, LambdaCase, TupleSections #-}
+{-# LANGUAGE DeriveAnyClass, DeriveFunctor, DeriveGeneric, DuplicateRecordFields, LambdaCase, OverloadedStrings, RecordWildCards, TupleSections #-}
 module Data.Abstract.ScopeGraph
   ( Slot(..)
   , Info(..)
@@ -55,13 +55,13 @@ import Source.Span
 
 -- A slot is a location in the heap where a value is stored.
 data Slot address = Slot { frameAddress :: address, position :: Position }
-    deriving (Eq, Show, Ord, Generic, NFData)
+    deriving (Eq, Show, Ord)
 
 
 data AccessControl = Public
                    | Protected
                    | Private
-                   deriving (Bounded, Enum, Eq, Generic, Hashable, ToJSON, NFData, Show)
+                   deriving (Bounded, Enum, Eq, Generic, Hashable, ToJSON, Show)
 
 instance ToJSONFields AccessControl where
   toJSONFields accessControl = ["accessControl" .= accessControl]
@@ -87,7 +87,7 @@ instance Ord AccessControl where
 
 
 data Relation = Default | Instance | Prelude | Gensym
-  deriving (Bounded, Enum, Eq, Show, Ord, Generic, NFData)
+  deriving (Bounded, Enum, Eq, Show, Ord)
 
 instance Lower Relation where
   lowerBound = Default
@@ -100,7 +100,7 @@ data Info scopeAddress = Info
   , infoSpan            :: Span
   , infoKind            :: Kind
   , infoAssociatedScope :: Maybe scopeAddress
-  } deriving (Eq, Show, Ord, Generic, NFData)
+  } deriving (Eq, Show, Ord)
 
 instance HasSpan (Info scopeAddress) where
   span_ = lens infoSpan (\i s -> i { infoSpan = s })
@@ -113,7 +113,7 @@ data ReferenceInfo = ReferenceInfo
   { refSpan   :: Span
   , refKind   :: Kind
   , refModule :: ModuleInfo
-  } deriving (Eq, Show, Ord, Generic, NFData)
+  } deriving (Eq, Show, Ord)
 
 instance HasSpan ReferenceInfo where
   span_ = lens refSpan (\r s -> r { refSpan = s })
@@ -143,7 +143,7 @@ data Kind = AbstractClass
           | Unknown
           | UnqualifiedImport
           | VariableDeclaration
-  deriving (Bounded, Enum, Eq, Show, Ord, Generic, NFData)
+  deriving (Bounded, Enum, Eq, Show, Ord)
 
 instance Lower Kind where
   lowerBound = Unknown
@@ -160,7 +160,7 @@ data Scope address =
     , references   :: Map Reference ([ReferenceInfo], Path address)
     , declarations :: Seq (Info address)
     }
-  deriving (Eq, Show, Ord, Generic, NFData)
+  deriving (Eq, Show, Ord)
 
 instance Lower (Scope scopeAddress) where
   lowerBound = Scope mempty mempty mempty
@@ -175,10 +175,10 @@ instance AbstractHole (Info address) where
   hole = lowerBound
 
 newtype Position = Position { unPosition :: Int }
-  deriving (Eq, Show, Ord, Generic, NFData)
+  deriving (Eq, Show, Ord)
 
 newtype ScopeGraph scope = ScopeGraph { unScopeGraph :: Map scope (Scope scope) }
-  deriving (Eq, Generic, NFData, Ord, Show)
+  deriving (Eq, Ord, Show)
 
 instance Ord scope => Lower (ScopeGraph scope) where
   lowerBound = ScopeGraph mempty
@@ -189,7 +189,7 @@ data Path scope
   | DPath Declaration Position
   -- | Construct an edge from a scope to another declaration path.
   | EPath EdgeLabel scope (Path scope)
-  deriving (Eq, Functor, Generic, NFData, Ord, Show)
+  deriving (Eq, Functor, Ord, Show)
 
 instance AbstractHole (Path scope) where
   hole = Hole
@@ -399,13 +399,13 @@ associatedScope Declaration{..} g@(ScopeGraph graph) = go (Map.keys graph)
     lookupAssociatedScope scope = ((lookupDeclaration unDeclaration scope g >>= infoAssociatedScope . fst) <|>)
 
 newtype Reference = Reference { unReference :: Name }
-  deriving (Eq, Ord, Show, Generic, NFData)
+  deriving (Eq, Ord, Show)
 
 instance Lower Reference where
   lowerBound = Reference $ name ""
 
 newtype Declaration = Declaration { unDeclaration :: Name }
-  deriving (Eq, Ord, Show, Generic, NFData)
+  deriving (Eq, Ord, Show)
 
 instance Lower Declaration where
   lowerBound = Declaration $ name ""
@@ -416,4 +416,4 @@ formatDeclaration = formatName . unDeclaration
 -- | The type of edge from a scope to its parent scopes.
 -- Either a lexical edge or an import edge in the case of non-lexical edges.
 data EdgeLabel = Lexical | Import | Export | Superclass
-  deriving (Bounded, Enum, Eq, Ord, Show, Generic, NFData)
+  deriving (Bounded, Enum, Eq, Ord, Show)

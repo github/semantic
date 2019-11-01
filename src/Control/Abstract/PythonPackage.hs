@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, UndecidableInstances #-}
+{-# LANGUAGE FlexibleInstances, GeneralizedNewtypeDeriving, MultiParamTypeClasses, OverloadedStrings, UndecidableInstances #-}
 module Control.Abstract.PythonPackage
 ( runPythonPackaging, Strategy(..) ) where
 

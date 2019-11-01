@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeFamilies, TypeOperators #-}
+{-# LANGUAGE DataKinds, FlexibleContexts, TypeFamilies, TypeOperators #-}
 module Semantic.Analysis
 ( evaluate
 , runDomainEffects
@@ -46,10 +46,10 @@ type DomainC term address value m
 -- | Evaluate a list of modules with the prelude for the passed language available, and applying the passed function to every module.
 evaluate :: ( Carrier outerSig outer
             , derefSig ~ (Deref value :+: allocatorSig)
-            , derefC ~ (DerefC address value allocatorC)
+            , derefC ~ DerefC address value allocatorC
             , Carrier derefSig derefC
             , allocatorSig ~ (Allocator address :+: Reader ModuleInfo :+: outerSig)
-            , allocatorC ~ (AllocatorC address (ReaderC ModuleInfo outer))
+            , allocatorC ~ AllocatorC address (ReaderC ModuleInfo outer)
             , Carrier allocatorSig allocatorC
             , Effect outerSig
             , Member Fresh outerSig
@@ -187,8 +187,8 @@ evalTerm :: ( Carrier sig m
             , Member Fresh sig
             , Member Trace sig
             , Ord address
-            , Show address
             , Recursive term
+            , Show address
             )
          => Open (term -> Evaluator term address value m value)
          -> term -> Evaluator term address value m value

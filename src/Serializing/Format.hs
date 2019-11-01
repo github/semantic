@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs #-}
+{-# LANGUAGE FlexibleContexts, GADTs, OverloadedStrings #-}
 module Serializing.Format
 ( Format(..)
 , FormatStyle(..)

@@ -1,10 +1,12 @@
-{-# LANGUAGE ImplicitParams #-}
+{-# LANGUAGE DataKinds, ImplicitParams, OverloadedStrings, TypeApplications #-}
 {-# OPTIONS_GHC -O0 #-}
 module Analysis.PHP.Spec (spec) where
 
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import qualified Data.Abstract.Value.Concrete as Value
 import qualified Data.Language as Language
+import qualified Language.PHP.Term as PHP
+import           Source.Loc
 import           SpecHelpers
 
 
@@ -44,5 +46,4 @@ spec = do
 
   where
     fixtures = "test/fixtures/php/analysis/"
-    evaluate = evalPHPProject . map (fixtures <>)
-    evalPHPProject = testEvaluating <=< evaluateProject' ?session (Proxy :: Proxy 'Language.PHP) phpParser
+    evaluate = evaluateProject @'Language.PHP @(PHP.Term Loc) ?session Proxy . map (fixtures <>)

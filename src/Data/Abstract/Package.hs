@@ -1,5 +1,4 @@
-{-# LANGUAGE DeriveAnyClass #-}
-
+{-# LANGUAGE DeriveFunctor #-}
 module Data.Abstract.Package
   ( Package (..)
   , PackageInfo (..)
@@ -11,7 +10,6 @@ import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
 import qualified Data.Map as Map
 import Data.Abstract.Name
-import Prologue
 
 type PackageName = Name
 
@@ -20,7 +18,7 @@ data PackageInfo = PackageInfo
   { packageName        :: PackageName
   , packageResolutions :: Map.Map FilePath FilePath
   }
-  deriving (Eq, Ord, Show, Generic, NFData)
+  deriving (Eq, Ord, Show)
 
 -- | A package represents the unit of dependency, i.e. something which can depend upon, or be depended upon by, other packages. Packages have modules and may have entry points from which evaluation can proceed.
 data Package term = Package

@@ -1,0 +1,17 @@
+#!/bin/bash
+# Computes the paths to files causing changes to the ghci flags. You probably won’t be running this yourself, but rather ghcide will via configuration in hie.yaml.
+
+set -e
+
+cd $(dirname "$0")/..
+
+echo "cabal.project"
+
+echo "semantic.cabal"
+echo "semantic-analysis/semantic-analysis.cabal"
+echo "semantic-ast/semantic-ast.cabal"
+echo "semantic-core/semantic-core.cabal"
+echo "semantic-java/semantic-java.cabal"
+echo "semantic-json/semantic-json.cabal"
+echo "semantic-python/semantic-python.cabal"
+echo "semantic-tags/semantic-tags.cabal"

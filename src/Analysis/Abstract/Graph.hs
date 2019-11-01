@@ -1,4 +1,4 @@
-{-# LANGUAGE DerivingVia, LambdaCase, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DerivingVia, FlexibleContexts, FlexibleInstances, LambdaCase, MultiParamTypeClasses, OverloadedStrings, RankNTypes, ScopedTypeVariables, TypeFamilies, UndecidableInstances #-}
 module Analysis.Abstract.Graph
 ( Graph(..)
 , ControlFlowVertex(..)
@@ -20,13 +20,11 @@ import           Algebra.Graph.Export.Dot hiding (vertexName)
 import           Control.Abstract hiding (Function(..))
 import           Control.Effect.Carrier
 import           Data.Abstract.BaseError
-import           Data.Abstract.Declarations
 import           Data.Abstract.Module (Module (moduleInfo), ModuleInfo (..))
 import           Data.Abstract.Package (PackageInfo (..))
 import           Data.ByteString.Builder
 import           Data.Graph
 import           Data.Graph.ControlFlowVertex
-import           Data.Term
 import qualified Data.Map as Map
 import qualified Data.Text.Encoding as T
 import           Prologue
@@ -37,12 +35,12 @@ style = (defaultStyle (T.encodeUtf8Builder . vertexIdentifier))
   { vertexAttributes = vertexAttributes
   , edgeAttributes   = edgeAttributes
   }
-  where vertexAttributes Package{}       = [ "style" := "dashed", "shape" := "box" ]
-        vertexAttributes Module{}        = [ "style" := "dotted, rounded", "shape" := "box" ]
-        vertexAttributes UnknownModule{} = [ "style" := "dotted, rounded", "shape" := "box", "color" := "red", "fontcolor" := "red" ]
-        vertexAttributes Variable{..} = [ "label" := T.encodeUtf8Builder (vertexName <> " (Variable)"), "tooltip" := T.encodeUtf8Builder (showSpan vertexSpan), "style" := "rounded", "shape" := "box" ]
-        vertexAttributes Method{..}   = [ "label" := T.encodeUtf8Builder (vertexName <> " (Method)"),   "tooltip" := T.encodeUtf8Builder (showSpan vertexSpan)  , "style" := "rounded", "shape" := "box" ]
-        vertexAttributes Function{..} = [ "label" := T.encodeUtf8Builder (vertexName <> " (Function)"), "tooltip" := T.encodeUtf8Builder (showSpan vertexSpan), "style" := "rounded", "shape" := "box" ]
+  where vertexAttributes Package{}        = [ "style" := "dashed", "shape" := "box" ]
+        vertexAttributes Module{}         = [ "style" := "dotted, rounded", "shape" := "box" ]
+        vertexAttributes UnknownModule{}  = [ "style" := "dotted, rounded", "shape" := "box", "color" := "red", "fontcolor" := "red" ]
+        vertexAttributes (Variable n _ s) = [ "label" := T.encodeUtf8Builder (n <> " (Variable)"), "tooltip" := T.encodeUtf8Builder (showSpan s), "style" := "rounded", "shape" := "box" ]
+        vertexAttributes (Method   n _ s) = [ "label" := T.encodeUtf8Builder (n <> " (Method)"),   "tooltip" := T.encodeUtf8Builder (showSpan s)  , "style" := "rounded", "shape" := "box" ]
+        vertexAttributes (Function n _ s) = [ "label" := T.encodeUtf8Builder (n <> " (Function)"), "tooltip" := T.encodeUtf8Builder (showSpan s), "style" := "rounded", "shape" := "box" ]
         edgeAttributes Module{}   Module{}          = [ "len" := "5.0", "label" := "imports" ]
         edgeAttributes Module{}   UnknownModule{}   = [ "len" := "5.0", "label" := "imports" ]
         edgeAttributes Package{}  Module{}   = [ "len" := "5.0", "style" := "dashed" ]
@@ -70,20 +68,17 @@ graphingTerms :: ( Member (Reader ModuleInfo) sig
                  , Member (Reader (CurrentFrame address)) sig
                  , Member (Reader (CurrentScope address)) sig
                  , Member (Reader ControlFlowVertex) sig
-                 , VertexDeclaration syntax
-                 , Declarations1 syntax
+                 , VertexDeclaration term
                  , Ord address
-                 , Foldable syntax
-                 , term ~ Term syntax Loc
                  , Carrier sig m
                  )
-              => Open (term -> Evaluator term address value m a)
-graphingTerms recur term@(Term (In a syntax)) = do
+              => Open (term Loc -> Evaluator (term Loc) address value m a)
+graphingTerms recur term = do
   definedInModule <- currentModule
-  case toVertex a definedInModule syntax of
+  case toVertex definedInModule term of
     Just (v@Function{}, name) -> recurWithContext v name
     Just (v@Method{}, name) -> recurWithContext v name
-    Just (v@Variable{..}, name) -> do
+    Just (v@Variable{}, name) -> do
       variableDefinition v
       slot <- lookupSlot (Declaration name)
       defined <- gets (Map.lookup slot)

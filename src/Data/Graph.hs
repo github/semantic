@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE FlexibleContexts, GeneralizedNewtypeDeriving, OverloadedStrings, ScopedTypeVariables, TypeFamilies, UndecidableInstances #-}
 module Data.Graph
 ( Graph(..)
 , overlay
@@ -29,7 +29,7 @@ import           Proto.Semantic_Fields as P
 
 -- | An algebraic graph with 'Ord', 'Semigroup', and 'Monoid' instances.
 newtype Graph vertex = Graph { unGraph :: G.Graph vertex }
-  deriving (Alternative, Applicative, Eq, Functor, Monad, Show, Class.Graph, NFData)
+  deriving (Alternative, Applicative, Eq, Functor, Monad, Show, Class.Graph)
 
 instance Ord t => Class.ToGraph (Graph t) where
   type ToVertex (Graph t) = t
