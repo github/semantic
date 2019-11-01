@@ -64,4 +64,6 @@ data Domain term name value m k
   -- Record construction & elimination
   | Record [(name, value term name)] (value term name         -> m k)
   | Project (value term name) name   (Maybe (value term name) -> m k)
-  deriving (Functor)
+  deriving (Functor, Generic1)
+
+instance HFunctor (Domain term name value)
