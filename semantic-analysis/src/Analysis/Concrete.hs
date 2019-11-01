@@ -112,6 +112,7 @@ runFile eval file = traverse run file
             . runReader (fileSpan file)
             . runFail
             . runReader @(Env name) mempty
+            . runEnv @name
             . fix (eval concreteAnalysis)
 
 concreteAnalysis :: ( Carrier sig m
