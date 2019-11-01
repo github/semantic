@@ -2,6 +2,7 @@
 module Analysis.Analysis
 ( Analysis(..)
 , alloc'
+, bind'
 , Env(..)
 ) where
 
@@ -31,6 +32,9 @@ data Analysis term name address value m = Analysis
 
 alloc' :: (Carrier sig m, Member (Env name addr) sig) => name -> m addr
 alloc' name = send (Alloc name pure)
+
+bind' :: (Carrier sig m, Member (Env name addr) sig) => name -> addr -> m a -> m a
+bind' name addr m = send (Bind name addr m pure)
 
 
 data Env name addr m k
