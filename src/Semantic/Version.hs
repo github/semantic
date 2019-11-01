@@ -17,10 +17,12 @@ import Paths_semantic (version)
 -- The SHA1 hash of this build of semantic.
 -- If compiled as a development build, this will be @<development>@.
 buildSHA :: String
-#ifdef COMPUTE_GIT_SHA
+#if defined(GIT_COMMIT)
+buildSHA = "GIT_COMMIT"
+#elif defined(COMPUTE_GIT_SHA)
 buildSHA = $(gitHash)
 #else
-buildSHA = "<development>"
+buildSHA = "unspecified"
 #endif
 
 -- The version string of this build of semantic.

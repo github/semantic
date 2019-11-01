@@ -33,6 +33,7 @@ COPY semantic-source semantic-source/
 COPY semantic-tags semantic-tags/
 COPY cabal.project .
 RUN cabal v2-update && \
+    cabal configure --ghc-options="-D$GIT_COMMIT"
     cabal v2-build --flags="release" --only-dependencies
 
 # Build all of semantic

@@ -11,7 +11,7 @@ BUILD_SHA=$(git rev-parse HEAD 2>/dev/null)
 DOCKER_IMAGE=docker.pkg.github.com/github/semantic/semantic
 
 # Build
-docker build -t $DOCKER_IMAGE .
+docker build -t $DOCKER_IMAGE --build-arg BUILD_SHA=$BUILD_SHA.
 
 # Make sure semantic is in the image.
 docker run --rm $DOCKER_IMAGE --version
