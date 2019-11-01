@@ -42,6 +42,8 @@ echo "-i$root/test"
 echo "-optP-include"
 echo "-optP$root/$repl_builddir/build/x86_64-osx/ghc-$ghc_version/semantic-0.8.0.0/build/autogen/cabal_macros.h"
 
+echo "-hide-all-packages"
+
 # Emit package flags from the environment file, removing comments & prefixing with -
 cabal exec --builddir=$repl_builddir -v0 bash -- -c 'cat $GHC_ENVIRONMENT' | grep -v '^--' | sed -e 's/^/-/'
 
