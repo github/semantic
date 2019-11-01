@@ -8,6 +8,7 @@ module Analysis.ScopeGraph
 ) where
 
 import           Analysis.Analysis
+import           Analysis.Carrier.Env.Monovariant as A
 import           Analysis.File
 import           Analysis.FlowInsensitive
 import           Control.Applicative (Alternative (..))
@@ -86,6 +87,7 @@ runFile
 runFile eval file = traverse run file
   where run = runReader (filePath file)
             . runReader (fileSpan file)
+            . runEnv @name
             . runReader (Map.empty @name @Ref)
             . runFail
             . fmap fold
@@ -95,6 +97,7 @@ scopeGraphAnalysis
   :: ( Alternative m
      , Carrier sig m
      , Member (Reader Path.AbsRelFile) sig
+     , Member (Env name name) sig
      , Member (Reader Span) sig
      , Member (Reader (Map.Map name Ref)) sig
      , Member (State (Heap name (ScopeGraph name))) sig
@@ -102,11 +105,9 @@ scopeGraphAnalysis
      )
   => Analysis term name name (ScopeGraph name) m
 scopeGraphAnalysis = Analysis{..}
-  where alloc = pure
-        bind name _ m = do
-          ref <- askRef
-          local (Map.insert name ref) m
-        lookupEnv = pure . Just
+  where alloc = A.alloc
+        bind = A.bind
+        lookupEnv = A.lookupEnv
         deref addr = do
           ref <- askRef
           bindRef <- asks (Map.lookup addr)
