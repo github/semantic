@@ -6,6 +6,7 @@ module Analysis.ImportGraph
 ) where
 
 import           Analysis.Analysis
+import           Analysis.Carrier.Env.Monovariant as A
 import           Analysis.File
 import           Analysis.FlowInsensitive
 import           Control.Applicative (Alternative(..))
@@ -88,6 +89,7 @@ runFile
 runFile eval file = traverse run file
   where run = runReader (filePath file)
             . runReader (fileSpan file)
+            . runEnv @name
             . runFail
             . fmap fold
             . convergeTerm (Proxy @name) (fix (cacheTerm . eval importGraphAnalysis))
@@ -95,6 +97,7 @@ runFile eval file = traverse run file
 -- FIXME: decompose into a product domain and two atomic domains
 importGraphAnalysis :: ( Alternative m
                        , Carrier sig m
+                       , Member (Env name name) sig
                        , Member (Reader Path.AbsRelFile) sig
                        , Member (Reader Span) sig
                        , Member (State (Heap name (Value term name))) sig
@@ -106,9 +109,9 @@ importGraphAnalysis :: ( Alternative m
                        )
                     => Analysis term name name (Value term name) m
 importGraphAnalysis = Analysis{..}
-  where alloc = pure
-        bind _ _ m = m
-        lookupEnv = pure . Just
+  where alloc = A.alloc
+        bind = A.bind
+        lookupEnv = A.lookupEnv
         deref addr = gets (Map.lookup addr >=> nonEmpty . Set.toList) >>= maybe (pure Nothing) (foldMapA (pure . Just))
         assign addr v = modify (Map.insertWith (<>) addr (Set.singleton v))
         abstract _ name body = do
