@@ -8,13 +8,13 @@ module Analysis.Effect.Env
 
 import Control.Effect.Carrier
 
-alloc :: (Carrier sig m, Member (Env name addr) sig) => name -> m addr
+alloc :: (Member (Env name addr) sig, Carrier sig m) => name -> m addr
 alloc name = send (Alloc name pure)
 
-bind :: (Carrier sig m, Member (Env name addr) sig) => name -> addr -> m a -> m a
+bind :: (Member (Env name addr) sig, Carrier sig m) => name -> addr -> m a -> m a
 bind name addr m = send (Bind name addr m pure)
 
-lookupEnv :: (Carrier sig m, Member (Env name addr) sig) => name -> m (Maybe addr)
+lookupEnv :: (Member (Env name addr) sig, Carrier sig m) => name -> m (Maybe addr)
 lookupEnv name = send (Lookup name pure)
 
 
