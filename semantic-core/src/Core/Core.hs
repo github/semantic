@@ -55,7 +55,7 @@ import Syntax.Term
 data Core f a
   -- | Recursive local binding of a name in a scope; strict evaluation of the name in the body will diverge.
   --
-  --   Simultaneous (and therefore potentially mutually-recursive) bidnings can be made by binding a 'Record' recursively within 'Rec' and projecting from it with ':.'.
+  --   Simultaneous (and therefore potentially mutually-recursive) bindings can be made by binding a 'Record' recursively within 'Rec' and projecting from it with ':.'.
   = Rec (Named (Scope () f a))
   -- | Sequencing without binding; analogous to '>>' or '*>'.
   | f a :>> f a
