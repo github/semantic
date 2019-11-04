@@ -1,11 +1,17 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, QuantifiedConstraints, StandaloneDeriving #-}
+{-# LANGUAGE FlexibleContexts, GeneralizedNewtypeDeriving, QuantifiedConstraints, StandaloneDeriving #-}
 module Analysis.Domain
-( Domain(..)
+( unit
+, Domain(..)
 ) where
 
+import Control.Effect.Carrier
 import Data.String (IsString)
 import Data.Text (Text)
 import Syntax.Scope
+
+unit :: (Carrier sig m, Member Domain sig) => m a
+unit = send Unit
+
 
 data Domain f a
   = Unit
