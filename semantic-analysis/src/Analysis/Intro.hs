@@ -17,7 +17,7 @@ import Control.Effect.Carrier
 import Data.String (IsString)
 import Data.Text (Text)
 import GHC.Generics (Generic1)
-import Syntax.Fin
+import Syntax.Fin as Fin
 import Syntax.Module
 import Syntax.Scope
 import Syntax.Term
@@ -38,8 +38,8 @@ record fs = send (Record fs)
 lam :: (Eq a, Carrier sig m, Member Intro sig) => Maybe Name -> a -> m a -> m a
 lam u n b = send (Lam u (abstract1 n b))
 
-lamFin :: (Carrier sig m, Member Intro sig) => Maybe Name -> m (Var (Fin ('S n)) a) -> m (Var (Fin n) a)
-lamFin u b = send (Lam u (toScopeFin b))
+lamFin :: (Carrier sig m, Member Intro sig) => Maybe Name -> m (Fin ('S n)) -> m (Fin n)
+lamFin u b = send (Lam u (abstractVar (maybe (B ()) F . Fin.strengthen) b))
 
 lams :: (Eq a, Foldable t, Carrier sig m, Member Intro sig) => t (Maybe Name, a) -> m a -> m a
 lams names body = foldr (uncurry lam) body names
