@@ -31,14 +31,17 @@ COPY semantic-json semantic-json/
 COPY semantic-python semantic-python/
 COPY semantic-source semantic-source/
 COPY semantic-tags semantic-tags/
+COPY semantic-ast semantic-ast/
 COPY cabal.project .
 RUN cabal v2-update && \
-    cabal configure --ghc-options="-D$GIT_COMMIT"
-    cabal v2-build --flags="release" --only-dependencies
+    cabal v2-configure --flags="release" --ghc-options="-D$GIT_COMMIT"
+COPY cabal.project.local .
+RUN cabal v2-build --only-dependencies
+
 
 # Build all of semantic
 COPY . .
-RUN cabal v2-build --flags="release" semantic:exe:semantic
+RUN cabal v2-build semantic:exe:semantic
 
 # A fake `install` target until we can get `cabal v2-install` to work
 RUN cp $(find dist-newstyle/build/x86_64-linux -name semantic -type f -perm -u=x) /usr/local/bin/semantic
