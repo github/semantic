@@ -13,6 +13,7 @@ import qualified Algebra.Graph as G
 import qualified Algebra.Graph.Export.Dot as G
 import           Analysis.Analysis
 import qualified Analysis.Carrier.Env.Precise as A
+import qualified Analysis.Carrier.Heap.Precise as A
 import           Analysis.File
 import           Control.Applicative (Alternative (..))
 import           Control.Carrier.Fail.WithLoc
@@ -84,7 +85,7 @@ concrete
 concrete eval
   = run
   . runFresh
-  . runHeap
+  . A.runHeap
   . traverse (runFile eval)
 
 runFile
@@ -94,6 +95,7 @@ runFile
      , Foldable term
      , IsString name
      , Member Fresh sig
+     , Member (A.Heap Precise (Concrete term name)) sig
      , Member (State (Heap term name)) sig
      , Ord name
      , Show name
@@ -119,6 +121,7 @@ concreteAnalysis :: ( Carrier sig m
                     , Foldable term
                     , IsString name
                     , Member (A.Env name Precise) sig
+                    , Member (A.Heap Precise (Concrete term name)) sig
                     , Member (Reader (Env name)) sig
                     , Member (Reader Path.AbsRelFile) sig
                     , Member (Reader Span) sig
@@ -130,8 +133,8 @@ concreteAnalysis :: ( Carrier sig m
                     )
                  => Analysis term name Precise (Concrete term name) m
 concreteAnalysis = Analysis{..}
-  where deref = gets . IntMap.lookup
-        assign addr value = modify (IntMap.insert addr value)
+  where deref = A.deref
+        assign = A.assign
         abstract _ name body = do
           path <- ask
           span <- ask
@@ -177,10 +180,6 @@ lookupConcrete heap name = run . evalState IntSet.empty . runNonDet . inConcrete
           modify (IntSet.insert addr)
           inConcrete val
         maybeA = maybe empty pure
-
-
-runHeap :: StateC (Heap term name) m a -> m (Heap term name, a)
-runHeap = runState mempty
 
 
 -- | 'heapGraph', 'heapValueGraph', and 'heapAddressGraph' allow us to conveniently export SVGs of the heap:
