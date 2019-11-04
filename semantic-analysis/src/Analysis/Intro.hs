@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveTraversable, FlexibleContexts, GeneralizedNewtypeDeriving, QuantifiedConstraints, StandaloneDeriving #-}
+{-# LANGUAGE DeriveGeneric, DeriveTraversable, FlexibleContexts, GeneralizedNewtypeDeriving, QuantifiedConstraints, StandaloneDeriving #-}
 module Analysis.Intro
 ( unit
 , bool
@@ -14,6 +14,7 @@ import Control.Applicative (Alternative(..))
 import Control.Effect.Carrier
 import Data.String (IsString)
 import Data.Text (Text)
+import GHC.Generics (Generic1)
 import Syntax.Module
 import Syntax.Scope
 import Syntax.Term
@@ -47,7 +48,7 @@ data Intro f a
   | String Text
   | Record [(Name, f a)]
   | Lam (Maybe Name) (Scope () f a)
-  deriving (Foldable, Functor, Traversable)
+  deriving (Foldable, Functor, Generic1, Traversable)
 
 deriving instance (Eq   a, forall a . Eq   a => Eq   (f a), Monad f) => Eq   (Intro f a)
 deriving instance (Ord  a, forall a . Eq   a => Eq   (f a)
