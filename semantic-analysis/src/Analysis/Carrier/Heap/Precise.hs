@@ -22,7 +22,7 @@ newtype HeapC value m a = HeapC (StateC (IntMap.IntMap value) m a)
   deriving (Applicative, Functor, Monad, Fail.MonadFail)
 
 instance (Carrier sig m, Effect sig)
-      => Carrier (Heap Precise value :+: sig) (HeapC value m) where
+      => Carrier (Heap Precise value :+: State (IntMap.IntMap value) :+: sig) (HeapC value m) where
   eff (L (Deref addr k))        = HeapC (gets (IntMap.lookup addr)) >>= k
   eff (L (Assign addr value k)) = HeapC (modify (IntMap.insert addr value)) >> k
-  eff (R other)                 = HeapC (eff (R (handleCoercible other)))
+  eff (R other)                 = HeapC (eff (handleCoercible other))
