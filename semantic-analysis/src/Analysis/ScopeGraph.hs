@@ -9,6 +9,7 @@ module Analysis.ScopeGraph
 
 import           Analysis.Analysis
 import           Analysis.Carrier.Env.Monovariant
+import qualified Analysis.Carrier.Heap.Monovariant as A
 import           Analysis.File
 import           Analysis.FlowInsensitive
 import           Control.Applicative (Alternative (..))
@@ -17,10 +18,8 @@ import           Control.Effect.Carrier
 import           Control.Effect.Fresh
 import           Control.Effect.Reader
 import           Control.Effect.State
-import           Control.Monad ((>=>))
 import           Data.Foldable (fold)
 import           Data.Function (fix)
-import           Data.List.NonEmpty
 import qualified Data.Map as Map
 import           Data.Proxy
 import qualified Data.Set as Set
@@ -91,31 +90,22 @@ runFile eval file = traverse run file
             . runReader (Map.empty @name @Ref)
             . runFail
             . fmap fold
-            . convergeTerm (Proxy @name) (fix (cacheTerm . eval scopeGraphAnalysis))
+            . convergeTerm (Proxy @name) (A.runHeap @name @(ScopeGraph name) . fix (cacheTerm . eval scopeGraphAnalysis))
 
 scopeGraphAnalysis
   :: forall term name m sig
   .  ( Alternative m
      , Carrier sig m
      , Member (Env name name) sig
+     , Member (A.Heap name (ScopeGraph name)) sig
      , Member (Reader Path.AbsRelFile) sig
      , Member (Reader Span) sig
-     , Member (Reader (Map.Map name Ref)) sig
-     , Member (State (Heap name (ScopeGraph name))) sig
      , Ord name
      )
   => Analysis term name name (ScopeGraph name) m
 scopeGraphAnalysis = Analysis{..}
-  where deref addr = do
-          ref <- askRef
-          bindRef <- asks (Map.lookup addr)
-          cell <- gets (Map.lookup addr >=> nonEmpty . Set.toList)
-          let extending = mappend (extendBinding addr ref bindRef)
-          maybe (pure Nothing) (foldMapA (pure . Just . extending)) cell
-        assign addr v = do
-          ref <- askRef
-          bindRef <- asks (Map.lookup addr)
-          modify (Map.insertWith (<>) addr (Set.singleton (extendBinding addr ref bindRef <> v)))
+  where deref = A.deref
+        assign = A.assign
         abstract eval name body = do
           addr <- alloc @name @name name
           assign name mempty
@@ -135,7 +125,3 @@ scopeGraphAnalysis = Analysis{..}
             (k, v') <$ assign addr v'
           pure (foldMap snd fields')
         _ ... m = pure (Just m)
-
-        askRef = Ref <$> ask <*> ask
-
-        extendBinding addr ref bindRef = ScopeGraph (maybe Map.empty (\ (Ref path span) -> Map.singleton (Decl addr path span) (Set.singleton ref)) bindRef)
