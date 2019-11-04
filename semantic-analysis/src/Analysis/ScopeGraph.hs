@@ -8,7 +8,7 @@ module Analysis.ScopeGraph
 ) where
 
 import           Analysis.Analysis
-import           Analysis.Carrier.Env.Monovariant as A
+import           Analysis.Carrier.Env.Monovariant
 import           Analysis.File
 import           Analysis.FlowInsensitive
 import           Control.Applicative (Alternative (..))
@@ -117,9 +117,9 @@ scopeGraphAnalysis = Analysis{..}
           bindRef <- asks (Map.lookup addr)
           modify (Map.insertWith (<>) addr (Set.singleton (extendBinding addr ref bindRef <> v)))
         abstract eval name body = do
-          addr <- A.alloc @name @name name
+          addr <- alloc @name @name name
           assign name mempty
-          A.bind name addr (eval body)
+          bind name addr (eval body)
         apply _ f a = pure (f <> a)
         unit = pure mempty
         bool _ = pure mempty

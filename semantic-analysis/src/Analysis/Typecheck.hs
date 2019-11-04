@@ -8,7 +8,7 @@ module Analysis.Typecheck
 ) where
 
 import           Analysis.Analysis
-import           Analysis.Carrier.Env.Monovariant as A
+import           Analysis.Carrier.Env.Monovariant
 import           Analysis.File
 import           Analysis.FlowInsensitive
 import           Control.Applicative (Alternative (..))
@@ -167,7 +167,7 @@ typecheckingAnalysis = Analysis{..}
         assign addr ty = modify (Map.insertWith (<>) addr (Set.singleton ty))
         abstract eval name body = do
           -- FIXME: construct the associated scope
-          addr <- A.alloc @name @name name
+          addr <- alloc @name @name name
           arg <- meta
           assign addr arg
           ty <- eval body
@@ -185,7 +185,7 @@ typecheckingAnalysis = Analysis{..}
         asString s = unify (Alg String) s $> mempty
         record fields = do
           fields' <- for fields $ \ (k, v) -> do
-            addr <- A.alloc @name @name k
+            addr <- alloc @name @name k
             (k, v) <$ assign addr v
           -- FIXME: should records reference types by address instead?
           pure (Alg (Record (Map.fromList fields')))

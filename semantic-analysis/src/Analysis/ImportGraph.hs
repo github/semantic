@@ -6,7 +6,7 @@ module Analysis.ImportGraph
 ) where
 
 import           Analysis.Analysis
-import           Analysis.Carrier.Env.Monovariant as A
+import           Analysis.Carrier.Env.Monovariant
 import           Analysis.File
 import           Analysis.FlowInsensitive
 import           Control.Applicative (Alternative(..))
@@ -120,7 +120,7 @@ importGraphAnalysis = Analysis{..}
         apply eval (Value (Closure path span name body) _) a = local (const path) . local (const span) $ do
           addr <- alloc @name @name name
           assign addr a
-          A.bind name addr (eval body)
+          bind name addr (eval body)
         apply _ f _ = fail $ "Cannot coerce " <> show f <> " to function"
         unit = pure mempty
         bool _ = pure mempty
@@ -130,7 +130,7 @@ importGraphAnalysis = Analysis{..}
         asString _ = pure mempty
         record fields = do
           for_ fields $ \ (k, v) -> do
-            addr <- A.alloc @name @name k
+            addr <- alloc @name @name k
             assign addr v
           pure (Value Abstract (foldMap (valueGraph . snd) fields))
         _ ... m = pure (Just m)
