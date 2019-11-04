@@ -91,6 +91,7 @@ runFile eval file = traverse run file
             . runReader (Map.empty @name @Ref)
             . runFail
             . fmap fold
+            . runNonDetM Set.singleton
             . convergeTerm (Proxy @name) (fix (cacheTerm . eval scopeGraphAnalysis))
 
 scopeGraphAnalysis

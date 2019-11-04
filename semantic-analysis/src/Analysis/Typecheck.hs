@@ -149,6 +149,7 @@ runFile eval file = traverse run file
               v <- meta
               bs <- m
               v <$ for_ bs (unify v))
+          . runNonDetM Set.singleton
           . convergeTerm (Proxy @name) (fix (cacheTerm . eval typecheckingAnalysis))
 
 typecheckingAnalysis
