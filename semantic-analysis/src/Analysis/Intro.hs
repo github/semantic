@@ -1,10 +1,11 @@
-{-# LANGUAGE DeriveGeneric, DeriveTraversable, FlexibleContexts, GeneralizedNewtypeDeriving, QuantifiedConstraints, StandaloneDeriving #-}
+{-# LANGUAGE DataKinds, DeriveGeneric, DeriveTraversable, FlexibleContexts, GeneralizedNewtypeDeriving, QuantifiedConstraints, StandaloneDeriving #-}
 module Analysis.Intro
 ( unit
 , bool
 , string
 , record
 , lam
+, lamFin
 , lams
 , unlam
 , Intro(..)
@@ -16,9 +17,11 @@ import Control.Effect.Carrier
 import Data.String (IsString)
 import Data.Text (Text)
 import GHC.Generics (Generic1)
+import Syntax.Fin
 import Syntax.Module
 import Syntax.Scope
 import Syntax.Term
+import Syntax.Var
 
 unit :: (Carrier sig m, Member Intro sig) => m a
 unit = send Unit
@@ -34,6 +37,9 @@ record fs = send (Record fs)
 
 lam :: (Eq a, Carrier sig m, Member Intro sig) => Maybe Name -> a -> m a -> m a
 lam u n b = send (Lam u (abstract1 n b))
+
+lamFin :: (Carrier sig m, Member Intro sig) => Maybe Name -> m (Var (Fin ('S n)) a) -> m (Var (Fin n) a)
+lamFin u b = send (Lam u (toScopeFin b))
 
 lams :: (Eq a, Foldable t, Carrier sig m, Member Intro sig) => t (Maybe Name, a) -> m a -> m a
 lams names body = foldr (uncurry lam) body names
