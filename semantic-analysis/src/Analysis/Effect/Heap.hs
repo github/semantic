@@ -4,6 +4,9 @@ module Analysis.Effect.Heap
   deref
 , assign
 , Heap(..)
+  -- * Re-exports
+, Carrier
+, run
 ) where
 
 import Control.Effect.Carrier

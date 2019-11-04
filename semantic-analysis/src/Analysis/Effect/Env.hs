@@ -5,6 +5,9 @@ module Analysis.Effect.Env
 , bind
 , lookupEnv
 , Env(..)
+  -- * Re-exports
+, Carrier
+, run
 ) where
 
 import Control.Effect.Carrier
