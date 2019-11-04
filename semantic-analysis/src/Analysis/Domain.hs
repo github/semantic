@@ -4,8 +4,9 @@ module Analysis.Domain
 
 import Data.Text (Text)
 
-data Domain
+data Domain name a
   = Unit
   | Bool Bool
   | String Text
+  | Record [(name, a)]
   deriving (Eq, Ord, Show)
