@@ -9,4 +9,5 @@ data Domain name a
   | Bool Bool
   | String Text
   | Record [(name, a)]
+  | Lam name a
   deriving (Eq, Ord, Show)
