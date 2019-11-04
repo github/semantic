@@ -44,9 +44,11 @@ data Monotype name f a
   = Bool
   | Unit
   | String
-  | Arr (f a) (f a)
+  | f a :-> f a
   | Record (Map.Map name (f a))
   deriving (Foldable, Functor, Generic1, Traversable)
+
+infixr 0 :->
 
 type Type name = Term (Monotype name) Meta
 
@@ -62,11 +64,11 @@ deriving instance (Show name, Show a, forall a . Show a => Show (f a))          
 
 instance HFunctor (Monotype name)
 instance RightModule (Monotype name) where
-  Unit     >>=* _ = Unit
-  Bool     >>=* _ = Bool
-  String   >>=* _ = String
-  Arr a b  >>=* f = Arr (a >>= f) (b >>= f)
-  Record m >>=* f = Record ((>>= f) <$> m)
+  Unit      >>=* _ = Unit
+  Bool      >>=* _ = Bool
+  String    >>=* _ = String
+  (a :-> b) >>=* f = a >>= f :-> b >>= f
+  Record m  >>=* f = Record ((>>= f) <$> m)
 
 type Meta = Int
 
@@ -169,11 +171,11 @@ typecheckingAnalysis = Analysis{..}
           arg <- meta
           A.assign addr arg
           ty <- eval body
-          pure (Alg (Arr arg ty))
+          pure (Alg (arg :-> ty))
         apply _ f a = do
           _A <- meta
           _B <- meta
-          unify (Alg (Arr _A _B)) f
+          unify (Alg (_A :-> _B)) f
           unify _A a
           pure _B
         unit = pure (Alg Unit)
@@ -216,7 +218,7 @@ solve cs = for_ cs solve
   where solve = \case
           -- FIXME: how do we enforce proper subtyping? row polymorphism or something?
           Alg (Record f1) :===: Alg (Record f2) -> traverse solve (Map.intersectionWith (:===:) f1 f2) $> ()
-          Alg (Arr a1 b1) :===: Alg (Arr a2 b2) -> solve (a1 :===: a2) *> solve (b1 :===: b2)
+          Alg (a1 :-> b1) :===: Alg (a2 :-> b2) -> solve (a1 :===: a2) *> solve (b1 :===: b2)
           Var m1   :===: Var m2   | m1 == m2 -> pure ()
           Var m1   :===: t2         -> do
             sol <- solution m1
