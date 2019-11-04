@@ -46,6 +46,7 @@ library
     Analysis.Carrier.Heap.Monovariant
     Analysis.Carrier.Heap.Precise
     Analysis.Concrete
+    Analysis.Domain
     Analysis.Effect.Env
     Analysis.Effect.Heap
     Analysis.File
