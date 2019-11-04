@@ -8,6 +8,7 @@ module Analysis.Intro
 , lams
 , unlam
 , Intro(..)
+, Name(..)
 ) where
 
 import Control.Applicative (Alternative(..))
