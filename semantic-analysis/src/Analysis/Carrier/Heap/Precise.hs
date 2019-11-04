@@ -1,2 +1,6 @@
 module Analysis.Carrier.Heap.Precise
-() where
+( -- * Heap effect
+  module Analysis.Effect.Heap
+) where
+
+import Analysis.Effect.Heap
