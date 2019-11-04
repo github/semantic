@@ -96,7 +96,8 @@ runFile eval file = traverse run file
 
 -- FIXME: decompose into a product domain and two atomic domains
 importGraphAnalysis
-  :: ( Alternative m
+  :: forall term name m sig
+  .  ( Alternative m
      , Carrier sig m
      , Member (Env name name) sig
      , Member (Reader Path.AbsRelFile) sig
@@ -110,19 +111,16 @@ importGraphAnalysis
      )
   => Analysis term name name (Value term name) m
 importGraphAnalysis = Analysis{..}
-  where alloc = A.alloc
-        bind = A.bind
-        lookupEnv = A.lookupEnv
-        deref addr = gets (Map.lookup addr >=> nonEmpty . Set.toList) >>= maybe (pure Nothing) (foldMapA (pure . Just))
+  where deref addr = gets (Map.lookup addr >=> nonEmpty . Set.toList) >>= maybe (pure Nothing) (foldMapA (pure . Just))
         assign addr v = modify (Map.insertWith (<>) addr (Set.singleton v))
         abstract _ name body = do
           path <- ask
           span <- ask
           pure (Value (Closure path span name body) mempty)
         apply eval (Value (Closure path span name body) _) a = local (const path) . local (const span) $ do
-          addr <- alloc name
+          addr <- alloc @name @name name
           assign addr a
-          bind name addr (eval body)
+          A.bind name addr (eval body)
         apply _ f _ = fail $ "Cannot coerce " <> show f <> " to function"
         unit = pure mempty
         bool _ = pure mempty
@@ -132,7 +130,7 @@ importGraphAnalysis = Analysis{..}
         asString _ = pure mempty
         record fields = do
           for_ fields $ \ (k, v) -> do
-            addr <- alloc k
+            addr <- A.alloc @name @name k
             assign addr v
           pure (Value Abstract (foldMap (valueGraph . snd) fields))
         _ ... m = pure (Just m)

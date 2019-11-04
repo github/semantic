@@ -152,7 +152,8 @@ runFile eval file = traverse run file
           . convergeTerm (Proxy @name) (fix (cacheTerm . eval typecheckingAnalysis))
 
 typecheckingAnalysis
-  :: ( Alternative m
+  :: forall term name m sig
+  .  ( Alternative m
      , Carrier sig m
      , Member (Env name name) sig
      , Member Fresh sig
@@ -162,14 +163,11 @@ typecheckingAnalysis
      )
   => Analysis term name name (Type name) m
 typecheckingAnalysis = Analysis{..}
-  where alloc = A.alloc
-        bind = A.bind
-        lookupEnv = A.lookupEnv
-        deref addr = gets (Map.lookup addr >=> nonEmpty . Set.toList) >>= maybe (pure Nothing) (foldMapA (pure . Just))
+  where deref addr = gets (Map.lookup addr >=> nonEmpty . Set.toList) >>= maybe (pure Nothing) (foldMapA (pure . Just))
         assign addr ty = modify (Map.insertWith (<>) addr (Set.singleton ty))
         abstract eval name body = do
           -- FIXME: construct the associated scope
-          addr <- alloc name
+          addr <- A.alloc @name @name name
           arg <- meta
           assign addr arg
           ty <- eval body
@@ -187,7 +185,7 @@ typecheckingAnalysis = Analysis{..}
         asString s = unify (Alg String) s $> mempty
         record fields = do
           fields' <- for fields $ \ (k, v) -> do
-            addr <- alloc k
+            addr <- A.alloc @name @name k
             (k, v) <$ assign addr v
           -- FIXME: should records reference types by address instead?
           pure (Alg (Record (Map.fromList fields')))

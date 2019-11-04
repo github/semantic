@@ -130,10 +130,7 @@ concreteAnalysis :: ( Carrier sig m
                     )
                  => Analysis term name Precise (Concrete term name) m
 concreteAnalysis = Analysis{..}
-  where alloc = A.alloc
-        bind = A.bind
-        lookupEnv = A.lookupEnv
-        deref = gets . IntMap.lookup
+  where deref = gets . IntMap.lookup
         assign addr value = modify (IntMap.insert addr value)
         abstract _ name body = do
           path <- ask
@@ -142,7 +139,7 @@ concreteAnalysis = Analysis{..}
           pure (Closure path span name body env)
         apply eval (Closure path span name body env) a = do
           local (const path) . local (const span) $ do
-            addr <- alloc name
+            addr <- A.alloc name
             assign addr a
             local (const (Map.insert name addr env)) (eval body)
         apply _ f _ = fail $ "Cannot coerce " <> show f <> " to function"
@@ -155,7 +152,7 @@ concreteAnalysis = Analysis{..}
         asString v          = fail $ "Cannot coerce " <> show v <> " to String"
         record fields = do
           fields' <- for fields $ \ (name, value) -> do
-            addr <- alloc name
+            addr <- A.alloc name
             assign addr value
             pure (name, addr)
           pure (Record (Map.fromList fields'))

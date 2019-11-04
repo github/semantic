@@ -94,7 +94,8 @@ runFile eval file = traverse run file
             . convergeTerm (Proxy @name) (fix (cacheTerm . eval scopeGraphAnalysis))
 
 scopeGraphAnalysis
-  :: ( Alternative m
+  :: forall term name m sig
+  .  ( Alternative m
      , Carrier sig m
      , Member (Reader Path.AbsRelFile) sig
      , Member (Env name name) sig
@@ -105,10 +106,7 @@ scopeGraphAnalysis
      )
   => Analysis term name name (ScopeGraph name) m
 scopeGraphAnalysis = Analysis{..}
-  where alloc = A.alloc
-        bind = A.bind
-        lookupEnv = A.lookupEnv
-        deref addr = do
+  where deref addr = do
           ref <- askRef
           bindRef <- asks (Map.lookup addr)
           cell <- gets (Map.lookup addr >=> nonEmpty . Set.toList)
@@ -119,9 +117,9 @@ scopeGraphAnalysis = Analysis{..}
           bindRef <- asks (Map.lookup addr)
           modify (Map.insertWith (<>) addr (Set.singleton (extendBinding addr ref bindRef <> v)))
         abstract eval name body = do
-          addr <- alloc name
+          addr <- A.alloc @name @name name
           assign name mempty
-          bind name addr (eval body)
+          A.bind name addr (eval body)
         apply _ f a = pure (f <> a)
         unit = pure mempty
         bool _ = pure mempty
