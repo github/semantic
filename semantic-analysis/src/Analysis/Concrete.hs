@@ -117,21 +117,22 @@ runFile eval file = traverse run file
             . A.runEnv @name
             . fix (eval concreteAnalysis)
 
-concreteAnalysis :: ( Carrier sig m
-                    , Foldable term
-                    , IsString name
-                    , Member (A.Env name Precise) sig
-                    , Member (A.Heap Precise (Concrete term name)) sig
-                    , Member (Reader (Env name)) sig
-                    , Member (Reader Path.AbsRelFile) sig
-                    , Member (Reader Span) sig
-                    , Member (State (Heap term name)) sig
-                    , MonadFail m
-                    , Ord name
-                    , Show name
-                    , Show (term name)
-                    )
-                 => Analysis term name Precise (Concrete term name) m
+concreteAnalysis
+  :: ( Carrier sig m
+     , Foldable term
+     , IsString name
+     , Member (A.Env name Precise) sig
+     , Member (A.Heap Precise (Concrete term name)) sig
+     , Member (Reader (Env name)) sig
+     , Member (Reader Path.AbsRelFile) sig
+     , Member (Reader Span) sig
+     , Member (State (Heap term name)) sig
+     , MonadFail m
+     , Ord name
+     , Show name
+     , Show (term name)
+     )
+  => Analysis term name Precise (Concrete term name) m
 concreteAnalysis = Analysis{..}
   where deref = A.deref
         assign = A.assign
