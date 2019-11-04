@@ -1,6 +1,7 @@
 {-# LANGUAGE DeriveFunctor, DeriveGeneric, FlexibleContexts #-}
 module Analysis.Effect.Heap
 ( deref
+, assign
 , Heap(..)
 ) where
 
@@ -9,6 +10,9 @@ import GHC.Generics (Generic1)
 
 deref :: (Member (Heap addr value) sig, Carrier sig m) => addr -> m (Maybe value)
 deref addr = send (Deref addr pure)
+
+assign :: (Member (Heap addr value) sig, Carrier sig m) => addr -> value -> m ()
+assign addr value = send (Assign addr value (pure ()))
 
 
 data Heap addr value m k
