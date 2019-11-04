@@ -45,6 +45,7 @@ library
     Analysis.Carrier.Env.Precise
     Analysis.Concrete
     Analysis.Effect.Env
+    Analysis.Effect.Heap
     Analysis.File
     Analysis.FlowInsensitive
     Analysis.ImportGraph
