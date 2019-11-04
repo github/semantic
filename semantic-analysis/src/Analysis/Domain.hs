@@ -6,13 +6,17 @@ module Analysis.Domain
 , record
 , lam
 , lams
+, unlam
 , Domain(..)
 ) where
 
+import Control.Applicative (Alternative(..))
 import Control.Effect.Carrier
 import Data.String (IsString)
 import Data.Text (Text)
+import Syntax.Module
 import Syntax.Scope
+import Syntax.Term
 
 unit :: (Carrier sig m, Member Domain sig) => m a
 unit = send Unit
@@ -31,6 +35,10 @@ lam u n b = send (Lam u (abstract1 n b))
 
 lams :: (Eq a, Foldable t, Carrier sig m, Member Domain sig) => t (Maybe Name, a) -> m a -> m a
 lams names body = foldr (uncurry lam) body names
+
+unlam :: (Alternative m, Member Domain sig, RightModule sig) => a -> Term sig a -> m (Maybe Name, a, Term sig a)
+unlam n (Alg sig) | Just (Lam n' b) <- prj sig = pure (n', n, instantiate1 (pure n) b)
+unlam _ _                                      = empty
 
 
 data Domain f a
