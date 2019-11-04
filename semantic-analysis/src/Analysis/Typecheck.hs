@@ -150,8 +150,7 @@ runFile eval file = traverse run file
               bs <- m
               v <$ for_ bs (unify v))
           . runNonDetM Set.singleton
-          . A.runHeap @name @(Type name)
-          . convergeTerm (Proxy @name) (fix (cacheTerm . eval typecheckingAnalysis))
+          . convergeTerm (Proxy @name) (A.runHeap @name @(Type name) . fix (cacheTerm . eval typecheckingAnalysis))
 
 typecheckingAnalysis
   :: forall term name m sig
