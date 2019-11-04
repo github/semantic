@@ -12,7 +12,7 @@ data Domain f a
   | Bool Bool
   | String Text
   | Record [(Name, f a)]
-  | Lam Name (Scope () f a)
+  | Lam (Maybe Name) (Scope () f a)
 
 deriving instance (Eq   a, forall a . Eq   a => Eq   (f a), Monad f) => Eq   (Domain f a)
 deriving instance (Ord  a, forall a . Eq   a => Eq   (f a)
