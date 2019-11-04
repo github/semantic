@@ -1,5 +1,5 @@
 {-# LANGUAGE DeriveTraversable, FlexibleContexts, GeneralizedNewtypeDeriving, QuantifiedConstraints, StandaloneDeriving #-}
-module Analysis.Domain
+module Analysis.Intro
 ( unit
 , bool
 , string
@@ -7,7 +7,7 @@ module Analysis.Domain
 , lam
 , lams
 , unlam
-, Domain(..)
+, Intro(..)
 ) where
 
 import Control.Applicative (Alternative(..))
@@ -18,30 +18,30 @@ import Syntax.Module
 import Syntax.Scope
 import Syntax.Term
 
-unit :: (Carrier sig m, Member Domain sig) => m a
+unit :: (Carrier sig m, Member Intro sig) => m a
 unit = send Unit
 
-bool :: (Carrier sig m, Member Domain sig) => Bool -> m a
+bool :: (Carrier sig m, Member Intro sig) => Bool -> m a
 bool = send . Bool
 
-string :: (Carrier sig m, Member Domain sig) => Text -> m a
+string :: (Carrier sig m, Member Intro sig) => Text -> m a
 string = send . String
 
-record :: (Carrier sig m, Member Domain sig) => [(Name, m a)] -> m a
+record :: (Carrier sig m, Member Intro sig) => [(Name, m a)] -> m a
 record fs = send (Record fs)
 
-lam :: (Eq a, Carrier sig m, Member Domain sig) => Maybe Name -> a -> m a -> m a
+lam :: (Eq a, Carrier sig m, Member Intro sig) => Maybe Name -> a -> m a -> m a
 lam u n b = send (Lam u (abstract1 n b))
 
-lams :: (Eq a, Foldable t, Carrier sig m, Member Domain sig) => t (Maybe Name, a) -> m a -> m a
+lams :: (Eq a, Foldable t, Carrier sig m, Member Intro sig) => t (Maybe Name, a) -> m a -> m a
 lams names body = foldr (uncurry lam) body names
 
-unlam :: (Alternative m, Member Domain sig, RightModule sig) => a -> Term sig a -> m (Maybe Name, a, Term sig a)
+unlam :: (Alternative m, Member Intro sig, RightModule sig) => a -> Term sig a -> m (Maybe Name, a, Term sig a)
 unlam n (Alg sig) | Just (Lam n' b) <- prj sig = pure (n', n, instantiate1 (pure n) b)
 unlam _ _                                      = empty
 
 
-data Domain f a
+data Intro f a
   = Unit
   | Bool Bool
   | String Text
@@ -49,10 +49,10 @@ data Domain f a
   | Lam (Maybe Name) (Scope () f a)
   deriving (Foldable, Functor, Traversable)
 
-deriving instance (Eq   a, forall a . Eq   a => Eq   (f a), Monad f) => Eq   (Domain f a)
+deriving instance (Eq   a, forall a . Eq   a => Eq   (f a), Monad f) => Eq   (Intro f a)
 deriving instance (Ord  a, forall a . Eq   a => Eq   (f a)
-                         , forall a . Ord  a => Ord  (f a), Monad f) => Ord  (Domain f a)
-deriving instance (Show a, forall a . Show a => Show (f a))          => Show (Domain f a)
+                         , forall a . Ord  a => Ord  (f a), Monad f) => Ord  (Intro f a)
+deriving instance (Show a, forall a . Show a => Show (f a))          => Show (Intro f a)
 
 
 -- | User-specified and -relevant names.

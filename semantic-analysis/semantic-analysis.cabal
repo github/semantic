@@ -46,12 +46,12 @@ library
     Analysis.Carrier.Heap.Monovariant
     Analysis.Carrier.Heap.Precise
     Analysis.Concrete
-    Analysis.Domain
     Analysis.Effect.Env
     Analysis.Effect.Heap
     Analysis.File
     Analysis.FlowInsensitive
     Analysis.ImportGraph
+    Analysis.Intro
     Analysis.ScopeGraph
     Analysis.Typecheck
     Control.Carrier.Fail.WithLoc
