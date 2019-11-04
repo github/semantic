@@ -95,19 +95,20 @@ runFile eval file = traverse run file
             . convergeTerm (Proxy @name) (fix (cacheTerm . eval importGraphAnalysis))
 
 -- FIXME: decompose into a product domain and two atomic domains
-importGraphAnalysis :: ( Alternative m
-                       , Carrier sig m
-                       , Member (Env name name) sig
-                       , Member (Reader Path.AbsRelFile) sig
-                       , Member (Reader Span) sig
-                       , Member (State (Heap name (Value term name))) sig
-                       , MonadFail m
-                       , Ord  name
-                       , Ord  (term name)
-                       , Show name
-                       , Show (term name)
-                       )
-                    => Analysis term name name (Value term name) m
+importGraphAnalysis
+  :: ( Alternative m
+     , Carrier sig m
+     , Member (Env name name) sig
+     , Member (Reader Path.AbsRelFile) sig
+     , Member (Reader Span) sig
+     , Member (State (Heap name (Value term name))) sig
+     , MonadFail m
+     , Ord  name
+     , Ord  (term name)
+     , Show name
+     , Show (term name)
+     )
+  => Analysis term name name (Value term name) m
 importGraphAnalysis = Analysis{..}
   where alloc = A.alloc
         bind = A.bind
