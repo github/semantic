@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, LambdaCase, OverloadedStrings, RankNTypes, RecordWildCards, TypeOperators #-}
+{-# LANGUAGE FlexibleContexts, LambdaCase, OverloadedStrings, RankNTypes, RecordWildCards, ScopedTypeVariables, TypeApplications, TypeOperators #-}
 module Core.Eval
 ( eval
 , prog1
@@ -12,6 +12,7 @@ module Core.Eval
 
 import Analysis.Analysis
 import Analysis.Effect.Env as A
+import Analysis.Effect.Heap as A
 import Analysis.File
 import Control.Applicative (Alternative (..))
 import Control.Effect.Carrier
@@ -29,8 +30,10 @@ import Syntax.Scope
 import Syntax.Term
 import qualified System.Path as Path
 
-eval :: ( Carrier sig m
+eval :: forall address value m sig
+     .  ( Carrier sig m
         , Member (Env Name address) sig
+        , Member (Heap address value) sig
         , Member (Reader Span) sig
         , MonadFail m
         , Semigroup value
@@ -42,17 +45,17 @@ eval Analysis{..} eval = \case
   Var n -> lookupEnv' n >>= deref' n
   Alg (R c) -> case c of
     Rec (Named (Ignored n) b) -> do
-      addr <- A.alloc n
+      addr <- A.alloc @Name @address n
       v <- A.bind n addr (eval (instantiate1 (pure n) b))
-      v <$ assign addr v
+      v <$ A.assign addr v
     -- NB: Combining the results of the evaluations allows us to model effects in abstract domains. This in turn means that we can define an abstract domain modelling the types-and-effects of computations by means of a 'Semigroup' instance which takes the type of its second operand and the union of both operands’ effects.
     --
     -- It’s also worth noting that we use a semigroup instead of a semilattice because the lattice structure of our abstract domains is instead modelled by nondeterminism effects used by some of them.
     a :>> b -> (<>) <$> eval a <*> eval b
     Named (Ignored n) a :>>= b -> do
       a' <- eval a
-      addr <- A.alloc n
-      assign addr a'
+      addr <- A.alloc @Name @address n
+      A.assign addr a'
       A.bind n addr ((a' <>) <$> eval (instantiate1 (pure n) b))
     Lam (Named (Ignored n) b) -> abstract eval n (instantiate1 (pure n) b)
     f :$ a -> do
@@ -78,14 +81,14 @@ eval Analysis{..} eval = \case
     a := b -> do
       b' <- eval b
       addr <- ref a
-      b' <$ assign addr b'
+      b' <$ A.assign addr b'
   Alg (L (Ann span c)) -> local (const span) (eval c)
   where freeVariable s = fail ("free variable: " <> s)
         uninitialized s = fail ("uninitialized variable: " <> s)
         invalidRef s = fail ("invalid ref: " <> s)
 
         lookupEnv' n = A.lookupEnv n >>= maybe (freeVariable (show n)) pure
-        deref' n = deref >=> maybe (uninitialized (show n)) pure
+        deref' n = A.deref @address >=> maybe (uninitialized (show n)) pure
 
         ref = \case
           Var n -> lookupEnv' n
