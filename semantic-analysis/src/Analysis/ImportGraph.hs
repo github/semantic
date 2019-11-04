@@ -92,7 +92,6 @@ runFile eval file = traverse run file
             . runEnv @name
             . runFail
             . fmap fold
-            . runNonDetM Set.singleton
             . convergeTerm (Proxy @name) (fix (cacheTerm . eval importGraphAnalysis))
 
 -- FIXME: decompose into a product domain and two atomic domains

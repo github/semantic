@@ -28,46 +28,45 @@ newtype FrameId name = FrameId { unFrameId :: name }
   deriving (Eq, Ord, Show)
 
 
-convergeTerm :: forall m sig value term address proxy
-             .  ( Alternative m
-                , Carrier sig m
+convergeTerm :: forall m sig a term address proxy
+             .  ( Carrier sig m
                 , Effect sig
                 , Eq address
                 , Member Fresh sig
-                , Member (State (Heap address value)) sig
+                , Member (State (Heap address a)) sig
+                , Ord a
                 , Ord term
-                , Ord value
                 )
              => proxy address
-             -> (term -> NonDetC (ReaderC (Cache term value) (StateC (Cache term value) m)) value)
+             -> (term -> NonDetC (ReaderC (Cache term a) (StateC (Cache term a) m)) a)
              -> term
-             -> m value
+             -> m (Set.Set a)
 convergeTerm _ eval body = do
   heap <- get
-  (cache, _) <- converge (Cache Map.empty :: Cache term value, heap :: Heap address value) $ \ (prevCache, _) -> runState (Cache Map.empty) . runReader prevCache $ do
+  (cache, _) <- converge (Cache Map.empty :: Cache term a, heap :: Heap address a) $ \ (prevCache, _) -> runState (Cache Map.empty) . runReader prevCache $ do
     _ <- resetFresh . runNonDetM Set.singleton $ eval body
     get
-  maybe empty (foldMapA pure) (Map.lookup body (unCache cache))
+  pure (fromMaybe mempty (Map.lookup body (unCache cache)))
 
-cacheTerm :: forall m sig value term
+cacheTerm :: forall m sig a term
           .  ( Alternative m
              , Carrier sig m
-             , Member (Reader (Cache term value)) sig
-             , Member (State  (Cache term value)) sig
-             , Ord value
+             , Member (Reader (Cache term a)) sig
+             , Member (State  (Cache term a)) sig
+             , Ord a
              , Ord term
              )
-          => (term -> m value)
-          -> (term -> m value)
+          => (term -> m a)
+          -> (term -> m a)
 cacheTerm eval term = do
   cached <- gets (Map.lookup term . unCache)
-  case cached :: Maybe (Set.Set value) of
+  case cached :: Maybe (Set.Set a) of
     Just results -> foldMapA pure results
     Nothing -> do
       results <- asks (fromMaybe mempty . Map.lookup term . unCache)
-      modify (Cache . Map.insert term (results :: Set.Set value) . unCache)
+      modify (Cache . Map.insert term (results :: Set.Set a) . unCache)
       result <- eval term
-      result <$ modify (Cache . Map.insertWith (<>) term (Set.singleton (result :: value)) . unCache)
+      result <$ modify (Cache . Map.insertWith (<>) term (Set.singleton (result :: a)) . unCache)
 
 runHeap :: StateC (Heap address a) m b -> m (Heap address a, b)
 runHeap m = runState Map.empty m
