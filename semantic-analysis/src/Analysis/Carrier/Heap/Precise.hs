@@ -1,13 +1,19 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Analysis.Carrier.Heap.Precise
 ( -- * Heap carrier
-  HeapC(..)
+  runHeap
+, HeapC(..)
   -- * Heap effect
 , module Analysis.Effect.Heap
 ) where
 
 import Analysis.Effect.Heap
+import Control.Effect.State.Strict
 import qualified Control.Monad.Fail as Fail
+import qualified Data.IntMap as IntMap
 
-newtype HeapC addr value m a = HeapC { runHeap :: m a }
+runHeap :: HeapC value m a -> m (IntMap.IntMap value, a)
+runHeap (HeapC m) = runState mempty m
+
+newtype HeapC value m a = HeapC (StateC (IntMap.IntMap value) m a)
   deriving (Applicative, Functor, Monad, Fail.MonadFail)
