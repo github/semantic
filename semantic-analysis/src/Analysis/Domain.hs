@@ -8,3 +8,4 @@ data Domain
   = Unit
   | Bool Bool
   | String Text
+  deriving (Eq, Ord, Show)
