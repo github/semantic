@@ -5,6 +5,7 @@ module Analysis.Domain
 , string
 , record
 , lam
+, lams
 , Domain(..)
 ) where
 
@@ -27,6 +28,9 @@ record fs = send (Record fs)
 
 lam :: (Eq a, Carrier sig m, Member Domain sig) => Maybe Name -> a -> m a -> m a
 lam u n b = send (Lam u (abstract1 n b))
+
+lams :: (Eq a, Foldable t, Carrier sig m, Member Domain sig) => t (Maybe Name, a) -> m a -> m a
+lams names body = foldr (uncurry lam) body names
 
 
 data Domain f a
