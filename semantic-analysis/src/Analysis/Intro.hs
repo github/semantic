@@ -55,6 +55,8 @@ deriving instance (Ord  a, forall a . Eq   a => Eq   (f a)
                          , forall a . Ord  a => Ord  (f a), Monad f) => Ord  (Intro f a)
 deriving instance (Show a, forall a . Show a => Show (f a))          => Show (Intro f a)
 
+instance HFunctor Intro
+
 
 -- | User-specified and -relevant names.
 newtype Name = Name { unName :: Text }
