@@ -107,15 +107,13 @@ importGraphAnalysis
      )
   => Analysis term name name (Value term name) m
 importGraphAnalysis = Analysis{..}
-  where deref = A.deref
-        assign = A.assign
-        abstract _ name body = do
+  where abstract _ name body = do
           path <- ask
           span <- ask
           pure (Value (Closure path span name body) mempty)
         apply eval (Value (Closure path span name body) _) a = local (const path) . local (const span) $ do
           addr <- alloc @name @name name
-          assign addr a
+          A.assign addr a
           bind name addr (eval body)
         apply _ f _ = fail $ "Cannot coerce " <> show f <> " to function"
         unit = pure mempty
@@ -127,6 +125,6 @@ importGraphAnalysis = Analysis{..}
         record fields = do
           for_ fields $ \ (k, v) -> do
             addr <- alloc @name @name k
-            assign addr v
+            A.assign addr v
           pure (Value Abstract (foldMap (valueGraph . snd) fields))
         _ ... m = pure (Just m)

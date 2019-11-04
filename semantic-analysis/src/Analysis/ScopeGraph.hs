@@ -104,11 +104,9 @@ scopeGraphAnalysis
      )
   => Analysis term name name (ScopeGraph name) m
 scopeGraphAnalysis = Analysis{..}
-  where deref = A.deref
-        assign = A.assign
-        abstract eval name body = do
+  where abstract eval name body = do
           addr <- alloc @name @name name
-          assign name mempty
+          A.assign @name @(ScopeGraph name) name mempty
           bind name addr (eval body)
         apply _ f a = pure (f <> a)
         unit = pure mempty
@@ -122,6 +120,6 @@ scopeGraphAnalysis = Analysis{..}
             path <- ask
             span <- ask
             let v' = ScopeGraph (Map.singleton (Decl k path span) mempty) <> v
-            (k, v') <$ assign addr v'
+            (k, v') <$ A.assign @name addr v'
           pure (foldMap snd fields')
         _ ... m = pure (Just m)

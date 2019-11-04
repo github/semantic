@@ -118,7 +118,8 @@ runFile eval file = traverse run file
             . fix (eval concreteAnalysis)
 
 concreteAnalysis
-  :: ( Carrier sig m
+  :: forall term name m sig
+  .  ( Carrier sig m
      , Foldable term
      , IsString name
      , Member (A.Env name Precise) sig
@@ -134,9 +135,7 @@ concreteAnalysis
      )
   => Analysis term name Precise (Concrete term name) m
 concreteAnalysis = Analysis{..}
-  where deref = A.deref
-        assign = A.assign
-        abstract _ name body = do
+  where abstract _ name body = do
           path <- ask
           span <- ask
           env <- asks (flip Map.restrictKeys (Set.delete name (foldMap Set.singleton body)))
@@ -144,7 +143,7 @@ concreteAnalysis = Analysis{..}
         apply eval (Closure path span name body env) a = do
           local (const path) . local (const span) $ do
             addr <- A.alloc name
-            assign addr a
+            A.assign addr a
             local (const (Map.insert name addr env)) (eval body)
         apply _ f _ = fail $ "Cannot coerce " <> show f <> " to function"
         unit = pure Unit
@@ -157,11 +156,11 @@ concreteAnalysis = Analysis{..}
         record fields = do
           fields' <- for fields $ \ (name, value) -> do
             addr <- A.alloc name
-            assign addr value
+            A.assign addr value
             pure (name, addr)
           pure (Record (Map.fromList fields'))
         addr ... n = do
-          val <- deref addr
+          val <- A.deref @Precise @(Concrete term name) addr
           heap <- get
           pure (val >>= lookupConcrete heap n)
 

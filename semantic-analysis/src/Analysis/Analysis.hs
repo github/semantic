@@ -11,9 +11,7 @@ import GHC.Generics (Generic1)
 --
 -- This is intended to be replaced with a selection of algebraic effects providing these interfaces and carriers providing reusable implementations.
 data Analysis term name address value m = Analysis
-  { deref     :: address -> m (Maybe value)
-  , assign    :: address -> value -> m ()
-  , abstract  :: (term name -> m value) -> name -> term name -> m value
+  { abstract  :: (term name -> m value) -> name -> term name -> m value
   , apply     :: (term name -> m value) -> value -> value -> m value
   , unit      :: m value
   , bool      :: Bool -> m value

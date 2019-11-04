@@ -163,13 +163,11 @@ typecheckingAnalysis
      )
   => Analysis term name name (Type name) m
 typecheckingAnalysis = Analysis{..}
-  where deref = A.deref
-        assign = A.assign
-        abstract eval name body = do
+  where abstract eval name body = do
           -- FIXME: construct the associated scope
           addr <- alloc @name @name name
           arg <- meta
-          assign addr arg
+          A.assign addr arg
           ty <- eval body
           pure (Alg (Arr arg ty))
         apply _ f a = do
@@ -186,7 +184,7 @@ typecheckingAnalysis = Analysis{..}
         record fields = do
           fields' <- for fields $ \ (k, v) -> do
             addr <- alloc @name @name k
-            (k, v) <$ assign addr v
+            (k, v) <$ A.assign addr v
           -- FIXME: should records reference types by address instead?
           pure (Alg (Record (Map.fromList fields')))
         _ ... m = pure (Just m)
