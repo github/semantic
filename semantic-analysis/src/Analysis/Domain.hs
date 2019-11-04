@@ -1,6 +1,7 @@
 {-# LANGUAGE FlexibleContexts, GeneralizedNewtypeDeriving, QuantifiedConstraints, StandaloneDeriving #-}
 module Analysis.Domain
 ( unit
+, bool
 , Domain(..)
 ) where
 
@@ -11,6 +12,9 @@ import Syntax.Scope
 
 unit :: (Carrier sig m, Member Domain sig) => m a
 unit = send Unit
+
+bool :: (Carrier sig m, Member Domain sig) => Bool -> m a
+bool = send . Bool
 
 
 data Domain f a
