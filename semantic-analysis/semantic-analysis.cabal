@@ -43,6 +43,7 @@ library
     Analysis.Analysis
     Analysis.Carrier.Env.Monovariant
     Analysis.Carrier.Env.Precise
+    Analysis.Carrier.Heap.Monovariant
     Analysis.Carrier.Heap.Precise
     Analysis.Concrete
     Analysis.Effect.Env
