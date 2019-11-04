@@ -4,6 +4,7 @@ module Analysis.Domain
 , bool
 , string
 , record
+, lam
 , Domain(..)
 ) where
 
@@ -23,6 +24,9 @@ string = send . String
 
 record :: (Carrier sig m, Member Domain sig) => [(Name, m a)] -> m a
 record fs = send (Record fs)
+
+lam :: (Eq a, Carrier sig m, Member Domain sig) => Maybe Name -> a -> m a -> m a
+lam u n b = send (Lam u (abstract1 n b))
 
 
 data Domain f a
