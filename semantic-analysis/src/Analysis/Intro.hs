@@ -57,6 +57,13 @@ deriving instance (Show a, forall a . Show a => Show (f a))          => Show (In
 
 instance HFunctor Intro
 
+instance RightModule Intro where
+  Unit       >>=* _ = Unit
+  Bool b     >>=* _ = Bool b
+  String s   >>=* _ = String s
+  Record fs  >>=* f = Record (map (fmap (>>= f)) fs)
+  Lam n b    >>=* f = Lam n (b >>=* f)
+
 
 -- | User-specified and -relevant names.
 newtype Name = Name { unName :: Text }
