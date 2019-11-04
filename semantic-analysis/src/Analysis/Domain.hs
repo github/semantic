@@ -2,6 +2,7 @@
 module Analysis.Domain
 ( unit
 , bool
+, string
 , Domain(..)
 ) where
 
@@ -15,6 +16,9 @@ unit = send Unit
 
 bool :: (Carrier sig m, Member Domain sig) => Bool -> m a
 bool = send . Bool
+
+string :: (Carrier sig m, Member Domain sig) => Text -> m a
+string = send . String
 
 
 data Domain f a
