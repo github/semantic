@@ -6,6 +6,7 @@ module Analysis.FlowInsensitive
 , cacheTerm
 , runHeap
 , foldMapA
+, runNonDetM
 ) where
 
 import           Control.Effect
