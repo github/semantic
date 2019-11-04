@@ -97,8 +97,8 @@ scopeGraphAnalysis
   :: forall term name m sig
   .  ( Alternative m
      , Carrier sig m
-     , Member (Reader Path.AbsRelFile) sig
      , Member (Env name name) sig
+     , Member (Reader Path.AbsRelFile) sig
      , Member (Reader Span) sig
      , Member (Reader (Map.Map name Ref)) sig
      , Member (State (Heap name (ScopeGraph name))) sig
