@@ -1,8 +1,9 @@
-{-# LANGUAGE QuantifiedConstraints, StandaloneDeriving #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, QuantifiedConstraints, StandaloneDeriving #-}
 module Analysis.Domain
 ( Domain(..)
 ) where
 
+import Data.String (IsString)
 import Data.Text (Text)
 import Syntax.Scope
 
@@ -17,3 +18,8 @@ deriving instance (Eq   name, Eq   a, forall a . Eq   a => Eq   (f a), Monad f) 
 deriving instance (Ord  name, Ord  a, forall a . Eq   a => Eq   (f a)
                                     , forall a . Ord  a => Ord  (f a), Monad f) => Ord  (Domain name f a)
 deriving instance (Show name, Show a, forall a . Show a => Show (f a))          => Show (Domain name f a)
+
+
+-- | User-specified and -relevant names.
+newtype Name = Name { unName :: Text }
+  deriving (Eq, IsString, Ord, Show)
