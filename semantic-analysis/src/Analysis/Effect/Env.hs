@@ -1,6 +1,7 @@
 {-# LANGUAGE DeriveFunctor, ExistentialQuantification, FlexibleContexts, LambdaCase, StandaloneDeriving #-}
 module Analysis.Effect.Env
-( alloc
+( -- * Env effect
+  alloc
 , bind
 , lookupEnv
 , Env(..)

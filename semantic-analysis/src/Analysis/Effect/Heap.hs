@@ -1,6 +1,7 @@
 {-# LANGUAGE DeriveFunctor, DeriveGeneric, FlexibleContexts #-}
 module Analysis.Effect.Heap
-( deref
+( -- * Heap effect
+  deref
 , assign
 , Heap(..)
 ) where
