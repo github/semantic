@@ -9,6 +9,7 @@ module Analysis.Typecheck
 
 import           Analysis.Analysis
 import           Analysis.Carrier.Env.Monovariant
+import qualified Analysis.Carrier.Heap.Monovariant as A
 import           Analysis.File
 import           Analysis.FlowInsensitive
 import           Control.Applicative (Alternative (..))
@@ -17,13 +18,12 @@ import           Control.Effect.Carrier
 import           Control.Effect.Fresh as Fresh
 import           Control.Effect.Reader hiding (Local)
 import           Control.Effect.State
-import           Control.Monad ((>=>), unless)
+import           Control.Monad (unless)
 import           Data.Foldable (for_)
 import           Data.Function (fix)
 import           Data.Functor (($>))
 import qualified Data.IntMap as IntMap
 import qualified Data.IntSet as IntSet
-import           Data.List.NonEmpty (nonEmpty)
 import qualified Data.Map as Map
 import           Data.Maybe (fromJust, fromMaybe)
 import           Data.Proxy
@@ -150,6 +150,7 @@ runFile eval file = traverse run file
               bs <- m
               v <$ for_ bs (unify v))
           . runNonDetM Set.singleton
+          . A.runHeap @name @(Type name)
           . convergeTerm (Proxy @name) (fix (cacheTerm . eval typecheckingAnalysis))
 
 typecheckingAnalysis
@@ -158,14 +159,14 @@ typecheckingAnalysis
      , Carrier sig m
      , Member (Env name name) sig
      , Member Fresh sig
+     , Member (A.Heap name (Type name)) sig
      , Member (State (Set.Set (Constraint name))) sig
-     , Member (State (Heap name (Type name))) sig
      , Ord name
      )
   => Analysis term name name (Type name) m
 typecheckingAnalysis = Analysis{..}
-  where deref addr = gets (Map.lookup addr >=> nonEmpty . Set.toList) >>= maybe (pure Nothing) (foldMapA (pure . Just))
-        assign addr ty = modify (Map.insertWith (<>) addr (Set.singleton ty))
+  where deref = A.deref
+        assign = A.assign
         abstract eval name body = do
           -- FIXME: construct the associated scope
           addr <- alloc @name @name name
