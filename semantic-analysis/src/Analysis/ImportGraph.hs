@@ -7,6 +7,7 @@ module Analysis.ImportGraph
 
 import           Analysis.Analysis
 import           Analysis.Carrier.Env.Monovariant
+import qualified Analysis.Carrier.Heap.Monovariant as A
 import           Analysis.File
 import           Analysis.FlowInsensitive
 import           Control.Applicative (Alternative(..))
@@ -14,11 +15,8 @@ import           Control.Carrier.Fail.WithLoc
 import           Control.Effect
 import           Control.Effect.Fresh
 import           Control.Effect.Reader
-import           Control.Effect.State
-import           Control.Monad ((>=>))
 import           Data.Foldable (fold, for_)
 import           Data.Function (fix)
-import           Data.List.NonEmpty (nonEmpty)
 import qualified Data.Map as Map
 import           Data.Proxy
 import qualified Data.Set as Set
@@ -92,7 +90,7 @@ runFile eval file = traverse run file
             . runEnv @name
             . runFail
             . fmap fold
-            . convergeTerm (Proxy @name) (fix (cacheTerm . eval importGraphAnalysis))
+            . convergeTerm (Proxy @name) (A.runHeap @name @(Value term name) . fix (cacheTerm . eval importGraphAnalysis))
 
 -- FIXME: decompose into a product domain and two atomic domains
 importGraphAnalysis
@@ -100,19 +98,17 @@ importGraphAnalysis
   .  ( Alternative m
      , Carrier sig m
      , Member (Env name name) sig
+     , Member (A.Heap name (Value term name)) sig
      , Member (Reader Path.AbsRelFile) sig
      , Member (Reader Span) sig
-     , Member (State (Heap name (Value term name))) sig
      , MonadFail m
-     , Ord  name
-     , Ord  (term name)
      , Show name
      , Show (term name)
      )
   => Analysis term name name (Value term name) m
 importGraphAnalysis = Analysis{..}
-  where deref addr = gets (Map.lookup addr >=> nonEmpty . Set.toList) >>= maybe (pure Nothing) (foldMapA (pure . Just))
-        assign addr v = modify (Map.insertWith (<>) addr (Set.singleton v))
+  where deref = A.deref
+        assign = A.assign
         abstract _ name body = do
           path <- ask
           span <- ask
