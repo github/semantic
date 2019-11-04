@@ -9,7 +9,7 @@ module Analysis.Carrier.Heap.Monovariant
 import Analysis.Effect.Heap
 import Control.Applicative (Alternative)
 import Control.Effect.Carrier
-import Control.Effect.State.Strict
+import Control.Effect.State
 import Control.Monad ((>=>))
 import qualified Control.Monad.Fail as Fail
 import Data.List.NonEmpty (nonEmpty)
