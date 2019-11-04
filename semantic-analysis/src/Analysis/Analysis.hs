@@ -25,15 +25,6 @@ data Analysis term name address value m = Analysis
   }
 
 
-data Heap addr value m k
-  = Deref addr (Maybe value -> m k)
-  | Assign addr value (m k)
-  deriving (Functor, Generic1)
-
-instance HFunctor (Heap addr value)
-instance Effect   (Heap addr value)
-
-
 data Domain term name value m k
   -- Functions construction & elimination
   = Abstract name (term name)                 (value term name -> m k)
