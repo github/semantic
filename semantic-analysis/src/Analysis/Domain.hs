@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, GeneralizedNewtypeDeriving, QuantifiedConstraints, StandaloneDeriving #-}
+{-# LANGUAGE DeriveTraversable, FlexibleContexts, GeneralizedNewtypeDeriving, QuantifiedConstraints, StandaloneDeriving #-}
 module Analysis.Domain
 ( unit
 , bool
@@ -47,6 +47,7 @@ data Domain f a
   | String Text
   | Record [(Name, f a)]
   | Lam (Maybe Name) (Scope () f a)
+  deriving (Foldable, Functor, Traversable)
 
 deriving instance (Eq   a, forall a . Eq   a => Eq   (f a), Monad f) => Eq   (Domain f a)
 deriving instance (Ord  a, forall a . Eq   a => Eq   (f a)
