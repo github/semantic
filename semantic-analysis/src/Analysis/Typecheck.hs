@@ -51,7 +51,7 @@ data Monotype name f a
 
 infixr 0 :->
 
-type Type name = Term (Monotype name) Meta
+type Type = Term (Monotype Name) Meta
 
 -- FIXME: Union the effects/annotations on the operands.
 
@@ -100,12 +100,12 @@ typecheckingFlowInsensitive
   :: Ord (term Name)
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term Name Name (Type Name) m
-     -> (term Name -> m (Type Name))
-     -> (term Name -> m (Type Name))
+     => Analysis term Name Name Type m
+     -> (term Name -> m Type)
+     -> (term Name -> m Type)
      )
   -> [File (term Name)]
-  -> ( Heap Name (Type Name)
+  -> ( Heap Name Type
      , [File (Either (Path.AbsRelFile, Span, String) (Term (Polytype :+: Monotype Name) Void))]
      )
 typecheckingFlowInsensitive eval
@@ -119,47 +119,47 @@ runFile
   :: ( Carrier sig m
      , Effect sig
      , Member Fresh sig
-     , Member (State (Heap Name (Type Name))) sig
+     , Member (State (Heap Name Type)) sig
      , Ord (term Name)
      )
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term Name Name (Type Name) m
-     -> (term Name -> m (Type Name))
-     -> (term Name -> m (Type Name))
+     => Analysis term Name Name Type m
+     -> (term Name -> m Type)
+     -> (term Name -> m Type)
      )
   -> File (term Name)
-  -> m (File (Either (Path.AbsRelFile, Span, String) (Type Name)))
+  -> m (File (Either (Path.AbsRelFile, Span, String) Type))
 runFile eval file = traverse run file
   where run
           = (\ m -> do
               (subst, t) <- m
-              modify @(Heap Name (Type Name)) (fmap (Set.map (substAll subst)))
+              modify @(Heap Name Type) (fmap (Set.map (substAll subst)))
               pure (substAll subst <$> t))
-          . runState (mempty :: (Substitution name))
+          . runState @Substitution mempty
           . runReader (filePath file)
           . runReader (fileSpan file)
           . runEnv @Name
           . runFail
           . (\ m -> do
             (cs, t) <- m
-            t <$ solve @Name cs)
-          . runState (Set.empty :: Set.Set (Constraint name))
+            t <$ solve cs)
+          . runState @(Set.Set Constraint) mempty
           . (\ m -> do
               v <- meta
               bs <- m
               v <$ for_ bs (unify v))
-          . convergeTerm (Proxy @Name) (A.runHeap @Name @(Type Name) . fix (cacheTerm . eval typecheckingAnalysis))
+          . convergeTerm (Proxy @Name) (A.runHeap @Name @Type . fix (cacheTerm . eval typecheckingAnalysis))
 
 typecheckingAnalysis
   :: ( Alternative m
      , Carrier sig m
      , Member (Env Name Name) sig
      , Member Fresh sig
-     , Member (A.Heap Name (Type Name)) sig
-     , Member (State (Set.Set (Constraint Name))) sig
+     , Member (A.Heap Name Type) sig
+     , Member (State (Set.Set Constraint)) sig
      )
-  => Analysis term Name Name (Type Name) m
+  => Analysis term Name Name Type m
 typecheckingAnalysis = Analysis{..}
   where abstract eval name body = do
           -- FIXME: construct the associated scope
@@ -188,28 +188,28 @@ typecheckingAnalysis = Analysis{..}
         _ ... m = pure (Just m)
 
 
-data Constraint name = Type name :===: Type name
+data Constraint = Type :===: Type
   deriving (Eq, Ord, Show)
 
 infix 4 :===:
 
-data Solution name
-  = Int := Type name
+data Solution
+  = Int := Type
   deriving (Eq, Ord, Show)
 
 infix 5 :=
 
-meta :: (Carrier sig m, Member Fresh sig) => m (Type name)
+meta :: (Carrier sig m, Member Fresh sig) => m Type
 meta = pure <$> Fresh.fresh
 
-unify :: (Carrier sig m, Member (State (Set.Set (Constraint name))) sig, Ord name) => Type name -> Type name -> m ()
+unify :: (Carrier sig m, Member (State (Set.Set Constraint)) sig) => Type -> Type -> m ()
 unify t1 t2
   | t1 == t2  = pure ()
   | otherwise = modify (<> Set.singleton (t1 :===: t2))
 
-type Substitution name = IntMap.IntMap (Type name)
+type Substitution = IntMap.IntMap Type
 
-solve :: (Member (State (Substitution name)) sig, MonadFail m, Ord name, Show name, Carrier sig m) => Set.Set (Constraint name) -> m ()
+solve :: (Member (State Substitution) sig, MonadFail m, Carrier sig m) => Set.Set Constraint -> m ()
 solve cs = for_ cs solve
   where solve = \case
           -- FIXME: how do we enforce proper subtyping? row polymorphism or something?
