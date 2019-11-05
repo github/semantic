@@ -22,7 +22,6 @@ import           Control.Effect.State
 import           Data.Foldable (fold)
 import           Data.Function (fix)
 import qualified Data.Map as Map
-import           Data.Proxy
 import qualified Data.Set as Set
 import           Data.Traversable (for)
 import           Prelude hiding (fail)
@@ -60,7 +59,7 @@ scopeGraph
      -> (term Name -> m (ScopeGraph Name))
      )
   -> [File (term Name)]
-  -> (Heap Name (ScopeGraph Name), [File (Either (Path.AbsRelFile, Span, String) (ScopeGraph Name))])
+  -> (Heap (ScopeGraph Name), [File (Either (Path.AbsRelFile, Span, String) (ScopeGraph Name))])
 scopeGraph eval
   = run
   . runFresh
@@ -71,7 +70,7 @@ runFile
   :: ( Carrier sig m
      , Effect sig
      , Member Fresh sig
-     , Member (State (Heap Name (ScopeGraph Name))) sig
+     , Member (State (Heap (ScopeGraph Name))) sig
      , Ord (term Name)
      )
   => (forall sig m
@@ -89,7 +88,7 @@ runFile eval file = traverse run file
             . runReader (Map.empty @Name @Ref)
             . runFail
             . fmap fold
-            . convergeTerm (Proxy @Name) (A.runHeap @Name @(ScopeGraph Name) . fix (cacheTerm . eval scopeGraphAnalysis))
+            . convergeTerm (A.runHeap @Name @(ScopeGraph Name) . fix (cacheTerm . eval scopeGraphAnalysis))
 
 scopeGraphAnalysis
   :: ( Alternative m

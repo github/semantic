@@ -27,7 +27,6 @@ import qualified Data.IntMap as IntMap
 import qualified Data.IntSet as IntSet
 import qualified Data.Map as Map
 import           Data.Maybe (fromJust, fromMaybe)
-import           Data.Proxy
 import           Data.Semigroup (Last (..))
 import qualified Data.Set as Set
 import           Data.Traversable (for)
@@ -105,7 +104,7 @@ typecheckingFlowInsensitive
      -> (term Name -> m Type)
      )
   -> [File (term Name)]
-  -> ( Heap Name Type
+  -> ( Heap Type
      , [File (Either (Path.AbsRelFile, Span, String) (Term (Polytype :+: Monotype) Void))]
      )
 typecheckingFlowInsensitive eval
@@ -119,7 +118,7 @@ runFile
   :: ( Carrier sig m
      , Effect sig
      , Member Fresh sig
-     , Member (State (Heap Name Type)) sig
+     , Member (State (Heap Type)) sig
      , Ord (term Name)
      )
   => (forall sig m
@@ -134,7 +133,7 @@ runFile eval file = traverse run file
   where run
           = (\ m -> do
               (subst, t) <- m
-              modify @(Heap Name Type) (fmap (Set.map (substAll subst)))
+              modify @(Heap Type) (fmap (Set.map (substAll subst)))
               pure (substAll subst <$> t))
           . runState @Substitution mempty
           . runReader (filePath file)
@@ -149,7 +148,7 @@ runFile eval file = traverse run file
               v <- meta
               bs <- m
               v <$ for_ bs (unify v))
-          . convergeTerm (Proxy @Name) (A.runHeap @Name @Type . fix (cacheTerm . eval typecheckingAnalysis))
+          . convergeTerm (A.runHeap @Name @Type . fix (cacheTerm . eval typecheckingAnalysis))
 
 typecheckingAnalysis
   :: ( Alternative m

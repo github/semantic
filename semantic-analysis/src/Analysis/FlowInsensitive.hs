@@ -8,6 +8,7 @@ module Analysis.FlowInsensitive
 , foldMapA
 ) where
 
+import           Analysis.Name
 import           Control.Effect
 import           Control.Effect.Fresh
 import           Control.Effect.NonDet
@@ -21,28 +22,26 @@ import qualified Data.Set as Set
 newtype Cache term value = Cache { unCache :: Map.Map term (Set.Set value) }
   deriving (Eq, Ord, Show)
 
-type Heap address value = Map.Map address (Set.Set value)
+type Heap value = Map.Map Name (Set.Set value)
 
 newtype FrameId name = FrameId { unFrameId :: name }
   deriving (Eq, Ord, Show)
 
 
-convergeTerm :: forall term value address proxy m sig
+convergeTerm :: forall term value m sig
              .  ( Carrier sig m
                 , Effect sig
-                , Eq address
                 , Member Fresh sig
-                , Member (State (Heap address value)) sig
+                , Member (State (Heap value)) sig
                 , Ord term
                 , Ord value
                 )
-             => proxy address
-             -> (term -> NonDetC (ReaderC (Cache term value) (StateC (Cache term value) m)) value)
+             => (term -> NonDetC (ReaderC (Cache term value) (StateC (Cache term value) m)) value)
              -> term
              -> m (Set.Set value)
-convergeTerm _ eval body = do
+convergeTerm eval body = do
   heap <- get
-  (cache, _) <- converge (Cache Map.empty :: Cache term value, heap :: Heap address value) $ \ (prevCache, _) -> runState (Cache Map.empty) . runReader prevCache $ do
+  (cache, _) <- converge (Cache Map.empty :: Cache term value, heap :: Heap value) $ \ (prevCache, _) -> runState (Cache Map.empty) . runReader prevCache $ do
     _ <- resetFresh . runNonDetM Set.singleton $ eval body
     get
   pure (fromMaybe mempty (Map.lookup body (unCache cache)))
@@ -67,7 +66,7 @@ cacheTerm eval term = do
       result <- eval term
       result <$ modify (Cache . Map.insertWith (<>) term (Set.singleton (result :: value)) . unCache)
 
-runHeap :: StateC (Heap address value) m a -> m (Heap address value, a)
+runHeap :: StateC (Heap value) m a -> m (Heap value, a)
 runHeap m = runState Map.empty m
 
 -- | Fold a collection by mapping each element onto an 'Alternative' action.

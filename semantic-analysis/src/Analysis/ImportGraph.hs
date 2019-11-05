@@ -19,7 +19,6 @@ import           Control.Effect.Reader
 import           Data.Foldable (fold, for_)
 import           Data.Function (fix)
 import qualified Data.Map as Map
-import           Data.Proxy
 import qualified Data.Set as Set
 import           Data.Text (Text)
 import           Prelude hiding (fail)
@@ -57,7 +56,7 @@ importGraph
      -> (term Name -> m (Value (term Name)))
      )
   -> [File (term Name)]
-  -> ( Heap Name (Value (term Name))
+  -> ( Heap (Value (term Name))
      , [File (Either (Path.AbsRelFile, Span, String) (Value (term Name)))]
      )
 importGraph eval
@@ -71,7 +70,7 @@ runFile
   .  ( Carrier sig m
      , Effect sig
      , Member Fresh sig
-     , Member (State (Heap Name (Value (term Name)))) sig
+     , Member (State (Heap (Value (term Name)))) sig
      , Ord  (term Name)
      , Show (term Name)
      )
@@ -89,7 +88,7 @@ runFile eval file = traverse run file
             . runEnv @Name
             . runFail
             . fmap fold
-            . convergeTerm (Proxy @Name) (A.runHeap @Name @(Value (term Name)) . fix (cacheTerm . eval importGraphAnalysis))
+            . convergeTerm (A.runHeap @Name @(Value (term Name)) . fix (cacheTerm . eval importGraphAnalysis))
 
 -- FIXME: decompose into a product domain and two atomic domains
 importGraphAnalysis
