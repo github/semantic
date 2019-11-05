@@ -12,6 +12,7 @@ import           Analysis.Carrier.Env.Monovariant
 import qualified Analysis.Carrier.Heap.Monovariant as A
 import           Analysis.File
 import           Analysis.FlowInsensitive
+import           Analysis.Name
 import           Control.Applicative (Alternative (..))
 import           Control.Carrier.Fail.WithLoc
 import           Control.Effect.Carrier
@@ -96,16 +97,16 @@ generalize ty = fromJust (closed (forAlls (IntSet.toList (mvs ty)) (hoistTerm R 
 
 
 typecheckingFlowInsensitive
-  :: (Ord name, Ord (term name), Show name)
+  :: Ord (term Name)
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term name name (Type name) m
-     -> (term name -> m (Type name))
-     -> (term name -> m (Type name))
+     => Analysis term Name Name (Type Name) m
+     -> (term Name -> m (Type Name))
+     -> (term Name -> m (Type Name))
      )
-  -> [File (term name)]
-  -> ( Heap name (Type name)
-     , [File (Either (Path.AbsRelFile, Span, String) (Term (Polytype :+: Monotype name) Void))]
+  -> [File (term Name)]
+  -> ( Heap Name (Type Name)
+     , [File (Either (Path.AbsRelFile, Span, String) (Term (Polytype :+: Monotype Name) Void))]
      )
 typecheckingFlowInsensitive eval
   = run
@@ -115,59 +116,56 @@ typecheckingFlowInsensitive eval
   . traverse (runFile eval)
 
 runFile
-  :: forall term name m sig
+  :: forall term m sig
   .  ( Carrier sig m
      , Effect sig
      , Member Fresh sig
-     , Member (State (Heap name (Type name))) sig
-     , Ord name
-     , Ord (term name)
-     , Show name
+     , Member (State (Heap Name (Type Name))) sig
+     , Ord (term Name)
      )
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term name name (Type name) m
-     -> (term name -> m (Type name))
-     -> (term name -> m (Type name))
+     => Analysis term Name Name (Type Name) m
+     -> (term Name -> m (Type Name))
+     -> (term Name -> m (Type Name))
      )
-  -> File (term name)
-  -> m (File (Either (Path.AbsRelFile, Span, String) (Type name)))
+  -> File (term Name)
+  -> m (File (Either (Path.AbsRelFile, Span, String) (Type Name)))
 runFile eval file = traverse run file
   where run
           = (\ m -> do
               (subst, t) <- m
-              modify @(Heap name (Type name)) (fmap (Set.map (substAll subst)))
+              modify @(Heap Name (Type Name)) (fmap (Set.map (substAll subst)))
               pure (substAll subst <$> t))
           . runState (mempty :: (Substitution name))
           . runReader (filePath file)
           . runReader (fileSpan file)
-          . runEnv @name
+          . runEnv @Name
           . runFail
           . (\ m -> do
             (cs, t) <- m
-            t <$ solve @name cs)
+            t <$ solve @Name cs)
           . runState (Set.empty :: Set.Set (Constraint name))
           . (\ m -> do
               v <- meta
               bs <- m
               v <$ for_ bs (unify v))
-          . convergeTerm (Proxy @name) (A.runHeap @name @(Type name) . fix (cacheTerm . eval typecheckingAnalysis))
+          . convergeTerm (Proxy @Name) (A.runHeap @Name @(Type Name) . fix (cacheTerm . eval typecheckingAnalysis))
 
 typecheckingAnalysis
-  :: forall term name m sig
+  :: forall term m sig
   .  ( Alternative m
      , Carrier sig m
-     , Member (Env name name) sig
+     , Member (Env Name Name) sig
      , Member Fresh sig
-     , Member (A.Heap name (Type name)) sig
-     , Member (State (Set.Set (Constraint name))) sig
-     , Ord name
+     , Member (A.Heap Name (Type Name)) sig
+     , Member (State (Set.Set (Constraint Name))) sig
      )
-  => Analysis term name name (Type name) m
+  => Analysis term Name Name (Type Name) m
 typecheckingAnalysis = Analysis{..}
   where abstract eval name body = do
           -- FIXME: construct the associated scope
-          addr <- alloc @name @name name
+          addr <- alloc @Name @Name name
           arg <- meta
           A.assign addr arg
           ty <- eval body
@@ -185,7 +183,7 @@ typecheckingAnalysis = Analysis{..}
         asString s = unify (Alg String) s $> mempty
         record fields = do
           fields' <- for fields $ \ (k, v) -> do
-            addr <- alloc @name @name k
+            addr <- alloc @Name @Name k
             (k, v) <$ A.assign addr v
           -- FIXME: should records reference types by address instead?
           pure (Alg (Record (Map.fromList fields')))
