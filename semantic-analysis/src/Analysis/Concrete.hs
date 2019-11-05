@@ -15,6 +15,7 @@ import           Analysis.Analysis
 import qualified Analysis.Carrier.Env.Precise as A
 import qualified Analysis.Carrier.Heap.Precise as A
 import           Analysis.File
+import           Analysis.Name
 import           Control.Applicative (Alternative (..))
 import           Control.Carrier.Fail.WithLoc
 import           Control.Effect
@@ -29,7 +30,6 @@ import qualified Data.IntSet as IntSet
 import qualified Data.Map as Map
 import           Data.Semigroup (Last (..))
 import qualified Data.Set as Set
-import           Data.String (IsString)
 import           Data.Text (Text, pack)
 import           Data.Traversable (for)
 import           Prelude hiding (fail)
@@ -69,19 +69,16 @@ data Edge = Lexical | Import
 
 concrete
   :: ( Foldable term
-     , IsString name
-     , Ord name
-     , Show name
-     , Show (term name)
+     , Show (term Name)
      )
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term name Precise (Concrete term name) m
-     -> (term name -> m (Concrete term name))
-     -> (term name -> m (Concrete term name))
+     => Analysis term Name Precise (Concrete term Name) m
+     -> (term Name -> m (Concrete term Name))
+     -> (term Name -> m (Concrete term Name))
      )
-  -> [File (term name)]
-  -> (Heap term name, [File (Either (Path.AbsRelFile, Span, String) (Concrete term name))])
+  -> [File (term Name)]
+  -> (Heap term Name, [File (Either (Path.AbsRelFile, Span, String) (Concrete term Name))])
 concrete eval
   = run
   . runFresh
@@ -89,51 +86,45 @@ concrete eval
   . traverse (runFile eval)
 
 runFile
-  :: forall term name m sig
+  :: forall term m sig
   .  ( Carrier sig m
      , Effect sig
      , Foldable term
-     , IsString name
      , Member Fresh sig
-     , Member (A.Heap Precise (Concrete term name)) sig
-     , Member (State (Heap term name)) sig
-     , Ord name
-     , Show name
-     , Show (term name)
+     , Member (A.Heap Precise (Concrete term Name)) sig
+     , Member (State (Heap term Name)) sig
+     , Show (term Name)
      )
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term name Precise (Concrete term name) m
-     -> (term name -> m (Concrete term name))
-     -> (term name -> m (Concrete term name))
+     => Analysis term Name Precise (Concrete term Name) m
+     -> (term Name -> m (Concrete term Name))
+     -> (term Name -> m (Concrete term Name))
      )
-  -> File (term name)
-  -> m (File (Either (Path.AbsRelFile, Span, String) (Concrete term name)))
+  -> File (term Name)
+  -> m (File (Either (Path.AbsRelFile, Span, String) (Concrete term Name)))
 runFile eval file = traverse run file
   where run = runReader (filePath file)
             . runReader (fileSpan file)
             . runFail
-            . runReader @(Env name) mempty
-            . A.runEnv @name
+            . runReader @(Env Name) mempty
+            . A.runEnv @Name
             . fix (eval concreteAnalysis)
 
 concreteAnalysis
-  :: forall term name m sig
+  :: forall term m sig
   .  ( Carrier sig m
      , Foldable term
-     , IsString name
-     , Member (A.Env name Precise) sig
-     , Member (A.Heap Precise (Concrete term name)) sig
-     , Member (Reader (Env name)) sig
+     , Member (A.Env Name Precise) sig
+     , Member (A.Heap Precise (Concrete term Name)) sig
+     , Member (Reader (Env Name)) sig
      , Member (Reader Path.AbsRelFile) sig
      , Member (Reader Span) sig
-     , Member (State (Heap term name)) sig
+     , Member (State (Heap term Name)) sig
      , MonadFail m
-     , Ord name
-     , Show name
-     , Show (term name)
+     , Show (term Name)
      )
-  => Analysis term name Precise (Concrete term name) m
+  => Analysis term Name Precise (Concrete term Name) m
 concreteAnalysis = Analysis{..}
   where abstract _ name body = do
           path <- ask
@@ -160,12 +151,12 @@ concreteAnalysis = Analysis{..}
             pure (name, addr)
           pure (Record (Map.fromList fields'))
         addr ... n = do
-          val <- A.deref @Precise @(Concrete term name) addr
+          val <- A.deref @Precise @(Concrete term Name) addr
           heap <- get
           pure (val >>= lookupConcrete heap n)
 
 
-lookupConcrete :: (IsString name, Ord name) => Heap term name -> name -> Concrete term name -> Maybe Precise
+lookupConcrete :: Heap term Name -> Name -> Concrete term Name -> Maybe Precise
 lookupConcrete heap name = run . evalState IntSet.empty . runNonDet . inConcrete
   where -- look up the name in a concrete value
         inConcrete = inFrame <=< maybeA . recordFrame
@@ -187,7 +178,7 @@ lookupConcrete heap name = run . evalState IntSet.empty . runNonDet . inConcrete
 --   > λ let (heap, res) = concrete [ruby]
 --   > λ writeFile "/Users/rob/Desktop/heap.dot" (export (addressStyle heap) (heapAddressGraph heap))
 --   > λ :!dot -Tsvg < ~/Desktop/heap.dot > ~/Desktop/heap.svg
-heapGraph :: (Precise -> Concrete term name -> a) -> (Either Edge name -> Precise -> G.Graph a) -> Heap term name -> G.Graph a
+heapGraph :: (Precise -> Concrete term Name -> a) -> (Either Edge Name -> Precise -> G.Graph a) -> Heap term Name -> G.Graph a
 heapGraph vertex edge h = foldr (uncurry graph) G.empty (IntMap.toList h)
   where graph k v rest = (G.vertex (vertex k v) `G.connect` outgoing v) `G.overlay` rest
         outgoing = \case
@@ -197,15 +188,15 @@ heapGraph vertex edge h = foldr (uncurry graph) G.empty (IntMap.toList h)
           Closure _ _ _ _ env -> foldr (G.overlay . edge (Left Lexical)) G.empty env
           Record frame -> Map.foldrWithKey (\ k -> G.overlay . edge (Right k)) G.empty frame
 
-heapValueGraph :: Heap term name -> G.Graph (Concrete term name)
+heapValueGraph :: Heap term Name -> G.Graph (Concrete term Name)
 heapValueGraph h = heapGraph (const id) (const fromAddr) h
   where fromAddr addr = maybe G.empty G.vertex (IntMap.lookup addr h)
 
-heapAddressGraph :: Heap term name -> G.Graph (EdgeType term name, Precise)
+heapAddressGraph :: Heap term Name -> G.Graph (EdgeType term Name, Precise)
 heapAddressGraph = heapGraph (\ addr v -> (Value v, addr)) (fmap G.vertex . (,) . either Edge Slot)
 
-addressStyle :: (name -> Text) -> Heap term name -> G.Style (EdgeType term name, Precise) Text
-addressStyle unName heap = (G.defaultStyle vertex) { G.edgeAttributes }
+addressStyle :: Heap term Name -> G.Style (EdgeType term Name, Precise) Text
+addressStyle heap = (G.defaultStyle vertex) { G.edgeAttributes }
   where vertex (_, addr) = pack (show addr) <> " = " <> maybe "?" fromConcrete (IntMap.lookup addr heap)
         edgeAttributes _ (Slot name,    _) = ["label" G.:= unName name]
         edgeAttributes _ (Edge Import,  _) = ["color" G.:= "blue"]
