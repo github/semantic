@@ -78,8 +78,7 @@ concrete eval
   . traverse (runFile eval)
 
 runFile
-  :: forall term m sig
-  .  ( Carrier sig m
+  :: ( Carrier sig m
      , Effect sig
      , Foldable term
      , Member Fresh sig
