@@ -33,8 +33,8 @@ convergeTerm :: forall m sig value term address proxy
                 , Eq address
                 , Member Fresh sig
                 , Member (State (Heap address value)) sig
-                , Ord value
                 , Ord term
+                , Ord value
                 )
              => proxy address
              -> (term -> NonDetC (ReaderC (Cache term value) (StateC (Cache term value) m)) value)
@@ -52,8 +52,8 @@ cacheTerm :: forall m sig value term
              , Carrier sig m
              , Member (Reader (Cache term value)) sig
              , Member (State  (Cache term value)) sig
-             , Ord value
              , Ord term
+             , Ord value
              )
           => (term -> m value)
           -> (term -> m value)
