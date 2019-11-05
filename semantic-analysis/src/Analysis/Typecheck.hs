@@ -41,30 +41,30 @@ import           Syntax.Term
 import           Syntax.Var (closed)
 import qualified System.Path as Path
 
-data Monotype name f a
+data Monotype f a
   = Bool
   | Unit
   | String
   | f a :-> f a
-  | Record (Map.Map name (f a))
+  | Record (Map.Map Name (f a))
   deriving (Foldable, Functor, Generic1, Traversable)
 
 infixr 0 :->
 
-type Type = Term (Monotype Name) Meta
+type Type = Term Monotype Meta
 
 -- FIXME: Union the effects/annotations on the operands.
 
 -- | We derive the 'Semigroup' instance for types to take the second argument. This is equivalent to stating that the type of an imperative sequence of statements is the type of its final statement.
-deriving via (Last (Term (Monotype name) a)) instance Semigroup (Term (Monotype name) a)
+deriving via (Last (Term Monotype a)) instance Semigroup (Term Monotype a)
 
-deriving instance (Eq   name, Eq   a, forall a . Eq   a => Eq   (f a), Monad f) => Eq   (Monotype name f a)
-deriving instance (Ord  name, Ord  a, forall a . Eq   a => Eq   (f a)
-                                    , forall a . Ord  a => Ord  (f a), Monad f) => Ord  (Monotype name f a)
-deriving instance (Show name, Show a, forall a . Show a => Show (f a))          => Show (Monotype name f a)
+deriving instance (Eq   a, forall a . Eq   a => Eq   (f a), Monad f) => Eq   (Monotype f a)
+deriving instance (Ord  a, forall a . Eq   a => Eq   (f a)
+                         , forall a . Ord  a => Ord  (f a), Monad f) => Ord  (Monotype f a)
+deriving instance (Show a, forall a . Show a => Show (f a))          => Show (Monotype f a)
 
-instance HFunctor (Monotype name)
-instance RightModule (Monotype name) where
+instance HFunctor Monotype
+instance RightModule Monotype where
   Unit      >>=* _ = Unit
   Bool      >>=* _ = Bool
   String    >>=* _ = String
@@ -92,7 +92,7 @@ forAll n body = send (PForAll (abstract1 n body))
 forAlls :: (Eq a, Carrier sig m, Member Polytype sig, Foldable t) => t a -> m a -> m a
 forAlls ns body = foldr forAll body ns
 
-generalize :: Term (Monotype name) Meta -> Term (Polytype :+: Monotype name) Void
+generalize :: Term Monotype Meta -> Term (Polytype :+: Monotype) Void
 generalize ty = fromJust (closed (forAlls (IntSet.toList (mvs ty)) (hoistTerm R ty)))
 
 
@@ -106,7 +106,7 @@ typecheckingFlowInsensitive
      )
   -> [File (term Name)]
   -> ( Heap Name Type
-     , [File (Either (Path.AbsRelFile, Span, String) (Term (Polytype :+: Monotype Name) Void))]
+     , [File (Either (Path.AbsRelFile, Span, String) (Term (Polytype :+: Monotype) Void))]
      )
 typecheckingFlowInsensitive eval
   = run
