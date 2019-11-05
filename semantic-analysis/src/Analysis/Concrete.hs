@@ -39,9 +39,6 @@ import qualified System.Path as Path
 type Precise = Int
 type Env = Map.Map Name Precise
 
-newtype FrameId = FrameId { unFrameId :: Precise }
-  deriving (Eq, Ord, Show)
-
 data Concrete term
   = Closure Path.AbsRelFile Span Name term Env
   | Unit
