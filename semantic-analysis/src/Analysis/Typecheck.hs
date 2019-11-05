@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveGeneric, DeriveTraversable, DerivingVia, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, LambdaCase, MultiParamTypeClasses, QuantifiedConstraints, RankNTypes, RecordWildCards, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DeriveGeneric, DeriveTraversable, DerivingVia, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, LambdaCase, MultiParamTypeClasses, QuantifiedConstraints, RankNTypes, RecordWildCards, StandaloneDeriving, TypeApplications, TypeOperators, UndecidableInstances #-}
 module Analysis.Typecheck
 ( Monotype (..)
 , Meta
@@ -116,8 +116,7 @@ typecheckingFlowInsensitive eval
   . traverse (runFile eval)
 
 runFile
-  :: forall term m sig
-  .  ( Carrier sig m
+  :: ( Carrier sig m
      , Effect sig
      , Member Fresh sig
      , Member (State (Heap Name (Type Name))) sig
@@ -153,8 +152,7 @@ runFile eval file = traverse run file
           . convergeTerm (Proxy @Name) (A.runHeap @Name @(Type Name) . fix (cacheTerm . eval typecheckingAnalysis))
 
 typecheckingAnalysis
-  :: forall term m sig
-  .  ( Alternative m
+  :: ( Alternative m
      , Carrier sig m
      , Member (Env Name Name) sig
      , Member Fresh sig
