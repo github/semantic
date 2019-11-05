@@ -56,11 +56,6 @@ recordFrame :: Concrete term name -> Maybe (Env name)
 recordFrame (Record frame) = Just frame
 recordFrame _              = Nothing
 
-newtype Frame name = Frame
-  { frameSlots :: Env name
-  }
-  deriving (Eq, Ord, Show)
-
 type Heap term name = IntMap.IntMap (Concrete term name)
 
 data Edge = Lexical | Import
