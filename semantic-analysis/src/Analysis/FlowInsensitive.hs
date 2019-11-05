@@ -1,7 +1,6 @@
 {-# LANGUAGE FlexibleContexts, OverloadedStrings, ScopedTypeVariables, TypeOperators #-}
 module Analysis.FlowInsensitive
 ( Heap
-, FrameId(..)
 , convergeTerm
 , cacheTerm
 , runHeap
@@ -23,9 +22,6 @@ newtype Cache term value = Cache { unCache :: Map.Map term (Set.Set value) }
   deriving (Eq, Ord, Show)
 
 type Heap value = Map.Map Name (Set.Set value)
-
-newtype FrameId name = FrameId { unFrameId :: name }
-  deriving (Eq, Ord, Show)
 
 
 convergeTerm :: forall term value m sig
