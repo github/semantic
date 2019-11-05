@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, DeriveGeneric, DeriveTraversable, FlexibleContexts, GeneralizedNewtypeDeriving, QuantifiedConstraints, StandaloneDeriving #-}
+{-# LANGUAGE DataKinds, DeriveGeneric, DeriveTraversable, FlexibleContexts, QuantifiedConstraints, StandaloneDeriving #-}
 module Analysis.Intro
 ( unit
 , bool
@@ -12,9 +12,9 @@ module Analysis.Intro
 , Name(..)
 ) where
 
+import Analysis.Name
 import Control.Applicative (Alternative(..))
 import Control.Effect.Carrier
-import Data.String (IsString)
 import Data.Text (Text)
 import GHC.Generics (Generic1)
 import Syntax.Fin as Fin
@@ -70,8 +70,3 @@ instance RightModule Intro where
   String s   >>=* _ = String s
   Record fs  >>=* f = Record (map (fmap (>>= f)) fs)
   Lam n b    >>=* f = Lam n (b >>=* f)
-
-
--- | User-specified and -relevant names.
-newtype Name = Name { unName :: Text }
-  deriving (Eq, IsString, Ord, Show)
