@@ -58,9 +58,6 @@ recordFrame _              = Nothing
 
 type Heap term name = IntMap.IntMap (Concrete term name)
 
-data Edge = Lexical | Import
-  deriving (Eq, Ord, Show)
-
 
 concrete
   :: ( Foldable term
@@ -209,4 +206,7 @@ data EdgeType term name
   = Edge Edge
   | Slot name
   | Value (Concrete term name)
+  deriving (Eq, Ord, Show)
+
+data Edge = Lexical | Import
   deriving (Eq, Ord, Show)
