@@ -54,7 +54,7 @@ scopeGraph
   :: Ord (term Name)
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term Name Name (ScopeGraph Name) m
+     => Analysis term Name (ScopeGraph Name) m
      -> (term Name -> m (ScopeGraph Name))
      -> (term Name -> m (ScopeGraph Name))
      )
@@ -75,7 +75,7 @@ runFile
      )
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term Name Name (ScopeGraph Name) m
+     => Analysis term Name (ScopeGraph Name) m
      -> (term Name -> m (ScopeGraph Name))
      -> (term Name -> m (ScopeGraph Name))
      )
@@ -98,7 +98,7 @@ scopeGraphAnalysis
      , Member (Reader Path.AbsRelFile) sig
      , Member (Reader Span) sig
      )
-  => Analysis term Name Name (ScopeGraph Name) m
+  => Analysis term Name (ScopeGraph Name) m
 scopeGraphAnalysis = Analysis{..}
   where abstract eval name body = do
           addr <- alloc @Name @Name name

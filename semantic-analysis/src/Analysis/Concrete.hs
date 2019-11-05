@@ -62,7 +62,7 @@ concrete
      )
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term Name Precise (Concrete (term Name)) m
+     => Analysis term Precise (Concrete (term Name)) m
      -> (term Name -> m (Concrete (term Name)))
      -> (term Name -> m (Concrete (term Name)))
      )
@@ -85,7 +85,7 @@ runFile
      )
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term Name Precise (Concrete (term Name)) m
+     => Analysis term Precise (Concrete (term Name)) m
      -> (term Name -> m (Concrete (term Name)))
      -> (term Name -> m (Concrete (term Name)))
      )
@@ -112,7 +112,7 @@ concreteAnalysis
      , MonadFail m
      , Show (term Name)
      )
-  => Analysis term Name Precise (Concrete (term Name)) m
+  => Analysis term Precise (Concrete (term Name)) m
 concreteAnalysis = Analysis{..}
   where abstract _ name body = do
           path <- ask

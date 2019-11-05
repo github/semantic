@@ -51,7 +51,7 @@ importGraph
   :: (Ord (term Name), Show (term Name))
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term Name Name (Value (term Name)) m
+     => Analysis term Name (Value (term Name)) m
      -> (term Name -> m (Value (term Name)))
      -> (term Name -> m (Value (term Name)))
      )
@@ -76,7 +76,7 @@ runFile
      )
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term Name Name (Value (term Name)) m
+     => Analysis term Name (Value (term Name)) m
      -> (term Name -> m (Value (term Name)))
      -> (term Name -> m (Value (term Name)))
      )
@@ -102,7 +102,7 @@ importGraphAnalysis
      , MonadFail m
      , Show (term Name)
      )
-  => Analysis term Name Name (Value (term Name)) m
+  => Analysis term Name (Value (term Name)) m
 importGraphAnalysis = Analysis{..}
   where abstract _ name body = do
           path <- ask
