@@ -49,6 +49,7 @@ library
     Analysis.Effect.Env
     Analysis.Effect.Heap
     Analysis.File
+    Analysis.Name
     Analysis.FlowInsensitive
     Analysis.ImportGraph
     Analysis.Intro
