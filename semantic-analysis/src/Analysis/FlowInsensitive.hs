@@ -18,56 +18,56 @@ import           Data.Maybe (fromMaybe)
 import           Data.Monoid (Alt(..))
 import qualified Data.Set as Set
 
-newtype Cache term a = Cache { unCache :: Map.Map term (Set.Set a) }
+newtype Cache term value = Cache { unCache :: Map.Map term (Set.Set value) }
   deriving (Eq, Ord, Show)
 
-type Heap address a = Map.Map address (Set.Set a)
+type Heap address value = Map.Map address (Set.Set value)
 
 newtype FrameId name = FrameId { unFrameId :: name }
   deriving (Eq, Ord, Show)
 
 
-convergeTerm :: forall m sig a term address proxy
+convergeTerm :: forall m sig value term address proxy
              .  ( Carrier sig m
                 , Effect sig
                 , Eq address
                 , Member Fresh sig
-                , Member (State (Heap address a)) sig
-                , Ord a
+                , Member (State (Heap address value)) sig
+                , Ord value
                 , Ord term
                 )
              => proxy address
-             -> (term -> NonDetC (ReaderC (Cache term a) (StateC (Cache term a) m)) a)
+             -> (term -> NonDetC (ReaderC (Cache term value) (StateC (Cache term value) m)) value)
              -> term
-             -> m (Set.Set a)
+             -> m (Set.Set value)
 convergeTerm _ eval body = do
   heap <- get
-  (cache, _) <- converge (Cache Map.empty :: Cache term a, heap :: Heap address a) $ \ (prevCache, _) -> runState (Cache Map.empty) . runReader prevCache $ do
+  (cache, _) <- converge (Cache Map.empty :: Cache term value, heap :: Heap address value) $ \ (prevCache, _) -> runState (Cache Map.empty) . runReader prevCache $ do
     _ <- resetFresh . runNonDetM Set.singleton $ eval body
     get
   pure (fromMaybe mempty (Map.lookup body (unCache cache)))
 
-cacheTerm :: forall m sig a term
+cacheTerm :: forall m sig value term
           .  ( Alternative m
              , Carrier sig m
-             , Member (Reader (Cache term a)) sig
-             , Member (State  (Cache term a)) sig
-             , Ord a
+             , Member (Reader (Cache term value)) sig
+             , Member (State  (Cache term value)) sig
+             , Ord value
              , Ord term
              )
-          => (term -> m a)
-          -> (term -> m a)
+          => (term -> m value)
+          -> (term -> m value)
 cacheTerm eval term = do
   cached <- gets (Map.lookup term . unCache)
-  case cached :: Maybe (Set.Set a) of
+  case cached :: Maybe (Set.Set value) of
     Just results -> foldMapA pure results
     Nothing -> do
       results <- asks (fromMaybe mempty . Map.lookup term . unCache)
-      modify (Cache . Map.insert term (results :: Set.Set a) . unCache)
+      modify (Cache . Map.insert term (results :: Set.Set value) . unCache)
       result <- eval term
-      result <$ modify (Cache . Map.insertWith (<>) term (Set.singleton (result :: a)) . unCache)
+      result <$ modify (Cache . Map.insertWith (<>) term (Set.singleton (result :: value)) . unCache)
 
-runHeap :: StateC (Heap address a) m b -> m (Heap address a, b)
+runHeap :: StateC (Heap address value) m a -> m (Heap address value, a)
 runHeap m = runState Map.empty m
 
 -- | Fold a collection by mapping each element onto an 'Alternative' action.
