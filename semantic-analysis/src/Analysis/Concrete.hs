@@ -37,22 +37,22 @@ import           Source.Span
 import qualified System.Path as Path
 
 type Precise = Int
-type Env name = Map.Map name Precise
+type Env = Map.Map Name Precise
 
 newtype FrameId = FrameId { unFrameId :: Precise }
   deriving (Eq, Ord, Show)
 
 data Concrete term
-  = Closure Path.AbsRelFile Span Name term (Env Name)
+  = Closure Path.AbsRelFile Span Name term Env
   | Unit
   | Bool Bool
   | String Text
-  | Record (Env Name)
+  | Record Env
   deriving (Eq, Ord, Show)
   -- NB: We derive the 'Semigroup' instance for 'Concrete' to take the second argument. This is equivalent to stating that the return value of an imperative sequence of statements is the value of its final statement.
   deriving Semigroup via Last (Concrete term)
 
-recordFrame :: Concrete term -> Maybe (Env Name)
+recordFrame :: Concrete term -> Maybe Env
 recordFrame (Record frame) = Just frame
 recordFrame _              = Nothing
 
@@ -99,7 +99,7 @@ runFile eval file = traverse run file
   where run = runReader (filePath file)
             . runReader (fileSpan file)
             . runFail
-            . runReader @(Env Name) mempty
+            . runReader @Env mempty
             . A.runEnv @Name
             . fix (eval concreteAnalysis)
 
@@ -109,7 +109,7 @@ concreteAnalysis
      , Foldable term
      , Member (A.Env Name Precise) sig
      , Member (A.Heap Precise (Concrete (term Name))) sig
-     , Member (Reader (Env Name)) sig
+     , Member (Reader Env) sig
      , Member (Reader Path.AbsRelFile) sig
      , Member (Reader Span) sig
      , Member (State (Heap (term Name))) sig
