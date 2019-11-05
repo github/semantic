@@ -24,22 +24,22 @@ data Analysis term address value m = Analysis
   }
 
 
-data Domain term name value m k
+data Domain term value m k
   -- Functions construction & elimination
-  = Abstract name (term name)                 (value term name -> m k)
-  | Apply (value term name) (value term name) (value term name -> m k)
+  = Abstract Name (term Name)                 (value term -> m k)
+  | Apply (value term) (value term) (value term -> m k)
   -- Unit construction (no elimination)
-  | Unit (value term name -> m k)
+  | Unit (value term -> m k)
   -- Boolean construction & elimination
-  | Bool   Bool              (value term name -> m k)
-  | AsBool (value term name) (Bool            -> m k)
+  | Bool   Bool              (value term -> m k)
+  | AsBool (value term) (Bool            -> m k)
   -- String construction & elimination
-  | String   Text              (value term name -> m k)
-  | AsString (value term name) (Text            -> m k)
+  | String   Text              (value term -> m k)
+  | AsString (value term) (Text            -> m k)
   -- Record construction & elimination
-  | Record [(name, value term name)] (value term name         -> m k)
-  | Project (value term name) name   (Maybe (value term name) -> m k)
+  | Record [(Name, value term)] (value term         -> m k)
+  | Project (value term) Name   (Maybe (value term) -> m k)
   deriving (Functor, Generic1)
 
-instance HFunctor (Domain term name value)
-instance Effect   (Domain term name value)
+instance HFunctor (Domain term value)
+instance Effect   (Domain term value)
