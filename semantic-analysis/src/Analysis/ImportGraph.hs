@@ -10,6 +10,7 @@ import           Analysis.Carrier.Env.Monovariant
 import qualified Analysis.Carrier.Heap.Monovariant as A
 import           Analysis.File
 import           Analysis.FlowInsensitive
+import           Analysis.Name
 import           Control.Applicative (Alternative(..))
 import           Control.Carrier.Fail.WithLoc
 import           Control.Effect
@@ -48,16 +49,16 @@ data Semi term name
 
 
 importGraph
-  :: (Ord name, Ord (term name), Show name, Show (term name))
+  :: (Ord (term Name), Show (term Name))
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term name name (Value term name) m
-     -> (term name -> m (Value term name))
-     -> (term name -> m (Value term name))
+     => Analysis term Name Name (Value term Name) m
+     -> (term Name -> m (Value term Name))
+     -> (term Name -> m (Value term Name))
      )
-  -> [File (term name)]
-  -> ( Heap name (Value term name)
-     , [File (Either (Path.AbsRelFile, Span, String) (Value term name))]
+  -> [File (term Name)]
+  -> ( Heap Name (Value term Name)
+     , [File (Either (Path.AbsRelFile, Span, String) (Value term Name))]
      )
 importGraph eval
   = run
@@ -66,53 +67,50 @@ importGraph eval
   . traverse (runFile eval)
 
 runFile
-  :: forall term name m sig
+  :: forall term m sig
   .  ( Carrier sig m
      , Effect sig
      , Member Fresh sig
-     , Member (State (Heap name (Value term name))) sig
-     , Ord  name
-     , Ord  (term name)
-     , Show name
-     , Show (term name)
+     , Member (State (Heap Name (Value term Name))) sig
+     , Ord  (term Name)
+     , Show (term Name)
      )
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term name name (Value term name) m
-     -> (term name -> m (Value term name))
-     -> (term name -> m (Value term name))
+     => Analysis term Name Name (Value term Name) m
+     -> (term Name -> m (Value term Name))
+     -> (term Name -> m (Value term Name))
      )
-  -> File (term name)
-  -> m (File (Either (Path.AbsRelFile, Span, String) (Value term name)))
+  -> File (term Name)
+  -> m (File (Either (Path.AbsRelFile, Span, String) (Value term Name)))
 runFile eval file = traverse run file
   where run = runReader (filePath file)
             . runReader (fileSpan file)
-            . runEnv @name
+            . runEnv @Name
             . runFail
             . fmap fold
-            . convergeTerm (Proxy @name) (A.runHeap @name @(Value term name) . fix (cacheTerm . eval importGraphAnalysis))
+            . convergeTerm (Proxy @Name) (A.runHeap @Name @(Value term Name) . fix (cacheTerm . eval importGraphAnalysis))
 
 -- FIXME: decompose into a product domain and two atomic domains
 importGraphAnalysis
-  :: forall term name m sig
+  :: forall term m sig
   .  ( Alternative m
      , Carrier sig m
-     , Member (Env name name) sig
-     , Member (A.Heap name (Value term name)) sig
+     , Member (Env Name Name) sig
+     , Member (A.Heap Name (Value term Name)) sig
      , Member (Reader Path.AbsRelFile) sig
      , Member (Reader Span) sig
      , MonadFail m
-     , Show name
-     , Show (term name)
+     , Show (term Name)
      )
-  => Analysis term name name (Value term name) m
+  => Analysis term Name Name (Value term Name) m
 importGraphAnalysis = Analysis{..}
   where abstract _ name body = do
           path <- ask
           span <- ask
           pure (Value (Closure path span name body) mempty)
         apply eval (Value (Closure path span name body) _) a = local (const path) . local (const span) $ do
-          addr <- alloc @name @name name
+          addr <- alloc @Name @Name name
           A.assign addr a
           bind name addr (eval body)
         apply _ f _ = fail $ "Cannot coerce " <> show f <> " to function"
@@ -124,7 +122,7 @@ importGraphAnalysis = Analysis{..}
         asString _ = pure mempty
         record fields = do
           for_ fields $ \ (k, v) -> do
-            addr <- alloc @name @name k
+            addr <- alloc @Name @Name k
             A.assign addr v
           pure (Value Abstract (foldMap (valueGraph . snd) fields))
         _ ... m = pure (Just m)
