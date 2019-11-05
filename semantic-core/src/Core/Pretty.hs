@@ -43,7 +43,7 @@ primitive = keyword . mappend "#"
 data Style = Unicode | Ascii
 
 name :: Name -> AnsiDoc
-name n = if needsQuotation n then enclose (symbol "#{") (symbol "}") (pretty n) else pretty n
+name (Name n) = if needsQuotation (Name n) then enclose (symbol "#{") (symbol "}") (pretty n) else pretty n
 
 prettyCore :: Style -> Term Core Name -> AnsiDoc
 prettyCore style = unPrec . go . fmap name
