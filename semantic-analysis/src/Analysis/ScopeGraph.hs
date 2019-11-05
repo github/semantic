@@ -68,8 +68,7 @@ scopeGraph eval
   . traverse (runFile eval)
 
 runFile
-  :: forall term m sig
-  .  ( Carrier sig m
+  :: ( Carrier sig m
      , Effect sig
      , Member Fresh sig
      , Member (State (Heap Name (ScopeGraph Name))) sig
@@ -93,8 +92,7 @@ runFile eval file = traverse run file
             . convergeTerm (Proxy @Name) (A.runHeap @Name @(ScopeGraph Name) . fix (cacheTerm . eval scopeGraphAnalysis))
 
 scopeGraphAnalysis
-  :: forall term m sig
-  .  ( Alternative m
+  :: ( Alternative m
      , Carrier sig m
      , Member (Env Name Name) sig
      , Member (A.Heap Name (ScopeGraph Name)) sig
