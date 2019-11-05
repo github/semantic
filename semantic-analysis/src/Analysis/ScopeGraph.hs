@@ -85,7 +85,6 @@ runFile eval file = traverse run file
   where run = runReader (filePath file)
             . runReader (fileSpan file)
             . runEnv
-            . runReader (Map.empty @Name @Ref)
             . runFail
             . fmap fold
             . convergeTerm (A.runHeap @Name @(ScopeGraph Name) . fix (cacheTerm . eval scopeGraphAnalysis))
