@@ -32,7 +32,7 @@ import qualified System.Path as Path
 
 eval :: forall address value m sig
      .  ( Carrier sig m
-        , Member (Env Name address) sig
+        , Member (Env address) sig
         , Member (Heap address value) sig
         , Member (Reader Span) sig
         , MonadFail m
@@ -45,7 +45,7 @@ eval Analysis{..} eval = \case
   Var n -> lookupEnv' n >>= deref' n
   Alg (R c) -> case c of
     Rec (Named (Ignored n) b) -> do
-      addr <- A.alloc @Name @address n
+      addr <- A.alloc @address n
       v <- A.bind n addr (eval (instantiate1 (pure n) b))
       v <$ A.assign addr v
     -- NB: Combining the results of the evaluations allows us to model effects in abstract domains. This in turn means that we can define an abstract domain modelling the types-and-effects of computations by means of a 'Semigroup' instance which takes the type of its second operand and the union of both operands’ effects.
@@ -54,7 +54,7 @@ eval Analysis{..} eval = \case
     a :>> b -> (<>) <$> eval a <*> eval b
     Named (Ignored n) a :>>= b -> do
       a' <- eval a
-      addr <- A.alloc @Name @address n
+      addr <- A.alloc @address n
       A.assign addr a'
       A.bind n addr ((a' <>) <$> eval (instantiate1 (pure n) b))
     Lam (Named (Ignored n) b) -> abstract eval n (instantiate1 (pure n) b)

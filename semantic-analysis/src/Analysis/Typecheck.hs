@@ -138,7 +138,7 @@ runFile eval file = traverse run file
           . runState @Substitution mempty
           . runReader (filePath file)
           . runReader (fileSpan file)
-          . runEnv @Name
+          . runEnv
           . runFail
           . (\ m -> do
             (cs, t) <- m
@@ -153,7 +153,7 @@ runFile eval file = traverse run file
 typecheckingAnalysis
   :: ( Alternative m
      , Carrier sig m
-     , Member (Env Name Name) sig
+     , Member (Env Name) sig
      , Member Fresh sig
      , Member (A.Heap Name Type) sig
      , Member (State (Set.Set Constraint)) sig
@@ -162,7 +162,7 @@ typecheckingAnalysis
 typecheckingAnalysis = Analysis{..}
   where abstract eval name body = do
           -- FIXME: construct the associated scope
-          addr <- alloc @Name @Name name
+          addr <- alloc @Name name
           arg <- meta
           A.assign addr arg
           ty <- eval body
@@ -180,7 +180,7 @@ typecheckingAnalysis = Analysis{..}
         asString s = unify (Alg String) s $> mempty
         record fields = do
           fields' <- for fields $ \ (k, v) -> do
-            addr <- alloc @Name @Name k
+            addr <- alloc @Name k
             (k, v) <$ A.assign addr v
           -- FIXME: should records reference types by address instead?
           pure (Alg (Record (Map.fromList fields')))

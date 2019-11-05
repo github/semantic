@@ -85,7 +85,7 @@ runFile
 runFile eval file = traverse run file
   where run = runReader (filePath file)
             . runReader (fileSpan file)
-            . runEnv @Name
+            . runEnv
             . runFail
             . fmap fold
             . convergeTerm (A.runHeap @Name @(Value (term Name)) . fix (cacheTerm . eval importGraphAnalysis))
@@ -95,7 +95,7 @@ importGraphAnalysis
   :: forall term m sig
   .  ( Alternative m
      , Carrier sig m
-     , Member (Env Name Name) sig
+     , Member (Env Name) sig
      , Member (A.Heap Name (Value (term Name))) sig
      , Member (Reader Path.AbsRelFile) sig
      , Member (Reader Span) sig
@@ -109,7 +109,7 @@ importGraphAnalysis = Analysis{..}
           span <- ask
           pure (Value (Closure path span name body) mempty)
         apply eval (Value (Closure path span name body) _) a = local (const path) . local (const span) $ do
-          addr <- alloc @Name @Name name
+          addr <- alloc @Name name
           A.assign addr a
           bind name addr (eval body)
         apply _ f _ = fail $ "Cannot coerce " <> show f <> " to function"
@@ -121,7 +121,7 @@ importGraphAnalysis = Analysis{..}
         asString _ = pure mempty
         record fields = do
           for_ fields $ \ (k, v) -> do
-            addr <- alloc @Name @Name k
+            addr <- alloc @Name k
             A.assign addr v
           pure (Value Abstract (foldMap (valueGraph . snd) fields))
         _ ... m = pure (Just m)

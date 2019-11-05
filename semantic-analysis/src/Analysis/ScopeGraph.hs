@@ -84,7 +84,7 @@ runFile
 runFile eval file = traverse run file
   where run = runReader (filePath file)
             . runReader (fileSpan file)
-            . runEnv @Name
+            . runEnv
             . runReader (Map.empty @Name @Ref)
             . runFail
             . fmap fold
@@ -93,7 +93,7 @@ runFile eval file = traverse run file
 scopeGraphAnalysis
   :: ( Alternative m
      , Carrier sig m
-     , Member (Env Name Name) sig
+     , Member (Env Name) sig
      , Member (A.Heap Name (ScopeGraph Name)) sig
      , Member (Reader Path.AbsRelFile) sig
      , Member (Reader Span) sig
@@ -101,7 +101,7 @@ scopeGraphAnalysis
   => Analysis term Name (ScopeGraph Name) m
 scopeGraphAnalysis = Analysis{..}
   where abstract eval name body = do
-          addr <- alloc @Name @Name name
+          addr <- alloc @Name name
           A.assign @Name @(ScopeGraph Name) name mempty
           bind name addr (eval body)
         apply _ f a = pure (f <> a)

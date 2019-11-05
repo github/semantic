@@ -96,14 +96,14 @@ runFile eval file = traverse run file
             . runReader (fileSpan file)
             . runFail
             . runReader @Env mempty
-            . A.runEnv @Name
+            . A.runEnv
             . fix (eval concreteAnalysis)
 
 concreteAnalysis
   :: forall term m sig
   .  ( Carrier sig m
      , Foldable term
-     , Member (A.Env Name Precise) sig
+     , Member (A.Env Precise) sig
      , Member (A.Heap Precise (Concrete (term Name))) sig
      , Member (Reader Env) sig
      , Member (Reader Path.AbsRelFile) sig
