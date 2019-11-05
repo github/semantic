@@ -27,7 +27,7 @@ newtype FrameId name = FrameId { unFrameId :: name }
   deriving (Eq, Ord, Show)
 
 
-convergeTerm :: forall m sig value term address proxy
+convergeTerm :: forall term value address proxy m sig
              .  ( Carrier sig m
                 , Effect sig
                 , Eq address
@@ -47,7 +47,7 @@ convergeTerm _ eval body = do
     get
   pure (fromMaybe mempty (Map.lookup body (unCache cache)))
 
-cacheTerm :: forall m sig value term
+cacheTerm :: forall term value m sig
           .  ( Alternative m
              , Carrier sig m
              , Member (Reader (Cache term value)) sig
