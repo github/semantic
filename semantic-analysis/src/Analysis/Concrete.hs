@@ -183,10 +183,10 @@ heapValueGraph :: Heap (term Name) -> G.Graph (Concrete (term Name))
 heapValueGraph h = heapGraph (const id) (const fromAddr) h
   where fromAddr addr = maybe G.empty G.vertex (IntMap.lookup addr h)
 
-heapAddressGraph :: Heap (term Name) -> G.Graph (EdgeType (term Name) Name, Precise)
+heapAddressGraph :: Heap (term Name) -> G.Graph (EdgeType (term Name), Precise)
 heapAddressGraph = heapGraph (\ addr v -> (Value v, addr)) (fmap G.vertex . (,) . either Edge Slot)
 
-addressStyle :: Heap (term Name) -> G.Style (EdgeType (term Name) Name, Precise) Text
+addressStyle :: Heap (term Name) -> G.Style (EdgeType (term Name), Precise) Text
 addressStyle heap = (G.defaultStyle vertex) { G.edgeAttributes }
   where vertex (_, addr) = pack (show addr) <> " = " <> maybe "?" fromConcrete (IntMap.lookup addr heap)
         edgeAttributes _ (Slot name,    _) = ["label" G.:= unName name]
@@ -201,9 +201,9 @@ addressStyle heap = (G.defaultStyle vertex) { G.edgeAttributes }
           Record _ -> "{}"
         showPos (Pos l c) = pack (show l) <> ":" <> pack (show c)
 
-data EdgeType term name
+data EdgeType term
   = Edge Edge
-  | Slot name
+  | Slot Name
   | Value (Concrete term)
   deriving (Eq, Ord, Show)
 
