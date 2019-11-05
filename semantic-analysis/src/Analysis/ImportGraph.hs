@@ -28,20 +28,20 @@ import qualified System.Path as Path
 
 type ImportGraph = Map.Map Text (Set.Set Text)
 
-data Value term name = Value
-  { valueSemi  :: Semi term name
+data Value term = Value
+  { valueSemi  :: Semi term
   , valueGraph :: ImportGraph
   }
   deriving (Eq, Ord, Show)
 
-instance Semigroup (Value term name) where
+instance Semigroup (Value term) where
   Value _ g1 <> Value _ g2 = Value Abstract (Map.unionWith (<>) g1 g2)
 
-instance Monoid (Value term name) where
+instance Monoid (Value term) where
   mempty = Value Abstract mempty
 
-data Semi term name
-  = Closure Path.AbsRelFile Span name (term name)
+data Semi term
+  = Closure Path.AbsRelFile Span Name term
   -- FIXME: Bound String values.
   | String Text
   | Abstract
@@ -52,13 +52,13 @@ importGraph
   :: (Ord (term Name), Show (term Name))
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term Name Name (Value term Name) m
-     -> (term Name -> m (Value term Name))
-     -> (term Name -> m (Value term Name))
+     => Analysis term Name Name (Value (term Name)) m
+     -> (term Name -> m (Value (term Name)))
+     -> (term Name -> m (Value (term Name)))
      )
   -> [File (term Name)]
-  -> ( Heap Name (Value term Name)
-     , [File (Either (Path.AbsRelFile, Span, String) (Value term Name))]
+  -> ( Heap Name (Value (term Name))
+     , [File (Either (Path.AbsRelFile, Span, String) (Value (term Name)))]
      )
 importGraph eval
   = run
@@ -71,25 +71,25 @@ runFile
   .  ( Carrier sig m
      , Effect sig
      , Member Fresh sig
-     , Member (State (Heap Name (Value term Name))) sig
+     , Member (State (Heap Name (Value (term Name)))) sig
      , Ord  (term Name)
      , Show (term Name)
      )
   => (forall sig m
      .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
-     => Analysis term Name Name (Value term Name) m
-     -> (term Name -> m (Value term Name))
-     -> (term Name -> m (Value term Name))
+     => Analysis term Name Name (Value (term Name)) m
+     -> (term Name -> m (Value (term Name)))
+     -> (term Name -> m (Value (term Name)))
      )
   -> File (term Name)
-  -> m (File (Either (Path.AbsRelFile, Span, String) (Value term Name)))
+  -> m (File (Either (Path.AbsRelFile, Span, String) (Value (term Name))))
 runFile eval file = traverse run file
   where run = runReader (filePath file)
             . runReader (fileSpan file)
             . runEnv @Name
             . runFail
             . fmap fold
-            . convergeTerm (Proxy @Name) (A.runHeap @Name @(Value term Name) . fix (cacheTerm . eval importGraphAnalysis))
+            . convergeTerm (Proxy @Name) (A.runHeap @Name @(Value (term Name)) . fix (cacheTerm . eval importGraphAnalysis))
 
 -- FIXME: decompose into a product domain and two atomic domains
 importGraphAnalysis
@@ -97,13 +97,13 @@ importGraphAnalysis
   .  ( Alternative m
      , Carrier sig m
      , Member (Env Name Name) sig
-     , Member (A.Heap Name (Value term Name)) sig
+     , Member (A.Heap Name (Value (term Name))) sig
      , Member (Reader Path.AbsRelFile) sig
      , Member (Reader Span) sig
      , MonadFail m
      , Show (term Name)
      )
-  => Analysis term Name Name (Value term Name) m
+  => Analysis term Name Name (Value (term Name)) m
 importGraphAnalysis = Analysis{..}
   where abstract _ name body = do
           path <- ask
