@@ -38,15 +38,15 @@ record fs = send (Record fs)
 lam :: (Eq a, Carrier sig m, Member Intro sig) => Maybe Name -> a -> m a -> m a
 lam u n b = send (Lam u (abstract1 n b))
 
-lamFin :: (Carrier sig m, Member Intro sig) => Maybe Name -> m (Fin ('S n)) -> m (Fin n)
-lamFin u b = send (Lam u (abstractVar (maybe (B ()) F . Fin.strengthen) b))
-
 lams :: (Eq a, Foldable t, Carrier sig m, Member Intro sig) => t (Maybe Name, a) -> m a -> m a
 lams names body = foldr (uncurry lam) body names
 
 unlam :: (Alternative m, Member Intro sig, RightModule sig) => a -> Term sig a -> m (Maybe Name, a, Term sig a)
 unlam n (Alg sig) | Just (Lam n' b) <- prj sig = pure (n', n, instantiate1 (pure n) b)
 unlam _ _                                      = empty
+
+lamFin :: (Carrier sig m, Member Intro sig) => Maybe Name -> m (Fin ('S n)) -> m (Fin n)
+lamFin u b = send (Lam u (abstractVar (maybe (B ()) F . Fin.strengthen) b))
 
 
 data Intro f a
