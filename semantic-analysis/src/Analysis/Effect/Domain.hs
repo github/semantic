@@ -14,3 +14,5 @@ data Domain term value m k
   = Abstract term (value -> m k)
   | Concretize value (term -> m k)
   deriving (Functor, Generic1)
+
+instance HFunctor (Domain term value)
