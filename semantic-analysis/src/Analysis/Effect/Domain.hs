@@ -11,8 +11,8 @@ import Control.Effect.Carrier
 import GHC.Generics (Generic1)
 
 data Domain term value m k
-  = Abstract term (value -> m k)
-  | Concretize value (term -> m k)
+  = Abstract   term  (value -> m k)
+  | Concretize value (term  -> m k)
   deriving (Functor, Generic1)
 
 instance HFunctor (Domain term value)
