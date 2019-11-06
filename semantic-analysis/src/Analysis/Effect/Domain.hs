@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE DeriveFunctor, DeriveGeneric #-}
 module Analysis.Effect.Domain
 ( -- * Domain effect
   Domain(..)
@@ -8,8 +8,9 @@ module Analysis.Effect.Domain
 ) where
 
 import Control.Effect.Carrier
+import GHC.Generics (Generic1)
 
 data Domain term value m k
   = Abstract term (value -> m k)
   | Concretize value (term -> m k)
-  deriving (Functor)
+  deriving (Functor, Generic1)
