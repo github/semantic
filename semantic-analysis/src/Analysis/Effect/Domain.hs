@@ -16,3 +16,4 @@ data Domain term value m k
   deriving (Functor, Generic1)
 
 instance HFunctor (Domain term value)
+instance Effect   (Domain term value)
