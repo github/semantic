@@ -12,17 +12,17 @@ module Analysis.Effect.Domain
 import Control.Effect.Carrier
 import GHC.Generics (Generic1)
 
-abstract :: (Member (Domain term value) sig, Carrier sig m) => term -> m value
-abstract term = send (Abstract term pure)
+abstract :: (Member (Domain concrete abstract) sig, Carrier sig m) => concrete -> m abstract
+abstract concrete = send (Abstract concrete pure)
 
-concretize :: (Member (Domain term value) sig, Carrier sig m) => value -> m term
-concretize value = send (Concretize value pure)
+concretize :: (Member (Domain concrete abstract) sig, Carrier sig m) => abstract -> m concrete
+concretize abstract = send (Concretize abstract pure)
 
 
-data Domain term value m k
-  = Abstract   term  (value -> m k)
-  | Concretize value (term  -> m k)
+data Domain concrete abstract m k
+  = Abstract   concrete (abstract -> m k)
+  | Concretize abstract (concrete -> m k)
   deriving (Functor, Generic1)
 
-instance HFunctor (Domain term value)
-instance Effect   (Domain term value)
+instance HFunctor (Domain concrete abstract)
+instance Effect   (Domain concrete abstract)
