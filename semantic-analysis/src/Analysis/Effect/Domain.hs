@@ -1,2 +1,7 @@
 module Analysis.Effect.Domain
-() where
+( -- * Re-exports
+  Carrier
+, run
+) where
+
+import Control.Effect.Carrier
