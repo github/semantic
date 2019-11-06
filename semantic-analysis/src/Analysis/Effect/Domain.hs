@@ -2,6 +2,7 @@
 module Analysis.Effect.Domain
 ( -- * Domain effect
   abstract
+, concretize
 , Domain(..)
   -- * Re-exports
 , Carrier
@@ -13,6 +14,9 @@ import GHC.Generics (Generic1)
 
 abstract :: (Member (Domain term value) sig, Carrier sig m) => term -> m value
 abstract term = send (Abstract term pure)
+
+concretize :: (Member (Domain term value) sig, Carrier sig m) => value -> m term
+concretize value = send (Concretize value pure)
 
 
 data Domain term value m k
