@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, TypeOperators #-}
+{-# LANGUAGE DeriveFunctor, FlexibleContexts, GeneralizedNewtypeDeriving, TypeApplications, TypeOperators #-}
 module Analysis.Abstract.Caching.FlowInsensitive
 ( cachingTerms
 , convergingModules

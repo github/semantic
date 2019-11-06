@@ -1,5 +1,4 @@
-{-# LANGUAGE KindSignatures #-}
-
+{-# LANGUAGE FlexibleContexts, KindSignatures, RecordWildCards #-}
 module Data.Abstract.BaseError (
   BaseError(..)
 , throwBaseError

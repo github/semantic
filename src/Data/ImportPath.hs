@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveAnyClass, DeriveGeneric #-}
 module Data.ImportPath (IsRelative(..), ImportPath(..), importPath, toName, defaultAlias) where
 
 import Prologue

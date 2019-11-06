@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Tags.Spec (spec) where
 
 import Control.Effect.Reader

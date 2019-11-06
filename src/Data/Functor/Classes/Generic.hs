@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeOperators, RankNTypes, UndecidableInstances #-}
+{-# LANGUAGE FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, TypeOperators, RankNTypes, UndecidableInstances #-}
 module Data.Functor.Classes.Generic
 ( Eq1(..)
 , genericLiftEq

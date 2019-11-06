@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleContexts, MultiParamTypeClasses #-}
 module Control.Abstract.Roots
 ( ValueRoots(..)
 , Live

@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, ExistentialQuantification, GADTs, RankNTypes #-}
+{-# LANGUAGE ConstraintKinds, DeriveFunctor, ExistentialQuantification, FlexibleContexts, GADTs, RankNTypes, StandaloneDeriving #-}
 module Control.Effect.Parse
 ( -- * Parse effect
   Parse(..)

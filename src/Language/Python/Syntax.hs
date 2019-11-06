@@ -1,6 +1,5 @@
-{-# LANGUAGE DeriveAnyClass, DerivingVia #-}
-{-# OPTIONS_GHC -Wno-missing-export-lists #-}
-module Language.Python.Syntax where
+{-# LANGUAGE DeriveAnyClass, DeriveGeneric, DeriveTraversable, FlexibleContexts, RecordWildCards, TypeApplications #-}
+module Language.Python.Syntax (module Language.Python.Syntax) where
 
 import Prologue
 
@@ -24,8 +23,8 @@ import           Diffing.Algorithm
 import           Source.Span
 
 data QualifiedName
-  = QualifiedName { paths :: NonEmpty FilePath }
-  | RelativeQualifiedName { path :: FilePath, maybeQualifiedName ::  Maybe QualifiedName }
+  = QualifiedName (NonEmpty FilePath)
+  | RelativeQualifiedName FilePath (Maybe QualifiedName)
   deriving (Eq, Generic, Hashable, Ord, Show, ToJSON)
 
 qualifiedName :: NonEmpty Text -> QualifiedName

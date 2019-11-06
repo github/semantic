@@ -1,4 +1,4 @@
-{-# LANGUAGE FunctionalDependencies, MonoLocalBinds #-}
+{-# LANGUAGE FlexibleContexts, FlexibleInstances, FunctionalDependencies, MonoLocalBinds, OverloadedStrings #-}
 module Rendering.Graph
 ( renderTreeGraph
 , termStyle

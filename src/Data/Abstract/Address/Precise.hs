@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE FlexibleInstances, MultiParamTypeClasses, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Address.Precise
 ( Precise(..)
 ) where

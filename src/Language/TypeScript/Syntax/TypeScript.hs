@@ -1,6 +1,5 @@
-{-# LANGUAGE DeriveAnyClass, DerivingVia, DuplicateRecordFields, TupleSections #-}
-{-# OPTIONS_GHC -Wno-missing-export-lists #-}
-module Language.TypeScript.Syntax.TypeScript where
+{-# LANGUAGE DeriveAnyClass, DeriveGeneric, DeriveTraversable, DuplicateRecordFields, FlexibleContexts, RecordWildCards, TupleSections, TypeApplications #-}
+module Language.TypeScript.Syntax.TypeScript (module Language.TypeScript.Syntax.TypeScript) where
 
 import Prologue
 

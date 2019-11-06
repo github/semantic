@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, OverloadedLists #-}
+{-# LANGUAGE OverloadedLists, OverloadedStrings #-}
 module Assigning.Assignment.Spec (spec) where
 
 import Assigning.Assignment

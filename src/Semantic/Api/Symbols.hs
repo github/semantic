@@ -1,4 +1,4 @@
-{-# LANGUAGE AllowAmbiguousTypes, ScopedTypeVariables, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes, DataKinds, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, OverloadedStrings, RecordWildCards, ScopedTypeVariables, TypeApplications, TypeFamilies, UndecidableInstances #-}
 module Semantic.Api.Symbols
   ( legacyParseSymbols
   , parseSymbols

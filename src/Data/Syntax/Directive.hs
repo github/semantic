@@ -1,6 +1,5 @@
-{-# LANGUAGE DeriveAnyClass, DerivingVia, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances #-}
-{-# OPTIONS_GHC -Wno-missing-export-lists #-}
-module Data.Syntax.Directive where
+{-# LANGUAGE DeriveAnyClass, DeriveGeneric, DeriveTraversable, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances #-}
+module Data.Syntax.Directive (module Data.Syntax.Directive) where
 
 import Prologue
 

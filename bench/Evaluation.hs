@@ -2,31 +2,22 @@
 
 module Evaluation (benchmarks) where
 
-import           Algebra.Graph
-import           Control.Monad
 import           Control.Carrier.Parse.Simple
 import qualified Data.Duration as Duration
 import           Data.Abstract.Evaluatable
-import           Data.Abstract.FreeVariables
 import           Data.Blob
 import           Data.Blob.IO (readBlobFromFile')
 import           Data.Bifunctor
-import           Data.Functor.Classes
-import           Data.Functor.Foldable (Base, Recursive)
-import           "semantic" Data.Graph (Graph (..), topologicalSort)
-import           Data.Graph.ControlFlowVertex
+import           "semantic" Data.Graph (topologicalSort)
 import qualified Data.Language as Language
 import           Data.Project
 import           Data.Proxy
-import           Data.Term
 import           Gauge.Main
 import           Parsing.Parser
 import           Semantic.Config (defaultOptions)
 import           Semantic.Graph
-import           Semantic.Task (SomeException, TaskSession (..), runTask, withOptions)
+import           Semantic.Task (TaskSession (..), runTask, withOptions)
 import           Semantic.Util
-import           Source.Loc
-import           Source.Span (HasSpan)
 import qualified System.Path as Path
 import           System.Path ((</>))
 
@@ -40,20 +31,22 @@ callGraphProject' :: ( Language.SLanguage lang
                   -> Path.RelFile
                   -> IO (Either String ())
 callGraphProject' session proxy path
-  | let lang = Language.reflect proxy
-  , Just (SomeParser parser) <- parserForLanguage analysisParsers lang = fmap (bimap show (const ())) . runTask session $ do
+  | Just (SomeParser parser) <- parserForLanguage analysisParsers lang = fmap (bimap show (const ())) . runTask session $ do
   blob <- readBlobFromFile' (fileForTypedPath path)
   package <- fmap snd <$> runParse (Duration.fromSeconds 10) (parsePackage parser (Project (Path.toString (Path.takeDirectory path)) [blob] lang []))
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   runCallGraph proxy False modules package
+  | otherwise = error $ "Analysis not supported for: " <> show lang
+  where lang = Language.reflect proxy
 
 callGraphProject proxy paths = withOptions defaultOptions $ \ config logger statter ->
   callGraphProject' (TaskSession config "" False logger statter) proxy paths
 
 evaluateProject proxy path
-  | let lang = Language.reflect proxy
-  , Just (SomeParser parser) <- parserForLanguage analysisParsers lang = withOptions defaultOptions $ \ config logger statter ->
+  | Just (SomeParser parser) <- parserForLanguage analysisParsers lang = withOptions defaultOptions $ \ config logger statter ->
   fmap (const ()) . justEvaluating =<< evaluateProject' (TaskSession config "" False logger statter) proxy parser [Path.toString path]
+  | otherwise = error $ "Analysis not supported for: " <> show lang
+  where lang = Language.reflect proxy
 
 pyEval :: Path.RelFile -> Benchmarkable
 pyEval p = nfIO $ evaluateProject  (Proxy @'Language.Python) (Path.relDir "bench/bench-fixtures/python" </> p)

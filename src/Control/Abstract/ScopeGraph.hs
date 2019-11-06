@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DerivingStrategies, GADTs, GeneralizedNewtypeDeriving, KindSignatures, RankNTypes, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DeriveFunctor, DeriveGeneric, FlexibleContexts, GADTs, GeneralizedNewtypeDeriving, KindSignatures, RankNTypes, RecordWildCards, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeOperators, UndecidableInstances #-}
 module Control.Abstract.ScopeGraph
   ( lookup
   , declare
@@ -367,15 +367,17 @@ alloc = send . flip Alloc pure
 
 data Allocator address (m :: * -> *) k
   = Alloc Name (address -> m k)
-  deriving stock (Functor, Generic1)
-  deriving anyclass (HFunctor, Effect)
+  deriving (Functor, Generic1)
+
+instance HFunctor (Allocator address)
+instance Effect   (Allocator address)
 
 runAllocator :: Evaluator term address value (AllocatorC address m) a
              -> Evaluator term address value m a
 runAllocator = raiseHandler runAllocatorC
 
 newtype AllocatorC address m a = AllocatorC { runAllocatorC :: m a }
-  deriving newtype (Alternative, Applicative, Functor, Monad)
+  deriving (Alternative, Applicative, Functor, Monad)
 
 runScopeErrorWith :: (forall resume . BaseError (ScopeError address) resume -> Evaluator term address value m resume)
                   -> Evaluator term address value (ResumableWithC (BaseError (ScopeError address)) m) a

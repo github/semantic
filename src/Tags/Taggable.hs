@@ -12,7 +12,7 @@ identify a new syntax as Taggable, you need to:
 constructor name of this syntax.
 
 -}
-{-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, ScopedTypeVariables, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, DataKinds, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, RecordWildCards, ScopedTypeVariables, TypeApplications, TypeFamilies, UndecidableInstances #-}
 module Tags.Taggable
 ( Tagger
 , Token(..)
@@ -47,9 +47,9 @@ import qualified Language.TypeScript.Syntax as TypeScript
 
  -- TODO: Move to src/Data
 data Token
-  = Enter { tokenName :: Text, tokenSnippetRange :: Range }
-  | Exit  { tokenName :: Text, tokenSnippetRange :: Range}
-  | Iden  { identifierName :: Text, tokenLoc :: Loc, docsLiteralRange :: Maybe Range }
+  = Enter Text Range
+  | Exit  Text Range
+  | Iden  Text Loc (Maybe Range)
   deriving (Eq, Show)
 
 type Tagger = Stream (Of Token)

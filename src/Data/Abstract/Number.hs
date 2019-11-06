@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, StandaloneDeriving, Rank2Types #-}
+{-# LANGUAGE GADTs, StandaloneDeriving, RankNTypes, TypeApplications #-}
 
 module Data.Abstract.Number
     ( Number (..)

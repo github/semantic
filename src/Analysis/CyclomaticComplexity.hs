@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, DefaultSignatures, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, DefaultSignatures, FlexibleInstances, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, TypeApplications, TypeFamilies, UndecidableInstances #-}
 module Analysis.CyclomaticComplexity
 ( CyclomaticComplexity(..)
 , HasCyclomaticComplexity
@@ -103,8 +103,8 @@ type family CyclomaticComplexityStrategy syntax where
   CyclomaticComplexityStrategy Statement.If = 'Custom
   CyclomaticComplexityStrategy Statement.Pattern = 'Custom
   CyclomaticComplexityStrategy Statement.While = 'Custom
-  CyclomaticComplexityStrategy (Sum fs) = 'Custom
-  CyclomaticComplexityStrategy a = 'Default
+  CyclomaticComplexityStrategy (Sum _) = 'Custom
+  CyclomaticComplexityStrategy _ = 'Default
 
 
 -- | The 'Default' strategy takes the sum without incrementing.

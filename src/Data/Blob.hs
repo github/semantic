@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, ExplicitNamespaces, PatternSynonyms #-}
+{-# LANGUAGE DeriveAnyClass, DeriveGeneric, ExplicitNamespaces, FlexibleContexts, FlexibleInstances, OverloadedStrings, RecordWildCards #-}
 module Data.Blob
 ( File(..)
 , fileForPath
@@ -41,7 +41,7 @@ import qualified System.Path.PartClass as Path.PartClass
 data File = File
   { filePath     :: FilePath
   , fileLanguage :: Language
-  } deriving (Show, Eq, Generic)
+  } deriving (Show, Eq)
 
 -- | Prefer 'fileForTypedPath' if at all possible.
 fileForPath :: FilePath  -> File
@@ -55,7 +55,7 @@ data Blob = Blob
   { blobSource   :: Source -- ^ The UTF-8 encoded source text of the blob.
   , blobFile     :: File   -- ^ Path/language information for this blob.
   , blobOid      :: Text   -- ^ Git OID for this blob, mempty if blob is not from a git db.
-  } deriving (Show, Eq, Generic)
+  } deriving (Show, Eq)
 
 blobLanguage :: Blob -> Language
 blobLanguage = fileLanguage . blobFile
@@ -92,7 +92,7 @@ decodeBlobs = fmap blobs <$> eitherDecode
 
 -- | An exception indicating that we’ve tried to diff or parse a blob of unknown language.
 newtype NoLanguageForBlob = NoLanguageForBlob FilePath
-  deriving (Eq, Exception, Ord, Show, Typeable)
+  deriving (Eq, Exception, Ord, Show)
 
 noLanguageForBlob :: (Member (Error SomeException) sig, Carrier sig m) => FilePath -> m a
 noLanguageForBlob blobPath = throwError (SomeException (NoLanguageForBlob blobPath))

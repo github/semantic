@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE FlexibleContexts, GeneralizedNewtypeDeriving, OverloadedStrings, ScopedTypeVariables, TypeFamilies, UndecidableInstances #-}
 module Data.Graph
 ( Graph(..)
 , overlay

@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DefaultSignatures, DerivingStrategies, GeneralizedNewtypeDeriving, KindSignatures, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DefaultSignatures, DeriveFunctor, DeriveGeneric, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, KindSignatures, MultiParamTypeClasses, TypeApplications, TypeOperators, UndecidableInstances #-}
 module Diffing.Algorithm
   ( Diff (..)
   , Algorithm(..)
@@ -37,12 +37,13 @@ data Diff term1 term2 diff (m :: * -> *) k
   | Insert term2 (diff -> m k)
   -- | Replace one term with another.
   | Replace term1 term2 (diff -> m k)
-  deriving stock (Functor, Generic1)
-  deriving anyclass (HFunctor, Effect)
+  deriving (Functor, Generic1)
 
+instance HFunctor (Diff term1 term2 diff)
+instance Effect   (Diff term1 term2 diff)
 
 newtype Algorithm term1 term2 diff m a = Algorithm { runAlgorithm :: m a }
-  deriving newtype (Applicative, Alternative, Functor, Monad)
+  deriving (Applicative, Alternative, Functor, Monad)
 
 instance Carrier sig m => Carrier sig (Algorithm term1 term2 diff m) where
   eff = Algorithm . eff . handleCoercible

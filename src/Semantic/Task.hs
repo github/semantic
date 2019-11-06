@@ -1,5 +1,4 @@
-{-# LANGUAGE ConstraintKinds, ExistentialQuantification, GADTs, GeneralizedNewtypeDeriving, KindSignatures,
-             ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE FlexibleContexts, FlexibleInstances, GADTs, GeneralizedNewtypeDeriving, KindSignatures, MultiParamTypeClasses, RecordWildCards, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Semantic.Task
 ( TaskC
 , Level(..)

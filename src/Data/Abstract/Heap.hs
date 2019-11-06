@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE FlexibleInstances, GeneralizedNewtypeDeriving, RecordWildCards #-}
 module Data.Abstract.Heap
   ( Heap(..)
   , Frame(..)
@@ -52,11 +52,11 @@ data Frame scopeAddress frameAddress value = Frame
   , slots        :: IntMap (Set value)
   -- ^ An IntMap of values that are declared in the frame.
   }
-  deriving (Eq, Ord, Show, Generic)
+  deriving (Eq, Ord, Show)
 
 -- | A Heap is a Map from frame addresses to frames.
 newtype Heap scopeAddress frameAddress value = Heap { unHeap :: Map frameAddress (Frame scopeAddress frameAddress value) }
-  deriving (Eq, Generic, Lower, Ord)
+  deriving (Eq, Lower, Ord)
 
 
 -- | Look up the frame for an 'address' in a 'Heap', if any.

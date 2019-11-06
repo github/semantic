@@ -1,3 +1,4 @@
+{-# LANGUAGE DataKinds, FlexibleContexts #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module SpecHelpers

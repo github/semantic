@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DerivingStrategies, GADTs, GeneralizedNewtypeDeriving, KindSignatures, RankNTypes, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DeriveFunctor, DeriveGeneric, FlexibleContexts, GADTs, GeneralizedNewtypeDeriving, KindSignatures, RankNTypes, RecordWildCards, ScopedTypeVariables, StandaloneDeriving, TypeOperators, UndecidableInstances #-}
 module Control.Abstract.Heap
 ( Heap
 , HeapError(..)
@@ -420,15 +420,17 @@ reachable roots heap = go mempty roots
 data Deref value (m :: * -> *) k
   = DerefCell        (Set value) (Maybe value -> m k)
   | AssignCell value (Set value) (Set value   -> m k)
-  deriving stock (Functor, Generic1)
-  deriving anyclass (HFunctor, Effect)
+  deriving (Functor, Generic1)
+
+instance HFunctor (Deref value)
+instance Effect   (Deref value)
 
 runDeref :: Evaluator term address value (DerefC address value m) a
          -> Evaluator term address value m a
 runDeref = raiseHandler runDerefC
 
 newtype DerefC address value m a = DerefC { runDerefC :: m a }
-  deriving newtype (Alternative, Applicative, Functor, Monad)
+  deriving (Alternative, Applicative, Functor, Monad)
 
 
 

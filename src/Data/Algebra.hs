@@ -1,4 +1,4 @@
-{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE DeriveGeneric, DeriveTraversable, RankNTypes #-}
 module Data.Algebra
   ( FAlgebra
   , RAlgebra

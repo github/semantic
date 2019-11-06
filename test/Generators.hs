@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Generators
   ( source
   , integerScientific

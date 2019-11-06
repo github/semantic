@@ -1,5 +1,5 @@
-{-# LANGUAGE PartialTypeSignatures, TypeOperators #-}
-{-# OPTIONS_GHC -Wno-missing-signatures -Wno-partial-type-signatures -O0 #-}
+{-# LANGUAGE DataKinds, FlexibleContexts, PartialTypeSignatures, TypeApplications, TypeOperators #-}
+{-# OPTIONS_GHC -Wno-missing-signatures -Wno-missing-exported-signatures -Wno-partial-type-signatures -O0 #-}
 module Semantic.Util
   ( evaluateProject'
   , justEvaluating
