@@ -9,13 +9,13 @@ import Data.Text (Text)
 --
 -- This is intended to be replaced with a selection of algebraic effects providing these interfaces and carriers providing reusable implementations.
 data Analysis term address value m = Analysis
-  { abstract  :: (term Name -> m value) -> Name -> term Name -> m value
-  , apply     :: (term Name -> m value) -> value -> value -> m value
-  , unit      :: m value
-  , bool      :: Bool -> m value
-  , asBool    :: value -> m Bool
-  , string    :: Text -> m value
-  , asString  :: value -> m Text
-  , record    :: [(Name, value)] -> m value
-  , (...)     :: address -> Name -> m (Maybe address)
+  { abstract :: (term Name -> m value) -> Name -> term Name -> m value
+  , apply    :: (term Name -> m value) -> value -> value -> m value
+  , unit     :: m value
+  , bool     :: Bool -> m value
+  , asBool   :: value -> m Bool
+  , string   :: Text -> m value
+  , asString :: value -> m Text
+  , record   :: [(Name, value)] -> m value
+  , (...)    :: address -> Name -> m (Maybe address)
   }
