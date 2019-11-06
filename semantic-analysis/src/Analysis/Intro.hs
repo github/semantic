@@ -9,6 +9,7 @@ module Analysis.Intro
 , lams
 , unlam
 , unlamFin
+, lam'
 , Intro(..)
 , Name(..)
 ) where
@@ -52,6 +53,9 @@ lamFin u b = send (Lam u (abstractVar (maybe (B ()) F . Fin.strengthen) b))
 unlamFin :: (Alternative m, Member Intro sig, RightModule sig) => Term sig (Fin n) -> m (Maybe Name, Term sig (Fin ('S n)))
 unlamFin (Alg sig) | Just (Lam n b) <- prj sig = pure (n, instantiateVar (unVar (const (pure FZ)) (pure . FS)) b)
 unlamFin _                                     = empty
+
+lam' :: (Carrier sig m, Member Intro sig) => Maybe Name -> m (Var () a) -> m a
+lam' u b = send (Lam u (toScope b))
 
 
 data Intro f a
