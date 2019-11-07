@@ -1,6 +1,5 @@
-{-# LANGUAGE DeriveAnyClass, DerivingVia, DuplicateRecordFields #-}
-{-# OPTIONS_GHC -Wno-missing-export-lists #-}
-module Language.PHP.Syntax where
+{-# LANGUAGE DeriveAnyClass, DeriveGeneric, DeriveTraversable, DuplicateRecordFields, FlexibleContexts #-}
+module Language.PHP.Syntax (module Language.PHP.Syntax) where
 
 import Prologue hiding (Text)
 

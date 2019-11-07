@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveGeneric #-}
 module Data.Functor.Classes.Generic.Spec (spec) where
 
 import Data.Functor.Classes.Generic

@@ -1,0 +1,31 @@
+-- Consider copying this to your ~/.ghc/ghci.conf file:
+
+-- Pretty-printing
+:set -ignore-package pretty-simple -package pretty-simple
+:def! pretty \ _ -> pure ":set -interactive-print Text.Pretty.Simple.pPrint"
+:def! no-pretty \ _ -> pure ":set -interactive-print System.IO.print"
+:def! r \_ -> pure ":reload\n:pretty"
+
+-- Turn on some language extensions you use a lot
+:seti -XFlexibleContexts -XOverloadedStrings -XTypeApplications
+
+-- Break on errors
+:seti -fbreak-on-error
+
+-- Automatically show the code around breakpoints
+:set stop :list
+
+-- Use a cyan lambda as the prompt
+:set prompt "\ESC[1;36m\STXλ \ESC[m\STX"
+
+-- Better errors
+:set -ferror-spans -freverse-errors -fprint-expanded-synonyms
+
+-- Path-local ghci history
+:set -flocal-ghci-history
+
+-- Better typed holes
+:set -funclutter-valid-hole-fits -fabstract-refinement-hole-fits -frefinement-level-hole-fits=2
+
+-- Enable pretty-printing immediately
+:pretty

@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DataKinds, OverloadedStrings, TypeApplications #-}
 module Diffing.Interpreter.Spec (spec, afterTerm, beforeTerm) where
 
 import Control.Applicative ((<|>))

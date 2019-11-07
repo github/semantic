@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, LambdaCase, MultiParamTypeClasses, ScopedTypeVariables, TypeApplications, TypeOperators, UndecidableInstances #-}
 module Control.Abstract.Evaluator
   ( Evaluator(..)
   , raiseHandler
@@ -76,10 +76,16 @@ runReturn = raiseHandler $ fmap (either unReturn id) . runError
 
 -- | Effects for control flow around loops (breaking and continuing).
 data LoopControl value
-  = Break    { unLoopControl :: value }
-  | Continue { unLoopControl :: value }
+  = Break    value
+  | Continue value
   | Abort
   deriving (Eq, Ord, Show)
+
+unLoopControl :: LoopControl value -> value
+unLoopControl = \case
+  Break    v -> v
+  Continue v -> v
+  Abort      -> error "unLoopControl: Abort"
 
 throwBreak :: (Member (Error (LoopControl value)) sig, Carrier sig m)
            => value

@@ -1,6 +1,5 @@
-{-# LANGUAGE DeriveAnyClass, DerivingVia, DuplicateRecordFields, ScopedTypeVariables #-}
-{-# OPTIONS_GHC -Wno-missing-export-lists #-}
-module Data.Syntax.Literal where
+{-# LANGUAGE DeriveAnyClass, DeriveGeneric, DeriveTraversable, DuplicateRecordFields, OverloadedStrings, RecordWildCards, ScopedTypeVariables, TypeApplications #-}
+module Data.Syntax.Literal (module Data.Syntax.Literal) where
 
 import Prelude hiding (Float, null)
 import Prologue hiding (Set, hash, null)
@@ -16,8 +15,7 @@ import           Text.Read (readMaybe)
 -- Boolean
 
 newtype Boolean a = Boolean { booleanContent :: Bool }
-  deriving stock (Foldable, Traversable, Functor, Generic1)
-  deriving anyclass (Hashable1, Diffable, FreeVariables1, Declarations1, ToJSONFields1)
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
 
 instance Eq1 Boolean where liftEq = genericLiftEq
 instance Ord1 Boolean where liftCompare = genericLiftCompare

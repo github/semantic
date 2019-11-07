@@ -1,6 +1,5 @@
-{-# LANGUAGE DeriveAnyClass, DerivingVia, MultiParamTypeClasses #-}
-{-# OPTIONS_GHC -Wno-missing-export-lists #-}
-module Data.Syntax.Comment where
+{-# LANGUAGE DeriveAnyClass, DeriveGeneric, DeriveTraversable, DerivingVia, MultiParamTypeClasses #-}
+module Data.Syntax.Comment (module Data.Syntax.Comment) where
 
 import Prologue
 

@@ -1,4 +1,4 @@
-{-# LANGUAGE ImplicitParams, LambdaCase, NamedFieldPuns #-}
+{-# LANGUAGE ImplicitParams, LambdaCase #-}
 module Integration.Spec (testTree) where
 
 import Control.Exception (throw)
@@ -28,19 +28,19 @@ testsForLanguage language = do
   localOption (mkTimeout 3000000) $ testGroup (Path.toString language) $ fmap testForExample items
 {-# NOINLINE testsForLanguage #-}
 
-data Example = DiffExample { fileA :: Path.RelFile, fileB :: Path.RelFile, diffOutput :: Path.RelFile }
-             | ParseExample { file :: Path.RelFile, parseOutput :: Path.RelFile }
+data Example = DiffExample Path.RelFile Path.RelFile Path.RelFile
+             | ParseExample Path.RelFile Path.RelFile
              deriving (Eq, Show)
 
 testForExample :: (?session :: TaskSession) => Example -> TestTree
 testForExample = \case
-  DiffExample{fileA, fileB, diffOutput} ->
+  DiffExample fileA fileB diffOutput ->
     goldenVsStringDiff
       ("diffs " <> Path.toString diffOutput)
       (\ref new -> ["git", "diff", ref, new])
       (Path.toString diffOutput)
       (BL.fromStrict <$> diffFilePaths ?session fileA fileB)
-  ParseExample{file, parseOutput} ->
+  ParseExample file parseOutput ->
     goldenVsStringDiff
       ("parses " <> Path.toString parseOutput)
       (\ref new -> ["git", "diff", ref, new])

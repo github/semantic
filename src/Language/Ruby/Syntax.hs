@@ -1,6 +1,5 @@
-{-# LANGUAGE DeriveAnyClass, DerivingVia, DuplicateRecordFields, TupleSections #-}
-{-# OPTIONS_GHC -Wno-missing-export-lists #-}
-module Language.Ruby.Syntax where
+{-# LANGUAGE DeriveAnyClass, DeriveGeneric, DeriveTraversable, DuplicateRecordFields, FlexibleContexts, OverloadedStrings, RecordWildCards, TupleSections, TypeApplications #-}
+module Language.Ruby.Syntax (module Language.Ruby.Syntax) where
 
 import Prologue
 

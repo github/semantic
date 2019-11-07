@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DerivingStrategies, GADTs, GeneralizedNewtypeDeriving, KindSignatures, Rank2Types, ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE DeriveFunctor, DeriveGeneric, FlexibleContexts, GADTs, GeneralizedNewtypeDeriving, KindSignatures, MultiParamTypeClasses, RankNTypes, ScopedTypeVariables, TypeOperators #-}
 module Control.Abstract.Value
 ( AbstractValue(..)
 , AbstractIntro(..)
@@ -133,9 +133,10 @@ data Function term address value (m :: * -> *) k
   | BuiltIn address BuiltIn (value -> m k)           -- ^ A built-in is parameterized by its parent scope, BuiltIn type, and returns a value.
   | Call value [value] (value -> m k)                -- ^ A Call takes a set of values as parameters and returns a ValueRef.
   | Bind value value (value -> m k)
-  deriving stock (Functor, Generic1)
-  deriving anyclass (HFunctor, Effect)
+  deriving (Functor, Generic1)
 
+instance HFunctor (Function term address value)
+instance Effect   (Function term address value)
 
 runFunction :: (term -> Evaluator term address value (FunctionC term address value m) value)
             -> Evaluator term address value (FunctionC term address value m) a
@@ -143,7 +144,7 @@ runFunction :: (term -> Evaluator term address value (FunctionC term address val
 runFunction eval = raiseHandler (runReader (runEvaluator . eval) . runFunctionC)
 
 newtype FunctionC term address value m a = FunctionC { runFunctionC :: ReaderC (term -> FunctionC term address value m value) m a }
-  deriving newtype (Alternative, Applicative, Functor, Monad)
+  deriving (Alternative, Applicative, Functor, Monad)
 
 -- | Construct a boolean value in the abstract domain.
 boolean :: (Member (Boolean value) sig, Carrier sig m) => Bool -> m value
@@ -160,16 +161,17 @@ ifthenelse v t e = asBool v >>= \ c -> if c then t else e
 data Boolean value (m :: * -> *) k
   = Boolean Bool (value -> m k)
   | AsBool value (Bool -> m k)
-  deriving stock (Functor, Generic1)
-  deriving anyclass (HFunctor, Effect)
+  deriving (Functor, Generic1)
+
+instance HFunctor (Boolean value)
+instance Effect   (Boolean value)
 
 runBoolean :: Evaluator term address value (BooleanC value m) a
            -> Evaluator term address value m a
 runBoolean = raiseHandler runBooleanC
 
 newtype BooleanC value m a = BooleanC { runBooleanC :: m a }
-  deriving stock Functor
-  deriving newtype (Alternative, Applicative, Monad)
+  deriving (Alternative, Applicative, Functor, Monad)
 
 
 -- | The fundamental looping primitive, built on top of 'ifthenelse'.
@@ -209,7 +211,7 @@ forLoop initial cond step body = initial *> while cond (withLexicalScopeAndFrame
 
 data While value m k
   = While (m value) (m value) (value -> m k)
-  deriving stock (Functor, Generic1)
+  deriving (Functor, Generic1)
 
 instance HFunctor (While value) where
   hmap f (While cond body k) = While (f cond) (f body) (f . k)
@@ -219,8 +221,7 @@ runWhile :: Evaluator term address value (WhileC value m) a
 runWhile = raiseHandler runWhileC
 
 newtype WhileC value m a = WhileC { runWhileC :: m a }
-  deriving stock Functor
-  deriving newtype (Alternative, Applicative, Monad)
+  deriving (Alternative, Applicative, Functor, Monad)
 
 -- | Construct an abstract unit value.
 unit :: (Carrier sig m, Member (Unit value) sig) => Evaluator term address value m value
@@ -228,16 +229,17 @@ unit = send (Unit pure)
 
 newtype Unit value (m :: * -> *) k
   = Unit (value -> m k)
-  deriving stock (Functor, Generic1)
-  deriving anyclass (HFunctor, Effect)
+  deriving (Functor, Generic1)
+
+instance HFunctor (Unit value)
+instance Effect   (Unit value)
 
 runUnit :: Evaluator term address value (UnitC value m) a
         -> Evaluator term address value m a
 runUnit = raiseHandler runUnitC
 
 newtype UnitC value m a = UnitC { runUnitC :: m a }
-  deriving stock Functor
-  deriving newtype (Alternative, Applicative, Monad)
+  deriving (Alternative, Applicative, Functor, Monad)
 
 -- | Construct a String value in the abstract domain.
 string :: (Member (String value) sig, Carrier sig m) => Text -> m value
@@ -250,12 +252,13 @@ asString v = send (AsString v pure)
 data String value (m :: * -> *) k
   = String Text (value -> m k)
   | AsString value (Text -> m k)
-  deriving stock (Functor, Generic1)
-  deriving anyclass (HFunctor, Effect)
+  deriving (Functor, Generic1)
+
+instance HFunctor (String value)
+instance Effect   (String value)
 
 newtype StringC value m a = StringC { runStringC :: m a }
-  deriving stock Functor
-  deriving newtype (Alternative, Applicative, Monad)
+  deriving (Alternative, Applicative, Functor, Monad)
 
 runString :: Evaluator term address value (StringC value m) a
           -> Evaluator term address value m a
@@ -302,12 +305,13 @@ data Numeric value (m :: * -> *) k
   | Rational Rational (value -> m k)
   | LiftNumeric NumericFunction value (value -> m k)
   | LiftNumeric2 Numeric2Function value value (value -> m k)
-  deriving stock (Functor, Generic1)
-  deriving anyclass (HFunctor, Effect)
+  deriving (Functor, Generic1)
+
+instance HFunctor (Numeric value)
+instance Effect   (Numeric value)
 
 newtype NumericC value m a = NumericC { runNumericC :: m a }
-  deriving stock Functor
-  deriving newtype (Alternative, Applicative, Monad)
+  deriving (Alternative, Applicative, Functor, Monad)
 
 runNumeric :: Evaluator term address value (NumericC value m) a
            -> Evaluator term address value m a
@@ -350,16 +354,17 @@ data Bitwise value (m :: * -> *) k
   | LiftBitwise BitwiseFunction value (value -> m k)
   | LiftBitwise2 Bitwise2Function value value (value -> m k)
   | UnsignedRShift value value (value -> m k)
-  deriving stock (Functor, Generic1)
-  deriving anyclass (HFunctor, Effect)
+  deriving (Functor, Generic1)
+
+instance HFunctor (Bitwise value)
+instance Effect   (Bitwise value)
 
 runBitwise :: Evaluator term address value (BitwiseC value m) a
            -> Evaluator term address value m a
 runBitwise = raiseHandler runBitwiseC
 
 newtype BitwiseC value m a = BitwiseC { runBitwiseC :: m a }
-  deriving stock Functor
-  deriving newtype (Alternative, Applicative, Monad)
+  deriving (Alternative, Applicative, Functor, Monad)
 
 object :: (Member (Object address value) sig, Carrier sig m) => address -> m value
 object address = send (Object address pure)
@@ -378,12 +383,13 @@ data Object address value m k
   = Object address (value -> m k)
   | ScopedEnvironment value (Maybe address -> m k)
   | Klass Declaration address (value -> m k)
-  deriving stock (Functor, Generic1)
-  deriving anyclass (HFunctor, Effect)
+  deriving (Functor, Generic1)
+
+instance HFunctor (Object address value)
+instance Effect   (Object address value)
 
 newtype ObjectC address value m a = ObjectC { runObjectC :: m a }
-  deriving stock Functor
-  deriving newtype (Alternative, Applicative, Monad)
+  deriving (Alternative, Applicative, Functor, Monad)
 
 runObject :: Evaluator term address value (ObjectC address value m) a
           -> Evaluator term address value m a
@@ -399,12 +405,13 @@ asArray v = send (AsArray v pure)
 data Array value (m :: * -> *) k
   = Array [value] (value -> m k)
   | AsArray value ([value] -> m k)
-  deriving stock (Functor, Generic1)
-  deriving anyclass (HFunctor, Effect)
+  deriving (Functor, Generic1)
+
+instance HFunctor (Array value)
+instance Effect   (Array value)
 
 newtype ArrayC value m a = ArrayC { runArrayC :: m a }
-  deriving stock Functor
-  deriving newtype (Alternative, Applicative, Monad)
+  deriving (Alternative, Applicative, Functor, Monad)
 
 runArray :: Evaluator term address value (ArrayC value m) a
          -> Evaluator term address value m a
@@ -421,12 +428,13 @@ kvPair v1 v2 = send (KvPair v1 v2 pure)
 data Hash value (m :: * -> *) k
   = Hash [(value, value)] (value -> m k)
   | KvPair value value (value -> m k)
-  deriving stock (Functor, Generic1)
-  deriving anyclass (HFunctor, Effect)
+  deriving (Functor, Generic1)
+
+instance HFunctor (Hash value)
+instance Effect   (Hash value)
 
 newtype HashC value m a = HashC { runHashC :: m a }
-  deriving stock Functor
-  deriving newtype (Alternative, Applicative, Monad)
+  deriving (Alternative, Applicative, Functor, Monad)
 
 runHash :: Evaluator term address value (HashC value m) a
         -> Evaluator term address value m a

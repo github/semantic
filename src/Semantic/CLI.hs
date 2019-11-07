@@ -1,4 +1,4 @@
-{-# LANGUAGE ApplicativeDo #-}
+{-# LANGUAGE ApplicativeDo, FlexibleContexts #-}
 module Semantic.CLI (main) where
 
 import qualified Control.Carrier.Parse.Measured as Parse
@@ -29,13 +29,12 @@ import qualified System.Path.PartClass as Path.PartClass
 
 import Control.Concurrent (mkWeakThreadId, myThreadId)
 import Control.Exception (Exception(..), throwTo)
-import Data.Typeable (Typeable)
 import System.Posix.Signals
 import System.Mem.Weak (deRefWeak)
 import Proto.Semantic_JSON()
 
 newtype SignalException = SignalException Signal
-  deriving (Show, Typeable)
+  deriving (Show)
 instance Exception SignalException
 
 installSignalHandlers :: IO ()

@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveFunctor #-}
 module Data.Abstract.Package
   ( Package (..)
   , PackageInfo (..)

@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleInstances, RecordWildCards #-}
 module Semantic.Telemetry.Stat
 (
 -- Primary API for creating stats.

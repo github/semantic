@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, LambdaCase, RankNTypes, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE FlexibleContexts, FlexibleInstances, GADTs, LambdaCase, MultiParamTypeClasses, RankNTypes, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Value.Concrete
   ( Value (..)
   , ValueError (..)
@@ -44,7 +44,7 @@ data Value term address
   | Hash [Value term address]
   | Null
   | Hole
-  deriving (Eq, Ord, Show, Generic)
+  deriving (Eq, Ord, Show)
 
 
 instance ValueRoots address (Value term address) where

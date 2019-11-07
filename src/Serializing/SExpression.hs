@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, RankNTypes, ScopedTypeVariables #-}
+{-# LANGUAGE FlexibleContexts, GADTs, OverloadedStrings, RankNTypes, ScopedTypeVariables #-}
 module Serializing.SExpression
 ( serializeSExpression
 , ToSExpression(..)

@@ -1,4 +1,4 @@
-{-# LANGUAGE AllowAmbiguousTypes, LambdaCase, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances, ViewPatterns #-}
+{-# LANGUAGE AllowAmbiguousTypes, DataKinds, FlexibleContexts, FlexibleInstances, LambdaCase, MultiParamTypeClasses, OverloadedStrings, RankNTypes, RecordWildCards, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances, ViewPatterns #-}
 module Analysis.TOCSummary
 ( Declaration(..)
 , formatIdentifier
@@ -151,5 +151,5 @@ type family DeclarationStrategy syntax where
   DeclarationStrategy Declaration.Method   = 'Custom
   DeclarationStrategy Markdown.Heading     = 'Custom
   DeclarationStrategy Syntax.Error         = 'Custom
-  DeclarationStrategy (Sum fs)             = 'Custom
-  DeclarationStrategy a                    = 'Default
+  DeclarationStrategy (Sum _)              = 'Custom
+  DeclarationStrategy _                    = 'Default

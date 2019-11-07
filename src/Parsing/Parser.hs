@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, DataKinds, GADTs, TypeFamilies #-}
+{-# LANGUAGE ConstraintKinds, DataKinds, GADTs, TypeApplications, TypeFamilies #-}
 module Parsing.Parser
 ( Parser(..)
   -- * Parsers

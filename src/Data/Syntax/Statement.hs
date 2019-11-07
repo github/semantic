@@ -1,6 +1,5 @@
-{-# LANGUAGE DeriveAnyClass, DerivingVia, ScopedTypeVariables, UndecidableInstances, ViewPatterns, DuplicateRecordFields #-}
-{-# OPTIONS_GHC -Wno-missing-export-lists #-}
-module Data.Syntax.Statement where
+{-# LANGUAGE DeriveAnyClass, DeriveGeneric, DeriveTraversable, DuplicateRecordFields, RecordWildCards, ScopedTypeVariables, TypeApplications, UndecidableInstances, ViewPatterns #-}
+module Data.Syntax.Statement (module Data.Syntax.Statement) where
 
 import Prologue
 

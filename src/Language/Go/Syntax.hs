@@ -1,6 +1,5 @@
-{-# LANGUAGE DeriveAnyClass, DerivingVia #-}
-{-# OPTIONS_GHC -Wno-missing-export-lists #-}
-module Language.Go.Syntax where
+{-# LANGUAGE DeriveAnyClass, DeriveGeneric, DeriveTraversable, FlexibleContexts, RecordWildCards, TypeApplications #-}
+module Language.Go.Syntax (module Language.Go.Syntax) where
 
 import Prologue
 

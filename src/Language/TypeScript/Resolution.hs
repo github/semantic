@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleContexts, RecordWildCards #-}
 module Language.TypeScript.Resolution
   ( ImportPath (..)
   , IsRelative (..)

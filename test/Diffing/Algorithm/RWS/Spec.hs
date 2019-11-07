@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, TypeOperators #-}
+{-# LANGUAGE DataKinds, OverloadedStrings, TypeOperators #-}
 module Diffing.Algorithm.RWS.Spec (spec) where
 
 import Data.Bifunctor

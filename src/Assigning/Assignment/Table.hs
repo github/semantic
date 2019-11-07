@@ -1,4 +1,4 @@
-{-# LANGUAGE DerivingVia #-}
+{-# LANGUAGE DeriveGeneric, DeriveTraversable, DerivingVia, RecordWildCards #-}
 module Assigning.Assignment.Table
 ( Table(tableAddresses)
 , singleton

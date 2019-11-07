@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings, TypeApplications #-}
 module Numeric.Exts
   ( parseInteger
   , hex
