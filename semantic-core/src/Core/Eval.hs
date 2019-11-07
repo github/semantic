@@ -11,9 +11,11 @@ module Core.Eval
 ) where
 
 import Analysis.Analysis
+import Analysis.Effect.Domain as A
 import Analysis.Effect.Env as A
 import Analysis.Effect.Heap as A
 import Analysis.File
+import qualified Analysis.Intro as A
 import Control.Applicative (Alternative (..))
 import Control.Effect.Carrier
 import Control.Effect.Fail
@@ -32,6 +34,7 @@ import qualified System.Path as Path
 
 eval :: forall address value m sig
      .  ( Carrier sig m
+        , Member (Domain value) sig
         , Member (Env address) sig
         , Member (Heap address value) sig
         , Member (Reader Span) sig
@@ -62,13 +65,13 @@ eval Analysis{..} eval = \case
       f' <- eval f
       a' <- eval a
       apply eval f' a'
-    Unit -> unit
-    Bool b -> bool b
+    Unit -> A.abstract A.Unit
+    Bool b -> A.abstract (A.Bool b)
     If c t e -> do
       c' <- eval c >>= asBool
       if c' then eval t else eval e
-    String s -> string s
-    Load p -> eval p >>= asString >> unit -- FIXME: add a load command or something
+    String s -> A.abstract (A.String s)
+    Load p -> eval p >>= asString >> A.abstract A.Unit -- FIXME: add a load command or something
     Record fields -> traverse (traverse eval) fields >>= record
     a :. b -> do
       a' <- ref a
@@ -76,7 +79,7 @@ eval Analysis{..} eval = \case
     a :? b -> do
       a' <- ref a
       mFound <- a' ... b
-      bool (isJust mFound)
+      A.abstract (A.Bool (isJust mFound))
 
     a := b -> do
       b' <- eval b
