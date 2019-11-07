@@ -26,7 +26,6 @@ tmp/
 *.hp
 *.prof
 *.pyc
-/hie.yaml
 
 /test.*
 /*.html
