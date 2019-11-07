@@ -68,10 +68,10 @@ eval Analysis{..} eval = \case
     Unit -> A.abstract A.Unit
     Bool b -> A.abstract (A.Bool b)
     If c t e -> do
-      c' <- eval c >>= asBool
+      A.Bool c' <- eval c >>= A.concretize
       if c' then eval t else eval e
     String s -> A.abstract (A.String s)
-    Load p -> eval p >>= asString >> A.abstract A.Unit -- FIXME: add a load command or something
+    Load p -> eval p >>= A.concretize >> A.abstract A.Unit -- FIXME: add a load command or something
     Record fields -> traverse (traverse eval) fields >>= record
     a :. b -> do
       a' <- ref a
@@ -97,7 +97,7 @@ eval Analysis{..} eval = \case
           Var n -> lookupEnv' n
           Alg (R c) -> case c of
             If c t e -> do
-              c' <- eval c >>= asBool
+              A.Bool c' <- eval c >>= A.concretize
               if c' then ref t else ref e
             a :. b -> do
               a' <- ref a
