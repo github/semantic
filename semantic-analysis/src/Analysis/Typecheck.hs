@@ -150,7 +150,7 @@ runFile eval file = traverse run file
               v <- meta
               bs <- m
               v <$ for_ bs (unify v))
-          . convergeTerm (A.runHeap @Name @Type . fix (cacheTerm . eval typecheckingAnalysis))
+          . convergeTerm (runDomain . A.runHeap @Name @Type . fix (cacheTerm . eval typecheckingAnalysis))
 
 typecheckingAnalysis
   :: ( Alternative m
