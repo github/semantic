@@ -10,6 +10,8 @@ module Analysis.Typecheck
 import           Analysis.Analysis
 import           Analysis.Carrier.Env.Monovariant
 import qualified Analysis.Carrier.Heap.Monovariant as A
+import           Analysis.Effect.Domain
+import qualified Analysis.Intro as Intro
 import           Analysis.File
 import           Analysis.FlowInsensitive
 import           Analysis.Name
@@ -232,3 +234,19 @@ mvs = foldMap IntSet.singleton
 
 substAll :: Monad t => IntMap.IntMap (t Meta) -> t Meta -> t Meta
 substAll s a = a >>= \ i -> fromMaybe (pure i) (IntMap.lookup i s)
+
+
+newtype DomainC m a = DomainC { runDomain :: m a }
+  deriving (Alternative, Applicative, Functor, Monad, MonadFail)
+
+instance (Alternative m, Carrier sig m, MonadFail m) => Carrier (Domain Type :+: sig) (DomainC m) where
+  eff (L (Abstract v k)) = case v of
+    Intro.Unit     -> k (Alg Unit)
+    Intro.Bool   _ -> k (Alg Bool)
+    Intro.String _ -> k (Alg String)
+  eff (L (Concretize t k)) = case t of
+    Alg Unit   -> k Intro.Unit
+    Alg Bool   -> k (Intro.Bool True) <|> k (Intro.Bool False)
+    Alg String -> k (Intro.String mempty)
+    t -> fail ("can’t concretize " <> show t)
+  eff (R other) = DomainC (eff (handleCoercible other))
