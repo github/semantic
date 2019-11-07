@@ -248,5 +248,5 @@ instance (Alternative m, Carrier sig m, MonadFail m) => Carrier (Domain Type :+:
     Alg Unit   -> k Intro.Unit
     Alg Bool   -> k (Intro.Bool True) <|> k (Intro.Bool False)
     Alg String -> k (Intro.String mempty)
-    t -> fail ("can’t concretize " <> show t)
+    t          -> fail ("can’t concretize " <> show t)
   eff (R other) = DomainC (eff (handleCoercible other))
