@@ -303,15 +303,11 @@ library
                      , tree-sitter-ruby ^>= 0.2
                      , tree-sitter-typescript ^>= 0.2.1
                      , tree-sitter-tsx ^>= 0.2.1
-  if flag(release)
-    cpp-options:       -DCOMPUTE_GIT_SHA
 
 executable semantic
   import:              haskell, dependencies, executable-flags
   hs-source-dirs:      app
   main-is:             Main.hs
-  if flag(release)
-    cpp-options:       -DCOMPUTE_GIT_SHA
   build-depends:       base
                      , semantic
 
