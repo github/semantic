@@ -9,20 +9,21 @@ module Analysis.Effect.Domain
 , run
 ) where
 
+import Analysis.Intro
 import Control.Effect.Carrier
 import GHC.Generics (Generic1)
 
-abstract :: (Member (Domain concrete abstract) sig, Carrier sig m) => concrete -> m abstract
+abstract :: (Member (Domain abstract) sig, Carrier sig m) => Intro -> m abstract
 abstract concrete = send (Abstract concrete pure)
 
-concretize :: (Member (Domain concrete abstract) sig, Carrier sig m) => abstract -> m concrete
+concretize :: (Member (Domain abstract) sig, Carrier sig m) => abstract -> m Intro
 concretize abstract = send (Concretize abstract pure)
 
 
-data Domain concrete abstract m k
-  = Abstract   concrete (abstract -> m k)
-  | Concretize abstract (concrete -> m k)
+data Domain abstract m k
+  = Abstract   Intro    (abstract -> m k)
+  | Concretize abstract (Intro    -> m k)
   deriving (Functor, Generic1)
 
-instance HFunctor (Domain concrete abstract)
-instance Effect   (Domain concrete abstract)
+instance HFunctor (Domain abstract)
+instance Effect   (Domain abstract)
