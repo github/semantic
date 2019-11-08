@@ -47,7 +47,6 @@ import Data.Text (Text)
 import GHC.Generics (Generic1)
 import GHC.Stack
 import Source.Span
-import Syntax.Functor
 import Syntax.Scope
 import Syntax.Stack
 import Syntax.Sum
@@ -91,8 +90,22 @@ infixl 9 :.
 infix  3 :=
 
 instance HFunctor Core
-instance Effect Traversable Core
-instance RightModule Core
+
+instance RightModule Core where
+  Rec b      >>=* f = Rec ((>>=* f) <$> b)
+  (a :>> b)  >>=* f = (a >>= f) :>> (b >>= f)
+  (a :>>= b) >>=* f = ((>>= f) <$> a) :>>= (b >>=* f)
+  Lam b      >>=* f = Lam ((>>=* f) <$> b)
+  (a :$ b)   >>=* f = (a >>= f) :$ (b >>= f)
+  Unit       >>=* _ = Unit
+  Bool b     >>=* _ = Bool b
+  If c t e   >>=* f = If (c >>= f) (t >>= f) (e >>= f)
+  String s   >>=* _ = String s
+  Load b     >>=* f = Load (b >>= f)
+  Record fs  >>=* f = Record (map (fmap (>>= f)) fs)
+  (a :. b)   >>=* f = (a >>= f) :. b
+  (a :? b)   >>=* f = (a >>= f) :. b
+  (a := b)   >>=* f = (a >>= f) := (b >>= f)
 
 deriving instance (Eq   a, forall a . Eq   a => Eq   (f a), Monad f) => Eq   (Core f a)
 deriving instance (Ord  a, forall a . Eq   a => Eq   (f a)
@@ -217,8 +230,9 @@ data Ann ann f a
   deriving (Eq, Foldable, Functor, Generic1, Ord, Show, Traversable)
 
 instance HFunctor (Ann ann)
-instance Effect Functor (Ann ann)
-instance RightModule (Ann ann)
+
+instance RightModule (Ann ann) where
+  Ann l b >>=* f = Ann l (b >>= f)
 
 
 ann :: Has (Ann Span) sig m => HasCallStack => m a -> m a
