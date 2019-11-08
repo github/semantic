@@ -22,12 +22,12 @@ runFail = runError . runFailC
 newtype FailC m a = FailC { runFailC :: ErrorC (Path.AbsRelFile, Span, String) m a }
   deriving (Alternative, Applicative, Functor, Monad)
 
-instance (Effect c sig, c (Either (Path.AbsRelFile, Span, String)), Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m) => MonadFail (FailC m) where
+instance (Effect sig, Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m) => MonadFail (FailC m) where
   fail s = do
     path <- ask
     span <- ask
     FailC (throwError (path :: Path.AbsRelFile, span :: Span, s))
 
-instance (Effect c sig, c (Either (Path.AbsRelFile, Span, String)), Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m) => Algebra (Fail :+: sig) (FailC m) where
+instance (Effect sig, Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m) => Algebra (Fail :+: sig) (FailC m) where
   alg (L (Fail s)) = fail s
-  alg (R other)    = FailC (handleCoercible other)
+  alg (R other)    = FailC (alg (R (handleCoercible other)))
