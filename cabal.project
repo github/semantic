@@ -48,5 +48,10 @@ source-repository-package
 
 source-repository-package
   type: git
+  location: https://github.com/fused-effects/fused-effects-resumable
+  tag: bd6c51dff70f03d8404572f1f413c8a612e41c49
+
+source-repository-package
+  type: git
   location: https://github.com/antitypical/fused-syntax.git
   tag: 3cd17047d4c709ecba555bbe70b6e91923d7b698

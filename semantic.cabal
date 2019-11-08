@@ -57,6 +57,7 @@ common dependencies
                      , fastsum ^>= 0.1.1.0
                      , fused-effects ^>= 1
                      , fused-effects-exceptions ^>= 1
+                     , fused-effects-resumable ^>= 0.1
                      , hashable ^>= 1.2.7.0
                      , tree-sitter ^>= 0.5
                      , mtl ^>= 2.2.2
