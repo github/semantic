@@ -33,7 +33,6 @@ import           Data.Void
 import           GHC.Generics (Generic1)
 import           Prelude hiding (fail)
 import           Source.Span
-import           Syntax.Functor
 import           Syntax.Module
 import           Syntax.Scope
 import           Syntax.Term
@@ -61,13 +60,20 @@ deriving instance (Ord  name, Ord  a, forall a . Eq   a => Eq   (f a)
 deriving instance (Show name, Show a, forall a . Show a => Show (f a))          => Show (Monotype name f a)
 
 instance HFunctor (Monotype name)
-instance Effect Functor (Monotype name)
-instance RightModule (Monotype name)
+instance Effect (Monotype name)
+
+instance RightModule (Monotype name) where
+  item >>=* go = case item of
+    Bool -> Bool
+    Unit -> Unit
+    String -> String
+    Arr l r -> Arr (l >>= go) (r >>= go)
+    Record items -> Record (fmap (>>= go) items)
 
 type Meta = Int
 
 newtype Polytype f a = PForAll (Scope () f a)
-  deriving (Effect Traversable, Foldable, Functor, Generic1, HFunctor, RightModule, Traversable)
+  deriving (Foldable, Functor, Generic1, HFunctor, RightModule, Traversable)
 
 deriving instance (Eq   a, forall a . Eq   a => Eq   (f a), Monad f) => Eq   (Polytype f a)
 deriving instance (Ord  a, forall a . Eq   a => Eq   (f a)
@@ -105,9 +111,8 @@ typecheckingFlowInsensitive eval
   . traverse (runFile eval)
 
 runFile
-  :: forall term name m c sig
-  .  ( forall ctx . Functor ctx => c ctx
-     , Effect c sig
+  :: forall term name m sig
+  .  ( Effect sig
      , Has Fresh sig m
      , Has (State (Heap name (Type name))) sig m
      , Ord name
