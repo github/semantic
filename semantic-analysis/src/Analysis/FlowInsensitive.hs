@@ -27,9 +27,8 @@ newtype FrameId name = FrameId { unFrameId :: name }
   deriving (Eq, Ord, Show)
 
 
-convergeTerm :: forall m c sig a term address proxy
-             .  ( Effect c sig
-                , c ((,) (Cache term a))
+convergeTerm :: forall m sig a term address proxy
+             .  ( Effect sig
                 , Eq address
                 , Has Fresh sig m
                 , Has (State (Heap address a)) sig m
