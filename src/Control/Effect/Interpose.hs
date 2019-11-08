@@ -10,6 +10,7 @@ module Control.Effect.Interpose
 import Control.Applicative
 import Control.Algebra
 import Control.Carrier.Reader
+import Control.Effect.Sum.Project
 
 data Interpose (eff :: (* -> *) -> * -> *) m k
   = forall a . Interpose (m a) (forall n x . eff n x -> m x) (a -> m k)
@@ -46,7 +47,7 @@ newtype Listener (eff :: (* -> *) -> * -> *) m = Listener (forall n x . eff n x 
 runListener :: Listener eff (InterposeC eff m) -> eff (InterposeC eff m) a -> InterposeC eff m a
 runListener (Listener listen) = listen
 
-instance Has eff sig m => Algebra (Interpose eff :+: sig) (InterposeC eff m) where
+instance (Has eff sig m, Project eff sig) => Algebra (Interpose eff :+: sig) (InterposeC eff m) where
   alg (L (Interpose m h k)) =
     InterposeC (local (const (Just (Listener h))) (runInterposeC m)) >>= k
   alg (R other) = do
