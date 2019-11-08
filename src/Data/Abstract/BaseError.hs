@@ -28,10 +28,9 @@ instance (Eq1 exc) => Eq1 (BaseError exc) where
 instance Show1 exc => Show1 (BaseError exc) where
   liftShowsPrec sl sp d (BaseError info span exc) = showParen (d > 10) $ showString "BaseError" . showChar ' ' . showsPrec 11 info . showChar ' ' . showsPrec 11 span . showChar ' ' . liftShowsPrec sl sp 11 exc
 
-throwBaseError :: ( Member (Resumable (BaseError exc)) sig
-                  , Member (Reader M.ModuleInfo) sig
-                  , Member (Reader S.Span) sig
-                  , Carrier sig m
+throwBaseError :: ( Has (Resumable (BaseError exc)) sig m
+                  , Has (Reader M.ModuleInfo) sig m
+                  , Has (Reader S.Span) sig m
                   )
                 => exc resume
                 -> m resume
