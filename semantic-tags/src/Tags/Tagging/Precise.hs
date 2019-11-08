@@ -8,9 +8,9 @@ module Tags.Tagging.Precise
 , GFoldable1(..)
 ) where
 
-import Control.Carrier.Pure
 import Control.Carrier.Reader
 import Control.Carrier.Writer.Strict
+import Data.Functor.Identity
 import Data.Monoid (Endo(..))
 import Data.Text as Text (Text, takeWhile)
 import GHC.Generics
@@ -31,7 +31,7 @@ yield = tell . Endo . (:) . modSpan toOneIndexed where
   modSpan f t@Tag{ loc = l } = t { loc = l { span = f (span l) } }
   toOneIndexed (Span (Pos l1 c1) (Pos l2 c2)) = Span (Pos (l1 + 1) (c1 + 1)) (Pos (l2 + 1) (c2 + 1))
 
-runTagging :: Source -> ReaderC Source (WriterC Tags PureC) () -> [Tag]
+runTagging :: Source -> ReaderC Source (WriterC Tags Identity) () -> [Tag]
 runTagging source
   = ($ [])
   . appEndo
