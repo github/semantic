@@ -67,9 +67,8 @@ scopeGraph eval
   . traverse (runFile eval)
 
 runFile
-  :: forall term name m c sig
-  .  ( forall ctx . Functor ctx => c ctx
-     , Effect c sig
+  :: forall term name m sig
+  .  ( Effect sig
      , Has Fresh sig m
      , Has (State (Heap name (ScopeGraph name))) sig m
      , Ord name
