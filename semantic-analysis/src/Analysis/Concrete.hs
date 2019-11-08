@@ -87,9 +87,8 @@ concrete eval
   . traverse (runFile eval)
 
 runFile
-  :: forall term name m c sig
-  .  ( forall ctx . Functor ctx => c ctx
-     , Effect c sig
+  :: forall term name m sig
+  .  ( Effect sig
      , Foldable term
      , IsString name
      , Has Fresh sig m
