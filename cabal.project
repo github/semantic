@@ -43,12 +43,12 @@ source-repository-package
 source-repository-package
   type: git
   location: https://github.com/fused-effects/fused-effects-exceptions
-  tag: 31c9b7cdee1b93b1f1d716c1af92ad4b8c2bd4d3
+  tag: 8d3d9c9eafcf254c7ccc04219d23114520117ccc
 
 source-repository-package
   type: git
   location: https://github.com/antitypical/fused-syntax.git
-  tag: 4e1048e3e3004d6b4cb3d365fdf589186a306e27
+  tag: 3cd17047d4c709ecba555bbe70b6e91923d7b698
 
 source-repository-package
   type: git
