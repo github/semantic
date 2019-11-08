@@ -6,6 +6,7 @@ packages: .
           semantic-json
           semantic-python
           semantic-tags
+          ../haskell-tree-sitter/*
 
 jobs: $ncpus
 
@@ -49,45 +50,3 @@ source-repository-package
   type: git
   location: https://github.com/antitypical/fused-syntax.git
   tag: 3cd17047d4c709ecba555bbe70b6e91923d7b698
-
-source-repository-package
-  type: git
-  location: https://github.com/tree-sitter/haskell-tree-sitter
-  subdir: tree-sitter
-  tag: dfa8d51c838dddc745402f1fc1caaad45c069c1d
-
-source-repository-package
-  type: git
-  location: https://github.com/tree-sitter/haskell-tree-sitter
-  subdir: tree-sitter-go
-  tag: dfa8d51c838dddc745402f1fc1caaad45c069c1d
-
-source-repository-package
-  type: git
-  location: https://github.com/tree-sitter/haskell-tree-sitter
-  subdir: tree-sitter-ruby
-  tag: dfa8d51c838dddc745402f1fc1caaad45c069c1d
-
-source-repository-package
-  type: git
-  location: https://github.com/tree-sitter/haskell-tree-sitter
-  subdir: tree-sitter-python
-  tag: dfa8d51c838dddc745402f1fc1caaad45c069c1d
-
-source-repository-package
-  type: git
-  location: https://github.com/tree-sitter/haskell-tree-sitter
-  subdir: tree-sitter-php
-  tag: dfa8d51c838dddc745402f1fc1caaad45c069c1d
-
-source-repository-package
-  type: git
-  location: https://github.com/tree-sitter/haskell-tree-sitter
-  subdir: tree-sitter-typescript
-  tag: dfa8d51c838dddc745402f1fc1caaad45c069c1d
-
-source-repository-package
-  type: git
-  location: https://github.com/tree-sitter/haskell-tree-sitter
-  subdir: tree-sitter-tsx
-  tag: dfa8d51c838dddc745402f1fc1caaad45c069c1d
