@@ -21,7 +21,8 @@ data Readline m k
   | Print (Doc AnsiStyle) (m k)
   deriving (Functor, Generic1)
 
-instance Effect Functor Readline
+instance HFunctor Readline
+instance Effect Readline
 
 
 prompt :: Has Readline sig m => String -> m (Int, Maybe String)
