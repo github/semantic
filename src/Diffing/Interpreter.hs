@@ -5,9 +5,8 @@ module Diffing.Interpreter
 , stripDiff
 ) where
 
-import Control.Effect.Carrier
-import Control.Effect.Cull
-import Control.Effect.NonDet
+import Control.Algebra
+import Control.Carrier.Cull.Church
 import qualified Data.Diff as Diff
 import Data.Edit (Edit, edit)
 import Data.Term
@@ -20,7 +19,7 @@ diffTerms :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax)
           => Term syntax ann1
           -> Term syntax ann2
           -> Diff.Diff syntax ann1 ann2
-diffTerms t1 t2 = stripDiff (fromMaybe (Diff.comparing t1' t2') (run (runNonDetOnce (runDiff (algorithmForTerms t1' t2')))))
+diffTerms t1 t2 = stripDiff (fromMaybe (Diff.comparing t1' t2') (run (runCullA (cull (runDiff (algorithmForTerms t1' t2'))))))
   where (t1', t2') = ( defaultFeatureVectorDecorator t1
                      , defaultFeatureVectorDecorator t2)
 
@@ -54,21 +53,19 @@ newtype DiffC term1 term2 diff m a = DiffC { runDiffC :: m a }
   deriving (Alternative, Applicative, Functor, Monad, MonadIO)
 
 instance ( Alternative m
-         , Carrier sig m
          , Diffable syntax
          , Eq1 syntax
-         , Member NonDet sig
-         , Monad m
+         , Has NonDet sig m
          , Traversable syntax
          )
-      => Carrier
+      => Algebra
         (Diff (Term syntax (FeatureVector, ann1)) (Term syntax (FeatureVector, ann2)) (Diff.Diff syntax (FeatureVector, ann1) (FeatureVector, ann2)) :+: sig)
         (DiffC (Term syntax (FeatureVector, ann1)) (Term syntax (FeatureVector, ann2)) (Diff.Diff syntax (FeatureVector, ann1) (FeatureVector, ann2)) m) where
-  eff (L op) = case op of
+  alg (L op) = case op of
     Diff t1 t2 k -> runDiff (algorithmForTerms t1 t2) <|> pure (Diff.comparing t1 t2) >>= k
     Linear (Term (In ann1 f1)) (Term (In ann2 f2)) k -> Diff.merge (ann1, ann2) <$> tryAlignWith (runDiff . diffEdit) f1 f2 >>= k
     RWS as bs k -> traverse (runDiff . diffEdit) (rws comparableTerms equivalentTerms as bs) >>= k
     Delete a k -> k (Diff.deleting a)
     Insert b k -> k (Diff.inserting b)
     Replace a b k -> k (Diff.comparing a b)
-  eff (R other) = DiffC . eff . handleCoercible $ other
+  alg (R other) = DiffC . alg . handleCoercible $ other
