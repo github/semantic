@@ -10,7 +10,7 @@ module Language.Python.Core
 import Prelude hiding (fail)
 
 import           AST.Element
-import           Control.Effect hiding ((:+:))
+import           Control.Algebra hiding ((:+:))
 import           Control.Effect.Reader
 import           Control.Monad.Fail
 import           Core.Core as Core
@@ -49,9 +49,8 @@ pattern SingleIdentifier name <- Py.ExpressionList
 -- We leave the representation of Core syntax abstract so that it's not
 -- possible for us to 'cheat' by pattern-matching on or eliminating a
 -- compiled term.
-type CoreSyntax sig t = ( Member Core sig
-                        , Member (Ann Span) sig
-                        , Carrier sig t
+type CoreSyntax sig t = ( Has Core sig t
+                        , Has (Ann Span) sig t
                         , Foldable t
                         )
 
@@ -59,8 +58,7 @@ class Compile (py :: * -> *) where
   -- FIXME: rather than failing the compilation process entirely
   -- with MonadFail, we should emit core that represents failure
   compile :: ( CoreSyntax syn t
-             , Member (Reader Bindings) sig
-             , Carrier sig m
+             , Has (Reader Bindings) sig m
              , MonadFail m
              )
           => py Span
@@ -71,8 +69,7 @@ class Compile (py :: * -> *) where
   compile a _ _ = defaultCompile a
 
 toplevelCompile :: ( CoreSyntax syn t
-                   , Member (Reader Bindings) sig
-                   , Carrier sig m
+                   , Has (Reader Bindings) sig m
                    , MonadFail m
                    )
                 => Py.Module Span
@@ -81,7 +78,7 @@ toplevelCompile py = compile py pure none
 
 -- | TODO: This is not right, it should be a reference to a Preluded
 -- NoneType instance, but it will do for now.
-none :: (Member Core sig, Carrier sig t) => t Name
+none :: Has Core sig t => t Name
 none = unit
 
 locate :: ( HasField "ann" syntax Span
@@ -146,7 +143,7 @@ desugar acc = \case
 -- returns a function). There's some pun to be made on "collapsing
 -- sugar", like "icing" or "sugar water" but I'll leave that as an
 -- exercise to the reader.
-collapseDesugared :: (CoreSyntax syn t, Member (Reader Bindings) sig, Carrier sig m)
+collapseDesugared :: (CoreSyntax syn t, Has (Reader Bindings) sig m)
                   => Located Name           -- The current LHS to which to assign
                   -> (t Name -> m (t Name)) -- A meta-continuation: it takes a name and returns a continuation
                   -> t Name                 -- The current RHS to which to assign, yielded from an outer continuation
