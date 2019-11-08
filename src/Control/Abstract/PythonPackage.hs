@@ -3,7 +3,8 @@ module Control.Abstract.PythonPackage
 ( runPythonPackaging, Strategy(..) ) where
 
 import           Control.Abstract as Abstract
-import           Control.Effect.Carrier
+import           Control.Algebra
+import           Control.Effect.Sum.Project
 import           Data.Abstract.Name (name)
 import           Data.Abstract.Path (stripQuotes)
 import           Data.Abstract.Value.Concrete (Value (..))
@@ -24,14 +25,15 @@ newtype PythonPackagingC term address m a = PythonPackagingC { runPythonPackagin
 wrap :: Evaluator term address (Value term address) m a -> PythonPackagingC term address m a
 wrap = PythonPackagingC . runEvaluator
 
-instance ( Carrier sig m
-         , Member (Function term address (Value term address)) sig
-         , Member (State Strategy) sig
-         , Member (Abstract.String (Value term address)) sig
-         , Member (Abstract.Array (Value term address)) sig
+instance ( Algebra sig m
+         , Project (Function term address (Value term address)) sig
+         , Has (Function term address (Value term address)) sig m
+         , Has (State Strategy) sig m
+         , Has (Abstract.String (Value term address)) sig m
+         , Has (Abstract.Array (Value term address)) sig m
          )
-      => Carrier sig (PythonPackagingC term address m) where
-  eff op
+      => Algebra sig (PythonPackagingC term address m) where
+  alg op
     | Just e <- prj op = wrap $ case handleCoercible e of
       Call callName params k -> Evaluator . k =<< do
         case callName of
@@ -55,4 +57,4 @@ instance ( Carrier sig m
       Function name params body scope k -> function name params body scope >>= Evaluator . k
       BuiltIn n b k -> builtIn n b >>= Evaluator . k
       Bind obj value k -> bindThis obj value >>= Evaluator . k
-    | otherwise = PythonPackagingC . eff $ handleCoercible op
+    | otherwise = PythonPackagingC . alg $ handleCoercible op
