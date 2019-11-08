@@ -8,8 +8,8 @@ module Control.Effect.Interpose
 ) where
 
 import Control.Applicative
-import Control.Effect.Carrier
-import Control.Effect.Reader
+import Control.Algebra
+import Control.Carrier.Reader
 
 data Interpose (eff :: (* -> *) -> * -> *) m k
   = forall a . Interpose (m a) (forall n x . eff n x -> m x) (a -> m k)
@@ -24,7 +24,7 @@ instance HFunctor (Interpose eff) where
 --   The intercepted effects are not re-sent in the surrounding context; thus, the innermost nested 'interpose' listening for an effect will win, and the effect’s own handler will not get the chance to service the request.
 --
 --   Note that since 'Interpose' lacks an 'Effect' instance, only “pure” effects, i.e. effects which can be handled inside other effects using 'hmap' alone, can be run within the 'runInterpose' scope. This includes @Reader@, but not e.g. @State@ or @Error@.
-interpose :: (Member (Interpose eff) sig, Carrier sig m)
+interpose :: Has (Interpose eff) sig m
           => m a
           -> (forall n x . eff n x -> m x)
           -> m a
@@ -46,11 +46,11 @@ newtype Listener (eff :: (* -> *) -> * -> *) m = Listener (forall n x . eff n x 
 runListener :: Listener eff (InterposeC eff m) -> eff (InterposeC eff m) a -> InterposeC eff m a
 runListener (Listener listen) = listen
 
-instance (Carrier sig m, Member eff sig) => Carrier (Interpose eff :+: sig) (InterposeC eff m) where
-  eff (L (Interpose m h k)) =
+instance Has eff sig m => Algebra (Interpose eff :+: sig) (InterposeC eff m) where
+  alg (L (Interpose m h k)) =
     InterposeC (local (const (Just (Listener h))) (runInterposeC m)) >>= k
-  eff (R other) = do
+  alg (R other) = do
     listener <- InterposeC ask
     case (listener, prj other) of
       (Just listener, Just eff) -> runListener listener eff
-      _                         -> InterposeC (eff (R (handleCoercible other)))
+      _                         -> InterposeC (alg (R (handleCoercible other)))
