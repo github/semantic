@@ -26,7 +26,7 @@ module SpecHelpers
 import Control.Abstract
 import Control.Carrier.Fresh.Strict
 import Control.Carrier.Parse.Simple
-import Control.Carrier.Reader
+import Control.Carrier.Reader as X
 import qualified Control.Carrier.Trace.Ignoring as Trace.Ignoring
 import Control.Carrier.Resumable.Either
 import Control.Carrier.Lift
