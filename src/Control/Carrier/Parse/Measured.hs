@@ -10,8 +10,8 @@ module Control.Carrier.Parse.Measured
 ) where
 
 import qualified Assigning.Assignment as Assignment
+import           Control.Algebra
 import           Control.Effect.Error
-import           Control.Effect.Carrier
 import           Control.Effect.Parse
 import           Control.Effect.Reader
 import           Control.Effect.Trace
@@ -34,20 +34,19 @@ import           Source.Source (Source)
 newtype ParseC m a = ParseC { runParse :: m a }
   deriving (Applicative, Functor, Monad, MonadIO)
 
-instance ( Carrier sig m
-         , Member (Error SomeException) sig
-         , Member (Reader TaskSession) sig
-         , Member Telemetry sig
-         , Member Timeout sig
-         , Member Trace sig
+instance ( Has (Error SomeException) sig m
+         , Has (Reader TaskSession) sig m
+         , Has Telemetry sig m
+         , Has Timeout sig m
+         , Has Trace sig m
          , MonadIO m
          )
-      => Carrier (Parse :+: sig) (ParseC m) where
-  eff (L (Parse parser blob k)) = runParser blob parser >>= k
-  eff (R other) = ParseC (eff (handleCoercible other))
+      => Algebra (Parse :+: sig) (ParseC m) where
+  alg (L (Parse parser blob k)) = runParser blob parser >>= k
+  alg (R other) = ParseC (alg (handleCoercible other))
 
 -- | Parse a 'Blob' in 'IO'.
-runParser :: (Member (Error SomeException) sig, Member (Reader TaskSession) sig, Member Telemetry sig, Member Timeout sig, Member Trace sig, Carrier sig m, MonadIO m)
+runParser :: (Has (Error SomeException) sig m, Has (Reader TaskSession) sig m, Has Telemetry sig m, Has Timeout sig m, Has Trace sig m, MonadIO m)
           => Blob
           -> Parser term
           -> m term
@@ -81,12 +80,11 @@ instance Exception ParserCancelled
 runAssignment
   :: ( Foldable term
      , Syntax.HasErrors term
-     , Member (Error SomeException) sig
-     , Member (Reader TaskSession) sig
-     , Member Telemetry sig
-     , Member Timeout sig
-     , Member Trace sig
-     , Carrier sig m
+     , Has (Error SomeException) sig m
+     , Has (Reader TaskSession) sig m
+     , Has Telemetry sig m
+     , Has Timeout sig m
+     , Has Trace sig m
      , MonadIO m
      )
   => (Source -> assignment (term Assignment.Loc) -> ast -> Either (Error.Error String) (term Assignment.Loc))
@@ -137,7 +135,7 @@ runAssignment assign parser blob@Blob{..} assignment = do
 
 
 -- | Log an 'Error.Error' at the specified 'Level'.
-logError :: (Member Telemetry sig, Carrier sig m)
+logError :: Has Telemetry sig m
          => TaskSession
          -> Level
          -> Blob
