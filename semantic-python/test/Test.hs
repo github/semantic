@@ -6,9 +6,9 @@ import           Analysis.Concrete (Concrete)
 import qualified Analysis.Concrete as Concrete
 import           Analysis.File
 import           Analysis.ScopeGraph
-import           Control.Effect
-import           Control.Effect.Fail
-import           Control.Effect.Reader
+import           Control.Algebra
+import           Control.Carrier.Fail.Either
+import           Control.Carrier.Reader
 import           Control.Monad hiding (fail)
 import           Control.Monad.Catch
 import           Control.Monad.IO.Class
@@ -116,7 +116,7 @@ checkPythonFile fp = HUnit.testCaseSteps (Path.toString fp) $ \step -> withFroze
   result <- ByteString.readFile (Path.toString fullPath) >>= TS.parseByteString TSP.tree_sitter_python
 
   -- Run the compiler
-  let coreResult = Control.Effect.run
+  let coreResult = Control.Algebra.run
                    . runFail
                    . runReader @Py.Bindings mempty
                    . Py.toplevelCompile
