@@ -11,7 +11,9 @@ import qualified Data.Map.Strict as Map
 
 import Control.Abstract as Abstract
 import Control.Abstract.ScopeGraph (runAllocator)
-import Control.Effect.Carrier
+import Control.Algebra
+import Control.Carrier.Error.Either
+import Control.Carrier.Reader
 import Control.Effect.Interpose
 import Data.Abstract.Evaluatable
 import Data.Abstract.Module
@@ -44,18 +46,18 @@ type DomainC term address value m
     m))))))))))
 
 -- | Evaluate a list of modules with the prelude for the passed language available, and applying the passed function to every module.
-evaluate :: ( Carrier outerSig outer
+evaluate :: ( Algebra outerSig outer
             , derefSig ~ (Deref value :+: allocatorSig)
             , derefC ~ DerefC address value allocatorC
-            , Carrier derefSig derefC
+            , Algebra derefSig derefC
             , allocatorSig ~ (Allocator address :+: Reader ModuleInfo :+: outerSig)
             , allocatorC ~ AllocatorC address (ReaderC ModuleInfo outer)
-            , Carrier allocatorSig allocatorC
+            , Algebra allocatorSig allocatorC
             , Effect outerSig
-            , Member Fresh outerSig
-            , Member (Reader (ModuleTable (Module (ModuleResult address value)))) outerSig
-            , Member (State (Heap address address value)) outerSig
-            , Member (State (ScopeGraph address)) outerSig
+            , Has Fresh outerSig outer
+            , Has (Reader (ModuleTable (Module (ModuleResult address value)))) outerSig outer
+            , Has (State (Heap address address value)) outerSig outer
+            , Has (State (ScopeGraph address)) outerSig outer
             , Ord address
             )
          => proxy (lang :: Language)
@@ -109,21 +111,21 @@ runDomainEffects :: ( AbstractValue term address value (DomainC term address val
                     , whileSig ~ (While value :+: booleanSig)
                     , functionC ~ FunctionC term address value whileC
                     , functionSig ~ (Function term address value :+: whileSig)
-                    , Carrier functionSig functionC
+                    , Algebra functionSig functionC
                     , HasPrelude lang
-                    , Member (Allocator address) sig
-                    , Member (Deref value) sig
-                    , Member Fresh sig
-                    , Member (Reader (CurrentFrame address)) sig
-                    , Member (Reader (CurrentScope address)) sig
-                    , Member (Reader ModuleInfo) sig
-                    , Member (Reader Span) sig
-                    , Member (Resumable (BaseError (AddressError address value))) sig
-                    , Member (Resumable (BaseError (HeapError address))) sig
-                    , Member (Resumable (BaseError (ScopeError address))) sig
-                    , Member (State (Heap address address value)) sig
-                    , Member (State (ScopeGraph address)) sig
-                    , Member Trace sig
+                    , Has (Allocator address) sig m
+                    , Has (Deref value) sig m
+                    , Has Fresh sig m
+                    , Has (Reader (CurrentFrame address)) sig m
+                    , Has (Reader (CurrentScope address)) sig m
+                    , Has (Reader ModuleInfo) sig m
+                    , Has (Reader Span) sig m
+                    , Has (Resumable (BaseError (AddressError address value))) sig m
+                    , Has (Resumable (BaseError (HeapError address))) sig m
+                    , Has (Resumable (BaseError (ScopeError address))) sig m
+                    , Has (State (Heap address address value)) sig m
+                    , Has (State (ScopeGraph address)) sig m
+                    , Has Trace sig m
                     , Ord address
                     , Show address
                     )
@@ -148,44 +150,43 @@ runDomainEffects runTerm
 -- | Evaluate a term recursively, applying the passed function at every recursive position.
 --
 --   This calls out to the 'Evaluatable' instances, and can have other functions composed after it to e.g. intercept effects arising in the evaluation of the term.
-evalTerm :: ( Carrier sig m
-            , AbstractValue term address value m
+evalTerm :: ( AbstractValue term address value m
             , AccessControls term
             , Declarations term
             , Evaluatable (Base term)
             , FreeVariables term
             , HasSpan term
-            , Member (Allocator address) sig
-            , Member (Bitwise value) sig
-            , Member (Boolean value) sig
-            , Member (Deref value) sig
-            , Member (Error (LoopControl value)) sig
-            , Member (Error (Return value)) sig
-            , Member (Function term address value) sig
-            , Member (Modules address value) sig
-            , Member (Numeric value) sig
-            , Member (Object address value) sig
-            , Member (Array value) sig
-            , Member (Hash value) sig
-            , Member (Reader ModuleInfo) sig
-            , Member (Reader PackageInfo) sig
-            , Member (Reader Span) sig
-            , Member (Resumable (BaseError (AddressError address value))) sig
-            , Member (Resumable (BaseError (HeapError address))) sig
-            , Member (Resumable (BaseError (ScopeError address))) sig
-            , Member (Resumable (BaseError (UnspecializedError address value))) sig
-            , Member (Resumable (BaseError (EvalError term address value))) sig
-            , Member (Resumable (BaseError ResolutionError)) sig
-            , Member (State (Heap address address value)) sig
-            , Member (State (ScopeGraph address)) sig
-            , Member (Abstract.String value) sig
-            , Member (Reader (CurrentFrame address)) sig
-            , Member (Reader (CurrentScope address)) sig
-            , Member (State Span) sig
-            , Member (Unit value) sig
-            , Member (While value) sig
-            , Member Fresh sig
-            , Member Trace sig
+            , Has (Allocator address) sig m
+            , Has (Bitwise value) sig m
+            , Has (Boolean value) sig m
+            , Has (Deref value) sig m
+            , Has (Error (LoopControl value)) sig m
+            , Has (Error (Return value)) sig m
+            , Has (Function term address value) sig m
+            , Has (Modules address value) sig m
+            , Has (Numeric value) sig m
+            , Has (Object address value) sig m
+            , Has (Array value) sig m
+            , Has (Hash value) sig m
+            , Has (Reader ModuleInfo) sig m
+            , Has (Reader PackageInfo) sig m
+            , Has (Reader Span) sig m
+            , Has (Resumable (BaseError (AddressError address value))) sig m
+            , Has (Resumable (BaseError (HeapError address))) sig m
+            , Has (Resumable (BaseError (ScopeError address))) sig m
+            , Has (Resumable (BaseError (UnspecializedError address value))) sig m
+            , Has (Resumable (BaseError (EvalError term address value))) sig m
+            , Has (Resumable (BaseError ResolutionError)) sig m
+            , Has (State (Heap address address value)) sig m
+            , Has (State (ScopeGraph address)) sig m
+            , Has (Abstract.String value) sig m
+            , Has (Reader (CurrentFrame address)) sig m
+            , Has (Reader (CurrentScope address)) sig m
+            , Has (State Span) sig m
+            , Has (Unit value) sig m
+            , Has (While value) sig m
+            , Has Fresh sig m
+            , Has Trace sig m
             , Ord address
             , Recursive term
             , Show address
