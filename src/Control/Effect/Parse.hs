@@ -11,7 +11,7 @@ module Control.Effect.Parse
 , Has
 ) where
 
-import Control.Carrier
+import Control.Algebra
 import Control.Effect.Error
 import Control.Exception (SomeException)
 import Data.Bitraversable
@@ -30,7 +30,7 @@ instance HFunctor Parse where
   hmap f (Parse parser blob k) = Parse parser blob (f . k)
 
 instance Effect Parse where
-  handle state handler (Parse parser blob k) = Parse parser blob (handler . (<$ state) . k)
+  thread state handler (Parse parser blob k) = Parse parser blob (handler . (<$ state) . k)
 
 
 -- | Parse a 'Blob' with the given 'Parser'.
