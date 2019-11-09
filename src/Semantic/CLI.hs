@@ -2,7 +2,7 @@
 module Semantic.CLI (main) where
 
 import qualified Control.Carrier.Parse.Measured as Parse
-import           Control.Effect.Reader
+import           Control.Carrier.Reader
 import           Control.Exception as Exc (displayException)
 import           Data.Blob
 import           Data.Blob.IO
