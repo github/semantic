@@ -10,17 +10,14 @@ import           Control.Exception (displayException)
 import qualified Control.Foldl as Foldl
 import           Control.Lens
 import           Control.Monad
-import           Control.Monad.IO.Class
 import           Control.Monad.Trans.Resource (ResIO, runResourceT)
 import           Data.Blob
 import qualified Data.ByteString.Lazy.Char8 as BLC
 import qualified Data.ByteString.Streaming.Char8 as ByteStream
-import           Data.Either
 import           Data.Foldable
 import           Data.Function ((&))
 import           Data.Language (LanguageMode (..), PerLanguageModes (..))
 import           Data.Set (Set)
-import           Data.Typeable
 import qualified Streaming.Prelude as Stream
 import           System.FilePath.Glob
 import           System.Path ((</>))
@@ -30,12 +27,10 @@ import qualified System.Process as Process
 import Data.Flag
 import Proto.Semantic as P hiding (Blob, BlobPair)
 import Proto.Semantic_Fields as P
-import Semantic.Api (TermOutputFormat (..), parseTermBuilder)
-import Semantic.Api.Symbols (parseSymbols, parseSymbolsBuilder)
+import Semantic.Api.Symbols (parseSymbols)
 import Semantic.Config as Config
 import Semantic.Task
 import Semantic.Task.Files
-import Serializing.Format (Format (..))
 
 import qualified Test.Tasty as Tasty
 import qualified Test.Tasty.HUnit as HUnit
@@ -84,12 +79,12 @@ buildExamples session lang tsDir = do
       -- Use alacarte language mode (this is the control)
       step "a la carte"
       alacarte <- runTask session (runParse (parseSymbolsFilePath aLaCarteLanguageModes file))
-      assertOK alacarte file knownFailures
+      assertOK alacarte knownFailures
 
       -- Test out precise language mode (treatment)
       step "precise"
       precise <- runTask session (runParse (parseSymbolsFilePath preciseLanguageModes file))
-      assertOK precise file knownFailures
+      assertOK precise knownFailures
 
       -- Compare the control and treatment
       case (alacarte, precise) of
@@ -99,11 +94,11 @@ buildExamples session lang tsDir = do
   pure (Tasty.testGroup (languageName lang) trees)
 
   where
-    assertOK res file knownFailures = case res of
+    assertOK res _ = case res of
       Left e  -> HUnit.assertFailure (show (displayException e))
       Right res -> case toList (res^.files) of
         [x] | (e:_) <- toList (x^.errors) -> HUnit.assertFailure (show e)
-        [x] -> pure ()
+        [_] -> pure ()
         _   -> HUnit.assertFailure "Expected 1 file in response"
 
 aLaCarteLanguageModes :: PerLanguageModes
@@ -153,9 +148,7 @@ parseSymbolsFilePath ::
   , Member Distribute sig
   , Member Parse sig
   , Member Files sig
-  , Member (Reader Config) sig
   , Carrier sig m
-  , MonadIO m
   )
   => PerLanguageModes
   -> Path.RelFile
