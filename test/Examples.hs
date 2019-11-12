@@ -74,8 +74,7 @@ buildExamples session lang tsDir = do
   files <- globDir1 (compile ("**/*" <> languageExtension lang)) (Path.toString (tsDir </> languageExampleDir lang))
   let paths = Path.relFile <$> files
   trees <- forConcurrently paths $ \file -> do
-    path <- Path.toString <$> (Path.makeRelative <$> Path.makeAbsoluteFromCwd tsDir <*> Path.makeAbsoluteFromCwd file)
-    pure . HUnit.testCaseSteps ("[" <> languageName lang <> "] " <> path) $ \step -> do
+    pure . HUnit.testCaseSteps ("[" <> languageName lang <> "] " <> Path.toString file) $ \step -> do
       -- Use alacarte language mode (this is the control)
       step "a la carte"
       alacarte <- runTask session (runParse (parseSymbolsFilePath aLaCarteLanguageModes file))
