@@ -15,6 +15,8 @@ import           Core.Parser as Parse
 import qualified Core.Eval as Eval
 import           Core.Name
 import qualified Generators as Gen
+import qualified Graph
+import           Graph (parseEither)
 import           Source.Span
 import           Syntax.Term
 
@@ -23,9 +25,6 @@ import           Syntax.Term
 true, false :: Term Core Name
 true  = bool True
 false = bool False
-
-parseEither :: Trifecta.Parser a -> String -> Either String a
-parseEither p = Trifecta.foldResult (Left . show . Trifecta._errDoc) Right . Trifecta.parseString (p <* Trifecta.eof) mempty
 
 -- * Parser roundtripping properties. Note that parsing and prettyprinting is generally
 -- not a roundtrip, because the parser inserts 'Ann' nodes itself.
@@ -113,6 +112,7 @@ tests = testGroup "semantic-core"
   [ parserSpecs
   , parserExamples
   , parserProps
+  , Graph.testTree
   ]
 
 main :: IO ()
