@@ -51,6 +51,7 @@ library
   exposed-modules:
     Language.Python
     Language.Python.Core
+    Language.Python.Failure
     Language.Python.Tags
   hs-source-dirs: src
 
