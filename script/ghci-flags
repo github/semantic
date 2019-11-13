@@ -1,0 +1,65 @@
+#!/bin/bash
+# Computes the flags for ghcide to pass to ghci. You probably won’t be running this yourself, but rather ghcide will via configuration in hie.yaml.
+
+set -e
+
+cd $(dirname "$0")/..
+
+root="$(pwd)"
+ghc_version="$(ghc --numeric-version)"
+
+if [ "$1" == "--builddir" ]; then
+  repl_builddir="$2"
+  shift 2
+else
+  repl_builddir=dist-newstyle
+fi
+
+echo "-O0"
+echo "-ignore-dot-ghci"
+
+echo "-outputdir $repl_builddir/build/x86_64-osx/ghc-$ghc_version/semantic-0.8.0.0/build"
+echo "-odir $repl_builddir/build/x86_64-osx/ghc-$ghc_version/semantic-0.8.0.0/build"
+echo "-hidir $repl_builddir/build/x86_64-osx/ghc-$ghc_version/semantic-0.8.0.0/build"
+echo "-stubdir $repl_builddir/build/x86_64-osx/ghc-$ghc_version/semantic-0.8.0.0/build"
+
+echo "-i$root/$repl_builddir/build/x86_64-osx/ghc-$ghc_version/semantic-0.8.0.0/build/autogen"
+
+echo "-I$root/$repl_builddir/build/x86_64-osx/ghc-$ghc_version/semantic-0.8.0.0/build/autogen"
+
+echo "-i$root/semantic-analysis/src"
+echo "-i$root/semantic-ast/src"
+echo "-i$root/semantic-core/src"
+echo "-i$root/semantic-java/src"
+echo "-i$root/semantic-json/src"
+echo "-i$root/semantic-python/src"
+echo "-i$root/semantic-tags/src"
+echo "-i$root/app"
+echo "-i$root/src"
+echo "-i$root/bench"
+echo "-i$root/test"
+
+echo "-optP-include"
+echo "-optP$root/$repl_builddir/build/x86_64-osx/ghc-$ghc_version/semantic-0.8.0.0/build/autogen/cabal_macros.h"
+
+echo "-hide-all-packages"
+
+# Emit package flags from the environment file, removing comments & prefixing with -
+cabal exec --builddir=$repl_builddir -v0 bash -- -c 'cat $GHC_ENVIRONMENT' | grep -v '^--' | sed -e 's/^/-/'
+
+echo "-XHaskell2010"
+echo "-XStrictData"
+
+echo "-Wwarn"
+
+echo "-Weverything"
+echo "-Wno-all-missed-specialisations"
+echo "-Wno-implicit-prelude"
+echo "-Wno-missed-specialisations"
+echo "-Wno-missing-import-lists"
+echo "-Wno-missing-local-signatures"
+echo "-Wno-monomorphism-restriction"
+echo "-Wno-name-shadowing"
+echo "-Wno-safe"
+echo "-Wno-unsafe"
+echo "-Wno-star-is-type"

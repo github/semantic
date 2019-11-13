@@ -19,6 +19,7 @@ dist-repl
 tmp/
 /bin/
 
+/src/Semantic/Version.hs.bak
 /semanticd/test/current
 /semanticd/test/rover-example-config/semantic.log
 /test/fixtures/*/examples
@@ -26,7 +27,6 @@ tmp/
 *.hp
 *.prof
 *.pyc
-/hie.yaml
 
 /test.*
 /*.html
