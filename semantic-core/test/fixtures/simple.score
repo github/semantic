@@ -1,0 +1,5 @@
+{
+  func <- \x -> "string";
+
+  func #unit
+}

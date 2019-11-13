@@ -64,7 +64,9 @@ test-suite test
   type:           exitcode-stdio-1.0
   hs-source-dirs: test
   main-is:        Test.hs
-  other-modules:  Generators
+  other-modules:
+    Generators
+    Graph
   build-depends:
       base
     , semantic-analysis
