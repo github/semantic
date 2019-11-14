@@ -5,7 +5,7 @@ module Graph
   , parseEither
   ) where
 
-import qualified Analysis.ScopeGraph as ScopeGraph
+--import qualified Analysis.ScopeGraph as ScopeGraph
 import           Core.Core
 import           Core.Name
 import           Core.Parser as Parse
