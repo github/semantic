@@ -75,6 +75,8 @@ test-suite test
     , fused-effects
     , fused-syntax
     , hedgehog ^>= 1
+    , pathtype
+    , semilattices ^>= 0.0.0.4
     , tasty >= 1.2 && <2
     , tasty-hedgehog ^>= 1.0.0.1
     , tasty-hunit >= 0.10 && <1
