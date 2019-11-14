@@ -20,7 +20,7 @@ parseEither p = Trifecta.foldResult (Left . show . Trifecta._errDoc) Right . Tri
 
 testSimpleScopeGraph :: Tasty.TestTree
 testSimpleScopeGraph = HUnit.testCase "simple.score" $ do
-  contents <- readFile "test/fixtures/simple.score"
+  contents <- readFile "semantic-core/test/fixtures/simple.score"
   (_parsed :: Term Core Name) <- case parseEither Parse.core contents of
     Right x -> pure x
     Left m  -> HUnit.assertFailure ("Couldn't parse simple.score: " <> m)
