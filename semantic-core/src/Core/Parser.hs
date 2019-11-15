@@ -1,5 +1,4 @@
-{-# LANGUAGE ConstraintKinds #-}
-{-# LANGUAGE FlexibleContexts, GeneralizedNewtypeDeriving, LambdaCase, TypeOperators #-}
+{-# LANGUAGE ConstraintKinds, FlexibleContexts, GeneralizedNewtypeDeriving, LambdaCase, TypeOperators #-}
 module Core.Parser
   ( core
   , lit
@@ -21,14 +20,14 @@ import           Data.Foldable (foldl')
 import           Data.Function
 import           Data.Int
 import           Data.String
+import qualified Source.Span as Source
 import           Text.Parser.LookAhead (LookAheadParsing)
 import qualified Text.Parser.Token as Token
 import qualified Text.Parser.Token.Highlight as Highlight
 import qualified Text.Parser.Token.Style as Style
 import           Text.Trifecta hiding (ident)
-import qualified Text.Trifecta.Rendering as Trifecta
 import qualified Text.Trifecta.Delta as Trifecta
-import qualified Source.Span as Source
+import qualified Text.Trifecta.Rendering as Trifecta
 
 -- * Identifier styles and derived parsers
 
