@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings, TypeApplications, TypeOperators #-}
+{-# LANGUAGE FlexibleContexts, OverloadedStrings, TypeApplications, TypeOperators #-}
 module Main (main) where
 
 import qualified Text.Trifecta as Trifecta
@@ -9,6 +9,7 @@ import           Test.Tasty.Hedgehog
 import           Test.Tasty.HUnit
 
 import           Analysis.File
+import           Control.Effect
 import           Core.Core
 import           Core.Pretty
 import           Core.Parser as Parse
@@ -20,7 +21,7 @@ import           Syntax.Term
 
 -- * Helpers
 
-true, false :: Term Core Name
+true, false :: Term (Ann Span :+: Core) Name
 true  = bool True
 false = bool False
 
@@ -30,10 +31,10 @@ parseEither p = Trifecta.foldResult (Left . show . Trifecta._errDoc) Right . Tri
 -- * Parser roundtripping properties. Note that parsing and prettyprinting is generally
 -- not a roundtrip, because the parser inserts 'Ann' nodes itself.
 
-prop_roundtrips :: Gen (Term Core Name) -> Property
+prop_roundtrips :: Gen (Term (Ann Span :+: Core) Name) -> Property
 prop_roundtrips gen = property $ do
   input <- forAll gen
-  tripping input showCore (parseEither (Parse.core <* Trifecta.eof))
+  tripping input (showCore . stripAnnotations) (parseEither (Parse.core <* Trifecta.eof))
 
 parserProps :: TestTree
 parserProps = testGroup "Parsing: roundtripping"
@@ -46,7 +47,7 @@ parserProps = testGroup "Parsing: roundtripping"
 
 -- * Parser specs
 
-parsesInto :: String -> Term Core Name -> Assertion
+parsesInto :: String -> Term (Ann Span :+: Core) Name -> Assertion
 parsesInto str res = case parseEither Parse.core str of
   Right x -> x @?= res
   Left m  -> assertFailure m
@@ -56,7 +57,7 @@ assert_booleans_parse = do
   parseEither Parse.core "#true"  @?= Right true
   parseEither Parse.core "#false" @?= Right false
 
-a, f, g, h :: Term Core Name
+a, f, g, h :: Term (Ann Span :+: Core) Name
 (a, f, g, h) = (pure "a", pure "f", pure "g", pure "h")
 
 assert_ifthen_parse :: Assertion
@@ -92,8 +93,8 @@ parserSpecs = testGroup "Parsing: simple specs"
   , testCase "quoted names" assert_quoted_name_parse
   ]
 
-assert_roundtrips :: File (Term Core Name) -> Assertion
-assert_roundtrips (File _ _ core) = case parseEither Parse.core (showCore core) of
+assert_roundtrips :: File (Term (Ann Span :+: Core) Name) -> Assertion
+assert_roundtrips (File _ _ core) = case parseEither Parse.core (showCore (stripAnnotations core)) of
   Right v -> v @?= core
   Left  e -> assertFailure e
 
