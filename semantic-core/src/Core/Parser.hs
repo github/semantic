@@ -106,7 +106,7 @@ projection = foldl' (&) <$> atom <*> many (choice [ flip (Core..?)  <$ symbol ".
                                                   ])
 
 atom :: CoreParsing sig m t => m (t Name)
-atom = choice
+atom = positioned . choice $
   [ comp
   , lit
   , ident
