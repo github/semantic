@@ -78,6 +78,7 @@ test-suite test
     , hedgehog ^>= 1
     , microlens ^>= 0.4.11
     , pathtype
+    , pretty-simple
     , semilattices ^>= 0.0.0.4
     , tasty >= 1.2 && <2
     , tasty-hedgehog ^>= 1.0.0.1
