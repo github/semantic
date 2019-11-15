@@ -76,6 +76,7 @@ test-suite test
     , fused-syntax
     , hedgehog ^>= 1
     , pathtype
+    , pretty-simple
     , semilattices ^>= 0.0.0.4
     , tasty >= 1.2 && <2
     , tasty-hedgehog ^>= 1.0.0.1

@@ -17,6 +17,7 @@ import qualified Core.Eval as Eval
 import           Analysis.File
 import qualified System.Path as Path
 import qualified System.Path.IO as Path (readFile)
+import Text.Pretty.Simple
 
 import qualified Test.Tasty as Tasty
 import qualified Test.Tasty.HUnit as HUnit
@@ -31,7 +32,12 @@ testSimpleScopeGraph = HUnit.testCase "simple.score" $ do
   case parseEither Parse.core contents of
     Left m  -> HUnit.assertFailure ("Couldn't parse simple.score: " <> m)
     Right (x :: Term Core Name) -> do
-      (_heap, [_res]) <- pure (ScopeGraph.scopeGraph Eval.eval [File p lowerBound (hoistTerm inj x)])
+      (heap, [res]) <- pure (ScopeGraph.scopeGraph Eval.eval [File p lowerBound (hoistTerm inj x)])
+      putStrLn "*** heap ***"
+      pPrint heap
+      putStrLn "*** res ***"
+      pPrint res
+
       pure ()
 
 testTree :: Tasty.TestTree
