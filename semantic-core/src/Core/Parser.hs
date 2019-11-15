@@ -70,7 +70,7 @@ convertSpan :: Trifecta.Span -> Source.Span
 convertSpan (Trifecta.Span s e _) = Source.Span (convertDelta s) (convertDelta e)
   where
     build :: Int64 -> Int64 -> Source.Pos
-    build l c = Source.Pos (fromIntegral l) (fromIntegral c)
+    build l c = Source.Pos (fromIntegral l + 1) (fromIntegral c)
     convertDelta :: Trifecta.Delta -> Source.Pos
     convertDelta = \case
       Trifecta.Columns c _        -> build 0 c
