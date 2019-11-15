@@ -1,4 +1,4 @@
-{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE ScopedTypeVariables, TypeOperators #-}
 
 module Graph
   ( testTree
@@ -18,6 +18,7 @@ import           Analysis.File
 import qualified System.Path as Path
 import qualified System.Path.IO as Path (readFile)
 import Text.Pretty.Simple
+import Source.Span
 
 import qualified Test.Tasty as Tasty
 import qualified Test.Tasty.HUnit as HUnit
@@ -31,8 +32,8 @@ testSimpleScopeGraph = HUnit.testCase "simple.score" $ do
   contents <- Path.readFile p
   case parseEither Parse.core contents of
     Left m  -> HUnit.assertFailure ("Couldn't parse simple.score: " <> m)
-    Right (x :: Term Core Name) -> do
-      (heap, [res]) <- pure (ScopeGraph.scopeGraph Eval.eval [File p lowerBound (hoistTerm inj x)])
+    Right (x :: Term (Ann Span :+: Core) Name) -> do
+      (heap, [res]) <- pure (ScopeGraph.scopeGraph Eval.eval [File p lowerBound x])
       putStrLn "*** heap ***"
       pPrint heap
       putStrLn "*** res ***"
