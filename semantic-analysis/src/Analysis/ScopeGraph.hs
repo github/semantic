@@ -41,6 +41,10 @@ data Ref = Ref
   }
   deriving (Eq, Ord, Show)
 
+instance HasSpan Ref where
+  span_ afa s = fmap (put s) (afa (refSpan s))
+    where put r s = r { refSpan = s }
+
 newtype ScopeGraph name = ScopeGraph { unScopeGraph :: Map.Map (Decl name) (Set.Set Ref) }
   deriving (Eq, Ord, Show)
 
