@@ -79,8 +79,8 @@ convertSpan (Trifecta.Span s e _) = Source.Span (convertDelta s) (convertDelta e
       Trifecta.Lines l c _ _      -> build l c
       Trifecta.Directed _ l c _ _ -> build l c
 
-_positioned :: CoreParsing sig m t => m (t a) -> m (t a)
-_positioned act = do
+positioned :: CoreParsing sig m t => m (t a) -> m (t a)
+positioned act = do
   result :~ triSpan <- spanned act
   pure (Core.annAt (convertSpan triSpan) result)
 
@@ -150,12 +150,14 @@ lit = let x `given` n = x <$ reserved n in choice
   ] <?> "literal"
 
 record :: CoreParsing sig m t => m (t Name)
-record = Core.record <$ reserved "#record" <*> braces (sepEndBy ((,) <$> identifier <* symbolic ':' <*> expr) comma)
+record = Core.record <$ reserved "#record" <*> braces (field `sepEndBy` comma)
+  where
+    field = ((,) <$> identifier <* symbolic ':' <*> expr)
 
 lambda :: CoreParsing sig m t => m (t Name)
 lambda = Core.lam <$ lambduh <*> name <* arrow <*> expr <?> "lambda" where
   lambduh = symbolic 'λ' <|> symbolic '\\'
   arrow   = symbol "→"   <|> symbol "->"
 
-ident :: (Applicative t, Monad m, TokenParsing m) => m (t Name)
-ident = pure . namedValue <$> name <?> "identifier"
+ident :: CoreParsing sig m t => m (t Name)
+ident = positioned (pure . namedValue <$> name <?> "identifier")

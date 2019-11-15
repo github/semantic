@@ -34,7 +34,7 @@ parseEither p = Trifecta.foldResult (Left . show . Trifecta._errDoc) Right . Tri
 prop_roundtrips :: Gen (Term (Ann Span :+: Core) Name) -> Property
 prop_roundtrips gen = property $ do
   input <- forAll gen
-  tripping input (showCore . stripAnnotations) (parseEither (Parse.core <* Trifecta.eof))
+  tripping input (showCore . stripAnnotations) (fmap (stripAnnotations @Span) . parseEither (Parse.core <* Trifecta.eof))
 
 parserProps :: TestTree
 parserProps = testGroup "Parsing: roundtripping"
@@ -49,7 +49,7 @@ parserProps = testGroup "Parsing: roundtripping"
 
 parsesInto :: String -> Term (Ann Span :+: Core) Name -> Assertion
 parsesInto str res = case parseEither Parse.core str of
-  Right x -> x @?= res
+  Right x -> stripAnnotations @Span x @?= stripAnnotations res
   Left m  -> assertFailure m
 
 assert_booleans_parse :: Assertion
@@ -95,7 +95,7 @@ parserSpecs = testGroup "Parsing: simple specs"
 
 assert_roundtrips :: File (Term (Ann Span :+: Core) Name) -> Assertion
 assert_roundtrips (File _ _ core) = case parseEither Parse.core (showCore (stripAnnotations core)) of
-  Right v -> v @?= core
+  Right v -> stripAnnotations @Span v @?= stripAnnotations core
   Left  e -> assertFailure e
 
 parserExamples :: TestTree
