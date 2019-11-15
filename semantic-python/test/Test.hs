@@ -132,7 +132,7 @@ checkPythonFile fp = HUnit.testCaseSteps (Path.toString fp) $ \step -> withFroze
       (Right (Right _), Directive.Fails)         -> HUnit.assertFailure "Expected translation to fail"
       (Right (Right item), Directive.Result k v) -> assertEvaluatesTo item k v
       (Right (Right item), Directive.JQ _)       -> assertJQExpressionSucceeds directive result item
-      (Right (Right item), Directive.Tree t)     -> assertTreeEqual (stripAnnotations item) t
+      (Right (Right item), Directive.Tree t)     -> assertTreeEqual (stripAnnotations item) (stripAnnotations t)
 
 milestoneFixtures :: IO Tasty.TestTree
 milestoneFixtures = buildTests <$> readFiles
