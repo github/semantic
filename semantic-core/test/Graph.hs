@@ -1,26 +1,28 @@
-{-# LANGUAGE ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE ScopedTypeVariables, TypeOperators, OverloadedStrings, OverloadedLists #-}
 
 module Graph
   ( testTree
   , parseEither
   ) where
 
+import           Analysis.File
+import           Analysis.ScopeGraph
 import           Control.Effect.Carrier
-import qualified Analysis.ScopeGraph as ScopeGraph
 import           Core.Core
+import qualified Core.Eval as Eval
 import           Core.Name
 import           Core.Parser as Parse
-import           Syntax.Term
-import qualified Text.Trifecta as Trifecta
+import qualified Data.Map as Map
 import           Data.Semilattice.Lower
-import qualified Core.Eval as Eval
-import           Analysis.File
+import           Lens.Micro
+import           Source.Span
+import           Syntax.Term
 import qualified System.Path as Path
 import qualified System.Path.IO as Path (readFile)
-import Text.Pretty.Simple
-import Source.Span
+import qualified Text.Trifecta as Trifecta
 
 import qualified Test.Tasty as Tasty
+import           Test.Tasty.HUnit ((@?=))
 import qualified Test.Tasty.HUnit as HUnit
 
 parseEither :: Trifecta.Parser a -> String -> Either String a
@@ -33,13 +35,12 @@ testSimpleScopeGraph = HUnit.testCase "simple.score" $ do
   case parseEither Parse.core contents of
     Left m  -> HUnit.assertFailure ("Couldn't parse simple.score: " <> m)
     Right (x :: Term (Ann Span :+: Core) Name) -> do
-      (heap, [res]) <- pure (ScopeGraph.scopeGraph Eval.eval [File p lowerBound x])
-      putStrLn "*** heap ***"
-      pPrint heap
-      putStrLn "*** res ***"
-      pPrint res
+      (_heap, [File { fileBody = Right (ScopeGraph res) }]) <- pure (scopeGraph Eval.eval [File p lowerBound x])
+      [(decl, [ref])] <- pure (Map.toList res)
+      declSymbol decl @?= "func"
+      ref^.span_.start_ @?= Pos 4 2
+      ref^.span_.end_   @?= Pos 4 7
 
-      pure ()
 
 testTree :: Tasty.TestTree
 testTree = Tasty.testGroup "Core scope graphing"
