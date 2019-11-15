@@ -141,13 +141,13 @@ name :: (TokenParsing m, Monad m) => m (Named Name)
 name = named' <$> identifier <?> "name"
 
 lit :: CoreParsing sig m t => m (t Name)
-lit = let x `given` n = x <$ reserved n in choice
+lit = let x `given` n = x <$ reserved n in positioned (choice
   [ Core.bool True  `given` "#true"
   , Core.bool False `given` "#false"
   , Core.unit       `given` "#unit"
   , record
   , Core.string <$> stringLiteral
-  ] <?> "literal"
+  ] <?> "literal")
 
 record :: CoreParsing sig m t => m (t Name)
 record = Core.record <$ reserved "#record" <*> braces (field `sepEndBy` comma)
