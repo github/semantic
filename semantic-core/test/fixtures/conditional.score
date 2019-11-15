@@ -1,0 +1,11 @@
+{
+  cond <- #true;
+
+  if cond then {
+    merle <- \x -> "merle";
+    merle #unit
+  } else {
+    taako <- \x -> "taako";
+    taako #unit
+  }
+}
