@@ -91,7 +91,7 @@ core :: CoreParsing sig m t => m (t Name)
 core = runCoreParser expr
 
 expr :: CoreParsing sig m t => m (t Name)
-expr = ifthenelse <|> lambda <|> rec <|> load <|> assign
+expr = positioned (ifthenelse <|> lambda <|> rec <|> load <|> assign)
 
 assign :: CoreParsing sig m t => m (t Name)
 assign = application <**> (symbolic '=' *> rhs <|> pure id) <?> "assignment"

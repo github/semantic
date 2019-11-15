@@ -28,13 +28,18 @@ false = bool False
 parseEither :: Trifecta.Parser a -> String -> Either String a
 parseEither p = Trifecta.foldResult (Left . show . Trifecta._errDoc) Right . Trifecta.parseString (p <* Trifecta.eof) mempty
 
+unSpan :: Functor f
+       => f (Term (Ann Span :+: (Ann Span :+: Core)) a)
+       -> f (Term (Ann Span :+: Core) a)
+unSpan = fmap (stripAnnotations @Span)
+
 -- * Parser roundtripping properties. Note that parsing and prettyprinting is generally
 -- not a roundtrip, because the parser inserts 'Ann' nodes itself.
 
 prop_roundtrips :: Gen (Term (Ann Span :+: Core) Name) -> Property
 prop_roundtrips gen = property $ do
   input <- forAll gen
-  tripping input (showCore . stripAnnotations) (fmap (stripAnnotations @Span) . parseEither (Parse.core <* Trifecta.eof))
+  tripping input (showCore . stripAnnotations) (unSpan . parseEither (Parse.core <* Trifecta.eof))
 
 parserProps :: TestTree
 parserProps = testGroup "Parsing: roundtripping"
@@ -54,8 +59,8 @@ parsesInto str res = case parseEither Parse.core str of
 
 assert_booleans_parse :: Assertion
 assert_booleans_parse = do
-  parseEither Parse.core "#true"  @?= Right true
-  parseEither Parse.core "#false" @?= Right false
+  unSpan (parseEither Parse.core "#true")  @?= Right true
+  unSpan (parseEither Parse.core "#false") @?= Right false
 
 a, f, g, h :: Term (Ann Span :+: Core) Name
 (a, f, g, h) = (pure "a", pure "f", pure "g", pure "h")
