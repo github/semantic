@@ -29,7 +29,7 @@ import qualified System.Path as Path
 import qualified System.Path.PartClass as Path.Class
 import           System.Process
 import qualified Text.Parser.Token.Style as Style
-import           Text.Trifecta (CharParsing, TokenParsing (..))
+import           Text.Trifecta (CharParsing, DeltaParsing (..))
 import qualified Text.Trifecta as Trifecta
 
 {- |
@@ -57,7 +57,7 @@ projects.
 
 -}
 data Directive = JQ ByteString -- | @# CHECK-JQ: expr@
-               | Tree (Term Core Name) -- | @# CHECK-TREE: core@
+               | Tree (Term (Core.Ann Source.Span :+: Core) Name) -- | @# CHECK-TREE: core@
                | Result Text (Concrete (Term (Core.Ann Source.Span :+: Core)) Name) -- | @# CHECK-RESULT key: expected
                | Fails -- | @# CHECK-FAILS@ fails unless translation fails.
                  deriving (Eq, Show)
@@ -80,7 +80,7 @@ readDirectivesFromFile
 
 describe :: Directive -> String
 describe Fails        = "<expect failure>"
-describe (Tree t)     =  Core.Pretty.showCore t
+describe (Tree t)     =  Core.Pretty.showCore (Core.stripAnnotations t)
 describe (JQ b)       = ByteString.unpack b
 describe (Result t e) = T.unpack t <> ": " <> show e
 
@@ -92,19 +92,19 @@ jq = do
   void $ Trifecta.string "# CHECK-JQ: "
   JQ . ByteString.pack <$> many (Trifecta.noneOf "\n")
 
-tree :: (Monad m, TokenParsing m) => m Directive
+tree :: (Monad m, DeltaParsing m) => m Directive
 tree = do
   void $ Trifecta.string "# CHECK-TREE: "
   Tree <$> Core.Parser.core
 
-result :: (Monad m, TokenParsing m) => m Directive
+result :: (Monad m, DeltaParsing m) => m Directive
 result = do
   void $ Trifecta.string "# CHECK-RESULT "
   key <- Trifecta.ident Style.haskellIdents
   void $ Trifecta.symbolic ':'
   Result key <$> concrete
 
-concrete :: TokenParsing m => m (Concrete term Name)
+concrete :: DeltaParsing m => m (Concrete term Name)
 concrete = Trifecta.choice
   [ String <$> Trifecta.stringLiteral
   , Bool True <$ Trifecta.symbol "#true"
@@ -112,7 +112,7 @@ concrete = Trifecta.choice
   , Unit <$ Trifecta.symbol "#unit"
   ]
 
-directive :: (Monad m, TokenParsing m) => m Directive
+directive :: DeltaParsing m => m Directive
 directive = Trifecta.choice [ fails, result, jq, tree ]
 
 parseDirective :: ByteString -> Either String Directive
