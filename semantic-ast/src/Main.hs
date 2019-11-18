@@ -58,7 +58,6 @@ generateAST (SemanticAST format noColor source) =
           Pretty | noColor -> pPrintNoColor
                  | otherwise -> pPrint
 
--- need AST in scope for case format and ..
 
 opts :: ParserInfo SemanticAST
 opts = info (parseAST <**> helper)
@@ -70,5 +69,3 @@ opts = info (parseAST <**> helper)
 data Format = Show
             | Pretty
   deriving (Read)
-
--- bool field would break Read
