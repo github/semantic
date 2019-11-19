@@ -1,4 +1,5 @@
 {-# LANGUAGE TypeApplications #-}
+{-# GHC-OPTIONS -Wall -Werror -Wredundant-constraints #-}
 module Main (main) where
 
 import System.Environment
