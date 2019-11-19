@@ -6,9 +6,16 @@
 set -e
 cd $(dirname "$0")/..
 
-VERSION="0.8.0.0"
+VERSION="0.9.0.0"
 BUILD_SHA=$(git rev-parse HEAD 2>/dev/null)
 DOCKER_IMAGE=docker.pkg.github.com/github/semantic/semantic
+
+# Set the version to the current commit sha
+SED_ARGS="-i"
+if [[ "$(uname -s)" = "Darwin" ]]; then
+  SED_ARGS="$SED_ARGS .bak"
+fi
+sed $SED_ARGS "s/buildSHA =.*/buildSHA = \"$BUILD_SHA\"/" src/Semantic/Version.hs
 
 # Build
 docker build -t $DOCKER_IMAGE .
@@ -16,11 +23,15 @@ docker build -t $DOCKER_IMAGE .
 # Make sure semantic is in the image.
 docker run --rm $DOCKER_IMAGE --version
 
-# Requires that you've logged in to the GPR (e.g. `docker login docker.pkg.github.com`)
-# https://help.github.com/en/articles/configuring-docker-for-use-with-github-package-registry
-docker tag $DOCKER_IMAGE $DOCKER_IMAGE:latest
-docker tag $DOCKER_IMAGE $DOCKER_IMAGE:$VERSION
-docker tag $DOCKER_IMAGE $DOCKER_IMAGE:sha_$BUILD_SHA
-docker push $DOCKER_IMAGE:sha_$BUILD_SHA
-docker push $DOCKER_IMAGE:$VERSION
-docker push $DOCKER_IMAGE:latest
+read -p "Do you want to publish to the GitHub Registry [y/n]? " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+  # Requires that you've logged in to the GPR (e.g. `docker login docker.pkg.github.com`)
+  # https://help.github.com/en/articles/configuring-docker-for-use-with-github-package-registry
+  docker tag $DOCKER_IMAGE $DOCKER_IMAGE:latest
+  docker tag $DOCKER_IMAGE $DOCKER_IMAGE:$VERSION
+  docker tag $DOCKER_IMAGE $DOCKER_IMAGE:sha_$BUILD_SHA
+  docker push $DOCKER_IMAGE:sha_$BUILD_SHA
+  docker push $DOCKER_IMAGE:$VERSION
+  docker push $DOCKER_IMAGE:latest
+fi
