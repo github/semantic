@@ -32,6 +32,8 @@ library
                      , aeson ^>= 1.4.6.0
   hs-source-dirs:      src
   default-language:    Haskell2010
+  ghc-options:       -Wall
+                     -Wredundant-constraints
 
 executable semantic-ast
   main-is:             Main.hs
@@ -48,3 +50,5 @@ executable semantic-ast
                      , aeson ^>= 1.4.6.0
   hs-source-dirs:      src
   default-language:    Haskell2010
+  ghc-options:       -Wall
+                     -Wredundant-constraints
