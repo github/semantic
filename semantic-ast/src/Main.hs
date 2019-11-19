@@ -69,4 +69,5 @@ opts = info (parseAST <**> helper)
 -- TODO: Define formats for json, sexpression, etc.
 data Format = Show
             | Pretty
+            | Json
   deriving (Read)
