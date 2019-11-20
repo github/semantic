@@ -58,7 +58,7 @@ common dependencies
                      , fused-effects ^>= 0.5.0.0
                      , fused-effects-exceptions ^>= 0.2.0.0
                      , hashable ^>= 1.2.7.0
-                     , tree-sitter ^>= 0.5
+                     , tree-sitter ^>= 0.6
                      , mtl ^>= 2.2.2
                      , network ^>= 2.8.0.0
                      , pathtype ^>= 0.8.1
@@ -299,7 +299,7 @@ library
                      , vector ^>= 0.12.0.2
                      , tree-sitter-go ^>= 0.2
                      , tree-sitter-php ^>= 0.2
-                     , tree-sitter-python ^>= 0.6
+                     , tree-sitter-python ^>= 0.7
                      , tree-sitter-ruby ^>= 0.2
                      , tree-sitter-typescript ^>= 0.2.1
                      , tree-sitter-tsx ^>= 0.2.1
@@ -352,7 +352,7 @@ test-suite test
                      , Generators
                      , Properties
   build-depends:       semantic
-                     , tree-sitter-json ^>= 0.3
+                     , tree-sitter-json ^>= 0.4
                      , Glob ^>= 0.10.0
                      , hedgehog ^>= 1
                      , hspec >= 2.6 && <3
