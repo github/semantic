@@ -226,7 +226,13 @@ infix 3 .=
 
 data Ann ann f a
   = Ann ann (f a)
-  deriving (Eq, Foldable, Functor, Generic1, Ord, Show, Traversable)
+  deriving (Foldable, Functor, Generic1, Show, Traversable)
+
+instance Eq (f a) => Eq (Ann ann f a) where
+  Ann _ x == Ann _ y = x == y
+
+instance Ord (f a) => Ord (Ann ann f a) where
+  compare (Ann _ x) (Ann _ y) = compare x y
 
 instance HFunctor (Ann ann)
 
