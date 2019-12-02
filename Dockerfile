@@ -4,7 +4,7 @@ RUN cabal v2-update && \
     cabal v2-install proto-lens-protoc
 RUN which proto-lens-protoc
 
-FROM golang:1.13-stretch AS protoc
+FROM golang:1.13-buster AS protoc
 RUN apt-get update && apt-get install -y unzip
 ENV PROTOBUF_VERSION=3.7.1
 RUN wget "https://github.com/protocolbuffers/protobuf/releases/download/v3.7.1/protoc-$PROTOBUF_VERSION-linux-x86_64.zip" && \
@@ -33,7 +33,7 @@ RUN cp $(find dist-newstyle/build/x86_64-linux -name semantic -type f -perm -u=x
 
 # Create a fresh image containing only the compiled CLI program, so that the
 # image isn't bulked up by all of the extra build state.
-FROM debian:stretch-slim
+FROM debian:buster-slim
 
 RUN apt-get update && \
   apt-get install -y \
