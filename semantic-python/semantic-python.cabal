@@ -23,6 +23,7 @@ common haskell
   build-depends:       base ^>=4.12
                      , fused-effects ^>= 0.5
                      , fused-syntax
+                     , parsers ^>= 0.12.10
                      , semantic-core ^>= 0.0
                      , semantic-source ^>= 0.0
                      , semantic-tags ^>= 0.0

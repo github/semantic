@@ -8,15 +8,10 @@
   // object's superclass is type itself
   object <- type "object" type #record{};
 
-  str <- type "str" object #record { };
-  str.__new__ = (\contents -> instance str contents #record{});
+  str <- type "str" object #record { __new__: \prim -> instance #unit prim #record{} };
 
   getitem <- \super -> \item -> \attr ->
     if item.slots.?attr then item.slots.attr else #unit;
 
-  new <- \class -> class.__new__;
-
-  example <- new str "hello";
-
-  #record { type: type, object: object, str: str, getitem: getitem, new: new, example: example }
+  #record { type: type, object: object, str: str, getitem: getitem}
 }

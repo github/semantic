@@ -4,6 +4,7 @@ module Semantic.Api.Diffs
   , DiffOutputFormat(..)
 
   , diffTerms
+  , diffGraph
   ) where
 
 import           Analysis.ConstructorName (ConstructorName)

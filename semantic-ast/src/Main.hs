@@ -1,14 +1,15 @@
 {-# LANGUAGE TypeApplications #-}
+{-# OPTIONS_GHC -Wno-unused-top-binds #-}
+
 module Main (main) where
 
-import System.Environment
 import TreeSitter.Unmarshal
 import qualified TreeSitter.Python.AST as AST
 import qualified TreeSitter.Python as Python
 import Source.Range
 import Source.Span
 import Data.ByteString.Char8
-import Data.ByteString (pack, readFile, ByteString)
+import Data.ByteString (readFile)
 import System.IO (FilePath)
 import Options.Applicative hiding (style)
 import Data.Semigroup ((<>))
