@@ -82,13 +82,18 @@ instance ToTagsBy 'Custom Py.ClassDefinition where
 instance ToTagsBy 'Custom Py.Call where
   tags' t@Py.Call
     { ann = loc@Loc { byteRange = range }
-    , function = Py.PrimaryExpression (Prj Py.Identifier { text = name })
-    } = do
-      src <- ask @Source
-      let sliced = slice src range
-      Tags.yield (Tag name Call loc (Tags.firstLine sliced) Nothing)
-      gtags t
-  tags' t@Py.Call{} = gtags t
+    , function = Py.PrimaryExpression expr
+    } = case expr of
+        (Prj Py.Attribute { attribute = Py.Identifier _ name }) -> yield name
+        (Prj (Py.Identifier _ name)) -> yield name
+        _ -> gtags t
+      where
+        yield name = do
+          src <- ask @Source
+          let sliced = slice src range
+          Tags.yield (Tag name Call loc (Tags.firstLine sliced) Nothing)
+          gtags t
+
 
 docComment :: Source -> (Py.CompoundStatement :+: Py.SimpleStatement) Loc -> Maybe Text
 docComment src (R1 (Py.SimpleStatement (Prj Py.ExpressionStatement { extraChildren = L1 (Prj (Py.Expression (Prj (Py.PrimaryExpression (Prj Py.String { ann }))))) :|_ }))) = Just (toText (slice src (byteRange ann)))
