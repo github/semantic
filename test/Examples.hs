@@ -15,9 +15,12 @@ import           Data.Blob
 import qualified Data.ByteString.Lazy.Char8 as BLC
 import qualified Data.ByteString.Streaming.Char8 as ByteStream
 import           Data.Foldable
+import           Data.Either
 import           Data.Function ((&))
 import           Data.Language (LanguageMode (..), PerLanguageModes (..))
+import           Data.List
 import           Data.Set (Set)
+-- import qualified Data.Set as Set
 import qualified Streaming.Prelude as Stream
 import           System.FilePath.Glob
 import           System.Path ((</>))
@@ -78,27 +81,38 @@ buildExamples session lang tsDir = do
       -- Use alacarte language mode (this is the control)
       step "a la carte"
       alacarte <- runTask session (runParse (parseSymbolsFilePath aLaCarteLanguageModes file))
-      assertOK alacarte knownFailures
+      HUnit.assertBool "a la carte parsing failed" (isRight alacarte)
 
       -- Test out precise language mode (treatment)
       step "precise"
       precise <- runTask session (runParse (parseSymbolsFilePath preciseLanguageModes file))
-      assertOK precise knownFailures
+      HUnit.assertBool "precise parsing failed" (isRight precise)
 
-      -- Compare the control and treatment
-      case (alacarte, precise) of
-        (Right a, Right b) -> a HUnit.@=? b
-        _ -> pure ()
+      step "compare"
+      assertMatch file knownFailures alacarte precise
 
   pure (Tasty.testGroup (languageName lang) trees)
 
   where
-    assertOK res _ = case res of
-      Left e  -> HUnit.assertFailure (show (displayException e))
-      Right res -> case toList (res^.files) of
-        [x] | (e:_) <- toList (x^.errors) -> HUnit.assertFailure (show e)
-        [_] -> pure ()
-        _   -> HUnit.assertFailure "Expected 1 file in response"
+    assertMatch _ _ a b = case (a, b) of
+      (Right a, Right b) -> case (toList (a^.files), toList (b^.files)) of
+        ([x], _) | (e:_) <- toList (x^.errors) -> HUnit.assertFailure (show e)
+        (_, [y]) | (e:_) <- toList (y^.errors) -> HUnit.assertFailure (show e)
+        ([x], [y]) -> do
+          HUnit.assertEqual "Expected paths to be equal" (x^.path) (y^.path)
+          let xSymbols = sort $ toListOf (symbols . traverse . symbol) x
+          let ySymbols = sort $ toListOf (symbols . traverse . symbol) y
+          HUnit.assertEqual "Expected symbols to be equal" xSymbols ySymbols
+          pure ()
+        _   -> HUnit.assertFailure "Expected 1 file in each response"
+      (Left e, _) -> HUnit.assertFailure (show (displayException e))
+      (_, Left e) -> HUnit.assertFailure (show (displayException e))
+    -- assertOK res path knownFailures = case res of
+    --   Left e    -> if Set.member path knownFailures then pure() else HUnit.assertFailure (show (displayException e))
+    --   Right res -> case toList (res^.files) of
+    --     [x] | (e:_) <- toList (x^.errors) -> HUnit.assertFailure (show e)
+    --     [_] -> pure ()
+    --     _   -> HUnit.assertFailure "Expected 1 file in response"
 
 aLaCarteLanguageModes :: PerLanguageModes
 aLaCarteLanguageModes = PerLanguageModes
@@ -152,4 +166,8 @@ parseSymbolsFilePath ::
   => PerLanguageModes
   -> Path.RelFile
   -> m ParseTreeSymbolResponse
-parseSymbolsFilePath languageModes path = readBlob (fileForTypedPath path) >>= runReader languageModes . parseSymbols . pure @[]
+parseSymbolsFilePath languageModes path
+  = readBlob (fileForTypedPath path)
+  >>= runReader languageModes . parseSymbols . pure @[]
+  -- >>= serialize Format.JSON
+  -- >>= pure . toLazyByteString
