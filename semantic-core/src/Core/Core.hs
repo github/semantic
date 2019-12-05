@@ -51,6 +51,7 @@ import Syntax.Scope
 import Syntax.Stack
 import Syntax.Module
 import Syntax.Term
+import Syntax.Traversable
 
 data Core f a
   -- | Recursive local binding of a name in a scope; strict evaluation of the name in the body will diverge.
@@ -89,6 +90,7 @@ infixl 9 :.
 infix  3 :=
 
 instance HFunctor Core
+instance HTraversable Core
 
 deriving instance (Eq   a, forall a . Eq   a => Eq   (f a), Monad f) => Eq   (Core f a)
 deriving instance (Ord  a, forall a . Eq   a => Eq   (f a)
@@ -230,9 +232,11 @@ data Ann ann f a
 
 instance HFunctor (Ann ann)
 
+instance HTraversable (Ann ann) where
+  htraverse f (Ann a x) = Ann a <$> f x
+
 instance RightModule (Ann ann) where
   Ann l b >>=* f = Ann l (b >>= f)
-
 
 ann :: (Carrier sig m, Member (Ann Span) sig) => HasCallStack => m a -> m a
 ann = annWith callStack
