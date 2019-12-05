@@ -49,5 +49,5 @@ invariantViolated = send . InvariantViolated
 
 eliminateFailures :: (MonadFail m, HTraversable sig, RightModule sig)
                   => Term (Failure :+: sig) a
-                  -> Either String (Term sig a)
+                  -> m (Term sig a)
 eliminateFailures = Syntax.Term.handle (pure . pure) (fail . show)
