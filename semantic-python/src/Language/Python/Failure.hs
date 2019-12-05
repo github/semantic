@@ -12,6 +12,7 @@ module Language.Python.Failure
 import Prelude hiding (fail)
 
 import Control.Effect.Carrier
+import Control.Monad.Fail
 import Data.Coerce
 import Data.Kind
 import Syntax.Module
@@ -46,7 +47,7 @@ unimplemented x = send . Unimplemented $ x
 invariantViolated :: (Member Failure sig, Carrier sig m) => String -> m a
 invariantViolated = send . InvariantViolated
 
-eliminateFailures :: (HTraversable sig, RightModule sig)
+eliminateFailures :: (MonadFail m, HTraversable sig, RightModule sig)
                   => Term (Failure :+: sig) a
                   -> Either String (Term sig a)
-eliminateFailures = Syntax.Term.handle (pure . pure) (Left . show)
+eliminateFailures = Syntax.Term.handle (pure . pure) (fail . show)
