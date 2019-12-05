@@ -7,7 +7,6 @@ import qualified Analysis.Concrete as Concrete
 import           Analysis.File
 import           Analysis.ScopeGraph
 import           Control.Effect
-import           Control.Effect.Fail
 import           Control.Effect.Reader
 import           Control.Monad hiding (fail)
 import           Control.Monad.Catch
@@ -31,6 +30,7 @@ import           Data.Maybe
 import           Data.Text (Text)
 import           GHC.Stack
 import qualified Language.Python.Core as Py
+import           Language.Python.Failure
 import           Prelude hiding (fail)
 import           Source.Span
 import           Streaming
@@ -108,6 +108,11 @@ assertEvaluatesTo core k val = do
 assertTreeEqual :: Term Core Name -> Term Core Name -> HUnit.Assertion
 assertTreeEqual t item = HUnit.assertEqual ("got (pretty)" <> showCore item) t item
 
+eliminateFailures :: Term (Failure :+: Ann Span :+: Core) Name
+                  -> Either String (Term (Ann Span :+: Core) Name)
+eliminateFailures = Syntax.Term.handle (pure . pure) (Left . show)
+
+
 checkPythonFile :: HasCallStack => Path.RelFile -> Tasty.TestTree
 checkPythonFile fp = HUnit.testCaseSteps (Path.toString fp) $ \step -> withFrozenCallStack $ do
   -- Extract the directives and the core associated with the provided file
@@ -116,10 +121,10 @@ checkPythonFile fp = HUnit.testCaseSteps (Path.toString fp) $ \step -> withFroze
   result <- ByteString.readFile (Path.toString fullPath) >>= TS.parseByteString TSP.tree_sitter_python
 
   -- Run the compiler
-  let coreResult = Control.Effect.run
-                   . runFail
+  let coreResult = extractResult
+                   . Control.Effect.run
                    . runReader @Py.Bindings mempty
-                   . Py.toplevelCompile
+                   . Py.toplevelCompile @(Failure :+: Ann Span :+: Core) @(Term _)
                    <$> result
 
   -- Dispatch based on the result-directive pair
