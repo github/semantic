@@ -7,6 +7,7 @@ import qualified Analysis.Concrete as Concrete
 import           Analysis.File
 import           Analysis.ScopeGraph
 import           Control.Effect
+import           Control.Effect.Fail
 import           Control.Effect.Reader
 import           Control.Monad hiding (fail)
 import           Control.Monad.Catch
@@ -117,7 +118,9 @@ checkPythonFile fp = HUnit.testCaseSteps (Path.toString fp) $ \step -> withFroze
   result <- ByteString.readFile (Path.toString fullPath) >>= TS.parseByteString TSP.tree_sitter_python
 
   -- Run the compiler
-  let coreResult = eliminateFailures
+  let coreResult = Control.Effect.run
+                   . runFail
+                   . eliminateFailures
                    . Control.Effect.run
                    . runReader @Py.Bindings mempty
                    . Py.toplevelCompile @(Failure :+: Ann Span :+: Core) @(Term _)
