@@ -30,6 +30,9 @@ package semantic-python
 package semantic-tags
   ghc-options: -Werror
 
+package semantic-ast
+  ghc-options: -Werror
+
 source-repository-package
   type: git
   location: https://github.com/tclem/proto-lens-jsonpb
