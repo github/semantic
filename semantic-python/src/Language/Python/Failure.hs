@@ -6,7 +6,7 @@ module Language.Python.Failure
   ( Failure (..)
   , unimplemented
   , invariantViolated
---  , eliminateFailures
+  , eliminateFailures
   ) where
 
 import Prelude hiding (fail)
@@ -15,6 +15,7 @@ import Control.Effect.Carrier
 import Data.Coerce
 import Data.Kind
 import Syntax.Module
+import Syntax.Term
 import Syntax.Traversable
 
 data Failure (f :: Type -> Type) a
@@ -45,15 +46,7 @@ unimplemented x = send . Unimplemented $ x
 invariantViolated :: (Member Failure sig, Carrier sig m) => String -> m a
 invariantViolated = send . InvariantViolated
 
--- eliminateFailures :: forall m a sig . (MonadFail m, HFunctor sig, forall g . Functor g => Functor (sig g))
---                   => Term (Failure :+: sig) a
---                   -> m (Term sig a)
--- eliminateFailures = iter
---  _
--- eliminateFailures (Var v) = pure (Var v)
--- eliminateFailures (Alg (L _x)) = Control.Monad.Fail.fail "encountered failure"
--- eliminateFailures (Alg (R y)) = Alg <$> (htraverse eliminateFailures y)
---eliminateFailures (Alg (R other)) = Alg <$> (_hmap (eliminateFailures f) other)
-
--- htraverse :: Applicative f => (forall a. g a -> f (h a)) -> t g a -> f (t h a)
--- htraverse _f _x = undefined
+eliminateFailures :: (HTraversable sig, RightModule sig)
+                  => Term (Failure :+: sig) a
+                  -> Either String (Term sig a)
+eliminateFailures = Syntax.Term.handle (pure . pure) (Left . show)

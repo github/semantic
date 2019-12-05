@@ -108,10 +108,6 @@ assertEvaluatesTo core k val = do
 assertTreeEqual :: Term Core Name -> Term Core Name -> HUnit.Assertion
 assertTreeEqual t item = HUnit.assertEqual ("got (pretty)" <> showCore item) t item
 
-eliminateFailures :: Term (Failure :+: Ann Span :+: Core) Name
-                  -> Either String (Term (Ann Span :+: Core) Name)
-eliminateFailures = Syntax.Term.handle (pure . pure) (Left . show)
-
 
 checkPythonFile :: HasCallStack => Path.RelFile -> Tasty.TestTree
 checkPythonFile fp = HUnit.testCaseSteps (Path.toString fp) $ \step -> withFrozenCallStack $ do
@@ -121,7 +117,7 @@ checkPythonFile fp = HUnit.testCaseSteps (Path.toString fp) $ \step -> withFroze
   result <- ByteString.readFile (Path.toString fullPath) >>= TS.parseByteString TSP.tree_sitter_python
 
   -- Run the compiler
-  let coreResult = extractResult
+  let coreResult = eliminateFailures
                    . Control.Effect.run
                    . runReader @Py.Bindings mempty
                    . Py.toplevelCompile @(Failure :+: Ann Span :+: Core) @(Term _)
