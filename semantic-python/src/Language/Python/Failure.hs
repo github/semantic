@@ -1,6 +1,6 @@
-{-# LANGUAGE DeriveFoldable, DeriveFunctor, DeriveGeneric, DeriveTraversable, ExistentialQuantification,
-             FlexibleContexts, KindSignatures, LambdaCase, MultiParamTypeClasses, QuantifiedConstraints, RankNTypes,
-             StandaloneDeriving, TypeOperators #-}
+{-# LANGUAGE DeriveFoldable, DeriveFunctor, DeriveTraversable, ExistentialQuantification, FlexibleContexts,
+             KindSignatures, LambdaCase, MultiParamTypeClasses, QuantifiedConstraints, RankNTypes, StandaloneDeriving,
+             TypeOperators #-}
 
 module Language.Python.Failure
   ( Failure (..)
@@ -42,7 +42,7 @@ instance RightModule Failure where
   a >>=* _ = coerce a
 
 unimplemented :: (Show ast, Member Failure sig, Carrier sig m) => ast -> m a
-unimplemented x = send . Unimplemented $ x
+unimplemented = send . Unimplemented
 
 invariantViolated :: (Member Failure sig, Carrier sig m) => String -> m a
 invariantViolated = send . InvariantViolated
