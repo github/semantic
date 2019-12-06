@@ -1,5 +1,6 @@
-{-# LANGUAGE DeriveGeneric, DeriveTraversable, FlexibleContexts, LambdaCase, MultiParamTypeClasses, OverloadedStrings, QuantifiedConstraints, RankNTypes,
-             ScopedTypeVariables, StandaloneDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DeriveGeneric, DeriveTraversable, FlexibleContexts, LambdaCase, MultiParamTypeClasses, OverloadedStrings,
+             QuantifiedConstraints, RankNTypes, ScopedTypeVariables, StandaloneDeriving, TypeFamilies, TypeOperators,
+             UndecidableInstances #-}
 module Core.Core
 ( Core(..)
 , rec
@@ -47,9 +48,9 @@ import Data.Text (Text)
 import GHC.Generics (Generic1)
 import GHC.Stack
 import Source.Span
+import Syntax.Module
 import Syntax.Scope
 import Syntax.Stack
-import Syntax.Module
 import Syntax.Term
 import Syntax.Traversable
 
@@ -124,7 +125,7 @@ infixr 1 >>>
 
 unseq :: (Alternative m, Member Core sig) => Term sig a -> m (Term sig a, Term sig a)
 unseq (Alg sig) | Just (a :>> b) <- prj sig = pure (a, b)
-unseq _                                     = empty
+unseq _         = empty
 
 unseqs :: Member Core sig => Term sig a -> NonEmpty (Term sig a)
 unseqs = go
@@ -141,7 +142,7 @@ infixr 1 >>>=
 
 unbind :: (Alternative m, Member Core sig, RightModule sig) => a -> Term sig a -> m (Named a :<- Term sig a, Term sig a)
 unbind n (Alg sig) | Just (Named u a :>>= b) <- prj sig = pure (Named u n :<- a, instantiate1 (pure n) b)
-unbind _ _                                              = empty
+unbind _ _         = empty
 
 unstatement :: (Alternative m, Member Core sig, RightModule sig) => a -> Term sig a -> m (Maybe (Named a) :<- Term sig a, Term sig a)
 unstatement n t = first (first Just) <$> unbind n t <|> first (Nothing :<-) <$> unseq t
@@ -170,7 +171,7 @@ lams names body = foldr lam body names
 
 unlam :: (Alternative m, Member Core sig, RightModule sig) => a -> Term sig a -> m (Named a, Term sig a)
 unlam n (Alg sig) | Just (Lam b) <- prj sig = pure (n <$ b, instantiate1 (pure n) (namedValue b))
-unlam _ _                                   = empty
+unlam _ _         = empty
 
 ($$) :: (Carrier sig m, Member Core sig) => m a -> m a -> m a
 f $$ a = send (f :$ a)
@@ -185,7 +186,7 @@ infixl 8 $$*
 
 unapply :: (Alternative m, Member Core sig) => Term sig a -> m (Term sig a, Term sig a)
 unapply (Alg sig) | Just (f :$ a) <- prj sig = pure (f, a)
-unapply _                                    = empty
+unapply _         = empty
 
 unapplies :: Member Core sig => Term sig a -> (Term sig a, Stack (Term sig a))
 unapplies core = case unapply core of
@@ -237,6 +238,7 @@ instance HTraversable (Ann ann) where
 
 instance RightModule (Ann ann) where
   Ann l b >>=* f = Ann l (b >>= f)
+
 
 ann :: (Carrier sig m, Member (Ann Span) sig) => HasCallStack => m a -> m a
 ann = annWith callStack
