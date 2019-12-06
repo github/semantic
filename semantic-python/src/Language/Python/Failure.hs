@@ -1,6 +1,6 @@
-{-# LANGUAGE DeriveFoldable, DeriveFunctor, DeriveTraversable, ExistentialQuantification, FlexibleContexts,
-             KindSignatures, LambdaCase, MultiParamTypeClasses, QuantifiedConstraints, RankNTypes, StandaloneDeriving,
-             TypeOperators #-}
+{-# LANGUAGE DeriveFoldable, DeriveFunctor, DeriveGeneric, DeriveTraversable, ExistentialQuantification,
+             FlexibleContexts, KindSignatures, LambdaCase, MultiParamTypeClasses, QuantifiedConstraints, RankNTypes,
+             StandaloneDeriving, TypeOperators #-}
 
 module Language.Python.Failure
   ( Failure (..)
@@ -15,6 +15,8 @@ import Control.Effect.Carrier
 import Control.Monad.Fail
 import Data.Coerce
 import Data.Kind
+import GHC.Generics (Generic1)
+import Syntax.Foldable
 import Syntax.Module
 import Syntax.Term
 import Syntax.Traversable
@@ -32,15 +34,13 @@ deriving instance Functor (Failure f)
 deriving instance Foldable (Failure f)
 deriving instance Traversable (Failure f)
 
-instance HFunctor Failure where hmap _ = coerce
-
-instance HTraversable Failure where
-  htraverse _ = \case
-    Unimplemented x -> pure (Unimplemented x)
-    InvariantViolated y -> pure (InvariantViolated y)
+instance HFunctor Failure
+instance HFoldable Failure
+instance HTraversable Failure
 
 instance RightModule Failure where
   a >>=* _ = coerce a
+
 
 unimplemented :: (Show ast, Member Failure sig, Carrier sig m) => ast -> m a
 unimplemented = send . Unimplemented . show
