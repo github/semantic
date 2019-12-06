@@ -15,12 +15,11 @@ import           Data.Blob
 import qualified Data.ByteString.Lazy.Char8 as BLC
 import qualified Data.ByteString.Streaming.Char8 as ByteStream
 import           Data.Foldable
-import           Data.Either
 import           Data.Function ((&))
 import           Data.Language (LanguageMode (..), PerLanguageModes (..))
 import           Data.List
 import           Data.Set (Set)
--- import qualified Data.Set as Set
+import qualified Data.Set as Set
 import qualified Streaming.Prelude as Stream
 import           System.FilePath.Glob
 import           System.Path ((</>))
@@ -77,42 +76,61 @@ buildExamples session lang tsDir = do
   files <- globDir1 (compile ("**/*" <> languageExtension lang)) (Path.toString (tsDir </> languageExampleDir lang))
   let paths = Path.relFile <$> files
   trees <- forConcurrently paths $ \file -> do
-    pure . HUnit.testCaseSteps ("[" <> languageName lang <> "] " <> Path.toString file) $ \step -> do
-      -- Use alacarte language mode (this is the control)
+    let name = "[" <> languageName lang <> "] " <> Path.toString file
+    pure . HUnit.testCaseSteps name $ \step -> do
+      -- Use alacarte language mode
       step "a la carte"
       alacarte <- runTask session (runParse (parseSymbolsFilePath aLaCarteLanguageModes file))
-      HUnit.assertBool "a la carte parsing failed" (isRight alacarte)
+      assertOK "a la carte" alacarte
 
-      -- Test out precise language mode (treatment)
+      -- Test out precise language mode
       step "precise"
       precise <- runTask session (runParse (parseSymbolsFilePath preciseLanguageModes file))
-      HUnit.assertBool "precise parsing failed" (isRight precise)
+      assertOK "precise" precise
 
+      -- Compare the two
       step "compare"
       assertMatch file knownFailures alacarte precise
 
-  pure (Tasty.testGroup (languageName lang) trees)
+  pure (Tasty.testGroup (languageName lang) (take 100 trees))
 
   where
-    assertMatch _ _ a b = case (a, b) of
+    assertOK msg = either (\e -> HUnit.assertFailure (msg <> " failed to parse" <> show e)) (refuteErrors msg)
+    refuteErrors msg a = case toList (a^.files) of
+      [x] | (e:_) <- toList (x^.errors) -> HUnit.assertFailure (msg <> " parse errors " <> show e)
+      _ -> pure ()
+
+    assertMatch filePath knownFailures a b = case (a, b) of
       (Right a, Right b) -> case (toList (a^.files), toList (b^.files)) of
-        ([x], _) | (e:_) <- toList (x^.errors) -> HUnit.assertFailure (show e)
-        (_, [y]) | (e:_) <- toList (y^.errors) -> HUnit.assertFailure (show e)
+        ([x], [y]) | (e1:_) <- toList (x^.errors)
+                   , (e2:_) <- toList (y^.errors)
+                   -> if Set.member filePath knownFailures
+                      then pure ()
+                      else HUnit.assertFailure ("Parse errors (both) " <> show e1 <> show e2)
+        (_, [y])   | (e:_) <- toList (y^.errors)
+                   -> HUnit.assertFailure ("Parse errors (precise) " <> show e)
+        ([x], _)   | (_e:_) <- toList (x^.errors)
+                   -> pure () -- HUnit.assertFailure ("Parse errors (a la carte) " <> show e)
         ([x], [y]) -> do
           HUnit.assertEqual "Expected paths to be equal" (x^.path) (y^.path)
           let xSymbols = sort $ toListOf (symbols . traverse . symbol) x
-          let ySymbols = sort $ toListOf (symbols . traverse . symbol) y
-          HUnit.assertEqual "Expected symbols to be equal" xSymbols ySymbols
+              ySymbols = sort $ toListOf (symbols . traverse . symbol) y
+              delta = xSymbols \\ ySymbols
+              msg = "Found in a la carte, but not precise: "
+                  <> show delta
+                  <> "\n"
+                  <> "Found in precise but not a la carte: "
+                  <> show (ySymbols \\ xSymbols)
+                  <> "\n"
+                  <> "Expected: " <> show xSymbols <> "\n"
+                  <> "But got:" <> show ySymbols
+
+          HUnit.assertBool ("Expect symbols to be equal.\n" <> msg) (null delta)
           pure ()
-        _   -> HUnit.assertFailure "Expected 1 file in each response"
-      (Left e, _) -> HUnit.assertFailure (show (displayException e))
-      (_, Left e) -> HUnit.assertFailure (show (displayException e))
-    -- assertOK res path knownFailures = case res of
-    --   Left e    -> if Set.member path knownFailures then pure() else HUnit.assertFailure (show (displayException e))
-    --   Right res -> case toList (res^.files) of
-    --     [x] | (e:_) <- toList (x^.errors) -> HUnit.assertFailure (show e)
-    --     [_] -> pure ()
-    --     _   -> HUnit.assertFailure "Expected 1 file in response"
+        _          -> HUnit.assertFailure "Expected 1 file in each response"
+      (Left e1, Left e2) -> HUnit.assertFailure ("Unable to parse (both)" <> show (displayException e1) <> show (displayException e2))
+      (_, Left e)        -> HUnit.assertFailure ("Unable to parse (precise)" <> show (displayException e))
+      (Left _e, _)       -> pure () -- HUnit.assertFailure ("Unable to parse (a la carte)" <> show (displayException e))
 
 aLaCarteLanguageModes :: PerLanguageModes
 aLaCarteLanguageModes = PerLanguageModes
@@ -166,8 +184,4 @@ parseSymbolsFilePath ::
   => PerLanguageModes
   -> Path.RelFile
   -> m ParseTreeSymbolResponse
-parseSymbolsFilePath languageModes path
-  = readBlob (fileForTypedPath path)
-  >>= runReader languageModes . parseSymbols . pure @[]
-  -- >>= serialize Format.JSON
-  -- >>= pure . toLazyByteString
+parseSymbolsFilePath languageModes path = readBlob (fileForTypedPath path) >>= runReader languageModes . parseSymbols . pure @[]
