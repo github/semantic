@@ -188,7 +188,7 @@ infixl 8 $$*
 
 unapply :: (Alternative m, Member Core sig) => Term sig a -> m (Term sig a, Term sig a)
 unapply (Alg sig) | Just (f :$ a) <- prj sig = pure (f, a)
-unapply _         = empty
+unapply _                                    = empty
 
 unapplies :: Member Core sig => Term sig a -> (Term sig a, Stack (Term sig a))
 unapplies core = case unapply core of
