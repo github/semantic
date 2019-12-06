@@ -1,5 +1,5 @@
 {-# LANGUAGE DeriveFoldable, DeriveFunctor, DeriveGeneric, DeriveTraversable, ExistentialQuantification,
-             FlexibleContexts, KindSignatures, LambdaCase, MultiParamTypeClasses, QuantifiedConstraints, RankNTypes,
+             FlexibleContexts, KindSignatures, MultiParamTypeClasses, QuantifiedConstraints, RankNTypes,
              StandaloneDeriving, TypeOperators #-}
 
 module Language.Python.Failure
