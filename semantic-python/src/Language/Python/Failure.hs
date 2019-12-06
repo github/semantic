@@ -20,11 +20,12 @@ import Syntax.Term
 import Syntax.Traversable
 
 data Failure (f :: Type -> Type) a
-  = forall a . Show a => Unimplemented a
+  = Unimplemented String
   | InvariantViolated String
+    deriving Generic1
 
 instance Show (Failure f a) where
-  show (Unimplemented a)     = "unimplemented: " <> show a
+  show (Unimplemented a)     = "unimplemented: " <> a
   show (InvariantViolated a) = "invariant violated: " <> a
 
 deriving instance Functor (Failure f)
@@ -42,7 +43,7 @@ instance RightModule Failure where
   a >>=* _ = coerce a
 
 unimplemented :: (Show ast, Member Failure sig, Carrier sig m) => ast -> m a
-unimplemented = send . Unimplemented
+unimplemented = send . Unimplemented . show
 
 invariantViolated :: (Member Failure sig, Carrier sig m) => String -> m a
 invariantViolated = send . InvariantViolated
