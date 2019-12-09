@@ -92,7 +92,7 @@ buildExamples session lang tsDir = do
       step "compare"
       assertMatch file knownFailures alacarte precise
 
-  pure (Tasty.testGroup (languageName lang) (take 1000 trees))
+  pure (Tasty.testGroup (languageName lang) trees)
 
   where
     assertOK msg = either (\e -> HUnit.assertFailure (msg <> " failed to parse" <> show e)) (refuteErrors msg)
