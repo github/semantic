@@ -114,6 +114,7 @@ instance ToTagsBy 'Custom Py.Call where
           (Prj Py.Attribute { attribute = Py.Identifier _ name }) -> yield name
           (Prj (Py.Identifier _ name)) -> yield name
           (Prj Py.Call { function = Py.PrimaryExpression expr' }) -> match expr' -- Nested call expression like this in Python represent creating an instance of a class and calling it: e.g. AClass()()
+          (Prj (Py.ParenthesizedExpression _ (Prj (Py.Expression (Prj (Py.PrimaryExpression expr')))))) -> match expr' -- Parenthesized expressions
           _ -> gtags t
         yield name = do
           src <- ask @Source
