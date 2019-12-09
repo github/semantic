@@ -1,4 +1,4 @@
-{-# LANGUAGE AllowAmbiguousTypes, DataKinds, DisambiguateRecordFields, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, NamedFieldPuns, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes, DataKinds, DisambiguateRecordFields, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, NamedFieldPuns, OverloadedStrings, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Language.Python.Tags
 ( ToTags(..)
 ) where
@@ -48,12 +48,37 @@ type family ToTagsInstance t :: Strategy where
   ToTagsInstance Py.FunctionDefinition = 'Custom
   ToTagsInstance Py.ClassDefinition    = 'Custom
   ToTagsInstance Py.Call               = 'Custom
+
+  -- These built-in functions all get handled as calls
+  ToTagsInstance Py.AssertStatement    = 'Custom
+  ToTagsInstance Py.GlobalStatement    = 'Custom
+  ToTagsInstance Py.DeleteStatement    = 'Custom
+  ToTagsInstance Py.PrintStatement     = 'Custom
+
   ToTagsInstance _                     = 'Generic
 
 
 instance (ToTags l, ToTags r) => ToTagsBy 'Custom (l :+: r) where
   tags' (L1 l) = tags l
   tags' (R1 r) = tags r
+
+keywordFunctionCall t loc range name = do
+  src <- ask @Source
+  let sliced = slice src range
+  Tags.yield (Tag name Function loc (Tags.firstLine sliced) Nothing)
+  gtags t
+
+instance ToTagsBy 'Custom Py.AssertStatement where
+  tags' t@Py.AssertStatement { ann = loc@Loc { byteRange = range } } = keywordFunctionCall t loc range "assert"
+
+instance ToTagsBy 'Custom Py.DeleteStatement where
+  tags' t@Py.DeleteStatement { ann = loc@Loc { byteRange = range } } = keywordFunctionCall t loc range "del"
+
+instance ToTagsBy 'Custom Py.GlobalStatement where
+  tags' t@Py.GlobalStatement { ann = loc@Loc { byteRange = range } } = keywordFunctionCall t loc range "global"
+
+instance ToTagsBy 'Custom Py.PrintStatement where
+  tags' t@Py.PrintStatement { ann = loc@Loc { byteRange = range } } = keywordFunctionCall t loc range "print"
 
 instance ToTagsBy 'Custom Py.FunctionDefinition where
   tags' t@Py.FunctionDefinition
