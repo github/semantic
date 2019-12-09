@@ -108,11 +108,13 @@ instance ToTagsBy 'Custom Py.Call where
   tags' t@Py.Call
     { ann = loc@Loc { byteRange = range }
     , function = Py.PrimaryExpression expr
-    } = case expr of
-        (Prj Py.Attribute { attribute = Py.Identifier _ name }) -> yield name
-        (Prj (Py.Identifier _ name)) -> yield name
-        _ -> gtags t
+    } = match expr
       where
+        match expr = case expr of
+          (Prj Py.Attribute { attribute = Py.Identifier _ name }) -> yield name
+          (Prj (Py.Identifier _ name)) -> yield name
+          (Prj Py.Call { function = Py.PrimaryExpression expr' }) -> match expr' -- Nested call expression like this in Python represent creating an instance of a class and calling it: e.g. AClass()()
+          _ -> gtags t
         yield name = do
           src <- ask @Source
           let sliced = slice src range
