@@ -30,6 +30,9 @@ package semantic-python
 package semantic-tags
   ghc-options: -Werror
 
+package semantic-ast
+  ghc-options: -Werror
+
 source-repository-package
   type: git
   location: https://github.com/tclem/proto-lens-jsonpb
@@ -38,4 +41,4 @@ source-repository-package
 source-repository-package
   type: git
   location: https://github.com/antitypical/fused-syntax.git
-  tag: 5b7512db962d5b3f973002615b8bc86ab074d5aa
+  tag: 6b412694e64cc275ed06513b3c360f03bb1f04fd
