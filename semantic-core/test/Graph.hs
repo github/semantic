@@ -1,4 +1,4 @@
-{-# LANGUAGE ScopedTypeVariables, TypeOperators, OverloadedStrings, OverloadedLists #-}
+{-# LANGUAGE OverloadedLists, OverloadedStrings, ScopedTypeVariables, TypeOperators #-}
 
 module Graph
   ( testTree
@@ -19,7 +19,6 @@ import           Source.Span
 import           Syntax.Term
 import qualified System.Path as Path
 import qualified System.Path.IO as Path (readFile)
-import           Text.Pretty.Simple
 import qualified Text.Trifecta as Trifecta
 
 import qualified Test.Tasty as Tasty
@@ -49,10 +48,10 @@ testConditional = HUnit.testCase "conditional.score" $ do
   case parseEither Parse.core contents of
     Left m  -> HUnit.assertFailure ("Couldn't parse conditional.score: " <> m)
     Right (x :: Term (Ann Span :+: Core) Name) -> do
-      (heap, [File { fileBody = Right (ScopeGraph res) }]) <- pure (scopeGraph Eval.eval [File p lowerBound x])
-      [(merle, [refm]), (taako, [reft])] <- pure (Map.toList res)
+      (_heap, [File { fileBody = Right (ScopeGraph res) }]) <- pure (scopeGraph Eval.eval [File p lowerBound x])
+      [(_merle, [refm]), (_taako, [reft])] <- pure (Map.toList res)
       refm^.span_.start_ @?= Pos 6 4
-      reft^.span_.start_ @?= Pos 7 9
+      reft^.span_.start_ @?= Pos 9 4
 
 testTree :: Tasty.TestTree
 testTree = Tasty.testGroup "Core scope graphing"
