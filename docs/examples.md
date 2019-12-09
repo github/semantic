@@ -114,7 +114,7 @@ def foo(x):
 Now, let's graph.
 
 ``` bash
-$ semantic graph main.py
+$ semantic graph --language Python main.py
 digraph
 {
 
@@ -129,7 +129,7 @@ digraph
 To make this easier to visualize, let's use the `dot` utility from `graphviz` and write this graph to SVG:
 
 ```
-$ semantic graph main.py | dot -Tsvg > main.html && open main.html
+$ semantic graph --language Python main.py | dot -Tsvg > main.html && open main.html
 ```
 
 You'll get something that looks like this:
@@ -141,7 +141,7 @@ You'll get something that looks like this:
 Call graphs expand on the import graphing capabilities by adding in some additional vertices and edges to the graph to identify named symbols and the connections between them. Taking the same example code, simply add `--call` to the invocation of semantic:
 
 ```
-$ semantic graph --calls main.py | dot -Tsvg > main.html && open main.html
+$ semantic graph --language Python --calls main.py | dot -Tsvg > main.html && open main.html
 ```
 
 ![a call graph](images/call_graph.svg)
