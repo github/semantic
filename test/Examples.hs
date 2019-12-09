@@ -92,7 +92,7 @@ buildExamples session lang tsDir = do
       step "compare"
       assertMatch file knownFailures alacarte precise
 
-  pure (Tasty.testGroup (languageName lang) (take 100 trees))
+  pure (Tasty.testGroup (languageName lang) (take 1000 trees))
 
   where
     assertOK msg = either (\e -> HUnit.assertFailure (msg <> " failed to parse" <> show e)) (refuteErrors msg)
@@ -109,8 +109,8 @@ buildExamples session lang tsDir = do
                       else HUnit.assertFailure ("Parse errors (both) " <> show e1 <> show e2)
         (_, [y])   | (e:_) <- toList (y^.errors)
                    -> HUnit.assertFailure ("Parse errors (precise) " <> show e)
-        ([x], _)   | (_e:_) <- toList (x^.errors)
-                   -> pure () -- HUnit.assertFailure ("Parse errors (a la carte) " <> show e)
+        ([x], _)   | (e:_) <- toList (x^.errors)
+                   -> HUnit.assertFailure ("Parse errors (a la carte) " <> show e)
         ([x], [y]) -> do
           HUnit.assertEqual "Expected paths to be equal" (x^.path) (y^.path)
           let xSymbols = sort $ toListOf (symbols . traverse . symbol) x
@@ -125,12 +125,12 @@ buildExamples session lang tsDir = do
                   <> "Expected: " <> show xSymbols <> "\n"
                   <> "But got:" <> show ySymbols
 
-          HUnit.assertBool ("Expect symbols to be equal.\n" <> msg) (null delta)
+          HUnit.assertBool ("Expected symbols to be equal.\n" <> msg) (null delta)
           pure ()
         _          -> HUnit.assertFailure "Expected 1 file in each response"
       (Left e1, Left e2) -> HUnit.assertFailure ("Unable to parse (both)" <> show (displayException e1) <> show (displayException e2))
       (_, Left e)        -> HUnit.assertFailure ("Unable to parse (precise)" <> show (displayException e))
-      (Left _e, _)       -> pure () -- HUnit.assertFailure ("Unable to parse (a la carte)" <> show (displayException e))
+      (Left e, _)        -> HUnit.assertFailure ("Unable to parse (a la carte)" <> show (displayException e))
 
 aLaCarteLanguageModes :: PerLanguageModes
 aLaCarteLanguageModes = PerLanguageModes
