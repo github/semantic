@@ -31,6 +31,7 @@ import           Data.Maybe
 import           Data.Text (Text)
 import           GHC.Stack
 import qualified Language.Python.Core as Py
+import           Language.Python.Failure
 import           Prelude hiding (fail)
 import           Source.Span
 import           Streaming
@@ -108,6 +109,7 @@ assertEvaluatesTo core k val = do
 assertTreeEqual :: Term Core Name -> Term Core Name -> HUnit.Assertion
 assertTreeEqual t item = HUnit.assertEqual ("got (pretty)" <> showCore item) t item
 
+
 checkPythonFile :: HasCallStack => Path.RelFile -> Tasty.TestTree
 checkPythonFile fp = HUnit.testCaseSteps (Path.toString fp) $ \step -> withFrozenCallStack $ do
   -- Extract the directives and the core associated with the provided file
@@ -118,8 +120,10 @@ checkPythonFile fp = HUnit.testCaseSteps (Path.toString fp) $ \step -> withFroze
   -- Run the compiler
   let coreResult = Control.Effect.run
                    . runFail
+                   . eliminateFailures
+                   . Control.Effect.run
                    . runReader @Py.Bindings mempty
-                   . Py.toplevelCompile
+                   . Py.toplevelCompile @(Failure :+: Ann Span :+: Core) @(Term _)
                    <$> result
 
   -- Dispatch based on the result-directive pair

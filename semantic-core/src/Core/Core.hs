@@ -1,5 +1,6 @@
-{-# LANGUAGE DeriveGeneric, DeriveTraversable, FlexibleContexts, LambdaCase, MultiParamTypeClasses, OverloadedStrings, QuantifiedConstraints, RankNTypes,
-             ScopedTypeVariables, StandaloneDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DeriveGeneric, DeriveTraversable, FlexibleContexts, LambdaCase, MultiParamTypeClasses, OverloadedStrings,
+             QuantifiedConstraints, RankNTypes, ScopedTypeVariables, StandaloneDeriving, TypeFamilies, TypeOperators,
+             UndecidableInstances #-}
 module Core.Core
 ( Core(..)
 , rec
@@ -47,10 +48,12 @@ import Data.Text (Text)
 import GHC.Generics (Generic1)
 import GHC.Stack
 import Source.Span
+import Syntax.Foldable
+import Syntax.Module
 import Syntax.Scope
 import Syntax.Stack
-import Syntax.Module
 import Syntax.Term
+import Syntax.Traversable
 
 data Core f a
   -- | Recursive local binding of a name in a scope; strict evaluation of the name in the body will diverge.
@@ -89,6 +92,8 @@ infixl 9 :.
 infix  3 :=
 
 instance HFunctor Core
+instance HFoldable Core
+instance HTraversable Core
 
 deriving instance (Eq   a, forall a . Eq   a => Eq   (f a), Monad f) => Eq   (Core f a)
 deriving instance (Ord  a, forall a . Eq   a => Eq   (f a)
@@ -229,6 +234,8 @@ data Ann ann f a
   deriving (Eq, Foldable, Functor, Generic1, Ord, Show, Traversable)
 
 instance HFunctor (Ann ann)
+instance HFoldable (Ann ann)
+instance HTraversable (Ann ann)
 
 instance RightModule (Ann ann) where
   Ann l b >>=* f = Ann l (b >>= f)
