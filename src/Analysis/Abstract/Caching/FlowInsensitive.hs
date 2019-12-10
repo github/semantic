@@ -7,6 +7,7 @@ module Analysis.Abstract.Caching.FlowInsensitive
 
 import Prologue
 
+import Control.Algebra (Effect)
 import Control.Carrier.Fresh.Strict
 import Control.Carrier.NonDet.Church
 import Control.Carrier.Reader
@@ -78,7 +79,8 @@ cachingTerms recur term = do
       values <- consultOracle c
       cachingConfiguration c values (recur term)
 
-convergingModules :: ( Eq value
+convergingModules :: ( Effect sig
+                     , Eq value
                      , Has Fresh sig m
                      , Has (Reader (Cache term address value)) sig m
                      , Has (Reader (Live address)) sig m
@@ -88,16 +90,16 @@ convergingModules :: ( Eq value
                      , Ord term
                      , Alternative m
                      )
-                  => (Module (Either prelude term) -> Evaluator term address value (NonDetC m) value)
+                  => (Module (Either prelude term) -> Evaluator term address value (NonDetC (FreshC m)) value)
                   -> (Module (Either prelude term) -> Evaluator term address value m value)
-convergingModules recur m@(Module _ (Left _)) = raiseHandler runNonDetA (recur m) >>= maybeM empty
+convergingModules recur m@(Module _ (Left _)) = raiseHandler (evalFresh 0 . runNonDetA) (recur m) >>= maybeM empty
 convergingModules recur m@(Module _ (Right term)) = do
   c <- getConfiguration term
   heap <- getHeap
   -- Convergence here is predicated upon an Eq instance, not α-equivalence
   (cache, _) <- converge (lowerBound, heap) (\ (prevCache, _) -> isolateCache $ do
     -- We need to reset fresh generation so that this invocation converges.
-    evalFresh 0 . pure $
+    raiseHandler (evalFresh 0) $
     -- This is subtle: though the calling context supports nondeterminism, we want
     -- to corral all the nondeterminism that happens in this @eval@ invocation, so
     -- that it doesn't "leak" to the calling context and diverge (otherwise this
