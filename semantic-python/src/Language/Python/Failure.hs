@@ -11,7 +11,7 @@ module Language.Python.Failure
 
 import Prelude hiding (fail)
 
-import Control.Effect.Carrier
+import Control.Algebra
 import Control.Monad.Fail
 import Data.Coerce
 import Data.Kind
