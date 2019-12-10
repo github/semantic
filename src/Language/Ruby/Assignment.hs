@@ -70,11 +70,15 @@ expressionChoices =
   , method
   , methodCall
   , mk Break Statement.Break
+  , mk Break' Statement.Break
   , mk Next Statement.Continue
+  , mk Next' Statement.Continue
   , mk Redo Statement.Retry
   , mk Retry Statement.Retry
   , mk Return Statement.Return
+  , mk Return' Statement.Return
   , mk Yield Statement.Yield
+  , mk Yield' Statement.Yield
   , module'
   , pair
   , parenthesizedExpressions
@@ -92,7 +96,7 @@ expressionChoices =
   , while'
   ]
   where
-    mk s construct = makeTerm <$> symbol s <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (symbol ArgumentList *> children expressions))
+    mk s construct = makeTerm <$> symbol s <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional ((symbol ArgumentList <|> symbol ArgumentList') *> children expressions))
 
 expressions :: Assignment (Term Loc)
 expressions = makeTerm'' <$> location <*> many expression
@@ -315,10 +319,10 @@ pair :: Assignment (Term Loc)
 pair =   makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> expression <*> (expression <|> emptyTerm))
 
 args :: Assignment [Term Loc]
-args = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children (many expression) <|> many expression
+args = (symbol ArgumentList <|> symbol ArgumentList') *> children (many expression) <|> many expression
 
 methodCall :: Assignment (Term Loc)
-methodCall = makeTerm' <$> symbol MethodCall <*> children (require <|> load <|> send)
+methodCall = makeTerm' <$> (symbol MethodCall <|> symbol MethodCall') <*> children (require <|> load <|> send)
   where
     send = inject <$> ((regularCall <|> funcCall <|> scopeCall <|> dotCall) <*> optional block)
 
@@ -335,8 +339,8 @@ methodCall = makeTerm' <$> symbol MethodCall <*> children (require <|> load <|> 
     load = inject <$ symbol Identifier <*> do
       s <- rawSource
       guard (s == "load")
-      (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children (Ruby.Syntax.Load <$> expression <*> optional expression)
-    nameExpression = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children expression
+      (symbol ArgumentList <|> symbol ArgumentList') *> children (Ruby.Syntax.Load <$> expression <*> optional expression)
+    nameExpression = (symbol ArgumentList <|> symbol ArgumentList') *> children expression
 
 methodSelector :: Assignment (Term Loc)
 methodSelector = makeTerm <$> symbols <*> (Syntax.Identifier <$> (name <$> source))
@@ -465,8 +469,10 @@ invert term = makeTerm <$> location <*> fmap Expression.Not term
 
 -- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
 term :: Assignment (Term Loc) -> Assignment (Term Loc)
-term term = contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 (comment <|> heredocEnd) <*> emptyTerm)
-  where heredocEnd = makeTerm <$> symbol HeredocEnd <*> (Literal.TextElement <$> source)
+term term = contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 (comment <|> heredocBody) <*> emptyTerm)
+  where
+    heredocBody = makeTerm <$> symbol HeredocBody <*> children (some (interpolation <|> escapeSequence <|> heredocEnd))
+    heredocEnd = makeTerm <$> symbol HeredocEnd <*> (Literal.TextElement <$> source)
 
 -- | Match a series of terms or comments until a delimiter is matched.
 manyTermsTill :: Assignment (Term Loc) -> Assignment b -> Assignment [Term Loc]
