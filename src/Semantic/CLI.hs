@@ -9,7 +9,7 @@ import           Data.Blob.IO
 import qualified Data.Flag as Flag
 import           Data.Handle
 import qualified Data.Language as Language
-import           Data.List (delete, intercalate)
+import           Data.List (intercalate)
 import           Data.Project
 import           Options.Applicative hiding (style)
 import           Prologue
