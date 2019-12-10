@@ -5,7 +5,6 @@ import Control.Effect.Reader
 import Control.Exception (fromException)
 import SpecHelpers
 
-import Data.Blob (NoLanguageForBlob (..))
 import Semantic.Api hiding (Blob)
 
  -- we need some lenses here, oof
