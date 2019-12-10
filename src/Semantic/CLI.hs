@@ -158,7 +158,7 @@ graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute a g
         (x:_) -> pure $! Project (takeDirectory x) blobs (Language.languageForFilePath x) mempty
         _     -> pure $! Project "/" mempty Language.Unknown mempty
 
-    allLanguages = intercalate "|" . fmap show . delete Language.Unknown $ [minBound .. maxBound]
+    allLanguages = intercalate "|" . fmap show $ [Language.Go .. maxBound]
     readProjectRecursively = makeReadProjectRecursivelyTask
       <$> option auto (long "language" <> help "The language for the analysis." <> metavar allLanguages)
       <*> optional (pathOption (long "root" <> help "Root directory of project. Optional, defaults to entry file/directory." <> metavar "DIR"))
