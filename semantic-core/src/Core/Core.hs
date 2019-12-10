@@ -51,7 +51,6 @@ import Syntax.Module
 import Syntax.Scope
 import Syntax.Stack
 import Syntax.Sum
-import Syntax.Module
 import Syntax.Term
 import Syntax.Traversable
 
