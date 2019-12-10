@@ -8,6 +8,7 @@ module Analysis.Abstract.Caching.FlowSensitive
 
 import Prologue
 
+import Control.Algebra (Effect)
 import Control.Carrier.NonDet.Church
 import Control.Carrier.Reader
 import Control.Carrier.Fresh.Strict
@@ -79,6 +80,7 @@ cachingTerms recur term = do
       cachingConfiguration c pairs (recur term)
 
 convergingModules :: ( Cacheable term address value
+                     , Effect sig
                      , Has Fresh sig m
                      , Has (Reader (Cache term address value)) sig m
                      , Has (Reader (Live address)) sig m
@@ -86,16 +88,16 @@ convergingModules :: ( Cacheable term address value
                      , Has (State (Heap address address value)) sig m
                      , Alternative m
                      )
-                  => (Module (Either prelude term) -> Evaluator term address value (NonDetC m) value)
+                  => (Module (Either prelude term) -> Evaluator term address value (NonDetC (FreshC m)) value)
                   -> (Module (Either prelude term) -> Evaluator term address value m value)
-convergingModules recur m@(Module _ (Left _)) = raiseHandler runNonDetA (recur m) >>= maybeM empty
+convergingModules recur m@(Module _ (Left _)) = raiseHandler (evalFresh 0 . runNonDetA) (recur m) >>= maybeM empty
 convergingModules recur m@(Module _ (Right term)) = do
   c <- getConfiguration term
   -- Convergence here is predicated upon an Eq instance, not α-equivalence
   cache <- converge lowerBound (\ prevCache -> isolateCache $ do
     putHeap        (configurationHeap    c)
     -- We need to reset fresh generation so that this invocation converges.
-    evalFresh 0 . pure $
+    raiseHandler (evalFresh 0) $
     -- This is subtle: though the calling context supports nondeterminism, we want
     -- to corral all the nondeterminism that happens in this @eval@ invocation, so
     -- that it doesn't "leak" to the calling context and diverge (otherwise this
