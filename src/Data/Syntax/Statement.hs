@@ -133,7 +133,7 @@ instance Evaluatable Let where
 
 -- AugmentedAssignment
 
-data AugmentedAssignment a = AugmentedAssignment { augmentedAssignmentTarget :: !a }
+newtype AugmentedAssignment a = AugmentedAssignment { augmentedAssignmentTarget :: !a }
   deriving (Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
 
 instance Eq1 AugmentedAssignment where liftEq = genericLiftEq
