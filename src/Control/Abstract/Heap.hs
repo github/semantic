@@ -1,4 +1,6 @@
-{-# LANGUAGE DeriveFunctor, DeriveGeneric, FlexibleContexts, GADTs, GeneralizedNewtypeDeriving, KindSignatures, RankNTypes, RecordWildCards, ScopedTypeVariables, StandaloneDeriving, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DeriveFunctor, DeriveGeneric, FlexibleContexts, GADTs, GeneralizedNewtypeDeriving, KindSignatures,
+             RankNTypes, RecordWildCards, ScopedTypeVariables, StandaloneDeriving, TypeOperators,
+             UndecidableInstances #-}
 module Control.Abstract.Heap
 ( Heap
 , HeapError(..)
@@ -47,7 +49,6 @@ import           Control.Abstract.Evaluator
 import           Control.Abstract.Roots
 import           Control.Abstract.ScopeGraph hiding (ScopeError (..))
 import           Control.Abstract.ScopeGraph (ScopeError)
-import           Control.Applicative (Alternative)
 import           Control.Effect.Carrier
 import           Data.Abstract.BaseError
 import           Data.Abstract.Heap (Heap, Position (..))
@@ -55,7 +56,7 @@ import qualified Data.Abstract.Heap as Heap
 import           Data.Abstract.Live
 import           Data.Abstract.Module (ModuleInfo)
 import           Data.Abstract.Name
-import           Data.Abstract.ScopeGraph (Kind(..), Path (..), Relation(..), putDeclarationScopeAtPosition)
+import           Data.Abstract.ScopeGraph (Kind (..), Path (..), putDeclarationScopeAtPosition)
 import qualified Data.Map.Strict as Map
 import           Prologue
 import           Source.Span (Span)
@@ -483,7 +484,7 @@ instance Show address => Show1 (AddressError address value) where
 instance Eq address => Eq1 (AddressError address value) where
   liftEq _ (UninitializedSlot a) (UninitializedSlot b) = a == b
   liftEq _ (UnallocatedSlot a)   (UnallocatedSlot b)   = a == b
-  liftEq _ _                        _                        = False
+  liftEq _ _                        _                  = False
 
 throwAddressError :: ( Member (Resumable (BaseError (AddressError address body))) sig
                      , Member (Reader ModuleInfo) sig

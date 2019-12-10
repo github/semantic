@@ -12,7 +12,6 @@ import           Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
 import           Data.Abstract.Name (name)
 import qualified Data.Abstract.ScopeGraph as ScopeGraph (AccessControl(..))
-import           Data.List (elem)
 import qualified Data.List.NonEmpty as NonEmpty
 import           Data.Syntax
     ( contextualize

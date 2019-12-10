@@ -26,7 +26,7 @@ runParse :: Duration -> ParseC m a -> m a
 runParse timeout = runReader timeout . runParseC
 
 newtype ParseC m a = ParseC { runParseC :: ReaderC Duration m a }
-  deriving (Applicative, Functor, Monad, MonadIO)
+  deriving (Applicative, Functor, Monad, MonadFail, MonadIO)
 
 instance ( Carrier sig m
          , Member (Error SomeException) sig

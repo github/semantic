@@ -1,4 +1,5 @@
-{-# LANGUAGE FlexibleContexts, FlexibleInstances, GADTs, GeneralizedNewtypeDeriving, KindSignatures, MultiParamTypeClasses, RecordWildCards, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE FlexibleContexts, FlexibleInstances, GADTs, GeneralizedNewtypeDeriving, KindSignatures, MultiParamTypeClasses, RecordWildCards, ScopedTypeVariables, StandaloneDeriving, TypeOperators, UndecidableInstances #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 module Semantic.Task
 ( TaskC
 , Level(..)
@@ -87,6 +88,8 @@ serialize format input = do
   formatStyle <- asks (Flag.choose IsTerminal Plain Colourful . configIsTerminal)
   pure (runSerialize formatStyle format input)
 
+deriving instance MonadFail m => MonadFail (CatchC m)
+
 data TaskSession
   = TaskSession
   { config    :: Config
@@ -134,7 +137,7 @@ runTraceInTelemetry :: TraceInTelemetryC m a
 runTraceInTelemetry = runTraceInTelemetryC
 
 newtype TraceInTelemetryC m a = TraceInTelemetryC { runTraceInTelemetryC :: m a }
-  deriving (Applicative, Functor, Monad, MonadIO)
+  deriving (Applicative, Functor, Monad, MonadFail, MonadIO)
 
 instance (Member Telemetry sig, Carrier sig m) => Carrier (Trace :+: sig) (TraceInTelemetryC m) where
   eff (R other)         = TraceInTelemetryC . eff . handleCoercible $ other

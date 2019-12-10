@@ -3,7 +3,6 @@ module Semantic.CLI (main) where
 
 import qualified Control.Carrier.Parse.Measured as Parse
 import           Control.Effect.Reader
-import           Control.Exception as Exc (displayException)
 import           Data.Blob
 import           Data.Blob.IO
 import           Data.Handle
@@ -27,8 +26,7 @@ import           System.FilePath
 import qualified System.Path as Path
 import qualified System.Path.PartClass as Path.PartClass
 
-import Control.Concurrent (mkWeakThreadId, myThreadId)
-import Control.Exception (Exception(..), throwTo)
+import Control.Concurrent (throwTo, mkWeakThreadId, myThreadId)
 import System.Posix.Signals
 import System.Mem.Weak (deRefWeak)
 import Proto.Semantic_JSON()

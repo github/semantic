@@ -53,7 +53,7 @@ runHandler :: Handler m -> TimeoutC m a -> IO a
 runHandler h@(Handler handler) = handler . runReader h . runTimeoutC
 
 newtype TimeoutC m a = TimeoutC { runTimeoutC :: ReaderC (Handler m) m a }
-  deriving (Functor, Applicative, Monad, MonadIO)
+  deriving (Functor, Applicative, Monad, MonadFail, MonadIO)
 
 instance MonadUnliftIO m => MonadUnliftIO (TimeoutC m) where
   askUnliftIO = TimeoutC . ReaderC $ \(Handler h) ->

@@ -5,7 +5,6 @@ import Prologue
 
 import           Control.Abstract hiding (Import)
 import           Data.Abstract.Evaluatable as Evaluatable
-import           Data.Abstract.ScopeGraph (AccessControl (..))
 import           Data.JSON.Fields
 import qualified Data.Map.Strict as Map
 import           Data.Semigroup.App

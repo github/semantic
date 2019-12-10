@@ -1,4 +1,5 @@
-{-# LANGUAGE DefaultSignatures, FlexibleContexts, FlexibleInstances, GADTs, MultiParamTypeClasses, OverloadedStrings, RecordWildCards, TypeApplications, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DefaultSignatures, FlexibleContexts, FlexibleInstances, GADTs, MultiParamTypeClasses, OverloadedStrings,
+             RecordWildCards, TypeApplications, TypeOperators, UndecidableInstances #-}
 module Data.JSON.Fields
   ( JSONFields (..)
   , JSONFields1 (..)
@@ -10,7 +11,6 @@ module Data.JSON.Fields
 import           Data.Aeson
 import           Data.Edit
 import qualified Data.Map as Map
-import           Data.Sum (Apply (..), Sum)
 import qualified Data.Text as Text
 import           GHC.Generics
 import           Prologue

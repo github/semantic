@@ -56,7 +56,7 @@ withDistribute :: MonadUnliftIO m => DistributeC m a -> m a
 withDistribute r = withUnliftIO (`runDistribute` r)
 
 newtype DistributeC m a = DistributeC { runDistributeC :: ReaderC (UnliftIO m) m a }
-  deriving (Functor, Applicative, Monad, MonadIO)
+  deriving (Functor, Applicative, Monad, MonadFail, MonadIO)
 
 -- This can be simpler if we add an instance to fused-effects that takes
 -- care of this folderol for us (then we can justt derive the MonadUnliftIO instance)

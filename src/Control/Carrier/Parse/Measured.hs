@@ -32,7 +32,7 @@ import           Semantic.Timeout
 import           Source.Source (Source)
 
 newtype ParseC m a = ParseC { runParse :: m a }
-  deriving (Applicative, Functor, Monad, MonadIO)
+  deriving (Applicative, Functor, Monad, MonadFail, MonadIO)
 
 instance ( Carrier sig m
          , Member (Error SomeException) sig

@@ -12,12 +12,8 @@ module Semantic.Util
 import Prelude hiding (readFile)
 
 import           Control.Abstract
-import           Control.Abstract.Heap (runHeapError)
-import           Control.Abstract.ScopeGraph (runScopeError)
 import           Control.Carrier.Parse.Simple
 import           Control.Effect.Lift
-import           Control.Effect.Trace (runTraceByPrinting)
-import           Control.Exception (displayException)
 import           Control.Lens.Getter
 import           Data.Abstract.Address.Precise as Precise
 import           Data.Abstract.Evaluatable

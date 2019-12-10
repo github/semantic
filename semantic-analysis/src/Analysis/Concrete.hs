@@ -1,4 +1,6 @@
-{-# LANGUAGE DerivingVia, FlexibleContexts, FlexibleInstances, LambdaCase, MultiParamTypeClasses, NamedFieldPuns, OverloadedStrings, RankNTypes, RecordWildCards, ScopedTypeVariables, TypeApplications, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DerivingVia, FlexibleContexts, FlexibleInstances, LambdaCase, MultiParamTypeClasses, NamedFieldPuns,
+             OverloadedStrings, RankNTypes, RecordWildCards, ScopedTypeVariables, TypeApplications, TypeOperators,
+             UndecidableInstances #-}
 module Analysis.Concrete
 ( Concrete(..)
 , concrete
@@ -13,14 +15,13 @@ import qualified Algebra.Graph as G
 import qualified Algebra.Graph.Export.Dot as G
 import           Analysis.Analysis
 import           Analysis.File
-import           Control.Applicative (Alternative (..))
 import           Control.Carrier.Fail.WithLoc
 import           Control.Effect
 import           Control.Effect.Fresh
 import           Control.Effect.NonDet
 import           Control.Effect.Reader hiding (Local)
 import           Control.Effect.State
-import           Control.Monad ((<=<), guard)
+import           Control.Monad (guard, (<=<))
 import           Data.Function (fix)
 import qualified Data.IntMap as IntMap
 import qualified Data.IntSet as IntSet

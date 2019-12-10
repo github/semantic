@@ -1,4 +1,5 @@
-{-# LANGUAGE DataKinds, DeriveGeneric, FlexibleContexts, GADTs, LambdaCase, RecordWildCards, ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE DataKinds, DeriveGeneric, FlexibleContexts, GADTs, LambdaCase, RecordWildCards, ScopedTypeVariables,
+             TypeOperators #-}
 module Parsing.TreeSitter
 ( TSParseException (..)
 , Duration(..)
@@ -14,7 +15,6 @@ import           Control.Effect.Reader
 import qualified Control.Exception as Exc
 import           Foreign
 import           Foreign.C.Types (CBool (..))
-import           Foreign.Marshal.Array (allocaArray)
 
 import           Data.AST (AST, Node (Node))
 import           Data.Blob

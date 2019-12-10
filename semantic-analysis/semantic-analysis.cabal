@@ -58,7 +58,7 @@ library
     , fused-syntax
     , haskeline                   ^>= 0.7.5
     , pathtype                    ^>= 0.8.1
-    , prettyprinter               ^>= 1.2.1
+    , prettyprinter                >= 1.2.1 && < 1.4
     , prettyprinter-ansi-terminal ^>= 1.1.1
     , semantic-source             ^>= 0
     , terminal-size               ^>= 0.3

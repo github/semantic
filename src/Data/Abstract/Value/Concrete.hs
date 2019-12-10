@@ -6,8 +6,6 @@ module Data.Abstract.Value.Concrete
   , runValueErrorWith
   ) where
 
-import Control.Abstract.ScopeGraph (Allocator, ScopeError)
-import Control.Abstract.Heap (scopeLookup)
 import qualified Control.Abstract as Abstract
 import Control.Abstract hiding (Boolean(..), Function(..), Numeric(..), Object(..), Array(..), Hash(..), String(..), Unit(..), While(..))
 import Control.Effect.Carrier
@@ -19,7 +17,6 @@ import Data.Abstract.Name
 import qualified Data.Abstract.Number as Number
 import Data.Bits
 import Data.List (genericIndex, genericLength)
-import Data.Scientific (Scientific, coefficient, normalize)
 import Data.Scientific.Exts
 import Data.Text (pack)
 import Data.Word

@@ -42,7 +42,6 @@ import           Control.Lens.Getter
 import           Data.Abstract.Address.Hole as Hole
 import           Data.Abstract.Address.Monovariant as Monovariant
 import           Data.Abstract.Address.Precise as Precise
-import           Data.Abstract.BaseError (BaseError (..))
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Heap
 import           Data.Abstract.Module

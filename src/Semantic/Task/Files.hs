@@ -67,9 +67,9 @@ runFiles :: FilesC m a -> m a
 runFiles = runFilesC
 
 newtype FilesC m a = FilesC { runFilesC :: m a }
-  deriving (Functor, Applicative, Monad, MonadIO)
+  deriving (Functor, Applicative, Monad, MonadFail, MonadIO)
 
-instance (Member (Error SomeException) sig, Member Catch sig, MonadIO m, Carrier sig m) => Carrier (Files :+: sig) (FilesC m) where
+instance (Member (Error SomeException) sig, Member Catch sig, MonadFail m, MonadIO m, Carrier sig m) => Carrier (Files :+: sig) (FilesC m) where
   eff (R other) = FilesC (eff (handleCoercible other))
   eff (L op) = case op of
     Read (FromPath path) k                                    -> rethrowing (readBlobFromFile' path) >>= k
