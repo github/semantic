@@ -117,7 +117,6 @@ library
                      , Control.Effect.Parse
                      , Control.Effect.REPL
                      , Control.Effect.Sum.Project
-                     , Control.Rewriting
                      -- Datatypes for abstract interpretation
                      , Data.Abstract.Address.Hole
                      , Data.Abstract.Address.Monovariant
