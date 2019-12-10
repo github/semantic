@@ -137,7 +137,7 @@ keywordArgument :: Assignment (Term Loc)
 keywordArgument = makeTerm <$> symbol KeywordArgument <*> children (Statement.Assignment [] <$> term expression <*> term expression)
 
 parenthesizedExpression :: Assignment (Term Loc)
-parenthesizedExpression = symbol ParenthesizedExpression *> children expressions
+parenthesizedExpression = (symbol ParenthesizedExpression <|> symbol ParenthesizedExpression') *> children expressions
 
 parameter :: Assignment (Term Loc)
 parameter =  makeTerm <$> symbol DefaultParameter <*> children (Statement.Assignment [] <$> term expression <*> term expression)

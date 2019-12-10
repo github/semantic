@@ -317,6 +317,7 @@ instance Compile Py.Integer
 instance Compile Py.Lambda
 instance Compile Py.List
 instance Compile Py.ListComprehension
+instance Compile Py.ListSplat
 
 instance Compile Py.Module where
   compile it@Py.Module { Py.extraChildren = stmts } _cc =
