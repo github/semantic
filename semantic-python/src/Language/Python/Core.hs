@@ -63,7 +63,7 @@ class Compile (py :: * -> *) where
           -> (t Name -> m (t Name))
           -> (t Name -> m (t Name))
 
-  default compile :: (Applicative m, Member Failure syn, Carrier syn t, Show (py Span)) => py Span -> (t Name -> m (t Name)) -> (t Name -> m (t Name))
+  default compile :: (Applicative m, Has Failure syn t, Show (py Span)) => py Span -> (t Name -> m (t Name)) -> (t Name -> m (t Name))
   compile a _ _ = defaultCompile a
 
 toplevelCompile :: ( CoreSyntax syn t
@@ -86,7 +86,7 @@ locate :: ( HasField "ann" syntax Span
        -> t a
 locate syn  = Core.annAt (getField @"ann" syn)
 
-defaultCompile :: (Applicative m, Member Failure syn, Carrier syn t, Show py) => py -> m (t Name)
+defaultCompile :: (Applicative m, Has Failure syn t, Show py) => py -> m (t Name)
 defaultCompile = pure . unimplemented
 
 
