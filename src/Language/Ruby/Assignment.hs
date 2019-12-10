@@ -315,7 +315,7 @@ pair :: Assignment (Term Loc)
 pair =   makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> expression <*> (expression <|> emptyTerm))
 
 args :: Assignment [Term Loc]
-args = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children (many expression) <|> many expression
+args = symbol ArgumentList *> children (many expression) <|> many expression
 
 methodCall :: Assignment (Term Loc)
 methodCall = makeTerm' <$> symbol MethodCall <*> children (require <|> load <|> send)
@@ -335,8 +335,8 @@ methodCall = makeTerm' <$> symbol MethodCall <*> children (require <|> load <|> 
     load = inject <$ symbol Identifier <*> do
       s <- rawSource
       guard (s == "load")
-      (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children (Ruby.Syntax.Load <$> expression <*> optional expression)
-    nameExpression = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children expression
+      symbol ArgumentList *> children (Ruby.Syntax.Load <$> expression <*> optional expression)
+    nameExpression = symbol ArgumentList *> children expression
 
 methodSelector :: Assignment (Term Loc)
 methodSelector = makeTerm <$> symbols <*> (Syntax.Identifier <$> (name <$> source))
