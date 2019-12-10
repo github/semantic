@@ -1,7 +1,7 @@
 cabal-version:       2.4
 
 name:                semantic
-version:             0.9.0.0
+version:             0.10.0.0
 synopsis:            Framework and executable for analyzing and diffing untrusted code.
 description:         Semantic is a library for parsing, analyzing, and comparing source code across many languages.
 homepage:            http://github.com/github/semantic#readme
@@ -59,7 +59,7 @@ common dependencies
                      , fused-effects-exceptions ^>= 1
                      , fused-effects-resumable ^>= 0.1
                      , hashable ^>= 1.2.7.0
-                     , tree-sitter ^>= 0.6
+                     , tree-sitter ^>= 0.7
                      , mtl ^>= 2.2.2
                      , network ^>= 2.8.0.0
                      , pathtype ^>= 0.8.1
@@ -298,12 +298,12 @@ library
                      , unliftio-core ^>= 0.1.2.0
                      , unordered-containers ^>= 0.2.9.0
                      , vector ^>= 0.12.0.2
-                     , tree-sitter-go ^>= 0.2
+                     , tree-sitter-go ^>= 0.3
                      , tree-sitter-php ^>= 0.2
-                     , tree-sitter-python ^>= 0.7
-                     , tree-sitter-ruby ^>= 0.2
-                     , tree-sitter-typescript ^>= 0.2.1
-                     , tree-sitter-tsx ^>= 0.2.1
+                     , tree-sitter-python ^>= 0.8
+                     , tree-sitter-ruby ^>= 0.3
+                     , tree-sitter-typescript ^>= 0.3
+                     , tree-sitter-tsx ^>= 0.3
 
 executable semantic
   import:              haskell, dependencies, executable-flags
@@ -353,7 +353,7 @@ test-suite test
                      , Generators
                      , Properties
   build-depends:       semantic
-                     , tree-sitter-json ^>= 0.4
+                     , tree-sitter-json ^>= 0.5
                      , Glob ^>= 0.10.0
                      , hedgehog ^>= 1
                      , hspec >= 2.6 && <3
