@@ -51,8 +51,11 @@ type family ToTagsInstance t :: Strategy where
 
   -- These built-in functions all get handled as calls
   ToTagsInstance Py.AssertStatement    = 'Custom
-  ToTagsInstance Py.GlobalStatement    = 'Custom
+  ToTagsInstance Py.Await              = 'Custom
   ToTagsInstance Py.DeleteStatement    = 'Custom
+  ToTagsInstance Py.ExecStatement      = 'Custom
+  ToTagsInstance Py.GlobalStatement    = 'Custom
+  ToTagsInstance Py.NonlocalStatement  = 'Custom
   ToTagsInstance Py.PrintStatement     = 'Custom
 
   ToTagsInstance _                     = 'Generic
@@ -71,11 +74,20 @@ keywordFunctionCall t loc range name = do
 instance ToTagsBy 'Custom Py.AssertStatement where
   tags' t@Py.AssertStatement { ann = loc@Loc { byteRange = range } } = keywordFunctionCall t loc range "assert"
 
+instance ToTagsBy 'Custom Py.Await where
+  tags' t@Py.Await { ann = loc@Loc { byteRange = range } } = keywordFunctionCall t loc range "await"
+
 instance ToTagsBy 'Custom Py.DeleteStatement where
   tags' t@Py.DeleteStatement { ann = loc@Loc { byteRange = range } } = keywordFunctionCall t loc range "del"
 
+instance ToTagsBy 'Custom Py.ExecStatement where
+  tags' t@Py.ExecStatement { ann = loc@Loc { byteRange = range } } = keywordFunctionCall t loc range "exec"
+
 instance ToTagsBy 'Custom Py.GlobalStatement where
   tags' t@Py.GlobalStatement { ann = loc@Loc { byteRange = range } } = keywordFunctionCall t loc range "global"
+
+instance ToTagsBy 'Custom Py.NonlocalStatement where
+  tags' t@Py.NonlocalStatement { ann = loc@Loc { byteRange = range } } = keywordFunctionCall t loc range "nonlocal"
 
 instance ToTagsBy 'Custom Py.PrintStatement where
   tags' t@Py.PrintStatement { ann = loc@Loc { byteRange = range } } = keywordFunctionCall t loc range "print"
