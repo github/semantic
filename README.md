@@ -96,7 +96,7 @@ Available options:
 
 ## Development
 
-`semantic` requires at least GHC 8.6.4 and Cabal 2.4. We strongly recommend using [`ghcup`][ghcup] to sandbox GHC versions, as GHC packages installed through your OS's package manager may not install statically-linked versions of the GHC boot libraries.
+`semantic` requires at least GHC 8.6.4 and Cabal 2.4. We strongly recommend using [`ghcup`][ghcup] to sandbox GHC versions, as GHC packages installed through your OS's package manager may not install statically-linked versions of the GHC boot libraries. `semantic` currently builds only on Unix systems; users of other operating systems may wish to use the [Docker images](https://github.com/github/semantic/packages/11609).
 
 We use `cabal's` [Nix-style local builds][nix] for development. To get started quickly:
 
