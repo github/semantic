@@ -6,7 +6,6 @@ packages: .
           semantic-json
           semantic-python
           semantic-tags
-          ../haskell-tree-sitter/*
 
 jobs: $ncpus
 
