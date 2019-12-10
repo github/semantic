@@ -52,4 +52,4 @@ source-repository-package
 source-repository-package
   type: git
   location: https://github.com/antitypical/fused-syntax.git
-  tag: 1fd5534085d9592f8b42461c0b2602b0344389bb
+  tag: d11e14581217590a5c67f79cbaeee35ac8acee6a
