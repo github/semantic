@@ -5,11 +5,11 @@ import qualified Control.Carrier.Parse.Measured as Parse
 import           Control.Effect.Reader
 import           Data.Blob
 import           Data.Blob.IO
+import qualified Data.Flag as Flag
 import           Data.Handle
 import qualified Data.Language as Language
 import           Data.List (intercalate)
 import           Data.Project
-import qualified Data.Flag as Flag
 import           Options.Applicative hiding (style)
 import           Prologue
 import           Semantic.Api hiding (File)
@@ -26,10 +26,11 @@ import           System.FilePath
 import qualified System.Path as Path
 import qualified System.Path.PartClass as Path.PartClass
 
-import Control.Concurrent (throwTo, mkWeakThreadId, myThreadId)
-import System.Posix.Signals
+import Control.Concurrent (mkWeakThreadId, myThreadId)
+import Control.Exception (Exception (..), throwTo)
+import Proto.Semantic_JSON ()
 import System.Mem.Weak (deRefWeak)
-import Proto.Semantic_JSON()
+import System.Posix.Signals
 
 newtype SignalException = SignalException Signal
   deriving (Show)
@@ -155,8 +156,10 @@ graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute a g
       case paths of
         (x:_) -> pure $! Project (takeDirectory x) blobs (Language.languageForFilePath x) mempty
         _     -> pure $! Project "/" mempty Language.Unknown mempty
+
+    allLanguages = intercalate "|" . fmap show $ [Language.Go .. maxBound]
     readProjectRecursively = makeReadProjectRecursivelyTask
-      <$> option auto (long "language" <> help "The language for the analysis.")
+      <$> option auto (long "language" <> help "The language for the analysis." <> metavar allLanguages)
       <*> optional (pathOption (long "root" <> help "Root directory of project. Optional, defaults to entry file/directory." <> metavar "DIR"))
       <*> many (pathOption (long "exclude-dir" <> help "Exclude a directory (e.g. vendor)" <> metavar "DIR"))
       <*> argument path (metavar "PATH")
