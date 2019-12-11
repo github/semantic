@@ -3,12 +3,10 @@
 module Main (main) where
 
 import           Control.Carrier.Parse.Measured
-import           Control.Effect
-import           Control.Effect.Reader
+import           Control.Carrier.Reader
+import           Control.Concurrent.Async (forConcurrently)
 import           Control.Exception (displayException)
 import qualified Control.Foldl as Foldl
-import           Data.Function ((&))
-import           Control.Concurrent.Async (forConcurrently)
 import           Control.Monad
 import           Control.Monad.IO.Class
 import           Control.Monad.Trans.Resource (ResIO, runResourceT)
@@ -16,6 +14,7 @@ import           Data.Blob
 import qualified Data.ByteString.Lazy.Char8 as BLC
 import qualified Data.ByteString.Streaming.Char8 as ByteStream
 import           Data.Either
+import           Data.Function ((&))
 import           Data.Language (defaultLanguageModes)
 import           Data.Set (Set)
 import           Data.Typeable
@@ -119,5 +118,5 @@ knownFailuresForPath tsDir (Just path)
   )
 
 
-parseFilePath :: (Member (Error SomeException) sig, Member Distribute sig, Member Parse sig, Member Files sig, Member (Reader Config) sig, Carrier sig m, MonadIO m) => Path.RelFile -> m Bool
+parseFilePath :: (Has (Error SomeException) sig m, Has Distribute sig m, Has Parse sig m, Has Files sig m, Has (Reader Config) sig m, MonadIO m) => Path.RelFile -> m Bool
 parseFilePath path = readBlob (fileForTypedPath path) >>= runReader defaultLanguageModes . parseTermBuilder @[] TermShow . pure >>= const (pure True)
