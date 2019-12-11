@@ -27,7 +27,7 @@ import qualified System.Path as Path
 import qualified System.Path.PartClass as Path.PartClass
 
 import Control.Concurrent (mkWeakThreadId, myThreadId)
-import Control.Exception (Exception (..), throwTo)
+import Control.Exception (throwTo)
 import Proto.Semantic_JSON ()
 import System.Mem.Weak (deRefWeak)
 import System.Posix.Signals
