@@ -1,4 +1,6 @@
-{-# LANGUAGE DataKinds, DeriveFunctor, ExistentialQuantification, FlexibleContexts, FlexibleInstances, GADTs, GeneralizedNewtypeDeriving, KindSignatures, MultiParamTypeClasses, StandaloneDeriving, TypeApplications, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, DeriveFunctor, ExistentialQuantification, FlexibleContexts, FlexibleInstances, GADTs,
+             GeneralizedNewtypeDeriving, KindSignatures, MultiParamTypeClasses, StandaloneDeriving, TypeOperators,
+             UndecidableInstances #-}
 
 module Semantic.Task.Files
   ( Files
@@ -28,8 +30,8 @@ import           Prelude hiding (readFile)
 import           Prologue hiding (catch)
 import           Semantic.IO
 import qualified System.IO as IO hiding (withBinaryFile)
-import qualified System.Path.IO as IO (withBinaryFile)
 import qualified System.Path as Path
+import qualified System.Path.IO as IO (withBinaryFile)
 
 data Source blob where
   FromPath       :: File                            -> Source Blob
@@ -50,16 +52,16 @@ data Files (m :: * -> *) k
 deriving instance Functor m => Functor (Files m)
 
 instance HFunctor Files where
-  hmap f (Read s k) = Read s (f . k)
+  hmap f (Read s k)                = Read s (f . k)
   hmap f (ReadProject mp p l ps k) = ReadProject mp p l ps (f . k)
-  hmap f (FindFiles p s ps k) = FindFiles p s ps (f . k)
-  hmap f (Write d b k) = Write d b (f k)
+  hmap f (FindFiles p s ps k)      = FindFiles p s ps (f . k)
+  hmap f (Write d b k)             = Write d b (f k)
 
 instance Effect Files where
-  thread state handler (Read s k) = Read s (handler . (<$ state) . k)
+  thread state handler (Read s k)                = Read s (handler . (<$ state) . k)
   thread state handler (ReadProject mp p l ps k) = ReadProject mp p l ps (handler . (<$ state) . k)
-  thread state handler (FindFiles p s ps k) = FindFiles p s ps (handler . (<$ state) . k)
-  thread state handler (Write d b k) = Write d b (handler . (<$ state) $ k)
+  thread state handler (FindFiles p s ps k)      = FindFiles p s ps (handler . (<$ state) . k)
+  thread state handler (Write d b k)             = Write d b (handler . (<$ state) $ k)
 
 -- | Run a 'Files' effect in 'IO'
 runFiles :: FilesC m a -> m a

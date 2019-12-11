@@ -1,4 +1,5 @@
-{-# LANGUAGE DeriveFunctor, ExistentialQuantification, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, MultiParamTypeClasses, StandaloneDeriving, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DeriveFunctor, ExistentialQuantification, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving,
+             MultiParamTypeClasses, StandaloneDeriving, TypeOperators, UndecidableInstances #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 -- TODO: We should kill this entirely, because with fused-effects 1.0 we can unlift the various runConcurrently operations.
 module Semantic.Distribute
@@ -11,10 +12,10 @@ module Semantic.Distribute
 , DistributeC(..)
 ) where
 
-import qualified Control.Concurrent.Async as Async
 import           Control.Algebra
-import           Control.Carrier.Reader
 import           Control.Carrier.Lift
+import           Control.Carrier.Reader
+import qualified Control.Concurrent.Async as Async
 import           Control.Monad.IO.Unlift
 import           Control.Parallel.Strategies
 import           Prologue
@@ -59,7 +60,7 @@ withDistribute :: MonadUnliftIO m => DistributeC m a -> m a
 withDistribute r = withUnliftIO (`runDistribute` r)
 
 instance MonadUnliftIO m => MonadUnliftIO (LiftC m) where
-  askUnliftIO = LiftC $ withUnliftIO $ \u -> return (UnliftIO (unliftIO u . runM))
+  askUnliftIO = LiftC $ withUnliftIO $ \u -> pure (UnliftIO (unliftIO u . runM))
   {-# INLINE askUnliftIO #-}
   withRunInIO inner = LiftC $ withRunInIO $ \run -> inner (run . runM)
   {-# INLINE withRunInIO #-}
