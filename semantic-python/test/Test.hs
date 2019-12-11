@@ -121,7 +121,7 @@ checkPythonFile fp = HUnit.testCaseSteps (Path.toString fp) $ \step -> withFroze
   let coreResult = Control.Algebra.run
                    . runFail
                    . eliminateFailures
-                   . Control.Effect.run
+                   . Control.Algebra.run
                    . runReader @Py.Bindings mempty
                    . Py.toplevelCompile @(Failure :+: Ann Span :+: Core) @(Term _)
                    <$> result
