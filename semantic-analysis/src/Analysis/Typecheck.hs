@@ -60,7 +60,6 @@ deriving instance (Ord  name, Ord  a, forall a . Eq   a => Eq   (f a)
 deriving instance (Show name, Show a, forall a . Show a => Show (f a))          => Show (Monotype name f a)
 
 instance HFunctor (Monotype name)
-instance Effect (Monotype name)
 
 instance RightModule (Monotype name) where
   item >>=* go = case item of
