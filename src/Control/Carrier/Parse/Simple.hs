@@ -1,13 +1,13 @@
 {-# LANGUAGE FlexibleContexts, FlexibleInstances, GADTs, GeneralizedNewtypeDeriving, MultiParamTypeClasses, RecordWildCards, TypeOperators, UndecidableInstances #-}
 -- | A carrier for 'Parse' effects suitable for use in the repl, tests, etc.
 module Control.Carrier.Parse.Simple
-( -- * Parse effect
-  module Control.Effect.Parse
-  -- * Parse carrier
-, ParseC(..)
+( -- * Parse carrier
+  ParseC(..)
 , runParse
   -- * Exceptions
 , ParseFailure(..)
+  -- * Parse effect
+, module Control.Effect.Parse
 ) where
 
 import qualified Assigning.Assignment as Assignment
