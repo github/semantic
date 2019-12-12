@@ -6,7 +6,12 @@ module Control.Abstract.Evaluator.Spec
 
 import           Control.Abstract as Abstract
 import qualified Control.Abstract.Heap as Heap
-import           Control.Effect.Lift
+import           Control.Carrier.Lift
+import           Control.Carrier.Error.Either
+import           Control.Carrier.Fresh.Strict
+import           Control.Carrier.Resumable.Either
+import           Control.Carrier.State.Strict
+import           Control.Carrier.Trace.Ignoring
 import           Data.Abstract.Address.Precise as Precise
 import           Data.Abstract.BaseError
 import           Data.Abstract.Evaluatable
@@ -44,10 +49,11 @@ spec = do
 
 evaluate
   = runM
-  . runTraceByIgnoring
+  . runTrace
   . runState (lowerBound @(ScopeGraph Precise))
   . runState (lowerBound @(Heap Precise Precise Val))
-  . runFresh
+  . fmap snd
+  . runFresh 0
   . runReader (PackageInfo (SpecHelpers.name "test") mempty)
   . runReader (ModuleInfo "test/Control/Abstract/Evaluator/Spec.hs" Language.Haskell mempty)
   . evalState (lowerBound @Span)
@@ -104,7 +110,7 @@ newtype SpecEff = SpecEff
                  (FreshC
                  (StateC (Heap Precise Precise Val)
                  (StateC (ScopeGraph Precise)
-                 (TraceByIgnoringC
+                 (TraceC
                  (LiftC IO))))))))))))))))))))))))
                  Val
   }

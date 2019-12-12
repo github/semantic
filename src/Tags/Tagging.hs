@@ -10,7 +10,7 @@ where
 import Prelude hiding (fail, filter, log)
 import Prologue hiding (Element, hash)
 
-import           Control.Effect.State as Eff
+import           Control.Carrier.State.Strict as Eff
 import           Data.Abstract.Declarations (Declarations)
 import           Data.Text as T hiding (empty)
 import           Streaming
@@ -49,9 +49,7 @@ runTagging lang symbolsToSummarize source
 
 type ContextToken = (Text, Range)
 
-contextualizing :: ( Member (State [ContextToken]) sig
-                   , Carrier sig m
-                   )
+contextualizing :: Has (State [ContextToken]) sig m
                 => Source.Source
                 -> (Text -> Maybe Kind)
                 -> Stream (Of Token) m a
@@ -68,9 +66,7 @@ contextualizing source toKind = Streaming.mapMaybeM $ \case
     slice = stripEnd . Source.toText . Source.slice source
     firstLine = T.take 180 . fst . breakOn "\n"
 
-enterScope, exitScope :: ( Member (State [ContextToken]) sig
-                         , Carrier sig m
-                         )
+enterScope, exitScope :: Has (State [ContextToken]) sig m
                       => ContextToken
                       -> m ()
 enterScope c = modify @[ContextToken] (c :)

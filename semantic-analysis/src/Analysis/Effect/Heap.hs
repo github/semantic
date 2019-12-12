@@ -5,17 +5,18 @@ module Analysis.Effect.Heap
 , assign
 , Heap(..)
   -- * Re-exports
-, Carrier
+, Algebra
+, Has
 , run
 ) where
 
-import Control.Effect.Carrier
+import Control.Algebra
 import GHC.Generics (Generic1)
 
-deref :: (Member (Heap addr value) sig, Carrier sig m) => addr -> m (Maybe value)
+deref :: Has (Heap addr value) sig m => addr -> m (Maybe value)
 deref addr = send (Deref addr pure)
 
-assign :: (Member (Heap addr value) sig, Carrier sig m) => addr -> value -> m ()
+assign :: Has (Heap addr value) sig m => addr -> value -> m ()
 assign addr value = send (Assign addr value (pure ()))
 
 

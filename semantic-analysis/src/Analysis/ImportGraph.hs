@@ -12,10 +12,11 @@ import           Analysis.File
 import           Analysis.FlowInsensitive
 import           Analysis.Name
 import           Control.Applicative (Alternative(..))
+import           Control.Algebra
 import           Control.Carrier.Fail.WithLoc
-import           Control.Effect
-import           Control.Effect.Fresh
-import           Control.Effect.Reader
+import           Control.Carrier.Fresh.Strict
+import           Control.Carrier.Reader
+import           Control.Carrier.State.Strict
 import           Data.Foldable (fold, for_)
 import           Data.Function (fix)
 import qualified Data.Map as Map
@@ -50,7 +51,7 @@ data Semi term
 importGraph
   :: (Ord (term Name), Show (term Name))
   => (forall sig m
-     .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
+     .  (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
      => Analysis term Name (Value (term Name)) m
      -> (term Name -> m (Value (term Name)))
      -> (term Name -> m (Value (term Name)))
@@ -61,21 +62,20 @@ importGraph
      )
 importGraph eval
   = run
-  . runFresh
+  . evalFresh 0
   . runHeap
   . traverse (runFile eval)
 
 runFile
   :: forall term m sig
-  .  ( Carrier sig m
-     , Effect sig
-     , Member Fresh sig
-     , Member (State (Heap (Value (term Name)))) sig
+  .  ( Effect sig
+     , Has Fresh sig m
+     , Has (State (Heap (Value (term Name)))) sig m
      , Ord  (term Name)
      , Show (term Name)
      )
   => (forall sig m
-     .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
+     .  (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
      => Analysis term Name (Value (term Name)) m
      -> (term Name -> m (Value (term Name)))
      -> (term Name -> m (Value (term Name)))
@@ -88,17 +88,15 @@ runFile eval file = traverse run file
             . runEnv
             . runFail
             . fmap fold
-            . convergeTerm (A.runHeap @Name @(Value (term Name)) . fix (cacheTerm . eval importGraphAnalysis))
+            . convergeTerm 0 (A.runHeap @Name @(Value (term Name)) . fix (cacheTerm . eval importGraphAnalysis))
 
 -- FIXME: decompose into a product domain and two atomic domains
 importGraphAnalysis
-  :: forall term m sig
-  .  ( Alternative m
-     , Carrier sig m
-     , Member (Env Name) sig
-     , Member (A.Heap Name (Value (term Name))) sig
-     , Member (Reader Path.AbsRelFile) sig
-     , Member (Reader Span) sig
+  :: ( Alternative m
+     , Has (Env Name) sig m
+     , Has (A.Heap Name (Value (term Name))) sig m
+     , Has (Reader Path.AbsRelFile) sig m
+     , Has (Reader Span) sig m
      , MonadFail m
      , Show (term Name)
      )

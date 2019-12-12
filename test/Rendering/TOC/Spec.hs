@@ -3,7 +3,6 @@ module Rendering.TOC.Spec (spec) where
 
 import Analysis.TOCSummary
 import Control.Effect.Parse
-import Control.Effect.Reader
 import Control.Monad.IO.Class
 import Data.Aeson hiding (defaultOptions)
 import Data.Bifunctor
@@ -217,7 +216,7 @@ blankDiff = merge (Nothing, Nothing) (inject [ inserting (termIn Nothing (inject
 
 -- Diff helpers
 summarize
-  :: (Member (Error SomeException) sig, Member Parse sig, Member Telemetry sig, Carrier sig m, MonadIO m)
+  :: (Has (Error SomeException) sig m, Has Parse sig m, Has Telemetry sig m, MonadIO m)
   => BlobPair
   -> m [Either ErrorSummary TOCSummary]
 summarize = parsePairWith (summarizeTermParsers defaultLanguageModes) summarizeTerms

@@ -46,13 +46,13 @@ import           Source.Source as Source
 import qualified Tags.Tag as Tag
 import qualified Tags.Tagging.Precise as Tagging
 
-diffSummaryBuilder :: (Carrier sig m, Member Distribute sig, Member (Error SomeException) sig, Member Parse sig, Member (Reader Config) sig, Member (Reader PerLanguageModes) sig, Member Telemetry sig, MonadIO m) => Format DiffTreeTOCResponse -> [BlobPair] -> m Builder
+diffSummaryBuilder :: (Has Distribute sig m, Has (Error SomeException) sig m, Has Parse sig m, Has (Reader Config) sig m, Has (Reader PerLanguageModes) sig m, Has Telemetry sig m, MonadIO m) => Format DiffTreeTOCResponse -> [BlobPair] -> m Builder
 diffSummaryBuilder format blobs = diffSummary blobs >>= serialize format
 
-legacyDiffSummary :: (Carrier sig m, Member Distribute sig, Member (Error SomeException) sig, Member Parse sig, Member (Reader PerLanguageModes) sig, Member Telemetry sig, MonadIO m) => [BlobPair] -> m Summaries
+legacyDiffSummary :: (Has Distribute sig m, Has (Error SomeException) sig m, Has Parse sig m, Has (Reader PerLanguageModes) sig m, Has Telemetry sig m, MonadIO m) => [BlobPair] -> m Summaries
 legacyDiffSummary = distributeFoldMap go
   where
-    go :: (Carrier sig m, Member (Error SomeException) sig, Member Parse sig, Member (Reader PerLanguageModes) sig, Member Telemetry sig, MonadIO m) => BlobPair -> m Summaries
+    go :: (Has (Error SomeException) sig m, Has Parse sig m, Has (Reader PerLanguageModes) sig m, Has Telemetry sig m, MonadIO m) => BlobPair -> m Summaries
     go blobPair = asks summarizeTermParsers >>= \ p -> parsePairWith p (fmap (uncurry (flip Summaries) . bimap toMap toMap . partitionEithers) . summarizeTerms) blobPair
       `catchError` \(SomeException e) ->
         pure $ Summaries mempty (toMap [ErrorSummary (T.pack (show e)) lowerBound lang])
@@ -64,12 +64,12 @@ legacyDiffSummary = distributeFoldMap go
             toMap as = Map.singleton path (toJSON <$> as)
 
 
-diffSummary :: (Carrier sig m, Member Distribute sig, Member (Error SomeException) sig, Member Parse sig, Member (Reader PerLanguageModes) sig, Member Telemetry sig, MonadIO m) => [BlobPair] -> m DiffTreeTOCResponse
+diffSummary :: (Has Distribute sig m, Has (Error SomeException) sig m, Has Parse sig m, Has (Reader PerLanguageModes) sig m, Has Telemetry sig m, MonadIO m) => [BlobPair] -> m DiffTreeTOCResponse
 diffSummary blobs = do
   diff <- distributeFor blobs go
   pure $ defMessage & P.files .~ diff
   where
-    go :: (Carrier sig m, Member (Error SomeException) sig, Member Parse sig, Member (Reader PerLanguageModes) sig, Member Telemetry sig, MonadIO m) => BlobPair -> m TOCSummaryFile
+    go :: (Has (Error SomeException) sig m, Has Parse sig m, Has (Reader PerLanguageModes) sig m, Has Telemetry sig m, MonadIO m) => BlobPair -> m TOCSummaryFile
     go blobPair = asks summarizeTermParsers >>= \ p -> parsePairWith p (fmap (uncurry toFile . partitionEithers . map (bimap toError toChange)) . summarizeTerms) blobPair
       `catchError` \(SomeException e) ->
         pure $ toFile [defMessage & P.error .~ T.pack (show e) & P.maybe'span .~ Nothing] []
@@ -103,13 +103,13 @@ summarizeTermParsers :: PerLanguageModes -> Map Language (SomeParser SummarizeTe
 summarizeTermParsers = allParsers
 
 class SummarizeTerms term where
-  summarizeTerms :: (Member Telemetry sig, Carrier sig m, MonadIO m) => Edit (Blob, term Loc) (Blob, term Loc) -> m [Either ErrorSummary TOCSummary]
+  summarizeTerms :: (Has Telemetry sig m, MonadIO m) => Edit (Blob, term Loc) (Blob, term Loc) -> m [Either ErrorSummary TOCSummary]
 
 instance (TermMode term ~ strategy, SummarizeTermsBy strategy term) => SummarizeTerms term where
   summarizeTerms = summarizeTermsBy @strategy
 
 class SummarizeTermsBy (strategy :: LanguageMode) term where
-  summarizeTermsBy :: (Member Telemetry sig, Carrier sig m, MonadIO m) => Edit (Blob, term Loc) (Blob, term Loc) -> m [Either ErrorSummary TOCSummary]
+  summarizeTermsBy :: (Has Telemetry sig m, MonadIO m) => Edit (Blob, term Loc) (Blob, term Loc) -> m [Either ErrorSummary TOCSummary]
 
 instance (DiffTerms term, HasDeclaration (Syntax term), Traversable (Syntax term), Recursive (term Loc), Base (term Loc) ~ TermF (Syntax term) Loc) => SummarizeTermsBy 'ALaCarte term where
   summarizeTermsBy = fmap diffTOC . diffTerms . bimap decorateTerm decorateTerm where

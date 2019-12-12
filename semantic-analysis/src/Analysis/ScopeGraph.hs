@@ -13,11 +13,11 @@ import qualified Analysis.Carrier.Heap.Monovariant as A
 import           Analysis.File
 import           Analysis.FlowInsensitive
 import           Analysis.Name
+import           Control.Algebra
 import           Control.Applicative (Alternative (..))
+import           Control.Carrier.Reader
 import           Control.Carrier.Fail.WithLoc
-import           Control.Effect.Carrier
-import           Control.Effect.Fresh
-import           Control.Effect.Reader
+import           Control.Carrier.Fresh.Strict
 import           Control.Effect.State
 import           Data.Foldable (fold)
 import           Data.Function (fix)
@@ -53,7 +53,7 @@ instance Ord name => Monoid (ScopeGraph name) where
 scopeGraph
   :: Ord (term Name)
   => (forall sig m
-     .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
+     .  (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
      => Analysis term Name (ScopeGraph Name) m
      -> (term Name -> m (ScopeGraph Name))
      -> (term Name -> m (ScopeGraph Name))
@@ -62,19 +62,18 @@ scopeGraph
   -> (Heap (ScopeGraph Name), [File (Either (Path.AbsRelFile, Span, String) (ScopeGraph Name))])
 scopeGraph eval
   = run
-  . runFresh
+  . evalFresh 0
   . runHeap
   . traverse (runFile eval)
 
 runFile
-  :: ( Carrier sig m
-     , Effect sig
-     , Member Fresh sig
-     , Member (State (Heap (ScopeGraph Name))) sig
+  :: ( Effect sig
+     , Has Fresh sig m
+     , Has (State (Heap (ScopeGraph Name))) sig m
      , Ord (term Name)
      )
   => (forall sig m
-     .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
+     .  (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
      => Analysis term Name (ScopeGraph Name) m
      -> (term Name -> m (ScopeGraph Name))
      -> (term Name -> m (ScopeGraph Name))
@@ -87,15 +86,14 @@ runFile eval file = traverse run file
             . runEnv
             . runFail
             . fmap fold
-            . convergeTerm (A.runHeap @Name @(ScopeGraph Name) . fix (cacheTerm . eval scopeGraphAnalysis))
+            . convergeTerm 0 (A.runHeap @Name @(ScopeGraph Name) . fix (cacheTerm . eval scopeGraphAnalysis))
 
 scopeGraphAnalysis
   :: ( Alternative m
-     , Carrier sig m
-     , Member (Env Name) sig
-     , Member (A.Heap Name (ScopeGraph Name)) sig
-     , Member (Reader Path.AbsRelFile) sig
-     , Member (Reader Span) sig
+     , Has (Env Name) sig m
+     , Has (A.Heap Name (ScopeGraph Name)) sig m
+     , Has (Reader Path.AbsRelFile) sig m
+     , Has (Reader Span) sig m
      )
   => Analysis term Name (ScopeGraph Name) m
 scopeGraphAnalysis = Analysis{..}

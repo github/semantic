@@ -8,9 +8,8 @@ module Parsing.TreeSitter
 
 import Prologue
 
-import           Control.Effect.Fail
-import           Control.Effect.Lift
-import           Control.Effect.Reader
+import           Control.Carrier.Fail.Either
+import           Control.Carrier.Reader
 import qualified Control.Exception as Exc
 import           Foreign
 import           Foreign.C.Types (CBool (..))
@@ -59,7 +58,7 @@ parseToPreciseAST
   -> m (Either TSParseException (t Loc))
 parseToPreciseAST parseTimeout language blob = runParse parseTimeout language blob $ \ rootPtr ->
   TS.withCursor (castPtr rootPtr) $ \ cursor ->
-    runM (runFail (runReader cursor (runReader (Source.bytes (blobSource blob)) (TS.peekNode >>= TS.unmarshalNode))))
+    runFail (runReader cursor (runReader (Source.bytes (blobSource blob)) (TS.peekNode >>= TS.unmarshalNode)))
       >>= either (Exc.throw . UnmarshalFailure) pure
 
 instance Exception TSParseException where

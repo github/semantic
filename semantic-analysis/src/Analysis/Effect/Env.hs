@@ -6,20 +6,21 @@ module Analysis.Effect.Env
 , lookupEnv
 , Env(..)
   -- * Re-exports
-, Carrier
+, Algebra
+, Has
 , run
 ) where
 
 import Analysis.Name
-import Control.Effect.Carrier
+import Control.Algebra
 
-alloc :: (Member (Env addr) sig, Carrier sig m) => Name -> m addr
+alloc :: Has (Env addr) sig m => Name -> m addr
 alloc name = send (Alloc name pure)
 
-bind :: (Member (Env addr) sig, Carrier sig m) => Name -> addr -> m a -> m a
+bind :: Has (Env addr) sig m => Name -> addr -> m a -> m a
 bind name addr m = send (Bind name addr m pure)
 
-lookupEnv :: (Member (Env addr) sig, Carrier sig m) => Name -> m (Maybe addr)
+lookupEnv :: Has (Env addr) sig m => Name -> m (Maybe addr)
 lookupEnv name = send (Lookup name pure)
 
 
@@ -37,7 +38,7 @@ instance HFunctor (Env addr) where
     Lookup name k -> Lookup name (f . k)
 
 instance Effect (Env addr) where
-  handle ctx hdl = \case
+  thread ctx hdl = \case
     Alloc name k -> Alloc name (hdl . (<$ ctx) . k)
     Bind name addr m k -> Bind name addr (hdl (m <$ ctx)) (hdl . fmap k)
     Lookup name k -> Lookup name (hdl . (<$ ctx) . k)

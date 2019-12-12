@@ -8,14 +8,13 @@ module Analysis.FlowInsensitive
 ) where
 
 import           Analysis.Name
-import           Control.Effect
-import           Control.Effect.Fresh
-import           Control.Effect.NonDet
-import           Control.Effect.Reader
-import           Control.Effect.State
+import           Control.Algebra
+import           Control.Carrier.Fresh.Strict
+import           Control.Carrier.NonDet.Church
+import           Control.Carrier.Reader
+import           Control.Carrier.State.Strict
 import qualified Data.Map as Map
 import           Data.Maybe (fromMaybe)
-import           Data.Monoid (Alt(..))
 import qualified Data.Set as Set
 
 newtype Cache term value = Cache { unCache :: Map.Map term (Set.Set value) }
@@ -25,28 +24,27 @@ type Heap value = Map.Map Name (Set.Set value)
 
 
 convergeTerm :: forall term value m sig
-             .  ( Carrier sig m
-                , Effect sig
-                , Member Fresh sig
-                , Member (State (Heap value)) sig
+             .  ( Effect sig
+                , Has Fresh sig m
+                , Has (State (Heap value)) sig m
                 , Ord term
                 , Ord value
                 )
-             => (term -> NonDetC (ReaderC (Cache term value) (StateC (Cache term value) m)) value)
+             => Int
+             -> (term -> NonDetC (FreshC (ReaderC (Cache term value) (StateC (Cache term value) m))) value)
              -> term
              -> m (Set.Set value)
-convergeTerm eval body = do
+convergeTerm n eval body = do
   heap <- get
   (cache, _) <- converge (Cache Map.empty :: Cache term value, heap :: Heap value) $ \ (prevCache, _) -> runState (Cache Map.empty) . runReader prevCache $ do
-    _ <- resetFresh . runNonDetM Set.singleton $ eval body
+    _ <- evalFresh n . runNonDetM Set.singleton $ eval body
     get
   pure (fromMaybe mempty (Map.lookup body (unCache cache)))
 
 cacheTerm :: forall term value m sig
           .  ( Alternative m
-             , Carrier sig m
-             , Member (Reader (Cache term value)) sig
-             , Member (State  (Cache term value)) sig
+             , Has (Reader (Cache term value)) sig m
+             , Has (State  (Cache term value)) sig m
              , Ord term
              , Ord value
              )
@@ -64,13 +62,6 @@ cacheTerm eval term = do
 
 runHeap :: StateC (Heap value) m a -> m (Heap value, a)
 runHeap m = runState Map.empty m
-
--- | Fold a collection by mapping each element onto an 'Alternative' action.
-foldMapA :: (Alternative m, Foldable t) => (b -> m a) -> t b -> m a
-foldMapA f = getAlt . foldMap (Alt . f)
-
-runNonDetM :: (Monoid b, Applicative m) => (a -> b) -> NonDetC m a -> m b
-runNonDetM f (NonDetC m) = m (fmap . (<>) . f) (pure mempty)
 
 -- | Iterate a monadic action starting from some initial seed until the results converge.
 --

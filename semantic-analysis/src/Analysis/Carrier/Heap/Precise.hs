@@ -8,8 +8,8 @@ module Analysis.Carrier.Heap.Precise
 ) where
 
 import Analysis.Effect.Heap
-import Control.Effect.Carrier
-import Control.Effect.State.Strict
+import Control.Algebra
+import Control.Carrier.State.Strict
 import qualified Control.Monad.Fail as Fail
 import qualified Data.IntMap as IntMap
 
@@ -21,8 +21,8 @@ runHeap (HeapC m) = runState mempty m
 newtype HeapC value m a = HeapC (StateC (IntMap.IntMap value) m a)
   deriving (Applicative, Functor, Monad, Fail.MonadFail)
 
-instance (Carrier sig m, Effect sig)
-      => Carrier (Heap Precise value :+: State (IntMap.IntMap value) :+: sig) (HeapC value m) where
-  eff (L (Deref addr k))        = HeapC (gets (IntMap.lookup addr)) >>= k
-  eff (L (Assign addr value k)) = HeapC (modify (IntMap.insert addr value)) >> k
-  eff (R other)                 = HeapC (eff (handleCoercible other))
+instance (Algebra sig m, Effect sig)
+      => Algebra (Heap Precise value :+: State (IntMap.IntMap value) :+: sig) (HeapC value m) where
+  alg (L (Deref addr k))        = HeapC (gets (IntMap.lookup addr)) >>= k
+  alg (L (Assign addr value k)) = HeapC (modify (IntMap.insert addr value)) >> k
+  alg (R other)                 = HeapC (alg (handleCoercible other))

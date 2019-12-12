@@ -6,25 +6,29 @@ module Data.Abstract.Value.Concrete
   , runValueErrorWith
   ) where
 
+import Prologue
+
+import Control.Carrier.Resumable.Either (SomeError)
+import qualified Control.Carrier.Resumable.Either as Either
+import qualified Control.Carrier.Resumable.Resume as With
+import Data.List (genericIndex, genericLength)
+import qualified Data.Map.Strict as Map
+import Data.Scientific (Scientific, coefficient, normalize)
+import Data.Scientific.Exts
+import Data.Text (pack)
+
 import Control.Abstract.ScopeGraph (Allocator, ScopeError)
 import Control.Abstract.Heap (scopeLookup)
 import qualified Control.Abstract as Abstract
 import Control.Abstract hiding (Boolean(..), Function(..), Numeric(..), Object(..), Array(..), Hash(..), String(..), Unit(..), While(..))
-import Control.Effect.Carrier
+import Control.Algebra
 import Control.Effect.Interpose
 import Data.Abstract.BaseError
 import Data.Abstract.Evaluatable (UnspecializedError(..), EvalError(..), Declarations)
 import Data.Abstract.FreeVariables
 import Data.Abstract.Name
 import qualified Data.Abstract.Number as Number
-import Data.Bits
-import Data.List (genericIndex, genericLength)
-import Data.Scientific (Scientific, coefficient, normalize)
-import Data.Scientific.Exts
-import Data.Text (pack)
-import Data.Word
-import Prologue
-import qualified Data.Map.Strict as Map
+
 
 data Value term address
     -- TODO: Split Closure up into a separate data type.                                                  Scope   Frame
@@ -52,33 +56,33 @@ instance ValueRoots address (Value term address) where
 
 
 instance ( FreeVariables term
-         , Member (Allocator address) sig
-         , Member (Deref (Value term address)) sig
-         , Member Fresh sig
-         , Member (Reader (CurrentFrame address)) sig
-         , Member (Reader (CurrentScope address)) sig
-         , Member (Reader ModuleInfo) sig
-         , Member (Reader PackageInfo) sig
-         , Member (Reader Span) sig
-         , Member (State Span) sig
-         , Member (State (ScopeGraph address)) sig
-         , Member (Resumable (BaseError (AddressError address (Value term address)))) sig
-         , Member (Resumable (BaseError (EvalError term address (Value term address)))) sig
-         , Member (Resumable (BaseError (ValueError term address))) sig
-         , Member (Resumable (BaseError (HeapError address))) sig
-         , Member (Resumable (BaseError (ScopeError address))) sig
-         , Member (State (Heap address address (Value term address))) sig
-         , Member (Error (Return (Value term address))) sig
+         , Has (Allocator address) sig m
+         , Has (Deref (Value term address)) sig m
+         , Has Fresh sig m
+         , Has (Reader (CurrentFrame address)) sig m
+         , Has (Reader (CurrentScope address)) sig m
+         , Has (Reader ModuleInfo) sig m
+         , Has (Reader PackageInfo) sig m
+         , Has (Reader Span) sig m
+         , Has (State Span) sig m
+         , Has (State (ScopeGraph address)) sig m
+         , Has (Resumable (BaseError (AddressError address (Value term address)))) sig m
+         , Has (Resumable (BaseError (EvalError term address (Value term address)))) sig m
+         , Has (Resumable (BaseError (ValueError term address))) sig m
+         , Has (Resumable (BaseError (HeapError address))) sig m
+         , Has (Resumable (BaseError (ScopeError address))) sig m
+         , Has (State (Heap address address (Value term address))) sig m
+         , Has (Error (Return (Value term address))) sig m
          , Declarations term
-         , Member Trace sig
+         , Has Trace sig m
          , Ord address
-         , Carrier sig m
+         , Algebra sig m
          , Show address
          , Show term
          )
-      => Carrier (Abstract.Function term address (Value term address) :+: sig) (Abstract.FunctionC term address (Value term address) m) where
-  eff (R other) = FunctionC . eff . R . handleCoercible $ other
-  eff (L op) = runEvaluator $ do
+      => Algebra (Abstract.Function term address (Value term address) :+: sig) (Abstract.FunctionC term address (Value term address) m) where
+  alg (R other) = FunctionC . alg . R . handleCoercible $ other
+  alg (L op) = runEvaluator $ do
     eval <- Evaluator . FunctionC $ ask
     let closure maybeName params body scope = do
           packageInfo <- currentPackage
@@ -119,27 +123,27 @@ instance ( FreeVariables term
           _ -> throwValueError (CallError op)
         Evaluator (k boxed)
 
-instance ( Member (Reader ModuleInfo) sig
-         , Member (Reader Span) sig
-         , Member (Resumable (BaseError (ValueError term address))) sig
-         , Carrier sig m
+instance ( Has (Reader ModuleInfo) sig m
+         , Has (Reader Span) sig m
+         , Has (Resumable (BaseError (ValueError term address))) sig m
+         , Algebra sig m
          , Monad m
          )
-      => Carrier (Abstract.Boolean (Value term address) :+: sig) (BooleanC (Value term address) m) where
-  eff (R other) = BooleanC . eff . handleCoercible $ other
-  eff (L op) = case op of
+      => Algebra (Abstract.Boolean (Value term address) :+: sig) (BooleanC (Value term address) m) where
+  alg (R other) = BooleanC . alg . handleCoercible $ other
+  alg (L op) = case op of
     Abstract.Boolean b          k -> k $! Boolean b
     Abstract.AsBool (Boolean b) k -> k b
     Abstract.AsBool other       k -> throwBaseError (BoolError other) >>= k
 
-instance ( Carrier sig m
-         , Member (Abstract.Boolean (Value term address)) sig
-         , Member (Error (LoopControl (Value term address))) sig
-         , Member (Interpose (Resumable (BaseError (UnspecializedError address (Value term address))))) sig
+instance ( Algebra sig m
+         , Has (Abstract.Boolean (Value term address)) sig m
+         , Has (Error (LoopControl (Value term address))) sig m
+         , Has (Interpose (Resumable (BaseError (UnspecializedError address (Value term address))))) sig m
          )
-      => Carrier (Abstract.While (Value term address) :+: sig) (WhileC (Value term address) m) where
-  eff (R other) = WhileC . eff . handleCoercible $ other
-  eff (L (Abstract.While cond body k)) = do
+      => Algebra (Abstract.While (Value term address) :+: sig) (WhileC (Value term address) m) where
+  alg (R other) = WhileC . alg . handleCoercible $ other
+  alg (L (Abstract.While cond body k)) = do
 
     let loop x = catchError x $ \case
           Break value -> pure value
@@ -194,33 +198,33 @@ instance ( Carrier sig m
     --       Resumable (BaseError _ _ (RefUnspecializedError _)) _ -> throwError (Abort @(Value term address))) >>= k
 
 
-instance Carrier sig m
-      => Carrier (Abstract.Unit (Value term address) :+: sig) (UnitC (Value term address) m) where
-  eff (R other) = UnitC . eff . handleCoercible $ other
-  eff (L (Abstract.Unit k )) = k Unit
+instance Algebra sig m
+      => Algebra (Abstract.Unit (Value term address) :+: sig) (UnitC (Value term address) m) where
+  alg (R other) = UnitC . alg . handleCoercible $ other
+  alg (L (Abstract.Unit k )) = k Unit
 
-instance ( Member (Reader ModuleInfo) sig
-         , Member (Reader Span) sig
-         , Member (Resumable (BaseError (ValueError term address))) sig
-         , Carrier sig m
+instance ( Has (Reader ModuleInfo) sig m
+         , Has (Reader Span) sig m
+         , Has (Resumable (BaseError (ValueError term address))) sig m
+         , Algebra sig m
          , Monad m
          )
-      => Carrier (Abstract.String (Value term address) :+: sig) (StringC (Value term address) m) where
-  eff (R other) = StringC . eff . handleCoercible $ other
-  eff (L op) = case op of
+      => Algebra (Abstract.String (Value term address) :+: sig) (StringC (Value term address) m) where
+  alg (R other) = StringC . alg . handleCoercible $ other
+  alg (L op) = case op of
     Abstract.String   t          k -> k (String t)
     Abstract.AsString (String t) k -> k t
     Abstract.AsString other      k -> throwBaseError (StringError other) >>= k
 
-instance ( Member (Reader ModuleInfo) sig
-         , Member (Reader Span) sig
-         , Member (Resumable (BaseError (ValueError term address))) sig
-         , Carrier sig m
+instance ( Has (Reader ModuleInfo) sig m
+         , Has (Reader Span) sig m
+         , Has (Resumable (BaseError (ValueError term address))) sig m
+         , Algebra sig m
          , Monad m
          )
-      => Carrier (Abstract.Numeric (Value term address) :+: sig) (NumericC (Value term address) m) where
-  eff (R other) = NumericC . eff . handleCoercible $ other
-  eff (L op) = case op of
+      => Algebra (Abstract.Numeric (Value term address) :+: sig) (NumericC (Value term address) m) where
+  alg (R other) = NumericC . alg . handleCoercible $ other
+  alg (L op) = case op of
     Abstract.Integer  t k -> k (Integer (Number.Integer t))
     Abstract.Float    t k -> k (Float (Number.Decimal t))
     Abstract.Rational t k -> k (Rational (Number.Ratio t))
@@ -242,10 +246,9 @@ instance ( Member (Reader ModuleInfo) sig
       _                        -> throwBaseError (Numeric2Error left right)
 
 -- Dispatch whatever's contained inside a 'Number.SomeNumber' to its appropriate 'MonadValue' ctor
-specialize :: ( Member (Reader ModuleInfo) sig
-              , Member (Reader Span) sig
-              , Member (Resumable (BaseError (ValueError term address))) sig
-              , Carrier sig m
+specialize :: ( Has (Reader ModuleInfo) sig m
+              , Has (Reader Span) sig m
+              , Has (Resumable (BaseError (ValueError term address))) sig m
               )
            => Either ArithException Number.SomeNumber
            -> m (Value term address)
@@ -255,15 +258,15 @@ specialize (Right (Number.SomeNumber (Number.Decimal t))) = pure (Float (Number.
 specialize (Right (Number.SomeNumber (Number.Ratio t)))   = pure (Rational (Number.Ratio t))
 
 
-instance ( Member (Reader ModuleInfo) sig
-         , Member (Reader Span) sig
-         , Member (Resumable (BaseError (ValueError term address))) sig
-         , Carrier sig m
+instance ( Has (Reader ModuleInfo) sig m
+         , Has (Reader Span) sig m
+         , Has (Resumable (BaseError (ValueError term address))) sig m
+         , Algebra sig m
          , Monad m
          )
-      => Carrier (Abstract.Bitwise (Value term address) :+: sig) (BitwiseC (Value term address) m) where
-  eff (R other) = BitwiseC . eff . handleCoercible $ other
-  eff (L op) = case op of
+      => Algebra (Abstract.Bitwise (Value term address) :+: sig) (BitwiseC (Value term address) m) where
+  alg (R other) = BitwiseC . alg . handleCoercible $ other
+  alg (L op) = case op of
     CastToInteger (Integer (Number.Integer i)) k -> k (Integer (Number.Integer i))
     CastToInteger (Float (Number.Decimal i)) k -> k (Integer (Number.Integer (coefficient (normalize i))))
     CastToInteger i k -> throwBaseError (NumericError i) >>= k
@@ -278,9 +281,9 @@ ourShift :: Word64 -> Int -> Integer
 ourShift a b = toInteger (shiftR a b)
 
 
-instance Carrier sig m => Carrier (Abstract.Object address (Value term address) :+: sig) (ObjectC address (Value term address) m) where
-  eff (R other) = ObjectC . eff . handleCoercible $ other
-  eff (L op) = case op of
+instance Algebra sig m => Algebra (Abstract.Object address (Value term address) :+: sig) (ObjectC address (Value term address) m) where
+  alg (R other) = ObjectC . alg . handleCoercible $ other
+  alg (L op) = case op of
     Abstract.Object address k -> k (Object address)
     Abstract.ScopedEnvironment (Object address) k -> k (Just address)
     Abstract.ScopedEnvironment (Class _ _ address) k -> k (Just address)
@@ -288,22 +291,22 @@ instance Carrier sig m => Carrier (Abstract.Object address (Value term address) 
     Abstract.ScopedEnvironment _ k -> k Nothing
     Abstract.Klass n frame k -> k (Class n mempty frame)
 
-instance ( Member (Reader ModuleInfo) sig
-         , Member (Reader Span) sig
-         , Member (Resumable (BaseError (ValueError term address))) sig
-         , Carrier sig m
+instance ( Has (Reader ModuleInfo) sig m
+         , Has (Reader Span) sig m
+         , Has (Resumable (BaseError (ValueError term address))) sig m
+         , Algebra sig m
          , Monad m
          )
-      => Carrier (Abstract.Array (Value term address) :+: sig) (ArrayC (Value term address) m) where
-  eff (R other) = ArrayC . eff . handleCoercible $ other
-  eff (L op) = case op of
+      => Algebra (Abstract.Array (Value term address) :+: sig) (ArrayC (Value term address) m) where
+  alg (R other) = ArrayC . alg . handleCoercible $ other
+  alg (L op) = case op of
     Abstract.Array t k -> k (Array t)
     Abstract.AsArray (Array addresses) k -> k addresses
     Abstract.AsArray val k -> throwBaseError (ArrayError val) >>= k
 
-instance ( Carrier sig m ) => Carrier (Abstract.Hash (Value term address) :+: sig) (HashC (Value term address) m) where
-  eff (R other) = HashC . eff . handleCoercible $ other
-  eff (L op) = case op of
+instance ( Algebra sig m ) => Algebra (Abstract.Hash (Value term address) :+: sig) (HashC (Value term address) m) where
+  alg (R other) = HashC . alg . handleCoercible $ other
+  alg (L op) = case op of
     Abstract.Hash t k -> k ((Hash . map (uncurry KVPair)) t)
     Abstract.KvPair t v k -> k (KVPair t v)
 
@@ -315,13 +318,13 @@ instance (Show address, Show term) => AbstractIntro (Value term address) where
   null     = Null
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
-instance ( Member (Abstract.Boolean (Value term address)) sig
-         , Member (Reader ModuleInfo) sig
-         , Member (Reader Span) sig
-         , Member (Resumable (BaseError (ValueError term address))) sig
+instance ( Has (Abstract.Boolean (Value term address)) sig m
+         , Has (Reader ModuleInfo) sig m
+         , Has (Reader Span) sig m
+         , Has (Resumable (BaseError (ValueError term address))) sig m
          , Show address
          , Show term
-         , Carrier sig m
+         , Algebra sig m
          )
       => AbstractValue term address (Value term address) m where
   asPair val
@@ -399,19 +402,18 @@ deriving instance (Show address, Show term) => Show (ValueError term address res
 instance (Show address, Show term) => Show1 (ValueError term address) where
   liftShowsPrec _ _ = showsPrec
 
-runValueError :: Evaluator term address (Value term address) (ResumableC (BaseError (ValueError term address)) m) a
+runValueError :: Evaluator term address (Value term address) (Either.ResumableC (BaseError (ValueError term address)) m) a
               -> Evaluator term address (Value term address) m (Either (SomeError (BaseError (ValueError term address))) a)
-runValueError = Evaluator . runResumable . runEvaluator
+runValueError = Evaluator . Either.runResumable . runEvaluator
 
 runValueErrorWith :: (forall resume . BaseError (ValueError term address) resume -> Evaluator term address (Value term address) m resume)
-                  -> Evaluator term address (Value term address) (ResumableWithC (BaseError (ValueError term address)) m) a
+                  -> Evaluator term address (Value term address) (With.ResumableC (BaseError (ValueError term address)) m) a
                   -> Evaluator term address (Value term address) m a
-runValueErrorWith f = Evaluator . runResumableWith (runEvaluator . f) . runEvaluator
+runValueErrorWith f = Evaluator . With.runResumable (runEvaluator . f) . runEvaluator
 
-throwValueError :: ( Member (Resumable (BaseError (ValueError term address))) sig
-                   , Member (Reader ModuleInfo) sig
-                   , Member (Reader Span) sig
-                   , Carrier sig m
+throwValueError :: ( Has (Resumable (BaseError (ValueError term address))) sig m
+                   , Has (Reader ModuleInfo) sig m
+                   , Has (Reader Span) sig m
                    )
                 => ValueError term address resume
                 -> Evaluator term address (Value term address) m resume

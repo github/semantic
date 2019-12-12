@@ -21,15 +21,15 @@ tested-with:         GHC == 8.6.5
 common haskell
   default-language:    Haskell2010
   build-depends:       base ^>=4.12
-                     , fused-effects ^>= 0.5
+                     , fused-effects ^>= 1.0
                      , fused-syntax
                      , parsers ^>= 0.12.10
                      , semantic-core ^>= 0.0
                      , semantic-source ^>= 0.0
                      , semantic-tags ^>= 0.0
                      , text ^>= 1.2.3
-                     , tree-sitter ^>= 0.5
-                     , tree-sitter-python ^>= 0.6
+                     , tree-sitter ^>= 0.7
+                     , tree-sitter-python ^>= 0.8
 
   ghc-options:
     -Weverything
@@ -51,6 +51,7 @@ library
   exposed-modules:
     Language.Python
     Language.Python.Core
+    Language.Python.Failure
     Language.Python.Tags
   hs-source-dirs: src
 

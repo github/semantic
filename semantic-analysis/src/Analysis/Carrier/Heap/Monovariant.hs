@@ -8,7 +8,7 @@ module Analysis.Carrier.Heap.Monovariant
 
 import Analysis.Effect.Heap
 import Control.Applicative (Alternative)
-import Control.Effect.Carrier
+import Control.Algebra
 import Control.Effect.State
 import Control.Monad ((>=>))
 import qualified Control.Monad.Fail as Fail
@@ -21,12 +21,11 @@ newtype HeapC addr value m a = HeapC { runHeap :: m a }
   deriving (Alternative, Applicative, Functor, Monad, Fail.MonadFail)
 
 instance ( Alternative m
-         , Carrier sig m
-         , Member (State (Map.Map addr (Set.Set value))) sig
+         , Has (State (Map.Map addr (Set.Set value))) sig m
          , Ord addr
          , Ord value
          )
-      => Carrier (Heap addr value :+: sig) (HeapC addr value m) where
-  eff (L (Deref  addr       k)) = gets (Map.lookup addr >=> nonEmpty . Set.toList) >>= maybe (pure Nothing) (getAlt . foldMap (Alt . pure . Just)) >>= k
-  eff (L (Assign addr value k)) = modify (Map.insertWith (<>) addr (Set.singleton value)) >> k
-  eff (R other)                 = HeapC (eff (handleCoercible other))
+      => Algebra (Heap addr value :+: sig) (HeapC addr value m) where
+  alg (L (Deref  addr       k)) = gets (Map.lookup addr >=> nonEmpty . Set.toList) >>= maybe (pure Nothing) (getAlt . foldMap (Alt . pure . Just)) >>= k
+  alg (L (Assign addr value k)) = modify (Map.insertWith (<>) addr (Set.singleton value)) >> k
+  alg (R other)                 = HeapC (alg (handleCoercible other))

@@ -16,13 +16,13 @@ import qualified Analysis.Carrier.Env.Precise as A
 import qualified Analysis.Carrier.Heap.Precise as A
 import           Analysis.File
 import           Analysis.Name
+import           Control.Algebra
 import           Control.Applicative (Alternative (..))
 import           Control.Carrier.Fail.WithLoc
-import           Control.Effect
-import           Control.Effect.Fresh
-import           Control.Effect.NonDet
-import           Control.Effect.Reader hiding (Local)
-import           Control.Effect.State
+import           Control.Carrier.Fresh.Strict
+import           Control.Carrier.NonDet.Church
+import           Control.Carrier.Reader hiding (Local)
+import           Control.Carrier.State.Strict
 import           Control.Monad ((<=<), guard)
 import           Data.Function (fix)
 import qualified Data.IntMap as IntMap
@@ -61,7 +61,7 @@ concrete
      , Show (term Name)
      )
   => (forall sig m
-     .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
+     .  (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
      => Analysis term Precise (Concrete (term Name)) m
      -> (term Name -> m (Concrete (term Name)))
      -> (term Name -> m (Concrete (term Name)))
@@ -70,21 +70,21 @@ concrete
   -> (Heap (term Name), [File (Either (Path.AbsRelFile, Span, String) (Concrete (term Name)))])
 concrete eval
   = run
-  . runFresh
+  . evalFresh 0
   . A.runHeap
   . traverse (runFile eval)
 
 runFile
-  :: ( Carrier sig m
-     , Effect sig
+  :: forall term m sig
+  .  ( Effect sig
      , Foldable term
-     , Member Fresh sig
-     , Member (A.Heap Precise (Concrete (term Name))) sig
-     , Member (State (Heap (term Name))) sig
+     , Has Fresh sig m
+     , Has (A.Heap Precise (Concrete (term Name))) sig m
+     , Has (State (Heap (term Name))) sig m
      , Show (term Name)
      )
   => (forall sig m
-     .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
+     .  (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
      => Analysis term Precise (Concrete (term Name)) m
      -> (term Name -> m (Concrete (term Name)))
      -> (term Name -> m (Concrete (term Name)))
@@ -101,14 +101,13 @@ runFile eval file = traverse run file
 
 concreteAnalysis
   :: forall term m sig
-  .  ( Carrier sig m
-     , Foldable term
-     , Member (A.Env Precise) sig
-     , Member (A.Heap Precise (Concrete (term Name))) sig
-     , Member (Reader Env) sig
-     , Member (Reader Path.AbsRelFile) sig
-     , Member (Reader Span) sig
-     , Member (State (Heap (term Name))) sig
+  .  ( Foldable term
+     , Has (A.Env Precise) sig m
+     , Has (A.Heap Precise (Concrete (term Name))) sig m
+     , Has (Reader Env) sig m
+     , Has (Reader Path.AbsRelFile) sig m
+     , Has (Reader Span) sig m
+     , Has (State (Heap (term Name))) sig m
      , MonadFail m
      , Show (term Name)
      )
@@ -145,7 +144,7 @@ concreteAnalysis = Analysis{..}
 
 
 lookupConcrete :: Heap (term Name) -> Name -> Concrete (term Name) -> Maybe Precise
-lookupConcrete heap name = run . evalState IntSet.empty . runNonDet . inConcrete
+lookupConcrete heap name = run . evalState IntSet.empty . runNonDetA . inConcrete
   where -- look up the name in a concrete value
         inConcrete = inFrame <=< maybeA . recordFrame
         -- look up the name in a specific 'Frame', with slots taking precedence over parents

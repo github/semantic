@@ -16,8 +16,8 @@ import Analysis.Effect.Env as A
 import Analysis.Effect.Heap as A
 import Analysis.File
 import qualified Analysis.Intro as A
+import Control.Algebra
 import Control.Applicative (Alternative (..))
-import Control.Effect.Carrier
 import Control.Effect.Fail
 import Control.Effect.Reader
 import Control.Monad ((>=>))
@@ -33,11 +33,10 @@ import Syntax.Term
 import qualified System.Path as Path
 
 eval :: forall address value m sig
-     .  ( Carrier sig m
-        , Member (Domain value) sig
-        , Member (Env address) sig
-        , Member (Heap address value) sig
-        , Member (Reader Span) sig
+     .  ( Has (Domain value) sig m
+        , Has (Env address) sig m
+        , Has (Heap address value) sig m
+        , Has (Reader Span) sig m
         , MonadFail m
         , Semigroup value
         )
@@ -106,30 +105,30 @@ eval Analysis{..} eval = \case
           Alg (L (Ann span c)) -> local (const span) (ref c)
 
 
-prog1 :: (Carrier sig t, Member Core sig) => File (t Name)
+prog1 :: Has Core sig t => File (t Name)
 prog1 = fromBody $ lam (named' "foo")
   (    named' "bar" :<- pure "foo"
   >>>= Core.if' (pure "bar")
     (Core.bool False)
     (Core.bool True))
 
-prog2 :: (Carrier sig t, Member Core sig) => File (t Name)
+prog2 :: Has Core sig t => File (t Name)
 prog2 = fromBody $ fileBody prog1 $$ Core.bool True
 
-prog3 :: (Carrier sig t, Member Core sig) => File (t Name)
+prog3 :: Has Core sig t => File (t Name)
 prog3 = fromBody $ lams [named' "foo", named' "bar", named' "quux"]
   (Core.if' (pure "quux")
     (pure "bar")
     (pure "foo"))
 
-prog4 :: (Carrier sig t, Member Core sig) => File (t Name)
+prog4 :: Has Core sig t => File (t Name)
 prog4 = fromBody
   (    named' "foo" :<- Core.bool True
   >>>= Core.if' (pure "foo")
     (Core.bool True)
     (Core.bool False))
 
-prog5 :: (Carrier sig t, Member (Ann Span) sig, Member Core sig) => File (t Name)
+prog5 :: (Has (Ann Span) sig t, Has Core sig t) => File (t Name)
 prog5 = fromBody $ ann (do'
   [ Just (named' "mkPoint") :<- lams [named' "_x", named' "_y"] (ann (Core.record
     [ ("x", ann (pure "_x"))
@@ -140,7 +139,7 @@ prog5 = fromBody $ ann (do'
   , Nothing :<- ann (ann (pure "point") Core.... "y") .= ann (ann (pure "point") Core.... "x")
   ])
 
-prog6 :: (Carrier sig t, Member Core sig) => [File (t Name)]
+prog6 :: Has Core sig t => [File (t Name)]
 prog6 =
   [ (fromBody (Core.record
     [ ("dep", Core.record [ ("var", Core.bool True) ]) ]))
@@ -152,7 +151,7 @@ prog6 =
     { filePath = Path.absRel "main" }
   ]
 
-ruby :: (Carrier sig t, Member (Ann Span) sig, Member Core sig) => File (t Name)
+ruby :: (Has (Ann Span) sig t, Has Core sig t) => File (t Name)
 ruby = fromBody $ annWith callStack (rec (named' __semantic_global) (do' statements))
   where statements =
           [ Just "Class" :<- record

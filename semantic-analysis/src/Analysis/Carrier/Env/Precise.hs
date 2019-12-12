@@ -11,7 +11,7 @@ module Analysis.Carrier.Env.Precise
 
 import qualified Analysis.Effect.Env as A
 import Analysis.Name
-import Control.Effect.Carrier
+import Control.Algebra
 import Control.Effect.Fresh
 import Control.Effect.Reader
 import qualified Control.Monad.Fail as Fail
@@ -23,12 +23,11 @@ type Env = Map.Map Name Precise
 newtype EnvC m a = EnvC { runEnv :: m a }
   deriving (Applicative, Functor, Monad, Fail.MonadFail)
 
-instance ( Carrier sig m
-         , Member Fresh sig
-         , Member (Reader Env) sig
+instance ( Has Fresh sig m
+         , Has (Reader Env) sig m
          )
-      => Carrier (A.Env Precise :+: sig) (EnvC m) where
-  eff (L (A.Alloc _ k))          = fresh >>= k
-  eff (L (A.Bind name addr m k)) = local (Map.insert name addr) m >>= k
-  eff (L (A.Lookup name k))      = asks (Map.lookup name) >>= k
-  eff (R other)                  = EnvC (eff (handleCoercible other))
+      => Algebra (A.Env Precise :+: sig) (EnvC m) where
+  alg (L (A.Alloc _ k))          = fresh >>= k
+  alg (L (A.Bind name addr m k)) = local (Map.insert name addr) m >>= k
+  alg (L (A.Lookup name k))      = asks (Map.lookup name) >>= k
+  alg (R other)                  = EnvC (alg (handleCoercible other))

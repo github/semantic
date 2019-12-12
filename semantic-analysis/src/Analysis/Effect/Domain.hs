@@ -5,18 +5,19 @@ module Analysis.Effect.Domain
 , concretize
 , Domain(..)
   -- * Re-exports
-, Carrier
+, Algebra
+, Has
 , run
 ) where
 
 import Analysis.Intro
-import Control.Effect.Carrier
+import Control.Algebra
 import GHC.Generics (Generic1)
 
-abstract :: (Member (Domain abstract) sig, Carrier sig m) => Intro -> m abstract
+abstract :: Has (Domain abstract) sig m => Intro -> m abstract
 abstract concrete = send (Abstract concrete pure)
 
-concretize :: (Member (Domain abstract) sig, Carrier sig m) => abstract -> m Intro
+concretize :: Has (Domain abstract) sig m => abstract -> m Intro
 concretize abstract = send (Concretize abstract pure)
 
 
