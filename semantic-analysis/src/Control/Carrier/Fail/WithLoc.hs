@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, FlexibleInstances, GeneralizedNewtypeDeriving, MultiParamTypeClasses, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE FlexibleInstances, GeneralizedNewtypeDeriving, MultiParamTypeClasses, TypeOperators, UndecidableInstances #-}
 module Control.Carrier.Fail.WithLoc
 ( -- * Fail effect
   module Control.Effect.Fail
