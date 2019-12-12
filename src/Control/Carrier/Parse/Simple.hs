@@ -23,9 +23,9 @@ import           Parsing.Parser
 import           Parsing.TreeSitter
 
 runParse :: Duration -> ParseC m a -> m a
-runParse timeout = runReader timeout . runParseC
+runParse timeout (ParseC m) = runReader timeout m
 
-newtype ParseC m a = ParseC { runParseC :: ReaderC Duration m a }
+newtype ParseC m a = ParseC (ReaderC Duration m a)
   deriving (Applicative, Functor, Monad, MonadIO)
 
 instance ( Has (Error SomeException) sig m
