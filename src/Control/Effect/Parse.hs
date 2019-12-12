@@ -8,7 +8,9 @@ module Control.Effect.Parse
 , parseWith
 , parsePairWith
   -- * Re-exports
+, Algebra
 , Has
+, run
 ) where
 
 import Control.Algebra
