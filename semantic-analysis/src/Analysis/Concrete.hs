@@ -113,8 +113,7 @@ runFile eval file = traverse run file
             . fix (eval concreteAnalysis)
 
 concreteAnalysis
-  :: forall term name m sig
-  .  ( Foldable term
+  :: ( Foldable term
      , IsString name
      , Has Fresh sig m
      , Has (Reader (Env name)) sig m
@@ -160,7 +159,7 @@ concreteAnalysis = Analysis{..}
         addr ... n = do
           val <- deref addr
           heap <- get
-          pure (val >>= lookupConcrete (heap :: Heap term name) n)
+          pure (val >>= lookupConcrete heap n)
 
 
 lookupConcrete :: (IsString name, Ord name) => Heap term name -> name -> Concrete term name -> Maybe Precise
