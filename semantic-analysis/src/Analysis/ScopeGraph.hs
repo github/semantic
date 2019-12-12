@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, FlexibleContexts, OverloadedStrings, QuantifiedConstraints, RankNTypes, RecordWildCards, ScopedTypeVariables, TypeApplications, TypeOperators #-}
+{-# LANGUAGE FlexibleContexts, OverloadedStrings, RankNTypes, RecordWildCards, ScopedTypeVariables, TypeApplications, TypeOperators #-}
 module Analysis.ScopeGraph
 ( ScopeGraph(..)
 , Ref (..)

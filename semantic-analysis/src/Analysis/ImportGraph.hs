@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, FlexibleContexts, QuantifiedConstraints, RankNTypes, RecordWildCards, ScopedTypeVariables, TypeApplications #-}
+{-# LANGUAGE FlexibleContexts, RankNTypes, RecordWildCards, ScopedTypeVariables, TypeApplications #-}
 module Analysis.ImportGraph
 ( ImportGraph
 , importGraph

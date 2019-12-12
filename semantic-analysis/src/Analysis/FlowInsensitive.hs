@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, FlexibleContexts, OverloadedStrings, ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE FlexibleContexts, OverloadedStrings, ScopedTypeVariables, TypeOperators #-}
 module Analysis.FlowInsensitive
 ( Heap
 , FrameId(..)
