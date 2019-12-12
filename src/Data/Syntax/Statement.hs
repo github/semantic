@@ -3,8 +3,8 @@ module Data.Syntax.Statement (module Data.Syntax.Statement) where
 
 import Prologue
 
-import           Control.Abstract hiding (Break, Continue, Return, While)
-import           Data.Abstract.Evaluatable as Abstract
+import           Control.Abstract hiding (Break, Catch, Continue, Return, Throw, While)
+import           Data.Abstract.Evaluatable as Abstract hiding (Catch, Throw)
 import           Data.Aeson (ToJSON1 (..))
 import           Data.JSON.Fields
 import qualified Data.Abstract.ScopeGraph as ScopeGraph

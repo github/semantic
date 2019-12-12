@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, FlexibleContexts, PartialTypeSignatures, TypeApplications, TypeOperators #-}
+{-# LANGUAGE AllowAmbiguousTypes, DataKinds, FlexibleContexts, PartialTypeSignatures, TypeApplications, TypeOperators #-}
 {-# OPTIONS_GHC -Wno-missing-signatures -Wno-missing-exported-signatures -Wno-partial-type-signatures -O0 #-}
 module Semantic.Util
   ( evaluateProject'
@@ -14,9 +14,13 @@ import Prelude hiding (readFile)
 import           Control.Abstract
 import           Control.Abstract.Heap (runHeapError)
 import           Control.Abstract.ScopeGraph (runScopeError)
+import           Control.Carrier.Fresh.Strict
 import           Control.Carrier.Parse.Simple
-import           Control.Effect.Lift
-import           Control.Effect.Trace (runTraceByPrinting)
+import           Control.Carrier.Lift
+import           Control.Carrier.Trace.Printing
+import           Control.Carrier.Reader
+import           Control.Carrier.Resumable.Either (SomeError (..))
+import           Control.Carrier.State.Strict
 import           Control.Exception (displayException)
 import           Control.Lens.Getter
 import           Data.Abstract.Address.Precise as Precise
@@ -50,10 +54,10 @@ justEvaluating :: Evaluator term Precise (Value term Precise) _ result
 justEvaluating
   = runM
   . runEvaluator
-  . raiseHandler runTraceByPrinting
+  . raiseHandler runTrace
   . runHeap
   . runScopeGraph
-  . raiseHandler runFresh
+  . raiseHandler (fmap snd . runFresh 0)
   . fmap reassociate
   . runLoadError
   . runUnspecialized

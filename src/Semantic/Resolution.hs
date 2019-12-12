@@ -7,7 +7,7 @@ module Semantic.Resolution
   , ResolutionC(..)
   ) where
 
-import           Control.Effect.Carrier
+import           Control.Algebra
 import           Data.Aeson
 import           Data.Aeson.Types (parseMaybe)
 import           Data.Blob
@@ -22,7 +22,7 @@ import           System.FilePath.Posix
 import qualified System.Path as Path
 
 
-nodeJSResolutionMap :: (Member Files sig, Carrier sig m, MonadIO m) => FilePath -> Text -> [FilePath] -> m (Map FilePath FilePath)
+nodeJSResolutionMap :: (Has Files sig m, MonadIO m) => FilePath -> Text -> [FilePath] -> m (Map FilePath FilePath)
 nodeJSResolutionMap rootDir prop excludeDirs = do
   files <- findFiles (Path.absRel rootDir) [".json"] (fmap Path.absRel excludeDirs)
   let packageFiles = fileForTypedPath <$> filter ((==) (Path.relFile "package.json") . Path.takeFileName) files
@@ -37,7 +37,7 @@ nodeJSResolutionMap rootDir prop excludeDirs = do
       where relPkgDotJSONPath = makeRelative rootDir path
             relEntryPath x = takeDirectory relPkgDotJSONPath </> x
 
-resolutionMap :: (Member Resolution sig, Carrier sig m) => Project -> m (Map FilePath FilePath)
+resolutionMap :: Has Resolution sig m => Project -> m (Map FilePath FilePath)
 resolutionMap Project{..} = case projectLanguage of
   TypeScript -> send (NodeJSResolution projectRootDir "types" projectExcludeDirs pure)
   JavaScript -> send (NodeJSResolution projectRootDir "main"  projectExcludeDirs pure)
@@ -57,8 +57,8 @@ runResolution = runResolutionC
 newtype ResolutionC m a = ResolutionC { runResolutionC :: m a }
   deriving (Applicative, Functor, Monad, MonadIO)
 
-instance (Member Files sig, Carrier sig m, MonadIO m) => Carrier (Resolution :+: sig) (ResolutionC m) where
-  eff (R other) = ResolutionC . eff . handleCoercible $ other
-  eff (L op) = case op of
+instance (Has Files sig m, MonadIO m) => Algebra (Resolution :+: sig) (ResolutionC m) where
+  alg (R other) = ResolutionC . alg . handleCoercible $ other
+  alg (L op) = case op of
     NodeJSResolution dir prop excludeDirs k -> nodeJSResolutionMap dir prop excludeDirs >>= k
     NoResolution                          k -> k Map.empty

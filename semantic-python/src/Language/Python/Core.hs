@@ -10,7 +10,7 @@ module Language.Python.Core
 import Prelude hiding (fail)
 
 import           AST.Element
-import           Control.Effect hiding ((:+:))
+import           Control.Algebra hiding ((:+:))
 import           Control.Effect.Reader
 import           Core.Core as Core
 import           Core.Name as Name
@@ -49,28 +49,25 @@ pattern SingleIdentifier name <- Py.ExpressionList
 -- We leave the representation of Core syntax abstract so that it's not
 -- possible for us to 'cheat' by pattern-matching on or eliminating a
 -- compiled term.
-type CoreSyntax sig t = ( Member Core sig
-                        , Member (Ann Span) sig
-                        , Member Failure sig
-                        , Carrier sig t
+type CoreSyntax sig t = ( Has Core sig t
+                        , Has (Ann Span) sig t
+                        , Has Failure sig t
                         , Foldable t
                         )
 
 class Compile (py :: * -> *) where
   compile :: ( CoreSyntax syn t
-             , Member (Reader Bindings) sig
-             , Carrier sig m
+             , Has (Reader Bindings) sig m
              )
           => py Span
           -> (t Name -> m (t Name))
           -> (t Name -> m (t Name))
 
-  default compile :: (Applicative m, Member Failure syn, Carrier syn t, Show (py Span)) => py Span -> (t Name -> m (t Name)) -> (t Name -> m (t Name))
+  default compile :: (Applicative m, Has Failure syn t, Show (py Span)) => py Span -> (t Name -> m (t Name)) -> (t Name -> m (t Name))
   compile a _ _ = defaultCompile a
 
 toplevelCompile :: ( CoreSyntax syn t
-                   , Member (Reader Bindings) sig
-                   , Carrier sig m
+                   , Has (Reader Bindings) sig m
                    )
                 => Py.Module Span
                 -> m (t Name)
@@ -78,7 +75,7 @@ toplevelCompile py = compile py pure none
 
 -- | TODO: This is not right, it should be a reference to a Preluded
 -- NoneType instance, but it will do for now.
-none :: (Member Core sig, Carrier sig t) => t Name
+none :: Has Core sig t => t Name
 none = unit
 
 locate :: ( HasField "ann" syntax Span
@@ -89,7 +86,7 @@ locate :: ( HasField "ann" syntax Span
        -> t a
 locate syn  = Core.annAt (getField @"ann" syn)
 
-defaultCompile :: (Applicative m, Member Failure syn, Carrier syn t, Show py) => py -> m (t Name)
+defaultCompile :: (Applicative m, Has Failure syn t, Show py) => py -> m (t Name)
 defaultCompile = pure . unimplemented
 
 
@@ -142,7 +139,7 @@ desugar acc = \case
 -- returns a function). There's some pun to be made on "collapsing
 -- sugar", like "icing" or "sugar water" but I'll leave that as an
 -- exercise to the reader.
-collapseDesugared :: (CoreSyntax syn t, Member (Reader Bindings) sig, Carrier sig m)
+collapseDesugared :: (CoreSyntax syn t, Has (Reader Bindings) sig m)
                   => Located Name           -- The current LHS to which to assign
                   -> (t Name -> m (t Name)) -- A meta-continuation: it takes a name and returns a continuation
                   -> t Name                 -- The current RHS to which to assign, yielded from an outer continuation

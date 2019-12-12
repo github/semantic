@@ -3,9 +3,10 @@
 
 module Analysis.TypeScript.Spec (spec) where
 
+import           Control.Abstract.ScopeGraph hiding (AccessControl(..))
+import           Control.Carrier.Resumable.Either (SomeError (..))
 import           Data.Syntax.Statement (StatementBlock(..))
 import qualified Data.Abstract.ScopeGraph as ScopeGraph (AccessControl(..))
-import           Control.Abstract.ScopeGraph hiding (AccessControl(..))
 import           Data.Abstract.Evaluatable
 import qualified Data.Abstract.Heap as Heap
 import           Data.Abstract.Module (ModuleInfo (..))

@@ -44,11 +44,10 @@ instance Evaluatable VariableName
 -- file, the complete contents of the included file are treated as though it
 -- were defined inside that function.
 
-resolvePHPName :: ( Member (Modules address value) sig
-                  , Member (Reader ModuleInfo) sig
-                  , Member (Reader Span) sig
-                  , Member (Resumable (BaseError ResolutionError)) sig
-                  , Carrier sig m
+resolvePHPName :: ( Has (Modules address value) sig m
+                  , Has (Reader ModuleInfo) sig m
+                  , Has (Reader Span) sig m
+                  , Has (Resumable (BaseError ResolutionError)) sig m
                   )
                => T.Text
                -> Evaluator term address value m ModulePath
@@ -58,18 +57,17 @@ resolvePHPName n = do
   where name = toName n
         toName = T.unpack . dropRelativePrefix . stripQuotes
 
-include :: ( Carrier sig m
-           , Member (Modules address value) sig
-           , Member (Reader (CurrentFrame address)) sig
-           , Member (Reader (CurrentScope address)) sig
-           , Member (Reader ModuleInfo) sig
-           , Member (Reader Span) sig
-           , Member (Resumable (BaseError (HeapError address))) sig
-           , Member (State (ScopeGraph address)) sig
-           , Member (Resumable (BaseError ResolutionError)) sig
-           , Member (State (Heap address address value)) sig
-           , Member (Abstract.String value) sig
-           , Member Trace sig
+include :: ( Has (Modules address value) sig m
+           , Has (Reader (CurrentFrame address)) sig m
+           , Has (Reader (CurrentScope address)) sig m
+           , Has (Reader ModuleInfo) sig m
+           , Has (Reader Span) sig m
+           , Has (Resumable (BaseError (HeapError address))) sig m
+           , Has (State (ScopeGraph address)) sig m
+           , Has (Resumable (BaseError ResolutionError)) sig m
+           , Has (State (Heap address address value)) sig m
+           , Has (Abstract.String value) sig m
+           , Has Trace sig m
            , Ord address
            )
         => (term -> Evaluator term address value m value)

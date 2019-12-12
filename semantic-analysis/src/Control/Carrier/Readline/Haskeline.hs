@@ -1,21 +1,18 @@
 {-# LANGUAGE FlexibleInstances, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, TypeApplications, TypeOperators, UndecidableInstances #-}
 module Control.Carrier.Readline.Haskeline
-( -- * Readline effect
-  module Control.Effect.Readline
-  -- * Readline carrier
-, runReadline
+( -- * Readline carrier
+  runReadline
 , runReadlineWithHistory
 , ReadlineC (..)
-  -- * Re-exports
-, Carrier
-, run
+  -- * Readline effect
+, module Control.Effect.Readline
 , runM
 ) where
 
-import Control.Effect.Carrier
-import Control.Effect.Lift
-import Control.Effect.Reader
-import Control.Effect.Readline hiding (Carrier)
+import Control.Algebra
+import Control.Carrier.Lift
+import Control.Carrier.Reader
+import Control.Effect.Readline
 import Control.Monad.Fix
 import Control.Monad.IO.Class
 import Data.Coerce
@@ -48,14 +45,14 @@ runReadlineWithHistory block = do
 newtype ReadlineC m a = ReadlineC { runReadlineC :: ReaderC Line (LiftC (InputT m)) a }
   deriving (Applicative, Functor, Monad, MonadFix, MonadIO)
 
-instance MonadException m => Carrier Readline (ReadlineC m) where
-  eff (Prompt prompt k) = ReadlineC $ do
+instance MonadException m => Algebra Readline (ReadlineC m) where
+  alg (Prompt prompt k) = ReadlineC $ do
     str <- sendM (getInputLine @m (cyan <> prompt <> plain))
     Line line <- ask
     local increment (runReadlineC (k line str))
     where cyan = "\ESC[1;36m\STX"
           plain = "\ESC[0m\STX"
-  eff (Print doc k) = do
+  alg (Print doc k) = do
     s <- maybe 80 Size.width <$> liftIO size
     liftIO (renderIO stdout (layoutSmart defaultLayoutOptions { layoutPageWidth = AvailablePerLine s 0.8 } (doc <> line)))
     k

@@ -17,7 +17,8 @@ module Control.Abstract.Evaluator
   , module X
   ) where
 
-import Control.Effect.Carrier
+import Control.Algebra
+import Control.Carrier.Error.Either
 import Control.Effect.Error as X
 import Control.Effect.Fresh as X
 import Control.Effect.NonDet as X
@@ -36,8 +37,8 @@ import Data.Coerce
 newtype Evaluator term address value m a = Evaluator { runEvaluator :: m a }
   deriving (Alternative, Applicative, Functor, Monad, MonadIO)
 
-instance Carrier sig m => Carrier sig (Evaluator term address value m) where
-  eff = Evaluator . eff . handleCoercible
+instance Algebra sig m => Algebra sig (Evaluator term address value m) where
+  alg = Evaluator . alg . handleCoercible
 
 -- | Raise a handler on monads into a handler on 'Evaluator's over those monads.
 raiseHandler :: (m a -> n b)
@@ -56,19 +57,17 @@ type Open a = a -> a
 newtype Return value = Return { unReturn :: value }
   deriving (Eq, Ord, Show)
 
-earlyReturn :: ( Member (Error (Return value)) sig
-               , Carrier sig m
-               )
+earlyReturn :: Has (Throw (Return value)) sig m
             => value
             -> Evaluator term address value m value
 earlyReturn = throwError . Return
 
-catchReturn :: (Member (Error (Return value)) sig, Carrier sig m)
+catchReturn :: Has (Catch (Return value)) sig m
             => Evaluator term address value m value
             -> Evaluator term address value m value
 catchReturn = flip catchError (\ (Return value) -> pure value)
 
-runReturn :: Carrier sig m
+runReturn :: Algebra sig m
           => Evaluator term address value (ErrorC (Return value) m) value
           -> Evaluator term address value m value
 runReturn = raiseHandler $ fmap (either unReturn id) . runError
@@ -87,29 +86,27 @@ unLoopControl = \case
   Continue v -> v
   Abort      -> error "unLoopControl: Abort"
 
-throwBreak :: (Member (Error (LoopControl value)) sig, Carrier sig m)
+throwBreak :: Has (Error (LoopControl value)) sig m
            => value
            -> Evaluator term address value m value
 throwBreak = throwError . Break
 
-throwContinue :: (Member (Error (LoopControl value)) sig, Carrier sig m)
+throwContinue :: Has (Error (LoopControl value)) sig m
               => value
               -> Evaluator term address value m value
 throwContinue = throwError . Continue
 
-throwAbort :: forall term address sig m value a . (Member (Error (LoopControl value)) sig, Carrier sig m)
+throwAbort :: forall term address sig m value a . Has (Error (LoopControl value)) sig m
            => Evaluator term address value m a
 throwAbort = throwError (Abort @value)
 
-catchLoopControl :: ( Member (Error (LoopControl value)) sig
-                    , Carrier sig m
-                    )
+catchLoopControl :: Has (Error (LoopControl value)) sig m
                  => Evaluator term address value m a
                  -> (LoopControl value -> Evaluator term address value m a)
                  -> Evaluator term address value m a
 catchLoopControl = catchError
 
-runLoopControl :: Carrier sig m
+runLoopControl :: Algebra sig m
                => Evaluator term address value (ErrorC (LoopControl value) m) value
                -> Evaluator term address value m value
 runLoopControl = raiseHandler $ fmap (either unLoopControl id) . runError
