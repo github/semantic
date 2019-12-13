@@ -16,7 +16,7 @@ build-type:          Simple
 stability:           alpha
 extra-source-files:  README.md
 
-tested-with:         GHC == 8.6.5
+tested-with:         GHC == 8.8.1
 
 flag release
   description: Build with optimizations on (for CI or deployment builds)
@@ -46,7 +46,7 @@ common haskell
 -- as caret-operator bounds relative to a version in Stackage.
 -- These are currently pinned to lts-13.13.
 common dependencies
-  build-depends:       base >= 4.12 && < 5
+  build-depends:       base >= 4.13 && < 5
                      , aeson ^>= 1.4.2.0
                      , algebraic-graphs ^>= 0.3
                      , async ^>= 2.2.1
@@ -257,7 +257,7 @@ library
                      , Prologue
   autogen-modules:     Paths_semantic
   other-modules:       Paths_semantic
-  build-depends:       base >= 4.12 && < 5
+  build-depends:       base >= 4.13 && < 5
                      , ansi-terminal >= 0.8.2 && <1
                      , array ^>= 0.5.3.0
                      , attoparsec ^>= 0.13.2.2
