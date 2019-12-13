@@ -15,7 +15,6 @@ import Analysis.Effect.Domain as A
 import Analysis.Effect.Env as A
 import Analysis.Effect.Heap as A
 import Analysis.File
-import qualified Analysis.Intro as A
 import Control.Algebra
 import Control.Applicative (Alternative (..))
 import Control.Effect.Fail
@@ -67,10 +66,10 @@ eval Analysis{..} eval = \case
     Unit -> A.unit
     Bool b -> A.bool b
     If c t e -> do
-      A.Bool c' <- eval c >>= A.concretize
+      c' <- eval c >>= A.asBool
       if c' then eval t else eval e
     String s -> A.string s
-    Load p -> eval p >>= A.concretize >> A.unit -- FIXME: add a load command or something
+    Load p -> eval p >>= A.asString >> A.unit -- FIXME: add a load command or something
     Record fields -> traverse (traverse eval) fields >>= record
     a :. b -> do
       a' <- ref a
@@ -96,7 +95,7 @@ eval Analysis{..} eval = \case
           Var n -> lookupEnv' n
           Alg (R c) -> case c of
             If c t e -> do
-              A.Bool c' <- eval c >>= A.concretize
+              c' <- eval c >>= A.asBool
               if c' then ref t else ref e
             a :. b -> do
               a' <- ref a
