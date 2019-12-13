@@ -75,7 +75,7 @@ buildExamples session lang tsDir = do
   knownFailures <- knownFailuresForPath tsDir (languageKnownFailuresTxt lang)
   files <- globDir1 (compile ("**/*" <> languageExtension lang)) (Path.toString (tsDir </> languageExampleDir lang))
   let paths = Path.relFile <$> files
-  trees <- forConcurrently paths $ \file -> do
+  trees <- for paths $ \file -> do
     let name = "[" <> languageName lang <> "] " <> Path.toString file
     pure . HUnit.testCaseSteps name $ \step -> do
       -- Use alacarte language mode
