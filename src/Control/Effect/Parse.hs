@@ -7,9 +7,13 @@ module Control.Effect.Parse
 , parserForBlob
 , parseWith
 , parsePairWith
+  -- * Re-exports
+, Algebra
+, Has
+, run
 ) where
 
-import Control.Effect.Carrier
+import Control.Algebra
 import Control.Effect.Error
 import Control.Exception (SomeException)
 import Data.Bitraversable
@@ -28,11 +32,11 @@ instance HFunctor Parse where
   hmap f (Parse parser blob k) = Parse parser blob (f . k)
 
 instance Effect Parse where
-  handle state handler (Parse parser blob k) = Parse parser blob (handler . (<$ state) . k)
+  thread state handler (Parse parser blob k) = Parse parser blob (handler . (<$ state) . k)
 
 
 -- | Parse a 'Blob' with the given 'Parser'.
-parse :: (Member Parse sig, Carrier sig m)
+parse :: Has Parse sig m
       => Parser term
       -> Blob
       -> m term
@@ -50,7 +54,7 @@ parserForBlob parsers = parserForLanguage parsers . blobLanguage
 
 -- | Parse a 'Blob' with one of the provided parsers, and run an action on the abstracted term.
 parseWith
-  :: (Carrier sig m, Member (Error SomeException) sig, Member Parse sig)
+  :: (Has (Error SomeException) sig m, Has Parse sig m)
   => Map.Map Language (SomeParser c ann)       -- ^ The set of parsers to select from.
   -> (forall term . c term => term ann -> m a) -- ^ A function to run on the parsed term. Note that the term is abstract, but constrained by @c@, allowing you to do anything @c@ allows, and requiring that all the input parsers produce terms supporting @c@.
   -> Blob                                      -- ^ The blob to parse.
@@ -61,7 +65,7 @@ parseWith parsers with blob = case parserForBlob parsers blob of
 
 -- | Parse a 'BlobPair' with one of the provided parsers, and run an action on the abstracted term pair.
 parsePairWith
-  :: (Carrier sig m, Member (Error SomeException) sig, Member Parse sig)
+  :: (Has (Error SomeException) sig m, Has Parse sig m)
   => Map.Map Language (SomeParser c ann)                                     -- ^ The set of parsers to select from.
   -> (forall term . c term => Edit (Blob, term ann) (Blob, term ann) -> m a) -- ^ A function to run on the parsed terms. Note that the terms are abstract, but constrained by @c@, allowing you to do anything @c@ allows, and requiring that all the input parsers produce terms supporting @c@.
   -> BlobPair                                                                -- ^ The blob pair to parse.

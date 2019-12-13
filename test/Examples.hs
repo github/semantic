@@ -3,9 +3,8 @@
 module Main (main) where
 
 import           Control.Carrier.Parse.Measured
+import           Control.Carrier.Reader
 import           Control.Concurrent.Async (forConcurrently)
-import           Control.Effect
-import           Control.Effect.Reader
 import           Control.Exception (displayException)
 import qualified Control.Foldl as Foldl
 import           Control.Lens
@@ -25,6 +24,7 @@ import           System.FilePath.Glob
 import           System.Path ((</>))
 import qualified System.Path as Path
 import qualified System.Process as Process
+
 
 import Data.Flag
 import Proto.Semantic as P hiding (Blob, BlobPair)
@@ -175,11 +175,10 @@ knownFailuresForPath tsDir (Just path)
   )
 
 parseSymbolsFilePath ::
-  ( Member (Error SomeException) sig
-  , Member Distribute sig
-  , Member Parse sig
-  , Member Files sig
-  , Carrier sig m
+  ( Has (Error SomeException) sig m
+  , Has Distribute sig m
+  , Has Parse sig m
+  , Has Files sig m
   )
   => PerLanguageModes
   -> Path.RelFile

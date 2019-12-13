@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Tags.Spec (spec) where
 
-import Control.Effect.Reader
+import Control.Carrier.Reader
 import Semantic.Api.Symbols
 import Source.Loc
 import SpecHelpers

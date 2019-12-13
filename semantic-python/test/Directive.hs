@@ -8,8 +8,8 @@ module Directive ( Directive (..)
                  ) where
 
 import           Analysis.Concrete (Concrete (..))
+import           Control.Algebra
 import           Control.Applicative
-import           Control.Effect
 import           Control.Monad
 import           Control.Monad.Trans.Resource (ResourceT, runResourceT)
 import           Core.Core (Core)
