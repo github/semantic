@@ -125,9 +125,6 @@ concreteAnalysis = Analysis{..}
             local (const (Map.insert name addr env)) (eval body)
         apply _ f _ = fail $ "Cannot coerce " <> show f <> " to function"
         unit = pure Unit
-        bool b = pure (Bool b)
-        asBool (Bool b) = pure b
-        asBool v        = fail $ "Cannot coerce " <> show v <> " to Bool"
         string s = pure (String s)
         asString (String s) = pure s
         asString v          = fail $ "Cannot coerce " <> show v <> " to String"

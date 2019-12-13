@@ -170,8 +170,6 @@ typecheckingAnalysis = Analysis{..}
           unify _A a
           pure _B
         unit = pure (Alg Unit)
-        bool _ = pure (Alg Bool)
-        asBool b = unify (Alg Bool) b >> pure True <|> pure False
         string _ = pure (Alg String)
         asString s = unify (Alg String) s $> mempty
         record fields = do

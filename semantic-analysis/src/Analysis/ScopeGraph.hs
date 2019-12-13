@@ -103,8 +103,6 @@ scopeGraphAnalysis = Analysis{..}
           bind name addr (eval body)
         apply _ f a = pure (f <> a)
         unit = pure mempty
-        bool _ = pure mempty
-        asBool _ = pure True <|> pure False
         string _ = pure mempty
         asString _ = pure mempty
         record fields = do
