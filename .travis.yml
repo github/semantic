@@ -36,6 +36,7 @@ before_install:
 install:
 - cabal v2-update -v
 - cabal v2-configure --enable-tests --enable-benchmarks --disable-optimization --write-ghc-environment-files=always --jobs=2
+- cabal v2-build tree-sitter-python tree-sitter-java
 - cabal v2-build --only-dependencies
 
 script:
