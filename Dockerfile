@@ -19,7 +19,7 @@ COPY --from=haskell /root/.cabal/bin/proto-lens-protoc /usr/local/bin/proto-lens
 ENTRYPOINT ["/protobuf/bin/protoc", "-I/protobuf", "--plugin=protoc-gen-haskell=/usr/local/bin/proto-lens-protoc"]
 
 # Build semantic
-FROM haskell:8.6 as build
+FROM haskell:8.8 as build
 WORKDIR /build
 
 # Build all of semantic
