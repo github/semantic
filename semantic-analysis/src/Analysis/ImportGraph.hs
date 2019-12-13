@@ -111,7 +111,6 @@ importGraphAnalysis = Analysis{..}
           A.assign addr a
           bind name addr (eval body)
         apply _ f _ = fail $ "Cannot coerce " <> show f <> " to function"
-        unit = pure mempty
         string s = pure (Value (String s) mempty)
         asString (Value (String s) _) = pure s
         asString _ = pure mempty

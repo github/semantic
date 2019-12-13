@@ -169,7 +169,6 @@ typecheckingAnalysis = Analysis{..}
           unify (Alg (_A :-> _B)) f
           unify _A a
           pure _B
-        unit = pure (Alg Unit)
         string _ = pure (Alg String)
         asString s = unify (Alg String) s $> mempty
         record fields = do
