@@ -22,11 +22,10 @@ import           System.FilePath.Posix
 -- TODO: Fully sort out ruby require/load mechanics
 --
 -- require "json"
-resolveRubyName :: ( Member (Modules address value) sig
-                   , Member (Reader ModuleInfo) sig
-                   , Member (Reader Span) sig
-                   , Member (Resumable (BaseError ResolutionError)) sig
-                   , Carrier sig m
+resolveRubyName :: ( Has (Modules address value) sig m
+                   , Has (Reader ModuleInfo) sig m
+                   , Has (Reader Span) sig m
+                   , Has (Resumable (BaseError ResolutionError)) sig m
                    )
                 => Text
                 -> Evaluator term address value m M.ModulePath
@@ -37,11 +36,10 @@ resolveRubyName name = do
   maybeM (throwResolutionError $ NotFoundError name' paths Language.Ruby) modulePath
 
 -- load "/root/src/file.rb"
-resolveRubyPath :: ( Member (Modules address value) sig
-                   , Member (Reader ModuleInfo) sig
-                   , Member (Reader Span) sig
-                   , Member (Resumable (BaseError ResolutionError)) sig
-                   , Carrier sig m
+resolveRubyPath :: ( Has (Modules address value) sig m
+                   , Has (Reader ModuleInfo) sig m
+                   , Has (Reader Span) sig m
+                   , Has (Resumable (BaseError ResolutionError)) sig m
                    )
                 => Text
                 -> Evaluator term address value m M.ModulePath
@@ -97,9 +95,8 @@ instance Evaluatable Require where
     insertFrameLink ScopeGraph.Import (Map.singleton moduleScope moduleFrame)
     pure v -- Returns True if the file was loaded, False if it was already loaded. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-require
 
-doRequire :: ( Member (Boolean value) sig
-             , Member (Modules address value) sig
-             , Carrier sig m
+doRequire :: ( Has (Boolean value) sig m
+             , Has (Modules address value) sig m
              )
           => M.ModulePath
           -> Evaluator term address value m ((address, address), value)
@@ -126,19 +123,18 @@ instance Evaluatable Load where
     shouldWrap <- eval wrap >>= asBool
     doLoad path shouldWrap
 
-doLoad :: ( Member (Boolean value) sig
-          , Member (Modules address value) sig
-          , Member (Reader (CurrentFrame address)) sig
-          , Member (Reader (CurrentScope address)) sig
-          , Member (Reader ModuleInfo) sig
-          , Member (Reader Span) sig
-          , Member (Resumable (BaseError ResolutionError)) sig
-          , Member (State (ScopeGraph.ScopeGraph address)) sig
-          , Member (State (Heap address address value)) sig
-          , Member (Resumable (BaseError (HeapError address))) sig
-          , Member Trace sig
+doLoad :: ( Has (Boolean value) sig m
+          , Has (Modules address value) sig m
+          , Has (Reader (CurrentFrame address)) sig m
+          , Has (Reader (CurrentScope address)) sig m
+          , Has (Reader ModuleInfo) sig m
+          , Has (Reader Span) sig m
+          , Has (Resumable (BaseError ResolutionError)) sig m
+          , Has (State (ScopeGraph.ScopeGraph address)) sig m
+          , Has (State (Heap address address value)) sig m
+          , Has (Resumable (BaseError (HeapError address))) sig m
+          , Has Trace sig m
           , Ord address
-          , Carrier sig m
           )
        => Text
        -> Bool

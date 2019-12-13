@@ -46,12 +46,10 @@ module Semantic.Task
 , Telemetry
 ) where
 
-import           Control.Effect.Carrier
-import           Control.Effect.Catch
-import           Control.Effect.Error
-import           Control.Effect.Lift
-import           Control.Effect.Reader
-import           Control.Effect.Resource
+import           Control.Algebra
+import           Control.Carrier.Error.Either
+import           Control.Carrier.Lift
+import           Control.Carrier.Reader
 import           Control.Effect.Trace
 import           Control.Monad.IO.Class
 import           Data.ByteString.Builder
@@ -75,12 +73,10 @@ type TaskC
   ( TelemetryC
   ( ErrorC SomeException
   ( TimeoutC
-  ( ResourceC
-  ( CatchC
   ( DistributeC
-  ( LiftC IO)))))))))))
+  ( LiftC IO)))))))))
 
-serialize :: (Member (Reader Config) sig, Carrier sig m)
+serialize :: Has (Reader Config) sig m
           => Format input
           -> input
           -> m Builder
@@ -107,8 +103,6 @@ runTask taskSession@TaskSession{..} task = do
         run
           = runM
           . withDistribute
-          . runCatch
-          . runResource
           . withTimeout
           . runError
           . runTelemetry logger statter
@@ -139,6 +133,6 @@ runTraceInTelemetry = runTraceInTelemetryC
 newtype TraceInTelemetryC m a = TraceInTelemetryC { runTraceInTelemetryC :: m a }
   deriving (Applicative, Functor, Monad, MonadFail, MonadIO)
 
-instance (Member Telemetry sig, Carrier sig m) => Carrier (Trace :+: sig) (TraceInTelemetryC m) where
-  eff (R other)         = TraceInTelemetryC . eff . handleCoercible $ other
-  eff (L (Trace str k)) = writeLog Debug str [] >> k
+instance Has Telemetry sig m => Algebra (Trace :+: sig) (TraceInTelemetryC m) where
+  alg (R other)         = TraceInTelemetryC . alg . handleCoercible $ other
+  alg (L (Trace str k)) = writeLog Debug str [] >> k

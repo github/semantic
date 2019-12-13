@@ -11,7 +11,7 @@ module Language.Python.Failure
 
 import Prelude hiding (fail)
 
-import Control.Effect.Carrier
+import Control.Algebra
 import Control.Monad.Fail
 import Data.Coerce
 import Data.Kind
@@ -42,10 +42,10 @@ instance RightModule Failure where
   a >>=* _ = coerce a
 
 
-unimplemented :: (Show ast, Member Failure sig, Carrier sig m) => ast -> m a
+unimplemented :: (Show ast, Has Failure sig m) => ast -> m a
 unimplemented = send . Unimplemented . show
 
-invariantViolated :: (Member Failure sig, Carrier sig m) => String -> m a
+invariantViolated :: Has Failure sig m => String -> m a
 invariantViolated = send . InvariantViolated
 
 eliminateFailures :: (MonadFail m, HTraversable sig, RightModule sig)

@@ -2,7 +2,7 @@
 module Semantic.CLI (main) where
 
 import qualified Control.Carrier.Parse.Measured as Parse
-import           Control.Effect.Reader
+import           Control.Carrier.Reader
 import           Data.Blob
 import           Data.Blob.IO
 import qualified Data.Flag as Flag

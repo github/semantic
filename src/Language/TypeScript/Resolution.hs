@@ -26,13 +26,12 @@ import qualified Data.Language as Language
 --
 -- NB: TypeScript has a couple of different strategies, but the main one (and the
 -- only one we support) mimics Node.js.
-resolveWithNodejsStrategy :: ( Member (Modules address value) sig
-                             , Member (Reader M.ModuleInfo) sig
-                             , Member (Reader PackageInfo) sig
-                             , Member (Reader Span) sig
-                             , Member (Resumable (BaseError ResolutionError)) sig
-                             , Member Trace sig
-                             , Carrier sig m
+resolveWithNodejsStrategy :: ( Has (Modules address value) sig m
+                             , Has (Reader M.ModuleInfo) sig m
+                             , Has (Reader PackageInfo) sig m
+                             , Has (Reader Span) sig m
+                             , Has (Resumable (BaseError ResolutionError)) sig m
+                             , Has Trace sig m
                              )
                           => ImportPath
                           -> [String]
@@ -47,13 +46,12 @@ resolveWithNodejsStrategy (ImportPath path _)    exts        = resolveRelativePa
 -- /root/src/moduleB.ts
 -- /root/src/moduleB/package.json (if it specifies a "types" property)
 -- /root/src/moduleB/index.ts
-resolveRelativePath :: ( Member (Modules address value) sig
-                       , Member (Reader M.ModuleInfo) sig
-                       , Member (Reader PackageInfo) sig
-                       , Member (Reader Span) sig
-                       , Member (Resumable (BaseError ResolutionError)) sig
-                       , Member Trace sig
-                       , Carrier sig m
+resolveRelativePath :: ( Has (Modules address value) sig m
+                       , Has (Reader M.ModuleInfo) sig m
+                       , Has (Reader PackageInfo) sig m
+                       , Has (Reader Span) sig m
+                       , Has (Resumable (BaseError ResolutionError)) sig m
+                       , Has Trace sig m
                        )
                     => FilePath
                     -> [String]
@@ -77,13 +75,12 @@ resolveRelativePath relImportPath exts = do
 --
 -- /root/node_modules/moduleB.ts, etc
 -- /node_modules/moduleB.ts, etc
-resolveNonRelativePath :: ( Member (Modules address value) sig
-                          , Member (Reader M.ModuleInfo) sig
-                          , Member (Reader PackageInfo) sig
-                          , Member (Reader Span) sig
-                          , Member (Resumable (BaseError ResolutionError)) sig
-                          , Member Trace sig
-                          , Carrier sig m
+resolveNonRelativePath :: ( Has (Modules address value) sig m
+                          , Has (Reader M.ModuleInfo) sig m
+                          , Has (Reader PackageInfo) sig m
+                          , Has (Reader Span) sig m
+                          , Has (Resumable (BaseError ResolutionError)) sig m
+                          , Has Trace sig m
                           )
                        => FilePath
                        -> [String]
@@ -104,10 +101,9 @@ resolveNonRelativePath name exts = do
     notFound xs = throwResolutionError $ NotFoundError name xs Language.TypeScript
 
 -- | Resolve a module name to a ModulePath.
-resolveModule :: ( Member (Modules address value) sig
-                 , Member (Reader PackageInfo) sig
-                 , Member Trace sig
-                 , Carrier sig m
+resolveModule :: ( Has (Modules address value) sig m
+                 , Has (Reader PackageInfo) sig m
+                 , Has Trace sig m
                  )
               => FilePath -- ^ Module path used as directory to search in
               -> [String] -- ^ File extensions to look for

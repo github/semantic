@@ -17,6 +17,15 @@ module Data.Abstract.Evaluatable
 , throwUnspecializedError
 ) where
 
+import Prologue
+
+import           Control.Algebra
+import qualified Control.Carrier.Resumable.Either as Either
+import qualified Control.Carrier.Resumable.Resume as With
+import           Data.Scientific (Scientific)
+import           Data.Semigroup.Foldable
+import           Source.Span (HasSpan(..))
+
 import Control.Abstract hiding (Load, String)
 import qualified Control.Abstract as Abstract
 import Control.Abstract.Context as X
@@ -31,53 +40,47 @@ import Data.Abstract.Name as X
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import Data.Abstract.AccessControls.Class as X
 import Data.Language
-import Data.Scientific (Scientific)
 import Data.Semigroup.App
-import Data.Semigroup.Foldable
-import Data.Sum hiding (project)
 import Data.Term
-import Prologue
-import Source.Span (HasSpan(..))
 
 -- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
 class (Show1 constr, Foldable constr) => Evaluatable constr where
   eval :: ( AbstractValue term address value m
           , AccessControls term
-          , Carrier sig m
           , Declarations term
           , FreeVariables term
           , HasSpan term
-          , Member (Allocator address) sig
-          , Member (Bitwise value) sig
-          , Member (Boolean value) sig
-          , Member (While value) sig
-          , Member (Deref value) sig
-          , Member (State (ScopeGraph address)) sig
-          , Member (Error (LoopControl value)) sig
-          , Member (Error (Return value)) sig
-          , Member Fresh sig
-          , Member (Function term address value) sig
-          , Member (Modules address value) sig
-          , Member (Numeric value) sig
-          , Member (Object address value) sig
-          , Member (Array value) sig
-          , Member (Hash value) sig
-          , Member (Reader ModuleInfo) sig
-          , Member (Reader PackageInfo) sig
-          , Member (Reader Span) sig
-          , Member (State Span) sig
-          , Member (Abstract.String value) sig
-          , Member (Reader (CurrentFrame address)) sig
-          , Member (Reader (CurrentScope address)) sig
-          , Member (Resumable (BaseError (ScopeError address))) sig
-          , Member (Resumable (BaseError (HeapError address))) sig
-          , Member (Resumable (BaseError (AddressError address value))) sig
-          , Member (Resumable (BaseError (UnspecializedError address value))) sig
-          , Member (Resumable (BaseError (EvalError term address value))) sig
-          , Member (Resumable (BaseError ResolutionError)) sig
-          , Member (State (Heap address address value)) sig
-          , Member Trace sig
-          , Member (Unit value) sig
+          , Has (Allocator address) sig m
+          , Has (Bitwise value) sig m
+          , Has (Boolean value) sig m
+          , Has (While value) sig m
+          , Has (Deref value) sig m
+          , Has (State (ScopeGraph address)) sig m
+          , Has (Error (LoopControl value)) sig m
+          , Has (Error (Return value)) sig m
+          , Has Fresh sig m
+          , Has (Function term address value) sig m
+          , Has (Modules address value) sig m
+          , Has (Numeric value) sig m
+          , Has (Object address value) sig m
+          , Has (Array value) sig m
+          , Has (Hash value) sig m
+          , Has (Reader ModuleInfo) sig m
+          , Has (Reader PackageInfo) sig m
+          , Has (Reader Span) sig m
+          , Has (State Span) sig m
+          , Has (Abstract.String value) sig m
+          , Has (Reader (CurrentFrame address)) sig m
+          , Has (Reader (CurrentScope address)) sig m
+          , Has (Resumable (BaseError (ScopeError address))) sig m
+          , Has (Resumable (BaseError (HeapError address))) sig m
+          , Has (Resumable (BaseError (AddressError address value))) sig m
+          , Has (Resumable (BaseError (UnspecializedError address value))) sig m
+          , Has (Resumable (BaseError (EvalError term address value))) sig m
+          , Has (Resumable (BaseError ResolutionError)) sig m
+          , Has (State (Heap address address value)) sig m
+          , Has Trace sig m
+          , Has (Unit value) sig m
           , Ord address
           , Show address
           )
@@ -89,19 +92,18 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
     throwUnspecializedError $ UnspecializedError ("Eval unspecialized for " <> liftShowsPrec (const (const id)) (const id) 0 expr "")
 
   ref :: ( AbstractValue term address value m
-         , Carrier sig m
          , Declarations term
-         , Member (Object address value) sig
-         , Member (Reader (CurrentFrame address)) sig
-         , Member (Reader (CurrentScope address)) sig
-         , Member (Reader ModuleInfo) sig
-         , Member (Reader Span) sig
-         , Member (Resumable (BaseError (EvalError term address value))) sig
-         , Member (Resumable (BaseError (HeapError address))) sig
-         , Member (Resumable (BaseError (ScopeError address))) sig
-         , Member (Resumable (BaseError (UnspecializedError address value))) sig
-         , Member (State (Heap address address value)) sig
-         , Member (State (ScopeGraph address)) sig
+         , Has (Object address value) sig m
+         , Has (Reader (CurrentFrame address)) sig m
+         , Has (Reader (CurrentScope address)) sig m
+         , Has (Reader ModuleInfo) sig m
+         , Has (Reader Span) sig m
+         , Has (Resumable (BaseError (EvalError term address value))) sig m
+         , Has (Resumable (BaseError (HeapError address))) sig m
+         , Has (Resumable (BaseError (ScopeError address))) sig m
+         , Has (Resumable (BaseError (UnspecializedError address value))) sig m
+         , Has (State (Heap address address value)) sig m
+         , Has (State (ScopeGraph address)) sig m
          , Ord address
          )
       => (term -> Evaluator term address value m value)
@@ -111,7 +113,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
     throwUnspecializedError $ RefUnspecializedError ("ref unspecialized for " <> liftShowsPrec (const (const id)) (const id) 0 expr "")
 
 
-traceResolve :: (Show a, Show b, Member Trace sig, Carrier sig m) => a -> b -> Evaluator term address value m ()
+traceResolve :: (Show a, Show b, Has Trace sig m) => a -> b -> Evaluator term address value m ()
 traceResolve name path = trace ("resolved " <> show name <> " -> " <> show path)
 
 
@@ -119,24 +121,23 @@ traceResolve name path = trace ("resolved " <> show name <> " -> " <> show path)
 
 class HasPrelude (language :: Language) where
   definePrelude :: ( AbstractValue term address value m
-                   , Carrier sig m
                    , HasCallStack
-                   , Member (Allocator address) sig
-                   , Member (State (ScopeGraph address)) sig
-                   , Member (Resumable (BaseError (ScopeError address))) sig
-                   , Member (Resumable (BaseError (HeapError address))) sig
-                   , Member (Deref value) sig
-                   , Member Fresh sig
-                   , Member (Function term address value) sig
-                   , Member (Reader ModuleInfo) sig
-                   , Member (Reader Span) sig
-                   , Member (Resumable (BaseError (AddressError address value))) sig
-                   , Member (State (Heap address address value)) sig
-                   , Member (Reader (CurrentFrame address)) sig
-                   , Member (Reader (CurrentScope address)) sig
-                   , Member Trace sig
-                   , Member (Unit value) sig
-                   , Member (Object address value) sig
+                   , Has (Allocator address) sig m
+                   , Has (State (ScopeGraph address)) sig m
+                   , Has (Resumable (BaseError (ScopeError address))) sig m
+                   , Has (Resumable (BaseError (HeapError address))) sig m
+                   , Has (Deref value) sig m
+                   , Has Fresh sig m
+                   , Has (Function term address value) sig m
+                   , Has (Reader ModuleInfo) sig m
+                   , Has (Reader Span) sig m
+                   , Has (Resumable (BaseError (AddressError address value))) sig m
+                   , Has (State (Heap address address value)) sig m
+                   , Has (Reader (CurrentFrame address)) sig m
+                   , Has (Reader (CurrentScope address)) sig m
+                   , Has Trace sig m
+                   , Has (Unit value) sig m
+                   , Has (Object address value) sig m
                    , Ord address
                    , Show address
                    )
@@ -174,17 +175,16 @@ instance HasPrelude 'JavaScript where
     defineSelf
     defineNamespace (Declaration (X.name "console")) $ defineBuiltIn (Declaration $ X.name "log") Default Public Print
 
-defineSelf :: ( Carrier sig m
-              , Member (State (ScopeGraph address)) sig
-              , Member (Resumable (BaseError (ScopeError address))) sig
-              , Member (Resumable (BaseError (HeapError address))) sig
-              , Member (Deref value) sig
-              , Member (Reader ModuleInfo) sig
-              , Member (Reader Span) sig
-              , Member (State (Heap address address value)) sig
-              , Member (Reader (CurrentFrame address)) sig
-              , Member (Reader (CurrentScope address)) sig
-              , Member (Object address value) sig
+defineSelf :: ( Has (State (ScopeGraph address)) sig m
+              , Has (Resumable (BaseError (ScopeError address))) sig m
+              , Has (Resumable (BaseError (HeapError address))) sig m
+              , Has (Deref value) sig m
+              , Has (Reader ModuleInfo) sig m
+              , Has (Reader Span) sig m
+              , Has (State (Heap address address value)) sig m
+              , Has (Reader (CurrentFrame address)) sig m
+              , Has (Reader (CurrentScope address)) sig m
+              , Has (Object address value) sig m
               , Ord address
               )
            => Evaluator term address value m ()
@@ -212,10 +212,9 @@ data EvalError term address value return where
   ReferenceError      :: value -> term -> EvalError term address value (Slot address)
   ScopedEnvError      :: value -> EvalError term address value address
 
-throwNoNameError :: ( Carrier sig m
-                    , Member (Reader ModuleInfo) sig
-                    , Member (Reader Span) sig
-                    , Member (Resumable (BaseError (EvalError term address value))) sig
+throwNoNameError :: ( Has (Reader ModuleInfo) sig m
+                    , Has (Reader Span) sig m
+                    , Has (Resumable (BaseError (EvalError term address value))) sig m
                     )
                 => term
                 -> Evaluator term address value m Name
@@ -239,19 +238,18 @@ instance (Eq term, Eq value) => Eq1 (EvalError term address value) where
 instance (Show term, Show value) => Show1 (EvalError term address value) where
   liftShowsPrec _ _ = showsPrec
 
-runEvalError :: Evaluator term address value (ResumableC (BaseError (EvalError term address value)) m) a
-             -> Evaluator term address value m (Either (SomeError (BaseError (EvalError term address value))) a)
-runEvalError = raiseHandler runResumable
+runEvalError :: Evaluator term address value (Either.ResumableC (BaseError (EvalError term address value)) m) a
+             -> Evaluator term address value m (Either (Either.SomeError (BaseError (EvalError term address value))) a)
+runEvalError = raiseHandler Either.runResumable
 
 runEvalErrorWith :: (forall resume . (BaseError (EvalError term address value)) resume -> Evaluator term address value m resume)
-                 -> Evaluator term address value (ResumableWithC (BaseError (EvalError term address value)) m) a
+                 -> Evaluator term address value (With.ResumableC (BaseError (EvalError term address value)) m) a
                  -> Evaluator term address value m a
-runEvalErrorWith f = raiseHandler $ runResumableWith (runEvaluator . f)
+runEvalErrorWith f = raiseHandler $ With.runResumable (runEvaluator . f)
 
-throwEvalError :: ( Member (Reader ModuleInfo) sig
-                  , Member (Reader Span) sig
-                  , Member (Resumable (BaseError (EvalError term address value))) sig
-                  , Carrier sig m
+throwEvalError :: ( Has (Reader ModuleInfo) sig m
+                  , Has (Reader Span) sig m
+                  , Has (Resumable (BaseError (EvalError term address value))) sig m
                   )
                => EvalError term address value resume
                -> Evaluator term address value m resume
@@ -274,20 +272,19 @@ instance Eq1 (UnspecializedError address value) where
 instance Show1 (UnspecializedError address value) where
   liftShowsPrec _ _ = showsPrec
 
-runUnspecialized :: Evaluator term address value (ResumableC (BaseError (UnspecializedError address value)) m) a
-                 -> Evaluator term address value m (Either (SomeError (BaseError (UnspecializedError address value))) a)
-runUnspecialized = raiseHandler runResumable
+runUnspecialized :: Evaluator term address value (Either.ResumableC (BaseError (UnspecializedError address value)) m) a
+                 -> Evaluator term address value m (Either (Either.SomeError (BaseError (UnspecializedError address value))) a)
+runUnspecialized = raiseHandler Either.runResumable
 
 runUnspecializedWith :: (forall resume . BaseError (UnspecializedError address value) resume -> Evaluator term address value m resume)
-                     -> Evaluator term address value (ResumableWithC (BaseError (UnspecializedError address value)) m) a
+                     -> Evaluator term address value (With.ResumableC (BaseError (UnspecializedError address value)) m) a
                      -> Evaluator term address value m a
-runUnspecializedWith f = raiseHandler $ runResumableWith (runEvaluator . f)
+runUnspecializedWith f = raiseHandler $ With.runResumable (runEvaluator . f)
 
 
-throwUnspecializedError :: ( Member (Resumable (BaseError (UnspecializedError address value))) sig
-                           , Member (Reader ModuleInfo) sig
-                           , Member (Reader Span) sig
-                           , Carrier sig m
+throwUnspecializedError :: ( Has (Resumable (BaseError (UnspecializedError address value))) sig m
+                           , Has (Reader ModuleInfo) sig m
+                           , Has (Reader Span) sig m
                            )
                         => UnspecializedError address value resume
                         -> Evaluator term address value m resume

@@ -2,20 +2,20 @@
 module Analysis.FlowInsensitive
 ( Heap
 , FrameId(..)
+, Cache
 , convergeTerm
 , cacheTerm
 , runHeap
 , foldMapA
 ) where
 
-import           Control.Effect
-import           Control.Effect.Fresh
-import           Control.Effect.NonDet
-import           Control.Effect.Reader
-import           Control.Effect.State
+import           Control.Algebra
+import           Control.Carrier.Fresh.Strict
+import           Control.Carrier.NonDet.Church
+import           Control.Carrier.Reader
+import           Control.Carrier.State.Strict
 import qualified Data.Map as Map
 import           Data.Maybe (fromMaybe)
-import           Data.Monoid (Alt(..))
 import qualified Data.Set as Set
 
 newtype Cache term a = Cache { unCache :: Map.Map term (Set.Set a) }
@@ -28,30 +28,29 @@ newtype FrameId name = FrameId { unFrameId :: name }
 
 
 convergeTerm :: forall m sig a term address proxy
-             .  ( Carrier sig m
-                , Effect sig
+             .  ( Effect sig
                 , Eq address
-                , Member Fresh sig
-                , Member (State (Heap address a)) sig
+                , Has Fresh sig m
+                , Has (State (Heap address a)) sig m
                 , Ord a
                 , Ord term
                 )
              => proxy address
-             -> (term -> NonDetC (ReaderC (Cache term a) (StateC (Cache term a) m)) a)
+             -> Int
+             -> (term -> NonDetC (FreshC (ReaderC (Cache term a) (StateC (Cache term a) m))) a)
              -> term
              -> m (Set.Set a)
-convergeTerm _ eval body = do
+convergeTerm _ n eval body = do
   heap <- get
   (cache, _) <- converge (Cache Map.empty :: Cache term a, heap :: Heap address a) $ \ (prevCache, _) -> runState (Cache Map.empty) . runReader prevCache $ do
-    _ <- resetFresh . runNonDetM Set.singleton $ eval body
+    _ <- runFresh n . runNonDetM Set.singleton $ eval body
     get
   pure (fromMaybe mempty (Map.lookup body (unCache cache)))
 
 cacheTerm :: forall m sig a term
           .  ( Alternative m
-             , Carrier sig m
-             , Member (Reader (Cache term a)) sig
-             , Member (State  (Cache term a)) sig
+             , Has (Reader (Cache term a)) sig m
+             , Has (State  (Cache term a)) sig m
              , Ord a
              , Ord term
              )
@@ -69,13 +68,6 @@ cacheTerm eval term = do
 
 runHeap :: StateC (Heap address a) m b -> m (Heap address a, b)
 runHeap m = runState Map.empty m
-
--- | Fold a collection by mapping each element onto an 'Alternative' action.
-foldMapA :: (Alternative m, Foldable t) => (b -> m a) -> t b -> m a
-foldMapA f = getAlt . foldMap (Alt . f)
-
-runNonDetM :: (Monoid b, Applicative m) => (a -> b) -> NonDetC m a -> m b
-runNonDetM f (NonDetC m) = m (fmap . (<>) . f) (pure mempty)
 
 -- | Iterate a monadic action starting from some initial seed until the results converge.
 --

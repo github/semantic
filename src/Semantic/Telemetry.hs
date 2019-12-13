@@ -49,8 +49,8 @@ module Semantic.Telemetry
 , IgnoreTelemetryC(..)
 ) where
 
-import           Control.Effect.Carrier
-import           Control.Effect.Reader
+import           Control.Algebra
+import           Control.Carrier.Reader
 import           Control.Exception
 import           Control.Monad.IO.Class
 import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
@@ -117,15 +117,15 @@ queueStat q = liftIO . writeAsyncQueue q
 -- Eff interface
 
 -- | A task which logs a message at a specific log level to stderr.
-writeLog :: (Member Telemetry sig, Carrier sig m) => Level -> String -> [(String, String)] -> m ()
+writeLog :: Has Telemetry sig m => Level -> String -> [(String, String)] -> m ()
 writeLog level message pairs = send (WriteLog level message pairs (pure ()))
 
 -- | A task which writes a stat.
-writeStat :: (Member Telemetry sig, Carrier sig m) => Stat -> m ()
+writeStat :: Has Telemetry sig m => Stat -> m ()
 writeStat stat = send (WriteStat stat (pure ()))
 
 -- | A task which measures and stats the timing of another task.
-time :: (Member Telemetry sig, Carrier sig m, MonadIO m) => String -> [(String, String)] -> m output -> m output
+time :: (Has Telemetry sig m, MonadIO m) => String -> [(String, String)] -> m output -> m output
 time statName tags task = do
   (a, stat) <- withTiming statName tags task
   a <$ writeStat stat
@@ -150,13 +150,13 @@ runTelemetry logger statter = runReader (logger, statter) . runTelemetryC
 newtype TelemetryC m a = TelemetryC { runTelemetryC :: ReaderC (LogQueue, StatQueue) m a }
   deriving (Applicative, Functor, Monad, MonadFail, MonadIO)
 
-instance (Carrier sig m, MonadIO m) => Carrier (Telemetry :+: sig) (TelemetryC m) where
-  eff (L op) = do
+instance (Algebra sig m, MonadIO m) => Algebra (Telemetry :+: sig) (TelemetryC m) where
+  alg (L op) = do
     queues <- TelemetryC ask
     case op of
       WriteStat stat k               -> queueStat (snd queues) stat *> k
       WriteLog level message pairs k -> queueLogMessage (fst queues) level message pairs *> k
-  eff (R other) = TelemetryC (eff (R (handleCoercible other)))
+  alg (R other) = TelemetryC (alg (R (handleCoercible other)))
 
 -- | Run a 'Telemetry' effect by ignoring statting/logging.
 ignoreTelemetry :: IgnoreTelemetryC m a -> m a
@@ -165,7 +165,7 @@ ignoreTelemetry = runIgnoreTelemetryC
 newtype IgnoreTelemetryC m a = IgnoreTelemetryC { runIgnoreTelemetryC :: m a }
   deriving (Applicative, Functor, Monad)
 
-instance Carrier sig m => Carrier (Telemetry :+: sig) (IgnoreTelemetryC m) where
-  eff (R other) = IgnoreTelemetryC . eff . handleCoercible $ other
-  eff (L (WriteStat _ k))    = k
-  eff (L (WriteLog _ _ _ k)) = k
+instance Algebra sig m => Algebra (Telemetry :+: sig) (IgnoreTelemetryC m) where
+  alg (R other) = IgnoreTelemetryC . alg . handleCoercible $ other
+  alg (L (WriteStat _ k))    = k
+  alg (L (WriteLog _ _ _ k)) = k

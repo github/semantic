@@ -49,25 +49,25 @@ data DiffOutputFormat
   | DiffDotGraph
   deriving (Eq, Show)
 
-parseDiffBuilder :: (Traversable t, Member (Error SomeException) sig, Member (Reader Config) sig, Member Telemetry sig, Member Distribute sig, Member Parse sig, Carrier sig m, MonadIO m) => DiffOutputFormat -> t BlobPair -> m Builder
+parseDiffBuilder :: (Traversable t, Has (Error SomeException) sig m, Has (Reader Config) sig m, Has Telemetry sig m, Has Distribute sig m, Has Parse sig m, MonadIO m) => DiffOutputFormat -> t BlobPair -> m Builder
 parseDiffBuilder DiffJSONTree    = distributeFoldMap jsonDiff >=> serialize Format.JSON -- NB: Serialize happens at the top level for these two JSON formats to collect results of multiple blob pairs.
 parseDiffBuilder DiffJSONGraph   = diffGraph >=> serialize Format.JSON
 parseDiffBuilder DiffSExpression = distributeFoldMap (parsePairWith diffParsers sexprDiff)
 parseDiffBuilder DiffShow        = distributeFoldMap (parsePairWith diffParsers showDiff)
 parseDiffBuilder DiffDotGraph    = distributeFoldMap (parsePairWith diffParsers dotGraphDiff)
 
-jsonDiff :: (Member (Error SomeException) sig, Member Telemetry sig, Member Parse sig, Carrier sig m, MonadIO m) => BlobPair -> m (Rendering.JSON.JSON "diffs" SomeJSON)
+jsonDiff :: (Has (Error SomeException) sig m, Has Telemetry sig m, Has Parse sig m, MonadIO m) => BlobPair -> m (Rendering.JSON.JSON "diffs" SomeJSON)
 jsonDiff blobPair = parsePairWith diffParsers jsonTreeDiff blobPair `catchError` jsonError blobPair
 
 jsonError :: Applicative m => BlobPair -> SomeException -> m (Rendering.JSON.JSON "diffs" SomeJSON)
 jsonError blobPair (SomeException e) = pure $ renderJSONDiffError blobPair (show e)
 
-diffGraph :: (Traversable t, Member (Error SomeException) sig, Member Telemetry sig, Member Distribute sig, Member Parse sig, Carrier sig m, MonadIO m) => t BlobPair -> m DiffTreeGraphResponse
+diffGraph :: (Traversable t, Has (Error SomeException) sig m, Has Telemetry sig m, Has Distribute sig m, Has Parse sig m, MonadIO m) => t BlobPair -> m DiffTreeGraphResponse
 diffGraph blobs = do
   graph <- distributeFor blobs go
   pure $ defMessage & P.files .~ toList graph
   where
-    go :: (Member (Error SomeException) sig, Member Telemetry sig, Member Parse sig, Carrier sig m, MonadIO m) => BlobPair -> m DiffTreeFileGraph
+    go :: (Has (Error SomeException) sig m, Has Telemetry sig m, Has Parse sig m, MonadIO m) => BlobPair -> m DiffTreeFileGraph
     go blobPair = parsePairWith diffParsers jsonGraphDiff blobPair
       `catchError` \(SomeException e) ->
         pure $ defMessage
@@ -82,14 +82,14 @@ diffGraph blobs = do
 
 
 class DOTGraphDiff term where
-  dotGraphDiff :: (Carrier sig m, Member (Reader Config) sig, Member Telemetry sig, MonadIO m) => Edit (Blob, term Loc) (Blob, term Loc) -> m Builder
+  dotGraphDiff :: (Has (Reader Config) sig m, Has Telemetry sig m, MonadIO m) => Edit (Blob, term Loc) (Blob, term Loc) -> m Builder
 
 instance (DiffTerms term, ConstructorName (Syntax term), Foldable (Syntax term), Functor (Syntax term)) => DOTGraphDiff term where
   dotGraphDiff = serialize (DOT (diffStyle "diffs")) . renderTreeGraph <=< diffTerms
 
 
 class JSONGraphDiff term where
-  jsonGraphDiff :: (Carrier sig m, Member Telemetry sig, MonadIO m) => Edit (Blob, term Loc) (Blob, term Loc) -> m DiffTreeFileGraph
+  jsonGraphDiff :: (Has Telemetry sig m, MonadIO m) => Edit (Blob, term Loc) (Blob, term Loc) -> m DiffTreeFileGraph
 
 instance (DiffTerms term, ConstructorName (Syntax term), Foldable (Syntax term), Functor (Syntax term)) => JSONGraphDiff term where
   jsonGraphDiff terms = do
@@ -108,27 +108,27 @@ instance (DiffTerms term, ConstructorName (Syntax term), Foldable (Syntax term),
 
 
 class JSONTreeDiff term where
-  jsonTreeDiff :: (Carrier sig m, Member Telemetry sig, MonadIO m) => Edit (Blob, term Loc) (Blob, term Loc) -> m (Rendering.JSON.JSON "diffs" SomeJSON)
+  jsonTreeDiff :: (Has Telemetry sig m, MonadIO m) => Edit (Blob, term Loc) (Blob, term Loc) -> m (Rendering.JSON.JSON "diffs" SomeJSON)
 
 instance (DiffTerms term, Foldable (Syntax term), ToJSONFields1 (Syntax term)) => JSONTreeDiff term where
   jsonTreeDiff terms = renderJSONDiff (bimap fst fst terms) <$> diffTerms terms
 
 
 class SExprDiff term where
-  sexprDiff :: (Carrier sig m, Member (Reader Config) sig, Member Telemetry sig, MonadIO m) => Edit (Blob, term Loc) (Blob, term Loc) -> m Builder
+  sexprDiff :: (Has (Reader Config) sig m, Has Telemetry sig m, MonadIO m) => Edit (Blob, term Loc) (Blob, term Loc) -> m Builder
 
 instance (DiffTerms term, ConstructorName (Syntax term), Foldable (Syntax term), Functor (Syntax term)) => SExprDiff term where
   sexprDiff = serialize (SExpression ByConstructorName) <=< diffTerms
 
 
 class ShowDiff term where
-  showDiff :: (Carrier sig m, Member (Reader Config) sig, Member Telemetry sig, MonadIO m) => Edit (Blob, term Loc) (Blob, term Loc) -> m Builder
+  showDiff :: (Has (Reader Config) sig m, Has Telemetry sig m, MonadIO m) => Edit (Blob, term Loc) (Blob, term Loc) -> m Builder
 
 instance (DiffTerms term, Foldable (Syntax term), Show1 (Syntax term)) => ShowDiff term where
   showDiff = serialize Show <=< diffTerms
 
 
-diffTerms :: (DiffTerms term, Foldable (Syntax term), Member Telemetry sig, Carrier sig m, MonadIO m)
+diffTerms :: (DiffTerms term, Foldable (Syntax term), Has Telemetry sig m, MonadIO m)
   => Edit (Blob, term ann) (Blob, term ann) -> m (Diff (Syntax term) ann ann)
 diffTerms terms = time "diff" languageTag $ do
   let diff = diffTermPair (bimap snd snd terms)

@@ -32,10 +32,10 @@ import           Source.Loc as Loc
 import           Tags.Tagging
 import qualified Tags.Tagging.Precise as Precise
 
-legacyParseSymbols :: (Member Distribute sig, Member (Error SomeException) sig, Member (Reader PerLanguageModes) sig, Member Parse sig, Carrier sig m, Traversable t) => t Blob -> m Legacy.ParseTreeSymbolResponse
+legacyParseSymbols :: (Has Distribute sig m, Has (Error SomeException) sig m, Has (Reader PerLanguageModes) sig m, Has Parse sig m, Traversable t) => t Blob -> m Legacy.ParseTreeSymbolResponse
 legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> distributeFoldMap go blobs
   where
-    go :: (Member (Error SomeException) sig, Member (Reader PerLanguageModes) sig, Member Parse sig, Carrier sig m) => Blob -> m [Legacy.File]
+    go :: (Has (Error SomeException) sig m, Has (Reader PerLanguageModes) sig m, Has Parse sig m) => Blob -> m [Legacy.File]
     go blob@Blob{..} = asks toTagsParsers >>= \ p -> parseWith p (pure . renderToSymbols) blob `catchError` (\(SomeException _) -> pure (pure emptyFile))
       where
         emptyFile = tagsToFile []
@@ -59,15 +59,15 @@ legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> distributeFoldMap 
           , symbolSpan = converting #? Loc.span loc
           }
 
-parseSymbolsBuilder :: (Member Distribute sig, Member (Error SomeException) sig, Member Parse sig, Member (Reader Config) sig, Member (Reader PerLanguageModes) sig, Carrier sig m, Traversable t) => Format ParseTreeSymbolResponse -> t Blob -> m Builder
+parseSymbolsBuilder :: (Has Distribute sig m, Has (Error SomeException) sig m, Has Parse sig m, Has (Reader Config) sig m, Has (Reader PerLanguageModes) sig m, Traversable t) => Format ParseTreeSymbolResponse -> t Blob -> m Builder
 parseSymbolsBuilder format blobs = parseSymbols blobs >>= serialize format
 
-parseSymbols :: (Member Distribute sig, Member (Error SomeException) sig, Member (Reader PerLanguageModes) sig, Member Parse sig, Carrier sig m, Traversable t) => t Blob -> m ParseTreeSymbolResponse
+parseSymbols :: (Has Distribute sig m, Has (Error SomeException) sig m, Has (Reader PerLanguageModes) sig m, Has Parse sig m, Traversable t) => t Blob -> m ParseTreeSymbolResponse
 parseSymbols blobs = do
   terms <- distributeFor blobs go
   pure $ defMessage & P.files .~ toList terms
   where
-    go :: (Member (Error SomeException) sig, Member (Reader PerLanguageModes) sig, Member Parse sig, Carrier sig m) => Blob -> m File
+    go :: (Has (Error SomeException) sig m, Has (Reader PerLanguageModes) sig m, Has Parse sig m) => Blob -> m File
     go blob@Blob{..} = catching $ tagsToFile <$> tagsForBlob blob
       where
         catching m = m `catchError` (\(SomeException e) -> pure $ errorFile (show e))
@@ -96,7 +96,7 @@ parseSymbols blobs = do
           & P.maybe'span ?~ converting # Loc.span loc
           & P.maybe'docs .~ fmap (flip (set P.docstring) defMessage) docs
 
-tagsForBlob :: (Carrier sig m, Member (Error SomeException) sig, Member Parse sig, Member (Reader PerLanguageModes) sig) => Blob -> m [Tag]
+tagsForBlob :: (Has (Error SomeException) sig m, Has Parse sig m, Has (Reader PerLanguageModes) sig m) => Blob -> m [Tag]
 tagsForBlob blob = asks toTagsParsers >>= \p -> parseWith p (pure . tags symbolsToSummarize blob) blob
 
 symbolsToSummarize :: [Text]
