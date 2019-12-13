@@ -94,6 +94,7 @@ expressionChoices =
   , unless
   , until'
   , while'
+  , do'
   ]
   where
     mk s construct = makeTerm <$> symbol s <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional ((symbol ArgumentList <|> symbol ArgumentList') *> children expressions))
@@ -294,6 +295,9 @@ while' :: Assignment (Term Loc)
 while' =
       makeTerm <$> symbol While         <*> children      (Statement.While <$> expression <*> expressions)
   <|> makeTerm <$> symbol WhileModifier <*> children (flip Statement.While <$> expression <*> expression)
+
+do' :: Assignment (Term Loc)
+do' = symbol Do *> children expressions
 
 until' :: Assignment (Term Loc)
 until' =
