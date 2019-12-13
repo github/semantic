@@ -9,6 +9,8 @@ packages: .
 
 jobs: $ncpus
 
+allow-newer: all:template-haskell
+
 package semantic
   ghc-options: -Werror
 
