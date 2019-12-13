@@ -35,7 +35,7 @@ jobs:
       name: Cache dist-newstyle
       with:
         path: dist-newstyle
-        key: ${{ runner.os }}-${{ matrix.ghc }}-fused-effects-dist
+        key: ${{ runner.os }}-${{ matrix.ghc }}-semantic-dist
 
     - name: Install dependencies
       run: |
