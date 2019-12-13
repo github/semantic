@@ -21,7 +21,7 @@ import           Control.Carrier.Fresh.Strict
 import           Control.Carrier.NonDet.Church
 import           Control.Carrier.Reader hiding (Local)
 import           Control.Carrier.State.Strict
-import           Control.Monad (guard, (<=<))
+import           Control.Monad ((<=<))
 import           Data.Function (fix)
 import qualified Data.IntMap as IntMap
 import qualified Data.IntSet as IntSet
