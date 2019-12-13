@@ -63,6 +63,13 @@ instance (ToTags l, ToTags r) => ToTagsBy 'Custom (l :+: r) where
   tags' (L1 l) = tags l
   tags' (R1 r) = tags r
 
+keywordFunctionCall
+  :: ( Has (Reader Source) sig m
+     , Has (Writer Tags.Tags) sig m
+     , Generic1 t
+     , Tags.GFoldable1 ToTags (Rep1 t)
+     )
+  => t Loc -> Loc -> Range -> Text -> m ()
 keywordFunctionCall t loc range name = do
   src <- ask @Source
   let sliced = slice src range
