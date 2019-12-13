@@ -64,13 +64,13 @@ eval Analysis{..} eval = \case
       f' <- eval f
       a' <- eval a
       apply eval f' a'
-    Unit -> A.abstract A.Unit
-    Bool b -> A.abstract (A.Bool b)
+    Unit -> A.unit
+    Bool b -> A.bool b
     If c t e -> do
       A.Bool c' <- eval c >>= A.concretize
       if c' then eval t else eval e
-    String s -> A.abstract (A.String s)
-    Load p -> eval p >>= A.concretize >> A.abstract A.Unit -- FIXME: add a load command or something
+    String s -> A.string s
+    Load p -> eval p >>= A.concretize >> A.unit -- FIXME: add a load command or something
     Record fields -> traverse (traverse eval) fields >>= record
     a :. b -> do
       a' <- ref a
@@ -78,7 +78,7 @@ eval Analysis{..} eval = \case
     a :? b -> do
       a' <- ref a
       mFound <- a' ... b
-      A.abstract (A.Bool (isJust mFound))
+      A.bool (isJust mFound)
 
     a := b -> do
       b' <- eval b
