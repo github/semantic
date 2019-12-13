@@ -169,8 +169,6 @@ typecheckingAnalysis = Analysis{..}
           unify (Alg (_A :-> _B)) f
           unify _A a
           pure _B
-        string _ = pure (Alg String)
-        asString s = unify (Alg String) s $> mempty
         record fields = do
           fields' <- for fields $ \ (k, v) -> do
             addr <- alloc @Name k

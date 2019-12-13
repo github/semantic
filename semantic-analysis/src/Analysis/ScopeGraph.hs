@@ -102,8 +102,6 @@ scopeGraphAnalysis = Analysis{..}
           A.assign @Name @(ScopeGraph Name) name mempty
           bind name addr (eval body)
         apply _ f a = pure (f <> a)
-        string _ = pure mempty
-        asString _ = pure mempty
         record fields = do
           fields' <- for fields $ \ (k, v) -> do
             addr <- alloc k
