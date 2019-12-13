@@ -1,11 +1,13 @@
-{-# LANGUAGE DeriveFunctor, DeriveGeneric, FlexibleContexts #-}
+{-# LANGUAGE DeriveFunctor, DeriveGeneric, FlexibleContexts, LambdaCase #-}
 module Analysis.Effect.Domain
 ( -- * Domain effect
   abstract
 , concretize
 , unit
 , bool
+, asBool
 , string
+, asString
 , Domain(..)
   -- * Re-exports
 , Algebra
@@ -15,6 +17,8 @@ module Analysis.Effect.Domain
 
 import Analysis.Intro as A
 import Control.Algebra
+import Control.Monad ((>=>))
+import Control.Monad.Fail as Fail
 import Data.Text (Text)
 import GHC.Generics (Generic1)
 
@@ -31,8 +35,18 @@ unit = abstract A.Unit
 bool :: Has (Domain abstract) sig m => Bool -> m abstract
 bool = abstract . A.Bool
 
+asBool :: (Has (Domain abstract) sig m, MonadFail m) => abstract -> m Bool
+asBool = concretize >=> \case
+  A.Bool b -> pure b
+  other    -> typeError "Bool" other
+
 string :: Has (Domain abstract) sig m => Text -> m abstract
 string = abstract . A.String
+
+asString :: (Has (Domain abstract) sig m, MonadFail m) => abstract -> m Text
+asString = concretize >=> \case
+  A.String t -> pure t
+  other      -> typeError "String" other
 
 
 data Domain abstract m k
@@ -42,3 +56,7 @@ data Domain abstract m k
 
 instance HFunctor (Domain abstract)
 instance Effect   (Domain abstract)
+
+
+typeError :: (Show a, MonadFail m) => String -> a -> m b
+typeError expected actual = Fail.fail $ "expected " <> expected <> ", got " <> show actual
