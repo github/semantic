@@ -1,4 +1,6 @@
-{-# LANGUAGE FlexibleContexts, FlexibleInstances, GADTs, GeneralizedNewtypeDeriving, KindSignatures, MultiParamTypeClasses, RecordWildCards, ScopedTypeVariables, StandaloneDeriving, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE FlexibleContexts, FlexibleInstances, GADTs, GeneralizedNewtypeDeriving, KindSignatures,
+             MultiParamTypeClasses, RecordWildCards, ScopedTypeVariables, StandaloneDeriving, TypeOperators,
+             UndecidableInstances #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Semantic.Task
 ( TaskC
@@ -83,8 +85,6 @@ serialize :: Has (Reader Config) sig m
 serialize format input = do
   formatStyle <- asks (Flag.choose IsTerminal Plain Colourful . configIsTerminal)
   pure (runSerialize formatStyle format input)
-
-deriving instance MonadFail m => MonadFail (CatchC m)
 
 data TaskSession
   = TaskSession

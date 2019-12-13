@@ -4,7 +4,6 @@ module Data.Abstract.Address.Precise
 ) where
 
 import           Control.Abstract
-import           Control.Abstract.ScopeGraph (AllocatorC (..))
 import           Control.Algebra
 import qualified Data.Set as Set
 import           Prologue
