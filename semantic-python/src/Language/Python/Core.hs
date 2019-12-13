@@ -321,7 +321,7 @@ instance Compile Py.Lambda where
           unparam _ = Nothing
       body' <- compile body cc next
       let params = maybe [] unparams parameters
-      pure . locate it. . lams (catMaybes (fmap unparam params)) $ body'
+      pure . locate it . lams (catMaybes (fmap unparam params)) $ body'
 
 instance Compile Py.List
 instance Compile Py.ListComprehension
