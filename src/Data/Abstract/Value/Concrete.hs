@@ -14,15 +14,12 @@ import qualified Control.Carrier.Resumable.Either as Either
 import qualified Control.Carrier.Resumable.Resume as With
 import           Data.List (genericIndex, genericLength)
 import qualified Data.Map.Strict as Map
-import           Data.Scientific (Scientific, coefficient, normalize)
 import           Data.Scientific.Exts
 import           Data.Text (pack)
 
 import           Control.Abstract hiding
     (Array (..), Boolean (..), Function (..), Hash (..), Numeric (..), Object (..), String (..), Unit (..), While (..))
 import qualified Control.Abstract as Abstract
-import           Control.Abstract.Heap (scopeLookup)
-import           Control.Abstract.ScopeGraph (Allocator, ScopeError)
 import           Control.Algebra
 import           Control.Effect.Interpose
 import           Data.Abstract.BaseError
