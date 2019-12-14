@@ -75,7 +75,7 @@ instance GValue Par1 where
 class GFields f where
   gfields :: ToJSON a => [(Text, Value)] -> f a -> [(Text, Value)]
 
--- gvalue is a wrapper that calls to @toJSON@ (for leaf node types such as Text) or recurses via @marshal@
+-- gvalue is a wrappe`r that calls to @toJSON@ (for leaf node types such as Text) or recurses via @marshal@
 -- since it's a function on types, we need a typeclass.
 class GValue f where
   gvalue :: (ToJSON a) => f a -> Value
