@@ -10,7 +10,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE DeriveGeneric #-}
 
-module TreeSitter.Marshal.JSON where
+module Marshal.JSON where
 
 import Data.Aeson as Aeson
 import GHC.Generics
