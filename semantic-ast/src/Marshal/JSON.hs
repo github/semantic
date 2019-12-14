@@ -40,7 +40,6 @@ class GMarshalJSON f where
 
 -- We need a marshal instance for the node datatype we wish to serialize.
 instance MarshalJSON Bar
-
 -- Generic instances
 
 -- Stores meta-data for datatypes
@@ -62,7 +61,6 @@ instance (GFields f, GFields g) => GFields (f :*: g) where
 instance (GValue p, Selector s) => GFields (S1 s p) where
   gfields acc x = (Text.pack (selName x), gvalue (unM1 x)) : acc
 -- knows what the type of x is, whereas M1 has parameters that can be instantiated to anything
-
 
 -- GValue for leaves
 instance ToJSON a => GValue (K1 i a) where
