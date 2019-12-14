@@ -37,7 +37,7 @@ common haskell
 
 library
   import:              haskell
-  exposed-modules:     TreeSitter.Marshal.JSON
+  exposed-modules:     Marshal.JSON
   -- other-modules:
   -- other-extensions:
   build-depends:       base ^>=4.12.0.0
