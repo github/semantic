@@ -14,10 +14,10 @@ module Marshal.JSON where
 
 import Data.Aeson as Aeson
 import GHC.Generics
-import Data.Proxy
 import Data.Text (Text)
 import qualified Data.Text as Text
-import GHC.TypeLits
+-- import Data.Proxy
+-- import GHC.TypeLits
 
 -- Test datatype that will go away: this is just to get us started!
 data Bar a = Bar
