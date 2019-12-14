@@ -10,7 +10,9 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE DeriveGeneric #-}
 
-module Marshal.JSON where
+module Marshal.JSON
+( marshal
+) where
 
 import Data.Aeson as Aeson
 import GHC.Generics
