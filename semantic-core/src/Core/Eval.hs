@@ -39,12 +39,12 @@ eval :: forall address value m sig
         , MonadFail m
         , Semigroup value
         )
-     => Analysis (Term (Ann Span :+: Core)) address value m
-     -> (Term (Ann Span :+: Core) Name -> m value)
-     -> (Term (Ann Span :+: Core) Name -> m value)
+     => Analysis (Term (Ann Span :+: Core :+: Intro)) address value m
+     -> (Term (Ann Span :+: Core :+: Intro) Name -> m value)
+     -> (Term (Ann Span :+: Core :+: Intro) Name -> m value)
 eval Analysis{..} eval = \case
   Var n -> lookupEnv' n >>= deref' n
-  Alg (R c) -> case c of
+  Alg (R (L c)) -> case c of
     Rec (Named (Ignored n) b) -> do
       addr <- A.alloc @address n
       v <- A.bind n addr (eval (instantiate1 (pure n) b))
@@ -63,12 +63,9 @@ eval Analysis{..} eval = \case
       f' <- eval f
       a' <- eval a
       apply eval f' a'
-    Unit -> A.unit
-    Bool b -> A.bool b
     If c t e -> do
       c' <- eval c >>= A.asBool
       if c' then eval t else eval e
-    String s -> A.string s
     Load p -> eval p >>= A.asString >> A.unit -- FIXME: add a load command or something
     Record fields -> traverse (traverse eval) fields >>= record
     a :. b -> do
@@ -83,6 +80,10 @@ eval Analysis{..} eval = \case
       b' <- eval b
       addr <- ref a
       b' <$ A.assign addr b'
+  Alg (R (R c)) -> case c of
+    Unit -> A.unit
+    Bool b -> A.bool b
+    String s -> A.string s
   Alg (L (Ann span c)) -> local (const span) (eval c)
   where freeVariable s = fail ("free variable: " <> s)
         uninitialized s = fail ("uninitialized variable: " <> s)
@@ -93,7 +94,7 @@ eval Analysis{..} eval = \case
 
         ref = \case
           Var n -> lookupEnv' n
-          Alg (R c) -> case c of
+          Alg (R (L c)) -> case c of
             If c t e -> do
               c' <- eval c >>= A.asBool
               if c' then ref t else ref e
@@ -101,17 +102,18 @@ eval Analysis{..} eval = \case
               a' <- ref a
               a' ... b >>= maybe (freeVariable (show b)) pure
             c -> invalidRef (show c)
+          Alg (R (R c)) -> invalidRef (show c)
           Alg (L (Ann span c)) -> local (const span) (ref c)
 
 
-prog1 :: Has Core sig t => File (t Name)
+prog1 :: (Has Core sig t, Has Intro sig t) => File (t Name)
 prog1 = fromBody $ lam (named' "foo")
   (    named' "bar" :<- pure "foo"
   >>>= Core.if' (pure "bar")
     (Core.bool False)
     (Core.bool True))
 
-prog2 :: Has Core sig t => File (t Name)
+prog2 :: (Has Core sig t, Has Intro sig t) => File (t Name)
 prog2 = fromBody $ fileBody prog1 $$ Core.bool True
 
 prog3 :: Has Core sig t => File (t Name)
@@ -120,14 +122,14 @@ prog3 = fromBody $ lams [named' "foo", named' "bar", named' "quux"]
     (pure "bar")
     (pure "foo"))
 
-prog4 :: Has Core sig t => File (t Name)
+prog4 :: (Has Core sig t, Has Intro sig t) => File (t Name)
 prog4 = fromBody
   (    named' "foo" :<- Core.bool True
   >>>= Core.if' (pure "foo")
     (Core.bool True)
     (Core.bool False))
 
-prog5 :: (Has (Ann Span) sig t, Has Core sig t) => File (t Name)
+prog5 :: (Has (Ann Span) sig t, Has Core sig t, Has Intro sig t) => File (t Name)
 prog5 = fromBody $ ann (do'
   [ Just (named' "mkPoint") :<- lams [named' "_x", named' "_y"] (ann (Core.record
     [ ("x", ann (pure "_x"))
@@ -138,7 +140,7 @@ prog5 = fromBody $ ann (do'
   , Nothing :<- ann (ann (pure "point") Core.... "y") .= ann (ann (pure "point") Core.... "x")
   ])
 
-prog6 :: Has Core sig t => [File (t Name)]
+prog6 :: (Has Core sig t, Has Intro sig t) => [File (t Name)]
 prog6 =
   [ (fromBody (Core.record
     [ ("dep", Core.record [ ("var", Core.bool True) ]) ]))
@@ -150,7 +152,7 @@ prog6 =
     { filePath = Path.absRel "main" }
   ]
 
-ruby :: (Has (Ann Span) sig t, Has Core sig t) => File (t Name)
+ruby :: (Has (Ann Span) sig t, Has Core sig t, Has Intro sig t) => File (t Name)
 ruby = fromBody $ annWith callStack (rec (named' __semantic_global) (do' statements))
   where statements =
           [ Just "Class" :<- record

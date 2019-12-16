@@ -52,6 +52,7 @@ pattern SingleIdentifier name <- Py.ExpressionList
 type CoreSyntax sig t = ( Has Core sig t
                         , Has (Ann Span) sig t
                         , Has Failure sig t
+                        , Has Intro sig t
                         , Foldable t
                         )
 
@@ -75,7 +76,7 @@ toplevelCompile py = compile py pure none
 
 -- | TODO: This is not right, it should be a reference to a Preluded
 -- NoneType instance, but it will do for now.
-none :: Has Core sig t => t Name
+none :: Has Intro sig t => t Name
 none = unit
 
 locate :: ( HasField "ann" syntax Span
@@ -192,7 +193,8 @@ instance Compile Py.Call where
 
 instance Compile Py.ClassDefinition where
   compile it@Py.ClassDefinition { body = pybody, name = Py.Identifier _ann (Name -> n) } cc next = do
-    let buildTypeCall _ = do
+    let buildTypeCall :: (Has Core syn t, Has Intro syn t, Has (Reader Bindings) sig m) => w -> m (t Name)
+        buildTypeCall _ = do
           bindings <- asks @Bindings (toList . unBindings)
           let buildName n = (n, pure n)
               contents = record . fmap buildName $ bindings
