@@ -47,6 +47,9 @@ echo "-hide-all-packages"
 # Emit package flags from the environment file, removing comments & prefixing with -
 cabal exec --builddir=$repl_builddir -v0 bash -- -c 'cat $GHC_ENVIRONMENT' | grep -v '^--' | sed -e 's/^/-/'
 
+# Explicit package flags for the -inplace packages (dependencies listed in cabal.project source-repository-package stanzas).
+echo "-package fused-syntax"
+
 echo "-XHaskell2010"
 echo "-XStrictData"
 
