@@ -43,8 +43,10 @@ jobs:
         cabal v2-configure --disable-optimization --enable-benchmarks --enable-tests --write-ghc-environment-files=always -j2
         cabal v2-build --only-dependencies
 
-    - name: Haskell Linter
-      uses: domdere/haskell-lint-action@v1.0.2
+    - name: hlint
+      run: |
+        cabal install hlint
+        cabal exec hlint -- src semantic-python
 
     - name: Build & test
       run: |
