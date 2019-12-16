@@ -5,6 +5,7 @@ packages: .
           semantic-java
           semantic-json
           semantic-python
+          semantic-ruby
           semantic-tags
 
 jobs: $ncpus
