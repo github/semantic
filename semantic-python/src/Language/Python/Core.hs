@@ -341,7 +341,11 @@ instance Compile Py.Module where
     in fmap (locate it) . foldr compile buildRecord stmts
 
 instance Compile Py.NamedExpression
-instance Compile Py.None
+
+instance Compile Py.None where
+  -- None is not overridable, and thus always points to the prelude's None.
+  compile _it cc _ = cc (pure "__semantic_prelude" ... "None")
+
 instance Compile Py.NonlocalStatement
 instance Compile Py.NotOperator
 

@@ -10,8 +10,16 @@
 
   str <- type "str" object #record { __new__: \prim -> instance #unit prim #record{} };
 
+  NoneType <- type "None" object #record { __new__: \prim -> instance #unit prim #record{} };
+  None <- NoneType.__slots.__new__ #unit;
+
   getitem <- \super -> \item -> \attr ->
     if item.slots.?attr then item.slots.attr else #unit;
 
-  #record { type: type, object: object, str: str, getitem: getitem}
+  #record { type: type
+          , object: object
+          , str: str
+          , NoneType: NoneType
+          , None: None
+          , getitem: getitem}
 }
