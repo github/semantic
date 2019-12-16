@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, RecordWildCards, TypeApplications #-}
+{-# LANGUAGE FlexibleContexts, RecordWildCards, OverloadedStrings, TypeApplications #-}
 {-# OPTIONS_GHC -O1 #-}
 module Main (main) where
 
@@ -17,6 +17,7 @@ import           Data.Foldable
 import           Data.Function ((&))
 import           Data.Language (LanguageMode (..), PerLanguageModes (..))
 import           Data.List
+import qualified Data.Text as Text
 import           Data.Set (Set)
 import qualified Data.Set as Set
 import           Data.Traversable
@@ -108,17 +109,17 @@ buildExamples session lang tsDir = do
                    -> HUnit.assertFailure ("Parse errors (a la carte) " <> show e)
         ([x], [y]) -> do
           HUnit.assertEqual "Expected paths to be equal" (x^.path) (y^.path)
-          let xSymbols = sort $ toListOf (symbols . traverse . symbol) x
-              ySymbols = sort $ toListOf (symbols . traverse . symbol) y
-              delta = xSymbols \\ ySymbols
+          let aLaCarteSymbols = sort . filterALaCarteSymbols (languageName lang) $ toListOf (symbols . traverse . symbol) x
+              preciseSymbols = sort $ toListOf (symbols . traverse . symbol) y
+              delta = aLaCarteSymbols \\ preciseSymbols
               msg = "Found in a la carte, but not precise: "
                   <> show delta
                   <> "\n"
                   <> "Found in precise but not a la carte: "
-                  <> show (ySymbols \\ xSymbols)
+                  <> show (preciseSymbols \\ aLaCarteSymbols)
                   <> "\n"
-                  <> "Expected: " <> show xSymbols <> "\n"
-                  <> "But got:" <> show ySymbols
+                  <> "Expected: " <> show aLaCarteSymbols <> "\n"
+                  <> "But got:" <> show preciseSymbols
 
           HUnit.assertBool ("Expected symbols to be equal.\n" <> msg) (null delta)
           pure ()
@@ -126,6 +127,30 @@ buildExamples session lang tsDir = do
       (Left e1, Left e2) -> HUnit.assertFailure ("Unable to parse (both)" <> show (displayException e1) <> show (displayException e2))
       (_, Left e)        -> HUnit.assertFailure ("Unable to parse (precise)" <> show (displayException e))
       (Left e, _)        -> HUnit.assertFailure ("Unable to parse (a la carte)" <> show (displayException e))
+
+
+filterALaCarteSymbols :: String -> [Text.Text] -> [Text.Text]
+filterALaCarteSymbols "ruby" symbols
+  -- = filterBlanks
+  -- . removeSetterEqualSign
+  = filterOutInstanceVariables
+  . filterOutBuiltInMethods
+  $ symbols
+  where
+    -- filterBlanks = filter (not . Text.null)
+    -- removeSetterEqualSign = fmap (Text.dropWhileEnd (== '='))
+    filterOutInstanceVariables = filter (not . Text.isPrefixOf "@")
+    filterOutBuiltInMethods = filter (`notElem` blacklist)
+    blacklist =
+      [ "alias"
+      , "load"
+      , "require_relative"
+      , "require"
+      , "super"
+      , "undef"
+      , "defined?"
+      ]
+filterALaCarteSymbols _      symbols = symbols
 
 aLaCarteLanguageModes :: PerLanguageModes
 aLaCarteLanguageModes = PerLanguageModes

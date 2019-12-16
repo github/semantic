@@ -6,13 +6,10 @@ module Language.Ruby.Tags
 import           AST.Element
 import           Control.Effect.Reader
 import           Control.Effect.Writer
-import           Data.Maybe (listToMaybe)
-import           Data.Monoid (Ap(..))
-import           Data.List.NonEmpty (NonEmpty(..))
+import           Data.Monoid (Ap (..))
 import           Data.Text as Text
 import           GHC.Generics
 import           Source.Loc
-import           Source.Range
 import           Source.Source as Source
 import           Tags.Tag
 import qualified Tags.Tagging.Precise as Tags
@@ -58,7 +55,18 @@ instance (ToTags l, ToTags r) => ToTagsBy 'Custom (l :+: r) where
   tags' (L1 l) = tags l
   tags' (R1 r) = tags r
 
+nameBlacklist :: [Text]
+nameBlacklist =
+  [ "alias"
+  , "load"
+  , "require_relative"
+  , "require"
+  , "super"
+  , "undef"
+  ]
+
 yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text -> Kind -> Loc -> Range -> m ()
+yieldTag name Call _ _ | name `elem` nameBlacklist = pure ()
 yieldTag name kind loc range = do
   src <- ask @Source
   let sliced = slice src range
@@ -148,10 +156,6 @@ instance ToTagsBy 'Custom Rb.MethodCall where
       _ -> gtags t
     where
       yield name = yieldTag name Call loc range >> gtags t
-
--- docComment :: Source -> (Rb.CompoundStatement :+: Rb.SimpleStatement) Loc -> Maybe Text
--- docComment src (R1 (Rb.SimpleStatement (Prj Rb.ExpressionStatement { extraChildren = L1 (Prj (Rb.Expression (Prj (Rb.PrimaryExpression (Prj Rb.String { ann }))))) :|_ }))) = Just (toText (slice src (byteRange ann)))
--- docComment _ _ = Nothing
 
 gtags
   :: ( Has (Reader Source) sig m
