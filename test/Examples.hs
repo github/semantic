@@ -14,18 +14,19 @@ import           Data.Blob
 import qualified Data.ByteString.Lazy.Char8 as BLC
 import qualified Data.ByteString.Streaming.Char8 as ByteStream
 import           Data.Foldable
-import           Data.Traversable
 import           Data.Function ((&))
 import           Data.Language (LanguageMode (..), PerLanguageModes (..))
 import           Data.List
 import           Data.Set (Set)
 import qualified Data.Set as Set
+import           Data.Traversable
 import qualified Streaming.Prelude as Stream
 import           System.FilePath.Glob
 import           System.Path ((</>))
 import qualified System.Path as Path
 import qualified System.Process as Process
-
+import qualified Test.Tasty as Tasty
+import qualified Test.Tasty.HUnit as HUnit
 
 import Data.Flag
 import Proto.Semantic as P hiding (Blob, BlobPair)
@@ -34,9 +35,6 @@ import Semantic.Api.Symbols (parseSymbols)
 import Semantic.Config as Config
 import Semantic.Task
 import Semantic.Task.Files
-
-import qualified Test.Tasty as Tasty
-import qualified Test.Tasty.HUnit as HUnit
 
 data LanguageExample
   = LanguageExample
@@ -156,8 +154,6 @@ main = withOptions testOptions $ \ config logger statter -> do
   let session = TaskSession config "-" False logger statter
 
   allTests <- forConcurrently examples $ \lang@LanguageExample{..} -> do
-    -- let tsLang = Path.relDir ("tree-sitter-" <> languageName)
-    -- let tsDir = Path.relDir "tmp/haskell-tree-sitter" </> tsLang </> Path.relDir "vendor" </> tsLang
     let tsDir = Path.relDir "tmp" </> Path.relDir (languageName <> "-examples")
     buildExamples session lang tsDir
 
