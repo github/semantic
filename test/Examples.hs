@@ -14,6 +14,7 @@ import           Data.Blob
 import qualified Data.ByteString.Lazy.Char8 as BLC
 import qualified Data.ByteString.Streaming.Char8 as ByteStream
 import           Data.Foldable
+import           Data.Traversable
 import           Data.Function ((&))
 import           Data.Language (LanguageMode (..), PerLanguageModes (..))
 import           Data.List
@@ -41,26 +42,23 @@ data LanguageExample
   = LanguageExample
   { languageName             :: String
   , languageExtension        :: String
-  , languageExampleDir       :: Path.RelDir
   , languageKnownFailuresTxt :: Maybe Path.RelFile
   } deriving (Eq, Show)
 
-le :: String -> String -> Path.RelDir -> Maybe Path.RelFile -> LanguageExample
+le :: String -> String -> Maybe Path.RelFile -> LanguageExample
 le = LanguageExample
 
 examples :: [LanguageExample]
 examples =
-  [ le "python" ".py" examples (Just $ Path.relFile "script/known_failures.txt")
-  -- , le "ruby" ".rb" examples (Just $ Path.relFile "script/known_failures.txt")
-  -- , le "typescript" ".ts" examples (Just $ Path.relFile "typescript/script/known_failures.txt")
-  -- , le "typescript" ".tsx" examples (Just $ Path.relFile "typescript/script/known_failures.txt")
-  -- , le "typescript" ".js" examples Nothing -- parse JavaScript with TypeScript parser.
+  -- [ le "python" "**/*.py" Nothing -- (Just $ Path.relFile "script/known_failures.txt")
+  [ le "ruby" "**/*.rb" Nothing -- (Just $ Path.relFile "script/known_failures.txt")
+  -- , le "typescript" "**/*.[jt]s*" Nothing -- (Just $ Path.relFile "typescript/script/known_failures.txt")
+  -- , le "typescript" "**/*.tsx" Nothing
+  -- , le "javascript" ".js" examples Nothing -- parse JavaScript with TypeScript parser.
   -- , le "go" ".go" examples (Just $ Path.relFile "script/known-failures.txt")
 
   -- TODO: Java assignment errors need to be investigated
-  -- , le "java" ".java" "examples/guava" (Just "script/known_failures_guava.txt")
-  -- , le "java" ".java" "examples/elasticsearch" (Just "script/known_failures_elasticsearch.txt")
-  -- , le "java" ".java" "examples/RxJava" (Just "script/known_failures_RxJava.txt")
+  -- , le "java" ".java" examples (Just $ Path.relFile "script/known_failures_guava.txt")
 
   -- TODO: Haskell assignment errors need to be investigated
   -- , le "haskell" ".hs" "examples/effects" (Just "script/known-failures-effects.txt")
@@ -68,16 +66,15 @@ examples =
   -- , le "haskell" ".hs" "examples/ivory" (Just "script/known-failures-ivory.txt")
 
   -- , ("php", ".php") -- TODO: No parse-examples in tree-sitter yet
-  ] where examples = Path.relDir "examples"
+  ]-- where examples = Path.relDir "examples"
 
 buildExamples :: TaskSession -> LanguageExample -> Path.RelDir -> IO Tasty.TestTree
 buildExamples session lang tsDir = do
   knownFailures <- knownFailuresForPath tsDir (languageKnownFailuresTxt lang)
-  files <- globDir1 (compile ("**/*" <> languageExtension lang)) (Path.toString (tsDir </> languageExampleDir lang))
+  files <- globDir1 (compile (languageExtension lang)) (Path.toString tsDir)
   let paths = Path.relFile <$> files
   trees <- for paths $ \file -> do
-    let name = "[" <> languageName lang <> "] " <> Path.toString file
-    pure . HUnit.testCaseSteps name $ \step -> do
+    pure . HUnit.testCaseSteps (Path.toString file) $ \step -> do
       -- Use alacarte language mode
       step "a la carte"
       alacarte <- runTask session (runParse (parseSymbolsFilePath aLaCarteLanguageModes file))
@@ -102,14 +99,14 @@ buildExamples session lang tsDir = do
 
     assertMatch filePath knownFailures a b = case (a, b) of
       (Right a, Right b) -> case (toList (a^.files), toList (b^.files)) of
-        ([x], [y]) | (e1:_) <- toList (x^.errors)
-                   , (e2:_) <- toList (y^.errors)
+        ([x], [y]) | e1:_ <- toList (x^.errors)
+                   , e2:_ <- toList (y^.errors)
                    -> if Set.member filePath knownFailures
                       then pure ()
                       else HUnit.assertFailure ("Parse errors (both) " <> show e1 <> show e2)
-        (_, [y])   | (e:_) <- toList (y^.errors)
+        (_, [y])   | e:_ <- toList (y^.errors)
                    -> HUnit.assertFailure ("Parse errors (precise) " <> show e)
-        ([x], _)   | (e:_) <- toList (x^.errors)
+        ([x], _)   | e:_ <- toList (x^.errors)
                    -> HUnit.assertFailure ("Parse errors (a la carte) " <> show e)
         ([x], [y]) -> do
           HUnit.assertEqual "Expected paths to be equal" (x^.path) (y^.path)
@@ -135,11 +132,15 @@ buildExamples session lang tsDir = do
 aLaCarteLanguageModes :: PerLanguageModes
 aLaCarteLanguageModes = PerLanguageModes
   { pythonMode = ALaCarte
+  , rubyMode = ALaCarte
+  -- , typescriptMode = ALaCarte
   }
 
 preciseLanguageModes :: PerLanguageModes
 preciseLanguageModes = PerLanguageModes
   { pythonMode = Precise
+  , rubyMode = Precise
+  -- , typescriptMode = Precise
   }
 
 testOptions :: Config.Options
@@ -155,8 +156,9 @@ main = withOptions testOptions $ \ config logger statter -> do
   let session = TaskSession config "-" False logger statter
 
   allTests <- forConcurrently examples $ \lang@LanguageExample{..} -> do
-    let tsLang = Path.relDir ("tree-sitter-" <> languageName)
-    let tsDir = Path.relDir "tmp/haskell-tree-sitter" </> tsLang </> Path.relDir "vendor" </> tsLang
+    -- let tsLang = Path.relDir ("tree-sitter-" <> languageName)
+    -- let tsDir = Path.relDir "tmp/haskell-tree-sitter" </> tsLang </> Path.relDir "vendor" </> tsLang
+    let tsDir = Path.relDir "tmp" </> Path.relDir (languageName <> "-examples")
     buildExamples session lang tsDir
 
   Tasty.defaultMain $ Tasty.testGroup "parse-examples" allTests
