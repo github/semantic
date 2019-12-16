@@ -174,6 +174,11 @@ languageModes = Language.PerLanguageModes
                   <> metavar "ALaCarte|Precise"
                   <> value Language.ALaCarte
                   <> showDefault)
+  <*> option auto (  long "ruby-mode"
+                  <> help "The AST representation to use for Ruby sources"
+                  <> metavar "ALaCarte|Precise"
+                  <> value Language.ALaCarte
+                  <> showDefault)
 
 filePathReader :: ReadM File
 filePathReader = fileForPath <$> str

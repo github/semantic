@@ -109,7 +109,7 @@ analysisParsers = Map.fromList
   , javascriptParser
   , phpParser
   , pythonParserALaCarte
-  , rubyParser
+  , rubyParserALaCarte
   , typescriptParser
   , tsxParser
   ]
