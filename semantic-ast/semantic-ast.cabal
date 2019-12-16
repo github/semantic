@@ -40,7 +40,7 @@ library
   exposed-modules:
   -- other-modules:
   -- other-extensions:
-  build-depends:       base >= 4.13 && < 4.14
+  build-depends:       base ^>= 4.13
                      , tree-sitter ^>= 0.7.1
                      , semantic-source ^>= 0.0
                      , tree-sitter-python ^>= 0.8
