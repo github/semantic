@@ -1,4 +1,4 @@
-{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ForeignFunctionInterface, RecordWildCards #-}
 module Semantic.Config
   ( Config (..)
   , defaultConfig
@@ -21,8 +21,9 @@ module Semantic.Config
   ) where
 
 import           Data.Duration
-import           Data.Error (LogPrintSource(..))
+import           Data.Error (LogPrintSource (..))
 import           Data.Flag
+import           Foreign.C.Types
 import           Network.HostName
 import           Network.URI
 import           Prologue
@@ -33,19 +34,19 @@ import qualified Semantic.Telemetry.Stat as Stat
 import           Semantic.Version (buildSHA)
 import           System.Environment
 import           System.IO (hIsTerminalDevice, stdout)
-import           System.Posix.Process
-import           System.Posix.Types
 
 data IsTerminal       = IsTerminal
 data FailTestParsing  = FailTestParsing
 data FailOnWarning    = FailOnWarning
 data FailOnParseError = FailOnParseError
 
+foreign import ccall "getpid" getPid :: IO CInt
+
 data Config
   = Config
   { configAppName                :: String               -- ^ Application name ("semantic")
   , configHostName               :: String               -- ^ HostName from getHostName
-  , configProcessID              :: ProcessID            -- ^ ProcessID from getProcessID
+  , configProcessID              :: CInt                 -- ^ Result of calling getpid(1)
   , configStatsHost              :: Stat.Host            -- ^ Host of statsd/datadog (default: "127.0.0.1")
   , configStatsPort              :: Stat.Port            -- ^ Port of statsd/datadog (default: "28125")
   , configTreeSitterParseTimeout :: Duration             -- ^ Timeout in milliseconds before canceling tree-sitter parsing (default: 6000).
@@ -79,7 +80,7 @@ infoOptions = defaultOptions { optionsLogLevel = Just Info }
 
 defaultConfig :: Options -> IO Config
 defaultConfig options@Options{..} = do
-  pid <- getProcessID
+  pid <- getPid
   hostName <- getHostName
   isTerminal <- hIsTerminalDevice stdout
   (statsHost, statsPort) <- lookupStatsAddr

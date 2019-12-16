@@ -30,7 +30,7 @@ import Control.Concurrent (mkWeakThreadId, myThreadId)
 import Control.Exception (throwTo)
 import Proto.Semantic_JSON ()
 import System.Mem.Weak (deRefWeak)
-import System.Posix.Signals
+import System.Signal
 
 newtype SignalException = SignalException Signal
   deriving (Show)
@@ -40,9 +40,8 @@ installSignalHandlers :: IO ()
 installSignalHandlers = do
   mainThreadId <- myThreadId
   weakTid <- mkWeakThreadId mainThreadId
-  for_ [ sigABRT, sigBUS, sigHUP, sigILL, sigQUIT, sigSEGV,
-          sigSYS, sigTERM, sigUSR1, sigUSR2, sigXCPU, sigXFSZ ] $ \sig ->
-    installHandler sig (Catch $ sendException weakTid sig) Nothing
+  for_ [ sigABRT, sigILL, sigSEGV, sigTERM ] $ \sig ->
+    installHandler sig (sendException weakTid)
   where
     sendException weakTid sig = do
       m <- deRefWeak weakTid
