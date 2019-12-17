@@ -306,8 +306,9 @@ instance Compile Py.IfStatement where
                        <*> compile consequence cc next
                        <*> foldr clause (cc next) alternative)
     where clause (R1 Py.ElseClause{ body }) _ = compile body cc next
-          clause (L1 Py.ElifClause{ condition, consequence }) rest  =
-            if' <$> compile condition pure next <*> compile consequence cc next <*> rest
+          clause (L1 Py.ElifClause{ condition, consequence }) rest = do
+            cond <- compile condition pure next
+            if' (cond ... "__prim") <$> compile consequence cc next <*> rest
 
 
 instance Compile Py.ImportFromStatement
