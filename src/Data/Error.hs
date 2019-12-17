@@ -14,7 +14,6 @@ module Data.Error
 import Prologue
 
 import Data.ByteString.Char8 (unpack)
-import Data.Ix (inRange)
 import Data.List (intersperse, isSuffixOf)
 import System.Console.ANSI
 

@@ -1,11 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Semantic.Spec (spec) where
 
-import Control.Effect.Reader
+import Control.Carrier.Reader
 import Control.Exception (fromException)
 import SpecHelpers
 
-import Data.Blob (NoLanguageForBlob (..))
 import Semantic.Api hiding (Blob)
 
  -- we need some lenses here, oof

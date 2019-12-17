@@ -10,11 +10,11 @@ module Analysis.ScopeGraph
 import           Analysis.Analysis
 import           Analysis.File
 import           Analysis.FlowInsensitive
+import           Control.Algebra
 import           Control.Applicative (Alternative (..))
+import           Control.Carrier.Reader
 import           Control.Carrier.Fail.WithLoc
-import           Control.Effect.Carrier
-import           Control.Effect.Fresh
-import           Control.Effect.Reader
+import           Control.Carrier.Fresh.Strict
 import           Control.Effect.State
 import           Control.Monad ((>=>))
 import           Data.Foldable (fold)
@@ -53,7 +53,7 @@ instance Ord name => Monoid (ScopeGraph name) where
 scopeGraph
   :: (Ord name, Ord (term name))
   => (forall sig m
-     .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
+     .  (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
      => Analysis term name name (ScopeGraph name) m
      -> (term name -> m (ScopeGraph name))
      -> (term name -> m (ScopeGraph name))
@@ -62,21 +62,20 @@ scopeGraph
   -> (Heap name (ScopeGraph name), [File (Either (Path.AbsRelFile, Span, String) (ScopeGraph name))])
 scopeGraph eval
   = run
-  . runFresh
+  . evalFresh 0
   . runHeap
   . traverse (runFile eval)
 
 runFile
   :: forall term name m sig
-  .  ( Carrier sig m
-     , Effect sig
-     , Member Fresh sig
-     , Member (State (Heap name (ScopeGraph name))) sig
+  .  ( Effect sig
+     , Has Fresh sig m
+     , Has (State (Heap name (ScopeGraph name))) sig m
      , Ord name
      , Ord (term name)
      )
   => (forall sig m
-     .  (Carrier sig m, Member (Reader Path.AbsRelFile) sig, Member (Reader Span) sig, MonadFail m)
+     .  (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
      => Analysis term name name (ScopeGraph name) m
      -> (term name -> m (ScopeGraph name))
      -> (term name -> m (ScopeGraph name))
@@ -89,15 +88,14 @@ runFile eval file = traverse run file
             . runReader (Map.empty @name @Ref)
             . runFail
             . fmap fold
-            . convergeTerm (Proxy @name) (fix (cacheTerm . eval scopeGraphAnalysis))
+            . convergeTerm (Proxy @name) 0 (fix (cacheTerm . eval scopeGraphAnalysis))
 
 scopeGraphAnalysis
   :: ( Alternative m
-     , Carrier sig m
-     , Member (Reader Path.AbsRelFile) sig
-     , Member (Reader Span) sig
-     , Member (Reader (Map.Map name Ref)) sig
-     , Member (State (Heap name (ScopeGraph name))) sig
+     , Has (Reader Path.AbsRelFile) sig m
+     , Has (Reader Span) sig m
+     , Has (Reader (Map.Map name Ref)) sig m
+     , Has (State (Heap name (ScopeGraph name))) sig m
      , Ord name
      )
   => Analysis term name name (ScopeGraph name) m

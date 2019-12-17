@@ -9,7 +9,6 @@ import qualified Data.Set as Set
 
 import           Control.Abstract hiding (AccessControl (..), Function)
 import           Data.Abstract.Evaluatable
-import           Data.Abstract.Name (__self)
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.JSON.Fields
 import           Diffing.Algorithm
@@ -39,12 +38,11 @@ instance Evaluatable Function where
     v <- function name params functionBody associatedScope
     v <$ assign addr v
 
-declareFunction :: ( Carrier sig m
-                   , Member (State (ScopeGraph address)) sig
-                   , Member (Allocator address) sig
-                   , Member (Reader (CurrentScope address)) sig
-                   , Member (Reader ModuleInfo) sig
-                   , Member Fresh sig
+declareFunction :: ( Has (State (ScopeGraph address)) sig m
+                   , Has (Allocator address) sig m
+                   , Has (Reader (CurrentScope address)) sig m
+                   , Has (Reader ModuleInfo) sig m
+                   , Has Fresh sig m
                    , Ord address
                    )
                 => Maybe Name

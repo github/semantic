@@ -3,7 +3,7 @@
 module Analysis.Ruby.Spec (spec) where
 
 import           Control.Abstract (Declaration (..), ScopeError (..))
-import           Control.Effect.Resumable (SomeError (..))
+import           Control.Carrier.Resumable.Either (SomeError (..))
 import           Data.Abstract.Evaluatable
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Number as Number

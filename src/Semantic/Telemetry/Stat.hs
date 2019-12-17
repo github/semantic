@@ -32,7 +32,6 @@ import qualified Data.ByteString.Char8 as B
 import           Data.List (intercalate)
 import           Data.List.Split (splitOneOf)
 import qualified Data.Time.Clock as Time
-import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
 import           Network.Socket
     (Socket (..), SocketType (..), addrAddress, addrFamily, close, connect, defaultProtocol, getAddrInfo, socket)
 import           Network.Socket.ByteString

@@ -5,7 +5,6 @@ import Prologue
 
 import           Control.Abstract hiding (Import)
 import           Data.Abstract.Evaluatable as Evaluatable
-import           Data.Abstract.ScopeGraph (AccessControl (..))
 import           Data.JSON.Fields
 import qualified Data.Map.Strict as Map
 import           Data.Semigroup.App
@@ -237,23 +236,22 @@ instance Ord1 Module where liftCompare = genericLiftCompare
 instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 
 declareModule :: ( AbstractValue term address value m
-                 , Carrier sig m
                  , Declarations term
-                 , Member (Allocator address) sig
-                 , Member (Deref value) sig
-                 , Member (Object address value) sig
-                 , Member (Reader (CurrentFrame address)) sig
-                 , Member (Reader (CurrentScope address)) sig
-                 , Member (Reader Span) sig
-                 , Member (Resumable (BaseError (EvalError term address value))) sig
-                 , Member (State (Heap address address value)) sig
-                 , Member (State (ScopeGraph address)) sig
-                 , Member Fresh sig
-                 , Member (Reader ModuleInfo) sig
-                 , Member (Resumable (BaseError (AddressError address value))) sig
-                 , Member (Resumable (BaseError (HeapError address))) sig
-                 , Member (Resumable (BaseError (ScopeError address))) sig
-                 , Member (Unit value) sig
+                 , Has (Allocator address) sig m
+                 , Has (Deref value) sig m
+                 , Has (Object address value) sig m
+                 , Has (Reader (CurrentFrame address)) sig m
+                 , Has (Reader (CurrentScope address)) sig m
+                 , Has (Reader Span) sig m
+                 , Has (Resumable (BaseError (EvalError term address value))) sig m
+                 , Has (State (Heap address address value)) sig m
+                 , Has (State (ScopeGraph address)) sig m
+                 , Has Fresh sig m
+                 , Has (Reader ModuleInfo) sig m
+                 , Has (Resumable (BaseError (AddressError address value))) sig m
+                 , Has (Resumable (BaseError (HeapError address))) sig m
+                 , Has (Resumable (BaseError (ScopeError address))) sig m
+                 , Has (Unit value) sig m
                  , Ord address
                  )
                 => (term -> Evaluator term address value m value)

@@ -8,10 +8,9 @@ module Rendering.Graph
 
 import Algebra.Graph.Export.Dot
 import Analysis.ConstructorName
-import Control.Effect.Fresh
-import Control.Effect.Pure
-import Control.Effect.Reader
-import Control.Effect.State
+import Control.Carrier.Fresh.Strict
+import Control.Carrier.Reader
+import Control.Carrier.State.Strict
 import Control.Lens
 import Data.Diff
 import Data.Edit
@@ -32,13 +31,14 @@ renderTreeGraph :: (Ord vertex, Recursive t, ToTreeGraph vertex (Base t)) => t -
 renderTreeGraph = simplify . runGraph . cata toTreeGraph
 
 runGraph :: ReaderC (Graph vertex)
-           (FreshC PureC) (Graph vertex)
+           (FreshC Identity) (Graph vertex)
          -> Graph vertex
 runGraph = run . runFresh' . runReader mempty
   where
     -- NB: custom runFresh so that we count starting at 1 in order to avoid
     -- default values for proto encoding.
     runFresh' = evalState 1 . runFreshC
+    runFreshC (FreshC a) = a
 
 -- | GraphViz styling for terms
 termStyle :: (IsString string, Monoid string) => String -> Style TermVertex string
@@ -62,7 +62,7 @@ diffStyle name = (defaultStyle (fromString . show . view diffVertexId))
           _                                -> []
 
 class ToTreeGraph vertex t | t -> vertex where
-  toTreeGraph :: (Member Fresh sig, Member (Reader (Graph vertex)) sig, Carrier sig m) => t (m (Graph vertex)) -> m (Graph vertex)
+  toTreeGraph :: (Has Fresh sig m, Has (Reader (Graph vertex)) sig m) => t (m (Graph vertex)) -> m (Graph vertex)
 
 instance (ConstructorName syntax, Foldable syntax) =>
   ToTreeGraph TermVertex (TermF syntax Loc) where
@@ -70,9 +70,8 @@ instance (ConstructorName syntax, Foldable syntax) =>
     termAlgebra ::
       ( ConstructorName syntax
       , Foldable syntax
-      , Member Fresh sig
-      , Member (Reader (Graph TermVertex)) sig
-      , Carrier sig m
+      , Has Fresh sig m
+      , Has (Reader (Graph TermVertex)) sig m
       )
       => TermF syntax Loc (m (Graph TermVertex))
       -> m (Graph TermVertex)
@@ -117,9 +116,8 @@ instance (ConstructorName syntax, Foldable syntax) =>
       ann a = converting #? Loc.span a
       diffAlgebra ::
         ( Foldable f
-        , Member Fresh sig
-        , Member (Reader (Graph DiffTreeVertex)) sig
-        , Carrier sig m
+        , Has Fresh sig m
+        , Has (Reader (Graph DiffTreeVertex)) sig m
         ) => f (m (Graph DiffTreeVertex)) -> DiffTreeVertex'DiffTerm -> m (Graph DiffTreeVertex)
       diffAlgebra syntax a = do
         i <- fresh

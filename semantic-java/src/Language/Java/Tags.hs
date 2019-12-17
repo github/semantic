@@ -16,9 +16,8 @@ import qualified TreeSitter.Java.AST as Java
 
 class ToTags t where
   tags
-    :: ( Carrier sig m
-       , Member (Reader Source) sig
-       , Member (Writer Tags.Tags) sig
+    :: ( Has (Reader Source) sig m
+       , Has (Writer Tags.Tags) sig m
        )
     => t Loc
     -> m ()
@@ -29,9 +28,8 @@ instance (ToTagsBy strategy t, strategy ~ ToTagsInstance t) => ToTags t where
 
 class ToTagsBy (strategy :: Strategy) t where
   tags'
-    :: ( Carrier sig m
-       , Member (Reader Source) sig
-       , Member (Writer Tags.Tags) sig
+    :: ( Has (Reader Source) sig m
+       , Has (Writer Tags.Tags) sig m
        )
     => t Loc
     -> m ()
@@ -89,9 +87,8 @@ instance ToTagsBy 'Custom Java.MethodInvocation where
 
 
 gtags
-  :: ( Carrier sig m
-     , Member (Reader Source) sig
-     , Member (Writer Tags.Tags) sig
+  :: ( Has (Reader Source) sig m
+     , Has (Writer Tags.Tags) sig m
      , Generic1 t
      , Tags.GFoldable1 ToTags (Rep1 t)
      )

@@ -15,9 +15,9 @@ class ValueRoots address value where
   valueRoots :: value -> Live address
 
 -- | Retrieve the local 'Live' set.
-askRoots :: (Member (Reader (Live address)) sig, Carrier sig m) => Evaluator term address value m (Live address)
+askRoots :: Has (Reader (Live address)) sig m => Evaluator term address value m (Live address)
 askRoots = ask
 
 -- | Run a computation with the given 'Live' set added to the local root set.
-extraRoots :: (Member (Reader (Live address)) sig, Carrier sig m, Ord address) => Live address -> Evaluator term address value m a -> Evaluator term address value m a
+extraRoots :: (Has (Reader (Live address)) sig m, Ord address) => Live address -> Evaluator term address value m a -> Evaluator term address value m a
 extraRoots roots = local (<> roots)

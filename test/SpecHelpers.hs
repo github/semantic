@@ -24,11 +24,14 @@ module SpecHelpers
 ) where
 
 import Control.Abstract
+import Control.Carrier.Fresh.Strict
 import Control.Carrier.Parse.Simple
-import Control.Effect.Lift
-import Control.Effect.Trace as X (runTraceByIgnoring, runTraceByReturning)
+import Control.Carrier.Reader as X
+import qualified Control.Carrier.Trace.Ignoring as Trace.Ignoring
+import Control.Carrier.Resumable.Either
+import Control.Carrier.Lift
+import Control.Carrier.State.Strict
 import Control.Exception (displayException)
-import Control.Monad ((>=>))
 import Control.Monad as X
 import Data.Abstract.Address.Precise as X
 import Data.Abstract.Evaluatable
@@ -37,7 +40,6 @@ import qualified Data.Abstract.Heap as Heap
 import Data.Abstract.Module as X
 import Data.Abstract.ModuleTable as X hiding (lookup)
 import Data.Abstract.Name as X
-import Data.Abstract.ScopeGraph (EdgeLabel(..))
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import Data.Abstract.Value.Concrete (Value(..), ValueError, runValueError)
 import Data.Blob as X
@@ -101,7 +103,7 @@ parseFilePath session path = do
   res <- runTask session . runParse (configTreeSitterParseTimeout (config session)) . runReader defaultLanguageModes $ parseTermBuilder TermSExpression (toList blob)
   pure (runBuilder <$> res)
 
-runParseWithConfig :: (Carrier sig m, Member (Reader Config) sig) => ParseC m a -> m a
+runParseWithConfig :: Has (Reader Config) sig m => ParseC m a -> m a
 runParseWithConfig task = asks configTreeSitterParseTimeout >>= \ timeout -> runParse timeout task
 
 -- | Read two files to a BlobPair.
@@ -124,7 +126,7 @@ type TestEvaluatingC term
   ( StateC (Heap Precise Precise (Val term))
   ( StateC (ScopeGraph Precise)
   ( FreshC
-  ( TraceByIgnoringC
+  ( Trace.Ignoring.TraceC
   ( LiftC IO))))))))))))
 type TestEvaluatingErrors term
   = '[ BaseError (AddressError Precise (Val term))
@@ -147,8 +149,9 @@ testEvaluating :: Evaluator term Precise (Val term) (TestEvaluatingC term) a
                -> IO (TestEvaluatingState term a)
 testEvaluating
   = runM
-  . runTraceByIgnoring
-  . runFresh
+  . Trace.Ignoring.runTrace
+  . fmap snd
+  . runFresh 0
   . runEvaluator
   . runScopeGraph
   . runHeap

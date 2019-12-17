@@ -12,7 +12,6 @@ module Data.Abstract.Name
 import           Control.Effect.Fresh
 import           Data.Aeson
 import qualified Data.Char as Char
-import           Data.Text (Text)
 import qualified Data.Text as Text
 import           Prologue
 
@@ -23,7 +22,7 @@ data Name
   deriving (Eq, Ord)
 
 -- | Generate a fresh (unused) name for use in synthesized variables/closures/etc.
-gensym :: (Member Fresh sig, Carrier sig m) => m Name
+gensym :: Has Fresh sig m => m Name
 gensym = I <$> fresh
 
 -- | Construct a 'Name' from a 'Text'.

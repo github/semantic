@@ -20,7 +20,6 @@ import           Data.Abstract.Name
 import           Data.Abstract.Package (PackageInfo (..))
 import           Data.Aeson
 import           Data.Graph (VertexTag (..))
-import qualified Data.Graph as G
 import           Data.Quieterm (Quieterm(..))
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration

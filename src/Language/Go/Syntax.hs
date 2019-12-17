@@ -19,13 +19,12 @@ import qualified Data.Text as T
 import           Diffing.Algorithm
 import           System.FilePath.Posix
 
-resolveGoImport :: ( Member (Modules address value) sig
-                   , Member (Reader ModuleInfo) sig
-                   , Member (Reader Package.PackageInfo) sig
-                   , Member (Reader Span) sig
-                   , Member (Resumable (BaseError ResolutionError)) sig
-                   , Member Trace sig
-                   , Carrier sig m
+resolveGoImport :: ( Has (Modules address value) sig m
+                   , Has (Reader ModuleInfo) sig m
+                   , Has (Reader Package.PackageInfo) sig m
+                   , Has (Reader Span) sig m
+                   , Has (Resumable (BaseError ResolutionError)) sig m
+                   , Has Trace sig m
                    )
                 => ImportPath
                 -> Evaluator term address value m [ModulePath]

@@ -94,7 +94,7 @@ decodeBlobs = fmap blobs <$> eitherDecode
 newtype NoLanguageForBlob = NoLanguageForBlob FilePath
   deriving (Eq, Exception, Ord, Show)
 
-noLanguageForBlob :: (Member (Error SomeException) sig, Carrier sig m) => FilePath -> m a
+noLanguageForBlob :: Has (Error SomeException) sig m => FilePath -> m a
 noLanguageForBlob blobPath = throwError (SomeException (NoLanguageForBlob blobPath))
 
 -- | Represents a blobs suitable for diffing which can be either a blob to

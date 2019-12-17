@@ -1,7 +1,7 @@
 module Semantic.CLI.Spec (testTree) where
 
 import           Control.Carrier.Parse.Simple
-import           Control.Effect.Reader
+import           Control.Carrier.Reader
 import           Data.ByteString.Builder
 import           Semantic.Api hiding (Blob, BlobPair, File)
 import           Semantic.Task

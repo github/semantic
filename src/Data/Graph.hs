@@ -20,7 +20,7 @@ import qualified Algebra.Graph.AdjacencyMap as A
 import           Algebra.Graph.Class (connect, overlay, vertex)
 import qualified Algebra.Graph.Class as Class
 import qualified Algebra.Graph.ToGraph as Class
-import           Control.Effect.State
+import           Control.Carrier.State.Strict
 import           Control.Lens (view)
 import           Data.Aeson
 import qualified Data.Set as Set
@@ -50,7 +50,7 @@ topologicalSort = go . Class.toAdjacencyMap . G.transpose . unGraph
           . traverse_ visit
           . A.vertexList
           $ graph
-          where visit :: (Member (State (Visited v)) sig, Carrier sig m) => v -> m ()
+          where visit :: Has (State (Visited v)) sig m => v -> m ()
                 visit v = do
                   isMarked <- Set.member v . visitedVertices <$> get
                   if isMarked then

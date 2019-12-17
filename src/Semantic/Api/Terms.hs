@@ -43,13 +43,13 @@ import qualified Language.JSON as JSON
 import qualified Language.Python as PythonPrecise
 
 
-termGraph :: (Traversable t, Member Distribute sig, Member (Error SomeException) sig, Member Parse sig, Carrier sig m) => t Blob -> m ParseTreeGraphResponse
+termGraph :: (Traversable t, Has Distribute sig m, Has (Error SomeException) sig m, Has Parse sig m) => t Blob -> m ParseTreeGraphResponse
 termGraph blobs = do
   terms <- distributeFor blobs go
   pure $ defMessage
     & P.files .~ toList terms
   where
-    go :: (Member (Error SomeException) sig, Member Parse sig, Carrier sig m) => Blob -> m ParseTreeFileGraph
+    go :: (Has (Error SomeException) sig m, Has Parse sig m) => Blob -> m ParseTreeFileGraph
     go blob = parseWith jsonGraphTermParsers (pure . jsonGraphTerm blob) blob
       `catchError` \(SomeException e) ->
         pure $ defMessage
@@ -71,7 +71,7 @@ data TermOutputFormat
   | TermQuiet
   deriving (Eq, Show)
 
-parseTermBuilder :: (Traversable t, Member Distribute sig, Member (Error SomeException) sig, Member (Reader PerLanguageModes) sig, Member Parse sig, Member (Reader Config) sig, Carrier sig m, MonadIO m)
+parseTermBuilder :: (Traversable t, Has Distribute sig m, Has (Error SomeException) sig m, Has (Reader PerLanguageModes) sig m, Has Parse sig m, Has (Reader Config) sig m, MonadIO m)
   => TermOutputFormat -> t Blob -> m Builder
 parseTermBuilder TermJSONTree    = distributeFoldMap jsonTerm >=> serialize Format.JSON -- NB: Serialize happens at the top level for these two JSON formats to collect results of multiple blobs.
 parseTermBuilder TermJSONGraph   = termGraph >=> serialize Format.JSON
@@ -80,13 +80,13 @@ parseTermBuilder TermDotGraph    = distributeFoldMap (parseWith dotGraphTermPars
 parseTermBuilder TermShow        = distributeFoldMap (\ blob -> asks showTermParsers >>= \ parsers -> parseWith parsers showTerm blob)
 parseTermBuilder TermQuiet       = distributeFoldMap quietTerm
 
-jsonTerm :: (Member (Error SomeException) sig, Member Parse sig, Carrier sig m) => Blob -> m (Rendering.JSON.JSON "trees" SomeJSON)
+jsonTerm :: (Has (Error SomeException) sig m, Has Parse sig m) => Blob -> m (Rendering.JSON.JSON "trees" SomeJSON)
 jsonTerm blob = parseWith jsonTreeTermParsers (pure . jsonTreeTerm blob) blob `catchError` jsonError blob
 
 jsonError :: Applicative m => Blob -> SomeException -> m (Rendering.JSON.JSON "trees" SomeJSON)
 jsonError blob (SomeException e) = pure $ renderJSONError blob (show e)
 
-quietTerm :: (Member (Error SomeException) sig, Member (Reader PerLanguageModes) sig, Member Parse sig, Member (Reader Config) sig, Carrier sig m, MonadIO m) => Blob -> m Builder
+quietTerm :: (Has (Error SomeException) sig m, Has (Reader PerLanguageModes) sig m, Has Parse sig m, Has (Reader Config) sig m, MonadIO m) => Blob -> m Builder
 quietTerm blob = showTiming blob <$> time' ( asks showTermParsers >>= \ parsers -> parseWith parsers (fmap (const (Right ())) . showTerm) blob `catchError` timingError )
   where
     timingError (SomeException e) = pure (Left (show e))
@@ -99,13 +99,13 @@ showTermParsers :: PerLanguageModes -> Map Language (SomeParser ShowTerm Loc)
 showTermParsers = allParsers
 
 class ShowTerm term where
-  showTerm :: (Carrier sig m, Member (Reader Config) sig) => term Loc -> m Builder
+  showTerm :: (Has (Reader Config) sig m) => term Loc -> m Builder
 
 instance (TermMode term ~ strategy, ShowTermBy strategy term) => ShowTerm term where
   showTerm = showTermBy @strategy
 
 class ShowTermBy (strategy :: LanguageMode) term where
-  showTermBy :: (Carrier sig m, Member (Reader Config) sig) => term Loc -> m Builder
+  showTermBy :: (Has (Reader Config) sig m) => term Loc -> m Builder
 
 instance ShowTermBy 'Precise Java.Term where
   showTermBy = serialize Show . void . Java.getTerm
@@ -149,7 +149,7 @@ dotGraphTermParsers :: Map Language (SomeParser DOTGraphTerm Loc)
 dotGraphTermParsers = aLaCarteParsers
 
 class DOTGraphTerm term where
-  dotGraphTerm :: (Carrier sig m, Member (Reader Config) sig) => term Loc -> m Builder
+  dotGraphTerm :: (Has (Reader Config) sig m) => term Loc -> m Builder
 
 instance (Recursive (term Loc), ToTreeGraph TermVertex (Base (term Loc))) => DOTGraphTerm term where
   dotGraphTerm = serialize (DOT (termStyle "terms")) . renderTreeGraph
