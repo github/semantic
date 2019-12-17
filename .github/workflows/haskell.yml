@@ -46,7 +46,7 @@ jobs:
     - name: hlint
       run: |
         cabal install hlint
-        cabal exec hlint -- src semantic-python
+        cabal run hlint -- src semantic-python
 
     - name: Build & test
       run: |
