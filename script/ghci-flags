@@ -49,7 +49,7 @@ function flags {
   echo "-hide-all-packages"
 
   # Emit package flags from the environment file, removing comments & prefixing with -
-  cabal v2-exec --builddir="$repl_builddir" -v0 bash -- -c 'cat $GHC_ENVIRONMENT' | grep -v '^--' | sed -e 's/^/-/'
+  cabal v2-exec --builddir="$repl_builddir" -v0 bash -- -c 'cat "$GHC_ENVIRONMENT"' | grep -v '^--' | sed -e 's/^/-/'
 
   echo "-XHaskell2010"
   echo "-XStrictData"
