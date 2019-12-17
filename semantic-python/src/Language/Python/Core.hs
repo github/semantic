@@ -46,6 +46,9 @@ pattern SingleIdentifier name <- Py.ExpressionList
     ]
   }
 
+prelude :: Has Core sig t => [Name] -> t Name
+prelude = foldl' (\a b -> a ... b) (pure "__semantic_prelude")
+
 -- We leave the representation of Core syntax abstract so that it's not
 -- possible for us to 'cheat' by pattern-matching on or eliminating a
 -- compiled term.
