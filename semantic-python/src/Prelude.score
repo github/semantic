@@ -8,9 +8,11 @@
   // object's superclass is type itself
   object <- type "object" type #record{};
 
-  str <- type "str" object #record { __new__: \prim -> instance #unit prim #record{} };
-
-  bool <- type "bool" object #record { __new: \prim -> instance #unit prim #record{} };
+  // These classes' __new__ slots are incorrect (the first parameter should be the `str`
+  // and `bool` values themselves, not object), but until semantic/#362 is fixed, we can't
+  // use `rec` in the prelude, so for True and False below we call instance manually.
+  str <- type "str" object #record { __new__: \prim -> instance object prim #record{} };
+  bool <- type "bool" object #record { __new__: \prim -> instance object prim #record{} };
 
   True <- instance bool #true #record {};
   False <- instance bool #false #record {};
