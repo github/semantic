@@ -136,7 +136,9 @@ identifier =
     mk s = makeTerm <$> symbol s <*> (Syntax.Identifier . name <$> source)
     zsuper = makeTerm <$> symbol Super <*> (Ruby.Syntax.ZSuper <$ source)
     vcallOrLocal = do
-      (loc, ident, locals) <- identWithLocals
+      loc <- symbol Identifier
+      ident <- source
+      locals <- getLocals
       case ident of
         "__FILE__" -> pure $ makeTerm loc Directive.File
         "__LINE__" -> pure $ makeTerm loc Directive.Line
@@ -402,17 +404,11 @@ assignment' = makeTerm  <$> symbol Assignment         <*> children (Ruby.Syntax.
        <|> lhsIdent
        <|> expression
 
-identWithLocals :: Assignment (Loc, Text, [Text])
-identWithLocals = do
-  loc <- symbol Identifier
-  -- source advances, so it's important we call getLocals first
-  locals <- getLocals
-  ident <- source
-  pure (loc, ident, locals)
-
 lhsIdent :: Assignment (Term Loc)
 lhsIdent = do
-  (loc, ident, locals) <- identWithLocals
+  locals <- getLocals
+  loc <- symbol Identifier
+  ident <- source
   putLocals (ident : locals)
   pure $ makeTerm loc (Syntax.Identifier (name ident))
 
