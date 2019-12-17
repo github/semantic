@@ -1,6 +1,12 @@
 name: Haskell CI
 
-on: [pull_request]
+on:
+  # Trigger the workflow on push or pull request,
+  # but only for the master branch
+  push:
+    branches:
+      - master
+  pull_request:
 
 jobs:
   build:
@@ -21,17 +27,19 @@ jobs:
         ghc-version: ${{ matrix.ghc }}
         cabal-version: ${{ matrix.cabal }}
 
-    - uses: actions/cache@preview
+    - uses: actions/cache@v1
       name: Cache ~/.cabal/packages
       with:
         path: ~/.cabal/packages
         key: ${{ runner.os }}-${{ matrix.ghc }}-cabal-packages
-    - uses: actions/cache@preview
+
+    - uses: actions/cache@v1
       name: Cache ~/.cabal/store
       with:
         path: ~/.cabal/store
         key: ${{ runner.os }}-${{ matrix.ghc }}-cabal-store
-    - uses: actions/cache@preview
+
+    - uses: actions/cache@v1
       name: Cache dist-newstyle
       with:
         path: dist-newstyle
