@@ -10,4 +10,4 @@ repl_builddir=dist-repl
 
 cabal v2-build --builddir="$repl_builddir" all --only-dependencies
 
-cabal v2-exec --builddir="$repl_builddir" ghci -- -ghci-script=.ghci.semantic $(script/ghci-flags --builddir "$repl_builddir") -no-ignore-dot-ghci $@
+cabal v2-exec --builddir="$repl_builddir" env -- -u GHC_ENVIRONMENT ghci -ghci-script=.ghci.semantic $(script/ghci-flags --builddir "$repl_builddir") -no-ignore-dot-ghci $@
