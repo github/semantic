@@ -149,7 +149,7 @@ filterALaCarteSymbols "ruby" symbols
       , "super"
       , "undef"
       , "defined?"
-      -- , "lambda"
+      , "lambda"
       ]
 filterALaCarteSymbols _      symbols = symbols
 

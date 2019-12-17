@@ -16,9 +16,12 @@ data Tag = Tag
   deriving (Eq, Show)
 
 data Kind
+  -- Definitions
   = Function
   | Method
   | Class
   | Module
+  -- References
   | Call
+  | Constant
   deriving (Bounded, Enum, Eq, Show)

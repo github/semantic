@@ -1,4 +1,4 @@
-{-# LANGUAGE AllowAmbiguousTypes, DataKinds, DisambiguateRecordFields, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, NamedFieldPuns, OverloadedStrings, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes, DataKinds, DisambiguateRecordFields, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, NamedFieldPuns, OverloadedStrings, PartialTypeSignatures, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Language.Ruby.Tags
 ( ToTags(..)
 ) where
@@ -46,7 +46,9 @@ data Strategy = Generic | Custom
 type family ToTagsInstance t :: Strategy where
   ToTagsInstance (_ :+: _)             = 'Custom
   ToTagsInstance Rb.Class              = 'Custom
+  ToTagsInstance Rb.SingletonClass     = 'Custom
   ToTagsInstance Rb.Module             = 'Custom
+
   ToTagsInstance Rb.Method             = 'Custom
   ToTagsInstance Rb.SingletonMethod    = 'Custom
 
@@ -63,6 +65,7 @@ type family ToTagsInstance t :: Strategy where
   ToTagsInstance Rb.MethodParameters   = 'Custom
   ToTagsInstance Rb.LambdaParameters   = 'Custom
   ToTagsInstance Rb.BlockParameters    = 'Custom
+  ToTagsInstance Rb.Assignment         = 'Custom
 
   ToTagsInstance _                     = 'Generic
 
@@ -70,6 +73,10 @@ instance (ToTags l, ToTags r) => ToTagsBy 'Custom (l :+: r) where
   tags' (L1 l) = tags l
   tags' (R1 r) = tags r
 
+-- These are all valid, but point to methods in Kernel and other parts of the
+-- Ruby stdlib. A la carte displays some of these, but not others and since we
+-- have nothing to link to yet (can't jump-to-def), we hide them from the
+-- current tags output.
 nameBlacklist :: [Text]
 nameBlacklist =
   [ "alias"
@@ -78,6 +85,8 @@ nameBlacklist =
   , "require"
   , "super"
   , "undef"
+  , "__FILE__"
+  , "lambda"
   ]
 
 yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text -> Kind -> Loc -> Range -> m ()
@@ -87,23 +96,33 @@ yieldTag name kind loc range = do
   let sliced = slice src range
   Tags.yield (Tag name kind loc (Tags.firstLine sliced) Nothing)
 
-instance ToTagsBy 'Custom Rb.Class  where
+instance ToTagsBy 'Custom Rb.Class where
   tags' t@Rb.Class
     { ann = loc@Loc { byteRange = range }
     , name = expr
-    } = case expr of
-      Prj Rb.Constant { text = name } -> yield name
-      Prj Rb.ScopeResolution { name = Prj Rb.Constant { text = name } } -> yield name
-      Prj Rb.ScopeResolution { name = Prj Rb.Identifier { text = name } } -> yield name
+    } = enterScope True $ case expr of
+      Prj Rb.Constant { text } -> yield text
+      Prj Rb.ScopeResolution { name = Prj Rb.Constant { text } } -> yield text
+      Prj Rb.ScopeResolution { name = Prj Rb.Identifier { text } } -> yield text
       _ -> gtags t
     where
       yield name = yieldTag name Class loc range >> gtags t
 
-instance ToTagsBy 'Custom Rb.Module  where
+instance ToTagsBy 'Custom Rb.SingletonClass where
+  tags' t@Rb.SingletonClass
+    { ann = loc@Loc { byteRange = range }
+    , value = Rb.Arg expr
+    } = enterScope True $ case expr of
+      Prj (Rb.Primary (Prj (Rb.Lhs (Prj (Rb.Variable (Prj Rb.Constant { text })))))) -> yield text
+      _ -> gtags t
+    where
+      yield name = yieldTag name Class loc range >> gtags t
+
+instance ToTagsBy 'Custom Rb.Module where
   tags' t@Rb.Module
     { ann = loc@Loc { byteRange = range }
     , name = expr
-    } = case expr of
+    } = enterScope True $ case expr of
       Prj Rb.Constant { text = name } -> yield name
       Prj Rb.ScopeResolution { name = Prj Rb.Constant { text = name } } -> yield name
       Prj Rb.ScopeResolution { name = Prj Rb.Identifier { text = name } } -> yield name
@@ -163,15 +182,21 @@ instance ToTagsBy 'Custom Rb.Lambda where
 instance ToTagsBy 'Custom Rb.Call where
   tags' t@Rb.Call
     { ann = loc@Loc { byteRange = range }
+    -- , receiver = Rb.Primary rcv
     , method = expr
     } = do
+      -- TODO: a la carte tags captures some receivers like this:
+      -- case rcv of
+      --   Prj (Rb.Lhs (Prj (Rb.Variable (Prj Rb.Identifier { text = name })))) -> yield name
+      --   -- Prj (Rb.Lhs (Prj (Rb.Variable (Prj Rb.Constant { text = name })))) -> yield name
+      --   _ -> pure ()
       case expr of
-        Prj Rb.Identifier { text = name } -> yield name
-        Prj Rb.Constant { text = name } -> yield name
-        Prj Rb.Operator { text = name } -> yield name
+        Prj Rb.Identifier { text = name } -> yield name Call
+        Prj Rb.Constant { text = name } -> yield name Constant
+        Prj Rb.Operator { text = name } -> yield name Call
         _ -> gtags t
     where
-      yield name = yieldTag name Call loc range >> gtags t
+      yield name kind = yieldTag name kind loc range >> gtags t
 
 instance ToTagsBy 'Custom Rb.Lhs where
   tags' t@(Rb.Lhs (Prj (Rb.Variable expr)))
@@ -190,14 +215,15 @@ instance ToTagsBy 'Custom Rb.MethodCall where
     { ann = loc@Loc { byteRange = range }
     , method = expr
     } = case expr of
-      Prj (Rb.Variable (Prj Rb.Identifier { text = name })) -> yield name
-      Prj (Rb.Variable (Prj Rb.Constant { text = name })) -> yield name
-      Prj (Rb.Variable (Prj Rb.GlobalVariable { text = name })) -> yield name
-      Prj (Rb.Variable (Prj Rb.ClassVariable { text = name })) -> yield name
-      Prj (Rb.Variable (Prj Rb.InstanceVariable { text = name })) -> yield name
+      Prj (Rb.Variable (Prj Rb.Identifier { text = name })) -> yield name Call
+      Prj (Rb.Variable (Prj Rb.Constant { text = name })) -> yield name Constant
+      -- Prj (Rb.Variable (Prj Rb.GlobalVariable { text = name })) -> yield name
+      -- Prj (Rb.Variable (Prj Rb.ClassVariable { text = name })) -> yield name
+      -- Prj (Rb.Variable (Prj Rb.InstanceVariable { text = name })) -> yield name
       _ -> gtags t
     where
-      yield name = yieldTag name Call loc range >> gtags t
+      yield name kind = yieldTag name kind loc range >> gtags t
+
 introduceLocals
   :: ( Has (Reader Source) sig m
      , Has (Writer Tags.Tags) sig m
@@ -225,6 +251,20 @@ instance ToTagsBy 'Custom Rb.LambdaParameters where
 
 instance ToTagsBy 'Custom Rb.BlockParameters where
   tags' Rb.BlockParameters{ extraChildren } = introduceLocals extraChildren
+
+instance ToTagsBy 'Custom Rb.Assignment where
+  tags' t@Rb.Assignment{ left } = do
+    case left of
+      Prj (Rb.Lhs (Prj (Rb.Variable (Prj Rb.Identifier { text })))) -> modify (text :)
+      Prj Rb.LeftAssignmentList { extraChildren } -> introduceLhsLocals extraChildren
+      _ -> tags left
+    gtags t
+    where
+      introduceLhsLocals xs = for_ xs $ \x -> case x of
+        Prj (Rb.Lhs (Prj (Rb.Variable (Prj Rb.Identifier { text })))) -> modify (text :)
+        Prj Rb.DestructuredLeftAssignment { extraChildren } -> introduceLhsLocals extraChildren
+        Prj Rb.RestAssignment { extraChildren = Just (Rb.Lhs (Prj (Rb.Variable (Prj Rb.Identifier { text })))) } -> modify (text :)
+        _ -> tags x
 
 gtags
   :: ( Has (Reader Source) sig m
