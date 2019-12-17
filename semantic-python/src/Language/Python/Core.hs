@@ -265,7 +265,7 @@ instance Compile Py.ExpressionList where
 
 
 instance Compile Py.False where
-  compile it cc _ = cc $ locate it (bool False)
+  compile it cc _ = cc $ locate it (prelude ["False"])
 
 instance Compile Py.Float
 instance Compile Py.ForStatement
@@ -397,7 +397,7 @@ instance Compile Py.String where
 instance Compile Py.Subscript
 
 instance Compile Py.True where
-  compile it cc _next = cc $ locate it (bool True)
+  compile it cc _next = cc $ locate it (prelude ["True"])
 
 instance Compile Py.TryStatement
 
