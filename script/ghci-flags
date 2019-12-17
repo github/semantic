@@ -22,14 +22,14 @@ function flags {
   echo "-O0"
   echo "-ignore-dot-ghci"
 
-  echo "-outputdir $repl_builddir/build/x86_64-osx/ghc-$ghc_version/build"
-  echo "-odir $repl_builddir/build/x86_64-osx/ghc-$ghc_version/build"
-  echo "-hidir $repl_builddir/build/x86_64-osx/ghc-$ghc_version/build"
-  echo "-stubdir $repl_builddir/build/x86_64-osx/ghc-$ghc_version/build"
+  echo "-outputdir $repl_builddir/build/x86_64-osx/ghc-$ghc_version/build-repl"
+  echo "-odir $repl_builddir/build/x86_64-osx/ghc-$ghc_version/build-repl"
+  echo "-hidir $repl_builddir/build/x86_64-osx/ghc-$ghc_version/build-repl"
+  echo "-stubdir $repl_builddir/build/x86_64-osx/ghc-$ghc_version/build-repl"
 
-  echo "-i$root/$repl_builddir/build/x86_64-osx/ghc-$ghc_version/build/autogen"
+  echo "-i$root/$repl_builddir/build/x86_64-osx/ghc-$ghc_version/build-repl/autogen"
 
-  echo "-I$root/$repl_builddir/build/x86_64-osx/ghc-$ghc_version/build/autogen"
+  echo "-I$root/$repl_builddir/build/x86_64-osx/ghc-$ghc_version/build-repl/autogen"
 
   echo "-i$root/semantic-analysis/src"
   echo "-i$root/semantic-ast/src"
@@ -44,7 +44,7 @@ function flags {
   echo "-i$root/test"
 
   echo "-optP-include"
-  echo "-optP$root/$repl_builddir/build/x86_64-osx/ghc-$ghc_version/build/autogen/cabal_macros.h"
+  echo "-optP$root/$repl_builddir/build/x86_64-osx/ghc-$ghc_version/build-repl/autogen/cabal_macros.h"
 
   echo "-hide-all-packages"
 
