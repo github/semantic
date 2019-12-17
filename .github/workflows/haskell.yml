@@ -54,5 +54,5 @@ jobs:
         cabal v2-run semantic:test
         cabal v2-run semantic-core:test
         cabal v2-run semantic-python:test
-        cabal v2-run semantic-source:test
-        cabal v2-run semantic-source:doctest
+        cd semantic-source; cabal v2-run semantic-source:test; cd ..
+        cd semantic-source; cabal v2-run semantic-source:doctest -- src; cd ..
