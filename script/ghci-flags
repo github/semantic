@@ -8,6 +8,8 @@ cd $(dirname "$0")/..
 root="$(pwd)"
 ghc_version="$(ghc --numeric-version)"
 
+output_file="${HIE_BIOS_OUTPUT:-/dev/stdout}"
+
 if [ "$1" == "--builddir" ]; then
   repl_builddir="$2"
   shift 2
