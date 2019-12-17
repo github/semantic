@@ -350,7 +350,11 @@ instance Compile Py.None where
   compile _it cc _ = cc (prelude ["None"])
 
 instance Compile Py.NonlocalStatement
-instance Compile Py.NotOperator
+
+instance Compile Py.NotOperator where
+  compile _it@Py.NotOperator{ argument } cc next = do
+    val <- compile argument pure next
+    cc (prelude ["not"] $$ val)
 
 instance Compile Py.ParenthesizedExpression where
   compile it@Py.ParenthesizedExpression { extraChildren } cc
