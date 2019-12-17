@@ -199,8 +199,8 @@ instance Compile Py.ClassDefinition where
           bindings <- asks @Bindings (toList . unBindings)
           let buildName n = (n, pure n)
               contents = record . fmap buildName $ bindings
-              typefn = pure "__semantic_prelude" ... "type"
-              object = pure "__semantic_prelude" ... "object"
+              typefn = prelude ["type"]
+              object = prelude ["object"]
 
           pure (typefn $$ Core.string (coerce n) $$ object $$ contents)
 
@@ -346,8 +346,8 @@ instance Compile Py.Module where
 instance Compile Py.NamedExpression
 
 instance Compile Py.None where
-  -- None is not overridable, and thus always points to the prelude's None.
-  compile _it cc _ = cc (pure "__semantic_prelude" ... "None")
+  -- None is not an lvalue, and thus always points to the prelude's None.
+  compile _it cc _ = cc (prelude ["None"])
 
 instance Compile Py.NonlocalStatement
 instance Compile Py.NotOperator
@@ -387,7 +387,7 @@ instance Compile Py.String where
 
     if any isNothing contents
       then pure . invariantViolated $ "Couldn't string-desugar " <> show it
-      else let new = pure "__semantic_prelude" ... "str" ... "__slots" ... "__new__"
+      else let new = prelude ["str", "__slots", "__new__"]
            in cc $ locate it (new $$ Core.string (mconcat (catMaybes contents)))
 
 instance Compile Py.Subscript
