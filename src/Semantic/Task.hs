@@ -1,7 +1,5 @@
 {-# LANGUAGE FlexibleContexts, FlexibleInstances, GADTs, GeneralizedNewtypeDeriving, KindSignatures,
-             MultiParamTypeClasses, RecordWildCards, ScopedTypeVariables, StandaloneDeriving, TypeOperators,
-             UndecidableInstances #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+             MultiParamTypeClasses, RecordWildCards, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Semantic.Task
 ( TaskC
 , Level(..)
