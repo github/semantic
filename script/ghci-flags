@@ -45,7 +45,7 @@ echo "-optP$root/$repl_builddir/build/x86_64-osx/ghc-$ghc_version/semantic-0.8.0
 echo "-hide-all-packages"
 
 # Emit package flags from the environment file, removing comments & prefixing with -
-cabal exec --builddir=$repl_builddir -v0 bash -- -c 'cat $GHC_ENVIRONMENT' | grep -v '^--' | sed -e 's/^/-/'
+cabal exec --builddir="$repl_builddir" -v0 bash -- -c 'cat $GHC_ENVIRONMENT' | grep -v '^--' | sed -e 's/^/-/'
 
 echo "-XHaskell2010"
 echo "-XStrictData"
