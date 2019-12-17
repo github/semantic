@@ -66,6 +66,7 @@ function flags {
   echo "-Wno-safe"
   echo "-Wno-unsafe"
   echo "-Wno-star-is-type"
+  echo "-Wno-missing-deriving-strategies"
 }
 
 flags > "$output_file"
