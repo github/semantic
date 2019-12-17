@@ -14,7 +14,6 @@ import           Data.Blob
 import           Data.Language
 import qualified Data.Map as Map
 import           Data.Project
-import           GHC.Generics (Generic1)
 import           Prologue
 import           Semantic.Task.Files
 import qualified Source.Source as Source
@@ -55,7 +54,7 @@ runResolution :: ResolutionC m a -> m a
 runResolution = runResolutionC
 
 newtype ResolutionC m a = ResolutionC { runResolutionC :: m a }
-  deriving (Applicative, Functor, Monad, MonadIO)
+  deriving (Applicative, Functor, Monad, MonadFail, MonadIO)
 
 instance (Has Files sig m, MonadIO m) => Algebra (Resolution :+: sig) (ResolutionC m) where
   alg (R other) = ResolutionC . alg . handleCoercible $ other

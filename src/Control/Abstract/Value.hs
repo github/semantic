@@ -1,4 +1,5 @@
-{-# LANGUAGE DeriveFunctor, DeriveGeneric, FlexibleContexts, GADTs, GeneralizedNewtypeDeriving, KindSignatures, MultiParamTypeClasses, RankNTypes, ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE DeriveFunctor, DeriveGeneric, FlexibleContexts, GADTs, GeneralizedNewtypeDeriving, KindSignatures,
+             MultiParamTypeClasses, RankNTypes, ScopedTypeVariables, TypeOperators #-}
 module Control.Abstract.Value
 ( AbstractValue(..)
 , AbstractIntro(..)
@@ -73,7 +74,7 @@ module Control.Abstract.Value
 
 import Control.Abstract.Evaluator
 import Control.Abstract.Heap
-import Control.Abstract.ScopeGraph (Allocator, CurrentScope, Declaration, ScopeGraph)
+import Control.Abstract.ScopeGraph (CurrentScope, Declaration, ScopeGraph)
 import Control.Algebra
 import Control.Carrier.Reader
 import Data.Abstract.BaseError

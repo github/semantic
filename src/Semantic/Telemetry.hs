@@ -148,7 +148,7 @@ runTelemetry :: LogQueue -> StatQueue -> TelemetryC m a -> m a
 runTelemetry logger statter = runReader (logger, statter) . runTelemetryC
 
 newtype TelemetryC m a = TelemetryC { runTelemetryC :: ReaderC (LogQueue, StatQueue) m a }
-  deriving (Applicative, Functor, Monad, MonadIO)
+  deriving (Applicative, Functor, Monad, MonadFail, MonadIO)
 
 instance (Algebra sig m, MonadIO m) => Algebra (Telemetry :+: sig) (TelemetryC m) where
   alg (L op) = do

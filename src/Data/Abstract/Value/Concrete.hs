@@ -1,4 +1,5 @@
-{-# LANGUAGE FlexibleContexts, FlexibleInstances, GADTs, LambdaCase, MultiParamTypeClasses, RankNTypes, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE FlexibleContexts, FlexibleInstances, GADTs, LambdaCase, MultiParamTypeClasses, RankNTypes,
+             ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Value.Concrete
   ( Value (..)
   , ValueError (..)
@@ -8,25 +9,23 @@ module Data.Abstract.Value.Concrete
 
 import Prologue
 
-import Control.Carrier.Resumable.Either (SomeError)
+import           Control.Carrier.Resumable.Either (SomeError)
 import qualified Control.Carrier.Resumable.Either as Either
 import qualified Control.Carrier.Resumable.Resume as With
-import Data.List (genericIndex, genericLength)
+import           Data.List (genericIndex, genericLength)
 import qualified Data.Map.Strict as Map
-import Data.Scientific (Scientific, coefficient, normalize)
-import Data.Scientific.Exts
-import Data.Text (pack)
+import           Data.Scientific.Exts
+import           Data.Text (pack)
 
-import Control.Abstract.ScopeGraph (Allocator, ScopeError)
-import Control.Abstract.Heap (scopeLookup)
+import           Control.Abstract hiding
+    (Array (..), Boolean (..), Function (..), Hash (..), Numeric (..), Object (..), String (..), Unit (..), While (..))
 import qualified Control.Abstract as Abstract
-import Control.Abstract hiding (Boolean(..), Function(..), Numeric(..), Object(..), Array(..), Hash(..), String(..), Unit(..), While(..))
-import Control.Algebra
-import Control.Effect.Interpose
-import Data.Abstract.BaseError
-import Data.Abstract.Evaluatable (UnspecializedError(..), EvalError(..), Declarations)
-import Data.Abstract.FreeVariables
-import Data.Abstract.Name
+import           Control.Algebra
+import           Control.Effect.Interpose
+import           Data.Abstract.BaseError
+import           Data.Abstract.Evaluatable (Declarations, EvalError (..), UnspecializedError (..))
+import           Data.Abstract.FreeVariables
+import           Data.Abstract.Name
 import qualified Data.Abstract.Number as Number
 
 
@@ -200,7 +199,7 @@ instance ( Algebra sig m
 
 instance Algebra sig m
       => Algebra (Abstract.Unit (Value term address) :+: sig) (UnitC (Value term address) m) where
-  alg (R other) = UnitC . alg . handleCoercible $ other
+  alg (R other)              = UnitC . alg . handleCoercible $ other
   alg (L (Abstract.Unit k )) = k Unit
 
 instance ( Has (Reader ModuleInfo) sig m
@@ -252,7 +251,7 @@ specialize :: ( Has (Reader ModuleInfo) sig m
               )
            => Either ArithException Number.SomeNumber
            -> m (Value term address)
-specialize (Left exc) = throwBaseError (ArithmeticError exc)
+specialize (Left exc)                                     = throwBaseError (ArithmeticError exc)
 specialize (Right (Number.SomeNumber (Number.Integer t))) = pure (Integer (Number.Integer t))
 specialize (Right (Number.SomeNumber (Number.Decimal t))) = pure (Float (Number.Decimal t))
 specialize (Right (Number.SomeNumber (Number.Ratio t)))   = pure (Rational (Number.Ratio t))
@@ -284,12 +283,12 @@ ourShift a b = toInteger (shiftR a b)
 instance Algebra sig m => Algebra (Abstract.Object address (Value term address) :+: sig) (ObjectC address (Value term address) m) where
   alg (R other) = ObjectC . alg . handleCoercible $ other
   alg (L op) = case op of
-    Abstract.Object address k -> k (Object address)
-    Abstract.ScopedEnvironment (Object address) k -> k (Just address)
-    Abstract.ScopedEnvironment (Class _ _ address) k -> k (Just address)
+    Abstract.Object address k                          -> k (Object address)
+    Abstract.ScopedEnvironment (Object address) k      -> k (Just address)
+    Abstract.ScopedEnvironment (Class _ _ address) k   -> k (Just address)
     Abstract.ScopedEnvironment (Namespace _ address) k -> k (Just address)
-    Abstract.ScopedEnvironment _ k -> k Nothing
-    Abstract.Klass n frame k -> k (Class n mempty frame)
+    Abstract.ScopedEnvironment _ k                     -> k Nothing
+    Abstract.Klass n frame k                           -> k (Class n mempty frame)
 
 instance ( Has (Reader ModuleInfo) sig m
          , Has (Reader Span) sig m
@@ -300,14 +299,14 @@ instance ( Has (Reader ModuleInfo) sig m
       => Algebra (Abstract.Array (Value term address) :+: sig) (ArrayC (Value term address) m) where
   alg (R other) = ArrayC . alg . handleCoercible $ other
   alg (L op) = case op of
-    Abstract.Array t k -> k (Array t)
+    Abstract.Array t k                   -> k (Array t)
     Abstract.AsArray (Array addresses) k -> k addresses
-    Abstract.AsArray val k -> throwBaseError (ArrayError val) >>= k
+    Abstract.AsArray val k               -> throwBaseError (ArrayError val) >>= k
 
 instance ( Algebra sig m ) => Algebra (Abstract.Hash (Value term address) :+: sig) (HashC (Value term address) m) where
   alg (R other) = HashC . alg . handleCoercible $ other
   alg (L op) = case op of
-    Abstract.Hash t k -> k ((Hash . map (uncurry KVPair)) t)
+    Abstract.Hash t k     -> k ((Hash . map (uncurry KVPair)) t)
     Abstract.KvPair t v k -> k (KVPair t v)
 
 
@@ -386,17 +385,17 @@ data ValueError term address resume where
   BoundsError            :: [Value term address] -> Prelude.Integer  -> ValueError term address (Value term address)
 
 instance (Eq address, Eq term) => Eq1 (ValueError term address) where
-  liftEq _ (StringError a) (StringError b)                       = a == b
-  liftEq _ (CallError a) (CallError b)                           = a == b
-  liftEq _ (BoolError a) (BoolError c)                           = a == c
-  liftEq _ (IndexError a b) (IndexError c d)                     = (a == c) && (b == d)
-  liftEq _ (Numeric2Error a b) (Numeric2Error c d)               = (a == c) && (b == d)
-  liftEq _ (ComparisonError a b) (ComparisonError c d)           = (a == c) && (b == d)
-  liftEq _ (Bitwise2Error a b) (Bitwise2Error c d)               = (a == c) && (b == d)
-  liftEq _ (BitwiseError a) (BitwiseError b)                     = a == b
-  liftEq _ (KeyValueError a) (KeyValueError b)                   = a == b
-  liftEq _ (BoundsError a b) (BoundsError c d)                   = (a == c) && (b == d)
-  liftEq _ _             _                                       = False
+  liftEq _ (StringError a) (StringError b)             = a == b
+  liftEq _ (CallError a) (CallError b)                 = a == b
+  liftEq _ (BoolError a) (BoolError c)                 = a == c
+  liftEq _ (IndexError a b) (IndexError c d)           = (a == c) && (b == d)
+  liftEq _ (Numeric2Error a b) (Numeric2Error c d)     = (a == c) && (b == d)
+  liftEq _ (ComparisonError a b) (ComparisonError c d) = (a == c) && (b == d)
+  liftEq _ (Bitwise2Error a b) (Bitwise2Error c d)     = (a == c) && (b == d)
+  liftEq _ (BitwiseError a) (BitwiseError b)           = a == b
+  liftEq _ (KeyValueError a) (KeyValueError b)         = a == b
+  liftEq _ (BoundsError a b) (BoundsError c d)         = (a == c) && (b == d)
+  liftEq _ _             _                             = False
 
 deriving instance (Show address, Show term) => Show (ValueError term address resume)
 instance (Show address, Show term) => Show1 (ValueError term address) where

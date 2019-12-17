@@ -25,10 +25,10 @@ readBlobFromFile (File path language) = do
   pure . Just . sourceBlob path language . Source.fromUTF8 $ raw
 
 -- | Read a utf8-encoded file to a 'Blob', raising an IOError if it can't be found.
-readBlobFromFile' :: MonadIO m => File -> m Blob
+readBlobFromFile' :: (MonadFail m, MonadIO m) => File -> m Blob
 readBlobFromFile' file = do
   maybeFile <- readBlobFromFile file
-  maybeM (Prelude.fail ("cannot read '" <> show file <> "', file not found or language not supported.")) maybeFile
+  maybeM (fail ("cannot read '" <> show file <> "', file not found or language not supported.")) maybeFile
 
 -- | Read all blobs in the directory with Language.supportedExts.
 readBlobsFromDir :: MonadIO m => Path.AbsRelDir -> m [Blob]

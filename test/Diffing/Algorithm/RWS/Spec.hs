@@ -3,7 +3,6 @@ module Diffing.Algorithm.RWS.Spec (spec) where
 
 import Data.Bifunctor
 import Data.Diff
-import Data.Functor.Listable (ListableSyntax)
 import Data.Sum
 import qualified Data.Syntax as Syntax
 import Data.Term
