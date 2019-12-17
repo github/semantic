@@ -6,7 +6,7 @@ set -e
 
 cd $(dirname "$0")/..
 
-repl_builddir=dist-repl
+repl_builddir=dist-newstyle
 
 cabal v2-build --builddir="$repl_builddir" all --only-dependencies
 
