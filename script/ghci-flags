@@ -5,7 +5,6 @@ set -e
 
 cd "$(dirname "$0")/.."
 
-root="$(pwd)"
 ghc_version="$(ghc --numeric-version)"
 
 # recent hie-bios requires us to output to the file at $HIE_BIOS_OUTPUT, but older builds & script/repl don’t set that var, so we default it to stdout
@@ -22,24 +21,24 @@ function flags {
   echo "-hidir dist-newstyle/build/x86_64-osx/ghc-$ghc_version/build-repl"
   echo "-stubdir dist-newstyle/build/x86_64-osx/ghc-$ghc_version/build-repl"
 
-  echo "-i$root/dist-newstyle/build/x86_64-osx/ghc-$ghc_version/build-repl/autogen"
+  echo "-idist-newstyle/build/x86_64-osx/ghc-$ghc_version/build-repl/autogen"
 
-  echo "-I$root/dist-newstyle/build/x86_64-osx/ghc-$ghc_version/build-repl/autogen"
+  echo "-Idist-newstyle/build/x86_64-osx/ghc-$ghc_version/build-repl/autogen"
 
-  echo "-i$root/semantic-analysis/src"
-  echo "-i$root/semantic-ast/src"
-  echo "-i$root/semantic-core/src"
-  echo "-i$root/semantic-java/src"
-  echo "-i$root/semantic-json/src"
-  echo "-i$root/semantic-python/src"
-  echo "-i$root/semantic-tags/src"
-  echo "-i$root/app"
-  echo "-i$root/src"
-  echo "-i$root/bench"
-  echo "-i$root/test"
+  echo "-isemantic-analysis/src"
+  echo "-isemantic-ast/src"
+  echo "-isemantic-core/src"
+  echo "-isemantic-java/src"
+  echo "-isemantic-json/src"
+  echo "-isemantic-python/src"
+  echo "-isemantic-tags/src"
+  echo "-iapp"
+  echo "-isrc"
+  echo "-ibench"
+  echo "-itest"
 
   echo "-optP-include"
-  echo "-optP$root/dist-newstyle/build/x86_64-osx/ghc-$ghc_version/build-repl/autogen/cabal_macros.h"
+  echo "-optPdist-newstyle/build/x86_64-osx/ghc-$ghc_version/build-repl/autogen/cabal_macros.h"
 
   echo "-hide-all-packages"
 
