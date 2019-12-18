@@ -45,6 +45,26 @@ data LanguageExample
 le :: String -> String -> [Path.RelFile] -> LanguageExample
 le = LanguageExample
 
+examples :: [LanguageExample]
+examples =
+  [ le "python" "**/*.py" mempty
+  , le "ruby" "**/*.rb" rubySkips
+  -- , le "typescript" "**/*.[jt]s*" Nothing -- (Just $ Path.relFile "typescript/script/known_failures.txt")
+  -- , le "typescript" "**/*.tsx" Nothing
+  -- , le "javascript" ".js" examples Nothing -- parse JavaScript with TypeScript parser.
+  -- , le "go" ".go" examples (Just $ Path.relFile "script/known-failures.txt")
+
+  -- TODO: Java assignment errors need to be investigated
+  -- , le "java" ".java" examples (Just $ Path.relFile "script/known_failures_guava.txt")
+
+  -- TODO: Haskell assignment errors need to be investigated
+  -- , le "haskell" ".hs" "examples/effects" (Just "script/known-failures-effects.txt")
+  -- , le "haskell" ".hs" "examples/postgrest" (Just "script/known-failures-postgrest.txt")
+  -- , le "haskell" ".hs" "examples/ivory" (Just "script/known-failures-ivory.txt")
+
+  -- , ("php", ".php") -- TODO: No parse-examples in tree-sitter yet
+  ]-- where examples = Path.relDir "examples"
+
 rubySkips :: [Path.RelFile]
 rubySkips = Path.relFile <$>
   [
@@ -63,26 +83,6 @@ rubySkips = Path.relFile <$>
   , "ruby_spec/core/argf/readpartial_spec.rb"
   , "ruby_spec/core/process/exec_spec.rb"
   ]
-
-examples :: [LanguageExample]
-examples =
-  -- [ le "python" "**/*.py" Nothing -- (Just $ Path.relFile "script/known_failures.txt")
-  [ le "ruby" "**/*.rb" rubySkips
-  -- , le "typescript" "**/*.[jt]s*" Nothing -- (Just $ Path.relFile "typescript/script/known_failures.txt")
-  -- , le "typescript" "**/*.tsx" Nothing
-  -- , le "javascript" ".js" examples Nothing -- parse JavaScript with TypeScript parser.
-  -- , le "go" ".go" examples (Just $ Path.relFile "script/known-failures.txt")
-
-  -- TODO: Java assignment errors need to be investigated
-  -- , le "java" ".java" examples (Just $ Path.relFile "script/known_failures_guava.txt")
-
-  -- TODO: Haskell assignment errors need to be investigated
-  -- , le "haskell" ".hs" "examples/effects" (Just "script/known-failures-effects.txt")
-  -- , le "haskell" ".hs" "examples/postgrest" (Just "script/known-failures-postgrest.txt")
-  -- , le "haskell" ".hs" "examples/ivory" (Just "script/known-failures-ivory.txt")
-
-  -- , ("php", ".php") -- TODO: No parse-examples in tree-sitter yet
-  ]-- where examples = Path.relDir "examples"
 
 buildExamples :: TaskSession -> LanguageExample -> Path.RelDir -> IO Tasty.TestTree
 buildExamples session lang tsDir = do
@@ -146,14 +146,10 @@ buildExamples session lang tsDir = do
 
 filterALaCarteSymbols :: String -> [Text.Text] -> [Text.Text]
 filterALaCarteSymbols "ruby" symbols
-  -- = filterBlanks
-  -- . removeSetterEqualSign
   = filterOutInstanceVariables
   . filterOutBuiltInMethods
   $ symbols
   where
-    -- filterBlanks = filter (not . Text.null)
-    -- removeSetterEqualSign = fmap (Text.dropWhileEnd (== '='))
     filterOutInstanceVariables = filter (not . Text.isPrefixOf "@")
     filterOutBuiltInMethods = filter (`notElem` blacklist)
     blacklist =
@@ -172,14 +168,12 @@ aLaCarteLanguageModes :: PerLanguageModes
 aLaCarteLanguageModes = PerLanguageModes
   { pythonMode = ALaCarte
   , rubyMode = ALaCarte
-  -- , typescriptMode = ALaCarte
   }
 
 preciseLanguageModes :: PerLanguageModes
 preciseLanguageModes = PerLanguageModes
   { pythonMode = Precise
   , rubyMode = Precise
-  -- , typescriptMode = Precise
   }
 
 testOptions :: Config.Options
