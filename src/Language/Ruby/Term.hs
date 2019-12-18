@@ -87,6 +87,7 @@ type Syntax =
   , Literal.SymbolElement
   , Literal.TextElement
   , Ruby.Syntax.Assignment
+  , Statement.AugmentedAssignment
   , Statement.Break
   , Statement.Catch
   , Statement.Continue

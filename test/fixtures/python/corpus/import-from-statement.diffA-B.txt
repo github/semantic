@@ -1,23 +1,4 @@
 (Statements
-{+(Import
-  {+(Alias
-    {+(Identifier)+}
-    {+(Identifier)+})+})+}
-{+(Import
-  {+(Alias
-    {+(Identifier)+}
-    {+(Identifier)+})+}
-  {+(Alias
-    {+(Identifier)+}
-    {+(Identifier)+})+})+}
-{+(Import)+}
-{+(Import
-  {+(Alias
-    {+(Identifier)+}
-    {+(Identifier)+})+}
-  {+(Alias
-    {+(Identifier)+}
-    {+(Identifier)+})+})+}
 { (Import
   {-(Alias
     {-(Identifier)-}
@@ -26,18 +7,37 @@
   {+(Alias
     {+(Identifier)+}
     {+(Identifier)+})+}) }
-{+(Import
-  {+(Alias
-    {+(Identifier)+}
-    {+(Identifier)+})+})+}
-{-(Import
+{ (Import
   {-(Alias
     {-(Identifier)-}
     {-(Identifier)-})-}
   {-(Alias
     {-(Identifier)-}
-    {-(Identifier)-})-})-}
-{-(Import)-}
+    {-(Identifier)-})-})
+->(Import
+  {+(Alias
+    {+(Identifier)+}
+    {+(Identifier)+})+}
+  {+(Alias
+    {+(Identifier)+}
+    {+(Identifier)+})+}) }
+{ (Import)
+->(Import) }
+{+(Import
+  {+(Alias
+    {+(Identifier)+}
+    {+(Identifier)+})+}
+  {+(Alias
+    {+(Identifier)+}
+    {+(Identifier)+})+})+}
+{+(Import
+  {+(Alias
+    {+(Identifier)+}
+    {+(Identifier)+})+})+}
+{+(Import
+  {+(Alias
+    {+(Identifier)+}
+    {+(Identifier)+})+})+}
 {-(Import
   {-(Alias
     {-(Identifier)-}

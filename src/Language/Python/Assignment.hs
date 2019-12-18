@@ -288,7 +288,7 @@ assignment' =  makeAssignment <$> symbol Assignment <*> children ((,,) <$> term 
   where rvalue = expressionList <|> assignment' <|> yield <|> emptyTerm
         makeAssignment loc (lhs, maybeType, rhs) = makeTerm loc (Statement.Assignment (maybeToList maybeType) lhs rhs)
         assign :: (f :< Python.Syntax) => (Term Loc -> Term Loc -> f (Term Loc)) -> Term Loc -> Term Loc -> Sum Python.Syntax (Term Loc)
-        assign c l r = inject (Statement.Assignment [] l (makeTerm1 (c l r)))
+        assign c l r = inject (Statement.AugmentedAssignment (makeTerm1 (c l r)))
 
 yield :: Assignment (Term Loc)
 yield = makeTerm <$> symbol Yield <*> (Statement.Yield <$> children (term ( expression <|> emptyTerm )))

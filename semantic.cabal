@@ -59,7 +59,7 @@ common dependencies
                      , fused-effects-exceptions ^>= 1
                      , fused-effects-resumable ^>= 0.1
                      , hashable >= 1.2.7 && < 1.4
-                     , tree-sitter ^>= 0.7.1
+                     , tree-sitter ^>= 0.7.2
                      , mtl ^>= 2.2.2
                      , network ^>= 2.8.0.0
                      , pathtype ^>= 0.8.1
@@ -288,6 +288,7 @@ library
                      , semantic-java ^>= 0
                      , semantic-json ^>= 0
                      , semantic-python ^>= 0
+                     , semantic-ruby ^>= 0
                      , semantic-tags ^>= 0
                      , semigroupoids ^>= 5.3.2
                      , split ^>= 0.2.3.3
@@ -298,12 +299,12 @@ library
                      , unliftio-core ^>= 0.1.2.0
                      , unordered-containers ^>= 0.2.9.0
                      , vector ^>= 0.12.0.2
-                     , tree-sitter-go ^>= 0.3
+                     , tree-sitter-go ^>= 0.4
                      , tree-sitter-php ^>= 0.2
                      , tree-sitter-python ^>= 0.8
-                     , tree-sitter-ruby ^>= 0.3.1
-                     , tree-sitter-typescript ^>= 0.3
-                     , tree-sitter-tsx ^>= 0.3
+                     , tree-sitter-ruby ^>= 0.4
+                     , tree-sitter-typescript ^>= 0.4
+                     , tree-sitter-tsx ^>= 0.4
 
 executable semantic
   import:              haskell, dependencies, executable-flags
@@ -376,6 +377,7 @@ test-suite parse-examples
   build-depends:       semantic
                      , Glob
                      , foldl ^>= 1.4.5
+                     , lens >= 4.17 && < 4.19
                      , resourcet ^>= 1.2
                      , streaming
                      , streaming-bytestring ^>= 0.1.6
