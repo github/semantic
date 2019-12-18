@@ -27,6 +27,9 @@ function flags {
 
   echo "-I$build_products_dir/autogen"
 
+  echo "-optP-include"
+  echo "-optP$build_products_dir/autogen/cabal_macros.h"
+
   echo "-isemantic-analysis/src"
   echo "-isemantic-ast/src"
   echo "-isemantic-core/src"
@@ -38,9 +41,6 @@ function flags {
   echo "-isrc"
   echo "-ibench"
   echo "-itest"
-
-  echo "-optP-include"
-  echo "-optP$build_products_dir/autogen/cabal_macros.h"
 
   echo "-hide-all-packages"
 
