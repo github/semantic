@@ -12,18 +12,20 @@ output_file="${HIE_BIOS_OUTPUT:-/dev/stdout}"
 
 cabal v2-build -v0 all --only-dependencies
 
+build_products_dir="dist-newstyle/build/x86_64-osx/ghc-$ghc_version/build-repl"
+
 function flags {
   echo "-O0"
   echo "-ignore-dot-ghci"
 
-  echo "-outputdir dist-newstyle/build/x86_64-osx/ghc-$ghc_version/build-repl"
-  echo "-odir dist-newstyle/build/x86_64-osx/ghc-$ghc_version/build-repl"
-  echo "-hidir dist-newstyle/build/x86_64-osx/ghc-$ghc_version/build-repl"
-  echo "-stubdir dist-newstyle/build/x86_64-osx/ghc-$ghc_version/build-repl"
+  echo "-outputdir $build_products_dir"
+  echo "-odir $build_products_dir"
+  echo "-hidir $build_products_dir"
+  echo "-stubdir $build_products_dir"
 
-  echo "-idist-newstyle/build/x86_64-osx/ghc-$ghc_version/build-repl/autogen"
+  echo "-i$build_products_dir/autogen"
 
-  echo "-Idist-newstyle/build/x86_64-osx/ghc-$ghc_version/build-repl/autogen"
+  echo "-I$build_products_dir/autogen"
 
   echo "-isemantic-analysis/src"
   echo "-isemantic-ast/src"
@@ -38,7 +40,7 @@ function flags {
   echo "-itest"
 
   echo "-optP-include"
-  echo "-optPdist-newstyle/build/x86_64-osx/ghc-$ghc_version/build-repl/autogen/cabal_macros.h"
+  echo "-optP$build_products_dir/autogen/cabal_macros.h"
 
   echo "-hide-all-packages"
 
