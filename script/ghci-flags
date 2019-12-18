@@ -11,27 +11,20 @@ ghc_version="$(ghc --numeric-version)"
 # recent hie-bios requires us to output to the file at $HIE_BIOS_OUTPUT, but older builds & script/repl don’t set that var, so we default it to stdout
 output_file="${HIE_BIOS_OUTPUT:-/dev/stdout}"
 
-if [ "$1" == "--builddir" ]; then
-  repl_builddir="$2"
-  shift 2
-else
-  repl_builddir=dist-newstyle
-fi
-
-cabal v2-build -v0 --builddir="$repl_builddir" all --only-dependencies
+cabal v2-build -v0 all --only-dependencies
 
 function flags {
   echo "-O0"
   echo "-ignore-dot-ghci"
 
-  echo "-outputdir $repl_builddir/build/x86_64-osx/ghc-$ghc_version/build-repl"
-  echo "-odir $repl_builddir/build/x86_64-osx/ghc-$ghc_version/build-repl"
-  echo "-hidir $repl_builddir/build/x86_64-osx/ghc-$ghc_version/build-repl"
-  echo "-stubdir $repl_builddir/build/x86_64-osx/ghc-$ghc_version/build-repl"
+  echo "-outputdir dist-newstyle/build/x86_64-osx/ghc-$ghc_version/build-repl"
+  echo "-odir dist-newstyle/build/x86_64-osx/ghc-$ghc_version/build-repl"
+  echo "-hidir dist-newstyle/build/x86_64-osx/ghc-$ghc_version/build-repl"
+  echo "-stubdir dist-newstyle/build/x86_64-osx/ghc-$ghc_version/build-repl"
 
-  echo "-i$root/$repl_builddir/build/x86_64-osx/ghc-$ghc_version/build-repl/autogen"
+  echo "-i$root/dist-newstyle/build/x86_64-osx/ghc-$ghc_version/build-repl/autogen"
 
-  echo "-I$root/$repl_builddir/build/x86_64-osx/ghc-$ghc_version/build-repl/autogen"
+  echo "-I$root/dist-newstyle/build/x86_64-osx/ghc-$ghc_version/build-repl/autogen"
 
   echo "-i$root/semantic-analysis/src"
   echo "-i$root/semantic-ast/src"
@@ -46,12 +39,12 @@ function flags {
   echo "-i$root/test"
 
   echo "-optP-include"
-  echo "-optP$root/$repl_builddir/build/x86_64-osx/ghc-$ghc_version/build-repl/autogen/cabal_macros.h"
+  echo "-optP$root/dist-newstyle/build/x86_64-osx/ghc-$ghc_version/build-repl/autogen/cabal_macros.h"
 
   echo "-hide-all-packages"
 
   # Emit package flags from the environment file, removing comments & prefixing with -
-  cabal v2-exec --builddir="$repl_builddir" -v0 bash -- -c 'cat "$GHC_ENVIRONMENT"' | grep -v '^--' | sed -e 's/^/-/'
+  cabal v2-exec -v0 bash -- -c 'cat "$GHC_ENVIRONMENT"' | grep -v '^--' | sed -e 's/^/-/'
 
   echo "-XHaskell2010"
   echo "-XStrictData"

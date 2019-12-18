@@ -6,6 +6,4 @@ set -e
 
 cd "$(dirname "$0")/.."
 
-repl_builddir=dist-newstyle
-
-cabal v2-exec --builddir="$repl_builddir" env -- -u GHC_ENVIRONMENT ghci -ghci-script=.ghci.repl $(script/ghci-flags --builddir "$repl_builddir") -no-ignore-dot-ghci $@
+cabal v2-exec env -- -u GHC_ENVIRONMENT ghci -ghci-script=.ghci.repl $(script/ghci-flags) -no-ignore-dot-ghci $@
