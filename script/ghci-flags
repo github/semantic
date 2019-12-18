@@ -3,7 +3,7 @@
 
 set -e
 
-cd $(dirname "$0")/..
+cd "$(dirname "$0")/.."
 
 root="$(pwd)"
 ghc_version="$(ghc --numeric-version)"
