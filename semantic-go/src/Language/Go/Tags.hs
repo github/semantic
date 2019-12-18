@@ -1,4 +1,4 @@
-{-# LANGUAGE AllowAmbiguousTypes, DataKinds, DisambiguateRecordFields, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, NamedFieldPuns, OverloadedStrings, PartialTypeSignatures, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes, DataKinds, DisambiguateRecordFields, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, NamedFieldPuns, PartialTypeSignatures, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Language.Go.Tags
 ( ToTags(..)
 ) where
@@ -6,9 +6,7 @@ module Language.Go.Tags
 import           AST.Element
 import           Control.Effect.Reader
 import           Control.Effect.Writer
-import           Control.Monad
 import           Data.Monoid (Ap (..))
-import           Data.Foldable
 import           Data.Text as Text
 import           GHC.Generics
 import           Source.Loc
