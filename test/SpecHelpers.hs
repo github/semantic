@@ -32,7 +32,6 @@ import Control.Carrier.Resumable.Either
 import Control.Carrier.Lift
 import Control.Carrier.State.Strict
 import Control.Exception (displayException)
-import Control.Monad ((>=>))
 import Control.Monad as X
 import Data.Abstract.Address.Precise as X
 import Data.Abstract.Evaluatable
@@ -41,7 +40,6 @@ import qualified Data.Abstract.Heap as Heap
 import Data.Abstract.Module as X
 import Data.Abstract.ModuleTable as X hiding (lookup)
 import Data.Abstract.Name as X
-import Data.Abstract.ScopeGraph (EdgeLabel(..))
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import Data.Abstract.Value.Concrete (Value(..), ValueError, runValueError)
 import Data.Blob as X

@@ -1,0 +1,5 @@
+#!/bin/bash
+
+rm -rf ~/.cabal/store/ghc-8.6.5/tr-sttr*
+rm -rf ~/.cabal/store/ghc-8.6.5/lib/libHStr-sttr*
+rm -rf ~/.cabal/store/ghc-8.6.5/package.db/tr-sttr*

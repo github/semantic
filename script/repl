@@ -4,10 +4,7 @@
 
 set -e
 
-cd $(dirname "$0")/..
+cd "$(dirname "$0")/.."
 
-repl_builddir=dist-repl
-
-cabal build --builddir="$repl_builddir" all --only-dependencies
-
-cabal exec --builddir="$repl_builddir" env -- -u GHC_ENVIRONMENT ghci -ghci-script=.ghci.semantic $(script/ghci-flags --builddir "$repl_builddir") -no-ignore-dot-ghci $@
+# exec ghci with the appropriate flags, and without the $GHC_ENVIRONMENT variable interfering
+cabal v2-exec env -- -u GHC_ENVIRONMENT ghci -ghci-script=.ghci.repl $(script/ghci-flags) -no-ignore-dot-ghci $@

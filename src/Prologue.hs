@@ -8,25 +8,25 @@ module Prologue
   ) where
 
 
-import Debug.Trace as X (traceShowM, traceM)
 import Data.Bifunctor.Join as X
 import Data.Bits as X
 import Data.ByteString as X (ByteString)
 import Data.Coerce as X
-import Data.Int as X (Int8, Int16, Int32, Int64)
 import Data.Either as X (fromLeft, fromRight)
+import Data.Int as X (Int16, Int32, Int64, Int8)
 import Data.IntMap as X (IntMap)
 import Data.IntSet as X (IntSet)
 import Data.Ix as X (Ix (..))
 import Data.List.NonEmpty as X (NonEmpty (..), nonEmpty, some1)
 import Data.Map as X (Map)
 import Data.Maybe as X
+import Data.Semilattice.Lower as X (Lower (..))
 import Data.Sequence as X (Seq)
-import Data.Semilattice.Lower as X (Lower(..))
 import Data.Set as X (Set)
-import Data.Sum as X (Sum, Element, Elements, (:<), (:<:), Apply (..), inject)
+import Data.Sum as X ((:<), (:<:), Apply (..), Element, Elements, Sum, inject)
 import Data.Text as X (Text)
-import Data.Word as X (Word8, Word16, Word32, Word64)
+import Data.Word as X (Word16, Word32, Word64, Word8)
+import Debug.Trace as X (traceM, traceShowM)
 
 import Control.Exception as X hiding (Handler (..), assert, evaluate, throw, throwIO, throwTo)
 
@@ -43,12 +43,12 @@ import Data.Bifunctor as X (Bifunctor (..))
 import Data.Bitraversable as X
 import Data.Foldable as X hiding (product, sum)
 import Data.Function as X (fix, on, (&))
-import Data.Functor as X (void, ($>))
+import Data.Functor as X (($>))
 import Data.Functor.Classes as X
 import Data.Functor.Classes.Generic as X
 import Data.Functor.Foldable as X (Base, Corecursive (..), Recursive (..))
 import Data.Hashable as X (Hashable, hash, hashUsing, hashWithSalt)
-import Data.Hashable.Lifted as X (Hashable1(..), hashWithSalt1)
+import Data.Hashable.Lifted as X (Hashable1 (..), hashWithSalt1)
 import Data.Monoid as X (First (..), Last (..), Monoid (..))
 import Data.Monoid.Generic as X
 import Data.Proxy as X (Proxy (..))

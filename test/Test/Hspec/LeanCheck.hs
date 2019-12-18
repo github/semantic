@@ -8,7 +8,6 @@ import Control.Exception
 import Data.Bifunctor (first)
 import Data.List (intercalate)
 import Data.Maybe (listToMaybe)
-import GHC.Show as Show (showsPrec)
 import Test.Hspec
 import Test.Hspec.Core.Spec as Hspec
 import qualified Test.HUnit.Lang as HUnit

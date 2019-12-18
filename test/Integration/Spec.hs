@@ -3,7 +3,7 @@ module Integration.Spec (testTree) where
 
 import Control.Exception (throw)
 import Data.Foldable (find)
-import Data.List (union, concat, transpose)
+import Data.List (union, transpose)
 import qualified Data.ByteString.Lazy as BL
 import System.FilePath.Glob
 import System.IO.Unsafe

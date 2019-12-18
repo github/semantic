@@ -12,7 +12,6 @@ module Data.Abstract.Name
 import           Control.Effect.Fresh
 import           Data.Aeson
 import qualified Data.Char as Char
-import           Data.Text (Text)
 import qualified Data.Text as Text
 import           Prologue
 

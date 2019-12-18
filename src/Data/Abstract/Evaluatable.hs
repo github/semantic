@@ -38,7 +38,6 @@ import Data.Abstract.FreeVariables as X
 import Data.Abstract.Module
 import Data.Abstract.Name as X
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
-import Data.Abstract.ScopeGraph (Relation(..))
 import Data.Abstract.AccessControls.Class as X
 import Data.Language
 import Data.Semigroup.App

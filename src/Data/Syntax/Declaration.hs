@@ -9,7 +9,6 @@ import qualified Data.Set as Set
 
 import           Control.Abstract hiding (AccessControl (..), Function)
 import           Data.Abstract.Evaluatable
-import           Data.Abstract.Name (__self)
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.JSON.Fields
 import           Diffing.Algorithm
