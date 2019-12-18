@@ -131,8 +131,8 @@ identifier =
   <|> mk Setter
   <|> mk SplatArgument
   <|> mk HashSplatArgument
-  <|> mk BlockArgument
   <|> mk Uninterpreted
+  <|> symbol BlockArgument *> children expression
   where
     mk s = makeTerm <$> symbol s <*> (Syntax.Identifier . name <$> source)
     zsuper = makeTerm <$> symbol Super <*> (Ruby.Syntax.ZSuper <$ source)
