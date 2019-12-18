@@ -45,6 +45,8 @@ class MarshalJSON t where
   default marshal :: ( Generic1 t, GMarshalJSON (Rep1 t), ToJSON a) => t a -> Value
   marshal = gmarshal . from1
 
+instance (GMarshalJSON (Rep1 t), Generic1 t) => MarshalJSON t
+
 -- Typeclass to generically marshal ASTs into JSON
 -- Given some type @a@ that's an instance of @ToJSON@, we apply a function @f@ and return a JSON value represented as a Haskell value
 class GMarshalJSON f where
