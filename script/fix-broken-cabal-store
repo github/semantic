@@ -2,6 +2,6 @@
 
 ghc_version="$(ghc --numeric-version)"
 
-rm -rf ~/.cabal/store/ghc-$ghc_version/tr-sttr*
-rm -rf ~/.cabal/store/ghc-$ghc_version/lib/libHStr-sttr*
-rm -rf ~/.cabal/store/ghc-$ghc_version/package.db/tr-sttr*
+rm -rf "~/.cabal/store/ghc-$ghc_version/tr-sttr*"
+rm -rf "~/.cabal/store/ghc-$ghc_version/lib/libHStr-sttr*"
+rm -rf "~/.cabal/store/ghc-$ghc_version/package.db/tr-sttr*"
