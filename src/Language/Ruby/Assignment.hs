@@ -395,7 +395,7 @@ assignment' = makeTerm  <$> symbol Assignment         <*> children (Ruby.Syntax.
                 ])
   where
     assign :: (f :< Ruby.Syntax) => (Term Loc -> Term Loc -> f (Term Loc)) -> Term Loc -> Term Loc -> Sum Ruby.Syntax (Term Loc)
-    assign c l r = inject (Ruby.Syntax.Assignment [] l (makeTerm1 (c l r)))
+    assign c l r = inject (Statement.AugmentedAssignment (makeTerm1 (c l r)))
 
     lhs  = makeTerm <$> symbol LeftAssignmentList  <*> children (many expr) <|> expr
     rhs  = makeTerm <$> symbol RightAssignmentList <*> children (many expr) <|> expr
