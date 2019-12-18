@@ -213,7 +213,7 @@ solve cs = for_ cs solve
               Nothing | m1 `IntSet.member` mvs t2 -> fail ("Occurs check failure: " <> show m1 <> " :===: " <> show t2)
                       | otherwise                 -> modify (IntMap.insert m1 t2 . fmap (substAll (IntMap.singleton m1 t2)))
           t1         :===: Var m2   -> solve (Var m2 :===: t1)
-          t1         :===: t2         -> unless (t1 == t2) $ fail ("Type mismatch:\nexpected: " <> show t1 <> "\n  actual: " <> show t2)
+          t1         :===: t2       -> unless (t1 == t2) $ fail ("Type mismatch:\nexpected: " <> show t1 <> "\n  actual: " <> show t2)
 
         solution m = fmap (m :=) <$> gets (IntMap.lookup m)
 
