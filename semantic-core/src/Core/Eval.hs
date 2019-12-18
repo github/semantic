@@ -45,7 +45,7 @@ eval :: forall address value m sig
 eval Analysis{..} eval = \case
   Var n -> lookupEnv' n >>= deref' n
   Alg (R (L c)) -> case c of
-    Rec (Named (Ignored n) b) -> do
+    Rec (Named n b) -> do
       addr <- A.alloc @address n
       v <- A.bind n addr (eval (instantiate1 (pure n) b))
       v <$ A.assign addr v
@@ -53,12 +53,12 @@ eval Analysis{..} eval = \case
     --
     -- It’s also worth noting that we use a semigroup instead of a semilattice because the lattice structure of our abstract domains is instead modelled by nondeterminism effects used by some of them.
     a :>> b -> (<>) <$> eval a <*> eval b
-    Named (Ignored n) a :>>= b -> do
+    Named n a :>>= b -> do
       a' <- eval a
       addr <- A.alloc @address n
       A.assign addr a'
       A.bind n addr ((a' <>) <$> eval (instantiate1 (pure n) b))
-    Lam (Named (Ignored n) b) -> abstract eval n (instantiate1 (pure n) b)
+    Lam (Named n b) -> abstract eval n (instantiate1 (pure n) b)
     f :$ a -> do
       f' <- eval f
       a' <- eval a

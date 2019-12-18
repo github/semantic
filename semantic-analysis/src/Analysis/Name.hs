@@ -6,9 +6,9 @@ module Analysis.Name
 , named'
 , namedName
 , namedValue
-, Ignored(..)
 ) where
 
+import Data.Function (on)
 import Data.String (IsString)
 import Data.Text (Text)
 
@@ -18,24 +18,23 @@ newtype Name = Name { unName :: Text }
 
 
 -- | Annotates an @a@ with a 'Name'-provided name, which is ignored for '==' and 'compare'.
-data Named a = Named (Ignored Name) a
-  deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
+data Named a = Named Name a
+  deriving (Foldable, Functor, Show, Traversable)
 
 named :: Name -> a -> Named a
-named = Named . Ignored
+named = Named
 
 named' :: Name -> Named Name
-named' u = Named (Ignored u) u
+named' u = Named u u
 
 namedName :: Named a -> Name
-namedName (Named (Ignored n) _) = n
+namedName (Named n _) = n
 
 namedValue :: Named a -> a
 namedValue (Named _ a) = a
 
+instance Eq a => Eq (Named a) where
+  (==) = (==) `on` namedValue
 
-newtype Ignored a = Ignored a
-  deriving (Foldable, Functor, Show, Traversable)
-
-instance Eq  (Ignored a) where _ == _ = True
-instance Ord (Ignored a) where compare _ _ = EQ
+instance Ord a => Ord (Named a) where
+  compare = compare `on` namedValue

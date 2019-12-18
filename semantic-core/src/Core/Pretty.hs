@@ -50,12 +50,12 @@ prettyCore style = unPrec . go . fmap name
   where go = \case
           Var v -> atom v
           Alg t -> case t of
-            Rec (Named (Ignored x) b) -> prec 3 . group . nest 2 $ vsep
+            Rec (Named x b) -> prec 3 . group . nest 2 $ vsep
               [ keyword "rec" <+> name x
               , symbol "=" <+> align (withPrec 0 (go (instantiate1 (pure (name x)) b)))
               ]
 
-            Lam (Named (Ignored x) b) -> prec 3 . group . nest 2 $ vsep
+            Lam (Named x b) -> prec 3 . group . nest 2 $ vsep
               [ lambda <> name x, arrow <+> withPrec 0 (go (instantiate1 (pure (name x)) b)) ]
 
             Record fs -> atom . group . nest 2 $ vsep [ primitive "record", block ", " (map (uncurry keyValue) fs) ]
@@ -90,7 +90,7 @@ prettyCore style = unPrec . go . fmap name
         block _ [] = braces mempty
         block s ss = encloseSep "{ " " }" s ss
         keyValue x v = name x <+> symbol ":" <+> unPrec (go v)
-        prettyStatement names (Just (Named (Ignored u) _) :<- t) = name u <+> arrowL <+> unPrec (go (either (names !!) id <$> t))
+        prettyStatement names (Just (Named u _) :<- t) = name u <+> arrowL <+> unPrec (go (either (names !!) id <$> t))
         prettyStatement names (Nothing                    :<- t) = unPrec (go (either (names !!) id <$> t))
         lambda = case style of
           Unicode -> symbol "λ"
