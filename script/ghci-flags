@@ -18,6 +18,8 @@ else
   repl_builddir=dist-newstyle
 fi
 
+cabal v2-build -v0 --builddir="$repl_builddir" all --only-dependencies
+
 function flags {
   echo "-O0"
   echo "-ignore-dot-ghci"
