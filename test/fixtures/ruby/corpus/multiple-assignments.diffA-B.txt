@@ -2,8 +2,7 @@
   (Assignment
     (Statements
       (Identifier)
-    { (Identifier)
-    ->(Identifier) }
+      (Identifier)
     {-(Identifier)-})
     (Array
       (Integer)
