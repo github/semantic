@@ -33,6 +33,7 @@ import qualified Data.Syntax.Directive as Directive
 import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
+import qualified Data.Text as Text
 import qualified Language.Ruby.Syntax as Ruby.Syntax
 import           Language.Ruby.Term as Ruby
 import           TreeSitter.Ruby as Grammar
@@ -399,10 +400,16 @@ assignment' = makeTerm  <$> symbol Assignment         <*> children (Ruby.Syntax.
 
     lhs  = makeTerm <$> symbol LeftAssignmentList  <*> children (many expr) <|> expr
     rhs  = makeTerm <$> symbol RightAssignmentList <*> children (many expr) <|> expr
-    expr = makeTerm <$> symbol RestAssignment      <*> (Syntax.Identifier . name <$> source)
+    expr = makeTerm <$> symbol RestAssignment      <*> restAssign
        <|> makeTerm <$> symbol DestructuredLeftAssignment <*> children (many expr)
        <|> lhsIdent
        <|> expression
+
+    restAssign = do
+      locals <- getLocals
+      ident <- Text.dropWhile (== '*') <$> source
+      putLocals (ident : locals)
+      pure $ Syntax.Identifier (name ident)
 
 lhsIdent :: Assignment (Term Loc)
 lhsIdent = do
