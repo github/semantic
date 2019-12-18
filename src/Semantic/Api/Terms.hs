@@ -40,6 +40,7 @@ import           Source.Loc
 
 import qualified Language.Java as Java
 import qualified Language.JSON as JSON
+import qualified Language.Go as GoPrecise
 import qualified Language.Python as PythonPrecise
 import qualified Language.Ruby as RubyPrecise
 
@@ -108,6 +109,9 @@ instance (TermMode term ~ strategy, ShowTermBy strategy term) => ShowTerm term w
 class ShowTermBy (strategy :: LanguageMode) term where
   showTermBy :: (Has (Reader Config) sig m) => term Loc -> m Builder
 
+instance ShowTermBy 'Precise GoPrecise.Term where
+  showTermBy = serialize Show . void . GoPrecise.getTerm
+
 instance ShowTermBy 'Precise Java.Term where
   showTermBy = serialize Show . void . Java.getTerm
 
@@ -135,6 +139,9 @@ instance (TermMode term ~ strategy, SExprTermBy strategy term) => SExprTerm term
 
 class SExprTermBy (strategy :: LanguageMode) term where
   sexprTermBy :: term Loc -> Builder
+
+instance SExprTermBy 'Precise GoPrecise.Term where
+  sexprTermBy = SExpr.Precise.serializeSExpression . GoPrecise.getTerm
 
 instance SExprTermBy 'Precise Java.Term where
   sexprTermBy = SExpr.Precise.serializeSExpression . Java.getTerm

@@ -178,6 +178,11 @@ languageModes = Language.PerLanguageModes
                   <> metavar "ALaCarte|Precise"
                   <> value Language.ALaCarte
                   <> showDefault)
+  <*> option auto (  long "go-mode"
+                  <> help "The AST representation to use for Go sources"
+                  <> metavar "ALaCarte|Precise"
+                  <> value Language.ALaCarte
+                  <> showDefault)
 
 filePathReader :: ReadM File
 filePathReader = fileForPath <$> str

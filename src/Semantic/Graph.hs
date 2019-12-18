@@ -104,7 +104,7 @@ instance
 
 analysisParsers :: Map Language (SomeParser AnalyzeTerm Loc)
 analysisParsers = Map.fromList
-  [ goParser
+  [ goParserALaCarte
   , javascriptParser
   , phpParser
   , pythonParserALaCarte

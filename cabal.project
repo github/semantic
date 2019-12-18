@@ -2,6 +2,7 @@ packages: .
           semantic-analysis
           semantic-ast
           semantic-core
+          semantic-go
           semantic-java
           semantic-json
           semantic-python

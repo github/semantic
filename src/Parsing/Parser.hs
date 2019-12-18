@@ -5,6 +5,8 @@ module Parsing.Parser
   -- $abstract
 , SomeParser(..)
 , goParser
+, goParserALaCarte
+, goParserPrecise
 , javaParser
 , javascriptParser
 , jsonParser
@@ -35,7 +37,8 @@ import qualified Data.Map as Map
 import qualified Data.Syntax as Syntax
 import           Data.Term
 import           Foreign.Ptr
-import qualified Language.Go.Assignment as Go
+import qualified Language.Go as GoPrecise
+import qualified Language.Go.Assignment as GoALaCarte
 import qualified Language.Java as Java
 import qualified Language.JSON as JSON
 import qualified Language.Markdown.Assignment as Markdown
@@ -103,8 +106,16 @@ data Parser term where
 data SomeParser c a where
   SomeParser :: c t => Parser (t a) -> SomeParser c a
 
-goParser :: c Go.Term => (Language, SomeParser c Loc)
-goParser = (Go, SomeParser (AssignmentParser (ASTParser tree_sitter_go) Go.assignment))
+goParserALaCarte :: c GoALaCarte.Term => (Language, SomeParser c Loc)
+goParserALaCarte = (Go, SomeParser (AssignmentParser (ASTParser tree_sitter_go) GoALaCarte.assignment))
+
+goParserPrecise :: c GoPrecise.Term => (Language, SomeParser c Loc)
+goParserPrecise = (Go, SomeParser (UnmarshalParser @GoPrecise.Term GoPrecise.tree_sitter_go))
+
+goParser :: (c GoALaCarte.Term, c GoPrecise.Term) => PerLanguageModes -> (Language, SomeParser c Loc)
+goParser modes = case goMode modes of
+  ALaCarte -> goParserALaCarte
+  Precise  -> goParserPrecise
 
 javaParser :: c Java.Term => (Language, SomeParser c Loc)
 javaParser = (Java, SomeParser (UnmarshalParser @Java.Term Java.tree_sitter_java))
@@ -155,6 +166,7 @@ typescriptParser = (TypeScript, SomeParser (AssignmentParser (ASTParser tree_sit
 
 -- | A type family selecting the language mode for a given term type.
 type family TermMode term where
+  TermMode GoPrecise.Term     = 'Precise
   TermMode Java.Term          = 'Precise
   TermMode JSON.Term          = 'Precise
   TermMode PythonPrecise.Term = 'Precise
@@ -164,7 +176,7 @@ type family TermMode term where
 
 -- | The canonical set of parsers producing à la carte terms.
 aLaCarteParsers
-  :: ( c Go.Term
+  :: ( c GoALaCarte.Term
      , c Markdown.Term
      , c PHP.Term
      , c PythonALaCarte.Term
@@ -174,7 +186,7 @@ aLaCarteParsers
      )
   => Map Language (SomeParser c Loc)
 aLaCarteParsers = Map.fromList
-  [ goParser
+  [ goParserALaCarte
   , javascriptParser
   , jsxParser
   , markdownParser
@@ -191,6 +203,7 @@ preciseParsers
      , c JSON.Term
      , c PythonPrecise.Term
      , c RubyPrecise.Term
+     , c GoPrecise.Term
      )
   => Map Language (SomeParser c Loc)
 preciseParsers = Map.fromList
@@ -198,11 +211,13 @@ preciseParsers = Map.fromList
   , jsonParser
   , pythonParserPrecise
   , rubyParserPrecise
+  , goParserPrecise
   ]
 
 -- | The canonical set of all parsers for the passed per-language modes.
 allParsers
-  :: ( c Go.Term
+  :: ( c GoALaCarte.Term
+     , c GoPrecise.Term
      , c Java.Term
      , c JSON.Term
      , c Markdown.Term
@@ -217,7 +232,7 @@ allParsers
   => PerLanguageModes
   -> Map Language (SomeParser c Loc)
 allParsers modes = Map.fromList
-  [ goParser
+  [ goParser modes
   , javaParser
   , javascriptParser
   , jsonParser
