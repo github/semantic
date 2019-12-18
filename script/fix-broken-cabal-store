@@ -1,5 +1,7 @@
 #!/bin/bash
 
-rm -rf ~/.cabal/store/ghc-8.6.5/tr-sttr*
-rm -rf ~/.cabal/store/ghc-8.6.5/lib/libHStr-sttr*
-rm -rf ~/.cabal/store/ghc-8.6.5/package.db/tr-sttr*
+store_dir="$HOME/.cabal/store/ghc-$(ghc --numeric-version)"
+
+rm -rf "$store_dir"/tr-sttr*
+rm -rf "$store_dir"/lib/libHStr-sttr*
+rm -rf "$store_dir"/package.db/tr-sttr*
