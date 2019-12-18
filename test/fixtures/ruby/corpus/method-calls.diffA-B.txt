@@ -28,7 +28,8 @@
     {-(Array)-}
     {-(Integer)-})-}
   {-(Identifier)-}
-  {-(Identifier)-}
+  {-(Send
+    {-(Identifier)-})-}
   {-(Function
     {-(Empty)-}
     {-(Identifier)-}
