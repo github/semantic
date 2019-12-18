@@ -14,7 +14,6 @@ import           Data.Blob
 import qualified Data.ByteString.Lazy.Char8 as BLC
 import qualified Data.ByteString.Streaming.Char8 as ByteStream
 import           Data.Foldable
-import           Data.Function ((&))
 import           Data.Language (LanguageMode (..), PerLanguageModes (..))
 import           Data.List
 import qualified Data.Text as Text
@@ -50,6 +49,7 @@ rubySkips :: [Path.RelFile]
 rubySkips = Path.relFile <$>
   [
   -- UTF8 encoding issues ("Cannot decode byte '\xe3': Data.Text.Internal.Encoding.decodeUtf8: Invalid UTF-8 stream")
+  -- These are going to be hard to fix as Ruby allows non-utf8 characters content in string literals
     "ruby_spec/optional/capi/string_spec.rb"
   , "ruby_spec/core/string/b_spec.rb"
   , "ruby_spec/core/string/shared/encode.rb"
