@@ -55,6 +55,8 @@ type family ToTagsInstance t :: Strategy where
   ToTagsInstance Rb.Call               = 'Custom
   ToTagsInstance Rb.Lhs                = 'Custom
   ToTagsInstance Rb.MethodCall         = 'Custom
+  ToTagsInstance Rb.Alias              = 'Custom
+  ToTagsInstance Rb.Undef              = 'Custom
 
   -- Along with class, module, and method definitions, these introduce new lexical scopes for locals
   ToTagsInstance Rb.Block              = 'Custom
@@ -223,6 +225,30 @@ instance ToTagsBy 'Custom Rb.MethodCall where
       _ -> gtags t
     where
       yield name kind = yieldTag name kind loc range >> gtags t
+
+instance ToTagsBy 'Custom Rb.Alias where
+  tags' t@Rb.Alias
+    { ann = loc@Loc { byteRange = range }
+    , alias = Rb.MethodName aliasExpr
+    , name = Rb.MethodName nameExpr
+    } = do
+      case aliasExpr of
+        Prj Rb.Identifier { text } -> yieldTag text Function loc range
+        _ -> tags aliasExpr
+      case nameExpr of
+        Prj Rb.Identifier { text } -> yieldTag text Call loc range
+        _ -> tags nameExpr
+      gtags t
+
+instance ToTagsBy 'Custom Rb.Undef where
+  tags' t@Rb.Undef
+    { ann = loc@Loc { byteRange = range }
+    , extraChildren
+    } = for_ extraChildren $ \(Rb.MethodName expr) -> do
+      case expr of
+        Prj Rb.Identifier { text } -> yieldTag text Call loc range
+        _ -> tags expr
+      gtags t
 
 introduceLocals
   :: ( Has (Reader Source) sig m
