@@ -69,6 +69,7 @@ instance ToTagsBy 'Custom Go.CallExpression where
           Prj Go.SelectorExpression { field = Go.FieldIdentifier { text }} -> yield text
           Prj Go.Identifier { text } -> yield text
           Prj Go.CallExpression { function = Go.Expression e } -> match e
+          Prj Go.ParenthesizedExpression { extraChildren = Go.Expression e } -> match e
           _ -> gtags t
         yield name = yieldTag name Call loc byteRange >> gtags t
 
