@@ -24,12 +24,11 @@ function flags {
   echo "-hidir $build_products_dir"
   echo "-stubdir $build_products_dir"
 
-  echo "-i$build_products_dir/autogen"
-
-  echo "-I$build_products_dir/autogen"
-
   echo "-optP-include"
   echo "-optP$build_products_dir/autogen/cabal_macros.h"
+
+  echo "-i$build_products_dir/autogen"
+  echo "-I$build_products_dir/autogen"
 
   echo "-isemantic-analysis/src"
   echo "-isemantic-ast/src"
