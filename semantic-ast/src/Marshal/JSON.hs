@@ -11,7 +11,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 
 module Marshal.JSON
-( marshal
+( MarshalJSON(..)
 ) where
 
 import Data.Aeson as Aeson
