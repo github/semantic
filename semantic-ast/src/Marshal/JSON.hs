@@ -67,7 +67,6 @@ instance GFields fields => GMarshalJSON (C1 c fields) where
 instance (GFields f, GFields g) => GFields (f :*: g) where
   gfields acc (f :*: g) = gfields (gfields acc g) f
 
--- Takes term-level value of the type-level string 'fieldname' by passing a Proxy specialised to 'fieldname' to the knownSymbol function.
 -- To actually get a value out of this datum, we'll need one more typeclass. Let's call its method 'gvalue'.
 -- Implement base case for products
 instance (GValue p, Selector s) => GFields (S1 s p) where
