@@ -69,7 +69,7 @@ rubySkips :: [Path.RelFile]
 rubySkips = Path.relFile <$>
   [
   -- UTF8 encoding issues ("Cannot decode byte '\xe3': Data.Text.Internal.Encoding.decodeUtf8: Invalid UTF-8 stream")
-  -- These are going to be hard to fix as Ruby allows non-utf8 characters content in string literals
+  -- These are going to be hard to fix as Ruby allows non-utf8 character content in string literals
     "ruby_spec/optional/capi/string_spec.rb"
   , "ruby_spec/core/string/b_spec.rb"
   , "ruby_spec/core/string/shared/encode.rb"
@@ -79,7 +79,7 @@ rubySkips = Path.relFile <$>
   -- Doesn't parse
   , "ruby_spec/language/string_spec.rb"
 
-  -- Can't detect method calls inside heredoc bodies
+  -- Can't detect method calls inside heredoc bodies with precise ASTs
   , "ruby_spec/core/argf/readpartial_spec.rb"
   , "ruby_spec/core/process/exec_spec.rb"
   ]
