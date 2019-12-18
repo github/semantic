@@ -28,8 +28,8 @@ common haskell
                      , semantic-source ^>= 0.0
                      , semantic-tags ^>= 0.0
                      , text ^>= 1.2.3
-                     , tree-sitter ^>= 0.7
-                     , tree-sitter-ruby ^>= 0.3.1
+                     , tree-sitter ^>= 0.7.2
+                     , tree-sitter-ruby ^>= 0.4
 
   ghc-options:
     -Weverything
