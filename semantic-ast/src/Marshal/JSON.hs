@@ -55,10 +55,6 @@ instance (GMarshalJSON (Rep1 t), Generic1 t) => MarshalJSON t
 class GMarshalJSON f where
   gmarshal :: (ToJSON a) => f a -> Value
 
--- We need a marshal instance for the node datatype we wish to serialize.
-instance MarshalJSON Bar
--- Generic instances
-
 -- Stores meta-data for datatypes
 -- using unM1 instead of pattern-matching on M1 to express with function composition
 instance GMarshalJSON f => GMarshalJSON (M1 D c f) where
