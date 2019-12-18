@@ -62,16 +62,17 @@ instance GMarshalJSON f => GMarshalJSON (M1 D c f) where
 -- Need to fold over S1 product types and pass the result to Aeson objects
 instance GFields fields => GMarshalJSON (C1 c fields) where
   gmarshal = object . gfields [] . unM1
-
--- Implement the product case
-instance (GFields f, GFields g) => GFields (f :*: g) where
-  gfields acc (f :*: g) = gfields (gfields acc g) f
+-- TODO: we first see gfields appear where we have constructors because ...
 
 -- Implement base case for products
 -- To actually get a value out of this datum, we'll need one more typeclass: GValue. Let's call its method 'gvalue'.
 instance (GValue p, Selector s) => GFields (S1 s p) where
   gfields acc x = (Text.pack (selName x), gvalue (unM1 x)) : acc
 -- knows what the type of x is, whereas M1 has parameters that can be instantiated to anything
+
+-- Implement inductive case for product case
+instance (GFields f, GFields g) => GFields (f :*: g) where
+  gfields acc (f :*: g) = gfields (gfields acc g) f
 
 -- Implement the sum case
 instance (GMarshalJSON f, GMarshalJSON g) => GMarshalJSON (f :+: g) where
