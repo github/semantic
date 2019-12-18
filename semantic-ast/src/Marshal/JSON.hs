@@ -27,6 +27,14 @@ data Bar a = Bar
   -- Aeson requires that the datatypes derive Generic
   -- we want Generic1 because we can represent types of kind * -> *
 
+-- Thinking about the shape of Bar:
+-- it is a Datatype, meaning it will require M1 D
+-- it has a data constructor, so it will require C1
+-- it is a product type, so it will require :*:
+-- it has record selector fields so it will require S1
+-- is has a parameter so it will require Par1
+-- it has a constant, foo :: Text, so it will require K1 R
+
 -- Serialize unmarshaled ASTs into JSON representation by auto-deriving Aeson instances generically
 class MarshalJSON t where
   marshal :: (ToJSON a) => t a -> Value
