@@ -6,4 +6,5 @@ set -e
 
 cd "$(dirname "$0")/.."
 
+# exec ghci with the appropriate flags, and without the $GHC_ENVIRONMENT variable interfering
 cabal v2-exec env -- -u GHC_ENVIRONMENT ghci -ghci-script=.ghci.repl $(script/ghci-flags) -no-ignore-dot-ghci $@
