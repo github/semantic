@@ -278,7 +278,7 @@ library
                      , optparse-applicative >= 0.14.3 && < 0.16
                      , parallel ^>= 3.2.2.0
                      , parsers ^>= 0.12.9
-                     , prettyprinter >= 1.2.1 && < 1.4
+                     , prettyprinter >= 1.2 && < 2
                      , pretty-show ^>= 1.9.5
                      , profunctors ^>= 5.3
                      , proto-lens >= 0.5 && < 0.7
