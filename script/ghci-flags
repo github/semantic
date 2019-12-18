@@ -30,6 +30,7 @@ function flags {
   echo "-i$build_products_dir/autogen"
   echo "-I$build_products_dir/autogen"
 
+  # TODO: would be nice to figure this out from cabal.project & the .cabal files
   echo "-isemantic-analysis/src"
   echo "-isemantic-ast/src"
   echo "-isemantic-core/src"
