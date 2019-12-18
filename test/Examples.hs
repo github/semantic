@@ -1,6 +1,6 @@
 {-# LANGUAGE FlexibleContexts, RecordWildCards, OverloadedStrings, TypeApplications #-}
 {-# OPTIONS_GHC -O1 #-}
-module Main (main) where
+module Main (main, knownFailuresForPath) where
 
 import           Control.Carrier.Parse.Measured
 import           Control.Carrier.Reader
@@ -19,7 +19,6 @@ import           Data.Language (LanguageMode (..), PerLanguageModes (..))
 import           Data.List
 import qualified Data.Text as Text
 import           Data.Set (Set)
-import qualified Data.Set as Set
 import           Data.Traversable
 import qualified Streaming.Prelude as Stream
 import           System.FilePath.Glob
@@ -39,18 +38,35 @@ import Semantic.Task.Files
 
 data LanguageExample
   = LanguageExample
-  { languageName             :: String
-  , languageExtension        :: String
-  , languageKnownFailuresTxt :: Maybe Path.RelFile
+  { languageName      :: String
+  , languageExtension :: String
+  , languageSkips     :: [Path.RelFile]
   } deriving (Eq, Show)
 
-le :: String -> String -> Maybe Path.RelFile -> LanguageExample
+le :: String -> String -> [Path.RelFile] -> LanguageExample
 le = LanguageExample
+
+rubySkips :: [Path.RelFile]
+rubySkips = Path.relFile <$>
+  [ "ruby_spec/language/string_spec.rb"
+
+  -- UTF8 encoding issues ("Cannot decode byte '\xe3': Data.Text.Internal.Encoding.decodeUtf8: Invalid UTF-8 stream")
+  , "ruby_spec/optional/capi/string_spec.rb"
+  , "ruby_spec/core/string/b_spec.rb"
+  , "ruby_spec/core/string/shared/encode.rb"
+
+  -- Doesn't parse b/c of issue with r<<i
+  , "ruby_spec/core/enumerable/shared/inject.rb"
+
+  -- Can't detect method calls inside heredoc bodies
+  , "ruby_spec/core/argf/readpartial_spec.rb"
+  , "ruby_spec/core/process/exec_spec.rb"
+  ]
 
 examples :: [LanguageExample]
 examples =
   -- [ le "python" "**/*.py" Nothing -- (Just $ Path.relFile "script/known_failures.txt")
-  [ le "ruby" "**/*.rb" Nothing -- (Just $ Path.relFile "script/known_failures.txt")
+  [ le "ruby" "**/*.rb" rubySkips
   -- , le "typescript" "**/*.[jt]s*" Nothing -- (Just $ Path.relFile "typescript/script/known_failures.txt")
   -- , le "typescript" "**/*.tsx" Nothing
   -- , le "javascript" ".js" examples Nothing -- parse JavaScript with TypeScript parser.
@@ -69,9 +85,9 @@ examples =
 
 buildExamples :: TaskSession -> LanguageExample -> Path.RelDir -> IO Tasty.TestTree
 buildExamples session lang tsDir = do
-  knownFailures <- knownFailuresForPath tsDir (languageKnownFailuresTxt lang)
+  let skips = fmap (tsDir </>) (languageSkips lang)
   files <- globDir1 (compile (languageExtension lang)) (Path.toString tsDir)
-  let paths = Path.relFile <$> files
+  let paths = filter (`notElem` skips) $ Path.relFile <$> files
   trees <- for paths $ \file -> do
     pure . HUnit.testCaseSteps (Path.toString file) $ \step -> do
       -- Use alacarte language mode
@@ -86,7 +102,7 @@ buildExamples session lang tsDir = do
 
       -- Compare the two
       step "compare"
-      assertMatch file knownFailures alacarte precise
+      assertMatch alacarte precise
 
   pure (Tasty.testGroup (languageName lang) trees)
 
@@ -96,13 +112,11 @@ buildExamples session lang tsDir = do
       [x] | (e:_) <- toList (x^.errors) -> HUnit.assertFailure (msg <> " parse errors " <> show e)
       _ -> pure ()
 
-    assertMatch filePath knownFailures a b = case (a, b) of
+    assertMatch a b = case (a, b) of
       (Right a, Right b) -> case (toList (a^.files), toList (b^.files)) of
         ([x], [y]) | e1:_ <- toList (x^.errors)
                    , e2:_ <- toList (y^.errors)
-                   -> if Set.member filePath knownFailures
-                      then pure ()
-                      else HUnit.assertFailure ("Parse errors (both) " <> show e1 <> show e2)
+                   -> HUnit.assertFailure ("Parse errors (both) " <> show e1 <> show e2)
         (_, [y])   | e:_ <- toList (y^.errors)
                    -> HUnit.assertFailure ("Parse errors (precise) " <> show e)
         ([x], _)   | e:_ <- toList (x^.errors)
