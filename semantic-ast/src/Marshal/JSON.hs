@@ -45,6 +45,8 @@ class MarshalJSON t where
   default marshal :: ( Generic1 t, GMarshalJSON (Rep1 t), ToJSON a) => t a -> Value
   marshal = gmarshal . from1
 
+-- We want to create MarshalJSON instances for each type constructor
+-- if we wanted it for a particular instance, it'd be something like MarshalJSON Bar
 instance (GMarshalJSON (Rep1 t), Generic1 t) => MarshalJSON t
 
 -- Typeclass to generically marshal ASTs into JSON
