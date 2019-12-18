@@ -47,8 +47,9 @@ le = LanguageExample
 
 examples :: [LanguageExample]
 examples =
-  [ le "python" "**/*.py" mempty
-  , le "ruby" "**/*.rb" rubySkips
+  [ le "go" "**/*.go" goSkips
+  -- [ le "python" "**/*.py" mempty
+  -- , le "ruby" "**/*.rb" rubySkips
   -- , le "typescript" "**/*.[jt]s*" Nothing -- (Just $ Path.relFile "typescript/script/known_failures.txt")
   -- , le "typescript" "**/*.tsx" Nothing
   -- , le "javascript" ".js" examples Nothing -- parse JavaScript with TypeScript parser.
@@ -65,24 +66,38 @@ examples =
   -- , ("php", ".php") -- TODO: No parse-examples in tree-sitter yet
   ]-- where examples = Path.relDir "examples"
 
-rubySkips :: [Path.RelFile]
-rubySkips = Path.relFile <$>
+goSkips :: [Path.RelFile]
+goSkips = Path.relFile <$>
   [
-  -- UTF8 encoding issues ("Cannot decode byte '\xe3': Data.Text.Internal.Encoding.decodeUtf8: Invalid UTF-8 stream")
-  -- These are going to be hard to fix as Ruby allows non-utf8 character content in string literals
-    "ruby_spec/optional/capi/string_spec.rb"
-  , "ruby_spec/core/string/b_spec.rb"
-  , "ruby_spec/core/string/shared/encode.rb"
+  -- Super slow
+    "go/src/vendor/golang_org/x/text/unicode/norm/tables.go"
+  , "go/src/vendor/golang_org/x/text/unicode/bidi/tables.go"
+  , "go/src/cmd/vendor/golang.org/x/arch/x86/x86asm/tables.go"
+  , "moby/vendor/golang.org/x/text/unicode/norm/tables9.0.0.go"
+  , "moby/vendor/golang.org/x/text/unicode/norm/tables10.0.0.go"
 
-  -- Doesn't parse b/c of issue with r<<i
-  , "ruby_spec/core/enumerable/shared/inject.rb"
-  -- Doesn't parse
-  , "ruby_spec/language/string_spec.rb"
-
-  -- Can't detect method calls inside heredoc bodies with precise ASTs
-  , "ruby_spec/core/argf/readpartial_spec.rb"
-  , "ruby_spec/core/process/exec_spec.rb"
+  -- Assignment timeouts
+  , "go/src/cmd/compile/internal/gc/constFold_test.go"
   ]
+
+-- rubySkips :: [Path.RelFile]
+-- rubySkips = Path.relFile <$>
+--   [
+--   -- UTF8 encoding issues ("Cannot decode byte '\xe3': Data.Text.Internal.Encoding.decodeUtf8: Invalid UTF-8 stream")
+--   -- These are going to be hard to fix as Ruby allows non-utf8 character content in string literals
+--     "ruby_spec/optional/capi/string_spec.rb"
+--   , "ruby_spec/core/string/b_spec.rb"
+--   , "ruby_spec/core/string/shared/encode.rb"
+
+--   -- Doesn't parse b/c of issue with r<<i
+--   , "ruby_spec/core/enumerable/shared/inject.rb"
+--   -- Doesn't parse
+--   , "ruby_spec/language/string_spec.rb"
+
+--   -- Can't detect method calls inside heredoc bodies with precise ASTs
+--   , "ruby_spec/core/argf/readpartial_spec.rb"
+--   , "ruby_spec/core/process/exec_spec.rb"
+--   ]
 
 buildExamples :: TaskSession -> LanguageExample -> Path.RelDir -> IO Tasty.TestTree
 buildExamples session lang tsDir = do
@@ -168,12 +183,14 @@ aLaCarteLanguageModes :: PerLanguageModes
 aLaCarteLanguageModes = PerLanguageModes
   { pythonMode = ALaCarte
   , rubyMode = ALaCarte
+  , goMode = ALaCarte
   }
 
 preciseLanguageModes :: PerLanguageModes
 preciseLanguageModes = PerLanguageModes
   { pythonMode = Precise
   , rubyMode = Precise
+  , goMode = Precise
   }
 
 testOptions :: Config.Options
