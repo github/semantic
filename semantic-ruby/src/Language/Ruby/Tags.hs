@@ -116,6 +116,8 @@ instance ToTagsBy 'Custom Rb.SingletonClass where
     , value = Rb.Arg expr
     } = enterScope True $ case expr of
       Prj (Rb.Primary (Prj (Rb.Lhs (Prj (Rb.Variable (Prj Rb.Constant { text })))))) -> yield text
+      Prj (Rb.Primary (Prj (Rb.Lhs (Prj Rb.ScopeResolution { name = Prj Rb.Constant { text } })))) -> yield text
+      Prj (Rb.Primary (Prj (Rb.Lhs (Prj Rb.ScopeResolution { name = Prj Rb.Identifier { text } })))) -> yield text
       _ -> gtags t
     where
       yield name = yieldTag name Class loc range >> gtags t
@@ -184,33 +186,28 @@ instance ToTagsBy 'Custom Rb.Lambda where
 instance ToTagsBy 'Custom Rb.Call where
   tags' t@Rb.Call
     { ann = loc@Loc { byteRange = range }
-    -- , receiver = Rb.Primary rcv
     , method = expr
-    } = do
-      -- TODO: a la carte tags captures some receivers like this:
-      -- case rcv of
-      --   Prj (Rb.Lhs (Prj (Rb.Variable (Prj Rb.Identifier { text = name })))) -> yield name
-      --   -- Prj (Rb.Lhs (Prj (Rb.Variable (Prj Rb.Constant { text = name })))) -> yield name
-      --   _ -> pure ()
-      case expr of
-        Prj Rb.Identifier { text = name } -> yield name Call
-        Prj Rb.Constant { text = name } -> yield name Constant
-        Prj Rb.Operator { text = name } -> yield name Call
-        _ -> gtags t
+    } = case expr of
+      Prj Rb.Identifier { text = name } -> yield name Call
+      Prj Rb.Constant { text = name } -> yield name Call -- TODO: Should be Constant
+      Prj Rb.Operator { text = name } -> yield name Call
+      _ -> gtags t
     where
       yield name kind = yieldTag name kind loc range >> gtags t
 
 instance ToTagsBy 'Custom Rb.Lhs where
-  tags' t@(Rb.Lhs (Prj (Rb.Variable expr)))
-    = case expr of
-      Prj Rb.Identifier { ann = loc@Loc { byteRange = range }, text = name } -> do
+  tags' t@(Rb.Lhs expr) = case expr of
+    Prj (Rb.Variable (Prj Rb.Identifier { ann = loc@Loc { byteRange }, text })) -> yield text Call loc byteRange
+    Prj Rb.ScopeResolution { ann = loc@Loc { byteRange }, name = Prj Rb.Identifier { text } } -> yield text Call loc byteRange
+    -- TODO: These would be great to track, but doesn't match current a la carte tags output
+    -- Prj (Rb.Variable (Prj Rb.Constant { ann = loc@Loc { byteRange }, text })) -> yield text Constant loc byteRange
+    -- Prj Rb.ScopeResolution { ann = loc@Loc { byteRange }, name = Prj Rb.Constant { text } } -> yield text Constant loc byteRange
+    _ -> gtags t
+    where
+      yield name kind loc range = do
         locals <- get @[Text]
-        unless (name `elem` locals) $ yieldTag name Call loc range
+        unless (name `elem` locals) $ yieldTag name kind loc range
         gtags t
-      -- TODO: This would be great to track, but doesn't match current a la carte tags output
-      -- Prj Rb.Constant { ann = loc@Loc { byteRange = range }, text = name } -> yieldTag name Constant loc range >> gtags t
-      _ -> gtags t
-  tags' t = gtags t
 
 instance ToTagsBy 'Custom Rb.MethodCall where
   tags' t@Rb.MethodCall
@@ -218,10 +215,9 @@ instance ToTagsBy 'Custom Rb.MethodCall where
     , method = expr
     } = case expr of
       Prj (Rb.Variable (Prj Rb.Identifier { text = name })) -> yield name Call
-      Prj (Rb.Variable (Prj Rb.Constant { text = name })) -> yield name Constant
-      -- Prj (Rb.Variable (Prj Rb.GlobalVariable { text = name })) -> yield name
-      -- Prj (Rb.Variable (Prj Rb.ClassVariable { text = name })) -> yield name
-      -- Prj (Rb.Variable (Prj Rb.InstanceVariable { text = name })) -> yield name
+      Prj (Rb.Variable (Prj Rb.Constant { text = name })) -> yield name Call -- TODO: Should be Constant
+      Prj Rb.ScopeResolution { name = Prj Rb.Constant { text } } -> yield text Call
+      Prj Rb.ScopeResolution { name = Prj Rb.Identifier { text } } -> yield text Call -- TODO: Should be Constant
       _ -> gtags t
     where
       yield name kind = yieldTag name kind loc range >> gtags t
