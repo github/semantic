@@ -3,11 +3,10 @@ module Data.Abstract.Address.Precise
 ( Precise(..)
 ) where
 
-import Control.Abstract
-import Control.Abstract.ScopeGraph (AllocatorC(..))
-import Control.Algebra
+import           Control.Abstract
+import           Control.Algebra
 import qualified Data.Set as Set
-import Prologue
+import           Prologue
 
 -- | 'Precise' models precise store semantics where only the 'Latest' value is taken. Everything gets it's own address (always makes a new allocation) which makes for a larger store.
 newtype Precise = Precise { unPrecise :: Int }
@@ -18,7 +17,7 @@ instance Show Precise where
 
 
 instance Has Fresh sig m => Algebra (Allocator Precise :+: sig) (AllocatorC Precise m) where
-  alg (R other) = AllocatorC . alg . handleCoercible $ other
+  alg (R other)       = AllocatorC . alg . handleCoercible $ other
   alg (L (Alloc _ k)) = Precise <$> fresh >>= k
 
 

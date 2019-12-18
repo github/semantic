@@ -1,4 +1,5 @@
-{-# LANGUAGE FlexibleContexts, FlexibleInstances, GADTs, GeneralizedNewtypeDeriving, KindSignatures, MultiParamTypeClasses, RecordWildCards, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE FlexibleContexts, FlexibleInstances, GADTs, GeneralizedNewtypeDeriving, KindSignatures,
+             MultiParamTypeClasses, RecordWildCards, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Semantic.Task
 ( TaskC
 , Level(..)
@@ -128,7 +129,7 @@ runTraceInTelemetry :: TraceInTelemetryC m a
 runTraceInTelemetry = runTraceInTelemetryC
 
 newtype TraceInTelemetryC m a = TraceInTelemetryC { runTraceInTelemetryC :: m a }
-  deriving (Applicative, Functor, Monad, MonadIO)
+  deriving (Applicative, Functor, Monad, MonadFail, MonadIO)
 
 instance Has Telemetry sig m => Algebra (Trace :+: sig) (TraceInTelemetryC m) where
   alg (R other)         = TraceInTelemetryC . alg . handleCoercible $ other

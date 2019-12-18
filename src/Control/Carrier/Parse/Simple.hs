@@ -1,4 +1,5 @@
-{-# LANGUAGE FlexibleContexts, FlexibleInstances, GADTs, GeneralizedNewtypeDeriving, MultiParamTypeClasses, RecordWildCards, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE FlexibleContexts, FlexibleInstances, GADTs, GeneralizedNewtypeDeriving, MultiParamTypeClasses,
+             RecordWildCards, TypeOperators, UndecidableInstances #-}
 -- | A carrier for 'Parse' effects suitable for use in the repl, tests, etc.
 module Control.Carrier.Parse.Simple
 ( -- * Parse carrier
@@ -26,14 +27,14 @@ runParse :: Duration -> ParseC m a -> m a
 runParse timeout (ParseC m) = runReader timeout m
 
 newtype ParseC m a = ParseC (ReaderC Duration m a)
-  deriving (Applicative, Functor, Monad, MonadIO)
+  deriving (Applicative, Functor, Monad, MonadFail, MonadIO)
 
 instance ( Has (Error SomeException) sig m
          , MonadIO m
          )
       => Algebra (Parse :+: sig) (ParseC m) where
   alg (L (Parse parser blob k)) = ParseC ask >>= \ timeout -> runParser timeout blob parser >>= k
-  alg (R other) = ParseC (send (handleCoercible other))
+  alg (R other)                 = ParseC (send (handleCoercible other))
 
 -- | Parse a 'Blob' in 'IO'.
 runParser

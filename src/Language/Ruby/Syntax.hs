@@ -4,10 +4,6 @@ module Language.Ruby.Syntax (module Language.Ruby.Syntax) where
 import Prologue
 
 import           Control.Abstract as Abstract hiding (Load, String)
-import           Control.Abstract.Heap (Heap, HeapError, insertFrameLink)
-import           Control.Abstract.ScopeGraph (insertImportEdge)
-import           Control.Abstract.Value (Boolean)
-import           Control.Monad (unless)
 import           Data.Abstract.BaseError
 import           Data.Abstract.Evaluatable
 import qualified Data.Abstract.Module as M

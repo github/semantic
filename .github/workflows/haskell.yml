@@ -1,0 +1,66 @@
+name: Haskell CI
+
+on:
+  # Trigger the workflow on push or pull request,
+  # but only for the master branch
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  build:
+    name: ghc ${{ matrix.ghc }}
+    runs-on: ubuntu-16.04
+    strategy:
+      matrix:
+        ghc: ["8.8.1"]
+        cabal: ["3.0"]
+
+    steps:
+    - uses: actions/checkout@master
+      if: github.event.action == 'opened' || github.event.action == 'synchronize' || github.event.ref == 'refs/heads/master'
+
+    - uses: actions/setup-haskell@v1
+      name: Setup Haskell
+      with:
+        ghc-version: ${{ matrix.ghc }}
+        cabal-version: ${{ matrix.cabal }}
+
+    - uses: actions/cache@v1
+      name: Cache ~/.cabal/packages
+      with:
+        path: ~/.cabal/packages
+        key: ${{ runner.os }}-${{ matrix.ghc }}-cabal-packages
+
+    - uses: actions/cache@v1
+      name: Cache ~/.cabal/store
+      with:
+        path: ~/.cabal/store
+        key: ${{ runner.os }}-${{ matrix.ghc }}-cabal-store
+
+    - uses: actions/cache@v1
+      name: Cache dist-newstyle
+      with:
+        path: dist-newstyle
+        key: ${{ runner.os }}-${{ matrix.ghc }}-semantic-dist
+
+    - name: Install dependencies
+      run: |
+        cabal v2-update
+        cabal v2-configure --disable-optimization --enable-benchmarks --enable-tests --write-ghc-environment-files=always -j2
+        cabal v2-build --only-dependencies
+
+    - name: hlint
+      run: |
+        cabal install hlint --installdir=dist-newstyle
+        dist-newstyle/hlint src semantic-python
+
+    - name: Build & test
+      run: |
+        cabal v2-build
+        cabal v2-run semantic:test
+        cabal v2-run semantic-core:test
+        cabal v2-run semantic-python:test
+        cd semantic-source; cabal v2-run semantic-source:test; cd ..
+        cd semantic-source; cabal v2-run semantic-source:doctest -- src; cd ..

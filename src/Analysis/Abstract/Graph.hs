@@ -24,7 +24,6 @@ import           Control.Carrier.State.Strict
 import           Control.Effect.Sum.Project
 import           Data.Abstract.BaseError
 import           Data.Abstract.Module (Module (moduleInfo), ModuleInfo (..))
-import           Data.Abstract.Package (PackageInfo (..))
 import           Data.ByteString.Builder
 import           Data.Graph
 import           Data.Graph.ControlFlowVertex

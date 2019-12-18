@@ -13,7 +13,6 @@ module Rendering.JSON
 , SomeJSON(..)
 ) where
 
-import Data.Aeson (ToJSON, toJSON, object, (.=))
 import Data.Aeson as A
 import Data.Blob
 import Data.JSON.Fields

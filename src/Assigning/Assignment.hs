@@ -98,7 +98,6 @@ import Data.AST
 import Data.Error
 import qualified Source.Source as Source
 import Data.Term
-import Data.Text (Text)
 import Data.Text.Encoding (decodeUtf8')
 import qualified Source.Loc as L
 import Source.Range as Range

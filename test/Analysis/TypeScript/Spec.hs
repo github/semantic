@@ -9,7 +9,6 @@ import           Data.Syntax.Statement (StatementBlock(..))
 import qualified Data.Abstract.ScopeGraph as ScopeGraph (AccessControl(..))
 import           Data.Abstract.Evaluatable
 import qualified Data.Abstract.Heap as Heap
-import           Data.Abstract.Module (ModuleInfo (..))
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Number as Number
 import           Data.Abstract.Package (PackageInfo (..))

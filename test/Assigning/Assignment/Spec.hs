@@ -5,7 +5,6 @@ import Assigning.Assignment
 import Data.AST
 import Data.Bifunctor (first)
 import Data.Ix
-import Data.Semigroup ((<>))
 import Data.Term
 import Data.Text as T (Text, length, words)
 import Data.Text.Encoding (encodeUtf8)

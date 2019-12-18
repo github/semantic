@@ -311,7 +311,18 @@ instance Compile Py.ImportFromStatement
 instance Compile Py.ImportStatement
 instance Compile Py.Integer
 
-instance Compile Py.Lambda
+instance Compile Py.Lambda where
+  compile it@Py.Lambda
+    { body
+    , parameters
+    } cc next = do
+      let unparams (Py.LambdaParameters _ ps) = toList ps
+          unparam (Py.Parameter (Prj (Py.Identifier _pann pname))) = Just . named' . Name $ pname
+          unparam _ = Nothing
+      body' <- compile body cc next
+      let params = maybe [] unparams parameters
+      pure . locate it . lams (catMaybes (fmap unparam params)) $ body'
+
 instance Compile Py.List
 instance Compile Py.ListComprehension
 instance Compile Py.ListSplat
@@ -330,7 +341,11 @@ instance Compile Py.Module where
     in fmap (locate it) . foldr compile buildRecord stmts
 
 instance Compile Py.NamedExpression
-instance Compile Py.None
+
+instance Compile Py.None where
+  -- None is not overridable, and thus always points to the prelude's None.
+  compile _it cc _ = cc (pure "__semantic_prelude" ... "None")
+
 instance Compile Py.NonlocalStatement
 instance Compile Py.NotOperator
 
