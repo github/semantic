@@ -104,6 +104,7 @@ type Syntax =
   , Literal.Reference
   , Literal.TextElement
   , Statement.Assignment
+  , Statement.AugmentedAssignment
   , Statement.Break
   , Statement.Continue
   , Statement.For

@@ -454,7 +454,7 @@ assignment' =  makeTerm' <$> symbol AssignmentStatement <*> children (infixTerm 
     assign l r = inject (Statement.Assignment [] l r)
 
     augmentedAssign :: (f :< Go.Syntax) => (Term Loc -> Term Loc -> f (Term Loc)) -> Term Loc -> Term Loc -> Sum Go.Syntax (Term Loc)
-    augmentedAssign c l r = assign l (makeTerm1 (c l r))
+    augmentedAssign c l r = inject (Statement.AugmentedAssignment (makeTerm1 (c l r)))
 
     invert cons a b = Expression.Not (makeTerm1 (cons a b))
 
