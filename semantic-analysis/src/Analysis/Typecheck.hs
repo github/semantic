@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveGeneric, DeriveTraversable, DerivingVia, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, LambdaCase, MultiParamTypeClasses, QuantifiedConstraints, RankNTypes, RecordWildCards, StandaloneDeriving, TypeApplications, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DeriveGeneric, DeriveTraversable, DerivingVia, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, LambdaCase, MultiParamTypeClasses, QuantifiedConstraints, RankNTypes, RecordWildCards, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeOperators, UndecidableInstances #-}
 module Analysis.Typecheck
 ( Monotype (..)
 , Meta
@@ -22,6 +22,7 @@ import           Control.Carrier.Fresh.Strict as Fresh
 import           Control.Carrier.Reader hiding (Local)
 import           Control.Carrier.State.Strict
 import           Control.Monad (unless)
+import           Control.Monad.Trans.Class
 import           Data.Foldable (for_)
 import           Data.Function (fix)
 import           Data.Functor (($>))
@@ -94,7 +95,7 @@ generalize ty = fromJust (closed (forAlls (IntSet.toList (mvs ty)) (hoistTerm R 
 
 
 typecheckingFlowInsensitive
-  :: Ord (term Name)
+  :: (Has Intro.Intro syn term, Ord (term Name))
   => (forall sig m
      .  (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
      => Analysis term Name Type m
@@ -116,6 +117,7 @@ runFile
   :: ( Effect sig
      , Has Fresh sig m
      , Has (State (Heap Type)) sig m
+     , Has Intro.Intro syn term
      , Ord (term Name)
      )
   => (forall sig m
@@ -145,7 +147,7 @@ runFile eval file = traverse run file
               v <- meta
               bs <- m
               v <$ for_ bs (unify v))
-          . convergeTerm 1 (runDomain . A.runHeap @Name @Type . fix (cacheTerm . eval typecheckingAnalysis))
+          . convergeTerm 1  (A.runHeap @Name @Type . fix (\ eval' -> runDomain (Evaluator eval') . fix (cacheTerm . eval typecheckingAnalysis)))
 
 typecheckingAnalysis
   :: ( Alternative m
@@ -225,17 +227,40 @@ substAll :: Monad t => IntMap.IntMap (t Meta) -> t Meta -> t Meta
 substAll s a = a >>= \ i -> fromMaybe (pure i) (IntMap.lookup i s)
 
 
-newtype DomainC m a = DomainC { runDomain :: m a }
+runDomain :: Evaluator term m -> DomainC term m a -> m a
+runDomain eval (DomainC m) = runReader eval m
+
+newtype Evaluator term m = Evaluator { runEvaluator :: term Name -> m Type }
+
+newtype DomainC term m a = DomainC (ReaderC (Evaluator term m) m a)
   deriving (Alternative, Applicative, Functor, Monad, MonadFail)
 
-instance (Alternative m, Algebra sig m, MonadFail m) => Algebra (Domain Type :+: sig) (DomainC m) where
+instance MonadTrans (DomainC term) where
+  lift = DomainC . lift
+
+instance ( Alternative m
+         , Has (Env Name) sig m
+         , Has Fresh sig m
+         , Has (A.Heap Name Type) sig m
+         , Monad term
+         , MonadFail m
+         , Has Intro.Intro syn term
+         ) => Algebra (Domain term Type :+: sig) (DomainC term m) where
   alg (L (Abstract v k)) = case v of
     Intro.Unit     -> k (Alg Unit)
     Intro.Bool   _ -> k (Alg Bool)
     Intro.String _ -> k (Alg String)
+    Intro.Lam (Named n b) -> do
+      eval <- DomainC (asks runEvaluator)
+      addr <- alloc @Name n
+      arg <- meta
+      A.assign addr arg
+      ty <- lift (eval (instantiate1 (pure n) b))
+      k (Alg (arg :-> ty))
   alg (L (Concretize t k)) = case t of
-    Alg Unit   -> k Intro.Unit
-    Alg Bool   -> k (Intro.Bool True) <|> k (Intro.Bool False)
-    Alg String -> k (Intro.String mempty)
-    t          -> fail ("can’t concretize " <> show t)
-  alg (R other) = DomainC (alg (handleCoercible other))
+    Alg Unit      -> k Intro.Unit
+    Alg Bool      -> k (Intro.Bool True) <|> k (Intro.Bool False)
+    Alg String    -> k (Intro.String mempty)
+    Alg (_ :-> b) -> concretize @term b >>= k . Intro.Lam . Named (Name mempty) . lift . send
+    t             -> fail ("can’t concretize " <> show t)
+  alg (R other) = DomainC (send (handleCoercible other))

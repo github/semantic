@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveFunctor, DeriveGeneric, FlexibleContexts, LambdaCase #-}
+{-# LANGUAGE AllowAmbiguousTypes, DeriveFunctor, DeriveGeneric, FlexibleContexts, LambdaCase, QuantifiedConstraints, ScopedTypeVariables, TypeApplications #-}
 module Analysis.Effect.Domain
 ( -- * Domain effect
   abstract
@@ -15,47 +15,49 @@ module Analysis.Effect.Domain
 , run
 ) where
 
-import Analysis.Intro as A
+import Analysis.Intro (Intro)
+import qualified Analysis.Intro as A
+import Analysis.Name
 import Control.Algebra
 import Control.Monad ((>=>))
 import Control.Monad.Fail as Fail
 import Data.Text (Text)
 import GHC.Generics (Generic1)
 
-abstract :: Has (Domain abstract) sig m => Intro -> m abstract
+abstract :: Has (Domain term abstract) sig m => Intro term Name -> m abstract
 abstract concrete = send (Abstract concrete pure)
 
-concretize :: Has (Domain abstract) sig m => abstract -> m Intro
+concretize :: Has (Domain term abstract) sig m => abstract -> m (Intro term Name)
 concretize abstract = send (Concretize abstract pure)
 
 
-unit :: Has (Domain abstract) sig m => m abstract
-unit = abstract A.Unit
+unit :: forall term abstract m sig . Has (Domain term abstract) sig m => m abstract
+unit = abstract @term A.Unit
 
-bool :: Has (Domain abstract) sig m => Bool -> m abstract
-bool = abstract . A.Bool
+bool :: forall term abstract m sig . Has (Domain term abstract) sig m => Bool -> m abstract
+bool = abstract @term . A.Bool
 
-asBool :: (Has (Domain abstract) sig m, MonadFail m) => abstract -> m Bool
-asBool = concretize >=> \case
+asBool :: forall term abstract m sig . (Has (Domain term abstract) sig m, MonadFail m, forall a . Show a => Show (term a)) => abstract -> m Bool
+asBool = concretize @term >=> \case
   A.Bool b -> pure b
   other    -> typeError "Bool" other
 
-string :: Has (Domain abstract) sig m => Text -> m abstract
-string = abstract . A.String
+string :: forall term abstract m sig . Has (Domain term abstract) sig m => Text -> m abstract
+string = abstract @term . A.String
 
-asString :: (Has (Domain abstract) sig m, MonadFail m) => abstract -> m Text
-asString = concretize >=> \case
+asString :: forall term abstract m sig . (Has (Domain term abstract) sig m, MonadFail m, forall a . Show a => Show (term a)) => abstract -> m Text
+asString = concretize @term >=> \case
   A.String t -> pure t
   other      -> typeError "String" other
 
 
-data Domain abstract m k
-  = Abstract   Intro    (abstract -> m k)
-  | Concretize abstract (Intro    -> m k)
+data Domain term abstract m k
+  = Abstract   (Intro term Name) (abstract        -> m k)
+  | Concretize abstract          (Intro term Name -> m k)
   deriving (Functor, Generic1)
 
-instance HFunctor (Domain abstract)
-instance Effect   (Domain abstract)
+instance HFunctor (Domain term abstract)
+instance Effect   (Domain term abstract)
 
 
 typeError :: (Show a, MonadFail m) => String -> a -> m b

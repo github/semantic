@@ -28,23 +28,25 @@ import GHC.Stack
 import Prelude hiding (fail)
 import Source.Span
 import Syntax.Scope
-import Syntax.Term
+import qualified Syntax.Term as Term
 import qualified System.Path as Path
 
+type Term = Term.Term (Ann Span :+: Core :+: Intro)
+
 eval :: forall address value m sig
-     .  ( Has (Domain value) sig m
+     .  ( Has (Domain Term value) sig m
         , Has (Env address) sig m
         , Has (Heap address value) sig m
         , Has (Reader Span) sig m
         , MonadFail m
         , Semigroup value
         )
-     => Analysis (Term (Ann Span :+: Core :+: Intro)) address value m
-     -> (Term (Ann Span :+: Core :+: Intro) Name -> m value)
-     -> (Term (Ann Span :+: Core :+: Intro) Name -> m value)
+     => Analysis Term address value m
+     -> (Term Name -> m value)
+     -> (Term Name -> m value)
 eval Analysis{..} eval = \case
-  Var n -> lookupEnv' n >>= deref' n
-  Alg (R (L c)) -> case c of
+  Term.Var n -> lookupEnv' n >>= deref' n
+  Term.Alg (R (L c)) -> case c of
     Rec (Named n b) -> do
       addr <- A.alloc @address n
       v <- A.bind n addr (eval (instantiate1 (pure n) b))
@@ -64,9 +66,9 @@ eval Analysis{..} eval = \case
       a' <- eval a
       apply eval f' a'
     If c t e -> do
-      c' <- eval c >>= A.asBool
+      c' <- eval c >>= A.asBool @Term
       if c' then eval t else eval e
-    Load p -> eval p >>= A.asString >> A.unit -- FIXME: add a load command or something
+    Load p -> eval p >>= A.asString @Term >> A.unit @Term -- FIXME: add a load command or something
     Record fields -> traverse (traverse eval) fields >>= record
     a :. b -> do
       a' <- ref a
@@ -74,17 +76,17 @@ eval Analysis{..} eval = \case
     a :? b -> do
       a' <- ref a
       mFound <- a' ... b
-      A.bool (isJust mFound)
+      A.bool @Term (isJust mFound)
 
     a := b -> do
       b' <- eval b
       addr <- ref a
       b' <$ A.assign addr b'
-  Alg (R (R c)) -> case c of
-    Unit -> A.unit
-    Bool b -> A.bool b
-    String s -> A.string s
-  Alg (L (Ann span c)) -> local (const span) (eval c)
+  Term.Alg (R (R c)) -> case c of
+    Unit -> A.unit @Term
+    Bool b -> A.bool @Term b
+    String s -> A.string @Term s
+  Term.Alg (L (Ann span c)) -> local (const span) (eval c)
   where freeVariable s = fail ("free variable: " <> s)
         uninitialized s = fail ("uninitialized variable: " <> s)
         invalidRef s = fail ("invalid ref: " <> s)
@@ -93,17 +95,17 @@ eval Analysis{..} eval = \case
         deref' n = A.deref @address >=> maybe (uninitialized (show n)) pure
 
         ref = \case
-          Var n -> lookupEnv' n
-          Alg (R (L c)) -> case c of
+          Term.Var n -> lookupEnv' n
+          Term.Alg (R (L c)) -> case c of
             If c t e -> do
-              c' <- eval c >>= A.asBool
+              c' <- eval c >>= A.asBool @Term
               if c' then ref t else ref e
             a :. b -> do
               a' <- ref a
               a' ... b >>= maybe (freeVariable (show b)) pure
             c -> invalidRef (show c)
-          Alg (R (R c)) -> invalidRef (show c)
-          Alg (L (Ann span c)) -> local (const span) (ref c)
+          Term.Alg (R (R c)) -> invalidRef (show c)
+          Term.Alg (L (Ann span c)) -> local (const span) (ref c)
 
 
 prog1 :: (Has Core sig t, Has Intro sig t) => File (t Name)
