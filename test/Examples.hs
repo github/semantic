@@ -72,12 +72,17 @@ goSkips = Path.relFile <$>
   -- Super slow
     "go/src/vendor/golang_org/x/text/unicode/norm/tables.go"
   , "go/src/vendor/golang_org/x/text/unicode/bidi/tables.go"
+  , "go/src/vendor/golang_org/x/net/idna/tables.go"
   , "go/src/cmd/vendor/golang.org/x/arch/x86/x86asm/tables.go"
   , "moby/vendor/golang.org/x/text/unicode/norm/tables9.0.0.go"
   , "moby/vendor/golang.org/x/text/unicode/norm/tables10.0.0.go"
 
   -- Assignment timeouts
   , "go/src/cmd/compile/internal/gc/constFold_test.go"
+
+  -- Parse errors
+  , "go/src/math/big/arith.go" -- Unhandled identifier character: 'ŝ'
+  , "moby/vendor/github.com/beorn7/perks/quantile/stream.go" -- Unhandled identifier character: 'ƒ'
   ]
 
 -- rubySkips :: [Path.RelFile]
