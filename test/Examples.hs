@@ -48,15 +48,16 @@ le = LanguageExample
 
 rubySkips :: [Path.RelFile]
 rubySkips = Path.relFile <$>
-  [ "ruby_spec/language/string_spec.rb"
-
+  [
   -- UTF8 encoding issues ("Cannot decode byte '\xe3': Data.Text.Internal.Encoding.decodeUtf8: Invalid UTF-8 stream")
-  , "ruby_spec/optional/capi/string_spec.rb"
+    "ruby_spec/optional/capi/string_spec.rb"
   , "ruby_spec/core/string/b_spec.rb"
   , "ruby_spec/core/string/shared/encode.rb"
 
   -- Doesn't parse b/c of issue with r<<i
   , "ruby_spec/core/enumerable/shared/inject.rb"
+  -- Doesn't parse
+  , "ruby_spec/language/string_spec.rb"
 
   -- Can't detect method calls inside heredoc bodies
   , "ruby_spec/core/argf/readpartial_spec.rb"
