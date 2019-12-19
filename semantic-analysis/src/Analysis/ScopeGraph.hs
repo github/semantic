@@ -122,7 +122,7 @@ instance (Has (Env Addr :+: A.Heap Addr ScopeGraph :+: Reader Path.AbsRelFile :+
           let v' = ScopeGraph (Map.singleton (Decl k path span) mempty) <> v
           v' <$ A.assign @Addr addr v'
         k (fold fields')
-    L (Concretize _ k) -> k Unit
+    L (Concretize _ k) -> k Unit -- FIXME: break Concretize out by constructor.
     R other -> DomainC (send (handleCoercible other))
 
 -- scopeGraphAnalysis
