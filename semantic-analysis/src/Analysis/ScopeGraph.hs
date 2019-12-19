@@ -125,27 +125,3 @@ instance (Has (Env Addr :+: A.Heap Addr ScopeGraph :+: Reader Path.AbsRelFile :+
         k (fold fields')
     L (Concretize _ k) -> k Unit -- FIXME: break Concretize out by constructor.
     R other -> DomainC (send (handleCoercible other))
-
--- scopeGraphAnalysis
---   :: ( Alternative m
---      , Has (Env Name) sig m
---      , Has (A.Heap Name ScopeGraph) sig m
---      , Has (Reader Path.AbsRelFile) sig m
---      , Has (Reader Span) sig m
---      )
---   => Analysis Name ScopeGraph m
--- scopeGraphAnalysis = Analysis{..}
---   where -- abstract eval name body = do
---         --   addr <- alloc @Addr name
---         --   A.assign @Addr @ScopeGraph name mempty
---         --   bind name addr (eval body)
---         -- apply _ f a = pure (f <> a)
---         record fields = do
---           fields' <- for fields $ \ (k, v) -> do
---             addr <- alloc k
---             path <- ask
---             span <- ask
---             let v' = ScopeGraph (Map.singleton (Decl k path span) mempty) <> v
---             (k, v') <$ A.assign @Addr addr v'
---           pure (foldMap snd fields')
---         _ ... m = pure (Just m)

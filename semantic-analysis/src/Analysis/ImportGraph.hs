@@ -134,28 +134,3 @@ instance Has (Env Addr :+: A.Heap Addr (Value (Semi term)) :+: Reader Path.AbsRe
       String s      -> k (I.String s)
       Closure _ _ b -> k (I.Lam b)
     R other -> DomainC (send (handleCoercible other))
-
-
--- FIXME: decompose into a product domain and two atomic domains
--- importGraphAnalysis
---   :: ( Alternative m
---      , Has (Env Name) sig m
---      , Has (A.Heap Name (Value (Semi term))) sig m
---      )
---   => Analysis Name (Value (Semi term)) m
--- importGraphAnalysis = Analysis{..}
---   where -- abstract _ name body = do
---         --   path <- ask
---         --   span <- ask
---         --   pure (Value (Closure path span name body) mempty)
---         -- apply eval (Value (Closure path span name body) _) a = local (const path) . local (const -- span) $ do
---         --   addr <- alloc @Addr name
---         --   A.assign addr a
---         --   bind name addr (eval body)
---         -- apply _ f _ = fail $ "Cannot coerce " <> show f <> " to function"
---         record fields = do
---           for_ fields $ \ (k, v) -> do
---             addr <- alloc @Addr k
---             A.assign addr v
---           pure (Value Abstract (foldMap (valueGraph . snd) fields))
---         _ ... m = pure (Just m)

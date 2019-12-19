@@ -96,52 +96,6 @@ runFile eval file = traverse run file
             . A.runEnv
             . fix (\ eval' -> runDomain eval' . fix eval)
 
--- concreteAnalysis
---   :: forall term m sig
---   .  ( Has (A.Env Addr) sig m
---      , Has (A.Heap Addr (Concrete term)) sig m
---      , Has (State (Heap (Concrete term))) sig m
---      )
---   => Analysis Addr (Concrete term) m
--- concreteAnalysis = Analysis{..}
---   where -- abstract _ name body = do
---         --   path <- ask
---         --   span <- ask
---         --   env <- asks (flip Map.restrictKeys (Set.delete name (foldMap Set.singleton body)))
---         --   pure (Closure path span name body env)
---         -- apply eval (Closure path span name body env) a = do
---         --   local (const path) . local (const span) $ do
---         --     addr <- A.alloc name
---         --     A.assign addr a
---         --     local (const (Map.insert name addr env)) (eval body)
---         -- apply _ f _ = fail $ "Cannot coerce " <> show f <> " to function"
---         record fields = do
---           fields' <- for fields $ \ (name, value) -> do
---             addr <- A.alloc name
---             A.assign addr value
---             pure (name, addr)
---           pure (Record (Map.fromList fields'))
---         addr ... n = do
---           val <- A.deref @Addr @(Concrete term) addr
---           heap <- get
---           pure (val >>= lookupConcrete heap n)
-
-
--- lookupConcrete :: Heap (Concrete term) -> Name -> Concrete (term Addr) -> Maybe Addr
--- lookupConcrete heap name = run . evalState IntSet.empty . runNonDetA . inConcrete
---   where -- look up the name in a concrete value
---         inConcrete = inFrame <=< maybeA . recordFrame
---         -- look up the name in a specific 'Frame', with slots taking precedence over parents
---         inFrame fs = maybeA (Map.lookup name fs) <|> (maybeA (Map.lookup "__semantic_super" fs) >>= inAddress)
---         -- look up the name in the value an address points to, if we haven’t already visited it
---         inAddress addr = do
---           visited <- get
---           guard (addr `IntSet.notMember` visited)
---           -- FIXME: throw an error if we can’t deref @addr@
---           val <- maybeA (IntMap.lookup addr heap)
---           modify (IntSet.insert addr)
---           inConcrete val
---         maybeA = maybe empty pure
 
 runDomain :: (term Addr -> m (Concrete term)) -> DomainC term m a -> m a
 runDomain eval (DomainC m) = runReader eval m
