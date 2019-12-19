@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, OverloadedStrings, RankNTypes, RecordWildCards, TypeApplications, TypeOperators #-}
+{-# LANGUAGE FlexibleContexts, GeneralizedNewtypeDeriving, OverloadedStrings, RankNTypes, RecordWildCards, TypeApplications, TypeOperators #-}
 module Analysis.ScopeGraph
 ( ScopeGraph(..)
 , Ref (..)
@@ -12,6 +12,7 @@ import           Analysis.File
 import           Analysis.FlowInsensitive
 import           Analysis.Name
 import           Control.Algebra
+import           Control.Applicative (Alternative(..))
 import           Control.Carrier.Reader
 import           Control.Carrier.Fail.WithLoc
 import           Control.Carrier.Fresh.Strict
@@ -87,6 +88,7 @@ runFile eval file = traverse run file
 
 
 newtype DomainC term m a = DomainC (ReaderC (term Addr -> m ScopeGraph) m a)
+  deriving (Alternative, Applicative, Functor, Monad, MonadFail)
 
 -- scopeGraphAnalysis
 --   :: ( Alternative m
