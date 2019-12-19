@@ -111,6 +111,7 @@ newtype DomainC term m a = DomainC (ReaderC (term Addr -> m (Value (Semi term)))
 instance MonadTrans (DomainC term) where
   lift = DomainC . lift
 
+-- FIXME: decompose into a product domain and two atomic domains
 instance Has (Env Addr :+: A.Heap Addr (Value (Semi term)) :+: Reader Path.AbsRelFile :+: Reader Span) sig m => Algebra (A.Domain term Addr (Value (Semi term)) :+: sig) (DomainC term m) where
   alg = \case
     L (A.Abstract i k) -> case i of
