@@ -17,6 +17,7 @@ import           Control.Carrier.Reader
 import           Control.Carrier.Fail.WithLoc
 import           Control.Carrier.Fresh.Strict
 import           Control.Effect.State
+import           Control.Monad.Trans.Class
 import           Data.Foldable (fold)
 import           Data.Function (fix)
 import qualified Data.Map as Map
@@ -89,6 +90,9 @@ runFile eval file = traverse run file
 
 newtype DomainC term m a = DomainC (ReaderC (term Addr -> m ScopeGraph) m a)
   deriving (Alternative, Applicative, Functor, Monad, MonadFail)
+
+instance MonadTrans (DomainC term) where
+  lift = DomainC . lift
 
 -- scopeGraphAnalysis
 --   :: ( Alternative m
