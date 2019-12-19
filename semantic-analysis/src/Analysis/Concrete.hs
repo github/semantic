@@ -14,7 +14,9 @@ import qualified Algebra.Graph as G
 import qualified Algebra.Graph.Export.Dot as G
 import qualified Analysis.Carrier.Env.Precise as A
 import qualified Analysis.Carrier.Heap.Precise as A
+import           Analysis.Effect.Domain
 import           Analysis.File
+import qualified Analysis.Intro as I
 import           Analysis.Name
 import           Control.Algebra
 import           Control.Carrier.Fail.WithLoc
@@ -26,6 +28,7 @@ import qualified Data.IntMap as IntMap
 import qualified Data.Map as Map
 import           Data.Semigroup (Last (..))
 import           Data.Text (Text, pack)
+import           Data.Traversable (for)
 import           Prelude hiding (fail)
 import           Source.Span
 import           Syntax.Scope
@@ -142,6 +145,38 @@ newtype DomainC term m a = DomainC (ReaderC (term Addr -> m (Concrete term)) m a
 
 instance MonadTrans (DomainC term) where
   lift = DomainC . lift
+
+instance ( Applicative term
+         , Has (A.Env Addr) sig m
+         , Has (A.Heap Addr (Concrete term)) sig m
+         , Has (Reader Path.AbsRelFile) sig m
+         , Has (Reader Span) sig m
+         )
+      => Algebra (Domain term Addr (Concrete term) :+: sig) (DomainC term m) where
+  alg = \case
+    L (Abstract i k) -> case i of
+      I.Unit            -> k Unit
+      I.Bool b          -> k (Bool b)
+      I.String s        -> k (String s)
+      I.Lam (Named n b) -> do
+        path <- ask
+        span <- ask
+        k (Closure path span n b)
+      I.Record fields   -> do
+        eval <- DomainC ask
+        fields' <- for fields $ \ (name, t) -> do
+          addr <- A.alloc name
+          v <- lift (eval t)
+          A.assign @Addr @(Concrete term) addr v
+          pure (name, addr)
+        k (Record (Map.fromList fields'))
+    L (Concretize c k) -> case c of
+      Unit            -> k I.Unit
+      Bool b          -> k (I.Bool b)
+      String s        -> k (I.String s)
+      Closure _ _ n b -> k (I.Lam (Named n b))
+      Record fields   -> k (I.Record (map (fmap pure) (Map.toList fields)))
+    R other -> DomainC (send (handleCoercible other))
 
 
 -- | 'heapGraph', 'heapValueGraph', and 'heapAddressGraph' allow us to conveniently export SVGs of the heap:
