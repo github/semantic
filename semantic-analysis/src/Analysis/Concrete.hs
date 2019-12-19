@@ -1,4 +1,4 @@
-{-# LANGUAGE DerivingVia, FlexibleContexts, FlexibleInstances, LambdaCase, MultiParamTypeClasses, NamedFieldPuns,
+{-# LANGUAGE DerivingVia, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, LambdaCase, MultiParamTypeClasses, NamedFieldPuns,
              OverloadedStrings, RankNTypes, RecordWildCards, ScopedTypeVariables, TypeApplications, TypeOperators,
              UndecidableInstances #-}
 module Analysis.Concrete
@@ -129,6 +129,9 @@ runFile eval file = traverse run file
 --           modify (IntSet.insert addr)
 --           inConcrete val
 --         maybeA = maybe empty pure
+
+newtype DomainC term m a = DomainC (ReaderC (term Addr -> m (Concrete (term Addr))) m a)
+  deriving (Applicative, Functor, Monad, MonadFail)
 
 
 -- | 'heapGraph', 'heapValueGraph', and 'heapAddressGraph' allow us to conveniently export SVGs of the heap:
