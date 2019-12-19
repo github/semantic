@@ -4,10 +4,8 @@ module Analysis.Typecheck
 , Meta
 , Polytype (..)
 , typecheckingFlowInsensitive
-, typecheckingAnalysis
 ) where
 
-import           Analysis.Analysis
 import           Analysis.Carrier.Env.Monovariant
 import qualified Analysis.Carrier.Heap.Monovariant as A
 import           Analysis.Effect.Domain
@@ -98,8 +96,7 @@ typecheckingFlowInsensitive
   :: (Has Intro.Intro syn term, Ord (term Name))
   => (forall sig m
      .  (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
-     => Analysis Name Type m
-     -> (term Name -> m Type)
+     => (term Name -> m Type)
      -> (term Name -> m Type)
      )
   -> [File (term Name)]
@@ -122,8 +119,7 @@ runFile
      )
   => (forall sig m
      .  (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
-     => Analysis Name Type m
-     -> (term Name -> m Type)
+     => (term Name -> m Type)
      -> (term Name -> m Type)
      )
   -> File (term Name)
@@ -147,35 +143,35 @@ runFile eval file = traverse run file
               v <- meta
               bs <- m
               v <$ for_ bs (unify v))
-          . convergeTerm 1  (A.runHeap @Name @Type . fix (\ eval' -> runDomain (Evaluator eval') . fix (cacheTerm . eval typecheckingAnalysis)))
+          . convergeTerm 1  (A.runHeap @Name @Type . fix (\ eval' -> runDomain (Evaluator eval') . fix (cacheTerm . eval)))
 
-typecheckingAnalysis
-  :: ( Alternative m
-     , Has (Env Name) sig m
-     , Has (A.Heap Name Type) sig m
-     )
-  => Analysis Name Type m
-typecheckingAnalysis = Analysis{..}
-  where -- abstract eval name body = do
-        --   -- FIXME: construct the associated scope
-        --   addr <- alloc @Name name
-        --   arg <- meta
-        --   A.assign addr arg
-        --   ty <- eval body
-        --   pure (Alg (arg :-> ty))
-        -- apply _ f a = do
-        --   _A <- meta
-        --   _B <- meta
-        --   unify (Alg (_A :-> _B)) f
-        --   unify _A a
-        --   pure _B
-        record fields = do
-          fields' <- for fields $ \ (k, v) -> do
-            addr <- alloc @Name k
-            (k, v) <$ A.assign addr v
-          -- FIXME: should records reference types by address instead?
-          pure (Alg (Record (Map.fromList fields')))
-        _ ... m = pure (Just m)
+-- typecheckingAnalysis
+--   :: ( Alternative m
+--      , Has (Env Name) sig m
+--      , Has (A.Heap Name Type) sig m
+--      )
+--   => Analysis Name Type m
+-- typecheckingAnalysis = Analysis{..}
+--   where -- abstract eval name body = do
+--         --   -- FIXME: construct the associated scope
+--         --   addr <- alloc @Name name
+--         --   arg <- meta
+--         --   A.assign addr arg
+--         --   ty <- eval body
+--         --   pure (Alg (arg :-> ty))
+--         -- apply _ f a = do
+--         --   _A <- meta
+--         --   _B <- meta
+--         --   unify (Alg (_A :-> _B)) f
+--         --   unify _A a
+--         --   pure _B
+--         record fields = do
+--           fields' <- for fields $ \ (k, v) -> do
+--             addr <- alloc @Name k
+--             (k, v) <$ A.assign addr v
+--           -- FIXME: should records reference types by address instead?
+--           pure (Alg (Record (Map.fromList fields')))
+--         _ ... m = pure (Just m)
 
 
 data Constraint = Type :===: Type

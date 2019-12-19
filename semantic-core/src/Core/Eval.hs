@@ -10,7 +10,6 @@ module Core.Eval
 , ruby
 ) where
 
-import Analysis.Analysis
 import Analysis.Effect.Domain as A
 import Analysis.Effect.Env as A
 import Analysis.Effect.Heap as A
@@ -42,10 +41,9 @@ eval :: forall address value m sig
         , Semigroup value
         , Show address
         )
-     => Analysis address value m
+     => (Term address -> m value)
      -> (Term address -> m value)
-     -> (Term address -> m value)
-eval Analysis{..} eval = \case
+eval eval = \case
   Term.Var n -> deref' n n
   Term.Alg (R (L c)) -> case c of
     Rec (Named n b) -> do

@@ -40,7 +40,6 @@ library
   import: common
   hs-source-dirs: src
   exposed-modules:
-    Analysis.Analysis
     Analysis.Carrier.Env.Monovariant
     Analysis.Carrier.Env.Precise
     Analysis.Carrier.Heap.Monovariant

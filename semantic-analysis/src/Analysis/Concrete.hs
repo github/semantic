@@ -4,7 +4,6 @@
 module Analysis.Concrete
 ( Concrete(..)
 , concrete
-, concreteAnalysis
 , heapGraph
 , heapValueGraph
 , heapAddressGraph
@@ -13,7 +12,6 @@ module Analysis.Concrete
 
 import qualified Algebra.Graph as G
 import qualified Algebra.Graph.Export.Dot as G
-import           Analysis.Analysis
 import qualified Analysis.Carrier.Env.Precise as A
 import qualified Analysis.Carrier.Heap.Precise as A
 import           Analysis.File
@@ -21,17 +19,12 @@ import           Analysis.Name
 import           Control.Algebra
 import           Control.Carrier.Fail.WithLoc
 import           Control.Carrier.Fresh.Strict
-import           Control.Carrier.NonDet.Church
 import           Control.Carrier.Reader hiding (Local)
-import           Control.Carrier.State.Strict
-import           Control.Monad ((<=<))
 import           Data.Function (fix)
 import qualified Data.IntMap as IntMap
-import qualified Data.IntSet as IntSet
 import qualified Data.Map as Map
 import           Data.Semigroup (Last (..))
 import           Data.Text (Text, pack)
-import           Data.Traversable (for)
 import           Prelude hiding (fail)
 import           Source.Span
 import qualified System.Path as Path
@@ -49,9 +42,9 @@ data Concrete term
   -- NB: We derive the 'Semigroup' instance for 'Concrete' to take the second argument. This is equivalent to stating that the return value of an imperative sequence of statements is the value of its final statement.
   deriving Semigroup via Last (Concrete term)
 
-recordFrame :: Concrete term -> Maybe Env
-recordFrame (Record frame) = Just frame
-recordFrame _              = Nothing
+-- recordFrame :: Concrete term -> Maybe Env
+-- recordFrame (Record frame) = Just frame
+-- recordFrame _              = Nothing
 
 type Heap term = IntMap.IntMap (Concrete term)
 
@@ -59,8 +52,7 @@ type Heap term = IntMap.IntMap (Concrete term)
 concrete
   :: (forall sig m
      .  (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
-     => Analysis Precise (Concrete (term Name)) m
-     -> (term Name -> m (Concrete (term Name)))
+     => (term Name -> m (Concrete (term Name)))
      -> (term Name -> m (Concrete (term Name)))
      )
   -> [File (term Name)]
@@ -75,13 +67,10 @@ runFile
   :: forall term m sig
   .  ( Effect sig
      , Has Fresh sig m
-     , Has (A.Heap Precise (Concrete (term Name))) sig m
-     , Has (State (Heap (term Name))) sig m
      )
   => (forall sig m
      .  (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
-     => Analysis Precise (Concrete (term Name)) m
-     -> (term Name -> m (Concrete (term Name)))
+     => (term Name -> m (Concrete (term Name)))
      -> (term Name -> m (Concrete (term Name)))
      )
   -> File (term Name)
@@ -92,54 +81,54 @@ runFile eval file = traverse run file
             . runFail
             . runReader @Env mempty
             . A.runEnv
-            . fix (eval concreteAnalysis)
+            . fix eval
 
-concreteAnalysis
-  :: forall term m sig
-  .  ( Has (A.Env Precise) sig m
-     , Has (A.Heap Precise (Concrete (term Name))) sig m
-     , Has (State (Heap (term Name))) sig m
-     )
-  => Analysis Precise (Concrete (term Name)) m
-concreteAnalysis = Analysis{..}
-  where -- abstract _ name body = do
-        --   path <- ask
-        --   span <- ask
-        --   env <- asks (flip Map.restrictKeys (Set.delete name (foldMap Set.singleton body)))
-        --   pure (Closure path span name body env)
-        -- apply eval (Closure path span name body env) a = do
-        --   local (const path) . local (const span) $ do
-        --     addr <- A.alloc name
-        --     A.assign addr a
-        --     local (const (Map.insert name addr env)) (eval body)
-        -- apply _ f _ = fail $ "Cannot coerce " <> show f <> " to function"
-        record fields = do
-          fields' <- for fields $ \ (name, value) -> do
-            addr <- A.alloc name
-            A.assign addr value
-            pure (name, addr)
-          pure (Record (Map.fromList fields'))
-        addr ... n = do
-          val <- A.deref @Precise @(Concrete (term Name)) addr
-          heap <- get
-          pure (val >>= lookupConcrete heap n)
+-- concreteAnalysis
+--   :: forall term m sig
+--   .  ( Has (A.Env Precise) sig m
+--      , Has (A.Heap Precise (Concrete (term Name))) sig m
+--      , Has (State (Heap (term Name))) sig m
+--      )
+--   => Analysis Precise (Concrete (term Name)) m
+-- concreteAnalysis = Analysis{..}
+--   where -- abstract _ name body = do
+--         --   path <- ask
+--         --   span <- ask
+--         --   env <- asks (flip Map.restrictKeys (Set.delete name (foldMap Set.singleton body)))
+--         --   pure (Closure path span name body env)
+--         -- apply eval (Closure path span name body env) a = do
+--         --   local (const path) . local (const span) $ do
+--         --     addr <- A.alloc name
+--         --     A.assign addr a
+--         --     local (const (Map.insert name addr env)) (eval body)
+--         -- apply _ f _ = fail $ "Cannot coerce " <> show f <> " to function"
+--         record fields = do
+--           fields' <- for fields $ \ (name, value) -> do
+--             addr <- A.alloc name
+--             A.assign addr value
+--             pure (name, addr)
+--           pure (Record (Map.fromList fields'))
+--         addr ... n = do
+--           val <- A.deref @Precise @(Concrete (term Name)) addr
+--           heap <- get
+--           pure (val >>= lookupConcrete heap n)
 
 
-lookupConcrete :: Heap (term Name) -> Name -> Concrete (term Name) -> Maybe Precise
-lookupConcrete heap name = run . evalState IntSet.empty . runNonDetA . inConcrete
-  where -- look up the name in a concrete value
-        inConcrete = inFrame <=< maybeA . recordFrame
-        -- look up the name in a specific 'Frame', with slots taking precedence over parents
-        inFrame fs = maybeA (Map.lookup name fs) <|> (maybeA (Map.lookup "__semantic_super" fs) >>= inAddress)
-        -- look up the name in the value an address points to, if we haven’t already visited it
-        inAddress addr = do
-          visited <- get
-          guard (addr `IntSet.notMember` visited)
-          -- FIXME: throw an error if we can’t deref @addr@
-          val <- maybeA (IntMap.lookup addr heap)
-          modify (IntSet.insert addr)
-          inConcrete val
-        maybeA = maybe empty pure
+-- lookupConcrete :: Heap (term Name) -> Name -> Concrete (term Name) -> Maybe Precise
+-- lookupConcrete heap name = run . evalState IntSet.empty . runNonDetA . inConcrete
+--   where -- look up the name in a concrete value
+--         inConcrete = inFrame <=< maybeA . recordFrame
+--         -- look up the name in a specific 'Frame', with slots taking precedence over parents
+--         inFrame fs = maybeA (Map.lookup name fs) <|> (maybeA (Map.lookup "__semantic_super" fs) >>= inAddress)
+--         -- look up the name in the value an address points to, if we haven’t already visited it
+--         inAddress addr = do
+--           visited <- get
+--           guard (addr `IntSet.notMember` visited)
+--           -- FIXME: throw an error if we can’t deref @addr@
+--           val <- maybeA (IntMap.lookup addr heap)
+--           modify (IntSet.insert addr)
+--           inConcrete val
+--         maybeA = maybe empty pure
 
 
 -- | 'heapGraph', 'heapValueGraph', and 'heapAddressGraph' allow us to conveniently export SVGs of the heap:

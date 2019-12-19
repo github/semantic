@@ -2,22 +2,19 @@
 module Analysis.ImportGraph
 ( ImportGraph
 , importGraph
-, importGraphAnalysis
 ) where
 
-import           Analysis.Analysis
 import           Analysis.Carrier.Env.Monovariant
 import qualified Analysis.Carrier.Heap.Monovariant as A
 import           Analysis.File
 import           Analysis.FlowInsensitive
 import           Analysis.Name
-import           Control.Applicative (Alternative(..))
 import           Control.Algebra
 import           Control.Carrier.Fail.WithLoc
 import           Control.Carrier.Fresh.Strict
 import           Control.Carrier.Reader
 import           Control.Carrier.State.Strict
-import           Data.Foldable (fold, for_)
+import           Data.Foldable (fold)
 import           Data.Function (fix)
 import qualified Data.Map as Map
 import qualified Data.Set as Set
@@ -52,8 +49,7 @@ importGraph
   :: Ord (term Name)
   => (forall sig m
      .  (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
-     => Analysis Name (Value (term Name)) m
-     -> (term Name -> m (Value (term Name)))
+     => (term Name -> m (Value (term Name)))
      -> (term Name -> m (Value (term Name)))
      )
   -> [File (term Name)]
@@ -75,8 +71,7 @@ runFile
      )
   => (forall sig m
      .  (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
-     => Analysis Name (Value (term Name)) m
-     -> (term Name -> m (Value (term Name)))
+     => (term Name -> m (Value (term Name)))
      -> (term Name -> m (Value (term Name)))
      )
   -> File (term Name)
@@ -87,28 +82,28 @@ runFile eval file = traverse run file
             . runEnv
             . runFail
             . fmap fold
-            . convergeTerm 0 (A.runHeap @Name @(Value (term Name)) . fix (cacheTerm . eval importGraphAnalysis))
+            . convergeTerm 0 (A.runHeap @Name @(Value (term Name)) . fix (cacheTerm . eval))
 
 -- FIXME: decompose into a product domain and two atomic domains
-importGraphAnalysis
-  :: ( Alternative m
-     , Has (Env Name) sig m
-     , Has (A.Heap Name (Value (term Name))) sig m
-     )
-  => Analysis Name (Value (term Name)) m
-importGraphAnalysis = Analysis{..}
-  where -- abstract _ name body = do
-        --   path <- ask
-        --   span <- ask
-        --   pure (Value (Closure path span name body) mempty)
-        -- apply eval (Value (Closure path span name body) _) a = local (const path) . local (const -- span) $ do
-        --   addr <- alloc @Name name
-        --   A.assign addr a
-        --   bind name addr (eval body)
-        -- apply _ f _ = fail $ "Cannot coerce " <> show f <> " to function"
-        record fields = do
-          for_ fields $ \ (k, v) -> do
-            addr <- alloc @Name k
-            A.assign addr v
-          pure (Value Abstract (foldMap (valueGraph . snd) fields))
-        _ ... m = pure (Just m)
+-- importGraphAnalysis
+--   :: ( Alternative m
+--      , Has (Env Name) sig m
+--      , Has (A.Heap Name (Value (term Name))) sig m
+--      )
+--   => Analysis Name (Value (term Name)) m
+-- importGraphAnalysis = Analysis{..}
+--   where -- abstract _ name body = do
+--         --   path <- ask
+--         --   span <- ask
+--         --   pure (Value (Closure path span name body) mempty)
+--         -- apply eval (Value (Closure path span name body) _) a = local (const path) . local (const -- span) $ do
+--         --   addr <- alloc @Name name
+--         --   A.assign addr a
+--         --   bind name addr (eval body)
+--         -- apply _ f _ = fail $ "Cannot coerce " <> show f <> " to function"
+--         record fields = do
+--           for_ fields $ \ (k, v) -> do
+--             addr <- alloc @Name k
+--             A.assign addr v
+--           pure (Value Abstract (foldMap (valueGraph . snd) fields))
+--         _ ... m = pure (Just m)
