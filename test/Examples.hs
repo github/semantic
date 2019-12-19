@@ -1,25 +1,19 @@
 {-# LANGUAGE FlexibleContexts, RecordWildCards, OverloadedStrings, TypeApplications #-}
 {-# OPTIONS_GHC -O1 #-}
-module Main (main, knownFailuresForPath) where
+module Main (main) where
 
 import           Control.Carrier.Parse.Measured
 import           Control.Carrier.Reader
 import           Control.Concurrent.Async (forConcurrently)
 import           Control.Exception (displayException)
-import qualified Control.Foldl as Foldl
 import           Control.Lens
 import           Control.Monad
-import           Control.Monad.Trans.Resource (ResIO, runResourceT)
 import           Data.Blob
-import qualified Data.ByteString.Lazy.Char8 as BLC
-import qualified Data.ByteString.Streaming.Char8 as ByteStream
 import           Data.Foldable
 import           Data.Language (LanguageMode (..), PerLanguageModes (..))
 import           Data.List
 import qualified Data.Text as Text
-import           Data.Set (Set)
 import           Data.Traversable
-import qualified Streaming.Prelude as Stream
 import           System.FilePath.Glob
 import           System.Path ((</>))
 import qualified System.Path as Path
@@ -50,14 +44,14 @@ le = LanguageExample
 examples :: [LanguageExample]
 examples =
   [ le "go" "**/*.go" goFileSkips goDirSkips
-  -- [ le "python" "**/*.py" mempty mempty
-  -- , le "ruby" "**/*.rb" rubySkips mempty
+  , le "python" "**/*.py" mempty mempty
+  , le "ruby" "**/*.rb" rubySkips mempty
   -- , le "typescript" "**/*.[jt]s*" mempty mempty
   -- , le "typescript" "**/*.tsx" mempty mempty
   ]
 
 goFileSkips :: [Path.RelFile]
-goFileSkips = fmap Path.relPath
+goFileSkips = Path.relPath <$>
   [
   -- Super slow
     "go/src/vendor/golang_org/x/text/unicode/norm/tables.go"
@@ -88,7 +82,7 @@ goFileSkips = fmap Path.relPath
   ]
 
 goDirSkips :: [Path.RelDir]
-goDirSkips = Path.rel <$>
+goDirSkips = Path.relDir <$>
   [ "go/src/cmd/compile/internal/ssa"
   , "go/test/fixedbugs"
   , "go/test/syntax"
@@ -96,25 +90,24 @@ goDirSkips = Path.rel <$>
   , "go/test"
   ]
 
+rubySkips :: [Path.RelFile]
+rubySkips = Path.relFile <$>
+  [
+  -- UTF8 encoding issues ("Cannot decode byte '\xe3': Data.Text.Internal.Encoding.decodeUtf8: Invalid UTF-8 stream")
+  -- These are going to be hard to fix as Ruby allows non-utf8 character content in string literals
+    "ruby_spec/optional/capi/string_spec.rb"
+  , "ruby_spec/core/string/b_spec.rb"
+  , "ruby_spec/core/string/shared/encode.rb"
 
--- rubySkips :: [Path.RelFile]
--- rubySkips = Path.relFile <$>
---   [
---   -- UTF8 encoding issues ("Cannot decode byte '\xe3': Data.Text.Internal.Encoding.decodeUtf8: Invalid UTF-8 stream")
---   -- These are going to be hard to fix as Ruby allows non-utf8 character content in string literals
---     "ruby_spec/optional/capi/string_spec.rb"
---   , "ruby_spec/core/string/b_spec.rb"
---   , "ruby_spec/core/string/shared/encode.rb"
+  -- Doesn't parse b/c of issue with r<<i
+  , "ruby_spec/core/enumerable/shared/inject.rb"
+  -- Doesn't parse
+  , "ruby_spec/language/string_spec.rb"
 
---   -- Doesn't parse b/c of issue with r<<i
---   , "ruby_spec/core/enumerable/shared/inject.rb"
---   -- Doesn't parse
---   , "ruby_spec/language/string_spec.rb"
-
---   -- Can't detect method calls inside heredoc bodies with precise ASTs
---   , "ruby_spec/core/argf/readpartial_spec.rb"
---   , "ruby_spec/core/process/exec_spec.rb"
---   ]
+  -- Can't detect method calls inside heredoc bodies with precise ASTs
+  , "ruby_spec/core/argf/readpartial_spec.rb"
+  , "ruby_spec/core/process/exec_spec.rb"
+  ]
 
 buildExamples :: TaskSession -> LanguageExample -> Path.RelDir -> IO Tasty.TestTree
 buildExamples session lang tsDir = do
@@ -227,19 +220,6 @@ main = withOptions testOptions $ \ config logger statter -> do
     buildExamples session lang tsDir
 
   Tasty.defaultMain $ Tasty.testGroup "parse-examples" allTests
-
-knownFailuresForPath :: Path.RelDir -> Maybe Path.RelFile -> IO (Set Path.RelFile)
-knownFailuresForPath _ Nothing = pure mempty
-knownFailuresForPath tsDir (Just path)
-  = runResourceT
-  ( ByteStream.readFile @ResIO (Path.toString (tsDir </> path))
-  & ByteStream.lines
-  & ByteStream.denull
-  & Stream.mapped ByteStream.toLazy
-  & Stream.filter ((/= '#') . BLC.head)
-  & Stream.map (Path.relFile . BLC.unpack)
-  & Foldl.purely Stream.fold_ Foldl.set
-  )
 
 parseSymbolsFilePath ::
   ( Has (Error SomeException) sig m
