@@ -62,7 +62,7 @@ type Heap = IntMap.IntMap
 concrete
   :: Applicative term
   => (forall sig m
-     .  (Has (Domain term Addr (Concrete term)) sig m, Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
+     .  (Has (Domain term Addr (Concrete term)) sig m, Has (A.Env Addr) sig m, Has (A.Heap Addr (Concrete term)) sig m, Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
      => (term Addr -> m (Concrete term))
      -> (term Addr -> m (Concrete term))
      )
@@ -82,7 +82,7 @@ runFile
      , Has (A.Heap Addr (Concrete term)) sig m
      )
   => (forall sig m
-     .  (Has (Domain term Addr (Concrete term)) sig m, Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
+     .  (Has (Domain term Addr (Concrete term)) sig m, Has (A.Env Addr) sig m, Has (A.Heap Addr (Concrete term)) sig m, Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
      => (term Addr -> m (Concrete term))
      -> (term Addr -> m (Concrete term))
      )
