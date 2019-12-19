@@ -57,7 +57,7 @@ generateAST (SemanticAST format noColor source) =
         go = ast >=> display
         ast = parseByteString @AST.Module @(Range, Span) Python.tree_sitter_python
         display = case format of
-          Json -> print . either toJSON (marshal . fmap (const ())) 
+          Json -> print . either toJSON (marshal . fmap (const ())) -- TODO: replacing range and span annotations with () for which there is a ToJSON instance for now, deal with this later
           Show -> print
           Pretty | noColor -> pPrintNoColor
                  | otherwise -> pPrint
