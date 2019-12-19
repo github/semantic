@@ -85,3 +85,11 @@ test-suite test
                , tasty-hunit ^>= 0.10.0.2
                , trifecta >= 2 && <3
                , unordered-containers ^>= 0.2.10
+
+benchmark prelude
+  import:              haskell
+  hs-source-dirs:      bench
+  type:                exitcode-stdio-1.0
+  main-is:             Bench.hs
+  ghc-options:         -static
+  build-depends:       gauge ^>= 0.2.5
