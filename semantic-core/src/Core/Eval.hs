@@ -41,7 +41,7 @@ eval :: forall address value m sig
         , MonadFail m
         , Semigroup value
         )
-     => Analysis Term address value m
+     => Analysis address value m
      -> (Term Name -> m value)
      -> (Term Name -> m value)
 eval Analysis{..} eval = \case

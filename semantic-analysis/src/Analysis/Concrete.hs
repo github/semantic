@@ -59,7 +59,7 @@ type Heap term = IntMap.IntMap (Concrete term)
 concrete
   :: (forall sig m
      .  (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
-     => Analysis term Precise (Concrete (term Name)) m
+     => Analysis Precise (Concrete (term Name)) m
      -> (term Name -> m (Concrete (term Name)))
      -> (term Name -> m (Concrete (term Name)))
      )
@@ -80,7 +80,7 @@ runFile
      )
   => (forall sig m
      .  (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
-     => Analysis term Precise (Concrete (term Name)) m
+     => Analysis Precise (Concrete (term Name)) m
      -> (term Name -> m (Concrete (term Name)))
      -> (term Name -> m (Concrete (term Name)))
      )
@@ -100,7 +100,7 @@ concreteAnalysis
      , Has (A.Heap Precise (Concrete (term Name))) sig m
      , Has (State (Heap (term Name))) sig m
      )
-  => Analysis term Precise (Concrete (term Name)) m
+  => Analysis Precise (Concrete (term Name)) m
 concreteAnalysis = Analysis{..}
   where -- abstract _ name body = do
         --   path <- ask

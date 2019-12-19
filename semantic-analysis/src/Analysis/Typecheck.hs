@@ -98,7 +98,7 @@ typecheckingFlowInsensitive
   :: (Has Intro.Intro syn term, Ord (term Name))
   => (forall sig m
      .  (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
-     => Analysis term Name Type m
+     => Analysis Name Type m
      -> (term Name -> m Type)
      -> (term Name -> m Type)
      )
@@ -122,7 +122,7 @@ runFile
      )
   => (forall sig m
      .  (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
-     => Analysis term Name Type m
+     => Analysis Name Type m
      -> (term Name -> m Type)
      -> (term Name -> m Type)
      )
@@ -154,7 +154,7 @@ typecheckingAnalysis
      , Has (Env Name) sig m
      , Has (A.Heap Name Type) sig m
      )
-  => Analysis term Name Type m
+  => Analysis Name Type m
 typecheckingAnalysis = Analysis{..}
   where -- abstract eval name body = do
         --   -- FIXME: construct the associated scope
