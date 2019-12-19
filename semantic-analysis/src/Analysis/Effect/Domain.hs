@@ -1,4 +1,5 @@
-{-# LANGUAGE AllowAmbiguousTypes, DeriveFunctor, DeriveGeneric, FlexibleContexts, LambdaCase, QuantifiedConstraints, ScopedTypeVariables, TypeApplications #-}
+{-# LANGUAGE AllowAmbiguousTypes, DeriveFunctor, DeriveGeneric, FlexibleContexts, LambdaCase, QuantifiedConstraints,
+             ScopedTypeVariables, TypeApplications #-}
 module Analysis.Effect.Domain
 ( -- * Domain effect
   abstract
@@ -19,15 +20,15 @@ module Analysis.Effect.Domain
 , run
 ) where
 
-import Analysis.Intro (Intro)
+import           Analysis.Intro (Intro)
 import qualified Analysis.Intro as A
-import Analysis.Name
-import Control.Algebra
-import Control.Monad ((>=>))
-import Control.Monad.Fail as Fail
-import Data.Text (Text)
-import GHC.Generics (Generic1)
-import Syntax.Scope (Scope)
+import           Analysis.Name
+import           Control.Algebra
+import           Control.Monad ((>=>))
+import           Control.Monad.Fail as Fail
+import           Data.Text (Text)
+import           GHC.Generics (Generic1)
+import           Syntax.Scope (Scope)
 
 abstract :: Has (Domain term addr abstract) sig m => Intro term addr -> m abstract
 abstract concrete = send (Abstract concrete pure)
