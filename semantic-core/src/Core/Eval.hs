@@ -72,14 +72,13 @@ eval Analysis{..} eval = \case
       c' <- eval c >>= A.asBool @Term @address
       if c' then eval t else eval e
     Load p -> eval p >>= A.asString @Term @address >> A.unit @Term @address -- FIXME: add a load command or something
-    Record fields -> traverse (traverse eval) fields >>= record
+    Record fields -> A.record fields
     a :. b -> do
-      a' <- ref a
-      a' ... b >>= maybe (freeVariable (show b)) (deref' b)
+      a' <- eval a >>= asRecord @Term @address
+      maybe (freeVariable (show b)) eval (lookup b a')
     a :? b -> do
-      a' <- ref a
-      mFound <- a' ... b
-      A.bool @Term @address (isJust mFound)
+      a' <- eval a >>= asRecord @Term @address
+      A.bool @Term @address (isJust (lookup b a'))
 
     a := b -> do
       b' <- eval b
