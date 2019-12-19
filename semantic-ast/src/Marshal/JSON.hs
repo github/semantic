@@ -67,7 +67,7 @@ instance GFields fields => GMarshalJSON (C1 c fields) where
 -- TODO: we first see gfields appear where we have constructors because ...
 
 -- Implement base case for products
--- To get a value out of this datum, we'll need one more typeclass: GValue with the method 'gvalue'.
+-- To get a value out of this datum, we define another typeclass: @GValue@ with the method @gvalue@.
 instance (GValue p, Selector s) => GFields (S1 s p) where
   gfields acc x = (Text.pack (selName x), gvalue (unM1 x)) : acc
 -- knows what the type of x is, whereas M1 has parameters that can be instantiated to anything
