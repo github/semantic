@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, GeneralizedNewtypeDeriving, OverloadedStrings, RankNTypes, RecordWildCards, TypeApplications, TypeOperators #-}
+{-# LANGUAGE FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, LambdaCase, MultiParamTypeClasses, OverloadedStrings, RankNTypes, RecordWildCards, TypeApplications, TypeOperators, UndecidableInstances #-}
 module Analysis.ScopeGraph
 ( ScopeGraph(..)
 , Ref (..)
@@ -8,7 +8,9 @@ module Analysis.ScopeGraph
 
 import           Analysis.Carrier.Env.Monovariant
 import qualified Analysis.Carrier.Heap.Monovariant as A
+import           Analysis.Effect.Domain
 import           Analysis.File
+import           Analysis.Intro
 import           Analysis.FlowInsensitive
 import           Analysis.Name
 import           Control.Algebra
@@ -22,8 +24,10 @@ import           Data.Foldable (fold)
 import           Data.Function (fix)
 import qualified Data.Map as Map
 import qualified Data.Set as Set
+import           Data.Traversable (for)
 import           Prelude hiding (fail)
 import           Source.Span
+import           Syntax.Scope
 import qualified System.Path as Path
 
 data Decl = Decl
@@ -95,6 +99,31 @@ newtype DomainC term m a = DomainC (ReaderC (term Addr -> m ScopeGraph) m a)
 
 instance MonadTrans (DomainC term) where
   lift = DomainC . lift
+
+instance (Has (Env Addr :+: A.Heap Addr ScopeGraph :+: Reader Path.AbsRelFile :+: Reader Span) sig m, Monad term) => Algebra (Domain term Addr ScopeGraph :+: sig) (DomainC term m) where
+  alg = \case
+    L (Abstract i k) -> case i of
+      Unit -> k mempty
+      Bool _ -> k mempty
+      String _ -> k mempty
+      Lam (Named n b) -> do
+        eval <- DomainC ask
+        addr <- alloc @Addr n
+        A.assign @Addr @ScopeGraph addr mempty
+        g <- bind n addr (lift (eval (instantiate1 (pure addr) b)))
+        k g
+      Record fields -> do
+        eval <- DomainC ask
+        fields' <- for fields $ \ (k, t) -> do
+          addr <- alloc k
+          path <- ask
+          span <- ask
+          v <- lift (eval t)
+          let v' = ScopeGraph (Map.singleton (Decl k path span) mempty) <> v
+          v' <$ A.assign @Addr addr v'
+        k (fold fields')
+    L (Concretize _ k) -> k Unit
+    R other -> DomainC (send (handleCoercible other))
 
 -- scopeGraphAnalysis
 --   :: ( Alternative m
