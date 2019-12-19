@@ -60,7 +60,8 @@ type Heap = IntMap.IntMap
 
 
 concrete
-  :: (forall sig m
+  :: Applicative term
+  => (forall sig m
      .  (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
      => (term Addr -> m (Concrete term))
      -> (term Addr -> m (Concrete term))
@@ -75,8 +76,10 @@ concrete eval
 
 runFile
   :: forall term m sig
-  .  ( Effect sig
+  .  ( Applicative term
+     , Effect sig
      , Has Fresh sig m
+     , Has (A.Heap Addr (Concrete term)) sig m
      )
   => (forall sig m
      .  (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
@@ -91,7 +94,7 @@ runFile eval file = traverse run file
             . runFail
             . runReader @Env mempty
             . A.runEnv
-            . fix eval
+            . fix (\ eval' -> runDomain eval' . fix eval)
 
 -- concreteAnalysis
 --   :: forall term m sig
@@ -139,6 +142,9 @@ runFile eval file = traverse run file
 --           modify (IntSet.insert addr)
 --           inConcrete val
 --         maybeA = maybe empty pure
+
+runDomain :: (term Addr -> m (Concrete term)) -> DomainC term m a -> m a
+runDomain eval (DomainC m) = runReader eval m
 
 newtype DomainC term m a = DomainC (ReaderC (term Addr -> m (Concrete term)) m a)
   deriving (Applicative, Functor, Monad, MonadFail)
