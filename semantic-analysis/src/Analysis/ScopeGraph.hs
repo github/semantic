@@ -24,8 +24,8 @@ import           Prelude hiding (fail)
 import           Source.Span
 import qualified System.Path as Path
 
-data Decl name = Decl
-  { declSymbol :: name
+data Decl = Decl
+  { declSymbol :: Name
   , declPath   :: Path.AbsRelFile
   , declSpan   :: Span
   }
@@ -39,24 +39,24 @@ data Ref = Ref
 
 type Addr = Name
 
-newtype ScopeGraph name = ScopeGraph { unScopeGraph :: Map.Map (Decl name) (Set.Set Ref) }
+newtype ScopeGraph = ScopeGraph { unScopeGraph :: Map.Map Decl (Set.Set Ref) }
   deriving (Eq, Ord, Show)
 
-instance Ord name => Semigroup (ScopeGraph name) where
+instance Semigroup ScopeGraph where
   ScopeGraph a <> ScopeGraph b = ScopeGraph (Map.unionWith (<>) a b)
 
-instance Ord name => Monoid (ScopeGraph name) where
+instance Monoid ScopeGraph where
   mempty = ScopeGraph Map.empty
 
 scopeGraph
   :: Ord (term Addr)
   => (forall sig m
      .  (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
-     => (term Addr -> m (ScopeGraph Name))
-     -> (term Addr -> m (ScopeGraph Name))
+     => (term Addr -> m ScopeGraph)
+     -> (term Addr -> m ScopeGraph)
      )
   -> [File (term Addr)]
-  -> (Heap (ScopeGraph Name), [File (Either (Path.AbsRelFile, Span, String) (ScopeGraph Name))])
+  -> (Heap ScopeGraph, [File (Either (Path.AbsRelFile, Span, String) ScopeGraph)])
 scopeGraph eval
   = run
   . evalFresh 0
@@ -66,36 +66,36 @@ scopeGraph eval
 runFile
   :: ( Effect sig
      , Has Fresh sig m
-     , Has (State (Heap (ScopeGraph Name))) sig m
+     , Has (State (Heap ScopeGraph)) sig m
      , Ord (term Addr)
      )
   => (forall sig m
      .  (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
-     => (term Addr -> m (ScopeGraph Name))
-     -> (term Addr -> m (ScopeGraph Name))
+     => (term Addr -> m ScopeGraph)
+     -> (term Addr -> m ScopeGraph)
      )
   -> File (term Addr)
-  -> m (File (Either (Path.AbsRelFile, Span, String) (ScopeGraph Name)))
+  -> m (File (Either (Path.AbsRelFile, Span, String) ScopeGraph))
 runFile eval file = traverse run file
   where run = runReader (filePath file)
             . runReader (fileSpan file)
             . runEnv
             . runFail
             . fmap fold
-            . convergeTerm 0 (A.runHeap @Addr @(ScopeGraph Name) . fix (cacheTerm . eval))
+            . convergeTerm 0 (A.runHeap @Addr @ScopeGraph . fix (cacheTerm . eval))
 
 -- scopeGraphAnalysis
 --   :: ( Alternative m
 --      , Has (Env Name) sig m
---      , Has (A.Heap Name (ScopeGraph Name)) sig m
+--      , Has (A.Heap Name ScopeGraph) sig m
 --      , Has (Reader Path.AbsRelFile) sig m
 --      , Has (Reader Span) sig m
 --      )
---   => Analysis Name (ScopeGraph Name) m
+--   => Analysis Name ScopeGraph m
 -- scopeGraphAnalysis = Analysis{..}
 --   where -- abstract eval name body = do
 --         --   addr <- alloc @Addr name
---         --   A.assign @Addr @(ScopeGraph Name) name mempty
+--         --   A.assign @Addr @ScopeGraph name mempty
 --         --   bind name addr (eval body)
 --         -- apply _ f a = pure (f <> a)
 --         record fields = do
