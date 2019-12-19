@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, QuantifiedConstraints, RankNTypes, RecordWildCards, ScopedTypeVariables, StandaloneDeriving, TypeApplications, UndecidableInstances #-}
+{-# LANGUAGE FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, MultiParamTypeClasses, LambdaCase, QuantifiedConstraints, RankNTypes, RecordWildCards, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeOperators, UndecidableInstances #-}
 module Analysis.ImportGraph
 ( ImportGraph
 , importGraph
@@ -6,7 +6,9 @@ module Analysis.ImportGraph
 
 import           Analysis.Carrier.Env.Monovariant
 import qualified Analysis.Carrier.Heap.Monovariant as A
+import qualified Analysis.Effect.Domain as A
 import           Analysis.File
+import qualified Analysis.Intro as I
 import           Analysis.FlowInsensitive
 import           Analysis.Name
 import           Control.Algebra
@@ -21,6 +23,7 @@ import           Data.Function (fix)
 import qualified Data.Map as Map
 import qualified Data.Set as Set
 import           Data.Text (Text)
+import           Data.Traversable (for)
 import           Prelude hiding (fail)
 import           Source.Span
 import           Syntax.Scope (Scope)
@@ -104,6 +107,29 @@ newtype DomainC term m a = DomainC (ReaderC (term Addr -> m (Value (Semi term)))
 
 instance MonadTrans (DomainC term) where
   lift = DomainC . lift
+
+instance Has (Env Addr :+: A.Heap Addr (Value (Semi term)) :+: Reader Path.AbsRelFile :+: Reader Span) sig m => Algebra (A.Domain term Addr (Value (Semi term)) :+: sig) (DomainC term m) where
+  alg = \case
+    L (A.Abstract i k) -> case i of
+      I.Unit     -> k mempty
+      I.Bool _   -> k mempty
+      I.String s -> k (Value (String s) mempty)
+      I.Lam b    -> do
+        path <- ask
+        span <- ask
+        k (Value (Closure path span b) mempty)
+      I.Record f -> do
+        eval <- DomainC ask
+        fields <- for f $ \ (k, t) -> do
+          addr <- alloc @Addr k
+          v <- lift (eval t)
+          v <$ A.assign @Addr @(Value (Semi term)) addr v
+        k (fold fields)
+    L (A.Concretize (Value s _) k) -> case s of
+      Abstract      -> k I.Unit -- FIXME: this should be broken down for case analysis
+      String s      -> k (I.String s)
+      Closure _ _ b -> k (I.Lam b)
+    R other -> DomainC (send (handleCoercible other))
 
 
 -- FIXME: decompose into a product domain and two atomic domains
