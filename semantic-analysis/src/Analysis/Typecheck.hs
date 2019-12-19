@@ -143,7 +143,7 @@ runFile eval file = traverse run file
               v <- meta
               bs <- m
               v <$ for_ bs (unify v))
-          . convergeTerm 1  (A.runHeap @Name @Type . fix (\ eval' -> runDomain (Evaluator eval') . fix (cacheTerm . eval)))
+          . convergeTerm 1  (A.runHeap @Name @Type . fix (\ eval' -> runDomain eval' . fix (cacheTerm . eval)))
 
 -- typecheckingAnalysis
 --   :: ( Alternative m
@@ -221,12 +221,10 @@ substAll :: Monad t => IntMap.IntMap (t Meta) -> t Meta -> t Meta
 substAll s a = a >>= \ i -> fromMaybe (pure i) (IntMap.lookup i s)
 
 
-runDomain :: Evaluator term m -> DomainC term m a -> m a
+runDomain :: (term Name -> m Type) -> DomainC term m a -> m a
 runDomain eval (DomainC m) = runReader eval m
 
-newtype Evaluator term m = Evaluator { runEvaluator :: term Name -> m Type }
-
-newtype DomainC term m a = DomainC (ReaderC (Evaluator term m) m a)
+newtype DomainC term m a = DomainC (ReaderC (term Name -> m Type) m a)
   deriving (Alternative, Applicative, Functor, Monad, MonadFail)
 
 instance MonadTrans (DomainC term) where
@@ -245,14 +243,14 @@ instance ( Alternative m
     Intro.Bool   _ -> k (Alg Bool)
     Intro.String _ -> k (Alg String)
     Intro.Lam (Named n b) -> do
-      eval <- DomainC (asks runEvaluator)
+      eval <- DomainC ask
       addr <- alloc @Name n
       arg <- meta
       A.assign addr arg
       ty <- lift (eval (instantiate1 (pure n) b))
       k (Alg (arg :-> ty))
     Intro.Record fields -> do
-      eval <- DomainC (asks runEvaluator)
+      eval <- DomainC ask
       fields' <- for fields $ \ (k, t) -> do
         addr <- alloc @Name k
         v <- lift (eval t)
