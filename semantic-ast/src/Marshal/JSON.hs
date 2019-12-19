@@ -15,6 +15,7 @@ module Marshal.JSON
 ) where
 
 import Data.Aeson as Aeson
+import Data.List.NonEmpty (NonEmpty)
 import GHC.Generics
 import Data.Text (Text)
 import qualified Data.Text as Text
