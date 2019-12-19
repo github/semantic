@@ -188,6 +188,20 @@ languageModes = Language.PerLanguageModes
                   <> metavar "ALaCarte|Precise"
                   <> value Language.ALaCarte
                   <> showDefault)
+  <*> option auto (  long "tsx-mode"
+                  <> help "The AST representation to use for TSX sources"
+                  <> metavar "ALaCarte|Precise"
+                  <> value Language.ALaCarte
+                  <> showDefault)
+  <*> languageModeOption "javascript" "JavaScript"
+  <*> languageModeOption "jsx" "JSX"
+  where
+    languageModeOption shortName fullName
+      = option auto (  long (shortName <> "-mode")
+                    <> help ("The AST representation to use for " <> fullName <> " sources")
+                    <> metavar "ALaCarte|Precise"
+                    <> value Language.ALaCarte
+                    <> showDefault)
 
 filePathReader :: ReadM File
 filePathReader = fileForPath <$> str

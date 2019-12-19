@@ -45,6 +45,7 @@ import qualified Language.Go as GoPrecise
 import qualified Language.Python as PythonPrecise
 import qualified Language.Ruby as RubyPrecise
 import qualified Language.TypeScript as TypeScriptPrecise
+import qualified Language.TSX as TSXPrecise
 
 
 termGraph :: (Traversable t, Has Distribute sig m, Has (Error SomeException) sig m, Has Parse sig m) => t Blob -> m ParseTreeGraphResponse
@@ -126,6 +127,9 @@ instance ShowTermBy 'Precise PythonPrecise.Term where
 instance ShowTermBy 'Precise RubyPrecise.Term where
   showTermBy = serialize Show . void . RubyPrecise.getTerm
 
+instance ShowTermBy 'Precise TSXPrecise.Term where
+  showTermBy = serialize Show . void . TSXPrecise.getTerm
+
 instance ShowTermBy 'Precise TypeScriptPrecise.Term where
   showTermBy = serialize Show . void . TypeScriptPrecise.getTerm
 
@@ -159,6 +163,9 @@ instance SExprTermBy 'Precise PythonPrecise.Term where
 
 instance SExprTermBy 'Precise RubyPrecise.Term where
   sexprTermBy = SExpr.Precise.serializeSExpression . RubyPrecise.getTerm
+
+instance SExprTermBy 'Precise TSXPrecise.Term where
+  sexprTermBy = SExpr.Precise.serializeSExpression . TSXPrecise.getTerm
 
 instance SExprTermBy 'Precise TypeScriptPrecise.Term where
   sexprTermBy = SExpr.Precise.serializeSExpression . TypeScriptPrecise.getTerm

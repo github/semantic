@@ -45,6 +45,7 @@ function flags {
   echo "-isemantic-json/src"
   echo "-isemantic-python/src"
   echo "-isemantic-ruby/src"
+  echo "-isemantic-tsx/src"
   echo "-isemantic-typescript/src"
   echo "-isemantic-tags/src"
   echo "-iapp"

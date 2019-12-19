@@ -155,6 +155,9 @@ data PerLanguageModes = PerLanguageModes
   , rubyMode   :: LanguageMode
   , goMode     :: LanguageMode
   , typescriptMode :: LanguageMode
+  , tsxMode :: LanguageMode
+  , javascriptMode :: LanguageMode
+  , jsxMode :: LanguageMode
   }
   deriving (Eq, Ord, Show)
 
@@ -164,6 +167,9 @@ defaultLanguageModes = PerLanguageModes
   , rubyMode = ALaCarte
   , goMode = ALaCarte
   , typescriptMode = ALaCarte
+  , tsxMode = ALaCarte
+  , javascriptMode = ALaCarte
+  , jsxMode = ALaCarte
   }
 
 data LanguageMode

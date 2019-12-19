@@ -93,6 +93,7 @@ type Syntax =
   , Literal.TextElement
   , Literal.Regex
   , Statement.Assignment
+  , Statement.AugmentedAssignment
   , Statement.Break
   , Statement.Catch
   , Statement.Continue

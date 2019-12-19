@@ -8,8 +8,12 @@ module Parsing.Parser
 , goParserALaCarte
 , goParserPrecise
 , javaParser
+, javascriptParserALaCarte
+, javascriptParserPrecise
 , javascriptParser
 , jsonParser
+, jsxParserALaCarte
+, jsxParserPrecise
 , jsxParser
 , markdownParser
 , phpParser
@@ -19,6 +23,8 @@ module Parsing.Parser
 , rubyParserALaCarte
 , rubyParserPrecise
 , rubyParser
+, tsxParserALaCarte
+, tsxParserPrecise
 , tsxParser
 , typescriptParserALaCarte
 , typescriptParserPrecise
@@ -49,7 +55,8 @@ import qualified Language.Python as PythonPrecise
 import qualified Language.Python.Assignment as PythonALaCarte
 import qualified Language.Ruby as RubyPrecise
 import qualified Language.Ruby.Assignment as RubyALaCarte
-import qualified Language.TSX.Assignment as TSX
+import qualified Language.TSX as TSXPrecise
+import qualified Language.TSX.Assignment as TSXALaCarte
 import qualified Language.TypeScript as TypeScriptPrecise
 import qualified Language.TypeScript.Assignment as TypeScriptALaCarte
 import           Prelude hiding (fail)
@@ -123,14 +130,30 @@ goParser modes = case goMode modes of
 javaParser :: c Java.Term => (Language, SomeParser c Loc)
 javaParser = (Java, SomeParser (UnmarshalParser @Java.Term Java.tree_sitter_java))
 
-javascriptParser :: c TSX.Term => (Language, SomeParser c Loc)
-javascriptParser = (JavaScript, SomeParser (AssignmentParser (ASTParser tree_sitter_tsx) TSX.assignment))
+javascriptParserALaCarte :: c TSXALaCarte.Term => (Language, SomeParser c Loc)
+javascriptParserALaCarte = (JavaScript, SomeParser (AssignmentParser (ASTParser tree_sitter_tsx) TSXALaCarte.assignment))
+
+javascriptParserPrecise :: c TSXPrecise.Term => (Language, SomeParser c Loc)
+javascriptParserPrecise = (JavaScript, SomeParser (UnmarshalParser @TSXPrecise.Term TSXPrecise.tree_sitter_tsx))
+
+javascriptParser :: (c TSXALaCarte.Term, c TSXPrecise.Term) => PerLanguageModes -> (Language, SomeParser c Loc)
+javascriptParser modes = case javascriptMode modes of
+  ALaCarte -> javascriptParserALaCarte
+  Precise  -> javascriptParserPrecise
 
 jsonParser :: c JSON.Term => (Language, SomeParser c Loc)
 jsonParser = (JSON, SomeParser (UnmarshalParser @JSON.Term JSON.tree_sitter_json))
 
-jsxParser :: c TSX.Term => (Language, SomeParser c Loc)
-jsxParser = (JSX, SomeParser (AssignmentParser (ASTParser tree_sitter_tsx) TSX.assignment))
+jsxParserALaCarte :: c TSXALaCarte.Term => (Language, SomeParser c Loc)
+jsxParserALaCarte = (JSX, SomeParser (AssignmentParser (ASTParser tree_sitter_tsx) TSXALaCarte.assignment))
+
+jsxParserPrecise :: c TSXPrecise.Term => (Language, SomeParser c Loc)
+jsxParserPrecise = (JSX, SomeParser (UnmarshalParser @TSXPrecise.Term TSXPrecise.tree_sitter_tsx))
+
+jsxParser :: (c TSXALaCarte.Term, c TSXPrecise.Term) => PerLanguageModes -> (Language, SomeParser c Loc)
+jsxParser modes = case jsxMode modes of
+  ALaCarte -> jsxParserALaCarte
+  Precise  -> jsxParserPrecise
 
 markdownParser :: c Markdown.Term => (Language, SomeParser c Loc)
 markdownParser = (Markdown, SomeParser (AssignmentParser MarkdownParser Markdown.assignment))
@@ -160,8 +183,16 @@ rubyParser modes = case rubyMode modes of
   ALaCarte -> rubyParserALaCarte
   Precise  -> rubyParserPrecise
 
-tsxParser :: c TSX.Term => (Language, SomeParser c Loc)
-tsxParser = (TSX, SomeParser (AssignmentParser (ASTParser tree_sitter_tsx) TSX.assignment))
+tsxParserALaCarte :: c TSXALaCarte.Term => (Language, SomeParser c Loc)
+tsxParserALaCarte = (TSX, SomeParser (AssignmentParser (ASTParser tree_sitter_tsx) TSXALaCarte.assignment))
+
+tsxParserPrecise :: c TSXPrecise.Term => (Language, SomeParser c Loc)
+tsxParserPrecise = (TSX, SomeParser (UnmarshalParser @TSXPrecise.Term TSXPrecise.tree_sitter_tsx))
+
+tsxParser :: (c TSXALaCarte.Term, c TSXPrecise.Term) => PerLanguageModes -> (Language, SomeParser c Loc)
+tsxParser modes = case tsxMode modes of
+  ALaCarte -> tsxParserALaCarte
+  Precise  -> tsxParserPrecise
 
 typescriptParserALaCarte :: c TypeScriptALaCarte.Term => (Language, SomeParser c Loc)
 typescriptParserALaCarte = (TypeScript, SomeParser (AssignmentParser (ASTParser tree_sitter_typescript) TypeScriptALaCarte.assignment))
@@ -183,6 +214,7 @@ type family TermMode term where
   TermMode PythonPrecise.Term     = 'Precise
   TermMode RubyPrecise.Term       = 'Precise
   TermMode TypeScriptPrecise.Term = 'Precise
+  TermMode TSXPrecise.Term        = 'Precise
   TermMode _                      = 'ALaCarte
 
 -- | The canonical set of parsers producing à la carte terms.
@@ -192,20 +224,20 @@ aLaCarteParsers
      , c PHP.Term
      , c PythonALaCarte.Term
      , c RubyALaCarte.Term
-     , c TSX.Term
+     , c TSXALaCarte.Term
      , c TypeScriptALaCarte.Term
      )
   => Map Language (SomeParser c Loc)
 aLaCarteParsers = Map.fromList
-  [ goParserALaCarte
-  , javascriptParser
-  , jsxParser
+  [ javascriptParserALaCarte
+  , jsxParserALaCarte
   , markdownParser
   , phpParser
   , pythonParserALaCarte
   , rubyParserALaCarte
+  , tsxParserALaCarte
   , typescriptParserALaCarte
-  , tsxParser
+  , goParserALaCarte
   ]
 
 -- | The canonical set of parsers producing precise terms.
@@ -216,15 +248,19 @@ preciseParsers
      , c RubyPrecise.Term
      , c GoPrecise.Term
      , c TypeScriptPrecise.Term
+     , c TSXPrecise.Term
      )
   => Map Language (SomeParser c Loc)
 preciseParsers = Map.fromList
-  [ javaParser
+  [ goParserPrecise
+  , javascriptParserPrecise
   , jsonParser
+  , jsxParserPrecise
   , pythonParserPrecise
   , rubyParserPrecise
-  , goParserPrecise
+  , tsxParserPrecise
   , typescriptParserPrecise
+  , javaParser
   ]
 
 -- | The canonical set of all parsers for the passed per-language modes.
@@ -239,7 +275,8 @@ allParsers
      , c PythonPrecise.Term
      , c RubyALaCarte.Term
      , c RubyPrecise.Term
-     , c TSX.Term
+     , c TSXALaCarte.Term
+     , c TSXPrecise.Term
      , c TypeScriptALaCarte.Term
      , c TypeScriptPrecise.Term
      )
@@ -248,13 +285,13 @@ allParsers
 allParsers modes = Map.fromList
   [ goParser modes
   , javaParser
-  , javascriptParser
+  , javascriptParser modes
   , jsonParser
-  , jsxParser
+  , jsxParser modes
   , markdownParser
   , phpParser
   , pythonParser modes
   , rubyParser modes
+  , tsxParser modes
   , typescriptParser modes
-  , tsxParser
   ]

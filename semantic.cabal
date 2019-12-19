@@ -290,6 +290,7 @@ library
                      , semantic-json ^>= 0
                      , semantic-python ^>= 0
                      , semantic-ruby ^>= 0
+                     , semantic-tsx ^>= 0
                      , semantic-typescript ^>= 0
                      , semantic-tags ^>= 0
                      , semigroupoids ^>= 5.3.2
