@@ -37,6 +37,8 @@ data Ref = Ref
   }
   deriving (Eq, Ord, Show)
 
+type Addr = Name
+
 newtype ScopeGraph name = ScopeGraph { unScopeGraph :: Map.Map (Decl name) (Set.Set Ref) }
   deriving (Eq, Ord, Show)
 
@@ -80,7 +82,7 @@ runFile eval file = traverse run file
             . runEnv
             . runFail
             . fmap fold
-            . convergeTerm 0 (A.runHeap @Name @(ScopeGraph Name) . fix (cacheTerm . eval))
+            . convergeTerm 0 (A.runHeap @Addr @(ScopeGraph Name) . fix (cacheTerm . eval))
 
 -- scopeGraphAnalysis
 --   :: ( Alternative m
@@ -92,8 +94,8 @@ runFile eval file = traverse run file
 --   => Analysis Name (ScopeGraph Name) m
 -- scopeGraphAnalysis = Analysis{..}
 --   where -- abstract eval name body = do
---         --   addr <- alloc @Name name
---         --   A.assign @Name @(ScopeGraph Name) name mempty
+--         --   addr <- alloc @Addr name
+--         --   A.assign @Addr @(ScopeGraph Name) name mempty
 --         --   bind name addr (eval body)
 --         -- apply _ f a = pure (f <> a)
 --         record fields = do
@@ -102,6 +104,6 @@ runFile eval file = traverse run file
 --             path <- ask
 --             span <- ask
 --             let v' = ScopeGraph (Map.singleton (Decl k path span) mempty) <> v
---             (k, v') <$ A.assign @Name addr v'
+--             (k, v') <$ A.assign @Addr addr v'
 --           pure (foldMap snd fields')
 --         _ ... m = pure (Just m)
