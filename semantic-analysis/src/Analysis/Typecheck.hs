@@ -152,25 +152,23 @@ runFile eval file = traverse run file
 typecheckingAnalysis
   :: ( Alternative m
      , Has (Env Name) sig m
-     , Has Fresh sig m
      , Has (A.Heap Name Type) sig m
-     , Has (State (Set.Set Constraint)) sig m
      )
   => Analysis term Name Type m
 typecheckingAnalysis = Analysis{..}
-  where abstract eval name body = do
-          -- FIXME: construct the associated scope
-          addr <- alloc @Name name
-          arg <- meta
-          A.assign addr arg
-          ty <- eval body
-          pure (Alg (arg :-> ty))
-        apply _ f a = do
-          _A <- meta
-          _B <- meta
-          unify (Alg (_A :-> _B)) f
-          unify _A a
-          pure _B
+  where -- abstract eval name body = do
+        --   -- FIXME: construct the associated scope
+        --   addr <- alloc @Name name
+        --   arg <- meta
+        --   A.assign addr arg
+        --   ty <- eval body
+        --   pure (Alg (arg :-> ty))
+        -- apply _ f a = do
+        --   _A <- meta
+        --   _B <- meta
+        --   unify (Alg (_A :-> _B)) f
+        --   unify _A a
+        --   pure _B
         record fields = do
           fields' <- for fields $ \ (k, v) -> do
             addr <- alloc @Name k

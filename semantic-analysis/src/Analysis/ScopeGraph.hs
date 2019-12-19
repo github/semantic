@@ -97,11 +97,11 @@ scopeGraphAnalysis
      )
   => Analysis term Name (ScopeGraph Name) m
 scopeGraphAnalysis = Analysis{..}
-  where abstract eval name body = do
-          addr <- alloc @Name name
-          A.assign @Name @(ScopeGraph Name) name mempty
-          bind name addr (eval body)
-        apply _ f a = pure (f <> a)
+  where -- abstract eval name body = do
+        --   addr <- alloc @Name name
+        --   A.assign @Name @(ScopeGraph Name) name mempty
+        --   bind name addr (eval body)
+        -- apply _ f a = pure (f <> a)
         record fields = do
           fields' <- for fields $ \ (k, v) -> do
             addr <- alloc k

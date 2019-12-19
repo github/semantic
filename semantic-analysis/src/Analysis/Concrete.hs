@@ -30,7 +30,6 @@ import qualified Data.IntMap as IntMap
 import qualified Data.IntSet as IntSet
 import qualified Data.Map as Map
 import           Data.Semigroup (Last (..))
-import qualified Data.Set as Set
 import           Data.Text (Text, pack)
 import           Data.Traversable (for)
 import           Prelude hiding (fail)
@@ -58,10 +57,7 @@ type Heap term = IntMap.IntMap (Concrete term)
 
 
 concrete
-  :: ( Foldable term
-     , Show (term Name)
-     )
-  => (forall sig m
+  :: (forall sig m
      .  (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
      => Analysis term Precise (Concrete (term Name)) m
      -> (term Name -> m (Concrete (term Name)))
@@ -78,11 +74,9 @@ concrete eval
 runFile
   :: forall term m sig
   .  ( Effect sig
-     , Foldable term
      , Has Fresh sig m
      , Has (A.Heap Precise (Concrete (term Name))) sig m
      , Has (State (Heap (term Name))) sig m
-     , Show (term Name)
      )
   => (forall sig m
      .  (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
@@ -102,29 +96,23 @@ runFile eval file = traverse run file
 
 concreteAnalysis
   :: forall term m sig
-  .  ( Foldable term
-     , Has (A.Env Precise) sig m
+  .  ( Has (A.Env Precise) sig m
      , Has (A.Heap Precise (Concrete (term Name))) sig m
-     , Has (Reader Env) sig m
-     , Has (Reader Path.AbsRelFile) sig m
-     , Has (Reader Span) sig m
      , Has (State (Heap (term Name))) sig m
-     , MonadFail m
-     , Show (term Name)
      )
   => Analysis term Precise (Concrete (term Name)) m
 concreteAnalysis = Analysis{..}
-  where abstract _ name body = do
-          path <- ask
-          span <- ask
-          env <- asks (flip Map.restrictKeys (Set.delete name (foldMap Set.singleton body)))
-          pure (Closure path span name body env)
-        apply eval (Closure path span name body env) a = do
-          local (const path) . local (const span) $ do
-            addr <- A.alloc name
-            A.assign addr a
-            local (const (Map.insert name addr env)) (eval body)
-        apply _ f _ = fail $ "Cannot coerce " <> show f <> " to function"
+  where -- abstract _ name body = do
+        --   path <- ask
+        --   span <- ask
+        --   env <- asks (flip Map.restrictKeys (Set.delete name (foldMap Set.singleton body)))
+        --   pure (Closure path span name body env)
+        -- apply eval (Closure path span name body env) a = do
+        --   local (const path) . local (const span) $ do
+        --     addr <- A.alloc name
+        --     A.assign addr a
+        --     local (const (Map.insert name addr env)) (eval body)
+        -- apply _ f _ = fail $ "Cannot coerce " <> show f <> " to function"
         record fields = do
           fields' <- for fields $ \ (name, value) -> do
             addr <- A.alloc name

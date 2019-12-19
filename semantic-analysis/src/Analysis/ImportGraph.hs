@@ -49,7 +49,7 @@ data Semi term
 
 
 importGraph
-  :: (Ord (term Name), Show (term Name))
+  :: Ord (term Name)
   => (forall sig m
      .  (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
      => Analysis term Name (Value (term Name)) m
@@ -72,7 +72,6 @@ runFile
      , Has Fresh sig m
      , Has (State (Heap (Value (term Name)))) sig m
      , Ord  (term Name)
-     , Show (term Name)
      )
   => (forall sig m
      .  (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
@@ -95,22 +94,18 @@ importGraphAnalysis
   :: ( Alternative m
      , Has (Env Name) sig m
      , Has (A.Heap Name (Value (term Name))) sig m
-     , Has (Reader Path.AbsRelFile) sig m
-     , Has (Reader Span) sig m
-     , MonadFail m
-     , Show (term Name)
      )
   => Analysis term Name (Value (term Name)) m
 importGraphAnalysis = Analysis{..}
-  where abstract _ name body = do
-          path <- ask
-          span <- ask
-          pure (Value (Closure path span name body) mempty)
-        apply eval (Value (Closure path span name body) _) a = local (const path) . local (const span) $ do
-          addr <- alloc @Name name
-          A.assign addr a
-          bind name addr (eval body)
-        apply _ f _ = fail $ "Cannot coerce " <> show f <> " to function"
+  where -- abstract _ name body = do
+        --   path <- ask
+        --   span <- ask
+        --   pure (Value (Closure path span name body) mempty)
+        -- apply eval (Value (Closure path span name body) _) a = local (const path) . local (const -- span) $ do
+        --   addr <- alloc @Name name
+        --   A.assign addr a
+        --   bind name addr (eval body)
+        -- apply _ f _ = fail $ "Cannot coerce " <> show f <> " to function"
         record fields = do
           for_ fields $ \ (k, v) -> do
             addr <- alloc @Name k
