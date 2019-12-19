@@ -91,6 +91,9 @@ instance GValue Par1 where
 instance (GMarshalJSON (Rep1 t), Generic1 t) => GValue (Rec1 t) where
   gvalue (Rec1 f) = marshal f
 
+instance (GValue t) => GValue (Maybe :.: t) where
+  gvalue (Comp1 (Just t)) = gvalue t
+  gvalue (Comp1 Nothing) = Null
 -- Define a new class to operate on product field types;
 -- Takes an accumulator, a datatype, and returns a new accumulator value.
 class GFields f where
