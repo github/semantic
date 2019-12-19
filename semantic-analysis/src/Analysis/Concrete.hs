@@ -29,8 +29,8 @@ import           Prelude hiding (fail)
 import           Source.Span
 import qualified System.Path as Path
 
-type Precise = Int
-type Env = Map.Map Name Precise
+type Addr = Int
+type Env = Map.Map Name Addr
 
 data Concrete term
   = Closure Path.AbsRelFile Span Name term Env
@@ -85,11 +85,11 @@ runFile eval file = traverse run file
 
 -- concreteAnalysis
 --   :: forall term m sig
---   .  ( Has (A.Env Precise) sig m
---      , Has (A.Heap Precise (Concrete (term Name))) sig m
+--   .  ( Has (A.Env Addr) sig m
+--      , Has (A.Heap Addr (Concrete (term Name))) sig m
 --      , Has (State (Heap (term Name))) sig m
 --      )
---   => Analysis Precise (Concrete (term Name)) m
+--   => Analysis Addr (Concrete (term Name)) m
 -- concreteAnalysis = Analysis{..}
 --   where -- abstract _ name body = do
 --         --   path <- ask
@@ -109,12 +109,12 @@ runFile eval file = traverse run file
 --             pure (name, addr)
 --           pure (Record (Map.fromList fields'))
 --         addr ... n = do
---           val <- A.deref @Precise @(Concrete (term Name)) addr
+--           val <- A.deref @Addr @(Concrete (term Name)) addr
 --           heap <- get
 --           pure (val >>= lookupConcrete heap n)
 
 
--- lookupConcrete :: Heap (term Name) -> Name -> Concrete (term Name) -> Maybe Precise
+-- lookupConcrete :: Heap (term Name) -> Name -> Concrete (term Name) -> Maybe Addr
 -- lookupConcrete heap name = run . evalState IntSet.empty . runNonDetA . inConcrete
 --   where -- look up the name in a concrete value
 --         inConcrete = inFrame <=< maybeA . recordFrame
@@ -136,7 +136,7 @@ runFile eval file = traverse run file
 --   > λ let (heap, res) = concrete [ruby]
 --   > λ writeFile "/Users/rob/Desktop/heap.dot" (export (addressStyle heap) (heapAddressGraph heap))
 --   > λ :!dot -Tsvg < ~/Desktop/heap.dot > ~/Desktop/heap.svg
-heapGraph :: (Precise -> Concrete (term Name) -> a) -> (Either Edge Name -> Precise -> G.Graph a) -> Heap (term Name) -> G.Graph a
+heapGraph :: (Addr -> Concrete (term Name) -> a) -> (Either Edge Name -> Addr -> G.Graph a) -> Heap (term Name) -> G.Graph a
 heapGraph vertex edge h = foldr (uncurry graph) G.empty (IntMap.toList h)
   where graph k v rest = (G.vertex (vertex k v) `G.connect` outgoing v) `G.overlay` rest
         outgoing = \case
@@ -150,10 +150,10 @@ heapValueGraph :: Heap (term Name) -> G.Graph (Concrete (term Name))
 heapValueGraph h = heapGraph (const id) (const fromAddr) h
   where fromAddr addr = maybe G.empty G.vertex (IntMap.lookup addr h)
 
-heapAddressGraph :: Heap (term Name) -> G.Graph (EdgeType (term Name), Precise)
+heapAddressGraph :: Heap (term Name) -> G.Graph (EdgeType (term Name), Addr)
 heapAddressGraph = heapGraph (\ addr v -> (Value v, addr)) (fmap G.vertex . (,) . either Edge Slot)
 
-addressStyle :: Heap (term Name) -> G.Style (EdgeType (term Name), Precise) Text
+addressStyle :: Heap (term Name) -> G.Style (EdgeType (term Name), Addr) Text
 addressStyle heap = (G.defaultStyle vertex) { G.edgeAttributes }
   where vertex (_, addr) = pack (show addr) <> " = " <> maybe "?" fromConcrete (IntMap.lookup addr heap)
         edgeAttributes _ (Slot name,    _) = ["label" G.:= unName name]
