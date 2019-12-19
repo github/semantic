@@ -61,7 +61,7 @@ eval Analysis{..} eval = \case
       addr <- A.alloc @address n
       A.assign addr a'
       A.bind n addr ((a' <>) <$> eval (instantiate1 (pure n) b))
-    Lam (Named n b) -> A.abstract (I.Lam (Named n b))
+    Lam (Named n b) -> A.lam (Named n b)
     f :$ a -> do
       f' <- eval f
       A.concretize f' >>= \case
@@ -115,7 +115,7 @@ eval Analysis{..} eval = \case
 
 
 prog1 :: (Has Core sig t, Has Intro sig t) => File (t Name)
-prog1 = fromBody $ lam (named' "foo")
+prog1 = fromBody $ Core.lam (named' "foo")
   (    named' "bar" :<- pure "foo"
   >>>= Core.if' (pure "bar")
     (Core.bool False)

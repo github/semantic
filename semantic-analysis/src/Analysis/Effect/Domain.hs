@@ -8,6 +8,7 @@ module Analysis.Effect.Domain
 , asBool
 , string
 , asString
+, lam
 , Domain(..)
   -- * Re-exports
 , Algebra
@@ -23,6 +24,7 @@ import Control.Monad ((>=>))
 import Control.Monad.Fail as Fail
 import Data.Text (Text)
 import GHC.Generics (Generic1)
+import Syntax.Scope (Scope)
 
 abstract :: Has (Domain term abstract) sig m => Intro term Name -> m abstract
 abstract concrete = send (Abstract concrete pure)
@@ -49,6 +51,10 @@ asString :: forall term abstract m sig . (Has (Domain term abstract) sig m, Mona
 asString = concretize @term >=> \case
   A.String t -> pure t
   other      -> typeError "String" other
+
+
+lam :: Has (Domain term abstract) sig m => Named (Scope () term Name) -> m abstract
+lam = abstract . A.Lam
 
 
 data Domain term abstract m k
