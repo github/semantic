@@ -20,6 +20,7 @@ import           Control.Algebra
 import           Control.Carrier.Fail.WithLoc
 import           Control.Carrier.Fresh.Strict
 import           Control.Carrier.Reader hiding (Local)
+import           Control.Monad.Trans.Class (MonadTrans(..))
 import           Data.Function (fix)
 import qualified Data.IntMap as IntMap
 import qualified Data.Map as Map
@@ -132,6 +133,9 @@ runFile eval file = traverse run file
 
 newtype DomainC term m a = DomainC (ReaderC (term Addr -> m (Concrete (term Addr))) m a)
   deriving (Applicative, Functor, Monad, MonadFail)
+
+instance MonadTrans (DomainC term) where
+  lift = DomainC . lift
 
 
 -- | 'heapGraph', 'heapValueGraph', and 'heapAddressGraph' allow us to conveniently export SVGs of the heap:
