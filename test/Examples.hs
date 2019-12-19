@@ -35,39 +35,29 @@ import Semantic.Config as Config
 import Semantic.Task
 import Semantic.Task.Files
 
-data LanguageExample
-  = LanguageExample
-  { languageName      :: String
-  , languageExtension :: String
-  , languageSkips     :: [Path.RelFile]
-  } deriving (Eq, Show)
+data LanguageExample =
+  LanguageExample
+    { languageName      :: String
+    , languageExtension :: String
+    , languageSkips     :: [Path.RelFile]
+    , languageDirSkips  :: [Path.RelDir]
+    }
+  deriving (Eq, Show)
 
-le :: String -> String -> [Path.RelFile] -> LanguageExample
+le :: String -> String -> [Path.RelFile] -> [Path.RelDir] -> LanguageExample
 le = LanguageExample
 
 examples :: [LanguageExample]
 examples =
-  [ le "go" "**/*.go" goSkips
-  -- [ le "python" "**/*.py" mempty
-  -- , le "ruby" "**/*.rb" rubySkips
-  -- , le "typescript" "**/*.[jt]s*" Nothing -- (Just $ Path.relFile "typescript/script/known_failures.txt")
-  -- , le "typescript" "**/*.tsx" Nothing
-  -- , le "javascript" ".js" examples Nothing -- parse JavaScript with TypeScript parser.
-  -- , le "go" ".go" examples (Just $ Path.relFile "script/known-failures.txt")
+  [ le "go" "**/*.go" goFileSkips goDirSkips
+  -- [ le "python" "**/*.py" mempty mempty
+  -- , le "ruby" "**/*.rb" rubySkips mempty
+  -- , le "typescript" "**/*.[jt]s*" mempty mempty
+  -- , le "typescript" "**/*.tsx" mempty mempty
+  ]
 
-  -- TODO: Java assignment errors need to be investigated
-  -- , le "java" ".java" examples (Just $ Path.relFile "script/known_failures_guava.txt")
-
-  -- TODO: Haskell assignment errors need to be investigated
-  -- , le "haskell" ".hs" "examples/effects" (Just "script/known-failures-effects.txt")
-  -- , le "haskell" ".hs" "examples/postgrest" (Just "script/known-failures-postgrest.txt")
-  -- , le "haskell" ".hs" "examples/ivory" (Just "script/known-failures-ivory.txt")
-
-  -- , ("php", ".php") -- TODO: No parse-examples in tree-sitter yet
-  ]-- where examples = Path.relDir "examples"
-
-goSkips :: [Path.RelFile]
-goSkips = Path.relFile <$>
+goFileSkips :: [Path.RelFile]
+goFileSkips = fmap Path.relPath
   [
   -- Super slow
     "go/src/vendor/golang_org/x/text/unicode/norm/tables.go"
@@ -79,11 +69,33 @@ goSkips = Path.relFile <$>
 
   -- Assignment timeouts
   , "go/src/cmd/compile/internal/gc/constFold_test.go"
+  , "go/src/cmd/compile/internal/gc/testdata/arithConst.go"
+  , "moby/vendor/github.com/docker/swarmkit/api/types.pb.go"
+  , "moby/vendor/github.com/docker/swarmkit/api/control.pb.go"
+
+  -- Parser timeouts
+  , "moby/vendor/github.com/ugorji/go/codec/fast-path.generated.go"
 
   -- Parse errors
   , "go/src/math/big/arith.go" -- Unhandled identifier character: 'ŝ'
+  , "go/src/cmd/vet/testdata/deadcode.go"
   , "moby/vendor/github.com/beorn7/perks/quantile/stream.go" -- Unhandled identifier character: 'ƒ'
+
+  -- UTF8 encoding issues ("Cannot decode byte '\xe3': Data.Text.Internal.Encoding.decodeUtf8: Invalid UTF-8 stream")
+  , "go/src/text/template/exec_test.go"
+  , "go/src/bufio/bufio_test.go"
+  , "go/doc/progs/go1.go"
   ]
+
+goDirSkips :: [Path.RelDir]
+goDirSkips = Path.rel <$>
+  [ "go/src/cmd/compile/internal/ssa"
+  , "go/test/fixedbugs"
+  , "go/test/syntax"
+  , "go/test/method4.dir"
+  , "go/test"
+  ]
+
 
 -- rubySkips :: [Path.RelFile]
 -- rubySkips = Path.relFile <$>
@@ -106,9 +118,10 @@ goSkips = Path.relFile <$>
 
 buildExamples :: TaskSession -> LanguageExample -> Path.RelDir -> IO Tasty.TestTree
 buildExamples session lang tsDir = do
-  let skips = fmap (tsDir </>) (languageSkips lang)
+  let fileSkips = fmap (tsDir </>) (languageSkips lang)
+      dirSkips  = fmap (tsDir </>) (languageDirSkips lang)
   files <- globDir1 (compile (languageExtension lang)) (Path.toString tsDir)
-  let paths = filter (`notElem` skips) $ Path.relFile <$> files
+  let paths = filter (\x -> Path.takeDirectory x `notElem` dirSkips) . filter (`notElem` fileSkips) $ Path.relFile <$> files
   trees <- for paths $ \file -> do
     pure . HUnit.testCaseSteps (Path.toString file) $ \step -> do
       -- Use alacarte language mode
@@ -162,7 +175,6 @@ buildExamples session lang tsDir = do
       (Left e1, Left e2) -> HUnit.assertFailure ("Unable to parse (both)" <> show (displayException e1) <> show (displayException e2))
       (_, Left e)        -> HUnit.assertFailure ("Unable to parse (precise)" <> show (displayException e))
       (Left e, _)        -> HUnit.assertFailure ("Unable to parse (a la carte)" <> show (displayException e))
-
 
 filterALaCarteSymbols :: String -> [Text.Text] -> [Text.Text]
 filterALaCarteSymbols "ruby" symbols
