@@ -25,6 +25,8 @@ import qualified System.Path as Path
 
 type ImportGraph = Map.Map Text (Set.Set Text)
 
+type Addr = Name
+
 data Value term = Value
   { valueSemi  :: Semi term
   , valueGraph :: ImportGraph
@@ -82,7 +84,7 @@ runFile eval file = traverse run file
             . runEnv
             . runFail
             . fmap fold
-            . convergeTerm 0 (A.runHeap @Name @(Value (term Name)) . fix (cacheTerm . eval))
+            . convergeTerm 0 (A.runHeap @Addr @(Value (term Addr)) . fix (cacheTerm . eval))
 
 -- FIXME: decompose into a product domain and two atomic domains
 -- importGraphAnalysis
@@ -97,13 +99,13 @@ runFile eval file = traverse run file
 --         --   span <- ask
 --         --   pure (Value (Closure path span name body) mempty)
 --         -- apply eval (Value (Closure path span name body) _) a = local (const path) . local (const -- span) $ do
---         --   addr <- alloc @Name name
+--         --   addr <- alloc @Addr name
 --         --   A.assign addr a
 --         --   bind name addr (eval body)
 --         -- apply _ f _ = fail $ "Cannot coerce " <> show f <> " to function"
 --         record fields = do
 --           for_ fields $ \ (k, v) -> do
---             addr <- alloc @Name k
+--             addr <- alloc @Addr k
 --             A.assign addr v
 --           pure (Value Abstract (foldMap (valueGraph . snd) fields))
 --         _ ... m = pure (Just m)
