@@ -97,7 +97,7 @@ generalize ty = fromJust (closed (forAlls (IntSet.toList (mvs ty)) (hoistTerm R 
 typecheckingFlowInsensitive
   :: (Has Intro.Intro syn term, Ord (term Addr))
   => (forall sig m
-     .  (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
+     .  (Has (Domain term Addr Type :+: Env Addr :+: A.Heap Addr Type :+: Reader Path.AbsRelFile :+: Reader Span) sig m, MonadFail m)
      => (term Addr -> m Type)
      -> (term Addr -> m Type)
      )
@@ -120,7 +120,7 @@ runFile
      , Ord (term Addr)
      )
   => (forall sig m
-     .  (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
+     .  (Has (Domain term Addr Type :+: Env Addr :+: A.Heap Addr Type :+: Reader Path.AbsRelFile :+: Reader Span) sig m, MonadFail m)
      => (term Addr -> m Type)
      -> (term Addr -> m Type)
      )
