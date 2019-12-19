@@ -102,8 +102,8 @@ eval Analysis{..} eval = \case
               c' <- eval c >>= A.asBool @Term @address
               if c' then ref t else ref e
             a :. b -> do
-              a' <- ref a
-              a' ... b >>= maybe (freeVariable (show b)) pure
+              a' <- eval a >>= asRecord @Term @address
+              maybe (freeVariable (show b)) ref (lookup b a')
             c -> invalidRef (show c)
           Term.Alg (R (R c)) -> invalidRef (show c)
           Term.Alg (L (Ann span c)) -> local (const span) (ref c)
