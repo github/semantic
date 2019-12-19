@@ -84,6 +84,10 @@ runFile eval file = traverse run file
             . fmap fold
             . convergeTerm 0 (A.runHeap @Addr @ScopeGraph . fix (cacheTerm . eval))
 
+
+
+newtype DomainC term m a = DomainC (ReaderC (term Addr -> m ScopeGraph) m a)
+
 -- scopeGraphAnalysis
 --   :: ( Alternative m
 --      , Has (Env Name) sig m
