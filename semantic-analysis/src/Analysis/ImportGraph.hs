@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, RankNTypes, RecordWildCards, ScopedTypeVariables, TypeApplications #-}
+{-# LANGUAGE FlexibleContexts, FlexibleInstances, QuantifiedConstraints, RankNTypes, RecordWildCards, ScopedTypeVariables, StandaloneDeriving, TypeApplications, UndecidableInstances #-}
 module Analysis.ImportGraph
 ( ImportGraph
 , importGraph
@@ -21,42 +21,50 @@ import qualified Data.Set as Set
 import           Data.Text (Text)
 import           Prelude hiding (fail)
 import           Source.Span
+import           Syntax.Scope (Scope)
 import qualified System.Path as Path
 
 type ImportGraph = Map.Map Text (Set.Set Text)
 
 type Addr = Name
 
-data Value term = Value
-  { valueSemi  :: Semi term
+data Value semi = Value
+  { valueSemi  :: semi
   , valueGraph :: ImportGraph
   }
   deriving (Eq, Ord, Show)
 
-instance Semigroup (Value term) where
+instance Semigroup (Value (Semi term)) where
   Value _ g1 <> Value _ g2 = Value Abstract (Map.unionWith (<>) g1 g2)
 
-instance Monoid (Value term) where
+instance Monoid (Value (Semi term)) where
   mempty = Value Abstract mempty
 
 data Semi term
-  = Closure Path.AbsRelFile Span Name term
+  = Closure Path.AbsRelFile Span (Named (Scope () term Addr))
   -- FIXME: Bound String values.
   | String Text
   | Abstract
-  deriving (Eq, Ord, Show)
+
+deriving instance ( forall a . Eq   a => Eq   (f a), Monad f) => Eq   (Semi f)
+deriving instance ( forall a . Eq   a => Eq   (f a)
+                  , forall a . Ord  a => Ord  (f a), Monad f) => Ord  (Semi f)
+deriving instance ( forall a . Show a => Show (f a))          => Show (Semi f)
 
 
 importGraph
-  :: Ord (term Addr)
+  :: ( Monad term
+     , forall a . Eq  a => Eq  (term a)
+     , forall a . Ord a => Ord (term a)
+     )
   => (forall sig m
      .  (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
-     => (term Addr -> m (Value (term Addr)))
-     -> (term Addr -> m (Value (term Addr)))
+     => (term Addr -> m (Value (Semi term)))
+     -> (term Addr -> m (Value (Semi term)))
      )
   -> [File (term Addr)]
-  -> ( Heap (Value (term Addr))
-     , [File (Either (Path.AbsRelFile, Span, String) (Value (term Addr)))]
+  -> ( Heap (Value (Semi term))
+     , [File (Either (Path.AbsRelFile, Span, String) (Value (Semi term)))]
      )
 importGraph eval
   = run
@@ -68,31 +76,33 @@ runFile
   :: forall term m sig
   .  ( Effect sig
      , Has Fresh sig m
-     , Has (State (Heap (Value (term Addr)))) sig m
-     , Ord  (term Addr)
+     , Has (State (Heap (Value (Semi term)))) sig m
+     , Monad term
+     , forall a . Eq  a => Eq  (term a)
+     , forall a . Ord a => Ord (term a)
      )
   => (forall sig m
      .  (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
-     => (term Addr -> m (Value (term Addr)))
-     -> (term Addr -> m (Value (term Addr)))
+     => (term Addr -> m (Value (Semi term)))
+     -> (term Addr -> m (Value (Semi term)))
      )
   -> File (term Addr)
-  -> m (File (Either (Path.AbsRelFile, Span, String) (Value (term Addr))))
+  -> m (File (Either (Path.AbsRelFile, Span, String) (Value (Semi term))))
 runFile eval file = traverse run file
   where run = runReader (filePath file)
             . runReader (fileSpan file)
             . runEnv
             . runFail
             . fmap fold
-            . convergeTerm 0 (A.runHeap @Addr @(Value (term Addr)) . fix (cacheTerm . eval))
+            . convergeTerm 0 (A.runHeap @Addr @(Value (Semi term)) . fix (cacheTerm . eval))
 
 -- FIXME: decompose into a product domain and two atomic domains
 -- importGraphAnalysis
 --   :: ( Alternative m
 --      , Has (Env Name) sig m
---      , Has (A.Heap Name (Value (term Addr))) sig m
+--      , Has (A.Heap Name (Value (Semi term))) sig m
 --      )
---   => Analysis Name (Value (term Addr)) m
+--   => Analysis Name (Value (Semi term)) m
 -- importGraphAnalysis = Analysis{..}
 --   where -- abstract _ name body = do
 --         --   path <- ask
