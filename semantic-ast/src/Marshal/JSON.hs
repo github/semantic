@@ -97,6 +97,8 @@ instance (GValue t) => GValue (Maybe :.: t) where
 
 instance (GValue t) => GValue ([] :.: t) where
   gvalue (Comp1 ts) = toJSON $ map gvalue ts
+
+instance (GValue t) => GValue (NonEmpty :.: t) where
 -- Define a new class to operate on product field types;
 -- Takes an accumulator, a datatype, and returns a new accumulator value.
 class GFields f where
