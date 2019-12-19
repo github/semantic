@@ -57,7 +57,7 @@ instance Monoid ScopeGraph where
 scopeGraph
   :: (Monad term, Ord (term Addr))
   => (forall sig m
-     .  (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
+     .  (Has (Domain term Addr ScopeGraph :+: Env Addr :+: A.Heap Addr ScopeGraph :+: Reader Path.AbsRelFile :+: Reader Span) sig m, MonadFail m)
      => (term Addr -> m ScopeGraph)
      -> (term Addr -> m ScopeGraph)
      )
@@ -77,7 +77,7 @@ runFile
      , Ord (term Addr)
      )
   => (forall sig m
-     .  (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
+     .  (Has (Domain term Addr ScopeGraph :+: Env Addr :+: A.Heap Addr ScopeGraph :+: Reader Path.AbsRelFile :+: Reader Span) sig m, MonadFail m)
      => (term Addr -> m ScopeGraph)
      -> (term Addr -> m ScopeGraph)
      )
