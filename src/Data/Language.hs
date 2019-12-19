@@ -150,14 +150,18 @@ textToLanguage = \case
   _ -> Unknown
 
 
-newtype PerLanguageModes = PerLanguageModes
+data PerLanguageModes = PerLanguageModes
   { pythonMode :: LanguageMode
+  , rubyMode   :: LanguageMode
+  -- , typescriptMode :: LanguageMode
   }
   deriving (Eq, Ord, Show)
 
 defaultLanguageModes :: PerLanguageModes
 defaultLanguageModes = PerLanguageModes
   { pythonMode = ALaCarte
+  , rubyMode = ALaCarte
+  -- , typescriptMode = ALaCarte
   }
 
 data LanguageMode

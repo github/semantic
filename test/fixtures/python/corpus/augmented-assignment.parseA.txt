@@ -1,16 +1,13 @@
 (Statements
-  (Assignment
-    (Identifier)
+  (AugmentedAssignment
     (Plus
       (Identifier)
       (Integer)))
-  (Assignment
-    (Identifier)
+  (AugmentedAssignment
     (RShift
       (Identifier)
       (Integer)))
-  (Assignment
-    (Identifier)
+  (AugmentedAssignment
     (DividedBy
       (Identifier)
       (Integer))))

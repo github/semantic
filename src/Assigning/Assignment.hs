@@ -145,9 +145,8 @@ location = tracing Loc `Then` pure
 getLocals :: HasCallStack => Assignment ast grammar [Text]
 getLocals = tracing GetLocals `Then` pure
 
-putLocals :: (HasCallStack, Enum grammar, Eq1 ast, Ix grammar) => [Text] -> Assignment ast grammar ()
-putLocals l = (tracing (PutLocals l) `Then` pure)
-          <|> (tracing End `Then` pure)
+putLocals :: HasCallStack => [Text] -> Assignment ast grammar ()
+putLocals l = tracing (PutLocals l) `Then` pure
 
 -- | Zero-width production of the current node.
 currentNode :: HasCallStack => Assignment ast grammar (TermF ast (Node grammar) ())
@@ -242,8 +241,6 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
         run yield t initialState = state `seq` maybe (anywhere Nothing) atNode (listToMaybe stateNodes)
           where atNode (Term (In node f)) = case runTracing t of
                   Loc -> yield (nodeLocation node) state
-                  GetLocals -> yield stateLocals state
-                  PutLocals l -> yield () (state { stateLocals = l })
                   CurrentNode -> yield (In node (() <$ f)) state
                   Source -> yield (Source.bytes (Source.slice source (nodeByteRange node))) (advanceState state)
                   Children child -> do
@@ -253,6 +250,8 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                   _ -> anywhere (Just node)
 
                 anywhere node = case runTracing t of
+                  GetLocals -> yield stateLocals state
+                  PutLocals l -> yield () (state { stateLocals = l })
                   End -> requireExhaustive (tracingCallSite t) ((), state) >>= uncurry yield
                   Loc -> yield (L.Loc (Range stateOffset stateOffset) (Span statePos statePos)) state
                   Many rule -> fix (\ recur state -> (go rule state >>= \ (a, state') -> first (a:) <$> if state == state' then pure ([], state') else recur state') `catchError` const (pure ([], state))) state >>= uncurry yield

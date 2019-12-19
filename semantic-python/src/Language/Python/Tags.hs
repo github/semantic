@@ -1,4 +1,4 @@
-{-# LANGUAGE AllowAmbiguousTypes, DataKinds, DisambiguateRecordFields, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, NamedFieldPuns, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes, DataKinds, DisambiguateRecordFields, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, NamedFieldPuns, OverloadedStrings, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Language.Python.Tags
 ( ToTags(..)
 ) where
@@ -46,12 +46,56 @@ type family ToTagsInstance t :: Strategy where
   ToTagsInstance Py.FunctionDefinition = 'Custom
   ToTagsInstance Py.ClassDefinition    = 'Custom
   ToTagsInstance Py.Call               = 'Custom
+
+  -- These built-in functions all get handled as calls
+  ToTagsInstance Py.AssertStatement    = 'Custom
+  ToTagsInstance Py.Await              = 'Custom
+  ToTagsInstance Py.DeleteStatement    = 'Custom
+  ToTagsInstance Py.ExecStatement      = 'Custom
+  ToTagsInstance Py.GlobalStatement    = 'Custom
+  ToTagsInstance Py.NonlocalStatement  = 'Custom
+  ToTagsInstance Py.PrintStatement     = 'Custom
+
   ToTagsInstance _                     = 'Generic
 
 
 instance (ToTags l, ToTags r) => ToTagsBy 'Custom (l :+: r) where
   tags' (L1 l) = tags l
   tags' (R1 r) = tags r
+
+keywordFunctionCall
+  :: ( Has (Reader Source) sig m
+     , Has (Writer Tags.Tags) sig m
+     , Generic1 t
+     , Tags.GFoldable1 ToTags (Rep1 t)
+     )
+  => t Loc -> Loc -> Range -> Text -> m ()
+keywordFunctionCall t loc range name = do
+  src <- ask @Source
+  let sliced = slice src range
+  Tags.yield (Tag name Function loc (Tags.firstLine sliced) Nothing)
+  gtags t
+
+instance ToTagsBy 'Custom Py.AssertStatement where
+  tags' t@Py.AssertStatement { ann = loc@Loc { byteRange = range } } = keywordFunctionCall t loc range "assert"
+
+instance ToTagsBy 'Custom Py.Await where
+  tags' t@Py.Await { ann = loc@Loc { byteRange = range } } = keywordFunctionCall t loc range "await"
+
+instance ToTagsBy 'Custom Py.DeleteStatement where
+  tags' t@Py.DeleteStatement { ann = loc@Loc { byteRange = range } } = keywordFunctionCall t loc range "del"
+
+instance ToTagsBy 'Custom Py.ExecStatement where
+  tags' t@Py.ExecStatement { ann = loc@Loc { byteRange = range } } = keywordFunctionCall t loc range "exec"
+
+instance ToTagsBy 'Custom Py.GlobalStatement where
+  tags' t@Py.GlobalStatement { ann = loc@Loc { byteRange = range } } = keywordFunctionCall t loc range "global"
+
+instance ToTagsBy 'Custom Py.NonlocalStatement where
+  tags' t@Py.NonlocalStatement { ann = loc@Loc { byteRange = range } } = keywordFunctionCall t loc range "nonlocal"
+
+instance ToTagsBy 'Custom Py.PrintStatement where
+  tags' t@Py.PrintStatement { ann = loc@Loc { byteRange = range } } = keywordFunctionCall t loc range "print"
 
 instance ToTagsBy 'Custom Py.FunctionDefinition where
   tags' t@Py.FunctionDefinition
@@ -80,13 +124,21 @@ instance ToTagsBy 'Custom Py.ClassDefinition where
 instance ToTagsBy 'Custom Py.Call where
   tags' t@Py.Call
     { ann = loc@Loc { byteRange = range }
-    , function = Py.PrimaryExpression (Prj Py.Identifier { text = name })
-    } = do
-      src <- ask @Source
-      let sliced = slice src range
-      Tags.yield (Tag name Call loc (Tags.firstLine sliced) Nothing)
-      gtags t
-  tags' t@Py.Call{} = gtags t
+    , function = Py.PrimaryExpression expr
+    } = match expr
+      where
+        match expr = case expr of
+          (Prj Py.Attribute { attribute = Py.Identifier _ name }) -> yield name
+          (Prj (Py.Identifier _ name)) -> yield name
+          (Prj Py.Call { function = Py.PrimaryExpression expr' }) -> match expr' -- Nested call expression like this in Python represent creating an instance of a class and calling it: e.g. AClass()()
+          (Prj (Py.ParenthesizedExpression _ (Prj (Py.Expression (Prj (Py.PrimaryExpression expr')))))) -> match expr' -- Parenthesized expressions
+          _ -> gtags t
+        yield name = do
+          src <- ask @Source
+          let sliced = slice src range
+          Tags.yield (Tag name Call loc (Tags.firstLine sliced) Nothing)
+          gtags t
+
 
 docComment :: Source -> (Py.CompoundStatement :+: Py.SimpleStatement) Loc -> Maybe Text
 docComment src (R1 (Py.SimpleStatement (Prj Py.ExpressionStatement { extraChildren = L1 (Prj (Py.Expression (Prj (Py.PrimaryExpression (Prj Py.String { ann }))))) :|_ }))) = Just (toText (slice src (byteRange ann)))

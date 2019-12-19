@@ -41,6 +41,7 @@ import           Source.Loc
 import qualified Language.Java as Java
 import qualified Language.JSON as JSON
 import qualified Language.Python as PythonPrecise
+import qualified Language.Ruby as RubyPrecise
 
 
 termGraph :: (Traversable t, Has Distribute sig m, Has (Error SomeException) sig m, Has Parse sig m) => t Blob -> m ParseTreeGraphResponse
@@ -116,6 +117,9 @@ instance ShowTermBy 'Precise JSON.Term where
 instance ShowTermBy 'Precise PythonPrecise.Term where
   showTermBy = serialize Show . void . PythonPrecise.getTerm
 
+instance ShowTermBy 'Precise RubyPrecise.Term where
+  showTermBy = serialize Show . void . RubyPrecise.getTerm
+
 instance (Recursive (term Loc), Show1 syntax, Base (term Loc) ~ TermF syntax Loc) => ShowTermBy 'ALaCarte term where
   showTermBy = serialize Show . quieterm
 
@@ -140,6 +144,9 @@ instance SExprTermBy 'Precise JSON.Term where
 
 instance SExprTermBy 'Precise PythonPrecise.Term where
   sexprTermBy = SExpr.Precise.serializeSExpression . PythonPrecise.getTerm
+
+instance SExprTermBy 'Precise RubyPrecise.Term where
+  sexprTermBy = SExpr.Precise.serializeSExpression . RubyPrecise.getTerm
 
 instance (Recursive (term Loc), SExpr.ToSExpression (Base (term Loc))) => SExprTermBy 'ALaCarte term where
   sexprTermBy = SExpr.serializeSExpression ByConstructorName

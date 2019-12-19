@@ -63,7 +63,7 @@ parseFixtures =
         path' = [File "test/fixtures/ruby/corpus/and-or.A.rb" Ruby, File "test/fixtures/ruby/corpus/and-or.B.rb" Ruby]
         path'' = [File "test/fixtures/ruby/corpus/method-declaration.A.rb" Ruby]
         prefix = Path.relDir "test/fixtures/cli"
-        run = runReader (PerLanguageModes ALaCarte)
+        run = runReader (PerLanguageModes ALaCarte ALaCarte)
 
 diffFixtures :: [(String, [BlobPair] -> ParseC TaskC Builder, [(File, File)], Path.RelFile)]
 diffFixtures =
