@@ -149,21 +149,21 @@ instance MonadTrans (DomainC term) where
 --   > λ let (heap, res) = concrete [ruby]
 --   > λ writeFile "/Users/rob/Desktop/heap.dot" (export (addressStyle heap) (heapAddressGraph heap))
 --   > λ :!dot -Tsvg < ~/Desktop/heap.dot > ~/Desktop/heap.svg
-heapGraph :: (Addr -> Concrete term -> a) -> (Either Edge Name -> Addr -> G.Graph a) -> Heap (Concrete term) -> G.Graph a
+heapGraph :: Foldable term => (Addr -> Concrete term -> a) -> (Either Edge Name -> Addr -> G.Graph a) -> Heap (Concrete term) -> G.Graph a
 heapGraph vertex edge h = foldr (uncurry graph) G.empty (IntMap.toList h)
   where graph k v rest = (G.vertex (vertex k v) `G.connect` outgoing v) `G.overlay` rest
         outgoing = \case
           Unit -> G.empty
           Bool _ -> G.empty
           String _ -> G.empty
-          -- Closure _ _ _ _ env -> foldr (G.overlay . edge (Left Lexical)) G.empty env
+          Closure _ _ _ b -> foldr (G.overlay . edge (Left Lexical)) G.empty b
           Record frame -> Map.foldrWithKey (\ k -> G.overlay . edge (Right k)) G.empty frame
 
-heapValueGraph :: Heap (Concrete term) -> G.Graph (Concrete term)
+heapValueGraph :: Foldable term => Heap (Concrete term) -> G.Graph (Concrete term)
 heapValueGraph h = heapGraph (const id) (const fromAddr) h
   where fromAddr addr = maybe G.empty G.vertex (IntMap.lookup addr h)
 
-heapAddressGraph :: Heap (Concrete term) -> G.Graph (EdgeType (Concrete term), Addr)
+heapAddressGraph :: Foldable term => Heap (Concrete term) -> G.Graph (EdgeType (Concrete term), Addr)
 heapAddressGraph = heapGraph (\ addr v -> (Value v, addr)) (fmap G.vertex . (,) . either Edge Slot)
 
 addressStyle :: Heap (Concrete term) -> G.Style (EdgeType (Concrete term), Addr) Text
