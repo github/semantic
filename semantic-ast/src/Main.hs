@@ -19,6 +19,7 @@ import Data.Foldable (traverse_)
 import Control.Monad ((>=>))
 import Marshal.JSON (marshal)
 import Data.ByteString.Lazy (putStrLn)
+import Data.Aeson.Encode.Pretty (encodePretty)
 
 data SemanticAST = SemanticAST
   { format :: Format
