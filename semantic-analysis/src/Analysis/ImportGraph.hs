@@ -63,7 +63,7 @@ importGraph
      , forall a . Ord a => Ord (term a)
      )
   => (forall sig m
-     .  (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
+     .  (Has (A.Domain term Addr (Value (Semi term)) :+: Env Addr :+: A.Heap Addr (Value (Semi term)) :+: Reader Path.AbsRelFile :+: Reader Span) sig m, MonadFail m)
      => (term Addr -> m (Value (Semi term)))
      -> (term Addr -> m (Value (Semi term)))
      )
@@ -87,7 +87,7 @@ runFile
      , forall a . Ord a => Ord (term a)
      )
   => (forall sig m
-     .  (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
+     .  (Has (A.Domain term Addr (Value (Semi term)) :+: Env Addr :+: A.Heap Addr (Value (Semi term)) :+: Reader Path.AbsRelFile :+: Reader Span) sig m, MonadFail m)
      => (term Addr -> m (Value (Semi term)))
      -> (term Addr -> m (Value (Semi term)))
      )
