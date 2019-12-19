@@ -183,6 +183,11 @@ languageModes = Language.PerLanguageModes
                   <> metavar "ALaCarte|Precise"
                   <> value Language.ALaCarte
                   <> showDefault)
+  <*> option auto (  long "typescript-mode"
+                  <> help "The AST representation to use for TypeScript sources"
+                  <> metavar "ALaCarte|Precise"
+                  <> value Language.ALaCarte
+                  <> showDefault)
 
 filePathReader :: ReadM File
 filePathReader = fileForPath <$> str

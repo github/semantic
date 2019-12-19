@@ -154,6 +154,7 @@ data PerLanguageModes = PerLanguageModes
   { pythonMode :: LanguageMode
   , rubyMode   :: LanguageMode
   , goMode     :: LanguageMode
+  , typescriptMode :: LanguageMode
   }
   deriving (Eq, Ord, Show)
 
@@ -162,6 +163,7 @@ defaultLanguageModes = PerLanguageModes
   { pythonMode = ALaCarte
   , rubyMode = ALaCarte
   , goMode = ALaCarte
+  , typescriptMode = ALaCarte
   }
 
 data LanguageMode

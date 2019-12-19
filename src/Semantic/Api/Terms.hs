@@ -1,4 +1,5 @@
 {-# LANGUAGE AllowAmbiguousTypes, DataKinds, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, RankNTypes, RecordWildCards, ScopedTypeVariables, TypeApplications, TypeFamilies, UndecidableInstances #-}
+{-# OPTIONS_GHC -freduction-depth=0 #-}
 module Semantic.Api.Terms
   ( termGraph
   , parseTermBuilder
@@ -43,6 +44,7 @@ import qualified Language.JSON as JSON
 import qualified Language.Go as GoPrecise
 import qualified Language.Python as PythonPrecise
 import qualified Language.Ruby as RubyPrecise
+import qualified Language.TypeScript as TypeScriptPrecise
 
 
 termGraph :: (Traversable t, Has Distribute sig m, Has (Error SomeException) sig m, Has Parse sig m) => t Blob -> m ParseTreeGraphResponse
@@ -124,6 +126,9 @@ instance ShowTermBy 'Precise PythonPrecise.Term where
 instance ShowTermBy 'Precise RubyPrecise.Term where
   showTermBy = serialize Show . void . RubyPrecise.getTerm
 
+instance ShowTermBy 'Precise TypeScriptPrecise.Term where
+  showTermBy = serialize Show . void . TypeScriptPrecise.getTerm
+
 instance (Recursive (term Loc), Show1 syntax, Base (term Loc) ~ TermF syntax Loc) => ShowTermBy 'ALaCarte term where
   showTermBy = serialize Show . quieterm
 
@@ -154,6 +159,9 @@ instance SExprTermBy 'Precise PythonPrecise.Term where
 
 instance SExprTermBy 'Precise RubyPrecise.Term where
   sexprTermBy = SExpr.Precise.serializeSExpression . RubyPrecise.getTerm
+
+instance SExprTermBy 'Precise TypeScriptPrecise.Term where
+  sexprTermBy = SExpr.Precise.serializeSExpression . TypeScriptPrecise.getTerm
 
 instance (Recursive (term Loc), SExpr.ToSExpression (Base (term Loc))) => SExprTermBy 'ALaCarte term where
   sexprTermBy = SExpr.serializeSExpression ByConstructorName

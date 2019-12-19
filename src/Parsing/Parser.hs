@@ -20,6 +20,8 @@ module Parsing.Parser
 , rubyParserPrecise
 , rubyParser
 , tsxParser
+, typescriptParserALaCarte
+, typescriptParserPrecise
 , typescriptParser
   -- * Modes by term type
 , TermMode
@@ -48,7 +50,8 @@ import qualified Language.Python.Assignment as PythonALaCarte
 import qualified Language.Ruby as RubyPrecise
 import qualified Language.Ruby.Assignment as RubyALaCarte
 import qualified Language.TSX.Assignment as TSX
-import qualified Language.TypeScript.Assignment as TypeScript
+import qualified Language.TypeScript as TypeScriptPrecise
+import qualified Language.TypeScript.Assignment as TypeScriptALaCarte
 import           Prelude hiding (fail)
 import           Prologue
 import           TreeSitter.Go
@@ -160,19 +163,27 @@ rubyParser modes = case rubyMode modes of
 tsxParser :: c TSX.Term => (Language, SomeParser c Loc)
 tsxParser = (TSX, SomeParser (AssignmentParser (ASTParser tree_sitter_tsx) TSX.assignment))
 
-typescriptParser :: c TypeScript.Term => (Language, SomeParser c Loc)
-typescriptParser = (TypeScript, SomeParser (AssignmentParser (ASTParser tree_sitter_typescript) TypeScript.assignment))
+typescriptParserALaCarte :: c TypeScriptALaCarte.Term => (Language, SomeParser c Loc)
+typescriptParserALaCarte = (TypeScript, SomeParser (AssignmentParser (ASTParser tree_sitter_typescript) TypeScriptALaCarte.assignment))
+
+typescriptParserPrecise :: c TypeScriptPrecise.Term => (Language, SomeParser c Loc)
+typescriptParserPrecise = (TypeScript, SomeParser (UnmarshalParser @TypeScriptPrecise.Term TypeScriptPrecise.tree_sitter_typescript))
+
+typescriptParser :: (c TypeScriptALaCarte.Term, c TypeScriptPrecise.Term) => PerLanguageModes -> (Language, SomeParser c Loc)
+typescriptParser modes = case typescriptMode modes of
+  ALaCarte -> typescriptParserALaCarte
+  Precise  -> typescriptParserPrecise
 
 
 -- | A type family selecting the language mode for a given term type.
 type family TermMode term where
-  TermMode GoPrecise.Term     = 'Precise
-  TermMode Java.Term          = 'Precise
-  TermMode JSON.Term          = 'Precise
-  TermMode PythonPrecise.Term = 'Precise
-  TermMode RubyPrecise.Term   = 'Precise
-  TermMode _                  = 'ALaCarte
-
+  TermMode GoPrecise.Term         = 'Precise
+  TermMode Java.Term              = 'Precise
+  TermMode JSON.Term              = 'Precise
+  TermMode PythonPrecise.Term     = 'Precise
+  TermMode RubyPrecise.Term       = 'Precise
+  TermMode TypeScriptPrecise.Term = 'Precise
+  TermMode _                      = 'ALaCarte
 
 -- | The canonical set of parsers producing à la carte terms.
 aLaCarteParsers
@@ -182,7 +193,7 @@ aLaCarteParsers
      , c PythonALaCarte.Term
      , c RubyALaCarte.Term
      , c TSX.Term
-     , c TypeScript.Term
+     , c TypeScriptALaCarte.Term
      )
   => Map Language (SomeParser c Loc)
 aLaCarteParsers = Map.fromList
@@ -193,7 +204,7 @@ aLaCarteParsers = Map.fromList
   , phpParser
   , pythonParserALaCarte
   , rubyParserALaCarte
-  , typescriptParser
+  , typescriptParserALaCarte
   , tsxParser
   ]
 
@@ -204,6 +215,7 @@ preciseParsers
      , c PythonPrecise.Term
      , c RubyPrecise.Term
      , c GoPrecise.Term
+     , c TypeScriptPrecise.Term
      )
   => Map Language (SomeParser c Loc)
 preciseParsers = Map.fromList
@@ -212,6 +224,7 @@ preciseParsers = Map.fromList
   , pythonParserPrecise
   , rubyParserPrecise
   , goParserPrecise
+  , typescriptParserPrecise
   ]
 
 -- | The canonical set of all parsers for the passed per-language modes.
@@ -227,7 +240,8 @@ allParsers
      , c RubyALaCarte.Term
      , c RubyPrecise.Term
      , c TSX.Term
-     , c TypeScript.Term
+     , c TypeScriptALaCarte.Term
+     , c TypeScriptPrecise.Term
      )
   => PerLanguageModes
   -> Map Language (SomeParser c Loc)
@@ -241,6 +255,6 @@ allParsers modes = Map.fromList
   , phpParser
   , pythonParser modes
   , rubyParser modes
-  , typescriptParser
+  , typescriptParser modes
   , tsxParser
   ]
