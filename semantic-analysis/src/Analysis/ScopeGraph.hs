@@ -55,7 +55,7 @@ instance Monoid ScopeGraph where
   mempty = ScopeGraph Map.empty
 
 scopeGraph
-  :: Ord (term Addr)
+  :: (Monad term, Ord (term Addr))
   => (forall sig m
      .  (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
      => (term Addr -> m ScopeGraph)
@@ -73,6 +73,7 @@ runFile
   :: ( Effect sig
      , Has Fresh sig m
      , Has (State (Heap ScopeGraph)) sig m
+     , Monad term
      , Ord (term Addr)
      )
   => (forall sig m
@@ -88,7 +89,7 @@ runFile eval file = traverse run file
             . runEnv
             . runFail
             . fmap fold
-            . convergeTerm 0 (A.runHeap @Addr @ScopeGraph . fix (cacheTerm . eval))
+            . convergeTerm 0 (A.runHeap @Addr @ScopeGraph . fix (\ eval' -> runDomain eval' . fix (cacheTerm . eval)))
 
 
 runDomain :: (term Addr -> m ScopeGraph) -> DomainC term m a -> m a
