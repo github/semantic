@@ -87,3 +87,5 @@ instance UnmarshalAnn IntegerLit where
       _        -> fail ("could not parse '" <> str <> "'")
 
 -- 
+fn :: (ToJSON a) => Expr a -> Value
+fn = marshal
