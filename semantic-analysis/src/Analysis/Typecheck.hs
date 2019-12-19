@@ -53,6 +53,8 @@ infixr 0 :->
 
 type Type = Term Monotype Meta
 
+type Addr = Name
+
 -- FIXME: Union the effects/annotations on the operands.
 
 -- | We derive the 'Semigroup' instance for types to take the second argument. This is equivalent to stating that the type of an imperative sequence of statements is the type of its final statement.
@@ -93,13 +95,13 @@ generalize ty = fromJust (closed (forAlls (IntSet.toList (mvs ty)) (hoistTerm R 
 
 
 typecheckingFlowInsensitive
-  :: (Has Intro.Intro syn term, Ord (term Name))
+  :: (Has Intro.Intro syn term, Ord (term Addr))
   => (forall sig m
      .  (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
-     => (term Name -> m Type)
-     -> (term Name -> m Type)
+     => (term Addr -> m Type)
+     -> (term Addr -> m Type)
      )
-  -> [File (term Name)]
+  -> [File (term Addr)]
   -> ( Heap Type
      , [File (Either (Path.AbsRelFile, Span, String) (Term (Polytype :+: Monotype) Void))]
      )
@@ -115,14 +117,14 @@ runFile
      , Has Fresh sig m
      , Has (State (Heap Type)) sig m
      , Has Intro.Intro syn term
-     , Ord (term Name)
+     , Ord (term Addr)
      )
   => (forall sig m
      .  (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
-     => (term Name -> m Type)
-     -> (term Name -> m Type)
+     => (term Addr -> m Type)
+     -> (term Addr -> m Type)
      )
-  -> File (term Name)
+  -> File (term Addr)
   -> m (File (Either (Path.AbsRelFile, Span, String) Type))
 runFile eval file = traverse run file
   where run
@@ -143,7 +145,7 @@ runFile eval file = traverse run file
               v <- meta
               bs <- m
               v <$ for_ bs (unify v))
-          . convergeTerm 1  (A.runHeap @Name @Type . fix (\ eval' -> runDomain eval' . fix (cacheTerm . eval)))
+          . convergeTerm 1  (A.runHeap @Addr @Type . fix (\ eval' -> runDomain eval' . fix (cacheTerm . eval)))
 
 -- typecheckingAnalysis
 --   :: ( Alternative m
@@ -221,23 +223,23 @@ substAll :: Monad t => IntMap.IntMap (t Meta) -> t Meta -> t Meta
 substAll s a = a >>= \ i -> fromMaybe (pure i) (IntMap.lookup i s)
 
 
-runDomain :: (term Name -> m Type) -> DomainC term m a -> m a
+runDomain :: (term Addr -> m Type) -> DomainC term m a -> m a
 runDomain eval (DomainC m) = runReader eval m
 
-newtype DomainC term m a = DomainC (ReaderC (term Name -> m Type) m a)
+newtype DomainC term m a = DomainC (ReaderC (term Addr -> m Type) m a)
   deriving (Alternative, Applicative, Functor, Monad, MonadFail)
 
 instance MonadTrans (DomainC term) where
   lift = DomainC . lift
 
 instance ( Alternative m
-         , Has (Env Name) sig m
+         , Has (Env Addr) sig m
          , Has Fresh sig m
-         , Has (A.Heap Name Type) sig m
+         , Has (A.Heap Addr Type) sig m
          , Monad term
          , MonadFail m
          , Has Intro.Intro syn term
-         ) => Algebra (Domain term Name Type :+: sig) (DomainC term m) where
+         ) => Algebra (Domain term Addr Type :+: sig) (DomainC term m) where
   alg (L (Abstract v k)) = case v of
     Intro.Unit     -> k (Alg Unit)
     Intro.Bool   _ -> k (Alg Bool)
@@ -252,7 +254,7 @@ instance ( Alternative m
     Intro.Record fields -> do
       eval <- DomainC ask
       fields' <- for fields $ \ (k, t) -> do
-        addr <- alloc @Name k
+        addr <- alloc @Addr k
         v <- lift (eval t)
         (k, v) <$ A.assign addr v
       -- FIXME: should records reference types by address instead?
