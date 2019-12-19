@@ -40,16 +40,31 @@ data Value semi = Value
   deriving (Eq, Ord, Show)
 
 instance Semigroup (Value (Semi term)) where
-  Value _ g1 <> Value _ g2 = Value Abstract (Map.unionWith (<>) g1 g2)
+  Value s1 g1 <> Value s2 g2 = Value (s1 <> s2) (Map.unionWith (<>) g1 g2)
 
 instance Monoid (Value (Semi term)) where
-  mempty = Value Abstract mempty
+  mempty = Value mempty mempty
 
 data Semi term
-  = Closure Path.AbsRelFile Span (Named (Scope () term Addr))
+  = Bottom
+  | Closure Path.AbsRelFile Span (Named (Scope () term Addr))
+  | Unit
+  | Bool
   -- FIXME: Bound String values.
   | String Text
-  | Abstract
+  | Top
+
+instance Semigroup (Semi term) where
+  s1        <> Bottom    = s1
+  Bottom    <> s2        = s2
+  Unit      <> Unit      = Unit
+  Bool      <> Bool      = Bool
+  String s1 <> String s2
+    | s1 == s2           = String s1
+  _         <> _         = Top
+
+instance Monoid (Semi term) where
+  mempty = Bottom
 
 deriving instance ( forall a . Eq   a => Eq   (f a), Monad f) => Eq   (Semi f)
 deriving instance ( forall a . Eq   a => Eq   (f a)
@@ -112,11 +127,11 @@ instance MonadTrans (DomainC term) where
   lift = DomainC . lift
 
 -- FIXME: decompose into a product domain and two atomic domains
-instance Has (Env Addr :+: A.Heap Addr (Value (Semi term)) :+: Reader Path.AbsRelFile :+: Reader Span) sig m => Algebra (A.Domain term Addr (Value (Semi term)) :+: sig) (DomainC term m) where
+instance (Alternative m, Has (Env Addr :+: A.Heap Addr (Value (Semi term)) :+: Reader Path.AbsRelFile :+: Reader Span) sig m) => Algebra (A.Domain term Addr (Value (Semi term)) :+: sig) (DomainC term m) where
   alg = \case
     L (A.Abstract i k) -> case i of
-      I.Unit     -> k mempty
-      I.Bool _   -> k mempty
+      I.Unit     -> k (Value Unit mempty)
+      I.Bool _   -> k (Value Bool mempty)
       I.String s -> k (Value (String s) mempty)
       I.Lam b    -> do
         path <- ask
@@ -130,7 +145,10 @@ instance Has (Env Addr :+: A.Heap Addr (Value (Semi term)) :+: Reader Path.AbsRe
           v <$ A.assign @Addr @(Value (Semi term)) addr v
         k (fold fields)
     L (A.Concretize (Value s _) k) -> case s of
-      Abstract      -> k I.Unit -- FIXME: this should be broken down for case analysis
+      Bottom        -> k I.Unit -- FIXME: what should we do when we don’t know anything about the value?
+      Unit          -> k I.Unit
+      Bool          -> k (I.Bool True) <|> k (I.Bool False)
       String s      -> k (I.String s)
       Closure _ _ b -> k (I.Lam b)
+      Top           -> k I.Unit -- FIXME: what should we do when the value comprised multiple things?
     R other -> DomainC (send (handleCoercible other))
