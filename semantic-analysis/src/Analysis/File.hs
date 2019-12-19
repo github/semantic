@@ -1,12 +1,14 @@
-{-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE DeriveAnyClass, DeriveGeneric, DeriveTraversable #-}
 module Analysis.File
 ( File(..)
 , fromBody
 ) where
 
-import Data.Maybe (fromJust, listToMaybe)
-import GHC.Stack
-import Source.Span
+import           Control.DeepSeq (NFData)
+import           Data.Maybe (fromJust, listToMaybe)
+import           GHC.Generics (Generic)
+import           GHC.Stack
+import           Source.Span
 import qualified System.Path as Path
 
 data File a = File
@@ -14,7 +16,7 @@ data File a = File
   , fileSpan :: {-# UNPACK #-} !Span
   , fileBody :: !a
   }
-  deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
+  deriving (Eq, Foldable, Functor, Ord, Show, Traversable, Generic, NFData)
 
 fromBody :: HasCallStack => a -> File a
 fromBody body = File (Path.absRel (srcLocFile srcLoc)) (spanFromSrcLoc srcLoc) body where

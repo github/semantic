@@ -1,4 +1,5 @@
-{-# LANGUAGE FlexibleContexts, OverloadedStrings, RankNTypes, RecordWildCards, ScopedTypeVariables, TypeApplications, TypeOperators #-}
+{-# LANGUAGE DeriveAnyClass, DeriveGeneric, DerivingStrategies, FlexibleContexts, GeneralizedNewtypeDeriving,
+             OverloadedStrings, RankNTypes, RecordWildCards, ScopedTypeVariables, TypeApplications, TypeOperators #-}
 module Analysis.ScopeGraph
 ( ScopeGraph(..)
 , Ref (..)
@@ -12,9 +13,10 @@ import           Analysis.File
 import           Analysis.FlowInsensitive
 import           Control.Algebra
 import           Control.Applicative (Alternative (..))
-import           Control.Carrier.Reader
 import           Control.Carrier.Fail.WithLoc
 import           Control.Carrier.Fresh.Strict
+import           Control.Carrier.Reader
+import           Control.DeepSeq
 import           Control.Effect.State
 import           Control.Monad ((>=>))
 import           Data.Foldable (fold)
@@ -24,6 +26,7 @@ import qualified Data.Map as Map
 import           Data.Proxy
 import qualified Data.Set as Set
 import           Data.Traversable (for)
+import           GHC.Generics
 import           Prelude hiding (fail)
 import           Source.Span
 import qualified System.Path as Path
@@ -33,16 +36,19 @@ data Decl name = Decl
   , declPath   :: Path.AbsRelFile
   , declSpan   :: Span
   }
-  deriving (Eq, Ord, Show)
+  deriving stock (Eq, Ord, Show, Generic)
+  deriving anyclass (NFData)
 
 data Ref = Ref
   { refPath :: Path.AbsRelFile
   , refSpan :: Span
   }
-  deriving (Eq, Ord, Show)
+  deriving stock (Eq, Ord, Show, Generic)
+  deriving anyclass (NFData)
 
 newtype ScopeGraph name = ScopeGraph { unScopeGraph :: Map.Map (Decl name) (Set.Set Ref) }
-  deriving (Eq, Ord, Show)
+  deriving stock (Eq, Ord, Show)
+  deriving newtype NFData
 
 instance Ord name => Semigroup (ScopeGraph name) where
   ScopeGraph a <> ScopeGraph b = ScopeGraph (Map.unionWith (<>) a b)
