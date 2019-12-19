@@ -10,6 +10,7 @@ module Source.Range
 ) where
 
 import Control.DeepSeq (NFData)
+import Data.Aeson (ToJSON)
 import Data.Hashable (Hashable)
 import Data.Semilattice.Lower (Lower(..))
 import GHC.Generics (Generic)
