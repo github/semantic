@@ -38,7 +38,7 @@ type Addr = Int
 type Env = Map.Map Name Addr
 
 data Concrete term
-  = Closure Path.AbsRelFile Span Name (Scope () term Addr)
+  = Closure Path.AbsRelFile Span (Named (Scope () term Addr))
   | Unit
   | Bool Bool
   | String Text
@@ -161,14 +161,14 @@ instance ( Applicative term
       => Algebra (Domain term Addr (Concrete term) :+: sig) (DomainC term m) where
   alg = \case
     L (Abstract i k) -> case i of
-      I.Unit            -> k Unit
-      I.Bool b          -> k (Bool b)
-      I.String s        -> k (String s)
-      I.Lam (Named n b) -> do
+      I.Unit          -> k Unit
+      I.Bool b        -> k (Bool b)
+      I.String s      -> k (String s)
+      I.Lam b         -> do
         path <- ask
         span <- ask
-        k (Closure path span n b)
-      I.Record fields   -> do
+        k (Closure path span b)
+      I.Record fields -> do
         eval <- DomainC ask
         fields' <- for fields $ \ (name, t) -> do
           addr <- A.alloc name
@@ -177,11 +177,11 @@ instance ( Applicative term
           pure (name, addr)
         k (Record (Map.fromList fields'))
     L (Concretize c k) -> case c of
-      Unit            -> k I.Unit
-      Bool b          -> k (I.Bool b)
-      String s        -> k (I.String s)
-      Closure _ _ n b -> k (I.Lam (Named n b))
-      Record fields   -> k (I.Record (map (fmap pure) (Map.toList fields)))
+      Unit          -> k I.Unit
+      Bool b        -> k (I.Bool b)
+      String s      -> k (I.String s)
+      Closure _ _ b -> k (I.Lam b)
+      Record fields -> k (I.Record (map (fmap pure) (Map.toList fields)))
     R other -> DomainC (send (handleCoercible other))
 
 
@@ -197,7 +197,7 @@ heapGraph vertex edge h = foldr (uncurry graph) G.empty (IntMap.toList h)
           Unit -> G.empty
           Bool _ -> G.empty
           String _ -> G.empty
-          Closure _ _ _ b -> foldr (G.overlay . edge (Left Lexical)) G.empty b
+          Closure _ _ (Named _ b) -> foldr (G.overlay . edge (Left Lexical)) G.empty b
           Record frame -> Map.foldrWithKey (\ k -> G.overlay . edge (Right k)) G.empty frame
 
 heapValueGraph :: Foldable term => Heap (Concrete term) -> G.Graph (Concrete term)
@@ -218,7 +218,7 @@ addressStyle heap = (G.defaultStyle vertex) { G.edgeAttributes }
           Unit ->  "()"
           Bool b -> pack $ show b
           String s -> pack $ show s
-          Closure p (Span s e) n _ -> "\\\\ " <> unName n <> " [" <> pack (Path.toString p) <> ":" <> showPos s <> "-" <> showPos e <> "]"
+          Closure p (Span s e) (Named n _) -> "\\\\ " <> unName n <> " [" <> pack (Path.toString p) <> ":" <> showPos s <> "-" <> showPos e <> "]"
           Record _ -> "{}"
         showPos (Pos l c) = pack (show l) <> ":" <> pack (show c)
 
