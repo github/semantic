@@ -88,6 +88,9 @@ instance ToJSON a => GValue (K1 i a) where
 instance GValue Par1 where
   gvalue = toJSON . unPar1
 
+instance (GMarshalJSON (Rep1 t), Generic1 t) => GValue (Rec1 t) where
+  gvalue (Rec1 f) = marshal f
+
 -- Define a new class to operate on product field types;
 -- Takes an accumulator, a datatype, and returns a new accumulator value.
 class GFields f where
