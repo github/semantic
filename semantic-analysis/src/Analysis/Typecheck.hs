@@ -239,7 +239,8 @@ instance ( Alternative m
          , Monad term
          , MonadFail m
          , Has Intro.Intro syn term
-         ) => Algebra (Domain term Addr Type :+: sig) (DomainC term m) where
+         )
+      => Algebra (Domain term Addr Type :+: sig) (DomainC term m) where
   alg (L (Abstract v k)) = case v of
     Intro.Unit     -> k (Alg Unit)
     Intro.Bool   _ -> k (Alg Bool)
