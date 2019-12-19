@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, FlexibleInstances, QuantifiedConstraints, RankNTypes, RecordWildCards, ScopedTypeVariables, StandaloneDeriving, TypeApplications, UndecidableInstances #-}
+{-# LANGUAGE FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, QuantifiedConstraints, RankNTypes, RecordWildCards, ScopedTypeVariables, StandaloneDeriving, TypeApplications, UndecidableInstances #-}
 module Analysis.ImportGraph
 ( ImportGraph
 , importGraph
@@ -10,6 +10,7 @@ import           Analysis.File
 import           Analysis.FlowInsensitive
 import           Analysis.Name
 import           Control.Algebra
+import           Control.Applicative (Alternative(..))
 import           Control.Carrier.Fail.WithLoc
 import           Control.Carrier.Fresh.Strict
 import           Control.Carrier.Reader
@@ -95,6 +96,11 @@ runFile eval file = traverse run file
             . runFail
             . fmap fold
             . convergeTerm 0 (A.runHeap @Addr @(Value (Semi term)) . fix (cacheTerm . eval))
+
+
+newtype DomainC term m a = DomainC (ReaderC (term Addr -> m (Value (Semi term))) m a)
+  deriving (Alternative, Applicative, Functor, Monad, MonadFail)
+
 
 -- FIXME: decompose into a product domain and two atomic domains
 -- importGraphAnalysis
