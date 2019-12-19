@@ -19,7 +19,7 @@ data Range = Range
   { start :: {-# UNPACK #-} !Int
   , end   :: {-# UNPACK #-} !Int
   }
-  deriving (Eq, Generic, Ord, Show)
+  deriving (Eq, Generic, Ord, Show, ToJSON)
 
 instance Hashable Range
 instance NFData   Range
