@@ -48,15 +48,15 @@ data Semi term
 
 
 importGraph
-  :: Ord (term Name)
+  :: Ord (term Addr)
   => (forall sig m
      .  (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
-     => (term Name -> m (Value (term Name)))
-     -> (term Name -> m (Value (term Name)))
+     => (term Addr -> m (Value (term Addr)))
+     -> (term Addr -> m (Value (term Addr)))
      )
-  -> [File (term Name)]
-  -> ( Heap (Value (term Name))
-     , [File (Either (Path.AbsRelFile, Span, String) (Value (term Name)))]
+  -> [File (term Addr)]
+  -> ( Heap (Value (term Addr))
+     , [File (Either (Path.AbsRelFile, Span, String) (Value (term Addr)))]
      )
 importGraph eval
   = run
@@ -68,16 +68,16 @@ runFile
   :: forall term m sig
   .  ( Effect sig
      , Has Fresh sig m
-     , Has (State (Heap (Value (term Name)))) sig m
-     , Ord  (term Name)
+     , Has (State (Heap (Value (term Addr)))) sig m
+     , Ord  (term Addr)
      )
   => (forall sig m
      .  (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
-     => (term Name -> m (Value (term Name)))
-     -> (term Name -> m (Value (term Name)))
+     => (term Addr -> m (Value (term Addr)))
+     -> (term Addr -> m (Value (term Addr)))
      )
-  -> File (term Name)
-  -> m (File (Either (Path.AbsRelFile, Span, String) (Value (term Name))))
+  -> File (term Addr)
+  -> m (File (Either (Path.AbsRelFile, Span, String) (Value (term Addr))))
 runFile eval file = traverse run file
   where run = runReader (filePath file)
             . runReader (fileSpan file)
@@ -90,9 +90,9 @@ runFile eval file = traverse run file
 -- importGraphAnalysis
 --   :: ( Alternative m
 --      , Has (Env Name) sig m
---      , Has (A.Heap Name (Value (term Name))) sig m
+--      , Has (A.Heap Name (Value (term Addr))) sig m
 --      )
---   => Analysis Name (Value (term Name)) m
+--   => Analysis Name (Value (term Addr)) m
 -- importGraphAnalysis = Analysis{..}
 --   where -- abstract _ name body = do
 --         --   path <- ask
