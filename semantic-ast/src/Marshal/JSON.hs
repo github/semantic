@@ -70,6 +70,7 @@ instance (GValue p, Selector s) => GFields (S1 s p) where
   gfields acc x = (Text.pack (selName x), gvalue (unM1 x)) : acc
 -- knows what the type of x is, whereas M1 has parameters that can be instantiated to anything
 
+
 -- Implement inductive case for product case
 instance (GFields f, GFields g) => GFields (f :*: g) where
   gfields acc (f :*: g) = gfields (gfields acc g) f
