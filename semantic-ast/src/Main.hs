@@ -8,6 +8,7 @@ import qualified TreeSitter.Python.AST as AST
 import qualified TreeSitter.Python as Python
 import Source.Range
 import Source.Span
+import Data.Aeson (encode, toJSON)
 import Data.ByteString.Char8
 import Data.ByteString (readFile)
 import System.IO (FilePath)
@@ -16,7 +17,6 @@ import Data.Semigroup ((<>))
 import Text.Pretty.Simple (pPrint, pPrintNoColor)
 import Data.Foldable (traverse_)
 import Control.Monad ((>=>))
-import Data.Aeson as Aeson
 
 data SemanticAST = SemanticAST
   { format :: Format
