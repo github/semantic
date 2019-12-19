@@ -50,6 +50,7 @@ library
                      , aeson                ^>= 1.4.2.0
                      , text                 ^>= 1.2.3.1
                      , bytestring           ^>= 0.10.8.2
+                     , aeson-pretty         ^>= 0.8.8
   hs-source-dirs:      src
   default-language:    Haskell2010
   ghc-options:       -Wall
@@ -70,6 +71,7 @@ executable semantic-ast
                      , pretty-simple
                      , aeson
                      , bytestring
+                     , aeson-pretty
   hs-source-dirs:      src
   default-language:    Haskell2010
   ghc-options:       -Wall
