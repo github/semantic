@@ -5,6 +5,7 @@ module Analysis.Intro
 , bool
 , string
 , lam
+, record
 ) where
 
 import Analysis.Name
@@ -21,6 +22,7 @@ data Intro t a
   | Bool Bool
   | String Text
   | Lam (Named (Scope () t a))
+  | Record [(Name, t a)]
   deriving (Foldable, Functor, Generic1, Traversable)
 
 deriving instance (Eq   a, forall a . Eq   a => Eq   (f a), Monad f) => Eq   (Intro f a)
@@ -37,6 +39,7 @@ instance RightModule Intro where
   Bool b   >>=* _ = Bool b
   String s >>=* _ = String s
   Lam b    >>=* f = Lam ((>>=* f) <$> b)
+  Record t >>=* f = Record (map (fmap (>>= f)) t)
 
 
 unit :: Has Intro sig m => m a
@@ -51,3 +54,7 @@ string = send . String
 
 lam :: (Eq a, Has Intro sig m) => Named a -> m a -> m a
 lam (Named u n) b = send (Lam (Named u (abstract1 n b)))
+
+
+record :: Has Intro sig m => [(Name, m a)] -> m a
+record = send . Record

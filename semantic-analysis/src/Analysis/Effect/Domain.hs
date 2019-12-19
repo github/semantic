@@ -10,6 +10,8 @@ module Analysis.Effect.Domain
 , asString
 , lam
 , asLam
+, record
+, asRecord
 , Domain(..)
   -- * Re-exports
 , Algebra
@@ -61,6 +63,15 @@ asLam :: (Has (Domain term addr abstract) sig m, MonadFail m, Show addr, forall 
 asLam = concretize >=> \case
   A.Lam b -> pure b
   other   -> typeError "Lam" other
+
+
+record :: forall term addr abstract m sig . Has (Domain term addr abstract) sig m => [(Name, term addr)] -> m abstract
+record = abstract @term . A.Record
+
+asRecord :: forall term addr abstract m sig . (Has (Domain term addr abstract) sig m, MonadFail m, Show addr, forall a . Show a => Show (term a)) => abstract -> m [(Name, term addr)]
+asRecord = concretize @term >=> \case
+  A.Record fs -> pure fs
+  other       -> typeError "Record" other
 
 
 data Domain term addr abstract m k

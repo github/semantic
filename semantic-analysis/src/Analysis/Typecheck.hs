@@ -255,6 +255,15 @@ instance ( Alternative m
       A.assign addr arg
       ty <- lift (eval (instantiate1 (pure n) b))
       k (Alg (arg :-> ty))
+    Intro.Record fields -> do
+      eval <- DomainC (asks runEvaluator)
+      fields' <- for fields $ \ (k, t) -> do
+        addr <- alloc @Name k
+        v <- lift (eval t)
+        (k, v) <$ A.assign addr v
+      -- FIXME: should records reference types by address instead?
+      k (Alg (Record (Map.fromList fields')))
+
   alg (L (Concretize t k)) = case t of
     Alg Unit      -> k Intro.Unit
     Alg Bool      -> k (Intro.Bool True) <|> k (Intro.Bool False)
