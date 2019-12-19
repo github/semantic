@@ -272,3 +272,5 @@ instance ( Alternative m
     Alg (Record t) -> traverse (traverse concretize) (Map.toList t) >>= k . Intro.Record . map (fmap send)
     t             -> fail ("can’t concretize " <> show t)
   alg (R other) = DomainC (send (handleCoercible other))
+
+-- FIXME: we don’t get the chance to unify anything because concretization asks for an intro form, not an intro form of a specific type
