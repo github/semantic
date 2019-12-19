@@ -17,6 +17,7 @@ import Data.Semigroup ((<>))
 import Text.Pretty.Simple (pPrint, pPrintNoColor)
 import Data.Foldable (traverse_)
 import Control.Monad ((>=>))
+import Marshal.JSON (marshal)
 
 data SemanticAST = SemanticAST
   { format :: Format
