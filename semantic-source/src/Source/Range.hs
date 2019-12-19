@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveGeneric, RankNTypes #-}
+{-# LANGUAGE DeriveAnyClass, DeriveGeneric, RankNTypes #-}
 module Source.Range
 ( Range(..)
 , point
