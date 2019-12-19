@@ -15,6 +15,7 @@ import           Control.Carrier.Fail.WithLoc
 import           Control.Carrier.Fresh.Strict
 import           Control.Carrier.Reader
 import           Control.Carrier.State.Strict
+import           Control.Monad.Trans.Class
 import           Data.Foldable (fold)
 import           Data.Function (fix)
 import qualified Data.Map as Map
@@ -100,6 +101,9 @@ runFile eval file = traverse run file
 
 newtype DomainC term m a = DomainC (ReaderC (term Addr -> m (Value (Semi term))) m a)
   deriving (Alternative, Applicative, Functor, Monad, MonadFail)
+
+instance MonadTrans (DomainC term) where
+  lift = DomainC . lift
 
 
 -- FIXME: decompose into a product domain and two atomic domains
