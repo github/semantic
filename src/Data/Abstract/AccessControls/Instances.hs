@@ -117,6 +117,7 @@ instance AccessControls1 Literal.Null
 instance AccessControls1 Literal.KeyValue
 
 instance AccessControls1 Statement.Assignment
+instance AccessControls1 Statement.AugmentedAssignment
 instance AccessControls1 Statement.Break
 instance AccessControls1 Statement.Catch
 instance AccessControls1 Statement.Continue

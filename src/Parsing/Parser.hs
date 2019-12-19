@@ -14,6 +14,8 @@ module Parsing.Parser
 , pythonParserALaCarte
 , pythonParserPrecise
 , pythonParser
+, rubyParserALaCarte
+, rubyParserPrecise
 , rubyParser
 , tsxParser
 , typescriptParser
@@ -40,7 +42,8 @@ import qualified Language.Markdown.Assignment as Markdown
 import qualified Language.PHP.Assignment as PHP
 import qualified Language.Python as PythonPrecise
 import qualified Language.Python.Assignment as PythonALaCarte
-import qualified Language.Ruby.Assignment as Ruby
+import qualified Language.Ruby as RubyPrecise
+import qualified Language.Ruby.Assignment as RubyALaCarte
 import qualified Language.TSX.Assignment as TSX
 import qualified Language.TypeScript.Assignment as TypeScript
 import           Prelude hiding (fail)
@@ -132,8 +135,16 @@ pythonParser modes = case pythonMode modes of
   ALaCarte -> pythonParserALaCarte
   Precise  -> pythonParserPrecise
 
-rubyParser :: c Ruby.Term => (Language, SomeParser c Loc)
-rubyParser = (Ruby, SomeParser (AssignmentParser (ASTParser tree_sitter_ruby) Ruby.assignment))
+rubyParserALaCarte :: c RubyALaCarte.Term => (Language, SomeParser c Loc)
+rubyParserALaCarte = (Ruby, SomeParser (AssignmentParser (ASTParser tree_sitter_ruby) RubyALaCarte.assignment))
+
+rubyParserPrecise :: c RubyPrecise.Term => (Language, SomeParser c Loc)
+rubyParserPrecise = (Ruby, SomeParser (UnmarshalParser @RubyPrecise.Term RubyPrecise.tree_sitter_ruby))
+
+rubyParser :: (c RubyALaCarte.Term, c RubyPrecise.Term) => PerLanguageModes -> (Language, SomeParser c Loc)
+rubyParser modes = case rubyMode modes of
+  ALaCarte -> rubyParserALaCarte
+  Precise  -> rubyParserPrecise
 
 tsxParser :: c TSX.Term => (Language, SomeParser c Loc)
 tsxParser = (TSX, SomeParser (AssignmentParser (ASTParser tree_sitter_tsx) TSX.assignment))
@@ -147,6 +158,7 @@ type family TermMode term where
   TermMode Java.Term          = 'Precise
   TermMode JSON.Term          = 'Precise
   TermMode PythonPrecise.Term = 'Precise
+  TermMode RubyPrecise.Term   = 'Precise
   TermMode _                  = 'ALaCarte
 
 
@@ -156,7 +168,7 @@ aLaCarteParsers
      , c Markdown.Term
      , c PHP.Term
      , c PythonALaCarte.Term
-     , c Ruby.Term
+     , c RubyALaCarte.Term
      , c TSX.Term
      , c TypeScript.Term
      )
@@ -168,7 +180,7 @@ aLaCarteParsers = Map.fromList
   , markdownParser
   , phpParser
   , pythonParserALaCarte
-  , rubyParser
+  , rubyParserALaCarte
   , typescriptParser
   , tsxParser
   ]
@@ -178,12 +190,14 @@ preciseParsers
   :: ( c Java.Term
      , c JSON.Term
      , c PythonPrecise.Term
+     , c RubyPrecise.Term
      )
   => Map Language (SomeParser c Loc)
 preciseParsers = Map.fromList
   [ javaParser
   , jsonParser
   , pythonParserPrecise
+  , rubyParserPrecise
   ]
 
 -- | The canonical set of all parsers for the passed per-language modes.
@@ -195,7 +209,8 @@ allParsers
      , c PHP.Term
      , c PythonALaCarte.Term
      , c PythonPrecise.Term
-     , c Ruby.Term
+     , c RubyALaCarte.Term
+     , c RubyPrecise.Term
      , c TSX.Term
      , c TypeScript.Term
      )
@@ -210,7 +225,7 @@ allParsers modes = Map.fromList
   , markdownParser
   , phpParser
   , pythonParser modes
-  , rubyParser
+  , rubyParser modes
   , typescriptParser
   , tsxParser
   ]

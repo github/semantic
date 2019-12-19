@@ -11,9 +11,7 @@ import Source.Span
 import Data.Aeson (encode, toJSON)
 import Data.ByteString.Char8
 import Data.ByteString (readFile)
-import System.IO (FilePath)
 import Options.Applicative hiding (style)
-import Data.Semigroup ((<>))
 import Text.Pretty.Simple (pPrint, pPrintNoColor)
 import Data.Foldable (traverse_)
 import Control.Monad ((>=>))

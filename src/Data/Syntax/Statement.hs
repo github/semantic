@@ -131,6 +131,21 @@ instance Evaluatable Let where
     unit
 
 
+-- AugmentedAssignment
+
+newtype AugmentedAssignment a = AugmentedAssignment { augmentedAssignmentTarget :: a }
+  deriving (Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
+
+instance Eq1 AugmentedAssignment where liftEq = genericLiftEq
+instance Ord1 AugmentedAssignment where liftCompare = genericLiftCompare
+instance Show1 AugmentedAssignment where liftShowsPrec = genericLiftShowsPrec
+
+instance Declarations1 AugmentedAssignment where
+  liftDeclaredName declaredName AugmentedAssignment{..} = declaredName augmentedAssignmentTarget
+
+instance Evaluatable AugmentedAssignment
+
+
 -- Assignment
 
 -- | Assignment to a variable or other lvalue.

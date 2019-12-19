@@ -32,6 +32,7 @@ import qualified Data.Syntax.Directive as Directive
 import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
+import qualified Data.Text as Text
 import qualified Language.Ruby.Syntax as Ruby.Syntax
 import           Language.Ruby.Term as Ruby
 import           TreeSitter.Ruby as Grammar
@@ -93,6 +94,7 @@ expressionChoices =
   , unless
   , until'
   , while'
+  , do'
   ]
   where
     mk s construct = makeTerm <$> symbol s <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional ((symbol ArgumentList <|> symbol ArgumentList') *> children expressions))
@@ -128,13 +130,15 @@ identifier =
   <|> mk Setter
   <|> mk SplatArgument
   <|> mk HashSplatArgument
-  <|> mk BlockArgument
   <|> mk Uninterpreted
+  <|> symbol BlockArgument *> children expression
   where
     mk s = makeTerm <$> symbol s <*> (Syntax.Identifier . name <$> source)
     zsuper = makeTerm <$> symbol Super <*> (Ruby.Syntax.ZSuper <$ source)
     vcallOrLocal = do
-      (loc, ident, locals) <- identWithLocals
+      loc <- symbol Identifier
+      ident <- source
+      locals <- getLocals
       case ident of
         "__FILE__" -> pure $ makeTerm loc Directive.File
         "__LINE__" -> pure $ makeTerm loc Directive.Line
@@ -294,6 +298,9 @@ while' =
       makeTerm <$> symbol While         <*> children      (Statement.While <$> expression <*> expressions)
   <|> makeTerm <$> symbol WhileModifier <*> children (flip Statement.While <$> expression <*> expression)
 
+do' :: Assignment (Term Loc)
+do' = symbol Do *> children expressions
+
 until' :: Assignment (Term Loc)
 until' =
       makeTerm <$> symbol Until         <*> children      (Statement.While <$> invert expression <*> expressions)
@@ -388,26 +395,26 @@ assignment' = makeTerm  <$> symbol Assignment         <*> children (Ruby.Syntax.
                 ])
   where
     assign :: (f :< Ruby.Syntax) => (Term Loc -> Term Loc -> f (Term Loc)) -> Term Loc -> Term Loc -> Sum Ruby.Syntax (Term Loc)
-    assign c l r = inject (Ruby.Syntax.Assignment [] l (makeTerm1 (c l r)))
+    assign c l r = inject (Statement.AugmentedAssignment (makeTerm1 (c l r)))
 
     lhs  = makeTerm <$> symbol LeftAssignmentList  <*> children (many expr) <|> expr
     rhs  = makeTerm <$> symbol RightAssignmentList <*> children (many expr) <|> expr
-    expr = makeTerm <$> symbol RestAssignment      <*> (Syntax.Identifier . name <$> source)
+    expr = makeTerm <$> symbol RestAssignment      <*> restAssign
        <|> makeTerm <$> symbol DestructuredLeftAssignment <*> children (many expr)
        <|> lhsIdent
        <|> expression
 
-identWithLocals :: Assignment (Loc, Text, [Text])
-identWithLocals = do
-  loc <- symbol Identifier
-  -- source advances, so it's important we call getLocals first
-  locals <- getLocals
-  ident <- source
-  pure (loc, ident, locals)
+    restAssign = do
+      locals <- getLocals
+      ident <- Text.dropWhile (== '*') <$> source
+      putLocals (ident : locals)
+      pure $ Syntax.Identifier (name ident)
 
 lhsIdent :: Assignment (Term Loc)
 lhsIdent = do
-  (loc, ident, locals) <- identWithLocals
+  locals <- getLocals
+  loc <- symbol Identifier
+  ident <- source
   putLocals (ident : locals)
   pure $ makeTerm loc (Syntax.Identifier (name ident))
 

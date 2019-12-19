@@ -86,6 +86,7 @@ type Syntax =
   , Python.Syntax.QualifiedAliasedImport
   , Python.Syntax.Redirect
   , Statement.Assignment
+  , Statement.AugmentedAssignment
   , Statement.Break
   , Statement.Catch
   , Statement.Continue

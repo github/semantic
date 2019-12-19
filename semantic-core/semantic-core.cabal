@@ -51,7 +51,7 @@ library
     , fused-syntax
     , parsers                     ^>= 0.12.10
     , pathtype                    ^>= 0.8.1
-    , prettyprinter                >= 1.2.1 && < 1.4
+    , prettyprinter                >= 1.2.1 && < 2
     , prettyprinter-ansi-terminal ^>= 1.1.1
     , semantic-analysis           ^>= 0
     , semantic-source             ^>= 0
