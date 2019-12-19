@@ -15,6 +15,7 @@ import Analysis.Effect.Domain as A
 import Analysis.Effect.Env as A
 import Analysis.Effect.Heap as A
 import Analysis.File
+import qualified Analysis.Intro as I
 import Control.Algebra
 import Control.Applicative (Alternative (..))
 import Control.Effect.Fail
@@ -60,11 +61,16 @@ eval Analysis{..} eval = \case
       addr <- A.alloc @address n
       A.assign addr a'
       A.bind n addr ((a' <>) <$> eval (instantiate1 (pure n) b))
-    Lam (Named n b) -> abstract eval n (instantiate1 (pure n) b)
+    Lam (Named n b) -> A.abstract (I.Lam (Named n b))
     f :$ a -> do
       f' <- eval f
-      a' <- eval a
-      apply eval f' a'
+      A.concretize f' >>= \case
+        I.Lam (Named n b) -> do
+          a' <- eval a
+          addr <- A.alloc @address n
+          A.assign addr a'
+          A.bind n addr (eval (instantiate1 (pure n) b))
+        actual -> fail $ "expected lambda, got " <> show actual
     If c t e -> do
       c' <- eval c >>= A.asBool @Term
       if c' then eval t else eval e
