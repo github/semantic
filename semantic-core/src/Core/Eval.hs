@@ -15,7 +15,6 @@ import Analysis.Effect.Domain as A
 import Analysis.Effect.Env as A
 import Analysis.Effect.Heap as A
 import Analysis.File
-import qualified Analysis.Intro as I
 import Control.Algebra
 import Control.Applicative (Alternative (..))
 import Control.Effect.Fail
@@ -34,26 +33,23 @@ import qualified System.Path as Path
 
 type Term = Term.Term (Ann Span :+: Core :+: Intro)
 
--- FIXME: we can only parameterize terms by addresses if we have some notion of existentials to bind free vars
-
 eval :: forall address value m sig
-     .  ( Has (Domain Term address value) sig m
+     .  ( Has (Domain Term value) sig m
         , Has (Env address) sig m
         , Has (Heap address value) sig m
         , Has (Reader Span) sig m
         , MonadFail m
         , Semigroup value
-        , Show address
         )
      => Analysis Term address value m
-     -> (Term address -> m value)
-     -> (Term address -> m value)
+     -> (Term Name -> m value)
+     -> (Term Name -> m value)
 eval Analysis{..} eval = \case
-  Term.Var n -> deref' n n
+  Term.Var n -> lookupEnv' n >>= deref' n
   Term.Alg (R (L c)) -> case c of
     Rec (Named n b) -> do
       addr <- A.alloc @address n
-      v <- eval (instantiate1 (pure addr) b)
+      v <- A.bind n addr (eval (instantiate1 (pure n) b))
       v <$ A.assign addr v
     -- NB: Combining the results of the evaluations allows us to model effects in abstract domains. This in turn means that we can define an abstract domain modelling the types-and-effects of computations by means of a 'Semigroup' instance which takes the type of its second operand and the union of both operands’ effects.
     --
@@ -63,21 +59,16 @@ eval Analysis{..} eval = \case
       a' <- eval a
       addr <- A.alloc @address n
       A.assign addr a'
-      A.bind n addr ((a' <>) <$> eval (instantiate1 (pure addr) b))
-    Lam (Named n b) -> A.abstract (I.Lam (Named n b))
+      A.bind n addr ((a' <>) <$> eval (instantiate1 (pure n) b))
+    Lam (Named n b) -> abstract eval n (instantiate1 (pure n) b)
     f :$ a -> do
       f' <- eval f
-      A.concretize @Term @address @value f' >>= \case
-        I.Lam (Named n b) -> do
-          a' <- eval a
-          addr <- A.alloc @address n
-          A.assign addr a'
-          A.bind n addr (eval (instantiate1 (pure addr) b))
-        actual -> fail $ "expected closure, got " <> show actual
+      a' <- eval a
+      apply eval f' a'
     If c t e -> do
-      c' <- eval c >>= A.asBool @Term @address
+      c' <- eval c >>= A.asBool @Term
       if c' then eval t else eval e
-    Load p -> eval p >>= A.asString @Term @address >> A.unit @Term @address -- FIXME: add a load command or something
+    Load p -> eval p >>= A.asString @Term >> A.unit @Term -- FIXME: add a load command or something
     Record fields -> traverse (traverse eval) fields >>= record
     a :. b -> do
       a' <- ref a
@@ -85,28 +76,29 @@ eval Analysis{..} eval = \case
     a :? b -> do
       a' <- ref a
       mFound <- a' ... b
-      A.bool @Term @address (isJust mFound)
+      A.bool @Term (isJust mFound)
 
     a := b -> do
       b' <- eval b
       addr <- ref a
       b' <$ A.assign addr b'
   Term.Alg (R (R c)) -> case c of
-    Unit -> A.unit @Term @address
-    Bool b -> A.bool @Term @address b
-    String s -> A.string @Term @address s
+    Unit -> A.unit @Term
+    Bool b -> A.bool @Term b
+    String s -> A.string @Term s
   Term.Alg (L (Ann span c)) -> local (const span) (eval c)
   where freeVariable s = fail ("free variable: " <> s)
         uninitialized s = fail ("uninitialized variable: " <> s)
         invalidRef s = fail ("invalid ref: " <> s)
 
+        lookupEnv' n = A.lookupEnv n >>= maybe (freeVariable (show n)) pure
         deref' n = A.deref @address >=> maybe (uninitialized (show n)) pure
 
         ref = \case
-          Term.Var n -> pure n
+          Term.Var n -> lookupEnv' n
           Term.Alg (R (L c)) -> case c of
             If c t e -> do
-              c' <- eval c >>= A.asBool @Term @address
+              c' <- eval c >>= A.asBool @Term
               if c' then ref t else ref e
             a :. b -> do
               a' <- ref a
