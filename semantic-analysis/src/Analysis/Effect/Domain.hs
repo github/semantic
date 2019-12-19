@@ -9,6 +9,7 @@ module Analysis.Effect.Domain
 , string
 , asString
 , lam
+, asLam
 , Domain(..)
   -- * Re-exports
 , Algebra
@@ -55,6 +56,11 @@ asString = concretize @term >=> \case
 
 lam :: Has (Domain term abstract) sig m => Named (Scope () term Name) -> m abstract
 lam = abstract . A.Lam
+
+asLam :: (Has (Domain term abstract) sig m, MonadFail m, forall a . Show a => Show (term a)) => abstract -> m (Named (Scope () term Name))
+asLam = concretize >=> \case
+  A.Lam b -> pure b
+  other   -> typeError "Lam" other
 
 
 data Domain term abstract m k
