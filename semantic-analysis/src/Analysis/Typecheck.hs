@@ -265,9 +265,10 @@ instance ( Alternative m
       k (Alg (Record (Map.fromList fields')))
 
   alg (L (Concretize t k)) = case t of
-    Alg Unit      -> k Intro.Unit
-    Alg Bool      -> k (Intro.Bool True) <|> k (Intro.Bool False)
-    Alg String    -> k (Intro.String mempty)
-    Alg (_ :-> b) -> concretize @term b >>= k . Intro.Lam . Named (Name mempty) . lift . send
+    Alg Unit       -> k Intro.Unit
+    Alg Bool       -> k (Intro.Bool True) <|> k (Intro.Bool False)
+    Alg String     -> k (Intro.String mempty)
+    Alg (_ :-> b)  -> concretize @term b >>= k . Intro.Lam . Named (Name mempty) . lift . send
+    Alg (Record t) -> traverse (traverse concretize) (Map.toList t) >>= k . Intro.Record . map (fmap send)
     t             -> fail ("can’t concretize " <> show t)
   alg (R other) = DomainC (send (handleCoercible other))
