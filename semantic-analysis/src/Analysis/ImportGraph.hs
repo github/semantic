@@ -99,8 +99,11 @@ runFile eval file = traverse run file
             . runEnv
             . runFail
             . fmap fold
-            . convergeTerm 0 (A.runHeap @Addr @(Value (Semi term)) . fix (cacheTerm . eval))
+            . convergeTerm 0 (A.runHeap @Addr @(Value (Semi term)) . fix (\ eval' -> runDomain eval' . fix (cacheTerm . eval)))
 
+
+runDomain :: (term Addr -> m (Value (Semi term))) -> DomainC term m a -> m a
+runDomain eval (DomainC m) = runReader eval m
 
 newtype DomainC term m a = DomainC (ReaderC (term Addr -> m (Value (Semi term))) m a)
   deriving (Alternative, Applicative, Functor, Monad, MonadFail)
