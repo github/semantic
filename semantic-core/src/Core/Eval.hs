@@ -34,22 +34,23 @@ import qualified System.Path as Path
 type Term = Term.Term (Ann Span :+: Core :+: Intro)
 
 eval :: forall address value m sig
-     .  ( Has (Domain Term value) sig m
+     .  ( Has (Domain Term address value) sig m
         , Has (Env address) sig m
         , Has (Heap address value) sig m
         , Has (Reader Span) sig m
         , MonadFail m
         , Semigroup value
+        , Show address
         )
      => Analysis address value m
-     -> (Term Name -> m value)
-     -> (Term Name -> m value)
+     -> (Term address -> m value)
+     -> (Term address -> m value)
 eval Analysis{..} eval = \case
-  Term.Var n -> lookupEnv' n >>= deref' n
+  Term.Var n -> deref' n n
   Term.Alg (R (L c)) -> case c of
     Rec (Named n b) -> do
       addr <- A.alloc @address n
-      v <- A.bind n addr (eval (instantiate1 (pure n) b))
+      v <- A.bind n addr (eval (instantiate1 (pure addr) b))
       v <$ A.assign addr v
     -- NB: Combining the results of the evaluations allows us to model effects in abstract domains. This in turn means that we can define an abstract domain modelling the types-and-effects of computations by means of a 'Semigroup' instance which takes the type of its second operand and the union of both operands’ effects.
     --
@@ -59,18 +60,18 @@ eval Analysis{..} eval = \case
       a' <- eval a
       addr <- A.alloc @address n
       A.assign addr a'
-      A.bind n addr ((a' <>) <$> eval (instantiate1 (pure n) b))
+      A.bind n addr ((a' <>) <$> eval (instantiate1 (pure addr) b))
     Lam (Named n b) -> A.lam (Named n b)
     f :$ a -> do
       Named n b <- eval f >>= asLam
       a' <- eval a
       addr <- A.alloc @address n
       A.assign addr a'
-      A.bind n addr (eval (instantiate1 (pure n) b))
+      A.bind n addr (eval (instantiate1 (pure addr) b))
     If c t e -> do
-      c' <- eval c >>= A.asBool @Term
+      c' <- eval c >>= A.asBool @Term @address
       if c' then eval t else eval e
-    Load p -> eval p >>= A.asString @Term >> A.unit @Term -- FIXME: add a load command or something
+    Load p -> eval p >>= A.asString @Term @address >> A.unit @Term @address -- FIXME: add a load command or something
     Record fields -> traverse (traverse eval) fields >>= record
     a :. b -> do
       a' <- ref a
@@ -78,29 +79,28 @@ eval Analysis{..} eval = \case
     a :? b -> do
       a' <- ref a
       mFound <- a' ... b
-      A.bool @Term (isJust mFound)
+      A.bool @Term @address (isJust mFound)
 
     a := b -> do
       b' <- eval b
       addr <- ref a
       b' <$ A.assign addr b'
   Term.Alg (R (R c)) -> case c of
-    Unit -> A.unit @Term
-    Bool b -> A.bool @Term b
-    String s -> A.string @Term s
+    Unit -> A.unit @Term @address
+    Bool b -> A.bool @Term @address b
+    String s -> A.string @Term @address s
   Term.Alg (L (Ann span c)) -> local (const span) (eval c)
   where freeVariable s = fail ("free variable: " <> s)
         uninitialized s = fail ("uninitialized variable: " <> s)
         invalidRef s = fail ("invalid ref: " <> s)
 
-        lookupEnv' n = A.lookupEnv n >>= maybe (freeVariable (show n)) pure
         deref' n = A.deref @address >=> maybe (uninitialized (show n)) pure
 
         ref = \case
-          Term.Var n -> lookupEnv' n
+          Term.Var n -> pure n
           Term.Alg (R (L c)) -> case c of
             If c t e -> do
-              c' <- eval c >>= A.asBool @Term
+              c' <- eval c >>= A.asBool @Term @address
               if c' then ref t else ref e
             a :. b -> do
               a' <- ref a
