@@ -7,10 +7,7 @@
       (Assignment
         (Identifier)
         (Integer))
-      (Assignment
-        (Statements
-          (Identifier)
-          (Identifier))
+      (AugmentedAssignment
         (Plus
           (Statements
             (Identifier)
@@ -18,43 +15,35 @@
           (Statements
             (Integer)
             (Integer))))
-      (Assignment
-        (Identifier)
+      (AugmentedAssignment
         (Times
           (Identifier)
           (Integer)))
-      (Assignment
-        (Identifier)
+      (AugmentedAssignment
         (Plus
           (Identifier)
           (Integer)))
-      (Assignment
-        (Identifier)
+      (AugmentedAssignment
         (LShift
           (Identifier)
           (Integer)))
-      (Assignment
-        (Identifier)
+      (AugmentedAssignment
         (RShift
           (Identifier)
           (Integer)))
-      (Assignment
-        (Identifier)
+      (AugmentedAssignment
         (DividedBy
           (Identifier)
           (Integer)))
-      (Assignment
-        (Identifier)
+      (AugmentedAssignment
         (BXOr
           (Identifier)
           (Integer)))
-      (Assignment
-        (Identifier)
+      (AugmentedAssignment
         (Modulo
           (Identifier)
           (Integer)))
-      (Assignment
-        (Identifier)
+      (AugmentedAssignment
         (Not
           (BAnd
             (Identifier)
