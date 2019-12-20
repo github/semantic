@@ -37,6 +37,7 @@ import           Source.Span
 import           Streaming
 import qualified Streaming.Process
 import           Syntax.Term
+import           Syntax.Var (closed)
 import           System.Directory
 import           System.Exit
 import           System.Path ((</>))
@@ -91,7 +92,8 @@ assertJQExpressionSucceeds directive tree core = do
 assertEvaluatesTo :: Term (Ann Span :+: Core) Name -> Text -> Concrete (Term (Ann Span :+: Core)) -> HUnit.Assertion
 assertEvaluatesTo core k val = do
   prelude <- parsePrelude
-  let allTogether = (named' "__semantic_prelude" :<- prelude) >>>= core
+  let withPrelude = (named' "__semantic_prelude" :<- prelude) >>>= core
+  allTogether <- maybe (HUnit.assertFailure ("Can’t evaluate open term: " <> showCore (stripAnnotations withPrelude))) pure (closed withPrelude)
   let filius = [File (Path.absRel "<interactive>") (Span (Pos 1 1) (Pos 1 1)) allTogether]
 
   (heap, env) <- case Concrete.concrete Eval.eval filius of
