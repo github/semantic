@@ -65,10 +65,6 @@ deriving instance ( forall a . Eq   a => Eq   (f a)
 deriving instance ( forall a . Show a => Show (f a))          => Show (Concrete f)
 
 
--- recordFrame :: Concrete term -> Maybe Env
--- recordFrame (Record frame) = Just frame
--- recordFrame _              = Nothing
-
 type Heap = IntMap.IntMap
 
 
