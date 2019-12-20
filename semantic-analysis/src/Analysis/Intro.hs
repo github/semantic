@@ -1,4 +1,7 @@
-{-# LANGUAGE DeriveGeneric, DeriveTraversable, QuantifiedConstraints, StandaloneDeriving #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE QuantifiedConstraints #-}
+{-# LANGUAGE StandaloneDeriving #-}
 module Analysis.Intro
 ( Intro(..)
 , unit
