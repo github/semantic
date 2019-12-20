@@ -83,8 +83,8 @@ eval eval = \case
       addr <- ref a
       b' <$ A.assign addr b'
   Term.Alg (R (R c)) -> case c of
-    Unit -> A.unit @Term @address
-    Bool b -> A.bool @Term @address b
+    Unit     -> A.unit @Term @address
+    Bool b   -> A.bool @Term @address b
     String s -> A.string @Term @address s
   Term.Alg (L (Ann span c)) -> local (const span) (eval c)
   where freeVariable s = fail ("free variable: " <> s)
