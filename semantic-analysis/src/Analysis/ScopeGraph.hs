@@ -10,14 +10,14 @@ import           Analysis.Carrier.Env.Monovariant
 import qualified Analysis.Carrier.Heap.Monovariant as A
 import           Analysis.Effect.Domain
 import           Analysis.File
-import           Analysis.Intro
 import           Analysis.FlowInsensitive
+import           Analysis.Intro
 import           Analysis.Name
 import           Control.Algebra
-import           Control.Applicative (Alternative(..))
-import           Control.Carrier.Reader
+import           Control.Applicative (Alternative (..))
 import           Control.Carrier.Fail.WithLoc
 import           Control.Carrier.Fresh.Strict
+import           Control.Carrier.Reader
 import           Control.Effect.State
 import           Control.Monad.Trans.Class
 import           Data.Foldable (fold)
