@@ -57,7 +57,7 @@ asLam v = send (AsLam v pure)
 record :: forall term addr abstract m sig . Has (Domain term addr abstract) sig m => [(Name, term addr)] -> m abstract
 record fs = send (Record fs pure)
 
--- FIXME: Support partial concretization of lambdas and records.
+-- FIXME: Support partial concretization of records.
 asRecord :: forall term addr abstract m sig . Has (Domain term addr abstract) sig m => abstract -> m [(Name, term addr)]
 asRecord v = send (AsRecord v pure)
 
