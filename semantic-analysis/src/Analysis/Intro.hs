@@ -1,5 +1,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE QuantifiedConstraints #-}
 {-# LANGUAGE StandaloneDeriving #-}
 module Analysis.Intro
@@ -8,16 +10,21 @@ module Analysis.Intro
 , bool
 , string
 , lam
+, lams
+, unlam
 , record
 ) where
 
 import Analysis.Name
 import Control.Algebra
+import Control.Applicative (Alternative (..))
 import Data.Text (Text)
 import GHC.Generics (Generic1)
 import Syntax.Foldable
 import Syntax.Module
 import Syntax.Scope
+import Syntax.Sum
+import Syntax.Term
 import Syntax.Traversable
 
 data Intro t a
@@ -57,6 +64,14 @@ string = send . String
 
 lam :: (Eq a, Has Intro sig m) => Named a -> m a -> m a
 lam (Named u n) b = send (Lam (Named u (abstract1 n b)))
+
+lams :: (Eq a, Foldable t, Has Intro sig m) => t (Named a) -> m a -> m a
+lams names body = foldr lam body names
+
+unlam :: (Alternative m, Project Intro sig, RightModule sig) => a -> Term sig a -> m (Named a, Term sig a)
+unlam n = \case
+  Alg sig | Just (Lam b) <- prj sig -> pure (n <$ b, instantiate1 (pure n) (namedValue b))
+  _                                 -> empty
 
 
 record :: Has Intro sig m => [(Name, m a)] -> m a
