@@ -88,7 +88,7 @@ assertJQExpressionSucceeds directive tree core = do
     HUnit.assertFailure (unlines [errorMsg, dirMsg, jsonMsg, astMsg, treeMsg, treeMsg', show err])
 
 -- handles CHECK-RESULT directives
-assertEvaluatesTo :: Term (Ann Span :+: Core) Name -> Text -> Concrete (Term (Ann Span :+: Core)) Name -> HUnit.Assertion
+assertEvaluatesTo :: Term (Ann Span :+: Core) Name -> Text -> Concrete (Term (Ann Span :+: Core)) -> HUnit.Assertion
 assertEvaluatesTo core k val = do
   prelude <- parsePrelude
   let allTogether = (named' "__semantic_prelude" :<- prelude) >>>= core
