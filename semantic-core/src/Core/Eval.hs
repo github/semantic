@@ -74,19 +74,19 @@ eval eval = \case
       A.assign addr a'
       A.bind n addr (eval (instantiate1 (pure addr) b))
     If c t e -> do
-      c' <- eval c >>= A.asBool @Term @address
+      c' <- eval c >>= A.asBool
       if c' then eval t else eval e
-    Load p -> eval p >>= A.asString @Term @address >> A.unit @Term @address -- FIXME: add a load command or something
-    Unit     -> A.unit @Term @address
-    Bool b   -> A.bool @Term @address b
-    String s -> A.string @Term @address s
+    Load p -> eval p >>= A.asString >> A.unit -- FIXME: add a load command or something
+    Unit     -> A.unit
+    Bool b   -> A.bool b
+    String s -> A.string s
     Record fields -> A.record fields
     a :. b -> do
-      a' <- eval a >>= A.asRecord @Term @address
+      a' <- eval a >>= A.asRecord
       maybe (freeVariable (show b)) eval (lookup b a')
     a :? b -> do
       a' <- eval a >>= A.asRecord @Term @address
-      A.bool @Term @address (isJust (lookup b a'))
+      A.bool (isJust (lookup b a'))
 
     a := b -> do
       b' <- eval b
@@ -103,10 +103,10 @@ eval eval = \case
           Term.Var n -> pure n
           Term.Alg (R c) -> case c of
             If c t e -> do
-              c' <- eval c >>= A.asBool @Term @address
+              c' <- eval c >>= A.asBool
               if c' then ref t else ref e
             a :. b -> do
-              a' <- eval a >>= A.asRecord @Term @address
+              a' <- eval a >>= A.asRecord
               maybe (freeVariable (show b)) ref (lookup b a')
             c -> invalidRef (show c)
           Term.Alg (L (Ann span c)) -> local (const span) (ref c)

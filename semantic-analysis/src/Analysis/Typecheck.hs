@@ -230,23 +230,23 @@ instance ( Alternative m
          )
       => Algebra (A.Domain term Addr Type :+: sig) (DomainC term m) where
   alg = \case
-    L (A.Unit       k) -> k (Alg Unit)
-    L (A.Bool     _ k) -> k (Alg Bool)
-    L (A.AsBool   t k) -> do
+    L (L (A.Unit       k)) -> k (Alg Unit)
+    L (R (L (A.Bool     _ k))) -> k (Alg Bool)
+    L (R (L (A.AsBool   t k))) -> do
       unify t (Alg Bool)
       k True <|> k False
-    L (A.String   _ k) -> k (Alg String)
-    L (A.AsString t k) -> do
+    L (R (R (L (A.String   _ k)))) -> k (Alg String)
+    L (R (R (L (A.AsString t k)))) -> do
       unify t (Alg String)
       k mempty
-    L (A.Lam (Named n b) k) -> do
+    L (R (R (R (L (A.Lam (Named n b) k))))) -> do
       eval <- DomainC ask
       addr <- alloc @Name n
       arg <- meta
       A.assign addr arg
       ty <- lift (eval (instantiate1 (pure n) b))
       k (Alg (arg :-> ty))
-    L (A.AsLam    t k) -> do
+    L (R (R (R (L (A.AsLam    t k))))) -> do
       arg <- meta
       ret <- meta
       unify t (Alg (arg :-> ret))
@@ -259,7 +259,7 @@ instance ( Alternative m
         Alg (_ :-> b)  -> send . Intro.Lam . Named (Name mempty) . lift <$> concretize b
         Alg (Record t) -> Intro.record <$> traverse (traverse concretize) (Map.toList t)
         t              -> fail $ "can’t concretize " <> show t -- FIXME: concretize type variables by incrementally solving constraints
-    L (A.Record fields k) -> do
+    L (R (R (R (R (A.Record fields k))))) -> do
       eval <- DomainC ask
       fields' <- for fields $ \ (k, t) -> do
         addr <- alloc @Addr k
@@ -267,7 +267,7 @@ instance ( Alternative m
         (k, v) <$ A.assign addr v
       -- FIXME: should records reference types by address instead?
       k (Alg (Record (Map.fromList fields')))
-    L (A.AsRecord t k) -> do
+    L (R (R (R (R (A.AsRecord t k))))) -> do
       unify t (Alg (Record mempty))
       k mempty -- FIXME: return whatever fields we have, when it’s actually a Record
 

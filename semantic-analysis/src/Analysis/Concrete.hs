@@ -123,23 +123,23 @@ instance ( Applicative term
          )
       => Algebra (A.Domain term Addr (Concrete term) :+: sig) (DomainC term m) where
   alg = \case
-    L (A.Unit k) -> k Unit
-    L (A.Bool     b k) -> k (Bool b)
-    L (A.AsBool   c k) -> case c of
+    L (L (A.Unit k)) -> k Unit
+    L (R (L (A.Bool     b k))) -> k (Bool b)
+    L (R (L (A.AsBool   c k))) -> case c of
       Bool   b -> k b
       _        -> fail "expected Bool"
-    L (A.String   s k) -> k (String s)
-    L (A.AsString c k) -> case c of
+    L (R (R (L (A.String   s k)))) -> k (String s)
+    L (R (R (L (A.AsString c k)))) -> case c of
       String s -> k s
       _        -> fail "expected String"
-    L (A.Lam      b k) -> do
+    L (R (R (R (L (A.Lam      b k))))) -> do
       path <- ask
       span <- ask
       k (Closure path span b)
-    L (A.AsLam    c k) -> case c of
+    L (R (R (R (L (A.AsLam    c k))))) -> case c of
       Closure _ _ b -> k b
       _             -> fail "expected Closure"
-    L (A.Record fields k) -> do
+    L (R (R (R (R (A.Record fields k))))) -> do
       eval <- DomainC ask
       fields' <- for fields $ \ (name, t) -> do
         addr <- A.alloc name
@@ -147,7 +147,7 @@ instance ( Applicative term
         A.assign @Addr @(Concrete term) addr v
         pure (name, addr)
       k (Record (Map.fromList fields'))
-    L (A.AsRecord c k) -> case c of
+    L (R (R (R (R (A.AsRecord c k))))) -> case c of
       Record fields -> k (map (fmap pure) (Map.toList fields))
       _             -> fail "expected Record"
     R other -> DomainC (send (handleCoercible other))
