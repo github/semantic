@@ -10,23 +10,23 @@ module Core.Eval
 , ruby
 ) where
 
-import Analysis.Effect.Domain as A
-import Analysis.Effect.Env as A
-import Analysis.Effect.Heap as A
-import Analysis.File
-import Control.Algebra
-import Control.Applicative (Alternative (..))
-import Control.Effect.Fail
-import Control.Effect.Reader
-import Control.Monad ((>=>))
-import Core.Core as Core
-import Core.Name
-import Data.Functor
-import Data.Maybe (fromMaybe, isJust)
-import GHC.Stack
-import Prelude hiding (fail)
-import Source.Span
-import Syntax.Scope
+import           Analysis.Effect.Domain as A
+import           Analysis.Effect.Env as A
+import           Analysis.Effect.Heap as A
+import           Analysis.File
+import           Control.Algebra
+import           Control.Applicative (Alternative (..))
+import           Control.Effect.Fail
+import           Control.Effect.Reader
+import           Control.Monad ((>=>))
+import           Core.Core as Core
+import           Core.Name
+import           Data.Functor
+import           Data.Maybe (fromMaybe, isJust)
+import           GHC.Stack
+import           Prelude hiding (fail)
+import           Source.Span
+import           Syntax.Scope
 import qualified Syntax.Term as Term
 import qualified System.Path as Path
 
