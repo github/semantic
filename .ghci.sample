@@ -1,7 +1,7 @@
 -- Consider copying this to your ~/.ghc/ghci.conf file:
 
 -- Pretty-printing
-:set -package-id prtty-smpl-3.1.0.0-b6696d88
+:set -package-id prtty-smpl-3.1.1.0-c89f0500
 :set -interactive-print Text.Pretty.Simple.pPrint
 
 -- Turn on some language extensions you use a lot
