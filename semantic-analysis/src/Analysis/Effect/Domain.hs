@@ -30,82 +30,82 @@ import Data.Text (Text)
 import GHC.Generics (Generic1)
 import Syntax.Scope (Scope)
 
-unit :: Has (UnitDomain abstract) sig m => m abstract
+unit :: Has (UnitDomain value) sig m => m value
 unit = send (Unit pure)
 
-data UnitDomain abstract m k
-  = Unit (abstract -> m k)
+data UnitDomain value m k
+  = Unit (value -> m k)
   deriving (Functor, Generic1)
 
-instance HFunctor (UnitDomain abstract)
-instance Effect   (UnitDomain abstract)
+instance HFunctor (UnitDomain value)
+instance Effect   (UnitDomain value)
 
 
-bool :: Has (BoolDomain abstract) sig m => Bool -> m abstract
+bool :: Has (BoolDomain value) sig m => Bool -> m value
 bool b = send (Bool b pure)
 
-asBool :: Has (BoolDomain abstract) sig m => abstract -> m Bool
+asBool :: Has (BoolDomain value) sig m => value -> m Bool
 asBool v = send (AsBool v pure)
 
-data BoolDomain abstract m k
-  = Bool   Bool     (abstract -> m k)
-  | AsBool abstract (Bool     -> m k)
+data BoolDomain value m k
+  = Bool   Bool  (value -> m k)
+  | AsBool value (Bool     -> m k)
   deriving (Functor, Generic1)
 
-instance HFunctor (BoolDomain abstract)
-instance Effect   (BoolDomain abstract)
+instance HFunctor (BoolDomain value)
+instance Effect   (BoolDomain value)
 
 
-string :: Has (StringDomain abstract) sig m => Text -> m abstract
+string :: Has (StringDomain value) sig m => Text -> m value
 string s = send (String s pure)
 
-asString :: Has (StringDomain abstract) sig m => abstract -> m Text
+asString :: Has (StringDomain value) sig m => value -> m Text
 asString v = send (AsString v pure)
 
-data StringDomain abstract m k
-  = String   Text     (abstract -> m k)
-  | AsString abstract (Text     -> m k)
+data StringDomain value m k
+  = String   Text  (value -> m k)
+  | AsString value (Text     -> m k)
   deriving (Functor, Generic1)
 
-instance HFunctor (StringDomain abstract)
-instance Effect   (StringDomain abstract)
+instance HFunctor (StringDomain value)
+instance Effect   (StringDomain value)
 
 
-lam :: Has (FunctionDomain term addr abstract) sig m => Named (Scope () term addr) -> m abstract
+lam :: Has (FunctionDomain term addr value) sig m => Named (Scope () term addr) -> m value
 lam b = send (Lam b pure)
 
 -- FIXME: Support partial concretization of lambdas.
-asLam :: Has (FunctionDomain term addr abstract) sig m => abstract -> m (Named (Scope () term addr))
+asLam :: Has (FunctionDomain term addr value) sig m => value -> m (Named (Scope () term addr))
 asLam v = send (AsLam v pure)
 
-data FunctionDomain term addr abstract m k
-  = Lam   (Named (Scope () term addr)) (abstract -> m k)
-  | AsLam abstract                     (Named (Scope () term addr)     -> m k)
+data FunctionDomain term addr value m k
+  = Lam   (Named (Scope () term addr)) (value -> m k)
+  | AsLam value                        (Named (Scope () term addr)     -> m k)
   deriving (Functor, Generic1)
 
-instance HFunctor (FunctionDomain term addr abstract)
-instance Effect   (FunctionDomain term addr abstract)
+instance HFunctor (FunctionDomain term addr value)
+instance Effect   (FunctionDomain term addr value)
 
 
-record :: Has (RecordDomain term addr abstract) sig m => [(Name, term addr)] -> m abstract
+record :: Has (RecordDomain term addr value) sig m => [(Name, term addr)] -> m value
 record fs = send (Record fs pure)
 
 -- FIXME: Support partial concretization of records.
-asRecord :: Has (RecordDomain term addr abstract) sig m => abstract -> m [(Name, term addr)]
+asRecord :: Has (RecordDomain term addr value) sig m => value -> m [(Name, term addr)]
 asRecord v = send (AsRecord v pure)
 
-data RecordDomain term addr abstract m k
-  = Record   [(Name, term addr)] (abstract -> m k)
-  | AsRecord abstract            ([(Name, term addr)]     -> m k)
+data RecordDomain term addr value m k
+  = Record   [(Name, term addr)] (value -> m k)
+  | AsRecord value               ([(Name, term addr)]     -> m k)
   deriving (Functor, Generic1)
 
-instance HFunctor (RecordDomain term addr abstract)
-instance Effect   (RecordDomain term addr abstract)
+instance HFunctor (RecordDomain term addr value)
+instance Effect   (RecordDomain term addr value)
 
 
-type Domain term addr abstract
-  =   UnitDomain abstract
-  :+: BoolDomain abstract
-  :+: StringDomain abstract
-  :+: FunctionDomain term addr abstract
-  :+: RecordDomain term addr abstract
+type Domain term addr value
+  =   UnitDomain value
+  :+: BoolDomain value
+  :+: StringDomain value
+  :+: FunctionDomain term addr value
+  :+: RecordDomain term addr value
