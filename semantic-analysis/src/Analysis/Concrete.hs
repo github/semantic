@@ -111,14 +111,15 @@ instance ( Applicative term
          , Has (A.Heap Addr (Concrete term)) sig m
          , Has (Reader Path.AbsRelFile) sig m
          , Has (Reader Span) sig m
+         , MonadFail m
          )
       => Algebra (Domain term Addr (Concrete term) :+: sig) (DomainC term m) where
   alg = \case
     L (Abstract i k) -> case i of
-      I.Unit          -> k Unit
-      I.Bool b        -> k (Bool b)
-      I.String s      -> k (String s)
-      I.Lam b         -> do
+      I.Unit         -> k Unit
+      I.Bool b       -> k (Bool b)
+      I.String s     -> k (String s)
+      I.Lam b        -> do
         path <- ask
         span <- ask
         k (Closure path span b)
@@ -130,12 +131,18 @@ instance ( Applicative term
           A.assign @Addr @(Concrete term) addr v
           pure (name, addr)
         k (Record (Map.fromList fields'))
-    L (Concretize c k) -> case c of
-      Unit          -> k I.Unit
-      Bool b        -> k (I.Bool b)
-      String s      -> k (I.String s)
-      Closure _ _ b -> k (I.Lam b)
-      Record fields -> k (I.Record (map (fmap pure) (Map.toList fields)))
+    L (AsBool   c k) -> case c of
+      Bool   b       -> k b
+      _              -> fail "expected Bool"
+    L (AsString c k) -> case c of
+      String s       -> k s
+      _              -> fail "expected String"
+    L (AsLam    c k) -> case c of
+      Closure _ _ b  -> k b
+      _              -> fail "expected Closure"
+    L (AsRecord c k) -> case c of
+      Record fields  -> k (map (fmap pure) (Map.toList fields))
+      _              -> fail "expected Record"
     R other -> DomainC (send (handleCoercible other))
 
 

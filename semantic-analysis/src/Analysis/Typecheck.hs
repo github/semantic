@@ -223,38 +223,56 @@ instance ( Alternative m
          , Has (Env Addr) sig m
          , Has Fresh sig m
          , Has (A.Heap Addr Type) sig m
+         , Has (State (Set.Set Constraint)) sig m
          , Monad term
          , MonadFail m
          , Has Intro.Intro syn term
          )
       => Algebra (Domain term Addr Type :+: sig) (DomainC term m) where
-  alg (L (Abstract v k)) = case v of
-    Intro.Unit     -> k (Alg Unit)
-    Intro.Bool   _ -> k (Alg Bool)
-    Intro.String _ -> k (Alg String)
-    Intro.Lam (Named n b) -> do
-      eval <- DomainC ask
-      addr <- alloc @Name n
-      arg <- meta
-      A.assign addr arg
-      ty <- lift (eval (instantiate1 (pure n) b))
-      k (Alg (arg :-> ty))
-    Intro.Record fields -> do
-      eval <- DomainC ask
-      fields' <- for fields $ \ (k, t) -> do
-        addr <- alloc @Addr k
-        v <- lift (eval t)
-        (k, v) <$ A.assign addr v
-      -- FIXME: should records reference types by address instead?
-      k (Alg (Record (Map.fromList fields')))
+  alg = \case
+    L (Abstract v k) -> case v of
+      Intro.Unit     -> k (Alg Unit)
+      Intro.Bool   _ -> k (Alg Bool)
+      Intro.String _ -> k (Alg String)
+      Intro.Lam (Named n b) -> do
+        eval <- DomainC ask
+        addr <- alloc @Name n
+        arg <- meta
+        A.assign addr arg
+        ty <- lift (eval (instantiate1 (pure n) b))
+        k (Alg (arg :-> ty))
+      Intro.Record fields -> do
+        eval <- DomainC ask
+        fields' <- for fields $ \ (k, t) -> do
+          addr <- alloc @Addr k
+          v <- lift (eval t)
+          (k, v) <$ A.assign addr v
+        -- FIXME: should records reference types by address instead?
+        k (Alg (Record (Map.fromList fields')))
 
-  alg (L (Concretize t k)) = case t of
-    Alg Unit       -> k Intro.Unit
-    Alg Bool       -> k (Intro.Bool True) <|> k (Intro.Bool False)
-    Alg String     -> k (Intro.String mempty)
-    Alg (_ :-> b)  -> concretize @term b >>= k . Intro.Lam . Named (Name mempty) . lift . send
-    Alg (Record t) -> traverse (traverse concretize) (Map.toList t) >>= k . Intro.Record . map (fmap send)
-    t             -> fail ("can’t concretize " <> show t)
-  alg (R other) = DomainC (send (handleCoercible other))
+    L (AsBool   t k) -> do
+      unify t (Alg Bool)
+      k True <|> k False
+    L (AsString t k) -> do
+      unify t (Alg String)
+      k mempty
+    L (AsLam    t k) -> do
+      arg <- meta
+      ret <- meta
+      unify t (Alg (arg :-> ret))
+      b <- concretize ret
+      k (Named (Name mempty) (lift b)) where
+      concretize = \case
+        Alg Unit       -> pure Intro.unit
+        Alg Bool       -> pure (Intro.bool True) <|> pure (Intro.bool False)
+        Alg String     -> pure (Intro.string mempty)
+        Alg (_ :-> b)  -> send . Intro.Lam . Named (Name mempty) . lift <$> concretize b
+        Alg (Record t) -> Intro.record <$> traverse (traverse concretize) (Map.toList t)
+        t              -> fail $ "can’t concretize " <> show t -- FIXME: concretize type variables by incrementally solving constraints
+    L (AsRecord t k) -> do
+      unify t (Alg (Record mempty))
+      k mempty -- FIXME: return whatever fields we have, when it’s actually a Record
+
+    R other -> DomainC (send (handleCoercible other))
 
 -- FIXME: we don’t get the chance to unify anything because concretization asks for an intro form, not an intro form of a specific type

@@ -101,7 +101,7 @@ newtype DomainC term m a = DomainC (ReaderC (term Addr -> m ScopeGraph) m a)
 instance MonadTrans (DomainC term) where
   lift = DomainC . lift
 
-instance (Has (Env Addr :+: A.Heap Addr ScopeGraph :+: Reader Path.AbsRelFile :+: Reader Span) sig m, Monad term) => Algebra (Domain term Addr ScopeGraph :+: sig) (DomainC term m) where
+instance (Alternative m, Has (Env Addr :+: A.Heap Addr ScopeGraph :+: Reader Path.AbsRelFile :+: Reader Span) sig m, Monad term) => Algebra (Domain term Addr ScopeGraph :+: sig) (DomainC term m) where
   alg = \case
     L (Abstract i k) -> case i of
       Unit -> k mempty
@@ -123,5 +123,8 @@ instance (Has (Env Addr :+: A.Heap Addr ScopeGraph :+: Reader Path.AbsRelFile :+
           let v' = ScopeGraph (Map.singleton (Decl k path span) mempty) <> v
           v' <$ A.assign @Addr addr v'
         k (fold fields')
-    L (Concretize _ k) -> k Unit -- FIXME: break Concretize out by constructor.
+    L (AsBool   _ k) -> k True <|> k False
+    L (AsString _ k) -> k mempty
+    L (AsLam    _ k) -> alloc (Name mempty) >>= k . Named (Name mempty) . lift . pure
+    L (AsRecord _ k) -> k []
     R other -> DomainC (send (handleCoercible other))

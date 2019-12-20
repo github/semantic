@@ -112,7 +112,7 @@ instance MonadTrans (DomainC term) where
   lift = DomainC . lift
 
 -- FIXME: decompose into a product domain and two atomic domains
-instance Has (Env Addr :+: A.Heap Addr (Value (Semi term)) :+: Reader Path.AbsRelFile :+: Reader Span) sig m => Algebra (A.Domain term Addr (Value (Semi term)) :+: sig) (DomainC term m) where
+instance (Alternative m, Has (Env Addr :+: A.Heap Addr (Value (Semi term)) :+: Reader Path.AbsRelFile :+: Reader Span) sig m, MonadFail m) => Algebra (A.Domain term Addr (Value (Semi term)) :+: sig) (DomainC term m) where
   alg = \case
     L (A.Abstract i k) -> case i of
       I.Unit     -> k mempty
@@ -129,8 +129,11 @@ instance Has (Env Addr :+: A.Heap Addr (Value (Semi term)) :+: Reader Path.AbsRe
           v <- lift (eval t)
           v <$ A.assign @Addr @(Value (Semi term)) addr v
         k (fold fields)
-    L (A.Concretize (Value s _) k) -> case s of
-      Abstract      -> k I.Unit -- FIXME: this should be broken down for case analysis
-      String s      -> k (I.String s)
-      Closure _ _ b -> k (I.Lam b)
+    L (A.AsBool   _ k) -> k True <|> k False
+    L (A.AsString _ k) -> k mempty
+    L (A.AsLam (Value v _) k) -> case v of
+      Closure _ _ b -> k b
+      String _      -> fail $ "expected closure, got String"
+      Abstract      -> fail $ "expected closure, got Abstract"
+    L (A.AsRecord _ k) -> k []
     R other -> DomainC (send (handleCoercible other))
