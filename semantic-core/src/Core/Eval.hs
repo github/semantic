@@ -66,7 +66,7 @@ eval eval = \case
       addr <- A.alloc @address n
       A.assign addr a'
       A.bind n addr ((a' <>) <$> eval (instantiate1 (pure addr) b))
-    Lam (Named n b) -> A.lam (Named n b)
+    Lam b -> A.lam b
     f :$ a -> do
       Named n b <- eval f >>= A.asLam
       a' <- eval a
