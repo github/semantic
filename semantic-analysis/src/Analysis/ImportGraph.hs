@@ -21,7 +21,6 @@ import qualified Analysis.Carrier.Heap.Monovariant as A
 import qualified Analysis.Effect.Domain as A
 import           Analysis.File
 import           Analysis.FlowInsensitive
-import qualified Analysis.Intro as I
 import           Analysis.Name
 import           Control.Algebra
 import           Control.Applicative (Alternative (..))
@@ -126,26 +125,25 @@ instance MonadTrans (DomainC term) where
 -- FIXME: decompose into a product domain and two atomic domains
 instance (Alternative m, Has (Env Addr :+: A.Heap Addr (Value (Semi term)) :+: Reader Path.AbsRelFile :+: Reader Span) sig m, MonadFail m) => Algebra (A.Domain term Addr (Value (Semi term)) :+: sig) (DomainC term m) where
   alg = \case
-    L (A.Abstract i k) -> case i of
-      I.Unit     -> k mempty
-      I.Bool _   -> k mempty
-      I.String s -> k (Value (String s) mempty)
-      I.Lam b    -> do
-        path <- ask
-        span <- ask
-        k (Value (Closure path span b) mempty)
-      I.Record f -> do
-        eval <- DomainC ask
-        fields <- for f $ \ (k, t) -> do
-          addr <- alloc @Addr k
-          v <- lift (eval t)
-          v <$ A.assign @Addr @(Value (Semi term)) addr v
-        k (fold fields)
+    L (A.Unit     k) -> k mempty
+    L (A.Bool _   k) -> k mempty
     L (A.AsBool   _ k) -> k True <|> k False
+    L (A.String s k) -> k (Value (String s) mempty)
     L (A.AsString _ k) -> k mempty
+    L (A.Lam b    k) -> do
+      path <- ask
+      span <- ask
+      k (Value (Closure path span b) mempty)
     L (A.AsLam (Value v _) k) -> case v of
       Closure _ _ b -> k b
       String _      -> fail $ "expected closure, got String"
       Abstract      -> fail $ "expected closure, got Abstract"
+    L (A.Record f k) -> do
+      eval <- DomainC ask
+      fields <- for f $ \ (k, t) -> do
+        addr <- alloc @Addr k
+        v <- lift (eval t)
+        v <$ A.assign @Addr @(Value (Semi term)) addr v
+      k (fold fields)
     L (A.AsRecord _ k) -> k []
     R other -> DomainC (send (handleCoercible other))

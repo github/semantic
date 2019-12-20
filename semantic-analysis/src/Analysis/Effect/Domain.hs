@@ -8,8 +8,7 @@
 {-# LANGUAGE TypeApplications #-}
 module Analysis.Effect.Domain
 ( -- * Domain effect
-  abstract
-, unit
+  unit
 , bool
 , asBool
 , string
@@ -25,36 +24,30 @@ module Analysis.Effect.Domain
 , run
 ) where
 
-import           Analysis.Intro (Intro)
-import qualified Analysis.Intro as A
 import           Analysis.Name
 import           Control.Algebra
 import           Data.Text (Text)
 import           GHC.Generics (Generic1)
 import           Syntax.Scope (Scope)
 
-abstract :: Has (Domain term addr abstract) sig m => Intro term addr -> m abstract
-abstract concrete = send (Abstract concrete pure)
-
-
 unit :: forall term addr abstract m sig . Has (Domain term addr abstract) sig m => m abstract
-unit = abstract @term @addr A.Unit
+unit = send (Unit @term @addr pure)
 
 bool :: forall term addr abstract m sig . Has (Domain term addr abstract) sig m => Bool -> m abstract
-bool = abstract @term @addr . A.Bool
+bool b = send (Bool @term @addr b pure)
 
 asBool :: forall term addr abstract m sig . Has (Domain term addr abstract) sig m => abstract -> m Bool
 asBool v = send (AsBool @term @addr v pure)
 
 string :: forall term addr abstract m sig . Has (Domain term addr abstract) sig m => Text -> m abstract
-string = abstract @term @addr . A.String
+string s = send (String @term @addr s pure)
 
 asString :: forall term addr abstract m sig . Has (Domain term addr abstract) sig m => abstract -> m Text
 asString v = send (AsString @term @addr v pure)
 
 
 lam :: Has (Domain term addr abstract) sig m => Named (Scope () term addr) -> m abstract
-lam = abstract . A.Lam
+lam b = send (Lam b pure)
 
 -- FIXME: Support partial concretization of lambdas.
 asLam :: Has (Domain term addr abstract) sig m => abstract -> m (Named (Scope () term addr))
@@ -62,7 +55,7 @@ asLam v = send (AsLam v pure)
 
 
 record :: forall term addr abstract m sig . Has (Domain term addr abstract) sig m => [(Name, term addr)] -> m abstract
-record = abstract @term . A.Record
+record fs = send (Record fs pure)
 
 -- FIXME: Support partial concretization of lambdas and records.
 asRecord :: forall term addr abstract m sig . Has (Domain term addr abstract) sig m => abstract -> m [(Name, term addr)]
@@ -70,11 +63,15 @@ asRecord v = send (AsRecord v pure)
 
 
 data Domain term addr abstract m k
-  = Abstract (Intro term addr) (abstract                   -> m k)
-  | AsBool   abstract          (Bool                       -> m k)
-  | AsString abstract          (Text                       -> m k)
-  | AsLam    abstract          (Named (Scope () term addr) -> m k)
-  | AsRecord abstract          ([(Name, term addr)]        -> m k)
+  = Unit                                  (abstract                   -> m k)
+  | Bool     Bool                         (abstract                   -> m k)
+  | AsBool   abstract                     (Bool                       -> m k)
+  | String   Text                         (abstract                   -> m k)
+  | AsString abstract                     (Text                       -> m k)
+  | Lam      (Named (Scope () term addr)) (abstract                   -> m k)
+  | AsLam    abstract                     (Named (Scope () term addr) -> m k)
+  | Record   [(Name, term addr)]          (abstract                   -> m k)
+  | AsRecord abstract                     ([(Name, term addr)]        -> m k)
   deriving (Functor, Generic1)
 
 instance HFunctor (Domain term addr abstract)

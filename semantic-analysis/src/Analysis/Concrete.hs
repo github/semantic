@@ -27,9 +27,8 @@ import qualified Algebra.Graph as G
 import qualified Algebra.Graph.Export.Dot as G
 import qualified Analysis.Carrier.Env.Precise as A
 import qualified Analysis.Carrier.Heap.Precise as A
-import           Analysis.Effect.Domain
+import qualified Analysis.Effect.Domain as A
 import           Analysis.File
-import qualified Analysis.Intro as I
 import           Analysis.Name
 import           Control.Algebra
 import           Control.Carrier.Fail.WithLoc
@@ -71,7 +70,7 @@ type Heap = IntMap.IntMap
 concrete
   :: Applicative term
   => (forall sig m
-     .  (Has (Domain term Addr (Concrete term) :+: A.Env Addr :+: A.Heap Addr (Concrete term) :+: Reader Path.AbsRelFile :+: Reader Span) sig m, MonadFail m)
+     .  (Has (A.Domain term Addr (Concrete term) :+: A.Env Addr :+: A.Heap Addr (Concrete term) :+: Reader Path.AbsRelFile :+: Reader Span) sig m, MonadFail m)
      => (term Addr -> m (Concrete term))
      -> (term Addr -> m (Concrete term))
      )
@@ -91,7 +90,7 @@ runFile
      , Has (A.Heap Addr (Concrete term)) sig m
      )
   => (forall sig m
-     .  (Has (Domain term Addr (Concrete term) :+: A.Env Addr :+: A.Heap Addr (Concrete term) :+: Reader Path.AbsRelFile :+: Reader Span) sig m, MonadFail m)
+     .  (Has (A.Domain term Addr (Concrete term) :+: A.Env Addr :+: A.Heap Addr (Concrete term) :+: Reader Path.AbsRelFile :+: Reader Span) sig m, MonadFail m)
      => (term Addr -> m (Concrete term))
      -> (term Addr -> m (Concrete term))
      )
@@ -122,34 +121,33 @@ instance ( Applicative term
          , Has (Reader Span) sig m
          , MonadFail m
          )
-      => Algebra (Domain term Addr (Concrete term) :+: sig) (DomainC term m) where
+      => Algebra (A.Domain term Addr (Concrete term) :+: sig) (DomainC term m) where
   alg = \case
-    L (Abstract i k) -> case i of
-      I.Unit         -> k Unit
-      I.Bool b       -> k (Bool b)
-      I.String s     -> k (String s)
-      I.Lam b        -> do
-        path <- ask
-        span <- ask
-        k (Closure path span b)
-      I.Record fields -> do
-        eval <- DomainC ask
-        fields' <- for fields $ \ (name, t) -> do
-          addr <- A.alloc name
-          v <- lift (eval t)
-          A.assign @Addr @(Concrete term) addr v
-          pure (name, addr)
-        k (Record (Map.fromList fields'))
-    L (AsBool   c k) -> case c of
+    L (A.Unit k) -> k Unit
+    L (A.Bool     b k) -> k (Bool b)
+    L (A.AsBool   c k) -> case c of
       Bool   b -> k b
       _        -> fail "expected Bool"
-    L (AsString c k) -> case c of
+    L (A.String   s k) -> k (String s)
+    L (A.AsString c k) -> case c of
       String s -> k s
       _        -> fail "expected String"
-    L (AsLam    c k) -> case c of
+    L (A.Lam      b k) -> do
+      path <- ask
+      span <- ask
+      k (Closure path span b)
+    L (A.AsLam    c k) -> case c of
       Closure _ _ b -> k b
       _             -> fail "expected Closure"
-    L (AsRecord c k) -> case c of
+    L (A.Record fields k) -> do
+      eval <- DomainC ask
+      fields' <- for fields $ \ (name, t) -> do
+        addr <- A.alloc name
+        v <- lift (eval t)
+        A.assign @Addr @(Concrete term) addr v
+        pure (name, addr)
+      k (Record (Map.fromList fields'))
+    L (A.AsRecord c k) -> case c of
       Record fields -> k (map (fmap pure) (Map.toList fields))
       _             -> fail "expected Record"
     R other -> DomainC (send (handleCoercible other))

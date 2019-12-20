@@ -23,7 +23,7 @@ module Analysis.Typecheck
 
 import           Analysis.Carrier.Env.Monovariant
 import qualified Analysis.Carrier.Heap.Monovariant as A
-import           Analysis.Effect.Domain
+import qualified Analysis.Effect.Domain as A
 import           Analysis.File
 import           Analysis.FlowInsensitive
 import qualified Analysis.Intro as Intro
@@ -112,7 +112,7 @@ generalize ty = fromJust (closed (forAlls (IntSet.toList (mvs ty)) (hoistTerm R 
 typecheckingFlowInsensitive
   :: (Has Intro.Intro syn term, Ord (term Addr))
   => (forall sig m
-     .  (Has (Domain term Addr Type :+: Env Addr :+: A.Heap Addr Type :+: Reader Path.AbsRelFile :+: Reader Span) sig m, MonadFail m)
+     .  (Has (A.Domain term Addr Type :+: Env Addr :+: A.Heap Addr Type :+: Reader Path.AbsRelFile :+: Reader Span) sig m, MonadFail m)
      => (term Addr -> m Type)
      -> (term Addr -> m Type)
      )
@@ -135,7 +135,7 @@ runFile
      , Ord (term Addr)
      )
   => (forall sig m
-     .  (Has (Domain term Addr Type :+: Env Addr :+: A.Heap Addr Type :+: Reader Path.AbsRelFile :+: Reader Span) sig m, MonadFail m)
+     .  (Has (A.Domain term Addr Type :+: Env Addr :+: A.Heap Addr Type :+: Reader Path.AbsRelFile :+: Reader Span) sig m, MonadFail m)
      => (term Addr -> m Type)
      -> (term Addr -> m Type)
      )
@@ -228,35 +228,25 @@ instance ( Alternative m
          , MonadFail m
          , Has Intro.Intro syn term
          )
-      => Algebra (Domain term Addr Type :+: sig) (DomainC term m) where
+      => Algebra (A.Domain term Addr Type :+: sig) (DomainC term m) where
   alg = \case
-    L (Abstract v k) -> case v of
-      Intro.Unit     -> k (Alg Unit)
-      Intro.Bool   _ -> k (Alg Bool)
-      Intro.String _ -> k (Alg String)
-      Intro.Lam (Named n b) -> do
-        eval <- DomainC ask
-        addr <- alloc @Name n
-        arg <- meta
-        A.assign addr arg
-        ty <- lift (eval (instantiate1 (pure n) b))
-        k (Alg (arg :-> ty))
-      Intro.Record fields -> do
-        eval <- DomainC ask
-        fields' <- for fields $ \ (k, t) -> do
-          addr <- alloc @Addr k
-          v <- lift (eval t)
-          (k, v) <$ A.assign addr v
-        -- FIXME: should records reference types by address instead?
-        k (Alg (Record (Map.fromList fields')))
-
-    L (AsBool   t k) -> do
+    L (A.Unit       k) -> k (Alg Unit)
+    L (A.Bool     _ k) -> k (Alg Bool)
+    L (A.AsBool   t k) -> do
       unify t (Alg Bool)
       k True <|> k False
-    L (AsString t k) -> do
+    L (A.String   _ k) -> k (Alg String)
+    L (A.AsString t k) -> do
       unify t (Alg String)
       k mempty
-    L (AsLam    t k) -> do
+    L (A.Lam (Named n b) k) -> do
+      eval <- DomainC ask
+      addr <- alloc @Name n
+      arg <- meta
+      A.assign addr arg
+      ty <- lift (eval (instantiate1 (pure n) b))
+      k (Alg (arg :-> ty))
+    L (A.AsLam    t k) -> do
       arg <- meta
       ret <- meta
       unify t (Alg (arg :-> ret))
@@ -269,7 +259,15 @@ instance ( Alternative m
         Alg (_ :-> b)  -> send . Intro.Lam . Named (Name mempty) . lift <$> concretize b
         Alg (Record t) -> Intro.record <$> traverse (traverse concretize) (Map.toList t)
         t              -> fail $ "can’t concretize " <> show t -- FIXME: concretize type variables by incrementally solving constraints
-    L (AsRecord t k) -> do
+    L (A.Record fields k) -> do
+      eval <- DomainC ask
+      fields' <- for fields $ \ (k, t) -> do
+        addr <- alloc @Addr k
+        v <- lift (eval t)
+        (k, v) <$ A.assign addr v
+      -- FIXME: should records reference types by address instead?
+      k (Alg (Record (Map.fromList fields')))
+    L (A.AsRecord t k) -> do
       unify t (Alg (Record mempty))
       k mempty -- FIXME: return whatever fields we have, when it’s actually a Record
 

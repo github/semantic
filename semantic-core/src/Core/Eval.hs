@@ -17,7 +17,7 @@ module Core.Eval
 , ruby
 ) where
 
-import           Analysis.Effect.Domain as A
+import qualified Analysis.Effect.Domain as A
 import           Analysis.Effect.Env as A
 import           Analysis.Effect.Heap as A
 import           Analysis.File
@@ -40,7 +40,7 @@ import qualified System.Path as Path
 type Term = Term.Term (Ann Span :+: Core)
 
 eval :: forall address value m sig
-     .  ( Has (Domain Term address value) sig m
+     .  ( Has (A.Domain Term address value) sig m
         , Has (Env address) sig m
         , Has (Heap address value) sig m
         , Has (Reader Span) sig m
@@ -68,7 +68,7 @@ eval eval = \case
       A.bind n addr ((a' <>) <$> eval (instantiate1 (pure addr) b))
     Lam (Named n b) -> A.lam (Named n b)
     f :$ a -> do
-      Named n b <- eval f >>= asLam
+      Named n b <- eval f >>= A.asLam
       a' <- eval a
       addr <- A.alloc @address n
       A.assign addr a'
@@ -82,10 +82,10 @@ eval eval = \case
     String s -> A.string @Term @address s
     Record fields -> A.record fields
     a :. b -> do
-      a' <- eval a >>= asRecord @Term @address
+      a' <- eval a >>= A.asRecord @Term @address
       maybe (freeVariable (show b)) eval (lookup b a')
     a :? b -> do
-      a' <- eval a >>= asRecord @Term @address
+      a' <- eval a >>= A.asRecord @Term @address
       A.bool @Term @address (isJust (lookup b a'))
 
     a := b -> do
@@ -106,7 +106,7 @@ eval eval = \case
               c' <- eval c >>= A.asBool @Term @address
               if c' then ref t else ref e
             a :. b -> do
-              a' <- eval a >>= asRecord @Term @address
+              a' <- eval a >>= A.asRecord @Term @address
               maybe (freeVariable (show b)) ref (lookup b a')
             c -> invalidRef (show c)
           Term.Alg (L (Ann span c)) -> local (const span) (ref c)
