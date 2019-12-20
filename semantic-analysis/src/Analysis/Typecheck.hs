@@ -24,9 +24,9 @@ module Analysis.Typecheck
 import           Analysis.Carrier.Env.Monovariant
 import qualified Analysis.Carrier.Heap.Monovariant as A
 import           Analysis.Effect.Domain
-import qualified Analysis.Intro as Intro
 import           Analysis.File
 import           Analysis.FlowInsensitive
+import qualified Analysis.Intro as Intro
 import           Analysis.Name
 import           Control.Algebra
 import           Control.Applicative (Alternative (..))
