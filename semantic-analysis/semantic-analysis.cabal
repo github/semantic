@@ -70,3 +70,4 @@ library
     , semantic-source             ^>= 0
     , terminal-size               ^>= 0.3
     , text                        ^>= 1.2.3.1
+    , transformers                ^>= 0.5
