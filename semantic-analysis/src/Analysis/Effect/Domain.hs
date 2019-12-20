@@ -56,6 +56,7 @@ asString v = send (AsString @term @addr v pure)
 lam :: Has (Domain term addr abstract) sig m => Named (Scope () term addr) -> m abstract
 lam = abstract . A.Lam
 
+-- FIXME: Support partial concretization of lambdas.
 asLam :: Has (Domain term addr abstract) sig m => abstract -> m (Named (Scope () term addr))
 asLam v = send (AsLam v pure)
 
@@ -63,6 +64,7 @@ asLam v = send (AsLam v pure)
 record :: forall term addr abstract m sig . Has (Domain term addr abstract) sig m => [(Name, term addr)] -> m abstract
 record = abstract @term . A.Record
 
+-- FIXME: Support partial concretization of lambdas and records.
 asRecord :: forall term addr abstract m sig . Has (Domain term addr abstract) sig m => abstract -> m [(Name, term addr)]
 asRecord v = send (AsRecord v pure)
 
