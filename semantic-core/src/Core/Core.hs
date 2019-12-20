@@ -30,16 +30,15 @@ module Core.Core
 , ($$*)
 , unapply
 , unapplies
+, unit
+, bool
 , if'
+, string
 , load
 , record
 , (...)
 , (.?)
 , (.=)
-, Intro(..)
-, unit
-, bool
-, string
 , Ann(..)
 , ann
 , annAt
@@ -81,7 +80,10 @@ data Core f a
   | Lam (Named (Scope () f a))
   -- | Function application; analogous to '$'.
   | f a :$ f a
+  | Unit
+  | Bool Bool
   | If (f a) (f a) (f a)
+  | String Text
   -- | Load the specified file (by path).
   | Load (f a)
   -- | A record mapping some keys to some values.
@@ -110,7 +112,10 @@ instance RightModule Core where
   (a :>>= b) >>=* f = ((>>= f) <$> a) :>>= (b >>=* f)
   Lam b      >>=* f = Lam ((>>=* f) <$> b)
   (a :$ b)   >>=* f = (a >>= f) :$ (b >>= f)
+  Unit       >>=* _ = Unit
+  Bool b     >>=* _ = Bool b
   If c t e   >>=* f = If (c >>= f) (t >>= f) (e >>= f)
+  String s   >>=* _ = String s
   Load b     >>=* f = Load (b >>= f)
   Record fs  >>=* f = Record (map (fmap (>>= f)) fs)
   (a :. b)   >>=* f = (a >>= f) :. b
@@ -157,7 +162,7 @@ unbind n = \case
 unstatement :: (Alternative m, Project Core sig, RightModule sig) => a -> Term sig a -> m (Maybe (Named a) :<- Term sig a, Term sig a)
 unstatement n t = first (first Just) <$> unbind n t <|> first (Nothing :<-) <$> unseq t
 
-do' :: (Eq a, Foldable t, Has Core sig m, Has Intro sig m) => t (Maybe (Named a) :<- m a) -> m a
+do' :: (Eq a, Foldable t, Has Core sig m) => t (Maybe (Named a) :<- m a) -> m a
 do' bindings = fromMaybe unit (foldr bind Nothing bindings)
   where bind (n :<- a) v = maybe (a >>>) ((>>>=) . (:<- a)) n <$> v <|> Just a
 
@@ -205,8 +210,17 @@ unapplies core = case unapply core of
   Just (f, a) -> (:> a) <$> unapplies f
   Nothing     -> (core, Nil)
 
+unit :: Has Core sig m => m a
+unit = send Unit
+
+bool :: Has Core sig m => Bool -> m a
+bool = send . Bool
+
 if' :: Has Core sig m => m a -> m a -> m a -> m a
 if' c t e = send (If c t e)
+
+string :: Has Core sig m => Text -> m a
+string = send . String
 
 load :: Has Core sig m => m a -> m a
 load = send . Load
@@ -228,32 +242,6 @@ infixl 9 .?
 a .= b = send (a := b)
 
 infix 3 .=
-
-
-data Intro (f :: * -> *) a
-  = Unit
-  | Bool Bool
-  | String Text
-  deriving (Eq, Foldable, Functor, Generic1, Ord, Show, Traversable)
-
-instance HFunctor Intro
-instance HFoldable Intro
-instance HTraversable Intro
-
-instance RightModule Intro where
-  Unit     >>=* _ = Unit
-  Bool b   >>=* _ = Bool b
-  String s >>=* _ = String s
-
-
-unit :: Has Intro sig m => m a
-unit = send Unit
-
-bool :: Has Intro sig m => Bool -> m a
-bool = send . Bool
-
-string :: Has Intro sig m => Text -> m a
-string = send . String
 
 
 data Ann ann f a

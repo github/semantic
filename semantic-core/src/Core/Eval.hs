@@ -37,7 +37,7 @@ import           Syntax.Scope
 import qualified Syntax.Term as Term
 import qualified System.Path as Path
 
-type Term = Term.Term (Ann Span :+: Core :+: Intro)
+type Term = Term.Term (Ann Span :+: Core)
 
 eval :: forall address value m sig
      .  ( Has (Domain Term address value) sig m
@@ -52,7 +52,7 @@ eval :: forall address value m sig
      -> (Term address -> m value)
 eval eval = \case
   Term.Var n -> deref' n n
-  Term.Alg (R (L c)) -> case c of
+  Term.Alg (R c) -> case c of
     Rec (Named n b) -> do
       addr <- A.alloc @address n
       v <- A.bind n addr (eval (instantiate1 (pure addr) b))
@@ -77,6 +77,9 @@ eval eval = \case
       c' <- eval c >>= A.asBool @Term @address
       if c' then eval t else eval e
     Load p -> eval p >>= A.asString @Term @address >> A.unit @Term @address -- FIXME: add a load command or something
+    Unit     -> A.unit @Term @address
+    Bool b   -> A.bool @Term @address b
+    String s -> A.string @Term @address s
     Record fields -> A.record fields
     a :. b -> do
       a' <- eval a >>= asRecord @Term @address
@@ -89,10 +92,6 @@ eval eval = \case
       b' <- eval b
       addr <- ref a
       b' <$ A.assign addr b'
-  Term.Alg (R (R c)) -> case c of
-    Unit     -> A.unit @Term @address
-    Bool b   -> A.bool @Term @address b
-    String s -> A.string @Term @address s
   Term.Alg (L (Ann span c)) -> local (const span) (eval c)
   where freeVariable s = fail ("free variable: " <> s)
         uninitialized s = fail ("uninitialized variable: " <> s)
@@ -102,7 +101,7 @@ eval eval = \case
 
         ref = \case
           Term.Var n -> pure n
-          Term.Alg (R (L c)) -> case c of
+          Term.Alg (R c) -> case c of
             If c t e -> do
               c' <- eval c >>= A.asBool @Term @address
               if c' then ref t else ref e
@@ -110,18 +109,17 @@ eval eval = \case
               a' <- eval a >>= asRecord @Term @address
               maybe (freeVariable (show b)) ref (lookup b a')
             c -> invalidRef (show c)
-          Term.Alg (R (R c)) -> invalidRef (show c)
           Term.Alg (L (Ann span c)) -> local (const span) (ref c)
 
 
-prog1 :: (Has Core sig t, Has Intro sig t) => File (t Name)
+prog1 :: Has Core sig t => File (t Name)
 prog1 = fromBody $ Core.lam (named' "foo")
   (    named' "bar" :<- pure "foo"
   >>>= Core.if' (pure "bar")
     (Core.bool False)
     (Core.bool True))
 
-prog2 :: (Has Core sig t, Has Intro sig t) => File (t Name)
+prog2 :: Has Core sig t => File (t Name)
 prog2 = fromBody $ fileBody prog1 $$ Core.bool True
 
 prog3 :: Has Core sig t => File (t Name)
@@ -130,14 +128,14 @@ prog3 = fromBody $ lams [named' "foo", named' "bar", named' "quux"]
     (pure "bar")
     (pure "foo"))
 
-prog4 :: (Has Core sig t, Has Intro sig t) => File (t Name)
+prog4 :: Has Core sig t => File (t Name)
 prog4 = fromBody
   (    named' "foo" :<- Core.bool True
   >>>= Core.if' (pure "foo")
     (Core.bool True)
     (Core.bool False))
 
-prog5 :: (Has (Ann Span) sig t, Has Core sig t, Has Intro sig t) => File (t Name)
+prog5 :: (Has (Ann Span) sig t, Has Core sig t) => File (t Name)
 prog5 = fromBody $ ann (do'
   [ Just (named' "mkPoint") :<- lams [named' "_x", named' "_y"] (ann (Core.record
     [ ("x", ann (pure "_x"))
@@ -148,7 +146,7 @@ prog5 = fromBody $ ann (do'
   , Nothing :<- ann (ann (pure "point") Core.... "y") .= ann (ann (pure "point") Core.... "x")
   ])
 
-prog6 :: (Has Core sig t, Has Intro sig t) => [File (t Name)]
+prog6 :: Has Core sig t => [File (t Name)]
 prog6 =
   [ (fromBody (Core.record
     [ ("dep", Core.record [ ("var", Core.bool True) ]) ]))
@@ -160,7 +158,7 @@ prog6 =
     { filePath = Path.absRel "main" }
   ]
 
-ruby :: (Has (Ann Span) sig t, Has Core sig t, Has Intro sig t) => File (t Name)
+ruby :: (Has (Ann Span) sig t, Has Core sig t) => File (t Name)
 ruby = fromBody $ annWith callStack (rec (named' __semantic_global) (do' statements))
   where statements =
           [ Just "Class" :<- record
