@@ -274,5 +274,3 @@ instance ( Alternative m
       k mempty -- FIXME: return whatever fields we have, when it’s actually a Record
 
     R other -> DomainC (send (handleCoercible other))
-
--- FIXME: we don’t get the chance to unify anything because concretization asks for an intro form, not an intro form of a specific type
