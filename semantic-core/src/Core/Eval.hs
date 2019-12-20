@@ -66,6 +66,7 @@ eval eval = \case
       addr <- A.alloc @address n
       A.assign addr a'
       A.bind n addr ((a' <>) <$> eval (instantiate1 (pure addr) b))
+    Lam (Named n b) -> A.lam (Named n b)
     f :$ a -> do
       Named n b <- eval f >>= asLam
       a' <- eval a
@@ -76,6 +77,7 @@ eval eval = \case
       c' <- eval c >>= A.asBool @Term @address
       if c' then eval t else eval e
     Load p -> eval p >>= A.asString @Term @address >> A.unit @Term @address -- FIXME: add a load command or something
+    Record fields -> A.record fields
     a :. b -> do
       a' <- eval a >>= asRecord @Term @address
       maybe (freeVariable (show b)) eval (lookup b a')
@@ -88,11 +90,9 @@ eval eval = \case
       addr <- ref a
       b' <$ A.assign addr b'
   Term.Alg (R (R c)) -> case c of
-    Unit            -> A.unit @Term @address
-    Bool b          -> A.bool @Term @address b
-    String s        -> A.string @Term @address s
-    Lam (Named n b) -> A.lam (Named n b)
-    Record fields   -> A.record fields
+    Unit     -> A.unit @Term @address
+    Bool b   -> A.bool @Term @address b
+    String s -> A.string @Term @address s
   Term.Alg (L (Ann span c)) -> local (const span) (eval c)
   where freeVariable s = fail ("free variable: " <> s)
         uninitialized s = fail ("uninitialized variable: " <> s)
@@ -124,7 +124,7 @@ prog1 = fromBody $ Core.lam (named' "foo")
 prog2 :: (Has Core sig t, Has Intro sig t) => File (t Name)
 prog2 = fromBody $ fileBody prog1 $$ Core.bool True
 
-prog3 :: (Has Core sig t, Has Intro sig t) => File (t Name)
+prog3 :: Has Core sig t => File (t Name)
 prog3 = fromBody $ lams [named' "foo", named' "bar", named' "quux"]
   (Core.if' (pure "quux")
     (pure "bar")

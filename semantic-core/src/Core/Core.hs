@@ -23,16 +23,23 @@ module Core.Core
 , do'
 , unstatements
 , (:<-)(..)
+, lam
+, lams
+, unlam
 , ($$)
 , ($$*)
 , unapply
 , unapplies
 , if'
 , load
+, record
 , (...)
 , (.?)
 , (.=)
-, module Analysis.Intro
+, Intro(..)
+, unit
+, bool
+, string
 , Ann(..)
 , ann
 , annAt
@@ -41,7 +48,6 @@ module Core.Core
 , stripAnnotations
 ) where
 
-import Analysis.Intro
 import Control.Algebra
 import Control.Applicative (Alternative (..))
 import Core.Name
@@ -49,6 +55,7 @@ import Data.Bifunctor (Bifunctor (..))
 import Data.Foldable (foldl')
 import Data.List.NonEmpty (NonEmpty (..))
 import Data.Maybe (fromMaybe, listToMaybe)
+import Data.Text (Text)
 import GHC.Generics (Generic1)
 import GHC.Stack
 import Source.Span
@@ -71,11 +78,14 @@ data Core f a
   --
   --   Bindings made with :>>= are sequential, i.e. the name is not bound within the value, only within the consequence.
   | Named (f a) :>>= Scope () f a
+  | Lam (Named (Scope () f a))
   -- | Function application; analogous to '$'.
   | f a :$ f a
   | If (f a) (f a) (f a)
   -- | Load the specified file (by path).
   | Load (f a)
+  -- | A record mapping some keys to some values.
+  | Record [(Name, f a)]
   -- | Projection from a record.
   | f a :. Name
   -- | Projection of a record, with failure.
@@ -98,9 +108,11 @@ instance RightModule Core where
   Rec b      >>=* f = Rec ((>>=* f) <$> b)
   (a :>> b)  >>=* f = (a >>= f) :>> (b >>= f)
   (a :>>= b) >>=* f = ((>>= f) <$> a) :>>= (b >>=* f)
+  Lam b      >>=* f = Lam ((>>=* f) <$> b)
   (a :$ b)   >>=* f = (a >>= f) :$ (b >>= f)
   If c t e   >>=* f = If (c >>= f) (t >>= f) (e >>= f)
   Load b     >>=* f = Load (b >>= f)
+  Record fs  >>=* f = Record (map (fmap (>>= f)) fs)
   (a :. b)   >>=* f = (a >>= f) :. b
   (a :? b)   >>=* f = (a >>= f) :. b
   (a := b)   >>=* f = (a >>= f) := (b >>= f)
@@ -161,6 +173,17 @@ instance Bifunctor (:<-) where
   bimap f g (a :<- b) = f a :<- g b
 
 
+lam :: (Eq a, Has Core sig m) => Named a -> m a -> m a
+lam (Named u n) b = send (Lam (Named u (abstract1 n b)))
+
+lams :: (Eq a, Foldable t, Has Core sig m) => t (Named a) -> m a -> m a
+lams names body = foldr lam body names
+
+unlam :: (Alternative m, Project Core sig, RightModule sig) => a -> Term sig a -> m (Named a, Term sig a)
+unlam n = \case
+  Alg sig | Just (Lam b) <- prj sig -> pure (n <$ b, instantiate1 (pure n) (namedValue b))
+  _                                 -> empty
+
 ($$) :: Has Core sig m => m a -> m a -> m a
 f $$ a = send (f :$ a)
 
@@ -188,6 +211,9 @@ if' c t e = send (If c t e)
 load :: Has Core sig m => m a -> m a
 load = send . Load
 
+record :: Has Core sig m => [(Name, m a)] -> m a
+record fs = send (Record fs)
+
 (...) :: Has Core sig m => m a -> Name -> m a
 a ... b = send (a :. b)
 
@@ -202,6 +228,32 @@ infixl 9 .?
 a .= b = send (a := b)
 
 infix 3 .=
+
+
+data Intro (f :: * -> *) a
+  = Unit
+  | Bool Bool
+  | String Text
+  deriving (Eq, Foldable, Functor, Generic1, Ord, Show, Traversable)
+
+instance HFunctor Intro
+instance HFoldable Intro
+instance HTraversable Intro
+
+instance RightModule Intro where
+  Unit     >>=* _ = Unit
+  Bool b   >>=* _ = Bool b
+  String s >>=* _ = String s
+
+
+unit :: Has Intro sig m => m a
+unit = send Unit
+
+bool :: Has Intro sig m => Bool -> m a
+bool = send . Bool
+
+string :: Has Intro sig m => Text -> m a
+string = send . String
 
 
 data Ann ann f a
