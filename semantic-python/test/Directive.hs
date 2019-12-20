@@ -58,7 +58,7 @@ projects.
 -}
 data Directive = JQ ByteString -- | @# CHECK-JQ: expr@
                | Tree (Term Core Name) -- | @# CHECK-TREE: core@
-               | Result Text (Concrete (Term (Core.Ann Source.Span :+: Core)) Name) -- | @# CHECK-RESULT key: expected
+               | Result Text (Concrete (Term (Core.Ann Source.Span :+: Core))) -- | @# CHECK-RESULT key: expected
                | Fails -- | @# CHECK-FAILS@ fails unless translation fails.
                  deriving (Eq, Show)
 
@@ -104,7 +104,7 @@ result = do
   void $ Trifecta.symbolic ':'
   Result key <$> concrete
 
-concrete :: TokenParsing m => m (Concrete term Name)
+concrete :: TokenParsing m => m (Concrete term)
 concrete = Trifecta.choice
   [ String <$> Trifecta.stringLiteral
   , Bool True <$ Trifecta.symbol "#true"
