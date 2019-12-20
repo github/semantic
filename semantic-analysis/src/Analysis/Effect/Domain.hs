@@ -49,7 +49,7 @@ asBool v = send (AsBool v pure)
 
 data BoolDomain value m k
   = Bool   Bool  (value -> m k)
-  | AsBool value (Bool     -> m k)
+  | AsBool value (Bool  -> m k)
   deriving (Functor, Generic1)
 
 instance HFunctor (BoolDomain value)
@@ -64,7 +64,7 @@ asString v = send (AsString v pure)
 
 data StringDomain value m k
   = String   Text  (value -> m k)
-  | AsString value (Text     -> m k)
+  | AsString value (Text  -> m k)
   deriving (Functor, Generic1)
 
 instance HFunctor (StringDomain value)
@@ -79,8 +79,8 @@ asLam :: Has (FunctionDomain term addr value) sig m => value -> m (Named (Scope 
 asLam v = send (AsLam v pure)
 
 data FunctionDomain term addr value m k
-  = Lam   (Named (Scope () term addr)) (value -> m k)
-  | AsLam value                        (Named (Scope () term addr)     -> m k)
+  = Lam   (Named (Scope () term addr)) (value                      -> m k)
+  | AsLam value                        (Named (Scope () term addr) -> m k)
   deriving (Functor, Generic1)
 
 instance HFunctor (FunctionDomain term addr value)
@@ -95,8 +95,8 @@ asRecord :: Has (RecordDomain term addr value) sig m => value -> m [(Name, term 
 asRecord v = send (AsRecord v pure)
 
 data RecordDomain term addr value m k
-  = Record   [(Name, term addr)] (value -> m k)
-  | AsRecord value               ([(Name, term addr)]     -> m k)
+  = Record   [(Name, term addr)] (value               -> m k)
+  | AsRecord value               ([(Name, term addr)] -> m k)
   deriving (Functor, Generic1)
 
 instance HFunctor (RecordDomain term addr value)
