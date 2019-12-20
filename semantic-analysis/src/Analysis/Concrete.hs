@@ -35,7 +35,7 @@ import           Control.Algebra
 import           Control.Carrier.Fail.WithLoc
 import           Control.Carrier.Fresh.Strict
 import           Control.Carrier.Reader hiding (Local)
-import           Control.Monad.Trans.Class (MonadTrans(..))
+import           Control.Monad.Trans.Class (MonadTrans (..))
 import           Data.Function (fix)
 import qualified Data.IntMap as IntMap
 import qualified Data.Map as Map
