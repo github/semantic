@@ -141,17 +141,17 @@ instance ( Applicative term
           pure (name, addr)
         k (Record (Map.fromList fields'))
     L (AsBool   c k) -> case c of
-      Bool   b       -> k b
-      _              -> fail "expected Bool"
+      Bool   b -> k b
+      _        -> fail "expected Bool"
     L (AsString c k) -> case c of
-      String s       -> k s
-      _              -> fail "expected String"
+      String s -> k s
+      _        -> fail "expected String"
     L (AsLam    c k) -> case c of
-      Closure _ _ b  -> k b
-      _              -> fail "expected Closure"
+      Closure _ _ b -> k b
+      _             -> fail "expected Closure"
     L (AsRecord c k) -> case c of
-      Record fields  -> k (map (fmap pure) (Map.toList fields))
-      _              -> fail "expected Record"
+      Record fields -> k (map (fmap pure) (Map.toList fields))
+      _             -> fail "expected Record"
     R other -> DomainC (send (handleCoercible other))
 
 
