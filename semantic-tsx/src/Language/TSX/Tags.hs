@@ -7,6 +7,7 @@ module Language.TSX.Tags
 import           AST.Element
 import           Control.Effect.Reader
 import           Control.Effect.Writer
+import           Data.Foldable
 import           Data.Monoid (Ap (..))
 import           Data.Text as Text
 import           GHC.Generics
@@ -41,15 +42,13 @@ data Strategy = Generic | Custom
 
 type family ToTagsInstance t :: Strategy where
   ToTagsInstance (_ :+: _)              = 'Custom
-  ToTagsInstance Tsx.Function            = 'Custom
-  ToTagsInstance Tsx.FunctionSignature   = 'Custom
-  ToTagsInstance Tsx.FunctionDeclaration = 'Custom
-  ToTagsInstance Tsx.MethodDefinition    = 'Custom
-  ToTagsInstance Tsx.ClassDeclaration    = 'Custom
   ToTagsInstance Tsx.CallExpression      = 'Custom
-
   ToTagsInstance Tsx.Class               = 'Custom
-
+  ToTagsInstance Tsx.ClassDeclaration    = 'Custom
+  ToTagsInstance Tsx.Function            = 'Custom
+  ToTagsInstance Tsx.FunctionDeclaration = 'Custom
+  ToTagsInstance Tsx.FunctionSignature   = 'Custom
+  ToTagsInstance Tsx.MethodDefinition    = 'Custom
   ToTagsInstance _                      = 'Generic
 
 instance ToTagsBy 'Custom Tsx.Function where
@@ -97,9 +96,12 @@ instance ToTagsBy 'Custom Tsx.CallExpression where
       match expr = case expr of
         Prj Tsx.Identifier { text } -> yield text
         Prj Tsx.NewExpression { constructor = Prj Tsx.Identifier { text } } -> yield text
-        -- Prj Tsx.MemberExpression { property = Tsx.PropertyIdentifier { text }, object = (Tsx.Expression expr) } -> yieldTag text Call loc byteRange >> match expr
         Prj Tsx.CallExpression { function = Tsx.Expression expr } -> match expr
         Prj Tsx.MemberExpression { property = Tsx.PropertyIdentifier { text } } -> yield text
+        Prj Tsx.Function { name = Just Tsx.Identifier { text }} -> yield text
+        Prj Tsx.ParenthesizedExpression { extraChildren } -> for_ extraChildren $ \ x -> case x of
+          Prj (Tsx.Expression expr) -> match expr
+          _ -> tags x
         _ -> gtags t
       yield name = yieldTag name Call loc byteRange >> gtags t
 

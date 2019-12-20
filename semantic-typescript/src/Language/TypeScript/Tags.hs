@@ -7,6 +7,7 @@ module Language.TypeScript.Tags
 import           AST.Element
 import           Control.Effect.Reader
 import           Control.Effect.Writer
+import           Data.Foldable
 import           Data.Monoid (Ap (..))
 import           Data.Text as Text
 import           GHC.Generics
@@ -41,12 +42,12 @@ data Strategy = Generic | Custom
 
 type family ToTagsInstance t :: Strategy where
   ToTagsInstance (_ :+: _)              = 'Custom
-  ToTagsInstance Ts.Function            = 'Custom
-  ToTagsInstance Ts.FunctionSignature   = 'Custom
-  ToTagsInstance Ts.FunctionDeclaration = 'Custom
-  ToTagsInstance Ts.MethodDefinition    = 'Custom
-  ToTagsInstance Ts.ClassDeclaration    = 'Custom
   ToTagsInstance Ts.CallExpression      = 'Custom
+  ToTagsInstance Ts.ClassDeclaration    = 'Custom
+  ToTagsInstance Ts.Function            = 'Custom
+  ToTagsInstance Ts.FunctionDeclaration = 'Custom
+  ToTagsInstance Ts.FunctionSignature   = 'Custom
+  ToTagsInstance Ts.MethodDefinition    = 'Custom
   ToTagsInstance _                      = 'Generic
 
 instance ToTagsBy 'Custom Ts.Function where
@@ -94,9 +95,12 @@ instance ToTagsBy 'Custom Ts.CallExpression where
       match expr = case expr of
         Prj Ts.Identifier { text } -> yield text
         Prj Ts.NewExpression { constructor = Prj Ts.Identifier { text } } -> yield text
-        -- Prj Ts.MemberExpression { property = Ts.PropertyIdentifier { text }, object = (Ts.Expression expr) } -> yieldTag text Call loc byteRange >> match expr
         Prj Ts.CallExpression { function = Ts.Expression expr } -> match expr
         Prj Ts.MemberExpression { property = Ts.PropertyIdentifier { text } } -> yield text
+        Prj Ts.Function { name = Just Ts.Identifier { text }} -> yield text
+        Prj Ts.ParenthesizedExpression { extraChildren } -> for_ extraChildren $ \ x -> case x of
+          Prj (Ts.Expression expr) -> match expr
+          _ -> tags x
         _ -> gtags t
       yield name = yieldTag name Call loc byteRange >> gtags t
 
