@@ -46,8 +46,8 @@ examples =
   [ le "go" "**/*.go" goFileSkips goDirSkips
   , le "python" "**/*.py" mempty mempty
   , le "ruby" "**/*.rb" rubySkips mempty
-  -- , le "typescript" "**/*.[jt]s*" mempty mempty
-  -- , le "typescript" "**/*.tsx" mempty mempty
+  , le "typescript" "**/*.[jt]s" typescriptSkips mempty
+  , le "typescript" "**/*.[jt]sx" tsxSkips mempty
   ]
 
 goFileSkips :: [Path.RelFile]
@@ -103,10 +103,43 @@ rubySkips = Path.relFile <$>
   , "ruby_spec/core/enumerable/shared/inject.rb"
   -- Doesn't parse
   , "ruby_spec/language/string_spec.rb"
+  , "ruby_spec/language/fixtures/freeze_magic_comment_required_diff_enc.rb"
 
   -- Can't detect method calls inside heredoc bodies with precise ASTs
   , "ruby_spec/core/argf/readpartial_spec.rb"
   , "ruby_spec/core/process/exec_spec.rb"
+  ]
+
+tsxSkips :: [Path.RelFile]
+tsxSkips = Path.relFile <$>
+  [
+  -- Cannot decode byte '\xe2': Data.Text.Internal.Encoding.decodeUtf8: Invalid UTF-8 stream
+    "desktop/app/src/ui/clone-repository/clone-github-repository.tsx"
+  , "desktop/app/src/ui/toolbar/revert-progress.tsx"
+  ]
+
+typescriptSkips :: [Path.RelFile]
+typescriptSkips = Path.relFile <$>
+  [
+  -- Assignment timeouts
+    "npm/node_modules/request/node_modules/http-signature/node_modules/sshpk/node_modules/tweetnacl/nacl-fast.js"
+  , "npm/node_modules/cli-table2/test/cell-test.js"
+  , "npm/node_modules/request/node_modules/har-validator/node_modules/ajv/dist/regenerator.min.js"
+  , "npm/node_modules/request/node_modules/har-validator/node_modules/ajv/dist/ajv.bundle.js"
+  , "npm/node_modules/request/node_modules/har-validator/node_modules/ajv/dist/ajv.min.js"
+  , "npm/node_modules/request/node_modules/har-validator/node_modules/ajv/dist/nodent.min.js"
+  , "npm/node_modules/bluebird/js/browser/bluebird.js"
+  , "npm/node_modules/bluebird/js/browser/bluebird.min.js"
+  , "npm/node_modules/bluebird/js/browser/bluebird.core.js"
+  , "npm/node_modules/cli-table2/node_modules/lodash/index.js"
+  , "npm/node_modules/cli-table2/node_modules/lodash/index.js"
+
+  -- Cannot decode byte '\xd0': Data.Text.Internal.Encoding.decodeUtf8: Invalid UTF-8 stream
+  , "npm/node_modules/npm-profile/node_modules/make-fetch-happen/node_modules/socks-proxy-agent/node_modules/socks/node_modules/smart-buffer/test/smart-buffer.test.js"
+  , "npm/node_modules/pacote/node_modules/make-fetch-happen/node_modules/socks-proxy-agent/node_modules/socks/node_modules/smart-buffer/test/smart-buffer.test.js"
+  , "npm/node_modules/archy/test/multi_line.js"
+  , "npm/node_modules/archy/test/beep.js"
+  , "npm/node_modules/cli-table2/test/cell-test.js"
   ]
 
 buildExamples :: TaskSession -> LanguageExample -> Path.RelDir -> IO Tasty.TestTree
@@ -194,6 +227,10 @@ aLaCarteLanguageModes = PerLanguageModes
   { pythonMode = ALaCarte
   , rubyMode = ALaCarte
   , goMode = ALaCarte
+  , typescriptMode = ALaCarte
+  , tsxMode = ALaCarte
+  , javascriptMode = ALaCarte
+  , jsxMode = ALaCarte
   }
 
 preciseLanguageModes :: PerLanguageModes
@@ -201,6 +238,10 @@ preciseLanguageModes = PerLanguageModes
   { pythonMode = Precise
   , rubyMode = Precise
   , goMode = Precise
+  , typescriptMode = Precise
+  , tsxMode = Precise
+  , javascriptMode = Precise
+  , jsxMode = Precise
   }
 
 testOptions :: Config.Options
