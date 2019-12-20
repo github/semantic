@@ -8,11 +8,11 @@ import           Analysis.Carrier.Env.Monovariant
 import qualified Analysis.Carrier.Heap.Monovariant as A
 import qualified Analysis.Effect.Domain as A
 import           Analysis.File
-import qualified Analysis.Intro as I
 import           Analysis.FlowInsensitive
+import qualified Analysis.Intro as I
 import           Analysis.Name
 import           Control.Algebra
-import           Control.Applicative (Alternative(..))
+import           Control.Applicative (Alternative (..))
 import           Control.Carrier.Fail.WithLoc
 import           Control.Carrier.Fresh.Strict
 import           Control.Carrier.Reader
