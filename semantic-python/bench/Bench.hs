@@ -11,11 +11,13 @@ import qualified Core.Eval as Eval
 import           Core.Name
 import qualified Core.Parser
 import qualified Data.ByteString as ByteString
+import qualified Data.Text.Prettyprint.Doc.Render.Terminal as Pretty
 import           Gauge
 import           Source.Span
 import           Syntax.Scope
 import           Syntax.Term
 import           Syntax.Var
+import           System.Exit (exitFailure)
 import qualified System.Path as Path
 import qualified Text.Trifecta as Trifecta
 
@@ -43,10 +45,8 @@ count = \case
 parsePrelude :: IO (Term (Ann Span :+: Core) Name)
 parsePrelude = do
   preludesrc <- ByteString.readFile "semantic-python/src/Prelude.score"
-  let ePrelude = Trifecta.parseByteString (Core.Parser.core <* Trifecta.eof) mempty preludesrc
-  case Trifecta.foldResult (Left . show) Right ePrelude of
-    Right r -> pure r
-    Left s  -> fail ("Couldn't parse prelude: " <> s)
+  let ePrelude = Trifecta.parseByteString (Trifecta.spaces *> Core.Parser.core <* Trifecta.eof) mempty preludesrc
+  Trifecta.foldResult (\a -> Pretty.putDoc (Trifecta._errDoc a) *> exitFailure) pure ePrelude
 
 graphPrelude :: Term (Ann Span :+: Core) Name -> (Heap Name (ScopeGraph Name), [File (Either (Path.AbsRelFile, Span, String) (ScopeGraph Name))])
 graphPrelude t = scopeGraph Eval.eval [File (Path.absRel "<interactive>") (Span (Pos 1 1) (Pos 1 1)) t]

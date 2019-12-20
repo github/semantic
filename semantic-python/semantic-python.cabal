@@ -93,3 +93,4 @@ benchmark prelude
   main-is:             Bench.hs
   ghc-options:         -static
   build-depends:       gauge ^>= 0.2.5
+                     , prettyprinter-ansi-terminal ^>= 1.1.1
