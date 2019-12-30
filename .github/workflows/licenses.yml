@@ -1,0 +1,4 @@
+name: Licensed CI
+uses: jonabc/licensed-ci@v1.3.1
+
+on: ['pull_request']

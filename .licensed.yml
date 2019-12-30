@@ -1,0 +1,22 @@
+allowed:
+  - apache-2.0
+  - bsd-2-clause
+  - bsd-3-clause
+  - isc
+  - mit
+  - cc0-1.0
+  - unlicense
+
+ignored:
+  cabal:
+    - semantic*
+
+cabal:
+  ghc_package_db:
+    - "~/.cabal/store/ghc-8.8.1/package.db"
+    - dist-newstyle/packagedb/ghc-8.8.1
+    - global
+  cabal_file_targets:
+    - common
+    - library
+    - executable
