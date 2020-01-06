@@ -58,7 +58,7 @@ assertEvaluatesTo :: Term (Ann Span :+: Core) Name -> Text -> Concrete (Term (An
 assertEvaluatesTo core k val = do
   prelude <- parsePrelude
   let withPrelude = (named' "__semantic_prelude" :<- prelude) >>>= core
-  allTogether <- maybe (HUnit.assertFailure ("Can’t evaluate open term: " <> showCore (stripAnnotations withPrelude))) pure (closed withPrelude)
+  allTogether <- maybeM (HUnit.assertFailure ("Can’t evaluate open term: " <> showCore (stripAnnotations withPrelude))) (closed withPrelude)
   let filius = [File (Path.absRel "<interactive>") (Span (Pos 1 1) (Pos 1 1)) allTogether]
 
   (heap, env) <- case Concrete.concrete Eval.eval filius of
