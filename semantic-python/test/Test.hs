@@ -71,6 +71,7 @@ assertEvaluatesTo core k val = do
 
   let found = Map.lookup (Name k) env >>= flip IntMap.lookup heap
   found HUnit.@?= Just val
+{-# HLINT ignore assertEvaluatesTo #-}
 
 -- handles CHECK-TREE directives
 assertTreeEqual :: Term Core Name -> Term Core Name -> HUnit.Assertion
