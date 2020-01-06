@@ -11,7 +11,7 @@ on: [push]
 jobs:
   build:
     name: ghc ${{ matrix.ghc }}
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         ghc: ["8.8.1"]
@@ -50,6 +50,14 @@ jobs:
         cabal v2-configure --disable-optimization --enable-benchmarks --enable-tests --write-ghc-environment-files=always -j2
         cabal v2-build --only-dependencies
 
+    - uses: jonabc/setup-licensed@v1
+      with:
+        version: 2.x
+    - uses: jonabc/licensed-ci@v1
+      name: Open source license check
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+
     - name: hlint
       run: |
         cabal install hlint --installdir=dist-newstyle
@@ -63,11 +71,3 @@ jobs:
         cabal v2-run semantic-python:test
         cd semantic-source; cabal v2-run semantic-source:test; cd ..
         cd semantic-source; cabal v2-run semantic-source:doctest -- src; cd ..
-
-    - uses: jonabc/setup-licensed@v1
-      with:
-        version: 2.x
-    - uses: jonabc/licensed-ci@v1
-      name: Open source license check
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
