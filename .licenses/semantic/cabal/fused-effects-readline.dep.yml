@@ -1,9 +1,0 @@
----
-name: fused-effects-readline
-version: 0.0.0.0
-type: cabal
-summary: A readline-like effect and carrier for fused-effects
-homepage: https://github.com/fused-effects/fused-effects-readline
-license: none
-licenses: []
-notices: []
