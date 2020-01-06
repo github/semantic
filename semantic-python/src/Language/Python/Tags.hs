@@ -77,25 +77,25 @@ keywordFunctionCall t loc range name = do
   gtags t
 
 instance ToTagsBy 'Custom Py.AssertStatement where
-  tags' t@Py.AssertStatement { ann = loc@Loc { byteRange = range } } = keywordFunctionCall t loc range "assert"
+  tags' t@Py.AssertStatement { ann = loc@Loc { byteRange } } = keywordFunctionCall t loc byteRange "assert"
 
 instance ToTagsBy 'Custom Py.Await where
-  tags' t@Py.Await { ann = loc@Loc { byteRange = range } } = keywordFunctionCall t loc range "await"
+  tags' t@Py.Await { ann = loc@Loc { byteRange } } = keywordFunctionCall t loc byteRange "await"
 
 instance ToTagsBy 'Custom Py.DeleteStatement where
-  tags' t@Py.DeleteStatement { ann = loc@Loc { byteRange = range } } = keywordFunctionCall t loc range "del"
+  tags' t@Py.DeleteStatement { ann = loc@Loc { byteRange } } = keywordFunctionCall t loc byteRange "del"
 
 instance ToTagsBy 'Custom Py.ExecStatement where
-  tags' t@Py.ExecStatement { ann = loc@Loc { byteRange = range } } = keywordFunctionCall t loc range "exec"
+  tags' t@Py.ExecStatement { ann = loc@Loc { byteRange } } = keywordFunctionCall t loc byteRange "exec"
 
 instance ToTagsBy 'Custom Py.GlobalStatement where
-  tags' t@Py.GlobalStatement { ann = loc@Loc { byteRange = range } } = keywordFunctionCall t loc range "global"
+  tags' t@Py.GlobalStatement { ann = loc@Loc { byteRange } } = keywordFunctionCall t loc byteRange "global"
 
 instance ToTagsBy 'Custom Py.NonlocalStatement where
-  tags' t@Py.NonlocalStatement { ann = loc@Loc { byteRange = range } } = keywordFunctionCall t loc range "nonlocal"
+  tags' t@Py.NonlocalStatement { ann = loc@Loc { byteRange } } = keywordFunctionCall t loc byteRange "nonlocal"
 
 instance ToTagsBy 'Custom Py.PrintStatement where
-  tags' t@Py.PrintStatement { ann = loc@Loc { byteRange = range } } = keywordFunctionCall t loc range "print"
+  tags' t@Py.PrintStatement { ann = loc@Loc { byteRange } } = keywordFunctionCall t loc byteRange "print"
 
 instance ToTagsBy 'Custom Py.FunctionDefinition where
   tags' t@Py.FunctionDefinition
