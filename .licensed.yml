@@ -1,15 +1,98 @@
+sources:
+  cabal: true
+
 allowed:
   - apache-2.0
   - bsd-2-clause
   - bsd-3-clause
+  - cc0-1.0
   - isc
   - mit
-  - cc0-1.0
   - unlicense
 
 ignored:
   cabal:
-    - semantic*
+    - rts
+    # Packages we own
+    - semantic-*
+    - tree-sitter-*
+    - z-tree-sitter-*
+    - fused-syntax
+    - proto-lens-jsonpb
+    - tree-sitter
+
+reviewed:
+  cabal:
+    # Multiple
+    - cmark-gfm
+    # BSD 2/3-clause reviewed
+    - adjunctions
+    - aeson
+    - ansi-terminal
+    - ansi-wl-pprint
+    - array
+    - attoparsec
+    - base
+    - base64-bytestring
+    - binary
+    - bifunctors
+    - blaze-builder
+    - blaze-html
+    - blaze-markup
+    - bytestring
+    - comonad
+    - containers
+    - contravariant
+    - deepseq
+    - directory
+    - directory-tree
+    - distributive
+    - exceptions
+    - fastsum
+    - fingertree
+    - free
+    - ghc-boot-th
+    - ghc-prim
+    - haskeline
+    - kan-extensions
+    - lens
+    - lens-family
+    - lens-family-core
+    - libyaml
+    - mersenne-random-pure64
+    - mtl
+    - network
+    - network-uri
+    - parallel
+    - parsec
+    - parsers
+    - pathtype
+    - pretty
+    - primitive
+    - process
+    - profunctors
+    - QuickCheck
+    - random
+    - recursion-schemes
+    - reducers
+    - semigroupoids
+    - semigroups
+    - split
+    - stm
+    - stm-chans
+    - template-haskell
+    - time
+    - transformers
+    - transformers-compat
+    - trifecta
+    - unix
+    - utf8-string
+    - utility-ht
+    - uuid-types
+    - vector
+    - vector-algorithms
+    - void
+    - yaml
 
 cabal:
   ghc_package_db:
@@ -17,6 +100,10 @@ cabal:
     - dist-newstyle/packagedb/ghc-8.8.1
     - global
   cabal_file_targets:
-    - common
     - library
     - executable
+
+apps:
+  - source_path: .
+    name: semantic
+  # - source_path: semantic-tags
