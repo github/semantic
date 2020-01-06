@@ -1,6 +1,6 @@
 ---
 name: exceptions
-version: 0.10.3
+version: 0.10.4
 type: cabal
 summary: Extensible optionally-pure exceptions
 homepage: https://github.com/ekmett/exceptions/

@@ -1,9 +1,9 @@
 ---
 name: base-compat
-version: 0.11.0
+version: 0.10.5
 type: cabal
 summary: A compatibility layer for base
-homepage: 
+homepage:
 license: mit
 licenses:
 - sources: doc/LICENSE

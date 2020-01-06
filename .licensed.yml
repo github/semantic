@@ -19,6 +19,7 @@ ignored:
     - fused-effects-readline
     - fused-syntax
     - proto-lens-jsonpb
+    - semantic
     - semantic-*
     - tree-sitter
     - tree-sitter-*
