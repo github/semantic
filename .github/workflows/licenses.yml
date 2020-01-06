@@ -1,6 +1,6 @@
 name: Licensed CI
 
-on: ['pull_request']
+on: [push]
 
 jobs:
   check:
