@@ -48,7 +48,7 @@ jobs:
       run: |
         cabal v2-update
         cabal v2-configure --disable-optimization --enable-benchmarks --enable-tests --write-ghc-environment-files=always -j2
-        cabal v2-build --only-dependencies
+        cabal v2-build all --only-dependencies
 
     - uses: jonabc/setup-licensed@v1
       with:
