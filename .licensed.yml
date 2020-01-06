@@ -123,6 +123,5 @@ apps:
   - source_path: semantic-java
   - source_path: semantic-json
   - source_path: semantic-python
-  - source_path: semantic-ruby
   - source_path: semantic-source
   - source_path: semantic-tags
