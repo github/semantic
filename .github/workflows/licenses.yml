@@ -4,7 +4,13 @@ on: ['pull_request']
 
 jobs:
   check:
+    name: open source license check
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v1
+    - uses: jonabc/setup-licensed@v1
+      with:
+        version: 2.x
     - uses: jonabc/licensed-ci@v1.3.1
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
