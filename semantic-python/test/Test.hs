@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings, ScopedTypeVariables, TypeApplications, TypeOperators #-}
-
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 module Main (main) where
 
 import           Analysis.Concrete (Concrete)
