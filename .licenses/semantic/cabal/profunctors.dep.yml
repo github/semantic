@@ -1,6 +1,6 @@
 ---
 name: profunctors
-version: 5.5.1
+version: '5.3'
 type: cabal
 summary: Profunctors
 homepage: https://github.com/ekmett/profunctors/

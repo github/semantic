@@ -1,6 +1,6 @@
 ---
 name: mono-traversable
-version: 1.0.13.0
+version: 1.0.15.1
 type: cabal
 summary: Type classes for mapping, folding, and traversing monomorphic containers
 homepage: https://github.com/snoyberg/mono-traversable

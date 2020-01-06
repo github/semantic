@@ -1,6 +1,6 @@
 ---
 name: prettyprinter
-version: 1.3.0
+version: 1.5.1
 type: cabal
 summary: A modern, easy to use, well-documented, extensible pretty-printer.
 homepage: https://github.com/quchen/prettyprinter
