@@ -65,13 +65,10 @@ jobs:
         cd semantic-source; cabal v2-run semantic-source:test; cd ..
         cd semantic-source; cabal v2-run semantic-source:doctest -- src; cd ..
 
-    - name: Open source license check
-      runs-on: ubuntu-latest
-      steps:
-      - uses: actions/checkout@v1
-      - uses: jonabc/setup-licensed@v1
-        with:
-          version: 2.x
-      - uses: jonabc/licensed-ci@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+    - uses: jonabc/setup-licensed@v1
+      with:
+        version: 2.x
+    - uses: jonabc/licensed-ci@v1
+      name: Open source license check
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
