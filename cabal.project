@@ -2,10 +2,13 @@ packages: .
           semantic-analysis
           semantic-ast
           semantic-core
+          semantic-go
           semantic-java
           semantic-json
           semantic-python
           semantic-ruby
+          semantic-tsx
+          semantic-typescript
           semantic-tags
 
 jobs: $ncpus
@@ -19,6 +22,9 @@ package semantic-analysis
 package semantic-core
   ghc-options: -Werror
 
+package semantic-go
+  ghc-options: -Werror
+
 package semantic-java
   ghc-options: -Werror
 
@@ -26,6 +32,9 @@ package semantic-json
   ghc-options: -Werror
 
 package semantic-python
+  ghc-options: -Werror
+
+package semantic-ruby
   ghc-options: -Werror
 
 package semantic-tags

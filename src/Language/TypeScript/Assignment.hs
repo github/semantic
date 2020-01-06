@@ -103,7 +103,7 @@ augmentedAssignmentExpression = makeTerm' <$> symbol AugmentedAssignmentExpressi
   , assign Expression.LShift <$ symbol AnonLAngleLAngleEqual
   , assign Expression.BOr <$ symbol AnonPipeEqual ])
   where assign :: (f :< TypeScript.Syntax) => (Term Loc -> Term Loc -> f (Term Loc)) -> Term Loc -> Term Loc -> Sum TypeScript.Syntax (Term Loc)
-        assign c l r = inject (Statement.Assignment [] l (makeTerm1 (c l r)))
+        assign c l r = inject (Statement.AugmentedAssignment (makeTerm1 (c l r)))
 
 
 awaitExpression :: Assignment (Term Loc)

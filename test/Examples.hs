@@ -1,25 +1,19 @@
 {-# LANGUAGE FlexibleContexts, RecordWildCards, OverloadedStrings, TypeApplications #-}
 {-# OPTIONS_GHC -O1 #-}
-module Main (main, knownFailuresForPath) where
+module Main (main) where
 
 import           Control.Carrier.Parse.Measured
 import           Control.Carrier.Reader
 import           Control.Concurrent.Async (forConcurrently)
 import           Control.Exception (displayException)
-import qualified Control.Foldl as Foldl
 import           Control.Lens
 import           Control.Monad
-import           Control.Monad.Trans.Resource (ResIO, runResourceT)
 import           Data.Blob
-import qualified Data.ByteString.Lazy.Char8 as BLC
-import qualified Data.ByteString.Streaming.Char8 as ByteStream
 import           Data.Foldable
 import           Data.Language (LanguageMode (..), PerLanguageModes (..))
 import           Data.List
 import qualified Data.Text as Text
-import           Data.Set (Set)
 import           Data.Traversable
-import qualified Streaming.Prelude as Stream
 import           System.FilePath.Glob
 import           System.Path ((</>))
 import qualified System.Path as Path
@@ -35,35 +29,66 @@ import Semantic.Config as Config
 import Semantic.Task
 import Semantic.Task.Files
 
-data LanguageExample
-  = LanguageExample
-  { languageName      :: String
-  , languageExtension :: String
-  , languageSkips     :: [Path.RelFile]
-  } deriving (Eq, Show)
+data LanguageExample =
+  LanguageExample
+    { languageName      :: String
+    , languageExtension :: String
+    , languageSkips     :: [Path.RelFile]
+    , languageDirSkips  :: [Path.RelDir]
+    }
+  deriving (Eq, Show)
 
-le :: String -> String -> [Path.RelFile] -> LanguageExample
+le :: String -> String -> [Path.RelFile] -> [Path.RelDir] -> LanguageExample
 le = LanguageExample
 
 examples :: [LanguageExample]
 examples =
-  [ le "python" "**/*.py" mempty
-  , le "ruby" "**/*.rb" rubySkips
-  -- , le "typescript" "**/*.[jt]s*" Nothing -- (Just $ Path.relFile "typescript/script/known_failures.txt")
-  -- , le "typescript" "**/*.tsx" Nothing
-  -- , le "javascript" ".js" examples Nothing -- parse JavaScript with TypeScript parser.
-  -- , le "go" ".go" examples (Just $ Path.relFile "script/known-failures.txt")
+  [ le "go" "**/*.go" goFileSkips goDirSkips
+  , le "python" "**/*.py" mempty mempty
+  , le "ruby" "**/*.rb" rubySkips mempty
+  , le "typescript" "**/*.[jt]s" typescriptSkips mempty
+  , le "typescript" "**/*.[jt]sx" tsxSkips mempty
+  ]
 
-  -- TODO: Java assignment errors need to be investigated
-  -- , le "java" ".java" examples (Just $ Path.relFile "script/known_failures_guava.txt")
+goFileSkips :: [Path.RelFile]
+goFileSkips = Path.relPath <$>
+  [
+  -- Super slow
+    "go/src/vendor/golang_org/x/text/unicode/norm/tables.go"
+  , "go/src/vendor/golang_org/x/text/unicode/bidi/tables.go"
+  , "go/src/vendor/golang_org/x/net/idna/tables.go"
+  , "go/src/cmd/vendor/golang.org/x/arch/x86/x86asm/tables.go"
+  , "moby/vendor/golang.org/x/text/unicode/norm/tables9.0.0.go"
+  , "moby/vendor/golang.org/x/text/unicode/norm/tables10.0.0.go"
 
-  -- TODO: Haskell assignment errors need to be investigated
-  -- , le "haskell" ".hs" "examples/effects" (Just "script/known-failures-effects.txt")
-  -- , le "haskell" ".hs" "examples/postgrest" (Just "script/known-failures-postgrest.txt")
-  -- , le "haskell" ".hs" "examples/ivory" (Just "script/known-failures-ivory.txt")
+  -- Assignment timeouts
+  , "go/src/cmd/compile/internal/gc/constFold_test.go"
+  , "go/src/cmd/compile/internal/gc/testdata/arithConst.go"
+  , "moby/vendor/github.com/docker/swarmkit/api/types.pb.go"
+  , "moby/vendor/github.com/docker/swarmkit/api/control.pb.go"
 
-  -- , ("php", ".php") -- TODO: No parse-examples in tree-sitter yet
-  ]-- where examples = Path.relDir "examples"
+  -- Parser timeouts
+  , "moby/vendor/github.com/ugorji/go/codec/fast-path.generated.go"
+
+  -- Parse errors
+  , "go/src/math/big/arith.go" -- Unhandled identifier character: 'ŝ'
+  , "go/src/cmd/vet/testdata/deadcode.go"
+  , "moby/vendor/github.com/beorn7/perks/quantile/stream.go" -- Unhandled identifier character: 'ƒ'
+
+  -- UTF8 encoding issues ("Cannot decode byte '\xe3': Data.Text.Internal.Encoding.decodeUtf8: Invalid UTF-8 stream")
+  , "go/src/text/template/exec_test.go"
+  , "go/src/bufio/bufio_test.go"
+  , "go/doc/progs/go1.go"
+  ]
+
+goDirSkips :: [Path.RelDir]
+goDirSkips = Path.relDir <$>
+  [ "go/src/cmd/compile/internal/ssa"
+  , "go/test/fixedbugs"
+  , "go/test/syntax"
+  , "go/test/method4.dir"
+  , "go/test"
+  ]
 
 rubySkips :: [Path.RelFile]
 rubySkips = Path.relFile <$>
@@ -78,17 +103,51 @@ rubySkips = Path.relFile <$>
   , "ruby_spec/core/enumerable/shared/inject.rb"
   -- Doesn't parse
   , "ruby_spec/language/string_spec.rb"
+  , "ruby_spec/language/fixtures/freeze_magic_comment_required_diff_enc.rb"
 
   -- Can't detect method calls inside heredoc bodies with precise ASTs
   , "ruby_spec/core/argf/readpartial_spec.rb"
   , "ruby_spec/core/process/exec_spec.rb"
   ]
 
+tsxSkips :: [Path.RelFile]
+tsxSkips = Path.relFile <$>
+  [
+  -- Cannot decode byte '\xe2': Data.Text.Internal.Encoding.decodeUtf8: Invalid UTF-8 stream
+    "desktop/app/src/ui/clone-repository/clone-github-repository.tsx"
+  , "desktop/app/src/ui/toolbar/revert-progress.tsx"
+  ]
+
+typescriptSkips :: [Path.RelFile]
+typescriptSkips = Path.relFile <$>
+  [
+  -- Assignment timeouts
+    "npm/node_modules/request/node_modules/http-signature/node_modules/sshpk/node_modules/tweetnacl/nacl-fast.js"
+  , "npm/node_modules/cli-table2/test/cell-test.js"
+  , "npm/node_modules/request/node_modules/har-validator/node_modules/ajv/dist/regenerator.min.js"
+  , "npm/node_modules/request/node_modules/har-validator/node_modules/ajv/dist/ajv.bundle.js"
+  , "npm/node_modules/request/node_modules/har-validator/node_modules/ajv/dist/ajv.min.js"
+  , "npm/node_modules/request/node_modules/har-validator/node_modules/ajv/dist/nodent.min.js"
+  , "npm/node_modules/bluebird/js/browser/bluebird.js"
+  , "npm/node_modules/bluebird/js/browser/bluebird.min.js"
+  , "npm/node_modules/bluebird/js/browser/bluebird.core.js"
+  , "npm/node_modules/cli-table2/node_modules/lodash/index.js"
+  , "npm/node_modules/cli-table2/node_modules/lodash/index.js"
+
+  -- Cannot decode byte '\xd0': Data.Text.Internal.Encoding.decodeUtf8: Invalid UTF-8 stream
+  , "npm/node_modules/npm-profile/node_modules/make-fetch-happen/node_modules/socks-proxy-agent/node_modules/socks/node_modules/smart-buffer/test/smart-buffer.test.js"
+  , "npm/node_modules/pacote/node_modules/make-fetch-happen/node_modules/socks-proxy-agent/node_modules/socks/node_modules/smart-buffer/test/smart-buffer.test.js"
+  , "npm/node_modules/archy/test/multi_line.js"
+  , "npm/node_modules/archy/test/beep.js"
+  , "npm/node_modules/cli-table2/test/cell-test.js"
+  ]
+
 buildExamples :: TaskSession -> LanguageExample -> Path.RelDir -> IO Tasty.TestTree
 buildExamples session lang tsDir = do
-  let skips = fmap (tsDir </>) (languageSkips lang)
+  let fileSkips = fmap (tsDir </>) (languageSkips lang)
+      dirSkips  = fmap (tsDir </>) (languageDirSkips lang)
   files <- globDir1 (compile (languageExtension lang)) (Path.toString tsDir)
-  let paths = filter (`notElem` skips) $ Path.relFile <$> files
+  let paths = filter (\x -> Path.takeDirectory x `notElem` dirSkips) . filter (`notElem` fileSkips) $ Path.relFile <$> files
   trees <- for paths $ \file -> do
     pure . HUnit.testCaseSteps (Path.toString file) $ \step -> do
       -- Use alacarte language mode
@@ -143,7 +202,6 @@ buildExamples session lang tsDir = do
       (_, Left e)        -> HUnit.assertFailure ("Unable to parse (precise)" <> show (displayException e))
       (Left e, _)        -> HUnit.assertFailure ("Unable to parse (a la carte)" <> show (displayException e))
 
-
 filterALaCarteSymbols :: String -> [Text.Text] -> [Text.Text]
 filterALaCarteSymbols "ruby" symbols
   = filterOutInstanceVariables
@@ -168,12 +226,22 @@ aLaCarteLanguageModes :: PerLanguageModes
 aLaCarteLanguageModes = PerLanguageModes
   { pythonMode = ALaCarte
   , rubyMode = ALaCarte
+  , goMode = ALaCarte
+  , typescriptMode = ALaCarte
+  , tsxMode = ALaCarte
+  , javascriptMode = ALaCarte
+  , jsxMode = ALaCarte
   }
 
 preciseLanguageModes :: PerLanguageModes
 preciseLanguageModes = PerLanguageModes
   { pythonMode = Precise
   , rubyMode = Precise
+  , goMode = Precise
+  , typescriptMode = Precise
+  , tsxMode = Precise
+  , javascriptMode = Precise
+  , jsxMode = Precise
   }
 
 testOptions :: Config.Options
@@ -193,19 +261,6 @@ main = withOptions testOptions $ \ config logger statter -> do
     buildExamples session lang tsDir
 
   Tasty.defaultMain $ Tasty.testGroup "parse-examples" allTests
-
-knownFailuresForPath :: Path.RelDir -> Maybe Path.RelFile -> IO (Set Path.RelFile)
-knownFailuresForPath _ Nothing = pure mempty
-knownFailuresForPath tsDir (Just path)
-  = runResourceT
-  ( ByteStream.readFile @ResIO (Path.toString (tsDir </> path))
-  & ByteStream.lines
-  & ByteStream.denull
-  & Stream.mapped ByteStream.toLazy
-  & Stream.filter ((/= '#') . BLC.head)
-  & Stream.map (Path.relFile . BLC.unpack)
-  & Foldl.purely Stream.fold_ Foldl.set
-  )
 
 parseSymbolsFilePath ::
   ( Has (Error SomeException) sig m

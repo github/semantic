@@ -63,19 +63,13 @@
         (Empty))))
   (Method
     (Statements
-      (Assignment
-        (MemberAccess
-          (Identifier)
-          (Identifier))
+      (AugmentedAssignment
         (Times
           (MemberAccess
             (Identifier)
             (Identifier))
           (Identifier)))
-      (Assignment
-        (MemberAccess
-          (Identifier)
-          (Identifier))
+      (AugmentedAssignment
         (Times
           (MemberAccess
             (Identifier)

@@ -173,7 +173,7 @@ steps:
       #   `{-#LANGUAGE #-}'.
       #
       # Default: vertical.
-      style: compact
+      style: vertical
 
       # Align affects alignment of closing pragma brackets.
       #
