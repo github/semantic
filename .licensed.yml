@@ -7,6 +7,7 @@ allowed:
   - bsd-3-clause
   - cc0-1.0
   - isc
+  - lgpl-2.1
   - mit
   - unlicense
 
@@ -34,8 +35,8 @@ reviewed:
     - attoparsec
     - base
     - base64-bytestring
-    - binary
     - bifunctors
+    - binary
     - blaze-builder
     - blaze-html
     - blaze-markup
