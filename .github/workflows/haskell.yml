@@ -50,13 +50,13 @@ jobs:
         cabal v2-configure --disable-optimization --enable-benchmarks --enable-tests --write-ghc-environment-files=always -j2
         cabal v2-build --only-dependencies
 
-    # - uses: jonabc/setup-licensed@v1
-    #   with:
-    #     version: 2.x
-    # - uses: jonabc/licensed-ci@v1
-    #   name: Open source license check
-    #   with:
-    #     github_token: ${{ secrets.GITHUB_TOKEN }}
+    - uses: jonabc/setup-licensed@v1
+      with:
+        version: 2.x
+    - uses: jonabc/licensed-ci@v1
+      name: Open source license check
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: hlint
       run: |
