@@ -1,0 +1,29 @@
+---
+name: clock
+version: '0.8'
+type: cabal
+summary: 'High-resolution clock functions: monotonic, realtime, cputime.'
+homepage: https://github.com/corsis/clock
+license: other
+licenses:
+- sources: doc/LICENSE
+  text: "Copyright (c) 2009-2012, Cetin Sert\nCopyright (c) 2010, Eugene Kirpichov\n\nAll
+    rights reserved.\n\nRedistribution and use in source and binary forms, with or
+    without\nmodification, are permitted provided that the following conditions are\nmet:\n\n
+    \   * Redistributions of source code must retain the above copyright\n      notice,
+    this list of conditions and the following disclaimer.\n\n    * Redistributions
+    in binary form must reproduce the above\n      copyright notice, this list of
+    conditions and the following\n      disclaimer in the documentation and/or other
+    materials provided\n      with the distribution.\n\n    * The names of contributors
+    may not be used to endorse or promote\n      products derived from this software
+    without specific prior\n      written permission. \n\nTHIS SOFTWARE IS PROVIDED
+    BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS\n\"AS IS\" AND ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, BUT NOT\nLIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR\nA PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT\nOWNER
+    OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,\nSPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT\nLIMITED TO, PROCUREMENT OF SUBSTITUTE
+    GOODS OR SERVICES; LOSS OF USE,\nDATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+    CAUSED AND ON ANY\nTHEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+    OR TORT\n(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\nOF
+    THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n"
+notices: []

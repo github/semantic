@@ -1,0 +1,57 @@
+---
+name: base
+version: 4.13.0.0
+type: cabal
+summary: Basic libraries
+homepage: 
+license: other
+licenses:
+- sources: LICENSE
+  text: "This library (libraries/base) is derived from code from several\nsources:
+    \n\n  * Code from the GHC project which is largely (c) The University of\n    Glasgow,
+    and distributable under a BSD-style license (see below),\n\n  * Code from the
+    Haskell 98 Report which is (c) Simon Peyton Jones\n    and freely redistributable
+    (but see the full license for\n    restrictions).\n\n  * Code from the Haskell
+    Foreign Function Interface specification,\n    which is (c) Manuel M. T. Chakravarty
+    and freely redistributable\n    (but see the full license for restrictions).\n\nThe
+    full text of these licenses is reproduced below.  All of the\nlicenses are BSD-style
+    or compatible.\n\n-----------------------------------------------------------------------------\n\nThe
+    Glasgow Haskell Compiler License\n\nCopyright 2004, The University Court of the
+    University of Glasgow. \nAll rights reserved.\n\nRedistribution and use in source
+    and binary forms, with or without\nmodification, are permitted provided that the
+    following conditions are met:\n\n- Redistributions of source code must retain
+    the above copyright notice,\nthis list of conditions and the following disclaimer.\n
+    \n- Redistributions in binary form must reproduce the above copyright notice,\nthis
+    list of conditions and the following disclaimer in the documentation\nand/or other
+    materials provided with the distribution.\n \n- Neither name of the University
+    nor the names of its contributors may be\nused to endorse or promote products
+    derived from this software without\nspecific prior written permission. \n\nTHIS
+    SOFTWARE IS PROVIDED BY THE UNIVERSITY COURT OF THE UNIVERSITY OF\nGLASGOW AND
+    THE CONTRIBUTORS \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES,\nINCLUDING,
+    BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND\nFITNESS FOR
+    A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE\nUNIVERSITY COURT OF
+    THE UNIVERSITY OF GLASGOW OR THE CONTRIBUTORS BE LIABLE\nFOR ANY DIRECT, INDIRECT,
+    INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL\nDAMAGES (INCLUDING, BUT NOT
+    LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR\nSERVICES; LOSS OF USE, DATA, OR
+    PROFITS; OR BUSINESS INTERRUPTION) HOWEVER\nCAUSED AND ON ANY THEORY OF LIABILITY,
+    WHETHER IN CONTRACT, STRICT\nLIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY\nOUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
+    OF SUCH\nDAMAGE.\n\n-----------------------------------------------------------------------------\n\nCode
+    derived from the document \"Report on the Programming Language\nHaskell 98\",
+    is distributed under the following license:\n\n  Copyright (c) 2002 Simon Peyton
+    Jones\n\n  The authors intend this Report to belong to the entire Haskell\n  community,
+    and so we grant permission to copy and distribute it for\n  any purpose, provided
+    that it is reproduced in its entirety,\n  including this Notice.  Modified versions
+    of this Report may also be\n  copied and distributed for any purpose, provided
+    that the modified\n  version is clearly presented as such, and that it does not
+    claim to\n  be a definition of the Haskell 98 Language.\n\n-----------------------------------------------------------------------------\n\nCode
+    derived from the document \"The Haskell 98 Foreign Function\nInterface, An Addendum
+    to the Haskell 98 Report\" is distributed under\nthe following license:\n\n  Copyright
+    (c) 2002 Manuel M. T. Chakravarty\n\n  The authors intend this Report to belong
+    to the entire Haskell\n  community, and so we grant permission to copy and distribute
+    it for\n  any purpose, provided that it is reproduced in its entirety,\n  including
+    this Notice.  Modified versions of this Report may also be\n  copied and distributed
+    for any purpose, provided that the modified\n  version is clearly presented as
+    such, and that it does not claim to\n  be a definition of the Haskell 98 Foreign
+    Function Interface.\n\n-----------------------------------------------------------------------------\n"
+notices: []

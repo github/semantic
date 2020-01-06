@@ -1,0 +1,31 @@
+---
+name: unix
+version: 2.7.2.2
+type: cabal
+summary: POSIX functionality
+homepage: https://github.com/haskell/unix
+license: other
+licenses:
+- sources: LICENSE
+  text: "The Glasgow Haskell Compiler License\n\nCopyright 2004, The University Court
+    of the University of Glasgow. \nAll rights reserved.\n\nRedistribution and use
+    in source and binary forms, with or without\nmodification, are permitted provided
+    that the following conditions are met:\n\n- Redistributions of source code must
+    retain the above copyright notice,\nthis list of conditions and the following
+    disclaimer.\n \n- Redistributions in binary form must reproduce the above copyright
+    notice,\nthis list of conditions and the following disclaimer in the documentation\nand/or
+    other materials provided with the distribution.\n \n- Neither name of the University
+    nor the names of its contributors may be\nused to endorse or promote products
+    derived from this software without\nspecific prior written permission. \n\nTHIS
+    SOFTWARE IS PROVIDED BY THE UNIVERSITY COURT OF THE UNIVERSITY OF\nGLASGOW AND
+    THE CONTRIBUTORS \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES,\nINCLUDING,
+    BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND\nFITNESS FOR
+    A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE\nUNIVERSITY COURT OF
+    THE UNIVERSITY OF GLASGOW OR THE CONTRIBUTORS BE LIABLE\nFOR ANY DIRECT, INDIRECT,
+    INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL\nDAMAGES (INCLUDING, BUT NOT
+    LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR\nSERVICES; LOSS OF USE, DATA, OR
+    PROFITS; OR BUSINESS INTERRUPTION) HOWEVER\nCAUSED AND ON ANY THEORY OF LIABILITY,
+    WHETHER IN CONTRACT, STRICT\nLIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY\nOUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
+    OF SUCH\nDAMAGE.\n"
+notices: []

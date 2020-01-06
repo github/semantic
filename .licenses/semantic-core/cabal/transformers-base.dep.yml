@@ -1,0 +1,29 @@
+---
+name: transformers-base
+version: 0.4.5.2
+type: cabal
+summary: Lift computations from the bottom of a transformer stack
+homepage: https://github.com/mvv/transformers-base
+license: bsd-3-clause
+licenses:
+- sources: doc/LICENSE
+  text: "Copyright (c) 2011, Mikhail Vorozhtsov, Bas van Dijk\nAll rights reserved.\n\nRedistribution
+    and use in source and binary forms, with or without \nmodification, are permitted
+    provided that the following conditions are met:\n\n- Redistributions of source
+    code must retain the above copyright notice, \n  this list of conditions and the
+    following disclaimer.\n- Redistributions in binary form must reproduce the above
+    copyright \n  notice, this list of conditions and the following disclaimer in
+    the \n  documentation and/or other materials provided with the distribution.\n-
+    Neither the names of the copyright owners nor the names of the \n  contributors
+    may be used to endorse or promote products derived \n  from this software without
+    specific prior written permission.\n\nTHIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
+    HOLDERS AND CONTRIBUTORS\n\"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+    BUT NOT\nLIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR\nA
+    PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT\nOWNER OR CONTRIBUTORS
+    BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,\nSPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+    DAMAGES (INCLUDING, BUT NOT\nLIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+    LOSS OF USE,\nDATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+    ANY\nTHEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT\n(INCLUDING
+    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\nOF THIS SOFTWARE,
+    EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n\n"
+notices: []

@@ -1,0 +1,28 @@
+---
+name: wcwidth
+version: 0.0.2
+type: cabal
+summary: Native wcwidth.
+homepage: https://github.com/solidsnack/wcwidth/
+license: other
+licenses:
+- sources: doc/LICENSE
+  text: "\n  ©2009 Jason Dusek.\n\n  Redistribution and use in source and binary forms,
+    with or without\n  modification, are permitted provided that the following conditions
+    are met:\n\n .  Redistributions of source code must retain the above copyright
+    notice,\n    this list of conditions and the following disclaimer.\n\n .  Redistributions
+    in binary form must reproduce the above copyright notice,\n    this list of conditions
+    and the following disclaimer in the documentation\n    and/or other materials
+    provided with the distribution.\n\n .  Names of the contributors to this software
+    may not be used to endorse or\n    promote products derived from this software
+    without specific prior written\n    permission.\n\n  This software is provided
+    by the contributors \"as is\" and any express or\n  implied warranties, including,
+    but not limited to, the implied warranties of\n  merchantability and fitness for
+    a particular purpose are disclaimed. In no\n  event shall the contributors be
+    liable for any direct, indirect, incidental,\n  special, exemplary, or consequential
+    damages (including, but not limited to,\n  procurement of substitute goods or
+    services; loss of use, data, or profits;\n  or business interruption) however
+    caused and on any theory of liability,\n  whether in contract, strict liability,
+    or tort (including negligence or\n  otherwise) arising in any way out of the use
+    of this software, even if\n  advised of the possibility of such damage. \n\n"
+notices: []

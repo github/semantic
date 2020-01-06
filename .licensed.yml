@@ -15,6 +15,7 @@ ignored:
   cabal:
     - rts
     # Packages we own
+    - fused-effects
     - fused-effects-readline
     - fused-syntax
     - proto-lens-jsonpb
@@ -27,6 +28,7 @@ reviewed:
   cabal:
     # Multiple
     - cmark-gfm
+    - tasty-hunit
     # BSD 2/3-clause reviewed
     - adjunctions
     - aeson
@@ -42,7 +44,9 @@ reviewed:
     - blaze-html
     - blaze-markup
     - bytestring
+    - clock
     - comonad
+    - constraints
     - containers
     - contravariant
     - deepseq
@@ -83,10 +87,12 @@ reviewed:
     - stm
     - stm-chans
     - template-haskell
+    - temporary
     - time
     - transformers
     - transformers-compat
     - trifecta
+    - unbounded-delays
     - unix
     - utf8-string
     - utility-ht
@@ -94,7 +100,9 @@ reviewed:
     - vector
     - vector-algorithms
     - void
+    - wcwidth
     - yaml
+    - zlib
 
 cabal:
   ghc_package_db:
@@ -108,4 +116,12 @@ cabal:
 apps:
   - source_path: .
     name: semantic
-  # - source_path: semantic-tags
+  - source_path: semantic-analysis
+  - source_path: semantic-ast
+  - source_path: semantic-core
+  - source_path: semantic-java
+  - source_path: semantic-json
+  - source_path: semantic-python
+  - source_path: semantic-ruby
+  - source_path: semantic-source
+  - source_path: semantic-tags

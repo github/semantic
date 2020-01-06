@@ -1,0 +1,29 @@
+---
+name: uuid-types
+version: 1.0.3
+type: cabal
+summary: Type definitions for Universally Unique Identifiers
+homepage: https://github.com/aslatter/uuid
+license: other
+licenses:
+- sources: doc/LICENSE
+  text: "Copyright (c) 2008, Antoine Latter\n\nAll rights reserved.\n\nRedistribution
+    and use in source and binary forms, with or without \nmodification, are permitted
+    provided that the following conditions are \nmet:\n\n    * Redistributions of
+    source code must retain the above copyright \nnotice, this list of conditions
+    and the following disclaimer.\n    * Redistributions in binary form must reproduce
+    the above copyright \nnotice, this list of conditions and the following disclaimer
+    in the \ndocumentation and/or other materials provided with the distribution.\n
+    \   * The names of the authors may not be used to endorse or promote \nproducts
+    derived from this software without specific prior written \npermission.\n\nTHIS
+    SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS\n\"AS IS\" AND
+    ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT\nLIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR\nA PARTICULAR PURPOSE ARE DISCLAIMED.
+    IN NO EVENT SHALL THE COPYRIGHT \nOWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, \nSPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+    BUT NOT LIMITED \nTO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+    DATA, OR\nPROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+    OF\nLIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING\nNEGLIGENCE
+    OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS\nSOFTWARE, EVEN IF ADVISED
+    OF THE POSSIBILITY OF SUCH DAMAGE.\n"
+notices: []
