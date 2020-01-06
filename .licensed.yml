@@ -15,12 +15,13 @@ ignored:
   cabal:
     - rts
     # Packages we own
-    - semantic-*
-    - tree-sitter-*
-    - z-tree-sitter-*
+    - fused-effects-readline
     - fused-syntax
     - proto-lens-jsonpb
+    - semantic-*
     - tree-sitter
+    - tree-sitter-*
+    - z-tree-sitter-*
 
 reviewed:
   cabal:
