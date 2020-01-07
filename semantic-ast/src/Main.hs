@@ -16,7 +16,7 @@ import Text.Pretty.Simple (pPrint, pPrintNoColor)
 import Data.Foldable (traverse_)
 import Control.Monad ((>=>))
 import Marshal.JSON (marshal)
-import Data.ByteString.Lazy (putStrLn)
+import Data.ByteString.Lazy.Char8 (putStrLn)
 import Data.Aeson.Encode.Pretty (encodePretty)
 
 data SemanticAST = SemanticAST
@@ -57,7 +57,7 @@ generateAST (SemanticAST format noColor source) =
         go = ast >=> display
         ast = parseByteString @AST.Module @(Range, Span) Python.tree_sitter_python
         display = case format of
-          Json -> Data.ByteString.Lazy.putStrLn . encodePretty . either toJSON (marshal . fmap (const ())) -- TODO: replacing range and span annotations with () for which there is a ToJSON instance for now, deal with this later
+          Json -> Data.ByteString.Lazy.Char8.putStrLn . encodePretty . either toJSON (marshal . fmap (const ())) -- TODO: replacing range and span annotations with () for which there is a ToJSON instance for now, deal with this later
           Show -> print
           Pretty | noColor -> pPrintNoColor
                  | otherwise -> pPrint
