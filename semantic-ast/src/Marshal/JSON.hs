@@ -38,10 +38,6 @@ data Bar a = Bar
 -- it has a constant, foo :: Text, so it will require K1 R
 
 -- Serialize unmarshaled ASTs into JSON representation by auto-deriving Aeson instances generically
--- Given some shape t with polymorphic type a such that a has a ToJSON instance, we can produce a JSON value
--- in the default definition, we add further constraints: 
--- - Generic1 t - the type constructor will be a sum, product, leaf etc. and will require a Generic1 instance
--- - GMarshalJSON (Rep1 t) -- the type constructor should be a Rep1, which is an associated type (ie., an open type family affiliated with a class, and thus it's like a function for types, in this case the Haskell language datatypes used in the AST)
 class MarshalJSON t where
   marshal :: (ToJSON a) => t a -> Value
   default marshal :: ( Generic1 t, GMarshalJSON (Rep1 t), ToJSON a) => t a -> Value
