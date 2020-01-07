@@ -393,10 +393,13 @@ benchmark evaluation
   type:                exitcode-stdio-1.0
   main-is:             Main.hs
   other-modules:       Evaluation
+                     , Tagging
   ghc-options:         -static
   build-depends:       base
                      , algebraic-graphs
                      , gauge ^>= 0.2.5
+                     , Glob
+                     , lens >= 4.17 && < 4.19
                      , semantic
                      , semantic-source
 
