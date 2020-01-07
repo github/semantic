@@ -21,30 +21,13 @@ import GHC.Generics
 import Data.Text (Text)
 import qualified Data.Text as Text
 
--- Test datatype that will go away: this is just to get us started!
-data Bar a = Bar
-  { ann :: a
-  , foo :: Text
-  } deriving (Eq, Show, Generic1)
-  -- Aeson requires that the datatypes derive Generic
-  -- we want Generic1 because we can represent types of kind * -> *
-
--- Thinking about the shape of Bar:
--- it is a Datatype, meaning it will require M1 D
--- it has a data constructor, so it will require C1
--- it is a product type, so it will require :*:
--- it has record selector fields so it will require S1
--- is has a parameter so it will require Par1
--- it has a constant, foo :: Text, so it will require K1 R
-
 -- Serialize unmarshaled ASTs into JSON representation by auto-deriving Aeson instances generically
 class MarshalJSON t where
   marshal :: (ToJSON a) => t a -> Value
   default marshal :: ( Generic1 t, GMarshalJSON (Rep1 t), ToJSON a) => t a -> Value
   marshal = gmarshal . from1
 
--- We want to create MarshalJSON instances for each type constructor
--- if we wanted it for a particular instance, it'd be something like MarshalJSON Bar
+-- Create MarshalJSON instances for each type constructor
 instance (GMarshalJSON (Rep1 t), Generic1 t) => MarshalJSON t
 
 -- Typeclass to generically marshal ASTs into JSON
