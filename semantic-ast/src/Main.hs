@@ -8,7 +8,7 @@ import qualified TreeSitter.Python.AST as AST
 import qualified TreeSitter.Python as Python
 import Source.Range
 import Source.Span
-import Data.Aeson (encode, toJSON)
+import Data.Aeson (toJSON)
 import Data.ByteString.Char8
 import Data.ByteString (readFile)
 import Options.Applicative hiding (style)
