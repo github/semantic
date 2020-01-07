@@ -38,7 +38,7 @@ class GMarshalJSON f where
 instance GMarshalJSON f => GMarshalJSON (M1 D c f) where
   gmarshal = gmarshal . unM1 -- using unM1 instead of pattern-matching on M1 in order to express with function composition
 
--- Need to fold over S1 product types and pass the result to Aeson objects
+-- Fold over S1 product types and pass the result to Aeson objects
 instance GFields fields => GMarshalJSON (C1 c fields) where
   gmarshal = object . gfields [] . unM1
 -- TODO: we first see gfields appear where we have constructors because ...
