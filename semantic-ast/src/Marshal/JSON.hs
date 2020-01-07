@@ -20,7 +20,6 @@ import Data.List.NonEmpty (NonEmpty)
 import GHC.Generics
 import Data.Text (Text)
 import qualified Data.Text as Text
--- import Marshal.Examples
 
 -- Test datatype that will go away: this is just to get us started!
 data Bar a = Bar
