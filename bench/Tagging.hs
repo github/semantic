@@ -35,8 +35,9 @@ import Semantic.Task.Files
 
 benchmarks :: Benchmark
 benchmarks = bgroup "tagging"
-  [ pythonBenchmarks
-  , goBenchmarks
+  -- [ pythonBenchmarks
+  -- , goBenchmarks
+  [ rubyBenchmarks
   ]
 
 pythonBenchmarks :: Benchmark
@@ -52,6 +53,13 @@ goBenchmarks = bgroup "go"
   , bench "a la carte" $ runTagging aLaCarteLanguageModes dir "*.go"
   ]
   where dir = Path.relDir "tmp/go-examples/go/src/database/sql"
+
+rubyBenchmarks :: Benchmark
+rubyBenchmarks = bgroup "ruby"
+  [ bench "precise" $ runTagging preciseLanguageModes dir "*.rb"
+  , bench "a la carte" $ runTagging aLaCarteLanguageModes dir "*.rb"
+  ]
+  where dir = Path.relDir "tmp/ruby-examples/ruby_spec/language"
 
 runTagging :: PerLanguageModes -> Path.RelDir -> String -> Benchmarkable
 runTagging mode dir glob = nfIO . withOptions testOptions $ \ config logger statter -> do
