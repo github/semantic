@@ -27,6 +27,7 @@ common haskell
                      , semantic-core ^>= 0.0
                      , semantic-source ^>= 0.0
                      , semantic-tags ^>= 0.0
+                     , semantic-scope-graph ^>= 0.0
                      , text ^>= 1.2.3
                      , tree-sitter ^>= 0.7.2
                      , tree-sitter-python ^>= 0.8
@@ -53,6 +54,7 @@ library
     Language.Python
     Language.Python.Core
     Language.Python.Failure
+    Language.Python.ScopeGraph
     Language.Python.Tags
   hs-source-dirs: src
 

@@ -41,6 +41,8 @@ package semantic-ruby
 package semantic-tags
   ghc-options: -Werror
 
+package semantic-scope-graph
+
 package semantic-ast
   ghc-options: -Werror
 

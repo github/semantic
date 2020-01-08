@@ -1,6 +1,6 @@
 {-# LANGUAGE DuplicateRecordFields #-}
 
-module Data.ScopeGraph () where
+module Data.ScopeGraph (ToScopeGraph(..), ScopeGraph, Info, runScopeGraph) where
 
 import           Algebra.Graph.Labelled (Graph, (-<), (>-))
 import qualified Algebra.Graph.Labelled as G
@@ -44,18 +44,18 @@ type SGM =
 class ToScopeGraph t where
   scopeGraph :: Source -> t Loc -> SGM (ScopeGraph Info)
 
-instance ToScopeGraph Py.Identifier where
-  scopeGraph _ (Py.Identifier _ t) = ScopeGraph . G.vertex . Node (Ref t) <$> liftIO newUnique
+-- instance ToScopeGraph Py.Identifier where
+--   scopeGraph _ (Py.Identifier _ t) = ScopeGraph . G.vertex . Node (Ref t) <$> liftIO newUnique
 
-instance ToScopeGraph Py.Module where
-  scopeGraph src Py.Module { Py.extraChildren = stmts } = do
-    parent <- ask
-    self <- ScopeGraph . G.vertex . Node Scope <$> liftIO newUnique
-    foldr (\item acc -> do {
-              x <- acc;
-              y <- scopeGraph src item;
-              pure (x --> y);
-          }) (pure (parent --> self)) stmts
+-- instance ToScopeGraph Py.Module where
+--   scopeGraph src Py.Module { Py.extraChildren = stmts } = do
+--     parent <- ask
+--     self <- ScopeGraph . G.vertex . Node Scope <$> liftIO newUnique
+--     foldr (\item acc -> do {
+--               x <- acc;
+--               y <- scopeGraph src item;
+--               pure (x --> y);
+--           }) (pure (parent --> self)) stmts
 
 runScopeGraph :: ToScopeGraph t => Source -> t Loc -> IO (ScopeGraph Info)
 runScopeGraph src item = do
