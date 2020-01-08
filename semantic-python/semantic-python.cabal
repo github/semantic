@@ -58,6 +58,14 @@ library
     Language.Python.Tags
   hs-source-dirs: src
 
+executable python-graph
+  import:              haskell
+  hs-source-dirs:      app
+  main-is:             Main.hs
+  build-depends:       base
+                     , semantic-python
+                     , semantic-scope-graph
+
 test-suite test
   import: haskell
   type: exitcode-stdio-1.0
