@@ -65,6 +65,7 @@ executable python-graph
   build-depends:       base
                      , semantic-python
                      , semantic-scope-graph
+                     , bytestring
 
 test-suite test
   import: haskell
