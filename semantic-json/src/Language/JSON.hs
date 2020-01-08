@@ -11,8 +11,11 @@ import qualified TreeSitter.Unmarshal as TS
 
 newtype Term a = Term { getTerm :: JSON.Document a }
 
+instance TS.SymbolMatching Term where
+  showFailure _ _ = "failed for Term"
+
 instance TS.Unmarshal Term where
-  unmarshalNode node = Term <$> TS.unmarshalNode node
+  matchers = fmap (TS.hoist Term) TS.matchers
 
 -- | Tags aren’t really meaningful for JSON, but by implementing this we can avoid having to customize the set of parsers used for computing tags.
 instance Tags.ToTags Term where

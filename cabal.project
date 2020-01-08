@@ -10,6 +10,7 @@ packages: .
           semantic-tsx
           semantic-typescript
           semantic-tags
+          ../haskell-tree-sitter/tree-sitter*
 
 jobs: $ncpus
 

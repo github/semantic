@@ -35,9 +35,9 @@ import Semantic.Task.Files
 
 benchmarks :: Benchmark
 benchmarks = bgroup "tagging"
-  -- [ pythonBenchmarks
-  -- , goBenchmarks
-  [ rubyBenchmarks
+  [ pythonBenchmarks
+  , goBenchmarks
+  , rubyBenchmarks
   ]
 
 pythonBenchmarks :: Benchmark
