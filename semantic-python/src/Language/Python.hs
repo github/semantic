@@ -22,4 +22,4 @@ instance Tags.ToTags Term where
 
 
 instance ScopeGraph.ToScopeGraph Term where
-  scopeGraph src = ScopeGraph.runScopeGraph src . PyScopeGraph.scopeGraph . getTerm
+  scopeGraph = ScopeGraph.scopeGraph . getTerm

@@ -41,7 +41,7 @@ type SGM =
 
 
 class ToScopeGraph t where
-  scopeGraph :: Source -> t Loc -> SGM (ScopeGraph Info)
+  scopeGraph :: ( Has (Reader Source) sig m ) => t Loc -> m (ScopeGraph Info)
 
 -- instance ToScopeGraph Py.Identifier where
 --   scopeGraph _ (Py.Identifier _ t) = ScopeGraph . G.vertex . Node (Ref t) <$> liftIO newUnique
@@ -59,4 +59,4 @@ class ToScopeGraph t where
 runScopeGraph :: ToScopeGraph t => Source -> t Loc -> IO (ScopeGraph Info)
 runScopeGraph src item = do
   root <- ScopeGraph . G.vertex . Node Root <$> newUnique
-  runM . runReader root $ scopeGraph src item
+  runM . runReader root . runReader src $ scopeGraph item
