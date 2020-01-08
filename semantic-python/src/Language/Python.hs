@@ -11,6 +11,7 @@ import qualified Data.ScopeGraph as ScopeGraph
 import qualified TreeSitter.Python (tree_sitter_python)
 import qualified TreeSitter.Python.AST as Py
 import qualified TreeSitter.Unmarshal as TS
+import qualified Algebra.Graph as Graph
 
 newtype Term a = Term { getTerm :: Py.Module a }
 
@@ -23,3 +24,14 @@ instance Tags.ToTags Term where
 
 instance ScopeGraph.ToScopeGraph Term where
   scopeGraph = ScopeGraph.scopeGraph . getTerm
+
+instance ScopeGraph.ToScopeGraph Py.Module where
+  scopeGraph Py.Module{} = pure $ ScopeGraph.ScopeGraph Graph.empty
+
+--     parent <- ask
+--     self <- ScopeGraph . G.vertex . Node Scope <$> liftIO newUnique
+--     foldr (\item acc -> do {
+--               x <- acc;
+--               y <- scopeGraph src item;
+--               pure (x --> y);
+--           }) (pure (parent --> self)) stmts

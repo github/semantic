@@ -1,9 +1,9 @@
 {-# LANGUAGE DuplicateRecordFields #-}
 
-module Data.ScopeGraph (ToScopeGraph(..), ScopeGraph, Info, runScopeGraph) where
+module Data.ScopeGraph (ToScopeGraph(..), ScopeGraph(..), Info, runScopeGraph) where
 
-import           Algebra.Graph.Labelled (Graph, (-<), (>-))
-import qualified Algebra.Graph.Labelled as G
+import           Algebra.Graph (Graph)
+import qualified Algebra.Graph as G
 import           Control.Carrier.Fresh.Strict
 import           Control.Carrier.Lift
 import           Control.Carrier.Reader
@@ -23,12 +23,7 @@ data Node a = Node
 instance Eq (Node a) where
   (==) = (==) `on` ident
 
-data ScopeGraph a = ScopeGraph (Graph Edge (Node a))
-
-(-->) :: ScopeGraph a -> ScopeGraph a -> ScopeGraph a
-ScopeGraph a --> ScopeGraph b = ScopeGraph (G.connect FromTo a b)
-
-data Edge = FromTo | ToFrom | Bidi deriving (Eq, Ord, Show)
+data ScopeGraph a = ScopeGraph (Graph (Node a))
 
 data Info = Ref Text
           | Scope

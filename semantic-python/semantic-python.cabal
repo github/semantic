@@ -31,7 +31,7 @@ common haskell
                      , text ^>= 1.2.3
                      , tree-sitter ^>= 0.7.2
                      , tree-sitter-python ^>= 0.8
-
+                     , algebraic-graphs
   ghc-options:
     -Weverything
     -Wno-missing-local-signatures
