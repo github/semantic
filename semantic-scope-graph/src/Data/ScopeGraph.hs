@@ -23,11 +23,18 @@ data Node a = Node
 instance Eq (Node a) where
   (==) = (==) `on` ident
 
-data ScopeGraph a = ScopeGraph (Graph (Node a))
+instance Show a => Show (Node a) where
+  -- TODO: This is dropping ident field in Node
+  show = show . contents
+
+
+newtype ScopeGraph a = ScopeGraph (Graph (Node a))
+  deriving (Show)
 
 data Info = Ref Text
           | Scope
           | Root
+  deriving (Show)
 
 type SGM =
   ( ReaderC (ScopeGraph Info)
