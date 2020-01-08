@@ -14,7 +14,6 @@ import           Data.Text (Text)
 import           Data.Unique
 import           Source.Loc (Loc (..))
 import           Source.Source as Source
-import qualified TreeSitter.Python.AST as Py
 
 data Node a = Node
   { contents :: a
