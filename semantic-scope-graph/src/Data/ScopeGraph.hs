@@ -1,13 +1,16 @@
 {-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE TypeFamilies          #-}
 
 module Data.ScopeGraph (ToScopeGraph(..), ScopeGraph(..), Info, runScopeGraph) where
 
 import           Algebra.Graph (Graph)
 import qualified Algebra.Graph as G
+import qualified Algebra.Graph.Class as Graph.Class
 import           Control.Carrier.Fresh.Strict
 import           Control.Carrier.Lift
 import           Control.Carrier.Reader
 import           Control.Monad.IO.Class
+import           Data.Coerce
 import           Data.Function
 import           Data.Functor.Identity
 import           Data.Text (Text)
@@ -30,6 +33,13 @@ instance Show a => Show (Node a) where
 
 newtype ScopeGraph a = ScopeGraph (Graph (Node a))
   deriving (Show)
+
+instance Graph.Class.Graph (ScopeGraph a) where
+  type Vertex (ScopeGraph a) = Node a
+  empty  = ScopeGraph G.empty
+  vertex = ScopeGraph . G.vertex
+  overlay (ScopeGraph a) (ScopeGraph b) = ScopeGraph (a `G.overlay` b)
+  connect (ScopeGraph a) (ScopeGraph b) = ScopeGraph (a `G.connect` b)
 
 data Info = Ref Text
           | Scope
