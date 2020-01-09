@@ -59,7 +59,7 @@ rubyBenchmarks = bgroup "ruby"
   [ bench "precise" $ runTagging preciseLanguageModes dir "*.rb"
   , bench "a la carte" $ runTagging aLaCarteLanguageModes dir "*.rb"
   ]
-  where dir = Path.relDir "tmp/ruby-examples/ruby_spec/language"
+  where dir = Path.relDir "tmp/ruby-examples/ruby_spec/command_line"
 
 runTagging :: PerLanguageModes -> Path.RelDir -> String -> Benchmarkable
 runTagging mode dir glob = nfIO . withOptions testOptions $ \ config logger statter -> do
