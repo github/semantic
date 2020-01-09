@@ -4,6 +4,7 @@ module Language.Java
 , TreeSitter.Java.tree_sitter_java
 ) where
 
+import           Data.Proxy
 import qualified Language.Java.Tags as JavaTags
 import qualified Tags.Tagging.Precise as Tags
 import qualified TreeSitter.Java (tree_sitter_java)
@@ -13,10 +14,11 @@ import qualified TreeSitter.Unmarshal as TS
 newtype Term a = Term { getTerm :: Java.Program a }
 
 instance TS.SymbolMatching Term where
-  showFailure _ _ = "failed for Term"
+  matchedSymbols _ = TS.matchedSymbols (Proxy :: Proxy Java.Program)
+  showFailure _ = TS.showFailure (Proxy :: Proxy Java.Program)
 
 instance TS.Unmarshal Term where
-  matchers = fmap (TS.hoist Term) TS.matchers
+  matchers = fmap (fmap (TS.hoist Term)) TS.matchers
 
 instance Tags.ToTags Term where
   tags src = Tags.runTagging src . JavaTags.tags . getTerm

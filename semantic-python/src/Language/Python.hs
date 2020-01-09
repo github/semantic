@@ -4,6 +4,7 @@ module Language.Python
 , TreeSitter.Python.tree_sitter_python
 ) where
 
+import           Data.Proxy
 import qualified Language.Python.Tags as PyTags
 import qualified Tags.Tagging.Precise as Tags
 import qualified TreeSitter.Python (tree_sitter_python)
@@ -13,10 +14,11 @@ import qualified TreeSitter.Unmarshal as TS
 newtype Term a = Term { getTerm :: Py.Module a }
 
 instance TS.SymbolMatching Term where
-  showFailure _ _ = "failed for Term"
+  matchedSymbols _ = TS.matchedSymbols (Proxy :: Proxy Py.Module)
+  showFailure _ = TS.showFailure (Proxy :: Proxy Py.Module)
 
 instance TS.Unmarshal Term where
-  matchers = fmap (TS.hoist Term) TS.matchers
+  matchers = fmap (fmap (TS.hoist Term)) TS.matchers
 
 instance Tags.ToTags Term where
   tags src = Tags.runTagging src . PyTags.tags . getTerm
