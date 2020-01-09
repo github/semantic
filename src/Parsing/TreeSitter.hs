@@ -57,7 +57,7 @@ parseToPreciseAST
   -> m (Either TSParseException (t Loc))
 parseToPreciseAST parseTimeout language blob = runParse parseTimeout language blob $ \ rootPtr ->
   TS.withCursor (castPtr rootPtr) $ \ cursor ->
-    (Right <$> runReader (TS.UnmarshalState (Source.bytes (blobSource blob)) cursor) (TS.peekNode >>= TS.unmarshalNode))
+    (Right <$> runReader (TS.UnmarshalState (Source.bytes (blobSource blob)) cursor) (TS.unmarshal cursor))
       >>= either (Exc.throw . UnmarshalFailure . TS.getUnmarshalError) pure
 
 instance Exception TSParseException where
@@ -101,8 +101,8 @@ anaM g = a where a = pure . embed <=< traverse a <=< g
 
 
 nodeRange :: TS.Node -> Range
-nodeRange TS.Node{..} = Range (fromIntegral nodeStartByte) (fromIntegral nodeEndByte)
+nodeRange node = Range (fromIntegral (TS.nodeStartByte node)) (fromIntegral (TS.nodeEndByte node))
 
 nodeSpan :: TS.Node -> Span
-nodeSpan TS.Node{..} = nodeStartPoint `seq` nodeEndPoint `seq` Span (pointPos nodeStartPoint) (pointPos nodeEndPoint)
+nodeSpan node = TS.nodeStartPoint node `seq` TS.nodeEndPoint node `seq` Span (pointPos (TS.nodeStartPoint node)) (pointPos (TS.nodeEndPoint node))
   where pointPos TS.TSPoint{..} = pointRow `seq` pointColumn `seq` Pos (1 + fromIntegral pointRow) (1 + fromIntegral pointColumn)
