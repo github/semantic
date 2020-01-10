@@ -77,6 +77,13 @@ type family ToTagsInstance t :: Strategy where
   ToTagsInstance Rb.DoBlock            = 'Custom
   ToTagsInstance Rb.Lambda             = 'Custom
 
+  -- Need to traverse in the right order for tracking locals
+  ToTagsInstance Rb.If                 = 'Custom
+  ToTagsInstance Rb.Elsif              = 'Custom
+  ToTagsInstance Rb.Unless             = 'Custom
+  ToTagsInstance Rb.While              = 'Custom
+  ToTagsInstance Rb.Until              = 'Custom
+
   -- Parameters and assignment introduce locals
   ToTagsInstance Rb.MethodParameters   = 'Custom
   ToTagsInstance Rb.LambdaParameters   = 'Custom
@@ -196,7 +203,34 @@ instance ToTagsBy 'Custom Rb.DoBlock where
   tags' = enterScope False . gtags
 
 instance ToTagsBy 'Custom Rb.Lambda where
-  tags' = enterScope False . gtags
+  tags' Rb.Lambda { body, parameters } = enterScope False $ do
+    maybe (pure ()) tags parameters
+    tags body
+
+instance ToTagsBy 'Custom Rb.If where
+  tags' Rb.If { condition, consequence, alternative } = do
+    tags condition
+    maybe (pure ()) tags consequence
+    maybe (pure ()) tags alternative
+
+instance ToTagsBy 'Custom Rb.Elsif where
+  tags' Rb.Elsif { condition, consequence, alternative } = do
+    tags condition
+    maybe (pure ()) tags consequence
+    maybe (pure ()) tags alternative
+
+instance ToTagsBy 'Custom Rb.Unless where
+  tags' Rb.Unless { condition, consequence, alternative } = do
+    tags condition
+    maybe (pure ()) tags consequence
+    maybe (pure ()) tags alternative
+
+instance ToTagsBy 'Custom Rb.While where
+  tags' Rb.While { condition, body } = tags condition >> tags body
+
+instance ToTagsBy 'Custom Rb.Until where
+  tags' Rb.Until { condition, body } = tags condition >> tags body
+
 
 instance ToTagsBy 'Custom Rb.Call where
   tags' t@Rb.Call
