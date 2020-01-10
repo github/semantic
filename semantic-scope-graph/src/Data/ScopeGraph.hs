@@ -5,12 +5,9 @@
 module Data.ScopeGraph
   ( ToScopeGraph(..)
   , ScopeGraph(..)
-  , Info
+  , Info (..)
   , runScopeGraph
-  , scope
-  , ref
-  , root
-  , Graph.Class.edges
+  , Graph.Class.Graph (..)
   ) where
 
 import           Algebra.Graph (Graph)
@@ -20,6 +17,7 @@ import qualified Algebra.Graph.Class as Graph.Class
 import           Control.Carrier.Fresh.Strict
 import           Control.Carrier.Lift
 import           Control.Carrier.Reader
+import           Control.Monad.IO.Class
 import           Data.Text (Text, unpack)
 import           Data.Unique
 import           Source.Loc (Loc (..))
@@ -33,52 +31,48 @@ instance Show a => Show (Node a) where
   show = show . contents
 
 
-newtype ScopeGraph a = ScopeGraph (Graph (Node a))
+newtype ScopeGraph a = ScopeGraph (Graph a)
   deriving (Show, Eq)
 
 root :: Vertex (ScopeGraph Info)
-root = Node Root
+root = Root
 
-ref :: Text -> IO (Vertex (ScopeGraph Info))
-ref t = Node <$> (Ref <$> newUnique <*> pure t)
+-- ref :: Text -> IO (Vertex (ScopeGraph Info))
+-- ref t = Node <$> (Ref <$> newUnique <*> pure t)
 
-scope :: IO (Vertex (ScopeGraph Info))
-scope = Node . Scope <$> newUnique
+-- scope :: IO (Vertex (ScopeGraph Info))
+-- scope = Node . Scope <$> newUnique
 
 
 instance Graph.Class.Graph (ScopeGraph a) where
-  type Vertex (ScopeGraph a) = Node a
+  type Vertex (ScopeGraph a) = a
   empty  = ScopeGraph G.empty
   vertex = ScopeGraph . G.vertex
   overlay (ScopeGraph a) (ScopeGraph b) = ScopeGraph (a `G.overlay` b)
   connect (ScopeGraph a) (ScopeGraph b) = ScopeGraph (a `G.connect` b)
 
-data Info = Ref Unique Text
-          | Scope Unique
+data Info = Decl Int Text
+          | Scope Int
           | Root
   deriving (Eq, Ord)
 
 instance Show Info where
   show = \case
-    Ref _ i -> unpack i
-    Scope u -> "❇️  " <> take 3 (show (hashUnique u))
+    Decl _ i -> unpack i
+    Scope u -> "❇️  " <> show u
     Root    -> "🏁"
 
 class ToScopeGraph t where
-  scopeGraph :: ( Has (Reader Source) sig m ) => t Loc -> m (ScopeGraph Info)
+  scopeGraph ::
+    ( Has (Reader Source) sig m
+    , Has (Reader (Vertex (ScopeGraph Info))) sig m
+    , MonadIO m
+    )
+    => t Loc
+    -> m (ScopeGraph Info)
 
 -- instance ToScopeGraph Py.Identifier where
 --   scopeGraph _ (Py.Identifier _ t) = ScopeGraph . G.vertex . Node (Ref t) <$> liftIO newUnique
-
--- instance ToScopeGraph Py.Module where
---   scopeGraph src Py.Module { Py.extraChildren = stmts } = do
---     parent <- ask
---     self <- ScopeGraph . G.vertex . Node Scope <$> liftIO newUnique
---     foldr (\item acc -> do {
---               x <- acc;
---               y <- scopeGraph src item;
---               pure (x --> y);
---           }) (pure (parent --> self)) stmts
 
 runScopeGraph :: ToScopeGraph t => Source -> t Loc -> IO (ScopeGraph Info)
 runScopeGraph src item = do

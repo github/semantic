@@ -28,6 +28,7 @@ common haskell
                      , semantic-source ^>= 0.0
                      , semantic-tags ^>= 0.0
                      , semantic-scope-graph ^>= 0.0
+                     , semilattices
                      , text ^>= 1.2.3
                      , tree-sitter ^>= 0.7.2
                      , tree-sitter-python ^>= 0.8
@@ -51,6 +52,8 @@ common haskell
 library
   import: haskell
   exposed-modules:
+    Control.Effect.Sketch
+    Control.Carrier.Sketch.Fresh
     Language.Python
     Language.Python.Core
     Language.Python.Failure

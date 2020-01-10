@@ -1,11 +1,14 @@
 -- | Semantic functionality for Python programs.
+{-# LANGUAGE DuplicateRecordFields #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Language.Python
 ( Term(..)
 , TreeSitter.Python.tree_sitter_python
 ) where
 
-import qualified Algebra.Graph as Graph
+-- import           Control.Carrier.Reader
+-- import           Control.Monad.IO.Class
+import           Data.ScopeGraph (ToScopeGraph (..))
 import qualified Data.ScopeGraph as ScopeGraph
 import qualified Language.Python.Tags as PyTags
 import qualified Tags.Tagging.Precise as Tags
@@ -25,9 +28,12 @@ instance Tags.ToTags Term where
 instance ScopeGraph.ToScopeGraph Term where
   scopeGraph = ScopeGraph.scopeGraph . getTerm
 
-instance ScopeGraph.ToScopeGraph Py.Module where
-  scopeGraph Py.Module{} = pure $ ScopeGraph.ScopeGraph Graph.empty
-
+instance ToScopeGraph Py.Module where
+  scopeGraph = undefined
+  -- scopeGraph Py.Module { Py.extraChildren = _stmts } = do
+  --   parent <- ask
+  --   self <- liftIO $ ScopeGraph.scope
+  --   pure $ ScopeGraph.edges [(parent, self)]
 --     parent <- ask
 --     self <- ScopeGraph . G.vertex . Node Scope <$> liftIO newUnique
 --     foldr (\item acc -> do {
