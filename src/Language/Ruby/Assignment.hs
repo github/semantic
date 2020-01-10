@@ -128,9 +128,9 @@ identifier =
   <|> mk GlobalVariable
   <|> mk Operator
   <|> mk Setter
-  <|> mk SplatArgument
-  <|> mk HashSplatArgument
   <|> mk Uninterpreted
+  <|> symbol HashSplatArgument *> children expression
+  <|> symbol SplatArgument *> children expression
   <|> symbol BlockArgument *> children expression
   where
     mk s = makeTerm <$> symbol s <*> (Syntax.Identifier . name <$> source)
