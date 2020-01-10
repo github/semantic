@@ -18,6 +18,7 @@ import           Data.Blob
 import           Data.Foldable
 import           Data.Language (LanguageMode (..), PerLanguageModes (..))
 import           Data.List
+import           Data.Int
 import qualified Data.Text as Text
 import           Data.Traversable
 import           System.FilePath.Glob
@@ -215,19 +216,28 @@ buildExamples session lang tsDir = do
           HUnit.assertBool ("Expected symbols to be equal.\n" <> msg) (null invDelta)
 
           -- Check details
-          let aLaCarteSymbols = sortOn (^.symbol) . filter (okALaCarteSymbol (languageName lang) . view symbol) $ toList (x^.symbols)
-              preciseSymbols  = sortOn (^.symbol) . filter (okALaCarteSymbol (languageName lang) . view symbol) $ toList (y^.symbols)
+          let aLaCarteSymbols = sortOn sSym . filter (okALaCarteSymbol (languageName lang) . view symbol) $ toList (x^.symbols)
+              preciseSymbols  = sortOn sSym . filter (okALaCarteSymbol (languageName lang) . view symbol) $ toList (y^.symbols)
           for_ (zip aLaCarteSymbols preciseSymbols) $ \ (left, right) -> do
             let lineNo = ":" <> show (left^.P.span^.start^.line)
-                lSpan = " [" <> show (left^.P.span^.start^.line) <> ", " <> show (left^.P.span^.start^.column) <>  "]"
-                rSpan = " [" <> show (right^.P.span^.start^.line) <> ", " <> show (right^.P.span^.start^.column) <>  "]"
-            -- HUnit.assertEqual (Text.unpack (x^.path) <> lSpan) (left^.symbol) (right^.symbol)
-            HUnit.assertEqual (Text.unpack (x^.path) <> lineNo) (Text.unpack (left^.symbol) <> lSpan) (Text.unpack (right^.symbol) <> rSpan)
+                -- lSpan = " [" <> show (startRow left) <> ", " <> show (left^.P.span^.start^.column) <>  "]"
+                -- rSpan = " [" <> show (startRow right) <> ", " <> show (right^.P.span^.start^.column) <>  "]"
+            HUnit.assertEqual (Text.unpack (x^.path) <> lineNo) (left^.symbol) (right^.symbol)
+            HUnit.assertEqual (Text.unpack (x^.path) <> lineNo) (left^.line) (right^.line)
+            -- HUnit.assertEqual (Text.unpack (x^.path) <> lineNo) (Text.unpack (left^.symbol) <> span left) (Text.unpack (right^.symbol) <> span right)
 
         _          -> HUnit.assertFailure "Expected 1 file in each response"
       (Left e1, Left e2) -> HUnit.assertFailure ("Unable to parse (both)" <> show (displayException e1) <> show (displayException e2))
       (_, Left e)        -> HUnit.assertFailure ("Unable to parse (precise)" <> show (displayException e))
       (Left e, _)        -> HUnit.assertFailure ("Unable to parse (a la carte)" <> show (displayException e))
+
+    sSym x = SortableSymbol (x^.symbol) (x^.P.span^.start^.line)
+    -- span x = " ["  <> show (x^.P.span^.start^.line) <> ", " <> show (x^.P.span^.start^.column) <>
+    --          " - " <> show (x^.P.span^.end^.line) <> ", " <> show (x^.P.span^.end^.column) <> "]"
+
+data SortableSymbol = SortableSymbol Text.Text Int32
+  deriving (Eq, Show, Ord)
+
 
 okALaCarteSymbol :: String -> Text.Text -> Bool
 okALaCarteSymbol "ruby" symbol = not (instanceVariable symbol || builtInMethod symbol)
