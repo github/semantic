@@ -398,7 +398,7 @@ assignment' = makeTerm  <$> symbol Assignment         <*> children (Ruby.Syntax.
     assign c l r = inject (Statement.AugmentedAssignment (makeTerm1 (c l r)))
 
     lhs  = makeTerm <$> symbol LeftAssignmentList  <*> children (many expr) <|> expr
-    rhs  = makeTerm <$> symbol RightAssignmentList <*> children (many expr) <|> expr
+    rhs  = makeTerm <$> symbol RightAssignmentList <*> children (many expression) <|> expression
     expr = makeTerm <$> symbol RestAssignment      <*> restAssign
        <|> makeTerm <$> symbol DestructuredLeftAssignment <*> children (many expr)
        <|> lhsIdent
