@@ -29,7 +29,7 @@ instance ScopeGraph.ToScopeGraph Term where
   scopeGraph = ScopeGraph.scopeGraph . getTerm
 
 instance ToScopeGraph Py.Module where
-  scopeGraph = undefined
+  scopeGraph _ = pure (ScopeGraph.empty)
   -- scopeGraph Py.Module { Py.extraChildren = _stmts } = do
   --   parent <- ask
   --   self <- liftIO $ ScopeGraph.scope

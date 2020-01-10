@@ -38,10 +38,10 @@ The graph should be
 
 -}
 
-sampleGraphThing :: forall address sig m . (Has (Sketch address) sig m) => m ()
+sampleGraphThing :: (Has (Sketch ScopeGraph.Info) sig m) => m ()
 sampleGraphThing = do
-  declare @address "hello" DeclProperties
-  declare @address "goodbye" DeclProperties
+  declare @ScopeGraph.Info "hello" DeclProperties
+  declare @ScopeGraph.Info "goodbye" DeclProperties
 
 -- needed :: IO (ScopeGraph.ScopeGraph ScopeGraph.Info)
 -- needed = do
