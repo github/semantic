@@ -294,14 +294,14 @@ instance ToTagsBy 'Custom Rb.Assignment where
     case left of
       Prj (Rb.Lhs (Prj (Rb.Variable (Prj Rb.Identifier { text })))) -> modify (text :)
       Prj Rb.LeftAssignmentList { extraChildren } -> introduceLhsLocals extraChildren
-      _ -> tags left
+      _ -> pure ()
     gtags t
     where
       introduceLhsLocals xs = for_ xs $ \x -> case x of
         Prj (Rb.Lhs (Prj (Rb.Variable (Prj Rb.Identifier { text })))) -> modify (text :)
         Prj Rb.DestructuredLeftAssignment { extraChildren } -> introduceLhsLocals extraChildren
         Prj Rb.RestAssignment { extraChildren = Just (Rb.Lhs (Prj (Rb.Variable (Prj Rb.Identifier { text })))) } -> modify (text :)
-        _ -> tags x
+        _ -> pure ()
 
 gtags
   :: ( Has (Reader Source) sig m
