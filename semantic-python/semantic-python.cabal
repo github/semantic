@@ -23,7 +23,6 @@ common haskell
   build-depends:       base ^>= 4.13
                      , fused-effects ^>= 1.0
                      , fused-syntax
-                     , generic-monoid
                      , parsers ^>= 0.12.10
                      , semantic-core ^>= 0.0
                      , semantic-source ^>= 0.0
@@ -53,8 +52,6 @@ common haskell
 library
   import: haskell
   exposed-modules:
-    Control.Effect.Sketch
-    Control.Carrier.Sketch.Fresh
     Language.Python
     Language.Python.Core
     Language.Python.Failure
