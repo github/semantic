@@ -89,6 +89,8 @@ type family ToTagsInstance t :: Strategy where
   ToTagsInstance Rb.LambdaParameters   = 'Custom
   ToTagsInstance Rb.BlockParameters    = 'Custom
   ToTagsInstance Rb.Assignment         = 'Custom
+  ToTagsInstance Rb.OperatorAssignment = 'Custom
+
 
   ToTagsInstance _                     = 'Generic
 
@@ -336,6 +338,13 @@ instance ToTagsBy 'Custom Rb.Assignment where
         Prj Rb.DestructuredLeftAssignment { extraChildren } -> introduceLhsLocals extraChildren
         Prj Rb.RestAssignment { extraChildren = Just (Rb.Lhs (Prj (Rb.Variable (Prj Rb.Identifier { text })))) } -> modify (text :)
         _ -> pure ()
+
+instance ToTagsBy 'Custom Rb.OperatorAssignment where
+  tags' t@Rb.OperatorAssignment{ left } = do
+    case left of
+      Prj (Rb.Lhs (Prj (Rb.Variable (Prj Rb.Identifier { text })))) -> modify (text :)
+      _ -> pure ()
+    gtags t
 
 gtags
   :: ( Has (Reader Source) sig m
