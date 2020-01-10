@@ -102,6 +102,7 @@ nameBlacklist =
   , "super"
   , "undef"
   , "__FILE__"
+  , "__LINE__"
   , "lambda"
   ]
 
