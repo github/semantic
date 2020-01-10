@@ -37,6 +37,9 @@ data Sketchbook address = Sketchbook
   deriving Semigroup via GenericSemigroup (Sketchbook address)
   deriving Monoid via GenericMonoid (Sketchbook address)
 
+getParent :: ScopeGraph.Addressable address => Sketchbook address -> ScopeGraph.Vertex (ScopeGraph address)
+getParent = fromMaybe ScopeGraph.root . getLast . sParent
+
 newtype SketchC address m a = SketchC (StateC (Sketchbook address) (FreshC m) a)
   deriving (Applicative, Functor, Monad, MonadIO)
 
@@ -44,7 +47,7 @@ instance forall address sig m . (ScopeGraph.Addressable address, Effect sig, Alg
   alg (L (Declare name _props k)) = do
     ua <- SketchC fresh
     ub <- SketchC fresh
-    parent <- SketchC (gets @(Sketchbook address) (fromMaybe ScopeGraph.root . getLast . sParent))
+    parent <- SketchC (gets @(Sketchbook address) getParent)
 
     let newScope = ScopeGraph.scope ua
     let newDecl  = ScopeGraph.decl ub name
