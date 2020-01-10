@@ -278,16 +278,16 @@ introduceLocals params = for_ params $ \param -> case param of
   Prj Rb.KeywordParameter { name = Rb.Identifier { text = lvar }} -> modify (lvar :)
   Prj Rb.OptionalParameter { name = Rb.Identifier { text = lvar }} -> modify (lvar :)
   Prj Rb.SplatParameter { name = Just Rb.Identifier { text = lvar } } -> modify (lvar :)
-  _ -> tags param
+  _ -> pure ()
 
 instance ToTagsBy 'Custom Rb.MethodParameters where
-  tags' Rb.MethodParameters{ extraChildren } = introduceLocals extraChildren
+  tags' t@Rb.MethodParameters{ extraChildren } = introduceLocals extraChildren >> gtags t
 
 instance ToTagsBy 'Custom Rb.LambdaParameters where
-  tags' Rb.LambdaParameters{ extraChildren } = introduceLocals extraChildren
+  tags' t@Rb.LambdaParameters{ extraChildren } = introduceLocals extraChildren >> gtags t
 
 instance ToTagsBy 'Custom Rb.BlockParameters where
-  tags' Rb.BlockParameters{ extraChildren } = introduceLocals extraChildren
+  tags' t@Rb.BlockParameters{ extraChildren } = introduceLocals extraChildren >> gtags t
 
 instance ToTagsBy 'Custom Rb.Assignment where
   tags' t@Rb.Assignment{ left } = do
