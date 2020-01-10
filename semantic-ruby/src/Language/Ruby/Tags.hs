@@ -84,6 +84,10 @@ type family ToTagsInstance t :: Strategy where
   ToTagsInstance Rb.While              = 'Custom
   ToTagsInstance Rb.Until              = 'Custom
 
+  -- TODO: Remove this. Precise has better support for regex content than a la carte so we have to ignore to match current output
+  ToTagsInstance Rb.Regex         = 'Custom
+  ToTagsInstance Rb.Subshell      = 'Custom
+
   -- Parameters and assignment introduce locals
   ToTagsInstance Rb.MethodParameters   = 'Custom
   ToTagsInstance Rb.LambdaParameters   = 'Custom
@@ -233,6 +237,11 @@ instance ToTagsBy 'Custom Rb.While where
 instance ToTagsBy 'Custom Rb.Until where
   tags' Rb.Until { condition, body } = tags condition >> tags body
 
+instance ToTagsBy 'Custom Rb.Regex where
+  tags' Rb.Regex { } = pure ()
+
+instance ToTagsBy 'Custom Rb.Subshell where
+  tags' Rb.Subshell { } = pure ()
 
 instance ToTagsBy 'Custom Rb.Call where
   tags' t@Rb.Call
