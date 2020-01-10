@@ -1,38 +1,50 @@
 {-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE LambdaCase            #-}
 {-# LANGUAGE TypeFamilies          #-}
 
-module Data.ScopeGraph (ToScopeGraph(..), ScopeGraph(..), Info, runScopeGraph) where
+module Data.ScopeGraph
+  ( ToScopeGraph(..)
+  , ScopeGraph(..)
+  , Info
+  , runScopeGraph
+  , scope
+  , ref
+  , root
+  , Graph.Class.edges
+  ) where
 
 import           Algebra.Graph (Graph)
 import qualified Algebra.Graph as G
+import           Algebra.Graph.Class (Vertex)
 import qualified Algebra.Graph.Class as Graph.Class
 import           Control.Carrier.Fresh.Strict
 import           Control.Carrier.Lift
 import           Control.Carrier.Reader
-import           Control.Monad.IO.Class
-import           Data.Coerce
-import           Data.Function
-import           Data.Functor.Identity
-import           Data.Text (Text)
+import           Data.Text (Text, unpack)
 import           Data.Unique
 import           Source.Loc (Loc (..))
-import           Source.Source as Source
+import           Source.Source (Source)
 
 data Node a = Node
   { contents :: a
-  , ident    :: Data.Unique.Unique
-  } deriving (Ord)
-
-instance Eq (Node a) where
-  (==) = (==) `on` ident
+  } deriving (Eq, Ord)
 
 instance Show a => Show (Node a) where
-  -- TODO: This is dropping ident field in Node
   show = show . contents
 
 
 newtype ScopeGraph a = ScopeGraph (Graph (Node a))
-  deriving (Show)
+  deriving (Show, Eq)
+
+root :: Vertex (ScopeGraph Info)
+root = Node Root
+
+ref :: Text -> IO (Vertex (ScopeGraph Info))
+ref t = Node <$> (Ref <$> newUnique <*> pure t)
+
+scope :: IO (Vertex (ScopeGraph Info))
+scope = Node . Scope <$> newUnique
+
 
 instance Graph.Class.Graph (ScopeGraph a) where
   type Vertex (ScopeGraph a) = Node a
@@ -41,16 +53,16 @@ instance Graph.Class.Graph (ScopeGraph a) where
   overlay (ScopeGraph a) (ScopeGraph b) = ScopeGraph (a `G.overlay` b)
   connect (ScopeGraph a) (ScopeGraph b) = ScopeGraph (a `G.connect` b)
 
-data Info = Ref Text
-          | Scope
+data Info = Ref Unique Text
+          | Scope Unique
           | Root
-  deriving (Show)
+  deriving (Eq, Ord)
 
-type SGM =
-  ( ReaderC (ScopeGraph Info)
-  ( LiftC IO
-  ))
-
+instance Show Info where
+  show = \case
+    Ref _ i -> unpack i
+    Scope u -> "❇️  " <> take 3 (show (hashUnique u))
+    Root    -> "🏁"
 
 class ToScopeGraph t where
   scopeGraph :: ( Has (Reader Source) sig m ) => t Loc -> m (ScopeGraph Info)
@@ -70,5 +82,4 @@ class ToScopeGraph t where
 
 runScopeGraph :: ToScopeGraph t => Source -> t Loc -> IO (ScopeGraph Info)
 runScopeGraph src item = do
-  root <- ScopeGraph . G.vertex . Node Root <$> newUnique
   runM . runReader root . runReader src $ scopeGraph item

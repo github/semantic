@@ -1,17 +1,17 @@
 -- | Semantic functionality for Python programs.
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 module Language.Python
 ( Term(..)
 , TreeSitter.Python.tree_sitter_python
 ) where
 
-import qualified Language.Python.Tags as PyTags
-import qualified Language.Python.ScopeGraph as PyScopeGraph
-import qualified Tags.Tagging.Precise as Tags
+import qualified Algebra.Graph as Graph
 import qualified Data.ScopeGraph as ScopeGraph
+import qualified Language.Python.Tags as PyTags
+import qualified Tags.Tagging.Precise as Tags
 import qualified TreeSitter.Python (tree_sitter_python)
 import qualified TreeSitter.Python.AST as Py
 import qualified TreeSitter.Unmarshal as TS
-import qualified Algebra.Graph as Graph
 
 newtype Term a = Term { getTerm :: Py.Module a }
 
