@@ -34,6 +34,9 @@ instance Show a => Show (Node a) where
 newtype ScopeGraph a = ScopeGraph (Algebra.Graph.Graph a)
   deriving (Show, Eq)
 
+instance Semigroup (ScopeGraph a) where (<>) = GC.overlay
+instance Monoid (ScopeGraph a) where mempty = GC.empty
+
 -- ref :: Text -> IO (Vertex (ScopeGraph Info))
 -- ref t = Node <$> (Ref <$> newUnique <*> pure t)
 
