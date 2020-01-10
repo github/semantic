@@ -204,7 +204,7 @@ instance ToTagsBy 'Custom Rb.Call where
     , method = expr
     } = case expr of
       Prj Rb.Identifier { text = name } -> yield name Call
-      Prj Rb.Constant { text = name } -> yield name Call -- TODO: Should be Constant
+      Prj Rb.Constant { text = name } -> yield name Call -- TODO: Should yield Constant
       Prj Rb.Operator { text = name } -> yield name Call
       _ -> gtags t
     where
@@ -230,9 +230,9 @@ instance ToTagsBy 'Custom Rb.MethodCall where
     , method = expr
     } = case expr of
       Prj (Rb.Variable (Prj Rb.Identifier { text = name })) -> yield name Call
-      Prj (Rb.Variable (Prj Rb.Constant { text = name })) -> yield name Call -- TODO: Should be Constant
-      Prj Rb.ScopeResolution { name = Prj Rb.Constant { text } } -> yield text Call
-      Prj Rb.ScopeResolution { name = Prj Rb.Identifier { text } } -> yield text Call -- TODO: Should be Constant
+      Prj (Rb.Variable (Prj Rb.Constant { text = name })) -> yield name Call -- TODO: Should yield Constant
+      Prj Rb.ScopeResolution { name = Prj Rb.Identifier { text } } -> yield text Call
+      Prj Rb.ScopeResolution { name = Prj Rb.Constant { text } } -> yield text Call  -- TODO: Should yield Constant
       _ -> gtags t
     where
       yield name kind = yieldTag name kind loc range >> gtags t
