@@ -25,11 +25,12 @@ library
     Data.ScopeGraph
   build-depends:
       base                >= 4.13 && < 5
-    , fused-effects      ^>= 1.0
-    , semantic-source    ^>= 0.0
     , algebraic-graphs    >= 0.3 && < 0.5
-    , text               ^>= 1.2.3.1
+    , fused-effects      ^>= 1.0
     , generic-monoid
+    , pathtype
+    , semantic-source    ^>= 0.0
+    , text               ^>= 1.2.3.1
   hs-source-dirs:      src
   default-language:    Haskell2010
   ghc-options:

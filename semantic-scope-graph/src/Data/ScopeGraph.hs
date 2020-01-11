@@ -22,6 +22,7 @@ import           Data.Text (Text, unpack)
 import           Data.Unique
 import           Source.Loc (Loc (..))
 import           Source.Source (Source)
+import qualified System.Path as Path
 
 data Node a = Node
   { contents :: a
@@ -53,13 +54,13 @@ instance GC.Graph (ScopeGraph a) where
 
 data Info = Decl Int Text
           | Scope Int
-          | Root
+          | Root Path.AbsRelFile
   deriving (Eq, Ord)
 
 class Addressable a where
   scope :: Int -> a
   decl  :: Int -> Text -> a
-  root  :: a
+  root  :: Path.AbsRelFile -> a
 
 instance Addressable Info where
   scope = Scope
@@ -70,7 +71,7 @@ instance Show Info where
   show = \case
     Decl _ i -> unpack i
     Scope u -> "❇️  " <> show u
-    Root    -> "🏁"
+    Root _  -> "🏁"
 
 class ToScopeGraph t where
   scopeGraph ::
@@ -84,6 +85,6 @@ class ToScopeGraph t where
 -- instance ToScopeGraph Py.Identifier where
 --   scopeGraph _ (Py.Identifier _ t) = ScopeGraph . G.vertex . Node (Ref t) <$> liftIO newUnique
 
-runScopeGraph :: ToScopeGraph t => Source -> t Loc -> IO (ScopeGraph Info)
-runScopeGraph src item = do
-  runM . runReader (root @Info) . runReader src $ scopeGraph item
+runScopeGraph :: ToScopeGraph t => Path.AbsRelFile -> Source -> t Loc -> IO (ScopeGraph Info)
+runScopeGraph p src item = do
+  runM . runReader (Root p) . runReader src $ scopeGraph item

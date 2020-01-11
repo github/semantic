@@ -9,6 +9,7 @@
 {-# LANGUAGE TypeApplications           #-}
 {-# LANGUAGE TypeOperators              #-}
 {-# LANGUAGE UndecidableInstances       #-}
+{-# OPTIONS_GHC -Wno-redundant-constraints #-}
 
 module Control.Carrier.Sketch.Fresh
   ( SketchC (..)
@@ -38,7 +39,10 @@ data Sketchbook address = Sketchbook
   deriving Monoid via GenericMonoid (Sketchbook address)
 
 getParent :: ScopeGraph.Addressable address => Sketchbook address -> ScopeGraph.Vertex (ScopeGraph address)
-getParent = fromMaybe ScopeGraph.root . getLast . sParent
+getParent
+  = fromMaybe (error "BUG: getParent should be total, if you hit this something's wrong")
+  . getLast
+  . sParent
 
 newtype SketchC address m a = SketchC (StateC (Sketchbook address) (FreshC m) a)
   deriving (Applicative, Functor, Monad, MonadIO)
@@ -51,14 +55,13 @@ instance forall address sig m . (ScopeGraph.Addressable address, Effect sig, Alg
 
     let newScope = ScopeGraph.scope ua
     let newDecl  = ScopeGraph.decl ub name
-    let newGraph = ScopeGraph.overlays [ ScopeGraph.edge parent newScope
-                                        , ScopeGraph.edge newScope newDecl
-                                        ]
+    let newGraph = ScopeGraph.edge parent newScope
+                   <> ScopeGraph.edge newScope newDecl
 
     SketchC (modify (mappend (Sketchbook newGraph (pure newScope))))
     k
   alg (R other) = SketchC (alg (R (R (handleCoercible other))))
 
-runSketch :: (Functor m) => SketchC address m a -> m (ScopeGraph address, a)
+runSketch :: (ScopeGraph.Addressable address, Functor m) => SketchC address m a -> m (ScopeGraph address, a)
 runSketch (SketchC go) = evalFresh 0 . fmap (first sGraph) . runState mempty $ go
 
