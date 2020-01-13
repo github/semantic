@@ -24,6 +24,7 @@ module Tags.Tagging.Precise
 , foldMap1
 , foldMapDefault1
 , fmapDefault1
+, traverseDefault1
 , GTraversable1(..)
 , Generics(..)
 ) where
@@ -133,6 +134,10 @@ foldMapDefault1 f = foldMap1 @Foldable f (foldMap f)
 -- | This function may be used as a value for 'fmap' in a 'Functor' instance.
 fmapDefault1 :: Traversable1 Functor t => (a -> b) -> t a -> t b
 fmapDefault1 f = runIdentity . traverse1 @Functor (Identity . f) (Identity . fmap f)
+
+-- | This function may be used as a value for 'traverse' in a 'Traversable' instance.
+traverseDefault1 :: (Traversable1 Traversable t, Applicative f) => (a -> f b) -> t a -> f (t b)
+traverseDefault1 f = traverse1 @Traversable f (traverse f)
 
 
 -- FIXME: move GTraversable1 into semantic-ast.
