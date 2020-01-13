@@ -90,6 +90,7 @@ instance GFoldable1 c U1 where
 
 
 class Traversable1 c t where
+  -- | Map annotations and subterms of kind @* -> *@ into an 'Applicative' context.
   traverse1
     :: Applicative f
     => (a -> f b)
