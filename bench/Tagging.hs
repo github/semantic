@@ -10,7 +10,7 @@ module Tagging (benchmarks) where
 import           Control.Carrier.Parse.Measured
 import           Control.Carrier.Reader
 import           Control.Concurrent.Async (forConcurrently)
-import           Control.Exception (displayException)
+import           Control.Exception (displayException, throwIO)
 import           Control.Lens
 import           Control.Monad
 import           Data.Blob
@@ -66,9 +66,7 @@ runTagging mode dir glob = nfIO . withOptions testOptions $ \ config logger stat
   let session = TaskSession config "-" False logger statter
   files <- globDir1 (compile glob) (Path.toString dir)
   let paths = Path.relFile <$> files
-  for_ paths $ \ file -> do
-    _ <- runTask session (runParse (parseSymbolsFilePath mode file))
-    pure ()
+  for_ paths (runTask session . runParse . parseSymbolsFilePath mode >=> either throwIO pure)
 
 parseSymbolsFilePath ::
   ( Has (Error SomeException) sig m
