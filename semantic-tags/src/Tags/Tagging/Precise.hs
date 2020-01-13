@@ -1,4 +1,12 @@
-{-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, RankNTypes, ScopedTypeVariables, TypeApplications, TypeOperators #-}
+{-# LANGUAGE AllowAmbiguousTypes   #-}
+{-# LANGUAGE ConstraintKinds       #-}
+{-# LANGUAGE FlexibleContexts      #-}
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE RankNTypes            #-}
+{-# LANGUAGE ScopedTypeVariables   #-}
+{-# LANGUAGE TypeApplications      #-}
+{-# LANGUAGE TypeOperators         #-}
 module Tags.Tagging.Precise
 ( Tags
 , ToTags(..)
@@ -13,13 +21,13 @@ module Tags.Tagging.Precise
 import Control.Carrier.Reader
 import Control.Carrier.Writer.Strict
 import Data.Functor.Identity
-import Data.Monoid (Endo(..))
+import Data.Monoid (Endo (..))
 import Data.Text as Text (Text, takeWhile)
 import GHC.Generics
 import Prelude hiding (span)
-import Source.Loc (Loc(..))
-import Source.Span
+import Source.Loc (Loc (..))
 import Source.Source as Source
+import Source.Span
 import Tags.Tag
 
 type Tags = Endo [Tag]
