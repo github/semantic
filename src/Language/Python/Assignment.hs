@@ -128,10 +128,10 @@ expressionList :: Assignment (Term Loc)
 expressionList = makeTerm'' <$> symbol ExpressionList <*> children (someTerm expression)
 
 listSplat :: Assignment (Term Loc)
-listSplat = makeTerm <$> symbol ListSplat <*> (Syntax.Identifier . name <$> source)
+listSplat = makeTerm <$> symbol ListSplat <*> children (someTerm expression)
 
 dictionarySplat :: Assignment (Term Loc)
-dictionarySplat = makeTerm <$> symbol DictionarySplat <*> (Syntax.Identifier . name <$> source)
+dictionarySplat = makeTerm <$> symbol DictionarySplat <*> children (someTerm expression)
 
 keywordArgument :: Assignment (Term Loc)
 keywordArgument = makeTerm <$> symbol KeywordArgument <*> children (Statement.Assignment [] <$> term expression <*> term expression)
