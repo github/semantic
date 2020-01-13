@@ -16,11 +16,13 @@ module Tags.Tagging.Precise
 , firstLine
 , GFoldable1(..)
 , Traversable1(..)
+, foldMap1
 , GTraversable1(..)
 ) where
 
 import Control.Carrier.Reader
 import Control.Carrier.Writer.Strict
+import Data.Functor.Const
 import Data.Functor.Identity
 import Data.Monoid (Endo (..))
 import Data.Text as Text (Text, takeWhile)
@@ -104,6 +106,10 @@ class Traversable1 c t where
     -> t a
     -> f (t b)
   traverse1 f g = fmap to1 . gtraverse1 @c f g . from1
+
+foldMap1 :: forall c t b a . (Traversable1 c t, Monoid b) => (a -> b) -> (forall t' . c t' => t' a -> b) -> t a -> b
+foldMap1 f g = getConst . traverse1 @c (Const . f) (Const . g)
+
 
 class GTraversable1 c t where
   -- | Generically map annotations and subterms of kind @* -> *@ into an 'Applicative' context.
