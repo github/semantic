@@ -2,31 +2,21 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications  #-}
 
-{-# OPTIONS_GHC -Wno-unused-imports -Wno-unused-top-binds #-}
-
 module Tagging (benchmarks) where
 
 import           Control.Carrier.Parse.Measured
 import           Control.Carrier.Reader
-import           Control.Concurrent.Async (forConcurrently)
-import           Control.Exception (displayException, throwIO)
-import           Control.Lens
+import           Control.Exception (throwIO)
 import           Control.Monad
 import           Data.Blob
 import           Data.Foldable
 import           Data.Language (LanguageMode (..), PerLanguageModes (..))
-import           Data.List
-import qualified Data.Text as Text
-import           Data.Traversable
 import           Gauge
 import           System.FilePath.Glob
-import           System.Path ((</>))
 import qualified System.Path as Path
-import qualified System.Process as Process
 
 import Data.Flag
 import Proto.Semantic as P hiding (Blob, BlobPair)
-import Proto.Semantic_Fields as P
 import Semantic.Api.Symbols (parseSymbols)
 import Semantic.Config as Config
 import Semantic.Task
