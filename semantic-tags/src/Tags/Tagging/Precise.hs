@@ -1,5 +1,6 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE ConstraintKinds #-}
+{-# LANGUAGE DefaultSignatures #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
@@ -95,6 +96,13 @@ class Traversable1 c t where
     -> (forall t' . c t' => t' a -> f (t' b))
     -> t a
     -> f (t b)
+  default traverse1
+    :: (Applicative f, Generic1 t, GTraversable1 c (Rep1 t))
+    => (a -> f b)
+    -> (forall t' . c t' => t' a -> f (t' b))
+    -> t a
+    -> f (t b)
+  traverse1 f g = fmap to1 . gtraverse1 @c f g . from1
 
 class GTraversable1 c t where
   -- | Generically map annotations and subterms of kind @* -> *@ into an 'Applicative' context.
