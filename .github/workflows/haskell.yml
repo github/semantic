@@ -53,7 +53,7 @@ jobs:
 
     - name: hlint
       run: |
-        cabal install hlint --installdir=dist-newstyle
+        cabal install hlint --installdir=dist-newstyle --overwrite-policy=always
         dist-newstyle/hlint src semantic-python
 
     - name: Build & test
