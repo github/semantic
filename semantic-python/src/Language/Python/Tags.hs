@@ -139,19 +139,25 @@ instance ToTagsBy 'Custom Py.Call where
     { ann = loc@Loc { byteRange = range }
     , function = Py.PrimaryExpression expr
     } = match expr
-      where
-        match expr = case expr of
-          (Prj Py.Attribute { attribute = Py.Identifier _ name }) -> yield name
-          (Prj (Py.Identifier _ name)) -> yield name
-          (Prj Py.Call { function = Py.PrimaryExpression expr' }) -> match expr' -- Nested call expression like this in Python represent creating an instance of a class and calling it: e.g. AClass()()
-          (Prj (Py.ParenthesizedExpression _ (Prj (Py.Expression (Prj (Py.PrimaryExpression expr')))))) -> match expr' -- Parenthesized expressions
-          _ -> gtags t
-        yield name = do
-          src <- ask @Source
-          let sliced = slice src range
-          Tags.yield (Tag name Call loc (Tags.firstLine sliced) Nothing)
-          gtags t
+    where
+      match expr = case expr of
+        (Prj Py.Attribute { attribute = Py.Identifier _ name }) -> yield name
+        (Prj (Py.Identifier _ name)) -> yield name
+        (Prj Py.Call { function = Py.PrimaryExpression expr' }) -> match expr' -- Nested call expression like this in Python represent creating an instance of a class and calling it: e.g. AClass()()
+        (Prj (Py.ParenthesizedExpression _ (Prj (Py.Expression (Prj (Py.PrimaryExpression expr')))))) -> match expr' -- Parenthesized expressions
+        _ -> gtags t
+      yield name = yieldTag name Call loc range >> gtags t
+        -- yield name = do
+        --   src <- ask @Source
+        --   let sliced = slice src range
+        --   Tags.yield (Tag name Call loc (Tags.firstLine sliced) Nothing)
+        --   gtags t
 
+yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text -> Kind -> Loc -> Range -> m ()
+yieldTag name kind loc range = do
+  src <- ask @Source
+  let sliced = slice src range
+  Tags.yield (Tag name kind loc (Tags.firstLine sliced) Nothing)
 
 docComment :: Source -> (Py.CompoundStatement :+: Py.SimpleStatement) Loc -> Maybe Text
 docComment src (R1 (Py.SimpleStatement (Prj Py.ExpressionStatement { extraChildren = L1 (Prj (Py.Expression (Prj (Py.PrimaryExpression (Prj Py.String { ann }))))) :|_ }))) = Just (toText (slice src (byteRange ann)))
