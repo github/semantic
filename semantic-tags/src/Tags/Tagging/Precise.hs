@@ -88,3 +88,6 @@ class GTraversable1 c t where
 
 instance GTraversable1 c f => GTraversable1 c (M1 i c' f) where
   gtraverse1 f = fmap M1 . gtraverse1 @c f . unM1
+
+instance (GTraversable1 c f, GTraversable1 c g) => GTraversable1 c (f :*: g) where
+  gtraverse1 f (l :*: r) = (:*:) <$> gtraverse1 @c f l <*> gtraverse1 @c f r
