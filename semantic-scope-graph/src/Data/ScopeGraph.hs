@@ -1,11 +1,15 @@
+{-# LANGUAGE DataKinds             #-}
 {-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE LambdaCase            #-}
 {-# LANGUAGE TypeApplications      #-}
 {-# LANGUAGE TypeFamilies          #-}
+{-# LANGUAGE TypeOperators         #-}
 
 module Data.ScopeGraph
   ( ToScopeGraph(..)
   , ScopeGraph(..)
+  , onChildren
   , Info (..)
   , module GC
   , Addressable (..)
@@ -14,11 +18,11 @@ module Data.ScopeGraph
 import qualified Algebra.Graph
 import           Algebra.Graph.Class as GC
 import           Control.Effect.Sketch
-import           Control.Monad.IO.Class
+import           Data.Foldable
 import           Data.Text (Text, unpack)
-import           Data.Unique
+import           GHC.Generics
+import           GHC.Records
 import           Source.Loc (Loc (..))
-import           Source.Source (Source)
 import qualified System.Path as Path
 
 data Node a = Node
@@ -76,3 +80,17 @@ class ToScopeGraph t where
     )
     => t Loc
     -> m (ScopeGraph Info)
+
+instance (ToScopeGraph l, ToScopeGraph r) => ToScopeGraph (l :+: r) where
+  scopeGraph (L1 l) = scopeGraph l
+  scopeGraph (R1 r) = scopeGraph r
+
+onChildren ::
+  ( Traversable t
+  , ToScopeGraph syn
+  , Has (Sketch Info) sig m
+  , HasField "extraChildren" (r Loc) (t (syn Loc))
+  )
+  => r Loc
+  -> m (ScopeGraph Info)
+onChildren x = fold <$> traverse scopeGraph (getField @"extraChildren" x)

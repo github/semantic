@@ -1,6 +1,9 @@
+{-# LANGUAGE DataKinds                  #-}
 {-# LANGUAGE DuplicateRecordFields      #-}
+{-# LANGUAGE FlexibleContexts           #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE NamedFieldPuns             #-}
+{-# LANGUAGE ScopedTypeVariables        #-}
 {-# LANGUAGE StandaloneDeriving         #-}
 {-# LANGUAGE TypeApplications           #-}
 {-# LANGUAGE TypeOperators              #-}
@@ -15,7 +18,7 @@ module Language.Python
 -- import           Control.Monad.IO.Class
 import           Data.Foldable
 import qualified Data.List.NonEmpty as NonEmpty
-import           Data.ScopeGraph (ToScopeGraph (..))
+import           Data.ScopeGraph (ToScopeGraph (..), onChildren)
 import qualified Data.ScopeGraph as ScopeGraph
 import           GHC.Generics
 import qualified Language.Python.Tags as PyTags
@@ -38,30 +41,42 @@ instance Tags.ToTags Term where
 instance ScopeGraph.ToScopeGraph Term where
   scopeGraph = ScopeGraph.scopeGraph . getTerm
 
-instance ToScopeGraph Py.Block where
-  scopeGraph (Py.Block _ children) = fold <$> traverse scopeGraph children
+instance ToScopeGraph Py.Await where
+  scopeGraph (Py.Await _ a) = scopeGraph a
+
+instance ToScopeGraph Py.BooleanOperator where
+  scopeGraph (Py.BooleanOperator _ _ left right) = mappend <$> scopeGraph left <*> scopeGraph right
+
+instance ToScopeGraph Py.BinaryOperator where
+  scopeGraph (Py.BinaryOperator _ _ left right) = mappend <$> scopeGraph left <*> scopeGraph right
+
+
+instance ToScopeGraph Py.Block where scopeGraph = onChildren
+
+instance ToScopeGraph Py.ClassDefinition where scopeGraph = todo
 
 deriving instance ToScopeGraph Py.CompoundStatement
 
+instance ToScopeGraph Py.ConditionalExpression where scopeGraph = onChildren
+
 instance ToScopeGraph Py.DecoratedDefinition where scopeGraph = todo
 
-instance ToScopeGraph Py.Module where
-  scopeGraph Py.Module { Py.extraChildren = stmts } = fold <$> traverse scopeGraph stmts
-
-instance (ToScopeGraph l, ToScopeGraph r) => ToScopeGraph (l :+: r) where
-  scopeGraph (L1 l) = scopeGraph l
-  scopeGraph (R1 r) = scopeGraph r
+instance ToScopeGraph Py.ComparisonOperator where scopeGraph = onChildren
 
 deriving instance ToScopeGraph Py.Expression
 
 instance ToScopeGraph Py.ElseClause where
   scopeGraph (Py.ElseClause _ elc) = scopeGraph elc
 
-instance ToScopeGraph Py.ExceptClause where
-  scopeGraph (Py.ExceptClause _ as) = fold <$> traverse scopeGraph as
+instance ToScopeGraph Py.ElifClause where
+  scopeGraph (Py.ElifClause _ body condition) = mappend <$> scopeGraph condition <*> scopeGraph body
 
-instance ToScopeGraph Py.ExpressionList where
-  scopeGraph (Py.ExpressionList _ as) = fold <$> traverse scopeGraph as
+instance ToScopeGraph Py.ExceptClause where scopeGraph = onChildren
+
+instance ToScopeGraph Py.ExpressionList where scopeGraph = onChildren
+
+instance ToScopeGraph Py.False where
+  scopeGraph _ = pure mempty
 
 instance ToScopeGraph Py.FinallyClause where
   scopeGraph (Py.FinallyClause _ block) = scopeGraph block
@@ -77,15 +92,37 @@ instance ToScopeGraph Py.IfStatement where
     alt <- traverse scopeGraph alternative
     pure (fold (con : bod : alt))
 
+instance ToScopeGraph Py.Integer where scopeGraph = const (pure mempty)
+
 instance ToScopeGraph Py.Lambda where scopeGraph = todo
 
+instance ToScopeGraph Py.List where scopeGraph = onChildren
+
+instance ToScopeGraph Py.ListComprehension where scopeGraph = todo
+
+instance ToScopeGraph Py.ListSplat where scopeGraph = onChildren
+
 instance ToScopeGraph Py.NamedExpression where scopeGraph = todo
+
+instance ToScopeGraph Py.None where scopeGraph = const (pure mempty)
+
+instance ToScopeGraph Py.NonlocalStatement where scopeGraph = todo
+
+instance ToScopeGraph Py.Module where scopeGraph = onChildren
 
 instance ToScopeGraph Py.ReturnStatement where
   scopeGraph (Py.ReturnStatement _ mVal) = maybe (pure mempty) scopeGraph mVal
 
+instance ToScopeGraph Py.True where
+  scopeGraph _ = pure mempty
+
 instance ToScopeGraph Py.NotOperator where
   scopeGraph (Py.NotOperator _ arg) = scopeGraph arg
+
+instance ToScopeGraph Py.ParenthesizedExpression where
+  scopeGraph (Py.ParenthesizedExpression _ e) = scopeGraph e
+
+instance ToScopeGraph Py.PassStatement where scopeGraph _ = pure mempty
 
 instance ToScopeGraph Py.PrintStatement where
   scopeGraph (Py.PrintStatement _ args _chevron) = fold <$> traverse scopeGraph args
@@ -96,6 +133,16 @@ deriving instance ToScopeGraph Py.SimpleStatement
 
 instance ToScopeGraph Py.RaiseStatement where
   scopeGraph = todo
+
+instance ToScopeGraph Py.Set where scopeGraph = onChildren
+
+instance ToScopeGraph Py.SetComprehension where scopeGraph = todo
+
+instance ToScopeGraph Py.String where scopeGraph _ = pure mempty
+
+instance ToScopeGraph Py.Subscript where scopeGraph = todo
+
+instance ToScopeGraph Py.Tuple where scopeGraph = onChildren
 
 instance ToScopeGraph Py.TryStatement where
   scopeGraph (Py.TryStatement _ body elseClauses) = do
@@ -115,3 +162,5 @@ instance ToScopeGraph Py.WhileStatement where
 
 instance ToScopeGraph Py.WithStatement where
   scopeGraph = todo
+
+instance ToScopeGraph Py.Yield where scopeGraph = onChildren
