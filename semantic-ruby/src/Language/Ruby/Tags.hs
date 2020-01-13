@@ -22,7 +22,6 @@ import           Control.Effect.Reader
 import           Control.Effect.State
 import           Control.Effect.Writer
 import           Control.Monad
-import           Data.Monoid (Ap (..))
 import           Data.Foldable
 import           Data.Text as Text
 import           GHC.Generics
@@ -311,7 +310,7 @@ gtags
      )
   => t Loc
   -> m ()
-gtags = getAp . Tags.foldMap1 @ToTags (const mempty) (Ap . tags) . Tags.Generics
+gtags = Tags.traverse1_ @ToTags (const (pure ())) tags . Tags.Generics
 
 instance (Generic1 t, Tags.GTraversable1 ToTags (Rep1 t)) => ToTagsBy 'Generic t where
   tags' = gtags

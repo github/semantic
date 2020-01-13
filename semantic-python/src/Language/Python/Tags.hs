@@ -20,7 +20,6 @@ import           AST.Element
 import           Control.Effect.Reader
 import           Control.Effect.Writer
 import           Data.Maybe (listToMaybe)
-import           Data.Monoid (Ap(..))
 import           Data.List.NonEmpty (NonEmpty(..))
 import           Data.Text as Text
 import           GHC.Generics
@@ -166,7 +165,7 @@ gtags
      )
   => t Loc
   -> m ()
-gtags = getAp . Tags.foldMap1 @ToTags (const mempty) (Ap . tags) . Tags.Generics
+gtags = Tags.traverse1_ @ToTags (const (pure ())) tags . Tags.Generics
 
 instance (Generic1 t, Tags.GTraversable1 ToTags (Rep1 t)) => ToTagsBy 'Generic t where
   tags' = gtags
