@@ -18,6 +18,7 @@ import           Core.Name as Name
 import           Data.Coerce
 import           Data.Foldable
 import           Data.Function
+import           Data.Text (Text)
 import           Data.List.NonEmpty (NonEmpty (..))
 import           Data.Maybe
 import           GHC.Records
@@ -40,10 +41,10 @@ def n = coerce (Stack.:> n)
 -- a Python ExpressionList. Easier than pattern-matching every time.
 -- TODO: when this is finished, we won't need this pattern, as we'll
 -- handle ExpressionLists the smart way every time.
-pattern SingleIdentifier :: Name -> Py.ExpressionList a
+pattern SingleIdentifier :: Coercible t Text => t -> Py.ExpressionList a
 pattern SingleIdentifier name <- Py.ExpressionList
   { Py.extraChildren =
-    [ Py.Expression (Prj (Py.PrimaryExpression (Prj Py.Identifier { text = Name -> name })))
+    [ Py.Expression (Prj (Py.PrimaryExpression (Prj Py.Identifier { text = coerce -> name })))
     ]
   }
 

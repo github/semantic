@@ -17,28 +17,17 @@ module Language.Python
 
 -- import           Control.Carrier.Reader
 -- import           Control.Monad.IO.Class
-import           AST.Element
 import           Control.Effect.Sketch
 import           Convert.ToScopeGraph
 import           Data.Foldable
 import qualified Data.List.NonEmpty as NonEmpty
 import qualified Data.ScopeGraph as ScopeGraph
-import           Data.Text (Text)
+import           Language.Python.Core (pattern SingleIdentifier)
 import qualified Language.Python.Tags as PyTags
 import qualified Tags.Tagging.Precise as Tags
 import qualified TreeSitter.Python (tree_sitter_python)
 import qualified TreeSitter.Python.AST as Py
 import qualified TreeSitter.Unmarshal as TS
-
--- | Useful pattern synonym for extracting a single identifier from
--- a Python ExpressionList. Easier than pattern-matching every time.
--- TODO: when this is finished, we won't need this pattern, as we'll
--- handle ExpressionLists the smart way every time.
-pattern SingleIdentifier :: Text -> Py.ExpressionList a
-pattern SingleIdentifier name <- Py.ExpressionList
-  { Py.extraChildren =
-    Py.Expression (Prj (Py.PrimaryExpression (Prj Py.Identifier { text = name }))) NonEmpty.:| []
-  }
 
 todo :: Show a => a -> b
 todo s = error ("TODO: " <> show s)
