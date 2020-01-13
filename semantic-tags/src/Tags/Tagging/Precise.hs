@@ -102,7 +102,7 @@ instance GFoldable1 c U1 where
 --
 -- 'Traversable1' can express any combination of first- and second-order mapping, folding, and traversal.
 class Traversable1 c t where
-  -- | Map annotations and subterms of kind @* -> *@ into an 'Applicative' context.
+  -- | Map annotations of kind @*@ and heterogeneously-typed subterms of kind @* -> *@ under some constraint @c@ into an 'Applicative' context.
   --
   -- Note that this traversal is non-recursive: any recursion through subterms must be performed by the second function argument.
   traverse1
