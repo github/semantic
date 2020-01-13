@@ -150,6 +150,11 @@ instance GTraversable1 c U1 where
   gtraverse1 _ _ _ = pure U1
 
 
+-- | @'Generics' t@ has a 'Traversable1' instance when @'Rep1' t@ has a 'GTraversable1' instance, making this convenient for applying 'traverse1' to 'Generic1' types lacking 'Traversable1' instances:
+--
+-- @
+-- 'getGenerics' '<$>' 'traverse1' f g ('Generics' t) = 'to1' '<$>' 'gtraverse1' f g ('from1' t)
+-- @
 newtype Generics t a = Generics { getGenerics :: t a }
   deriving (Foldable, Functor, Traversable)
 
