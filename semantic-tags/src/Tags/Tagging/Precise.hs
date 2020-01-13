@@ -99,6 +99,8 @@ instance GFoldable1 c U1 where
 -- FIXME: derive Traversable1 instances for TH-generated syntax types.
 
 -- | Simultaneous traversal of subterms of kind @*@ and @* -> *@ in an 'Applicative' context.
+--
+-- 'Traversable1' can express any combination of first- and second-order mapping, folding, and traversal.
 class Traversable1 c t where
   -- | Map annotations and subterms of kind @* -> *@ into an 'Applicative' context.
   traverse1
