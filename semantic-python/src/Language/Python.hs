@@ -121,10 +121,8 @@ instance ToScopeGraph Py.FutureImportStatement where scopeGraph = todo
 instance ToScopeGraph Py.GeneratorExpression where scopeGraph = todo
 
 instance ToScopeGraph Py.Identifier where
-  -- THIS IS WRONG, SORRY, JOSH, I JUST WANTED TO FILL SOMETHING IN HERE
   scopeGraph (Py.Identifier _ t) = do
     declare @ScopeGraph.Info t DeclProperties
-    pure mempty
 
 instance ToScopeGraph Py.IfStatement where
   scopeGraph (Py.IfStatement _ alternative body condition) = do

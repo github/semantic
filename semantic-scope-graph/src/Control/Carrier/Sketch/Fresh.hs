@@ -67,10 +67,10 @@ runSketch ::
   (ScopeGraph.Addressable address, Functor m)
   => Maybe Path.AbsRelFile
   -> SketchC address m a
-  -> m (ScopeGraph address, a)
+  -> m a
 runSketch rootpath (SketchC go)
   = evalFresh 0
-  . fmap (first sGraph)
+  . fmap snd
   . runState (Sketchbook ScopeGraph.empty (pure (ScopeGraph.root rootpath)))
   $ go
 
