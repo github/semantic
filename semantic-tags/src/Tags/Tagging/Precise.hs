@@ -20,6 +20,7 @@ module Tags.Tagging.Precise
 , Traversable1(..)
 , for1
 , traverse1_
+, for1_
 , foldMap1
 , foldMapDefault1
 , fmapDefault1
@@ -111,6 +112,15 @@ traverse1_
   -> t a
   -> f ()
 traverse1_ f g = getAp . foldMap1 @c (Ap . void . f) (Ap . void . g)
+
+for1_
+  :: forall c t f a a' a''
+  .  (Traversable1 c t, Applicative f)
+  => t a
+  -> (a -> f a')
+  -> (forall t' . c t' => t' a -> f a'')
+  -> f ()
+for1_ t f g = getAp $ foldMap1 @c (Ap . void . f) (Ap . void . g) t
 
 foldMap1 :: forall c t b a . (Traversable1 c t, Monoid b) => (a -> b) -> (forall t' . c t' => t' a -> b) -> t a -> b
 foldMap1 f g = getConst . traverse1 @c (Const . f) (Const . g)
