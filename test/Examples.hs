@@ -51,8 +51,8 @@ le = LanguageExample
 examples :: [LanguageExample]
 examples =
   -- [ le "go" "**/*.go" goFileSkips goDirSkips
-  -- [ le "python" "**/*.py" mempty mempty
-  [ le "ruby" "**/*.rb" rubySkips mempty
+  [ le "python" "**/*.py" mempty mempty
+  -- [ le "ruby" "**/*.rb" rubySkips mempty
   -- , le "typescript" "**/*.[jt]s" typescriptSkips mempty
   -- , le "typescript" "**/*.[jt]sx" tsxSkips mempty
   ]
@@ -223,19 +223,22 @@ buildExamples session lang tsDir = do
                 -- lSpan = " [" <> show (startRow left) <> ", " <> show (left^.P.span^.start^.column) <>  "]"
                 -- rSpan = " [" <> show (startRow right) <> ", " <> show (right^.P.span^.start^.column) <>  "]"
             HUnit.assertEqual (Text.unpack (x^.path) <> lineNo) (left^.symbol) (right^.symbol)
-            HUnit.assertEqual (Text.unpack (x^.path) <> lineNo) (left^.line) (right^.line)
-            -- HUnit.assertEqual (Text.unpack (x^.path) <> lineNo) (Text.unpack (left^.symbol) <> span left) (Text.unpack (right^.symbol) <> span right)
+            HUnit.assertEqual (Text.unpack (x^.path) <> lineNo) (Text.unpack (left^.symbol) <> span left) (Text.unpack (right^.symbol) <> span right)
+            if left^.kind == "Class"
+              then HUnit.assertEqual (Text.unpack (x^.path) <> lineNo) (left^.line) (right^.line)
+              -- then HUnit.assertBool (Text.unpack (x^.path) <> lineNo) (Text.isPrefixOf (left^.line) (right^.line))
+              else pure ()
 
         _          -> HUnit.assertFailure "Expected 1 file in each response"
       (Left e1, Left e2) -> HUnit.assertFailure ("Unable to parse (both)" <> show (displayException e1) <> show (displayException e2))
       (_, Left e)        -> HUnit.assertFailure ("Unable to parse (precise)" <> show (displayException e))
       (Left e, _)        -> HUnit.assertFailure ("Unable to parse (a la carte)" <> show (displayException e))
 
-    sSym x = SortableSymbol (x^.symbol) (x^.P.span^.start^.line)
-    -- span x = " ["  <> show (x^.P.span^.start^.line) <> ", " <> show (x^.P.span^.start^.column) <>
-    --          " - " <> show (x^.P.span^.end^.line) <> ", " <> show (x^.P.span^.end^.column) <> "]"
+    sSym x = SortableSymbol (x^.symbol) (x^.P.span^.start^.line) (x^.P.span^.start^.column) (x^.P.span^.end^.line) (x^.P.span^.end^.column)
+    span x = " ["  <> show (x^.P.span^.start^.line) <> ", " <> show (x^.P.span^.start^.column) <>
+             " - " <> show (x^.P.span^.end^.line) <> ", " <> show (x^.P.span^.end^.column) <> "]"
 
-data SortableSymbol = SortableSymbol Text.Text Int32
+data SortableSymbol = SortableSymbol Text.Text Int32 Int32 Int32 Int32
   deriving (Eq, Show, Ord)
 
 
