@@ -16,6 +16,7 @@ module Language.Python
 
 -- import           Control.Carrier.Reader
 -- import           Control.Monad.IO.Class
+import           Control.Effect.Sketch
 import           Data.Foldable
 import qualified Data.List.NonEmpty as NonEmpty
 import           Data.ScopeGraph (ToScopeGraph (..), onChildren)
@@ -50,10 +51,15 @@ instance ToScopeGraph Py.BooleanOperator where
 instance ToScopeGraph Py.BinaryOperator where
   scopeGraph (Py.BinaryOperator _ _ left right) = mappend <$> scopeGraph left <*> scopeGraph right
 
+instance ToScopeGraph Py.Attribute where scopeGraph = onChildren
 
 instance ToScopeGraph Py.Block where scopeGraph = onChildren
 
+instance ToScopeGraph Py.Call where scopeGraph = todo
+
 instance ToScopeGraph Py.ClassDefinition where scopeGraph = todo
+
+instance ToScopeGraph Py.ConcatenatedString where scopeGraph = const (pure mempty)
 
 deriving instance ToScopeGraph Py.CompoundStatement
 
@@ -63,6 +69,12 @@ instance ToScopeGraph Py.DecoratedDefinition where scopeGraph = todo
 
 instance ToScopeGraph Py.ComparisonOperator where scopeGraph = onChildren
 
+instance ToScopeGraph Py.Dictionary where scopeGraph = onChildren
+
+instance ToScopeGraph Py.DictionaryComprehension where scopeGraph = todo
+
+instance ToScopeGraph Py.DictionarySplat where scopeGraph = todo
+
 deriving instance ToScopeGraph Py.Expression
 
 instance ToScopeGraph Py.ElseClause where
@@ -70,6 +82,8 @@ instance ToScopeGraph Py.ElseClause where
 
 instance ToScopeGraph Py.ElifClause where
   scopeGraph (Py.ElifClause _ body condition) = mappend <$> scopeGraph condition <*> scopeGraph body
+
+instance ToScopeGraph Py.Ellipsis where scopeGraph = const (pure mempty)
 
 instance ToScopeGraph Py.ExceptClause where scopeGraph = onChildren
 
@@ -81,9 +95,19 @@ instance ToScopeGraph Py.False where
 instance ToScopeGraph Py.FinallyClause where
   scopeGraph (Py.FinallyClause _ block) = scopeGraph block
 
+instance ToScopeGraph Py.Float where scopeGraph = const (pure mempty)
+
 instance ToScopeGraph Py.ForStatement where scopeGraph = todo
 
 instance ToScopeGraph Py.FunctionDefinition where scopeGraph = todo
+
+instance ToScopeGraph Py.GeneratorExpression where scopeGraph = todo
+
+instance ToScopeGraph Py.Identifier where
+  -- THIS IS WRONG, SORRY, JOSH, I JUST WANTED TO FILL SOMETHING IN HERE
+  scopeGraph (Py.Identifier _ t) = do
+    declare @ScopeGraph.Info t DeclProperties
+    pure mempty
 
 instance ToScopeGraph Py.IfStatement where
   scopeGraph (Py.IfStatement _ alternative body condition) = do
@@ -118,6 +142,9 @@ instance ToScopeGraph Py.True where
 
 instance ToScopeGraph Py.NotOperator where
   scopeGraph (Py.NotOperator _ arg) = scopeGraph arg
+
+instance ToScopeGraph Py.Pair where
+  scopeGraph (Py.Pair _ value key) = mappend <$> scopeGraph key <*> scopeGraph value
 
 instance ToScopeGraph Py.ParenthesizedExpression where
   scopeGraph (Py.ParenthesizedExpression _ e) = scopeGraph e

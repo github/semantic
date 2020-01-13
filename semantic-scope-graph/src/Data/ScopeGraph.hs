@@ -93,4 +93,7 @@ onChildren ::
   )
   => r Loc
   -> m (ScopeGraph Info)
-onChildren x = fold <$> traverse scopeGraph (getField @"extraChildren" x)
+onChildren
+  = fmap fold
+  . traverse scopeGraph
+  . getField @"extraChildren"
