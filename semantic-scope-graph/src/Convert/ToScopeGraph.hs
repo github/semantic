@@ -1,10 +1,14 @@
-{-# LANGUAGE DataKinds        #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE TypeOperators    #-}
+{-# LANGUAGE AllowAmbiguousTypes       #-}
+{-# LANGUAGE DataKinds                 #-}
+{-# LANGUAGE ExistentialQuantification #-}
+{-# LANGUAGE FlexibleContexts          #-}
+{-# LANGUAGE ScopedTypeVariables       #-}
+{-# LANGUAGE TypeApplications          #-}
+{-# LANGUAGE TypeOperators             #-}
 module Convert.ToScopeGraph
   ( ToScopeGraph (..)
   , onChildren
+  , onField
   ) where
 
 import Control.Effect.Sketch
@@ -24,6 +28,18 @@ class ToScopeGraph t where
 instance (ToScopeGraph l, ToScopeGraph r) => ToScopeGraph (l :+: r) where
   scopeGraph (L1 l) = scopeGraph l
   scopeGraph (R1 r) = scopeGraph r
+
+onField ::
+  forall field syn sig m r .
+  ( Has (Sketch Info) sig m
+  , HasField field (r Loc) (syn Loc)
+  , ToScopeGraph syn
+  )
+  => r Loc
+  -> m (ScopeGraph Info)
+onField
+  = scopeGraph @syn
+  . getField @field
 
 onChildren ::
   ( Traversable t
