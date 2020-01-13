@@ -54,8 +54,7 @@ library
                      , aeson-pretty         ^>= 0.8.8
   hs-source-dirs:      src
   default-language:    Haskell2010
-  ghc-options:       -Wall
-                     -Wredundant-constraints
+
 
 executable semantic-ast
   import:              haskell
