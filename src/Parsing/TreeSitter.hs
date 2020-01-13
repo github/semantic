@@ -57,8 +57,8 @@ parseToPreciseAST
   -> m (Either TSParseException (t Loc))
 parseToPreciseAST parseTimeout language blob = runParse parseTimeout language blob $ \ rootPtr ->
   TS.withCursor (castPtr rootPtr) $ \ cursor ->
-    (Right <$> runReader (TS.UnmarshalState (Source.bytes (blobSource blob)) cursor) (liftIO (peek rootPtr) >>= TS.unmarshalNode))
-      >>= either (Exc.throw . UnmarshalFailure . TS.getUnmarshalError) pure
+    runReader (TS.UnmarshalState (Source.bytes (blobSource blob)) cursor) (liftIO (peek rootPtr) >>= TS.unmarshalNode)
+    `Exc.catch` (Exc.throw . UnmarshalFailure . TS.getUnmarshalError)
 
 instance Exception TSParseException where
   displayException = \case
