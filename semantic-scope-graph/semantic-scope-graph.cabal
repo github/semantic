@@ -22,6 +22,7 @@ library
   exposed-modules:
     Control.Effect.Sketch
     Control.Carrier.Sketch.Fresh
+    Convert.ToScopeGraph
     Data.ScopeGraph
   build-depends:
       base                >= 4.13 && < 5

@@ -7,9 +7,7 @@
 {-# LANGUAGE TypeOperators         #-}
 
 module Data.ScopeGraph
-  ( ToScopeGraph(..)
-  , ScopeGraph(..)
-  , onChildren
+  ( ScopeGraph(..)
   , Info (..)
   , module GC
   , Addressable (..)
@@ -17,12 +15,7 @@ module Data.ScopeGraph
 
 import qualified Algebra.Graph
 import           Algebra.Graph.Class as GC
-import           Control.Effect.Sketch
-import           Data.Foldable
 import           Data.Text (Text, unpack)
-import           GHC.Generics
-import           GHC.Records
-import           Source.Loc (Loc (..))
 import qualified System.Path as Path
 
 data Node a = Node
@@ -73,27 +66,3 @@ instance Show Info where
     Decl _ i -> unpack i
     Scope u -> "❇️  " <> show u
     Root _  -> "🏁"
-
-class ToScopeGraph t where
-  scopeGraph ::
-    ( Has (Sketch Info) sig m
-    )
-    => t Loc
-    -> m (ScopeGraph Info)
-
-instance (ToScopeGraph l, ToScopeGraph r) => ToScopeGraph (l :+: r) where
-  scopeGraph (L1 l) = scopeGraph l
-  scopeGraph (R1 r) = scopeGraph r
-
-onChildren ::
-  ( Traversable t
-  , ToScopeGraph syn
-  , Has (Sketch Info) sig m
-  , HasField "extraChildren" (r Loc) (t (syn Loc))
-  )
-  => r Loc
-  -> m (ScopeGraph Info)
-onChildren
-  = fmap fold
-  . traverse scopeGraph
-  . getField @"extraChildren"

@@ -17,9 +17,10 @@ module Language.Python
 -- import           Control.Carrier.Reader
 -- import           Control.Monad.IO.Class
 import           Control.Effect.Sketch
+import           Convert.ToScopeGraph
+import           Convert.ToScopeGraph (ToScopeGraph (..), onChildren)
 import           Data.Foldable
 import qualified Data.List.NonEmpty as NonEmpty
-import           Data.ScopeGraph (ToScopeGraph (..), onChildren)
 import qualified Data.ScopeGraph as ScopeGraph
 import           GHC.Generics
 import qualified Language.Python.Tags as PyTags
@@ -39,8 +40,8 @@ instance TS.Unmarshal Term where
 instance Tags.ToTags Term where
   tags src = Tags.runTagging src . PyTags.tags . getTerm
 
-instance ScopeGraph.ToScopeGraph Term where
-  scopeGraph = ScopeGraph.scopeGraph . getTerm
+instance ToScopeGraph Term where
+  scopeGraph = scopeGraph . getTerm
 
 instance ToScopeGraph Py.AssertStatement where scopeGraph = onChildren
 

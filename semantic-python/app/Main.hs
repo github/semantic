@@ -8,6 +8,7 @@ module Main (main) where
 import           Control.Algebra
 import           Control.Carrier.Sketch.Fresh
 import           Control.Monad
+import           Convert.ToScopeGraph
 import qualified Data.ByteString as ByteString
 import qualified Data.ScopeGraph as ScopeGraph
 import qualified Language.Python ()
