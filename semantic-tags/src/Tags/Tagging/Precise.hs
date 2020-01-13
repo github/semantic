@@ -18,6 +18,7 @@ module Tags.Tagging.Precise
 , Traversable1(..)
 , foldMap1
 , GTraversable1(..)
+, Generics(..)
 ) where
 
 import Control.Carrier.Reader
@@ -144,3 +145,6 @@ instance (Traversable f, GTraversable1 c g) => GTraversable1 c (f :.: g) where
 
 instance GTraversable1 c U1 where
   gtraverse1 _ _ _ = pure U1
+
+
+newtype Generics t a = Generics { getGenerics :: t a }
