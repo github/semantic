@@ -104,6 +104,12 @@ instance GFoldable1 c U1 where
 class Traversable1 c t where
   -- | Map annotations of kind @*@ and heterogeneously-typed subterms of kind @* -> *@ under some constraint @c@ into an 'Applicative' context. The constraint is necessary to operate on otherwise universally-quantified subterms, since otherwise there would be insufficient information to inspect them at all.
   --
+  -- No proxy is provided for the constraint @c@; instead, @-XTypeApplications@ should be used. E.g. here we ignore the annotations and print all the @* -> *@ subterms using 'Show1':
+  --
+  -- @
+  -- 'traverse1' \@'Data.Functor.Classes.Show1' 'pure' (\ t -> t '<$' 'putStrLn' ('Data.Functor.Classes.showsPrec1' 0 t ""))
+  -- @
+  --
   -- Note that this traversal is non-recursive: any recursion through subterms must be performed by the second function argument.
   traverse1
     :: Applicative f
