@@ -48,7 +48,6 @@ instance GFields fields => GMarshalJSON (C1 c fields) where
 instance (GValue p, Selector s) => GFields (S1 s p) where
   gfields acc x = (Text.pack (selName x), gvalue (unM1 x)) : acc
 
-
 -- Implement inductive case for product case
 instance (GFields f, GFields g) => GFields (f :*: g) where
   gfields acc (f :*: g) = gfields (gfields acc g) f
@@ -88,5 +87,3 @@ class GFields f where
 -- since it's a function on types, we need a typeclass
 class GValue f where
   gvalue :: (ToJSON a) => f a -> Value
-
--- TODO: use toEncoding -- direct serialization to ByteString
