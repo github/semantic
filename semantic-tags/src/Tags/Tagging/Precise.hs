@@ -10,6 +10,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Tags.Tagging.Precise
 ( Tags
 , ToTags(..)
@@ -151,3 +152,6 @@ instance GTraversable1 c U1 where
 
 newtype Generics t a = Generics { getGenerics :: t a }
   deriving (Foldable, Functor, Traversable)
+
+instance (Generic1 t, GTraversable1 c (Rep1 t)) => Traversable1 c (Generics t) where
+  traverse1 f g = fmap (Generics . to1) . gtraverse1 @c f g . from1 . getGenerics
