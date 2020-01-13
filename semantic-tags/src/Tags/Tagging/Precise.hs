@@ -19,6 +19,7 @@ module Tags.Tagging.Precise
 , firstLine
 , GFoldable1(..)
 , Traversable1(..)
+, for1
 , foldMap1
 , GTraversable1(..)
 , Generics(..)
@@ -124,6 +125,15 @@ class Traversable1 c t where
     -> t a
     -> f (t b)
   traverse1 f g = fmap to1 . gtraverse1 @c f g . from1
+
+for1
+  :: forall c t f a b
+  .  (Traversable1 c t, Applicative f)
+  => t a
+  -> (a -> f b)
+  -> (forall t' . c t' => t' a -> f (t' b))
+  -> f (t b)
+for1 t f g = traverse1 @c f g t
 
 foldMap1 :: forall c t b a . (Traversable1 c t, Monoid b) => (a -> b) -> (forall t' . c t' => t' a -> b) -> t a -> b
 foldMap1 f g = getConst . traverse1 @c (Const . f) (Const . g)
