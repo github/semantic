@@ -60,7 +60,7 @@ instance forall address sig m . (ScopeGraph.Addressable address, Effect sig, Alg
                    <> ScopeGraph.edge newScope newDecl
 
     SketchC (modify (<> (Sketchbook newGraph (pure newScope))))
-    k
+    SketchC (gets sGraph) >>= k
   alg (R other) = SketchC (alg (R (R (handleCoercible other))))
 
 runSketch ::
