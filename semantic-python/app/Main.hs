@@ -55,7 +55,7 @@ assertEqual a b = unless (a == b) (die (show a <> "\ndoes not equal\n" <> show b
 
 main :: IO ()
 main = do
-  let path = "semantic-python/test/fixtures/1-01-empty-module.py"
+  let path = "semantic-python/test/fixtures/1-04-toplevel-assignment.py"
   file <- ByteString.readFile path
   tree <- TS.parseByteString @Py.Module @Loc TSP.tree_sitter_python file
   pyModule <- either die pure tree
