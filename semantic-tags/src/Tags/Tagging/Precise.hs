@@ -179,6 +179,8 @@ instance GTraversable1 c U1 where
 -- @
 -- 'getGenerics' '<$>' 'traverse1' f g ('Generics' t) = 'to1' '<$>' 'gtraverse1' f g ('from1' t)
 -- @
+--
+-- It further defines its 'Foldable', 'Functor', and 'Traversable' instances thus, making it suitable for use with @-XDerivingVia@.
 newtype Generics t a = Generics { getGenerics :: t a }
 
 instance (Generic1 t, GTraversable1 Foldable (Rep1 t)) => Foldable (Generics t) where
