@@ -80,6 +80,7 @@ instance GFoldable1 c U1 where
 
 
 class GTraversable1 c t where
+  -- | Generically map annotations and subterms of kind @* -> *@ into an 'Applicative' context.
   gtraverse1
     :: Applicative f
     => (a -> f b)
