@@ -95,6 +95,7 @@ instance GFoldable1 c U1 where
   gfoldMap1 _ _ = mempty
 
 
+-- FIXME: move Traversable1 into semantic-ast.
 class Traversable1 c t where
   -- | Map annotations and subterms of kind @* -> *@ into an 'Applicative' context.
   traverse1
@@ -115,6 +116,7 @@ foldMap1 :: forall c t b a . (Traversable1 c t, Monoid b) => (a -> b) -> (forall
 foldMap1 f g = getConst . traverse1 @c (Const . f) (Const . g)
 
 
+-- FIXME: move GTraversable1 into semantic-ast.
 class GTraversable1 c t where
   -- | Generically map annotations and subterms of kind @* -> *@ into an 'Applicative' context.
   gtraverse1
