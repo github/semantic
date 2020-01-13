@@ -69,6 +69,9 @@ type family ToTagsInstance t :: Strategy where
   ToTagsInstance Py.NonlocalStatement  = 'Custom
   ToTagsInstance Py.PrintStatement     = 'Custom
 
+  -- Ignore for now to match a la carte tags output
+  ToTagsInstance Py.Interpolation      = 'Custom
+
   ToTagsInstance _                     = 'Generic
 
 
@@ -88,6 +91,9 @@ keywordFunctionCall t loc range name = do
   let sliced = slice src range
   Tags.yield (Tag name Function loc (Tags.firstLine sliced) Nothing)
   gtags t
+
+instance ToTagsBy 'Custom Py.Interpolation where
+  tags' Py.Interpolation { } = pure ()
 
 instance ToTagsBy 'Custom Py.AssertStatement where
   tags' t@Py.AssertStatement { ann = loc@Loc { byteRange } } = keywordFunctionCall t loc byteRange "assert"
