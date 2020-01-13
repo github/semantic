@@ -66,7 +66,6 @@ type family ToTagsInstance t :: Strategy where
   ToTagsInstance Rb.Method             = 'Custom
   ToTagsInstance Rb.SingletonMethod    = 'Custom
 
-  ToTagsInstance Rb.Call               = 'Custom
   ToTagsInstance Rb.Lhs                = 'Custom
   ToTagsInstance Rb.MethodCall         = 'Custom
   ToTagsInstance Rb.Alias              = 'Custom
@@ -243,20 +242,15 @@ instance ToTagsBy 'Custom Rb.Regex where
 instance ToTagsBy 'Custom Rb.Subshell where
   tags' Rb.Subshell { } = pure ()
 
-instance ToTagsBy 'Custom Rb.Call where
-  tags' t@Rb.Call
-    { ann = loc@Loc { byteRange = range }
-    , method = expr
-    } = case expr of
-      Prj Rb.Identifier { text = name } -> yield name Call
-      Prj Rb.Constant { text = name } -> yield name Call -- TODO: Should yield Constant
-      Prj Rb.Operator { text = name } -> yield name Call
-      _ -> gtags t
-    where
-      yield name kind = yieldTag name kind loc range >> gtags t
-
 instance ToTagsBy 'Custom Rb.Lhs where
   tags' t@(Rb.Lhs expr) = case expr of
+    -- NOTE: Calls do not look for locals
+    Prj Rb.Call { ann = loc@Loc { byteRange }, method } -> case method of
+      Prj Rb.Identifier { text } -> yieldCall text loc byteRange
+      Prj Rb.Constant { text } -> yieldCall text loc byteRange
+      Prj Rb.Operator { text } -> yieldCall text loc byteRange
+      _ -> gtags t
+    -- These do check for locals before yielding a call tag
     Prj (Rb.Variable (Prj Rb.Identifier { ann = loc@Loc { byteRange }, text })) -> yield text Call loc byteRange
     Prj Rb.ScopeResolution { ann = loc@Loc { byteRange }, name = Prj Rb.Identifier { text } } -> yield text Call loc byteRange
     -- TODO: These would be great to track, but doesn't match current a la carte tags output
@@ -264,6 +258,7 @@ instance ToTagsBy 'Custom Rb.Lhs where
     -- Prj Rb.ScopeResolution { ann = loc@Loc { byteRange }, name = Prj Rb.Constant { text } } -> yield text Constant loc byteRange
     _ -> gtags t
     where
+      yieldCall name loc range = yieldTag name Call loc range >> gtags t
       yield name kind loc range = do
         locals <- get @[Text]
         unless (name `elem` locals) $ yieldTag name kind loc range
@@ -278,6 +273,11 @@ instance ToTagsBy 'Custom Rb.MethodCall where
       Prj (Rb.Variable (Prj Rb.Constant { text = name })) -> yield name Call -- TODO: Should yield Constant
       Prj Rb.ScopeResolution { name = Prj Rb.Identifier { text } } -> yield text Call
       Prj Rb.ScopeResolution { name = Prj Rb.Constant { text } } -> yield text Call  -- TODO: Should yield Constant
+      Prj Rb.Call { method } -> case method of
+        Prj Rb.Identifier { text } -> yield text Call
+        Prj Rb.Constant { text } -> yield text Call
+        Prj Rb.Operator { text } -> yield text Call
+        _ -> gtags t
       _ -> gtags t
     where
       yield name kind = yieldTag name kind loc range >> gtags t
