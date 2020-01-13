@@ -6,6 +6,7 @@ module Tags.Tagging.Precise
 , runTagging
 , firstLine
 , GFoldable1(..)
+, GTraversable1(..)
 ) where
 
 import Control.Carrier.Reader
@@ -76,3 +77,6 @@ instance (Foldable f, GFoldable1 c g) => GFoldable1 c (f :.: g) where
 
 instance GFoldable1 c U1 where
   gfoldMap1 _ _ = mempty
+
+
+class GTraversable1 c t where
