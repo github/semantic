@@ -80,3 +80,8 @@ instance GFoldable1 c U1 where
 
 
 class GTraversable1 c t where
+  gtraverse1
+    :: Applicative f
+    => (forall t' . c t' => t' a -> f (t' b))
+    -> t a
+    -> f (t b)
