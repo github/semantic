@@ -22,7 +22,6 @@ import           Control.Carrier.Fresh.Strict
 import           Control.Carrier.State.Strict
 import           Control.Effect.Sketch
 import           Control.Monad.IO.Class
-import           Data.Bifunctor
 import           Data.Maybe
 import           Data.Monoid
 import           Data.Monoid.Generic

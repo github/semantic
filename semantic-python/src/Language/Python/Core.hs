@@ -5,6 +5,7 @@
 module Language.Python.Core
 ( toplevelCompile
 , Bindings
+, pattern SingleIdentifier
 ) where
 
 import Prelude hiding (fail)

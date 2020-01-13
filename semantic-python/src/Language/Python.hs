@@ -3,6 +3,7 @@
 {-# LANGUAGE FlexibleContexts           #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE NamedFieldPuns             #-}
+{-# LANGUAGE PatternSynonyms            #-}
 {-# LANGUAGE ScopedTypeVariables        #-}
 {-# LANGUAGE StandaloneDeriving         #-}
 {-# LANGUAGE TypeApplications           #-}
@@ -16,18 +17,28 @@ module Language.Python
 
 -- import           Control.Carrier.Reader
 -- import           Control.Monad.IO.Class
+import           AST.Element
 import           Control.Effect.Sketch
 import           Convert.ToScopeGraph
-import           Convert.ToScopeGraph (ToScopeGraph (..), onChildren)
 import           Data.Foldable
 import qualified Data.List.NonEmpty as NonEmpty
 import qualified Data.ScopeGraph as ScopeGraph
-import           GHC.Generics
+import           Data.Text (Text)
 import qualified Language.Python.Tags as PyTags
 import qualified Tags.Tagging.Precise as Tags
 import qualified TreeSitter.Python (tree_sitter_python)
 import qualified TreeSitter.Python.AST as Py
 import qualified TreeSitter.Unmarshal as TS
+
+-- | Useful pattern synonym for extracting a single identifier from
+-- a Python ExpressionList. Easier than pattern-matching every time.
+-- TODO: when this is finished, we won't need this pattern, as we'll
+-- handle ExpressionLists the smart way every time.
+pattern SingleIdentifier :: Text -> Py.ExpressionList a
+pattern SingleIdentifier name <- Py.ExpressionList
+  { Py.extraChildren =
+    Py.Expression (Prj (Py.PrimaryExpression (Prj Py.Identifier { text = name }))) NonEmpty.:| []
+  }
 
 todo :: Show a => a -> b
 todo s = error ("TODO: " <> show s)
@@ -49,6 +60,10 @@ instance ToScopeGraph Py.BreakStatement where scopeGraph = todo
 
 instance ToScopeGraph Py.AssertStatement where scopeGraph = onChildren
 
+instance ToScopeGraph Py.Assignment where
+  scopeGraph (Py.Assignment _ (SingleIdentifier t) _val _typ) = declare @ScopeGraph.Info t DeclProperties
+  scopeGraph x                                                = todo x
+
 instance ToScopeGraph Py.Await where
   scopeGraph (Py.Await _ a) = scopeGraph a
 
@@ -58,9 +73,14 @@ instance ToScopeGraph Py.BooleanOperator where
 instance ToScopeGraph Py.BinaryOperator where
   scopeGraph (Py.BinaryOperator _ _ left right) = mappend <$> scopeGraph left <*> scopeGraph right
 
+instance ToScopeGraph Py.AugmentedAssignment where
+  scopeGraph Py.AugmentedAssignment{ right } = scopeGraph right
+
 instance ToScopeGraph Py.Attribute where scopeGraph = todo
 
 instance ToScopeGraph Py.Block where scopeGraph = onChildren
+
+instance ToScopeGraph Py.BreakStatement where scopeGraph = const (pure mempty)
 
 instance ToScopeGraph Py.Call where scopeGraph = todo
 
@@ -121,8 +141,8 @@ instance ToScopeGraph Py.FutureImportStatement where scopeGraph = todo
 instance ToScopeGraph Py.GeneratorExpression where scopeGraph = todo
 
 instance ToScopeGraph Py.Identifier where
-  scopeGraph (Py.Identifier _ t) = do
-    declare @ScopeGraph.Info t DeclProperties
+  scopeGraph (Py.Identifier _ _t) = pure mempty -- TODO
+
 
 instance ToScopeGraph Py.IfStatement where
   scopeGraph (Py.IfStatement _ alternative body condition) = do
