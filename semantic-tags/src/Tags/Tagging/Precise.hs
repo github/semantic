@@ -96,6 +96,7 @@ instance GFoldable1 c U1 where
 
 
 -- FIXME: move Traversable1 into semantic-ast.
+-- FIXME: derive Traversable1 instances for TH-generated syntax types.
 class Traversable1 c t where
   -- | Map annotations and subterms of kind @* -> *@ into an 'Applicative' context.
   traverse1
