@@ -43,6 +43,10 @@ instance Tags.ToTags Term where
 instance ToScopeGraph Term where
   scopeGraph = scopeGraph . getTerm
 
+instance ToScopeGraph Py.Assignment where scopeGraph = todo
+instance ToScopeGraph Py.AugmentedAssignment where scopeGraph = todo
+instance ToScopeGraph Py.BreakStatement where scopeGraph = todo
+
 instance ToScopeGraph Py.AssertStatement where scopeGraph = onChildren
 
 instance ToScopeGraph Py.Await where
