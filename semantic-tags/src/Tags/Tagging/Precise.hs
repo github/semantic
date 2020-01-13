@@ -6,6 +6,7 @@ module Tags.Tagging.Precise
 , runTagging
 , firstLine
 , GFoldable1(..)
+, Traversable1(..)
 , GTraversable1(..)
 ) where
 
@@ -78,6 +79,14 @@ instance (Foldable f, GFoldable1 c g) => GFoldable1 c (f :.: g) where
 instance GFoldable1 c U1 where
   gfoldMap1 _ _ = mempty
 
+
+class Traversable1 c t where
+  traverse1
+    :: Applicative f
+    => (a -> f b)
+    -> (forall t' . c t' => t' a -> f (t' b))
+    -> t a
+    -> f (t b)
 
 class GTraversable1 c t where
   -- | Generically map annotations and subterms of kind @* -> *@ into an 'Applicative' context.
