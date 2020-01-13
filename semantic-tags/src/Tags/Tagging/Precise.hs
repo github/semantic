@@ -82,19 +82,20 @@ instance GFoldable1 c U1 where
 class GTraversable1 c t where
   gtraverse1
     :: Applicative f
-    => (forall t' . c t' => t' a -> f (t' b))
+    => (a -> f b)
+    -> (forall t' . c t' => t' a -> f (t' b))
     -> t a
     -> f (t b)
 
 instance GTraversable1 c f => GTraversable1 c (M1 i c' f) where
-  gtraverse1 f = fmap M1 . gtraverse1 @c f . unM1
+  gtraverse1 f g = fmap M1 . gtraverse1 @c f g . unM1
 
 instance (GTraversable1 c f, GTraversable1 c g) => GTraversable1 c (f :*: g) where
-  gtraverse1 f (l :*: r) = (:*:) <$> gtraverse1 @c f l <*> gtraverse1 @c f r
+  gtraverse1 f g (l :*: r) = (:*:) <$> gtraverse1 @c f g l <*> gtraverse1 @c f g r
 
 instance (GTraversable1 c f, GTraversable1 c g) => GTraversable1 c (f :+: g) where
-  gtraverse1 f (L1 l) = L1 <$> gtraverse1 @c f l
-  gtraverse1 f (R1 r) = R1 <$> gtraverse1 @c f r
+  gtraverse1 f g (L1 l) = L1 <$> gtraverse1 @c f g l
+  gtraverse1 f g (R1 r) = R1 <$> gtraverse1 @c f g r
 
 instance GTraversable1 c (K1 R t) where
-  gtraverse1 _ (K1 k) = pure (K1 k)
+  gtraverse1 _ _ (K1 k) = pure (K1 k)
