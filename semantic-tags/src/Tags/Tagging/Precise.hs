@@ -85,3 +85,6 @@ class GTraversable1 c t where
     => (forall t' . c t' => t' a -> f (t' b))
     -> t a
     -> f (t b)
+
+instance GTraversable1 c f => GTraversable1 c (M1 i c' f) where
+  gtraverse1 f = fmap M1 . gtraverse1 @c f . unM1
