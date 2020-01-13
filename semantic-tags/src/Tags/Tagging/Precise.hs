@@ -102,3 +102,6 @@ instance GTraversable1 c (K1 R t) where
 
 instance GTraversable1 c Par1 where
   gtraverse1 f _ (Par1 a) = Par1 <$> f a
+
+instance (Traversable f, GTraversable1 c g) => GTraversable1 c (f :.: g) where
+  gtraverse1 f g = fmap Comp1 . traverse (gtraverse1 @c f g) . unComp1
