@@ -67,6 +67,7 @@ executable python-graph
                      , semantic-python
                      , semantic-scope-graph
                      , bytestring
+                     , pathtype
 
 test-suite test
   import: haskell

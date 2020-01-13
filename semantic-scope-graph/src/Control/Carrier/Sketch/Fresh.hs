@@ -29,6 +29,7 @@ import           Data.Monoid.Generic
 import           Data.ScopeGraph (ScopeGraph)
 import qualified Data.ScopeGraph as ScopeGraph
 import           GHC.Generics (Generic)
+import qualified System.Path as Path
 
 data Sketchbook address = Sketchbook
   { sGraph  :: ScopeGraph address
@@ -36,13 +37,13 @@ data Sketchbook address = Sketchbook
   }
   deriving stock Generic
   deriving Semigroup via GenericSemigroup (Sketchbook address)
-  deriving Monoid via GenericMonoid (Sketchbook address)
 
 getParent :: ScopeGraph.Addressable address => Sketchbook address -> ScopeGraph.Vertex (ScopeGraph address)
-getParent
-  = fromMaybe (error "BUG: getParent should be total, if you hit this something's wrong")
+getParent s
+  = fromMaybe (error "Invariant violated: sketchbook had empty parent")
   . getLast
   . sParent
+  $ s
 
 newtype SketchC address m a = SketchC (StateC (Sketchbook address) (FreshC m) a)
   deriving (Applicative, Functor, Monad, MonadIO)
@@ -58,10 +59,18 @@ instance forall address sig m . (ScopeGraph.Addressable address, Effect sig, Alg
     let newGraph = ScopeGraph.edge parent newScope
                    <> ScopeGraph.edge newScope newDecl
 
-    SketchC (modify (mappend (Sketchbook newGraph (pure newScope))))
+    SketchC (modify (<> (Sketchbook newGraph (pure newScope))))
     k
   alg (R other) = SketchC (alg (R (R (handleCoercible other))))
 
-runSketch :: (ScopeGraph.Addressable address, Functor m) => SketchC address m a -> m (ScopeGraph address, a)
-runSketch (SketchC go) = evalFresh 0 . fmap (first sGraph) . runState mempty $ go
+runSketch ::
+  (ScopeGraph.Addressable address, Functor m)
+  => Maybe Path.AbsRelFile
+  -> SketchC address m a
+  -> m (ScopeGraph address, a)
+runSketch rootpath (SketchC go)
+  = evalFresh 0
+  . fmap (first sGraph)
+  . runState (Sketchbook ScopeGraph.empty (pure (ScopeGraph.root rootpath)))
+  $ go
 

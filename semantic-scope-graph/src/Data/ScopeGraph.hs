@@ -7,16 +7,13 @@ module Data.ScopeGraph
   ( ToScopeGraph(..)
   , ScopeGraph(..)
   , Info (..)
-  , runScopeGraph
   , module GC
   , Addressable (..)
   ) where
 
 import qualified Algebra.Graph
 import           Algebra.Graph.Class as GC
-import           Control.Carrier.Fresh.Strict
-import           Control.Carrier.Lift
-import           Control.Carrier.Reader
+import           Control.Effect.Sketch
 import           Control.Monad.IO.Class
 import           Data.Text (Text, unpack)
 import           Data.Unique
@@ -54,13 +51,13 @@ instance GC.Graph (ScopeGraph a) where
 
 data Info = Decl Int Text
           | Scope Int
-          | Root Path.AbsRelFile
+          | Root (Maybe Path.AbsRelFile)
   deriving (Eq, Ord)
 
 class Addressable a where
   scope :: Int -> a
   decl  :: Int -> Text -> a
-  root  :: Path.AbsRelFile -> a
+  root  :: Maybe Path.AbsRelFile -> a
 
 instance Addressable Info where
   scope = Scope
@@ -75,16 +72,7 @@ instance Show Info where
 
 class ToScopeGraph t where
   scopeGraph ::
-    ( Has (Reader Source) sig m
-    , Has (Reader (Vertex (ScopeGraph Info))) sig m
-    , MonadIO m
+    ( Has (Sketch Info) sig m
     )
     => t Loc
     -> m (ScopeGraph Info)
-
--- instance ToScopeGraph Py.Identifier where
---   scopeGraph _ (Py.Identifier _ t) = ScopeGraph . G.vertex . Node (Ref t) <$> liftIO newUnique
-
-runScopeGraph :: ToScopeGraph t => Path.AbsRelFile -> Source -> t Loc -> IO (ScopeGraph Info)
-runScopeGraph p src item = do
-  runM . runReader (Root p) . runReader src $ scopeGraph item
