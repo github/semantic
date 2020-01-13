@@ -1,7 +1,6 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE DefaultSignatures #-}
-{-# LANGUAGE DeriveTraversable #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
@@ -182,7 +181,15 @@ instance GTraversable1 c U1 where
 -- 'getGenerics' '<$>' 'traverse1' f g ('Generics' t) = 'to1' '<$>' 'gtraverse1' f g ('from1' t)
 -- @
 newtype Generics t a = Generics { getGenerics :: t a }
-  deriving (Foldable, Functor, Traversable)
+
+instance (Generic1 t, GTraversable1 Foldable (Rep1 t)) => Foldable (Generics t) where
+  foldMap = foldMapDefault1
+
+instance (Generic1 t, GTraversable1 Functor (Rep1 t)) => Functor (Generics t) where
+  fmap = fmapDefault1
+
+instance (Generic1 t, GTraversable1 Foldable (Rep1 t), GTraversable1 Functor (Rep1 t), GTraversable1 Traversable (Rep1 t)) => Traversable (Generics t) where
+  traverse = traverseDefault1
 
 instance (Generic1 t, GTraversable1 c (Rep1 t)) => Traversable1 c (Generics t) where
   traverse1 f g = fmap (Generics . to1) . gtraverse1 @c f g . from1 . getGenerics
