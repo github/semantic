@@ -20,6 +20,7 @@ module Tags.Tagging.Precise
 , Traversable1(..)
 , for1
 , foldMap1
+, foldMapDefault1
 , GTraversable1(..)
 , Generics(..)
 ) where
@@ -101,6 +102,11 @@ for1 t f g = traverse1 @c f g t
 
 foldMap1 :: forall c t b a . (Traversable1 c t, Monoid b) => (a -> b) -> (forall t' . c t' => t' a -> b) -> t a -> b
 foldMap1 f g = getConst . traverse1 @c (Const . f) (Const . g)
+
+
+-- | This function may be used as a value for 'foldMap' in a 'Foldable' instance.
+foldMapDefault1 :: (Traversable1 Foldable t, Monoid b) => (a -> b) -> t a -> b
+foldMapDefault1 f = foldMap1 @Foldable f (foldMap f)
 
 
 -- FIXME: move GTraversable1 into semantic-ast.
