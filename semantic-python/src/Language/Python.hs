@@ -42,6 +42,8 @@ instance Tags.ToTags Term where
 instance ScopeGraph.ToScopeGraph Term where
   scopeGraph = ScopeGraph.scopeGraph . getTerm
 
+instance ToScopeGraph Py.AssertStatement where scopeGraph = onChildren
+
 instance ToScopeGraph Py.Await where
   scopeGraph (Py.Await _ a) = scopeGraph a
 
@@ -51,7 +53,7 @@ instance ToScopeGraph Py.BooleanOperator where
 instance ToScopeGraph Py.BinaryOperator where
   scopeGraph (Py.BinaryOperator _ _ left right) = mappend <$> scopeGraph left <*> scopeGraph right
 
-instance ToScopeGraph Py.Attribute where scopeGraph = onChildren
+instance ToScopeGraph Py.Attribute where scopeGraph = todo
 
 instance ToScopeGraph Py.Block where scopeGraph = onChildren
 
@@ -65,9 +67,13 @@ deriving instance ToScopeGraph Py.CompoundStatement
 
 instance ToScopeGraph Py.ConditionalExpression where scopeGraph = onChildren
 
+instance ToScopeGraph Py.ContinueStatement where scopeGraph = const (pure mempty)
+
 instance ToScopeGraph Py.DecoratedDefinition where scopeGraph = todo
 
 instance ToScopeGraph Py.ComparisonOperator where scopeGraph = onChildren
+
+instance ToScopeGraph Py.DeleteStatement where scopeGraph = const (pure mempty)
 
 instance ToScopeGraph Py.Dictionary where scopeGraph = onChildren
 
@@ -87,6 +93,10 @@ instance ToScopeGraph Py.Ellipsis where scopeGraph = const (pure mempty)
 
 instance ToScopeGraph Py.ExceptClause where scopeGraph = onChildren
 
+instance ToScopeGraph Py.ExecStatement where scopeGraph = const (pure mempty)
+
+instance ToScopeGraph Py.ExpressionStatement where scopeGraph = onChildren
+
 instance ToScopeGraph Py.ExpressionList where scopeGraph = onChildren
 
 instance ToScopeGraph Py.False where
@@ -100,6 +110,8 @@ instance ToScopeGraph Py.Float where scopeGraph = const (pure mempty)
 instance ToScopeGraph Py.ForStatement where scopeGraph = todo
 
 instance ToScopeGraph Py.FunctionDefinition where scopeGraph = todo
+
+instance ToScopeGraph Py.FutureImportStatement where scopeGraph = todo
 
 instance ToScopeGraph Py.GeneratorExpression where scopeGraph = todo
 
@@ -116,7 +128,13 @@ instance ToScopeGraph Py.IfStatement where
     alt <- traverse scopeGraph alternative
     pure (fold (con : bod : alt))
 
+instance ToScopeGraph Py.GlobalStatement where scopeGraph = todo
+
 instance ToScopeGraph Py.Integer where scopeGraph = const (pure mempty)
+
+instance ToScopeGraph Py.ImportStatement where scopeGraph = todo
+
+instance ToScopeGraph Py.ImportFromStatement where scopeGraph = todo
 
 instance ToScopeGraph Py.Lambda where scopeGraph = todo
 
