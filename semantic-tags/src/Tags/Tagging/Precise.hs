@@ -95,3 +95,6 @@ instance (GTraversable1 c f, GTraversable1 c g) => GTraversable1 c (f :*: g) whe
 instance (GTraversable1 c f, GTraversable1 c g) => GTraversable1 c (f :+: g) where
   gtraverse1 f (L1 l) = L1 <$> gtraverse1 @c f l
   gtraverse1 f (R1 r) = R1 <$> gtraverse1 @c f r
+
+instance GTraversable1 c (K1 R t) where
+  gtraverse1 _ (K1 k) = pure (K1 k)
