@@ -52,8 +52,8 @@ examples :: [LanguageExample]
 examples =
   -- [ le "go" "**/*.go" goFileSkips goDirSkips
   -- [ le "python" "**/*.py" mempty mempty
-  -- [ le "ruby" "**/*.rb" rubySkips mempty
-  [ le "typescript" "**/*.[jt]s" typescriptSkips mempty
+  [ le "ruby" "**/*.rb" rubySkips mempty
+  -- [ le "typescript" "**/*.[jt]s" typescriptSkips mempty
   -- [ le "typescript" "**/*.[jt]sx" tsxSkips mempty
   ]
 
@@ -234,11 +234,11 @@ buildExamples session lang tsDir = do
             HUnit.assertEqual (Text.unpack (x^.path) <> lineNo) (Text.unpack (left^.symbol) <> span left) (Text.unpack (right^.symbol) <> span right)
 
             -- HUnit.assertEqual (Text.unpack (x^.path) <> lineNo) (left^.line) (right^.line)
-            HUnit.assertBool (Text.unpack (x^.path) <> lineNo) (Text.isPrefixOf (left^.line) (right^.line))
-            -- if left^.kind == "Class"
-            --   then HUnit.assertEqual (Text.unpack (x^.path) <> lineNo) (left^.line) (right^.line)
+            -- HUnit.assertBool (Text.unpack (x^.path) <> lineNo) (Text.isPrefixOf (left^.line) (right^.line))
+            if left^.kind == "Class"
+              then HUnit.assertEqual (Text.unpack (x^.path) <> lineNo) (left^.line) (right^.line)
             --   -- then HUnit.assertBool (Text.unpack (x^.path) <> lineNo) (Text.isPrefixOf (left^.line) (right^.line))
-            --   else pure ()
+              else pure ()
 
         _          -> HUnit.assertFailure "Expected 1 file in each response"
       (Left e1, Left e2) -> HUnit.assertFailure ("Unable to parse (both)" <> show (displayException e1) <> show (displayException e2))
