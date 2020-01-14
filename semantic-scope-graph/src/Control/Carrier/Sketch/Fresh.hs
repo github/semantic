@@ -66,6 +66,19 @@ instance forall address sig m . (address ~ Name, Effect sig, Algebra sig m) => A
           old
     SketchC (put @(Sketchbook Name) (Sketchbook new current))
     k ()
+  alg (L (Reference n decl _props k)) = do
+    Sketchbook old current <- SketchC (get @(Sketchbook Name))
+    let new =
+          ScopeGraph.reference
+          (ScopeGraph.Reference (Data.Name.name n))
+          (lowerBound @ModuleInfo)
+          (lowerBound @Span)
+          ScopeGraph.Identifier
+          (ScopeGraph.Declaration (Data.Name.name decl))
+          current
+          old
+    SketchC (put @(Sketchbook Name) (Sketchbook new current))
+    k ()
   alg (R other) = SketchC (alg (R (R (handleCoercible other))))
 
 runSketch ::
@@ -78,4 +91,3 @@ runSketch _rootpath (SketchC go)
   . fmap (first sGraph)
   . runState lowerBound
   $ go
-
