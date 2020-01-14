@@ -86,11 +86,7 @@ keywordFunctionCall
      , Tags.GFoldable1 ToTags (Rep1 t)
      )
   => t Loc -> Loc -> Range -> Text -> m ()
-keywordFunctionCall t loc range name = do
-  src <- ask @Source
-  let sliced = slice src range
-  Tags.yield (Tag name Function loc (Tags.firstLine sliced) Nothing)
-  gtags t
+keywordFunctionCall t loc range name = yieldTag name Function loc range Nothing >> gtags t
 
 instance ToTagsBy 'Custom Py.Interpolation where
   tags' Py.Interpolation { } = pure ()
@@ -124,9 +120,7 @@ instance ToTagsBy 'Custom Py.FunctionDefinition where
     } = do
       src <- ask @Source
       let docs = listToMaybe extraChildren >>= docComment src
-          sliced = slice src (Range start end)
-      Tags.yield (Tag name Function loc (Tags.firstLine sliced) docs)
-      gtags t
+      yieldTag name Function loc (Range start end) docs >> gtags t
 
 instance ToTagsBy 'Custom Py.ClassDefinition where
   tags' t@Py.ClassDefinition
@@ -136,9 +130,7 @@ instance ToTagsBy 'Custom Py.ClassDefinition where
     } = do
       src <- ask @Source
       let docs = listToMaybe extraChildren >>= docComment src
-          sliced = slice src (Range start end)
-      Tags.yield (Tag name Class loc (Tags.firstLine sliced) docs)
-      gtags t
+      yieldTag name Class loc (Range start end) docs >> gtags t
 
 instance ToTagsBy 'Custom Py.Call where
   tags' t@Py.Call
@@ -152,18 +144,13 @@ instance ToTagsBy 'Custom Py.Call where
         (Prj Py.Call { function = Py.PrimaryExpression expr' }) -> match expr' -- Nested call expression like this in Python represent creating an instance of a class and calling it: e.g. AClass()()
         (Prj (Py.ParenthesizedExpression _ (Prj (Py.Expression (Prj (Py.PrimaryExpression expr')))))) -> match expr' -- Parenthesized expressions
         _ -> gtags t
-      yield name = yieldTag name Call loc range >> gtags t
-        -- yield name = do
-        --   src <- ask @Source
-        --   let sliced = slice src range
-        --   Tags.yield (Tag name Call loc (Tags.firstLine sliced) Nothing)
-        --   gtags t
+      yield name = yieldTag name Call loc range Nothing >> gtags t
 
-yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text -> Kind -> Loc -> Range -> m ()
-yieldTag name kind loc range = do
+yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text -> Kind -> Loc -> Range -> Maybe Text -> m ()
+yieldTag name kind loc range docs = do
   src <- ask @Source
-  let sliced = slice src range
-  Tags.yield (Tag name kind loc (Tags.firstLine sliced) Nothing)
+  let sliced = Tags.firstLine (slice src range)
+  Tags.yield (Tag name kind loc sliced docs)
 
 docComment :: Source -> (Py.CompoundStatement :+: Py.SimpleStatement) Loc -> Maybe Text
 docComment src (R1 (Py.SimpleStatement (Prj Py.ExpressionStatement { extraChildren = L1 (Prj (Py.Expression (Prj (Py.PrimaryExpression (Prj Py.String { ann }))))) :|_ }))) = Just (toText (slice src (byteRange ann)))
