@@ -1,4 +1,11 @@
-{-# LANGUAGE FlexibleContexts, LambdaCase, OverloadedStrings, RankNTypes, RecordWildCards, TypeOperators #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeOperators #-}
 module Core.Eval
 ( eval
 , prog1
@@ -10,95 +17,103 @@ module Core.Eval
 , ruby
 ) where
 
-import Analysis.Analysis
-import Analysis.File
-import Control.Algebra
-import Control.Applicative (Alternative (..))
-import Control.Effect.Fail
-import Control.Effect.Reader
-import Control.Monad ((>=>))
-import Core.Core as Core
-import Core.Name
-import Data.Functor
-import Data.Maybe (fromMaybe, isJust)
-import GHC.Stack
-import Prelude hiding (fail)
-import Source.Span
-import Syntax.Scope
-import Syntax.Term
+import qualified Analysis.Effect.Domain as A
+import           Analysis.Effect.Env as A
+import           Analysis.Effect.Heap as A
+import           Analysis.File
+import           Control.Algebra
+import           Control.Applicative (Alternative (..))
+import           Control.Effect.Fail
+import           Control.Effect.Reader
+import           Control.Monad ((>=>))
+import           Core.Core as Core
+import           Core.Name
+import           Data.Functor
+import           Data.Maybe (fromMaybe, isJust)
+import           GHC.Stack
+import           Prelude hiding (fail)
+import           Source.Span
+import           Syntax.Scope
+import qualified Syntax.Term as Term
 import qualified System.Path as Path
 
-eval :: ( Has (Reader Span) sig m
+type Term = Term.Term (Ann Span :+: Core)
+
+eval :: forall address value m sig
+     .  ( Has (A.Domain Term address value) sig m
+        , Has (Env address) sig m
+        , Has (Heap address value) sig m
+        , Has (Reader Span) sig m
         , MonadFail m
         , Semigroup value
+        , Show address
         )
-     => Analysis (Term (Ann Span :+: Core)) Name address value m
-     -> (Term (Ann Span :+: Core) Name -> m value)
-     -> (Term (Ann Span :+: Core) Name -> m value)
-eval Analysis{..} eval = \case
-  Var n -> lookupEnv' n >>= deref' n
-  Alg (R c) -> case c of
-    Rec (Named (Ignored n) b) -> do
-      addr <- alloc n
-      v <- bind n addr (eval (instantiate1 (pure n) b))
-      v <$ assign addr v
+     => (Term address -> m value)
+     -> (Term address -> m value)
+eval eval = \case
+  Term.Var n -> deref' n n
+  Term.Alg (R c) -> case c of
+    Rec (Named n b) -> do
+      addr <- A.alloc @address n
+      v <- A.bind n addr (eval (instantiate1 (pure addr) b))
+      v <$ A.assign addr v
     -- NB: Combining the results of the evaluations allows us to model effects in abstract domains. This in turn means that we can define an abstract domain modelling the types-and-effects of computations by means of a 'Semigroup' instance which takes the type of its second operand and the union of both operands’ effects.
     --
     -- It’s also worth noting that we use a semigroup instead of a semilattice because the lattice structure of our abstract domains is instead modelled by nondeterminism effects used by some of them.
     a :>> b -> (<>) <$> eval a <*> eval b
-    Named (Ignored n) a :>>= b -> do
+    Named n a :>>= b -> do
       a' <- eval a
-      addr <- alloc n
-      assign addr a'
-      bind n addr ((a' <>) <$> eval (instantiate1 (pure n) b))
-    Lam (Named (Ignored n) b) -> abstract eval n (instantiate1 (pure n) b)
+      addr <- A.alloc @address n
+      A.assign addr a'
+      A.bind n addr ((a' <>) <$> eval (instantiate1 (pure addr) b))
+    Lam b -> A.lam b
     f :$ a -> do
-      f' <- eval f
+      Named n b <- eval f >>= A.asLam
       a' <- eval a
-      apply eval f' a'
-    Unit -> unit
-    Bool b -> bool b
+      addr <- A.alloc @address n
+      A.assign addr a'
+      A.bind n addr (eval (instantiate1 (pure addr) b))
     If c t e -> do
-      c' <- eval c >>= asBool
+      c' <- eval c >>= A.asBool
       if c' then eval t else eval e
-    String s -> string s
-    Load p -> eval p >>= asString >> unit -- FIXME: add a load command or something
-    Record fields -> traverse (traverse eval) fields >>= record
+    Load p -> eval p >>= A.asString >> A.unit -- FIXME: add a load command or something
+    Unit     -> A.unit
+    Bool b   -> A.bool b
+    String s -> A.string s
+    Record fields -> A.record fields
     a :. b -> do
-      a' <- ref a
-      a' ... b >>= maybe (freeVariable (show b)) (deref' b)
+      a' <- eval a >>= A.asRecord
+      maybe (freeVariable (show b)) eval (lookup b a')
     a :? b -> do
-      a' <- ref a
-      mFound <- a' ... b
-      bool (isJust mFound)
+      a' <- eval a >>= A.asRecord @Term @address
+      A.bool (isJust (lookup b a'))
 
     a := b -> do
       b' <- eval b
       addr <- ref a
-      b' <$ assign addr b'
-  Alg (L (Ann span c)) -> local (const span) (eval c)
+      b' <$ A.assign addr b'
+  Term.Alg (L (Ann span c)) -> local (const span) (eval c)
   where freeVariable s = fail ("free variable: " <> s)
         uninitialized s = fail ("uninitialized variable: " <> s)
         invalidRef s = fail ("invalid ref: " <> s)
 
-        lookupEnv' n = lookupEnv n >>= maybe (freeVariable (show n)) pure
-        deref' n = deref >=> maybe (uninitialized (show n)) pure
+        deref' n = A.deref @address >=> maybe (uninitialized (show n)) pure
 
         ref = \case
-          Var n -> lookupEnv' n
-          Alg (R c) -> case c of
+          Term.Var n -> pure n
+          Term.Alg (R c) -> case c of
             If c t e -> do
-              c' <- eval c >>= asBool
+              c' <- eval c >>= A.asBool
               if c' then ref t else ref e
             a :. b -> do
-              a' <- ref a
-              a' ... b >>= maybe (freeVariable (show b)) pure
+              a' <- eval a >>= A.asRecord
+              maybe (freeVariable (show b)) ref (lookup b a')
             c -> invalidRef (show c)
-          Alg (L (Ann span c)) -> local (const span) (ref c)
+          Term.Alg (L (Ann span c)) -> local (const span) (ref c)
 
 
 prog1 :: Has Core sig t => File (t Name)
-prog1 = fromBody $ lam (named' "foo")
+prog1 = fromBody $ Core.lam (named' "foo")
   (    named' "bar" :<- pure "foo"
   >>>= Core.if' (pure "bar")
     (Core.bool False)

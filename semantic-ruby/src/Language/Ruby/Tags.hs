@@ -22,7 +22,6 @@ import           Control.Effect.Reader
 import           Control.Effect.State
 import           Control.Effect.Writer
 import           Control.Monad
-import           Data.Monoid (Ap (..))
 import           Data.Foldable
 import           Data.Text as Text
 import           GHC.Generics
@@ -153,7 +152,7 @@ yieldMethodNameTag
      , Has (Reader Source) sig m
      , Has (Writer Tags.Tags) sig m
      , Generic1 t
-     , Tags.GFoldable1 ToTags (Rep1 t)
+     , Tags.GTraversable1 ToTags (Rep1 t)
      ) => t Loc -> Loc -> Range -> Rb.MethodName Loc -> m ()
 yieldMethodNameTag t loc range (Rb.MethodName expr) = enterScope True $ case expr of
   Prj Rb.Identifier { text = name } -> yield name
@@ -307,11 +306,11 @@ gtags
      , Has (Writer Tags.Tags) sig m
      , Has (State [Text]) sig m
      , Generic1 t
-     , Tags.GFoldable1 ToTags (Rep1 t)
+     , Tags.GTraversable1 ToTags (Rep1 t)
      )
   => t Loc
   -> m ()
-gtags = getAp . Tags.gfoldMap1 @ToTags (Ap . tags) . from1
+gtags = Tags.traverse1_ @ToTags (const (pure ())) tags . Tags.Generics
 
-instance (Generic1 t, Tags.GFoldable1 ToTags (Rep1 t)) => ToTagsBy 'Generic t where
+instance (Generic1 t, Tags.GTraversable1 ToTags (Rep1 t)) => ToTagsBy 'Generic t where
   tags' = gtags

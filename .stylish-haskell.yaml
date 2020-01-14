@@ -183,7 +183,7 @@ steps:
       #   between actual import and closing bracket.
       #
       # Default: true
-      align: true
+      align: false
 
       # stylish-haskell can detect redundancy of some language pragmas. If this
       # is set to true, it will remove those redundant pragmas. Default: true.

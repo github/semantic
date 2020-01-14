@@ -8,11 +8,9 @@ module Instances () where
 -- we should keep track of them in a dedicated file.
 
 import           Analysis.File
-import           Analysis.ScopeGraph
 import           Core.Name (Name (..))
 import           Data.Aeson
-import qualified Data.Map as Map
-import           Data.Text (Text, pack)
+import           Data.Text (pack)
 import qualified System.Path as Path
 
 deriving newtype instance ToJSON Name
@@ -27,21 +25,3 @@ instance ToJSON a => ToJSON (File a) where
 
 instance ToJSON Path.AbsRelFile where
   toJSON p = toJSON (pack (Path.toString p))
-
-instance ToJSON Ref where
-  toJSON (Ref path span) = object
-    [ "kind" .= ("ref" :: Text)
-    , "path" .= path
-    , "span" .= span
-    ]
-
-instance ToJSON (Decl Name) where
-  toJSON Decl{declSymbol, declPath, declSpan} = object
-    [ "kind"   .= ("decl" :: Text)
-    , "symbol" .= declSymbol
-    , "path" .= declPath
-    , "span" .= declSpan
-    ]
-
-instance ToJSON (ScopeGraph Name) where
-  toJSON (ScopeGraph sc) = toJSON . Map.mapKeys declSymbol $ sc
