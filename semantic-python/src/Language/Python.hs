@@ -21,6 +21,7 @@ import           Control.Effect.Sketch
 import           Convert.ToScopeGraph
 import           Data.Foldable
 import qualified Data.List.NonEmpty as NonEmpty
+import           Data.Name (Name)
 import           Language.Python.Core (pattern SingleIdentifier)
 import qualified Language.Python.Tags as PyTags
 import qualified Tags.Tagging.Precise as Tags
@@ -48,7 +49,7 @@ instance ToScopeGraph Term where
 instance ToScopeGraph Py.AssertStatement where scopeGraph = onChildren
 
 instance ToScopeGraph Py.Assignment where
-  scopeGraph (Py.Assignment _ (SingleIdentifier t) _val _typ) = complete <* declare @Addr t DeclProperties
+  scopeGraph (Py.Assignment _ (SingleIdentifier t) _val _typ) = complete <* declare @Name t DeclProperties
   scopeGraph x                                                = todo x
 
 instance ToScopeGraph Py.Await where

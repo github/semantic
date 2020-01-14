@@ -11,6 +11,7 @@ import           Control.Carrier.Sketch.Fresh
 import           Control.Monad
 import           Convert.ToScopeGraph
 import qualified Data.ByteString as ByteString
+import           Data.Name (Name)
 import qualified Data.ScopeGraph as ScopeGraph
 import qualified Language.Python ()
 import           Source.Loc
@@ -42,13 +43,13 @@ The graph should be
 -}
 
 
-runScopeGraph :: ToScopeGraph t => Path.AbsRelFile -> Source.Source -> t Loc -> (ScopeGraph.ScopeGraph Addr, Result)
-runScopeGraph p _src item = run . runSketch @Addr (Just p) $ scopeGraph item
+runScopeGraph :: ToScopeGraph t => Path.AbsRelFile -> Source.Source -> t Loc -> (ScopeGraph.ScopeGraph Name, Result)
+runScopeGraph p _src item = run . runSketch @Name (Just p) $ scopeGraph item
 
-sampleGraphThing :: (Has (Sketch Addr) sig m) => m Result
+sampleGraphThing :: (Has (Sketch Name) sig m) => m Result
 sampleGraphThing = do
-  declare @Addr "hello" DeclProperties
-  declare @Addr "goodbye" DeclProperties
+  declare @Name "hello" DeclProperties
+  declare @Name "goodbye" DeclProperties
   pure Complete
 
 
@@ -61,7 +62,7 @@ main = do
   file <- ByteString.readFile path
   tree <- TS.parseByteString @Py.Module @Loc TSP.tree_sitter_python file
   pyModule <- either die pure tree
-  let (expecto, Complete) = run $ runSketch @Addr Nothing sampleGraphThing
+  let (expecto, Complete) = run $ runSketch @Name Nothing sampleGraphThing
   let (result, Complete) = runScopeGraph (Path.absRel path) (Source.fromUTF8 file) pyModule
   print result
   assertEqual expecto result
