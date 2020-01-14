@@ -1,4 +1,11 @@
-{-# LANGUAGE DeriveAnyClass, DeriveFunctor, DeriveGeneric, DuplicateRecordFields, LambdaCase, OverloadedStrings, RecordWildCards, TupleSections #-}
+{-# LANGUAGE DeriveAnyClass        #-}
+{-# LANGUAGE DeriveFunctor         #-}
+{-# LANGUAGE DeriveGeneric         #-}
+{-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE LambdaCase            #-}
+{-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE RecordWildCards       #-}
+{-# LANGUAGE TupleSections         #-}
 module Data.ScopeGraph
   ( Slot(..)
   , Info(..)
@@ -42,16 +49,16 @@ module Data.ScopeGraph
 import Prelude hiding (lookup)
 import Prologue
 
+import           Control.Abstract.Hole
 import           Control.Lens.Lens
+import           Data.Abstract.Module
+import           Data.Abstract.Name
 import           Data.Aeson
+import           Data.JSON.Fields
 import qualified Data.Map.Strict as Map
 import qualified Data.Sequence as Seq
 import qualified Data.Set as Set
-import Control.Abstract.Hole
-import Data.Abstract.Module
-import Data.JSON.Fields
-import Data.Abstract.Name
-import Source.Span
+import           Source.Span
 
 -- A slot is a location in the heap where a value is stored.
 data Slot address = Slot { frameAddress :: address, position :: Position }
