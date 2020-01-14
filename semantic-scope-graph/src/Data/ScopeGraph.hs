@@ -48,12 +48,12 @@ module Data.ScopeGraph
 
 import Prelude hiding (lookup)
 
-import           Control.Abstract.Hole
 import           Control.Lens.Lens
 import           Data.Abstract.Module
-import           Data.Abstract.Name
 import           Data.Aeson
+import           Data.Hole
 import qualified Data.Map.Strict as Map
+import           Data.Name
 import qualified Data.Sequence as Seq
 import qualified Data.Set as Set
 import           Source.Span

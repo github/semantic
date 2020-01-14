@@ -1,4 +1,4 @@
-module Control.Abstract.Hole
+module Data.Hole
   ( AbstractHole (..)
   ) where
 

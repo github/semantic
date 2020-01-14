@@ -24,12 +24,15 @@ library
     Control.Carrier.Sketch.Fresh
     Convert.ToScopeGraph
     Data.ScopeGraph
+    Data.Name
   build-depends:
       base                >= 4.13 && < 5
     , aeson
     , algebraic-graphs    >= 0.3 && < 0.5
     , containers
     , fused-effects      ^>= 1.0
+    , hashable
+    , lens
     , generic-monoid
     , pathtype
     , semantic-source    ^>= 0.0
