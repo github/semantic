@@ -1,5 +1,5 @@
 # Revision history for semantic-scope-graph
 
-## 0.1.0.0 -- YYYY-mm-dd
+## 0.1.0.0 -- 2020-01-14
 
-* First version. Released on an unsuspecting world.
+* First version.
