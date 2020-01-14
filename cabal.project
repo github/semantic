@@ -42,6 +42,7 @@ package semantic-tags
   ghc-options: -Werror
 
 package semantic-scope-graph
+  ghc-options: -Werror
 
 package semantic-ast
   ghc-options: -Werror
