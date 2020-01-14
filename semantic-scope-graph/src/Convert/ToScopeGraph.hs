@@ -14,6 +14,7 @@ module Convert.ToScopeGraph
 
 import Control.Effect.Sketch
 import Data.Foldable
+import Data.List.NonEmpty
 import Data.Name (Name)
 import Data.Typeable
 import GHC.Generics
@@ -29,11 +30,14 @@ class Typeable t => ToScopeGraph t where
 
 data Result
   = Complete
-  | Todo deriving (Eq, Show, Ord)
+  | Todo (NonEmpty String)
+    deriving (Eq, Show, Ord)
 
 instance Semigroup Result where
   Complete <> Complete = Complete
-  _ <> _ = Todo
+  Todo a <> Todo b     = Todo (a <> b)
+  a <> Complete        = a
+  Complete <> a        = a
 
 instance Monoid Result where mempty = Complete
 

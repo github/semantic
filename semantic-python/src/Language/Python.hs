@@ -27,8 +27,8 @@ import qualified TreeSitter.Python (tree_sitter_python)
 import qualified TreeSitter.Python.AST as Py
 import qualified TreeSitter.Unmarshal as TS
 
-todo :: Applicative m => a -> m Result
-todo = const (pure Todo)
+todo :: (Show a, Applicative m) => a -> m Result
+todo = pure . Todo . pure . show
 
 complete :: Applicative m => m Result
 complete = pure Complete
