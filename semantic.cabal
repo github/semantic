@@ -387,7 +387,7 @@ test-suite parse-examples
                      , tasty
                      , tasty-hunit
 
-benchmark evaluation
+benchmark benchmarks
   import:              haskell, dependencies, executable-flags
   hs-source-dirs:      bench
   type:                exitcode-stdio-1.0
