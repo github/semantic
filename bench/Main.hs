@@ -8,5 +8,5 @@ import qualified Tagging
 main :: IO ()
 main = defaultMain
   [ Tagging.benchmarks
-  -- , Evaluation.benchmarks
+  , Evaluation.benchmarks
   ]
