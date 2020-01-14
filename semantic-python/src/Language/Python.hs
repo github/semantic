@@ -15,8 +15,6 @@ module Language.Python
 , TreeSitter.Python.tree_sitter_python
 ) where
 
--- import           Control.Carrier.Reader
--- import           Control.Monad.IO.Class
 import           Control.Effect.Sketch
 import           Convert.ToScopeGraph
 import           Data.Foldable
