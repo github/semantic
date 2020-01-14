@@ -28,27 +28,18 @@ import           Data.Monoid
 import           Data.Monoid.Generic
 import           Data.ScopeGraph (ScopeGraph)
 import qualified Data.ScopeGraph as ScopeGraph
+import           Data.Semilattice.Lower
 import           GHC.Generics (Generic)
 import qualified System.Path as Path
 
-data Sketchbook address = Sketchbook
+newtype Sketchbook address = Sketchbook
   { sGraph  :: ScopeGraph address
-  , sParent :: Last (ScopeGraph.Vertex (ScopeGraph address))
-  }
-  deriving stock Generic
-  deriving Semigroup via GenericSemigroup (Sketchbook address)
-
-getParent :: ScopeGraph.Addressable address => Sketchbook address -> ScopeGraph.Vertex (ScopeGraph address)
-getParent s
-  = fromMaybe (error "Invariant violated: sketchbook had empty parent")
-  . getLast
-  . sParent
-  $ s
+  } deriving (Eq, Show, Lower)
 
 newtype SketchC address m a = SketchC (StateC (Sketchbook address) (FreshC m) a)
   deriving (Applicative, Functor, Monad, MonadIO)
 
-instance forall address sig m . (ScopeGraph.Addressable address, Effect sig, Algebra sig m) => Algebra (Sketch address :+: sig) (SketchC address m) where
+instance forall address sig m . (Effect sig, Algebra sig m) => Algebra (Sketch address :+: sig) (SketchC address m) where
   alg (L (Declare name _props k)) = do
     ua <- SketchC fresh
     ub <- SketchC fresh
@@ -72,6 +63,6 @@ runSketch ::
 runSketch rootpath (SketchC go)
   = evalFresh 0
   . fmap (first sGraph)
-  . runState (Sketchbook ScopeGraph.empty (pure (ScopeGraph.root rootpath)))
+  . runState lowerBound
   $ go
 

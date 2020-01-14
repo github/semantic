@@ -48,14 +48,27 @@ module Data.ScopeGraph
 
 import Prelude hiding (lookup)
 
+import           Control.Applicative
 import           Control.Lens.Lens
-import           Data.Abstract.Module
+import           Control.Monad
 import           Data.Aeson
+import           Data.Bifunctor
+import           Data.Foldable
+import           Data.Hashable
 import           Data.Hole
+import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
+import           Data.Maybe
+import           Data.Module
+import           Data.Monoid
 import           Data.Name
+import           Data.Semilattice.Lower
+import           Data.Sequence (Seq)
 import qualified Data.Sequence as Seq
+import           Data.Set (Set)
 import qualified Data.Set as Set
+import           Data.Text (Text)
+import           GHC.Generics
 import           Source.Span
 
 -- A slot is a location in the heap where a value is stored.
@@ -67,9 +80,6 @@ data AccessControl = Public
                    | Protected
                    | Private
                    deriving (Bounded, Enum, Eq, Generic, Hashable, ToJSON, Show)
-
-instance ToJSONFields AccessControl where
-  toJSONFields accessControl = ["accessControl" .= accessControl]
 
 -- | The Ord AccessControl instance represents an order specification of AccessControls.
 -- AccessControls that are less than or equal to another AccessControl implies access.
@@ -340,7 +350,7 @@ lookupReference  name scope g = fmap snd . Map.lookup (Reference name) =<< paths
 insertEdge :: Ord scopeAddress => EdgeLabel -> scopeAddress -> scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
 insertEdge label target currentAddress g@(ScopeGraph graph) = fromMaybe g $ do
   currentScope' <- lookupScope currentAddress g
-  scopes <- maybeM (Just mempty) (Map.lookup label (edges currentScope'))
+  scopes <- maybe (Just mempty) pure (Map.lookup label (edges currentScope'))
   let newScope = currentScope' { edges = Map.insert label (target : scopes) (edges currentScope') }
   pure (ScopeGraph (Map.insert currentAddress newScope graph))
 

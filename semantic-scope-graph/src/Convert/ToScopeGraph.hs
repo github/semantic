@@ -7,6 +7,7 @@
 {-# LANGUAGE TypeOperators             #-}
 module Convert.ToScopeGraph
   ( ToScopeGraph (..)
+  , Addr
   , Result (..)
   , onChildren
   , onField
@@ -19,9 +20,11 @@ import GHC.Generics
 import GHC.Records
 import Source.Loc
 
+type Addr = Int
+
 class ToScopeGraph t where
   scopeGraph ::
-    ( Has (Sketch Info) sig m
+    ( Has (Sketch (Info Addr)) sig m
     )
     => t Loc
     -> m Result
@@ -42,7 +45,7 @@ instance (ToScopeGraph l, ToScopeGraph r) => ToScopeGraph (l :+: r) where
 
 onField ::
   forall field syn sig m r .
-  ( Has (Sketch Info) sig m
+  ( Has (Sketch (Info Addr)) sig m
   , HasField field (r Loc) (syn Loc)
   , ToScopeGraph syn
   )
@@ -55,7 +58,7 @@ onField
 onChildren ::
   ( Traversable t
   , ToScopeGraph syn
-  , Has (Sketch Info) sig m
+  , Has (Sketch (Info Addr)) sig m
   , HasField "extraChildren" (r Loc) (t (syn Loc))
   )
   => r Loc

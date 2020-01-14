@@ -20,11 +20,13 @@ tested-with:         GHC == 8.6.5
 
 library
   exposed-modules:
-    Control.Effect.Sketch
     Control.Carrier.Sketch.Fresh
+    Control.Effect.Sketch
     Convert.ToScopeGraph
-    Data.ScopeGraph
+    Data.Hole
+    Data.Module
     Data.Name
+    Data.ScopeGraph
   build-depends:
       base                >= 4.13 && < 5
     , aeson
@@ -33,6 +35,7 @@ library
     , fused-effects      ^>= 1.0
     , hashable
     , lens
+    , semilattices
     , generic-monoid
     , pathtype
     , semantic-source    ^>= 0.0
