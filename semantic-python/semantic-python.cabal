@@ -54,7 +54,6 @@ library
     Language.Python
     Language.Python.Core
     Language.Python.Failure
-    Language.Python.ScopeGraph
     Language.Python.Tags
   hs-source-dirs: src
 
