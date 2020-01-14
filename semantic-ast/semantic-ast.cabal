@@ -41,9 +41,9 @@ library
   -- other-modules:
   -- other-extensions:
   build-depends:       base ^>= 4.13
-                     , tree-sitter ^>= 0.7.2
+                     , tree-sitter ^>= 0.8
                      , semantic-source ^>= 0.0
-                     , tree-sitter-python ^>= 0.8
+                     , tree-sitter-python ^>= 0.8.1
                      , bytestring ^>= 0.10.8.2
                      , optparse-applicative >= 0.14.3 && < 0.16
                      , pretty-simple ^>= 3.1.0.0
