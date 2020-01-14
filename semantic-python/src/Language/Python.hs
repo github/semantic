@@ -29,8 +29,11 @@ import qualified TreeSitter.Python (tree_sitter_python)
 import qualified TreeSitter.Python.AST as Py
 import qualified TreeSitter.Unmarshal as TS
 
-todo :: Show a => a -> b
-todo s = error ("TODO: " <> show s)
+todo :: Applicative m => a -> m Result
+todo = const (pure Todo)
+
+complete :: Applicative m => m Result
+complete = pure Complete
 
 newtype Term a = Term { getTerm :: Py.Module a }
 
@@ -46,7 +49,7 @@ instance ToScopeGraph Term where
 instance ToScopeGraph Py.AssertStatement where scopeGraph = onChildren
 
 instance ToScopeGraph Py.Assignment where
-  scopeGraph (Py.Assignment _ (SingleIdentifier t) _val _typ) = declare @ScopeGraph.Info t DeclProperties
+  scopeGraph (Py.Assignment _ (SingleIdentifier t) _val _typ) = complete <* declare @ScopeGraph.Info t DeclProperties
   scopeGraph x                                                = todo x
 
 instance ToScopeGraph Py.Await where

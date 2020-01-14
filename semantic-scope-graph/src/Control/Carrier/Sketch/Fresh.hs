@@ -22,6 +22,7 @@ import           Control.Carrier.Fresh.Strict
 import           Control.Carrier.State.Strict
 import           Control.Effect.Sketch
 import           Control.Monad.IO.Class
+import           Data.Bifunctor
 import           Data.Maybe
 import           Data.Monoid
 import           Data.Monoid.Generic
@@ -58,18 +59,19 @@ instance forall address sig m . (ScopeGraph.Addressable address, Effect sig, Alg
     let newGraph = ScopeGraph.edge parent newScope
                    <> ScopeGraph.edge newScope newDecl
 
-    SketchC (modify (<> (Sketchbook newGraph (pure newScope))))
-    SketchC (gets sGraph) >>= k
+    SketchC (modify ())
+
+    k ()
   alg (R other) = SketchC (alg (R (R (handleCoercible other))))
 
 runSketch ::
   (ScopeGraph.Addressable address, Functor m)
   => Maybe Path.AbsRelFile
   -> SketchC address m a
-  -> m a
+  -> m (ScopeGraph address, a)
 runSketch rootpath (SketchC go)
   = evalFresh 0
-  . fmap snd
+  . fmap (first sGraph)
   . runState (Sketchbook ScopeGraph.empty (pure (ScopeGraph.root rootpath)))
   $ go
 

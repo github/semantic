@@ -3,6 +3,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications    #-}
 {-# LANGUAGE TypeOperators       #-}
+{-# OPTIONS_GHC -Wno-incomplete-uni-patterns #-}
 module Main (main) where
 
 import           Control.Algebra
@@ -41,13 +42,14 @@ The graph should be
 -}
 
 
-runScopeGraph :: ToScopeGraph t => Path.AbsRelFile -> Source.Source -> t Loc -> ScopeGraph.ScopeGraph ScopeGraph.Info
+runScopeGraph :: ToScopeGraph t => Path.AbsRelFile -> Source.Source -> t Loc -> (ScopeGraph.ScopeGraph ScopeGraph.Info, Result)
 runScopeGraph p _src item = run . runSketch @ScopeGraph.Info (Just p) $ scopeGraph item
 
-sampleGraphThing :: (Has (Sketch ScopeGraph.Info) sig m) => m (ScopeGraph.ScopeGraph ScopeGraph.Info)
+sampleGraphThing :: (Has (Sketch ScopeGraph.Info) sig m) => m Result
 sampleGraphThing = do
-  void $ declare @ScopeGraph.Info "hello" DeclProperties
+  declare @ScopeGraph.Info "hello" DeclProperties
   declare @ScopeGraph.Info "goodbye" DeclProperties
+  pure Complete
 
 
 assertEqual :: (Show a, Eq a) => a -> a -> IO ()
@@ -59,8 +61,8 @@ main = do
   file <- ByteString.readFile path
   tree <- TS.parseByteString @Py.Module @Loc TSP.tree_sitter_python file
   pyModule <- either die pure tree
-  let expecto = run $ runSketch @ScopeGraph.Info Nothing sampleGraphThing
-  let result = runScopeGraph (Path.absRel path) (Source.fromUTF8 file) pyModule
+  let (expecto, Complete) = run $ runSketch @ScopeGraph.Info Nothing sampleGraphThing
+  let (result, Complete) = runScopeGraph (Path.absRel path) (Source.fromUTF8 file) pyModule
   print result
   assertEqual expecto result
 

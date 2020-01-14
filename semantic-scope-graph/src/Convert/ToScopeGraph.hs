@@ -7,6 +7,7 @@
 {-# LANGUAGE TypeOperators             #-}
 module Convert.ToScopeGraph
   ( ToScopeGraph (..)
+  , Result (..)
   , onChildren
   , onField
   ) where
@@ -23,7 +24,17 @@ class ToScopeGraph t where
     ( Has (Sketch Info) sig m
     )
     => t Loc
-    -> m (ScopeGraph Info)
+    -> m Result
+
+data Result
+  = Complete
+  | Todo deriving (Eq, Show, Ord)
+
+instance Semigroup Result where
+  Complete <> Complete = Complete
+  _ <> _ = Todo
+
+instance Monoid Result where mempty = Complete
 
 instance (ToScopeGraph l, ToScopeGraph r) => ToScopeGraph (l :+: r) where
   scopeGraph (L1 l) = scopeGraph l
@@ -36,7 +47,7 @@ onField ::
   , ToScopeGraph syn
   )
   => r Loc
-  -> m (ScopeGraph Info)
+  -> m Result
 onField
   = scopeGraph @syn
   . getField @field
@@ -48,7 +59,7 @@ onChildren ::
   , HasField "extraChildren" (r Loc) (t (syn Loc))
   )
   => r Loc
-  -> m (ScopeGraph Info)
+  -> m Result
 onChildren
   = fmap fold
   . traverse scopeGraph
