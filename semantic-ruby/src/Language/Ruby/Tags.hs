@@ -191,9 +191,12 @@ enterScope createNew m = do
 
 instance ToTagsBy 'Custom Rb.Method where
   tags' t@Rb.Method
-    { ann = loc@Loc { byteRange = range }
+    { ann = loc@Loc { byteRange = range@Range { start } }
     , name = expr
-    } = yieldMethodNameTag t loc range expr
+    , parameters
+    } = case parameters of
+      Just Rb.MethodParameters { ann = Loc { byteRange = Range { end } }} -> yieldMethodNameTag t loc (Range start end) expr
+      _ -> yieldMethodNameTag t loc range expr
 
 instance ToTagsBy 'Custom Rb.SingletonMethod where
   tags' t@Rb.SingletonMethod
@@ -266,7 +269,8 @@ instance ToTagsBy 'Custom Rb.Lhs where
 
 instance ToTagsBy 'Custom Rb.MethodCall where
   tags' t@Rb.MethodCall
-    { ann = loc@Loc { byteRange = range }
+    { ann = loc@Loc { byteRange = byteRange@Range {} }
+    , block
     , method = expr
     } = case expr of
       Prj (Rb.Variable (Prj Rb.Identifier { text = name })) -> yield name Call
@@ -280,6 +284,11 @@ instance ToTagsBy 'Custom Rb.MethodCall where
         _ -> gtags t
       _ -> gtags t
     where
+      -- Don't include the block in the range
+      range = case block of
+        -- Just (Prj Rb.Block { ann = Loc { byteRange = Range { start = end } } }) -> Range start end
+        -- Just (Prj Rb.DoBlock { ann = Loc { byteRange = Range { start = end } } }) -> Range start end
+        _ -> byteRange
       yield name kind = yieldTag name kind loc range >> gtags t
 
 instance ToTagsBy 'Custom Rb.Alias where
