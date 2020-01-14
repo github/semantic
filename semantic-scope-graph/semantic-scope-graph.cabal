@@ -26,7 +26,9 @@ library
     Data.ScopeGraph
   build-depends:
       base                >= 4.13 && < 5
+    , aeson
     , algebraic-graphs    >= 0.3 && < 0.5
+    , containers
     , fused-effects      ^>= 1.0
     , generic-monoid
     , pathtype
