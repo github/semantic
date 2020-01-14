@@ -1,4 +1,16 @@
-{-# LANGUAGE DeriveGeneric, DeriveTraversable, FlexibleContexts, LambdaCase, MultiParamTypeClasses, OverloadedStrings, QuantifiedConstraints, RankNTypes, ScopedTypeVariables, StandaloneDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuantifiedConstraints #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Core.Core
 ( Core(..)
 , rec
@@ -57,7 +69,7 @@ import Syntax.Traversable
 data Core f a
   -- | Recursive local binding of a name in a scope; strict evaluation of the name in the body will diverge.
   --
-  --   Simultaneous (and therefore potentially mutually-recursive) bidnings can be made by binding a 'Record' recursively within 'Rec' and projecting from it with ':.'.
+  --   Simultaneous (and therefore potentially mutually-recursive) bindings can be made by binding a 'Record' recursively within 'Rec' and projecting from it with ':.'.
   = Rec (Named (Scope () f a))
   -- | Sequencing without binding; analogous to '>>' or '*>'.
   | f a :>> f a
@@ -125,8 +137,9 @@ a >>> b = send (a :>> b)
 infixr 1 >>>
 
 unseq :: (Alternative m, Project Core sig) => Term sig a -> m (Term sig a, Term sig a)
-unseq (Alg sig) | Just (a :>> b) <- prj sig = pure (a, b)
-unseq _                                     = empty
+unseq = \case
+  Alg sig | Just (a :>> b) <- prj sig -> pure (a, b)
+  _                                   -> empty
 
 unseqs :: Project Core sig => Term sig a -> NonEmpty (Term sig a)
 unseqs = go
@@ -142,8 +155,9 @@ Named u n :<- a >>>= b = send (Named u a :>>= abstract1 n b)
 infixr 1 >>>=
 
 unbind :: (Alternative m, Project Core sig, RightModule sig) => a -> Term sig a -> m (Named a :<- Term sig a, Term sig a)
-unbind n (Alg sig) | Just (Named u a :>>= b) <- prj sig = pure (Named u n :<- a, instantiate1 (pure n) b)
-unbind _ _                                              = empty
+unbind n = \case
+  Alg sig | Just (Named u a :>>= b) <- prj sig -> pure (Named u n :<- a, instantiate1 (pure n) b)
+  _                                            -> empty
 
 unstatement :: (Alternative m, Project Core sig, RightModule sig) => a -> Term sig a -> m (Maybe (Named a) :<- Term sig a, Term sig a)
 unstatement n t = first (first Just) <$> unbind n t <|> first (Nothing :<-) <$> unseq t
@@ -171,8 +185,9 @@ lams :: (Eq a, Foldable t, Has Core sig m) => t (Named a) -> m a -> m a
 lams names body = foldr lam body names
 
 unlam :: (Alternative m, Project Core sig, RightModule sig) => a -> Term sig a -> m (Named a, Term sig a)
-unlam n (Alg sig) | Just (Lam b) <- prj sig = pure (n <$ b, instantiate1 (pure n) (namedValue b))
-unlam _ _                                   = empty
+unlam n = \case
+  Alg sig | Just (Lam b) <- prj sig -> pure (n <$ b, instantiate1 (pure n) (namedValue b))
+  _                                 -> empty
 
 ($$) :: Has Core sig m => m a -> m a -> m a
 f $$ a = send (f :$ a)
@@ -186,8 +201,9 @@ infixl 8 $$
 infixl 8 $$*
 
 unapply :: (Alternative m, Project Core sig) => Term sig a -> m (Term sig a, Term sig a)
-unapply (Alg sig) | Just (f :$ a) <- prj sig = pure (f, a)
-unapply _                                    = empty
+unapply = \case
+  Alg sig | Just (f :$ a) <- prj sig -> pure (f, a)
+  _                                  -> empty
 
 unapplies :: Project Core sig => Term sig a -> (Term sig a, Stack (Term sig a))
 unapplies core = case unapply core of

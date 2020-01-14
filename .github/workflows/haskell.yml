@@ -11,14 +11,14 @@ on:
 jobs:
   build:
     name: ghc ${{ matrix.ghc }}
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         ghc: ["8.8.1"]
         cabal: ["3.0"]
 
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v2
       if: github.event.action == 'opened' || github.event.action == 'synchronize' || github.event.ref == 'refs/heads/master'
 
     - uses: actions/setup-haskell@v1
@@ -26,12 +26,6 @@ jobs:
       with:
         ghc-version: ${{ matrix.ghc }}
         cabal-version: ${{ matrix.cabal }}
-
-    - uses: actions/cache@v1
-      name: Cache ~/.cabal/packages
-      with:
-        path: ~/.cabal/packages
-        key: ${{ runner.os }}-${{ matrix.ghc }}-v1-cabal-packages
 
     - uses: actions/cache@v1
       name: Cache ~/.cabal/store
@@ -43,17 +37,17 @@ jobs:
       name: Cache dist-newstyle
       with:
         path: dist-newstyle
-        key: ${{ runner.os }}-${{ matrix.ghc }}-semantic-dist
+        key: ${{ runner.os }}-${{ matrix.ghc }}-${{ matrix.cabal }}-semantic-dist
 
     - name: Install dependencies
       run: |
         cabal v2-update
         cabal v2-configure --disable-optimization --enable-benchmarks --enable-tests --write-ghc-environment-files=always -j2
-        cabal v2-build --only-dependencies
+        cabal v2-build all --only-dependencies
 
     - name: hlint
       run: |
-        cabal install hlint --installdir=dist-newstyle
+        test -f dist-newstyle/hlint || cabal install hlint --installdir=dist-newstyle
         dist-newstyle/hlint src semantic-python
 
     - name: Build & test

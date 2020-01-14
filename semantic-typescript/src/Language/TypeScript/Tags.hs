@@ -22,7 +22,6 @@ import           AST.Element
 import           Control.Effect.Reader
 import           Control.Effect.Writer
 import           Data.Foldable
-import           Data.Monoid (Ap (..))
 import           Data.Text as Text
 import           GHC.Generics
 import           Source.Loc
@@ -126,13 +125,13 @@ gtags
   :: ( Has (Reader Source) sig m
      , Has (Writer Tags.Tags) sig m
      , Generic1 t
-     , Tags.GFoldable1 ToTags (Rep1 t)
+     , Tags.GTraversable1 ToTags (Rep1 t)
      )
   => t Loc
   -> m ()
-gtags = getAp . Tags.gfoldMap1 @ToTags (Ap . tags) . from1
+gtags = Tags.traverse1_ @ToTags (const (pure ())) tags . Tags.Generics
 
-instance (Generic1 t, Tags.GFoldable1 ToTags (Rep1 t)) => ToTagsBy 'Generic t where
+instance (Generic1 t, Tags.GTraversable1 ToTags (Rep1 t)) => ToTagsBy 'Generic t where
   tags' = gtags
 
 -- These are all valid, but point to built-in functions (e.g. require) that a la
