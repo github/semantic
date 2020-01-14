@@ -45,6 +45,7 @@ runTagging lang symbolsToSummarize source
         "Module"   -> Just Module
         "Call"     -> Just Call
         "Send"     -> Just Call -- Ruby’s Send is considered to be a kind of 'Call'
+        "AmbientFunction" -> Just Function -- Classify TypeScript ambient functions as 'Function'
         _          -> Nothing
 
 type ContextToken = (Text, Range)

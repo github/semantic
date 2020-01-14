@@ -142,8 +142,10 @@ type family TaggableInstance (t :: * -> *) :: Strategy where
   TaggableInstance Ruby.Class           = 'Custom
   TaggableInstance Ruby.Module          = 'Custom
   TaggableInstance TypeScript.Module    = 'Custom
+  TaggableInstance TypeScript.AmbientFunction = 'Custom
   TaggableInstance Expression.Call      = 'Custom
   TaggableInstance Ruby.Send            = 'Custom
+
   TaggableInstance _                    = 'Default
 
 instance TaggableBy 'Default t
@@ -171,6 +173,10 @@ instance TaggableBy 'Custom Declaration.Function where
   docsLiteral' _ _         = Nothing
   snippet' ann (Declaration.Function _ _ _ body) = subtractLoc ann (termAnnotation body)
   symbolName' = declaredName . Declaration.functionName
+
+instance TaggableBy 'Custom TypeScript.AmbientFunction where
+  snippet' ann _   = byteRange ann
+  symbolName'      = declaredName . TypeScript.ambientFunctionIdentifier
 
 instance TaggableBy 'Custom Declaration.Method where
   docsLiteral' Python (Declaration.Method _ _ _ _ body _)

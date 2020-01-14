@@ -5,6 +5,7 @@
 {-# LANGUAGE FlexibleInstances        #-}
 {-# LANGUAGE MultiParamTypeClasses    #-}
 {-# LANGUAGE NamedFieldPuns           #-}
+{-# LANGUAGE OverloadedStrings        #-}
 {-# LANGUAGE PartialTypeSignatures    #-}
 {-# LANGUAGE ScopedTypeVariables      #-}
 {-# LANGUAGE TypeApplications         #-}
@@ -134,7 +135,16 @@ gtags = getAp . Tags.gfoldMap1 @ToTags (Ap . tags) . from1
 instance (Generic1 t, Tags.GFoldable1 ToTags (Rep1 t)) => ToTagsBy 'Generic t where
   tags' = gtags
 
+-- These are all valid, but point to built-in functions (e.g. require) that a la
+-- carte doesn't display and since we have nothing to link to yet (can't
+-- jump-to-def), we hide them from the current tags output.
+nameBlacklist :: [Text]
+nameBlacklist =
+  [ "require"
+  ]
+
 yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text -> Kind -> Loc -> Range -> m ()
+yieldTag name Call _ _ | name `elem` nameBlacklist = pure ()
 yieldTag name kind loc range = do
   src <- ask @Source
   let sliced = slice src range
