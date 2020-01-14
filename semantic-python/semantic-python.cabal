@@ -58,7 +58,7 @@ library
     Language.Python.Tags
   hs-source-dirs: src
 
-test-suite compiling-test
+test-suite compiling
   import: haskell
   type: exitcode-stdio-1.0
   hs-source-dirs: test
@@ -68,7 +68,7 @@ test-suite compiling-test
   other-modules: Directive
                , Instances
 
-test-suite test-graphing
+test-suite graphing
   import: haskell
   type: exitcode-stdio-1.0
   hs-source-dirs: test-graphing
