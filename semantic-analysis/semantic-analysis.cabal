@@ -40,12 +40,19 @@ library
   import: common
   hs-source-dirs: src
   exposed-modules:
-    Analysis.Analysis
+    Analysis.Carrier.Env.Monovariant
+    Analysis.Carrier.Env.Precise
+    Analysis.Carrier.Heap.Monovariant
+    Analysis.Carrier.Heap.Precise
     Analysis.Concrete
+    Analysis.Effect.Domain
+    Analysis.Effect.Env
+    Analysis.Effect.Heap
     Analysis.File
     Analysis.FlowInsensitive
     Analysis.ImportGraph
-    Analysis.ScopeGraph
+    Analysis.Intro
+    Analysis.Name
     Analysis.Typecheck
     Control.Carrier.Fail.WithLoc
   build-depends:
@@ -62,3 +69,4 @@ library
     , semantic-source             ^>= 0
     , terminal-size               ^>= 0.3
     , text                        ^>= 1.2.3.1
+    , transformers                ^>= 0.5

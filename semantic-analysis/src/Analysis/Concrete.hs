@@ -1,10 +1,22 @@
-{-# LANGUAGE DerivingVia, FlexibleContexts, FlexibleInstances, LambdaCase, MultiParamTypeClasses, NamedFieldPuns,
-             OverloadedStrings, RankNTypes, RecordWildCards, ScopedTypeVariables, TypeApplications, TypeOperators,
-             UndecidableInstances #-}
+{-# LANGUAGE DerivingVia #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE NamedFieldPuns #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuantifiedConstraints #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Analysis.Concrete
 ( Concrete(..)
 , concrete
-, concreteAnalysis
 , heapGraph
 , heapValueGraph
 , heapAddressGraph
@@ -13,175 +25,132 @@ module Analysis.Concrete
 
 import qualified Algebra.Graph as G
 import qualified Algebra.Graph.Export.Dot as G
-import           Analysis.Analysis
+import qualified Analysis.Carrier.Env.Precise as A
+import qualified Analysis.Carrier.Heap.Precise as A
+import qualified Analysis.Effect.Domain as A
 import           Analysis.File
+import           Analysis.Name
 import           Control.Algebra
 import           Control.Carrier.Fail.WithLoc
 import           Control.Carrier.Fresh.Strict
-import           Control.Carrier.NonDet.Church
 import           Control.Carrier.Reader hiding (Local)
-import           Control.Carrier.State.Strict
-import           Control.Monad ((<=<))
+import           Control.Monad.Trans.Class (MonadTrans (..))
 import           Data.Function (fix)
 import qualified Data.IntMap as IntMap
-import qualified Data.IntSet as IntSet
 import qualified Data.Map as Map
 import           Data.Semigroup (Last (..))
-import qualified Data.Set as Set
-import           Data.String (IsString)
 import           Data.Text (Text, pack)
 import           Data.Traversable (for)
 import           Prelude hiding (fail)
 import           Source.Span
+import           Syntax.Scope
 import qualified System.Path as Path
 
-type Precise = Int
-type Env name = Map.Map name Precise
+type Addr = Int
+type Env = Map.Map Name Addr
 
-newtype FrameId = FrameId { unFrameId :: Precise }
-  deriving (Eq, Ord, Show)
-
-data Concrete term name
-  = Closure Path.AbsRelFile Span name (term name) (Env name)
+data Concrete term
+  = Closure Path.AbsRelFile Span (Named (Scope () term Addr))
   | Unit
   | Bool Bool
   | String Text
-  | Record (Env name)
-  deriving (Eq, Ord, Show)
+  | Record Env
   -- NB: We derive the 'Semigroup' instance for 'Concrete' to take the second argument. This is equivalent to stating that the return value of an imperative sequence of statements is the value of its final statement.
-  deriving Semigroup via Last (Concrete term name)
+  deriving Semigroup via Last (Concrete term)
 
-recordFrame :: Concrete term name -> Maybe (Env name)
-recordFrame (Record frame) = Just frame
-recordFrame _              = Nothing
+deriving instance ( forall a . Eq   a => Eq   (f a), Monad f) => Eq   (Concrete f)
+deriving instance ( forall a . Eq   a => Eq   (f a)
+                  , forall a . Ord  a => Ord  (f a), Monad f) => Ord  (Concrete f)
+deriving instance ( forall a . Show a => Show (f a))          => Show (Concrete f)
 
-newtype Frame name = Frame
-  { frameSlots :: Env name
-  }
-  deriving (Eq, Ord, Show)
 
-type Heap term name = IntMap.IntMap (Concrete term name)
-
-data Edge = Lexical | Import
-  deriving (Eq, Ord, Show)
+type Heap = IntMap.IntMap
 
 
 concrete
-  :: ( Foldable term
-     , IsString name
-     , Ord name
-     , Show name
-     , Show (term name)
-     )
+  :: Applicative term
   => (forall sig m
-     .  (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
-     => Analysis term name Precise (Concrete term name) m
-     -> (term name -> m (Concrete term name))
-     -> (term name -> m (Concrete term name))
+     .  (Has (A.Domain term Addr (Concrete term) :+: A.Env Addr :+: A.Heap Addr (Concrete term) :+: Reader Path.AbsRelFile :+: Reader Span) sig m, MonadFail m)
+     => (term Addr -> m (Concrete term))
+     -> (term Addr -> m (Concrete term))
      )
-  -> [File (term name)]
-  -> (Heap term name, [File (Either (Path.AbsRelFile, Span, String) (Concrete term name))])
+  -> [File (term Addr)]
+  -> (Heap (Concrete term), [File (Either (Path.AbsRelFile, Span, String) (Concrete term))])
 concrete eval
   = run
   . evalFresh 0
-  . runHeap
+  . A.runHeap
   . traverse (runFile eval)
 
 runFile
-  :: forall term name m sig
-  .  ( Effect sig
-     , Foldable term
-     , IsString name
+  :: forall term m sig
+  .  ( Applicative term
+     , Effect sig
      , Has Fresh sig m
-     , Has (State (Heap term name)) sig m
-     , Ord name
-     , Show name
-     , Show (term name)
+     , Has (A.Heap Addr (Concrete term)) sig m
      )
   => (forall sig m
-     .  (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m, MonadFail m)
-     => Analysis term name Precise (Concrete term name) m
-     -> (term name -> m (Concrete term name))
-     -> (term name -> m (Concrete term name))
+     .  (Has (A.Domain term Addr (Concrete term) :+: A.Env Addr :+: A.Heap Addr (Concrete term) :+: Reader Path.AbsRelFile :+: Reader Span) sig m, MonadFail m)
+     => (term Addr -> m (Concrete term))
+     -> (term Addr -> m (Concrete term))
      )
-  -> File (term name)
-  -> m (File (Either (Path.AbsRelFile, Span, String) (Concrete term name)))
+  -> File (term Addr)
+  -> m (File (Either (Path.AbsRelFile, Span, String) (Concrete term)))
 runFile eval file = traverse run file
   where run = runReader (filePath file)
             . runReader (fileSpan file)
             . runFail
-            . runReader @(Env name) mempty
-            . fix (eval concreteAnalysis)
-
-concreteAnalysis
-  :: ( Foldable term
-     , IsString name
-     , Has Fresh sig m
-     , Has (Reader (Env name)) sig m
-     , Has (Reader Path.AbsRelFile) sig m
-     , Has (Reader Span) sig m
-     , Has (State (Heap term name)) sig m
-     , MonadFail m
-     , Ord name
-     , Show name
-     , Show (term name)
-     )
-  => Analysis term name Precise (Concrete term name) m
-concreteAnalysis = Analysis{..}
-  where alloc _ = fresh
-        bind name addr m = local (Map.insert name addr) m
-        lookupEnv n = asks (Map.lookup n)
-        deref = gets . IntMap.lookup
-        assign addr value = modify (IntMap.insert addr value)
-        abstract _ name body = do
-          path <- ask
-          span <- ask
-          env <- asks (flip Map.restrictKeys (Set.delete name (foldMap Set.singleton body)))
-          pure (Closure path span name body env)
-        apply eval (Closure path span name body env) a = do
-          local (const path) . local (const span) $ do
-            addr <- alloc name
-            assign addr a
-            local (const (Map.insert name addr env)) (eval body)
-        apply _ f _ = fail $ "Cannot coerce " <> show f <> " to function"
-        unit = pure Unit
-        bool b = pure (Bool b)
-        asBool (Bool b) = pure b
-        asBool v        = fail $ "Cannot coerce " <> show v <> " to Bool"
-        string s = pure (String s)
-        asString (String s) = pure s
-        asString v          = fail $ "Cannot coerce " <> show v <> " to String"
-        record fields = do
-          fields' <- for fields $ \ (name, value) -> do
-            addr <- alloc name
-            assign addr value
-            pure (name, addr)
-          pure (Record (Map.fromList fields'))
-        addr ... n = do
-          val <- deref addr
-          heap <- get
-          pure (val >>= lookupConcrete heap n)
+            . runReader @Env mempty
+            . A.runEnv
+            . fix (\ eval' -> runDomain eval' . fix eval)
 
 
-lookupConcrete :: (IsString name, Ord name) => Heap term name -> name -> Concrete term name -> Maybe Precise
-lookupConcrete heap name = run . evalState IntSet.empty . runNonDetA . inConcrete
-  where -- look up the name in a concrete value
-        inConcrete = inFrame <=< maybeA . recordFrame
-        -- look up the name in a specific 'Frame', with slots taking precedence over parents
-        inFrame fs = maybeA (Map.lookup name fs) <|> (maybeA (Map.lookup "__semantic_super" fs) >>= inAddress)
-        -- look up the name in the value an address points to, if we haven’t already visited it
-        inAddress addr = do
-          visited <- get
-          guard (addr `IntSet.notMember` visited)
-          -- FIXME: throw an error if we can’t deref @addr@
-          val <- maybeA (IntMap.lookup addr heap)
-          modify (IntSet.insert addr)
-          inConcrete val
-        maybeA = maybe empty pure
+runDomain :: (term Addr -> m (Concrete term)) -> DomainC term m a -> m a
+runDomain eval (DomainC m) = runReader eval m
 
+newtype DomainC term m a = DomainC (ReaderC (term Addr -> m (Concrete term)) m a)
+  deriving (Applicative, Functor, Monad, MonadFail)
 
-runHeap :: StateC (Heap term name) m a -> m (Heap term name, a)
-runHeap = runState mempty
+instance MonadTrans (DomainC term) where
+  lift = DomainC . lift
+
+instance ( Applicative term
+         , Has (A.Env Addr) sig m
+         , Has (A.Heap Addr (Concrete term)) sig m
+         , Has (Reader Path.AbsRelFile) sig m
+         , Has (Reader Span) sig m
+         , MonadFail m
+         )
+      => Algebra (A.Domain term Addr (Concrete term) :+: sig) (DomainC term m) where
+  alg = \case
+    L (L (A.Unit k)) -> k Unit
+    L (R (L (A.Bool     b k))) -> k (Bool b)
+    L (R (L (A.AsBool   c k))) -> case c of
+      Bool   b -> k b
+      _        -> fail "expected Bool"
+    L (R (R (L (A.String   s k)))) -> k (String s)
+    L (R (R (L (A.AsString c k)))) -> case c of
+      String s -> k s
+      _        -> fail "expected String"
+    L (R (R (R (L (A.Lam      b k))))) -> do
+      path <- ask
+      span <- ask
+      k (Closure path span b)
+    L (R (R (R (L (A.AsLam    c k))))) -> case c of
+      Closure _ _ b -> k b
+      _             -> fail "expected Closure"
+    L (R (R (R (R (A.Record fields k))))) -> do
+      eval <- DomainC ask
+      fields' <- for fields $ \ (name, t) -> do
+        addr <- A.alloc name
+        v <- lift (eval t)
+        A.assign @Addr @(Concrete term) addr v
+        pure (name, addr)
+      k (Record (Map.fromList fields'))
+    L (R (R (R (R (A.AsRecord c k))))) -> case c of
+      Record fields -> k (map (fmap pure) (Map.toList fields))
+      _             -> fail "expected Record"
+    R other -> DomainC (send (handleCoercible other))
 
 
 -- | 'heapGraph', 'heapValueGraph', and 'heapAddressGraph' allow us to conveniently export SVGs of the heap:
@@ -189,25 +158,25 @@ runHeap = runState mempty
 --   > λ let (heap, res) = concrete [ruby]
 --   > λ writeFile "/Users/rob/Desktop/heap.dot" (export (addressStyle heap) (heapAddressGraph heap))
 --   > λ :!dot -Tsvg < ~/Desktop/heap.dot > ~/Desktop/heap.svg
-heapGraph :: (Precise -> Concrete term name -> a) -> (Either Edge name -> Precise -> G.Graph a) -> Heap term name -> G.Graph a
+heapGraph :: Foldable term => (Addr -> Concrete term -> a) -> (Either Edge Name -> Addr -> G.Graph a) -> Heap (Concrete term) -> G.Graph a
 heapGraph vertex edge h = foldr (uncurry graph) G.empty (IntMap.toList h)
   where graph k v rest = (G.vertex (vertex k v) `G.connect` outgoing v) `G.overlay` rest
         outgoing = \case
           Unit -> G.empty
           Bool _ -> G.empty
           String _ -> G.empty
-          Closure _ _ _ _ env -> foldr (G.overlay . edge (Left Lexical)) G.empty env
+          Closure _ _ (Named _ b) -> foldr (G.overlay . edge (Left Lexical)) G.empty b
           Record frame -> Map.foldrWithKey (\ k -> G.overlay . edge (Right k)) G.empty frame
 
-heapValueGraph :: Heap term name -> G.Graph (Concrete term name)
+heapValueGraph :: Foldable term => Heap (Concrete term) -> G.Graph (Concrete term)
 heapValueGraph h = heapGraph (const id) (const fromAddr) h
   where fromAddr addr = maybe G.empty G.vertex (IntMap.lookup addr h)
 
-heapAddressGraph :: Heap term name -> G.Graph (EdgeType term name, Precise)
+heapAddressGraph :: Foldable term => Heap (Concrete term) -> G.Graph (EdgeType (Concrete term), Addr)
 heapAddressGraph = heapGraph (\ addr v -> (Value v, addr)) (fmap G.vertex . (,) . either Edge Slot)
 
-addressStyle :: (name -> Text) -> Heap term name -> G.Style (EdgeType term name, Precise) Text
-addressStyle unName heap = (G.defaultStyle vertex) { G.edgeAttributes }
+addressStyle :: Heap (Concrete term) -> G.Style (EdgeType (Concrete term), Addr) Text
+addressStyle heap = (G.defaultStyle vertex) { G.edgeAttributes }
   where vertex (_, addr) = pack (show addr) <> " = " <> maybe "?" fromConcrete (IntMap.lookup addr heap)
         edgeAttributes _ (Slot name,    _) = ["label" G.:= unName name]
         edgeAttributes _ (Edge Import,  _) = ["color" G.:= "blue"]
@@ -217,12 +186,15 @@ addressStyle unName heap = (G.defaultStyle vertex) { G.edgeAttributes }
           Unit ->  "()"
           Bool b -> pack $ show b
           String s -> pack $ show s
-          Closure p (Span s e) n _ _ -> "\\\\ " <> unName n <> " [" <> pack (Path.toString p) <> ":" <> showPos s <> "-" <> showPos e <> "]"
+          Closure p (Span s e) (Named n _) -> "\\\\ " <> unName n <> " [" <> pack (Path.toString p) <> ":" <> showPos s <> "-" <> showPos e <> "]"
           Record _ -> "{}"
         showPos (Pos l c) = pack (show l) <> ":" <> pack (show c)
 
-data EdgeType term name
+data EdgeType value
   = Edge Edge
-  | Slot name
-  | Value (Concrete term name)
+  | Slot Name
+  | Value value
+  deriving (Eq, Ord, Show)
+
+data Edge = Lexical | Import
   deriving (Eq, Ord, Show)
