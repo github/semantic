@@ -51,10 +51,10 @@ le = LanguageExample
 examples :: [LanguageExample]
 examples =
   -- [ le "go" "**/*.go" goFileSkips goDirSkips
-  [ le "python" "**/*.py" mempty mempty
+  -- [ le "python" "**/*.py" mempty mempty
   -- [ le "ruby" "**/*.rb" rubySkips mempty
-  -- , le "typescript" "**/*.[jt]s" typescriptSkips mempty
-  -- , le "typescript" "**/*.[jt]sx" tsxSkips mempty
+  [ le "typescript" "**/*.[jt]s" typescriptSkips mempty
+  -- [ le "typescript" "**/*.[jt]sx" tsxSkips mempty
   ]
 
 goFileSkips :: [Path.RelFile]
@@ -80,7 +80,12 @@ goFileSkips = Path.relPath <$>
   -- Parse errors
   , "go/src/math/big/arith.go" -- Unhandled identifier character: 'ŝ'
   , "go/src/cmd/vet/testdata/deadcode.go"
+  , "go/src/cmd/vet/testdata/testingpkg/tests_test.go"
   , "moby/vendor/github.com/beorn7/perks/quantile/stream.go" -- Unhandled identifier character: 'ƒ'
+
+  -- A la carte struggles on these
+  , "src/cmd/go/testdata/src/notest/hello.go" -- a la carte chokes on ParseError
+  , "go/src/cmd/asm/internal/asm/parse.go" -- a la carte spans are off on line 1124
 
   -- UTF8 encoding issues ("Cannot decode byte '\xe3': Data.Text.Internal.Encoding.decodeUtf8: Invalid UTF-8 stream")
   , "go/src/text/template/exec_test.go"
@@ -147,6 +152,9 @@ typescriptSkips = Path.relFile <$>
   , "npm/node_modules/bluebird/js/browser/bluebird.core.js"
   , "npm/node_modules/cli-table2/node_modules/lodash/index.js"
   , "npm/node_modules/cli-table2/node_modules/lodash/index.js"
+
+  -- Parse errors
+  , "npm/node_modules/slide/lib/async-map-ordered.js"
 
   -- Cannot decode byte '\xd0': Data.Text.Internal.Encoding.decodeUtf8: Invalid UTF-8 stream
   , "npm/node_modules/npm-profile/node_modules/make-fetch-happen/node_modules/socks-proxy-agent/node_modules/socks/node_modules/smart-buffer/test/smart-buffer.test.js"
@@ -224,10 +232,13 @@ buildExamples session lang tsDir = do
                 -- rSpan = " [" <> show (startRow right) <> ", " <> show (right^.P.span^.start^.column) <>  "]"
             HUnit.assertEqual (Text.unpack (x^.path) <> lineNo) (left^.symbol) (right^.symbol)
             HUnit.assertEqual (Text.unpack (x^.path) <> lineNo) (Text.unpack (left^.symbol) <> span left) (Text.unpack (right^.symbol) <> span right)
-            if left^.kind == "Class"
-              then HUnit.assertEqual (Text.unpack (x^.path) <> lineNo) (left^.line) (right^.line)
-              -- then HUnit.assertBool (Text.unpack (x^.path) <> lineNo) (Text.isPrefixOf (left^.line) (right^.line))
-              else pure ()
+
+            -- HUnit.assertEqual (Text.unpack (x^.path) <> lineNo) (left^.line) (right^.line)
+            HUnit.assertBool (Text.unpack (x^.path) <> lineNo) (Text.isPrefixOf (left^.line) (right^.line))
+            -- if left^.kind == "Class"
+            --   then HUnit.assertEqual (Text.unpack (x^.path) <> lineNo) (left^.line) (right^.line)
+            --   -- then HUnit.assertBool (Text.unpack (x^.path) <> lineNo) (Text.isPrefixOf (left^.line) (right^.line))
+            --   else pure ()
 
         _          -> HUnit.assertFailure "Expected 1 file in each response"
       (Left e1, Left e2) -> HUnit.assertFailure ("Unable to parse (both)" <> show (displayException e1) <> show (displayException e2))
@@ -243,6 +254,9 @@ data SortableSymbol = SortableSymbol Text.Text Int32 Int32 Int32 Int32
 
 
 okALaCarteSymbol :: String -> Text.Text -> Bool
+okALaCarteSymbol "typescript" symbol = symbol `notElem` blacklist
+  where
+    blacklist = ["require"]
 okALaCarteSymbol "ruby" symbol = not (instanceVariable symbol || builtInMethod symbol)
   where
     instanceVariable = Text.isPrefixOf "@"
