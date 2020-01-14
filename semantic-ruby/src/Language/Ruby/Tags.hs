@@ -284,25 +284,23 @@ instance ToTagsBy 'Custom Rb.MethodCall where
 
 instance ToTagsBy 'Custom Rb.Alias where
   tags' t@Rb.Alias
-    { ann = loc@Loc { byteRange = range }
-    , alias = Rb.MethodName aliasExpr
+    { alias = Rb.MethodName aliasExpr
     , name = Rb.MethodName nameExpr
     } = do
       case aliasExpr of
-        Prj Rb.Identifier { text } -> yieldTag text Function loc range
+        Prj Rb.Identifier { ann = loc@Loc { byteRange}, text } -> yieldTag text Function loc byteRange
         _ -> tags aliasExpr
       case nameExpr of
-        Prj Rb.Identifier { text } -> yieldTag text Call loc range
+        Prj Rb.Identifier { ann = loc@Loc { byteRange}, text } -> yieldTag text Call loc byteRange
         _ -> tags nameExpr
       gtags t
 
 instance ToTagsBy 'Custom Rb.Undef where
   tags' t@Rb.Undef
-    { ann = loc@Loc { byteRange = range }
-    , extraChildren
+    { extraChildren
     } = for_ extraChildren $ \(Rb.MethodName expr) -> do
       case expr of
-        Prj Rb.Identifier { text } -> yieldTag text Call loc range
+        Prj Rb.Identifier { ann = loc@Loc { byteRange }, text } -> yieldTag text Call loc byteRange
         _ -> tags expr
       gtags t
 
