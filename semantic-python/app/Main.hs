@@ -44,7 +44,7 @@ The graph should be
 
 
 runScopeGraph :: ToScopeGraph t => Path.AbsRelFile -> Source.Source -> t Loc -> (ScopeGraph.ScopeGraph Name, Result)
-runScopeGraph p _src item = run . runSketch @Name (Just p) $ scopeGraph item
+runScopeGraph p _src item = run . runSketch (Just p) $ scopeGraph item
 
 sampleGraphThing :: (Has (Sketch Name) sig m) => m Result
 sampleGraphThing = do
@@ -62,7 +62,7 @@ main = do
   file <- ByteString.readFile path
   tree <- TS.parseByteString @Py.Module @Loc TSP.tree_sitter_python file
   pyModule <- either die pure tree
-  let (expecto, Complete) = run $ runSketch @Name Nothing sampleGraphThing
+  let (expecto, Complete) = run $ runSketch Nothing sampleGraphThing
   let (result, Complete) = runScopeGraph (Path.absRel path) (Source.fromUTF8 file) pyModule
   print result
   assertEqual expecto result

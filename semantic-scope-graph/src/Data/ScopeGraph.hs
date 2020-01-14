@@ -274,7 +274,6 @@ declare :: Ord scope
         -> (ScopeGraph scope, Maybe Position)
 declare decl moduleInfo rel accessControl declSpan kind assocScope currentScope g = fromMaybe (g, Nothing) $ do
   scope <- lookupScope currentScope g
-
   dataSeq <- ddataOfScope currentScope g
   case Seq.findIndexR (\Info{..} -> decl == infoDeclaration && declSpan == infoSpan && rel == infoRelation) dataSeq of
     Just index -> pure (g, Just (Position index))
