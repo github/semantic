@@ -55,7 +55,7 @@ sampleGraphThing = do
 
 assertSimpleAssignment :: HUnit.Assertion
 assertSimpleAssignment = do
-  let path = "semantic-python/test/fixtures/1-04-toplevel-assignment.py"
+  let path = "../semantic-python/test/fixtures/1-04-toplevel-assignment.py"
   file <- ByteString.readFile path
   tree <- TS.parseByteString @Py.Module @Loc TSP.tree_sitter_python file
   pyModule <- either die pure tree
@@ -64,4 +64,11 @@ assertSimpleAssignment = do
   HUnit.assertEqual "Should work for simple case" expecto result
 
 main :: IO ()
-main = Tasty.defaultMain (HUnit.testCase "toplevel assignment" assertSimpleAssignment)
+main = Tasty.defaultMain $
+  Tasty.testGroup "Tests" [
+    Tasty.testGroup "declare" [
+      HUnit.testCase "toplevel assignment" assertSimpleAssignment
+    ],
+    Tasty.testGroup "reference" [
+    ]
+  ]
