@@ -94,8 +94,7 @@ instance ToScopeGraph Py.DictionarySplat where scopeGraph = todo
 
 deriving instance ToScopeGraph Py.Expression
 
-instance ToScopeGraph Py.ElseClause where
-  scopeGraph (Py.ElseClause _ elc) = scopeGraph elc
+instance ToScopeGraph Py.ElseClause where scopeGraph = onField @"body"
 
 instance ToScopeGraph Py.ElifClause where
   scopeGraph (Py.ElifClause _ body condition) = mappend <$> scopeGraph condition <*> scopeGraph body
@@ -110,11 +109,9 @@ instance ToScopeGraph Py.ExpressionStatement where scopeGraph = onChildren
 
 instance ToScopeGraph Py.ExpressionList where scopeGraph = onChildren
 
-instance ToScopeGraph Py.False where
-  scopeGraph _ = pure mempty
+instance ToScopeGraph Py.False where scopeGraph _ = pure mempty
 
-instance ToScopeGraph Py.FinallyClause where
-  scopeGraph (Py.FinallyClause _ block) = scopeGraph block
+instance ToScopeGraph Py.FinallyClause where scopeGraph = onField @"extraChildren"
 
 instance ToScopeGraph Py.Float where scopeGraph = const (pure mempty)
 
@@ -167,14 +164,12 @@ instance ToScopeGraph Py.ReturnStatement where
 instance ToScopeGraph Py.True where
   scopeGraph _ = pure mempty
 
-instance ToScopeGraph Py.NotOperator where
-  scopeGraph (Py.NotOperator _ arg) = scopeGraph arg
+instance ToScopeGraph Py.NotOperator where scopeGraph = onField @"argument"
 
 instance ToScopeGraph Py.Pair where
   scopeGraph (Py.Pair _ value key) = mappend <$> scopeGraph key <*> scopeGraph value
 
-instance ToScopeGraph Py.ParenthesizedExpression where
-  scopeGraph (Py.ParenthesizedExpression _ e) = scopeGraph e
+instance ToScopeGraph Py.ParenthesizedExpression where scopeGraph = onField "extraChildren"
 
 instance ToScopeGraph Py.PassStatement where scopeGraph _ = pure mempty
 
@@ -185,8 +180,7 @@ deriving instance ToScopeGraph Py.PrimaryExpression
 
 deriving instance ToScopeGraph Py.SimpleStatement
 
-instance ToScopeGraph Py.RaiseStatement where
-  scopeGraph = todo
+instance ToScopeGraph Py.RaiseStatement where scopeGraph = todo
 
 instance ToScopeGraph Py.Set where scopeGraph = onChildren
 
@@ -204,8 +198,7 @@ instance ToScopeGraph Py.TryStatement where
     els <- traverse scopeGraph elseClauses
     pure (fold (NonEmpty.cons bod els))
 
-instance ToScopeGraph Py.UnaryOperator where
-  scopeGraph (Py.UnaryOperator _ _ arg) = scopeGraph arg
+instance ToScopeGraph Py.UnaryOperator where scopeGraph = onField @"argument"
 
 instance ToScopeGraph Py.WhileStatement where
   scopeGraph Py.WhileStatement{ alternative, body, condition } = do

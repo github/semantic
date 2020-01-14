@@ -2,6 +2,7 @@
 {-# LANGUAGE DataKinds                 #-}
 {-# LANGUAGE ExistentialQuantification #-}
 {-# LANGUAGE FlexibleContexts          #-}
+{-# LANGUAGE KindSignatures            #-}
 {-# LANGUAGE ScopedTypeVariables       #-}
 {-# LANGUAGE TypeApplications          #-}
 {-# LANGUAGE TypeOperators             #-}
@@ -19,6 +20,7 @@ import Data.Name (Name)
 import Data.Typeable
 import GHC.Generics
 import GHC.Records
+import GHC.TypeLits
 import Source.Loc
 
 class Typeable t => ToScopeGraph t where
@@ -46,7 +48,7 @@ instance (ToScopeGraph l, ToScopeGraph r) => ToScopeGraph (l :+: r) where
   scopeGraph (R1 r) = scopeGraph r
 
 onField ::
-  forall field syn sig m r .
+  forall (field :: Symbol) syn sig m r .
   ( Has (Sketch Name) sig m
   , HasField field (r Loc) (syn Loc)
   , ToScopeGraph syn
