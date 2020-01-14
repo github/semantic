@@ -28,11 +28,10 @@ common haskell
                      , semantic-source ^>= 0.0
                      , semantic-tags ^>= 0.0
                      , semantic-scope-graph ^>= 0.0
-                     , semilattices
+                     , semilattices ^>= 0
                      , text ^>= 1.2.3
                      , tree-sitter ^>= 0.7.2
                      , tree-sitter-python ^>= 0.8
-                     , algebraic-graphs
   ghc-options:
     -Weverything
     -Wno-missing-local-signatures
@@ -76,10 +75,10 @@ test-suite test-graphing
   main-is: GraphTest.hs
   ghc-options: -threaded
 
-  build-depends: semantic-python
+  build-depends: base
+               , semantic-python
                , semantic-scope-graph
-               , bytestring
-               , pathtype
-               , base
-               , tasty
-               , tasty-hunit
+               , bytestring ^>= 0.10.8
+               , pathtype ^>= 0.8
+               , tasty ^>= 1.2
+               , tasty-hunit ^>= 0.10
