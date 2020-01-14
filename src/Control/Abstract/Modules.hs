@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveFunctor, DeriveGeneric, FlexibleContexts, FlexibleInstances, GADTs, GeneralizedNewtypeDeriving,
              KindSignatures, MultiParamTypeClasses, RankNTypes, ScopedTypeVariables, StandaloneDeriving, TypeOperators,
-             UndecidableInstances #-}
+             OverloadedStrings, UndecidableInstances #-}
 module Control.Abstract.Modules
 ( ModuleResult
 , lookupModule
@@ -131,7 +131,7 @@ runLoadErrorWith f = raiseHandler $ With.runResumable (runEvaluator . f)
 throwLoadError :: Has (Resumable (BaseError (LoadError address value))) sig m
                => LoadError address value resume
                -> m resume
-throwLoadError err@(ModuleNotFoundError name) = throwResumable $ BaseError (ModuleInfo name Unknown mempty) lowerBound err
+throwLoadError err@(ModuleNotFoundError name) = throwResumable $ BaseError (ModuleInfo name "Unknown" mempty) lowerBound err
 -- TODO: Might be able to get rest of ModuleInfo from the env ^.
 
 

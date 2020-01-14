@@ -71,6 +71,7 @@ import           Prologue hiding (TypeError (..))
 import           Semantic.Analysis
 import           Semantic.Task as Task
 import           Source.Loc as Loc
+import qualified System.Path as Path
 import           Source.Span
 import           System.FilePath.Posix (takeDirectory, (</>))
 import           Text.Show.Pretty (ppShow)
@@ -344,7 +345,7 @@ parseModule :: Has Parse sig m
             -> Parser term
             -> Blob
             -> m (Module (Blob, term))
-parseModule proj parser blob = moduleForBlob (Just (projectRootDir proj)) blob . (,) blob <$> parse parser blob
+parseModule proj parser blob = moduleForBlob (Just (Path.abs (projectRootDir proj))) blob . (,) blob <$> parse parser blob
 
 withTermSpans :: ( Has (Reader Span) sig m
                  , Has (State Span) sig m -- last evaluated child's span

@@ -105,13 +105,13 @@ noLanguageForBlob :: Has (Error SomeException) sig m => FilePath -> m a
 noLanguageForBlob blobPath = throwError (SomeException (NoLanguageForBlob blobPath))
 
 -- | Construct a 'Module' for a 'Blob' and @term@, relative to some root 'FilePath'.
-moduleForBlob :: Maybe FilePath -- ^ The root directory relative to which the module will be resolved, if any.
-              -> Blob           -- ^ The 'Blob' containing the module.
-              -> term           -- ^ The @term@ representing the body of the module.
+moduleForBlob :: Maybe Path.AbsDir -- ^ The root directory relative to which the module will be resolved, if any.
+              -> Blob             -- ^ The 'Blob' containing the module.
+              -> term             -- ^ The @term@ representing the body of the module.
               -> Module term    -- ^ A 'Module' named appropriate for the 'Blob', holding the @term@, and constructed relative to the root 'FilePath', if any.
 moduleForBlob rootDir b = Module info
-  where root = fromMaybe (takeDirectory (blobPath b)) rootDir
-        info = ModuleInfo (makeRelative root (blobPath b)) (blobLanguage b) (blobOid b)
+  where root = fromMaybe (Path.takeDirectory (Path.absFile (blobPath b))) rootDir
+        info = ModuleInfo (Path.toString (Path.makeRelative root (Path.absFile (blobPath b)))) (languageToText (blobLanguage b)) (blobOid b)
 
 -- | Represents a blobs suitable for diffing which can be either a blob to
 -- delete, a blob to insert, or a pair of blobs to diff.
