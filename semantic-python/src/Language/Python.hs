@@ -1,13 +1,13 @@
-{-# LANGUAGE DataKinds                  #-}
-{-# LANGUAGE DuplicateRecordFields      #-}
-{-# LANGUAGE FlexibleContexts           #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE NamedFieldPuns             #-}
-{-# LANGUAGE PatternSynonyms            #-}
-{-# LANGUAGE ScopedTypeVariables        #-}
-{-# LANGUAGE StandaloneDeriving         #-}
-{-# LANGUAGE TypeApplications           #-}
-{-# LANGUAGE TypeOperators              #-}
+{-# LANGUAGE NamedFieldPuns #-}
+{-# LANGUAGE PatternSynonyms #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeOperators #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 -- | Semantic functionality for Python programs.
 module Language.Python
@@ -169,7 +169,7 @@ instance ToScopeGraph Py.NotOperator where scopeGraph = onField @"argument"
 instance ToScopeGraph Py.Pair where
   scopeGraph (Py.Pair _ value key) = mappend <$> scopeGraph key <*> scopeGraph value
 
-instance ToScopeGraph Py.ParenthesizedExpression where scopeGraph = onField "extraChildren"
+instance ToScopeGraph Py.ParenthesizedExpression where scopeGraph = onField @"extraChildren"
 
 instance ToScopeGraph Py.PassStatement where scopeGraph _ = pure mempty
 
