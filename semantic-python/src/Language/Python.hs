@@ -124,7 +124,9 @@ instance ToScopeGraph Py.FutureImportStatement where scopeGraph = todo
 instance ToScopeGraph Py.GeneratorExpression where scopeGraph = todo
 
 instance ToScopeGraph Py.Identifier where
-  scopeGraph (Py.Identifier _ _t) = pure mempty -- TODO
+  scopeGraph (Py.Identifier _ name) = do
+    reference @Name name name RefProperties
+    complete
 
 
 instance ToScopeGraph Py.IfStatement where
