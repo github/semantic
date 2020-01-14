@@ -59,17 +59,7 @@ library
     Language.Python.Tags
   hs-source-dirs: src
 
-executable python-graph
-  import:              haskell
-  hs-source-dirs:      app
-  main-is:             Main.hs
-  build-depends:       base
-                     , semantic-python
-                     , semantic-scope-graph
-                     , bytestring
-                     , pathtype
-
-test-suite test
+test-suite compiling-test
   import: haskell
   type: exitcode-stdio-1.0
   hs-source-dirs: test
@@ -79,22 +69,15 @@ test-suite test
   other-modules: Directive
                , Instances
 
-  build-depends: semantic-python == 0.0.0.0
-               , aeson ^>= 1.4.4
-               , aeson-pretty ^>= 0.8.7
-               , bytestring ^>= 0.10.8.2
-               , containers ^>= 0.6
-               , directory ^>= 1.3.3
-               , exceptions ^>= 0.10.2
-               , pathtype ^>= 0.8.1
-               , pretty-show ^>= 1.9.5
-               , process ^>= 1.6.5
-               , resourcet ^>= 1.2.2
-               , semantic-analysis ^>= 0
-               , streaming ^>= 0.2.2
-               , streaming-process ^>= 0.1
-               , streaming-bytestring ^>= 0.1.6
-               , tasty ^>= 1.2.3
-               , tasty-hunit ^>= 0.10.0.2
-               , trifecta >= 2 && <3
-               , unordered-containers ^>= 0.2.10
+test-suite test-graphing
+  import: haskell
+  type: exitcode-stdio-1.0
+  hs-source-dirs: test-graphing
+  main-is: GraphTest.hs
+  ghc-options: -threaded
+
+  build-depends: semantic-python
+               , semantic-scope-graph
+               , bytestring
+               , pathtype
+               , base
