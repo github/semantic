@@ -81,3 +81,5 @@ test-suite test-graphing
                , bytestring
                , pathtype
                , base
+               , tasty
+               , tasty-hunit
