@@ -1,14 +1,13 @@
 {-# LANGUAGE FlexibleContexts, OverloadedStrings, ScopedTypeVariables, TypeOperators #-}
 module Analysis.FlowInsensitive
 ( Heap
-, FrameId(..)
-, Cache
 , convergeTerm
 , cacheTerm
 , runHeap
 , foldMapA
 ) where
 
+import           Analysis.Name
 import           Control.Algebra
 import           Control.Carrier.Fresh.Strict
 import           Control.Carrier.NonDet.Church
@@ -18,55 +17,50 @@ import qualified Data.Map as Map
 import           Data.Maybe (fromMaybe)
 import qualified Data.Set as Set
 
-newtype Cache term a = Cache { unCache :: Map.Map term (Set.Set a) }
+newtype Cache term value = Cache { unCache :: Map.Map term (Set.Set value) }
   deriving (Eq, Ord, Show)
 
-type Heap address a = Map.Map address (Set.Set a)
-
-newtype FrameId name = FrameId { unFrameId :: name }
-  deriving (Eq, Ord, Show)
+type Heap value = Map.Map Name (Set.Set value)
 
 
-convergeTerm :: forall m sig a term address proxy
+convergeTerm :: forall term value m sig
              .  ( Effect sig
-                , Eq address
                 , Has Fresh sig m
-                , Has (State (Heap address a)) sig m
-                , Ord a
+                , Has (State (Heap value)) sig m
                 , Ord term
+                , Ord value
                 )
-             => proxy address
-             -> Int
-             -> (term -> NonDetC (FreshC (ReaderC (Cache term a) (StateC (Cache term a) m))) a)
+             => Int
+             -> (term -> NonDetC (FreshC (ReaderC (Cache term value) (StateC (Cache term value) m))) value)
              -> term
-             -> m (Set.Set a)
-convergeTerm _ n eval body = do
+             -> m (Set.Set value)
+convergeTerm n eval body = do
   heap <- get
-  (cache, _) <- converge (Cache Map.empty :: Cache term a, heap :: Heap address a) $ \ (prevCache, _) -> runState (Cache Map.empty) . runReader prevCache $ do
-    _ <- runFresh n . runNonDetM Set.singleton $ eval body
+  (cache, _) <- converge (Cache Map.empty :: Cache term value, heap :: Heap value) $ \ (prevCache, _) -> runState (Cache Map.empty) . runReader prevCache $ do
+    _ <- evalFresh n . runNonDetM Set.singleton $ eval body
     get
   pure (fromMaybe mempty (Map.lookup body (unCache cache)))
 
-cacheTerm :: forall m sig a term
+cacheTerm :: forall term value m sig
           .  ( Alternative m
-             , Has (Reader (Cache term a)) sig m
-             , Has (State  (Cache term a)) sig m
-             , Ord a
+             , Has (Reader (Cache term value)) sig m
+             , Has (State  (Cache term value)) sig m
              , Ord term
+             , Ord value
              )
-          => (term -> m a)
-          -> (term -> m a)
+          => (term -> m value)
+          -> (term -> m value)
 cacheTerm eval term = do
   cached <- gets (Map.lookup term . unCache)
-  case cached :: Maybe (Set.Set a) of
+  case cached :: Maybe (Set.Set value) of
     Just results -> foldMapA pure results
     Nothing -> do
       results <- asks (fromMaybe mempty . Map.lookup term . unCache)
-      modify (Cache . Map.insert term (results :: Set.Set a) . unCache)
+      modify (Cache . Map.insert term (results :: Set.Set value) . unCache)
       result <- eval term
-      result <$ modify (Cache . Map.insertWith (<>) term (Set.singleton (result :: a)) . unCache)
+      result <$ modify (Cache . Map.insertWith (<>) term (Set.singleton (result :: value)) . unCache)
 
-runHeap :: StateC (Heap address a) m b -> m (Heap address a, b)
+runHeap :: StateC (Heap value) m a -> m (Heap value, a)
 runHeap m = runState Map.empty m
 
 -- | Iterate a monadic action starting from some initial seed until the results converge.

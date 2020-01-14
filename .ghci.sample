@@ -1,10 +1,8 @@
 -- Consider copying this to your ~/.ghc/ghci.conf file:
 
 -- Pretty-printing
-:set -ignore-package pretty-simple -package pretty-simple
-:def! pretty \ _ -> pure ":set -interactive-print Text.Pretty.Simple.pPrint"
-:def! no-pretty \ _ -> pure ":set -interactive-print System.IO.print"
-:def! r \_ -> pure ":reload\n:pretty"
+:set -package-id prtty-smpl-3.1.1.0-c89f0500
+:set -interactive-print Text.Pretty.Simple.pPrint
 
 -- Turn on some language extensions you use a lot
 :seti -XFlexibleContexts -XOverloadedStrings -XTypeApplications
@@ -26,6 +24,3 @@
 
 -- Better typed holes
 :set -funclutter-valid-hole-fits -fabstract-refinement-hole-fits -frefinement-level-hole-fits=2
-
--- Enable pretty-printing immediately
-:pretty

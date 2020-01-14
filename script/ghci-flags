@@ -10,9 +10,6 @@ ghc_version="$(ghc --numeric-version)"
 # recent hie-bios requires us to output to the file at $HIE_BIOS_OUTPUT, but older builds & script/repl don’t set that var, so we default it to stdout
 output_file="${HIE_BIOS_OUTPUT:-/dev/stdout}"
 
-# do a build of dependencies up front to ensure they’re all available
-cabal v2-build -v0 all --only-dependencies
-
 build_products_dir="dist-newstyle/build/x86_64-osx/ghc-$ghc_version/build-repl"
 
 function flags {
@@ -44,6 +41,7 @@ function flags {
   echo "-isemantic-java/src"
   echo "-isemantic-json/src"
   echo "-isemantic-python/src"
+  echo "-isemantic-python/test"
   echo "-isemantic-ruby/src"
   echo "-isemantic-tsx/src"
   echo "-isemantic-typescript/src"
