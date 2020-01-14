@@ -70,6 +70,8 @@ firstLine = Text.takeWhile (/= '\n') . toText . Source.take 180
 -- | Simultaneous traversal of subterms of kind @*@ and @* -> *@ in an 'Applicative' context.
 --
 -- 'Traversable1' can express any combination of first- and second-order mapping, folding, and traversal.
+--
+-- Note that the @1@ suffix is used in the manner of 'Data.Functor.Classes.Show1' or 'Generic1', rather than 'foldr1'; it’s a higher-order traversal which is simultaneously able to traverse (and alter) annotations.
 class Traversable1 c t where
   -- | Map annotations of kind @*@ and heterogeneously-typed subterms of kind @* -> *@ under some constraint @c@ into an 'Applicative' context. The constraint is necessary to operate on otherwise universally-quantified subterms, since otherwise there would be insufficient information to inspect them at all.
   --
