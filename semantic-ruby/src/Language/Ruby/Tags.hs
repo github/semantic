@@ -5,6 +5,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
+{-# HLINT ignore "Reduce duplication" #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 module Language.Ruby.Tags
 ( ToTags(..)
 ) where
