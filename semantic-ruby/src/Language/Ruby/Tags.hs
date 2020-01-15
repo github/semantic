@@ -219,7 +219,6 @@ instance ToTags Rb.Lhs where
 instance ToTags Rb.MethodCall where
   tags t@Rb.MethodCall
     { ann = loc@Loc { byteRange = byteRange@Range {} }
-    , block
     , method = expr
     } = case expr of
       Prj (Rb.Variable (Prj Rb.Identifier { text = name })) -> yield name Call
@@ -233,12 +232,7 @@ instance ToTags Rb.MethodCall where
         _                          -> gtags t
       _ -> gtags t
     where
-      -- Don't include the block in the range
-      range = case block of
-        -- Just (Prj Rb.Block { ann = Loc { byteRange = Range { start = end } } }) -> Range start end
-        -- Just (Prj Rb.DoBlock { ann = Loc { byteRange = Range { start = end } } }) -> Range start end
-        _ -> byteRange
-      yield name kind = yieldTag name kind loc range >> gtags t
+      yield name kind = yieldTag name kind loc byteRange >> gtags t
 
 instance ToTags Rb.Alias where
   tags t@Rb.Alias
