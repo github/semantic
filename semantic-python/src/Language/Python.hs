@@ -5,6 +5,7 @@ module Language.Python
 ) where
 
 import           Data.Proxy
+import           Language.Python.ScopeGraph
 import qualified Language.Python.Tags as PyTags
 import           ScopeGraph.Convert
 import qualified Tags.Tagging.Precise as Tags

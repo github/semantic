@@ -23,7 +23,6 @@ module Language.Python.ScopeGraph
 import           Control.Algebra (Algebra (..), handleCoercible)
 import           Control.Effect.Sketch
 import           Data.Foldable
-import qualified Data.List.NonEmpty as NonEmpty
 import           Data.Monoid
 import           Data.Name
 import           Data.Typeable
@@ -101,25 +100,25 @@ instance ToScopeGraph Py.Attribute where scopeGraph = todo
 
 instance ToScopeGraph Py.Block where scopeGraph = onChildren
 
-instance ToScopeGraph Py.BreakStatement where scopeGraph _ = mempty
+instance ToScopeGraph Py.BreakStatement where scopeGraph = mempty
 
 instance ToScopeGraph Py.Call where scopeGraph = todo
 
 instance ToScopeGraph Py.ClassDefinition where scopeGraph = todo
 
-instance ToScopeGraph Py.ConcatenatedString where scopeGraph _ = mempty
+instance ToScopeGraph Py.ConcatenatedString where scopeGraph = mempty
 
 deriving instance ToScopeGraph Py.CompoundStatement
 
 instance ToScopeGraph Py.ConditionalExpression where scopeGraph = onChildren
 
-instance ToScopeGraph Py.ContinueStatement where scopeGraph _ = mempty
+instance ToScopeGraph Py.ContinueStatement where scopeGraph = mempty
 
 instance ToScopeGraph Py.DecoratedDefinition where scopeGraph = todo
 
 instance ToScopeGraph Py.ComparisonOperator where scopeGraph = onChildren
 
-instance ToScopeGraph Py.DeleteStatement where scopeGraph _ = mempty
+instance ToScopeGraph Py.DeleteStatement where scopeGraph = mempty
 
 instance ToScopeGraph Py.Dictionary where scopeGraph = onChildren
 
@@ -134,11 +133,11 @@ instance ToScopeGraph Py.ElseClause where scopeGraph = onField @"body"
 instance ToScopeGraph Py.ElifClause where
   scopeGraph (Py.ElifClause _ body condition) = scopeGraph condition <> scopeGraph body
 
-instance ToScopeGraph Py.Ellipsis where scopeGraph _ = mempty
+instance ToScopeGraph Py.Ellipsis where scopeGraph = mempty
 
 instance ToScopeGraph Py.ExceptClause where scopeGraph = onChildren
 
-instance ToScopeGraph Py.ExecStatement where scopeGraph _ = mempty
+instance ToScopeGraph Py.ExecStatement where scopeGraph = mempty
 
 instance ToScopeGraph Py.ExpressionStatement where scopeGraph = onChildren
 
@@ -148,7 +147,7 @@ instance ToScopeGraph Py.False where scopeGraph _ = pure mempty
 
 instance ToScopeGraph Py.FinallyClause where scopeGraph = onField @"extraChildren"
 
-instance ToScopeGraph Py.Float where scopeGraph _ = mempty
+instance ToScopeGraph Py.Float where scopeGraph = mempty
 
 instance ToScopeGraph Py.ForStatement where scopeGraph = todo
 
@@ -171,7 +170,7 @@ instance ToScopeGraph Py.IfStatement where
 
 instance ToScopeGraph Py.GlobalStatement where scopeGraph = todo
 
-instance ToScopeGraph Py.Integer where scopeGraph _ = mempty
+instance ToScopeGraph Py.Integer where scopeGraph = mempty
 
 instance ToScopeGraph Py.ImportStatement where scopeGraph = todo
 
@@ -187,7 +186,7 @@ instance ToScopeGraph Py.ListSplat where scopeGraph = onChildren
 
 instance ToScopeGraph Py.NamedExpression where scopeGraph = todo
 
-instance ToScopeGraph Py.None where scopeGraph _ = mempty
+instance ToScopeGraph Py.None where scopeGraph = mempty
 
 instance ToScopeGraph Py.NonlocalStatement where scopeGraph = todo
 
@@ -196,17 +195,16 @@ instance ToScopeGraph Py.Module where scopeGraph = onChildren
 instance ToScopeGraph Py.ReturnStatement where
   scopeGraph (Py.ReturnStatement _ mVal) = maybe (pure mempty) scopeGraph mVal
 
-instance ToScopeGraph Py.True where
-  scopeGraph _ = pure mempty
+instance ToScopeGraph Py.True where scopeGraph = mempty
 
 instance ToScopeGraph Py.NotOperator where scopeGraph = onField @"argument"
 
 instance ToScopeGraph Py.Pair where
-  scopeGraph (Py.Pair _ value key) =scopeGraph key <> scopeGraph value
+  scopeGraph (Py.Pair _ value key) = scopeGraph key <> scopeGraph value
 
 instance ToScopeGraph Py.ParenthesizedExpression where scopeGraph = onField @"extraChildren"
 
-instance ToScopeGraph Py.PassStatement where scopeGraph _ = mempty
+instance ToScopeGraph Py.PassStatement where scopeGraph = mempty
 
 instance ToScopeGraph Py.PrintStatement where
   scopeGraph (Py.PrintStatement _ args _chevron) = foldMap scopeGraph args
@@ -221,17 +219,16 @@ instance ToScopeGraph Py.Set where scopeGraph = onChildren
 
 instance ToScopeGraph Py.SetComprehension where scopeGraph = todo
 
-instance ToScopeGraph Py.String where scopeGraph _ = mempty
+instance ToScopeGraph Py.String where scopeGraph = mempty
 
 instance ToScopeGraph Py.Subscript where scopeGraph = todo
 
 instance ToScopeGraph Py.Tuple where scopeGraph = onChildren
 
 instance ToScopeGraph Py.TryStatement where
-  scopeGraph (Py.TryStatement _ body elseClauses) = do
-    bod <- scopeGraph body
-    els <- traverse scopeGraph elseClauses
-    pure (fold (NonEmpty.cons bod els))
+  scopeGraph (Py.TryStatement _ body elseClauses)
+    = scopeGraph body
+    <> foldMap scopeGraph elseClauses
 
 instance ToScopeGraph Py.UnaryOperator where scopeGraph = onField @"argument"
 
