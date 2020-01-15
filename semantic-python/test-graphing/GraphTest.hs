@@ -53,14 +53,19 @@ sampleGraphThing = do
   declare @Name "goodbye" DeclProperties
   pure Complete
 
+graphFile :: FilePath -> IO (ScopeGraph.ScopeGraph Name, Result)
+graphFile fp = do
+  file <- ByteString.readFile fp
+  tree <- TS.parseByteString @Py.Module @Loc TSP.tree_sitter_python file
+  pyModule <- either die pure tree
+  pure $ runScopeGraph (Path.absRel fp) (Source.fromUTF8 file) pyModule
+
+
 assertSimpleAssignment :: HUnit.Assertion
 assertSimpleAssignment = do
   let path = "../semantic-python/test/fixtures/1-04-toplevel-assignment.py"
-  file <- ByteString.readFile path
-  tree <- TS.parseByteString @Py.Module @Loc TSP.tree_sitter_python file
-  pyModule <- either die pure tree
+  (result, Complete) <- graphFile path
   let (expecto, Complete) = run $ runSketch Nothing sampleGraphThing
-  let (result, Complete) = runScopeGraph (Path.absRel path) (Source.fromUTF8 file) pyModule
   HUnit.assertEqual "Should work for simple case" expecto result
 
 expectedReference :: (Has (Sketch Name) sig m) => m Result
@@ -72,11 +77,9 @@ expectedReference = do
 assertSimpleReference :: HUnit.Assertion
 assertSimpleReference = do
   let path = "../semantic-python/test/fixtures/5-01-simple-reference.py"
-  file <- ByteString.readFile path
-  tree <- TS.parseByteString @Py.Module @Loc TSP.tree_sitter_python file
-  pyModule <- either die pure tree
+  (result, Complete) <- graphFile path
   let (expecto, Complete) = run $ runSketch Nothing expectedReference
-  let (result, Complete) = runScopeGraph (Path.absRel path) (Source.fromUTF8 file) pyModule
+
   HUnit.assertEqual "Should work for simple case" expecto result
 
 main :: IO ()
