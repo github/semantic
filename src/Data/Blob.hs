@@ -40,6 +40,7 @@ import           Data.Language
 import           Data.Module
 import           Source.Source (Source)
 import qualified Source.Source as Source
+import qualified System.FilePath as FP
 import qualified System.Path as Path
 import qualified System.Path.PartClass as Path.PartClass
 
@@ -105,13 +106,13 @@ noLanguageForBlob :: Has (Error SomeException) sig m => FilePath -> m a
 noLanguageForBlob blobPath = throwError (SomeException (NoLanguageForBlob blobPath))
 
 -- | Construct a 'Module' for a 'Blob' and @term@, relative to some root 'FilePath'.
-moduleForBlob :: Maybe Path.AbsDir -- ^ The root directory relative to which the module will be resolved, if any.
+moduleForBlob :: Maybe FilePath -- ^ The root directory relative to which the module will be resolved, if any. TODO: typed paths
               -> Blob             -- ^ The 'Blob' containing the module.
               -> term             -- ^ The @term@ representing the body of the module.
               -> Module term    -- ^ A 'Module' named appropriate for the 'Blob', holding the @term@, and constructed relative to the root 'FilePath', if any.
 moduleForBlob rootDir b = Module info
-  where root = fromMaybe (Path.takeDirectory (Path.absFile (blobPath b))) rootDir
-        info = ModuleInfo (Path.toString (Path.makeRelative root (Path.absFile (blobPath b)))) (languageToText (blobLanguage b)) (blobOid b)
+  where root = fromMaybe (FP.takeDirectory (blobPath b)) rootDir
+        info = ModuleInfo (FP.makeRelative root (blobPath b)) (languageToText (blobLanguage b)) (blobOid b)
 
 -- | Represents a blobs suitable for diffing which can be either a blob to
 -- delete, a blob to insert, or a pair of blobs to diff.
