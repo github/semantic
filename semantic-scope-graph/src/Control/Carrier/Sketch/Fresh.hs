@@ -10,8 +10,9 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
-{-# OPTIONS_GHC -Wno-redundant-constraints #-}
 
+-- | This carrier interprets the Sketch effect, keeping track of
+-- the current scope and in-progress graph internally.
 module Control.Carrier.Sketch.Fresh
   ( SketchC (..)
   , runSketch
