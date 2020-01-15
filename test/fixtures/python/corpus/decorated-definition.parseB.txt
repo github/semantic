@@ -9,10 +9,12 @@
           (Statements)
           (Decorator
             (Identifier)
-            (Identifier)
+            (Statements
+              (Identifier))
             (Decorator
               (Identifier)
-              (Identifier)
+              (Statements
+                (Identifier))
               (Decorator
                 (Identifier)
                 (Statements
@@ -20,8 +22,10 @@
                   (Assignment
                     (Identifier)
                     (Boolean))
-                  (Identifier)
-                  (Identifier))
+                  (Statements
+                    (Identifier))
+                  (Statements
+                    (Identifier)))
                 (Function
                   (Identifier)
                   (Statements

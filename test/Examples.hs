@@ -1,5 +1,11 @@
-{-# LANGUAGE FlexibleContexts, RecordWildCards, OverloadedStrings, TypeApplications #-}
+{-# LANGUAGE FlexibleContexts  #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards   #-}
+{-# LANGUAGE TypeApplications  #-}
+{-# LANGUAGE AllowAmbiguousTypes  #-}
+
 {-# OPTIONS_GHC -O1 #-}
+{-# OPTIONS_GHC -Wno-unused-top-binds -Wno-unused-imports #-}
 module Main (main) where
 
 import           Control.Carrier.Parse.Measured
@@ -12,6 +18,7 @@ import           Data.Blob
 import           Data.Foldable
 import           Data.Language (LanguageMode (..), PerLanguageModes (..))
 import           Data.List
+import           Data.Int
 import qualified Data.Text as Text
 import           Data.Traversable
 import           System.FilePath.Glob
@@ -73,7 +80,12 @@ goFileSkips = Path.relPath <$>
   -- Parse errors
   , "go/src/math/big/arith.go" -- Unhandled identifier character: 'ŝ'
   , "go/src/cmd/vet/testdata/deadcode.go"
+  , "go/src/cmd/vet/testdata/testingpkg/tests_test.go"
   , "moby/vendor/github.com/beorn7/perks/quantile/stream.go" -- Unhandled identifier character: 'ƒ'
+
+  -- A la carte struggles on these
+  , "src/cmd/go/testdata/src/notest/hello.go" -- a la carte chokes on ParseError
+  , "go/src/cmd/asm/internal/asm/parse.go" -- a la carte spans are off on line 1124
 
   -- UTF8 encoding issues ("Cannot decode byte '\xe3': Data.Text.Internal.Encoding.decodeUtf8: Invalid UTF-8 stream")
   , "go/src/text/template/exec_test.go"
@@ -104,10 +116,18 @@ rubySkips = Path.relFile <$>
   -- Doesn't parse
   , "ruby_spec/language/string_spec.rb"
   , "ruby_spec/language/fixtures/freeze_magic_comment_required_diff_enc.rb"
+  , "ruby_spec/command_line/fixtures/freeze_flag_required_diff_enc.rb"
+  , "ruby_spec/command_line/fixtures/bad_syntax.rb"
 
   -- Can't detect method calls inside heredoc bodies with precise ASTs
   , "ruby_spec/core/argf/readpartial_spec.rb"
   , "ruby_spec/core/process/exec_spec.rb"
+
+  -- These are known differences between precise and a la carte (usually precise is producing better data) that we aren't going to fix.
+  , "ruby_spec/language/def_spec.rb"
+  , "ruby_spec/language/block_spec.rb"
+  , "ruby_spec/language/method_spec.rb"
+  , "ruby_spec/language/lambda_spec.rb"
   ]
 
 tsxSkips :: [Path.RelFile]
@@ -133,6 +153,9 @@ typescriptSkips = Path.relFile <$>
   , "npm/node_modules/bluebird/js/browser/bluebird.core.js"
   , "npm/node_modules/cli-table2/node_modules/lodash/index.js"
   , "npm/node_modules/cli-table2/node_modules/lodash/index.js"
+
+  -- Parse errors
+  , "npm/node_modules/slide/lib/async-map-ordered.js"
 
   -- Cannot decode byte '\xd0': Data.Text.Internal.Encoding.decodeUtf8: Invalid UTF-8 stream
   , "npm/node_modules/npm-profile/node_modules/make-fetch-happen/node_modules/socks-proxy-agent/node_modules/socks/node_modules/smart-buffer/test/smart-buffer.test.js"
@@ -182,34 +205,63 @@ buildExamples session lang tsDir = do
         ([x], _)   | e:_ <- toList (x^.errors)
                    -> HUnit.assertFailure ("Parse errors (a la carte) " <> show e)
         ([x], [y]) -> do
+          -- Check paths
           HUnit.assertEqual "Expected paths to be equal" (x^.path) (y^.path)
+
+          -- Check symbols
           let aLaCarteSymbols = sort . filterALaCarteSymbols (languageName lang) $ toListOf (symbols . traverse . symbol) x
-              preciseSymbols = sort $ toListOf (symbols . traverse . symbol) y
+              preciseSymbols = sort . filterALaCarteSymbols (languageName lang) $ toListOf (symbols . traverse . symbol) y
               delta = aLaCarteSymbols \\ preciseSymbols
+              invDelta = preciseSymbols \\ aLaCarteSymbols
               msg = "Found in a la carte, but not precise: "
                   <> show delta
                   <> "\n"
                   <> "Found in precise but not a la carte: "
-                  <> show (preciseSymbols \\ aLaCarteSymbols)
+                  <> show invDelta
                   <> "\n"
                   <> "Expected: " <> show aLaCarteSymbols <> "\n"
                   <> "But got:" <> show preciseSymbols
-
           HUnit.assertBool ("Expected symbols to be equal.\n" <> msg) (null delta)
-          pure ()
+          HUnit.assertBool ("Expected symbols to be equal.\n" <> msg) (null invDelta)
+
+          -- Check details
+          let aLaCarteSymbols = sortOn sSym . filter (okALaCarteSymbol (languageName lang) . view symbol) $ toList (x^.symbols)
+              preciseSymbols  = sortOn sSym . filter (okALaCarteSymbol (languageName lang) . view symbol) $ toList (y^.symbols)
+          for_ (zip aLaCarteSymbols preciseSymbols) $ \ (left, right) -> do
+            let lineNo = ":" <> show (left^.P.span^.start^.line)
+                -- lSpan = " [" <> show (startRow left) <> ", " <> show (left^.P.span^.start^.column) <>  "]"
+                -- rSpan = " [" <> show (startRow right) <> ", " <> show (right^.P.span^.start^.column) <>  "]"
+            HUnit.assertEqual (Text.unpack (x^.path) <> lineNo) (left^.symbol) (right^.symbol)
+            HUnit.assertEqual (Text.unpack (x^.path) <> lineNo) (Text.unpack (left^.symbol) <> span left) (Text.unpack (right^.symbol) <> span right)
+
+            -- HUnit.assertEqual (Text.unpack (x^.path) <> lineNo) (left^.line) (right^.line)
+            -- HUnit.assertBool (Text.unpack (x^.path) <> lineNo) (Text.isPrefixOf (left^.line) (right^.line))
+            -- if left^.kind == "Method"
+            --   then HUnit.assertEqual (Text.unpack (x^.path) <> lineNo) (left^.line) (right^.line)
+            -- --   -- then HUnit.assertBool (Text.unpack (x^.path) <> lineNo) (Text.isPrefixOf (left^.line) (right^.line))
+            --   else pure ()
+
         _          -> HUnit.assertFailure "Expected 1 file in each response"
       (Left e1, Left e2) -> HUnit.assertFailure ("Unable to parse (both)" <> show (displayException e1) <> show (displayException e2))
       (_, Left e)        -> HUnit.assertFailure ("Unable to parse (precise)" <> show (displayException e))
       (Left e, _)        -> HUnit.assertFailure ("Unable to parse (a la carte)" <> show (displayException e))
 
-filterALaCarteSymbols :: String -> [Text.Text] -> [Text.Text]
-filterALaCarteSymbols "ruby" symbols
-  = filterOutInstanceVariables
-  . filterOutBuiltInMethods
-  $ symbols
+    sSym x = SortableSymbol (x^.symbol) (x^.P.span^.start^.line) (x^.P.span^.start^.column) (x^.P.span^.end^.line) (x^.P.span^.end^.column)
+    span x = " ["  <> show (x^.P.span^.start^.line) <> ", " <> show (x^.P.span^.start^.column) <>
+             " - " <> show (x^.P.span^.end^.line) <> ", " <> show (x^.P.span^.end^.column) <> "]"
+
+data SortableSymbol = SortableSymbol Text.Text Int32 Int32 Int32 Int32
+  deriving (Eq, Show, Ord)
+
+
+okALaCarteSymbol :: String -> Text.Text -> Bool
+okALaCarteSymbol "typescript" symbol = symbol `notElem` blacklist
   where
-    filterOutInstanceVariables = filter (not . Text.isPrefixOf "@")
-    filterOutBuiltInMethods = filter (`notElem` blacklist)
+    blacklist = ["require"]
+okALaCarteSymbol "ruby" symbol = not (instanceVariable symbol || builtInMethod symbol)
+  where
+    instanceVariable = Text.isPrefixOf "@"
+    builtInMethod x = x `elem` blacklist
     blacklist =
       [ "alias"
       , "load"
@@ -220,7 +272,10 @@ filterALaCarteSymbols "ruby" symbols
       , "defined?"
       , "lambda"
       ]
-filterALaCarteSymbols _      symbols = symbols
+okALaCarteSymbol _ _ = True
+
+filterALaCarteSymbols :: String -> [Text.Text] -> [Text.Text]
+filterALaCarteSymbols lang = filter (okALaCarteSymbol lang)
 
 aLaCarteLanguageModes :: PerLanguageModes
 aLaCarteLanguageModes = PerLanguageModes
