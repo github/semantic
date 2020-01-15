@@ -116,6 +116,7 @@ rubySkips = Path.relFile <$>
   -- Doesn't parse
   , "ruby_spec/language/string_spec.rb"
   , "ruby_spec/language/fixtures/freeze_magic_comment_required_diff_enc.rb"
+  , "ruby_spec/command_line/fixtures/freeze_flag_required_diff_enc.rb"
   , "ruby_spec/command_line/fixtures/bad_syntax.rb"
 
   -- Can't detect method calls inside heredoc bodies with precise ASTs
@@ -235,10 +236,10 @@ buildExamples session lang tsDir = do
 
             -- HUnit.assertEqual (Text.unpack (x^.path) <> lineNo) (left^.line) (right^.line)
             -- HUnit.assertBool (Text.unpack (x^.path) <> lineNo) (Text.isPrefixOf (left^.line) (right^.line))
-            if left^.kind == "Class"
-              then HUnit.assertEqual (Text.unpack (x^.path) <> lineNo) (left^.line) (right^.line)
-            --   -- then HUnit.assertBool (Text.unpack (x^.path) <> lineNo) (Text.isPrefixOf (left^.line) (right^.line))
-              else pure ()
+            -- if left^.kind == "Method"
+            --   then HUnit.assertEqual (Text.unpack (x^.path) <> lineNo) (left^.line) (right^.line)
+            -- --   -- then HUnit.assertBool (Text.unpack (x^.path) <> lineNo) (Text.isPrefixOf (left^.line) (right^.line))
+            --   else pure ()
 
         _          -> HUnit.assertFailure "Expected 1 file in each response"
       (Left e1, Left e2) -> HUnit.assertFailure ("Unable to parse (both)" <> show (displayException e1) <> show (displayException e2))
