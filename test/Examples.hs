@@ -50,11 +50,11 @@ le = LanguageExample
 
 examples :: [LanguageExample]
 examples =
-  -- [ le "go" "**/*.go" goFileSkips goDirSkips
-  -- [ le "python" "**/*.py" mempty mempty
-  [ le "ruby" "**/*.rb" rubySkips mempty
-  -- [ le "typescript" "**/*.[jt]s" typescriptSkips mempty
-  -- [ le "typescript" "**/*.[jt]sx" tsxSkips mempty
+  [ le "go" "**/*.go" goFileSkips goDirSkips
+  , le "python" "**/*.py" mempty mempty
+  , le "ruby" "**/*.rb" rubySkips mempty
+  , le "typescript" "**/*.[jt]s" typescriptSkips mempty
+  , le "typescript" "**/*.[jt]sx" tsxSkips mempty
   ]
 
 goFileSkips :: [Path.RelFile]
