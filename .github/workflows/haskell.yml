@@ -1,12 +1,12 @@
 name: Haskell CI
 
-on: [push]
-  # # Trigger the workflow on push or pull request,
-  # # but only for the master branch
-  # push:
-  #   branches:
-  #     - master
-  # pull_request:
+on:
+  # Trigger the workflow on push or pull request,
+  # but only for the master branch
+  push:
+    branches:
+      - master
+  pull_request:
 
 jobs:
   build:
@@ -19,18 +19,13 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      if: github.event.action == 'opened' || github.event.action == 'synchronize' || github.event.ref == 'refs/heads/master'
 
     - uses: actions/setup-haskell@v1
       name: Setup Haskell
       with:
         ghc-version: ${{ matrix.ghc }}
         cabal-version: ${{ matrix.cabal }}
-
-    - uses: actions/cache@v1
-      name: Cache ~/.cabal/packages
-      with:
-        path: ~/.cabal/packages
-        key: ${{ runner.os }}-${{ matrix.ghc }}-v1-cabal-packages
 
     - uses: actions/cache@v1
       name: Cache ~/.cabal/store
@@ -42,7 +37,7 @@ jobs:
       name: Cache dist-newstyle
       with:
         path: dist-newstyle
-        key: ${{ runner.os }}-${{ matrix.ghc }}-semantic-dist
+        key: ${{ runner.os }}-${{ matrix.ghc }}-${{ matrix.cabal }}-semantic-dist
 
     - name: Install dependencies
       run: |
@@ -60,7 +55,7 @@ jobs:
 
     - name: hlint
       run: |
-        cabal install hlint --installdir=dist-newstyle
+        test -f dist-newstyle/hlint || cabal install hlint --installdir=dist-newstyle
         dist-newstyle/hlint src semantic-python
 
     - name: Build & test

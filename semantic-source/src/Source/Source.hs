@@ -42,6 +42,7 @@ import           Data.Semilattice.Lower
 import           Data.String (IsString (..))
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
+import           Data.Text.Encoding.Error (lenientDecode)
 import           GHC.Generics (Generic)
 import           Source.Range
 import           Source.Span (Span(Span), Pos(..))
@@ -87,7 +88,7 @@ fromText = Source . T.encodeUtf8
 
 -- | Return the Text contained in the 'Source'.
 toText :: Source -> T.Text
-toText = T.decodeUtf8 . bytes
+toText = T.decodeUtf8With lenientDecode . bytes
 
 
 -- Slicing

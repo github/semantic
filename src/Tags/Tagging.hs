@@ -39,13 +39,14 @@ runTagging lang symbolsToSummarize source
     toKind x = do
       guard (x `elem` symbolsToSummarize)
       case x of
-        "Function" -> Just Function
-        "Method"   -> Just Method
-        "Class"    -> Just Class
-        "Module"   -> Just Module
-        "Call"     -> Just Call
-        "Send"     -> Just Call -- Ruby’s Send is considered to be a kind of 'Call'
-        _          -> Nothing
+        "Function"        -> Just Function
+        "Method"          -> Just Method
+        "Class"           -> Just Class
+        "Module"          -> Just Module
+        "Call"            -> Just Call
+        "Send"            -> Just Call -- Ruby’s Send is considered to be a kind of 'Call'
+        "AmbientFunction" -> Just Function -- Classify TypeScript ambient functions as 'Function'
+        _                 -> Nothing
 
 type ContextToken = (Text, Range)
 
@@ -59,12 +60,12 @@ contextualizing source toKind = Streaming.mapMaybeM $ \case
   Exit  x r -> Nothing <$ exitScope (x, r)
   Iden iden loc docsLiteralRange -> fmap go (get @[ContextToken]) where
     go = \case
-      ((x, r):("Context", cr):_) | Just kind <- toKind x -> Just $ Tag iden kind loc (firstLine (slice r)) (Just (slice cr))
-      ((x, r):_) | Just kind <- toKind x -> Just $ Tag iden kind loc (firstLine (slice r)) (slice <$> docsLiteralRange)
+      ((x, r):("Context", cr):_) | Just kind <- toKind x -> Just $ Tag iden kind loc (firstLine r) (Just (slice cr))
+      ((x, r):_) | Just kind <- toKind x -> Just $ Tag iden kind loc (firstLine r) (slice <$> docsLiteralRange)
       _ -> Nothing
   where
-    slice = stripEnd . Source.toText . Source.slice source
-    firstLine = T.take 180 . fst . breakOn "\n"
+    slice = T.stripEnd . Source.toText . Source.slice source
+    firstLine = T.stripEnd . T.takeWhile (/= '\n') . Source.toText . Source.take 180 . Source.slice source
 
 enterScope, exitScope :: Has (State [ContextToken]) sig m
                       => ContextToken

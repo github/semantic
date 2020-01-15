@@ -1,18 +1,10 @@
-{-# LANGUAGE AllowAmbiguousTypes      #-}
-{-# LANGUAGE DataKinds                #-}
+{-# LANGUAGE DefaultSignatures #-}
 {-# LANGUAGE DisambiguateRecordFields #-}
-{-# LANGUAGE FlexibleContexts         #-}
-{-# LANGUAGE FlexibleInstances        #-}
-{-# LANGUAGE MultiParamTypeClasses    #-}
-{-# LANGUAGE NamedFieldPuns           #-}
-{-# LANGUAGE PartialTypeSignatures    #-}
-{-# LANGUAGE ScopedTypeVariables      #-}
-{-# LANGUAGE TypeApplications         #-}
-{-# LANGUAGE TypeFamilies             #-}
-{-# LANGUAGE TypeOperators            #-}
-{-# LANGUAGE UndecidableInstances     #-}
-
-{-# OPTIONS_GHC -freduction-depth=0 #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE NamedFieldPuns #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeOperators #-}
 module Language.TypeScript.Tags
 ( ToTags(..)
 ) where
@@ -21,13 +13,13 @@ import           AST.Element
 import           Control.Effect.Reader
 import           Control.Effect.Writer
 import           Data.Foldable
-import           Data.Monoid (Ap (..))
 import           Data.Text as Text
 import           GHC.Generics
 import           Source.Loc
 import           Source.Source as Source
 import           Tags.Tag
 import qualified Tags.Tagging.Precise as Tags
+import           TreeSitter.Token
 import qualified TreeSitter.TypeScript.AST as Ts
 
 class ToTags t where
@@ -37,70 +29,54 @@ class ToTags t where
        )
     => t Loc
     -> m ()
-
-instance (ToTagsBy strategy t, strategy ~ ToTagsInstance t) => ToTags t where
-  tags = tags' @strategy
-
-
-class ToTagsBy (strategy :: Strategy) t where
-  tags'
+  default tags
     :: ( Has (Reader Source) sig m
        , Has (Writer Tags.Tags) sig m
+       , Generic1 t
+       , Tags.GTraversable1 ToTags (Rep1 t)
        )
     => t Loc
     -> m ()
+  tags = gtags
 
-
-data Strategy = Generic | Custom
-
-type family ToTagsInstance t :: Strategy where
-  ToTagsInstance (_ :+: _)              = 'Custom
-  ToTagsInstance Ts.CallExpression      = 'Custom
-  ToTagsInstance Ts.ClassDeclaration    = 'Custom
-  ToTagsInstance Ts.Function            = 'Custom
-  ToTagsInstance Ts.FunctionDeclaration = 'Custom
-  ToTagsInstance Ts.FunctionSignature   = 'Custom
-  ToTagsInstance Ts.MethodDefinition    = 'Custom
-  ToTagsInstance _                      = 'Generic
-
-instance ToTagsBy 'Custom Ts.Function where
-  tags' t@Ts.Function
+instance ToTags Ts.Function where
+  tags t@Ts.Function
     { ann = loc@Loc { byteRange }
     , name = Just Ts.Identifier { text }
     } = yieldTag text Function loc byteRange >> gtags t
-  tags' t = gtags t
+  tags t = gtags t
 
-instance ToTagsBy 'Custom Ts.FunctionSignature where
-  tags' t@Ts.FunctionSignature
+instance ToTags Ts.FunctionSignature where
+  tags t@Ts.FunctionSignature
     { ann = loc@Loc { byteRange }
     , name = Ts.Identifier { text }
     } = yieldTag text Function loc byteRange >> gtags t
 
-instance ToTagsBy 'Custom Ts.FunctionDeclaration where
-  tags' t@Ts.FunctionDeclaration
+instance ToTags Ts.FunctionDeclaration where
+  tags t@Ts.FunctionDeclaration
     { ann = loc@Loc { byteRange }
     , name = Ts.Identifier { text }
     } = yieldTag text Function loc byteRange >> gtags t
 
-instance ToTagsBy 'Custom Ts.MethodDefinition where
-  tags' t@Ts.MethodDefinition
+instance ToTags Ts.MethodDefinition where
+  tags t@Ts.MethodDefinition
     { ann = loc@Loc { byteRange }
     , name
     } = case name of
       Prj Ts.PropertyIdentifier { text } -> yield text
       -- TODO: There are more here
-      _ -> gtags t
+      _                                  -> gtags t
       where
         yield name = yieldTag name Call loc byteRange >> gtags t
 
-instance ToTagsBy 'Custom Ts.ClassDeclaration where
-  tags' t@Ts.ClassDeclaration
+instance ToTags Ts.ClassDeclaration where
+  tags t@Ts.ClassDeclaration
     { ann = loc@Loc { byteRange }
     , name = Ts.TypeIdentifier { text }
     } = yieldTag text Class loc byteRange >> gtags t
 
-instance ToTagsBy 'Custom Ts.CallExpression where
-  tags' t@Ts.CallExpression
+instance ToTags Ts.CallExpression where
+  tags t@Ts.CallExpression
     { ann = loc@Loc { byteRange }
     , function = Ts.Expression expr
     } = match expr
@@ -113,29 +89,197 @@ instance ToTagsBy 'Custom Ts.CallExpression where
         Prj Ts.Function { name = Just Ts.Identifier { text }} -> yield text
         Prj Ts.ParenthesizedExpression { extraChildren } -> for_ extraChildren $ \ x -> case x of
           Prj (Ts.Expression expr) -> match expr
-          _ -> tags x
+          _                        -> tags x
         _ -> gtags t
       yield name = yieldTag name Call loc byteRange >> gtags t
 
-instance (ToTags l, ToTags r) => ToTagsBy 'Custom (l :+: r) where
-  tags' (L1 l) = tags l
-  tags' (R1 r) = tags r
+instance (ToTags l, ToTags r) => ToTags (l :+: r) where
+  tags (L1 l) = tags l
+  tags (R1 r) = tags r
+
+instance ToTags (Token sym n) where tags _ = pure ()
 
 gtags
   :: ( Has (Reader Source) sig m
      , Has (Writer Tags.Tags) sig m
      , Generic1 t
-     , Tags.GFoldable1 ToTags (Rep1 t)
+     , Tags.GTraversable1 ToTags (Rep1 t)
      )
   => t Loc
   -> m ()
-gtags = getAp . Tags.gfoldMap1 @ToTags (Ap . tags) . from1
+gtags = Tags.traverse1_ @ToTags (const (pure ())) tags . Tags.Generics
 
-instance (Generic1 t, Tags.GFoldable1 ToTags (Rep1 t)) => ToTagsBy 'Generic t where
-  tags' = gtags
+-- These are all valid, but point to built-in functions (e.g. require) that a la
+-- carte doesn't display and since we have nothing to link to yet (can't
+-- jump-to-def), we hide them from the current tags output.
+nameBlacklist :: [Text]
+nameBlacklist =
+  [ "require"
+  ]
 
 yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text -> Kind -> Loc -> Range -> m ()
+yieldTag name Call _ _ | name `elem` nameBlacklist = pure ()
 yieldTag name kind loc range = do
   src <- ask @Source
   let sliced = slice src range
   Tags.yield (Tag name kind loc (Tags.firstLine sliced) Nothing)
+
+instance ToTags Ts.AbstractClassDeclaration
+instance ToTags Ts.AbstractMethodSignature
+instance ToTags Ts.AccessibilityModifier
+instance ToTags Ts.AmbientDeclaration
+instance ToTags Ts.Arguments
+instance ToTags Ts.Array
+instance ToTags Ts.ArrayPattern
+instance ToTags Ts.ArrayType
+instance ToTags Ts.ArrowFunction
+instance ToTags Ts.AsExpression
+instance ToTags Ts.AssignmentExpression
+instance ToTags Ts.AssignmentPattern
+instance ToTags Ts.AugmentedAssignmentExpression
+instance ToTags Ts.AwaitExpression
+instance ToTags Ts.BinaryExpression
+instance ToTags Ts.BreakStatement
+-- instance ToTags Ts.CallExpression
+instance ToTags Ts.CallSignature
+instance ToTags Ts.CatchClause
+instance ToTags Ts.Class
+instance ToTags Ts.ClassBody
+-- instance ToTags Ts.ClassDeclaration
+instance ToTags Ts.ClassHeritage
+instance ToTags Ts.ComputedPropertyName
+instance ToTags Ts.Constraint
+instance ToTags Ts.ConstructSignature
+instance ToTags Ts.ConstructorType
+instance ToTags Ts.ContinueStatement
+instance ToTags Ts.DebuggerStatement
+instance ToTags Ts.Declaration
+instance ToTags Ts.Decorator
+instance ToTags Ts.DefaultType
+instance ToTags Ts.DestructuringPattern
+instance ToTags Ts.DoStatement
+instance ToTags Ts.EmptyStatement
+instance ToTags Ts.EnumAssignment
+instance ToTags Ts.EnumBody
+instance ToTags Ts.EnumDeclaration
+instance ToTags Ts.EscapeSequence
+instance ToTags Ts.ExistentialType
+instance ToTags Ts.ExportClause
+instance ToTags Ts.ExportSpecifier
+instance ToTags Ts.ExportStatement
+instance ToTags Ts.Expression
+instance ToTags Ts.ExpressionStatement
+instance ToTags Ts.ExtendsClause
+instance ToTags Ts.False
+instance ToTags Ts.FinallyClause
+instance ToTags Ts.FlowMaybeType
+instance ToTags Ts.ForInStatement
+instance ToTags Ts.ForStatement
+instance ToTags Ts.FormalParameters
+-- instance ToTags Ts.Function
+-- instance ToTags Ts.FunctionDeclaration
+-- instance ToTags Ts.FunctionSignature
+instance ToTags Ts.FunctionType
+instance ToTags Ts.GeneratorFunction
+instance ToTags Ts.GeneratorFunctionDeclaration
+instance ToTags Ts.GenericType
+instance ToTags Ts.HashBangLine
+instance ToTags Ts.Identifier
+instance ToTags Ts.IfStatement
+instance ToTags Ts.ImplementsClause
+instance ToTags Ts.Import
+instance ToTags Ts.ImportAlias
+instance ToTags Ts.ImportClause
+instance ToTags Ts.ImportRequireClause
+instance ToTags Ts.ImportSpecifier
+instance ToTags Ts.ImportStatement
+instance ToTags Ts.IndexSignature
+instance ToTags Ts.IndexTypeQuery
+instance ToTags Ts.InterfaceDeclaration
+instance ToTags Ts.InternalModule
+instance ToTags Ts.IntersectionType
+instance ToTags Ts.JsxAttribute
+instance ToTags Ts.JsxClosingElement
+instance ToTags Ts.JsxElement
+instance ToTags Ts.JsxExpression
+instance ToTags Ts.JsxFragment
+instance ToTags Ts.JsxNamespaceName
+instance ToTags Ts.JsxOpeningElement
+instance ToTags Ts.JsxSelfClosingElement
+instance ToTags Ts.JsxText
+instance ToTags Ts.LabeledStatement
+instance ToTags Ts.LexicalDeclaration
+instance ToTags Ts.LiteralType
+instance ToTags Ts.LookupType
+instance ToTags Ts.MappedTypeClause
+instance ToTags Ts.MemberExpression
+instance ToTags Ts.MetaProperty
+-- instance ToTags Ts.MethodDefinition
+instance ToTags Ts.MethodSignature
+instance ToTags Ts.Module
+instance ToTags Ts.NamedImports
+instance ToTags Ts.NamespaceImport
+instance ToTags Ts.NestedIdentifier
+instance ToTags Ts.NestedTypeIdentifier
+instance ToTags Ts.NewExpression
+instance ToTags Ts.NonNullExpression
+instance ToTags Ts.Null
+instance ToTags Ts.Number
+instance ToTags Ts.Object
+instance ToTags Ts.ObjectPattern
+instance ToTags Ts.ObjectType
+instance ToTags Ts.OptionalParameter
+instance ToTags Ts.Pair
+instance ToTags Ts.ParenthesizedExpression
+instance ToTags Ts.ParenthesizedType
+instance ToTags Ts.PredefinedType
+instance ToTags Ts.Program
+instance ToTags Ts.PropertyIdentifier
+instance ToTags Ts.PropertySignature
+instance ToTags Ts.PublicFieldDefinition
+instance ToTags Ts.Readonly
+instance ToTags Ts.Regex
+instance ToTags Ts.RegexFlags
+instance ToTags Ts.RegexPattern
+instance ToTags Ts.RequiredParameter
+instance ToTags Ts.RestParameter
+instance ToTags Ts.ReturnStatement
+instance ToTags Ts.SequenceExpression
+instance ToTags Ts.ShorthandPropertyIdentifier
+instance ToTags Ts.SpreadElement
+instance ToTags Ts.Statement
+instance ToTags Ts.StatementBlock
+instance ToTags Ts.StatementIdentifier
+instance ToTags Ts.String
+instance ToTags Ts.SubscriptExpression
+instance ToTags Ts.Super
+instance ToTags Ts.SwitchBody
+instance ToTags Ts.SwitchCase
+instance ToTags Ts.SwitchDefault
+instance ToTags Ts.SwitchStatement
+instance ToTags Ts.TemplateString
+instance ToTags Ts.TemplateSubstitution
+instance ToTags Ts.TernaryExpression
+instance ToTags Ts.This
+instance ToTags Ts.ThrowStatement
+instance ToTags Ts.True
+instance ToTags Ts.TryStatement
+instance ToTags Ts.TupleType
+instance ToTags Ts.TypeAliasDeclaration
+instance ToTags Ts.TypeAnnotation
+instance ToTags Ts.TypeArguments
+instance ToTags Ts.TypeAssertion
+instance ToTags Ts.TypeIdentifier
+instance ToTags Ts.TypeParameter
+instance ToTags Ts.TypeParameters
+instance ToTags Ts.TypePredicate
+instance ToTags Ts.TypeQuery
+instance ToTags Ts.UnaryExpression
+instance ToTags Ts.Undefined
+instance ToTags Ts.UnionType
+instance ToTags Ts.UpdateExpression
+instance ToTags Ts.VariableDeclaration
+instance ToTags Ts.VariableDeclarator
+instance ToTags Ts.WhileStatement
+instance ToTags Ts.WithStatement
+instance ToTags Ts.YieldExpression

@@ -59,7 +59,7 @@ common dependencies
                      , fused-effects-exceptions ^>= 1
                      , fused-effects-resumable ^>= 0.1
                      , hashable >= 1.2.7 && < 1.4
-                     , tree-sitter ^>= 0.7.2
+                     , tree-sitter ^>= 0.8
                      , mtl ^>= 2.2.2
                      , network ^>= 2.8.0.0
                      , pathtype ^>= 0.8.1
@@ -302,12 +302,12 @@ library
                      , unliftio-core ^>= 0.1.2.0
                      , unordered-containers ^>= 0.2.9.0
                      , vector ^>= 0.12.0.2
-                     , tree-sitter-go ^>= 0.4
+                     , tree-sitter-go ^>= 0.4.1
                      , tree-sitter-php ^>= 0.2
-                     , tree-sitter-python ^>= 0.8
-                     , tree-sitter-ruby ^>= 0.4
-                     , tree-sitter-typescript ^>= 0.4
-                     , tree-sitter-tsx ^>= 0.4
+                     , tree-sitter-python ^>= 0.8.1
+                     , tree-sitter-ruby ^>= 0.4.1
+                     , tree-sitter-typescript ^>= 0.4.1
+                     , tree-sitter-tsx ^>= 0.4.1
 
 executable semantic
   import:              haskell, dependencies, executable-flags
@@ -357,7 +357,7 @@ test-suite test
                      , Generators
                      , Properties
   build-depends:       semantic
-                     , tree-sitter-json ^>= 0.5
+                     , tree-sitter-json ^>= 0.6
                      , Glob ^>= 0.10.0
                      , hedgehog ^>= 1
                      , hspec >= 2.6 && <3
@@ -387,16 +387,19 @@ test-suite parse-examples
                      , tasty
                      , tasty-hunit
 
-benchmark evaluation
+benchmark benchmarks
   import:              haskell, dependencies, executable-flags
   hs-source-dirs:      bench
   type:                exitcode-stdio-1.0
   main-is:             Main.hs
   other-modules:       Evaluation
+                     , Tagging
   ghc-options:         -static
   build-depends:       base
                      , algebraic-graphs
                      , gauge ^>= 0.2.5
+                     , Glob
+                     , lens >= 4.17 && < 4.19
                      , semantic
                      , semantic-source
 
