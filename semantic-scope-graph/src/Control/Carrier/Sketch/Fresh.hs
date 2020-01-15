@@ -18,14 +18,15 @@ module Control.Carrier.Sketch.Fresh
   , module Control.Effect.Sketch
   ) where
 
-import           Control.Algebra
-import           Control.Carrier.Fresh.Strict
-import           Control.Carrier.State.Strict
-import           Control.Effect.Sketch
-import           Control.Monad.IO.Class
-import           Data.Bifunctor
+import Control.Algebra
+import Control.Carrier.Fresh.Strict
+import Control.Carrier.State.Strict
+import Control.Effect.Reader
+import Control.Effect.Sketch
+import Control.Monad.IO.Class
+import Data.Bifunctor
+--import qualified Data.Map.Strict as Map
 import           Data.Module
-import qualified Data.Map.Strict as Map
 import           Data.Name (Name)
 import qualified Data.Name
 import           Data.ScopeGraph (ScopeGraph)
@@ -51,12 +52,12 @@ instance Lower (Sketchbook Name) where
 newtype SketchC address m a = SketchC (StateC (Sketchbook address) (FreshC m) a)
   deriving (Applicative, Functor, Monad, MonadIO)
 
-instance forall address sig m . (address ~ Name, Effect sig, Algebra sig m) => Algebra (Sketch Name :+: sig) (SketchC Name m) where
+instance (Effect sig, Algebra sig m) => Algebra (SketchEff Name :+: Reader Name :+: Fresh :+: sig) (SketchC Name m) where
   alg (L (Declare n _props k)) = do
     Sketchbook old current <- SketchC (get @(Sketchbook Name))
     let (new, _pos) =
           ScopeGraph.declare
-          (ScopeGraph.Declaration (Data.Name.name n))
+          (ScopeGraph.Declaration n)
           (lowerBound @ModuleInfo)
           ScopeGraph.Default
           ScopeGraph.Public
@@ -80,15 +81,28 @@ instance forall address sig m . (address ~ Name, Effect sig, Algebra sig m) => A
           old
     SketchC (put @(Sketchbook Name) (Sketchbook new current))
     k ()
-  alg (L (NewScope edges k)) = do
-    Sketchbook old current <- SketchC (get @(Sketchbook Name))
-    let new = ScopeGraph.newScope address edges old
-    SketchC (put @(Sketchbook Name) (Sketchbook new current))
-    k ()
+  alg (L (NewScope _edges k)) = do
+    -- Sketchbook old current <- SketchC (get @(Sketchbook Name))
+    -- let new = ScopeGraph.newScope address edges old
+    -- SketchC (put @(Sketchbook Name) (Sketchbook new current))
+    k undefined
+  alg (R (L a)) = case a of
+    Ask k -> SketchC (gets sCurrentScope) >>= k
+    Local fn go k -> do
+      initial@(Sketchbook s oldScope) <- SketchC get
+      let newScope = fn oldScope
+      SketchC (put (Sketchbook s newScope))
+      result <- go
+      SketchC (put initial)
+      k result
 
-  name <- gensym
-  address <- alloc name
-  address <$ modify (ScopeGraph.newScope address edges)
+  alg (R (R (L a))) = send (handleCoercible a)
+  alg (R (R (R a))) = send (handleCoercible a)
+
+
+  -- name <- gensym
+  -- address <- alloc name
+  -- address <$ modify (ScopeGraph.newScope address edges)
 
 
   -- alg (L (DeclareFun n _props k)) = do
@@ -108,7 +122,7 @@ instance forall address sig m . (address ~ Name, Effect sig, Algebra sig m) => A
   --         old
   --   SketchC (put @(Sketchbook Name) (Sketchbook new current))
   --   k ()
-  alg (R other) = SketchC (alg (R (R (handleCoercible other))))
+  --alg (R other)     = SketchC (alg (R (R (handleCoercible other))))
 
 runSketch ::
   (Functor m)

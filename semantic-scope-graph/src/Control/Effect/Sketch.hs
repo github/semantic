@@ -1,14 +1,16 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE DuplicateRecordFields #-}
-{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeOperators #-}
 
 module Control.Effect.Sketch
-  ( Sketch (..)
+  ( Sketch
+  , SketchEff (..)
   , DeclProperties (..)
   , RefProperties (..)
   , FunProperties (..)
@@ -21,21 +23,21 @@ module Control.Effect.Sketch
   , Has
   ) where
 
-import GHC.Records
-import Control.Effect.Fresh
-import Control.Algebra
---import Data.ScopeGraph (ScopeGraph)
-import Data.Text (Text)
-import Data.Map.Strict (Map)
+import           Control.Algebra
+import           Control.Effect.Fresh
+import           Control.Effect.Reader
+import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
-import GHC.Generics
 import           Data.Name (Name)
 import qualified Data.Name as Name
 import qualified Data.ScopeGraph as ScopeGraph
+import           Data.Text (Text)
+import           GHC.Generics (Generic, Generic1)
+import           GHC.Records
 
 data DeclProperties address = DeclProperties {
-    kind :: ScopeGraph.Kind
-  , relation :: ScopeGraph.Relation
+    kind            :: ScopeGraph.Kind
+  , relation        :: ScopeGraph.Relation
   , associatedScope :: Maybe address
 }
 
@@ -44,26 +46,30 @@ data FunProperties = FunProperties {
   kind :: ScopeGraph.Kind
 }
 
-data Sketch address m k =
+type Sketch address
+  = SketchEff address
+  :+: Fresh
+  :+: Reader address
+
+data SketchEff address m k =
     Declare Name (DeclProperties address) (() -> m k)
   | Reference Text Text RefProperties (() -> m k)
-  | CurrentScope (address -> m k)
   | NewScope (Map ScopeGraph.EdgeLabel [address]) (address -> m k)
   deriving (Generic, Generic1, HFunctor, Effect)
 
+currentScope :: (Has (Sketch address) sig m) => m address
+currentScope = ask
+
 declare :: forall a sig m . (Has (Sketch a) sig m) => Name -> DeclProperties a -> m ()
-declare n props = send @(Sketch a) (Declare n props pure)
+declare n props = send (Declare n props pure)
 
 reference :: forall a sig m . (Has (Sketch a) sig m) => Text -> Text -> RefProperties -> m ()
-reference n decl props = send @(Sketch a) (Reference n decl props pure)
-
-currentScope :: forall address sig m . (Has (Sketch address) sig m) => m address
-currentScope = send @(Sketch address) (CurrentScope pure)
+reference n decl props = send @(SketchEff a) (Reference n decl props pure)
 
 newScope :: forall address sig m . (Has (Sketch address) sig m) => Map ScopeGraph.EdgeLabel [address] -> m address
-newScope edges = send @(Sketch address) (NewScope edges pure)
+newScope edges = send (NewScope edges pure)
 
-declareFunction :: forall address sig m . (Has (Sketch address) sig m, Has Fresh sig m) => Maybe Name -> FunProperties -> m (Name, address)
+declareFunction :: forall address sig m . (Has (Sketch address) sig m) => Maybe Name -> FunProperties -> m (Name, address)
 declareFunction name props = do
   currentScope' <- currentScope
   let lexicalEdges = Map.singleton ScopeGraph.Lexical [ currentScope' ]
@@ -71,7 +77,7 @@ declareFunction name props = do
   name' <- declareMaybeName name (DeclProperties { relation = ScopeGraph.Default, kind = (getField @"kind" @FunProperties props), associatedScope = Just associatedScope })
   pure (name', associatedScope)
 
-declareMaybeName :: forall address sig m . (Has (Sketch address) sig m, Has Fresh sig m)
+declareMaybeName :: forall address sig m . (Has (Sketch address) sig m)
                  => Maybe Name
                  -> DeclProperties address
                  -> m Name
