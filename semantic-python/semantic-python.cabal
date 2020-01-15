@@ -55,6 +55,7 @@ library
     Language.Python.Core
     Language.Python.Failure
     Language.Python.Tags
+    Language.Python.ScopeGraph
   hs-source-dirs: src
 
 test-suite compiling

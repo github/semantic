@@ -14,6 +14,7 @@ import qualified Data.ByteString as ByteString
 import           Data.Name (Name)
 import qualified Data.ScopeGraph as ScopeGraph
 import qualified Language.Python ()
+import qualified Language.Python as Py (Term)
 import           Source.Loc
 import qualified Source.Source as Source
 import           System.Exit (die)
@@ -23,7 +24,6 @@ import qualified System.Path.Directory as Path
 import qualified Test.Tasty as Tasty
 import qualified Test.Tasty.HUnit as HUnit
 import qualified TreeSitter.Python as TSP
-import qualified TreeSitter.Python.AST as Py
 import qualified TreeSitter.Unmarshal as TS
 
 {-
@@ -59,7 +59,7 @@ sampleGraphThing = do
 graphFile :: FilePath -> IO (ScopeGraph.ScopeGraph Name, Result)
 graphFile fp = do
   file <- ByteString.readFile fp
-  tree <- TS.parseByteString @Py.Module @Loc TSP.tree_sitter_python file
+  tree <- TS.parseByteString @Py.Term @Loc TSP.tree_sitter_python file
   pyModule <- either die pure tree
   pure $ runScopeGraph (Path.absRel fp) (Source.fromUTF8 file) pyModule
 
