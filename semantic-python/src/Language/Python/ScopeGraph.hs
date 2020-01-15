@@ -25,7 +25,7 @@ import           Data.Typeable
 import           GHC.Generics
 import           GHC.Records
 import           GHC.TypeLits
-import           Language.Python.Core (pattern SingleIdentifier)
+import           Language.Python.Patterns
 import           Source.Loc
 import qualified TreeSitter.Python.AST as Py
 
