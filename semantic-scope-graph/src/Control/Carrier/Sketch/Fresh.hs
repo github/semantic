@@ -7,7 +7,6 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
 
@@ -51,7 +50,7 @@ instance Lower (Sketchbook Name) where
 newtype SketchC address m a = SketchC (StateC (Sketchbook address) (FreshC m) a)
   deriving (Applicative, Functor, Monad, MonadIO)
 
-instance forall address sig m . (address ~ Name, Effect sig, Algebra sig m) => Algebra (Sketch Name :+: sig) (SketchC Name m) where
+instance (Effect sig, Algebra sig m) => Algebra (Sketch Name :+: sig) (SketchC Name m) where
   alg (L (Declare n _props k)) = do
     Sketchbook old current <- SketchC (get @(Sketchbook Name))
     let (new, _pos) =
