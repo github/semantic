@@ -49,6 +49,9 @@ newtype Bindings = Bindings { unBindings :: Stack Name }
 def :: Name -> Bindings -> Bindings
 def n = coerce (Stack.:> n)
 
+prelude :: Has Core sig t => [Name] -> t Name
+prelude = foldl' (\a b -> a ... b) (pure "__semantic_prelude")
+
 -- We leave the representation of Core syntax abstract so that it's not
 -- possible for us to 'cheat' by pattern-matching on or eliminating a
 -- compiled term.
@@ -199,8 +202,8 @@ instance Compile Py.ClassDefinition where
           bindings <- asks @Bindings (toList . unBindings)
           let buildName n = (n, pure n)
               contents = record . fmap buildName $ bindings
-              typefn = pure "__semantic_prelude" ... "type"
-              object = pure "__semantic_prelude" ... "object"
+              typefn = prelude ["type"]
+              object = prelude ["object"]
 
           pure (typefn $$ Core.string (coerce n) $$ object $$ contents)
 
@@ -346,11 +349,15 @@ instance Compile Py.Module where
 instance Compile Py.NamedExpression
 
 instance Compile Py.None where
-  -- None is not overridable, and thus always points to the prelude's None.
-  compile _it cc _ = cc (pure "__semantic_prelude" ... "None")
+  -- None is not an lvalue, and thus always points to the prelude's None.
+  compile _it cc _ = cc (prelude ["None"])
 
 instance Compile Py.NonlocalStatement
-instance Compile Py.NotOperator
+
+instance Compile Py.NotOperator where
+  compile _it@Py.NotOperator{ argument } cc next = do
+    val <- compile argument pure next
+    cc (prelude ["not"] $$ val)
 
 instance Compile Py.ParenthesizedExpression where
   compile it@Py.ParenthesizedExpression { extraChildren } cc
@@ -387,7 +394,7 @@ instance Compile Py.String where
 
     if any isNothing contents
       then pure . invariantViolated $ "Couldn't string-desugar " <> show it
-      else let new = pure "__semantic_prelude" ... "str" ... "__slots" ... "__new__"
+      else let new = prelude ["str", "__slots", "__new__"]
            in cc $ locate it (new $$ Core.string (mconcat (catMaybes contents)))
 
 instance Compile Py.Subscript

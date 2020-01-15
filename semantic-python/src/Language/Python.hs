@@ -4,7 +4,7 @@ module Language.Python
 , TreeSitter.Python.tree_sitter_python
 ) where
 
-import           Language.Python.ScopeGraph
+import           Data.Proxy
 import qualified Language.Python.Tags as PyTags
 import           ScopeGraph.Convert
 import qualified Tags.Tagging.Precise as Tags
@@ -14,8 +14,12 @@ import qualified TreeSitter.Unmarshal as TS
 
 newtype Term a = Term { getTerm :: Py.Module a }
 
+instance TS.SymbolMatching Term where
+  matchedSymbols _ = TS.matchedSymbols (Proxy :: Proxy Py.Module)
+  showFailure _ = TS.showFailure (Proxy :: Proxy Py.Module)
+
 instance TS.Unmarshal Term where
-  unmarshalNode node = Term <$> TS.unmarshalNode node
+  matchers = fmap (fmap (TS.hoist Term)) TS.matchers
 
 instance Tags.ToTags Term where
   tags src = Tags.runTagging src . PyTags.tags . getTerm
