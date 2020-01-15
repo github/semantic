@@ -133,20 +133,20 @@ instance (TaggableBy strategy t, strategy ~ TaggableInstance t) => Taggable t wh
   symbolName = symbolName' @strategy
 
 type family TaggableInstance (t :: * -> *) :: Strategy where
-  TaggableInstance (Sum _)              = 'Custom
-  TaggableInstance (TermF _ _)          = 'Custom
-  TaggableInstance Syntax.Context       = 'Custom
-  TaggableInstance Declaration.Function = 'Custom
-  TaggableInstance Declaration.Method   = 'Custom
-  TaggableInstance Declaration.Class    = 'Custom
-  TaggableInstance Ruby.Class           = 'Custom
-  TaggableInstance Ruby.Module          = 'Custom
-  TaggableInstance TypeScript.Module    = 'Custom
+  TaggableInstance (Sum _)                    = 'Custom
+  TaggableInstance (TermF _ _)                = 'Custom
+  TaggableInstance Syntax.Context             = 'Custom
+  TaggableInstance Declaration.Function       = 'Custom
+  TaggableInstance Declaration.Method         = 'Custom
+  TaggableInstance Declaration.Class          = 'Custom
+  TaggableInstance Ruby.Class                 = 'Custom
+  TaggableInstance Ruby.Module                = 'Custom
+  TaggableInstance TypeScript.Module          = 'Custom
   TaggableInstance TypeScript.AmbientFunction = 'Custom
-  TaggableInstance Expression.Call      = 'Custom
-  TaggableInstance Ruby.Send            = 'Custom
+  TaggableInstance Expression.Call            = 'Custom
+  TaggableInstance Ruby.Send                  = 'Custom
 
-  TaggableInstance _                    = 'Default
+  TaggableInstance _                          = 'Default
 
 instance TaggableBy 'Default t
 
