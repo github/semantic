@@ -20,12 +20,13 @@ import           Data.Foldable
 import           Data.Text as Text
 import           GHC.Generics
 import           Source.Loc
-import           Source.Range
+import           Source.Range as Range
 import           Source.Source as Source
 import           Tags.Tag
 import qualified Tags.Tagging.Precise as Tags
 import qualified TreeSitter.Ruby.AST as Rb
 import           TreeSitter.Token
+import qualified TreeSitter.Unmarshal as TS
 
 class ToTags t where
   tags
@@ -78,39 +79,55 @@ yieldTag name kind loc range = do
 
 instance ToTags Rb.Class where
   tags t@Rb.Class
-    { ann = loc@Loc { byteRange = range }
+    { ann = loc@Loc { byteRange = Range { start } }
     , name = expr
+    , extraChildren
     } = enterScope True $ case expr of
       Prj Rb.Constant { text }                                     -> yield text
       Prj Rb.ScopeResolution { name = Prj Rb.Constant { text } }   -> yield text
       Prj Rb.ScopeResolution { name = Prj Rb.Identifier { text } } -> yield text
       _                                                            -> gtags t
     where
-      yield name = yieldTag name Class loc range >> gtags t
+      range' = case extraChildren of
+        Prj Rb.Superclass { ann = Loc { byteRange = Range { end }}} : _ -> Range start end
+        _ -> Range start (getEnd expr)
+      getEnd = Range.end . byteRange . TS.gann
+      yield name = yieldTag name Class loc range' >> gtags t
 
 instance ToTags Rb.SingletonClass where
   tags t@Rb.SingletonClass
-    { ann = loc@Loc { byteRange = range }
+    { ann = loc@Loc { byteRange = range@Range { start } }
     , value = Rb.Arg expr
+    , extraChildren
     } = enterScope True $ case expr of
       Prj (Rb.Primary (Prj (Rb.Lhs (Prj (Rb.Variable (Prj Rb.Constant { text }))))))                 -> yield text
       Prj (Rb.Primary (Prj (Rb.Lhs (Prj Rb.ScopeResolution { name = Prj Rb.Constant { text } }))))   -> yield text
       Prj (Rb.Primary (Prj (Rb.Lhs (Prj Rb.ScopeResolution { name = Prj Rb.Identifier { text } })))) -> yield text
       _                                                                                              -> gtags t
     where
-      yield name = yieldTag name Class loc range >> gtags t
+      range' = case extraChildren of
+        x : _ -> Range start (getStart x)
+        _ -> range
+      getStart = Range.start . byteRange . TS.gann
+      yield name = yieldTag name Class loc range' >> gtags t
 
 instance ToTags Rb.Module where
   tags t@Rb.Module
-    { ann = loc@Loc { byteRange = range }
+    { ann = loc@Loc { byteRange = Range { start } }
     , name = expr
+    , extraChildren
     } = enterScope True $ case expr of
       Prj Rb.Constant { text = name }                                     -> yield name
       Prj Rb.ScopeResolution { name = Prj Rb.Constant { text = name } }   -> yield name
       Prj Rb.ScopeResolution { name = Prj Rb.Identifier { text = name } } -> yield name
       _                                                                   -> gtags t
     where
-      yield name = yieldTag name Module loc range >> gtags t
+      range' = case extraChildren of
+        x : _ -> Range start (getStart x)
+        _ -> Range start (getEnd expr)
+      getEnd = Range.end . byteRange . TS.gann
+      getStart = Range.start . byteRange . TS.gann
+      yield name = yieldTag name Module loc range' >> gtags t
 
 yieldMethodNameTag
   :: ( Has (State [Text]) sig m
@@ -142,18 +159,27 @@ enterScope createNew m = do
 
 instance ToTags Rb.Method where
   tags t@Rb.Method
-    { ann = loc@Loc { byteRange = range@Range { start } }
-    , name = expr
+    { ann = loc@Loc { byteRange = Range { start } }
+    , name
     , parameters
-    } = case parameters of
-      Just Rb.MethodParameters { ann = Loc { byteRange = Range { end } }} -> yieldMethodNameTag t loc (Range start end) expr
-      _ -> yieldMethodNameTag t loc range expr
+    } = yieldMethodNameTag t loc range' name
+    where
+      range' = case parameters of
+        Just Rb.MethodParameters { ann = Loc { byteRange = Range { end } }} -> Range start end
+        _ -> Range start (getEnd name)
+      getEnd = Range.end . byteRange . TS.gann
 
 instance ToTags Rb.SingletonMethod where
   tags t@Rb.SingletonMethod
-    { ann = loc@Loc { byteRange = range }
-    , name = expr
-    } = yieldMethodNameTag t loc range expr
+    { ann = loc@Loc { byteRange = Range { start } }
+    , name
+    , parameters
+    } = yieldMethodNameTag t loc range' name
+    where
+      range' = case parameters of
+        Just Rb.MethodParameters { ann = Loc { byteRange = Range { end } }} -> Range start end
+        _ -> Range start (getEnd name)
+      getEnd = Range.end . byteRange . TS.gann
 
 instance ToTags Rb.Block where
   tags = enterScope False . gtags

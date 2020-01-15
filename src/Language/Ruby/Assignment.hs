@@ -248,7 +248,7 @@ method = makeTerm <$> symbol Method <*> (withNewScope . children) (Declaration.M
         expressions' = makeTerm <$> location <*> many expression
 
 singletonMethod :: Assignment (Term Loc)
-singletonMethod = makeTerm <$> symbol SingletonMethod <*> (withNewScope . children) (Declaration.Method [] <$> expression <*> methodSelector <*> params <*> expressions <*> pure publicAccessControl)
+singletonMethod = makeTerm <$> symbol SingletonMethod <*> (withExtendedScope . children) (Declaration.Method [] <$> expression <*> methodSelector <*> params <*> expressions <*> pure publicAccessControl)
   where params = symbol MethodParameters *> children (many parameter) <|> pure []
 
 lambda :: Assignment (Term Loc)
