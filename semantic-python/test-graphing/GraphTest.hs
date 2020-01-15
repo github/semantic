@@ -9,12 +9,12 @@ module Main (main) where
 import           Control.Algebra
 import           Control.Carrier.Sketch.Fresh
 import           Control.Monad
-import           Convert.ToScopeGraph
 import qualified Data.ByteString as ByteString
 import           Data.Name (Name)
 import qualified Data.ScopeGraph as ScopeGraph
 import qualified Language.Python ()
 import qualified Language.Python as Py (Term)
+import           ScopeGraph.Convert
 import           Source.Loc
 import qualified Source.Source as Source
 import           System.Exit (die)

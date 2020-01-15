@@ -22,7 +22,6 @@ module Language.Python.ScopeGraph
 
 import           Control.Algebra (Algebra (..), handleCoercible)
 import           Control.Effect.Sketch
-import           Convert.ToScopeGraph (Result (..), complete, todo)
 import           Data.Foldable
 import qualified Data.List.NonEmpty as NonEmpty
 import           Data.Monoid
@@ -32,6 +31,7 @@ import           GHC.Generics
 import           GHC.Records
 import           GHC.TypeLits
 import           Language.Python.Patterns
+import           ScopeGraph.Convert (Result (..), complete, todo)
 import           Source.Loc
 import qualified TreeSitter.Python.AST as Py
 

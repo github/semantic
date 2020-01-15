@@ -4,9 +4,9 @@ module Language.Python
 , TreeSitter.Python.tree_sitter_python
 ) where
 
-import           Convert.ToScopeGraph
 import           Language.Python.ScopeGraph
 import qualified Language.Python.Tags as PyTags
+import           ScopeGraph.Convert
 import qualified Tags.Tagging.Precise as Tags
 import qualified TreeSitter.Python (tree_sitter_python)
 import qualified TreeSitter.Python.AST as Py

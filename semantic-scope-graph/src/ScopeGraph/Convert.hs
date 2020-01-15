@@ -6,7 +6,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
-module Convert.ToScopeGraph
+module ScopeGraph.Convert
   ( ToScopeGraph (..)
   , Result (..)
   , todo
