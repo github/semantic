@@ -8,6 +8,7 @@ module Main (main) where
 
 import           Control.Algebra
 import           Control.Carrier.Sketch.Fresh
+import           Control.Monad
 import           Convert.ToScopeGraph
 import qualified Data.ByteString as ByteString
 import           Data.Name (Name)
@@ -16,7 +17,9 @@ import qualified Language.Python ()
 import           Source.Loc
 import qualified Source.Source as Source
 import           System.Exit (die)
+import           System.Path ((</>))
 import qualified System.Path as Path
+import qualified System.Path.Directory as Path
 import qualified Test.Tasty as Tasty
 import qualified Test.Tasty.HUnit as HUnit
 import qualified TreeSitter.Python as TSP
@@ -63,7 +66,7 @@ graphFile fp = do
 
 assertSimpleAssignment :: HUnit.Assertion
 assertSimpleAssignment = do
-  let path = "../semantic-python/test/fixtures/1-04-toplevel-assignment.py"
+  let path = "semantic-python/test/fixtures/1-04-toplevel-assignment.py"
   (result, Complete) <- graphFile path
   let (expecto, Complete) = run $ runSketch Nothing sampleGraphThing
   HUnit.assertEqual "Should work for simple case" expecto result
@@ -76,19 +79,25 @@ expectedReference = do
 
 assertSimpleReference :: HUnit.Assertion
 assertSimpleReference = do
-  let path = "../semantic-python/test/fixtures/5-01-simple-reference.py"
+  let path = "semantic-python/test/fixtures/5-01-simple-reference.py"
   (result, Complete) <- graphFile path
   let (expecto, Complete) = run $ runSketch Nothing expectedReference
 
   HUnit.assertEqual "Should work for simple case" expecto result
 
 main :: IO ()
-main = Tasty.defaultMain $
-  Tasty.testGroup "Tests" [
-    Tasty.testGroup "declare" [
-      HUnit.testCase "toplevel assignment" assertSimpleAssignment
-    ],
-    Tasty.testGroup "reference" [
-      HUnit.testCase "simple reference" assertSimpleReference
+main = do
+  -- make sure we're in the root directory so the paths resolve properly
+  cwd <- Path.getCurrentDirectory
+  when (Path.takeDirName cwd == Just (Path.relDir "semantic-python"))
+    (Path.setCurrentDirectory (cwd </> Path.relDir ".."))
+
+  Tasty.defaultMain $
+    Tasty.testGroup "Tests" [
+      Tasty.testGroup "declare" [
+        HUnit.testCase "toplevel assignment" assertSimpleAssignment
+      ],
+      Tasty.testGroup "reference" [
+        HUnit.testCase "simple reference" assertSimpleReference
+      ]
     ]
-  ]
