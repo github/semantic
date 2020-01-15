@@ -1,4 +1,7 @@
-{-# LANGUAGE DataKinds, OverloadedStrings, TypeApplications, TypeOperators #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeOperators #-}
 {-# OPTIONS_GHC -fno-warn-missing-signatures #-}
 module Control.Abstract.Evaluator.Spec
 ( spec
@@ -6,9 +9,9 @@ module Control.Abstract.Evaluator.Spec
 
 import           Control.Abstract as Abstract
 import qualified Control.Abstract.Heap as Heap
-import           Control.Carrier.Lift
 import           Control.Carrier.Error.Either
 import           Control.Carrier.Fresh.Strict
+import           Control.Carrier.Lift
 import           Control.Carrier.Resumable.Either
 import           Control.Carrier.State.Strict
 import           Control.Carrier.Trace.Ignoring
@@ -20,7 +23,6 @@ import qualified Data.Abstract.Number as Number
 import           Data.Abstract.Package
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.Abstract.Value.Concrete as Value
-import qualified Data.Language as Language
 import qualified Data.Map.Strict as Map
 import           Data.Sum
 import           SpecHelpers hiding (reassociate)
@@ -55,7 +57,7 @@ evaluate
   . fmap snd
   . runFresh 0
   . runReader (PackageInfo (SpecHelpers.name "test") mempty)
-  . runReader (ModuleInfo "test/Control/Abstract/Evaluator/Spec.hs" Language.Haskell mempty)
+  . runReader (ModuleInfo "test/Control/Abstract/Evaluator/Spec.hs" "Haskell" mempty)
   . evalState (lowerBound @Span)
   . runReader (lowerBound @Span)
   . runEvaluator
