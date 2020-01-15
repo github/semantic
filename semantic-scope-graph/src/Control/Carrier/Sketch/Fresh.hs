@@ -25,6 +25,7 @@ import           Control.Effect.Sketch
 import           Control.Monad.IO.Class
 import           Data.Bifunctor
 import           Data.Module
+import qualified Data.Map.Strict as Map
 import           Data.Name (Name)
 import qualified Data.Name
 import           Data.ScopeGraph (ScopeGraph)
@@ -79,6 +80,34 @@ instance forall address sig m . (address ~ Name, Effect sig, Algebra sig m) => A
           old
     SketchC (put @(Sketchbook Name) (Sketchbook new current))
     k ()
+  alg (L (NewScope edges k)) = do
+    Sketchbook old current <- SketchC (get @(Sketchbook Name))
+    let new = ScopeGraph.newScope address edges old
+    SketchC (put @(Sketchbook Name) (Sketchbook new current))
+    k ()
+
+  name <- gensym
+  address <- alloc name
+  address <$ modify (ScopeGraph.newScope address edges)
+
+
+  -- alg (L (DeclareFun n _props k)) = do
+  --   Sketchbook old current <- SketchC (get @(Sketchbook Name))
+  --   let lexicalEdges = Map.singleton Lexical [ currentScope' ]
+  --   associatedScope <- ScopeGraph.newScope lexicalEdges
+  --   name' <- ScopeGraph.declareMaybeName name ScopeGraph.Default accessControl span kind (Just associatedScope)
+  --   pure (name', associatedScope)
+
+  --   let new =
+  --         ScopeGraph.declareFunction
+  --         (Just n)
+  --         ScopeGraph.Public
+  --         (lowerBound @Span)
+  --         ScopeGraph.Function
+  --         current
+  --         old
+  --   SketchC (put @(Sketchbook Name) (Sketchbook new current))
+  --   k ()
   alg (R other) = SketchC (alg (R (R (handleCoercible other))))
 
 runSketch ::

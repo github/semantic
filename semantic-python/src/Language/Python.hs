@@ -117,7 +117,11 @@ instance ToScopeGraph Py.Float where scopeGraph = const (pure mempty)
 
 instance ToScopeGraph Py.ForStatement where scopeGraph = todo
 
-instance ToScopeGraph Py.FunctionDefinition where scopeGraph = todo
+instance ToScopeGraph Py.FunctionDefinition where scopeGraph = do
+  let lexicalEdges = Map.singleton Lexical [ currentScope' ]
+  associatedScope <- ScopeGraph.newScope lexicalEdges
+  name' <- ScopeGraph.declareMaybeName name ScopeGraph.Default accessControl span kind (Just associatedScope)
+  pure (name', associatedScope)
 
 instance ToScopeGraph Py.FutureImportStatement where scopeGraph = todo
 

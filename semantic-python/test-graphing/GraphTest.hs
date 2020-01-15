@@ -85,6 +85,20 @@ assertSimpleReference = do
 
   HUnit.assertEqual "Should work for simple case" expecto result
 
+expectedLexicalScope :: (Has (Sketch Name) sig m) => m Result
+expectedLexicalScope = do
+  declare @Name "x" DeclProperties
+  reference @Name "x" "x" RefProperties
+  pure Complete
+
+assertLexicalScope :: HUnit.Assertion
+assertLexicalScope = do
+  let path = "semantic-python/test/fixtures/5-02-simple-function.py"
+  (result, Complete) <- graphFile path
+  let (expecto, Complete) = run $ runSketch Nothing expectedReference
+
+  HUnit.assertEqual "Should work for simple case" expecto result
+
 main :: IO ()
 main = do
   -- make sure we're in the root directory so the paths resolve properly
@@ -99,5 +113,8 @@ main = do
       ],
       Tasty.testGroup "reference" [
         HUnit.testCase "simple reference" assertSimpleReference
+      ],
+      Tasty.testGroup "lexical scopes" [
+        HUnit.testCase "simple scope" assertLexicalScope
       ]
     ]
