@@ -17,6 +17,9 @@ package semantic
 package semantic-analysis
   ghc-options: -Werror
 
+package semantic-ast
+  ghc-options: -Werror
+
 package semantic-core
   ghc-options: -Werror
 
@@ -36,9 +39,6 @@ package semantic-ruby
   ghc-options: -Werror
 
 package semantic-tags
-  ghc-options: -Werror
-
-package semantic-ast
   ghc-options: -Werror
 
 source-repository-package
