@@ -1,5 +1,4 @@
 {-# LANGUAGE TypeApplications #-}
-{-# OPTIONS_GHC -Wall -Werror -Wredundant-constraints -Wno-unused-top-binds #-}
 
 module Main (main) where
 
