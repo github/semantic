@@ -55,7 +55,7 @@ generateAST (SemanticAST format noColor source) =
           Left filePaths -> traverse Data.ByteString.readFile filePaths
           Right source   -> pure [Data.ByteString.Char8.pack source]
         go = ast >=> display
-        ast = parseByteString @AST.Module @(Range, Span) Python.tree_sitter_python
+        ast = parseByteString @AST.Module @(Range, Span) Python.tree_sitter_python -- TODO: generalize for all languages
         display = case format of
           Json -> Data.ByteString.Lazy.Char8.putStrLn . encodePretty . either toJSON (marshal . fmap (const ())) -- TODO: replacing range and span annotations with () for which there is a ToJSON instance for now, deal with this later
           Show -> print
