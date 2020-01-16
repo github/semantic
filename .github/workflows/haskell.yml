@@ -42,8 +42,8 @@ jobs:
     - name: Install dependencies
       run: |
         cabal v2-update
-        cabal v2-configure --disable-optimization --enable-benchmarks --enable-tests --write-ghc-environment-files=always -j2
-        cabal v2-build all --only-dependencies
+        cabal v2-configure --project-file=cabal.project.ci --disable-optimization --enable-benchmarks --enable-tests --write-ghc-environment-files=always -j2
+        cabal v2-build     --project-file=cabal.project.ci all --only-dependencies
 
     - name: hlint
       run: |
@@ -52,9 +52,9 @@ jobs:
 
     - name: Build & test
       run: |
-        cabal v2-build
-        cabal v2-run semantic:test
-        cabal v2-run semantic-core:test
-        cabal v2-run semantic-python:test
+        cabal v2-build --project-file=cabal.project.ci
+        cabal v2-run   --project-file=cabal.project.ci semantic:test
+        cabal v2-run   --project-file=cabal.project.ci semantic-core:test
+        cabal v2-run   --project-file=cabal.project.ci semantic-python:test
         cd semantic-source; cabal v2-run --project-file=cabal.project.ci semantic-source:test; cd ..
         cd semantic-source; cabal v2-run --project-file=cabal.project.ci semantic-source:doctest -- src; cd ..
