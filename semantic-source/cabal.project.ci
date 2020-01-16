@@ -1,4 +1,4 @@
--- ATTENTION: care must be taken to keep this file in sync with cabal.project. If you add a package there, add it here (and add a package stanza with ghc-options to enable errors in CI at the bottom).
+-- ATTENTION: care must be taken to keep this file in sync with cabal.project. If you add a package here, add it there (and add a package stanza with ghc-options to enable errors in CI at the bottom of this file).
 
 -- Local packages
 packages: .
