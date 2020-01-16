@@ -1,4 +1,7 @@
+-- Local packages
 packages: .
 
+
+-- Treat warnings as errors for CI builds
 package semantic-source
   ghc-options: -Werror
