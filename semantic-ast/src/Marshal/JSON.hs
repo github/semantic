@@ -87,3 +87,5 @@ class GFields f where
 -- since it's a function on types, we need a typeclass
 class GValue f where
   gvalue :: (ToJSON a) => f a -> Value
+
+-- TODO: use toEncoding -- direct serialization to ByteString
