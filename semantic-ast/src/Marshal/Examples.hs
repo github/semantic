@@ -13,7 +13,6 @@ import Prelude hiding (fail)
 import Source.Range
 import TreeSitter.Token
 import TreeSitter.Unmarshal
-import Marshal.JSON
 
 -- | An example of a sum-of-products datatype.
 data Expr a
@@ -85,7 +84,3 @@ instance UnmarshalAnn IntegerLit where
     case readDec str of
       (i, _):_ -> pure (IntegerLit i)
       _        -> fail ("could not parse '" <> str <> "'")
-
--- 
-fn :: (ToJSON a) => Expr a -> Value
-fn = marshal
