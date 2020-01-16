@@ -1,16 +1,15 @@
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE PatternSynonyms #-}
 {-# LANGUAGE DuplicateRecordFields #-}
-{-# LANGUAGE ViewPatterns #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedLists #-}
+{-# LANGUAGE PatternSynonyms #-}
 
 module Language.Python.Patterns
   ( pattern SingleIdentifier
   ) where
 
-import Data.Coerce
 import           AST.Element
-import Data.Text (Text)
+import           Data.Coerce
+import           Data.Text (Text)
 import qualified TreeSitter.Python.AST as Py
 
 -- | Useful pattern synonym for extracting a single identifier from
