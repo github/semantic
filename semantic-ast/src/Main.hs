@@ -1,5 +1,5 @@
 {-# LANGUAGE TypeApplications #-}
-{-# GHC-OPTIONS -Wall -Werror -Wredundant-constraints -Wno-unused-top-binds #-}
+{-# OPTIONS_GHC -Wall -Werror -Wredundant-constraints -Wno-unused-top-binds #-}
 
 module Main (main) where
 
