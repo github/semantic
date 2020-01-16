@@ -43,9 +43,10 @@ instance Algebra sig m => Algebra sig (Ap m) where
 class Typeable t => ToScopeGraph t where
   scopeGraph ::
     ( Has (Sketch Name) sig m
+    , Monoid (m Result)
     )
     => t Loc
-    -> Ap m Result
+    -> m Result
 
 instance (ToScopeGraph l, ToScopeGraph r) => ToScopeGraph (l :+: r) where
   scopeGraph (L1 l) = scopeGraph l
