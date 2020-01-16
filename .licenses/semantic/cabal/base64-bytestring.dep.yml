@@ -1,6 +1,6 @@
 ---
 name: base64-bytestring
-version: 1.0.0.2
+version: 1.0.0.3
 type: cabal
 summary: Fast base64 encoding and decoding for ByteStrings
 homepage: https://github.com/haskell/base64-bytestring
