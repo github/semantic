@@ -21,6 +21,12 @@ jobs:
         cabal-version: ${{ matrix.cabal }}
 
     - uses: actions/cache@v1
+      name: Cache ~/.cabal/packages
+      with:
+        path: ~/.cabal/packages
+        key: ${{ runner.os }}-${{ matrix.ghc }}-cabal-packages
+      
+    - uses: actions/cache@v1
       name: Cache ~/.cabal/store
       with:
         path: ~/.cabal/store
