@@ -48,7 +48,7 @@ library
     Source.Span
   build-depends:
       aeson          ^>= 1.4.2.0
-    , base            >= 4.13 && < 5
+    , base            >= 4.12 && < 5
     , bytestring     ^>= 0.10.8.2
     , deepseq        ^>= 1.4.4.0
     , generic-monoid ^>= 0.1.0.0
