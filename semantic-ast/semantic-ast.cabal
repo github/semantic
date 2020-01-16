@@ -38,6 +38,7 @@ common haskell
 library
   import:              haskell
   exposed-modules:     Marshal.JSON
+                     , Marshal.Examples
   -- other-modules:
   -- other-extensions:
   build-depends:       base ^>= 4.13
