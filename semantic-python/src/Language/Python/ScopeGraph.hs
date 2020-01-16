@@ -57,9 +57,10 @@ onField ::
   ( Has (Sketch Name) sig m
   , HasField field (r Loc) (syn Loc)
   , ToScopeGraph syn
+  , Monoid (m Result)
   )
   => r Loc
-  -> Ap m Result
+  -> m Result
 onField
   = scopeGraph @syn
   . getField @field
@@ -69,9 +70,10 @@ onChildren ::
   , ToScopeGraph syn
   , Has (Sketch Name) sig m
   , HasField "extraChildren" (r Loc) (t (syn Loc))
+  , Monoid (m Result)
   )
   => r Loc
-  -> Ap m Result
+  -> m Result
 onChildren
   = fmap fold
   . traverse scopeGraph
