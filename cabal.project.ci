@@ -12,6 +12,24 @@ packages: .
           semantic-typescript
           semantic-tags
 
+-- Packages brought in from other repos instead of hackage
+source-repository-package
+  type: git
+  location: https://github.com/tclem/proto-lens-jsonpb
+  tag: 5d40444be689bef1e12cbe38da0261283775ec64
+
+source-repository-package
+  type: git
+  location: https://github.com/antitypical/fused-syntax.git
+  tag: d11e14581217590a5c67f79cbaeee35ac8acee6a
+
+source-repository-package
+  type: git
+  location: https://github.com/fused-effects/fused-effects-readline.git
+  tag: 7a96949c77c73c6e5975c8d6171ffb63eb76b467
+
+
+-- Treat warnings as errors for CI builds
 package semantic
   ghc-options: -Werror
 
@@ -47,19 +65,3 @@ package semantic-tsx
 
 package semantic-typescript
   ghc-options: -Werror
-
--- Packages brought in from other repos instead of hackage
-source-repository-package
-  type: git
-  location: https://github.com/tclem/proto-lens-jsonpb
-  tag: 5d40444be689bef1e12cbe38da0261283775ec64
-
-source-repository-package
-  type: git
-  location: https://github.com/antitypical/fused-syntax.git
-  tag: d11e14581217590a5c67f79cbaeee35ac8acee6a
-
-source-repository-package
-  type: git
-  location: https://github.com/fused-effects/fused-effects-readline.git
-  tag: 7a96949c77c73c6e5975c8d6171ffb63eb76b467
