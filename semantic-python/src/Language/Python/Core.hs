@@ -50,7 +50,7 @@ def :: Name -> Bindings -> Bindings
 def n = coerce (Stack.:> n)
 
 prelude :: Has Core sig t => [Name] -> t Name
-prelude = foldl' (\a b -> a ... b) (pure "__semantic_prelude")
+prelude = foldl' (...) (pure "__semantic_prelude")
 
 -- We leave the representation of Core syntax abstract so that it's not
 -- possible for us to 'cheat' by pattern-matching on or eliminating a
@@ -209,7 +209,7 @@ instance Compile Py.ClassDefinition where
 
     body <- compile pybody buildTypeCall next
     let coreName = Name.named' n
-        assignClass = coreName :<- (rec coreName body)
+        assignClass = coreName :<- rec coreName body
         continuing = fmap (locate it . (assignClass >>>=))
     continuing (local (def n) (cc next))
 
