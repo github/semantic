@@ -79,6 +79,8 @@ goFileSkips = Path.relPath <$>
 
   -- Parse errors
   , "go/src/math/big/arith.go" -- Unhandled identifier character: 'ŝ'
+  , "go/src/cmd/go/testdata/src/badpkg/x.go"
+  , "go/src/cmd/go/testdata/src/notest/hello.go"
   , "go/src/cmd/vet/testdata/deadcode.go"
   , "go/src/cmd/vet/testdata/testingpkg/tests_test.go"
   , "moby/vendor/github.com/beorn7/perks/quantile/stream.go" -- Unhandled identifier character: 'ƒ'
@@ -86,11 +88,6 @@ goFileSkips = Path.relPath <$>
   -- A la carte struggles on these
   , "src/cmd/go/testdata/src/notest/hello.go" -- a la carte chokes on ParseError
   , "go/src/cmd/asm/internal/asm/parse.go" -- a la carte spans are off on line 1124
-
-  -- UTF8 encoding issues ("Cannot decode byte '\xe3': Data.Text.Internal.Encoding.decodeUtf8: Invalid UTF-8 stream")
-  , "go/src/text/template/exec_test.go"
-  , "go/src/bufio/bufio_test.go"
-  , "go/doc/progs/go1.go"
   ]
 
 goDirSkips :: [Path.RelDir]
@@ -105,14 +102,8 @@ goDirSkips = Path.relDir <$>
 rubySkips :: [Path.RelFile]
 rubySkips = Path.relFile <$>
   [
-  -- UTF8 encoding issues ("Cannot decode byte '\xe3': Data.Text.Internal.Encoding.decodeUtf8: Invalid UTF-8 stream")
-  -- These are going to be hard to fix as Ruby allows non-utf8 character content in string literals
-    "ruby_spec/optional/capi/string_spec.rb"
-  , "ruby_spec/core/string/b_spec.rb"
-  , "ruby_spec/core/string/shared/encode.rb"
-
   -- Doesn't parse b/c of issue with r<<i
-  , "ruby_spec/core/enumerable/shared/inject.rb"
+    "ruby_spec/core/enumerable/shared/inject.rb"
   -- Doesn't parse
   , "ruby_spec/language/string_spec.rb"
   , "ruby_spec/language/fixtures/freeze_magic_comment_required_diff_enc.rb"
@@ -133,9 +124,6 @@ rubySkips = Path.relFile <$>
 tsxSkips :: [Path.RelFile]
 tsxSkips = Path.relFile <$>
   [
-  -- Cannot decode byte '\xe2': Data.Text.Internal.Encoding.decodeUtf8: Invalid UTF-8 stream
-    "desktop/app/src/ui/clone-repository/clone-github-repository.tsx"
-  , "desktop/app/src/ui/toolbar/revert-progress.tsx"
   ]
 
 typescriptSkips :: [Path.RelFile]
@@ -156,13 +144,6 @@ typescriptSkips = Path.relFile <$>
 
   -- Parse errors
   , "npm/node_modules/slide/lib/async-map-ordered.js"
-
-  -- Cannot decode byte '\xd0': Data.Text.Internal.Encoding.decodeUtf8: Invalid UTF-8 stream
-  , "npm/node_modules/npm-profile/node_modules/make-fetch-happen/node_modules/socks-proxy-agent/node_modules/socks/node_modules/smart-buffer/test/smart-buffer.test.js"
-  , "npm/node_modules/pacote/node_modules/make-fetch-happen/node_modules/socks-proxy-agent/node_modules/socks/node_modules/smart-buffer/test/smart-buffer.test.js"
-  , "npm/node_modules/archy/test/multi_line.js"
-  , "npm/node_modules/archy/test/beep.js"
-  , "npm/node_modules/cli-table2/test/cell-test.js"
   ]
 
 buildExamples :: TaskSession -> LanguageExample -> Path.RelDir -> IO Tasty.TestTree
