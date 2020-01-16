@@ -82,8 +82,7 @@ gtags = Tags.traverse1_ @ToTags (const (pure ())) tags . Tags.Generics
 yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text -> Kind -> Loc -> Range -> m ()
 yieldTag name kind loc range = do
   src <- ask @Source
-  let sliced = slice src range
-  Tags.yield (Tag name kind loc (Tags.firstLine sliced) Nothing)
+  Tags.yield (Tag name kind loc (Tags.firstLine src range) Nothing)
 
 
 instance ToTags Go.ArgumentList

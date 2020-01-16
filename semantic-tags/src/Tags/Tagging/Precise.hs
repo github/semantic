@@ -38,6 +38,7 @@ import GHC.Generics
 import Prelude hiding (span)
 import Source.Loc (Loc (..))
 import Source.Source as Source
+import Source.Range (Range)
 import Source.Span
 import Tags.Tag
 
@@ -60,8 +61,9 @@ runTagging source
   . execWriter
   . runReader source
 
-firstLine :: Source -> Text
-firstLine = Text.stripEnd . Text.take 180 . Text.takeWhile (/= '\n') . Source.toText
+-- | Slices a range out of 'Source' and gives back the first line of source up to 180 characters.
+firstLine :: Source -> Range -> Text
+firstLine src = Text.stripEnd . Text.take 180 . Text.takeWhile (/= '\n') . Source.toText . slice src
 
 
 -- FIXME: move Traversable1 into semantic-ast.
