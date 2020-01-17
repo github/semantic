@@ -205,7 +205,7 @@ instance Compile Py.ClassDefinition where
               typefn = prelude ["type"]
               object = prelude ["object"]
 
-          pure (typefn $$ Core.string (coerce n) $$ object $$ contents)
+          pure (typefn $$ Core.string (formatName n) $$ object $$ contents)
 
     body <- compile pybody buildTypeCall next
     let coreName = Name.named' n

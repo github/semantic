@@ -22,6 +22,7 @@ reservedNames = [ "#true", "#false", "if", "then", "else"
 -- name conflicts with a Core primitive.
 needsQuotation :: Name -> Bool
 needsQuotation (Name u) = HashSet.member (unpack u) reservedNames || Text.any (not . isSimpleCharacter) u
+needsQuotation _        = False
 
 -- | A ‘simple’ character is, loosely defined, a character that is compatible
 -- with identifiers in most ASCII-oriented programming languages. This is defined
