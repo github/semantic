@@ -12,7 +12,7 @@
   - {name: init, within: []}
   - {name: last, within: []}
   - {name: fromJust, within: []}
-  - {name: decodeUtf8, within: []}
+  - {name: decodeUtf8, within: [], message: "Use decodeUtf8' or decodeUtf8With lenientDecode"}
 
 # Replace a $ b $ c with a . b $ c
 - group: {name: dollar, enabled: true}
