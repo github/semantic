@@ -29,7 +29,7 @@ import qualified Analysis.Carrier.Env.Precise as A
 import qualified Analysis.Carrier.Heap.Precise as A
 import qualified Analysis.Effect.Domain as A
 import           Analysis.File
-import           Analysis.Name
+import           Analysis.Functor.Named
 import           Control.Algebra
 import           Control.Carrier.Fail.WithLoc
 import           Control.Carrier.Fresh.Strict

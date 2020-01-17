@@ -26,8 +26,8 @@ import qualified Analysis.Carrier.Heap.Monovariant as A
 import qualified Analysis.Effect.Domain as A
 import           Analysis.File
 import           Analysis.FlowInsensitive
+import           Analysis.Functor.Named
 import qualified Analysis.Intro as Intro
-import           Analysis.Name
 import           Control.Algebra
 import           Control.Applicative (Alternative (..))
 import           Control.Carrier.Fail.WithLoc

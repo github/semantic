@@ -1,3 +1,6 @@
+{-# LANGUAGE DeriveFoldable #-}
+{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE DeriveTraversable #-}
 module Analysis.Functor.Named
 ( module Analysis.Name
 , Named (..)
@@ -7,7 +10,9 @@ module Analysis.Functor.Named
 , namedValue
 ) where
 
+
 import Analysis.Name
+import Data.Function (on)
 
 -- | Annotates an @a@ with a 'Name'-provided name, which is ignored for '==' and 'compare'.
 data Named a = Named Name a

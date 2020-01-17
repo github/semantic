@@ -50,6 +50,7 @@ library
     Analysis.Effect.Heap
     Analysis.File
     Analysis.FlowInsensitive
+    Analysis.Functor.Named
     Analysis.ImportGraph
     Analysis.Intro
     Analysis.Name

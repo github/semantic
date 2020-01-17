@@ -1,11 +1,13 @@
 {-# LANGUAGE DeriveGeneric, DeriveTraversable, GeneralizedNewtypeDeriving, LambdaCase, OverloadedLists #-}
 module Core.Name
 ( module Analysis.Name
+, module Analysis.Functor.Named
 , reservedNames
 , isSimpleCharacter
 , needsQuotation
 ) where
 
+import           Analysis.Functor.Named
 import           Analysis.Name
 import qualified Data.Char as Char
 import           Data.HashSet (HashSet)
