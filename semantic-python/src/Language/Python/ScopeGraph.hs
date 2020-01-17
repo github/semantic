@@ -8,6 +8,7 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE PatternSynonyms #-}
+{-# LANGUAGE QuantifiedConstraints #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE StandaloneDeriving #-}
@@ -25,7 +26,6 @@ import           Control.Effect.Sketch
 import           Data.Foldable
 import           Data.Monoid
 import           Data.Name
-import           Data.Typeable
 import           GHC.Generics
 import           GHC.Records
 import           GHC.TypeLits
@@ -39,8 +39,10 @@ instance Algebra sig m => Algebra sig (Ap m) where
   alg = Ap . alg . handleCoercible
 
 -- This typeclass is internal-only, though it shares the same interface
--- as the one defined in semantic-scope-graph.
-class Typeable t => ToScopeGraph t where
+-- as the one defined in semantic-scope-graph. The somewhat-unconventional
+-- quantified constraint is to avoid having to define Show1 instances for
+-- every single Python AST type.
+class (forall a . Show a => Show (t a)) => ToScopeGraph t where
   scopeGraph ::
     ( Has (Sketch Name) sig m
     , Monoid (m Result)
