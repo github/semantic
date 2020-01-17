@@ -27,6 +27,8 @@ common haskell
                      , semantic-core ^>= 0.0
                      , semantic-source ^>= 0.0
                      , semantic-tags ^>= 0.0
+                     , semantic-scope-graph ^>= 0.0
+                     , semilattices ^>= 0
                      , text ^>= 1.2.3
                      , tree-sitter ^>= 0.8
                      , tree-sitter-python ^>= 0.8.1
@@ -53,18 +55,17 @@ library
     Language.Python
     Language.Python.Core
     Language.Python.Failure
+    Language.Python.Patterns
+    Language.Python.ScopeGraph
     Language.Python.Tags
   hs-source-dirs: src
 
-test-suite test
+test-suite compiling
   import: haskell
   type: exitcode-stdio-1.0
   hs-source-dirs: test
   main-is: Test.hs
   ghc-options: -threaded
-
-  other-modules: Directive
-               , Instances
 
   build-depends: semantic-python == 0.0.0.0
                , aeson ^>= 1.4.4
@@ -85,3 +86,21 @@ test-suite test
                , tasty-hunit ^>= 0.10.0.2
                , trifecta >= 2 && <3
                , unordered-containers ^>= 0.2.10
+
+  other-modules: Directive
+               , Instances
+
+test-suite graphing
+  import: haskell
+  type: exitcode-stdio-1.0
+  hs-source-dirs: test-graphing
+  main-is: GraphTest.hs
+  ghc-options: -threaded
+
+  build-depends: base
+               , semantic-python
+               , semantic-scope-graph
+               , bytestring
+               , pathtype
+               , tasty
+               , tasty-hunit

@@ -43,6 +43,7 @@ function flags {
   echo "-isemantic-python/src"
   echo "-isemantic-python/test"
   echo "-isemantic-ruby/src"
+  echo "-isemantic-scope-graph/src"
   echo "-isemantic-tsx/src"
   echo "-isemantic-typescript/src"
   echo "-isemantic-tags/src"

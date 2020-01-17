@@ -1,6 +1,19 @@
-{-# LANGUAGE ConstraintKinds, DataKinds, DefaultSignatures, DisambiguateRecordFields, FlexibleContexts,
-             GeneralizedNewtypeDeriving, KindSignatures, LambdaCase, NamedFieldPuns, OverloadedLists,
-             OverloadedStrings, PatternSynonyms, StandaloneDeriving, TypeApplications, TypeOperators, ViewPatterns #-}
+{-# LANGUAGE ConstraintKinds #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DefaultSignatures #-}
+{-# LANGUAGE DisambiguateRecordFields #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE NamedFieldPuns #-}
+{-# LANGUAGE OverloadedLists #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE PatternSynonyms #-}
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE ViewPatterns #-}
 
 module Language.Python.Core
 ( toplevelCompile
@@ -21,6 +34,7 @@ import           Data.List.NonEmpty (NonEmpty (..))
 import           Data.Maybe
 import           GHC.Records
 import           Language.Python.Failure
+import           Language.Python.Patterns
 import           Source.Span (Span)
 import           Syntax.Stack (Stack (..))
 import qualified Syntax.Stack as Stack
@@ -35,19 +49,8 @@ newtype Bindings = Bindings { unBindings :: Stack Name }
 def :: Name -> Bindings -> Bindings
 def n = coerce (Stack.:> n)
 
--- | Useful pattern synonym for extracting a single identifier from
--- a Python ExpressionList. Easier than pattern-matching every time.
--- TODO: when this is finished, we won't need this pattern, as we'll
--- handle ExpressionLists the smart way every time.
-pattern SingleIdentifier :: Name -> Py.ExpressionList a
-pattern SingleIdentifier name <- Py.ExpressionList
-  { Py.extraChildren =
-    [ Py.Expression (Prj (Py.PrimaryExpression (Prj Py.Identifier { text = Name -> name })))
-    ]
-  }
-
 prelude :: Has Core sig t => [Name] -> t Name
-prelude = foldl' (\a b -> a ... b) (pure "__semantic_prelude")
+prelude = foldl' (...) (pure "__semantic_prelude")
 
 -- We leave the representation of Core syntax abstract so that it's not
 -- possible for us to 'cheat' by pattern-matching on or eliminating a
@@ -206,7 +209,7 @@ instance Compile Py.ClassDefinition where
 
     body <- compile pybody buildTypeCall next
     let coreName = Name.named' n
-        assignClass = coreName :<- (rec coreName body)
+        assignClass = coreName :<- rec coreName body
         continuing = fmap (locate it . (assignClass >>>=))
     continuing (local (def n) (cc next))
 
@@ -321,7 +324,7 @@ instance Compile Py.Lambda where
     } cc next = do
       let unparams (Py.LambdaParameters _ ps) = toList ps
           unparam (Py.Parameter (Prj (Py.Identifier _pann pname))) = Just . named' . Name $ pname
-          unparam _ = Nothing
+          unparam _                                                = Nothing
       body' <- compile body cc next
       let params = maybe [] unparams parameters
       pure . locate it . lams (catMaybes (fmap unparam params)) $ body'
@@ -404,7 +407,7 @@ instance Compile Py.TryStatement
 instance Compile Py.Tuple where
   compile it@Py.Tuple { Py.extraChildren = [] } cc _ = cc $ locate it unit
 
-  compile it _ _ = pure $ unimplemented it
+  compile it _ _                                     = pure $ unimplemented it
 
 instance Compile Py.UnaryOperator
 instance Compile Py.WhileStatement

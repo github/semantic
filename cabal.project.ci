@@ -10,6 +10,7 @@ packages: .
           semantic-json
           semantic-python
           semantic-ruby
+          semantic-scope-graph
           semantic-tsx
           semantic-typescript
           semantic-tags
@@ -58,6 +59,9 @@ package semantic-python
   ghc-options: -Werror
 
 package semantic-ruby
+  ghc-options: -Werror
+
+package semantic-scope-graph
   ghc-options: -Werror
 
 package semantic-tags
