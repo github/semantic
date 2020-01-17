@@ -3,10 +3,10 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
-{-# OPTIONS_GHC -Wno-incomplete-uni-patterns #-}
 module Main (main) where
 
 import           Control.Algebra
+import           Control.Carrier.Lift
 import           Control.Carrier.Sketch.Fresh
 import           Control.Monad
 import qualified Data.ByteString as ByteString
@@ -68,7 +68,7 @@ assertSimpleAssignment :: HUnit.Assertion
 assertSimpleAssignment = do
   let path = "semantic-python/test/fixtures/1-04-toplevel-assignment.py"
   (result, Complete) <- graphFile path
-  let (expecto, Complete) = run $ runSketch Nothing sampleGraphThing
+  (expecto, Complete) <- runM $ runSketch Nothing sampleGraphThing
   HUnit.assertEqual "Should work for simple case" expecto result
 
 expectedReference :: (Has (Sketch Name) sig m) => m Result
@@ -81,7 +81,7 @@ assertSimpleReference :: HUnit.Assertion
 assertSimpleReference = do
   let path = "semantic-python/test/fixtures/5-01-simple-reference.py"
   (result, Complete) <- graphFile path
-  let (expecto, Complete) = run $ runSketch Nothing expectedReference
+  (expecto, Complete) <- runM $ runSketch Nothing expectedReference
 
   HUnit.assertEqual "Should work for simple case" expecto result
 
