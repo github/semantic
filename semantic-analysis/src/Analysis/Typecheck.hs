@@ -251,12 +251,12 @@ instance ( Alternative m
       ret <- meta
       unify t (Alg (arg :-> ret))
       b <- concretize ret
-      k (Named (Name mempty) (lift b)) where
+      k (Named (name mempty) (lift b)) where
       concretize = \case
         Alg Unit       -> pure Intro.unit
         Alg Bool       -> pure (Intro.bool True) <|> pure (Intro.bool False)
         Alg String     -> pure (Intro.string mempty)
-        Alg (_ :-> b)  -> send . Intro.Lam . Named (Name mempty) . lift <$> concretize b
+        Alg (_ :-> b)  -> send . Intro.Lam . Named (name mempty) . lift <$> concretize b
         Alg (Record t) -> Intro.record <$> traverse (traverse concretize) (Map.toList t)
         t              -> fail $ "can’t concretize " <> show t -- FIXME: concretize type variables by incrementally solving constraints
     L (R (R (R (R (A.Record fields k))))) -> do

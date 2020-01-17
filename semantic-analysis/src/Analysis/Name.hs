@@ -1,12 +1,13 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
 module Analysis.Name
-( Name (Name)
+( Name
 -- * Constructors
 , gensym
 , name
 , nameI
 , formatName
+, isGenerated
 , __self
 ) where
 
@@ -34,6 +35,10 @@ gensym = I <$> fresh
 -- | Construct a 'Name' from a 'Text'.
 name :: Text -> Name
 name = Name
+
+isGenerated :: Name -> Bool
+isGenerated (I _) = True
+isGenerated _     = False
 
 -- | Construct a 'Name' from an 'Int'. This is suitable for automatic generation, e.g. using a Fresh effect, but should not be used for human-generated names.
 nameI :: Int -> Name

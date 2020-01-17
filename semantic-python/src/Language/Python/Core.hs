@@ -197,7 +197,7 @@ instance Compile Py.Call where
   compile it _ _ = pure . invariantViolated $ "can't compile Call node with generator expression: " <> show it
 
 instance Compile Py.ClassDefinition where
-  compile it@Py.ClassDefinition { body = pybody, name = Py.Identifier _ann (Name -> n) } cc next = do
+  compile it@Py.ClassDefinition { body = pybody, name = Py.Identifier _ann (Name.name -> n) } cc next = do
     let buildTypeCall _ = do
           bindings <- asks @Bindings (toList . unBindings)
           let buildName n = (n, pure n)
@@ -244,8 +244,8 @@ instance Compile Py.DottedName where
   compile it@Py.DottedName
     { extraChildren = Py.Identifier { text } :| rest
     } cc _next = do
-    let aggregate Py.Identifier { text = inner } x = x ... Name inner
-        composite = foldr aggregate (pure (Name text)) rest
+    let aggregate Py.Identifier { text = inner } x = x ... Name.name inner
+        composite = foldr aggregate (pure (Name.name text)) rest
     locate it composite & cc
 
 
@@ -287,21 +287,21 @@ instance Compile Py.FunctionDefinition where
           let parameters' = catMaybes parameterMs
           body' <- compile body pure next
           -- Build a lambda.
-          let located = locate it (rec (Name.named' (Name name)) (lams parameters' body'))
+          let located = locate it (rec (Name.named' (Name.name name)) (lams parameters' body'))
           -- Give it a name (below), then augment the current continuation
           -- with the new name (with 'def'), so that calling contexts know
           -- that we have built an exportable definition.
-          assigning located <$> local (def (Name name)) (cc next)
-    where param (Py.Parameter (Prj (Py.Identifier _pann pname))) = Just . named' . Name $ pname
+          assigning located <$> local (def (Name.name name)) (cc next)
+    where param (Py.Parameter (Prj (Py.Identifier _pann pname))) = Just . named' . Name.name $ pname
           param _                                                = Nothing
-          assigning item f = (Name.named' (Name name) :<- item) >>>= f
+          assigning item f = (Name.named' (Name.name name) :<- item) >>>= f
 
 instance Compile Py.FutureImportStatement
 instance Compile Py.GeneratorExpression
 instance Compile Py.GlobalStatement
 
 instance Compile Py.Identifier where
-  compile Py.Identifier { text } cc _ = cc . pure . Name $ text
+  compile Py.Identifier { text } cc _ = cc . pure . Name.name $ text
 
 instance Compile Py.IfStatement where
   compile it@Py.IfStatement{ condition, consequence, alternative} cc next =
@@ -323,7 +323,7 @@ instance Compile Py.Lambda where
     , parameters
     } cc next = do
       let unparams (Py.LambdaParameters _ ps) = toList ps
-          unparam (Py.Parameter (Prj (Py.Identifier _pann pname))) = Just . named' . Name $ pname
+          unparam (Py.Parameter (Prj (Py.Identifier _pann pname))) = Just . named' . Name.name $ pname
           unparam _                                                = Nothing
       body' <- compile body cc next
       let params = maybe [] unparams parameters
