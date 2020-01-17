@@ -2,13 +2,72 @@
 
 -- Local packages
 packages: .
+          semantic-analysis
+          semantic-ast
+          semantic-core
+          semantic-go
+          semantic-java
+          semantic-json
+          semantic-python
+          semantic-ruby
+          semantic-tsx
+          semantic-typescript
+          semantic-tags
+
+-- Packages brought in from other repos instead of hackage
+-- ATTENTION: remember to update cabal.project when bumping SHAs here!
+source-repository-package
+  type: git
+  location: https://github.com/tclem/proto-lens-jsonpb
+  tag: 5d40444be689bef1e12cbe38da0261283775ec64
+
+source-repository-package
+  type: git
+  location: https://github.com/antitypical/fused-syntax.git
+  tag: d11e14581217590a5c67f79cbaeee35ac8acee6a
+
+source-repository-package
+  type: git
+  location: https://github.com/fused-effects/fused-effects-readline.git
+  tag: 7a96949c77c73c6e5975c8d6171ffb63eb76b467
 
 
 -- Treat warnings as errors for CI builds
+package semantic
+  ghc-options: -Werror
+
+package semantic-analysis
+  ghc-options: -Werror
+
+package semantic-ast
+  ghc-options: -Werror
+
+package semantic-core
+  ghc-options: -Werror
+
+package semantic-go
+  ghc-options: -Werror
+
+package semantic-java
+  ghc-options: -Werror
+
+package semantic-json
+  ghc-options: -Werror
+
+package semantic-python
+  ghc-options: -Werror
+
+package semantic-ruby
+  ghc-options: -Werror
 
 package semantic-scope-graph
   ghc-options: -Werror
 
-package semantic-source
+package semantic-tags
   ghc-options: -Werror
 
+package semantic-tsx
+  ghc-options: -Werror
+
+package semantic-typescript
+  ghc-options: -Werror
