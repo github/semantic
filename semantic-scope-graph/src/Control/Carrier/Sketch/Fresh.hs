@@ -33,6 +33,10 @@ import           Data.Semilattice.Lower
 import           Source.Span
 import qualified System.Path as Path
 
+-- | The state type used to keep track of the in-progress graph and
+-- positional/contextual information. The name "sketchbook" is meant
+-- to invoke an in-progress, concealed work, as well as the
+-- "sketching" of a graph.
 data Sketchbook address = Sketchbook
   { sGraph        :: ScopeGraph address
   , sCurrentScope :: address
