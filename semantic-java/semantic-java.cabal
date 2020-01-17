@@ -25,7 +25,7 @@ library
   build-depends:
       base              >= 4.13 && < 5
     , fused-effects    ^>= 1.0
-    , semantic-source  ^>= 0.0
+    , semantic-source  ^>= 0.0.1
     , semantic-tags    ^>= 0.0
     , tree-sitter      ^>= 0.8
     , tree-sitter-java ^>= 0.6.1

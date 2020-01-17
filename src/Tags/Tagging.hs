@@ -60,12 +60,13 @@ contextualizing source toKind = Streaming.mapMaybeM $ \case
   Exit  x r -> Nothing <$ exitScope (x, r)
   Iden iden loc docsLiteralRange -> fmap go (get @[ContextToken]) where
     go = \case
-      ((x, r):("Context", cr):_) | Just kind <- toKind x -> Just $ Tag iden kind loc (firstLine r) (Just (slice cr))
-      ((x, r):_) | Just kind <- toKind x -> Just $ Tag iden kind loc (firstLine r) (slice <$> docsLiteralRange)
+      ((x, r):("Context", cr):_) | Just kind <- toKind x -> Just $ Tag iden kind loc (firstLine r) (Just (sliceDocs cr))
+      ((x, r):_) | Just kind <- toKind x -> Just $ Tag iden kind loc (firstLine r) (sliceDocs <$> docsLiteralRange)
       _ -> Nothing
   where
-    slice = T.stripEnd . Source.toText . Source.slice source
-    firstLine = T.stripEnd . T.takeWhile (/= '\n') . Source.toText . Source.take 180 . Source.slice source
+    slice = Source.toText . Source.slice source
+    sliceDocs = T.stripEnd . slice
+    firstLine = T.stripEnd . T.take 180 . T.takeWhile (/= '\n') . slice
 
 enterScope, exitScope :: Has (State [ContextToken]) sig m
                       => ContextToken
