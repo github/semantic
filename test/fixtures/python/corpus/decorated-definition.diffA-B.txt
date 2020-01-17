@@ -11,15 +11,16 @@
           (Decorator
           { (Identifier)
           ->(Identifier) }
-          {+(Identifier)+}
+          {+(Statements
+            {+(Identifier)+})+}
           {-(Integer)-}
             (Decorator
             { (Identifier)
             ->(Identifier) }
-            {+(Identifier)+}
-            {-(Statements
+              (Statements
+              {+(Identifier)+}
               {-(Integer)-}
-              {-(Integer)-})-}
+              {-(Integer)-})
               (Decorator
                 (Identifier)
               {+(Statements
@@ -27,17 +28,21 @@
                 {+(Assignment
                   {+(Identifier)+}
                   {+(Boolean)+})+}
-                {+(Identifier)+}
-                {+(Identifier)+})+}
+                {+(Statements
+                  {+(Identifier)+})+}
+                {+(Statements
+                  {+(Identifier)+})+})+}
               {-(Assignment
                 {-(Identifier)-}
                 {-(Boolean)-})-}
               { (Decorator
                 {-(Identifier)-}
-                {-(Identifier)-}
+                {-(Statements
+                  {-(Identifier)-})-}
                 {-(Decorator
                   {-(Identifier)-}
-                  {-(Identifier)-}
+                  {-(Statements
+                    {-(Identifier)-})-}
                   {-(Decorator
                     {-(Identifier)-}
                     {-(Statements
@@ -45,8 +50,10 @@
                       {-(Assignment
                         {-(Identifier)-}
                         {-(Boolean)-})-}
-                      {-(Identifier)-}
-                      {-(Identifier)-})-}
+                      {-(Statements
+                        {-(Identifier)-})-}
+                      {-(Statements
+                        {-(Identifier)-})-})-}
                     {-(Function
                       {-(Identifier)-}
                       {-(Statements

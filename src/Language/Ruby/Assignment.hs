@@ -128,9 +128,9 @@ identifier =
   <|> mk GlobalVariable
   <|> mk Operator
   <|> mk Setter
-  <|> mk SplatArgument
-  <|> mk HashSplatArgument
   <|> mk Uninterpreted
+  <|> symbol HashSplatArgument *> children expression
+  <|> symbol SplatArgument *> children expression
   <|> symbol BlockArgument *> children expression
   where
     mk s = makeTerm <$> symbol s <*> (Syntax.Identifier . name <$> source)
@@ -248,7 +248,7 @@ method = makeTerm <$> symbol Method <*> (withNewScope . children) (Declaration.M
         expressions' = makeTerm <$> location <*> many expression
 
 singletonMethod :: Assignment (Term Loc)
-singletonMethod = makeTerm <$> symbol SingletonMethod <*> (withNewScope . children) (Declaration.Method [] <$> expression <*> methodSelector <*> params <*> expressions <*> pure publicAccessControl)
+singletonMethod = makeTerm <$> symbol SingletonMethod <*> (withExtendedScope . children) (Declaration.Method [] <$> expression <*> methodSelector <*> params <*> expressions <*> pure publicAccessControl)
   where params = symbol MethodParameters *> children (many parameter) <|> pure []
 
 lambda :: Assignment (Term Loc)
@@ -398,7 +398,7 @@ assignment' = makeTerm  <$> symbol Assignment         <*> children (Ruby.Syntax.
     assign c l r = inject (Statement.AugmentedAssignment (makeTerm1 (c l r)))
 
     lhs  = makeTerm <$> symbol LeftAssignmentList  <*> children (many expr) <|> expr
-    rhs  = makeTerm <$> symbol RightAssignmentList <*> children (many expr) <|> expr
+    rhs  = makeTerm <$> symbol RightAssignmentList <*> children (many expression) <|> expression
     expr = makeTerm <$> symbol RestAssignment      <*> restAssign
        <|> makeTerm <$> symbol DestructuredLeftAssignment <*> children (many expr)
        <|> lhsIdent

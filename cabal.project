@@ -1,3 +1,6 @@
+-- ATTENTION: care must be taken to keep this file in sync with cabal.project.ci. If you add a package here, add it there (and add a package stanza with ghc-options to enable errors in CI at the bottom of that file).
+
+-- Local packages
 packages: .
           semantic-analysis
           semantic-ast
@@ -12,41 +15,8 @@ packages: .
           semantic-tags
           semantic-scope-graph
 
-jobs: $ncpus
-
-package semantic
-  ghc-options: -Werror
-
-package semantic-analysis
-  ghc-options: -Werror
-
-package semantic-core
-  ghc-options: -Werror
-
-package semantic-go
-  ghc-options: -Werror
-
-package semantic-java
-  ghc-options: -Werror
-
-package semantic-json
-  ghc-options: -Werror
-
-package semantic-python
-  ghc-options: -Werror
-
-package semantic-ruby
-  ghc-options: -Werror
-
-package semantic-tags
-  ghc-options: -Werror
-
-package semantic-scope-graph
-  ghc-options: -Werror
-
-package semantic-ast
-  ghc-options: -Werror
-
+-- Packages brought in from other repos instead of hackage
+-- ATTENTION: remember to update cabal.project.ci when bumping SHAs here!
 source-repository-package
   type: git
   location: https://github.com/tclem/proto-lens-jsonpb

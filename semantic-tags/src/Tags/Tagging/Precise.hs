@@ -33,7 +33,7 @@ import Data.Functor (void)
 import Data.Functor.Const
 import Data.Functor.Identity
 import Data.Monoid (Ap (..), Endo (..))
-import Data.Text as Text (Text, takeWhile)
+import Data.Text as Text (Text, takeWhile, stripEnd)
 import GHC.Generics
 import Prelude hiding (span)
 import Source.Loc (Loc (..))
@@ -61,7 +61,7 @@ runTagging source
   . runReader source
 
 firstLine :: Source -> Text
-firstLine = Text.takeWhile (/= '\n') . toText . Source.take 180
+firstLine = Text.stripEnd . Text.takeWhile (/= '\n') . toText . Source.take 180
 
 
 -- FIXME: move Traversable1 into semantic-ast.
