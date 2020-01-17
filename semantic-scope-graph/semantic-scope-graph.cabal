@@ -25,7 +25,6 @@ library
     ScopeGraph.Convert
     Data.Hole
     Data.Module
-    Data.Name
     Data.ScopeGraph
   build-depends:
       base                >= 4.13 && < 5

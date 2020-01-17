@@ -21,11 +21,11 @@ module Language.Python.ScopeGraph
   ( scopeGraphModule
   ) where
 
+import           Analysis.Name
 import           Control.Algebra (Algebra (..), handleCoercible)
 import           Control.Effect.Sketch
 import           Data.Foldable
 import           Data.Monoid
-import           Data.Name
 import           GHC.Generics
 import           GHC.Records
 import           GHC.TypeLits

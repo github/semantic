@@ -48,6 +48,7 @@ module Data.ScopeGraph
 
 import Prelude hiding (lookup)
 
+import           Analysis.Name
 import           Control.Applicative
 import           Control.Lens.Lens
 import           Control.Monad
@@ -61,7 +62,6 @@ import qualified Data.Map.Strict as Map
 import           Data.Maybe
 import           Data.Module
 import           Data.Monoid
-import           Data.Name
 import           Data.Semilattice.Lower
 import           Data.Sequence (Seq)
 import qualified Data.Sequence as Seq
