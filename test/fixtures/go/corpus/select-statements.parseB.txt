@@ -55,7 +55,8 @@
                     (Empty)))
                 (Empty))))
           (DefaultPattern
-            (Statements))))
+            (Return
+              (Empty)))))
       (Select
         (Statements
           (Pattern

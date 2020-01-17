@@ -14,8 +14,9 @@
     (RequiredParameter
     { (Identifier)
     ->(Identifier) })
-  { (Identifier)
-  ->(Identifier) }
+    (Statements
+    { (Identifier)
+    ->(Identifier) })
     (Statements
     { (Identifier)
     ->(Identifier) }))
@@ -43,7 +44,8 @@
       ->(Integer) })
     { (Identifier)
     ->(Identifier) })
-  { (Identifier)
-  ->(Identifier) }
+    (Statements
+    { (Identifier)
+    ->(Identifier) })
     (Statements
       (Identifier))))
