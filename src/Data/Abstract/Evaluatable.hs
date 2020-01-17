@@ -26,6 +26,7 @@ import           Data.Scientific (Scientific)
 import           Data.Semigroup.Foldable
 import           Source.Span (HasSpan(..))
 
+import Analysis.Name as X
 import Control.Abstract hiding (Load, String)
 import qualified Control.Abstract as Abstract
 import Control.Abstract.Context as X
@@ -36,7 +37,6 @@ import Data.Abstract.BaseError as X
 import Data.Abstract.Declarations as X
 import Data.Abstract.FreeVariables as X
 import Data.Abstract.Module
-import Data.Abstract.Name as X
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import Data.Abstract.AccessControls.Class as X
 import Data.Language

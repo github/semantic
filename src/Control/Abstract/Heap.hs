@@ -44,6 +44,7 @@ module Control.Abstract.Heap
 , scopeLookup
 ) where
 
+import           Analysis.Name
 import           Control.Abstract.Context (withCurrentCallStack)
 import           Control.Abstract.Evaluator
 import           Control.Abstract.Roots
@@ -58,7 +59,6 @@ import           Data.Abstract.Heap (Heap, Position (..))
 import qualified Data.Abstract.Heap as Heap
 import           Data.Abstract.Live
 import           Data.Abstract.Module (ModuleInfo)
-import           Data.Abstract.Name
 import           Data.Abstract.ScopeGraph (Kind (..), Path (..), putDeclarationScopeAtPosition)
 import qualified Data.Map.Strict as Map
 import           Prologue

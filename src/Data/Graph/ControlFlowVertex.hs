@@ -14,9 +14,9 @@ module Data.Graph.ControlFlowVertex
 , VertexDeclaration1 (..)
 ) where
 
+import           Analysis.Name
 import           Data.Abstract.Declarations
 import           Data.Abstract.Module (ModuleInfo (..))
-import           Data.Abstract.Name
 import           Data.Abstract.Package (PackageInfo (..))
 import           Data.Aeson
 import           Data.Graph (VertexTag (..))

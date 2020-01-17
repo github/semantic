@@ -23,6 +23,7 @@ module SpecHelpers
 , evaluateProject
 ) where
 
+import Analysis.Name as X
 import Control.Abstract
 import Control.Carrier.Fresh.Strict
 import Control.Carrier.Parse.Simple
@@ -39,7 +40,6 @@ import Data.Abstract.FreeVariables as X
 import qualified Data.Abstract.Heap as Heap
 import Data.Abstract.Module as X
 import Data.Abstract.ModuleTable as X hiding (lookup)
-import Data.Abstract.Name as X
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import Data.Abstract.Value.Concrete (Value(..), ValueError, runValueError)
 import Data.Blob as X
