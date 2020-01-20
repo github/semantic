@@ -1,4 +1,12 @@
-{-# LANGUAGE DerivingStrategies, GeneralizedNewtypeDeriving, StandaloneDeriving, FlexibleInstances, NamedFieldPuns, OverloadedStrings, QuantifiedConstraints, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE NamedFieldPuns #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuantifiedConstraints #-}
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module Instances () where
@@ -8,13 +16,9 @@ module Instances () where
 -- we should keep track of them in a dedicated file.
 
 import           Analysis.File
-import           Core.Name (Name (..))
 import           Data.Aeson
 import           Data.Text (pack)
 import qualified System.Path as Path
-
-deriving newtype instance ToJSON Name
-deriving newtype instance ToJSONKey Name
 
 instance ToJSON a => ToJSON (File a) where
   toJSON File{filePath, fileSpan, fileBody} = object
