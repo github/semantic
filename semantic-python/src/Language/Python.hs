@@ -15,6 +15,7 @@ module Language.Python
 , TreeSitter.Python.tree_sitter_python
 ) where
 
+import qualified Data.Map.Strict as Map
 import           Control.Effect.Sketch
 import           Convert.ToScopeGraph
 import           Data.Foldable
@@ -26,6 +27,8 @@ import qualified Tags.Tagging.Precise as Tags
 import qualified TreeSitter.Python (tree_sitter_python)
 import qualified TreeSitter.Python.AST as Py
 import qualified TreeSitter.Unmarshal as TS
+import qualified Data.ScopeGraph as ScopeGraph
+import qualified Control.Effect.Sketch as Sketch
 
 todo :: (Show a, Applicative m) => a -> m Result
 todo = pure . Todo . pure . show
@@ -47,7 +50,9 @@ instance ToScopeGraph Term where
 instance ToScopeGraph Py.AssertStatement where scopeGraph = onChildren
 
 instance ToScopeGraph Py.Assignment where
-  scopeGraph (Py.Assignment _ (SingleIdentifier t) _val _typ) = complete <* declare @Name t DeclProperties
+  scopeGraph (Py.Assignment _ (SingleIdentifier t) _val _typ) = do
+    let declProps = (DeclProperties ScopeGraph.Identifier ScopeGraph.Default Nothing)
+    complete <* declare @Name t declProps
   scopeGraph x                                                = todo x
 
 instance ToScopeGraph Py.Await where
@@ -117,11 +122,12 @@ instance ToScopeGraph Py.Float where scopeGraph = const (pure mempty)
 
 instance ToScopeGraph Py.ForStatement where scopeGraph = todo
 
-instance ToScopeGraph Py.FunctionDefinition where scopeGraph = do
-  let lexicalEdges = Map.singleton Lexical [ currentScope' ]
-  associatedScope <- ScopeGraph.newScope lexicalEdges
-  name' <- ScopeGraph.declareMaybeName name ScopeGraph.Default accessControl span kind (Just associatedScope)
-  pure (name', associatedScope)
+instance ToScopeGraph Py.FunctionDefinition where
+  scopeGraph = do
+    let lexicalEdges = Map.singleton Lexical [ currentScope' ]
+    associatedScope <- ScopeGraph.newScope lexicalEdges
+    name' <- Sketch.declareMaybeName name ScopeGraph.Default accessControl span kind (Just associatedScope)
+    pure (name', associatedScope)
 
 instance ToScopeGraph Py.FutureImportStatement where scopeGraph = todo
 
