@@ -29,8 +29,6 @@ class MarshalJSON t where
   default fields :: ( Generic1 t, GFields (Rep1 t), ToJSON a) => [(Text, Value)] -> t a -> [(Text, Value)]
   fields acc = gfields acc . from1
 
--- Create MarshalJSON instances for each type constructor
-instance (GMarshalJSON (Rep1 t), Generic1 t) => MarshalJSON t
 
 -- Create MarshalJSON instances for each type constructor
 instance (GFields (Rep1 t), Generic1 t) => MarshalJSON t
