@@ -74,7 +74,8 @@ instance ToJSON a => GValue (K1 i a) where
 instance GValue Par1 where
   gvalue = toJSON . unPar1
 
-instance (GMarshalJSON (Rep1 t), Generic1 t) => GValue (Rec1 t) where
+-- breadcrumb, no longer relevant: This looks wrong! But GHC can infer that we only have a single instance class constraint above
+instance (MarshalJSON t) => GValue (Rec1 t) where
   gvalue (Rec1 f) = marshal f
 
 instance (GValue t) => GValue (Maybe :.: t) where
