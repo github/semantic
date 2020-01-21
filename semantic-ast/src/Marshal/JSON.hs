@@ -35,8 +35,9 @@ class GMarshalJSON f where
   gmarshal :: (ToJSON a) => f a -> Value
 
 -- Stores meta-data for datatypes
-instance GMarshalJSON f => GMarshalJSON (M1 D c f) where
-  gmarshal = gmarshal . unM1 -- using unM1 instead of pattern-matching on M1 in order to express with function composition
+instance (GFields f, Datatype c) => GFields (M1 D c f) where
+   gfields acc x = gfields ((Text.pack "type", String (Text.pack (datatypeName x))): acc) $ unM1 x
+  -- gmarshal = gmarshal . unM1 -- using unM1 instead of pattern-matching on M1 in order to express with function composition
 
 -- Fold over S1 product types and pass the result to Aeson objects
 instance GFields fields => GFields (C1 c fields) where
