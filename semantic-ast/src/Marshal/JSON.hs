@@ -24,6 +24,7 @@ import qualified Data.Text as Text
 -- Serialize unmarshaled ASTs into JSON representation by auto-deriving Aeson instances generically
 class MarshalJSON t where
   marshal :: (ToJSON a) => t a -> Value -- don't need default signature because they're the same now
+  marshal = object . fields []
 
 -- Create MarshalJSON instances for each type constructor
 instance (GMarshalJSON (Rep1 t), Generic1 t) => MarshalJSON t
