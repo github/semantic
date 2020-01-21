@@ -1,18 +1,27 @@
-{-# LANGUAGE FlexibleInstances, GeneralizedNewtypeDeriving, MultiParamTypeClasses, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Diffing.Interpreter
 ( diffTerms
 , DiffTerms(..)
 , stripDiff
 ) where
 
-import Control.Algebra
-import Control.Carrier.Cull.Church
+
+import           Control.Algebra
+import           Control.Carrier.Cull.Church
+import           Control.Monad.IO.Class
+import           Data.Bifunctor
 import qualified Data.Diff as Diff
-import Data.Edit (Edit, edit)
-import Data.Term
-import Diffing.Algorithm
-import Diffing.Algorithm.RWS
-import Prologue
+import           Data.Edit (Edit, edit)
+import           Data.Functor.Classes
+import           Data.Hashable.Lifted
+import           Data.Maybe
+import           Data.Term
+import           Diffing.Algorithm
+import           Diffing.Algorithm.RWS
 
 -- | Diff two à la carte terms recursively.
 diffTerms :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax)
