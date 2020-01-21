@@ -173,7 +173,7 @@ data Scope address = Scope
   { edges        :: Map EdgeLabel [address]
   , references   :: Map Reference ([ReferenceInfo], Path address)
   , declarations :: Seq (Info address)
-  , domain :: Domain
+  , domain       :: Domain
   } deriving (Eq, Show, Ord)
 
 instance Lower (Scope scopeAddress) where
