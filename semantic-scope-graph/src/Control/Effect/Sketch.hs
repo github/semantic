@@ -18,7 +18,7 @@ module Control.Effect.Sketch
   , currentScope
   , newScope
   , declareFunction
-  -- , declareFunction
+  , declareMaybeName
   , reference
   , Has
   ) where
