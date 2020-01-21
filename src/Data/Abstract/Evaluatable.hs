@@ -15,6 +15,7 @@ module Data.Abstract.Evaluatable
 , runUnspecialized
 , runUnspecializedWith
 , throwUnspecializedError
+, __self
 ) where
 
 import Prologue
@@ -116,6 +117,8 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
 traceResolve :: (Show a, Show b, Has Trace sig m) => a -> b -> Evaluator term address value m ()
 traceResolve name path = trace ("resolved " <> show name <> " -> " <> show path)
 
+__self :: Name
+__self = name "__semantic_self"
 
 -- Preludes
 
@@ -189,7 +192,7 @@ defineSelf :: ( Has (State (ScopeGraph address)) sig m
               )
            => Evaluator term address value m ()
 defineSelf = do
-  let self = Declaration X.__self
+  let self = Declaration __self
   declare self ScopeGraph.Prelude Public lowerBound ScopeGraph.Unknown Nothing
   slot <- lookupSlot self
   assign slot =<< object =<< currentFrame

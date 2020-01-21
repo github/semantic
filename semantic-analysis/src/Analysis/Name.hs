@@ -8,7 +8,6 @@ module Analysis.Name
 , nameI
 , formatName
 , isGenerated
-, __self
 ) where
 
 import           Control.Effect.Fresh
@@ -67,6 +66,3 @@ instance Hashable Name where
 instance ToJSON Name where
   toJSON = toJSON . formatName
   toEncoding = toEncoding . formatName
-
-__self :: Name
-__self = name "__semantic_self"

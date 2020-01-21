@@ -24,7 +24,7 @@ import qualified Control.Abstract as Abstract
 import           Control.Algebra
 import           Control.Effect.Interpose
 import           Data.Abstract.BaseError
-import           Data.Abstract.Evaluatable (Declarations, EvalError (..), UnspecializedError (..))
+import           Data.Abstract.Evaluatable (Declarations, EvalError (..), UnspecializedError (..), __self)
 import           Data.Abstract.FreeVariables
 import qualified Data.Abstract.Number as Number
 
