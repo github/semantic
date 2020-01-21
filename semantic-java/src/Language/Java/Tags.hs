@@ -1,11 +1,15 @@
-{-# LANGUAGE AllowAmbiguousTypes, DataKinds, DisambiguateRecordFields, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, NamedFieldPuns, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DefaultSignatures #-}
+{-# LANGUAGE DisambiguateRecordFields #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE NamedFieldPuns #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeOperators #-}
 module Language.Java.Tags
 ( ToTags(..)
 ) where
 
 import           Control.Effect.Reader
 import           Control.Effect.Writer
-import           Data.Monoid (Ap(..))
 import           GHC.Generics
 import           Source.Loc
 import           Source.Range
@@ -13,6 +17,7 @@ import           Source.Source as Source
 import           Tags.Tag
 import qualified Tags.Tagging.Precise as Tags
 import qualified TreeSitter.Java.AST as Java
+import           TreeSitter.Token
 
 class ToTags t where
   tags
@@ -21,68 +26,54 @@ class ToTags t where
        )
     => t Loc
     -> m ()
-
-instance (ToTagsBy strategy t, strategy ~ ToTagsInstance t) => ToTags t where
-  tags = tags' @strategy
-
-
-class ToTagsBy (strategy :: Strategy) t where
-  tags'
+  default tags
     :: ( Has (Reader Source) sig m
        , Has (Writer Tags.Tags) sig m
+       , Generic1 t
+       , Tags.GTraversable1 ToTags (Rep1 t)
        )
     => t Loc
     -> m ()
+  tags = gtags
 
+instance (ToTags l, ToTags r) => ToTags (l :+: r) where
+  tags (L1 l) = tags l
+  tags (R1 r) = tags r
 
-data Strategy = Generic | Custom
+instance ToTags (Token sym n) where tags _ = pure ()
 
-type family ToTagsInstance t :: Strategy where
-  ToTagsInstance (_ :+: _)              = 'Custom
-  ToTagsInstance Java.MethodDeclaration = 'Custom
-  ToTagsInstance Java.MethodInvocation  = 'Custom
-  ToTagsInstance Java.ClassDeclaration  = 'Custom
-  ToTagsInstance _                      = 'Generic
-
-
-instance (ToTags l, ToTags r) => ToTagsBy 'Custom (l :+: r) where
-  tags' (L1 l) = tags l
-  tags' (R1 r) = tags r
-
-instance ToTagsBy 'Custom Java.MethodDeclaration where
-  tags' t@Java.MethodDeclaration
+instance ToTags Java.MethodDeclaration where
+  tags t@Java.MethodDeclaration
     { ann = loc@Loc { byteRange = range }
     , name = Java.Identifier { text = name }
     , body
     } = do
       src <- ask @Source
-      let sliced = slice src range
+      let line = Tags.firstLine src range
             { end = case body of
               Just Java.Block { ann = Loc Range { end } _ } -> end
               Nothing                                       -> end range
             }
-      Tags.yield (Tag name Method loc (Tags.firstLine sliced) Nothing)
+      Tags.yield (Tag name Method loc line Nothing)
       gtags t
 
-instance ToTagsBy 'Custom Java.ClassDeclaration where
-  tags' t@Java.ClassDeclaration
+instance ToTags Java.ClassDeclaration where
+  tags t@Java.ClassDeclaration
     { ann = loc@Loc { byteRange = Range { start } }
     , name = Java.Identifier { text = name }
     , body = Java.ClassBody { ann = Loc Range { start = end } _ }
     } = do
       src <- ask @Source
-      let sliced = slice src (Range start end)
-      Tags.yield (Tag name Class loc (Tags.firstLine sliced) Nothing)
+      Tags.yield (Tag name Class loc (Tags.firstLine src (Range start end)) Nothing)
       gtags t
 
-instance ToTagsBy 'Custom Java.MethodInvocation where
-  tags' t@Java.MethodInvocation
+instance ToTags Java.MethodInvocation where
+  tags t@Java.MethodInvocation
     { ann = loc@Loc { byteRange = range }
     , name = Java.Identifier { text = name }
     } = do
       src <- ask @Source
-      let sliced = slice src range
-      Tags.yield (Tag name Call loc (Tags.firstLine sliced) Nothing)
+      Tags.yield (Tag name Call loc (Tags.firstLine src range) Nothing)
       gtags t
 
 
@@ -90,11 +81,137 @@ gtags
   :: ( Has (Reader Source) sig m
      , Has (Writer Tags.Tags) sig m
      , Generic1 t
-     , Tags.GFoldable1 ToTags (Rep1 t)
+     , Tags.GTraversable1 ToTags (Rep1 t)
      )
   => t Loc
   -> m ()
-gtags = getAp . Tags.gfoldMap1 @ToTags (Ap . tags) . from1
+gtags = Tags.traverse1_ @ToTags (const (pure ())) tags . Tags.Generics
 
-instance (Generic1 t, Tags.GFoldable1 ToTags (Rep1 t)) => ToTagsBy 'Generic t where
-  tags' = gtags
+instance ToTags Java.AnnotatedType
+instance ToTags Java.Annotation
+instance ToTags Java.AnnotationArgumentList
+instance ToTags Java.AnnotationTypeBody
+instance ToTags Java.AnnotationTypeDeclaration
+instance ToTags Java.AnnotationTypeElementDeclaration
+instance ToTags Java.ArgumentList
+instance ToTags Java.ArrayAccess
+instance ToTags Java.ArrayCreationExpression
+instance ToTags Java.ArrayInitializer
+instance ToTags Java.ArrayType
+instance ToTags Java.AssertStatement
+instance ToTags Java.AssignmentExpression
+instance ToTags Java.Asterisk
+instance ToTags Java.BinaryExpression
+instance ToTags Java.BinaryIntegerLiteral
+instance ToTags Java.Block
+instance ToTags Java.BooleanType
+instance ToTags Java.BreakStatement
+instance ToTags Java.CastExpression
+instance ToTags Java.CatchClause
+instance ToTags Java.CatchFormalParameter
+instance ToTags Java.CatchType
+instance ToTags Java.CharacterLiteral
+instance ToTags Java.ClassBody
+-- instance ToTags Java.ClassDeclaration
+instance ToTags Java.ClassLiteral
+instance ToTags Java.ConstantDeclaration
+instance ToTags Java.ConstructorBody
+instance ToTags Java.ConstructorDeclaration
+instance ToTags Java.ContinueStatement
+instance ToTags Java.DecimalFloatingPointLiteral
+instance ToTags Java.DecimalIntegerLiteral
+instance ToTags Java.Declaration
+instance ToTags Java.Dimensions
+instance ToTags Java.DimensionsExpr
+instance ToTags Java.DoStatement
+instance ToTags Java.ElementValueArrayInitializer
+instance ToTags Java.ElementValuePair
+instance ToTags Java.EnhancedForStatement
+instance ToTags Java.EnumBody
+instance ToTags Java.EnumBodyDeclarations
+instance ToTags Java.EnumConstant
+instance ToTags Java.EnumDeclaration
+instance ToTags Java.ExplicitConstructorInvocation
+instance ToTags Java.Expression
+instance ToTags Java.ExpressionStatement
+instance ToTags Java.ExtendsInterfaces
+instance ToTags Java.False
+instance ToTags Java.FieldAccess
+instance ToTags Java.FieldDeclaration
+instance ToTags Java.FinallyClause
+instance ToTags Java.FloatingPointType
+instance ToTags Java.ForInit
+instance ToTags Java.ForStatement
+instance ToTags Java.FormalParameter
+instance ToTags Java.FormalParameters
+instance ToTags Java.GenericType
+instance ToTags Java.HexFloatingPointLiteral
+instance ToTags Java.HexIntegerLiteral
+instance ToTags Java.Identifier
+instance ToTags Java.IfStatement
+instance ToTags Java.ImportDeclaration
+instance ToTags Java.InferredParameters
+instance ToTags Java.InstanceofExpression
+instance ToTags Java.IntegralType
+instance ToTags Java.InterfaceBody
+instance ToTags Java.InterfaceDeclaration
+instance ToTags Java.InterfaceTypeList
+instance ToTags Java.LabeledStatement
+instance ToTags Java.LambdaExpression
+instance ToTags Java.Literal
+instance ToTags Java.LocalVariableDeclaration
+instance ToTags Java.LocalVariableDeclarationStatement
+instance ToTags Java.MarkerAnnotation
+-- instance ToTags Java.MethodDeclaration
+-- instance ToTags Java.MethodInvocation
+instance ToTags Java.MethodReference
+instance ToTags Java.Modifiers
+instance ToTags Java.ModuleDeclaration
+instance ToTags Java.ModuleDirective
+instance ToTags Java.ModuleName
+instance ToTags Java.NullLiteral
+instance ToTags Java.ObjectCreationExpression
+instance ToTags Java.OctalIntegerLiteral
+instance ToTags Java.PackageDeclaration
+instance ToTags Java.ParenthesizedExpression
+instance ToTags Java.Primary
+instance ToTags Java.Program
+instance ToTags Java.ReceiverParameter
+instance ToTags Java.RequiresModifier
+instance ToTags Java.Resource
+instance ToTags Java.ResourceSpecification
+instance ToTags Java.ReturnStatement
+instance ToTags Java.ScopedIdentifier
+instance ToTags Java.ScopedTypeIdentifier
+instance ToTags Java.SimpleType
+instance ToTags Java.SpreadParameter
+instance ToTags Java.Statement
+instance ToTags Java.StaticInitializer
+instance ToTags Java.StringLiteral
+instance ToTags Java.Super
+instance ToTags Java.SuperInterfaces
+instance ToTags Java.Superclass
+instance ToTags Java.SwitchBlock
+instance ToTags Java.SwitchLabel
+instance ToTags Java.SwitchStatement
+instance ToTags Java.SynchronizedStatement
+instance ToTags Java.TernaryExpression
+instance ToTags Java.This
+instance ToTags Java.ThrowStatement
+instance ToTags Java.Throws
+instance ToTags Java.True
+instance ToTags Java.TryStatement
+instance ToTags Java.TryWithResourcesStatement
+instance ToTags Java.Type
+instance ToTags Java.TypeArguments
+instance ToTags Java.TypeBound
+instance ToTags Java.TypeIdentifier
+instance ToTags Java.TypeParameter
+instance ToTags Java.TypeParameters
+instance ToTags Java.UnannotatedType
+instance ToTags Java.UnaryExpression
+instance ToTags Java.UpdateExpression
+instance ToTags Java.VariableDeclarator
+instance ToTags Java.VoidType
+instance ToTags Java.WhileStatement
+instance ToTags Java.Wildcard

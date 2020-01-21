@@ -19,23 +19,21 @@
       {+(Empty)+}
       {+(Empty)+}
       {+(Empty)+})+}
-    {+(Slice
-      {+(Identifier)+}
-      {+(Integer)+}
-      {+(Integer)+}
-      {+(Integer)+})+}
       (Slice
       { (Identifier)
       ->(Identifier) }
         (Integer)
       { (Empty)
       ->(Integer) }
+      { (Empty)
+      ->(Integer) })
+      (Slice
+      { (Identifier)
+      ->(Identifier) }
+      { (Empty)
+      ->(Integer) }
+        (Integer)
         (Empty))
-    {-(Slice
-      {-(Identifier)-}
-      {-(Empty)-}
-      {-(Integer)-}
-      {-(Empty)-})-}
     {-(Slice
       {-(Identifier)-}
       {-(Integer)-}

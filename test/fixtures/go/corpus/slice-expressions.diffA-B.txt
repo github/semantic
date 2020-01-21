@@ -27,14 +27,16 @@
       ->(Integer) }
       { (Empty)
       ->(Integer) })
-      (Slice
-      { (Identifier)
-      ->(Identifier) }
-      { (Empty)
-      ->(Integer) }
-      { (Integer)
-      ->(Integer) }
-        (Empty))
+    {+(Slice
+      {+(Identifier)+}
+      {+(Integer)+}
+      {+(Integer)+}
+      {+(Empty)+})+}
+    {-(Slice
+      {-(Identifier)-}
+      {-(Empty)-}
+      {-(Integer)-}
+      {-(Empty)-})-}
     {-(Slice
       {-(Identifier)-}
       {-(Empty)-}

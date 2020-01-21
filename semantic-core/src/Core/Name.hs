@@ -1,51 +1,16 @@
 {-# LANGUAGE DeriveGeneric, DeriveTraversable, GeneralizedNewtypeDeriving, LambdaCase, OverloadedLists #-}
 module Core.Name
-( Name (..)
-, Named(..)
-, named
-, named'
-, namedName
-, namedValue
-, Ignored(..)
+( module Analysis.Name
 , reservedNames
 , isSimpleCharacter
 , needsQuotation
 ) where
 
+import           Analysis.Name
 import qualified Data.Char as Char
 import           Data.HashSet (HashSet)
 import qualified Data.HashSet as HashSet
-import           Data.String (IsString)
-import           Data.Text as Text (Text, any, unpack)
-import           Data.Text.Prettyprint.Doc (Pretty)
-import           GHC.Generics (Generic)
-
--- | User-specified and -relevant names.
-newtype Name = Name { unName :: Text }
-  deriving (Eq, Generic, IsString, Ord, Pretty, Show)
-
--- | Annotates an @a@ with a 'Name'-provided name, which is ignored for '==' and 'compare'.
-data Named a = Named (Ignored Name) a
-  deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
-
-named :: Name -> a -> Named a
-named = Named . Ignored
-
-named' :: Name -> Named Name
-named' u = Named (Ignored u) u
-
-namedName :: Named a -> Name
-namedName (Named (Ignored n) _) = n
-
-namedValue :: Named a -> a
-namedValue (Named _ a) = a
-
-newtype Ignored a = Ignored a
-  deriving (Foldable, Functor, Show, Traversable)
-
-instance Eq  (Ignored a) where _ == _ = True
-instance Ord (Ignored a) where compare _ _ = EQ
-
+import           Data.Text as Text (any, unpack)
 
 reservedNames :: HashSet String
 reservedNames = [ "#true", "#false", "if", "then", "else"

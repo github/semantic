@@ -290,7 +290,7 @@ defaultCase :: Assignment (Term Loc)
 defaultCase = makeTerm <$> symbol DefaultCase <*> children (Go.Syntax.DefaultPattern <$> (expressions <|> emptyTerm))
 
 defaultExpressionCase :: Assignment (Term Loc)
-defaultExpressionCase = makeTerm <$> symbol DefaultCase <*> (Go.Syntax.DefaultPattern <$ rawSource <*> (expressions <|> emptyTerm))
+defaultExpressionCase = makeTerm <$> symbol DefaultCase <*> children (Go.Syntax.DefaultPattern <$> (expressions <|> emptyTerm))
 
 callExpression :: Assignment (Term Loc)
 callExpression = makeTerm <$> symbol CallExpression <*> children (Expression.Call [] <$> expression <*> manyTerm expression <*> emptyTerm)
@@ -454,7 +454,7 @@ assignment' =  makeTerm' <$> symbol AssignmentStatement <*> children (infixTerm 
     assign l r = inject (Statement.Assignment [] l r)
 
     augmentedAssign :: (f :< Go.Syntax) => (Term Loc -> Term Loc -> f (Term Loc)) -> Term Loc -> Term Loc -> Sum Go.Syntax (Term Loc)
-    augmentedAssign c l r = assign l (makeTerm1 (c l r))
+    augmentedAssign c l r = inject (Statement.AugmentedAssignment (makeTerm1 (c l r)))
 
     invert cons a b = Expression.Not (makeTerm1 (cons a b))
 

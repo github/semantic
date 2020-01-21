@@ -168,16 +168,20 @@ graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute a g
 
 languageModes :: Parser Language.PerLanguageModes
 languageModes = Language.PerLanguageModes
-  <$> option auto (  long "python-mode"
-                  <> help "The AST representation to use for Python sources"
-                  <> metavar "ALaCarte|Precise"
-                  <> value Language.ALaCarte
-                  <> showDefault)
-  <*> option auto (  long "ruby-mode"
-                  <> help "The AST representation to use for Ruby sources"
-                  <> metavar "ALaCarte|Precise"
-                  <> value Language.ALaCarte
-                  <> showDefault)
+  <$> languageModeOption "python" "Python"
+  <*> languageModeOption "ruby" "Ruby"
+  <*> languageModeOption "go" "Go"
+  <*> languageModeOption "typescript" "TypeScript"
+  <*> languageModeOption "tsx" "TSX"
+  <*> languageModeOption "javascript" "JavaScript"
+  <*> languageModeOption "jsx" "JSX"
+  where
+    languageModeOption shortName fullName
+      = option auto (  long (shortName <> "-mode")
+                    <> help ("The AST representation to use for " <> fullName <> " sources")
+                    <> metavar "ALaCarte|Precise"
+                    <> value Language.ALaCarte
+                    <> showDefault)
 
 filePathReader :: ReadM File
 filePathReader = fileForPath <$> str

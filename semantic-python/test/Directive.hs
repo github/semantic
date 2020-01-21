@@ -4,12 +4,10 @@
 module Directive ( Directive (..)
                  , readDirectivesFromFile
                  , describe
-                 , toProcess
                  ) where
 
 import           Analysis.Concrete (Concrete (..))
 import           Control.Algebra
-import           Control.Applicative
 import           Control.Monad
 import           Control.Monad.Trans.Resource (ResourceT, runResourceT)
 import           Core.Core (Core)
@@ -27,7 +25,6 @@ import qualified Streaming.Prelude as Stream
 import           Syntax.Term (Term)
 import qualified System.Path as Path
 import qualified System.Path.PartClass as Path.Class
-import           System.Process
 import qualified Text.Parser.Token.Style as Style
 import           Text.Trifecta (CharParsing, TokenParsing (..))
 import qualified Text.Trifecta as Trifecta
@@ -39,13 +36,11 @@ describe to the test suite how to query the results of a given test
 case. A directive that looks like this:
 
 @
-  # CHECK-JQ: has("mach")
+  # CHECK-RESULT: key: value
 @
 
-would, after converting the contents of the file to a Core expression,
-dump that expression to JSON and pipe said JSON to @jq -e
-'has("mach")@, which will return an error code unless the passed JSON
-is a hash containing the @"mach"@ key.
+would test that the value for @key@ in the result evaluates to the given
+concrete value.
 
 This syntax was inspired by LLVM's
 [FileCheck](https://llvm.org/docs/CommandGuide/FileCheck.html). This
@@ -56,9 +51,8 @@ significantly and has been a successful strategy for the LLVM and Rust
 projects.
 
 -}
-data Directive = JQ ByteString -- | @# CHECK-JQ: expr@
-               | Tree (Term Core Name) -- | @# CHECK-TREE: core@
-               | Result Text (Concrete (Term (Core.Ann Source.Span :+: Core)) Name) -- | @# CHECK-RESULT key: expected
+data Directive = Tree (Term Core Name) -- | @# CHECK-TREE: core@
+               | Result Text (Concrete (Term (Core.Ann Source.Span :+: Core))) -- | @# CHECK-RESULT key: expected
                | Fails -- | @# CHECK-FAILS@ fails unless translation fails.
                  deriving (Eq, Show)
 
@@ -81,16 +75,10 @@ readDirectivesFromFile
 describe :: Directive -> String
 describe Fails        = "<expect failure>"
 describe (Tree t)     =  Core.Pretty.showCore t
-describe (JQ b)       = ByteString.unpack b
 describe (Result t e) = T.unpack t <> ": " <> show e
 
 fails :: CharParsing m => m Directive
 fails = Fails <$ Trifecta.string "# CHECK-FAILS"
-
-jq :: (Monad m, CharParsing m) => m Directive
-jq = do
-  void $ Trifecta.string "# CHECK-JQ: "
-  JQ . ByteString.pack <$> many (Trifecta.noneOf "\n")
 
 tree :: (Monad m, TokenParsing m) => m Directive
 tree = do
@@ -104,7 +92,7 @@ result = do
   void $ Trifecta.symbolic ':'
   Result key <$> concrete
 
-concrete :: TokenParsing m => m (Concrete term Name)
+concrete :: TokenParsing m => m (Concrete term)
 concrete = Trifecta.choice
   [ String <$> Trifecta.stringLiteral
   , Bool True <$ Trifecta.symbol "#true"
@@ -113,12 +101,8 @@ concrete = Trifecta.choice
   ]
 
 directive :: (Monad m, TokenParsing m) => m Directive
-directive = Trifecta.choice [ fails, result, jq, tree ]
+directive = Trifecta.choice [ fails, result, tree ]
 
 parseDirective :: ByteString -> Either String Directive
 parseDirective = Trifecta.foldResult (Left . show) Right
                . Trifecta.parseByteString (directive <* Trifecta.eof) mempty
-
-toProcess :: Directive -> CreateProcess
-toProcess (JQ d) = proc "jq" ["-e", ByteString.unpack d]
-toProcess x      = error ("can't call toProcess on " <> show x)

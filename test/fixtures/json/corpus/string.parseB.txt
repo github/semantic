@@ -5,4 +5,5 @@
         (Value 
           (String 
             [ 
-              (StringContent "world") ])) ])))
+              (StringContent 
+                []) ])) ])))

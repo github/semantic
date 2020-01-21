@@ -153,7 +153,11 @@ textToLanguage = \case
 data PerLanguageModes = PerLanguageModes
   { pythonMode :: LanguageMode
   , rubyMode   :: LanguageMode
-  -- , typescriptMode :: LanguageMode
+  , goMode     :: LanguageMode
+  , typescriptMode :: LanguageMode
+  , tsxMode :: LanguageMode
+  , javascriptMode :: LanguageMode
+  , jsxMode :: LanguageMode
   }
   deriving (Eq, Ord, Show)
 
@@ -161,7 +165,11 @@ defaultLanguageModes :: PerLanguageModes
 defaultLanguageModes = PerLanguageModes
   { pythonMode = ALaCarte
   , rubyMode = ALaCarte
-  -- , typescriptMode = ALaCarte
+  , goMode = ALaCarte
+  , typescriptMode = ALaCarte
+  , tsxMode = ALaCarte
+  , javascriptMode = ALaCarte
+  , jsxMode = ALaCarte
   }
 
 data LanguageMode

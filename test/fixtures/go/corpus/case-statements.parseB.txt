@@ -34,4 +34,10 @@
               (Identifier)
               (Empty)))
           (DefaultPattern
-            (Statements)))))))
+            (Statements
+              (Call
+                (Identifier)
+                (Statements)
+                (Empty))
+              (Break
+                (Empty)))))))))
