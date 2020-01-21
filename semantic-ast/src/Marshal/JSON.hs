@@ -34,6 +34,9 @@ class MarshalJSON t where
   
  -- TODO: range and span will require a new release of semantic-source
 
+instance {-# OVERLAPPING #-} (MarshalJSON f, MarshalJSON g) => MarshalJSON (f :+: g) where 
+  fields acc (L1 f) = fields acc f
+  fields acc (R1 g) = fields acc g
 
 -- Create MarshalJSON instances for each type constructor
 instance (GFields (Rep1 t), Generic1 t) => MarshalJSON t
