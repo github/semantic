@@ -39,6 +39,9 @@ instance (GFields f, Datatype c) => GFields (M1 D c f) where
    gfields acc x = gfields ((Text.pack "type", String (Text.pack (datatypeName x))): acc) $ unM1 x
   -- gmarshal = gmarshal . unM1 -- using unM1 instead of pattern-matching on M1 in order to express with function composition
 
+-- Need to know constructor names in order to distinguish between two AST datatypes which both have an extraChildren field. 
+-- Maybe a type field?
+
 -- 1. Need to get the name of the datatype. 
 -- 2. Pass info along somewhere where we can do something with it. 
 
