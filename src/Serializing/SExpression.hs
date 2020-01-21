@@ -1,4 +1,8 @@
-{-# LANGUAGE FlexibleContexts, GADTs, OverloadedStrings, RankNTypes, ScopedTypeVariables #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 module Serializing.SExpression
 ( serializeSExpression
 , ToSExpression(..)
@@ -9,9 +13,8 @@ import Analysis.ConstructorName
 import Data.ByteString.Builder
 import Data.Diff
 import Data.Edit
+import Data.Functor.Foldable
 import Data.Term
-import Prelude
-import Prologue
 
 data Options = ByShow | ByConstructorName
 
