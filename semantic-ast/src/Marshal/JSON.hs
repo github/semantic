@@ -25,6 +25,9 @@ import qualified Data.Text as Text
 class MarshalJSON t where
   marshal :: (ToJSON a) => t a -> Value -- don't need default signature because they're the same now
   marshal = object . fields []
+  fields :: (ToJSON a) => [(Text, Value)] -> t a -> [(Text, Value)]
+  default fields :: ( Generic1 t, GFields (Rep1 t), ToJSON a) => [(Text, Value)] -> t a -> [(Text, Value)]
+  fields acc = gfields acc . from1
 
 -- Create MarshalJSON instances for each type constructor
 instance (GMarshalJSON (Rep1 t), Generic1 t) => MarshalJSON t
