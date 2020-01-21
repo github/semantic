@@ -31,6 +31,9 @@ class MarshalJSON t where
 
  -- Need a way to discriminate between things we want to be represented as nodes in the JSON vs. don't (sums vs. not sums)
  -- only call object where we have an "inside" value
+  
+ -- TODO: range and span will require a new release of semantic-source
+
 
 -- Create MarshalJSON instances for each type constructor
 instance (GFields (Rep1 t), Generic1 t) => MarshalJSON t
