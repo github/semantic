@@ -68,10 +68,11 @@ instance (GFields f, GFields g) => GFields (f :*: g) where
   gfields acc (f :*: g) = gfields (gfields acc g) f
 
 -- Implement the sum case
-instance (GMarshalJSON f, GMarshalJSON g) => GMarshalJSON (f :+: g) where
-  gmarshal (L1 f) = gmarshal f
-  gmarshal (R1 g) = gmarshal g
 -- TODO: not much point in generating objects for the L1/R1 portions of sums; we probably want to just spit out their contents, flattening the sum
+-- instance (GFields f, GFields g) => GFields (f :+: g) where
+--   gfields acc (L1 f) = gfields acc f
+--   gfields acc (R1 g) = gfields acc g
+-- Not calling into it anyway anymore! 
 
 -- GValue for leaves
 instance ToJSON a => GValue (K1 i a) where
