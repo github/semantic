@@ -57,6 +57,7 @@ instance (GValue p, Selector s) => GFields (S1 s p) where
   gfields acc x = (Text.pack (selName x), gvalue (unM1 x)) : acc
 
 -- Implement inductive case for product case
+-- Product datatypes are marshalled to an object with a type field holding the constructor name and a separate field for each selector in the datatype.
 instance (GFields f, GFields g) => GFields (f :*: g) where
   gfields acc (f :*: g) = gfields (gfields acc g) f
 
