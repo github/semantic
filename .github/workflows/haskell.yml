@@ -39,16 +39,16 @@ jobs:
         path: dist-newstyle
         key: ${{ runner.os }}-${{ matrix.ghc }}-${{ matrix.cabal }}-semantic-dist
 
+    # - name: hlint
+    #   run: |
+    #     test -f dist-newstyle/hlint || cabal install hlint --installdir=dist-newstyle
+    #     dist-newstyle/hlint src semantic-python
+
     - name: Install dependencies
       run: |
         cabal v2-update
         cabal v2-configure --project-file=cabal.project.ci --disable-optimization --enable-benchmarks --enable-tests --write-ghc-environment-files=always -j2
         cabal v2-build     --project-file=cabal.project.ci all --only-dependencies
-
-    - name: hlint
-      run: |
-        test -f dist-newstyle/hlint || cabal install hlint --installdir=dist-newstyle
-        dist-newstyle/hlint src semantic-python
 
     - name: Build & test
       run: |
