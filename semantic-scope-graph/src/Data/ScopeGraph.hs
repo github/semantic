@@ -163,22 +163,21 @@ data Kind = AbstractClass
 instance Lower Kind where
   lowerBound = Unknown
 
--- Offsets and frame addresses in the heap should be addresses?
-data Scope address =
-    Scope {
-      edges        :: Map EdgeLabel [address]
-    , references   :: Map Reference ([ReferenceInfo], Path address)
-    , declarations :: Seq (Info address)
-    }
-  | PreludeScope {
-      edges        :: Map EdgeLabel [address]
-    , references   :: Map Reference ([ReferenceInfo], Path address)
-    , declarations :: Seq (Info address)
-    }
+data Domain
+  = Standard
+  | Preluded
   deriving (Eq, Show, Ord)
 
+-- Offsets and frame addresses in the heap should be addresses?
+data Scope address = Scope
+  { edges        :: Map EdgeLabel [address]
+  , references   :: Map Reference ([ReferenceInfo], Path address)
+  , declarations :: Seq (Info address)
+  , domain :: Domain
+  } deriving (Eq, Show, Ord)
+
 instance Lower (Scope scopeAddress) where
-  lowerBound = Scope mempty mempty mempty
+  lowerBound = Scope mempty mempty mempty Standard
 
 instance AbstractHole (Scope scopeAddress) where
   hole = lowerBound
@@ -373,11 +372,11 @@ insertDeclarationSpan decl@Declaration{..} span g = fromMaybe g $ do
 
 -- | Insert a new scope with the given address and edges into the scope graph.
 newScope :: Ord address => address -> Map EdgeLabel [address] -> ScopeGraph address -> ScopeGraph address
-newScope address edges = insertScope address (Scope edges mempty mempty)
+newScope address edges = insertScope address (Scope edges mempty mempty Standard)
 
 -- | Insert a new scope with the given address and edges into the scope graph.
 newPreludeScope :: Ord address => address -> Map EdgeLabel [address] -> ScopeGraph address -> ScopeGraph address
-newPreludeScope address edges = insertScope address (PreludeScope edges mempty mempty)
+newPreludeScope address edges = insertScope address (Scope edges mempty mempty Preluded)
 
 insertScope :: Ord address => address -> Scope address -> ScopeGraph address -> ScopeGraph address
 insertScope address scope = ScopeGraph . Map.insert address scope . unScopeGraph
