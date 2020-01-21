@@ -32,9 +32,6 @@ class MarshalJSON t where
 -- Create MarshalJSON instances for each type constructor
 instance (GMarshalJSON (Rep1 t), Generic1 t) => MarshalJSON t
 
--- Typeclass to generically marshal ASTs into JSON
-class GMarshalJSON f where
-  gmarshal :: (ToJSON a) => f a -> Value
 
 -- Stores meta-data for datatypes
 instance (GFields f, Datatype c) => GFields (M1 D c f) where
