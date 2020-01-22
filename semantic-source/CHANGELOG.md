@@ -2,6 +2,8 @@
 
 - Adds an `NFData` instance for `Source`.
 
+- Decodes to `Text` leniently instead of throwing exceptions.
+
 
 # 0.0.0.1
 

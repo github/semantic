@@ -22,7 +22,7 @@ library
   exposed-modules:
     Control.Carrier.Sketch.Fresh
     Control.Effect.Sketch
-    Convert.ToScopeGraph
+    ScopeGraph.Convert
     Data.Hole
     Data.Module
     Data.Name

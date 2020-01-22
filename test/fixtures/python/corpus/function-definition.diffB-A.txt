@@ -4,7 +4,8 @@
   ->(Identifier) }
   {-(RequiredParameter
     {-(Identifier)-})-}
-  {-(Identifier)-}
+  {-(Statements
+    {-(Identifier)-})-}
     (Statements
     { (Identifier)
     ->(Identifier) }))
@@ -21,7 +22,8 @@
     (RequiredParameter
     { (Identifier)
     ->(Identifier) })
-  {+(Identifier)+}
+  {+(Statements
+    {+(Identifier)+})+}
     (Statements
     { (Identifier)
     ->(Identifier) }))
@@ -41,7 +43,8 @@
       ->(TextElement) })
     { (Identifier)
     ->(Identifier) })
-  { (Identifier)
-  ->(Identifier) }
+    (Statements
+    { (Identifier)
+    ->(Identifier) })
     (Statements
       (Identifier))))

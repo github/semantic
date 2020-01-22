@@ -10,6 +10,10 @@
 
   str <- type "str" object #record { __new__: \prim -> instance #unit prim #record{} };
 
+  // We will fill in the actual definition of these operators
+  // pending the presence of more eliminators.
+  not <- \val -> if val then #false else #true;
+
   NoneType <- type "None" object #record { __new__: \prim -> instance #unit prim #record{} };
   None <- NoneType.__slots.__new__ #unit;
 
@@ -19,6 +23,7 @@
   #record { type: type
           , object: object
           , str: str
+          , not: not
           , NoneType: NoneType
           , None: None
           , getitem: getitem}

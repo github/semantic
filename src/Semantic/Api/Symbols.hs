@@ -100,7 +100,7 @@ tagsForBlob :: (Has (Error SomeException) sig m, Has Parse sig m, Has (Reader Pe
 tagsForBlob blob = asks toTagsParsers >>= \p -> parseWith p (pure . tags symbolsToSummarize blob) blob
 
 symbolsToSummarize :: [Text]
-symbolsToSummarize = ["Function", "Method", "Class", "Module", "Call", "Send"]
+symbolsToSummarize = ["Function", "AmbientFunction", "Method", "Class", "Module", "Call", "Send"]
 
 class ToTags t where
   tags :: [Text] -> Blob -> t Loc -> [Tag]

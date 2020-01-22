@@ -7,11 +7,11 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
-{-# OPTIONS_GHC -Wno-redundant-constraints #-}
 
+-- | This carrier interprets the Sketch effect, keeping track of
+-- the current scope and in-progress graph internally.
 module Control.Carrier.Sketch.Fresh
   ( SketchC (..)
   , runSketch
@@ -35,12 +35,16 @@ import           Data.Semilattice.Lower
 import           Source.Span
 import qualified System.Path as Path
 
-data Sketchbook address = Sketchbook
-  { sGraph        :: ScopeGraph address
-  , sCurrentScope :: address
+-- | The state type used to keep track of the in-progress graph and
+-- positional/contextual information. The name "sketchbook" is meant
+-- to invoke an in-progress, concealed work, as well as the
+-- "sketching" of a graph.
+data Sketchbook = Sketchbook
+  { sGraph        :: ScopeGraph Name
+  , sCurrentScope :: Name
   } deriving (Eq, Show)
 
-instance Lower (Sketchbook Name) where
+instance Lower Sketchbook where
   lowerBound =
     let
       initialGraph = ScopeGraph.insertScope n initialScope lowerBound
@@ -49,12 +53,12 @@ instance Lower (Sketchbook Name) where
     in
       Sketchbook initialGraph n
 
-newtype SketchC address m a = SketchC (StateC (Sketchbook address) (FreshC m) a)
+newtype SketchC address m a = SketchC (StateC Sketchbook (FreshC m) a)
   deriving (Applicative, Functor, Monad, MonadIO)
 
-instance (Effect sig, Algebra sig m) => Algebra (SketchEff Name :+: Reader Name :+: Fresh :+: sig) (SketchC Name m) where
+instance (Effect sig, Algebra sig m) => Algebra (SketchEff :+: Reader Name :+: Fresh :+: sig) (SketchC Name m) where
   alg (L (Declare n _props k)) = do
-    Sketchbook old current <- SketchC (get @(Sketchbook Name))
+    Sketchbook old current <- SketchC (get @Sketchbook)
     let (new, _pos) =
           ScopeGraph.declare
           (ScopeGraph.Declaration n)
@@ -66,10 +70,10 @@ instance (Effect sig, Algebra sig m) => Algebra (SketchEff Name :+: Reader Name 
           Nothing
           current
           old
-    SketchC (put @(Sketchbook Name) (Sketchbook new current))
+    SketchC (put (Sketchbook new current))
     k ()
   alg (L (Reference n decl _props k)) = do
-    Sketchbook old current <- SketchC (get @(Sketchbook Name))
+    Sketchbook old current <- SketchC (get @Sketchbook)
     let new =
           ScopeGraph.reference
           (ScopeGraph.Reference (Data.Name.name n))
@@ -79,7 +83,7 @@ instance (Effect sig, Algebra sig m) => Algebra (SketchEff Name :+: Reader Name 
           (ScopeGraph.Declaration (Data.Name.name decl))
           current
           old
-    SketchC (put @(Sketchbook Name) (Sketchbook new current))
+    SketchC (put (Sketchbook new current))
     k ()
   alg (L (NewScope _edges k)) = do
     -- Sketchbook old current <- SketchC (get @(Sketchbook Name))

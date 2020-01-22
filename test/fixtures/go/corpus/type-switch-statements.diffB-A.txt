@@ -35,7 +35,8 @@
             (Break
               (Empty)))
         {-(DefaultPattern
-          {-(Statements)-})-}))
+          {-(Break
+            {-(Empty)-})-})-}))
       (TypeSwitch
         (Statements
         { (Identifier)

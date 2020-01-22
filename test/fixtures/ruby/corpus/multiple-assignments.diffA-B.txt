@@ -33,7 +33,8 @@
   {-(Statements
     {-(Identifier)-}
     {-(Identifier)-})-}
-  {-(Identifier)-})-}
+  {-(Send
+    {-(Identifier)-})-})-}
 {-(Assignment
   {-(Statements
     {-(Send
@@ -56,4 +57,5 @@
     {-(Statements
       {-(Identifier)-}
       {-(Identifier)-})-})-}
-  {-(Identifier)-})-})
+  {-(Send
+    {-(Identifier)-})-})-})

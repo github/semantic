@@ -6,26 +6,21 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
-module Convert.ToScopeGraph
+module ScopeGraph.Convert
   ( ToScopeGraph (..)
   , Result (..)
-  , onChildren
-  , onField
+  , todo
+  , complete
   ) where
 
 import Control.Effect.Sketch
-import Data.Foldable
 import Data.List.NonEmpty
-import Data.Name (Name)
 import Data.Typeable
-import GHC.Generics
-import GHC.Records
-import GHC.TypeLits
 import Source.Loc
 
 class Typeable t => ToScopeGraph t where
   scopeGraph ::
-    ( Has (Sketch Name) sig m
+    ( Has Sketch sig m
     )
     => t Loc
     -> m Result
@@ -43,31 +38,8 @@ instance Semigroup Result where
 
 instance Monoid Result where mempty = Complete
 
-instance (ToScopeGraph l, ToScopeGraph r) => ToScopeGraph (l :+: r) where
-  scopeGraph (L1 l) = scopeGraph l
-  scopeGraph (R1 r) = scopeGraph r
+todo :: (Show a, Applicative m) => a -> m Result
+todo = pure . Todo . pure . show
 
-onField ::
-  forall (field :: Symbol) syn sig m r .
-  ( Has (Sketch Name) sig m
-  , HasField field (r Loc) (syn Loc)
-  , ToScopeGraph syn
-  )
-  => r Loc
-  -> m Result
-onField
-  = scopeGraph @syn
-  . getField @field
-
-onChildren ::
-  ( Traversable t
-  , ToScopeGraph syn
-  , Has (Sketch Name) sig m
-  , HasField "extraChildren" (r Loc) (t (syn Loc))
-  )
-  => r Loc
-  -> m Result
-onChildren
-  = fmap fold
-  . traverse scopeGraph
-  . getField @"extraChildren"
+complete :: Applicative m => m Result
+complete = pure Complete
