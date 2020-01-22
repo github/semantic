@@ -147,7 +147,7 @@ yieldMethodNameTag t loc range (Rb.MethodName expr) = enterScope True $ case exp
   -- Prj Rb.Symbol { extraChildren = [Prj Rb.EscapeSequence { text = name }] } -> yield name
   _                                                               -> gtags t
   where
-    yield name = yieldTag name Function loc range >> gtags t
+    yield name = yieldTag name Method loc range >> gtags t
 
 enterScope :: (Has (State [Text]) sig m) => Bool -> m () -> m ()
 enterScope createNew m = do

@@ -67,7 +67,7 @@ instance ToTags Ts.MethodDefinition where
       -- TODO: There are more here
       _                                  -> gtags t
       where
-        yield name = yieldTag name Call loc byteRange >> gtags t
+        yield name = yieldTag name Method loc byteRange >> gtags t
 
 instance ToTags Ts.ClassDeclaration where
   tags t@Ts.ClassDeclaration
