@@ -16,12 +16,16 @@ import qualified Data.Char as Char
 import           Data.Hashable
 import           Data.Text (Text)
 import qualified Data.Text as Text
+import Data.String
 
 -- | The type of variable names.
 data Name
   = Name Text
   | I Int
   deriving (Eq, Ord)
+
+instance IsString Name where
+  fromString = name . Text.pack
 
 -- | Generate a fresh (unused) name for use in synthesized variables/closures/etc.
 gensym :: Has Fresh sig m => m Name
