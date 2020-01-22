@@ -18,8 +18,10 @@ module Control.Effect.Sketch
   , RefProperties (..)
   , FunProperties (..)
   , declare
+  -- Scope Manipulation
   , currentScope
   , newScope
+  , withScope
   , declareFunction
   , declareMaybeName
   , reference
@@ -73,7 +75,7 @@ reference n decl props = send (Reference n decl props pure)
 newScope :: forall sig m . (Has Sketch sig m) => Map ScopeGraph.EdgeLabel [Name] -> m Name
 newScope edges = send (NewScope edges pure)
 
-declareFunction :: forall sig m . (Has Sketch sig m, Has (Reader Name) sig m) => Maybe Name -> FunProperties -> m (Name, Name)
+declareFunction :: forall sig m . (Has Sketch sig m) => Maybe Name -> FunProperties -> m (Name, Name)
 declareFunction name props = do
   currentScope' <- currentScope
   let lexicalEdges = Map.singleton ScopeGraph.Lexical [ currentScope' ]
@@ -81,7 +83,7 @@ declareFunction name props = do
   name' <- declareMaybeName name (DeclProperties { relation = ScopeGraph.Default, kind = (getField @"kind" @FunProperties props), associatedScope = Just associatedScope })
   pure (name', associatedScope)
 
-declareMaybeName :: forall sig m . (Has Sketch sig m)
+declareMaybeName :: Has Sketch sig m
                  => Maybe Name
                  -> DeclProperties
                  -> m Name
@@ -90,6 +92,11 @@ declareMaybeName maybeName props = do
     Just name -> declare name props >> pure name
     _         -> Name.gensym >>= \name -> declare name (props { relation = ScopeGraph.Gensym }) >> pure name -- TODO: Modify props and change Kind to Gensym
 
+withScope :: Has Sketch sig m
+          => Name
+          -> m a
+          -> m a
+withScope scope = local (const scope)
 -- declareFunction :: ( Has (State (ScopeGraph address)) sig m
 --                    , Has (Allocator address) sig m
 --                    , Has (Reader (CurrentScope address)) sig m

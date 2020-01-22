@@ -175,8 +175,8 @@ instance ToScopeGraph Py.FunctionDefinition where
     associatedScope <- newScope lexicalEdges
     let declProps = DeclProperties ScopeGraph.Function ScopeGraph.Default (Just associatedScope)
     name' <- declareMaybeName (Just $ Name.name name) declProps
-    -- withScope associatedScope $
-    --   (for parameters $ declare parameter) <> scopeGraph body
+    withScope associatedScope $ pure ()
+      -- (for parameters $ declare parameter) <> scopeGraph body
     complete
 
 instance ToScopeGraph Py.FutureImportStatement where scopeGraph = todo
