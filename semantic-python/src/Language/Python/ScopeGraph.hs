@@ -15,6 +15,7 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE PatternSynonyms #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module Language.Python.ScopeGraph
@@ -24,6 +25,8 @@ module Language.Python.ScopeGraph
 import           Control.Algebra (Algebra (..), handleCoercible)
 import           Control.Effect.Sketch
 import           Data.Foldable
+import           Data.Traversable
+import           Data.Maybe
 import           Data.Monoid
 import           Data.Name
 import           GHC.Generics
@@ -39,6 +42,7 @@ import           Control.Effect.Reader
 import           Control.Effect.Sketch
 import qualified Data.ScopeGraph as ScopeGraph
 import qualified Data.Name as Name
+import AST.Element
 
 -- This orphan instance will perish once it lands in fused-effects.
 instance Algebra sig m => Algebra sig (Ap m) where
@@ -175,9 +179,19 @@ instance ToScopeGraph Py.FunctionDefinition where
     associatedScope <- newScope lexicalEdges
     let declProps = DeclProperties ScopeGraph.Function ScopeGraph.Default (Just associatedScope)
     name' <- declareMaybeName (Just $ Name.name name) declProps
-    withScope associatedScope $ pure ()
-      -- (for parameters $ declare parameter) <> scopeGraph body
-    complete
+    withScope associatedScope $ do
+      let declProps = DeclProperties ScopeGraph.Parameter ScopeGraph.Default Nothing
+      let param (Py.Parameter (Prj (Py.Identifier _pann pname))) = Just (Name.name pname)
+          param _ = Nothing
+      let parameterMs = fmap param parameters
+      if any isNothing parameterMs
+        then todo parameterMs
+        else do
+          let parameters' = catMaybes parameterMs
+          paramDeclarations <- for parameters' $ \parameter ->
+            complete <* declare parameter declProps
+          bodyResult <- scopeGraph body
+          pure (mconcat paramDeclarations <> bodyResult)
 
 instance ToScopeGraph Py.FutureImportStatement where scopeGraph = todo
 
