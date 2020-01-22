@@ -52,8 +52,8 @@ runScopeGraph p _src item = run . runSketch (Just p) $ scopeGraph item
 
 sampleGraphThing :: (Has Sketch sig m) => m Result
 sampleGraphThing = do
-  declare @Name "hello" DeclProperties
-  declare @Name "goodbye" DeclProperties
+  declare "hello" (DeclProperties ScopeGraph.Assignment ScopeGraph.Default Nothing)
+  declare "goodbye" (DeclProperties ScopeGraph.Assignment ScopeGraph.Default Nothing)
   pure Complete
 
 graphFile :: FilePath -> IO (ScopeGraph.ScopeGraph Name, Result)
@@ -73,8 +73,8 @@ assertSimpleAssignment = do
 
 expectedReference :: (Has Sketch sig m) => m Result
 expectedReference = do
-  declare @Name "x" DeclProperties
-  reference @Name "x" "x" RefProperties
+  declare "x" (DeclProperties ScopeGraph.Assignment ScopeGraph.Default Nothing)
+  reference "x" "x" RefProperties
   pure Complete
 
 assertSimpleReference :: HUnit.Assertion
@@ -87,8 +87,8 @@ assertSimpleReference = do
 
 expectedLexicalScope :: (Has Sketch sig m) => m Result
 expectedLexicalScope = do
-  declare @Name "x" DeclProperties
-  reference @Name "x" "x" RefProperties
+  declare "x" (DeclProperties ScopeGraph.Assignment ScopeGraph.Default Nothing)
+  reference "x" "x" RefProperties {}
   pure Complete
 
 assertLexicalScope :: HUnit.Assertion
