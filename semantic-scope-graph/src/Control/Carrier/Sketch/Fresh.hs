@@ -104,31 +104,6 @@ instance (Effect sig, Algebra sig m) => Algebra (SketchEff :+: Reader Name :+: F
   alg (R (R (L a))) = send (handleCoercible a)
   alg (R (R (R a))) = send (handleCoercible a)
 
-
-  -- name <- gensym
-  -- address <- alloc name
-  -- address <$ modify (ScopeGraph.newScope address edges)
-
-
-  -- alg (L (DeclareFun n _props k)) = do
-  --   Sketchbook old current <- SketchC (get @(Sketchbook Name))
-  --   let lexicalEdges = Map.singleton Lexical [ currentScope' ]
-  --   associatedScope <- ScopeGraph.newScope lexicalEdges
-  --   name' <- ScopeGraph.declareMaybeName name ScopeGraph.Default accessControl span kind (Just associatedScope)
-  --   pure (name', associatedScope)
-
-  --   let new =
-  --         ScopeGraph.declareFunction
-  --         (Just n)
-  --         ScopeGraph.Public
-  --         (lowerBound @Span)
-  --         ScopeGraph.Function
-  --         current
-  --         old
-  --   SketchC (put @(Sketchbook Name) (Sketchbook new current))
-  --   k ()
-  --alg (R other)     = SketchC (alg (R (R (handleCoercible other))))
-
 runSketch ::
   (Functor m)
   => Maybe Path.AbsRelFile
