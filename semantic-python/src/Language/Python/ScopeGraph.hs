@@ -94,7 +94,7 @@ instance ToScopeGraph Py.AssertStatement where scopeGraph = onChildren
 
 instance ToScopeGraph Py.Assignment where
   scopeGraph (Py.Assignment _ (SingleIdentifier t) _val _typ) = do
-    let declProps = (DeclProperties ScopeGraph.Identifier ScopeGraph.Default Nothing)
+    let declProps = (DeclProperties ScopeGraph.Assignment ScopeGraph.Default Nothing)
     complete <* declare (Name.name t) declProps
   scopeGraph x                                                = todo x
 
