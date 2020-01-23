@@ -1,3 +1,4 @@
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE DerivingVia #-}
@@ -28,10 +29,11 @@ import Data.Bifunctor
 --import qualified Data.Map.Strict as Map
 import           Data.Module
 import           Data.Name (Name)
-import qualified Data.Name
+import qualified Data.Name as Name
 import           Data.ScopeGraph (ScopeGraph)
 import qualified Data.ScopeGraph as ScopeGraph
 import           Data.Semilattice.Lower
+import           GHC.Records
 import           Source.Span
 import qualified System.Path as Path
 
@@ -49,7 +51,7 @@ instance Lower Sketchbook where
     let
       initialGraph = ScopeGraph.insertScope n initialScope lowerBound
       initialScope = ScopeGraph.Scope mempty mempty mempty
-      n = Data.Name.nameI 0
+      n = Name.nameI 0
     in
       Sketchbook initialGraph n
 
