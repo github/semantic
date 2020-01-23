@@ -5,6 +5,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE PatternSynonyms #-}
@@ -15,34 +16,29 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
-{-# LANGUAGE PatternSynonyms #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module Language.Python.ScopeGraph
   ( scopeGraphModule
   ) where
 
+import           AST.Element
 import           Control.Algebra (Algebra (..), handleCoercible)
+import           Control.Effect.Fresh
 import           Control.Effect.Sketch
 import           Data.Foldable
-import           Data.Traversable
+import qualified Data.Map.Strict as Map
 import           Data.Maybe
 import           Data.Monoid
-import           Data.Name
-import           GHC.Generics
+import qualified Data.Name as Name
+import qualified Data.ScopeGraph as ScopeGraph
+import           Data.Traversable
 import           GHC.Records
 import           GHC.TypeLits
 import           Language.Python.Patterns
 import           ScopeGraph.Convert (Result (..), complete, todo)
 import           Source.Loc
 import qualified TreeSitter.Python.AST as Py
-import qualified Data.Map.Strict as Map
-import           Control.Effect.Fresh
-import           Control.Effect.Reader
-import           Control.Effect.Sketch
-import qualified Data.ScopeGraph as ScopeGraph
-import qualified Data.Name as Name
-import AST.Element
 
 -- This orphan instance will perish once it lands in fused-effects.
 instance Algebra sig m => Algebra sig (Ap m) where
@@ -119,7 +115,18 @@ instance ToScopeGraph Py.Block where scopeGraph = onChildren
 
 instance ToScopeGraph Py.BreakStatement where scopeGraph = mempty
 
-instance ToScopeGraph Py.Call where scopeGraph = todo
+instance ToScopeGraph Py.Call where
+  scopeGraph Py.Call
+    { function
+    , arguments = L1 Py.ArgumentList { extraChildren = args }
+    } = do
+      result <- scopeGraph function
+      let scopeGraphArg = \case
+            Prj expr -> scopeGraph (expr :: Py.Expression Loc)
+            _    -> undefined
+      args <- traverse scopeGraphArg args
+      pure (result <> mconcat args)
+
 
 instance ToScopeGraph Py.ClassDefinition where scopeGraph = todo
 
@@ -182,7 +189,7 @@ instance ToScopeGraph Py.FunctionDefinition where
     withScope associatedScope $ do
       let declProps = DeclProperties ScopeGraph.Parameter ScopeGraph.Default Nothing
       let param (Py.Parameter (Prj (Py.Identifier _pann pname))) = Just (Name.name pname)
-          param _ = Nothing
+          param _                                                = Nothing
       let parameterMs = fmap param parameters
       if any isNothing parameterMs
         then todo parameterMs
