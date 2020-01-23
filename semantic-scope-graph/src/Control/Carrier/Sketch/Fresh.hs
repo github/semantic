@@ -57,17 +57,17 @@ newtype SketchC address m a = SketchC (StateC Sketchbook (FreshC m) a)
   deriving (Applicative, Functor, Monad, MonadIO)
 
 instance (Effect sig, Algebra sig m) => Algebra (SketchEff :+: Reader Name :+: Fresh :+: sig) (SketchC Name m) where
-  alg (L (Declare n _props k)) = do
+  alg (L (Declare n props k)) = do
     Sketchbook old current <- SketchC (get @Sketchbook)
     let (new, _pos) =
           ScopeGraph.declare
           (ScopeGraph.Declaration n)
           (lowerBound @ModuleInfo)
-          ScopeGraph.Default
+          (relation props)
           ScopeGraph.Public
           (lowerBound @Span)
-          ScopeGraph.Identifier
-          Nothing
+          (getField @"kind" @DeclProperties props)
+          (associatedScope props)
           current
           old
     SketchC (put (Sketchbook new current))
@@ -76,11 +76,11 @@ instance (Effect sig, Algebra sig m) => Algebra (SketchEff :+: Reader Name :+: F
     Sketchbook old current <- SketchC (get @Sketchbook)
     let new =
           ScopeGraph.reference
-          (ScopeGraph.Reference (Data.Name.name n))
+          (ScopeGraph.Reference (Name.name n))
           (lowerBound @ModuleInfo)
           (lowerBound @Span)
           ScopeGraph.Identifier
-          (ScopeGraph.Declaration (Data.Name.name decl))
+          (ScopeGraph.Declaration (Name.name decl))
           current
           old
     SketchC (put (Sketchbook new current))
