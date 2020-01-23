@@ -181,11 +181,8 @@ instance ToScopeGraph Py.FunctionDefinition where
     , parameters = Py.Parameters _ann2 parameters
     , body
     } = do
-    currentScope' <- currentScope
-    let lexicalEdges = Map.singleton ScopeGraph.Lexical [ currentScope' ]
-    associatedScope <- newScope lexicalEdges
-    let declProps = DeclProperties ScopeGraph.Function ScopeGraph.Default (Just associatedScope)
-    name' <- declareMaybeName (Just $ Name.name name) declProps
+    let funProps = FunProperties ScopeGraph.Function
+    (_, associatedScope) <- declareFunction (Just $ Name.name name) funProps
     withScope associatedScope $ do
       let declProps = DeclProperties ScopeGraph.Parameter ScopeGraph.Default Nothing
       let param (Py.Parameter (Prj (Py.Identifier _pann pname))) = Just (Name.name pname)
