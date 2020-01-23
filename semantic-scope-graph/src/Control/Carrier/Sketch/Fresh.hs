@@ -85,11 +85,12 @@ instance (Effect sig, Algebra sig m) => Algebra (SketchEff :+: Reader Name :+: F
           old
     SketchC (put (Sketchbook new current))
     k ()
-  alg (L (NewScope _edges k)) = do
-    -- Sketchbook old current <- SketchC (get @(Sketchbook Name))
-    -- let new = ScopeGraph.newScope address edges old
-    -- SketchC (put @(Sketchbook Name) (Sketchbook new current))
-    k undefined
+  alg (L (NewScope edges k)) = do
+    Sketchbook old current <- SketchC get
+    name <- SketchC Name.gensym
+    let new = ScopeGraph.newScope name edges old
+    SketchC (put (Sketchbook new current))
+    k name
   alg (R (L a)) = case a of
     Ask k -> SketchC (gets sCurrentScope) >>= k
     Local fn go k -> do
