@@ -122,7 +122,7 @@ instance ToScopeGraph Py.Call where
     } = do
       result <- scopeGraph function
       let scopeGraphArg = \case
-            Prj expr -> scopeGraph (expr :: Py.Expression Loc)
+            Prj expr -> scopeGraph @Py.Expression expr
             other    -> todo other
       args <- traverse scopeGraphArg args
       pure (result <> mconcat args)
