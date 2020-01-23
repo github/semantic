@@ -11,6 +11,7 @@ import           Control.Carrier.Sketch.Fresh
 import           Control.Monad
 import qualified Data.ByteString as ByteString
 import           Data.Name (Name)
+import qualified Data.Name as Name
 import qualified Data.ScopeGraph as ScopeGraph
 import qualified Language.Python ()
 import qualified Language.Python as Py (Term)
@@ -91,11 +92,29 @@ expectedLexicalScope = do
   reference "foo" "foo" RefProperties {}
   pure Complete
 
+expectedFunctionArg :: (Has Sketch sig m) => m Result
+expectedFunctionArg = do
+  declare "foo" (DeclProperties ScopeGraph.Function ScopeGraph.Default Nothing)
+  withScope (Name.nameI 0) $ do
+    declare "x" (DeclProperties ScopeGraph.Identifier ScopeGraph.Default Nothing)
+    reference "x" "x" RefProperties
+    pure ()
+  reference "foo" "foo" RefProperties
+  pure Complete
+
 assertLexicalScope :: HUnit.Assertion
 assertLexicalScope = do
   let path = "semantic-python/test/fixtures/5-02-simple-function.py"
   (graph, result) <- graphFile path
   let (expecto, Complete) = run $ runSketch Nothing expectedLexicalScope
+
+  HUnit.assertEqual "Should work for simple case" expecto graph
+
+assertFunctionArg :: HUnit.Assertion
+assertFunctionArg = do
+  let path = "semantic-python/test/fixtures/5-03-function-argument.py"
+  (graph, result) <- graphFile path
+  let (expecto, Complete) = run $ runSketch Nothing expectedFunctionArg
 
   HUnit.assertEqual "Should work for simple case" expecto graph
 
@@ -115,6 +134,7 @@ main = do
         HUnit.testCase "simple reference" assertSimpleReference
       ],
       Tasty.testGroup "lexical scopes" [
-        HUnit.testCase "simple scope" assertLexicalScope
+        HUnit.testCase "simple function scope" assertLexicalScope
+      , HUnit.testCase "simple function argument" assertFunctionArg
       ]
     ]
