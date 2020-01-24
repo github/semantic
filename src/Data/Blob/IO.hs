@@ -13,7 +13,7 @@ import Prologue
 
 import           Analysis.File as File
 import qualified Control.Concurrent.Async as Async
-import           Data.Blob hiding (File)
+import           Data.Blob
 import qualified Data.ByteString as B
 import           Data.Language
 import           Semantic.IO

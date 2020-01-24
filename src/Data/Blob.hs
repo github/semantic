@@ -27,8 +27,7 @@ module Data.Blob
 
 import Prologue
 
-import           Analysis.File (fileBody)
-import qualified Analysis.File
+import           Analysis.File (File (..))
 import           Analysis.Language as Language
 import           Control.Effect.Error
 import           Data.Aeson
@@ -44,8 +43,8 @@ import qualified System.Path.PartClass as Path.PartClass
 
 -- | The source, path information, and language of a file read from disk.
 data Blob = Blob
-  { blobSource :: Source -- ^ The UTF-8 encoded source text of the blob.
-  , blobFile   :: File   -- ^ Path/language information for this blob.
+  { blobSource :: Source         -- ^ The UTF-8 encoded source text of the blob.
+  , blobFile   :: File Language  -- ^ Path/language information for this blob.
   } deriving (Show, Eq)
 
 blobLanguage :: Blob -> Language
