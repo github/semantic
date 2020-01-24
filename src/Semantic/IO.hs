@@ -11,7 +11,6 @@ module Semantic.IO
 import Prelude hiding (readFile)
 import Prologue
 
-import           Data.Language
 import           System.Directory (doesDirectoryExist)
 import           System.Directory.Tree (AnchoredDirTree (..))
 import qualified System.Directory.Tree as Tree
