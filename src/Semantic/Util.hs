@@ -1,4 +1,9 @@
-{-# LANGUAGE AllowAmbiguousTypes, DataKinds, FlexibleContexts, PartialTypeSignatures, TypeApplications, TypeOperators #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE PartialTypeSignatures #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeOperators #-}
 {-# OPTIONS_GHC -Wno-missing-signatures -Wno-missing-exported-signatures -Wno-partial-type-signatures -O0 #-}
 module Semantic.Util
   ( evaluateProject'
@@ -13,12 +18,12 @@ import Prelude hiding (readFile)
 
 import           Control.Abstract
 import           Control.Carrier.Fresh.Strict
-import           Control.Carrier.Parse.Simple
 import           Control.Carrier.Lift
-import           Control.Carrier.Trace.Printing
+import           Control.Carrier.Parse.Simple
 import           Control.Carrier.Reader
 import           Control.Carrier.Resumable.Either (SomeError (..))
 import           Control.Carrier.State.Strict
+import           Control.Carrier.Trace.Printing
 import           Control.Lens.Getter
 import           Data.Abstract.Address.Precise as Precise
 import           Data.Abstract.Evaluatable
@@ -39,7 +44,7 @@ import           Semantic.Analysis
 import           Semantic.Config
 import           Semantic.Graph
 import           Semantic.Task
-import           Source.Span (HasSpan(..))
+import           Source.Span (HasSpan (..))
 import           System.Exit (die)
 import           System.FilePath.Posix (takeDirectory)
 
@@ -69,7 +74,7 @@ justEvaluating
 evaluateProject' session proxy parser paths = do
   let lang = Language.reflect proxy
   res <- runTask session $ asks configTreeSitterParseTimeout >>= \ timeout -> runParse timeout $ do
-    blobs <- catMaybes <$> traverse readBlobFromFile (flip File lang <$> paths)
+    blobs <- catMaybes <$> traverse readBlobFromFile (fileForPath <$> paths)
     package <- fmap snd <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs lang [])
     modules <- topologicalSort <$> runImportGraphToModules proxy package
     trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)

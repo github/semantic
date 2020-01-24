@@ -9,12 +9,13 @@ module Data.Project
 import Prelude hiding (readFile)
 import Prologue
 
+import qualified Analysis.File
 import           Data.Blob
 import           Data.Blob.IO
 import           Data.Language
 import qualified Data.Text as T
-import           System.FilePath.Posix
 import           Semantic.IO
+import           System.FilePath.Posix
 import qualified System.Path as Path
 
 -- | A 'Project' contains all the information that semantic needs
@@ -56,5 +57,5 @@ readProjectFromPaths maybeRoot path lang excludeDirs = do
   blobs <- liftIO $ traverse (readBlobFromFile' . toFile) paths
   pure $ Project (Path.toString rootDir) blobs lang (fmap Path.toString excludeDirs)
   where
-    toFile path = File (Path.toString path) lang
+    toFile path = Analysis.File.File path lowerBound lang
     exts = extensionsForLanguage lang

@@ -1,6 +1,15 @@
-{-# LANGUAGE DataKinds, DeriveFunctor, ExistentialQuantification, FlexibleContexts, FlexibleInstances, GADTs,
-             GeneralizedNewtypeDeriving, KindSignatures, MultiParamTypeClasses, StandaloneDeriving, TypeOperators,
-             UndecidableInstances #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE ExistentialQuantification #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 module Semantic.Task.Files
   ( Files
@@ -92,14 +101,9 @@ data FilesArg
   | FilesFromPaths [File]
 
 -- | A task which reads a list of 'Blob's from a 'Handle' or a list of 'FilePath's optionally paired with 'Language's.
-readBlobs :: (Has Files sig m, MonadIO m) => FilesArg -> m [Blob]
+readBlobs :: Has Files sig m => FilesArg -> m [Blob]
 readBlobs (FilesFromHandle handle) = send (Read (FromHandle handle) pure)
-readBlobs (FilesFromPaths [path]) = do
-  isDir <- isDirectory (filePath path)
-  if isDir
-    then send (Read (FromDir (Path.path (filePath path))) pure)
-    else pure <$> send (Read (FromPath path) pure)
-readBlobs (FilesFromPaths paths) = traverse (send . flip Read pure . FromPath) paths
+readBlobs (FilesFromPaths paths)   = traverse (send . flip Read pure . FromPath) paths
 
 -- | A task which reads a list of pairs of 'Blob's from a 'Handle' or a list of pairs of 'FilePath's optionally paired with 'Language's.
 readBlobPairs :: Has Files sig m => Either (Handle 'IO.ReadMode) [(File, File)] -> m [BlobPair]

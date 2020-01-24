@@ -29,6 +29,7 @@ import qualified Data.Text as T
 import           GHC.Generics (Generic)
 import qualified System.FilePath as OldPath
 import qualified System.Path as Path
+import qualified System.Path.PartClass as Path.PartClass
 
 -- | The various languages we support.
 data Language
@@ -109,7 +110,7 @@ languageForFilePath path =
     [result] -> textToLanguage result
     _        -> Unknown
 
-languageForTypedPath :: Path.AbsRelFile -> Language
+languageForTypedPath :: Path.PartClass.AbsRel ar => Path.File ar -> Language
 languageForTypedPath = languageForFilePath . Path.toString
 
 supportedExts :: [String]

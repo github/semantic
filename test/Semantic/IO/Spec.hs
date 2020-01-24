@@ -4,19 +4,21 @@ module Semantic.IO.Spec (spec) where
 
 import Prelude hiding (readFile)
 
+import           Analysis.File
 import           Data.Blob
 import           Data.Handle
 import           SpecHelpers
+import qualified System.Path as Path
 
 spec :: Spec
 spec = do
   describe "readFile" $ do
     it "returns a blob for extant files" $ do
-      Just blob <- readBlobFromFile (File "semantic.cabal" Unknown)
+      Just blob <- readBlobFromFile (File (Path.absRel "semantic.cabal") lowerBound Unknown)
       blobPath blob `shouldBe` "semantic.cabal"
 
     it "throws for absent files" $ do
-      readBlobFromFile (File "this file should not exist" Unknown) `shouldThrow` anyIOException
+      readBlobFromFile (File (Path.absRel "/dev/doesnotexist") lowerBound Unknown) `shouldThrow` anyIOException
 
   describe "readBlobPairsFromHandle" $ do
     let a = sourceBlob "method.rb" Ruby "def foo; end"

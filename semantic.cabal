@@ -67,6 +67,7 @@ common dependencies
                      , recursion-schemes ^>= 5.1
                      , scientific ^>= 0.3.6.2
                      , safe-exceptions ^>= 0.1.7.0
+                     , semantic-analysis
                      , semantic-source ^>= 0.0.1
                      , semilattices ^>= 0.0.0.3
                      , streaming ^>= 0.2.2.0
@@ -285,7 +286,6 @@ library
                      , proto-lens-jsonpb
                      , proto-lens-runtime >= 0.5 && <0.7
                      , reducers ^>= 3.12.3
-                     , semantic-analysis
                      , semantic-go ^>= 0
                      , semantic-java ^>= 0
                      , semantic-json ^>= 0

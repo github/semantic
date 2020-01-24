@@ -81,6 +81,7 @@ import           Semantic.Task as Task
 import           Source.Loc as Loc
 import           Source.Span
 import           System.FilePath.Posix (takeDirectory, (</>))
+import qualified System.Path as Path
 import           Text.Show.Pretty (ppShow)
 
 data GraphType = ImportGraph | CallGraph
@@ -334,8 +335,9 @@ parsePythonPackage parser project = do
                                         ]
     PythonPackage.FindPackages excludeDirs -> do
       trace "In Graph.FindPackages"
-      let initFiles = filter (("__init__.py" `isSuffixOf`) . filePath) (projectFiles project)
-      let packageDirs = filter (`notElem` ((projectRootDir project </>) . unpack <$> excludeDirs)) (takeDirectory . filePath <$> initFiles)
+      let initFiles = filter (isInit . filePath) (projectFiles project)
+          isInit = (== Path.relFile "__init__.py") . Path.takeFileName
+          packageDirs = filter (`notElem` ((projectRootDir project </>) . unpack <$> excludeDirs)) (takeDirectory . Path.toString . filePath <$> initFiles)
       packageFromProject project [ blob | dir <- packageDirs
                                         , blob <- projectBlobs project
                                         , dir `isPrefixOf` blobPath blob

@@ -6,9 +6,11 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 module Data.Blob
-( File(..)
-, fileForPath
-, fileForTypedPath
+( File
+, Analysis.File.fileBody
+, Analysis.File.filePath
+, Analysis.File.fileForPath
+, Analysis.File.fileForTypedPath
 , Blob(..)
 , Blobs(..)
 , blobLanguage
@@ -31,6 +33,8 @@ module Data.Blob
 
 import Prologue
 
+import           Analysis.File (fileBody)
+import qualified Analysis.File
 import           Control.Effect.Error
 import           Data.Aeson
 import qualified Data.ByteString.Lazy as BL
@@ -44,35 +48,23 @@ import qualified System.FilePath as FP
 import qualified System.Path as Path
 import qualified System.Path.PartClass as Path.PartClass
 
--- | A 'FilePath' paired with its corresponding 'Language'.
--- Unpacked to have the same size overhead as (FilePath, Language).
-data File = File
-  { filePath     :: FilePath
-  , fileLanguage :: Language
-  } deriving (Show, Eq)
-
--- | Prefer 'fileForTypedPath' if at all possible.
-fileForPath :: FilePath  -> File
-fileForPath p = File p (languageForFilePath p)
-
-fileForTypedPath :: Path.PartClass.AbsRel ar => Path.File ar -> File
-fileForTypedPath = fileForPath . Path.toString
+type File = Analysis.File.File Language
 
 -- | The source, path information, and language of a file read from disk.
 data Blob = Blob
-  { blobSource :: Source -- ^ The UTF-8 encoded source text of the blob.
-  , blobFile   :: File   -- ^ Path/language information for this blob.
-  , blobOid    :: Text   -- ^ Git OID for this blob, mempty if blob is not from a git db.
+  { blobSource :: Source        -- ^ The UTF-8 encoded source text of the blob.
+  , blobFile   :: File          -- ^ Path/language information for this blob.
+  , blobOid    :: Text          -- ^ Git OID for this blob, mempty if blob is not from a git db.
   } deriving (Show, Eq)
 
 blobLanguage :: Blob -> Language
-blobLanguage = fileLanguage . blobFile
+blobLanguage = Analysis.File.fileBody . blobFile
 
 blobPath :: Blob -> FilePath
-blobPath = filePath . blobFile
+blobPath = Path.toString . Analysis.File.filePath . blobFile
 
 makeBlob :: Source -> FilePath -> Language -> Text -> Blob
-makeBlob s p l = Blob s (File p l)
+makeBlob s p l = Blob s (Analysis.File.File (Path.absRel p) lowerBound l)
 {-# INLINE makeBlob #-}
 
 newtype Blobs a = Blobs { blobs :: [a] }
