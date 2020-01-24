@@ -68,28 +68,6 @@ parseSymbolsFilePath ::
   -> m ParseTreeSymbolResponse
 parseSymbolsFilePath languageModes path = readBlob (fileForTypedPath path) >>= runReader languageModes . parseSymbols . pure @[]
 
-aLaCarteLanguageModes :: PerLanguageModes
-aLaCarteLanguageModes = PerLanguageModes
-  { pythonMode = ALaCarte
-  , rubyMode = ALaCarte
-  , goMode = ALaCarte
-  , typescriptMode = ALaCarte
-  , tsxMode = ALaCarte
-  , javascriptMode = ALaCarte
-  , jsxMode = ALaCarte
-  }
-
-preciseLanguageModes :: PerLanguageModes
-preciseLanguageModes = PerLanguageModes
-  { pythonMode = Precise
-  , rubyMode = Precise
-  , goMode = Precise
-  , typescriptMode = Precise
-  , tsxMode = Precise
-  , javascriptMode = Precise
-  , jsxMode = Precise
-  }
-
 testOptions :: Config.Options
 testOptions = defaultOptions
   { optionsFailOnWarning = flag FailOnWarning True

@@ -258,28 +258,6 @@ okALaCarteSymbol _ _ = True
 filterALaCarteSymbols :: String -> [Text.Text] -> [Text.Text]
 filterALaCarteSymbols lang = filter (okALaCarteSymbol lang)
 
-aLaCarteLanguageModes :: PerLanguageModes
-aLaCarteLanguageModes = PerLanguageModes
-  { pythonMode = ALaCarte
-  , rubyMode = ALaCarte
-  , goMode = ALaCarte
-  , typescriptMode = ALaCarte
-  , tsxMode = ALaCarte
-  , javascriptMode = ALaCarte
-  , jsxMode = ALaCarte
-  }
-
-preciseLanguageModes :: PerLanguageModes
-preciseLanguageModes = PerLanguageModes
-  { pythonMode = Precise
-  , rubyMode = Precise
-  , goMode = Precise
-  , typescriptMode = Precise
-  , tsxMode = Precise
-  , javascriptMode = Precise
-  , jsxMode = Precise
-  }
-
 testOptions :: Config.Options
 testOptions = defaultOptions
   { optionsFailOnWarning = flag FailOnWarning True

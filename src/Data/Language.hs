@@ -12,6 +12,8 @@ module Data.Language
   , languageToText
   , PerLanguageModes(..)
   , defaultLanguageModes
+  , preciseLanguageModes
+  , aLaCarteLanguageModes
   , LanguageMode(..)
   ) where
 
@@ -162,7 +164,21 @@ data PerLanguageModes = PerLanguageModes
   deriving (Eq, Ord, Show)
 
 defaultLanguageModes :: PerLanguageModes
-defaultLanguageModes = PerLanguageModes
+defaultLanguageModes = preciseLanguageModes
+
+aLaCarteLanguageModes :: PerLanguageModes
+aLaCarteLanguageModes = PerLanguageModes
+  { pythonMode = ALaCarte
+  , rubyMode = ALaCarte
+  , goMode = ALaCarte
+  , typescriptMode = ALaCarte
+  , tsxMode = ALaCarte
+  , javascriptMode = ALaCarte
+  , jsxMode = ALaCarte
+  }
+
+preciseLanguageModes :: PerLanguageModes
+preciseLanguageModes = PerLanguageModes
   { pythonMode = Precise
   , rubyMode = Precise
   , goMode = Precise
