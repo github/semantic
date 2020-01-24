@@ -74,6 +74,8 @@ instance FromJSON Blob where
 nullBlob :: Blob -> Bool
 nullBlob Blob{..} = Source.null blobSource
 
+-- | Create a Blob from a provided path, language, and UTF-8 source.
+-- The resulting Blob's span is taken from the 'totalSpan' of the source.
 fromSource :: Path.PartClass.AbsRel ar => Path.File ar -> Language -> Source -> Blob
 fromSource filepath language source
   = Blob source (Analysis.File.File (Path.toAbsRel filepath) (totalSpan source) language)

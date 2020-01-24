@@ -25,6 +25,7 @@ fromBody :: HasCallStack => a -> File a
 fromBody body = File (Path.absRel (srcLocFile srcLoc)) (spanFromSrcLoc srcLoc) body where
   srcLoc = snd (fromJust (listToMaybe (getCallStack callStack)))
 
+-- | The language of the provided file, as inferred by 'Language.forPath'.
 fileLanguage :: File a -> Language
 fileLanguage = Language.forPath . filePath
 

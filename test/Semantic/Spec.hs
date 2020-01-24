@@ -4,6 +4,7 @@ module Semantic.Spec (spec) where
 import           Analysis.File
 import           Control.Carrier.Reader
 import           Control.Exception (fromException)
+import qualified Data.Blob as Blob
 import           Source.Source (totalSpan)
 import           SpecHelpers
 import qualified System.Path as Path
