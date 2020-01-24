@@ -1,38 +1,83 @@
-(Statements
-  (Send
-    (Send
-      (Identifier))
-    (Identifier))
-  (Send
-    (Identifier)
-    (Send
-      (Identifier))
-    (Send
-      (Identifier))
-    (KeyValue
-      (SymbolElement)
-      (Integer))
-    (KeyValue
-      (SymbolElement)
-      (Integer)))
-  (Send
-    (Identifier)
-    (Send
-      (Identifier)
-      (Send
-        (Identifier))))
-  (Send
-    (Identifier)
-    (KeyValue
-      (Array)
-      (Integer))
-    (Send
-      (Identifier))
-    (Send
-      (Identifier))
-    (Function
-      (Empty)
-      (Identifier)
-      (Function
-        (Empty)
-        (Integer)))))
+(Program 
+  (Statement 
+    (MethodCall 
+      (ArgumentList) 
+      (Call 
+        (Primary 
+          (Lhs 
+            (Variable 
+              (Identifier "x")))) 
+        (Identifier "foo")))) 
+  (Statement 
+    (MethodCall 
+      (ArgumentList 
+        (Arg 
+          (Primary 
+            (Lhs 
+              (Variable 
+                (Identifier "a"))))) 
+        (Arg 
+          (Primary 
+            (Lhs 
+              (Variable 
+                (Identifier "b"))))) 
+        (Pair 
+          (Arg 
+            (Primary 
+              (Integer "2"))) 
+          (Symbol)) 
+        (Pair 
+          (Arg 
+            (Primary 
+              (Integer "3"))) 
+          (Symbol))) 
+      (Variable 
+        (Identifier "foo")))) 
+  (Statement 
+    (MethodCall 
+      (ArgumentList 
+        (MethodCall 
+          (ArgumentList 
+            (Arg 
+              (Primary 
+                (Lhs 
+                  (Variable 
+                    (Identifier "a")))))) 
+          (Variable 
+            (Identifier "bar")))) 
+      (Variable 
+        (Identifier "foo")))) 
+  (Statement 
+    (MethodCall 
+      (ArgumentList 
+        (Pair 
+          (Arg 
+            (Primary 
+              (Integer "1"))) 
+          (Arg 
+            (Primary 
+              (Array)))) 
+        (SplatArgument 
+          (Arg 
+            (Primary 
+              (Lhs 
+                (Variable 
+                  (Identifier "bar")))))) 
+        (BlockArgument 
+          (Arg 
+            (Primary 
+              (Lhs 
+                (Variable 
+                  (Identifier "blk")))))) 
+        (Arg 
+          (Primary 
+            (Lambda 
+              (Block 
+                (Statement 
+                  (Arg 
+                    (Primary 
+                      (Integer "1"))))) 
+              (LambdaParameters 
+                (Identifier "a")))))) 
+      (Variable 
+        (Identifier "foo")))))

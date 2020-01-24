@@ -1,6 +1,12 @@
-(Statements
-  (Call
-    (Identifier)
-    (Identifier)
-    (TextElement)
-    (Empty)))
+(Program 
+  (Statement 
+    (ExpressionStatement 
+      (Expression 
+        (CallExpression 
+          (Expression 
+            (Identifier "someFunction")) 
+          (Arguments 
+            (Expression 
+              (Identifier "arg1")) 
+            (Expression 
+              (String))))))))

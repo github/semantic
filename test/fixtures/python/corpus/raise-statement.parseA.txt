@@ -1,15 +1,30 @@
-(Statements
-  (Throw
-    (Statements))
-  (Throw
-    (Call
-      (Identifier)
-      (TextElement)
-      (Empty)))
-  (Throw
-    (Statements
-      (Call
-        (Identifier)
-        (TextElement)
-        (Empty))
-      (Identifier))))
+(Module 
+  (SimpleStatement 
+    (RaiseStatement)) 
+  (SimpleStatement 
+    (RaiseStatement 
+      (ExpressionList 
+        (Expression 
+          (PrimaryExpression 
+            (Call 
+              (PrimaryExpression 
+                (Identifier "RuntimeError")) 
+              (ArgumentList 
+                (Expression 
+                  (PrimaryExpression 
+                    (String)))))))))) 
+  (SimpleStatement 
+    (RaiseStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Identifier "e"))) 
+      (ExpressionList 
+        (Expression 
+          (PrimaryExpression 
+            (Call 
+              (PrimaryExpression 
+                (Identifier "RunTimeError")) 
+              (ArgumentList 
+                (Expression 
+                  (PrimaryExpression 
+                    (String)))))))))))

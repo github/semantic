@@ -1,4 +1,9 @@
-(Statements
-  (Subscript
-    (Identifier)
-    (TextElement)))
+(Program 
+  (Statement 
+    (ExpressionStatement 
+      (Expression 
+        (SubscriptExpression 
+          (Expression 
+            (Identifier "x")) 
+          (Expression 
+            (String)))))))

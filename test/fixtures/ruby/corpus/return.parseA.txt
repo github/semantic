@@ -1,4 +1,9 @@
-(Statements
-  (Return
-    (Send
-      (Identifier))))
+(Program 
+  (Statement 
+    (Return 
+      (ArgumentList 
+        (Arg 
+          (Primary 
+            (Lhs 
+              (Variable 
+                (Identifier "foo")))))))))

@@ -1,5 +1,5 @@
-(Statements
-  (Continue
-    (Empty))
-  (Continue
-    (Empty)))
+(Module 
+  (SimpleStatement 
+    (ContinueStatement "continue")) 
+  (SimpleStatement 
+    (ContinueStatement "continue")))

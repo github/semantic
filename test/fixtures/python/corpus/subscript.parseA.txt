@@ -1,4 +1,11 @@
-(Statements
-  (Subscript
-    (Identifier)
-    (Identifier)))
+(Module 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Subscript 
+            (Expression 
+              (PrimaryExpression 
+                (Identifier "b"))) 
+            (PrimaryExpression 
+              (Identifier "a"))))))))

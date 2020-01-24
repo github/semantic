@@ -1,12 +1,14 @@
-(Statements
-  (Call
-    (Identifier)
-    (Identifier)
-    (Empty))
-  (Context
-    (Comment)
-    (Call
-      (Identifier)
-      (Identifier)
-      (Identifier)
-      (Empty))))
+(Module 
+  (SimpleStatement 
+    (AssertStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Identifier "a"))))) 
+  (SimpleStatement 
+    (AssertStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Identifier "b"))) 
+      (Expression 
+        (PrimaryExpression 
+          (Identifier "c"))))))

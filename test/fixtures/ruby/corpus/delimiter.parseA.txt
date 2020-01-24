@@ -1,7 +1,25 @@
-(Statements
-  (TextElement)
-  (TextElement)
-  (TextElement)
-  (TextElement)
-  (TextElement)
-  (TextElement))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (String)))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (String)))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (String)))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (String)))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (String)))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (String)))))

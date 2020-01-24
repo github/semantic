@@ -1,6 +1,12 @@
-(Statements
-  (MemberAccess
-    (MemberAccess
-      (Identifier)
-      (Identifier))
-    (Identifier)))
+(Module 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Attribute 
+            (Identifier "c") 
+            (PrimaryExpression 
+              (Attribute 
+                (Identifier "b") 
+                (PrimaryExpression 
+                  (Identifier "a"))))))))))

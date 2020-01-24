@@ -1,2 +1,5 @@
-(Statements
-  (String))
+(Program 
+  (Statement 
+    (ExpressionStatement 
+      (Expression 
+        (TemplateString)))))

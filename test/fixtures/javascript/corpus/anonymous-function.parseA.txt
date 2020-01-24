@@ -1,20 +1,20 @@
-(Statements
-  (Function
-    (Empty)
-    (Empty)
-    (Empty)
-    (RequiredParameter
-      (Empty)
-      (Empty)
-      (Identifier)
-      (Empty))
-    (RequiredParameter
-      (Empty)
-      (Empty)
-      (Identifier)
-      (Empty))
-    (StatementBlock
-      (Return
-        (Plus
-          (Identifier)
-          (Identifier))))))
+(Program 
+  (Statement 
+    (ExpressionStatement 
+      (Expression 
+        (Function 
+          (StatementBlock 
+            (Statement 
+              (ReturnStatement 
+                (Expression 
+                  (BinaryExpression 
+                    (Token) 
+                    (Expression 
+                      (Identifier "a")) 
+                    (Expression 
+                      (Identifier "b"))))))) 
+          (FormalParameters 
+            (RequiredParameter 
+              (Identifier "a")) 
+            (RequiredParameter 
+              (Identifier "b"))))))))

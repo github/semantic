@@ -1,3 +1,4 @@
-(Statements
-  (DefaultExport
-    (Identifier)))
+(Program 
+  (Statement 
+    (ExportStatement 
+      (Identifier "Linter"))))

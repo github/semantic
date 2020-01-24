@@ -1,8 +1,15 @@
-(Statements
-  (Method
-    (Empty)
-    (Identifier)
-    (Identifier)
-    (Statements
-      (Send
-        (Identifier)))))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Method 
+          (MethodName 
+            (Identifier "bar")) 
+          (MethodParameters 
+            (Identifier "a")) 
+          (Statement 
+            (Arg 
+              (Primary 
+                (Lhs 
+                  (Variable 
+                    (Identifier "baz")))))))))))

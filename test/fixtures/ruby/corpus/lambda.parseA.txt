@@ -1,47 +1,79 @@
-(Statements
-  (Send
-    (Identifier)
-    (Function
-      (Empty)
-      (Statements)))
-  (Send
-    (Identifier)
-    (Function
-      (Empty)
-      (Send
-        (Identifier))))
-  (Send
-    (Identifier)
-    (Function
-      (Empty)
-      (Identifier)
-      (Identifier)
-      (Identifier)
-      (Integer)))
-  (Function
-    (Empty)
-    (Function
-      (Empty)
-      (Statements)))
-  (Function
-    (Empty)
-    (Function
-      (Empty)
-      (Send
-        (Identifier))))
-  (Function
-    (Empty)
-    (Identifier)
-    (Function
-      (Empty)
-      (Integer)))
-  (Function
-    (Empty)
-    (Identifier)
-    (Identifier)
-    (Statements
-      (Identifier)
-      (Identifier))
-    (Function
-      (Empty)
-      (Statements))))
+(Program 
+  (Statement 
+    (MethodCall 
+      (Block) 
+      (Variable 
+        (Identifier "lambda")))) 
+  (Statement 
+    (MethodCall 
+      (Block 
+        (Statement 
+          (Arg 
+            (Primary 
+              (Lhs 
+                (Variable 
+                  (Identifier "foo"))))))) 
+      (Variable 
+        (Identifier "lambda")))) 
+  (Statement 
+    (MethodCall 
+      (Block 
+        (BlockParameters 
+          (Identifier "a") 
+          (KeywordParameter 
+            (Arg 
+              (Primary 
+                (Lhs 
+                  (False "false")))) 
+            (Identifier "b")) 
+          (OptionalParameter 
+            (Arg 
+              (Primary 
+                (Lhs 
+                  (Nil "nil")))) 
+            (Identifier "c"))) 
+        (Statement 
+          (Arg 
+            (Primary 
+              (Integer "1"))))) 
+      (Variable 
+        (Identifier "lambda")))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Lambda 
+          (Block))))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Lambda 
+          (Block 
+            (Statement 
+              (Arg 
+                (Primary 
+                  (Lhs 
+                    (Variable 
+                      (Identifier "foo"))))))))))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Lambda 
+          (Block 
+            (Statement 
+              (Arg 
+                (Primary 
+                  (Integer "1"))))) 
+          (LambdaParameters 
+            (Identifier "foo")))))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Lambda 
+          (Block) 
+          (LambdaParameters 
+            (Identifier "d") 
+            (SplatParameter 
+              (Identifier "f")) 
+            (DestructuredParameter 
+              (Identifier "x") 
+              (Identifier "y"))))))))

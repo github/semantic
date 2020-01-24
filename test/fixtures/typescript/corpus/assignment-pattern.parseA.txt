@@ -1,9 +1,13 @@
-(Statements
-  (VariableDeclaration
-    (Assignment
-      (Empty)
-      (Hash
-        (Assignment
-          (ShorthandPropertyIdentifier)
-          (Float)))
-      (Identifier))))
+(Program 
+  (Statement 
+    (Declaration 
+      (VariableDeclaration 
+        (VariableDeclarator 
+          (Expression 
+            (Identifier "foo")) 
+          (DestructuringPattern 
+            (ObjectPattern 
+              (AssignmentPattern 
+                (ShorthandPropertyIdentifier "x") 
+                (Expression 
+                  (Number "0"))))))))))

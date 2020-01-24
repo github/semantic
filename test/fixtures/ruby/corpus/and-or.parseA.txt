@@ -1,6 +1,14 @@
-(Statements
-  (LowPrecedenceAnd
-    (Send
-      (Identifier))
-    (Send
-      (Identifier))))
+(Program 
+  (Statement 
+    (Binary 
+      (Token) 
+      (Arg 
+        (Primary 
+          (Lhs 
+            (Variable 
+              (Identifier "foo"))))) 
+      (Arg 
+        (Primary 
+          (Lhs 
+            (Variable 
+              (Identifier "bar"))))))))

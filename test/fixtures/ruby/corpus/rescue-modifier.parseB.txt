@@ -1,7 +1,13 @@
-(Statements
-  (Try
-    (Send
-      (Identifier))
-    (Catch
-      (Boolean)
-      (Empty))))
+(Program 
+  (Statement 
+    (RescueModifier 
+      (Statement 
+        (Arg 
+          (Primary 
+            (Lhs 
+              (Variable 
+                (Identifier "foo")))))) 
+      (Arg 
+        (Primary 
+          (Lhs 
+            (False "false")))))))

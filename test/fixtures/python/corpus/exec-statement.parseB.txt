@@ -1,16 +1,19 @@
-(Statements
-  (Call
-    (Identifier)
-    (TextElement)
-    (Identifier)
-    (Empty))
-  (Call
-    (Identifier)
-    (TextElement)
-    (Identifier)
-    (Identifier)
-    (Empty))
-  (Call
-    (Identifier)
-    (TextElement)
-    (Empty)))
+(Module 
+  (SimpleStatement 
+    (ExecStatement 
+      (String) 
+      (Expression 
+        (PrimaryExpression 
+          (Identifier "d"))))) 
+  (SimpleStatement 
+    (ExecStatement 
+      (String) 
+      (Expression 
+        (PrimaryExpression 
+          (Identifier "b"))) 
+      (Expression 
+        (PrimaryExpression 
+          (Identifier "c"))))) 
+  (SimpleStatement 
+    (ExecStatement 
+      (String))))
