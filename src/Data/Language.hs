@@ -7,7 +7,10 @@ module Data.Language
   , supportedExts
   ) where
 
-import Analysis.Language
+import           Analysis.Language
+import qualified Data.Languages as Lingo
+import qualified Data.Map.Strict as Map
+import qualified Data.Text as T
 
 codeNavLanguages :: [Language]
 codeNavLanguages = [Go, Java, Ruby, Python, JavaScript, TypeScript, PHP]

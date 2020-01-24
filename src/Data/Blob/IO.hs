@@ -34,6 +34,7 @@ readBlobFromFile' file = do
   maybeFile <- readBlobFromFile file
   maybeM (fail ("cannot read '" <> show file <> "', file not found or language not supported.")) maybeFile
 
+-- | Read a blob from the provided absolute or relative path , failing if it can't be found.
 readBlobFromPath :: (MonadFail m, MonadIO m) => Path.AbsRelFile -> m Blob
 readBlobFromPath = readBlobFromFile' . File.fromPath
 
