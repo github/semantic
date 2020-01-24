@@ -1,4 +1,7 @@
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 module Data.Module
@@ -12,7 +15,10 @@ module Data.Module
 import Data.Functor.Classes
 import Data.Maybe
 import Data.Semilattice.Lower
+import Data.Serialize
+import Data.Serialize.Text ()
 import Data.Text (Text)
+import GHC.Generics
 import GHC.Stack
 
 data Module body = Module { moduleInfo :: ModuleInfo, moduleBody :: body }
@@ -25,7 +31,8 @@ instance Show body => Show (Module body) where
 type ModulePath = FilePath
 
 data ModuleInfo = ModuleInfo { modulePath :: ModulePath, moduleLanguage :: Text, moduleOid :: Text }
-  deriving (Eq, Ord)
+  deriving stock (Eq, Ord, Generic)
+  deriving anyclass Serialize
 
 instance Lower ModuleInfo where
   lowerBound = ModuleInfo mempty "Unknown" mempty

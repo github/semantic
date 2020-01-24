@@ -1,11 +1,15 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveFunctor #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TupleSections #-}
+{-# LANGUAGE TypeApplications #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 module Data.ScopeGraph
   ( Slot(..)
   , Info(..)
@@ -65,21 +69,27 @@ import           Data.Name
 import           Data.Semilattice.Lower
 import           Data.Sequence (Seq)
 import qualified Data.Sequence as Seq
+import           Data.Serialize
 import           Data.Set (Set)
 import qualified Data.Set as Set
 import           Data.Text (Text)
 import           GHC.Generics
 import           Source.Span
 
+deriving anyclass instance Serialize Span
+deriving anyclass instance Serialize Pos
+
 -- A slot is a location in the heap where a value is stored.
 data Slot address = Slot { frameAddress :: address, position :: Position }
     deriving (Eq, Show, Ord)
 
 
-data AccessControl = Public
-                   | Protected
-                   | Private
-                   deriving (Bounded, Enum, Eq, Generic, Hashable, ToJSON, Show)
+data AccessControl
+  = Public
+  | Protected
+  | Private
+  deriving stock (Bounded, Enum, Eq, Generic, Show)
+  deriving anyclass (Hashable, ToJSON, Serialize)
 
 -- | The Ord AccessControl instance represents an order specification of AccessControls.
 -- AccessControls that are less than or equal to another AccessControl implies access.
@@ -102,7 +112,8 @@ instance Ord AccessControl where
 
 
 data Relation = Default | Instance | Prelude | Gensym
-  deriving (Bounded, Enum, Eq, Show, Ord)
+  deriving stock (Bounded, Enum, Eq, Show, Ord, Generic)
+  deriving anyclass Serialize
 
 instance Lower Relation where
   lowerBound = Default
@@ -115,7 +126,8 @@ data Info scopeAddress = Info
   , infoSpan            :: Span
   , infoKind            :: Kind
   , infoAssociatedScope :: Maybe scopeAddress
-  } deriving (Eq, Show, Ord)
+  } deriving stock (Eq, Show, Ord, Generic)
+    deriving anyclass Serialize
 
 instance HasSpan (Info scopeAddress) where
   span_ = lens infoSpan (\i s -> i { infoSpan = s })
@@ -128,7 +140,8 @@ data ReferenceInfo = ReferenceInfo
   { refSpan   :: Span
   , refKind   :: Kind
   , refModule :: ModuleInfo
-  } deriving (Eq, Show, Ord)
+  } deriving stock (Eq, Show, Ord, Generic)
+    deriving anyclass Serialize
 
 instance HasSpan ReferenceInfo where
   span_ = lens refSpan (\r s -> r { refSpan = s })
@@ -158,7 +171,8 @@ data Kind = AbstractClass
           | Unknown
           | UnqualifiedImport
           | VariableDeclaration
-  deriving (Bounded, Enum, Eq, Show, Ord)
+  deriving stock (Bounded, Enum, Eq, Show, Ord, Generic)
+  deriving anyclass Serialize
 
 instance Lower Kind where
   lowerBound = Unknown
@@ -166,7 +180,8 @@ instance Lower Kind where
 data Domain
   = Standard
   | Preluded
-  deriving (Eq, Show, Ord)
+  deriving stock (Eq, Show, Ord, Generic)
+  deriving anyclass Serialize
 
 -- Offsets and frame addresses in the heap should be addresses?
 data Scope address = Scope
@@ -174,7 +189,8 @@ data Scope address = Scope
   , references   :: Map Reference ([ReferenceInfo], Path address)
   , declarations :: Seq (Info address)
   , domain       :: Domain
-  } deriving (Eq, Show, Ord)
+  } deriving stock (Eq, Show, Ord, Generic)
+    deriving anyclass Serialize
 
 instance Lower (Scope scopeAddress) where
   lowerBound = Scope mempty mempty mempty Standard
@@ -189,7 +205,8 @@ instance AbstractHole (Info address) where
   hole = lowerBound
 
 newtype Position = Position { unPosition :: Int }
-  deriving (Eq, Show, Ord)
+  deriving stock (Eq, Show, Ord, Generic)
+  deriving anyclass Serialize
 
 newtype ScopeGraph scope = ScopeGraph { unScopeGraph :: Map scope (Scope scope) }
   deriving (Eq, Ord, Show)
@@ -203,7 +220,8 @@ data Path scope
   | DPath Declaration Position
   -- | Construct an edge from a scope to another declaration path.
   | EPath EdgeLabel scope (Path scope)
-  deriving (Eq, Functor, Ord, Show)
+  deriving stock (Eq, Functor, Ord, Show, Generic)
+  deriving anyclass Serialize
 
 instance AbstractHole (Path scope) where
   hole = Hole
@@ -414,11 +432,19 @@ associatedScope Declaration{..} g@(ScopeGraph graph) = go (Map.keys graph)
 newtype Reference = Reference { unReference :: Name }
   deriving (Eq, Ord, Show)
 
+instance Serialize Reference where
+  put = put @Text . formatName . unReference
+  get = Reference . name <$> get @Text
+
 instance Lower Reference where
   lowerBound = Reference $ name ""
 
 newtype Declaration = Declaration { unDeclaration :: Name }
-  deriving (Eq, Ord, Show)
+  deriving stock (Eq, Ord, Show)
+
+instance Serialize Declaration where
+  put = put @Text . formatName . unDeclaration
+  get = Declaration . name <$> get @Text
 
 instance Lower Declaration where
   lowerBound = Declaration $ name ""
@@ -429,4 +455,5 @@ formatDeclaration = formatName . unDeclaration
 -- | The type of edge from a scope to its parent scopes.
 -- Either a lexical edge or an import edge in the case of non-lexical edges.
 data EdgeLabel = Lexical | Import | Export | Superclass
-  deriving (Bounded, Enum, Eq, Ord, Show)
+  deriving stock (Bounded, Enum, Eq, Ord, Show, Generic)
+  deriving anyclass Serialize
