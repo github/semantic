@@ -49,8 +49,8 @@ type File = Analysis.File.File Language
 
 -- | The source, path information, and language of a file read from disk.
 data Blob = Blob
-  { blobSource :: Source        -- ^ The UTF-8 encoded source text of the blob.
-  , blobFile   :: File          -- ^ Path/language information for this blob.
+  { blobSource :: Source -- ^ The UTF-8 encoded source text of the blob.
+  , blobFile   :: File   -- ^ Path/language information for this blob.
   } deriving (Show, Eq)
 
 blobLanguage :: Blob -> Language

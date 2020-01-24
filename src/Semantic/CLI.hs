@@ -153,8 +153,8 @@ graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute a g
       <$> (   Just <$> some (strArgument (metavar "FILES..."))
           <|> flag' Nothing (long "stdin" <> help "Read a list of newline-separated paths to analyze from stdin."))
     makeReadProjectFromPathsTask maybePaths = do
-      ePaths <- maybeM (liftIO (many getLine)) maybePaths
-      let paths = rights (Path.parse <$> ePaths)
+      strPaths <- maybeM (liftIO (many getLine)) maybePaths
+      let paths = rights (Path.parse <$> strPaths)
       blobs <- traverse readBlobFromPath paths
       case paths of
         (x:_) -> pure $! Project (Path.toString (Path.takeDirectory x)) blobs (Language.forPath x) mempty
