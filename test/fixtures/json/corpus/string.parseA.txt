@@ -1,9 +1,6 @@
 (Document 
   (Value 
     (Array 
-      [ 
-        (Value 
-          (String 
-            [ 
-              (StringContent 
-                []) ])) ])))
+      (Value 
+        (String 
+          (StringContent))))))
