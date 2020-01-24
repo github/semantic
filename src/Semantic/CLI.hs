@@ -180,7 +180,7 @@ languageModes = Language.PerLanguageModes
       = option auto (  long (shortName <> "-mode")
                     <> help ("The AST representation to use for " <> fullName <> " sources")
                     <> metavar "ALaCarte|Precise"
-                    <> value Language.ALaCarte
+                    <> value Language.Precise
                     <> showDefault)
 
 filePathReader :: ReadM File
