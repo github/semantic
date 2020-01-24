@@ -28,4 +28,4 @@ spec = do
 
     it "renders with the specified renderer" $ do
       output <- fmap runBuilder . runTaskOrDie . runReader defaultLanguageModes $ parseTermBuilder TermSExpression [methodsBlob]
-      output `shouldBe` "(Statements\n  (Method\n    (Empty)\n    (Identifier)\n    (Statements)))\n"
+      output `shouldBe` "(Program \n  (Statement \n    (Arg \n      (Primary \n        (Method \n          (MethodName \n            (Identifier \"foo\")))))))\n"
