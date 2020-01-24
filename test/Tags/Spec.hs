@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Tags.Spec (spec) where
 
+import qualified Analysis.File as File
 import           Control.Carrier.Reader
 import           Semantic.Api.Symbols
 import           Source.Loc
@@ -90,4 +91,4 @@ spec = do
         ]
 
 parseTestFile :: Foldable t => t Tags.Kind -> Path.RelFile -> IO [Tag]
-parseTestFile include path = runTaskOrDie $ readBlob (fileForTypedPath path) >>= runReader defaultLanguageModes . fmap (filter ((`elem` include) . kind)) . tagsForBlob
+parseTestFile include path = runTaskOrDie $ readBlob (File.fromPath path) >>= runReader defaultLanguageModes . fmap (filter ((`elem` include) . kind)) . tagsForBlob

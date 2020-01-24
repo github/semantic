@@ -1,4 +1,8 @@
-{-# LANGUAGE DataKinds, GADTs, OverloadedStrings, PackageImports, TypeApplications #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE PackageImports #-}
+{-# LANGUAGE TypeApplications #-}
 
 module Graphing.Calls.Spec ( spec ) where
 
@@ -7,6 +11,7 @@ import SpecHelpers
 
 import Algebra.Graph
 
+import qualified Analysis.File as File
 import           Control.Effect.Parse
 import           "semantic" Data.Graph (Graph (..), topologicalSort)
 import           Data.Graph.ControlFlowVertex
@@ -19,7 +24,7 @@ callGraphPythonProject path = runTaskOrDie $ do
   let proxy = Proxy @'Language.Python
       lang = Language.Python
   SomeParser parser <- pure . fromJust $! parserForLanguage analysisParsers Language.Python
-  blob <- readBlobFromFile' (fileForTypedPath path)
+  blob <- readBlobFromFile' (File.fromPath path)
   package <- fmap snd <$> parsePackage parser (Project (Path.toString (Path.takeDirectory path)) [blob] lang [])
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   runCallGraph proxy False modules package

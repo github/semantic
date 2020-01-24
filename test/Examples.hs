@@ -1,8 +1,8 @@
-{-# LANGUAGE FlexibleContexts  #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards   #-}
-{-# LANGUAGE TypeApplications  #-}
-{-# LANGUAGE AllowAmbiguousTypes  #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TypeApplications #-}
 
 {-# OPTIONS_GHC -O1 #-}
 {-# OPTIONS_GHC -Wno-unused-top-binds -Wno-unused-imports #-}
@@ -16,9 +16,9 @@ import           Control.Lens
 import           Control.Monad
 import           Data.Blob
 import           Data.Foldable
+import           Data.Int
 import           Data.Language (LanguageMode (..), PerLanguageModes (..))
 import           Data.List
-import           Data.Int
 import qualified Data.Text as Text
 import           Data.Traversable
 import           System.FilePath.Glob
@@ -174,7 +174,7 @@ buildExamples session lang tsDir = do
     assertOK msg = either (\e -> HUnit.assertFailure (msg <> " failed to parse" <> show e)) (refuteErrors msg)
     refuteErrors msg a = case toList (a^.files) of
       [x] | (e:_) <- toList (x^.errors) -> HUnit.assertFailure (msg <> " parse errors " <> show e)
-      _ -> pure ()
+      _                                 -> pure ()
 
     assertMatch a b = case (a, b) of
       (Right a, Right b) -> case (toList (a^.files), toList (b^.files)) of
@@ -307,4 +307,4 @@ parseSymbolsFilePath ::
   => PerLanguageModes
   -> Path.RelFile
   -> m ParseTreeSymbolResponse
-parseSymbolsFilePath languageModes path = readBlob (fileForTypedPath path) >>= runReader languageModes . parseSymbols . pure @[]
+parseSymbolsFilePath languageModes path = readBlob (File.fromPath path) >>= runReader languageModes . parseSymbols . pure @[]

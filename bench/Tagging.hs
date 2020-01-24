@@ -1,6 +1,6 @@
-{-# LANGUAGE FlexibleContexts  #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TypeApplications  #-}
+{-# LANGUAGE TypeApplications #-}
 
 module Tagging (benchmarks) where
 
@@ -66,7 +66,7 @@ parseSymbolsFilePath ::
   => PerLanguageModes
   -> Path.RelFile
   -> m ParseTreeSymbolResponse
-parseSymbolsFilePath languageModes path = readBlob (fileForTypedPath path) >>= runReader languageModes . parseSymbols . pure @[]
+parseSymbolsFilePath languageModes path = readBlob (File.fromPath path) >>= runReader languageModes . parseSymbols . pure @[]
 
 aLaCarteLanguageModes :: PerLanguageModes
 aLaCarteLanguageModes = PerLanguageModes

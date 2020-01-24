@@ -3,7 +3,7 @@ module Analysis.File
 ( File(..)
 , fileLanguage
 , fromBody
-, fileForTypedPath
+, fromPath
 ) where
 
 import           Analysis.Language
@@ -28,5 +28,5 @@ fromBody body = File (Path.absRel (srcLocFile srcLoc)) (spanFromSrcLoc srcLoc) b
 fileLanguage :: File a -> Language
 fileLanguage = languageForTypedPath . filePath
 
-fileForTypedPath :: Path.PartClass.AbsRel ar => Path.File ar -> File Language
-fileForTypedPath p = File (Path.toAbsRel p) lowerBound (languageForTypedPath p)
+fromPath :: Path.PartClass.AbsRel ar => Path.File ar -> File Language
+fromPath p = File (Path.toAbsRel p) lowerBound (languageForTypedPath p)

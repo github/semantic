@@ -2,6 +2,7 @@
 {-# LANGUAGE FlexibleContexts #-}
 module Semantic.CLI (main) where
 
+import qualified Analysis.File as File
 import qualified Control.Carrier.Parse.Measured as Parse
 import           Control.Carrier.Reader
 import           Data.Blob
@@ -24,7 +25,6 @@ import qualified Semantic.Telemetry.Log as Log
 import           Semantic.Version
 import           Serializing.Format hiding (Options)
 import           System.Exit (die)
-import           System.FilePath
 import qualified System.Path as Path
 import qualified System.Path.PartClass as Path.PartClass
 
@@ -187,7 +187,7 @@ languageModes = Language.PerLanguageModes
                     <> showDefault)
 
 filePathReader :: ReadM File
-filePathReader = fileForTypedPath <$> path
+filePathReader = File.fromPath <$> path
 
 path :: (Path.PartClass.FileDir fd) => ReadM (Path.AbsRel fd)
 path = eitherReader Path.parse

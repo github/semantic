@@ -11,7 +11,7 @@ module Data.Blob.IO
 
 import Prologue
 
-import           Analysis.File
+import           Analysis.File as File
 import qualified Control.Concurrent.Async as Async
 import           Data.Blob hiding (File)
 import qualified Data.ByteString as B
@@ -35,12 +35,12 @@ readBlobFromFile' file = do
   maybeM (fail ("cannot read '" <> show file <> "', file not found or language not supported.")) maybeFile
 
 readBlobFromPath :: (MonadFail m, MonadIO m) => Path.AbsRelFile -> m Blob
-readBlobFromPath = readBlobFromFile' . fileForTypedPath
+readBlobFromPath = readBlobFromFile' . File.fromPath
 
 -- | Read all blobs in the directory with Language.supportedExts.
 readBlobsFromDir :: MonadIO m => Path.AbsRelDir -> m [Blob]
 readBlobsFromDir path = liftIO . fmap catMaybes $
-  findFilesInDir path supportedExts mempty >>= Async.mapConcurrently (readBlobFromFile . fileForTypedPath)
+  findFilesInDir path supportedExts mempty >>= Async.mapConcurrently (readBlobFromFile . File.fromPath)
 
 readFilePair :: MonadIO m => File Language -> File Language -> m BlobPair
 readFilePair a b = do
