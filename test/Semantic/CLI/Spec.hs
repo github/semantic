@@ -69,8 +69,8 @@ diffFixtures :: [(String, [BlobPair] -> ParseC TaskC Builder, [(File, File)], Pa
 diffFixtures =
   [ ("json diff", parseDiffBuilder DiffJSONTree, pathMode, prefix </> Path.file "diff-tree.json")
   , ("s-expression diff", parseDiffBuilder DiffSExpression, pathMode, Path.relFile "test/fixtures/ruby/corpus/method-declaration.diffA-B.txt")
-  , ("toc summaries diff", runReader defaultLanguageModes . diffSummaryBuilder Serializing.Format.JSON, pathMode, prefix </> Path.file "diff-tree.toc.json")
-  , ("protobuf diff", runReader defaultLanguageModes . diffSummaryBuilder Serializing.Format.Proto, pathMode, prefix </> Path.file "diff-tree.toc.protobuf.bin")
+  , ("toc summaries diff", runReader aLaCarteLanguageModes . diffSummaryBuilder Serializing.Format.JSON, pathMode, prefix </> Path.file "diff-tree.toc.json")
+  , ("protobuf diff", runReader aLaCarteLanguageModes . diffSummaryBuilder Serializing.Format.Proto, pathMode, prefix </> Path.file "diff-tree.toc.protobuf.bin")
   ]
   where pathMode = [(File "test/fixtures/ruby/corpus/method-declaration.A.rb" Ruby, File "test/fixtures/ruby/corpus/method-declaration.B.rb"  Ruby)]
         prefix = Path.relDir "test/fixtures/cli"
