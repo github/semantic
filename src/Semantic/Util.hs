@@ -16,6 +16,7 @@ module Semantic.Util
 
 import Prelude hiding (readFile)
 
+import           Analysis.File
 import           Control.Abstract
 import           Control.Carrier.Fresh.Strict
 import           Control.Carrier.Lift
@@ -31,7 +32,6 @@ import           Data.Abstract.Module
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Package
 import           Data.Abstract.Value.Concrete as Concrete
-import           Data.Blob
 import           Data.Blob.IO
 import           Data.Graph (topologicalSort)
 import qualified Data.Language as Language
@@ -47,6 +47,7 @@ import           Semantic.Task
 import           Source.Span (HasSpan (..))
 import           System.Exit (die)
 import           System.FilePath.Posix (takeDirectory)
+import qualified System.Path as Path
 
 justEvaluating :: Evaluator term Precise (Value term Precise) _ result
                -> IO ( Heap Precise Precise (Value term Precise),
@@ -90,6 +91,9 @@ evaluateProject' session proxy parser paths = do
 parseFile, parseFileQuiet :: Parser term -> FilePath -> IO term
 parseFile      parser = runTask'     . (parse parser <=< readBlob . fileForPath)
 parseFileQuiet parser = runTaskQuiet . (parse parser <=< readBlob . fileForPath)
+
+fileForPath :: FilePath -> File Language.Language
+fileForPath p = File (Path.absRel p) lowerBound (Language.languageForFilePath p)
 
 runTask', runTaskQuiet :: ParseC TaskC a -> IO a
 runTask'     task = runTaskWithOptions debugOptions   (asks configTreeSitterParseTimeout >>= \ timeout -> runParse timeout task) >>= either (die . displayException) pure

@@ -4,6 +4,7 @@
 module Data.Blob.IO
   ( readBlobFromFile
   , readBlobFromFile'
+  , readBlobFromPath
   , readBlobsFromDir
   , readFilePair
   ) where
@@ -27,11 +28,14 @@ readBlobFromFile file@(File path _ _language) = do
   let newblob = Blob (Source.fromUTF8 raw) file
   pure . Just $ newblob
 
--- | Read a utf8-encoded file to a 'Blob', raising an IOError if it can't be found.
+-- | Read a utf8-encoded file to a 'Blob', failing if it can't be found.
 readBlobFromFile' :: (MonadFail m, MonadIO m) => File Language -> m Blob
 readBlobFromFile' file = do
   maybeFile <- readBlobFromFile file
   maybeM (fail ("cannot read '" <> show file <> "', file not found or language not supported.")) maybeFile
+
+readBlobFromPath :: (MonadFail m, MonadIO m) => Path.AbsRelFile -> m Blob
+readBlobFromPath = readBlobFromFile' . fileForTypedPath
 
 -- | Read all blobs in the directory with Language.supportedExts.
 readBlobsFromDir :: MonadIO m => Path.AbsRelDir -> m [Blob]

@@ -1,10 +1,12 @@
-{-# LANGUAGE ApplicativeDo, FlexibleContexts #-}
+{-# LANGUAGE ApplicativeDo #-}
+{-# LANGUAGE FlexibleContexts #-}
 module Semantic.CLI (main) where
 
 import qualified Control.Carrier.Parse.Measured as Parse
 import           Control.Carrier.Reader
 import           Data.Blob
 import           Data.Blob.IO
+import           Data.Either
 import qualified Data.Flag as Flag
 import           Data.Handle
 import qualified Data.Language as Language
@@ -151,10 +153,11 @@ graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute a g
       <$> (   Just <$> some (strArgument (metavar "FILES..."))
           <|> flag' Nothing (long "stdin" <> help "Read a list of newline-separated paths to analyze from stdin."))
     makeReadProjectFromPathsTask maybePaths = do
-      paths <- maybeM (liftIO (many getLine)) maybePaths
-      blobs <- traverse readBlobFromFile' (fileForPath <$> paths)
+      ePaths <- maybeM (liftIO (many getLine)) maybePaths
+      let paths = rights (Path.parse <$> ePaths)
+      blobs <- traverse readBlobFromPath paths
       case paths of
-        (x:_) -> pure $! Project (takeDirectory x) blobs (Language.languageForFilePath x) mempty
+        (x:_) -> pure $! Project (Path.toString (Path.takeDirectory x)) blobs (Language.languageForTypedPath x) mempty
         _     -> pure $! Project "/" mempty Language.Unknown mempty
 
     allLanguages = intercalate "|" . fmap show $ [Language.Go .. maxBound]
@@ -184,7 +187,7 @@ languageModes = Language.PerLanguageModes
                     <> showDefault)
 
 filePathReader :: ReadM File
-filePathReader = fileForPath <$> str
+filePathReader = fileForTypedPath <$> path
 
 path :: (Path.PartClass.FileDir fd) => ReadM (Path.AbsRel fd)
 path = eitherReader Path.parse

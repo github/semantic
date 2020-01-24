@@ -9,7 +9,6 @@ module Data.Blob
 ( File
 , Analysis.File.fileBody
 , Analysis.File.filePath
-, Analysis.File.fileForPath
 , Analysis.File.fileForTypedPath
 , Blob(..)
 , Blobs(..)
