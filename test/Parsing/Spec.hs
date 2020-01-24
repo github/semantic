@@ -15,7 +15,7 @@ spec :: Spec
 spec = do
   describe "parseToAST" $ do
     let source = toJSONSource [1 :: Int .. 10000]
-    let largeBlob = sourceBlob (Path.relFile "large.json") JSON source
+    let largeBlob = fromSource (Path.relFile "large.json") JSON source
 
     it "returns a result when the timeout does not expire" $ do
       let timeout = fromMicroseconds 0 -- Zero microseconds indicates no timeout

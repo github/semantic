@@ -17,7 +17,7 @@ setBlobLanguage lang b = b { blobFile = (blobFile b) { fileBody = lang }}
 spec :: Spec
 spec = do
   describe "parseBlob" $ do
-    let methodsBlob = sourceBlob (Path.relFile "methods.rb") Ruby "def foo\nend\n"
+    let methodsBlob = Blob.fromSource (Path.relFile "methods.rb") Ruby "def foo\nend\n"
 
     it "returns error if given an unknown language (json)" $ do
       output <- fmap runBuilder . runTaskOrDie . runReader defaultLanguageModes $ parseTermBuilder TermJSONTree [ setBlobLanguage Unknown methodsBlob ]

@@ -17,7 +17,7 @@ module Data.Blob
 , blobPath
 , decodeBlobs
 , nullBlob
-, sourceBlob
+, fromSource
 , moduleForBlob
 , noLanguageForBlob
 , BlobPair
@@ -74,8 +74,8 @@ instance FromJSON Blob where
 nullBlob :: Blob -> Bool
 nullBlob Blob{..} = Source.null blobSource
 
-sourceBlob :: Path.PartClass.AbsRel ar => Path.File ar -> Language -> Source -> Blob
-sourceBlob filepath language source
+fromSource :: Path.PartClass.AbsRel ar => Path.File ar -> Language -> Source -> Blob
+fromSource filepath language source
   = Blob source (Analysis.File.File (Path.toAbsRel filepath) (totalSpan source) language)
 
 decodeBlobs :: BL.ByteString -> Either String [Blob]

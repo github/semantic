@@ -37,7 +37,7 @@ callGraphProject' :: ( Language.SLanguage lang
                   -> IO (Either String ())
 callGraphProject' session proxy path
   | Just (SomeParser parser) <- parserForLanguage analysisParsers lang = fmap (bimap show (const ())) . runTask session $ do
-  blob <- readBlobFromFile' (File.fromPath path)
+  blob <- readBlobFromPath path
   package <- fmap snd <$> runParse (Duration.fromSeconds 10) (parsePackage parser (Project (Path.toString (Path.takeDirectory path)) [blob] lang []))
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   runCallGraph proxy False modules package

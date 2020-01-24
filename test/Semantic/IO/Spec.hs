@@ -21,8 +21,8 @@ spec = do
       readBlobFromFile (File (Path.absRel "/dev/doesnotexist") lowerBound Unknown) `shouldThrow` anyIOException
 
   describe "readBlobPairsFromHandle" $ do
-    let a = sourceBlob (Path.relFile "method.rb") Ruby "def foo; end"
-    let b = sourceBlob (Path.relFile "method.rb") Ruby "def bar(x); end"
+    let a = Blob.fromSource (Path.relFile "method.rb") Ruby "def foo; end"
+    let b = Blob.fromSource (Path.relFile "method.rb") Ruby "def bar(x); end"
     it "returns blobs for valid JSON encoded diff input" $ do
       blobs <- blobsFromFilePath "test/fixtures/cli/diff.json"
       blobs `shouldBe` [Compare a b]
@@ -47,7 +47,7 @@ spec = do
     it "returns blobs for unsupported language" $ do
       h <- openFileForReading "test/fixtures/cli/diff-unsupported-language.json"
       blobs <- readBlobPairsFromHandle h
-      let b' = sourceBlob "test.kt" Unknown "fun main(args: Array<String>) {\nprintln(\"hi\")\n}\n"
+      let b' = Blob.fromSource "test.kt" Unknown "fun main(args: Array<String>) {\nprintln(\"hi\")\n}\n"
       blobs `shouldBe` [Insert b']
 
     it "detects language based on filepath for empty language" $ do
@@ -70,7 +70,7 @@ spec = do
     it "returns blobs for valid JSON encoded parse input" $ do
       h <- openFileForReading "test/fixtures/cli/parse.json"
       blobs <- readBlobsFromHandle h
-      let a = sourceBlob "method.rb" Ruby "def foo; end"
+      let a = Blob.fromSource "method.rb" Ruby "def foo; end"
       blobs `shouldBe` [a]
 
     it "throws on blank input" $ do
