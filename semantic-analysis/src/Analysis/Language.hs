@@ -133,5 +133,3 @@ textToLanguage = \case
   "TSX" -> TSX
   "PHP" -> PHP
   _ -> Unknown
-
-
