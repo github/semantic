@@ -21,6 +21,7 @@ import           Data.Term
 import           Source.Loc
 import qualified Source.Source as Source
 import           Source.Span
+import qualified System.Timeout as System
 
 import qualified TreeSitter.Cursor as TS
 import qualified TreeSitter.Language as TS
@@ -32,6 +33,7 @@ import qualified TreeSitter.Unmarshal as TS
 data TSParseException
   = ParserTimedOut
   | IncompatibleVersions
+  | UnmarshalTimedOut
   | UnmarshalFailure String
     deriving (Eq, Show, Generic)
 
@@ -52,18 +54,24 @@ parseToPreciseAST
      , TS.Unmarshal t
      )
   => Duration
+  -> Duration
   -> Ptr TS.Language
   -> Blob
   -> m (Either TSParseException (t Loc))
-parseToPreciseAST parseTimeout language blob = runParse parseTimeout language blob $ \ rootPtr ->
-  TS.withCursor (castPtr rootPtr) $ \ cursor ->
-    runReader (TS.UnmarshalState (Source.bytes (blobSource blob)) cursor) (liftIO (peek rootPtr) >>= TS.unmarshalNode)
-    `Exc.catch` (Exc.throw . UnmarshalFailure . TS.getUnmarshalError)
+parseToPreciseAST parseTimeout unmarshalTimeout language blob = runParse parseTimeout language blob $ \ rootPtr ->
+  withTimeout $
+    TS.withCursor (castPtr rootPtr) $ \ cursor ->
+      runReader (TS.UnmarshalState (Source.bytes (blobSource blob)) cursor) (liftIO (peek rootPtr) >>= TS.unmarshalNode)
+        `Exc.catch` (Exc.throw . UnmarshalFailure . TS.getUnmarshalError)
+  where
+    withTimeout :: IO a -> IO a
+    withTimeout action = System.timeout (toMicroseconds unmarshalTimeout) action >>= maybeM (Exc.throw UnmarshalTimedOut)
 
 instance Exception TSParseException where
   displayException = \case
     ParserTimedOut -> "tree-sitter: parser timed out"
     IncompatibleVersions -> "tree-sitter: incompatible versions"
+    UnmarshalTimedOut -> "tree-sitter: unmarshal timed out"
     UnmarshalFailure s -> "tree-sitter: unmarshal failure - " <> show s
 
 runParse

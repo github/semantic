@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveGeneric, RankNTypes #-}
+{-# LANGUAGE DeriveAnyClass, DeriveGeneric, RankNTypes #-}
 module Source.Range
 ( Range(..)
 , point
@@ -10,6 +10,7 @@ module Source.Range
 ) where
 
 import Control.DeepSeq (NFData)
+import Data.Aeson (ToJSON)
 import Data.Hashable (Hashable)
 import Data.Semilattice.Lower (Lower(..))
 import GHC.Generics (Generic)
@@ -19,7 +20,7 @@ data Range = Range
   { start :: {-# UNPACK #-} !Int
   , end   :: {-# UNPACK #-} !Int
   }
-  deriving (Eq, Generic, Ord, Show)
+  deriving (Eq, Generic, Ord, Show, ToJSON)
 
 instance Hashable Range
 instance NFData   Range

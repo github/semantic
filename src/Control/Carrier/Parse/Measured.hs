@@ -58,9 +58,9 @@ runParser blob@Blob{..} parser = case parser of
         >>= either (\e -> trace (displayException e) *> throwError (SomeException e)) pure
 
   UnmarshalParser language ->
-    time "parse.tree_sitter_ast_parse" languageTag $ do
+    time "parse.tree_sitter_precise_ast_parse" languageTag $ do
       config <- asks config
-      parseToPreciseAST (configTreeSitterParseTimeout config) language blob
+      parseToPreciseAST (configTreeSitterParseTimeout config) (configTreeSitterUnmarshalTimeout config) language blob
         >>= either (\e -> trace (displayException e) *> throwError (SomeException e)) pure
 
   AssignmentParser    parser assignment -> runAssignment Assignment.assign    parser blob assignment

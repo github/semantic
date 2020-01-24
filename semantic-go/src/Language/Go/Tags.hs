@@ -47,7 +47,7 @@ instance ToTags Go.MethodDeclaration where
   tags t@Go.MethodDeclaration
     { ann = loc@Loc { byteRange }
     , name = Go.FieldIdentifier { text }
-    } = yieldTag text Function loc byteRange >> gtags t
+    } = yieldTag text Method loc byteRange >> gtags t
 
 instance ToTags Go.CallExpression where
   tags t@Go.CallExpression
