@@ -1,15 +1,28 @@
-(Statements
-  (Package
-    (Identifier))
-  (Function
-    (Identifier)
-    (Statements
-      (Type
-        (Identifier)
-        (Pointer
-          (Identifier)))
-      (Type
-        (Identifier)
-        (Pointer
-          (Pointer
-            (Identifier)))))))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (FunctionDeclaration 
+    (Block 
+      (Statement 
+        (TypeDeclaration 
+          (TypeSpec 
+            (TypeIdentifier "p1") 
+            (Type 
+              (SimpleType 
+                (PointerType 
+                  (Type 
+                    (SimpleType 
+                      (TypeIdentifier "string"))))))) 
+          (TypeSpec 
+            (TypeIdentifier "p2") 
+            (Type 
+              (SimpleType 
+                (PointerType 
+                  (Type 
+                    (SimpleType 
+                      (PointerType 
+                        (Type 
+                          (SimpleType 
+                            (TypeIdentifier "p1"))))))))))))) 
+    (Identifier "main") 
+    (ParameterList)))

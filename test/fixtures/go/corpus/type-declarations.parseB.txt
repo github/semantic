@@ -1,44 +1,49 @@
-(Statements
-  (Package
-    (Identifier))
-  (Function
-    (Identifier)
-    (Statements
-      (Statements
-        (Type
-          (Identifier)
-          (Identifier)))
-      (Statements
-        (Type
-          (Identifier)
-          (Identifier))
-        (Type
-          (Identifier)
-          (Identifier)))
-      (Statements
-        (Context
-          (Comment)
-          (Type
-            (Identifier)
-            (Constructor
-              (Empty)
-              (Statements
-                (Field
-                  (Identifier)
-                  (Statements
-                    (Identifier)))
-                (Field
-                  (Identifier)
-                  (Statements
-                    (Identifier)))
-                (Field
-                  (Identifier)
-                  (Statements
-                    (Identifier)))))))
-        (Type
-          (Identifier)
-          (Interface
-            (Statements)))
-        (Context
-          (Comment)
-          (Empty))))))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (FunctionDeclaration 
+    (Block 
+      (Statement 
+        (TypeDeclaration 
+          (TypeSpec 
+            (TypeIdentifier "x") 
+            (Type 
+              (SimpleType 
+                (TypeIdentifier "y")))))) 
+      (Statement 
+        (TypeDeclaration 
+          (TypeSpec 
+            (TypeIdentifier "x") 
+            (Type 
+              (SimpleType 
+                (TypeIdentifier "y")))) 
+          (TypeSpec 
+            (TypeIdentifier "e") 
+            (Type 
+              (SimpleType 
+                (TypeIdentifier "f")))))) 
+      (Statement 
+        (TypeDeclaration 
+          (TypeSpec 
+            (TypeIdentifier "testWrite") 
+            (Type 
+              (SimpleType 
+                (StructType 
+                  (FieldDeclarationList 
+                    (FieldDeclaration 
+                      (FieldIdentifier "cnt") 
+                      (TypeIdentifier "int")) 
+                    (FieldDeclaration 
+                      (FieldIdentifier "wantStr") 
+                      (TypeIdentifier "string")) 
+                    (FieldDeclaration 
+                      (FieldIdentifier "wantErr") 
+                      (TypeIdentifier "error"))))))) 
+          (TypeSpec 
+            (TypeIdentifier "testFac") 
+            (Type 
+              (SimpleType 
+                (InterfaceType 
+                  (MethodSpecList)))))))) 
+    (Identifier "main") 
+    (ParameterList)))

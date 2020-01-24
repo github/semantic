@@ -1,70 +1,178 @@
-(Statements
-  (Package
-    (Identifier))
-  (Function
-    (Identifier)
-    (Statements
-      (Context
-        (Comment)
-        (Or
-          (Identifier)
-          (Context
-            (Comment)
-            (Identifier))))
-      (Context
-        (Comment)
-        (And
-          (Identifier)
-          (Identifier)))
-      (Equal
-        (Identifier)
-        (Identifier))
-      (Not
-        (Equal
-          (Identifier)
-          (Identifier)))
-      (LessThan
-        (Identifier)
-        (Identifier))
-      (LessThanEqual
-        (Identifier)
-        (Identifier))
-      (GreaterThan
-        (Identifier)
-        (Identifier))
-      (GreaterThanEqual
-        (Identifier)
-        (Identifier))
-      (Plus
-        (Identifier)
-        (Identifier))
-      (Minus
-        (Identifier)
-        (Identifier))
-      (BOr
-        (Identifier)
-        (Identifier))
-      (BXOr
-        (Identifier)
-        (Identifier))
-      (Times
-        (Identifier)
-        (Identifier))
-      (DividedBy
-        (Identifier)
-        (Identifier))
-      (Modulo
-        (Identifier)
-        (Identifier))
-      (LShift
-        (Identifier)
-        (Identifier))
-      (RShift
-        (Identifier)
-        (Identifier))
-      (BAnd
-        (Identifier)
-        (Identifier))
-      (BAnd
-        (Identifier)
-        (Identifier)))))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (FunctionDeclaration 
+    (Block 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (BinaryExpression 
+              (Token) 
+              (Expression 
+                (Identifier "a")) 
+              (Expression 
+                (Identifier "b")))))) 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (BinaryExpression 
+              (Token) 
+              (Expression 
+                (Identifier "c")) 
+              (Expression 
+                (Identifier "d")))))) 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (BinaryExpression 
+              (Token) 
+              (Expression 
+                (Identifier "e")) 
+              (Expression 
+                (Identifier "f")))))) 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (BinaryExpression 
+              (Token) 
+              (Expression 
+                (Identifier "g")) 
+              (Expression 
+                (Identifier "h")))))) 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (BinaryExpression 
+              (Token) 
+              (Expression 
+                (Identifier "i")) 
+              (Expression 
+                (Identifier "j")))))) 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (BinaryExpression 
+              (Token) 
+              (Expression 
+                (Identifier "k")) 
+              (Expression 
+                (Identifier "l")))))) 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (BinaryExpression 
+              (Token) 
+              (Expression 
+                (Identifier "m")) 
+              (Expression 
+                (Identifier "n")))))) 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (BinaryExpression 
+              (Token) 
+              (Expression 
+                (Identifier "o")) 
+              (Expression 
+                (Identifier "p")))))) 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (BinaryExpression 
+              (Token) 
+              (Expression 
+                (Identifier "q")) 
+              (Expression 
+                (Identifier "r")))))) 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (BinaryExpression 
+              (Token) 
+              (Expression 
+                (Identifier "s")) 
+              (Expression 
+                (Identifier "t")))))) 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (BinaryExpression 
+              (Token) 
+              (Expression 
+                (Identifier "u")) 
+              (Expression 
+                (Identifier "v")))))) 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (BinaryExpression 
+              (Token) 
+              (Expression 
+                (Identifier "x")) 
+              (Expression 
+                (Identifier "y")))))) 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (BinaryExpression 
+              (Token) 
+              (Expression 
+                (Identifier "z")) 
+              (Expression 
+                (Identifier "aa")))))) 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (BinaryExpression 
+              (Token) 
+              (Expression 
+                (Identifier "bb")) 
+              (Expression 
+                (Identifier "cc")))))) 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (BinaryExpression 
+              (Token) 
+              (Expression 
+                (Identifier "dd")) 
+              (Expression 
+                (Identifier "ee")))))) 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (BinaryExpression 
+              (Token) 
+              (Expression 
+                (Identifier "ff")) 
+              (Expression 
+                (Identifier "gg")))))) 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (BinaryExpression 
+              (Token) 
+              (Expression 
+                (Identifier "hh")) 
+              (Expression 
+                (Identifier "ii")))))) 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (BinaryExpression 
+              (Token) 
+              (Expression 
+                (Identifier "jj")) 
+              (Expression 
+                (Identifier "kk")))))) 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (BinaryExpression 
+              (Token) 
+              (Expression 
+                (Identifier "ll")) 
+              (Expression 
+                (Identifier "mm"))))))) 
+    (Identifier "main") 
+    (ParameterList)))

@@ -1,31 +1,51 @@
-(Statements
-  (Package
-    (Identifier))
-  (Function
-    (Identifier)
-    (Statements
-      (Slice
-        (Identifier)
-        (Integer)
-        (Empty)
-        (Empty))
-      (Slice
-        (Identifier)
-        (Empty)
-        (Integer)
-        (Empty))
-      (Slice
-        (Identifier)
-        (Empty)
-        (Empty)
-        (Empty))
-      (Slice
-        (Identifier)
-        (Integer)
-        (Integer)
-        (Integer))
-      (Slice
-        (Identifier)
-        (Integer)
-        (Integer)
-        (Empty)))))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (FunctionDeclaration 
+    (Block 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (SliceExpression 
+              (Expression 
+                (IntLiteral "2")) 
+              (Expression 
+                (Identifier "a")))))) 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (SliceExpression 
+              (Expression 
+                (IntLiteral "3")) 
+              (Expression 
+                (Identifier "b")))))) 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (SliceExpression 
+              (Expression 
+                (Identifier "c")))))) 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (SliceExpression 
+              (Expression 
+                (IntLiteral "1")) 
+              (Expression 
+                (IntLiteral "3")) 
+              (Expression 
+                (IntLiteral "2")) 
+              (Expression 
+                (Identifier "d")))))) 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (SliceExpression 
+              (Expression 
+                (IntLiteral "1")) 
+              (Expression 
+                (IntLiteral "2")) 
+              (Expression 
+                (Identifier "e"))))))) 
+    (Identifier "main") 
+    (ParameterList)))

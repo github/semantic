@@ -1,10 +1,18 @@
-(Statements
-  (Package
-    (Identifier))
-  (Function
-    (Identifier)
-    (TypeAssertion
-      (Identifier)
-      (MemberAccess
-        (Identifier)
-        (Identifier)))))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (FunctionDeclaration 
+    (Block 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (TypeAssertionExpression 
+              (Type 
+                (SimpleType 
+                  (QualifiedType 
+                    (TypeIdentifier "Person") 
+                    (PackageIdentifier "z")))) 
+              (Expression 
+                (Identifier "x"))))))) 
+    (Identifier "main") 
+    (ParameterList)))

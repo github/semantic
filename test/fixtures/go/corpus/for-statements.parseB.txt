@@ -1,99 +1,159 @@
-(Statements
-  (Package
-    (Identifier))
-  (Function
-    (Identifier)
-    (Statements
-      (For
-        (Empty)
-        (Empty)
-        (Empty)
-        (Statements
-          (Call
-            (Identifier)
-            (Statements)
-            (Empty))
-          (Goto
-            (Identifier))))
-      (ForEach
-        (Identifier)
-        (Identifier)
-        (Statements
-          (Call
-            (Identifier)
-            (Statements)
-            (Empty))
-          (Break
-            (Identifier))))
-      (For
-        (Empty)
-        (Empty)
-        (Empty)
-        (Statements
-          (Call
-            (Identifier)
-            (Statements)
-            (Empty))
-          (Continue
-            (Identifier))))
-      (For
-        (LessThan
-          (Identifier)
-          (Integer))
-        (PostIncrement
-          (Identifier))
-        (Empty)
-        (Statements
-          (Call
-            (Identifier)
-            (Statements)
-            (Empty))
-          (Continue
-            (Empty))))
-      (For
-        (Empty)
-        (Empty)
-        (Empty)
-        (Statements
-          (Call
-            (Identifier)
-            (Identifier)
-            (Empty))
-          (Break
-            (Empty))))
-      (ForEach
-        (Statements
-          (Identifier)
-          (Identifier))
-        (Identifier)
-        (Call
-          (Identifier)
-          (Statements
-            (Identifier)
-            (Identifier))
-          (Empty)))
-      (ForEach
-        (Statements
-          (Identifier)
-          (Identifier))
-        (Identifier)
-        (Call
-          (Identifier)
-          (Statements
-            (Identifier)
-            (Identifier))
-          (Empty)))
-      (For
-        (Empty)
-        (LessThan
-          (Integer)
-          (Integer))
-        (Empty)
-        (Call
-          (Identifier)
-          (Statements)
-          (Empty)))
-      (ForEach
-        (Empty)
-        (Identifier)
-        (Statements)))))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (FunctionDeclaration 
+    (Block 
+      (Statement 
+        (ForStatement 
+          (Block 
+            (Statement 
+              (SimpleStatement 
+                (Expression 
+                  (CallExpression 
+                    (Expression 
+                      (Identifier "a")) 
+                    (ArgumentList))))) 
+            (Statement 
+              (GotoStatement 
+                (LabelName "loop")))) 
+          (ForClause))) 
+      (Statement 
+        (ForStatement 
+          (Block 
+            (Statement 
+              (SimpleStatement 
+                (Expression 
+                  (CallExpression 
+                    (Expression 
+                      (Identifier "a")) 
+                    (ArgumentList))))) 
+            (Statement 
+              (BreakStatement 
+                (LabelName "loop")))) 
+          (RangeClause 
+            (ExpressionList 
+              (Expression 
+                (Identifier "x"))) 
+            (Expression 
+              (Identifier "y"))))) 
+      (Statement 
+        (ForStatement 
+          (Block 
+            (Statement 
+              (SimpleStatement 
+                (Expression 
+                  (CallExpression 
+                    (Expression 
+                      (Identifier "a")) 
+                    (ArgumentList))))) 
+            (Statement 
+              (ContinueStatement 
+                (LabelName "loop2")))) 
+          (ForClause))) 
+      (Statement 
+        (ForStatement 
+          (Block 
+            (Statement 
+              (SimpleStatement 
+                (Expression 
+                  (CallExpression 
+                    (Expression 
+                      (Identifier "a")) 
+                    (ArgumentList))))) 
+            (Statement 
+              (ContinueStatement))) 
+          (ForClause 
+            (Expression 
+              (BinaryExpression 
+                (Token) 
+                (Expression 
+                  (Identifier "i")) 
+                (Expression 
+                  (IntLiteral "10")))) 
+            (SimpleStatement 
+              (IncStatement 
+                (Expression 
+                  (Identifier "i"))))))) 
+      (Statement 
+        (ForStatement 
+          (Block 
+            (Statement 
+              (SimpleStatement 
+                (Expression 
+                  (CallExpression 
+                    (Expression 
+                      (Identifier "a")) 
+                    (ArgumentList 
+                      (Expression 
+                        (Identifier "x"))))))) 
+            (Statement 
+              (BreakStatement))))) 
+      (Statement 
+        (ForStatement 
+          (Block 
+            (Statement 
+              (SimpleStatement 
+                (Expression 
+                  (CallExpression 
+                    (Expression 
+                      (Identifier "g")) 
+                    (ArgumentList 
+                      (Expression 
+                        (Identifier "i")) 
+                      (Expression 
+                        (Identifier "s")))))))) 
+          (RangeClause 
+            (ExpressionList 
+              (Expression 
+                (Identifier "s")) 
+              (Expression 
+                (Identifier "i"))) 
+            (Expression 
+              (Identifier "b"))))) 
+      (Statement 
+        (ForStatement 
+          (Block 
+            (Statement 
+              (SimpleStatement 
+                (Expression 
+                  (CallExpression 
+                    (Expression 
+                      (Identifier "h")) 
+                    (ArgumentList 
+                      (Expression 
+                        (Identifier "k")) 
+                      (Expression 
+                        (Identifier "v")))))))) 
+          (RangeClause 
+            (ExpressionList 
+              (Expression 
+                (Identifier "k")) 
+              (Expression 
+                (Identifier "v"))) 
+            (Expression 
+              (Identifier "m"))))) 
+      (Statement 
+        (ForStatement 
+          (Block 
+            (Statement 
+              (SimpleStatement 
+                (Expression 
+                  (CallExpression 
+                    (Expression 
+                      (Identifier "j")) 
+                    (ArgumentList)))))) 
+          (Expression 
+            (BinaryExpression 
+              (Token) 
+              (Expression 
+                (IntLiteral "2")) 
+              (Expression 
+                (IntLiteral "1")))))) 
+      (Statement 
+        (ForStatement 
+          (Block) 
+          (RangeClause 
+            (Expression 
+              (Identifier "b")))))) 
+    (Identifier "main") 
+    (ParameterList)))

@@ -1,53 +1,76 @@
-(Statements
-  (Package
-    (Identifier))
-  (Function
-    (Identifier)
-    (Statements))
-  (Function
-    (Identifier)
-    (Statements))
-  (Function
-    (Identifier)
-    (Identifier)
-    (Statements
-      (Identifier)
-      (Identifier))
-    (Statements
-      (Identifier)
-      (Identifier)
-      (Identifier)
-      (Identifier))
-    (Statements))
-  (Function
-    (Statements
-      (Statements
-        (Identifier))
-      (Statements
-        (Identifier)))
-    (Identifier)
-    (Statements))
-  (Function
-    (Statements
-      (Statements
-        (Identifier)
-        (Identifier))
-      (Statements
-        (Identifier)
-        (Identifier)))
-    (Identifier)
-    (Statements))
-  (Function
-    (Identifier)
-    (Identifier)
-    (Empty))
-  (Function
-    (Context
-      (Comment)
-      (Empty))
-    (Identifier)
-    (Statements
-      (Identifier)
-      (Pointer
-        (Identifier)))
-    (Statements)))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (FunctionDeclaration 
+    (Block) 
+    (Identifier "main") 
+    (ParameterList)) 
+  (FunctionDeclaration 
+    (Block) 
+    (Identifier "f1") 
+    (ParameterList)) 
+  (FunctionDeclaration 
+    (Block) 
+    (SimpleType 
+      (TypeIdentifier "int")) 
+    (Identifier "f2") 
+    (ParameterList 
+      (ParameterDeclaration 
+        (Identifier "a") 
+        (Type 
+          (SimpleType 
+            (TypeIdentifier "int")))) 
+      (ParameterDeclaration 
+        (Identifier "b") 
+        (Token) 
+        (Identifier "c") 
+        (Token) 
+        (Identifier "d") 
+        (Type 
+          (SimpleType 
+            (TypeIdentifier "string")))))) 
+  (FunctionDeclaration 
+    (Block) 
+    (ParameterList 
+      (ParameterDeclaration 
+        (Type 
+          (SimpleType 
+            (TypeIdentifier "int")))) 
+      (ParameterDeclaration 
+        (Type 
+          (SimpleType 
+            (TypeIdentifier "error"))))) 
+    (Identifier "f2") 
+    (ParameterList)) 
+  (FunctionDeclaration 
+    (Block) 
+    (ParameterList 
+      (ParameterDeclaration 
+        (Identifier "result") 
+        (Type 
+          (SimpleType 
+            (TypeIdentifier "int")))) 
+      (ParameterDeclaration 
+        (Identifier "err") 
+        (Type 
+          (SimpleType 
+            (TypeIdentifier "error"))))) 
+    (Identifier "f2") 
+    (ParameterList)) 
+  (FunctionDeclaration 
+    (SimpleType 
+      (TypeIdentifier "bool")) 
+    (Identifier "lockedOSThread") 
+    (ParameterList)) 
+  (FunctionDeclaration 
+    (Block) 
+    (Identifier "getcontext") 
+    (ParameterList 
+      (ParameterDeclaration 
+        (Identifier "c") 
+        (Type 
+          (SimpleType 
+            (PointerType 
+              (Type 
+                (SimpleType 
+                  (TypeIdentifier "u"))))))))))

@@ -1,34 +1,75 @@
-(Statements
-  (Package
-    (Identifier))
-  (Function
-    (Identifier)
-    (Statements
-      (Call
-        (Identifier)
-        (SendChannel
-          (Identifier))
-        (Empty))
-      (Call
-        (Identifier)
-        (Statements
-          (SendChannel
-            (Identifier))
-          (Minus
-            (Identifier)
-            (Identifier)))
-        (Empty))
-      (Call
-        (Identifier)
-        (Statements
-          (SendChannel
-            (Identifier))
-          (Integer)
-          (Integer))
-        (Empty))
-      (Call
-        (Identifier)
-        (Map
-          (Identifier)
-          (Identifier))
-        (Empty)))))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (FunctionDeclaration 
+    (Block 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (CallExpression 
+              (Expression 
+                (Identifier "make")) 
+              (ArgumentList 
+                (Type 
+                  (SimpleType 
+                    (ChannelType 
+                      (Type 
+                        (SimpleType 
+                          (TypeIdentifier "string"))))))))))) 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (CallExpression 
+              (Expression 
+                (Identifier "make")) 
+              (ArgumentList 
+                (Type 
+                  (SimpleType 
+                    (ChannelType 
+                      (Type 
+                        (SimpleType 
+                          (TypeIdentifier "string")))))) 
+                (Expression 
+                  (ParenthesizedExpression 
+                    (Expression 
+                      (BinaryExpression 
+                        (Token) 
+                        (Expression 
+                          (Identifier "new")) 
+                        (Expression 
+                          (Identifier "old"))))))))))) 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (CallExpression 
+              (Expression 
+                (Identifier "make")) 
+              (ArgumentList 
+                (Type 
+                  (SimpleType 
+                    (ChannelType 
+                      (Type 
+                        (SimpleType 
+                          (TypeIdentifier "string")))))) 
+                (Expression 
+                  (IntLiteral "7")) 
+                (Expression 
+                  (IntLiteral "11"))))))) 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (CallExpression 
+              (Expression 
+                (Identifier "new")) 
+              (ArgumentList 
+                (Type 
+                  (SimpleType 
+                    (MapType 
+                      (Type 
+                        (SimpleType 
+                          (TypeIdentifier "int"))) 
+                      (Type 
+                        (SimpleType 
+                          (TypeIdentifier "int")))))))))))) 
+    (Identifier "main") 
+    (ParameterList)))

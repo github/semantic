@@ -1,72 +1,169 @@
-(Statements
-  (Package
-    (Identifier))
-  (Function
-    (Identifier)
-    (Statements
-      (Pointer
-        (Call
-          (Identifier)
-          (Identifier)
-          (Empty)))
-      (Call
-        (Pointer
-          (Identifier))
-        (Identifier)
-        (Empty))
-      (TypeConversion
-        (ReceiveChannel
-          (Identifier))
-        (Identifier))
-      (TypeConversion
-        (Parenthesized
-          (ReceiveChannel
-            (Identifier)))
-        (Identifier))
-      (TypeConversion
-        (Function
-          (Empty))
-        (Identifier))
-      (TypeConversion
-        (Parenthesized
-          (Function
-            (Empty)))
-        (Identifier))
-      (TypeConversion
-        (Parenthesized
-          (Function
-            (Identifier)))
-        (Identifier))
-      (TypeConversion
-        (Function
-          (Identifier))
-        (Identifier))
-      (TypeConversion
-        (Slice
-          (MemberAccess
-            (Identifier)
-            (Identifier)))
-        (MemberAccess
-          (Identifier)
-          (Identifier)))
-      (TypeConversion
-        (Parenthesized
-          (Slice
-            (MemberAccess
-              (Identifier)
-              (Identifier))))
-        (MemberAccess
-          (Identifier)
-          (Identifier)))
-      (Call
-        (MemberAccess
-          (Identifier)
-          (Identifier))
-        (Identifier)
-        (Empty))
-      (Call
-        (MemberAccess
-          (Identifier)
-          (Identifier))
-        (Identifier)
-        (Empty)))))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (FunctionDeclaration 
+    (Block 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (UnaryExpression 
+              (Token) 
+              (Expression 
+                (CallExpression 
+                  (Expression 
+                    (Identifier "Point")) 
+                  (ArgumentList 
+                    (Expression 
+                      (Identifier "q"))))))))) 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (CallExpression 
+              (Expression 
+                (ParenthesizedExpression 
+                  (Expression 
+                    (UnaryExpression 
+                      (Token) 
+                      (Expression 
+                        (Identifier "Point")))))) 
+              (ArgumentList 
+                (Expression 
+                  (Identifier "q"))))))) 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (TypeConversionExpression 
+              (Type 
+                (SimpleType 
+                  (ChannelType 
+                    (Type 
+                      (SimpleType 
+                        (TypeIdentifier "int")))))) 
+              (Expression 
+                (Identifier "d")))))) 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (TypeConversionExpression 
+              (Type 
+                (ParenthesizedType 
+                  (Type 
+                    (SimpleType 
+                      (ChannelType 
+                        (Type 
+                          (SimpleType 
+                            (TypeIdentifier "int")))))))) 
+              (Expression 
+                (Identifier "d")))))) 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (TypeConversionExpression 
+              (Type 
+                (SimpleType 
+                  (FunctionType 
+                    (ParameterList)))) 
+              (Expression 
+                (Identifier "f")))))) 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (TypeConversionExpression 
+              (Type 
+                (ParenthesizedType 
+                  (Type 
+                    (SimpleType 
+                      (FunctionType 
+                        (ParameterList)))))) 
+              (Expression 
+                (Identifier "f")))))) 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (TypeConversionExpression 
+              (Type 
+                (ParenthesizedType 
+                  (Type 
+                    (SimpleType 
+                      (FunctionType 
+                        (SimpleType 
+                          (TypeIdentifier "int")) 
+                        (ParameterList)))))) 
+              (Expression 
+                (Identifier "f")))))) 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (TypeConversionExpression 
+              (Type 
+                (SimpleType 
+                  (FunctionType 
+                    (SimpleType 
+                      (TypeIdentifier "int")) 
+                    (ParameterList)))) 
+              (Expression 
+                (Identifier "f")))))) 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (TypeConversionExpression 
+              (Type 
+                (SimpleType 
+                  (SliceType 
+                    (Type 
+                      (SimpleType 
+                        (QualifiedType 
+                          (TypeIdentifier "y") 
+                          (PackageIdentifier "x"))))))) 
+              (Expression 
+                (SelectorExpression 
+                  (FieldIdentifier "e") 
+                  (Expression 
+                    (Identifier "z")))))))) 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (TypeConversionExpression 
+              (Type 
+                (ParenthesizedType 
+                  (Type 
+                    (SimpleType 
+                      (SliceType 
+                        (Type 
+                          (SimpleType 
+                            (QualifiedType 
+                              (TypeIdentifier "g") 
+                              (PackageIdentifier "f"))))))))) 
+              (Expression 
+                (SelectorExpression 
+                  (FieldIdentifier "i") 
+                  (Expression 
+                    (Identifier "h")))))))) 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (CallExpression 
+              (Expression 
+                (SelectorExpression 
+                  (FieldIdentifier "k") 
+                  (Expression 
+                    (Identifier "j")))) 
+              (ArgumentList 
+                (Expression 
+                  (Identifier "l"))))))) 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (CallExpression 
+              (Expression 
+                (ParenthesizedExpression 
+                  (Expression 
+                    (SelectorExpression 
+                      (FieldIdentifier "n") 
+                      (Expression 
+                        (Identifier "m")))))) 
+              (ArgumentList 
+                (Expression 
+                  (Identifier "o")))))))) 
+    (Identifier "main") 
+    (ParameterList)))
