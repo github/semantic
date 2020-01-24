@@ -9,8 +9,7 @@ module Analysis.Language
   , SLanguage (..)
   , extensionsForLanguage
   , knownLanguage
-  , languageForFilePath
-  , languageForTypedPath
+  , forPath
   , pathIsMinified
   , supportedExts
   , codeNavLanguages
@@ -99,19 +98,16 @@ knownLanguage = (/= Unknown)
 extensionsForLanguage :: Language -> [String]
 extensionsForLanguage language = T.unpack <$> maybe mempty Lingo.languageExtensions (Map.lookup (languageToText language) Lingo.languages)
 
-languageForFilePath :: FilePath -> Language
-languageForFilePath path =
+forPath :: Path.PartClass.AbsRel ar => Path.File ar -> Language
+forPath path =
   let spurious lang = lang `elem` [ "Hack" -- .php files
                                   , "GCC Machine Description" -- .md files
                                   , "XML" -- .tsx files
                                   ]
-      allResults = Lingo.languageName <$> Lingo.languagesForPath path
+      allResults = Lingo.languageName <$> Lingo.languagesForPath (Path.toString path)
   in case filter (not . spurious) allResults of
     [result] -> textToLanguage result
     _        -> Unknown
-
-languageForTypedPath :: Path.PartClass.AbsRel ar => Path.File ar -> Language
-languageForTypedPath = languageForFilePath . Path.toString
 
 supportedExts :: [String]
 supportedExts = foldr append mempty supportedLanguages

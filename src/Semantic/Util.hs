@@ -4,6 +4,7 @@
 {-# LANGUAGE PartialTypeSignatures #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE ViewPatterns #-}
 {-# OPTIONS_GHC -Wno-missing-signatures -Wno-missing-exported-signatures -Wno-partial-type-signatures -O0 #-}
 module Semantic.Util
   ( evaluateProject'
@@ -93,7 +94,7 @@ parseFile      parser = runTask'     . (parse parser <=< readBlob . fileForPath)
 parseFileQuiet parser = runTaskQuiet . (parse parser <=< readBlob . fileForPath)
 
 fileForPath :: FilePath -> File Language.Language
-fileForPath p = File (Path.absRel p) lowerBound (Language.languageForFilePath p)
+fileForPath (Path.absRel -> p) = File p lowerBound (Language.forPath p)
 
 runTask', runTaskQuiet :: ParseC TaskC a -> IO a
 runTask'     task = runTaskWithOptions debugOptions   (asks configTreeSitterParseTimeout >>= \ timeout -> runParse timeout task) >>= either (die . displayException) pure

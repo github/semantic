@@ -6,7 +6,7 @@ module Analysis.File
 , fromPath
 ) where
 
-import           Analysis.Language
+import           Analysis.Language as Language
 import           Data.Maybe (fromJust, listToMaybe)
 import           Data.Semilattice.Lower
 import           GHC.Stack
@@ -26,7 +26,7 @@ fromBody body = File (Path.absRel (srcLocFile srcLoc)) (spanFromSrcLoc srcLoc) b
   srcLoc = snd (fromJust (listToMaybe (getCallStack callStack)))
 
 fileLanguage :: File a -> Language
-fileLanguage = languageForTypedPath . filePath
+fileLanguage = Language.forPath . filePath
 
 fromPath :: Path.PartClass.AbsRel ar => Path.File ar -> File Language
-fromPath p = File (Path.toAbsRel p) lowerBound (languageForTypedPath p)
+fromPath p = File (Path.toAbsRel p) lowerBound (Language.forPath p)

@@ -33,12 +33,12 @@ import Prologue
 
 import           Analysis.File (fileBody)
 import qualified Analysis.File
+import           Analysis.Language as Language
 import           Control.Effect.Error
 import           Data.Aeson
 import qualified Data.ByteString.Lazy as BL
 import           Data.Edit
 import           Data.JSON.Fields
-import           Data.Language
 import           Data.Module
 import           Source.Source (Source, totalSpan)
 import qualified Source.Source as Source
@@ -63,24 +63,19 @@ newtype Blobs a = Blobs { blobs :: [a] }
   deriving (Generic, FromJSON)
 
 instance FromJSON Blob where
-  parseJSON = withObject "Blob" $ \b -> inferringLanguage
-    <$> b .: "content"
-    <*> b .: "path"
-    <*> b .: "language"
+  parseJSON = withObject "Blob" $ \b -> do
+    src <- b .: "content"
+    Right pth <- Path.parse <$> (b .: "path")
+    lang <- b .: "language"
+    let lang' = if knownLanguage lang then lang else Language.forPath pth
+    pure (Blob src (Analysis.File.File pth (totalSpan src) lang'))
 
 nullBlob :: Blob -> Bool
 nullBlob Blob{..} = Source.null blobSource
 
-
 sourceBlob :: FilePath -> Language -> Source -> Blob
 sourceBlob filepath language source
   = Blob source (Analysis.File.File (Path.absRel filepath) (totalSpan source) language)
-
-
-inferringLanguage :: Source -> FilePath -> Language -> Blob
-inferringLanguage src pth lang
-  = Blob src (Analysis.File.File (Path.absRel pth) (Source.totalSpan src) inferred)
-  where inferred = if knownLanguage lang then lang else languageForFilePath pth
 
 decodeBlobs :: BL.ByteString -> Either String [Blob]
 decodeBlobs = fmap blobs <$> eitherDecode
