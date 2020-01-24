@@ -10,7 +10,7 @@ import           Control.Exception (throwIO)
 import           Control.Monad
 import           Data.Blob
 import           Data.Foldable
-import           Data.Language (LanguageMode (..), PerLanguageModes (..))
+import           Data.Language (PerLanguageModes (..), aLaCarteLanguageModes, preciseLanguageModes)
 import           Gauge
 import           System.FilePath.Glob
 import qualified System.Path as Path
