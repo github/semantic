@@ -1,5 +1,6 @@
 module Data.Maybe.Exts
-( maybeLast
+( module Data.Maybe
+, maybeLast
 , fromMaybeLast
 , maybeM
 ) where

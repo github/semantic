@@ -1,4 +1,16 @@
-{-# LANGUAGE DeriveFunctor, DeriveGeneric, FlexibleContexts, FlexibleInstances, GADTs, GeneralizedNewtypeDeriving, KindSignatures, MultiParamTypeClasses, OverloadedStrings, RecordWildCards, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Semantic.Resolution
   ( Resolution (..)
   , nodeJSResolutionMap
@@ -8,13 +20,18 @@ module Semantic.Resolution
   ) where
 
 import           Control.Algebra
+import           Control.Monad.IO.Class
 import           Data.Aeson
 import           Data.Aeson.Types (parseMaybe)
 import           Data.Blob
+import           Data.Foldable
 import           Data.Language
 import qualified Data.Map as Map
+import           Data.Map.Strict (Map)
+import           Data.Maybe.Exts
 import           Data.Project
-import           Prologue
+import           Data.Text (Text)
+import           GHC.Generics (Generic1)
 import           Semantic.Task.Files
 import qualified Source.Source as Source
 import           System.FilePath.Posix
