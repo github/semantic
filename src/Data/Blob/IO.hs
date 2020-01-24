@@ -24,7 +24,7 @@ readBlobFromFile :: MonadIO m => File Language -> m (Maybe Blob)
 readBlobFromFile (File (Path.toString -> "/dev/null") _ _) = pure Nothing
 readBlobFromFile file@(File path _ _language) = do
   raw <- liftIO $ B.readFile (Path.toString path)
-  let newblob = Blob (Source.fromUTF8 raw) file mempty
+  let newblob = Blob (Source.fromUTF8 raw) file
   pure . Just $ newblob
 
 -- | Read a utf8-encoded file to a 'Blob', raising an IOError if it can't be found.

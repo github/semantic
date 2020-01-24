@@ -68,7 +68,7 @@ import           Data.Blob
 import           Data.Graph
 import           Data.Graph.ControlFlowVertex (VertexDeclaration)
 import           Data.Language as Language
-import           Data.List (isPrefixOf, isSuffixOf)
+import           Data.List (isPrefixOf)
 import qualified Data.Map as Map
 import           Data.Project
 import           Data.Text (pack, unpack)

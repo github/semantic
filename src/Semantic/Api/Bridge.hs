@@ -89,7 +89,6 @@ instance APIBridge API.Blob Data.Blob where
       in Data.Blob
       { blobSource = src
       , blobFile = File pth (Source.totalSpan src) (blob^.language.bridging)
-      , blobOid = mempty
       }
 
 

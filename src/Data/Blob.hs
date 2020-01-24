@@ -45,7 +45,6 @@ import           Source.Source (Source, totalSpan)
 import qualified Source.Source as Source
 import qualified System.FilePath as FP
 import qualified System.Path as Path
-import qualified System.Path.PartClass as Path.PartClass
 
 type File = Analysis.File.File Language
 
@@ -53,7 +52,6 @@ type File = Analysis.File.File Language
 data Blob = Blob
   { blobSource :: Source        -- ^ The UTF-8 encoded source text of the blob.
   , blobFile   :: File          -- ^ Path/language information for this blob.
-  , blobOid    :: Text          -- ^ Git OID for this blob, mempty if blob is not from a git db.
   } deriving (Show, Eq)
 
 blobLanguage :: Blob -> Language
@@ -77,12 +75,12 @@ nullBlob Blob{..} = Source.null blobSource
 
 sourceBlob :: FilePath -> Language -> Source -> Blob
 sourceBlob filepath language source
-  = Blob source (Analysis.File.File (Path.absRel filepath) (totalSpan source) language) mempty
+  = Blob source (Analysis.File.File (Path.absRel filepath) (totalSpan source) language)
 
 
 inferringLanguage :: Source -> FilePath -> Language -> Blob
 inferringLanguage src pth lang
-  = Blob src (Analysis.File.File (Path.absRel pth) (Source.totalSpan src) inferred) mempty
+  = Blob src (Analysis.File.File (Path.absRel pth) (Source.totalSpan src) inferred)
   where inferred = if knownLanguage lang then lang else languageForFilePath pth
 
 decodeBlobs :: BL.ByteString -> Either String [Blob]
@@ -102,7 +100,7 @@ moduleForBlob :: Maybe FilePath -- ^ The root directory relative to which the mo
               -> Module term    -- ^ A 'Module' named appropriate for the 'Blob', holding the @term@, and constructed relative to the root 'FilePath', if any.
 moduleForBlob rootDir b = Module info
   where root = fromMaybe (FP.takeDirectory (blobPath b)) rootDir
-        info = ModuleInfo (FP.makeRelative root (blobPath b)) (languageToText (blobLanguage b)) (blobOid b)
+        info = ModuleInfo (FP.makeRelative root (blobPath b)) (languageToText (blobLanguage b)) mempty
 
 -- | Represents a blobs suitable for diffing which can be either a blob to
 -- delete, a blob to insert, or a pair of blobs to diff.
