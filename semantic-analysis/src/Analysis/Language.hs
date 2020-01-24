@@ -10,7 +10,6 @@ module Analysis.Language
   , extensionsForLanguage
   , knownLanguage
   , forPath
-  , pathIsMinified
   , textToLanguage
   , languageToText
   ) where
@@ -21,7 +20,6 @@ import qualified Data.Languages as Lingo
 import qualified Data.Map.Strict as Map
 import qualified Data.Text as T
 import           GHC.Generics (Generic)
-import qualified System.FilePath as OldPath
 import qualified System.Path as Path
 import qualified System.Path.PartClass as Path.PartClass
 
@@ -103,9 +101,6 @@ forPath path =
   in case filter (not . spurious) allResults of
     [result] -> textToLanguage result
     _        -> Unknown
-
-pathIsMinified :: FilePath -> Bool
-pathIsMinified = OldPath.isExtensionOf ".min.js"
 
 languageToText :: Language -> T.Text
 languageToText = \case

@@ -1,4 +1,8 @@
-{-# LANGUAGE DuplicateRecordFields, GADTs, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Semantic.IO
   ( isDirectory
   , findFilesInDir
@@ -17,6 +21,9 @@ import qualified System.Path.PartClass as Path.PartClass
 
 isDirectory :: MonadIO m => FilePath -> m Bool
 isDirectory path = liftIO (doesDirectoryExist path)
+
+pathIsMinified :: FilePath -> Bool
+pathIsMinified = isExtensionOf ".min.js"
 
 -- Recursively find files in a directory.
 findFilesInDir :: (Path.PartClass.AbsRel ar, MonadIO m) => Path.Dir ar -> [String] -> [Path.Dir ar] -> m [Path.File ar]
