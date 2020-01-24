@@ -62,7 +62,7 @@ instance FromJSON Blob where
     Right pth <- fmap Path.parse (b .: "path")
     lang <- b .: "language"
     let lang' = if knownLanguage lang then lang else Language.forPath pth
-    pure (Blob src (Analysis.File.File pth (totalSpan src) lang'))
+    pure (fromSource pth lang' src)
 
 nullBlob :: Blob -> Bool
 nullBlob Blob{..} = Source.null blobSource
