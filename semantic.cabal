@@ -67,6 +67,7 @@ common dependencies
                      , recursion-schemes ^>= 5.1
                      , scientific ^>= 0.3.6.2
                      , safe-exceptions ^>= 0.1.7.0
+                     , semantic-diff ^>= 0
                      , semantic-source ^>= 0.0.1
                      , semilattices ^>= 0.0.0.3
                      , streaming ^>= 0.2.2.0
@@ -144,18 +145,14 @@ library
                      , Data.AST
                      , Data.Blob
                      , Data.Blob.IO
-                     , Data.Diff
                      , Data.Duration
-                     , Data.Edit
                      , Data.Error
                      , Data.Flag
-                     , Data.Functor.Classes.Generic
                      , Data.Graph
                      , Data.Graph.ControlFlowVertex
                      , Data.Handle
                      , Data.History
                      , Data.ImportPath
-                     , Data.JSON.Fields
                      , Data.Language
                      , Data.Map.Monoidal
                      , Data.Project
@@ -171,13 +168,6 @@ library
                      , Data.Syntax.Literal
                      , Data.Syntax.Statement
                      , Data.Syntax.Type
-                     , Data.Term
-                     -- Diffing algorithms & interpretation thereof
-                     , Diffing.Algorithm
-                     , Diffing.Algorithm.RWS
-                     , Diffing.Algorithm.RWS.FeatureVector
-                     , Diffing.Algorithm.SES
-                     , Diffing.Interpreter
                      -- Language-specific grammar/syntax types, & assignments
                      , Language.Markdown.Assignment
                      , Language.Markdown.Syntax

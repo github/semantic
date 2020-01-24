@@ -19,7 +19,7 @@ module Data.JSON.Fields
 import           Data.Aeson
 import           Data.Edit
 import qualified Data.Map as Map
-import           Data.ScopeGraph
+-- import           Data.ScopeGraph
 import qualified Data.Text as Text
 import           GHC.Generics
 import           Prologue
@@ -81,8 +81,8 @@ instance ToJSONFields a => ToJSON (JSONFields a) where
   toJSON = object . toJSONFields . unJSONFields
   toEncoding = pairs . mconcat . toJSONFields . unJSONFields
 
-instance ToJSONFields AccessControl where
-  toJSONFields accessControl = ["accessControl" .= accessControl]
+-- instance ToJSONFields AccessControl where
+--   toJSONFields accessControl = ["accessControl" .= accessControl]
 
 newtype JSONFields1 f a = JSONFields1 { unJSONFields1 :: f a }
 

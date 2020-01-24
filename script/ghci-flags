@@ -37,6 +37,7 @@ function flags {
   echo "-isemantic-analysis/src"
   echo "-isemantic-ast/src"
   echo "-isemantic-core/src"
+  echo "-isemantic-diff/src"
   echo "-isemantic-go/src"
   echo "-isemantic-java/src"
   echo "-isemantic-json/src"
