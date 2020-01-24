@@ -9,7 +9,7 @@ module Data.Project
 import Prelude hiding (readFile)
 import Prologue
 
-import qualified Analysis.File
+import           Analysis.File
 import           Data.Blob
 import           Data.Blob.IO
 import           Data.Language
@@ -33,7 +33,7 @@ projectName = T.pack . dropExtensions . takeFileName . projectRootDir
 projectExtensions :: Project -> [String]
 projectExtensions = extensionsForLanguage . projectLanguage
 
-projectFiles :: Project -> [File]
+projectFiles :: Project -> [File Language]
 projectFiles = fmap blobFile . projectBlobs
 
 readProjectFromPaths :: MonadIO m

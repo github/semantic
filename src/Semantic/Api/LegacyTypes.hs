@@ -15,7 +15,7 @@ module Semantic.Api.LegacyTypes
   ) where
 
 import Data.Aeson
-import Data.Blob hiding (File)
+import Data.Blob
 import Prologue
 
 newtype DiffTreeRequest = DiffTreeRequest { blobs :: [BlobPair] }

@@ -22,7 +22,7 @@ import           Control.Effect.Reader
 import           Control.Exception
 import           Control.Lens
 import           Data.Abstract.Declarations
-import           Data.Blob hiding (File)
+import           Data.Blob
 import           Data.ByteString.Builder
 import           Data.Language
 import           Data.ProtoLens (defMessage)

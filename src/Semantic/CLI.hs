@@ -5,7 +5,6 @@ module Semantic.CLI (main) where
 import qualified Analysis.File as File
 import qualified Control.Carrier.Parse.Measured as Parse
 import           Control.Carrier.Reader
-import           Data.Blob
 import           Data.Blob.IO
 import           Data.Either
 import qualified Data.Flag as Flag
@@ -186,7 +185,7 @@ languageModes = Language.PerLanguageModes
                     <> value Language.ALaCarte
                     <> showDefault)
 
-filePathReader :: ReadM File
+filePathReader :: ReadM (File.File Language.Language)
 filePathReader = File.fromPath <$> path
 
 path :: (Path.PartClass.FileDir fd) => ReadM (Path.AbsRel fd)

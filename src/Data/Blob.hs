@@ -6,11 +6,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 module Data.Blob
-( File
-, Analysis.File.fileBody
-, Analysis.File.filePath
-, Analysis.File.fromPath
-, Blob(..)
+( Blob(..)
 , Blobs(..)
 , blobLanguage
 , NoLanguageForBlob (..)

@@ -43,6 +43,7 @@ import Prelude hiding (readFile)
 import           Analysis.Abstract.Caching.FlowInsensitive
 import           Analysis.Abstract.Collecting
 import           Analysis.Abstract.Graph as Graph
+import           Analysis.File
 import           Control.Abstract hiding (String)
 import           Control.Abstract.PythonPackage as PythonPackage
 import           Control.Algebra
