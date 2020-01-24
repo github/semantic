@@ -40,6 +40,7 @@ data Language
     | TSX
     deriving (Eq, Generic, Ord, Read, Show, Bounded, Hashable, ToJSON, Enum)
 
+-- | Reifies a proxied type-level 'Language' to a value.
 class SLanguage (lang :: Language) where
   reflect :: proxy lang -> Language
 

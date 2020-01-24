@@ -42,8 +42,6 @@ import qualified System.FilePath as FP
 import qualified System.Path as Path
 import qualified System.Path.PartClass as Path.PartClass
 
-type File = Analysis.File.File Language
-
 -- | The source, path information, and language of a file read from disk.
 data Blob = Blob
   { blobSource :: Source -- ^ The UTF-8 encoded source text of the blob.
