@@ -1,9 +1,12 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Semantic.Spec (spec) where
 
-import Control.Carrier.Reader
-import Control.Exception (fromException)
-import SpecHelpers
+import           Analysis.File
+import           Control.Carrier.Reader
+import           Control.Exception (fromException)
+import           Source.Source (totalSpan)
+import           SpecHelpers
+import qualified System.Path as Path
 
 import Semantic.Api hiding (Blob)
 
@@ -14,7 +17,7 @@ setBlobLanguage lang b = b { blobFile = (blobFile b) { fileBody = lang }}
 spec :: Spec
 spec = do
   describe "parseBlob" $ do
-    let methodsBlob = makeBlob "def foo\nend\n" "methods.rb" Ruby mempty
+    let methodsBlob = sourceBlob "methods.rb" Ruby "def foo\nend\n"
 
     it "returns error if given an unknown language (json)" $ do
       output <- fmap runBuilder . runTaskOrDie . runReader defaultLanguageModes $ parseTermBuilder TermJSONTree [ setBlobLanguage Unknown methodsBlob ]

@@ -16,7 +16,6 @@ module Data.Blob
 , blobLanguage
 , NoLanguageForBlob (..)
 , blobPath
-, makeBlob
 , decodeBlobs
 , nullBlob
 , sourceBlob
@@ -42,7 +41,7 @@ import           Data.Edit
 import           Data.JSON.Fields
 import           Data.Language
 import           Data.Module
-import           Source.Source (Source)
+import           Source.Source (Source, totalSpan)
 import qualified Source.Source as Source
 import qualified System.FilePath as FP
 import qualified System.Path as Path
@@ -63,10 +62,6 @@ blobLanguage = Analysis.File.fileBody . blobFile
 blobPath :: Blob -> FilePath
 blobPath = Path.toString . Analysis.File.filePath . blobFile
 
-makeBlob :: Source -> FilePath -> Language -> Text -> Blob
-makeBlob s p l = Blob s (Analysis.File.File (Path.absRel p) lowerBound l)
-{-# INLINE makeBlob #-}
-
 newtype Blobs a = Blobs { blobs :: [a] }
   deriving (Generic, FromJSON)
 
@@ -79,13 +74,16 @@ instance FromJSON Blob where
 nullBlob :: Blob -> Bool
 nullBlob Blob{..} = Source.null blobSource
 
+
 sourceBlob :: FilePath -> Language -> Source -> Blob
-sourceBlob filepath language source = makeBlob source filepath language mempty
+sourceBlob filepath language source
+  = Blob source (Analysis.File.File (Path.absRel filepath) (totalSpan source) language) mempty
+
 
 inferringLanguage :: Source -> FilePath -> Language -> Blob
 inferringLanguage src pth lang
-  | knownLanguage lang = makeBlob src pth lang mempty
-  | otherwise = makeBlob src pth (languageForFilePath pth) mempty
+  = Blob src (Analysis.File.File (Path.absRel pth) (Source.totalSpan src) inferred) mempty
+  where inferred = if knownLanguage lang then lang else languageForFilePath pth
 
 decodeBlobs :: BL.ByteString -> Either String [Blob]
 decodeBlobs = fmap blobs <$> eitherDecode
