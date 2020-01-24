@@ -29,4 +29,4 @@ fileLanguage :: File a -> Language
 fileLanguage = languageForTypedPath . filePath
 
 fileForTypedPath :: Path.PartClass.AbsRel ar => Path.File ar -> File Language
-fileForTypedPath p = File (Path.absRel (Path.toString p)) lowerBound (languageForTypedPath p)
+fileForTypedPath p = File (Path.toAbsRel p) lowerBound (languageForTypedPath p)
