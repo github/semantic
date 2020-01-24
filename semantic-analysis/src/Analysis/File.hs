@@ -1,12 +1,14 @@
 {-# LANGUAGE DeriveTraversable #-}
 module Analysis.File
 ( File(..)
+, fileLanguage
 , fromBody
 ) where
 
-import Data.Maybe (fromJust, listToMaybe)
-import GHC.Stack
-import Source.Span
+import           Analysis.Language
+import           Data.Maybe (fromJust, listToMaybe)
+import           GHC.Stack
+import           Source.Span
 import qualified System.Path as Path
 
 data File a = File
@@ -19,3 +21,6 @@ data File a = File
 fromBody :: HasCallStack => a -> File a
 fromBody body = File (Path.absRel (srcLocFile srcLoc)) (spanFromSrcLoc srcLoc) body where
   srcLoc = snd (fromJust (listToMaybe (getCallStack callStack)))
+
+fileLanguage :: File a -> Language
+fileLanguage = languageForTypedPath . filePath

@@ -10,6 +10,7 @@ module Analysis.Language
   , extensionsForLanguage
   , knownLanguage
   , languageForFilePath
+  , languageForTypedPath
   , pathIsMinified
   , supportedExts
   , codeNavLanguages
@@ -107,6 +108,9 @@ languageForFilePath path =
   in case filter (not . spurious) allResults of
     [result] -> textToLanguage result
     _        -> Unknown
+
+languageForTypedPath :: Path.AbsRelFile -> Language
+languageForTypedPath = languageForFilePath . Path.toString
 
 supportedExts :: [String]
 supportedExts = foldr append mempty supportedLanguages
