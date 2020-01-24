@@ -72,5 +72,5 @@ executable semantic-ast
                      , aeson
                      , bytestring
                      , aeson-pretty
-  hs-source-dirs:      src
+  hs-source-dirs:      app
   default-language:    Haskell2010
