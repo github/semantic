@@ -285,6 +285,7 @@ library
                      , proto-lens-jsonpb
                      , proto-lens-runtime >= 0.5 && <0.7
                      , reducers ^>= 3.12.3
+                     , semantic-analysis
                      , semantic-go ^>= 0
                      , semantic-java ^>= 0
                      , semantic-json ^>= 0
