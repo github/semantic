@@ -21,8 +21,8 @@ spec = do
       readBlobFromFile (File (Path.absRel "/dev/doesnotexist") lowerBound Unknown) `shouldThrow` anyIOException
 
   describe "readBlobPairsFromHandle" $ do
-    let a = sourceBlob "method.rb" Ruby "def foo; end"
-    let b = sourceBlob "method.rb" Ruby "def bar(x); end"
+    let a = sourceBlob (Path.relFile "method.rb") Ruby "def foo; end"
+    let b = sourceBlob (Path.relFile "method.rb") Ruby "def bar(x); end"
     it "returns blobs for valid JSON encoded diff input" $ do
       blobs <- blobsFromFilePath "test/fixtures/cli/diff.json"
       blobs `shouldBe` [Compare a b]
