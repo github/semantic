@@ -163,13 +163,13 @@ data PerLanguageModes = PerLanguageModes
 
 defaultLanguageModes :: PerLanguageModes
 defaultLanguageModes = PerLanguageModes
-  { pythonMode = ALaCarte
-  , rubyMode = ALaCarte
-  , goMode = ALaCarte
-  , typescriptMode = ALaCarte
-  , tsxMode = ALaCarte
-  , javascriptMode = ALaCarte
-  , jsxMode = ALaCarte
+  { pythonMode = Precise
+  , rubyMode = Precise
+  , goMode = Precise
+  , typescriptMode = Precise
+  , tsxMode = Precise
+  , javascriptMode = Precise
+  , jsxMode = Precise
   }
 
 data LanguageMode
