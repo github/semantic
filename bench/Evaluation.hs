@@ -10,7 +10,6 @@ module Evaluation (benchmarks) where
 import           Control.Carrier.Parse.Simple
 import           Data.Abstract.Evaluatable
 import           Data.Bifunctor
-import           Data.Blob
 import           Data.Blob.IO (readBlobFromPath)
 import qualified Data.Duration as Duration
 import           "semantic" Data.Graph (topologicalSort)
