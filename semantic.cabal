@@ -59,7 +59,7 @@ common dependencies
                      , fused-effects-exceptions ^>= 1
                      , fused-effects-resumable ^>= 0.1
                      , hashable >= 1.2.7 && < 1.4
-                     , tree-sitter ^>= 0.8
+                     , tree-sitter ^>= 0.8.0.2
                      , mtl ^>= 2.2.2
                      , network ^>= 2.8.0.0
                      , pathtype ^>= 0.8.1
@@ -304,7 +304,7 @@ library
                      , unliftio-core ^>= 0.1.2.0
                      , unordered-containers ^>= 0.2.9.0
                      , vector ^>= 0.12.0.2
-                     , tree-sitter-go ^>= 0.4.1
+                     , tree-sitter-go ^>= 0.4.1.1
                      , tree-sitter-php ^>= 0.2
                      , tree-sitter-python ^>= 0.8.1
                      , tree-sitter-ruby ^>= 0.4.1
