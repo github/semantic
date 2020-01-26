@@ -4,8 +4,8 @@ module Semantic.IO.Spec (spec) where
 
 import Prelude hiding (readFile)
 
-import           Analysis.File
-import           Data.Blob
+import           Analysis.File as File
+import           Data.Blob as Blob
 import           Data.Handle
 import           SpecHelpers
 import qualified System.Path as Path
@@ -47,7 +47,7 @@ spec = do
     it "returns blobs for unsupported language" $ do
       h <- openFileForReading "test/fixtures/cli/diff-unsupported-language.json"
       blobs <- readBlobPairsFromHandle h
-      let b' = Blob.fromSource "test.kt" Unknown "fun main(args: Array<String>) {\nprintln(\"hi\")\n}\n"
+      let b' = Blob.fromSource (Path.relFile "test.kt") Unknown "fun main(args: Array<String>) {\nprintln(\"hi\")\n}\n"
       blobs `shouldBe` [Insert b']
 
     it "detects language based on filepath for empty language" $ do
@@ -70,7 +70,7 @@ spec = do
     it "returns blobs for valid JSON encoded parse input" $ do
       h <- openFileForReading "test/fixtures/cli/parse.json"
       blobs <- readBlobsFromHandle h
-      let a = Blob.fromSource "method.rb" Ruby "def foo; end"
+      let a = Blob.fromSource (Path.relFile "method.rb") Ruby "def foo; end"
       blobs `shouldBe` [a]
 
     it "throws on blank input" $ do

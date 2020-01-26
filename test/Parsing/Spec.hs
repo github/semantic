@@ -1,15 +1,16 @@
 {-# LANGUAGE TypeApplications #-}
 module Parsing.Spec (spec) where
 
-import Data.Blob
-import Data.ByteString.Char8 (pack)
-import Data.Duration
-import Data.Either
-import Data.Language
-import Parsing.TreeSitter
-import Source.Source
-import SpecHelpers
-import TreeSitter.JSON (Grammar, tree_sitter_json)
+import           Data.Blob
+import           Data.ByteString.Char8 (pack)
+import           Data.Duration
+import           Data.Either
+import           Data.Language
+import           Parsing.TreeSitter
+import           Source.Source
+import           SpecHelpers
+import qualified System.Path as Path
+import           TreeSitter.JSON (Grammar, tree_sitter_json)
 
 spec :: Spec
 spec = do

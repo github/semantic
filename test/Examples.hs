@@ -8,6 +8,7 @@
 {-# OPTIONS_GHC -Wno-unused-top-binds -Wno-unused-imports #-}
 module Main (main) where
 
+import qualified Analysis.File as File
 import           Control.Carrier.Parse.Measured
 import           Control.Carrier.Reader
 import           Control.Concurrent.Async (forConcurrently)
