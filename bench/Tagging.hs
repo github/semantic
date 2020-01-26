@@ -8,19 +8,19 @@ import           Control.Carrier.Parse.Measured
 import           Control.Carrier.Reader
 import           Control.Exception (throwIO)
 import           Control.Monad
-import           Data.Blob
 import           Data.Foldable
 import           Data.Language (LanguageMode (..), PerLanguageModes (..))
 import           Gauge
 import           System.FilePath.Glob
 import qualified System.Path as Path
 
-import Data.Flag
-import Proto.Semantic as P hiding (Blob, BlobPair)
-import Semantic.Api.Symbols (parseSymbols)
-import Semantic.Config as Config
-import Semantic.Task
-import Semantic.Task.Files
+import qualified Analysis.File as File
+import           Data.Flag
+import           Proto.Semantic as P hiding (Blob, BlobPair)
+import           Semantic.Api.Symbols (parseSymbols)
+import           Semantic.Config as Config
+import           Semantic.Task
+import           Semantic.Task.Files
 
 benchmarks :: Benchmark
 benchmarks = bgroup "tagging"

@@ -11,7 +11,7 @@ import           Control.Carrier.Parse.Simple
 import           Data.Abstract.Evaluatable
 import           Data.Bifunctor
 import           Data.Blob
-import           Data.Blob.IO (readBlobFromFile')
+import           Data.Blob.IO (readBlobFromPath)
 import qualified Data.Duration as Duration
 import           "semantic" Data.Graph (topologicalSort)
 import qualified Data.Language as Language
@@ -25,19 +25,21 @@ import           Semantic.Task (TaskSession (..), runTask, withOptions)
 import           Semantic.Util
 import           System.Path ((</>))
 import qualified System.Path as Path
+import qualified System.Path.PartClass as Path.PartClass
 
 -- Duplicating this stuff from Util to shut off the logging
 
 callGraphProject' :: ( Language.SLanguage lang
                      , HasPrelude lang
+                     , Path.PartClass.AbsRel ar
                      )
                   => TaskSession
                   -> Proxy lang
-                  -> Path.RelFile
+                  -> Path.File ar
                   -> IO (Either String ())
 callGraphProject' session proxy path
   | Just (SomeParser parser) <- parserForLanguage analysisParsers lang = fmap (bimap show (const ())) . runTask session $ do
-  blob <- readBlobFromPath path
+  blob <- readBlobFromPath (Path.toAbsRel path)
   package <- fmap snd <$> runParse (Duration.fromSeconds 10) (parsePackage parser (Project (Path.toString (Path.takeDirectory path)) [blob] lang []))
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   runCallGraph proxy False modules package
