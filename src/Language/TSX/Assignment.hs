@@ -1,4 +1,9 @@
-{-# LANGUAGE DataKinds, FlexibleContexts, OverloadedStrings, RankNTypes, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
 module Language.TSX.Assignment
 ( assignment
 , TSX.Syntax
@@ -6,12 +11,17 @@ module Language.TSX.Assignment
 , TSX.Term(..)
 ) where
 
-import Assigning.Assignment hiding (Assignment, Error)
-import Data.Abstract.Name (name)
-import qualified Data.Abstract.ScopeGraph as ScopeGraph (AccessControl(..))
+import           Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
-import Data.Sum
-import Data.Syntax
+import           Control.Monad
+import           Data.Abstract.Name (name)
+import qualified Data.Abstract.ScopeGraph as ScopeGraph (AccessControl (..))
+import           Data.Foldable
+import           Data.Function
+import           Data.List.NonEmpty (nonEmpty, some1)
+import           Data.Maybe
+import           Data.Sum
+import           Data.Syntax
     ( contextualize
     , emptyTerm
     , handleError
@@ -31,10 +41,9 @@ import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Language.TSX.Syntax as TSX.Syntax
+import           Language.TSX.Term as TSX
 import qualified Language.TypeScript.Resolution as TypeScript.Resolution
-import Language.TSX.Term as TSX
-import Prologue
-import TreeSitter.TSX as Grammar
+import           TreeSitter.TSX as Grammar
 
 type Assignment = Assignment.Assignment [] Grammar
 
@@ -567,11 +576,11 @@ importStatement =   makeImportTerm <$> symbol Grammar.ImportStatement <*> childr
     makeImportTerm1 loc from (Just alias, _) = makeTerm loc (TSX.Syntax.QualifiedAliasedImport alias from)
     makeImportTerm1 loc from (Nothing, symbols) = makeTerm loc (TSX.Syntax.Import (uncurry TSX.Syntax.Alias <$> symbols) from)
     makeImportTerm loc ([x], from) = makeImportTerm1 loc from x
-    makeImportTerm loc (xs, from) = makeTerm loc $ fmap (makeImportTerm1 loc from) xs
+    makeImportTerm loc (xs, from)  = makeTerm loc $ fmap (makeImportTerm1 loc from) xs
     importSymbol = symbol Grammar.ImportSpecifier *> children (makeNameAliasPair <$> rawIdentifier <*> ((Just <$> rawIdentifier) <|> pure Nothing))
     rawIdentifier = symbol Identifier *> (name <$> source)
     makeNameAliasPair from (Just alias) = (from, alias)
-    makeNameAliasPair from Nothing = (from, from)
+    makeNameAliasPair from Nothing      = (from, from)
 
     -- TODO: Need to validate that inline comments are still handled with this change in assigning to Path and not a Term.Term (Sum TSX.Syntax).
     fromClause = symbol Grammar.String *> (TypeScript.Resolution.importPath <$> source)
@@ -627,7 +636,7 @@ exportStatement = makeTerm <$> symbol Grammar.ExportStatement <*> children (flip
     exportSymbol = symbol Grammar.ExportSpecifier *> children (makeNameAliasPair <$> rawIdentifier <*> (Just <$> rawIdentifier))
                  <|> symbol Grammar.ExportSpecifier *> children (makeNameAliasPair <$> rawIdentifier <*> pure Nothing)
     makeNameAliasPair from (Just alias) = TSX.Syntax.Alias from alias
-    makeNameAliasPair from Nothing = TSX.Syntax.Alias from from
+    makeNameAliasPair from Nothing      = TSX.Syntax.Alias from from
     rawIdentifier = symbol Identifier *> (name <$> source)
     -- TODO: Need to validate that inline comments are still handled with this change in assigning to Path and not a Term.Term (Sum TSX.Syntax).
     fromClause = symbol Grammar.String *> (TypeScript.Resolution.importPath <$> source)

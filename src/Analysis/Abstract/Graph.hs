@@ -36,6 +36,7 @@ import           Data.Abstract.Module (Module (moduleInfo), ModuleInfo (..))
 import           Data.ByteString.Builder
 import           Data.Graph
 import           Data.Graph.ControlFlowVertex
+import           Data.Map (Map)
 import qualified Data.Map as Map
 import qualified Data.Text.Encoding as T
 import           Source.Loc
@@ -131,7 +132,7 @@ graphingModules recur m = do
   where
     -- NB: path is null for Languages like Ruby that have module imports that require concrete value semantics.
     includeModule path
-      = let path' = if Prologue.null path then "unknown, concrete semantics required" else path
+      = let path' = if Prelude.null path then "unknown, concrete semantics required" else path
             info = moduleInfo m
       in moduleInclusion (moduleVertex (ModuleInfo path' (moduleLanguage info) (moduleOid info)))
 

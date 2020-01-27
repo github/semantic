@@ -1,11 +1,19 @@
-{-# LANGUAGE DeriveAnyClass, DeriveGeneric, DeriveTraversable, DuplicateRecordFields, FlexibleContexts #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE FlexibleContexts #-}
 module Language.PHP.Syntax (module Language.PHP.Syntax) where
 
-import Prologue hiding (Text)
-
 import           Control.Lens.Getter
+import           Data.Functor.Classes
+import           Data.Functor.Classes.Generic
+import           Data.Hashable.Lifted
+import           Data.List.NonEmpty (NonEmpty (..))
 import qualified Data.Map.Strict as Map
+import           Data.Maybe.Exts
 import qualified Data.Text as T
+import           GHC.Generics (Generic1)
 
 import           Control.Abstract as Abstract
 import           Data.Abstract.BaseError

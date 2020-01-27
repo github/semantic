@@ -1,22 +1,37 @@
-{-# LANGUAGE DeriveAnyClass, DeriveGeneric, DeriveTraversable, DuplicateRecordFields, FlexibleContexts, OverloadedStrings, RecordWildCards, TupleSections, TypeApplications #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TupleSections #-}
+{-# LANGUAGE TypeApplications #-}
 module Language.Ruby.Syntax (module Language.Ruby.Syntax) where
 
-import Prologue
-
 import           Control.Abstract as Abstract hiding (Load, String)
+import           Control.Monad
 import           Data.Abstract.BaseError
 import           Data.Abstract.Evaluatable
 import qualified Data.Abstract.Module as M
 import           Data.Abstract.Name as Name
 import           Data.Abstract.Path
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
+import           Data.Functor.Classes
+import           Data.Functor.Classes.Generic
+import           Data.Hashable.Lifted
 import           Data.JSON.Fields
 import qualified Data.Language as Language
+import           Data.List.NonEmpty (nonEmpty)
 import qualified Data.Map.Strict as Map
+import           Data.Maybe.Exts
 import           Data.Semigroup.App
 import           Data.Semigroup.Foldable
+import           Data.Text (Text)
 import qualified Data.Text as T
+import           Data.Traversable (for)
 import           Diffing.Algorithm
+import           GHC.Generics (Generic1)
 import           System.FilePath.Posix
 
 -- TODO: Fully sort out ruby require/load mechanics
