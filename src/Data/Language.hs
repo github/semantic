@@ -1,4 +1,9 @@
-{-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric, KindSignatures, LambdaCase, OverloadedStrings #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE OverloadedStrings #-}
 module Data.Language
   ( Language (..)
   , SLanguage (..)
@@ -16,10 +21,11 @@ module Data.Language
   ) where
 
 import           Data.Aeson
+import           Data.Hashable
 import qualified Data.Languages as Lingo
-import qualified Data.Text as T
 import qualified Data.Map.Strict as Map
-import           Prologue
+import qualified Data.Text as T
+import           GHC.Generics (Generic)
 import           System.FilePath.Posix
 
 -- | The various languages we support.
@@ -151,13 +157,13 @@ textToLanguage = \case
 
 
 data PerLanguageModes = PerLanguageModes
-  { pythonMode :: LanguageMode
-  , rubyMode   :: LanguageMode
-  , goMode     :: LanguageMode
+  { pythonMode     :: LanguageMode
+  , rubyMode       :: LanguageMode
+  , goMode         :: LanguageMode
   , typescriptMode :: LanguageMode
-  , tsxMode :: LanguageMode
+  , tsxMode        :: LanguageMode
   , javascriptMode :: LanguageMode
-  , jsxMode :: LanguageMode
+  , jsxMode        :: LanguageMode
   }
   deriving (Eq, Ord, Show)
 
