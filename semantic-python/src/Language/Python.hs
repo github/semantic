@@ -5,12 +5,12 @@ module Language.Python
 ) where
 
 import           Data.Proxy
+import qualified Language.Python.AST as Py
 import           Language.Python.ScopeGraph
 import qualified Language.Python.Tags as PyTags
 import           ScopeGraph.Convert
 import qualified Tags.Tagging.Precise as Tags
 import qualified TreeSitter.Python (tree_sitter_python)
-import qualified TreeSitter.Python.AST as Py
 import qualified TreeSitter.Unmarshal as TS
 
 newtype Term a = Term { getTerm :: Py.Module a }

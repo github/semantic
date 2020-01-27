@@ -3,7 +3,7 @@
 module Main (main) where
 
 import TreeSitter.Unmarshal
-import qualified TreeSitter.Python.AST as AST
+import qualified Language.Python.AST as AST
 import qualified TreeSitter.Python as Python
 import Source.Range
 import Source.Span

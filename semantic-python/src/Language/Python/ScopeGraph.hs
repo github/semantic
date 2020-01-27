@@ -29,10 +29,10 @@ import           Data.Name
 import           GHC.Generics
 import           GHC.Records
 import           GHC.TypeLits
+import qualified Language.Python.AST as Py
 import           Language.Python.Patterns
 import           ScopeGraph.Convert (Result (..), complete, todo)
 import           Source.Loc
-import qualified TreeSitter.Python.AST as Py
 
 -- This orphan instance will perish once it lands in fused-effects.
 instance Algebra sig m => Algebra sig (Ap m) where

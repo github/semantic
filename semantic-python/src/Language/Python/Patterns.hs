@@ -11,7 +11,7 @@ module Language.Python.Patterns
 import           AST.Element
 import           Data.Coerce
 import           Data.Text (Text)
-import qualified TreeSitter.Python.AST as Py
+import qualified Language.Python.AST as Py
 
 -- | Useful pattern synonym for extracting a single identifier from
 -- a Python ExpressionList. Easier than pattern-matching every time.

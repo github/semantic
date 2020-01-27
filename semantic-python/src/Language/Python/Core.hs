@@ -33,12 +33,12 @@ import           Data.Function
 import           Data.List.NonEmpty (NonEmpty (..))
 import           Data.Maybe
 import           GHC.Records
+import qualified Language.Python.AST as Py
 import           Language.Python.Failure
 import           Language.Python.Patterns
 import           Source.Span (Span)
 import           Syntax.Stack (Stack (..))
 import qualified Syntax.Stack as Stack
-import qualified TreeSitter.Python.AST as Py
 
 -- | Keeps track of the current scope's bindings (so that we can, when
 -- compiling a class or module, return the list of bound variables as

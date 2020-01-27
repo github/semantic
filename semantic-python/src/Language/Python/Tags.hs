@@ -16,12 +16,12 @@ import           Data.List.NonEmpty (NonEmpty (..))
 import           Data.Maybe (listToMaybe)
 import           Data.Text as Text
 import           GHC.Generics
+import qualified Language.Python.AST as Py
 import           Source.Loc
 import           Source.Range
 import           Source.Source as Source
 import           Tags.Tag
 import qualified Tags.Tagging.Precise as Tags
-import qualified TreeSitter.Python.AST as Py
 import           TreeSitter.Token
 
 class ToTags t where
