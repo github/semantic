@@ -18,4 +18,4 @@ import           Prelude hiding (False, Float, Integer, Rational, String, True)
 import           TreeSitter.GenerateSyntax
 import qualified TreeSitter.Go as Grammar
 
-astDeclarationsForLanguage Grammar.tree_sitter_go "../../vendor/tree-sitter-go/src/node-types.json"
+astDeclarationsForLanguage Grammar.tree_sitter_go "../../../vendor/tree-sitter-go/src/node-types.json"
