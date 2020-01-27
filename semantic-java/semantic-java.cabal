@@ -21,12 +21,14 @@ tested-with:         GHC == 8.6.5
 library
   exposed-modules:
     Language.Java
+    Language.Java.AST
     Language.Java.Tags
   build-depends:
       base              >= 4.13 && < 5
     , fused-effects    ^>= 1.0
     , semantic-source  ^>= 0.0.1
     , semantic-tags    ^>= 0.0
+    , template-haskell ^>= 2.15
     , tree-sitter      ^>= 0.8
     , tree-sitter-java ^>= 0.6.1
   hs-source-dirs:      src
