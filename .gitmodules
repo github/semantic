@@ -10,3 +10,6 @@
 [submodule "semantic-go/vendor/tree-sitter-go"]
 	path = semantic-go/vendor/tree-sitter-go
 	url = https://github.com/tree-sitter/tree-sitter-go.git
+[submodule "semantic-ruby/vendor/tree-sitter-ruby"]
+	path = semantic-ruby/vendor/tree-sitter-ruby
+	url = https://github.com/tree-sitter/tree-sitter-ruby.git
