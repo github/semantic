@@ -11,12 +11,12 @@ module Language.Java.Tags
 import           Control.Effect.Reader
 import           Control.Effect.Writer
 import           GHC.Generics
+import qualified Language.Java.AST as Java
 import           Source.Loc
 import           Source.Range
 import           Source.Source as Source
 import           Tags.Tag
 import qualified Tags.Tagging.Precise as Tags
-import qualified TreeSitter.Java.AST as Java
 import           TreeSitter.Token
 
 class ToTags t where
