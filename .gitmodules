@@ -7,3 +7,6 @@
 [submodule "semantic-java/vendor/tree-sitter-java"]
 	path = semantic-java/vendor/tree-sitter-java
 	url = https://github.com/tree-sitter/tree-sitter-java.git
+[submodule "semantic-go/vendor/tree-sitter-go"]
+	path = semantic-go/vendor/tree-sitter-go
+	url = https://github.com/tree-sitter/tree-sitter-go.git
