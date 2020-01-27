@@ -1,4 +1,8 @@
-{-# LANGUAGE GADTs, StandaloneDeriving, RankNTypes, TypeApplications #-}
+{-# LANGUAGE ExistentialQuantification #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE TypeApplications #-}
 
 module Data.Abstract.Number
     ( Number (..)
@@ -9,10 +13,10 @@ module Data.Abstract.Number
     , liftedFloorDiv
     ) where
 
-import Data.Scientific
+import           Data.Function (on)
+import           Data.Scientific
+import           Prelude hiding (Integer)
 import qualified Prelude
-import Prelude hiding (Integer)
-import Prologue
 
 -- | A generalized number type that unifies all interpretable numeric types.
 --   This is a GADT, so you can specialize the 'a' parameter and be confident
@@ -34,13 +38,13 @@ deriving instance Eq a => Eq (Number a)
 
 instance Show (Number a) where
   show (Integer i) = show i
-  show (Ratio r) = show r
+  show (Ratio r)   = show r
   show (Decimal d) = show d
 
 -- | Every 'Number' can be coerced to a 'Scientific'. Used in the 'Ord' instance.
 toScientific :: Number a -> Scientific
 toScientific (Integer i) = fromInteger i
-toScientific (Ratio r) = fromRational r
+toScientific (Ratio r)   = fromRational r
 toScientific (Decimal s) = s
 
 instance Eq a => Ord (Number a) where compare = compare `on` toScientific
