@@ -1,4 +1,9 @@
-{-# LANGUAGE AllowAmbiguousTypes, DataKinds, FlexibleContexts, PartialTypeSignatures, TypeApplications, TypeOperators #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE PartialTypeSignatures #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeOperators #-}
 {-# OPTIONS_GHC -Wno-missing-signatures -Wno-missing-exported-signatures -Wno-partial-type-signatures -O0 #-}
 module Semantic.Util
   ( evaluateProject'
@@ -13,13 +18,15 @@ import Prelude hiding (readFile)
 
 import           Control.Abstract
 import           Control.Carrier.Fresh.Strict
-import           Control.Carrier.Parse.Simple
 import           Control.Carrier.Lift
-import           Control.Carrier.Trace.Printing
+import           Control.Carrier.Parse.Simple
 import           Control.Carrier.Reader
 import           Control.Carrier.Resumable.Either (SomeError (..))
 import           Control.Carrier.State.Strict
+import           Control.Carrier.Trace.Printing
+import           Control.Exception hiding (evaluate)
 import           Control.Lens.Getter
+import           Control.Monad
 import           Data.Abstract.Address.Precise as Precise
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
@@ -31,15 +38,16 @@ import           Data.Blob.IO
 import           Data.Graph (topologicalSort)
 import qualified Data.Language as Language
 import           Data.List (uncons)
+import           Data.Maybe
 import           Data.Project
-import           Data.Sum (weaken)
+import           Data.Semilattice.Lower
+import           Data.Sum
 import           Parsing.Parser
-import           Prologue
 import           Semantic.Analysis
 import           Semantic.Config
 import           Semantic.Graph
 import           Semantic.Task
-import           Source.Span (HasSpan(..))
+import           Source.Span (HasSpan (..))
 import           System.Exit (die)
 import           System.FilePath.Posix (takeDirectory)
 

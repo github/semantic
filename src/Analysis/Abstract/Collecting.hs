@@ -4,7 +4,7 @@ module Analysis.Abstract.Collecting
 
 import Control.Abstract
 import Control.Carrier.Reader
-import Prologue
+import Data.Semilattice.Lower
 
 providingLiveSet :: Evaluator term address value (ReaderC (Live address) m) a -> Evaluator term address value m a
 providingLiveSet = raiseHandler (runReader lowerBound)

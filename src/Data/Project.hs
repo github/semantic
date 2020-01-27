@@ -7,14 +7,15 @@ module Data.Project
   ) where
 
 import Prelude hiding (readFile)
-import Prologue
 
+import           Control.Monad.IO.Class
 import           Data.Blob
 import           Data.Blob.IO
 import           Data.Language
+import           Data.Text (Text)
 import qualified Data.Text as T
-import           System.FilePath.Posix
 import           Semantic.IO
+import           System.FilePath.Posix
 import qualified System.Path as Path
 
 -- | A 'Project' contains all the information that semantic needs

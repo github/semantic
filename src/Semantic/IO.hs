@@ -1,12 +1,16 @@
-{-# LANGUAGE DuplicateRecordFields, GADTs, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Semantic.IO
   ( isDirectory
   , findFilesInDir
   ) where
 
 import Prelude hiding (readFile)
-import Prologue
 
+import           Control.Monad.IO.Class
 import           Data.Language
 import           System.Directory (doesDirectoryExist)
 import           System.Directory.Tree (AnchoredDirTree (..))

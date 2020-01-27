@@ -1,4 +1,13 @@
-{-# LANGUAGE DerivingVia, FlexibleContexts, FlexibleInstances, LambdaCase, MultiParamTypeClasses, OverloadedStrings, RankNTypes, ScopedTypeVariables, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE DerivingVia #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Analysis.Abstract.Graph
 ( Graph(..)
 , ControlFlowVertex(..)
@@ -17,7 +26,7 @@ module Analysis.Abstract.Graph
 ) where
 
 import           Algebra.Graph.Export.Dot hiding (vertexName)
-import           Control.Abstract hiding (Function(..))
+import           Control.Abstract hiding (Function (..))
 import           Control.Algebra
 import           Control.Carrier.Reader
 import           Control.Carrier.State.Strict
@@ -29,7 +38,6 @@ import           Data.Graph
 import           Data.Graph.ControlFlowVertex
 import qualified Data.Map as Map
 import qualified Data.Text.Encoding as T
-import           Prologue
 import           Source.Loc
 
 style :: Style ControlFlowVertex Builder

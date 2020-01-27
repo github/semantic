@@ -29,15 +29,19 @@ module Data.Blob
 , pathKeyForBlobPair
 ) where
 
-import Prologue
-
 import           Control.Effect.Error
+import           Control.Exception
 import           Data.Aeson
+import           Data.Bifunctor
 import qualified Data.ByteString.Lazy as BL
 import           Data.Edit
 import           Data.JSON.Fields
 import           Data.Language
+import           Data.Maybe
+import           Data.Maybe.Exts
 import           Data.Module
+import           Data.Text (Text)
+import           GHC.Generics (Generic)
 import           Source.Source (Source)
 import qualified Source.Source as Source
 import qualified System.FilePath as FP
@@ -124,7 +128,7 @@ instance FromJSON BlobPair where
     >>= maybeM (Prelude.fail "Expected object with 'before' and/or 'after' keys only")
 
 maybeBlobPair :: MonadFail m => Maybe Blob -> Maybe Blob -> m BlobPair
-maybeBlobPair a b = maybeM (Prologue.fail "expected file pair with content on at least one side") (fromMaybes a b)
+maybeBlobPair a b = maybeM (fail "expected file pair with content on at least one side") (fromMaybes a b)
 
 languageForBlobPair :: BlobPair -> Language
 languageForBlobPair = mergeEdit combine . bimap blobLanguage blobLanguage where
