@@ -4,3 +4,6 @@
 [submodule "semantic-python/vendor/tree-sitter-python"]
 	path = semantic-python/vendor/tree-sitter-python
 	url = https://github.com/tree-sitter/tree-sitter-python.git
+[submodule "semantic-java/vendor/tree-sitter-java"]
+	path = semantic-java/vendor/tree-sitter-java
+	url = https://github.com/tree-sitter/tree-sitter-java.git
