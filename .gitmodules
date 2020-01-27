@@ -16,3 +16,6 @@
 [submodule "semantic-typescript/vendor/tree-sitter-typescript"]
 	path = semantic-typescript/vendor/tree-sitter-typescript
 	url = https://github.com/tree-sitter/tree-sitter-typescript.git
+[submodule "languages/tsx/vendor/tree-sitter-typescript"]
+	path = languages/tsx/vendor/tree-sitter-typescript
+	url = https://github.com/tree-sitter/tree-sitter-typescript.git
