@@ -1,15 +1,21 @@
-{-# LANGUAGE FlexibleInstances, GeneralizedNewtypeDeriving, MultiParamTypeClasses, OverloadedStrings, UndecidableInstances #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Control.Abstract.PythonPackage
 ( runPythonPackaging, Strategy(..) ) where
 
 import           Control.Abstract as Abstract
 import           Control.Algebra
 import           Control.Effect.Sum.Project
+import           Control.Monad
 import           Data.Abstract.Name (name)
 import           Data.Abstract.Path (stripQuotes)
 import           Data.Abstract.Value.Concrete (Value (..))
 import qualified Data.Map as Map
-import           Prologue
+import           Data.Semilattice.Lower
+import           Data.Text (Text)
 
 data Strategy = Unknown | Packages [Text] | FindPackages [Text]
   deriving (Show, Eq)

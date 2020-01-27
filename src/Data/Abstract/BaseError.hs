@@ -1,14 +1,16 @@
-{-# LANGUAGE FlexibleContexts, KindSignatures, RecordWildCards #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE RecordWildCards #-}
 module Data.Abstract.BaseError (
   BaseError(..)
 , throwBaseError
 )
 where
 
-import Control.Abstract.Context
-import Control.Abstract.Evaluator
+import           Control.Abstract.Context
+import           Control.Abstract.Evaluator
 import qualified Data.Abstract.Module as M
-import Prologue
+import           Data.Functor.Classes
 import qualified Source.Span as S
 
 data BaseError (exc :: * -> *) resume = BaseError { baseErrorModuleInfo :: ModuleInfo, baseErrorSpan :: Span, baseErrorException :: exc resume }
