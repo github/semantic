@@ -21,6 +21,7 @@ tested-with:         GHC == 8.6.5
 library
   exposed-modules:
     Language.JSON
+    Language.JSON.AST
   build-depends:
       base              >= 4.13 && < 5
     , semantic-tags    ^>= 0.0
