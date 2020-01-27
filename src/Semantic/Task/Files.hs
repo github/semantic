@@ -1,6 +1,15 @@
-{-# LANGUAGE DataKinds, DeriveFunctor, ExistentialQuantification, FlexibleContexts, FlexibleInstances, GADTs,
-             GeneralizedNewtypeDeriving, KindSignatures, MultiParamTypeClasses, StandaloneDeriving, TypeOperators,
-             UndecidableInstances #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE ExistentialQuantification #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 module Semantic.Task.Files
   ( Files
@@ -20,6 +29,8 @@ module Semantic.Task.Files
 
 import           Control.Algebra
 import           Control.Effect.Error
+import           Control.Exception
+import           Control.Monad.IO.Class
 import           Data.Blob
 import           Data.Blob.IO
 import qualified Data.ByteString.Builder as B
@@ -27,7 +38,6 @@ import           Data.Handle
 import           Data.Language
 import           Data.Project
 import           Prelude hiding (readFile)
-import           Prologue hiding (catch)
 import           Semantic.IO
 import qualified System.IO as IO hiding (withBinaryFile)
 import qualified System.Path as Path
