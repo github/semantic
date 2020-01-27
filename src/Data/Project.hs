@@ -57,5 +57,5 @@ readProjectFromPaths maybeRoot path lang excludeDirs = do
   blobs <- liftIO $ traverse (readBlobFromFile' . toFile) paths
   pure $ Project (Path.toString rootDir) blobs lang (fmap Path.toString excludeDirs)
   where
-    toFile path = Analysis.File.File path lowerBound lang
+    toFile path = File path lowerBound lang
     exts = extensionsForLanguage lang
