@@ -50,14 +50,6 @@ data Pos = Pos
   }
 ```
 
-### Split up imports into logical groups.
-
-We use the following convention, each section separated by a newline:
-
-1. Prelude/Prologue import
-2. Library/stdlib imports
-3. Local in-project imports.
-
 ### Align typographical symbols.
 
 `->` in `case` statements and signatures, `=` in functions, and `::` in records should be aligned. Your editor can help with this. In certain situations, aligning symbols may decrease readability, e.g. complicated `case` statements. Use your best judgment.
