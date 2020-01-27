@@ -27,6 +27,7 @@ common haskell
                      , semantic-core ^>= 0.0
                      , semantic-source ^>= 0.0.1
                      , semantic-tags ^>= 0.0
+                     , template-haskell ^>= 2.15
                      , text ^>= 1.2.3
                      , tree-sitter ^>= 0.8
                      , tree-sitter-ruby ^>= 0.4.1
@@ -50,5 +51,6 @@ library
   import: haskell
   exposed-modules:
     Language.Ruby
+    Language.Ruby.AST
     Language.Ruby.Tags
   hs-source-dirs: src
