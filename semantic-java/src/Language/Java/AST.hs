@@ -18,4 +18,4 @@ import           TreeSitter.GenerateSyntax
 import qualified TreeSitter.Java as Grammar
 import           TreeSitter.Token
 
-astDeclarationsForLanguage Grammar.tree_sitter_java "../../vendor/tree-sitter-java/src/node-types.json"
+astDeclarationsForLanguage Grammar.tree_sitter_java "../../../vendor/tree-sitter-java/src/node-types.json"
