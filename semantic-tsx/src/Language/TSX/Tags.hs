@@ -15,12 +15,12 @@ import           Control.Effect.Writer
 import           Data.Foldable
 import           Data.Text as Text
 import           GHC.Generics
+import qualified Language.TSX.AST as Tsx
 import           Source.Loc
 import           Source.Source as Source
 import           Tags.Tag
 import qualified Tags.Tagging.Precise as Tags
 import           TreeSitter.Token
-import qualified TreeSitter.TSX.AST as Tsx
 
 class ToTags t where
   tags
