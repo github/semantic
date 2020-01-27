@@ -29,6 +29,7 @@ common haskell
                      , semantic-tags ^>= 0.0
                      , semantic-scope-graph ^>= 0.0
                      , semilattices ^>= 0
+                     , template-haskell ^>= 2.15
                      , text ^>= 1.2.3
                      , tree-sitter ^>= 0.8
                      , tree-sitter-python ^>= 0.8.1
@@ -53,6 +54,7 @@ library
   import: haskell
   exposed-modules:
     Language.Python
+    Language.Python.AST
     Language.Python.Core
     Language.Python.Failure
     Language.Python.Patterns
