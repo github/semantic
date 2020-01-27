@@ -88,7 +88,6 @@ parseSymbols blobs = do
           & P.language .~ (bridging # blobLanguage')
           & P.symbols .~ mempty
           & P.errors .~ [defMessage & P.error .~ pack e]
-          & P.blobOid .~ mempty
 
         tagsToFile :: [Tag] -> File
         tagsToFile tags = defMessage
@@ -96,7 +95,6 @@ parseSymbols blobs = do
           & P.language .~ (bridging # blobLanguage')
           & P.symbols .~ fmap tagToSymbol tags
           & P.errors .~ mempty
-          & P.blobOid .~ mempty
 
         tagToSymbol :: Tag -> Symbol
         tagToSymbol Tag{..} = defMessage
