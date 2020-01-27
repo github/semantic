@@ -12,7 +12,17 @@ identify a new syntax as Taggable, you need to:
 constructor name of this syntax.
 
 -}
-{-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, DataKinds, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, RecordWildCards, ScopedTypeVariables, TypeApplications, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE ConstraintKinds #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Tags.Taggable
 ( Tagger
 , Token(..)
@@ -23,18 +33,19 @@ module Tags.Taggable
 )
 where
 
-import Prologue
-
 import Analysis.ConstructorName
 import Analysis.HasTextElement
 import Data.Abstract.Declarations
 import Data.Abstract.Name
+import Data.Algebra
+import Data.Foldable
+import Data.Functor.Foldable
 import Data.Language
+import Data.Sum
 import Data.Term
 import Data.Text hiding (empty)
 import Source.Loc as Loc
 import Source.Range
-
 import Streaming hiding (Sum)
 import Streaming.Prelude (yield)
 
@@ -206,11 +217,11 @@ instance TaggableBy 'Custom Ruby.Class where
 
 instance TaggableBy 'Custom Ruby.Module where
   snippet' ann (Ruby.Module _ (body:_)) = subtractLoc ann (termAnnotation body)
-  snippet' ann (Ruby.Module _ _)                    = byteRange ann
+  snippet' ann (Ruby.Module _ _)        = byteRange ann
   symbolName' = declaredName . Ruby.moduleIdentifier
 
 instance TaggableBy 'Custom TypeScript.Module where
-  snippet' ann (TypeScript.Module _ (body:_)) = subtractLoc ann (termAnnotation body)
+  snippet' ann (TypeScript.Module _ (body:_))             = subtractLoc ann (termAnnotation body)
   snippet' ann (TypeScript.Module _ _                   ) = byteRange ann
   symbolName' = declaredName . TypeScript.moduleIdentifier
 
@@ -220,5 +231,5 @@ instance TaggableBy 'Custom Expression.Call where
 
 instance TaggableBy 'Custom Ruby.Send where
   snippet' ann (Ruby.Send _ _ _ (Just body)) = subtractLoc ann (termAnnotation body)
-  snippet' ann _                                           = byteRange ann
+  snippet' ann _                             = byteRange ann
   symbolName' Ruby.Send{..} = declaredName =<< sendSelector
