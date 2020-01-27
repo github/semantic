@@ -42,6 +42,7 @@ common haskell
 library
   import: haskell
   exposed-modules:
+    Source.Language
     Source.Loc
     Source.Range
     Source.Source
