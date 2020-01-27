@@ -18,4 +18,4 @@ import           Prelude hiding (False, Float, Integer, Rational, String, True)
 import           TreeSitter.GenerateSyntax
 import qualified TreeSitter.Ruby as Grammar
 
-astDeclarationsForLanguage Grammar.tree_sitter_ruby "../../vendor/tree-sitter-ruby/src/node-types.json"
+astDeclarationsForLanguage Grammar.tree_sitter_ruby "../../../vendor/tree-sitter-ruby/src/node-types.json"
