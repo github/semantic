@@ -5,9 +5,9 @@ module Language.JSON
 ) where
 
 import           Data.Proxy
+import qualified Language.JSON.AST as JSON
 import qualified Tags.Tagging.Precise as Tags
 import qualified TreeSitter.JSON (tree_sitter_json)
-import qualified TreeSitter.JSON.AST as JSON
 import qualified TreeSitter.Unmarshal as TS
 
 newtype Term a = Term { getTerm :: JSON.Document a }
