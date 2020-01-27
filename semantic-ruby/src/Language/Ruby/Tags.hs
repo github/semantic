@@ -19,12 +19,12 @@ import           Control.Monad
 import           Data.Foldable
 import           Data.Text as Text
 import           GHC.Generics
+import qualified Language.Ruby.AST as Rb
 import           Source.Loc
 import           Source.Range as Range
 import           Source.Source as Source
 import           Tags.Tag
 import qualified Tags.Tagging.Precise as Tags
-import qualified TreeSitter.Ruby.AST as Rb
 import           TreeSitter.Token
 import qualified TreeSitter.Unmarshal as TS
 
