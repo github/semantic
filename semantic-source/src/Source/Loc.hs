@@ -7,13 +7,13 @@ module Source.Loc
 ) where
 
 import Control.DeepSeq (NFData)
+import Data.Aeson (ToJSON(..), object, (.=))
 import Data.Hashable (Hashable)
 import Data.Monoid.Generic
 import GHC.Generics (Generic)
 import Prelude hiding (span)
 import Source.Range
 import Source.Span
-import Data.Aeson (ToJSON(..), object, (.=))
 
 data Loc = Loc
   { byteRange :: {-# UNPACK #-} !Range
