@@ -38,6 +38,10 @@ common haskell
 library
   import:              haskell
   exposed-modules:     Marshal.JSON
+                       AST.Deserialize
+                       AST.GenerateSyntax
+                       AST.Token
+                       AST.Unmarshal
 
   -- other-modules:
   -- other-extensions:
