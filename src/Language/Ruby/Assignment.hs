@@ -35,7 +35,7 @@ import qualified Data.Syntax.Statement as Statement
 import qualified Data.Text as Text
 import qualified Language.Ruby.Syntax as Ruby.Syntax
 import           Language.Ruby.Term as Ruby
-import           TreeSitter.Ruby as Grammar
+import           Language.Ruby.Grammar as Grammar
 
 type Assignment = Assignment.Assignment [] Grammar
 

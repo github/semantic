@@ -52,5 +52,6 @@ library
   exposed-modules:
     Language.Ruby
     Language.Ruby.AST
+    Language.Ruby.Grammar
     Language.Ruby.Tags
   hs-source-dirs: src
