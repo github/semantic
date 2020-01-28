@@ -13,7 +13,7 @@ import qualified Language.Ruby.AST as Rb
 import qualified Language.Ruby.Tags as RbTags
 import qualified Tags.Tagging.Precise as Tags
 import qualified TreeSitter.Ruby (tree_sitter_ruby)
-import qualified TreeSitter.Unmarshal as TS
+import qualified AST.Unmarshal as TS
 
 newtype Term a = Term { getTerm :: Rb.Program a }
 

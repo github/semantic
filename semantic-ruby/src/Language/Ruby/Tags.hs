@@ -25,8 +25,8 @@ import           Source.Range as Range
 import           Source.Source as Source
 import           Tags.Tag
 import qualified Tags.Tagging.Precise as Tags
-import           TreeSitter.Token
-import qualified TreeSitter.Unmarshal as TS
+import           AST.Token
+import qualified AST.Unmarshal as TS
 
 class ToTags t where
   tags
