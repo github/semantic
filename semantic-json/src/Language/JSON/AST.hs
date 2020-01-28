@@ -14,7 +14,7 @@ module Language.JSON.AST
 ) where
 
 import           Prelude hiding (String)
-import           TreeSitter.GenerateSyntax
+import           AST.GenerateSyntax
 import qualified TreeSitter.JSON as Grammar
 
 astDeclarationsForLanguage Grammar.tree_sitter_json "../../../vendor/tree-sitter-json/src/node-types.json"
