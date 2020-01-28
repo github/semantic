@@ -28,7 +28,7 @@ import           Data.Abstract.Package
 import           Data.Abstract.Value.Concrete as Concrete
 import           Data.Blob
 import           Data.Blob.IO
-import           Data.Graph (topologicalSort)
+import           Data.Graph.Algebraic (topologicalSort)
 import qualified Data.Language as Language
 import           Data.List (uncons)
 import           Data.Project

@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GADTs, OverloadedStrings, PackageImports, TypeApplications #-}
+{-# LANGUAGE DataKinds, GADTs, OverloadedStrings, TypeApplications #-}
 
 module Graphing.Calls.Spec ( spec ) where
 
@@ -8,7 +8,7 @@ import SpecHelpers
 import Algebra.Graph
 
 import           Control.Effect.Parse
-import           "semantic" Data.Graph (Graph (..), topologicalSort)
+import           Data.Graph.Algebraic (Graph (..), topologicalSort)
 import           Data.Graph.ControlFlowVertex
 import qualified Data.Language as Language
 import           Semantic.Graph

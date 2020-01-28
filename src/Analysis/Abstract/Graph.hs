@@ -25,7 +25,7 @@ import           Control.Effect.Sum.Project
 import           Data.Abstract.BaseError
 import           Data.Abstract.Module (Module (moduleInfo), ModuleInfo (..))
 import           Data.ByteString.Builder
-import           Data.Graph
+import           Data.Graph.Algebraic
 import           Data.Graph.ControlFlowVertex
 import qualified Data.Map as Map
 import qualified Data.Text.Encoding as T

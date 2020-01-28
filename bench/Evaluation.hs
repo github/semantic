@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, FlexibleContexts, PackageImports, PartialTypeSignatures, TypeApplications, TypeFamilies #-}
+{-# LANGUAGE DataKinds, FlexibleContexts, PartialTypeSignatures, TypeApplications, TypeFamilies #-}
 
 module Evaluation (benchmarks) where
 
@@ -8,7 +8,7 @@ import           Data.Abstract.Evaluatable
 import           Data.Blob
 import           Data.Blob.IO (readBlobFromFile')
 import           Data.Bifunctor
-import           "semantic" Data.Graph (topologicalSort)
+import           Data.Graph.Algebraic (topologicalSort)
 import qualified Data.Language as Language
 import           Data.Project
 import           Data.Proxy

@@ -150,7 +150,7 @@ library
                      , Data.Error
                      , Data.Flag
                      , Data.Functor.Classes.Generic
-                     , Data.Graph
+                     , Data.Graph.Algebraic
                      , Data.Graph.ControlFlowVertex
                      , Data.Handle
                      , Data.History

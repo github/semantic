@@ -1,5 +1,5 @@
 {-# LANGUAGE FlexibleContexts, GeneralizedNewtypeDeriving, OverloadedStrings, ScopedTypeVariables, TypeFamilies, UndecidableInstances #-}
-module Data.Graph
+module Data.Graph.Algebraic
 ( Graph(..)
 , overlay
 , connect
