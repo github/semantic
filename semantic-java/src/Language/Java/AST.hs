@@ -14,8 +14,8 @@ module Language.Java.AST
 ( module Language.Java.AST
 ) where
 
-import           TreeSitter.GenerateSyntax
+import           AST.GenerateSyntax
 import qualified TreeSitter.Java as Grammar
-import           TreeSitter.Token
+import           AST.Token
 
 astDeclarationsForLanguage Grammar.tree_sitter_java "../../../vendor/tree-sitter-java/src/node-types.json"
