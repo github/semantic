@@ -10,7 +10,7 @@ import qualified Language.TypeScript.AST as TypeScript
 import qualified Language.TypeScript.Tags as TsTags
 import qualified Tags.Tagging.Precise as Tags
 import qualified TreeSitter.TypeScript (tree_sitter_typescript)
-import qualified TreeSitter.Unmarshal as TS
+import qualified AST.Unmarshal as TS
 
 newtype Term a = Term { getTerm :: TypeScript.Program a }
 
