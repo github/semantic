@@ -36,13 +36,9 @@ library
     , hashable
     , lens
     , pathtype
-<<<<<<< HEAD
     , semantic-analysis
-    , semantic-source    ^>= 0.0
-    , semilattices
-=======
     , semantic-source    ^>= 0.0.2
->>>>>>> origin/master
+    , semilattices
     , text               ^>= 1.2.3.1
   hs-source-dirs:      src
   default-language:    Haskell2010
