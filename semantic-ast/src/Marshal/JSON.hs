@@ -1,27 +1,26 @@
-{-# LANGUAGE DefaultSignatures #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE TypeOperators #-}
-{-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE RankNTypes #-}
-{-# LANGUAGE ExistentialQuantification #-}
-{-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE DataKinds #-}
-{-# LANGUAGE TypeSynonymInstances #-}
-{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE DefaultSignatures #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE ExistentialQuantification #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE TypeSynonymInstances #-}
 {-# LANGUAGE UndecidableInstances #-}
 
 module Marshal.JSON
 ( MarshalJSON(..)
 ) where
 
-import Data.Aeson as Aeson
-import Data.List.NonEmpty (NonEmpty)
-import GHC.Generics
-import Data.Text (Text)
+import           Data.Aeson as Aeson
+import           Data.List.NonEmpty (NonEmpty)
+import           Data.Text (Text)
 import qualified Data.Text as Text
+import           GHC.Generics
 
--- TODO: range and span will require a new release of semantic-source
 -- TODO: use toEncoding -- direct serialization to ByteString
 
 -- Serialize unmarshaled ASTs into JSON representation by auto-deriving Aeson instances generically
@@ -33,7 +32,7 @@ class MarshalJSON t where
   fields acc = gfields acc . from1
 
 -- Implement the sum case
-instance {-# OVERLAPPING #-} (MarshalJSON f, MarshalJSON g) => MarshalJSON (f :+: g) where 
+instance {-# OVERLAPPING #-} (MarshalJSON f, MarshalJSON g) => MarshalJSON (f :+: g) where
   fields acc (L1 f) = fields acc f
   fields acc (R1 g) = fields acc g
 
@@ -71,7 +70,7 @@ instance (MarshalJSON t) => GValue (Rec1 t) where
 
 instance (GValue t) => GValue (Maybe :.: t) where
   gvalue (Comp1 (Just t)) = gvalue t
-  gvalue (Comp1 Nothing) = Null
+  gvalue (Comp1 Nothing)  = Null
 
 instance (GValue t) => GValue ([] :.: t) where
   gvalue (Comp1 ts) = toJSON $ map gvalue ts

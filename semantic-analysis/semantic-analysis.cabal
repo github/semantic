@@ -52,7 +52,6 @@ library
     Analysis.FlowInsensitive
     Analysis.ImportGraph
     Analysis.Intro
-    Analysis.Language
     Analysis.Name
     Analysis.Typecheck
     Control.Carrier.Fail.WithLoc
@@ -71,7 +70,7 @@ library
     , pathtype                    ^>= 0.8.1
     , prettyprinter                >= 1.2 && < 2
     , prettyprinter-ansi-terminal ^>= 1.1.1
-    , semantic-source             ^>= 0.0.1
+    , semantic-source             ^>= 0.0.2
     , semilattices
     , terminal-size               ^>= 0.3
     , text                        ^>= 1.2.3.1

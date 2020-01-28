@@ -6,10 +6,10 @@ module Analysis.File
 , fromPath
 ) where
 
-import           Analysis.Language as Language
 import           Data.Maybe (fromJust, listToMaybe)
 import           Data.Semilattice.Lower
 import           GHC.Stack
+import           Source.Language as Language
 import           Source.Span
 import qualified System.Path as Path
 import qualified System.Path.PartClass as Path.PartClass

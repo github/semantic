@@ -28,13 +28,13 @@ module Data.Blob
 import Prologue
 
 import           Analysis.File (File (..))
-import           Analysis.Language as Language
 import           Control.Effect.Error
 import           Data.Aeson
 import qualified Data.ByteString.Lazy as BL
 import           Data.Edit
 import           Data.JSON.Fields
 import           Data.Module
+import           Source.Language as Language
 import           Source.Source (Source, totalSpan)
 import qualified Source.Source as Source
 import qualified System.FilePath as FP
