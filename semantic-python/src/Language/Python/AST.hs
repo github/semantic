@@ -16,6 +16,6 @@ module Language.Python.AST
 
 import           Prelude hiding (False, Float, Integer, String, True)
 import           AST.GenerateSyntax
-import qualified TreeSitter.Python as Grammar
+import qualified Language.Python.Grammar as Grammar
 
 astDeclarationsForLanguage Grammar.tree_sitter_python "../../../vendor/tree-sitter-python/src/node-types.json"

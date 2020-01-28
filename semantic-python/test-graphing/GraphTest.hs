@@ -23,7 +23,7 @@ import qualified System.Path as Path
 import qualified System.Path.Directory as Path
 import qualified Test.Tasty as Tasty
 import qualified Test.Tasty.HUnit as HUnit
-import qualified TreeSitter.Python as TSP
+import qualified Language.Python.Grammar as TSP
 import qualified AST.Unmarshal as TS
 
 {-
