@@ -27,8 +27,8 @@ import Prologue
 
 import Analysis.ConstructorName
 import Analysis.HasTextElement
+import Analysis.Name
 import Data.Abstract.Declarations
-import Data.Abstract.Name
 import Data.Language
 import Data.Term
 import Data.Text hiding (empty)
