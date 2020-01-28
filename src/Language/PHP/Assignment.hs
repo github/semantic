@@ -8,9 +8,9 @@ module Language.PHP.Assignment
 
 import Prologue
 
+import qualified Analysis.Name as Name
 import           Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
-import qualified Data.Abstract.Name as Name
 import qualified Data.Abstract.ScopeGraph as ScopeGraph (AccessControl(..))
 import qualified Data.List.NonEmpty as NonEmpty
 import           Data.Syntax

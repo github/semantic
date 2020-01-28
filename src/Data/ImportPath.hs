@@ -3,7 +3,7 @@ module Data.ImportPath (IsRelative(..), ImportPath(..), importPath, toName, defa
 
 import Prologue
 
-import           Data.Abstract.Name
+import           Analysis.Name
 import           Data.Abstract.Path (stripQuotes)
 import           Data.Aeson
 import qualified Data.Text as T

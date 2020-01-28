@@ -9,12 +9,13 @@ module Data.Project
 import Prelude hiding (readFile)
 import Prologue
 
+import           Analysis.File
 import           Data.Blob
 import           Data.Blob.IO
 import           Data.Language
 import qualified Data.Text as T
-import           System.FilePath.Posix
 import           Semantic.IO
+import           System.FilePath.Posix
 import qualified System.Path as Path
 
 -- | A 'Project' contains all the information that semantic needs
@@ -32,7 +33,7 @@ projectName = T.pack . dropExtensions . takeFileName . projectRootDir
 projectExtensions :: Project -> [String]
 projectExtensions = extensionsForLanguage . projectLanguage
 
-projectFiles :: Project -> [File]
+projectFiles :: Project -> [File Language]
 projectFiles = fmap blobFile . projectBlobs
 
 readProjectFromPaths :: MonadIO m
@@ -56,5 +57,5 @@ readProjectFromPaths maybeRoot path lang excludeDirs = do
   blobs <- liftIO $ traverse (readBlobFromFile' . toFile) paths
   pure $ Project (Path.toString rootDir) blobs lang (fmap Path.toString excludeDirs)
   where
-    toFile path = File (Path.toString path) lang
+    toFile path = File path lowerBound lang
     exts = extensionsForLanguage lang

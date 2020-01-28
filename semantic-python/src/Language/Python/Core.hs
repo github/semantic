@@ -1,6 +1,19 @@
-{-# LANGUAGE ConstraintKinds, DataKinds, DefaultSignatures, DisambiguateRecordFields, FlexibleContexts,
-             GeneralizedNewtypeDeriving, KindSignatures, LambdaCase, NamedFieldPuns, OverloadedLists,
-             OverloadedStrings, PatternSynonyms, StandaloneDeriving, TypeApplications, TypeOperators, ViewPatterns #-}
+{-# LANGUAGE ConstraintKinds #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DefaultSignatures #-}
+{-# LANGUAGE DisambiguateRecordFields #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE NamedFieldPuns #-}
+{-# LANGUAGE OverloadedLists #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE PatternSynonyms #-}
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE ViewPatterns #-}
 
 module Language.Python.Core
 ( toplevelCompile
@@ -21,6 +34,7 @@ import           Data.List.NonEmpty (NonEmpty (..))
 import           Data.Maybe
 import           GHC.Records
 import           Language.Python.Failure
+import           Language.Python.Patterns
 import           Source.Span (Span)
 import           Syntax.Stack (Stack (..))
 import qualified Syntax.Stack as Stack
@@ -35,19 +49,8 @@ newtype Bindings = Bindings { unBindings :: Stack Name }
 def :: Name -> Bindings -> Bindings
 def n = coerce (Stack.:> n)
 
--- | Useful pattern synonym for extracting a single identifier from
--- a Python ExpressionList. Easier than pattern-matching every time.
--- TODO: when this is finished, we won't need this pattern, as we'll
--- handle ExpressionLists the smart way every time.
-pattern SingleIdentifier :: Name -> Py.ExpressionList a
-pattern SingleIdentifier name <- Py.ExpressionList
-  { Py.extraChildren =
-    [ Py.Expression (Prj (Py.PrimaryExpression (Prj Py.Identifier { text = Name -> name })))
-    ]
-  }
-
 prelude :: Has Core sig t => [Name] -> t Name
-prelude = foldl' (\a b -> a ... b) (pure "__semantic_prelude")
+prelude = foldl' (...) (pure "__semantic_prelude")
 
 -- We leave the representation of Core syntax abstract so that it's not
 -- possible for us to 'cheat' by pattern-matching on or eliminating a
@@ -194,7 +197,7 @@ instance Compile Py.Call where
   compile it _ _ = pure . invariantViolated $ "can't compile Call node with generator expression: " <> show it
 
 instance Compile Py.ClassDefinition where
-  compile it@Py.ClassDefinition { body = pybody, name = Py.Identifier _ann (Name -> n) } cc next = do
+  compile it@Py.ClassDefinition { body = pybody, name = Py.Identifier _ann (Name.name -> n) } cc next = do
     let buildTypeCall _ = do
           bindings <- asks @Bindings (toList . unBindings)
           let buildName n = (n, pure n)
@@ -202,11 +205,11 @@ instance Compile Py.ClassDefinition where
               typefn = prelude ["type"]
               object = prelude ["object"]
 
-          pure (typefn $$ Core.string (coerce n) $$ object $$ contents)
+          pure (typefn $$ Core.string (formatName n) $$ object $$ contents)
 
     body <- compile pybody buildTypeCall next
     let coreName = Name.named' n
-        assignClass = coreName :<- (rec coreName body)
+        assignClass = coreName :<- rec coreName body
         continuing = fmap (locate it . (assignClass >>>=))
     continuing (local (def n) (cc next))
 
@@ -241,8 +244,8 @@ instance Compile Py.DottedName where
   compile it@Py.DottedName
     { extraChildren = Py.Identifier { text } :| rest
     } cc _next = do
-    let aggregate Py.Identifier { text = inner } x = x ... Name inner
-        composite = foldr aggregate (pure (Name text)) rest
+    let aggregate Py.Identifier { text = inner } x = x ... Name.name inner
+        composite = foldr aggregate (pure (Name.name text)) rest
     locate it composite & cc
 
 
@@ -284,21 +287,21 @@ instance Compile Py.FunctionDefinition where
           let parameters' = catMaybes parameterMs
           body' <- compile body pure next
           -- Build a lambda.
-          let located = locate it (rec (Name.named' (Name name)) (lams parameters' body'))
+          let located = locate it (rec (Name.named' (Name.name name)) (lams parameters' body'))
           -- Give it a name (below), then augment the current continuation
           -- with the new name (with 'def'), so that calling contexts know
           -- that we have built an exportable definition.
-          assigning located <$> local (def (Name name)) (cc next)
-    where param (Py.Parameter (Prj (Py.Identifier _pann pname))) = Just . named' . Name $ pname
+          assigning located <$> local (def (Name.name name)) (cc next)
+    where param (Py.Parameter (Prj (Py.Identifier _pann pname))) = Just . named' . Name.name $ pname
           param _                                                = Nothing
-          assigning item f = (Name.named' (Name name) :<- item) >>>= f
+          assigning item f = (Name.named' (Name.name name) :<- item) >>>= f
 
 instance Compile Py.FutureImportStatement
 instance Compile Py.GeneratorExpression
 instance Compile Py.GlobalStatement
 
 instance Compile Py.Identifier where
-  compile Py.Identifier { text } cc _ = cc . pure . Name $ text
+  compile Py.Identifier { text } cc _ = cc . pure . Name.name $ text
 
 instance Compile Py.IfStatement where
   compile it@Py.IfStatement{ condition, consequence, alternative} cc next =
@@ -320,8 +323,8 @@ instance Compile Py.Lambda where
     , parameters
     } cc next = do
       let unparams (Py.LambdaParameters _ ps) = toList ps
-          unparam (Py.Parameter (Prj (Py.Identifier _pann pname))) = Just . named' . Name $ pname
-          unparam _ = Nothing
+          unparam (Py.Parameter (Prj (Py.Identifier _pann pname))) = Just . named' . Name.name $ pname
+          unparam _                                                = Nothing
       body' <- compile body cc next
       let params = maybe [] unparams parameters
       pure . locate it . lams (catMaybes (fmap unparam params)) $ body'
@@ -404,7 +407,7 @@ instance Compile Py.TryStatement
 instance Compile Py.Tuple where
   compile it@Py.Tuple { Py.extraChildren = [] } cc _ = cc $ locate it unit
 
-  compile it _ _ = pure $ unimplemented it
+  compile it _ _                                     = pure $ unimplemented it
 
 instance Compile Py.UnaryOperator
 instance Compile Py.WhileStatement

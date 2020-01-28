@@ -1,4 +1,9 @@
-{-# LANGUAGE DeriveGeneric, DerivingVia, DeriveAnyClass, DuplicateRecordFields, OverloadedStrings, RecordWildCards #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DerivingVia #-}
+{-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
 module Semantic.Api.LegacyTypes
   ( DiffTreeRequest(..)
   , ParseTreeRequest(..)
@@ -10,7 +15,7 @@ module Semantic.Api.LegacyTypes
   ) where
 
 import Data.Aeson
-import Data.Blob hiding (File(..))
+import Data.Blob
 import Prologue
 
 newtype DiffTreeRequest = DiffTreeRequest { blobs :: [BlobPair] }
@@ -27,9 +32,9 @@ newtype ParseTreeSymbolResponse = ParseTreeSymbolResponse { files :: [File] }
   deriving (Eq, Show, Generic, ToJSON)
 
 data File = File
-  { filePath :: Text
+  { filePath     :: Text
   , fileLanguage :: Text
-  , fileSymbols :: [Symbol]
+  , fileSymbols  :: [Symbol]
   }
   deriving (Eq, Show, Generic)
 

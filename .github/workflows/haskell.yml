@@ -25,12 +25,12 @@ jobs:
       with:
         path: ~/.cabal/packages
         key: ${{ runner.os }}-${{ matrix.ghc }}-cabal-packages
-      
+
     - uses: actions/cache@v1
       name: Cache ~/.cabal/store
       with:
         path: ~/.cabal/store
-        key: ${{ runner.os }}-${{ matrix.ghc }}-v1-cabal-store
+        key: ${{ runner.os }}-${{ matrix.ghc }}-v5-cabal-store
 
     - uses: actions/cache@v1
       name: Cache dist-newstyle
@@ -41,8 +41,8 @@ jobs:
     - name: Install dependencies
       run: |
         cabal v2-update
-        cabal v2-configure --disable-optimization --enable-benchmarks --enable-tests --write-ghc-environment-files=always -j2
-        cabal v2-build all --only-dependencies
+        cabal v2-configure --project-file=cabal.project.ci --disable-optimization --enable-benchmarks --enable-tests --write-ghc-environment-files=always -j2
+        cabal v2-build     --project-file=cabal.project.ci all --only-dependencies
 
     - uses: jonabc/setup-licensed@v1
       with:
@@ -56,12 +56,13 @@ jobs:
       run: |
         test -f dist-newstyle/hlint || cabal install hlint --installdir=dist-newstyle
         dist-newstyle/hlint src semantic-python
-
+        
     - name: Build & test
       run: |
-        cabal v2-build
-        cabal v2-run semantic:test
-        cabal v2-run semantic-core:test
-        cabal v2-run semantic-python:test
-        cd semantic-source; cabal v2-run semantic-source:test; cd ..
-        cd semantic-source; cabal v2-run semantic-source:doctest -- src; cd ..
+        cabal v2-build --project-file=cabal.project.ci
+        cabal v2-run   --project-file=cabal.project.ci semantic:test
+        cabal v2-run   --project-file=cabal.project.ci semantic-core:test
+        cabal v2-run   --project-file=cabal.project.ci semantic-python:test:compiling
+        cabal v2-run   --project-file=cabal.project.ci semantic-python:test:graphing
+        cd semantic-source; cabal v2-run --project-file=cabal.project.ci semantic-source:test; cd ..
+        cd semantic-source; cabal v2-run --project-file=cabal.project.ci semantic-source:doctest -- src; cd ..

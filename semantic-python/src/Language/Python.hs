@@ -5,7 +5,9 @@ module Language.Python
 ) where
 
 import           Data.Proxy
+import           Language.Python.ScopeGraph
 import qualified Language.Python.Tags as PyTags
+import           ScopeGraph.Convert
 import qualified Tags.Tagging.Precise as Tags
 import qualified TreeSitter.Python (tree_sitter_python)
 import qualified TreeSitter.Python.AST as Py
@@ -22,3 +24,6 @@ instance TS.Unmarshal Term where
 
 instance Tags.ToTags Term where
   tags src = Tags.runTagging src . PyTags.tags . getTerm
+
+instance ToScopeGraph Term where
+  scopeGraph = scopeGraphModule . getTerm

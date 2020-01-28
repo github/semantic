@@ -117,8 +117,7 @@ instance ToTags Py.Call where
 yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text -> Kind -> Loc -> Range -> Maybe Text -> m ()
 yieldTag name kind loc range docs = do
   src <- ask @Source
-  let sliced = Tags.firstLine (slice src range)
-  Tags.yield (Tag name kind loc sliced docs)
+  Tags.yield (Tag name kind loc (Tags.firstLine src range) docs)
 
 docComment :: Source -> (Py.CompoundStatement :+: Py.SimpleStatement) Loc -> Maybe Text
 docComment src (R1 (Py.SimpleStatement (Prj Py.ExpressionStatement { extraChildren = L1 (Prj (Py.Expression (Prj (Py.PrimaryExpression (Prj Py.String { ann }))))) :|_ }))) = Just (toText (slice src (byteRange ann)))

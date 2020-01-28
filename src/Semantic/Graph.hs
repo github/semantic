@@ -1,4 +1,13 @@
-{-# LANGUAGE DataKinds, FlexibleContexts, FlexibleInstances, GADTs, LambdaCase, OverloadedStrings, ScopedTypeVariables, TypeApplications, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Semantic.Graph
 ( analysisParsers
 , AnalyzeTerm
@@ -34,6 +43,7 @@ import Prelude hiding (readFile)
 import           Analysis.Abstract.Caching.FlowInsensitive
 import           Analysis.Abstract.Collecting
 import           Analysis.Abstract.Graph as Graph
+import           Analysis.File
 import           Control.Abstract hiding (String)
 import           Control.Abstract.PythonPackage as PythonPackage
 import           Control.Algebra
@@ -43,6 +53,7 @@ import           Control.Carrier.Resumable.Resume
 import           Control.Carrier.State.Strict
 import           Control.Effect.Parse
 import           Control.Lens.Getter
+import           Data.Abstract.AccessControls.Instances ()
 import           Data.Abstract.Address.Hole as Hole
 import           Data.Abstract.Address.Monovariant as Monovariant
 import           Data.Abstract.Address.Precise as Precise
@@ -52,15 +63,13 @@ import           Data.Abstract.Module
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Package as Package
 import           Data.Abstract.Value.Abstract as Abstract
-import           Data.Abstract.Value.Concrete as Concrete
-    (Value, ValueError (..), runValueErrorWith)
+import           Data.Abstract.Value.Concrete as Concrete (Value, ValueError (..), runValueErrorWith)
 import           Data.Abstract.Value.Type as Type
-import           Data.Abstract.AccessControls.Instances ()
 import           Data.Blob
 import           Data.Graph
 import           Data.Graph.ControlFlowVertex (VertexDeclaration)
 import           Data.Language as Language
-import           Data.List (isPrefixOf, isSuffixOf)
+import           Data.List (isPrefixOf)
 import qualified Data.Map as Map
 import           Data.Project
 import           Data.Text (pack, unpack)
@@ -73,6 +82,7 @@ import           Semantic.Task as Task
 import           Source.Loc as Loc
 import           Source.Span
 import           System.FilePath.Posix (takeDirectory, (</>))
+import qualified System.Path as Path
 import           Text.Show.Pretty (ppShow)
 
 data GraphType = ImportGraph | CallGraph
@@ -326,8 +336,9 @@ parsePythonPackage parser project = do
                                         ]
     PythonPackage.FindPackages excludeDirs -> do
       trace "In Graph.FindPackages"
-      let initFiles = filter (("__init__.py" `isSuffixOf`) . filePath) (projectFiles project)
-      let packageDirs = filter (`notElem` ((projectRootDir project </>) . unpack <$> excludeDirs)) (takeDirectory . filePath <$> initFiles)
+      let initFiles = filter (isInit . filePath) (projectFiles project)
+          isInit = (== Path.relFile "__init__.py") . Path.takeFileName
+          packageDirs = filter (`notElem` ((projectRootDir project </>) . unpack <$> excludeDirs)) (takeDirectory . Path.toString . filePath <$> initFiles)
       packageFromProject project [ blob | dir <- packageDirs
                                         , blob <- projectBlobs project
                                         , dir `isPrefixOf` blobPath blob
@@ -404,7 +415,7 @@ resumingUnspecialized :: ( AbstractHole address
                       => Evaluator term address value (ResumableC (BaseError (UnspecializedError address value)) m) a
                       -> Evaluator term address value m a
 resumingUnspecialized = runUnspecializedWith (\ baseError -> traceError "UnspecializedError" baseError *> case baseErrorException baseError of
-  UnspecializedError _ -> pure hole
+  UnspecializedError _    -> pure hole
   RefUnspecializedError _ -> pure hole)
 
 resumingAddressError :: ( AbstractHole value
@@ -447,12 +458,12 @@ resumingHeapError :: ( AbstractHole address
                   => Evaluator term address value (ResumableC (BaseError (HeapError address)) m) a
                   -> Evaluator term address value m a
 resumingHeapError = runHeapErrorWith (\ baseError -> traceError "ScopeError" baseError *> case baseErrorException baseError of
-    CurrentFrameError -> pure hole
-    LookupAddressError _ -> pure hole
+    CurrentFrameError     -> pure hole
+    LookupAddressError _  -> pure hole
     -- FIXME: this is clearly bogus
     LookupFrameError addr -> pure (Frame addr lowerBound lowerBound)
-    LookupLinksError _ -> pure mempty
-    LookupLinkError _ -> pure hole)
+    LookupLinksError _    -> pure mempty
+    LookupLinkError _     -> pure hole)
 
 resumingScopeError :: ( Has Trace sig m
                       , AbstractHole (Slot address)
@@ -464,13 +475,13 @@ resumingScopeError :: ( Has Trace sig m
                     => Evaluator term address value (ResumableC (BaseError (ScopeError address)) m) a
                     -> Evaluator term address value m a
 resumingScopeError = runScopeErrorWith (\ baseError -> traceError "ScopeError" baseError *> case baseErrorException baseError of
-  ScopeError _ _ -> pure hole
-  ImportReferenceError -> pure hole
-  LookupScopeError -> pure hole
-  LookupPathError _ -> pure hole
-  CurrentScopeError -> pure hole
+  ScopeError _ _                -> pure hole
+  ImportReferenceError          -> pure hole
+  LookupScopeError              -> pure hole
+  LookupPathError _             -> pure hole
+  CurrentScopeError             -> pure hole
   LookupDeclarationScopeError _ -> pure hole
-  DeclarationByNameError _ -> pure hole)
+  DeclarationByNameError _      -> pure hole)
 
 resumingTypeError :: ( Has Trace sig m
                      , Effect sig

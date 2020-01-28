@@ -4,9 +4,9 @@ module Data.Syntax.Expression (module Data.Syntax.Expression) where
 import Prelude hiding (null)
 import Prologue hiding (index, null)
 
+import           Analysis.Name as Name
 import           Control.Abstract hiding (Bitwise (..), Call)
 import           Data.Abstract.Evaluatable as Abstract
-import           Data.Abstract.Name as Name
 import           Data.Abstract.Number (liftIntegralFrac, liftReal, liftedExponent, liftedFloorDiv)
 import           Data.Fixed
 import           Data.JSON.Fields

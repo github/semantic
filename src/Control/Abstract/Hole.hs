@@ -1,6 +1,5 @@
 module Control.Abstract.Hole
-  ( AbstractHole (..)
+  ( module X
   ) where
 
-class AbstractHole a where
-  hole :: a
+import Data.Hole as X

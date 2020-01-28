@@ -29,7 +29,7 @@ import qualified Analysis.Carrier.Env.Precise as A
 import qualified Analysis.Carrier.Heap.Precise as A
 import qualified Analysis.Effect.Domain as A
 import           Analysis.File
-import           Analysis.Name
+import           Analysis.Functor.Named
 import           Control.Algebra
 import           Control.Carrier.Fail.WithLoc
 import           Control.Carrier.Fresh.Strict
@@ -178,7 +178,7 @@ heapAddressGraph = heapGraph (\ addr v -> (Value v, addr)) (fmap G.vertex . (,) 
 addressStyle :: Heap (Concrete term) -> G.Style (EdgeType (Concrete term), Addr) Text
 addressStyle heap = (G.defaultStyle vertex) { G.edgeAttributes }
   where vertex (_, addr) = pack (show addr) <> " = " <> maybe "?" fromConcrete (IntMap.lookup addr heap)
-        edgeAttributes _ (Slot name,    _) = ["label" G.:= unName name]
+        edgeAttributes _ (Slot name,    _) = ["label" G.:= formatName name]
         edgeAttributes _ (Edge Import,  _) = ["color" G.:= "blue"]
         edgeAttributes _ (Edge Lexical, _) = ["color" G.:= "green"]
         edgeAttributes _ _                 = []
@@ -186,7 +186,7 @@ addressStyle heap = (G.defaultStyle vertex) { G.edgeAttributes }
           Unit ->  "()"
           Bool b -> pack $ show b
           String s -> pack $ show s
-          Closure p (Span s e) (Named n _) -> "\\\\ " <> unName n <> " [" <> pack (Path.toString p) <> ":" <> showPos s <> "-" <> showPos e <> "]"
+          Closure p (Span s e) (Named n _) -> "\\\\ " <> formatName n <> " [" <> pack (Path.toString p) <> ":" <> showPos s <> "-" <> showPos e <> "]"
           Record _ -> "{}"
         showPos (Pos l c) = pack (show l) <> ":" <> pack (show c)
 

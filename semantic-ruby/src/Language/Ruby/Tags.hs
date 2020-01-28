@@ -74,8 +74,7 @@ yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text ->
 yieldTag name Call _ _ | name `elem` nameBlacklist = pure ()
 yieldTag name kind loc range = do
   src <- ask @Source
-  let sliced = slice src range
-  Tags.yield (Tag name kind loc (Tags.firstLine sliced) Nothing)
+  Tags.yield (Tag name kind loc (Tags.firstLine src range) Nothing)
 
 instance ToTags Rb.Class where
   tags t@Rb.Class
@@ -148,7 +147,7 @@ yieldMethodNameTag t loc range (Rb.MethodName expr) = enterScope True $ case exp
   -- Prj Rb.Symbol { extraChildren = [Prj Rb.EscapeSequence { text = name }] } -> yield name
   _                                                               -> gtags t
   where
-    yield name = yieldTag name Function loc range >> gtags t
+    yield name = yieldTag name Method loc range >> gtags t
 
 enterScope :: (Has (State [Text]) sig m) => Bool -> m () -> m ()
 enterScope createNew m = do

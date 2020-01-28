@@ -67,7 +67,7 @@ instance ToTags Tsx.MethodDefinition where
       -- TODO: There are more here
       _                                   -> gtags t
       where
-        yield name = yieldTag name Call loc byteRange >> gtags t
+        yield name = yieldTag name Method loc byteRange >> gtags t
 
 instance ToTags Tsx.ClassDeclaration where
   tags t@Tsx.ClassDeclaration
@@ -100,6 +100,19 @@ instance ToTags Tsx.Class where
     } = yieldTag text Class loc byteRange >> gtags t
   tags t = gtags t
 
+instance ToTags Tsx.Module where
+  tags t@Tsx.Module
+    { ann = loc@Loc { byteRange }
+    , name
+    } = match name
+    where
+      match expr = case expr of
+        Prj Tsx.Identifier { text } -> yield text
+        -- TODO: Handle NestedIdentifiers and Strings
+        -- Prj Tsx.NestedIdentifier { extraChildren } -> match
+        _ -> gtags t
+      yield text = yieldTag text Module loc byteRange >> gtags t
+
 instance (ToTags l, ToTags r) => ToTags (l :+: r) where
   tags (L1 l) = tags l
   tags (R1 r) = tags r
@@ -128,8 +141,7 @@ yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text ->
 yieldTag name Call _ _ | name `elem` nameBlacklist = pure ()
 yieldTag name kind loc range = do
   src <- ask @Source
-  let sliced = slice src range
-  Tags.yield (Tag name kind loc (Tags.firstLine sliced) Nothing)
+  Tags.yield (Tag name kind loc (Tags.firstLine src range) Nothing)
 
 instance ToTags Tsx.AbstractClassDeclaration
 instance ToTags Tsx.AbstractMethodSignature
@@ -223,7 +235,7 @@ instance ToTags Tsx.MemberExpression
 instance ToTags Tsx.MetaProperty
 -- instance ToTags Tsx.MethodDefinition
 instance ToTags Tsx.MethodSignature
-instance ToTags Tsx.Module
+-- instance ToTags Tsx.Module
 instance ToTags Tsx.NamedImports
 instance ToTags Tsx.NamespaceImport
 instance ToTags Tsx.NestedIdentifier

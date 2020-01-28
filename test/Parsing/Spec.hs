@@ -1,21 +1,22 @@
 {-# LANGUAGE TypeApplications #-}
 module Parsing.Spec (spec) where
 
-import Data.Blob
-import Data.ByteString.Char8 (pack)
-import Data.Duration
-import Data.Either
-import Data.Language
-import Parsing.TreeSitter
-import Source.Source
-import SpecHelpers
-import TreeSitter.JSON (Grammar, tree_sitter_json)
+import           Data.Blob
+import           Data.ByteString.Char8 (pack)
+import           Data.Duration
+import           Data.Either
+import           Data.Language
+import           Parsing.TreeSitter
+import           Source.Source
+import           SpecHelpers
+import qualified System.Path as Path
+import           TreeSitter.JSON (Grammar, tree_sitter_json)
 
 spec :: Spec
 spec = do
   describe "parseToAST" $ do
     let source = toJSONSource [1 :: Int .. 10000]
-    let largeBlob = sourceBlob "large.json" JSON source
+    let largeBlob = fromSource (Path.relFile "large.json") JSON source
 
     it "returns a result when the timeout does not expire" $ do
       let timeout = fromMicroseconds 0 -- Zero microseconds indicates no timeout

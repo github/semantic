@@ -3,11 +3,11 @@ module Language.Ruby.Syntax (module Language.Ruby.Syntax) where
 
 import Prologue
 
+import           Analysis.Name as Name
 import           Control.Abstract as Abstract hiding (Load, String)
 import           Data.Abstract.BaseError
 import           Data.Abstract.Evaluatable
 import qualified Data.Abstract.Module as M
-import           Data.Abstract.Name as Name
 import           Data.Abstract.Path
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.JSON.Fields
