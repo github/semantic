@@ -1,7 +1,7 @@
 cabal-version:       2.4
 
 name:                semantic-source
-version:             0.0.1.0
+version:             0.0.2.0
 synopsis:            Types and functionality for working with source code
 description:         Types and functionality for working with source code (program text).
 homepage:            https://github.com/github/semantic/tree/master/semantic-source#readme
@@ -42,6 +42,7 @@ common haskell
 library
   import: haskell
   exposed-modules:
+    Source.Language
     Source.Loc
     Source.Range
     Source.Source
@@ -51,8 +52,11 @@ library
     , base            >= 4.12 && < 5
     , bytestring     ^>= 0.10.8.2
     , deepseq        ^>= 1.4.4.0
+    , containers     ^>= 0.6.2
     , generic-monoid ^>= 0.1.0.0
     , hashable        >= 1.2.7 && < 1.4
+    , lingo          ^>= 0.3
+    , pathtype       ^>= 0.8.1
     , semilattices   ^>= 0.0.0.3
     , text           ^>= 1.2.3.1
   hs-source-dirs: src
