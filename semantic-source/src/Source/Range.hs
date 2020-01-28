@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveGeneric, RankNTypes #-}
+{-# LANGUAGE DeriveAnyClass, DeriveGeneric, RankNTypes, NamedFieldPuns #-}
 module Source.Range
 ( Range(..)
 , point
@@ -10,6 +10,7 @@ module Source.Range
 ) where
 
 import Control.DeepSeq (NFData)
+import Data.Aeson (ToJSON(..))
 import Data.Hashable (Hashable)
 import Data.Semilattice.Lower (Lower(..))
 import GHC.Generics (Generic)
@@ -24,6 +25,8 @@ data Range = Range
 instance Hashable Range
 instance NFData   Range
 
+
+
 -- $
 -- prop> a <> (b <> c) === (a <> b) <> (c :: Range)
 instance Semigroup Range where
@@ -32,6 +35,8 @@ instance Semigroup Range where
 instance Lower Range where
   lowerBound = Range 0 0
 
+instance ToJSON Range where
+  toJSON Range { start, end } = toJSON [ start, end ]
 
 -- | Construct a 'Range' with a given value for both its start and end indices.
 point :: Int -> Range
@@ -60,3 +65,4 @@ lens get put afa s = fmap (put s) (afa (get s))
 -- $setup
 -- >>> import Test.QuickCheck
 -- >>> instance Arbitrary Range where arbitrary = Range <$> arbitrary <*> arbitrary ; shrink (Range s e) = Range <$> shrink s <*> shrink e
+

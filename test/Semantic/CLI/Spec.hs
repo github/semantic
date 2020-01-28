@@ -1,14 +1,16 @@
 module Semantic.CLI.Spec (testTree) where
 
+import           Analysis.File
 import           Control.Carrier.Parse.Simple
 import           Control.Carrier.Reader
 import           Data.ByteString.Builder
+import           Data.Language
 import           Semantic.Api hiding (Blob, BlobPair, File)
 import           Semantic.Task
 import           Serializing.Format
 import           System.IO.Unsafe
-import qualified System.Path as Path
 import           System.Path ((</>))
+import qualified System.Path as Path
 import qualified System.Path.Directory as Path
 
 import SpecHelpers
@@ -34,7 +36,7 @@ renderDiff ref new = unsafePerformIO $ do
     else ["git", "diff", ref, new]
 {-# NOINLINE renderDiff #-}
 
-testForDiffFixture :: (String, [BlobPair] -> ParseC TaskC Builder, [(File, File)], Path.RelFile) -> TestTree
+testForDiffFixture :: (String, [BlobPair] -> ParseC TaskC Builder, [(File Language, File Language)], Path.RelFile) -> TestTree
 testForDiffFixture (diffRenderer, runDiff, files, expected) =
   goldenVsStringDiff
     ("diff fixture renders to " <> diffRenderer <> " " <> show files)
@@ -42,7 +44,7 @@ testForDiffFixture (diffRenderer, runDiff, files, expected) =
     (Path.toString expected)
     (fmap toLazyByteString . runTaskOrDie $ readBlobPairs (Right files) >>= runDiff)
 
-testForParseFixture :: (String, [Blob] -> ParseC TaskC Builder, [File], Path.RelFile) -> TestTree
+testForParseFixture :: (String, [Blob] -> ParseC TaskC Builder, [File Language], Path.RelFile) -> TestTree
 testForParseFixture (format, runParse, files, expected) =
   goldenVsStringDiff
     ("diff fixture renders to " <> format)
@@ -50,7 +52,7 @@ testForParseFixture (format, runParse, files, expected) =
     (Path.toString expected)
     (fmap toLazyByteString . runTaskOrDie $ readBlobs (FilesFromPaths files) >>= runParse)
 
-parseFixtures :: [(String, [Blob] -> ParseC TaskC Builder, [File], Path.RelFile)]
+parseFixtures :: [(String, [Blob] -> ParseC TaskC Builder, [File Language], Path.RelFile)]
 parseFixtures =
   [ ("s-expression", run . parseTermBuilder TermSExpression, path, Path.relFile "test/fixtures/ruby/corpus/and-or.parseA.txt")
   , ("json", run . parseTermBuilder TermJSONTree, path, prefix </> Path.file "parse-tree.json")
@@ -59,18 +61,18 @@ parseFixtures =
   , ("symbols", run . parseSymbolsBuilder Serializing.Format.JSON, path'', prefix </> Path.file "parse-tree.symbols.json")
   , ("protobuf symbols", run . parseSymbolsBuilder Serializing.Format.Proto, path'', prefix </> Path.file "parse-tree.symbols.protobuf.bin")
   ]
-  where path = [File "test/fixtures/ruby/corpus/and-or.A.rb" Ruby]
-        path' = [File "test/fixtures/ruby/corpus/and-or.A.rb" Ruby, File "test/fixtures/ruby/corpus/and-or.B.rb" Ruby]
-        path'' = [File "test/fixtures/ruby/corpus/method-declaration.A.rb" Ruby]
+  where path = [File (Path.absRel "test/fixtures/ruby/corpus/and-or.A.rb") lowerBound Ruby]
+        path' = [File (Path.absRel "test/fixtures/ruby/corpus/and-or.A.rb") lowerBound Ruby, File (Path.absRel"test/fixtures/ruby/corpus/and-or.B.rb") lowerBound Ruby]
+        path'' = [File (Path.absRel "test/fixtures/ruby/corpus/method-declaration.A.rb") lowerBound Ruby]
         prefix = Path.relDir "test/fixtures/cli"
         run = runReader defaultLanguageModes
 
-diffFixtures :: [(String, [BlobPair] -> ParseC TaskC Builder, [(File, File)], Path.RelFile)]
+diffFixtures :: [(String, [BlobPair] -> ParseC TaskC Builder, [(File Language, File Language)], Path.RelFile)]
 diffFixtures =
   [ ("json diff", parseDiffBuilder DiffJSONTree, pathMode, prefix </> Path.file "diff-tree.json")
   , ("s-expression diff", parseDiffBuilder DiffSExpression, pathMode, Path.relFile "test/fixtures/ruby/corpus/method-declaration.diffA-B.txt")
   , ("toc summaries diff", runReader defaultLanguageModes . diffSummaryBuilder Serializing.Format.JSON, pathMode, prefix </> Path.file "diff-tree.toc.json")
   , ("protobuf diff", runReader defaultLanguageModes . diffSummaryBuilder Serializing.Format.Proto, pathMode, prefix </> Path.file "diff-tree.toc.protobuf.bin")
   ]
-  where pathMode = [(File "test/fixtures/ruby/corpus/method-declaration.A.rb" Ruby, File "test/fixtures/ruby/corpus/method-declaration.B.rb"  Ruby)]
+  where pathMode = [(File (Path.absRel "test/fixtures/ruby/corpus/method-declaration.A.rb") lowerBound Ruby, File (Path.absRel "test/fixtures/ruby/corpus/method-declaration.B.rb") lowerBound Ruby)]
         prefix = Path.relDir "test/fixtures/cli"
