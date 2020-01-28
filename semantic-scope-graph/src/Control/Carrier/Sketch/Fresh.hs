@@ -46,8 +46,7 @@ instance Lower (Sketchbook Name) where
   lowerBound =
     let
       initialGraph = ScopeGraph.insertScope n initialScope lowerBound
-      initialScope = ScopeGraph.Scope mempty mempty mempty
-      n = Analysis.Name.nameI 0
+      n = Data.Name.nameI 0
     in
       Sketchbook initialGraph n
 

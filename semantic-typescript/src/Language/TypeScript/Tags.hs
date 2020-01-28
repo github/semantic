@@ -67,7 +67,7 @@ instance ToTags Ts.MethodDefinition where
       -- TODO: There are more here
       _                                  -> gtags t
       where
-        yield name = yieldTag name Call loc byteRange >> gtags t
+        yield name = yieldTag name Method loc byteRange >> gtags t
 
 instance ToTags Ts.ClassDeclaration where
   tags t@Ts.ClassDeclaration
@@ -92,6 +92,19 @@ instance ToTags Ts.CallExpression where
           _                        -> tags x
         _ -> gtags t
       yield name = yieldTag name Call loc byteRange >> gtags t
+
+instance ToTags Ts.Module where
+  tags t@Ts.Module
+    { ann = loc@Loc { byteRange }
+    , name
+    } = match name
+    where
+      match expr = case expr of
+        Prj Ts.Identifier { text } -> yield text
+        -- TODO: Handle NestedIdentifiers and Strings
+        -- Prj Tsx.NestedIdentifier { extraChildren } -> match
+        _ -> gtags t
+      yield text = yieldTag text Module loc byteRange >> gtags t
 
 instance (ToTags l, ToTags r) => ToTags (l :+: r) where
   tags (L1 l) = tags l
@@ -215,7 +228,7 @@ instance ToTags Ts.MemberExpression
 instance ToTags Ts.MetaProperty
 -- instance ToTags Ts.MethodDefinition
 instance ToTags Ts.MethodSignature
-instance ToTags Ts.Module
+-- instance ToTags Ts.Module
 instance ToTags Ts.NamedImports
 instance ToTags Ts.NamespaceImport
 instance ToTags Ts.NestedIdentifier

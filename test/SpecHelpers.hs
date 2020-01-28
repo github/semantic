@@ -1,4 +1,5 @@
-{-# LANGUAGE DataKinds, FlexibleContexts #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module SpecHelpers
@@ -23,62 +24,64 @@ module SpecHelpers
 , evaluateProject
 ) where
 
-import Analysis.Name as X
-import Control.Abstract
-import Control.Carrier.Fresh.Strict
-import Control.Carrier.Parse.Simple
-import Control.Carrier.Reader as X
+import qualified Analysis.File as File
+import           Control.Abstract
+import           Control.Carrier.Fresh.Strict
+import           Control.Carrier.Lift
+import           Control.Carrier.Parse.Simple
+import           Control.Carrier.Reader as X
+import           Control.Carrier.Resumable.Either
+import           Control.Carrier.State.Strict
 import qualified Control.Carrier.Trace.Ignoring as Trace.Ignoring
-import Control.Carrier.Resumable.Either
-import Control.Carrier.Lift
-import Control.Carrier.State.Strict
-import Control.Exception (displayException)
-import Control.Monad as X
-import Data.Abstract.Address.Precise as X
-import Data.Abstract.Evaluatable
-import Data.Abstract.FreeVariables as X
+import           Control.Exception (displayException)
+import           Control.Monad as X
+import           Data.Abstract.Address.Precise as X
+import           Data.Abstract.Evaluatable
+import           Data.Abstract.FreeVariables as X
 import qualified Data.Abstract.Heap as Heap
-import Data.Abstract.Module as X
-import Data.Abstract.ModuleTable as X hiding (lookup)
+import           Data.Abstract.Module as X
+import           Data.Abstract.ModuleTable as X hiding (lookup)
+import           Data.Abstract.Name as X
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
-import Data.Abstract.Value.Concrete (Value(..), ValueError, runValueError)
-import Data.Blob as X
-import Data.Blob.IO as X
-import Data.ByteString as X (ByteString)
-import Data.ByteString.Builder (Builder, toLazyByteString)
-import Data.ByteString.Lazy (toStrict)
-import Data.Edit as X
-import Data.Foldable (toList)
-import Data.Functor.Listable as X
-import Data.Language as X hiding (Precise)
-import Data.List.NonEmpty as X (NonEmpty(..))
-import Data.Maybe as X
-import Data.Monoid as X (Monoid(..), First(..), Last(..))
-import Data.Project as X
-import Data.Proxy as X
-import Data.Semigroup as X (Semigroup(..))
-import Data.Semilattice.Lower as X
-import Data.Sum as Sum
-import Data.Term as X
-import Data.Traversable as X (for)
-import Debug.Trace as X (traceShowM, traceM)
-import Parsing.Parser as X
-import Semantic.Api hiding (File, Blob, BlobPair)
-import Semantic.Config (Config(..), optionsLogLevel)
-import Semantic.Graph (analysisParsers, runHeap, runScopeGraph)
-import Semantic.Task as X
-import Semantic.Telemetry (LogQueue, StatQueue)
-import Semantic.Util as X
-import Source.Range as X hiding (start, end, point)
-import Source.Source as X (Source)
-import Source.Span as X hiding (HasSpan(..), start, end, point)
-import System.Exit (die)
+import           Data.Abstract.Value.Concrete (Value (..), ValueError, runValueError)
+import           Data.Blob as X
+import           Data.Blob.IO as X
+import           Data.ByteString as X (ByteString)
+import           Data.ByteString.Builder (Builder, toLazyByteString)
+import           Data.ByteString.Lazy (toStrict)
+import           Data.Edit as X
+import           Data.Foldable (toList)
+import           Data.Functor.Listable as X
+import           Data.Language as X hiding (Precise)
+import           Data.List.NonEmpty as X (NonEmpty (..))
+import           Data.Maybe as X
+import           Data.Monoid as X (First (..), Last (..), Monoid (..))
+import           Data.Project as X
+import           Data.Proxy as X
+import           Data.Semigroup as X (Semigroup (..))
+import           Data.Semilattice.Lower as X
+import           Data.String
+import           Data.Sum as Sum
+import           Data.Term as X
+import           Data.Traversable as X (for)
+import           Debug.Trace as X (traceM, traceShowM)
+import           Parsing.Parser as X
+import           Semantic.Api hiding (Blob, BlobPair, File)
+import           Semantic.Config (Config (..), optionsLogLevel)
+import           Semantic.Graph (analysisParsers, runHeap, runScopeGraph)
+import           Semantic.Task as X
+import           Semantic.Telemetry (LogQueue, StatQueue)
+import           Semantic.Util as X
+import           Source.Range as X hiding (end, point, start)
+import           Source.Source as X (Source)
+import           Source.Span as X hiding (HasSpan (..), end, point, start)
+import           System.Exit (die)
 import qualified System.Path as Path
-import Test.Hspec as X (Spec, SpecWith, context, describe, it, xit, parallel, pendingWith, around, runIO)
-import Test.Hspec.Expectations as X
-import Test.Hspec.LeanCheck as X
-import Test.LeanCheck as X
-import Unsafe.Coerce (unsafeCoerce)
+import           Test.Hspec as X (Spec, SpecWith, around, context, describe, it, parallel, pendingWith, runIO, xit)
+import           Test.Hspec.Expectations as X
+import           Test.Hspec.LeanCheck as X
+import           Test.LeanCheck as X
+import           Unsafe.Coerce (unsafeCoerce)
 
 runBuilder :: Builder -> ByteString
 runBuilder = toStrict . toLazyByteString
@@ -93,7 +96,7 @@ diffFilePaths session p1 p2 = do
 -- | Returns an s-expression parse tree for the specified path.
 parseFilePath :: TaskSession -> Path.RelFile -> IO (Either SomeException ByteString)
 parseFilePath session path = do
-  blob <- readBlobFromFile (fileForTypedPath path)
+  blob <- readBlobFromFile (File.fromPath path)
   res <- runTask session . runParse (configTreeSitterParseTimeout (config session)) . runReader defaultLanguageModes $ parseTermBuilder TermSExpression (toList blob)
   pure (runBuilder <$> res)
 
@@ -102,7 +105,7 @@ runParseWithConfig task = asks configTreeSitterParseTimeout >>= \ timeout -> run
 
 -- | Read two files to a BlobPair.
 readFilePathPair :: Path.RelFile -> Path.RelFile -> IO BlobPair
-readFilePathPair p1 p2 = readFilePair (fileForTypedPath p1) (fileForTypedPath p2)
+readFilePathPair p1 p2 = readFilePair (File.fromPath p1) (File.fromPath p2)
 
 -- Run a Task and call `die` if it returns an Exception.
 runTaskOrDie :: ParseC TaskC a -> IO a
