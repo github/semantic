@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DeriveGeneric, RankNTypes, NamedFieldPuns, OverloadedStrings #-}
+{-# LANGUAGE DeriveAnyClass, DeriveGeneric, RankNTypes, NamedFieldPuns #-}
 module Source.Range
 ( Range(..)
 , point
