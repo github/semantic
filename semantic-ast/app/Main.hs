@@ -4,7 +4,7 @@ module Main (main) where
 
 import AST.Unmarshal as Unmarshal
 import qualified Language.Python.AST as AST
-import qualified TreeSitter.Python as Python
+import qualified Language.Python.Grammar as Python
 import Source.Range
 import Source.Span
 import Data.Aeson (toJSON)
