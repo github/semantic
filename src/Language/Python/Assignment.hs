@@ -33,7 +33,7 @@ import qualified Data.Syntax.Type as Type
 import           Language.Python.Syntax as Python.Syntax
 import           Language.Python.Term as Python
 import           Prologue
-import           TreeSitter.Python as Grammar
+import           Language.Python.Grammar as Grammar
 
 type Assignment = Assignment.Assignment [] Grammar
 
