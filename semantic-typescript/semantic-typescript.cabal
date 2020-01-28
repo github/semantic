@@ -29,7 +29,7 @@ common haskell
                      , semantic-tags ^>= 0.0
                      , text ^>= 1.2.3
                      , tree-sitter ^>= 0.8
-                     , tree-sitter-typescript ^>= 0.4.1
+                     , tree-sitter-typescript ^>= 0.4.2
 
   ghc-options:
     -Weverything
