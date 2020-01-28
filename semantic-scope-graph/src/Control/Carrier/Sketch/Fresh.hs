@@ -49,8 +49,7 @@ data Sketchbook = Sketchbook
 instance Lower Sketchbook where
   lowerBound =
     let
-      initialGraph = ScopeGraph.insertScope n initialScope lowerBound
-      initialScope = ScopeGraph.Scope mempty mempty mempty
+      initialGraph = ScopeGraph.insertScope n lowerBound lowerBound
       n = Name.nameI 0
     in
       Sketchbook initialGraph n
@@ -112,7 +111,7 @@ runSketch ::
   -> SketchC Name m a
   -> m (ScopeGraph Name, a)
 runSketch _rootpath (SketchC go)
-  = evalFresh 0
+  = evalFresh 1
   . fmap (first sGraph)
   . runState lowerBound
   $ go

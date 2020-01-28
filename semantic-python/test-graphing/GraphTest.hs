@@ -88,14 +88,14 @@ assertSimpleReference = do
 
 expectedLexicalScope :: (Has Sketch sig m) => m Result
 expectedLexicalScope = do
-  declare "foo" (DeclProperties ScopeGraph.Function ScopeGraph.Default Nothing)
+  declareFunction (Just $ Name.name "foo") (FunProperties ScopeGraph.Function)
   reference "foo" "foo" RefProperties {}
   pure Complete
 
 expectedFunctionArg :: (Has Sketch sig m) => m Result
 expectedFunctionArg = do
-  declare "foo" (DeclProperties ScopeGraph.Function ScopeGraph.Default Nothing)
-  withScope (Name.nameI 0) $ do
+  (_, associatedScope) <- declareFunction (Just $ Name.name "foo") (FunProperties ScopeGraph.Function)
+  withScope associatedScope $ do
     declare "x" (DeclProperties ScopeGraph.Identifier ScopeGraph.Default Nothing)
     reference "x" "x" RefProperties
     pure ()
