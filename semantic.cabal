@@ -307,8 +307,8 @@ library
                      , tree-sitter-php ^>= 0.2
                      , tree-sitter-python ^>= 0.8.1
                      , tree-sitter-ruby ^>= 0.4.1
-                     , tree-sitter-typescript ^>= 0.4.1
-                     , tree-sitter-tsx ^>= 0.4.1
+                     , tree-sitter-typescript ^>= 0.4.2
+                     , tree-sitter-tsx ^>= 0.4.2
 
 executable semantic
   import:              haskell, dependencies, executable-flags
