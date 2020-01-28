@@ -64,8 +64,8 @@ import           Prologue
 import           TreeSitter.Go
 import qualified TreeSitter.Language as TS (Language, Symbol)
 import           TreeSitter.PHP
-import           TreeSitter.Python
-import           TreeSitter.Ruby (tree_sitter_ruby)
+import           Language.Python.Grammar
+import           Language.Ruby.Grammar (tree_sitter_ruby)
 import           TreeSitter.TSX
 import           TreeSitter.TypeScript
 import           AST.Unmarshal
