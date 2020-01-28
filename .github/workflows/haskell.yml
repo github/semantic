@@ -37,7 +37,7 @@ jobs:
       name: Cache ~/.cabal/store
       with:
         path: ~/.cabal/store
-        key: ${{ runner.os }}-${{ matrix.ghc }}-v4-cabal-store
+        key: ${{ runner.os }}-${{ matrix.ghc }}-v5-cabal-store
 
     - uses: actions/cache@v1
       if: always() # always cache built dependencies, even if e.g. tests fail
