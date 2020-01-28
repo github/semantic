@@ -11,7 +11,7 @@ import qualified Language.Python.Tags as PyTags
 import           ScopeGraph.Convert
 import qualified Tags.Tagging.Precise as Tags
 import qualified TreeSitter.Python (tree_sitter_python)
-import qualified TreeSitter.Unmarshal as TS
+import qualified AST.Unmarshal as TS
 
 newtype Term a = Term { getTerm :: Py.Module a }
 
