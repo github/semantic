@@ -10,7 +10,7 @@ import qualified Language.Go.AST as Go
 import qualified Language.Go.Tags as GoTags
 import qualified Tags.Tagging.Precise as Tags
 import qualified TreeSitter.Go (tree_sitter_go)
-import qualified TreeSitter.Unmarshal as TS
+import qualified AST.Unmarshal as TS
 
 newtype Term a = Term { getTerm :: Go.SourceFile a }
 

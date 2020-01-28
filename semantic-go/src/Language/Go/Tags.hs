@@ -18,7 +18,7 @@ import           Source.Loc
 import           Source.Source as Source
 import           Tags.Tag
 import qualified Tags.Tagging.Precise as Tags
-import           TreeSitter.Token
+import           AST.Token
 
 class ToTags t where
   tags
