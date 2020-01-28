@@ -10,7 +10,7 @@ import qualified Language.TSX.AST as TSX
 import qualified Language.TSX.Tags as TsxTags
 import qualified Tags.Tagging.Precise as Tags
 import qualified TreeSitter.TSX (tree_sitter_tsx)
-import qualified TreeSitter.Unmarshal as TS
+import qualified AST.Unmarshal as TS
 
 newtype Term a = Term { getTerm :: TSX.Program a }
 
