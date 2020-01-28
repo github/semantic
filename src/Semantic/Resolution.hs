@@ -1,4 +1,16 @@
-{-# LANGUAGE DeriveFunctor, DeriveGeneric, FlexibleContexts, FlexibleInstances, GADTs, GeneralizedNewtypeDeriving, KindSignatures, MultiParamTypeClasses, OverloadedStrings, RecordWildCards, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Semantic.Resolution
   ( Resolution (..)
   , nodeJSResolutionMap
@@ -7,6 +19,7 @@ module Semantic.Resolution
   , ResolutionC(..)
   ) where
 
+import           Analysis.File as File
 import           Control.Algebra
 import           Data.Aeson
 import           Data.Aeson.Types (parseMaybe)
@@ -21,10 +34,10 @@ import           System.FilePath.Posix
 import qualified System.Path as Path
 
 
-nodeJSResolutionMap :: (Has Files sig m, MonadIO m) => FilePath -> Text -> [FilePath] -> m (Map FilePath FilePath)
+nodeJSResolutionMap :: Has Files sig m => FilePath -> Text -> [FilePath] -> m (Map FilePath FilePath)
 nodeJSResolutionMap rootDir prop excludeDirs = do
   files <- findFiles (Path.absRel rootDir) [".json"] (fmap Path.absRel excludeDirs)
-  let packageFiles = fileForTypedPath <$> filter ((==) (Path.relFile "package.json") . Path.takeFileName) files
+  let packageFiles = File.fromPath <$> filter ((==) (Path.relFile "package.json") . Path.takeFileName) files
   blobs <- readBlobs (FilesFromPaths packageFiles)
   pure $ fold (mapMaybe (lookup prop) blobs)
   where
