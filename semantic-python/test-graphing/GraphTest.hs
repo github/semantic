@@ -24,7 +24,7 @@ import qualified System.Path.Directory as Path
 import qualified Test.Tasty as Tasty
 import qualified Test.Tasty.HUnit as HUnit
 import qualified TreeSitter.Python as TSP
-import qualified TreeSitter.Unmarshal as TS
+import qualified AST.Unmarshal as TS
 
 {-
 
