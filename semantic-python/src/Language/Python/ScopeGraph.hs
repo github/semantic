@@ -27,7 +27,6 @@ import           Control.Algebra (Algebra (..), handleCoercible)
 import           Control.Effect.Fresh
 import           Control.Effect.Sketch
 import           Data.Foldable
-import qualified Data.Map.Strict as Map
 import           Data.Maybe
 import           Data.Monoid
 import qualified Data.Name as Name
@@ -126,6 +125,7 @@ instance ToScopeGraph Py.Call where
             other    -> todo other
       args <- traverse scopeGraphArg args
       pure (result <> mconcat args)
+  scopeGraph it = todo it
 
 
 instance ToScopeGraph Py.ClassDefinition where scopeGraph = todo
