@@ -68,7 +68,7 @@ import           TreeSitter.Python
 import           TreeSitter.Ruby (tree_sitter_ruby)
 import           TreeSitter.TSX
 import           TreeSitter.TypeScript
-import           TreeSitter.Unmarshal
+import           AST.Unmarshal
 
 -- | A parser from 'Source' onto some term type.
 data Parser term where
