@@ -45,8 +45,8 @@ data Sketchbook address = Sketchbook
 instance Lower (Sketchbook Name) where
   lowerBound =
     let
-      initialGraph = ScopeGraph.insertScope n initialScope lowerBound
-      n = Data.Name.nameI 0
+      initialGraph = ScopeGraph.insertScope n lowerBound lowerBound
+      n = Analysis.Name.nameI 0
     in
       Sketchbook initialGraph n
 
