@@ -218,7 +218,11 @@ instance ToScopeGraph Py.Integer where scopeGraph = mempty
 
 instance ToScopeGraph Py.ImportStatement where scopeGraph = todo
 
-instance ToScopeGraph Py.ImportFromStatement where scopeGraph = todo
+instance ToScopeGraph Py.ImportFromStatement where
+  scopeGraph (Py.ImportFromStatement _ [] (L1 (Py.DottedName _ names)) (Just (Py.WildcardImport _ _))) = do
+      complete <* insertEdge ScopeGraph.Import names
+
+
 
 instance ToScopeGraph Py.Lambda where scopeGraph = todo
 
