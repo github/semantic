@@ -9,7 +9,7 @@ import TreeSitter.TypeScript.Internal
 import TreeSitter.Language
 
 -- Regenerate template haskell code when these files change:
-addDependentFileRelative "../../../vendor/tree-sitter-typescript/typescript/src/parser.c"
+addDependentFileRelative "../../vendor/tree-sitter-typescript/typescript/src/parser.c"
 
 -- | Statically-known rules corresponding to symbols in the grammar.
 mkSymbolDatatype (mkName "Grammar") tree_sitter_typescript
