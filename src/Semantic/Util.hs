@@ -4,10 +4,7 @@
 {-# LANGUAGE PartialTypeSignatures #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
-<<<<<<< HEAD
-=======
 {-# LANGUAGE ViewPatterns #-}
->>>>>>> origin/master
 {-# OPTIONS_GHC -Wno-missing-signatures -Wno-missing-exported-signatures -Wno-partial-type-signatures -O0 #-}
 module Semantic.Util
   ( evaluateProject'
@@ -29,10 +26,7 @@ import           Control.Carrier.Reader
 import           Control.Carrier.Resumable.Either (SomeError (..))
 import           Control.Carrier.State.Strict
 import           Control.Carrier.Trace.Printing
-<<<<<<< HEAD
 import           Control.Exception hiding (evaluate)
-=======
->>>>>>> origin/master
 import           Control.Lens.Getter
 import           Control.Monad
 import           Data.Abstract.Address.Precise as Precise

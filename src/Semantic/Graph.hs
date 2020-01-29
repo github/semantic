@@ -71,7 +71,7 @@ import           Data.Functor.Foldable
 import           Data.Graph
 import           Data.Graph.ControlFlowVertex (VertexDeclaration)
 import           Data.Language as Language
-import           Data.List (find, isPrefixOf, isSuffixOf)
+import           Data.List (find, isPrefixOf)
 import           Data.Map (Map)
 import qualified Data.Map as Map
 import           Data.Project
