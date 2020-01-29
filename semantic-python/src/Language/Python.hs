@@ -12,8 +12,6 @@ import qualified Tags.Tagging.Precise as Tags
 import qualified TreeSitter.Python (tree_sitter_python)
 import qualified TreeSitter.Python.AST as Py
 import qualified TreeSitter.Unmarshal as TS
-import qualified Data.ScopeGraph as ScopeGraph
-import qualified Control.Effect.Sketch as Sketch
 
 newtype Term a = Term { getTerm :: Py.Module a }
 
