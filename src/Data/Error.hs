@@ -1,4 +1,8 @@
-{-# LANGUAGE DeriveFunctor, FlexibleInstances, GADTs, RankNTypes, RecordWildCards #-}
+{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE RecordWildCards #-}
 module Data.Error
   ( Error (..)
   , formatError
@@ -11,10 +15,12 @@ module Data.Error
   , Colourize (..)
   ) where
 
-import Prologue
-
+import Control.Exception (Exception)
 import Data.ByteString.Char8 (unpack)
+import Data.Foldable
+import Data.Ix (inRange)
 import Data.List (intersperse, isSuffixOf)
+import GHC.Stack
 import System.Console.ANSI
 
 import           Data.Blob

@@ -1,4 +1,5 @@
-{-# LANGUAGE FlexibleInstances, RecordWildCards #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE RecordWildCards #-}
 module Semantic.Telemetry.Stat
 (
 -- Primary API for creating stats.
@@ -28,6 +29,8 @@ module Semantic.Telemetry.Stat
 ) where
 
 
+import           Control.Monad
+import           Control.Monad.IO.Class
 import qualified Data.ByteString.Char8 as B
 import           Data.List (intercalate)
 import           Data.List.Split (splitOneOf)
@@ -36,7 +39,6 @@ import           Network.Socket
     (Socket (..), SocketType (..), addrAddress, addrFamily, close, connect, defaultProtocol, getAddrInfo, socket)
 import           Network.Socket.ByteString
 import           Numeric
-import           Prologue
 import           System.IO.Error
 
 -- | A named piece of data you wish to record a specific 'Metric' for.

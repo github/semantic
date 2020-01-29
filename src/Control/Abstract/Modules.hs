@@ -1,6 +1,17 @@
-{-# LANGUAGE DeriveFunctor, DeriveGeneric, FlexibleContexts, FlexibleInstances, GADTs, GeneralizedNewtypeDeriving,
-             KindSignatures, MultiParamTypeClasses, RankNTypes, ScopedTypeVariables, StandaloneDeriving, TypeOperators,
-             OverloadedStrings, UndecidableInstances #-}
+{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Control.Abstract.Modules
 ( ModuleResult
 , lookupModule
@@ -21,13 +32,18 @@ module Control.Abstract.Modules
 , ModuleTable
 ) where
 
-import Prologue
-
 import           Control.Algebra
 import           Control.Carrier.Reader
 import qualified Control.Carrier.Resumable.Either as Either
 import qualified Control.Carrier.Resumable.Resume as With
+import           Control.Monad.IO.Class
+import           Data.Foldable
+import           Data.Functor.Classes
+import           Data.Maybe.Exts
+import           Data.Semilattice.Lower
+import           Data.Set (Set)
 import qualified Data.Set as Set
+import           GHC.Generics (Generic1)
 import           Source.Span
 import           System.FilePath.Posix (takeDirectory)
 

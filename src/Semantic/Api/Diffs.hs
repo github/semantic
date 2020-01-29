@@ -1,4 +1,10 @@
-{-# LANGUAGE AllowAmbiguousTypes, DataKinds, FlexibleContexts, FlexibleInstances, MonoLocalBinds, RankNTypes, UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE MonoLocalBinds #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Semantic.Api.Diffs
   ( parseDiffBuilder
   , DiffOutputFormat(..)
@@ -13,23 +19,27 @@ import           Control.Effect.Parse
 import           Control.Effect.Reader
 import           Control.Exception
 import           Control.Lens
+import           Control.Monad
 import           Control.Monad.IO.Class
+import           Data.Bifoldable
 import           Data.Blob
 import           Data.ByteString.Builder
 import           Data.Diff
 import           Data.Edit
+import           Data.Foldable
+import           Data.Functor.Classes
 import           Data.Graph
 import           Data.JSON.Fields (ToJSONFields1)
 import           Data.Language
+import           Data.Map.Strict (Map)
 import           Data.ProtoLens (defMessage)
-import           Data.Term (IsTerm(..))
+import           Data.Term (IsTerm (..))
 import qualified Data.Text as T
-import           Diffing.Interpreter (DiffTerms(..))
+import           Diffing.Interpreter (DiffTerms (..))
 import           Parsing.Parser
-import           Prologue
 import           Proto.Semantic as P hiding (Blob, BlobPair)
 import           Proto.Semantic_Fields as P
-import           Proto.Semantic_JSON()
+import           Proto.Semantic_JSON ()
 import           Rendering.Graph
 import           Rendering.JSON hiding (JSON)
 import qualified Rendering.JSON

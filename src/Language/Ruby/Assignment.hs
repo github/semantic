@@ -1,4 +1,9 @@
-{-# LANGUAGE DataKinds, FlexibleContexts, OverloadedStrings, RankNTypes, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
 module Language.Ruby.Assignment
 ( assignment
 , Ruby.Syntax
@@ -6,13 +11,15 @@ module Language.Ruby.Assignment
 , Ruby.Term(..)
 ) where
 
-import Prologue hiding (for, unless)
-
 import           Analysis.Name (name)
 import           Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
-import qualified Data.Abstract.ScopeGraph as ScopeGraph (AccessControl(..))
+import           Control.Monad hiding (unless)
+import qualified Data.Abstract.ScopeGraph as ScopeGraph (AccessControl (..))
+import           Data.List.NonEmpty (some1)
 import qualified Data.List.NonEmpty as NonEmpty
+import           Data.Maybe
+import           Data.Sum
 import           Data.Syntax
     ( contextualize
     , emptyTerm

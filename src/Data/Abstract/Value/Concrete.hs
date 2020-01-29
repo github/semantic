@@ -1,5 +1,14 @@
-{-# LANGUAGE FlexibleContexts, FlexibleInstances, GADTs, LambdaCase, MultiParamTypeClasses, RankNTypes,
-             ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Data.Abstract.Value.Concrete
   ( Value (..)
   , ValueError (..)
@@ -7,15 +16,21 @@ module Data.Abstract.Value.Concrete
   , runValueErrorWith
   ) where
 
-import Prologue
-
 import           Control.Carrier.Resumable.Either (SomeError)
 import qualified Control.Carrier.Resumable.Either as Either
 import qualified Control.Carrier.Resumable.Resume as With
+import           Control.Exception (ArithException)
+import           Data.Bits (shiftR)
+import           Data.Foldable
+import           Data.Function
+import           Data.Functor
+import           Data.Functor.Classes
 import           Data.List (genericIndex, genericLength)
 import qualified Data.Map.Strict as Map
 import           Data.Scientific.Exts
-import           Data.Text (pack)
+import           Data.Semilattice.Lower
+import           Data.Text (Text, pack)
+import           Data.Word
 
 import           Analysis.Name
 import           Control.Abstract hiding

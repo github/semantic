@@ -1,12 +1,14 @@
-{-# LANGUAGE DeriveAnyClass, DeriveGeneric #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
 module Data.ImportPath (IsRelative(..), ImportPath(..), importPath, toName, defaultAlias) where
-
-import Prologue
 
 import           Analysis.Name
 import           Data.Abstract.Path (stripQuotes)
 import           Data.Aeson
+import           Data.Hashable
+import           Data.Text
 import qualified Data.Text as T
+import           GHC.Generics (Generic)
 import           System.FilePath.Posix
 
 data IsRelative = Unknown | Relative | NonRelative

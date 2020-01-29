@@ -1,4 +1,18 @@
-{-# LANGUAGE AllowAmbiguousTypes, DataKinds, FlexibleContexts, FlexibleInstances, LambdaCase, MultiParamTypeClasses, OverloadedStrings, RankNTypes, RecordWildCards, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances, ViewPatterns #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE ViewPatterns #-}
 module Analysis.TOCSummary
 ( Declaration(..)
 , formatIdentifier
@@ -8,15 +22,19 @@ module Analysis.TOCSummary
 , declarationAlgebra
 ) where
 
-import Prologue hiding (project)
-
+import           Data.Algebra
 import           Data.Blob
 import qualified Data.Error as Error
 import           Data.Flag
+import           Data.Foldable (toList)
 import           Data.Language as Language
+import           Data.List.NonEmpty (nonEmpty)
+import           Data.Semigroup (sconcat)
+import           Data.Sum
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import           Data.Term
+import           Data.Text (Text)
 import qualified Data.Text as T
 import qualified Language.Markdown.Syntax as Markdown
 import           Source.Loc as Loc

@@ -1,17 +1,25 @@
-{-# LANGUAGE DeriveFunctor, FlexibleContexts, GeneralizedNewtypeDeriving, TypeApplications, TypeOperators #-}
+{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeOperators #-}
 module Analysis.Abstract.Caching.FlowInsensitive
 ( cachingTerms
 , convergingModules
 , caching
 ) where
 
-import Prologue
-
 import Control.Algebra (Effect)
 import Control.Carrier.Fresh.Strict
 import Control.Carrier.NonDet.Church
 import Control.Carrier.Reader
 import Control.Carrier.State.Strict
+import Data.Bifunctor
+import Data.Foldable
+import Data.Functor.Classes
+import Data.Maybe.Exts
+import Data.Semilattice.Lower
+import Data.Set (Set)
 
 import Control.Abstract
 import Data.Abstract.Module
@@ -194,8 +202,8 @@ newtype Cache term address value = Cache { unCache :: Monoidal.Map (Configuratio
 
 -- | A single point in a program’s execution.
 data Configuration term address = Configuration
-  { configurationTerm    :: term                -- ^ The “instruction,” i.e. the current term to evaluate.
-  , configurationRoots   :: Live address        -- ^ The set of rooted addresses.
+  { configurationTerm  :: term                -- ^ The “instruction,” i.e. the current term to evaluate.
+  , configurationRoots :: Live address        -- ^ The set of rooted addresses.
   }
   deriving (Eq, Ord, Show)
 

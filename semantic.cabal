@@ -158,6 +158,7 @@ library
                      , Data.JSON.Fields
                      , Data.Language
                      , Data.Map.Monoidal
+                     , Data.Maybe.Exts
                      , Data.Project
                      , Data.Quieterm
                      , Data.Semigroup.App
@@ -254,7 +255,6 @@ library
                      , Tags.Taggable
                      , Tags.Tagging
                      -- Custom Prelude
-                     , Prologue
   autogen-modules:     Paths_semantic
   other-modules:       Paths_semantic
   build-depends:       base >= 4.13 && < 5

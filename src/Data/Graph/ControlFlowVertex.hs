@@ -1,4 +1,14 @@
-{-# LANGUAGE DataKinds, EmptyCase, FlexibleInstances, MultiParamTypeClasses, OverloadedStrings, RecordWildCards, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE EmptyCase #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Data.Graph.ControlFlowVertex
 ( ControlFlowVertex (..)
 , packageVertex
@@ -20,15 +30,19 @@ import           Data.Abstract.Module (ModuleInfo (..))
 import           Data.Abstract.Package (PackageInfo (..))
 import           Data.Aeson
 import           Data.Graph.Algebraic (VertexTag (..))
-import           Data.Quieterm (Quieterm(..))
+import           Data.Hashable
+import           Data.Proxy
+import           Data.Quieterm (Quieterm (..))
+import           Data.Semilattice.Lower
+import           Data.Sum
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Expression as Expression
 import           Data.Term
+import           Data.Text (Text)
 import qualified Data.Text as T
 import           GHC.Generics (V1)
 import           Prelude hiding (span)
-import           Prologue
 import qualified Source.Loc as Loc
 import           Source.Span
 

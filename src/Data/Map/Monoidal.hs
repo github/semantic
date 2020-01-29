@@ -1,4 +1,6 @@
-{-# LANGUAGE DeriveTraversable, GeneralizedNewtypeDeriving, MultiParamTypeClasses #-}
+{-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 -- | This module defines a 'Map' type whose 'Monoid' and 'Reducer' instances merge values using the 'Semigroup' instance for the underlying type.
 module Data.Map.Monoidal
 ( Map
@@ -15,11 +17,12 @@ module Data.Map.Monoidal
 , module Reducer
 ) where
 
-import Data.Aeson (ToJSON)
+import           Data.Aeson (ToJSON)
+import           Data.Functor.Classes
 import qualified Data.Map as Map
-import Data.Semigroup.Reducer as Reducer
-import Prelude hiding (lookup)
-import Prologue hiding (Map, empty)
+import           Data.Semigroup.Reducer as Reducer
+import           Data.Semilattice.Lower
+import           Prelude hiding (lookup)
 
 newtype Map key value = Map { unMap :: Map.Map key value }
   deriving (Eq, Eq1, Eq2, Foldable, Functor, Ord, Ord1, Ord2, Show, Show1, Show2, ToJSON, Traversable, Lower)

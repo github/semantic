@@ -1,4 +1,9 @@
-{-# LANGUAGE ConstraintKinds, FlexibleContexts, GADTs, GeneralizedNewtypeDeriving, TypeApplications, TypeOperators #-}
+{-# LANGUAGE ConstraintKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeOperators #-}
 module Analysis.Abstract.Caching.FlowSensitive
 ( Cache
 , cachingTerms
@@ -6,13 +11,18 @@ module Analysis.Abstract.Caching.FlowSensitive
 , caching
 ) where
 
-import Prologue
-
 import Control.Algebra (Effect)
+import Control.Carrier.Fresh.Strict
 import Control.Carrier.NonDet.Church
 import Control.Carrier.Reader
-import Control.Carrier.Fresh.Strict
 import Control.Carrier.State.Strict
+import Data.Bifunctor
+import Data.Foldable
+import Data.Functor
+import Data.Functor.Classes
+import Data.Maybe.Exts
+import Data.Semilattice.Lower
+import Data.Set (Set)
 
 import Control.Abstract
 import Data.Abstract.Module

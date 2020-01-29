@@ -1,10 +1,13 @@
-{-# LANGUAGE FlexibleContexts, TypeFamilies #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE TypeFamilies #-}
 module Analysis.Decorator
 ( decoratorWithAlgebra
 ) where
 
+import Data.Algebra
+import Data.Bifunctor
+import Data.Functor.Foldable
 import Data.Term
-import Prologue
 
 -- | Lift an algebra into a decorator for terms annotated with records.
 decoratorWithAlgebra :: (Functor (Syntax term), IsTerm term, Recursive (term a), Base (term a) ~ TermF (Syntax term) a)
