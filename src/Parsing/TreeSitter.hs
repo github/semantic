@@ -19,7 +19,6 @@ import Control.Monad
 import Control.Monad.IO.Class
 import Data.Functor.Foldable
 import Foreign
-import Foreign.C.Types (CBool (..))
 import GHC.Generics
 
 import           Data.AST (AST, Node (Node))
@@ -94,7 +93,6 @@ runParse parseTimeout language Blob{..} action =
   liftIO . Exc.tryJust fromException . TS.withParser language $ \ parser -> do
     let timeoutMicros = fromIntegral $ toMicroseconds parseTimeout
     TS.ts_parser_set_timeout_micros parser timeoutMicros
-    TS.ts_parser_halt_on_error parser (CBool 1)
     compatible <- TS.ts_parser_set_language parser language
     if compatible then
       TS.withParseTree parser (Source.bytes blobSource) $ \ treePtr -> do

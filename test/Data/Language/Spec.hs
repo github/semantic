@@ -1,8 +1,9 @@
 module Data.Language.Spec (testTree) where
 
-import Data.Language
-import Test.Tasty
-import Test.Tasty.HUnit
+import           Data.Language as Language
+import qualified System.Path as Path
+import           Test.Tasty
+import           Test.Tasty.HUnit
 
 testTree :: TestTree
 testTree = testGroup "Data.Language"
@@ -13,7 +14,7 @@ testTree = testGroup "Data.Language"
       codeNavLanguages @=? [Go, Java, Ruby, Python, JavaScript, TypeScript, PHP]
 
   , testCase "languageForFilePath works for languages with ambiguous lingo extensions" $ do
-      languageForFilePath "foo.php" @=? PHP
-      languageForFilePath "foo.md" @=? Markdown
-      languageForFilePath "foo.tsx" @=? TSX
+      Language.forPath (Path.relFile "foo.php") @=? PHP
+      Language.forPath (Path.relFile "foo.md" ) @=? Markdown
+      Language.forPath (Path.relFile "foo.tsx") @=? TSX
   ]

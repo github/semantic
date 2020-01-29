@@ -7,6 +7,7 @@ module Control.Abstract.Primitive
   , defineBuiltIn
   ) where
 
+import           Analysis.Name
 import           Control.Abstract.Context
 import           Control.Abstract.Evaluator
 import           Control.Abstract.Heap
@@ -14,7 +15,6 @@ import           Control.Abstract.ScopeGraph
 import           Control.Abstract.Value
 import           Control.Monad
 import           Data.Abstract.BaseError
-import           Data.Abstract.Name
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.Map.Strict as Map
 import           Data.Maybe

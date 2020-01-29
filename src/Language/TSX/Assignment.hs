@@ -11,10 +11,10 @@ module Language.TSX.Assignment
 , TSX.Term(..)
 ) where
 
+import           Analysis.Name (name)
 import           Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
 import           Control.Monad
-import           Data.Abstract.Name (name)
 import qualified Data.Abstract.ScopeGraph as ScopeGraph (AccessControl (..))
 import           Data.Foldable
 import           Data.Function

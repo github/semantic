@@ -8,7 +8,7 @@ module Data.Abstract.FreeVariables
   , FreeVariables1 (..)
   ) where
 
-import Data.Abstract.Name
+import Analysis.Name
 import Data.Set (Set)
 import Data.Sum
 import Data.Term

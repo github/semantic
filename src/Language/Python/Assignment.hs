@@ -10,10 +10,10 @@ module Language.Python.Assignment
 , Python.Term(..)
 ) where
 
+import           Analysis.Name (name)
 import           Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
 import           Control.Monad
-import           Data.Abstract.Name (name)
 import           Data.Functor
 import           Data.List.NonEmpty (some1)
 import qualified Data.List.NonEmpty as NonEmpty

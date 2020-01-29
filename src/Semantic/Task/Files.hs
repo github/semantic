@@ -27,6 +27,7 @@ module Semantic.Task.Files
   , FilesArg(..)
   ) where
 
+import           Analysis.File
 import           Control.Algebra
 import           Control.Effect.Error
 import           Control.Exception
@@ -44,10 +45,10 @@ import qualified System.Path as Path
 import qualified System.Path.IO as IO (withBinaryFile)
 
 data Source blob where
-  FromPath       :: File                            -> Source Blob
+  FromPath       :: File Language                   -> Source Blob
   FromHandle     :: Handle 'IO.ReadMode             -> Source [Blob]
   FromDir        :: Path.AbsRelDir                  -> Source [Blob]
-  FromPathPair   :: File -> File                    -> Source BlobPair
+  FromPathPair   :: File Language -> File Language  -> Source BlobPair
   FromPairHandle :: Handle 'IO.ReadMode             -> Source [BlobPair]
 
 data Destination = ToPath Path.AbsRelFile | ToHandle (Handle 'IO.WriteMode)
@@ -93,26 +94,21 @@ instance (Has (Error SomeException) sig m, MonadFail m, MonadIO m) => Algebra (F
     Write (ToPath path) builder k                             -> liftIO (IO.withBinaryFile path IO.WriteMode (`B.hPutBuilder` builder)) >> k
     Write (ToHandle (WriteHandle handle)) builder k           -> liftIO (B.hPutBuilder handle builder) >> k
 
-readBlob :: Has Files sig m => File -> m Blob
+readBlob :: Has Files sig m => File Language -> m Blob
 readBlob file = send (Read (FromPath file) pure)
 
 -- Various ways to read in files
 data FilesArg
   = FilesFromHandle (Handle 'IO.ReadMode)
-  | FilesFromPaths [File]
+  | FilesFromPaths [File Language]
 
 -- | A task which reads a list of 'Blob's from a 'Handle' or a list of 'FilePath's optionally paired with 'Language's.
-readBlobs :: (Has Files sig m, MonadIO m) => FilesArg -> m [Blob]
+readBlobs :: Has Files sig m => FilesArg -> m [Blob]
 readBlobs (FilesFromHandle handle) = send (Read (FromHandle handle) pure)
-readBlobs (FilesFromPaths [path]) = do
-  isDir <- isDirectory (filePath path)
-  if isDir
-    then send (Read (FromDir (Path.path (filePath path))) pure)
-    else pure <$> send (Read (FromPath path) pure)
-readBlobs (FilesFromPaths paths) = traverse (send . flip Read pure . FromPath) paths
+readBlobs (FilesFromPaths paths)   = traverse (send . flip Read pure . FromPath) paths
 
 -- | A task which reads a list of pairs of 'Blob's from a 'Handle' or a list of pairs of 'FilePath's optionally paired with 'Language's.
-readBlobPairs :: Has Files sig m => Either (Handle 'IO.ReadMode) [(File, File)] -> m [BlobPair]
+readBlobPairs :: Has Files sig m => Either (Handle 'IO.ReadMode) [(File Language, File Language)] -> m [BlobPair]
 readBlobPairs (Left handle) = send (Read (FromPairHandle handle) pure)
 readBlobPairs (Right paths) = traverse (send . flip Read pure . uncurry FromPathPair) paths
 

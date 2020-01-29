@@ -24,6 +24,7 @@ module Data.Abstract.Evaluatable
 , runUnspecialized
 , runUnspecializedWith
 , throwUnspecializedError
+, __self
 ) where
 
 import           Control.Algebra
@@ -40,6 +41,7 @@ import           Data.Text
 import           GHC.Stack
 import           Source.Span (HasSpan (..))
 
+import           Analysis.Name as X
 import           Control.Abstract hiding (Load, String)
 import qualified Control.Abstract as Abstract
 import           Control.Abstract.Context as X
@@ -73,7 +75,6 @@ import           Data.Abstract.BaseError as X
 import           Data.Abstract.Declarations as X
 import           Data.Abstract.FreeVariables as X
 import           Data.Abstract.Module
-import           Data.Abstract.Name as X
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.Language
 import           Data.Semigroup.App
@@ -152,6 +153,8 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
 traceResolve :: (Show a, Show b, Has Trace sig m) => a -> b -> Evaluator term address value m ()
 traceResolve name path = trace ("resolved " <> show name <> " -> " <> show path)
 
+__self :: Name
+__self = name "__semantic_self"
 
 -- Preludes
 
@@ -225,7 +228,7 @@ defineSelf :: ( Has (State (ScopeGraph address)) sig m
               )
            => Evaluator term address value m ()
 defineSelf = do
-  let self = Declaration X.__self
+  let self = Declaration __self
   declare self ScopeGraph.Prelude Public lowerBound ScopeGraph.Unknown Nothing
   slot <- lookupSlot self
   assign slot =<< object =<< currentFrame

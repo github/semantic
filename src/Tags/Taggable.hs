@@ -35,8 +35,8 @@ where
 
 import Analysis.ConstructorName
 import Analysis.HasTextElement
+import Analysis.Name
 import Data.Abstract.Declarations
-import Data.Abstract.Name
 import Data.Algebra
 import Data.Foldable
 import Data.Functor.Foldable

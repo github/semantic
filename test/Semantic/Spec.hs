@@ -1,20 +1,23 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Semantic.Spec (spec) where
 
-import Control.Carrier.Reader
-import Control.Exception (fromException)
-import SpecHelpers
+import           Analysis.File
+import           Control.Carrier.Reader
+import           Control.Exception (fromException)
+import qualified Data.Blob as Blob
+import           SpecHelpers
+import qualified System.Path as Path
 
 import Semantic.Api hiding (Blob)
 
  -- we need some lenses here, oof
 setBlobLanguage :: Language -> Blob -> Blob
-setBlobLanguage lang b = b { blobFile = (blobFile b) { fileLanguage = lang }}
+setBlobLanguage lang b = b { blobFile = (blobFile b) { fileBody = lang }}
 
 spec :: Spec
 spec = do
   describe "parseBlob" $ do
-    let methodsBlob = makeBlob "def foo\nend\n" "methods.rb" Ruby mempty
+    let methodsBlob = Blob.fromSource (Path.relFile "methods.rb") Ruby "def foo\nend\n"
 
     it "returns error if given an unknown language (json)" $ do
       output <- fmap runBuilder . runTaskOrDie . runReader defaultLanguageModes $ parseTermBuilder TermJSONTree [ setBlobLanguage Unknown methodsBlob ]
@@ -23,8 +26,8 @@ spec = do
     it "throws if given an unknown language for sexpression output" $ do
       res <- runTaskWithOptions defaultOptions (runReader defaultLanguageModes (runParseWithConfig (parseTermBuilder TermSExpression [setBlobLanguage Unknown methodsBlob])))
       case res of
-        Left exc    -> fromException exc `shouldBe` Just (NoLanguageForBlob "methods.rb")
-        Right _bad  -> fail "Expected parseTermBuilder to fail for an unknown language"
+        Left exc   -> fromException exc `shouldBe` Just (NoLanguageForBlob "methods.rb")
+        Right _bad -> fail "Expected parseTermBuilder to fail for an unknown language"
 
     it "renders with the specified renderer" $ do
       output <- fmap runBuilder . runTaskOrDie . runReader defaultLanguageModes $ parseTermBuilder TermSExpression [methodsBlob]

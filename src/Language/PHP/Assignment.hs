@@ -10,9 +10,9 @@ module Language.PHP.Assignment
 , PHP.Term(..)
 ) where
 
+import qualified Analysis.Name as Name
 import           Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
-import qualified Data.Abstract.Name as Name
 import qualified Data.Abstract.ScopeGraph as ScopeGraph (AccessControl (..))
 import           Data.Foldable
 import           Data.List.NonEmpty (NonEmpty (..), some1)

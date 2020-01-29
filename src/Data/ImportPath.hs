@@ -2,7 +2,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 module Data.ImportPath (IsRelative(..), ImportPath(..), importPath, toName, defaultAlias) where
 
-import           Data.Abstract.Name
+import           Analysis.Name
 import           Data.Abstract.Path (stripQuotes)
 import           Data.Aeson
 import           Data.Hashable

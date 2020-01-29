@@ -10,10 +10,10 @@ module Language.Go.Assignment
 , Go.Term(..)
 ) where
 
+import           Analysis.Name (name)
 import           Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
 import           Control.Monad
-import           Data.Abstract.Name (name)
 import qualified Data.Abstract.ScopeGraph as ScopeGraph (AccessControl (..))
 import           Data.ImportPath (defaultAlias, importPath)
 import           Data.List.NonEmpty (NonEmpty (..), some1)

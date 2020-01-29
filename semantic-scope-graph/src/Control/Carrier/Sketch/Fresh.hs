@@ -18,6 +18,8 @@ module Control.Carrier.Sketch.Fresh
   , module Control.Effect.Sketch
   ) where
 
+import           Analysis.Name (Name)
+import qualified Analysis.Name
 import           Control.Algebra
 import           Control.Carrier.Fresh.Strict
 import           Control.Carrier.State.Strict
@@ -25,8 +27,6 @@ import           Control.Effect.Sketch
 import           Control.Monad.IO.Class
 import           Data.Bifunctor
 import           Data.Module
-import           Data.Name (Name)
-import qualified Data.Name
 import           Data.ScopeGraph (ScopeGraph)
 import qualified Data.ScopeGraph as ScopeGraph
 import           Data.Semilattice.Lower
@@ -45,9 +45,8 @@ data Sketchbook address = Sketchbook
 instance Lower (Sketchbook Name) where
   lowerBound =
     let
-      initialGraph = ScopeGraph.insertScope n initialScope lowerBound
-      initialScope = lowerBound
-      n = Data.Name.nameI 0
+      initialGraph = ScopeGraph.insertScope n lowerBound lowerBound
+      n = Analysis.Name.nameI 0
     in
       Sketchbook initialGraph n
 
@@ -59,7 +58,7 @@ instance (Effect sig, Algebra sig m) => Algebra (Sketch Name :+: sig) (SketchC N
     Sketchbook old current <- SketchC (get @(Sketchbook Name))
     let (new, _pos) =
           ScopeGraph.declare
-          (ScopeGraph.Declaration (Data.Name.name n))
+          (ScopeGraph.Declaration (Analysis.Name.name n))
           (lowerBound @ModuleInfo)
           ScopeGraph.Default
           ScopeGraph.Public
@@ -74,11 +73,11 @@ instance (Effect sig, Algebra sig m) => Algebra (Sketch Name :+: sig) (SketchC N
     Sketchbook old current <- SketchC (get @(Sketchbook Name))
     let new =
           ScopeGraph.reference
-          (ScopeGraph.Reference (Data.Name.name n))
+          (ScopeGraph.Reference (Analysis.Name.name n))
           (lowerBound @ModuleInfo)
           (lowerBound @Span)
           ScopeGraph.Identifier
-          (ScopeGraph.Declaration (Data.Name.name decl))
+          (ScopeGraph.Declaration (Analysis.Name.name decl))
           current
           old
     SketchC (put @(Sketchbook Name) (Sketchbook new current))

@@ -43,7 +43,7 @@ library
   -- other-extensions:
   build-depends:       base ^>= 4.13
                      , tree-sitter ^>= 0.8
-                     , semantic-source ^>= 0.0.1
+                     , semantic-source ^>= 0.0.2
                      , tree-sitter-python ^>= 0.8.1
                      , bytestring ^>= 0.10.8.2
                      , optparse-applicative >= 0.14.3 && < 0.16

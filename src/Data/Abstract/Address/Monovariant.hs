@@ -5,9 +5,9 @@ module Data.Abstract.Address.Monovariant
 
 import Prologue
 
+import Analysis.Name
 import Control.Abstract
 import Control.Algebra
-import Data.Abstract.Name
 import qualified Data.Set as Set
 
 -- | 'Monovariant' models using one address for a particular name. It tracks the set of values that a particular address takes and uses it's name to lookup in the store and only allocation if new.

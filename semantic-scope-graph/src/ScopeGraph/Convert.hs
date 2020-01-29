@@ -13,9 +13,9 @@ module ScopeGraph.Convert
   , complete
   ) where
 
+import Analysis.Name (Name)
 import Control.Effect.Sketch
 import Data.List.NonEmpty
-import Data.Name (Name)
 import Data.Typeable
 import Source.Loc
 

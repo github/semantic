@@ -43,6 +43,7 @@ import Prelude hiding (readFile)
 import           Analysis.Abstract.Caching.FlowInsensitive
 import           Analysis.Abstract.Collecting
 import           Analysis.Abstract.Graph as Graph
+import           Analysis.File
 import           Control.Abstract hiding (String)
 import           Control.Abstract.PythonPackage as PythonPackage
 import           Control.Algebra
@@ -70,8 +71,12 @@ import           Data.Functor.Foldable
 import           Data.Graph
 import           Data.Graph.ControlFlowVertex (VertexDeclaration)
 import           Data.Language as Language
+<<<<<<< HEAD
 import           Data.List (find, isPrefixOf, isSuffixOf)
 import           Data.Map (Map)
+=======
+import           Data.List (isPrefixOf)
+>>>>>>> origin/master
 import qualified Data.Map as Map
 import           Data.Project
 import           Data.Proxy
@@ -84,6 +89,7 @@ import           Semantic.Task as Task
 import           Source.Loc as Loc
 import           Source.Span
 import           System.FilePath.Posix (takeDirectory, (</>))
+import qualified System.Path as Path
 import           Text.Show.Pretty (ppShow)
 
 data GraphType = ImportGraph | CallGraph
@@ -337,8 +343,9 @@ parsePythonPackage parser project = do
                                         ]
     PythonPackage.FindPackages excludeDirs -> do
       trace "In Graph.FindPackages"
-      let initFiles = filter (("__init__.py" `isSuffixOf`) . filePath) (projectFiles project)
-      let packageDirs = filter (`notElem` ((projectRootDir project </>) . unpack <$> excludeDirs)) (takeDirectory . filePath <$> initFiles)
+      let initFiles = filter (isInit . filePath) (projectFiles project)
+          isInit = (== Path.relFile "__init__.py") . Path.takeFileName
+          packageDirs = filter (`notElem` ((projectRootDir project </>) . unpack <$> excludeDirs)) (takeDirectory . Path.toString . filePath <$> initFiles)
       packageFromProject project [ blob | dir <- packageDirs
                                         , blob <- projectBlobs project
                                         , dir `isPrefixOf` blobPath blob

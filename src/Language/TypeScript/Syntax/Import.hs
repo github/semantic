@@ -3,9 +3,9 @@ module Language.TypeScript.Syntax.Import (module Language.TypeScript.Syntax.Impo
 
 import Prologue
 
+import qualified Analysis.Name as Name
 import           Control.Abstract hiding (Import)
 import           Data.Abstract.Evaluatable as Evaluatable
-import qualified Data.Abstract.Name as Name
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.JSON.Fields
 import           Diffing.Algorithm

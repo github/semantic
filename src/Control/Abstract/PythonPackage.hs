@@ -6,11 +6,11 @@
 module Control.Abstract.PythonPackage
 ( runPythonPackaging, Strategy(..) ) where
 
+import           Analysis.Name (name)
 import           Control.Abstract as Abstract
 import           Control.Algebra
 import           Control.Effect.Sum.Project
 import           Control.Monad
-import           Data.Abstract.Name (name)
 import           Data.Abstract.Path (stripQuotes)
 import           Data.Abstract.Value.Concrete (Value (..))
 import qualified Data.Map as Map
