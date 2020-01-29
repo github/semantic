@@ -1,4 +1,12 @@
-{-# LANGUAGE DeriveGeneric, DeriveTraversable, FlexibleContexts, FlexibleInstances, FunctionalDependencies, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
 module Data.Term
 ( Term(..)
 , TermF(..)
@@ -15,12 +23,17 @@ module Data.Term
 , injectTerm
 ) where
 
-import Prologue
-
 import           Control.Lens.Lens
 import           Data.Aeson
+import           Data.Bifoldable
+import           Data.Bifunctor
+import           Data.Bitraversable
+import           Data.Functor.Classes
+import           Data.Functor.Foldable
 import           Data.JSON.Fields
+import           Data.Sum
 import qualified Data.Sum as Sum
+import           GHC.Generics (Generic1)
 import           Source.Span
 import           Text.Show
 

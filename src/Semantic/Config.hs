@@ -21,11 +21,11 @@ module Semantic.Config
   ) where
 
 import           Data.Duration
-import           Data.Error (LogPrintSource(..))
+import           Data.Error (LogPrintSource (..))
 import           Data.Flag
+import           Data.Maybe
 import           Network.HostName
 import           Network.URI
-import           Prologue
 import           Semantic.Env
 import           Semantic.Telemetry
 import qualified Semantic.Telemetry.Error as Error

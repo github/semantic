@@ -1,13 +1,19 @@
-{-# LANGUAGE DeriveAnyClass, DeriveGeneric, DeriveTraversable, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Data.Syntax.Directive (module Data.Syntax.Directive) where
-
-import Prologue
 
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module (ModuleInfo (..))
+import           Data.Functor.Classes.Generic
+import           Data.Hashable.Lifted
 import           Data.JSON.Fields
 import qualified Data.Text as T
 import           Diffing.Algorithm
+import           GHC.Generics (Generic1)
 import           Source.Span
 
 -- A file directive like the Ruby constant `__FILE__`.

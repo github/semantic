@@ -1,4 +1,8 @@
-{-# LANGUAGE FlexibleInstances, MultiParamTypeClasses, OverloadedStrings, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Data.Abstract.Value.Abstract
 ( Abstract (..)
 , runFunction
@@ -6,12 +10,12 @@ module Data.Abstract.Value.Abstract
 , runWhile
 ) where
 
-import Control.Abstract as Abstract
-import Control.Algebra
-import Data.Abstract.BaseError
-import Data.Abstract.Evaluatable
+import           Control.Abstract as Abstract
+import           Control.Algebra
+import           Data.Abstract.BaseError
+import           Data.Abstract.Evaluatable
+import           Data.Foldable
 import qualified Data.Map.Strict as Map
-import Prologue
 
 data Abstract = Abstract
   deriving (Eq, Ord, Show)
@@ -76,7 +80,7 @@ instance ( Has (Abstract.Boolean Abstract) sig m
 
 instance Algebra sig m
       => Algebra (Unit Abstract :+: sig) (UnitC Abstract m) where
-  alg (R other) = UnitC . alg . handleCoercible $ other
+  alg (R other)             = UnitC . alg . handleCoercible $ other
   alg (L (Abstract.Unit k)) = k Abstract
 
 instance Algebra sig m
@@ -90,18 +94,18 @@ instance Algebra sig m
       => Algebra (Numeric Abstract :+: sig) (NumericC Abstract m) where
   alg (R other) = NumericC . alg . handleCoercible $ other
   alg (L op) = case op of
-    Integer _ k -> k Abstract
-    Float _ k -> k Abstract
-    Rational _ k -> k Abstract
-    LiftNumeric _ _ k -> k Abstract
+    Integer _ k          -> k Abstract
+    Float _ k            -> k Abstract
+    Rational _ k         -> k Abstract
+    LiftNumeric _ _ k    -> k Abstract
     LiftNumeric2 _ _ _ k -> k Abstract
 
 instance Algebra sig m
       => Algebra (Bitwise Abstract :+: sig) (BitwiseC Abstract m) where
   alg (R other) = BitwiseC . alg . handleCoercible $ other
   alg (L op) = case op of
-    CastToInteger _ k -> k Abstract
-    LiftBitwise _ _ k -> k Abstract
+    CastToInteger _ k    -> k Abstract
+    LiftBitwise _ _ k    -> k Abstract
     LiftBitwise2 _ _ _ k -> k Abstract
     UnsignedRShift _ _ k -> k Abstract
 
@@ -109,22 +113,22 @@ instance Algebra sig m
       => Algebra (Object address Abstract :+: sig) (ObjectC address Abstract m) where
   alg (R other) = ObjectC . alg . handleCoercible $ other
   alg (L op) = case op of
-    Object _ k -> k Abstract
+    Object _ k            -> k Abstract
     ScopedEnvironment _ k -> k Nothing
-    Klass _ _ k -> k Abstract
+    Klass _ _ k           -> k Abstract
 
 instance Algebra sig m
       => Algebra (Array Abstract :+: sig) (ArrayC Abstract m) where
   alg (R other) = ArrayC . alg . handleCoercible $ other
   alg (L op) = case op of
-    Array _ k -> k Abstract
+    Array _ k   -> k Abstract
     AsArray _ k -> k []
 
 instance Algebra sig m
       => Algebra (Hash Abstract :+: sig) (HashC Abstract m) where
   alg (R other) = HashC . alg . handleCoercible $ other
   alg (L op) = case op of
-    Hash _ k -> k Abstract
+    Hash _ k     -> k Abstract
     KvPair _ _ k -> k Abstract
 
 

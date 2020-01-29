@@ -1,4 +1,8 @@
-{-# LANGUAGE FlexibleContexts, FlexibleInstances, FunctionalDependencies, MonoLocalBinds, OverloadedStrings #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE MonoLocalBinds #-}
+{-# LANGUAGE OverloadedStrings #-}
 module Rendering.Graph
 ( renderTreeGraph
 , termStyle
@@ -14,14 +18,15 @@ import Control.Carrier.State.Strict
 import Control.Lens
 import Data.Diff
 import Data.Edit
+import Data.Foldable
+import Data.Functor.Foldable
 import Data.Graph
 import Data.ProtoLens (defMessage)
 import Data.String (IsString (..))
 import Data.Term
-import Prologue
-import Semantic.Api.Bridge
 import Proto.Semantic as P
 import Proto.Semantic_Fields as P
+import Semantic.Api.Bridge
 import Source.Loc as Loc
 
 import qualified Data.Text as T

@@ -16,7 +16,8 @@ module Semantic.Api.LegacyTypes
 
 import Data.Aeson
 import Data.Blob
-import Prologue
+import Data.Text (Text)
+import GHC.Generics (Generic)
 
 newtype DiffTreeRequest = DiffTreeRequest { blobs :: [BlobPair] }
   deriving (Eq, Show, Generic, FromJSON)

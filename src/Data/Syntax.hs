@@ -1,25 +1,54 @@
-{-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, DataKinds, DeriveAnyClass, DeriveGeneric, DeriveTraversable, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, OverloadedStrings, RankNTypes, RecordWildCards, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE ConstraintKinds #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Data.Syntax (module Data.Syntax) where
 
-import Data.Abstract.Evaluatable hiding (Empty, Error)
-import Data.Aeson as Aeson (ToJSON(..), object)
-import Data.JSON.Fields
-import qualified Data.Set as Set
-import Data.Sum
-import Data.Term
-import GHC.Types (Constraint)
-import GHC.TypeLits
-import Diffing.Algorithm
-import Prelude
-import Prologue
-import Source.Loc
-import Source.Range as Range
-import Source.Span as Span
 import qualified Assigning.Assignment as Assignment
-import qualified Data.Error as Error
-import Control.Abstract.ScopeGraph (reference, Reference(..), Declaration(..))
-import Control.Abstract.Heap (deref, lookupSlot)
+import           Control.Abstract.Heap (deref, lookupSlot)
+import           Control.Abstract.ScopeGraph (Declaration (..), Reference (..), reference)
+import           Data.Abstract.Evaluatable hiding (Empty, Error)
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
+import           Data.Aeson as Aeson (ToJSON (..), object)
+import           Data.Bifunctor
+import qualified Data.Error as Error
+import           Data.Foldable
+import           Data.Function
+import           Data.Functor.Classes
+import           Data.Functor.Classes.Generic
+import           Data.Functor.Foldable (cata)
+import           Data.Hashable
+import           Data.Hashable.Lifted
+import           Data.Ix
+import           Data.JSON.Fields
+import           Data.List.NonEmpty (NonEmpty (..), nonEmpty)
+import           Data.Proxy
+import           Data.Semigroup (sconcat)
+import qualified Data.Set as Set
+import           Data.Sum
+import           Data.Term
+import           Data.Text (Text)
+import           Diffing.Algorithm
+import           GHC.Generics
+import           GHC.Stack
+import           GHC.TypeLits
+import           GHC.Types (Constraint)
+import           Source.Loc
+import           Source.Range as Range
+import           Source.Span as Span
 
 -- Combinators
 
@@ -35,7 +64,7 @@ makeTerm' ann syntax = termIn (sconcat (ann :| (termAnnotation <$> toList syntax
 makeTerm'' :: (Element syntax syntaxes, Sum syntaxes ~ Syntax term, Semigroup ann, Apply Foldable syntaxes, Foldable syntax, IsTerm term) => ann -> syntax (term ann) -> term ann
 makeTerm'' ann children = case toList children of
   [x] -> x
-  _ -> makeTerm' ann (inject children)
+  _   -> makeTerm' ann (inject children)
 
 -- | Lift non-empty syntax into a term, injecting the syntax into a union & appending all subterms’.annotations to make the new term’s annotation.
 makeTerm1 :: (HasCallStack, Element syntax syntaxes, Sum syntaxes ~ Syntax term, Semigroup ann, Apply Foldable syntaxes, IsTerm term) => syntax (term ann) -> term ann
@@ -45,7 +74,7 @@ makeTerm1 = makeTerm1' . inject
 makeTerm1' :: (HasCallStack, Semigroup ann, Foldable (Syntax term), IsTerm term) => Syntax term (term ann) -> term ann
 makeTerm1' syntax = case toList syntax of
   a : _ -> makeTerm' (termAnnotation a) syntax
-  _ -> error "makeTerm1': empty structure"
+  _     -> error "makeTerm1': empty structure"
 
 -- | Construct an empty term at the current position.
 emptyTerm :: (Empty :< syntaxes, Sum syntaxes ~ Syntax term, Apply Foldable syntaxes, IsTerm term) => Assignment.Assignment ast grammar (term Loc)
@@ -68,7 +97,7 @@ contextualize :: (HasCallStack, Context :< syntaxes, Sum syntaxes ~ Syntax term,
 contextualize context rule = make <$> Assignment.manyThrough context rule
   where make (cs, node) = case nonEmpty cs of
           Just cs -> makeTerm1 (Context cs node)
-          _ -> node
+          _       -> node
 
 -- | Match context terms after a subject term and before a delimiter, returning the delimiter paired with a Context term if any context terms matched, or the subject term otherwise.
 postContextualizeThrough :: (HasCallStack, Context :< syntaxes, Sum syntaxes ~ Syntax term, Alternative m, Semigroup ann, Apply Foldable syntaxes, IsTerm term)
@@ -79,7 +108,7 @@ postContextualizeThrough :: (HasCallStack, Context :< syntaxes, Sum syntaxes ~ S
 postContextualizeThrough context rule end = make <$> rule <*> Assignment.manyThrough context end
   where make node (cs, end) = case nonEmpty cs of
           Just cs -> (makeTerm1 (Context cs node), end)
-          _ -> (node, end)
+          _       -> (node, end)
 
 -- | Match context terms after a subject term, wrapping both up in a Context term if any context terms matched, or otherwise returning the subject term.
 postContextualize :: (HasCallStack, Context :< syntaxes, Sum syntaxes ~ Syntax term, Alternative m, Semigroup ann, Apply Foldable syntaxes, IsTerm term)
@@ -89,7 +118,7 @@ postContextualize :: (HasCallStack, Context :< syntaxes, Sum syntaxes ~ Syntax t
 postContextualize context rule = make <$> rule <*> many context
   where make node cs = case nonEmpty cs of
           Just cs -> makeTerm1 (Context cs node)
-          _ -> node
+          _       -> node
 
 -- | Match infix terms separated by any of a list of operators, with optional context terms following each operand.
 infixContext :: (Context :< syntaxes, Sum syntaxes ~ Syntax term, Assignment.Parsing m, Semigroup ann, HasCallStack, Apply Foldable syntaxes, IsTerm term)

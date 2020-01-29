@@ -1,11 +1,27 @@
-{-# LANGUAGE DeriveAnyClass, DeriveGeneric, DeriveTraversable, FlexibleContexts, MultiParamTypeClasses, RecordWildCards, ScopedTypeVariables, TypeApplications, TupleSections, UndecidableInstances #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TupleSections #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Data.Syntax.Declaration (module Data.Syntax.Declaration) where
 
-import Prologue
 
 import           Control.Lens.Getter
+import           Control.Monad
+import           Data.Foldable
+import           Data.Functor.Classes.Generic
+import           Data.Hashable.Lifted
 import qualified Data.Map.Strict as Map
+import           Data.Maybe.Exts
+import           Data.Semilattice.Lower
 import qualified Data.Set as Set
+import           Data.Traversable
+import           GHC.Generics (Generic1)
 
 import           Control.Abstract hiding (AccessControl (..), Function)
 import           Data.Abstract.Evaluatable
@@ -65,11 +81,11 @@ instance FreeVariables1 Function where
   liftFreeVariables freeVariables f@Function{..} = foldMap freeVariables f `Set.difference` foldMap freeVariables functionParameters
 
 data Method a = Method
-  { methodContext :: [a]
-  , methodReceiver :: a
-  , methodName :: a
-  , methodParameters :: [a]
-  , methodBody :: a
+  { methodContext       :: [a]
+  , methodReceiver      :: a
+  , methodName          :: a
+  , methodParameters    :: [a]
+  , methodBody          :: a
   , methodAccessControl :: ScopeGraph.AccessControl
   }
   deriving (Foldable, Traversable, Functor, Generic1, Hashable1, ToJSONFields1)
@@ -106,9 +122,9 @@ instance FreeVariables1 Method where
 
 -- | A method signature in TypeScript or a method spec in Go.
 data MethodSignature a = MethodSignature
-  { methodSignatureContext :: [a]
-  , methodSignatureName :: a
-  , methodSignatureParameters :: [a]
+  { methodSignatureContext       :: [a]
+  , methodSignatureName          :: a
+  , methodSignatureParameters    :: [a]
   , methodSignatureAccessControl :: ScopeGraph.AccessControl
   }
   deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
@@ -193,9 +209,9 @@ instance Declarations a => Declarations (InterfaceDeclaration a) where
 
 -- | A public field definition such as a field definition in a JavaScript class.
 data PublicFieldDefinition a = PublicFieldDefinition
-  { publicFieldContext :: [a]
-  , publicFieldPropertyName :: a
-  , publicFieldValue :: a
+  { publicFieldContext       :: [a]
+  , publicFieldPropertyName  :: a
+  , publicFieldValue         :: a
   , publicFieldAccessControl :: ScopeGraph.AccessControl
   }
   deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)

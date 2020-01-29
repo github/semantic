@@ -1,4 +1,15 @@
-{-# LANGUAGE DataKinds, FlexibleContexts, FlexibleInstances, GADTs, InstanceSigs, MultiParamTypeClasses, RankNTypes, RecordWildCards, ScopedTypeVariables, StandaloneDeriving, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE InstanceSigs #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
 -- | Assignment of AST onto some other structure (typically terms).
 --
 --   Parsing yields an AST represented as a Rose tree labelled with symbols in the language’s grammar and source locations (byte Range and Span). An Assignment represents a (partial) map from AST nodes onto some other structure; in essence, it’s a parser that operates over trees. (For our purposes, this structure is typically Terms annotated with source locations.) Assignments are able to match based on symbol, sequence, and hierarchy; thus, in @x = y@, both @x@ and @y@ might have the same symbol, @Identifier@, the left can be assigned to a variable declaration, while the right can be assigned to a variable reference.
@@ -90,20 +101,32 @@ module Assigning.Assignment
 , module Parsers
 ) where
 
-import Prologue
-import Prelude hiding (fail)
 import qualified Assigning.Assignment.Table as Table
-import Control.Monad.Except (MonadError (..))
-import Data.AST
-import Data.Error
-import qualified Source.Source as Source
-import Data.Term
-import Data.Text.Encoding (decodeUtf8')
+import           Control.Applicative
+import           Control.Monad
+import           Control.Monad.Except (MonadError (..))
+import           Data.AST
+import           Data.Bifunctor
+import           Data.ByteString (ByteString)
+import           Data.Error
+import           Data.Foldable
+import           Data.Function
+import           Data.Functor.Classes
+import           Data.Ix
+import           Data.List.NonEmpty (NonEmpty (..), nonEmpty)
+import           Data.Maybe
+import           Data.Semigroup
+import           Data.Term
+import           Data.Text (Text)
+import           Data.Text.Encoding (decodeUtf8')
+import           GHC.Stack
+import           Prelude hiding (fail)
 import qualified Source.Loc as L
-import Source.Range as Range
-import Source.Span as Span
-import Text.Parser.Combinators as Parsers hiding (choice)
-import TreeSitter.Language
+import           Source.Range as Range
+import qualified Source.Source as Source
+import           Source.Span as Span
+import           Text.Parser.Combinators as Parsers hiding (choice)
+import           TreeSitter.Language
 
 -- | Assignment from an AST with some set of 'symbol's onto some other value.
 --
@@ -129,12 +152,12 @@ data Tracing f a where
 
 assignmentCallSite :: Assignment ast grammar a -> Maybe (String, SrcLoc)
 assignmentCallSite (Tracing site _ `Then` _) = site
-assignmentCallSite _ = Nothing
+assignmentCallSite _                         = Nothing
 
 tracing :: HasCallStack => f a -> Tracing f a
 tracing f = case getCallStack callStack of
   (_ : site : _) -> Tracing (Just site) f
-  _ -> Tracing Nothing f
+  _              -> Tracing Nothing f
 
 -- | Zero-width production of the current location.
 --
@@ -209,8 +232,8 @@ nodeError cs expected n@Node{..} = Error (nodeSpan n) expected (Just (Right node
 firstSet :: (Enum grammar, Ix grammar) => Assignment ast grammar a -> [grammar]
 firstSet = iterFreer (\ _ (Tracing _ assignment) -> case assignment of
   Choose table _ _ -> Table.tableAddresses table
-  Label child _ -> firstSet child
-  _ -> []) . ([] <$)
+  Label child _    -> firstSet child
+  _                -> []) . ([] <$)
 
 
 -- | Run an assignment over an AST exhaustively.
@@ -275,7 +298,7 @@ requireExhaustive callSite (a, state) =
   let state' = skipTokens state
       stack = fromCallSiteList (maybe id (:) callSite (stateCallSites state))
   in case stateNodes state' of
-    [] -> Right (a, state')
+    []                   -> Right (a, state')
     Term (In node _) : _ -> Left (nodeError stack [] node)
 
 skipTokens :: Symbol grammar => State ast grammar -> State ast grammar
@@ -289,11 +312,11 @@ advanceState state@State{..}
 
 -- | State kept while running 'Assignment's.
 data State ast grammar = State
-  { stateOffset :: {-# UNPACK #-} !Int    -- ^ The offset into the Source thus far reached, measured in bytes.
-  , statePos :: {-# UNPACK #-} !Pos  -- ^ The (1-indexed) line/column position in the Source thus far reached.
+  { stateOffset    :: {-# UNPACK #-} !Int    -- ^ The offset into the Source thus far reached, measured in bytes.
+  , statePos       :: {-# UNPACK #-} !Pos  -- ^ The (1-indexed) line/column position in the Source thus far reached.
   , stateCallSites :: ![(String, SrcLoc)] -- ^ The symbols & source locations of the calls thus far.
-  , stateNodes :: ![AST ast grammar]      -- ^ The remaining nodes to assign. Note that 'children' rules recur into subterms, and thus this does not necessarily reflect all of the terms remaining to be assigned in the overall algorithm, only those “in scope.”
-  , stateLocals :: ![Text]      -- Special state necessary for the Ruby assignment. When we refactor Assignment to use effects we should pull this out into Language.Ruby.Assignment.
+  , stateNodes     :: ![AST ast grammar]      -- ^ The remaining nodes to assign. Note that 'children' rules recur into subterms, and thus this does not necessarily reflect all of the terms remaining to be assigned in the overall algorithm, only those “in scope.”
+  , stateLocals    :: ![Text]      -- Special state necessary for the Ruby assignment. When we refactor Assignment to use effects we should pull this out into Language.Ruby.Assignment.
   }
 
 deriving instance (Eq grammar, Eq1 ast) => Eq (State ast grammar)
@@ -315,13 +338,13 @@ instance (Enum grammar, Eq1 ast, Ix grammar) => Alternative (Assignment ast gram
   l@(Tracing callSiteL la `Then` continueL) <|> r@(Tracing callSiteR ra `Then` continueR) = go callSiteL la continueL callSiteR ra continueR
     where go :: forall l r . Maybe (String, SrcLoc) -> AssignmentF ast grammar l -> (l -> Assignment ast grammar a) -> Maybe (String, SrcLoc) -> AssignmentF ast grammar r -> (r -> Assignment ast grammar a) -> Assignment ast grammar a
           go callSiteL la continueL callSiteR ra continueR = case (la, ra) of
-            (Fail _, _) -> r
-            (Alt [], _) -> r
-            (_, Alt []) -> l
+            (Fail _, _)      -> r
+            (Alt [], _)      -> r
+            (_, Alt [])      -> l
             (Alt ls, Alt rs) -> alternate (Alt ((Left <$> ls) <> (Right <$> rs)))
-            (Alt ls, _) -> rebuild (Alt ((continueL <$> ls) <> pure r)) id
-            (_, Alt rs) -> rebuild (Alt (pure l <> (continueR <$> rs))) id
-            _           -> rebuild (Alt [l, r]) id
+            (Alt ls, _)      -> rebuild (Alt ((continueL <$> ls) <> pure r)) id
+            (_, Alt rs)      -> rebuild (Alt (pure l <> (continueR <$> rs))) id
+            _                -> rebuild (Alt [l, r]) id
             where alternate :: AssignmentF ast grammar (Either l r) -> Assignment ast grammar a
                   alternate a = rebuild a (either continueL continueR)
                   rebuild :: AssignmentF ast grammar x -> (x -> Assignment ast grammar a) -> Assignment ast grammar a
@@ -368,7 +391,7 @@ infixl 1 `Then`
 
 instance Functor (Freer f) where
   fmap f = go
-    where go (Return result) = Return (f result)
+    where go (Return result)   = Return (f result)
           go (Then step yield) = Then step (go . yield)
           {-# INLINE go #-}
   {-# INLINE fmap #-}
@@ -405,7 +428,7 @@ instance Monad (Freer f) where
 --   This is analogous to 'iter' with a continuation for the interior values, and is therefore suitable for defining interpreters for GADTs/types lacking a 'Functor' instance.
 iterFreer :: (forall x. (x -> a) -> f x -> a) -> Freer f a -> a
 iterFreer algebra = go
-  where go (Return result) = result
+  where go (Return result)        = result
         go (Then action continue) = algebra (go . continue) action
         {-# INLINE go #-}
 {-# INLINE iterFreer #-}

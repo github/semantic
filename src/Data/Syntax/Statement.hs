@@ -1,17 +1,28 @@
-{-# LANGUAGE DeriveAnyClass, DeriveGeneric, DeriveTraversable, DuplicateRecordFields, RecordWildCards, ScopedTypeVariables, TypeApplications, UndecidableInstances, ViewPatterns #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE ViewPatterns #-}
 module Data.Syntax.Statement (module Data.Syntax.Statement) where
-
-import Prologue
 
 import           Control.Abstract hiding (Break, Catch, Continue, Return, Throw, While)
 import           Data.Abstract.Evaluatable as Abstract hiding (Catch, Throw)
-import           Data.Aeson (ToJSON1 (..))
-import           Data.JSON.Fields
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
+import           Data.Aeson (ToJSON1 (..))
+import           Data.Functor.Classes.Generic
+import           Data.Hashable.Lifted
+import           Data.JSON.Fields
+import           Data.List.NonEmpty (nonEmpty)
 import qualified Data.Map.Strict as Map
+import           Data.Maybe.Exts
 import           Data.Semigroup.App
 import           Data.Semigroup.Foldable
 import           Diffing.Algorithm
+import           GHC.Generics (Generic1)
 
 -- | Imperative sequence of statements/declarations s.t.:
 --

@@ -1,4 +1,14 @@
-{-# LANGUAGE DefaultSignatures, DeriveFunctor, DeriveGeneric, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, KindSignatures, MultiParamTypeClasses, TypeApplications, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DefaultSignatures #-}
+{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Diffing.Algorithm
   ( Diff (..)
   , Algorithm(..)
@@ -14,14 +24,19 @@ module Diffing.Algorithm
   , algorithmForTerms
   ) where
 
-import Control.Algebra hiding ((:+:))
-import Control.Effect.NonDet
+import           Control.Algebra hiding ((:+:))
+import           Control.Applicative
+import           Control.Effect.NonDet
 import qualified Data.Diff as Diff
 import qualified Data.Edit as Edit
-import Data.Sum
-import Data.Term
-import GHC.Generics
-import Prologue
+import           Data.Functor
+import           Data.Functor.Classes
+import           Data.List.NonEmpty
+import           Data.Maybe
+import           Data.Maybe.Exts
+import           Data.Sum
+import           Data.Term
+import           GHC.Generics
 
 -- | A single step in a diffing algorithm, parameterized by the types of terms, diffs, and the result of the applicable algorithm.
 data Diff term1 term2 diff (m :: * -> *) k
@@ -257,12 +272,12 @@ instance (GDiffable f, GDiffable g) => GDiffable (f :*: g) where
 instance (GDiffable f, GDiffable g) => GDiffable (f :+: g) where
   galgorithmFor (L1 a1) (L1 a2) = L1 <$> galgorithmFor a1 a2
   galgorithmFor (R1 b1) (R1 b2) = R1 <$> galgorithmFor b1 b2
-  galgorithmFor _ _ = empty
+  galgorithmFor _ _             = empty
 
   gtryAlignWith f a b = case (a, b) of
     (L1 a, L1 b) -> L1 <$> gtryAlignWith f a b
     (R1 a, R1 b) -> R1 <$> gtryAlignWith f a b
-    _ -> empty
+    _            -> empty
 
   gcomparableTo (L1 _) (L1 _) = True
   gcomparableTo (R1 _) (R1 _) = True

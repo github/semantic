@@ -1,5 +1,12 @@
-{-# LANGUAGE DeriveFunctor, ExistentialQuantification, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving,
-             MultiParamTypeClasses, StandaloneDeriving, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE ExistentialQuantification #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 -- TODO: We should kill this entirely, because with fused-effects 1.0 we can unlift the various runConcurrently operations.
 module Semantic.Distribute
@@ -18,7 +25,7 @@ import           Control.Carrier.Reader
 import qualified Control.Concurrent.Async as Async
 import           Control.Monad.IO.Unlift
 import           Control.Parallel.Strategies
-import           Prologue
+import           Data.Foldable (fold)
 
 -- | Distribute a 'Traversable' container of tasks over the available cores (i.e. execute them concurrently), collecting their results.
 --

@@ -1,4 +1,5 @@
-{-# LANGUAGE DeriveTraversable, GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Data.Abstract.ModuleTable
 ( ModulePath
 , ModuleTable (..)
@@ -13,11 +14,13 @@ module Data.Abstract.ModuleTable
 , toPairs
 ) where
 
-import Data.Abstract.Module
+import           Data.Abstract.Module
+import           Data.Functor.Classes
 import qualified Data.Map as Map
-import Prelude hiding (lookup)
-import Prologue
-import System.FilePath.Posix
+import           Data.Semilattice.Lower
+import           Data.Set (Set)
+import           Prelude hiding (lookup)
+import           System.FilePath.Posix
 
 newtype ModuleTable a = ModuleTable { unModuleTable :: Map.Map ModulePath a }
   deriving (Eq, Foldable, Functor, Lower, Monoid, Ord, Semigroup, Traversable)

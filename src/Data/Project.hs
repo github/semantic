@@ -7,12 +7,14 @@ module Data.Project
   ) where
 
 import Prelude hiding (readFile)
-import Prologue
 
 import           Analysis.File
+import           Control.Monad.IO.Class
 import           Data.Blob
 import           Data.Blob.IO
 import           Data.Language
+import           Data.Semilattice.Lower
+import           Data.Text (Text)
 import qualified Data.Text as T
 import           Semantic.IO
 import           System.FilePath.Posix

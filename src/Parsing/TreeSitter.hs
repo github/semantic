@@ -1,5 +1,11 @@
-{-# LANGUAGE DataKinds, DeriveGeneric, FlexibleContexts, GADTs, LambdaCase, RecordWildCards, ScopedTypeVariables,
-             TypeOperators #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeOperators #-}
 module Parsing.TreeSitter
 ( TSParseException (..)
 , Duration(..)
@@ -7,15 +13,18 @@ module Parsing.TreeSitter
 , parseToPreciseAST
 ) where
 
-import Prologue
-
-import           Control.Carrier.Reader
-import qualified Control.Exception as Exc
-import           Foreign
+import Control.Carrier.Reader
+import Control.Exception as Exc
+import Control.Monad
+import Control.Monad.IO.Class
+import Data.Functor.Foldable
+import Foreign
+import GHC.Generics
 
 import           Data.AST (AST, Node (Node))
 import           Data.Blob
 import           Data.Duration
+import           Data.Maybe.Exts
 import           Data.Term
 import           Source.Loc
 import qualified Source.Source as Source
@@ -66,7 +75,7 @@ parseToPreciseAST parseTimeout unmarshalTimeout language blob = runParse parseTi
     withTimeout :: IO a -> IO a
     withTimeout action = System.timeout (toMicroseconds unmarshalTimeout) action >>= maybeM (Exc.throw UnmarshalTimedOut)
 
-instance Exception TSParseException where
+instance Exc.Exception TSParseException where
   displayException = \case
     ParserTimedOut -> "tree-sitter: parser timed out"
     IncompatibleVersions -> "tree-sitter: incompatible versions"

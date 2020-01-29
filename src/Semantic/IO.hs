@@ -9,8 +9,8 @@ module Semantic.IO
   ) where
 
 import Prelude hiding (readFile)
-import Prologue
 
+import           Control.Monad.IO.Class
 import           System.Directory (doesDirectoryExist)
 import           System.Directory.Tree (AnchoredDirTree (..))
 import qualified System.Directory.Tree as Tree

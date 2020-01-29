@@ -1,4 +1,8 @@
-{-# LANGUAGE DataKinds, FlexibleContexts, RankNTypes, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
 module Language.PHP.Assignment
 ( assignment
 , PHP.Syntax
@@ -6,13 +10,14 @@ module Language.PHP.Assignment
 , PHP.Term(..)
 ) where
 
-import Prologue
-
 import qualified Analysis.Name as Name
 import           Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
-import qualified Data.Abstract.ScopeGraph as ScopeGraph (AccessControl(..))
+import qualified Data.Abstract.ScopeGraph as ScopeGraph (AccessControl (..))
+import           Data.Foldable
+import           Data.List.NonEmpty (NonEmpty (..), some1)
 import qualified Data.List.NonEmpty as NonEmpty
+import           Data.Sum
 import           Data.Syntax
     ( contextualize
     , emptyTerm

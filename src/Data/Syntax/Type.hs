@@ -1,11 +1,20 @@
-{-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric, DeriveTraversable, DuplicateRecordFields, MultiParamTypeClasses, RecordWildCards, UndecidableInstances #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Data.Syntax.Type (module Data.Syntax.Type) where
 
 import Data.Abstract.Evaluatable
+import Data.Functor.Classes.Generic
+import Data.Hashable.Lifted
 import Data.JSON.Fields
 import Diffing.Algorithm
-import Prelude hiding (Bool, Float, Int, Double)
-import Prologue hiding (Map)
+import GHC.Generics (Generic1)
+import Prelude hiding (Bool, Double, Float, Int)
 
 data Array a = Array { arraySize :: Maybe a, arrayElementType :: a }
   deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
