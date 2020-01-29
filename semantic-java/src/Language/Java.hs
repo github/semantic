@@ -1,14 +1,14 @@
 -- | Semantic functionality for Java programs.
 module Language.Java
 ( Term(..)
-, TreeSitter.Java.tree_sitter_java
+, Language.Java.Grammar.tree_sitter_java
 ) where
 
 import           Data.Proxy
 import qualified Language.Java.AST as Java
 import qualified Language.Java.Tags as JavaTags
 import qualified Tags.Tagging.Precise as Tags
-import qualified TreeSitter.Java (tree_sitter_java)
+import qualified Language.Java.Grammar (tree_sitter_java)
 import qualified AST.Unmarshal as TS
 
 newtype Term a = Term { getTerm :: Java.Program a }

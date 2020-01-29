@@ -15,7 +15,7 @@ module Language.Java.AST
 ) where
 
 import           AST.GenerateSyntax
-import qualified TreeSitter.Java as Grammar
+import qualified Language.Java.Grammar as Grammar
 import           AST.Token
 
 astDeclarationsForLanguage Grammar.tree_sitter_java "../../../vendor/tree-sitter-java/src/node-types.json"
