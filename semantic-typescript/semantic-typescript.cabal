@@ -52,5 +52,6 @@ library
   exposed-modules:
     Language.TypeScript
     Language.TypeScript.AST
+    Language.TypeScript.Grammar
     Language.TypeScript.Tags
   hs-source-dirs: src
