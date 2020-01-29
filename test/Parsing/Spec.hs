@@ -10,7 +10,7 @@ import           Parsing.TreeSitter
 import           Source.Source
 import           SpecHelpers
 import qualified System.Path as Path
-import           TreeSitter.JSON (Grammar, tree_sitter_json)
+import           Language.JSON.Grammar (Grammar, tree_sitter_json)
 
 spec :: Spec
 spec = do
