@@ -26,7 +26,7 @@ library
   build-depends:
       base              >= 4.13 && < 5
     , fused-effects    ^>= 1.0
-    , semantic-source  ^>= 0.0.1
+    , semantic-source  ^>= 0.0.2
     , semantic-tags    ^>= 0.0
     , template-haskell ^>= 2.15
     , tree-sitter      ^>= 0.8

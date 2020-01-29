@@ -50,23 +50,30 @@ library
     Analysis.Effect.Heap
     Analysis.File
     Analysis.FlowInsensitive
+    Analysis.Functor.Named
     Analysis.ImportGraph
     Analysis.Intro
     Analysis.Name
     Analysis.Typecheck
     Control.Carrier.Fail.WithLoc
   build-depends:
-      algebraic-graphs            ^>= 0.3
+    , aeson                       ^>= 1.4
+    , algebraic-graphs            ^>= 0.3
     , base                         >= 4.13 && < 5
     , containers                  ^>= 0.6
+    , filepath
     , fused-effects               ^>= 1.0
     , fused-effects-readline
     , fused-syntax
+    , hashable
     , haskeline                   ^>= 0.7.5
+    , hashable
+    , lingo                       ^>= 0.3
     , pathtype                    ^>= 0.8.1
     , prettyprinter                >= 1.2 && < 2
     , prettyprinter-ansi-terminal ^>= 1.1.1
-    , semantic-source             ^>= 0.0.1
+    , semantic-source             ^>= 0.0.2
+    , semilattices
     , terminal-size               ^>= 0.3
     , text                        ^>= 1.2.3.1
     , transformers                ^>= 0.5

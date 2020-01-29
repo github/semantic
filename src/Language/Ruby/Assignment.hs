@@ -8,9 +8,9 @@ module Language.Ruby.Assignment
 
 import Prologue hiding (for, unless)
 
+import           Analysis.Name (name)
 import           Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
-import           Data.Abstract.Name (name)
 import qualified Data.Abstract.ScopeGraph as ScopeGraph (AccessControl(..))
 import qualified Data.List.NonEmpty as NonEmpty
 import           Data.Syntax

@@ -21,11 +21,11 @@ module Language.Python.ScopeGraph
   ( scopeGraphModule
   ) where
 
+import           Analysis.Name
 import           Control.Algebra (Algebra (..), handleCoercible)
 import           Control.Effect.Sketch
 import           Data.Foldable
 import           Data.Monoid
-import           Data.Name
 import           GHC.Generics
 import           GHC.Records
 import           GHC.TypeLits
@@ -87,7 +87,7 @@ scopeGraphModule = getAp . scopeGraph
 instance ToScopeGraph Py.AssertStatement where scopeGraph = onChildren
 
 instance ToScopeGraph Py.Assignment where
-  scopeGraph (Py.Assignment _ (SingleIdentifier t) _val _typ) = complete <* declare @Name t DeclProperties
+  scopeGraph (Py.Assignment _ (SingleIdentifier t) _val _typ) = complete <* declare @Name (formatName t) DeclProperties
   scopeGraph x                                                = todo x
 
 instance ToScopeGraph Py.Await where

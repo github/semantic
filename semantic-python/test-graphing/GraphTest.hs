@@ -5,12 +5,12 @@
 {-# LANGUAGE TypeOperators #-}
 module Main (main) where
 
+import           Analysis.Name (Name)
 import           Control.Algebra
 import           Control.Carrier.Lift
 import           Control.Carrier.Sketch.Fresh
 import           Control.Monad
 import qualified Data.ByteString as ByteString
-import           Data.Name (Name)
 import qualified Data.ScopeGraph as ScopeGraph
 import qualified Language.Python ()
 import qualified Language.Python as Py (Term)

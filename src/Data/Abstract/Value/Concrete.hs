@@ -17,15 +17,15 @@ import qualified Data.Map.Strict as Map
 import           Data.Scientific.Exts
 import           Data.Text (pack)
 
+import           Analysis.Name
 import           Control.Abstract hiding
     (Array (..), Boolean (..), Function (..), Hash (..), Numeric (..), Object (..), String (..), Unit (..), While (..))
 import qualified Control.Abstract as Abstract
 import           Control.Algebra
 import           Control.Effect.Interpose
 import           Data.Abstract.BaseError
-import           Data.Abstract.Evaluatable (Declarations, EvalError (..), UnspecializedError (..))
+import           Data.Abstract.Evaluatable (Declarations, EvalError (..), UnspecializedError (..), __self)
 import           Data.Abstract.FreeVariables
-import           Data.Abstract.Name
 import qualified Data.Abstract.Number as Number
 
 

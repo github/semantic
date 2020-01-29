@@ -67,7 +67,8 @@ common dependencies
                      , recursion-schemes ^>= 5.1
                      , scientific ^>= 0.3.6.2
                      , safe-exceptions ^>= 0.1.7.0
-                     , semantic-source ^>= 0.0.1
+                     , semantic-analysis ^>= 0
+                     , semantic-source ^>= 0.0.2
                      , semilattices ^>= 0.0.0.3
                      , streaming ^>= 0.2.2.0
                      , text ^>= 1.2.3.1
@@ -131,7 +132,6 @@ library
                      , Data.Abstract.Live
                      , Data.Abstract.Module
                      , Data.Abstract.ModuleTable
-                     , Data.Abstract.Name
                      , Data.Abstract.Number
                      , Data.Abstract.Package
                      , Data.Abstract.Path

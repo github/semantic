@@ -19,9 +19,9 @@ import Data.ByteString.Lazy.Char8 (putStrLn)
 import Data.Aeson.Encode.Pretty (encodePretty)
 
 data SemanticAST = SemanticAST
-  { format :: Format
-  , noColor  :: Bool
-  , source :: Either [FilePath] String
+  { _format :: Format
+  , _noColor  :: Bool
+  , _source :: Either [FilePath] String
   }
 
 -- Usage: semantic-ast --format ARG [--no-color] (--sourceString STRING | FILEPATHS…)

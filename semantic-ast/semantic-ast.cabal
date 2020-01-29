@@ -50,7 +50,7 @@ library
                      , aeson-pretty         ^>= 0.8.8
                      , bytestring           ^>= 0.10.8.2
                      , tree-sitter          ^>= 0.8
-                     , semantic-source      ^>= 0.0.1
+                     , semantic-source      ^>= 0.0.2
                      , template-haskell     ^>= 2.15
                      , tree-sitter-python   ^>= 0.8.1
                      , bytestring           ^>= 0.10.8.2

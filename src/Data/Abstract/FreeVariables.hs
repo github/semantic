@@ -4,10 +4,10 @@ module Data.Abstract.FreeVariables
   , FreeVariables1 (..)
   ) where
 
-import Data.Abstract.Name
-import           Data.Sum
-import           Data.Term
-import           Prologue
+import Analysis.Name
+import Data.Sum
+import Data.Term
+import Prologue
 
 -- | Types which can contain unbound variables.
 class FreeVariables term where
