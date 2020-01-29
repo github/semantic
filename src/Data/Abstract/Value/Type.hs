@@ -1,4 +1,15 @@
-{-# LANGUAGE FlexibleContexts, FlexibleInstances, GADTs, LambdaCase, MultiParamTypeClasses, OverloadedStrings, RankNTypes, ScopedTypeVariables, StandaloneDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Data.Abstract.Value.Type
   ( Type (..)
   , TypeError (..)
@@ -11,21 +22,23 @@ module Data.Abstract.Value.Type
   , runWhile
   ) where
 
-import Prologue hiding (TypeError)
-
 import           Control.Algebra
-import           Control.Carrier.State.Strict
-import qualified Control.Carrier.Resumable.Resume as With
 import           Control.Carrier.Resumable.Either (SomeError)
 import qualified Control.Carrier.Resumable.Either as Either
+import qualified Control.Carrier.Resumable.Resume as With
+import           Control.Carrier.State.Strict
+import           Control.Monad
+import           Data.Functor
+import           Data.Functor.Classes
+import           Data.List.NonEmpty (NonEmpty, nonEmpty)
 import qualified Data.Map as Map
 
-import Control.Abstract.ScopeGraph
+import           Control.Abstract hiding
+    (Array (..), Boolean (..), Function (..), Hash (..), Numeric (..), Object (..), String (..), Unit (..), While (..))
 import qualified Control.Abstract as Abstract
-import Control.Abstract hiding (Boolean(..), Function(..), Numeric(..), Object(..), Array(..), Hash(..), String(..), Unit(..), While(..))
-import Data.Abstract.BaseError
-import Data.Semigroup.Foldable (foldMap1)
-import Data.Abstract.Evaluatable
+import           Data.Abstract.BaseError
+import           Data.Abstract.Evaluatable
+import           Data.Semigroup.Foldable (foldMap1)
 
 type TName = Int
 
@@ -81,14 +94,14 @@ deriving instance Show (TypeError resume)
 
 instance Eq1   TypeError where
   liftEq      _ (UnificationError a1 b1) (UnificationError a2 b2) = a1 == a2 && b1 == b2
-  liftEq      _ (InfiniteType a1 b1) (InfiniteType a2 b2) = a1 == a2 && b1 == b2
-  liftEq      _ _ _ = False
+  liftEq      _ (InfiniteType a1 b1) (InfiniteType a2 b2)         = a1 == a2 && b1 == b2
+  liftEq      _ _ _                                               = False
 
 instance Ord1  TypeError where
   liftCompare _ (UnificationError a1 b1) (UnificationError a2 b2) = compare a1 a2 <> compare b1 b2
-  liftCompare _ (InfiniteType a1 b1) (InfiniteType a2 b2) = compare a1 a2 <> compare b1 b2
-  liftCompare _ (InfiniteType _ _) (UnificationError _ _) = LT
-  liftCompare _ (UnificationError _ _) (InfiniteType _ _) = GT
+  liftCompare _ (InfiniteType a1 b1) (InfiniteType a2 b2)         = compare a1 a2 <> compare b1 b2
+  liftCompare _ (InfiniteType _ _) (UnificationError _ _)         = LT
+  liftCompare _ (UnificationError _ _) (InfiniteType _ _)         = GT
 
 instance Show1 TypeError where liftShowsPrec _ _ = showsPrec
 
@@ -210,17 +223,17 @@ unify a b = do
   b' <- prune b
   case (a', b') of
     (a1 :-> b1, a2 :-> b2) -> (:->) <$> unify a1 a2 <*> unify b1 b2
-    (a, Null) -> pure a
-    (Null, b) -> pure b
-    (Var id, ty) -> substitute id ty
-    (ty, Var id) -> substitute id ty
-    (Array t1, Array t2) -> Array <$> unify t1 t2
+    (a, Null)              -> pure a
+    (Null, b)              -> pure b
+    (Var id, ty)           -> substitute id ty
+    (ty, Var id)           -> substitute id ty
+    (Array t1, Array t2)   -> Array <$> unify t1 t2
     -- FIXME: unifying with sums should distribute nondeterministically.
     -- FIXME: ordering shouldn’t be significant for undiscriminated sums.
-    (a1 :+ b1, a2 :+ b2) -> (:+) <$> unify a1 a2 <*> unify b1 b2
-    (a1 :* b1, a2 :* b2) -> (:*) <$> unify a1 a2 <*> unify b1 b2
-    (t1, t2) | t1 == t2 -> pure t2
-    _ -> throwTypeError (UnificationError a b)
+    (a1 :+ b1, a2 :+ b2)   -> (:+) <$> unify a1 a2 <*> unify b1 b2
+    (a1 :* b1, a2 :* b2)   -> (:*) <$> unify a1 a2 <*> unify b1 b2
+    (t1, t2) | t1 == t2    -> pure t2
+    _                      -> throwTypeError (UnificationError a b)
 
 instance Ord address => ValueRoots address Type where
   valueRoots _ = mempty
@@ -290,7 +303,7 @@ instance ( Has (Reader ModuleInfo) sig m
          , Alternative m
          )
       => Algebra (Abstract.Boolean Type :+: sig) (BooleanC Type m) where
-  alg (R other) = BooleanC . alg . handleCoercible $ other
+  alg (R other)                  = BooleanC . alg . handleCoercible $ other
   alg (L (Abstract.Boolean _ k)) = k Bool
   alg (L (Abstract.AsBool t k))  = unify t Bool *> (k True <|> k False)
 
@@ -309,7 +322,7 @@ instance ( Has (Abstract.Boolean Type) sig m
 
 instance Algebra sig m
       => Algebra (Abstract.Unit Type :+: sig) (UnitC Type m) where
-  alg (R other) = UnitC . alg . handleCoercible $ other
+  alg (R other)             = UnitC . alg . handleCoercible $ other
   alg (L (Abstract.Unit k)) = k Unit
 
 instance ( Has (Reader ModuleInfo) sig m
@@ -320,8 +333,8 @@ instance ( Has (Reader ModuleInfo) sig m
          , Alternative m
          )
       => Algebra (Abstract.String Type :+: sig) (StringC Type m) where
-  alg (R other) = StringC . alg . handleCoercible $ other
-  alg (L (Abstract.String _ k)) = k String
+  alg (R other)                   = StringC . alg . handleCoercible $ other
+  alg (L (Abstract.String _ k))   = k String
   alg (L (Abstract.AsString t k)) = unify t String *> k ""
 
 instance ( Has (Reader ModuleInfo) sig m
@@ -353,17 +366,17 @@ instance ( Has (Reader ModuleInfo) sig m
       => Algebra (Abstract.Bitwise Type :+: sig) (BitwiseC Type m) where
   alg (R other) = BitwiseC . alg . handleCoercible $ other
   alg (L op) = case op of
-    CastToInteger t k -> unify t (Int :+ Float :+ Rational) *> k Int
-    LiftBitwise _ t k -> unify t Int >>= k
+    CastToInteger t k      -> unify t (Int :+ Float :+ Rational) *> k Int
+    LiftBitwise _ t k      -> unify t Int >>= k
     LiftBitwise2 _ t1 t2 k -> unify Int t1 >>= unify t2 >>= k
     UnsignedRShift t1 t2 k -> unify Int t2 *> unify Int t1 >>= k
 
 instance ( Algebra sig m ) => Algebra (Abstract.Object address Type :+: sig) (ObjectC address Type m) where
   alg (R other) = ObjectC . alg . handleCoercible $ other
   alg (L op) = case op of
-    Abstract.Object _ k -> k Object
+    Abstract.Object _ k            -> k Object
     Abstract.ScopedEnvironment _ k -> k Nothing
-    Abstract.Klass _ _ k -> k Object
+    Abstract.Klass _ _ k           -> k Object
 
 instance ( Has Fresh sig m
          , Has (Reader ModuleInfo) sig m
@@ -384,8 +397,8 @@ instance ( Has Fresh sig m
     unify t (Array (Var field)) >> k mempty
 
 instance ( Algebra sig m ) => Algebra (Abstract.Hash Type :+: sig) (HashC Type m) where
-  alg (R other) = HashC . alg . handleCoercible $ other
-  alg (L (Abstract.Hash t k)) = k (Hash t)
+  alg (R other)                     = HashC . alg . handleCoercible $ other
+  alg (L (Abstract.Hash t k))       = k (Hash t)
   alg (L (Abstract.KvPair t1 t2 k)) = k (t1 :* t2)
 
 
@@ -422,8 +435,8 @@ instance ( Has Fresh sig m
   liftComparison (Concrete _) left right = case (left, right) of
     (Float, Int) ->                     pure Bool
     (Int, Float) ->                     pure Bool
-    _                 -> unify left right $> Bool
+    _            -> unify left right $> Bool
   liftComparison Generalized left right = case (left, right) of
     (Float, Int) ->                     pure Int
     (Int, Float) ->                     pure Int
-    _                 -> unify left right $> Bool
+    _            -> unify left right $> Bool

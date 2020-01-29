@@ -1,4 +1,8 @@
-{-# LANGUAGE DeriveTraversable, FlexibleInstances, MultiParamTypeClasses, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Data.Abstract.Address.Hole
 ( Hole(..)
 , toMaybe
@@ -6,7 +10,7 @@ module Data.Abstract.Address.Hole
 
 import Control.Abstract
 import Control.Algebra
-import Prologue
+import Data.Semilattice.Lower
 
 data Hole context a = Partial context | Total a
   deriving (Foldable, Functor, Eq, Ord, Show, Traversable)
@@ -27,7 +31,7 @@ instance ( Algebra (Allocator address :+: sig) (AllocatorC address m)
          , Monad m
          )
       => Algebra (Allocator (Hole context address) :+: sig) (AllocatorC (Hole context address) m) where
-  alg (R other) = AllocatorC . alg . handleCoercible $ other
+  alg (R other)          = AllocatorC . alg . handleCoercible $ other
   alg (L (Alloc name k)) = Total <$> promoteA (alg (L (Alloc name pure))) >>= k
 
 
