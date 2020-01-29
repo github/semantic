@@ -13,6 +13,7 @@ import           Control.Monad.IO.Class
 import           Data.Blob
 import           Data.Blob.IO
 import           Data.Language
+import           Data.Semilattice.Lower
 import           Data.Text (Text)
 import qualified Data.Text as T
 import           Semantic.IO
