@@ -1,15 +1,21 @@
-{-# LANGUAGE DeriveAnyClass, DeriveGeneric, DeriveTraversable, DuplicateRecordFields, RecordWildCards, TypeApplications #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TypeApplications #-}
 module Language.TypeScript.Syntax.JavaScript (module Language.TypeScript.Syntax.JavaScript) where
-
-import Prologue
 
 import           Control.Abstract.Heap
 import           Control.Abstract.ScopeGraph hiding (Import)
 import           Data.Abstract.Evaluatable
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
+import           Data.Functor.Classes.Generic
+import           Data.Hashable.Lifted
 import           Data.JSON.Fields
 import qualified Data.Map.Strict as Map
 import           Diffing.Algorithm
+import           GHC.Generics (Generic1)
 import           Language.TypeScript.Resolution
 
 newtype ImplementsClause a = ImplementsClause { implementsClauseTypes :: [a] }
