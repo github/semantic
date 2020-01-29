@@ -22,6 +22,7 @@ library
   exposed-modules:
     Language.JSON
     Language.JSON.AST
+    Language.JSON.Grammar
   build-depends:
       base              >= 4.13 && < 5
     , semantic-tags    ^>= 0.0
