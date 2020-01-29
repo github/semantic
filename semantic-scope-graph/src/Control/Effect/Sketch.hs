@@ -89,7 +89,7 @@ declareMaybeName :: Has Sketch sig m
                  -> m Name
 declareMaybeName maybeName props = do
   case maybeName of
-    Just name -> declare name props >> pure name
+    Just name -> name <$ declare name props
     _         -> Name.gensym >>= \name -> declare name (props { relation = ScopeGraph.Gensym }) >> pure name -- TODO: Modify props and change Kind to Gensym
 
 withScope :: Has Sketch sig m
