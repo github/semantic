@@ -52,5 +52,6 @@ library
   exposed-modules:
     Language.Go
     Language.Go.AST
+    Language.Go.Grammar
     Language.Go.Tags
   hs-source-dirs: src

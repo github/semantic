@@ -61,7 +61,7 @@ import qualified Language.TypeScript as TypeScriptPrecise
 import qualified Language.TypeScript.Assignment as TypeScriptALaCarte
 import           Prelude hiding (fail)
 import           Prologue
-import           TreeSitter.Go
+import           Language.Go.Grammar
 import qualified TreeSitter.Language as TS (Language, Symbol)
 import           TreeSitter.PHP
 import           Language.Python.Grammar

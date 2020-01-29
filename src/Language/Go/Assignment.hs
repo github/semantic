@@ -26,7 +26,7 @@ import           Language.Go.Syntax as Go.Syntax hiding (runeLiteral, labelName)
 import           Language.Go.Term as Go
 import           Language.Go.Type as Go.Type
 import Data.ImportPath (importPath, defaultAlias)
-import           TreeSitter.Go as Grammar
+import           Language.Go.Grammar as Grammar
 
 type Assignment = Assignment.Assignment [] Grammar
 
