@@ -1,4 +1,7 @@
-{-# LANGUAGE OverloadedStrings, ScopedTypeVariables, TypeApplications, TypeOperators #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeOperators #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 module Main (main) where
 
@@ -69,7 +72,7 @@ assertEvaluatesTo core k val = do
     (_, files) ->
       HUnit.assertFailure ("Unexpected number of files: " <> show (length files))
 
-  let found = Map.lookup (Name k) env >>= flip IntMap.lookup heap
+  let found = Map.lookup (name k) env >>= flip IntMap.lookup heap
   found HUnit.@?= Just val
 {-# HLINT ignore assertEvaluatesTo #-}
 

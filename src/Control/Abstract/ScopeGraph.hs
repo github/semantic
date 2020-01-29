@@ -43,13 +43,13 @@ module Control.Abstract.ScopeGraph
   , ScopeGraph.Path
   ) where
 
+import           Analysis.Name hiding (name)
 import           Control.Abstract.Evaluator hiding (Local)
 import           Control.Algebra
 import qualified Control.Carrier.Resumable.Resume as With
 import qualified Control.Carrier.Resumable.Either as Either
 import           Data.Abstract.BaseError
 import           Data.Abstract.Module
-import           Data.Abstract.Name hiding (name)
 import           Data.Abstract.ScopeGraph (Kind, Declaration(..), EdgeLabel, Reference, Relation(..), Scope (..), ScopeGraph, Slot(..), Info(..), AccessControl(..))
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Prelude hiding (lookup)

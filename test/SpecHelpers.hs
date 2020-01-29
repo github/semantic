@@ -25,6 +25,7 @@ module SpecHelpers
 ) where
 
 import qualified Analysis.File as File
+import           Analysis.Name as X
 import           Control.Abstract
 import           Control.Carrier.Fresh.Strict
 import           Control.Carrier.Lift
@@ -41,7 +42,6 @@ import           Data.Abstract.FreeVariables as X
 import qualified Data.Abstract.Heap as Heap
 import           Data.Abstract.Module as X
 import           Data.Abstract.ModuleTable as X hiding (lookup)
-import           Data.Abstract.Name as X
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.Abstract.Value.Concrete (Value (..), ValueError, runValueError)
 import           Data.Blob as X
@@ -60,7 +60,6 @@ import           Data.Project as X
 import           Data.Proxy as X
 import           Data.Semigroup as X (Semigroup (..))
 import           Data.Semilattice.Lower as X
-import           Data.String
 import           Data.Sum as Sum
 import           Data.Term as X
 import           Data.Traversable as X (for)
@@ -85,11 +84,6 @@ import           Unsafe.Coerce (unsafeCoerce)
 
 runBuilder :: Builder -> ByteString
 runBuilder = toStrict . toLazyByteString
-
--- | This orphan instance is so we don't have to insert @name@ calls
--- in dozens and dozens of environment specs.
-instance IsString Name where
-  fromString = X.name . fromString
 
 -- | Returns an s-expression formatted diff for the specified FilePath pair.
 diffFilePaths :: TaskSession -> Path.RelFile -> Path.RelFile -> IO ByteString

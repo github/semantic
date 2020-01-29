@@ -33,8 +33,8 @@ import           Control.Effect.Fresh
 import           Control.Effect.Reader
 import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
-import           Data.Name (Name)
-import qualified Data.Name as Name
+import           Analysis.Name (Name)
+import qualified Analysis.Name as Name
 import qualified Data.ScopeGraph as ScopeGraph
 import           Data.Text (Text)
 import           GHC.Generics (Generic, Generic1)

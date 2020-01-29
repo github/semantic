@@ -23,13 +23,13 @@ module Language.Python.ScopeGraph
   ) where
 
 import           AST.Element
+import qualified Analysis.Name as Name
 import           Control.Algebra (Algebra (..), handleCoercible)
 import           Control.Effect.Fresh
 import           Control.Effect.Sketch
 import           Data.Foldable
 import           Data.Maybe
 import           Data.Monoid
-import qualified Data.Name as Name
 import qualified Data.ScopeGraph as ScopeGraph
 import           Data.Traversable
 import           GHC.Records
@@ -94,7 +94,7 @@ instance ToScopeGraph Py.AssertStatement where scopeGraph = onChildren
 instance ToScopeGraph Py.Assignment where
   scopeGraph (Py.Assignment _ (SingleIdentifier t) _val _typ) = do
     let declProps = (DeclProperties ScopeGraph.Assignment ScopeGraph.Default Nothing)
-    complete <* declare (Name.name t) declProps
+    complete <* declare t declProps
   scopeGraph x                                                = todo x
 
 instance ToScopeGraph Py.Await where

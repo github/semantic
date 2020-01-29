@@ -19,17 +19,16 @@ module Control.Carrier.Sketch.Fresh
   , module Control.Effect.Sketch
   ) where
 
-import Control.Algebra
-import Control.Carrier.Fresh.Strict
-import Control.Carrier.State.Strict
-import Control.Effect.Reader
-import Control.Effect.Sketch
-import Control.Monad.IO.Class
-import Data.Bifunctor
---import qualified Data.Map.Strict as Map
+import           Analysis.Name (Name)
+import qualified Analysis.Name as Name
+import           Control.Algebra
+import           Control.Carrier.Fresh.Strict
+import           Control.Carrier.State.Strict
+import           Control.Carrier.Reader
+import           Control.Effect.Sketch
+import           Control.Monad.IO.Class
+import           Data.Bifunctor
 import           Data.Module
-import           Data.Name (Name)
-import qualified Data.Name as Name
 import           Data.ScopeGraph (ScopeGraph)
 import qualified Data.ScopeGraph as ScopeGraph
 import           Data.Semilattice.Lower

@@ -11,7 +11,7 @@ module Analysis.Intro
 , record
 ) where
 
-import Analysis.Name
+import Analysis.Functor.Named
 import Control.Algebra
 import Data.Text (Text)
 import GHC.Generics (Generic1)

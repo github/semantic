@@ -6,10 +6,10 @@ module Data.Abstract.Package
   , Data.Abstract.Package.fromModules
   ) where
 
+import Analysis.Name
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
 import qualified Data.Map as Map
-import Data.Abstract.Name
 
 type PackageName = Name
 

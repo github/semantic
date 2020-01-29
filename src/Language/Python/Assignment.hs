@@ -6,9 +6,9 @@ module Language.Python.Assignment
 , Python.Term(..)
 ) where
 
+import           Analysis.Name (name)
 import           Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
-import           Data.Abstract.Name (name)
 import qualified Data.List.NonEmpty as NonEmpty
 import           Data.Sum
 import           Data.Syntax

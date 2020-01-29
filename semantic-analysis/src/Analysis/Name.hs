@@ -1,40 +1,68 @@
-{-# LANGUAGE DeriveTraversable, GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE OverloadedStrings #-}
 module Analysis.Name
-( Name(..)
-, Named(..)
-, named
-, named'
-, namedName
-, namedValue
+( Name
+-- * Constructors
+, gensym
+, name
+, nameI
+, formatName
+, isGenerated
 ) where
 
-import Data.Function (on)
-import Data.String (IsString)
-import Data.Text (Text)
+import           Control.Effect.Fresh
+import           Data.Aeson
+import qualified Data.Char as Char
+import           Data.Hashable
+import           Data.String
+import           Data.Text (Text)
+import qualified Data.Text as Text
 
--- | User-specified and -relevant names.
-newtype Name = Name { unName :: Text }
-  deriving (Eq, IsString, Ord, Show)
+-- | The type of variable names.
+data Name
+  = Name Text
+  | I Int
+  deriving (Eq, Ord)
 
+instance IsString Name where
+  fromString = Name . fromString
 
--- | Annotates an @a@ with a 'Name'-provided name, which is ignored for '==' and 'compare'.
-data Named a = Named Name a
-  deriving (Foldable, Functor, Show, Traversable)
+-- | Generate a fresh (unused) name for use in synthesized variables/closures/etc.
+gensym :: Has Fresh sig m => m Name
+gensym = I <$> fresh
 
-named :: Name -> a -> Named a
-named = Named
+-- | Construct a 'Name' from a 'Text'.
+name :: Text -> Name
+name = Name
 
-named' :: Name -> Named Name
-named' u = Named u u
+isGenerated :: Name -> Bool
+isGenerated (I _) = True
+isGenerated _     = False
 
-namedName :: Named a -> Name
-namedName (Named n _) = n
+-- | Construct a 'Name' from an 'Int'. This is suitable for automatic generation, e.g. using a Fresh effect, but should not be used for human-generated names.
+nameI :: Int -> Name
+nameI = I
 
-namedValue :: Named a -> a
-namedValue (Named _ a) = a
+-- | Extract a human-readable 'Text' from a 'Name'.
+-- Sample outputs can be found in @Data.Abstract.Name.Spec@.
+formatName :: Name -> Text
+formatName (Name name) = name
+formatName (I i)       = Text.pack $ '_' : (alphabet !! a) : replicate n 'ʹ'
+  where alphabet = ['a'..'z']
+        (n, a) = i `divMod` length alphabet
 
-instance Eq a => Eq (Named a) where
-  (==) = (==) `on` namedValue
+instance Show Name where
+  showsPrec _ = prettyShowString . Text.unpack . formatName
+    where prettyShowString str = showChar '"' . foldr ((.) . prettyChar) id str . showChar '"'
+          prettyChar c
+            | c `elem` ['\\', '\"'] = Char.showLitChar c
+            | Char.isPrint c        = showChar c
+            | otherwise             = Char.showLitChar c
 
-instance Ord a => Ord (Named a) where
-  compare = compare `on` namedValue
+instance Hashable Name where
+  hashWithSalt salt (Name name) = hashWithSalt salt name
+  hashWithSalt salt (I i)       = salt `hashWithSalt` (1 :: Int) `hashWithSalt` i
+
+instance ToJSON Name where
+  toJSON = toJSON . formatName
+  toEncoding = toEncoding . formatName

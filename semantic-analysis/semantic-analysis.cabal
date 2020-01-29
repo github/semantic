@@ -50,6 +50,7 @@ library
     Analysis.Effect.Heap
     Analysis.File
     Analysis.FlowInsensitive
+    Analysis.Functor.Named
     Analysis.ImportGraph
     Analysis.Intro
     Analysis.Name
@@ -66,6 +67,7 @@ library
     , fused-syntax
     , hashable
     , haskeline                   ^>= 0.7.5
+    , hashable
     , lingo                       ^>= 0.3
     , pathtype                    ^>= 0.8.1
     , prettyprinter                >= 1.2 && < 2

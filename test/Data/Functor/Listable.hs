@@ -16,6 +16,7 @@ module Data.Functor.Listable
 , ListableSyntax
 ) where
 
+import qualified Analysis.Name as Name
 import qualified Analysis.TOCSummary as ToC
 import Data.Abstract.ScopeGraph (AccessControl(..))
 import Data.Bifunctor.Join
@@ -27,7 +28,6 @@ import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Statement as Statement
-import qualified Data.Abstract.Name as Name
 import Data.Term
 import Data.Text as T (Text, pack)
 import Data.Sum
