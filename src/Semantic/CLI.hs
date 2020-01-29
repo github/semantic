@@ -7,7 +7,6 @@ import qualified Control.Carrier.Parse.Measured as Parse
 import           Control.Carrier.Reader
 import           Control.Exception
 import           Control.Monad.IO.Class
-import           Data.Blob
 import           Data.Blob.IO
 import           Data.Either
 import qualified Data.Flag as Flag
