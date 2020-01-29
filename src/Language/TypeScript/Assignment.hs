@@ -34,7 +34,7 @@ import qualified Language.TypeScript.Syntax as TypeScript.Syntax
 import qualified Language.TypeScript.Resolution as TypeScript.Resolution
 import Language.TypeScript.Term as TypeScript
 import Prologue
-import TreeSitter.TypeScript as Grammar
+import Language.TypeScript.Grammar as Grammar
 
 type Assignment = Assignment.Assignment [] Grammar
 

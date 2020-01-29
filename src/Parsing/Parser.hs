@@ -67,7 +67,7 @@ import           TreeSitter.PHP
 import           Language.Python.Grammar
 import           Language.Ruby.Grammar (tree_sitter_ruby)
 import           TreeSitter.TSX
-import           TreeSitter.TypeScript
+import           Language.TypeScript.Grammar
 import           AST.Unmarshal
 
 -- | A parser from 'Source' onto some term type.
