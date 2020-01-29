@@ -22,6 +22,7 @@ library
   exposed-modules:
     Language.Java
     Language.Java.AST
+    Language.Java.Grammar
     Language.Java.Tags
   build-depends:
       base              >= 4.13 && < 5
