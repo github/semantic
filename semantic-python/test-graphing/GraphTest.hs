@@ -102,6 +102,9 @@ expectedFunctionArg = do
   reference "foo" "foo" RefProperties
   pure Complete
 
+expectedImportHole :: (Has Sketch sig m) => m Result
+expectedImportHole = undefined
+
 assertLexicalScope :: HUnit.Assertion
 assertLexicalScope = do
   let path = "semantic-python/test/fixtures/5-02-simple-function.py"
@@ -115,6 +118,14 @@ assertFunctionArg = do
   let path = "semantic-python/test/fixtures/5-03-function-argument.py"
   (graph, _) <- graphFile path
   case run (runSketch Nothing expectedFunctionArg) of
+    (expecto, Complete) -> HUnit.assertEqual "Should work for simple case" expecto graph
+    (_, Todo msg) -> HUnit.assertFailure ("Failed to complete:" <>  show msg)
+
+assertImportHole :: HUnit.Assertion
+assertImportHole = do
+  let path = "semantic-python/test/fixtures/cheese/6-01-import-holes.py"
+  (graph, _) <- graphFile path
+  case run (runSketch Nothing expectedImportHole) of
     (expecto, Complete) -> HUnit.assertEqual "Should work for simple case" expecto graph
     (_, Todo msg) -> HUnit.assertFailure ("Failed to complete:" <>  show msg)
 
@@ -136,5 +147,8 @@ main = do
       Tasty.testGroup "lexical scopes" [
         HUnit.testCase "simple function scope" assertLexicalScope
       , HUnit.testCase "simple function argument" assertFunctionArg
+      ],
+      Tasty.testGroup "imports" [
+        HUnit.testCase "simple function argument" assertImportHole
       ]
     ]
