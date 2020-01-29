@@ -88,7 +88,7 @@ assertSimpleReference = do
 
 expectedLexicalScope :: (Has Sketch sig m) => m Result
 expectedLexicalScope = do
-  declareFunction (Just $ Name.name "foo") (FunProperties ScopeGraph.Function)
+  _ <- declareFunction (Just $ Name.name "foo") (FunProperties ScopeGraph.Function)
   reference "foo" "foo" RefProperties {}
   pure Complete
 
@@ -105,18 +105,18 @@ expectedFunctionArg = do
 assertLexicalScope :: HUnit.Assertion
 assertLexicalScope = do
   let path = "semantic-python/test/fixtures/5-02-simple-function.py"
-  (graph, result) <- graphFile path
-  let (expecto, Complete) = run $ runSketch Nothing expectedLexicalScope
-
-  HUnit.assertEqual "Should work for simple case" expecto graph
+  (graph, _) <- graphFile path
+  case run (runSketch Nothing expectedLexicalScope) of
+    (expecto, Complete) -> HUnit.assertEqual "Should work for simple case" expecto graph
+    (_, Todo msg) -> HUnit.assertFailure ("Failed to complete:" <> show msg)
 
 assertFunctionArg :: HUnit.Assertion
 assertFunctionArg = do
   let path = "semantic-python/test/fixtures/5-03-function-argument.py"
-  (graph, result) <- graphFile path
-  let (expecto, Complete) = run $ runSketch Nothing expectedFunctionArg
-
-  HUnit.assertEqual "Should work for simple case" expecto graph
+  (graph, _) <- graphFile path
+  case run (runSketch Nothing expectedFunctionArg) of
+    (expecto, Complete) -> HUnit.assertEqual "Should work for simple case" expecto graph
+    (_, Todo msg) -> HUnit.assertFailure ("Failed to complete:" <>  show msg)
 
 main :: IO ()
 main = do
