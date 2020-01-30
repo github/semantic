@@ -7,6 +7,7 @@ module Language.TypeScript.Grammar
 import Language.Haskell.TH
 import TreeSitter.TypeScript (tree_sitter_typescript)
 import AST.Grammar.TH
+import TreeSitter.Language (addDependentFileRelative)
 
 -- Regenerate template haskell code when these files change:
 addDependentFileRelative "../../vendor/tree-sitter-typescript/typescript/src/parser.c"

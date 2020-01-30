@@ -7,6 +7,7 @@ module Language.Java.Grammar
 import Language.Haskell.TH
 import TreeSitter.Java (tree_sitter_java)
 import AST.Grammar.TH
+import TreeSitter.Language (addDependentFileRelative)
 
 -- Regenerate template haskell code when these files change:
 addDependentFileRelative "../../../vendor/tree-sitter-java/src/parser.c"

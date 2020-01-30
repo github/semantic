@@ -7,6 +7,7 @@ module Language.Ruby.Grammar
 import Language.Haskell.TH
 import TreeSitter.Ruby (tree_sitter_ruby)
 import AST.Grammar.TH
+import TreeSitter.Language (addDependentFileRelative)
 
 -- Regenerate template haskell code when these files change:
 addDependentFileRelative "../../../vendor/tree-sitter-ruby/src/parser.c"

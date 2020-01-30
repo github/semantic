@@ -7,6 +7,7 @@ module Language.JSON.Grammar
 import Language.Haskell.TH
 import TreeSitter.JSON (tree_sitter_json)
 import AST.Grammar.TH
+import TreeSitter.Language (addDependentFileRelative)
 
 -- Regenerate template haskell code when these files change:
 addDependentFileRelative "../../../vendor/tree-sitter-json/src/parser.c"

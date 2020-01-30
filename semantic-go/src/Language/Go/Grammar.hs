@@ -7,6 +7,7 @@ module Language.Go.Grammar
 import Language.Haskell.TH
 import TreeSitter.Go (tree_sitter_go)
 import AST.Grammar.TH
+import TreeSitter.Language (addDependentFileRelative)
 
 -- Regenerate template haskell code when these files change:
 addDependentFileRelative "../../../vendor/tree-sitter-go/src/parser.c"
