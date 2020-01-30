@@ -54,10 +54,6 @@ library
                      , optparse-applicative >= 0.14.3 && < 0.16
                      , pretty-simple        ^>= 3.1.0.0
                      , text                 ^>= 1.2.3.1
-                     , unordered-containers ^>= 0.2.10
-                     , containers            >= 0.6.0.1
-                     , text                 ^>= 1.2.3.1
-                     , filepath             ^>= 1.4.1
 
   hs-source-dirs:      src
   default-language:    Haskell2010
@@ -81,8 +77,5 @@ executable semantic-ast
                      , aeson-pretty
                      , semantic-python
                      , text
-                     , unordered-containers
-                     , containers
-                     , filepath
   hs-source-dirs:      app
   default-language:    Haskell2010
