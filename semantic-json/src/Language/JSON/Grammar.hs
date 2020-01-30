@@ -5,7 +5,8 @@ module Language.JSON.Grammar
 ) where
 
 import Language.Haskell.TH
-import TreeSitter.JSON.Internal
+import TreeSitter.JSON (tree_sitter_json)
+-- import TreeSitter.JSON.Internal
 import TreeSitter.Language
 
 -- Regenerate template haskell code when these files change:

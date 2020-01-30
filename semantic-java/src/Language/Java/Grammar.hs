@@ -5,7 +5,8 @@ module Language.Java.Grammar
 ) where
 
 import Language.Haskell.TH
-import TreeSitter.Java.Internal
+-- import TreeSitter.Java.Internal
+import TreeSitter.Java (tree_sitter_java)
 import TreeSitter.Language
 
 -- Regenerate template haskell code when these files change:
