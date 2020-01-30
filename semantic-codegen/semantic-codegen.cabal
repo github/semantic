@@ -8,19 +8,75 @@ version:             0.1.0.0
 -- synopsis:
 -- description:
 -- bug-reports:
--- license:
+license:             MIT
 license-file:        LICENSE
-author:              Ayman Nadeem
-maintainer:          aymannadeem@github.com
--- copyright:
--- category:
-build-type:          Simple
+author:              The Semantic Authors
+maintainer:          opensource+semantic@github.com
+copyright:           (c) 2019 GitHub, Inc.
+category:            Language
 extra-source-files:  CHANGELOG.md
 
+tested-with:         GHC == 8.6.5
+
+common haskell
+  default-language:    Haskell2010
+  ghc-options:
+    -Weverything
+    -Wno-missing-local-signatures
+    -Wno-missing-import-lists
+    -Wno-implicit-prelude
+    -Wno-safe
+    -Wno-unsafe
+    -Wno-name-shadowing
+    -Wno-monomorphism-restriction
+    -Wno-missed-specialisations
+    -Wno-all-missed-specialisations
+    -Wno-star-is-type
+  if (impl(ghc >= 8.8))
+    ghc-options: -Wno-missing-deriving-strategies
+
+library
+  import:              haskell
+  exposed-modules:     AST.Deserialize
+                       AST.GenerateSyntax
+                       AST.Grammar.TH
+                       AST.Token
+                       AST.Unmarshal
+
+-- other-modules:
+  -- other-extensions:
+  build-depends:       base ^>= 4.13
+                     , aeson                ^>= 1.4.2.0
+                     , bytestring           ^>= 0.10.8.2
+                     , tree-sitter          ^>= 0.8
+                     , semantic-source      ^>= 0.0.2
+                     , template-haskell     ^>= 2.15
+                     , bytestring           ^>= 0.10.8.2
+                     , text                 ^>= 1.2.3.1
+                     , unordered-containers ^>= 0.2.10
+                     , containers            >= 0.6.0.1
+                     , text                 ^>= 1.2.3.1
+                     , filepath             ^>= 1.4.1
+
+  hs-source-dirs:      src
+  default-language:    Haskell2010
+
 executable semantic-codegen
+  import:              haskell
   main-is:             Main.hs
   -- other-modules:
   -- other-extensions:
   build-depends:       base >=4.13 && <4.14
+                     , tree-sitter
+                     , semantic-source
+                     , tree-sitter-python
+                     , bytestring
+                     , aeson
+                     , bytestring
+                     , text
+                     , unordered-containers
+                     , containers
+                     , filepath
+  default-language:    Haskell2010
   -- hs-source-dirs:
   default-language:    Haskell2010
