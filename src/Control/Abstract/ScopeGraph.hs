@@ -162,7 +162,7 @@ insertEdge :: ( Has (State (ScopeGraph address)) sig m
            -> Evaluator term address value m ()
 insertEdge label target = do
   currentAddress <- currentScope
-  modify (ScopeGraph.insertEdge label target currentAddress)
+  modify (ScopeGraph.insertEdge label (pure target) currentAddress)
 
 -- | Inserts a new scope into the scope graph with the given edges.
 newScope :: ( Has (Allocator address) sig m

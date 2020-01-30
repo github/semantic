@@ -91,6 +91,12 @@ instance (Effect sig, Algebra sig m) => Algebra (SketchEff :+: Reader Name :+: F
     let new = ScopeGraph.newScope name edges old
     SketchC (put (Sketchbook new current))
     k name
+  alg (L (InsertEdge label address k)) = do
+    Sketchbook old current <- SketchC get
+    let new = ScopeGraph.insertEdge label address current old
+    SketchC (put (Sketchbook new current))
+    k ()
+
   alg (R (L a)) = case a of
     Ask k -> SketchC (gets sCurrentScope) >>= k
     Local fn go k -> do

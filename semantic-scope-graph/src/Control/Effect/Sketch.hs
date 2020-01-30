@@ -20,6 +20,7 @@ module Control.Effect.Sketch
   , declare
   -- Scope Manipulation
   , currentScope
+  , insertEdge
   , newScope
   , withScope
   , declareFunction
@@ -28,17 +29,18 @@ module Control.Effect.Sketch
   , Has
   ) where
 
+import           Analysis.Name (Name)
+import qualified Analysis.Name as Name
 import           Control.Algebra
 import           Control.Effect.Fresh
 import           Control.Effect.Reader
 import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
-import           Analysis.Name (Name)
-import qualified Analysis.Name as Name
 import qualified Data.ScopeGraph as ScopeGraph
 import           Data.Text (Text)
 import           GHC.Generics (Generic, Generic1)
 import           GHC.Records
+import Data.List.NonEmpty
 
 data DeclProperties = DeclProperties {
     kind            :: ScopeGraph.Kind
@@ -60,6 +62,7 @@ data SketchEff m k =
     Declare Name DeclProperties (() -> m k)
   | Reference Text Text RefProperties (() -> m k)
   | NewScope (Map ScopeGraph.EdgeLabel [Name]) (Name -> m k)
+  | InsertEdge ScopeGraph.EdgeLabel (NonEmpty Name) (() -> m k)
   deriving (Generic, Generic1, HFunctor, Effect)
 
 currentScope :: Has (Reader Name) sig m => m Name
@@ -74,6 +77,9 @@ reference n decl props = send (Reference n decl props pure)
 
 newScope :: forall sig m . (Has Sketch sig m) => Map ScopeGraph.EdgeLabel [Name] -> m Name
 newScope edges = send (NewScope edges pure)
+
+insertEdge :: Has Sketch sig m => ScopeGraph.EdgeLabel -> NonEmpty Name -> m ()
+insertEdge label targets = send (InsertEdge label targets pure)
 
 declareFunction :: forall sig m . (Has Sketch sig m) => Maybe Name -> FunProperties -> m (Name, Name)
 declareFunction name props = do
@@ -97,21 +103,3 @@ withScope :: Has Sketch sig m
           -> m a
           -> m a
 withScope scope = local (const scope)
--- declareFunction :: ( Has (State (ScopeGraph address)) sig m
---                    , Has (Allocator address) sig m
---                    , Has (Reader (CurrentScope address)) sig m
---                    , Has (Reader ModuleInfo) sig m
---                    , Has Fresh sig m
---                    , Ord address
---                    )
---                 => Maybe Name
---                 -> ScopeGraph.AccessControl
---                 -> Span
---                 -> ScopeGraph.Kind
---                 -> Evaluator term address value m (Name, address)
--- declareFunction name accessControl span kind = do
---   currentScope' <- currentScope
---   let lexicalEdges = Map.singleton Lexical [ currentScope' ]
---   associatedScope <- newScope lexicalEdges
---   name' <- declareMaybeName name Default accessControl span kind (Just associatedScope)
---   pure (name', associatedScope)
