@@ -25,6 +25,7 @@ library
     Language.JSON.Grammar
   build-depends:
       base              >= 4.13 && < 5
+    , semantic-ast
     , semantic-tags    ^>= 0.0
     , template-haskell ^>= 2.15
     , tree-sitter      ^>= 0.8
