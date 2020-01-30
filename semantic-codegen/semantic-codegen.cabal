@@ -69,7 +69,6 @@ executable semantic-codegen
   build-depends:       base >=4.13 && <4.14
                      , tree-sitter
                      , semantic-source
-                     , tree-sitter-python
                      , bytestring
                      , aeson
                      , bytestring
