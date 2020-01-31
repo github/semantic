@@ -22,8 +22,8 @@ module Language.Python.ScopeGraph
   ( scopeGraphModule
   ) where
 
-import           AST.Element
 import qualified Analysis.Name as Name
+import           AST.Element
 import           Control.Algebra (Algebra (..), handleCoercible)
 import           Control.Effect.Fresh
 import           Control.Effect.Sketch
@@ -92,7 +92,7 @@ scopeGraphModule = getAp . scopeGraph
 instance ToScopeGraph Py.AssertStatement where scopeGraph = onChildren
 
 instance ToScopeGraph Py.Assignment where
-  scopeGraph (Py.Assignment _ (SingleIdentifier t) _val _typ) = do
+  scopeGraph (Py.Assignment _ (SingleIdentifier t) val _typ) = do
     let declProps = (DeclProperties ScopeGraph.Assignment ScopeGraph.Default Nothing)
     declare t declProps
     maybe complete scopeGraph val
