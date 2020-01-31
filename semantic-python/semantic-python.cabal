@@ -104,6 +104,7 @@ test-suite graphing
 
   build-depends: base
                , semantic-python
+               , semantic-codegen
                , semantic-scope-graph
                , bytestring
                , pathtype
