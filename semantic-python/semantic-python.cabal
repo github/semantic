@@ -26,6 +26,7 @@ common haskell
                      , parsers ^>= 0.12.10
                      , semantic-analysis ^>= 0
                      , semantic-core ^>= 0.0
+                     , semantic-codegen
                      , semantic-source ^>= 0.0.2
                      , semantic-tags ^>= 0.0
                      , semantic-scope-graph ^>= 0.0
