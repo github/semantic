@@ -47,5 +47,4 @@ library
     -Wno-missed-specialisations
     -Wno-all-missed-specialisations
     -Wno-star-is-type
-if (impl(ghc >= 8.8))
-    ghc-options: -Wno-missing-deriving-strategies
+    -Wno-missing-deriving-strategies
