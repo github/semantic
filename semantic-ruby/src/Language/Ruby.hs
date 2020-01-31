@@ -3,7 +3,7 @@
 -- | Semantic functionality for Ruby programs.
 module Language.Ruby
 ( Term(..)
-, TreeSitter.Ruby.tree_sitter_ruby
+, Language.Ruby.Grammar.tree_sitter_ruby
 ) where
 
 import           Control.Carrier.State.Strict
