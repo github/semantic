@@ -28,28 +28,38 @@ module Control.Effect.Sketch
   , Has
   ) where
 
+import           Analysis.Name (Name)
+import qualified Analysis.Name as Name
 import           Control.Algebra
 import           Control.Effect.Fresh
 import           Control.Effect.Reader
+import           Control.Lens ((^.))
+import           Data.Generics.Product (field)
 import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
-import           Analysis.Name (Name)
-import qualified Analysis.Name as Name
 import qualified Data.ScopeGraph as ScopeGraph
 import           Data.Text (Text)
 import           GHC.Generics (Generic, Generic1)
 import           GHC.Records
+import           Source.Span
 
-data DeclProperties = DeclProperties {
-    kind            :: ScopeGraph.Kind
+data DeclProperties = DeclProperties
+  { kind            :: ScopeGraph.Kind
   , relation        :: ScopeGraph.Relation
   , associatedScope :: Maybe Name
-}
+  , spanInfo        :: Span
+  } deriving Generic
+
+instance HasSpan DeclProperties where span_ = field @"spanInfo"
 
 data RefProperties = RefProperties
-data FunProperties = FunProperties {
-  kind :: ScopeGraph.Kind
-}
+
+data FunProperties = FunProperties
+  { kind     :: ScopeGraph.Kind
+  , spanInfo :: Span
+  } deriving Generic
+
+instance HasSpan FunProperties where span_ = field @"spanInfo"
 
 type Sketch
   = SketchEff
@@ -80,7 +90,12 @@ declareFunction name props = do
   currentScope' <- currentScope
   let lexicalEdges = Map.singleton ScopeGraph.Lexical [ currentScope' ]
   associatedScope <- newScope lexicalEdges
-  name' <- declareMaybeName name (DeclProperties { relation = ScopeGraph.Default, kind = (getField @"kind" @FunProperties props), associatedScope = Just associatedScope })
+  name' <- declareMaybeName name DeclProperties
+                                   { relation = ScopeGraph.Default
+                                   , kind = (getField @"kind" @FunProperties props)
+                                   , associatedScope = Just associatedScope
+                                   , spanInfo = props^.span_
+                                   }
   pure (name', associatedScope)
 
 declareMaybeName :: Has Sketch sig m
