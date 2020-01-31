@@ -97,21 +97,4 @@ withScope :: Has Sketch sig m
           -> m a
           -> m a
 withScope scope = local (const scope)
--- declareFunction :: ( Has (State (ScopeGraph address)) sig m
---                    , Has (Allocator address) sig m
---                    , Has (Reader (CurrentScope address)) sig m
---                    , Has (Reader ModuleInfo) sig m
---                    , Has Fresh sig m
---                    , Ord address
---                    )
---                 => Maybe Name
---                 -> ScopeGraph.AccessControl
---                 -> Span
---                 -> ScopeGraph.Kind
---                 -> Evaluator term address value m (Name, address)
--- declareFunction name accessControl span kind = do
---   currentScope' <- currentScope
---   let lexicalEdges = Map.singleton Lexical [ currentScope' ]
---   associatedScope <- newScope lexicalEdges
---   name' <- declareMaybeName name Default accessControl span kind (Just associatedScope)
---   pure (name', associatedScope)
+
