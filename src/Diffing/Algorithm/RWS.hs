@@ -1,4 +1,10 @@
-{-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric, GADTs, RankNTypes, RecordWildCards, TypeOperators #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TypeOperators #-}
 {-# OPTIONS_GHC -Wno-incomplete-uni-patterns #-} -- FIXME
 module Diffing.Algorithm.RWS
 ( rws
@@ -14,16 +20,27 @@ module Diffing.Algorithm.RWS
 , equalTerms
 ) where
 
-import Control.Monad.State.Strict
-import Data.Diff (DiffF(..), comparing, deleting, inserting, merge)
-import Data.Edit
+import           Control.Applicative
+import           Control.Arrow ((&&&))
+import           Control.Monad.State.Strict
+import           Data.Diff (DiffF (..), comparing, deleting, inserting, merge)
+import           Data.Edit
+import           Data.Foldable
+import           Data.Function
+import           Data.Functor.Classes
+import           Data.Functor.Foldable (cata)
+import           Data.Hashable
+import           Data.Hashable.Lifted
+import           Data.Ix (inRange)
 import qualified Data.KdMap.Static as KdMap
-import Data.List (sortOn)
-import Data.Term as Term
-import Diffing.Algorithm (Diffable(..))
-import Diffing.Algorithm.RWS.FeatureVector
-import Diffing.Algorithm.SES
-import Prologue
+import           Data.List (sortOn)
+import           Data.Maybe
+import           Data.Term as Term
+import           Data.Traversable
+import           Diffing.Algorithm (Diffable (..))
+import           Diffing.Algorithm.RWS.FeatureVector
+import           Diffing.Algorithm.SES
+import           GHC.Generics (Generic)
 
 -- | A relation on 'Term's, guaranteed constant-time in the size of the 'Term' by parametricity.
 --
@@ -158,7 +175,7 @@ editDistanceUpTo m a b = diffCost m (approximateDiff a b)
   where diffCost = flip . cata $ \ diff m -> case diff of
           _ | m <= 0 -> 0
           Merge body -> sum (fmap ($ pred m) body)
-          body -> succ (sum (fmap ($ pred m) body))
+          body       -> succ (sum (fmap ($ pred m) body))
         approximateDiff a b = maybe (comparing a b) (merge (termAnnotation a, termAnnotation b)) (tryAlignWith (Just . edit deleting inserting approximateDiff) (termOut a) (termOut b))
 
 

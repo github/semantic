@@ -9,13 +9,13 @@ module Data.Blob.IO
   , readFilePair
   ) where
 
-import Prologue
-
 import           Analysis.File as File
 import qualified Control.Concurrent.Async as Async
+import           Control.Monad.IO.Class
 import           Data.Blob
 import qualified Data.ByteString as B
 import           Data.Language
+import           Data.Maybe.Exts
 import           Semantic.IO
 import qualified Source.Source as Source
 import qualified System.Path as Path

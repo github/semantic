@@ -1,4 +1,9 @@
-{-# LANGUAGE DataKinds, FlexibleContexts, RankNTypes, RecordWildCards, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
 module Language.Markdown.Assignment
 ( assignment
 , Markdown.Syntax
@@ -6,11 +11,11 @@ module Language.Markdown.Assignment
 , Markdown.Term(..)
 ) where
 
-import Prologue
-
 import           Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
 import qualified CMarkGFM
+import           Control.Monad
+import           Data.Sum
 import           Data.Syntax (makeTerm)
 import qualified Data.Syntax as Syntax
 import qualified Data.Term as Term
@@ -46,7 +51,7 @@ list :: Assignment (Term Loc)
 list = Term.termIn <$> symbol List <*> (makeList . Term.termFAnnotation . Term.termFOut <$> currentNode <*> children (many item))
   where
     makeList (CMarkGFM.LIST CMarkGFM.ListAttributes{..}) = case listType of
-      CMarkGFM.BULLET_LIST -> inject . Markup.UnorderedList
+      CMarkGFM.BULLET_LIST  -> inject . Markup.UnorderedList
       CMarkGFM.ORDERED_LIST -> inject . Markup.OrderedList
     makeList _ = inject . Markup.UnorderedList
 
@@ -57,7 +62,7 @@ heading :: Assignment (Term Loc)
 heading = makeTerm <$> symbol Heading <*> (makeHeading . Term.termFAnnotation . Term.termFOut <$> currentNode <*> children (many inlineElement) <*> manyTill blockElement (void (symbol Heading) <|> eof))
   where
     makeHeading (CMarkGFM.HEADING level) = Markup.Heading level
-    makeHeading _ = Markup.Heading 0
+    makeHeading _                        = Markup.Heading 0
 
 blockQuote :: Assignment (Term Loc)
 blockQuote = makeTerm <$> symbol BlockQuote <*> children (Markup.BlockQuote <$> many blockElement)
@@ -66,7 +71,7 @@ codeBlock :: Assignment (Term Loc)
 codeBlock = makeTerm <$> symbol CodeBlock <*> (makeCode . Term.termFAnnotation . Term.termFOut <$> currentNode <*> source)
   where
     makeCode (CMarkGFM.CODE_BLOCK language _) = Markup.Code (nullText language)
-    makeCode _ = Markup.Code Nothing
+    makeCode _                                = Markup.Code Nothing
 
 thematicBreak :: Assignment (Term Loc)
 thematicBreak = makeTerm <$> token ThematicBreak <*> pure Markup.ThematicBreak
@@ -118,13 +123,13 @@ link :: Assignment (Term Loc)
 link = makeTerm <$> symbol Link <*> (makeLink . Term.termFAnnotation . Term.termFOut <$> currentNode) <* advance
   where
     makeLink (CMarkGFM.LINK url title) = Markup.Link url (nullText title)
-    makeLink _ = Markup.Link mempty Nothing
+    makeLink _                         = Markup.Link mempty Nothing
 
 image :: Assignment (Term Loc)
 image = makeTerm <$> symbol Image <*> (makeImage . Term.termFAnnotation . Term.termFOut <$> currentNode) <* advance
   where
     makeImage (CMarkGFM.IMAGE url title) = Markup.Image url (nullText title)
-    makeImage _ = Markup.Image mempty Nothing
+    makeImage _                          = Markup.Image mempty Nothing
 
 code :: Assignment (Term Loc)
 code = makeTerm <$> symbol Code <*> (Markup.Code Nothing <$> source)

@@ -1,7 +1,10 @@
-{-# LANGUAGE DeriveAnyClass, DeriveGeneric, DeriveTraversable, FlexibleContexts, RecordWildCards, TypeApplications #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TypeApplications #-}
 module Language.Go.Syntax (module Language.Go.Syntax) where
-
-import Prologue
 
 import           Control.Abstract
 import           Data.Abstract.BaseError
@@ -10,13 +13,20 @@ import           Data.Abstract.Module
 import qualified Data.Abstract.Package as Package
 import           Data.Abstract.Path
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
+import           Data.Foldable
+import           Data.Functor.Classes
+import           Data.Functor.Classes.Generic
+import           Data.Hashable.Lifted
 import           Data.ImportPath
 import           Data.JSON.Fields
+import           Data.List.NonEmpty (nonEmpty)
 import qualified Data.Map as Map
 import           Data.Semigroup.App
 import           Data.Semigroup.Foldable
+import           Data.Text (Text)
 import qualified Data.Text as T
 import           Diffing.Algorithm
+import           GHC.Generics (Generic1)
 import           System.FilePath.Posix
 
 resolveGoImport :: ( Has (Modules address value) sig m
@@ -34,7 +44,7 @@ resolveGoImport (ImportPath path Relative) = do
   paths <- listModulesInDir (joinPaths (takeDirectory modulePath) path)
   case paths of
     [] -> throwResolutionError $ GoImportError path
-    _ -> pure paths
+    _  -> pure paths
 resolveGoImport (ImportPath path NonRelative) = do
   package <- T.unpack . formatName . Package.packageName <$> currentPackage
   trace ("attempting to resolve " <> show path <> " for package " <> package)
@@ -43,7 +53,7 @@ resolveGoImport (ImportPath path NonRelative) = do
     -- First two are source, next is package name, remaining are path to package
     -- (e.g. github.com/golang/<package>/path...).
     (_ : _ : p : xs) | p == package -> listModulesInDir (joinPath xs)
-    _  -> throwResolutionError $ GoImportError path
+    _                               -> throwResolutionError $ GoImportError path
 
 -- | Import declarations (symbols are added directly to the calling environment).
 --

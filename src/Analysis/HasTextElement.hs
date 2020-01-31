@@ -4,7 +4,7 @@ module Analysis.HasTextElement
 ) where
 
 import Data.Sum
-import Prologue
+import Data.Proxy
 import qualified Data.Syntax.Literal as Literal
 
 class HasTextElement syntax where

@@ -1,4 +1,14 @@
-{-# LANGUAGE AllowAmbiguousTypes, DataKinds, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, RankNTypes, RecordWildCards, ScopedTypeVariables, TypeApplications, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE UndecidableInstances #-}
 {-# OPTIONS_GHC -freduction-depth=0 #-}
 module Semantic.Api.Terms
   ( termGraph
@@ -16,17 +26,20 @@ import           Data.Aeson (ToJSON)
 import           Data.Blob
 import           Data.ByteString.Builder
 import           Data.Either
+import           Data.Foldable
+import           Data.Functor.Classes
+import           Data.Functor.Foldable
 import           Data.Graph
 import           Data.Language
+import           Data.Map.Strict (Map)
 import           Data.ProtoLens (defMessage)
 import           Data.Quieterm
 import           Data.Term
 import qualified Data.Text as T
 import           Parsing.Parser
-import           Prologue
 import           Proto.Semantic as P hiding (Blob)
 import           Proto.Semantic_Fields as P
-import           Proto.Semantic_JSON()
+import           Proto.Semantic_JSON ()
 import           Rendering.Graph
 import           Rendering.JSON hiding (JSON)
 import qualified Rendering.JSON
@@ -39,13 +52,13 @@ import qualified Serializing.SExpression as SExpr
 import qualified Serializing.SExpression.Precise as SExpr.Precise (serializeSExpression)
 import           Source.Loc
 
+import qualified Language.Go as GoPrecise
 import qualified Language.Java as Java
 import qualified Language.JSON as JSON
-import qualified Language.Go as GoPrecise
 import qualified Language.Python as PythonPrecise
 import qualified Language.Ruby as RubyPrecise
-import qualified Language.TypeScript as TypeScriptPrecise
 import qualified Language.TSX as TSXPrecise
+import qualified Language.TypeScript as TypeScriptPrecise
 
 
 termGraph :: (Traversable t, Has Distribute sig m, Has (Error SomeException) sig m, Has Parse sig m) => t Blob -> m ParseTreeGraphResponse

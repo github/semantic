@@ -1,18 +1,26 @@
-{-# LANGUAGE DataKinds, FlexibleInstances, MultiParamTypeClasses, RecordWildCards, ScopedTypeVariables, TypeApplications, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Analysis.PackageDef
 ( PackageDef(..)
 , HasPackageDef
 , packageDefAlgebra
 ) where
 
-import Data.Blob
-import Source.Source as Source
-import Data.Sum
-import Data.Term
+import           Data.Algebra
+import           Data.Blob
+import           Data.Proxy
+import           Data.Sum
+import           Data.Term
 import qualified Data.Text as T
 import qualified Language.Go.Syntax
-import Prologue
-import Source.Loc
+import           Source.Loc
+import           Source.Source as Source
 
 newtype PackageDef = PackageDef { moduleDefIdentifier :: T.Text }
   deriving (Eq, Show)

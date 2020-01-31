@@ -4,9 +4,9 @@ module Data.Abstract.Path
   , stripQuotes
   ) where
 
-import Prologue
+import           Data.Text (Text)
 import qualified Data.Text as T
-import System.FilePath.Posix
+import           System.FilePath.Posix
 
 -- | Join two paths a and b. Handles walking up relative directories in b. e.g.
 --

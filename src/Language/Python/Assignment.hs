@@ -1,4 +1,8 @@
-{-# LANGUAGE DataKinds, FlexibleContexts, RankNTypes, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
 module Language.Python.Assignment
 ( assignment
 , Python.Syntax
@@ -9,7 +13,11 @@ module Language.Python.Assignment
 import           Analysis.Name (name)
 import           Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
+import           Control.Monad
+import           Data.Functor
+import           Data.List.NonEmpty (some1)
 import qualified Data.List.NonEmpty as NonEmpty
+import           Data.Maybe
 import           Data.Sum
 import           Data.Syntax
     ( contextualize
@@ -32,7 +40,6 @@ import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import           Language.Python.Syntax as Python.Syntax
 import           Language.Python.Term as Python
-import           Prologue
 import           TreeSitter.Python as Grammar
 
 type Assignment = Assignment.Assignment [] Grammar
@@ -166,14 +173,14 @@ forStatement = symbol ForStatement >>= \ loc -> children (make loc <$> (symbol V
   where
     make loc binding subject body forElseClause = case forElseClause of
       Nothing -> makeTerm loc (Statement.ForEach binding subject body)
-      Just a -> makeTerm loc (Statement.Else (makeTerm loc $ Statement.ForEach binding subject body) a)
+      Just a  -> makeTerm loc (Statement.Else (makeTerm loc $ Statement.ForEach binding subject body) a)
 
 whileStatement :: Assignment (Term Loc)
 whileStatement = symbol WhileStatement >>= \ loc -> children (make loc <$> term expression <*> term block <*> optional (symbol ElseClause *> children expressions))
   where
     make loc whileCondition whileBody whileElseClause = case whileElseClause of
       Nothing -> makeTerm loc (Statement.While whileCondition whileBody)
-      Just a -> makeTerm loc (Statement.Else (makeTerm loc $ Statement.While whileCondition whileBody) a)
+      Just a  -> makeTerm loc (Statement.Else (makeTerm loc $ Statement.While whileCondition whileBody) a)
 
 tryStatement :: Assignment (Term Loc)
 tryStatement = makeTerm <$> symbol TryStatement <*> children (Statement.Try <$> term block <*> manyTerm (expression <|> elseClause))

@@ -1,24 +1,28 @@
-{-# LANGUAGE DataKinds, FlexibleContexts, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
 module Semantic.Analysis
 ( evaluate
 , runDomainEffects
 , evalTerm
 ) where
 
-import Prologue
 
+import           Control.Abstract as Abstract
+import           Control.Algebra
+import           Control.Carrier.Error.Either
+import           Control.Carrier.Reader
+import           Control.Effect.Interpose
+import           Data.Abstract.Evaluatable
+import           Data.Abstract.Module
+import           Data.Abstract.ModuleTable as ModuleTable
+import           Data.Foldable
+import           Data.Function
+import           Data.Functor.Foldable
+import           Data.Language (Language)
 import qualified Data.Map.Strict as Map
-
-import Control.Abstract as Abstract
-import Control.Algebra
-import Control.Carrier.Error.Either
-import Control.Carrier.Reader
-import Control.Effect.Interpose
-import Data.Abstract.Evaluatable
-import Data.Abstract.Module
-import Data.Abstract.ModuleTable as ModuleTable
-import Data.Language (Language)
-import Source.Span
+import           Source.Span
 
 type ModuleC address value m
   = ErrorC (LoopControl value)
@@ -77,7 +81,7 @@ evaluate lang runModule modules = do
           let (scopeEdges, frameLinks) = case (parentScope, parentFrame) of
                 (Just parentScope, Just parentFrame) -> (Map.singleton Lexical [ parentScope ], Map.singleton Lexical (Map.singleton parentScope parentFrame))
                 _ -> mempty
-          scopeAddress <- if Prologue.null scopeEdges then newPreludeScope scopeEdges else newScope scopeEdges
+          scopeAddress <- if Data.Foldable.null scopeEdges then newPreludeScope scopeEdges else newScope scopeEdges
           frameAddress <- newFrame scopeAddress frameLinks
           val <- runInModule scopeAddress frameAddress m
           pure ((scopeAddress, frameAddress), val)

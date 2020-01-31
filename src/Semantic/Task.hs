@@ -1,5 +1,13 @@
-{-# LANGUAGE FlexibleContexts, FlexibleInstances, GADTs, GeneralizedNewtypeDeriving, KindSignatures,
-             MultiParamTypeClasses, RecordWildCards, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Semantic.Task
 ( TaskC
 , Level(..)
@@ -51,10 +59,10 @@ import           Control.Carrier.Error.Either
 import           Control.Carrier.Lift
 import           Control.Carrier.Reader
 import           Control.Effect.Trace
+import           Control.Exception
 import           Control.Monad.IO.Class
 import           Data.ByteString.Builder
 import qualified Data.Flag as Flag
-import           Prologue hiding (project)
 import           Semantic.Config
 import           Semantic.Distribute
 import           Semantic.Resolution

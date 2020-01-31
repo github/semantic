@@ -17,12 +17,15 @@ module Data.JSON.Fields
   ) where
 
 import           Data.Aeson
+import           Data.Bifunctor.Join
 import           Data.Edit
 import qualified Data.Map as Map
+import           Data.Maybe
 import           Data.ScopeGraph
+import           Data.Sum
+import           Data.Text (Text)
 import qualified Data.Text as Text
 import           GHC.Generics
-import           Prologue
 import           Source.Loc
 import           Source.Range
 

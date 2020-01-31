@@ -1,17 +1,28 @@
-{-# LANGUAGE DeriveAnyClass, DeriveGeneric, DeriveTraversable, DuplicateRecordFields, OverloadedStrings, RecordWildCards, TypeApplications #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TypeApplications #-}
 module Language.TypeScript.Syntax.Import (module Language.TypeScript.Syntax.Import) where
-
-import Prologue
 
 import qualified Analysis.Name as Name
 import           Control.Abstract hiding (Import)
+import           Control.Monad
 import           Data.Abstract.Evaluatable as Evaluatable
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
+import           Data.Aeson (ToJSON)
+import           Data.Foldable
+import           Data.Functor.Classes.Generic
+import           Data.Hashable
+import           Data.Hashable.Lifted
 import           Data.JSON.Fields
-import           Diffing.Algorithm
-import           Language.TypeScript.Resolution
 import qualified Data.Map.Strict as Map
-import Data.Aeson (ToJSON)
+import           Data.Semilattice.Lower
+import           Diffing.Algorithm
+import           GHC.Generics (Generic, Generic1)
+import           Language.TypeScript.Resolution
 
 data Import a = Import { importSymbols :: ![Alias], importFrom :: ImportPath }
   deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
@@ -25,7 +36,7 @@ instance Evaluatable Import where
   eval _ _ (Import symbols importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
     ((moduleScope, moduleFrame), _) <- require modulePath
-    if Prologue.null symbols then do
+    if Prelude.null symbols then do
       insertImportEdge moduleScope
       insertFrameLink ScopeGraph.Import (Map.singleton moduleScope moduleFrame)
     else do

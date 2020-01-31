@@ -1,4 +1,12 @@
-{-# LANGUAGE DeriveGeneric, DerivingVia, DuplicateRecordFields, LambdaCase, OverloadedStrings, RankNTypes, RecordWildCards, ScopedTypeVariables, TupleSections #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DerivingVia #-}
+{-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TupleSections #-}
 module Rendering.TOC
 ( diffTOC
 , Summaries(..)
@@ -10,17 +18,25 @@ module Rendering.TOC
 , summarizeChange
 ) where
 
-import Prologue hiding (index)
-import Analysis.TOCSummary
-import Data.Aeson (ToJSON(..), Value, (.=), object)
-import Data.Diff
-import Data.Edit
-import Data.Language as Language
-import Data.List (sortOn)
+import           Analysis.TOCSummary
+import           Control.Applicative
+import           Control.Arrow ((&&&))
+import           Data.Aeson (ToJSON (..), Value, object, (.=))
+import           Data.Bifoldable
+import           Data.Bifunctor
+import           Data.Diff
+import           Data.Edit
+import           Data.Foldable
+import           Data.Functor.Foldable (cata)
+import           Data.Language as Language
+import           Data.List (sortOn)
 import qualified Data.Map.Monoidal as Map
-import Data.Term
+import           Data.Maybe
+import           Data.Monoid.Generic
+import           Data.Term
 import qualified Data.Text as T
-import Source.Loc
+import           GHC.Generics (Generic)
+import           Source.Loc
 
 data Summaries = Summaries { changes, errors :: Map.Map T.Text [Value] }
   deriving (Eq, Show, Generic)

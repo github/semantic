@@ -21,13 +21,18 @@ module Semantic.Resolution
 
 import           Analysis.File as File
 import           Control.Algebra
+import           Control.Monad.IO.Class
 import           Data.Aeson
 import           Data.Aeson.Types (parseMaybe)
 import           Data.Blob
+import           Data.Foldable
 import           Data.Language
 import qualified Data.Map as Map
+import           Data.Map.Strict (Map)
+import           Data.Maybe.Exts
 import           Data.Project
-import           Prologue
+import           Data.Text (Text)
+import           GHC.Generics (Generic1)
 import           Semantic.Task.Files
 import qualified Source.Source as Source
 import           System.FilePath.Posix

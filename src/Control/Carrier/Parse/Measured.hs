@@ -1,4 +1,11 @@
-{-# LANGUAGE FlexibleContexts, FlexibleInstances, GADTs, GeneralizedNewtypeDeriving, MultiParamTypeClasses, RecordWildCards, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 -- | A carrier for 'Parse' effects suitable for use in production.
 module Control.Carrier.Parse.Measured
 ( -- * Parse carrier
@@ -16,17 +23,18 @@ import           Control.Effect.Parse
 import           Control.Effect.Reader
 import           Control.Effect.Trace
 import           Control.Exception
+import           Control.Monad
 import           Control.Monad.IO.Class
 import           Data.Blob
 import qualified Data.Error as Error
 import qualified Data.Flag as Flag
+import           Data.Foldable
 import qualified Data.Syntax as Syntax
 import           Parsing.CMark
 import           Parsing.Parser
 import           Parsing.TreeSitter
-import           Prologue hiding (project)
 import           Semantic.Config
-import           Semantic.Task (TaskSession(..))
+import           Semantic.Task (TaskSession (..))
 import           Semantic.Telemetry
 import           Semantic.Timeout
 import           Source.Source (Source)
@@ -43,7 +51,7 @@ instance ( Has (Error SomeException) sig m
          )
       => Algebra (Parse :+: sig) (ParseC m) where
   alg (L (Parse parser blob k)) = runParser blob parser >>= k
-  alg (R other) = ParseC (alg (handleCoercible other))
+  alg (R other)                 = ParseC (alg (handleCoercible other))
 
 -- | Parse a 'Blob' in 'IO'.
 runParser :: (Has (Error SomeException) sig m, Has (Reader TaskSession) sig m, Has Telemetry sig m, Has Timeout sig m, Has Trace sig m, MonadIO m)

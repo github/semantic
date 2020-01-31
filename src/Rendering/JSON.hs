@@ -1,4 +1,11 @@
-{-# LANGUAGE DataKinds, GADTs, GeneralizedNewtypeDeriving, KindSignatures, OverloadedStrings, RecordWildCards, ScopedTypeVariables, TypeApplications #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications #-}
 module Rendering.JSON
 ( JSON(..)
 , renderJSONDiff
@@ -15,10 +22,10 @@ module Rendering.JSON
 
 import Data.Aeson as A
 import Data.Blob
+import Data.Foldable (fold)
 import Data.JSON.Fields
 import Data.Text (pack)
 import GHC.TypeLits
-import Prologue
 
 newtype JSON (key :: Symbol) a = JSON { unJSON :: [a] }
   deriving (Eq, Monoid, Semigroup, Show)

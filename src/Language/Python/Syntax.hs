@@ -1,14 +1,27 @@
-{-# LANGUAGE DeriveAnyClass, DeriveGeneric, DeriveTraversable, FlexibleContexts, RecordWildCards, TypeApplications #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TypeApplications #-}
 module Language.Python.Syntax (module Language.Python.Syntax) where
-
-import Prologue
 
 import           Control.Lens.Getter
 import           Data.Aeson hiding (object)
+import           Data.Foldable
+import           Data.Functor.Classes
+import           Data.Functor.Classes.Generic
+import           Data.Hashable
+import           Data.Hashable.Lifted
 import qualified Data.List as List
+import           Data.List.NonEmpty (NonEmpty (..))
 import qualified Data.List.NonEmpty as NonEmpty
 import qualified Data.Map.Strict as Map
+import           Data.Maybe.Exts
+import           Data.Text (Text)
 import qualified Data.Text as T
+import           Data.Traversable
+import           GHC.Generics (Generic, Generic1)
 import           System.FilePath.Posix
 
 import           Control.Abstract.Heap
@@ -160,7 +173,7 @@ instance Evaluatable Import where
     -- Last module path is the one we want to import
     let path = NonEmpty.last modulePaths
     ((moduleScope, moduleFrame), _) <- require path
-    if Prologue.null xs then do
+    if Prelude.null xs then do
       insertImportEdge moduleScope
       insertFrameLink ScopeGraph.Import (Map.singleton moduleScope moduleFrame)
     else do

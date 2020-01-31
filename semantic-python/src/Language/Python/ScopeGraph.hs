@@ -94,8 +94,9 @@ instance ToScopeGraph Py.AssertStatement where scopeGraph = onChildren
 instance ToScopeGraph Py.Assignment where
   scopeGraph (Py.Assignment _ (SingleIdentifier t) _val _typ) = do
     let declProps = (DeclProperties ScopeGraph.Assignment ScopeGraph.Default Nothing)
-    complete <* declare t declProps
-  scopeGraph x                                                = todo x
+    declare t declProps
+    maybe complete scopeGraph val
+  scopeGraph x = todo x
 
 instance ToScopeGraph Py.Await where
   scopeGraph (Py.Await _ a) = scopeGraph a

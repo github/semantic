@@ -1,4 +1,7 @@
-{-# LANGUAGE DeriveGeneric, DeriveTraversable, DerivingVia, RecordWildCards #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE DerivingVia #-}
+{-# LANGUAGE RecordWildCards #-}
 module Assigning.Assignment.Table
 ( Table(tableAddresses)
 , singleton
@@ -7,10 +10,15 @@ module Assigning.Assignment.Table
 , lookup
 ) where
 
-import Prologue
-import Prelude hiding (lookup)
+import           Data.Bifunctor
+import           Data.Functor.Classes
+import           Data.IntMap (IntMap)
 import qualified Data.IntMap as IntMap
 import qualified Data.IntSet as IntSet
+import           Data.Monoid.Generic
+import           Data.Traversable
+import           GHC.Generics (Generic)
+import           Prelude hiding (lookup)
 
 data Table i a = Table { tableAddresses :: [i], tableBranches :: IntMap a }
   deriving (Eq, Foldable, Functor, Show, Traversable, Generic)

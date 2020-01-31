@@ -1,11 +1,17 @@
-{-# LANGUAGE DeriveAnyClass, DeriveGeneric, DeriveTraversable, DuplicateRecordFields #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE DuplicateRecordFields #-}
 module Language.Markdown.Syntax (module Language.Markdown.Syntax) where
 
 import           Data.Abstract.Declarations
+import           Data.Functor.Classes
+import           Data.Functor.Classes.Generic
+import           Data.Hashable.Lifted
 import           Data.JSON.Fields
 import qualified Data.Text as T
 import           Diffing.Algorithm
-import           Prologue hiding (Text)
+import           GHC.Generics (Generic1)
 
 newtype Document a = Document { values :: [a] }
   deriving (Declarations1, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, ToJSONFields1)
