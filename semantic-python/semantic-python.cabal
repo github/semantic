@@ -33,7 +33,7 @@ common haskell
                      , text ^>= 1.2.3
                      , tree-sitter ^>= 0.8
                      , tree-sitter-python ^>= 0.8.1
-
+                     , containers
   ghc-options:
     -Weverything
     -Wno-missing-local-signatures
