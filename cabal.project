@@ -4,6 +4,7 @@
 packages: .
           semantic-analysis
           semantic-ast
+          semantic-codegen
           semantic-core
           semantic-go
           semantic-java
