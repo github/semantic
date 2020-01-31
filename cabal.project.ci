@@ -4,6 +4,7 @@
 packages: .
           semantic-analysis
           semantic-ast
+          semantic-codegen
           semantic-core
           semantic-go
           semantic-java
@@ -41,6 +42,9 @@ package semantic-analysis
   ghc-options: -Werror
 
 package semantic-ast
+  ghc-options: -Werror
+
+package semantic-codegen
   ghc-options: -Werror
 
 package semantic-core
