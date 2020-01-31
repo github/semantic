@@ -92,10 +92,10 @@ scopeGraphModule = getAp . scopeGraph
 instance ToScopeGraph Py.AssertStatement where scopeGraph = onChildren
 
 instance ToScopeGraph Py.Assignment where
-  scopeGraph (Py.Assignment _ (SingleIdentifier t) _val _typ) = do
+  scopeGraph (Py.Assignment _ (SingleIdentifier t) val _typ) = do
     let declProps = (DeclProperties ScopeGraph.Assignment ScopeGraph.Default Nothing)
     maybe complete scopeGraph val <* declare t declProps
-  scopeGraph x                                                = todo x
+  scopeGraph x = todo x
 
 instance ToScopeGraph Py.Await where
   scopeGraph (Py.Await _ a) = scopeGraph a
