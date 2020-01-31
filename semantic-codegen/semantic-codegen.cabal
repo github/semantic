@@ -45,7 +45,7 @@ library
 
 -- other-modules:
   -- other-extensions:
-  build-depends:       base ^>= 4.13
+  build-depends:       base >= 4.13
                      , aeson                ^>= 1.4.2.0
                      , bytestring           ^>= 0.10.8.2
                      , tree-sitter          ^>= 0.8
@@ -66,7 +66,7 @@ executable semantic-codegen
   main-is:             Main.hs
   -- other-modules:
   -- other-extensions:
-  build-depends:       base >=4.13 && <4.14
+  build-depends:       base
                      , tree-sitter
                      , semantic-source
                      , bytestring
