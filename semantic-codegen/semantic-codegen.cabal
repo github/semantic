@@ -57,6 +57,7 @@ library
                      , containers            >= 0.6.0.1
                      , text                 ^>= 1.2.3.1
                      , filepath             ^>= 1.4.1
+                     , directory            ^>= 1.3.3.2
 
   hs-source-dirs:      src
   default-language:    Haskell2010
