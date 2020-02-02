@@ -361,6 +361,7 @@ test-suite test
                      , Generators
                      , Properties
   build-depends:       semantic
+                     , semantic-json
                      , tree-sitter-json ^>= 0.6
                      , Glob ^>= 0.10.0
                      , hedgehog ^>= 1
