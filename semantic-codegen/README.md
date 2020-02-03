@@ -48,7 +48,6 @@ To parse source code and produce ASTs locally:
 cabal new-repl lib:tree-sitter-python
 ```
 
-2. Set language extensions, `OverloadedStrings` and `TypeApplications`, and import relevant modules, `TreeSitter.Unmarshal`, `Source.Range` and `Source.Span`:
 
 ```
 :seti -XOverloadedStrings
@@ -56,7 +55,7 @@ cabal new-repl lib:tree-sitter-python
 
 import Source.Span
 import Source.Range
-import TreeSitter.Unmarshal
+import AST.Unmarshal
 ```
 
 3. You can now call `parseByteString`, passing in the desired language you wish to parse (in this case Python exemplified by `tree_sitter_python`), and the source code (in this case an integer `1`). Since the function is constrained by `(Unmarshal t, UnmarshalAnn a)`, you can use type applications to provide a top-level node `t`, an entry point into the tree, in addition to a polymorphic annotation `a` used to represent range and span:
