@@ -17,6 +17,7 @@ import           Data.Semilattice.Lower
 import qualified Language.Python ()
 import qualified Language.Python as Py (Term)
 import           ScopeGraph.Convert
+import qualified ScopeGraph.Properties.Declaration as Props
 import           Source.Loc
 import qualified Source.Source as Source
 import           Source.Span
@@ -55,9 +56,8 @@ runScopeGraph p _src item = run . runSketch (Just p) $ scopeGraph item
 
 sampleGraphThing :: (Has Sketch sig m) => m Result
 sampleGraphThing = do
-  -- TODO: until https://github.com/github/semantic/issues/457 is fixed, these are 0-indexed, which is technically wrong
-  declare "hello" (DeclProperties ScopeGraph.Assignment ScopeGraph.Default Nothing (Span (Pos 2 0) (Pos 2 10)))
-  declare "goodbye" (DeclProperties ScopeGraph.Assignment ScopeGraph.Default Nothing (Span (Pos 3 0) (Pos 3 12)))
+  declare "hello" (Props.Declaration ScopeGraph.Assignment ScopeGraph.Default Nothing (Span (Pos 2 0) (Pos 2 10)))
+  declare "goodbye" (Props.Declaration ScopeGraph.Assignment ScopeGraph.Default Nothing (Span (Pos 3 0) (Pos 3 12)))
   pure Complete
 
 graphFile :: FilePath -> IO (ScopeGraph.ScopeGraph Name, Result)
@@ -77,7 +77,7 @@ assertSimpleAssignment = do
 
 expectedReference :: (Has Sketch sig m) => m Result
 expectedReference = do
-  declare "x" (DeclProperties ScopeGraph.Assignment ScopeGraph.Default Nothing (Span (Pos 0 0) (Pos 0 5)))
+  declare "x" (Props.Declaration ScopeGraph.Assignment ScopeGraph.Default Nothing (Span (Pos 0 0) (Pos 0 5)))
   reference "x" "x" RefProperties
   pure Complete
 
@@ -99,7 +99,7 @@ expectedFunctionArg :: (Has Sketch sig m) => m Result
 expectedFunctionArg = do
   (_, associatedScope) <- declareFunction (Just $ Name.name "foo") (FunProperties ScopeGraph.Function (Span (Pos 0 0) (Pos 1 12)))
   withScope associatedScope $ do
-    declare "x" (DeclProperties ScopeGraph.Identifier ScopeGraph.Default Nothing lowerBound)
+    declare "x" (Props.Declaration ScopeGraph.Identifier ScopeGraph.Default Nothing lowerBound)
     reference "x" "x" RefProperties
     pure ()
   reference "foo" "foo" RefProperties
