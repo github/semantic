@@ -14,8 +14,6 @@
 module Control.Effect.Sketch
   ( Sketch
   , SketchEff (..)
-  , RefProperties (..)
-  , FunProperties (..)
   , declare
   -- Scope Manipulation
   , currentScope
@@ -32,26 +30,14 @@ import qualified Analysis.Name as Name
 import           Control.Algebra
 import           Control.Effect.Fresh
 import           Control.Effect.Reader
-import           Control.Lens ((^.))
-import           Data.Generics.Product (field)
 import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
 import qualified Data.ScopeGraph as ScopeGraph
 import           Data.Text (Text)
 import           GHC.Generics (Generic, Generic1)
-import           GHC.Records
 import qualified ScopeGraph.Properties.Declaration as Props
-import           Source.Span
-
-
-data RefProperties = RefProperties
-
-data FunProperties = FunProperties
-  { kind     :: ScopeGraph.Kind
-  , spanInfo :: Span
-  } deriving Generic
-
-instance HasSpan FunProperties where span_ = field @"spanInfo"
+import qualified ScopeGraph.Properties.Function as Props
+import qualified ScopeGraph.Properties.Reference as Props
 
 type Sketch
   = SketchEff
@@ -60,7 +46,7 @@ type Sketch
 
 data SketchEff m k =
     Declare Name Props.Declaration (() -> m k)
-  | Reference Text Text RefProperties (() -> m k)
+  | Reference Text Text Props.Reference (() -> m k)
   | NewScope (Map ScopeGraph.EdgeLabel [Name]) (Name -> m k)
   deriving (Generic, Generic1, HFunctor, Effect)
 
@@ -71,22 +57,22 @@ declare :: forall sig m . (Has Sketch sig m) => Name -> Props.Declaration -> m (
 declare n props = send (Declare n props pure)
 
 -- | Establish a reference to a prior declaration.
-reference :: forall sig m . (Has Sketch sig m) => Text -> Text -> RefProperties -> m ()
+reference :: forall sig m . (Has Sketch sig m) => Text -> Text -> Props.Reference -> m ()
 reference n decl props = send (Reference n decl props pure)
 
 newScope :: forall sig m . (Has Sketch sig m) => Map ScopeGraph.EdgeLabel [Name] -> m Name
 newScope edges = send (NewScope edges pure)
 
-declareFunction :: forall sig m . (Has Sketch sig m) => Maybe Name -> FunProperties -> m (Name, Name)
-declareFunction name props = do
+declareFunction :: forall sig m . (Has Sketch sig m) => Maybe Name -> Props.Function -> m (Name, Name)
+declareFunction name (Props.Function kind span) = do
   currentScope' <- currentScope
   let lexicalEdges = Map.singleton ScopeGraph.Lexical [ currentScope' ]
   associatedScope <- newScope lexicalEdges
   name' <- declareMaybeName name Props.Declaration
                                    { Props.relation = ScopeGraph.Default
-                                   , Props.kind = (getField @"kind" @FunProperties props)
+                                   , Props.kind = kind
                                    , Props.associatedScope = Just associatedScope
-                                   , Props.span = props^.span_
+                                   , Props.span = span
                                    }
   pure (name', associatedScope)
 

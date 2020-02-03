@@ -39,6 +39,8 @@ import           GHC.TypeLits
 import           Language.Python.Patterns
 import           ScopeGraph.Convert (Result (..), complete, todo)
 import qualified ScopeGraph.Properties.Declaration as Props
+import qualified ScopeGraph.Properties.Function as Props
+import qualified ScopeGraph.Properties.Reference as Props
 import           Source.Loc
 import           Source.Span (span_)
 import qualified TreeSitter.Python.AST as Py
@@ -191,9 +193,9 @@ instance ToScopeGraph Py.FunctionDefinition where
     , parameters = Py.Parameters _ann2 parameters
     , body
     } = do
-    (_, associatedScope) <- declareFunction (Just $ Name.name name) FunProperties
-      { kind     = ScopeGraph.Function
-      , spanInfo = ann^.span_
+    (_, associatedScope) <- declareFunction (Just $ Name.name name) Props.Function
+      { Props.kind = ScopeGraph.Function
+      , Props.span = ann^.span_
       }
     withScope associatedScope $ do
       let declProps = Props.Declaration
@@ -220,7 +222,7 @@ instance ToScopeGraph Py.GeneratorExpression where scopeGraph = todo
 
 instance ToScopeGraph Py.Identifier where
   scopeGraph (Py.Identifier _ name) = do
-    reference name name RefProperties
+    reference name name Props.Reference
     complete
 
 instance ToScopeGraph Py.IfStatement where

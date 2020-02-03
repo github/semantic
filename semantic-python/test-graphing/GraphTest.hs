@@ -18,6 +18,8 @@ import qualified Language.Python ()
 import qualified Language.Python as Py (Term)
 import           ScopeGraph.Convert
 import qualified ScopeGraph.Properties.Declaration as Props
+import qualified ScopeGraph.Properties.Function as Props
+import qualified ScopeGraph.Properties.Reference as Props
 import           Source.Loc
 import qualified Source.Source as Source
 import           Source.Span
@@ -78,7 +80,7 @@ assertSimpleAssignment = do
 expectedReference :: (Has Sketch sig m) => m Result
 expectedReference = do
   declare "x" (Props.Declaration ScopeGraph.Assignment ScopeGraph.Default Nothing (Span (Pos 0 0) (Pos 0 5)))
-  reference "x" "x" RefProperties
+  reference "x" "x" Props.Reference
   pure Complete
 
 assertSimpleReference :: HUnit.Assertion
@@ -91,18 +93,18 @@ assertSimpleReference = do
 
 expectedLexicalScope :: (Has Sketch sig m) => m Result
 expectedLexicalScope = do
-  _ <- declareFunction (Just $ Name.name "foo") (FunProperties ScopeGraph.Function (Span (Pos 0 0) (Pos 1 24)))
-  reference "foo" "foo" RefProperties {}
+  _ <- declareFunction (Just $ Name.name "foo") (Props.Function ScopeGraph.Function (Span (Pos 0 0) (Pos 1 24)))
+  reference "foo" "foo" Props.Reference {}
   pure Complete
 
 expectedFunctionArg :: (Has Sketch sig m) => m Result
 expectedFunctionArg = do
-  (_, associatedScope) <- declareFunction (Just $ Name.name "foo") (FunProperties ScopeGraph.Function (Span (Pos 0 0) (Pos 1 12)))
+  (_, associatedScope) <- declareFunction (Just $ Name.name "foo") (Props.Function ScopeGraph.Function (Span (Pos 0 0) (Pos 1 12)))
   withScope associatedScope $ do
     declare "x" (Props.Declaration ScopeGraph.Identifier ScopeGraph.Default Nothing lowerBound)
-    reference "x" "x" RefProperties
+    reference "x" "x" Props.Reference
     pure ()
-  reference "foo" "foo" RefProperties
+  reference "foo" "foo" Props.Reference
   pure Complete
 
 assertLexicalScope :: HUnit.Assertion
