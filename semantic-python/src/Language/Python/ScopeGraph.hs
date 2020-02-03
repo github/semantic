@@ -27,7 +27,7 @@ import           AST.Element
 import           Control.Algebra (Algebra (..), handleCoercible)
 import           Control.Effect.Fresh
 import           Control.Effect.Sketch
-import           Control.Lens ((&), (.~), (^.))
+import           Control.Lens (set, (^.))
 import           Data.Foldable
 import           Data.Maybe
 import           Data.Monoid
@@ -190,8 +190,10 @@ instance ToScopeGraph Py.FunctionDefinition where
     , parameters = Py.Parameters _ann2 parameters
     , body
     } = do
-    let funProps = FunProperties ScopeGraph.Function (ann^.span_)
-    (_, associatedScope) <- declareFunction (Just $ Name.name name) funProps
+    (_, associatedScope) <- declareFunction (Just $ Name.name name) FunProperties
+      { kind     = ScopeGraph.Function
+      , spanInfo = ann^.span_
+      }
     withScope associatedScope $ do
       let declProps = DeclProperties
             { kind = ScopeGraph.Parameter
@@ -207,7 +209,7 @@ instance ToScopeGraph Py.FunctionDefinition where
         else do
           let parameters' = catMaybes parameterMs
           paramDeclarations <- for parameters' $ \(pos, parameter) ->
-            complete <* declare parameter (declProps & span_ .~ pos^.span_)
+            complete <* declare parameter (set span_ (pos^.span_) declProps)
           bodyResult <- scopeGraph body
           pure (mconcat paramDeclarations <> bodyResult)
 
