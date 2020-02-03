@@ -6,14 +6,14 @@ module Language.Ruby
 , Language.Ruby.Grammar.tree_sitter_ruby
 ) where
 
+import qualified AST.Unmarshal as TS
 import           Control.Carrier.State.Strict
 import           Data.Proxy
 import           Data.Text (Text)
 import qualified Language.Ruby.AST as Rb
+import qualified Language.Ruby.Grammar (tree_sitter_ruby)
 import qualified Language.Ruby.Tags as RbTags
 import qualified Tags.Tagging.Precise as Tags
-import qualified Language.Ruby.Grammar (tree_sitter_ruby)
-import qualified AST.Unmarshal as TS
 
 newtype Term a = Term { getTerm :: Rb.Program a }
 
