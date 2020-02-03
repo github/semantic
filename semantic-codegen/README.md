@@ -2,6 +2,8 @@
 
 CodeGen is the process for auto-generating language-specific, strongly-typed ASTs to be used in [Semantic](https://github.com/github/semantic-code/blob/d9f91a05dc30a61b9ff8c536d75661d417f3c506/design-docs/precise-code-navigation.md).
 
+_Note: This project was recently moved from `tree-sitter` into `Semantic`. These docs are in the process of being updated to reflect changes._
+
 ### Prerequisites
 To get started, first make sure your language has:
 
