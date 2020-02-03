@@ -28,7 +28,7 @@ import           Data.Diff
 import           Data.Edit
 import           Data.Foldable
 import           Data.Functor.Classes
-import           Data.Graph
+import           Data.Graph.Algebraic
 import           Data.JSON.Fields (ToJSONFields1)
 import           Data.Language
 import           Data.Map.Strict (Map)

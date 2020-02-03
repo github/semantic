@@ -11,13 +11,13 @@ module Language.Java.Tags
 import           Control.Effect.Reader
 import           Control.Effect.Writer
 import           GHC.Generics
+import qualified Language.Java.AST as Java
 import           Source.Loc
 import           Source.Range
 import           Source.Source as Source
 import           Tags.Tag
 import qualified Tags.Tagging.Precise as Tags
-import qualified TreeSitter.Java.AST as Java
-import           TreeSitter.Token
+import           AST.Token
 
 class ToTags t where
   tags
@@ -140,7 +140,7 @@ instance ToTags Java.FieldAccess
 instance ToTags Java.FieldDeclaration
 instance ToTags Java.FinallyClause
 instance ToTags Java.FloatingPointType
-instance ToTags Java.ForInit
+-- instance ToTags Java.ForInit
 instance ToTags Java.ForStatement
 instance ToTags Java.FormalParameter
 instance ToTags Java.FormalParameters
@@ -160,7 +160,7 @@ instance ToTags Java.LabeledStatement
 instance ToTags Java.LambdaExpression
 instance ToTags Java.Literal
 instance ToTags Java.LocalVariableDeclaration
-instance ToTags Java.LocalVariableDeclarationStatement
+-- instance ToTags Java.LocalVariableDeclarationStatement
 instance ToTags Java.MarkerAnnotation
 -- instance ToTags Java.MethodDeclaration
 -- instance ToTags Java.MethodInvocation

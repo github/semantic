@@ -20,7 +20,7 @@ import Data.Diff
 import Data.Edit
 import Data.Foldable
 import Data.Functor.Foldable
-import Data.Graph
+import Data.Graph.Algebraic
 import Data.ProtoLens (defMessage)
 import Data.String (IsString (..))
 import Data.Term

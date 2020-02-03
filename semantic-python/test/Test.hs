@@ -39,8 +39,8 @@ import           System.Path ((</>))
 import qualified System.Path as Path
 import qualified System.Path.Directory as Path
 import qualified Text.Trifecta as Trifecta
-import qualified TreeSitter.Python as TSP
-import qualified TreeSitter.Unmarshal as TS
+import qualified Language.Python.Grammar as TSP
+import qualified AST.Unmarshal as TS
 
 import qualified Test.Tasty as Tasty
 import qualified Test.Tasty.HUnit as HUnit

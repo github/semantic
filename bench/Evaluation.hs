@@ -1,6 +1,5 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE PackageImports #-}
 {-# LANGUAGE PartialTypeSignatures #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeFamilies #-}
@@ -12,7 +11,7 @@ import           Data.Abstract.Evaluatable
 import           Data.Bifunctor
 import           Data.Blob.IO (readBlobFromPath)
 import qualified Data.Duration as Duration
-import           "semantic" Data.Graph (topologicalSort)
+import           Data.Graph.Algebraic (topologicalSort)
 import qualified Data.Language as Language
 import           Data.Project
 import           Data.Proxy

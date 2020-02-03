@@ -66,14 +66,14 @@ import qualified Language.TSX.Assignment as TSXALaCarte
 import qualified Language.TypeScript as TypeScriptPrecise
 import qualified Language.TypeScript.Assignment as TypeScriptALaCarte
 import           Prelude hiding (fail)
-import           TreeSitter.Go
+import           Language.Go.Grammar
 import qualified TreeSitter.Language as TS (Language, Symbol)
 import           TreeSitter.PHP
-import           TreeSitter.Python
-import           TreeSitter.Ruby (tree_sitter_ruby)
+import           Language.Python.Grammar
+import           Language.Ruby.Grammar (tree_sitter_ruby)
 import           TreeSitter.TSX
-import           TreeSitter.TypeScript
-import           TreeSitter.Unmarshal
+import           Language.TypeScript.Grammar
+import           AST.Unmarshal
 
 -- | A parser from 'Source' onto some term type.
 data Parser term where
