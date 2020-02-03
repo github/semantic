@@ -38,6 +38,7 @@ import           GHC.Records
 import           GHC.TypeLits
 import           Language.Python.Patterns
 import           ScopeGraph.Convert (Result (..), complete, todo)
+import qualified ScopeGraph.Properties.Declaration as Props
 import           Source.Loc
 import           Source.Span (span_)
 import qualified TreeSitter.Python.AST as Py
@@ -96,11 +97,11 @@ instance ToScopeGraph Py.AssertStatement where scopeGraph = onChildren
 
 instance ToScopeGraph Py.Assignment where
   scopeGraph (Py.Assignment ann (SingleIdentifier t) val _typ) = do
-    declare t DeclProperties
-      { kind     = ScopeGraph.Assignment
-      , relation = ScopeGraph.Default
-      , associatedScope = Nothing
-      , spanInfo = ann^.span_
+    declare t Props.Declaration
+      { Props.kind     = ScopeGraph.Assignment
+      , Props.relation = ScopeGraph.Default
+      , Props.associatedScope = Nothing
+      , Props.span = ann^.span_
       }
     maybe complete scopeGraph val
   scopeGraph x = todo x
@@ -195,11 +196,11 @@ instance ToScopeGraph Py.FunctionDefinition where
       , spanInfo = ann^.span_
       }
     withScope associatedScope $ do
-      let declProps = DeclProperties
-            { kind = ScopeGraph.Parameter
-            , relation = ScopeGraph.Default
-            , associatedScope = Nothing
-            , spanInfo = lowerBound
+      let declProps = Props.Declaration
+            { Props.kind = ScopeGraph.Parameter
+            , Props.relation = ScopeGraph.Default
+            , Props.associatedScope = Nothing
+            , Props.span = lowerBound
             }
       let param (Py.Parameter (Prj (Py.Identifier pann pname))) = Just (pann, Name.name pname)
           param _                                               = Nothing
