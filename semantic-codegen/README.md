@@ -50,6 +50,7 @@ To parse source code and produce ASTs locally:
 cabal new-repl lib:tree-sitter-python
 ```
 
+2. Set language extensions, `OverloadedStrings` and `TypeApplications`, and import relevant modules, `AST.Unmarshal`, `Source.Range` and `Source.Span`:
 
 ```
 :seti -XOverloadedStrings
