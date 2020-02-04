@@ -11,7 +11,7 @@ module AST.GenerateSyntax
 
 import           AST.Deserialize (Children (..), Datatype (..), DatatypeName (..), Field (..), Multiple (..), Named (..), Required (..), Type (..))
 import           AST.Token
-import           AST.Traversable1
+import           AST.Traversable1.Class
 import qualified AST.Unmarshal as TS
 import           Data.Aeson hiding (String)
 import           Data.Foldable
