@@ -2,6 +2,7 @@
 
 -- Local packages
 packages: .
+          semantic
           semantic-analysis
           semantic-ast
           semantic-cli
