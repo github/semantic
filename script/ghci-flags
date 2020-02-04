@@ -21,11 +21,16 @@ function add_autogen_includes {
     echo "-I$1"
 }
 
+cores=$(sysctl -n machdep.cpu.core_count || echo 4)
+
 function flags {
   # disable optimizations for faster loading
   echo "-O0"
   # don’t load .ghci files (for ghcide)
   echo "-ignore-dot-ghci"
+
+  # use as many jobs as there are physical cores
+  echo "-j$cores"
 
   # where to put build products
   echo "-outputdir $build_products_dir"
@@ -43,6 +48,7 @@ function flags {
   # TODO: would be nice to figure this out from cabal.project & the .cabal files
   echo "-isemantic-analysis/src"
   echo "-isemantic-ast/src"
+  echo "-isemantic-codegen/src"
   echo "-isemantic-core/src"
   echo "-isemantic-go/src"
   echo "-isemantic-java/src"

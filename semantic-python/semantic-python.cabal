@@ -26,10 +26,12 @@ common haskell
                      , parsers ^>= 0.12.10
                      , semantic-analysis ^>= 0
                      , semantic-core ^>= 0.0
+                     , semantic-codegen
                      , semantic-source ^>= 0.0.2
                      , semantic-tags ^>= 0.0
                      , semantic-scope-graph ^>= 0.0
                      , semilattices ^>= 0
+                     , template-haskell ^>= 2.15
                      , text ^>= 1.2.3
                      , tree-sitter ^>= 0.8
                      , tree-sitter-python ^>= 0.8.1
@@ -54,7 +56,9 @@ library
   import: haskell
   exposed-modules:
     Language.Python
+    Language.Python.AST
     Language.Python.Core
+    Language.Python.Grammar
     Language.Python.Failure
     Language.Python.Patterns
     Language.Python.ScopeGraph
@@ -81,6 +85,7 @@ test-suite compiling
                , process ^>= 1.6.5
                , resourcet ^>= 1.2.2
                , semantic-analysis ^>= 0
+               , semantic-codegen
                , streaming ^>= 0.2.2
                , streaming-process ^>= 0.1
                , streaming-bytestring ^>= 0.1.6
@@ -101,6 +106,7 @@ test-suite graphing
 
   build-depends: base
                , semantic-python
+               , semantic-codegen
                , semantic-scope-graph
                , bytestring
                , pathtype

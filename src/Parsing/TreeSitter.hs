@@ -36,7 +36,7 @@ import qualified TreeSitter.Language as TS
 import qualified TreeSitter.Node as TS
 import qualified TreeSitter.Parser as TS
 import qualified TreeSitter.Tree as TS
-import qualified TreeSitter.Unmarshal as TS
+import qualified AST.Unmarshal as TS
 
 data TSParseException
   = ParserTimedOut

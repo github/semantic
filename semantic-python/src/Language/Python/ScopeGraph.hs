@@ -36,12 +36,12 @@ import           Data.Semilattice.Lower
 import           Data.Traversable
 import           GHC.Records
 import           GHC.TypeLits
+import qualified Language.Python.AST as Py
 import           Language.Python.Patterns
 import           ScopeGraph.Convert (Result (..), complete, todo)
 import qualified ScopeGraph.Properties.Declaration as Props
 import           Source.Loc
 import           Source.Span (span_)
-import qualified TreeSitter.Python.AST as Py
 
 -- This orphan instance will perish once it lands in fused-effects.
 instance Algebra sig m => Algebra sig (Ap m) where

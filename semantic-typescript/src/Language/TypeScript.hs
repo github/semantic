@@ -2,15 +2,15 @@
 -- | Semantic functionality for TypeScript programs.
 module Language.TypeScript
 ( Term(..)
-, TreeSitter.TypeScript.tree_sitter_typescript
+, Language.TypeScript.Grammar.tree_sitter_typescript
 ) where
 
 import           Data.Proxy
+import qualified Language.TypeScript.AST as TypeScript
 import qualified Language.TypeScript.Tags as TsTags
 import qualified Tags.Tagging.Precise as Tags
-import qualified TreeSitter.TypeScript (tree_sitter_typescript)
-import qualified TreeSitter.TypeScript.AST as TypeScript
-import qualified TreeSitter.Unmarshal as TS
+import qualified Language.TypeScript.Grammar (tree_sitter_typescript)
+import qualified AST.Unmarshal as TS
 
 newtype Term a = Term { getTerm :: TypeScript.Program a }
 

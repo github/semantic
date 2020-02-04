@@ -4,7 +4,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE UndecidableInstances #-}
-module Data.Graph
+module Data.Graph.Algebraic
 ( Graph(..)
 , overlay
 , connect
