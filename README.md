@@ -104,7 +104,7 @@ We use `cabal's` [Nix-style local builds][nix] for development. To get started q
 git clone git@github.com:github/semantic.git
 cd semantic
 script/bootstrap
-cabal v2-build
+cabal v2-build all
 cabal v2-test
 cabal v2-run semantic -- --help
 ```
