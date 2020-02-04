@@ -48,3 +48,18 @@ library
     -Wno-all-missed-specialisations
     -Wno-star-is-type
     -Wno-missing-deriving-strategies
+
+test-suite test
+  import: common
+  type:             exitcode-stdio-1.0
+  hs-source-dirs:   test
+  main-is:          Test.hs
+  build-depends:    base
+                  , tree-sitter
+                  , tree-sitter-java
+                  , tree-sitter-test-helpers
+                  , bytestring ^>= 0.10.8.2
+                  , pathtype ^>= 0.8.1
+                  , text
+                  , tasty
+                  , tasty-hunit
