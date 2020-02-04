@@ -56,3 +56,47 @@ library
     Language.Ruby.Grammar
     Language.Ruby.Tags
   hs-source-dirs: src
+
+test-suite test
+  import:           common
+  type:             exitcode-stdio-1.0
+  hs-source-dirs:   test
+  main-is:          Test.hs
+  build-depends:    base
+                  , tree-sitter
+                  , tree-sitter-ruby
+                  , tree-sitter-test-helpers
+                  , bytestring ^>= 0.10.8.2
+                  , hedgehog >= 0.6 && <2
+                  , pathtype ^>= 0.8.1
+                  , text
+                  , tasty
+                  , tasty-hedgehog
+                  , tasty-hunit
+
+executable benchmarks
+  import:              common
+  hs-source-dirs:      bench
+  -- type:                exitcode-stdio-1.0
+  main-is:             Main.hs
+  other-modules:       Parsing
+  ghc-options:         -static -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m"
+  build-depends:       base
+                     , gauge ^>= 0.2.5
+                     , bytestring
+                     , Glob
+                     , lens >= 4.17 && < 4.19
+                     , pathtype ^>= 0.8.1
+                     , tree-sitter
+                     , tree-sitter-ruby
+
+executable tree-sitter-ruby
+  import: common
+  hs-source-dirs: app
+  ghc-options: -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m"
+  main-is: Main.hs
+  build-depends:
+      base
+    , bytestring
+    , tree-sitter
+    , tree-sitter-ruby
