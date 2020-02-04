@@ -9,6 +9,7 @@ packages: .
           semantic-go
           semantic-java
           semantic-json
+          semantic-parse
           semantic-python
           semantic-ruby
           semantic-scope-graph
@@ -57,6 +58,9 @@ package semantic-java
   ghc-options: -Werror
 
 package semantic-json
+  ghc-options: -Werror
+
+package semantic-parse
   ghc-options: -Werror
 
 package semantic-python

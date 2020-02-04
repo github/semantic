@@ -9,6 +9,10 @@ module AST.GenerateSyntax
 , astDeclarationsForLanguage
 ) where
 
+import           AST.Deserialize (Children (..), Datatype (..), DatatypeName (..), Field (..), Multiple (..), Named (..), Required (..), Type (..))
+import           AST.Token
+import           AST.Traversable1.Class
+import qualified AST.Unmarshal as TS
 import           Data.Aeson hiding (String)
 import           Data.Foldable
 import           Data.List
@@ -22,12 +26,9 @@ import           Language.Haskell.TH as TH
 import           Language.Haskell.TH.Syntax as TH
 import           System.Directory
 import           System.FilePath.Posix
-import           AST.Deserialize (Children (..), Datatype (..), DatatypeName (..), Field (..), Multiple (..), Named (..), Required (..), Type (..))
 import qualified TreeSitter.Language as TS
 import           TreeSitter.Node
 import           TreeSitter.Symbol (TSSymbol, toHaskellCamelCaseIdentifier, toHaskellPascalCaseIdentifier)
-import           AST.Token
-import qualified AST.Unmarshal as TS
 
 -- | Derive Haskell datatypes from a language and its @node-types.json@ file.
 --
@@ -52,7 +53,7 @@ astDeclarationsForLanguage language filePath = do
 getAllSymbols :: Ptr TS.Language -> IO [(String, Named)]
 getAllSymbols language = do
   count <- TS.ts_language_symbol_count language
-  mapM getSymbol [(0 :: TSSymbol) .. fromIntegral (pred count)]
+  traverse getSymbol [(0 :: TSSymbol) .. fromIntegral (pred count)]
   where
     getSymbol i = do
       cname <- TS.ts_language_symbol_name language i
@@ -71,21 +72,31 @@ syntaxDatatype language allSymbols datatype = skipDefined $ do
       let fieldName = mkName ("get" <> nameStr)
       con <- recC name [TH.varBangType fieldName (TH.bangType strictness (pure types' `appT` varT typeParameterName))]
       hasFieldInstance <- makeHasFieldInstance (conT name) (varT typeParameterName) (varE fieldName)
+      traversalInstances <- makeTraversalInstances (conT name)
       pure
-        ( NewtypeD [] name [PlainTV typeParameterName] Nothing con [deriveGN, deriveStockClause, deriveAnyClassClause]
-        : hasFieldInstance)
+        (  NewtypeD [] name [PlainTV typeParameterName] Nothing con [deriveGN, deriveStockClause, deriveAnyClassClause]
+        :  hasFieldInstance
+        <> traversalInstances)
     ProductType (DatatypeName datatypeName) named children fields -> do
       con <- ctorForProductType datatypeName typeParameterName children fields
-      result <- symbolMatchingInstance allSymbols name named datatypeName
-      pure $ generatedDatatype name [con] typeParameterName:result
+      symbolMatchingInstance <- symbolMatchingInstance allSymbols name named datatypeName
+      traversalInstances <- makeTraversalInstances (conT name)
+      pure
+        (  generatedDatatype name [con] typeParameterName
+        :  symbolMatchingInstance
+        <> traversalInstances)
       -- Anonymous leaf types are defined as synonyms for the `Token` datatype
     LeafType (DatatypeName datatypeName) Anonymous -> do
       tsSymbol <- runIO $ withCStringLen datatypeName (\(s, len) -> TS.ts_language_symbol_for_name language s len False)
       pure [ TySynD name [] (ConT ''Token `AppT` LitT (StrTyLit datatypeName) `AppT` LitT (NumTyLit (fromIntegral tsSymbol))) ]
     LeafType (DatatypeName datatypeName) Named -> do
       con <- ctorForLeafType (DatatypeName datatypeName) typeParameterName
-      result <- symbolMatchingInstance allSymbols name Named datatypeName
-      pure $ generatedDatatype name [con] typeParameterName:result
+      symbolMatchingInstance <- symbolMatchingInstance allSymbols name Named datatypeName
+      traversalInstances <- makeTraversalInstances (conT name)
+      pure
+        (  generatedDatatype name [con] typeParameterName
+        :  symbolMatchingInstance
+        <> traversalInstances)
   where
     -- Skip generating datatypes that have already been defined (overridden) in the module where the splice is running.
     skipDefined m = do
@@ -93,11 +104,22 @@ syntaxDatatype language allSymbols datatype = skipDefined $ do
       if isLocal then pure [] else m
     name = mkName nameStr
     nameStr = toNameString (datatypeNameStatus datatype) (getDatatypeName (AST.Deserialize.datatypeName datatype))
-    deriveStockClause = DerivClause (Just StockStrategy) [ ConT ''Eq, ConT ''Ord, ConT ''Show, ConT ''Generic, ConT ''Foldable, ConT ''Functor, ConT ''Traversable, ConT ''Generic1]
-    deriveAnyClassClause = DerivClause (Just AnyclassStrategy) [ConT ''TS.Unmarshal]
+    deriveStockClause = DerivClause (Just StockStrategy) [ ConT ''Eq, ConT ''Ord, ConT ''Show, ConT ''Generic, ConT ''Generic1]
+    deriveAnyClassClause = DerivClause (Just AnyclassStrategy) [ConT ''TS.Unmarshal, ConT ''Traversable1 `AppT` VarT (mkName "someConstraint")]
     deriveGN = DerivClause (Just NewtypeStrategy) [ConT ''TS.SymbolMatching]
     generatedDatatype name cons typeParameterName = DataD [] name [PlainTV typeParameterName] Nothing cons [deriveStockClause, deriveAnyClassClause]
 
+
+makeTraversalInstances :: TypeQ -> Q [Dec]
+makeTraversalInstances ty =
+  [d|
+  instance Foldable $ty where
+    foldMap = foldMapDefault1
+  instance Functor $ty where
+    fmap = fmapDefault1
+  instance Traversable $ty where
+    traverse = traverseDefault1
+  |]
 
 makeHasFieldInstance :: TypeQ -> TypeQ -> ExpQ -> Q [Dec]
 makeHasFieldInstance ty param elim =
@@ -126,7 +148,7 @@ debugPrefix (name, Anonymous) = "_" <> name
 -- | Build Q Constructor for product types (nodes with fields)
 ctorForProductType :: String -> Name -> Maybe Children -> [(String, Field)] -> Q Con
 ctorForProductType constructorName typeParameterName children fields = ctorForTypes constructorName lists where
-  lists = annotation : fieldList ++ childList
+  lists = annotation : fieldList <> childList
   annotation = ("ann", varT typeParameterName)
   fieldList = map (fmap toType) fields
   childList = toList $ fmap toTypeChild children
