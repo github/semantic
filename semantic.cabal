@@ -231,7 +231,6 @@ library
                      , Semantic.Api.Symbols
                      , Semantic.Api.Terms
                      , Semantic.Api.TOCSummaries
-                     , Semantic.CLI
                      , Semantic.Config
                      , Semantic.Distribute
                      , Semantic.Env
@@ -276,7 +275,6 @@ library
                      , lens >= 4.17 && < 4.19
                      , mersenne-random-pure64 ^>= 0.2.2.0
                      , network-uri ^>= 2.6.1.0
-                     , optparse-applicative >= 0.14.3 && < 0.16
                      , parallel ^>= 3.2.2.0
                      , parsers ^>= 0.12.9
                      , prettyprinter >= 1.2 && < 2
@@ -312,13 +310,6 @@ library
                      , tree-sitter-ruby ^>= 0.4.1
                      , tree-sitter-typescript ^>= 0.4.2
                      , tree-sitter-tsx ^>= 0.4.2
-
-executable semantic
-  import:              haskell, dependencies, executable-flags
-  hs-source-dirs:      app
-  main-is:             Main.hs
-  build-depends:       base
-                     , semantic
 
 test-suite test
   import:              haskell, dependencies, executable-flags

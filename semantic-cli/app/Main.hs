@@ -1,6 +1,7 @@
 {-# LANGUAGE ApplicativeDo #-}
 {-# LANGUAGE FlexibleContexts #-}
-module Semantic.CLI (main) where
+{-# OPTIONS_GHC -Wno-name-shadowing #-}
+module Main (main) where
 
 import qualified Analysis.File as File
 import qualified Control.Carrier.Parse.Measured as Parse

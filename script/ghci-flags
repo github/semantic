@@ -48,6 +48,7 @@ function flags {
   # TODO: would be nice to figure this out from cabal.project & the .cabal files
   echo "-isemantic-analysis/src"
   echo "-isemantic-ast/src"
+  echo "-isemantic-cli/app"
   echo "-isemantic-codegen/src"
   echo "-isemantic-core/src"
   echo "-isemantic-go/src"
