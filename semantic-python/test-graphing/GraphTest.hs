@@ -6,6 +6,7 @@
 module Main (main) where
 
 import           Analysis.Name (Name)
+import qualified Analysis.Name as Name
 import           Control.Algebra
 import           Control.Carrier.Lift
 import           Control.Carrier.Sketch.Fresh
@@ -50,10 +51,10 @@ The graph should be
 runScopeGraph :: ToScopeGraph t => Path.AbsRelFile -> Source.Source -> t Loc -> (ScopeGraph.ScopeGraph Name, Result)
 runScopeGraph p _src item = run . runSketch (Just p) $ scopeGraph item
 
-sampleGraphThing :: (Has (Sketch Name) sig m) => m Result
+sampleGraphThing :: (Has Sketch sig m) => m Result
 sampleGraphThing = do
-  declare @Name "hello" DeclProperties
-  declare @Name "goodbye" DeclProperties
+  declare "hello" (DeclProperties ScopeGraph.Assignment ScopeGraph.Default Nothing)
+  declare "goodbye" (DeclProperties ScopeGraph.Assignment ScopeGraph.Default Nothing)
   pure Complete
 
 graphFile :: FilePath -> IO (ScopeGraph.ScopeGraph Name, Result)
@@ -71,10 +72,10 @@ assertSimpleAssignment = do
   (expecto, Complete) <- runM $ runSketch Nothing sampleGraphThing
   HUnit.assertEqual "Should work for simple case" expecto result
 
-expectedReference :: (Has (Sketch Name) sig m) => m Result
+expectedReference :: (Has Sketch sig m) => m Result
 expectedReference = do
-  declare @Name "x" DeclProperties
-  reference @Name "x" "x" RefProperties
+  declare "x" (DeclProperties ScopeGraph.Assignment ScopeGraph.Default Nothing)
+  reference "x" "x" RefProperties
   pure Complete
 
 assertSimpleReference :: HUnit.Assertion
@@ -84,6 +85,38 @@ assertSimpleReference = do
   (expecto, Complete) <- runM $ runSketch Nothing expectedReference
 
   HUnit.assertEqual "Should work for simple case" expecto result
+
+expectedLexicalScope :: (Has Sketch sig m) => m Result
+expectedLexicalScope = do
+  _ <- declareFunction (Just $ Name.name "foo") (FunProperties ScopeGraph.Function)
+  reference "foo" "foo" RefProperties {}
+  pure Complete
+
+expectedFunctionArg :: (Has Sketch sig m) => m Result
+expectedFunctionArg = do
+  (_, associatedScope) <- declareFunction (Just $ Name.name "foo") (FunProperties ScopeGraph.Function)
+  withScope associatedScope $ do
+    declare "x" (DeclProperties ScopeGraph.Identifier ScopeGraph.Default Nothing)
+    reference "x" "x" RefProperties
+    pure ()
+  reference "foo" "foo" RefProperties
+  pure Complete
+
+assertLexicalScope :: HUnit.Assertion
+assertLexicalScope = do
+  let path = "semantic-python/test/fixtures/5-02-simple-function.py"
+  (graph, _) <- graphFile path
+  case run (runSketch Nothing expectedLexicalScope) of
+    (expecto, Complete) -> HUnit.assertEqual "Should work for simple case" expecto graph
+    (_, Todo msg) -> HUnit.assertFailure ("Failed to complete:" <> show msg)
+
+assertFunctionArg :: HUnit.Assertion
+assertFunctionArg = do
+  let path = "semantic-python/test/fixtures/5-03-function-argument.py"
+  (graph, _) <- graphFile path
+  case run (runSketch Nothing expectedFunctionArg) of
+    (expecto, Complete) -> HUnit.assertEqual "Should work for simple case" expecto graph
+    (_, Todo msg) -> HUnit.assertFailure ("Failed to complete:" <>  show msg)
 
 main :: IO ()
 main = do
@@ -99,5 +132,9 @@ main = do
       ],
       Tasty.testGroup "reference" [
         HUnit.testCase "simple reference" assertSimpleReference
+      ],
+      Tasty.testGroup "lexical scopes" [
+        HUnit.testCase "simple function scope" assertLexicalScope
+      , HUnit.testCase "simple function argument" assertFunctionArg
       ]
     ]

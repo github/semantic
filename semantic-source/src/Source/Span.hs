@@ -1,4 +1,6 @@
-{-# LANGUAGE DeriveGeneric, OverloadedStrings, RankNTypes #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RankNTypes #-}
 -- | Source position and span information
 --
 --   Mostly taken from purescript's SourcePos definition.
@@ -16,9 +18,9 @@ import           Control.DeepSeq (NFData)
 import           Data.Aeson ((.:), (.=))
 import qualified Data.Aeson as A
 import           Data.Hashable (Hashable)
-import           Data.Semilattice.Lower (Lower(..))
+import           Data.Semilattice.Lower (Lower (..))
 import           GHC.Generics (Generic)
-import           GHC.Stack (SrcLoc(..))
+import           GHC.Stack (SrcLoc (..))
 
 -- | A Span of position information
 data Span = Span
@@ -56,7 +58,11 @@ spanFromSrcLoc :: SrcLoc -> Span
 spanFromSrcLoc s = Span (Pos (srcLocStartLine s) (srcLocStartCol s)) (Pos (srcLocEndLine s) (srcLocEndCol s))
 
 
--- | Source position information (1-indexed)
+-- | Source position information.
+-- The 'Pos' values associated with ASTs returned from tree-sitter
+-- 'Unmarshal' instances are zero-indexed. Unless you are displaying
+-- span information to a user, you should write your code assuming
+-- zero-indexing.
 data Pos = Pos
   { line   :: {-# UNPACK #-} !Int
   , column :: {-# UNPACK #-} !Int
