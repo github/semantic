@@ -11,6 +11,7 @@ module AST.GenerateSyntax
 
 import           AST.Deserialize (Children (..), Datatype (..), DatatypeName (..), Field (..), Multiple (..), Named (..), Required (..), Type (..))
 import           AST.Token
+import           AST.Traversable1
 import qualified AST.Unmarshal as TS
 import           Data.Aeson hiding (String)
 import           Data.Foldable
@@ -94,7 +95,7 @@ syntaxDatatype language allSymbols datatype = skipDefined $ do
     name = mkName nameStr
     nameStr = toNameString (datatypeNameStatus datatype) (getDatatypeName (AST.Deserialize.datatypeName datatype))
     deriveStockClause = DerivClause (Just StockStrategy) [ ConT ''Eq, ConT ''Ord, ConT ''Show, ConT ''Generic, ConT ''Foldable, ConT ''Functor, ConT ''Traversable, ConT ''Generic1]
-    deriveAnyClassClause = DerivClause (Just AnyclassStrategy) [ConT ''TS.Unmarshal]
+    deriveAnyClassClause = DerivClause (Just AnyclassStrategy) [ConT ''TS.Unmarshal, ConT ''Traversable1 `AppT` VarT (mkName "someConstraint")]
     deriveGN = DerivClause (Just NewtypeStrategy) [ConT ''TS.SymbolMatching]
     generatedDatatype name cons typeParameterName = DataD [] name [PlainTV typeParameterName] Nothing cons [deriveStockClause, deriveAnyClassClause]
 
