@@ -1,17 +1,17 @@
 -- | Semantic functionality for Python programs.
 module Language.Python
 ( Term(..)
-, TreeSitter.Python.tree_sitter_python
+, Language.Python.Grammar.tree_sitter_python
 ) where
 
 import           Data.Proxy
+import qualified Language.Python.AST as Py
 import           Language.Python.ScopeGraph
 import qualified Language.Python.Tags as PyTags
 import           ScopeGraph.Convert
 import qualified Tags.Tagging.Precise as Tags
-import qualified TreeSitter.Python (tree_sitter_python)
-import qualified TreeSitter.Python.AST as Py
-import qualified TreeSitter.Unmarshal as TS
+import qualified Language.Python.Grammar (tree_sitter_python)
+import qualified AST.Unmarshal as TS
 
 newtype Term a = Term { getTerm :: Py.Module a }
 

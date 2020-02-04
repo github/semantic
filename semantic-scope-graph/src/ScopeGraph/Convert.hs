@@ -13,7 +13,6 @@ module ScopeGraph.Convert
   , complete
   ) where
 
-import Analysis.Name (Name)
 import Control.Effect.Sketch
 import Data.List.NonEmpty
 import Data.Typeable
@@ -21,7 +20,7 @@ import Source.Loc
 
 class Typeable t => ToScopeGraph t where
   scopeGraph ::
-    ( Has (Sketch Name) sig m
+    ( Has Sketch sig m
     )
     => t Loc
     -> m Result

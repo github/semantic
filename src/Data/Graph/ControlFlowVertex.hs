@@ -29,7 +29,7 @@ import           Data.Abstract.Declarations
 import           Data.Abstract.Module (ModuleInfo (..))
 import           Data.Abstract.Package (PackageInfo (..))
 import           Data.Aeson
-import           Data.Graph (VertexTag (..))
+import           Data.Graph.Algebraic (VertexTag (..))
 import           Data.Hashable
 import           Data.Proxy
 import           Data.Quieterm (Quieterm (..))

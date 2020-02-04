@@ -1,0 +1,21 @@
+[submodule "semantic-json/vendor/tree-sitter-json"]
+	path = semantic-json/vendor/tree-sitter-json
+	url = https://github.com/tree-sitter/tree-sitter-json.git
+[submodule "semantic-python/vendor/tree-sitter-python"]
+	path = semantic-python/vendor/tree-sitter-python
+	url = https://github.com/tree-sitter/tree-sitter-python.git
+[submodule "semantic-java/vendor/tree-sitter-java"]
+	path = semantic-java/vendor/tree-sitter-java
+	url = https://github.com/tree-sitter/tree-sitter-java.git
+[submodule "semantic-go/vendor/tree-sitter-go"]
+	path = semantic-go/vendor/tree-sitter-go
+	url = https://github.com/tree-sitter/tree-sitter-go.git
+[submodule "semantic-ruby/vendor/tree-sitter-ruby"]
+	path = semantic-ruby/vendor/tree-sitter-ruby
+	url = https://github.com/tree-sitter/tree-sitter-ruby.git
+[submodule "semantic-typescript/vendor/tree-sitter-typescript"]
+	path = semantic-typescript/vendor/tree-sitter-typescript
+	url = https://github.com/tree-sitter/tree-sitter-typescript.git
+[submodule "semantic-tsx/vendor/tree-sitter-typescript"]
+	path = semantic-tsx/vendor/tree-sitter-typescript
+	url = https://github.com/tree-sitter/tree-sitter-typescript.git

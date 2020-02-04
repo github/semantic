@@ -24,9 +24,11 @@ common haskell
                      , fused-effects ^>= 1.0
                      , fused-syntax
                      , parsers ^>= 0.12.10
+                     , semantic-codegen
                      , semantic-core ^>= 0.0
                      , semantic-source ^>= 0.0.2
                      , semantic-tags ^>= 0.0
+                     , template-haskell ^>= 2.15
                      , text ^>= 1.2.3
                      , tree-sitter ^>= 0.8
                      , tree-sitter-go ^>= 0.4.1
@@ -50,5 +52,7 @@ library
   import: haskell
   exposed-modules:
     Language.Go
+    Language.Go.AST
+    Language.Go.Grammar
     Language.Go.Tags
   hs-source-dirs: src

@@ -37,7 +37,7 @@ jobs:
       name: Cache ~/.cabal/store
       with:
         path: ~/.cabal/store
-        key: ${{ runner.os }}-${{ matrix.ghc }}-v5-cabal-store
+        key: ${{ runner.os }}-${{ matrix.ghc }}-v6-cabal-store
 
     - uses: actions/cache@v1
       name: Cache dist-newstyle
@@ -52,7 +52,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        cabal v2-update
+        script/bootstrap
         cabal v2-configure --project-file=cabal.project.ci --disable-optimization --enable-benchmarks --enable-tests --write-ghc-environment-files=always -j2
         cabal v2-build     --project-file=cabal.project.ci all --only-dependencies
 
