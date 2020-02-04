@@ -16,6 +16,6 @@ module Language.Go.AST
 
 import           Prelude hiding (False, Float, Integer, Rational, String, True)
 import           AST.GenerateSyntax
-import qualified Language.Go.Grammar as Grammar
+import qualified TreeSitter.Go as Go
 
-astDeclarationsForLanguage Grammar.tree_sitter_go "../../../vendor/tree-sitter-go/src/node-types.json"
+runIO Go.getNodeTypesPath >>= astDeclarationsForLanguage Go.tree_sitter_go
