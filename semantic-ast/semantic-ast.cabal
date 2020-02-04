@@ -37,7 +37,9 @@ common haskell
 
 library
   import:              haskell
-  exposed-modules:     Marshal.JSON
+  exposed-modules:
+    AST.Traversable1
+    Marshal.JSON
 
 
   -- other-modules:
