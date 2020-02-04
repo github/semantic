@@ -10,6 +10,7 @@ module Language.TSX.Tags
 ) where
 
 import           AST.Element
+import           AST.Token
 import           Control.Effect.Reader
 import           Control.Effect.Writer
 import           Data.Foldable
@@ -20,7 +21,6 @@ import           Source.Loc
 import           Source.Source as Source
 import           Tags.Tag
 import qualified Tags.Tagging.Precise as Tags
-import           AST.Token
 
 class ToTags t where
   tags
@@ -110,7 +110,7 @@ instance ToTags Tsx.Module where
         Prj Tsx.Identifier { text } -> yield text
         -- TODO: Handle NestedIdentifiers and Strings
         -- Prj Tsx.NestedIdentifier { extraChildren } -> match
-        _ -> gtags t
+        _                           -> gtags t
       yield text = yieldTag text Module loc byteRange >> gtags t
 
 instance (ToTags l, ToTags r) => ToTags (l :+: r) where

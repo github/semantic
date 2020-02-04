@@ -8,6 +8,7 @@ module Language.Java.Tags
 ( ToTags(..)
 ) where
 
+import           AST.Token
 import           Control.Effect.Reader
 import           Control.Effect.Writer
 import           GHC.Generics
@@ -17,7 +18,6 @@ import           Source.Range
 import           Source.Source as Source
 import           Tags.Tag
 import qualified Tags.Tagging.Precise as Tags
-import           AST.Token
 
 class ToTags t where
   tags

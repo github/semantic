@@ -12,6 +12,8 @@ module Language.Ruby.Tags
 ) where
 
 import           AST.Element
+import           AST.Token
+import qualified AST.Unmarshal as TS
 import           Control.Effect.Reader
 import           Control.Effect.State
 import           Control.Effect.Writer
@@ -25,8 +27,6 @@ import           Source.Range as Range
 import           Source.Source as Source
 import           Tags.Tag
 import qualified Tags.Tagging.Precise as Tags
-import           AST.Token
-import qualified AST.Unmarshal as TS
 
 class ToTags t where
   tags
@@ -89,7 +89,7 @@ instance ToTags Rb.Class where
     where
       range' = case extraChildren of
         Prj Rb.Superclass { ann = Loc { byteRange = Range { end }}} : _ -> Range start end
-        _ -> Range start (getEnd expr)
+        _                                                               -> Range start (getEnd expr)
       getEnd = Range.end . byteRange . TS.gann
       yield name = yieldTag name Class loc range' >> gtags t
 
@@ -106,7 +106,7 @@ instance ToTags Rb.SingletonClass where
     where
       range' = case extraChildren of
         x : _ -> Range start (getStart x)
-        _ -> range
+        _     -> range
       getStart = Range.start . byteRange . TS.gann
       yield name = yieldTag name Class loc range' >> gtags t
 
@@ -123,7 +123,7 @@ instance ToTags Rb.Module where
     where
       range' = case extraChildren of
         x : _ -> Range start (getStart x)
-        _ -> Range start (getEnd expr)
+        _     -> Range start (getEnd expr)
       getEnd = Range.end . byteRange . TS.gann
       getStart = Range.start . byteRange . TS.gann
       yield name = yieldTag name Module loc range' >> gtags t
@@ -165,7 +165,7 @@ instance ToTags Rb.Method where
     where
       range' = case parameters of
         Just Rb.MethodParameters { ann = Loc { byteRange = Range { end } }} -> Range start end
-        _ -> Range start (getEnd name)
+        _                                                                   -> Range start (getEnd name)
       getEnd = Range.end . byteRange . TS.gann
 
 instance ToTags Rb.SingletonMethod where
@@ -177,7 +177,7 @@ instance ToTags Rb.SingletonMethod where
     where
       range' = case parameters of
         Just Rb.MethodParameters { ann = Loc { byteRange = Range { end } }} -> Range start end
-        _ -> Range start (getEnd name)
+        _                                                                   -> Range start (getEnd name)
       getEnd = Range.end . byteRange . TS.gann
 
 instance ToTags Rb.Block where

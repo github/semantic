@@ -9,6 +9,7 @@ module Language.Go.Tags
 ) where
 
 import           AST.Element
+import           AST.Token
 import           Control.Effect.Reader
 import           Control.Effect.Writer
 import           Data.Text as Text
@@ -18,7 +19,6 @@ import           Source.Loc
 import           Source.Source as Source
 import           Tags.Tag
 import qualified Tags.Tagging.Precise as Tags
-import           AST.Token
 
 class ToTags t where
   tags
