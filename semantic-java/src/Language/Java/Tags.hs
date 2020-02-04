@@ -9,6 +9,7 @@ module Language.Java.Tags
 ) where
 
 import           AST.Token
+import           AST.Traversable1
 import           Control.Effect.Reader
 import           Control.Effect.Writer
 import           GHC.Generics
@@ -30,7 +31,7 @@ class ToTags t where
     :: ( Has (Reader Source) sig m
        , Has (Writer Tags.Tags) sig m
        , Generic1 t
-       , Tags.GTraversable1 ToTags (Rep1 t)
+       , GTraversable1 ToTags (Rep1 t)
        )
     => t Loc
     -> m ()
@@ -81,11 +82,11 @@ gtags
   :: ( Has (Reader Source) sig m
      , Has (Writer Tags.Tags) sig m
      , Generic1 t
-     , Tags.GTraversable1 ToTags (Rep1 t)
+     , GTraversable1 ToTags (Rep1 t)
      )
   => t Loc
   -> m ()
-gtags = Tags.traverse1_ @ToTags (const (pure ())) tags . Tags.Generics
+gtags = traverse1_ @ToTags (const (pure ())) tags . Generics
 
 instance ToTags Java.AnnotatedType
 instance ToTags Java.Annotation

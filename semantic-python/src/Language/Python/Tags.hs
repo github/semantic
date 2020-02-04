@@ -11,6 +11,7 @@ module Language.Python.Tags
 
 import           AST.Element
 import           AST.Token
+import           AST.Traversable1
 import           Control.Effect.Reader
 import           Control.Effect.Writer
 import           Data.List.NonEmpty (NonEmpty (..))
@@ -35,7 +36,7 @@ class ToTags t where
     :: ( Has (Reader Source) sig m
        , Has (Writer Tags.Tags) sig m
        , Generic1 t
-       , Tags.GTraversable1 ToTags (Rep1 t)
+       , GTraversable1 ToTags (Rep1 t)
        )
     => t Loc
     -> m ()
@@ -51,7 +52,7 @@ keywordFunctionCall
   :: ( Has (Reader Source) sig m
      , Has (Writer Tags.Tags) sig m
      , Generic1 t
-     , Tags.GTraversable1 ToTags (Rep1 t)
+     , GTraversable1 ToTags (Rep1 t)
      )
   => t Loc -> Loc -> Range -> Text -> m ()
 keywordFunctionCall t loc range name = yieldTag name Function loc range Nothing >> gtags t
@@ -128,11 +129,11 @@ gtags
   :: ( Has (Reader Source) sig m
      , Has (Writer Tags.Tags) sig m
      , Generic1 t
-     , Tags.GTraversable1 ToTags (Rep1 t)
+     , GTraversable1 ToTags (Rep1 t)
      )
   => t Loc
   -> m ()
-gtags = Tags.traverse1_ @ToTags (const (pure ())) tags . Tags.Generics
+gtags = traverse1_ @ToTags (const (pure ())) tags . Generics
 
 instance ToTags Py.AliasedImport
 instance ToTags Py.ArgumentList

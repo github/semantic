@@ -13,6 +13,7 @@ module Language.Ruby.Tags
 
 import           AST.Element
 import           AST.Token
+import           AST.Traversable1
 import qualified AST.Unmarshal as TS
 import           Control.Effect.Reader
 import           Control.Effect.State
@@ -41,7 +42,7 @@ class ToTags t where
        , Has (Writer Tags.Tags) sig m
        , Has (State [Text]) sig m
        , Generic1 t
-       , Tags.GTraversable1 ToTags (Rep1 t)
+       , GTraversable1 ToTags (Rep1 t)
        )
     => t Loc
     -> m ()
@@ -133,7 +134,7 @@ yieldMethodNameTag
      , Has (Reader Source) sig m
      , Has (Writer Tags.Tags) sig m
      , Generic1 t
-     , Tags.GTraversable1 ToTags (Rep1 t)
+     , GTraversable1 ToTags (Rep1 t)
      ) => t Loc -> Loc -> Range -> Rb.MethodName Loc -> m ()
 yieldMethodNameTag t loc range (Rb.MethodName expr) = enterScope True $ case expr of
   Prj Rb.Identifier { text = name }                               -> yield name
@@ -337,11 +338,11 @@ gtags
      , Has (Writer Tags.Tags) sig m
      , Has (State [Text]) sig m
      , Generic1 t
-     , Tags.GTraversable1 ToTags (Rep1 t)
+     , GTraversable1 ToTags (Rep1 t)
      )
   => t Loc
   -> m ()
-gtags = Tags.traverse1_ @ToTags (const (pure ())) tags . Tags.Generics
+gtags = traverse1_ @ToTags (const (pure ())) tags . Generics
 
 -- instance ToTags Rb.Alias
 instance ToTags Rb.Arg

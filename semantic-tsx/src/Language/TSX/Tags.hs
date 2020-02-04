@@ -11,6 +11,7 @@ module Language.TSX.Tags
 
 import           AST.Element
 import           AST.Token
+import           AST.Traversable1
 import           Control.Effect.Reader
 import           Control.Effect.Writer
 import           Data.Foldable
@@ -33,7 +34,7 @@ class ToTags t where
     :: ( Has (Reader Source) sig m
        , Has (Writer Tags.Tags) sig m
        , Generic1 t
-       , Tags.GTraversable1 ToTags (Rep1 t)
+       , GTraversable1 ToTags (Rep1 t)
        )
     => t Loc
     -> m ()
@@ -123,11 +124,11 @@ gtags
   :: ( Has (Reader Source) sig m
      , Has (Writer Tags.Tags) sig m
      , Generic1 t
-     , Tags.GTraversable1 ToTags (Rep1 t)
+     , GTraversable1 ToTags (Rep1 t)
      )
   => t Loc
   -> m ()
-gtags = Tags.traverse1_ @ToTags (const (pure ())) tags . Tags.Generics
+gtags = traverse1_ @ToTags (const (pure ())) tags . Generics
 
 -- These are all valid, but point to built-in functions (e.g. require) that a la
 -- carte doesn't display and since we have nothing to link to yet (can't
