@@ -23,7 +23,6 @@ module Language.Python.ScopeGraph
 
 import qualified Analysis.Name as Name
 import           AST.Element
-import           Control.Algebra (Algebra (..), handleCoercible)
 import           Control.Effect.Fresh
 import           Control.Effect.Sketch
 import           Data.Foldable
