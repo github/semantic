@@ -100,6 +100,17 @@ syntaxDatatype language allSymbols datatype = skipDefined $ do
     generatedDatatype name cons typeParameterName = DataD [] name [PlainTV typeParameterName] Nothing cons [deriveStockClause, deriveAnyClassClause]
 
 
+makeInstances :: TypeQ -> Q [Dec]
+makeInstances ty =
+  [d|
+  instance Foldable $ty where
+    foldMap = foldMapDefault1
+  instance Functor $ty where
+    fmap = fmapDefault1
+  instance Traversable $ty where
+    traverse = traverseDefault1
+  |]
+
 makeHasFieldInstance :: TypeQ -> TypeQ -> ExpQ -> Q [Dec]
 makeHasFieldInstance ty param elim =
   [d|instance HasField "ann" $(ty `appT` param) $param where
