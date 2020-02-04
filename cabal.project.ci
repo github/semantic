@@ -60,6 +60,9 @@ package semantic-java
 package semantic-json
   ghc-options: -Werror
 
+package semantic-parse
+  ghc-options: -Werror
+
 package semantic-python
   ghc-options: -Werror
 
