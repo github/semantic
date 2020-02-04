@@ -1,9 +1,6 @@
 # semantic-ast
 
-This package has two goals:
-
-1. Develop a library that will produce ASTs;
-2. Provide a command line tool that will output ASTs in supported formats.
+This package provides a command line tool that will output ASTs in supported formats.
 
 #### CLI
 
