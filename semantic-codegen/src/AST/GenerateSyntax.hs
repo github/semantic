@@ -9,6 +9,9 @@ module AST.GenerateSyntax
 , astDeclarationsForLanguage
 ) where
 
+import           AST.Deserialize (Children (..), Datatype (..), DatatypeName (..), Field (..), Multiple (..), Named (..), Required (..), Type (..))
+import           AST.Token
+import qualified AST.Unmarshal as TS
 import           Data.Aeson hiding (String)
 import           Data.Foldable
 import           Data.List
@@ -22,12 +25,9 @@ import           Language.Haskell.TH as TH
 import           Language.Haskell.TH.Syntax as TH
 import           System.Directory
 import           System.FilePath.Posix
-import           AST.Deserialize (Children (..), Datatype (..), DatatypeName (..), Field (..), Multiple (..), Named (..), Required (..), Type (..))
 import qualified TreeSitter.Language as TS
 import           TreeSitter.Node
 import           TreeSitter.Symbol (TSSymbol, toHaskellCamelCaseIdentifier, toHaskellPascalCaseIdentifier)
-import           AST.Token
-import qualified AST.Unmarshal as TS
 
 -- | Derive Haskell datatypes from a language and its @node-types.json@ file.
 --
