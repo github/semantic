@@ -72,13 +72,19 @@ syntaxDatatype language allSymbols datatype = skipDefined $ do
       let fieldName = mkName ("get" <> nameStr)
       con <- recC name [TH.varBangType fieldName (TH.bangType strictness (pure types' `appT` varT typeParameterName))]
       hasFieldInstance <- makeHasFieldInstance (conT name) (varT typeParameterName) (varE fieldName)
+      traversalInstances <- makeTraversalInstances (conT name)
       pure
-        ( NewtypeD [] name [PlainTV typeParameterName] Nothing con [deriveGN, deriveStockClause, deriveAnyClassClause]
-        : hasFieldInstance)
+        (  NewtypeD [] name [PlainTV typeParameterName] Nothing con [deriveGN, deriveStockClause, deriveAnyClassClause]
+        :  hasFieldInstance
+        <> traversalInstances)
     ProductType (DatatypeName datatypeName) named children fields -> do
       con <- ctorForProductType datatypeName typeParameterName children fields
       result <- symbolMatchingInstance allSymbols name named datatypeName
-      pure $ generatedDatatype name [con] typeParameterName:result
+      traversalInstances <- makeTraversalInstances (conT name)
+      pure
+        (  generatedDatatype name [con] typeParameterName
+        :  result
+        <> traversalInstances)
       -- Anonymous leaf types are defined as synonyms for the `Token` datatype
     LeafType (DatatypeName datatypeName) Anonymous -> do
       tsSymbol <- runIO $ withCStringLen datatypeName (\(s, len) -> TS.ts_language_symbol_for_name language s len False)
@@ -86,7 +92,11 @@ syntaxDatatype language allSymbols datatype = skipDefined $ do
     LeafType (DatatypeName datatypeName) Named -> do
       con <- ctorForLeafType (DatatypeName datatypeName) typeParameterName
       result <- symbolMatchingInstance allSymbols name Named datatypeName
-      pure $ generatedDatatype name [con] typeParameterName:result
+      traversalInstances <- makeTraversalInstances (conT name)
+      pure
+        (  generatedDatatype name [con] typeParameterName
+        :  result
+        <> traversalInstances)
   where
     -- Skip generating datatypes that have already been defined (overridden) in the module where the splice is running.
     skipDefined m = do
@@ -94,7 +104,7 @@ syntaxDatatype language allSymbols datatype = skipDefined $ do
       if isLocal then pure [] else m
     name = mkName nameStr
     nameStr = toNameString (datatypeNameStatus datatype) (getDatatypeName (AST.Deserialize.datatypeName datatype))
-    deriveStockClause = DerivClause (Just StockStrategy) [ ConT ''Eq, ConT ''Ord, ConT ''Show, ConT ''Generic, ConT ''Foldable, ConT ''Functor, ConT ''Traversable, ConT ''Generic1]
+    deriveStockClause = DerivClause (Just StockStrategy) [ ConT ''Eq, ConT ''Ord, ConT ''Show, ConT ''Generic, ConT ''Generic1]
     deriveAnyClassClause = DerivClause (Just AnyclassStrategy) [ConT ''TS.Unmarshal, ConT ''Traversable1 `AppT` VarT (mkName "someConstraint")]
     deriveGN = DerivClause (Just NewtypeStrategy) [ConT ''TS.SymbolMatching]
     generatedDatatype name cons typeParameterName = DataD [] name [PlainTV typeParameterName] Nothing cons [deriveStockClause, deriveAnyClassClause]
