@@ -46,7 +46,6 @@ import           Analysis.Abstract.Graph as Graph
 import           Analysis.File
 import           Control.Abstract hiding (String)
 import           Control.Abstract.PythonPackage as PythonPackage
-import           Control.Algebra
 import           Control.Carrier.Fresh.Strict
 import           Control.Carrier.Reader
 import           Control.Carrier.Resumable.Resume

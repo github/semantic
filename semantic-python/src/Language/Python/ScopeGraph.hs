@@ -16,7 +16,6 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module Language.Python.ScopeGraph
   ( scopeGraphModule
@@ -24,7 +23,6 @@ module Language.Python.ScopeGraph
 
 import qualified Analysis.Name as Name
 import           AST.Element
-import           Control.Algebra (Algebra (..), handleCoercible)
 import           Control.Effect.Fresh
 import           Control.Effect.Sketch
 import           Data.Foldable
@@ -38,10 +36,6 @@ import qualified Language.Python.AST as Py
 import           Language.Python.Patterns
 import           ScopeGraph.Convert (Result (..), complete, todo)
 import           Source.Loc
-
--- This orphan instance will perish once it lands in fused-effects.
-instance Algebra sig m => Algebra sig (Ap m) where
-  alg = Ap . alg . handleCoercible
 
 -- This typeclass is internal-only, though it shares the same interface
 -- as the one defined in semantic-scope-graph. The somewhat-unconventional
