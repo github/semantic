@@ -17,5 +17,6 @@ module Language.Python.AST
 import           Prelude hiding (False, Float, Integer, String, True)
 import           AST.GenerateSyntax
 import qualified Language.Python.Grammar as Grammar
+import TreeSitter.Python (getNodeTypesPath, tree_sitter_python)
 
 runIO TypeScript.getNodeTypesPath >>= astDeclarationsForLanguage Grammar.tree_sitter_python
