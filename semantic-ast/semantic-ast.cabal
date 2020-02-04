@@ -40,6 +40,7 @@ library
   exposed-modules:
     AST.Element
     AST.Traversable1
+    AST.Traversable1.Class
     Marshal.JSON
 
 
@@ -52,7 +53,6 @@ library
                      , tree-sitter          ^>= 0.8
                      , semantic-source      ^>= 0.0.2
                      , template-haskell     ^>= 2.15
-                     , tree-sitter-python   ^>= 0.8.1
                      , bytestring           ^>= 0.10.8.2
                      , optparse-applicative >= 0.14.3 && < 0.16
                      , pretty-simple        ^>= 3.1.0.0
@@ -71,7 +71,7 @@ executable semantic-ast
                      , semantic-ast
                      , tree-sitter
                      , semantic-source
-                     , tree-sitter-python
+                     , tree-sitter-python ^>= 0.8.1
                      , bytestring
                      , optparse-applicative
                      , pretty-simple
