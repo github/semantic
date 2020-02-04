@@ -60,25 +60,3 @@ library
 
   hs-source-dirs:      src
   default-language:    Haskell2010
-
-
-executable semantic-ast
-  import:              haskell
-  main-is:             Main.hs
-  -- other-modules:
-  -- other-extensions:
-  build-depends:       base
-                     , semantic-ast
-                     , tree-sitter
-                     , semantic-source
-                     , tree-sitter-python ^>= 0.8.1
-                     , bytestring
-                     , optparse-applicative
-                     , pretty-simple
-                     , aeson
-                     , bytestring
-                     , aeson-pretty
-                     , semantic-python
-                     , text
-  hs-source-dirs:      app
-  default-language:    Haskell2010
