@@ -26,13 +26,14 @@ import           Control.Carrier.Fresh.Strict
 import           Control.Carrier.Reader
 import           Control.Carrier.State.Strict
 import           Control.Effect.Sketch
+import           Control.Lens ((^.))
 import           Control.Monad.IO.Class
 import           Data.Bifunctor
 import           Data.Module
 import           Data.ScopeGraph (ScopeGraph)
 import qualified Data.ScopeGraph as ScopeGraph
 import           Data.Semilattice.Lower
-import qualified ScopeGraph.Properties.Declaration as Props
+import           GHC.Records
 import           Source.Span
 import qualified System.Path as Path
 
@@ -59,16 +60,15 @@ newtype SketchC address m a = SketchC (StateC Sketchbook (FreshC m) a)
 instance (Effect sig, Algebra sig m) => Algebra (SketchEff :+: Reader Name :+: Fresh :+: sig) (SketchC Name m) where
   alg (L (Declare n props k)) = do
     Sketchbook old current <- SketchC (get @Sketchbook)
-    let Props.Declaration kind relation associatedScope span = props
     let (new, _pos) =
           ScopeGraph.declare
           (ScopeGraph.Declaration n)
           (lowerBound @ModuleInfo)
-          relation
+          (relation props)
           ScopeGraph.Public
-          span
-          kind
-          associatedScope
+          (props^.span_)
+          (getField @"kind" @DeclProperties props)
+          (associatedScope props)
           current
           old
     SketchC (put (Sketchbook new current))

@@ -14,6 +14,7 @@
 module Control.Effect.Sketch
   ( Sketch
   , SketchEff (..)
+  , DeclProperties (..)
   , RefProperties (..)
   , FunProperties (..)
   , declare
@@ -40,9 +41,16 @@ import qualified Data.ScopeGraph as ScopeGraph
 import           Data.Text (Text)
 import           GHC.Generics (Generic, Generic1)
 import           GHC.Records
-import qualified ScopeGraph.Properties.Declaration as Props
 import           Source.Span
 
+data DeclProperties = DeclProperties
+  { kind            :: ScopeGraph.Kind
+  , relation        :: ScopeGraph.Relation
+  , associatedScope :: Maybe Name
+  , spanInfo        :: Span
+  } deriving Generic
+
+instance HasSpan DeclProperties where span_ = field @"spanInfo"
 
 data RefProperties = RefProperties
 
@@ -59,7 +67,7 @@ type Sketch
   :+: Reader Name
 
 data SketchEff m k =
-    Declare Name Props.Declaration (() -> m k)
+    Declare Name DeclProperties (() -> m k)
   | Reference Text Text RefProperties (() -> m k)
   | NewScope (Map ScopeGraph.EdgeLabel [Name]) (Name -> m k)
   deriving (Generic, Generic1, HFunctor, Effect)
@@ -67,7 +75,7 @@ data SketchEff m k =
 currentScope :: Has (Reader Name) sig m => m Name
 currentScope = ask
 
-declare :: forall sig m . (Has Sketch sig m) => Name -> Props.Declaration -> m ()
+declare :: forall sig m . (Has Sketch sig m) => Name -> DeclProperties -> m ()
 declare n props = send (Declare n props pure)
 
 -- | Establish a reference to a prior declaration.
@@ -82,24 +90,22 @@ declareFunction name props = do
   currentScope' <- currentScope
   let lexicalEdges = Map.singleton ScopeGraph.Lexical [ currentScope' ]
   associatedScope <- newScope lexicalEdges
-  name' <- declareMaybeName name Props.Declaration
-                                   { Props.relation = ScopeGraph.Default
-                                   , Props.kind = (getField @"kind" @FunProperties props)
-                                   , Props.associatedScope = Just associatedScope
-                                   , Props.span = props^.span_
+  name' <- declareMaybeName name DeclProperties
+                                   { relation = ScopeGraph.Default
+                                   , kind = (getField @"kind" @FunProperties props)
+                                   , associatedScope = Just associatedScope
+                                   , spanInfo = props^.span_
                                    }
   pure (name', associatedScope)
 
 declareMaybeName :: Has Sketch sig m
                  => Maybe Name
-                 -> Props.Declaration
+                 -> DeclProperties
                  -> m Name
 declareMaybeName maybeName props = do
   case maybeName of
     Just name -> name <$ declare name props
-    _         -> do
-      name <- Name.gensym
-      name <$ declare name (props { Props.relation = ScopeGraph.Gensym })
+    _         -> Name.gensym >>= \name -> declare name (props { relation = ScopeGraph.Gensym }) >> pure name -- TODO: Modify props and change Kind to Gensym
 
 withScope :: Has Sketch sig m
           => Name
