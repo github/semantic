@@ -66,6 +66,7 @@ executable semantic-ast
   -- other-extensions:
   build-depends:       base
                      , semantic-ast
+                     , semantic-codegen
                      , tree-sitter
                      , semantic-source
                      , tree-sitter-python
