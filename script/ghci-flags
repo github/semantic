@@ -53,6 +53,7 @@ function flags {
   echo "-isemantic-go/src"
   echo "-isemantic-java/src"
   echo "-isemantic-json/src"
+  echo "-isemantic-parse/src"
   echo "-isemantic-python/src"
   echo "-isemantic-python/test"
   echo "-isemantic-ruby/src"
