@@ -27,7 +27,6 @@ common haskell
                      , semantic-analysis ^>= 0
                      , semantic-ast
                      , semantic-core ^>= 0.0
-                     , semantic-codegen
                      , semantic-source ^>= 0.0.2
                      , semantic-tags ^>= 0.0
                      , semantic-scope-graph ^>= 0.0
@@ -85,7 +84,6 @@ test-suite compiling
                , process ^>= 1.6.5
                , resourcet ^>= 1.2.2
                , semantic-analysis ^>= 0
-               , semantic-codegen
                , streaming ^>= 0.2.2
                , streaming-process ^>= 0.1
                , streaming-bytestring ^>= 0.1.6
@@ -106,7 +104,6 @@ test-suite graphing
 
   build-depends: base
                , semantic-python
-               , semantic-codegen
                , semantic-scope-graph
                , bytestring
                , pathtype

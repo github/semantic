@@ -25,7 +25,6 @@ common haskell
                      , fused-syntax
                      , parsers ^>= 0.12.10
                      , semantic-ast
-                     , semantic-codegen
                      , semantic-core ^>= 0.0
                      , semantic-source ^>= 0.0.2
                      , semantic-tags ^>= 0.0
