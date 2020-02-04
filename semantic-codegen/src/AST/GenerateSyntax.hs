@@ -53,7 +53,7 @@ astDeclarationsForLanguage language filePath = do
 getAllSymbols :: Ptr TS.Language -> IO [(String, Named)]
 getAllSymbols language = do
   count <- TS.ts_language_symbol_count language
-  mapM getSymbol [(0 :: TSSymbol) .. fromIntegral (pred count)]
+  traverse getSymbol [(0 :: TSSymbol) .. fromIntegral (pred count)]
   where
     getSymbol i = do
       cname <- TS.ts_language_symbol_name language i
@@ -148,7 +148,7 @@ debugPrefix (name, Anonymous) = "_" <> name
 -- | Build Q Constructor for product types (nodes with fields)
 ctorForProductType :: String -> Name -> Maybe Children -> [(String, Field)] -> Q Con
 ctorForProductType constructorName typeParameterName children fields = ctorForTypes constructorName lists where
-  lists = annotation : fieldList ++ childList
+  lists = annotation : fieldList <> childList
   annotation = ("ann", varT typeParameterName)
   fieldList = map (fmap toType) fields
   childList = toList $ fmap toTypeChild children
