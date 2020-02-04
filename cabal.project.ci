@@ -1,8 +1,7 @@
 -- ATTENTION: care must be taken to keep this file in sync with cabal.project and script/ghci-flags. If you add a package here, add it there (and add a package stanza with ghc-options to enable errors in CI at the bottom of this file).
 
 -- Local packages
-packages: .
-          semantic-analysis
+packages: semantic-analysis
           semantic-ast
           semantic-codegen
           semantic-core
@@ -15,6 +14,7 @@ packages: .
           semantic-tsx
           semantic-typescript
           semantic-tags
+          semantic
 
 -- Packages brought in from other repos instead of hackage
 -- ATTENTION: remember to update cabal.project when bumping SHAs here!
@@ -42,6 +42,9 @@ package semantic-analysis
   ghc-options: -Werror
 
 package semantic-ast
+  ghc-options: -Werror
+
+package semantic-cli
   ghc-options: -Werror
 
 package semantic-codegen

@@ -61,10 +61,9 @@ function flags {
   echo "-isemantic-tsx/src"
   echo "-isemantic-typescript/src"
   echo "-isemantic-tags/src"
-  echo "-iapp"
-  echo "-isrc"
-  echo "-ibench"
-  echo "-itest"
+  echo "-isemantic/src"
+  echo "-isemantic/bench"
+  echo "-isemantic/test"
 
   # disable automatic selection of packages
   echo "-hide-all-packages"
