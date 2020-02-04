@@ -59,9 +59,9 @@ jobs:
     - name: Build & test
       run: |
         cabal v2-build all --project-file=cabal.project.ci
-        cabal v2-run   --project-file=cabal.project.ci semantic:test
         cabal v2-run   --project-file=cabal.project.ci semantic-core:test
         cabal v2-run   --project-file=cabal.project.ci semantic-python:test:compiling
         cabal v2-run   --project-file=cabal.project.ci semantic-python:test:graphing
+        cd semantic; cabal v2-run   --project-file=cabal.project.ci semantic:test
         cd semantic-source; cabal v2-run --project-file=cabal.project.ci semantic-source:test; cd ..
         cd semantic-source; cabal v2-run --project-file=cabal.project.ci semantic-source:doctest -- src; cd ..
