@@ -67,7 +67,6 @@ common dependencies
                      , recursion-schemes ^>= 5.1
                      , scientific ^>= 0.3.6.2
                      , safe-exceptions ^>= 0.1.7.0
-                     , semantic-codegen
                      , semantic-analysis ^>= 0
                      , semantic-source ^>= 0.0.2
                      , semilattices ^>= 0.0.0.3
