@@ -100,8 +100,8 @@ syntaxDatatype language allSymbols datatype = skipDefined $ do
     generatedDatatype name cons typeParameterName = DataD [] name [PlainTV typeParameterName] Nothing cons [deriveStockClause, deriveAnyClassClause]
 
 
-makeInstances :: TypeQ -> Q [Dec]
-makeInstances ty =
+makeTraversalInstances :: TypeQ -> Q [Dec]
+makeTraversalInstances ty =
   [d|
   instance Foldable $ty where
     foldMap = foldMapDefault1
