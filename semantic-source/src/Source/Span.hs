@@ -84,7 +84,7 @@ instance A.FromJSON Pos where
     pure $ Pos line col
 
 instance Lower Pos where
-  lowerBound = Pos 1 1
+  lowerBound = Pos 0 0
 
 
 line_, column_ :: Lens' Pos Int
