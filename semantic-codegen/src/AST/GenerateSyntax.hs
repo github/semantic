@@ -79,11 +79,11 @@ syntaxDatatype language allSymbols datatype = skipDefined $ do
         <> traversalInstances)
     ProductType (DatatypeName datatypeName) named children fields -> do
       con <- ctorForProductType datatypeName typeParameterName children fields
-      result <- symbolMatchingInstance allSymbols name named datatypeName
+      symbolMatchingInstance <- symbolMatchingInstance allSymbols name named datatypeName
       traversalInstances <- makeTraversalInstances (conT name)
       pure
         (  generatedDatatype name [con] typeParameterName
-        :  result
+        :  symbolMatchingInstance
         <> traversalInstances)
       -- Anonymous leaf types are defined as synonyms for the `Token` datatype
     LeafType (DatatypeName datatypeName) Anonymous -> do
@@ -91,11 +91,11 @@ syntaxDatatype language allSymbols datatype = skipDefined $ do
       pure [ TySynD name [] (ConT ''Token `AppT` LitT (StrTyLit datatypeName) `AppT` LitT (NumTyLit (fromIntegral tsSymbol))) ]
     LeafType (DatatypeName datatypeName) Named -> do
       con <- ctorForLeafType (DatatypeName datatypeName) typeParameterName
-      result <- symbolMatchingInstance allSymbols name Named datatypeName
+      symbolMatchingInstance <- symbolMatchingInstance allSymbols name Named datatypeName
       traversalInstances <- makeTraversalInstances (conT name)
       pure
         (  generatedDatatype name [con] typeParameterName
-        :  result
+        :  symbolMatchingInstance
         <> traversalInstances)
   where
     -- Skip generating datatypes that have already been defined (overridden) in the module where the splice is running.
