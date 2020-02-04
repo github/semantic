@@ -28,8 +28,6 @@ import Data.Functor.Identity
 import Data.Monoid (Ap (..))
 import GHC.Generics
 
--- FIXME: derive Traversable1 instances for TH-generated syntax types.
-
 -- | Simultaneous traversal of subterms of kind @*@ and @* -> *@ in an 'Applicative' context.
 --
 -- 'Traversable1' can express any combination of first- and second-order mapping, folding, and traversal.
