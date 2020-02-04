@@ -16,7 +16,6 @@ module Language.TSX.AST
 
 import           Prelude hiding (False, Float, Integer, String, True)
 import           AST.GenerateSyntax
-import qualified Language.TSX.Grammar as Grammar
-import           TreeSitter.TSX (getNodeTypesPath) 
+import qualified TreeSitter.TSX as TSX
 
-runIO TSX.getNodeTypesPath >>= astDeclarationsForLanguage Grammar.tree_sitter_tsx
+runIO TSX.getNodeTypesPath >>= astDeclarationsForLanguage TSX.tree_sitter_tsx
