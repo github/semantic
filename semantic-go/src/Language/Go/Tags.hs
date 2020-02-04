@@ -14,7 +14,6 @@ import           AST.Traversable1
 import           Control.Effect.Reader
 import           Control.Effect.Writer
 import           Data.Text as Text
-import           GHC.Generics
 import qualified Language.Go.AST as Go
 import           Source.Loc
 import           Source.Source as Source
@@ -31,8 +30,7 @@ class ToTags t where
   default tags
     :: ( Has (Reader Source) sig m
        , Has (Writer Tags.Tags) sig m
-       , Generic1 t
-       , GTraversable1 ToTags (Rep1 t)
+       , Traversable1 ToTags t
        )
     => t Loc
     -> m ()
@@ -73,12 +71,11 @@ instance ToTags (Token sym n) where tags _ = pure ()
 gtags
   :: ( Has (Reader Source) sig m
      , Has (Writer Tags.Tags) sig m
-     , Generic1 t
-     , GTraversable1 ToTags (Rep1 t)
+     , Traversable1 ToTags t
      )
   => t Loc
   -> m ()
-gtags = traverse1_ @ToTags (const (pure ())) tags . Generics
+gtags = traverse1_ @ToTags (const (pure ())) tags
 
 yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text -> Kind -> Loc -> Range -> m ()
 yieldTag name kind loc range = do

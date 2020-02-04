@@ -16,7 +16,6 @@ import           Control.Effect.Reader
 import           Control.Effect.Writer
 import           Data.Foldable
 import           Data.Text as Text
-import           GHC.Generics
 import qualified Language.TSX.AST as Tsx
 import           Source.Loc
 import           Source.Source as Source
@@ -33,8 +32,7 @@ class ToTags t where
   default tags
     :: ( Has (Reader Source) sig m
        , Has (Writer Tags.Tags) sig m
-       , Generic1 t
-       , GTraversable1 ToTags (Rep1 t)
+       , Traversable1 ToTags t
        )
     => t Loc
     -> m ()
@@ -123,12 +121,11 @@ instance ToTags (Token sym n) where tags _ = pure ()
 gtags
   :: ( Has (Reader Source) sig m
      , Has (Writer Tags.Tags) sig m
-     , Generic1 t
-     , GTraversable1 ToTags (Rep1 t)
+     , Traversable1 ToTags t
      )
   => t Loc
   -> m ()
-gtags = traverse1_ @ToTags (const (pure ())) tags . Generics
+gtags = traverse1_ @ToTags (const (pure ())) tags
 
 -- These are all valid, but point to built-in functions (e.g. require) that a la
 -- carte doesn't display and since we have nothing to link to yet (can't

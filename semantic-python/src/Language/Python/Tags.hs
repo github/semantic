@@ -17,7 +17,6 @@ import           Control.Effect.Writer
 import           Data.List.NonEmpty (NonEmpty (..))
 import           Data.Maybe (listToMaybe)
 import           Data.Text as Text
-import           GHC.Generics
 import qualified Language.Python.AST as Py
 import           Source.Loc
 import           Source.Range
@@ -35,8 +34,7 @@ class ToTags t where
   default tags
     :: ( Has (Reader Source) sig m
        , Has (Writer Tags.Tags) sig m
-       , Generic1 t
-       , GTraversable1 ToTags (Rep1 t)
+       , Traversable1 ToTags t
        )
     => t Loc
     -> m ()
@@ -51,8 +49,7 @@ instance ToTags (Token sym n) where tags _ = pure ()
 keywordFunctionCall
   :: ( Has (Reader Source) sig m
      , Has (Writer Tags.Tags) sig m
-     , Generic1 t
-     , GTraversable1 ToTags (Rep1 t)
+     , Traversable1 ToTags t
      )
   => t Loc -> Loc -> Range -> Text -> m ()
 keywordFunctionCall t loc range name = yieldTag name Function loc range Nothing >> gtags t
@@ -128,12 +125,11 @@ docComment _ _ = Nothing
 gtags
   :: ( Has (Reader Source) sig m
      , Has (Writer Tags.Tags) sig m
-     , Generic1 t
-     , GTraversable1 ToTags (Rep1 t)
+     , Traversable1 ToTags t
      )
   => t Loc
   -> m ()
-gtags = traverse1_ @ToTags (const (pure ())) tags . Generics
+gtags = traverse1_ @ToTags (const (pure ())) tags
 
 instance ToTags Py.AliasedImport
 instance ToTags Py.ArgumentList

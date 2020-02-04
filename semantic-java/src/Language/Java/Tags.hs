@@ -12,7 +12,7 @@ import           AST.Token
 import           AST.Traversable1
 import           Control.Effect.Reader
 import           Control.Effect.Writer
-import           GHC.Generics
+import           GHC.Generics ((:+:)(..))
 import qualified Language.Java.AST as Java
 import           Source.Loc
 import           Source.Range
@@ -30,8 +30,7 @@ class ToTags t where
   default tags
     :: ( Has (Reader Source) sig m
        , Has (Writer Tags.Tags) sig m
-       , Generic1 t
-       , GTraversable1 ToTags (Rep1 t)
+       , Traversable1 ToTags t
        )
     => t Loc
     -> m ()
@@ -81,12 +80,11 @@ instance ToTags Java.MethodInvocation where
 gtags
   :: ( Has (Reader Source) sig m
      , Has (Writer Tags.Tags) sig m
-     , Generic1 t
-     , GTraversable1 ToTags (Rep1 t)
+     , Traversable1 ToTags t
      )
   => t Loc
   -> m ()
-gtags = traverse1_ @ToTags (const (pure ())) tags . Generics
+gtags = traverse1_ @ToTags (const (pure ())) tags
 
 instance ToTags Java.AnnotatedType
 instance ToTags Java.Annotation
