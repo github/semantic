@@ -19,4 +19,4 @@ import           AST.GenerateSyntax
 import qualified Language.Python.Grammar as Grammar
 import TreeSitter.Python (getNodeTypesPath, tree_sitter_python)
 
-runIO TypeScript.getNodeTypesPath >>= astDeclarationsForLanguage Grammar.tree_sitter_python
+runIO Python.getNodeTypesPath >>= astDeclarationsForLanguage Grammar.tree_sitter_python
