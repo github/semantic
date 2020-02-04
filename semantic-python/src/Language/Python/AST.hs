@@ -18,4 +18,4 @@ import           Prelude hiding (False, Float, Integer, String, True)
 import           AST.GenerateSyntax
 import qualified Language.Python.Grammar as Grammar
 
-astDeclarationsForLanguage Grammar.tree_sitter_python "../../../vendor/tree-sitter-python/src/node-types.json"
+runIO TypeScript.getNodeTypesPath >>= astDeclarationsForLanguage Grammar.tree_sitter_python
