@@ -17,4 +17,4 @@ import           Prelude hiding (String)
 import           AST.GenerateSyntax
 import qualified TreeSitter.JSON as JSON
 
-runIO JSON.getNodeTypesPath >>= astDeclarationsForLanguage JSON.tree_sitter_python
+runIO JSON.getNodeTypesPath >>= astDeclarationsForLanguage JSON.tree_sitter_json
