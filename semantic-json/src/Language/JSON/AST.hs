@@ -15,7 +15,6 @@ module Language.JSON.AST
 
 import           Prelude hiding (String)
 import           AST.GenerateSyntax
-import qualified Language.JSON.Grammar as Grammar
 import qualified TreeSitter.JSON as JSON
 
 runIO JSON.getNodeTypesPath >>= astDeclarationsForLanguage JSON.tree_sitter_python
