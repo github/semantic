@@ -16,6 +16,6 @@ module Language.Ruby.AST
 
 import           Prelude hiding (False, Float, Integer, Rational, String, True)
 import           AST.GenerateSyntax
-import qualified Language.Ruby.Grammar as Grammar
+import qualified TreeSitter.Ruby as Ruby
 
-astDeclarationsForLanguage Grammar.tree_sitter_ruby "../../../vendor/tree-sitter-ruby/src/node-types.json"
+runIO Ruby.getNodeTypesPath >>= astDeclarationsForLanguage Ruby.tree_sitter_ruby
