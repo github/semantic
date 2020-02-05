@@ -12,21 +12,21 @@ module Language.Ruby.Tags
 ) where
 
 import           AST.Element
+import           AST.Token
+import           AST.Traversable1
+import qualified AST.Unmarshal as TS
 import           Control.Effect.Reader
 import           Control.Effect.State
 import           Control.Effect.Writer
 import           Control.Monad
 import           Data.Foldable
 import           Data.Text as Text
-import           GHC.Generics
 import qualified Language.Ruby.AST as Rb
 import           Source.Loc
 import           Source.Range as Range
 import           Source.Source as Source
 import           Tags.Tag
 import qualified Tags.Tagging.Precise as Tags
-import           AST.Token
-import qualified AST.Unmarshal as TS
 
 class ToTags t where
   tags
@@ -40,8 +40,7 @@ class ToTags t where
     :: ( Has (Reader Source) sig m
        , Has (Writer Tags.Tags) sig m
        , Has (State [Text]) sig m
-       , Generic1 t
-       , Tags.GTraversable1 ToTags (Rep1 t)
+       , Traversable1 ToTags t
        )
     => t Loc
     -> m ()
@@ -89,7 +88,7 @@ instance ToTags Rb.Class where
     where
       range' = case extraChildren of
         Prj Rb.Superclass { ann = Loc { byteRange = Range { end }}} : _ -> Range start end
-        _ -> Range start (getEnd expr)
+        _                                                               -> Range start (getEnd expr)
       getEnd = Range.end . byteRange . TS.gann
       yield name = yieldTag name Class loc range' >> gtags t
 
@@ -106,7 +105,7 @@ instance ToTags Rb.SingletonClass where
     where
       range' = case extraChildren of
         x : _ -> Range start (getStart x)
-        _ -> range
+        _     -> range
       getStart = Range.start . byteRange . TS.gann
       yield name = yieldTag name Class loc range' >> gtags t
 
@@ -123,7 +122,7 @@ instance ToTags Rb.Module where
     where
       range' = case extraChildren of
         x : _ -> Range start (getStart x)
-        _ -> Range start (getEnd expr)
+        _     -> Range start (getEnd expr)
       getEnd = Range.end . byteRange . TS.gann
       getStart = Range.start . byteRange . TS.gann
       yield name = yieldTag name Module loc range' >> gtags t
@@ -132,8 +131,7 @@ yieldMethodNameTag
   :: ( Has (State [Text]) sig m
      , Has (Reader Source) sig m
      , Has (Writer Tags.Tags) sig m
-     , Generic1 t
-     , Tags.GTraversable1 ToTags (Rep1 t)
+     , Traversable1 ToTags t
      ) => t Loc -> Loc -> Range -> Rb.MethodName Loc -> m ()
 yieldMethodNameTag t loc range (Rb.MethodName expr) = enterScope True $ case expr of
   Prj Rb.Identifier { text = name }                               -> yield name
@@ -165,7 +163,7 @@ instance ToTags Rb.Method where
     where
       range' = case parameters of
         Just Rb.MethodParameters { ann = Loc { byteRange = Range { end } }} -> Range start end
-        _ -> Range start (getEnd name)
+        _                                                                   -> Range start (getEnd name)
       getEnd = Range.end . byteRange . TS.gann
 
 instance ToTags Rb.SingletonMethod where
@@ -177,7 +175,7 @@ instance ToTags Rb.SingletonMethod where
     where
       range' = case parameters of
         Just Rb.MethodParameters { ann = Loc { byteRange = Range { end } }} -> Range start end
-        _ -> Range start (getEnd name)
+        _                                                                   -> Range start (getEnd name)
       getEnd = Range.end . byteRange . TS.gann
 
 instance ToTags Rb.Block where
@@ -336,12 +334,11 @@ gtags
   :: ( Has (Reader Source) sig m
      , Has (Writer Tags.Tags) sig m
      , Has (State [Text]) sig m
-     , Generic1 t
-     , Tags.GTraversable1 ToTags (Rep1 t)
+     , Traversable1 ToTags t
      )
   => t Loc
   -> m ()
-gtags = Tags.traverse1_ @ToTags (const (pure ())) tags . Tags.Generics
+gtags = traverse1_ @ToTags (const (pure ())) tags
 
 -- instance ToTags Rb.Alias
 instance ToTags Rb.Arg
