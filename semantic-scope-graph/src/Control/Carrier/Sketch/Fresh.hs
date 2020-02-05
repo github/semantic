@@ -93,7 +93,7 @@ instance (Effect sig, Algebra sig m) => Algebra (SketchEff :+: Reader Name :+: F
     k name
   alg (L (InsertEdge label address k)) = do
     Sketchbook old current <- SketchC get
-    let new = ScopeGraph.insertEdge label address current old
+    let new = ScopeGraph.addImportEdge label address current old
     SketchC (put (Sketchbook new current))
     k ()
 

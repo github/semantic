@@ -23,6 +23,8 @@ module Data.ScopeGraph
   , insertImportReference
   , newScope
   , newPreludeScope
+  , addImportHole
+  , addImportEdge
   , insertScope
   , insertEdge
   , Path(..)
@@ -70,7 +72,8 @@ import qualified Data.Set as Set
 import           Data.Text (Text)
 import           GHC.Generics
 import           Source.Span
-import Data.List.NonEmpty (NonEmpty)
+import Data.List.NonEmpty (NonEmpty(..))
+import qualified Data.List.NonEmpty as NonEmpty
 
 -- A slot is a location in the heap where a value is stored.
 data Slot address = Slot { frameAddress :: address, position :: Position }
@@ -347,11 +350,25 @@ lookupReference :: Ord scopeAddress => Name -> scopeAddress -> ScopeGraph scopeA
 lookupReference  name scope g = fmap snd . Map.lookup (Reference name) =<< pathsOfScope scope g
 
 insertEdge :: Ord scopeAddress => EdgeLabel -> scopeAddress -> scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
-insertEdge label hole currentAddress g@(ScopeGraph graph) = fromMaybe g $ do
+insertEdge label target currentAddress g@(ScopeGraph graph) = fromMaybe g $ do
   currentScope' <- lookupScope currentAddress g
   scopes <- maybe (Just mempty) pure (Map.lookup label (edges currentScope'))
-  let newScope = currentScope' { edges = Map.insert label (toList targets <> scopes) (edges currentScope') }
+  let newScope = currentScope' { edges = Map.insert label (target : scopes) (edges currentScope') }
   pure (ScopeGraph (Map.insert currentAddress newScope graph))
+
+addImportEdge :: Ord scopeAddress => EdgeLabel -> NonEmpty scopeAddress -> scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
+addImportEdge edge names currentAddress g = do
+  case names of
+    (x :| []) -> addImportHole Import x currentAddress g
+    (x :| xs) -> do
+      let scopeGraph' = newScope x mempty g
+      addImportEdge edge (NonEmpty.fromList xs) x scopeGraph'
+
+
+addImportHole :: Ord scopeAddress => EdgeLabel -> scopeAddress -> scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
+addImportHole label name currentAddress g = fromMaybe g $ do
+  let scope' = newScope name mempty g
+  pure (insertEdge label name currentAddress scope')
 
 
 -- | Update the 'Scope' containing a 'Declaration' with an associated scope address.
