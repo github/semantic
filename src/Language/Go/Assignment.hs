@@ -15,7 +15,7 @@ import           Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
 import           Control.Monad
 import qualified Data.Abstract.ScopeGraph as ScopeGraph (AccessControl (..))
-import           Data.ImportPath (defaultAlias, importPath)
+import           Data.ImportPath ()
 import           Data.List.NonEmpty (NonEmpty (..), some1)
 import           Data.Sum
 import           Data.Syntax
@@ -31,7 +31,8 @@ import qualified Data.Term as Term
 import           Language.Go.Syntax as Go.Syntax hiding (labelName, runeLiteral)
 import           Language.Go.Term as Go
 import           Language.Go.Type as Go.Type
-import           TreeSitter.Go as Grammar
+import Data.ImportPath (importPath, defaultAlias)
+import           Language.Go.Grammar as Grammar
 
 type Assignment = Assignment.Assignment [] Grammar
 

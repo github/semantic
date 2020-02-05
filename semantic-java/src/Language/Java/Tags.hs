@@ -8,16 +8,17 @@ module Language.Java.Tags
 ( ToTags(..)
 ) where
 
+import           AST.Token
+import           AST.Traversable1
 import           Control.Effect.Reader
 import           Control.Effect.Writer
-import           GHC.Generics
+import           GHC.Generics ((:+:)(..))
+import qualified Language.Java.AST as Java
 import           Source.Loc
 import           Source.Range
 import           Source.Source as Source
 import           Tags.Tag
 import qualified Tags.Tagging.Precise as Tags
-import qualified TreeSitter.Java.AST as Java
-import           TreeSitter.Token
 
 class ToTags t where
   tags
@@ -29,8 +30,7 @@ class ToTags t where
   default tags
     :: ( Has (Reader Source) sig m
        , Has (Writer Tags.Tags) sig m
-       , Generic1 t
-       , Tags.GTraversable1 ToTags (Rep1 t)
+       , Traversable1 ToTags t
        )
     => t Loc
     -> m ()
@@ -80,12 +80,11 @@ instance ToTags Java.MethodInvocation where
 gtags
   :: ( Has (Reader Source) sig m
      , Has (Writer Tags.Tags) sig m
-     , Generic1 t
-     , Tags.GTraversable1 ToTags (Rep1 t)
+     , Traversable1 ToTags t
      )
   => t Loc
   -> m ()
-gtags = Tags.traverse1_ @ToTags (const (pure ())) tags . Tags.Generics
+gtags = traverse1_ @ToTags (const (pure ())) tags
 
 instance ToTags Java.AnnotatedType
 instance ToTags Java.Annotation
@@ -140,7 +139,7 @@ instance ToTags Java.FieldAccess
 instance ToTags Java.FieldDeclaration
 instance ToTags Java.FinallyClause
 instance ToTags Java.FloatingPointType
-instance ToTags Java.ForInit
+-- instance ToTags Java.ForInit
 instance ToTags Java.ForStatement
 instance ToTags Java.FormalParameter
 instance ToTags Java.FormalParameters
@@ -160,7 +159,7 @@ instance ToTags Java.LabeledStatement
 instance ToTags Java.LambdaExpression
 instance ToTags Java.Literal
 instance ToTags Java.LocalVariableDeclaration
-instance ToTags Java.LocalVariableDeclarationStatement
+-- instance ToTags Java.LocalVariableDeclarationStatement
 instance ToTags Java.MarkerAnnotation
 -- instance ToTags Java.MethodDeclaration
 -- instance ToTags Java.MethodInvocation

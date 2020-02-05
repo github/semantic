@@ -29,7 +29,7 @@ import           Data.Either
 import           Data.Foldable
 import           Data.Functor.Classes
 import           Data.Functor.Foldable
-import           Data.Graph
+import           Data.Graph.Algebraic (Edge(..), vertexList, edgeList)
 import           Data.Language
 import           Data.Map.Strict (Map)
 import           Data.ProtoLens (defMessage)
