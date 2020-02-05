@@ -25,10 +25,12 @@ import qualified Analysis.Name as Name
 import           AST.Element
 import           Control.Effect.Fresh
 import           Control.Effect.Sketch
+import           Control.Lens (set, (^.))
 import           Data.Foldable
 import           Data.Maybe
 import           Data.Monoid
 import qualified Data.ScopeGraph as ScopeGraph
+import           Data.Semilattice.Lower
 import           Data.Traversable
 import           GHC.Records
 import           GHC.TypeLits
@@ -36,6 +38,7 @@ import qualified Language.Python.AST as Py
 import           Language.Python.Patterns
 import           ScopeGraph.Convert (Result (..), complete, todo)
 import           Source.Loc
+import           Source.Span (span_)
 
 -- This typeclass is internal-only, though it shares the same interface
 -- as the one defined in semantic-scope-graph. The somewhat-unconventional
@@ -86,9 +89,13 @@ scopeGraphModule = getAp . scopeGraph
 instance ToScopeGraph Py.AssertStatement where scopeGraph = onChildren
 
 instance ToScopeGraph Py.Assignment where
-  scopeGraph (Py.Assignment _ (SingleIdentifier t) val _typ) = do
-    let declProps = (DeclProperties ScopeGraph.Assignment ScopeGraph.Default Nothing)
-    declare t declProps
+  scopeGraph (Py.Assignment ann (SingleIdentifier t) val _typ) = do
+    declare t DeclProperties
+      { kind     = ScopeGraph.Assignment
+      , relation = ScopeGraph.Default
+      , associatedScope = Nothing
+      , spanInfo = ann^.span_
+      }
     maybe complete scopeGraph val
   scopeGraph x = todo x
 
@@ -172,23 +179,31 @@ instance ToScopeGraph Py.ForStatement where scopeGraph = todo
 
 instance ToScopeGraph Py.FunctionDefinition where
   scopeGraph Py.FunctionDefinition
-    { name       = Py.Identifier _ann1 name
+    { ann
+    , name       = Py.Identifier _ann1 name
     , parameters = Py.Parameters _ann2 parameters
     , body
     } = do
-    let funProps = FunProperties ScopeGraph.Function
-    (_, associatedScope) <- declareFunction (Just $ Name.name name) funProps
+    (_, associatedScope) <- declareFunction (Just $ Name.name name) FunProperties
+      { kind     = ScopeGraph.Function
+      , spanInfo = ann^.span_
+      }
     withScope associatedScope $ do
-      let declProps = DeclProperties ScopeGraph.Parameter ScopeGraph.Default Nothing
-      let param (Py.Parameter (Prj (Py.Identifier _pann pname))) = Just (Name.name pname)
-          param _                                                = Nothing
+      let declProps = DeclProperties
+            { kind = ScopeGraph.Parameter
+            , relation = ScopeGraph.Default
+            , associatedScope = Nothing
+            , spanInfo = lowerBound
+            }
+      let param (Py.Parameter (Prj (Py.Identifier pann pname))) = Just (pann, Name.name pname)
+          param _                                               = Nothing
       let parameterMs = fmap param parameters
       if any isNothing parameterMs
         then todo parameterMs
         else do
           let parameters' = catMaybes parameterMs
-          paramDeclarations <- for parameters' $ \parameter ->
-            complete <* declare parameter declProps
+          paramDeclarations <- for parameters' $ \(pos, parameter) ->
+            complete <* declare parameter (set span_ (pos^.span_) declProps)
           bodyResult <- scopeGraph body
           pure (mconcat paramDeclarations <> bodyResult)
 

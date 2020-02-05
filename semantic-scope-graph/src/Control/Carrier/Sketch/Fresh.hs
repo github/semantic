@@ -23,9 +23,10 @@ import           Analysis.Name (Name)
 import qualified Analysis.Name as Name
 import           Control.Algebra
 import           Control.Carrier.Fresh.Strict
-import           Control.Carrier.State.Strict
 import           Control.Carrier.Reader
+import           Control.Carrier.State.Strict
 import           Control.Effect.Sketch
+import           Control.Lens ((^.))
 import           Control.Monad.IO.Class
 import           Data.Bifunctor
 import           Data.Module
@@ -65,7 +66,7 @@ instance (Effect sig, Algebra sig m) => Algebra (SketchEff :+: Reader Name :+: F
           (lowerBound @ModuleInfo)
           (relation props)
           ScopeGraph.Public
-          (lowerBound @Span)
+          (props^.span_)
           (getField @"kind" @DeclProperties props)
           (associatedScope props)
           current
