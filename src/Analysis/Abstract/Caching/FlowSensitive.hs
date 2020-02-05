@@ -11,7 +11,6 @@ module Analysis.Abstract.Caching.FlowSensitive
 , caching
 ) where
 
-import Control.Algebra (Effect)
 import Control.Carrier.Fresh.Strict
 import Control.Carrier.NonDet.Church
 import Control.Carrier.Reader
