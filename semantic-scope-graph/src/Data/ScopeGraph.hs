@@ -39,6 +39,7 @@ module Data.ScopeGraph
   , lookupScope
   , lookupScopePath
   , Scope(..)
+  , Domain(..)
   , scopeOfRef
   , pathDeclarationScope
   , putDeclarationScopeAtPosition

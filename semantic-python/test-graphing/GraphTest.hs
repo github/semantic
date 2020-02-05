@@ -3,10 +3,11 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
-module Main (main) where
+module Main (main, graphFile) where
 
 import           Analysis.Name (Name)
 import qualified Analysis.Name as Name
+import qualified AST.Unmarshal as TS
 import           Control.Algebra
 import           Control.Carrier.Lift
 import           Control.Carrier.Sketch.Fresh
@@ -16,6 +17,7 @@ import qualified Data.ScopeGraph as ScopeGraph
 import           Data.Semilattice.Lower
 import qualified Language.Python ()
 import qualified Language.Python as Py (Term)
+import qualified Language.Python.Grammar as TSP
 import           ScopeGraph.Convert
 import           Source.Loc
 import qualified Source.Source as Source
@@ -26,8 +28,6 @@ import qualified System.Path as Path
 import qualified System.Path.Directory as Path
 import qualified Test.Tasty as Tasty
 import qualified Test.Tasty.HUnit as HUnit
-import qualified Language.Python.Grammar as TSP
-import qualified AST.Unmarshal as TS
 
 {-
 

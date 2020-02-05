@@ -25,13 +25,10 @@ instance Show body => Show (Module body) where
 type ModulePath = FilePath
 
 data ModuleInfo = ModuleInfo { modulePath :: ModulePath, moduleLanguage :: Text, moduleOid :: Text }
-  deriving (Eq, Ord)
+  deriving (Eq, Ord, Show)
 
 instance Lower ModuleInfo where
   lowerBound = ModuleInfo mempty "Unknown" mempty
-
-instance Show ModuleInfo where
-  showsPrec d = showsUnaryWith showsPrec "ModuleInfo" d . modulePath
 
 moduleInfoFromSrcLoc :: SrcLoc -> ModuleInfo
 moduleInfoFromSrcLoc loc = ModuleInfo (srcLocModule loc) "Unknown" mempty

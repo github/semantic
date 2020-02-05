@@ -22,6 +22,7 @@ library
   exposed-modules:
     Control.Carrier.Sketch.Fresh
     Control.Effect.Sketch
+    ScopeGraph.Algebraic
     ScopeGraph.Convert
     Data.Hole
     Data.Module
