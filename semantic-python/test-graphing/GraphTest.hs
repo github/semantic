@@ -103,7 +103,10 @@ expectedFunctionArg = do
   pure Complete
 
 expectedImportHole :: (Has Sketch sig m) => m Result
-expectedImportHole = undefined
+expectedImportHole = do
+  addImportEdge Import ["cheese", "ints"]
+
+
 
 assertLexicalScope :: HUnit.Assertion
 assertLexicalScope = do
@@ -123,7 +126,7 @@ assertFunctionArg = do
 
 assertImportHole :: HUnit.Assertion
 assertImportHole = do
-  let path = "semantic-python/test/fixtures/cheese/6-01-import-holes.py"
+  let path = "semantic-python/test/fixtures/cheese/6-01-imports.py"
   (graph, _) <- graphFile path
   case run (runSketch Nothing expectedImportHole) of
     (expecto, Complete) -> HUnit.assertEqual "Should work for simple case" expecto graph

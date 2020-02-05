@@ -346,8 +346,8 @@ putDeclarationScopeAtPosition scope position assocScope g@(ScopeGraph graph) = f
 lookupReference :: Ord scopeAddress => Name -> scopeAddress -> ScopeGraph scopeAddress -> Maybe (Path scopeAddress)
 lookupReference  name scope g = fmap snd . Map.lookup (Reference name) =<< pathsOfScope scope g
 
-insertEdge :: Ord scopeAddress => EdgeLabel -> NonEmpty scopeAddress -> scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
-insertEdge label targets currentAddress g@(ScopeGraph graph) = fromMaybe g $ do
+insertEdge :: Ord scopeAddress => EdgeLabel -> scopeAddress -> scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
+insertEdge label hole currentAddress g@(ScopeGraph graph) = fromMaybe g $ do
   currentScope' <- lookupScope currentAddress g
   scopes <- maybe (Just mempty) pure (Map.lookup label (edges currentScope'))
   let newScope = currentScope' { edges = Map.insert label (toList targets <> scopes) (edges currentScope') }
