@@ -30,15 +30,13 @@ import qualified Data.Error as Error
 import qualified Data.Flag as Flag
 import           Data.Foldable
 import qualified Data.Syntax as Syntax
-import           Data.Sum
-import           Data.Term
-import           Data.Typeable
 import           Parsing.Parser
 import           Parsing.TreeSitter
 import           Semantic.Config
 import           Semantic.Task (TaskSession (..))
 import           Semantic.Telemetry
 import           Semantic.Timeout
+import           Source.Source (Source)
 
 newtype ParseC m a = ParseC { runParse :: m a }
   deriving (Applicative, Functor, Monad, MonadFail, MonadIO)
@@ -72,11 +70,11 @@ runParser blob@Blob{..} parser = case parser of
       parseToPreciseAST (configTreeSitterParseTimeout config) (configTreeSitterUnmarshalTimeout config) language blob
         >>= either (\e -> trace (displayException e) *> throwError (SomeException e)) pure
 
-  eff (R other) = ParseC (eff (handleCoercible other))
+  AssignmentParser    parser assignment -> runAssignment Assignment.assign    parser blob assignment
 
+  where languageTag = [("language" :: String, show (blobLanguage blob))]
 
-data AssignmentTimedOut = AssignmentTimedOut
-  deriving (Show, Typeable)
+data AssignmentTimedOut = AssignmentTimedOut deriving (Show)
 
 instance Exception AssignmentTimedOut
 
