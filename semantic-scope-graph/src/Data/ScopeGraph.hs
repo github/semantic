@@ -356,24 +356,25 @@ insertEdge label target currentAddress g@(ScopeGraph graph) = fromMaybe g $ do
   let newScope = currentScope' { edges = Map.insert label (target : scopes) (edges currentScope') }
   pure (ScopeGraph (Map.insert currentAddress newScope graph))
 
-addImportEdge :: Ord scopeAddress => EdgeLabel -> NonEmpty scopeAddress -> scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
-addImportEdge edge names currentAddress g = do
-  case names of
-    (x :| []) -> addImportHole x currentAddress g
-    (x :| xs) -> do
-      case lookupScope x g of
-        Just _ -> addImportEdge edge (NonEmpty.fromList xs) x g
-        Nothing ->
-          let
-            scopeGraph' = insertEdge edge x currentAddress (newScope x mempty g)
-            in
-            addImportEdge edge (NonEmpty.fromList xs) x scopeGraph'
-
+addImportEdge :: Ord scopeAddress => EdgeLabel -> [scopeAddress] -> scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
+addImportEdge edge importEdge currentAddress g = do
+  case importEdge of
+    (name:[]) -> maybe
+                (insertEdge edge name currentAddress (newScope name mempty g))
+                (const (insertEdge edge name currentAddress g))
+                (lookupScope name g)
+    (name:names) -> let
+      scopeGraph' = maybe
+        (insertEdge VoidL name currentAddress (newScope name mempty g))
+        (const (insertEdge edge name currentAddress g))
+        (lookupScope name g)
+      in
+        addImportEdge edge names name scopeGraph'
 
 addImportHole :: Ord scopeAddress => scopeAddress -> scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
 addImportHole name currentAddress g = fromMaybe g $ do
   let scope' = newScope name mempty g
-  pure (insertEdge Void name currentAddress scope')
+  pure (insertEdge VoidL name currentAddress scope')
 
 
 -- | Update the 'Scope' containing a 'Declaration' with an associated scope address.
@@ -451,5 +452,5 @@ formatDeclaration = formatName . unDeclaration
 
 -- | The type of edge from a scope to its parent scopes.
 -- Either a lexical edge or an import edge in the case of non-lexical edges.
-data EdgeLabel = Lexical | Import | Void | Export | Superclass
+data EdgeLabel = Lexical | Import | Export | Superclass | VoidL
   deriving (Bounded, Enum, Eq, Ord, Show)

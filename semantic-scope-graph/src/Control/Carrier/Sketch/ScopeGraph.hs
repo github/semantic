@@ -35,6 +35,7 @@ import           Data.Semilattice.Lower
 import           GHC.Records
 import           Source.Span
 import qualified System.Path as Path
+import qualified Data.List.NonEmpty as NonEmpty
 
 -- | The state type used to keep track of the in-progress graph and
 -- positional/contextual information. The name "sketchbook" is meant
@@ -93,7 +94,7 @@ instance (Effect sig, Algebra sig m) => Algebra (ScopeGraphEff :+: Reader Name :
     k name
   alg (L (InsertEdge label address k)) = do
     Sketchbook old current <- SketchC get
-    let new = ScopeGraph.addImportEdge label address current old
+    let new = ScopeGraph.addImportEdge label (NonEmpty.toList address) current old
     SketchC (put (Sketchbook new current))
     k ()
 
