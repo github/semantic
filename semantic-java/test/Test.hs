@@ -5,8 +5,8 @@ import qualified System.Path as Path
 import           Test.Tasty
 import           TreeSitter.Java
 import qualified TreeSitter.Java.AST as Java
-import           TreeSitter.Test.Helpers
 import           TreeSitter.Unmarshal
+import           AST.Test
 
 main :: IO ()
 main
