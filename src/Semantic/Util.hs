@@ -26,7 +26,9 @@ import           Control.Carrier.Reader
 import           Control.Carrier.Resumable.Either (SomeError (..))
 import           Control.Carrier.State.Strict
 import           Control.Carrier.Trace.Printing
+import           Control.Exception hiding (evaluate)
 import           Control.Lens.Getter
+import           Control.Monad
 import           Data.Abstract.Address.Precise as Precise
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
@@ -34,13 +36,14 @@ import qualified Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Package
 import           Data.Abstract.Value.Concrete as Concrete
 import           Data.Blob.IO
-import           Data.Graph (topologicalSort)
+import           Data.Graph.Algebraic (topologicalSort)
 import qualified Data.Language as Language
 import           Data.List (uncons)
+import           Data.Maybe
 import           Data.Project
-import           Data.Sum (weaken)
+import           Data.Semilattice.Lower
+import           Data.Sum
 import           Parsing.Parser
-import           Prologue
 import           Semantic.Analysis
 import           Semantic.Config
 import           Semantic.Graph

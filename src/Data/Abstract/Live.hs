@@ -1,4 +1,7 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
 module Data.Abstract.Live
   ( Live (..)
   , fromAddresses
@@ -11,15 +14,17 @@ module Data.Abstract.Live
   , liveMap
   ) where
 
-import Data.Set as Set
-import Prologue
+import Data.Function
+import Data.Functor.Classes
+import Data.Semilattice.Lower
+import Data.Set as Set hiding (foldr)
 
 -- | A set of live addresses (whether roots or reachable).
 newtype Live address = Live { unLive :: Set address }
   deriving (Eq, Lower, Monoid, Ord, Semigroup)
 
 fromAddresses :: (Foldable t, Ord address) => t address -> Live address
-fromAddresses = Prologue.foldr liveInsert lowerBound
+fromAddresses = foldr liveInsert lowerBound
 
 -- | Construct a 'Live' set containing only the given address.
 liveSingleton :: address -> Live address

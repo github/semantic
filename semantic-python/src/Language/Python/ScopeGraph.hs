@@ -16,32 +16,32 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module Language.Python.ScopeGraph
   ( scopeGraphModule
   ) where
 
-import           AST.Element
 import qualified Analysis.Name as Name
-import           Control.Algebra (Algebra (..), handleCoercible)
+import           AST.Element
 import           Control.Effect.Fresh
 import           Control.Effect.ScopeGraph
+import           Control.Lens (set, (^.))
 import           Data.Foldable
 import           Data.Maybe
 import           Data.Monoid
 import qualified Data.ScopeGraph as ScopeGraph
+import           Data.Semilattice.Lower
 import           Data.Traversable
 import           GHC.Records
 import           GHC.TypeLits
+import qualified Language.Python.AST as Py
 import           Language.Python.Patterns
 import           ScopeGraph.Convert (Result (..), complete, todo)
+import qualified ScopeGraph.Properties.Declaration as Props
+import qualified ScopeGraph.Properties.Function as Props
+import qualified ScopeGraph.Properties.Reference as Props
 import           Source.Loc
-import qualified TreeSitter.Python.AST as Py
-
--- This orphan instance will perish once it lands in fused-effects.
-instance Algebra sig m => Algebra sig (Ap m) where
-  alg = Ap . alg . handleCoercible
+import           Source.Span (span_)
 
 -- This typeclass is internal-only, though it shares the same interface
 -- as the one defined in semantic-scope-graph. The somewhat-unconventional
@@ -92,10 +92,15 @@ scopeGraphModule = getAp . scopeGraph
 instance ToScopeGraph Py.AssertStatement where scopeGraph = onChildren
 
 instance ToScopeGraph Py.Assignment where
-  scopeGraph (Py.Assignment _ (SingleIdentifier t) _val _typ) = do
-    let declProps = (DeclProperties ScopeGraph.Assignment ScopeGraph.Default Nothing)
-    complete <* declare t declProps
-  scopeGraph x                                                = todo x
+  scopeGraph (Py.Assignment ann (SingleIdentifier t) val _typ) = do
+    declare t Props.Declaration
+      { Props.kind     = ScopeGraph.Assignment
+      , Props.relation = ScopeGraph.Default
+      , Props.associatedScope = Nothing
+      , Props.span = ann^.span_
+      }
+    maybe complete scopeGraph val
+  scopeGraph x = todo x
 
 instance ToScopeGraph Py.Await where
   scopeGraph (Py.Await _ a) = scopeGraph a
@@ -177,23 +182,31 @@ instance ToScopeGraph Py.ForStatement where scopeGraph = todo
 
 instance ToScopeGraph Py.FunctionDefinition where
   scopeGraph Py.FunctionDefinition
-    { name       = Py.Identifier _ann1 name
+    { ann
+    , name       = Py.Identifier _ann1 name
     , parameters = Py.Parameters _ann2 parameters
     , body
     } = do
-    let funProps = FunProperties ScopeGraph.Function
-    (_, associatedScope) <- declareFunction (Just $ Name.name name) funProps
+    (_, associatedScope) <- declareFunction (Just $ Name.name name) Props.Function
+      { Props.kind = ScopeGraph.Function
+      , Props.span = ann^.span_
+      }
     withScope associatedScope $ do
-      let declProps = DeclProperties ScopeGraph.Parameter ScopeGraph.Default Nothing
-      let param (Py.Parameter (Prj (Py.Identifier _pann pname))) = Just (Name.name pname)
-          param _                                                = Nothing
+      let declProps = Props.Declaration
+            { Props.kind = ScopeGraph.Parameter
+            , Props.relation = ScopeGraph.Default
+            , Props.associatedScope = Nothing
+            , Props.span = lowerBound
+            }
+      let param (Py.Parameter (Prj (Py.Identifier pann pname))) = Just (pann, Name.name pname)
+          param _                                               = Nothing
       let parameterMs = fmap param parameters
       if any isNothing parameterMs
         then todo parameterMs
         else do
           let parameters' = catMaybes parameterMs
-          paramDeclarations <- for parameters' $ \parameter ->
-            complete <* declare parameter declProps
+          paramDeclarations <- for parameters' $ \(pos, parameter) ->
+            complete <* declare parameter (set span_ (pos^.span_) declProps)
           bodyResult <- scopeGraph body
           pure (mconcat paramDeclarations <> bodyResult)
 
@@ -203,7 +216,7 @@ instance ToScopeGraph Py.GeneratorExpression where scopeGraph = todo
 
 instance ToScopeGraph Py.Identifier where
   scopeGraph (Py.Identifier _ name) = do
-    reference name name RefProperties
+    reference name name Props.Reference
     complete
 
 instance ToScopeGraph Py.IfStatement where

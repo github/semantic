@@ -1,4 +1,13 @@
-{-# LANGUAGE DerivingVia, FlexibleContexts, FlexibleInstances, LambdaCase, MultiParamTypeClasses, OverloadedStrings, RankNTypes, ScopedTypeVariables, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE DerivingVia #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Analysis.Abstract.Graph
 ( Graph(..)
 , ControlFlowVertex(..)
@@ -17,7 +26,7 @@ module Analysis.Abstract.Graph
 ) where
 
 import           Algebra.Graph.Export.Dot hiding (vertexName)
-import           Control.Abstract hiding (Function(..))
+import           Control.Abstract hiding (Function (..))
 import           Control.Algebra
 import           Control.Carrier.Reader
 import           Control.Carrier.State.Strict
@@ -25,11 +34,11 @@ import           Control.Effect.Sum.Project
 import           Data.Abstract.BaseError
 import           Data.Abstract.Module (Module (moduleInfo), ModuleInfo (..))
 import           Data.ByteString.Builder
-import           Data.Graph
+import           Data.Graph.Algebraic
 import           Data.Graph.ControlFlowVertex
+import           Data.Map (Map)
 import qualified Data.Map as Map
 import qualified Data.Text.Encoding as T
-import           Prologue
 import           Source.Loc
 
 style :: Style ControlFlowVertex Builder
@@ -123,7 +132,7 @@ graphingModules recur m = do
   where
     -- NB: path is null for Languages like Ruby that have module imports that require concrete value semantics.
     includeModule path
-      = let path' = if Prologue.null path then "unknown, concrete semantics required" else path
+      = let path' = if Prelude.null path then "unknown, concrete semantics required" else path
             info = moduleInfo m
       in moduleInclusion (moduleVertex (ModuleInfo path' (moduleLanguage info) (moduleOid info)))
 

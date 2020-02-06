@@ -1,12 +1,16 @@
-{-# LANGUAGE DeriveAnyClass, DeriveGeneric, DeriveTraversable, DuplicateRecordFields #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE DuplicateRecordFields #-}
 module Language.TSX.Syntax.JSX (module Language.TSX.Syntax.JSX) where
 
-import Prologue
-
 import           Data.Abstract.Evaluatable
+import           Data.Functor.Classes.Generic
+import           Data.Hashable.Lifted
 import           Data.JSON.Fields
 import qualified Data.Text as T
 import           Diffing.Algorithm
+import           GHC.Generics (Generic1)
 
 
 data JsxElement a = JsxElement { jsxOpeningElement :: !a,  jsxElements :: ![a], jsxClosingElement :: !a }

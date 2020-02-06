@@ -1,13 +1,15 @@
--- ATTENTION: care must be taken to keep this file in sync with cabal.project. If you add a package here, add it there (and add a package stanza with ghc-options to enable errors in CI at the bottom of this file).
+-- ATTENTION: care must be taken to keep this file in sync with cabal.project and script/ghci-flags. If you add a package here, add it there (and add a package stanza with ghc-options to enable errors in CI at the bottom of this file).
 
 -- Local packages
 packages: .
           semantic-analysis
           semantic-ast
+          semantic-codegen
           semantic-core
           semantic-go
           semantic-java
           semantic-json
+          semantic-parse
           semantic-python
           semantic-ruby
           semantic-scope-graph
@@ -43,6 +45,9 @@ package semantic-analysis
 package semantic-ast
   ghc-options: -Werror
 
+package semantic-codegen
+  ghc-options: -Werror
+
 package semantic-core
   ghc-options: -Werror
 
@@ -53,6 +58,9 @@ package semantic-java
   ghc-options: -Werror
 
 package semantic-json
+  ghc-options: -Werror
+
+package semantic-parse
   ghc-options: -Werror
 
 package semantic-python

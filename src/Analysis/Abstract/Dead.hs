@@ -1,4 +1,8 @@
-{-# LANGUAGE FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, MultiParamTypeClasses, StandaloneDeriving #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE StandaloneDeriving #-}
 module Analysis.Abstract.Dead
 ( Dead(..)
 , revivingTerms
@@ -9,9 +13,10 @@ module Analysis.Abstract.Dead
 import Control.Abstract
 import Control.Carrier.State.Strict
 import Data.Abstract.Module
+import Data.Functor.Foldable
 import Data.Semigroup.Reducer as Reducer
-import Data.Set (delete)
-import Prologue
+import Data.Semilattice.Lower
+import Data.Set (Set, delete)
 
 -- | A set of “dead” (unreachable) terms.
 newtype Dead term = Dead { unDead :: Set term }

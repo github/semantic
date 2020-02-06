@@ -1,11 +1,17 @@
-{-# LANGUAGE DeriveAnyClass, DeriveGeneric, DeriveTraversable, DerivingVia, MultiParamTypeClasses #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE DerivingVia #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 module Data.Syntax.Comment (module Data.Syntax.Comment) where
 
-import Prologue
-
 import Data.Abstract.Evaluatable
+import Data.Functor.Classes.Generic
+import Data.Hashable.Lifted
 import Data.JSON.Fields
+import Data.Text (Text)
 import Diffing.Algorithm
+import GHC.Generics (Generic1)
 
 -- | An unnested comment (line or block).
 newtype Comment a = Comment { commentContent :: Text }

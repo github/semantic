@@ -1,12 +1,19 @@
-{-# LANGUAGE DataKinds, FlexibleInstances, MultiParamTypeClasses, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Analysis.ConstructorName
 ( ConstructorName(..)
 ) where
 
+import Data.Proxy
 import Data.Sum
 import Data.Term
 import GHC.Generics
-import Prologue
 
 -- | A typeclass to retrieve the name of the data constructor for a value.
 --

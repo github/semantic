@@ -23,19 +23,19 @@ import           Analysis.Name (Name)
 import qualified Analysis.Name as Name
 import           Control.Algebra
 import           Control.Carrier.Fresh.Strict
-import           Control.Carrier.State.Strict
 import           Control.Carrier.Reader
-import           Control.Effect.ScopeGraph (ScopeGraphEff(..), DeclProperties(..))
+import           Control.Carrier.State.Strict
+import           Control.Effect.ScopeGraph (ScopeGraphEff (..))
 import           Control.Monad.IO.Class
 import           Data.Bifunctor
+import qualified Data.List.NonEmpty as NonEmpty
 import           Data.Module
 import           Data.ScopeGraph (ScopeGraph)
 import qualified Data.ScopeGraph as ScopeGraph
 import           Data.Semilattice.Lower
-import           GHC.Records
+import qualified ScopeGraph.Properties.Declaration as Props
 import           Source.Span
 import qualified System.Path as Path
-import qualified Data.List.NonEmpty as NonEmpty
 
 -- | The state type used to keep track of the in-progress graph and
 -- positional/contextual information. The name "sketchbook" is meant
@@ -60,15 +60,16 @@ newtype SketchC address m a = SketchC (StateC Sketchbook (FreshC m) a)
 instance (Effect sig, Algebra sig m) => Algebra (ScopeGraphEff :+: Reader Name :+: Fresh :+: sig) (SketchC Name m) where
   alg (L (Declare n props k)) = do
     Sketchbook old current <- SketchC (get @Sketchbook)
+    let Props.Declaration kind relation associatedScope span = props
     let (new, _pos) =
           ScopeGraph.declare
           (ScopeGraph.Declaration n)
           (lowerBound @ModuleInfo)
-          (relation props)
+          relation
           ScopeGraph.Public
-          (lowerBound @Span)
-          (getField @"kind" @DeclProperties props)
-          (associatedScope props)
+          span
+          kind
+          associatedScope
           current
           old
     SketchC (put (Sketchbook new current))

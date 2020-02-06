@@ -1,17 +1,30 @@
-{-# LANGUAGE DeriveAnyClass, DeriveGeneric, DeriveTraversable, DuplicateRecordFields, FlexibleContexts, RecordWildCards, TupleSections, TypeApplications #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TupleSections #-}
+{-# LANGUAGE TypeApplications #-}
 module Language.TypeScript.Syntax.TypeScript (module Language.TypeScript.Syntax.TypeScript) where
 
-import Prologue
-
 import           Control.Abstract hiding (Import)
+import           Control.Monad
 import           Data.Abstract.Evaluatable as Evaluatable
+import qualified Data.Abstract.ScopeGraph as ScopeGraph
+import           Data.Foldable
+import           Data.Functor.Classes.Generic
+import           Data.Hashable.Lifted
 import           Data.JSON.Fields
+import           Data.List.NonEmpty (nonEmpty)
 import qualified Data.Map.Strict as Map
+import           Data.Maybe.Exts
 import           Data.Semigroup.App
 import           Data.Semigroup.Foldable
 import qualified Data.Text as T
+import           Data.Traversable
 import           Diffing.Algorithm
-import qualified Data.Abstract.ScopeGraph as ScopeGraph
+import           GHC.Generics (Generic1)
 
 -- | ShorthandPropertyIdentifier used in object patterns such as var baz = { foo } to mean var baz = { foo: foo }
 newtype ShorthandPropertyIdentifier a = ShorthandPropertyIdentifier { contents :: T.Text }

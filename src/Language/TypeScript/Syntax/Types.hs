@@ -1,14 +1,20 @@
-{-# LANGUAGE DeriveAnyClass, DeriveGeneric, DeriveTraversable, DuplicateRecordFields, RecordWildCards, TypeApplications #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TypeApplications #-}
 module Language.TypeScript.Syntax.Types (module Language.TypeScript.Syntax.Types) where
-
-import Prologue
 
 import           Control.Abstract hiding (Import)
 import           Data.Abstract.Evaluatable as Evaluatable
+import qualified Data.Abstract.ScopeGraph as ScopeGraph
+import           Data.Functor.Classes.Generic
+import           Data.Hashable.Lifted
 import           Data.JSON.Fields
 import qualified Data.Text as T
 import           Diffing.Algorithm
-import qualified Data.Abstract.ScopeGraph as ScopeGraph
+import           GHC.Generics (Generic1)
 
 -- | Lookup type for a type-level key in a typescript map.
 data LookupType a = LookupType { lookupTypeIdentifier :: a, lookupTypeKey :: a }

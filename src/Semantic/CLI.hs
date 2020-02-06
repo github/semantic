@@ -5,15 +5,18 @@ module Semantic.CLI (main) where
 import qualified Analysis.File as File
 import qualified Control.Carrier.Parse.Measured as Parse
 import           Control.Carrier.Reader
+import           Control.Exception
+import           Control.Monad.IO.Class
 import           Data.Blob.IO
 import           Data.Either
 import qualified Data.Flag as Flag
+import           Data.Foldable
 import           Data.Handle
 import qualified Data.Language as Language
 import           Data.List (intercalate)
+import           Data.Maybe.Exts
 import           Data.Project
 import           Options.Applicative hiding (style)
-import           Prologue
 import           Semantic.Api hiding (File)
 import           Semantic.Config
 import qualified Semantic.Graph as Graph
@@ -28,7 +31,6 @@ import qualified System.Path as Path
 import qualified System.Path.PartClass as Path.PartClass
 
 import Control.Concurrent (mkWeakThreadId, myThreadId)
-import Control.Exception (throwTo)
 import Proto.Semantic_JSON ()
 import System.Mem.Weak (deRefWeak)
 import System.Posix.Signals

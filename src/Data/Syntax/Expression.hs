@@ -1,19 +1,39 @@
-{-# LANGUAGE DeriveAnyClass, DeriveGeneric, DeriveTraversable, DuplicateRecordFields, FlexibleContexts, MultiParamTypeClasses, OverloadedStrings, RecordWildCards, ScopedTypeVariables, TypeApplications, UndecidableInstances #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Data.Syntax.Expression (module Data.Syntax.Expression) where
 
 import Prelude hiding (null)
-import Prologue hiding (index, null)
 
 import           Analysis.Name as Name
 import           Control.Abstract hiding (Bitwise (..), Call)
+import           Control.Applicative
+import           Control.Monad
 import           Data.Abstract.Evaluatable as Abstract
 import           Data.Abstract.Number (liftIntegralFrac, liftReal, liftedExponent, liftedFloorDiv)
+import qualified Data.Abstract.ScopeGraph as ScopeGraph
+import           Data.Bits
 import           Data.Fixed
+import           Data.Foldable (for_)
+import           Data.Functor.Classes.Generic
+import           Data.Hashable.Lifted
 import           Data.JSON.Fields
+import           Data.List (find)
+import           Data.List.NonEmpty (NonEmpty)
 import qualified Data.List.NonEmpty as NonEmpty
 import qualified Data.Map.Strict as Map
+import           Data.Maybe
+import           Data.Maybe.Exts
 import           Diffing.Algorithm hiding (Delete)
-import qualified Data.Abstract.ScopeGraph as ScopeGraph
+import           GHC.Generics (Generic1)
 
 -- | Typical prefix function application, like `f(x)` in many languages, or `f x` in Haskell.
 data Call a = Call { callContext :: ![a], callFunction :: !a, callParams :: ![a], callBlock :: !a }
@@ -454,7 +474,7 @@ instance Evaluatable MemberAccess where
     case lhsFrame of
       Just lhsFrame -> withScopeAndFrame lhsFrame (ref' rhs)
       -- Throw a ReferenceError since we're attempting to reference a name within a value that is not an Object.
-      Nothing -> throwEvalError (ReferenceError lhsValue rhs)
+      Nothing       -> throwEvalError (ReferenceError lhsValue rhs)
 
 
 -- | Subscript (e.g a[1])

@@ -24,9 +24,12 @@ common haskell
                      , fused-effects ^>= 1.0
                      , fused-syntax
                      , parsers ^>= 0.12.10
+                     , semantic-ast
+                     , semantic-codegen
                      , semantic-core ^>= 0.0
                      , semantic-source ^>= 0.0.2
                      , semantic-tags ^>= 0.0
+                     , template-haskell ^>= 2.15
                      , text ^>= 1.2.3
                      , tree-sitter ^>= 0.8
                      , tree-sitter-tsx ^>= 0.4.2
@@ -50,5 +53,6 @@ library
   import: haskell
   exposed-modules:
     Language.TSX
+    Language.TSX.AST
     Language.TSX.Tags
   hs-source-dirs: src

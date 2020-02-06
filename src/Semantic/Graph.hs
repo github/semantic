@@ -46,13 +46,13 @@ import           Analysis.Abstract.Graph as Graph
 import           Analysis.File
 import           Control.Abstract hiding (String)
 import           Control.Abstract.PythonPackage as PythonPackage
-import           Control.Algebra
 import           Control.Carrier.Fresh.Strict
 import           Control.Carrier.Reader
 import           Control.Carrier.Resumable.Resume
 import           Control.Carrier.State.Strict
 import           Control.Effect.Parse
 import           Control.Lens.Getter
+import           Control.Monad
 import           Data.Abstract.AccessControls.Instances ()
 import           Data.Abstract.Address.Hole as Hole
 import           Data.Abstract.Address.Monovariant as Monovariant
@@ -66,17 +66,19 @@ import           Data.Abstract.Value.Abstract as Abstract
 import           Data.Abstract.Value.Concrete as Concrete (Value, ValueError (..), runValueErrorWith)
 import           Data.Abstract.Value.Type as Type
 import           Data.Blob
-import           Data.Graph
+import           Data.Functor.Foldable
+import           Data.Graph.Algebraic
 import           Data.Graph.ControlFlowVertex (VertexDeclaration)
 import           Data.Language as Language
-import           Data.List (isPrefixOf)
+import           Data.List (find, isPrefixOf)
+import           Data.Map (Map)
 import qualified Data.Map as Map
 import           Data.Project
+import           Data.Proxy
 import           Data.Text (pack, unpack)
 import           Language.Haskell.HsColour
 import           Language.Haskell.HsColour.Colourise
 import           Parsing.Parser
-import           Prologue hiding (TypeError (..))
 import           Semantic.Analysis
 import           Semantic.Task as Task
 import           Source.Loc as Loc

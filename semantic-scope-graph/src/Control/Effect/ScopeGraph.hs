@@ -10,13 +10,10 @@
 
 -- | The ScopeGraph effect is used to build up a scope graph over
 -- the lifetime of a monadic computation. The name is meant to evoke
--- physically ScopeGraphing the hierarchical outline of a graph.
+-- physically sketching the hierarchical outline of a graph.
 module Control.Effect.ScopeGraph
   ( ScopeGraph
   , ScopeGraphEff (..)
-  , DeclProperties (..)
-  , RefProperties (..)
-  , FunProperties (..)
   , declare
   -- Scope Manipulation
   , currentScope
@@ -42,16 +39,9 @@ import           GHC.Generics (Generic, Generic1)
 import           GHC.Records
 import Data.List.NonEmpty
 
-data DeclProperties = DeclProperties {
-    kind            :: ScopeGraph.Kind
-  , relation        :: ScopeGraph.Relation
-  , associatedScope :: Maybe Name
-}
-
-data RefProperties = RefProperties
-data FunProperties = FunProperties {
-  kind :: ScopeGraph.Kind
-}
+import qualified ScopeGraph.Properties.Declaration as Props
+import qualified ScopeGraph.Properties.Function as Props
+import qualified ScopeGraph.Properties.Reference as Props
 
 type ScopeGraph
   = ScopeGraphEff
@@ -59,8 +49,8 @@ type ScopeGraph
   :+: Reader Name
 
 data ScopeGraphEff m k =
-    Declare Name DeclProperties (() -> m k)
-  | Reference Text Text RefProperties (() -> m k)
+    Declare Name Props.Declaration (() -> m k)
+  | Reference Text Text Props.Reference (() -> m k)
   | NewScope (Map ScopeGraph.EdgeLabel [Name]) (Name -> m k)
   | InsertEdge ScopeGraph.EdgeLabel (NonEmpty Name) (() -> m k)
   deriving (Generic, Generic1, HFunctor, Effect)
@@ -68,11 +58,11 @@ data ScopeGraphEff m k =
 currentScope :: Has (Reader Name) sig m => m Name
 currentScope = ask
 
-declare :: forall sig m . Has ScopeGraph sig m => Name -> DeclProperties -> m ()
+declare :: forall sig m . (Has ScopeGraph sig m) => Name -> Props.Declaration -> m ()
 declare n props = send (Declare n props pure)
 
 -- | Establish a reference to a prior declaration.
-reference :: forall sig m . Has ScopeGraph sig m => Text -> Text -> RefProperties -> m ()
+reference :: forall sig m . (Has ScopeGraph sig m) => Text -> Text -> Props.Reference -> m ()
 reference n decl props = send (Reference n decl props pure)
 
 newScope :: forall sig m . Has ScopeGraph sig m => Map ScopeGraph.EdgeLabel [Name] -> m Name
@@ -82,22 +72,29 @@ newScope edges = send (NewScope edges pure)
 insertEdge :: Has ScopeGraph sig m => ScopeGraph.EdgeLabel -> NonEmpty Name -> m ()
 insertEdge label targets = send (InsertEdge label targets pure)
 
-declareFunction :: forall sig m . Has ScopeGraph sig m => Maybe Name -> FunProperties -> m (Name, Name)
-declareFunction name props = do
+declareFunction :: forall sig m . (Has ScopeGraph sig m) => Maybe Name -> Props.Function -> m (Name, Name)
+declareFunction name (Props.Function kind span) = do
   currentScope' <- currentScope
   let lexicalEdges = Map.singleton ScopeGraph.Lexical [ currentScope' ]
   associatedScope <- newScope lexicalEdges
-  name' <- declareMaybeName name (DeclProperties { relation = ScopeGraph.Default, kind = (getField @"kind" @FunProperties props), associatedScope = Just associatedScope })
+  name' <- declareMaybeName name Props.Declaration
+                                   { Props.relation = ScopeGraph.Default
+                                   , Props.kind = kind
+                                   , Props.associatedScope = Just associatedScope
+                                   , Props.span = span
+                                   }
   pure (name', associatedScope)
 
 declareMaybeName :: Has ScopeGraph sig m
                  => Maybe Name
-                 -> DeclProperties
+                 -> Props.Declaration
                  -> m Name
 declareMaybeName maybeName props = do
   case maybeName of
-    Just name -> declare name props >> pure name
-    _         -> Name.gensym >>= \name -> declare name (props { relation = ScopeGraph.Gensym }) >> pure name -- TODO: Modify props and change Kind to Gensym
+    Just name -> name <$ declare name props
+    _         -> do
+      name <- Name.gensym
+      name <$ declare name (props { Props.relation = ScopeGraph.Gensym })
 
 withScope :: Has ScopeGraph sig m
           => Name

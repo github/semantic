@@ -1,4 +1,12 @@
-{-# LANGUAGE FlexibleContexts, GADTs, LambdaCase, OverloadedStrings, RankNTypes, ScopedTypeVariables, TypeApplications, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Tags.Tagging
 ( runTagging
 , Tag(..)
@@ -8,10 +16,11 @@ module Tags.Tagging
 where
 
 import Prelude hiding (fail, filter, log)
-import Prologue hiding (Element, hash)
 
 import           Control.Carrier.State.Strict as Eff
+import           Control.Monad
 import           Data.Abstract.Declarations (Declarations)
+import           Data.Functor.Foldable
 import           Data.Text as T hiding (empty)
 import           Streaming
 import qualified Streaming.Prelude as Streaming

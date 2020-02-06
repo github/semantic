@@ -1,28 +1,25 @@
-# semantic-ast
+# semantic-parse
 
-This package has two goals:
-
-1. Develop a library that will produce ASTs;
-2. Provide a command line tool that will output ASTs in supported formats.
+This package provides a command line tool that will output ASTs in supported formats.
 
 #### CLI
 
-To output ASTs, run the `semantic-ast` command, specifying two mandatory options: 1) the format you'd like to return (ex., `Show`, `JSON`, etc.) and 2) the option specifying whether the source code will be passed in directly via command line (using `--sourceString`) or via providing the file path `--sourceFile`.
+To output ASTs, run the `semantic-parse` command, specifying two mandatory options: 1) the format you'd like to return (ex., `Show`, `JSON`, etc.) and 2) the option specifying whether the source code will be passed in directly via command line (using `--sourceString`) or via providing the file path `--sourceFile`.
 
 Filepath:
 ```
-semantic-ast --format [FORMAT] --sourceFile [FILEPATH]
+semantic-parse --format [FORMAT] --sourceFile [FILEPATH]
 ```
 
 Source string:
 ```
-semantic-ast --format [FORMAT] --sourceString [SOURCE]
+semantic-parse --format [FORMAT] --sourceString [SOURCE]
 ```
 
 An example command is:
 
 ```
-semantic-ast -- --format Show --sourceString "a"
+semantic-parse -- --format Show --sourceString "a"
 ```
 
 This will generate an AST

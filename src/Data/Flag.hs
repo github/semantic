@@ -8,7 +8,7 @@ module Data.Flag
   , choose
   ) where
 
-import Prologue
+import Data.Coerce
 
 -- | To declare a new flag, declare a singly-inhabited type:
 -- @data MyFlag = MyFlag@

@@ -1,4 +1,8 @@
-{-# LANGUAGE ConstraintKinds, DataKinds, GADTs, TypeApplications, TypeFamilies #-}
+{-# LANGUAGE ConstraintKinds #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeFamilies #-}
 module Parsing.Parser
 ( Parser(..)
   -- * Parsers
@@ -40,7 +44,9 @@ module Parsing.Parser
 import           Assigning.Assignment
 import qualified CMarkGFM
 import           Data.AST
+import           Data.Functor.Classes
 import           Data.Language
+import           Data.Map (Map)
 import qualified Data.Map as Map
 import qualified Data.Syntax as Syntax
 import           Data.Term
@@ -60,15 +66,14 @@ import qualified Language.TSX.Assignment as TSXALaCarte
 import qualified Language.TypeScript as TypeScriptPrecise
 import qualified Language.TypeScript.Assignment as TypeScriptALaCarte
 import           Prelude hiding (fail)
-import           Prologue
-import           TreeSitter.Go
+import           Language.Go.Grammar
 import qualified TreeSitter.Language as TS (Language, Symbol)
 import           TreeSitter.PHP
-import           TreeSitter.Python
-import           TreeSitter.Ruby (tree_sitter_ruby)
+import           Language.Python.Grammar
+import           Language.Ruby.Grammar (tree_sitter_ruby)
 import           TreeSitter.TSX
-import           TreeSitter.TypeScript
-import           TreeSitter.Unmarshal
+import           Language.TypeScript.Grammar
+import           AST.Unmarshal
 
 -- | A parser from 'Source' onto some term type.
 data Parser term where

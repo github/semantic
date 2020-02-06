@@ -1,10 +1,8 @@
-{-# LANGUAGE PackageImports #-}
-
 module Data.Graph.Spec (spec) where
 
 import SpecHelpers
 
-import "semantic" Data.Graph
+import Data.Graph.Algebraic
 import qualified Algebra.Graph.Class as Class
 
 spec :: Spec

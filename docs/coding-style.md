@@ -13,8 +13,6 @@ Our CI systems ensure that all patches pass `hlint`'s muster. We have our own se
 We strongly recommend adding Haddock documentation to any function/data type, unless its purpose is immediately apparent from its name.
 Comments should describe the "why", type signatures should describe the "what", and the code should describe the "how".
 
-The Haskell Prelude is too minimal for serious work. The `Prologue` module should be imported in most files, as it reexports most of what you need.
-
 # Formatting
 
 2 spaces everywhere. Tabs are forbidden. Haskell indentation can be unpredictable, so generally stick with what your editor suggests.
@@ -50,14 +48,6 @@ data Pos = Pos
   }
 ```
 
-### Split up imports into logical groups.
-
-We use the following convention, each section separated by a newline:
-
-1. Prelude/Prologue import
-2. Library/stdlib imports
-3. Local in-project imports.
-
 ### Align typographical symbols.
 
 `->` in `case` statements and signatures, `=` in functions, and `::` in records should be aligned. Your editor can help with this. In certain situations, aligning symbols may decrease readability, e.g. complicated `case` statements. Use your best judgment.
@@ -66,7 +56,7 @@ We use the following convention, each section separated by a newline:
 
 Locally bound variables (such as the arguments to functions, or helpers defined in a `where` clause) can have short names, such as `x` or `go`. Globally bound functions and variables should have descriptive names.
 
-You'll often find yourself implementing functions that conflict with Prelude/Prologue definitions. If this is the case, avoid adding a prefix to these functions, and instead import them qualified.
+You'll often find yourself implementing functions that conflict with Prelude definitions. If this is the case, avoid adding a prefix to these functions, and instead import them qualified.
 
 ``` haskell
 -- Broke
