@@ -16,7 +16,6 @@ import           Control.Monad
 import qualified Data.ByteString as ByteString
 import qualified Data.List.NonEmpty as NonEmpty
 import qualified Data.ScopeGraph as ScopeGraph
-import qualified Data.ScopeGraph as ScopeGraph
 import           Data.Semilattice.Lower
 import qualified Language.Python ()
 import qualified Language.Python as Py (Term)
