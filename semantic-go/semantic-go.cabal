@@ -58,7 +58,7 @@ library
   hs-source-dirs: src
 
 test-suite test
-  import: common
+  import: haskell
   type:             exitcode-stdio-1.0
   hs-source-dirs:   test
   main-is:          Test.hs
