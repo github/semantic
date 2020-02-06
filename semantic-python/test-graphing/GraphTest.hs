@@ -13,11 +13,16 @@ import           Control.Carrier.Sketch.Fresh
 import           Control.Monad
 import qualified Data.ByteString as ByteString
 import qualified Data.ScopeGraph as ScopeGraph
+import           Data.Semilattice.Lower
 import qualified Language.Python ()
 import qualified Language.Python as Py (Term)
 import           ScopeGraph.Convert
+import qualified ScopeGraph.Properties.Declaration as Props
+import qualified ScopeGraph.Properties.Function as Props
+import qualified ScopeGraph.Properties.Reference as Props
 import           Source.Loc
 import qualified Source.Source as Source
+import           Source.Span
 import           System.Exit (die)
 import           System.Path ((</>))
 import qualified System.Path as Path
@@ -53,8 +58,8 @@ runScopeGraph p _src item = run . runSketch (Just p) $ scopeGraph item
 
 sampleGraphThing :: (Has Sketch sig m) => m Result
 sampleGraphThing = do
-  declare "hello" (DeclProperties ScopeGraph.Assignment ScopeGraph.Default Nothing)
-  declare "goodbye" (DeclProperties ScopeGraph.Assignment ScopeGraph.Default Nothing)
+  declare "hello" (Props.Declaration ScopeGraph.Assignment ScopeGraph.Default Nothing (Span (Pos 2 0) (Pos 2 10)))
+  declare "goodbye" (Props.Declaration ScopeGraph.Assignment ScopeGraph.Default Nothing (Span (Pos 3 0) (Pos 3 12)))
   pure Complete
 
 graphFile :: FilePath -> IO (ScopeGraph.ScopeGraph Name, Result)
@@ -74,8 +79,8 @@ assertSimpleAssignment = do
 
 expectedReference :: (Has Sketch sig m) => m Result
 expectedReference = do
-  declare "x" (DeclProperties ScopeGraph.Assignment ScopeGraph.Default Nothing)
-  reference "x" "x" RefProperties
+  declare "x" (Props.Declaration ScopeGraph.Assignment ScopeGraph.Default Nothing (Span (Pos 0 0) (Pos 0 5)))
+  reference "x" "x" Props.Reference
   pure Complete
 
 assertSimpleReference :: HUnit.Assertion
@@ -88,18 +93,18 @@ assertSimpleReference = do
 
 expectedLexicalScope :: (Has Sketch sig m) => m Result
 expectedLexicalScope = do
-  _ <- declareFunction (Just $ Name.name "foo") (FunProperties ScopeGraph.Function)
-  reference "foo" "foo" RefProperties {}
+  _ <- declareFunction (Just $ Name.name "foo") (Props.Function ScopeGraph.Function (Span (Pos 0 0) (Pos 1 24)))
+  reference "foo" "foo" Props.Reference {}
   pure Complete
 
 expectedFunctionArg :: (Has Sketch sig m) => m Result
 expectedFunctionArg = do
-  (_, associatedScope) <- declareFunction (Just $ Name.name "foo") (FunProperties ScopeGraph.Function)
+  (_, associatedScope) <- declareFunction (Just $ Name.name "foo") (Props.Function ScopeGraph.Function (Span (Pos 0 0) (Pos 1 12)))
   withScope associatedScope $ do
-    declare "x" (DeclProperties ScopeGraph.Identifier ScopeGraph.Default Nothing)
-    reference "x" "x" RefProperties
+    declare "x" (Props.Declaration ScopeGraph.Identifier ScopeGraph.Default Nothing lowerBound)
+    reference "x" "x" Props.Reference
     pure ()
-  reference "foo" "foo" RefProperties
+  reference "foo" "foo" Props.Reference
   pure Complete
 
 assertLexicalScope :: HUnit.Assertion
@@ -108,7 +113,7 @@ assertLexicalScope = do
   (graph, _) <- graphFile path
   case run (runSketch Nothing expectedLexicalScope) of
     (expecto, Complete) -> HUnit.assertEqual "Should work for simple case" expecto graph
-    (_, Todo msg) -> HUnit.assertFailure ("Failed to complete:" <> show msg)
+    (_, Todo msg)       -> HUnit.assertFailure ("Failed to complete:" <> show msg)
 
 assertFunctionArg :: HUnit.Assertion
 assertFunctionArg = do
@@ -116,7 +121,7 @@ assertFunctionArg = do
   (graph, _) <- graphFile path
   case run (runSketch Nothing expectedFunctionArg) of
     (expecto, Complete) -> HUnit.assertEqual "Should work for simple case" expecto graph
-    (_, Todo msg) -> HUnit.assertFailure ("Failed to complete:" <>  show msg)
+    (_, Todo msg)       -> HUnit.assertFailure ("Failed to complete:" <>  show msg)
 
 main :: IO ()
 main = do

@@ -23,6 +23,9 @@ library
     Control.Carrier.Sketch.Fresh
     Control.Effect.Sketch
     ScopeGraph.Convert
+    ScopeGraph.Properties.Declaration
+    ScopeGraph.Properties.Function
+    ScopeGraph.Properties.Reference
     Data.Hole
     Data.Module
     Data.ScopeGraph
@@ -33,6 +36,7 @@ library
     , containers
     , fused-effects      ^>= 1.0
     , generic-monoid
+    , generic-lens
     , hashable
     , lens
     , pathtype
