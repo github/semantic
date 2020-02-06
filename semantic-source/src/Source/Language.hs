@@ -32,7 +32,6 @@ data Language
     | JavaScript
     | JSON
     | JSX
-    | Markdown
     | Python
     | Ruby
     | TypeScript
@@ -64,9 +63,6 @@ instance SLanguage 'JSON where
 
 instance SLanguage 'JSX where
   reflect _ = JSX
-
-instance SLanguage 'Markdown where
-  reflect _ = Markdown
 
 instance SLanguage 'Python where
   reflect _ = Python
@@ -112,7 +108,6 @@ languageToText = \case
   JavaScript -> "JavaScript"
   JSON -> "JSON"
   JSX -> "JSX"
-  Markdown -> "Markdown"
   Python -> "Python"
   Ruby -> "Ruby"
   TypeScript -> "TypeScript"
@@ -127,7 +122,6 @@ textToLanguage = \case
   "JavaScript" -> JavaScript
   "JSON" -> JSON
   "JSX" -> JSX
-  "Markdown" -> Markdown
   "Python" -> Python
   "Ruby" -> Ruby
   "TypeScript" -> TypeScript

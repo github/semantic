@@ -87,7 +87,6 @@ Available options:
 |          | JSON           | ✅     | ✅     | ✅    | N/A | N/A     | N/A          | N/A| |
 |          | JSX            | ✅     | ✅     | ✅    | 🔶  |         |              | | |
 |          | Haskell        | 🚧     | 🚧     | 🚧    | 🔶  | 🚧       |              | | |
-|          | Markdown       | ✅     | ✅     | ✅    | 🔶  | N/A     | N/A          | N/A | &nbsp; |
 
 * ✅ — Supported
 * 🔶 — Partial support

@@ -30,7 +30,6 @@ import qualified Data.Error as Error
 import qualified Data.Flag as Flag
 import           Data.Foldable
 import qualified Data.Syntax as Syntax
-import           Parsing.CMark
 import           Parsing.Parser
 import           Parsing.TreeSitter
 import           Semantic.Config
@@ -72,11 +71,6 @@ runParser blob@Blob{..} parser = case parser of
         >>= either (\e -> trace (displayException e) *> throwError (SomeException e)) pure
 
   AssignmentParser    parser assignment -> runAssignment Assignment.assign    parser blob assignment
-
-  MarkdownParser ->
-    time "parse.cmark_parse" languageTag $
-      let term = cmarkParser blobSource
-      in length term `seq` pure term
   where languageTag = [("language" :: String, show (blobLanguage blob))]
 
 data ParserCancelled = ParserTimedOut | AssignmentTimedOut

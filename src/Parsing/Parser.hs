@@ -19,7 +19,6 @@ module Parsing.Parser
 , jsxParserALaCarte
 , jsxParserPrecise
 , jsxParser
-, markdownParser
 , phpParser
 , pythonParserALaCarte
 , pythonParserPrecise
@@ -42,7 +41,7 @@ module Parsing.Parser
 ) where
 
 import           Assigning.Assignment
-import qualified CMarkGFM
+import           AST.Unmarshal
 import           Data.AST
 import           Data.Functor.Classes
 import           Data.Language
@@ -53,27 +52,25 @@ import           Data.Term
 import           Foreign.Ptr
 import qualified Language.Go as GoPrecise
 import qualified Language.Go.Assignment as GoALaCarte
+import           Language.Go.Grammar
 import qualified Language.Java as Java
 import qualified Language.JSON as JSON
-import qualified Language.Markdown.Assignment as Markdown
 import qualified Language.PHP.Assignment as PHP
 import qualified Language.Python as PythonPrecise
 import qualified Language.Python.Assignment as PythonALaCarte
+import           Language.Python.Grammar
 import qualified Language.Ruby as RubyPrecise
 import qualified Language.Ruby.Assignment as RubyALaCarte
+import           Language.Ruby.Grammar (tree_sitter_ruby)
 import qualified Language.TSX as TSXPrecise
 import qualified Language.TSX.Assignment as TSXALaCarte
 import qualified Language.TypeScript as TypeScriptPrecise
 import qualified Language.TypeScript.Assignment as TypeScriptALaCarte
+import           Language.TypeScript.Grammar
 import           Prelude hiding (fail)
-import           Language.Go.Grammar
 import qualified TreeSitter.Language as TS (Language, Symbol)
 import           TreeSitter.PHP
-import           Language.Python.Grammar
-import           Language.Ruby.Grammar (tree_sitter_ruby)
 import           TreeSitter.TSX
-import           Language.TypeScript.Grammar
-import           AST.Unmarshal
 
 -- | A parser from 'Source' onto some term type.
 data Parser term where
@@ -86,8 +83,6 @@ data Parser term where
                    => Parser (AST ast grammar)          -- ^ A parser producing AST.
                    -> Assignment ast grammar (term Loc) -- ^ An assignment from AST onto 'Term's.
                    -> Parser (term Loc)                 -- ^ A parser producing 'Term's.
-  -- | A parser for 'Markdown' using cmark.
-  MarkdownParser :: Parser (AST (TermF [] CMarkGFM.NodeType) Markdown.Grammar)
 
 
 -- $abstract
@@ -160,9 +155,6 @@ jsxParser modes = case jsxMode modes of
   ALaCarte -> jsxParserALaCarte
   Precise  -> jsxParserPrecise
 
-markdownParser :: c Markdown.Term => (Language, SomeParser c Loc)
-markdownParser = (Markdown, SomeParser (AssignmentParser MarkdownParser Markdown.assignment))
-
 phpParser :: c PHP.Term => (Language, SomeParser c Loc)
 phpParser = (PHP, SomeParser (AssignmentParser (ASTParser tree_sitter_php) PHP.assignment))
 
@@ -225,7 +217,6 @@ type family TermMode term where
 -- | The canonical set of parsers producing à la carte terms.
 aLaCarteParsers
   :: ( c GoALaCarte.Term
-     , c Markdown.Term
      , c PHP.Term
      , c PythonALaCarte.Term
      , c RubyALaCarte.Term
@@ -236,7 +227,6 @@ aLaCarteParsers
 aLaCarteParsers = Map.fromList
   [ javascriptParserALaCarte
   , jsxParserALaCarte
-  , markdownParser
   , phpParser
   , pythonParserALaCarte
   , rubyParserALaCarte
@@ -274,7 +264,6 @@ allParsers
      , c GoPrecise.Term
      , c Java.Term
      , c JSON.Term
-     , c Markdown.Term
      , c PHP.Term
      , c PythonALaCarte.Term
      , c PythonPrecise.Term
@@ -293,7 +282,6 @@ allParsers modes = Map.fromList
   , javascriptParser modes
   , jsonParser
   , jsxParser modes
-  , markdownParser
   , phpParser
   , pythonParser modes
   , rubyParser modes

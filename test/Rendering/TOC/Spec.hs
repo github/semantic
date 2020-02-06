@@ -1,27 +1,32 @@
-{-# LANGUAGE DataKinds, FlexibleContexts, MonoLocalBinds, OverloadedStrings, TupleSections, TypeOperators #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE MonoLocalBinds #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TupleSections #-}
+{-# LANGUAGE TypeOperators #-}
 module Rendering.TOC.Spec (spec) where
 
-import Analysis.TOCSummary
-import Control.Effect.Parse
-import Control.Monad.IO.Class
-import Data.Aeson hiding (defaultOptions)
-import Data.Bifunctor
-import Data.Diff
-import Data.Either (isRight)
-import Data.Sum
-import Data.Term
-import Data.Text (Text)
-import Diffing.Interpreter
-import Prelude
+import           Analysis.TOCSummary
+import           Control.Effect.Parse
+import           Control.Monad.IO.Class
+import           Data.Aeson hiding (defaultOptions)
+import           Data.Bifunctor
+import           Data.Diff
+import           Data.Either (isRight)
+import           Data.Sum
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
-import Rendering.TOC
-import Semantic.Api (diffSummaryBuilder, summarizeTerms, summarizeTermParsers)
-import Serializing.Format as Format
-import Source.Loc
-import Source.Span
-import qualified System.Path as Path
+import           Data.Term
+import           Data.Text (Text)
+import           Diffing.Interpreter
+import           Prelude
+import           Rendering.TOC
+import           Semantic.Api (diffSummaryBuilder, summarizeTermParsers, summarizeTerms)
+import           Serializing.Format as Format
+import           Source.Loc
+import           Source.Span
 import           System.Path ((</>))
+import qualified System.Path as Path
 
 import SpecHelpers
 
@@ -147,12 +152,6 @@ spec = do
       blobs <- blobsForPaths (Path.relFile "ruby/toc/lambda.A.rb") (Path.relFile "ruby/toc/lambda.B.rb")
       output <- runTaskOrDie (runReader defaultLanguageModes (diffSummaryBuilder Format.JSON [blobs]))
       runBuilder output `shouldBe` ("{\"files\":[{\"path\":\"test/fixtures/ruby/toc/lambda.A.rb -> test/fixtures/ruby/toc/lambda.B.rb\",\"language\":\"Ruby\"}]}\n" :: ByteString)
-
-    it "summarizes Markdown headings" $ do
-      blobs <- blobsForPaths (Path.relFile "markdown/toc/headings.A.md") (Path.relFile "markdown/toc/headings.B.md")
-      output <- runTaskOrDie (runReader defaultLanguageModes (diffSummaryBuilder Format.JSON [blobs]))
-      runBuilder output `shouldBe` ("{\"files\":[{\"path\":\"test/fixtures/markdown/toc/headings.A.md -> test/fixtures/markdown/toc/headings.B.md\",\"language\":\"Markdown\",\"changes\":[{\"category\":\"Heading 1\",\"term\":\"Introduction\",\"span\":{\"start\":{\"line\":1,\"column\":1},\"end\":{\"line\":3,\"column\":16}},\"changeType\":\"REMOVED\"},{\"category\":\"Heading 2\",\"term\":\"Two\",\"span\":{\"start\":{\"line\":5,\"column\":1},\"end\":{\"line\":7,\"column\":4}},\"changeType\":\"MODIFIED\"},{\"category\":\"Heading 3\",\"term\":\"This heading is new\",\"span\":{\"start\":{\"line\":9,\"column\":1},\"end\":{\"line\":11,\"column\":10}},\"changeType\":\"ADDED\"},{\"category\":\"Heading 1\",\"term\":\"Final\",\"span\":{\"start\":{\"line\":13,\"column\":1},\"end\":{\"line\":14,\"column\":4}},\"changeType\":\"ADDED\"}]}]}\n" :: ByteString)
-
 
 type Diff' = Diff ListableSyntax (Maybe Declaration) (Maybe Declaration)
 type Term' = Term ListableSyntax (Maybe Declaration)

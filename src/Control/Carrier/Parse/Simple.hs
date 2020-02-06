@@ -1,5 +1,11 @@
-{-# LANGUAGE FlexibleContexts, FlexibleInstances, GADTs, GeneralizedNewtypeDeriving, MultiParamTypeClasses,
-             RecordWildCards, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 -- | A carrier for 'Parse' effects suitable for use in the repl, tests, etc.
 module Control.Carrier.Parse.Simple
 ( -- * Parse carrier
@@ -56,10 +62,6 @@ runParser timeout blob@Blob{..} parser = case parser of
 
   AssignmentParser    parser assignment ->
     runParser timeout blob parser >>= either (throwError . toException) pure . Assignment.assign    blobSource assignment
-
-  MarkdownParser ->
-    let term = cmarkParser blobSource
-    in length term `seq` pure term
 
 newtype ParseFailure = ParseFailure String
   deriving (Show)

@@ -15,6 +15,5 @@ testTree = testGroup "Data.Language"
 
   , testCase "languageForFilePath works for languages with ambiguous lingo extensions" $ do
       Language.forPath (Path.relFile "foo.php") @=? PHP
-      Language.forPath (Path.relFile "foo.md" ) @=? Markdown
       Language.forPath (Path.relFile "foo.tsx") @=? TSX
   ]
