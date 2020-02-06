@@ -113,7 +113,7 @@ test-suite graphing
 
 
 test-suite test
-  import: common
+  import: haskell
   type:             exitcode-stdio-1.0
   hs-source-dirs:   test
   main-is:          Test.hs
@@ -130,7 +130,7 @@ test-suite test
                   , tasty-hunit
 
 executable benchmark
-  import: common
+  import: haskell
   hs-source-dirs: bench
   ghc-options: -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m"
   main-is: Bench.hs
