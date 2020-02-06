@@ -365,7 +365,7 @@ addImportEdge edge importEdge currentAddress g = do
                 (lookupScope name g)
     (name:names) -> let
       scopeGraph' = maybe
-        (insertEdge VoidL name currentAddress (newScope name mempty g))
+        (addImportHole name currentAddress g)
         (const (insertEdge edge name currentAddress g))
         (lookupScope name g)
       in
