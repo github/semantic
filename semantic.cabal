@@ -207,7 +207,6 @@ library
                      , Language.Python.Term
                      , Numeric.Exts
                      -- Parser glue
-                     , Parsing.CMark
                      , Parsing.Parser
                      , Parsing.TreeSitter
                      -- Rendering formats

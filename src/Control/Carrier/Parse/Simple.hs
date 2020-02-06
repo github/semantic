@@ -25,7 +25,6 @@ import           Control.Effect.Parse
 import           Control.Exception
 import           Control.Monad.IO.Class
 import           Data.Blob
-import           Parsing.CMark
 import           Parsing.Parser
 import           Parsing.TreeSitter
 
