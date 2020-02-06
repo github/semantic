@@ -42,11 +42,11 @@ library
     AST.Element
     AST.GenerateSyntax
     AST.Grammar.TH
+    AST.Marshal.JSON
     AST.Token
     AST.Traversable1
     AST.Traversable1.Class
     AST.Unmarshal
-    Marshal.JSON
 
 
   -- other-modules:
