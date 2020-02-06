@@ -24,7 +24,7 @@ data SemanticAST = SemanticAST
   , _source :: Either [FilePath] String
   }
 
--- Usage: semantic-ast --format ARG [--no-color] (--sourceString STRING | FILEPATHS…)
+-- Usage: semantic-parse --format ARG [--no-color] (--sourceString STRING | FILEPATHS…)
 parseAST :: Parser SemanticAST
 parseAST = SemanticAST
   <$> option auto
@@ -66,7 +66,7 @@ opts :: ParserInfo SemanticAST
 opts = info (parseAST <**> helper)
   ( fullDesc
  <> progDesc "Parse source code and produce an AST"
- <> header "semantic-ast is a package used to parse source code" )
+ <> header "semantic-parse is a package used to parse source code" )
 
 -- TODO: Define formats for json, sexpression, etc.
 data Format = Show
