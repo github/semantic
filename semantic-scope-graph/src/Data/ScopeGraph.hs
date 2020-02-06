@@ -345,7 +345,8 @@ putDeclarationScopeAtPosition scope position assocScope g@(ScopeGraph graph) = f
   let seq = Seq.adjust' (\Info{..} -> Info { infoAssociatedScope = assocScope, .. }) (unPosition position) dataSeq
   pure $ ScopeGraph (Map.adjust (\s -> s { declarations = seq }) scope graph)
 
-lookupReference :: Ord scopeAddress => Name -> scopeAddress -> ScopeGraph scopeAddress -> Maybe (Path scopeAddress)
+-- | Lookup a reference by traversing the paths of a given scope and return a Maybe (Path address)
+lookupReference :: Ord address => Name -> address -> ScopeGraph address -> Maybe (Path address)
 lookupReference  name scope g = fmap snd . Map.lookup (Reference name) =<< pathsOfScope scope g
 
 insertEdge :: Ord scopeAddress => EdgeLabel -> scopeAddress -> scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
