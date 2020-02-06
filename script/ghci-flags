@@ -44,6 +44,8 @@ function flags {
   then add_autogen_includes "$build_dir/semantic-0.10.0.0/noopt/build/autogen"
   fi
 
+  echo "-optP-Wno-macro-redefined"
+
   # .hs source dirs
   # TODO: would be nice to figure this out from cabal.project & the .cabal files
   echo "-isemantic-analysis/src"
