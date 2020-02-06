@@ -361,7 +361,7 @@ insertEdges labels target currentAddress g =
   foldr (\label graph -> insertEdge label target currentAddress graph) g labels
 
 -- | Add an import edge of the form 'a -> Import -> b -> Import -> c' or creates intermediate void scopes of the form
---   'a -> VoidL -> b -> Import -> c' if the given scopes cannot be found.
+--   'a -> Void -> b -> Import -> c' if the given scopes cannot be found.
 addImportEdge :: Ord scopeAddress => EdgeLabel -> [scopeAddress] -> scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
 addImportEdge edge importEdge currentAddress g = do
   case importEdge of
@@ -382,7 +382,7 @@ addImportHole :: Ord scopeAddress => EdgeLabel -> scopeAddress -> scopeAddress -
 addImportHole edge name currentAddress g = let
   scopeGraph' = newScope name mempty g
   in
-  insertEdges (NonEmpty.fromList [VoidL, edge]) name currentAddress scopeGraph'
+  insertEdges (NonEmpty.fromList [Void, edge]) name currentAddress scopeGraph'
 
 
 -- | Update the 'Scope' containing a 'Declaration' with an associated scope address.
@@ -460,5 +460,5 @@ formatDeclaration = formatName . unDeclaration
 
 -- | The type of edge from a scope to its parent scopes.
 -- Either a lexical edge or an import edge in the case of non-lexical edges.
-data EdgeLabel = Lexical | Import | Export | Superclass | VoidL
+data EdgeLabel = Lexical | Import | Export | Superclass | Void
   deriving (Bounded, Enum, Eq, Ord, Show)
