@@ -9,10 +9,11 @@ import           Analysis.Name (Name)
 import qualified Analysis.Name as Name
 import           Control.Algebra
 import           Control.Carrier.Lift
-import           Control.Carrier.Sketch.Fresh
+import           Control.Carrier.Sketch.ScopeGraph
+import           Control.Effect.ScopeGraph
+import qualified Data.ScopeGraph as ScopeGraph
 import           Control.Monad
 import qualified Data.ByteString as ByteString
-import qualified Data.ScopeGraph as ScopeGraph
 import qualified Language.Python ()
 import qualified Language.Python as Py (Term)
 import           ScopeGraph.Convert
@@ -26,6 +27,7 @@ import qualified Test.Tasty as Tasty
 import qualified Test.Tasty.HUnit as HUnit
 import qualified TreeSitter.Python as TSP
 import qualified TreeSitter.Unmarshal as TS
+import qualified Data.List.NonEmpty as NonEmpty
 
 {-
 
@@ -104,9 +106,8 @@ expectedFunctionArg = do
 
 expectedImportHole :: (Has ScopeGraph sig m) => m Result
 expectedImportHole = do
-  addImportEdge Import ["cheese", "ints"]
-
-
+  insertEdge ScopeGraph.Import (NonEmpty.fromList ["chees", "ints"])
+  pure Complete
 
 assertLexicalScope :: HUnit.Assertion
 assertLexicalScope = do
