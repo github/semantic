@@ -71,8 +71,6 @@ import qualified Data.Set as Set
 import           Data.Text (Text)
 import           GHC.Generics
 import           Source.Span
-import Data.List.NonEmpty (NonEmpty(..))
-import qualified Data.List.NonEmpty as NonEmpty
 
 -- A slot is a location in the heap where a value is stored.
 data Slot address = Slot { frameAddress :: address, position :: Position }
@@ -359,6 +357,7 @@ insertEdge label target currentAddress g@(ScopeGraph graph) = fromMaybe g $ do
 addImportEdge :: Ord scopeAddress => EdgeLabel -> [scopeAddress] -> scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
 addImportEdge edge importEdge currentAddress g = do
   case importEdge of
+    [] -> g
     (name:[]) -> maybe
                 (insertEdge edge name currentAddress (newScope name mempty g))
                 (const (insertEdge edge name currentAddress g))
