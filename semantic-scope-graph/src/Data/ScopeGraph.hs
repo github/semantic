@@ -71,6 +71,8 @@ import qualified Data.Set as Set
 import           Data.Text (Text)
 import           GHC.Generics
 import           Source.Span
+import Data.List.NonEmpty (NonEmpty)
+import qualified Data.List.NonEmpty as NonEmpty
 
 -- A slot is a location in the heap where a value is stored.
 data Slot address = Slot { frameAddress :: address, position :: Position }
@@ -354,6 +356,10 @@ insertEdge label target currentAddress g@(ScopeGraph graph) = fromMaybe g $ do
   let newScope = currentScope' { edges = Map.insert label (target : scopes) (edges currentScope') }
   pure (ScopeGraph (Map.insert currentAddress newScope graph))
 
+insertEdges :: Ord scopeAddress => NonEmpty EdgeLabel -> scopeAddress -> scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
+insertEdges labels target currentAddress g =
+  foldr (\label graph -> insertEdge label target currentAddress graph) g labels
+
 -- | Add an import edge of the form 'a -> Import -> b -> Import -> c' or creates intermediate void scopes of the form
 --   'a -> VoidL -> b -> Import -> c' if the given scopes cannot be found.
 addImportEdge :: Ord scopeAddress => EdgeLabel -> [scopeAddress] -> scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
@@ -361,21 +367,22 @@ addImportEdge edge importEdge currentAddress g = do
   case importEdge of
     [] -> g
     (name:[]) -> maybe
-                (insertEdge edge name currentAddress (newScope name mempty g))
+                (addImportHole edge name currentAddress g)
                 (const (insertEdge edge name currentAddress g))
                 (lookupScope name g)
     (name:names) -> let
       scopeGraph' = maybe
-        (addImportHole name currentAddress g)
+        (addImportHole edge name currentAddress g)
         (const (insertEdge edge name currentAddress g))
         (lookupScope name g)
       in
         addImportEdge edge names name scopeGraph'
 
-addImportHole :: Ord scopeAddress => scopeAddress -> scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
-addImportHole name currentAddress g = fromMaybe g $ do
-  let scope' = newScope name mempty g
-  pure (insertEdge VoidL name currentAddress scope')
+addImportHole :: Ord scopeAddress => EdgeLabel -> scopeAddress -> scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
+addImportHole edge name currentAddress g = let
+  scopeGraph' = newScope name mempty g
+  in
+  insertEdges (NonEmpty.fromList [VoidL, edge]) name currentAddress scopeGraph'
 
 
 -- | Update the 'Scope' containing a 'Declaration' with an associated scope address.
