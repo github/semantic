@@ -58,7 +58,7 @@ library
   hs-source-dirs: src
 
 test-suite test
-  import:           common
+  import:           haskell
   type:             exitcode-stdio-1.0
   hs-source-dirs:   test
   main-is:          Test.hs
@@ -75,7 +75,7 @@ test-suite test
                   , tasty-hunit
 
 executable benchmarks
-  import:              common
+  import:              haskell
   hs-source-dirs:      bench
   -- type:                exitcode-stdio-1.0
   main-is:             Main.hs
@@ -91,12 +91,11 @@ executable benchmarks
                      , tree-sitter-ruby
 
 executable tree-sitter-ruby
-  import: common
-  hs-source-dirs: app
-  ghc-options: -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m"
-  main-is: Main.hs
-  build-depends:
-      base
-    , bytestring
-    , tree-sitter
-    , tree-sitter-ruby
+  import: haskell
+  hs-source-dirs:      app
+  ghc-options:         -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m"
+  main-is:             Main.hs
+  build-depends:       base
+                     , bytestring
+                     , tree-sitter
+                     , tree-sitter-ruby
