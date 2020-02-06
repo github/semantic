@@ -65,7 +65,7 @@ test-suite test
   build-depends:    base
                   , tree-sitter
                   , tree-sitter-java
-                  , tree-sitter-test-helpers
+                  , semantic-ast
                   , bytestring ^>= 0.10.8.2
                   , pathtype ^>= 0.8.1
                   , text
