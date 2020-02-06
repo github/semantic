@@ -1,4 +1,15 @@
-{-# LANGUAGE GADTs, LambdaCase, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Data.Abstract.Value.Type
   ( Type (..)
   , TypeError (..)
@@ -11,15 +22,23 @@ module Data.Abstract.Value.Type
   , runWhile
   ) where
 
-import Control.Abstract.ScopeGraph
-import qualified Control.Abstract as Abstract
-import Control.Abstract hiding (Boolean(..), Function(..), Numeric(..), Object(..), Array(..), Hash(..), String(..), Unit(..), While(..))
-import Control.Effect.Carrier
-import Data.Abstract.BaseError
-import Data.Semigroup.Foldable (foldMap1)
+import           Control.Algebra
+import           Control.Carrier.Resumable.Either (SomeError)
+import qualified Control.Carrier.Resumable.Either as Either
+import qualified Control.Carrier.Resumable.Resume as With
+import           Control.Carrier.State.Strict
+import           Control.Monad
+import           Data.Functor
+import           Data.Functor.Classes
+import           Data.List.NonEmpty (NonEmpty, nonEmpty)
 import qualified Data.Map as Map
-import Prologue hiding (TypeError)
-import Data.Abstract.Evaluatable
+
+import           Control.Abstract hiding
+    (Array (..), Boolean (..), Function (..), Hash (..), Numeric (..), Object (..), String (..), Unit (..), While (..))
+import qualified Control.Abstract as Abstract
+import           Data.Abstract.BaseError
+import           Data.Abstract.Evaluatable
+import           Data.Semigroup.Foldable (foldMap1)
 
 type TName = Int
 
@@ -75,50 +94,49 @@ deriving instance Show (TypeError resume)
 
 instance Eq1   TypeError where
   liftEq      _ (UnificationError a1 b1) (UnificationError a2 b2) = a1 == a2 && b1 == b2
-  liftEq      _ (InfiniteType a1 b1) (InfiniteType a2 b2) = a1 == a2 && b1 == b2
-  liftEq      _ _ _ = False
+  liftEq      _ (InfiniteType a1 b1) (InfiniteType a2 b2)         = a1 == a2 && b1 == b2
+  liftEq      _ _ _                                               = False
 
 instance Ord1  TypeError where
   liftCompare _ (UnificationError a1 b1) (UnificationError a2 b2) = compare a1 a2 <> compare b1 b2
-  liftCompare _ (InfiniteType a1 b1) (InfiniteType a2 b2) = compare a1 a2 <> compare b1 b2
-  liftCompare _ (InfiniteType _ _) (UnificationError _ _) = LT
-  liftCompare _ (UnificationError _ _) (InfiniteType _ _) = GT
+  liftCompare _ (InfiniteType a1 b1) (InfiniteType a2 b2)         = compare a1 a2 <> compare b1 b2
+  liftCompare _ (InfiniteType _ _) (UnificationError _ _)         = LT
+  liftCompare _ (UnificationError _ _) (InfiniteType _ _)         = GT
 
 instance Show1 TypeError where liftShowsPrec _ _ = showsPrec
 
-runTypeError :: Evaluator term address value (ResumableC (BaseError TypeError) m) a
+runTypeError :: Evaluator term address value (Either.ResumableC (BaseError TypeError) m) a
              -> Evaluator term address value m (Either (SomeError (BaseError TypeError)) a)
-runTypeError = raiseHandler runResumable
+runTypeError = raiseHandler Either.runResumable
 
 runTypeErrorWith :: (forall resume . (BaseError TypeError) resume -> Evaluator term address value m resume)
-                 -> Evaluator term address value (ResumableWithC (BaseError TypeError) m) a
+                 -> Evaluator term address value (With.ResumableC (BaseError TypeError) m) a
                  -> Evaluator term address value m a
-runTypeErrorWith f = raiseHandler $ runResumableWith (runEvaluator . f)
+runTypeErrorWith f = raiseHandler $ With.runResumable (runEvaluator . f)
 
 
-throwTypeError :: ( Member (Resumable (BaseError TypeError)) sig
-                  , Member (Reader ModuleInfo) sig
-                  , Member (Reader Span) sig
-                  , Carrier sig m
+throwTypeError :: ( Has (Resumable (BaseError TypeError)) sig m
+                  , Has (Reader ModuleInfo) sig m
+                  , Has (Reader Span) sig m
                   )
                => TypeError resume
                -> m resume
 throwTypeError = throwBaseError
 
-runTypeMap :: Carrier sig m
+runTypeMap :: Algebra sig m
            => Evaluator term address Type (StateC TypeMap m) a
            -> Evaluator term address Type m a
 runTypeMap = raiseHandler $ fmap snd . runState emptyTypeMap
 
-runTypes :: Carrier sig m
-         => Evaluator term address Type (ResumableC (BaseError TypeError)
+runTypes :: Algebra sig m
+         => Evaluator term address Type (Either.ResumableC (BaseError TypeError)
                                          (StateC TypeMap m)) a
          -> Evaluator term address Type m (Either (SomeError (BaseError TypeError)) a)
 runTypes = runTypeMap . runTypeError
 
-runTypesWith :: Carrier sig m
+runTypesWith :: Algebra sig m
              => (forall resume . (BaseError TypeError) resume -> Evaluator term address Type (StateC TypeMap m) resume)
-             -> Evaluator term address Type (ResumableWithC (BaseError TypeError)
+             -> Evaluator term address Type (With.ResumableC (BaseError TypeError)
                                             (StateC TypeMap
                                             m)) a
              -> Evaluator term address Type m a
@@ -130,17 +148,13 @@ newtype TypeMap = TypeMap { unTypeMap :: Map.Map TName Type }
 emptyTypeMap :: TypeMap
 emptyTypeMap = TypeMap Map.empty
 
-modifyTypeMap :: ( Member (State TypeMap) sig
-                 , Carrier sig m
-                 )
+modifyTypeMap :: Has (State TypeMap) sig m
               => (Map.Map TName Type -> Map.Map TName Type)
               -> m ()
 modifyTypeMap f = modify (TypeMap . f . unTypeMap)
 
 -- | Prunes substituted type variables
-prune :: ( Member (State TypeMap) sig
-         , Carrier sig m
-         )
+prune :: Has (State TypeMap) sig m
       => Type
       -> m Type
 prune (Var id) = gets (Map.lookup id . unTypeMap) >>= \case
@@ -153,9 +167,7 @@ prune ty = pure ty
 
 -- | Checks whether a type variable name occurs within another type. This
 --   function is used in 'substitute' to prevent unification of infinite types
-occur :: ( Member (State TypeMap) sig
-         , Carrier sig m
-         )
+occur :: Has (State TypeMap) sig m
       => TName
       -> Type
       -> m Bool
@@ -181,11 +193,10 @@ occur id = prune >=> \case
     eitherM f (a, b) = (||) <$> f a <*> f b
 
 -- | Substitutes a type variable name for another type
-substitute :: ( Member (Reader ModuleInfo) sig
-              , Member (Reader Span) sig
-              , Member (Resumable (BaseError TypeError)) sig
-              , Member (State TypeMap) sig
-              , Carrier sig m
+substitute :: ( Has (Reader ModuleInfo) sig m
+              , Has (Reader Span) sig m
+              , Has (Resumable (BaseError TypeError)) sig m
+              , Has (State TypeMap) sig m
               )
            => TName
            -> Type
@@ -199,11 +210,10 @@ substitute id ty = do
   pure ty
 
 -- | Unify two 'Type's.
-unify :: ( Member (Reader ModuleInfo) sig
-         , Member (Reader Span) sig
-         , Member (Resumable (BaseError TypeError)) sig
-         , Member (State TypeMap) sig
-         , Carrier sig m
+unify :: ( Has (Reader ModuleInfo) sig m
+         , Has (Reader Span) sig m
+         , Has (Resumable (BaseError TypeError)) sig m
+         , Has (State TypeMap) sig m
          )
       => Type
       -> Type
@@ -213,47 +223,47 @@ unify a b = do
   b' <- prune b
   case (a', b') of
     (a1 :-> b1, a2 :-> b2) -> (:->) <$> unify a1 a2 <*> unify b1 b2
-    (a, Null) -> pure a
-    (Null, b) -> pure b
-    (Var id, ty) -> substitute id ty
-    (ty, Var id) -> substitute id ty
-    (Array t1, Array t2) -> Array <$> unify t1 t2
+    (a, Null)              -> pure a
+    (Null, b)              -> pure b
+    (Var id, ty)           -> substitute id ty
+    (ty, Var id)           -> substitute id ty
+    (Array t1, Array t2)   -> Array <$> unify t1 t2
     -- FIXME: unifying with sums should distribute nondeterministically.
     -- FIXME: ordering shouldn’t be significant for undiscriminated sums.
-    (a1 :+ b1, a2 :+ b2) -> (:+) <$> unify a1 a2 <*> unify b1 b2
-    (a1 :* b1, a2 :* b2) -> (:*) <$> unify a1 a2 <*> unify b1 b2
-    (t1, t2) | t1 == t2 -> pure t2
-    _ -> throwTypeError (UnificationError a b)
+    (a1 :+ b1, a2 :+ b2)   -> (:+) <$> unify a1 a2 <*> unify b1 b2
+    (a1 :* b1, a2 :* b2)   -> (:*) <$> unify a1 a2 <*> unify b1 b2
+    (t1, t2) | t1 == t2    -> pure t2
+    _                      -> throwTypeError (UnificationError a b)
 
 instance Ord address => ValueRoots address Type where
   valueRoots _ = mempty
 
 
-instance ( Member (Allocator address) sig
-         , Member (Deref Type) sig
-         , Member (Error (Return Type)) sig
-         , Member Fresh sig
-         , Member (Reader (CurrentFrame address)) sig
-         , Member (Reader (CurrentScope address)) sig
-         , Member (Reader ModuleInfo) sig
-         , Member (Reader Span) sig
-         , Member (State Span) sig
-         , Member (Resumable (BaseError (EvalError term address Type))) sig
-         , Member (Resumable (BaseError TypeError)) sig
-         , Member (Resumable (BaseError (AddressError address Type))) sig
-         , Member (State (Heap address address Type)) sig
-         , Member (State (ScopeGraph address)) sig
-         , Member (Resumable (BaseError (ScopeError address))) sig
-         , Member (Resumable (BaseError (HeapError address))) sig
-         , Member (State TypeMap) sig
+instance ( Has (Allocator address) sig m
+         , Has (Deref Type) sig m
+         , Has (Error (Return Type)) sig m
+         , Has Fresh sig m
+         , Has (Reader (CurrentFrame address)) sig m
+         , Has (Reader (CurrentScope address)) sig m
+         , Has (Reader ModuleInfo) sig m
+         , Has (Reader Span) sig m
+         , Has (State Span) sig m
+         , Has (Resumable (BaseError (EvalError term address Type))) sig m
+         , Has (Resumable (BaseError TypeError)) sig m
+         , Has (Resumable (BaseError (AddressError address Type))) sig m
+         , Has (State (Heap address address Type)) sig m
+         , Has (State (ScopeGraph address)) sig m
+         , Has (Resumable (BaseError (ScopeError address))) sig m
+         , Has (Resumable (BaseError (HeapError address))) sig m
+         , Has (State TypeMap) sig m
          , Declarations term
          , Ord address
          , Show address
-         , Carrier sig m
+         , Algebra sig m
          )
-      => Carrier (Abstract.Function term address Type :+: sig) (FunctionC term address Type m) where
-  eff (R other) = FunctionC (eff (R (handleCoercible other)))
-  eff (L op) = runEvaluator $ do
+      => Algebra (Abstract.Function term address Type :+: sig) (FunctionC term address Type m) where
+  alg (R other) = FunctionC (alg (R (handleCoercible other)))
+  alg (L op) = runEvaluator $ do
     eval <- Evaluator . FunctionC $ ask
     case op of
       Abstract.Function _ params body scope k -> do
@@ -285,58 +295,58 @@ instance ( Member (Allocator address) sig
 
 
 
-instance ( Member (Reader ModuleInfo) sig
-         , Member (Reader Span) sig
-         , Member (Resumable (BaseError TypeError)) sig
-         , Member (State TypeMap) sig
-         , Carrier sig m
+instance ( Has (Reader ModuleInfo) sig m
+         , Has (Reader Span) sig m
+         , Has (Resumable (BaseError TypeError)) sig m
+         , Has (State TypeMap) sig m
+         , Algebra sig m
          , Alternative m
          )
-      => Carrier (Abstract.Boolean Type :+: sig) (BooleanC Type m) where
-  eff (R other) = BooleanC . eff . handleCoercible $ other
-  eff (L (Abstract.Boolean _ k)) = k Bool
-  eff (L (Abstract.AsBool t k))  = unify t Bool *> (k True <|> k False)
+      => Algebra (Abstract.Boolean Type :+: sig) (BooleanC Type m) where
+  alg (R other)                  = BooleanC . alg . handleCoercible $ other
+  alg (L (Abstract.Boolean _ k)) = k Bool
+  alg (L (Abstract.AsBool t k))  = unify t Bool *> (k True <|> k False)
 
 
 
-instance ( Member (Abstract.Boolean Type) sig
-         , Carrier sig m
+instance ( Has (Abstract.Boolean Type) sig m
+         , Algebra sig m
          , Alternative m
          )
-      => Carrier (Abstract.While Type :+: sig) (WhileC Type m) where
-  eff (R other) = WhileC . eff . handleCoercible $ other
-  eff (L (Abstract.While cond body k)) = do
+      => Algebra (Abstract.While Type :+: sig) (WhileC Type m) where
+  alg (R other) = WhileC . alg . handleCoercible $ other
+  alg (L (Abstract.While cond body k)) = do
     cond' <- cond
     ifthenelse cond' (body *> empty) (k Unit)
 
 
-instance Carrier sig m
-      => Carrier (Abstract.Unit Type :+: sig) (UnitC Type m) where
-  eff (R other) = UnitC . eff . handleCoercible $ other
-  eff (L (Abstract.Unit k)) = k Unit
+instance Algebra sig m
+      => Algebra (Abstract.Unit Type :+: sig) (UnitC Type m) where
+  alg (R other)             = UnitC . alg . handleCoercible $ other
+  alg (L (Abstract.Unit k)) = k Unit
 
-instance ( Member (Reader ModuleInfo) sig
-         , Member (Reader Span) sig
-         , Member (Resumable (BaseError TypeError)) sig
-         , Member (State TypeMap) sig
-         , Carrier sig m
+instance ( Has (Reader ModuleInfo) sig m
+         , Has (Reader Span) sig m
+         , Has (Resumable (BaseError TypeError)) sig m
+         , Has (State TypeMap) sig m
+         , Algebra sig m
          , Alternative m
          )
-      => Carrier (Abstract.String Type :+: sig) (StringC Type m) where
-  eff (R other) = StringC . eff . handleCoercible $ other
-  eff (L (Abstract.String _ k)) = k String
-  eff (L (Abstract.AsString t k)) = unify t String *> k ""
+      => Algebra (Abstract.String Type :+: sig) (StringC Type m) where
+  alg (R other)                   = StringC . alg . handleCoercible $ other
+  alg (L (Abstract.String _ k))   = k String
+  alg (L (Abstract.AsString t k)) = unify t String *> k ""
 
-instance ( Member (Reader ModuleInfo) sig
-         , Member (Reader Span) sig
-         , Member (Resumable (BaseError TypeError)) sig
-         , Member (State TypeMap) sig
-         , Carrier sig m
+instance ( Has (Reader ModuleInfo) sig m
+         , Has (Reader Span) sig m
+         , Has (Resumable (BaseError TypeError)) sig m
+         , Has (State TypeMap) sig m
+         , Algebra sig m
          , Monad m
          )
-      => Carrier (Abstract.Numeric Type :+: sig) (NumericC Type m) where
-  eff (R other) = NumericC . eff . handleCoercible $ other
-  eff (L op) = case op of
+      => Algebra (Abstract.Numeric Type :+: sig) (NumericC Type m) where
+  alg (R other) = NumericC . alg . handleCoercible $ other
+  alg (L op) = case op of
     Abstract.Integer _ k -> k Int
     Abstract.Float _ k -> k Float
     Abstract.Rational _ k -> k Rational
@@ -346,50 +356,50 @@ instance ( Member (Reader ModuleInfo) sig
       (Int, Float) -> k Float
       _            -> unify left right >>= k
 
-instance ( Member (Reader ModuleInfo) sig
-         , Member (Reader Span) sig
-         , Member (Resumable (BaseError TypeError)) sig
-         , Member (State TypeMap) sig
-         , Carrier sig m
+instance ( Has (Reader ModuleInfo) sig m
+         , Has (Reader Span) sig m
+         , Has (Resumable (BaseError TypeError)) sig m
+         , Has (State TypeMap) sig m
+         , Algebra sig m
          , Monad m
          )
-      => Carrier (Abstract.Bitwise Type :+: sig) (BitwiseC Type m) where
-  eff (R other) = BitwiseC . eff . handleCoercible $ other
-  eff (L op) = case op of
-    CastToInteger t k -> unify t (Int :+ Float :+ Rational) *> k Int
-    LiftBitwise _ t k -> unify t Int >>= k
+      => Algebra (Abstract.Bitwise Type :+: sig) (BitwiseC Type m) where
+  alg (R other) = BitwiseC . alg . handleCoercible $ other
+  alg (L op) = case op of
+    CastToInteger t k      -> unify t (Int :+ Float :+ Rational) *> k Int
+    LiftBitwise _ t k      -> unify t Int >>= k
     LiftBitwise2 _ t1 t2 k -> unify Int t1 >>= unify t2 >>= k
     UnsignedRShift t1 t2 k -> unify Int t2 *> unify Int t1 >>= k
 
-instance ( Carrier sig m ) => Carrier (Abstract.Object address Type :+: sig) (ObjectC address Type m) where
-  eff (R other) = ObjectC . eff . handleCoercible $ other
-  eff (L op) = case op of
-    Abstract.Object _ k -> k Object
+instance ( Algebra sig m ) => Algebra (Abstract.Object address Type :+: sig) (ObjectC address Type m) where
+  alg (R other) = ObjectC . alg . handleCoercible $ other
+  alg (L op) = case op of
+    Abstract.Object _ k            -> k Object
     Abstract.ScopedEnvironment _ k -> k Nothing
-    Abstract.Klass _ _ k -> k Object
+    Abstract.Klass _ _ k           -> k Object
 
-instance ( Member Fresh sig
-         , Member (Reader ModuleInfo) sig
-         , Member (Reader Span) sig
-         , Member (Resumable (BaseError TypeError)) sig
-         , Member (State TypeMap) sig
-         , Carrier sig m
+instance ( Has Fresh sig m
+         , Has (Reader ModuleInfo) sig m
+         , Has (Reader Span) sig m
+         , Has (Resumable (BaseError TypeError)) sig m
+         , Has (State TypeMap) sig m
+         , Algebra sig m
          , Monad m
          )
-      => Carrier (Abstract.Array Type :+: sig) (ArrayC Type m) where
-  eff (R other) = ArrayC . eff . handleCoercible $ other
-  eff (L (Abstract.Array fieldTypes k)) = do
+      => Algebra (Abstract.Array Type :+: sig) (ArrayC Type m) where
+  alg (R other) = ArrayC . alg . handleCoercible $ other
+  alg (L (Abstract.Array fieldTypes k)) = do
     var <- fresh
     fieldType <- foldr (\ t1 -> (unify t1 =<<)) (pure (Var var)) fieldTypes
     k (Array fieldType)
-  eff (L (Abstract.AsArray t k)) = do
+  alg (L (Abstract.AsArray t k)) = do
     field <- fresh
     unify t (Array (Var field)) >> k mempty
 
-instance ( Carrier sig m ) => Carrier (Abstract.Hash Type :+: sig) (HashC Type m) where
-  eff (R other) = HashC . eff . handleCoercible $ other
-  eff (L (Abstract.Hash t k)) = k (Hash t)
-  eff (L (Abstract.KvPair t1 t2 k)) = k (t1 :* t2)
+instance ( Algebra sig m ) => Algebra (Abstract.Hash Type :+: sig) (HashC Type m) where
+  alg (R other)                     = HashC . alg . handleCoercible $ other
+  alg (L (Abstract.Hash t k))       = k (Hash t)
+  alg (L (Abstract.KvPair t1 t2 k)) = k (t1 :* t2)
 
 
 instance AbstractHole Type where
@@ -399,12 +409,12 @@ instance AbstractIntro Type where
   null        = Null
 
 -- | Discard the value arguments (if any), constructing a 'Type' instead.
-instance ( Member Fresh sig
-         , Member (Reader ModuleInfo) sig
-         , Member (Reader Span) sig
-         , Member (Resumable (BaseError TypeError)) sig
-         , Member (State TypeMap) sig
-         , Carrier sig m
+instance ( Has Fresh sig m
+         , Has (Reader ModuleInfo) sig m
+         , Has (Reader Span) sig m
+         , Has (Resumable (BaseError TypeError)) sig m
+         , Has (State TypeMap) sig m
+         , Algebra sig m
          )
       => AbstractValue term address Type m where
   tuple fields = pure $ zeroOrMoreProduct fields
@@ -425,8 +435,8 @@ instance ( Member Fresh sig
   liftComparison (Concrete _) left right = case (left, right) of
     (Float, Int) ->                     pure Bool
     (Int, Float) ->                     pure Bool
-    _                 -> unify left right $> Bool
+    _            -> unify left right $> Bool
   liftComparison Generalized left right = case (left, right) of
     (Float, Int) ->                     pure Int
     (Int, Float) ->                     pure Int
-    _                 -> unify left right $> Bool
+    _            -> unify left right $> Bool

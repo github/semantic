@@ -1,3 +1,4 @@
+{-# LANGUAGE RecordWildCards #-}
 module Semantic.Telemetry.Log
   ( Level (..)
   , LogOptions (..)
@@ -8,12 +9,13 @@ module Semantic.Telemetry.Log
   , writeLogMessage
   ) where
 
+import           Control.Monad.IO.Class
+import           Data.Bifunctor
 import           Data.Error (Colourize (..), withSGRCode)
 import           Data.Flag as Flag
 import           Data.List (intersperse)
 import qualified Data.Time.Format as Time
 import qualified Data.Time.LocalTime as LocalTime
-import           Prologue
 import           System.Console.ANSI
 import           System.IO
 import           Text.Printf
@@ -35,9 +37,9 @@ data Level
 
 -- | Options for controlling logging
 data LogOptions = LogOptions
-  { logOptionsLevel      :: Maybe Level  -- ^ What level of messages to log. 'Nothing' disabled logging.
-  , logOptionsFormatter  :: LogFormatter -- ^ Log formatter to use.
-  , logOptionsContext :: [(String, String)]
+  { logOptionsLevel     :: Maybe Level  -- ^ What level of messages to log. 'Nothing' disabled logging.
+  , logOptionsFormatter :: LogFormatter -- ^ Log formatter to use.
+  , logOptionsContext   :: [(String, String)]
   }
 
 -- | Write a log a message to stderr.

@@ -1,4 +1,8 @@
-{-# LANGUAGE GADTs, RankNTypes, ScopedTypeVariables #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 module Serializing.SExpression
 ( serializeSExpression
 , ToSExpression(..)
@@ -8,10 +12,9 @@ module Serializing.SExpression
 import Analysis.ConstructorName
 import Data.ByteString.Builder
 import Data.Diff
-import Data.Patch
+import Data.Edit
+import Data.Functor.Foldable
 import Data.Term
-import Prelude
-import Prologue
 
 data Options = ByShow | ByConstructorName
 
@@ -43,6 +46,6 @@ instance (ConstructorName syntax, Foldable syntax, Show ann1, Show ann2) => ToSE
   toSExpression options diff n = case diff of
     Patch (Delete term) -> nl n <> pad (n - 1) <> "{-" <> namedBranch options term n <> "-}"
     Patch (Insert term) -> nl n <> pad (n - 1) <> "{+" <> namedBranch options term n <> "+}"
-    Patch (Replace term1 term2) -> nl n       <> pad (n - 1) <> "{ " <> namedBranch options term1 n
+    Patch (Compare term1 term2) -> nl n       <> pad (n - 1) <> "{ " <> namedBranch options term1 n
                                 <> nl (n + 1) <> pad (n - 1) <> "->" <> namedBranch options term2 n <> " }"
     Merge term -> nl n <> pad n <> namedBranch options term n

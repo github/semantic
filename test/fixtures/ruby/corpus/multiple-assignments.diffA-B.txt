@@ -2,8 +2,7 @@
   (Assignment
     (Statements
       (Identifier)
-    { (Identifier)
-    ->(Identifier) }
+      (Identifier)
     {-(Identifier)-})
     (Array
       (Integer)
@@ -34,7 +33,8 @@
   {-(Statements
     {-(Identifier)-}
     {-(Identifier)-})-}
-  {-(Identifier)-})-}
+  {-(Send
+    {-(Identifier)-})-})-}
 {-(Assignment
   {-(Statements
     {-(Send
@@ -57,4 +57,5 @@
     {-(Statements
       {-(Identifier)-}
       {-(Identifier)-})-})-}
-  {-(Identifier)-})-})
+  {-(Send
+    {-(Identifier)-})-})-})

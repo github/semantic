@@ -1,24 +1,26 @@
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE ImplicitParams #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeApplications #-}
 {-# OPTIONS_GHC -O0 #-}
 
 module Analysis.TypeScript.Spec (spec) where
 
-import           Data.Syntax.Statement (StatementBlock(..))
-import qualified Data.Abstract.ScopeGraph as ScopeGraph (AccessControl(..))
-import           Control.Abstract.ScopeGraph hiding (AccessControl(..))
+import           Control.Abstract.ScopeGraph hiding (AccessControl (..))
+import           Control.Carrier.Resumable.Either (SomeError (..))
 import           Data.Abstract.Evaluatable
 import qualified Data.Abstract.Heap as Heap
-import           Data.Abstract.Module (ModuleInfo (..))
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Number as Number
 import           Data.Abstract.Package (PackageInfo (..))
+import qualified Data.Abstract.ScopeGraph as ScopeGraph (AccessControl (..))
 import           Data.Abstract.Value.Concrete as Concrete
 import qualified Data.Language as Language
-import           Data.Quieterm
 import           Data.Scientific (scientific)
 import           Data.Sum
+import           Data.Syntax.Statement (StatementBlock (..))
 import           Data.Text (pack)
-import qualified Language.TypeScript.Assignment as TypeScript
+import qualified Language.TypeScript.Term as TypeScript
 import           Source.Loc
 import           SpecHelpers
 
@@ -82,7 +84,7 @@ spec = do
 
     it "fails exporting symbols not defined in the module" $ do
       (_, (_, res)) <- evaluate ["bad-export.ts", "pip.ts", "a.ts", "foo.ts"]
-      res `shouldBe` Left (SomeError (inject @(BaseError (ScopeError Precise)) (BaseError (ModuleInfo "bad-export.ts" Language.TypeScript mempty) (Span (Pos 2 1) (Pos 2 28)) ImportReferenceError)))
+      res `shouldBe` Left (SomeError (inject @(BaseError (ScopeError Precise)) (BaseError (ModuleInfo "bad-export.ts" "TypeScript" mempty) (Span (Pos 2 1) (Pos 2 28)) ImportReferenceError)))
 
     it "evaluates early return statements" $ do
       (scopeGraph, (heap, res)) <- evaluate ["early-return.ts"]
@@ -166,23 +168,21 @@ spec = do
 
     it "member access of private field definition throws AccessControlError" $ do
       (_, (_, res)) <- evaluate ["access_control/adder.ts", "access_control/private_field_definition.ts"]
-      let expected = Left (SomeError (inject @TypeScriptEvalError (BaseError (ModuleInfo "private_field_definition.ts" Language.TypeScript mempty) (Span (Pos 4 1) (Pos 4 6)) (AccessControlError ("foo", ScopeGraph.Public) ("y", ScopeGraph.Private) (Concrete.Float (Decimal 2.0))))))
+      let expected = Left (SomeError (inject @TypeScriptEvalError (BaseError (ModuleInfo "private_field_definition.ts" "TypeScript" mempty) (Span (Pos 4 1) (Pos 4 6)) (AccessControlError ("foo", ScopeGraph.Public) ("y", ScopeGraph.Private) (Concrete.Float (Decimal 2.0))))))
       res `shouldBe` expected
 
     it "member access of private static field definition throws AccessControlError" $ do
       (_, (_, res)) <- evaluate ["access_control/adder.ts", "access_control/private_static_field_definition.ts"]
-      let expected = Left (SomeError (inject @TypeScriptEvalError (BaseError (ModuleInfo "private_static_field_definition.ts" Language.TypeScript mempty) (Span (Pos 3 1) (Pos 3 8)) (AccessControlError ("Adder", ScopeGraph.Public) ("z", ScopeGraph.Private) Unit))))
+      let expected = Left (SomeError (inject @TypeScriptEvalError (BaseError (ModuleInfo "private_static_field_definition.ts" "TypeScript" mempty) (Span (Pos 3 1) (Pos 3 8)) (AccessControlError ("Adder", ScopeGraph.Public) ("z", ScopeGraph.Private) Unit))))
       res `shouldBe` expected
 
     it "member access of private methods throws AccessControlError" $ do
       (_, (_, res)) <- evaluate ["access_control/adder.ts", "access_control/private_method.ts"]
-      let expected = Left (SomeError (inject @TypeScriptEvalError (BaseError (ModuleInfo "private_method.ts" Language.TypeScript mempty) (Span (Pos 4 1) (Pos 4 16)) (AccessControlError ("foo", ScopeGraph.Public) ("private_add", ScopeGraph.Private) (Closure (PackageInfo "access_control" mempty) (ModuleInfo "adder.ts" Language.TypeScript mempty) (Just "private_add") Nothing [] (Right (Quieterm (In (Loc (Range 146 148) (Span (Pos 7 27) (Pos 7 29))) (inject (StatementBlock []))))) (Precise 20) (Precise 18))))))
+      let expected = Left (SomeError (inject @TypeScriptEvalError (BaseError (ModuleInfo "private_method.ts" "TypeScript" mempty) (Span (Pos 4 1) (Pos 4 16)) (AccessControlError ("foo", ScopeGraph.Public) ("private_add", ScopeGraph.Private) (Closure (PackageInfo "access_control" mempty) (ModuleInfo "adder.ts" "TypeScript" mempty) (Just "private_add") Nothing [] (Right (TypeScript.Term (In (Loc (Range 146 148) (Span (Pos 7 27) (Pos 7 29))) (inject (StatementBlock []))))) (Precise 20) (Precise 18))))))
       res `shouldBe` expected
 
   where
     fixtures = "test/fixtures/typescript/analysis/"
-    evaluate = evalTypeScriptProject . map (fixtures <>)
-    evalTypeScriptProject = testEvaluating <=< (evaluateProject' ?session (Proxy :: Proxy 'Language.TypeScript) typescriptParser)
+    evaluate = evaluateProject @'Language.TypeScript @(TypeScript.Term Loc) ?session Proxy . map (fixtures <>)
 
-type TypeScriptTerm = Quieterm (Sum TypeScript.Syntax) Loc
-type TypeScriptEvalError = BaseError (EvalError TypeScriptTerm Precise (Concrete.Value TypeScriptTerm Precise))
+type TypeScriptEvalError = BaseError (EvalError (TypeScript.Term Loc) Precise (Concrete.Value (TypeScript.Term Loc) Precise))

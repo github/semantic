@@ -1,4 +1,7 @@
-{-# LANGUAGE DeriveAnyClass, GADTs #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE StandaloneDeriving #-}
 
 module Data.Handle
   ( Handle (..)
@@ -14,9 +17,8 @@ module Data.Handle
   , InvalidJSONException (..)
   ) where
 
-import Prologue
-
-import           Control.Exception (throw)
+import           Control.Exception (Exception, throw)
+import           Control.Monad.IO.Class
 import           Data.Aeson
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.ByteString.Lazy.Char8 as BLC

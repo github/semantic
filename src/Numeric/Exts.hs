@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeApplications #-}
 module Numeric.Exts
   ( parseInteger
   , hex
@@ -10,11 +12,11 @@ module Numeric.Exts
 import Control.Applicative
 import Control.Monad hiding (fail)
 import Data.Attoparsec.Text
-import Data.Char (isDigit, isOctDigit, isHexDigit)
+import Data.Char (isDigit, isHexDigit, isOctDigit)
+import Data.Maybe.Exts
 import Data.Text
 import Numeric
-import Prelude hiding (fail, filter)
-import Prologue
+import Prelude hiding (filter)
 import Text.Read (readMaybe)
 
 -- The ending stanza. Note the explicit endOfInput call to ensure we haven't left any dangling input.

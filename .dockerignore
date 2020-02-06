@@ -1,6 +1,11 @@
 Dockerfile
 /.licenses
+/.git
+.ghci
+.ghci_history
 .ghc.environment.x86_64-darwin-8.6.5
+*.yaml
+*.md
 
 /bin
 /dist
@@ -8,3 +13,7 @@ Dockerfile
 /notices
 /docs
 /tmp
+/semantic-source
+/bench
+/script
+/test

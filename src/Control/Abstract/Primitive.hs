@@ -1,3 +1,5 @@
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TupleSections #-}
 module Control.Abstract.Primitive
   ( defineClass
@@ -5,32 +7,35 @@ module Control.Abstract.Primitive
   , defineBuiltIn
   ) where
 
-import Control.Abstract.Context
-import Control.Abstract.Evaluator
-import Control.Abstract.Heap
-import Control.Abstract.ScopeGraph
-import Control.Abstract.Value
-import Data.Abstract.BaseError
+import           Analysis.Name
+import           Control.Abstract.Context
+import           Control.Abstract.Evaluator
+import           Control.Abstract.Heap
+import           Control.Abstract.ScopeGraph
+import           Control.Abstract.Value
+import           Control.Monad
+import           Data.Abstract.BaseError
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
-import Data.Abstract.Name
-import Data.Map.Strict as Map
-import Prologue
+import           Data.Map.Strict as Map
+import           Data.Maybe
+import           Data.Semilattice.Lower
+import           Data.Traversable
+import           GHC.Stack
 
 defineBuiltIn :: ( HasCallStack
-                 , Member (Deref value) sig
-                 , Member (Reader (CurrentFrame address)) sig
-                 , Member (Reader (CurrentScope address)) sig
-                 , Member (Reader ModuleInfo) sig
-                 , Member (Reader Span) sig
-                 , Member (State (Heap address address value)) sig
-                 , Member (State (ScopeGraph address)) sig
-                 , Member (Resumable (BaseError (ScopeError address))) sig
-                 , Member (Resumable (BaseError (HeapError address))) sig
-                 , Member (Function term address value) sig
-                 , Member (Allocator address) sig
-                 , Member Fresh sig
+                 , Has (Deref value) sig m
+                 , Has (Reader (CurrentFrame address)) sig m
+                 , Has (Reader (CurrentScope address)) sig m
+                 , Has (Reader ModuleInfo) sig m
+                 , Has (Reader Span) sig m
+                 , Has (State (Heap address address value)) sig m
+                 , Has (State (ScopeGraph address)) sig m
+                 , Has (Resumable (BaseError (ScopeError address))) sig m
+                 , Has (Resumable (BaseError (HeapError address))) sig m
+                 , Has (Function term address value) sig m
+                 , Has (Allocator address) sig m
+                 , Has Fresh sig m
                  , Ord address
-                 , Carrier sig m
                  )
               => Declaration
               -> Relation
@@ -52,20 +57,19 @@ defineBuiltIn declaration rel accessControl value = withCurrentCallStack callSta
   value <- builtIn associatedScope value
   assign slot value
 
-defineClass :: ( Carrier sig m
-               , HasCallStack
-               , Member (Allocator address) sig
-               , Member (Deref value) sig
-               , Member (Reader ModuleInfo) sig
-               , Member (Reader Span) sig
-               , Member Fresh sig
-               , Member (Reader (CurrentFrame address)) sig
-               , Member (Reader (CurrentScope address)) sig
-               , Member (Resumable (BaseError (HeapError address))) sig
-               , Member (Resumable (BaseError (ScopeError address))) sig
-               , Member (State (Heap address address value)) sig
-               , Member (State (ScopeGraph address)) sig
-               , Member (Unit value) sig
+defineClass :: ( HasCallStack
+               , Has (Allocator address) sig m
+               , Has (Deref value) sig m
+               , Has (Reader ModuleInfo) sig m
+               , Has (Reader Span) sig m
+               , Has Fresh sig m
+               , Has (Reader (CurrentFrame address)) sig m
+               , Has (Reader (CurrentScope address)) sig m
+               , Has (Resumable (BaseError (HeapError address))) sig m
+               , Has (Resumable (BaseError (ScopeError address))) sig m
+               , Has (State (Heap address address value)) sig m
+               , Has (State (ScopeGraph address)) sig m
+               , Has (Unit value) sig m
                , Ord address
                )
             => Declaration
@@ -89,19 +93,18 @@ defineClass declaration superclasses body = void . define declaration Default Pu
     unit
 
 defineNamespace :: ( AbstractValue term address value m
-                   , Carrier sig m
                    , HasCallStack
-                   , Member (Allocator address) sig
-                   , Member (Deref value) sig
-                   , Member (Reader (CurrentFrame address)) sig
-                   , Member (Reader (CurrentScope address)) sig
-                   , Member (Reader ModuleInfo) sig
-                   , Member (Reader Span) sig
-                   , Member (Resumable (BaseError (HeapError address))) sig
-                   , Member Fresh sig
-                   , Member (Resumable (BaseError (ScopeError address))) sig
-                   , Member (State (Heap address address value)) sig
-                   , Member (State (ScopeGraph address)) sig
+                   , Has (Allocator address) sig m
+                   , Has (Deref value) sig m
+                   , Has (Reader (CurrentFrame address)) sig m
+                   , Has (Reader (CurrentScope address)) sig m
+                   , Has (Reader ModuleInfo) sig m
+                   , Has (Reader Span) sig m
+                   , Has (Resumable (BaseError (HeapError address))) sig m
+                   , Has Fresh sig m
+                   , Has (Resumable (BaseError (ScopeError address))) sig m
+                   , Has (State (Heap address address value)) sig m
+                   , Has (State (ScopeGraph address)) sig m
                    , Ord address
                    )
                 => Declaration

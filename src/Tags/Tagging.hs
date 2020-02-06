@@ -1,15 +1,26 @@
-{-# LANGUAGE GADTs, LambdaCase, RankNTypes, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Tags.Tagging
 ( runTagging
 , Tag(..)
 , Kind(..)
+, IsTaggable
 )
 where
 
 import Prelude hiding (fail, filter, log)
-import Prologue hiding (Element, hash)
 
-import           Control.Effect.State as Eff
+import           Control.Carrier.State.Strict as Eff
+import           Control.Monad
+import           Data.Abstract.Declarations (Declarations)
+import           Data.Functor.Foldable
 import           Data.Text as T hiding (empty)
 import           Streaming
 import qualified Streaming.Prelude as Streaming
@@ -21,11 +32,11 @@ import qualified Source.Source as Source
 import           Tags.Tag
 import           Tags.Taggable
 
-runTagging :: (IsTaggable syntax)
+runTagging :: (IsTerm term, IsTaggable (Syntax term), Base (term Loc) ~ TermF (Syntax term) Loc, Recursive (term Loc), Declarations (term Loc))
            => Language
            -> [Text]
            -> Source.Source
-           -> Term syntax Loc
+           -> term Loc
            -> [Tag]
 runTagging lang symbolsToSummarize source
   = Eff.run
@@ -37,19 +48,18 @@ runTagging lang symbolsToSummarize source
     toKind x = do
       guard (x `elem` symbolsToSummarize)
       case x of
-        "Function" -> Just Function
-        "Method"   -> Just Method
-        "Class"    -> Just Class
-        "Module"   -> Just Module
-        "Call"     -> Just Call
-        "Send"     -> Just Call -- Ruby’s Send is considered to be a kind of 'Call'
-        _          -> Nothing
+        "Function"        -> Just Function
+        "Method"          -> Just Method
+        "Class"           -> Just Class
+        "Module"          -> Just Module
+        "Call"            -> Just Call
+        "Send"            -> Just Call -- Ruby’s Send is considered to be a kind of 'Call'
+        "AmbientFunction" -> Just Function -- Classify TypeScript ambient functions as 'Function'
+        _                 -> Nothing
 
 type ContextToken = (Text, Range)
 
-contextualizing :: ( Member (State [ContextToken]) sig
-                   , Carrier sig m
-                   )
+contextualizing :: Has (State [ContextToken]) sig m
                 => Source.Source
                 -> (Text -> Maybe Kind)
                 -> Stream (Of Token) m a
@@ -57,19 +67,17 @@ contextualizing :: ( Member (State [ContextToken]) sig
 contextualizing source toKind = Streaming.mapMaybeM $ \case
   Enter x r -> Nothing <$ enterScope (x, r)
   Exit  x r -> Nothing <$ exitScope (x, r)
-  Iden iden span docsLiteralRange -> get @[ContextToken] >>= pure . \case
-    ((x, r):("Context", cr):_) | Just kind <- toKind x
-      -> Just $ Tag iden kind span (firstLine (slice r)) (Just (slice cr))
-    ((x, r):_) | Just kind <- toKind x
-      -> Just $ Tag iden kind span (firstLine (slice r)) (slice <$> docsLiteralRange)
-    _ -> Nothing
+  Iden iden loc docsLiteralRange -> fmap go (get @[ContextToken]) where
+    go = \case
+      ((x, r):("Context", cr):_) | Just kind <- toKind x -> Just $ Tag iden kind loc (firstLine r) (Just (sliceDocs cr))
+      ((x, r):_) | Just kind <- toKind x -> Just $ Tag iden kind loc (firstLine r) (sliceDocs <$> docsLiteralRange)
+      _ -> Nothing
   where
-    slice = stripEnd . Source.toText . Source.slice source
-    firstLine = T.take 180 . fst . breakOn "\n"
+    slice = Source.toText . Source.slice source
+    sliceDocs = T.stripEnd . slice
+    firstLine = T.stripEnd . T.take 180 . T.takeWhile (/= '\n') . slice
 
-enterScope, exitScope :: ( Member (State [ContextToken]) sig
-                         , Carrier sig m
-                         )
+enterScope, exitScope :: Has (State [ContextToken]) sig m
                       => ContextToken
                       -> m ()
 enterScope c = modify @[ContextToken] (c :)

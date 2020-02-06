@@ -34,7 +34,13 @@
             {-(Identifier)-}
             {-(Empty)-})-})-}
         {-(DefaultPattern
-          {-(Statements)-})-})-})-})
+          {-(Statements
+            {-(Call
+              {-(Identifier)-}
+              {-(Statements)-}
+              {-(Empty)-})-}
+            {-(Break
+              {-(Empty)-})-})-})-})-})-})
   ->(Match
     {+(Empty)+}
     {+(Statements)+}) }))

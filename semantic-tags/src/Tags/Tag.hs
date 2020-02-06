@@ -4,21 +4,24 @@ module Tags.Tag
 ) where
 
 import Data.Text (Text)
-import Source.Span
+import Source.Loc
 
 data Tag = Tag
   { name :: Text
   , kind :: Kind
-  , span :: Span
+  , loc  :: Loc
   , line :: Text
   , docs :: Maybe Text
   }
   deriving (Eq, Show)
 
 data Kind
+  -- Definitions
   = Function
   | Method
   | Class
   | Module
+  -- References
   | Call
+  -- | Constant -- TODO: New kind for constant references
   deriving (Bounded, Enum, Eq, Show)

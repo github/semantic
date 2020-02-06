@@ -1,26 +1,21 @@
 (Statements
-  (Assignment
-    (Identifier)
+  (AugmentedAssignment
     (Plus
       (Identifier)
       (Integer)))
-  (Assignment
-    (Identifier)
+  (AugmentedAssignment
     (Minus
       (Identifier)
       (Integer)))
-  (Assignment
-    (Identifier)
+  (AugmentedAssignment
     (Times
       (Identifier)
       (Integer)))
-  (Assignment
-    (Identifier)
+  (AugmentedAssignment
     (DividedBy
       (Identifier)
       (Integer)))
-  (Assignment
-    (Identifier)
+  (AugmentedAssignment
     (Power
       (Identifier)
       (Integer))))

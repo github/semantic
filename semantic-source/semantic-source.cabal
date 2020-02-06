@@ -1,7 +1,7 @@
 cabal-version:       2.4
 
 name:                semantic-source
-version:             0.0.0.1
+version:             0.1.0.0
 synopsis:            Types and functionality for working with source code
 description:         Types and functionality for working with source code (program text).
 homepage:            https://github.com/github/semantic/tree/master/semantic-source#readme
@@ -22,7 +22,7 @@ tested-with:
   GHC == 8.6.5
   GHC == 8.8.1
 
-common common
+common haskell
   default-language: Haskell2010
   ghc-options:
     -Weverything
@@ -40,8 +40,9 @@ common common
     ghc-options: -Wno-missing-deriving-strategies
 
 library
-  import: common
+  import: haskell
   exposed-modules:
+    Source.Language
     Source.Loc
     Source.Range
     Source.Source
@@ -51,14 +52,17 @@ library
     , base            >= 4.12 && < 5
     , bytestring     ^>= 0.10.8.2
     , deepseq        ^>= 1.4.4.0
+    , containers     ^>= 0.6.2
     , generic-monoid ^>= 0.1.0.0
     , hashable        >= 1.2.7 && < 1.4
+    , lingo          ^>= 0.3
+    , pathtype       ^>= 0.8.1
     , semilattices   ^>= 0.0.0.3
     , text           ^>= 1.2.3.1
   hs-source-dirs: src
 
 test-suite doctest
-  import: common
+  import: haskell
   type: exitcode-stdio-1.0
   main-is: Doctest.hs
   build-depends:
@@ -69,8 +73,9 @@ test-suite doctest
   hs-source-dirs: test
 
 test-suite test
-  import: common
+  import: haskell
   type: exitcode-stdio-1.0
+  hs-source-dirs: test
   main-is: Test.hs
   other-modules:
     Source.Test
@@ -82,7 +87,6 @@ test-suite test
     , tasty-hedgehog  ^>= 1.0.0.1
     , tasty-hunit      >= 0.10 && <1
     , text
-  hs-source-dirs: test
 
 source-repository head
   type:     git

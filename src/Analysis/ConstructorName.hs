@@ -1,12 +1,19 @@
-{-# LANGUAGE ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Analysis.ConstructorName
 ( ConstructorName(..)
 ) where
 
+import Data.Proxy
 import Data.Sum
 import Data.Term
 import GHC.Generics
-import Prologue
 
 -- | A typeclass to retrieve the name of the data constructor for a value.
 --
@@ -32,7 +39,7 @@ type family ConstructorNameStrategy syntax where
   ConstructorNameStrategy (Sum _)     = 'Custom
   ConstructorNameStrategy []          = 'Custom
   ConstructorNameStrategy (TermF _ _) = 'Custom
-  ConstructorNameStrategy syntax      = 'Default
+  ConstructorNameStrategy _           = 'Default
 
 class ConstructorNameWithStrategy (strategy :: Strategy) syntax where
   constructorNameWithStrategy :: proxy strategy -> syntax a -> String

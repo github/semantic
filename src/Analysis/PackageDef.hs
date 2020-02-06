@@ -1,21 +1,29 @@
-{-# LANGUAGE ScopedTypeVariables, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Analysis.PackageDef
 ( PackageDef(..)
 , HasPackageDef
 , packageDefAlgebra
 ) where
 
-import Data.Blob
-import Source.Source as Source
-import Data.Sum
-import Data.Term
+import           Data.Algebra
+import           Data.Blob
+import           Data.Proxy
+import           Data.Sum
+import           Data.Term
 import qualified Data.Text as T
 import qualified Language.Go.Syntax
-import Prologue
-import Source.Loc
+import           Source.Loc
+import           Source.Source as Source
 
 newtype PackageDef = PackageDef { moduleDefIdentifier :: T.Text }
-  deriving (Eq, Generic, Show)
+  deriving (Eq, Show)
 
 -- | An r-algebra producing 'Just' a 'PackageDef' for syntax nodes corresponding to high-level declarations, or 'Nothing' otherwise.
 --
@@ -80,8 +88,8 @@ class HasPackageDefWithStrategy (strategy :: Strategy) syntax where
 --   If you’re seeing errors about missing a 'CustomHasPackageDef' instance for a given type, you’ve probably listed it in here but not defined a 'CustomHasPackageDef' instance for it, or else you’ve listed the wrong type in here. Conversely, if your 'customHasPackageDef' method is never being called, you may have forgotten to list the type in here.
 type family PackageDefStrategy syntax where
   PackageDefStrategy Language.Go.Syntax.Package = 'Custom
-  PackageDefStrategy (Sum fs) = 'Custom
-  PackageDefStrategy a = 'Default
+  PackageDefStrategy (Sum _) = 'Custom
+  PackageDefStrategy _ = 'Default
 
 
 -- | The 'Default' strategy produces 'Nothing'.

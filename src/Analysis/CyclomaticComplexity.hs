@@ -1,16 +1,24 @@
-{-# LANGUAGE DataKinds, DefaultSignatures, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DefaultSignatures #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Analysis.CyclomaticComplexity
 ( CyclomaticComplexity(..)
 , HasCyclomaticComplexity
 , cyclomaticComplexityAlgebra
 ) where
 
-import Data.Aeson
-import Data.Sum
+import           Data.Aeson
+import           Data.Proxy
+import           Data.Sum
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Statement as Statement
-import Data.Term
-import Prologue
+import           Data.Term
 
 -- | The cyclomatic complexity of a (sub)term.
 newtype CyclomaticComplexity = CyclomaticComplexity Int
@@ -103,8 +111,8 @@ type family CyclomaticComplexityStrategy syntax where
   CyclomaticComplexityStrategy Statement.If = 'Custom
   CyclomaticComplexityStrategy Statement.Pattern = 'Custom
   CyclomaticComplexityStrategy Statement.While = 'Custom
-  CyclomaticComplexityStrategy (Sum fs) = 'Custom
-  CyclomaticComplexityStrategy a = 'Default
+  CyclomaticComplexityStrategy (Sum _) = 'Custom
+  CyclomaticComplexityStrategy _ = 'Default
 
 
 -- | The 'Default' strategy takes the sum without incrementing.

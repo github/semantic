@@ -1,4 +1,10 @@
-{-# LANGUAGE DeriveAnyClass, DerivingStrategies, GeneralizedNewtypeDeriving, LambdaCase, StandaloneDeriving, FlexibleInstances, NamedFieldPuns, OverloadedStrings, QuantifiedConstraints, TypeOperators, UndecidableInstances, TypeApplications #-}
+{-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE NamedFieldPuns #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuantifiedConstraints #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module Instances () where
@@ -7,16 +13,10 @@ module Instances () where
 -- expose in semantic-core proper, yet are important enough that
 -- we should keep track of them in a dedicated file.
 
-import           Analysis.ScopeGraph
+import           Analysis.File
 import           Data.Aeson
-import           Data.File
-import           Data.Loc
-import qualified Data.Map as Map
-import           Data.Name (Name (..))
-import           Data.Text (Text)
-
-deriving newtype instance ToJSON Name
-deriving newtype instance ToJSONKey Name
+import           Data.Text (pack)
+import qualified System.Path as Path
 
 instance ToJSON a => ToJSON (File a) where
   toJSON File{filePath, fileSpan, fileBody} = object
@@ -25,22 +25,5 @@ instance ToJSON a => ToJSON (File a) where
     , "body" .= fileBody
     ]
 
-deriving newtype instance ToJSON Path
-
-instance ToJSON Ref where
-  toJSON (Ref path span) = object
-    [ "kind" .= ("ref" :: Text)
-    , "path" .= path
-    , "span" .= span
-    ]
-
-instance ToJSON Decl where
-  toJSON Decl{declSymbol, declPath, declSpan} = object
-    [ "kind"   .= ("decl" :: Text)
-    , "symbol" .= declSymbol
-    , "path" .= declPath
-    , "span" .= declSpan
-    ]
-
-instance ToJSON ScopeGraph where
-  toJSON (ScopeGraph sc) = toJSON . Map.mapKeys declSymbol $ sc
+instance ToJSON Path.AbsRelFile where
+  toJSON p = toJSON (pack (Path.toString p))

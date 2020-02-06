@@ -1,5 +1,13 @@
-{-# LANGUAGE DefaultSignatures, MultiParamTypeClasses, TypeOperators, UndecidableInstances, GADTs #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-} -- FIXME
+{-# LANGUAGE DefaultSignatures #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Data.JSON.Fields
   ( JSONFields (..)
   , JSONFields1 (..)
@@ -9,11 +17,15 @@ module Data.JSON.Fields
   ) where
 
 import           Data.Aeson
+import           Data.Bifunctor.Join
+import           Data.Edit
 import qualified Data.Map as Map
-import           Data.Sum (Apply (..), Sum)
+import           Data.Maybe
+import           Data.ScopeGraph
+import           Data.Sum
+import           Data.Text (Text)
 import qualified Data.Text as Text
 import           GHC.Generics
-import           Prologue
 import           Source.Loc
 import           Source.Range
 
@@ -57,6 +69,11 @@ instance ToJSONFields Span where
 instance ToJSONFields Loc where
   toJSONFields Loc{..} = toJSONFields byteRange <> toJSONFields span
 
+instance (ToJSONFields a, ToJSONFields b) => ToJSONFields (Edit a b) where
+  toJSONFields (Insert a)    = [ "insert" .= object (toJSONFields a) ]
+  toJSONFields (Delete a)    = [ "delete" .= object (toJSONFields a) ]
+  toJSONFields (Compare a b) = [ "replace" .= [object (toJSONFields a), object (toJSONFields b)] ]
+
 
 newtype JSONFields a = JSONFields { unJSONFields :: a }
 
@@ -67,6 +84,8 @@ instance ToJSONFields a => ToJSON (JSONFields a) where
   toJSON = object . toJSONFields . unJSONFields
   toEncoding = pairs . mconcat . toJSONFields . unJSONFields
 
+instance ToJSONFields AccessControl where
+  toJSONFields accessControl = ["accessControl" .= accessControl]
 
 newtype JSONFields1 f a = JSONFields1 { unJSONFields1 :: f a }
 

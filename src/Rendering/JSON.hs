@@ -1,4 +1,11 @@
-{-# LANGUAGE DataKinds, GADTs, GeneralizedNewtypeDeriving, KindSignatures, ScopedTypeVariables #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications #-}
 module Rendering.JSON
 ( JSON(..)
 , renderJSONDiff
@@ -13,14 +20,12 @@ module Rendering.JSON
 , SomeJSON(..)
 ) where
 
-import Data.Aeson (ToJSON, toJSON, object, (.=))
 import Data.Aeson as A
-import Data.JSON.Fields
 import Data.Blob
-import Data.Patch
+import Data.Foldable (fold)
+import Data.JSON.Fields
 import Data.Text (pack)
 import GHC.TypeLits
-import Prologue
 
 newtype JSON (key :: Symbol) a = JSON { unJSON :: [a] }
   deriving (Eq, Monoid, Semigroup, Show)
@@ -56,8 +61,8 @@ newtype JSONStat = JSONStat { jsonStatBlobs :: BlobPair }
   deriving (Eq, Show)
 
 instance ToJSON JSONStat where
-  toJSON JSONStat{..} = object ("path" .= pathKeyForBlobPair jsonStatBlobs : toJSONFields (these Delete Insert Replace (runJoin jsonStatBlobs)))
-  toEncoding JSONStat{..} = pairs (fold ("path" .= pathKeyForBlobPair jsonStatBlobs : toJSONFields (these Delete Insert Replace (runJoin jsonStatBlobs))))
+  toJSON JSONStat{..} = object ("path" .= pathKeyForBlobPair jsonStatBlobs : toJSONFields jsonStatBlobs)
+  toEncoding JSONStat{..} = pairs (fold ("path" .= pathKeyForBlobPair jsonStatBlobs : toJSONFields jsonStatBlobs))
 
 -- | Render a term to a value representing its JSON.
 renderJSONTerm :: ToJSON a => Blob -> a -> JSON "trees" SomeJSON

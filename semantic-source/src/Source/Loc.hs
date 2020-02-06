@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveGeneric, DerivingVia, RankNTypes #-}
+{-# LANGUAGE DeriveGeneric, DerivingVia, RankNTypes, NamedFieldPuns, OverloadedStrings #-}
 module Source.Loc
 ( Loc(..)
 , byteRange_
@@ -7,6 +7,7 @@ module Source.Loc
 ) where
 
 import Control.DeepSeq (NFData)
+import Data.Aeson (ToJSON(..), object, (.=))
 import Data.Hashable (Hashable)
 import Data.Monoid.Generic
 import GHC.Generics (Generic)
@@ -28,6 +29,9 @@ instance HasSpan Loc where
   span_ = lens span (\l s -> l { span = s })
   {-# INLINE span_ #-}
 
+instance ToJSON Loc where
+  toJSON Loc{byteRange, span} = object ["sourceRange" .= byteRange
+                                      , "sourceSpan" .= span]
 
 byteRange_ :: Lens' Loc Range
 byteRange_ = lens byteRange (\l r -> l { byteRange = r })
@@ -38,3 +42,4 @@ type Lens' s a = forall f . Functor f => (a -> f a) -> (s -> f s)
 lens :: (s -> a) -> (s -> a -> s) -> Lens' s a
 lens get put afa s = fmap (put s) (afa (get s))
 {-# INLINE lens #-}
+

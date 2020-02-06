@@ -1,9 +1,11 @@
-{-# LANGUAGE ImplicitParams #-}
+{-# LANGUAGE DataKinds, ImplicitParams, OverloadedStrings, TypeApplications #-}
 {-# OPTIONS_GHC -O0 #-}
 module Analysis.Go.Spec (spec) where
 
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import qualified Data.Language as Language
+import qualified Language.Go.Term as Go
+import           Source.Loc
 import           SpecHelpers
 
 
@@ -32,5 +34,4 @@ spec = do
 
   where
     fixtures = "test/fixtures/go/analysis/"
-    evaluate = evalGoProject . map (fixtures <>)
-    evalGoProject = testEvaluating <=< evaluateProject' ?session (Proxy :: Proxy 'Language.Go) goParser
+    evaluate = evaluateProject @'Language.Go @(Go.Term Loc) ?session Proxy . map (fixtures <>)

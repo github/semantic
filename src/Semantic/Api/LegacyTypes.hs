@@ -1,4 +1,9 @@
-{-# LANGUAGE DerivingVia, DeriveAnyClass, DuplicateRecordFields #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DerivingVia #-}
+{-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
 module Semantic.Api.LegacyTypes
   ( DiffTreeRequest(..)
   , ParseTreeRequest(..)
@@ -10,31 +15,29 @@ module Semantic.Api.LegacyTypes
   ) where
 
 import Data.Aeson
-import Data.Blob hiding (File(..))
-import Prologue
+import Data.Blob
+import Data.Text (Text)
+import GHC.Generics (Generic)
 
 newtype DiffTreeRequest = DiffTreeRequest { blobs :: [BlobPair] }
-  deriving stock (Eq, Show, Generic)
-  deriving anyclass (FromJSON)
+  deriving (Eq, Show, Generic, FromJSON)
 
 --
 -- Legacy Symbols API
 --
 
 newtype ParseTreeRequest = ParseTreeRequest { blobs :: [Blob] }
-  deriving stock (Eq, Show, Generic)
-  deriving anyclass (FromJSON)
+  deriving (Eq, Show, Generic, FromJSON)
 
 newtype ParseTreeSymbolResponse = ParseTreeSymbolResponse { files :: [File] }
-  deriving stock (Eq, Show, Generic)
-  deriving anyclass (ToJSON)
+  deriving (Eq, Show, Generic, ToJSON)
 
 data File = File
-  { filePath :: Text
+  { filePath     :: Text
   , fileLanguage :: Text
-  , fileSymbols :: [Symbol]
+  , fileSymbols  :: [Symbol]
   }
-  deriving stock (Generic, Eq, Show)
+  deriving (Eq, Show, Generic)
 
 instance ToJSON File where
   toJSON File{..}
@@ -49,7 +52,7 @@ data Symbol = Symbol
   , symbolLine :: Text
   , symbolSpan :: Maybe Span
   }
-  deriving stock (Generic, Eq, Show)
+  deriving (Generic, Eq, Show)
 
 instance ToJSON Symbol where
   toJSON Symbol{..}
@@ -60,11 +63,10 @@ instance ToJSON Symbol where
              ]
 
 data Position = Position { line :: Int, column :: Int }
-  deriving stock (Eq, Ord, Show, Generic)
+  deriving (Eq, Ord, Show, Generic)
 
 instance ToJSON Position
   where toJSON Position{..} = toJSON [line, column]
 
 data Span = Span { start :: Maybe Position, end :: Maybe Position }
-  deriving stock (Eq, Ord, Show, Generic)
-  deriving anyclass (ToJSON)
+  deriving (Eq, Ord, Show, Generic, ToJSON)

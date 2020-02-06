@@ -1,4 +1,8 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, TypeOperators #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE StandaloneDeriving #-}
 module Analysis.Abstract.Dead
 ( Dead(..)
 , revivingTerms
@@ -7,10 +11,12 @@ module Analysis.Abstract.Dead
 ) where
 
 import Control.Abstract
+import Control.Carrier.State.Strict
 import Data.Abstract.Module
+import Data.Functor.Foldable
 import Data.Semigroup.Reducer as Reducer
-import Data.Set (delete)
-import Prologue
+import Data.Semilattice.Lower
+import Data.Set (Set, delete)
 
 -- | A set of “dead” (unreachable) terms.
 newtype Dead term = Dead { unDead :: Set term }
@@ -19,11 +25,11 @@ newtype Dead term = Dead { unDead :: Set term }
 deriving instance Ord term => Reducer term (Dead term)
 
 -- | Update the current 'Dead' set.
-killAll :: (Member (State (Dead term)) sig, Carrier sig m) => Dead term -> Evaluator term address value m ()
+killAll :: (Has (State (Dead term)) sig m) => Dead term -> Evaluator term address value m ()
 killAll = put
 
 -- | Revive a single term, removing it from the current 'Dead' set.
-revive :: (Member (State (Dead term)) sig, Carrier sig m, Ord term) => term -> Evaluator term address value m ()
+revive :: (Has (State (Dead term)) sig m, Ord term) => term -> Evaluator term address value m ()
 revive t = modify (Dead . delete t . unDead)
 
 -- | Compute the set of all subterms recursively.
@@ -31,19 +37,17 @@ subterms :: (Ord term, Recursive term, Foldable (Base term)) => term -> Dead ter
 subterms term = term `cons` para (foldMap (uncurry cons)) term
 
 
-revivingTerms :: ( Member (State (Dead term)) sig
-                , Ord term
-                , Carrier sig m
-                )
+revivingTerms :: ( Has (State (Dead term)) sig m
+                 , Ord term
+                 )
               => Open (term -> Evaluator term address value m a)
 revivingTerms recur term = revive term *> recur term
 
 killingModules :: ( Foldable (Base term)
-                 , Member (State (Dead term)) sig
-                 , Ord term
-                 , Recursive term
-                 , Carrier sig m
-                 )
+                  , Has (State (Dead term)) sig m
+                  , Ord term
+                  , Recursive term
+                  )
                => Open (Module term -> Evaluator term address value m a)
 killingModules recur m = killAll (subterms (moduleBody m)) *> recur m
 

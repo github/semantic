@@ -1,6 +1,5 @@
 (Statements
-  (Assignment
-    (Identifier)
+  (AugmentedAssignment
     (Plus
       (Identifier)
     { (Float)

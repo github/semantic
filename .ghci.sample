@@ -1,0 +1,26 @@
+-- Consider copying this to your ~/.ghc/ghci.conf file:
+
+-- Pretty-printing
+:set -package-id prtty-smpl-3.1.1.0-c89f0500
+:set -interactive-print Text.Pretty.Simple.pPrint
+
+-- Turn on some language extensions you use a lot
+:seti -XFlexibleContexts -XOverloadedStrings -XTypeApplications
+
+-- Break on errors
+:seti -fbreak-on-error
+
+-- Automatically show the code around breakpoints
+:set stop :list
+
+-- Use a cyan lambda as the prompt
+:set prompt "\ESC[1;36m\STXλ \ESC[m\STX"
+
+-- Better errors
+:set -ferror-spans -freverse-errors -fprint-expanded-synonyms
+
+-- Path-local ghci history
+:set -flocal-ghci-history
+
+-- Better typed holes
+:set -funclutter-valid-hole-fits -fabstract-refinement-hole-fits -frefinement-level-hole-fits=2

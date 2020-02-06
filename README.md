@@ -96,7 +96,7 @@ Available options:
 
 ## Development
 
-`semantic` requires at least GHC 8.6.4 and Cabal 2.4. We strongly recommend using [`ghcup`][ghcup] to sandbox GHC versions, as GHC packages installed through your OS's package manager may not install statically-linked versions of the GHC boot libraries.
+`semantic` requires at least GHC 8.8.1 and Cabal 3.0. We strongly recommend using [`ghcup`][ghcup] to sandbox GHC versions, as GHC packages installed through your OS's package manager may not install statically-linked versions of the GHC boot libraries. `semantic` currently builds only on Unix systems; users of other operating systems may wish to use the [Docker images](https://github.com/github/semantic/packages/11609).
 
 We use `cabal's` [Nix-style local builds][nix] for development. To get started quickly:
 
@@ -104,15 +104,14 @@ We use `cabal's` [Nix-style local builds][nix] for development. To get started q
 git clone git@github.com:github/semantic.git
 cd semantic
 script/bootstrap
-cabal new-build
-cabal new-test
-cabal new-run semantic -- --help
+cabal v2-build
+cabal v2-test
+cabal v2-run semantic -- --help
 ```
 
  `stack` as a build tool is not officially supported; there is an unofficial [`stack.yaml`](https://gist.github.com/jkachmar/f200caee83280f1f25e9cfa2dd2b16bb) available, though we cannot make guarantees as to its stability.
 
 [nix]: https://www.haskell.org/cabal/users-guide/nix-local-build-overview.html
-[stackage]: https://stackage.org
 [ghcup]: https://www.haskell.org/ghcup/
 
 ## Technology and architecture

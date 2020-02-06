@@ -1,10 +1,10 @@
-{-# LANGUAGE ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, FlexibleInstances, MultiParamTypeClasses, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.HasTextElement
 ( HasTextElement(..)
 ) where
 
 import Data.Sum
-import Prologue
+import Data.Proxy
 import qualified Data.Syntax.Literal as Literal
 
 class HasTextElement syntax where
@@ -29,8 +29,8 @@ class HasTextElementWithStrategy (strategy :: Strategy) syntax where
 
 type family TextElementStrategy syntax where
   TextElementStrategy Literal.TextElement = 'Custom
-  TextElementStrategy (Sum fs) = 'Custom
-  TextElementStrategy a = 'Default
+  TextElementStrategy (Sum _) = 'Custom
+  TextElementStrategy _ = 'Default
 
 instance HasTextElementWithStrategy 'Default syntax where
   isTextElementWithStrategy _ _ = False

@@ -1,4 +1,19 @@
+<<<<<<< HEAD
 {-# LANGUAGE DataKinds, GADTs, InstanceSigs, MultiParamTypeClasses, RankNTypes, ScopedTypeVariables, StandaloneDeriving, TypeFamilies, TypeOperators #-}
+=======
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE InstanceSigs #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
+>>>>>>> origin/master
 -- | Assignment of AST onto some other structure (typically terms).
 --
 --   Parsing yields an AST represented as a Rose tree labelled with symbols in the language’s grammar and source locations (byte Range and Span). An Assignment represents a (partial) map from AST nodes onto some other structure; in essence, it’s a parser that operates over trees. (For our purposes, this structure is typically Terms annotated with source locations.) Assignments are able to match based on symbol, sequence, and hierarchy; thus, in @x = y@, both @x@ and @y@ might have the same symbol, @Identifier@, the left can be assigned to a variable declaration, while the right can be assigned to a variable reference.
@@ -89,21 +104,32 @@ module Assigning.Assignment
 , module Parsers
 ) where
 
-import Prologue
-import Prelude hiding (fail)
 import qualified Assigning.Assignment.Table as Table
-import Control.Monad.Except (MonadError (..))
-import Data.AST
-import Data.Error
-import qualified Source.Source as Source
-import Data.Term
-import Data.Text (Text)
-import Data.Text.Encoding (decodeUtf8')
+import           Control.Applicative
+import           Control.Monad
+import           Control.Monad.Except (MonadError (..))
+import           Data.AST
+import           Data.Bifunctor
+import           Data.ByteString (ByteString)
+import           Data.Error
+import           Data.Foldable
+import           Data.Function
+import           Data.Functor.Classes
+import           Data.Ix
+import           Data.List.NonEmpty (NonEmpty (..), nonEmpty)
+import           Data.Maybe
+import           Data.Semigroup
+import           Data.Term
+import           Data.Text (Text)
+import           Data.Text.Encoding (decodeUtf8')
+import           GHC.Stack
+import           Prelude hiding (fail)
 import qualified Source.Loc as L
-import Source.Range as Range
-import Source.Span as Span
-import Text.Parser.Combinators as Parsers hiding (choice)
-import TreeSitter.Language
+import           Source.Range as Range
+import qualified Source.Source as Source
+import           Source.Span as Span
+import           Text.Parser.Combinators as Parsers hiding (choice)
+import           TreeSitter.Language
 
 -- | Assignment from an AST with some set of 'symbol's onto some other value.
 --
@@ -128,7 +154,7 @@ data Tracing f a where
 
 assignmentCallSite :: Assignment grammar a -> Maybe (String, SrcLoc)
 assignmentCallSite (Tracing site _ `Then` _) = site
-assignmentCallSite _ = Nothing
+assignmentCallSite _                         = Nothing
 
 tracing :: HasCallStack => f a -> Tracing f a
 tracing f = case getCallStack callStack of
@@ -144,12 +170,21 @@ location = tracing Loc `Then` pure
 getLocals :: HasCallStack => Assignment grammar [Text]
 getLocals = tracing GetLocals `Then` pure
 
+<<<<<<< HEAD
 putLocals :: (HasCallStack, Enum grammar, Ix grammar) => [Text] -> Assignment grammar ()
 putLocals l = (tracing (PutLocals l) `Then` pure)
           <|> (tracing End `Then` pure)
+=======
+putLocals :: HasCallStack => [Text] -> Assignment ast grammar ()
+putLocals l = tracing (PutLocals l) `Then` pure
+>>>>>>> origin/master
 
 -- | Zero-width match of a node with the given symbol, producing the current node’s location.
+<<<<<<< HEAD
 symbol :: (Enum grammar, HasCallStack) => grammar -> Assignment grammar L.Loc
+=======
+symbol :: (Enum grammar, HasCallStack) => grammar -> Assignment ast grammar L.Loc
+>>>>>>> origin/master
 symbol s = tracing (Choose (Table.singleton s location) Nothing Nothing) `Then` pure
 
 -- | A rule to produce a node’s source as a ByteString.
@@ -205,12 +240,12 @@ nodeError cs expected n@Node{..} = Error (nodeSpan n) expected (Just (Right node
 firstSet :: (Enum grammar, Ix grammar) => Assignment grammar a -> [grammar]
 firstSet = iterFreer (\ _ (Tracing _ assignment) -> case assignment of
   Choose table _ _ -> Table.tableAddresses table
-  Label child _ -> firstSet child
-  _ -> []) . ([] <$)
+  Label child _    -> firstSet child
+  _                -> []) . ([] <$)
 
 
 -- | Run an assignment over an AST exhaustively.
-assign :: Symbol grammar
+assign :: (Symbol grammar, Eq1 ast, Foldable ast, Functor ast)
        => Source.Source           -- ^ The source for the parse tree.
        -> Assignment grammar a    -- ^ The 'Assignment to run.
        -> AST grammar             -- ^ The root of the ast.
@@ -219,7 +254,7 @@ assign source assignment ast = bimap (fmap (either id show)) fst (runAssignment 
 {-# INLINE assign #-}
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax over an AST exhaustively.
-runAssignment :: forall grammar a . Symbol grammar
+runAssignment :: forall grammar a ast. (Symbol grammar, Eq1 ast, Foldable ast, Functor ast)
               => Source.Source                                             -- ^ The source for the parse tree.
               -> Assignment grammar a                                      -- ^ The 'Assignment' to run.
               -> State grammar                                             -- ^ The current state.
@@ -247,6 +282,8 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                   _ -> anywhere (Just node)
 
                 anywhere node = case runTracing t of
+                  GetLocals -> yield stateLocals state
+                  PutLocals l -> yield () (state { stateLocals = l })
                   End -> requireExhaustive (tracingCallSite t) ((), state) >>= uncurry yield
                   Loc -> yield (L.Loc (Range stateOffset stateOffset) (Span statePos statePos)) state
                   Many rule -> fix (\ recur state -> (go rule state >>= \ (a, state') -> first (a:) <$> if state == state' then pure ([], state') else recur state') `catchError` const (pure ([], state))) state >>= uncurry yield
@@ -270,7 +307,7 @@ requireExhaustive callSite (a, state) =
   let state' = skipTokens state
       stack = fromCallSiteList (maybe id (:) callSite (stateCallSites state))
   in case stateNodes state' of
-    [] -> Right (a, state')
+    []                   -> Right (a, state')
     Term (In node _) : _ -> Left (nodeError stack [] node)
 
 skipTokens :: Symbol grammar => State grammar -> State grammar
@@ -283,12 +320,12 @@ advanceState state@State{..}
   | otherwise = state
 
 -- | State kept while running 'Assignment's.
-data State grammar = State
-  { stateOffset :: {-# UNPACK #-} !Int    -- ^ The offset into the Source thus far reached, measured in bytes.
-  , statePos :: {-# UNPACK #-} !Pos  -- ^ The (1-indexed) line/column position in the Source thus far reached.
+data State ast grammar = State
+  { stateOffset    :: {-# UNPACK #-} !Int    -- ^ The offset into the Source thus far reached, measured in bytes.
+  , statePos       :: {-# UNPACK #-} !Pos  -- ^ The (1-indexed) line/column position in the Source thus far reached.
   , stateCallSites :: ![(String, SrcLoc)] -- ^ The symbols & source locations of the calls thus far.
-  , stateNodes :: ![AST grammar]      -- ^ The remaining nodes to assign. Note that 'children' rules recur into subterms, and thus this does not necessarily reflect all of the terms remaining to be assigned in the overall algorithm, only those “in scope.”
-  , stateLocals :: ![Text]      -- Special state necessary for the Ruby assignment. When we refactor Assignment to use effects we should pull this out into Language.Ruby.Assignment.
+  , stateNodes     :: ![AST grammar]      -- ^ The remaining nodes to assign. Note that 'children' rules recur into subterms, and thus this does not necessarily reflect all of the terms remaining to be assigned in the overall algorithm, only those “in scope.”
+  , stateLocals    :: ![Text]      -- Special state necessary for the Ruby assignment. When we refactor Assignment to use effects we should pull this out into Language.Ruby.Assignment.
   }
   deriving (Eq, Show)
 
@@ -308,14 +345,14 @@ instance (Enum grammar, Ix grammar) => Alternative (Assignment grammar) where
   l@(Tracing callSiteL la `Then` continueL) <|> r@(Tracing callSiteR ra `Then` continueR) = go callSiteL la continueL callSiteR ra continueR
     where go :: forall l r . Maybe (String, SrcLoc) -> AssignmentF grammar l -> (l -> Assignment grammar a) -> Maybe (String, SrcLoc) -> AssignmentF grammar r -> (r -> Assignment grammar a) -> Assignment grammar a
           go callSiteL la continueL callSiteR ra continueR = case (la, ra) of
-            (Fail _, _) -> r
-            (Alt [], _) -> r
-            (_, Alt []) -> l
+            (Fail _, _)      -> r
+            (Alt [], _)      -> r
+            (_, Alt [])      -> l
             (Alt ls, Alt rs) -> alternate (Alt ((Left <$> ls) <> (Right <$> rs)))
-            (Alt ls, _) -> rebuild (Alt ((continueL <$> ls) <> pure r)) id
-            (_, Alt rs) -> rebuild (Alt (pure l <> (continueR <$> rs))) id
-            _           -> rebuild (Alt [l, r]) id
-            where alternate :: AssignmentF grammar (Either l r) -> Assignment grammar a
+            (Alt ls, _)      -> rebuild (Alt ((continueL <$> ls) <> pure r)) id
+            (_, Alt rs)      -> rebuild (Alt (pure l <> (continueR <$> rs))) id
+            _                -> rebuild (Alt [l, r]) id
+            where alternate :: AssignmentF ast grammar (Either l r) -> Assignment ast grammar a
                   alternate a = rebuild a (either continueL continueR)
                   rebuild :: AssignmentF grammar x -> (x -> Assignment grammar a) -> Assignment grammar a
                   rebuild a c = Tracing (callSiteL <|> callSiteR) a `Then` c
@@ -333,14 +370,16 @@ instance (Enum grammar, Ix grammar, Show grammar) => Parsing (Assignment grammar
   (<?>) :: HasCallStack => Assignment grammar a -> String -> Assignment grammar a
   a <?> s = tracing (Label a s) `Then` pure
 
+  unexpected :: String -> Assignment grammar a
   unexpected = fail
 
   eof :: HasCallStack => Assignment grammar ()
   eof = tracing End `Then` pure
 
+  notFollowedBy :: Show a => Assignment grammar a -> Assignment grammar ()
   notFollowedBy a = (a >>= unexpected . show) <|> pure ()
 
-instance (Enum grammar, Ix grammar, Show grammar) => MonadError (Error (Either String grammar)) (Assignment grammar) where
+instance (Enum grammar, Eq1 ast, Ix grammar, Show grammar) => MonadError (Error (Either String grammar)) (Assignment ast grammar) where
   throwError err = fail (show err)
 
   catchError rule handler = iterFreer (\ continue (Tracing cs assignment) -> case assignment of
@@ -359,7 +398,7 @@ infixl 1 `Then`
 
 instance Functor (Freer f) where
   fmap f = go
-    where go (Return result) = Return (f result)
+    where go (Return result)   = Return (f result)
           go (Then step yield) = Then step (go . yield)
           {-# INLINE go #-}
   {-# INLINE fmap #-}
@@ -396,7 +435,7 @@ instance Monad (Freer f) where
 --   This is analogous to 'iter' with a continuation for the interior values, and is therefore suitable for defining interpreters for GADTs/types lacking a 'Functor' instance.
 iterFreer :: (forall x. (x -> a) -> f x -> a) -> Freer f a -> a
 iterFreer algebra = go
-  where go (Return result) = result
+  where go (Return result)        = result
         go (Then action continue) = algebra (go . continue) action
         {-# INLINE go #-}
 {-# INLINE iterFreer #-}

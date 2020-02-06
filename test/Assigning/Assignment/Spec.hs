@@ -1,11 +1,10 @@
-{-# LANGUAGE DataKinds, OverloadedLists #-}
+{-# LANGUAGE OverloadedLists, OverloadedStrings #-}
 module Assigning.Assignment.Spec (spec) where
 
 import Assigning.Assignment
 import Data.AST
 import Data.Bifunctor (first)
 import Data.Ix
-import Data.Semigroup ((<>))
 import Data.Term
 import Data.Text as T (Text, length, words)
 import Data.Text.Encoding (encodeUtf8)

@@ -1,5 +1,5 @@
 # Put protoc and twirp tooling in its own image
-FROM haskell:8.6 as haskell
+FROM haskell:8.8 as haskell
 RUN cabal v2-update && \
     cabal v2-install proto-lens-protoc
 RUN which proto-lens-protoc
@@ -19,24 +19,14 @@ COPY --from=haskell /root/.cabal/bin/proto-lens-protoc /usr/local/bin/proto-lens
 ENTRYPOINT ["/protobuf/bin/protoc", "-I/protobuf", "--plugin=protoc-gen-haskell=/usr/local/bin/proto-lens-protoc"]
 
 # Build semantic
-FROM haskell:8.6 as build
+FROM haskell:8.8 as build
 WORKDIR /build
-
-# Build just the dependencies so that this layer can be cached
-COPY semantic.cabal .
-COPY semantic-core semantic-core/
-COPY semantic-java semantic-java/
-COPY semantic-json semantic-json/
-COPY semantic-python semantic-python/
-COPY semantic-source semantic-source/
-COPY semantic-tags semantic-tags/
-COPY cabal.project .
-RUN cabal v2-update && \
-    cabal v2-build --flags="release" --only-dependencies
 
 # Build all of semantic
 COPY . .
-RUN cabal v2-build --flags="release" semantic:exe:semantic
+RUN cabal v2-update && \
+    cabal v2-configure --flags="release" && \
+    cabal v2-build semantic:exe:semantic
 
 # A fake `install` target until we can get `cabal v2-install` to work
 RUN cp $(find dist-newstyle/build/x86_64-linux -name semantic -type f -perm -u=x) /usr/local/bin/semantic

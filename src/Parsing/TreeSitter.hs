@@ -1,4 +1,11 @@
-{-# LANGUAGE DataKinds, GADTs, LambdaCase, ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeOperators #-}
 module Parsing.TreeSitter
 ( TSParseException (..)
 , Duration(..)
@@ -6,34 +13,35 @@ module Parsing.TreeSitter
 , parseToPreciseAST
 ) where
 
-import Prologue
-
-import           Control.Effect.Fail
-import           Control.Effect.Lift
-import           Control.Effect.Reader
-import qualified Control.Exception as Exc
-import           Foreign
-import           Foreign.C.Types (CBool (..))
-import           Foreign.Marshal.Array (allocaArray)
+import Control.Carrier.Reader
+import Control.Exception as Exc
+import Control.Monad
+import Control.Monad.IO.Class
+import Data.Functor.Foldable
+import Foreign
+import GHC.Generics
 
 import           Data.AST (AST, Node (Node))
 import           Data.Blob
 import           Data.Duration
+import           Data.Maybe.Exts
 import           Data.Term
 import           Source.Loc
 import qualified Source.Source as Source
 import           Source.Span
+import qualified System.Timeout as System
 
 import qualified TreeSitter.Cursor as TS
 import qualified TreeSitter.Language as TS
 import qualified TreeSitter.Node as TS
 import qualified TreeSitter.Parser as TS
 import qualified TreeSitter.Tree as TS
-import qualified TreeSitter.Unmarshal as TS
+import qualified AST.Unmarshal as TS
 
 data TSParseException
   = ParserTimedOut
   | IncompatibleVersions
+  | UnmarshalTimedOut
   | UnmarshalFailure String
     deriving (Eq, Show, Generic)
 
@@ -54,18 +62,24 @@ parseToPreciseAST
      , TS.Unmarshal t
      )
   => Duration
+  -> Duration
   -> Ptr TS.Language
   -> Blob
   -> m (Either TSParseException (t Loc))
-parseToPreciseAST parseTimeout language blob = runParse parseTimeout language blob $ \ rootPtr ->
-  TS.withCursor (castPtr rootPtr) $ \ cursor ->
-    runM (runFail (runReader cursor (runReader (Source.bytes (blobSource blob)) (TS.peekNode >>= TS.unmarshalNode))))
-      >>= either (Exc.throw . UnmarshalFailure) pure
+parseToPreciseAST parseTimeout unmarshalTimeout language blob = runParse parseTimeout language blob $ \ rootPtr ->
+  withTimeout $
+    TS.withCursor (castPtr rootPtr) $ \ cursor ->
+      runReader (TS.UnmarshalState (Source.bytes (blobSource blob)) cursor) (liftIO (peek rootPtr) >>= TS.unmarshalNode)
+        `Exc.catch` (Exc.throw . UnmarshalFailure . TS.getUnmarshalError)
+  where
+    withTimeout :: IO a -> IO a
+    withTimeout action = System.timeout (toMicroseconds unmarshalTimeout) action >>= maybeM (Exc.throw UnmarshalTimedOut)
 
-instance Exception TSParseException where
+instance Exc.Exception TSParseException where
   displayException = \case
     ParserTimedOut -> "tree-sitter: parser timed out"
     IncompatibleVersions -> "tree-sitter: incompatible versions"
+    UnmarshalTimedOut -> "tree-sitter: unmarshal timed out"
     UnmarshalFailure s -> "tree-sitter: unmarshal failure - " <> show s
 
 runParse
@@ -79,7 +93,6 @@ runParse parseTimeout language Blob{..} action =
   liftIO . Exc.tryJust fromException . TS.withParser language $ \ parser -> do
     let timeoutMicros = fromIntegral $ toMicroseconds parseTimeout
     TS.ts_parser_set_timeout_micros parser timeoutMicros
-    TS.ts_parser_halt_on_error parser (CBool 1)
     compatible <- TS.ts_parser_set_language parser language
     if compatible then
       TS.withParseTree parser (Source.bytes blobSource) $ \ treePtr -> do
@@ -103,8 +116,8 @@ anaM g = a where a = pure . embed <=< traverse a <=< g
 
 
 nodeRange :: TS.Node -> Range
-nodeRange TS.Node{..} = Range (fromIntegral nodeStartByte) (fromIntegral nodeEndByte)
+nodeRange node = Range (fromIntegral (TS.nodeStartByte node)) (fromIntegral (TS.nodeEndByte node))
 
 nodeSpan :: TS.Node -> Span
-nodeSpan TS.Node{..} = nodeStartPoint `seq` nodeEndPoint `seq` Span (pointPos nodeStartPoint) (pointPos nodeEndPoint)
+nodeSpan node = TS.nodeStartPoint node `seq` TS.nodeEndPoint node `seq` Span (pointPos (TS.nodeStartPoint node)) (pointPos (TS.nodeEndPoint node))
   where pointPos TS.TSPoint{..} = pointRow `seq` pointColumn `seq` Pos (1 + fromIntegral pointRow) (1 + fromIntegral pointColumn)

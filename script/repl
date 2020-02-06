@@ -1,0 +1,13 @@
+#!/bin/bash
+# Usage: script/repl [ARGS...]
+# Run a repl session capable of loading all of the packages and their individual components. Any passed arguments, e.g. module names or flags, will be passed to ghci.
+
+set -e
+
+cd "$(dirname "$0")/.."
+
+# do a build of dependencies up front to ensure they’re all available
+cabal v2-build all --enable-benchmarks --enable-tests --only-dependencies
+
+# exec ghci with the appropriate flags, and without the $GHC_ENVIRONMENT variable interfering
+cabal v2-exec env -- -u GHC_ENVIRONMENT ghci -ghci-script=.ghci.repl $(script/ghci-flags) -no-ignore-dot-ghci $@

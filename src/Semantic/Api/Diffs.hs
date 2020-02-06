@@ -1,46 +1,48 @@
-{-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, LambdaCase, MonoLocalBinds, QuantifiedConstraints, RankNTypes #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE MonoLocalBinds #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Semantic.Api.Diffs
   ( parseDiffBuilder
   , DiffOutputFormat(..)
+
+  , diffTerms
   , diffGraph
-
-  , decoratingDiffWith
-  , DiffEffects
-
-  , legacySummarizeDiffParsers
-  , LegacySummarizeDiff(..)
-  , summarizeDiffParsers
-  , SummarizeDiff(..)
   ) where
 
 import           Analysis.ConstructorName (ConstructorName)
-import           Analysis.Decorator (decoratorWithAlgebra)
-import           Analysis.TOCSummary (Declaration, HasDeclaration, declarationAlgebra)
 import           Control.Effect.Error
 import           Control.Effect.Parse
 import           Control.Effect.Reader
 import           Control.Exception
 import           Control.Lens
+import           Control.Monad
 import           Control.Monad.IO.Class
+import           Data.Bifoldable
 import           Data.Blob
 import           Data.ByteString.Builder
-import           Data.Graph
-import           Data.JSON.Fields
+import           Data.Diff
+import           Data.Edit
+import           Data.Foldable
+import           Data.Functor.Classes
+import           Data.Graph.Algebraic
+import           Data.JSON.Fields (ToJSONFields1)
 import           Data.Language
+import           Data.Map.Strict (Map)
 import           Data.ProtoLens (defMessage)
-import           Data.Term
+import           Data.Term (IsTerm (..))
 import qualified Data.Text as T
-import           Diffing.Algorithm (Diffable)
-import           Diffing.Interpreter (DiffTerms(..))
+import           Diffing.Interpreter (DiffTerms (..))
 import           Parsing.Parser
-import           Prologue
 import           Proto.Semantic as P hiding (Blob, BlobPair)
 import           Proto.Semantic_Fields as P
-import           Proto.Semantic_JSON()
+import           Proto.Semantic_JSON ()
 import           Rendering.Graph
 import           Rendering.JSON hiding (JSON)
 import qualified Rendering.JSON
-import           Rendering.TOC
 import           Semantic.Api.Bridge
 import           Semantic.Config
 import           Semantic.Task as Task
@@ -57,26 +59,26 @@ data DiffOutputFormat
   | DiffDotGraph
   deriving (Eq, Show)
 
-parseDiffBuilder :: (Traversable t, DiffEffects sig m) => DiffOutputFormat -> t BlobPair -> m Builder
+parseDiffBuilder :: (Traversable t, Has (Error SomeException) sig m, Has (Reader Config) sig m, Has Telemetry sig m, Has Distribute sig m, Has Parse sig m, MonadIO m) => DiffOutputFormat -> t BlobPair -> m Builder
 parseDiffBuilder DiffJSONTree    = distributeFoldMap jsonDiff >=> serialize Format.JSON -- NB: Serialize happens at the top level for these two JSON formats to collect results of multiple blob pairs.
 parseDiffBuilder DiffJSONGraph   = diffGraph >=> serialize Format.JSON
-parseDiffBuilder DiffSExpression = distributeFoldMap (diffWith sexprDiffParsers sexprDiff)
-parseDiffBuilder DiffShow        = distributeFoldMap (diffWith showDiffParsers showDiff)
-parseDiffBuilder DiffDotGraph    = distributeFoldMap (diffWith dotGraphDiffParsers dotGraphDiff)
+parseDiffBuilder DiffSExpression = distributeFoldMap (parsePairWith diffParsers sexprDiff)
+parseDiffBuilder DiffShow        = distributeFoldMap (parsePairWith diffParsers showDiff)
+parseDiffBuilder DiffDotGraph    = distributeFoldMap (parsePairWith diffParsers dotGraphDiff)
 
-jsonDiff :: DiffEffects sig m => BlobPair -> m (Rendering.JSON.JSON "diffs" SomeJSON)
-jsonDiff blobPair = diffWith jsonTreeDiffParsers (pure . jsonTreeDiff blobPair) blobPair `catchError` jsonError blobPair
+jsonDiff :: (Has (Error SomeException) sig m, Has Telemetry sig m, Has Parse sig m, MonadIO m) => BlobPair -> m (Rendering.JSON.JSON "diffs" SomeJSON)
+jsonDiff blobPair = parsePairWith diffParsers jsonTreeDiff blobPair `catchError` jsonError blobPair
 
 jsonError :: Applicative m => BlobPair -> SomeException -> m (Rendering.JSON.JSON "diffs" SomeJSON)
 jsonError blobPair (SomeException e) = pure $ renderJSONDiffError blobPair (show e)
 
-diffGraph :: (Traversable t, DiffEffects sig m) => t BlobPair -> m DiffTreeGraphResponse
+diffGraph :: (Traversable t, Has (Error SomeException) sig m, Has Telemetry sig m, Has Distribute sig m, Has Parse sig m, MonadIO m) => t BlobPair -> m DiffTreeGraphResponse
 diffGraph blobs = do
   graph <- distributeFor blobs go
   pure $ defMessage & P.files .~ toList graph
   where
-    go :: DiffEffects sig m => BlobPair -> m DiffTreeFileGraph
-    go blobPair = diffWith jsonGraphDiffParsers (pure . jsonGraphDiff blobPair) blobPair
+    go :: (Has (Error SomeException) sig m, Has Telemetry sig m, Has Parse sig m, MonadIO m) => BlobPair -> m DiffTreeFileGraph
+    go blobPair = parsePairWith diffParsers jsonGraphDiff blobPair
       `catchError` \(SomeException e) ->
         pure $ defMessage
           & P.path .~ path
@@ -88,144 +90,78 @@ diffGraph blobs = do
         path = T.pack $ pathForBlobPair blobPair
         lang = bridging # languageForBlobPair blobPair
 
-type DiffEffects sig m = (Member (Error SomeException) sig, Member (Reader Config) sig, Member Telemetry sig, Member Distribute sig, Member Parse sig, Carrier sig m, MonadIO m)
+
+class DOTGraphDiff term where
+  dotGraphDiff :: (Has (Reader Config) sig m, Has Telemetry sig m, MonadIO m) => Edit (Blob, term Loc) (Blob, term Loc) -> m Builder
+
+instance (DiffTerms term, ConstructorName (Syntax term), Foldable (Syntax term), Functor (Syntax term)) => DOTGraphDiff term where
+  dotGraphDiff = serialize (DOT (diffStyle "diffs")) . renderTreeGraph <=< diffTerms
 
 
-dotGraphDiffParsers :: Map Language (SomeParser DOTGraphDiff Loc)
-dotGraphDiffParsers = aLaCarteParsers
+class JSONGraphDiff term where
+  jsonGraphDiff :: (Has Telemetry sig m, MonadIO m) => Edit (Blob, term Loc) (Blob, term Loc) -> m DiffTreeFileGraph
 
-class DiffTerms term => DOTGraphDiff term where
-  dotGraphDiff :: (Carrier sig m, Member (Reader Config) sig) => DiffFor term Loc Loc -> m Builder
-
-instance (ConstructorName syntax, Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => DOTGraphDiff (Term syntax) where
-  dotGraphDiff = serialize (DOT (diffStyle "diffs")) . renderTreeGraph
-
-
-jsonGraphDiffParsers :: Map Language (SomeParser JSONGraphDiff Loc)
-jsonGraphDiffParsers = aLaCarteParsers
-
-class DiffTerms term => JSONGraphDiff term where
-  jsonGraphDiff :: BlobPair -> DiffFor term Loc Loc -> DiffTreeFileGraph
-
-instance (ConstructorName syntax, Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => JSONGraphDiff (Term syntax) where
-  jsonGraphDiff blobPair diff
-    = let graph = renderTreeGraph diff
-          toEdge (Edge (a, b)) = defMessage & P.source .~ a^.diffVertexId & P.target .~ b^.diffVertexId
-          path = T.pack $ pathForBlobPair blobPair
-          lang = bridging # languageForBlobPair blobPair
-      in defMessage
-           & P.path .~ path
-           & P.language .~ lang
-           & P.vertices .~ vertexList graph
-           & P.edges .~ fmap toEdge (edgeList graph)
-           & P.errors .~ mempty
+instance (DiffTerms term, ConstructorName (Syntax term), Foldable (Syntax term), Functor (Syntax term)) => JSONGraphDiff term where
+  jsonGraphDiff terms = do
+    diff <- diffTerms terms
+    let blobPair = bimap fst fst terms
+        graph = renderTreeGraph diff
+        toEdge (Edge (a, b)) = defMessage & P.source .~ a^.diffVertexId & P.target .~ b^.diffVertexId
+        path = T.pack $ pathForBlobPair blobPair
+        lang = bridging # languageForBlobPair blobPair
+    pure $! defMessage
+      & P.path     .~ path
+      & P.language .~ lang
+      & P.vertices .~ vertexList graph
+      & P.edges    .~ fmap toEdge (edgeList graph)
+      & P.errors   .~ mempty
 
 
-jsonTreeDiffParsers :: Map Language (SomeParser JSONTreeDiff Loc)
-jsonTreeDiffParsers = aLaCarteParsers
+class JSONTreeDiff term where
+  jsonTreeDiff :: (Has Telemetry sig m, MonadIO m) => Edit (Blob, term Loc) (Blob, term Loc) -> m (Rendering.JSON.JSON "diffs" SomeJSON)
 
-class DiffTerms term => JSONTreeDiff term where
-  jsonTreeDiff :: BlobPair -> DiffFor term Loc Loc -> Rendering.JSON.JSON "diffs" SomeJSON
-
-instance (Diffable syntax, Eq1 syntax, Hashable1 syntax, ToJSONFields1 syntax, Traversable syntax) => JSONTreeDiff (Term syntax) where
-  jsonTreeDiff = renderJSONDiff
+instance (DiffTerms term, Foldable (Syntax term), ToJSONFields1 (Syntax term)) => JSONTreeDiff term where
+  jsonTreeDiff terms = renderJSONDiff (bimap fst fst terms) <$> diffTerms terms
 
 
-sexprDiffParsers :: Map Language (SomeParser SExprDiff Loc)
-sexprDiffParsers = aLaCarteParsers
+class SExprDiff term where
+  sexprDiff :: (Has (Reader Config) sig m, Has Telemetry sig m, MonadIO m) => Edit (Blob, term Loc) (Blob, term Loc) -> m Builder
 
-class DiffTerms term => SExprDiff term where
-  sexprDiff :: (Carrier sig m, Member (Reader Config) sig) => DiffFor term Loc Loc -> m Builder
-
-instance (ConstructorName syntax, Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => SExprDiff (Term syntax) where
-  sexprDiff = serialize (SExpression ByConstructorName)
+instance (DiffTerms term, ConstructorName (Syntax term), Foldable (Syntax term), Functor (Syntax term)) => SExprDiff term where
+  sexprDiff = serialize (SExpression ByConstructorName) <=< diffTerms
 
 
-showDiffParsers :: Map Language (SomeParser ShowDiff Loc)
-showDiffParsers = aLaCarteParsers
+class ShowDiff term where
+  showDiff :: (Has (Reader Config) sig m, Has Telemetry sig m, MonadIO m) => Edit (Blob, term Loc) (Blob, term Loc) -> m Builder
 
-class DiffTerms term => ShowDiff term where
-  showDiff :: (Carrier sig m, Member (Reader Config) sig) => DiffFor term Loc Loc -> m Builder
-
-instance (Diffable syntax, Eq1 syntax, Hashable1 syntax, Show1 syntax, Traversable syntax) => ShowDiff (Term syntax) where
-  showDiff = serialize Show
+instance (DiffTerms term, Foldable (Syntax term), Show1 (Syntax term)) => ShowDiff term where
+  showDiff = serialize Show <=< diffTerms
 
 
-legacySummarizeDiffParsers :: Map Language (SomeParser LegacySummarizeDiff Loc)
-legacySummarizeDiffParsers = aLaCarteParsers
-
-class DiffTerms term => LegacySummarizeDiff term where
-  legacyDecorateTerm :: Blob -> term Loc -> term (Maybe Declaration)
-  legacySummarizeDiff :: BlobPair -> DiffFor term (Maybe Declaration) (Maybe Declaration) -> Summaries
-
-instance (Diffable syntax, Eq1 syntax, HasDeclaration syntax, Hashable1 syntax, Traversable syntax) => LegacySummarizeDiff (Term syntax) where
-  legacyDecorateTerm = decoratorWithAlgebra . declarationAlgebra
-  legacySummarizeDiff = renderToCDiff
-
-
-summarizeDiffParsers :: Map Language (SomeParser SummarizeDiff Loc)
-summarizeDiffParsers = aLaCarteParsers
-
-class DiffTerms term => SummarizeDiff term where
-  decorateTerm :: Blob -> term Loc -> term (Maybe Declaration)
-  summarizeDiff :: BlobPair -> DiffFor term (Maybe Declaration) (Maybe Declaration) -> TOCSummaryFile
-
-instance (Diffable syntax, Eq1 syntax, HasDeclaration syntax, Hashable1 syntax, Traversable syntax) => SummarizeDiff (Term syntax) where
-  decorateTerm = decoratorWithAlgebra . declarationAlgebra
-  summarizeDiff blobPair diff = foldr go (defMessage & P.path .~ path & P.language .~ lang) (diffTOC diff)
-    where
-      path = T.pack $ pathKeyForBlobPair blobPair
-      lang = bridging # languageForBlobPair blobPair
-
-      toChangeType = \case
-        "added" -> ADDED
-        "modified" -> MODIFIED
-        "removed" -> REMOVED
-        _ -> NONE
-
-      go :: TOCSummary -> TOCSummaryFile -> TOCSummaryFile
-      go TOCSummary{..} file = defMessage
-        & P.path .~ file^.P.path
-        & P.language .~ file^.P.language
-        & P.changes .~ (defMessage & P.category .~ summaryCategoryName & P.term .~ summaryTermName & P.maybe'span .~ (converting #? summarySpan) & P.changeType .~ toChangeType summaryChangeType) : file^.P.changes
-        & P.errors .~ file^.P.errors
-
-      go ErrorSummary{..} file = defMessage
-        & P.path .~ file^.P.path
-        & P.language .~ file^.P.language
-        & P.changes .~ file^.P.changes
-        & P.errors .~ (defMessage & P.error .~ errorText & P.maybe'span .~ converting #? errorSpan) : file^.P.errors
-
-
--- | Parse a 'BlobPair' using one of the provided parsers, diff the resulting terms, and run an action on the abstracted diff.
---
--- This allows us to define features using an abstract interface, and use them with diffs for any parser whose terms support that interface.
-diffWith
-  :: (forall term . c term => DiffTerms term, DiffEffects sig m)
-  => Map Language (SomeParser c Loc)                            -- ^ The set of parsers to select from.
-  -> (forall term . c term => DiffFor term Loc Loc -> m output) -- ^ A function to run on the computed diff. Note that the diff is abstract (it’s the diff type corresponding to an abstract term type), but the term type is constrained by @c@, allowing you to do anything @c@ allows, and requiring that all the input parsers produce terms supporting @c@.
-  -> BlobPair                                                   -- ^ The blob pair to parse.
-  -> m output
-diffWith parsers render blobPair = parsePairWith parsers (render <=< diffTerms blobPair) blobPair
-
--- | Parse a 'BlobPair' using one of the provided parsers, decorate the resulting terms, diff them, and run an action on the abstracted diff.
---
--- This allows us to define features using an abstract interface, and use them with diffs for any parser whose terms support that interface.
-decoratingDiffWith
-  :: forall ann c output m sig
-  .  (forall term . c term => DiffTerms term, DiffEffects sig m)
-  => Map Language (SomeParser c Loc)                            -- ^ The set of parsers to select from.
-  -> (forall term . c term => Blob -> term Loc -> term ann)     -- ^ A function to decorate the terms, replacing their annotations and thus the annotations in the resulting diff.
-  -> (forall term . c term => DiffFor term ann ann -> m output) -- ^ A function to run on the computed diff. Note that the diff is abstract (it’s the diff type corresponding to an abstract term type), but the term type is constrained by @c@, allowing you to do anything @c@ allows, and requiring that all the input parsers produce terms supporting @c@.
-  -> BlobPair                                                   -- ^ The blob pair to parse.
-  -> m output
-decoratingDiffWith parsers decorate render blobPair = parsePairWith parsers (render <=< diffTerms blobPair . bimap (decorate blobL) (decorate blobR)) blobPair where
-  (blobL, blobR) = fromThese errorBlob errorBlob (runJoin blobPair)
-  errorBlob = Prelude.error "evaluating blob on absent side"
-
-diffTerms :: (DiffTerms term, Member Telemetry sig, Carrier sig m, MonadIO m)
-  => BlobPair -> These (term ann) (term ann) -> m (DiffFor term ann ann)
-diffTerms blobs terms = time "diff" languageTag $ do
-  let diff = diffTermPair terms
+diffTerms :: (DiffTerms term, Foldable (Syntax term), Has Telemetry sig m, MonadIO m)
+  => Edit (Blob, term ann) (Blob, term ann) -> m (Diff (Syntax term) ann ann)
+diffTerms terms = time "diff" languageTag $ do
+  let diff = diffTermPair (bimap snd snd terms)
   diff <$ writeStat (Stat.count "diff.nodes" (bilength diff) languageTag)
   where languageTag = languageTagForBlobPair blobs
+        blobs = bimap fst fst terms
+
+diffParsers :: Map Language (SomeParser Anything Loc)
+diffParsers = aLaCarteParsers
+
+class
+  ( DiffTerms term
+  , ConstructorName (Syntax term)
+  , Foldable (Syntax term)
+  , Functor (Syntax term)
+  , Show1 (Syntax term)
+  , ToJSONFields1 (Syntax term)
+  ) => Anything term
+instance
+  ( DiffTerms term
+  , ConstructorName (Syntax term)
+  , Foldable (Syntax term)
+  , Functor (Syntax term)
+  , Show1 (Syntax term)
+  , ToJSONFields1 (Syntax term)
+  ) => Anything term

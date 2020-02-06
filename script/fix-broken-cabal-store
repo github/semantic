@@ -1,0 +1,7 @@
+#!/bin/bash
+
+store_dir="$HOME/.cabal/store/ghc-$(ghc --numeric-version)"
+
+rm -rf "$store_dir"/tr-sttr*
+rm -rf "$store_dir"/lib/libHStr-sttr*
+rm -rf "$store_dir"/package.db/tr-sttr*

@@ -11,12 +11,15 @@ profiles
 cabal.project.local*
 dist
 dist-newstyle
+dist-repl
+.ghci
 .ghc.environment.*
 .ghci_history
 
 tmp/
 /bin/
 
+/src/Semantic/Version.hs.bak
 /semanticd/test/current
 /semanticd/test/rover-example-config/semantic.log
 /test/fixtures/*/examples
@@ -24,7 +27,6 @@ tmp/
 *.hp
 *.prof
 *.pyc
-/hie.yaml
 
 /test.*
 /*.html

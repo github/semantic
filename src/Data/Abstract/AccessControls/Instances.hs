@@ -1,6 +1,6 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, UndecidableInstances #-}
-{-# OPTIONS_GHC -Wno-orphans -Wno-missing-export-lists #-}
-module Data.Abstract.AccessControls.Instances where
+{-# LANGUAGE GeneralizedNewtypeDeriving, StandaloneDeriving, TypeApplications, UndecidableInstances #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
+module Data.Abstract.AccessControls.Instances () where
 
 import Data.Sum
 import Data.Term
@@ -15,15 +15,27 @@ import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Language.Go.Syntax as Go
+import qualified Language.Go.Term as Go
 import qualified Language.Go.Type as Go
 import qualified Language.PHP.Syntax as PHP
+import qualified Language.PHP.Term as PHP
 import qualified Language.Python.Syntax as Python
+import qualified Language.Python.Term as Python
 import qualified Language.Ruby.Syntax as Ruby
+import qualified Language.Ruby.Term as Ruby
 import qualified Language.TSX.Syntax as TSX
+import qualified Language.TSX.Term as TSX
 import qualified Language.TypeScript.Syntax as TypeScript
+import qualified Language.TypeScript.Term as TypeScript
 import Data.Quieterm
 
 deriving instance AccessControls1 syntax => AccessControls (Term syntax ann)
+deriving instance AccessControls (Go.Term ann)
+deriving instance AccessControls (PHP.Term ann)
+deriving instance AccessControls (Python.Term ann)
+deriving instance AccessControls (Ruby.Term ann)
+deriving instance AccessControls (TSX.Term ann)
+deriving instance AccessControls (TypeScript.Term ann)
 
 instance (AccessControls recur, AccessControls1 syntax) => AccessControls (TermF syntax ann recur) where
   termToAccessControl = liftTermToAccessControl termToAccessControl . termFOut
@@ -105,6 +117,7 @@ instance AccessControls1 Literal.Null
 instance AccessControls1 Literal.KeyValue
 
 instance AccessControls1 Statement.Assignment
+instance AccessControls1 Statement.AugmentedAssignment
 instance AccessControls1 Statement.Break
 instance AccessControls1 Statement.Catch
 instance AccessControls1 Statement.Continue

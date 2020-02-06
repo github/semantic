@@ -1,4 +1,6 @@
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE GADTs #-}
+{-# LANGUAGE OverloadedStrings #-}
 module Serializing.Format
 ( Format(..)
 , FormatStyle(..)
@@ -11,11 +13,11 @@ import Algebra.Graph.Export.Dot
 import Algebra.Graph.ToGraph
 import Data.Aeson (ToJSON (..), fromEncoding)
 import Data.ByteString.Builder
-import Language.Haskell.HsColour
-import Language.Haskell.HsColour.Colourise
-import Prologue
+import Data.Functor.Foldable
 import Data.ProtoLens.Encoding as Proto
 import Data.ProtoLens.Message (Message)
+import Language.Haskell.HsColour
+import Language.Haskell.HsColour.Colourise
 import Serializing.SExpression
 import Text.Show.Pretty
 

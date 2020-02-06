@@ -1,4 +1,8 @@
-{-# LANGUAGE GADTs, RankNTypes #-}
+{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE RecordWildCards #-}
 module Data.Error
   ( Error (..)
   , formatError
@@ -11,11 +15,12 @@ module Data.Error
   , Colourize (..)
   ) where
 
-import Prologue
-
+import Control.Exception (Exception)
 import Data.ByteString.Char8 (unpack)
+import Data.Foldable
 import Data.Ix (inRange)
 import Data.List (intersperse, isSuffixOf)
+import GHC.Stack
 import System.Console.ANSI
 
 import           Data.Blob
@@ -34,7 +39,7 @@ data Error grammar = Error
   , errorExpected  :: [grammar]
   , errorActual    :: Maybe grammar
   , errorCallStack :: CallStack
-  } deriving (Show, Functor, Typeable)
+  } deriving (Show, Functor)
 
 -- | This instance does not take into account the call stack.
 instance Eq grammar => Eq (Error grammar) where

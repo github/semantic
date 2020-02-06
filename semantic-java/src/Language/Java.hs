@@ -1,19 +1,24 @@
 -- | Semantic functionality for Java programs.
 module Language.Java
 ( Term(..)
-, TreeSitter.Java.tree_sitter_java
+, Language.Java.Grammar.tree_sitter_java
 ) where
 
+import           Data.Proxy
+import qualified Language.Java.AST as Java
 import qualified Language.Java.Tags as JavaTags
 import qualified Tags.Tagging.Precise as Tags
-import qualified TreeSitter.Java (tree_sitter_java)
-import qualified TreeSitter.Java.AST as Java
-import qualified TreeSitter.Unmarshal as TS
+import qualified Language.Java.Grammar (tree_sitter_java)
+import qualified AST.Unmarshal as TS
 
 newtype Term a = Term { getTerm :: Java.Program a }
 
+instance TS.SymbolMatching Term where
+  matchedSymbols _ = TS.matchedSymbols (Proxy :: Proxy Java.Program)
+  showFailure _ = TS.showFailure (Proxy :: Proxy Java.Program)
+
 instance TS.Unmarshal Term where
-  unmarshalNode node = Term <$> TS.unmarshalNode node
+  matchers = fmap (fmap (TS.hoist Term)) TS.matchers
 
 instance Tags.ToTags Term where
   tags src = Tags.runTagging src . JavaTags.tags . getTerm

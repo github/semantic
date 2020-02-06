@@ -1,20 +1,28 @@
-{-# LANGUAGE FunctionalDependencies, LambdaCase #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE RecordWildCards #-}
 module Semantic.Api.Bridge
   ( APIBridge (..)
   , APIConvert (..)
   , (#?)
   ) where
 
+import           Analysis.File
 import           Control.Lens
 import qualified Data.Blob as Data
+import qualified Data.Edit as Data
+import           Data.Either
 import qualified Data.Language as Data
 import           Data.ProtoLens (defMessage)
 import qualified Data.Text as T
-import qualified Semantic.Api.LegacyTypes as Legacy
+import           Data.Text.Lens
 import qualified Proto.Semantic as API
 import           Proto.Semantic_Fields as P
-import           Source.Source (fromText, toText)
+import qualified Semantic.Api.LegacyTypes as Legacy
+import qualified Source.Source as Source (fromText, toText, totalSpan)
 import qualified Source.Span as Source
+import qualified System.Path as Path
 
 -- | An @APIBridge x y@ instance describes an isomorphism between @x@ and @y@.
 -- This is suitable for types such as 'Pos' which are representationally equivalent
@@ -70,19 +78,29 @@ instance APIBridge T.Text Data.Language where
 
 instance APIBridge API.Blob Data.Blob where
   bridging = iso apiBlobToBlob blobToApiBlob where
-    blobToApiBlob b = defMessage & P.content .~ toText (Data.blobSource b) & P.path .~ T.pack (Data.blobPath b) & P.language .~ (bridging # Data.blobLanguage b)
-    apiBlobToBlob blob = Data.makeBlob (fromText (blob^.content)) (T.unpack (blob^.path)) (blob^.(language . bridging)) mempty
+    blobToApiBlob b
+      = defMessage
+      & P.content .~ Source.toText (Data.blobSource b)
+      & P.path .~ T.pack (Data.blobPath b)
+      & P.language .~ (bridging # Data.blobLanguage b)
+    apiBlobToBlob blob =
+      let src = blob^.content.to Source.fromText
+          pth = fromRight (Path.toAbsRel Path.emptyFile) (blob^.path._Text.to Path.parse)
+      in Data.Blob
+      { blobSource = src
+      , blobFile = File pth (Source.totalSpan src) (blob^.language.bridging)
+      }
 
 
 instance APIConvert API.BlobPair Data.BlobPair where
   converting = prism' blobPairToApiBlobPair apiBlobPairToBlobPair where
 
     apiBlobPairToBlobPair blobPair = case (blobPair^.maybe'before, blobPair^.maybe'after) of
-      (Just before, Just after) -> Just $ Data.Diffing (before^.bridging) (after^.bridging)
-      (Just before, Nothing)    -> Just $ Data.Deleting (before^.bridging)
-      (Nothing, Just after)     -> Just $ Data.Inserting (after^.bridging)
+      (Just before, Just after) -> Just $ Data.Compare (before^.bridging) (after^.bridging)
+      (Just before, Nothing)    -> Just $ Data.Delete (before^.bridging)
+      (Nothing, Just after)     -> Just $ Data.Insert (after^.bridging)
       _                         -> Nothing
 
-    blobPairToApiBlobPair (Data.Diffing before after) = defMessage & P.maybe'before .~ (bridging #? before) & P.maybe'after .~ (bridging #? after)
-    blobPairToApiBlobPair (Data.Inserting after)      = defMessage & P.maybe'before .~ Nothing & P.maybe'after .~ (bridging #? after)
-    blobPairToApiBlobPair (Data.Deleting before)      = defMessage & P.maybe'before .~ (bridging #? before) & P.maybe'after .~ Nothing
+    blobPairToApiBlobPair (Data.Compare before after) = defMessage & P.maybe'before .~ (bridging #? before) & P.maybe'after .~ (bridging #? after)
+    blobPairToApiBlobPair (Data.Insert after)         = defMessage & P.maybe'before .~ Nothing & P.maybe'after .~ (bridging #? after)
+    blobPairToApiBlobPair (Data.Delete before)        = defMessage & P.maybe'before .~ (bridging #? before) & P.maybe'after .~ Nothing

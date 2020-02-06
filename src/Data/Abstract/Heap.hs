@@ -1,4 +1,6 @@
-{-# LANGUAGE DeriveAnyClass, DerivingStrategies, GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE RecordWildCards #-}
 module Data.Abstract.Heap
   ( Heap(..)
   , Frame(..)
@@ -36,10 +38,15 @@ import           Data.Abstract.ScopeGraph
     , pathDeclaration
     , pathPosition
     )
+import           Data.Foldable
+import           Data.Functor.Classes
+import           Data.IntMap (IntMap)
 import qualified Data.IntMap as IntMap
+import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
+import           Data.Semilattice.Lower
+import           Data.Set (Set)
 import           Prelude hiding (lookup)
-import           Prologue
 
 -- | A Frame describes the vertices of the Heap. Think of it as an instance of a Scope in the ScopeGraph.
 data Frame scopeAddress frameAddress value = Frame
@@ -52,15 +59,11 @@ data Frame scopeAddress frameAddress value = Frame
   , slots        :: IntMap (Set value)
   -- ^ An IntMap of values that are declared in the frame.
   }
-  deriving (Eq, Ord, Show, Generic, NFData)
+  deriving (Eq, Ord, Show)
 
 -- | A Heap is a Map from frame addresses to frames.
 newtype Heap scopeAddress frameAddress value = Heap { unHeap :: Map frameAddress (Frame scopeAddress frameAddress value) }
-  deriving stock (Eq, Generic, Ord)
-  deriving newtype (NFData)
-
-instance Lower (Heap scopeAddress frameAddress value) where
-  lowerBound = Heap lowerBound
+  deriving (Eq, Lower, Ord)
 
 
 -- | Look up the frame for an 'address' in a 'Heap', if any.

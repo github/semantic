@@ -1,37 +1,46 @@
-{-# LANGUAGE DeriveAnyClass, DerivingVia, DuplicateRecordFields, TupleSections #-}
-{-# OPTIONS_GHC -Wno-missing-export-lists #-}
-module Language.Ruby.Syntax where
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TupleSections #-}
+{-# LANGUAGE TypeApplications #-}
+module Language.Ruby.Syntax (module Language.Ruby.Syntax) where
 
-import Prologue
-
+import           Analysis.Name as Name
 import           Control.Abstract as Abstract hiding (Load, String)
-import           Control.Abstract.Heap (Heap, HeapError, insertFrameLink)
-import           Control.Abstract.ScopeGraph (insertImportEdge)
-import           Control.Abstract.Value (Boolean)
-import           Control.Monad (unless)
+import           Control.Monad
 import           Data.Abstract.BaseError
 import           Data.Abstract.Evaluatable
 import qualified Data.Abstract.Module as M
-import           Data.Abstract.Name as Name
 import           Data.Abstract.Path
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
+import           Data.Functor.Classes
+import           Data.Functor.Classes.Generic
+import           Data.Hashable.Lifted
 import           Data.JSON.Fields
 import qualified Data.Language as Language
+import           Data.List.NonEmpty (nonEmpty)
 import qualified Data.Map.Strict as Map
+import           Data.Maybe.Exts
 import           Data.Semigroup.App
 import           Data.Semigroup.Foldable
+import           Data.Text (Text)
 import qualified Data.Text as T
+import           Data.Traversable (for)
 import           Diffing.Algorithm
+import           GHC.Generics (Generic1)
 import           System.FilePath.Posix
 
 -- TODO: Fully sort out ruby require/load mechanics
 --
 -- require "json"
-resolveRubyName :: ( Member (Modules address value) sig
-                   , Member (Reader ModuleInfo) sig
-                   , Member (Reader Span) sig
-                   , Member (Resumable (BaseError ResolutionError)) sig
-                   , Carrier sig m
+resolveRubyName :: ( Has (Modules address value) sig m
+                   , Has (Reader ModuleInfo) sig m
+                   , Has (Reader Span) sig m
+                   , Has (Resumable (BaseError ResolutionError)) sig m
                    )
                 => Text
                 -> Evaluator term address value m M.ModulePath
@@ -42,11 +51,10 @@ resolveRubyName name = do
   maybeM (throwResolutionError $ NotFoundError name' paths Language.Ruby) modulePath
 
 -- load "/root/src/file.rb"
-resolveRubyPath :: ( Member (Modules address value) sig
-                   , Member (Reader ModuleInfo) sig
-                   , Member (Reader Span) sig
-                   , Member (Resumable (BaseError ResolutionError)) sig
-                   , Carrier sig m
+resolveRubyPath :: ( Has (Modules address value) sig m
+                   , Has (Reader ModuleInfo) sig m
+                   , Has (Reader Span) sig m
+                   , Has (Resumable (BaseError ResolutionError)) sig m
                    )
                 => Text
                 -> Evaluator term address value m M.ModulePath
@@ -59,8 +67,11 @@ cleanNameOrPath :: Text -> String
 cleanNameOrPath = T.unpack . dropRelativePrefix . stripQuotes
 
 data Send a = Send { sendReceiver :: Maybe a, sendSelector :: Maybe a, sendArgs :: [a], sendBlock :: Maybe a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
-  deriving (Eq1, Show1, Ord1) via Generically Send
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
+
+instance Eq1 Send where liftEq = genericLiftEq
+instance Ord1 Send where liftCompare = genericLiftCompare
+instance Show1 Send where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Send where
   eval eval _ Send{..} = do
@@ -83,8 +94,11 @@ instance Evaluatable Send where
     maybe callFunction (`withScopeAndFrame` callFunction) lhsFrame
 
 data Require a = Require { requireRelative :: Bool, requirePath :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
-  deriving (Eq1, Show1, Ord1) via Generically Require
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
+
+instance Eq1 Require where liftEq = genericLiftEq
+instance Ord1 Require where liftCompare = genericLiftCompare
+instance Show1 Require where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Require where
   eval eval _ (Require _ x) = do
@@ -96,9 +110,8 @@ instance Evaluatable Require where
     insertFrameLink ScopeGraph.Import (Map.singleton moduleScope moduleFrame)
     pure v -- Returns True if the file was loaded, False if it was already loaded. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-require
 
-doRequire :: ( Member (Boolean value) sig
-             , Member (Modules address value) sig
-             , Carrier sig m
+doRequire :: ( Has (Boolean value) sig m
+             , Has (Modules address value) sig m
              )
           => M.ModulePath
           -> Evaluator term address value m ((address, address), value)
@@ -110,8 +123,11 @@ doRequire path = do
 
 
 data Load a = Load { loadPath :: a, loadWrap :: Maybe a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
-  deriving (Eq1, Show1, Ord1) via Generically Load
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
+
+instance Eq1 Load where liftEq = genericLiftEq
+instance Ord1 Load where liftCompare = genericLiftCompare
+instance Show1 Load where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Load where
   eval eval _ (Load x Nothing) = do
@@ -122,19 +138,18 @@ instance Evaluatable Load where
     shouldWrap <- eval wrap >>= asBool
     doLoad path shouldWrap
 
-doLoad :: ( Member (Boolean value) sig
-          , Member (Modules address value) sig
-          , Member (Reader (CurrentFrame address)) sig
-          , Member (Reader (CurrentScope address)) sig
-          , Member (Reader ModuleInfo) sig
-          , Member (Reader Span) sig
-          , Member (Resumable (BaseError ResolutionError)) sig
-          , Member (State (ScopeGraph.ScopeGraph address)) sig
-          , Member (State (Heap address address value)) sig
-          , Member (Resumable (BaseError (HeapError address))) sig
-          , Member Trace sig
+doLoad :: ( Has (Boolean value) sig m
+          , Has (Modules address value) sig m
+          , Has (Reader (CurrentFrame address)) sig m
+          , Has (Reader (CurrentScope address)) sig m
+          , Has (Reader ModuleInfo) sig m
+          , Has (Reader Span) sig m
+          , Has (Resumable (BaseError ResolutionError)) sig m
+          , Has (State (ScopeGraph.ScopeGraph address)) sig m
+          , Has (State (Heap address address value)) sig m
+          , Has (Resumable (BaseError (HeapError address))) sig m
+          , Has Trace sig m
           , Ord address
-          , Carrier sig m
           )
        => Text
        -> Bool
@@ -151,8 +166,11 @@ doLoad path shouldWrap = do
 -- TODO: autoload
 
 data Class a = Class { classIdentifier :: !a, classSuperClass :: !(Maybe a), classBody :: !a }
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, FreeVariables1, ToJSONFields1, NFData1)
-  deriving (Eq1, Show1, Ord1) via Generically Class
+  deriving (Foldable, Traversable, Functor, Generic1, Hashable1, FreeVariables1, ToJSONFields1)
+
+instance Eq1 Class where liftEq = genericLiftEq
+instance Ord1 Class where liftCompare = genericLiftCompare
+instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 
 instance Diffable Class where
   equivalentBySubterm = Just . classIdentifier
@@ -208,8 +226,11 @@ instance Declarations1 Class where
 
 
 data Module a = Module { moduleIdentifier :: !a, moduleStatements :: ![a] }
-  deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
-  deriving (Eq1, Show1, Ord1) via Generically Module
+  deriving (Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
+
+instance Eq1 Module where liftEq = genericLiftEq
+instance Ord1 Module where liftCompare = genericLiftCompare
+instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Module where
   eval eval _ Module{..} =  do
@@ -252,8 +273,11 @@ instance Declarations1 Module where
 
 
 data LowPrecedenceAnd a = LowPrecedenceAnd { lhs :: a, rhs :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
-  deriving (Eq1, Show1, Ord1) via Generically LowPrecedenceAnd
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
+
+instance Eq1 LowPrecedenceAnd where liftEq = genericLiftEq
+instance Ord1 LowPrecedenceAnd where liftCompare = genericLiftCompare
+instance Show1 LowPrecedenceAnd where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable LowPrecedenceAnd where
   -- N.B. we have to use Monad rather than Applicative/Traversable on 'And' and 'Or' so that we don't evaluate both operands
@@ -264,8 +288,11 @@ instance Evaluatable LowPrecedenceAnd where
 
 
 data LowPrecedenceOr a = LowPrecedenceOr { lhs :: a, rhs :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
-  deriving (Eq1, Show1, Ord1) via Generically LowPrecedenceOr
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
+
+instance Eq1 LowPrecedenceOr where liftEq = genericLiftEq
+instance Ord1 LowPrecedenceOr where liftCompare = genericLiftCompare
+instance Show1 LowPrecedenceOr where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable LowPrecedenceOr where
   -- N.B. we have to use Monad rather than Applicative/Traversable on 'And' and 'Or' so that we don't evaluate both operands
@@ -275,8 +302,11 @@ instance Evaluatable LowPrecedenceOr where
       ifthenelse cond (pure cond) b
 
 data Assignment a = Assignment { assignmentContext :: ![a], assignmentTarget :: !a, assignmentValue :: !a }
-  deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
-  deriving (Eq1, Show1, Ord1) via Generically Assignment
+  deriving (Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
+
+instance Eq1 Assignment where liftEq = genericLiftEq
+instance Ord1 Assignment where liftCompare = genericLiftCompare
+instance Show1 Assignment where liftShowsPrec = genericLiftShowsPrec
 
 instance Declarations1 Assignment where
   liftDeclaredName declaredName Assignment{..} = declaredName assignmentTarget
@@ -312,7 +342,10 @@ instance Evaluatable Assignment where
 -- the semantics of invoking @super()@ but implicitly passing the current function's
 -- arguments to the @super()@ invocation.
 data ZSuper a = ZSuper
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, NFData1)
-  deriving (Eq1, Show1, Ord1) via Generically ZSuper
+  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
+
+instance Eq1 ZSuper where liftEq = genericLiftEq
+instance Ord1 ZSuper where liftCompare = genericLiftCompare
+instance Show1 ZSuper where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable ZSuper

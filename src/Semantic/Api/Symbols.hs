@@ -1,8 +1,19 @@
-{-# LANGUAGE MonoLocalBinds, RankNTypes #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Semantic.Api.Symbols
   ( legacyParseSymbols
   , parseSymbols
   , parseSymbolsBuilder
+  , tagsForBlob
   ) where
 
 import           Control.Effect.Error
@@ -10,17 +21,18 @@ import           Control.Effect.Parse
 import           Control.Effect.Reader
 import           Control.Exception
 import           Control.Lens
-import           Data.Blob hiding (File (..))
+import           Data.Abstract.Declarations
+import           Data.Blob
 import           Data.ByteString.Builder
+import           Data.Foldable
+import           Data.Functor.Foldable
 import           Data.Language
+import           Data.Map.Strict (Map)
 import           Data.ProtoLens (defMessage)
-import           Data.Term
+import           Data.Term (IsTerm (..), TermF)
+import           Data.Text (Text)
 import           Data.Text (pack)
-import qualified Language.Java as Java
-import qualified Language.JSON as JSON
-import qualified Language.Python as Python
 import qualified Parsing.Parser as Parser
-import           Prologue
 import           Proto.Semantic as P hiding (Blob, BlobPair)
 import           Proto.Semantic_Fields as P
 import           Proto.Semantic_JSON ()
@@ -29,16 +41,14 @@ import qualified Semantic.Api.LegacyTypes as Legacy
 import           Semantic.Config
 import           Semantic.Task
 import           Serializing.Format (Format)
-import           Source.Loc
-import           Source.Source
-import           Tags.Taggable
+import           Source.Loc as Loc
 import           Tags.Tagging
 import qualified Tags.Tagging.Precise as Precise
 
-legacyParseSymbols :: (Member Distribute sig, Member (Error SomeException) sig, Member (Reader PerLanguageModes) sig, Member Parse sig, Carrier sig m, Traversable t) => t Blob -> m Legacy.ParseTreeSymbolResponse
+legacyParseSymbols :: (Has Distribute sig m, Has (Error SomeException) sig m, Has (Reader PerLanguageModes) sig m, Has Parse sig m, Traversable t) => t Blob -> m Legacy.ParseTreeSymbolResponse
 legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> distributeFoldMap go blobs
   where
-    go :: (Member (Error SomeException) sig, Member (Reader PerLanguageModes) sig, Member Parse sig, Carrier sig m) => Blob -> m [Legacy.File]
+    go :: (Has (Error SomeException) sig m, Has (Reader PerLanguageModes) sig m, Has Parse sig m) => Blob -> m [Legacy.File]
     go blob@Blob{..} = asks toTagsParsers >>= \ p -> parseWith p (pure . renderToSymbols) blob `catchError` (\(SomeException _) -> pure (pure emptyFile))
       where
         emptyFile = tagsToFile []
@@ -48,7 +58,7 @@ legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> distributeFoldMap 
         symbolsToSummarize = ["Function", "Method", "Class", "Module"]
 
         renderToSymbols :: ToTags t => t Loc -> [Legacy.File]
-        renderToSymbols = pure . tagsToFile . tags (blobLanguage blob) symbolsToSummarize blobSource
+        renderToSymbols = pure . tagsToFile . tags symbolsToSummarize blob
 
         tagsToFile :: [Tag] -> Legacy.File
         tagsToFile tags = Legacy.File (pack (blobPath blob)) (pack (show (blobLanguage blob))) (fmap tagToSymbol tags)
@@ -59,19 +69,19 @@ legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> distributeFoldMap 
           { symbolName = name
           , symbolKind = pack (show kind)
           , symbolLine = line
-          , symbolSpan = converting #? span
+          , symbolSpan = converting #? Loc.span loc
           }
 
-parseSymbolsBuilder :: (Member Distribute sig, Member (Error SomeException) sig, Member Parse sig, Member (Reader Config) sig, Member (Reader PerLanguageModes) sig, Carrier sig m, Traversable t) => Format ParseTreeSymbolResponse -> t Blob -> m Builder
+parseSymbolsBuilder :: (Has Distribute sig m, Has (Error SomeException) sig m, Has Parse sig m, Has (Reader Config) sig m, Has (Reader PerLanguageModes) sig m, Traversable t) => Format ParseTreeSymbolResponse -> t Blob -> m Builder
 parseSymbolsBuilder format blobs = parseSymbols blobs >>= serialize format
 
-parseSymbols :: (Member Distribute sig, Member (Error SomeException) sig, Member (Reader PerLanguageModes) sig, Member Parse sig, Carrier sig m, Traversable t) => t Blob -> m ParseTreeSymbolResponse
+parseSymbols :: (Has Distribute sig m, Has (Error SomeException) sig m, Has (Reader PerLanguageModes) sig m, Has Parse sig m, Traversable t) => t Blob -> m ParseTreeSymbolResponse
 parseSymbols blobs = do
   terms <- distributeFor blobs go
   pure $ defMessage & P.files .~ toList terms
   where
-    go :: (Member (Error SomeException) sig, Member (Reader PerLanguageModes) sig, Member Parse sig, Carrier sig m) => Blob -> m File
-    go blob@Blob{..} = catching $ asks toTagsParsers >>= \ p -> parseWith p (pure . renderToSymbols) blob
+    go :: (Has (Error SomeException) sig m, Has (Reader PerLanguageModes) sig m, Has Parse sig m) => Blob -> m File
+    go blob@Blob{..} = catching $ tagsToFile <$> tagsForBlob blob
       where
         catching m = m `catchError` (\(SomeException e) -> pure $ errorFile (show e))
         blobLanguage' = blobLanguage blob
@@ -81,10 +91,6 @@ parseSymbols blobs = do
           & P.language .~ (bridging # blobLanguage')
           & P.symbols .~ mempty
           & P.errors .~ [defMessage & P.error .~ pack e]
-          & P.blobOid .~ blobOid
-
-        renderToSymbols :: ToTags t => t Loc -> File
-        renderToSymbols term = tagsToFile (tags (blobLanguage blob) symbolsToSummarize blobSource term)
 
         tagsToFile :: [Tag] -> File
         tagsToFile tags = defMessage
@@ -92,33 +98,35 @@ parseSymbols blobs = do
           & P.language .~ (bridging # blobLanguage')
           & P.symbols .~ fmap tagToSymbol tags
           & P.errors .~ mempty
-          & P.blobOid .~ blobOid
 
         tagToSymbol :: Tag -> Symbol
         tagToSymbol Tag{..} = defMessage
           & P.symbol .~ name
           & P.kind .~ pack (show kind)
           & P.line .~ line
-          & P.maybe'span .~ converting #? span
+          & P.maybe'span ?~ converting # Loc.span loc
           & P.maybe'docs .~ fmap (flip (set P.docstring) defMessage) docs
 
+tagsForBlob :: (Has (Error SomeException) sig m, Has Parse sig m, Has (Reader PerLanguageModes) sig m) => Blob -> m [Tag]
+tagsForBlob blob = asks toTagsParsers >>= \p -> parseWith p (pure . tags symbolsToSummarize blob) blob
+
 symbolsToSummarize :: [Text]
-symbolsToSummarize = ["Function", "Method", "Class", "Module", "Call", "Send"]
+symbolsToSummarize = ["Function", "AmbientFunction", "Method", "Class", "Module", "Call", "Send"]
 
 class ToTags t where
-  tags :: Language -> [Text] -> Source -> t Loc -> [Tag]
+  tags :: [Text] -> Blob -> t Loc -> [Tag]
 
-instance IsTaggable syntax => ToTags (Term syntax) where
-  tags = runTagging
+instance (Parser.TermMode term ~ strategy, ToTagsBy strategy term) => ToTags term where
+  tags = tagsBy @strategy
 
-instance ToTags Java.Term where
-  tags _ _ = Precise.tags
+class ToTagsBy (strategy :: LanguageMode) term where
+  tagsBy :: [Text] -> Blob -> term Loc -> [Tag]
 
-instance ToTags JSON.Term where
-  tags _ _ = Precise.tags
+instance (IsTerm term, IsTaggable (Syntax term), Base (term Loc) ~ TermF (Syntax term) Loc, Recursive (term Loc), Declarations (term Loc)) => ToTagsBy 'ALaCarte term where
+  tagsBy symbols blob = runTagging (blobLanguage blob) symbols (blobSource blob)
 
-instance ToTags Python.Term where
-  tags _ _ = Precise.tags
+instance Precise.ToTags term => ToTagsBy 'Precise term where
+  tagsBy _ = Precise.tags . blobSource
 
 
 toTagsParsers :: PerLanguageModes -> Map Language (Parser.SomeParser ToTags Loc)

@@ -27,8 +27,10 @@
   {+(KeyValue
     {+(Array)+}
     {+(Integer)+})+}
-  {+(Identifier)+}
-  {+(Identifier)+}
+  {+(Send
+    {+(Identifier)+})+}
+  {+(Send
+    {+(Identifier)+})+}
   {+(Function
     {+(Empty)+}
     {+(Identifier)+}

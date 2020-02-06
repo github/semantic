@@ -1,18 +1,23 @@
 -- | Semantic functionality for JSON programs.
 module Language.JSON
 ( Term(..)
-, TreeSitter.JSON.tree_sitter_json
+, Language.JSON.Grammar.tree_sitter_json
 ) where
 
+import           Data.Proxy
+import qualified Language.JSON.AST as JSON
 import qualified Tags.Tagging.Precise as Tags
-import qualified TreeSitter.JSON (tree_sitter_json)
-import qualified TreeSitter.JSON.AST as JSON
-import qualified TreeSitter.Unmarshal as TS
+import qualified Language.JSON.Grammar (tree_sitter_json)
+import qualified AST.Unmarshal as TS
 
 newtype Term a = Term { getTerm :: JSON.Document a }
 
+instance TS.SymbolMatching Term where
+  matchedSymbols _ = TS.matchedSymbols (Proxy :: Proxy JSON.Document)
+  showFailure _ = TS.showFailure (Proxy :: Proxy JSON.Document)
+
 instance TS.Unmarshal Term where
-  unmarshalNode node = Term <$> TS.unmarshalNode node
+  matchers = fmap (fmap (TS.hoist Term)) TS.matchers
 
 -- | Tags aren’t really meaningful for JSON, but by implementing this we can avoid having to customize the set of parsers used for computing tags.
 instance Tags.ToTags Term where

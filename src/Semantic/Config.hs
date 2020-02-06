@@ -1,3 +1,4 @@
+{-# LANGUAGE RecordWildCards #-}
 module Semantic.Config
   ( Config (..)
   , defaultConfig
@@ -20,11 +21,11 @@ module Semantic.Config
   ) where
 
 import           Data.Duration
-import           Data.Error (LogPrintSource(..))
+import           Data.Error (LogPrintSource (..))
 import           Data.Flag
+import           Data.Maybe
 import           Network.HostName
 import           Network.URI
-import           Prologue
 import           Semantic.Env
 import           Semantic.Telemetry
 import qualified Semantic.Telemetry.Error as Error
@@ -42,20 +43,21 @@ data FailOnParseError = FailOnParseError
 
 data Config
   = Config
-  { configAppName                :: String               -- ^ Application name ("semantic")
-  , configHostName               :: String               -- ^ HostName from getHostName
-  , configProcessID              :: ProcessID            -- ^ ProcessID from getProcessID
-  , configStatsHost              :: Stat.Host            -- ^ Host of statsd/datadog (default: "127.0.0.1")
-  , configStatsPort              :: Stat.Port            -- ^ Port of statsd/datadog (default: "28125")
-  , configTreeSitterParseTimeout :: Duration             -- ^ Timeout in milliseconds before canceling tree-sitter parsing (default: 6000).
-  , configAssignmentTimeout      :: Duration             -- ^ Millisecond timeout for assignment (default: 4000)
-  , configMaxTelemetyQueueSize   :: Int                  -- ^ Max size of telemetry queues before messages are dropped (default: 1000).
-  , configIsTerminal             :: Flag IsTerminal      -- ^ Whether a terminal is attached (set automaticaly at runtime).
-  , configLogPrintSource         :: Flag LogPrintSource  -- ^ Whether to print the source reference when logging errors (set automatically at runtime).
-  , configLogFormatter           :: LogFormatter         -- ^ Log formatter to use (set automatically at runtime).
-  , configSHA                    :: String               -- ^ SHA to include in log messages (set automatically).
-  , configFailParsingForTesting  :: Flag FailTestParsing -- ^ Simulate internal parse failure for testing (default: False).
-  , configOptions                :: Options              -- ^ Options configurable via command line arguments.
+  { configAppName                    :: String               -- ^ Application name ("semantic")
+  , configHostName                   :: String               -- ^ HostName from getHostName
+  , configProcessID                  :: ProcessID            -- ^ ProcessID from getProcessID
+  , configStatsHost                  :: Stat.Host            -- ^ Host of statsd/datadog (default: "127.0.0.1")
+  , configStatsPort                  :: Stat.Port            -- ^ Port of statsd/datadog (default: "28125")
+  , configTreeSitterParseTimeout     :: Duration             -- ^ Timeout in milliseconds before canceling tree-sitter parsing (default: 6000).
+  , configTreeSitterUnmarshalTimeout :: Duration             -- ^ Timeout in milliseconds before canceling tree-sitter unmarshalling (default: 4000).
+  , configAssignmentTimeout          :: Duration             -- ^ Millisecond timeout for assignment (default: 4000)
+  , configMaxTelemetyQueueSize       :: Int                  -- ^ Max size of telemetry queues before messages are dropped (default: 1000).
+  , configIsTerminal                 :: Flag IsTerminal      -- ^ Whether a terminal is attached (set automaticaly at runtime).
+  , configLogPrintSource             :: Flag LogPrintSource  -- ^ Whether to print the source reference when logging errors (set automatically at runtime).
+  , configLogFormatter               :: LogFormatter         -- ^ Log formatter to use (set automatically at runtime).
+  , configSHA                        :: String               -- ^ SHA to include in log messages (set automatically).
+  , configFailParsingForTesting      :: Flag FailTestParsing -- ^ Simulate internal parse failure for testing (default: False).
+  , configOptions                    :: Options              -- ^ Options configurable via command line arguments.
   }
 
 -- Options configurable via command line arguments.
@@ -84,6 +86,7 @@ defaultConfig options@Options{..} = do
   (statsHost, statsPort) <- lookupStatsAddr
   size <- envLookupNum 1000 "MAX_TELEMETRY_QUEUE_SIZE"
   parseTimeout <- envLookupNum 6000 "TREE_SITTER_PARSE_TIMEOUT"
+  unmarshalTimeout <- envLookupNum 4000 "TREE_SITTER_UNMARSHAL_TIMEOUT"
   assignTimeout <- envLookupNum 4000 "SEMANTIC_ASSIGNMENT_TIMEOUT"
   pure Config
     { configAppName = "semantic"
@@ -93,6 +96,7 @@ defaultConfig options@Options{..} = do
     , configStatsPort = statsPort
 
     , configTreeSitterParseTimeout = fromMilliseconds parseTimeout
+    , configTreeSitterUnmarshalTimeout = fromMilliseconds unmarshalTimeout
     , configAssignmentTimeout = fromMilliseconds assignTimeout
     , configMaxTelemetyQueueSize = size
     , configIsTerminal = flag IsTerminal isTerminal

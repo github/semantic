@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Data.Scientific.Exts
     ( module Data.Scientific
     , attemptUnsafeArithmetic
@@ -5,16 +6,16 @@ module Data.Scientific.Exts
     ) where
 
 import Control.Applicative
-import Control.Exception as Exc (evaluate, try)
+import Control.Exception as Exc (ArithException, evaluate, try)
 import Control.Monad hiding (fail)
+import Control.Monad.Fail
 import Data.Attoparsec.Text
-import Data.Text hiding (takeWhile)
 import Data.Char (isDigit)
 import Data.Scientific
-import Prelude hiding (fail, filter, null, takeWhile)
-import Prologue hiding (null)
-import System.IO.Unsafe
+import Data.Text hiding (takeWhile)
 import Numeric.Exts
+import Prelude hiding (fail, filter, null, takeWhile)
+import System.IO.Unsafe
 
 parseScientific :: Text -> Either String Scientific
 parseScientific = parseOnly parser

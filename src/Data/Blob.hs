@@ -1,22 +1,22 @@
-{-# LANGUAGE DeriveAnyClass, ExplicitNamespaces, PatternSynonyms #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE ExplicitNamespaces #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
 module Data.Blob
-( File(..)
-, fileForPath
-, fileForRelPath
-, Blob(..)
+( Blob(..)
 , Blobs(..)
 , blobLanguage
 , NoLanguageForBlob (..)
 , blobPath
-, makeBlob
 , decodeBlobs
 , nullBlob
-, sourceBlob
+, fromSource
+, moduleForBlob
 , noLanguageForBlob
-, type BlobPair
-, pattern Diffing
-, pattern Inserting
-, pattern Deleting
+, BlobPair
 , maybeBlobPair
 , decodeBlobPairs
 , languageForBlobPair
@@ -25,136 +25,106 @@ module Data.Blob
 , pathKeyForBlobPair
 ) where
 
-import Prologue
 
+import           Analysis.File (File (..))
 import           Control.Effect.Error
+import           Control.Exception
 import           Data.Aeson
+import           Data.Bifunctor
 import qualified Data.ByteString.Lazy as BL
+import           Data.Edit
 import           Data.JSON.Fields
-import           Data.Language
-import           Source.Source (Source)
+import           Data.Maybe
+import           Data.Maybe.Exts
+import           Data.Module
+import           GHC.Generics (Generic)
+import           Source.Language as Language
+import           Source.Source (Source, totalSpan)
 import qualified Source.Source as Source
+import qualified System.FilePath as FP
 import qualified System.Path as Path
-
-
--- | A 'FilePath' paired with its corresponding 'Language'.
--- Unpacked to have the same size overhead as (FilePath, Language).
-data File = File
-  { filePath     :: FilePath
-  , fileLanguage :: Language
-  } deriving (Show, Eq, Generic)
-
--- | Prefer 'fileForRelPath' if at all possible.
-fileForPath :: FilePath  -> File
-fileForPath p = File p (languageForFilePath p)
-
-fileForRelPath :: Path.RelFile -> File
-fileForRelPath = fileForPath . Path.toString
+import qualified System.Path.PartClass as Path.PartClass
 
 -- | The source, path information, and language of a file read from disk.
 data Blob = Blob
-  { blobSource   :: Source -- ^ The UTF-8 encoded source text of the blob.
-  , blobFile     :: File   -- ^ Path/language information for this blob.
-  , blobOid      :: Text   -- ^ Git OID for this blob, mempty if blob is not from a git db.
-  } deriving (Show, Eq, Generic)
+  { blobSource :: Source         -- ^ The UTF-8 encoded source text of the blob.
+  , blobFile   :: File Language  -- ^ Path/language information for this blob.
+  } deriving (Show, Eq)
 
 blobLanguage :: Blob -> Language
-blobLanguage = fileLanguage . blobFile
+blobLanguage = Analysis.File.fileBody . blobFile
 
 blobPath :: Blob -> FilePath
-blobPath = filePath . blobFile
-
-makeBlob :: Source -> FilePath -> Language -> Text -> Blob
-makeBlob s p l = Blob s (File p l)
-{-# INLINE makeBlob #-}
+blobPath = Path.toString . Analysis.File.filePath . blobFile
 
 newtype Blobs a = Blobs { blobs :: [a] }
   deriving (Generic, FromJSON)
 
 instance FromJSON Blob where
-  parseJSON = withObject "Blob" $ \b -> inferringLanguage
-    <$> b .: "content"
-    <*> b .: "path"
-    <*> b .: "language"
+  parseJSON = withObject "Blob" $ \b -> do
+    src <- b .: "content"
+    Right pth <- fmap Path.parse (b .: "path")
+    lang <- b .: "language"
+    let lang' = if knownLanguage lang then lang else Language.forPath pth
+    pure (fromSource (pth :: Path.AbsRelFile) lang' src)
 
 nullBlob :: Blob -> Bool
 nullBlob Blob{..} = Source.null blobSource
 
-sourceBlob :: FilePath -> Language -> Source -> Blob
-sourceBlob filepath language source = makeBlob source filepath language mempty
-
-inferringLanguage :: Source -> FilePath -> Language -> Blob
-inferringLanguage src pth lang
-  | knownLanguage lang = makeBlob src pth lang mempty
-  | otherwise = makeBlob src pth (languageForFilePath pth) mempty
+-- | Create a Blob from a provided path, language, and UTF-8 source.
+-- The resulting Blob's span is taken from the 'totalSpan' of the source.
+fromSource :: Path.PartClass.AbsRel ar => Path.File ar -> Language -> Source -> Blob
+fromSource filepath language source
+  = Blob source (Analysis.File.File (Path.toAbsRel filepath) (totalSpan source) language)
 
 decodeBlobs :: BL.ByteString -> Either String [Blob]
 decodeBlobs = fmap blobs <$> eitherDecode
 
 -- | An exception indicating that we’ve tried to diff or parse a blob of unknown language.
 newtype NoLanguageForBlob = NoLanguageForBlob FilePath
-  deriving (Eq, Exception, Ord, Show, Typeable)
+  deriving (Eq, Exception, Ord, Show)
 
-noLanguageForBlob :: (Member (Error SomeException) sig, Carrier sig m) => FilePath -> m a
+noLanguageForBlob :: Has (Error SomeException) sig m => FilePath -> m a
 noLanguageForBlob blobPath = throwError (SomeException (NoLanguageForBlob blobPath))
+
+-- | Construct a 'Module' for a 'Blob' and @term@, relative to some root 'FilePath'.
+moduleForBlob :: Maybe FilePath -- ^ The root directory relative to which the module will be resolved, if any. TODO: typed paths
+              -> Blob             -- ^ The 'Blob' containing the module.
+              -> term             -- ^ The @term@ representing the body of the module.
+              -> Module term    -- ^ A 'Module' named appropriate for the 'Blob', holding the @term@, and constructed relative to the root 'FilePath', if any.
+moduleForBlob rootDir b = Module info
+  where root = fromMaybe (FP.takeDirectory (blobPath b)) rootDir
+        info = ModuleInfo (FP.makeRelative root (blobPath b)) (languageToText (blobLanguage b)) mempty
 
 -- | Represents a blobs suitable for diffing which can be either a blob to
 -- delete, a blob to insert, or a pair of blobs to diff.
-type BlobPair = Join These Blob
+type BlobPair = Edit Blob Blob
 
 instance FromJSON BlobPair where
-  parseJSON = withObject "BlobPair" $ \o -> do
-    before <- o .:? "before"
-    after <- o .:? "after"
-    case (before, after) of
-      (Just b, Just a)  -> pure $ Diffing b a
-      (Just b, Nothing) -> pure $ Deleting b
-      (Nothing, Just a) -> pure $ Inserting a
-      _                 -> Prelude.fail "Expected object with 'before' and/or 'after' keys only"
-
-pattern Diffing :: Blob -> Blob -> BlobPair
-pattern Diffing a b = Join (These a b)
-
-pattern Inserting :: Blob -> BlobPair
-pattern Inserting a = Join (That a)
-
-pattern Deleting :: Blob -> BlobPair
-pattern Deleting b = Join (This b)
-
-{-# COMPLETE Diffing, Inserting, Deleting #-}
+  parseJSON = withObject "BlobPair" $ \o ->
+    fromMaybes <$> (o .:? "before") <*> (o .:? "after")
+    >>= maybeM (Prelude.fail "Expected object with 'before' and/or 'after' keys only")
 
 maybeBlobPair :: MonadFail m => Maybe Blob -> Maybe Blob -> m BlobPair
-maybeBlobPair a b = case (a, b) of
-  (Just a, Nothing) -> pure (Deleting a)
-  (Nothing, Just b) -> pure (Inserting b)
-  (Just a, Just b)  -> pure (Diffing a b)
-  _                 -> Prologue.fail "expected file pair with content on at least one side"
+maybeBlobPair a b = maybeM (fail "expected file pair with content on at least one side") (fromMaybes a b)
 
 languageForBlobPair :: BlobPair -> Language
-languageForBlobPair (Deleting b)  = blobLanguage b
-languageForBlobPair (Inserting b) = blobLanguage b
-languageForBlobPair (Diffing a b)
-  | blobLanguage a == Unknown || blobLanguage b == Unknown
-    = Unknown
-  | otherwise
-    = blobLanguage b
+languageForBlobPair = mergeEdit combine . bimap blobLanguage blobLanguage where
+  combine a b
+    | a == Unknown || b == Unknown = Unknown
+    | otherwise                    = b
 
 pathForBlobPair :: BlobPair -> FilePath
-pathForBlobPair x = blobPath $ case x of
-  (Inserting b) -> b
-  (Deleting b)  -> b
-  (Diffing _ b) -> b
+pathForBlobPair = blobPath . mergeEdit (const id)
 
 languageTagForBlobPair :: BlobPair -> [(String, String)]
 languageTagForBlobPair pair = showLanguage (languageForBlobPair pair)
   where showLanguage = pure . (,) "language" . show
 
 pathKeyForBlobPair :: BlobPair -> FilePath
-pathKeyForBlobPair blobs = case bimap blobPath blobPath (runJoin blobs) of
-   This before -> before
-   That after -> after
-   These before after | before == after -> after
-                      | otherwise -> before <> " -> " <> after
+pathKeyForBlobPair = mergeEdit combine . bimap blobPath blobPath where
+   combine before after | before == after = after
+                        | otherwise       = before <> " -> " <> after
 
 instance ToJSONFields Blob where
   toJSONFields p = [ "path" .= blobPath p, "language" .= blobLanguage p]

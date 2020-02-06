@@ -1,10 +1,10 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, UndecidableInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, StandaloneDeriving, TypeApplications, UndecidableInstances #-}
 module Data.Abstract.Declarations
   ( Declarations (..)
   , Declarations1 (..)
   ) where
 
-import Data.Abstract.Name
+import Analysis.Name
 import Data.Sum
 import Data.Term
 

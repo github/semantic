@@ -1,0 +1,30 @@
+{
+  type <- \name -> \super -> \slots ->
+    #record { __name: name, __super: super, __slots: slots };
+
+  instance <- \class -> \prim -> \slots ->
+    #record { __super: class, __prim: prim, __slots: slots };
+
+  // object's superclass is type itself
+  object <- type "object" type #record{};
+
+  str <- type "str" object #record { __new__: \prim -> instance #unit prim #record{} };
+
+  // We will fill in the actual definition of these operators
+  // pending the presence of more eliminators.
+  not <- \val -> if val then #false else #true;
+
+  NoneType <- type "None" object #record { __new__: \prim -> instance #unit prim #record{} };
+  None <- NoneType.__slots.__new__ #unit;
+
+  getitem <- \super -> \item -> \attr ->
+    if item.slots.?attr then item.slots.attr else #unit;
+
+  #record { type: type
+          , object: object
+          , str: str
+          , not: not
+          , NoneType: NoneType
+          , None: None
+          , getitem: getitem}
+}
