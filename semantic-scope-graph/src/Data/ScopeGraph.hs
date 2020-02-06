@@ -58,6 +58,8 @@ import           Data.Bifunctor
 import           Data.Foldable
 import           Data.Hashable
 import           Data.Hole
+import           Data.List.NonEmpty (NonEmpty)
+import qualified Data.List.NonEmpty as NonEmpty
 import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
 import           Data.Maybe
@@ -71,8 +73,6 @@ import qualified Data.Set as Set
 import           Data.Text (Text)
 import           GHC.Generics
 import           Source.Span
-import Data.List.NonEmpty (NonEmpty)
-import qualified Data.List.NonEmpty as NonEmpty
 
 -- A slot is a location in the heap where a value is stored.
 data Slot address = Slot { frameAddress :: address, position :: Position }
