@@ -36,7 +36,6 @@ import qualified Data.Map.Strict as Map
 import qualified Data.ScopeGraph as ScopeGraph
 import           Data.Text (Text)
 import           GHC.Generics (Generic, Generic1)
-import           GHC.Records
 import Data.List.NonEmpty
 
 import qualified ScopeGraph.Properties.Declaration as Props
