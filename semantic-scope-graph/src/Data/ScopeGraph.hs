@@ -354,6 +354,8 @@ insertEdge label target currentAddress g@(ScopeGraph graph) = fromMaybe g $ do
   let newScope = currentScope' { edges = Map.insert label (target : scopes) (edges currentScope') }
   pure (ScopeGraph (Map.insert currentAddress newScope graph))
 
+-- | Add an import edge of the form 'a -> Import -> b -> Import -> c' or creates intermediate void scopes of the form
+--   'a -> VoidL -> b -> Import -> c' if the given scopes cannot be found.
 addImportEdge :: Ord scopeAddress => EdgeLabel -> [scopeAddress] -> scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
 addImportEdge edge importEdge currentAddress g = do
   case importEdge of
