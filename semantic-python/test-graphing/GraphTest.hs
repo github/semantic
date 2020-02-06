@@ -106,7 +106,7 @@ expectedFunctionArg = do
 
 expectedImportHole :: (Has ScopeGraph sig m) => m Result
 expectedImportHole = do
-  insertEdge ScopeGraph.Import (NonEmpty.fromList ["chees", "ints"])
+  insertEdge ScopeGraph.Import (NonEmpty.fromList ["cheese", "ints"])
   pure Complete
 
 assertLexicalScope :: HUnit.Assertion
