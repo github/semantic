@@ -49,6 +49,7 @@ common haskell
     ghc-options: -Wno-missing-deriving-strategies
 
 library
+  import: haskell
   exposed-modules:
     Language.Java
     Language.Java.AST
