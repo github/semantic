@@ -8,12 +8,12 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
 
--- | The Sketch effect is used to build up a scope graph over
+-- | The ScopeGraph effect is used to build up a scope graph over
 -- the lifetime of a monadic computation. The name is meant to evoke
--- physically sketching the hierarchical outline of a graph.
-module Control.Effect.Sketch
-  ( Sketch
-  , SketchEff (..)
+-- physically ScopeGraphing the hierarchical outline of a graph.
+module Control.Effect.ScopeGraph
+  ( ScopeGraph
+  , ScopeGraphEff (..)
   , DeclProperties (..)
   , RefProperties (..)
   , FunProperties (..)
@@ -53,12 +53,12 @@ data FunProperties = FunProperties {
   kind :: ScopeGraph.Kind
 }
 
-type Sketch
-  = SketchEff
+type ScopeGraph
+  = ScopeGraphEff
   :+: Fresh
   :+: Reader Name
 
-data SketchEff m k =
+data ScopeGraphEff m k =
     Declare Name DeclProperties (() -> m k)
   | Reference Text Text RefProperties (() -> m k)
   | NewScope (Map ScopeGraph.EdgeLabel [Name]) (Name -> m k)
@@ -68,20 +68,21 @@ data SketchEff m k =
 currentScope :: Has (Reader Name) sig m => m Name
 currentScope = ask
 
-declare :: forall sig m . (Has Sketch sig m) => Name -> DeclProperties -> m ()
+declare :: forall sig m . Has ScopeGraph sig m => Name -> DeclProperties -> m ()
 declare n props = send (Declare n props pure)
 
 -- | Establish a reference to a prior declaration.
-reference :: forall sig m . (Has Sketch sig m) => Text -> Text -> RefProperties -> m ()
+reference :: forall sig m . Has ScopeGraph sig m => Text -> Text -> RefProperties -> m ()
 reference n decl props = send (Reference n decl props pure)
 
-newScope :: forall sig m . (Has Sketch sig m) => Map ScopeGraph.EdgeLabel [Name] -> m Name
+newScope :: forall sig m . Has ScopeGraph sig m => Map ScopeGraph.EdgeLabel [Name] -> m Name
 newScope edges = send (NewScope edges pure)
 
-insertEdge :: Has Sketch sig m => ScopeGraph.EdgeLabel -> NonEmpty Name -> m ()
+-- | Takes an edge label and a list of names and inserts an import edge to a hole.
+insertEdge :: Has ScopeGraph sig m => ScopeGraph.EdgeLabel -> NonEmpty Name -> m ()
 insertEdge label targets = send (InsertEdge label targets pure)
 
-declareFunction :: forall sig m . (Has Sketch sig m) => Maybe Name -> FunProperties -> m (Name, Name)
+declareFunction :: forall sig m . Has ScopeGraph sig m => Maybe Name -> FunProperties -> m (Name, Name)
 declareFunction name props = do
   currentScope' <- currentScope
   let lexicalEdges = Map.singleton ScopeGraph.Lexical [ currentScope' ]
@@ -89,7 +90,7 @@ declareFunction name props = do
   name' <- declareMaybeName name (DeclProperties { relation = ScopeGraph.Default, kind = (getField @"kind" @FunProperties props), associatedScope = Just associatedScope })
   pure (name', associatedScope)
 
-declareMaybeName :: Has Sketch sig m
+declareMaybeName :: Has ScopeGraph sig m
                  => Maybe Name
                  -> DeclProperties
                  -> m Name
@@ -98,7 +99,7 @@ declareMaybeName maybeName props = do
     Just name -> declare name props >> pure name
     _         -> Name.gensym >>= \name -> declare name (props { relation = ScopeGraph.Gensym }) >> pure name -- TODO: Modify props and change Kind to Gensym
 
-withScope :: Has Sketch sig m
+withScope :: Has ScopeGraph sig m
           => Name
           -> m a
           -> m a

@@ -51,7 +51,7 @@ The graph should be
 runScopeGraph :: ToScopeGraph t => Path.AbsRelFile -> Source.Source -> t Loc -> (ScopeGraph.ScopeGraph Name, Result)
 runScopeGraph p _src item = run . runSketch (Just p) $ scopeGraph item
 
-sampleGraphThing :: (Has Sketch sig m) => m Result
+sampleGraphThing :: (Has ScopeGraph sig m) => m Result
 sampleGraphThing = do
   declare "hello" (DeclProperties ScopeGraph.Assignment ScopeGraph.Default Nothing)
   declare "goodbye" (DeclProperties ScopeGraph.Assignment ScopeGraph.Default Nothing)
@@ -72,7 +72,7 @@ assertSimpleAssignment = do
   (expecto, Complete) <- runM $ runSketch Nothing sampleGraphThing
   HUnit.assertEqual "Should work for simple case" expecto result
 
-expectedReference :: (Has Sketch sig m) => m Result
+expectedReference :: (Has ScopeGraph sig m) => m Result
 expectedReference = do
   declare "x" (DeclProperties ScopeGraph.Assignment ScopeGraph.Default Nothing)
   reference "x" "x" RefProperties
@@ -86,13 +86,13 @@ assertSimpleReference = do
 
   HUnit.assertEqual "Should work for simple case" expecto result
 
-expectedLexicalScope :: (Has Sketch sig m) => m Result
+expectedLexicalScope :: (Has ScopeGraph sig m) => m Result
 expectedLexicalScope = do
   _ <- declareFunction (Just $ Name.name "foo") (FunProperties ScopeGraph.Function)
   reference "foo" "foo" RefProperties {}
   pure Complete
 
-expectedFunctionArg :: (Has Sketch sig m) => m Result
+expectedFunctionArg :: (Has ScopeGraph sig m) => m Result
 expectedFunctionArg = do
   (_, associatedScope) <- declareFunction (Just $ Name.name "foo") (FunProperties ScopeGraph.Function)
   withScope associatedScope $ do
@@ -102,7 +102,7 @@ expectedFunctionArg = do
   reference "foo" "foo" RefProperties
   pure Complete
 
-expectedImportHole :: (Has Sketch sig m) => m Result
+expectedImportHole :: (Has ScopeGraph sig m) => m Result
 expectedImportHole = do
   addImportEdge Import ["cheese", "ints"]
 

@@ -13,10 +13,10 @@
 
 -- | This carrier interprets the Sketch effect, keeping track of
 -- the current scope and in-progress graph internally.
-module Control.Carrier.Sketch.Fresh
+module Control.Carrier.Sketch.ScopeGraph
   ( SketchC (..)
   , runSketch
-  , module Control.Effect.Sketch
+  , module Control.Effect.ScopeGraph
   ) where
 
 import           Analysis.Name (Name)
@@ -25,7 +25,7 @@ import           Control.Algebra
 import           Control.Carrier.Fresh.Strict
 import           Control.Carrier.State.Strict
 import           Control.Carrier.Reader
-import           Control.Effect.Sketch
+import           Control.Effect.ScopeGraph (ScopeGraphEff(..), DeclProperties(..))
 import           Control.Monad.IO.Class
 import           Data.Bifunctor
 import           Data.Module
@@ -56,7 +56,7 @@ instance Lower Sketchbook where
 newtype SketchC address m a = SketchC (StateC Sketchbook (FreshC m) a)
   deriving (Applicative, Functor, Monad, MonadIO)
 
-instance (Effect sig, Algebra sig m) => Algebra (SketchEff :+: Reader Name :+: Fresh :+: sig) (SketchC Name m) where
+instance (Effect sig, Algebra sig m) => Algebra (ScopeGraphEff :+: Reader Name :+: Fresh :+: sig) (SketchC Name m) where
   alg (L (Declare n props k)) = do
     Sketchbook old current <- SketchC (get @Sketchbook)
     let (new, _pos) =
