@@ -360,8 +360,13 @@ addImportEdge edge names currentAddress g = do
   case names of
     (x :| []) -> addImportHole x currentAddress g
     (x :| xs) -> do
-      let scopeGraph' = newScope x mempty g
-      addImportEdge edge (NonEmpty.fromList xs) x scopeGraph'
+      case lookupScope x g of
+        Just _ -> addImportEdge edge (NonEmpty.fromList xs) x g
+        Nothing ->
+          let
+            scopeGraph' = insertEdge edge x currentAddress (newScope x mempty g)
+            in
+            addImportEdge edge (NonEmpty.fromList xs) x scopeGraph'
 
 
 addImportHole :: Ord scopeAddress => scopeAddress -> scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
