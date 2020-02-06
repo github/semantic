@@ -23,7 +23,6 @@ module Data.ScopeGraph
   , insertImportReference
   , newScope
   , newPreludeScope
-  , addImportHole
   , addImportEdge
   , insertScope
   , insertEdge
@@ -359,16 +358,16 @@ insertEdge label target currentAddress g@(ScopeGraph graph) = fromMaybe g $ do
 addImportEdge :: Ord scopeAddress => EdgeLabel -> NonEmpty scopeAddress -> scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
 addImportEdge edge names currentAddress g = do
   case names of
-    (x :| []) -> addImportHole Import x currentAddress g
+    (x :| []) -> addImportHole x currentAddress g
     (x :| xs) -> do
       let scopeGraph' = newScope x mempty g
       addImportEdge edge (NonEmpty.fromList xs) x scopeGraph'
 
 
-addImportHole :: Ord scopeAddress => EdgeLabel -> scopeAddress -> scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
-addImportHole label name currentAddress g = fromMaybe g $ do
+addImportHole :: Ord scopeAddress => scopeAddress -> scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
+addImportHole name currentAddress g = fromMaybe g $ do
   let scope' = newScope name mempty g
-  pure (insertEdge label name currentAddress scope')
+  pure (insertEdge Void name currentAddress scope')
 
 
 -- | Update the 'Scope' containing a 'Declaration' with an associated scope address.
@@ -446,5 +445,5 @@ formatDeclaration = formatName . unDeclaration
 
 -- | The type of edge from a scope to its parent scopes.
 -- Either a lexical edge or an import edge in the case of non-lexical edges.
-data EdgeLabel = Lexical | Import | Export | Superclass
+data EdgeLabel = Lexical | Import | Void | Export | Superclass
   deriving (Bounded, Enum, Eq, Ord, Show)
