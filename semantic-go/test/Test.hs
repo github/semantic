@@ -5,7 +5,7 @@ import qualified System.Path as Path
 import           Test.Tasty
 import           Language.Go.Grammar
 import qualified Language.Go.AST as Go
-import           TreeSitter.Test.Helpers
+import           AST.Test
 import           AST.Unmarshal
 
 main :: IO ()
