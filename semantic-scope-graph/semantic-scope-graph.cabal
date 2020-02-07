@@ -22,10 +22,16 @@ library
   exposed-modules:
     Control.Carrier.Sketch.ScopeGraph
     Control.Effect.ScopeGraph
-    ScopeGraph.Convert
-    ScopeGraph.Properties.Declaration
-    ScopeGraph.Properties.Function
-    ScopeGraph.Properties.Reference
+    Control.Effect.ScopeGraph.Properties.Declaration
+    Control.Effect.ScopeGraph.Properties.Function
+    Control.Effect.ScopeGraph.Properties.Reference
+    Scope.Graph.AdjacencyList
+    Scope.Graph.Convert
+    Scope.Info
+    Scope.Path
+    Scope.Reference
+    Scope.Scope
+    Scope.Types
     Data.Hole
     Data.Module
     Data.ScopeGraph
