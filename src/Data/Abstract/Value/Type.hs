@@ -34,7 +34,7 @@ import           Data.List.NonEmpty (NonEmpty, nonEmpty)
 import qualified Data.Map as Map
 
 import           Control.Abstract hiding
-    (Array (..), Boolean (..), Function (..), Hash (..), Numeric (..), Object (..), String (..), Unit (..), While (..))
+    (Array (..), Boolean (..), Function (..), Hash (..), Numeric (..), Object (..), String (..), Unit (..), While (..), Void)
 import qualified Control.Abstract as Abstract
 import           Data.Abstract.BaseError
 import           Data.Abstract.Evaluatable
