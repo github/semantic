@@ -18,6 +18,7 @@ module Control.Effect.ScopeGraph
   -- Scope Manipulation
   , currentScope
   , insertEdge
+  , newReference
   , newScope
   , withScope
   , declareFunction
@@ -36,6 +37,7 @@ import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
 import qualified Data.ScopeGraph as ScopeGraph
 import           Data.Text (Text)
+import qualified Data.Text as Text
 import           GHC.Generics (Generic, Generic1)
 
 import qualified Control.Effect.ScopeGraph.Properties.Declaration as Props
@@ -70,6 +72,11 @@ newScope edges = send (NewScope edges pure)
 -- | Takes an edge label and a list of names and inserts an import edge to a hole.
 insertEdge :: Has ScopeGraph sig m => ScopeGraph.EdgeLabel -> NonEmpty Name -> m ()
 insertEdge label targets = send (InsertEdge label targets pure)
+
+-- | Inserts a reference
+newReference :: Has ScopeGraph sig m => Name -> Props.Reference -> m ()
+newReference name targets = reference (Text.pack $ show name) (Text.pack $ show name) targets
+
 
 declareFunction :: forall sig m . (Has ScopeGraph sig m) => Maybe Name -> Props.Function -> m (Name, Name)
 declareFunction name (Props.Function kind span) = do
