@@ -18,6 +18,7 @@ import           Data.Semilattice.Lower
 import qualified Language.Python ()
 import qualified Language.Python as Py (Term)
 import qualified Language.Python.Grammar as TSP
+import           ScopeGraph.Algebraic
 import           ScopeGraph.Convert
 import qualified ScopeGraph.Properties.Declaration as Props
 import qualified ScopeGraph.Properties.Function as Props
@@ -61,14 +62,6 @@ sampleGraphThing = do
   declare "hello" (Props.Declaration ScopeGraph.Assignment ScopeGraph.Default Nothing (Span (Pos 2 0) (Pos 2 10)))
   declare "goodbye" (Props.Declaration ScopeGraph.Assignment ScopeGraph.Default Nothing (Span (Pos 3 0) (Pos 3 12)))
   pure Complete
-
-graphFile :: FilePath -> IO (ScopeGraph.ScopeGraph Name, Result)
-graphFile fp = do
-  file <- ByteString.readFile fp
-  tree <- TS.parseByteString @Py.Term @Loc TSP.tree_sitter_python file
-  pyModule <- either die pure tree
-  pure $ runScopeGraph (Path.absRel fp) (Source.fromUTF8 file) pyModule
-
 
 assertSimpleAssignment :: HUnit.Assertion
 assertSimpleAssignment = do

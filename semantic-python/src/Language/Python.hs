@@ -1,17 +1,26 @@
+{-# LANGUAGE TypeApplications #-}
 -- | Semantic functionality for Python programs.
 module Language.Python
 ( Term(..)
 , Language.Python.Grammar.tree_sitter_python
+, graphPythonFile
 ) where
 
+import           Analysis.Name (Name)
+import qualified AST.Unmarshal as TS
+import           Control.Carrier.Sketch.Fresh
+import qualified Data.ByteString as ByteString
 import           Data.Proxy
+import           Data.ScopeGraph (ScopeGraph)
 import qualified Language.Python.AST as Py
+import           Language.Python.Grammar (tree_sitter_python)
 import           Language.Python.ScopeGraph
 import qualified Language.Python.Tags as PyTags
 import           ScopeGraph.Convert
+import           Source.Loc (Loc)
+import           System.Exit (die)
+import qualified System.Path as Path
 import qualified Tags.Tagging.Precise as Tags
-import qualified Language.Python.Grammar (tree_sitter_python)
-import qualified AST.Unmarshal as TS
 
 newtype Term a = Term { getTerm :: Py.Module a }
 
@@ -27,3 +36,10 @@ instance Tags.ToTags Term where
 
 instance ToScopeGraph Term where
   scopeGraph = scopeGraphModule . getTerm
+
+graphPythonFile :: Path.AbsRelFile -> IO (ScopeGraph Name, Result)
+graphPythonFile fp = do
+  file <- ByteString.readFile (Path.toString fp)
+  tree <- TS.parseByteString @Term @Loc tree_sitter_python file
+  pyModule <- either die pure tree
+  runSketch (Just fp) $ scopeGraph pyModule

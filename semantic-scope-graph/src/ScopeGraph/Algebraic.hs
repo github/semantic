@@ -1,33 +1,47 @@
-module ScopeGraph.Algebraic where
+{-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE TypeFamilies #-}
+module ScopeGraph.Algebraic
+  ( Graph (..)
+  , Node (..)
+  , fromPrimitive
+  , edgeLabels
+  ) where
 
 import qualified Algebra.Graph.Labelled as Labelled
+import           Algebra.Graph.ToGraph
 import           Analysis.Name (Name)
+import           Data.Foldable
 import qualified Data.Map.Strict as Map
 import           Data.Maybe
-import           Data.Monoid
-import           Data.ScopeGraph (EdgeLabel, Path, Scope, ScopeGraph)
+import           Data.ScopeGraph (EdgeLabel, Scope, ScopeGraph)
 import qualified Data.ScopeGraph
+import           Data.Sequence (Seq)
+import           Data.Set (Set)
+import qualified Data.Set as Set
 
-algebrize :: ScopeGraph Name -> Labelled.Graph [EdgeLabel] (Scope Name)
-algebrize (Data.ScopeGraph.ScopeGraph sg) = Labelled.edges (appEndo (Map.foldMapWithKey eachScope sg) mempty)
-  where
-     eachScope :: Name -> Scope Name -> Endo [([EdgeLabel], Scope Name, Scope Name)]
-     eachScope _n scope = Map.foldMapWithKey eachEdge (Data.ScopeGraph.edges scope)
-       where
-         eachEdge :: EdgeLabel -> [Name] -> Endo [([EdgeLabel], Scope Name, Scope Name)]
-         eachEdge lab connects =
-           let
-             scopes = catMaybes (fmap (`Map.lookup` sg) connects)
-             eachScope s = Endo ([([lab], scope, s)] <>)
-           in foldMap eachScope scopes
+data Node addr = Node addr (Scope addr)
+  deriving (Eq, Show, Ord)
 
-allPaths :: ScopeGraph address -> [Path address]
-allPaths = (`appEndo` []) . Map.foldMapWithKey go . Data.ScopeGraph.unScopeGraph
-  where
-    go :: address -> Scope address -> Endo [Path address]
-    go addr = Map.foldMapWithKey go2 . Data.ScopeGraph.references
-      where
-        go2 :: Data.ScopeGraph.Reference
-            -> ([Data.ScopeGraph.ReferenceInfo], Path address1)
-            -> Endo [Path address1]
-        go2 _ (_, a) = Endo (a :)
+newtype Graph addr = Graph { unGraph :: Labelled.Graph (Set EdgeLabel) (Node addr) }
+
+instance Ord addr => ToGraph (Graph addr) where
+  type ToVertex (Graph addr) = Node addr
+  toGraph (Graph a) = toGraph a
+
+edgeLabels :: Eq addr => Node addr -> Node addr -> Graph addr -> Set EdgeLabel
+edgeLabels a b (Graph g) = Labelled.edgeLabel a b g
+
+fromPrimitive :: ScopeGraph Name -> Graph Name
+fromPrimitive (Data.ScopeGraph.ScopeGraph sg)
+  = Graph (Labelled.edges (toList (Map.foldMapWithKey eachScope sg)))
+    where
+      eachScope :: Name -> Scope Name -> Seq (Set EdgeLabel, Node Name, Node Name)
+      eachScope n parent = Map.foldMapWithKey eachEdge (Data.ScopeGraph.edges parent)
+        where
+          eachEdge :: EdgeLabel -> [Name] -> Seq (Set EdgeLabel, Node Name, Node Name)
+          eachEdge lab connects = foldMap create scopes
+            where
+              inquire item = fmap (Node item) (Map.lookup item sg)
+              scopes = catMaybes (fmap inquire connects)
+              create neighbor = pure (Set.singleton lab, Node n parent, neighbor)

@@ -67,6 +67,17 @@ library
   hs-source-dirs: src
   build-depends: lens ^>= 4.18
 
+executable viz-python-graph
+  import: haskell
+  type: exitcode-stdio-1.0
+  hs-source-dirs: app
+  main-is: VizPythonGraph.hs
+  ghc-options: threaded
+
+  build-depends: semantic-python
+               , algebraic-graphs
+               , pathtype
+
 test-suite compiling
   import: haskell
   type: exitcode-stdio-1.0

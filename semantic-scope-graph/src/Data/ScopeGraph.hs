@@ -26,6 +26,7 @@ module Data.ScopeGraph
   , insertScope
   , insertEdge
   , Path(..)
+  , Info(..)
   , pathDeclaration
   , pathOfRef
   , pathPosition
