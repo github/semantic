@@ -42,14 +42,11 @@ module Parsing.Parser
 
 import           Assigning.Assignment
 import           AST.Unmarshal
-import           Data.Abstract.Evaluatable (HasPrelude)
 import           Data.AST
-import           Data.Functor.Classes
 import           Data.Language
 import           Data.Map (Map)
 import qualified Data.Map as Map
 import qualified Data.Syntax as Syntax
-import           Data.Term
 import           Foreign.Ptr
 import qualified Language.Go as GoPrecise
 import qualified Language.Go.Assignment as GoALaCarte

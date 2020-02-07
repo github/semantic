@@ -36,7 +36,6 @@ import qualified Data.Syntax.Declaration as Declaration
 import           Data.Term
 import           Data.Text (Text)
 import qualified Data.Text as T
-import qualified Language.Markdown.Syntax as Markdown
 import           Source.Loc as Loc
 import           Source.Range
 import           Source.Source as Source
