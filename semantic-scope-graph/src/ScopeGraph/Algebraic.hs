@@ -5,8 +5,9 @@
 module ScopeGraph.Algebraic
   ( Graph (..)
   , Node (..)
+  , Link (..)
   , fromPrimitive
-  , edgeLabels
+  , edgeLabel
   ) where
 
 import qualified Algebra.Graph.Labelled as Labelled
@@ -27,40 +28,57 @@ data Node addr
   | Informational (Info addr)
   deriving (Eq, Show, Ord)
 
-newtype Graph addr = Graph { unGraph :: Labelled.Graph (Set EdgeLabel) (Node addr) }
+
+data Link
+  = Strong
+  | Parent (Set EdgeLabel)
+    deriving (Eq, Ord, Show)
+
+instance Semigroup Link where
+  Strong <> Strong = Strong
+  Strong <> Parent a = Parent a
+  Parent a <> Strong = Parent a
+  Parent a <> Parent b = Parent (a <> b)
+
+instance Monoid Link where
+  mempty = Parent mempty
+
+parenting :: EdgeLabel -> Link
+parenting = Parent . Set.singleton
+
+newtype Graph addr = Graph { unGraph :: Labelled.Graph Link (Node addr) }
 
 instance Ord addr => ToGraph (Graph addr) where
   type ToVertex (Graph addr) = Node addr
   toGraph (Graph a) = toGraph a
 
-edgeLabels :: Eq addr => Node addr -> Node addr -> Graph addr -> Set EdgeLabel
-edgeLabels a b (Graph g) = Labelled.edgeLabel a b g
+edgeLabel :: Eq addr => Node addr -> Node addr -> Graph addr -> Link
+edgeLabel a b (Graph g) = Labelled.edgeLabel a b g
 
 fromPrimitive :: ScopeGraph Name -> Graph Name
 fromPrimitive omnigraph@(Data.ScopeGraph.ScopeGraph sg)
   = Graph (Labelled.edges (toList (Map.foldMapWithKey eachScope sg)))
     where
-      eachScope :: Name -> Scope Name -> Seq (Set EdgeLabel, Node Name, Node Name)
+      eachScope :: Name -> Scope Name -> Seq (Link, Node Name, Node Name)
       eachScope n parentScope
         = Map.foldMapWithKey eachEdge (Data.ScopeGraph.edges parentScope)
         <> foldMap eachInfo (Data.ScopeGraph.declarations parentScope)
         where
           parent = Node n parentScope
-          eachInfo :: Info Name -> Seq (Set EdgeLabel, Node Name, Node Name)
+          eachInfo :: Info Name -> Seq (Link, Node Name, Node Name)
           eachInfo i =
             let
-              standard = (Set.singleton Data.ScopeGraph.Within, parent, Informational i)
+              standard = (Strong, parent, Informational i)
               assoc = infoAssociatedScope i
             in
               (case (assoc, assoc >>= flip Data.ScopeGraph.lookupScope omnigraph) of
                 (Just a, Just sc) ->
-                  [ standard
-                  , (Set.singleton Data.ScopeGraph.Within, Informational i, Node a sc)
+                  [ (Strong, Informational i, Node a sc)
                   ]
                 _ -> [standard])
-          eachEdge :: EdgeLabel -> [Name] -> Seq (Set EdgeLabel, Node Name, Node Name)
+          eachEdge :: EdgeLabel -> [Name] -> Seq (Link, Node Name, Node Name)
           eachEdge lab connects = foldMap create scopes
             where
               inquire item = fmap (Node item) (Map.lookup item sg)
               scopes = catMaybes (fmap inquire connects)
-              create neighbor = pure (Set.singleton lab, parent, neighbor)
+              create neighbor = pure (parenting lab, parent, neighbor)

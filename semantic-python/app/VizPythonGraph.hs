@@ -53,10 +53,12 @@ fashion fp g = Dot.Style
         in
           ["label" := T.intercalate "|" sections]
 
-  , Dot.edgeAttributes = \a b -> ["label" := buildLabel (Algebraic.edgeLabels a b g)]
+  , Dot.edgeAttributes = \a b -> case Algebraic.edgeLabel a b g of
+      Algebraic.Strong   -> []
+      Algebraic.Parent s -> ["label" := (T.intercalate "," . fmap (T.pack . show) . sort . toList $ s)]
   }
   where
-    buildLabel = T.intercalate "," . fmap (T.pack . show) . sort . toList
+
 
 main :: IO ()
 main = do
