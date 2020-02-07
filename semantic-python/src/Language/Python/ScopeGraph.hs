@@ -235,6 +235,7 @@ instance ToScopeGraph Py.ImportFromStatement where
   scopeGraph (Py.ImportFromStatement _ [] (L1 (Py.DottedName _ names)) (Just (Py.WildcardImport _ _))) = do
     let toName (Py.Identifier _ name) = Name.name name
     complete <* insertEdge ScopeGraph.Import (toName <$> names)
+  scopeGraph term = todo (show term)
 
 
 
