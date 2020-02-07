@@ -19,8 +19,8 @@ import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import           Language.Python (graphPythonFile)
 import           Scope.Info
-import qualified ScopeGraph.Algebraic as Algebraic
-import           ScopeGraph.Convert
+import qualified Scope.Graph.Algebraic as Algebraic
+import           Scope.Graph.Convert
 import           Source.Span
 import           System.Environment
 import           System.IO
@@ -36,22 +36,24 @@ fashion fp g = Dot.Style
   { Dot.graphName = T.pack fp
   , Dot.preamble  = []
   , Dot.graphAttributes = []
-  , Dot.defaultVertexAttributes = ["shape" := "record"]
+  , Dot.defaultVertexAttributes = []
   , Dot.defaultEdgeAttributes = []
   , Dot.vertexName = \case
       Algebraic.Node n _ -> formatName n
-      Algebraic.Informational i    -> formatName (unDeclaration (infoDeclaration i))
+      Algebraic.Informational i    -> formatName (coerce (infoDeclaration i))
   , Dot.vertexAttributes = \case
       Algebraic.Node n s ->
-        let sections = ["Scope", formatName n]
-        in ["label" := T.intercalate "|" sections]
+        [ "label" := formatName n
+        , "shape" := "circle"
+        ]
       Algebraic.Informational i ->
         let
           sections = ["Info", dotName, dotKind]
-          dotName = formatName (unDeclaration (infoDeclaration i))
+          dotName = formatName (coerce (infoDeclaration i))
           dotKind = T.pack (show (infoKind i))
         in
-          ["label" := T.intercalate "|" sections]
+          ["label" := T.intercalate "|" sections
+          ,"shape" := "record"]
 
   , Dot.edgeAttributes = \a b -> case Algebraic.edgeLabel a b g of
       Algebraic.Strong   -> []
@@ -76,5 +78,3 @@ main = do
 
   let asAlg = Algebraic.fromPrimitive graph
   T.putStrLn . Dot.export (fashion file asAlg) $ asAlg
-
-

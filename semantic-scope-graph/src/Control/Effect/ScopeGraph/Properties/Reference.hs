@@ -2,7 +2,7 @@
 -- track of the parameters that need to be passed when establishing a new reference.
 -- It is currently unused, but will possess more fields in the future as scope graph
 -- functionality is enhanced.
-module ScopeGraph.Properties.Reference
+module Control.Effect.ScopeGraph.Properties.Reference
   ( Reference (..)
   ) where
 

@@ -24,7 +24,10 @@ module Language.Python.ScopeGraph
 import qualified Analysis.Name as Name
 import           AST.Element
 import           Control.Effect.Fresh
-import           Control.Effect.Sketch
+import           Control.Effect.ScopeGraph
+import qualified Control.Effect.ScopeGraph.Properties.Declaration as Props
+import qualified Control.Effect.ScopeGraph.Properties.Function as Props
+import qualified Control.Effect.ScopeGraph.Properties.Reference as Props
 import           Control.Lens (set, (^.))
 import           Data.Foldable
 import           Data.Maybe
@@ -36,10 +39,7 @@ import           GHC.Records
 import           GHC.TypeLits
 import qualified Language.Python.AST as Py
 import           Language.Python.Patterns
-import           ScopeGraph.Convert (Result (..), complete, todo)
-import qualified ScopeGraph.Properties.Declaration as Props
-import qualified ScopeGraph.Properties.Function as Props
-import qualified ScopeGraph.Properties.Reference as Props
+import           Scope.Graph.Convert (Result (..), complete, todo)
 import           Source.Loc
 import           Source.Span (span_)
 
@@ -49,7 +49,7 @@ import           Source.Span (span_)
 -- every single Python AST type.
 class (forall a . Show a => Show (t a)) => ToScopeGraph t where
   scopeGraph ::
-    ( Has Sketch sig m
+    ( Has ScopeGraph sig m
     , Monoid (m Result)
     )
     => t Loc
@@ -61,7 +61,7 @@ instance (ToScopeGraph l, ToScopeGraph r) => ToScopeGraph (l :+: r) where
 
 onField ::
   forall (field :: Symbol) syn sig m r .
-  ( Has Sketch sig m
+  ( Has ScopeGraph sig m
   , HasField field (r Loc) (syn Loc)
   , ToScopeGraph syn
   , Monoid (m Result)
@@ -75,7 +75,7 @@ onField
 onChildren ::
   ( Traversable t
   , ToScopeGraph syn
-  , Has Sketch sig m
+  , Has ScopeGraph sig m
   , HasField "extraChildren" (r Loc) (t (syn Loc))
   , Monoid (m Result)
   )
@@ -86,7 +86,7 @@ onChildren
   . traverse scopeGraph
   . getField @"extraChildren"
 
-scopeGraphModule :: Has Sketch sig m => Py.Module Loc -> m Result
+scopeGraphModule :: Has ScopeGraph sig m => Py.Module Loc -> m Result
 scopeGraphModule = getAp . scopeGraph
 
 instance ToScopeGraph Py.AssertStatement where scopeGraph = onChildren
@@ -231,7 +231,13 @@ instance ToScopeGraph Py.Integer where scopeGraph = mempty
 
 instance ToScopeGraph Py.ImportStatement where scopeGraph = todo
 
-instance ToScopeGraph Py.ImportFromStatement where scopeGraph = todo
+instance ToScopeGraph Py.ImportFromStatement where
+  scopeGraph (Py.ImportFromStatement _ [] (L1 (Py.DottedName _ names)) (Just (Py.WildcardImport _ _))) = do
+    let toName (Py.Identifier _ name) = Name.name name
+    complete <* insertEdge ScopeGraph.Import (toName <$> names)
+  scopeGraph term = todo (show term)
+
+
 
 instance ToScopeGraph Py.Lambda where scopeGraph = todo
 

@@ -2,7 +2,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedLists #-}
 {-# LANGUAGE TypeFamilies #-}
-module ScopeGraph.Algebraic
+module Scope.Graph.Algebraic
   ( Graph (..)
   , Node (..)
   , Link (..)
