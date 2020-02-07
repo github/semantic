@@ -73,7 +73,7 @@ newScope edges = send (NewScope edges pure)
 insertEdge :: Has ScopeGraph sig m => ScopeGraph.EdgeLabel -> NonEmpty Name -> m ()
 insertEdge label targets = send (InsertEdge label targets pure)
 
--- | Inserts a reference
+-- | Inserts a reference.
 newReference :: Has ScopeGraph sig m => Name -> Props.Reference -> m ()
 newReference name targets = reference (Text.pack $ show name) (Text.pack $ show name) targets
 
