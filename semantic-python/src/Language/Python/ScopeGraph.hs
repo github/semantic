@@ -40,8 +40,8 @@ import           GHC.TypeLits
 import qualified Language.Python.AST as Py
 import           Language.Python.Patterns
 import           Scope.Graph.Convert (Result (..), complete, todo)
-import           Source.Loc
-import           Source.Span (span_)
+import           Source.Loc (Loc)
+import           Source.Span (Span, span_)
 
 -- This typeclass is internal-only, though it shares the same interface
 -- as the one defined in semantic-scope-graph. The somewhat-unconventional
@@ -215,8 +215,9 @@ instance ToScopeGraph Py.FutureImportStatement where scopeGraph = todo
 instance ToScopeGraph Py.GeneratorExpression where scopeGraph = todo
 
 instance ToScopeGraph Py.Identifier where
-  scopeGraph (Py.Identifier _ name) = do
-    reference name name Props.Reference
+  scopeGraph (Py.Identifier ann name) = do
+    let refProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann^.span_ :: Span)
+    newReference (Name.name name) refProps
     complete
 
 instance ToScopeGraph Py.IfStatement where
