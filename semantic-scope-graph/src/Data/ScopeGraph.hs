@@ -7,7 +7,8 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TupleSections #-}
 module Data.ScopeGraph
-  ( Slot(..)
+  ( module Scope.Info
+  , Slot(..)
   , Info(..)
   , associatedScope
   , lookupDeclaration
@@ -16,7 +17,6 @@ module Data.ScopeGraph
   , declarationsByRelation
   , Declaration(..) -- TODO don't export these constructors
   , declare
-  , formatDeclaration
   , EdgeLabel(..)
   , insertDeclarationScope
   , insertDeclarationSpan
@@ -54,10 +54,8 @@ import           Analysis.Name
 import           Control.Applicative
 import           Control.Lens.Lens
 import           Control.Monad
-import           Data.Aeson
 import           Data.Bifunctor
 import           Data.Foldable
-import           Data.Hashable
 import           Data.Hole
 import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
@@ -69,62 +67,12 @@ import           Data.Sequence (Seq)
 import qualified Data.Sequence as Seq
 import           Data.Set (Set)
 import qualified Data.Set as Set
-import           Data.Text (Text)
-import           GHC.Generics
+import           Scope.Info
 import           Source.Span
 
 -- A slot is a location in the heap where a value is stored.
 data Slot address = Slot { frameAddress :: address, position :: Position }
     deriving (Eq, Show, Ord)
-
-
-data AccessControl = Public
-                   | Protected
-                   | Private
-                   deriving (Bounded, Enum, Eq, Generic, Hashable, ToJSON, Show)
-
--- | The Ord AccessControl instance represents an order specification of AccessControls.
--- AccessControls that are less than or equal to another AccessControl implies access.
--- It is helpful to consider `Public <= Private` as saying "Can a Public syntax term access a Private syntax term?"
--- In this way, Public AccessControl is the top of the order specification, and Private AccessControl is the bottom.
-instance Ord AccessControl where
-  -- | Private AccessControl represents the least overlap or accessibility with other AccessControls.
-  -- When asking if the AccessControl "on the left" is less than the AccessControl "on the right", Private AccessControl on the left always implies access to the thing on the right.
-  (<=) Private _           = True
-  (<=) _       Private     = False
-
-  -- | Protected AccessControl is in between Private and Public in the order specification.
-  -- Protected AccessControl "on the left" has access to Protected or Public AccessControls "on the right".
-  (<=) Protected Public    = True
-  (<=) Protected Protected = True
-
-  -- | Public AccessControl "on the left" has access only to Public AccessControl "on the right".
-  (<=) Public Public       = True
-  (<=) Public _            = False
-
-
-data Relation = Default | Instance | Prelude | Gensym
-  deriving (Bounded, Enum, Eq, Show, Ord)
-
-instance Lower Relation where
-  lowerBound = Default
-
-data Info scopeAddress = Info
-  { infoDeclaration     :: Declaration
-  , infoModule          :: ModuleInfo
-  , infoRelation        :: Relation
-  , infoAccessControl   :: AccessControl
-  , infoSpan            :: Span
-  , infoKind            :: Kind
-  , infoAssociatedScope :: Maybe scopeAddress
-  } deriving (Eq, Show, Ord)
-
-instance HasSpan (Info scopeAddress) where
-  span_ = lens infoSpan (\i s -> i { infoSpan = s })
-  {-# INLINE span_ #-}
-
-instance Lower (Info scopeAddress) where
-  lowerBound = Info lowerBound lowerBound lowerBound Public lowerBound lowerBound Nothing
 
 data ReferenceInfo = ReferenceInfo
   { refSpan   :: Span
@@ -135,35 +83,6 @@ data ReferenceInfo = ReferenceInfo
 instance HasSpan ReferenceInfo where
   span_ = lens refSpan (\r s -> r { refSpan = s })
   {-# INLINE span_ #-}
-
-data Kind = AbstractClass
-          | Assignment
-          | Call
-          | Class
-          | DefaultExport
-          | Function
-          | Identifier
-          | Let
-          | MemberAccess
-          | Method
-          | Module
-          | New
-          | Parameter
-          | PublicField
-          | QualifiedAliasedImport
-          | QualifiedExport
-          | QualifiedImport
-          | RequiredParameter
-          | This
-          | TypeAlias
-          | TypeIdentifier
-          | Unknown
-          | UnqualifiedImport
-          | VariableDeclaration
-  deriving (Bounded, Enum, Eq, Show, Ord)
-
-instance Lower Kind where
-  lowerBound = Unknown
 
 data Domain
   = Standard
@@ -186,9 +105,6 @@ instance AbstractHole (Scope scopeAddress) where
 
 instance AbstractHole address => AbstractHole (Slot address) where
   hole = Slot hole (Position 0)
-
-instance AbstractHole (Info address) where
-  hole = lowerBound
 
 newtype Position = Position { unPosition :: Int }
   deriving (Eq, Show, Ord)
@@ -419,16 +335,7 @@ newtype Reference = Reference { unReference :: Name }
 instance Lower Reference where
   lowerBound = Reference $ name ""
 
-newtype Declaration = Declaration { unDeclaration :: Name }
-  deriving (Eq, Ord, Show)
-
-instance Lower Declaration where
-  lowerBound = Declaration $ name ""
-
-formatDeclaration :: Declaration -> Text
-formatDeclaration = formatName . unDeclaration
-
 -- | The type of edge from a scope to its parent scopes.
 -- Either a lexical edge or an import edge in the case of non-lexical edges.
-data EdgeLabel = Lexical | Import | Export | Superclass
+data EdgeLabel = Lexical | Import | Export | Superclass | Within
   deriving (Bounded, Enum, Eq, Ord, Show)

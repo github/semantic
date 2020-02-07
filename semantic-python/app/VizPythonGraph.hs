@@ -1,3 +1,4 @@
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedLists #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE PatternSynonyms #-}
@@ -17,6 +18,7 @@ import           Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import           Language.Python (graphPythonFile)
+import           Scope.Info
 import qualified ScopeGraph.Algebraic as Algebraic
 import           ScopeGraph.Convert
 import           Source.Span
@@ -36,21 +38,20 @@ fashion fp g = Dot.Style
   , Dot.graphAttributes = []
   , Dot.defaultVertexAttributes = ["shape" := "record"]
   , Dot.defaultEdgeAttributes = []
-  , Dot.vertexName = \(Algebraic.Node n _) -> formatName n
-  , Dot.vertexAttributes = \(Algebraic.Node n s) ->
-      let sections = [formatName n, dotName, dotSpan, dotKind]
-          decls = Data.ScopeGraph.declarations s
-          dotName = case decls of
-            [info] -> formatName (coerce (Data.ScopeGraph.infoDeclaration info))
-            []     -> "??"
-            _      -> "MULTIPLE (" <> T.pack (show (length decls)) <> ")"
-          dotSpan = case decls of
-            [info] -> renderSpan (info^.span_)
-            _      -> ""
-          dotKind = case decls of
-            [info] -> T.pack (show (Data.ScopeGraph.infoKind info))
-            _      -> ""
-      in ["label" := T.intercalate "|" sections]
+  , Dot.vertexName = \case
+      Algebraic.Node n _ -> formatName n
+      Algebraic.Informational i    -> formatName (unDeclaration (infoDeclaration i))
+  , Dot.vertexAttributes = \case
+      Algebraic.Node n s ->
+        let sections = ["Scope", formatName n]
+        in ["label" := T.intercalate "|" sections]
+      Algebraic.Informational i ->
+        let
+          sections = ["Info", dotName, dotKind]
+          dotName = formatName (unDeclaration (infoDeclaration i))
+          dotKind = T.pack (show (infoKind i))
+        in
+          ["label" := T.intercalate "|" sections]
 
   , Dot.edgeAttributes = \a b -> ["label" := buildLabel (Algebraic.edgeLabels a b g)]
   }
