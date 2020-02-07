@@ -12,6 +12,9 @@ import           Control.Algebra
 import           Control.Carrier.Lift
 import           Control.Carrier.Sketch.ScopeGraph
 import           Control.Effect.ScopeGraph
+import qualified Control.Effect.ScopeGraph.Properties.Declaration as Props
+import qualified Control.Effect.ScopeGraph.Properties.Function as Props
+import qualified Control.Effect.ScopeGraph.Properties.Reference as Props
 import           Control.Monad
 import qualified Data.ByteString as ByteString
 import qualified Data.List.NonEmpty as NonEmpty
@@ -20,10 +23,7 @@ import           Data.Semilattice.Lower
 import qualified Language.Python ()
 import qualified Language.Python as Py (Term)
 import qualified Language.Python.Grammar as TSP
-import           ScopeGraph.Convert
-import qualified ScopeGraph.Properties.Declaration as Props
-import qualified ScopeGraph.Properties.Function as Props
-import qualified ScopeGraph.Properties.Reference as Props
+import           Scope.Graph.Convert
 import           Source.Loc
 import qualified Source.Source as Source
 import           Source.Span
