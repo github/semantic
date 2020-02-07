@@ -232,6 +232,7 @@ instance ToScopeGraph Py.Integer where scopeGraph = mempty
 
 instance ToScopeGraph Py.ImportStatement where scopeGraph = todo
 
+
 instance ToScopeGraph Py.ImportFromStatement where
   scopeGraph (Py.ImportFromStatement _ [] (L1 (Py.DottedName _ names)) (Just (Py.WildcardImport _ _))) = do
     let toName (Py.Identifier _ name) = Name.name name
@@ -246,7 +247,6 @@ instance ToScopeGraph Py.ImportFromStatement where
       newReference (Name.name name) referenceProps
 
     complete
-
 
 
 instance ToScopeGraph Py.Lambda where scopeGraph = todo
