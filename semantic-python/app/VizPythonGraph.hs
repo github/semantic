@@ -38,7 +38,7 @@ fashion fp g = Dot.Style
   , Dot.defaultEdgeAttributes = []
   , Dot.vertexName = \(Algebraic.Node n _) -> formatName n
   , Dot.vertexAttributes = \(Algebraic.Node n s) ->
-      let sections = [formatName n, dotName, dotSpan]
+      let sections = [formatName n, dotName, dotSpan, dotKind]
           decls = Data.ScopeGraph.declarations s
           dotName = case decls of
             [info] -> formatName (coerce (Data.ScopeGraph.infoDeclaration info))
@@ -46,7 +46,10 @@ fashion fp g = Dot.Style
             _      -> "MULTIPLE (" <> T.pack (show (length decls)) <> ")"
           dotSpan = case decls of
             [info] -> renderSpan (info^.span_)
-            _      -> "[? - ?]"
+            _      -> ""
+          dotKind = case decls of
+            [info] -> T.pack (show (Data.ScopeGraph.infoKind info))
+            _      -> ""
       in ["label" := T.intercalate "|" sections]
 
   , Dot.edgeAttributes = \a b -> ["label" := buildLabel (Algebraic.edgeLabels a b g)]
