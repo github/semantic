@@ -23,6 +23,7 @@ module Data.ScopeGraph
   , insertImportReference
   , newScope
   , newPreludeScope
+  , addImportEdge
   , insertScope
   , insertEdge
   , Path(..)
@@ -57,6 +58,8 @@ import           Data.Bifunctor
 import           Data.Foldable
 import           Data.Hashable
 import           Data.Hole
+import           Data.List.NonEmpty (NonEmpty)
+import qualified Data.List.NonEmpty as NonEmpty
 import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
 import           Data.Maybe
@@ -342,7 +345,8 @@ putDeclarationScopeAtPosition scope position assocScope g@(ScopeGraph graph) = f
   let seq = Seq.adjust' (\Info{..} -> Info { infoAssociatedScope = assocScope, .. }) (unPosition position) dataSeq
   pure $ ScopeGraph (Map.adjust (\s -> s { declarations = seq }) scope graph)
 
-lookupReference :: Ord scopeAddress => Name -> scopeAddress -> ScopeGraph scopeAddress -> Maybe (Path scopeAddress)
+-- | Lookup a reference by traversing the paths of a given scope and return a Maybe (Path address)
+lookupReference :: Ord address => Name -> address -> ScopeGraph address -> Maybe (Path address)
 lookupReference  name scope g = fmap snd . Map.lookup (Reference name) =<< pathsOfScope scope g
 
 insertEdge :: Ord scopeAddress => EdgeLabel -> scopeAddress -> scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
@@ -351,6 +355,34 @@ insertEdge label target currentAddress g@(ScopeGraph graph) = fromMaybe g $ do
   scopes <- maybe (Just mempty) pure (Map.lookup label (edges currentScope'))
   let newScope = currentScope' { edges = Map.insert label (target : scopes) (edges currentScope') }
   pure (ScopeGraph (Map.insert currentAddress newScope graph))
+
+insertEdges :: Ord scopeAddress => NonEmpty EdgeLabel -> scopeAddress -> scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
+insertEdges labels target currentAddress g =
+  foldr (\label graph -> insertEdge label target currentAddress graph) g labels
+
+-- | Add an import edge of the form 'a -> Import -> b -> Import -> c' or creates intermediate void scopes of the form
+--   'a -> Void -> b -> Import -> c' if the given scopes cannot be found.
+addImportEdge :: Ord scopeAddress => EdgeLabel -> [scopeAddress] -> scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
+addImportEdge edge importEdge currentAddress g = do
+  case importEdge of
+    [] -> g
+    (name:[]) -> maybe
+                (addImportHole edge name currentAddress g)
+                (const (insertEdge edge name currentAddress g))
+                (lookupScope name g)
+    (name:names) -> let
+      scopeGraph' = maybe
+        (addImportHole edge name currentAddress g)
+        (const (insertEdge edge name currentAddress g))
+        (lookupScope name g)
+      in
+        addImportEdge edge names name scopeGraph'
+
+addImportHole :: Ord scopeAddress => EdgeLabel -> scopeAddress -> scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
+addImportHole edge name currentAddress g = let
+  scopeGraph' = newScope name mempty g
+  in
+  insertEdges (NonEmpty.fromList [Void, edge]) name currentAddress scopeGraph'
 
 
 -- | Update the 'Scope' containing a 'Declaration' with an associated scope address.
@@ -428,5 +460,5 @@ formatDeclaration = formatName . unDeclaration
 
 -- | The type of edge from a scope to its parent scopes.
 -- Either a lexical edge or an import edge in the case of non-lexical edges.
-data EdgeLabel = Lexical | Import | Export | Superclass
+data EdgeLabel = Lexical | Import | Export | Superclass | Void
   deriving (Bounded, Enum, Eq, Ord, Show)

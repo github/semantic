@@ -20,8 +20,8 @@ tested-with:         GHC == 8.6.5
 
 library
   exposed-modules:
-    Control.Carrier.Sketch.Fresh
-    Control.Effect.Sketch
+    Control.Carrier.Sketch.ScopeGraph
+    Control.Effect.ScopeGraph
     ScopeGraph.Convert
     ScopeGraph.Properties.Declaration
     ScopeGraph.Properties.Function

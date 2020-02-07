@@ -13,14 +13,14 @@ module ScopeGraph.Convert
   , complete
   ) where
 
-import Control.Effect.Sketch
+import Control.Effect.ScopeGraph
 import Data.List.NonEmpty
 import Data.Typeable
 import Source.Loc
 
 class Typeable t => ToScopeGraph t where
   scopeGraph ::
-    ( Has Sketch sig m
+    ( Has ScopeGraph sig m
     )
     => t Loc
     -> m Result

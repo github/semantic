@@ -14,7 +14,7 @@ module Data.Syntax.Expression (module Data.Syntax.Expression) where
 import Prelude hiding (null)
 
 import           Analysis.Name as Name
-import           Control.Abstract hiding (Bitwise (..), Call)
+import           Control.Abstract hiding (Bitwise (..), Call, Void)
 import           Control.Applicative
 import           Control.Monad
 import           Data.Abstract.Evaluatable as Abstract
