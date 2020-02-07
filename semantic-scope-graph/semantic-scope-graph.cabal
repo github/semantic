@@ -24,6 +24,9 @@ library
     Control.Effect.Sketch
     ScopeGraph.Algebraic
     ScopeGraph.Convert
+    ScopeGraph.Properties.Declaration
+    ScopeGraph.Properties.Function
+    ScopeGraph.Properties.Reference
     Data.Hole
     Data.Module
     Data.ScopeGraph
