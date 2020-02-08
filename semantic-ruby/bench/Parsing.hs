@@ -9,9 +9,9 @@ import           Gauge
 import           System.Exit (die)
 import           System.FilePath.Glob
 import qualified System.Path as Path
-import           TreeSitter.Ruby
-import qualified TreeSitter.Ruby.AST as Rb
-import           TreeSitter.Unmarshal
+import           Language.Ruby
+import qualified Language.Ruby.AST as Rb
+import           AST.Unmarshal
 
 benchmarks :: Benchmark
 benchmarks = bgroup "parsing" [ rubyBenchmarks ]
