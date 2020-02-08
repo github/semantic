@@ -63,9 +63,6 @@ data ScopeGraphEff m k =
   | InsertEdge ScopeGraph.EdgeLabel (NonEmpty Name) (() -> m k)
   deriving (Generic, Generic1, HFunctor, Effect)
 
-currentScope :: Has (Reader Name) sig m => m Name
-currentScope = ask
-
 declare :: forall sig m . (Has ScopeGraph sig m) => Name -> Props.Declaration -> m ()
 declare n props = send (Declare n props pure)
 
