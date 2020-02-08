@@ -16,6 +16,7 @@ module Language.Java.AST
 
 import           AST.GenerateSyntax
 import           AST.Token
+import           Language.Haskell.TH.Syntax (runIO)
 import qualified TreeSitter.Java as Java
 
 runIO Java.getNodeTypesPath >>= astDeclarationsForLanguage Java.tree_sitter_java
