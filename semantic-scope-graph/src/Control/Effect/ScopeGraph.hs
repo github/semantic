@@ -63,6 +63,7 @@ maybeM f = maybe f pure
 
 type ScopeGraph
   = ScopeGraphEff
+  :+: Reader (CurrentScope Name)
   :+: Fresh
   :+: Reader Name
 
