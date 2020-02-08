@@ -43,6 +43,13 @@ import           GHC.Generics (Generic, Generic1)
 import qualified Control.Effect.ScopeGraph.Properties.Declaration as Props
 import qualified Control.Effect.ScopeGraph.Properties.Function as Props
 import qualified Control.Effect.ScopeGraph.Properties.Reference as Props
+import qualified Control.Effect.ScopeGraph.Properties.Reference as Props.Reference
+import           Control.Effect.State
+
+-- | Extract the 'Just' of a 'Maybe' in an 'Applicative' context or, given 'Nothing', run the provided action.
+maybeM :: Applicative f => f a -> Maybe a -> f a
+maybeM f = maybe f pure
+{-# INLINE maybeM #-}
 
 type ScopeGraph
   = ScopeGraphEff
@@ -70,12 +77,35 @@ newScope :: forall sig m . Has ScopeGraph sig m => Map ScopeGraph.EdgeLabel [Nam
 newScope edges = send (NewScope edges pure)
 
 -- | Takes an edge label and a list of names and inserts an import edge to a hole.
-insertEdge :: Has ScopeGraph sig m => ScopeGraph.EdgeLabel -> NonEmpty Name -> m ()
-insertEdge label targets = send (InsertEdge label targets pure)
+newEdge :: Has ScopeGraph sig m => ScopeGraph.EdgeLabel -> NonEmpty Name -> m ()
+newEdge label targets = send (InsertEdge label targets pure)
+
+
+currentScope :: (Has ScopeGraph sig m) => m Name
+currentScope = asks unCurrentScope
+
+lookupScope :: Has (State (ScopeGraph.ScopeGraph Name)) sig m => Name -> m (ScopeGraph.Scope Name)
+lookupScope address = maybeM undefined . ScopeGraph.lookupScope address =<< get
 
 -- | Inserts a reference.
-newReference :: Has ScopeGraph sig m => Name -> Props.Reference -> m ()
-newReference name targets = reference (Text.pack $ show name) (Text.pack $ show name) targets
+newReference :: (Has (State (ScopeGraph.ScopeGraph Name)) sig m, Has ScopeGraph sig m) => Name -> Props.Reference -> m ()
+newReference name props = do
+  currentAddress <- currentScope
+  scope <- lookupScope currentAddress
+
+  let refProps = Reference.ReferenceInfo (props^.span_) (Props.Reference.kind props) lowerBound
+      insertRef' :: ScopeGraph.Path Name -> ScopeGraph.ScopeGraph Name -> ScopeGraph.ScopeGraph Name
+      insertRef' path scopeGraph = let
+          scope' = (ScopeGraph.insertReference (Reference.Reference name) lowerBound (Props.Reference.span props) (getField @"kind" props) path) scope
+        in
+          (ScopeGraph.insertScope currentAddress scope' scopeGraph)
+  scopeGraph <- get @(ScopeGraph.ScopeGraph Name)
+  case ((AdjacencyList.findPath (const Nothing) (ScopeGraph.Declaration name) currentAddress scopeGraph) :: Maybe (Scope.Path Name)) of
+    Just path -> modify (\scopeGraph -> insertRef' path scopeGraph)
+    Nothing   -> undefined
+  -- maybe
+  --   (modify (const (ScopeGraph.insertScope currentAddress (ScopeGraph.newReference (Reference.Reference name) refProps scope))))
+
 
 
 declareFunction :: forall sig m . (Has ScopeGraph sig m) => Maybe Name -> Props.Function -> m (Name, Name)
