@@ -33,7 +33,7 @@ common haskell
                      , semilattices ^>= 0
                      , template-haskell ^>= 2.15
                      , text ^>= 1.2.3
-                     , tree-sitter ^>= 0.8
+                     , tree-sitter ^>= 0.9
                      , tree-sitter-python ^>= 0.8.1
                      , containers
   ghc-options:
