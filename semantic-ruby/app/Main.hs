@@ -8,9 +8,9 @@ import qualified Data.ByteString as B
 import           Data.Foldable (traverse_)
 import           System.Exit (die)
 import           System.Environment (getArgs)
-import           TreeSitter.Ruby
-import qualified TreeSitter.Ruby.AST as Rb
-import           TreeSitter.Unmarshal
+import           Language.Ruby
+import qualified Language.Ruby.AST as Rb
+import           AST.Unmarshal
 
 main :: IO ()
 main = getArgs >>= traverse_ (print <=< parseFile)
