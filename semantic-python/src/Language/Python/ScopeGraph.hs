@@ -236,11 +236,11 @@ instance ToScopeGraph Py.ImportStatement where scopeGraph = todo
 instance ToScopeGraph Py.ImportFromStatement where
   scopeGraph (Py.ImportFromStatement _ [] (L1 (Py.DottedName _ names)) (Just (Py.WildcardImport _ _))) = do
     let toName (Py.Identifier _ name) = Name.name name
-    complete <* insertEdge ScopeGraph.Import (toName <$> names)
+    complete <* newEdge ScopeGraph.Import (toName <$> names)
   scopeGraph (Py.ImportFromStatement _ [] (L1 (Py.DottedName _ names)) Nothing) = do
     let toName (Py.Identifier _ name) = Name.name name
         names' = toName <$> names
-    insertEdge ScopeGraph.Import names'
+    newEdge ScopeGraph.Import names'
 
     for_ names $ \(Py.Identifier ann name) -> do
       let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann^.span_ :: Span)
