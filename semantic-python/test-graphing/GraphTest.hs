@@ -79,12 +79,6 @@ assertSimpleAssignment = do
   (expecto, Complete) <- runM $ runSketch Nothing sampleGraphThing
   HUnit.assertEqual "Should work for simple case" expecto result
 
-expectedReference :: (Has ScopeGraph sig m) => m Result
-expectedReference = do
-  declare "x" (Props.Declaration ScopeGraph.Assignment ScopeGraph.Default Nothing (Span (Pos 0 0) (Pos 0 5)))
-  reference "x" "x" Props.Reference
-  pure Complete
-
 assertSimpleReference :: HUnit.Assertion
 assertSimpleReference = do
   let path = "semantic-python/test/fixtures/5-01-simple-reference.py"
@@ -93,10 +87,14 @@ assertSimpleReference = do
 
   HUnit.assertEqual "Should work for simple case" expecto result
 
-expectedLexicalScope :: (Has ScopeGraph sig m) => m Result
-expectedLexicalScope = do
-  _ <- declareFunction (Just $ Name.name "foo") (Props.Function ScopeGraph.Function (Span (Pos 0 0) (Pos 1 24)))
-  reference "foo" "foo" Props.Reference {}
+expectedReference :: (Has ScopeGraph sig m) => m Result
+expectedReference = do
+  declare "x" (Props.Declaration ScopeGraph.Assignment ScopeGraph.Default Nothing (Span (Pos 0 0) (Pos 0 5)))
+  let refProperties = Props.Reference ScopeGraph.Assignment ScopeGraph.Default (Span (Pos 0 0) (Pos 0 1))
+  reference "x" "x" refProperties
+  newReference "x" refProperties
+  pure Complete
+
   pure Complete
 
 expectedFunctionArg :: (Has ScopeGraph sig m) => m Result
@@ -104,9 +102,11 @@ expectedFunctionArg = do
   (_, associatedScope) <- declareFunction (Just $ Name.name "foo") (Props.Function ScopeGraph.Function (Span (Pos 0 0) (Pos 1 12)))
   withScope associatedScope $ do
     declare "x" (Props.Declaration ScopeGraph.Identifier ScopeGraph.Default Nothing lowerBound)
-    reference "x" "x" Props.Reference
+    let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 0 0) (Pos 0 1))
+    reference "x" "x" refProperties
     pure ()
-  reference "foo" "foo" Props.Reference
+  let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 0 0) (Pos 0 3))
+  newReference "foo" refProperties
   pure Complete
 
 expectedImportHole :: (Has ScopeGraph sig m) => m Result
@@ -122,6 +122,14 @@ assertLexicalScope = do
     (expecto, Complete) -> HUnit.assertEqual "Should work for simple case" expecto graph
     (_, Todo msg)       -> HUnit.assertFailure ("Failed to complete:" <> show msg)
 
+expectedLexicalScope :: (Has ScopeGraph sig m) => m Result
+expectedLexicalScope = do
+  _ <- declareFunction (Just $ Name.name "foo") (Props.Function ScopeGraph.Function (Span (Pos 0 0) (Pos 1 24)))
+  let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 0 0) (Pos 0 3))
+  newReference "foo" refProperties
+  pure Complete
+
+
 assertFunctionArg :: HUnit.Assertion
 assertFunctionArg = do
   let path = "semantic-python/test/fixtures/5-03-function-argument.py"
@@ -135,6 +143,14 @@ assertImportHole = do
   let path = "semantic-python/test/fixtures/cheese/6-01-imports.py"
   (graph, _) <- graphFile path
   case run (runSketch Nothing expectedImportHole) of
+    (expecto, Complete) -> HUnit.assertEqual "Should work for simple case" expecto graph
+    (_, Todo msg)       -> HUnit.assertFailure ("Failed to complete:" <>  show msg)
+
+assertQualifiedImport :: HUnit.Assertion
+assertQualifiedImport = do
+  let path = "semantic-python/test/fixtures/cheese/6-01-qualified-imports.py"
+  (graph, _) <- graphFile path
+  case run (runSketch Nothing expectedQualifiedImport) of
     (expecto, Complete) -> HUnit.assertEqual "Should work for simple case" expecto graph
     (_, Todo msg)       -> HUnit.assertFailure ("Failed to complete:" <>  show msg)
 
@@ -159,5 +175,6 @@ main = do
       ],
       Tasty.testGroup "imports" [
         HUnit.testCase "simple function argument" assertImportHole
+        , HUnit.testCase "qualified imports" assertQualifiedImport
       ]
     ]
