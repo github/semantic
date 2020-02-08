@@ -95,6 +95,12 @@ expectedReference = do
   newReference "x" refProperties
   pure Complete
 
+expectedQualifiedImport :: Has ScopeGraph sig m => m Result
+expectedQualifiedImport = do
+  let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 0 0) (Pos 0 3))
+  newReference (Name.name "cheese") refProperties
+  withScope "cheese" $ do
+    newReference (Name.name "ints") refProperties
   pure Complete
 
 expectedFunctionArg :: (Has ScopeGraph sig m) => m Result
