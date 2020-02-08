@@ -10,12 +10,18 @@ module Control.Effect.ScopeGraph.Properties.Reference
   ( Reference (..)
   ) where
 
+import Control.Lens
 import Data.ScopeGraph as ScopeGraph (Kind, Relation)
 import GHC.Generics (Generic)
+import Prelude hiding (span)
 import Source.Span
 
 data Reference = Reference
-  { kind            :: ScopeGraph.Kind
-  , relation        :: ScopeGraph.Relation
-  , span            :: Span
-    } deriving Generic
+  { kind     :: ScopeGraph.Kind
+  , relation :: ScopeGraph.Relation
+  , span     :: Span
+    } deriving (Generic, Show)
+
+instance HasSpan Reference where
+  span_ = lens span (\r s -> r { span = s })
+  {-# INLINE span_ #-}
