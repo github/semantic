@@ -32,13 +32,23 @@ import qualified Analysis.Name as Name
 import           Control.Algebra
 import           Control.Effect.Fresh
 import           Control.Effect.Reader
+import           Control.Lens
 import           Data.List.NonEmpty
 import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
+import qualified Data.Module as Module
+import           Data.ScopeGraph (CurrentScope (..))
 import qualified Data.ScopeGraph as ScopeGraph
+import           Data.Semilattice.Lower
 import           Data.Text (Text)
 import qualified Data.Text as Text
 import           GHC.Generics (Generic, Generic1)
+import           GHC.Records
+import qualified Scope.Reference as Reference
+import           Source.Span
+
+import qualified Scope.Graph.AdjacencyList as AdjacencyList
+import qualified Scope.Path as Scope
 
 import qualified Control.Effect.ScopeGraph.Properties.Declaration as Props
 import qualified Control.Effect.ScopeGraph.Properties.Function as Props
