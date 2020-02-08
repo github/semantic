@@ -361,7 +361,7 @@ test-suite test
                      , Properties
   build-depends:       semantic
                      , semantic-json
-                     , tree-sitter-json ^>= 0.6
+                     , tree-sitter-json ^>= 0.7
                      , Glob ^>= 0.10.0
                      , hedgehog ^>= 1
                      , hspec >= 2.6 && <3
