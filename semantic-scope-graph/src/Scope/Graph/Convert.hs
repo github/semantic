@@ -13,14 +13,18 @@ module Scope.Graph.Convert
   , complete
   ) where
 
-import Control.Effect.ScopeGraph
-import Data.List.NonEmpty
-import Data.Typeable
-import Source.Loc
+import           Analysis.Name (Name)
+import           Control.Effect.ScopeGraph
+import           Control.Effect.State
+import           Data.List.NonEmpty
+import qualified Data.ScopeGraph as ScopeGraph
+import           Data.Typeable
+import           Source.Loc
 
 class Typeable t => ToScopeGraph t where
   scopeGraph ::
     ( Has ScopeGraph sig m
+    , Has (State (ScopeGraph.ScopeGraph Name)) sig m
     )
     => t Loc
     -> m Result
