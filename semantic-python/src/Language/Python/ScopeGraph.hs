@@ -28,6 +28,7 @@ import           Control.Effect.ScopeGraph
 import qualified Control.Effect.ScopeGraph.Properties.Declaration as Props
 import qualified Control.Effect.ScopeGraph.Properties.Function as Props
 import qualified Control.Effect.ScopeGraph.Properties.Reference as Props
+import           Control.Effect.State
 import           Control.Lens (set, (^.))
 import           Data.Foldable
 import           Data.Maybe
@@ -50,6 +51,7 @@ import           Source.Span (Span, span_)
 class (forall a . Show a => Show (t a)) => ToScopeGraph t where
   scopeGraph ::
     ( Has ScopeGraph sig m
+    , Has (State (ScopeGraph.ScopeGraph Name)) sig m
     , Monoid (m Result)
     )
     => t Loc
@@ -62,6 +64,7 @@ instance (ToScopeGraph l, ToScopeGraph r) => ToScopeGraph (l :+: r) where
 onField ::
   forall (field :: Symbol) syn sig m r .
   ( Has ScopeGraph sig m
+  , Has (State (ScopeGraph.ScopeGraph Name)) sig m
   , HasField field (r Loc) (syn Loc)
   , ToScopeGraph syn
   , Monoid (m Result)
@@ -76,6 +79,7 @@ onChildren ::
   ( Traversable t
   , ToScopeGraph syn
   , Has ScopeGraph sig m
+  , Has (State (ScopeGraph.ScopeGraph Name)) sig m
   , HasField "extraChildren" (r Loc) (t (syn Loc))
   , Monoid (m Result)
   )
@@ -86,7 +90,7 @@ onChildren
   . traverse scopeGraph
   . getField @"extraChildren"
 
-scopeGraphModule :: Has ScopeGraph sig m => Py.Module Loc -> m Result
+scopeGraphModule :: (Has (State (ScopeGraph.ScopeGraph Name)) sig m, Has ScopeGraph sig m) => Py.Module Loc -> m Result
 scopeGraphModule = getAp . scopeGraph
 
 instance ToScopeGraph Py.AssertStatement where scopeGraph = onChildren
