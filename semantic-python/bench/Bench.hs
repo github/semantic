@@ -8,9 +8,9 @@ import qualified Data.ByteString as B
 import           Gauge
 import           System.Exit (die)
 import           System.Environment (getArgs)
-import           TreeSitter.Python
-import qualified TreeSitter.Python.AST as Py
-import           TreeSitter.Unmarshal
+import           Language.Python.Grammar
+import qualified Language.Python.AST as Py
+import           AST.Unmarshal
 
 main :: IO ()
 main = getArgs >>= defaultMain . map (bench <*> nfIO . (() <$) . parseFile)
