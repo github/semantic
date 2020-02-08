@@ -31,7 +31,7 @@ common haskell
                      , template-haskell ^>= 2.15
                      , text ^>= 1.2.3
                      , tree-sitter ^>= 0.8
-                     , tree-sitter-java ^>= 0.6.1
+                     , tree-sitter-java ^>= 0.7.0.0
 
   ghc-options:
     -Weverything
