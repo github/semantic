@@ -21,6 +21,7 @@ module Language.Python.ScopeGraph
   ( scopeGraphModule
   ) where
 
+import           Analysis.Name (Name)
 import qualified Analysis.Name as Name
 import           AST.Element
 import           Control.Effect.Fresh
