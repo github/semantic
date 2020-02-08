@@ -17,7 +17,7 @@ module Control.Effect.ScopeGraph
   , declare
   -- Scope Manipulation
   , currentScope
-  , insertEdge
+  , newEdge
   , newReference
   , newScope
   , withScope
