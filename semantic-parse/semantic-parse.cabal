@@ -42,7 +42,7 @@ executable semantic-parse
   -- other-extensions:
   build-depends:       base
                      , semantic-ast
-                     , tree-sitter ^> 0.9
+                     , tree-sitter ^> 0.9.0.0
                      , semantic-source
                      , tree-sitter-python ^>= 0.9.0.1
                      , bytestring
