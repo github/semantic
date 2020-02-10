@@ -53,6 +53,7 @@ library
   exposed-modules:
     Language.TSX
     Language.TSX.AST
+    Language.TSX.Grammar
     Language.TSX.Tags
   hs-source-dirs: src
 
