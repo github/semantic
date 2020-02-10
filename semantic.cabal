@@ -68,6 +68,7 @@ common dependencies
                      , scientific ^>= 0.3.6.2
                      , safe-exceptions ^>= 0.1.7.0
                      , semantic-analysis ^>= 0
+                     , semantic-ast
                      , semantic-source ^>= 0.0.2
                      , semilattices ^>= 0.0.0.3
                      , streaming ^>= 0.2.2.0
@@ -405,6 +406,7 @@ benchmark benchmarks
                      , Glob
                      , lens >= 4.17 && < 4.19
                      , semantic
+                     , semantic-ast
                      , semantic-source
 
 source-repository head
