@@ -1,13 +1,13 @@
 -- | Semantic functionality for JSON programs.
 module Language.JSON
 ( Term(..)
-, Language.JSON.Grammar.tree_sitter_json
+, TreeSitter.JSON.tree_sitter_json
 ) where
 
 import           Data.Proxy
 import qualified Language.JSON.AST as JSON
 import qualified Tags.Tagging.Precise as Tags
-import qualified Language.JSON.Grammar (tree_sitter_json)
+import qualified TreeSitter.JSON (tree_sitter_json)
 import qualified AST.Unmarshal as TS
 
 newtype Term a = Term { getTerm :: JSON.Document a }
