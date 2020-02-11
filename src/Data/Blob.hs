@@ -5,9 +5,9 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
+-- | Semantic-specific functionality for blob handling.
 module Data.Blob
-( Blob(..)
-, Blobs(..)
+( Blobs(..)
 , blobLanguage
 , NoLanguageForBlob (..)
 , blobPath
@@ -23,9 +23,11 @@ module Data.Blob
 , languageTagForBlobPair
 , pathForBlobPair
 , pathKeyForBlobPair
+, module Analysis.Blob
 ) where
 
 
+import           Analysis.Blob
 import           Analysis.File (File (..))
 import           Control.Effect.Error
 import           Control.Exception
@@ -45,37 +47,9 @@ import qualified System.FilePath as FP
 import qualified System.Path as Path
 import qualified System.Path.PartClass as Path.PartClass
 
--- | The source, path information, and language of a file read from disk.
-data Blob = Blob
-  { blobSource :: Source         -- ^ The UTF-8 encoded source text of the blob.
-  , blobFile   :: File Language  -- ^ Path/language information for this blob.
-  } deriving (Show, Eq)
-
-blobLanguage :: Blob -> Language
-blobLanguage = Analysis.File.fileBody . blobFile
-
-blobPath :: Blob -> FilePath
-blobPath = Path.toString . Analysis.File.filePath . blobFile
 
 newtype Blobs a = Blobs { blobs :: [a] }
   deriving (Generic, FromJSON)
-
-instance FromJSON Blob where
-  parseJSON = withObject "Blob" $ \b -> do
-    src <- b .: "content"
-    Right pth <- fmap Path.parse (b .: "path")
-    lang <- b .: "language"
-    let lang' = if knownLanguage lang then lang else Language.forPath pth
-    pure (fromSource (pth :: Path.AbsRelFile) lang' src)
-
-nullBlob :: Blob -> Bool
-nullBlob Blob{..} = Source.null blobSource
-
--- | Create a Blob from a provided path, language, and UTF-8 source.
--- The resulting Blob's span is taken from the 'totalSpan' of the source.
-fromSource :: Path.PartClass.AbsRel ar => Path.File ar -> Language -> Source -> Blob
-fromSource filepath language source
-  = Blob source (Analysis.File.File (Path.toAbsRel filepath) (totalSpan source) language)
 
 decodeBlobs :: BL.ByteString -> Either String [Blob]
 decodeBlobs = fmap blobs <$> eitherDecode
