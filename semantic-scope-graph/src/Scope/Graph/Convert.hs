@@ -20,7 +20,7 @@ import Source.Loc
 
 class Typeable t => ToScopeGraph t where
   scopeGraph ::
-    ( Has ScopeGraph sig m
+    ( ScopeGraphEff sig m
     )
     => t Loc
     -> m Result
