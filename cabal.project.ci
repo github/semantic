@@ -9,6 +9,7 @@ packages: .
           semantic-java
           semantic-json
           semantic-parse
+          semantic-php
           semantic-python
           semantic-ruby
           semantic-scope-graph
