@@ -9,13 +9,17 @@ import           Analysis.Name (Name)
 import qualified Analysis.Name as Name
 import qualified AST.Unmarshal as TS
 import           Control.Algebra
+import           Control.Carrier.Fresh.Strict
 import           Control.Carrier.Lift
 import           Control.Carrier.Sketch.ScopeGraph
+import           Control.Carrier.State.Strict
 import           Control.Effect.ScopeGraph
 import qualified Control.Effect.ScopeGraph.Properties.Declaration as Props
 import qualified Control.Effect.ScopeGraph.Properties.Function as Props
 import qualified Control.Effect.ScopeGraph.Properties.Reference as Props
+import           Control.Effect.State
 import           Control.Monad
+import           Data.Bifunctor (first)
 import qualified Data.ByteString as ByteString
 import qualified Data.List.NonEmpty as NonEmpty
 import qualified Data.ScopeGraph as ScopeGraph
@@ -56,7 +60,7 @@ The graph should be
 
 
 runScopeGraph :: ToScopeGraph t => Path.AbsRelFile -> Source.Source -> t Loc -> (ScopeGraph.ScopeGraph Name, Result)
-runScopeGraph p _src item = run . runSketch (Just p) $ scopeGraph item
+runScopeGraph p _src item = run . evalFresh 1 . fmap (first sGraph) . runState lowerBound $ scopeGraph item
 
 sampleGraphThing :: (Has ScopeGraph sig m) => m Result
 sampleGraphThing = do
