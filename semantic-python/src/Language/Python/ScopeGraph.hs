@@ -21,26 +21,20 @@ module Language.Python.ScopeGraph
   ( scopeGraphModule
   ) where
 
-import           Analysis.Name (Name)
 import qualified Analysis.Name as Name
 import           AST.Element
-import           Control.Effect.Fresh
 import           Control.Effect.ScopeGraph
 import qualified Control.Effect.ScopeGraph.Properties.Declaration as Props
 import qualified Control.Effect.ScopeGraph.Properties.Function as Props
 import qualified Control.Effect.ScopeGraph.Properties.Reference as Props
-import           Control.Effect.State
 import           Control.Lens (set, (^.))
 import           Data.Foldable
 import           Data.List.NonEmpty (NonEmpty (..))
-import qualified Data.List.NonEmpty as NonEmpty
 import           Data.Maybe
 import           Data.Monoid
 import qualified Data.ScopeGraph as ScopeGraph
 import           Data.Semilattice.Lower
 import           Data.Traversable
-import           Debug.Trace
-import           Debug.Trace
 import           GHC.Records
 import           GHC.TypeLits
 import qualified Language.Python.AST as Py
@@ -237,7 +231,7 @@ instance ToScopeGraph Py.GlobalStatement where scopeGraph = todo
 instance ToScopeGraph Py.Integer where scopeGraph = mempty
 
 instance ToScopeGraph Py.ImportStatement where
-  scopeGraph (Py.ImportStatement _ ((R1 (Py.DottedName _ names)) :| xs)) = do
+  scopeGraph (Py.ImportStatement _ ((R1 (Py.DottedName _ names)) :| [])) = do
     let toName (Py.Identifier _ name) = Name.name name
     newEdge ScopeGraph.Import (toName <$> names)
 
@@ -252,13 +246,15 @@ instance ToScopeGraph Py.ImportStatement where
             newReference (toName referenceIdentifier) referenceProps
 
     complete
+  scopeGraph term = todo (show term)
 
 instance ToScopeGraph Py.ImportFromStatement where
   scopeGraph (Py.ImportFromStatement _ [] (L1 (Py.DottedName _ names)) (Just (Py.WildcardImport _ _))) = do
     let toName (Py.Identifier _ name) = Name.name name
     complete <* newEdge ScopeGraph.Import (toName <$> names)
-  scopeGraph (Py.ImportFromStatement _ [] (L1 (Py.DottedName _ names)) Nothing) = do
+  scopeGraph (Py.ImportFromStatement _ [] (L1 (Py.DottedName _ _)) Nothing) = do
     undefined
+  scopeGraph term = todo term
 
 
 instance ToScopeGraph Py.Lambda where scopeGraph = todo
