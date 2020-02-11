@@ -60,7 +60,7 @@ The graph should be
 
 
 runScopeGraph :: ToScopeGraph t => Path.AbsRelFile -> Source.Source -> t Loc -> (ScopeGraph.ScopeGraph Name, Result)
-runScopeGraph p _src item = run . evalFresh 1 . fmap (first sGraph) . runState lowerBound $ scopeGraph item
+runScopeGraph p _src item = run . runSketch (Just p) $ scopeGraph item
 
 sampleGraphThing :: ScopeGraphEff sig m => m Result
 sampleGraphThing = do
