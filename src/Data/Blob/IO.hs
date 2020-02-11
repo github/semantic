@@ -7,6 +7,7 @@ module Data.Blob.IO
   , readBlobFromPath
   , readBlobsFromDir
   , readFilePair
+  , readProjectFromPaths
   ) where
 
 import           Analysis.Blob
