@@ -101,18 +101,6 @@ expectedQualifiedImport = do
     newReference (Name.name "ints") refProperties
   pure Complete
 
-expectedFunctionArg :: ScopeGraphEff sig m => m Result
-expectedFunctionArg = do
-  (_, associatedScope) <- declareFunction (Just $ Name.name "foo") (Props.Function ScopeGraph.Function (Span (Pos 0 0) (Pos 1 12)))
-  withScope associatedScope $ do
-    declare "x" (Props.Declaration ScopeGraph.Identifier ScopeGraph.Default Nothing lowerBound)
-    let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 0 0) (Pos 0 1))
-    reference "x" "x" refProperties
-    pure ()
-  let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 0 0) (Pos 0 3))
-  newReference "foo" refProperties
-  pure Complete
-
 expectedImportHole :: ScopeGraphEff sig m => m Result
 expectedImportHole = do
   newEdge ScopeGraph.Import (NonEmpty.fromList ["cheese", "ints"])
@@ -129,7 +117,7 @@ assertLexicalScope = do
 expectedLexicalScope :: ScopeGraphEff sig m => m Result
 expectedLexicalScope = do
   _ <- declareFunction (Just $ Name.name "foo") (Props.Function ScopeGraph.Function (Span (Pos 0 0) (Pos 1 24)))
-  let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 0 0) (Pos 0 3))
+  let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 3 0) (Pos 3 3))
   newReference "foo" refProperties
   pure Complete
 
@@ -141,6 +129,19 @@ assertFunctionArg = do
   case run (runSketch Nothing expectedFunctionArg) of
     (expecto, Complete) -> HUnit.assertEqual "Should work for simple case" expecto graph
     (_, Todo msg)       -> HUnit.assertFailure ("Failed to complete:" <>  show msg)
+
+expectedFunctionArg :: ScopeGraphEff sig m => m Result
+expectedFunctionArg = do
+  (_, associatedScope) <- declareFunction (Just $ Name.name "foo") (Props.Function ScopeGraph.Function (Span (Pos 0 0) (Pos 1 12)))
+  withScope associatedScope $ do
+    declare "x" (Props.Declaration ScopeGraph.Parameter ScopeGraph.Default Nothing (Span (Pos 0 8) (Pos 0 9)))
+    let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 1 11) (Pos 1 12))
+    newReference "x" refProperties
+    pure ()
+  let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 3 0) (Pos 3 3))
+  newReference "foo" refProperties
+  pure Complete
+
 
 assertImportHole :: HUnit.Assertion
 assertImportHole = do
