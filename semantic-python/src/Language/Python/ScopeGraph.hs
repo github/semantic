@@ -51,8 +51,7 @@ import           Source.Span (Span, span_)
 -- every single Python AST type.
 class (forall a . Show a => Show (t a)) => ToScopeGraph t where
   scopeGraph ::
-    ( Has ScopeGraph sig m
-    , Has (State (ScopeGraph.ScopeGraph Name)) sig m
+    ( ScopeGraphEff sig m
     , Monoid (m Result)
     )
     => t Loc
@@ -64,8 +63,7 @@ instance (ToScopeGraph l, ToScopeGraph r) => ToScopeGraph (l :+: r) where
 
 onField ::
   forall (field :: Symbol) syn sig m r .
-  ( Has ScopeGraph sig m
-  , Has (State (ScopeGraph.ScopeGraph Name)) sig m
+  ( ScopeGraphEff sig m
   , HasField field (r Loc) (syn Loc)
   , ToScopeGraph syn
   , Monoid (m Result)
@@ -79,8 +77,7 @@ onField
 onChildren ::
   ( Traversable t
   , ToScopeGraph syn
-  , Has ScopeGraph sig m
-  , Has (State (ScopeGraph.ScopeGraph Name)) sig m
+  , ScopeGraphEff sig m
   , HasField "extraChildren" (r Loc) (t (syn Loc))
   , Monoid (m Result)
   )
@@ -91,7 +88,7 @@ onChildren
   . traverse scopeGraph
   . getField @"extraChildren"
 
-scopeGraphModule :: (Has (State (ScopeGraph.ScopeGraph Name)) sig m, Has ScopeGraph sig m) => Py.Module Loc -> m Result
+scopeGraphModule :: ScopeGraphEff sig m => Py.Module Loc -> m Result
 scopeGraphModule = getAp . scopeGraph
 
 instance ToScopeGraph Py.AssertStatement where scopeGraph = onChildren
