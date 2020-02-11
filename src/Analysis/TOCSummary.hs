@@ -28,8 +28,6 @@ import qualified Data.Error as Error
 import           Data.Flag
 import           Data.Foldable (toList)
 import           Data.Language as Language
-import           Data.List.NonEmpty (nonEmpty)
-import           Data.Semigroup (sconcat)
 import           Data.Sum
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
