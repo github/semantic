@@ -231,16 +231,17 @@ instance ToScopeGraph Py.GlobalStatement where scopeGraph = todo
 instance ToScopeGraph Py.Integer where scopeGraph = mempty
 
 instance ToScopeGraph Py.ImportStatement where
-  scopeGraph (Py.ImportStatement _ ((R1 (Py.DottedName _ names)) :| [])) = do
+  scopeGraph (Py.ImportStatement _ ((R1 (Py.DottedName _ names@((Py.Identifier ann name) :| _))) :| [])) = do
     let toName (Py.Identifier _ name) = Name.name name
     newEdge ScopeGraph.Import (toName <$> names)
 
-    let xs = zip (toList names) (tail $ toList names)
-    for_ xs $ \pair -> do
+    let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann^.span_ :: Span)
+    newReference (Name.name name) referenceProps
+
+    let pairs = zip (toList names) (tail $ toList names)
+    for_ pairs $ \pair -> do
       case pair of
-        (scopeIdentifier@(Py.Identifier ann _), referenceIdentifier@(Py.Identifier ann2 _)) -> do
-          let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann^.span_ :: Span)
-          newReference (toName scopeIdentifier) referenceProps
+        (scopeIdentifier, referenceIdentifier@(Py.Identifier ann2 _)) -> do
           withScope (toName scopeIdentifier) $ do
             let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann2^.span_ :: Span)
             newReference (toName referenceIdentifier) referenceProps
