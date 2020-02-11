@@ -11,12 +11,14 @@ module Data.Blob.IO
 
 import           Analysis.Blob
 import           Analysis.File as File
+import           Analysis.Project
 import qualified Control.Concurrent.Async as Async
 import           Control.Monad.IO.Class
 import           Data.Blob
 import qualified Data.ByteString as B
 import           Data.Language
 import           Data.Maybe.Exts
+import           Data.Semilattice.Lower
 import           Semantic.IO
 import qualified Source.Source as Source
 import qualified System.Path as Path

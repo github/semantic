@@ -5,15 +5,12 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 -- | Semantic-specific functionality for blob handling.
 module Data.Blob
 ( Blobs(..)
-, blobLanguage
 , NoLanguageForBlob (..)
-, blobPath
 , decodeBlobs
-, nullBlob
-, fromSource
 , moduleForBlob
 , noLanguageForBlob
 , BlobPair
@@ -28,7 +25,6 @@ module Data.Blob
 
 
 import           Analysis.Blob
-import           Analysis.File (File (..))
 import           Control.Effect.Error
 import           Control.Exception
 import           Data.Aeson
@@ -41,11 +37,7 @@ import           Data.Maybe.Exts
 import           Data.Module
 import           GHC.Generics (Generic)
 import           Source.Language as Language
-import           Source.Source (Source, totalSpan)
-import qualified Source.Source as Source
 import qualified System.FilePath as FP
-import qualified System.Path as Path
-import qualified System.Path.PartClass as Path.PartClass
 
 
 newtype Blobs a = Blobs { blobs :: [a] }
