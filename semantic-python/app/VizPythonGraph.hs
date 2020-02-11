@@ -18,13 +18,14 @@ import           Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import           Language.Python (graphPythonFile)
-import           Scope.Info
 import qualified Scope.Graph.Algebraic as Algebraic
 import           Scope.Graph.Convert
+import           Scope.Info
 import           Source.Span
 import           System.Environment
 import           System.IO
 import qualified System.Path as Path
+import           Text.Pretty.Simple
 
 renderSpan :: Span -> Text
 renderSpan (Span (Pos a b) (Pos c d)) =
@@ -66,7 +67,8 @@ main :: IO ()
 main = do
   file:_ <- getArgs
   (graph, res) <- graphPythonFile (Path.absRel file)
-  let p = hPutStrLn stdout
+  let p :: Show a => a -> IO ()
+      p = pHPrint stdout
   case res of
     Complete  -> pure ()
     Todo list -> do
@@ -74,7 +76,7 @@ main = do
       p "TODOs remaining:"
       traverse_ p list
 
-  p (show $ graph)
+  p graph
 
   let asAlg = Algebraic.fromPrimitive graph
   T.putStrLn . Dot.export (fashion file asAlg) $ asAlg

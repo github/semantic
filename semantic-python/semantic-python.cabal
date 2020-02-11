@@ -78,6 +78,7 @@ executable viz-python-graph
   build-depends: semantic-python
                , algebraic-graphs
                , pathtype
+               , pretty-simple
 
 test-suite compiling
   import: haskell
