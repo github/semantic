@@ -15,7 +15,7 @@
 -- physically sketching the hierarchical outline of a graph.
 module Control.Effect.ScopeGraph
   ( ScopeGraph
-  , ScopeGraphEff (..)
+  , ScopeGraphEff
   , declare
   -- Scope Manipulation
   , currentScope
@@ -39,19 +39,15 @@ import           Data.List.NonEmpty
 import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
 import qualified Data.Module as Module
-import           Data.ScopeGraph (CurrentScope (..))
 import qualified Data.ScopeGraph as ScopeGraph
 import           Data.Semilattice.Lower
 import           Data.Text (Text)
-import qualified Data.Text as Text
-import           GHC.Generics (Generic, Generic1)
 import           GHC.Records
 import qualified Scope.Reference as Reference
 import           Source.Span
 
 import           Scope.Graph.AdjacencyList (ScopeGraph)
 import qualified Scope.Graph.AdjacencyList as AdjacencyList
-import qualified Scope.Path as Scope
 
 import qualified Control.Effect.ScopeGraph.Properties.Declaration as Props
 import qualified Control.Effect.ScopeGraph.Properties.Function as Props
@@ -111,8 +107,8 @@ reference n decl props = do
          ScopeGraph.reference
          (ScopeGraph.Reference (Name.name n))
          (lowerBound @Module.ModuleInfo)
-         (lowerBound @Span)
-         ScopeGraph.Identifier
+         (Props.Reference.span props)
+         (Props.Reference.kind props)
          (ScopeGraph.Declaration (Name.name decl))
          current
          old
@@ -120,7 +116,6 @@ reference n decl props = do
 
 newScope :: forall sig m . ScopeGraphEff sig m => Map ScopeGraph.EdgeLabel [Name] -> m Name
 newScope edges = do
-  current <- currentScope
   old <- graphInProgress
   name <- Name.gensym
   let new = ScopeGraph.newScope name edges old
