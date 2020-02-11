@@ -1,8 +1,10 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
@@ -47,6 +49,7 @@ import           GHC.Records
 import qualified Scope.Reference as Reference
 import           Source.Span
 
+import           Scope.Graph.AdjacencyList (ScopeGraph)
 import qualified Scope.Graph.AdjacencyList as AdjacencyList
 import qualified Scope.Path as Scope
 
@@ -61,42 +64,81 @@ maybeM :: Applicative f => f a -> Maybe a -> f a
 maybeM f = maybe f pure
 {-# INLINE maybeM #-}
 
-type ScopeGraph
-  = ScopeGraphEff
-  :+: Reader (CurrentScope Name)
-  :+: Fresh
-  :+: Reader Name
+type ScopeGraphEff sig m
+  = ( Has (State (ScopeGraph Name)) sig m
+    , Has (State Name) sig m
+    , Has (Reader Name) sig m
+    , Has Fresh sig m
+    )
 
-data ScopeGraphEff m k =
-    Declare Name Props.Declaration (() -> m k)
-  | Reference Text Text Props.Reference (() -> m k)
-  | NewScope (Map ScopeGraph.EdgeLabel [Name]) (Name -> m k)
-  | InsertEdge ScopeGraph.EdgeLabel (NonEmpty Name) (() -> m k)
-  deriving (Generic, Generic1, HFunctor, Effect)
+graphInProgress :: ScopeGraphEff sig m => m (ScopeGraph Name)
+graphInProgress = get
 
-declare :: forall sig m . (Has ScopeGraph sig m) => Name -> Props.Declaration -> m ()
-declare n props = send (Declare n props pure)
+currentScope :: ScopeGraphEff sig m => m Name
+currentScope = ask
+
+withScope :: ScopeGraphEff sig m
+          => Name
+          -> m a
+          -> m a
+withScope scope = local (const scope)
+
+
+declare :: ScopeGraphEff sig m => Name -> Props.Declaration -> m ()
+declare n props = do
+  current <- currentScope
+  old <- graphInProgress
+  let Props.Declaration kind relation associatedScope span = props
+  let (new, _pos) =
+         ScopeGraph.declare
+         (ScopeGraph.Declaration n)
+         (lowerBound @Module.ModuleInfo)
+         relation
+         ScopeGraph.Public
+         span
+         kind
+         associatedScope
+         current
+         old
+  put new
 
 -- | Establish a reference to a prior declaration.
-reference :: forall sig m . (Has ScopeGraph sig m) => Text -> Text -> Props.Reference -> m ()
-reference n decl props = send (Reference n decl props pure)
+reference :: forall sig m . ScopeGraphEff sig m => Text -> Text -> Props.Reference -> m ()
+reference n decl props = do
+  current <- currentScope
+  old <- graphInProgress
+  let new =
+         ScopeGraph.reference
+         (ScopeGraph.Reference (Name.name n))
+         (lowerBound @Module.ModuleInfo)
+         (lowerBound @Span)
+         ScopeGraph.Identifier
+         (ScopeGraph.Declaration (Name.name decl))
+         current
+         old
+  put new
 
-newScope :: forall sig m . Has ScopeGraph sig m => Map ScopeGraph.EdgeLabel [Name] -> m Name
-newScope edges = send (NewScope edges pure)
+newScope :: forall sig m . ScopeGraphEff sig m => Map ScopeGraph.EdgeLabel [Name] -> m Name
+newScope edges = do
+  current <- currentScope
+  old <- graphInProgress
+  name <- Name.gensym
+  let new = ScopeGraph.newScope name edges old
+  name <$ put new
 
 -- | Takes an edge label and a list of names and inserts an import edge to a hole.
-newEdge :: Has ScopeGraph sig m => ScopeGraph.EdgeLabel -> NonEmpty Name -> m ()
-newEdge label targets = send (InsertEdge label targets pure)
+newEdge :: ScopeGraphEff sig m => ScopeGraph.EdgeLabel -> NonEmpty Name -> m ()
+newEdge label address = do
+  current <- currentScope
+  old <- graphInProgress
+  let new = ScopeGraph.addImportEdge label (toList address) current old
+  put new
 
-
-currentScope :: (Has ScopeGraph sig m) => m Name
-currentScope = asks unCurrentScope
-
-lookupScope :: Has (State (ScopeGraph.ScopeGraph Name)) sig m => Name -> m (ScopeGraph.Scope Name)
+lookupScope :: ScopeGraphEff sig m => Name -> m (ScopeGraph.Scope Name)
 lookupScope address = maybeM undefined . ScopeGraph.lookupScope address =<< get
 
 -- | Inserts a reference.
-newReference :: (Has (State (ScopeGraph.ScopeGraph Name)) sig m, Has ScopeGraph sig m) => Name -> Props.Reference -> m ()
+newReference :: ScopeGraphEff sig m => Name -> Props.Reference -> m ()
 newReference name props = do
   currentAddress <- currentScope
   scope <- lookupScope currentAddress
@@ -111,12 +153,12 @@ newReference name props = do
   case ((AdjacencyList.findPath (const Nothing) (ScopeGraph.Declaration name) currentAddress scopeGraph) :: Maybe (Scope.Path Name)) of
     Just path -> modify (\scopeGraph -> insertRef' path scopeGraph)
     Nothing   -> undefined
-  -- maybe
-  --   (modify (const (ScopeGraph.insertScope currentAddress (ScopeGraph.newReference (Reference.Reference name) refProps scope))))
+    -- maybe
+    -- modify (const (ScopeGraph.insertScope currentAddress (ScopeGraph.newReference (Reference.Reference name) refProps scope)))
 
 
 
-declareFunction :: forall sig m . (Has ScopeGraph sig m) => Maybe Name -> Props.Function -> m (Name, Name)
+declareFunction :: forall sig m . ScopeGraphEff sig m => Maybe Name -> Props.Function -> m (Name, Name)
 declareFunction name (Props.Function kind span) = do
   currentScope' <- currentScope
   let lexicalEdges = Map.singleton ScopeGraph.Lexical [ currentScope' ]
@@ -129,7 +171,7 @@ declareFunction name (Props.Function kind span) = do
                                    }
   pure (name', associatedScope)
 
-declareMaybeName :: Has ScopeGraph sig m
+declareMaybeName :: ScopeGraphEff sig m
                  => Maybe Name
                  -> Props.Declaration
                  -> m Name
@@ -139,9 +181,3 @@ declareMaybeName maybeName props = do
     _         -> do
       name <- Name.gensym
       name <$ declare name (props { Props.relation = ScopeGraph.Gensym })
-
-withScope :: Has ScopeGraph sig m
-          => Name
-          -> m a
-          -> m a
-withScope scope = local (const scope)

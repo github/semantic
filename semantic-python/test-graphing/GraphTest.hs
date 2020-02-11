@@ -62,7 +62,7 @@ The graph should be
 runScopeGraph :: ToScopeGraph t => Path.AbsRelFile -> Source.Source -> t Loc -> (ScopeGraph.ScopeGraph Name, Result)
 runScopeGraph p _src item = run . evalFresh 1 . fmap (first sGraph) . runState lowerBound $ scopeGraph item
 
-sampleGraphThing :: (Has ScopeGraph sig m) => m Result
+sampleGraphThing :: ScopeGraphEff sig m => m Result
 sampleGraphThing = do
   declare "hello" (Props.Declaration ScopeGraph.Assignment ScopeGraph.Default Nothing (Span (Pos 2 0) (Pos 2 10)))
   declare "goodbye" (Props.Declaration ScopeGraph.Assignment ScopeGraph.Default Nothing (Span (Pos 3 0) (Pos 3 12)))
@@ -91,7 +91,7 @@ assertSimpleReference = do
 
   HUnit.assertEqual "Should work for simple case" expecto result
 
-expectedReference :: (Has ScopeGraph sig m) => m Result
+expectedReference :: ScopeGraphEff sig m => m Result
 expectedReference = do
   declare "x" (Props.Declaration ScopeGraph.Assignment ScopeGraph.Default Nothing (Span (Pos 0 0) (Pos 0 5)))
   let refProperties = Props.Reference ScopeGraph.Assignment ScopeGraph.Default (Span (Pos 0 0) (Pos 0 1))
@@ -99,7 +99,7 @@ expectedReference = do
   newReference "x" refProperties
   pure Complete
 
-expectedQualifiedImport :: Has ScopeGraph sig m => m Result
+expectedQualifiedImport :: ScopeGraphEff sig m => m Result
 expectedQualifiedImport = do
   let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 0 0) (Pos 0 3))
   newReference (Name.name "cheese") refProperties
@@ -107,7 +107,7 @@ expectedQualifiedImport = do
     newReference (Name.name "ints") refProperties
   pure Complete
 
-expectedFunctionArg :: (Has ScopeGraph sig m) => m Result
+expectedFunctionArg :: ScopeGraphEff sig m => m Result
 expectedFunctionArg = do
   (_, associatedScope) <- declareFunction (Just $ Name.name "foo") (Props.Function ScopeGraph.Function (Span (Pos 0 0) (Pos 1 12)))
   withScope associatedScope $ do
@@ -119,7 +119,7 @@ expectedFunctionArg = do
   newReference "foo" refProperties
   pure Complete
 
-expectedImportHole :: (Has ScopeGraph sig m) => m Result
+expectedImportHole :: ScopeGraphEff sig m => m Result
 expectedImportHole = do
   newEdge ScopeGraph.Import (NonEmpty.fromList ["cheese", "ints"])
   pure Complete
@@ -132,7 +132,7 @@ assertLexicalScope = do
     (expecto, Complete) -> HUnit.assertEqual "Should work for simple case" expecto graph
     (_, Todo msg)       -> HUnit.assertFailure ("Failed to complete:" <> show msg)
 
-expectedLexicalScope :: (Has ScopeGraph sig m) => m Result
+expectedLexicalScope :: ScopeGraphEff sig m => m Result
 expectedLexicalScope = do
   _ <- declareFunction (Just $ Name.name "foo") (Props.Function ScopeGraph.Function (Span (Pos 0 0) (Pos 1 24)))
   let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 0 0) (Pos 0 3))
