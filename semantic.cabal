@@ -289,6 +289,7 @@ library
                      , semantic-go ^>= 0
                      , semantic-java ^>= 0
                      , semantic-json ^>= 0
+                     , semantic-php ^>= 0
                      , semantic-python ^>= 0
                      , semantic-ruby ^>= 0
                      , semantic-scope-graph ^>= 0
