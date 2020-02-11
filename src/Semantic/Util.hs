@@ -18,6 +18,7 @@ module Semantic.Util
 import Prelude hiding (readFile)
 
 import           Analysis.File
+import           Analysis.Project
 import           Control.Abstract
 import           Control.Carrier.Fresh.Strict
 import           Control.Carrier.Lift
@@ -40,7 +41,6 @@ import           Data.Graph.Algebraic (topologicalSort)
 import qualified Data.Language as Language
 import           Data.List (uncons)
 import           Data.Maybe
-import           Data.Project
 import           Data.Semilattice.Lower
 import           Data.Sum
 import           Parsing.Parser

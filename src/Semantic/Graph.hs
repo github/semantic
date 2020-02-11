@@ -44,6 +44,7 @@ import           Analysis.Abstract.Caching.FlowInsensitive
 import           Analysis.Abstract.Collecting
 import           Analysis.Abstract.Graph as Graph
 import           Analysis.File
+import           Analysis.Project
 import           Control.Abstract hiding (String)
 import           Control.Abstract.PythonPackage as PythonPackage
 import           Control.Carrier.Fresh.Strict
@@ -73,7 +74,6 @@ import           Data.Language as Language
 import           Data.List (find, isPrefixOf)
 import           Data.Map (Map)
 import qualified Data.Map as Map
-import           Data.Project
 import           Data.Proxy
 import           Data.Text (pack, unpack)
 import           Language.Haskell.HsColour

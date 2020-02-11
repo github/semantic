@@ -20,6 +20,7 @@ module Semantic.Resolution
   ) where
 
 import           Analysis.File as File
+import           Analysis.Project
 import           Control.Algebra
 import           Control.Monad.IO.Class
 import           Data.Aeson
@@ -30,7 +31,6 @@ import           Data.Language
 import qualified Data.Map as Map
 import           Data.Map.Strict (Map)
 import           Data.Maybe.Exts
-import           Data.Project
 import           Data.Text (Text)
 import           GHC.Generics (Generic1)
 import           Semantic.Task.Files
