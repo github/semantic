@@ -253,8 +253,8 @@ instance ToScopeGraph Py.ImportFromStatement where
   scopeGraph (Py.ImportFromStatement _ [] (L1 (Py.DottedName _ names)) (Just (Py.WildcardImport _ _))) = do
     let toName (Py.Identifier _ name) = Name.name name
     complete <* newEdge ScopeGraph.Import (toName <$> names)
-  scopeGraph (Py.ImportFromStatement _ [] (L1 (Py.DottedName _ _)) Nothing) = do
-    undefined
+  scopeGraph impossibleTerm@(Py.ImportFromStatement _ [] (L1 (Py.DottedName _ _)) Nothing) =
+    todo impossibleTerm
   scopeGraph term = todo term
 
 
