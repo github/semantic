@@ -151,12 +151,16 @@ newReference name props = do
           (ScopeGraph.insertScope currentAddress scope' scopeGraph)
   scopeGraph <- get @(ScopeGraph.ScopeGraph Name)
   case AdjacencyList.findPath (const Nothing) (ScopeGraph.Declaration name) currentAddress scopeGraph of
-    Just path -> modify (\scopeGraph -> insertRef' path scopeGraph)
-    Nothing   -> undefined
-    -- maybe
-    -- modify (const (ScopeGraph.insertScope currentAddress (ScopeGraph.newReference (Reference.Reference name) refProps scope)))
-
-
+    -- If a path to a declaration is found, insert a reference into the current scope.
+    Just path -> modify (insertRef' path)
+    -- If no path is found, insert a reference with a hole into the current scope.
+    Nothing   ->
+      modify (ScopeGraph.insertScope
+              currentAddress
+              (ScopeGraph.newReference
+                (Reference.Reference name)
+                refProps
+                scope))
 
 declareFunction :: forall sig m . ScopeGraphEff sig m => Maybe Name -> Props.Function -> m (Name, Name)
 declareFunction name (Props.Function kind span) = do

@@ -32,11 +32,15 @@ import qualified Control.Effect.ScopeGraph.Properties.Reference as Props
 import           Control.Effect.State
 import           Control.Lens (set, (^.))
 import           Data.Foldable
+import           Data.List.NonEmpty (NonEmpty (..))
+import qualified Data.List.NonEmpty as NonEmpty
 import           Data.Maybe
 import           Data.Monoid
 import qualified Data.ScopeGraph as ScopeGraph
 import           Data.Semilattice.Lower
 import           Data.Traversable
+import           Debug.Trace
+import           Debug.Trace
 import           GHC.Records
 import           GHC.TypeLits
 import qualified Language.Python.AST as Py
@@ -232,23 +236,29 @@ instance ToScopeGraph Py.GlobalStatement where scopeGraph = todo
 
 instance ToScopeGraph Py.Integer where scopeGraph = mempty
 
-instance ToScopeGraph Py.ImportStatement where scopeGraph = todo
+instance ToScopeGraph Py.ImportStatement where
+  scopeGraph (Py.ImportStatement _ ((R1 (Py.DottedName _ names)) :| xs)) = do
+    let toName (Py.Identifier _ name) = Name.name name
+    newEdge ScopeGraph.Import (toName <$> names)
 
+    let xs = zip (toList names) (tail $ toList names)
+    for_ xs $ \pair -> do
+      case pair of
+        (scopeIdentifier@(Py.Identifier ann _), referenceIdentifier@(Py.Identifier ann2 _)) -> do
+          let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann^.span_ :: Span)
+          newReference (toName scopeIdentifier) referenceProps
+          withScope (toName scopeIdentifier) $ do
+            let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann2^.span_ :: Span)
+            newReference (toName referenceIdentifier) referenceProps
+
+    complete
 
 instance ToScopeGraph Py.ImportFromStatement where
   scopeGraph (Py.ImportFromStatement _ [] (L1 (Py.DottedName _ names)) (Just (Py.WildcardImport _ _))) = do
     let toName (Py.Identifier _ name) = Name.name name
     complete <* newEdge ScopeGraph.Import (toName <$> names)
   scopeGraph (Py.ImportFromStatement _ [] (L1 (Py.DottedName _ names)) Nothing) = do
-    let toName (Py.Identifier _ name) = Name.name name
-        names' = toName <$> names
-    newEdge ScopeGraph.Import names'
-
-    for_ names $ \(Py.Identifier ann name) -> do
-      let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann^.span_ :: Span)
-      newReference (Name.name name) referenceProps
-
-    complete
+    undefined
 
 
 instance ToScopeGraph Py.Lambda where scopeGraph = todo

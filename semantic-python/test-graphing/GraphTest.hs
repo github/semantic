@@ -18,7 +18,6 @@ import           Control.Monad
 import qualified Data.ByteString as ByteString
 import qualified Data.List.NonEmpty as NonEmpty
 import qualified Data.ScopeGraph as ScopeGraph
-import           Data.Semilattice.Lower
 import qualified Language.Python ()
 import qualified Language.Python as Py (Term)
 import qualified Language.Python.Grammar as TSP
@@ -95,9 +94,13 @@ expectedReference = do
 
 expectedQualifiedImport :: ScopeGraphEff sig m => m Result
 expectedQualifiedImport = do
-  let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 0 0) (Pos 0 3))
+  newEdge ScopeGraph.Import (NonEmpty.fromList ["cheese", "ints"])
+
+  let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 0 7) (Pos 0 13))
   newReference (Name.name "cheese") refProperties
+
   withScope "cheese" $ do
+    let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 0 14) (Pos 0 18))
     newReference (Name.name "ints") refProperties
   pure Complete
 

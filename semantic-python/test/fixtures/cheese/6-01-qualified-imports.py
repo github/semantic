@@ -1,1 +1,1 @@
-from cheese.int
+import cheese.ints
