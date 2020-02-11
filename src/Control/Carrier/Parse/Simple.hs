@@ -1,5 +1,11 @@
-{-# LANGUAGE FlexibleContexts, FlexibleInstances, GADTs, GeneralizedNewtypeDeriving, MultiParamTypeClasses,
-             RecordWildCards, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 -- | A carrier for 'Parse' effects suitable for use in the repl, tests, etc.
 module Control.Carrier.Parse.Simple
 ( -- * Parse carrier
@@ -53,10 +59,10 @@ runParser timeout blob@Blob{..} parser = case parser of
     parseToPreciseAST timeout timeout language blob
       >>= either (throwError . SomeException) pure
 
-    AssignmentParser language assignment -> do
-      raw <- parseToAST timeout language blob >>= either (throwError . toException) pure
-      let ast = Assignment.assign (blobSource blob) assignment raw
-      either (throwError . toException) k ast
+  AssignmentParser language assignment -> do
+    raw <- parseToAST timeout language blob >>= either (throwError . toException) pure
+    let ast = Assignment.assign (blobSource blob) assignment raw
+    either (throwError . toException) k ast
 
 newtype ParseFailure = ParseFailure String
   deriving (Show)
