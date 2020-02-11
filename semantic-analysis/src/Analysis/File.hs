@@ -20,7 +20,7 @@ data File a = File
   , fileBody :: !a
   }
   deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
-
+q
 fromBody :: HasCallStack => a -> File a
 fromBody body = File (Path.absRel (srcLocFile srcLoc)) (spanFromSrcLoc srcLoc) body where
   srcLoc = snd (fromJust (listToMaybe (getCallStack callStack)))

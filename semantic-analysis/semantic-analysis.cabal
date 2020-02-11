@@ -54,6 +54,7 @@ library
     Analysis.ImportGraph
     Analysis.Intro
     Analysis.Name
+    Analysis.Project
     Analysis.Typecheck
     Control.Carrier.Fail.WithLoc
   build-depends:

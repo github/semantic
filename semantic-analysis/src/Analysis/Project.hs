@@ -1,4 +1,4 @@
-module Data.Project
+module Analysis.Project
   ( Project (..)
   , projectExtensions
   , projectName
