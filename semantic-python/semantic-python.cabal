@@ -21,9 +21,12 @@ tested-with:         GHC == 8.6.5
 common haskell
   default-language:    Haskell2010
   build-depends:       base ^>= 4.13
+                     , bytestring ^>= 0.10.9
                      , fused-effects ^>= 1.0.0.1
                      , fused-syntax
+                     , lens ^>= 4.18
                      , parsers ^>= 0.12.10
+                     , pathtype ^>= 0.8.1
                      , semantic-analysis ^>= 0
                      , semantic-ast
                      , semantic-core ^>= 0.0
@@ -65,14 +68,12 @@ library
     Language.Python.ScopeGraph
     Language.Python.Tags
   hs-source-dirs: src
-  build-depends: lens ^>= 4.18
 
 executable viz-python-graph
   import: haskell
-  type: exitcode-stdio-1.0
   hs-source-dirs: app
   main-is: VizPythonGraph.hs
-  ghc-options: threaded
+  ghc-options: -threaded
 
   build-depends: semantic-python
                , algebraic-graphs

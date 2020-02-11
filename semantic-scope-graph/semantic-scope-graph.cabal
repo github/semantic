@@ -26,6 +26,7 @@ library
     Control.Effect.ScopeGraph.Properties.Function
     Control.Effect.ScopeGraph.Properties.Reference
     Scope.Graph.AdjacencyList
+    Scope.Graph.Algebraic
     Scope.Graph.Convert
     Scope.Info
     Scope.Path

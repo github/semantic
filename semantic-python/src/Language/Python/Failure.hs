@@ -1,4 +1,4 @@
-f{-# LANGUAGE DeriveFoldable, DeriveFunctor, DeriveGeneric, DeriveTraversable, ExistentialQuantification,
+{-# LANGUAGE DeriveFoldable, DeriveFunctor, DeriveGeneric, DeriveTraversable, ExistentialQuantification,
              FlexibleContexts, KindSignatures, MultiParamTypeClasses, QuantifiedConstraints, RankNTypes,
              StandaloneDeriving, TypeOperators #-}
 
