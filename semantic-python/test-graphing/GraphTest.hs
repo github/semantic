@@ -89,8 +89,7 @@ assertSimpleReference = do
 expectedReference :: ScopeGraphEff sig m => m Result
 expectedReference = do
   declare "x" (Props.Declaration ScopeGraph.Assignment ScopeGraph.Default Nothing (Span (Pos 0 0) (Pos 0 5)))
-  let refProperties = Props.Reference ScopeGraph.Assignment ScopeGraph.Default (Span (Pos 0 0) (Pos 0 1))
-  reference "x" "x" refProperties
+  let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 1 0) (Pos 1 1))
   newReference "x" refProperties
   pure Complete
 

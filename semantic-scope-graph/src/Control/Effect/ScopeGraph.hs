@@ -150,7 +150,7 @@ newReference name props = do
         in
           (ScopeGraph.insertScope currentAddress scope' scopeGraph)
   scopeGraph <- get @(ScopeGraph.ScopeGraph Name)
-  case ((AdjacencyList.findPath (const Nothing) (ScopeGraph.Declaration name) currentAddress scopeGraph) :: Maybe (Scope.Path Name)) of
+  case AdjacencyList.findPath (const Nothing) (ScopeGraph.Declaration name) currentAddress scopeGraph of
     Just path -> modify (\scopeGraph -> insertRef' path scopeGraph)
     Nothing   -> undefined
     -- maybe
