@@ -9,9 +9,9 @@ import Prelude hiding (readFile)
 
 import           Analysis.Blob
 import           Analysis.File
-import           Data.Language
 import           Data.Text (Text)
 import qualified Data.Text as T
+import           Source.Language
 import           System.FilePath.Posix
 
 -- | A 'Project' contains all the information that semantic needs
