@@ -59,10 +59,8 @@ runParser timeout blob@Blob{..} parser = case parser of
     parseToPreciseAST timeout timeout language blob
       >>= either (throwError . SomeException) pure
 
-  AssignmentParser language assignment -> do
-    raw <- parseToAST timeout language blob >>= either (throwError . toException) pure
-    let ast = Assignment.assign (blobSource blob) assignment raw
-    either (throwError . toException) k ast
+  AssignmentParser    parser assignment ->
+    runParser timeout blob parser >>= either (throwError . toException) pure . Assignment.assign    blobSource assignment
 
 newtype ParseFailure = ParseFailure String
   deriving (Show)
