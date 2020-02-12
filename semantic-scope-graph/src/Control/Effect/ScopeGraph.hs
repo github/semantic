@@ -64,6 +64,7 @@ maybeM f = maybe f pure
 type ScopeGraphEff sig m
   = ( Has (State (ScopeGraph Name)) sig m
     , Has (State Name) sig m
+    , Has Fresh sig m
     , Has (Reader (CurrentScope Name)) sig m
     , Has (Reader Module.ModuleInfo) sig m
     )
