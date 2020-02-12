@@ -10,11 +10,11 @@ import qualified Tags.Tagging.Precise as Tags
 import qualified TreeSitter.PHP (tree_sitter_php)
 import qualified AST.Unmarshal as TS
 
-newtype Term a = Term { getTerm :: PHP.Document a }
+newtype Term a = Term { getTerm :: PHP.Program a }
 
 instance TS.SymbolMatching Term where
-  matchedSymbols _ = TS.matchedSymbols (Proxy :: Proxy PHP.Document)
-  showFailure _ = TS.showFailure (Proxy :: Proxy PHP.Document)
+  matchedSymbols _ = TS.matchedSymbols (Proxy :: Proxy PHP.Program)
+  showFailure _ = TS.showFailure (Proxy :: Proxy PHP.Program)
 
 instance TS.Unmarshal Term where
   matchers = fmap (fmap (TS.hoist Term)) TS.matchers
