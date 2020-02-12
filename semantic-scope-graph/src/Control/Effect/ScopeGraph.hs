@@ -83,20 +83,8 @@ withScope scope = local (const scope)
 declare :: ScopeGraphEff sig m => Name -> Props.Declaration -> m ()
 declare n props = do
   current <- currentScope
-  old <- graphInProgress
   let Props.Declaration kind relation associatedScope span = props
-  let (new, _pos) =
-         ScopeGraph.declare
-         (ScopeGraph.Declaration n)
-         (lowerBound @Module.ModuleInfo)
-         relation
-         ScopeGraph.Public
-         span
-         kind
-         associatedScope
-         current
-         old
-  put new
+  modify (fst . ScopeGraph.declare (ScopeGraph.Declaration n) (lowerBound @Module.ModuleInfo) relation ScopeGraph.Public span kind associatedScope current)
 
 -- | Establish a reference to a prior declaration.
 reference :: forall sig m . ScopeGraphEff sig m => Text -> Text -> Props.Reference -> m ()
@@ -116,10 +104,8 @@ reference n decl props = do
 
 newScope :: forall sig m . ScopeGraphEff sig m => Map ScopeGraph.EdgeLabel [Name] -> m Name
 newScope edges = do
-  old <- graphInProgress
   name <- Name.gensym
-  let new = ScopeGraph.newScope name edges old
-  name <$ put new
+  name <$ modify (ScopeGraph.newScope name edges)
 
 -- | Takes an edge label and a list of names and inserts an import edge to a hole.
 newEdge :: ScopeGraphEff sig m => ScopeGraph.EdgeLabel -> NonEmpty Name -> m ()
