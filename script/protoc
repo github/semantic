@@ -12,7 +12,8 @@ PARENT_DIR=$(dirname $(pwd))
 
 export PROJECT="github.com/github/semantic"
 
-# Generate Haskell for semantic's protobuf types
+# Generate Haskell for semantic's protobuf types. See the entrypoint in
+# Dockerfile for where the protoc pluggins are configured.
 docker run --rm --user $(id -u):$(id -g) -v $(pwd):/go/src/$PROJECT -w /go/src/$PROJECT \
     semantic-protoc --proto_path=proto \
     --haskell_out=./src \
