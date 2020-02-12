@@ -20,7 +20,6 @@ module Parsing.Parser
 , jsxParserPrecise
 , jsxParser
 , markdownParser
-, phpParser
 , pythonParserALaCarte
 , pythonParserPrecise
 , pythonParser
