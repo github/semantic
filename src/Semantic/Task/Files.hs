@@ -28,6 +28,7 @@ module Semantic.Task.Files
   ) where
 
 import           Analysis.File
+import           Analysis.Project
 import           Control.Algebra
 import           Control.Effect.Error
 import           Control.Exception
@@ -37,7 +38,6 @@ import           Data.Blob.IO
 import qualified Data.ByteString.Builder as B
 import           Data.Handle
 import           Data.Language
-import           Data.Project
 import           Prelude hiding (readFile)
 import           Semantic.IO
 import qualified System.IO as IO hiding (withBinaryFile)

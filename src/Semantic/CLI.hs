@@ -3,6 +3,7 @@
 module Semantic.CLI (main) where
 
 import qualified Analysis.File as File
+import           Analysis.Project
 import qualified Control.Carrier.Parse.Measured as Parse
 import           Control.Carrier.Reader
 import           Control.Exception
@@ -15,7 +16,6 @@ import           Data.Handle
 import qualified Data.Language as Language
 import           Data.List (intercalate)
 import           Data.Maybe.Exts
-import           Data.Project
 import           Options.Applicative hiding (style)
 import           Semantic.Api hiding (File)
 import           Semantic.Config

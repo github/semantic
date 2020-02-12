@@ -6,6 +6,7 @@
 
 module Evaluation (benchmarks) where
 
+import           Analysis.Project
 import           Control.Carrier.Parse.Simple
 import           Data.Abstract.Evaluatable
 import           Data.Bifunctor
@@ -13,7 +14,6 @@ import           Data.Blob.IO (readBlobFromPath)
 import qualified Data.Duration as Duration
 import           Data.Graph.Algebraic (topologicalSort)
 import qualified Data.Language as Language
-import           Data.Project
 import           Data.Proxy
 import           Gauge.Main
 import           Parsing.Parser
