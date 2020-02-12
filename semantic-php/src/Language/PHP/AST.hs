@@ -17,7 +17,7 @@ module Language.PHP.AST
 import           AST.GenerateSyntax
 import           AST.Token
 import           Language.Haskell.TH.Syntax (runIO)
-import           Prelude hiding (String)
+import           Prelude hiding (String, Integer, Float)
 import qualified TreeSitter.PHP as PHP (getNodeTypesPath, tree_sitter_php)
 
 runIO PHP.getNodeTypesPath >>= astDeclarationsForLanguage PHP.tree_sitter_php
