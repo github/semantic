@@ -174,15 +174,15 @@ expectedImportFromSymbols :: ScopeGraphEff sig m => m Result
 expectedImportFromSymbols = do
   newEdge ScopeGraph.Import (NonEmpty.fromList ["cheese", "ints"])
 
-  let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 0 7) (Pos 0 13))
+  let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 0 5) (Pos 0 11))
   newReference (Name.name "cheese") refProperties
 
   withScope "cheese" $ do
-    let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 0 14) (Pos 0 18))
+    let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 0 12) (Pos 0 16))
     newReference (Name.name "ints") refProperties
 
 
-  let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 0 25) (Pos 0 28))
+  let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 0 24) (Pos 0 27))
   newReference (Name.name "two") refProperties
 
   let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 2 0) (Pos 2 3))

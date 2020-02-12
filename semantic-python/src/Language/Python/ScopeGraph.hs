@@ -35,6 +35,7 @@ import           Data.Monoid
 import qualified Data.ScopeGraph as ScopeGraph
 import           Data.Semilattice.Lower
 import           Data.Traversable
+import           Debug.Trace
 import           GHC.Records
 import           GHC.TypeLits
 import qualified Language.Python.AST as Py
@@ -253,8 +254,33 @@ instance ToScopeGraph Py.ImportFromStatement where
   scopeGraph (Py.ImportFromStatement _ [] (L1 (Py.DottedName _ names)) (Just (Py.WildcardImport _ _))) = do
     let toName (Py.Identifier _ name) = Name.name name
     complete <* newEdge ScopeGraph.Import (toName <$> names)
-  scopeGraph impossibleTerm@(Py.ImportFromStatement _ [] (L1 (Py.DottedName _ _)) Nothing) =
-    todo impossibleTerm
+  scopeGraph impossibleTerm@(Py.ImportFromStatement _ imports (L1 (Py.DottedName _ names@((Py.Identifier ann name) :| _))) Nothing) = do
+    let toName (Py.Identifier _ name) = Name.name name
+    traceShowM names
+    newEdge ScopeGraph.Import (toName <$> names)
+
+    let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann^.span_ :: Span)
+    newReference (Name.name name) referenceProps
+
+    let pairs = zip (toList names) (tail $ toList names)
+    for_ pairs $ \pair -> do
+      case pair of
+        (scopeIdentifier, referenceIdentifier@(Py.Identifier ann2 _)) -> do
+          withScope (toName scopeIdentifier) $ do
+            let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann2^.span_ :: Span)
+            newReference (toName referenceIdentifier) referenceProps
+
+    completions <- for imports $ \identifier -> do
+      case identifier of
+        (R1 (Py.DottedName _ (Py.Identifier ann name :| []))) -> do
+          -- withScope ... $ do newReference referenceIdentifier
+          let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann^.span_ :: Span)
+          newReference (Name.name name) referenceProps
+          complete
+        term@(L1 (Py.AliasedImport ann (Py.Identifier _ name) (Py.DottedName _ names))) -> do
+          todo term
+
+    pure (mconcat completions)
   scopeGraph term = todo term
 
 
