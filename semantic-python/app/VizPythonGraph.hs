@@ -34,7 +34,7 @@ renderSpan (Span (Pos a b) (Pos c d)) =
 
 fashion :: FilePath -> Algebraic.Graph Name -> Dot.Style (Algebraic.Node Name) Text
 fashion fp g = Dot.Style
-  { Dot.graphName = T.pack fp
+  { Dot.graphName = T.pack . show $ fp
   , Dot.preamble  = []
   , Dot.graphAttributes = []
   , Dot.defaultVertexAttributes = []
