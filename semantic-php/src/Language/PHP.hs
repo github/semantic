@@ -1,7 +1,7 @@
 -- | Semantic functionality for JSON programs.
 module Language.PHP
 ( Term(..)
-, TreeSitter.PHP.tree_sitter_json
+, TreeSitter.PHP.tree_sitter_php
 ) where
 
 import           Data.Proxy
