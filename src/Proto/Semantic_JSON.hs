@@ -134,6 +134,27 @@ instance ToJSON ParseTreeGraphResponse where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding
 
+instance FromJSONPB ParseTreeScopeGraphResponse where
+  parseJSONPB = withObject "ParseTreeScopeGraphResponse" $ \obj -> do
+    files' <- obj .: "files"
+    pure $ defMessage
+      & P.files .~ files'
+
+instance ToJSONPB ParseTreeScopeGraphResponse where
+  toJSONPB x = object
+    [ "files" .= (x^.files)
+    ]
+  toEncodingPB x = pairs
+    [ "files" .= (x^.files)
+    ]
+
+instance FromJSON ParseTreeScopeGraphResponse where
+  parseJSON = parseJSONPB
+
+instance ToJSON ParseTreeScopeGraphResponse where
+  toJSON = toAesonValue
+  toEncoding = toAesonEncoding
+
 instance FromJSONPB ParseTreeFileGraph where
   parseJSONPB = withObject "ParseTreeFileGraph" $ \obj -> do
     path' <- obj .: "path"
@@ -821,6 +842,129 @@ instance FromJSON Span where
   parseJSON = parseJSONPB
 
 instance ToJSON Span where
+  toJSON = toAesonValue
+  toEncoding = toAesonEncoding
+
+instance FromJSONPB ScopeGraphFile where
+  parseJSONPB = withObject "ScopeGraphFile" $ \obj -> do
+    path' <- obj .: "path"
+    language' <- obj .: "language"
+    nodes' <- obj .: "nodes"
+    paths' <- obj .: "paths"
+    errors' <- obj .: "errors"
+    pure $ defMessage
+      & P.path .~ path'
+      & P.language .~ language'
+      & P.nodes .~ nodes'
+      & P.paths .~ paths'
+      & P.errors .~ errors'
+
+instance ToJSONPB ScopeGraphFile where
+  toJSONPB x = object
+    [ "path" .= (x^.path)
+    , "language" .= (x^.language)
+    , "nodes" .= (x^.nodes)
+    , "paths" .= (x^.paths)
+    , "errors" .= (x^.errors)
+    ]
+  toEncodingPB x = pairs
+    [ "path" .= (x^.path)
+    , "language" .= (x^.language)
+    , "nodes" .= (x^.nodes)
+    , "paths" .= (x^.paths)
+    , "errors" .= (x^.errors)
+    ]
+
+instance FromJSON ScopeGraphFile where
+  parseJSON = parseJSONPB
+
+instance ToJSON ScopeGraphFile where
+  toJSON = toAesonValue
+  toEncoding = toAesonEncoding
+
+instance FromJSONPB ScopeGraphNode where
+  parseJSONPB = withObject "ScopeGraphNode" $ \obj -> do
+    id' <- obj .: "id"
+    name' <- obj .: "name"
+    line' <- obj .: "line"
+    syntax' <- obj .: "syntax"
+    isDefinition' <- obj .: "isDefinition"
+    span' <- obj A..:? "span"
+    pure $ defMessage
+      & P.id .~ id'
+      & P.name .~ name'
+      & P.line .~ line'
+      & P.syntax .~ syntax'
+      & P.isDefinition .~ isDefinition'
+      & P.maybe'span .~ span'
+
+instance ToJSONPB ScopeGraphNode where
+  toJSONPB x = object
+    [ "id" .= (x^.id)
+    , "name" .= (x^.name)
+    , "line" .= (x^.line)
+    , "syntax" .= (x^.syntax)
+    , "isDefinition" .= (x^.isDefinition)
+    , "span" .= (x^.maybe'span)
+    ]
+  toEncodingPB x = pairs
+    [ "id" .= (x^.id)
+    , "name" .= (x^.name)
+    , "line" .= (x^.line)
+    , "syntax" .= (x^.syntax)
+    , "isDefinition" .= (x^.isDefinition)
+    , "span" .= (x^.maybe'span)
+    ]
+
+instance FromJSON ScopeGraphNode where
+  parseJSON = parseJSONPB
+
+instance ToJSON ScopeGraphNode where
+  toJSON = toAesonValue
+  toEncoding = toAesonEncoding
+
+instance FromJSONPB ScopeGraphPath where
+  parseJSONPB = withObject "ScopeGraphPath" $ \obj -> do
+    startingSymbolStack' <- obj .: "startingSymbolStack"
+    startingScopeStackSize' <- obj .: "startingScopeStackSize"
+    from' <- obj .: "from"
+    edges' <- obj .: "edges"
+    to' <- obj .: "to"
+    endingScopeStack' <- obj .: "endingScopeStack"
+    endingSymbolStack' <- obj .: "endingSymbolStack"
+    pure $ defMessage
+      & P.startingSymbolStack .~ startingSymbolStack'
+      & P.startingScopeStackSize .~ startingScopeStackSize'
+      & P.from .~ from'
+      & P.edges .~ edges'
+      & P.to .~ to'
+      & P.endingScopeStack .~ endingScopeStack'
+      & P.endingSymbolStack .~ endingSymbolStack'
+
+instance ToJSONPB ScopeGraphPath where
+  toJSONPB x = object
+    [ "startingSymbolStack" .= (x^.startingSymbolStack)
+    , "startingScopeStackSize" .= (x^.startingScopeStackSize)
+    , "from" .= (x^.from)
+    , "edges" .= (x^.edges)
+    , "to" .= (x^.to)
+    , "endingScopeStack" .= (x^.endingScopeStack)
+    , "endingSymbolStack" .= (x^.endingSymbolStack)
+    ]
+  toEncodingPB x = pairs
+    [ "startingSymbolStack" .= (x^.startingSymbolStack)
+    , "startingScopeStackSize" .= (x^.startingScopeStackSize)
+    , "from" .= (x^.from)
+    , "edges" .= (x^.edges)
+    , "to" .= (x^.to)
+    , "endingScopeStack" .= (x^.endingScopeStack)
+    , "endingSymbolStack" .= (x^.endingSymbolStack)
+    ]
+
+instance FromJSON ScopeGraphPath where
+  parseJSON = parseJSONPB
+
+instance ToJSON ScopeGraphPath where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding
 
