@@ -203,7 +203,6 @@ library
                      , Language.TypeScript.Syntax.TypeScript
                      , Language.TypeScript.Syntax.Types
                      , Language.TypeScript.Term
-                     , Language.PHP.Assignment
                      , Language.PHP.Syntax
                      , Language.PHP.Term
                      , Language.Python.Assignment
