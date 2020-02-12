@@ -162,6 +162,34 @@ assertQualifiedImport = do
     (expecto, Complete) -> HUnit.assertEqual "Should work for simple case" expecto graph
     (_, Todo msg)       -> HUnit.assertFailure ("Failed to complete:" <>  show msg)
 
+assertImportFromSymbols :: HUnit.Assertion
+assertImportFromSymbols = do
+  let path = "semantic-python/test/fixtures/cheese/6-03-import-from.py"
+  (graph, _) <- graphFile path
+  case run (runSketch Nothing expectedImportFromSymbols) of
+    (expecto, Complete) -> HUnit.assertEqual "Should work for simple case" expecto graph
+    (_, Todo msg)       -> HUnit.assertFailure ("Failed to complete:" <>  show msg)
+
+expectedImportFromSymbols :: ScopeGraphEff sig m => m Result
+expectedImportFromSymbols = do
+  newEdge ScopeGraph.Import (NonEmpty.fromList ["cheese", "ints"])
+
+  let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 0 7) (Pos 0 13))
+  newReference (Name.name "cheese") refProperties
+
+  withScope "cheese" $ do
+    let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 0 14) (Pos 0 18))
+    newReference (Name.name "ints") refProperties
+
+
+  let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 0 25) (Pos 0 28))
+  newReference (Name.name "two") refProperties
+
+  let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 2 0) (Pos 2 3))
+  newReference "two" refProperties
+
+  pure Complete
+
 main :: IO ()
 main = do
   -- make sure we're in the root directory so the paths resolve properly
@@ -184,5 +212,6 @@ main = do
       Tasty.testGroup "imports" [
         HUnit.testCase "simple function argument" assertImportHole
         , HUnit.testCase "qualified imports" assertQualifiedImport
+        , HUnit.testCase "qualified imports with symbols" assertImportFromSymbols
       ]
     ]
