@@ -43,7 +43,7 @@ runSketch ::
   -> SketchC Name m a
   -> m (ScopeGraph Name, a)
 runSketch _rootpath go
-  = evalFresh 0
+  = evalFresh 1
   . runReader @Name rootname
   . evalState @Name rootname
   . runState @(ScopeGraph Name) initialGraph
