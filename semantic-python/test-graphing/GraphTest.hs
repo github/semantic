@@ -156,7 +156,7 @@ assertImportHole = do
 
 assertQualifiedImport :: HUnit.Assertion
 assertQualifiedImport = do
-  let path = "semantic-python/test/fixtures/cheese/6-01-qualified-imports.py"
+  let path = "semantic-python/test/fixtures/cheese/6-02-qualified-imports.py"
   (graph, _) <- graphFile path
   case run (runSketch Nothing expectedQualifiedImport) of
     (expecto, Complete) -> HUnit.assertEqual "Should work for simple case" expecto graph
