@@ -48,6 +48,7 @@ import           Source.Span
 
 import           Scope.Graph.AdjacencyList (ScopeGraph)
 import qualified Scope.Graph.AdjacencyList as AdjacencyList
+import           Scope.Types
 
 import qualified Control.Effect.ScopeGraph.Properties.Declaration as Props
 import qualified Control.Effect.ScopeGraph.Properties.Function as Props
@@ -63,18 +64,18 @@ maybeM f = maybe f pure
 type ScopeGraphEff sig m
   = ( Has (State (ScopeGraph Name)) sig m
     , Has (State Name) sig m
-    , Has (Reader Name) sig m
-    , Has Fresh sig m
+    , Has (Reader (CurrentScope Name)) sig m
+    , Has (Reader Module.ModuleInfo) sig m
     )
 
 graphInProgress :: ScopeGraphEff sig m => m (ScopeGraph Name)
 graphInProgress = get
 
-currentScope :: ScopeGraphEff sig m => m Name
+currentScope :: ScopeGraphEff sig m => m (CurrentScope Name)
 currentScope = ask
 
 withScope :: ScopeGraphEff sig m
-          => Name
+          => CurrentScope Name
           -> m a
           -> m a
 withScope scope = local (const scope)
@@ -82,7 +83,7 @@ withScope scope = local (const scope)
 
 declare :: ScopeGraphEff sig m => Name -> Props.Declaration -> m ()
 declare n props = do
-  current <- currentScope
+  CurrentScope current <- currentScope
   old <- graphInProgress
   let Props.Declaration kind relation associatedScope span = props
   let (new, _pos) =
@@ -101,7 +102,7 @@ declare n props = do
 -- | Establish a reference to a prior declaration.
 reference :: forall sig m . ScopeGraphEff sig m => Text -> Text -> Props.Reference -> m ()
 reference n decl props = do
-  current <- currentScope
+  CurrentScope current <- currentScope
   old <- graphInProgress
   let new =
          ScopeGraph.reference
@@ -124,7 +125,7 @@ newScope edges = do
 -- | Takes an edge label and a list of names and inserts an import edge to a hole.
 newEdge :: ScopeGraphEff sig m => ScopeGraph.EdgeLabel -> NonEmpty Name -> m ()
 newEdge label address = do
-  current <- currentScope
+  CurrentScope current <- currentScope
   old <- graphInProgress
   let new = ScopeGraph.addImportEdge label (toList address) current old
   put new
@@ -135,7 +136,7 @@ lookupScope address = maybeM undefined . ScopeGraph.lookupScope address =<< get
 -- | Inserts a reference.
 newReference :: ScopeGraphEff sig m => Name -> Props.Reference -> m ()
 newReference name props = do
-  currentAddress <- currentScope
+  CurrentScope currentAddress <- currentScope
   scope <- lookupScope currentAddress
 
   let refProps = Reference.ReferenceInfo (props^.span_) (Props.Reference.kind props) lowerBound
@@ -159,7 +160,7 @@ newReference name props = do
 
 declareFunction :: forall sig m . ScopeGraphEff sig m => Maybe Name -> Props.Function -> m (Name, Name)
 declareFunction name (Props.Function kind span) = do
-  currentScope' <- currentScope
+  CurrentScope currentScope' <- currentScope
   let lexicalEdges = Map.singleton ScopeGraph.Lexical [ currentScope' ]
   associatedScope <- newScope lexicalEdges
   name' <- declareMaybeName name Props.Declaration
