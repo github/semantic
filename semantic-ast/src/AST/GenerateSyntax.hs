@@ -66,35 +66,28 @@ getAllSymbols language = do
 syntaxDatatype :: Ptr TS.Language -> [(String, Named)] -> Datatype -> Q [Dec]
 syntaxDatatype language allSymbols datatype = skipDefined $ do
   typeParameterName <- newName "a"
-  traversalInstances <- makeTraversalInstances (conT name)
+  let traversalInstances = makeTraversalInstances (conT name)
+  let glue a b c = a : b <> c
   case datatype of
-    SumType (DatatypeName _) _ subtypes -> do
-      types' <- fieldTypesToNestedSum subtypes
-      let fieldName = mkName ("get" <> nameStr)
-      con <- recC name [TH.varBangType fieldName (TH.bangType strictness (pure types' `appT` varT typeParameterName))]
-      hasFieldInstance <- makeHasFieldInstance (conT name) (varT typeParameterName) (varE fieldName)
-      pure
-        (  NewtypeD [] name [PlainTV typeParameterName] Nothing con [deriveGN, deriveStockClause, deriveAnyClassClause]
-        :  hasFieldInstance
-        <> traversalInstances)
+    SumType (DatatypeName _) _ subtypes ->
+      let types' = fieldTypesToNestedSum subtypes
+          fieldName = mkName ("get" <> nameStr)
+          con = recC name [TH.varBangType fieldName (TH.bangType strictness (types' `appT` varT typeParameterName))]
+          hasFieldInstance = makeHasFieldInstance (conT name) (varT typeParameterName) (varE fieldName)
+          newType = TH.newtypeD (TH.cxt []) name [PlainTV typeParameterName] Nothing con [pure deriveGN, pure deriveStockClause, pure deriveAnyClassClause]
+      in glue <$> newType <*> hasFieldInstance <*> traversalInstances
     ProductType datatypeName named children fields -> do
       con <- ctorForProductType datatypeName typeParameterName children fields
-      symbolMatchingInstance <- symbolMatchingInstance allSymbols name named datatypeName
-      pure
-        (  generatedDatatype name [con] typeParameterName
-        :  symbolMatchingInstance
-        <> traversalInstances)
+      let symbols = symbolMatchingInstance allSymbols name named datatypeName
+      glue <$> pure (generatedDatatype name [con] typeParameterName) <*> symbols <*> traversalInstances
       -- Anonymous leaf types are defined as synonyms for the `Token` datatype
     LeafType (DatatypeName datatypeName) Anonymous -> do
       tsSymbol <- runIO $ withCStringLen datatypeName (\(s, len) -> TS.ts_language_symbol_for_name language s len False)
       pure [ TySynD name [] (ConT ''Token `AppT` LitT (StrTyLit datatypeName) `AppT` LitT (NumTyLit (fromIntegral tsSymbol))) ]
     LeafType datatypeName Named -> do
       con <- ctorForLeafType datatypeName typeParameterName
-      symbolMatchingInstance <- symbolMatchingInstance allSymbols name Named datatypeName
-      pure
-        (  generatedDatatype name [con] typeParameterName
-        :  symbolMatchingInstance
-        <> traversalInstances)
+      let symbols = symbolMatchingInstance allSymbols name Named datatypeName
+      glue <$> pure (generatedDatatype name [con] typeParameterName) <*> symbols <*> traversalInstances
   where
     -- Skip generating datatypes that have already been defined (overridden) in the module where the splice is running.
     skipDefined m = do
