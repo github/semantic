@@ -161,9 +161,6 @@ jsxParser modes = case jsxMode modes of
 markdownParser :: c Markdown.Term => (Language, SomeParser c Loc)
 markdownParser = (Markdown, SomeParser (AssignmentParser MarkdownParser Markdown.assignment))
 
-phpParser :: c PHP.Term => (Language, SomeParser c Loc)
-phpParser = (PHP, SomeParser (AssignmentParser (ASTParser tree_sitter_php) PHP.assignment))
-
 pythonParserALaCarte :: c PythonALaCarte.Term => (Language, SomeParser c Loc)
 pythonParserALaCarte = (Python, SomeParser (AssignmentParser (ASTParser tree_sitter_python) PythonALaCarte.assignment))
 
@@ -224,7 +221,6 @@ type family TermMode term where
 aLaCarteParsers
   :: ( c GoALaCarte.Term
      , c Markdown.Term
-     , c PHP.Term
      , c PythonALaCarte.Term
      , c RubyALaCarte.Term
      , c TSXALaCarte.Term
@@ -235,7 +231,6 @@ aLaCarteParsers = Map.fromList
   [ javascriptParserALaCarte
   , jsxParserALaCarte
   , markdownParser
-  , phpParser
   , pythonParserALaCarte
   , rubyParserALaCarte
   , tsxParserALaCarte
@@ -273,7 +268,6 @@ allParsers
      , c Java.Term
      , c JSON.Term
      , c Markdown.Term
-     , c PHP.Term
      , c PythonALaCarte.Term
      , c PythonPrecise.Term
      , c RubyALaCarte.Term
@@ -292,7 +286,6 @@ allParsers modes = Map.fromList
   , jsonParser
   , jsxParser modes
   , markdownParser
-  , phpParser
   , pythonParser modes
   , rubyParser modes
   , tsxParser modes
