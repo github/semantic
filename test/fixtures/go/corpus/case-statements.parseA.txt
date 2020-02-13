@@ -1,8 +1,9 @@
-(Statements
-  (Package
-    (Identifier))
-  (Function
-    (Identifier)
-    (Match
-      (Empty)
-      (Statements))))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (FunctionDeclaration 
+    (Block 
+      (Statement 
+        (ExpressionSwitchStatement))) 
+    (Identifier "main") 
+    (ParameterList)))

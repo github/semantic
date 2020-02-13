@@ -1,3 +1,8 @@
-(Statements
-  (Typeof
-    (Identifier)))
+(Program 
+  (Statement 
+    (ExpressionStatement 
+      (Expression 
+        (UnaryExpression 
+          (Token) 
+          (Expression 
+            (Identifier "x")))))))

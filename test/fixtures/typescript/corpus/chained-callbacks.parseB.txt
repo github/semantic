@@ -1,20 +1,24 @@
-(Statements
-  (Call
-    (MemberAccess
-      (This)
-      (Identifier))
-    (Function
-      (Empty)
-      (Empty)
-      (Empty)
-      (RequiredParameter
-        (Empty)
-        (Empty)
-        (Identifier)
-        (Empty))
-      (StatementBlock
-        (Return
-          (MemberAccess
-            (Identifier)
-            (Identifier)))))
-    (Empty)))
+(Program 
+  (Statement 
+    (ExpressionStatement 
+      (Expression 
+        (CallExpression 
+          (Expression 
+            (MemberExpression 
+              (PropertyIdentifier "reduce") 
+              (Expression 
+                (This "this")))) 
+          (Arguments 
+            (Expression 
+              (Function 
+                (StatementBlock 
+                  (Statement 
+                    (ReturnStatement 
+                      (Expression 
+                        (MemberExpression 
+                          (PropertyIdentifier "a") 
+                          (Expression 
+                            (Identifier "b"))))))) 
+                (FormalParameters 
+                  (RequiredParameter 
+                    (Identifier "a")))))))))))

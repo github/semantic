@@ -1,13 +1,28 @@
-(Statements
-  (Class
-    (Identifier)
-    (Identifier)
-    (Method
-      (Empty)
-      (Identifier)
-      (Statements)))
-  (Class
-    (ScopeResolution
-      (Identifier)
-      (Identifier))
-    (Statements)))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Class 
+          (Constant "Foo") 
+          (Superclass 
+            (Arg 
+              (Primary 
+                (Lhs 
+                  (Variable 
+                    (Constant "Super")))))) 
+          (Statement 
+            (Arg 
+              (Primary 
+                (Method 
+                  (MethodName 
+                    (Identifier "test")))))))))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Class 
+          (ScopeResolution 
+            (Constant "Bar") 
+            (Primary 
+              (Lhs 
+                (Variable 
+                  (Constant "Foo"))))))))))

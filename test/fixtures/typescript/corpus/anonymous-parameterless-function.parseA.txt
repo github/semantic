@@ -1,8 +1,11 @@
-(Statements
-  (Function
-    (Empty)
-    (Empty)
-    (Empty)
-    (StatementBlock
-      (Return
-        (TextElement)))))
+(Program 
+  (Statement 
+    (ExpressionStatement 
+      (Expression 
+        (Function 
+          (StatementBlock 
+            (Statement 
+              (ReturnStatement 
+                (Expression 
+                  (String))))) 
+          (FormalParameters))))))

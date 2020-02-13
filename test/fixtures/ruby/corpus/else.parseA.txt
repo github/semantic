@@ -1,8 +1,11 @@
-(Statements
-  (Try
-    (Statements
-      (Send
-        (Identifier))
-      (Else
-        (Empty)
-        (Statements)))))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Begin 
+          (Statement 
+            (MethodCall 
+              (ArgumentList) 
+              (Variable 
+                (Identifier "foo")))) 
+          (Else))))))

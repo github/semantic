@@ -1,13 +1,25 @@
-(Statements
-  (Assignment
-    (Identifier)
-    (Hash
-      (KeyValue
-        (Identifier)
-        (SequenceExpression
-          (Float)
-          (SequenceExpression
-            (Plus
-              (Float)
-              (Float))
-            (Float)))))))
+(Program 
+  (Statement 
+    (ExpressionStatement 
+      (Expression 
+        (AssignmentExpression 
+          (Identifier "c") 
+          (Expression 
+            (Object 
+              (Pair 
+                (Expression 
+                  (ParenthesizedExpression 
+                    (SequenceExpression 
+                      (Expression 
+                        (Number "3")) 
+                      (SequenceExpression 
+                        (Expression 
+                          (BinaryExpression 
+                            (Token) 
+                            (Expression 
+                              (Number "4")) 
+                            (Expression 
+                              (Number "5")))) 
+                        (Expression 
+                          (Number "6")))))) 
+                (PropertyIdentifier "d")))))))))

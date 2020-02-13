@@ -1,62 +1,133 @@
-(Statements
-  (Package
-    (Identifier))
-  (Function
-    (Identifier)
-    (Statements
-      (Assignment
-        (Identifier)
-        (Integer))
-      (AugmentedAssignment
-        (Plus
-          (Statements
-            (Identifier)
-            (Identifier))
-          (Statements
-            (Integer)
-            (Integer))))
-      (AugmentedAssignment
-        (Times
-          (Identifier)
-          (Integer)))
-      (AugmentedAssignment
-        (Plus
-          (Identifier)
-          (Integer)))
-      (AugmentedAssignment
-        (LShift
-          (Identifier)
-          (Integer)))
-      (AugmentedAssignment
-        (RShift
-          (Identifier)
-          (Integer)))
-      (AugmentedAssignment
-        (DividedBy
-          (Identifier)
-          (Integer)))
-      (AugmentedAssignment
-        (BXOr
-          (Identifier)
-          (Integer)))
-      (AugmentedAssignment
-        (Modulo
-          (Identifier)
-          (Integer)))
-      (AugmentedAssignment
-        (Not
-          (BAnd
-            (Identifier)
-            (Integer))))
-      (Assignment
-        (Identifier)
-        (Statements
-          (Pointer
-            (Identifier))
-          (Reference
-            (Composite
-              (Identifier)
-              (Statements
-                (KeyValue
-                  (Identifier)
-                  (Integer))))))))))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (FunctionDeclaration 
+    (Block 
+      (Statement 
+        (SimpleStatement 
+          (AssignmentStatement 
+            (Token) 
+            (ExpressionList 
+              (Expression 
+                (Identifier "l"))) 
+            (ExpressionList 
+              (Expression 
+                (IntLiteral "1")))))) 
+      (Statement 
+        (SimpleStatement 
+          (AssignmentStatement 
+            (Token) 
+            (ExpressionList 
+              (Expression 
+                (Identifier "m")) 
+              (Expression 
+                (Identifier "n"))) 
+            (ExpressionList 
+              (Expression 
+                (IntLiteral "2")) 
+              (Expression 
+                (IntLiteral "3")))))) 
+      (Statement 
+        (SimpleStatement 
+          (AssignmentStatement 
+            (Token) 
+            (ExpressionList 
+              (Expression 
+                (Identifier "o"))) 
+            (ExpressionList 
+              (Expression 
+                (IntLiteral "3")))))) 
+      (Statement 
+        (SimpleStatement 
+          (AssignmentStatement 
+            (Token) 
+            (ExpressionList 
+              (Expression 
+                (Identifier "p"))) 
+            (ExpressionList 
+              (Expression 
+                (IntLiteral "1")))))) 
+      (Statement 
+        (SimpleStatement 
+          (AssignmentStatement 
+            (Token) 
+            (ExpressionList 
+              (Expression 
+                (Identifier "q"))) 
+            (ExpressionList 
+              (Expression 
+                (IntLiteral "1")))))) 
+      (Statement 
+        (SimpleStatement 
+          (AssignmentStatement 
+            (Token) 
+            (ExpressionList 
+              (Expression 
+                (Identifier "s"))) 
+            (ExpressionList 
+              (Expression 
+                (IntLiteral "2")))))) 
+      (Statement 
+        (SimpleStatement 
+          (AssignmentStatement 
+            (Token) 
+            (ExpressionList 
+              (Expression 
+                (Identifier "t"))) 
+            (ExpressionList 
+              (Expression 
+                (IntLiteral "2")))))) 
+      (Statement 
+        (SimpleStatement 
+          (AssignmentStatement 
+            (Token) 
+            (ExpressionList 
+              (Expression 
+                (Identifier "u"))) 
+            (ExpressionList 
+              (Expression 
+                (IntLiteral "2")))))) 
+      (Statement 
+        (SimpleStatement 
+          (AssignmentStatement 
+            (Token) 
+            (ExpressionList 
+              (Expression 
+                (Identifier "v"))) 
+            (ExpressionList 
+              (Expression 
+                (IntLiteral "2")))))) 
+      (Statement 
+        (SimpleStatement 
+          (AssignmentStatement 
+            (Token) 
+            (ExpressionList 
+              (Expression 
+                (Identifier "w"))) 
+            (ExpressionList 
+              (Expression 
+                (IntLiteral "2")))))) 
+      (Statement 
+        (VarDeclaration 
+          (VarSpec 
+            (ExpressionList 
+              (Expression 
+                (UnaryExpression 
+                  (Token) 
+                  (Expression 
+                    (CompositeLiteral 
+                      (LiteralValue 
+                        (KeyedElement 
+                          (FieldIdentifier "x") 
+                          (Expression 
+                            (IntLiteral "1000")))) 
+                      (TypeIdentifier "Point2D")))))) 
+            (Identifier "pointer") 
+            (Type 
+              (SimpleType 
+                (PointerType 
+                  (Type 
+                    (SimpleType 
+                      (TypeIdentifier "Point2D")))))))))) 
+    (Identifier "main") 
+    (ParameterList)))

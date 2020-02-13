@@ -1,6 +1,20 @@
-(Statements
-  (Hash)
-  (Set
-    (Integer)
-    (Integer)
-    (Integer)))
+(Module 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Dictionary))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Set 
+            (Expression 
+              (PrimaryExpression 
+                (Integer "1"))) 
+            (Expression 
+              (PrimaryExpression 
+                (Integer "2"))) 
+            (Expression 
+              (PrimaryExpression 
+                (Integer "3")))))))))

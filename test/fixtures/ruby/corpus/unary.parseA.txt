@@ -1,20 +1,49 @@
-(Statements
-  (Complement
-    (Send
-      (Identifier)))
-  (Not
-    (Send
-      (Identifier)))
-  (Negate
-    (Send
-      (Identifier)))
-  (Send
-    (Identifier))
-  (Not
-    (Send
-      (Identifier)))
-  (Call
-    (Identifier)
-    (Send
-      (Identifier))
-    (Empty)))
+(Program 
+  (Statement 
+    (Arg 
+      (Unary 
+        (Arg 
+          (Primary 
+            (Lhs 
+              (Variable 
+                (Identifier "a")))))))) 
+  (Statement 
+    (Arg 
+      (Unary 
+        (Arg 
+          (Primary 
+            (Lhs 
+              (Variable 
+                (Identifier "a")))))))) 
+  (Statement 
+    (Arg 
+      (Unary 
+        (Arg 
+          (Primary 
+            (Lhs 
+              (Variable 
+                (Identifier "a")))))))) 
+  (Statement 
+    (Arg 
+      (Unary 
+        (Arg 
+          (Primary 
+            (Lhs 
+              (Variable 
+                (Identifier "a")))))))) 
+  (Statement 
+    (Arg 
+      (Unary 
+        (Arg 
+          (Primary 
+            (Lhs 
+              (Variable 
+                (Identifier "foo")))))))) 
+  (Statement 
+    (Arg 
+      (Unary 
+        (Arg 
+          (Primary 
+            (Lhs 
+              (Variable 
+                (Identifier "foo")))))))))

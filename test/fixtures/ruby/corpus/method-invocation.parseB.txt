@@ -1,16 +1,40 @@
-(Statements
-  (Send
-    (Identifier)
-    (TextElement))
-  (Send
-    (Send
-      (Identifier))
-    (Identifier))
-  (Send
-    (Identifier)
-    (Integer)
-    (Integer))
-  (Send
-    (Identifier)
-    (Integer)
-    (Integer)))
+(Program 
+  (Statement 
+    (MethodCall 
+      (ArgumentList 
+        (Arg 
+          (Primary 
+            (String)))) 
+      (Variable 
+        (Identifier "print")))) 
+  (Statement 
+    (MethodCall 
+      (ArgumentList) 
+      (Call 
+        (Primary 
+          (Lhs 
+            (Variable 
+              (Identifier "foo")))) 
+        (Identifier "bar")))) 
+  (Statement 
+    (MethodCall 
+      (ArgumentList 
+        (Arg 
+          (Primary 
+            (Integer "2"))) 
+        (Arg 
+          (Primary 
+            (Integer "3")))) 
+      (Variable 
+        (Identifier "bar")))) 
+  (Statement 
+    (MethodCall 
+      (ArgumentList 
+        (Arg 
+          (Primary 
+            (Integer "2"))) 
+        (Arg 
+          (Primary 
+            (Integer "3")))) 
+      (Variable 
+        (Identifier "bar")))))

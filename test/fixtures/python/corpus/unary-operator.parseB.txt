@@ -1,6 +1,25 @@
-(Statements
-  (Complement
-    (Identifier))
-  (Negate
-    (Identifier))
-  (Identifier))
+(Module 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (UnaryOperator 
+            (Token) 
+            (PrimaryExpression 
+              (Identifier "a"))))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (UnaryOperator 
+            (Token) 
+            (PrimaryExpression 
+              (Identifier "b"))))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (UnaryOperator 
+            (Token) 
+            (PrimaryExpression 
+              (Identifier "c"))))))))

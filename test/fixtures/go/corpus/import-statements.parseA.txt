@@ -1,12 +1,11 @@
-(Statements
-  (Package
-    (Identifier))
-  (Statements
-    (Comment)
-    (Comment)
-    (QualifiedImport
-      (Identifier))
-    (Comment))
-  (Function
-    (Identifier)
-    (Statements)))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (ImportDeclaration 
+    (ImportSpecList 
+      (ImportSpec 
+        (InterpretedStringLiteral)))) 
+  (FunctionDeclaration 
+    (Block) 
+    (Identifier "main") 
+    (ParameterList)))

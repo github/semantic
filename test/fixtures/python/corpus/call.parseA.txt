@@ -1,13 +1,34 @@
-(Statements
-  (Call
-    (Identifier)
-    (Identifier)
-    (Empty))
-  (Call
-    (Identifier)
-    (Empty))
-  (Call
-    (Identifier)
-    (Identifier)
-    (Identifier)
-    (Empty)))
+(Module 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Call 
+            (PrimaryExpression 
+              (Identifier "foo")) 
+            (ArgumentList 
+              (Expression 
+                (PrimaryExpression 
+                  (Identifier "a"))))))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Call 
+            (PrimaryExpression 
+              (Identifier "bar")) 
+            (ArgumentList)))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Call 
+            (PrimaryExpression 
+              (Identifier "bazz")) 
+            (ArgumentList 
+              (Expression 
+                (PrimaryExpression 
+                  (Identifier "c"))) 
+              (Expression 
+                (PrimaryExpression 
+                  (Identifier "d"))))))))))

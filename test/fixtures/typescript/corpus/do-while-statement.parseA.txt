@@ -1,10 +1,20 @@
-(Statements
-  (DoWhile
-    (Boolean)
-    (Statements
-      (Call
-        (MemberAccess
-          (Identifier)
-          (Identifier))
-        (Identifier)
-        (Empty)))))
+(Program 
+  (Statement 
+    (DoStatement 
+      (Statement 
+        (StatementBlock 
+          (Statement 
+            (ExpressionStatement 
+              (Expression 
+                (CallExpression 
+                  (Expression 
+                    (MemberExpression 
+                      (PropertyIdentifier "log") 
+                      (Expression 
+                        (Identifier "console")))) 
+                  (Arguments 
+                    (Expression 
+                      (Identifier "insert"))))))))) 
+      (ParenthesizedExpression 
+        (Expression 
+          (True "true"))))))

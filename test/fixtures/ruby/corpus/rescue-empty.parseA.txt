@@ -1,8 +1,12 @@
-(Statements
-  (Try
-    (Statements
-      (Send
-        (Identifier))
-      (Catch
-        (Statements)
-        (Statements)))))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Begin 
+          (Statement 
+            (Arg 
+              (Primary 
+                (Lhs 
+                  (Variable 
+                    (Identifier "foo")))))) 
+          (Rescue))))))

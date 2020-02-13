@@ -1,13 +1,20 @@
-(Statements
-  (Package
-    (Identifier))
-  (Function
-    (Identifier)
-    (Call
-      (MemberAccess
-        (MemberAccess
-          (Identifier)
-          (Identifier))
-        (Identifier))
-      (Statements)
-      (Empty))))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (FunctionDeclaration 
+    (Block 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (CallExpression 
+              (Expression 
+                (SelectorExpression 
+                  (FieldIdentifier "z") 
+                  (Expression 
+                    (SelectorExpression 
+                      (FieldIdentifier "y") 
+                      (Expression 
+                        (Identifier "x")))))) 
+              (ArgumentList)))))) 
+    (Identifier "main") 
+    (ParameterList)))

@@ -1,14 +1,30 @@
-(Statements
-  (If
-    (Send
-      (Identifier))
-    (Statements
-      (Send
-        (Identifier)))
-    (If
-      (Send
-        (Identifier))
-      (Statements
-        (Send
-          (Identifier)))
-      (Empty))))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (If 
+          (Elsif 
+            (Then 
+              (Statement 
+                (MethodCall 
+                  (ArgumentList) 
+                  (Variable 
+                    (Identifier "qoz"))))) 
+            (Statement 
+              (Arg 
+                (Primary 
+                  (Lhs 
+                    (Variable 
+                      (Identifier "baz"))))))) 
+          (Then 
+            (Statement 
+              (MethodCall 
+                (ArgumentList) 
+                (Variable 
+                  (Identifier "foo"))))) 
+          (Statement 
+            (Arg 
+              (Primary 
+                (Lhs 
+                  (Variable 
+                    (Identifier "bar")))))))))))

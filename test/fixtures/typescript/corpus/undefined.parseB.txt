@@ -1,3 +1,5 @@
-(Statements
-  (Return
-    (Undefined)))
+(Program 
+  (Statement 
+    (ReturnStatement 
+      (Expression 
+        (Undefined "undefined")))))

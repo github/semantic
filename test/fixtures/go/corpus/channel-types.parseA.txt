@@ -1,34 +1,67 @@
-(Statements
-  (Package
-    (Identifier))
-  (Function
-    (Identifier)
-    (Statements
-      (Type
-        (Identifier)
-        (BidirectionalChannel
-          (ReceiveChannel
-            (Identifier))))
-      (Type
-        (Identifier)
-        (SendChannel
-          (SendChannel
-            (Constructor
-              (Empty)
-              (Statements)))))
-      (Type
-        (Identifier)
-        (SendChannel
-          (ReceiveChannel
-            (Identifier))))
-      (Type
-        (Identifier)
-        (ReceiveChannel
-          (ReceiveChannel
-            (Identifier))))
-      (Type
-        (Identifier)
-        (BidirectionalChannel
-          (Parenthesized
-            (ReceiveChannel
-              (Identifier))))))))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (FunctionDeclaration 
+    (Block 
+      (Statement 
+        (TypeDeclaration 
+          (TypeSpec 
+            (TypeIdentifier "c1") 
+            (Type 
+              (SimpleType 
+                (ChannelType 
+                  (Type 
+                    (SimpleType 
+                      (ChannelType 
+                        (Type 
+                          (SimpleType 
+                            (TypeIdentifier "int")))))))))) 
+          (TypeSpec 
+            (TypeIdentifier "c2") 
+            (Type 
+              (SimpleType 
+                (ChannelType 
+                  (Type 
+                    (SimpleType 
+                      (ChannelType 
+                        (Type 
+                          (SimpleType 
+                            (StructType 
+                              (FieldDeclarationList))))))))))) 
+          (TypeSpec 
+            (TypeIdentifier "c3") 
+            (Type 
+              (SimpleType 
+                (ChannelType 
+                  (Type 
+                    (SimpleType 
+                      (ChannelType 
+                        (Type 
+                          (SimpleType 
+                            (TypeIdentifier "int")))))))))) 
+          (TypeSpec 
+            (TypeIdentifier "c4") 
+            (Type 
+              (SimpleType 
+                (ChannelType 
+                  (Type 
+                    (SimpleType 
+                      (ChannelType 
+                        (Type 
+                          (SimpleType 
+                            (TypeIdentifier "int")))))))))) 
+          (TypeSpec 
+            (TypeIdentifier "c5") 
+            (Type 
+              (SimpleType 
+                (ChannelType 
+                  (Type 
+                    (ParenthesizedType 
+                      (Type 
+                        (SimpleType 
+                          (ChannelType 
+                            (Type 
+                              (SimpleType 
+                                (TypeIdentifier "int"))))))))))))))) 
+    (Identifier "main") 
+    (ParameterList)))

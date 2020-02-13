@@ -1,7 +1,10 @@
-(Statements
-  (Method
-    (Empty)
-    (Identifier)
-    (Identifier)
-    (Empty)
-    (Statements)))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Method 
+          (MethodName 
+            (Identifier "foo")) 
+          (MethodParameters 
+            (Identifier "name") 
+            (HashSplatParameter)))))))

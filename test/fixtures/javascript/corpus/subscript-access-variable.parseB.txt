@@ -1,4 +1,9 @@
-(Statements
-  (Subscript
-    (Identifier)
-    (Identifier)))
+(Program 
+  (Statement 
+    (ExpressionStatement 
+      (Expression 
+        (SubscriptExpression 
+          (Expression 
+            (Identifier "x")) 
+          (Expression 
+            (Identifier "someOtherVariable")))))))

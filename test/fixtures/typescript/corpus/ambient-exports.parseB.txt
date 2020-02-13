@@ -1,23 +1,22 @@
-(Statements
-  (DefaultExport
-    (Function
-      (Empty)
-      (Empty)
-      (Identifier)
-      (RequiredParameter
-        (Empty)
-        (Annotation
-          (PredefinedType))
-        (Identifier)
-        (Empty))
-      (RequiredParameter
-        (Empty)
-        (Annotation
-          (PredefinedType))
-        (Identifier)
-        (Empty))
-      (StatementBlock
-        (Return
-          (Hash
-            (ShorthandPropertyIdentifier)
-            (ShorthandPropertyIdentifier)))))))
+(Program 
+  (Statement 
+    (ExportStatement 
+      (Expression 
+        (Function 
+          (StatementBlock 
+            (Statement 
+              (ReturnStatement 
+                (Expression 
+                  (Object 
+                    (ShorthandPropertyIdentifier "x") 
+                    (ShorthandPropertyIdentifier "y")))))) 
+          (Identifier "bar") 
+          (FormalParameters 
+            (RequiredParameter 
+              (Identifier "x") 
+              (TypeAnnotation 
+                (PredefinedType "number"))) 
+            (RequiredParameter 
+              (Identifier "y") 
+              (TypeAnnotation 
+                (PredefinedType "number")))))))))

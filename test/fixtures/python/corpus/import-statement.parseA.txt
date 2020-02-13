@@ -1,15 +1,24 @@
-(Statements
-  (Statements
-    (QualifiedImport
-      (Identifier))
-    (QualifiedAliasedImport
-      (Identifier)))
-  (Statements
-    (QualifiedAliasedImport
-      (Identifier))
-    (QualifiedImport
-      (Identifier)))
-  (QualifiedImport
-    (Identifier)
-    (Identifier)
-    (Identifier)))
+(Module 
+  (SimpleStatement 
+    (ImportStatement 
+      (DottedName 
+        (Identifier "a")) 
+      (AliasedImport 
+        (Identifier "c") 
+        (DottedName 
+          (Identifier "b"))))) 
+  (SimpleStatement 
+    (ImportStatement 
+      (AliasedImport 
+        (Identifier "d") 
+        (DottedName 
+          (Identifier "b") 
+          (Identifier "c"))) 
+      (DottedName 
+        (Identifier "e")))) 
+  (SimpleStatement 
+    (ImportStatement 
+      (DottedName 
+        (Identifier "a") 
+        (Identifier "b") 
+        (Identifier "c")))))

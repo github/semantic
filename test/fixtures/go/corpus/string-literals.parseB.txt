@@ -1,12 +1,19 @@
-(Statements
-  (Package
-    (Identifier))
-  (Function
-    (Identifier)
-    (Statements
-      (Assignment
-        (Identifier)
-        (TextElement))
-      (Assignment
-        (Identifier)
-        (TextElement)))))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (FunctionDeclaration 
+    (Block 
+      (Statement 
+        (ConstDeclaration 
+          (ConstSpec 
+            (ExpressionList 
+              (Expression 
+                (InterpretedStringLiteral))) 
+            (Identifier "a")) 
+          (ConstSpec 
+            (ExpressionList 
+              (Expression 
+                (InterpretedStringLiteral))) 
+            (Identifier "b"))))) 
+    (Identifier "main") 
+    (ParameterList)))

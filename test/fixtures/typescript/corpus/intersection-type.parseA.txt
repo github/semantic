@@ -1,9 +1,10 @@
-(Statements
-  (VariableDeclaration
-    (Assignment
-      (Annotation
-        (Union
-          (TypeIdentifier)
-          (TypeIdentifier)))
-      (Identifier)
-      (Empty))))
+(Program 
+  (Statement 
+    (Declaration 
+      (LexicalDeclaration 
+        (VariableDeclarator 
+          (Identifier "x") 
+          (TypeAnnotation 
+            (UnionType 
+              (TypeIdentifier "Foo") 
+              (TypeIdentifier "Bar"))))))))

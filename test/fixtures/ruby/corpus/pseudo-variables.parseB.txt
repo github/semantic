@@ -1,5 +1,22 @@
-(Statements
-  (This)
-  (Null)
-  (Boolean)
-  (Boolean))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Lhs 
+          (Variable 
+            (Self "self")))))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Lhs 
+          (Nil "NIL"))))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Lhs 
+          (True "TRUE"))))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Lhs 
+          (False "FALSE"))))))

@@ -1,8 +1,15 @@
-(Statements
-  (ForEach
-    (Identifier)
-    (Identifier)
-    (Statements
-      (Call
-        (Identifier)
-        (Empty)))))
+(Program 
+  (Statement 
+    (ForInStatement 
+      (Statement 
+        (StatementBlock 
+          (Statement 
+            (ExpressionStatement 
+              (Expression 
+                (CallExpression 
+                  (Expression 
+                    (Identifier "item")) 
+                  (Arguments))))))) 
+      (Identifier "item") 
+      (Expression 
+        (Identifier "items")))))
