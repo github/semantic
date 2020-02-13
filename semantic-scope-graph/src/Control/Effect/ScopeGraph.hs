@@ -111,9 +111,7 @@ newScope edges = do
 newEdge :: ScopeGraphEff sig m => ScopeGraph.EdgeLabel -> NonEmpty Name -> m ()
 newEdge label address = do
   current <- currentScope
-  old <- graphInProgress
-  let new = ScopeGraph.addImportEdge label (toList address) current old
-  put new
+  modify (ScopeGraph.addImportEdge label (toList address) current)
 
 lookupScope :: ScopeGraphEff sig m => Name -> m (ScopeGraph.Scope Name)
 lookupScope address = maybeM undefined . ScopeGraph.lookupScope address =<< get
