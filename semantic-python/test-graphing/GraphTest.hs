@@ -190,6 +190,36 @@ expectedImportFromSymbols = do
 
   pure Complete
 
+assertImportFromSymbolAliases :: HUnit.Assertion
+assertImportFromSymbolAliases = do
+  let path = "semantic-python/test/fixtures/cheese/6-04-import-from-alias.py"
+  (graph, _) <- graphFile path
+  case run (runSketch Nothing expectedImportFromSymbolAliases) of
+    (expecto, Complete) -> HUnit.assertEqual "Should work for simple case" expecto graph
+    (_, Todo msg)       -> HUnit.assertFailure ("Failed to complete:" <>  show msg)
+
+expectedImportFromSymbolAliases :: ScopeGraphEff sig m => m Result
+expectedImportFromSymbolAliases = do
+  newEdge ScopeGraph.Import (NonEmpty.fromList ["cheese", "ints"])
+
+  let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 0 5) (Pos 0 11))
+  newReference (Name.name "cheese") refProperties
+
+  withScope "cheese" $ do
+    let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 0 12) (Pos 0 16))
+    newReference (Name.name "ints") refProperties
+
+  let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 0 24) (Pos 0 27))
+  newReference (Name.name "two") refProperties
+
+  let declProperties = Props.Declaration ScopeGraph.UnqualifiedImport ScopeGraph.Default Nothing (Span (Pos 0 31) (Pos 0 36))
+  declare (Name.name "three") declProperties
+
+  let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 2 0) (Pos 2 5))
+  newReference "three" refProperties
+
+  pure Complete
+
 main :: IO ()
 main = do
   -- make sure we're in the root directory so the paths resolve properly
@@ -213,5 +243,6 @@ main = do
         HUnit.testCase "simple function argument" assertImportHole
         , HUnit.testCase "qualified imports" assertQualifiedImport
         , HUnit.testCase "qualified imports with symbols" assertImportFromSymbols
+        , HUnit.testCase "qualified imports with symbol aliases" assertImportFromSymbolAliases
       ]
     ]
