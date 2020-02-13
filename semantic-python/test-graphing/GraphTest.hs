@@ -141,7 +141,7 @@ assertFunctionArg = do
 expectedFunctionArg :: ScopeGraphEff sig m => m Result
 expectedFunctionArg = do
   (_, associatedScope) <- declareFunction (Just $ Name.name "foo") (Props.Function ScopeGraph.Function (Span (Pos 0 0) (Pos 1 12)))
-  withScope associatedScope $ do
+  withScope (CurrentScope associatedScope) $ do
     declare "x" (Props.Declaration ScopeGraph.Parameter ScopeGraph.Default Nothing (Span (Pos 0 8) (Pos 0 9)))
     let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 1 11) (Pos 1 12))
     newReference "x" refProperties
