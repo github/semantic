@@ -1,20 +1,19 @@
-(Statements
-  (InterfaceDeclaration
-    (TypeParameters
-      (TypeParameter
-        (TypeIdentifier)
-        (Empty)
-        (Empty)))
-    (TypeIdentifier)
-    (ObjectType
-      (PropertySignature
-        (Empty)
-        (Annotation
-          (LiteralType
-            (TextElement)))
-        (Identifier))
-      (PropertySignature
-        (Readonly)
-        (Annotation
-          (TypeIdentifier))
-        (Identifier)))))
+(Program 
+  (Statement 
+    (Declaration 
+      (InterfaceDeclaration 
+        (ObjectType 
+          (PropertySignature 
+            (PropertyIdentifier "type") 
+            (TypeAnnotation 
+              (LiteralType 
+                (String)))) 
+          (PropertySignature 
+            (PropertyIdentifier "result") 
+            (TypeAnnotation 
+              (TypeIdentifier "T")) 
+            (Readonly "readonly"))) 
+        (TypeIdentifier "IResult") 
+        (TypeParameters 
+          (TypeParameter 
+            (TypeIdentifier "T")))))))

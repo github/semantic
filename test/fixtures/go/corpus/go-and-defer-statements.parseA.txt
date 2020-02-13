@@ -1,20 +1,27 @@
-(Statements
-  (Package
-    (Identifier))
-  (Function
-    (Identifier)
-    (Statements
-      (Defer
-        (Call
-          (MemberAccess
-            (Identifier)
-            (Identifier))
-          (Statements)
-          (Empty)))
-      (Go
-        (Call
-          (MemberAccess
-            (Identifier)
-            (Identifier))
-          (Statements)
-          (Empty))))))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (FunctionDeclaration 
+    (Block 
+      (Statement 
+        (DeferStatement 
+          (Expression 
+            (CallExpression 
+              (Expression 
+                (SelectorExpression 
+                  (FieldIdentifier "y") 
+                  (Expression 
+                    (Identifier "x")))) 
+              (ArgumentList))))) 
+      (Statement 
+        (GoStatement 
+          (Expression 
+            (CallExpression 
+              (Expression 
+                (SelectorExpression 
+                  (FieldIdentifier "y") 
+                  (Expression 
+                    (Identifier "x")))) 
+              (ArgumentList)))))) 
+    (Identifier "main") 
+    (ParameterList)))

@@ -1,37 +1,52 @@
-(Statements
-  (Package
-    (Identifier))
-  (Function
-    (Identifier)
-    (Statements
-      (Assignment
-        (Identifier)
-        (Composite
-          (Identifier)
-          (Statements
-            (KeyValue
-              (Identifier)
-              (TextElement))
-            (KeyValue
-              (Identifier)
-              (TextElement)))))
-      (Assignment
-        (Identifier)
-        (Composite
-          (Constructor
-            (Empty)
-            (Field
-              (Identifier)
-              (Statements
-                (Identifier))))
-          (Statements
-            (KeyValue
-              (Identifier)
-              (Integer)))))
-      (Assignment
-        (Identifier)
-        (Composite
-          (MemberAccess
-            (Identifier)
-            (Identifier))
-          (Statements))))))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (FunctionDeclaration 
+    (Block 
+      (Statement 
+        (ConstDeclaration 
+          (ConstSpec 
+            (ExpressionList 
+              (Expression 
+                (CompositeLiteral 
+                  (LiteralValue 
+                    (KeyedElement 
+                      (FieldIdentifier "name") 
+                      (Expression 
+                        (InterpretedStringLiteral))) 
+                    (KeyedElement 
+                      (FieldIdentifier "Age") 
+                      (Expression 
+                        (InterpretedStringLiteral)))) 
+                  (TypeIdentifier "Dog")))) 
+            (Identifier "s1")))) 
+      (Statement 
+        (ConstDeclaration 
+          (ConstSpec 
+            (ExpressionList 
+              (Expression 
+                (CompositeLiteral 
+                  (LiteralValue 
+                    (KeyedElement 
+                      (FieldIdentifier "j") 
+                      (Expression 
+                        (IntLiteral "6")))) 
+                  (StructType 
+                    (FieldDeclarationList 
+                      (FieldDeclaration 
+                        (FieldIdentifier "i") 
+                        (TypeIdentifier "float"))))))) 
+            (Identifier "s2")))) 
+      (Statement 
+        (ConstDeclaration 
+          (ConstSpec 
+            (ExpressionList 
+              (Expression 
+                (CompositeLiteral 
+                  (LiteralValue) 
+                  (QualifiedType 
+                    (TypeIdentifier "Month") 
+                    (PackageIdentifier "time"))))) 
+            (Identifier "s3"))))) 
+    (Identifier "main") 
+    (ParameterList)))

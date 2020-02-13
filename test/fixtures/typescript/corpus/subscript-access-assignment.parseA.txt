@@ -1,6 +1,12 @@
-(Statements
-  (Assignment
-    (Subscript
-      (Identifier)
-      (TextElement))
-    (Float)))
+(Program 
+  (Statement 
+    (ExpressionStatement 
+      (Expression 
+        (AssignmentExpression 
+          (SubscriptExpression 
+            (Expression 
+              (Identifier "y")) 
+            (Expression 
+              (String))) 
+          (Expression 
+            (Number "0")))))))

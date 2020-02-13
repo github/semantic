@@ -1,12 +1,25 @@
-(Statements
-  (Return
-    (Statements
-      (Plus
-        (Identifier)
-        (Identifier))
-      (Identifier)))
-  (Return
-    (Empty))
-  (Return
-    (Not
-      (Identifier))))
+(Module 
+  (SimpleStatement 
+    (ReturnStatement 
+      (ExpressionList 
+        (Expression 
+          (PrimaryExpression 
+            (BinaryOperator 
+              (Token) 
+              (PrimaryExpression 
+                (Identifier "c")) 
+              (PrimaryExpression 
+                (Identifier "a"))))) 
+        (Expression 
+          (PrimaryExpression 
+            (Identifier "b")))))) 
+  (SimpleStatement 
+    (ReturnStatement)) 
+  (SimpleStatement 
+    (ReturnStatement 
+      (ExpressionList 
+        (Expression 
+          (NotOperator 
+            (Expression 
+              (PrimaryExpression 
+                (Identifier "a")))))))))

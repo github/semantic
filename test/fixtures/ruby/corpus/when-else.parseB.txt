@@ -1,24 +1,45 @@
-(Statements
-  (Match
-    (Send
-      (Identifier))
-    (Statements
-      (Pattern
-        (Statements
-          (Send
-            (Identifier)))
-        (Statements
-          (Send
-            (Identifier))))
-      (Pattern
-        (Statements
-          (Send
-            (Identifier)))
-        (Statements))
-      (Pattern
-        (Statements
-          (Send
-            (Identifier)))
-        (Statements))
-      (Send
-        (Identifier)))))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Case 
+          (Arg 
+            (Primary 
+              (Lhs 
+                (Variable 
+                  (Identifier "foo"))))) 
+          (When 
+            (Pattern 
+              (Arg 
+                (Primary 
+                  (Lhs 
+                    (Variable 
+                      (Identifier "bar")))))) 
+            (Then 
+              (Statement 
+                (Arg 
+                  (Primary 
+                    (Lhs 
+                      (Variable 
+                        (Identifier "baz")))))))) 
+          (When 
+            (Pattern 
+              (Arg 
+                (Primary 
+                  (Lhs 
+                    (Variable 
+                      (Identifier "x"))))))) 
+          (When 
+            (Pattern 
+              (Arg 
+                (Primary 
+                  (Lhs 
+                    (Variable 
+                      (Identifier "y"))))))) 
+          (Else 
+            (Statement 
+              (Arg 
+                (Primary 
+                  (Lhs 
+                    (Variable 
+                      (Identifier "qoz"))))))))))))

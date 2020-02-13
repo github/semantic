@@ -1,61 +1,144 @@
-(Statements
-  (Assignment
-    (Statements
-      (Identifier)
-      (Identifier)
-      (Identifier))
-    (Array
-      (Integer)
-      (Integer)
-      (Integer)))
-  (Assignment
-    (Statements
-      (Identifier)
-      (Identifier))
-    (Array
-      (Integer)
-      (Integer)))
-  (Assignment
-    (Statements
-      (Identifier)
-      (Identifier))
-    (Array
-      (Integer)
-      (Integer)))
-  (Assignment
-    (Statements
-      (Identifier)
-      (Identifier))
-    (Array
-      (Integer)
-      (Integer)))
-  (Assignment
-    (Statements
-      (Identifier)
-      (Identifier))
-    (Send
-      (Identifier)))
-  (Assignment
-    (Statements
-      (Send
-        (This)
-        (Identifier))
-      (Send
-        (This)
-        (Identifier)))
-    (Statements
-      (Send
-        (Send
-          (Identifier))
-        (Identifier))
-      (Send
-        (Send
-          (Identifier))
-        (Identifier))))
-  (Assignment
-    (Statements
-      (Statements
-        (Identifier)
-        (Identifier)))
-    (Send
-      (Identifier))))
+(Program 
+  (Statement 
+    (Assignment 
+      (LeftAssignmentList 
+        (Lhs 
+          (Variable 
+            (Identifier "x"))) 
+        (Lhs 
+          (Variable 
+            (Identifier "y"))) 
+        (Lhs 
+          (Variable 
+            (Identifier "z")))) 
+      (Arg 
+        (Primary 
+          (Array 
+            (Arg 
+              (Primary 
+                (Integer "10"))) 
+            (Arg 
+              (Primary 
+                (Integer "20"))) 
+            (Arg 
+              (Primary 
+                (Integer "30")))))))) 
+  (Statement 
+    (Assignment 
+      (LeftAssignmentList 
+        (Lhs 
+          (Variable 
+            (Identifier "x"))) 
+        (Lhs 
+          (Variable 
+            (Identifier "y")))) 
+      (Arg 
+        (Primary 
+          (Array 
+            (Arg 
+              (Primary 
+                (Integer "1"))) 
+            (Arg 
+              (Primary 
+                (Integer "2")))))))) 
+  (Statement 
+    (Assignment 
+      (LeftAssignmentList 
+        (Lhs 
+          (Variable 
+            (Identifier "x"))) 
+        (RestAssignment)) 
+      (Arg 
+        (Primary 
+          (Array 
+            (Arg 
+              (Primary 
+                (Integer "1"))) 
+            (Arg 
+              (Primary 
+                (Integer "2")))))))) 
+  (Statement 
+    (Assignment 
+      (LeftAssignmentList 
+        (Lhs 
+          (Variable 
+            (Identifier "x"))) 
+        (RestAssignment 
+          (Lhs 
+            (Variable 
+              (Identifier "args"))))) 
+      (Arg 
+        (Primary 
+          (Array 
+            (Arg 
+              (Primary 
+                (Integer "1"))) 
+            (Arg 
+              (Primary 
+                (Integer "2")))))))) 
+  (Statement 
+    (Assignment 
+      (LeftAssignmentList 
+        (Lhs 
+          (Variable 
+            (Identifier "x"))) 
+        (Lhs 
+          (Variable 
+            (Identifier "y")))) 
+      (SplatArgument 
+        (Arg 
+          (Primary 
+            (Lhs 
+              (Variable 
+                (Identifier "foo")))))))) 
+  (Statement 
+    (Assignment 
+      (LeftAssignmentList 
+        (Lhs 
+          (Call 
+            (Primary 
+              (Lhs 
+                (Variable 
+                  (Self "self")))) 
+            (Identifier "foo"))) 
+        (Lhs 
+          (Call 
+            (Primary 
+              (Lhs 
+                (Variable 
+                  (Self "self")))) 
+            (Identifier "bar")))) 
+      (RightAssignmentList 
+        (Arg 
+          (Primary 
+            (Lhs 
+              (Call 
+                (Primary 
+                  (Lhs 
+                    (Variable 
+                      (Identifier "target")))) 
+                (Identifier "a?"))))) 
+        (Arg 
+          (Primary 
+            (Lhs 
+              (Call 
+                (Primary 
+                  (Lhs 
+                    (Variable 
+                      (Identifier "target")))) 
+                (Identifier "b")))))))) 
+  (Statement 
+    (Assignment 
+      (LeftAssignmentList 
+        (DestructuredLeftAssignment 
+          (Lhs 
+            (Variable 
+              (Identifier "x"))) 
+          (Lhs 
+            (Variable 
+              (Identifier "y"))))) 
+      (Arg 
+        (Primary 
+          (Lhs 
+            (Variable 
+              (Identifier "foo"))))))))

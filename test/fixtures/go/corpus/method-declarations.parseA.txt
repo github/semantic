@@ -1,84 +1,153 @@
-(Statements
-  (Package
-    (Identifier))
-  (Function
-    (Identifier)
-    (Statements))
-  (Method
-    (Statements
-      (Identifier))
-    (Identifier)
-    (Empty))
-  (Method
-    (Identifier)
-    (Statements
-      (Identifier)
-      (Identifier))
-    (Identifier)
-    (Statements
-      (Identifier)
-      (Identifier))
-    (Statements))
-  (Method
-    (Identifier)
-    (Statements
-      (Identifier)
-      (Pointer
-        (Identifier)))
-    (Identifier)
-    (Return
-      (Call
-        (MemberAccess
-          (Identifier)
-          (Identifier))
-        (Plus
-          (Times
-            (MemberAccess
-              (Identifier)
-              (Identifier))
-            (MemberAccess
-              (Identifier)
-              (Identifier)))
-          (Times
-            (MemberAccess
-              (Identifier)
-              (Identifier))
-            (MemberAccess
-              (Identifier)
-              (Identifier))))
-        (Empty))))
-  (Method
-    (Statements
-      (AugmentedAssignment
-        (Times
-          (MemberAccess
-            (Identifier)
-            (Identifier))
-          (Identifier)))
-      (AugmentedAssignment
-        (Times
-          (MemberAccess
-            (Identifier)
-            (Identifier))
-          (Identifier))))
-    (Statements
-      (Identifier)
-      (Pointer
-        (Identifier)))
-    (Identifier)
-    (Statements
-      (Identifier)
-      (Identifier))
-    (Empty))
-  (Method
-    (Identifier)
-    (Statements
-      (Identifier)
-      (Pointer
-        (Identifier)))
-    (Identifier)
-    (Statements
-      (Identifier)
-      (Identifier)
-      (Identifier))
-    (Statements)))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (FunctionDeclaration 
+    (Block) 
+    (Identifier "main") 
+    (ParameterList)) 
+  (MethodDeclaration 
+    (ParameterList 
+      (ParameterDeclaration 
+        (Type 
+          (SimpleType 
+            (TypeIdentifier "s"))))) 
+    (FieldIdentifier "Method") 
+    (ParameterList)) 
+  (MethodDeclaration 
+    (Block) 
+    (SimpleType 
+      (TypeIdentifier "bool")) 
+    (ParameterList 
+      (ParameterDeclaration 
+        (Identifier "self") 
+        (Type 
+          (SimpleType 
+            (TypeIdentifier "Person"))))) 
+    (FieldIdentifier "Equals") 
+    (ParameterList 
+      (ParameterDeclaration 
+        (Identifier "other") 
+        (Type 
+          (SimpleType 
+            (TypeIdentifier "Person")))))) 
+  (MethodDeclaration 
+    (Block 
+      (Statement 
+        (ReturnStatement 
+          (ExpressionList 
+            (Expression 
+              (CallExpression 
+                (Expression 
+                  (SelectorExpression 
+                    (FieldIdentifier "Sqrt") 
+                    (Expression 
+                      (Identifier "math")))) 
+                (ArgumentList 
+                  (Expression 
+                    (BinaryExpression 
+                      (Token) 
+                      (Expression 
+                        (BinaryExpression 
+                          (Token) 
+                          (Expression 
+                            (SelectorExpression 
+                              (FieldIdentifier "x") 
+                              (Expression 
+                                (Identifier "p")))) 
+                          (Expression 
+                            (SelectorExpression 
+                              (FieldIdentifier "x") 
+                              (Expression 
+                                (Identifier "p")))))) 
+                      (Expression 
+                        (BinaryExpression 
+                          (Token) 
+                          (Expression 
+                            (SelectorExpression 
+                              (FieldIdentifier "y") 
+                              (Expression 
+                                (Identifier "p")))) 
+                          (Expression 
+                            (SelectorExpression 
+                              (FieldIdentifier "y") 
+                              (Expression 
+                                (Identifier "p"))))))))))))))) 
+    (SimpleType 
+      (TypeIdentifier "float64")) 
+    (ParameterList 
+      (ParameterDeclaration 
+        (Identifier "p") 
+        (Type 
+          (SimpleType 
+            (PointerType 
+              (Type 
+                (SimpleType 
+                  (TypeIdentifier "Point")))))))) 
+    (FieldIdentifier "Length") 
+    (ParameterList)) 
+  (MethodDeclaration 
+    (Block 
+      (Statement 
+        (SimpleStatement 
+          (AssignmentStatement 
+            (Token) 
+            (ExpressionList 
+              (Expression 
+                (SelectorExpression 
+                  (FieldIdentifier "x") 
+                  (Expression 
+                    (Identifier "p"))))) 
+            (ExpressionList 
+              (Expression 
+                (Identifier "factor")))))) 
+      (Statement 
+        (SimpleStatement 
+          (AssignmentStatement 
+            (Token) 
+            (ExpressionList 
+              (Expression 
+                (SelectorExpression 
+                  (FieldIdentifier "y") 
+                  (Expression 
+                    (Identifier "p"))))) 
+            (ExpressionList 
+              (Expression 
+                (Identifier "factor"))))))) 
+    (ParameterList 
+      (ParameterDeclaration 
+        (Identifier "p") 
+        (Type 
+          (SimpleType 
+            (PointerType 
+              (Type 
+                (SimpleType 
+                  (TypeIdentifier "Point")))))))) 
+    (FieldIdentifier "Scale") 
+    (ParameterList 
+      (ParameterDeclaration 
+        (Identifier "factor") 
+        (Type 
+          (SimpleType 
+            (TypeIdentifier "float64")))))) 
+  (MethodDeclaration 
+    (Block) 
+    (SimpleType 
+      (TypeIdentifier "bool")) 
+    (ParameterList 
+      (ParameterDeclaration 
+        (Identifier "f") 
+        (Type 
+          (SimpleType 
+            (PointerType 
+              (Type 
+                (SimpleType 
+                  (TypeIdentifier "Field")))))))) 
+    (FieldIdentifier "Alive") 
+    (ParameterList 
+      (ParameterDeclaration 
+        (Identifier "x") 
+        (Token) 
+        (Identifier "y") 
+        (Type 
+          (SimpleType 
+            (TypeIdentifier "int")))))))

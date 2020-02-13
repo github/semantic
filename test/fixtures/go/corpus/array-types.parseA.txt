@@ -1,32 +1,63 @@
-(Statements
-  (Package
-    (Identifier))
-  (Function
-    (Identifier)
-    (Statements
-      (Statements
-        (Type
-          (Identifier)
-          (Array
-            (Plus
-              (Integer)
-              (Integer))
-            (Identifier))))
-      (Statements
-        (Type
-          (Identifier)
-          (Array
-            (Integer)
-            (Array
-              (Integer)
-              (Identifier)))))
-      (Statements
-        (Type
-          (Identifier)
-          (Array
-            (Integer)
-            (Array
-              (Integer)
-              (Array
-                (Integer)
-                (Identifier)))))))))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (FunctionDeclaration 
+    (Block 
+      (Statement 
+        (TypeDeclaration 
+          (TypeSpec 
+            (TypeIdentifier "a") 
+            (Type 
+              (SimpleType 
+                (ArrayType 
+                  (Expression 
+                    (BinaryExpression 
+                      (Token) 
+                      (Expression 
+                        (IntLiteral "2")) 
+                      (Expression 
+                        (IntLiteral "2")))) 
+                  (Type 
+                    (SimpleType 
+                      (TypeIdentifier "x"))))))))) 
+      (Statement 
+        (TypeDeclaration 
+          (TypeSpec 
+            (TypeIdentifier "b") 
+            (Type 
+              (SimpleType 
+                (ArrayType 
+                  (Expression 
+                    (IntLiteral "3")) 
+                  (Type 
+                    (SimpleType 
+                      (ArrayType 
+                        (Expression 
+                          (IntLiteral "5")) 
+                        (Type 
+                          (SimpleType 
+                            (TypeIdentifier "int")))))))))))) 
+      (Statement 
+        (TypeDeclaration 
+          (TypeSpec 
+            (TypeIdentifier "c") 
+            (Type 
+              (SimpleType 
+                (ArrayType 
+                  (Expression 
+                    (IntLiteral "2")) 
+                  (Type 
+                    (SimpleType 
+                      (ArrayType 
+                        (Expression 
+                          (IntLiteral "2")) 
+                        (Type 
+                          (SimpleType 
+                            (ArrayType 
+                              (Expression 
+                                (IntLiteral "2")) 
+                              (Type 
+                                (SimpleType 
+                                  (TypeIdentifier "float64")))))))))))))))) 
+    (Identifier "main") 
+    (ParameterList)))

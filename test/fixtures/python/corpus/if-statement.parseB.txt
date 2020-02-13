@@ -1,7 +1,17 @@
-(Statements
-  (If
-    (Identifier)
-    (Statements
-      (Identifier)
-      (Identifier))
-    (Statements)))
+(Module 
+  (CompoundStatement 
+    (IfStatement 
+      (Block 
+        (SimpleStatement 
+          (ExpressionStatement 
+            (Expression 
+              (PrimaryExpression 
+                (Identifier "a"))))) 
+        (SimpleStatement 
+          (ExpressionStatement 
+            (Expression 
+              (PrimaryExpression 
+                (Identifier "b")))))) 
+      (Expression 
+        (PrimaryExpression 
+          (Identifier "c"))))))

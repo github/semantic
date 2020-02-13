@@ -1,21 +1,57 @@
-(Statements
-  (Package
-    (Identifier))
-  (Function
-    (Identifier)
-    (Statements
-      (Assignment
-        (Identifier)
-        (Float))
-      (Assignment
-        (Identifier)
-        (Float))
-      (Assignment
-        (Identifier)
-        (Float))
-      (Assignment
-        (Identifier)
-        (Float))
-      (Assignment
-        (Identifier)
-        (Float)))))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (FunctionDeclaration 
+    (Block 
+      (Statement 
+        (SimpleStatement 
+          (AssignmentStatement 
+            (Token) 
+            (ExpressionList 
+              (Expression 
+                (Identifier "f1"))) 
+            (ExpressionList 
+              (Expression 
+                (FloatLiteral "2.6")))))) 
+      (Statement 
+        (SimpleStatement 
+          (AssignmentStatement 
+            (Token) 
+            (ExpressionList 
+              (Expression 
+                (Identifier "f2"))) 
+            (ExpressionList 
+              (Expression 
+                (FloatLiteral "2.6e211")))))) 
+      (Statement 
+        (SimpleStatement 
+          (AssignmentStatement 
+            (Token) 
+            (ExpressionList 
+              (Expression 
+                (Identifier "f3"))) 
+            (ExpressionList 
+              (Expression 
+                (FloatLiteral "2.6e+60")))))) 
+      (Statement 
+        (SimpleStatement 
+          (AssignmentStatement 
+            (Token) 
+            (ExpressionList 
+              (Expression 
+                (Identifier "f4"))) 
+            (ExpressionList 
+              (Expression 
+                (FloatLiteral "2.6e-7")))))) 
+      (Statement 
+        (SimpleStatement 
+          (AssignmentStatement 
+            (Token) 
+            (ExpressionList 
+              (Expression 
+                (Identifier "f5"))) 
+            (ExpressionList 
+              (Expression 
+                (FloatLiteral ".6e-60"))))))) 
+    (Identifier "main") 
+    (ParameterList)))

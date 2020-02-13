@@ -1,9 +1,34 @@
-(Statements
-  (Tuple
-    (Identifier)
-    (Identifier)
-    (Identifier))
-  (Tuple
-    (Identifier)
-    (Identifier))
-  (Identifier))
+(Module 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Tuple 
+            (Expression 
+              (PrimaryExpression 
+                (Identifier "b"))) 
+            (Expression 
+              (PrimaryExpression 
+                (Identifier "c"))) 
+            (Expression 
+              (PrimaryExpression 
+                (Identifier "a")))))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Tuple 
+            (Expression 
+              (PrimaryExpression 
+                (Identifier "b"))) 
+            (Expression 
+              (PrimaryExpression 
+                (Identifier "c")))))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (ParenthesizedExpression 
+            (Expression 
+              (PrimaryExpression 
+                (Identifier "a")))))))))

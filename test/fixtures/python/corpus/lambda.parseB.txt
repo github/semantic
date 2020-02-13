@@ -1,8 +1,16 @@
-(Statements
-  (Function
-    (Empty)
-    (Identifier)
-    (Statements
-      (Plus
-        (Identifier)
-        (Integer)))))
+(Module 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (Lambda 
+          (Expression 
+            (PrimaryExpression 
+              (BinaryOperator 
+                (Token) 
+                (PrimaryExpression 
+                  (Identifier "a")) 
+                (PrimaryExpression 
+                  (Integer "1"))))) 
+          (LambdaParameters 
+            (Parameter 
+              (Identifier "a"))))))))

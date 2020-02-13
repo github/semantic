@@ -1,45 +1,87 @@
-(Statements
-  (Decorator
-    (Identifier)
-    (Class
-      (Identifier)
-      (Statements
-        (Decorator
-          (Identifier)
-          (Statements)
-          (Decorator
-            (Identifier)
-            (Integer)
-            (Decorator
-              (Identifier)
-              (Statements
-                (Integer)
-                (Integer))
-              (Decorator
-                (Identifier)
-                (Assignment
-                  (Identifier)
-                  (Boolean))
-                (Decorator
-                  (Identifier)
-                  (Statements
-                    (Identifier))
-                  (Decorator
-                    (Identifier)
-                    (Statements
-                      (Identifier))
-                    (Decorator
-                      (Identifier)
-                      (Statements
-                        (Integer)
-                        (Assignment
-                          (Identifier)
-                          (Boolean))
-                        (Statements
-                          (Identifier))
-                        (Statements
-                          (Identifier)))
-                      (Function
-                        (Identifier)
-                        (Statements
-                          (Identifier))))))))))))))
+(Module 
+  (CompoundStatement 
+    (DecoratedDefinition 
+      (ClassDefinition 
+        (Block 
+          (CompoundStatement 
+            (DecoratedDefinition 
+              (FunctionDefinition 
+                (Block 
+                  (SimpleStatement 
+                    (ExpressionStatement 
+                      (Expression 
+                        (PrimaryExpression 
+                          (Identifier "g")))))) 
+                (Identifier "f") 
+                (Parameters)) 
+              (Decorator 
+                (ArgumentList) 
+                (DottedName 
+                  (Identifier "f"))) 
+              (Decorator 
+                (ArgumentList 
+                  (Expression 
+                    (PrimaryExpression 
+                      (Integer "1")))) 
+                (DottedName 
+                  (Identifier "d"))) 
+              (Decorator 
+                (ArgumentList 
+                  (Expression 
+                    (PrimaryExpression 
+                      (Integer "2"))) 
+                  (Expression 
+                    (PrimaryExpression 
+                      (Integer "3")))) 
+                (DottedName 
+                  (Identifier "e"))) 
+              (Decorator 
+                (ArgumentList 
+                  (KeywordArgument 
+                    (Expression 
+                      (PrimaryExpression 
+                        (True "True"))) 
+                    (Identifier "b"))) 
+                (DottedName 
+                  (Identifier "a"))) 
+              (Decorator 
+                (ArgumentList 
+                  (ListSplat 
+                    (Expression 
+                      (PrimaryExpression 
+                        (Identifier "b"))))) 
+                (DottedName 
+                  (Identifier "a"))) 
+              (Decorator 
+                (ArgumentList 
+                  (DictionarySplat 
+                    (Expression 
+                      (PrimaryExpression 
+                        (Identifier "c"))))) 
+                (DottedName 
+                  (Identifier "a"))) 
+              (Decorator 
+                (ArgumentList 
+                  (Expression 
+                    (PrimaryExpression 
+                      (Integer "1"))) 
+                  (KeywordArgument 
+                    (Expression 
+                      (PrimaryExpression 
+                        (True "True"))) 
+                    (Identifier "b")) 
+                  (ListSplat 
+                    (Expression 
+                      (PrimaryExpression 
+                        (Identifier "b")))) 
+                  (DictionarySplat 
+                    (Expression 
+                      (PrimaryExpression 
+                        (Identifier "c"))))) 
+                (DottedName 
+                  (Identifier "a")))))) 
+        (Identifier "C")) 
+      (Decorator 
+        (DottedName 
+          (Identifier "a") 
+          (Identifier "b"))))))

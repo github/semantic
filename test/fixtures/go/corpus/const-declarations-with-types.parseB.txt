@@ -1,14 +1,21 @@
-(Statements
-  (Package
-    (Identifier))
-  (Function
-    (Identifier)
-    (Assignment
-      (Annotation
-        (Statements
-          (Identifier)
-          (Identifier))
-        (Identifier))
-      (Statements
-        (Integer)
-        (Integer)))))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (FunctionDeclaration 
+    (Block 
+      (Statement 
+        (ConstDeclaration 
+          (ConstSpec 
+            (ExpressionList 
+              (Expression 
+                (IntLiteral "1")) 
+              (Expression 
+                (IntLiteral "2"))) 
+            (Identifier "one") 
+            (Token) 
+            (Identifier "two") 
+            (Type 
+              (SimpleType 
+                (TypeIdentifier "uiint64"))))))) 
+    (Identifier "main") 
+    (ParameterList)))

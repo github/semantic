@@ -1,2 +1,2 @@
-(Statements
-  (Empty))
+(Program 
+  (EmptyStatement ";"))

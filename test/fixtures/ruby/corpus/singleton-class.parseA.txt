@@ -1,11 +1,31 @@
-(Statements
-  (Class
-    (This)
-    (Statements))
-  (Class
-    (ScopeResolution
-      (Identifier)
-      (Identifier))
-    (Send
-      (Identifier)
-      (SymbolElement))))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (SingletonClass 
+          (Arg 
+            (Primary 
+              (Lhs 
+                (Variable 
+                  (Self "self"))))))))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (SingletonClass 
+          (Arg 
+            (Primary 
+              (Lhs 
+                (ScopeResolution 
+                  (Constant "Bar") 
+                  (Primary 
+                    (Lhs 
+                      (Variable 
+                        (Constant "Foo")))))))) 
+          (Statement 
+            (MethodCall 
+              (ArgumentList 
+                (Arg 
+                  (Primary 
+                    (Symbol)))) 
+              (Variable 
+                (Identifier "att_reader")))))))))

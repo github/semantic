@@ -1,6 +1,16 @@
-(Statements
-  (Let
-    (Identifier)
-    (Identifier)
-    (Statements
-      (Identifier))))
+(Module 
+  (CompoundStatement 
+    (WithStatement 
+      (Block 
+        (SimpleStatement 
+          (ExpressionStatement 
+            (Expression 
+              (PrimaryExpression 
+                (Identifier "c")))))) 
+      (WithItem 
+        (Expression 
+          (PrimaryExpression 
+            (Identifier "a"))) 
+        (Expression 
+          (PrimaryExpression 
+            (Identifier "b")))))))

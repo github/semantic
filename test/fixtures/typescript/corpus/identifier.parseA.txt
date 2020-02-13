@@ -1,2 +1,5 @@
-(Statements
-  (Identifier))
+(Program 
+  (Statement 
+    (ExpressionStatement 
+      (Expression 
+        (Identifier "theVar")))))

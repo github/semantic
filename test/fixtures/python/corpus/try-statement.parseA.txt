@@ -1,41 +1,102 @@
-(Statements
-  (Try
-    (Statements
-      (Identifier)
-      (Identifier))
-    (Catch
-      (Statements
-        (Identifier)
-        (Statements
-          (Identifier)
-          (Identifier)))
-      (Statements))
-    (Catch
-      (Let
-        (Identifier)
-        (Identifier)
-        (Empty))
-      (Statements
-        (Identifier)
-        (Identifier)))
-    (Catch
-      (Statements
-        (Identifier)
-        (Identifier)
-        (Statements
-          (Identifier)
-          (Identifier)))
-      (Statements))
-    (Catch
-      (Statements
-        (Identifier)
-        (Identifier))
-      (Statements)))
-  (Try
-    (Statements
-      (Identifier)
-      (Identifier))
-    (Finally
-      (Statements
-        (Identifier)
-        (Identifier)))))
+(Module 
+  (CompoundStatement 
+    (TryStatement 
+      (Block 
+        (SimpleStatement 
+          (ExpressionStatement 
+            (Expression 
+              (PrimaryExpression 
+                (Identifier "a"))))) 
+        (SimpleStatement 
+          (ExpressionStatement 
+            (Expression 
+              (PrimaryExpression 
+                (Identifier "b")))))) 
+      (ExceptClause 
+        (Expression 
+          (PrimaryExpression 
+            (Identifier "b"))) 
+        (Block 
+          (SimpleStatement 
+            (ExpressionStatement 
+              (Expression 
+                (PrimaryExpression 
+                  (Identifier "c"))))) 
+          (SimpleStatement 
+            (ExpressionStatement 
+              (Expression 
+                (PrimaryExpression 
+                  (Identifier "d"))))))) 
+      (ExceptClause 
+        (Expression 
+          (PrimaryExpression 
+            (Identifier "d"))) 
+        (Expression 
+          (PrimaryExpression 
+            (Identifier "e"))) 
+        (Block 
+          (SimpleStatement 
+            (ExpressionStatement 
+              (Expression 
+                (PrimaryExpression 
+                  (Identifier "f"))))) 
+          (SimpleStatement 
+            (ExpressionStatement 
+              (Expression 
+                (PrimaryExpression 
+                  (Identifier "g"))))))) 
+      (ExceptClause 
+        (Expression 
+          (PrimaryExpression 
+            (Identifier "g"))) 
+        (Expression 
+          (PrimaryExpression 
+            (Identifier "h"))) 
+        (Block 
+          (SimpleStatement 
+            (ExpressionStatement 
+              (Expression 
+                (PrimaryExpression 
+                  (Identifier "i"))))) 
+          (SimpleStatement 
+            (ExpressionStatement 
+              (Expression 
+                (PrimaryExpression 
+                  (Identifier "j"))))))) 
+      (ExceptClause 
+        (Block 
+          (SimpleStatement 
+            (ExpressionStatement 
+              (Expression 
+                (PrimaryExpression 
+                  (Identifier "j"))))) 
+          (SimpleStatement 
+            (ExpressionStatement 
+              (Expression 
+                (PrimaryExpression 
+                  (Identifier "k"))))))))) 
+  (CompoundStatement 
+    (TryStatement 
+      (Block 
+        (SimpleStatement 
+          (ExpressionStatement 
+            (Expression 
+              (PrimaryExpression 
+                (Identifier "a"))))) 
+        (SimpleStatement 
+          (ExpressionStatement 
+            (Expression 
+              (PrimaryExpression 
+                (Identifier "b")))))) 
+      (FinallyClause 
+        (Block 
+          (SimpleStatement 
+            (ExpressionStatement 
+              (Expression 
+                (PrimaryExpression 
+                  (Identifier "a"))))) 
+          (SimpleStatement 
+            (ExpressionStatement 
+              (Expression 
+                (PrimaryExpression 
+                  (Identifier "b"))))))))))

@@ -1,8 +1,9 @@
-(Statements
-  (VariableDeclaration
-    (Assignment
-      (Annotation
-        (TypeQuery
-          (Identifier)))
-      (Identifier)
-      (Empty))))
+(Program 
+  (Statement 
+    (Declaration 
+      (LexicalDeclaration 
+        (VariableDeclarator 
+          (Identifier "x") 
+          (TypeAnnotation 
+            (TypeQuery 
+              (Identifier "A"))))))))

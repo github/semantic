@@ -1,2 +1,5 @@
-(Statements
-  (Regex))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Regex)))))

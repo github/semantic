@@ -1,10 +1,20 @@
-(Statements
-  (Call
-    (Identifier)
-    (Subscript
-      (Identifier)
-      (Integer))
-    (Subscript
-      (Identifier)
-      (Integer))
-    (Empty)))
+(Module 
+  (SimpleStatement 
+    (DeleteStatement 
+      (ExpressionList 
+        (Expression 
+          (PrimaryExpression 
+            (Subscript 
+              (Expression 
+                (PrimaryExpression 
+                  (Integer "1"))) 
+              (PrimaryExpression 
+                (Identifier "b"))))) 
+        (Expression 
+          (PrimaryExpression 
+            (Subscript 
+              (Expression 
+                (PrimaryExpression 
+                  (Integer "2"))) 
+              (PrimaryExpression 
+                (Identifier "a")))))))))

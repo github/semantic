@@ -1,17 +1,43 @@
-(Statements
-  (Comprehension
-    (KeyValue
-      (Identifier)
-      (Identifier))
-    (Statements
-      (Identifier)
-      (Identifier)))
-  (Comprehension
-    (KeyValue
-      (Identifier)
-      (Identifier))
-    (Statements
-      (Statements
-        (Identifier)
-        (Identifier))
-      (Identifier))))
+(Module 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (DictionaryComprehension 
+            (Pair 
+              (Expression 
+                (PrimaryExpression 
+                  (Identifier "d"))) 
+              (Expression 
+                (PrimaryExpression 
+                  (Identifier "c")))) 
+            (ForInClause 
+              (Variables 
+                (PrimaryExpression 
+                  (Identifier "b"))) 
+              (Expression 
+                (PrimaryExpression 
+                  (Identifier "a"))))))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (DictionaryComprehension 
+            (Pair 
+              (Expression 
+                (PrimaryExpression 
+                  (Identifier "g"))) 
+              (Expression 
+                (PrimaryExpression 
+                  (Identifier "d")))) 
+            (ForInClause 
+              (Variables 
+                (PrimaryExpression 
+                  (Identifier "e"))) 
+              (Expression 
+                (PrimaryExpression 
+                  (Identifier "f")))) 
+            (IfClause 
+              (Expression 
+                (PrimaryExpression 
+                  (Identifier "d"))))))))))

@@ -1,37 +1,81 @@
-(Statements
-  (Function
-    (Identifier)
-    (Statements
-      (Identifier)))
-  (Function
-    (Identifier)
-    (RequiredParameter
-      (Identifier))
-    (Statements
-      (Identifier)))
-  (Function
-    (Identifier)
-    (RequiredParameter
-      (Identifier))
-    (Statements
-      (Identifier))
-    (Statements
-      (Identifier)))
-  (Function
-    (Identifier)
-    (Assignment
-      (Identifier)
-      (Identifier))
-    (Statements
-      (Identifier)))
-  (Function
-    (Identifier)
-    (Annotation
-      (Assignment
-        (Identifier)
-        (TextElement))
-      (Identifier))
-    (Statements
-      (Identifier))
-    (Statements
-      (Identifier))))
+(Module 
+  (CompoundStatement 
+    (FunctionDefinition 
+      (Block 
+        (SimpleStatement 
+          (ExpressionStatement 
+            (Expression 
+              (PrimaryExpression 
+                (Identifier "b")))))) 
+      (Identifier "a") 
+      (Parameters))) 
+  (CompoundStatement 
+    (FunctionDefinition 
+      (Block 
+        (SimpleStatement 
+          (ExpressionStatement 
+            (Expression 
+              (PrimaryExpression 
+                (Identifier "e")))))) 
+      (Identifier "c") 
+      (Parameters 
+        (Parameter 
+          (Identifier "d"))))) 
+  (CompoundStatement 
+    (FunctionDefinition 
+      (Block 
+        (SimpleStatement 
+          (ExpressionStatement 
+            (Expression 
+              (PrimaryExpression 
+                (Identifier "i")))))) 
+      (Identifier "g") 
+      (Parameters 
+        (Parameter 
+          (Identifier "g")) 
+        (Parameter 
+          (ListSplat 
+            (Expression 
+              (PrimaryExpression 
+                (Identifier "h")))))))) 
+  (CompoundStatement 
+    (FunctionDefinition 
+      (Block 
+        (SimpleStatement 
+          (ExpressionStatement 
+            (Expression 
+              (PrimaryExpression 
+                (Identifier "i")))))) 
+      (Identifier "h") 
+      (Parameters 
+        (Parameter 
+          (DefaultParameter 
+            (Expression 
+              (PrimaryExpression 
+                (Identifier "j"))) 
+            (Identifier "i")))))) 
+  (CompoundStatement 
+    (FunctionDefinition 
+      (Block 
+        (SimpleStatement 
+          (ExpressionStatement 
+            (Expression 
+              (PrimaryExpression 
+                (Identifier "j")))))) 
+      (Identifier "i") 
+      (Parameters 
+        (Parameter 
+          (TypedDefaultParameter 
+            (Expression 
+              (PrimaryExpression 
+                (String))) 
+            (Identifier "j") 
+            (Type 
+              (Expression 
+                (PrimaryExpression 
+                  (Identifier "str")))))) 
+        (Parameter 
+          (DictionarySplat 
+            (Expression 
+              (PrimaryExpression 
+                (Identifier "c")))))))))

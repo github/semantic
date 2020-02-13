@@ -1,5 +1,7 @@
-(Statements
-  (Method
-    (Empty)
-    (Identifier)
-    (Statements)))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Method 
+          (MethodName 
+            (Identifier "foo")))))))

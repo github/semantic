@@ -1,4 +1,8 @@
-(Statements
-  (Cast
-    (Identifier)
-    (PredefinedType)))
+(Program 
+  (Statement 
+    (ExpressionStatement 
+      (Expression 
+        (AsExpression 
+          (Expression 
+            (Identifier "foo")) 
+          (PredefinedType "any"))))))
