@@ -89,7 +89,7 @@ expectedReference :: ScopeGraphEff sig m => m Result
 expectedReference = do
   declare "x" (Props.Declaration ScopeGraph.Assignment ScopeGraph.Default Nothing (Span (Pos 0 0) (Pos 0 5)))
   let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 1 0) (Pos 1 1))
-  newReference "x" refProperties
+  newReference "x" refProperties (ScopeGraph.DPath (ScopeGraph.Declaration "x") (ScopeGraph.Position 0))
   pure Complete
 
 expectedQualifiedImport :: ScopeGraphEff sig m => m Result
@@ -97,11 +97,11 @@ expectedQualifiedImport = do
   newEdge ScopeGraph.Import (NonEmpty.fromList ["cheese", "ints"])
 
   let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 0 7) (Pos 0 13))
-  newReference (Name.name "cheese") refProperties
+  newReference (Name.name "cheese") refProperties ScopeGraph.Hole
 
   withScope "cheese" $ do
     let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 0 14) (Pos 0 18))
-    newReference (Name.name "ints") refProperties
+    newReference (Name.name "ints") refProperties ScopeGraph.Hole -- TODO not sure if this Path is right.
   pure Complete
 
 expectedWildcardImport :: ScopeGraphEff sig m => m Result
@@ -121,7 +121,7 @@ expectedLexicalScope :: ScopeGraphEff sig m => m Result
 expectedLexicalScope = do
   _ <- declareFunction (Just $ Name.name "foo") (Props.Function ScopeGraph.Function (Span (Pos 0 0) (Pos 1 24)))
   let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 3 0) (Pos 3 3))
-  newReference "foo" refProperties
+  newReference "foo" refProperties (ScopeGraph.DPath (ScopeGraph.Declaration "foo") (ScopeGraph.Position 0))
   pure Complete
 
 
@@ -139,10 +139,10 @@ expectedFunctionArg = do
   withScope associatedScope $ do
     declare "x" (Props.Declaration ScopeGraph.Parameter ScopeGraph.Default Nothing (Span (Pos 0 8) (Pos 0 9)))
     let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 1 11) (Pos 1 12))
-    newReference "x" refProperties
+    newReference "x" refProperties (ScopeGraph.DPath (ScopeGraph.Declaration "x") (ScopeGraph.Position 0))
     pure ()
   let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 3 0) (Pos 3 3))
-  newReference "foo" refProperties
+  newReference "foo" refProperties (ScopeGraph.DPath (ScopeGraph.Declaration "foo") (ScopeGraph.Position 0))
   pure Complete
 
 
@@ -175,18 +175,18 @@ expectedImportFromSymbols = do
   newEdge ScopeGraph.Import (NonEmpty.fromList ["cheese", "ints"])
 
   let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 0 5) (Pos 0 11))
-  newReference (Name.name "cheese") refProperties
+  newReference (Name.name "cheese") refProperties ScopeGraph.Hole
 
   withScope "cheese" $ do
     let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 0 12) (Pos 0 16))
-    newReference (Name.name "ints") refProperties
+    newReference (Name.name "ints") refProperties ScopeGraph.Hole
 
 
   let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 0 24) (Pos 0 27))
-  newReference (Name.name "two") refProperties
+  newReference (Name.name "two") refProperties (ScopeGraph.EPath ScopeGraph.Import "ints" (ScopeGraph.EPath ScopeGraph.Import "cheese" ScopeGraph.Hole))
 
   let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 2 0) (Pos 2 3))
-  newReference "two" refProperties
+  newReference "two" refProperties (ScopeGraph.DPath (ScopeGraph.Declaration "two") (ScopeGraph.Position 0))
 
   pure Complete
 
@@ -203,20 +203,20 @@ expectedImportFromSymbolAliases = do
   newEdge ScopeGraph.Import (NonEmpty.fromList ["cheese", "ints"])
 
   let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 0 5) (Pos 0 11))
-  newReference (Name.name "cheese") refProperties
+  newReference (Name.name "cheese") refProperties ScopeGraph.Hole
 
   withScope "cheese" $ do
     let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 0 12) (Pos 0 16))
-    newReference (Name.name "ints") refProperties
+    newReference (Name.name "ints") refProperties ScopeGraph.Hole
 
   let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 0 24) (Pos 0 27))
-  newReference (Name.name "two") refProperties
+  newReference (Name.name "two") refProperties (ScopeGraph.EPath ScopeGraph.Import "ints" (ScopeGraph.EPath ScopeGraph.Import "cheese" ScopeGraph.Hole))
 
   let declProperties = Props.Declaration ScopeGraph.UnqualifiedImport ScopeGraph.Default Nothing (Span (Pos 0 31) (Pos 0 36))
   declare (Name.name "three") declProperties
 
   let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 2 0) (Pos 2 5))
-  newReference "three" refProperties
+  newReference "three" refProperties (ScopeGraph.DPath (ScopeGraph.Declaration "two") (ScopeGraph.Position 0))
 
   pure Complete
 

@@ -220,7 +220,7 @@ instance ToScopeGraph Py.GeneratorExpression where scopeGraph = todo
 instance ToScopeGraph Py.Identifier where
   scopeGraph (Py.Identifier ann name) = do
     let refProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann^.span_ :: Span)
-    newReference (Name.name name) refProps
+    newReference (Name.name name) refProps ScopeGraph.Hole
     complete
 
 instance ToScopeGraph Py.IfStatement where
@@ -238,16 +238,24 @@ instance ToScopeGraph Py.ImportStatement where
     let toName (Py.Identifier _ name) = Name.name name
     newEdge ScopeGraph.Import (toName <$> names)
 
+    -- cheese
     let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann^.span_ :: Span)
-    newReference (Name.name name) referenceProps
+    newReference (Name.name name) referenceProps ScopeGraph.Hole
 
+    -- import cheese.ints.strings.bools
+    -- [(cheese, ints), (ints, strings), (strings, bools)]
+    -- (Reference ints) ([ReferenceInfo], EPath Import "cheese" Hole)
+    -- (Reference strings) ([ReferenceInfo], (EPath Import "cheese" (EPath Import "ints" Hole))
+    -- [(Py.Identifier ann name, Py.Identifier ann name2), ...]
     let pairs = zip (toList names) (tail $ toList names)
-    for_ pairs $ \pair -> do
-      case pair of
-        (scopeIdentifier, referenceIdentifier@(Py.Identifier ann2 _)) -> do
-          withScope (toName scopeIdentifier) $ do
-            let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann2^.span_ :: Span)
-            newReference (toName referenceIdentifier) referenceProps
+
+    foldrM (\(scopeIdentifier, Py.Identifier ann2 reference) (currentPath, lastName) ->
+      withScope (toName scopeIdentifier) $ do
+        let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann2^.span_ :: Span)
+            newPath = ScopeGraph.EPath ScopeGraph.Import lastName currentPath
+            referenceName = Name.name reference
+        newReference referenceName referenceProps newPath
+        pure (newPath, referenceName)) (ScopeGraph.Hole, Name.name name)  pairs
 
     complete
   scopeGraph term = todo (show term)
@@ -261,21 +269,24 @@ instance ToScopeGraph Py.ImportFromStatement where
     newEdge ScopeGraph.Import (toName <$> names)
 
     let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann^.span_ :: Span)
-    newReference (Name.name scopeName) referenceProps
+    newReference (Name.name scopeName) referenceProps ScopeGraph.Hole
 
     let pairs = zip (toList names) (tail $ toList names)
-    for_ pairs $ \pair -> do
-      case pair of
-        (scopeIdentifier, referenceIdentifier@(Py.Identifier ann2 _)) -> do
-          withScope (toName scopeIdentifier) $ do
-            let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann2^.span_ :: Span)
-            newReference (toName referenceIdentifier) referenceProps
+    (currentPath, lastName) <- foldrM (\(scopeIdentifier, Py.Identifier ann2 reference) (currentPath, lastName) ->
+      withScope (toName scopeIdentifier) $ do
+        let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann2^.span_ :: Span)
+            newPath = ScopeGraph.EPath ScopeGraph.Import lastName currentPath
+            referenceName = Name.name reference
+        newReference referenceName referenceProps newPath
+        pure (newPath, referenceName)) (ScopeGraph.Hole, Name.name scopeName)  pairs
+
+    let newPath = ScopeGraph.EPath ScopeGraph.Import lastName currentPath
 
     completions <- for imports $ \identifier -> do
       case identifier of
         (R1 (Py.DottedName _ (Py.Identifier ann name :| []))) -> do
           let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann^.span_ :: Span)
-          complete <* newReference (Name.name name) referenceProps
+          complete <* newReference (Name.name name) referenceProps newPath
         term@(L1 (Py.AliasedImport _ (Py.Identifier ann name) (Py.DottedName _ (Py.Identifier ann2 ref :| _)))) -> do
           let declProps = Props.Declaration ScopeGraph.UnqualifiedImport ScopeGraph.Default Nothing (ann^.span_ :: Span)
           declare (Name.name name) declProps
@@ -283,7 +294,7 @@ instance ToScopeGraph Py.ImportFromStatement where
 
           scopeGraph <- get @(ScopeGraph.ScopeGraph Name.Name)
           let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann2^.span_ :: Span)
-          newReference (Name.name ref) referenceProps
+          newReference (Name.name ref) referenceProps newPath
 
           complete
 

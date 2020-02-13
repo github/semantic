@@ -117,8 +117,8 @@ lookupScope :: ScopeGraphEff sig m => Name -> m (ScopeGraph.Scope Name)
 lookupScope address = maybeM undefined . ScopeGraph.lookupScope address =<< get
 
 -- | Inserts a reference.
-newReference :: ScopeGraphEff sig m => Name -> Props.Reference -> m ()
-newReference name props = do
+newReference :: ScopeGraphEff sig m => Name -> Props.Reference -> ScopeGraph.Path Name -> m ()
+newReference name props partialPath = do
   currentAddress <- currentScope
   scope <- lookupScope currentAddress
 
@@ -139,6 +139,7 @@ newReference name props = do
               (ScopeGraph.newReference
                 (Reference.Reference name)
                 refProps
+                partialPath
                 scope))
 
 declareFunction :: forall sig m . ScopeGraphEff sig m => Maybe Name -> Props.Function -> m (Name, Name)
