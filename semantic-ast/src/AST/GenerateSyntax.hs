@@ -66,13 +66,13 @@ getAllSymbols language = do
 syntaxDatatype :: Ptr TS.Language -> [(String, Named)] -> Datatype -> Q [Dec]
 syntaxDatatype language allSymbols datatype = skipDefined $ do
   typeParameterName <- newName "a"
+  traversalInstances <- makeTraversalInstances (conT name)
   case datatype of
     SumType (DatatypeName _) _ subtypes -> do
       types' <- fieldTypesToNestedSum subtypes
       let fieldName = mkName ("get" <> nameStr)
       con <- recC name [TH.varBangType fieldName (TH.bangType strictness (pure types' `appT` varT typeParameterName))]
       hasFieldInstance <- makeHasFieldInstance (conT name) (varT typeParameterName) (varE fieldName)
-      traversalInstances <- makeTraversalInstances (conT name)
       pure
         (  NewtypeD [] name [PlainTV typeParameterName] Nothing con [deriveGN, deriveStockClause, deriveAnyClassClause]
         :  hasFieldInstance
@@ -80,7 +80,6 @@ syntaxDatatype language allSymbols datatype = skipDefined $ do
     ProductType (DatatypeName datatypeName) named children fields -> do
       con <- ctorForProductType datatypeName typeParameterName children fields
       symbolMatchingInstance <- symbolMatchingInstance allSymbols name named datatypeName
-      traversalInstances <- makeTraversalInstances (conT name)
       pure
         (  generatedDatatype name [con] typeParameterName
         :  symbolMatchingInstance
@@ -92,7 +91,6 @@ syntaxDatatype language allSymbols datatype = skipDefined $ do
     LeafType (DatatypeName datatypeName) Named -> do
       con <- ctorForLeafType (DatatypeName datatypeName) typeParameterName
       symbolMatchingInstance <- symbolMatchingInstance allSymbols name Named datatypeName
-      traversalInstances <- makeTraversalInstances (conT name)
       pure
         (  generatedDatatype name [con] typeParameterName
         :  symbolMatchingInstance
