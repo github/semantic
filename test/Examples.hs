@@ -17,6 +17,7 @@ import           Control.Lens
 import           Control.Monad
 import           Data.Blob
 import           Data.Foldable
+import           Data.Int
 import           Data.Language (LanguageMode (..), PerLanguageModes (..), aLaCarteLanguageModes, preciseLanguageModes)
 import           Data.List
 import qualified Data.Text as Text
