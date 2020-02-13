@@ -47,7 +47,7 @@ astDeclarationsForLanguage language filePath = do
     debugSymbolNames :: [String]
     debugSymbolNames = $(listE (map (litE . stringL . debugPrefix) allSymbols))
     |]
-  (debugSymbolNames <>) . concat @[] <$> traverse (syntaxDatatype language allSymbols) input
+  mappend debugSymbolNames . concat @[] <$> traverse (syntaxDatatype language allSymbols) input
 
 -- Build a list of all symbols
 getAllSymbols :: Ptr TS.Language -> IO [(String, Named)]
