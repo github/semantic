@@ -66,7 +66,6 @@ import qualified Language.TypeScript.Assignment as TypeScriptALaCarte
 import           Prelude hiding (fail)
 import           Language.Go.Grammar
 import qualified TreeSitter.Language as TS (Language, Symbol)
-import           TreeSitter.PHP
 import           Language.Python.Grammar
 import           Language.Ruby.Grammar (tree_sitter_ruby)
 import           TreeSitter.TSX
