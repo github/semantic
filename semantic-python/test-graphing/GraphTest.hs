@@ -17,6 +17,7 @@ import qualified Control.Effect.ScopeGraph.Properties.Reference as Props
 import           Control.Monad
 import qualified Data.ByteString as ByteString
 import qualified Data.List.NonEmpty as NonEmpty
+import           Data.Module (ModuleInfo (..))
 import qualified Data.ScopeGraph as ScopeGraph
 import qualified Language.Python ()
 import qualified Language.Python as Py (Term)
@@ -54,7 +55,9 @@ The graph should be
 
 
 runScopeGraph :: ToScopeGraph t => Path.AbsRelFile -> Source.Source -> t Loc -> (ScopeGraph.ScopeGraph Name, Result)
-runScopeGraph p _src item = run . runSketch (Just p) $ scopeGraph item
+runScopeGraph p _src item = run . runSketch info $ scopeGraph item
+  where
+    info = ModuleInfo (Path.toString p) "Python" mempty
 
 sampleGraphThing :: ScopeGraphEff sig m => m Result
 sampleGraphThing = do
@@ -74,14 +77,14 @@ assertSimpleAssignment :: HUnit.Assertion
 assertSimpleAssignment = do
   let path = "semantic-python/test/fixtures/1-04-toplevel-assignment.py"
   (result, Complete) <- graphFile path
-  (expecto, Complete) <- runM $ runSketch Nothing sampleGraphThing
+  (expecto, Complete) <- runM $ runSketch (ModuleInfo path "Python" mempty) sampleGraphThing
   HUnit.assertEqual "Should work for simple case" expecto result
 
 assertSimpleReference :: HUnit.Assertion
 assertSimpleReference = do
   let path = "semantic-python/test/fixtures/5-01-simple-reference.py"
   (result, Complete) <- graphFile path
-  (expecto, Complete) <- runM $ runSketch Nothing expectedReference
+  (expecto, Complete) <- runM $ runSketch (ModuleInfo path "Python" mempty) expectedReference
 
   HUnit.assertEqual "Should work for simple case" expecto result
 
@@ -112,8 +115,9 @@ expectedImportHole = do
 assertLexicalScope :: HUnit.Assertion
 assertLexicalScope = do
   let path = "semantic-python/test/fixtures/5-02-simple-function.py"
+  let info = ModuleInfo path "Python" mempty
   (graph, _) <- graphFile path
-  case run (runSketch Nothing expectedLexicalScope) of
+  case run (runSketch info expectedLexicalScope) of
     (expecto, Complete) -> HUnit.assertEqual "Should work for simple case" expecto graph
     (_, Todo msg)       -> HUnit.assertFailure ("Failed to complete:" <> show msg)
 
@@ -129,7 +133,8 @@ assertFunctionArg :: HUnit.Assertion
 assertFunctionArg = do
   let path = "semantic-python/test/fixtures/5-03-function-argument.py"
   (graph, _) <- graphFile path
-  case run (runSketch Nothing expectedFunctionArg) of
+  let info = ModuleInfo path "Python" mempty
+  case run (runSketch info expectedFunctionArg) of
     (expecto, Complete) -> HUnit.assertEqual "Should work for simple case" expecto graph
     (_, Todo msg)       -> HUnit.assertFailure ("Failed to complete:" <>  show msg)
 
@@ -150,7 +155,8 @@ assertImportHole :: HUnit.Assertion
 assertImportHole = do
   let path = "semantic-python/test/fixtures/cheese/6-01-imports.py"
   (graph, _) <- graphFile path
-  case run (runSketch Nothing expectedImportHole) of
+  let info = ModuleInfo path "Python" mempty
+  case run (runSketch info expectedImportHole) of
     (expecto, Complete) -> HUnit.assertEqual "Should work for simple case" expecto graph
     (_, Todo msg)       -> HUnit.assertFailure ("Failed to complete:" <>  show msg)
 
@@ -158,7 +164,8 @@ assertQualifiedImport :: HUnit.Assertion
 assertQualifiedImport = do
   let path = "semantic-python/test/fixtures/cheese/6-01-qualified-imports.py"
   (graph, _) <- graphFile path
-  case run (runSketch Nothing expectedQualifiedImport) of
+  let info = ModuleInfo path "Python" mempty
+  case run (runSketch info expectedQualifiedImport) of
     (expecto, Complete) -> HUnit.assertEqual "Should work for simple case" expecto graph
     (_, Todo msg)       -> HUnit.assertFailure ("Failed to complete:" <>  show msg)
 

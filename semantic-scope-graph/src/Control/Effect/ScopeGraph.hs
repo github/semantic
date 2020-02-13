@@ -64,6 +64,7 @@ type ScopeGraphEff sig m
   = ( Has (State (ScopeGraph Name)) sig m
     , Has (State Name) sig m
     , Has (Reader Name) sig m
+    , Has (Reader Module.ModuleInfo) sig m
     , Has Fresh sig m
     )
 
@@ -84,11 +85,12 @@ declare :: ScopeGraphEff sig m => Name -> Props.Declaration -> m ()
 declare n props = do
   current <- currentScope
   old <- graphInProgress
+  info <- ask
   let Props.Declaration kind relation associatedScope span = props
   let (new, _pos) =
          ScopeGraph.declare
          (ScopeGraph.Declaration n)
-         (lowerBound @Module.ModuleInfo)
+         info
          relation
          ScopeGraph.Public
          span
@@ -103,10 +105,11 @@ reference :: forall sig m . ScopeGraphEff sig m => Text -> Text -> Props.Referen
 reference n decl props = do
   current <- currentScope
   old <- graphInProgress
+  info <- ask
   let new =
          ScopeGraph.reference
          (ScopeGraph.Reference (Name.name n))
-         (lowerBound @Module.ModuleInfo)
+         info
          (Props.Reference.span props)
          (Props.Reference.kind props)
          (ScopeGraph.Declaration (Name.name decl))
