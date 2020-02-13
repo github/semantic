@@ -8,19 +8,17 @@ module Language.Python
 
 import           Analysis.Name (Name)
 import qualified AST.Unmarshal as TS
-import qualified AST.Unmarshal as TS
 import           Control.Carrier.Sketch.ScopeGraph
 import qualified Data.ByteString as ByteString
 import           Data.Proxy
-import           Data.ScopeGraph (ScopeGraph)
-import qualified System.Path as Path
-import           Source.Loc (Loc)
 import qualified Language.Python.AST as Py
 import           Language.Python.Grammar (tree_sitter_python)
 import           Language.Python.ScopeGraph
 import qualified Language.Python.Tags as PyTags
 import           Scope.Graph.Convert
+import           Source.Loc (Loc)
 import           System.Exit (die)
+import qualified System.Path as Path
 import qualified Tags.Tagging.Precise as Tags
 
 newtype Term a = Term { getTerm :: Py.Module a }

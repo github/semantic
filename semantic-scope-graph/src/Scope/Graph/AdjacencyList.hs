@@ -49,6 +49,9 @@ ddataOfScope scope = fmap declarations . Map.lookup scope . unScopeGraph
 linksOfScope :: Ord scope => scope -> ScopeGraph scope -> Maybe (Map EdgeLabel [scope])
 linksOfScope scope = fmap edges . Map.lookup scope . unScopeGraph
 
+foldScopes :: Monoid m => (addr -> Scope addr -> m) -> ScopeGraph addr -> m
+foldScopes f = Map.foldMapWithKey f . unScopeGraph
+
 declarationsByAccessControl :: Ord scope => scope -> AccessControl -> ScopeGraph scope -> [ Info scope ]
 declarationsByAccessControl scope accessControl g = fromMaybe mempty $ do
   dataSeq <- ddataOfScope scope g

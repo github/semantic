@@ -2,12 +2,13 @@
 {-# LANGUAGE OverloadedLists #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE PatternSynonyms #-}
+{-# LANGUAGE TypeApplications #-}
 
 module Main (main) where
 
 import           Algebra.Graph.Export.Dot (Attribute (..))
 import qualified Algebra.Graph.Export.Dot as Dot
-import           Analysis.Name (Name, formatName)
+import           Analysis.Name (Name, formatName, nameI)
 import           Control.Lens.Getter
 import           Data.Coerce
 import           Data.Foldable
@@ -21,6 +22,7 @@ import           Language.Python (graphPythonFile)
 import qualified Scope.Graph.Algebraic as Algebraic
 import           Scope.Graph.Convert
 import           Scope.Info
+import           Scope.Types
 import           Source.Span
 import           System.Environment
 import           System.IO
@@ -41,11 +43,17 @@ fashion fp g = Dot.Style
   , Dot.defaultEdgeAttributes = []
   , Dot.vertexName = \case
       Algebraic.Node n _ -> formatName n
-      Algebraic.Informational i    -> formatName (coerce (infoDeclaration i))
+      Algebraic.Informational i -> formatName (coerce (infoDeclaration i))
+      Algebraic.Declares i   -> formatName (coerce (infoDeclaration i)) <> "_decl"
   , Dot.vertexAttributes = \case
       Algebraic.Node n s ->
         [ "label" := formatName n
         , "shape" := "circle"
+        ]
+      Algebraic.Declares n ->
+        [ "label" := formatName (coerce (infoDeclaration n))
+        , "shape" := "square"
+        , "color" := "gray"
         ]
       Algebraic.Informational i ->
         let
@@ -57,11 +65,20 @@ fashion fp g = Dot.Style
           ,"shape" := "record"]
 
   , Dot.edgeAttributes = \a b -> case Algebraic.edgeLabel a b g of
-      Algebraic.Strong   -> []
-      Algebraic.Parent s -> ["label" := (T.intercalate "," . fmap (T.pack . show) . sort . toList $ s)]
+      Algebraic.Declaring     -> ["color" := "red"]
+      Algebraic.Referencing s -> ["color" := "blue", "label" := (T.intercalate "," . fmap (T.pack . show) . sort . toList $ s)]
   }
   where
 
+soNowWeDump :: Data.ScopeGraph.ScopeGraph Name -> IO ()
+soNowWeDump = Data.ScopeGraph.foldGraph go (nameI 0)
+  where
+    go :: Name -> (Data.ScopeGraph.EdgeLabel -> IO ()) -> IO ()
+    go n fn = do
+      putStrLn "Entering"
+      pPrint n
+      let go e = pPrint e *> fn e
+      traverse_ @[] go [Lexical .. Superclass]
 
 main :: IO ()
 main = do
@@ -72,11 +89,13 @@ main = do
   case res of
     Complete  -> pure ()
     Todo list -> do
-      p "Graph conversion was not successful."
-      p "TODOs remaining:"
+      p @String "Graph conversion was not successful."
+      p @String "TODOs remaining:"
       traverse_ p list
 
-  p graph
-
+  soNowWeDump graph
+  p @String "****"
   let asAlg = Algebraic.fromPrimitive graph
+  p asAlg
+  p @String "****"
   T.putStrLn . Dot.export (fashion file asAlg) $ asAlg
