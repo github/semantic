@@ -67,38 +67,38 @@ syntaxDatatype :: Ptr TS.Language -> [(String, Named)] -> Datatype -> Q [Dec]
 syntaxDatatype language allSymbols datatype = skipDefined $ do
   typeParameterName <- newName "a"
   let traversalInstances = makeTraversalInstances (conT name)
-  let glue a b c = a : b <> c
+      glue a b c = a : b <> c
+      name = mkName nameStr
+      generatedDatatype cons = TH.dataD (TH.cxt []) name [PlainTV typeParameterName] Nothing cons [deriveStockClause, deriveAnyClassClause]
+      deriveStockClause = TH.derivClause (Just StockStrategy) [ TH.conT ''Eq, TH.conT ''Ord, TH.conT ''Show, TH.conT ''Generic, TH.conT ''Generic1]
+      deriveAnyClassClause = TH.derivClause (Just AnyclassStrategy) [TH.conT ''TS.Unmarshal, TH.conT ''Traversable1 `TH.appT` TH.varT (mkName "someConstraint")]
+      deriveGN = TH.derivClause (Just NewtypeStrategy) [TH.conT ''TS.SymbolMatching]
   case datatype of
     SumType (DatatypeName _) _ subtypes ->
       let types' = fieldTypesToNestedSum subtypes
           fieldName = mkName ("get" <> nameStr)
           con = recC name [TH.varBangType fieldName (TH.bangType strictness (types' `appT` varT typeParameterName))]
           hasFieldInstance = makeHasFieldInstance (conT name) (varT typeParameterName) (varE fieldName)
-          newType = TH.newtypeD (TH.cxt []) name [PlainTV typeParameterName] Nothing con [pure deriveGN, pure deriveStockClause, pure deriveAnyClassClause]
+          newType = TH.newtypeD (TH.cxt []) name [PlainTV typeParameterName] Nothing con [deriveGN, deriveStockClause, deriveAnyClassClause]
       in glue <$> newType <*> hasFieldInstance <*> traversalInstances
-    ProductType datatypeName named children fields -> do
-      con <- ctorForProductType datatypeName typeParameterName children fields
-      let symbols = symbolMatchingInstance allSymbols name named datatypeName
-      glue <$> pure (generatedDatatype name [con] typeParameterName) <*> symbols <*> traversalInstances
+    ProductType datatypeName named children fields ->
+      let con = ctorForProductType datatypeName typeParameterName children fields
+          symbols = symbolMatchingInstance allSymbols name named datatypeName
+      in glue <$> generatedDatatype [con] <*> symbols <*> traversalInstances
       -- Anonymous leaf types are defined as synonyms for the `Token` datatype
     LeafType (DatatypeName datatypeName) Anonymous -> do
       tsSymbol <- runIO $ withCStringLen datatypeName (\(s, len) -> TS.ts_language_symbol_for_name language s len False)
       pure [ TySynD name [] (ConT ''Token `AppT` LitT (StrTyLit datatypeName) `AppT` LitT (NumTyLit (fromIntegral tsSymbol))) ]
-    LeafType datatypeName Named -> do
-      con <- ctorForLeafType datatypeName typeParameterName
-      let symbols = symbolMatchingInstance allSymbols name Named datatypeName
-      glue <$> pure (generatedDatatype name [con] typeParameterName) <*> symbols <*> traversalInstances
+    LeafType datatypeName Named ->
+      let con = ctorForLeafType datatypeName typeParameterName
+          symbols = symbolMatchingInstance allSymbols name Named datatypeName
+      in glue <$> generatedDatatype [con] <*> symbols <*> traversalInstances
   where
     -- Skip generating datatypes that have already been defined (overridden) in the module where the splice is running.
     skipDefined m = do
       isLocal <- lookupTypeName nameStr >>= maybe (pure False) isLocalName
       if isLocal then pure [] else m
-    name = mkName nameStr
     nameStr = toNameString (datatypeNameStatus datatype) (getDatatypeName (AST.Deserialize.datatypeName datatype))
-    deriveStockClause = DerivClause (Just StockStrategy) [ ConT ''Eq, ConT ''Ord, ConT ''Show, ConT ''Generic, ConT ''Generic1]
-    deriveAnyClassClause = DerivClause (Just AnyclassStrategy) [ConT ''TS.Unmarshal, ConT ''Traversable1 `AppT` VarT (mkName "someConstraint")]
-    deriveGN = DerivClause (Just NewtypeStrategy) [ConT ''TS.SymbolMatching]
-    generatedDatatype name cons typeParameterName = DataD [] name [PlainTV typeParameterName] Nothing cons [deriveStockClause, deriveAnyClassClause]
 
 
 makeTraversalInstances :: TypeQ -> Q [Dec]
