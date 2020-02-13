@@ -104,8 +104,8 @@ expectedQualifiedImport = do
     newReference (Name.name "ints") refProperties
   pure Complete
 
-expectedImportHole :: ScopeGraphEff sig m => m Result
-expectedImportHole = do
+expectedWildcardImport :: ScopeGraphEff sig m => m Result
+expectedWildcardImport = do
   newEdge ScopeGraph.Import (NonEmpty.fromList ["cheese", "ints"])
   pure Complete
 
@@ -146,11 +146,11 @@ expectedFunctionArg = do
   pure Complete
 
 
-assertImportHole :: HUnit.Assertion
-assertImportHole = do
+assertWildcardImport :: HUnit.Assertion
+assertWildcardImport = do
   let path = "semantic-python/test/fixtures/cheese/6-01-imports.py"
   (graph, _) <- graphFile path
-  case run (runSketch Nothing expectedImportHole) of
+  case run (runSketch Nothing expectedWildcardImport) of
     (expecto, Complete) -> HUnit.assertEqual "Should work for simple case" expecto graph
     (_, Todo msg)       -> HUnit.assertFailure ("Failed to complete:" <>  show msg)
 
@@ -240,7 +240,7 @@ main = do
       , HUnit.testCase "simple function argument" assertFunctionArg
       ],
       Tasty.testGroup "imports" [
-        HUnit.testCase "simple function argument" assertImportHole
+        HUnit.testCase "simple function argument" assertWildcardImport
         , HUnit.testCase "qualified imports" assertQualifiedImport
         , HUnit.testCase "qualified imports with symbols" assertImportFromSymbols
         , HUnit.testCase "qualified imports with symbol aliases" assertImportFromSymbolAliases
