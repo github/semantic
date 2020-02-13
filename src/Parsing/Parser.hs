@@ -55,7 +55,6 @@ import qualified Language.Go.Assignment as GoALaCarte
 import qualified Language.Java as Java
 import qualified Language.JSON as JSON
 import qualified Language.Markdown.Assignment as Markdown
-import qualified Language.PHP.Assignment as PHP
 import qualified Language.Python as PythonPrecise
 import qualified Language.Python.Assignment as PythonALaCarte
 import qualified Language.Ruby as RubyPrecise
