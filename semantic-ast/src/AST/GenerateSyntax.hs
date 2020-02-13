@@ -77,7 +77,7 @@ syntaxDatatype language allSymbols datatype = skipDefined $ do
         (  NewtypeD [] name [PlainTV typeParameterName] Nothing con [deriveGN, deriveStockClause, deriveAnyClassClause]
         :  hasFieldInstance
         <> traversalInstances)
-    ProductType (DatatypeName datatypeName) named children fields -> do
+    ProductType datatypeName named children fields -> do
       con <- ctorForProductType datatypeName typeParameterName children fields
       symbolMatchingInstance <- symbolMatchingInstance allSymbols name named datatypeName
       pure
@@ -88,8 +88,8 @@ syntaxDatatype language allSymbols datatype = skipDefined $ do
     LeafType (DatatypeName datatypeName) Anonymous -> do
       tsSymbol <- runIO $ withCStringLen datatypeName (\(s, len) -> TS.ts_language_symbol_for_name language s len False)
       pure [ TySynD name [] (ConT ''Token `AppT` LitT (StrTyLit datatypeName) `AppT` LitT (NumTyLit (fromIntegral tsSymbol))) ]
-    LeafType (DatatypeName datatypeName) Named -> do
-      con <- ctorForLeafType (DatatypeName datatypeName) typeParameterName
+    LeafType datatypeName Named -> do
+      con <- ctorForLeafType datatypeName typeParameterName
       symbolMatchingInstance <- symbolMatchingInstance allSymbols name Named datatypeName
       pure
         (  generatedDatatype name [con] typeParameterName
@@ -125,8 +125,8 @@ makeHasFieldInstance ty param elim =
       getField = TS.gann . $elim |]
 
 -- | Create TH-generated SymbolMatching instances for sums, products, leaves
-symbolMatchingInstance :: [(String, Named)] -> Name -> Named -> String -> Q [Dec]
-symbolMatchingInstance allSymbols name named str = do
+symbolMatchingInstance :: [(String, Named)] -> Name -> Named -> DatatypeName -> Q [Dec]
+symbolMatchingInstance allSymbols name named (DatatypeName str) = do
   let tsSymbols = elemIndices (str, named) allSymbols
       names = intercalate ", " $ fmap (debugPrefix . (!!) allSymbols) tsSymbols
   [d|instance TS.SymbolMatching $(conT name) where
@@ -144,7 +144,7 @@ debugPrefix (name, Named)     = name
 debugPrefix (name, Anonymous) = "_" <> name
 
 -- | Build Q Constructor for product types (nodes with fields)
-ctorForProductType :: String -> Name -> Maybe Children -> [(String, Field)] -> Q Con
+ctorForProductType :: DatatypeName -> Name -> Maybe Children -> [(String, Field)] -> Q Con
 ctorForProductType constructorName typeParameterName children fields = ctorForTypes constructorName lists where
   lists = annotation : fieldList <> childList
   annotation = ("ann", varT typeParameterName)
@@ -161,14 +161,14 @@ ctorForProductType constructorName typeParameterName children fields = ctorForTy
 
 -- | Build Q Constructor for leaf types (nodes with no fields or subtypes)
 ctorForLeafType :: DatatypeName -> Name -> Q Con
-ctorForLeafType (DatatypeName name) typeParameterName = ctorForTypes name
+ctorForLeafType name typeParameterName = ctorForTypes name
   [ ("ann",  varT typeParameterName) -- ann :: a
   , ("text", conT ''Text)            -- text :: Text
   ]
 
 -- | Build Q Constructor for records
-ctorForTypes :: String -> [(String, Q TH.Type)] -> Q Con
-ctorForTypes constructorName types = recC (toName Named constructorName) recordFields where
+ctorForTypes :: DatatypeName -> [(String, Q TH.Type)] -> Q Con
+ctorForTypes (DatatypeName constructorName) types = recC (toName Named constructorName) recordFields where
   recordFields = map (uncurry toVarBangType) types
   toVarBangType str type' = TH.varBangType (mkName . toHaskellCamelCaseIdentifier $ str) (TH.bangType strictness type')
 
