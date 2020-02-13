@@ -118,7 +118,6 @@ analysisParsers :: Map Language (SomeParser AnalyzeTerm Loc)
 analysisParsers = Map.fromList
   [ goParserALaCarte
   , javascriptParserALaCarte
-  , phpParser
   , pythonParserALaCarte
   , rubyParserALaCarte
   , typescriptParserALaCarte
