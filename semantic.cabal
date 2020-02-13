@@ -67,7 +67,9 @@ common dependencies
                      , recursion-schemes ^>= 5.1
                      , scientific ^>= 0.3.6.2
                      , safe-exceptions ^>= 0.1.7.0
-                     , semantic-source ^>= 0.0.1
+                     , semantic-codegen
+                     , semantic-analysis ^>= 0
+                     , semantic-source ^>= 0.0.2
                      , semilattices ^>= 0.0.0.3
                      , streaming ^>= 0.2.2.0
                      , text ^>= 1.2.3.1
@@ -131,7 +133,6 @@ library
                      , Data.Abstract.Live
                      , Data.Abstract.Module
                      , Data.Abstract.ModuleTable
-                     , Data.Abstract.Name
                      , Data.Abstract.Number
                      , Data.Abstract.Package
                      , Data.Abstract.Path
@@ -150,7 +151,7 @@ library
                      , Data.Error
                      , Data.Flag
                      , Data.Functor.Classes.Generic
-                     , Data.Graph
+                     , Data.Graph.Algebraic
                      , Data.Graph.ControlFlowVertex
                      , Data.Handle
                      , Data.History
@@ -158,7 +159,7 @@ library
                      , Data.JSON.Fields
                      , Data.Language
                      , Data.Map.Monoidal
-                     , Data.Project
+                     , Data.Maybe.Exts
                      , Data.Quieterm
                      , Data.Semigroup.App
                      , Data.Scientific.Exts
@@ -254,7 +255,6 @@ library
                      , Tags.Taggable
                      , Tags.Tagging
                      -- Custom Prelude
-                     , Prologue
   autogen-modules:     Paths_semantic
   other-modules:       Paths_semantic
   build-depends:       base >= 4.13 && < 5
@@ -304,11 +304,13 @@ library
                      , unordered-containers ^>= 0.2.9.0
                      , vector ^>= 0.12.0.2
                      , tree-sitter-go ^>= 0.4.1.1
+                     , tree-sitter-java ^>= 0.6.1
+                     , tree-sitter-json ^>= 0.6
                      , tree-sitter-php ^>= 0.2
                      , tree-sitter-python ^>= 0.8.1
                      , tree-sitter-ruby ^>= 0.4.1
-                     , tree-sitter-typescript ^>= 0.4.1
-                     , tree-sitter-tsx ^>= 0.4.1
+                     , tree-sitter-typescript ^>= 0.4.2
+                     , tree-sitter-tsx ^>= 0.4.2
 
 executable semantic
   import:              haskell, dependencies, executable-flags
@@ -358,6 +360,7 @@ test-suite test
                      , Generators
                      , Properties
   build-depends:       semantic
+                     , semantic-json
                      , tree-sitter-json ^>= 0.6
                      , Glob ^>= 0.10.0
                      , hedgehog ^>= 1

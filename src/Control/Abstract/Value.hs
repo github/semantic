@@ -1,5 +1,13 @@
-{-# LANGUAGE DeriveFunctor, DeriveGeneric, FlexibleContexts, GADTs, GeneralizedNewtypeDeriving, KindSignatures,
-             MultiParamTypeClasses, RankNTypes, ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeOperators #-}
 module Control.Abstract.Value
 ( AbstractValue(..)
 , AbstractIntro(..)
@@ -72,6 +80,7 @@ module Control.Abstract.Value
 , HashC(..)
 ) where
 
+import Analysis.Name
 import Control.Abstract.Evaluator
 import Control.Abstract.Heap
 import Control.Abstract.ScopeGraph (CurrentScope, Declaration, ScopeGraph)
@@ -79,11 +88,12 @@ import Control.Algebra
 import Control.Carrier.Reader
 import Data.Abstract.BaseError
 import Data.Abstract.Module
-import Data.Abstract.Name
 import Data.Abstract.Number (Number, SomeNumber)
+import Data.Bits
 import Data.Scientific (Scientific)
+import Data.Text (Text)
+import GHC.Generics (Generic, Generic1)
 import Prelude hiding (String)
-import Prologue hiding (TypeError, hash)
 import Source.Span
 
 -- | This datum is passed into liftComparison to handle the fact that Ruby and PHP

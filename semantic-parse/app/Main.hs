@@ -1,24 +1,27 @@
 {-# LANGUAGE TypeApplications #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
 
 module Main (main) where
 
-import TreeSitter.Unmarshal
-import qualified TreeSitter.Python.AST as AST
-import qualified TreeSitter.Python as Python
+import AST.Unmarshal
+import qualified Language.Python.AST as AST
+import qualified Language.Python.Grammar as Python
 import Source.Range
 import Source.Span
+import Data.Aeson (toJSON)
 import Data.ByteString.Char8
 import Data.ByteString (readFile)
 import Options.Applicative hiding (style)
 import Text.Pretty.Simple (pPrint, pPrintNoColor)
 import Data.Foldable (traverse_)
 import Control.Monad ((>=>))
+import Marshal.JSON (marshal)
+import Data.ByteString.Lazy.Char8 (putStrLn)
+import Data.Aeson.Encode.Pretty (encodePretty)
 
 data SemanticAST = SemanticAST
-  { format :: Format
-  , noColor  :: Bool
-  , source :: Either [FilePath] String
+  { _format :: Format
+  , _noColor  :: Bool
+  , _source :: Either [FilePath] String
   }
 
 -- Usage: semantic-ast --format ARG [--no-color] (--sourceString STRING | FILEPATHS…)
@@ -51,13 +54,13 @@ generateAST (SemanticAST format noColor source) =
           Left filePaths -> traverse Data.ByteString.readFile filePaths
           Right source   -> pure [Data.ByteString.Char8.pack source]
         go = ast >=> display
-        ast = parseByteString @AST.Module @(Range, Span) Python.tree_sitter_python
+        ast = parseByteString @AST.Module @(Range, Span) Python.tree_sitter_python -- TODO: generalize for all languages
         display = case format of
+          Json -> Data.ByteString.Lazy.Char8.putStrLn . encodePretty . either toJSON (marshal . fmap (const ())) -- TODO: replacing range and span annotations with () for which there is a ToJSON instance for now, deal with this later
           Show -> print
           Pretty | noColor -> pPrintNoColor
                  | otherwise -> pPrint
 
--- need AST in scope for case format and ..
 
 opts :: ParserInfo SemanticAST
 opts = info (parseAST <**> helper)
@@ -68,6 +71,5 @@ opts = info (parseAST <**> helper)
 -- TODO: Define formats for json, sexpression, etc.
 data Format = Show
             | Pretty
+            | Json
   deriving (Read)
-
--- bool field would break Read

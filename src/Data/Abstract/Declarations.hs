@@ -4,7 +4,7 @@ module Data.Abstract.Declarations
   , Declarations1 (..)
   ) where
 
-import Data.Abstract.Name
+import Analysis.Name
 import Data.Sum
 import Data.Term
 

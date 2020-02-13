@@ -49,12 +49,13 @@ library
       base                         >= 4.13 && < 5
     , fused-effects               ^>= 1.0
     , fused-syntax
+    , hashable
     , parsers                     ^>= 0.12.10
     , pathtype                    ^>= 0.8.1
     , prettyprinter                >= 1.2.1 && < 2
     , prettyprinter-ansi-terminal ^>= 1.1.1
     , semantic-analysis           ^>= 0
-    , semantic-source             ^>= 0.0.1
+    , semantic-source             ^>= 0.0.2
     , text                        ^>= 1.2.3.1
     , trifecta                     >= 2 && < 2.2
     , unordered-containers        ^>= 0.2.10
@@ -69,7 +70,7 @@ test-suite test
       base
     , semantic-analysis
     , semantic-core
-    , semantic-source ^>= 0.0.1
+    , semantic-source
     , fused-effects
     , fused-syntax
     , hedgehog ^>= 1

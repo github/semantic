@@ -1,5 +1,11 @@
-{-# LANGUAGE DataKinds, DeriveGeneric, FlexibleContexts, GADTs, LambdaCase, RecordWildCards, ScopedTypeVariables,
-             TypeOperators #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeOperators #-}
 module Parsing.TreeSitter
 ( TSParseException (..)
 , Duration(..)
@@ -7,16 +13,18 @@ module Parsing.TreeSitter
 , parseToPreciseAST
 ) where
 
-import Prologue
-
-import           Control.Carrier.Reader
-import qualified Control.Exception as Exc
-import           Foreign
-import           Foreign.C.Types (CBool (..))
+import Control.Carrier.Reader
+import Control.Exception as Exc
+import Control.Monad
+import Control.Monad.IO.Class
+import Data.Functor.Foldable
+import Foreign
+import GHC.Generics
 
 import           Data.AST (AST, Node (Node))
 import           Data.Blob
 import           Data.Duration
+import           Data.Maybe.Exts
 import           Data.Term
 import           Source.Loc
 import qualified Source.Source as Source
@@ -28,7 +36,7 @@ import qualified TreeSitter.Language as TS
 import qualified TreeSitter.Node as TS
 import qualified TreeSitter.Parser as TS
 import qualified TreeSitter.Tree as TS
-import qualified TreeSitter.Unmarshal as TS
+import qualified AST.Unmarshal as TS
 
 data TSParseException
   = ParserTimedOut
@@ -67,7 +75,7 @@ parseToPreciseAST parseTimeout unmarshalTimeout language blob = runParse parseTi
     withTimeout :: IO a -> IO a
     withTimeout action = System.timeout (toMicroseconds unmarshalTimeout) action >>= maybeM (Exc.throw UnmarshalTimedOut)
 
-instance Exception TSParseException where
+instance Exc.Exception TSParseException where
   displayException = \case
     ParserTimedOut -> "tree-sitter: parser timed out"
     IncompatibleVersions -> "tree-sitter: incompatible versions"
@@ -85,7 +93,6 @@ runParse parseTimeout language Blob{..} action =
   liftIO . Exc.tryJust fromException . TS.withParser language $ \ parser -> do
     let timeoutMicros = fromIntegral $ toMicroseconds parseTimeout
     TS.ts_parser_set_timeout_micros parser timeoutMicros
-    TS.ts_parser_halt_on_error parser (CBool 1)
     compatible <- TS.ts_parser_set_language parser language
     if compatible then
       TS.withParseTree parser (Source.bytes blobSource) $ \ treePtr -> do

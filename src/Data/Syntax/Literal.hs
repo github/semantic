@@ -1,14 +1,25 @@
-{-# LANGUAGE DeriveAnyClass, DeriveGeneric, DeriveTraversable, DuplicateRecordFields, OverloadedStrings, RecordWildCards, ScopedTypeVariables, TypeApplications #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications #-}
 module Data.Syntax.Literal (module Data.Syntax.Literal) where
 
 import Prelude hiding (Float, null)
-import Prologue hiding (Set, hash, null)
 
+import           Control.Monad
 import           Data.Abstract.Evaluatable as Eval
+import           Data.Functor.Classes.Generic
+import           Data.Hashable.Lifted
 import           Data.JSON.Fields
 import           Data.Scientific.Exts
+import           Data.Text (Text)
 import qualified Data.Text as T
 import           Diffing.Algorithm
+import           GHC.Generics (Generic1)
 import           Numeric.Exts
 import           Text.Read (readMaybe)
 

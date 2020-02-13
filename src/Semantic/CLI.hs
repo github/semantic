@@ -1,17 +1,22 @@
-{-# LANGUAGE ApplicativeDo, FlexibleContexts #-}
+{-# LANGUAGE ApplicativeDo #-}
+{-# LANGUAGE FlexibleContexts #-}
 module Semantic.CLI (main) where
 
+import qualified Analysis.File as File
+import           Analysis.Project
 import qualified Control.Carrier.Parse.Measured as Parse
 import           Control.Carrier.Reader
-import           Data.Blob
+import           Control.Exception
+import           Control.Monad.IO.Class
 import           Data.Blob.IO
+import           Data.Either
 import qualified Data.Flag as Flag
+import           Data.Foldable
 import           Data.Handle
 import qualified Data.Language as Language
 import           Data.List (intercalate)
-import           Data.Project
+import           Data.Maybe.Exts
 import           Options.Applicative hiding (style)
-import           Prologue
 import           Semantic.Api hiding (File)
 import           Semantic.Config
 import qualified Semantic.Graph as Graph
@@ -22,12 +27,10 @@ import qualified Semantic.Telemetry.Log as Log
 import           Semantic.Version
 import           Serializing.Format hiding (Options)
 import           System.Exit (die)
-import           System.FilePath
 import qualified System.Path as Path
 import qualified System.Path.PartClass as Path.PartClass
 
 import Control.Concurrent (mkWeakThreadId, myThreadId)
-import Control.Exception (throwTo)
 import Proto.Semantic_JSON ()
 import System.Mem.Weak (deRefWeak)
 import System.Posix.Signals
@@ -150,10 +153,11 @@ graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute a g
       <$> (   Just <$> some (strArgument (metavar "FILES..."))
           <|> flag' Nothing (long "stdin" <> help "Read a list of newline-separated paths to analyze from stdin."))
     makeReadProjectFromPathsTask maybePaths = do
-      paths <- maybeM (liftIO (many getLine)) maybePaths
-      blobs <- traverse readBlobFromFile' (fileForPath <$> paths)
+      strPaths <- maybeM (liftIO (many getLine)) maybePaths
+      let paths = rights (Path.parse <$> strPaths)
+      blobs <- traverse readBlobFromPath paths
       case paths of
-        (x:_) -> pure $! Project (takeDirectory x) blobs (Language.languageForFilePath x) mempty
+        (x:_) -> pure $! Project (Path.toString (Path.takeDirectory x)) blobs (Language.forPath x) mempty
         _     -> pure $! Project "/" mempty Language.Unknown mempty
 
     allLanguages = intercalate "|" . fmap show $ [Language.Go .. maxBound]
@@ -182,8 +186,8 @@ languageModes = Language.PerLanguageModes
                     <> value Language.Precise
                     <> showDefault)
 
-filePathReader :: ReadM File
-filePathReader = fileForPath <$> str
+filePathReader :: ReadM (File.File Language.Language)
+filePathReader = File.fromPath <$> path
 
 path :: (Path.PartClass.FileDir fd) => ReadM (Path.AbsRel fd)
 path = eitherReader Path.parse

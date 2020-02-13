@@ -1,12 +1,13 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Tags.Spec (spec) where
 
-import Control.Carrier.Reader
-import Semantic.Api.Symbols
-import Source.Loc
-import SpecHelpers
+import qualified Analysis.File as File
+import           Control.Carrier.Reader
+import           Semantic.Api.Symbols
+import           Source.Loc
+import           SpecHelpers
 import qualified System.Path as Path
-import Tags.Tagging as Tags
+import           Tags.Tagging as Tags
 
 spec :: Spec
 spec = do
@@ -90,4 +91,4 @@ spec = do
         ]
 
 parseTestFile :: Foldable t => t Tags.Kind -> Path.RelFile -> IO [Tag]
-parseTestFile include path = runTaskOrDie $ readBlob (fileForPath (Path.toString path)) >>= runReader defaultLanguageModes . fmap (filter ((`elem` include) . kind)) . tagsForBlob
+parseTestFile include path = runTaskOrDie $ readBlob (File.fromPath path) >>= runReader defaultLanguageModes . fmap (filter ((`elem` include) . kind)) . tagsForBlob

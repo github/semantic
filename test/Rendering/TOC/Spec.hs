@@ -1,27 +1,32 @@
-{-# LANGUAGE DataKinds, FlexibleContexts, MonoLocalBinds, OverloadedStrings, TupleSections, TypeOperators #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE MonoLocalBinds #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TupleSections #-}
+{-# LANGUAGE TypeOperators #-}
 module Rendering.TOC.Spec (spec) where
 
-import Analysis.TOCSummary
-import Control.Effect.Parse
-import Control.Monad.IO.Class
-import Data.Aeson hiding (defaultOptions)
-import Data.Bifunctor
-import Data.Diff
-import Data.Either (isRight)
-import Data.Sum
-import Data.Term
-import Data.Text (Text)
-import Diffing.Interpreter
-import Prelude
+import           Analysis.TOCSummary
+import           Control.Effect.Parse
+import           Control.Monad.IO.Class
+import           Data.Aeson hiding (defaultOptions)
+import           Data.Bifunctor
+import           Data.Diff
+import           Data.Either (isRight)
+import           Data.Sum
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
-import Rendering.TOC
-import Semantic.Api (diffSummaryBuilder, summarizeTerms, summarizeTermParsers)
-import Serializing.Format as Format
-import Source.Loc
-import Source.Span
-import qualified System.Path as Path
+import           Data.Term
+import           Data.Text (Text)
+import           Diffing.Interpreter
+import           Prelude
+import           Rendering.TOC
+import           Semantic.Api (diffSummaryBuilder, summarizeTermParsers, summarizeTerms)
+import           Serializing.Format as Format
+import           Source.Loc
+import           Source.Span
 import           System.Path ((</>))
+import qualified System.Path as Path
 
 import SpecHelpers
 
@@ -140,8 +145,8 @@ spec = do
 
     it "produces JSON output if there are parse errors" $ do
       blobs <- blobsForPaths (Path.relFile "ruby/toc/methods.A.rb") (Path.relFile "ruby/toc/methods.X.rb")
-      output <- runTaskOrDie (runReader aLaCarteLanguageModes (diffSummaryBuilder Format.JSON [blobs]))
-      runBuilder output `shouldBe` ("{\"files\":[{\"path\":\"test/fixtures/ruby/toc/methods.A.rb -> test/fixtures/ruby/toc/methods.X.rb\",\"language\":\"Ruby\",\"changes\":[{\"category\":\"Method\",\"term\":\"bar\",\"span\":{\"start\":{\"line\":1,\"column\":1},\"end\":{\"line\":2,\"column\":4}},\"changeType\":\"REMOVED\"},{\"category\":\"Method\",\"term\":\"baz\",\"span\":{\"start\":{\"line\":4,\"column\":1},\"end\":{\"line\":5,\"column\":4}},\"changeType\":\"REMOVED\"}],\"errors\":[{\"error\":\"expected end of input nodes, but got ParseError\",\"span\":{\"start\":{\"line\":1,\"column\":1},\"end\":{\"line\":2,\"column\":3}}}]}]}\n" :: ByteString)
+      output <- runTaskOrDie (runReader defaultLanguageModes (diffSummaryBuilder Format.JSON [blobs]))
+      runBuilder output `shouldBe` ("{\"files\":[{\"path\":\"test/fixtures/ruby/toc/methods.A.rb -> test/fixtures/ruby/toc/methods.X.rb\",\"language\":\"Ruby\",\"changes\":[{\"category\":\"Method\",\"term\":\"bar\",\"span\":{\"start\":{\"line\":1,\"column\":1},\"end\":{\"line\":2,\"column\":4}},\"changeType\":\"REMOVED\"},{\"category\":\"Method\",\"term\":\"baz\",\"span\":{\"start\":{\"line\":4,\"column\":1},\"end\":{\"line\":5,\"column\":4}},\"changeType\":\"REMOVED\"}],\"errors\":[{\"error\":\"expected end of input nodes, but got ParseError\",\"span\":{\"start\":{\"line\":1,\"column\":1},\"end\":{\"line\":3,\"column\":1}}}]}]}\n" :: ByteString)
 
     it "ignores anonymous functions" $ do
       blobs <- blobsForPaths (Path.relFile "ruby/toc/lambda.A.rb") (Path.relFile "ruby/toc/lambda.B.rb")

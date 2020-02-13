@@ -1,5 +1,14 @@
-{-# LANGUAGE FlexibleContexts, FlexibleInstances, GADTs, LambdaCase, MultiParamTypeClasses, RankNTypes,
-             ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Data.Abstract.Value.Concrete
   ( Value (..)
   , ValueError (..)
@@ -7,25 +16,31 @@ module Data.Abstract.Value.Concrete
   , runValueErrorWith
   ) where
 
-import Prologue
-
 import           Control.Carrier.Resumable.Either (SomeError)
 import qualified Control.Carrier.Resumable.Either as Either
 import qualified Control.Carrier.Resumable.Resume as With
+import           Control.Exception (ArithException)
+import           Data.Bits (shiftR)
+import           Data.Foldable
+import           Data.Function
+import           Data.Functor
+import           Data.Functor.Classes
 import           Data.List (genericIndex, genericLength)
 import qualified Data.Map.Strict as Map
 import           Data.Scientific.Exts
-import           Data.Text (pack)
+import           Data.Semilattice.Lower
+import           Data.Text (Text, pack)
+import           Data.Word
 
+import           Analysis.Name
 import           Control.Abstract hiding
     (Array (..), Boolean (..), Function (..), Hash (..), Numeric (..), Object (..), String (..), Unit (..), While (..))
 import qualified Control.Abstract as Abstract
 import           Control.Algebra
 import           Control.Effect.Interpose
 import           Data.Abstract.BaseError
-import           Data.Abstract.Evaluatable (Declarations, EvalError (..), UnspecializedError (..))
+import           Data.Abstract.Evaluatable (Declarations, EvalError (..), UnspecializedError (..), __self)
 import           Data.Abstract.FreeVariables
-import           Data.Abstract.Name
 import qualified Data.Abstract.Number as Number
 
 

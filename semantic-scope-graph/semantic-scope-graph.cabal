@@ -20,12 +20,20 @@ tested-with:         GHC == 8.6.5
 
 library
   exposed-modules:
-    Control.Carrier.Sketch.Fresh
-    Control.Effect.Sketch
-    ScopeGraph.Convert
+    Control.Carrier.Sketch.ScopeGraph
+    Control.Effect.ScopeGraph
+    Control.Effect.ScopeGraph.Properties.Declaration
+    Control.Effect.ScopeGraph.Properties.Function
+    Control.Effect.ScopeGraph.Properties.Reference
+    Scope.Graph.AdjacencyList
+    Scope.Graph.Convert
+    Scope.Info
+    Scope.Path
+    Scope.Reference
+    Scope.Scope
+    Scope.Types
     Data.Hole
     Data.Module
-    Data.Name
     Data.ScopeGraph
   build-depends:
       base                >= 4.13 && < 5
@@ -33,12 +41,14 @@ library
     , algebraic-graphs    >= 0.3 && < 0.5
     , containers
     , fused-effects      ^>= 1.0
+    , generic-monoid
+    , generic-lens
     , hashable
     , lens
-    , semilattices
-    , generic-monoid
     , pathtype
-    , semantic-source    ^>= 0.0
+    , semantic-analysis
+    , semantic-source    ^>= 0.0.2
+    , semilattices
     , text               ^>= 1.2.3.1
   hs-source-dirs:      src
   default-language:    Haskell2010

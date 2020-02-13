@@ -17,8 +17,8 @@ import Control.Effect.Reader
 import Control.Effect.State
 import Data.Abstract.Module
 import Data.Abstract.Package
+import Data.Maybe
 import GHC.Stack
-import Prologue
 import Source.Span
 
 -- | Get the currently evaluating 'ModuleInfo'.

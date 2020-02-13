@@ -10,7 +10,7 @@ module Core.Pretty
 
 import           Analysis.File
 import           Core.Core
-import           Core.Name
+import           Core.Name hiding (name)
 import           Data.Foldable (toList)
 import           Data.Text.Prettyprint.Doc
 import qualified Data.Text.Prettyprint.Doc.Render.String as Pretty
@@ -43,7 +43,9 @@ primitive = keyword . mappend "#"
 data Style = Unicode | Ascii
 
 name :: Name -> AnsiDoc
-name (Name n) = if needsQuotation (Name n) then enclose (symbol "#{") (symbol "}") (pretty n) else pretty n
+name n
+  | needsQuotation n = enclose (symbol "#{") (symbol "}") (pretty (formatName n))
+  | otherwise        = pretty (formatName n)
 
 prettyCore :: Style -> Term Core Name -> AnsiDoc
 prettyCore style = unPrec . go . fmap name

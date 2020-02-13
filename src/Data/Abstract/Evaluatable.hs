@@ -1,4 +1,13 @@
-{-# LANGUAGE DataKinds, FlexibleContexts, GADTs, KindSignatures, OverloadedStrings, RankNTypes, StandaloneDeriving, TypeApplications, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Data.Abstract.Evaluatable
 ( module X
 , Evaluatable(..)
@@ -15,33 +24,61 @@ module Data.Abstract.Evaluatable
 , runUnspecialized
 , runUnspecializedWith
 , throwUnspecializedError
+, __self
 ) where
-
-import Prologue
 
 import           Control.Algebra
 import qualified Control.Carrier.Resumable.Either as Either
 import qualified Control.Carrier.Resumable.Resume as With
+import           Data.Foldable
+import           Data.Functor.Classes
+import           Data.List.NonEmpty (nonEmpty)
 import           Data.Scientific (Scientific)
 import           Data.Semigroup.Foldable
-import           Source.Span (HasSpan(..))
+import           Data.Semilattice.Lower
+import           Data.Sum
+import           Data.Text
+import           GHC.Stack
+import           Source.Span (HasSpan (..))
 
-import Control.Abstract hiding (Load, String)
+import           Analysis.Name as X
+import           Control.Abstract hiding (Load, String)
 import qualified Control.Abstract as Abstract
-import Control.Abstract.Context as X
-import Control.Abstract.Evaluator as X hiding (LoopControl(..), Return(..), catchLoopControl, runLoopControl, catchReturn, runReturn)
-import Control.Abstract.Modules as X (Modules, ModuleResult, ResolutionError(..), load, lookupModule, listModulesInDir, require, resolve, throwResolutionError)
-import Control.Abstract.Value as X hiding (Bitwise(..), Boolean(..), Function(..), Numeric(..), Object(..), Array(..), Hash(..), String(..), Unit(..), While(..))
-import Data.Abstract.BaseError as X
-import Data.Abstract.Declarations as X
-import Data.Abstract.FreeVariables as X
-import Data.Abstract.Module
-import Data.Abstract.Name as X
+import           Control.Abstract.Context as X
+import           Control.Abstract.Evaluator as X hiding
+    (LoopControl (..), Return (..), catchLoopControl, catchReturn, runLoopControl, runReturn)
+import           Control.Abstract.Modules as X
+    ( ModuleResult
+    , Modules
+    , ResolutionError (..)
+    , listModulesInDir
+    , load
+    , lookupModule
+    , require
+    , resolve
+    , throwResolutionError
+    )
+import           Control.Abstract.Value as X hiding
+    ( Array (..)
+    , Bitwise (..)
+    , Boolean (..)
+    , Function (..)
+    , Hash (..)
+    , Numeric (..)
+    , Object (..)
+    , String (..)
+    , Unit (..)
+    , While (..)
+    )
+import           Data.Abstract.AccessControls.Class as X
+import           Data.Abstract.BaseError as X
+import           Data.Abstract.Declarations as X
+import           Data.Abstract.FreeVariables as X
+import           Data.Abstract.Module
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
-import Data.Abstract.AccessControls.Class as X
-import Data.Language
-import Data.Semigroup.App
-import Data.Term
+import           Data.Language
+import           Data.Semigroup.App
+import           Data.Term
 
 -- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
 class (Show1 constr, Foldable constr) => Evaluatable constr where
@@ -116,6 +153,8 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
 traceResolve :: (Show a, Show b, Has Trace sig m) => a -> b -> Evaluator term address value m ()
 traceResolve name path = trace ("resolved " <> show name <> " -> " <> show path)
 
+__self :: Name
+__self = name "__semantic_self"
 
 -- Preludes
 
@@ -189,7 +228,7 @@ defineSelf :: ( Has (State (ScopeGraph address)) sig m
               )
            => Evaluator term address value m ()
 defineSelf = do
-  let self = Declaration X.__self
+  let self = Declaration __self
   declare self ScopeGraph.Prelude Public lowerBound ScopeGraph.Unknown Nothing
   slot <- lookupSlot self
   assign slot =<< object =<< currentFrame

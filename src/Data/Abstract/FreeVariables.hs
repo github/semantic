@@ -1,13 +1,17 @@
-{-# LANGUAGE DefaultSignatures, GeneralizedNewtypeDeriving, StandaloneDeriving, TypeApplications, UndecidableInstances #-}
+{-# LANGUAGE DefaultSignatures #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Data.Abstract.FreeVariables
   ( FreeVariables (..)
   , FreeVariables1 (..)
   ) where
 
-import Data.Abstract.Name
-import           Data.Sum
-import           Data.Term
-import           Prologue
+import Analysis.Name
+import Data.Set (Set)
+import Data.Sum
+import Data.Term
 
 -- | Types which can contain unbound variables.
 class FreeVariables term where

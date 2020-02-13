@@ -1,4 +1,6 @@
-{-# LANGUAGE DeriveGeneric, OverloadedStrings, RankNTypes #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RankNTypes #-}
 -- | Source position and span information
 --
 --   Mostly taken from purescript's SourcePos definition.
@@ -16,9 +18,8 @@ import           Control.DeepSeq (NFData)
 import           Data.Aeson ((.:), (.=))
 import qualified Data.Aeson as A
 import           Data.Hashable (Hashable)
-import           Data.Semilattice.Lower (Lower(..))
 import           GHC.Generics (Generic)
-import           GHC.Stack (SrcLoc(..))
+import           GHC.Stack (SrcLoc (..))
 
 -- | A Span of position information
 data Span = Span
@@ -44,10 +45,6 @@ instance A.FromJSON Span where
     <$> o .: "start"
     <*> o .: "end"
 
-instance Lower Span where
-  lowerBound = Span lowerBound lowerBound
-
-
 -- | Construct a Span with a given value for both its start and end positions.
 point :: Pos -> Span
 point p = Span p p
@@ -56,7 +53,11 @@ spanFromSrcLoc :: SrcLoc -> Span
 spanFromSrcLoc s = Span (Pos (srcLocStartLine s) (srcLocStartCol s)) (Pos (srcLocEndLine s) (srcLocEndCol s))
 
 
--- | Source position information (1-indexed)
+-- | Source position information.
+-- The 'Pos' values associated with ASTs returned from tree-sitter
+-- 'Unmarshal' instances are zero-indexed. Unless you are displaying
+-- span information to a user, you should write your code assuming
+-- zero-indexing.
 data Pos = Pos
   { line   :: {-# UNPACK #-} !Int
   , column :: {-# UNPACK #-} !Int
@@ -76,10 +77,6 @@ instance A.FromJSON Pos where
   parseJSON arr = do
     [ line, col ] <- A.parseJSON arr
     pure $ Pos line col
-
-instance Lower Pos where
-  lowerBound = Pos 1 1
-
 
 line_, column_ :: Lens' Pos Int
 line_   = lens line   (\p l -> p { line   = l })

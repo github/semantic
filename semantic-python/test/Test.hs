@@ -1,4 +1,7 @@
-{-# LANGUAGE OverloadedStrings, ScopedTypeVariables, TypeApplications, TypeOperators #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeOperators #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 module Main (main) where
 
@@ -36,8 +39,8 @@ import           System.Path ((</>))
 import qualified System.Path as Path
 import qualified System.Path.Directory as Path
 import qualified Text.Trifecta as Trifecta
-import qualified TreeSitter.Python as TSP
-import qualified TreeSitter.Unmarshal as TS
+import qualified Language.Python.Grammar as TSP
+import qualified AST.Unmarshal as TS
 
 import qualified Test.Tasty as Tasty
 import qualified Test.Tasty.HUnit as HUnit
@@ -69,7 +72,7 @@ assertEvaluatesTo core k val = do
     (_, files) ->
       HUnit.assertFailure ("Unexpected number of files: " <> show (length files))
 
-  let found = Map.lookup (Name k) env >>= flip IntMap.lookup heap
+  let found = Map.lookup (name k) env >>= flip IntMap.lookup heap
   found HUnit.@?= Just val
 {-# HLINT ignore assertEvaluatesTo #-}
 

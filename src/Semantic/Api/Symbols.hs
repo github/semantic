@@ -1,4 +1,14 @@
-{-# LANGUAGE AllowAmbiguousTypes, DataKinds, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, OverloadedStrings, RecordWildCards, ScopedTypeVariables, TypeApplications, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Semantic.Api.Symbols
   ( legacyParseSymbols
   , parseSymbols
@@ -12,14 +22,17 @@ import           Control.Effect.Reader
 import           Control.Exception
 import           Control.Lens
 import           Data.Abstract.Declarations
-import           Data.Blob hiding (File (..))
+import           Data.Blob
 import           Data.ByteString.Builder
+import           Data.Foldable
+import           Data.Functor.Foldable
 import           Data.Language
+import           Data.Map.Strict (Map)
 import           Data.ProtoLens (defMessage)
-import           Data.Term (IsTerm(..), TermF)
+import           Data.Term (IsTerm (..), TermF)
+import           Data.Text (Text)
 import           Data.Text (pack)
 import qualified Parsing.Parser as Parser
-import           Prologue
 import           Proto.Semantic as P hiding (Blob, BlobPair)
 import           Proto.Semantic_Fields as P
 import           Proto.Semantic_JSON ()
@@ -78,7 +91,6 @@ parseSymbols blobs = do
           & P.language .~ (bridging # blobLanguage')
           & P.symbols .~ mempty
           & P.errors .~ [defMessage & P.error .~ pack e]
-          & P.blobOid .~ blobOid
 
         tagsToFile :: [Tag] -> File
         tagsToFile tags = defMessage
@@ -86,7 +98,6 @@ parseSymbols blobs = do
           & P.language .~ (bridging # blobLanguage')
           & P.symbols .~ fmap tagToSymbol tags
           & P.errors .~ mempty
-          & P.blobOid .~ blobOid
 
         tagToSymbol :: Tag -> Symbol
         tagToSymbol Tag{..} = defMessage

@@ -6,22 +6,21 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
-module ScopeGraph.Convert
+module Scope.Graph.Convert
   ( ToScopeGraph (..)
   , Result (..)
   , todo
   , complete
   ) where
 
-import Control.Effect.Sketch
+import Control.Effect.ScopeGraph
 import Data.List.NonEmpty
-import Data.Name (Name)
 import Data.Typeable
 import Source.Loc
 
 class Typeable t => ToScopeGraph t where
   scopeGraph ::
-    ( Has (Sketch Name) sig m
+    ( ScopeGraphEff sig m
     )
     => t Loc
     -> m Result

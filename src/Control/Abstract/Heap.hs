@@ -1,6 +1,15 @@
-{-# LANGUAGE DeriveFunctor, DeriveGeneric, FlexibleContexts, GADTs, GeneralizedNewtypeDeriving, KindSignatures,
-             RankNTypes, RecordWildCards, ScopedTypeVariables, StandaloneDeriving, TypeOperators,
-             UndecidableInstances #-}
+{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Control.Abstract.Heap
 ( Heap
 , HeapError(..)
@@ -44,6 +53,7 @@ module Control.Abstract.Heap
 , scopeLookup
 ) where
 
+import           Analysis.Name
 import           Control.Abstract.Context (withCurrentCallStack)
 import           Control.Abstract.Evaluator
 import           Control.Abstract.Roots
@@ -58,10 +68,15 @@ import           Data.Abstract.Heap (Heap, Position (..))
 import qualified Data.Abstract.Heap as Heap
 import           Data.Abstract.Live
 import           Data.Abstract.Module (ModuleInfo)
-import           Data.Abstract.Name
 import           Data.Abstract.ScopeGraph (Kind (..), Path (..), putDeclarationScopeAtPosition)
+import           Data.Functor.Classes
+import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
-import           Prologue
+import           Data.Maybe.Exts
+import           Data.Semilattice.Lower
+import           Data.Set (Set)
+import           GHC.Generics (Generic1)
+import           GHC.Stack
 import           Source.Span (Span)
 
 

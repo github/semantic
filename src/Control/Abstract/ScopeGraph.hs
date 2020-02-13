@@ -1,4 +1,16 @@
-{-# LANGUAGE DeriveFunctor, DeriveGeneric, FlexibleContexts, GADTs, GeneralizedNewtypeDeriving, KindSignatures, RankNTypes, RecordWildCards, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Control.Abstract.ScopeGraph
   ( lookup
   , declare
@@ -43,17 +55,31 @@ module Control.Abstract.ScopeGraph
   , ScopeGraph.Path
   ) where
 
+import           Analysis.Name hiding (name)
 import           Control.Abstract.Evaluator hiding (Local)
 import           Control.Algebra
-import qualified Control.Carrier.Resumable.Resume as With
 import qualified Control.Carrier.Resumable.Either as Either
+import qualified Control.Carrier.Resumable.Resume as With
 import           Data.Abstract.BaseError
 import           Data.Abstract.Module
-import           Data.Abstract.Name hiding (name)
-import           Data.Abstract.ScopeGraph (Kind, Declaration(..), EdgeLabel, Reference, Relation(..), Scope (..), ScopeGraph, Slot(..), Info(..), AccessControl(..))
+import           Data.Abstract.ScopeGraph
+    ( AccessControl (..)
+    , Declaration (..)
+    , EdgeLabel
+    , Info (..)
+    , Kind
+    , Reference
+    , Relation (..)
+    , Scope (..)
+    , ScopeGraph
+    , Slot (..)
+    )
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
+import           Data.Functor.Classes
+import           Data.Map (Map)
+import           Data.Maybe.Exts
+import           GHC.Generics (Generic1)
 import           Prelude hiding (lookup)
-import           Prologue
 import           Source.Span
 
 lookup :: ( Ord address

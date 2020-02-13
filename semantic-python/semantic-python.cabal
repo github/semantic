@@ -21,18 +21,22 @@ tested-with:         GHC == 8.6.5
 common haskell
   default-language:    Haskell2010
   build-depends:       base ^>= 4.13
-                     , fused-effects ^>= 1.0
+                     , fused-effects ^>= 1.0.0.1
                      , fused-syntax
                      , parsers ^>= 0.12.10
+                     , semantic-analysis ^>= 0
+                     , semantic-ast
                      , semantic-core ^>= 0.0
-                     , semantic-source ^>= 0.0.1
+                     , semantic-codegen
+                     , semantic-source ^>= 0.0.2
                      , semantic-tags ^>= 0.0
                      , semantic-scope-graph ^>= 0.0
                      , semilattices ^>= 0
+                     , template-haskell ^>= 2.15
                      , text ^>= 1.2.3
                      , tree-sitter ^>= 0.8
                      , tree-sitter-python ^>= 0.8.1
-
+                     , containers
   ghc-options:
     -Weverything
     -Wno-missing-local-signatures
@@ -53,12 +57,15 @@ library
   import: haskell
   exposed-modules:
     Language.Python
+    Language.Python.AST
     Language.Python.Core
+    Language.Python.Grammar
     Language.Python.Failure
     Language.Python.Patterns
     Language.Python.ScopeGraph
     Language.Python.Tags
   hs-source-dirs: src
+  build-depends: lens ^>= 4.18
 
 test-suite compiling
   import: haskell
@@ -79,6 +86,7 @@ test-suite compiling
                , process ^>= 1.6.5
                , resourcet ^>= 1.2.2
                , semantic-analysis ^>= 0
+               , semantic-codegen
                , streaming ^>= 0.2.2
                , streaming-process ^>= 0.1
                , streaming-bytestring ^>= 0.1.6
@@ -99,6 +107,7 @@ test-suite graphing
 
   build-depends: base
                , semantic-python
+               , semantic-codegen
                , semantic-scope-graph
                , bytestring
                , pathtype

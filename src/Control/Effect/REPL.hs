@@ -1,4 +1,12 @@
-{-# LANGUAGE DeriveFunctor, DeriveGeneric, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, KindSignatures, MultiParamTypeClasses, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 module Control.Effect.REPL
   ( REPL (..)
@@ -8,12 +16,14 @@ module Control.Effect.REPL
   , runREPL
   ) where
 
-import Prologue
 
-import Control.Algebra
-import Control.Carrier.Reader
-import System.Console.Haskeline
+import           Control.Algebra
+import           Control.Carrier.Reader
+import           Control.Monad.IO.Class
+import           Data.Text (Text)
 import qualified Data.Text as T
+import           GHC.Generics (Generic1)
+import           System.Console.Haskeline
 
 data REPL (m :: * -> *) k
   = Prompt Text (Maybe Text -> m k)
