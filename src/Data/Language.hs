@@ -5,7 +5,6 @@ module Data.Language
   , defaultLanguageModes
   , preciseLanguageModes
   , aLaCarteLanguageModes
-  , LanguageMode(..)
   , codeNavLanguages
   , supportedExts
   ) where
