@@ -1,13 +1,37 @@
-(Statements
-  (AugmentedAssignment
-    (RShift
-      (Identifier)
-      (Integer)))
-  (AugmentedAssignment
-    (DividedBy
-      (Identifier)
-      (Integer)))
-  (AugmentedAssignment
-    (Plus
-      (Identifier)
-      (Integer))))
+(Module 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (AugmentedAssignment 
+        (Token) 
+        (ExpressionList 
+          (Expression 
+            (PrimaryExpression 
+              (Identifier "a")))) 
+        (ExpressionList 
+          (Expression 
+            (PrimaryExpression 
+              (Integer "2"))))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (AugmentedAssignment 
+        (Token) 
+        (ExpressionList 
+          (Expression 
+            (PrimaryExpression 
+              (Identifier "d")))) 
+        (ExpressionList 
+          (Expression 
+            (PrimaryExpression 
+              (Integer "1"))))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (AugmentedAssignment 
+        (Token) 
+        (ExpressionList 
+          (Expression 
+            (PrimaryExpression 
+              (Identifier "b")))) 
+        (ExpressionList 
+          (Expression 
+            (PrimaryExpression 
+              (Integer "1"))))))))

@@ -40,6 +40,7 @@ library
   import: common
   hs-source-dirs: src
   exposed-modules:
+    Analysis.Blob
     Analysis.Carrier.Env.Monovariant
     Analysis.Carrier.Env.Precise
     Analysis.Carrier.Heap.Monovariant
@@ -54,6 +55,7 @@ library
     Analysis.ImportGraph
     Analysis.Intro
     Analysis.Name
+    Analysis.Project
     Analysis.Typecheck
     Control.Carrier.Fail.WithLoc
   build-depends:

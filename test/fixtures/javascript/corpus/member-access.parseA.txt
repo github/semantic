@@ -1,4 +1,8 @@
-(Statements
-  (MemberAccess
-    (Identifier)
-    (Identifier)))
+(Program 
+  (Statement 
+    (ExpressionStatement 
+      (Expression 
+        (MemberExpression 
+          (PropertyIdentifier "someProperty") 
+          (Expression 
+            (Identifier "x")))))))

@@ -1,3 +1,4 @@
-(Statements
-  (Yield
-    (Empty)))
+(Module 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Yield))))

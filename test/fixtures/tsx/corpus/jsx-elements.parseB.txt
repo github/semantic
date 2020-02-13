@@ -1,19 +1,23 @@
-(Statements
-  (VariableDeclaration
-    (Assignment
-      (Empty)
-      (Identifier)
-      (JsxElement
-        (JsxOpeningElement
-          (Identifier)
-          (Empty)
-          (JsxAttribute
-            (Identifier)
-            (JsxExpression
-              (MemberAccess
-                (Identifier)
-                (Identifier)))))
-        (JsxExpression
-          (Identifier))
-        (JsxClosingElement
-          (Identifier))))))
+(Program 
+  (Statement 
+    (Declaration 
+      (VariableDeclaration 
+        (VariableDeclarator 
+          (Expression 
+            (JsxElement 
+              (JsxClosingElement 
+                (Identifier "Text")) 
+              (JsxOpeningElement 
+                (JsxAttribute 
+                  (PropertyIdentifier "bar") 
+                  (JsxExpression 
+                    (Expression 
+                      (MemberExpression 
+                        (PropertyIdentifier "titleText") 
+                        (Expression 
+                          (Identifier "styles")))))) 
+                (Identifier "Text")) 
+              (JsxExpression 
+                (Expression 
+                  (Identifier "children"))))) 
+          (Identifier "a"))))))

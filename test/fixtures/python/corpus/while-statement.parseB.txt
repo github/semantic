@@ -1,10 +1,13 @@
-(Statements
-  (While
-    (Identifier)
-    (Statements
-      (Break
-        (Empty))
-      (Continue
-        (Empty))
-      (NoOp
-        (Empty)))))
+(Module 
+  (CompoundStatement 
+    (WhileStatement 
+      (Block 
+        (SimpleStatement 
+          (BreakStatement "break")) 
+        (SimpleStatement 
+          (ContinueStatement "continue")) 
+        (SimpleStatement 
+          (PassStatement "pass"))) 
+      (Expression 
+        (PrimaryExpression 
+          (Identifier "false"))))))

@@ -1,6 +1,5 @@
 (Document 
   (Value 
     (Array 
-      [ 
-        (Value 
-          (True "true")) ])))
+      (Value 
+        (True "true")))))

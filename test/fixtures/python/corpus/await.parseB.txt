@@ -1,11 +1,20 @@
-(Statements
-  (Call
-    (Identifier)
-    (Plus
-      (Integer)
-      (Integer))
-    (Empty))
-  (Call
-    (Identifier)
-    (Identifier)
-    (Empty)))
+(Module 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (Await 
+          (Expression 
+            (PrimaryExpression 
+              (BinaryOperator 
+                (Token) 
+                (PrimaryExpression 
+                  (Integer "2")) 
+                (PrimaryExpression 
+                  (Integer "1"))))))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (Await 
+          (Expression 
+            (PrimaryExpression 
+              (Identifier "c"))))))))

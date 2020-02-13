@@ -1,42 +1,80 @@
-(Statements
-  (Method
-    (Empty)
-    (Identifier)
-    (Statements))
-  (Method
-    (Empty)
-    (Identifier)
-    (Statements))
-  (Method
-    (Empty)
-    (Identifier)
-    (Identifier)
-    (Statements))
-  (Method
-    (Empty)
-    (Identifier)
-    (Identifier)
-    (Identifier)
-    (Identifier)
-    (Empty)
-    (Statements))
-  (Method
-    (Empty)
-    (Identifier)
-    (Identifier)
-    (Statements))
-  (Method
-    (Empty)
-    (Identifier)
-    (Identifier)
-    (Statements))
-  (Method
-    (This)
-    (Identifier)
-    (Statements))
-  (Method
-    (This)
-    (Identifier)
-    (Identifier)
-    (Identifier)
-    (Statements)))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Method 
+          (MethodName 
+            (Identifier "foo")))))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Method 
+          (MethodName 
+            (Setter 
+              (Identifier "bar"))))))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Method 
+          (MethodName 
+            (Operator "-@")) 
+          (MethodParameters 
+            (Identifier "a")))))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Method 
+          (MethodName 
+            (Identifier "foo")) 
+          (MethodParameters 
+            (Identifier "a") 
+            (KeywordParameter 
+              (Arg 
+                (Primary 
+                  (Lhs 
+                    (False "false")))) 
+              (Identifier "b")) 
+            (KeywordParameter 
+              (Arg 
+                (Primary 
+                  (Lhs 
+                    (Nil "nil")))) 
+              (Identifier "c")) 
+            (HashSplatParameter)))))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Method 
+          (MethodName 
+            (Identifier "foo")) 
+          (MethodParameters 
+            (SplatParameter 
+              (Identifier "args"))))))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Method 
+          (MethodName 
+            (Identifier "foo")) 
+          (MethodParameters 
+            (BlockParameter 
+              (Identifier "block"))))))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (SingletonMethod 
+          (MethodName 
+            (Identifier "foo")) 
+          (Variable 
+            (Self "self")))))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (SingletonMethod 
+          (MethodName 
+            (Identifier "foo")) 
+          (MethodParameters 
+            (Identifier "a") 
+            (Identifier "b")) 
+          (Variable 
+            (Self "self")))))))

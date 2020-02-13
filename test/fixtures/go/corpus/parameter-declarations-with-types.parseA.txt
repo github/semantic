@@ -1,15 +1,21 @@
-(Statements
-  (Package
-    (Identifier))
-  (Function
-    (Identifier)
-    (Statements))
-  (Function
-    (Identifier)
-    (Statements
-      (Identifier)
-      (Identifier))
-    (Statements
-      (Identifier)
-      (Identifier))
-    (Statements)))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (FunctionDeclaration 
+    (Block) 
+    (Identifier "main") 
+    (ParameterList)) 
+  (FunctionDeclaration 
+    (Block) 
+    (Identifier "foo") 
+    (ParameterList 
+      (ParameterDeclaration 
+        (Identifier "a") 
+        (Type 
+          (SimpleType 
+            (TypeIdentifier "int")))) 
+      (ParameterDeclaration 
+        (Identifier "b") 
+        (Type 
+          (SimpleType 
+            (TypeIdentifier "string")))))))

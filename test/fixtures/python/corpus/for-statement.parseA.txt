@@ -1,37 +1,75 @@
-(Statements
-  (Else
-    (ForEach
-      (Statements
-        (Identifier)
-        (Identifier))
-      (Identifier)
-      (Statements
-        (Call
-          (Identifier)
-          (Identifier)
-          (Empty))
-        (ForEach
-          (Statements
-            (Identifier)
-            (Identifier))
-          (Identifier)
-          (Statements
-            (Call
-              (Identifier)
-              (Identifier)
-              (Empty))))))
-    (Call
-      (Identifier)
-      (Identifier)
-      (Empty)))
-  (ForEach
-    (Identifier)
-    (Array
-      (Tuple
-        (Integer))
-      (Tuple
-        (Integer))
-      (Tuple
-        (Integer)))
-    (Statements
-      (Identifier))))
+(Module 
+  (CompoundStatement 
+    (ForStatement 
+      (ElseClause 
+        (Block 
+          (SimpleStatement 
+            (PrintStatement 
+              (Expression 
+                (PrimaryExpression 
+                  (Identifier "x"))))))) 
+      (Block 
+        (SimpleStatement 
+          (PrintStatement 
+            (Expression 
+              (PrimaryExpression 
+                (Identifier "line"))))) 
+        (CompoundStatement 
+          (ForStatement 
+            (Block 
+              (SimpleStatement 
+                (PrintStatement 
+                  (Expression 
+                    (PrimaryExpression 
+                      (Identifier "character")))))) 
+            (Variables 
+              (PrimaryExpression 
+                (Identifier "character")) 
+              (PrimaryExpression 
+                (Identifier "j"))) 
+            (ExpressionList 
+              (Expression 
+                (PrimaryExpression 
+                  (Identifier "line"))))))) 
+      (Variables 
+        (PrimaryExpression 
+          (Identifier "line")) 
+        (PrimaryExpression 
+          (Identifier "i"))) 
+      (ExpressionList 
+        (Expression 
+          (PrimaryExpression 
+            (Identifier "lines")))))) 
+  (CompoundStatement 
+    (ForStatement 
+      (Block 
+        (SimpleStatement 
+          (ExpressionStatement 
+            (Expression 
+              (PrimaryExpression 
+                (Identifier "x")))))) 
+      (Variables 
+        (PrimaryExpression 
+          (Identifier "x"))) 
+      (ExpressionList 
+        (Expression 
+          (PrimaryExpression 
+            (List 
+              (Expression 
+                (PrimaryExpression 
+                  (Tuple 
+                    (Expression 
+                      (PrimaryExpression 
+                        (Integer "1")))))) 
+              (Expression 
+                (PrimaryExpression 
+                  (Tuple 
+                    (Expression 
+                      (PrimaryExpression 
+                        (Integer "2")))))) 
+              (Expression 
+                (PrimaryExpression 
+                  (Tuple 
+                    (Expression 
+                      (PrimaryExpression 
+                        (Integer "3")))))))))))))

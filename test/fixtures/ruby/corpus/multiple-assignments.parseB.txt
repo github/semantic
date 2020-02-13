@@ -1,9 +1,23 @@
-(Statements
-  (Assignment
-    (Statements
-      (Identifier)
-      (Identifier))
-    (Array
-      (Integer)
-      (Integer)
-      (Integer))))
+(Program 
+  (Statement 
+    (Assignment 
+      (LeftAssignmentList 
+        (Lhs 
+          (Variable 
+            (Identifier "x"))) 
+        (RestAssignment 
+          (Lhs 
+            (Variable 
+              (Identifier "y"))))) 
+      (Arg 
+        (Primary 
+          (Array 
+            (Arg 
+              (Primary 
+                (Integer "10"))) 
+            (Arg 
+              (Primary 
+                (Integer "20"))) 
+            (Arg 
+              (Primary 
+                (Integer "30")))))))))

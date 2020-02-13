@@ -1,5 +1,9 @@
-(Statements
-  (TypeAssertion
-    (TypeArguments
-      (PredefinedType))
-    (Identifier)))
+(Program 
+  (Statement 
+    (ExpressionStatement 
+      (Expression 
+        (TypeAssertion 
+          (TypeArguments 
+            (PredefinedType "string")) 
+          (Expression 
+            (Identifier "foo")))))))

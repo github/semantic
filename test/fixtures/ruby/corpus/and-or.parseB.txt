@@ -1,14 +1,35 @@
-(Statements
-  (LowPrecedenceOr
-    (Send
-      (Identifier))
-    (Send
-      (Identifier)))
-  (LowPrecedenceAnd
-    (LowPrecedenceOr
-      (Send
-        (Identifier))
-      (Send
-        (Identifier)))
-    (Send
-      (Identifier))))
+(Program 
+  (Statement 
+    (Binary 
+      (Token) 
+      (Arg 
+        (Primary 
+          (Lhs 
+            (Variable 
+              (Identifier "foo"))))) 
+      (Arg 
+        (Primary 
+          (Lhs 
+            (Variable 
+              (Identifier "bar"))))))) 
+  (Statement 
+    (Binary 
+      (Token) 
+      (Arg 
+        (Binary 
+          (Token) 
+          (Arg 
+            (Primary 
+              (Lhs 
+                (Variable 
+                  (Identifier "a"))))) 
+          (Arg 
+            (Primary 
+              (Lhs 
+                (Variable 
+                  (Identifier "b"))))))) 
+      (Arg 
+        (Primary 
+          (Lhs 
+            (Variable 
+              (Identifier "c"))))))))

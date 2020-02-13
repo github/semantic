@@ -9,7 +9,7 @@ import           Control.Carrier.Reader
 import           Control.Exception (throwIO)
 import           Control.Monad
 import           Data.Foldable
-import           Data.Language (LanguageMode (..), PerLanguageModes (..))
+import           Data.Language (PerLanguageModes (..), aLaCarteLanguageModes, preciseLanguageModes)
 import           Gauge
 import           System.FilePath.Glob
 import qualified System.Path as Path
@@ -67,28 +67,6 @@ parseSymbolsFilePath ::
   -> Path.RelFile
   -> m ParseTreeSymbolResponse
 parseSymbolsFilePath languageModes path = readBlob (File.fromPath path) >>= runReader languageModes . parseSymbols . pure @[]
-
-aLaCarteLanguageModes :: PerLanguageModes
-aLaCarteLanguageModes = PerLanguageModes
-  { pythonMode = ALaCarte
-  , rubyMode = ALaCarte
-  , goMode = ALaCarte
-  , typescriptMode = ALaCarte
-  , tsxMode = ALaCarte
-  , javascriptMode = ALaCarte
-  , jsxMode = ALaCarte
-  }
-
-preciseLanguageModes :: PerLanguageModes
-preciseLanguageModes = PerLanguageModes
-  { pythonMode = Precise
-  , rubyMode = Precise
-  , goMode = Precise
-  , typescriptMode = Precise
-  , tsxMode = Precise
-  , javascriptMode = Precise
-  , jsxMode = Precise
-  }
 
 testOptions :: Config.Options
 testOptions = defaultOptions

@@ -160,7 +160,6 @@ library
                      , Data.Language
                      , Data.Map.Monoidal
                      , Data.Maybe.Exts
-                     , Data.Project
                      , Data.Quieterm
                      , Data.Semigroup.App
                      , Data.Scientific.Exts

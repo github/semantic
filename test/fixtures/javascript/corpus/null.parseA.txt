@@ -1,2 +1,5 @@
-(Statements
-  (Null))
+(Program 
+  (Statement 
+    (ExpressionStatement 
+      (Expression 
+        (Null "null")))))

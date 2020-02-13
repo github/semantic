@@ -1,9 +1,25 @@
-(Statements
-  (Subscript
-    (Send
-      (Identifier))
-    (TextElement))
-  (Subscript
-    (Send
-      (Identifier))
-    (SymbolElement)))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Lhs 
+          (ElementReference 
+            (Primary 
+              (Lhs 
+                (Variable 
+                  (Identifier "x")))) 
+            (Arg 
+              (Primary 
+                (String)))))))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Lhs 
+          (ElementReference 
+            (Primary 
+              (Lhs 
+                (Variable 
+                  (Identifier "x")))) 
+            (Arg 
+              (Primary 
+                (Symbol)))))))))

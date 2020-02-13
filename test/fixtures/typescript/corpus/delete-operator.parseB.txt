@@ -1,5 +1,11 @@
-(Statements
-  (Delete
-    (MemberAccess
-      (Identifier)
-      (Identifier))))
+(Program 
+  (Statement 
+    (ExpressionStatement 
+      (Expression 
+        (UnaryExpression 
+          (Token) 
+          (Expression 
+            (MemberExpression 
+              (PropertyIdentifier "prop") 
+              (Expression 
+                (Identifier "thing")))))))))

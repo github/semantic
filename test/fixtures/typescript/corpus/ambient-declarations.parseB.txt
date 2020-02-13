@@ -1,46 +1,54 @@
-(Statements
-  (AmbientDeclaration
-    (InternalModule
-      (Identifier)))
-  (AmbientDeclaration
-    (Class
-      (TypeIdentifier)
-      (Statements)))
-  (AmbientDeclaration
-    (InterfaceDeclaration
-      (Empty)
-      (TypeIdentifier)
-      (ObjectType)))
-  (AmbientDeclaration
-    (Class
-      (TypeIdentifier)
-      (Statements
-        (MethodSignature
-          (Empty)
-          (Empty)
-          (Empty)
-          (Identifier)
-          (RequiredParameter
-            (Empty)
-            (Annotation
-              (PredefinedType))
-            (Identifier)
-            (Empty)))
-        (PublicFieldDefinition
-          (Empty)
-          (Annotation
-            (PredefinedType))
-          (Identifier)
-          (Empty))
-        (MethodSignature
-          (Empty)
-          (Empty)
-          (Annotation
-            (PredefinedType))
-          (Identifier)))))
-  (AmbientDeclaration
-    (AmbientFunction
-      (Empty)
-      (Annotation
-        (TypeIdentifier))
-      (Identifier))))
+(Program 
+  (Statement 
+    (Declaration 
+      (AmbientDeclaration 
+        (Declaration 
+          (InternalModule 
+            (StatementBlock) 
+            (Identifier "Erro")))))) 
+  (Statement 
+    (Declaration 
+      (AmbientDeclaration 
+        (Declaration 
+          (ClassDeclaration 
+            (ClassBody) 
+            (TypeIdentifier "Bar")))))) 
+  (Statement 
+    (Declaration 
+      (AmbientDeclaration 
+        (Declaration 
+          (InterfaceDeclaration 
+            (ObjectType) 
+            (TypeIdentifier "LogOptions")))))) 
+  (Statement 
+    (Declaration 
+      (AmbientDeclaration 
+        (Declaration 
+          (ClassDeclaration 
+            (ClassBody 
+              (MethodSignature 
+                (PropertyIdentifier "constructor") 
+                (FormalParameters 
+                  (RequiredParameter 
+                    (Identifier "greeting") 
+                    (TypeAnnotation 
+                      (PredefinedType "string"))))) 
+              (PublicFieldDefinition 
+                (PropertyIdentifier "greeting") 
+                (TypeAnnotation 
+                  (PredefinedType "string"))) 
+              (MethodSignature 
+                (TypeAnnotation 
+                  (PredefinedType "void")) 
+                (PropertyIdentifier "showGreeting") 
+                (FormalParameters))) 
+            (TypeIdentifier "Greeter")))))) 
+  (Statement 
+    (Declaration 
+      (AmbientDeclaration 
+        (Declaration 
+          (FunctionSignature 
+            (TypeAnnotation 
+              (TypeIdentifier "Bar")) 
+            (Identifier "foo") 
+            (FormalParameters)))))))

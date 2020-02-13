@@ -1,23 +1,62 @@
-(Statements
-  (Package
-    (Identifier))
-  (Function
-    (Identifier)
-    (Statements
-      (Identifier)
-      (Negate
-        (Identifier))
-      (Not
-        (ReceiveOperator
-          (Identifier)))
-      (Pointer
-        (Call
-          (Identifier)
-          (Statements)
-          (Empty)))
-      (Complement
-        (Identifier))
-      (Reference
-        (Identifier))
-      (ReceiveOperator
-        (Identifier)))))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (FunctionDeclaration 
+    (Block 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (UnaryExpression 
+              (Token) 
+              (Expression 
+                (Identifier "b")))))) 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (UnaryExpression 
+              (Token) 
+              (Expression 
+                (Identifier "c")))))) 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (UnaryExpression 
+              (Token) 
+              (Expression 
+                (UnaryExpression 
+                  (Token) 
+                  (Expression 
+                    (Identifier "d")))))))) 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (UnaryExpression 
+              (Token) 
+              (Expression 
+                (CallExpression 
+                  (Expression 
+                    (Identifier "bar")) 
+                  (ArgumentList))))))) 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (UnaryExpression 
+              (Token) 
+              (Expression 
+                (Identifier "i")))))) 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (UnaryExpression 
+              (Token) 
+              (Expression 
+                (Identifier "foo")))))) 
+      (Statement 
+        (SimpleStatement 
+          (Expression 
+            (UnaryExpression 
+              (Token) 
+              (Expression 
+                (Identifier "e"))))))) 
+    (Identifier "main") 
+    (ParameterList)))

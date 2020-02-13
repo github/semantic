@@ -1,34 +1,48 @@
-(Statements
-  (Hash
-    (KeyValue
-      (SymbolElement)
-      (TextElement))
-    (KeyValue
-      (SymbolElement)
-      (Integer))
-    (KeyValue
-      (TextElement)
-      (Boolean))
-    (KeyValue
-      (SymbolElement)
-      (Integer)))
-  (Hash)
-  (Hash
-    (Context
-      (Comment)
-      (KeyValue
-        (SymbolElement)
-        (Integer)))
-    (Context
-      (Comment)
-      (Comment)
-      (KeyValue
-        (TextElement)
-        (Integer)))
-    (Context
-      (Comment)
-      (Empty)))
-  (Hash
-    (Context
-      (Comment)
-      (Empty))))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Hash 
+          (Pair 
+            (Arg 
+              (Primary 
+                (String))) 
+            (Symbol)) 
+          (Pair 
+            (Arg 
+              (Primary 
+                (Integer "1"))) 
+            (Symbol)) 
+          (Pair 
+            (Arg 
+              (Primary 
+                (Lhs 
+                  (False "false")))) 
+            (String)) 
+          (Pair 
+            (Arg 
+              (Primary 
+                (Integer "10"))) 
+            (Symbol)))))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Hash)))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Hash 
+          (Pair 
+            (Arg 
+              (Primary 
+                (Integer "1"))) 
+            (Symbol)) 
+          (Pair 
+            (Arg 
+              (Primary 
+                (Integer "1"))) 
+            (String)))))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Hash)))))

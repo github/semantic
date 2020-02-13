@@ -1,27 +1,52 @@
-(Statements
-  (Package
-    (Identifier))
-  (Function
-    (Identifier)
-    (Statements
-      (Assignment
-        (Identifier)
-        (Composite
-          (Slice
-            (Identifier))
-          (Statements)))
-      (Assignment
-        (Identifier)
-        (Composite
-          (Slice
-            (Identifier))
-          (Statements
-            (TextElement))))
-      (Assignment
-        (Identifier)
-        (Composite
-          (Slice
-            (Identifier))
-          (Statements
-            (TextElement)
-            (TextElement)))))))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (FunctionDeclaration 
+    (Block 
+      (Statement 
+        (ConstDeclaration 
+          (ConstSpec 
+            (ExpressionList 
+              (Expression 
+                (CompositeLiteral 
+                  (LiteralValue) 
+                  (SliceType 
+                    (Type 
+                      (SimpleType 
+                        (TypeIdentifier "string"))))))) 
+            (Identifier "s1")))) 
+      (Statement 
+        (ConstDeclaration 
+          (ConstSpec 
+            (ExpressionList 
+              (Expression 
+                (CompositeLiteral 
+                  (LiteralValue 
+                    (Element 
+                      (Expression 
+                        (InterpretedStringLiteral)))) 
+                  (SliceType 
+                    (Type 
+                      (SimpleType 
+                        (TypeIdentifier "string"))))))) 
+            (Identifier "s2")))) 
+      (Statement 
+        (ConstDeclaration 
+          (ConstSpec 
+            (ExpressionList 
+              (Expression 
+                (CompositeLiteral 
+                  (LiteralValue 
+                    (Element 
+                      (Expression 
+                        (InterpretedStringLiteral))) 
+                    (Element 
+                      (Expression 
+                        (InterpretedStringLiteral)))) 
+                  (SliceType 
+                    (Type 
+                      (SimpleType 
+                        (TypeIdentifier "string"))))))) 
+            (Identifier "s3"))))) 
+    (Identifier "main") 
+    (ParameterList)))

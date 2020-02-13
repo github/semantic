@@ -1,54 +1,97 @@
-(Statements
-  (QualifiedExport)
-  (QualifiedExport)
-  (DefaultExport
-    (VariableDeclaration
-      (Assignment
-        (Empty)
-        (Identifier)
-        (Empty))
-      (Assignment
-        (Empty)
-        (Identifier)
-        (Empty))
-      (Assignment
-        (Empty)
-        (Identifier)
-        (Empty))))
-  (DefaultExport
-    (VariableDeclaration
-      (Assignment
-        (Empty)
-        (Identifier)
-        (Identifier))
-      (Assignment
-        (Empty)
-        (Identifier)
-        (Identifier))
-      (Assignment
-        (Empty)
-        (Identifier)
-        (Empty))
-      (Assignment
-        (Empty)
-        (Identifier)
-        (Empty))))
-  (DefaultExport
-    (Identifier))
-  (DefaultExport
-    (Function
-      (Empty)
-      (Empty)
-      (Empty)
-      (StatementBlock)))
-  (DefaultExport
-    (Function
-      (Empty)
-      (Empty)
-      (Identifier)
-      (StatementBlock)))
-  (QualifiedExport)
-  (DefaultExport
-    (TextElement))
-  (QualifiedExportFrom)
-  (QualifiedExportFrom))
+(Program 
+  (Statement 
+    (ExportStatement 
+      (ExportClause 
+        (ExportSpecifier 
+          (Identifier "name1")) 
+        (ExportSpecifier 
+          (Identifier "name2")) 
+        (ExportSpecifier 
+          (Identifier "name3")) 
+        (ExportSpecifier 
+          (Identifier "nameN"))))) 
+  (Statement 
+    (ExportStatement 
+      (ExportClause 
+        (ExportSpecifier 
+          (Identifier "name1") 
+          (Identifier "variable1")) 
+        (ExportSpecifier 
+          (Identifier "name2") 
+          (Identifier "variable2")) 
+        (ExportSpecifier 
+          (Identifier "nameN"))))) 
+  (Statement 
+    (ExportStatement 
+      (Declaration 
+        (LexicalDeclaration 
+          (VariableDeclarator 
+            (Identifier "name1")) 
+          (VariableDeclarator 
+            (Identifier "name2")) 
+          (VariableDeclarator 
+            (Identifier "nameN")))))) 
+  (Statement 
+    (ExportStatement 
+      (Declaration 
+        (LexicalDeclaration 
+          (VariableDeclarator 
+            (Expression 
+              (Identifier "value1")) 
+            (Identifier "name1")) 
+          (VariableDeclarator 
+            (Expression 
+              (Identifier "value2")) 
+            (Identifier "name2")) 
+          (VariableDeclarator 
+            (Identifier "name3")) 
+          (VariableDeclarator 
+            (Identifier "nameN")))))) 
+  (Statement 
+    (ExportStatement 
+      (Expression 
+        (Identifier "namedFunction")))) 
+  (Statement 
+    (ExportStatement 
+      (Expression 
+        (Function 
+          (StatementBlock) 
+          (FormalParameters))))) 
+  (Statement 
+    (ExportStatement 
+      (Expression 
+        (Function 
+          (StatementBlock) 
+          (Identifier "name1") 
+          (FormalParameters))))) 
+  (Statement 
+    (ExportStatement 
+      (ExportClause 
+        (ExportSpecifier 
+          (Identifier "default") 
+          (Identifier "name1"))))) 
+  (Statement 
+    (ExportStatement 
+      (String))) 
+  (Statement 
+    (ExportStatement 
+      (String) 
+      (ExportClause 
+        (ExportSpecifier 
+          (Identifier "name1")) 
+        (ExportSpecifier 
+          (Identifier "name2")) 
+        (ExportSpecifier 
+          (Identifier "nameN"))))) 
+  (Statement 
+    (ExportStatement 
+      (String) 
+      (ExportClause 
+        (ExportSpecifier 
+          (Identifier "name1") 
+          (Identifier "import1")) 
+        (ExportSpecifier 
+          (Identifier "name2") 
+          (Identifier "import2")) 
+        (ExportSpecifier 
+          (Identifier "nameN"))))))

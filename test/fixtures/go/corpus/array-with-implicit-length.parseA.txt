@@ -1,14 +1,28 @@
-(Statements
-  (Package
-    (Identifier))
-  (Function
-    (Identifier)
-    (Assignment
-      (Identifier)
-      (Composite
-        (Array
-          (Identifier))
-        (Statements
-          (Integer)
-          (Integer)
-          (Integer))))))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (FunctionDeclaration 
+    (Block 
+      (Statement 
+        (ConstDeclaration 
+          (ConstSpec 
+            (ExpressionList 
+              (Expression 
+                (CompositeLiteral 
+                  (LiteralValue 
+                    (Element 
+                      (Expression 
+                        (IntLiteral "1"))) 
+                    (Element 
+                      (Expression 
+                        (IntLiteral "2"))) 
+                    (Element 
+                      (Expression 
+                        (IntLiteral "3")))) 
+                  (ImplicitLengthArrayType 
+                    (Type 
+                      (SimpleType 
+                        (TypeIdentifier "int"))))))) 
+            (Identifier "a1"))))) 
+    (Identifier "main") 
+    (ParameterList)))

@@ -1,3 +1,5 @@
-(Statements
-  (Return
-    (Null)))
+(Program 
+  (Statement 
+    (ReturnStatement 
+      (Expression 
+        (Null "null")))))

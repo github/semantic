@@ -1,10 +1,25 @@
-(Statements
-  (Minus
-    (Plus
-      (Identifier)
-      (Times
-        (Identifier)
-        (Float)))
-    (Modulo
-      (Identifier)
-      (Float))))
+(Program 
+  (Statement 
+    (ExpressionStatement 
+      (Expression 
+        (BinaryExpression 
+          (Token) 
+          (Expression 
+            (BinaryExpression 
+              (Token) 
+              (Expression 
+                (Identifier "i")) 
+              (Expression 
+                (BinaryExpression 
+                  (Token) 
+                  (Expression 
+                    (Identifier "j")) 
+                  (Expression 
+                    (Number "2")))))) 
+          (Expression 
+            (BinaryExpression 
+              (Token) 
+              (Expression 
+                (Identifier "j")) 
+              (Expression 
+                (Number "4")))))))))

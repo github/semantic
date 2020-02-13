@@ -1,2 +1,6 @@
-(Statements
-  (Identifier))
+(Module 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Identifier "a"))))))

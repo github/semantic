@@ -1,32 +1,61 @@
-(Statements
-  (Decorator
-    (Identifier)
-    (Class
-      (Identifier)
-      (Statements
-        (Decorator
-          (Identifier)
-          (Statements)
-          (Decorator
-            (Identifier)
-            (Statements
-              (Identifier))
-            (Decorator
-              (Identifier)
-              (Statements
-                (Identifier))
-              (Decorator
-                (Identifier)
-                (Statements
-                  (Integer)
-                  (Assignment
-                    (Identifier)
-                    (Boolean))
-                  (Statements
-                    (Identifier))
-                  (Statements
-                    (Identifier)))
-                (Function
-                  (Identifier)
-                  (Statements
-                    (Identifier)))))))))))
+(Module 
+  (CompoundStatement 
+    (DecoratedDefinition 
+      (ClassDefinition 
+        (Block 
+          (CompoundStatement 
+            (DecoratedDefinition 
+              (FunctionDefinition 
+                (Block 
+                  (SimpleStatement 
+                    (ExpressionStatement 
+                      (Expression 
+                        (PrimaryExpression 
+                          (Identifier "g")))))) 
+                (Identifier "f") 
+                (Parameters)) 
+              (Decorator 
+                (ArgumentList) 
+                (DottedName 
+                  (Identifier "f"))) 
+              (Decorator 
+                (ArgumentList 
+                  (ListSplat 
+                    (Expression 
+                      (PrimaryExpression 
+                        (Identifier "b"))))) 
+                (DottedName 
+                  (Identifier "b"))) 
+              (Decorator 
+                (ArgumentList 
+                  (DictionarySplat 
+                    (Expression 
+                      (PrimaryExpression 
+                        (Identifier "c"))))) 
+                (DottedName 
+                  (Identifier "c"))) 
+              (Decorator 
+                (ArgumentList 
+                  (Expression 
+                    (PrimaryExpression 
+                      (Integer "2"))) 
+                  (KeywordArgument 
+                    (Expression 
+                      (PrimaryExpression 
+                        (True "True"))) 
+                    (Identifier "c")) 
+                  (ListSplat 
+                    (Expression 
+                      (PrimaryExpression 
+                        (Identifier "a")))) 
+                  (DictionarySplat 
+                    (Expression 
+                      (PrimaryExpression 
+                        (Identifier "d"))))) 
+                (DottedName 
+                  (Identifier "a")))))) 
+        (Identifier "D")) 
+      (Decorator 
+        (DottedName 
+          (Identifier "a") 
+          (Identifier "b"))))))

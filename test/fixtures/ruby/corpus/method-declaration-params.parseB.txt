@@ -1,8 +1,11 @@
-(Statements
-  (Method
-    (Empty)
-    (Identifier)
-    (Identifier)
-    (Identifier)
-    (Identifier)
-    (Statements)))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Method 
+          (MethodName 
+            (Identifier "foo")) 
+          (MethodParameters 
+            (Identifier "a") 
+            (Identifier "b") 
+            (Identifier "c")))))))

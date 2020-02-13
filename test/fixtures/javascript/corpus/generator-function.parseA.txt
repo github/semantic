@@ -1,21 +1,23 @@
-(Statements
-  (Function
-    (Empty)
-    (Empty)
-    (Identifier)
-    (RequiredParameter
-      (Empty)
-      (Empty)
-      (Identifier)
-      (Empty))
-    (RequiredParameter
-      (Empty)
-      (Empty)
-      (Identifier)
-      (Empty))
-    (StatementBlock
-      (Yield
-        (Empty))
-      (Yield
-        (Identifier))))
-  (Empty))
+(Program 
+  (Statement 
+    (Declaration 
+      (GeneratorFunctionDeclaration 
+        (StatementBlock 
+          (Statement 
+            (ExpressionStatement 
+              (Expression 
+                (YieldExpression)))) 
+          (Statement 
+            (ExpressionStatement 
+              (Expression 
+                (YieldExpression 
+                  (Expression 
+                    (Identifier "arg2"))))))) 
+        (Identifier "generateStuff") 
+        (FormalParameters 
+          (RequiredParameter 
+            (Identifier "arg1")) 
+          (RequiredParameter 
+            (Identifier "arg2")))))) 
+  (Statement 
+    (EmptyStatement ";")))
