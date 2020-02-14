@@ -274,6 +274,7 @@ allParsers
      , c Java.Term
      , c JSON.Term
      , c Markdown.Term
+     , c PHPPrecise.Term
      , c PythonALaCarte.Term
      , c PythonPrecise.Term
      , c RubyALaCarte.Term
@@ -292,6 +293,7 @@ allParsers modes = Map.fromList
   , jsonParser
   , jsxParser modes
   , markdownParser
+  , phpParserPrecise
   , pythonParser modes
   , rubyParser modes
   , tsxParser modes
