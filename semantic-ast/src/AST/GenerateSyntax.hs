@@ -74,6 +74,11 @@ getAllSymbols language = do
 syntaxDatatype :: Ptr TS.Language -> [(String, Named)] -> Datatype -> Q [Dec]
 syntaxDatatype language allSymbols datatype = skipDefined $ do
   typeParameterName <- newName "a"
+  generique <- [d|
+    instance ToJSON1 $(conT name) where
+      liftToJSON = genericLiftToJSON defaultOptions { tagSingleConstructors = True }
+    |]
+
   case datatype of
     SumType (DatatypeName _) _ subtypes -> do
       types' <- fieldTypesToNestedSum subtypes
@@ -84,12 +89,12 @@ syntaxDatatype language allSymbols datatype = skipDefined $ do
       pure
         (  NewtypeD [] name [PlainTV typeParameterName] Nothing con [deriveGN, deriveStockClause, deriveAnyClassClause]
         :  hasFieldInstance
-        <> traversalInstances)
+        <> traversalInstances
+        )
     ProductType (DatatypeName datatypeName) named children fields -> do
       con <- ctorForProductType datatypeName typeParameterName children fields
       symbolMatchingInstance <- symbolMatchingInstance allSymbols name named datatypeName
       traversalInstances <- makeTraversalInstances (conT name)
-      generique <- [d| instance ToJSON1 $(conT name) |]
       pure
         (  generatedDatatype name [con] typeParameterName
         :  symbolMatchingInstance
@@ -103,7 +108,6 @@ syntaxDatatype language allSymbols datatype = skipDefined $ do
       con <- ctorForLeafType (DatatypeName datatypeName) typeParameterName
       symbolMatchingInstance <- symbolMatchingInstance allSymbols name Named datatypeName
       traversalInstances <- makeTraversalInstances (conT name)
-      generique <- [d| instance ToJSON1 $(conT name) |]
       pure
         (  generatedDatatype name [con] typeParameterName
         :  symbolMatchingInstance
