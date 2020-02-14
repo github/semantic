@@ -4,12 +4,15 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeOperators #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 module AST.GenerateSyntax
 ( syntaxDatatype
 , astDeclarationsForLanguage
 ) where
 
-import           AST.Deserialize (Children (..), Datatype (..), DatatypeName (..), Field (..), Multiple (..), Named (..), Required (..), Type (..))
+import           AST.Deserialize
+    (Children (..), Datatype (..), DatatypeName (..), Field (..), Multiple (..), Named (..), Required (..), Type (..))
 import           AST.Token
 import           AST.Traversable1.Class
 import qualified AST.Unmarshal as TS
@@ -29,6 +32,11 @@ import           System.FilePath.Posix
 import qualified TreeSitter.Language as TS
 import           TreeSitter.Node
 import           TreeSitter.Symbol (TSSymbol, toHaskellCamelCaseIdentifier, toHaskellPascalCaseIdentifier)
+
+instance (ToJSON1 f, ToJSON1 g) => ToJSON1 (f :+: g) where
+  liftToJSON f g = \case
+    L1 a -> liftToJSON f g a
+    R1 b -> liftToJSON f g b
 
 -- | Derive Haskell datatypes from a language and its @node-types.json@ file.
 --
@@ -81,10 +89,12 @@ syntaxDatatype language allSymbols datatype = skipDefined $ do
       con <- ctorForProductType datatypeName typeParameterName children fields
       symbolMatchingInstance <- symbolMatchingInstance allSymbols name named datatypeName
       traversalInstances <- makeTraversalInstances (conT name)
+      generique <- [d| instance ToJSON1 $(conT name) |]
       pure
         (  generatedDatatype name [con] typeParameterName
         :  symbolMatchingInstance
-        <> traversalInstances)
+        <> traversalInstances
+        <> generique)
       -- Anonymous leaf types are defined as synonyms for the `Token` datatype
     LeafType (DatatypeName datatypeName) Anonymous -> do
       tsSymbol <- runIO $ withCStringLen datatypeName (\(s, len) -> TS.ts_language_symbol_for_name language s len False)
@@ -93,10 +103,12 @@ syntaxDatatype language allSymbols datatype = skipDefined $ do
       con <- ctorForLeafType (DatatypeName datatypeName) typeParameterName
       symbolMatchingInstance <- symbolMatchingInstance allSymbols name Named datatypeName
       traversalInstances <- makeTraversalInstances (conT name)
+      generique <- [d| instance ToJSON1 $(conT name) |]
       pure
         (  generatedDatatype name [con] typeParameterName
         :  symbolMatchingInstance
-        <> traversalInstances)
+        <> traversalInstances
+        <> generique)
   where
     -- Skip generating datatypes that have already been defined (overridden) in the module where the splice is running.
     skipDefined m = do
@@ -106,7 +118,7 @@ syntaxDatatype language allSymbols datatype = skipDefined $ do
     nameStr = toNameString (datatypeNameStatus datatype) (getDatatypeName (AST.Deserialize.datatypeName datatype))
     deriveStockClause = DerivClause (Just StockStrategy) [ ConT ''Eq, ConT ''Ord, ConT ''Show, ConT ''Generic, ConT ''Generic1]
     deriveAnyClassClause = DerivClause (Just AnyclassStrategy) [ConT ''TS.Unmarshal, ConT ''Traversable1 `AppT` VarT (mkName "someConstraint")]
-    deriveGN = DerivClause (Just NewtypeStrategy) [ConT ''TS.SymbolMatching]
+    deriveGN = DerivClause (Just NewtypeStrategy) [ConT ''TS.SymbolMatching, ConT ''ToJSON1]
     generatedDatatype name cons typeParameterName = DataD [] name [PlainTV typeParameterName] Nothing cons [deriveStockClause, deriveAnyClassClause]
 
 

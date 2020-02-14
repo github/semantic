@@ -1,16 +1,23 @@
+{-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 -- | Semantic functionality for JSON programs.
 module Language.PHP
 ( Term(..)
 , TreeSitter.PHP.tree_sitter_php
 ) where
 
+import qualified AST.Unmarshal as TS
+import           Data.Aeson (ToJSON (..), ToJSON1, toJSON1)
 import           Data.Proxy
 import qualified Language.PHP.AST as PHP
 import qualified Tags.Tagging.Precise as Tags
 import qualified TreeSitter.PHP (tree_sitter_php)
-import qualified AST.Unmarshal as TS
 
 newtype Term a = Term { getTerm :: PHP.Program a }
+  deriving newtype ToJSON1
+
+instance ToJSON a => ToJSON (Term a) where
+  toJSON = toJSON1
 
 instance TS.SymbolMatching Term where
   matchedSymbols _ = TS.matchedSymbols (Proxy :: Proxy PHP.Program)

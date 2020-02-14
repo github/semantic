@@ -1,10 +1,14 @@
-{-# LANGUAGE DataKinds, DeriveGeneric, DeriveTraversable, KindSignatures #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE KindSignatures #-}
 module AST.Token
 ( Token(..)
 ) where
 
+import Data.Aeson
 import GHC.Generics (Generic, Generic1)
-import GHC.TypeLits (Symbol, Nat)
+import GHC.TypeLits (Nat, Symbol)
 
 -- | An AST node representing a token, indexed by its name and numeric value.
 --
@@ -15,3 +19,5 @@ import GHC.TypeLits (Symbol, Nat)
 -- @
 newtype Token (symName :: Symbol) (symVal :: Nat) a = Token { ann :: a }
   deriving (Eq, Foldable, Functor, Generic, Generic1, Ord, Show, Traversable)
+
+instance ToJSON1 (Token symName val)

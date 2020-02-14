@@ -1,3 +1,5 @@
+{-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 -- | Semantic functionality for Python programs.
 module Language.Python
 ( Term(..)
@@ -5,6 +7,7 @@ module Language.Python
 ) where
 
 import qualified AST.Unmarshal as TS
+import           Data.Aeson (ToJSON (..), ToJSON1, toJSON1)
 import           Data.Proxy
 import qualified Language.Python.AST as Py
 import qualified Language.Python.Grammar (tree_sitter_python)
@@ -14,6 +17,10 @@ import           Scope.Graph.Convert
 import qualified Tags.Tagging.Precise as Tags
 
 newtype Term a = Term { getTerm :: Py.Module a }
+  deriving newtype ToJSON1
+
+instance ToJSON a => ToJSON (Term a) where
+  toJSON = toJSON1
 
 instance TS.SymbolMatching Term where
   matchedSymbols _ = TS.matchedSymbols (Proxy :: Proxy Py.Module)

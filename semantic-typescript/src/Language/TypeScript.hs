@@ -1,3 +1,5 @@
+{-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# OPTIONS_GHC -freduction-depth=0 #-}
 -- | Semantic functionality for TypeScript programs.
 module Language.TypeScript
@@ -5,14 +7,19 @@ module Language.TypeScript
 , Language.TypeScript.Grammar.tree_sitter_typescript
 ) where
 
+import qualified AST.Unmarshal as TS
+import           Data.Aeson (ToJSON (..), ToJSON1, toJSON1)
 import           Data.Proxy
 import qualified Language.TypeScript.AST as TypeScript
+import qualified Language.TypeScript.Grammar (tree_sitter_typescript)
 import qualified Language.TypeScript.Tags as TsTags
 import qualified Tags.Tagging.Precise as Tags
-import qualified Language.TypeScript.Grammar (tree_sitter_typescript)
-import qualified AST.Unmarshal as TS
 
 newtype Term a = Term { getTerm :: TypeScript.Program a }
+  deriving newtype ToJSON1
+
+instance ToJSON a => ToJSON (Term a) where
+  toJSON = toJSON1
 
 instance TS.SymbolMatching Term where
   matchedSymbols _ = TS.matchedSymbols (Proxy :: Proxy TypeScript.Program)

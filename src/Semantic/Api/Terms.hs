@@ -99,8 +99,8 @@ parseTermBuilder TermDotGraph    = distributeFoldMap (parseWith dotGraphTermPars
 parseTermBuilder TermShow        = distributeFoldMap (\ blob -> asks showTermParsers >>= \ parsers -> parseWith parsers showTerm blob)
 parseTermBuilder TermQuiet       = distributeFoldMap quietTerm
 
-jsonTerm :: (Has (Error SomeException) sig m, Has Parse sig m) => Blob -> m (Rendering.JSON.JSON "trees" SomeJSON)
-jsonTerm blob = parseWith jsonTreeTermParsers (pure . jsonTreeTerm blob) blob `catchError` jsonError blob
+jsonTerm :: (Has (Error SomeException) sig m, Has Parse sig m, Has (Reader PerLanguageModes) sig m) => Blob -> m (Rendering.JSON.JSON "trees" SomeJSON)
+jsonTerm blob = asks jsonTreeTermParsers >>= \parsers -> parseWith parsers (pure . jsonTreeTerm blob) blob `catchError` jsonError blob
 
 jsonError :: Applicative m => Blob -> SomeException -> m (Rendering.JSON.JSON "trees" SomeJSON)
 jsonError blob (SomeException e) = pure $ renderJSONError blob (show e)
@@ -204,8 +204,8 @@ instance (Recursive (term Loc), ToTreeGraph TermVertex (Base (term Loc))) => DOT
   dotGraphTerm = serialize (DOT (termStyle "terms")) . renderTreeGraph
 
 
-jsonTreeTermParsers :: Map Language (SomeParser JSONTreeTerm Loc)
-jsonTreeTermParsers = aLaCarteParsers
+jsonTreeTermParsers :: PerLanguageModes -> Map Language (SomeParser JSONTreeTerm Loc)
+jsonTreeTermParsers = allParsers
 
 class JSONTreeTerm term where
   jsonTreeTerm :: Blob -> term Loc -> Rendering.JSON.JSON "trees" SomeJSON
