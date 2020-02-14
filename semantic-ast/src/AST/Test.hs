@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module AST.Test
+module AST.TestHelpers
   ( CorpusExample(..)
   , readCorpusFiles
   , parseCorpusFile

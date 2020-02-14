@@ -5,7 +5,7 @@ import qualified System.Path as Path
 import           Test.Tasty
 import           TreeSitter.Ruby
 import qualified TreeSitter.Ruby.AST as Rb
-import           AST.Test
+import           AST.TestHelpers
 import           AST.Unmarshal
 
 main :: IO ()

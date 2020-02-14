@@ -5,7 +5,7 @@ import qualified System.Path as Path
 import           Test.Tasty
 import           TreeSitter.Python
 import qualified TreeSitter.Python.AST as Py
-import           AST.Test
+import           AST.TestHelpers
 import           AST.Unmarshal
 
 main :: IO ()

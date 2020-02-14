@@ -47,7 +47,7 @@ library
     AST.Traversable1
     AST.Traversable1.Class
     AST.Unmarshal
-    AST.Test
+    AST.TestHelpers
 
 
   -- other-modules:

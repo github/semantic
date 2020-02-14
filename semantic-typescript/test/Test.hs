@@ -5,7 +5,7 @@ import qualified System.Path as Path
 import           Test.Tasty
 import           TreeSitter.TypeScript
 import qualified TreeSitter.TypeScript.AST as Ts
-import           AST.Test
+import           AST.TestHelpers
 import           AST.Unmarshal
 
 main :: IO ()
